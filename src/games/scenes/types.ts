@@ -54,7 +54,13 @@ export type SceneSound =
   | "crow"
   | "neigh"
   | "hoot"
-  | "croak";
+  | "croak"
+  | "roar"
+  | "trumpet"
+  | "chatter"
+  | "squawk"
+  | "munch"
+  | "snap";
 
 /** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */
 export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" | "small" | "animal" | "wheels";

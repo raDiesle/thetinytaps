@@ -251,6 +251,38 @@ export function playCroak() {
   [0, 0.3].forEach((delay) => note({ from: 190, to: 140, duration: 0.16, type: "sawtooth", volume: 0.25, lowpass: 600, delay }));
 }
 
+/** "Roooar!" – a lion's yawn: a low growl that rises and sinks, soft enough for small ears. */
+export function playRoar() {
+  note({ from: 90, to: 150, duration: 0.35, type: "sawtooth", volume: 0.28, lowpass: 500 });
+  note({ from: 150, to: 80, duration: 0.8, type: "sawtooth", volume: 0.28, lowpass: 500, delay: 0.3 });
+  note({ from: 60, to: 45, duration: 0.9, type: "square", volume: 0.08, lowpass: 300, delay: 0.2 });
+}
+
+/** "Törööö!" – an elephant: a brassy note that climbs and holds. */
+export function playTrumpet() {
+  note({ from: 330, to: 620, duration: 0.25, type: "sawtooth", volume: 0.14, lowpass: 1800 });
+  note({ from: 620, to: 560, duration: 0.7, type: "sawtooth", volume: 0.14, lowpass: 1800, delay: 0.22 });
+  note({ from: 1240, to: 1120, duration: 0.6, type: "triangle", volume: 0.04, delay: 0.25 });
+}
+
+/** "Uh, uh, ah, ah!" – a monkey: short hoots that climb. */
+export function playChatter() {
+  for (let i = 0; i < 5; i++) note({ from: 420 + i * 70, to: 620 + i * 90, duration: 0.1, type: "triangle", volume: 0.18, delay: i * 0.13 });
+}
+
+/** "Kraah!" – a parrot or a peacock: a raspy call, twice. */
+export function playSquawk() {
+  [0, 0.35].forEach((delay) => note({ from: 1100, to: 650, duration: 0.22, type: "sawtooth", volume: 0.1, lowpass: 2600, delay }));
+}
+
+/** "Schnapp, schnapp!" – a crocodile's jaw closing twice. */
+export function playSnap() {
+  [0.3, 1].forEach((delay) => {
+    note({ from: 900, to: 180, duration: 0.07, type: "triangle", volume: 0.35, delay });
+    note({ from: 140, to: 90, duration: 0.12, type: "sine", volume: 0.25, delay });
+  });
+}
+
 /** Three hammer knocks. */
 export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));

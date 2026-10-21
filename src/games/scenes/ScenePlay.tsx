@@ -34,6 +34,12 @@ import {
   playNeigh,
   playHoot,
   playCroak,
+  playRoar,
+  playTrumpet,
+  playChatter,
+  playSquawk,
+  playMunch,
+  playSnap,
   playTweet,
   setSfxVolume,
 } from "@/lib/sfx";
@@ -78,6 +84,12 @@ const SOUNDS: Record<SceneSound, () => void> = {
   neigh: playNeigh,
   hoot: playHoot,
   croak: playCroak,
+  roar: playRoar,
+  trumpet: playTrumpet,
+  chatter: playChatter,
+  squawk: playSquawk,
+  munch: playMunch,
+  snap: playSnap,
 };
 
 /** Key presses closer together than this only spawn shapes. */
