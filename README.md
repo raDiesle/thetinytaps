@@ -34,6 +34,7 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `src/games/animals/` | Game "Was gehört zum Tier?": drag (or tap) the food to the hungry animal, or the animal into its home; the homes are drawn in `homes.tsx`, animals, foods and sentences are in `content.ts` |
 | `src/games/words/` | Game "Wörter tippen": whole word, first letter only, colour words, doing words (all from `de.ts`) |
 | `src/games/teeth/` | Game "Zähne putzen": brushing timer (1–3 minutes, one corner of the mouth per quarter) where sugar monsters vanish from the teeth, with music and spoken hints; no tapping needed, keeps the screen on |
+| `src/games/feelings/` | Game "Gefühle": comfort the bear (`bear.ts`, `BearPlay.tsx`) and kindergarten stories – pushed, kicked, toy taken, slide full, wanting a toy, angry yourself (`kita.ts`, `KitaPlay.tsx`); the animals in `Critter.tsx`, backgrounds in `places.tsx` |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
 | `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
 
@@ -73,3 +74,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 4. ~~Wörter tippen~~
 5. ~~Lebendige Bilder: Wimmelbild Baustelle, Stadt, Bauernhof, Hof am Teich~~ – next: Zoo
 6. ~~Was gehört zum Tier? (Tiere füttern, Wer wohnt wo?)~~
+7. ~~Gefühle: Bär trösten, Kindergarten-Geschichten~~
