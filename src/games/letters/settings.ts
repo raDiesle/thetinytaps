@@ -32,6 +32,8 @@ export interface LettersSettings {
   calm: boolean;
   /** Reveal letter → word → picture and number items one click at a time. */
   stepByStep: boolean;
+  /** Numbers: the child taps every thing to count it; the digit appears after the last one. */
+  countByTap: boolean;
   /** Automatic mode only: ignore new letters/numbers until counting has finished. */
   finishCounting: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
@@ -50,6 +52,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   sounds: true,
   calm: false,
   stepByStep: true,
+  countByTap: false,
   finishCounting: true,
   touchKeys: "auto",
 };

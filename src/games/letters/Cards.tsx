@@ -135,6 +135,8 @@ export function NumberCard({
   zeroEmoji,
   stage,
   hint,
+  tapped,
+  onItemPointer,
   onPointerDown,
 }: {
   n: number;
@@ -143,6 +145,12 @@ export function NumberCard({
   /** Number of items shown; the digit appears once stage > n. */
   stage: number;
   hint: boolean;
+  /**
+   * Counting by tapping: all items are shown, and these item indices have
+   * been tapped, in order. Each tapped item keeps its number.
+   */
+  tapped?: number[];
+  onItemPointer?: (index: number, e: PointerEvent) => void;
   onPointerDown?: PointerEventHandler;
 }) {
   return (
@@ -157,11 +165,28 @@ export function NumberCard({
             const first = ROWS[n].slice(0, row).reduce((sum, k) => sum + k, 0);
             return (
               <div key={row} className="count-row">
-                {Array.from({ length: perRow }, (_, j) => (
-                  <Reveal key={j} visible={first + j < stage} hint={hint}>
-                    <span className="count-item">{thing.emoji}</span>
-                  </Reveal>
-                ))}
+                {Array.from({ length: perRow }, (_, j) => {
+                  const index = first + j;
+                  if (!tapped) {
+                    return (
+                      <Reveal key={j} visible={index < stage} hint={hint}>
+                        <span className="count-item">{thing.emoji}</span>
+                      </Reveal>
+                    );
+                  }
+                  const order = tapped.indexOf(index);
+                  return (
+                    <Reveal key={j} visible hint={hint}>
+                      <span
+                        className={`count-tap${order >= 0 ? " counted" : ""}`}
+                        onPointerDown={(e) => onItemPointer?.(index, e)}
+                      >
+                        <span className="count-item">{thing.emoji}</span>
+                        {order >= 0 && <span className="count-badge">{order + 1}</span>}
+                      </span>
+                    </Reveal>
+                  );
+                })}
               </div>
             );
           })}
