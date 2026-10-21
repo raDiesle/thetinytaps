@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { MOODS } from "./Critter";
+import { imageFor, preloadImages, storyImages } from "./images";
 import { QUESTION, SITUATIONS, type Situation } from "./kita";
 import { PlaceDrawing } from "./places";
 import type { FeelingsSettings } from "./settings";
@@ -105,6 +106,11 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   const startSituation = useCallback(
     (situation: Situation) => {
       clearAll();
+      preloadImages([
+        storyImages.problem(situation.id),
+        storyImages.instead(situation.id),
+        ...situation.steps.map((_, i) => storyImages.step(situation.id, i)),
+      ]);
       setRun(freshRun(situation, nextKey.current++));
       playBeats(situation.intro, () => {
         setRun((r) => ({ ...r, phase: "steps" }));
@@ -211,8 +217,16 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   // Only what the child can choose from now is shown, big; at the end all good steps once more, small.
   let cards: ReactNode = null;
   if (run.phase === "outro" || run.phase === "done") {
-    cards = situation.steps.map((step) => (
-      <ChoiceCard key={step.label} picture={step.picture} place={place} label={step.label} state="done" small />
+    cards = situation.steps.map((step, i) => (
+      <ChoiceCard
+        key={step.label}
+        picture={step.picture}
+        image={imageFor(storyImages.step(situation.id, i))}
+        place={place}
+        label={step.label}
+        state="done"
+        small
+      />
     ));
   } else if (run.phase === "steps") {
     const playing = run.busy && !run.trying;
@@ -220,7 +234,15 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
     const step = situation.steps[index];
     const stepState: CardState = playing ? "playing" : run.trying ? "rest" : "choose";
     const list = [
-      <ChoiceCard key={step.label} picture={step.picture} place={place} label={step.label} state={stepState} onChoose={() => doStep(index)} />,
+      <ChoiceCard
+        key={step.label}
+        picture={step.picture}
+        image={imageFor(storyImages.step(situation.id, index))}
+        place={place}
+        label={step.label}
+        state={stepState}
+        onChoose={() => doStep(index)}
+      />,
     ];
     if (choose && index === 0) {
       const { instead } = situation;
@@ -228,7 +250,15 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
       list.splice(
         run.insteadFirst ? 0 : 1,
         0,
-        <ChoiceCard key="instead" picture={instead.picture} place={place} label={instead.label} state={insteadState} onChoose={tryInstead} />,
+        <ChoiceCard
+          key="instead"
+          picture={instead.picture}
+          image={imageFor(storyImages.instead(situation.id))}
+          place={place}
+          label={instead.label}
+          state={insteadState}
+          onChoose={tryInstead}
+        />,
       );
     }
     cards = list;
@@ -237,19 +267,25 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   // While the bear waits for the child he wonders; trying the not-so-good idea, he sees it crossed out.
   const thought = run.trying ? (
     <span className="fg-thought-picture">
-      <PictureScene picture={situation.instead.picture} place={place} />
+      <PictureScene picture={situation.instead.picture} place={place} image={imageFor(storyImages.instead(situation.id))} />
       <Mark good={false} className="fg-thought-mark" />
     </span>
   ) : ready ? (
     <span className="fg-thought-ask">?</span>
   ) : undefined;
 
+  const problemImage = imageFor(storyImages.problem(situation.id));
+
   return (
     <div className={`story-play kita-play${settings.calm ? " calm" : ""}`} onPointerDown={onStagePointer}>
       <header className="story-narration">
-        <span className="story-tag">
-          <span aria-hidden>{situation.emoji}</span> {situation.title}
-        </span>
+        {problemImage ? (
+          <img key={situation.id} className="story-picture" src={problemImage} alt={situation.title} draggable={false} />
+        ) : (
+          <span className="story-tag">
+            <span aria-hidden>{situation.emoji}</span> {situation.title}
+          </span>
+        )}
         <StepDots total={situation.steps.length} done={Math.min(run.stepsDone, situation.steps.length)} current={run.phase === "steps"} />
         <p key={run.narration}>{run.narration}</p>
       </header>
