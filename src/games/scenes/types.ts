@@ -70,6 +70,9 @@ export type SceneSound =
   | "beam"
   | "robot"
   | "alien"
+  | "alarm"
+  | "splash"
+  | "trill"
   | "whoosh";
 
 /** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */

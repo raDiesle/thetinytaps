@@ -50,6 +50,9 @@ import {
   playBeam,
   playRobot,
   playAlien,
+  playAlarm,
+  playSplash,
+  playTrill,
   playWhoosh,
   setSfxVolume,
 } from "@/lib/sfx";
@@ -109,6 +112,9 @@ const SOUNDS: Record<SceneSound, () => void> = {
   beam: playBeam,
   robot: playRobot,
   alien: playAlien,
+  alarm: playAlarm,
+  splash: playSplash,
+  trill: playTrill,
   whoosh: playWhoosh,
 };
 

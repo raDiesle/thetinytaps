@@ -409,3 +409,26 @@ export function playWhoosh() {
   note({ from: 300, to: 1600, duration: 0.35, type: "sawtooth", volume: 0.05, lowpass: 1400 });
   note({ from: 1600, to: 200, duration: 0.5, type: "sine", volume: 0.1, delay: 0.3 });
 }
+
+/** "Rrrring!" – a fire station's alarm bell: fast, bright strokes. */
+export function playAlarm() {
+  for (let i = 0; i < 12; i++) {
+    note({ from: 1320, duration: 0.09, type: "triangle", volume: 0.1, delay: i * 0.08 });
+    note({ from: 2640, duration: 0.06, type: "sine", volume: 0.04, delay: i * 0.08 });
+  }
+}
+
+/** "Pschhh!" – water spraying from a hose: quick falling swishes. */
+export function playSplash() {
+  [0, 0.12, 0.22, 0.36, 0.5].forEach((delay, i) =>
+    note({ from: 2400 - i * 120, to: 700, duration: 0.28, type: "sawtooth", volume: 0.03, lowpass: 3000, delay }),
+  );
+  [0.6, 0.75, 0.86].forEach((delay, i) => note({ from: PENTATONIC[(i * 2) % PENTATONIC.length] * 2, duration: 0.12, type: "sine", volume: 0.1, delay }));
+}
+
+/** "Trrrillll!" – a whistle with a rolling pea inside. */
+export function playTrill() {
+  [0, 0.55].forEach((start, n) => {
+    for (let i = 0; i < (n ? 8 : 4); i++) note({ from: i % 2 ? 2350 : 2150, duration: 0.05, type: "sine", volume: 0.12, delay: start + i * 0.045 });
+  });
+}
