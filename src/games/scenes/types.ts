@@ -68,8 +68,6 @@ export interface SceneItem {
   shadow?: [number, number, number];
   /** Keys mode: the key this item should get, e.g. "B" for the digger; else its first letter if free. */
   key?: string;
-  /** Keys mode: where the key badge sits, in the drawing's own coordinates; else the top of the first hit area. */
-  badge?: [number, number];
   /** Questions mode: what the item is like. Only clear cases, so every answer is obviously right. */
   traits?: SceneTrait[];
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */

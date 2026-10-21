@@ -65,7 +65,33 @@
 .st-baum-leaves ellipse,
 .st-oma-heart,
 .st-hund-tongue,
-.st-kaefer-wings {
+.st-kaefer-wings,
+.st-kirche-light,
+.st-kirche-ring path,
+.st-baecker-light,
+.st-wache-light,
+.st-katze-lids,
+.st-baum-squirrel,
+.st-baum-apple,
+.st-vogel-notes > g,
+.st-oma-wool,
+.st-laterne-moth,
+.st-hydrant-puddle,
+.st-bus-blink,
+.st-polizei-beam,
+.st-auto-beam,
+.st-auto-toot path,
+.st-rad-ring path,
+.st-enten-quack,
+.st-muell-glow,
+.st-muell-junk > *,
+.st-ampel-signal,
+.st-eimer-fly,
+.st-blumen-bee,
+.st-brunnen-fish,
+.st-brunnen-drops circle,
+.st-flug-puffs circle,
+.st-hund-bark {
   opacity: 0;
   pointer-events: none;
 }
@@ -86,7 +112,47 @@
 .st-baum-leaves ellipse,
 .st-hydrant-water circle,
 .st-post-letter,
-.st-kaefer-wings ellipse {
+.st-kaefer-wings ellipse,
+.st-kirche-light,
+.st-kirche-ring path,
+.st-haus-flower,
+.st-baecker-light,
+.st-wache-light,
+.st-wache-helmet,
+.st-baum-squirrel,
+.st-baum-apple,
+.st-vogel-notes > g,
+.st-oma-wool,
+.st-post-horn,
+.st-laterne-moth,
+.st-hydrant-nut,
+.st-hydrant-cap,
+.st-hydrant-puddle,
+.st-bus-driver,
+.st-bus-passenger,
+.st-bus-guest,
+.st-polizei-driver,
+.st-polizei-beam,
+.st-auto-driver,
+.st-auto-beam,
+.st-auto-toot path,
+.st-rad-bell,
+.st-rad-ring path,
+.st-enten-quack,
+.st-feuer-driver,
+.st-muell-driver,
+.st-muell-glow,
+.st-muell-junk > *,
+.st-ampel-button,
+.st-ampel-walk,
+.st-eimer-fly,
+.st-blumen-bee,
+.st-brunnen-fish,
+.st-brunnen-drops circle,
+.st-flug-pilot,
+.st-flug-puffs circle,
+.st-hund-bark,
+.st-taube-crumbs circle {
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -195,6 +261,111 @@
   }
 }
 
+/* Doors and hatches swing open on their hinge and close again. */
+@keyframes st-door {
+  20%,
+  75% {
+    transform: scaleX(0.15);
+  }
+}
+
+@keyframes st-wiggle {
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes st-nod {
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes st-bob {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Wheels of a vehicle that stays where it is roll a little back and forth. */
+@keyframes st-roll {
+  25% {
+    transform: rotate(30deg);
+  }
+  75% {
+    transform: rotate(-30deg);
+  }
+}
+
+/* Sound lines: appear, grow and fade. */
+@keyframes st-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes st-blink {
+  0%,
+  40%,
+  60%,
+  100% {
+    opacity: 0;
+  }
+  45%,
+  55% {
+    opacity: 1;
+  }
+}
+
+@keyframes st-indicator {
+  0%,
+  45% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Little flyers (moth, fly, bee) buzz around and are gone again. */
+@keyframes st-buzz {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  10% {
+    opacity: 1;
+  }
+  30% {
+    transform: translate(30px, -20px);
+  }
+  55% {
+    transform: translate(-30px, -30px);
+  }
+  80% {
+    transform: translate(20px, -6px);
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
 /* ---------- Flugzeug: flies a loop ---------- */
 
 .item-flugzeug.playing .st-flug-body {
@@ -218,6 +389,32 @@
   }
   100% {
     transform: translateX(0) rotate(1turn);
+  }
+}
+
+.item-flugzeug.playing .st-flug-rudder {
+  animation: st-wiggle 0.4s ease-in-out 6;
+}
+
+.item-flugzeug.playing .st-flug-pilot {
+  animation: st-bob 0.6s ease-in-out 4;
+}
+
+.item-flugzeug.playing .st-flug-puffs circle {
+  animation: st-trail 1s ease-out calc(var(--i) * 0.3s) 2;
+}
+
+@keyframes st-trail {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(50px) scale(1.6);
   }
 }
 
@@ -269,6 +466,18 @@
   }
 }
 
+.item-kirche.playing .st-kirche-door {
+  animation: st-door 2.4s ease-in-out;
+}
+
+.item-kirche.playing .st-kirche-light {
+  animation: st-light 1.6s ease-in-out calc(var(--i) * 0.2s);
+}
+
+.item-kirche.playing .st-kirche-ring path {
+  animation: st-ring 0.8s ease-out calc(var(--i) * 0.4s) 2;
+}
+
 /* ---------- Haus: lights go on one after the other, a child waves, the chimney smokes ---------- */
 
 .item-haus.playing .st-haus-light {
@@ -296,6 +505,39 @@
   }
 }
 
+.item-haus.playing .st-haus-door {
+  animation: st-door 2.4s ease-in-out;
+}
+
+.item-haus.playing .st-haus-curtain {
+  animation: st-curtain 2.2s ease-in-out;
+}
+
+.item-haus.playing .st-haus-peek {
+  animation: st-peek-up 2.2s ease-in-out 0.2s;
+}
+
+.item-haus.playing .st-haus-flower {
+  animation: st-pop 0.5s ease-in-out calc(var(--i) * 0.1s) 3;
+}
+
+@keyframes st-curtain {
+  20%,
+  75% {
+    transform: scaleX(0.35);
+  }
+}
+
+@keyframes st-peek-up {
+  25%,
+  75% {
+    transform: translateY(-40px);
+  }
+  50% {
+    transform: translateY(-34px);
+  }
+}
+
 /* ---------- Katze: stretches, tilts her head, waves her tail ---------- */
 
 .item-katze.playing .st-katze-body {
@@ -320,6 +562,20 @@
 @keyframes st-tilt {
   50% {
     transform: rotate(-14deg);
+  }
+}
+
+.item-katze.playing .st-katze-lids {
+  animation: st-blink 0.9s ease-in-out 2;
+}
+
+.item-katze.playing .st-katze-paw {
+  animation: st-paw 0.9s ease-in-out 2;
+}
+
+@keyframes st-paw {
+  50% {
+    transform: translateY(-8px) rotate(-20deg);
   }
 }
 
@@ -356,6 +612,24 @@
   }
 }
 
+.item-baeckerei.playing .st-baecker-light {
+  animation: st-light 1.6s ease-in-out calc(var(--i) * 0.3s);
+}
+
+.item-baeckerei.playing .st-baecker-awning {
+  animation: st-awning 0.55s ease-in-out 4;
+}
+
+.item-baeckerei.playing .st-baecker-bell {
+  animation: st-bell 0.5s ease-in-out 4;
+}
+
+@keyframes st-awning {
+  50% {
+    transform: scaleY(1.1);
+  }
+}
+
 /* ---------- Feuerwache: the gate rolls up, the lamp glows ---------- */
 
 .item-feuerwache.playing .st-wache-gate {
@@ -375,6 +649,22 @@
   75% {
     transform: scaleY(0.12);
   }
+}
+
+.item-feuerwache.playing .st-wache-light {
+  animation: st-light 1.4s ease-in-out calc(var(--i) * 0.25s);
+}
+
+.item-feuerwache.playing .st-wache-helmet {
+  animation: st-hop 0.6s ease-in-out calc(0.6s + var(--i) * 0.15s) 2;
+}
+
+.item-feuerwache.playing .st-wache-arm {
+  animation: st-wave 0.5s ease-in-out 0.6s 3;
+}
+
+.item-feuerwache.playing .st-wache-hose {
+  animation: st-turn 1.2s ease-in-out 0.8s;
 }
 
 /* ---------- Baum: the crown shakes, leaves fall ---------- */
@@ -409,6 +699,51 @@
   }
 }
 
+.item-baum.playing .st-baum-squirrel {
+  animation: st-squirrel 2s ease-in-out;
+}
+
+.item-baum.playing .st-baum-apple {
+  animation: st-apple 2s ease-in 0.2s;
+}
+
+@keyframes st-squirrel {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  25%,
+  75% {
+    opacity: 1;
+    transform: translateX(-6px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-6px, -6px);
+  }
+}
+
+@keyframes st-apple {
+  0% {
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(122px);
+  }
+  55% {
+    transform: translateY(100px);
+  }
+  70%,
+  90% {
+    opacity: 1;
+    transform: translateY(122px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(122px);
+  }
+}
+
 /* ---------- Vogel: flies a round over the park ---------- */
 
 .item-vogel.playing .st-vogel-flight {
@@ -431,6 +766,27 @@
   }
 }
 
+.item-vogel.playing .st-vogel-tail {
+  animation: st-wiggle 0.3s ease-in-out 8;
+}
+
+.item-vogel.playing .st-vogel-notes > g {
+  animation: st-note 1s ease-out calc(var(--i) * 0.4s) 2;
+}
+
+@keyframes st-note {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -24px);
+  }
+}
+
 /* ---------- Schaukel: swings high ---------- */
 
 .item-schaukel.playing .st-schaukel-swing {
@@ -446,6 +802,23 @@
   }
 }
 
+.item-schaukel.playing .st-schaukel-legs {
+  animation: st-kick 1.2s ease-in-out 2;
+}
+
+.item-schaukel.playing .st-schaukel-head {
+  animation: st-tilt 1.2s ease-in-out 2;
+}
+
+@keyframes st-kick {
+  25% {
+    transform: rotate(-30deg);
+  }
+  75% {
+    transform: rotate(20deg);
+  }
+}
+
 /* ---------- Eiswagen: the cones jump, the parasol wobbles ---------- */
 
 .item-eiswagen.playing .st-eis-cones > g {
@@ -454,6 +827,29 @@
 
 .item-eiswagen.playing .st-eis-schirm {
   animation: st-tilt 1.1s ease-in-out 2;
+}
+
+.item-eiswagen.playing .st-eis-arm {
+  animation: st-wave 0.5s ease-in-out 4;
+}
+
+.item-eiswagen.playing .st-eis-seller {
+  animation: st-nod 0.55s ease-in-out 4;
+}
+
+.item-eiswagen.playing .st-eis-lid {
+  animation: st-eis-lid 2s ease-in-out;
+}
+
+.item-eiswagen.playing .st-wheel {
+  animation: st-roll 1s ease-in-out 2;
+}
+
+@keyframes st-eis-lid {
+  20%,
+  70% {
+    transform: rotate(10deg);
+  }
 }
 
 /* ---------- Oma: waves, a heart rises ---------- */
@@ -494,6 +890,49 @@
   }
 }
 
+.item-oma.playing .st-oma-head {
+  animation: st-nod 0.5s ease-in-out 4;
+}
+
+.item-oma.playing .st-oma-leg {
+  animation: st-leg 0.5s ease-in-out calc(var(--i) * 0.25s) 3;
+}
+
+.item-oma.playing .st-oma-lid {
+  animation: st-oma-lid 1.6s ease-in-out 0.2s;
+}
+
+.item-oma.playing .st-oma-wool {
+  animation: st-wool 1.4s ease-in-out 0.4s;
+}
+
+@keyframes st-leg {
+  50% {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes st-oma-lid {
+  20%,
+  70% {
+    transform: rotate(-60deg);
+  }
+}
+
+@keyframes st-wool {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(-30px);
+  }
+}
+
 /* ---------- Briefkasten: the flap opens and a letter jumps out ---------- */
 
 .item-briefkasten.playing .st-post-flap {
@@ -501,7 +940,7 @@
 }
 
 .item-briefkasten.playing .st-post-letter {
-  animation: st-letter 1.8s ease-in-out;
+  animation: st-letter 1.4s ease-in-out calc(var(--i) * 0.2s);
 }
 
 @keyframes st-flap-open {
@@ -532,6 +971,21 @@
   }
 }
 
+.item-briefkasten.playing .st-post-horn {
+  animation: st-wiggle 0.45s ease-in-out 4;
+}
+
+.item-briefkasten.playing .st-post-door {
+  animation: st-post-door 1.6s ease-in-out;
+}
+
+@keyframes st-post-door {
+  20%,
+  70% {
+    transform: scaleY(0.2);
+  }
+}
+
 /* ---------- Spatz: hops and flutters ---------- */
 
 .item-spatz.playing .st-spatz-body {
@@ -540,6 +994,14 @@
 
 .item-spatz.playing .st-spatz-wing {
   animation: st-flap 0.1s ease-in-out 16 alternate;
+}
+
+.item-spatz.playing .st-spatz-head {
+  animation: st-tilt 0.8s ease-in-out 2;
+}
+
+.item-spatz.playing .st-spatz-tail {
+  animation: st-wiggle 0.2s ease-in-out 8;
 }
 
 /* ---------- Laterne: the light goes on ---------- */
@@ -570,6 +1032,18 @@
   }
 }
 
+.item-laterne.playing .st-laterne-moth {
+  animation: st-buzz 2s ease-in-out calc(var(--i) * 0.2s);
+}
+
+.item-laterne.playing .st-laterne-moth + .st-laterne-moth {
+  animation-direction: reverse;
+}
+
+.item-laterne.playing .st-laterne-hatch {
+  animation: st-door 2s ease-in-out;
+}
+
 /* ---------- Hydrant: water sprays out ---------- */
 
 .item-hydrant.playing .st-hydrant-water circle {
@@ -587,6 +1061,44 @@
   100% {
     opacity: 0.2;
     transform: translate(76px, 40px);
+  }
+}
+
+.item-hydrant.playing .st-hydrant-body {
+  animation: st-shake 0.3s ease-in-out 5;
+}
+
+.item-hydrant.playing .st-hydrant-nut {
+  animation: st-turn 0.6s ease-in-out 2;
+}
+
+.item-hydrant.playing .st-hydrant-cap {
+  animation: st-cap 1.6s ease-in-out;
+}
+
+.item-hydrant.playing .st-hydrant-puddle {
+  animation: st-puddle 1.8s ease-out;
+}
+
+@keyframes st-cap {
+  20%,
+  70% {
+    transform: translateX(-10px) rotate(-20deg);
+  }
+}
+
+@keyframes st-puddle {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  40%,
+  80% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
   }
 }
 
@@ -614,6 +1126,38 @@
   25%,
   70% {
     transform: scaleX(0.15);
+  }
+}
+
+.item-bus.playing .st-bus-driver {
+  animation: st-nod 0.6s ease-in-out 3;
+}
+
+.item-bus.playing .st-bus-passenger {
+  animation: st-bob 0.4s ease-in-out calc(var(--i) * 0.12s) 4;
+}
+
+.item-bus.playing .st-bus-guest {
+  animation: st-board 2.4s ease-in-out;
+}
+
+.item-bus.playing .st-bus-blink {
+  animation: st-indicator 0.6s linear 4;
+}
+
+.item-bus.playing .st-wheel {
+  animation: st-roll 1.2s ease-in-out 2;
+}
+
+@keyframes st-board {
+  30% {
+    transform: translateY(-8px);
+  }
+  45% {
+    transform: translateY(0);
+  }
+  60% {
+    transform: translate(8px, -4px);
   }
 }
 
@@ -654,6 +1198,22 @@
   }
 }
 
+.item-polizei.playing .st-polizei-driver {
+  animation: st-nod 0.55s ease-in-out 4;
+}
+
+.item-polizei.playing .st-polizei-antenna {
+  animation: st-wiggle 0.3s ease-in-out 7;
+}
+
+.item-polizei.playing .st-polizei-beam {
+  animation: st-glow 2.2s ease-in-out;
+}
+
+.item-polizei.playing .st-wheel {
+  animation: st-roll 1.1s ease-in-out 2;
+}
+
 /* ---------- Fahrrad: rides a bit and comes back ---------- */
 
 .item-fahrrad.playing .st-rad-body {
@@ -677,6 +1237,18 @@
   }
 }
 
+.item-fahrrad.playing .st-rad-bell {
+  animation: st-pop 0.3s ease-in-out 3;
+}
+
+.item-fahrrad.playing .st-rad-ring path {
+  animation: st-ring 0.6s ease-out calc(var(--i) * 0.15s) 3;
+}
+
+.item-fahrrad.playing .st-rad-head {
+  animation: st-nod 0.5s ease-in-out 4;
+}
+
 /* ---------- Enten: the family waddles ---------- */
 
 .item-enten.playing .st-enten-duck {
@@ -689,6 +1261,20 @@
   }
   75% {
     transform: translateY(-4px) rotate(8deg);
+  }
+}
+
+.item-enten.playing .st-enten-wing {
+  animation: st-wing 0.25s ease-in-out 8;
+}
+
+.item-enten.playing .st-enten-quack {
+  animation: st-ring 0.6s ease-out 3;
+}
+
+@keyframes st-wing {
+  50% {
+    transform: rotate(-25deg);
   }
 }
 
@@ -728,6 +1314,22 @@
   }
 }
 
+.item-auto.playing .st-wheel {
+  animation: st-turn 0.9s linear 2;
+}
+
+.item-auto.playing .st-auto-driver {
+  animation: st-bob 0.4s ease-in-out 4;
+}
+
+.item-auto.playing .st-auto-beam {
+  animation: st-glow 1.8s ease-in-out;
+}
+
+.item-auto.playing .st-auto-toot path {
+  animation: st-ring 0.6s ease-out calc(var(--i) * 0.15s) 2;
+}
+
 /* ---------- Feuerwehr: the ladder goes up, blue lights glow ---------- */
 
 .item-feuerwehr.playing .st-feuer-ladder {
@@ -746,6 +1348,29 @@
   30%,
   70% {
     transform: rotate(-28deg);
+  }
+}
+
+.item-feuerwehr.playing .st-feuer-shutter {
+  animation: st-shutter 2.6s ease-in-out;
+}
+
+.item-feuerwehr.playing .st-feuer-reel {
+  animation: st-turn 1s ease-in-out 0.6s 2;
+}
+
+.item-feuerwehr.playing .st-feuer-driver {
+  animation: st-nod 0.7s ease-in-out 4;
+}
+
+.item-feuerwehr.playing .st-wheel {
+  animation: st-roll 1.4s ease-in-out 2;
+}
+
+@keyframes st-shutter {
+  20%,
+  75% {
+    transform: scaleY(0.12);
   }
 }
 
@@ -772,6 +1397,59 @@
   }
 }
 
+.item-muellauto.playing .st-muell-lid {
+  animation: st-muell-lid 2.6s ease-in-out;
+}
+
+.item-muellauto.playing .st-muell-junk > * {
+  animation: st-muell-junk 2.6s ease-in;
+}
+
+.item-muellauto.playing .st-muell-beacon {
+  animation: st-pop 0.6s ease-in-out 4;
+}
+
+.item-muellauto.playing .st-muell-glow {
+  animation: st-glow 2.4s ease-in-out;
+}
+
+.item-muellauto.playing .st-muell-driver {
+  animation: st-nod 0.65s ease-in-out 4;
+}
+
+.item-muellauto.playing .st-wheel {
+  animation: st-roll 1.3s ease-in-out 2;
+}
+
+@keyframes st-muell-lid {
+  25%,
+  70% {
+    transform: rotate(50deg);
+  }
+}
+
+/* The bin is upside down meanwhile, so falling out is "up" in its own coordinates. */
+@keyframes st-muell-junk {
+  0%,
+  38% {
+    opacity: 0;
+    transform: none;
+  }
+  40% {
+    opacity: 1;
+    transform: none;
+  }
+  58% {
+    opacity: 1;
+    transform: translateY(-50px);
+  }
+  60%,
+  100% {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+}
+
 /* ---------- Ampel: red man, then green man, then red again ---------- */
 
 .item-ampel.playing .st-ampel-red {
@@ -793,6 +1471,35 @@
   20%,
   85% {
     opacity: 1;
+  }
+}
+
+.item-ampel.playing .st-ampel-button {
+  animation: st-press 0.4s ease-in-out 2;
+}
+
+.item-ampel.playing .st-ampel-signal {
+  animation: st-signal 2.6s linear;
+}
+
+.item-ampel.playing .st-ampel-walk {
+  animation: st-bob 0.4s ease-in-out 0.6s 4;
+}
+
+@keyframes st-press {
+  50% {
+    transform: scale(0.7);
+  }
+}
+
+@keyframes st-signal {
+  5%,
+  20% {
+    opacity: 1;
+  }
+  22%,
+  100% {
+    opacity: 0;
   }
 }
 
@@ -829,6 +1536,10 @@
   }
 }
 
+.item-muelleimer.playing .st-eimer-fly {
+  animation: st-buzz 1.6s ease-in-out;
+}
+
 /* ---------- Blumen: the blossoms open wide ---------- */
 
 .item-blumen.playing .st-blumen-head {
@@ -838,6 +1549,23 @@
 @keyframes st-bloom {
   50% {
     transform: scale(1.35) rotate(30deg);
+  }
+}
+
+.item-blumen.playing .st-blumen-stem {
+  animation: st-sway 0.8s ease-in-out calc(var(--i) * 0.1s) 2;
+}
+
+.item-blumen.playing .st-blumen-bee {
+  animation: st-buzz 1.8s ease-in-out;
+}
+
+@keyframes st-sway {
+  25% {
+    transform: rotate(6deg);
+  }
+  75% {
+    transform: rotate(-6deg);
   }
 }
 
@@ -863,6 +1591,10 @@
   }
 }
 
+.item-falter.playing .st-falter-antennae {
+  animation: st-wiggle 0.3s ease-in-out 8;
+}
+
 /* ---------- Roller: rolls a bit and comes back ---------- */
 
 .item-roller.playing .st-roller-ride {
@@ -879,6 +1611,20 @@
   }
 }
 
+.item-roller.playing .st-roller-leg {
+  animation: st-push 0.6s ease-in-out 3;
+}
+
+.item-roller.playing .st-roller-head {
+  animation: st-nod 0.6s ease-in-out 3;
+}
+
+@keyframes st-push {
+  50% {
+    transform: rotate(25deg);
+  }
+}
+
 /* ---------- Kinderwagen: rocks the baby ---------- */
 
 .item-kinderwagen.playing .st-wagen-body {
@@ -891,6 +1637,28 @@
   }
   75% {
     transform: rotate(5deg);
+  }
+}
+
+.item-kinderwagen.playing .st-wheel {
+  animation: st-roll 0.6s ease-in-out 3;
+}
+
+.item-kinderwagen.playing .st-wagen-hood {
+  animation: st-hood 0.9s ease-in-out 2;
+}
+
+.item-kinderwagen.playing .st-wagen-toy {
+  animation: st-swing 0.6s ease-in-out 3;
+}
+
+.item-kinderwagen.playing .st-wagen-hand {
+  animation: st-wave 0.45s ease-in-out 4;
+}
+
+@keyframes st-hood {
+  50% {
+    transform: rotate(-10deg);
   }
 }
 
@@ -936,6 +1704,45 @@
   }
 }
 
+.item-brunnen.playing .st-brunnen-fish {
+  animation: st-fish 1.4s ease-in-out 0.5s;
+}
+
+.item-brunnen.playing .st-brunnen-drops circle {
+  animation: st-splash 1.2s ease-out calc(0.3s + var(--i) * 0.15s);
+}
+
+@keyframes st-fish {
+  0% {
+    opacity: 0;
+    transform: rotate(30deg);
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(30px, -70px) rotate(-10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(60px, 0) rotate(-50deg);
+  }
+}
+
+@keyframes st-splash {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-30px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
 /* ---------- Luftballon: the balloon tugs at the string, the girl hops ---------- */
 
 .item-luftballon.playing .st-ballon-balloon {
@@ -952,6 +1759,26 @@
   }
   75% {
     transform: rotate(-10deg) translateY(-6px);
+  }
+}
+
+.item-luftballon.playing .st-ballon-arm {
+  animation: st-ballon-wave 2s ease-in-out;
+}
+
+.item-luftballon.playing .st-ballon-tail {
+  animation: st-wiggle 0.35s ease-in-out 6;
+}
+
+@keyframes st-ballon-wave {
+  20%,
+  60%,
+  85% {
+    transform: rotate(110deg);
+  }
+  40%,
+  72% {
+    transform: rotate(135deg);
   }
 }
 
@@ -975,6 +1802,18 @@
     opacity: 1;
     transform: scaleY(1.2);
   }
+}
+
+.item-hund.playing .st-hund-head {
+  animation: st-tilt 0.8s ease-in-out 2;
+}
+
+.item-hund.playing .st-hund-ear {
+  animation: st-wiggle 0.2s ease-in-out 8;
+}
+
+.item-hund.playing .st-hund-bark {
+  animation: st-ring 0.5s ease-out 0.1s 3;
 }
 
 /* ---------- Marienkäfer: opens her shell and flies a round ---------- */
@@ -1036,6 +1875,10 @@
   }
 }
 
+.item-marienkaefer.playing .st-kaefer-antenna {
+  animation: st-wiggle 0.3s ease-in-out 8;
+}
+
 /* ---------- Taube: pecks crumbs ---------- */
 
 .item-taube.playing .st-taube-head {
@@ -1045,6 +1888,24 @@
 @keyframes st-peck {
   50% {
     transform: rotate(40deg);
+  }
+}
+
+.item-taube.playing .st-taube-wing {
+  animation: st-wing 0.3s ease-in-out 6;
+}
+
+.item-taube.playing .st-taube-tail {
+  animation: st-wiggle 0.3s ease-in-out 6;
+}
+
+.item-taube.playing .st-taube-crumbs circle {
+  animation: st-crumb 0.6s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+@keyframes st-crumb {
+  50% {
+    transform: translateY(-6px);
   }
 }
 
@@ -1066,5 +1927,19 @@
   }
   80% {
     transform: translateY(-20px) rotate(8deg);
+  }
+}
+
+.item-maus.playing .st-maus-ear {
+  animation: st-wiggle 0.3s ease-in-out 6;
+}
+
+.item-maus.playing .st-maus-nose {
+  animation: st-sniff 0.25s ease-in-out 6;
+}
+
+@keyframes st-sniff {
+  50% {
+    transform: scale(1.2);
   }
 }

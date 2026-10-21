@@ -3,12 +3,32 @@ import { GLASS, INK, Inside, Pane, SAND, SKIN, STEEL, Wheel, nth } from "../shar
 /** A driver's head with a hard hat, for cabs. */
 function Driver({ cx, cy, hat = "#ffd60a" }: { cx: number; cy: number; hat?: string }) {
   return (
-    <>
+    <g className="bs-driver">
       <rect x={cx - 13} y={cy + 10} width="26" height="14" rx="5" fill="#ff8c42" />
       <circle cx={cx} cy={cy} r="12" fill={SKIN} />
       <circle cx={cx + 4} cy={cy - 1} r="1.8" fill="#2b2d42" />
       <path d={`M${cx - 14} ${cy - 3} Q${cx - 14} ${cy - 18} ${cx} ${cy - 18} Q${cx + 14} ${cy - 18} ${cx + 14} ${cy - 3} Z`} fill={hat} />
+    </g>
+  );
+}
+
+/** An orange warning light on a roof, centred on (cx, cy); it glows while the item plays. */
+function Beacon({ cx, cy }: { cx: number; cy: number }) {
+  return (
+    <>
+      <rect x={cx - 7} y={cy - 6} width="14" height="12" rx="5" fill="#b5651d" />
+      <rect x={cx - 10} y={cy + 4} width="20" height="4" rx="2" fill={INK} />
+      <rect className="bs-beacon" x={cx - 7} y={cy - 6} width="14" height="12" rx="5" fill="#ffb703" />
     </>
+  );
+}
+
+/** A wheel that turns while its vehicle rolls; `className` picks the turning animation. */
+function TurningWheel({ cx, cy, r, className }: { cx: number; cy: number; r?: number; className: string }) {
+  return (
+    <g className={className} style={{ transformOrigin: `${cx}px ${cy}px` }}>
+      <Wheel cx={cx} cy={cy} r={r} />
+    </g>
   );
 }
 
@@ -22,7 +42,7 @@ export function Bagger() {
       </g>
       <g className="bagger-body">
         <rect x="90" y="660" width="290" height="56" rx="28" fill={INK} />
-        <rect x="90" y="660" width="290" height="56" rx="28" fill="none" stroke="#2b2d42" strokeWidth="6" strokeDasharray="10 8" />
+        <rect className="bagger-track" x="90" y="660" width="290" height="56" rx="28" fill="none" stroke="#2b2d42" strokeWidth="6" strokeDasharray="10 8" />
         {[122, 178, 234, 290, 346].map((cx) => (
           <g key={cx}>
             <circle cx={cx} cy="688" r="17" fill={STEEL} />
@@ -93,34 +113,39 @@ export function Kran() {
       <rect x="728" y="140" width="58" height="48" rx="8" fill="#ffb703" />
       <rect x="728" y="176" width="58" height="12" rx="6" fill="#f4a100" />
       <Pane x={738} y={148} w={40} h={24} rx={4}>
-        <circle cx="758" cy="164" r="7" fill={SKIN} />
+        <circle className="kran-operator" cx="758" cy="164" r="7" fill={SKIN} />
       </Pane>
-      <rect x="1044" y="136" width="42" height="16" rx="4" fill={INK} />
-      <circle cx="1054" cy="136" r="4" fill={STEEL} />
-      <circle cx="1076" cy="136" r="4" fill={STEEL} />
-      <line
-        className="kran-cable"
-        x1="1065"
-        y1="152"
-        x2="1065"
-        y2="260"
-        stroke={INK}
-        strokeWidth="4"
-        style={{ transformOrigin: "1065px 152px" }}
-      />
-      <g className="kran-load">
-        <path d="M1065 258 V270 M1065 270 L1022 300 M1065 270 L1108 300" stroke={INK} strokeWidth="3" fill="none" />
-        <rect x="1056" y="252" width="18" height="12" rx="3" fill="#ffd60a" />
-        <circle cx="1065" cy="270" r="6" fill="none" stroke={INK} strokeWidth="4" />
-        <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
-          {[1020, 1050, 1080].map((x) => (
-            <rect key={x} x={x} y="300" width="30" height="15" />
-          ))}
-          {[1020, 1035, 1065, 1095].map((x, i) => (
-            <rect key={x} x={x} y="315" width={i === 0 || i === 3 ? 15 : 30} height="15" />
-          ))}
+      {/* The trolley runs along the jib with the cable and the load. */}
+      <g className="kran-trolley">
+        <rect x="1044" y="136" width="42" height="16" rx="4" fill={INK} />
+        <circle cx="1054" cy="136" r="4" fill={STEEL} />
+        <circle cx="1076" cy="136" r="4" fill={STEEL} />
+        <line
+          className="kran-cable"
+          x1="1065"
+          y1="152"
+          x2="1065"
+          y2="260"
+          stroke={INK}
+          strokeWidth="4"
+          style={{ transformOrigin: "1065px 152px" }}
+        />
+        <g className="kran-load">
+          <g className="kran-swing" style={{ transformOrigin: "1065px 258px" }}>
+            <path d="M1065 258 V270 M1065 270 L1022 300 M1065 270 L1108 300" stroke={INK} strokeWidth="3" fill="none" />
+            <rect x="1056" y="252" width="18" height="12" rx="3" fill="#ffd60a" />
+            <circle cx="1065" cy="270" r="6" fill="none" stroke={INK} strokeWidth="4" />
+            <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
+              {[1020, 1050, 1080].map((x) => (
+                <rect key={x} x={x} y="300" width="30" height="15" />
+              ))}
+              {[1020, 1035, 1065, 1095].map((x, i) => (
+                <rect key={x} x={x} y="315" width={i === 0 || i === 3 ? 15 : 30} height="15" />
+              ))}
+            </g>
+            <rect x="1016" y="330" width="98" height="10" rx="2" fill="#8d5a2b" />
+          </g>
         </g>
-        <rect x="1016" y="330" width="98" height="10" rx="2" fill="#8d5a2b" />
       </g>
     </>
   );
@@ -143,6 +168,7 @@ export function Betonmischer() {
       </Inside>
       <path d="M900 724 h8 L896 752 h-8 Z" fill="#fff" opacity="0.5" />
       <rect x="940" y="776" width="18" height="11" rx="4" fill="#fff4d6" />
+      <rect className="mischer-light" x="940" y="776" width="18" height="11" rx="4" fill="#ffd60a" />
       <rect x="950" y="790" width="10" height="16" rx="3" fill="#ced4da" />
       <defs>
         <clipPath id="bs-drum">
@@ -161,7 +187,7 @@ export function Betonmischer() {
           <ellipse cx="730" cy="704" rx="80" ry="12" fill="#fff" opacity="0.6" />
         </g>
         <ellipse cx="740" cy="740" rx="122" ry="58" fill="none" stroke={INK} strokeWidth="4" />
-        <rect x="604" y="726" width="20" height="28" rx="6" fill={INK} />
+        <rect className="mischer-chute" x="604" y="726" width="20" height="28" rx="6" fill={INK} style={{ transformOrigin: "614px 728px" }} />
       </g>
       {/* Concrete dripping from the chute while mixing */}
       <g className="mischer-drops" fill="#adb5bd">
@@ -179,7 +205,7 @@ export function Betonmischer() {
 
 export function Kipplaster() {
   return (
-    <>
+    <g className="kipper-truck">
       <g className="kipper-sand" fill={SAND}>
         {[1362, 1376, 1390, 1368, 1384].map((cx, i) => (
           <circle key={i} cx={cx} cy="748" r="8" style={nth(i)} />
@@ -189,6 +215,7 @@ export function Kipplaster() {
       <path d="M1080 800 V720 Q1080 706 1066 706 H1020 Q992 706 988 740 L984 800 Z" fill="#3ec300" />
       <path d="M984 784 H1080 V800 H984 Z" fill="#2d9a00" />
       <path d="M1026 716 H1068" stroke="#a7f070" strokeWidth="5" strokeLinecap="round" />
+      <Beacon cx={1040} cy={698} />
       <path d="M1066 722 H1024 Q1008 722 1002 752 H1066 Z" fill={GLASS} />
       <Inside d="M1066 722 H1024 Q1008 722 1002 752 H1066 Z">
         <Driver cx={1040} cy={740} />
@@ -203,12 +230,14 @@ export function Kipplaster() {
         <path d="M1088 712 H1352 L1351 724 H1089 Z" fill="#e76f51" />
         <path d="M1160 724 V798 M1230 724 V798 M1300 724 V798" stroke="#e76f51" strokeWidth="6" />
         <path d="M1100 740 H1150 M1170 740 H1220" stroke="#ffb07c" strokeWidth="5" strokeLinecap="round" />
+        {/* The tailgate swings open so the sand can pour out. */}
+        <rect className="kipper-gate" x="1342" y="716" width="10" height="82" rx="3" fill="#e76f51" style={{ transformOrigin: "1347px 716px" }} />
       </g>
       <path d={`${guard(1035, 830)} ${guard(1278, 830, 70)}`} stroke="#2b2d42" strokeWidth="8" fill="none" />
-      <Wheel cx={1035} cy={828} />
-      <Wheel cx={1245} cy={828} />
-      <Wheel cx={1310} cy={828} />
-    </>
+      <TurningWheel cx={1035} cy={828} className="kipper-wheel" />
+      <TurningWheel cx={1245} cy={828} className="kipper-wheel" />
+      <TurningWheel cx={1310} cy={828} className="kipper-wheel" />
+    </g>
   );
 }
 
@@ -217,6 +246,8 @@ export function Hubschrauber() {
     <g className="heli-body" style={{ transformOrigin: "390px 300px" }}>
       <path d="M356 292 L300 288 L296 304 L356 306 Z" fill="#ff5d73" />
       <path d="M300 288 L292 266 L306 266 L312 288 Z" fill="#e63950" />
+      <circle cx="299" cy="264" r="4" fill="#a4161a" />
+      <circle className="bs-beacon" cx="299" cy="264" r="4" fill="#ff3b3b" />
       <g className="heli-tail-rotor" style={{ transformOrigin: "298px 290px" }} stroke={INK} strokeWidth="4" strokeLinecap="round">
         <path d="M298 276 V304 M284 290 H312" />
       </g>
@@ -224,7 +255,7 @@ export function Hubschrauber() {
       <ellipse cx="392" cy="302" rx="46" ry="30" fill="#ff5d73" />
       <ellipse cx="384" cy="318" rx="38" ry="12" fill="#e63950" />
       <path d="M396 278 Q436 280 438 306 H396 Z" fill={GLASS} />
-      <circle cx="412" cy="296" r="9" fill={SKIN} />
+      <circle className="heli-pilot" cx="412" cy="296" r="9" fill={SKIN} />
       <path d="M402 286 Q406 282 410 282 L404 304 H400 Z" fill="#fff" opacity="0.55" />
       <ellipse cx="370" cy="288" rx="14" ry="6" fill="#ff8fa3" />
       <rect x="386" y="262" width="10" height="14" fill={INK} />
@@ -238,6 +269,11 @@ export function Ampel() {
     <>
       <rect x="1436" y="880" width="8" height="110" fill={INK} />
       <path d="M1436 930 h8 M1436 960 h8" stroke="#fff" strokeWidth="6" />
+      {/* The button box: pressing it lights "Signal kommt". */}
+      <rect x="1444" y="904" width="20" height="32" rx="4" fill="#ffd60a" />
+      <rect x="1447" y="908" width="14" height="8" rx="2" fill="#2b2d42" />
+      <rect className="ampel-signal" x="1447" y="908" width="14" height="8" rx="2" fill="#fff3b0" />
+      <circle className="ampel-button" cx="1454" cy="926" r="4" fill={INK} />
       <rect x="1414" y="770" width="52" height="118" rx="12" fill="#2b2d42" />
       <rect x="1418" y="774" width="10" height="110" rx="5" fill="#4a4e69" />
       {[800, 829, 858].map((cy) => (
@@ -267,16 +303,24 @@ export function Ballon() {
           <path d="M420 34 C470 34 474 88 446 122 L436 134 H404 L394 122 C366 88 370 34 420 34 Z" />
         </clipPath>
       </defs>
-      <path d="M404 134 L408 154 M436 134 L432 154" stroke="#8d5a2b" strokeWidth="2.5" />
       <g clipPath="url(#bs-balloon)">
         <rect x="360" y="30" width="120" height="110" fill="#ff5d73" />
         <path d="M398 30 V140 M442 30 V140" stroke="#ffd60a" strokeWidth="16" />
         <path d="M360 92 H480" stroke="#fff" strokeWidth="8" opacity="0.8" />
         <ellipse cx="400" cy="60" rx="10" ry="18" fill="#fff" opacity="0.4" />
       </g>
-      <path className="ballon-flame" d="M420 150 q-7 -10 0 -22 q7 12 0 22 Z" fill="#ff8c42" style={{ transformOrigin: "420px 150px" }} />
-      <rect x="404" y="152" width="32" height="20" rx="4" fill="#a0522d" />
-      <path d="M404 160 H436" stroke="#8d5a2b" strokeWidth="3" />
+      {/* The basket swings below the balloon; the pilot looks out and waves. */}
+      <g className="ballon-basket" style={{ transformOrigin: "420px 134px" }}>
+        <path d="M404 134 L408 154 M436 134 L432 154" stroke="#8d5a2b" strokeWidth="2.5" />
+        <path className="ballon-flame" d="M420 150 q-7 -10 0 -22 q7 12 0 22 Z" fill="#ff8c42" style={{ transformOrigin: "420px 150px" }} />
+        <g className="ballon-pilot">
+          <path className="ballon-arm" d="M430 154 L434 143" stroke={SKIN} strokeWidth="3" strokeLinecap="round" style={{ transformOrigin: "430px 154px" }} />
+          <circle cx="428" cy="150" r="6" fill={SKIN} />
+          <path d="M422 148 Q422 142 428 142 Q434 142 434 148 Z" fill="#ff5d73" />
+        </g>
+        <rect x="404" y="152" width="32" height="20" rx="4" fill="#a0522d" />
+        <path d="M404 160 H436" stroke="#8d5a2b" strokeWidth="3" />
+      </g>
     </g>
   );
 }
@@ -298,6 +342,7 @@ export function Walze() {
       <path d="M206 722 H250 M206 730 H250" stroke="#2b2d42" strokeWidth="3" opacity="0.3" />
       <path d="M288 700 V646 M378 700 V646" stroke={INK} strokeWidth="6" />
       <rect x="280" y="636" width="108" height="12" rx="5" fill="#e85d04" />
+      <Beacon cx={334} cy={628} />
       <Pane x={296} y={654} w={76} h={44}>
         <Driver cx={334} cy={676} />
       </Pane>
@@ -307,7 +352,7 @@ export function Walze() {
         <path d="M170 728 V792 M138 760 H202" stroke="#6c757d" strokeWidth="5" />
         <circle cx="170" cy="760" r="10" fill={INK} />
       </g>
-      <Wheel cx={372} cy={772} r={28} />
+      <TurningWheel cx={372} cy={772} r={28} className="walze-wheel" />
     </g>
   );
 }
@@ -315,7 +360,7 @@ export function Walze() {
 /** Forklift with a pallet of boxes. Drawn at its own spot; the scene places it far back. */
 export function Gabelstapler() {
   return (
-    <>
+    <g className="stapler-body">
       <path d="M28 40 V192 M40 40 V192" stroke={INK} strokeWidth="6" />
       <g className="stapler-load">
         <path d="M22 118 V190 H-32" stroke="#495057" strokeWidth="6" fill="none" strokeLinejoin="round" />
@@ -327,9 +372,10 @@ export function Gabelstapler() {
       <rect x="118" y="118" width="26" height="68" rx="8" fill="#e76f51" />
       <path d="M54 130 V64 M112 130 V64" stroke={INK} strokeWidth="5" />
       <rect x="48" y="56" width="72" height="9" rx="3" fill={INK} />
+      <Beacon cx={84} cy={50} />
       <Driver cx={84} cy={106} />
-      <Wheel cx={62} cy={186} r={14} />
-      <Wheel cx={124} cy={186} r={14} />
-    </>
+      <TurningWheel cx={62} cy={186} r={14} className="stapler-wheel" />
+      <TurningWheel cx={124} cy={186} r={14} className="stapler-wheel" />
+    </g>
   );
 }

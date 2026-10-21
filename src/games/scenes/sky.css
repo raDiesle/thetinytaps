@@ -4,8 +4,16 @@
   animation: sky-spin 40s linear infinite;
 }
 
-.wolke-rain path {
+.wolke-rain path,
+.wolke-rainbow,
+.sonne-wink,
+.sonne-sparkle path {
   opacity: 0;
+}
+
+.sonne-sparkle path {
+  transform-box: fill-box;
+  transform-origin: center;
 }
 
 /* ---------- Sonne: glows and turns its rays ---------- */
@@ -16,6 +24,40 @@
 
 .item-sonne.playing .sonne-rays {
   animation: sky-spin 2s ease-in-out;
+}
+
+.item-sonne.playing .sonne-wink {
+  animation: sonne-wink 2s ease-in-out;
+}
+
+.item-sonne.playing .sonne-sparkle path {
+  animation: sonne-sparkle 0.8s ease-out calc(0.3s + var(--i) * 0.25s);
+}
+
+@keyframes sonne-wink {
+  40%,
+  60% {
+    opacity: 1;
+  }
+  35%,
+  65% {
+    opacity: 0;
+  }
+}
+
+@keyframes sonne-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) rotate(90deg);
+  }
 }
 
 @keyframes sonne-pulse {
@@ -38,6 +80,37 @@
 
 .item-wolke.playing .wolke-rain path {
   animation: wolke-drop 0.6s linear calc(var(--i) * 0.12s) 4;
+}
+
+.item-wolke.playing .wolke-body {
+  animation: wolke-squish 0.6s ease-in-out 3;
+}
+
+.item-wolke.playing .wolke-rainbow {
+  animation: wolke-rainbow 2.6s ease-out;
+}
+
+@keyframes wolke-squish {
+  50% {
+    transform: scale(1.06, 0.94) translateY(4px);
+  }
+}
+
+@keyframes wolke-rainbow {
+  0%,
+  55% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70%,
+  92% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
 }
 
 @keyframes wolke-dark {
