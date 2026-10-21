@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { Sky } from "@/components/Sky";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
@@ -67,11 +68,14 @@ export function GameShell({
     window.addEventListener("keyup", onKeyUp, { capture: true });
     window.addEventListener("contextmenu", block);
     window.addEventListener("beforeunload", block);
+    // Safari on iPad zooms on pinch even with touch-action: none.
+    window.addEventListener("gesturestart", block);
     return () => {
       window.removeEventListener("keydown", onKeyDown, { capture: true });
       window.removeEventListener("keyup", onKeyUp, { capture: true });
       window.removeEventListener("contextmenu", block);
       window.removeEventListener("beforeunload", block);
+      window.removeEventListener("gesturestart", block);
     };
     // `stop` only uses stable setters and module functions.
   }, [playing]);
@@ -87,15 +91,19 @@ export function GameShell({
 
   return (
     <main className="start-screen">
+      <Sky />
       <Link to={backHref} className="back-link">
         ← {backLabel}
       </Link>
-      <h1>
+      <h1 className="menu-title">
         <span aria-hidden>{emoji}</span> {title}
       </h1>
       {settings && <section className="settings">{settings}</section>}
       <ExitHelp />
       <button className="start-button" onClick={start}>
+        <span className="start-icon" aria-hidden>
+          ▶
+        </span>
         Los geht&apos;s!
       </button>
     </main>

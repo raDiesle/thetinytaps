@@ -1,3 +1,4 @@
+import type { TouchKeysMode } from "@/components/TouchKeyboard";
 import type { ThemeId } from "@/content/types";
 
 /** "BÄR", "Bär" or "bär". */
@@ -23,6 +24,8 @@ export interface WordsSettings {
   sounds: boolean;
   /** Quieter sounds, no wiggling, softer shapes. */
   calm: boolean;
+  /** Big letter keys on the screen, for tablets without a keyboard. */
+  touchKeys: TouchKeysMode;
 }
 
 export const DEFAULT_WORDS_SETTINGS: WordsSettings = {
@@ -34,6 +37,7 @@ export const DEFAULT_WORDS_SETTINGS: WordsSettings = {
   speech: false,
   sounds: true,
   calm: false,
+  touchKeys: "auto",
 };
 
 // v2: speech is off by default now, so old saved settings start fresh.

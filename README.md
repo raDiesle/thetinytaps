@@ -24,6 +24,8 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 | `src/pages/` | One component per page |
 | `src/components/GameShell.tsx` | Shared shell: parent start screen, fullscreen + keyboard lock, hold-to-exit |
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
+| `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
+| `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/globals.css` |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/games/letters/` | Game "Buchstaben & Zahlen" |
 | `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes `baustelle/`, `stadt/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
@@ -39,6 +41,14 @@ The full guide (depth, keys, drawing style, checks) is the Claude Code skill
 Defaults: speech is off and the picture only moves when someone taps, hovers or
 presses a key. Parents can turn on speech, idle movement and the keys mode
 ("Jedes Ding hat eine Taste") on the start screen.
+
+## Tablets
+
+All games work by touch. The letters and words games show big letter keys on
+the screen on touch-only devices (tablets, phones); parents can switch them to
+"Immer" or "Nie" on the start screen. On iPad the games go fullscreen; on
+iPhone (no fullscreen in Safari) add the page to the home screen to hide the
+browser bars.
 
 To add a picture that has no emoji, put an SVG in `public/images/` and set
 `image` on the word (see Xylophon).
