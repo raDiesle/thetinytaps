@@ -82,6 +82,11 @@ const RIDDLE_SOUNDS = new Set<SceneSound>([
   "alien",
   "alarm",
   "trill",
+  "flush",
+  "blow",
+  "scrub",
+  "splash",
+  "tick",
 ]);
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];

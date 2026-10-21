@@ -51,9 +51,13 @@ import {
   playRobot,
   playAlien,
   playAlarm,
-  playSplash,
   playTrill,
   playWhoosh,
+  playFlush,
+  playBlow,
+  playScrub,
+  playSplash,
+  playTick,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -113,9 +117,13 @@ const SOUNDS: Record<SceneSound, () => void> = {
   robot: playRobot,
   alien: playAlien,
   alarm: playAlarm,
-  splash: playSplash,
   trill: playTrill,
   whoosh: playWhoosh,
+  flush: playFlush,
+  blow: playBlow,
+  scrub: playScrub,
+  splash: playSplash,
+  tick: playTick,
 };
 
 /** Key presses closer together than this only spawn shapes. */
