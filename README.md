@@ -31,7 +31,7 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/games/letters/` | Game "Buchstaben & Zahlen": free typing (numbers optionally counted by tapping each thing), "Wo ist das B?" (find the key for a shown letter, `FindPlay.tsx`) or the Buchstaben-Zug (keys become wagons, `TrainPlay.tsx`) |
 | `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes `baustelle/`, `stadt/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
-| `src/games/words/` | Game "Wörter tippen" (words come from `de.ts`, filtered by length and theme) |
+| `src/games/words/` | Game "Wörter tippen": whole word, first letter only, colour words, doing words (all from `de.ts`) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
 | `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
 
