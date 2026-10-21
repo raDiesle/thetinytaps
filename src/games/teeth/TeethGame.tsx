@@ -29,10 +29,16 @@ export function TeethGame() {
                 { value: "3", label: "3 Minuten" },
               ]}
             />
+            <Toggle
+              label="Vorher zeigen: Zahnbürste holen, Zahnpasta drauf"
+              checked={settings.prep}
+              onChange={(prep) => update({ prep })}
+            />
             <p className="setting-note">
               Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes
-              Mal, ob der Mund weit auf ist oder die Zähne zusammen sind und welche Zähne gerade dran sind; dort verschwinden die
-              Zuckermonster nach und nach. Der Bildschirm bleibt dabei an.
+              Mal, ob der Mund weit auf ist oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und
+              welche Zähne gerade dran sind. Auf allen noch nicht geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und
+              nach verschwinden. Der Bildschirm bleibt dabei an.
             </p>
             <p className="setting-note">
               Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren

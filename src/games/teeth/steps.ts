@@ -106,5 +106,3 @@ export const STEPS: Step[] = [
 
 /** While the monsters arrive and when everything is clean: a big grin. */
 export const GRIN_VIEW = CLOSED_FRONT;
-
-export const MONSTERS_PER_STEP = 4;
