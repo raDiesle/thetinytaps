@@ -114,11 +114,11 @@ function Eye({ x, eyes }: { x: number; eyes: Face["eyes"] }) {
         </g>
       );
     case "sleepy":
-      return <path d={`M${x - 5} 44 Q${x} 47 ${x + 5} 44`} className="line" />;
+      return <path d={`M${x - 5} 44 Q${x} 47 ${x + 5} 44`} className="fg-line" />;
     case "closed":
-      return <path d={`M${x - 5} 43 Q${x} 48 ${x + 5} 43`} className="line" />;
+      return <path d={`M${x - 5} 43 Q${x} 48 ${x + 5} 43`} className="fg-line" />;
     case "smile":
-      return <path d={`M${x - 5} 46 Q${x} 39 ${x + 5} 46`} className="line" />;
+      return <path d={`M${x - 5} 46 Q${x} 39 ${x + 5} 46`} className="fg-line" />;
     default:
       return (
         <g>
@@ -137,8 +137,8 @@ function FaceParts({ face }: { face: Face }) {
   const s = face.smile;
   return (
     <g className="c-face">
-      <path d={`M33 ${outer} L44 ${inner}`} className="line" />
-      <path d={`M67 ${outer} L56 ${inner}`} className="line" />
+      <path d={`M33 ${outer} L44 ${inner}`} className="fg-line" />
+      <path d={`M67 ${outer} L56 ${inner}`} className="fg-line" />
       <Eye x={39} eyes={face.eyes} />
       <Eye x={61} eyes={face.eyes} />
       <circle cx="30" cy="55" r="4.5" fill="#ff8fa3" opacity="0.55" />
@@ -146,7 +146,7 @@ function FaceParts({ face }: { face: Face }) {
       <ellipse cx="50" cy="52.5" rx="4.6" ry="3.3" fill="#2a1e5c" />
       {face.mouth === "o" && <ellipse cx="50" cy="62" rx="3.4" ry="4" fill="#2a1e5c" />}
       {face.mouth === "yawn" && <ellipse cx="50" cy="63" rx="5" ry="6.5" fill="#2a1e5c" />}
-      {!face.mouth && <path d={`M42 ${61 - s * 2} Q50 ${61 + s * 9} 58 ${61 - s * 2}`} className="line" />}
+      {!face.mouth && <path d={`M42 ${61 - s * 2} Q50 ${61 + s * 9} 58 ${61 - s * 2}`} className="fg-line" />}
       {face.tears && (
         <g className="c-tears">
           <path d="M37 50 q-3.5 6 0 8.5 q3.5 -2.5 0 -8.5z" fill="#59c3ff" />
@@ -161,7 +161,7 @@ function FaceParts({ face }: { face: Face }) {
 export function Critter({ species, face, teacher = false }: { species: Species; face: Face; teacher?: boolean }) {
   const look = LOOKS[species];
   return (
-    <svg className="critter" viewBox="0 -18 100 148" aria-hidden>
+    <svg className="fg-critter" viewBox="0 -18 100 148" aria-hidden>
       <g className="c-leg c-leg-l">
         <rect className="o" x="36" y="104" width="12" height="22" rx="6" fill={look.pants} />
       </g>

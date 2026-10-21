@@ -92,11 +92,11 @@ export function useFloaters() {
 
 export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
   return (
-    <div className="floaters" aria-hidden>
+    <div className="fg-floaters" aria-hidden>
       {floaters.map((f, i) => (
         <span
           key={f.id}
-          className="floater"
+          className="fg-floater"
           style={{ left: `${f.x}%`, bottom: `${f.y}%`, "--i": i % 4, "--float-ms": `${FLOAT_MS}ms` } as CSSProperties}
         >
           {f.emoji}
@@ -124,18 +124,18 @@ export function Actor({
 }) {
   return (
     <div
-      className={`actor actor-${id} pose-${state.pose} ${className}`}
+      className={`fg-actor fg-actor-${id} pose-${state.pose} ${className}`}
       style={{ left: `${state.x}%`, bottom: `${state.y}%` }}
       onPointerDown={onPointerDown}
     >
       {line && (
-        <div key={line} className="bubble">
+        <div key={line} className="fg-bubble">
           {line}
         </div>
       )}
-      <div className={`actor-figure${state.face === "left" ? " flip" : ""}`}>
+      <div className={`fg-figure${state.face === "left" ? " flip" : ""}`}>
         <Critter species={SPECIES[id]} face={face} teacher={id === "teacher"} />
-        {state.holds && <span className="held">{state.holds}</span>}
+        {state.holds && <span className="fg-held">{state.holds}</span>}
       </div>
     </div>
   );

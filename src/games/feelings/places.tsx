@@ -68,11 +68,11 @@ const BLOCK_COLORS = ["#ff6b6b", "#ffd23f", "#3ddc97", "#4cc9f0", "#b388ff"];
 /** Five blocks; the stage class "tower-down" knocks them over (see feelings.css). */
 function Tower() {
   return (
-    <g className="tower">
+    <g className="fg-tower">
       {BLOCK_COLORS.map((color, i) => (
         <rect
           key={color}
-          className={`block block-${i}`}
+          className={`fg-block fg-block-${i}`}
           x="72"
           y={81 - i * 9}
           width="12"
@@ -89,7 +89,7 @@ function Tower() {
 
 export function PlaceDrawing({ place, tower = place === "room" }: { place: Place; tower?: boolean }) {
   return (
-    <svg className="place" viewBox="-160 0 480 100" aria-hidden>
+    <svg className="fg-place" viewBox="-160 0 480 100" aria-hidden>
       {place === "room" ? <Room /> : <Outdoors />}
       {place === "sandbox" && <Sandbox />}
       {place === "slide" && <Slide />}
