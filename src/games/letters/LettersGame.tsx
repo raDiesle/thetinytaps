@@ -98,12 +98,19 @@ export function LettersGame() {
                 onChange={(stepByStep) => update({ stepByStep })}
               />
             )}
+            {settings.mode === "free" && (
+              <Toggle
+                label="Selbst zählen (jedes Ding antippen)"
+                checked={settings.countByTap}
+                onChange={(countByTap) => update({ countByTap })}
+              />
+            )}
             <Toggle
               label="Ruhiger Modus (leiser, weniger Bewegung)"
               checked={settings.calm}
               onChange={(calm) => update({ calm })}
             />
-            {settings.mode === "free" && !settings.stepByStep && (
+            {settings.mode === "free" && !settings.stepByStep && !settings.countByTap && (
               <Toggle
                 label="Zählen nicht unterbrechen"
                 checked={settings.finishCounting}

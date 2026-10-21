@@ -74,6 +74,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Statt automatisch zu zählen, tippt das Kind jedes Ding einzeln an; es hüpft und die Zahl wird gesagt. Erst wenn alle angetippt sind, erscheint die Ziffer.",
         why: "Übt die Eins-zu-eins-Zuordnung, die Grundlage des Zählens.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-05",
