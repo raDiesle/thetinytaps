@@ -39,7 +39,20 @@ export function Scheune() {
       <rect x="-86" y="-176" width="172" height="176" fill="#3b2418" />
       <path d="M-80 0 Q-60 -70 -10 -64 Q30 -90 80 -40 V0 Z" fill="#e9b949" />
       <path d="M-60 -20 l14 -16 M-20 -40 l10 -18 M30 -30 l16 -14" stroke="#c89b2c" strokeWidth="3" />
-      <circle className="bh-scheune-lamp" cx="0" cy="-140" r="10" fill="#ffd166" />
+      <g className="bh-scheune-mouse">
+        <ellipse cx="44" cy="-58" rx="12" ry="9" fill="#adb5bd" />
+        <circle cx="36" cy="-68" r="5" fill="#adb5bd" />
+        <circle cx="52" cy="-68" r="5" fill="#adb5bd" />
+        <circle cx="40" cy="-60" r="1.8" fill="#2b2d42" />
+        <circle cx="48" cy="-60" r="1.8" fill="#2b2d42" />
+        <circle cx="44" cy="-54" r="2" fill="#ff8fa3" />
+      </g>
+      <path d="M-80 0 Q-60 -40 -10 -40 Q30 -50 80 -30 V0 Z" fill="#e9b949" />
+      <g className="bh-scheune-lamp" style={{ transformOrigin: "0px -176px" }}>
+        <circle className="bh-scheune-glow" cx="0" cy="-140" r="28" fill="#ffd166" />
+        <path d="M0 -176 V-150" stroke="#2b2d42" strokeWidth="3" />
+        <circle cx="0" cy="-140" r="10" fill="#ffd166" />
+      </g>
       <BarnDoor x={-86} hinge={-86} />
       <BarnDoor x={0} hinge={86} />
       <circle className="bh-scheune-dust" cx="-30" cy="-60" r="16" fill="#f4c95d" style={nth(0)} />
@@ -108,14 +121,23 @@ export function Bauernhaus() {
           <rect className="bh-haus-shutter" x={x + 54} y={-150} width="22" height="60" rx="3" fill="#52b788" style={{ transformOrigin: `${x + 54}px -120px` }} />
           <rect x={x - 4} y={-92} width="60" height="14" rx="3" fill="#bc6c25" />
           {[8, 22, 36, 50].map((dx, j) => (
-            <circle key={dx} cx={x + dx} cy={-96} r="6" fill={j % 2 ? "#ff8fa3" : "#e63946"} />
+            <circle key={dx} className="bh-haus-flower" cx={x + dx} cy={-96} r="6" fill={j % 2 ? "#ff8fa3" : "#e63946"} style={nth(i * 4 + j)} />
           ))}
         </g>
       ))}
-      {/* Door */}
-      <path d="M-130 0 V-104 Q-100 -136 -70 -104 V0 Z" fill="#6b4423" />
-      <path d="M-122 -6 V-100 Q-100 -124 -78 -100 V-6" stroke="#8d5a2b" strokeWidth="4" fill="none" />
-      <circle cx="-80" cy="-56" r="4" fill="#ffd166" />
+      {/* Door; behind it a child peeks out when it opens */}
+      <path d="M-130 0 V-104 Q-100 -136 -70 -104 V0 Z" fill="#3b2418" />
+      <rect x="-114" y="-50" width="28" height="44" rx="10" fill="#4cc9f0" />
+      <circle cx="-100" cy="-66" r="15" fill={SKIN} />
+      <path d="M-114 -68 Q-112 -86 -100 -84 Q-88 -86 -86 -68 Q-94 -78 -114 -68 Z" fill="#e9c46a" />
+      <circle cx="-105" cy="-66" r="2" fill="#2b2d42" />
+      <circle cx="-95" cy="-66" r="2" fill="#2b2d42" />
+      <path d="M-104 -59 Q-100 -55 -96 -59" stroke="#2b2d42" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+      <g className="bh-haus-door" style={{ transformOrigin: "-130px -52px" }}>
+        <path d="M-130 0 V-104 Q-100 -136 -70 -104 V0 Z" fill="#6b4423" />
+        <path d="M-122 -6 V-100 Q-100 -124 -78 -100 V-6" stroke="#8d5a2b" strokeWidth="4" fill="none" />
+        <circle cx="-80" cy="-56" r="4" fill="#ffd166" />
+      </g>
       <rect x="-140" y="-6" width="80" height="8" rx="3" fill="#adb5bd" />
     </>
   );
@@ -130,8 +152,20 @@ export function Windmuehle() {
       <path d="M-62 0 L-42 -250 H42 L62 0 Z" fill="#f1e3c8" />
       <path d="M30 -250 H42 L62 0 H42 Z" fill="#e0cba8" />
       <path d="M-58 -60 H58 M-50 -150 H50" stroke="#e0cba8" strokeWidth="5" />
-      <path d="M-18 0 V-46 Q0 -64 18 -46 V0 Z" fill="#7f5539" />
+      <path d="M-18 0 V-46 Q0 -64 18 -46 V0 Z" fill="#3b2418" />
+      <circle cx="0" cy="-28" r="11" fill={SKIN} />
+      <path d="M-11 -32 Q-12 -46 0 -46 Q12 -46 11 -32 Z" fill="#fff" />
+      <circle cx="-4" cy="-28" r="1.6" fill="#2b2d42" />
+      <circle cx="4" cy="-28" r="1.6" fill="#2b2d42" />
+      <path d="M-3 -23 Q0 -20 3 -23" stroke="#2b2d42" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <path className="bh-muehle-door" d="M-18 0 V-46 Q0 -64 18 -46 V0 Z" fill="#7f5539" style={{ transformOrigin: "-18px -30px" }} />
+      <g className="bh-muehle-flour" fill="#fff">
+        {[0, 1, 2].map((i) => (
+          <circle key={i} cx={16 + i * 8} cy={-14} r={9 - i} style={nth(i)} />
+        ))}
+      </g>
       <rect x="-12" y="-196" width="24" height="30" rx="10" fill="#bde0fe" stroke="#7f5539" strokeWidth="4" />
+      <rect className="bh-muehle-light" x="-10" y="-194" width="20" height="26" rx="9" fill="#ffd166" />
       <path d="M-54 -246 Q0 -312 54 -246 Z" fill="#6c584c" />
       <rect x="-56" y="-252" width="112" height="10" rx="4" fill="#5a4a40" />
       <g className="bh-muehle-sails" style={{ transformOrigin: "0px -270px" }}>
@@ -157,6 +191,12 @@ export function Pumpe() {
       <path d="M-34 -22 H34" stroke="#ced4da" strokeWidth="4" />
       <path d="M36 0 L40 -40 H84 L88 0 Z" fill="#8d99ae" />
       <ellipse cx="62" cy="-40" rx="22" ry="5" fill="#4dabf7" />
+      <ellipse className="bh-pumpe-ripple" cx="62" cy="-40" rx="14" ry="3" fill="none" stroke="#fff" strokeWidth="2" />
+      <g className="bh-pumpe-splash" fill="#4dabf7">
+        {[46, 62, 78].map((cx, i) => (
+          <circle key={cx} cx={cx} cy={-44} r={4} style={nth(i)} />
+        ))}
+      </g>
       <path d="M40 -34 Q62 -20 84 -34" stroke="#6c757d" strokeWidth="3" fill="none" />
       <rect x="-16" y="-150" width="32" height="130" rx="8" fill="#2d6a4f" />
       <rect x="-8" y="-146" width="7" height="120" rx="3" fill="#fff" opacity="0.25" />

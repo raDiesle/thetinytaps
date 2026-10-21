@@ -68,18 +68,20 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   hitAreas: [[...]],             // optional, when the box would cover other items
   place: ground(footX, footY, toX, toY, size),
   shadow: [cx, cy, rx],          // ellipse under the foot, own coordinates
-  badge: [x, y],                 // optional key badge spot, own coordinates
   durationMs: 2000,              // matches the CSS animation length
   Art: Traktor,
 }
 ```
 
-- `box`, `hitAreas`, `shadow`, `badge` and CSS `transform-origin` px values are all
+- `box`, `hitAreas`, `shadow` and CSS `transform-origin` px values are all
   in the drawing's own coordinates; `place` moves them along.
 - Hit areas: at least ~60 × 60 units after placement, so small fingers hit them.
   Tiny animals (ladybird, snail) get a larger hit area than their box.
-- Key badge: by default at the top centre of the first hit area. Set `badge` when
-  that is not on the item itself, or when it hides an important part (ears).
+- Key badges are placed by the engine (`badgeSpots` in `ScenePlay.tsx`): just
+  **outside** the item's `box`, at the spot covering the least of any item's hit
+  areas, so letters never hide faces, doors or animations. The badge of the item
+  just started lights up yellow with a glow ring, so the child sees where to look.
+  Keep `box` tight around the drawing, otherwise the badge ends up far away.
 - Keys are assigned in `src/games/scenes/keys.ts`: wished key → first letter → any
   free key (A–Z, 1–0); when keys run out, items share a key and take turns. Only
   set `key` for the most important items, so letters stay meaningful.
@@ -120,6 +122,19 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 - Tap animation: `.item-<id>.playing .<part> { animation: ... }`, length ≤
   `durationMs`. Each item does something different and fun (hop, wobble, spin,
   open/close, puffs) and ends in its resting pose.
+- **The more moves, the better.** When tapped, everything a child would expect
+  to move does move – several parts per item, staggered over the animation:
+  - every door opens and closes again (hinge as pivot, `scaleX` or `rotate`), and
+    often someone peeks out; garage doors and gates roll up;
+  - every window does something: the sash swings open, the light goes on, a
+    curtain moves or a face looks out;
+  - lids, flaps, hatches and boot lids lift; levers, handles and switches move;
+  - wheels turn, lights blink once, horns/exhausts puff, signs and flags swing;
+  - people wave, nod, blink, lift a tool; animals blink, wag, twitch ears, hop;
+  - plants rustle, petals open, smoke and dust puff, little extras pop out
+    (notes, hearts, drops, sparks) and vanish again.
+  Draw these parts as separate elements with their own class from the start, so
+  they can move – a door painted into the wall can't open.
 - **The picture is still unless someone acts.** Idle movement (clouds, rotors,
   blinking lights, wagging tails) only under `.scene.lively …` – that class is set
   only when the parent turns on "Bild bewegt sich auch von allein". Check with
@@ -143,7 +158,9 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
    - each item animates when tapped and returns to rest;
    - `document.getAnimations()` is empty when nothing was tapped;
    - keys mode (trigger "⌨️ Jedes Ding hat eine Taste", "Tasten im Bild zeigen"):
-     every item shows a badge on itself, badges don't overlap, the key triggers it;
+     every item shows a badge next to it (not on it), badges don't overlap, the key
+     triggers it and its badge lights up;
+   - tap every item once and look: do all doors, windows, lids and faces move?
    - hover mode and find mode work; the hint ring sits on the item;
    - "Fragen" and "Geräusch-Rätsel" ask sensible questions; every chain plays through;
    - "Ausmalen": everything starts grey and gets its colour when tapped.

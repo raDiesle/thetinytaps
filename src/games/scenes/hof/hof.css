@@ -50,7 +50,36 @@
 .hf-korb-bees > g,
 .hf-ente-ripples ellipse,
 .hf-frosch-sac,
-.hf-katze-open {
+.hf-katze-open,
+.hf-lid,
+.hf-lines path,
+.hf-muehle-flour circle,
+.hf-muehle-light,
+.hf-haus-glow,
+.hf-scheune-glow,
+.hf-scheune-hay path,
+.hf-stall-feather,
+.hf-baum-leaves ellipse,
+.hf-baum-bird,
+.hf-huhn-egg,
+.hf-huhn-corn ellipse,
+.hf-katze-yawn,
+.hf-schwein-bubble circle,
+.hf-ente-bubbles circle,
+.hf-ente-drops ellipse,
+.hf-frosch-fly,
+.hf-frosch-tongue,
+.hf-korb-honey,
+.hf-biene-pollen circle,
+.hf-falter-dust circle,
+.hf-blume-pollen circle,
+.hf-ferkel-heart,
+.hf-pferd-dust circle,
+.hf-pferd-snort circle,
+.hf-heu-dust circle,
+.hf-traktor-light,
+.hf-traktor-beacon,
+.hf-schnecke-trail {
   opacity: 0;
   pointer-events: none;
 }
@@ -66,7 +95,32 @@
 .hf-frosch-sac,
 .hf-stall-egg,
 .hf-blume-head,
-.hf-scheuche-crow {
+.hf-scheuche-crow,
+.hf-lines path,
+.hf-muehle-flour circle,
+.hf-scheune-hay path,
+.hf-haus-flower,
+.hf-stall-heart,
+.hf-stall-feather,
+.hf-baum-leaves ellipse,
+.hf-baum-basket,
+.hf-huhn-egg,
+.hf-kueken-wing,
+.hf-katze-yawn,
+.hf-schwein-bubble circle,
+.hf-ente-bubbles circle,
+.hf-ente-drops ellipse,
+.hf-korb-honey,
+.hf-biene-pollen circle,
+.hf-falter-dust circle,
+.hf-blume-pollen circle,
+.hf-ferkel-heart,
+.hf-hase-tail,
+.hf-maus-nose,
+.hf-pferd-dust circle,
+.hf-pferd-snort circle,
+.hf-heu-dust circle,
+.hf-traktor-beacon {
   transform-box: fill-box;
   transform-origin: center;
 }
@@ -160,13 +214,154 @@
   }
 }
 
-/* ---------- Windmühle: the sails turn round once ---------- */
+/* ---------- Parts many items share: eyelids, sound lines, lights, little moves ---------- */
+
+/* Every animal and person blinks twice while it plays (Lid in parts.tsx). */
+.scene-item.playing .hf-lid {
+  animation: hf-blink 1.6s linear;
+}
+
+/* Moo, bark, toot: two lines in front of the mouth (Lines in parts.tsx). */
+.scene-item.playing .hf-lines path {
+  animation: hf-lines 0.7s ease-out calc(0.2s + var(--i) * 0.15s) 2;
+}
+
+@keyframes hf-blink {
+  0%,
+  28%,
+  40%,
+  68%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  30%,
+  38%,
+  70%,
+  78% {
+    opacity: 1;
+  }
+}
+
+@keyframes hf-lines {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* A window or lamp that lights up for a while. */
+@keyframes hf-glow {
+  15%,
+  85% {
+    opacity: 0.85;
+  }
+}
+
+/* Ears, leaves and flaps flick back and forth; the right one of a pair the other way. */
+@keyframes hf-flick {
+  to {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes hf-flick-r {
+  to {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes hf-tilt-s {
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes hf-hop-s {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes hf-pop-s {
+  50% {
+    transform: scale(1.4);
+  }
+}
+
+@keyframes hf-bob {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes hf-dust {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(1.8);
+  }
+}
+
+@keyframes hf-pollen {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.4);
+  }
+}
+
+@keyframes hf-float-up {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(1);
+  }
+}
+
+/* ---------- Windmühle: the sails turn round once, the door opens and flour puffs out, the window lights up ---------- */
 
 .item-windmuehle.playing .hf-muehle-sails {
   animation: hf-spin 2.4s ease-in-out;
 }
 
-/* ---------- Vogelscheuche: wobbles, the hat jumps, the crows hop up ---------- */
+.item-windmuehle.playing .hf-muehle-door {
+  animation: hf-door 2.4s ease-in-out;
+}
+
+.item-windmuehle.playing .hf-muehle-flour circle {
+  animation: hf-smoke 1.2s ease-out calc(0.4s + var(--i) * 0.3s);
+}
+
+.item-windmuehle.playing .hf-muehle-light {
+  animation: hf-glow 2.4s ease-in-out;
+}
+
+/* ---------- Vogelscheuche: wobbles and shakes its head, the hat jumps, the straw fluffs, the crows flap up ---------- */
 
 .item-vogelscheuche.playing .hf-scheuche-body {
   animation: hf-wobble 0.7s ease-in-out 3;
@@ -212,7 +407,19 @@
   }
 }
 
-/* ---------- Bauernhaus: the shutters open, the farmer's wife waves, the chimney smokes ---------- */
+.item-vogelscheuche.playing .hf-scheuche-head {
+  animation: hf-wobble 0.55s ease-in-out 0.2s 3;
+}
+
+.item-vogelscheuche.playing .hf-scheuche-straw {
+  animation: hf-flick 0.2s ease-in-out 8 alternate;
+}
+
+.item-vogelscheuche.playing .hf-crow-wing {
+  animation: hf-flick 0.15s ease-in-out calc(0.4s + var(--i) * 0.15s) 8 alternate;
+}
+
+/* ---------- Bauernhaus: shutters and front door open, the farmer's wife and the child wave, windows light up, flowers nod, the chimney smokes ---------- */
 
 .item-bauernhaus.playing .hf-haus-shutter {
   animation: hf-shutter 2.6s ease-in-out;
@@ -239,7 +446,27 @@
   }
 }
 
-/* ---------- Scheune: the doors swing open and a swallow flies out ---------- */
+.item-bauernhaus.playing .hf-haus-door {
+  animation: hf-door 2.6s ease-in-out;
+}
+
+.item-bauernhaus.playing .hf-haus-kid {
+  animation: hf-hop-s 0.5s ease-in-out 0.6s 2;
+}
+
+.item-bauernhaus.playing .hf-haus-kid-arm {
+  animation: hf-wave 0.4s ease-in-out 0.6s 4;
+}
+
+.item-bauernhaus.playing .hf-haus-glow {
+  animation: hf-glow 2.2s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-bauernhaus.playing .hf-haus-flower {
+  animation: hf-pop-s 0.5s ease-in-out calc(0.3s + var(--i) * 0.1s) 2;
+}
+
+/* ---------- Scheune: the doors swing open, a swallow flies out, the lamp lights up, hay flies from the loft ---------- */
 
 .item-scheune.playing .hf-scheune-door {
   animation: hf-door 2.6s ease-in-out;
@@ -273,7 +500,15 @@
   }
 }
 
-/* ---------- Storch: throws its head back and clatters with its beak ---------- */
+.item-scheune.playing .hf-scheune-glow {
+  animation: hf-glow 2.2s ease-in-out 0.2s;
+}
+
+.item-scheune.playing .hf-scheune-hay path {
+  animation: hf-straw 1.4s ease-out calc(0.5s + var(--i) * 0.15s);
+}
+
+/* ---------- Storch: throws its head back, clatters, flaps a wing, the babies pop up ---------- */
 
 .item-storch.playing .hf-storch-head {
   animation: hf-throwback 2.2s ease-in-out;
@@ -306,7 +541,28 @@
   }
 }
 
-/* ---------- Apfelbaum: the crown shakes and two apples fall ---------- */
+.item-storch.playing .hf-storch-wing {
+  animation: hf-flick 0.3s ease-in-out 0.2s 6 alternate;
+}
+
+.item-storch.playing .hf-storch-baby {
+  animation: hf-baby 2s ease-in-out calc(var(--i) * 0.15s);
+}
+
+@keyframes hf-baby {
+  25%,
+  80% {
+    transform: translateY(-18px);
+  }
+  40% {
+    transform: translateY(-14px);
+  }
+  55% {
+    transform: translateY(-20px);
+  }
+}
+
+/* ---------- Apfelbaum: the crown shakes, a bird flies out, leaves and two apples fall, the basket apples hop ---------- */
 
 .item-apfelbaum.playing .hf-baum-crown {
   animation: hf-shake 0.4s ease-in-out 3;
@@ -347,7 +603,53 @@
   }
 }
 
-/* ---------- Schaf and Lamm: hop twice and bleat ---------- */
+.item-apfelbaum.playing .hf-baum-leaves ellipse {
+  animation: hf-leaf-fall 2s ease-in calc(var(--i) * 0.2s);
+}
+
+.item-apfelbaum.playing .hf-baum-bird {
+  animation: hf-bird-out 1.8s ease-in 0.3s;
+}
+
+.item-apfelbaum.playing .hf-baum-basket {
+  animation: hf-hop-s 0.4s ease-in-out calc(1s + var(--i) * 0.08s) 2;
+}
+
+@keyframes hf-leaf-fall {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-14px, 70px) rotate(90deg);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, 140px) rotate(200deg);
+  }
+}
+
+@keyframes hf-bird-out {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(30px, -30px);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(160px, -130px);
+  }
+}
+
+/* ---------- Schaf and Lamm: hop twice, bleat, flick their ears, wag their tails ---------- */
 
 .item-schaf.playing .hf-schaf-body,
 .item-lamm.playing .hf-schaf-body {
@@ -365,7 +667,15 @@
   }
 }
 
-/* ---------- Hühnerstall: the door opens and an egg rolls down the ramp ---------- */
+.scene-item.playing .hf-schaf-ear {
+  animation: hf-flick 0.3s ease-in-out 0.1s 4 alternate;
+}
+
+.scene-item.playing .hf-schaf-tail {
+  animation: hf-wag 0.15s ease-in-out 8 alternate;
+}
+
+/* ---------- Hühnerstall: the door opens, an egg rolls down the ramp, a hen looks out, the heart beats, a feather floats down ---------- */
 
 .item-huehnerstall.playing .hf-stall-door {
   animation: hf-door 2.4s ease-in-out;
@@ -394,7 +704,55 @@
   }
 }
 
-/* ---------- Hahn: stretches, opens his beak and crows ---------- */
+/* The hen waits below the round hole until she looks out. */
+.hf-stall-hen {
+  transform: translateY(28px);
+}
+
+.item-huehnerstall.playing .hf-stall-hen {
+  animation: hf-peek 2.4s ease-in-out;
+}
+
+.item-huehnerstall.playing .hf-stall-heart {
+  animation: hf-pop-s 0.5s ease-in-out 0.2s 3;
+}
+
+.item-huehnerstall.playing .hf-stall-feather {
+  animation: hf-feather 2s ease-in-out 0.3s;
+}
+
+@keyframes hf-peek {
+  0%,
+  100% {
+    transform: translateY(28px);
+  }
+  25%,
+  75% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px) rotate(-8deg);
+  }
+}
+
+@keyframes hf-feather {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-20px, 30px) rotate(-20deg);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, 56px) rotate(15deg);
+  }
+}
+
+/* ---------- Hahn: stretches, opens his beak and crows, flaps and fans his tail ---------- */
 
 .item-hahn.playing .hf-hahn-body {
   animation: hf-stretch 2s ease-in-out;
@@ -427,7 +785,15 @@
   }
 }
 
-/* ---------- Kuh: nods, swishes her tail, rings her bell ---------- */
+.item-hahn.playing .hf-hahn-tail {
+  animation: hf-wobble 0.5s ease-in-out 0.2s 3;
+}
+
+.item-hahn.playing .hf-hahn-wing {
+  animation: hf-flick 0.2s ease-in-out 0.3s 8 alternate;
+}
+
+/* ---------- Kuh: nods and moos, flicks her ears, swishes her tail, rings her bell ---------- */
 
 .item-kuh.playing .hf-kuh-head {
   animation: hf-moo 1.2s ease-in-out 2;
@@ -456,7 +822,15 @@
   }
 }
 
-/* ---------- Ziege: butts with her head ---------- */
+.item-kuh.playing .hf-kuh-ear {
+  animation: hf-flick 0.25s ease-in-out 0.2s 6 alternate;
+}
+
+.item-kuh.playing .hf-kuh-udder {
+  animation: hf-tilt-s 0.3s ease-in-out 6 alternate;
+}
+
+/* ---------- Ziege: butts with her head, bleats, wags her tail, flicks her ear, her beard wiggles ---------- */
 
 .item-ziege.playing .hf-ziege-head {
   animation: hf-butt 1s ease-in-out 2;
@@ -479,7 +853,19 @@
   }
 }
 
-/* ---------- Pferd: rears up, shakes its mane, swishes its tail ---------- */
+.item-ziege.playing .hf-ziege-tail {
+  animation: hf-wag 0.15s ease-in-out 0.1s 10 alternate;
+}
+
+.item-ziege.playing .hf-ziege-ear {
+  animation: hf-flick 0.25s ease-in-out 0.3s 6 alternate;
+}
+
+.item-ziege.playing .hf-ziege-beard {
+  animation: hf-tilt-s 0.2s ease-in-out 0.2s 8 alternate;
+}
+
+/* ---------- Pferd: rears up, shakes its mane, twitches its ear, snorts, swishes its tail, dust flies on landing ---------- */
 
 .item-pferd.playing .hf-pferd-body {
   animation: hf-rear 2.4s ease-in-out;
@@ -512,7 +898,34 @@
   }
 }
 
-/* ---------- Hund: jumps, wags and barks ---------- */
+.item-pferd.playing .hf-pferd-ear {
+  animation: hf-flick 0.25s ease-in-out 0.1s 6 alternate;
+}
+
+.item-pferd.playing .hf-pferd-snort circle {
+  animation: hf-snort 0.9s ease-out calc(1.2s + var(--i) * 0.2s);
+}
+
+/* Dust flies where the hooves land. */
+.item-pferd.playing .hf-pferd-dust circle {
+  animation: hf-dust 0.7s ease-out calc(1.55s + var(--i) * 0.06s);
+}
+
+@keyframes hf-snort {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(30px, -10px) scale(1.6);
+  }
+}
+
+/* ---------- Hund: jumps, wags, flaps his ears and barks; the sign swings, the bones hop ---------- */
 
 .item-hund.playing .hf-hund-body {
   animation: hf-hop 0.6s ease-in-out 3;
@@ -543,7 +956,23 @@
   }
 }
 
-/* ---------- Huhn: pecks and flaps ---------- */
+.item-hund.playing .hf-hund-ear {
+  animation: hf-flick 0.15s ease-in-out 0.1s 10 alternate;
+}
+
+.item-hund.playing .hf-hund-tag {
+  animation: hf-tilt-s 0.15s ease-in-out 10 alternate;
+}
+
+.item-hund.playing .hf-hund-sign {
+  animation: hf-wobble 0.4s ease-in-out 0.2s 3;
+}
+
+.item-hund.playing .hf-hund-food {
+  animation: hf-hop-s 0.3s ease-in-out 0.3s 4;
+}
+
+/* ---------- Huhn: pecks up the grains, flaps, wags her tail and lays an egg ---------- */
 
 .item-huhn.playing .hf-huhn-head {
   animation: hf-peck 0.6s ease-in-out 3;
@@ -565,7 +994,46 @@
   }
 }
 
-/* ---------- Gans: stretches her neck and flaps ---------- */
+.item-huhn.playing .hf-huhn-tail {
+  animation: hf-wag 0.2s ease-in-out 6 alternate;
+}
+
+/* One grain disappears with each peck. */
+.item-huhn.playing .hf-huhn-corn ellipse {
+  animation: hf-eaten calc(0.35s + var(--i) * 0.6s) linear;
+}
+
+.item-huhn.playing .hf-huhn-egg {
+  animation: hf-egg-pop 2.2s ease-out;
+}
+
+@keyframes hf-eaten {
+  0%,
+  95% {
+    opacity: 1;
+  }
+}
+
+@keyframes hf-egg-pop {
+  0%,
+  65% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Gans: stretches her neck, honks, flaps, wags her tail, the bow wiggles ---------- */
 
 .item-gans.playing .hf-gans-neck {
   animation: hf-honk 1s ease-in-out 2;
@@ -581,13 +1049,31 @@
   }
 }
 
-/* ---------- Küken: hop one after the other ---------- */
+.item-gans.playing .hf-gans-tail {
+  animation: hf-wag 0.15s ease-in-out 0.1s 10 alternate;
+}
+
+.item-gans.playing .hf-gans-bow {
+  animation: hf-tilt-s 0.2s ease-in-out 8 alternate;
+}
+
+/* ---------- Küken: hop one after the other and flap their little wings ---------- */
 
 .item-kueken.playing .hf-kueken-chick {
   animation: hf-hop 0.5s ease-in-out calc(var(--i) * 0.2s) 2;
 }
 
-/* ---------- Bauer: walks a bit, lifts his hat, whistles ---------- */
+.item-kueken.playing .hf-kueken-wing {
+  animation: hf-flutter-wing 0.12s ease-in-out calc(var(--i) * 0.2s) 10 alternate;
+}
+
+@keyframes hf-flutter-wing {
+  to {
+    transform: translateY(-4px) rotate(-30deg);
+  }
+}
+
+/* ---------- Bauer: walks a bit, lifts his hat, whistles, the vegetables bounce ---------- */
 
 .item-bauer.playing .hf-bauer-walk {
   animation: hf-push 2.6s ease-in-out;
@@ -615,7 +1101,28 @@
   }
 }
 
-/* ---------- Traktor: drives forward and back, puffs ---------- */
+.item-bauer.playing .hf-bauer-leg {
+  animation: hf-step 0.6s ease-in-out calc(var(--i) * 0.3s) 3;
+}
+
+.item-bauer.playing .hf-bauer-veg {
+  animation: hf-hop-s 0.3s ease-in-out calc(var(--i) * 0.15s) 4;
+}
+
+.item-bauer.playing .hf-bauer-carrot {
+  animation: hf-tilt-s 0.2s ease-in-out calc(0.4s + var(--i) * 0.1s) 6 alternate;
+}
+
+@keyframes hf-step {
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+/* ---------- Traktor: drives forward and back, puffs, the driver bobs, beacon and headlight glow, it toots ---------- */
 
 .item-traktor.playing .hf-traktor-body {
   animation: hf-drive 2.6s ease-in-out;
@@ -654,7 +1161,36 @@
   }
 }
 
-/* ---------- Heuballen: wobbles, straw flies ---------- */
+.item-traktor.playing .hf-traktor-driver {
+  animation: hf-bob 0.3s ease-in-out 6;
+}
+
+.item-traktor.playing .hf-traktor-light {
+  animation: hf-glow 2.4s ease-in-out;
+}
+
+.item-traktor.playing .hf-traktor-beacon {
+  animation: hf-beacon 0.5s ease-in-out 0.2s 4;
+}
+
+.item-traktor.playing .hf-traktor-cap {
+  animation: hf-cap 0.25s ease-in-out 0.1s 8 alternate;
+}
+
+@keyframes hf-beacon {
+  50% {
+    opacity: 0.8;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes hf-cap {
+  to {
+    transform: rotate(-50deg);
+  }
+}
+
+/* ---------- Heuballen: wobbles and bounces, straw and dust fly ---------- */
 
 .item-heuballen.playing .hf-heu-round {
   animation: hf-wobble 0.6s ease-in-out 3;
@@ -677,7 +1213,21 @@
   }
 }
 
-/* ---------- Katze: wakes up, looks around, swishes her tail ---------- */
+.item-heuballen.playing .hf-heu-square {
+  animation: hf-squash 0.6s ease-in-out 0.1s 3;
+}
+
+.item-heuballen.playing .hf-heu-dust circle {
+  animation: hf-dust 0.8s ease-out calc(0.2s + var(--i) * 0.25s);
+}
+
+@keyframes hf-squash {
+  50% {
+    transform: scale(1.05, 0.92);
+  }
+}
+
+/* ---------- Katze: wakes up, yawns, looks around, twitches her ears, stretches, swishes her tail ---------- */
 
 .item-katze.playing .hf-katze-head {
   animation: hf-look 1.8s ease-in-out;
@@ -711,7 +1261,40 @@
   }
 }
 
-/* ---------- Kürbis: grows a little and wobbles ---------- */
+.item-katze.playing .hf-katze-ear {
+  animation: hf-flick 0.2s ease-in-out 0.3s 6 alternate;
+}
+
+.item-katze.playing .hf-katze-paw {
+  animation: hf-paw 1s ease-in-out calc(0.2s + var(--i) * 0.2s);
+}
+
+.item-katze.playing .hf-katze-yawn {
+  animation: hf-yawn 1.8s ease-in-out;
+}
+
+@keyframes hf-paw {
+  50% {
+    transform: translateX(-8px);
+  }
+}
+
+@keyframes hf-yawn {
+  0%,
+  10%,
+  50%,
+  100% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  20%,
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- Kürbis: grows a little and wobbles, the leaves flap, a ladybird crawls out ---------- */
 
 .item-kuerbis.playing .hf-kuerbis-body {
   animation: hf-grow 1.8s ease-in-out;
@@ -732,7 +1315,24 @@
   }
 }
 
-/* ---------- Schwein: wiggles in the mud, the mud splashes ---------- */
+.item-kuerbis.playing .hf-kuerbis-leaf,
+.item-kuerbis.playing .hf-kuerbis-vine {
+  animation: hf-flick 0.2s ease-in-out 0.2s 6 alternate;
+}
+
+/* The ladybird crawls out from behind the pumpkin and back. */
+.item-kuerbis.playing .hf-kuerbis-bug {
+  animation: hf-bug 1.8s ease-in-out;
+}
+
+@keyframes hf-bug {
+  30%,
+  70% {
+    transform: translateX(50px);
+  }
+}
+
+/* ---------- Schwein: wiggles in the mud, flops its ears, sniffs, the mud splashes and bubbles ---------- */
 
 .item-schwein.playing .hf-schwein-body {
   animation: hf-wiggle 0.5s ease-in-out 4;
@@ -773,13 +1373,62 @@
   }
 }
 
-/* ---------- Ferkel: hop one after the other ---------- */
+.item-schwein.playing .hf-schwein-ear {
+  animation: hf-flick 0.25s ease-in-out 6 alternate;
+}
+
+.item-schwein.playing .hf-schwein-snout {
+  animation: hf-snout 0.15s ease-in-out 0.2s 10 alternate;
+}
+
+.item-schwein.playing .hf-schwein-bubble circle {
+  animation: hf-bubble 0.8s ease-out calc(0.2s + var(--i) * 0.35s);
+}
+
+@keyframes hf-snout {
+  to {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes hf-bubble {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* ---------- Ferkel: hop one after the other, curl their tails, a heart pops up ---------- */
 
 .item-ferkel.playing .hf-ferkel-pig {
   animation: hf-hop 0.6s ease-in-out calc(var(--i) * 0.3s) 2;
 }
 
-/* ---------- Ente: head in the water, tail up ---------- */
+.item-ferkel.playing .hf-ferkel-tail {
+  animation: hf-spin 0.4s linear 3;
+}
+
+.item-ferkel.playing .hf-ferkel-ear {
+  animation: hf-flick 0.2s ease-in-out calc(var(--i) * 0.3s) 6 alternate;
+}
+
+.item-ferkel.playing .hf-ferkel-heart {
+  animation: hf-float-up 1.2s ease-out 0.3s;
+}
+
+/* ---------- Ente: head in the water, tail up and wagging, bubbles rise, drops fly ---------- */
 
 .item-ente.playing .hf-ente-body {
   animation: hf-dabble 2.4s ease-in-out;
@@ -813,7 +1462,44 @@
   }
 }
 
-/* ---------- Frosch: puffs his throat and jumps ---------- */
+.item-ente.playing .hf-ente-tail {
+  animation: hf-wag 0.15s ease-in-out 0.5s 8 alternate;
+}
+
+.item-ente.playing .hf-ente-bubbles circle {
+  animation: hf-rise 0.8s ease-out calc(0.6s + var(--i) * 0.25s);
+}
+
+/* Drops fly off the head when it comes up again. */
+.item-ente.playing .hf-ente-drops ellipse {
+  animation: hf-drops 0.55s ease-out calc(1.7s + var(--i) * 0.05s);
+}
+
+@keyframes hf-rise {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes hf-drops {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1) * 18px), -24px);
+  }
+}
+
+/* ---------- Frosch: puffs his throat, jumps, the pad bobs, the tongue catches a fly ---------- */
 
 .item-frosch.playing .hf-frosch-body {
   animation: hf-jump 1.8s ease-in-out;
@@ -842,7 +1528,74 @@
   }
 }
 
-/* ---------- Bienenkorb: wobbles and bees fly out ---------- */
+.item-frosch.playing .hf-frosch-pad {
+  animation: hf-pad 0.5s ease-in-out 1.55s;
+}
+
+.item-frosch.playing .hf-frosch-fly {
+  animation: hf-fly 2.2s ease-in-out;
+}
+
+/* After landing the tongue catches the fly. */
+.item-frosch.playing .hf-frosch-tongue {
+  animation: hf-tongue 2.2s ease-out;
+}
+
+@keyframes hf-pad {
+  50% {
+    transform: translateY(4px) scaleX(1.04);
+  }
+}
+
+@keyframes hf-fly {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  30% {
+    transform: translate(10px, -8px);
+  }
+  50% {
+    transform: translate(-6px, 4px);
+  }
+  70% {
+    transform: translate(6px, -4px);
+  }
+  86% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  88%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes hf-tongue {
+  0%,
+  78% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  84% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  92%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+
+/* ---------- Bienenkorb: wobbles, the knob hops, honey drips, bees fly out ---------- */
 
 .item-bienenkorb.playing .hf-korb-body {
   animation: hf-wobble 0.5s ease-in-out 4;
@@ -869,7 +1622,34 @@
   }
 }
 
-/* ---------- Biene: flies a loop ---------- */
+.item-bienenkorb.playing .hf-korb-knob {
+  animation: hf-hop-s 0.3s ease-in-out 0.2s 4;
+}
+
+.item-bienenkorb.playing .hf-korb-honey {
+  animation: hf-drip 1.6s ease-in 0.4s;
+}
+
+@keyframes hf-drip {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+/* ---------- Biene: flies a loop with a pollen trail, antennae wiggle ---------- */
 
 .item-biene.playing .hf-biene-flight {
   animation: hf-loop 2.4s ease-in-out;
@@ -892,7 +1672,15 @@
   }
 }
 
-/* ---------- Blumen: the heads turn and nod ---------- */
+.item-biene.playing .hf-biene-antenna {
+  animation: hf-tilt-s 0.15s ease-in-out 12 alternate;
+}
+
+.item-biene.playing .hf-biene-pollen circle {
+  animation: hf-pollen 1s ease-out calc(0.4s + var(--i) * 0.5s);
+}
+
+/* ---------- Blumen: the heads turn and nod, leaves and grass sway, pollen floats up ---------- */
 
 .item-blumen.playing .hf-blume-head {
   animation: hf-bloom 0.9s ease-in-out calc(var(--i) * 0.1s) 2;
@@ -904,7 +1692,28 @@
   }
 }
 
-/* ---------- Schmetterling: flutters around the flowers ---------- */
+.item-blumen.playing .hf-blume-leaf {
+  animation: hf-flick 0.3s ease-in-out 0.1s 4 alternate;
+}
+
+.item-blumen.playing .hf-blume-grass {
+  animation: hf-grass 0.4s ease-in-out 3;
+}
+
+.item-blumen.playing .hf-blume-pollen circle {
+  animation: hf-float-up 1.2s ease-out calc(0.2s + var(--i) * 0.1s);
+}
+
+@keyframes hf-grass {
+  25% {
+    transform: skewX(-8deg);
+  }
+  75% {
+    transform: skewX(8deg);
+  }
+}
+
+/* ---------- Schmetterling: flutters around the flowers with a sparkle trail, antennae wiggle ---------- */
 
 .item-schmetterling.playing .hf-falter-flight {
   animation: hf-flutter 2.4s ease-in-out;
@@ -922,7 +1731,15 @@
   }
 }
 
-/* ---------- Hase: hops, ears and nose wiggle ---------- */
+.item-schmetterling.playing .hf-falter-antenna {
+  animation: hf-tilt-s 0.2s ease-in-out 10 alternate;
+}
+
+.item-schmetterling.playing .hf-falter-dust circle {
+  animation: hf-pollen 1s ease-out calc(0.4s + var(--i) * 0.5s);
+}
+
+/* ---------- Hase: hops, ears, nose and tail wiggle, nibbles the carrot ---------- */
 
 .item-hase.playing .hf-hase-body {
   animation: hf-hop 0.7s ease-in-out 2;
@@ -963,7 +1780,22 @@
   transform-origin: center;
 }
 
-/* ---------- Schnecke: hides in her shell and comes out again ---------- */
+.item-hase.playing .hf-hase-tail {
+  animation: hf-puff 0.25s ease-in-out 6 alternate;
+}
+
+/* Nibble, nibble: the carrot wiggles. */
+.item-hase.playing .hf-hase-carrot {
+  animation: hf-tilt-s 0.15s ease-in-out 0.3s 10 alternate;
+}
+
+@keyframes hf-puff {
+  to {
+    transform: scale(1.3);
+  }
+}
+
+/* ---------- Schnecke: hides in her shell, comes out again, waves her eye stalks, the trail glistens ---------- */
 
 .item-schnecke.playing .hf-schnecke-foot {
   animation: hf-hide-in 2.4s ease-in-out;
@@ -993,7 +1825,30 @@
   }
 }
 
-/* ---------- Maus: hops and turns around ---------- */
+.item-schnecke.playing .hf-schnecke-stalks {
+  animation: hf-wobble 0.4s ease-in-out 1.5s 2;
+}
+
+.item-schnecke.playing .hf-schnecke-trail {
+  animation: hf-glisten 2.2s ease-in-out;
+}
+
+@keyframes hf-glisten {
+  0% {
+    opacity: 0;
+    stroke-dashoffset: 0;
+  }
+  20%,
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -36;
+  }
+}
+
+/* ---------- Maus: hops and turns around, tail, ears, nose and wheat wiggle ---------- */
 
 .item-maus.playing .hf-maus-body {
   animation: hf-twirl 1.6s ease-in-out;
@@ -1009,4 +1864,25 @@
   80% {
     transform: translateY(-14px) scaleX(1);
   }
+}
+
+.item-maus.playing .hf-maus-tail {
+  animation: hf-wag 0.15s ease-in-out 8 alternate;
+}
+
+.item-maus.playing .hf-maus-wheat {
+  animation: hf-tilt-s 0.2s ease-in-out 6 alternate;
+}
+
+.item-maus.playing .hf-maus-ear {
+  animation: hf-flick 0.2s ease-in-out 0.2s 6 alternate;
+}
+
+.item-maus.playing .hf-maus-nose {
+  animation: hf-sniff 0.15s ease-in-out 10 alternate;
+}
+
+/* The right one of a pair (ears, leaves) flicks the other way. */
+.scene-item.playing .hf-ear-right {
+  animation-name: hf-flick-r;
 }

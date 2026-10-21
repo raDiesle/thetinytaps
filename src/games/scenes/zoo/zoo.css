@@ -49,7 +49,25 @@
 .zo-fisch-ripples ellipse,
 .zo-nilpferd-mouth,
 .zo-nilpferd-ripples ellipse,
-.zo-pelikan-fish {
+.zo-pelikan-fish,
+.zo-lid,
+.zo-dust circle,
+.zo-nashorn-bird,
+.zo-affe-mouth,
+.zo-papagei-bubble,
+.zo-koala-zzz text,
+.zo-flamingo-ripples ellipse,
+.zo-bahn-smoke circle,
+.zo-bahn-light,
+.zo-kind-heart,
+.zo-ballon-twinkle,
+.zo-pinguin-ripples ellipse,
+.zo-fisch-bubbles circle,
+.zo-krokodil-bubbles circle,
+.zo-schildi-heart,
+.zo-nilpferd-spray circle,
+.zo-pelikan-drops circle,
+.zo-erdmann-dirt circle {
   opacity: 0;
   pointer-events: none;
 }
@@ -66,9 +84,111 @@
 .zo-pinguin-splash circle,
 .zo-fisch-ripples ellipse,
 .zo-nilpferd-ripples ellipse,
-.zo-pelikan-fish {
+.zo-pelikan-fish,
+.zo-dust circle,
+.zo-affe-mouth,
+.zo-koala-zzz text,
+.zo-flamingo-ripples ellipse,
+.zo-bahn-smoke circle,
+.zo-bahn-light,
+.zo-kind-heart,
+.zo-kind-bun,
+.zo-ballon-twinkle,
+.zo-pinguin-ripples ellipse,
+.zo-fisch-bubbles circle,
+.zo-krokodil-bubbles circle,
+.zo-schildi-heart,
+.zo-nilpferd-spray circle,
+.zo-pelikan-drops circle,
+.zo-erdmann-dirt circle,
+.zo-erdmann-ear,
+.zo-taube-crumbs circle,
+.zo-pfleger-bucketfish {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* ---------- Parts many items share ---------- */
+
+/* Every animal and person with a Lid blinks twice while it plays (the shortest item lasts 1.8 s). */
+.scene-item.playing .zo-lid {
+  animation: zo-blink 1.8s linear;
+}
+
+@keyframes zo-blink {
+  0%,
+  24%,
+  32%,
+  66%,
+  74%,
+  100% {
+    opacity: 0;
+  }
+  25%,
+  31%,
+  67%,
+  73% {
+    opacity: 1;
+  }
+}
+
+/* Small to-and-fro movement: ears, tails, crests, leaves, whiskers. */
+@keyframes zo-wiggle {
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes zo-twitch {
+  50% {
+    transform: rotate(-22deg);
+  }
+}
+
+@keyframes zo-nod {
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes zo-tilt {
+  20%,
+  45% {
+    transform: rotate(-10deg);
+  }
+  60%,
+  80% {
+    transform: rotate(6deg);
+  }
+}
+
+/* Drops and bubbles that rise and fade. */
+@keyframes zo-rise {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1) * 6px), -34px) scale(1.2);
+  }
+}
+
+/* Something pops up, stays a moment and disappears again (bubbles, hearts). */
+@keyframes zo-pop {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  20%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @keyframes zo-drift {
@@ -186,6 +306,23 @@
   }
 }
 
+.item-luftballon.playing .zo-ballon-string {
+  animation: zo-string 0.4s ease-in-out 6 alternate;
+}
+
+.item-luftballon.playing .zo-ballon-twinkle {
+  animation: zo-pop 0.8s ease-out 0.4s 2;
+}
+
+@keyframes zo-string {
+  from {
+    transform: skewX(-12deg);
+  }
+  to {
+    transform: skewX(12deg);
+  }
+}
+
 /* ---------- Giraffe: reaches into the tree, munches, a few leaves fall ---------- */
 
 .item-giraffe.playing .zo-giraffe-neck {
@@ -243,6 +380,14 @@
   }
 }
 
+.item-giraffe.playing .zo-giraffe-horns {
+  animation: zo-wiggle 0.3s ease-in-out 0.6s 4;
+}
+
+.item-giraffe.playing .zo-giraffe-ear {
+  animation: zo-twitch 0.4s ease-in-out 1.5s 2;
+}
+
 /* ---------- Strauß: runs off, turns and runs back ---------- */
 
 .item-strauss.playing .zo-strauss-body {
@@ -286,6 +431,14 @@
   to {
     transform: translateY(-6px);
   }
+}
+
+.item-strauss.playing .zo-strauss-plume {
+  animation: zo-wiggle 0.25s ease-in-out 8;
+}
+
+.item-strauss.playing .zo-dust circle {
+  animation: zo-dust 0.7s ease-out calc(var(--i) * 0.1s) 2;
 }
 
 /* ---------- Zebra: jumps and kicks out ---------- */
@@ -339,6 +492,14 @@
   to {
     transform: rotate(-12deg);
   }
+}
+
+.item-zebra.playing .zo-zebra-ear {
+  animation: zo-twitch 0.4s ease-in-out 0.2s 2;
+}
+
+.item-zebra.playing .zo-dust circle {
+  animation: zo-dust 0.7s ease-out calc(0.65s + var(--i) * 0.05s);
 }
 
 /* ---------- Elefant and Elefantenbaby: trunk up, flapping ears, a fountain of water ---------- */
@@ -399,6 +560,20 @@
   }
 }
 
+.item-elefant.playing .zo-elefant-leg {
+  animation: zo-leg-lift 1s ease-in-out 1.3s;
+}
+
+.item-elefantenbaby.playing .zo-baby-leg {
+  animation: zo-leg-lift 0.8s ease-in-out 1.2s;
+}
+
+@keyframes zo-leg-lift {
+  50% {
+    transform: rotate(-22deg);
+  }
+}
+
 /* ---------- Nashorn: lowers its head, snorts and stamps ---------- */
 
 .item-nashorn.playing .zo-nashorn-head {
@@ -442,6 +617,37 @@
   100% {
     opacity: 0;
     transform: translate(calc((var(--i) - 1) * 24px), -20px) scale(1.6);
+  }
+}
+
+.item-nashorn.playing .zo-nashorn-ears {
+  animation: zo-wiggle 0.25s ease-in-out 6;
+}
+
+.item-nashorn.playing .zo-nashorn-bird {
+  animation: zo-nashorn-bird 2s ease-in-out;
+}
+
+.item-nashorn.playing .zo-nashorn-bird-wing {
+  animation: zo-papagei-flap 0.12s ease-in-out 0.9s 6 alternate;
+}
+
+@keyframes zo-nashorn-bird {
+  0%,
+  100% {
+    opacity: 0;
+    transform: none;
+  }
+  15%,
+  40%,
+  60%,
+  85% {
+    opacity: 1;
+    transform: translateY(-38px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-58px);
   }
 }
 
@@ -520,6 +726,21 @@
   }
 }
 
+.item-loewe.playing .zo-loewe-ear {
+  animation: zo-twitch 0.35s ease-in-out 1.5s 2;
+}
+
+.item-loewe.playing .zo-loewe-paws {
+  animation: zo-stretch 2.2s ease-in-out;
+}
+
+@keyframes zo-stretch {
+  25%,
+  65% {
+    transform: translateX(14px);
+  }
+}
+
 /* ---------- Löwenbaby: crouches, pounces and squeaks ---------- */
 
 .item-loewenbaby.playing .zo-cub-body {
@@ -553,6 +774,14 @@
   }
 }
 
+.item-loewenbaby.playing .zo-cub-head {
+  animation: zo-tilt 1.8s ease-in-out;
+}
+
+.item-loewenbaby.playing .zo-cub-ear {
+  animation: zo-twitch 0.3s ease-in-out 1.1s 2;
+}
+
 /* ---------- Panda: munches its bamboo ---------- */
 
 .item-panda.playing .zo-panda-arm {
@@ -573,6 +802,18 @@
   to {
     transform: rotate(5deg);
   }
+}
+
+.item-panda.playing .zo-panda-ear {
+  animation: zo-twitch 0.4s ease-in-out 0.2s 3;
+}
+
+.item-panda.playing .zo-panda-foot {
+  animation: zo-wiggle 0.5s ease-in-out 4;
+}
+
+.item-panda.playing .zo-panda-leaves {
+  animation: zo-wiggle 0.3s ease-in-out 6;
 }
 
 /* ---------- Känguru: two big hops, the joey peeks out ---------- */
@@ -601,6 +842,31 @@
   25%,
   80% {
     transform: translateY(-12px);
+  }
+}
+
+.item-kaenguru.playing .zo-kaenguru-head {
+  animation: zo-nod 0.5s ease-in-out 0.9s 2;
+}
+
+.item-kaenguru.playing .zo-kaenguru-ears {
+  animation: zo-twitch 0.3s ease-in-out 0.2s 2;
+}
+
+.item-kaenguru.playing .zo-kaenguru-tail {
+  animation: zo-tail-thump 1s ease-in-out 2;
+}
+
+.item-kaenguru.playing .zo-dust circle {
+  animation: zo-dust 0.6s ease-out calc(0.75s + var(--i) * 0.04s);
+}
+
+@keyframes zo-tail-thump {
+  15% {
+    transform: rotate(8deg);
+  }
+  45% {
+    transform: rotate(-12deg);
   }
 }
 
@@ -633,6 +899,14 @@
   70% {
     transform: rotate(8deg);
   }
+}
+
+.item-koala.playing .zo-koala-zzz text {
+  animation: zo-note 0.9s ease-out calc(var(--i) * 0.2s);
+}
+
+.item-koala.playing .zo-koala-ear {
+  animation: zo-twitch 0.3s ease-in-out 0.8s 4;
 }
 
 /* ---------- Flamingo: flaps its wings and puts the other leg down ---------- */
@@ -668,6 +942,10 @@
   }
 }
 
+.item-flamingo.playing .zo-flamingo-ripples ellipse {
+  animation: zo-ripple 0.8s ease-out calc(0.4s + var(--i) * 0.2s) 2;
+}
+
 /* ---------- Affe: swings on the rope ---------- */
 
 .item-affe.playing .zo-affe-swing {
@@ -689,6 +967,29 @@
   }
 }
 
+.item-affe.playing .zo-affe-legs {
+  animation: zo-wiggle 0.4s ease-in-out 6;
+}
+
+.item-affe.playing .zo-affe-tail {
+  animation: zo-swish 0.3s ease-in-out 8 alternate;
+}
+
+.item-affe.playing .zo-affe-mouth {
+  animation: zo-chatter 0.3s ease-in-out 0.3s 6 alternate;
+}
+
+@keyframes zo-chatter {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------- Äffchen: bites the banana, then hops ---------- */
 
 .item-aeffchen.playing .zo-aeffchen-arm {
@@ -707,6 +1008,10 @@
   50% {
     transform: rotate(-50deg);
   }
+}
+
+.item-aeffchen.playing .zo-aeffchen-tail {
+  animation: zo-swish 0.3s ease-in-out 6 alternate;
 }
 
 /* ---------- Papagei: hops, flaps and bobs its head ---------- */
@@ -733,6 +1038,14 @@
   to {
     transform: rotate(-15deg);
   }
+}
+
+.item-papagei.playing .zo-papagei-tail {
+  animation: zo-wiggle 0.3s ease-in-out 6;
+}
+
+.item-papagei.playing .zo-papagei-bubble {
+  animation: zo-pop 1.6s ease-out 0.2s;
 }
 
 /* ---------- Pfau: opens its fan of feathers ---------- */
@@ -763,6 +1076,20 @@
   50% {
     opacity: 1;
     transform: rotate(3deg);
+  }
+}
+
+.item-pfau.playing .zo-pfau-crest {
+  animation: zo-wiggle 0.3s ease-in-out 0.4s 6;
+}
+
+.item-pfau.playing .zo-pfau-body {
+  animation: zo-strut 0.6s ease-in-out 4;
+}
+
+@keyframes zo-strut {
+  50% {
+    transform: translateY(-5px) rotate(-2deg);
   }
 }
 
@@ -804,6 +1131,20 @@
   }
 }
 
+.item-taube.playing .zo-taube-tail {
+  animation: zo-wiggle 0.25s ease-in-out 6;
+}
+
+.item-taube.playing .zo-taube-crumbs circle {
+  animation: zo-crumb 0.3s ease-out calc(var(--i) * 0.1s) 3;
+}
+
+@keyframes zo-crumb {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 /* ---------- Schmetterling: flutters round in a loop ---------- */
 
 .item-schmetterling.playing .zo-schmetterling-flight {
@@ -828,6 +1169,10 @@
   75% {
     transform: translate(-40px, -30px) rotate(-10deg);
   }
+}
+
+.item-schmetterling.playing .zo-schmetterling-antennae {
+  animation: zo-wiggle 0.3s ease-in-out 8;
 }
 
 /* ---------- Bimmelbahn: drives a bit, wheels turn, the bell rings, the children wave ---------- */
@@ -866,6 +1211,34 @@
 @keyframes zo-bounce {
   to {
     transform: translateY(-3px);
+  }
+}
+
+.item-bimmelbahn.playing .zo-bahn-kid {
+  animation: zo-kid-bob 0.3s ease-in-out calc(var(--i) * 0.15s) 6 alternate;
+}
+
+.item-bimmelbahn.playing .zo-bahn-driver {
+  animation: zo-nod 0.6s ease-in-out 3;
+}
+
+.item-bimmelbahn.playing .zo-bahn-smoke circle {
+  animation: zo-puff 0.8s ease-out calc(var(--i) * 0.2s) 2;
+}
+
+.item-bimmelbahn.playing .zo-bahn-light {
+  animation: zo-glow 0.6s ease-in-out 3;
+}
+
+@keyframes zo-kid-bob {
+  to {
+    transform: translateY(-5px) rotate(-6deg);
+  }
+}
+
+@keyframes zo-glow {
+  50% {
+    opacity: 0.8;
   }
 }
 
@@ -922,6 +1295,34 @@
   }
 }
 
+.item-tierpfleger.playing .zo-pfleger-hat {
+  animation: zo-hat 2s ease-in-out;
+}
+
+.item-tierpfleger.playing .zo-pfleger-bucket {
+  animation: zo-bucket 0.5s ease-in-out 4 alternate;
+}
+
+.item-tierpfleger.playing .zo-pfleger-bucketfish {
+  animation: zo-wiggle 0.25s ease-in-out 8;
+}
+
+@keyframes zo-hat {
+  55%,
+  75% {
+    transform: translateY(-14px) rotate(-12deg);
+  }
+  90% {
+    transform: none;
+  }
+}
+
+@keyframes zo-bucket {
+  to {
+    transform: rotate(6deg);
+  }
+}
+
 /* ---------- Kind: jumps for joy with the ice cream ---------- */
 
 .item-kind.playing .zo-kind-body {
@@ -930,6 +1331,24 @@
 
 .item-kind.playing .zo-kind-arm {
   animation: zo-wave 0.3s ease-in-out 6 alternate;
+}
+
+.item-kind.playing .zo-kind-scoop {
+  animation: zo-wiggle 0.3s ease-in-out 6;
+}
+
+.item-kind.playing .zo-kind-bun {
+  animation: zo-bun 0.3s ease-in-out calc(var(--i) * 0.1s) 5 alternate;
+}
+
+.item-kind.playing .zo-kind-heart {
+  animation: zo-note 1s ease-out 0.6s;
+}
+
+@keyframes zo-bun {
+  to {
+    transform: translateY(-6px);
+  }
 }
 
 /* ---------- Eiswagen: the umbrella wobbles, the bell rings, a cone pops up ---------- */
@@ -965,6 +1384,47 @@
   75% {
     opacity: 1;
     transform: translateY(-46px);
+  }
+}
+
+.item-eiswagen.playing .zo-eis-lid {
+  animation: zo-eis-lid 2s ease-in-out;
+}
+
+.item-eiswagen.playing .zo-eis-sign {
+  animation: zo-wiggle 0.3s ease-in-out 6;
+}
+
+.item-eiswagen.playing .zo-eis-body {
+  animation: zo-cart 2s ease-in-out;
+}
+
+.item-eiswagen.playing .zo-eis-wheel {
+  animation: zo-roll 2s ease-in-out;
+}
+
+@keyframes zo-eis-lid {
+  20%,
+  70% {
+    transform: rotate(-75deg);
+  }
+}
+
+@keyframes zo-cart {
+  25% {
+    transform: translateX(10px);
+  }
+  75% {
+    transform: translateX(-10px);
+  }
+}
+
+@keyframes zo-roll {
+  25% {
+    transform: rotate(40deg);
+  }
+  75% {
+    transform: rotate(-40deg);
   }
 }
 
@@ -1018,6 +1478,10 @@
   }
 }
 
+.item-pinguin.playing .zo-pinguin-ripples ellipse {
+  animation: zo-ripple 0.9s ease-out calc(1.25s + var(--i) * 0.2s);
+}
+
 /* ---------- Pinguin-Küken: waddles and flaps ---------- */
 
 .item-pinguinkueken.playing .zo-kueken-body {
@@ -1051,6 +1515,14 @@
   to {
     transform: rotate(40deg);
   }
+}
+
+.item-pinguinkueken.playing .zo-kueken-head {
+  animation: zo-tilt 1.8s ease-in-out;
+}
+
+.item-pinguinkueken.playing .zo-kueken-tuft {
+  animation: zo-wiggle 0.2s ease-in-out 8;
 }
 
 /* ---------- Fisch: jumps out of the water ---------- */
@@ -1098,6 +1570,14 @@
   }
 }
 
+.item-fisch.playing .zo-fisch-bubbles circle {
+  animation: zo-rise 0.6s ease-out calc(var(--i) * 0.12s);
+}
+
+.item-fisch.playing .zo-fisch-fin {
+  animation: zo-wiggle 0.2s ease-in-out 8;
+}
+
 /* ---------- Seehund: bounces the ball on its nose and claps ---------- */
 
 .item-seehund.playing .zo-seehund-ball {
@@ -1131,6 +1611,14 @@
   to {
     transform: rotate(30deg);
   }
+}
+
+.item-seehund.playing .zo-seehund-tail {
+  animation: zo-wiggle 0.25s ease-in-out 8;
+}
+
+.item-seehund.playing .zo-seehund-whiskers {
+  animation: zo-wiggle 0.2s ease-in-out 0.2s 6;
 }
 
 /* ---------- Erdmännchen: ducks into its hole, pops up and looks around ---------- */
@@ -1167,6 +1655,18 @@
   86% {
     transform: none;
   }
+}
+
+.item-erdmaennchen.playing .zo-erdmann-dirt circle {
+  animation: zo-splash 0.6s ease-out calc(0.1s + var(--i) * 0.05s);
+}
+
+.item-erdmaennchen.playing .zo-erdmann-ear {
+  animation: zo-wiggle 0.3s ease-in-out 1.4s 2;
+}
+
+.item-erdmaennchen.playing .zo-erdmann-paws {
+  animation: zo-wiggle 0.3s ease-in-out 1.2s 2;
 }
 
 /* ---------- Schildkröte: pulls its head in and pokes it out again ---------- */
@@ -1221,6 +1721,14 @@
   }
 }
 
+.item-schildkroete.playing .zo-schildi-tail {
+  animation: zo-wiggle 0.2s ease-in-out 1.4s 3;
+}
+
+.item-schildkroete.playing .zo-schildi-heart {
+  animation: zo-note 0.8s ease-out 1.15s;
+}
+
 /* ---------- Krokodil: snaps its jaw twice and swishes its tail ---------- */
 
 .item-krokodil.playing .zo-krokodil-jaw {
@@ -1244,6 +1752,20 @@
 @keyframes zo-croc-tail {
   to {
     transform: rotate(-8deg);
+  }
+}
+
+.item-krokodil.playing .zo-krokodil-leg {
+  animation: zo-paddle 0.35s ease-in-out calc(var(--i) * 0.17s) 4 alternate;
+}
+
+.item-krokodil.playing .zo-krokodil-bubbles circle {
+  animation: zo-rise 0.7s ease-out calc(1s + var(--i) * 0.12s);
+}
+
+@keyframes zo-paddle {
+  to {
+    transform: rotate(15deg);
   }
 }
 
@@ -1299,6 +1821,25 @@
   }
 }
 
+.item-nilpferd.playing .zo-nilpferd-spray circle {
+  animation: zo-spray-up 0.7s ease-out calc(1.5s + var(--i) * 0.06s);
+}
+
+@keyframes zo-spray-up {
+  0% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(calc((var(--i) - 1.5) * 14px), -50px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1.5) * 24px), -10px);
+  }
+}
+
 /* ---------- Pelikan: a fish drops into its beak, it gulps ---------- */
 
 .item-pelikan.playing .zo-pelikan-head {
@@ -1350,5 +1891,23 @@
   40%,
   65% {
     transform: scale(1.3);
+  }
+}
+
+.item-pelikan.playing .zo-pelikan-wing {
+  animation: zo-pelikan-flap 0.2s ease-in-out 6 alternate;
+}
+
+.item-pelikan.playing .zo-pelikan-tail {
+  animation: zo-wiggle 0.25s ease-in-out 1.2s 3;
+}
+
+.item-pelikan.playing .zo-pelikan-drops circle {
+  animation: zo-splash 0.6s ease-out calc(0.8s + var(--i) * 0.05s);
+}
+
+@keyframes zo-pelikan-flap {
+  to {
+    transform: rotate(-25deg);
   }
 }

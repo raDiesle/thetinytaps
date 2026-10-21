@@ -139,6 +139,8 @@ const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") +
 
 /** Per item: how often it was started (remounts restart the animation) and whether it is running. */
 type Plays = Record<string, { count: number; playing: boolean }>;
+/** Keys mode: the badge that lights up; the count restarts its animation on every press. */
+type Lit = { id: string; count: number };
 
 /** Colour mode: how much of each colour is left in the grey picture; the rest is white. */
 const GREY_SLOPE = 0.55;
@@ -164,6 +166,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const [partying, setPartying] = useState(false);
   /** Keys mode: the item in the glowing frame, moved with the arrow keys; hidden once an item starts. */
   const [focus, setFocus] = useState<SceneItem | null>(null);
+  const [lit, setLit] = useState<Lit | null>(null);
   const { bursts, spawn } = useBursts();
 
   const questRef = useRef<Quest | null>(null);
@@ -363,10 +366,11 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
    */
   const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover" | "key") => {
     interacted();
-    // The arrow keys go on from the activated item, but it gets no frame.
+    // The arrow keys go on from the activated item, but it gets no frame; its key badge lights up instead.
     if (settings.trigger === "keys") {
       focusRef.current = item;
       setFocus(null);
+      setLit((prev) => ({ id: item.id, count: (prev?.count ?? 0) + 1 }));
     }
     const quest = questRef.current;
 
@@ -602,7 +606,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
             </g>
           );
         })}
-        {settings.trigger === "keys" && settings.showKeys && <KeyBadges scene={scene} keyOf={keys.keyOf} />}
+        {settings.trigger === "keys" && settings.showKeys && <KeyBadges scene={scene} keyOf={keys.keyOf} lit={lit} />}
         {settings.trigger === "keys" && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
       </svg>
@@ -675,30 +679,28 @@ function FocusRing({ box: [x, y, w, h] }: { box: Box }) {
   );
 }
 
-/** Keys mode: each item's key in a little bubble at its top left corner. */
-function KeyBadges({ scene, keyOf }: { scene: Scene; keyOf: Map<string, string> }) {
-  const r = 13;
-  // Each badge sits on its item; one that would cover an earlier badge moves aside.
-  const taken: [number, number][] = [];
-  const spots = scene.items.map((item) => {
-    let [cx, cy] = badgeSpot(item, r);
-    for (let step = 1; step < 8 && taken.some(([x, y]) => Math.hypot(x - cx, y - cy) < 2 * r + 2); step++) {
-      cx += (step % 2 ? 1 : -1) * step * (2 * r + 2);
-    }
-    cx = Math.min(scene.width - r - 2, Math.max(r + 2, cx));
-    taken.push([cx, cy]);
-    return [cx, cy];
-  });
+const BADGE_R = 13;
+
+/**
+ * Keys mode: each item's key in a little bubble next to it. The bubble of the
+ * item that was just started lights up, so the child sees where to look.
+ */
+function KeyBadges({ scene, keyOf, lit }: { scene: Scene; keyOf: Map<string, string>; lit: Lit | null }) {
+  const spots = useMemo(() => badgeSpots(scene, BADGE_R), [scene]);
   return (
     <g className="scene-keys" aria-hidden>
       {scene.items.map((item, i) => {
         const [cx, cy] = spots[i];
+        const isLit = lit?.id === item.id;
         return (
-          <g key={item.id}>
-            <circle cx={cx} cy={cy} r={r} />
-            <text x={cx} y={cy}>
-              {keyOf.get(item.id)}
-            </text>
+          <g key={isLit ? `${item.id}-${lit.count}` : item.id} className={isLit ? "lit" : undefined}>
+            <circle className="scene-key-glow" cx={cx} cy={cy} r={BADGE_R} />
+            <g className="scene-key-cap">
+              <circle cx={cx} cy={cy} r={BADGE_R} />
+              <text x={cx} y={cy}>
+                {keyOf.get(item.id)}
+              </text>
+            </g>
           </g>
         );
       })}
@@ -706,14 +708,46 @@ function KeyBadges({ scene, keyOf }: { scene: Scene; keyOf: Map<string, string> 
   );
 }
 
-/** Where an item's key badge goes: its own spot, else just inside the top of its first hit area. */
-function badgeSpot(item: SceneItem, r: number): [number, number] {
-  if (item.badge) {
-    const [x, y] = placeBox([...item.badge, 0, 0], item.place);
-    return [x, y];
-  }
-  const [x, y, w, h] = placeBox(item.hitAreas?.[0] ?? item.box, item.place);
-  return [x + w / 2, y + Math.min(h / 2, r + 4)];
+/**
+ * Where the key badges go: just outside each item, at the spot that covers the
+ * least of it, of the other items and of the badges placed before. Above the
+ * item is preferred, then the sides, then below.
+ */
+function badgeSpots(scene: Scene, r: number): [number, number][] {
+  const areas = scene.items.flatMap((item) => (item.hitAreas ?? [item.box]).map((box) => placeBox(box, item.place)));
+  const covered = (cx: number, cy: number) =>
+    areas.reduce((sum, [x, y, w, h]) => {
+      const dx = Math.min(cx + r, x + w) - Math.max(cx - r, x);
+      const dy = Math.min(cy + r, y + h) - Math.max(cy - r, y);
+      return dx > 0 && dy > 0 ? sum + dx * dy : sum;
+    }, 0);
+  const gap = r + 4;
+  const taken: [number, number][] = [];
+  return scene.items.map((item) => {
+    const [x, y, w, h] = placeBox(item.box, item.place);
+    const candidates: [number, number][] = [
+      ...[0.5, 0.25, 0.75, 0, 1].map((t): [number, number] => [x + w * t, y - gap]),
+      ...[r, h / 2].flatMap((dy): [number, number][] => [
+        [x - gap, y + dy],
+        [x + w + gap, y + dy],
+      ]),
+      ...[0.5, 0, 1].map((t): [number, number] => [x + w * t, y + h + gap]),
+    ];
+    let best = candidates[0];
+    let bestScore = Infinity;
+    candidates.forEach(([cx, cy], order) => {
+      const outside = cx < r || cy < r || cx > scene.width - r || cy > scene.height - r;
+      const crowded = taken.some(([tx, ty]) => Math.hypot(tx - cx, ty - cy) < 2 * r + 4);
+      // Order only breaks ties: a free spot further round always beats a covering one.
+      const score = covered(cx, cy) + (outside ? 1e6 : 0) + (crowded ? 1e5 : 0) + order;
+      if (score < bestScore) {
+        best = [cx, cy];
+        bestScore = score;
+      }
+    });
+    taken.push(best);
+    return best;
+  });
 }
 
 /** The item drawn on its own, for the find question. */

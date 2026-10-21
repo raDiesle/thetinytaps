@@ -29,17 +29,23 @@ export function Traktor() {
       </g>
       <g className="bh-traktor-body">
         <rect x="94" y="-176" width="10" height="64" rx="3" fill="#495057" />
+        <rect className="bh-traktor-cap" x="92" y="-181" width="14" height="5" rx="2" fill="#343a40" style={{ transformOrigin: "92px -178px" }} />
+        <circle className="bh-traktor-beacon" cx="-48" cy="-246" r="20" fill="#ffd166" />
+        <path d="M-58 -236 Q-58 -252 -48 -252 Q-38 -252 -38 -236 Z" fill="#ffb703" />
         <rect x="-118" y="-236" width="140" height="14" rx="5" fill="#9d0208" />
         <rect x="-112" y="-224" width="9" height="100" fill="#495057" />
         <rect x="6" y="-224" width="9" height="100" fill="#495057" />
         <Pane x={-103} y={-218} w={109} h={84} rx={4}>
-          <Rider cx={-50} cy={-170} shirt="#3a86ff" cap="#2d6a4f" />
+          <g className="bh-driver">
+            <Rider cx={-50} cy={-170} shirt="#3a86ff" cap="#2d6a4f" />
+          </g>
         </Pane>
         <rect x="-124" y="-136" width="140" height="78" rx="10" fill="#e63946" />
         <path d="M0 -124 H128 Q146 -124 146 -104 V-58 H0 Z" fill="#e63946" />
         <path d="M6 -118 H126" stroke="#fff" strokeOpacity="0.4" strokeWidth="6" strokeLinecap="round" />
         <rect x="134" y="-110" width="12" height="44" rx="3" fill="#9d0208" />
         <path d="M138 -104 V-72 M142 -104 V-72" stroke="#6a040f" strokeWidth="2" />
+        <circle className="bh-traktor-beam" cx="142" cy="-118" r="18" fill="#fff4d6" />
         <circle cx="142" cy="-118" r="7" fill="#fff4d6" />
         <path d="M-6 -96 h16 M-6 -84 h16" stroke="#9d0208" strokeWidth="4" strokeLinecap="round" />
         <path d="M-132 -60 A70 70 0 0 1 12 -60" stroke="#9d0208" strokeWidth="14" fill="none" />
@@ -69,11 +75,20 @@ export function Maehdrescher() {
       <path d="M-110 -168 H140" stroke="#fff" strokeOpacity="0.35" strokeWidth="6" strokeLinecap="round" />
       <path d={CAB} fill="#bde0fe" />
       <Inside d={CAB}>
-        <Rider cx={-76} cy={-212} shirt="#e76f51" cap="#ffb703" />
+        <g className="bh-driver">
+          <Rider cx={-76} cy={-212} shirt="#e76f51" cap="#ffb703" />
+        </g>
       </Inside>
       <path d={CAB} stroke="#2d6a4f" strokeWidth="6" fill="none" />
       <path d="M-104 -246 h16 L-108 -180 h-8 Z" fill="#fff" opacity="0.5" />
       <rect x="-126" y="-262" width="100" height="14" rx="5" fill="#2d6a4f" />
+      <circle className="bh-drescher-beacon" cx="-76" cy="-270" r="20" fill="#ffd166" />
+      <path d="M-86 -262 Q-86 -278 -76 -278 Q-66 -278 -66 -262 Z" fill="#ffb703" />
+      <g className="bh-drescher-straw" fill="#e9c46a">
+        {[0, 1, 2].map((i) => (
+          <circle key={i} cx={160} cy={-80 + i * 10} r={12 - i * 2} style={nth(i)} />
+        ))}
+      </g>
       {/* Header with the turning reel in front */}
       <path d="M-226 -20 L-214 -70 H-126 V-20 Z" fill="#ffd166" />
       <path d="M-220 -30 H-130 M-216 -46 H-130 M-212 -62 H-130" stroke="#e9b949" strokeWidth="4" />
@@ -110,8 +125,16 @@ export function Schubkarre() {
       <path d="M-62 -70 H58 L40 -30 H-44 Z" fill="#4895ef" />
       <path d="M-58 -64 H54" stroke="#fff" strokeOpacity="0.4" strokeWidth="5" strokeLinecap="round" />
       <path d="M-100 -84 h-14" stroke="#6b4423" strokeWidth="10" strokeLinecap="round" />
-      <circle cx="64" cy="-22" r="22" fill="#2b2d42" />
-      <circle cx="64" cy="-22" r="9" fill="#ced4da" />
+      <g className="bh-karre-wheel" style={{ transformOrigin: "64px -22px" }}>
+        <circle cx="64" cy="-22" r="22" fill="#2b2d42" />
+        <path d="M64 -40 V-4 M46 -22 H82" stroke="#495057" strokeWidth="4" />
+        <circle cx="64" cy="-22" r="9" fill="#ced4da" />
+      </g>
+      <g className="bh-karre-dirt" fill="#b08968">
+        {[0, 1].map((i) => (
+          <circle key={i} cx={84 + i * 10} cy={-6} r={8} style={nth(i)} />
+        ))}
+      </g>
     </g>
   );
 }

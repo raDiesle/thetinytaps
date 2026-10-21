@@ -75,7 +75,24 @@
 .laterne-light,
 .kaefer-wings,
 .sand-grains circle,
-.saege-dust circle {
+.saege-dust circle,
+.bs-beacon,
+.hammer-chips circle,
+.hund-tongue,
+.frosch-tongue,
+.schnecke-trail,
+.maulwurf-dirt circle,
+.haus-light rect,
+.wagen-glow,
+.wagen-lamp,
+.wagen-steam circle,
+.huetchen-dust circle,
+.schild-glow,
+.schild-lamp,
+.laterne-moth,
+.container-dust circle,
+.mischer-light,
+.ampel-signal {
   opacity: 0;
 }
 
@@ -89,9 +106,112 @@
 .laterne-glow,
 .container-junk > g,
 .igel-spikes,
-.kaefer-wings ellipse {
+.kaefer-wings ellipse,
+.baum-leaves ellipse,
+.hammer-chips circle,
+.maulwurf-dirt circle,
+.wagen-steam circle,
+.huetchen-dust circle,
+.container-dust circle,
+.maus-ear,
+.maus-nose,
+.maus-whiskers,
+.maulwurf-paw,
+.maulwurf-nose,
+.igel-foot,
+.igel-nose,
+.hase-nose,
+.frosch-pouch,
+.hoernchen-nut,
+.radio-speaker,
+.ampel-button {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* ---------- Parts many items share ---------- */
+
+/* Eyelids: closed only for one blink while the item plays. */
+.bs-lid {
+  transform: scaleY(0);
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.scene-item.playing .bs-lid {
+  animation: bs-wink 0.36s ease-in-out 0.8s;
+}
+
+/* Drivers bob in their seats, roof lights glow. */
+.scene-item.playing .bs-driver {
+  animation: bs-nod 0.3s ease-in-out 6 alternate;
+}
+
+.scene-item.playing .bs-beacon {
+  animation: bs-glow 0.5s ease-in-out 4;
+}
+
+@keyframes bs-wink {
+  40%,
+  60% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes bs-nod {
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes bs-glow {
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes bs-sniff {
+  to {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes bs-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  25% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(1.8);
+  }
+}
+
+@keyframes bs-steam {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.4);
+  }
+}
+
+/* A wiggle around the rest pose: one turn left, one right, back to the middle. */
+@keyframes bs-wiggle {
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
 }
 
 @keyframes ballon-bob {
@@ -191,6 +311,69 @@
   }
 }
 
+/* The door swings open, the windows light up and a worker looks out. */
+.haus-peek {
+  transform: translateY(40px);
+}
+
+.item-haus.playing .haus-door {
+  animation: haus-door 2.4s ease-in-out;
+}
+
+.item-haus.playing .haus-light rect {
+  animation: haus-light 2.2s ease-in-out calc(var(--i, 0) * 0.2s);
+}
+
+.item-haus.playing .haus-peek {
+  animation: haus-peek 2.4s ease-in-out;
+}
+
+.item-haus.playing .haus-trowel {
+  animation: haus-trowel 0.15s ease-in-out 0.2s 6 alternate;
+}
+
+@keyframes haus-door {
+  0%,
+  10% {
+    transform: none;
+  }
+  25%,
+  75% {
+    transform: scaleX(0.12);
+  }
+  90% {
+    transform: none;
+  }
+}
+
+@keyframes haus-light {
+  20%,
+  80% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes haus-peek {
+  0%,
+  30% {
+    transform: translateY(40px);
+  }
+  45%,
+  80% {
+    transform: none;
+  }
+  95%,
+  100% {
+    transform: translateY(40px);
+  }
+}
+
+@keyframes haus-trowel {
+  to {
+    transform: rotate(-18deg);
+  }
+}
+
 /* ---------- Katze ---------- */
 
 .item-katze.playing .katze-tail {
@@ -211,6 +394,27 @@
   25%,
   75% {
     transform: rotate(-18deg);
+  }
+}
+
+.item-katze.playing .katze-ears {
+  animation: katze-ears 0.15s ease-in-out 0.3s 4 alternate;
+}
+
+.item-katze.playing .katze-body {
+  animation: katze-stretch 1.6s ease-in-out;
+}
+
+@keyframes katze-ears {
+  to {
+    transform: scale(1.1, 0.8);
+  }
+}
+
+@keyframes katze-stretch {
+  40%,
+  60% {
+    transform: scale(0.97, 1.06);
   }
 }
 
@@ -245,6 +449,73 @@
   }
 }
 
+/* The trolley runs out along the jib, the load swings, the flag waves, the operator looks around. */
+.item-kran.playing .kran-trolley {
+  animation: kran-trolley 3.2s ease-in-out;
+}
+
+.item-kran.playing .kran-swing {
+  animation: kran-swing 3.2s ease-in-out;
+}
+
+.item-kran.playing .kran-flag {
+  animation: bs-flag 0.4s ease-in-out 8 alternate;
+}
+
+.item-kran.playing .kran-light {
+  animation: bs-blink 0.8s steps(1) 4;
+}
+
+.item-kran.playing .kran-operator {
+  animation: kran-look 3.2s ease-in-out;
+}
+
+@keyframes kran-trolley {
+  0%,
+  5% {
+    transform: none;
+  }
+  25%,
+  55% {
+    transform: translateX(-70px);
+  }
+  90% {
+    transform: none;
+  }
+}
+
+@keyframes kran-swing {
+  25% {
+    transform: rotate(5deg);
+  }
+  32% {
+    transform: rotate(-4deg);
+  }
+  40% {
+    transform: rotate(2deg);
+  }
+  48% {
+    transform: none;
+  }
+  85% {
+    transform: rotate(-3deg);
+  }
+  92% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes kran-look {
+  20%,
+  40% {
+    transform: translateX(-5px);
+  }
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
 /* ---------- Vogel ---------- */
 
 .item-vogel.playing .vogel-flight {
@@ -270,6 +541,26 @@
 @keyframes vogel-flap {
   to {
     transform: scaleY(-1.4);
+  }
+}
+
+.item-vogel.playing .vogel-head {
+  animation: vogel-chirp 0.2s ease-in-out 4 alternate;
+}
+
+.item-vogel.playing .vogel-tail {
+  animation: vogel-tail 0.15s ease-in-out 1.9s 2 alternate;
+}
+
+@keyframes vogel-chirp {
+  to {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes vogel-tail {
+  to {
+    transform: rotate(18deg);
   }
 }
 
@@ -309,6 +600,26 @@
   }
 }
 
+/* The tracks run, the exhaust puffs, the warning light blinks. */
+.item-bagger.playing .bagger-track {
+  animation: bagger-track 0.3s linear 7;
+}
+
+.item-bagger.playing .bagger-smoke circle {
+  animation: bs-smoke 0.8s ease-out calc(var(--i) * 0.3s) 2;
+}
+
+.item-bagger.playing .bs-blink {
+  animation: bs-blink 0.5s steps(1) 4;
+}
+
+/* One dash and one gap of the track. */
+@keyframes bagger-track {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+
 /* ---------- Betonmischer: the spiral moves along the turning drum ---------- */
 
 .item-mischer.playing .mischer-stripes {
@@ -322,6 +633,20 @@
 @keyframes mischer-spin {
   to {
     transform: translateX(-50px);
+  }
+}
+
+.item-mischer.playing .mischer-chute {
+  animation: mischer-chute 0.3s ease-in-out 6 alternate;
+}
+
+.item-mischer.playing .mischer-light {
+  animation: bs-glow 0.55s ease-in-out 4;
+}
+
+@keyframes mischer-chute {
+  to {
+    transform: rotate(14deg);
   }
 }
 
@@ -349,6 +674,48 @@
   100% {
     opacity: 0;
     transform: translateY(80px);
+  }
+}
+
+/* It backs up first (wheels turning), and the tailgate swings open for the sand. */
+.item-kipper.playing .kipper-truck {
+  animation: kipper-back 2.8s ease-in-out;
+}
+
+.item-kipper.playing .kipper-wheel {
+  animation: kipper-wheel 2.8s ease-in-out;
+}
+
+.item-kipper.playing .kipper-gate {
+  animation: kipper-gate 2.8s ease-in-out;
+}
+
+@keyframes kipper-back {
+  20%,
+  80% {
+    transform: translateX(24px);
+  }
+}
+
+/* 24 units on a wheel of radius 28 is about 49°. */
+@keyframes kipper-wheel {
+  20%,
+  80% {
+    transform: rotate(49deg);
+  }
+}
+
+@keyframes kipper-gate {
+  0%,
+  20% {
+    transform: none;
+  }
+  32%,
+  62% {
+    transform: rotate(-40deg);
+  }
+  72% {
+    transform: none;
   }
 }
 
@@ -382,6 +749,35 @@
   }
 }
 
+/* He lifts his helmet to say hello and swings the other arm. */
+.item-arbeiter.playing .arbeiter-helmet {
+  animation: arbeiter-helmet 2.2s ease-in-out;
+}
+
+.item-arbeiter.playing .arbeiter-arm-left {
+  animation: arbeiter-swing 0.25s ease-in-out 8 alternate;
+}
+
+@keyframes arbeiter-helmet {
+  0%,
+  45% {
+    transform: none;
+  }
+  60%,
+  80% {
+    transform: translateY(-16px) rotate(-14deg);
+  }
+  95% {
+    transform: none;
+  }
+}
+
+@keyframes arbeiter-swing {
+  to {
+    transform: rotate(16deg);
+  }
+}
+
 /* ---------- Schubkarre ---------- */
 
 .item-karre.playing .karre-body {
@@ -410,6 +806,26 @@
   }
 }
 
+.item-karre.playing .karre-sand {
+  animation: karre-bounce 0.3s ease-in-out 4 alternate;
+}
+
+.item-karre.playing .karre-shovel {
+  animation: karre-shovel 0.3s ease-in-out 0.1s 4 alternate;
+}
+
+@keyframes karre-bounce {
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes karre-shovel {
+  to {
+    transform: rotate(-10deg) translateY(-4px);
+  }
+}
+
 /* ---------- Hütchen: squash, jump, land ---------- */
 
 .item-huetchen.playing .huetchen-body {
@@ -425,6 +841,21 @@
   }
   75% {
     transform: scale(1.1, 0.9);
+  }
+}
+
+.item-huetchen.playing .huetchen-dust circle {
+  animation: huetchen-dust 0.4s ease-out 0.5s;
+}
+
+@keyframes huetchen-dust {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 0.5) * 40px), -8px) scale(1.6);
   }
 }
 
@@ -447,6 +878,14 @@
   }
 }
 
+.item-heli.playing .heli-tail-rotor {
+  animation: bs-spin 0.2s linear 13;
+}
+
+.item-heli.playing .heli-pilot {
+  animation: bs-nod 0.3s ease-in-out 8 alternate;
+}
+
 /* ---------- Bauwagen: the door opens, the stove smokes ---------- */
 
 .item-bauwagen.playing .wagen-door {
@@ -464,10 +903,58 @@
   }
 }
 
+/* The window lights up, the curtain flutters, someone looks out, the cocoa steams. */
+.item-bauwagen.playing .wagen-glow {
+  animation: wagen-glow 2.6s ease-in-out;
+}
+
+.item-bauwagen.playing .wagen-peek {
+  animation: wagen-peek 2.6s ease-in-out;
+}
+
+.item-bauwagen.playing .wagen-curtain {
+  animation: wagen-curtain 0.4s ease-in-out 0.2s 6 alternate;
+}
+
+.item-bauwagen.playing .wagen-lamp {
+  animation: bs-glow 0.6s ease-in-out 4;
+}
+
+.item-bauwagen.playing .wagen-steam circle {
+  animation: bs-steam 1s ease-out calc(0.5s + var(--i) * 0.3s);
+}
+
+@keyframes wagen-glow {
+  15%,
+  80% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes wagen-peek {
+  0%,
+  20% {
+    transform: none;
+  }
+  35%,
+  70% {
+    transform: translateY(-24px);
+  }
+  85% {
+    transform: none;
+  }
+}
+
+@keyframes wagen-curtain {
+  to {
+    transform: scaleY(1.25) skewX(-6deg);
+  }
+}
+
 /* ---------- Klo: someone is inside! ---------- */
 
 .item-klo.playing .klo-body {
-  animation: klo-rattle 0.1s linear 14 alternate;
+  animation: klo-rattle 0.1s linear 6 alternate;
 }
 
 .item-klo.playing .klo-sign {
@@ -480,6 +967,35 @@
   }
   to {
     transform: rotate(2.5deg);
+  }
+}
+
+/* After the rattling the door opens and whoever is inside waves hello. */
+.item-klo.playing .klo-door {
+  animation: klo-door 2.4s ease-in-out;
+}
+
+.item-klo.playing .klo-vent {
+  animation: klo-vent 0.3s ease-out 2;
+}
+
+@keyframes klo-door {
+  0%,
+  30% {
+    transform: none;
+  }
+  45%,
+  78% {
+    transform: scaleX(0.14);
+  }
+  92% {
+    transform: none;
+  }
+}
+
+@keyframes klo-vent {
+  40% {
+    transform: translateY(-6px);
   }
 }
 
@@ -550,6 +1066,31 @@
   }
 }
 
+/* Someone presses the button: "Signal kommt" lights up. */
+.item-ampel.playing .ampel-button {
+  animation: ampel-press 0.3s ease-in-out;
+}
+
+.item-ampel.playing .ampel-signal {
+  animation: ampel-signal 2.7s linear;
+}
+
+@keyframes ampel-press {
+  50% {
+    transform: scale(0.6);
+  }
+}
+
+@keyframes ampel-signal {
+  8%,
+  60% {
+    opacity: 1;
+  }
+  64% {
+    opacity: 0;
+  }
+}
+
 /* ---------- Hund: wags, barks, hops ---------- */
 
 .item-hund.playing .hund-tail {
@@ -579,6 +1120,48 @@
   }
 }
 
+/* The ear flaps, the tongue comes out, the tag on the collar swings. */
+.hund-tongue {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.item-hund.playing .hund-ear {
+  animation: hund-ear 0.15s ease-in-out 6 alternate;
+}
+
+.item-hund.playing .hund-tongue {
+  animation: hund-tongue 1.6s ease-in-out;
+}
+
+.item-hund.playing .hund-tag {
+  animation: bs-wiggle 0.4s ease-in-out 0.7s 2;
+}
+
+@keyframes hund-ear {
+  to {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes hund-tongue {
+  0%,
+  35% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  45%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+  95%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+}
+
 /* ---------- Maus: comes out of the pipe and goes back ---------- */
 
 .item-maus.playing .maus-body {
@@ -589,6 +1172,34 @@
   25%,
   70% {
     transform: translate(64px, 14px);
+  }
+}
+
+.item-maus.playing .maus-tail {
+  animation: bs-wiggle 0.4s ease-in-out 4;
+}
+
+.item-maus.playing .maus-ear {
+  animation: maus-ear 0.15s ease-in-out calc(0.5s + var(--i) * 0.1s) 4 alternate;
+}
+
+.item-maus.playing .maus-nose {
+  animation: bs-sniff 0.12s ease-in-out 0.4s 8 alternate;
+}
+
+.item-maus.playing .maus-whiskers {
+  animation: maus-whiskers 0.12s ease-in-out 0.4s 8 alternate;
+}
+
+@keyframes maus-ear {
+  to {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes maus-whiskers {
+  to {
+    transform: scaleX(1.15);
   }
 }
 
@@ -634,6 +1245,31 @@
   }
 }
 
+/* Wings flap, the tail wags and the beak opens for every quack. */
+.item-ente.playing .ente-wing {
+  animation: ente-flap 0.15s ease-in-out 8 alternate;
+}
+
+.item-ente.playing .ente-tail {
+  animation: bs-wiggle 0.36s ease-in-out 0.2s 4;
+}
+
+.item-ente.playing .ente-beak {
+  animation: ente-quack 0.18s ease-in-out 4 alternate;
+}
+
+@keyframes ente-flap {
+  to {
+    transform: rotate(-30deg);
+  }
+}
+
+@keyframes ente-quack {
+  to {
+    transform: rotate(-25deg);
+  }
+}
+
 /* ---------- Presslufthammer: rattles and makes dust ---------- */
 
 .item-hammer.playing .hammer-shake {
@@ -661,6 +1297,34 @@
   }
 }
 
+/* Bits of road fly up, the helmet bounces. */
+.item-hammer.playing .hammer-chips circle {
+  animation: hammer-chip 0.5s ease-out calc(var(--i) * 0.12s) 2;
+}
+
+.item-hammer.playing .hammer-helmet {
+  animation: hammer-helmet 0.12s linear 12 alternate;
+}
+
+@keyframes hammer-chip {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc((var(--i) - 1.5) * 16px), -26px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1.5) * 24px), -4px);
+  }
+}
+
+@keyframes hammer-helmet {
+  to {
+    transform: translateY(-4px);
+  }
+}
+
 /* ---------- Schmetterling: flutters a loop over the flowers ---------- */
 
 .item-falter.playing .falter-flight {
@@ -680,6 +1344,16 @@
   }
   75% {
     transform: translate(40px, -50px);
+  }
+}
+
+.item-falter.playing .falter-antennae {
+  animation: falter-antennae 0.2s ease-in-out 12 alternate;
+}
+
+@keyframes falter-antennae {
+  to {
+    transform: scaleY(0.75);
   }
 }
 
@@ -708,6 +1382,57 @@
   to {
     opacity: 1;
     transform: scale(1.5, 1.8);
+  }
+}
+
+/* The basket swings, and the pilot looks out and waves. */
+.ballon-pilot {
+  transform: translateY(14px);
+}
+
+.item-ballon.playing .ballon-basket {
+  animation: ballon-swing 2.8s ease-in-out;
+}
+
+.item-ballon.playing .ballon-pilot {
+  animation: ballon-peek 2.8s ease-in-out;
+}
+
+.item-ballon.playing .ballon-arm {
+  animation: ballon-wave 0.25s ease-in-out 0.9s 4 alternate;
+}
+
+@keyframes ballon-swing {
+  20% {
+    transform: rotate(5deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+  60% {
+    transform: rotate(3deg);
+  }
+  80% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+@keyframes ballon-peek {
+  0% {
+    transform: translateY(14px);
+  }
+  25%,
+  75% {
+    transform: none;
+  }
+  100% {
+    transform: translateY(14px);
+  }
+}
+
+@keyframes ballon-wave {
+  to {
+    transform: rotate(30deg);
   }
 }
 
@@ -746,6 +1471,47 @@
   }
 }
 
+/* One apple falls, bounces, and grows back; the branch shakes too. */
+.item-baum.playing .baum-apple {
+  animation: baum-apple 2.2s;
+}
+
+.item-baum.playing .baum-branch {
+  animation: baum-rustle 0.3s ease-in-out 6 alternate;
+}
+
+@keyframes baum-apple {
+  0%,
+  25% {
+    transform: none;
+    animation-timing-function: ease-in;
+  }
+  45% {
+    transform: translateY(77px);
+    animation-timing-function: ease-out;
+  }
+  52% {
+    transform: translateY(66px);
+    animation-timing-function: ease-in;
+  }
+  58%,
+  82% {
+    opacity: 1;
+    transform: translateY(77px);
+  }
+  88% {
+    opacity: 0;
+    transform: translateY(77px);
+  }
+  89% {
+    opacity: 0;
+    transform: none;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 /* ---------- Eichhörnchen: hops onto the crown and back ---------- */
 
 .item-eichhoernchen.playing .hoernchen-body {
@@ -769,6 +1535,26 @@
   }
 }
 
+.item-eichhoernchen.playing .hoernchen-ear {
+  animation: hoernchen-ear 0.15s ease-in-out 0.2s 4 alternate;
+}
+
+.item-eichhoernchen.playing .hoernchen-nut {
+  animation: hoernchen-nibble 0.12s ease-in-out 1.3s 4 alternate;
+}
+
+@keyframes hoernchen-ear {
+  to {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes hoernchen-nibble {
+  to {
+    transform: translate(-2px, -5px);
+  }
+}
+
 /* ---------- Schild: wobbles on its pole ---------- */
 
 .item-schild.playing .schild-body {
@@ -787,6 +1573,21 @@
   }
   75% {
     transform: rotate(2deg);
+  }
+}
+
+/* The warning lamp on top glows a few times. */
+.item-schild.playing .schild-lamp {
+  animation: bs-glow 0.35s ease-in-out 4;
+}
+
+.item-schild.playing .schild-glow {
+  animation: schild-glow 0.35s ease-in-out 4;
+}
+
+@keyframes schild-glow {
+  50% {
+    opacity: 0.55;
   }
 }
 
@@ -813,6 +1614,20 @@
   100% {
     opacity: 0;
     transform: translate(10px, -50px) rotate(15deg);
+  }
+}
+
+.item-radio.playing .radio-antenna {
+  animation: bs-wiggle 0.48s ease-in-out 4;
+}
+
+.item-radio.playing .radio-speaker {
+  animation: radio-speaker 0.12s ease-in-out 16 alternate;
+}
+
+@keyframes radio-speaker {
+  to {
+    transform: scale(1.2);
   }
 }
 
@@ -844,6 +1659,32 @@
   }
 }
 
+/* The tools wiggle once they are up, the pliers snap, the latch flips. */
+.item-werkzeug.playing .werkzeug-tool {
+  animation: bs-wiggle 0.36s ease-in-out calc(0.6s + var(--i) * 0.1s) 2;
+}
+
+.item-werkzeug.playing .werkzeug-pliers {
+  animation: werkzeug-pliers 0.18s ease-in-out 0.7s 4 alternate;
+}
+
+.item-werkzeug.playing .werkzeug-latch {
+  animation: werkzeug-latch 1.8s ease-in-out;
+}
+
+@keyframes werkzeug-pliers {
+  to {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes werkzeug-latch {
+  10%,
+  85% {
+    transform: scaleY(-1);
+  }
+}
+
 /* ---------- Frosch: squats and jumps ---------- */
 
 .item-frosch.playing .frosch-body {
@@ -859,6 +1700,59 @@
   }
   75% {
     transform: scale(1.1, 0.9);
+  }
+}
+
+/* The legs stretch for the jump; after landing it croaks and catches a fly. */
+.frosch-tongue {
+  transform-box: fill-box;
+  transform-origin: 0 100%;
+}
+
+.item-frosch.playing .frosch-legs {
+  animation: frosch-legs 1.2s ease-in-out;
+}
+
+.item-frosch.playing .frosch-pouch {
+  animation: frosch-croak 0.2s ease-in-out 0.9s 2 alternate;
+}
+
+.item-frosch.playing .frosch-tongue {
+  animation: frosch-tongue 1.6s ease-out;
+}
+
+@keyframes frosch-legs {
+  30% {
+    transform: scaleY(1.3);
+  }
+  50% {
+    transform: scaleY(1.15);
+  }
+  65% {
+    transform: none;
+  }
+}
+
+@keyframes frosch-croak {
+  to {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes frosch-tongue {
+  0%,
+  78% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  84%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0);
   }
 }
 
@@ -896,6 +1790,27 @@
   }
 }
 
+.item-schnecke.playing .schnecke-shell {
+  animation: schnecke-wobble 0.65s ease-in-out 4 alternate;
+}
+
+.item-schnecke.playing .schnecke-trail {
+  animation: schnecke-trail 2.6s ease-in-out;
+}
+
+@keyframes schnecke-wobble {
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes schnecke-trail {
+  50%,
+  80% {
+    opacity: 0.6;
+  }
+}
+
 /* ---------- Straßenwalze: rolls forward and back, the drum turns ---------- */
 
 .item-walze.playing .walze-body {
@@ -925,6 +1840,18 @@
   }
 }
 
+.item-walze.playing .walze-wheel {
+  animation: walze-wheel 2.6s ease-in-out;
+}
+
+/* 60 units on a wheel of radius 28 is about 123°. */
+@keyframes walze-wheel {
+  45%,
+  55% {
+    transform: rotate(-123deg);
+  }
+}
+
 /* ---------- Gabelstapler: lifts the boxes up high and down again ---------- */
 
 .item-gabelstapler.playing .stapler-load {
@@ -935,6 +1862,30 @@
   40%,
   65% {
     transform: translateY(-80px);
+  }
+}
+
+/* It drives up to the shelf first, wheels turning. */
+.item-gabelstapler.playing .stapler-body {
+  animation: stapler-drive 2.4s ease-in-out;
+}
+
+.item-gabelstapler.playing .stapler-wheel {
+  animation: stapler-wheel 2.4s ease-in-out;
+}
+
+@keyframes stapler-drive {
+  20%,
+  80% {
+    transform: translateX(-14px);
+  }
+}
+
+/* 14 units on a wheel of radius 14 is about 57°. */
+@keyframes stapler-wheel {
+  20%,
+  80% {
+    transform: rotate(-57deg);
   }
 }
 
@@ -967,6 +1918,41 @@
   }
 }
 
+/* A moth flutters around the light while it is on. */
+.item-laterne.playing .laterne-moth {
+  animation: laterne-moth 2.2s ease-in-out;
+}
+
+.item-laterne.playing .laterne-moth-wings {
+  animation: falter-flap 0.08s linear 26 alternate;
+}
+
+@keyframes laterne-moth {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translate(-40px, 30px);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-16px, 6px);
+  }
+  45% {
+    transform: translate(18px, -4px);
+  }
+  65% {
+    transform: translate(4px, 14px);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-14px, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-40px, -20px);
+  }
+}
+
 /* ---------- Kabeltrommel: rolls a bit and back ---------- */
 
 .item-kabeltrommel.playing .kabel-roll {
@@ -990,6 +1976,10 @@
   }
 }
 
+.item-kabeltrommel.playing .kabel-plug {
+  animation: bs-wiggle 0.3s ease-in-out 0.2s 4;
+}
+
 /* ---------- Container: the junk jumps up ---------- */
 
 .item-container.playing .container-junk > g {
@@ -999,6 +1989,23 @@
 @keyframes container-hop {
   45% {
     transform: translateY(-46px) rotate(25deg);
+  }
+}
+
+.item-container.playing .container-box {
+  animation: container-rattle 0.08s linear 8 alternate;
+}
+
+.item-container.playing .container-dust circle {
+  animation: bs-puff 0.8s ease-out calc(0.15s + var(--i) * 0.12s);
+}
+
+@keyframes container-rattle {
+  from {
+    transform: rotate(-1.5deg);
+  }
+  to {
+    transform: rotate(1.5deg);
   }
 }
 
@@ -1026,6 +2033,38 @@
   }
 }
 
+/* He waves with both paws, sniffs, and earth crumbs fly. */
+.item-maulwurf.playing .maulwurf-paw {
+  animation: maulwurf-wave 0.2s ease-in-out calc(0.4s + var(--i) * 0.1s) 6 alternate;
+}
+
+.item-maulwurf.playing .maulwurf-nose {
+  animation: bs-sniff 0.15s ease-in-out 0.5s 6 alternate;
+}
+
+.item-maulwurf.playing .maulwurf-dirt circle {
+  animation: maulwurf-dirt 0.7s ease-out calc(0.2s + var(--i) * 0.05s);
+}
+
+@keyframes maulwurf-wave {
+  to {
+    transform: translateY(-7px) rotate(-15deg);
+  }
+}
+
+@keyframes maulwurf-dirt {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc((var(--i) - 1) * 26px), -34px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1) * 40px), 6px);
+  }
+}
+
 /* ---------- Igel: puffs up the spikes and sniffs along ---------- */
 
 .item-igel.playing .igel-body {
@@ -1044,6 +2083,20 @@
   30%,
   50% {
     transform: translate(16px, -3px);
+  }
+}
+
+.item-igel.playing .igel-nose {
+  animation: bs-sniff 0.15s ease-in-out 0.9s 6 alternate;
+}
+
+.item-igel.playing .igel-foot {
+  animation: igel-patter 0.15s ease-in-out calc(var(--i) * 0.15s) 6 alternate;
+}
+
+@keyframes igel-patter {
+  to {
+    transform: translateY(-4px);
   }
 }
 
@@ -1080,6 +2133,45 @@
   }
 }
 
+/* The red shell opens in two halves, and the leaf bounces when it takes off. */
+.item-marienkaefer.playing .kaefer-shell-l {
+  animation: kaefer-shell-l 2.4s ease-in-out;
+}
+
+.item-marienkaefer.playing .kaefer-shell-r {
+  animation: kaefer-shell-r 2.4s ease-in-out;
+}
+
+.item-marienkaefer.playing .kaefer-leaf {
+  animation: kaefer-leaf 1s ease-out;
+}
+
+@keyframes kaefer-shell-l {
+  5%,
+  90% {
+    transform: rotate(35deg);
+  }
+}
+
+@keyframes kaefer-shell-r {
+  5%,
+  90% {
+    transform: rotate(-35deg);
+  }
+}
+
+@keyframes kaefer-leaf {
+  15% {
+    transform: rotate(8deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+  65% {
+    transform: rotate(2deg);
+  }
+}
+
 /* ---------- Hase: only the ears show; he hops up and wiggles them ---------- */
 
 .hase-body {
@@ -1109,6 +2201,14 @@
   to {
     transform: rotate(12deg);
   }
+}
+
+.item-hase.playing .hase-bush {
+  animation: baum-rustle 0.15s ease-in-out 4 alternate;
+}
+
+.item-hase.playing .hase-nose {
+  animation: bs-sniff 0.15s ease-in-out 0.5s 6 alternate;
 }
 
 /* ---------- Sandhaufen: the shovel digs and the sand flies ---------- */
@@ -1141,6 +2241,22 @@
   }
 }
 
+.item-sandhaufen.playing .sand-pile {
+  animation: sand-squish 1.6s ease-in-out;
+}
+
+@keyframes sand-squish {
+  25% {
+    transform: scale(1.03, 0.96);
+  }
+  50% {
+    transform: scale(0.98, 1.03);
+  }
+  70% {
+    transform: none;
+  }
+}
+
 /* ---------- Säge: saws back and forth, sawdust falls ---------- */
 
 .item-saege.playing .saege-blade {
@@ -1166,3 +2282,35 @@
     transform: translateY(40px);
   }
 }
+
+/* The plank shakes with each stroke; its nearly sawn-off end droops. */
+.item-saege.playing .saege-plank {
+  animation: saege-plank 0.2s ease-in-out 8 alternate;
+}
+
+.item-saege.playing .saege-end {
+  animation: saege-end 1.6s ease-in-out;
+}
+
+@keyframes saege-plank {
+  from {
+    transform: rotate(-0.8deg);
+  }
+  to {
+    transform: rotate(0.8deg);
+  }
+}
+
+@keyframes saege-end {
+  0%,
+  60% {
+    transform: none;
+  }
+  75% {
+    transform: rotate(28deg);
+  }
+  85% {
+    transform: rotate(18deg);
+  }
+}
+

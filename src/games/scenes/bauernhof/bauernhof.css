@@ -42,7 +42,38 @@
 .bh-hund-tongue,
 .bh-huhn-egg,
 .bh-schwein-splash circle,
-.bh-ente-ripples ellipse {
+.bh-ente-ripples ellipse,
+.bh-lid,
+.bh-eule-feather,
+.bh-katze-heart,
+.bh-pferd-snort circle,
+.bh-pferd-dust circle,
+.bh-kuh-mouth,
+.bh-gans-feather,
+.bh-gans-lines path,
+.bh-hund-bark path,
+.bh-hund-dust circle,
+.bh-huhn-feather,
+.bh-kueken-notes > g,
+.bh-schnecke-trail,
+.bh-biene-pollen circle,
+.bh-ente-drops circle,
+.bh-frosch-tongue,
+.bh-scheune-glow,
+.bh-muehle-flour circle,
+.bh-muehle-light,
+.bh-pumpe-ripple,
+.bh-pumpe-splash circle,
+.bh-traktor-beacon,
+.bh-traktor-beam,
+.bh-drescher-beacon,
+.bh-drescher-straw circle,
+.bh-karre-dirt circle,
+.bh-scheuche-straw path,
+.bh-scheuche-bird,
+.bh-baum-bird,
+.bh-baum-leaf,
+.bh-heu-bits path {
   opacity: 0;
   pointer-events: none;
 }
@@ -55,9 +86,151 @@
 .bh-huhn-egg,
 .bh-schwein-splash circle,
 .bh-ente-ripples ellipse,
-.bh-karre-pumpkin {
+.bh-karre-pumpkin,
+.bh-eule-feather,
+.bh-katze-paw,
+.bh-katze-heart,
+.bh-pferd-snort circle,
+.bh-pferd-dust circle,
+.bh-kuh-mouth,
+.bh-hahn-comb,
+.bh-schaf-tail,
+.bh-gans-foot,
+.bh-gans-feather,
+.bh-gans-lines path,
+.bh-hund-bark path,
+.bh-hund-dust circle,
+.bh-huhn-feather,
+.bh-huhn-grain,
+.bh-kueken-notes > g,
+.bh-hase-tail,
+.bh-biene-pollen circle,
+.bh-ente-drops circle,
+.bh-scheune-glow,
+.bh-muehle-flour circle,
+.bh-pumpe-ripple,
+.bh-pumpe-splash circle,
+.bh-traktor-beacon,
+.bh-traktor-beam,
+.bh-drescher-beacon,
+.bh-drescher-straw circle,
+.bh-karre-dirt circle,
+.bh-scheuche-straw path,
+.bh-baum-leaf,
+.bh-heu-bits path,
+.bh-haus-flower {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* Parts many items share: eyes blink, drivers bob in their seats. */
+.playing .bh-lid {
+  animation: bh-lid 1.4s step-end;
+}
+
+.playing .bh-driver {
+  animation: bh-bob 0.4s ease-in-out 5;
+}
+
+@keyframes bh-lid {
+  20%,
+  70% {
+    opacity: 1;
+  }
+  30%,
+  80% {
+    opacity: 0;
+  }
+}
+
+@keyframes bh-bob {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes bh-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(-16px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(1);
+  }
+}
+
+@keyframes bh-glow {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+}
+
+@keyframes bh-feather {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0);
+  }
+  50% {
+    transform: translate(14px, 30px) rotate(30deg);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-4px, 60px) rotate(-20deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(4px, 70px) rotate(0);
+  }
+}
+
+@keyframes bh-flick {
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes bh-dust {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(1.8);
+  }
+}
+
+@keyframes bh-lines {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 @keyframes bh-drift {
@@ -164,6 +337,10 @@
   }
 }
 
+.item-schwalbe.playing .bh-schwalbe-tail {
+  animation: bh-flick 0.3s ease-in-out 6;
+}
+
 /* ---------- Windmühle: the sails turn twice ---------- */
 
 .item-windmuehle.playing .bh-muehle-sails {
@@ -174,6 +351,18 @@
   to {
     transform: rotate(2turn);
   }
+}
+
+.item-windmuehle.playing .bh-muehle-door {
+  animation: bh-door 2.4s ease-in-out;
+}
+
+.item-windmuehle.playing .bh-muehle-light {
+  animation: bh-light 2s ease-in-out 0.2s;
+}
+
+.item-windmuehle.playing .bh-muehle-flour circle {
+  animation: bh-puff 1s ease-out calc(0.7s + var(--i) * 0.2s);
 }
 
 /* ---------- Mähdrescher: the reel turns, it rumbles and grain pours out ---------- */
@@ -210,6 +399,14 @@
   }
 }
 
+.item-maehdrescher.playing .bh-drescher-beacon {
+  animation: bh-glow 0.5s ease-in-out 5;
+}
+
+.item-maehdrescher.playing .bh-drescher-straw circle {
+  animation: bh-puff 1s ease-out calc(0.4s + var(--i) * 0.25s) 2;
+}
+
 /* ---------- Bauernhaus: lights go on, shutters flap, the farmer's wife waves ---------- */
 
 .item-bauernhaus.playing .bh-haus-light {
@@ -237,6 +434,24 @@
   75% {
     transform: rotate(20deg);
   }
+}
+
+.item-bauernhaus.playing .bh-haus-door {
+  animation: bh-door 2.4s ease-in-out;
+}
+
+.item-bauernhaus.playing .bh-haus-flower {
+  animation: bh-flower 0.5s ease-in-out calc(0.6s + var(--i) * 0.1s) 2;
+}
+
+@keyframes bh-flower {
+  50% {
+    transform: scale(1.5);
+  }
+}
+
+.item-bauer.playing .bh-bauer-fork {
+  animation: bh-tilt 0.5s ease-in-out 0.2s 3;
 }
 
 /* ---------- Storch: throws its head back and clatters ---------- */
@@ -282,6 +497,21 @@
   }
 }
 
+.item-storch.playing .bh-storch-baby {
+  animation: bh-baby 2s ease-in-out;
+}
+
+@keyframes bh-baby {
+  30%,
+  70% {
+    transform: translateY(-18px);
+  }
+  40%,
+  60% {
+    transform: translateY(-20px) rotate(-8deg);
+  }
+}
+
 /* ---------- Katze: stretches, tilts her head, waves her tail ---------- */
 
 .item-katze.playing .bh-katze-body {
@@ -306,6 +536,31 @@
 @keyframes bh-tilt {
   50% {
     transform: rotate(-14deg);
+  }
+}
+
+.item-katze.playing .bh-katze-ears {
+  animation: bh-ears 0.3s ease-in-out 0.2s 3;
+}
+
+.item-katze.playing .bh-katze-paw {
+  animation: bh-paw 1.6s ease-in-out;
+}
+
+.item-katze.playing .bh-katze-heart {
+  animation: bh-pop 1.2s ease-out 0.5s;
+}
+
+@keyframes bh-ears {
+  50% {
+    transform: scaleY(0.85);
+  }
+}
+
+@keyframes bh-paw {
+  30%,
+  60% {
+    transform: translate(3px, -14px) rotate(-20deg);
   }
 }
 
@@ -334,6 +589,18 @@
   50% {
     transform: scaleX(-1);
   }
+}
+
+.item-scheune.playing .bh-scheune-lamp {
+  animation: bh-bell 0.8s ease-in-out 0.3s 2;
+}
+
+.item-scheune.playing .bh-scheune-glow {
+  animation: bh-glow 1.6s ease-in-out 0.4s;
+}
+
+.item-scheune.playing .bh-scheune-mouse {
+  animation: bh-hop 0.5s ease-in-out 0.8s 2;
 }
 
 /* ---------- Eule: looks around, blinks and flaps ---------- */
@@ -384,6 +651,10 @@
   }
 }
 
+.item-eule.playing .bh-eule-feather {
+  animation: bh-feather 1.6s ease-in-out 0.3s;
+}
+
 /* ---------- Apfelbaum: the crown shakes and the apples fall into the grass ---------- */
 
 .item-baum.playing .bh-baum-crown {
@@ -422,6 +693,43 @@
   91% {
     opacity: 0;
     transform: translateY(0);
+  }
+}
+
+.item-baum.playing .bh-baum-leaf {
+  animation: bh-leaf 1.6s ease-in calc(0.2s + var(--i) * 0.2s);
+}
+
+.item-baum.playing .bh-baum-bird {
+  animation: bh-fly-off 1.4s ease-in;
+}
+
+@keyframes bh-leaf {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(16px, 80px) rotate(60deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-6px, 150px) rotate(-30deg);
+  }
+}
+
+@keyframes bh-fly-off {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(140px, -120px);
   }
 }
 
@@ -474,6 +782,20 @@
   }
 }
 
+.item-hahn.playing .bh-hahn-tail {
+  animation: bh-fan 0.5s ease-in-out 0.3s 3;
+}
+
+.item-hahn.playing .bh-hahn-comb {
+  animation: bh-tilt 0.3s ease-in-out 0.4s 4;
+}
+
+@keyframes bh-fan {
+  50% {
+    transform: rotate(12deg);
+  }
+}
+
 /* ---------- Pferd: rears up, nods and swishes its tail ---------- */
 
 .item-pferd.playing .bh-pferd-body {
@@ -498,6 +820,22 @@
   }
 }
 
+.item-pferd.playing .bh-pferd-ear {
+  animation: bh-flick 0.3s ease-in-out 3;
+}
+
+.item-pferd.playing .bh-pferd-mane {
+  animation: bh-flick 0.5s ease-in-out 0.3s 2;
+}
+
+.item-pferd.playing .bh-pferd-snort circle {
+  animation: bh-puff 0.8s ease-out calc(0.5s + var(--i) * 0.15s);
+}
+
+.item-pferd.playing .bh-pferd-dust circle {
+  animation: bh-dust 0.6s ease-out calc(1.3s + var(--i) * 0.08s);
+}
+
 /* ---------- Heuballen: rolls away a bit and back ---------- */
 
 .item-heuballen.playing .bh-heu-roll {
@@ -508,6 +846,24 @@
   40%,
   55% {
     transform: translateX(80px) rotate(79deg);
+  }
+}
+
+.item-heuballen.playing .bh-heu-mouse {
+  animation: bh-heu-mouse 2.2s ease-in-out;
+}
+
+.item-heuballen.playing .bh-heu-bits path {
+  animation: bh-dust 0.7s ease-out calc(0.2s + var(--i) * 0.15s) 2;
+}
+
+@keyframes bh-heu-mouse {
+  40%,
+  56% {
+    transform: translateY(0);
+  }
+  46% {
+    transform: translateY(-18px);
   }
 }
 
@@ -547,6 +903,37 @@
   }
 }
 
+.item-vogelscheuche.playing .bh-scheuche-bird {
+  animation: bh-birds 1.4s ease-in calc(var(--i) * 0.15s);
+}
+
+.item-vogelscheuche.playing .bh-scheuche-straw path {
+  animation: bh-straw 0.9s ease-in calc(0.3s + var(--i) * 0.2s);
+}
+
+@keyframes bh-birds {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--dir) * 120px), -110px);
+  }
+}
+
+@keyframes bh-straw {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(70px) rotate(90deg);
+  }
+}
+
 /* ---------- Schaf: hops twice, the wool bounces ---------- */
 
 .item-schaf.playing .bh-schaf-body {
@@ -564,6 +951,24 @@
 @keyframes bh-squish {
   50% {
     transform: scale(1.08, 0.94);
+  }
+}
+
+.item-schaf.playing .bh-schaf-tail {
+  animation: bh-squish 0.2s ease-in-out 6;
+}
+
+.item-schaf.playing .bh-schaf-ear {
+  animation: bh-flick 0.3s ease-in-out 0.3s 3;
+}
+
+.item-schaf.playing .bh-schaf-ear-right {
+  animation-name: bh-flick-right;
+}
+
+@keyframes bh-flick-right {
+  50% {
+    transform: rotate(18deg);
   }
 }
 
@@ -590,6 +995,31 @@
   }
 }
 
+.item-kuh.playing .bh-kuh-ear {
+  animation: bh-flick 0.4s ease-in-out 4;
+}
+
+.item-kuh.playing .bh-kuh-ear-right {
+  animation-name: bh-flick-right;
+}
+
+.item-kuh.playing .bh-kuh-mouth {
+  animation: bh-moo 1.2s ease-in-out 0.2s;
+}
+
+@keyframes bh-moo {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  20%,
+  80% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
 /* ---------- Ziege: stands up on its hind legs and shakes its head ---------- */
 
 .item-ziege.playing .bh-ziege-body {
@@ -605,6 +1035,18 @@
   60% {
     transform: rotate(16deg);
   }
+}
+
+.item-ziege.playing .bh-ziege-tail {
+  animation: bh-flick 0.2s ease-in-out 6;
+}
+
+.item-ziege.playing .bh-ziege-ear {
+  animation: bh-flick-right 0.3s ease-in-out 0.5s 3;
+}
+
+.item-ziege.playing .bh-ziege-beard {
+  animation: bh-tilt 0.3s ease-in-out 0.6s 4;
 }
 
 /* ---------- Bauer: waves, lifts his hat and hops ---------- */
@@ -638,6 +1080,14 @@
   }
 }
 
+.item-schubkarre.playing .bh-karre-wheel {
+  animation: bh-spin 1.2s ease-in-out;
+}
+
+.item-schubkarre.playing .bh-karre-dirt circle {
+  animation: bh-dust 0.7s ease-out calc(0.3s + var(--i) * 0.2s);
+}
+
 /* ---------- Gans: stretches her neck, flaps and waddles ---------- */
 
 .item-gans.playing .bh-gans-neck {
@@ -655,6 +1105,28 @@
 @keyframes bh-goose {
   50% {
     transform: rotate(-30deg);
+  }
+}
+
+.item-gans.playing .bh-gans-beak {
+  animation: bh-beak-down 0.12s linear 0.2s 10 alternate;
+}
+
+.item-gans.playing .bh-gans-foot {
+  animation: bh-patter 0.3s ease-in-out calc(var(--i) * 0.15s) 5;
+}
+
+.item-gans.playing .bh-gans-lines path {
+  animation: bh-lines 0.5s ease-out calc(0.2s + var(--i) * 0.12s) 2;
+}
+
+.item-gans.playing .bh-gans-feather {
+  animation: bh-feather 1.4s ease-in-out 0.3s;
+}
+
+@keyframes bh-patter {
+  50% {
+    transform: translateY(-5px);
   }
 }
 
@@ -680,6 +1152,24 @@
   45%,
   55% {
     transform: translateX(40px);
+  }
+}
+
+.item-traktor.playing .bh-traktor-cap {
+  animation: bh-cap 0.3s ease-in-out 6;
+}
+
+.item-traktor.playing .bh-traktor-beacon {
+  animation: bh-glow 0.5s ease-in-out 4;
+}
+
+.item-traktor.playing .bh-traktor-beam {
+  animation: bh-glow 1.8s ease-in-out 0.2s;
+}
+
+@keyframes bh-cap {
+  50% {
+    transform: rotate(-40deg);
   }
 }
 
@@ -721,6 +1211,18 @@
   }
 }
 
+.item-hund.playing .bh-hund-ear {
+  animation: bh-flick-right 0.4s ease-in-out 4;
+}
+
+.item-hund.playing .bh-hund-bark path {
+  animation: bh-lines 0.4s ease-out calc(var(--i) * 0.1s) 4;
+}
+
+.item-hund.playing .bh-hund-dust circle {
+  animation: bh-dust 0.5s ease-out calc(0.7s + var(--i) * 0.05s) 2;
+}
+
 /* ---------- Pumpe: the handle pumps and water drips into the bucket ---------- */
 
 .item-pumpe.playing .bh-pumpe-handle {
@@ -745,6 +1247,14 @@
     opacity: 0.6;
     transform: translateY(44px);
   }
+}
+
+.item-pumpe.playing .bh-pumpe-ripple {
+  animation: bh-ripple 0.6s ease-out 0.4s 3;
+}
+
+.item-pumpe.playing .bh-pumpe-splash circle {
+  animation: bh-splash 0.6s ease-out calc(0.6s + var(--i) * 0.15s) 2;
 }
 
 /* ---------- Huhn: pecks three times, flaps and lays an egg ---------- */
@@ -783,6 +1293,24 @@
   }
 }
 
+.item-huhn.playing .bh-huhn-tail {
+  animation: bh-flick-right 0.3s ease-in-out 1.2s 2;
+}
+
+.item-huhn.playing .bh-huhn-grain {
+  animation: bh-grain-hop 0.4s ease-out calc(var(--i) * 0.1s) 3;
+}
+
+.item-huhn.playing .bh-huhn-feather {
+  animation: bh-feather 1.2s ease-in-out 0.8s;
+}
+
+@keyframes bh-grain-hop {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 /* ---------- Ente: dips her head into the water, ripples spread ---------- */
 
 .item-ente.playing .bh-ente-body {
@@ -809,6 +1337,14 @@
     opacity: 0;
     transform: scale(1.5);
   }
+}
+
+.item-ente.playing .bh-ente-wing {
+  animation: bh-hen-wing 0.15s ease-in-out 1.2s 6 alternate;
+}
+
+.item-ente.playing .bh-ente-drops circle {
+  animation: bh-splash 0.6s ease-out calc(1.1s + var(--i) * 0.1s);
 }
 
 /* ---------- Hase: hops, wiggles his ears and sniffs ---------- */
@@ -838,6 +1374,14 @@
   to {
     transform: translateY(-2px);
   }
+}
+
+.item-hase.playing .bh-hase-tail {
+  animation: bh-squish 0.2s ease-in-out 6;
+}
+
+.item-hase.playing .bh-hase-carrot {
+  animation: bh-tilt 0.3s ease-in-out 0.9s 3;
 }
 
 /* ---------- Schwein and Ferkel: roll about in the mud and splash ---------- */
@@ -875,6 +1419,27 @@
   }
 }
 
+.item-schwein.playing .bh-schwein-tail,
+.item-ferkel.playing .bh-schwein-tail {
+  animation: bh-curl 0.3s ease-in-out 6;
+}
+
+.item-schwein.playing .bh-schwein-ear,
+.item-ferkel.playing .bh-schwein-ear {
+  animation: bh-flick 0.3s ease-in-out 0.2s 3;
+}
+
+.item-schwein.playing .bh-schwein-ear-right,
+.item-ferkel.playing .bh-schwein-ear-right {
+  animation-name: bh-flick-right;
+}
+
+@keyframes bh-curl {
+  50% {
+    transform: rotate(40deg);
+  }
+}
+
 /* ---------- Frosch: crouches, jumps high and puffs his throat ---------- */
 
 .item-frosch.playing .bh-frosch-body {
@@ -903,6 +1468,37 @@
   }
 }
 
+.item-frosch.playing .bh-frosch-pad {
+  animation: bh-pad 1.2s ease-in-out;
+}
+
+.item-frosch.playing .bh-frosch-tongue {
+  animation: bh-tongue-flick 0.35s ease-out 1.2s;
+}
+
+@keyframes bh-pad {
+  15%,
+  80% {
+    transform: scale(1.04, 0.85);
+  }
+  30%,
+  70% {
+    transform: none;
+  }
+}
+
+@keyframes bh-tongue-flick {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(0.1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* ---------- Küken: hops and flaps ---------- */
 
 .item-kueken.playing .bh-kueken-body {
@@ -911,6 +1507,14 @@
 
 .item-kueken.playing .bh-kueken-wing {
   animation: bh-hen-wing 0.15s ease-in-out 12 alternate;
+}
+
+.item-kueken.playing .bh-kueken-shell {
+  animation: bh-tilt 0.3s ease-in-out 4;
+}
+
+.item-kueken.playing .bh-kueken-notes > g {
+  animation: bh-note 0.9s ease-out calc(0.3s + var(--i) * 0.3s);
 }
 
 /* ---------- Biene: flies a loop around the sunflower ---------- */
@@ -932,6 +1536,25 @@
   }
   75% {
     transform: translate(-40px, 40px);
+  }
+}
+
+.item-biene.playing .bh-biene-antennae {
+  animation: bh-flick 0.25s ease-in-out 8;
+}
+
+.item-biene.playing .bh-biene-pollen circle {
+  animation: bh-pollen 1s ease-out calc(1.2s + var(--i) * 0.2s);
+}
+
+@keyframes bh-pollen {
+  0% {
+    opacity: 1;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30px) scale(1.2);
   }
 }
 
@@ -960,5 +1583,16 @@
   50%,
   70% {
     transform: translateX(-16px);
+  }
+}
+
+.item-schnecke.playing .bh-schnecke-trail {
+  animation: bh-trail 2s ease-in-out;
+}
+
+@keyframes bh-trail {
+  30%,
+  80% {
+    opacity: 0.9;
   }
 }

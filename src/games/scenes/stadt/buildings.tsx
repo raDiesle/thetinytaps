@@ -27,8 +27,11 @@ export function Kirche() {
       <rect x="172" y="-190" width="18" height="190" fill="#e6d3ae" />
       <path d="M40 -190 L120 -252 L200 -190 Z" fill="#c1666b" />
       <path d="M120 -252 L200 -190 H170 Z" fill="#a8545a" />
-      {[90, 150].map((x) => (
-        <path key={x} d={`M${x - 14} -50 V-112 a14 14 0 0 1 28 0 V-50 Z`} fill={GLASS} stroke="#e2cfa8" strokeWidth="5" />
+      {[90, 150].map((x, i) => (
+        <g key={x}>
+          <path d={`M${x - 14} -50 V-112 a14 14 0 0 1 28 0 V-50 Z`} fill={GLASS} stroke="#e2cfa8" strokeWidth="5" />
+          <path className="st-kirche-light" d={`M${x - 12} -52 V-112 a12 12 0 0 1 24 0 V-52 Z`} fill="#ffe066" style={nth(i)} />
+        </g>
       ))}
       {/* Tower */}
       <rect x="-60" y="-420" width="120" height="420" fill="#f6ead2" />
@@ -65,13 +68,26 @@ export function Kirche() {
         <circle cx="0" cy="-236" r="5" fill="#e0a800" />
       </g>
       <rect x="-38" y="-232" width="76" height="8" rx="3" fill="#e2cfa8" />
+      {/* Sound waves of the bell, only while it rings */}
+      <g className="st-kirche-ring" fill="none" stroke="#ffc300" strokeWidth="4" strokeLinecap="round">
+        <path d="M-46 -290 q-10 20 0 40 M-58 -298 q-14 28 0 56" style={nth(0)} />
+        <path d="M46 -290 q10 20 0 40 M58 -298 q14 28 0 56" style={nth(1)} />
+      </g>
       {/* Round window and door */}
       <circle cx="0" cy="-160" r="18" fill={GLASS} stroke="#e2cfa8" strokeWidth="5" />
+      <circle className="st-kirche-light" cx="0" cy="-160" r="15" fill="#ffe066" style={nth(2)} />
       <path d="M0 -178 V-142 M-18 -160 H18" stroke="#e2cfa8" strokeWidth="3" />
-      <path d="M-30 0 V-64 a30 30 0 0 1 60 0 V0 Z" fill="#8d5a2b" />
-      <path d="M0 0 V-94" stroke="#6b4423" strokeWidth="4" />
-      <circle cx="-8" cy="-40" r="3.5" fill="#ffd60a" />
-      <circle cx="8" cy="-40" r="3.5" fill="#ffd60a" />
+      {/* Behind the door: warm candle light */}
+      <path d="M-30 0 V-64 a30 30 0 0 1 60 0 V0 Z" fill="#4a2f1d" />
+      <ellipse cx="0" cy="-40" rx="18" ry="30" fill="#ffd166" opacity="0.6" />
+      <path d="M-4 -14 V-34 M4 -14 V-30" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+      <path className="st-kirche-door" d="M-30 0 V-64 a30 30 0 0 1 30 -30 V0 Z" fill="#8d5a2b" style={{ transformOrigin: "-30px 0px" }} />
+      <path className="st-kirche-door" d="M0 0 V-94 a30 30 0 0 1 30 30 V0 Z" fill="#8d5a2b" style={{ transformOrigin: "30px 0px" }} />
+      <g className="st-kirche-door" style={{ transformOrigin: "-30px 0px" }}>
+        <path d="M-2 0 V-94" stroke="#6b4423" strokeWidth="4" />
+        <circle cx="-8" cy="-40" r="3.5" fill="#ffd60a" />
+      </g>
+      <circle className="st-kirche-door" cx="8" cy="-40" r="3.5" fill="#ffd60a" style={{ transformOrigin: "30px 0px" }} />
       <rect x="-42" y="-6" width="84" height="6" rx="2" fill="#dee2e6" />
     </>
   );
@@ -92,13 +108,18 @@ export function Haus() {
       <path d="M-96 -430 H96 M-112 -404 H112" stroke="#8e8a99" strokeWidth="5" />
       <circle cx="0" cy="-402" r="20" fill="#fff" />
       <circle cx="0" cy="-402" r="15" fill={GLASS} />
+      <circle className="st-haus-light" cx="0" cy="-402" r="15" fill="#ffe066" style={nth(8)} />
       <path d="M-6 -414 L4 -390" stroke="#fff" strokeWidth="4" opacity="0.6" />
       <rect x="-140" y="-362" width="280" height="362" fill="#ffcad4" />
       <rect x="118" y="-362" width="22" height="362" fill="#f4acb7" />
       <rect x="-148" y="-370" width="296" height="14" rx="4" fill="#e5989b" />
       <rect x="-140" y="-26" width="280" height="26" fill="#e5989b" />
       {/* Top floor; a child waves from the middle window */}
-      <Window x={-112} y={-334} light="st-haus-light" i={0} />
+      <Window x={-112} y={-334} light="st-haus-light" i={0}>
+        {/* Curtains that are pulled open */}
+        <rect className="st-haus-curtain" x="-112" y="-334" width="18" height="66" fill="#ffafcc" style={{ transformOrigin: "-112px -334px" }} />
+        <rect className="st-haus-curtain" x="-74" y="-334" width="18" height="66" fill="#ffafcc" style={{ transformOrigin: "-56px -334px" }} />
+      </Window>
       <Window x={-28} y={-334} light="st-haus-light" i={1}>
         <rect x="-14" y="-282" width="28" height="22" rx="8" fill="#4cc9f0" />
         <circle cx="0" cy="-294" r="14" fill={SKIN} />
@@ -109,7 +130,15 @@ export function Haus() {
           <circle cx="25" cy="-298" r="5" fill={SKIN} />
         </g>
       </Window>
-      <Window x={56} y={-334} light="st-haus-light" i={2} />
+      <Window x={56} y={-334} light="st-haus-light" i={2}>
+        {/* A grandpa pops up from below the sill and looks out */}
+        <g className="st-haus-peek">
+          <rect x="70" y="-238" width="28" height="22" rx="8" fill="#6a994e" />
+          <circle cx="84" cy="-250" r="13" fill={SKIN} />
+          <path d="M71 -254 Q72 -266 84 -265 Q96 -266 97 -254 Q90 -258 84 -258 Q78 -258 71 -254 Z" fill="#dee2e6" />
+          <Face cx={84} cy={-252} size={0.5} />
+        </g>
+      </Window>
       {/* First floor with flower boxes */}
       <Window x={-112} y={-226} light="st-haus-light" i={3} />
       <Window x={-28} y={-226} light="st-haus-light" i={4} />
@@ -118,16 +147,24 @@ export function Haus() {
         <g key={cx}>
           <rect x={cx - 30} y="-152" width="60" height="14" rx="4" fill="#a0522d" />
           {[-18, -6, 6, 18].map((dx, i) => (
-            <circle key={dx} cx={cx + dx} cy="-155" r="5" fill={i % 2 ? "#ff7bd0" : "#ffd60a"} />
+            <circle key={dx} className="st-haus-flower" cx={cx + dx} cy="-155" r="5" fill={i % 2 ? "#ff7bd0" : "#ffd60a"} style={nth(i)} />
           ))}
         </g>
       ))}
       {/* Ground floor */}
       <Window x={-112} y={-118} h={60} light="st-haus-light" i={6} />
       <Window x={56} y={-118} h={60} light="st-haus-light" i={7} />
-      <path d="M-28 -2 V-76 a28 28 0 0 1 56 0 V-2 Z" fill="#3a86ff" />
-      <path d="M-16 -70 a16 16 0 0 1 32 0 Z" fill={GLASS} />
-      <circle cx="16" cy="-40" r="4" fill="#ffd60a" />
+      {/* Behind the front door: the hall, and a child who comes to say hello */}
+      <path d="M-28 -2 V-76 a28 28 0 0 1 56 0 V-2 Z" fill="#6d4c5a" />
+      <rect x="-14" y="-48" width="28" height="46" rx="10" fill="#ffb703" />
+      <circle cx="0" cy="-60" r="14" fill={SKIN} />
+      <path d="M-14 -62 Q-14 -78 0 -77 Q14 -78 14 -62 Q4 -70 -14 -62 Z" fill="#6b4423" />
+      <Face cx={0} cy={-62} size={0.55} />
+      <g className="st-haus-door" style={{ transformOrigin: "-28px 0px" }}>
+        <path d="M-28 -2 V-76 a28 28 0 0 1 56 0 V-2 Z" fill="#3a86ff" />
+        <path d="M-16 -70 a16 16 0 0 1 32 0 Z" fill={GLASS} />
+        <circle cx="16" cy="-40" r="4" fill="#ffd60a" />
+      </g>
       <rect x="-38" y="-8" width="76" height="8" rx="2" fill="#dee2e6" />
     </>
   );
@@ -153,23 +190,25 @@ export function Baeckerei() {
       <rect x="-140" y="-322" width="280" height="322" fill="#fff1d6" />
       <rect x="118" y="-322" width="22" height="322" fill="#f6dfb8" />
       <rect x="-148" y="-330" width="296" height="12" rx="4" fill="#dda15e" />
-      <Window x={-112} y={-298} h={56} />
-      <Window x={56} y={-298} h={56} />
+      <Window x={-112} y={-298} h={56} light="st-baecker-light" i={0} />
+      <Window x={56} y={-298} h={56} light="st-baecker-light" i={1} />
       {/* Sign board with a loaf */}
       <rect x="-40" y="-292" width="80" height="48" rx="8" fill="#fff" stroke="#dda15e" strokeWidth="4" />
       <ellipse cx="0" cy="-268" rx="24" ry="13" fill="#d4a373" />
       <path d="M-12 -276 l6 12 M0 -279 l6 12 M12 -276 l5 10" stroke="#a0522d" strokeWidth="3" strokeLinecap="round" />
-      {/* Striped awning */}
-      {Array.from({ length: 8 }, (_, i) => {
-        const x = -146 + i * 36.5;
-        const color = i % 2 ? "#fff" : "#e63946";
-        return (
-          <g key={i} fill={color}>
-            <rect x={x} y="-206" width="36.5" height="32" />
-            <path d={`M${x} -175 a18.25 13 0 0 0 36.5 0 Z`} />
-          </g>
-        );
-      })}
+      {/* Striped awning, it flutters in the wind */}
+      <g className="st-baecker-awning" style={{ transformOrigin: "0px -206px" }}>
+        {Array.from({ length: 8 }, (_, i) => {
+          const x = -146 + i * 36.5;
+          const color = i % 2 ? "#fff" : "#e63946";
+          return (
+            <g key={i} fill={color}>
+              <rect x={x} y="-206" width="36.5" height="32" />
+              <path d={`M${x} -175 a18.25 13 0 0 0 36.5 0 Z`} />
+            </g>
+          );
+        })}
+      </g>
       <rect x="-150" y="-212" width="300" height="10" rx="4" fill="#c1121f" />
       {/* Shop window with bread that jumps */}
       <rect x="-130" y="-156" width="156" height="130" rx="4" fill="#fff" />
@@ -212,6 +251,12 @@ export function Baeckerei() {
       </Pane>
       <circle cx="100" cy="-48" r="4" fill="#ffd60a" />
       <rect x="34" y="-6" width="84" height="6" rx="2" fill="#dee2e6" />
+      {/* The shop bell above the door rings */}
+      <path d="M76 -164 V-156" stroke={INK} strokeWidth="3" />
+      <g className="st-baecker-bell" style={{ transformOrigin: "76px -156px" }}>
+        <path d="M68 -142 Q66 -156 76 -156 Q86 -156 84 -142 Z" fill="#ffc300" />
+        <circle cx="76" cy="-140" r="3" fill="#e0a800" />
+      </g>
       {/* Pretzel sign on a bracket */}
       <path d="M-140 -242 H-186 M-150 -242 Q-160 -258 -176 -248" stroke={INK} strokeWidth="5" strokeLinecap="round" fill="none" />
       <g className="st-baecker-sign" style={{ transformOrigin: "-172px -242px" }}>
@@ -239,8 +284,11 @@ export function Feuerwache() {
       <rect x="-100" y="-390" width="16" height="390" fill="#b5482f" />
       <path d="M-164 -390 h12 v-12 h12 v12 h12 v-12 h12 v12 h12 v-12 h12 v12 h4" fill="#8c3b2a" />
       <path className="st-wache-lamp" d="M-154 -398 a8 8 0 0 1 16 0 Z" fill="#3a86ff" />
-      {[-350, -270, -190].map((y) => (
-        <rect key={y} x="-132" y={y} width="20" height="36" rx="10" fill={GLASS} stroke="#fff" strokeWidth="3" />
+      {[-350, -270, -190].map((y, i) => (
+        <g key={y}>
+          <rect x="-132" y={y} width="20" height="36" rx="10" fill={GLASS} stroke="#fff" strokeWidth="3" />
+          <rect className="st-wache-light" x="-130" y={y + 2} width="16" height="32" rx="8" fill="#ffe066" style={nth(2 - i)} />
+        </g>
       ))}
       {/* Main building */}
       <rect x="-84" y="-250" width="244" height="250" fill="#d1603d" />
@@ -254,11 +302,30 @@ export function Feuerwache() {
       {/* Behind the gate: helmets and a hose */}
       <rect x="-64" y="-192" width="204" height="192" fill="#343a40" />
       <rect x="-64" y="-36" width="204" height="36" fill="#495057" />
-      {[-30, 10].map((x) => (
-        <path key={x} d={`M${x - 16} -136 Q${x - 16} -160 ${x} -160 Q${x + 16} -160 ${x + 16} -136 Z`} fill="#ffd60a" />
+      <rect x="-50" y="-136" width="76" height="6" rx="2" fill="#6c757d" />
+      {[-30, 6].map((x, i) => (
+        <path key={x} className="st-wache-helmet" d={`M${x - 16} -136 Q${x - 16} -160 ${x} -160 Q${x + 16} -160 ${x + 16} -136 Z`} fill="#ffd60a" style={nth(i)} />
       ))}
-      <circle cx="96" cy="-120" r="26" fill="none" stroke="#e63946" strokeWidth="9" />
-      <circle cx="96" cy="-120" r="12" fill="none" stroke="#e63946" strokeWidth="7" />
+      <g className="st-wache-hose" style={{ transformOrigin: "96px -120px" }}>
+        <circle cx="96" cy="-120" r="26" fill="none" stroke="#e63946" strokeWidth="9" />
+        <circle cx="96" cy="-120" r="12" fill="none" stroke="#e63946" strokeWidth="7" />
+        <path d="M96 -146 V-94" stroke="#c1121f" strokeWidth="4" />
+      </g>
+      {/* A firefighter waves from inside */}
+      <g className="st-wache-man">
+        <rect x="26" y="-34" width="10" height="34" rx="4" fill="#1d3557" />
+        <rect x="40" y="-34" width="10" height="34" rx="4" fill="#1d3557" />
+        <rect x="22" y="-84" width="32" height="54" rx="10" fill="#1d3557" />
+        <rect x="22" y="-56" width="32" height="5" fill="#ffd60a" />
+        <circle cx="38" cy="-98" r="14" fill={SKIN} />
+        <path d="M23 -100 Q23 -118 38 -118 Q53 -118 53 -100 Z" fill="#e63946" />
+        <rect x="21" y="-103" width="34" height="5" rx="2" fill="#c1121f" />
+        <Face cx={38} cy={-96} size={0.5} />
+        <g className="st-wache-arm" style={{ transformOrigin: "24px -78px" }}>
+          <path d="M24 -78 L10 -100" stroke="#1d3557" strokeWidth="8" strokeLinecap="round" />
+          <circle cx="9" cy="-103" r="5" fill={SKIN} />
+        </g>
+      </g>
       <g className="st-wache-gate" style={{ transformOrigin: "38px -192px" }}>
         <rect x="-64" y="-192" width="204" height="192" fill="#e9ecef" />
         <path d={Array.from({ length: 9 }, (_, i) => `M-64 ${-172 + i * 20} H140`).join(" ")} stroke="#ced4da" strokeWidth="4" />
@@ -276,11 +343,13 @@ export function Feuerwache() {
 export function Briefkasten() {
   return (
     <>
-      <g className="st-post-letter">
-        <rect x="-16" y="-170" width="32" height="22" rx="2" fill="#fff" stroke="#ced4da" strokeWidth="2" />
-        <path d="M-16 -170 L0 -158 L16 -170" stroke="#ced4da" strokeWidth="2" fill="none" />
-        <rect x="6" y="-168" width="7" height="7" fill="#ff5d73" />
-      </g>
+      {["#ff5d73", "#4cc9f0", "#06d6a0"].map((stamp, i) => (
+        <g key={stamp} className="st-post-letter" style={nth(i)}>
+          <rect x="-16" y="-170" width="32" height="22" rx="2" fill="#fff" stroke="#ced4da" strokeWidth="2" />
+          <path d="M-16 -170 L0 -158 L16 -170" stroke="#ced4da" strokeWidth="2" fill="none" />
+          <rect x="6" y="-168" width="7" height="7" fill={stamp} />
+        </g>
+      ))}
       <rect x="-5" y="-80" width="10" height="80" fill="#495057" />
       <rect x="-38" y="-170" width="76" height="96" rx="12" fill="#ffd60a" />
       <rect x="22" y="-170" width="16" height="96" rx="8" fill="#ffc300" />
@@ -288,8 +357,13 @@ export function Briefkasten() {
       <rect x="-22" y="-148" width="44" height="7" rx="3" fill="#2b2d42" />
       <rect className="st-post-flap" x="-24" y="-154" width="48" height="8" rx="3" fill="#ffc300" style={{ transformOrigin: "0px -154px" }} />
       {/* Post horn */}
-      <circle cx="-4" cy="-108" r="12" stroke="#2b2d42" strokeWidth="4" fill="none" />
-      <path d="M8 -110 L22 -120 V-96 Z" fill="#2b2d42" />
+      <g className="st-post-horn">
+        <circle cx="-4" cy="-108" r="12" stroke="#2b2d42" strokeWidth="4" fill="none" />
+        <path d="M8 -110 L22 -120 V-96 Z" fill="#2b2d42" />
+      </g>
+      {/* Little door at the bottom, where the postman takes the letters out */}
+      <rect x="-24" y="-92" width="48" height="12" rx="3" fill="#2b2d42" />
+      <rect className="st-post-door" x="-24" y="-92" width="48" height="12" rx="3" fill="#ffc300" stroke="#e0a800" strokeWidth="2" style={{ transformOrigin: "0px -80px" }} />
     </>
   );
 }
@@ -301,12 +375,23 @@ export function Laterne() {
       <circle className="st-laterne-glow" cx="0" cy="-260" r="48" fill="#fff3b0" />
       <path d="M0 0 V-232" stroke="#2b2d42" strokeWidth="8" />
       <rect x="-12" y="-28" width="24" height="28" rx="5" fill="#2b2d42" />
+      {/* Little service hatch in the foot */}
+      <rect x="-7" y="-23" width="14" height="16" rx="2" fill="#ffd60a" opacity="0.8" />
+      <rect className="st-laterne-hatch" x="-7" y="-23" width="14" height="16" rx="2" fill="#495057" style={{ transformOrigin: "-7px -15px" }} />
       <rect x="-9" y="-150" width="18" height="8" rx="3" fill="#2b2d42" />
       <path d="M-20 -236 H20 L14 -282 H-14 Z" fill="#e9ecef" stroke="#2b2d42" strokeWidth="4" strokeLinejoin="round" />
       <path className="st-laterne-light" d="M-20 -236 H20 L14 -282 H-14 Z" fill="#ffd60a" stroke="#2b2d42" strokeWidth="4" strokeLinejoin="round" />
       <path d="M0 -282 V-236" stroke="#2b2d42" strokeWidth="3" />
       <path d="M-26 -282 L0 -300 L26 -282 Z" fill="#2b2d42" />
       <circle cx="0" cy="-304" r="4" fill="#2b2d42" />
+      {/* Two moths that come to the light */}
+      {[0, 1].map((i) => (
+        <g key={i} className="st-laterne-moth" style={nth(i)}>
+          <ellipse cx="-5" cy="-262" rx="6" ry="4" fill="#fff" stroke="#adb5bd" strokeWidth="1.5" />
+          <ellipse cx="5" cy="-262" rx="6" ry="4" fill="#fff" stroke="#adb5bd" strokeWidth="1.5" />
+          <ellipse cx="0" cy="-262" rx="2" ry="5" fill={INK} />
+        </g>
+      ))}
     </>
   );
 }
@@ -320,13 +405,19 @@ export function Hydrant() {
           <circle key={i} cx="30" cy="-54" r="6" style={nth(i)} />
         ))}
       </g>
+      <ellipse className="st-hydrant-puddle" cx="74" cy="-2" rx="34" ry="7" fill="#74c0fc" />
       <rect x="-22" y="-12" width="44" height="12" rx="4" fill="#c1121f" />
-      <rect x="-16" y="-80" width="32" height="70" rx="8" fill="#e63946" />
-      <path d="M-18 -78 Q0 -102 18 -78 Z" fill="#c1121f" />
-      <rect x="-4" y="-104" width="8" height="10" rx="2" fill="#c1121f" />
-      <rect x="-28" y="-60" width="12" height="12" rx="3" fill="#c1121f" />
-      <rect x="16" y="-60" width="12" height="12" rx="3" fill="#c1121f" />
-      <path d="M-8 -70 V-24" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.4" />
+      <g className="st-hydrant-body" style={{ transformOrigin: "0px -12px" }}>
+        <rect x="-16" y="-80" width="32" height="70" rx="8" fill="#e63946" />
+        <path d="M-18 -78 Q0 -102 18 -78 Z" fill="#c1121f" />
+        <g className="st-hydrant-nut">
+          <rect x="-4" y="-104" width="8" height="10" rx="2" fill="#c1121f" />
+          <rect x="-9" y="-99" width="18" height="4" rx="2" fill="#c1121f" />
+        </g>
+        <rect className="st-hydrant-cap" x="-28" y="-60" width="12" height="12" rx="3" fill="#c1121f" />
+        <rect x="16" y="-60" width="12" height="12" rx="3" fill="#c1121f" />
+        <path d="M-8 -70 V-24" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.4" />
+      </g>
     </>
   );
 }
@@ -338,7 +429,8 @@ export function Ampel() {
       <rect x="-4" y="-152" width="8" height="152" fill="#495057" />
       <rect x="-10" y="-6" width="20" height="6" rx="2" fill="#495057" />
       <rect x="-11" y="-100" width="22" height="30" rx="5" fill="#ffd60a" />
-      <circle cx="0" cy="-85" r="5" fill={INK} />
+      <circle className="st-ampel-button" cx="0" cy="-85" r="5" fill={INK} />
+      <rect className="st-ampel-signal" x="-8" y="-98" width="16" height="5" rx="2" fill="#ff8c42" />
       <rect x="-26" y="-248" width="52" height="98" rx="10" fill="#2b2d42" />
       <rect x="-18" y="-240" width="36" height="40" rx="6" fill="#5a1e1e" />
       <rect x="-18" y="-196" width="36" height="40" rx="6" fill="#1e3a24" />
@@ -351,8 +443,10 @@ export function Ampel() {
         <rect x="1" y="-210" width="5" height="8" rx="2" />
       </g>
       <g className="st-ampel-green" fill="#3ec300" stroke="#3ec300" strokeWidth="4" strokeLinecap="round">
+        <g className="st-ampel-walk">
         <circle cx="2" cy="-186" r="5" stroke="none" />
         <path d="M1 -178 L-1 -168 M-1 -168 L-7 -160 M-1 -168 L5 -160 M0 -176 L-7 -170 M1 -176 L7 -172" fill="none" />
+        </g>
       </g>
       <rect x="-22" y="-244" width="8" height="90" rx="4" fill="#fff" opacity="0.12" />
     </>
@@ -375,6 +469,12 @@ export function Muelleimer() {
         <rect x="-34" y="-132" width="68" height="10" rx="5" fill="#f77f00" />
         <path d="M-14 -110 V-70 M0 -110 V-70 M14 -110 V-70" stroke="#f77f00" strokeWidth="4" strokeLinecap="round" />
       </g>
+      {/* A little fly buzzes around */}
+      <g className="st-eimer-fly">
+        <ellipse cx="-4" cy="-150" rx="5" ry="3.5" fill="#dee2e6" opacity="0.9" />
+        <ellipse cx="4" cy="-150" rx="5" ry="3.5" fill="#dee2e6" opacity="0.9" />
+        <circle cx="0" cy="-146" r="4" fill={INK} />
+      </g>
     </>
   );
 }
@@ -389,10 +489,21 @@ export function Brunnen() {
         <ellipse cx="-50" cy="-58" rx="22" ry="5" style={nth(0)} />
         <ellipse cx="56" cy="-60" rx="22" ry="5" style={nth(1)} />
       </g>
+      {/* A little fish jumps out of the water */}
+      <g className="st-brunnen-fish">
+        <ellipse cx="-70" cy="-40" rx="14" ry="8" fill="#ff8c42" />
+        <path d="M-56 -40 L-46 -48 V-32 Z" fill="#ff8c42" />
+        <circle cx="-78" cy="-42" r="2" fill={INK} />
+      </g>
       <rect x="-12" y="-130" width="24" height="72" fill="#ced4da" />
       <g className="st-brunnen-big" stroke="#a5d8ff" fill="none" strokeLinecap="round">
         <path d="M0 -136 V-236" strokeWidth="10" />
         <path d="M0 -232 Q-50 -250 -86 -74 M0 -232 Q50 -250 86 -74" strokeWidth="6" />
+      </g>
+      <g className="st-brunnen-drops" fill="#a5d8ff">
+        {[-110, -40, 30, 100].map((x, i) => (
+          <circle key={x} cx={x} cy="-70" r="6" style={nth(i)} />
+        ))}
       </g>
       <g className="st-brunnen-jet" stroke="#a5d8ff" fill="none" strokeLinecap="round" strokeWidth="5">
         <path d="M0 -138 V-162 M0 -160 Q-20 -170 -34 -138 M0 -160 Q20 -170 34 -138" />

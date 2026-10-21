@@ -5,7 +5,7 @@ import { Face, GLASS, INK, Inside, Pane, SKIN, nth } from "../shared";
 
 const PLANKS = [-150, -120, -90, 90, 120, 150];
 
-/** Red barn; the big doors swing open and a swallow flies out. */
+/** Red barn; the big doors swing open, a swallow flies out, the lamp lights up and hay flies from the loft. */
 export function Scheune() {
   return (
     <>
@@ -21,6 +21,16 @@ export function Scheune() {
       <path d="M-40 -246 Q-30 -280 -6 -272 Q10 -292 40 -268 V-246 Z" fill="#e9c46a" />
       <path d="M-26 -262 l-6 -10 M0 -270 l2 -12 M22 -264 l6 -10" stroke="#d4a373" strokeWidth="3" strokeLinecap="round" />
       <rect x="-40" y="-310" width="80" height="64" fill="none" stroke="#f8f9fa" strokeWidth="7" />
+      <g className="hf-scheune-hay" stroke="#e9c46a" strokeWidth="4" strokeLinecap="round">
+        {[-24, -6, 12, 28].map((x, i) => (
+          <path key={x} d={`M${x} -262 l6 -10`} style={nth(i)} />
+        ))}
+      </g>
+      {/* Stable lamp over the doors */}
+      <circle className="hf-scheune-glow" cx="0" cy="-200" r="22" fill="#ffe066" />
+      <path d="M-4 -222 h8 v6 h-8 Z" fill="#495057" />
+      <path d="M-12 -216 h24 l-5 10 h-14 Z" fill="#343a40" />
+      <circle cx="0" cy="-202" r="6" fill="#fff4d6" />
       {/* Inside: hay and the swallow */}
       <rect x="-92" y="-178" width="184" height="178" fill="#3d2314" />
       <path d="M-92 0 Q-70 -84 -20 -72 Q30 -104 92 -38 V0 Z" fill="#e9c46a" />
@@ -52,8 +62,12 @@ export function Scheune() {
 }
 
 const WINDOW = "M-36 -226 H36 V-152 H-36 Z";
+const DOOR = "M-30 0 V-86 Q-30 -116 0 -116 Q30 -116 30 -86 V0 Z";
 
-/** Half-timbered farmhouse; the shutters open and the farmer's wife waves, the chimney smokes. */
+/**
+ * Half-timbered farmhouse; the shutters open and the farmer's wife waves, the chimney
+ * smokes, the windows light up, the flowers nod and the child waves from the front door.
+ */
 export function Bauernhaus() {
   return (
     <>
@@ -77,6 +91,7 @@ export function Bauernhaus() {
       <path d="M-184 -238 L0 -398 L184 -238" stroke="#b5462d" strokeWidth="6" strokeLinejoin="round" fill="none" />
       {/* Round gable window */}
       <circle cx="0" cy="-306" r="20" fill={GLASS} stroke="#7f5539" strokeWidth="6" />
+      <circle className="hf-haus-glow" cx="0" cy="-306" r="17" fill="#ffe066" style={nth(2)} />
       <path d="M0 -326 V-286 M-20 -306 H20" stroke="#7f5539" strokeWidth="4" />
       {/* Upper window: the farmer's wife behind closed shutters */}
       <path d={WINDOW} fill={GLASS} />
@@ -99,33 +114,55 @@ export function Bauernhaus() {
       ].map(([hinge, dir]) => (
         <g key={hinge} className="hf-haus-shutter" style={{ transformOrigin: `${hinge}px -189px` }}>
           <rect x={Math.min(hinge, 0)} y="-226" width="36" height="74" fill="#2a9d8f" stroke="#21867a" strokeWidth="3" />
-          <path d={`M${hinge + 8 * dir} -214 H${-8 * dir} M${hinge + 8 * dir} -189 H${-8 * dir} M${hinge + 8 * dir} -164 H${-8 * dir}`} stroke="#21867a" strokeWidth="4" />
+          <path
+            d={`M${hinge + 8 * dir} -214 H${-8 * dir} M${hinge + 8 * dir} -189 H${-8 * dir} M${hinge + 8 * dir} -164 H${-8 * dir}`}
+            stroke="#21867a"
+            strokeWidth="4"
+          />
         </g>
       ))}
       <rect x="-44" y="-152" width="88" height="10" rx="3" fill="#bc6c25" />
       {/* Ground floor: windows with flower boxes, the door */}
-      {[-112, 62].map((x) => (
+      {[-112, 62].map((x, w) => (
         <g key={x}>
           <Pane x={x} y={-110} w={50} h={56} rx={4} />
+          <rect className="hf-haus-glow" x={x} y={-110} width="50" height="56" rx="4" fill="#ffe066" style={nth(w)} />
           <path d={`M${x} -110 h50 v56 h-50 Z M${x + 25} -110 v56`} stroke="#7f5539" strokeWidth="4" fill="none" />
           {[8, 20, 32, 44].map((dx, i) => (
-            <circle key={dx} cx={x + dx} cy={-56} r="6" fill={i % 2 ? "#ff5d73" : "#ffd60a"} />
+            <circle key={dx} className="hf-haus-flower" cx={x + dx} cy={-56} r="6" fill={i % 2 ? "#ff5d73" : "#ffd60a"} style={nth(i)} />
           ))}
           <rect x={x - 4} y="-52" width="58" height="12" rx="3" fill="#bc6c25" />
         </g>
       ))}
-      <path d="M-30 0 V-86 Q-30 -116 0 -116 Q30 -116 30 -86 V0 Z" fill="#2d6a4f" />
-      <path d="M-22 -10 V-84 Q-22 -106 0 -106 Q22 -106 22 -84 V-10 Z" fill="none" stroke="#1b4332" strokeWidth="4" />
-      <circle cx="18" cy="-52" r="4" fill="#ffd60a" />
-      <circle cx="0" cy="-86" r="9" fill={GLASS} />
+      {/* Front door: it opens and the farmer's child waves from the hall */}
+      <path d={DOOR} fill="#3d2314" />
+      <Inside d={DOOR}>
+        <g className="hf-haus-kid">
+          <rect x="-15" y="-48" width="30" height="48" rx="10" fill="#ffd60a" />
+          <circle cx="0" cy="-64" r="15" fill={SKIN} />
+          <path d="M-15 -66 Q-16 -82 0 -82 Q16 -82 15 -66 Q6 -74 -15 -66 Z" fill="#6b4423" />
+          <Face cx={0} cy={-64} size={0.55} />
+          <g className="hf-haus-kid-arm" style={{ transformOrigin: "12px -40px" }}>
+            <path d="M12 -40 L22 -66" stroke="#ffd60a" strokeWidth="8" strokeLinecap="round" />
+            <circle cx="23" cy="-70" r="5" fill={SKIN} />
+          </g>
+        </g>
+      </Inside>
+      <g className="hf-haus-door" style={{ transformOrigin: "-30px -58px" }}>
+        <path d={DOOR} fill="#2d6a4f" />
+        <path d="M-22 -10 V-84 Q-22 -106 0 -106 Q22 -106 22 -84 V-10 Z" fill="none" stroke="#1b4332" strokeWidth="4" />
+        <circle cx="18" cy="-52" r="4" fill="#ffd60a" />
+        <circle cx="0" cy="-86" r="9" fill={GLASS} />
+      </g>
       <rect x="-42" y="-6" width="84" height="8" rx="3" fill="#adb5bd" />
     </>
   );
 }
 
 const STALL_DOOR = "M-26 -50 V-96 Q-26 -116 0 -116 Q26 -116 26 -96 V-50 Z";
+const HOLE = "M41 -108 a15 15 0 1 0 30 0 a15 15 0 1 0 -30 0 Z";
 
-/** Hen house on stilts; the little door opens and an egg rolls down the ramp. */
+/** Hen house on stilts; the little door opens, an egg rolls down the ramp, a hen looks out and a feather floats down. */
 export function Huehnerstall() {
   return (
     <>
@@ -137,25 +174,49 @@ export function Huehnerstall() {
       <path d="M-114 -144 L0 -214 L114 -144 Z" fill="#c1121f" />
       <path d="M-114 -144 L0 -214 L114 -144" stroke="#9d0208" strokeWidth="6" strokeLinejoin="round" fill="none" />
       <circle cx="56" cy="-108" r="15" fill="#3d2314" />
+      <Inside d={HOLE}>
+        <g className="hf-stall-hen">
+          <ellipse cx="56" cy="-96" rx="11" ry="12" fill="#dda15e" />
+          <circle cx="52" cy="-108" r="3.5" fill="#e63946" />
+          <circle cx="57" cy="-110" r="4" fill="#e63946" />
+          <circle cx="62" cy="-107" r="3.5" fill="#e63946" />
+          <path d="M65 -98 L73 -96 L65 -93 Z" fill="#ffb703" />
+          <circle cx="60" cy="-100" r="1.8" fill="#2b2d42" />
+        </g>
+      </Inside>
       <path d="M48 -116 Q56 -126 64 -116" stroke="#e9c46a" strokeWidth="3" fill="none" />
       <path d={STALL_DOOR} fill="#3d2314" />
       <ellipse className="hf-stall-egg" cx="0" cy="-62" rx="9" ry="12" fill="#fff8e7" />
       <path className="hf-stall-door" d={STALL_DOOR} fill="#a0522d" style={{ transformOrigin: "-26px -83px" }} />
       <path d="M-30 -50 L-100 0 H-72 L-6 -50 Z" fill="#bc8a5f" />
       <path d="M-34 -40 h22 M-48 -30 h22 M-62 -20 h22 M-76 -10 h22" stroke="#8d5a2b" strokeWidth="3" />
-      <path d="M-58 -130 c-6 -8 -16 0 -8 8 l8 8 l8 -8 c8 -8 -2 -16 -8 -8 Z" fill="#ff5d73" />
+      <path className="hf-stall-heart" d="M-58 -130 c-6 -8 -16 0 -8 8 l8 8 l8 -8 c8 -8 -2 -16 -8 -8 Z" fill="#ff5d73" />
+      <path className="hf-stall-feather" d="M30 -72 q10 -14 20 -6 q-8 4 -20 6 Z M30 -72 l26 -8" fill="#f8f9fa" stroke="#dee2e6" strokeWidth="1.5" />
     </>
   );
 }
 
-/** Windmill on the hill far behind the field, in light colours; the sails turn. */
+const MILL_DOOR = "M-12 0 V-30 Q-12 -44 0 -44 Q12 -44 12 -30 V0 Z";
+
+/** Windmill on the hill far behind the field, in light colours; the sails turn, the door opens and flour puffs out. */
 export function Windmuehle() {
   return (
     <>
       <path d="M-52 0 L-34 -196 H34 L52 0 Z" fill="#f4ece2" />
       <path d="M14 0 L12 -196 H34 L52 0 Z" fill="#e6d9c8" />
-      <path d="M-12 0 V-30 Q-12 -44 0 -44 Q12 -44 12 -30 V0 Z" fill="#a98467" />
+      <path d={MILL_DOOR} fill="#5e503f" />
+      <g className="hf-muehle-flour" fill="#fff">
+        {[
+          [4, -14, 7],
+          [16, -26, 9],
+          [24, -10, 6],
+        ].map(([cx, cy, r], i) => (
+          <circle key={cx} cx={cx} cy={cy} r={r} style={nth(i)} />
+        ))}
+      </g>
+      <path className="hf-muehle-door" d={MILL_DOOR} fill="#a98467" style={{ transformOrigin: "-12px -22px" }} />
       <rect x="-8" y="-128" width="16" height="22" rx="3" fill="#a98467" />
+      <rect className="hf-muehle-light" x="-6" y="-126" width="12" height="18" rx="2" fill="#ffe066" />
       <rect x="-48" y="-152" width="96" height="8" rx="3" fill="#a98467" />
       <path d="M-42 -192 Q0 -252 42 -192 Z" fill="#b08968" />
       <g className="hf-muehle-sails" style={{ transformOrigin: "0px -214px" }}>
@@ -174,7 +235,7 @@ export function Windmuehle() {
 
 const COILS = [-36, -50, -64, -78, -92];
 
-/** Straw beehive on a little stool; it wobbles and bees fly out. */
+/** Straw beehive on a little stool; it wobbles, the knob on top hops, honey drips and bees fly out. */
 export function Bienenkorb() {
   return (
     <>
@@ -189,6 +250,11 @@ export function Bienenkorb() {
         })}
         <ellipse cx="-14" cy="-84" rx="8" ry="14" fill="#fff" opacity="0.35" />
         <ellipse cx="0" cy="-38" rx="11" ry="8" fill="#3d2314" />
+        <path className="hf-korb-honey" d="M4 -32 q-3 6 0 9 q3 -3 0 -9 Z" fill="#f4a261" />
+        <g className="hf-korb-knob" style={{ transformOrigin: "0px -108px" }}>
+          <rect x="-3" y="-118" width="6" height="12" rx="2" fill="#bc6c25" />
+          <circle cx="0" cy="-120" r="6" fill="#d4a373" />
+        </g>
       </g>
       <g className="hf-korb-bees">
         {[0, 1, 2].map((i) => (

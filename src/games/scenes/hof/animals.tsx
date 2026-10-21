@@ -1,4 +1,5 @@
 import { INK, nth } from "../shared";
+import { Lid, Lines } from "./parts";
 
 // The big farm animals. Each drawing has its foot point at (0, 0).
 
@@ -14,7 +15,7 @@ function Leg({ x, top, w, fill, hoof = "#495057" }: { x: number; top: number; w:
   );
 }
 
-/** Black-and-white cow, facing right; she nods, swishes her tail and rings her bell. */
+/** Black-and-white cow, facing right; she nods, moos, flicks her ears, blinks, swishes her tail and rings her bell. */
 export function Kuh() {
   return (
     <>
@@ -29,16 +30,22 @@ export function Kuh() {
       <ellipse cx="22" cy="-104" rx="28" ry="20" fill={SPOT} />
       <path d="M40 -162 Q66 -160 72 -142 Q58 -130 40 -140 Z" fill={SPOT} />
       <path d="M-120 -90 Q0 -62 104 -90 Q100 -66 60 -64 H-80 Q-118 -66 -120 -90 Z" fill="#e9ecef" />
-      <ellipse cx="-38" cy="-62" rx="22" ry="12" fill="#ffb3c1" />
-      <path d="M-48 -54 v8 M-38 -52 v8 M-28 -54 v8" stroke="#ff8fa3" strokeWidth="5" strokeLinecap="round" />
+      <g className="hf-kuh-udder" style={{ transformOrigin: "-38px -70px" }}>
+        <ellipse cx="-38" cy="-62" rx="22" ry="12" fill="#ffb3c1" />
+        <path d="M-48 -54 v8 M-38 -52 v8 M-28 -54 v8" stroke="#ff8fa3" strokeWidth="5" strokeLinecap="round" />
+      </g>
       <Leg x={-64} top={-84} w={22} fill="#fff" />
       <Leg x={90} top={-84} w={22} fill="#fff" />
       <g className="hf-kuh-head" style={{ transformOrigin: "96px -124px" }}>
         <path d="M78 -152 Q118 -156 128 -114 L102 -82 Q86 -100 78 -152 Z" fill="#fff" />
-        <ellipse cx="98" cy="-158" rx="19" ry="9" transform="rotate(-24 98 -158)" fill="#fff" />
-        <ellipse cx="98" cy="-158" rx="11" ry="5" transform="rotate(-24 98 -158)" fill="#ffb3c1" />
-        <ellipse cx="168" cy="-158" rx="19" ry="9" transform="rotate(24 168 -158)" fill="#fff" />
-        <ellipse cx="168" cy="-158" rx="11" ry="5" transform="rotate(24 168 -158)" fill="#ffb3c1" />
+        <g className="hf-kuh-ear" style={{ transformOrigin: "114px -152px" }}>
+          <ellipse cx="98" cy="-158" rx="19" ry="9" transform="rotate(-24 98 -158)" fill="#fff" />
+          <ellipse cx="98" cy="-158" rx="11" ry="5" transform="rotate(-24 98 -158)" fill="#ffb3c1" />
+        </g>
+        <g className="hf-kuh-ear hf-ear-right" style={{ transformOrigin: "152px -152px" }}>
+          <ellipse cx="168" cy="-158" rx="19" ry="9" transform="rotate(24 168 -158)" fill="#fff" />
+          <ellipse cx="168" cy="-158" rx="11" ry="5" transform="rotate(24 168 -158)" fill="#ffb3c1" />
+        </g>
         <path d="M114 -164 Q106 -182 114 -192 Q118 -178 126 -170 Z M152 -164 Q160 -182 152 -192 Q148 -178 140 -170 Z" fill="#fefae0" />
         <ellipse cx="133" cy="-130" rx="34" ry="40" fill="#fff" />
         <ellipse cx="148" cy="-142" rx="14" ry="17" fill={SPOT} />
@@ -51,6 +58,9 @@ export function Kuh() {
         <circle cx="146" cy="-136" r="4" fill={SPOT} />
         <circle cx="121.4" cy="-137.4" r="1.4" fill="#fff" />
         <circle cx="147.4" cy="-137.4" r="1.4" fill="#fff" />
+        <Lid cx={120} cy={-136} r={4.5} fill="#fff" />
+        <Lid cx={146} cy={-136} r={4.5} fill="#fff" />
+        <Lines x={170} y={-98} />
         <path d="M110 -84 Q133 -70 156 -84" stroke="#e63946" strokeWidth="6" fill="none" />
         <g className="hf-kuh-bell" style={{ transformOrigin: "133px -77px" }}>
           <path d="M126 -77 H140 L145 -58 H121 Z" fill="#ffd60a" />
@@ -65,7 +75,7 @@ export function Kuh() {
 const COAT = "#a0522d";
 const MANE = "#4a2511";
 
-/** Brown horse, facing right; it rears up, shakes its mane and swishes its tail. */
+/** Brown horse, facing right; it rears up, shakes its mane, twitches its ear, blinks, snorts, swishes its tail and the dust flies when it lands. */
 export function Pferd() {
   return (
     <g className="hf-pferd-body" style={{ transformOrigin: "-70px 0px" }}>
@@ -83,16 +93,33 @@ export function Pferd() {
       <Leg x={-56} top={-112} w={18} fill={COAT} hoof="#3d2314" />
       <Leg x={86} top={-112} w={18} fill={COAT} hoof="#3d2314" />
       <rect x="77" y="-34" width="18" height="21" fill="#fff" />
+      <g className="hf-pferd-dust" fill="#d4a373">
+        {[
+          [62, -6],
+          [86, -4],
+          [106, -8],
+        ].map(([cx, cy], i) => (
+          <circle key={cx} cx={cx} cy={cy} r="9" style={nth(i)} />
+        ))}
+      </g>
       <g className="hf-pferd-head" style={{ transformOrigin: "80px -150px" }}>
         <path d="M46 -166 Q70 -214 104 -238 L128 -216 Q104 -176 98 -118 Q60 -108 46 -166 Z" fill={COAT} />
         <path d="M104 -240 Q124 -258 140 -240 L176 -178 Q180 -156 160 -154 Q146 -154 136 -168 L102 -214 Z" fill={COAT} />
         <ellipse cx="163" cy="-166" rx="17" ry="13" fill="#7f3e1d" />
         <ellipse cx="170" cy="-168" rx="3.5" ry="2.5" fill="#3d2314" />
         <path d="M118 -242 Q126 -240 129 -232 L156 -182 Q151 -176 146 -181 L118 -230 Z" fill="#fff" opacity="0.9" />
-        <path d="M110 -240 L104 -266 L124 -246 Z" fill={COAT} />
-        <path d="M111 -246 L108 -258 L118 -248 Z" fill="#7f3e1d" />
+        <g className="hf-pferd-ear" style={{ transformOrigin: "116px -244px" }}>
+          <path d="M110 -240 L104 -266 L124 -246 Z" fill={COAT} />
+          <path d="M111 -246 L108 -258 L118 -248 Z" fill="#7f3e1d" />
+        </g>
         <circle cx="127" cy="-222" r="5" fill={SPOT} />
         <circle cx="128.6" cy="-223.6" r="1.6" fill="#fff" />
+        <Lid cx={127} cy={-222} r={5} fill={COAT} />
+        <g className="hf-pferd-snort" fill="#fff">
+          {[0, 1].map((i) => (
+            <circle key={i} cx={180 + i * 8} cy={-162 + i * 4} r={6 + i * 2} style={nth(i)} />
+          ))}
+        </g>
         <path d="M156 -158 Q164 -154 172 -158" stroke="#3d2314" strokeWidth="2.5" strokeLinecap="round" fill="none" />
         <path
           className="hf-pferd-mane"
@@ -129,10 +156,15 @@ function Sheep({ face }: { face: string }) {
       {WOOL.map(([cx, cy, r]) => (
         <circle key={cx} cx={cx} cy={cy} r={r} fill="#fff" />
       ))}
+      <circle className="hf-schaf-tail" cx="-72" cy="-72" r="11" fill="#fff" stroke="#e9ecef" strokeWidth="2" style={{ transformOrigin: "-62px -70px" }} />
       <ellipse cx="-10" cy="-92" rx="22" ry="7" fill="#fff" opacity="0.8" />
       <g className="hf-schaf-head" style={{ transformOrigin: "56px -66px" }}>
-        <ellipse cx="54" cy="-80" rx="13" ry="6" transform="rotate(-24 54 -80)" fill={face} />
-        <ellipse cx="88" cy="-80" rx="13" ry="6" transform="rotate(24 88 -80)" fill={face} />
+        <g className="hf-schaf-ear" style={{ transformOrigin: "62px -77px" }}>
+          <ellipse cx="54" cy="-80" rx="13" ry="6" transform="rotate(-24 54 -80)" fill={face} />
+        </g>
+        <g className="hf-schaf-ear hf-ear-right" style={{ transformOrigin: "80px -77px" }}>
+          <ellipse cx="88" cy="-80" rx="13" ry="6" transform="rotate(24 88 -80)" fill={face} />
+        </g>
         <ellipse cx="71" cy="-68" rx="18" ry="23" fill={face} />
         <circle cx="64" cy="-90" r="9" fill="#fff" />
         <circle cx="76" cy="-91" r="9" fill="#fff" />
@@ -141,6 +173,9 @@ function Sheep({ face }: { face: string }) {
         <circle cx="65" cy="-70" r="2.6" fill={SPOT} />
         <circle cx="79" cy="-70" r="2.6" fill={SPOT} />
         <path d="M66 -54 Q71 -50 76 -54" stroke={SPOT} strokeWidth="2" strokeLinecap="round" fill="none" />
+        <Lid cx={64.5} cy={-70} r={4.5} fill={face} />
+        <Lid cx={78.5} cy={-70} r={4.5} fill={face} />
+        <Lines x={94} y={-58} size={0.8} />
       </g>
     </g>
   );
@@ -162,11 +197,11 @@ export function Lamm() {
 
 const GOAT = "#ede0d4";
 
-/** Goat with horns and a beard, facing left; it butts with its head. */
+/** Goat with horns and a beard, facing left; it butts with its head, bleats, wags its tail, flicks its ear and its beard wiggles. */
 export function Ziege() {
   return (
     <g className="hf-ziege-body">
-      <path d="M58 -98 L74 -116 L66 -92 Z" fill={GOAT} />
+      <path className="hf-ziege-tail" d="M58 -98 L74 -116 L66 -92 Z" fill={GOAT} style={{ transformOrigin: "62px -96px" }} />
       <Leg x={-36} top={-70} w={12} fill="#d6ccc2" />
       <Leg x={46} top={-70} w={12} fill="#d6ccc2" />
       <ellipse cx="6" cy="-82" rx="62" ry="30" fill={GOAT} />
@@ -178,12 +213,16 @@ export function Ziege() {
         <path d="M-28 -104 L-50 -132 L-68 -118 L-46 -84 Z" fill={GOAT} />
         <path d="M-58 -142 Q-46 -170 -22 -162 Q-38 -158 -50 -138 Z" fill="#a5a58d" />
         <path d="M-50 -144 Q-34 -168 -12 -158 Q-28 -154 -42 -136 Z" fill="#b7b7a4" />
-        <ellipse cx="-36" cy="-130" rx="15" ry="6" transform="rotate(24 -36 -130)" fill={GOAT} />
-        <ellipse cx="-36" cy="-130" rx="9" ry="3.5" transform="rotate(24 -36 -130)" fill="#ffb3c1" />
+        <g className="hf-ziege-ear" style={{ transformOrigin: "-46px -136px" }}>
+          <ellipse cx="-36" cy="-130" rx="15" ry="6" transform="rotate(24 -36 -130)" fill={GOAT} />
+          <ellipse cx="-36" cy="-130" rx="9" ry="3.5" transform="rotate(24 -36 -130)" fill="#ffb3c1" />
+        </g>
         <path d="M-50 -146 Q-34 -140 -42 -118 L-72 -94 Q-86 -92 -88 -104 L-70 -138 Q-62 -150 -50 -146 Z" fill={GOAT} />
-        <path d="M-78 -96 L-74 -72 L-64 -96 Z" fill="#b08968" />
+        <path className="hf-ziege-beard" d="M-78 -96 L-74 -72 L-64 -96 Z" fill="#b08968" style={{ transformOrigin: "-71px -96px" }} />
         <circle cx="-60" cy="-128" r="4" fill={SPOT} />
         <circle cx="-61.2" cy="-129.2" r="1.3" fill="#fff" />
+        <Lid cx={-60} cy={-128} r={4} fill={GOAT} />
+        <Lines x={-96} y={-100} dir={-1} size={0.8} />
         <ellipse cx="-84" cy="-102" rx="2.5" ry="2" fill="#6c584c" />
         <path d="M-82 -94 Q-76 -92 -72 -96" stroke="#6c584c" strokeWidth="2" strokeLinecap="round" fill="none" />
       </g>
@@ -193,7 +232,7 @@ export function Ziege() {
 
 const DOG = "#c68b59";
 
-/** Dog in front of its kennel; it jumps, wags its tail and barks. */
+/** Dog in front of its kennel; it jumps, wags its tail, flaps its ears, blinks and barks; the name sign swings and the bones in the bowl hop. */
 export function Hund() {
   return (
     <>
@@ -202,12 +241,14 @@ export function Hund() {
       <path d="M-130 -94 L-66 -150 L-2 -94 Z" fill="#bc4749" />
       <path d="M-130 -94 L-66 -150 L-2 -94" stroke="#9d0208" strokeWidth="6" strokeLinejoin="round" fill="none" />
       <path d="M-90 0 V-48 Q-90 -74 -66 -74 Q-42 -74 -42 -48 V0 Z" fill="#3d2314" />
-      <rect x="-94" y="-98" width="56" height="16" rx="3" fill="#e9c46a" />
-      <text x="-66" y="-90" fill="#7f5539" fontSize="11" fontWeight="800" textAnchor="middle" dominantBaseline="central">
-        BELLO
-      </text>
+      <g className="hf-hund-sign" style={{ transformOrigin: "-66px -98px" }}>
+        <rect x="-94" y="-98" width="56" height="16" rx="3" fill="#e9c46a" />
+        <text x="-66" y="-90" fill="#7f5539" fontSize="11" fontWeight="800" textAnchor="middle" dominantBaseline="central">
+          BELLO
+        </text>
+      </g>
+      <path className="hf-hund-food" d="M-14 -10 l4 -6 M-4 -11 l2 -6" stroke="#f1c27d" strokeWidth="4" strokeLinecap="round" />
       <ellipse cx="-4" cy="-6" rx="18" ry="6" fill="#e63946" />
-      <path d="M-14 -10 l4 -6 M-4 -11 l2 -6" stroke="#f1c27d" strokeWidth="4" strokeLinecap="round" />
       <g className="hf-hund-body">
         <path
           className="hf-hund-tail"
@@ -227,10 +268,10 @@ export function Hund() {
         <ellipse cx="32" cy="-4" rx="9" ry="5" fill="#ede0d4" />
         <ellipse cx="55" cy="-4" rx="9" ry="5" fill="#ede0d4" />
         <path d="M24 -80 Q46 -70 68 -80" stroke="#3a86ff" strokeWidth="7" strokeLinecap="round" fill="none" />
-        <circle cx="46" cy="-72" r="5" fill="#ffd60a" />
+        <circle className="hf-hund-tag" cx="46" cy="-72" r="5" fill="#ffd60a" style={{ transformOrigin: "46px -78px" }} />
         <g className="hf-hund-head" style={{ transformOrigin: "46px -84px" }}>
-          <path d="M26 -126 Q8 -122 12 -88 Q24 -92 32 -114 Z" fill="#7f5539" />
-          <path d="M66 -126 Q84 -122 80 -88 Q68 -92 60 -114 Z" fill="#7f5539" />
+          <path className="hf-hund-ear" d="M26 -126 Q8 -122 12 -88 Q24 -92 32 -114 Z" fill="#7f5539" style={{ transformOrigin: "28px -122px" }} />
+          <path className="hf-hund-ear hf-ear-right" d="M66 -126 Q84 -122 80 -88 Q68 -92 60 -114 Z" fill="#7f5539" style={{ transformOrigin: "64px -122px" }} />
           <circle cx="46" cy="-108" r="26" fill={DOG} />
           <ellipse cx="57" cy="-114" rx="10" ry="9" fill="#7f5539" />
           <ellipse cx="46" cy="-93" rx="15" ry="11" fill="#ede0d4" />
@@ -242,6 +283,9 @@ export function Hund() {
           <circle cx="57" cy="-114" r="3.8" fill={SPOT} />
           <circle cx="37.2" cy="-115.2" r="1.3" fill="#fff" />
           <circle cx="58.2" cy="-115.2" r="1.3" fill="#fff" />
+          <Lid cx={36} cy={-114} r={3.8} fill={DOG} />
+          <Lid cx={57} cy={-114} r={3.8} fill="#7f5539" />
+          <Lines x={80} y={-100} />
         </g>
       </g>
     </>
@@ -251,7 +295,7 @@ export function Hund() {
 const PIG = "#ffafcc";
 const MUD = "#7f5539";
 
-/** Pig wallowing in a mud puddle; it wiggles and the mud splashes. */
+/** Pig wallowing in a mud puddle; it wiggles, flops its ears, sniffs, blinks, the mud splashes and bubbles. */
 export function Schwein() {
   return (
     <>
@@ -290,22 +334,35 @@ export function Schwein() {
           <rect key={x} x={x - 10} y="-48" width="20" height="40" rx="8" fill={PIG} />
         ))}
         <g className="hf-schwein-head" style={{ transformOrigin: "62px -80px" }}>
-          <path d="M60 -110 L56 -136 L80 -118 Z" fill="#f497b6" />
-          <path d="M96 -114 L108 -134 L110 -108 Z" fill="#f497b6" />
+          <path className="hf-schwein-ear" d="M60 -110 L56 -136 L80 -118 Z" fill="#f497b6" style={{ transformOrigin: "68px -114px" }} />
+          <path className="hf-schwein-ear hf-ear-right" d="M96 -114 L108 -134 L110 -108 Z" fill="#f497b6" style={{ transformOrigin: "102px -112px" }} />
           <circle cx="82" cy="-84" r="36" fill={PIG} />
           <circle cx="76" cy="-72" r="7" fill="#ff8fab" opacity="0.6" />
-          <ellipse cx="110" cy="-78" rx="17" ry="14" fill="#ff8fab" />
-          <ellipse cx="105" cy="-78" rx="3" ry="4.5" fill="#c9184a" />
-          <ellipse cx="115" cy="-78" rx="3" ry="4.5" fill="#c9184a" />
+          <g className="hf-schwein-snout" style={{ transformOrigin: "100px -78px" }}>
+            <ellipse cx="110" cy="-78" rx="17" ry="14" fill="#ff8fab" />
+            <ellipse cx="105" cy="-78" rx="3" ry="4.5" fill="#c9184a" />
+            <ellipse cx="115" cy="-78" rx="3" ry="4.5" fill="#c9184a" />
+          </g>
           <circle cx="76" cy="-98" r="4" fill={SPOT} />
           <circle cx="96" cy="-100" r="4" fill={SPOT} />
           <circle cx="77.3" cy="-99.3" r="1.3" fill="#fff" />
           <circle cx="97.3" cy="-101.3" r="1.3" fill="#fff" />
           <path d="M84 -62 Q94 -56 104 -62" stroke="#c9184a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+          <Lid cx={76} cy={-98} r={4} fill={PIG} />
+          <Lid cx={96} cy={-100} r={4} fill={PIG} />
         </g>
       </g>
       <path d="M-112 -16 Q0 4 112 -16 Q124 -6 104 4 Q0 14 -104 4 Q-124 -6 -112 -16 Z" fill={MUD} />
       <ellipse cx="40" cy="-4" rx="20" ry="3" fill="#b08968" opacity="0.7" />
+      <g className="hf-schwein-bubble" fill="#9c6644" stroke="#b08968" strokeWidth="2">
+        {[
+          [-70, -6, 7],
+          [-20, 0, 5],
+          [70, -4, 6],
+        ].map(([cx, cy, r], i) => (
+          <circle key={cx} cx={cx} cy={cy} r={r} style={nth(i)} />
+        ))}
+      </g>
     </>
   );
 }
@@ -315,29 +372,39 @@ function Piglet({ x, dir, i }: { x: number; dir: number; i: number }) {
   return (
     <g transform={`translate(${x} 0) scale(${dir} 1)`}>
       <g className="hf-ferkel-pig" style={nth(i)}>
-        <path d="M-26 -30 q-10 -2 -8 -10 q4 -6 9 0" stroke="#ff8fab" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path
+          className="hf-ferkel-tail"
+          d="M-26 -30 q-10 -2 -8 -10 q4 -6 9 0"
+          stroke="#ff8fab"
+          strokeWidth="3"
+          strokeLinecap="round"
+          fill="none"
+          style={{ transformOrigin: "-26px -30px" }}
+        />
         {[-14, 12].map((lx) => (
           <rect key={lx} x={lx - 5} y="-18" width="10" height="18" rx="4" fill="#ffafcc" />
         ))}
         <ellipse cx="0" cy="-26" rx="26" ry="18" fill="#ffc2d1" />
-        <path d="M14 -52 L12 -64 L24 -54 Z" fill="#ffafcc" />
+        <path className="hf-ferkel-ear" d="M14 -52 L12 -64 L24 -54 Z" fill="#ffafcc" style={{ transformOrigin: "17px -51px" }} />
         <circle cx="22" cy="-34" r="15" fill="#ffc2d1" />
         <ellipse cx="35" cy="-31" rx="7" ry="6" fill="#ff8fab" />
         <circle cx="33" cy="-31" r="1.4" fill="#c9184a" />
         <circle cx="37" cy="-31" r="1.4" fill="#c9184a" />
         <circle cx="24" cy="-39" r="2.4" fill={SPOT} />
         <circle cx="24.7" cy="-39.7" r="0.8" fill="#fff" />
+        <Lid cx={24} cy={-39} r={2.6} fill="#ffc2d1" />
       </g>
     </g>
   );
 }
 
-/** Two piglets, nose to nose; they hop one after the other. */
+/** Two piglets, nose to nose; they hop one after the other, curl their tails, flick their ears and a heart pops up. */
 export function Ferkel() {
   return (
     <>
       <Piglet x={-38} dir={1} i={0} />
       <Piglet x={40} dir={-1} i={1} />
+      <path className="hf-ferkel-heart" d="M0 -66 c-5 -7 -14 0 -7 7 l7 7 l7 -7 c7 -7 -2 -14 -7 -7 Z" fill="#ff5d73" />
     </>
   );
 }
