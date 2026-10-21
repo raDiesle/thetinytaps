@@ -150,7 +150,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       say(STEPS[phase].cue);
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
-      say("Fertig! Alle Zuckermonster sind weg. Blitzeblank!");
+      say("Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!");
       for (let i = 0; i < (settings.calm ? 4 : 12); i++) setTimeout(() => spawn(), i * 150);
     }
     // Only when the part changes, not when a setting does.
@@ -252,6 +252,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
           <p className={`teeth-mouth ${step.mouth}`}>
             {step.mouth === "open" ? "😮 Mund weit auf" : "😬 Zähne zusammen"}
             <span className="teeth-hint"> · {step.hint}</span>
+          </p>
+        )}
+        {done && (
+          <p className="teeth-mouth spit">
+            💦 Ausspucken
+            <span className="teeth-hint"> · nicht mit Wasser nachspülen</span>
           </p>
         )}
       </div>
