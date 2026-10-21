@@ -23,7 +23,7 @@ src/games/scenes/<id>/
 ```
 
 Register the scene in `src/games/scenes/index.ts` (`SCENES`) and remove it from
-`UPCOMING_SCENES`. The route `/bilder/<id>/` is generated from `SCENES`.
+`UPCOMING_SCENES`. The route `/bilder/<id>` (`src/pages/ScenePage.tsx`) finds it with `findScene`.
 
 Reuse instead of copying: `layout.ts` and `shared.tsx` are scene-local today; if a
 second scene needs the same helpers, move them to `src/games/scenes/` (shared) and
@@ -123,7 +123,7 @@ import them in both scenes.
 ## Checks before you finish
 
 1. `npm run typecheck` and `npm run build`.
-2. Preview (`.claude/launch.json`, `preview_start`) at `/bilder/<id>/`, then:
+2. Preview (`.claude/launch.json`, `preview_start`) at `/bilder/<id>`, then:
    - every item is tappable: for each item, `document.elementFromPoint` inside its
      hit area returns an element within `.item-<id>`;
    - each item animates when tapped and returns to rest;
