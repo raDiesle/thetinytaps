@@ -55,7 +55,26 @@
 .uw-truhe-coins > g,
 .uw-muschel-sparkle,
 .uw-flasche-heart,
-.uw-flunder-sand circle {
+.uw-flunder-sand circle,
+.uw-lid,
+.uw-bub circle,
+.uw-pop-heart,
+.uw-lines path,
+.uw-sparkle,
+.uw-sand circle,
+.uw-glow,
+.uw-leucht-splash circle,
+.uw-boot-hand,
+.uw-boot-splash circle,
+.uw-wal-mouth,
+.uw-wal-notes > g,
+.uw-uboot-sailor,
+.uw-taucher-lamp,
+.uw-qualle-glow,
+.uw-schiff-eyes,
+.uw-koralle-fish,
+.uw-krake-mouth,
+.uw-truhe-crown {
   opacity: 0;
   pointer-events: none;
 }
@@ -75,9 +94,26 @@
 .uw-muschel-pearl,
 .uw-muschel-sparkle,
 .uw-flasche-heart,
-.uw-flunder-sand circle {
+.uw-flunder-sand circle,
+.uw-bub circle,
+.uw-pop-heart,
+.uw-lines path,
+.uw-sparkle,
+.uw-sand circle,
+.uw-leucht-splash circle,
+.uw-boot-splash circle,
+.uw-mj-star,
+.uw-seestern-dot,
+.uw-kugel-mouth {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/* Things that grow out of the ground. */
+.uw-schiff-weed,
+.uw-koralle-brain {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
 }
 
 @keyframes uw-drift {
@@ -207,7 +243,89 @@
   }
 }
 
-/* ---------- Leuchtturm: the lamp shines ---------- */
+/* ---------- Parts many items share (parts.tsx); --d is when they start ---------- */
+
+.playing .uw-lid {
+  animation: uw-blink 1.8s linear 0.15s;
+}
+
+.playing .uw-bub circle {
+  animation: uw-bubble-up 1.2s ease-out calc(var(--d, 0.3s) + var(--i) * 0.18s);
+}
+
+.playing .uw-pop-heart {
+  animation: uw-heart 1.1s ease-out var(--d, 0.5s);
+}
+
+.playing .uw-lines path {
+  animation: uw-pop 0.5s ease-out calc(var(--d, 0.2s) + var(--i) * 0.15s) 2;
+}
+
+.playing .uw-sparkle {
+  animation: uw-twinkle 0.8s ease-in-out calc(0.3s + var(--i) * 0.3s);
+}
+
+.playing .uw-glow {
+  animation: uw-glow-on 1.6s ease-in-out calc(0.3s + var(--i, 0) * 0.25s);
+}
+
+.playing .uw-fish-fin {
+  animation: uw-fin-flutter 0.25s ease-in-out 6 alternate;
+}
+
+/* Two quick blinks. */
+@keyframes uw-blink {
+  0%,
+  18%,
+  28%,
+  58%,
+  68%,
+  100% {
+    opacity: 0;
+  }
+  21%,
+  25%,
+  61%,
+  65% {
+    opacity: 1;
+  }
+}
+
+/* A window lights up and goes dark again. */
+@keyframes uw-glow-on {
+  20%,
+  75% {
+    opacity: 1;
+  }
+}
+
+/* Swings a little to both sides and back. */
+@keyframes uw-wiggle {
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+/* Little legs patter back and forth. */
+@keyframes uw-patter {
+  25% {
+    transform: skewX(-10deg);
+  }
+  75% {
+    transform: skewX(10deg);
+  }
+}
+
+@keyframes uw-bob {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* ---------- Leuchtturm: the lamp shines, the keeper opens the door, waves splash ---------- */
 
 .item-leuchtturm.playing .uw-leucht-beams {
   animation: uw-beam 1.2s ease-in-out 2;
@@ -226,6 +344,27 @@
 @keyframes uw-lamp {
   50% {
     fill: #fffbe6;
+  }
+}
+
+.item-leuchtturm.playing .uw-leucht-door {
+  animation: uw-door-open 2.2s ease-in-out;
+}
+
+.item-leuchtturm.playing .uw-leucht-keeper {
+  animation: uw-bob 0.5s ease-in-out 0.4s 3;
+}
+
+.item-leuchtturm.playing .uw-leucht-splash circle {
+  animation:
+    uw-splash 0.7s ease-out calc(0.2s + var(--i) * 0.1s),
+    uw-splash 0.7s ease-out calc(1.3s + var(--i) * 0.1s);
+}
+
+@keyframes uw-door-open {
+  15%,
+  80% {
+    transform: scaleX(0.15);
   }
 }
 
@@ -264,6 +403,16 @@
   }
 }
 
+.item-moewe.playing .uw-moewe-jaw {
+  animation: uw-jaw 0.25s ease-in-out 0.2s 4 alternate;
+}
+
+@keyframes uw-jaw {
+  to {
+    transform: rotate(22deg);
+  }
+}
+
 /* ---------- Boot: rocks on the waves and puffs ---------- */
 
 .item-boot.playing .uw-boot-body {
@@ -272,6 +421,42 @@
 
 .item-boot.playing .uw-boot-puffs circle {
   animation: uw-puff 1s ease-out calc(var(--i) * 0.3s);
+}
+
+.item-boot.playing .uw-boot-captain {
+  animation: uw-bob 0.55s ease-in-out 4;
+}
+
+.item-boot.playing .uw-boot-hand {
+  animation: uw-boot-wave 1.8s ease-in-out 0.2s;
+}
+
+.item-boot.playing .uw-boot-flag {
+  animation: uw-flag 0.4s ease-in-out 4 alternate;
+}
+
+.item-boot.playing .uw-boot-splash circle {
+  animation:
+    uw-splash 0.6s ease-out calc(0.2s + var(--i) * 0.08s),
+    uw-splash 0.6s ease-out calc(1.3s + var(--i) * 0.08s);
+}
+
+@keyframes uw-boot-wave {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 1;
+  }
+  25%,
+  65% {
+    transform: rotate(-20deg);
+  }
+  45% {
+    transform: rotate(15deg);
+  }
 }
 
 /* ---------- Anker: pulled up and dropped into the sand ---------- */
@@ -295,6 +480,26 @@
   }
   80% {
     transform: translateY(-6px);
+  }
+}
+
+.item-anker.playing .uw-anker-chain {
+  animation: uw-chain 2s ease-in-out;
+}
+
+.item-anker.playing .uw-anker-weed {
+  animation: uw-wiggle 0.5s ease-in-out 0.3s 3;
+}
+
+.item-anker.playing .uw-anker-dust circle {
+  animation: uw-puff 0.6s ease-out 0.05s;
+}
+
+/* The chain links run up while the anchor is pulled up and back down when it drops. */
+@keyframes uw-chain {
+  35%,
+  50% {
+    stroke-dashoffset: -40;
   }
 }
 
@@ -355,6 +560,14 @@
   }
 }
 
+.item-wal.playing .uw-wal-mouth {
+  animation: uw-show 1.6s ease-in-out 0.4s;
+}
+
+.item-wal.playing .uw-wal-notes > g {
+  animation: uw-note 1s ease-out calc(0.5s + var(--i) * 0.4s);
+}
+
 /* ---------- Delfin: leaps out of the water and splashes back in ---------- */
 
 .item-delfin.playing .uw-delfin-jump {
@@ -400,6 +613,10 @@
   }
 }
 
+.item-delfin.playing .uw-delfin-flipper {
+  animation: uw-paddle 0.3s ease-in-out 6 alternate;
+}
+
 /* ---------- Rochen: glides and beats its wings ---------- */
 
 .item-rochen.playing .uw-rochen-body {
@@ -435,6 +652,23 @@
   }
 }
 
+.item-rochen.playing .uw-rochen-horn {
+  animation: uw-rochen-horn 0.5s ease-in-out 0.2s 3;
+}
+
+.item-rochen.playing .uw-rochen-horn-right {
+  animation-direction: reverse;
+}
+
+@keyframes uw-rochen-horn {
+  25% {
+    transform: rotate(16deg);
+  }
+  75% {
+    transform: rotate(-16deg);
+  }
+}
+
 /* ---------- Fische: the school swirls around ---------- */
 
 .item-fische.playing .uw-schwarm-fish {
@@ -451,6 +685,10 @@
   75% {
     transform: translate(30px, -16px);
   }
+}
+
+.item-fische.playing .uw-schwarm-tail {
+  animation: uw-wag 0.2s ease-in-out 10 alternate;
 }
 
 /* ---------- Qualle: pulses up and sinks down ---------- */
@@ -480,6 +718,10 @@
   50% {
     transform: scale(1.12, 0.85);
   }
+}
+
+.item-qualle.playing .uw-qualle-glow {
+  animation: uw-glow 2.2s ease-in-out;
 }
 
 /* ---------- Schiff: flag waves, bell rings, a fish looks out ---------- */
@@ -523,6 +765,25 @@
   30%,
   70% {
     transform: translateX(0);
+  }
+}
+
+.item-schiff.playing .uw-schiff-shutter {
+  animation: uw-shutter 2s ease-in-out calc(0.1s + var(--i) * 0.2s);
+}
+
+.item-schiff.playing .uw-schiff-eyes {
+  animation: uw-show 1.6s ease-in-out 0.5s;
+}
+
+.item-schiff.playing .uw-schiff-weed {
+  animation: uw-koralle-sway 0.6s ease-in-out 3;
+}
+
+@keyframes uw-shutter {
+  15%,
+  80% {
+    transform: scaleX(0.1);
   }
 }
 
@@ -574,6 +835,53 @@
   }
 }
 
+.item-uboot.playing .uw-uboot-hatch {
+  animation: uw-hatch 2.2s ease-in-out;
+}
+
+.item-uboot.playing .uw-uboot-sailor {
+  animation: uw-sailor 2.2s ease-in-out 0.1s;
+}
+
+.item-uboot.playing .uw-uboot-sailor-arm {
+  animation: uw-sailor-wave 0.3s ease-in-out 0.8s 4 alternate;
+}
+
+.item-uboot.playing .uw-uboot-captain {
+  animation: uw-bob 0.6s ease-in-out 3;
+}
+
+@keyframes uw-hatch {
+  12%,
+  85% {
+    transform: rotate(-100deg);
+  }
+}
+
+/* Climbs up out of the hatch, waves and climbs back down. */
+@keyframes uw-sailor {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  8%,
+  92% {
+    opacity: 1;
+    transform: translateY(30px);
+  }
+  30%,
+  75% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes uw-sailor-wave {
+  to {
+    transform: rotate(-28deg);
+  }
+}
+
 /* ---------- Seepferdchen: hops up and down ---------- */
 
 .item-seepferdchen.playing .uw-seepferd-body {
@@ -599,6 +907,20 @@
 @keyframes uw-fin-flutter {
   to {
     transform: rotate(20deg);
+  }
+}
+
+.item-seepferdchen.playing .uw-seepferd-tail {
+  animation: uw-seepferd-tail 0.5s ease-in-out 4 alternate;
+}
+
+.item-seepferdchen.playing .uw-seepferd-crown {
+  animation: uw-rock 0.6s ease-in-out 3;
+}
+
+@keyframes uw-seepferd-tail {
+  to {
+    transform: rotate(10deg);
   }
 }
 
@@ -632,6 +954,22 @@
 @keyframes uw-paddle-back {
   to {
     transform: rotate(-25deg);
+  }
+}
+
+.item-schildkroete.playing .uw-turtle-head {
+  animation: uw-turtle-nod 2.2s ease-in-out;
+}
+
+@keyframes uw-turtle-nod {
+  25% {
+    transform: translateX(-6px) rotate(-12deg);
+  }
+  50% {
+    transform: translateX(-6px) rotate(6deg);
+  }
+  75% {
+    transform: rotate(-6deg);
   }
 }
 
@@ -673,6 +1011,32 @@
 @keyframes uw-mj-fin {
   to {
     transform: rotate(-25deg);
+  }
+}
+
+.item-meerjungfrau.playing .uw-mj-hair {
+  animation: uw-mj-hair 0.8s ease-in-out 3;
+}
+
+.item-meerjungfrau.playing .uw-mj-star {
+  animation: uw-mj-star 1s ease-in-out 0.3s 2;
+}
+
+@keyframes uw-mj-hair {
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes uw-mj-star {
+  50% {
+    transform: rotate(180deg) scale(1.4);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }
 
@@ -727,6 +1091,20 @@
   }
 }
 
+.item-taucher.playing .uw-taucher-head {
+  animation: uw-taucher-nod 1.1s ease-in-out 2;
+}
+
+.item-taucher.playing .uw-taucher-lamp {
+  animation: uw-show 1.8s ease-in-out 0.2s;
+}
+
+@keyframes uw-taucher-nod {
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
 /* ---------- Schnecke: hides in its shell and peeks out ---------- */
 
 .item-schnecke.playing .uw-schnecke-body {
@@ -737,6 +1115,36 @@
   30%,
   60% {
     transform: translateX(30px) scaleX(0.2);
+  }
+}
+
+.item-schnecke.playing .uw-schnecke-stalks {
+  animation: uw-schnecke-stalks 2s ease-in-out;
+}
+
+.item-schnecke.playing .uw-schnecke-shell {
+  animation: uw-schnecke-shell 2s ease-in-out;
+}
+
+@keyframes uw-schnecke-stalks {
+  15% {
+    transform: rotate(-14deg);
+  }
+  70% {
+    transform: rotate(10deg);
+  }
+  85% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes uw-schnecke-shell {
+  30%,
+  60% {
+    transform: translateY(4px) rotate(-6deg);
+  }
+  75% {
+    transform: rotate(4deg);
   }
 }
 
@@ -763,6 +1171,35 @@
   }
 }
 
+.item-koralle.playing .uw-koralle-fish {
+  animation: uw-koralle-fish 1.6s ease-in-out 0.2s;
+}
+
+.item-koralle.playing .uw-koralle-brain {
+  animation: uw-squish 0.5s ease-in-out 2;
+}
+
+@keyframes uw-koralle-fish {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(70px, -24px);
+  }
+}
+
+@keyframes uw-squish {
+  50% {
+    transform: scale(1.06, 0.9);
+  }
+}
+
 /* ---------- Clownfisch: hides in the anemone and pops out ---------- */
 
 .item-clownfisch.playing .uw-clown-fish {
@@ -784,6 +1221,14 @@
   80% {
     transform: translateY(-6px) rotate(8deg);
   }
+}
+
+.item-clownfisch.playing .uw-clown-tail {
+  animation: uw-wag 0.2s ease-in-out 10 alternate;
+}
+
+.item-clownfisch.playing .uw-clown-fin {
+  animation: uw-fin-flutter 0.25s ease-in-out 8 alternate;
 }
 
 /* ---------- Krake: waves all eight arms ---------- */
@@ -812,6 +1257,10 @@
   75% {
     transform: translateY(-8px);
   }
+}
+
+.item-krake.playing .uw-krake-mouth {
+  animation: uw-show 1.6s ease-in-out 0.3s;
 }
 
 /* ---------- Hai: swims a little loop and grins ---------- */
@@ -848,10 +1297,28 @@
   }
 }
 
+.item-hai.playing .uw-hai-fin {
+  animation: uw-wiggle 0.55s ease-in-out 4;
+}
+
+.item-hai.playing .uw-hai-pfin {
+  animation: uw-paddle 0.275s ease-in-out 8 alternate;
+}
+
+.item-hai.playing .uw-hai-gills {
+  animation: uw-gills 0.55s ease-in-out 4;
+}
+
+@keyframes uw-gills {
+  50% {
+    opacity: 0.2;
+  }
+}
+
 /* ---------- Hummer: lifts and snaps its claws, flips its tail ---------- */
 
 .item-hummer.playing .uw-hummer-claw {
-  animation: uw-hummer-claw 2s ease-in-out calc(var(--i) * 0.1s);
+  animation: uw-hummer-claw 1.9s ease-in-out calc(var(--i) * 0.1s);
 }
 
 .item-hummer.playing .uw-hummer-pincer {
@@ -881,6 +1348,24 @@
 @keyframes uw-hummer-tail {
   to {
     transform: rotate(-12deg);
+  }
+}
+
+.item-hummer.playing .uw-hummer-antenna {
+  animation: uw-antenna 0.4s ease-in-out 4 alternate;
+}
+
+.item-hummer.playing .uw-hummer-antenna-2 {
+  animation-delay: 0.1s;
+}
+
+.item-hummer.playing .uw-hummer-legs {
+  animation: uw-patter 0.3s ease-in-out 6;
+}
+
+@keyframes uw-antenna {
+  to {
+    transform: rotate(10deg);
   }
 }
 
@@ -919,6 +1404,29 @@
 @keyframes uw-krabbe-claw {
   to {
     transform: rotate(calc(var(--s) * -14deg));
+  }
+}
+
+.item-krabbe.playing .uw-krabbe-legs {
+  animation: uw-patter 0.4s ease-in-out 5;
+}
+
+.item-krabbe.playing .uw-krabbe-eye {
+  animation: uw-krabbe-eye 0.5s ease-in-out calc(var(--i) * 0.1s) 3;
+}
+
+.item-krabbe.playing .uw-krabbe-sand circle {
+  animation:
+    uw-puff 0.6s ease-out 0.2s,
+    uw-puff 0.6s ease-out 1.2s;
+}
+
+@keyframes uw-krabbe-eye {
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
   }
 }
 
@@ -964,6 +1472,46 @@
   }
 }
 
+.item-schatztruhe.playing .uw-truhe-lock {
+  animation: uw-truhe-lock 2.4s ease-in-out;
+}
+
+.item-schatztruhe.playing .uw-truhe-crown {
+  animation: uw-truhe-crown 2.4s ease-in-out;
+}
+
+@keyframes uw-truhe-lock {
+  12% {
+    transform: rotate(30deg);
+  }
+  24% {
+    transform: rotate(-20deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  48% {
+    transform: none;
+  }
+}
+
+/* A crown rises out of the open chest and sinks back in. */
+@keyframes uw-truhe-crown {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  30%,
+  70% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+  85% {
+    opacity: 1;
+  }
+}
+
 /* ---------- Seestern: hops and spins ---------- */
 
 .item-seestern.playing .uw-seestern-body {
@@ -982,6 +1530,20 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+.item-seestern.playing .uw-seestern-dot {
+  animation: uw-dot 0.5s ease-in-out 3;
+}
+
+.item-seestern.playing .uw-seestern-sand circle {
+  animation: uw-puff 0.7s ease-out 1.15s;
+}
+
+@keyframes uw-dot {
+  50% {
+    transform: scale(1.6);
   }
 }
 
@@ -1019,6 +1581,25 @@
   }
 }
 
+.item-flaschenpost.playing .uw-flasche-bottle {
+  animation: uw-rock 0.95s ease-in-out 2;
+}
+
+.item-flaschenpost.playing .uw-flasche-letter {
+  animation: uw-letter 1s ease-in-out 0.3s;
+}
+
+.item-flaschenpost.playing .uw-flasche-sand circle {
+  animation: uw-puff 0.6s ease-out 0.05s;
+}
+
+@keyframes uw-letter {
+  30%,
+  70% {
+    transform: translateX(14px);
+  }
+}
+
 /* ---------- Seegras: sways and a little fish swims out ---------- */
 
 .item-seegras.playing .uw-seegras-blade {
@@ -1053,6 +1634,10 @@
   }
 }
 
+.item-seegras.playing .uw-seegras-fish-2 {
+  animation: uw-seegras-fish 1.9s ease-in-out 0.4s;
+}
+
 /* ---------- Flunder: jumps out of the sand ---------- */
 
 .item-flunder.playing .uw-flunder-body {
@@ -1062,7 +1647,7 @@
 .item-flunder.playing .uw-flunder-sand circle {
   animation:
     uw-puff 0.7s ease-out 0.05s,
-    uw-puff 0.7s ease-out 1.55s;
+    uw-puff 0.45s ease-out 1.5s;
 }
 
 @keyframes uw-flunder-jump {
@@ -1081,6 +1666,10 @@
   88% {
     transform: translateY(-6px);
   }
+}
+
+.item-flunder.playing .uw-flunder-tail {
+  animation: uw-wag 0.2s ease-in-out 8 alternate;
 }
 
 /* ---------- Kugelfisch: puffs up into a spiky ball ---------- */
@@ -1108,6 +1697,21 @@
   25%,
   65% {
     opacity: 1;
+  }
+}
+
+.item-kugelfisch.playing .uw-kugel-fin {
+  animation: uw-fin-flutter 0.15s ease-in-out 12 alternate;
+}
+
+.item-kugelfisch.playing .uw-kugel-mouth {
+  animation: uw-kugel-o 2.2s ease-in-out;
+}
+
+@keyframes uw-kugel-o {
+  25%,
+  65% {
+    transform: scale(0.5);
   }
 }
 
@@ -1188,6 +1792,14 @@
   }
 }
 
+.item-luftblasen.playing .uw-blasen-stone {
+  animation: uw-rock 0.5s ease-in-out 2;
+}
+
+.item-luftblasen.playing .uw-blasen-sand circle {
+  animation: uw-puff 0.6s ease-out 0.05s;
+}
+
 /* ---------- Seeigel: wiggles its spines and hops ---------- */
 
 .item-seeigel.playing .uw-seeigel-body {
@@ -1219,6 +1831,12 @@
   }
 }
 
+.item-seeigel.playing .uw-seeigel-sand circle {
+  animation:
+    uw-puff 0.45s ease-out 0.75s,
+    uw-puff 0.45s ease-out 1.5s;
+}
+
 /* ---------- Muschel: opens and shows the pearl ---------- */
 
 .item-muschel.playing .uw-muschel-lid {
@@ -1230,7 +1848,7 @@
 }
 
 .item-muschel.playing .uw-muschel-sparkle {
-  animation: uw-twinkle 0.8s ease-in-out 0.5s 2;
+  animation: uw-twinkle 0.75s ease-in-out 0.4s 2;
 }
 
 @keyframes uw-muschel-open {
@@ -1245,4 +1863,8 @@
   65% {
     transform: scale(1.15);
   }
+}
+
+.item-muschel.playing .uw-muschel-sand circle {
+  animation: uw-puff 0.6s ease-out 0.05s;
 }
