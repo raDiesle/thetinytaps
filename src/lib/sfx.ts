@@ -478,3 +478,16 @@ export function playSplash() {
 export function playTick() {
   [0, 0.4, 0.8, 1.2].forEach((delay, i) => note({ from: i % 2 ? 1300 : 1900, duration: 0.04, type: "square", volume: 0.07, lowpass: 3000, delay }));
 }
+
+/** "Tock-tock-tock!" – a woodpecker drumming on a tree: very fast, dry knocks that fade. */
+export function playPeck() {
+  for (let i = 0; i < 12; i++) note({ from: 900, to: 420, duration: 0.035, type: "triangle", volume: 0.3 - i * 0.018, delay: i * 0.055 });
+}
+
+/** "Kuckuck!" – a cuckoo: two soft notes, the second a third lower, twice. */
+export function playCuckoo() {
+  [0, 0.75].forEach((delay) => {
+    note({ from: 784, to: 770, duration: 0.24, type: "sine", volume: 0.28, delay });
+    note({ from: 622, to: 610, duration: 0.34, type: "sine", volume: 0.28, delay: delay + 0.3 });
+  });
+}

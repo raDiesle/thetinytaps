@@ -58,6 +58,8 @@ import {
   playScrub,
   playSplash,
   playTick,
+  playPeck,
+  playCuckoo,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -124,6 +126,8 @@ const SOUNDS: Record<SceneSound, () => void> = {
   scrub: playScrub,
   splash: playSplash,
   tick: playTick,
+  peck: playPeck,
+  cuckoo: playCuckoo,
 };
 
 /** Key presses closer together than this only spawn shapes. */
