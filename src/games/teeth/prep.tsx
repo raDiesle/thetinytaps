@@ -1,6 +1,6 @@
 import { STAR_PATH } from "@/components/Bursts";
 import { PICTURE } from "./jaw";
-import { INK, SKIN, Toothbrush } from "./mouth";
+import { INK, SKIN } from "./mouth";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a
 // hand takes it out, then the tube comes over and puts a blob of toothpaste
@@ -10,6 +10,18 @@ export type PrepPart = "brush" | "paste";
 
 const { width: W, height: H } = PICTURE;
 const SINK = 300;
+
+/** Drawn lying down with the bristles up and the handle to the right; the head sits at the origin. */
+function Toothbrush() {
+  return (
+    <g stroke={INK} strokeLinejoin="round">
+      <rect x={26} y={4} width={150} height={16} rx={8} fill="#4cc9f0" strokeWidth={3} />
+      <rect x={-38} y={2} width={70} height={14} rx={7} fill="#4cc9f0" strokeWidth={3} />
+      <rect x={-34} y={-15} width={58} height={18} rx={3} fill="#fff" strokeWidth={2.5} />
+      <path d="M-24 -13 V1 M-14 -13 V1 M-4 -13 V1 M6 -13 V1 M16 -13 V1" stroke="#9fd8f5" strokeWidth={2} />
+    </g>
+  );
+}
 
 /** A child's hand round the handle, its arm going off the picture. In the toothbrush's own coordinates. */
 function Hand() {

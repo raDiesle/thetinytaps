@@ -1,4 +1,4 @@
-import { useMemo, useRef, type CSSProperties, type PointerEvent } from "react";
+import { useMemo, type CSSProperties, type PointerEvent } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import {
   buildMouth,
@@ -15,6 +15,7 @@ import {
   type Vec3,
   type View,
 } from "./jaw";
+import { Brush, lerp3, type BrushAnchor } from "./brush";
 import type { Motion } from "./steps";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
@@ -29,8 +30,7 @@ const MIN_FACING = 0.03;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 const HEAD = 270;
-const MONSTER_SIZE = 1.15;
-const WAITING_SIZE = 0.72;
+const MONSTER_SIZE = 0.75;
 
 export interface MonsterSpot {
   id: number;
@@ -43,7 +43,7 @@ export interface MonsterSpot {
   variant: number;
   /** When it pops up, so they don't all appear at once. */
   delayMs: number;
-  /** On a tooth that comes later: a bit smaller, and only where it clearly shows. */
+  /** On a tooth that comes later: only shown where it clearly shows. The others glow. */
   waiting: boolean;
   /** The brush is coming for this one. */
   scared: boolean;
@@ -59,7 +59,10 @@ interface MouthProps {
   /** The surfaces being brushed now. */
   zone: { surface: Surface; teeth: ToothId[] } | null;
   monsters: MonsterSpot[];
-  brush: { tooth: ToothId; surface: Surface; motion: Motion } | null;
+  /** The brush goes from stop to stop; `at` is how far, 1.5 is half way from the second to the third. */
+  brush: { stops: { tooth: ToothId; spot: number }[]; at: number; surface: Surface; motion: Motion } | null;
+  paused: boolean;
+  calm: boolean;
   /** All clean: sparkles and smiling eyes. */
   happy: boolean;
   /** Shown while the child should open or close their mouth. */
@@ -112,13 +115,25 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, action, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, action, paused, calm, onTickle }: MouthProps) {
   const model = useMemo(() => buildMouth(view.open), [view.open]);
   const all = projectors(view);
   const project = all.face;
   const zoneKeys = new Set(zone?.teeth.map(toothKey));
   const teethByKey = new Map(model.teeth.map((t) => [t.key, t]));
   const toothFace = (id: ToothId, surface: Surface) => surfaceFace(teethByKey.get(toothKey(id))!.faces, surface);
+
+  /** Where on a tooth the brush works. Outside with the teeth together, it brushes both rows at once, on the bite. */
+  const anchorAt = (stop: { tooth: ToothId; spot: number }, surface: Surface): BrushAnchor => {
+    const face = toothFace(stop.tooth, surface);
+    const half = face.points.length / 2;
+    const along = unitOf(subOf(face.points[half - 1], face.points[0]));
+    if (surface === "outer" && view.open < 0.5) {
+      const other = toothFace({ ...stop.tooth, jaw: stop.tooth.jaw === "upper" ? "lower" : "upper" }, "outer");
+      return { at: lerp3(alongFace(face, 2), alongFace(other, 2), 0.5), normal: unitOf(lerp3(face.normal, other.normal, 0.5)), along };
+    }
+    return { at: alongFace(face, stop.spot), normal: face.normal, along };
+  };
 
   const head = project.point([0, 20, -60]);
   const lipPoints = model.lips.map(project.point);
@@ -178,6 +193,11 @@ export function Mouth({ view, zone, monsters, brush, happy, action, onTickle }: 
         <clipPath id="mouth-inside">
           <path d={lipsPath} />
         </clipPath>
+        <radialGradient id="monster-glow">
+          <stop offset="0.5" stopColor="#fffbd1" />
+          <stop offset="0.72" stopColor="#ffd23f" stopOpacity={0.95} />
+          <stop offset="1" stopColor="#ffb703" stopOpacity={0} />
+        </radialGradient>
       </defs>
 
       <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} fill="#dff6ff" />
@@ -218,21 +238,19 @@ export function Mouth({ view, zone, monsters, brush, happy, action, onTickle }: 
           // The ones being brushed stay even on a steep face. The waiting ones only where nothing hides them:
           // with the teeth together, only the outside of the teeth shows.
           if (m.waiting ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
-          const at = jaw.point(lift(along(face, m.spot), face, 4));
-          const size = (m.waiting ? WAITING_SIZE : MONSTER_SIZE) * project.zoom;
+          const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
           return (
-            <g key={m.id} transform={`translate(${at.x.toFixed(1)} ${at.y.toFixed(1)})`}>
-              <g className="monster-size" style={{ transform: `scale(${size.toFixed(2)})` }}>
-                <Monster
-                  color={m.color}
-                  variant={m.variant}
-                  gone={m.gone}
-                  scared={m.scared}
-                  tickled={m.tickled}
-                  delayMs={m.delayMs}
-                  onTickle={() => onTickle(m.id)}
-                />
-              </g>
+            <g key={m.id} transform={`translate(${at.x.toFixed(1)} ${at.y.toFixed(1)}) scale(${(MONSTER_SIZE * project.zoom).toFixed(2)})`}>
+              <Monster
+                color={m.color}
+                variant={m.variant}
+                active={!m.waiting}
+                gone={m.gone}
+                scared={m.scared}
+                tickled={m.tickled}
+                delayMs={m.delayMs}
+                onTickle={() => onTickle(m.id)}
+              />
             </g>
           );
         })}
@@ -257,7 +275,27 @@ export function Mouth({ view, zone, monsters, brush, happy, action, onTickle }: 
             );
           })}
 
-        {brush && <Brush brush={brush} project={all[brush.tooth.jaw]} face={toothFace(brush.tooth, brush.surface)} />}
+        {brush && brush.stops.length > 0 && (() => {
+          // Glide between the two stops either side of `at`.
+          const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
+          const next = Math.min(brush.stops.length - 1, i + 1);
+          const k = Math.min(1, Math.max(0, brush.at - i));
+          const a = anchorAt(brush.stops[i], brush.surface);
+          const b = anchorAt(brush.stops[next], brush.surface);
+          const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
+          const tooth = brush.stops[k < 0.5 ? i : next].tooth;
+          return (
+            <Brush
+              anchor={anchor}
+              surface={brush.surface}
+              tooth={tooth}
+              motion={brush.motion}
+              project={all[tooth.jaw]}
+              paused={paused}
+              calm={calm}
+            />
+          );
+        })()}
 
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
 
@@ -285,8 +323,14 @@ export function Mouth({ view, zone, monsters, brush, happy, action, onTickle }: 
 /** A point just in front of a face, where a monster or the brush sits. */
 const lift = (at: Vec3, face: Face, by: number): Vec3 => [at[0] + face.normal[0] * by, at[1] + face.normal[1] * by, at[2] + face.normal[2] * by];
 
+const subOf = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const unitOf = (a: Vec3): Vec3 => {
+  const length = Math.hypot(...a) || 1;
+  return [a[0] / length, a[1] / length, a[2] / length];
+};
+
 /** A point on a face, `i` steps along the tooth from one end, half way between its long edges. */
-function along(face: Face, i: number): Vec3 {
+function alongFace(face: Face, i: number): Vec3 {
   const a = face.points[i];
   const b = face.points[face.points.length - 1 - i];
   return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
@@ -376,42 +420,6 @@ function Face({ project, head, happy, open }: { project: Project; head: Point2; 
   );
 }
 
-function Brush({ brush, project, face }: { brush: NonNullable<MouthProps["brush"]>; project: Project; face: Face }) {
-  const lastAngle = useRef(0);
-  const spot = project.point(lift(face.center, face, 6));
-  // The handle comes out of the front of the mouth, or out of the corner for the cheek side.
-  const jawY = brush.tooth.jaw === "lower" ? -70 : 70;
-  let dir: { x: number; y: number };
-  if (brush.surface === "outer") {
-    dir = brush.tooth.n <= 1 ? { x: 1, y: 0.2 } : { x: brush.tooth.side === "left" ? -1 : 1, y: 0.15 };
-  } else {
-    const front = project.point([brush.tooth.side === "left" ? -40 : 40, jawY, 220]);
-    dir = { x: front.x - spot.x, y: front.y - spot.y };
-  }
-  let angle = (Math.atan2(dir.y, dir.x) * 180) / Math.PI;
-  // Turn the short way round when the brush moves on.
-  while (angle - lastAngle.current > 180) angle -= 360;
-  while (angle - lastAngle.current < -180) angle += 360;
-  lastAngle.current = angle;
-
-  // Bristles (drawn pointing up) towards the tooth.
-  const rad = (angle * Math.PI) / 180;
-  const bristles = { x: Math.sin(rad), y: -Math.cos(rad) };
-  const n = project.direction(face.normal);
-  const intoTooth = Math.hypot(n.x, n.y) > 0.15 ? { x: -n.x, y: -n.y } : { x: 0, y: brush.tooth.jaw === "lower" ? 1 : -1 };
-  const flip = bristles.x * intoTooth.x + bristles.y * intoTooth.y < 0 ? -1 : 1;
-
-  return (
-    <g className="brush shown" style={{ transform: `translate(${spot.x}px, ${spot.y}px) rotate(${angle}deg)` }}>
-      <g transform={`scale(0.7 ${0.7 * flip})`}>
-        <g className={`brush-move ${brush.motion}`}>
-          <Toothbrush foam />
-        </g>
-      </g>
-    </g>
-  );
-}
-
 const MONSTER_TOPS = [
   // Horns
   "M-9 -12 L-12 -20 L-4 -14 Z M9 -12 L12 -20 L4 -14 Z",
@@ -424,6 +432,7 @@ const MONSTER_TOPS = [
 function Monster({
   color,
   variant,
+  active,
   gone,
   scared,
   tickled,
@@ -432,6 +441,7 @@ function Monster({
 }: {
   color: string;
   variant: number;
+  active: boolean;
   gone: boolean;
   scared: boolean;
   tickled: boolean;
@@ -447,6 +457,8 @@ function Monster({
       className={`sugar-monster${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
       style={{ "--delay": `${delayMs}ms`, "--blink": `${-(delayMs % 3700)}ms` } as CSSProperties}
     >
+      {/* The ones to brush now glow. */}
+      {active && <circle className="monster-glow" cy={-3} r={27} fill="url(#monster-glow)" />}
       <g className="monster-body" onPointerDown={stop}>
         <path d={MONSTER_TOPS[variant % MONSTER_TOPS.length]} fill={color} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
         {variant % MONSTER_TOPS.length === 1 && (
@@ -486,28 +498,6 @@ function Monster({
         </g>
         <path d={STAR_PATH} transform="translate(-7 -9) scale(0.14)" fill="#ffd23f" stroke={INK} strokeWidth={10} />
       </g>
-    </g>
-  );
-}
-
-/** Drawn lying down with the bristles up and the handle to the right; the head sits at the origin. */
-export function Toothbrush({ foam = false }: { foam?: boolean }) {
-  return (
-    <g stroke={INK} strokeLinejoin="round">
-      <rect x={26} y={4} width={150} height={16} rx={8} fill="#4cc9f0" strokeWidth={3} />
-      <rect x={-38} y={2} width={70} height={14} rx={7} fill="#4cc9f0" strokeWidth={3} />
-      <rect x={-34} y={-15} width={58} height={18} rx={3} fill="#fff" strokeWidth={2.5} />
-      <path d="M-24 -13 V1 M-14 -13 V1 M-4 -13 V1 M6 -13 V1 M16 -13 V1" stroke="#9fd8f5" strokeWidth={2} />
-      {foam && (
-        <g className="brush-foam" fill="#fff" stroke="#bde0fe" strokeWidth={2}>
-          <circle cx={-30} cy={-20} r={6} />
-          <circle cx={-12} cy={-24} r={7} />
-          <circle cx={8} cy={-21} r={5} />
-          <circle cx={22} cy={-25} r={6} />
-          <circle cx={-22} cy={-32} r={4} />
-          <circle cx={14} cy={-34} r={4.5} />
-        </g>
-      )}
     </g>
   );
 }
