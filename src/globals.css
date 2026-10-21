@@ -376,6 +376,48 @@ a.game-card:focus-visible {
   rotate: 8deg;
 }
 
+/* Under the home menu, for parents: install as an app, works offline. */
+.install-hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 20px;
+  margin: 48px 0 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.install-hint > span {
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: #ffffffb0;
+}
+
+.install-hint span[aria-hidden] {
+  font-family: var(--font-emoji);
+}
+
+.install-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 22px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--ink);
+}
+
+.install-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
 /* The "p" in the home title: hold it to open the hidden idea page, without selecting text. */
 .secret-hold {
   user-select: none;

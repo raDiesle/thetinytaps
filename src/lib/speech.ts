@@ -52,9 +52,12 @@ export function saveVoiceName(name: string) {
   }
 }
 
-/** The chosen voice for `lang`, else the nicest one, else null. */
+/**
+ * The chosen voice for `lang`, else the nicest one, else null. Without network
+ * only voices on the device itself (the online "Google" ones stay silent offline).
+ */
 export function pickVoice(lang: string): SpeechSynthesisVoice | null {
-  const voices = voicesFor(lang);
+  const voices = voicesFor(lang).filter((v) => navigator.onLine || v.localService);
   return voices.find((v) => v.name === savedVoiceName()) ?? voices[0] ?? null;
 }
 

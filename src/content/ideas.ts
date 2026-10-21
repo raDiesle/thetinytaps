@@ -719,7 +719,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Offline & installierbar (PWA)",
         text: "Als App auf dem Homescreen, funktioniert im Flugzeug und ohne WLAN.",
         effort: "M",
-        planned: true,
+        done: true,
       },
       {
         id: "A-03",
