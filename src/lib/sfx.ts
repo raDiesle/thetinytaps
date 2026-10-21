@@ -233,3 +233,20 @@ export function playChime() {
   tone(PENTATONIC[2], 0.4, "sine", 0.2);
   setTimeout(() => tone(PENTATONIC[5], 0.5, "sine", 0.2), 90);
 }
+
+/** A cheerful brushing tune in steps of the pentatonic scale; null is a rest. */
+const TUNE = [0, 2, 4, 4, 5, 4, 2, null, 1, 3, 4, 3, 2, null, null, null, 0, 2, 4, 4, 5, 4, 5, 6, 7, 5, 4, 2, 0, null, null, null];
+const TUNE_BASS = [130.81, 196.0, 146.83, 196.0];
+
+/** The i-th beat of the brushing tune, which loops; a soft bass note starts every bar. */
+export function playTuneNote(i: number) {
+  const step = TUNE[i % TUNE.length];
+  if (step !== null) note({ from: PENTATONIC[step], duration: 0.26, type: "triangle", volume: 0.12 });
+  if (i % 4 === 0) note({ from: TUNE_BASS[Math.floor(i / 4) % TUNE_BASS.length], duration: 0.9, type: "sine", volume: 0.14 });
+}
+
+/** "Puff!" – a little monster vanishes in a cloud, with a sparkle after. */
+export function playPoof() {
+  note({ from: 900, to: 180, duration: 0.25, type: "sine", volume: 0.25 });
+  note({ from: PENTATONIC[7] * 2, duration: 0.3, type: "sine", volume: 0.08, delay: 0.18 });
+}

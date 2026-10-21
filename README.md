@@ -32,6 +32,7 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `src/games/letters/` | Game "Buchstaben & Zahlen": free typing (numbers optionally counted by tapping each thing), "Wo ist das B?" (find the key for a shown letter, `FindPlay.tsx`) or the Buchstaben-Zug (keys become wagons, `TrainPlay.tsx`) |
 | `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore with chain reactions and "alles entdeckt" party, find, sound riddle, trait questions in `quests.ts`, colouring in; tap, hover / swipe or keys with arrow-key frame in `focus.ts`) and the scenes `baustelle/`, `stadt/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
 | `src/games/words/` | Game "Wörter tippen": whole word, first letter only, colour words, doing words (all from `de.ts`) |
+| `src/games/teeth/` | Game "Zähne putzen": brushing timer (1–3 minutes, one corner of the mouth per quarter) where sugar monsters vanish from the teeth, with music and spoken hints; no tapping needed, keeps the screen on |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
 | `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
 
@@ -41,7 +42,7 @@ CSS file for the tap animations, then add it to `SCENES` in `src/games/scenes/in
 The full guide (depth, keys, drawing style, checks) is the Claude Code skill
 [`.claude/skills/neue-szene/SKILL.md`](.claude/skills/neue-szene/SKILL.md) – run it with `/neue-szene`.
 
-Defaults: speech is off and the picture only moves when someone taps, hovers or
+Defaults: speech is off (except in "Zähne putzen", where the spoken hints are the point) and the picture only moves when someone taps, hovers or
 presses a key. Parents can turn on speech, idle movement and the keys mode
 ("Jedes Ding hat eine Taste") on the start screen.
 
