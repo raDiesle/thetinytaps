@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
+import { keyMatches, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
+import { translate } from "@/content/translate";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -34,13 +36,6 @@ function wordsFor(pack: LanguagePack, mode: WordsMode, maxLetters: number, theme
 const isColor = (word: WordEntry): word is ColorWord => "color" in word;
 const isAction = (word: WordEntry): word is ActionWord => "action" in word;
 
-/** Case-insensitive, and "a" also counts for "ä" so keyboards without umlauts work. */
-function matches(key: string, letter: string) {
-  const k = key.toLocaleUpperCase("de-DE");
-  const l = letter.toLocaleUpperCase("de-DE");
-  return k === l || k === l.normalize("NFD")[0];
-}
-
 function shuffle<T>(items: T[]): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) {
@@ -67,7 +62,16 @@ function paradeSpots(count: number) {
   }));
 }
 
-export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: WordsSettings }) {
+export function WordsPlay({
+  pack,
+  second,
+  settings,
+}: {
+  pack: LanguagePack;
+  /** Optional second language: the finished word is also shown and said in it. */
+  second: LanguagePack | null;
+  settings: WordsSettings;
+}) {
   const [current, setCurrent] = useState<{ id: number; word: WordEntry } | null>(null);
   const [typed, setTyped] = useState(0);
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
@@ -92,6 +96,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
   const puzzle = useMemo(() => (reveal === "puzzle" ? puzzleGrid(letters.length) : null), [reveal, letters]);
   const color = current && isColor(current.word) ? current.word : null;
   const action = current && isAction(current.word) ? current.word : null;
+  const translation = current && second ? translate(current.word, second) : undefined;
   const parade = useMemo(() => (color ? paradeSpots(settings.calm ? 4 : color.things.length) : []), [color, settings.calm]);
 
   const say = useCallback(
@@ -103,7 +108,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
 
   const sayLetter = useCallback(
     (char: string) => {
-      const upper = char.toLocaleUpperCase("de-DE");
+      const upper = toUpper(char, pack);
       say(`${pack.letters.find((l) => l.upper === upper)?.spoken ?? char}!`);
     },
     [pack, say],
@@ -153,9 +158,12 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
     if (settings.sounds) playChime();
     const word = current.word;
     say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
+    if (settings.speech && second && translation) {
+      speak(`${translation}!`, second.speechLang, { queue: true, rate: settings.calm ? 0.75 : 0.85 });
+    }
     if (isColor(word)) setBackground(word.color);
     for (let i = 0; i < (settings.calm ? 3 : 8); i++) spawn();
-  }, [current, done, letters, typed, firstOnly, pack, say, sayLetter, spawn, settings.sounds, settings.calm]);
+  }, [current, done, letters, typed, firstOnly, pack, second, translation, say, sayLetter, spawn, settings.sounds, settings.speech, settings.calm]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -184,7 +192,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
         if (!tryNextWord()) funBurst();
         return;
       }
-      if (settings.anyKey || matches(key, letters[typed])) {
+      if (settings.anyKey || keyMatches(key, letters[typed], pack)) {
         if (!tryType()) funBurst();
         return;
       }
@@ -192,7 +200,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
       if ((nudges + 1) % HINT_AFTER_WRONG === 0) sayLetter(letters[typed]);
       setNudges(nudges + 1);
     },
-    [current, done, letters, typed, nudges, settings.anyKey, tryType, tryNextWord, funBurst, sayLetter],
+    [current, done, letters, typed, nudges, pack, settings.anyKey, tryType, tryNextWord, funBurst, sayLetter],
   );
 
   useEffect(() => {
@@ -228,11 +236,15 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
     funBurst(e.clientX, e.clientY);
   };
 
+  // The key for the next letter; "Ó" has none on the screen, so its "O" lights up.
+  const wanted = letters[typed] && toUpper(letters[typed], pack);
+  const wantedKey = !wanted || pack.letters.some((l) => l.upper === wanted) ? wanted : wanted.normalize("NFD")[0];
+
   const display = (char: string) =>
     settings.letterCase === "upper"
-      ? char.toLocaleUpperCase("de-DE")
+      ? toUpper(char, pack)
       : settings.letterCase === "lower"
-        ? char.toLocaleLowerCase("de-DE")
+        ? toLower(char, pack)
         : char;
 
   const figureClass = [
@@ -319,6 +331,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
                 ),
               )}
             </div>
+            {done && translation && <div className="translation">{translation}</div>}
           </div>
         )}
       </div>
@@ -326,8 +339,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
         <TouchKeyboard
           rows={rows}
           onKey={pressKey}
-          label={(key) => (settings.letterCase === "lower" ? key.toLocaleLowerCase("de-DE") : key)}
-          highlight={done ? undefined : letters[typed]?.toLocaleUpperCase("de-DE")}
+          label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
+          highlight={done ? undefined : wantedKey}
         />
       )}
       <BurstLayer bursts={bursts} />

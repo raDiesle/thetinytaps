@@ -53,7 +53,7 @@ export interface Countable {
 }
 
 export interface LanguagePack {
-  /** BCP-47 tag used for speech synthesis, e.g. "de-DE". */
+  /** BCP-47 tag used for speech synthesis and for upper/lower case ("i" is "İ" in Turkish), e.g. "de-DE". */
   speechLang: string;
   themes: Theme[];
   letters: LetterEntry[];
@@ -80,4 +80,11 @@ export interface LanguagePack {
   actions: ActionWord[];
   /** "Hüpf mit!", the invitation to join in once the figure acts. */
   joinIn: (word: ActionWord) => string;
+  /** "Tschu-tschu!", said when the letter train leaves. */
+  whistle: string;
+  /**
+   * Words by emoji for pictures that only other languages have (🐊 is no
+   * German letter word), so a second language can always say what is shown.
+   */
+  moreWords?: Record<string, string>;
 }

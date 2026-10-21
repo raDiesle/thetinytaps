@@ -744,7 +744,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Englisch, Türkisch, Polnisch, … als weiteres LanguagePack. Optional zweisprachig: „Bär – bear“.",
         why: "Für mehrsprachige Familien; die Struktur dafür gibt es schon.",
         effort: "M",
-        partial: "Die Sprachpakete sind vorbereitet, es gibt aber nur Deutsch.",
+        done: true,
       },
       {
         id: "A-06",
