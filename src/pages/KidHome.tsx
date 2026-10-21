@@ -22,6 +22,7 @@ const TILES: KidTile[] = [
   { id: "woerter", href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
   { id: "zaehne", href: "/zaehne/", emoji: "🦷", title: "Zähne putzen" },
   { id: "tiere", href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
+  { id: "kugelbahn", href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn" },
   { id: "gefuehle", href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
   ...SCENES.map((s) => ({ id: `bild-${s.id}`, href: `/bilder/${s.id}/`, emoji: s.emoji, title: s.title })),
 ];
