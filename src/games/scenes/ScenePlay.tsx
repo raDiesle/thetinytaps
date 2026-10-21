@@ -45,6 +45,8 @@ import {
   playWhale,
   playPing,
   playDolphin,
+  playPeck,
+  playCuckoo,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -98,6 +100,8 @@ const SOUNDS: Record<SceneSound, () => void> = {
   whale: playWhale,
   ping: playPing,
   dolphin: playDolphin,
+  peck: playPeck,
+  cuckoo: playCuckoo,
 };
 
 /** Key presses closer together than this only spawn shapes. */
