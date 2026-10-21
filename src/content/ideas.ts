@@ -564,6 +564,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "„Der Hase hat Hunger!“ – Futter (Möhre, Knochen, Banane) zum richtigen Tier ziehen. Das Tier mampft und bedankt sich.",
         why: "Zuordnen und Wissen über Tiere; witzige Reaktionen.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-09",
@@ -571,6 +572,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Wer wohnt wo?",
         text: "Tiere ihren Häusern zuordnen: Hund → Hütte, Vogel → Nest, Fisch → Aquarium, Biene → Bienenstock.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-10",

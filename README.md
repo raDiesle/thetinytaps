@@ -31,6 +31,7 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/games/letters/` | Game "Buchstaben & Zahlen": free typing (numbers optionally counted by tapping each thing), "Wo ist das B?" (find the key for a shown letter, `FindPlay.tsx`) or the Buchstaben-Zug (keys become wagons, `TrainPlay.tsx`) |
 | `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore with chain reactions and "alles entdeckt" party, find, sound riddle, trait questions in `quests.ts`, colouring in; tap, hover / swipe or keys with arrow-key frame in `focus.ts`) and the scenes `baustelle/`, `stadt/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
+| `src/games/animals/` | Game "Was gehört zum Tier?": drag (or tap) the food to the hungry animal, or the animal into its home; the homes are drawn in `homes.tsx`, animals, foods and sentences are in `content.ts` |
 | `src/games/words/` | Game "Wörter tippen": whole word, first letter only, colour words, doing words (all from `de.ts`) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
 | `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
@@ -70,3 +71,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 3. Own illustrations and recorded voice (incl. letter sounds „b“ instead of „Be“), offline (PWA)
 4. ~~Wörter tippen~~
 5. ~~Lebendige Bilder: Wimmelbild Baustelle, Stadt~~ – next: Bauernhof, Zoo
+6. ~~Was gehört zum Tier? (Tiere füttern, Wer wohnt wo?)~~

@@ -217,6 +217,24 @@ export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));
 }
 
+/** "Muh!" – a long, low moo. */
+export function playMoo() {
+  note({ from: 160, to: 120, duration: 0.9, type: "sawtooth", volume: 0.25, lowpass: 600 });
+}
+
+/** "Mampf, mampf" – three soft crunchy bites. */
+export function playMunch() {
+  [0, 0.28, 0.56].forEach((delay) => {
+    note({ from: 260, to: 140, duration: 0.1, type: "square", volume: 0.1, lowpass: 700, delay });
+    note({ from: 900, to: 500, duration: 0.06, type: "triangle", volume: 0.08, delay: delay + 0.04 });
+  });
+}
+
+/** "Bäh!" – a short, falling grumble, funny rather than sad. */
+export function playYuck() {
+  note({ from: 330, to: 200, duration: 0.35, type: "sawtooth", volume: 0.12, lowpass: 900 });
+}
+
 /** A random soft note, used for shapes and bubbles. */
 export function playRandomNote() {
   const freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
