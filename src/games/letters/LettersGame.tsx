@@ -4,7 +4,15 @@ import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
-import { DEFAULT_LETTERS_SETTINGS, LETTERS_SETTINGS_KEY, type Announce, type LetterCase, type LettersMode, type LettersSettings } from "./settings";
+import {
+  DEFAULT_LETTERS_SETTINGS,
+  LETTERS_SETTINGS_KEY,
+  type Announce,
+  type LetterCase,
+  type LettersMode,
+  type LettersSettings,
+} from "./settings";
+import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
 import { TrainPlay } from "./TrainPlay";
 
@@ -12,7 +20,6 @@ const pack = de;
 
 export function LettersGame() {
   const [settings, update] = useStoredSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
-  const train = settings.mode === "train";
 
   return (
     <GameShell
@@ -20,16 +27,24 @@ export function LettersGame() {
       emoji="🔤"
       settings={
         <>
-          <SettingsGroup title="Spiel">
+          <SettingsGroup title="Spielart">
             <Choice<LettersMode>
-              label="Spielart"
+              label="Spiel"
               value={settings.mode}
               onChange={(mode) => update({ mode })}
               options={[
-                { value: "cards", label: "🃏 Karten" },
+                { value: "free", label: "⌨️ Frei tippen" },
+                { value: "find", label: "🔍 Wo ist das B?" },
                 { value: "train", label: "🚂 Buchstaben-Zug" },
               ]}
             />
+            {settings.mode === "find" && (
+              <Toggle
+                label="Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"
+                checked={settings.hints}
+                onChange={(hints) => update({ hints })}
+              />
+            )}
           </SettingsGroup>
 
           <SettingsGroup title="Anzeige">
@@ -52,7 +67,7 @@ export function LettersGame() {
                 ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
               ]}
             />
-            {!train && (
+            {settings.mode !== "train" && (
               <Toggle label="Wort anzeigen" checked={settings.showWord} onChange={(showWord) => update({ showWord })} />
             )}
           </SettingsGroup>
@@ -60,7 +75,7 @@ export function LettersGame() {
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
             {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Be, wie Bär!" />}
-            {settings.speech && !train && (
+            {settings.speech && settings.mode === "free" && (
               <Choice<Announce>
                 label="Ansage"
                 value={settings.announce}
@@ -76,7 +91,7 @@ export function LettersGame() {
           </SettingsGroup>
 
           <SettingsGroup title="Verhalten">
-            {!train && (
+            {settings.mode === "free" && (
               <Toggle
                 label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
                 checked={settings.stepByStep}
@@ -88,7 +103,7 @@ export function LettersGame() {
               checked={settings.calm}
               onChange={(calm) => update({ calm })}
             />
-            {!settings.stepByStep && !train && (
+            {settings.mode === "free" && !settings.stepByStep && (
               <Toggle
                 label="Zählen nicht unterbrechen"
                 checked={settings.finishCounting}
@@ -103,7 +118,13 @@ export function LettersGame() {
         </>
       }
     >
-      {train ? <TrainPlay pack={pack} settings={settings} /> : <LettersPlay pack={pack} settings={settings} />}
+      {settings.mode === "find" ? (
+        <FindPlay pack={pack} settings={settings} />
+      ) : settings.mode === "train" ? (
+        <TrainPlay pack={pack} settings={settings} />
+      ) : (
+        <LettersPlay pack={pack} settings={settings} />
+      )}
     </GameShell>
   );
 }

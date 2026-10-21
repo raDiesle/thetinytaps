@@ -3,14 +3,19 @@ import type { ThemeId } from "@/content/types";
 
 export type LetterCase = "upper" | "both" | "lower";
 
-/** Cards: one big letter or number at a time. Train: every key adds a wagon to a train. */
-export type LettersMode = "cards" | "train";
+/**
+ * "free": every key shows its letter or number. "find": a letter is shown and the child looks for its key.
+ * "train": every key adds a wagon to a train.
+ */
+export type LettersMode = "free" | "find" | "train";
 
 /** What is spoken for a letter: "Be, wie Bär!", "Bär!" or "Be!". */
 export type Announce = "letterAndWord" | "word" | "letter";
 
 export interface LettersSettings {
   mode: LettersMode;
+  /** Find mode: after a few wrong keys, light up the wanted key on a little keyboard picture. */
+  hints: boolean;
   letterCase: LetterCase;
   /** Show the word under the picture, with its first letter highlighted. */
   showWord: boolean;
@@ -32,7 +37,8 @@ export interface LettersSettings {
 }
 
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
-  mode: "cards",
+  mode: "free",
+  hints: true,
   letterCase: "upper",
   showWord: true,
   speech: false,

@@ -86,6 +86,8 @@ export const de: LanguagePack = {
   countables,
   zero: { emoji: "🪹", sentence: "Das Nest ist leer!" },
   letterSentence: (l, word) => `${l.spoken}, wie ${word.word}!`,
+  findPrompt: (l) => `Wo ist das ${l.spoken}?`,
+  keyboardRows: ["1234567890ß", "QWERTZUIOPÜ", "ASDFGHJKLÖÄ", "YXCVBNM"],
   countSentence: (n, thing) =>
     n === 1
       ? `${indefiniteArticle(thing.singular)} ${thing.singular}!`
