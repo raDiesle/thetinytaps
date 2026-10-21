@@ -4,6 +4,7 @@ import { IdeasPage } from "@/pages/IdeasPage";
 import { LettersPage } from "@/pages/LettersPage";
 import { ScenePage } from "@/pages/ScenePage";
 import { ScenesMenu } from "@/pages/ScenesMenu";
+import { TeethPage } from "@/pages/TeethPage";
 import { WordsPage } from "@/pages/WordsPage";
 
 export function App() {
@@ -14,6 +15,7 @@ export function App() {
       <Route path="woerter" element={<WordsPage />} />
       <Route path="bilder" element={<ScenesMenu />} />
       <Route path="bilder/:scene" element={<ScenePage />} />
+      <Route path="zaehne" element={<TeethPage />} />
       <Route path="ideen" element={<IdeasPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

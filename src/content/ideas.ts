@@ -540,6 +540,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "2-Minuten-Timer: Ein Gebiss mit kleinen Zuckermonstern, die nach und nach verschwinden. Musik und Hinweise „Jetzt oben!“. Kein Tippen nötig.",
         why: "Echter Alltagsnutzen für Eltern.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-06",
