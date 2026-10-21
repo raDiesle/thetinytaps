@@ -6,10 +6,6 @@
   animation: bs-drift 26s ease-in-out infinite alternate;
 }
 
-.scene.lively .sonne-rays {
-  animation: bs-spin 40s linear infinite;
-}
-
 .scene.lively .bs-cloud-slow {
   animation-duration: 40s;
 }
@@ -67,7 +63,6 @@
 .bagger-smoke circle,
 .wagen-smoke circle,
 .mischer-drops circle,
-.wolke-rain path,
 .ente-ripples ellipse,
 .ente-splash circle,
 .hammer-dust circle,
@@ -280,20 +275,6 @@
 
 /* ---------- Sonne ---------- */
 
-.item-sonne.playing .sonne-body {
-  animation: sonne-pulse 1s ease-in-out 2;
-}
-
-.item-sonne.playing .sonne-rays {
-  animation: bs-spin 2s ease-in-out;
-}
-
-@keyframes sonne-pulse {
-  50% {
-    transform: scale(1.15);
-  }
-}
-
 /* ---------- Bagger: lifts the arm, then digs into the dirt ---------- */
 
 .item-bagger.playing .bagger-arm {
@@ -444,33 +425,6 @@
   }
   75% {
     transform: scale(1.1, 0.9);
-  }
-}
-
-/* ---------- Wolke: turns grey and rains ---------- */
-
-.item-wolke.playing .cloud-puffs {
-  animation: wolke-dark 2.6s ease-in-out;
-}
-
-.item-wolke.playing .wolke-rain path {
-  animation: wolke-drop 0.6s linear calc(var(--i) * 0.12s) 4;
-}
-
-@keyframes wolke-dark {
-  15%,
-  80% {
-    fill: #b8c4d6;
-  }
-}
-
-@keyframes wolke-drop {
-  0% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.4;
-    transform: translateY(220px);
   }
 }
 

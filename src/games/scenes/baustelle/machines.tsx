@@ -1,4 +1,4 @@
-import { GLASS, INK, Inside, Pane, SAND, SKIN, STEEL, Wheel, nth } from "./shared";
+import { GLASS, INK, Inside, Pane, SAND, SKIN, STEEL, Wheel, nth } from "../shared";
 
 /** A driver's head with a hard hat, for cabs. */
 function Driver({ cx, cy, hat = "#ffd60a" }: { cx: number; cy: number; hat?: string }) {

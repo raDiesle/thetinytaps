@@ -13,21 +13,24 @@ reference – read it before starting and copy its patterns.
 ## Files
 
 ```
-src/games/scenes/<id>/
-  <Name>.tsx       // export const <id>: Scene = { ..., items: [...] } – items back to front
-  layout.ts        // HORIZON, depthScale, float(), ground(), shared placements
-  background.tsx   // sky, horizon, ground, static details – nothing tappable
-  shared.tsx       // colours (INK, SKIN …), Wheel, Pane, Inside, Face, Cloud, nth()
-  <group>.tsx      // item drawings, grouped (animals.tsx, buildings.tsx …)
-  <id>.css         // all animations of this scene
+src/games/scenes/
+  layout.ts        // shared: HORIZON, depthScale, float(), ground(), transformOf, towardsHorizon
+  shared.tsx       // shared: colours (INK, SKIN …), Wheel, Pane, Inside, Face, Cloud, nth()
+  sky.tsx, sky.css // shared: Sonne and Wolke items with their animations
+  <id>/
+    <Name>.tsx     // export const <id>: Scene = { ..., items: [...] } – items back to front
+    layout.ts      // placements of this scene (built with ../layout's ground())
+    background.tsx // sky, horizon, ground, static details – nothing tappable
+    <group>.tsx    // item drawings, grouped (animals.tsx, buildings.tsx …)
+    <id>.css       // all animations of this scene
 ```
 
 Register the scene in `src/games/scenes/index.ts` (`SCENES`) and remove it from
 `UPCOMING_SCENES`. The route `/bilder/<id>` (`src/pages/ScenePage.tsx`) finds it with `findScene`.
 
-Reuse instead of copying: `layout.ts` and `shared.tsx` are scene-local today; if a
-second scene needs the same helpers, move them to `src/games/scenes/` (shared) and
-import them in both scenes.
+Reuse instead of copying: import the shared helpers from `../layout`, `../shared`
+and `../sky`. When a helper of one scene is needed by another, move it up to
+`src/games/scenes/` as well. `baustelle/` and `stadt/` are the references.
 
 ## Picture and depth
 
@@ -98,7 +101,7 @@ import them in both scenes.
   center`) for puffs and leaves. Never both on the same element.
 - Use `nth(i)` to stagger repeated parts (`--i` in CSS).
 - SVG ids (clipPath, gradients) must be unique per scene; prefix them (`bs-` for
-  Baustelle). Inside components that can render twice (thumbnails), use `useId()`
+  Baustelle, `st-` for Stadt). CSS is global, so prefix part classes too. Inside components that can render twice (thumbnails), use `useId()`
   like `Inside` does.
 
 ## Animations (`<id>.css`)

@@ -20,6 +20,12 @@ import {
   playRumble,
   playHum,
   playSaw,
+  playHonk,
+  playSiren,
+  playBells,
+  playRing,
+  playCoo,
+  playMeow,
   playTweet,
   setSfxVolume,
 } from "@/lib/sfx";
@@ -48,6 +54,12 @@ const SOUNDS: Record<SceneSound, () => void> = {
   rumble: playRumble,
   hum: playHum,
   saw: playSaw,
+  honk: playHonk,
+  siren: playSiren,
+  bells: playBells,
+  ring: playRing,
+  coo: playCoo,
+  meow: playMeow,
 };
 
 /** Key presses closer together than this only spawn shapes. */

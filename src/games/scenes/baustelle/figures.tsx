@@ -1,4 +1,4 @@
-import { CHEEK, Face, INK, SKIN, STEEL, nth } from "./shared";
+import { CHEEK, Face, INK, SKIN, STEEL, nth } from "../shared";
 
 export function Bauarbeiter() {
   return (

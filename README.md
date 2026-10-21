@@ -26,7 +26,7 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/games/letters/` | Game "Buchstaben & Zahlen" |
-| `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes, e.g. `baustelle/` |
+| `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes `baustelle/`, `stadt/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
 | `src/games/words/` | Game "Wörter tippen" (words come from `de.ts`, filtered by length and theme) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
 
@@ -56,4 +56,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 2. ~~Options: themes (Tiere, Fahrzeuge, Essen), announcement style, calm mode, uninterrupted counting~~
 3. Own illustrations and recorded voice (incl. letter sounds „b“ instead of „Be“), offline (PWA)
 4. ~~Wörter tippen~~
-5. ~~Lebendige Bilder: Wimmelbild Baustelle~~ – next: Bauernhof, Zoo, Stadt
+5. ~~Lebendige Bilder: Wimmelbild Baustelle, Stadt~~ – next: Bauernhof, Zoo

@@ -159,6 +159,47 @@ export function playSaw() {
   );
 }
 
+/** "Tüt, tüt!" – a car horn, two notes at once. */
+export function playHonk() {
+  [0, 0.3].forEach((delay) => {
+    note({ from: 392, duration: 0.22, type: "square", volume: 0.1, lowpass: 1400, delay });
+    note({ from: 494, duration: 0.22, type: "square", volume: 0.08, lowpass: 1400, delay });
+  });
+}
+
+/** "Tatütata" – two alternating siren notes, soft enough for small ears. */
+export function playSiren() {
+  [0, 0.4, 0.8, 1.2].forEach((delay, i) => note({ from: i % 2 ? 587 : 440, duration: 0.36, type: "triangle", volume: 0.18, delay }));
+}
+
+/** "Bim, bam" – church bells, low and ringing out. */
+export function playBells() {
+  [0, 0.6, 1.2].forEach((delay, i) => {
+    const base = i % 2 ? 330 : 392;
+    note({ from: base, duration: 1.2, type: "sine", volume: 0.25, delay });
+    note({ from: base * 2.4, duration: 0.6, type: "sine", volume: 0.06, delay });
+  });
+}
+
+/** "Kling, kling" – a bicycle bell. */
+export function playRing() {
+  [0, 0.16].forEach((delay) => {
+    note({ from: 2200, duration: 0.3, type: "sine", volume: 0.12, delay });
+    note({ from: 3300, duration: 0.2, type: "sine", volume: 0.05, delay });
+  });
+}
+
+/** "Gurr, gurr" – a pigeon. */
+export function playCoo() {
+  [0, 0.4].forEach((delay) => note({ from: 300, to: 220, duration: 0.3, type: "sine", volume: 0.3, lowpass: 800, delay }));
+}
+
+/** "Miau!" – rises and falls. */
+export function playMeow() {
+  note({ from: 600, to: 900, duration: 0.18, type: "triangle", volume: 0.2 });
+  note({ from: 900, to: 520, duration: 0.35, type: "triangle", volume: 0.2, delay: 0.17 });
+}
+
 /** Three hammer knocks. */
 export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));
