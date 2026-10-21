@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
+import { KID_HOME } from "@/components/GameShell";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { useTitle } from "@/lib/title";
@@ -48,6 +49,12 @@ export function Home() {
           </li>
         ))}
       </ul>
+      <Link to={KID_HOME} className="kid-home-link">
+        <span aria-hidden>🧸</span>
+        <span>
+          <strong>Kinder-Startseite</strong> – nur große Bilder im Vollbild, das Kind wählt selbst
+        </span>
+      </Link>
     </main>
   );
 }

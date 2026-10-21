@@ -233,3 +233,10 @@ export function playChime() {
   tone(PENTATONIC[2], 0.4, "sine", 0.2);
   setTimeout(() => tone(PENTATONIC[5], 0.5, "sine", 0.2), 90);
 }
+
+/** A slow, soft lullaby falling down the scale, for good night. */
+export function playLullaby() {
+  [5, 4, 2, 3, 1, 0].forEach((step, i) =>
+    note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }),
+  );
+}

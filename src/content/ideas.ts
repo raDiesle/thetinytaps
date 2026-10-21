@@ -724,6 +724,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Eltern stellen z. B. 10 Minuten ein. Danach wird alles langsam ruhiger, eine Gute-Nacht-Animation (siehe N-03) und das Spiel endet von selbst.",
         why: "Die Grenze setzt das Spiel, nicht die Eltern.",
         effort: "M",
+        done: true,
       },
       {
         id: "A-04",
@@ -732,6 +733,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Menü nur aus großen Bildern, ohne Text, im Vollbild. Das Kind wählt selbst zwischen den Spielen, Eltern-Einstellungen sind versteckt.",
         why: "Selbstständigkeit, ohne dass das Kind ins Browser-Menü kommt.",
         effort: "M",
+        done: true,
       },
       {
         id: "A-05",
