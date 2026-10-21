@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
+import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { useTitle } from "@/lib/title";
@@ -51,6 +52,7 @@ export function Home() {
           </li>
         ))}
       </ul>
+      <InstallHint />
     </main>
   );
 }
