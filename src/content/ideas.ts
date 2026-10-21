@@ -454,6 +454,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Quietscheente, Schaumberg, Wasserhahn tropft, Zahnbürste putzt, Föhn pustet, Klo spült, Handtuch.",
         why: "Begleitet echte Routinen (Baden, Zähneputzen).",
         effort: "M",
+        done: true,
       },
       {
         id: "S-06",
@@ -483,6 +484,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Wald",
         text: "Eule dreht den Kopf, Specht klopft, Reh, Fuchs, Pilze, Bach mit Steinen, Eichhörnchen versteckt Nüsse, Wildschwein.",
         effort: "L",
+        done: true,
       },
       {
         id: "S-10",
@@ -490,6 +492,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Weltall",
         text: "Rakete startet, Planeten drehen sich, Astronaut schwebt, Mond mit Kratern, Sterne funkeln beim Antippen, Ufo mit Außerirdischem.",
         effort: "M",
+        done: true,
       },
       {
         id: "S-11",
@@ -498,6 +501,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Sirene, Tor geht auf, Leiter fährt aus, Schlauch spritzt, Rutschstange, Helm, Feuerwehrhund.",
         why: "Fahrzeug-Fans lieben das; passt zur Baustelle.",
         effort: "L",
+        done: true,
       },
       {
         id: "S-12",

@@ -64,7 +64,22 @@ export type SceneSound =
   | "blub"
   | "whale"
   | "ping"
-  | "dolphin";
+  | "dolphin"
+  | "launch"
+  | "twinkle"
+  | "beam"
+  | "robot"
+  | "alien"
+  | "alarm"
+  | "trill"
+  | "whoosh"
+  | "flush"
+  | "blow"
+  | "scrub"
+  | "splash"
+  | "tick"
+  | "peck"
+  | "cuckoo";
 
 /** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */
 export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" | "small" | "animal" | "wheels";
@@ -88,6 +103,8 @@ export interface SceneItem {
   key?: string;
   /** Questions mode: what the item is like. Only clear cases, so every answer is obviously right. */
   traits?: SceneTrait[];
+  /** The name is a plural ("die Küken"), so questions say "Wo sind …?". */
+  plural?: boolean;
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */
   durationMs: number;
   /**

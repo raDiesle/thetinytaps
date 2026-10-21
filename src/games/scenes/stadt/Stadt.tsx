@@ -372,6 +372,7 @@ export const stadt: Scene = {
     {
       id: "blumen",
       name: "die Blumen",
+      plural: true,
       sentences: ["Die Blumen blühen bunt.", "Rosa, gelb und lila."],
       sound: "chime",
       box: [-58, -134, 116, 134],

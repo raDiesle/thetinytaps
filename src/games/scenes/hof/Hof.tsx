@@ -257,6 +257,7 @@ export const hof: Scene = {
     {
       id: "kueken",
       name: "die Küken",
+      plural: true,
       sentences: ["Piep, piep! Die Küken hüpfen.", "Die Küken sind klein und gelb."],
       sound: "tweet",
       box: [-56, -42, 118, 42],
@@ -398,6 +399,7 @@ export const hof: Scene = {
     {
       id: "blumen",
       name: "die Blumen",
+      plural: true,
       sentences: ["Die Blumen blühen auf der Wiese.", "Rot, blau, gelb und weiß."],
       sound: "chime",
       box: [-66, -124, 136, 124],
@@ -420,6 +422,7 @@ export const hof: Scene = {
     {
       id: "ferkel",
       name: "die Ferkel",
+      plural: true,
       sentences: ["Die Ferkel sind die Kinder vom Schwein.", "Oink! Die Ferkel hüpfen."],
       sound: "oink",
       box: [-74, -64, 150, 64],

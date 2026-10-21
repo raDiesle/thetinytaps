@@ -371,3 +371,123 @@ export function playLullaby() {
     note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }),
   );
 }
+
+/** "Wuuusch!" – a rocket lifts off: a deep rumble and a rush that climbs higher and higher. */
+export function playLaunch() {
+  note({ from: 70, to: 48, duration: 1.4, type: "sawtooth", volume: 0.3, lowpass: 300 });
+  note({ from: 160, to: 1100, duration: 1.2, type: "triangle", volume: 0.12, delay: 0.25 });
+  note({ from: 320, to: 1800, duration: 1, type: "sine", volume: 0.06, delay: 0.45 });
+}
+
+/** Funkel, funkel: quick high notes, like a star glittering. */
+export function playTwinkle() {
+  [7, 5, 6, 4, 7].forEach((step, i) => note({ from: PENTATONIC[step] * 2, duration: 0.25, type: "sine", volume: 0.08, delay: i * 0.09 }));
+}
+
+/** "Wiu, wiu!" – the ufo's beam: a note that slides up and down three times. */
+export function playBeam() {
+  [0, 0.36, 0.72].forEach((delay, i) => {
+    note({ from: 500 + i * 60, to: 1100 + i * 60, duration: 0.18, type: "sine", volume: 0.15, delay });
+    note({ from: 1100 + i * 60, to: 600 + i * 60, duration: 0.16, type: "sine", volume: 0.15, delay: delay + 0.18 });
+  });
+}
+
+/** "Bip, bop, bip!" – a robot talking in short square beeps. */
+export function playRobot() {
+  [880, 660, 990, 520].forEach((freq, i) => note({ from: freq, duration: 0.1, type: "square", volume: 0.07, lowpass: 2500, delay: i * 0.14 }));
+}
+
+/** "Bliep, blop!" – a little alien: a wobbly voice going up, down and up again. */
+export function playAlien() {
+  note({ from: 600, to: 1300, duration: 0.18, type: "triangle", volume: 0.16 });
+  note({ from: 1100, to: 500, duration: 0.2, type: "triangle", volume: 0.16, delay: 0.22 });
+  note({ from: 700, to: 1500, duration: 0.14, type: "triangle", volume: 0.14, delay: 0.46 });
+}
+
+/** "Wusch!" – something flies past: a soft sweep up and down. */
+export function playWhoosh() {
+  note({ from: 300, to: 1600, duration: 0.35, type: "sawtooth", volume: 0.05, lowpass: 1400 });
+  note({ from: 1600, to: 200, duration: 0.5, type: "sine", volume: 0.1, delay: 0.3 });
+}
+
+/** "Rrrring!" – a fire station's alarm bell: fast, bright strokes. */
+export function playAlarm() {
+  for (let i = 0; i < 12; i++) {
+    note({ from: 1320, duration: 0.09, type: "triangle", volume: 0.1, delay: i * 0.08 });
+    note({ from: 2640, duration: 0.06, type: "sine", volume: 0.04, delay: i * 0.08 });
+  }
+}
+
+/** "Trrrillll!" – a whistle with a rolling pea inside. */
+export function playTrill() {
+  [0, 0.55].forEach((start, n) => {
+    for (let i = 0; i < (n ? 8 : 4); i++) note({ from: i % 2 ? 2350 : 2150, duration: 0.05, type: "sine", volume: 0.12, delay: start + i * 0.045 });
+  });
+}
+
+/** White noise through a band-pass filter gliding from `from` to `to` Hz: rushing water, blowing air. */
+function hiss({ from, to = from, duration, volume, delay = 0, q = 1 }: { from: number; to?: number; duration: number; volume: number; delay?: number; q?: number }) {
+  const ac = audio();
+  if (!ac) return;
+  const start = ac.currentTime + delay;
+  const buffer = ac.createBuffer(1, Math.ceil(ac.sampleRate * duration), ac.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const source = ac.createBufferSource();
+  source.buffer = buffer;
+  const filter = ac.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.Q.value = q;
+  filter.frequency.setValueAtTime(from, start);
+  filter.frequency.exponentialRampToValueAtTime(to, start + duration);
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume * masterVolume, start + Math.min(0.08, duration / 4));
+  gain.gain.setValueAtTime(volume * masterVolume, start + duration * 0.6);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  source.connect(filter).connect(gain).connect(ac.destination);
+  source.start(start);
+  source.stop(start + duration);
+}
+
+/** "Wuuusch!" – the toilet flushes: rushing water that swirls down, and a gurgle at the end. */
+export function playFlush() {
+  hiss({ from: 500, to: 1600, duration: 0.7, volume: 0.35, q: 0.8 });
+  hiss({ from: 1600, to: 300, duration: 1.1, volume: 0.3, delay: 0.6, q: 0.8 });
+  [1.4, 1.55, 1.7].forEach((delay, i) => note({ from: 220 + i * 60, to: 520 + i * 80, duration: 0.09, type: "sine", volume: 0.18, delay }));
+}
+
+/** "Ssssss!" – warm air from a hair dryer, with the soft hum of its motor. */
+export function playBlow() {
+  hiss({ from: 1400, to: 1900, duration: 1.3, volume: 0.22, q: 0.6 });
+  note({ from: 180, to: 200, duration: 1.2, type: "sawtooth", volume: 0.05, lowpass: 500 });
+}
+
+/** "Schrubb, schrubb!" – a toothbrush going back and forth. */
+export function playScrub() {
+  for (let i = 0; i < 6; i++) hiss({ from: i % 2 ? 3200 : 2400, duration: 0.13, volume: 0.2, delay: i * 0.17, q: 2 });
+}
+
+/** "Plitsch, platsch!" – splashing water, with a few drops after. */
+export function playSplash() {
+  [0, 0.3].forEach((delay) => hiss({ from: 1800, to: 500, duration: 0.35, volume: 0.3, delay, q: 0.9 }));
+  [0.65, 0.8, 0.92].forEach((delay, i) => note({ from: PENTATONIC[(i * 2 + 3) % PENTATONIC.length] * 2, duration: 0.12, type: "sine", volume: 0.1, delay }));
+}
+
+/** "Tick, tack!" – a clock, high and low in turn. */
+export function playTick() {
+  [0, 0.4, 0.8, 1.2].forEach((delay, i) => note({ from: i % 2 ? 1300 : 1900, duration: 0.04, type: "square", volume: 0.07, lowpass: 3000, delay }));
+}
+
+/** "Tock-tock-tock!" – a woodpecker drumming on a tree: very fast, dry knocks that fade. */
+export function playPeck() {
+  for (let i = 0; i < 12; i++) note({ from: 900, to: 420, duration: 0.035, type: "triangle", volume: 0.3 - i * 0.018, delay: i * 0.055 });
+}
+
+/** "Kuckuck!" – a cuckoo: two soft notes, the second a third lower, twice. */
+export function playCuckoo() {
+  [0, 0.75].forEach((delay) => {
+    note({ from: 784, to: 770, duration: 0.24, type: "sine", volume: 0.28, delay });
+    note({ from: 622, to: 610, duration: 0.34, type: "sine", volume: 0.28, delay: delay + 0.3 });
+  });
+}

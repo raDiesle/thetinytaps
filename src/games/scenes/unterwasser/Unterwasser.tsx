@@ -147,6 +147,7 @@ export const unterwasser: Scene = {
     {
       id: "fische",
       name: "die Fische",
+      plural: true,
       sentences: ["Die Fische schwimmen im Kreis.", "Viele kleine Fische schwimmen zusammen."],
       sound: "blub",
       box: [-142, -72, 288, 124],
@@ -415,6 +416,7 @@ export const unterwasser: Scene = {
     {
       id: "luftblasen",
       name: "die Luftblasen",
+      plural: true,
       sentences: ["Blubb, blubb! Die Luftblasen steigen nach oben.", "Plopp! Die Blasen platzen."],
       sound: "blub",
       box: [-44, -182, 88, 184],
