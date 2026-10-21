@@ -212,9 +212,98 @@ export function playMeow() {
   note({ from: 900, to: 520, duration: 0.35, type: "triangle", volume: 0.2, delay: 0.17 });
 }
 
+/** "Oink, oink!" – two short grunts. */
+export function playOink() {
+  [0, 0.28].forEach((delay) => note({ from: 260, to: 180, duration: 0.14, type: "square", volume: 0.12, lowpass: 700, delay }));
+}
+
+/** "Mäh!" – a bleat: a quick wobble of short notes. */
+export function playBaa() {
+  for (let i = 0; i < 6; i++) note({ from: i % 2 ? 560 : 500, to: 470, duration: 0.09, type: "sawtooth", volume: 0.14, lowpass: 1500, delay: i * 0.08 });
+}
+
+/** "Gack, gack, gaaack!" – a hen. */
+export function playCluck() {
+  [0, 0.18, 0.36].forEach((delay, i) =>
+    note({ from: 700, to: i === 2 ? 900 : 500, duration: i === 2 ? 0.26 : 0.1, type: "triangle", volume: 0.18, lowpass: 2000, delay }),
+  );
+}
+
+/** "Kikeriki!" – the cock crows: three short notes and a long high one. */
+export function playCrow() {
+  [0, 0.14, 0.28].forEach((delay, i) => note({ from: 660 + i * 80, duration: 0.12, type: "sawtooth", volume: 0.12, lowpass: 2200, delay }));
+  note({ from: 980, to: 820, duration: 0.6, type: "sawtooth", volume: 0.12, lowpass: 2200, delay: 0.44 });
+}
+
+/** A horse's whinny: a high, trembling note that falls. */
+export function playNeigh() {
+  for (let i = 0; i < 8; i++) note({ from: 900 - i * 60, to: 840 - i * 60, duration: 0.1, type: "triangle", volume: 0.16, delay: i * 0.08 });
+}
+
+/** "Schuhu!" – an owl, two soft low hoots. */
+export function playHoot() {
+  note({ from: 420, to: 380, duration: 0.25, type: "sine", volume: 0.3 });
+  note({ from: 400, to: 340, duration: 0.5, type: "sine", volume: 0.3, delay: 0.35 });
+}
+
+/** "Quak, quak!" of a frog – lower and rounder than the duck. */
+export function playCroak() {
+  [0, 0.3].forEach((delay) => note({ from: 190, to: 140, duration: 0.16, type: "sawtooth", volume: 0.25, lowpass: 600, delay }));
+}
+
+/** "Roooar!" – a lion's yawn: a low growl that rises and sinks, soft enough for small ears. */
+export function playRoar() {
+  note({ from: 90, to: 150, duration: 0.35, type: "sawtooth", volume: 0.28, lowpass: 500 });
+  note({ from: 150, to: 80, duration: 0.8, type: "sawtooth", volume: 0.28, lowpass: 500, delay: 0.3 });
+  note({ from: 60, to: 45, duration: 0.9, type: "square", volume: 0.08, lowpass: 300, delay: 0.2 });
+}
+
+/** "Törööö!" – an elephant: a brassy note that climbs and holds. */
+export function playTrumpet() {
+  note({ from: 330, to: 620, duration: 0.25, type: "sawtooth", volume: 0.14, lowpass: 1800 });
+  note({ from: 620, to: 560, duration: 0.7, type: "sawtooth", volume: 0.14, lowpass: 1800, delay: 0.22 });
+  note({ from: 1240, to: 1120, duration: 0.6, type: "triangle", volume: 0.04, delay: 0.25 });
+}
+
+/** "Uh, uh, ah, ah!" – a monkey: short hoots that climb. */
+export function playChatter() {
+  for (let i = 0; i < 5; i++) note({ from: 420 + i * 70, to: 620 + i * 90, duration: 0.1, type: "triangle", volume: 0.18, delay: i * 0.13 });
+}
+
+/** "Kraah!" – a parrot or a peacock: a raspy call, twice. */
+export function playSquawk() {
+  [0, 0.35].forEach((delay) => note({ from: 1100, to: 650, duration: 0.22, type: "sawtooth", volume: 0.1, lowpass: 2600, delay }));
+}
+
+/** "Schnapp, schnapp!" – a crocodile's jaw closing twice. */
+export function playSnap() {
+  [0.3, 1].forEach((delay) => {
+    note({ from: 900, to: 180, duration: 0.07, type: "triangle", volume: 0.35, delay });
+    note({ from: 140, to: 90, duration: 0.12, type: "sine", volume: 0.25, delay });
+  });
+}
+
 /** Three hammer knocks. */
 export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));
+}
+
+/** "Muh!" – a long, low moo. */
+export function playMoo() {
+  note({ from: 160, to: 120, duration: 0.9, type: "sawtooth", volume: 0.25, lowpass: 600 });
+}
+
+/** "Mampf, mampf" – three soft crunchy bites. */
+export function playMunch() {
+  [0, 0.28, 0.56].forEach((delay) => {
+    note({ from: 260, to: 140, duration: 0.1, type: "square", volume: 0.1, lowpass: 700, delay });
+    note({ from: 900, to: 500, duration: 0.06, type: "triangle", volume: 0.08, delay: delay + 0.04 });
+  });
+}
+
+/** "Bäh!" – a short, falling grumble, funny rather than sad. */
+export function playYuck() {
+  note({ from: 330, to: 200, duration: 0.35, type: "sawtooth", volume: 0.12, lowpass: 900 });
 }
 
 /** A random soft note, used for shapes and bubbles. */
@@ -232,6 +321,23 @@ export function playCountNote(i: number) {
 export function playChime() {
   tone(PENTATONIC[2], 0.4, "sine", 0.2);
   setTimeout(() => tone(PENTATONIC[5], 0.5, "sine", 0.2), 90);
+}
+
+/** A cheerful brushing tune in steps of the pentatonic scale; null is a rest. */
+const TUNE = [0, 2, 4, 4, 5, 4, 2, null, 1, 3, 4, 3, 2, null, null, null, 0, 2, 4, 4, 5, 4, 5, 6, 7, 5, 4, 2, 0, null, null, null];
+const TUNE_BASS = [130.81, 196.0, 146.83, 196.0];
+
+/** The i-th beat of the brushing tune, which loops; a soft bass note starts every bar. */
+export function playTuneNote(i: number) {
+  const step = TUNE[i % TUNE.length];
+  if (step !== null) note({ from: PENTATONIC[step], duration: 0.26, type: "triangle", volume: 0.12 });
+  if (i % 4 === 0) note({ from: TUNE_BASS[Math.floor(i / 4) % TUNE_BASS.length], duration: 0.9, type: "sine", volume: 0.14 });
+}
+
+/** "Puff!" – a little monster vanishes in a cloud, with a sparkle after. */
+export function playPoof() {
+  note({ from: 900, to: 180, duration: 0.25, type: "sine", volume: 0.25 });
+  note({ from: PENTATONIC[7] * 2, duration: 0.3, type: "sine", volume: 0.08, delay: 0.18 });
 }
 
 /** A slow, soft lullaby falling down the scale, for good night. */

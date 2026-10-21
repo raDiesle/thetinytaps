@@ -20,6 +20,13 @@
       "runtimeArgs": ["dev", "--port", "3010"],
       "port": 3010,
       "autoPort": false
+    },
+    {
+      "name": "preview-pages",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": ["-c", "export PUBLIC_BASE_PATH=/thetinytaps && yarn build && yarn preview --port 3200"],
+      "port": 3200,
+      "autoPort": false
     }
   ]
 }

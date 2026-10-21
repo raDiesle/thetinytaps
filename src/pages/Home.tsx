@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
 import { KID_HOME } from "@/components/GameShell";
+import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { useTitle } from "@/lib/title";
@@ -10,6 +11,9 @@ const GAMES = [
   { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen", text: "Taste drücken – Bild, Buchstabe und Zahl erscheinen." },
   { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder", text: "Wimmelbilder zum Antippen – alles bewegt sich und spricht." },
   { href: "/woerter/", emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
+  { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen", text: "Zwei Minuten putzen, bis alle Zuckermonster weg sind." },
+  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?", text: "Tiere füttern und ihr Zuhause finden." },
+  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle", text: "Den Bären trösten – und üben, was man im Kindergarten tun kann." },
 ];
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
@@ -55,6 +59,7 @@ export function Home() {
           <strong>Kinder-Startseite</strong> – nur große Bilder im Vollbild, das Kind wählt selbst
         </span>
       </Link>
+      <InstallHint />
     </main>
   );
 }

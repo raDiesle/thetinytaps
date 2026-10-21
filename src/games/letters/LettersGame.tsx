@@ -1,8 +1,9 @@
 import { GameShell } from "@/components/GameShell";
+import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
-import { de } from "@/content/de";
+import { sampleLetter } from "@/content/languages";
 import { useStoredSettings } from "@/lib/storage";
 import {
   DEFAULT_LETTERS_SETTINGS,
@@ -16,10 +17,13 @@ import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
 import { TrainPlay } from "./TrainPlay";
 
-const pack = de;
-
 export function LettersGame() {
   const [settings, update] = useStoredSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
+  const languages = useLanguages();
+  const pack = languages.language.pack;
+  const second = languages.second?.pack ?? null;
+  // Examples in the settings, in the chosen language: „Be, wie Bär“.
+  const b = sampleLetter(pack);
 
   return (
     <GameShell
@@ -46,6 +50,8 @@ export function LettersGame() {
               />
             )}
           </SettingsGroup>
+
+          <LanguageSetting settings={languages.settings} update={languages.update} />
 
           <SettingsGroup title="Anzeige">
             <Choice<LetterCase>
@@ -88,16 +94,16 @@ export function LettersGame() {
 
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
-            {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Be, wie Bär!" />}
+            {settings.speech && <VoiceSetting lang={pack.speechLang} sample={pack.letterSentence(b, b.words[0])} />}
             {settings.speech && settings.mode === "free" && (
               <Choice<Announce>
                 label="Ansage"
                 value={settings.announce}
                 onChange={(announce) => update({ announce })}
                 options={[
-                  { value: "letterAndWord", label: "„Be, wie Bär“" },
-                  { value: "word", label: "„Bär“" },
-                  { value: "letter", label: "„Be“" },
+                  { value: "letterAndWord", label: `„${pack.letterSentence(b, b.words[0]).replace(/!$/, "")}“` },
+                  { value: "word", label: `„${b.words[0].word}“` },
+                  { value: "letter", label: `„${b.spoken}“` },
                 ]}
               />
             )}
@@ -140,11 +146,11 @@ export function LettersGame() {
       }
     >
       {settings.mode === "find" ? (
-        <FindPlay pack={pack} settings={settings} />
+        <FindPlay pack={pack} second={second} settings={settings} />
       ) : settings.mode === "train" ? (
         <TrainPlay pack={pack} settings={settings} />
       ) : (
-        <LettersPlay pack={pack} settings={settings} />
+        <LettersPlay pack={pack} second={second} settings={settings} />
       )}
     </GameShell>
   );

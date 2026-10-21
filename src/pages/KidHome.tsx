@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { useNavigate } from "react-router";
 import { GameShell, KID_STATE } from "@/components/GameShell";
 import { SettingsGroup, Toggle } from "@/components/SettingControls";
@@ -20,6 +20,9 @@ interface KidTile {
 const TILES: KidTile[] = [
   { id: "buchstaben", href: "/buchstaben/", emoji: "🔤", title: "Buchstaben und Zahlen" },
   { id: "woerter", href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
+  { id: "zaehne", href: "/zaehne/", emoji: "🦷", title: "Zähne putzen" },
+  { id: "tiere", href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
+  { id: "gefuehle", href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
   ...SCENES.map((s) => ({ id: `bild-${s.id}`, href: `/bilder/${s.id}/`, emoji: s.emoji, title: s.title })),
 ];
 
@@ -31,6 +34,33 @@ const DEFAULT_KID_HOME_SETTINGS: { hidden: string[] } = { hidden: [] };
 /** Time for the spoken name before the game opens. */
 const OPEN_DELAY_MS = 700;
 
+/** Largest tile size, in px. */
+const MAX_TILE = 260;
+
+/** Rows and columns that give `count` square tiles the most room in `width` × `height`. */
+function fitTiles(count: number, width: number, height: number) {
+  const gap = Math.min(width, height) * 0.05;
+  let best = { columns: count, tile: 0 };
+  for (let columns = 1; columns <= count; columns++) {
+    const rows = Math.ceil(count / columns);
+    const tile = Math.min((width - (columns - 1) * gap) / columns, (height - (rows - 1) * gap) / rows);
+    if (tile > best.tile) best = { columns, tile };
+  }
+  return { columns: best.columns, tile: Math.min(MAX_TILE, best.tile * 0.92), gap };
+}
+
+/** The room inside the kid home's padding: room for the exit button on top. */
+function useTileRoom() {
+  const measure = () => ({ width: window.innerWidth - 48, height: window.innerHeight - 96 });
+  const [room, setRoom] = useState(measure);
+  useEffect(() => {
+    const onResize = () => setRoom(measure());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return room;
+}
+
 /**
  * Child-friendly home page (idea A-04): big pictures only, in fullscreen. The
  * child picks a game, which starts right away with the grown-up's saved
@@ -41,6 +71,9 @@ export function KidHome() {
   const navigate = useNavigate();
   const [settings, update] = useStoredSettings(KID_HOME_SETTINGS_KEY, DEFAULT_KID_HOME_SETTINGS);
   const shown = TILES.filter((t) => !settings.hidden.includes(t.id));
+  const tiles = shown.length ? shown : TILES;
+  const room = useTileRoom();
+  const fit = fitTiles(tiles.length, room.width, room.height);
   const [opening, setOpening] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -82,8 +115,11 @@ export function KidHome() {
       }
     >
       <div className="kid-home">
-        <ul className="kid-tiles">
-          {(shown.length ? shown : TILES).map((t) => (
+        <ul
+          className="kid-tiles"
+          style={{ "--tile": `${fit.tile}px`, "--gap": `${fit.gap}px`, "--columns": fit.columns } as CSSProperties}
+        >
+          {tiles.map((t) => (
             <li key={t.id}>
               <button
                 type="button"

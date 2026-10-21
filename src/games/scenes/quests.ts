@@ -61,6 +61,18 @@ const RIDDLE_SOUNDS = new Set<SceneSound>([
   "ring",
   "coo",
   "meow",
+  "moo",
+  "oink",
+  "baa",
+  "cluck",
+  "crow",
+  "neigh",
+  "hoot",
+  "croak",
+  "roar",
+  "trumpet",
+  "chatter",
+  "squawk",
 ]);
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];

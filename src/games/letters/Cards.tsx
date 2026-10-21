@@ -37,6 +37,7 @@ function Reveal({ visible, hint, children }: { visible: boolean; hint: boolean; 
 export function LetterCard({
   letter,
   word,
+  translation,
   stage,
   settings,
   onPointerDown,
@@ -44,6 +45,8 @@ export function LetterCard({
 }: {
   letter: LetterEntry;
   word: WordEntry;
+  /** The word in the second language, shown under it. */
+  translation?: string;
   stage: number;
   settings: LettersSettings;
   onPointerDown?: PointerEventHandler;
@@ -75,6 +78,7 @@ export function LetterCard({
             <span className="first-letter">{word.word.slice(0, 1)}</span>
             {word.word.slice(1)}
           </div>
+          {translation && <div className="translation">{translation}</div>}
         </Reveal>
       )}
       <Reveal visible={visible("picture")} hint={settings.stepByStep}>
