@@ -5,15 +5,17 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 ## Development
 
 ```bash
-npm install
-npm run dev        # http://localhost:3000 (Rsbuild dev server)
-npm run typecheck
-npm run build      # static site in out/
-npm run preview    # serve the built site
+yarn install
+yarn dev           # http://localhost:3000 (Rsbuild dev server)
+yarn typecheck
+yarn build         # static site in out/
+yarn preview       # serve the built site
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 (repo settings → Pages → Source: **GitHub Actions**).
+
+Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 
 ## Structure
 

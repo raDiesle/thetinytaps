@@ -125,7 +125,7 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 
 ## Checks before you finish
 
-1. `npm run typecheck` and `npm run build`.
+1. `yarn typecheck` and `yarn build` (always yarn, never npm).
 2. Preview (`.claude/launch.json`, `preview_start`) at `/bilder/<id>`, then:
    - every item is tappable: for each item, `document.elementFromPoint` inside its
      hit area returns an element within `.item-<id>`;
