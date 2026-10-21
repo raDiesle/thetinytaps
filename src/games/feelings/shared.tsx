@@ -128,7 +128,7 @@ export function Actor({
 }) {
   return (
     <div
-      className={`fg-actor fg-actor-${id} pose-${state.pose} ${className}`}
+      className={`fg-actor fg-actor-${id} pose-${state.pose}${state.x < 0 || state.x > 100 ? " offstage" : ""} ${className}`}
       style={{ left: `${state.x}%`, bottom: `${state.y}%` }}
       onPointerDown={onPointerDown}
     >
@@ -146,8 +146,9 @@ export function Actor({
   );
 }
 
-/** A small picture of a choice: the animals in their poses on a bit of ground, and big signs. */
-export function PictureScene({ picture, place }: { picture: Picture; place: Place }) {
+/** A small picture of a choice: the illustration if there is one, else the animals drawn in their poses with big signs. */
+export function PictureScene({ picture, place, image }: { picture: Picture; place: Place; image?: string }) {
+  if (image) return <img className="fg-scene fg-scene-image" src={image} alt="" decoding="async" draggable={false} />;
   const actors = applyCast({}, picture.cast);
   return (
     <span className={`fg-scene fg-scene-${place === "room" ? "room" : "outdoors"}`} aria-hidden>
@@ -189,12 +190,15 @@ export function ChoiceCard({
   picture,
   place,
   label,
+  image,
   state,
   small = false,
   onChoose,
 }: {
   picture: Picture;
   place: Place;
+  /** An illustration to show instead of the drawn picture. */
+  image?: string;
   label: string;
   state: CardState;
   small?: boolean;
@@ -211,7 +215,7 @@ export function ChoiceCard({
         if (state === "choose") onChoose?.();
       }}
     >
-      <PictureScene picture={picture} place={place} />
+      <PictureScene picture={picture} place={place} image={image} />
       {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
       {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       <span className="fg-card-label">{label}</span>

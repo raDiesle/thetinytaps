@@ -46,6 +46,18 @@
   font-family: var(--font-emoji);
 }
 
+/* What happened, as a picture next to the question. */
+.story-picture {
+  height: clamp(56px, 12vh, 120px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: var(--outline);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 0 var(--ink);
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 /* The feeling's name is part of the game: big, and it pops when it changes. */
 .feeling-tag {
   border: var(--outline);
@@ -106,6 +118,11 @@
 
 .fg-actor-teacher {
   height: 44%;
+}
+
+/* Waiting off stage: on wide screens the drawing goes on past the stage, so hide them there. */
+.fg-actor.offstage {
+  visibility: hidden;
 }
 
 .fg-actor.big {
@@ -555,6 +572,11 @@
   container-type: size;
   border-radius: 15px;
   background: linear-gradient(#c4f1ff 0 87%, #8fd16a 87%);
+}
+
+.fg-scene-image {
+  object-fit: cover;
+  -webkit-user-drag: none;
 }
 
 .fg-scene-room {

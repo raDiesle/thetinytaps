@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { COMFORTS, COMFORTS_NEEDED, FEELINGS, type ComfortId, type Feeling } from "./bear";
 import { blendFace, MOODS } from "./Critter";
+import { bearImages, imageFor, preloadImages } from "./images";
 import { PlaceDrawing } from "./places";
 import type { FeelingsSettings } from "./settings";
 import { Actor, ChoiceCard, FloaterLayer, useFloaters, useTimers, useVoice } from "./shared";
@@ -64,6 +65,7 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
   const startFeeling = useCallback(
     (next: Feeling) => {
       clearAll();
+      preloadImages([bearImages.feeling(next.id), ...next.comforts.map(bearImages.comfort)]);
       setRound(freshRound(next, nextKey.current++));
       say(`${next.intro} ${QUESTION}`);
       if (next.id === "scared") sound("rumble");
@@ -155,9 +157,12 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
     .filter(Boolean)
     .join(" ");
 
+  const feelingImage = imageFor(bearImages.feeling(feeling.id));
+
   return (
     <div className={`story-play bear-play${settings.calm ? " calm" : ""}`} onPointerDown={() => happy && tryNextFeeling()}>
       <header className="story-narration">
+        {feelingImage && <img key={feeling.id} className="story-picture" src={feelingImage} alt="" draggable={false} />}
         <span key={`${round.key}-${happy}`} className="story-tag feeling-tag">
           <span aria-hidden>{happy ? feeling.end.emoji : feeling.emoji}</span> {happy ? feeling.end.name : feeling.name}
         </span>
@@ -203,6 +208,7 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
             <ChoiceCard
               key={id}
               picture={c.picture}
+              image={imageFor(bearImages.comfort(id))}
               place="room"
               label={c.label}
               state={done ? "done" : round.busy || happy ? "rest" : "choose"}
