@@ -1,0 +1,1944 @@
+/* Animations of the Weltall scene. Durations match durationMs in Weltall.tsx. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .wa-bgstar {
+  animation: wa-bg-twinkle 2.6s ease-in-out calc(var(--i) * -0.7s) infinite alternate;
+}
+
+.scene.lively .wa-ufo-body {
+  animation: wa-hover 3s ease-in-out infinite alternate;
+}
+
+.scene.lively .wa-astro-body {
+  animation: wa-hover 4s ease-in-out infinite alternate;
+}
+
+.scene.lively .wa-saturn-spin {
+  animation: wa-ring-spin 6s linear infinite;
+}
+
+.scene.lively .wa-station-beacon,
+.scene.lively .wa-basis-beacon,
+.scene.lively .wa-lander-light,
+.scene.lively .wa-sat-light {
+  animation: wa-light 1.6s ease-in-out infinite;
+}
+
+.scene.lively .wa-rh-tail {
+  animation: wa-wag 0.5s ease-in-out infinite alternate;
+}
+
+/* Lids, puffs, sparkles and lights that only show up in an animation; they can't be tapped meanwhile. */
+.wa-lid,
+.wa-erde-sparkle path,
+.wa-mars-moon,
+.wa-stern-rays,
+.wa-stern-wink,
+.wa-schnuppe-dust path,
+.wa-asteroid-bits circle,
+.wa-komet-sparkle path,
+.wa-ufo-beam,
+.wa-station-light,
+.wa-astro-glint path,
+.wa-saturn-moons circle,
+.wa-saturn-wink,
+.wa-sat-waves path,
+.wa-rakete-smoke circle,
+.wa-rakete-flame,
+.wa-flagge-sparkle path,
+.wa-lander-dust circle,
+.wa-lander-puff circle,
+.wa-solar-sparkle path,
+.wa-basis-light,
+.wa-dish-waves path,
+.wa-gh-drops ellipse,
+.wa-bagger-dust circle,
+.wa-buggy-dust circle,
+.wa-buggy-beam,
+.wa-robo-beeps path,
+.wa-rh-bark path,
+.wa-alien-pop path,
+.wa-baby-hearts path,
+.wa-blume-pollen path,
+.wa-hase-dust circle,
+.wa-maus-crumbs circle,
+.wa-krater-dust circle,
+.wa-krater-sparkle path,
+.wa-kristall-glow,
+.wa-kristall-sparkle path,
+.wa-astra-dust circle,
+.wa-astra-glint path,
+.wa-kiste-sparkle path,
+.wa-tele-star path,
+.wa-tele-glint,
+.wa-ball-dust circle,
+.wa-helm-glint path {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wa-bgstar,
+.wa-erde-glow,
+.wa-erde-sparkle path,
+.wa-schnuppe-dust path,
+.wa-asteroid-bits circle,
+.wa-komet-sparkle path,
+.wa-komet-glow,
+.wa-astro-glint path,
+.wa-rakete-smoke circle,
+.wa-flagge-sparkle path,
+.wa-lander-dust circle,
+.wa-lander-puff circle,
+.wa-solar-sparkle path,
+.wa-gh-flower,
+.wa-bagger-dust circle,
+.wa-buggy-dust circle,
+.wa-robo-beeps path,
+.wa-alien-pop path,
+.wa-baby-hearts path,
+.wa-blume-pollen path,
+.wa-hase-dust circle,
+.wa-maus-crumbs circle,
+.wa-krater-dust circle,
+.wa-krater-sparkle path,
+.wa-kristall-glow,
+.wa-kristall-sparkle path,
+.wa-astra-dust circle,
+.wa-astra-glint path,
+.wa-kiste-sparkle path,
+.wa-tele-star path,
+.wa-ball-dust circle,
+.wa-helm-glint path {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Plants grow up from where they stand. */
+.wa-gh-plant {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+/* Faces wait below their window until someone looks out. */
+.wa-station-face {
+  transform: translateY(14px);
+}
+
+.wa-basis-face {
+  transform: translateY(24px);
+}
+
+@keyframes wa-bg-twinkle {
+  to {
+    opacity: 0.3;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes wa-hover {
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes wa-ring-spin {
+  to {
+    stroke-dashoffset: -156;
+  }
+}
+
+/* A light blinks off and on again. */
+@keyframes wa-light {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes wa-wag {
+  to {
+    transform: rotate(25deg);
+  }
+}
+
+/* An eyelid closes for a moment. */
+@keyframes wa-blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 1;
+  }
+}
+
+/* Something shows for a while and goes again. */
+@keyframes wa-show {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+}
+
+/* Moon dust: grows and fades, drifting a little apart. */
+@keyframes wa-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  25% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1) * 24px), -26px) scale(1.6);
+  }
+}
+
+@keyframes wa-twinkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(90deg);
+  }
+}
+
+@keyframes wa-glow {
+  50% {
+    opacity: 0.7;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes wa-nod {
+  50% {
+    transform: translateY(3px);
+  }
+}
+
+@keyframes wa-wiggle {
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+/* A door or hatch swings open on its hinge and closes again. */
+@keyframes wa-door {
+  0%,
+  10% {
+    transform: none;
+  }
+  28%,
+  74% {
+    transform: scaleX(0.1);
+  }
+  92%,
+  100% {
+    transform: none;
+  }
+}
+
+/* A shout or signal: shows and fades. */
+@keyframes wa-signal {
+  0% {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Erde: turns, its clouds drift, it blinks ---------- */
+
+.item-erde.playing .wa-erde-land {
+  animation: wa-slide 2.4s ease-in-out;
+}
+
+.item-erde.playing .wa-erde-clouds {
+  animation: wa-slide-back 2.4s ease-in-out;
+}
+
+.item-erde.playing .wa-erde-body {
+  animation: wa-erde-wobble 2.4s ease-in-out;
+}
+
+.item-erde.playing .wa-erde-glow {
+  animation: wa-glow 1.2s ease-in-out 2;
+}
+
+.item-erde.playing .wa-lid {
+  animation: wa-blink 0.4s ease-in-out 1.3s;
+}
+
+.item-erde.playing .wa-erde-sparkle path {
+  animation: wa-twinkle 0.9s ease-out calc(0.3s + var(--i) * 0.3s);
+}
+
+@keyframes wa-slide {
+  to {
+    transform: translateX(160px);
+  }
+}
+
+@keyframes wa-slide-back {
+  to {
+    transform: translateX(-160px);
+  }
+}
+
+@keyframes wa-erde-wobble {
+  30% {
+    transform: rotate(-6deg) scale(1.04);
+  }
+  70% {
+    transform: rotate(5deg);
+  }
+}
+
+/* ---------- Mars: spins and bounces, its little moon flies around ---------- */
+
+.item-mars.playing .wa-mars-spots {
+  animation: wa-slide-mars 2.2s ease-in-out;
+}
+
+.item-mars.playing .wa-mars-body {
+  animation: wa-mars-bounce 2.2s ease-in-out;
+}
+
+.item-mars.playing .wa-mars-moon {
+  animation: wa-orbit 2.2s ease-in-out;
+}
+
+.item-mars.playing .wa-lid {
+  animation: wa-blink 0.4s ease-in-out 1.6s;
+}
+
+@keyframes wa-slide-mars {
+  to {
+    transform: translateX(88px);
+  }
+}
+
+@keyframes wa-mars-bounce {
+  25% {
+    transform: translateY(-16px);
+  }
+  50% {
+    transform: none;
+  }
+  70% {
+    transform: translateY(-8px);
+  }
+  85% {
+    transform: none;
+  }
+}
+
+@keyframes wa-orbit {
+  0% {
+    opacity: 0;
+    transform: rotate(0);
+  }
+  12%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Stern: spins, shines and winks ---------- */
+
+.item-stern.playing .wa-stern-body {
+  animation: wa-star-spin 2s ease-in-out;
+}
+
+.item-stern.playing .wa-stern-rays {
+  animation: wa-rays 2s ease-out;
+}
+
+.item-stern.playing .wa-stern-wink {
+  animation: wa-show 0.5s ease-in-out 1.4s;
+}
+
+@keyframes wa-star-spin {
+  50% {
+    transform: rotate(180deg) scale(1.25);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wa-rays {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* ---------- Sternschnuppe: zooms away and comes back ---------- */
+
+.item-sternschnuppe.playing .wa-schnuppe-body {
+  animation: wa-shoot 2.2s ease-in-out;
+}
+
+.item-sternschnuppe.playing .wa-schnuppe-dust path {
+  animation: wa-twinkle 0.8s ease-out calc(0.1s + var(--i) * 0.15s);
+}
+
+@keyframes wa-shoot {
+  35% {
+    opacity: 0;
+    transform: translate(-170px, 70px);
+  }
+  36% {
+    opacity: 0;
+    transform: translate(150px, -60px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Asteroid: tumbles and loses crumbs ---------- */
+
+.item-asteroid.playing .wa-asteroid-body {
+  animation: wa-tumble 2s ease-in-out;
+}
+
+.item-asteroid.playing .wa-asteroid-bits circle {
+  animation: wa-puff 0.9s ease-out calc(0.5s + var(--i) * 0.15s);
+}
+
+@keyframes wa-tumble {
+  50% {
+    transform: translate(-20px, 8px) rotate(200deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Komet: swishes its tail and sparkles ---------- */
+
+.item-komet.playing .wa-komet-body {
+  animation: wa-komet-fly 2.2s ease-in-out;
+}
+
+.item-komet.playing .wa-komet-tail {
+  animation: wa-tail 2.2s ease-in-out;
+}
+
+.item-komet.playing .wa-komet-glow {
+  animation: wa-glow 0.7s ease-in-out 3;
+}
+
+.item-komet.playing .wa-komet-sparkle path {
+  animation: wa-twinkle 0.8s ease-out calc(0.2s + var(--i) * 0.25s);
+}
+
+@keyframes wa-komet-fly {
+  40% {
+    transform: translate(-36px, 6px);
+  }
+  70% {
+    transform: translateX(10px);
+  }
+}
+
+@keyframes wa-tail {
+  30% {
+    transform: scale(1.3, 1.15);
+  }
+  60% {
+    transform: scaleX(0.9);
+  }
+  80% {
+    transform: scaleX(1.1);
+  }
+}
+
+/* ---------- Ufo: wobbles, blinks, shines its beam and the alien waves ---------- */
+
+.item-ufo.playing .wa-ufo-body {
+  animation: wa-ufo-wobble 2.6s ease-in-out;
+}
+
+.item-ufo.playing .wa-ufo-light {
+  animation: wa-light 0.4s ease-in-out calc(var(--i) * 0.1s) 5;
+}
+
+.item-ufo.playing .wa-ufo-beam {
+  animation: wa-beam 2.6s ease-in-out;
+}
+
+.item-ufo.playing .wa-ufo-arm {
+  animation: wa-ufo-wave 0.35s ease-in-out 0.4s 6 alternate;
+}
+
+.item-ufo.playing .wa-ufo-antenna {
+  animation: wa-wiggle 0.3s ease-in-out 6 alternate;
+}
+
+@keyframes wa-ufo-wobble {
+  15% {
+    transform: translateY(-12px) rotate(-6deg);
+  }
+  35% {
+    transform: translateY(-4px) rotate(6deg);
+  }
+  55% {
+    transform: translateY(-14px) rotate(-4deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(4deg);
+  }
+}
+
+@keyframes wa-beam {
+  0%,
+  20% {
+    opacity: 0;
+  }
+  35%,
+  70% {
+    opacity: 1;
+  }
+  85%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes wa-ufo-wave {
+  to {
+    transform: rotate(-35deg);
+  }
+}
+
+/* ---------- Raumstation: wings turn, windows light up, someone looks out ---------- */
+
+.item-raumstation.playing .wa-station-body {
+  animation: wa-station-turn 2.4s ease-in-out;
+}
+
+.item-raumstation.playing .wa-station-wing {
+  animation: wa-wing-turn 2s ease-in-out calc(var(--i) * 0.2s);
+}
+
+.item-raumstation.playing .wa-station-light {
+  animation: wa-window 1.8s ease-in-out calc(var(--i) * 0.25s);
+}
+
+.item-raumstation.playing .wa-station-face {
+  animation: wa-station-peek 2.4s ease-in-out;
+}
+
+.item-raumstation.playing .wa-station-beacon {
+  animation: wa-light 0.3s ease-in-out 7;
+}
+
+@keyframes wa-station-turn {
+  30% {
+    transform: rotate(-5deg);
+  }
+  70% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes wa-wing-turn {
+  25%,
+  75% {
+    transform: scaleY(0.2);
+  }
+  50% {
+    transform: none;
+  }
+}
+
+@keyframes wa-window {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes wa-station-peek {
+  0%,
+  100% {
+    transform: translateY(14px);
+  }
+  30%,
+  70% {
+    transform: none;
+  }
+}
+
+/* ---------- Astronaut: drifts on the line, kicks and waves ---------- */
+
+.item-astronaut.playing .wa-astro-body {
+  animation: wa-float 2.4s ease-in-out;
+}
+
+.item-astronaut.playing .wa-astro-arm {
+  animation: wa-arm-wave 0.3s ease-in-out 0.3s 6 alternate;
+}
+
+.item-astronaut.playing .wa-astro-leg {
+  animation: wa-kick 0.4s ease-in-out calc(var(--i) * 0.2s) 4 alternate;
+}
+
+.item-astronaut.playing .wa-astro-glint path {
+  animation: wa-twinkle 0.8s ease-out 1.1s;
+}
+
+@keyframes wa-float {
+  30% {
+    transform: translate(6px, -14px) rotate(-8deg);
+  }
+  65% {
+    transform: translate(-4px, -4px) rotate(6deg);
+  }
+}
+
+@keyframes wa-arm-wave {
+  to {
+    transform: rotate(-30deg);
+  }
+}
+
+@keyframes wa-kick {
+  to {
+    transform: rotate(18deg);
+  }
+}
+
+/* ---------- Saturn: the ring turns, the planet rocks, moons fly past, it winks ---------- */
+
+.item-saturn.playing .wa-saturn-spin {
+  animation: wa-ring-spin 2.4s linear;
+}
+
+.item-saturn.playing .wa-saturn-body {
+  animation: wa-saturn-rock 2.4s ease-in-out;
+}
+
+.item-saturn.playing .wa-saturn-moons circle {
+  animation: wa-saturn-moon 2.2s ease-in-out calc(var(--i) * 0.2s);
+}
+
+.item-saturn.playing .wa-saturn-wink {
+  animation: wa-show 0.5s ease-in-out 1.5s;
+}
+
+@keyframes wa-saturn-rock {
+  30% {
+    transform: rotate(-8deg);
+  }
+  70% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes wa-saturn-moon {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc((1 - 2 * var(--i)) * 120px));
+  }
+}
+
+/* ---------- Satellit: turns, flaps, blinks and sends signals ---------- */
+
+.item-satellit.playing .wa-sat-body {
+  animation: wa-sat-turn 2s ease-in-out;
+}
+
+.item-satellit.playing .wa-sat-wing {
+  animation: wa-flap 0.4s ease-in-out calc(var(--i) * 0.1s) 4 alternate;
+}
+
+.item-satellit.playing .wa-sat-waves path {
+  animation: wa-signal 0.7s ease-out calc(0.2s + var(--i) * 0.15s) 2;
+}
+
+.item-satellit.playing .wa-sat-light {
+  animation: wa-light 0.25s ease-in-out 7;
+}
+
+@keyframes wa-sat-turn {
+  30% {
+    transform: rotate(12deg);
+  }
+  70% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes wa-flap {
+  to {
+    transform: scaleX(0.4);
+  }
+}
+
+/* ---------- Sterne: twinkle one after the other ---------- */
+
+.item-sterne.playing .wa-sterne-star {
+  animation: wa-star-twinkle 0.7s ease-in-out calc(var(--i) * 0.25s);
+}
+
+.item-sterne.playing .wa-sterne-lines {
+  animation: wa-lines 2s ease-in-out;
+}
+
+@keyframes wa-star-twinkle {
+  50% {
+    transform: scale(1.5) rotate(36deg);
+  }
+}
+
+@keyframes wa-lines {
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* ---------- Flagge: flutters, the star sparkles ---------- */
+
+.item-flagge.playing .wa-flagge-cloth {
+  animation: wa-flutter 0.5s ease-in-out 4;
+}
+
+.item-flagge.playing .wa-flagge-pole {
+  animation: wa-pole 2s ease-in-out;
+}
+
+.item-flagge.playing .wa-flagge-sparkle path {
+  animation: wa-twinkle 0.8s ease-out calc(0.3s + var(--i) * 0.5s);
+}
+
+@keyframes wa-flutter {
+  25% {
+    transform: skewY(-6deg) scaleX(0.94);
+  }
+  75% {
+    transform: skewY(5deg) scaleX(0.97);
+  }
+}
+
+@keyframes wa-pole {
+  20% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+  80% {
+    transform: rotate(-1deg);
+  }
+}
+
+/* ---------- Solarzellen: tilt to the sun, a gleam runs over them ---------- */
+
+.item-solarzellen.playing .wa-solar-panel {
+  animation: wa-solar-tilt 2.2s ease-in-out;
+}
+
+.item-solarzellen.playing .wa-solar-shine {
+  animation: wa-shine 1.2s ease-in-out 0.4s;
+}
+
+.item-solarzellen.playing .wa-solar-lamp {
+  animation: wa-light 0.3s ease-in-out 6;
+}
+
+.item-solarzellen.playing .wa-solar-sparkle path {
+  animation: wa-twinkle 0.8s ease-out calc(0.9s + var(--i) * 0.3s);
+}
+
+@keyframes wa-solar-tilt {
+  30% {
+    transform: rotate(-8deg);
+  }
+  65% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes wa-shine {
+  to {
+    transform: translateX(330px);
+  }
+}
+
+/* ---------- Antenne: turns and sends signals ---------- */
+
+.item-antenne.playing .wa-dish-turn {
+  animation: wa-dish-turn 2.4s ease-in-out;
+}
+
+.item-antenne.playing .wa-dish-waves path {
+  animation: wa-signal 0.7s ease-out calc(0.4s + var(--i) * 0.15s) 2;
+}
+
+.item-antenne.playing .wa-dish-lamp {
+  animation: wa-light 0.3s ease-in-out 7;
+}
+
+@keyframes wa-dish-turn {
+  25% {
+    transform: rotate(-16deg);
+  }
+  60% {
+    transform: rotate(14deg);
+  }
+  85% {
+    transform: rotate(-4deg);
+  }
+}
+
+/* ---------- Landefähre: bounces, the hatch opens and someone looks out ---------- */
+
+.item-landefaehre.playing .wa-lander-body {
+  animation: wa-lander-bounce 2.6s ease-in-out;
+}
+
+.item-landefaehre.playing .wa-lander-dust circle {
+  animation: wa-puff 0.8s ease-out calc(0.35s + var(--i) * 0.06s);
+}
+
+.item-landefaehre.playing .wa-lander-puff circle {
+  animation: wa-puff 0.6s ease-out calc(var(--i) * 0.1s);
+}
+
+.item-landefaehre.playing .wa-lander-hatch {
+  animation: wa-door 2.6s ease-in-out;
+}
+
+.item-landefaehre.playing .wa-lander-peek {
+  animation: wa-lander-peek 2.6s ease-in-out;
+}
+
+.item-landefaehre.playing .wa-lander-pilot {
+  animation: wa-nod 0.4s ease-in-out 4;
+}
+
+.item-landefaehre.playing .wa-lander-dish {
+  animation: wa-wiggle 0.4s ease-in-out 6 alternate;
+}
+
+.item-landefaehre.playing .wa-lander-light {
+  animation: wa-light 0.3s ease-in-out 8;
+}
+
+@keyframes wa-lander-bounce {
+  12% {
+    transform: translateY(-16px);
+  }
+  28% {
+    transform: none;
+  }
+  36% {
+    transform: translateY(-6px);
+  }
+  44% {
+    transform: none;
+  }
+}
+
+@keyframes wa-lander-peek {
+  0%,
+  30% {
+    transform: translateY(12px);
+  }
+  45% {
+    transform: none;
+  }
+  55% {
+    transform: translateY(-3px);
+  }
+  65% {
+    transform: none;
+  }
+  80%,
+  100% {
+    transform: translateY(12px);
+  }
+}
+
+/* ---------- Mondstation: door opens, someone waves, windows light up ---------- */
+
+.item-mondbasis.playing .wa-basis-door {
+  animation: wa-door 2.6s ease-in-out;
+}
+
+.item-mondbasis.playing .wa-basis-wave {
+  animation: wa-basis-wave 0.3s ease-in-out 0.8s 4 alternate;
+}
+
+.item-mondbasis.playing .wa-basis-light {
+  animation: wa-window 1.8s ease-in-out calc(0.3s + var(--i) * 0.25s);
+}
+
+.item-mondbasis.playing .wa-basis-face {
+  animation: wa-basis-peek 2.4s ease-in-out;
+}
+
+.item-mondbasis.playing .wa-basis-beacon {
+  animation: wa-light 0.3s ease-in-out 8;
+}
+
+.item-mondbasis.playing .wa-basis-ant {
+  animation: wa-ant-wiggle 0.3s ease-in-out 6 alternate;
+}
+
+@keyframes wa-basis-wave {
+  to {
+    transform: rotate(30deg);
+  }
+}
+
+@keyframes wa-basis-peek {
+  0%,
+  100% {
+    transform: translateY(24px);
+  }
+  30%,
+  70% {
+    transform: none;
+  }
+}
+
+@keyframes wa-ant-wiggle {
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+/* ---------- Rakete: rumbles, flies up out of the picture and lands again ---------- */
+
+.item-rakete.playing .wa-rakete-body {
+  animation: wa-launch 3s;
+}
+
+.item-rakete.playing .wa-rakete-flame {
+  animation:
+    wa-flame 3s ease-in-out,
+    wa-flicker 0.15s ease-in-out 20 alternate;
+}
+
+.item-rakete.playing .wa-rakete-smoke circle {
+  animation:
+    wa-smoke 1.1s ease-out calc(0.2s + var(--i) * 0.06s),
+    wa-smoke 0.65s ease-out calc(2.15s + var(--i) * 0.04s);
+}
+
+.item-rakete.playing .wa-rakete-pilot {
+  animation: wa-nod 0.4s ease-in-out 2;
+}
+
+.item-rakete.playing .wa-rakete-light {
+  animation: wa-light 0.3s ease-in-out calc(var(--i) * 0.1s) 8;
+}
+
+@keyframes wa-launch {
+  0% {
+    transform: none;
+  }
+  4% {
+    transform: translateX(-3px);
+  }
+  8% {
+    transform: translateX(3px);
+  }
+  12% {
+    transform: translateX(-2px);
+  }
+  16% {
+    transform: none;
+    animation-timing-function: ease-in;
+  }
+  46%,
+  54% {
+    transform: translateY(-800px);
+    animation-timing-function: ease-out;
+  }
+  92% {
+    transform: none;
+  }
+  96% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-flame {
+  0%,
+  6% {
+    opacity: 0;
+  }
+  12%,
+  90% {
+    opacity: 1;
+  }
+  96%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes wa-flicker {
+  to {
+    transform: scale(0.9, 1.25);
+  }
+}
+
+@keyframes wa-smoke {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  25% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 2) * 34px), -20px) scale(1.8);
+  }
+}
+
+/* ---------- Weltraumblume: spins its petals, nods, waves its leaves ---------- */
+
+.item-weltraumblume.playing .wa-blume-petals {
+  animation: wa-petal-spin 2.2s ease-in-out;
+}
+
+.item-weltraumblume.playing .wa-blume-head {
+  animation: wa-blume-nod 2.2s ease-in-out;
+}
+
+.item-weltraumblume.playing .wa-blume-leaf {
+  animation: wa-leaf 0.4s ease-in-out calc(var(--i) * 0.1s) 4 alternate;
+}
+
+.item-weltraumblume.playing .wa-blume-pollen path {
+  animation: wa-twinkle 0.8s ease-out calc(0.3s + var(--i) * 0.2s);
+}
+
+@keyframes wa-petal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wa-blume-nod {
+  25% {
+    transform: rotate(-10deg);
+  }
+  55% {
+    transform: rotate(8deg);
+  }
+  80% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes wa-leaf {
+  to {
+    transform: rotate(-15deg);
+  }
+}
+
+/* ---------- Gewächshaus: rain inside, plants grow, the door swings ---------- */
+
+.item-gewaechshaus.playing .wa-gh-drops ellipse {
+  animation: wa-drop 0.8s ease-in calc(var(--i) * 0.12s) 2;
+}
+
+.item-gewaechshaus.playing .wa-gh-plant {
+  animation: wa-grow 1.2s ease-in-out calc(0.6s + var(--i) * 0.2s);
+}
+
+.item-gewaechshaus.playing .wa-gh-flower {
+  animation: wa-petal-spin 1.4s ease-in-out 0.6s;
+}
+
+.item-gewaechshaus.playing .wa-gh-door {
+  animation: wa-door 2.4s ease-in-out;
+}
+
+@keyframes wa-drop {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(70px);
+  }
+}
+
+@keyframes wa-grow {
+  50% {
+    transform: scale(1.04, 1.18);
+  }
+}
+
+/* ---------- Außerirdischer: jumps, waves, wiggles its antennae and blinks ---------- */
+
+.item-ausserirdischer.playing .wa-alien-body {
+  animation: wa-alien-jump 2.2s ease-in-out;
+}
+
+.item-ausserirdischer.playing .wa-alien-wave {
+  animation: wa-alien-wave 0.3s ease-in-out 0.2s 6 alternate;
+}
+
+.item-ausserirdischer.playing .wa-alien-arm {
+  animation: wa-alien-arm 0.5s ease-in-out 2 alternate;
+}
+
+.item-ausserirdischer.playing .wa-alien-ant {
+  animation: wa-wiggle 0.25s ease-in-out calc(var(--i) * 0.1s) 8 alternate;
+}
+
+.item-ausserirdischer.playing .wa-alien-head {
+  animation: wa-alien-tilt 2.2s ease-in-out;
+}
+
+.item-ausserirdischer.playing .wa-lid {
+  animation: wa-blink 0.4s ease-in-out 1.6s;
+}
+
+.item-ausserirdischer.playing .wa-alien-pop path {
+  animation: wa-twinkle 0.9s ease-out calc(0.4s + var(--i) * 0.3s);
+}
+
+@keyframes wa-alien-jump {
+  10% {
+    transform: scale(1.06, 0.9);
+  }
+  30% {
+    transform: translateY(-50px) scale(0.96, 1.05);
+  }
+  50% {
+    transform: scale(1.06, 0.92);
+  }
+  58% {
+    transform: none;
+  }
+}
+
+@keyframes wa-alien-wave {
+  to {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes wa-alien-arm {
+  to {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes wa-alien-tilt {
+  60% {
+    transform: rotate(8deg);
+  }
+  80% {
+    transform: rotate(-5deg);
+  }
+}
+
+/* ---------- Mondbagger: rolls forward, digs moon dust and rolls back ---------- */
+
+.item-mondbagger.playing .wa-bagger-body {
+  animation: wa-bagger-roll 2.4s ease-in-out;
+}
+
+.item-mondbagger.playing .wa-bagger-wheel {
+  animation: wa-bagger-wheel 2.4s ease-in-out;
+}
+
+.item-mondbagger.playing .wa-bagger-arm {
+  animation: wa-dig 2.4s ease-in-out;
+}
+
+.item-mondbagger.playing .wa-bagger-bucket {
+  animation: wa-scoop 2.4s ease-in-out;
+}
+
+.item-mondbagger.playing .wa-bagger-dust circle {
+  animation: wa-puff 0.8s ease-out calc(0.8s + var(--i) * 0.1s);
+}
+
+.item-mondbagger.playing .wa-bagger-beacon {
+  animation: wa-light 0.3s ease-in-out 8;
+}
+
+.item-mondbagger.playing .wa-bagger-driver {
+  animation: wa-nod 0.4s ease-in-out 4;
+}
+
+@keyframes wa-bagger-roll {
+  20% {
+    transform: translateX(14px) rotate(-1deg);
+  }
+  50% {
+    transform: translateX(14px) rotate(1deg);
+  }
+  75% {
+    transform: none;
+  }
+}
+
+@keyframes wa-bagger-wheel {
+  20%,
+  50% {
+    transform: rotate(30deg);
+  }
+  75%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-dig {
+  25%,
+  40% {
+    transform: rotate(16deg);
+  }
+  65%,
+  80% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes wa-scoop {
+  35% {
+    transform: rotate(-25deg);
+  }
+  55%,
+  80% {
+    transform: rotate(25deg);
+  }
+}
+
+/* ---------- Alien-Baby: bounces, shakes its rattle, sends hearts ---------- */
+
+.item-alienbaby.playing .wa-baby-body {
+  animation: wa-baby-bounce 0.5s ease-in-out 4;
+}
+
+.item-alienbaby.playing .wa-baby-rattle {
+  animation: wa-rattle 0.15s ease-in-out 12 alternate;
+}
+
+.item-alienbaby.playing .wa-baby-ant {
+  animation: wa-wiggle 0.25s ease-in-out 6 alternate;
+}
+
+.item-alienbaby.playing .wa-lid {
+  animation: wa-blink 0.4s ease-in-out 1.3s;
+}
+
+.item-alienbaby.playing .wa-baby-hearts path {
+  animation: wa-heart 1s ease-out calc(0.3s + var(--i) * 0.25s);
+}
+
+@keyframes wa-baby-bounce {
+  30% {
+    transform: scale(1.08, 0.88);
+  }
+  60% {
+    transform: translateY(-14px) scale(0.96, 1.06);
+  }
+}
+
+@keyframes wa-rattle {
+  to {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes wa-heart {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+/* ---------- Mondauto: drives off and back, bumping along ---------- */
+
+.item-buggy.playing .wa-buggy-body {
+  animation: wa-buggy-drive 2.4s ease-in-out;
+}
+
+.item-buggy.playing .wa-buggy-wheel {
+  animation: wa-buggy-wheel 2.4s ease-in-out;
+}
+
+.item-buggy.playing .wa-buggy-flag {
+  animation: wa-flutter 0.4s ease-in-out 6;
+}
+
+.item-buggy.playing .wa-buggy-dish {
+  animation: wa-wiggle 0.4s ease-in-out 6 alternate;
+}
+
+.item-buggy.playing .wa-buggy-beam {
+  animation: wa-show 2.4s ease-in-out;
+}
+
+.item-buggy.playing .wa-buggy-arm {
+  animation: wa-steer 0.3s ease-in-out 8 alternate;
+}
+
+.item-buggy.playing .wa-buggy-dust circle {
+  animation: wa-puff 0.8s ease-out calc(var(--i) * 0.08s);
+}
+
+@keyframes wa-buggy-drive {
+  15% {
+    transform: translate(30px, -6px);
+  }
+  30%,
+  45% {
+    transform: translateX(60px);
+  }
+  70% {
+    transform: translate(20px, -5px);
+  }
+  90%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-buggy-wheel {
+  30%,
+  45% {
+    transform: rotate(115deg);
+  }
+  90%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-steer {
+  to {
+    transform: rotate(-8deg);
+  }
+}
+
+/* ---------- Mondhase: hops very high and lands softly ---------- */
+
+.item-mondhase.playing .wa-hase-body {
+  animation: wa-moon-hop 2.2s ease-in-out;
+}
+
+.item-mondhase.playing .wa-hase-ear {
+  animation: wa-ear-flop 0.5s ease-in-out calc(var(--i) * 0.1s) 4 alternate;
+}
+
+.item-mondhase.playing .wa-hase-nose {
+  animation: wa-twitch 0.12s ease-in-out 10 alternate;
+}
+
+.item-mondhase.playing .wa-hase-carrot {
+  animation: wa-wiggle 0.3s ease-in-out 6 alternate;
+}
+
+.item-mondhase.playing .wa-lid {
+  animation: wa-blink 0.4s ease-in-out 1.75s;
+}
+
+.item-mondhase.playing .wa-hase-dust circle {
+  animation:
+    wa-puff 0.5s ease-out calc(var(--i) * 0.05s),
+    wa-puff 0.5s ease-out calc(1.6s + var(--i) * 0.05s);
+}
+
+@keyframes wa-moon-hop {
+  8% {
+    transform: scale(1.08, 0.88);
+  }
+  20% {
+    transform: translateY(-60px) scale(0.96, 1.06);
+  }
+  40% {
+    transform: translateY(-110px) rotate(-6deg);
+  }
+  62% {
+    transform: translateY(-40px);
+  }
+  76% {
+    transform: scale(1.08, 0.9);
+  }
+  86%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-ear-flop {
+  to {
+    transform: rotate(calc((2 * var(--i) - 1) * 18deg));
+  }
+}
+
+@keyframes wa-twitch {
+  to {
+    transform: translateY(-1.5px) scale(1.15);
+  }
+}
+
+/* ---------- Krater: stones hop out, dust puffs ---------- */
+
+.item-krater.playing .wa-krater-stone {
+  animation: wa-stone-hop 1.2s ease-in-out calc(var(--i) * 0.2s);
+}
+
+.item-krater.playing .wa-krater-dust circle {
+  animation: wa-puff 0.8s ease-out calc(0.9s + var(--i) * 0.08s);
+}
+
+.item-krater.playing .wa-krater-sparkle path {
+  animation: wa-twinkle 0.8s ease-out calc(0.2s + var(--i) * 0.2s);
+}
+
+@keyframes wa-stone-hop {
+  40% {
+    transform: translateY(-70px) rotate(120deg);
+  }
+  75% {
+    transform: rotate(200deg);
+  }
+  87% {
+    transform: translateY(-8px) rotate(280deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---------- Roboterhund: hops, barks, wags, flips its ears ---------- */
+
+.item-roboterhund.playing .wa-rh-body {
+  animation: wa-rh-hop 2s ease-in-out;
+}
+
+.item-roboterhund.playing .wa-rh-head {
+  animation: wa-rh-head 2s ease-in-out;
+}
+
+.item-roboterhund.playing .wa-rh-bark path {
+  animation: wa-signal 0.25s ease-out calc(1.3s + var(--i) * 0.03s) 2;
+}
+
+.item-roboterhund.playing .wa-rh-tail {
+  animation: wa-wag 0.15s ease-in-out 12 alternate;
+}
+
+.item-roboterhund.playing .wa-rh-ear {
+  animation: wa-ear-flip 0.4s ease-in-out calc(var(--i) * 0.1s) 2;
+}
+
+.item-roboterhund.playing .wa-rh-eyes {
+  animation: wa-eye-blink 0.3s ease-in-out 0.9s;
+}
+
+.item-roboterhund.playing .wa-rh-leg {
+  animation: wa-kick 0.3s ease-in-out calc(var(--i) * 0.07s) 2 alternate;
+}
+
+.item-roboterhund.playing .wa-rh-light {
+  animation: wa-light 0.25s ease-in-out calc(var(--i) * 0.08s) 6;
+}
+
+@keyframes wa-rh-hop {
+  15% {
+    transform: translateY(-22px);
+  }
+  30% {
+    transform: none;
+  }
+  45% {
+    transform: translateY(-14px);
+  }
+  60% {
+    transform: none;
+  }
+}
+
+@keyframes wa-rh-head {
+  65%,
+  80% {
+    transform: rotate(-12deg);
+  }
+  72%,
+  88% {
+    transform: none;
+  }
+}
+
+@keyframes wa-ear-flip {
+  50% {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes wa-eye-blink {
+  50% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* ---------- Kristall: glows, shimmers and sparkles ---------- */
+
+.item-kristall.playing .wa-kristall-glow {
+  animation: wa-crystal-glow 1s ease-in-out 2;
+}
+
+.item-kristall.playing .wa-kristall-shard {
+  animation: wa-shard 0.4s ease-in-out calc(var(--i) * 0.12s) 4 alternate;
+}
+
+.item-kristall.playing .wa-kristall-sparkle path {
+  animation: wa-twinkle 0.8s ease-out calc(0.2s + var(--i) * 0.3s);
+}
+
+@keyframes wa-crystal-glow {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes wa-shard {
+  to {
+    transform: translateY(-5px) rotate(calc((var(--i) - 1) * 5deg));
+  }
+}
+
+/* ---------- Helm: wobbles, and a little alien peeks out ---------- */
+
+.item-helm.playing .wa-helm-body {
+  animation: wa-helm-wobble 2s ease-in-out;
+}
+
+.item-helm.playing .wa-helm-guest {
+  animation: wa-helm-peek 2s ease-in-out;
+}
+
+.item-helm.playing .wa-helm-glint path {
+  animation: wa-twinkle 0.8s ease-out calc(0.2s + var(--i) * 0.4s);
+}
+
+@keyframes wa-helm-wobble {
+  15% {
+    transform: rotate(-8deg);
+  }
+  30% {
+    transform: rotate(6deg);
+  }
+  45% {
+    transform: rotate(-4deg);
+  }
+  60% {
+    transform: none;
+  }
+}
+
+@keyframes wa-helm-peek {
+  0%,
+  20% {
+    transform: none;
+  }
+  35%,
+  60%,
+  70% {
+    transform: translateY(-44px);
+  }
+  48% {
+    transform: translateY(-40px) rotate(-8deg);
+  }
+  85%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Ball: bounces very high, three times ---------- */
+
+.item-mondball.playing .wa-ball-body {
+  animation: wa-ball-bounce 2s;
+}
+
+.item-mondball.playing .wa-ball-spin {
+  animation: wa-petal-spin 2s ease-out;
+}
+
+/* Dust puffs up where the ball lands. */
+.item-mondball.playing .wa-ball-dust circle {
+  animation:
+    wa-puff 0.5s ease-out calc(0.8s + var(--i) * 0.04s),
+    wa-puff 0.4s ease-out calc(1.48s + var(--i) * 0.04s);
+}
+
+@keyframes wa-ball-bounce {
+  0% {
+    transform: none;
+    animation-timing-function: ease-out;
+  }
+  20% {
+    transform: translateY(-160px);
+    animation-timing-function: ease-in;
+  }
+  40% {
+    transform: scale(1.1, 0.85);
+    animation-timing-function: ease-out;
+  }
+  58% {
+    transform: translateY(-80px);
+    animation-timing-function: ease-in;
+  }
+  74% {
+    transform: scale(1.06, 0.9);
+    animation-timing-function: ease-out;
+  }
+  86% {
+    transform: translateY(-26px);
+    animation-timing-function: ease-in;
+  }
+  96%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Kiste: the lid opens and a star on a spring jumps out ---------- */
+
+.item-kiste.playing .wa-kiste-lid {
+  animation: wa-kiste-lid 2.2s ease-in-out;
+}
+
+.item-kiste.playing .wa-kiste-surprise {
+  animation: wa-surprise 2.2s ease-in-out;
+}
+
+.item-kiste.playing .wa-kiste-box {
+  animation: wa-box-shake 0.4s ease-in-out;
+}
+
+.item-kiste.playing .wa-kiste-sparkle path {
+  animation: wa-twinkle 0.8s ease-out calc(0.7s + var(--i) * 0.15s);
+}
+
+@keyframes wa-kiste-lid {
+  0%,
+  10% {
+    transform: none;
+  }
+  25%,
+  75% {
+    transform: rotate(-70deg);
+  }
+  90%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-surprise {
+  0%,
+  18% {
+    transform: none;
+  }
+  34% {
+    transform: translateY(-92px);
+  }
+  42% {
+    transform: translateY(-76px);
+  }
+  50% {
+    transform: translateY(-86px);
+  }
+  70% {
+    transform: translateY(-84px);
+  }
+  84%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-box-shake {
+  25% {
+    transform: rotate(-2deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+/* ---------- Maus: climbs out of the cheese, nibbles, swishes its tail ---------- */
+
+.item-maus.playing .wa-maus-body {
+  animation: wa-maus-climb 2.2s ease-in-out;
+}
+
+.item-maus.playing .wa-maus-head {
+  animation: wa-nibble 0.2s ease-in-out 0.5s 6 alternate;
+}
+
+.item-maus.playing .wa-maus-ear {
+  animation: wa-wiggle 0.25s ease-in-out calc(var(--i) * 0.1s) 6 alternate;
+}
+
+.item-maus.playing .wa-maus-tail {
+  animation: wa-tail-swish 0.35s ease-in-out 6 alternate;
+}
+
+.item-maus.playing .wa-maus-crumbs circle {
+  animation: wa-puff 0.7s ease-out calc(0.6s + var(--i) * 0.2s);
+}
+
+.item-maus.playing .wa-lid {
+  animation: wa-blink 0.4s ease-in-out 1.6s;
+}
+
+@keyframes wa-maus-climb {
+  20%,
+  70% {
+    transform: translateY(-34px);
+  }
+  90%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes wa-nibble {
+  to {
+    transform: translateY(2px) rotate(6deg);
+  }
+}
+
+@keyframes wa-tail-swish {
+  to {
+    transform: rotate(-18deg);
+  }
+}
+
+/* ---------- Astronautin: a slow moon hop, waving ---------- */
+
+.item-astronautin.playing .wa-astra-body {
+  animation: wa-astra-hop 2.6s ease-in-out;
+}
+
+.item-astronautin.playing .wa-astra-arm {
+  animation: wa-arm-wave 0.35s ease-in-out 0.2s 6 alternate;
+}
+
+.item-astronautin.playing .wa-astra-leg {
+  animation: wa-astra-tuck 2.6s ease-in-out;
+}
+
+.item-astronautin.playing .wa-astra-button {
+  animation: wa-light 0.3s ease-in-out calc(var(--i) * 0.1s) 7;
+}
+
+.item-astronautin.playing .wa-astra-dust circle {
+  animation:
+    wa-puff 0.5s ease-out calc(var(--i) * 0.05s),
+    wa-puff 0.5s ease-out calc(2s + var(--i) * 0.05s);
+}
+
+.item-astronautin.playing .wa-astra-glint path {
+  animation: wa-twinkle 0.8s ease-out 0.8s;
+}
+
+@keyframes wa-astra-hop {
+  10% {
+    transform: translateY(4px) scaleY(0.96);
+  }
+  45% {
+    transform: translateY(-80px);
+  }
+  80% {
+    transform: none;
+  }
+  88% {
+    transform: translateY(3px) scaleY(0.97);
+  }
+}
+
+@keyframes wa-astra-tuck {
+  30%,
+  60% {
+    transform: rotate(calc((1 - 2 * var(--i)) * 14deg));
+  }
+}
+
+/* ---------- Fernrohr: looks up, the lens glints, a star appears ---------- */
+
+.item-fernrohr.playing .wa-tele-tube {
+  animation: wa-tele-look 2.2s ease-in-out;
+}
+
+.item-fernrohr.playing .wa-tele-glint {
+  animation: wa-show 0.6s ease-in-out 0.8s;
+}
+
+.item-fernrohr.playing .wa-tele-star path {
+  animation: wa-twinkle 1s ease-out calc(0.7s + var(--i) * 0.3s);
+}
+
+@keyframes wa-tele-look {
+  30%,
+  65% {
+    transform: rotate(-14deg);
+  }
+  85% {
+    transform: rotate(4deg);
+  }
+}
+
+/* ---------- Roboter: rolls, lifts its arms, turns its head, beeps ---------- */
+
+.item-roboter.playing .wa-robo-body {
+  animation: wa-robo-roll 2.4s ease-in-out;
+}
+
+.item-roboter.playing .wa-robo-wheel {
+  animation: wa-robo-wheel 2.4s ease-in-out;
+}
+
+.item-roboter.playing .wa-robo-arm {
+  animation: wa-robo-arms 2.4s ease-in-out;
+}
+
+.item-roboter.playing .wa-robo-head {
+  animation: wa-robo-head 2.4s ease-in-out;
+}
+
+.item-roboter.playing .wa-robo-eyes {
+  animation: wa-eye-blink 0.3s ease-in-out 1.7s;
+}
+
+.item-roboter.playing .wa-robo-light {
+  animation: wa-light 0.3s ease-in-out calc(var(--i) * 0.1s) 7;
+}
+
+.item-roboter.playing .wa-robo-ant {
+  animation: wa-light 0.2s ease-in-out 10;
+}
+
+.item-roboter.playing .wa-robo-beeps path {
+  animation: wa-twinkle 0.8s ease-out calc(0.2s + var(--i) * 0.3s);
+}
+
+@keyframes wa-robo-roll {
+  25% {
+    transform: translateX(-18px);
+  }
+  50% {
+    transform: translateX(14px);
+  }
+  75% {
+    transform: translateX(-6px);
+  }
+}
+
+@keyframes wa-robo-wheel {
+  25% {
+    transform: rotate(-43deg);
+  }
+  50% {
+    transform: rotate(33deg);
+  }
+  75% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes wa-robo-arms {
+  20%,
+  60% {
+    transform: rotate(calc((1 - 2 * var(--i)) * 60deg));
+  }
+}
+
+@keyframes wa-robo-head {
+  20% {
+    transform: rotate(-14deg);
+  }
+  45% {
+    transform: rotate(14deg);
+  }
+  70% {
+    transform: none;
+  }
+}

@@ -371,3 +371,41 @@ export function playLullaby() {
     note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }),
   );
 }
+
+/** "Wuuusch!" – a rocket lifts off: a deep rumble and a rush that climbs higher and higher. */
+export function playLaunch() {
+  note({ from: 70, to: 48, duration: 1.4, type: "sawtooth", volume: 0.3, lowpass: 300 });
+  note({ from: 160, to: 1100, duration: 1.2, type: "triangle", volume: 0.12, delay: 0.25 });
+  note({ from: 320, to: 1800, duration: 1, type: "sine", volume: 0.06, delay: 0.45 });
+}
+
+/** Funkel, funkel: quick high notes, like a star glittering. */
+export function playTwinkle() {
+  [7, 5, 6, 4, 7].forEach((step, i) => note({ from: PENTATONIC[step] * 2, duration: 0.25, type: "sine", volume: 0.08, delay: i * 0.09 }));
+}
+
+/** "Wiu, wiu!" – the ufo's beam: a note that slides up and down three times. */
+export function playBeam() {
+  [0, 0.36, 0.72].forEach((delay, i) => {
+    note({ from: 500 + i * 60, to: 1100 + i * 60, duration: 0.18, type: "sine", volume: 0.15, delay });
+    note({ from: 1100 + i * 60, to: 600 + i * 60, duration: 0.16, type: "sine", volume: 0.15, delay: delay + 0.18 });
+  });
+}
+
+/** "Bip, bop, bip!" – a robot talking in short square beeps. */
+export function playRobot() {
+  [880, 660, 990, 520].forEach((freq, i) => note({ from: freq, duration: 0.1, type: "square", volume: 0.07, lowpass: 2500, delay: i * 0.14 }));
+}
+
+/** "Bliep, blop!" – a little alien: a wobbly voice going up, down and up again. */
+export function playAlien() {
+  note({ from: 600, to: 1300, duration: 0.18, type: "triangle", volume: 0.16 });
+  note({ from: 1100, to: 500, duration: 0.2, type: "triangle", volume: 0.16, delay: 0.22 });
+  note({ from: 700, to: 1500, duration: 0.14, type: "triangle", volume: 0.14, delay: 0.46 });
+}
+
+/** "Wusch!" – something flies past: a soft sweep up and down. */
+export function playWhoosh() {
+  note({ from: 300, to: 1600, duration: 0.35, type: "sawtooth", volume: 0.05, lowpass: 1400 });
+  note({ from: 1600, to: 200, duration: 0.5, type: "sine", volume: 0.1, delay: 0.3 });
+}
