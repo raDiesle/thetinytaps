@@ -1,7 +1,7 @@
 import { GameShell } from "@/components/GameShell";
 import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { TouchKeysSetting } from "@/components/TouchKeyboard";
+import { TouchKeysSetting, useTouchKeys } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { sampleLetter } from "@/content/languages";
 import { useStoredSettings } from "@/lib/storage";
@@ -24,6 +24,7 @@ export function LettersGame() {
   const second = languages.second?.pack ?? null;
   // Examples in the settings, in the chosen language: „Be, wie Bär“.
   const b = sampleLetter(pack);
+  const touchKeys = useTouchKeys(settings.touchKeys);
 
   return (
     <GameShell
@@ -44,7 +45,11 @@ export function LettersGame() {
             />
             {settings.mode === "find" && (
               <Toggle
-                label="Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"
+                label={
+                  touchKeys
+                    ? "Gesuchte Taste aufleuchten lassen, wenn es länger dauert"
+                    : "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"
+                }
                 checked={settings.hints}
                 onChange={(hints) => update({ hints })}
               />
@@ -139,9 +144,7 @@ export function LettersGame() {
             )}
           </SettingsGroup>
 
-          <SettingsGroup title="Tablet">
-            <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} />
-          </SettingsGroup>
+          <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} />
         </>
       }
     >

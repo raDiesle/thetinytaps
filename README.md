@@ -55,7 +55,14 @@ presses a key. Parents can turn on speech, idle movement and the keys mode
 
 All games work by touch. The letters and words games show big letter keys on
 the screen on touch-only devices (tablets, phones); parents can switch them to
-"Immer" or "Nie" on the start screen. On iPad the games go fullscreen; on
+"Immer" or "Nie" on the start screen.
+
+The start screens only offer what fits the device (`src/lib/device.ts`): on
+tablets and phones (every pointer is a finger) the keys mode of "Lebendige
+Bilder" and the keyboard hints (Esc, arrow keys) are hidden, and a saved keys
+mode falls back to tapping; on computers without a touch screen the on-screen
+keys option is hidden and the keys stay off. On a phone held upright the
+pictures show a "Quer halten" note, since the wide picture gets tiny. On iPad the games go fullscreen; on
 iPhone (no fullscreen in Safari) add the page to the home screen to hide the
 browser bars.
 

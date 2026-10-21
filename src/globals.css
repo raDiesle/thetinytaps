@@ -2139,6 +2139,49 @@ kbd {
   animation: none;
 }
 
+/* A note for the grown-up, below the picture; the picture stays playable. */
+.scene-rotate {
+  display: none;
+}
+
+@media (orientation: portrait) and (max-width: 600px) and (pointer: coarse) {
+  .scene-rotate {
+    position: absolute;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: fit-content;
+    max-width: calc(100% - 32px);
+    margin: 0 auto;
+    padding: 10px 22px 10px 14px;
+    border-radius: 99px;
+    background: #fff;
+    box-shadow: 0 6px 0 #00000014;
+    font-weight: 700;
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  .scene-rotate-phone {
+    font-size: 2rem;
+    animation: turn-phone 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes turn-phone {
+  0%,
+  30% {
+    transform: rotate(0);
+  }
+  60%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
 /* Unless the picture may move by itself, nothing moves without the child doing something. */
 .scene:not(.lively) .scene-prompt,
 .scene:not(.lively) .scene-hint {

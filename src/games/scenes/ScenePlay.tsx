@@ -657,6 +657,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         </div>
       )}
       {!questMode && !touched && <p className="scene-prompt">{(colouring ? COLOUR_PROMPTS : PROMPTS)[settings.trigger]}</p>}
+      {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
+      <p className="scene-rotate">
+        <span className="scene-rotate-phone" aria-hidden>
+          📱
+        </span>
+        Quer halten – dann wird das Bild groß
+      </p>
       <BurstLayer bursts={bursts} />
     </div>
   );

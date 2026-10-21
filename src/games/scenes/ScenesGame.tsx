@@ -2,6 +2,7 @@ import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
+import { useDevice, type Device } from "@/lib/device";
 import { useStoredSettings } from "@/lib/storage";
 import { findScene } from ".";
 import { ScenePlay } from "./ScenePlay";
@@ -17,7 +18,10 @@ import {
 const pack = de;
 
 export function ScenesGame({ sceneId }: { sceneId: string }) {
-  const [settings, update] = useStoredSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
+  const [stored, update] = useStoredSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
+  const device = useDevice();
+  // Tablets and phones have no keys, and the finger is right on the picture anyway.
+  const settings = device.touchOnly && stored.trigger === "keys" ? { ...stored, trigger: "tap" as const } : stored;
   const scene = findScene(sceneId);
   if (!scene) return null;
   const questMode = isQuestMode(settings.mode);
@@ -47,11 +51,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               label="Auslösen"
               value={settings.trigger}
               onChange={(trigger) => update({ trigger })}
-              options={[
-                { value: "tap", label: "👆 Antippen / Klicken" },
-                { value: "hover", label: "🖱️ Darüberfahren / Wischen" },
-                { value: "keys", label: "⌨️ Jedes Ding hat eine Taste, oder Pfeile + Leertaste (mit Tastatur)" },
-              ]}
+              options={triggerOptions(device)}
             />
             {settings.trigger === "keys" && (
               <Toggle
@@ -116,4 +116,20 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       <ScenePlay scene={scene} settings={settings} speechLang={pack.speechLang} />
     </GameShell>
   );
+}
+
+/** The ways to bring the picture to life, worded for this device; the keys only where there is a keyboard. */
+function triggerOptions(device: Device): { value: SceneTrigger; label: string }[] {
+  if (device.touchOnly) {
+    return [
+      { value: "tap", label: "👆 Antippen" },
+      { value: "hover", label: "👆 Wischen (Finger übers Bild ziehen)" },
+    ];
+  }
+  // With a mouse, keys are often easier for the youngest than aiming and clicking.
+  const keys = { value: "keys" as const, label: "⌨️ Jedes Ding hat eine Taste, oder Pfeile + Leertaste" };
+  if (!device.hasTouch) {
+    return [{ value: "tap", label: "🖱️ Klicken" }, { value: "hover", label: "🖱️ Mit der Maus darüberfahren" }, keys];
+  }
+  return [{ value: "tap", label: "👆 Antippen / Klicken" }, { value: "hover", label: "🖱️ Darüberfahren / Wischen" }, keys];
 }

@@ -2,6 +2,7 @@ import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
+import { useDevice } from "@/lib/device";
 import { useStoredSettings } from "@/lib/storage";
 import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes } from "./settings";
 import { KAI } from "./steps";
@@ -9,6 +10,7 @@ import { TeethPlay } from "./TeethPlay";
 
 export function TeethGame() {
   const [settings, update] = useStoredSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
+  const { touchOnly } = useDevice();
 
   return (
     <GameShell
@@ -32,9 +34,11 @@ export function TeethGame() {
               Mal, ob der Mund weit auf ist oder die Zähne zusammen sind und welche Zähne gerade dran sind; dort verschwinden die
               Zuckermonster nach und nach. Der Bildschirm bleibt dabei an.
             </p>
-            <p className="setting-note">
-              Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
-            </p>
+            {!touchOnly && (
+              <p className="setting-note">
+                Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
+              </p>
+            )}
           </SettingsGroup>
 
           <SettingsGroup title="Ton">

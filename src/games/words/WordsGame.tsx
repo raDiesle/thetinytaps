@@ -113,9 +113,7 @@ export function WordsGame() {
             />
           </SettingsGroup>
 
-          <SettingsGroup title="Tablet">
-            <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} />
-          </SettingsGroup>
+          <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} />
         </>
       }
     >

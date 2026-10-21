@@ -1,20 +1,17 @@
-import { useState, type CSSProperties, type PointerEvent } from "react";
+import type { CSSProperties, PointerEvent } from "react";
+import { useDevice } from "@/lib/device";
 import { BRIGHT_COLORS } from "./Bursts";
-import { Choice } from "./SettingControls";
+import { Choice, SettingsGroup } from "./SettingControls";
 
 /** Show big keys on the screen: only on touch devices without mouse or trackpad ("auto"), always, or never. */
 export type TouchKeysMode = "auto" | "on" | "off";
 
 const KEYS_PER_ROW = 10;
 
-/** True on tablets and phones: every pointer is a finger. A touch laptop or an iPad with trackpad doesn't count. */
-function touchOnly() {
-  return matchMedia("(any-pointer: coarse)").matches && !matchMedia("(any-pointer: fine)").matches;
-}
-
+/** On a computer without a touch screen the option is hidden and the keys stay off: real keys are easier than clicking. */
 export function useTouchKeys(mode: TouchKeysMode) {
-  const [auto] = useState(touchOnly);
-  return mode === "on" || (mode === "auto" && auto);
+  const device = useDevice();
+  return device.hasTouch && (mode === "on" || (mode === "auto" && device.touchOnly));
 }
 
 /** Splits keys into rows of ten, like a keyboard. */
@@ -70,18 +67,22 @@ export function TouchKeyboard({
   );
 }
 
-/** The parents' option for the on-screen keys. */
+/** The parents' option for the on-screen keys; not shown on computers without a touch screen. */
 export function TouchKeysSetting({ value, onChange }: { value: TouchKeysMode; onChange: (mode: TouchKeysMode) => void }) {
+  const device = useDevice();
+  if (!device.hasTouch) return null;
   return (
-    <Choice<TouchKeysMode>
-      label="Tasten auf dem Bildschirm"
-      value={value}
-      onChange={onChange}
-      options={[
-        { value: "auto", label: "📱 Nur auf Tablets" },
-        { value: "on", label: "Immer" },
-        { value: "off", label: "Nie" },
-      ]}
-    />
+    <SettingsGroup title="Tablet">
+      <Choice<TouchKeysMode>
+        label="Tasten auf dem Bildschirm"
+        value={value}
+        onChange={onChange}
+        options={[
+          { value: "auto", label: "📱 Nur auf Tablets" },
+          { value: "on", label: "Immer" },
+          { value: "off", label: "Nie (mit angeschlossener Tastatur)" },
+        ]}
+      />
+    </SettingsGroup>
   );
 }

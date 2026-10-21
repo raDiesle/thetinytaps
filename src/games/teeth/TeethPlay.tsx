@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { useDevice } from "@/lib/device";
 import { playChime, playCountNote, playPoof, playSqueak, playTuneNote, setSfxVolume } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
@@ -94,6 +95,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
   const [tickled, setTickled] = useState<number | null>(null);
+  const { touchOnly } = useDevice();
   const { bursts, spawn } = useBursts();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
@@ -286,7 +288,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             ⏸️
           </span>
           Pause
-          <small>Leertaste oder Tippen: weiter</small>
+          <small>{touchOnly ? "Tippen: weiter" : "Leertaste oder Tippen: weiter"}</small>
         </button>
       )}
 

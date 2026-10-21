@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, typ
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
+import { useDevice } from "@/lib/device";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import {
   clearPlaytime,
@@ -178,24 +179,33 @@ export function GameShell({
   );
 }
 
-/** Tells the grown-up, before the game starts, how to get back out of fullscreen. */
+/** Tells the grown-up, before the game starts, how to get back out of fullscreen. Tablets and phones have no Esc key. */
 function ExitHelp() {
   const seconds = EXIT_HOLD_MS / 1000;
+  const { touchOnly } = useDevice();
   return (
     <section className="exit-help" aria-label="So kommt man zurück zum Menü">
       <h2>Zurück zum Menü und raus aus dem Vollbild</h2>
       <ul>
+        {!touchOnly && (
+          <li>
+            <span aria-hidden>⌨️</span> Die Taste <kbd>Esc</kbd> {seconds}&nbsp;Sekunde gedrückt halten
+          </li>
+        )}
         <li>
-          <span aria-hidden>⌨️</span> Die Taste <kbd>Esc</kbd> {seconds}&nbsp;Sekunde gedrückt halten
-        </li>
-        <li>
-          <span aria-hidden>👆</span> oder den Knopf <span className="exit-sample">✕</span> oben rechts {seconds}&nbsp;Sekunde gedrückt
-          halten, bis der Ring voll ist
+          <span aria-hidden>👆</span> {touchOnly ? "Den" : "oder den"} Knopf <span className="exit-sample">✕</span> oben rechts{" "}
+          {seconds}&nbsp;Sekunde gedrückt halten, bis der Ring voll ist
         </li>
       </ul>
       <p>
-        Kurz drücken reicht absichtlich nicht, damit Kinder das Spiel nicht aus Versehen beenden. In Safari und Firefox beendet schon ein
-        kurzer Druck auf <kbd>Esc</kbd> das Vollbild; zurück zum Menü geht es dann mit dem Knopf <span className="exit-sample">✕</span>.
+        Kurz drücken reicht absichtlich nicht, damit Kinder das Spiel nicht aus Versehen beenden.
+        {!touchOnly && (
+          <>
+            {" "}
+            In Safari und Firefox beendet schon ein kurzer Druck auf <kbd>Esc</kbd> das Vollbild; zurück zum Menü geht es dann mit dem
+            Knopf <span className="exit-sample">✕</span>.
+          </>
+        )}
       </p>
     </section>
   );
