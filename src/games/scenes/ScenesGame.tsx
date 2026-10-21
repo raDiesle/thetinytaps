@@ -41,8 +41,16 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               options={[
                 { value: "tap", label: "👆 Antippen / Klicken" },
                 { value: "hover", label: "🖱️ Darüberfahren / Wischen" },
+                { value: "keys", label: "⌨️ Jedes Ding hat eine Taste" },
               ]}
             />
+            {settings.trigger === "keys" && (
+              <Toggle
+                label="Tasten im Bild zeigen"
+                checked={settings.showKeys}
+                onChange={(showKeys) => update({ showKeys })}
+              />
+            )}
             {settings.mode === "find" && (
               <Toggle
                 label="Tipp zeigen, wenn es länger dauert"
@@ -77,7 +85,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
             />
             {!settings.calm && (
               <Toggle
-                label="Bild bewegt sich auch von allein"
+                label="Bild bewegt sich auch von allein (Wolken, Rotor, Blinklichter …)"
                 checked={settings.ambient}
                 onChange={(ambient) => update({ ambient })}
               />

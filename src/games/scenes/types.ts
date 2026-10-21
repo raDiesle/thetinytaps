@@ -3,6 +3,23 @@ import type { ComponentType } from "react";
 /** x, y, width, height in scene units. */
 export type Box = [number, number, number, number];
 
+/**
+ * Moves a drawing to where it stands in the picture: translate(x, y) scale(scale).
+ * Smaller further back, so the picture gets depth without redrawing anything.
+ */
+export interface Placement {
+  x: number;
+  y: number;
+  scale: number;
+}
+
+/** The box as it appears in the picture once the placement is applied. */
+export function placeBox([x, y, w, h]: Box, place?: Placement): Box {
+  if (!place) return [x, y, w, h];
+  const { x: dx, y: dy, scale: s } = place;
+  return [dx + x * s, dy + y * s, w * s, h * s];
+}
+
 /** Synthesized effect played with an item's animation, see lib/sfx. */
 export type SceneSound =
   | "engine"
@@ -17,7 +34,13 @@ export type SceneSound =
   | "quack"
   | "bark"
   | "squeak"
-  | "melody";
+  | "melody"
+  | "sniff"
+  | "pop"
+  | "buzz"
+  | "rumble"
+  | "hum"
+  | "saw";
 
 export interface SceneItem {
   id: string;
@@ -30,10 +53,18 @@ export interface SceneItem {
   box: Box;
   /** Tap areas to use instead of `box` when it would cover other items (e.g. the crane). */
   hitAreas?: Box[];
+  /** Where the drawing stands in the picture; box, hit areas and shadow move along. */
+  place?: Placement;
+  /** Shadow on the ground below the item: centre x, centre y, radius x. */
+  shadow?: [number, number, number];
+  /** Keys mode: the key this item should get, e.g. "B" for the digger; else its first letter if free. */
+  key?: string;
+  /** Keys mode: where the key badge sits, in the drawing's own coordinates; else the top of the first hit area. */
+  badge?: [number, number];
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */
   durationMs: number;
   /**
-   * The drawing, in absolute scene coordinates. While the animation runs its
+   * The drawing, in its own scene coordinates (before `place`). While the animation runs its
    * group has the class `playing`; the scene's CSS animates the parts.
    */
   Art: ComponentType;

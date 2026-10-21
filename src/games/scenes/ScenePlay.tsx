@@ -16,12 +16,19 @@ import {
   playRotor,
   playSqueak,
   playMelody,
+  playSniff,
+  playPop,
+  playBuzz,
+  playRumble,
+  playHum,
+  playSaw,
   playTweet,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { assignKeys } from "./keys";
 import type { ScenesSettings } from "./settings";
-import type { Box, Scene, SceneItem, SceneSound } from "./types";
+import { placeBox, type Box, type Scene, type SceneItem, type SceneSound } from "./types";
 
 const SOUNDS: Record<SceneSound, () => void> = {
   engine: playEngine,
@@ -37,6 +44,12 @@ const SOUNDS: Record<SceneSound, () => void> = {
   bark: playBark,
   squeak: playSqueak,
   melody: playMelody,
+  sniff: playSniff,
+  pop: playPop,
+  buzz: playBuzz,
+  rumble: playRumble,
+  hum: playHum,
+  saw: playSaw,
 };
 
 /** Key presses closer together than this only spawn shapes. */
@@ -55,6 +68,8 @@ const AMBIENT_MIN_MS = 4000;
 const AMBIENT_MAX_MS = 9000;
 /** Hover mode: how long the pointer has to rest on an item, so just passing by doesn't count. */
 const HOVER_DWELL_MS = 200;
+
+const PROMPTS = { tap: "Tipp etwas an! 👆", hover: "Zeig auf etwas! 👆", keys: "Drück eine Taste! ⌨️" };
 
 const PRAISE = ["Super!", "Toll!", "Prima!", "Ja, genau!", "Richtig!"];
 
@@ -82,6 +97,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const lastInteraction = useRef(0);
   const sentenceIndex = useRef(new Map<string, number>());
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const svgRef = useRef<SVGSVGElement>(null);
 
   const later = useCallback((fn: () => void, ms: number) => {
     const timer = setTimeout(() => {
@@ -172,7 +188,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     return () => clearTimeout(timer);
   }, [target, settings.hints]);
 
-  // Ambient life: when nobody taps for a while, items move by themselves, silently.
+  // Ambient life (only if switched on): when nobody taps for a while, items move by themselves, silently.
   // In find mode the item being looked for stays still, so it isn't given away.
   useEffect(() => {
     if (!settings.ambient || settings.calm) return;
@@ -195,21 +211,22 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   };
 
   /**
-   * An item was tapped, or (in hover mode) pointed at for a moment. Hovering is
-   * quieter in find mode: wrong items only move, so sweeping the mouse or a
-   * finger across the picture doesn't start a stream of talk.
+   * An item was tapped, pointed at for a moment (hover mode) or its key was
+   * pressed (keys mode). Hovering is quieter in find mode: wrong items only
+   * move, so sweeping the mouse or a finger across the picture doesn't start a
+   * stream of talk.
    */
-  const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover") => {
+  const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover" | "key") => {
     interacted();
     const wanted = targetRef.current;
 
     if (settings.mode === "explore" || !wanted) {
       if (animate(item)) say(describe(item));
-      else if (how === "tap") funBurst(x, y);
+      else if (how !== "hover") funBurst(x, y);
       return;
     }
     if (celebrating.current) {
-      if (!animate(item) && how === "tap") funBurst(x, y);
+      if (!animate(item) && how !== "hover") funBurst(x, y);
       return;
     }
     if (item === wanted) {
@@ -231,6 +248,22 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     lastQuestion.current = performance.now();
     say(`Das ist ${item.name}. Wo ist ${wanted.name}?`);
   };
+
+  // The key handler is set up once; this way it always calls the current activate.
+  const activateRef = useRef(activate);
+  activateRef.current = activate;
+
+  /** Where an item is on screen, for the shapes that fly out of it. */
+  const screenPoint = useCallback((item: SceneItem): [number, number] => {
+    const [x, y, w, h] = placeBox(item.box, item.place);
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!matrix) return [window.innerWidth / 2, window.innerHeight / 2];
+    const point = new DOMPoint(x + w / 2, y + h / 2).matrixTransform(matrix);
+    return [point.x, point.y];
+  }, []);
+
+  const keys = useMemo(() => assignKeys(scene.items), [scene]);
+  const keyTurns = useRef(new Map<string, number>());
 
   const tapItem = (item: SceneItem, e: PointerEvent) => {
     e.stopPropagation();
@@ -272,6 +305,26 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
       if (e.repeat) return;
+
+      // Keys mode: the key's own item; items sharing a key take turns.
+      // Only the item's own animation limits how fast keys can be pressed.
+      if (settings.trigger === "keys") {
+        const key = e.key.toLocaleUpperCase("de-DE");
+        const list = keys.byKey.get(key);
+        const wanted = targetRef.current;
+        let item: SceneItem;
+        if (!list) item = pick(scene.items);
+        else if (wanted && list.includes(wanted)) item = wanted;
+        else {
+          const turn = keyTurns.current.get(key) ?? 0;
+          keyTurns.current.set(key, turn + 1);
+          item = list[turn % list.length];
+        }
+        const [x, y] = screenPoint(item);
+        activateRef.current(item, x, y, "key");
+        return;
+      }
+
       const now = performance.now();
       if (now - lastKey.current < MIN_KEY_MS) {
         funBurst();
@@ -294,11 +347,11 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [scene, animate, ask, describe, funBurst, say]);
+  }, [scene, keys, screenPoint, settings.trigger, animate, ask, describe, funBurst, say]);
 
   return (
     <div
-      className={`scene${settings.calm ? " calm" : ""}`}
+      className={`scene${settings.calm ? " calm" : ""}${settings.ambient && !settings.calm ? " lively" : ""}`}
       style={{ "--sky": scene.sky, "--ground": scene.ground } as CSSProperties}
       onPointerDown={onBackgroundPointer}
       onPointerMove={onPointerMove}
@@ -306,10 +359,11 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       onPointerUp={(e) => e.pointerType === "touch" && endHover()}
       onPointerCancel={endHover}
     >
-      <svg className="scene-svg" viewBox={`0 0 ${scene.width} ${scene.height}`} preserveAspectRatio="xMidYMid meet">
+      <svg ref={svgRef} className="scene-svg" viewBox={`0 0 ${scene.width} ${scene.height}`} preserveAspectRatio="xMidYMid meet">
         <scene.Background />
         {scene.items.map((item) => {
           const play = plays[item.id];
+          const place = item.place;
           return (
             <g
               key={`${item.id}-${play?.count ?? 0}`}
@@ -319,14 +373,26 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
               aria-label={capitalize(item.name)}
               onPointerDown={(e) => tapItem(item, e)}
             >
-              <item.Art />
-              {(item.hitAreas ?? [item.box]).map(([x, y, w, h], i) => (
-                <rect key={i} className="scene-hit" x={x} y={y} width={w} height={h} />
-              ))}
+              <g transform={place && `translate(${place.x} ${place.y}) scale(${place.scale})`}>
+                {item.shadow && (
+                  <ellipse
+                    className="scene-shadow"
+                    cx={item.shadow[0]}
+                    cy={item.shadow[1]}
+                    rx={item.shadow[2]}
+                    ry={Math.max(6, item.shadow[2] * 0.12)}
+                  />
+                )}
+                <item.Art />
+                {(item.hitAreas ?? [item.box]).map(([x, y, w, h], i) => (
+                  <rect key={i} className="scene-hit" x={x} y={y} width={w} height={h} />
+                ))}
+              </g>
             </g>
           );
         })}
-        {hint && target && <HintRing box={target.box} />}
+        {settings.trigger === "keys" && settings.showKeys && <KeyBadges scene={scene} keyOf={keys.keyOf} />}
+        {hint && target && <HintRing box={placeBox(target.box, target.place)} />}
       </svg>
 
       {target && (
@@ -349,7 +415,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         </div>
       )}
       {settings.mode === "explore" && !touched && (
-        <p className="scene-prompt">{settings.trigger === "hover" ? "Zeig auf etwas! 👆" : "Tipp etwas an! 👆"}</p>
+        <p className="scene-prompt">{PROMPTS[settings.trigger]}</p>
       )}
       <BurstLayer bursts={bursts} />
     </div>
@@ -359,6 +425,47 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
 function HintRing({ box: [x, y, w, h] }: { box: Box }) {
   const pad = 14;
   return <rect className="scene-hint" x={x - pad} y={y - pad} width={w + 2 * pad} height={h + 2 * pad} rx={28} />;
+}
+
+/** Keys mode: each item's key in a little bubble at its top left corner. */
+function KeyBadges({ scene, keyOf }: { scene: Scene; keyOf: Map<string, string> }) {
+  const r = 13;
+  // Each badge sits on its item; one that would cover an earlier badge moves aside.
+  const taken: [number, number][] = [];
+  const spots = scene.items.map((item) => {
+    let [cx, cy] = badgeSpot(item, r);
+    for (let step = 1; step < 8 && taken.some(([x, y]) => Math.hypot(x - cx, y - cy) < 2 * r + 2); step++) {
+      cx += (step % 2 ? 1 : -1) * step * (2 * r + 2);
+    }
+    cx = Math.min(scene.width - r - 2, Math.max(r + 2, cx));
+    taken.push([cx, cy]);
+    return [cx, cy];
+  });
+  return (
+    <g className="scene-keys" aria-hidden>
+      {scene.items.map((item, i) => {
+        const [cx, cy] = spots[i];
+        return (
+          <g key={item.id}>
+            <circle cx={cx} cy={cy} r={r} />
+            <text x={cx} y={cy}>
+              {keyOf.get(item.id)}
+            </text>
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** Where an item's key badge goes: its own spot, else just inside the top of its first hit area. */
+function badgeSpot(item: SceneItem, r: number): [number, number] {
+  if (item.badge) {
+    const [x, y] = placeBox([...item.badge, 0, 0], item.place);
+    return [x, y];
+  }
+  const [x, y, w, h] = placeBox(item.hitAreas?.[0] ?? item.box, item.place);
+  return [x + w / 2, y + Math.min(h / 2, r + 4)];
 }
 
 /** The item drawn on its own, for the find question. */

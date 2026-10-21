@@ -229,3 +229,109 @@ export function Werkzeugkasten() {
     </>
   );
 }
+
+/** Street lamp at the far edge of the road. */
+export function Laterne() {
+  return (
+    <>
+      <circle className="laterne-glow" cx="78" cy="530" r="40" fill="#fff3b0" />
+      <rect x="40" y="690" width="20" height="12" rx="3" fill="#495057" />
+      <path d="M50 692 V536 Q50 508 74 508" stroke="#495057" strokeWidth="7" fill="none" strokeLinecap="round" />
+      <path d="M62 504 H94 L88 518 H68 Z" fill="#343a40" />
+      <rect x="68" y="518" width="20" height="8" rx="3" fill="#dee2e6" />
+      <rect className="laterne-light" x="68" y="518" width="20" height="8" rx="3" fill="#ffd60a" />
+    </>
+  );
+}
+
+/** A big wooden cable drum that can roll. */
+export function Kabeltrommel() {
+  return (
+    <g className="kabel-roll">
+      <path d="M1344 678 Q1326 688 1306 682" stroke="#2b2d42" strokeWidth="5" fill="none" strokeLinecap="round" />
+      <g className="kabel-drum" style={{ transformOrigin: "1362px 646px" }}>
+        <circle cx="1362" cy="646" r="36" fill="#c68b59" />
+        <circle cx="1362" cy="646" r="29" fill="none" stroke="#a0522d" strokeWidth="3" />
+        <path d="M1362 618 V674 M1334 646 H1390" stroke="#a0522d" strokeWidth="4" />
+        <circle cx="1362" cy="646" r="10" fill="#8d5a2b" />
+        <circle cx="1362" cy="622" r="4" fill="#ff5d73" />
+      </g>
+    </g>
+  );
+}
+
+/** Skip for rubble; the junk jumps when tapped. Drawn at its own spot; the scene places it far back. */
+export function Container() {
+  return (
+    <>
+      <g className="container-junk">
+        <g style={nth(0)}>
+          <rect x="26" y="14" width="96" height="12" rx="2" fill="#c68b59" transform="rotate(-14 74 20)" />
+        </g>
+        <g style={nth(1)}>
+          <rect x="100" y="22" width="32" height="18" fill="#e76f51" stroke="#f4a261" strokeWidth="2" />
+        </g>
+        <g style={nth(2)}>
+          <circle cx="62" cy="36" r="12" fill="#adb5bd" />
+        </g>
+        <g style={nth(3)}>
+          <circle cx="144" cy="38" r="9" fill="#ced4da" />
+        </g>
+      </g>
+      <path d="M0 40 H180 L164 104 H16 Z" fill="#4895ef" />
+      <path d="M0 40 H180" stroke="#3a7bd5" strokeWidth="8" strokeLinecap="round" />
+      <path d="M46 48 L42 100 M90 48 V100 M134 48 L138 100" stroke="#3a7bd5" strokeWidth="6" />
+      <rect x="20" y="102" width="22" height="8" rx="2" fill={INK} />
+      <rect x="138" y="102" width="22" height="8" rx="2" fill={INK} />
+    </>
+  );
+}
+
+/** A sand pile with a shovel stuck in it. */
+export function Sandhaufen() {
+  return (
+    <>
+      <g className="sand-grains" fill="#e9b872">
+        {[
+          [770, 930],
+          [790, 922],
+          [806, 934],
+          [784, 940],
+        ].map(([cx, cy], i) => (
+          <circle key={cx} cx={cx} cy={cy} r="5" style={nth(i)} />
+        ))}
+      </g>
+      <path d="M716 1000 Q786 914 858 1000 Z" fill="#f4d58d" />
+      <path d="M744 984 Q786 940 826 984" stroke="#fae3a8" strokeWidth="8" fill="none" strokeLinecap="round" />
+      <g className="sand-schaufel" style={{ transformOrigin: "800px 962px" }}>
+        <path d="M800 962 L832 898" stroke="#8d5a2b" strokeWidth="7" strokeLinecap="round" />
+        <path d="M824 902 h18" stroke={INK} strokeWidth="6" strokeLinecap="round" />
+        <path d="M790 952 L812 962 L804 984 Q792 990 784 978 Z" fill={STEEL} />
+      </g>
+      <path d="M730 1000 Q786 960 846 1000 Z" fill="#f4d58d" />
+    </>
+  );
+}
+
+/** A sawhorse with a plank and a hand saw. */
+export function Saege() {
+  return (
+    <>
+      <path d="M1062 998 L1078 950 M1094 998 L1078 950 M1130 998 L1146 950 M1162 998 L1146 950" stroke="#8d5a2b" strokeWidth="6" strokeLinecap="round" />
+      <rect x="1066" y="944" width="92" height="10" rx="2" fill="#a0522d" />
+      <rect x="1040" y="932" width="132" height="12" rx="2" fill="#e9c46a" />
+      <path d="M1048 938 H1100 M1120 938 H1166" stroke="#d4a373" strokeWidth="2" />
+      <g className="saege-dust" fill="#e9c46a">
+        {[0, 1, 2].map((i) => (
+          <circle key={i} cx={1108 + i * 6} cy="950" r="3.5" style={nth(i)} />
+        ))}
+      </g>
+      <g className="saege-blade">
+        <path d="M1104 944 L1140 904 L1152 914 L1118 950 Z" fill="#ced4da" />
+        <path d="M1104 944 l4 -6 l2 5 l4 -6 l2 5 l4 -6 l2 5 l4 -6 l2 5" stroke="#8d99ae" strokeWidth="2" fill="none" />
+        <path d="M1140 904 L1156 890 L1168 902 L1152 914 Z" fill="#ff5d73" />
+        <circle cx="1155" cy="901" r="3" fill="#fff" />
+      </g>
+    </>
+  );
+}

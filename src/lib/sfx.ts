@@ -126,6 +126,39 @@ export function playMelody() {
   );
 }
 
+/** Quick little sniffs, for the hedgehog. */
+export function playSniff() {
+  [0, 0.12, 0.24, 0.5].forEach((delay) => note({ from: 1400, to: 900, duration: 0.05, type: "square", volume: 0.06, lowpass: 2000, delay }));
+}
+
+/** A pop, as if something jumps out of a hole. */
+export function playPop() {
+  note({ from: 300, to: 1100, duration: 0.12, type: "sine", volume: 0.3 });
+}
+
+/** A soft buzz of tiny wings. */
+export function playBuzz() {
+  for (let i = 0; i < 8; i++) note({ from: 210, to: 240, duration: 0.08, type: "sawtooth", volume: 0.07, lowpass: 700, delay: i * 0.09 });
+}
+
+/** A low rumble of something heavy rolling or tumbling. */
+export function playRumble() {
+  [0, 0.2, 0.42, 0.6].forEach((delay, i) => note({ from: 110 - i * 10, to: 70, duration: 0.18, type: "triangle", volume: 0.35, delay }));
+}
+
+/** A rising hum, like a light switching on. */
+export function playHum() {
+  note({ from: 220, to: 660, duration: 0.5, type: "sine", volume: 0.2 });
+  note({ from: 880, duration: 0.4, type: "sine", volume: 0.12, delay: 0.45 });
+}
+
+/** Ritsch, ratsch: a saw going back and forth. */
+export function playSaw() {
+  [0, 0.25, 0.5, 0.75].forEach((delay, i) =>
+    note({ from: i % 2 ? 520 : 300, to: i % 2 ? 300 : 520, duration: 0.2, type: "sawtooth", volume: 0.08, lowpass: 1800, delay }),
+  );
+}
+
 /** Three hammer knocks. */
 export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));

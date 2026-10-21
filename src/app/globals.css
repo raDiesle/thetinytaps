@@ -519,6 +519,33 @@ a.game-card:hover {
   fill: transparent;
 }
 
+.scene-shadow {
+  fill: #3d405b;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+/* Keys mode: the key of each item, like a little keyboard key. */
+.scene-keys {
+  pointer-events: none;
+}
+
+.scene-keys circle {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+.scene-keys text {
+  fill: var(--ink);
+  font-family: var(--font-rounded);
+  font-size: 16px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
 .scene-hint {
   fill: #ffffff30;
   stroke: #fff;
@@ -597,8 +624,9 @@ a.game-card:hover {
   font-weight: 800;
 }
 
-.calm .scene-prompt,
-.calm .scene-hint {
+/* Unless the picture may move by itself, nothing moves without the child doing something. */
+.scene:not(.lively) .scene-prompt,
+.scene:not(.lively) .scene-hint {
   animation: none;
 }
 

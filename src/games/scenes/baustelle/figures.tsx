@@ -334,3 +334,105 @@ export function Schnecke() {
     </g>
   );
 }
+
+/** A mole: only the top of its head shows above the molehill until it is tapped. */
+export function Maulwurf() {
+  return (
+    <>
+      <path d="M580 996 Q640 924 700 996 Z" fill="#8d5a2b" />
+      <g className="maulwurf-body">
+        <ellipse cx="640" cy="962" rx="22" ry="20" fill="#4a4e69" />
+        <path d="M628 954 q4 -3 8 0 M644 954 q4 -3 8 0" stroke="#fff" strokeWidth="2" strokeLinecap="round" fill="none" />
+        <ellipse cx="640" cy="967" rx="8" ry="6" fill="#ffafcc" />
+        <circle cx="640" cy="964" r="3" fill="#ff5d73" />
+        <path d="M630 968 h-13 M630 971 l-12 4 M650 968 h13 M650 971 l12 4" stroke="#c9ada7" strokeWidth="1.5" />
+        <ellipse cx="616" cy="978" rx="9" ry="6" fill="#ffafcc" />
+        <ellipse cx="664" cy="978" rx="9" ry="6" fill="#ffafcc" />
+      </g>
+      <path d="M584 996 Q640 948 696 996 Z" fill="#a86f45" />
+      <g fill="#6f4520">
+        <circle cx="604" cy="990" r="4" />
+        <circle cx="660" cy="984" r="3" />
+        <circle cx="684" cy="992" r="3.5" />
+      </g>
+    </>
+  );
+}
+
+// The hedgehog's spiky back: tips and dips around a half circle.
+const SPIKES = Array.from({ length: 21 }, (_, i) => {
+  const a = Math.PI * (1 - i / 20);
+  const r = i % 2 ? 26 : 36;
+  return `${(1096 + r * Math.cos(a) * 1.2).toFixed(1)} ${(878 - r * Math.sin(a)).toFixed(1)}`;
+}).join(" L");
+
+export function Igel() {
+  return (
+    <g className="igel-body">
+      <ellipse cx="1084" cy="880" rx="7" ry="4" fill="#6f4e37" />
+      <ellipse cx="1112" cy="880" rx="7" ry="4" fill="#6f4e37" />
+      <g className="igel-spikes">
+        <path d={`M${SPIKES} Z`} fill="#6f4e37" strokeLinejoin="round" />
+        <path d="M1070 862 l6 -8 M1090 852 l2 -9 M1108 856 l5 -8" stroke="#a47148" strokeWidth="3" strokeLinecap="round" />
+      </g>
+      <ellipse cx="1134" cy="868" rx="17" ry="12" fill="#e6ccb2" />
+      <circle cx="1152" cy="866" r="4" fill="#2b2d42" />
+      <circle cx="1134" cy="862" r="2.4" fill="#2b2d42" />
+      <circle cx="1134.8" cy="861.2" r="0.8" fill="#fff" />
+      <circle cx="1128" cy="872" r="3.5" fill={CHEEK} opacity="0.6" />
+      <circle cx="1124" cy="856" r="4" fill="#d5bdaf" />
+    </g>
+  );
+}
+
+/** A ladybird on a leaf. */
+export function Marienkaefer() {
+  return (
+    <>
+      <path d="M176 1000 Q170 976 178 952" stroke="#40916c" strokeWidth="4" fill="none" />
+      <path d="M178 962 Q200 940 216 952 Q198 968 178 962 Z" fill="#52b788" />
+      <path d="M180 960 Q198 954 212 952" stroke="#40916c" strokeWidth="2" fill="none" />
+      <g className="kaefer-flight">
+        <g className="kaefer-wings" fill="#e3f2fd" opacity="0.8">
+          <ellipse cx="190" cy="936" rx="10" ry="5" transform="rotate(-30 190 936)" />
+          <ellipse cx="206" cy="936" rx="10" ry="5" transform="rotate(30 206 936)" />
+        </g>
+        <path d="M206 940 q4 -8 10 -8 M209 943 q6 -4 10 -2" stroke={INK} strokeWidth="1.5" fill="none" />
+        <circle cx="207" cy="943" r="5" fill={INK} />
+        <circle cx="198" cy="946" r="10" fill="#ff3b3b" />
+        <path d="M198 936 V956" stroke={INK} strokeWidth="1.5" />
+        <circle cx="193" cy="942" r="2.2" fill={INK} />
+        <circle cx="203" cy="942" r="2.2" fill={INK} />
+        <circle cx="193" cy="951" r="2" fill={INK} />
+        <circle cx="203" cy="951" r="2" fill={INK} />
+        <circle cx="194" cy="940" r="1.5" fill="#fff" opacity="0.7" />
+      </g>
+    </>
+  );
+}
+
+/** A rabbit behind a bush; only its ears show until it is tapped. Drawn at its own spot; the scene places it far back. */
+export function Hase() {
+  return (
+    <>
+      <circle cx="40" cy="78" r="28" fill="#40916c" />
+      <circle cx="120" cy="82" r="24" fill="#40916c" />
+      <g className="hase-body" style={{ transformOrigin: "80px 60px" }}>
+        <g className="hase-ears" style={{ transformOrigin: "80px 30px" }}>
+          <ellipse cx="71" cy="14" rx="7" ry="19" fill="#c9b8a8" stroke={INK} strokeWidth="2" transform="rotate(-8 71 14)" />
+          <ellipse cx="89" cy="14" rx="7" ry="19" fill="#c9b8a8" stroke={INK} strokeWidth="2" transform="rotate(8 89 14)" />
+          <ellipse cx="71" cy="16" rx="2.5" ry="11" fill="#ffafcc" transform="rotate(-8 71 16)" />
+          <ellipse cx="89" cy="16" rx="2.5" ry="11" fill="#ffafcc" transform="rotate(8 89 16)" />
+        </g>
+        <circle cx="80" cy="46" r="18" fill="#c9b8a8" />
+        <ellipse cx="80" cy="52" rx="9" ry="6" fill="#f1e7dc" />
+        <Face cx={80} cy={44} size={0.8} />
+        <circle cx="80" cy="50" r="2.5" fill="#ff8fa3" />
+      </g>
+      <circle cx="80" cy="74" r="32" fill="#52b788" />
+      <circle cx="56" cy="88" r="20" fill="#52b788" />
+      <circle cx="104" cy="90" r="18" fill="#52b788" />
+      <circle cx="70" cy="62" r="9" fill="#74c69d" />
+    </>
+  );
+}

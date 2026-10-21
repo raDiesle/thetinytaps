@@ -27,7 +27,7 @@ export interface LettersSettings {
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   letterCase: "upper",
   showWord: true,
-  speech: true,
+  speech: false,
   announce: "letterAndWord",
   theme: "all",
   sounds: true,
@@ -36,4 +36,5 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   finishCounting: true,
 };
 
-export const LETTERS_SETTINGS_KEY = "tinytaps.letters.v1";
+// v2: speech is off by default now, so old saved settings start fresh.
+export const LETTERS_SETTINGS_KEY = "tinytaps.letters.v2";

@@ -31,9 +31,10 @@ export const DEFAULT_WORDS_SETTINGS: WordsSettings = {
   theme: "all",
   showPicture: true,
   anyKey: false,
-  speech: true,
+  speech: false,
   sounds: true,
   calm: false,
 };
 
-export const WORDS_SETTINGS_KEY = "tinytaps.words.v1";
+// v2: speech is off by default now, so old saved settings start fresh.
+export const WORDS_SETTINGS_KEY = "tinytaps.words.v2";

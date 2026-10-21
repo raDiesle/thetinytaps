@@ -276,3 +276,56 @@ export function Ballon() {
     </g>
   );
 }
+
+/** Road roller: the heavy drum flattens the new road. */
+export function Walze() {
+  return (
+    <g className="walze-body">
+      <g className="walze-smoke" fill="#dee2e6">
+        {[0, 1, 2].map((i) => (
+          <circle key={i} cx="236" cy="648" r="9" style={nth(i)} />
+        ))}
+      </g>
+      <rect x="230" y="652" width="12" height="50" rx="3" fill={INK} />
+      <path d="M170 760 L232 722 H262" stroke="#e85d04" strokeWidth="14" strokeLinecap="round" />
+      <rect x="196" y="700" width="210" height="58" rx="12" fill="#ffb703" />
+      <rect x="196" y="740" width="210" height="18" rx="8" fill="#f48c06" />
+      <rect x="204" y="705" width="194" height="6" rx="3" fill="#ffd166" />
+      <path d="M206 722 H250 M206 730 H250" stroke="#2b2d42" strokeWidth="3" opacity="0.3" />
+      <path d="M288 700 V646 M378 700 V646" stroke={INK} strokeWidth="6" />
+      <rect x="280" y="636" width="108" height="12" rx="5" fill="#e85d04" />
+      <Pane x={296} y={654} w={76} h={44}>
+        <Driver cx={334} cy={676} />
+      </Pane>
+      <g className="walze-drum" style={{ transformOrigin: "170px 760px" }}>
+        <circle cx="170" cy="760" r="40" fill="#6c757d" />
+        <circle cx="170" cy="760" r="32" fill="#8d99ae" />
+        <path d="M170 728 V792 M138 760 H202" stroke="#6c757d" strokeWidth="5" />
+        <circle cx="170" cy="760" r="10" fill={INK} />
+      </g>
+      <Wheel cx={372} cy={772} r={28} />
+    </g>
+  );
+}
+
+/** Forklift with a pallet of boxes. Drawn at its own spot; the scene places it far back. */
+export function Gabelstapler() {
+  return (
+    <>
+      <path d="M28 40 V192 M40 40 V192" stroke={INK} strokeWidth="6" />
+      <g className="stapler-load">
+        <path d="M22 118 V190 H-32" stroke="#495057" strokeWidth="6" fill="none" strokeLinejoin="round" />
+        <rect x="-34" y="178" width="52" height="9" rx="2" fill="#a0522d" />
+        <rect x="-30" y="138" width="44" height="40" rx="3" fill="#c68b59" />
+        <path d="M-30 156 H14" stroke="#e9c46a" strokeWidth="5" />
+      </g>
+      <path d="M44 130 H120 Q140 130 140 150 V186 H44 Z" fill="#ff8c42" />
+      <rect x="118" y="118" width="26" height="68" rx="8" fill="#e76f51" />
+      <path d="M54 130 V64 M112 130 V64" stroke={INK} strokeWidth="5" />
+      <rect x="48" y="56" width="72" height="9" rx="3" fill={INK} />
+      <Driver cx={84} cy={106} />
+      <Wheel cx={62} cy={186} r={14} />
+      <Wheel cx={124} cy={186} r={14} />
+    </>
+  );
+}
