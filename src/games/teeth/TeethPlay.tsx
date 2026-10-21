@@ -272,9 +272,11 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const target = step?.view ?? GRIN_VIEW;
   const view = useGlidingView(target, (settings.calm ? 1.5 : 1) * (mouthMoves ? MOUTH_MS : TURN_MS));
 
-  // The brush scrubs at the next monster still there, or the last one when they're all gone.
+  // The brush glides along the step's teeth and reaches each monster just as it goes.
   const inStep = monsters.filter((m) => m.step === phase);
-  const brushAt = inStep.find((m) => !isGone(m)) ?? inStep[inStep.length - 1];
+  const brushAt = inStep.find((m) => !isGone(m));
+  const stepDone = phase >= 0 ? (brushed - phase * stepMs) / stepMs : 0;
+  const brushStop = Math.max(0, Math.min(inStep.length - 1, stepDone * inStep.length - 0.6));
   // Every monster on a tooth not brushed yet; the picture shows those whose side of the tooth faces out.
   const spots: MonsterSpot[] = monsters
     .filter((m) => m.step >= phase)
@@ -330,9 +332,13 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             view={view}
             zone={step && { surface: step.surface, teeth: step.teeth }}
             monsters={spots}
-            brush={step && brushAt ? { tooth: brushAt.tooth, surface: step.surface, motion: step.motion } : null}
+            brush={
+              step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }
+            }
             happy={done}
             action={action}
+            paused={paused}
+            calm={settings.calm}
             onTickle={tickle}
           />
         )}
