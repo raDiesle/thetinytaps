@@ -3,10 +3,10 @@ import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { inTheme } from "@/content/themes";
-import type { LanguagePack, ThemeId, WordEntry } from "@/content/types";
+import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { MAX_LETTERS, type WordsSettings } from "./settings";
+import { MAX_LETTERS, type WordsMode, type WordsSettings } from "./settings";
 
 /** Keys closer together than this only spawn shapes, so mashing doesn't race through the word. */
 const MIN_TYPE_MS = 300;
@@ -24,6 +24,15 @@ function typeableWords(pack: LanguagePack, maxLetters: number, theme: "all" | Th
     .filter((w) => /^\p{L}+$/u.test(w.word) && w.word.length <= maxLetters);
   return inTheme(words, theme);
 }
+
+function wordsFor(pack: LanguagePack, mode: WordsMode, maxLetters: number, theme: "all" | ThemeId): WordEntry[] {
+  if (mode === "colors") return pack.colors;
+  if (mode === "actions") return pack.actions;
+  return typeableWords(pack, maxLetters, theme);
+}
+
+const isColor = (word: WordEntry): word is ColorWord => "color" in word;
+const isAction = (word: WordEntry): word is ActionWord => "action" in word;
 
 /** Case-insensitive, and "a" also counts for "ä" so keyboards without umlauts work. */
 function matches(key: string, letter: string) {
@@ -43,6 +52,21 @@ function shuffle<T>(items: T[]): T[] {
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
+/** Puzzle pieces over the picture, in a grid about as square as the letters allow. */
+function puzzleGrid(letters: number) {
+  const cols = Math.ceil(Math.sqrt(letters));
+  const rows = Math.ceil(letters / cols);
+  return { cols, rows, order: shuffle(Array.from({ length: cols * rows }, (_, i) => i)) };
+}
+
+/** Where the things of a colour hop in: around the edges, so the word stays readable. */
+function paradeSpots(count: number) {
+  return Array.from({ length: count }, (_, i) => ({
+    left: 4 + ((i + Math.random() * 0.6) / count) * 86,
+    top: i % 2 === 0 ? 2 + Math.random() * 8 : 78 + Math.random() * 8,
+  }));
+}
+
 export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: WordsSettings }) {
   const [current, setCurrent] = useState<{ id: number; word: WordEntry } | null>(null);
   const [typed, setTyped] = useState(0);
@@ -57,11 +81,18 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
   const deck = useRef<WordEntry[]>([]);
 
   const words = useMemo(
-    () => typeableWords(pack, MAX_LETTERS[settings.length], settings.theme),
-    [pack, settings.length, settings.theme],
+    () => wordsFor(pack, settings.mode, MAX_LETTERS[settings.length], settings.theme),
+    [pack, settings.mode, settings.length, settings.theme],
   );
   const letters = useMemo(() => (current ? Array.from(current.word.word) : []), [current]);
   const done = current !== null && typed === letters.length;
+  const firstOnly = settings.mode === "first";
+  // The first-letter game needs the picture as its only clue.
+  const reveal = firstOnly ? "now" : settings.picture;
+  const puzzle = useMemo(() => (reveal === "puzzle" ? puzzleGrid(letters.length) : null), [reveal, letters]);
+  const color = current && isColor(current.word) ? current.word : null;
+  const action = current && isAction(current.word) ? current.word : null;
+  const parade = useMemo(() => (color ? paradeSpots(settings.calm ? 4 : color.things.length) : []), [color, settings.calm]);
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -103,24 +134,28 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
     setTyped(0);
     setNudges(0);
     setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
-    say(`${word.word}!`);
-  }, [words, current, say]);
+    say(firstOnly ? pack.firstLetterPrompt(word) : `${word.word}!`);
+  }, [words, current, say, firstOnly, pack]);
 
   const typeNext = useCallback(() => {
     if (!current || done) return;
     const char = letters[typed];
-    setTyped(typed + 1);
+    // In the first-letter game the rest of the word flies in by itself.
+    const next = firstOnly ? letters.length : typed + 1;
+    setTyped(next);
     setNudges(0);
     sayLetter(char);
-    if (typed + 1 < letters.length) {
+    if (next < letters.length) {
       if (settings.sounds) playCountNote(typed);
       return;
     }
     doneAt.current = performance.now();
     if (settings.sounds) playChime();
-    say(`${current.word.word}! ${pick(pack.praise)}`, true);
+    const word = current.word;
+    say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
+    if (isColor(word)) setBackground(word.color);
     for (let i = 0; i < (settings.calm ? 3 : 8); i++) spawn();
-  }, [current, done, letters, typed, pack, say, sayLetter, spawn, settings.sounds, settings.calm]);
+  }, [current, done, letters, typed, firstOnly, pack, say, sayLetter, spawn, settings.sounds, settings.calm]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -200,17 +235,68 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
         ? char.toLocaleLowerCase("de-DE")
         : char;
 
+  const figureClass = [
+    "figure",
+    puzzle && "puzzle",
+    action && "actor",
+    done && action && `act-${action.action}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  /** Typed letters are bright; colour words are written in their colour, and in white once the screen has it. */
+  const typedColor = (i: number) => (color ? (done ? "#fff" : color.color) : BRIGHT_COLORS[i % BRIGHT_COLORS.length]);
+
+  const slotClass = (i: number) => {
+    if (i < typed) return firstOnly && i > 0 ? "slot typed flown" : "slot typed";
+    return firstOnly ? "slot hidden" : "slot later";
+  };
+
   return (
     <div
-      className={`words-play${settings.calm ? " calm" : ""}`}
+      className={`words-play${settings.calm ? " calm" : ""}${color && done ? " colored" : ""}`}
       style={{ background }}
       onPointerDown={onPlayAreaPointer}
     >
       <div className="stage">
+        {color && done && (
+          <div key={`parade-${current?.id}`} className="color-parade" aria-hidden>
+            {parade.map((spot, i) => (
+              <span
+                key={i}
+                className="parade-thing"
+                style={{ left: `${spot.left}%`, top: `${spot.top}%`, "--i": i } as CSSProperties}
+              >
+                {color.things[i]}
+              </span>
+            ))}
+          </div>
+        )}
         {current && (
           <div key={current.id} className={`card${done ? " done" : ""}`}>
-            <div className={`reveal ${settings.showPicture || done ? "shown" : "waiting"}`} onPointerDown={onPicturePointer}>
-              <Picture word={current.word} />
+            <div
+              className={`reveal ${reveal !== "end" || done ? "shown" : "waiting"}`}
+              onPointerDown={onPicturePointer}
+            >
+              <div className={figureClass}>
+                <Picture word={current.word} />
+                {puzzle && (
+                  <div
+                    className="puzzle-cover"
+                    style={{ gridTemplateColumns: `repeat(${puzzle.cols}, 1fr)`, gridTemplateRows: `repeat(${puzzle.rows}, 1fr)` }}
+                    aria-hidden
+                  >
+                    {puzzle.order.map((piece, n) => (
+                      <span
+                        key={piece}
+                        className={`piece${n < Math.round((typed / letters.length) * puzzle.order.length) ? " off" : ""}`}
+                        style={{ order: piece, background: BRIGHT_COLORS[piece % BRIGHT_COLORS.length] }}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+              {action && done && <div className="join-in">{pack.joinIn(action)} 🙌</div>}
             </div>
             <div className="slots" style={{ "--letters": letters.length } as CSSProperties}>
               {letters.map((char, i) =>
@@ -225,13 +311,8 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
                 ) : (
                   <span
                     key={i}
-                    className={`slot ${i < typed ? "typed" : "later"}`}
-                    style={
-                      {
-                        "--i": i,
-                        color: i < typed ? BRIGHT_COLORS[i % BRIGHT_COLORS.length] : undefined,
-                      } as CSSProperties
-                    }
+                    className={slotClass(i)}
+                    style={{ "--i": i, color: i < typed ? typedColor(i) : undefined } as CSSProperties}
                   >
                     {display(char)}
                   </span>

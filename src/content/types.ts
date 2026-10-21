@@ -28,6 +28,22 @@ export interface LetterEntry {
   words: WordEntry[];
 }
 
+/** A colour to type; when it is done the screen turns that colour and things of that colour hop in. */
+export interface ColorWord extends WordEntry {
+  /** CSS colour for the screen and the letters. */
+  color: string;
+  /** Emojis of things in that colour. */
+  things: string[];
+}
+
+/** How the figure of a doing word moves once the word is done; see `.act-*` in globals.css. */
+export type Action = "hop" | "run" | "sleep" | "dance" | "wave" | "spin" | "fly" | "swim" | "clap";
+
+/** A doing word ("HÜPF"); once typed, its figure does it. */
+export interface ActionWord extends WordEntry {
+  action: Action;
+}
+
 /** Something that can be shown N times for the number keys. */
 export interface Countable {
   emoji: string;
@@ -56,4 +72,12 @@ export interface LanguagePack {
   countSentence: (n: number, thing: Countable) => string;
   /** Short cheers, one is picked when a word has been typed. */
   praise: string[];
+  /** "Womit fängt Bär an?", asked when only the first letter is to be typed. */
+  firstLetterPrompt: (word: WordEntry) => string;
+  /** Colour words for the colour game. */
+  colors: ColorWord[];
+  /** Doing words that a figure acts out. */
+  actions: ActionWord[];
+  /** "Hüpf mit!", the invitation to join in once the figure acts. */
+  joinIn: (word: ActionWord) => string;
 }

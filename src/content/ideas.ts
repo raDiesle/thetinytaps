@@ -182,6 +182,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Jeder richtige Buchstabe deckt ein Puzzleteil des Bildes auf. Beim letzten Buchstaben ist das Bild komplett und bewegt sich.",
         why: "Belohnung nach jedem Buchstaben statt erst am Ende – hält bei längeren Wörtern durch.",
         effort: "S",
+        done: true,
       },
       {
         id: "W-02",
@@ -199,6 +200,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Nur das Bild wird gezeigt (🐻), gesucht ist der erste Buchstabe. Danach fliegt der Rest des Wortes von allein dazu.",
         why: "Kürzeste Form von „Wörter tippen“, ideal als Zwischenstufe.",
         effort: "S",
+        done: true,
       },
       {
         id: "W-04",
@@ -207,6 +209,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "ROT tippen → der ganze Bildschirm wird rot, rote Dinge hüpfen herein. Genauso BLAU, GELB, GRÜN.",
         why: "Wort und Bedeutung werden sofort sichtbar; Farben lernen nebenbei.",
         effort: "S",
+        done: true,
       },
       {
         id: "W-05",
@@ -215,6 +218,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "HÜPF, LAUF, SCHLAF, TANZ: Ist das Wort fertig, macht eine Figur genau das. Gerne als Einladung zum Mitmachen.",
         why: "Kinder bewegen sich mit – Wörter werden körperlich erlebt.",
         effort: "M",
+        done: true,
       },
       {
         id: "W-06",

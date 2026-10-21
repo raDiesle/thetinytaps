@@ -1,4 +1,4 @@
-import type { Countable, LanguagePack, LetterEntry, ThemeId, WordEntry } from "./types";
+import type { ActionWord, ColorWord, Countable, LanguagePack, LetterEntry, ThemeId, WordEntry } from "./types";
 
 const w = (word: string, emoji: string, image?: string): WordEntry => ({ word, emoji, image });
 const themed =
@@ -99,6 +99,29 @@ const countables: Countable[] = [
   { emoji: "⭐", singular: "Stern", plural: "Sterne" },
 ];
 
+const colors: ColorWord[] = [
+  { word: "Rot", emoji: "🔴", color: "#ff4d5e", things: ["🍎", "🍓", "🍒", "🚒", "🐞", "🌹", "🍅", "❤️"] },
+  { word: "Blau", emoji: "🔵", color: "#3a86ff", things: ["🐳", "🫐", "🚙", "🦋", "💙", "🧢", "🐋", "💧"] },
+  { word: "Gelb", emoji: "🟡", color: "#ffd60a", things: ["🍌", "🌻", "🐥", "⭐", "🍋", "🚕", "🧀", "🌙"] },
+  { word: "Grün", emoji: "🟢", color: "#38b000", things: ["🐸", "🥒", "🥦", "🍀", "🦖", "🌲", "🐢", "🍏"] },
+  { word: "Lila", emoji: "🟣", color: "#9d4edd", things: ["🍇", "🍆", "🔮", "☂️", "💜", "🪻", "👾", "🦄"] },
+  { word: "Rosa", emoji: "🩷", color: "#ff8fc7", things: ["🐷", "🌸", "🦩", "🎀", "🍬", "🩰", "🐙", "💗"] },
+  { word: "Orange", emoji: "🟠", color: "#ff8c1a", things: ["🍊", "🥕", "🦊", "🎃", "🏀", "🦁", "🐯", "🧡"] },
+];
+
+// Short commands ("Hüpf!") the child can do along with the figure.
+const actions: ActionWord[] = [
+  { word: "Hüpf", emoji: "🐸", action: "hop" },
+  { word: "Lauf", emoji: "🏃", action: "run" },
+  { word: "Schlaf", emoji: "😴", action: "sleep" },
+  { word: "Tanz", emoji: "💃", action: "dance" },
+  { word: "Wink", emoji: "👋", action: "wave" },
+  { word: "Dreh", emoji: "🐱", action: "spin" },
+  { word: "Flieg", emoji: "🐦", action: "fly" },
+  { word: "Schwimm", emoji: "🐟", action: "swim" },
+  { word: "Klatsch", emoji: "👏", action: "clap" },
+];
+
 /** German nouns ending in -e here are feminine ("eine Ente"); the rest take "ein". */
 const indefiniteArticle = (noun: string) => (noun.endsWith("e") ? "eine" : "ein");
 
@@ -127,4 +150,8 @@ export const de: LanguagePack = {
       ? `${indefiniteArticle(thing.singular)} ${thing.singular}!`
       : `${de.numberWords[n]} ${thing.plural}!`,
   praise: ["Super!", "Toll!", "Prima!", "Juhu!", "Klasse!"],
+  firstLetterPrompt: (word) => `${word.word}! Womit fängt ${word.word} an?`,
+  colors,
+  actions,
+  joinIn: (word) => `${word.word} mit!`,
 };
