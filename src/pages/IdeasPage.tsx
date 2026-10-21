@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { Choice, Toggle } from "@/components/SettingControls";
-import { EFFORT_LABELS, IDEA_AREAS, TOP_PICKS, ideaStatus, type Idea, type IdeaStatus } from "@/content/ideas";
+import { EFFORT_LABELS, IDEA_AREAS, TODDLER_RULES, TOP_PICKS, ideaStatus, type Idea, type IdeaStatus } from "@/content/ideas";
 import { useStoredSettings } from "@/lib/storage";
 import { useTitle } from "@/lib/title";
 
@@ -51,6 +51,17 @@ export function IdeasPage() {
         kann.
       </p>
       <Progress done={done} total={ALL_IDEAS.length} />
+
+      <section className="ideas-panel">
+        <h2>So einfach muss es sein – Faustregeln für 2-Jährige</h2>
+        <ul className="ideas-rules">
+          {TODDLER_RULES.map(({ emoji, text }) => (
+            <li key={text}>
+              <span aria-hidden>{emoji}</span> {text}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <section className="ideas-panel">
         <h2>Meine Empfehlung zuerst</h2>
@@ -109,6 +120,7 @@ export function IdeasPage() {
             <h2>
               <span aria-hidden>{area.emoji}</span> {area.prefix} – {area.title}
             </h2>
+            {area.intro && <p className="ideas-intro">{area.intro}</p>}
             <Progress done={countDone(area.ideas)} total={area.ideas.length} />
             <ul className="ideas-list">
               {ideas.map((idea) => (
