@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 
 // Everything in this scene is drawn in absolute scene coordinates (1600 × 1000),
 // so the transform-origin of an animated part is simply its pivot point in the picture.
@@ -35,12 +35,27 @@ export function Wheel({ cx, cy, r = 28 }: { cx: number; cy: number; r?: number }
   );
 }
 
-/** A window with a soft reflection; `children` are drawn behind the glare (e.g. a driver). */
+/** Draws `children` (a driver) only where they show through the window `d`, as if they sat inside behind it. */
+export function Inside({ d, children }: { d: string; children: ReactNode }) {
+  const id = useId();
+  return (
+    <>
+      <defs>
+        <clipPath id={id}>
+          <path d={d} />
+        </clipPath>
+      </defs>
+      <g clipPath={`url(#${id})`}>{children}</g>
+    </>
+  );
+}
+
+/** A window with a soft reflection; `children` sit behind it and are only seen through the glass (e.g. a driver). */
 export function Pane({ x, y, w, h, rx = 6, children }: { x: number; y: number; w: number; h: number; rx?: number; children?: ReactNode }) {
   return (
     <>
       <rect x={x} y={y} width={w} height={h} rx={rx} fill={GLASS} />
-      {children}
+      {children && <Inside d={`M${x} ${y} h${w} v${h} h${-w} Z`}>{children}</Inside>}
       <path d={`M${x + w * 0.3} ${y + 3} h${w * 0.18} L${x + w * 0.26} ${y + h - 3} h${-w * 0.18} Z`} fill="#fff" opacity="0.55" />
       <path d={`M${x + w * 0.56} ${y + 3} h${w * 0.07} L${x + w * 0.41} ${y + h - 3} h${-w * 0.07} Z`} fill="#fff" opacity="0.4" />
     </>

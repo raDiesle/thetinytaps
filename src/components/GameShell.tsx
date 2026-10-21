@@ -96,13 +96,34 @@ export function GameShell({
         <span aria-hidden>{emoji}</span> {title}
       </h1>
       {settings && <section className="settings">{settings}</section>}
+      <ExitHelp />
       <button className="start-button" onClick={start}>
         Los geht&apos;s!
       </button>
-      <p className="hint">
-        Zum Beenden die Taste <kbd>Esc</kbd> oder den Knopf oben rechts 1&nbsp;Sekunde gedrückt halten.
-      </p>
     </main>
+  );
+}
+
+/** Tells the grown-up, before the game starts, how to get back out of fullscreen. */
+function ExitHelp() {
+  const seconds = EXIT_HOLD_MS / 1000;
+  return (
+    <section className="exit-help" aria-label="So kommt man zurück zum Menü">
+      <h2>Zurück zum Menü und raus aus dem Vollbild</h2>
+      <ul>
+        <li>
+          <span aria-hidden>⌨️</span> Die Taste <kbd>Esc</kbd> {seconds}&nbsp;Sekunde gedrückt halten
+        </li>
+        <li>
+          <span aria-hidden>👆</span> oder den Knopf <span className="exit-sample">✕</span> oben rechts {seconds}&nbsp;Sekunde gedrückt
+          halten, bis der Ring voll ist
+        </li>
+      </ul>
+      <p>
+        Kurz drücken reicht absichtlich nicht, damit Kinder das Spiel nicht aus Versehen beenden. In Safari und Firefox beendet schon ein
+        kurzer Druck auf <kbd>Esc</kbd> das Vollbild; zurück zum Menü geht es dann mit dem Knopf <span className="exit-sample">✕</span>.
+      </p>
+    </section>
   );
 }
 

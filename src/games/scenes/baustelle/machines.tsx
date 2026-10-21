@@ -1,4 +1,4 @@
-import { GLASS, INK, Pane, SAND, SKIN, STEEL, Wheel, nth } from "./shared";
+import { GLASS, INK, Inside, Pane, SAND, SKIN, STEEL, Wheel, nth } from "./shared";
 
 /** A driver's head with a hard hat, for cabs. */
 function Driver({ cx, cy, hat = "#ffd60a" }: { cx: number; cy: number; hat?: string }) {
@@ -138,7 +138,9 @@ export function Betonmischer() {
       <path d="M870 784 H958 V800 H870 Z" fill="#0096c7" />
       <path d="M876 716 H916" stroke="#90e0ef" strokeWidth="5" strokeLinecap="round" />
       <path d="M884 722 H918 Q932 722 938 752 H884 Z" fill={GLASS} />
-      <Driver cx={906} cy={740} hat="#fff" />
+      <Inside d="M884 722 H918 Q932 722 938 752 H884 Z">
+        <Driver cx={906} cy={740} hat="#fff" />
+      </Inside>
       <path d="M900 724 h8 L896 752 h-8 Z" fill="#fff" opacity="0.5" />
       <rect x="940" y="776" width="18" height="11" rx="4" fill="#fff4d6" />
       <rect x="950" y="790" width="10" height="16" rx="3" fill="#ced4da" />
@@ -188,7 +190,9 @@ export function Kipplaster() {
       <path d="M984 784 H1080 V800 H984 Z" fill="#2d9a00" />
       <path d="M1026 716 H1068" stroke="#a7f070" strokeWidth="5" strokeLinecap="round" />
       <path d="M1066 722 H1024 Q1008 722 1002 752 H1066 Z" fill={GLASS} />
-      <Driver cx={1040} cy={740} />
+      <Inside d="M1066 722 H1024 Q1008 722 1002 752 H1066 Z">
+        <Driver cx={1040} cy={740} />
+      </Inside>
       <path d="M1046 724 h8 L1042 752 h-8 Z" fill="#fff" opacity="0.5" />
       <rect x="984" y="776" width="18" height="11" rx="4" fill="#fff4d6" />
       <rect x="978" y="790" width="10" height="16" rx="3" fill="#ced4da" />
