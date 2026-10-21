@@ -83,6 +83,16 @@ export function Rider({ cx, cy, shirt, hair = "#6b4423", cap }: { cx: number; cy
   );
 }
 
+/** An animal's eye with a highlight. */
+export function Eye({ cx, cy, r = 3.2 }: { cx: number; cy: number; r?: number }) {
+  return (
+    <>
+      <circle cx={cx} cy={cy} r={r} fill="#2b2d42" />
+      <circle cx={cx + r * 0.3} cy={cy - r * 0.35} r={r * 0.35} fill="#fff" />
+    </>
+  );
+}
+
 /** A small face: eyes with highlights, rosy cheeks and a smile, centred on (cx, cy). */
 export function Face({ cx, cy, size = 1 }: { cx: number; cy: number; size?: number }) {
   const s = size;

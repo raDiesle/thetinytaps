@@ -401,7 +401,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Zoo",
         text: "Löwe gähnt, Elefant spritzt, Giraffe frisst oben, Affen schaukeln, Pinguine rutschen, Seehund mit Ball, Tierpfleger.",
         effort: "L",
-        planned: true,
+        done: true,
       },
       {
         id: "S-03",

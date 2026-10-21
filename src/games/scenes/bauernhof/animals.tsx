@@ -1,20 +1,10 @@
-import { CHEEK, INK, nth } from "../shared";
+import { CHEEK, Eye, INK, nth } from "../shared";
 
 // The farm animals. Each drawing has its foot point at (0, 0), except those that sit on
 // something else: the owl (barn), the stork and the cat (farmhouse), the duck (water line)
 // and the swallow (in the sky, centred on its body).
 
 const EYE = "#2b2d42";
-
-/** An eye with a highlight. */
-function Eye({ cx, cy, r = 3.2 }: { cx: number; cy: number; r?: number }) {
-  return (
-    <>
-      <circle cx={cx} cy={cy} r={r} fill={EYE} />
-      <circle cx={cx + r * 0.3} cy={cy - r * 0.35} r={r * 0.35} fill="#fff" />
-    </>
-  );
-}
 
 /** Owl in the hayloft, in the barn's coordinates. */
 export function Eule() {
