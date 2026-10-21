@@ -32,7 +32,7 @@ export interface LettersSettings {
   sounds: boolean;
   /** Quieter sounds, no wiggling, softer shapes. */
   calm: boolean;
-  /** Reveal letter → word → picture and number items one click at a time. */
+  /** Reveal number items one click at a time; each click on a letter brings its next word. */
   stepByStep: boolean;
   /** Numbers: the child taps every thing to count it; the digit appears after the last one. */
   countByTap: boolean;

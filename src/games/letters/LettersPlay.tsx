@@ -5,7 +5,7 @@ import { inTheme } from "@/content/themes";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { LetterCard, NumberCard, letterParts } from "./Cards";
+import { LetterCard, NumberCard } from "./Cards";
 import type { LettersSettings } from "./settings";
 
 /** Presses closer together than this only spawn shapes, so mashing doesn't strobe. */
@@ -52,12 +52,11 @@ function isSame(target: Target | null, shown: Shown) {
   return false;
 }
 
-// Stages: a letter reveals its parts one by one (see letterParts). A number
-// reveals one item per stage (stage k shows k items); the stage after the
-// last item shows the digit. Zero starts with the empty nest at stage 0.
+// Stages: a letter shows everything at once, at stage 0. A number reveals
+// one item per stage (stage k shows k items); the stage after the last item
+// shows the digit. Zero starts with the empty nest at stage 0.
 const firstStage = (s: Shown) => (s.kind === "letter" ? 0 : Math.min(1, s.n));
-const lastStage = (s: Shown, showWord: boolean) =>
-  s.kind === "letter" ? letterParts(showWord).length - 1 : s.n + 1;
+const lastStage = (s: Shown) => (s.kind === "letter" ? 0 : s.n + 1);
 
 export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [shown, setShown] = useState<Shown | null>(null);
@@ -108,13 +107,9 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const announce = useCallback(
     (s: Shown, stage: number, queue = false) => {
       const sound = (play: () => void) => settings.sounds && play();
-      if (stage === lastStage(s, settings.showWord)) {
+      if (stage === lastStage(s)) {
         sound(playChime);
         say(sentenceFor(s), queue);
-      } else if (s.kind === "letter") {
-        const part = letterParts(settings.showWord)[stage];
-        sound(() => (stage === 0 ? playChime() : playCountNote(stage)));
-        say(part === "letter" ? `${s.letter.spoken}!` : `${s.word.word}!`, queue);
       } else if (stage === 0) {
         say(pack.zero.sentence, queue);
       } else {
@@ -122,7 +117,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         say(pack.numberWords[stage], queue);
       }
     },
-    [pack, say, sentenceFor, settings.sounds, settings.showWord],
+    [pack, say, sentenceFor, settings.sounds],
   );
 
   const funBurst = useCallback(
@@ -178,7 +173,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         announce(next, from);
         return;
       }
-      const last = lastStage(next, settings.showWord);
+      const last = lastStage(next);
       if (next.kind === "letter") {
         setStage(last);
         announce(next, last);
@@ -197,7 +192,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       }
       countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + COUNT_SUMMARY_MS;
     },
-    [announce, replace, byTap, settings.stepByStep, settings.showWord],
+    [announce, replace, byTap, settings.stepByStep],
   );
 
   const show = useCallback(
@@ -237,19 +232,19 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       countItem(index);
       return;
     }
-    if (stage < lastStage(shown, settings.showWord)) {
+    if (stage < lastStage(shown)) {
       setStage(stage + 1);
       announce(shown, stage + 1);
       return;
     }
     const id = nextId.current++;
     if (shown.kind === "letter") {
-      present({ ...shown, id, word: pickWord(shown.letter) }, 1);
+      present({ ...shown, id, word: pickWord(shown.letter) }, 0);
     } else {
       const next: Shown = { ...shown, id, thing: pickThing() };
       present(next, firstStage(next));
     }
-  }, [shown, stage, tapped, settings.showWord, byTap, countItem, announce, present, pickWord, pickThing]);
+  }, [shown, stage, tapped, byTap, countItem, announce, present, pickWord, pickThing]);
 
   /** Advance unless the last advance was too recent. */
   const tryAdvance = useCallback(() => {
@@ -269,11 +264,11 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       if (now - lastChange.current >= MIN_ADVANCE_MS) {
         lastChange.current = now;
         const next: Shown = { ...shown, id: nextId.current++, word: pickWord(shown.letter) };
-        present(next, lastStage(next, settings.showWord));
+        present(next, lastStage(next));
       }
       funBurst(e.clientX, e.clientY);
     },
-    [shown, present, pickWord, funBurst, settings.showWord],
+    [shown, present, pickWord, funBurst],
   );
 
   /** Make the card move once, unless calm mode is on. */
@@ -315,12 +310,12 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         if (!previous) return false;
         // Shown again in full, without putting the current one on the history.
         current.current = null;
-        present(previous, lastStage(previous, settings.showWord));
+        present(previous, lastStage(previous));
         return true;
       }
       return false;
     },
-    [present, spawn, animateCard, settings.sounds, settings.showWord],
+    [present, spawn, animateCard, settings.sounds],
   );
 
   /** A key was pressed, on the keyboard or on the screen. */
@@ -328,7 +323,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     (key: string) => {
       const target = resolveKey(key, pack);
       // Step by step, Space and Enter reveal the next part until everything is shown; then they are special keys again.
-      const revealing = shown !== null && stage < lastStage(shown, settings.showWord);
+      const revealing = shown !== null && stage < lastStage(shown);
       const isNextKey = ((key === " " || key === "Enter") && revealing) || (shown !== null && isSame(target, shown));
       if ((settings.stepByStep || byTap(shown)) && shown && isNextKey) {
         if (!tryAdvance()) funBurst();
@@ -344,7 +339,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       lastChange.current = now;
       show(target);
     },
-    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, settings.stepByStep, settings.showWord, settings.finishCounting],
+    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, settings.stepByStep, settings.finishCounting],
   );
 
   useEffect(() => {
@@ -401,7 +396,6 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
               key={shown.id}
               letter={shown.letter}
               word={shown.word}
-              stage={stage}
               settings={settings}
               onPointerDown={onCardPointer}
               onPicturePointerDown={nextWord}

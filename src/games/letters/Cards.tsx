@@ -17,13 +17,6 @@ const ROWS: Record<number, number[]> = {
   9: [3, 3, 3],
 };
 
-export type LetterPart = "letter" | "word" | "picture";
-
-/** The parts of a letter card, in the order they are revealed. */
-export function letterParts(showWord: boolean): LetterPart[] {
-  return showWord ? ["letter", "word", "picture"] : ["letter", "picture"];
-}
-
 /**
  * Keeps its content's space in the layout but hides it until `visible`.
  * With `hint`, hidden content shows as a pulsing dashed placeholder, so
@@ -34,17 +27,16 @@ function Reveal({ visible, hint, children }: { visible: boolean; hint: boolean; 
   return <div className={`reveal ${state}`}>{children}</div>;
 }
 
+/** A letter with its picture in the middle and the word underneath, all shown at once. */
 export function LetterCard({
   letter,
   word,
-  stage,
   settings,
   onPointerDown,
   onPicturePointerDown,
 }: {
   letter: LetterEntry;
   word: WordEntry;
-  stage: number;
   settings: LettersSettings;
   onPointerDown?: PointerEventHandler;
   /** Tapping the picture, e.g. for the next word with the same letter. */
@@ -53,8 +45,6 @@ export function LetterCard({
   const glyphs = { upper: [letter.upper], both: [letter.upper, letter.lower], lower: [letter.lower] }[
     settings.letterCase
   ];
-  const parts = letterParts(settings.showWord);
-  const visible = (part: LetterPart) => parts.indexOf(part) <= stage;
 
   return (
     <div className="card" onPointerDown={onPointerDown}>
@@ -69,19 +59,15 @@ export function LetterCard({
           ))}
         </div>
       )}
+      <div onPointerDown={onPicturePointerDown}>
+        <Picture word={word} />
+      </div>
       {settings.showWord && (
-        <Reveal visible={visible("word")} hint={settings.stepByStep}>
-          <div className="word">
-            <span className="first-letter">{word.word.slice(0, 1)}</span>
-            {word.word.slice(1)}
-          </div>
-        </Reveal>
-      )}
-      <Reveal visible={visible("picture")} hint={settings.stepByStep}>
-        <div onPointerDown={visible("picture") ? onPicturePointerDown : undefined}>
-          <Picture word={word} />
+        <div className="word">
+          <span className="first-letter">{word.word.slice(0, 1)}</span>
+          {word.word.slice(1)}
         </div>
-      </Reveal>
+      )}
     </div>
   );
 }
