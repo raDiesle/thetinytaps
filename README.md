@@ -23,7 +23,12 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/games/letters/` | Game "Buchstaben & Zahlen" |
+| `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap or hover / swipe) and the scenes, e.g. `baustelle/` |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
+
+To add a scene to "Lebendige Bilder", create a folder like `src/games/scenes/baustelle/`
+with the drawing (SVG in React, one component per tappable item), its texts and a
+CSS file for the tap animations, then add it to `SCENES` in `src/games/scenes/index.ts`.
 
 To add a picture that has no emoji, put an SVG in `public/images/` and set
 `image` on the word (see Xylophon).
@@ -40,4 +45,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 2. ~~Options: themes (Tiere, Fahrzeuge, Essen), announcement style, calm mode, uninterrupted counting~~
 3. Own illustrations and recorded voice (incl. letter sounds „b“ instead of „Be“), offline (PWA)
 4. Wörter tippen
-5. Wimmelbild Baustelle
+5. ~~Lebendige Bilder: Wimmelbild Baustelle~~ – next: Bauernhof, Zoo, Stadt

@@ -1,0 +1,932 @@
+/* Animations of the Baustelle scene. Durations match durationMs in Baustelle.tsx. */
+
+/* ---------- Idle movement (off in calm mode) ---------- */
+
+.scene:not(.calm) .bs-cloud {
+  animation: bs-drift 26s ease-in-out infinite alternate;
+}
+
+.scene:not(.calm) .sonne-rays {
+  animation: bs-spin 40s linear infinite;
+}
+
+.scene:not(.calm) .bs-cloud-slow {
+  animation-duration: 40s;
+}
+
+/* A car passes behind the trucks now and then. */
+.scene:not(.calm) .bs-car {
+  animation: bs-car 22s linear infinite;
+}
+
+.scene:not(.calm) .bs-blink {
+  animation: bs-blink 1.2s steps(1) calc(var(--i, 0) * 0.6s) infinite;
+}
+
+.scene:not(.calm) .kran-light {
+  animation: bs-blink 1.6s steps(1) infinite;
+}
+
+.scene:not(.calm) .kran-flag {
+  animation: bs-flag 1.2s ease-in-out infinite alternate;
+}
+
+.scene:not(.calm) .bagger-smoke circle {
+  animation: bs-smoke 3s ease-out calc(var(--i) * 1s) infinite;
+}
+
+.scene:not(.calm) .heli-rotor {
+  animation: heli-rotor 0.15s linear infinite alternate;
+}
+
+.scene:not(.calm) .heli-tail-rotor {
+  animation: bs-spin 0.4s linear infinite;
+}
+
+.scene:not(.calm) .falter-wings {
+  animation: falter-flap 0.35s ease-in-out infinite alternate;
+}
+
+.scene:not(.calm) .katze-tail {
+  animation: katze-wag 2.5s ease-in-out infinite alternate;
+}
+
+.scene:not(.calm) .ente-body {
+  animation: ente-bob 2.4s ease-in-out infinite;
+}
+
+.scene:not(.calm) .ballon-body {
+  animation: ballon-bob 6s ease-in-out infinite alternate;
+}
+
+.scene:not(.calm) .hoernchen-tail {
+  animation: katze-wag 3s ease-in-out infinite alternate;
+}
+
+/* Puffs, drops and dust are hidden until their animation shows them. */
+.bagger-smoke circle,
+.wagen-smoke circle,
+.mischer-drops circle,
+.wolke-rain path,
+.ente-ripples ellipse,
+.ente-splash circle,
+.hammer-dust circle,
+.kipper-sand circle,
+.ballon-flame,
+.radio-notes > g,
+.baum-leaves ellipse {
+  opacity: 0;
+}
+
+.bagger-smoke circle,
+.wagen-smoke circle,
+.ente-ripples ellipse,
+.hammer-dust circle,
+.haus-windows rect,
+.radio-notes > g {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes ballon-bob {
+  to {
+    transform: translate(16px, -10px);
+  }
+}
+
+@keyframes bs-car {
+  40%,
+  100% {
+    transform: translateX(1950px);
+  }
+}
+
+@keyframes bs-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes bs-flag {
+  to {
+    transform: scaleX(0.75) skewY(6deg);
+  }
+}
+
+@keyframes bs-smoke {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-24px, -80px) scale(1.8);
+  }
+}
+
+@keyframes heli-rotor {
+  to {
+    transform: scaleX(0.25);
+  }
+}
+
+@keyframes falter-flap {
+  to {
+    transform: scaleX(0.3);
+  }
+}
+
+@keyframes ente-bob {
+  50% {
+    transform: translateY(3px) rotate(-2deg);
+  }
+}
+
+@keyframes bs-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes bs-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes bs-rumble {
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+/* ---------- Haus: the top row of bricks is laid one by one ---------- */
+
+.item-haus.playing .haus-top rect {
+  animation: haus-hop 0.6s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-haus.playing .haus-windows rect {
+  animation: bs-pop 0.5s ease-in-out calc(0.8s + var(--i, 0) * 0.2s);
+}
+
+@keyframes bs-pop {
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+@keyframes haus-hop {
+  40% {
+    transform: translateY(-36px);
+  }
+}
+
+/* ---------- Katze ---------- */
+
+.item-katze.playing .katze-tail {
+  animation: katze-wag 0.4s ease-in-out 4 alternate;
+}
+
+.item-katze.playing .katze-head {
+  animation: katze-tilt 1.6s ease-in-out;
+}
+
+@keyframes katze-wag {
+  to {
+    transform: rotate(-35deg);
+  }
+}
+
+@keyframes katze-tilt {
+  25%,
+  75% {
+    transform: rotate(-18deg);
+  }
+}
+
+/* ---------- Kran: lowers the bricks, then lifts them high ---------- */
+
+.item-kran.playing .kran-cable {
+  animation: kran-cable 3.2s ease-in-out;
+}
+
+.item-kran.playing .kran-load {
+  animation: kran-load 3.2s ease-in-out;
+}
+
+/* The cable is 108 units long; its scale follows the load's offset. */
+@keyframes kran-cable {
+  35%,
+  50% {
+    transform: scaleY(1.37);
+  }
+  85% {
+    transform: scaleY(0.54);
+  }
+}
+
+@keyframes kran-load {
+  35%,
+  50% {
+    transform: translateY(40px);
+  }
+  85% {
+    transform: translateY(-50px);
+  }
+}
+
+/* ---------- Vogel ---------- */
+
+.item-vogel.playing .vogel-flight {
+  animation: vogel-fly 2.4s ease-in-out;
+}
+
+.item-vogel.playing .vogel-wing {
+  animation: vogel-flap 0.15s linear 16 alternate;
+}
+
+@keyframes vogel-fly {
+  20% {
+    transform: translate(-90px, -50px);
+  }
+  45% {
+    transform: translate(40px, -75px);
+  }
+  70% {
+    transform: translate(150px, -30px);
+  }
+}
+
+@keyframes vogel-flap {
+  to {
+    transform: scaleY(-1.4);
+  }
+}
+
+/* ---------- Sonne ---------- */
+
+.item-sonne.playing .sonne-body {
+  animation: sonne-pulse 1s ease-in-out 2;
+}
+
+.item-sonne.playing .sonne-rays {
+  animation: bs-spin 2s ease-in-out;
+}
+
+@keyframes sonne-pulse {
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+/* ---------- Bagger: lifts the arm, then digs into the dirt ---------- */
+
+.item-bagger.playing .bagger-arm {
+  animation: bagger-dig 2.2s ease-in-out;
+}
+
+.item-bagger.playing .bagger-bucket {
+  animation: bagger-scoop 2.2s ease-in-out;
+}
+
+.item-bagger.playing .bagger-body {
+  animation: bs-rumble 0.1s linear 22 alternate;
+}
+
+@keyframes bagger-dig {
+  30%,
+  42% {
+    transform: rotate(-16deg);
+  }
+  70% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes bagger-scoop {
+  30%,
+  42% {
+    transform: rotate(-30deg);
+  }
+  70% {
+    transform: rotate(25deg);
+  }
+}
+
+/* ---------- Betonmischer: the spiral moves along the turning drum ---------- */
+
+.item-mischer.playing .mischer-stripes {
+  animation: mischer-spin 0.55s linear 4;
+}
+
+.item-mischer.playing .mischer-truck {
+  animation: bs-rumble 0.1s linear 22 alternate;
+}
+
+@keyframes mischer-spin {
+  to {
+    transform: translateX(-50px);
+  }
+}
+
+/* ---------- Kipplaster: tips the bed and the sand pours out ---------- */
+
+.item-kipper.playing .kipper-bed {
+  animation: kipper-tip 2.8s ease-in-out;
+}
+
+.item-kipper.playing .kipper-sand circle {
+  animation: kipper-fall 0.8s ease-in calc(0.7s + var(--i) * 0.14s) 2;
+}
+
+@keyframes kipper-tip {
+  30%,
+  65% {
+    transform: rotate(28deg);
+  }
+}
+
+@keyframes kipper-fall {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+}
+
+/* ---------- Bauarbeiter: hops and waves ---------- */
+
+.item-arbeiter.playing .arbeiter-arm {
+  animation: arbeiter-wave 2.2s ease-in-out;
+}
+
+.item-arbeiter.playing .arbeiter-body {
+  animation: bs-hop 0.5s ease-out 2;
+}
+
+@keyframes arbeiter-wave {
+  20%,
+  80% {
+    transform: rotate(-150deg);
+  }
+  35%,
+  65% {
+    transform: rotate(-120deg);
+  }
+  50% {
+    transform: rotate(-165deg);
+  }
+}
+
+@keyframes bs-hop {
+  40% {
+    transform: translateY(-18px);
+  }
+}
+
+/* ---------- Schubkarre ---------- */
+
+.item-karre.playing .karre-body {
+  animation: karre-roll 1.8s ease-in-out;
+}
+
+.item-karre.playing .karre-wheel {
+  animation: karre-wheel 1.8s ease-in-out;
+}
+
+@keyframes karre-roll {
+  35% {
+    transform: translateX(40px);
+  }
+  75% {
+    transform: translateX(-20px);
+  }
+}
+
+@keyframes karre-wheel {
+  35% {
+    transform: rotate(160deg);
+  }
+  75% {
+    transform: rotate(-80deg);
+  }
+}
+
+/* ---------- Hütchen: squash, jump, land ---------- */
+
+.item-huetchen.playing .huetchen-body {
+  animation: huetchen-hop 0.9s ease-in-out;
+}
+
+@keyframes huetchen-hop {
+  15% {
+    transform: scale(1.15, 0.85);
+  }
+  45% {
+    transform: translateY(-70px) scale(0.92, 1.08);
+  }
+  75% {
+    transform: scale(1.1, 0.9);
+  }
+}
+
+/* ---------- Wolke: turns grey and rains ---------- */
+
+.item-wolke.playing .cloud-puffs {
+  animation: wolke-dark 2.6s ease-in-out;
+}
+
+.item-wolke.playing .wolke-rain path {
+  animation: wolke-drop 0.6s linear calc(var(--i) * 0.12s) 4;
+}
+
+@keyframes wolke-dark {
+  15%,
+  80% {
+    fill: #b8c4d6;
+  }
+}
+
+@keyframes wolke-drop {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+    transform: translateY(220px);
+  }
+}
+
+/* ---------- Hubschrauber: takes off, circles, lands ---------- */
+
+.item-heli.playing .heli-body {
+  animation: heli-fly 2.6s ease-in-out;
+}
+
+.item-heli.playing .heli-rotor {
+  animation: heli-rotor 0.08s linear infinite alternate;
+}
+
+@keyframes heli-fly {
+  30% {
+    transform: translate(-30px, -90px) rotate(-6deg);
+  }
+  65% {
+    transform: translate(70px, -60px) rotate(6deg);
+  }
+}
+
+/* ---------- Bauwagen: the door opens, the stove smokes ---------- */
+
+.item-bauwagen.playing .wagen-door {
+  animation: wagen-door 2.6s ease-in-out;
+}
+
+.item-bauwagen.playing .wagen-smoke circle {
+  animation: bs-smoke 1.2s ease-out calc(var(--i) * 0.35s) 2;
+}
+
+@keyframes wagen-door {
+  15%,
+  80% {
+    transform: scaleX(0.12);
+  }
+}
+
+/* ---------- Klo: someone is inside! ---------- */
+
+.item-klo.playing .klo-body {
+  animation: klo-rattle 0.1s linear 14 alternate;
+}
+
+.item-klo.playing .klo-sign {
+  animation: bs-blink 0.4s steps(1) 3;
+}
+
+@keyframes klo-rattle {
+  from {
+    transform: rotate(-2.5deg);
+  }
+  to {
+    transform: rotate(2.5deg);
+  }
+}
+
+/* ---------- Betonmischer: concrete drips from the chute ---------- */
+
+.item-mischer.playing .mischer-drops circle {
+  animation: mischer-drip 0.6s ease-in calc(0.2s + var(--i) * 0.2s) 3;
+}
+
+@keyframes mischer-drip {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}
+
+/* ---------- Ampel: red, yellow, green, back to red ---------- */
+
+.ampel-yellow,
+.ampel-green {
+  opacity: 0;
+}
+
+.item-ampel.playing .ampel-red {
+  animation: ampel-red 2.7s linear;
+}
+
+.item-ampel.playing .ampel-yellow {
+  animation: ampel-yellow 2.7s linear;
+}
+
+.item-ampel.playing .ampel-green {
+  animation: ampel-green 2.7s linear;
+}
+
+@keyframes ampel-red {
+  0%,
+  30% {
+    opacity: 1;
+  }
+  33%,
+  97% {
+    opacity: 0;
+  }
+}
+
+@keyframes ampel-yellow {
+  33%,
+  63% {
+    opacity: 1;
+  }
+  66% {
+    opacity: 0;
+  }
+}
+
+@keyframes ampel-green {
+  0%,
+  63% {
+    opacity: 0;
+  }
+  66%,
+  97% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Hund: wags, barks, hops ---------- */
+
+.item-hund.playing .hund-tail {
+  animation: hund-wag 0.12s linear 12 alternate;
+}
+
+.item-hund.playing .hund-head {
+  animation: hund-bark 0.3s ease-in-out 2;
+}
+
+.item-hund.playing .hund-body {
+  animation: bs-hop 0.4s ease-out 0.7s 2;
+}
+
+@keyframes hund-wag {
+  from {
+    transform: rotate(-25deg);
+  }
+  to {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes hund-bark {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+/* ---------- Maus: comes out of the pipe and goes back ---------- */
+
+.item-maus.playing .maus-body {
+  animation: maus-peek 1.8s ease-in-out;
+}
+
+@keyframes maus-peek {
+  25%,
+  70% {
+    transform: translate(64px, 14px);
+  }
+}
+
+/* ---------- Ente: splashes in the puddle ---------- */
+
+.item-ente.playing .ente-body {
+  animation: ente-splash 0.45s ease-in-out 4;
+}
+
+.item-ente.playing .ente-ripples ellipse {
+  animation: ente-ripple 0.9s ease-out calc(var(--i, 0) * 0.45s) 2;
+}
+
+.item-ente.playing .ente-splash circle {
+  animation: ente-drop 0.6s ease-out calc(var(--i) * 0.15s) 2;
+}
+
+@keyframes ente-splash {
+  50% {
+    transform: translateY(-10px) rotate(-8deg);
+  }
+}
+
+@keyframes ente-ripple {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes ente-drop {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-34px);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Presslufthammer: rattles and makes dust ---------- */
+
+.item-hammer.playing .hammer-shake {
+  animation: hammer-jitter 0.06s linear 26 alternate;
+}
+
+.item-hammer.playing .hammer-dust circle {
+  animation: hammer-dust 0.8s ease-out calc(var(--i) * 0.25s) 2;
+}
+
+@keyframes hammer-jitter {
+  to {
+    transform: translate(2px, -3px);
+  }
+}
+
+@keyframes hammer-dust {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(2);
+  }
+}
+
+/* ---------- Schmetterling: flutters a loop over the flowers ---------- */
+
+.item-falter.playing .falter-flight {
+  animation: falter-fly 2.4s ease-in-out;
+}
+
+.item-falter.playing .falter-wings {
+  animation: falter-flap 0.12s linear 20 alternate;
+}
+
+@keyframes falter-fly {
+  25% {
+    transform: translate(-80px, -60px);
+  }
+  50% {
+    transform: translate(-20px, -130px);
+  }
+  75% {
+    transform: translate(40px, -50px);
+  }
+}
+
+/* ---------- Heißluftballon: the burner flares and the balloon rises ---------- */
+
+.item-ballon.playing .ballon-body {
+  animation: ballon-rise 2.8s ease-in-out;
+}
+
+.item-ballon.playing .ballon-flame {
+  animation: ballon-flame 0.25s ease-in-out 6 alternate;
+}
+
+@keyframes ballon-rise {
+  40%,
+  60% {
+    transform: translate(30px, -26px);
+  }
+}
+
+@keyframes ballon-flame {
+  from {
+    opacity: 1;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.5, 1.8);
+  }
+}
+
+/* ---------- Baum: the crown rustles and leaves fall ---------- */
+
+.item-baum.playing .baum-crown {
+  animation: baum-rustle 0.3s ease-in-out 6 alternate;
+}
+
+.item-baum.playing .baum-leaves ellipse {
+  animation: baum-fall 1.6s ease-in calc(0.2s + var(--i) * 0.2s);
+}
+
+@keyframes baum-rustle {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes baum-fall {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-14px, 36px) rotate(60deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(8px, 72px) rotate(-30deg);
+  }
+}
+
+/* ---------- Eichhörnchen: hops onto the crown and back ---------- */
+
+.item-eichhoernchen.playing .hoernchen-body {
+  animation: hoernchen-hop 1.8s ease-in-out;
+}
+
+.item-eichhoernchen.playing .hoernchen-tail {
+  animation: katze-wag 0.2s ease-in-out 8 alternate;
+}
+
+@keyframes hoernchen-hop {
+  25% {
+    transform: translate(-20px, -46px);
+  }
+  35%,
+  65% {
+    transform: translate(-36px, -40px);
+  }
+  80% {
+    transform: translate(-12px, -30px);
+  }
+}
+
+/* ---------- Schild: wobbles on its pole ---------- */
+
+.item-schild.playing .schild-body {
+  animation: schild-wobble 1.4s ease-out;
+}
+
+@keyframes schild-wobble {
+  15% {
+    transform: rotate(-10deg);
+  }
+  35% {
+    transform: rotate(8deg);
+  }
+  55% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(2deg);
+  }
+}
+
+/* ---------- Radio: bounces to the beat, notes float up ---------- */
+
+.item-radio.playing .radio-body {
+  animation: radio-beat 0.24s ease-in-out 8 alternate;
+}
+
+.item-radio.playing .radio-notes > g {
+  animation: radio-note 1.2s ease-out calc(var(--i) * 0.3s) 1;
+}
+
+@keyframes radio-beat {
+  to {
+    transform: scale(1.08, 0.94);
+  }
+}
+
+@keyframes radio-note {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -50px) rotate(15deg);
+  }
+}
+
+/* ---------- Werkzeugkasten: the lid flips open and the tools pop up ---------- */
+
+.werkzeug-tools {
+  transform: translateY(40px);
+}
+
+.item-werkzeug.playing .werkzeug-lid {
+  animation: werkzeug-lid 1.8s ease-in-out;
+}
+
+.item-werkzeug.playing .werkzeug-tools {
+  animation: werkzeug-tools 1.8s ease-in-out;
+}
+
+@keyframes werkzeug-lid {
+  20%,
+  80% {
+    transform: rotate(60deg);
+  }
+}
+
+@keyframes werkzeug-tools {
+  30%,
+  70% {
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Frosch: squats and jumps ---------- */
+
+.item-frosch.playing .frosch-body {
+  animation: frosch-jump 1.2s ease-in-out;
+}
+
+@keyframes frosch-jump {
+  15% {
+    transform: scale(1.12, 0.85);
+  }
+  45% {
+    transform: translate(-10px, -80px) scale(0.92, 1.1);
+  }
+  75% {
+    transform: scale(1.1, 0.9);
+  }
+}
+
+/* ---------- Schnecke: stretches out and crawls a little ---------- */
+
+.item-schnecke.playing .schnecke-crawl {
+  animation: schnecke-crawl 2.6s ease-in-out;
+}
+
+.item-schnecke.playing .schnecke-foot {
+  animation: schnecke-stretch 0.65s ease-in-out 4 alternate;
+}
+
+.item-schnecke.playing .schnecke-stalks {
+  animation: schnecke-stalks 2.6s ease-in-out;
+}
+
+@keyframes schnecke-crawl {
+  50%,
+  70% {
+    transform: translateX(18px);
+  }
+}
+
+@keyframes schnecke-stretch {
+  to {
+    transform: scaleX(1.12);
+  }
+}
+
+@keyframes schnecke-stalks {
+  20%,
+  80% {
+    transform: scaleY(1.3);
+  }
+}

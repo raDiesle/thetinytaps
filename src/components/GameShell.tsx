@@ -16,6 +16,9 @@ interface GameShellProps {
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
   children: ReactNode;
+  /** Where the start screen's back link leads. */
+  backHref?: string;
+  backLabel?: string;
 }
 
 /**
@@ -23,7 +26,15 @@ interface GameShellProps {
  * playing, and an exit that toddlers won't trigger by accident: hold the
  * corner button or the Esc key for two seconds.
  */
-export function GameShell({ title, emoji, speechLang, settings, children }: GameShellProps) {
+export function GameShell({
+  title,
+  emoji,
+  speechLang,
+  settings,
+  children,
+  backHref = "/",
+  backLabel = "Alle Spiele",
+}: GameShellProps) {
   const [playing, setPlaying] = useState(false);
 
   const start = async () => {
@@ -80,8 +91,8 @@ export function GameShell({ title, emoji, speechLang, settings, children }: Game
 
   return (
     <main className="start-screen">
-      <Link href="/" className="back-link">
-        ← Alle Spiele
+      <Link href={backHref} className="back-link">
+        ← {backLabel}
       </Link>
       <h1>
         <span aria-hidden>{emoji}</span> {title}

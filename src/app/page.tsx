@@ -1,9 +1,9 @@
-import Link from "next/link";
+import { GameCard } from "@/components/GameCard";
 
 const GAMES = [
   { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen", text: "Taste drücken – Bild, Buchstabe und Zahl erscheinen." },
+  { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder", text: "Wimmelbilder zum Antippen – alles bewegt sich und spricht." },
   { emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
-  { emoji: "🏗️", title: "Wimmelbild Baustelle", text: "Bagger, Kran und Co. anklicken und entdecken." },
 ];
 
 export default function Home() {
@@ -14,31 +14,10 @@ export default function Home() {
       <ul className="game-list">
         {GAMES.map((g) => (
           <li key={g.title}>
-            {g.href ? (
-              <Link href={g.href} className="game-card">
-                <GameCardContent {...g} />
-              </Link>
-            ) : (
-              <div className="game-card disabled" aria-disabled>
-                <GameCardContent {...g} />
-                <span className="badge">bald</span>
-              </div>
-            )}
+            <GameCard {...g} />
           </li>
         ))}
       </ul>
     </main>
-  );
-}
-
-function GameCardContent({ emoji, title, text }: { emoji: string; title: string; text: string }) {
-  return (
-    <>
-      <span className="game-emoji" aria-hidden>
-        {emoji}
-      </span>
-      <span className="game-title">{title}</span>
-      <span className="game-text">{text}</span>
-    </>
   );
 }

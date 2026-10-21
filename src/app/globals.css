@@ -85,6 +85,12 @@ a.game-card:hover {
   font-size: 1rem;
 }
 
+.home > .back-link {
+  display: block;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
 .badge {
   position: absolute;
   top: 14px;
@@ -260,6 +266,8 @@ a.game-card:hover {
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 .hold-exit {
@@ -461,6 +469,113 @@ a.game-card:hover {
   }
 }
 
+/* ---------- Lebendige Bilder ---------- */
+
+/* Above and below the picture the sky and ground continue, whatever the screen shape. */
+.scene {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--sky) 50%, var(--ground) 50%);
+}
+
+.scene-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scene-item {
+  cursor: pointer;
+}
+
+/* Invisible but tappable: generous tap areas for small fingers. */
+.scene-hit {
+  fill: transparent;
+}
+
+.scene-hint {
+  fill: #ffffff30;
+  stroke: #fff;
+  stroke-width: 8;
+  stroke-dasharray: 22 14;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hint-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  50% {
+    stroke: var(--accent);
+    transform: scale(1.04);
+  }
+}
+
+.scene-prompt,
+.find-question {
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  width: fit-content;
+  /* Leave room for the stars (left) and the exit button (right). */
+  max-width: calc(100% - 160px);
+  margin: 0 auto;
+  border-radius: 99px;
+  background: #fff;
+  box-shadow: 0 6px 0 #00000014;
+  font-weight: 700;
+}
+
+.scene-prompt {
+  padding: 12px 28px;
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  pointer-events: none;
+  animation: bob 1.6s ease-in-out infinite;
+}
+
+.find-question {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 28px 8px 8px;
+  border: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: clamp(1.3rem, 3.5vw, 2.2rem);
+  cursor: pointer;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.find-thumb {
+  width: min(16vh, 120px);
+  height: min(12vh, 90px);
+  padding: 6px;
+  border-radius: 99px;
+  background: #e3f6ff;
+}
+
+.find-stars {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  max-width: 30vw;
+  font-family: var(--font-emoji);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  pointer-events: none;
+}
+
+.find-count {
+  margin-left: 6px;
+  font-family: var(--font-rounded);
+  font-weight: 800;
+}
+
+.calm .scene-prompt,
+.calm .scene-hint {
+  animation: none;
+}
+
 /* Calm mode: no wiggling or bouncing, softer shapes, slower colour changes. */
 .letters-play.calm {
   transition-duration: 1.2s;
@@ -495,7 +610,8 @@ a.game-card:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .picture,
-  .letters-welcome {
+  .letters-welcome,
+  .scene-prompt {
     animation: none;
   }
 }
