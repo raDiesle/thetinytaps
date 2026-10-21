@@ -496,3 +496,50 @@ export function playCuckoo() {
     note({ from: 622, to: 610, duration: 0.34, type: "sine", volume: 0.28, delay: delay + 0.3 });
   });
 }
+
+/** "Ding!" – a small bright bell that rings out. */
+export function playDing() {
+  note({ from: 1568, duration: 1.3, type: "sine", volume: 0.22 });
+  note({ from: 3920, duration: 0.5, type: "sine", volume: 0.05 });
+}
+
+/** "Wirrr" – a marble running round and round a funnel, getting faster and lower. */
+export function playSwirl() {
+  for (let i = 0; i < 12; i++) note({ from: 1000 - i * 55, to: 940 - i * 55, duration: 0.1, type: "sine", volume: 0.07, delay: i * (0.16 - i * 0.006) });
+}
+
+/** "Plopp" – something soft drops into a basket. */
+export function playPlop() {
+  note({ from: 260, to: 90, duration: 0.2, type: "sine", volume: 0.3 });
+}
+
+/** "Tock!" – wood knocking on wood; a higher `pitch` for small things. */
+export function playKnock(pitch = 700) {
+  note({ from: pitch, to: pitch * 0.5, duration: 0.08, type: "triangle", volume: 0.3 });
+  note({ from: 160, to: 70, duration: 0.12, type: "sine", volume: 0.25 });
+}
+
+/** "Plumps" – something soft or hollow falls over, like a paper roll or a carton. */
+export function playThump() {
+  note({ from: 150, to: 55, duration: 0.22, type: "sine", volume: 0.4 });
+  hiss({ from: 700, to: 300, duration: 0.15, volume: 0.12, q: 0.7 });
+}
+
+/** "Klong!" – a tin or a bottle hits something. */
+export function playClonk() {
+  note({ from: 640, to: 600, duration: 0.45, type: "triangle", volume: 0.16 });
+  note({ from: 1710, duration: 0.3, type: "sine", volume: 0.06 });
+  note({ from: 140, to: 70, duration: 0.1, type: "sine", volume: 0.2 });
+}
+
+/** "Rassel" – cereal shaking in its box as it falls over. */
+export function playRustle() {
+  for (let i = 0; i < 5; i++) hiss({ from: 4200, duration: 0.08, volume: 0.12, delay: i * 0.06, q: 1.5 });
+  note({ from: 140, to: 60, duration: 0.2, type: "sine", volume: 0.3, delay: 0.05 });
+}
+
+/** "Bumm!" – a big toy drum. */
+export function playDrum() {
+  note({ from: 150, to: 48, duration: 0.6, type: "sine", volume: 0.55 });
+  hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
+}

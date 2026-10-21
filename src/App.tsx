@@ -6,6 +6,7 @@ import { IdeasPage } from "@/pages/IdeasPage";
 import { KidHome } from "@/pages/KidHome";
 import { LettersPage } from "@/pages/LettersPage";
 import { LoudPage } from "@/pages/LoudPage";
+import { MarblePage } from "@/pages/MarblePage";
 import { ScenePage } from "@/pages/ScenePage";
 import { ScenesMenu } from "@/pages/ScenesMenu";
 import { ShadowsPage } from "@/pages/ShadowsPage";
@@ -25,6 +26,7 @@ export function App() {
       <Route path="gefuehle" element={<FeelingsPage />} />
       <Route path="schatten" element={<ShadowsPage />} />
       <Route path="laut-leise" element={<LoudPage />} />
+      <Route path="kugelbahn" element={<MarblePage />} />
       <Route path="kinder" element={<KidHome />} />
       <Route path="ideen" element={<IdeasPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
