@@ -51,7 +51,7 @@ const letters: LetterEntry[] = [
   letter("Y", "Üpsilon", [w("Yo-Yo", "🪀"), w("Yoga", "🧘")]),
   letter("Z", "Zett", [tier("Zebra", "🦓"), fahrzeug("Zug", "🚆"), essen("Zitrone", "🍋"), tier("Ziege", "🐐"), koerper("Zahn", "🦷"), koerper("Zunge", "👅")]),
   letter("Ä", "Ä", [essen("Äpfel", "🍏"), tier("Äffchen", "🐒")]),
-  letter("Ö", "Ö", [w("Öl", "🫒")]),
+  letter("Ö", "Ö", [w("Öl", "🫗", "images/oel.svg")]),
   letter("Ü", "Ü", [fest("Überraschung", "🎉")]),
 ];
 
