@@ -228,6 +228,32 @@ a.game-card:hover {
   color: #fff;
 }
 
+.voice-setting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.voice-setting select,
+.voice-setting button {
+  padding: 6px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.setting-note {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
 .start-button {
   padding: 18px 48px;
   border: 0;
@@ -461,8 +487,78 @@ a.game-card:hover {
   }
 }
 
+/* ---------- Words ---------- */
+
+.words-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.4s;
+}
+
+.slots {
+  display: flex;
+  gap: 0.08em;
+  font-size: min(22vh, calc(80vw / var(--letters)));
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+/* Every letter sits on a writing line; untyped letters show faintly, the next one pulses. */
+.slot {
+  min-width: 0.7em;
+  text-align: center;
+  border-bottom: 0.06em solid #2b2d4226;
+}
+
+.slot.typed {
+  border-bottom-color: transparent;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.slot.next {
+  color: #2b2d4255;
+  border-radius: 0.12em;
+  outline: 0.04em dashed #2b2d4250;
+  outline-offset: 0.03em;
+  animation: waiting 1.8s ease-in-out infinite;
+  cursor: pointer;
+}
+
+.slot.nudge {
+  animation:
+    shake 0.4s ease-in-out,
+    waiting 1.8s ease-in-out 0.4s infinite;
+}
+
+.slot.later {
+  color: #2b2d421c;
+}
+
+.card.done .slot {
+  animation: hop 0.5s ease-in-out calc(var(--i) * 80ms) 2;
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(-0.06em);
+  }
+  75% {
+    transform: translateX(0.06em);
+  }
+}
+
+@keyframes hop {
+  50% {
+    transform: translateY(-0.18em);
+  }
+}
+
 /* Calm mode: no wiggling or bouncing, softer shapes, slower colour changes. */
-.letters-play.calm {
+.letters-play.calm,
+.words-play.calm {
   transition-duration: 1.2s;
 }
 
@@ -475,8 +571,14 @@ a.game-card:hover {
   animation: fade-in 0.7s ease-out;
 }
 
-.calm .reveal.waiting {
+.calm .reveal.waiting,
+.calm .slot.next,
+.calm .card.done .slot {
   animation: none;
+}
+
+.calm .slot.typed {
+  animation: fade-in 0.7s ease-out;
 }
 
 .calm .burst-layer {

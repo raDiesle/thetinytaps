@@ -11,7 +11,6 @@ const EXIT_HOLD_MS = 1000;
 interface GameShellProps {
   title: string;
   emoji: string;
-  speechLang: string;
   /** Parent-facing options shown on the start screen. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
@@ -23,13 +22,13 @@ interface GameShellProps {
  * playing, and an exit that toddlers won't trigger by accident: hold the
  * corner button or the Esc key for two seconds.
  */
-export function GameShell({ title, emoji, speechLang, settings, children }: GameShellProps) {
+export function GameShell({ title, emoji, settings, children }: GameShellProps) {
   const [playing, setPlaying] = useState(false);
 
   const start = async () => {
     // These need the click as a user gesture, so run them before any await.
     unlockAudio();
-    unlockSpeech(speechLang);
+    unlockSpeech();
     setPlaying(true);
     await enterKidMode();
   };

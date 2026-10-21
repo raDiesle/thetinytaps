@@ -50,4 +50,6 @@ export interface LanguagePack {
   letterSentence: (letter: LetterEntry, word: WordEntry) => string;
   /** "drei Äpfel" / "ein Apfel" */
   countSentence: (n: number, thing: Countable) => string;
+  /** Short cheers, one is picked when a word has been typed. */
+  praise: string[];
 }

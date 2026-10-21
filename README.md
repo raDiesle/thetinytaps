@@ -23,6 +23,7 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/games/letters/` | Game "Buchstaben & Zahlen" |
+| `src/games/words/` | Game "Wörter tippen" (words come from `de.ts`, filtered by length and theme) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
 
 To add a picture that has no emoji, put an SVG in `public/images/` and set
@@ -39,5 +40,5 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 1. ~~Buchstaben & Zahlen (MVP)~~
 2. ~~Options: themes (Tiere, Fahrzeuge, Essen), announcement style, calm mode, uninterrupted counting~~
 3. Own illustrations and recorded voice (incl. letter sounds „b“ instead of „Be“), offline (PWA)
-4. Wörter tippen
+4. ~~Wörter tippen~~
 5. Wimmelbild Baustelle

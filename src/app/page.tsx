@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const GAMES = [
   { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen", text: "Taste drücken – Bild, Buchstabe und Zahl erscheinen." },
-  { emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
+  { href: "/woerter/", emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
   { emoji: "🏗️", title: "Wimmelbild Baustelle", text: "Bagger, Kran und Co. anklicken und entdecken." },
 ];
 
