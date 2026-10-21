@@ -35,6 +35,16 @@ export function Baum() {
         <circle cx="-32" cy="-270" r="16" fill="#74c69d" />
         <circle cx="-30" cy="-222" r="24" fill="#74c69d" opacity="0.6" />
       </g>
+      <g className="bh-baum-bird">
+        <path d="M50 -240 q8 -12 16 -2 q8 -10 16 2 q-16 -2 -32 0 Z" fill="#2b2d42" />
+      </g>
+      {[
+        [-70, -200],
+        [60, -150],
+        [-10, -170],
+      ].map(([x, y], i) => (
+        <path key={x} className="bh-baum-leaf" d={`M${x} ${y} q8 -10 16 0 q-8 10 -16 0 Z`} fill="#40916c" style={nth(i)} />
+      ))}
       {APPLES.map(([cx, cy], i) => (
         <g key={cx} className="bh-baum-apple" style={{ ...nth(i), "--fall": `${-cy - 8}px` } as CSSProperties}>
           <circle cx={cx} cy={cy} r="10" fill="#e63946" />
@@ -49,6 +59,22 @@ export function Baum() {
 /** Round hay bale; it rolls away a little and back. */
 export function Heuballen() {
   return (
+    <>
+    <g className="bh-heu-mouse">
+      <ellipse cx="0" cy="-14" rx="16" ry="12" fill="#adb5bd" />
+      <circle cx="-14" cy="-30" r="7" fill="#ced4da" />
+      <circle cx="10" cy="-30" r="7" fill="#ced4da" />
+      <circle cx="-2" cy="-24" r="11" fill="#adb5bd" />
+      <circle cx="-6" cy="-26" r="2" fill="#2b2d42" />
+      <circle cx="3" cy="-26" r="2" fill="#2b2d42" />
+      <circle cx="-2" cy="-20" r="2.4" fill="#ff8fa3" />
+      <path d="M14 -10 q16 0 14 -14" stroke="#adb5bd" strokeWidth="3" fill="none" strokeLinecap="round" />
+    </g>
+    <g className="bh-heu-bits" stroke="#e9b949" strokeWidth="4" strokeLinecap="round">
+      {[-40, 0, 40].map((x, i) => (
+        <path key={x} d={`M${x} -6 l8 -4`} style={nth(i)} />
+      ))}
+    </g>
     <g className="bh-heu-roll" style={{ transformOrigin: "0px -58px" }}>
       <circle cx="0" cy="-58" r="58" fill="#e9b949" />
       <circle cx="0" cy="-58" r="58" fill="none" stroke="#c89b2c" strokeWidth="4" />
@@ -56,5 +82,6 @@ export function Heuballen() {
       <path d="M-30 -104 a54 54 0 0 1 40 -10" stroke="#fff" strokeOpacity="0.5" strokeWidth="6" fill="none" strokeLinecap="round" />
       <path d="M-56 -40 l-10 4 M-50 -90 l-10 -6 M50 -94 l10 -6 M56 -36 l10 4" stroke="#e9b949" strokeWidth="3" strokeLinecap="round" />
     </g>
+    </>
   );
 }

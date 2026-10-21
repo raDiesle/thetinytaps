@@ -68,7 +68,7 @@ export const hof: Scene = {
       box: [-86, -228, 172, 228],
       hitAreas: [[-86, -228, 172, 156]],
       place: ground(0, 0, 600, 470, 1.2),
-      durationMs: 2200,
+      durationMs: 2400,
       Art: Vogelscheuche,
     },
     {
@@ -164,7 +164,7 @@ export const hof: Scene = {
       box: [-64, -316, 108, 104],
       hitAreas: [[-66, -332, 120, 118]],
       place: STALL,
-      durationMs: 2000,
+      durationMs: 2200,
       Art: Hahn,
     },
     {
@@ -238,7 +238,7 @@ export const hof: Scene = {
       box: [-50, -92, 106, 92],
       place: ground(0, 0, 600, 706),
       shadow: [0, 0, 34],
-      durationMs: 1800,
+      durationMs: 2200,
       Art: Huhn,
     },
     {
@@ -289,7 +289,7 @@ export const hof: Scene = {
       sound: "engine",
       traits: ["red", "wheels", "big"],
       key: "T",
-      box: [-172, -218, 332, 218],
+      box: [-172, -242, 332, 242],
       place: ground(0, 0, 330, 760, 1.05),
       shadow: [-14, 0, 160],
       durationMs: 2600,
@@ -342,7 +342,7 @@ export const hof: Scene = {
       key: "S",
       box: [-126, -140, 254, 140],
       place: ground(0, 0, 300, 908, 1.15),
-      durationMs: 2000,
+      durationMs: 2300,
       Art: Schwein,
     },
     {
@@ -355,7 +355,7 @@ export const hof: Scene = {
       box: [-52, -58, 116, 60],
       hitAreas: [[-64, -76, 140, 86]],
       place: ground(0, 0, 1220, 884),
-      durationMs: 2400,
+      durationMs: 2800,
       Art: Ente,
     },
     {
@@ -368,7 +368,7 @@ export const hof: Scene = {
       box: [-46, -56, 92, 62],
       hitAreas: [[-58, -82, 116, 90]],
       place: ground(0, 0, 1370, 904),
-      durationMs: 1800,
+      durationMs: 2200,
       Art: Frosch,
     },
     {
@@ -402,7 +402,7 @@ export const hof: Scene = {
       sound: "chime",
       box: [-66, -124, 136, 124],
       place: WIESE,
-      durationMs: 1800,
+      durationMs: 2300,
       Art: Blumen,
     },
     {

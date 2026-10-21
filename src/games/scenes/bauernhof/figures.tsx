@@ -1,4 +1,6 @@
-import { Face, SKIN } from "../shared";
+import type { CSSProperties } from "react";
+import { Face, SKIN, nth } from "../shared";
+import { Lid } from "./animals";
 
 // The farmer and the scarecrow. Foot point at (0, 0).
 
@@ -6,8 +8,10 @@ import { Face, SKIN } from "../shared";
 export function Bauer() {
   return (
     <g className="bh-bauer-body" style={{ transformOrigin: "0px 0px" }}>
-      <path d="M44 -6 V-176" stroke="#8d5a2b" strokeWidth="6" strokeLinecap="round" />
-      <path d="M32 -176 V-206 M44 -176 V-210 M56 -176 V-206 M30 -178 H58" stroke="#868e96" strokeWidth="4" strokeLinecap="round" />
+      <g className="bh-bauer-fork" style={{ transformOrigin: "44px -94px" }}>
+        <path d="M44 -6 V-176" stroke="#8d5a2b" strokeWidth="6" strokeLinecap="round" />
+        <path d="M32 -176 V-206 M44 -176 V-210 M56 -176 V-206 M30 -178 H58" stroke="#868e96" strokeWidth="4" strokeLinecap="round" />
+      </g>
       <rect x="-24" y="-70" width="20" height="62" rx="6" fill="#3a86ff" />
       <rect x="4" y="-70" width="20" height="62" rx="6" fill="#3a86ff" />
       <path d="M-30 0 V-12 Q-30 -16 -24 -16 H-2 V0 Z M2 0 V-16 H24 Q30 -16 30 -12 V0 Z" fill="#2b9348" />
@@ -28,6 +32,8 @@ export function Bauer() {
       <circle cx="-23" cy="-150" r="5" fill={SKIN} />
       <circle cx="23" cy="-150" r="5" fill={SKIN} />
       <Face cx={0} cy={-154} size={1.05} />
+      <Lid cx={-7.35} cy={-154} r={4.4} fill={SKIN} />
+      <Lid cx={7.35} cy={-154} r={4.4} fill={SKIN} />
       <path d="M-10 -138 Q0 -132 10 -138" stroke="#8d5a2b" strokeWidth="4" fill="none" strokeLinecap="round" />
       <g className="bh-bauer-hat" style={{ transformOrigin: "0px -172px" }}>
         <ellipse cx="0" cy="-170" rx="40" ry="9" fill="#e9c46a" />
@@ -68,6 +74,16 @@ export function Vogelscheuche() {
         <rect x="-24" y="-218" width="48" height="7" fill="#6a994e" />
         <circle cx="18" cy="-216" r="7" fill="#ff7bd0" />
       </g>
+      <g className="bh-scheuche-straw" stroke="#e9c46a" strokeWidth="4" strokeLinecap="round">
+        {[-30, 4, 34].map((x, i) => (
+          <path key={x} d={`M${x} -84 l4 10`} style={nth(i)} />
+        ))}
+      </g>
+      {[-1, 1].map((dir, i) => (
+        <g key={dir} className="bh-scheuche-bird" style={{ ...nth(i), "--dir": dir } as CSSProperties}>
+          <path d={`M${dir * 70 - 12} -164 q6 -10 12 -2 q6 -8 12 2 q-12 -2 -24 0 Z`} fill="#2b2d42" />
+        </g>
+      ))}
     </g>
   );
 }

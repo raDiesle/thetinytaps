@@ -1,4 +1,5 @@
 import { INK, Inside, nth } from "../shared";
+import { Lid, Lines } from "./parts";
 
 // Birds. Each drawing has its foot point at (0, 0), except those that sit on something
 // else: the stork (barn roof) and the rooster (hen house roof). The duck's (0, 0) is
@@ -6,7 +7,7 @@ import { INK, Inside, nth } from "../shared";
 
 const EYE = "#2b2d42";
 
-/** Stork in its nest on the barn roof, in the barn's coordinates; it throws its head back and clatters. */
+/** Stork in its nest on the barn roof, in the barn's coordinates; it throws its head back, clatters, flaps a wing and its babies pop up. */
 export function Storch() {
   return (
     <>
@@ -14,6 +15,14 @@ export function Storch() {
         <ellipse cx="-6" cy="-402" rx="32" ry="18" fill="#fff" />
         <path d="M-38 -404 Q-12 -390 22 -398 L16 -388 Q-12 -382 -40 -396 Z" fill={INK} />
         <path d="M-38 -404 L-52 -398 L-38 -394 Z" fill="#fff" />
+        <path
+          className="hf-storch-wing"
+          d="M-30 -410 Q-4 -432 20 -406 Q-4 -396 -30 -404 Z"
+          fill="#f8f9fa"
+          stroke="#dee2e6"
+          strokeWidth="2"
+          style={{ transformOrigin: "-26px -406px" }}
+        />
         <g className="hf-storch-head" style={{ transformOrigin: "10px -414px" }}>
           <path d="M10 -414 Q16 -436 11 -454" stroke="#fff" strokeWidth="13" strokeLinecap="round" fill="none" />
           <circle cx="13" cy="-460" r="12" fill="#fff" />
@@ -21,8 +30,20 @@ export function Storch() {
           <path className="hf-storch-beak-bottom" d="M20 -458 L62 -457 L20 -453 Z" fill="#e85d04" style={{ transformOrigin: "20px -456px" }} />
           <circle cx="16" cy="-464" r="2.6" fill={EYE} />
           <circle cx="16.8" cy="-464.8" r="0.9" fill="#fff" />
+          <Lid cx={16} cy={-464} r={2.6} fill="#fff" />
         </g>
       </g>
+      {/* Two stork babies, hidden in the nest until they pop up */}
+      {[
+        [-28, 1],
+        [24, -1],
+      ].map(([x, dir], i) => (
+        <g key={x} className="hf-storch-baby" style={nth(i)}>
+          <circle cx={x} cy="-380" r="9" fill="#f8f9fa" />
+          <path d={`M${x + 7 * dir} -383 l${12 * dir} 3 l${-12 * dir} 2 Z`} fill="#f77f00" />
+          <circle cx={x + 3 * dir} cy="-384" r="1.8" fill={EYE} />
+        </g>
+      ))}
       <ellipse cx="0" cy="-378" rx="50" ry="16" fill="#7f5539" />
       <path
         d="M-48 -384 L-20 -372 M-40 -370 L-6 -386 M-8 -368 L26 -386 M10 -390 L44 -374 M30 -368 L52 -382"
@@ -34,16 +55,18 @@ export function Storch() {
   );
 }
 
-/** Rooster on the ridge of the hen house roof, in the hen house's coordinates; "Kikeriki!" */
+/** Rooster on the ridge of the hen house roof, in the hen house's coordinates; "Kikeriki!" – he flaps, fans his tail and blinks. */
 export function Hahn() {
   return (
     <g className="hf-hahn-body" style={{ transformOrigin: "0px -212px" }}>
       <path d="M-6 -212 V-230 M6 -212 V-230 M-12 -212 h12 M0 -212 h12" stroke="#ff8c42" strokeWidth="4" strokeLinecap="round" />
-      <path d="M-14 -250 Q-56 -290 -44 -314 Q-32 -284 -6 -264 Z" fill="#2d6a4f" />
-      <path d="M-16 -246 Q-62 -270 -62 -294 Q-44 -266 -10 -252 Z" fill="#1b4332" />
-      <path d="M-16 -240 Q-56 -246 -64 -266 Q-42 -250 -12 -246 Z" fill="#e85d04" />
+      <g className="hf-hahn-tail" style={{ transformOrigin: "-12px -250px" }}>
+        <path d="M-14 -250 Q-56 -290 -44 -314 Q-32 -284 -6 -264 Z" fill="#2d6a4f" />
+        <path d="M-16 -246 Q-62 -270 -62 -294 Q-44 -266 -10 -252 Z" fill="#1b4332" />
+        <path d="M-16 -240 Q-56 -246 -64 -266 Q-42 -250 -12 -246 Z" fill="#e85d04" />
+      </g>
       <ellipse cx="0" cy="-244" rx="26" ry="20" fill="#bc4749" />
-      <ellipse cx="-4" cy="-242" rx="15" ry="9" fill="#9d0208" />
+      <ellipse className="hf-hahn-wing" cx="-4" cy="-242" rx="15" ry="9" fill="#9d0208" style={{ transformOrigin: "8px -244px" }} />
       <g className="hf-hahn-head" style={{ transformOrigin: "10px -258px" }}>
         <path d="M2 -250 Q2 -276 14 -286 Q28 -282 26 -262 Q16 -250 2 -250 Z" fill="#f4a261" />
         <circle cx="18" cy="-284" r="11" fill="#bc4749" />
@@ -55,6 +78,7 @@ export function Hahn() {
         <path className="hf-hahn-beak" d="M27 -281 L38 -280 L27 -277 Z" fill="#f77f00" style={{ transformOrigin: "27px -280px" }} />
         <circle cx="20" cy="-287" r="2.4" fill={EYE} />
         <circle cx="20.7" cy="-287.7" r="0.8" fill="#fff" />
+        <Lid cx={20} cy={-287} r={2.4} fill="#bc4749" />
       </g>
       <g className="hf-hahn-notes" fill={INK} fontSize="26" fontWeight="700">
         <text x="44" y="-292" style={nth(0)}>
@@ -68,12 +92,18 @@ export function Hahn() {
   );
 }
 
-/** Brown hen, facing right; she pecks and flaps her wings. */
+/** Brown hen, facing right; she pecks up the grains, flaps her wings, wags her tail, blinks and lays an egg. */
 export function Huhn() {
   return (
     <g className="hf-huhn-body">
+      <ellipse className="hf-huhn-egg" cx="-40" cy="-11" rx="9" ry="11" fill="#fff8e7" stroke="#e9d8a6" strokeWidth="2" />
+      <g className="hf-huhn-corn" fill="#ffd60a">
+        {[46, 56, 66].map((cx, i) => (
+          <ellipse key={cx} cx={cx} cy={-3 - (i % 2) * 3} rx="3.5" ry="2.5" style={nth(i)} />
+        ))}
+      </g>
       <path d="M-8 -16 V0 M8 -16 V0 M-14 0 h12 M2 0 h12" stroke="#ff8c42" strokeWidth="4" strokeLinecap="round" />
-      <path d="M-28 -50 Q-54 -76 -44 -88 Q-36 -66 -18 -60 Z" fill="#bc6c25" />
+      <path className="hf-huhn-tail" d="M-28 -50 Q-54 -76 -44 -88 Q-36 -66 -18 -60 Z" fill="#bc6c25" style={{ transformOrigin: "-24px -56px" }} />
       <ellipse cx="0" cy="-38" rx="34" ry="26" fill="#dda15e" />
       <ellipse cx="-6" cy="-54" rx="20" ry="5" fill="#fff" opacity="0.35" />
       <g className="hf-huhn-wing" style={{ transformOrigin: "4px -46px" }}>
@@ -90,12 +120,13 @@ export function Huhn() {
         <ellipse cx="42" cy="-60" rx="3.5" ry="5" fill="#e63946" />
         <circle cx="34" cy="-73" r="2.4" fill={EYE} />
         <circle cx="34.7" cy="-73.7" r="0.8" fill="#fff" />
+        <Lid cx={34} cy={-73} r={2.4} fill="#dda15e" />
       </g>
     </g>
   );
 }
 
-/** Three fluffy chicks; they hop one after the other. */
+/** Three fluffy chicks; they hop one after the other, flap their little wings and blink. */
 export function Kueken() {
   return (
     <>
@@ -103,24 +134,25 @@ export function Kueken() {
         <g key={x} className="hf-kueken-chick" style={nth(i)}>
           <path d={`M${x - 4} -6 V0 M${x + 4} -6 V0`} stroke="#ff8c42" strokeWidth="3" strokeLinecap="round" />
           <ellipse cx={x} cy="-15" rx="15" ry="12" fill="#ffd60a" />
-          <ellipse cx={x - 4} cy="-14" rx="7" ry="5" fill="#ffc300" />
+          <ellipse className="hf-kueken-wing" cx={x - 4} cy="-14" rx="7" ry="5" fill="#ffc300" />
           <circle cx={x + 9} cy="-29" r="10" fill="#ffd60a" />
           <path d={`M${x + 6} -38 q2 -6 6 -4 M${x + 9} -38 q4 -5 7 -1`} stroke="#ffc300" strokeWidth="2" strokeLinecap="round" fill="none" />
           <path d={`M${x + 18} -31 L${x + 25} -29 L${x + 18} -27 Z`} fill="#ff8c42" />
           <circle cx={x + 12} cy="-31" r="1.9" fill={EYE} />
+          <Lid cx={x + 12} cy={-31} r={2} fill="#ffd60a" />
         </g>
       ))}
     </>
   );
 }
 
-/** White goose with a blue bow, facing left; it stretches its neck and flaps its wings. */
+/** White goose with a blue bow, facing left; it stretches its neck, honks, flaps its wings, wags its tail, blinks and the bow wiggles. */
 export function Gans() {
   return (
     <g className="hf-gans-body">
       <path d="M-2 -18 V-4 M14 -18 V-4" stroke="#ff8c42" strokeWidth="4" />
       <path d="M-12 0 L-2 -6 L6 0 Z M4 0 L14 -6 L22 0 Z" fill="#ff8c42" />
-      <path d="M50 -62 L72 -74 L60 -48 Z" fill="#e9ecef" />
+      <path className="hf-gans-tail" d="M50 -62 L72 -74 L60 -48 Z" fill="#e9ecef" style={{ transformOrigin: "52px -58px" }} />
       <ellipse cx="14" cy="-44" rx="46" ry="28" fill="#fff" />
       <ellipse cx="14" cy="-26" rx="38" ry="9" fill="#e9ecef" />
       <g className="hf-gans-wing" style={{ transformOrigin: "4px -54px" }}>
@@ -134,8 +166,12 @@ export function Gans() {
         <circle cx="-37" cy="-112" r="4" fill="#e85d04" />
         <circle cx="-28" cy="-113" r="2.6" fill={EYE} />
         <circle cx="-28.8" cy="-113.8" r="0.9" fill="#fff" />
-        <path d="M-34 -78 L-46 -86 L-46 -70 Z M-22 -78 L-10 -86 L-10 -70 Z" fill="#4895ef" />
-        <circle cx="-28" cy="-78" r="5" fill="#3a86ff" />
+        <Lid cx={-28} cy={-113} r={2.6} fill="#fff" />
+        <Lines x={-62} y={-106} dir={-1} size={0.8} />
+        <g className="hf-gans-bow" style={{ transformOrigin: "-28px -78px" }}>
+          <path d="M-34 -78 L-46 -86 L-46 -70 Z M-22 -78 L-10 -86 L-10 -70 Z" fill="#4895ef" />
+          <circle cx="-28" cy="-78" r="5" fill="#3a86ff" />
+        </g>
       </g>
     </g>
   );
@@ -143,7 +179,7 @@ export function Gans() {
 
 const ABOVE_WATER = "M-90 2 V-130 H100 V2 Z";
 
-/** Mallard on the pond, facing right; it dips its head under water, tail up. */
+/** Mallard on the pond, facing right; it dips its head under water, tail up and wagging, bubbles rise and drops fly when it comes up. */
 export function Ente() {
   return (
     <>
@@ -154,8 +190,10 @@ export function Ente() {
       </g>
       <Inside d={ABOVE_WATER}>
         <g className="hf-ente-body" style={{ transformOrigin: "6px -4px" }}>
-          <path d="M-34 -20 L-50 -32 L-30 -28 Z" fill="#343a40" />
-          <path d="M-36 -28 q-4 -8 2 -10" stroke="#343a40" strokeWidth="3" fill="none" strokeLinecap="round" />
+          <g className="hf-ente-tail" style={{ transformOrigin: "-32px -24px" }}>
+            <path d="M-34 -20 L-50 -32 L-30 -28 Z" fill="#343a40" />
+            <path d="M-36 -28 q-4 -8 2 -10" stroke="#343a40" strokeWidth="3" fill="none" strokeLinecap="round" />
+          </g>
           <ellipse cx="0" cy="-14" rx="38" ry="20" fill="#ced4da" />
           <ellipse cx="24" cy="-18" rx="17" ry="16" fill="#7f4f24" />
           <ellipse cx="-6" cy="-22" rx="22" ry="10" fill="#a68a64" />
@@ -169,6 +207,24 @@ export function Ente() {
           <circle cx="36.8" cy="-53.8" r="0.8" fill="#fff" />
         </g>
       </Inside>
+      <g className="hf-ente-bubbles" fill="none" stroke="#fff" strokeWidth="2">
+        {[
+          [44, -4, 4],
+          [56, -6, 5],
+          [50, -2, 3],
+        ].map(([cx, cy, r], i) => (
+          <circle key={cx} cx={cx} cy={cy} r={r} style={nth(i)} />
+        ))}
+      </g>
+      <g className="hf-ente-drops" fill="#a2d2ff">
+        {[
+          [26, -66],
+          [50, -70],
+          [62, -58],
+        ].map(([cx, cy], i) => (
+          <ellipse key={cx} cx={cx} cy={cy} rx="3" ry="4.5" style={nth(i)} />
+        ))}
+      </g>
     </>
   );
 }
