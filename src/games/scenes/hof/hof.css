@@ -1,0 +1,1012 @@
+/* Animations of the scene Hof am Teich. Durations match durationMs in Hof.tsx. Sun and cloud: ../sky.css. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .hf-cloud {
+  animation: hf-drift 26s ease-in-out infinite alternate;
+}
+
+.scene.lively .hf-cloud-slow {
+  animation-duration: 40s;
+}
+
+.scene.lively .hf-muehle-sails {
+  animation: hf-spin 14s linear infinite;
+}
+
+.scene.lively .hf-kuh-tail,
+.scene.lively .hf-pferd-tail {
+  animation: hf-swish 2.6s ease-in-out infinite alternate;
+}
+
+.scene.lively .hf-hund-tail {
+  animation: hf-wag 0.6s ease-in-out infinite alternate;
+}
+
+.scene.lively .hf-katze-tail {
+  animation: hf-wag 3s ease-in-out infinite alternate;
+}
+
+.scene.lively .hf-falter-wings,
+.scene.lively .hf-biene-wings {
+  animation: hf-flap 0.3s ease-in-out infinite alternate;
+}
+
+.scene.lively .hf-haus-smoke circle {
+  animation: hf-smoke 3s ease-out calc(var(--i) * 1s) infinite;
+}
+
+/* Puffs, eggs, notes and splashes are hidden until their animation shows them, and can't be tapped meanwhile. */
+.hf-scheune-bird,
+.hf-haus-smoke circle,
+.hf-stall-egg,
+.hf-hahn-notes text,
+.hf-bauer-notes text,
+.hf-traktor-puff circle,
+.hf-hund-tongue,
+.hf-schwein-splash circle,
+.hf-baum-fall circle,
+.hf-heu-straw path,
+.hf-korb-bees > g,
+.hf-ente-ripples ellipse,
+.hf-frosch-sac,
+.hf-katze-open {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hf-haus-smoke circle,
+.hf-traktor-puff circle,
+.hf-hahn-notes text,
+.hf-bauer-notes text,
+.hf-schwein-splash circle,
+.hf-baum-fall circle,
+.hf-heu-straw path,
+.hf-ente-ripples ellipse,
+.hf-frosch-sac,
+.hf-stall-egg,
+.hf-blume-head,
+.hf-scheuche-crow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Hop on their feet. */
+.hf-schaf-body,
+.hf-ziege-body,
+.hf-huhn-body,
+.hf-kueken-chick,
+.hf-ferkel-pig,
+.hf-hase-body,
+.hf-maus-body,
+.hf-frosch-body,
+.hf-gans-body,
+.hf-hund-body,
+.hf-traktor-body,
+.hf-bauer-walk {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+@keyframes hf-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes hf-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes hf-swish {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes hf-wag {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes hf-flap {
+  to {
+    transform: scaleX(0.3);
+  }
+}
+
+@keyframes hf-smoke {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(16px, -80px) scale(1.8);
+  }
+}
+
+@keyframes hf-hop {
+  40%,
+  60% {
+    transform: translateY(-26px);
+  }
+}
+
+@keyframes hf-notes {
+  0% {
+    opacity: 0;
+    transform: translate(0, 10px);
+  }
+  20%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(14px, -40px);
+  }
+}
+
+/* ---------- Windmühle: the sails turn round once ---------- */
+
+.item-windmuehle.playing .hf-muehle-sails {
+  animation: hf-spin 2.4s ease-in-out;
+}
+
+/* ---------- Vogelscheuche: wobbles, the hat jumps, the crows hop up ---------- */
+
+.item-vogelscheuche.playing .hf-scheuche-body {
+  animation: hf-wobble 0.7s ease-in-out 3;
+}
+
+.item-vogelscheuche.playing .hf-scheuche-hat {
+  animation: hf-hat 1s ease-in-out 2;
+}
+
+.item-vogelscheuche.playing .hf-scheuche-crow {
+  animation: hf-crow 2.2s ease-in-out calc(var(--i) * 0.15s);
+}
+
+@keyframes hf-wobble {
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes hf-hat {
+  40% {
+    transform: translateY(-28px) rotate(-12deg);
+  }
+  60% {
+    transform: translateY(-28px) rotate(8deg);
+  }
+}
+
+@keyframes hf-crow {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25%,
+  65% {
+    transform: translate(18px, -70px) rotate(-10deg);
+  }
+  45% {
+    transform: translate(30px, -86px) rotate(8deg);
+  }
+}
+
+/* ---------- Bauernhaus: the shutters open, the farmer's wife waves, the chimney smokes ---------- */
+
+.item-bauernhaus.playing .hf-haus-shutter {
+  animation: hf-shutter 2.6s ease-in-out;
+}
+
+.item-bauernhaus.playing .hf-haus-arm {
+  animation: hf-wave 0.5s ease-in-out 0.5s 3;
+}
+
+.item-bauernhaus.playing .hf-haus-smoke circle {
+  animation: hf-smoke 1.4s ease-out calc(var(--i) * 0.4s);
+}
+
+@keyframes hf-shutter {
+  20%,
+  80% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes hf-wave {
+  50% {
+    transform: rotate(30deg);
+  }
+}
+
+/* ---------- Scheune: the doors swing open and a swallow flies out ---------- */
+
+.item-scheune.playing .hf-scheune-door {
+  animation: hf-door 2.6s ease-in-out;
+}
+
+.item-scheune.playing .hf-scheune-bird {
+  animation: hf-swallow 2.2s ease-in 0.4s;
+}
+
+@keyframes hf-door {
+  20%,
+  80% {
+    transform: scaleX(-0.55);
+  }
+}
+
+@keyframes hf-swallow {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-120px, -180px);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-340px, -300px);
+  }
+}
+
+/* ---------- Storch: throws its head back and clatters with its beak ---------- */
+
+.item-storch.playing .hf-storch-head {
+  animation: hf-throwback 2.2s ease-in-out;
+}
+
+.item-storch.playing .hf-storch-beak-top {
+  animation: hf-beak-up 0.12s ease-in-out 0.3s 14 alternate;
+}
+
+.item-storch.playing .hf-storch-beak-bottom {
+  animation: hf-beak-down 0.12s ease-in-out 0.3s 14 alternate;
+}
+
+@keyframes hf-throwback {
+  15%,
+  85% {
+    transform: rotate(-60deg);
+  }
+}
+
+@keyframes hf-beak-up {
+  to {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes hf-beak-down {
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+/* ---------- Apfelbaum: the crown shakes and two apples fall ---------- */
+
+.item-apfelbaum.playing .hf-baum-crown {
+  animation: hf-shake 0.4s ease-in-out 3;
+}
+
+.item-apfelbaum.playing .hf-baum-fall circle {
+  animation: hf-apple 2.2s ease-in calc(var(--i) * 0.2s);
+}
+
+@keyframes hf-shake {
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes hf-apple {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(132px);
+  }
+  50% {
+    transform: translateY(116px);
+  }
+  60%,
+  85% {
+    opacity: 1;
+    transform: translateY(132px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(132px);
+  }
+}
+
+/* ---------- Schaf and Lamm: hop twice and bleat ---------- */
+
+.item-schaf.playing .hf-schaf-body,
+.item-lamm.playing .hf-schaf-body {
+  animation: hf-hop 0.9s ease-in-out 2;
+}
+
+.item-schaf.playing .hf-schaf-head,
+.item-lamm.playing .hf-schaf-head {
+  animation: hf-nod 0.6s ease-in-out 3;
+}
+
+@keyframes hf-nod {
+  50% {
+    transform: rotate(-16deg);
+  }
+}
+
+/* ---------- Hühnerstall: the door opens and an egg rolls down the ramp ---------- */
+
+.item-huehnerstall.playing .hf-stall-door {
+  animation: hf-door 2.4s ease-in-out;
+}
+
+.item-huehnerstall.playing .hf-stall-egg {
+  animation: hf-egg 2.4s ease-in-out;
+}
+
+@keyframes hf-egg {
+  0%,
+  20% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  70% {
+    transform: translate(-72px, 52px) rotate(-300deg);
+  }
+  85% {
+    opacity: 1;
+    transform: translate(-90px, 56px) rotate(-360deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-90px, 56px) rotate(-360deg);
+  }
+}
+
+/* ---------- Hahn: stretches, opens his beak and crows ---------- */
+
+.item-hahn.playing .hf-hahn-body {
+  animation: hf-stretch 2s ease-in-out;
+}
+
+.item-hahn.playing .hf-hahn-head {
+  animation: hf-crow-head 2s ease-in-out;
+}
+
+.item-hahn.playing .hf-hahn-beak {
+  animation: hf-beak-down 0.4s ease-in-out 0.3s 4 alternate;
+}
+
+.item-hahn.playing .hf-hahn-notes text,
+.item-bauer.playing .hf-bauer-notes text {
+  animation: hf-notes 1.4s ease-out calc(0.3s + var(--i) * 0.4s);
+}
+
+@keyframes hf-stretch {
+  20%,
+  70% {
+    transform: scaleY(1.12);
+  }
+}
+
+@keyframes hf-crow-head {
+  20%,
+  70% {
+    transform: rotate(-24deg);
+  }
+}
+
+/* ---------- Kuh: nods, swishes her tail, rings her bell ---------- */
+
+.item-kuh.playing .hf-kuh-head {
+  animation: hf-moo 1.2s ease-in-out 2;
+}
+
+.item-kuh.playing .hf-kuh-tail {
+  animation: hf-swish 0.4s ease-in-out 6 alternate;
+}
+
+.item-kuh.playing .hf-kuh-bell {
+  animation: hf-bell 0.4s ease-in-out 6;
+}
+
+@keyframes hf-moo {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes hf-bell {
+  25% {
+    transform: rotate(22deg);
+  }
+  75% {
+    transform: rotate(-22deg);
+  }
+}
+
+/* ---------- Ziege: butts with her head ---------- */
+
+.item-ziege.playing .hf-ziege-head {
+  animation: hf-butt 1s ease-in-out 2;
+}
+
+.item-ziege.playing .hf-ziege-body {
+  animation: hf-lunge 1s ease-in-out 2;
+}
+
+@keyframes hf-butt {
+  40%,
+  60% {
+    transform: rotate(-26deg);
+  }
+}
+
+@keyframes hf-lunge {
+  50% {
+    transform: translateX(-14px);
+  }
+}
+
+/* ---------- Pferd: rears up, shakes its mane, swishes its tail ---------- */
+
+.item-pferd.playing .hf-pferd-body {
+  animation: hf-rear 2.4s ease-in-out;
+}
+
+.item-pferd.playing .hf-pferd-mane {
+  animation: hf-mane 0.3s ease-in-out 8 alternate;
+}
+
+.item-pferd.playing .hf-pferd-tail {
+  animation: hf-swish 0.4s ease-in-out 6 alternate;
+}
+
+@keyframes hf-rear {
+  30%,
+  60% {
+    transform: rotate(-14deg);
+  }
+  80% {
+    transform: rotate(0);
+  }
+  90% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes hf-mane {
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+/* ---------- Hund: jumps, wags and barks ---------- */
+
+.item-hund.playing .hf-hund-body {
+  animation: hf-hop 0.6s ease-in-out 3;
+}
+
+.item-hund.playing .hf-hund-tail {
+  animation: hf-wag 0.15s ease-in-out 12 alternate;
+}
+
+.item-hund.playing .hf-hund-head {
+  animation: hf-tilt 0.9s ease-in-out 2;
+}
+
+.item-hund.playing .hf-hund-tongue {
+  animation: hf-show 1.8s ease-in-out;
+}
+
+@keyframes hf-tilt {
+  50% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes hf-show {
+  10%,
+  90% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Huhn: pecks and flaps ---------- */
+
+.item-huhn.playing .hf-huhn-head {
+  animation: hf-peck 0.6s ease-in-out 3;
+}
+
+.item-huhn.playing .hf-huhn-wing {
+  animation: hf-wing 0.2s ease-in-out 6 alternate;
+}
+
+@keyframes hf-peck {
+  50% {
+    transform: rotate(50deg);
+  }
+}
+
+@keyframes hf-wing {
+  to {
+    transform: rotate(-30deg);
+  }
+}
+
+/* ---------- Gans: stretches her neck and flaps ---------- */
+
+.item-gans.playing .hf-gans-neck {
+  animation: hf-honk 1s ease-in-out 2;
+}
+
+.item-gans.playing .hf-gans-wing {
+  animation: hf-wing 0.25s ease-in-out 8 alternate;
+}
+
+@keyframes hf-honk {
+  50% {
+    transform: rotate(-30deg) translateX(-8px);
+  }
+}
+
+/* ---------- Küken: hop one after the other ---------- */
+
+.item-kueken.playing .hf-kueken-chick {
+  animation: hf-hop 0.5s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+/* ---------- Bauer: walks a bit, lifts his hat, whistles ---------- */
+
+.item-bauer.playing .hf-bauer-walk {
+  animation: hf-push 2.6s ease-in-out;
+}
+
+.item-bauer.playing .hf-bauer-wheel {
+  animation: hf-roll 2.6s ease-in-out;
+}
+
+.item-bauer.playing .hf-bauer-hat {
+  animation: hf-hat 1.2s ease-in-out 0.6s;
+}
+
+@keyframes hf-push {
+  40%,
+  50% {
+    transform: translateX(36px);
+  }
+}
+
+@keyframes hf-roll {
+  40%,
+  50% {
+    transform: rotate(0.25turn);
+  }
+}
+
+/* ---------- Traktor: drives forward and back, puffs ---------- */
+
+.item-traktor.playing .hf-traktor-body {
+  animation: hf-drive 2.6s ease-in-out;
+}
+
+.item-traktor.playing .hf-traktor-wheel {
+  animation: hf-wheels 2.6s ease-in-out;
+}
+
+.item-traktor.playing .hf-traktor-puff circle {
+  animation: hf-smoke 1s ease-out calc(var(--i) * 0.25s) 2;
+}
+
+@keyframes hf-drive {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  10%,
+  30% {
+    transform: translate(20px, -3px);
+  }
+  20% {
+    transform: translate(30px, 0);
+  }
+  45%,
+  55% {
+    transform: translate(70px, 0);
+  }
+}
+
+@keyframes hf-wheels {
+  45%,
+  55% {
+    transform: rotate(0.3turn);
+  }
+}
+
+/* ---------- Heuballen: wobbles, straw flies ---------- */
+
+.item-heuballen.playing .hf-heu-round {
+  animation: hf-wobble 0.6s ease-in-out 3;
+}
+
+.item-heuballen.playing .hf-heu-straw path {
+  animation: hf-straw 1.4s ease-out calc(var(--i) * 0.15s);
+}
+
+@keyframes hf-straw {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) rotate(160deg);
+  }
+}
+
+/* ---------- Katze: wakes up, looks around, swishes her tail ---------- */
+
+.item-katze.playing .hf-katze-head {
+  animation: hf-look 1.8s ease-in-out;
+}
+
+.item-katze.playing .hf-katze-tail {
+  animation: hf-wag 0.3s ease-in-out 6 alternate;
+}
+
+.item-katze.playing .hf-katze-open {
+  animation: hf-show 1.8s ease-in-out;
+}
+
+.item-katze.playing .hf-katze-closed {
+  animation: hf-hide 1.8s ease-in-out;
+}
+
+@keyframes hf-look {
+  30% {
+    transform: translateY(-10px) rotate(-14deg);
+  }
+  60% {
+    transform: translateY(-10px) rotate(10deg);
+  }
+}
+
+@keyframes hf-hide {
+  10%,
+  90% {
+    opacity: 0;
+  }
+}
+
+/* ---------- Kürbis: grows a little and wobbles ---------- */
+
+.item-kuerbis.playing .hf-kuerbis-body {
+  animation: hf-grow 1.8s ease-in-out;
+}
+
+@keyframes hf-grow {
+  30% {
+    transform: scale(1.18, 1.12);
+  }
+  45% {
+    transform: scale(1.1, 1.18);
+  }
+  60% {
+    transform: scale(1.16, 1.1) rotate(-3deg);
+  }
+  80% {
+    transform: scale(1) rotate(2deg);
+  }
+}
+
+/* ---------- Schwein: wiggles in the mud, the mud splashes ---------- */
+
+.item-schwein.playing .hf-schwein-body {
+  animation: hf-wiggle 0.5s ease-in-out 4;
+}
+
+.item-schwein.playing .hf-schwein-head {
+  animation: hf-nod 0.5s ease-in-out 4;
+}
+
+.item-schwein.playing .hf-schwein-tail {
+  animation: hf-spin 0.5s linear 4;
+}
+
+.item-schwein.playing .hf-schwein-splash circle {
+  animation: hf-splash 0.9s ease-out calc(var(--i) * 0.15s) 2;
+}
+
+@keyframes hf-wiggle {
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes hf-splash {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(0, -40px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+}
+
+/* ---------- Ferkel: hop one after the other ---------- */
+
+.item-ferkel.playing .hf-ferkel-pig {
+  animation: hf-hop 0.6s ease-in-out calc(var(--i) * 0.3s) 2;
+}
+
+/* ---------- Ente: head in the water, tail up ---------- */
+
+.item-ente.playing .hf-ente-body {
+  animation: hf-dabble 2.4s ease-in-out;
+}
+
+.item-ente.playing .hf-ente-ripples ellipse {
+  animation: hf-ripple 1.2s ease-out calc(var(--i) * 0.3s) 2;
+}
+
+@keyframes hf-dabble {
+  20%,
+  60% {
+    transform: rotate(80deg);
+  }
+  75% {
+    transform: rotate(0);
+  }
+  85% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes hf-ripple {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+/* ---------- Frosch: puffs his throat and jumps ---------- */
+
+.item-frosch.playing .hf-frosch-body {
+  animation: hf-jump 1.8s ease-in-out;
+}
+
+.item-frosch.playing .hf-frosch-sac {
+  animation: hf-sac 0.4s ease-in-out 2;
+}
+
+@keyframes hf-jump {
+  45% {
+    transform: translateY(0) scale(1.1, 0.9);
+  }
+  65% {
+    transform: translateY(-70px) scale(0.9, 1.1);
+  }
+  85% {
+    transform: translateY(0) scale(1.1, 0.9);
+  }
+}
+
+@keyframes hf-sac {
+  50% {
+    opacity: 1;
+    transform: scale(1.8);
+  }
+}
+
+/* ---------- Bienenkorb: wobbles and bees fly out ---------- */
+
+.item-bienenkorb.playing .hf-korb-body {
+  animation: hf-wobble 0.5s ease-in-out 4;
+}
+
+.item-bienenkorb.playing .hf-korb-bees > g {
+  animation: hf-swarm 1.6s ease-out calc(var(--i) * 0.25s);
+}
+
+@keyframes hf-swarm {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc((var(--i) - 1) * 40px), -60px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1) * 70px), -120px);
+  }
+}
+
+/* ---------- Biene: flies a loop ---------- */
+
+.item-biene.playing .hf-biene-flight {
+  animation: hf-loop 2.4s ease-in-out;
+}
+
+.item-biene.playing .hf-biene-wings,
+.item-schmetterling.playing .hf-falter-wings {
+  animation: hf-flap 0.12s ease-in-out 20 alternate;
+}
+
+@keyframes hf-loop {
+  25% {
+    transform: translate(-40px, -50px);
+  }
+  50% {
+    transform: translate(-80px, 0);
+  }
+  75% {
+    transform: translate(-40px, 30px);
+  }
+}
+
+/* ---------- Blumen: the heads turn and nod ---------- */
+
+.item-blumen.playing .hf-blume-head {
+  animation: hf-bloom 0.9s ease-in-out calc(var(--i) * 0.1s) 2;
+}
+
+@keyframes hf-bloom {
+  50% {
+    transform: scale(1.3) rotate(36deg);
+  }
+}
+
+/* ---------- Schmetterling: flutters around the flowers ---------- */
+
+.item-schmetterling.playing .hf-falter-flight {
+  animation: hf-flutter 2.4s ease-in-out;
+}
+
+@keyframes hf-flutter {
+  20% {
+    transform: translate(40px, -30px);
+  }
+  45% {
+    transform: translate(80px, 10px);
+  }
+  70% {
+    transform: translate(30px, 30px);
+  }
+}
+
+/* ---------- Hase: hops, ears and nose wiggle ---------- */
+
+.item-hase.playing .hf-hase-body {
+  animation: hf-hop 0.7s ease-in-out 2;
+}
+
+.item-hase.playing .hf-hase-ear {
+  animation: hf-ear 0.4s ease-in-out 4 alternate;
+}
+
+.item-hase.playing .hf-hase-ear2 {
+  animation: hf-ear2 0.4s ease-in-out 0.2s 4 alternate;
+}
+
+.item-hase.playing .hf-hase-nose {
+  animation: hf-sniff 0.15s ease-in-out 12 alternate;
+}
+
+@keyframes hf-ear {
+  to {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes hf-ear2 {
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes hf-sniff {
+  to {
+    transform: translateY(-2px) scale(1.2);
+  }
+}
+
+.hf-hase-nose {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ---------- Schnecke: hides in her shell and comes out again ---------- */
+
+.item-schnecke.playing .hf-schnecke-foot {
+  animation: hf-hide-in 2.4s ease-in-out;
+}
+
+.item-schnecke.playing .hf-schnecke-shell {
+  animation: hf-rock 2.4s ease-in-out;
+}
+
+@keyframes hf-hide-in {
+  20%,
+  60% {
+    transform: scale(0.3, 0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes hf-rock {
+  20% {
+    transform: rotate(-8deg);
+  }
+  40% {
+    transform: rotate(6deg);
+  }
+  60% {
+    transform: rotate(0);
+  }
+}
+
+/* ---------- Maus: hops and turns around ---------- */
+
+.item-maus.playing .hf-maus-body {
+  animation: hf-twirl 1.6s ease-in-out;
+}
+
+@keyframes hf-twirl {
+  30% {
+    transform: translateY(-30px) scaleX(-1);
+  }
+  60% {
+    transform: translateY(0) scaleX(-1);
+  }
+  80% {
+    transform: translateY(-14px) scaleX(1);
+  }
+}

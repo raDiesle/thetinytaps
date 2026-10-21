@@ -1,8 +1,9 @@
 import { GameShell } from "@/components/GameShell";
+import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
-import { de } from "@/content/de";
+import { sampleLetter } from "@/content/languages";
 import { useStoredSettings } from "@/lib/storage";
 import {
   DEFAULT_WORDS_SETTINGS,
@@ -15,10 +16,10 @@ import {
 } from "./settings";
 import { WordsPlay } from "./WordsPlay";
 
-const pack = de;
-
 export function WordsGame() {
   const [settings, update] = useStoredSettings(WORDS_SETTINGS_KEY, DEFAULT_WORDS_SETTINGS);
+  const languages = useLanguages();
+  const pack = languages.language.pack;
   // Colours and doing words are short fixed lists, so length and theme only apply to the picture words.
   const nouns = settings.mode === "spell" || settings.mode === "first";
 
@@ -41,6 +42,8 @@ export function WordsGame() {
               ]}
             />
           </SettingsGroup>
+
+          <LanguageSetting settings={languages.settings} update={languages.update} />
 
           {nouns && (
             <SettingsGroup title="Wörter">
@@ -93,7 +96,7 @@ export function WordsGame() {
 
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
-            {settings.speech && <VoiceSetting lang={pack.speechLang} sample={`Bär! ${pack.praise[0]}`} />}
+            {settings.speech && <VoiceSetting lang={pack.speechLang} sample={`${sampleLetter(pack).words[0].word}! ${pack.praise[0]}`} />}
             <Toggle label="Töne" checked={settings.sounds} onChange={(sounds) => update({ sounds })} />
           </SettingsGroup>
 
@@ -116,7 +119,7 @@ export function WordsGame() {
         </>
       }
     >
-      <WordsPlay pack={pack} settings={settings} />
+      <WordsPlay pack={pack} second={languages.second?.pack ?? null} settings={settings} />
     </GameShell>
   );
 }

@@ -3,7 +3,9 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { KeyboardMap } from "@/components/KeyboardMap";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
+import { keyMatches, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
+import { translate } from "@/content/translate";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playRandomNote, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -41,7 +43,16 @@ function shuffle<T>(items: T[]): T[] {
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /** "Wo ist das B?": a letter and its picture appear, and the child looks for the key. */
-export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
+export function FindPlay({
+  pack,
+  second,
+  settings,
+}: {
+  pack: LanguagePack;
+  /** Optional second language: the word is also shown and said in it. */
+  second: LanguagePack | null;
+  settings: LettersSettings;
+}) {
   const [current, setCurrent] = useState<{ id: number; letter: LetterEntry; word: WordEntry } | null>(null);
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [wrong, setWrong] = useState(0);
@@ -58,6 +69,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
 
   const letters = useMemo(() => findableLetters(pack, settings.theme), [pack, settings.theme]);
   const showHint = settings.hints && wrong >= HINT_AFTER_WRONG;
+  const translation = current && second ? translate(current.word, second) : undefined;
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -129,12 +141,15 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
       }
       lastPress.current = now;
 
-      if (key.toLocaleUpperCase("de-DE") === current.letter.upper) {
+      if (keyMatches(key, current.letter.upper, pack)) {
         foundAt.current = now;
         setFound(true);
         setFoundCount((n) => n + 1);
         if (settings.sounds) playChime();
         say(`${pack.letterSentence(current.letter, current.word)} ${pick(pack.praise)}`);
+        if (settings.speech && second && translation) {
+          speak(`${translation}!`, second.speechLang, { queue: true, rate: settings.calm ? 0.75 : 0.85 });
+        }
         for (let i = 0; i < (settings.calm ? 3 : 8); i++) spawn();
         return;
       }
@@ -142,7 +157,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, say, spawn, funBurst, tryNextLetter, settings.sounds, settings.calm],
+    [current, found, wrong, pack, second, translation, say, spawn, funBurst, tryNextLetter, settings.sounds, settings.speech, settings.calm],
   );
 
   useEffect(() => {
@@ -195,6 +210,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
                 {current.word.word.slice(1)}
               </div>
             )}
+            {settings.showWord && translation && <div className="translation">{translation}</div>}
             <div
               key={wrong}
               className={`find-key${wrong > 0 ? " nudge" : ""}`}
@@ -217,7 +233,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
         <TouchKeyboard
           rows={rows}
           onKey={pressKey}
-          label={(key) => (settings.letterCase === "lower" ? key.toLocaleLowerCase("de-DE") : key)}
+          label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
           highlight={showHint || found ? current?.letter.upper : undefined}
         />
       ) : (
