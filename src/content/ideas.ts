@@ -419,6 +419,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Fische schwärmen, Wal spritzt, Krake winkt mit acht Armen, Schatztruhe geht auf, Seestern, U-Boot, Luftblasen platzen.",
         why: "Sehr ruhige, fließende Bewegungen – schön im ruhigen Modus.",
         effort: "L",
+        done: true,
       },
       {
         id: "S-05",

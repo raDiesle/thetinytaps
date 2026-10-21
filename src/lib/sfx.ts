@@ -283,6 +283,31 @@ export function playSnap() {
   });
 }
 
+/** "Blubb, blubb!" – bubbles wobbling up through the water. */
+export function playBlub() {
+  [0, 0.15, 0.32, 0.46].forEach((delay, i) => note({ from: 280 + i * 70, to: 820 + i * 140, duration: 0.1, type: "sine", volume: 0.22, delay }));
+}
+
+/** "Uuuuh!" – a whale's song: a long, low note that slides up and down. */
+export function playWhale() {
+  note({ from: 170, to: 300, duration: 0.8, type: "sine", volume: 0.3 });
+  note({ from: 300, to: 140, duration: 1.1, type: "sine", volume: 0.3, delay: 0.7 });
+  note({ from: 340, to: 600, duration: 0.8, type: "triangle", volume: 0.05 });
+}
+
+/** "Ping!" – a submarine's sonar, with a soft echo. */
+export function playPing() {
+  note({ from: 1480, duration: 0.6, type: "sine", volume: 0.22 });
+  note({ from: 1480, duration: 0.5, type: "sine", volume: 0.07, delay: 0.45 });
+}
+
+/** "Ki-ki-ki!" – a dolphin: quick clicks and a whistle that goes up and down. */
+export function playDolphin() {
+  for (let i = 0; i < 4; i++) note({ from: 2600, to: 2200, duration: 0.04, type: "square", volume: 0.04, lowpass: 4000, delay: i * 0.07 });
+  note({ from: 1400, to: 2800, duration: 0.3, type: "sine", volume: 0.14, delay: 0.32 });
+  note({ from: 2800, to: 1800, duration: 0.25, type: "sine", volume: 0.14, delay: 0.62 });
+}
+
 /** Three hammer knocks. */
 export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));
