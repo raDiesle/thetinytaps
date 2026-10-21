@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
+import { toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote, playWhistle, setSfxVolume } from "@/lib/sfx";
@@ -93,7 +94,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
         };
       }
       if (key.length !== 1) return null;
-      const letter = pack.letters.find((l) => l.upper === key.toLocaleUpperCase("de-DE"));
+      const letter = pack.letters.find((l) => l.upper === toUpper(key, pack));
       if (!letter) return null;
       const word = pickWord(letter);
       const label = { upper: letter.upper, both: letter.upper + letter.lower, lower: letter.lower }[settings.letterCase];
@@ -109,10 +110,10 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     if (phase !== "waiting") return;
     if (settings.sounds) playWhistle();
     if (wagons.length === 0) {
-      say("Tschu-tschu!");
+      say(pack.whistle);
       return;
     }
-    say(`Tschu-tschu! ${wagons.map((w) => w.spoken).join(", ")}!`);
+    say(`${pack.whistle} ${wagons.map((w) => w.spoken).join(", ")}!`);
     setPhase("leaving");
     later(() => {
       setWagons([]);
@@ -120,7 +121,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
       setPhase("arriving");
     }, LEAVE_MS);
     later(() => setPhase("waiting"), LEAVE_MS + ARRIVE_MS);
-  }, [phase, wagons, say, settings.sounds]);
+  }, [phase, wagons, pack, say, settings.sounds]);
 
   /** A key was pressed, on the keyboard or on the screen. */
   const pressKey = useCallback(
@@ -225,7 +226,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
         <TouchKeyboard
           rows={rows}
           onKey={pressKey}
-          label={(key) => (settings.letterCase === "lower" ? key.toLocaleLowerCase("de-DE") : key)}
+          label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
         />
       )}
       <BurstLayer bursts={bursts} />

@@ -2360,3 +2360,24 @@ kbd {
     animation: none;
   }
 }
+
+/* ---------- Second language ---------- */
+
+/* The word in the second language, under the word: „Bär – bear“. */
+.translation {
+  margin-top: 0.1em;
+  font-size: min(6cqh, 8cqw);
+  font-weight: 700;
+  font-style: italic;
+  color: #2b2d4299;
+  text-align: center;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+}
+
+.colored .translation {
+  color: #fffc;
+}
+
+.calm .translation {
+  animation: none;
+}
