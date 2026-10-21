@@ -10,6 +10,7 @@ const GAMES = [
   { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder", text: "Wimmelbilder zum Antippen – alles bewegt sich und spricht." },
   { href: "/woerter/", emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
   { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen", text: "Zwei Minuten putzen, bis alle Zuckermonster weg sind." },
+  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?", text: "Tiere füttern und ihr Zuhause finden." },
 ];
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */

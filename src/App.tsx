@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router";
+import { AnimalsPage } from "@/pages/AnimalsPage";
 import { Home } from "@/pages/Home";
 import { IdeasPage } from "@/pages/IdeasPage";
 import { LettersPage } from "@/pages/LettersPage";
@@ -13,6 +14,7 @@ export function App() {
       <Route index element={<Home />} />
       <Route path="buchstaben" element={<LettersPage />} />
       <Route path="woerter" element={<WordsPage />} />
+      <Route path="tiere" element={<AnimalsPage />} />
       <Route path="bilder" element={<ScenesMenu />} />
       <Route path="bilder/:scene" element={<ScenePage />} />
       <Route path="zaehne" element={<TeethPage />} />
