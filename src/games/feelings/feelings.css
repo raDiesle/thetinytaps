@@ -1,0 +1,1003 @@
+/* The feelings game: comforting the bear, and the kindergarten stories. */
+
+.story-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #c4f1ff;
+}
+
+/* ---------- What is told, at the top ---------- */
+
+.story-narration {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  min-height: 4.5rem;
+  padding: max(12px, env(safe-area-inset-top)) 70px 10px;
+}
+
+.story-narration p {
+  margin: 0;
+  padding: 0.2em 0.7em;
+  border: var(--outline);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 5px 0 var(--ink);
+  font-size: clamp(1.2rem, 3.4vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.story-tag {
+  padding: 0.2em 0.7em;
+  border-radius: 999px;
+  background: #ffffffb0;
+  font-size: clamp(0.9rem, 2vw, 1.15rem);
+  font-weight: 600;
+}
+
+.story-tag span {
+  font-family: var(--font-emoji);
+}
+
+/* What happened, as a picture next to the question. */
+.story-picture {
+  height: clamp(56px, 12vh, 120px);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border: var(--outline);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 0 var(--ink);
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The feeling's name is part of the game: big, and it pops when it changes. */
+.feeling-tag {
+  border: var(--outline);
+  background: var(--sunshine);
+  font-size: clamp(1.2rem, 3.2vw, 2rem);
+  font-weight: 700;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- The stage ---------- */
+
+/* The stage keeps its shape (16:10) and sits on the bottom; the drawing reaches past its sides. */
+.story-stage-wrap {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+  container-type: size;
+  background: #c4f1ff;
+  transition: background 1s;
+}
+
+.story-stage-wrap.place-room {
+  background: #ffe9c9;
+}
+
+.story-stage {
+  position: relative;
+  flex: none;
+  width: min(100cqw, 160cqh);
+  aspect-ratio: 16 / 10;
+}
+
+.fg-place {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 300%;
+  height: 100%;
+  transition: filter 1s;
+}
+
+/* ---------- Actors ---------- */
+
+.fg-actor {
+  position: absolute;
+  z-index: 1;
+  height: 35%;
+  aspect-ratio: 100 / 148;
+  translate: -50% 0;
+  transition:
+    left 1.1s ease-in-out,
+    bottom 1.1s ease-in-out;
+}
+
+.fg-actor-teacher {
+  height: 44%;
+}
+
+/* Waiting off stage: on wide screens the drawing goes on past the stage, so hide them there. */
+.fg-actor.offstage {
+  visibility: hidden;
+}
+
+.fg-actor.big {
+  height: 66%;
+  cursor: pointer;
+}
+
+.fg-actor.pose-slide {
+  transition-timing-function: ease-in;
+}
+
+.fg-figure {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+}
+
+.fg-figure.flip {
+  scale: -1 1;
+}
+
+.fg-critter {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 100%;
+  transition:
+    rotate 0.4s,
+    translate 0.4s;
+}
+
+.fg-critter .o {
+  stroke: var(--ink);
+  stroke-width: 2.4;
+}
+
+.fg-critter .fg-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+
+.c-arm,
+.c-leg,
+.c-head {
+  transform-box: fill-box;
+  transition: rotate 0.35s;
+}
+
+/* Arms turn at the shoulder, legs at the hip, the head at the neck. */
+.c-arm {
+  transform-origin: 50% 10%;
+}
+
+.c-leg {
+  transform-origin: 50% 8%;
+}
+
+.c-head {
+  transform-origin: 50% 92%;
+}
+
+.c-tears {
+  animation: fg-tear-drop 1.4s ease-in infinite;
+}
+
+@keyframes fg-tear-drop {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(9px);
+    opacity: 0;
+  }
+}
+
+/* Poses. The figure looks to the right; .flip turns it round, poses and all. */
+
+.pose-push .c-arm-r,
+.pose-reach .c-arm-r,
+.pose-give .c-arm-r {
+  rotate: -80deg;
+}
+
+.pose-push .c-arm-l {
+  rotate: -65deg;
+}
+
+.pose-push .fg-critter {
+  translate: 8% 0;
+  rotate: 6deg;
+}
+
+.pose-stop .c-arm-r {
+  rotate: -165deg;
+}
+
+.pose-stop .fg-critter {
+  rotate: -3deg;
+}
+
+.pose-hug .c-arm-l {
+  rotate: -55deg;
+}
+
+.pose-hug .c-arm-r {
+  rotate: 55deg;
+}
+
+.pose-kick .c-leg-r {
+  rotate: -60deg;
+}
+
+.pose-kick .c-arm-l {
+  rotate: 35deg;
+}
+
+.pose-kick .fg-critter {
+  rotate: -5deg;
+}
+
+.pose-fall .fg-critter {
+  translate: 6% 0;
+  rotate: 14deg;
+}
+
+.pose-fall .c-arm-l {
+  rotate: 60deg;
+}
+
+.pose-fall .c-arm-r {
+  rotate: -60deg;
+}
+
+.pose-hop .c-arm-l,
+.pose-slide .c-arm-l {
+  rotate: 150deg;
+}
+
+.pose-hop .c-arm-r,
+.pose-slide .c-arm-r {
+  rotate: -150deg;
+}
+
+.pose-hop .fg-critter {
+  animation: fg-actor-hop 0.7s ease-in-out infinite;
+}
+
+/* Sitting on the slide: legs forward, a bit lower. */
+.pose-slide .c-leg {
+  rotate: -75deg;
+}
+
+.pose-slide .fg-critter {
+  translate: 0 10%;
+}
+
+.pose-walk .fg-critter {
+  animation: fg-actor-walk 0.3s ease-in-out infinite alternate;
+}
+
+.pose-walk .c-leg-l,
+.pose-walk .c-arm-r {
+  animation: fg-actor-swing 0.3s ease-in-out infinite alternate;
+}
+
+.pose-walk .c-leg-r,
+.pose-walk .c-arm-l {
+  animation: fg-actor-swing 0.3s ease-in-out infinite alternate-reverse;
+}
+
+.pose-stomp .fg-critter {
+  animation: fg-actor-stomp 0.32s ease-in-out infinite alternate;
+}
+
+.pose-stomp .c-arm-l {
+  rotate: 25deg;
+}
+
+.pose-stomp .c-arm-r {
+  rotate: -25deg;
+}
+
+.pose-breathe .fg-critter {
+  animation: fg-actor-breathe 1.6s ease-in-out 2;
+}
+
+.pose-shake .c-head {
+  animation: fg-actor-shake 0.45s ease-in-out 3;
+}
+
+@keyframes fg-actor-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-14%);
+  }
+}
+
+@keyframes fg-actor-walk {
+  to {
+    transform: translateY(-4%);
+  }
+}
+
+@keyframes fg-actor-swing {
+  from {
+    rotate: -22deg;
+  }
+  to {
+    rotate: 22deg;
+  }
+}
+
+@keyframes fg-actor-stomp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-7%) rotate(3deg);
+  }
+}
+
+@keyframes fg-actor-breathe {
+  50% {
+    transform: scale(1.08, 1.05);
+  }
+}
+
+@keyframes fg-actor-shake {
+  0%,
+  100% {
+    rotate: 0deg;
+  }
+  25% {
+    rotate: -12deg;
+  }
+  75% {
+    rotate: 12deg;
+  }
+}
+
+/* What an animal holds sits at its paw, further out when it reaches. */
+.fg-held {
+  position: absolute;
+  left: 76%;
+  top: 70%;
+  translate: -50% -50%;
+  font-family: var(--font-emoji);
+  font-size: 30cqh;
+  line-height: 1;
+  transition:
+    left 0.35s,
+    top 0.35s;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pose-push .fg-held,
+.pose-reach .fg-held,
+.pose-give .fg-held {
+  left: 104%;
+  top: 56%;
+}
+
+.pose-hug .fg-held {
+  left: 50%;
+  top: 68%;
+}
+
+.pose-hop .fg-held,
+.pose-slide .fg-held,
+.pose-stop .fg-held {
+  left: 92%;
+  top: 30%;
+}
+
+/* Speech bubbles stay readable when the figure is flipped: they sit outside it. */
+.fg-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  z-index: 3;
+  width: max-content;
+  max-width: 36cqw;
+  padding: 0.35em 0.7em;
+  translate: -50% 0;
+  border: 3px solid var(--ink);
+  border-radius: 1em;
+  background: #fff;
+  font-size: clamp(14px, 4.6cqh, 34px);
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fg-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50% -2px;
+  border: 10px solid transparent;
+  border-top-color: var(--ink);
+}
+
+.fg-actor.big .fg-bubble {
+  bottom: 96%;
+}
+
+/* ---------- Floating hearts, notes and puffs ---------- */
+
+.fg-floaters {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.fg-floater {
+  position: absolute;
+  translate: -50% 0;
+  font-family: var(--font-emoji);
+  font-size: 8cqh;
+  opacity: 0;
+  animation: fg-float-up var(--float-ms) ease-out calc(var(--i) * 90ms) forwards;
+}
+
+@keyframes fg-float-up {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(-20%) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-260%) scale(0.9);
+  }
+}
+
+/* ---------- Picture cards: what the bear can do, to be seen without reading ---------- */
+
+.story-play {
+  --card-w: min(36vw, 32vh, 300px);
+}
+
+/* Room for one row of big cards, so the stage doesn't jump when they change. */
+.story-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px clamp(14px, 4vw, 40px);
+  min-height: calc(var(--card-w) * 0.75 + 3.2rem);
+  padding: 14px 16px max(16px, env(safe-area-inset-bottom));
+  background: #8fd16a;
+}
+
+.story-play:has(.place-room) .story-buttons {
+  background: #e3b07a;
+}
+
+.fg-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--card-w);
+  padding: 6px 6px 4px;
+  border: var(--outline);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 6px 0 var(--ink);
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(0.9rem, 2.1vw, 1.25rem);
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    opacity 0.3s,
+    background 0.3s,
+    translate 0.15s,
+    box-shadow 0.15s;
+}
+
+.fg-card.small {
+  --card-w: min(20vw, 17vh, 150px);
+  border-radius: 16px;
+  font-size: clamp(0.75rem, 1.6vw, 1rem);
+}
+
+.fg-card-choose {
+  background: var(--sunshine);
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+/* Two cards to choose from take turns calling. */
+.fg-card-choose ~ .fg-card-choose {
+  animation-delay: -0.9s;
+}
+
+.fg-card:disabled {
+  translate: 0 3px;
+  box-shadow: 0 3px 0 var(--ink);
+  cursor: default;
+}
+
+.fg-card-playing,
+.fg-card-done {
+  background: #d9f7e6;
+}
+
+.fg-card-rest {
+  opacity: 0.55;
+}
+
+.fg-card-wrong {
+  background: #ffd6d6;
+}
+
+.fg-card-wrong .fg-scene {
+  filter: grayscale(0.7) opacity(0.65);
+}
+
+.fg-card-label {
+  padding: 4px 2px 2px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* The picture: a bit of sky and ground, the animals, the signs. */
+.fg-scene {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  container-type: size;
+  border-radius: 15px;
+  background: linear-gradient(#c4f1ff 0 87%, #8fd16a 87%);
+}
+
+.fg-scene-image {
+  object-fit: cover;
+  -webkit-user-drag: none;
+}
+
+.fg-scene-room {
+  background: linear-gradient(#ffe9c9 0 87%, #e3b07a 87%);
+}
+
+.fg-card.small .fg-scene {
+  border-radius: 10px;
+}
+
+.fg-scene .fg-actor {
+  height: 80%;
+  transition: none;
+}
+
+.fg-scene .fg-actor-teacher {
+  height: 92%;
+}
+
+.fg-scene-blanket {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  z-index: 2;
+  width: 62%;
+  height: 38%;
+  translate: -50% 0;
+  border: 3px solid var(--ink);
+  border-radius: 40% 40% 10px 10px / 30% 30% 10px 10px;
+  background: repeating-linear-gradient(45deg, #ff8fa3 0 8px, #ffb3c7 8px 16px);
+}
+
+/* Things in the paw are drawn bigger than on the stage, so they show on the small picture. */
+.fg-scene .fg-held {
+  font-size: 44cqh;
+}
+
+.fg-sign {
+  position: absolute;
+  z-index: 2;
+  translate: -50% 0;
+  font-family: var(--font-emoji);
+  line-height: 1;
+}
+
+/* Only the cards to choose from move; the others hold still. */
+.fg-card:not(.fg-card-choose) .fg-scene * {
+  animation: none;
+}
+
+/* ---------- Tick and cross ---------- */
+
+.fg-mark circle {
+  stroke: var(--ink);
+  stroke-width: 6;
+}
+
+.fg-mark.good circle {
+  fill: var(--mint);
+}
+
+.fg-mark.bad circle {
+  fill: #ff4d4d;
+}
+
+.fg-mark path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fg-card-mark {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  z-index: 3;
+  width: 36%;
+  animation: fg-stamp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The cross for the not-so-good idea is bigger than the tick, but leaves the picture to be seen. */
+.fg-card-wrong .fg-card-mark {
+  top: -18px;
+  right: -18px;
+  width: 46%;
+}
+
+.fg-card.small .fg-card-mark {
+  top: -10px;
+  right: -10px;
+  width: 32%;
+}
+
+@keyframes fg-stamp {
+  from {
+    opacity: 0;
+    scale: 2.2;
+    rotate: -25deg;
+  }
+}
+
+/* ---------- The bear thinks ---------- */
+
+.fg-thought {
+  position: absolute;
+  bottom: 106%;
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  translate: -50% 0;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Two little bubbles lead down to the head. */
+.fg-thought::before,
+.fg-thought::after {
+  content: "";
+  position: absolute;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.fg-thought::before {
+  top: calc(100% + 3px);
+  left: 42%;
+  width: 16px;
+  height: 16px;
+}
+
+.fg-thought::after {
+  top: calc(100% + 24px);
+  left: 36%;
+  width: 9px;
+  height: 9px;
+}
+
+.fg-thought-ask {
+  display: grid;
+  place-items: center;
+  width: 1.3em;
+  height: 1.3em;
+  font-size: clamp(18px, 10cqh, 72px);
+  font-weight: 700;
+  line-height: 1;
+  animation: fg-wonder 1.6s ease-in-out infinite;
+}
+
+@keyframes fg-wonder {
+  50% {
+    rotate: 14deg;
+    scale: 1.12;
+  }
+}
+
+.fg-thought:has(.fg-thought-picture) {
+  padding: 10px 14px;
+  border-radius: 42%;
+}
+
+.fg-thought-picture {
+  position: relative;
+  display: block;
+  width: 46cqh;
+}
+
+.fg-thought-picture .fg-scene {
+  border-radius: 34%;
+}
+
+/* The cross sits on the corner, so the picture stays to be seen. */
+.fg-thought-mark {
+  position: absolute;
+  right: -8%;
+  bottom: -8%;
+  width: 40%;
+  animation: fg-stamp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s backwards;
+}
+
+/* ---------- How far along: dots for the steps, hearts for the bear ---------- */
+
+.fg-dots,
+.fg-hearts {
+  display: flex;
+  gap: 6px;
+}
+
+.fg-dot {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #ffffffb0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.fg-dot.done {
+  background: var(--mint);
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fg-dot.now {
+  background: var(--sunshine);
+}
+
+.fg-heart {
+  font-family: var(--font-emoji);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1;
+}
+
+.fg-heart:not(.full) {
+  filter: grayscale(1) opacity(0.35);
+}
+
+.fg-heart.full {
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- "Weiter" ---------- */
+
+.story-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 26px 10px;
+  border: var(--outline);
+  border-radius: 22px;
+  background: var(--sunshine);
+  box-shadow: 0 6px 0 var(--ink);
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(1rem, 2.3vw, 1.35rem);
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+.story-button-emoji {
+  font-family: var(--font-emoji);
+  font-size: clamp(2.6rem, 9vh, 4.6rem);
+  line-height: 1.1;
+}
+
+/* ---------- Kindergarten: the tower that falls over ---------- */
+
+.fg-block {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.6s cubic-bezier(0.3, 1.3, 0.6, 1);
+}
+
+.tower-down .fg-block-0 {
+  transform: rotate(6deg);
+}
+
+.tower-down .fg-block-1 {
+  transform: translate(13px, 9px) rotate(84deg);
+}
+
+.tower-down .fg-block-2 {
+  transform: translate(-14px, 18px) rotate(-24deg);
+}
+
+.tower-down .fg-block-3 {
+  transform: translate(26px, 27px) rotate(12deg);
+}
+
+.tower-down .fg-block-4 {
+  transform: translate(38px, 36px) rotate(-70deg);
+}
+
+/* ---------- Comforting the bear ---------- */
+
+/* The tower stands next to the big bear, not behind him. */
+.bear-play .fg-tower {
+  translate: 54px 0;
+}
+
+/* Night for the tired and the scared bear; the light, or the storm passing, makes it day. */
+.story-stage.night .fg-place {
+  filter: brightness(0.45) saturate(0.7);
+}
+
+.story-stage-wrap:has(.night) {
+  background: #736962;
+}
+
+.story-stage.night.lit .fg-place,
+.feel-scared.happy .fg-place {
+  filter: none;
+}
+
+.story-stage-wrap:has(.night.lit),
+.story-stage-wrap:has(.feel-scared.happy) {
+  background: #ffe9c9;
+}
+
+.bear-moon,
+.bear-thunder {
+  position: absolute;
+  font-family: var(--font-emoji);
+  line-height: 1;
+  transition:
+    opacity 1s,
+    translate 1.2s;
+}
+
+.bear-moon {
+  left: 11%;
+  top: 19%;
+  font-size: 12cqh;
+}
+
+.bear-thunder {
+  left: 6%;
+  top: 4%;
+  font-size: 24cqh;
+  animation: fg-thunder 2.6s ease-in-out infinite;
+}
+
+.lit .bear-thunder {
+  opacity: 0.5;
+}
+
+.happy .bear-thunder {
+  opacity: 0;
+  translate: -80% 0;
+}
+
+@keyframes fg-thunder {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  8% {
+    transform: translateX(-3%) scale(1.05);
+  }
+  12% {
+    transform: translateX(3%);
+  }
+}
+
+.bear-blanket {
+  position: absolute;
+  left: 50%;
+  bottom: 3%;
+  z-index: 2;
+  width: 34%;
+  height: 30%;
+  translate: -50% 0;
+  border: var(--outline);
+  border-radius: 40% 40% 14px 14px / 30% 30% 14px 14px;
+  background: repeating-linear-gradient(45deg, #ff8fa3 0 14px, #ffb3c7 14px 28px);
+  pointer-events: none;
+  animation: fg-blanket-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes fg-blanket-in {
+  from {
+    opacity: 0;
+    transform: translateY(-60%);
+  }
+}
+
+/* Phones on their side: smaller sentences, so the stage keeps some room next to the cards. */
+@media (max-height: 500px) {
+  .story-narration {
+    min-height: 0;
+    padding-bottom: 6px;
+  }
+
+  .story-narration p {
+    font-size: clamp(1rem, 5vh, 1.5rem);
+  }
+}
+
+/* ---------- Calm mode and reduced motion ---------- */
+
+.story-play.calm .fg-actor {
+  transition-duration: 1.6s;
+}
+
+.story-play.calm .fg-critter,
+.story-play.calm .c-arm,
+.story-play.calm .c-leg,
+.story-play.calm .c-head,
+.story-play.calm .story-button,
+.story-play.calm .fg-card,
+.story-play.calm .fg-scene *,
+.story-play.calm .fg-thought-ask,
+.story-play.calm .bear-thunder,
+.story-play.calm .c-tears {
+  animation: none;
+}
+
+.story-play.calm .fg-floater {
+  animation-duration: calc(var(--float-ms) * 1.4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-play .fg-critter,
+  .story-play .c-arm,
+  .story-play .c-leg,
+  .story-play .c-head,
+  .story-play .story-button,
+  .story-play .fg-card,
+  .story-play .fg-scene *,
+  .story-play .fg-thought-ask,
+  .bear-thunder {
+    animation: none;
+  }
+}

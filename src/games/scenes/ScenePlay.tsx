@@ -26,6 +26,20 @@ import {
   playRing,
   playCoo,
   playMeow,
+  playMoo,
+  playOink,
+  playBaa,
+  playCluck,
+  playCrow,
+  playNeigh,
+  playHoot,
+  playCroak,
+  playRoar,
+  playTrumpet,
+  playChatter,
+  playSquawk,
+  playMunch,
+  playSnap,
   playTweet,
   setSfxVolume,
 } from "@/lib/sfx";
@@ -62,6 +76,20 @@ const SOUNDS: Record<SceneSound, () => void> = {
   ring: playRing,
   coo: playCoo,
   meow: playMeow,
+  moo: playMoo,
+  oink: playOink,
+  baa: playBaa,
+  cluck: playCluck,
+  crow: playCrow,
+  neigh: playNeigh,
+  hoot: playHoot,
+  croak: playCroak,
+  roar: playRoar,
+  trumpet: playTrumpet,
+  chatter: playChatter,
+  squawk: playSquawk,
+  munch: playMunch,
+  snap: playSnap,
 };
 
 /** Key presses closer together than this only spawn shapes. */
@@ -128,7 +156,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** Explore and colour mode: items tapped at least once (in colour mode: the coloured ones). */
   const [discovered, setDiscovered] = useState<ReadonlySet<string>>(new Set());
   const [partying, setPartying] = useState(false);
-  /** Keys mode: the item in the glowing frame, moved with the arrow keys. */
+  /** Keys mode: the item in the glowing frame, moved with the arrow keys; hidden once an item starts. */
   const [focus, setFocus] = useState<SceneItem | null>(null);
   const [lit, setLit] = useState<Lit | null>(null);
   const { bursts, spawn } = useBursts();
@@ -330,8 +358,10 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
    */
   const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover" | "key") => {
     interacted();
+    // The arrow keys go on from the activated item, but it gets no frame; its key badge lights up instead.
     if (settings.trigger === "keys") {
-      moveFocus(item);
+      focusRef.current = item;
+      setFocus(null);
       setLit((prev) => ({ id: item.id, count: (prev?.count ?? 0) + 1 }));
     }
     const quest = questRef.current;

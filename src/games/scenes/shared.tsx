@@ -62,6 +62,37 @@ export function Pane({ x, y, w, h, rx = 6, children }: { x: number; y: number; w
   );
 }
 
+/** Head and shoulders of someone sitting inside; `cap` draws a cap or helmet instead of hair. */
+export function Rider({ cx, cy, shirt, hair = "#6b4423", cap }: { cx: number; cy: number; shirt: string; hair?: string; cap?: string }) {
+  return (
+    <>
+      <rect x={cx - 15} y={cy + 11} width="30" height="22" rx="8" fill={shirt} />
+      <circle cx={cx} cy={cy} r="13" fill={SKIN} />
+      {cap ? (
+        <>
+          <path d={`M${cx - 14} ${cy - 4} Q${cx - 14} ${cy - 19} ${cx} ${cy - 19} Q${cx + 14} ${cy - 19} ${cx + 14} ${cy - 4} Z`} fill={cap} />
+          <rect x={cx - 16} y={cy - 7} width="32" height="5" rx="2" fill={cap} />
+        </>
+      ) : (
+        <path d={`M${cx - 13} ${cy - 1} Q${cx - 15} ${cy - 16} ${cx} ${cy - 15} Q${cx + 15} ${cy - 16} ${cx + 13} ${cy - 1} Q${cx + 2} ${cy - 10} ${cx - 13} ${cy - 1} Z`} fill={hair} />
+      )}
+      <circle cx={cx - 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />
+      <circle cx={cx + 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />
+      <path d={`M${cx - 4} ${cy + 6} Q${cx} ${cy + 9} ${cx + 4} ${cy + 6}`} stroke="#2b2d42" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+    </>
+  );
+}
+
+/** An animal's eye with a highlight. */
+export function Eye({ cx, cy, r = 3.2 }: { cx: number; cy: number; r?: number }) {
+  return (
+    <>
+      <circle cx={cx} cy={cy} r={r} fill="#2b2d42" />
+      <circle cx={cx + r * 0.3} cy={cy - r * 0.35} r={r * 0.35} fill="#fff" />
+    </>
+  );
+}
+
 /** A small face: eyes with highlights, rosy cheeks and a smile, centred on (cx, cy). */
 export function Face({ cx, cy, size = 1 }: { cx: number; cy: number; size?: number }) {
   const s = size;

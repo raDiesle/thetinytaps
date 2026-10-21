@@ -376,6 +376,48 @@ a.game-card:focus-visible {
   rotate: 8deg;
 }
 
+/* Under the home menu, for parents: install as an app, works offline. */
+.install-hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 12px 20px;
+  margin: 48px 0 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.install-hint > span {
+  padding: 6px 18px;
+  border-radius: 999px;
+  background: #ffffffb0;
+}
+
+.install-hint span[aria-hidden] {
+  font-family: var(--font-emoji);
+}
+
+.install-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 22px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 5px 0 var(--ink);
+}
+
+.install-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
 /* The "p" in the home title: hold it to open the hidden idea page, without selecting text. */
 .secret-hold {
   user-select: none;
@@ -702,6 +744,62 @@ button.idea-id {
   font-size: 1.15rem;
 }
 
+/* The options are folded into one bar until a grown-up opens them. */
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 680px;
+}
+
+.settings-panel > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 22px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 5px 0 var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+.settings-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-panel > summary::after {
+  content: "▾";
+  transition: rotate 0.2s;
+}
+
+.settings-panel[open] > summary::after {
+  rotate: 180deg;
+}
+
+.settings-panel > summary:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.settings-panel > summary:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+.settings-summary-note {
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--sunshine);
+  font-size: 0.95rem;
+}
+
 .settings-group {
   display: flex;
   flex-direction: column;
@@ -974,6 +1072,249 @@ kbd {
 @keyframes hold-progress {
   to {
     --progress: 100%;
+  }
+}
+
+/* ---------- Play time (idea A-03) ---------- */
+
+/* The last minute: a night-blue veil that thickens; taps still go through. */
+.playtime-dusk {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  background: radial-gradient(circle at 50% 40%, #1b1f4a99, #0b0d2a);
+  pointer-events: none;
+  transition: opacity 1s linear;
+}
+
+.good-night {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vmin;
+  overflow: hidden;
+  background: linear-gradient(#0b0d2a, #232a6b);
+  color: #fff4d6;
+  text-align: center;
+  animation: night-fall 3s ease-out both;
+}
+
+@keyframes night-fall {
+  from {
+    opacity: 0;
+  }
+}
+
+.good-night-star {
+  position: absolute;
+  color: #fff4d6;
+  font-size: 3vmin;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  50% {
+    opacity: 0.25;
+    scale: 0.7;
+  }
+}
+
+.good-night-moon {
+  font-family: var(--font-emoji);
+  font-size: 22vmin;
+  line-height: 1;
+  filter: drop-shadow(0 0 4vmin #fff4d680);
+  animation: moon-rise 4s ease-out both;
+}
+
+@keyframes moon-rise {
+  from {
+    translate: 0 20vmin;
+    opacity: 0;
+  }
+}
+
+.good-night-sleeper {
+  position: relative;
+  font-family: var(--font-emoji);
+  font-size: 16vmin;
+  line-height: 1;
+  animation: sleep-breathe 4s ease-in-out infinite;
+}
+
+.good-night-zzz {
+  position: absolute;
+  top: -0.3em;
+  right: -0.5em;
+  font-size: 0.45em;
+  animation: zzz-float 3s ease-in-out infinite;
+}
+
+@keyframes sleep-breathe {
+  50% {
+    scale: 1.04 0.97;
+  }
+}
+
+@keyframes zzz-float {
+  from {
+    translate: 0 0.4em;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    translate: 0.3em -0.6em;
+    opacity: 0;
+  }
+}
+
+.good-night-text {
+  margin: 0;
+  font-size: 7vmin;
+  font-weight: 700;
+}
+
+/* The exit ring stays findable for the grown-up on the dark sky. */
+.play-area:has(.good-night) .hold-exit {
+  background: conic-gradient(#fff4d6 var(--progress, 0%), #ffffff26 0);
+  color: #fff4d699;
+}
+
+.play-area:has(.good-night) .hold-exit.holding {
+  color: var(--ink);
+}
+
+.good-night-hint {
+  position: absolute;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  margin: 0;
+  padding: 0 16px;
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .good-night-star,
+  .good-night-sleeper,
+  .good-night-zzz {
+    animation: none;
+  }
+}
+
+/* ---------- Child-friendly home page (idea A-04) ---------- */
+
+.kid-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 56px;
+  padding: 10px 24px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font-size: 1.1rem;
+  text-align: left;
+  text-decoration: none;
+  box-shadow: 0 5px 0 var(--ink);
+}
+
+.kid-home-link > span:first-child {
+  font-family: var(--font-emoji);
+  font-size: 1.8rem;
+}
+
+.kid-home-link:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.kid-home {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: max(64px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
+  background: linear-gradient(var(--sky-top), var(--sky-bottom) 70%);
+}
+
+/* Tile size and columns come from KidHome, so every picture fits on one screen. */
+.kid-tiles {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), var(--tile));
+  justify-content: center;
+  gap: var(--gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.kid-tiles li {
+  --card: var(--tomato);
+  --tilt: -2deg;
+}
+
+.kid-tiles li:nth-child(5n + 2) {
+  --card: var(--sunshine);
+  --tilt: 2deg;
+}
+
+.kid-tiles li:nth-child(5n + 3) {
+  --card: var(--mint);
+}
+
+.kid-tiles li:nth-child(5n + 4) {
+  --card: var(--berry);
+  --tilt: 2deg;
+}
+
+.kid-tiles li:nth-child(5n + 5) {
+  --card: var(--ocean);
+}
+
+.kid-tile {
+  display: grid;
+  place-items: center;
+  width: var(--tile);
+  height: var(--tile);
+  padding: 0;
+  border: var(--outline);
+  border-radius: 22%;
+  background: var(--card);
+  font-family: var(--font-emoji);
+  font-size: calc(var(--tile) * 0.55);
+  line-height: 1;
+  box-shadow: var(--lift);
+  rotate: var(--tilt);
+  cursor: pointer;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s;
+}
+
+.kid-tile:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.kid-tile.opening {
+  animation: tile-pick 0.7s ease-in-out;
+}
+
+@keyframes tile-pick {
+  30% {
+    scale: 1.15;
+    rotate: calc(var(--tilt) * -3);
+  }
+  60% {
+    scale: 1.1;
+    rotate: calc(var(--tilt) * 3);
   }
 }
 
@@ -2373,4 +2714,25 @@ kbd {
   .scene-prompt {
     animation: none;
   }
+}
+
+/* ---------- Second language ---------- */
+
+/* The word in the second language, under the word: „Bär – bear“. */
+.translation {
+  margin-top: 0.1em;
+  font-size: min(6cqh, 8cqw);
+  font-weight: 700;
+  font-style: italic;
+  color: #2b2d4299;
+  text-align: center;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s backwards;
+}
+
+.colored .translation {
+  color: #fffc;
+}
+
+.calm .translation {
+  animation: none;
 }

@@ -393,7 +393,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Kuh, Schwein, Schaf, Hühner (Ei legen), Hahn weckt alle, Traktor, Scheune mit Katze, Misthaufen mit Fliegen, Pferd, Hofhund.",
         why: "Tierlaute sind das Lieblingsthema der Altersgruppe.",
         effort: "L",
-        planned: true,
+        done: true,
       },
       {
         id: "S-02",
@@ -401,7 +401,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Zoo",
         text: "Löwe gähnt, Elefant spritzt, Giraffe frisst oben, Affen schaukeln, Pinguine rutschen, Seehund mit Ball, Tierpfleger.",
         effort: "L",
-        planned: true,
+        done: true,
       },
       {
         id: "S-03",
@@ -537,9 +537,10 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "N-05",
         emoji: "🦷",
         title: "Zähneputz-Begleiter",
-        text: "2-Minuten-Timer: Ein Gebiss mit kleinen Zuckermonstern, die nach und nach verschwinden. Musik und Hinweise „Jetzt oben!“. Kein Tippen nötig.",
+        text: "2-Minuten-Timer: Ein Gebiss mit kleinen Zuckermonstern, die nach und nach verschwinden. Musik und Hinweise („Mund weit auf!“, „Zähne zusammenbeißen!“) in KAI-Reihenfolge, das Bild zeigt jeweils die richtige Ansicht. Kein Tippen nötig.",
         why: "Echter Alltagsnutzen für Eltern.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-06",
@@ -564,6 +565,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "„Der Hase hat Hunger!“ – Futter (Möhre, Knochen, Banane) zum richtigen Tier ziehen. Das Tier mampft und bedankt sich.",
         why: "Zuordnen und Wissen über Tiere; witzige Reaktionen.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-09",
@@ -571,6 +573,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Wer wohnt wo?",
         text: "Tiere ihren Häusern zuordnen: Hund → Hütte, Vogel → Nest, Fisch → Aquarium, Biene → Bienenstock.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-10",
@@ -599,9 +602,10 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "N-13",
         emoji: "😊",
         title: "Gefühle",
-        text: "Ein Bär ist traurig, wütend, müde oder fröhlich. Das Kind kann ihn trösten (streicheln, umarmen, Teddy geben) und sieht, wie sich das Gesicht verändert.",
-        why: "Gefühle benennen und Empathie – wichtig in der Trotzphase.",
+        text: "Ein Bär ist traurig, wütend, müde oder hat Angst. Das Kind kann ihn trösten (streicheln, umarmen, Teddy geben, pusten, zudecken) und sieht, wie sich das Gesicht verändert. Dazu kleine Kindergarten-Geschichten: geschubst, getreten, etwas weggenommen, Rutsche voll, etwas haben wollen, selbst wütend – mit „Stopp! Nein!“, Abstand, Hilfe holen, fragen, warten, tauschen.",
+        why: "Gefühle benennen und Empathie – wichtig in der Trotzphase. Und Worte für Streit im Kindergarten statt zurückhauen.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-14",
@@ -715,7 +719,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Offline & installierbar (PWA)",
         text: "Als App auf dem Homescreen, funktioniert im Flugzeug und ohne WLAN.",
         effort: "M",
-        planned: true,
+        done: true,
       },
       {
         id: "A-03",
@@ -724,6 +728,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Eltern stellen z. B. 10 Minuten ein. Danach wird alles langsam ruhiger, eine Gute-Nacht-Animation (siehe N-03) und das Spiel endet von selbst.",
         why: "Die Grenze setzt das Spiel, nicht die Eltern.",
         effort: "M",
+        done: true,
       },
       {
         id: "A-04",
@@ -732,6 +737,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Menü nur aus großen Bildern, ohne Text, im Vollbild. Das Kind wählt selbst zwischen den Spielen, Eltern-Einstellungen sind versteckt.",
         why: "Selbstständigkeit, ohne dass das Kind ins Browser-Menü kommt.",
         effort: "M",
+        done: true,
       },
       {
         id: "A-05",
@@ -740,7 +746,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Englisch, Türkisch, Polnisch, … als weiteres LanguagePack. Optional zweisprachig: „Bär – bear“.",
         why: "Für mehrsprachige Familien; die Struktur dafür gibt es schon.",
         effort: "M",
-        partial: "Die Sprachpakete sind vorbereitet, es gibt aber nur Deutsch.",
+        done: true,
       },
       {
         id: "A-06",

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
+import { toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
+import { translate, translateCountable } from "@/content/translate";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { LetterCard, NumberCard, letterParts } from "./Cards";
+import { LetterCard, NumberCard } from "./Cards";
 import type { LettersSettings } from "./settings";
 
 /** Presses closer together than this only spawn shapes, so mashing doesn't strobe. */
@@ -41,7 +43,7 @@ type Target = { kind: "letter"; letter: LetterEntry } | { kind: "number"; n: num
 function resolveKey(key: string, pack: LanguagePack): Target | null {
   if (/^[0-9]$/.test(key)) return { kind: "number", n: Number(key) };
   if (key.length !== 1) return null;
-  const upper = key.toLocaleUpperCase("de-DE");
+  const upper = toUpper(key, pack);
   const letter = pack.letters.find((l) => l.upper === upper);
   return letter ? { kind: "letter", letter } : null;
 }
@@ -52,14 +54,22 @@ function isSame(target: Target | null, shown: Shown) {
   return false;
 }
 
-// Stages: a letter reveals its parts one by one (see letterParts). A number
-// reveals one item per stage (stage k shows k items); the stage after the
-// last item shows the digit. Zero starts with the empty nest at stage 0.
+// Stages: a letter shows everything at once, at stage 0. A number reveals
+// one item per stage (stage k shows k items); the stage after the last item
+// shows the digit. Zero starts with the empty nest at stage 0.
 const firstStage = (s: Shown) => (s.kind === "letter" ? 0 : Math.min(1, s.n));
-const lastStage = (s: Shown, showWord: boolean) =>
-  s.kind === "letter" ? letterParts(showWord).length - 1 : s.n + 1;
+const lastStage = (s: Shown) => (s.kind === "letter" ? 0 : s.n + 1);
 
-export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
+export function LettersPlay({
+  pack,
+  second,
+  settings,
+}: {
+  pack: LanguagePack;
+  /** Optional second language: the word is also shown and said in it. */
+  second: LanguagePack | null;
+  settings: LettersSettings;
+}) {
   const [shown, setShown] = useState<Shown | null>(null);
   const [stage, setStage] = useState(0);
   /** Counting by tapping: indices of the tapped things, in order. */
@@ -104,17 +114,41 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     [pack, settings.announce],
   );
 
+  /** What a fully revealed letter or number is in the second language: "bear!", "three ducks!". */
+  const secondSentenceFor = useCallback(
+    (s: Shown) => {
+      if (!second) return null;
+      if (s.kind === "number") {
+        const thing = translateCountable(s.thing, second);
+        if (s.n === 0 || !thing) return `${second.numberWords[s.n]}!`;
+        return second.countSentence(s.n, thing);
+      }
+      if (settings.announce === "letter") return null;
+      const word = translate(s.word, second);
+      return word ? `${word}!` : null;
+    },
+    [second, settings.announce],
+  );
+
+  /** The full sentence, then the same in the second language. */
+  const sayAll = useCallback(
+    (s: Shown, queue = false) => {
+      say(sentenceFor(s), queue);
+      const also = secondSentenceFor(s);
+      if (settings.speech && second && also) {
+        speak(also, second.speechLang, { queue: true, rate: settings.calm ? 0.75 : 0.85 });
+      }
+    },
+    [say, sentenceFor, secondSentenceFor, second, settings.speech, settings.calm],
+  );
+
   /** Speak and play the sound for reaching `stage`. */
   const announce = useCallback(
     (s: Shown, stage: number, queue = false) => {
       const sound = (play: () => void) => settings.sounds && play();
-      if (stage === lastStage(s, settings.showWord)) {
+      if (stage === lastStage(s)) {
         sound(playChime);
-        say(sentenceFor(s), queue);
-      } else if (s.kind === "letter") {
-        const part = letterParts(settings.showWord)[stage];
-        sound(() => (stage === 0 ? playChime() : playCountNote(stage)));
-        say(part === "letter" ? `${s.letter.spoken}!` : `${s.word.word}!`, queue);
+        sayAll(s, queue);
       } else if (stage === 0) {
         say(pack.zero.sentence, queue);
       } else {
@@ -122,7 +156,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         say(pack.numberWords[stage], queue);
       }
     },
-    [pack, say, sentenceFor, settings.sounds, settings.showWord],
+    [pack, say, sayAll, settings.sounds],
   );
 
   const funBurst = useCallback(
@@ -178,7 +212,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         announce(next, from);
         return;
       }
-      const last = lastStage(next, settings.showWord);
+      const last = lastStage(next);
       if (next.kind === "letter") {
         setStage(last);
         announce(next, last);
@@ -197,7 +231,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       }
       countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + COUNT_SUMMARY_MS;
     },
-    [announce, replace, byTap, settings.stepByStep, settings.showWord],
+    [announce, replace, byTap, settings.stepByStep],
   );
 
   const show = useCallback(
@@ -237,19 +271,19 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       countItem(index);
       return;
     }
-    if (stage < lastStage(shown, settings.showWord)) {
+    if (stage < lastStage(shown)) {
       setStage(stage + 1);
       announce(shown, stage + 1);
       return;
     }
     const id = nextId.current++;
     if (shown.kind === "letter") {
-      present({ ...shown, id, word: pickWord(shown.letter) }, 1);
+      present({ ...shown, id, word: pickWord(shown.letter) }, 0);
     } else {
       const next: Shown = { ...shown, id, thing: pickThing() };
       present(next, firstStage(next));
     }
-  }, [shown, stage, tapped, settings.showWord, byTap, countItem, announce, present, pickWord, pickThing]);
+  }, [shown, stage, tapped, byTap, countItem, announce, present, pickWord, pickThing]);
 
   /** Advance unless the last advance was too recent. */
   const tryAdvance = useCallback(() => {
@@ -269,11 +303,11 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       if (now - lastChange.current >= MIN_ADVANCE_MS) {
         lastChange.current = now;
         const next: Shown = { ...shown, id: nextId.current++, word: pickWord(shown.letter) };
-        present(next, lastStage(next, settings.showWord));
+        present(next, lastStage(next));
       }
       funBurst(e.clientX, e.clientY);
     },
-    [shown, present, pickWord, funBurst, settings.showWord],
+    [shown, present, pickWord, funBurst],
   );
 
   /** Make the card move once, unless calm mode is on. */
@@ -315,12 +349,12 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         if (!previous) return false;
         // Shown again in full, without putting the current one on the history.
         current.current = null;
-        present(previous, lastStage(previous, settings.showWord));
+        present(previous, lastStage(previous));
         return true;
       }
       return false;
     },
-    [present, spawn, animateCard, settings.sounds, settings.showWord],
+    [present, spawn, animateCard, settings.sounds],
   );
 
   /** A key was pressed, on the keyboard or on the screen. */
@@ -328,7 +362,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     (key: string) => {
       const target = resolveKey(key, pack);
       // Step by step, Space and Enter reveal the next part until everything is shown; then they are special keys again.
-      const revealing = shown !== null && stage < lastStage(shown, settings.showWord);
+      const revealing = shown !== null && stage < lastStage(shown);
       const isNextKey = ((key === " " || key === "Enter") && revealing) || (shown !== null && isSame(target, shown));
       if ((settings.stepByStep || byTap(shown)) && shown && isNextKey) {
         if (!tryAdvance()) funBurst();
@@ -344,7 +378,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       lastChange.current = now;
       show(target);
     },
-    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, settings.stepByStep, settings.showWord, settings.finishCounting],
+    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, settings.stepByStep, settings.finishCounting],
   );
 
   useEffect(() => {
@@ -380,7 +414,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const repeat = (e: PointerEvent) => {
     e.stopPropagation();
     const counting = settings.finishCounting && performance.now() < countingUntil.current;
-    if (shown && !counting) say(sentenceFor(shown));
+    if (shown && !counting) sayAll(shown);
     funBurst(e.clientX, e.clientY);
   };
   const onCardPointer = settings.stepByStep || byTap(shown) ? undefined : repeat;
@@ -401,7 +435,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
               key={shown.id}
               letter={shown.letter}
               word={shown.word}
-              stage={stage}
+              translation={second ? translate(shown.word, second) : undefined}
               settings={settings}
               onPointerDown={onCardPointer}
               onPicturePointerDown={nextWord}
@@ -427,7 +461,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         <TouchKeyboard
           rows={rows}
           onKey={pressKey}
-          label={(key) => (settings.letterCase === "lower" ? key.toLocaleLowerCase("de-DE") : key)}
+          label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
         />
       )}
       <BurstLayer bursts={bursts} />

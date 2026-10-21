@@ -1,28 +1,7 @@
-import { Face, GLASS, INK, Inside, Pane, SKIN, Wheel, nth } from "../shared";
+import { Face, GLASS, INK, Inside, Pane, Rider, SKIN, Wheel, nth } from "../shared";
 
 // Vehicles. Each drawing has its foot point (the middle between the wheels, on the
 // ground) at (0, 0). In the far lane they drive left, in the near lane right.
-
-/** Head and shoulders of someone sitting inside; `cap` draws a cap or helmet instead of hair. */
-function Rider({ cx, cy, shirt, hair = "#6b4423", cap }: { cx: number; cy: number; shirt: string; hair?: string; cap?: string }) {
-  return (
-    <>
-      <rect x={cx - 15} y={cy + 11} width="30" height="22" rx="8" fill={shirt} />
-      <circle cx={cx} cy={cy} r="13" fill={SKIN} />
-      {cap ? (
-        <>
-          <path d={`M${cx - 14} ${cy - 4} Q${cx - 14} ${cy - 19} ${cx} ${cy - 19} Q${cx + 14} ${cy - 19} ${cx + 14} ${cy - 4} Z`} fill={cap} />
-          <rect x={cx - 16} y={cy - 7} width="32" height="5" rx="2" fill={cap} />
-        </>
-      ) : (
-        <path d={`M${cx - 13} ${cy - 1} Q${cx - 15} ${cy - 16} ${cx} ${cy - 15} Q${cx + 15} ${cy - 16} ${cx + 13} ${cy - 1} Q${cx + 2} ${cy - 10} ${cx - 13} ${cy - 1} Z`} fill={hair} />
-      )}
-      <circle cx={cx - 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />
-      <circle cx={cx + 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />
-      <path d={`M${cx - 4} ${cy + 6} Q${cx} ${cy + 9} ${cx + 4} ${cy + 6}`} stroke="#2b2d42" strokeWidth="1.6" strokeLinecap="round" fill="none" />
-    </>
-  );
-}
 
 /** A wheel that turns while its vehicle plays (class st-wheel). */
 function TurningWheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
