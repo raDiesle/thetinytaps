@@ -371,3 +371,57 @@ export function playLullaby() {
     note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }),
   );
 }
+
+/** White noise through a band-pass filter gliding from `from` to `to` Hz: rushing water, blowing air. */
+function hiss({ from, to = from, duration, volume, delay = 0, q = 1 }: { from: number; to?: number; duration: number; volume: number; delay?: number; q?: number }) {
+  const ac = audio();
+  if (!ac) return;
+  const start = ac.currentTime + delay;
+  const buffer = ac.createBuffer(1, Math.ceil(ac.sampleRate * duration), ac.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const source = ac.createBufferSource();
+  source.buffer = buffer;
+  const filter = ac.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.Q.value = q;
+  filter.frequency.setValueAtTime(from, start);
+  filter.frequency.exponentialRampToValueAtTime(to, start + duration);
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume * masterVolume, start + Math.min(0.08, duration / 4));
+  gain.gain.setValueAtTime(volume * masterVolume, start + duration * 0.6);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  source.connect(filter).connect(gain).connect(ac.destination);
+  source.start(start);
+  source.stop(start + duration);
+}
+
+/** "Wuuusch!" – the toilet flushes: rushing water that swirls down, and a gurgle at the end. */
+export function playFlush() {
+  hiss({ from: 500, to: 1600, duration: 0.7, volume: 0.35, q: 0.8 });
+  hiss({ from: 1600, to: 300, duration: 1.1, volume: 0.3, delay: 0.6, q: 0.8 });
+  [1.4, 1.55, 1.7].forEach((delay, i) => note({ from: 220 + i * 60, to: 520 + i * 80, duration: 0.09, type: "sine", volume: 0.18, delay }));
+}
+
+/** "Ssssss!" – warm air from a hair dryer, with the soft hum of its motor. */
+export function playBlow() {
+  hiss({ from: 1400, to: 1900, duration: 1.3, volume: 0.22, q: 0.6 });
+  note({ from: 180, to: 200, duration: 1.2, type: "sawtooth", volume: 0.05, lowpass: 500 });
+}
+
+/** "Schrubb, schrubb!" – a toothbrush going back and forth. */
+export function playScrub() {
+  for (let i = 0; i < 6; i++) hiss({ from: i % 2 ? 3200 : 2400, duration: 0.13, volume: 0.2, delay: i * 0.17, q: 2 });
+}
+
+/** "Plitsch, platsch!" – splashing water, with a few drops after. */
+export function playSplash() {
+  [0, 0.3].forEach((delay) => hiss({ from: 1800, to: 500, duration: 0.35, volume: 0.3, delay, q: 0.9 }));
+  [0.65, 0.8, 0.92].forEach((delay, i) => note({ from: PENTATONIC[(i * 2 + 3) % PENTATONIC.length] * 2, duration: 0.12, type: "sine", volume: 0.1, delay }));
+}
+
+/** "Tick, tack!" – a clock, high and low in turn. */
+export function playTick() {
+  [0, 0.4, 0.8, 1.2].forEach((delay, i) => note({ from: i % 2 ? 1300 : 1900, duration: 0.04, type: "square", volume: 0.07, lowpass: 3000, delay }));
+}

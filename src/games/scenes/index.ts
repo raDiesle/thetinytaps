@@ -1,3 +1,4 @@
+import { badezimmer } from "./badezimmer/Badezimmer";
 import { bauernhof } from "./bauernhof/Bauernhof";
 import { baustelle } from "./baustelle/Baustelle";
 import { hof } from "./hof/Hof";
@@ -7,7 +8,7 @@ import { unterwasser } from "./unterwasser/Unterwasser";
 import { zoo } from "./zoo/Zoo";
 
 /** All playable scenes, in menu order. */
-export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser];
+export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer];
 
 /** Shown greyed out in the menu so children (and parents) know more is coming. */
 export const UPCOMING_SCENES: { emoji: string; title: string }[] = [];
