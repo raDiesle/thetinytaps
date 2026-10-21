@@ -13,6 +13,9 @@ export const CHEEK = "#ff8fa3";
 /** Sets the --i custom property used to stagger animations. */
 export const nth = (i: number) => ({ "--i": i }) as CSSProperties;
 
+/** Sets the --s custom property: 1 or -1, so mirrored parts (left and right claws) can turn the other way. */
+export const side = (s: 1 | -1) => ({ "--s": s }) as CSSProperties;
+
 export function Wheel({ cx, cy, r = 28 }: { cx: number; cy: number; r?: number }) {
   const bolt = r * 0.42;
   return (
