@@ -7,6 +7,7 @@ import { KidHome } from "@/pages/KidHome";
 import { LettersPage } from "@/pages/LettersPage";
 import { ScenePage } from "@/pages/ScenePage";
 import { ScenesMenu } from "@/pages/ScenesMenu";
+import { ShadowsPage } from "@/pages/ShadowsPage";
 import { TeethPage } from "@/pages/TeethPage";
 import { WordsPage } from "@/pages/WordsPage";
 
@@ -21,6 +22,7 @@ export function App() {
       <Route path="bilder/:scene" element={<ScenePage />} />
       <Route path="zaehne" element={<TeethPage />} />
       <Route path="gefuehle" element={<FeelingsPage />} />
+      <Route path="schatten" element={<ShadowsPage />} />
       <Route path="kinder" element={<KidHome />} />
       <Route path="ideen" element={<IdeasPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />

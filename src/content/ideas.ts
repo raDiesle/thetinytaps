@@ -588,6 +588,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Bild soll auf seinen passenden Schatten gezogen werden (3 Schatten zur Auswahl). Oder einfacher: auf den richtigen Schatten tippen.",
         why: "Formen erkennen; geht mit Emojis fast ohne Zeichnen.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-08",

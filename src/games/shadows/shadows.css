@@ -1,0 +1,254 @@
+/* ---------- Schatten finden ---------- */
+
+.shadows-play {
+  --gap: min(4vw, 32px);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at 85% 12%, #fff3a8 0 8vmin, #fff9db 8vmin 18vmin, #fff4d6 18vmin);
+}
+
+.sh-top,
+.sh-ground {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.sh-top {
+  flex: 1.1;
+  align-items: flex-end;
+  padding-top: max(64px, env(safe-area-inset-top));
+  padding-bottom: 2vh;
+}
+
+.sh-ground {
+  flex: 1;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #b5e48c;
+}
+
+.sh-prompt {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: calc(100vw - 130px);
+  margin: 0;
+  padding: 0.25em 0.9em;
+  border-radius: 999px;
+  background: #ffffffe0;
+  font-size: clamp(1.1rem, 3.4vh, 1.9rem);
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sh-emoji {
+  display: block;
+  font-family: var(--font-emoji);
+  line-height: 1;
+}
+
+/* The picture in colour, big in the middle; it is what gets dragged. */
+.sh-picture-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sh-picture {
+  position: relative;
+  z-index: 5;
+  font-size: min(30vh, 40vw);
+  cursor: grab;
+  touch-action: none;
+  transition:
+    translate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    scale 0.3s;
+}
+
+.sh-picture:not(.dragging, .landed, .wrong, .nudge-0, .nudge-1) {
+  animation: sh-breathe 2.6s ease-in-out infinite;
+}
+
+.sh-picture.dragging {
+  z-index: 6;
+  scale: 1.1;
+  cursor: grabbing;
+  transition: scale 0.2s;
+}
+
+/* Onto the shadow, shrinking until it covers it exactly. */
+.sh-picture.landed {
+  transition:
+    translate 0.55s cubic-bezier(0.45, 0, 0.3, 1.15),
+    scale 0.55s ease-in-out;
+}
+
+.sh-picture.wrong {
+  animation: shake 0.3s ease-in-out 3;
+}
+
+.sh-picture.nudge-0 {
+  animation: sh-hop 0.45s ease-in-out;
+}
+
+.sh-picture.nudge-1 {
+  animation: sh-hop-again 0.45s ease-in-out;
+}
+
+.sh-name {
+  font-size: clamp(1.1rem, 3.4vh, 2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.sh-name.gone {
+  opacity: 0;
+}
+
+/* The shadows to choose from, in one row; they shrink to fit 2, 3 or 4 side by side. */
+.sh-options {
+  --cols: var(--n);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  justify-content: center;
+}
+
+/* Phones upright: two per row, so they stay big enough for a finger. */
+@media (max-aspect-ratio: 4/5) {
+  .sh-options {
+    --cols: min(var(--n), 2);
+  }
+}
+
+.sh-option {
+  --size: min(22vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 220px);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size);
+  height: var(--size);
+  border: var(--outline);
+  border-radius: 28px;
+  background: #fffbea;
+  box-shadow: var(--lift);
+  cursor: pointer;
+  touch-action: none;
+  transition: scale 0.25s;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+/* Phones upright: two rows of shadows have to fit into the meadow. */
+@media (max-aspect-ratio: 4/5) {
+  .sh-option {
+    --size: min(18vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 220px);
+  }
+}
+
+.sh-option:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.sh-option:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.sh-option:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.sh-option.focused {
+  outline: 6px solid var(--sunshine);
+  outline-offset: 6px;
+}
+
+.sh-option.near {
+  scale: 1.08;
+}
+
+.sh-shadow {
+  font-size: calc(var(--size) * 0.66);
+  filter: brightness(0);
+  opacity: 0.78;
+  pointer-events: none;
+  transition:
+    filter 0.35s,
+    opacity 0.35s;
+}
+
+/* A wrong shadow shows its colours for a moment: this is who it belongs to. */
+.sh-option.peek {
+  animation: wiggle 0.4s ease-in-out;
+}
+
+.sh-option.peek .sh-shadow {
+  filter: none;
+  opacity: 1;
+}
+
+.sh-option.matched {
+  background: #fff3a8;
+  animation: wiggle 0.5s ease-in-out 0.6s 2;
+}
+
+.sh-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 0.15em 0.6em;
+  border: var(--outline);
+  border-radius: 1em;
+  background: #fff;
+  font-size: clamp(1.1rem, 3.6vh, 2rem);
+  font-weight: 800;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes sh-breathe {
+  50% {
+    transform: scale(1.03, 0.98);
+  }
+}
+
+@keyframes sh-hop {
+  40% {
+    transform: translateY(-14%);
+  }
+}
+
+@keyframes sh-hop-again {
+  40% {
+    transform: translateY(-14%);
+  }
+}
+
+/* Calm mode: no breathing or bouncing, slower moves. */
+.shadows-play.calm .sh-picture:not(.wrong),
+.shadows-play.calm .sh-option,
+.shadows-play.calm .sh-picture-box {
+  animation: none;
+}
+
+.shadows-play.calm .sh-prompt {
+  animation: fade-in 0.7s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sh-picture:not(.dragging, .landed, .wrong, .nudge-0, .nudge-1) {
+    animation: none;
+  }
+}
