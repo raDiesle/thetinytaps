@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from "react-router";
+import { FeelingsPage } from "@/pages/FeelingsPage";
 import { Home } from "@/pages/Home";
 import { IdeasPage } from "@/pages/IdeasPage";
 import { LettersPage } from "@/pages/LettersPage";
@@ -14,6 +15,7 @@ export function App() {
       <Route path="woerter" element={<WordsPage />} />
       <Route path="bilder" element={<ScenesMenu />} />
       <Route path="bilder/:scene" element={<ScenePage />} />
+      <Route path="gefuehle" element={<FeelingsPage />} />
       <Route path="ideen" element={<IdeasPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

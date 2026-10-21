@@ -9,6 +9,7 @@ const GAMES = [
   { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen", text: "Taste drücken – Bild, Buchstabe und Zahl erscheinen." },
   { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder", text: "Wimmelbilder zum Antippen – alles bewegt sich und spricht." },
   { href: "/woerter/", emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
+  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle", text: "Den Bären trösten – und üben, was man im Kindergarten tun kann." },
 ];
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */

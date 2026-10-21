@@ -599,9 +599,10 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "N-13",
         emoji: "😊",
         title: "Gefühle",
-        text: "Ein Bär ist traurig, wütend, müde oder fröhlich. Das Kind kann ihn trösten (streicheln, umarmen, Teddy geben) und sieht, wie sich das Gesicht verändert.",
-        why: "Gefühle benennen und Empathie – wichtig in der Trotzphase.",
+        text: "Ein Bär ist traurig, wütend, müde oder hat Angst. Das Kind kann ihn trösten (streicheln, umarmen, Teddy geben, pusten, zudecken) und sieht, wie sich das Gesicht verändert. Dazu kleine Kindergarten-Geschichten: geschubst, getreten, etwas weggenommen, Rutsche voll, etwas haben wollen, selbst wütend – mit „Stopp! Nein!“, Abstand, Hilfe holen, fragen, warten, tauschen.",
+        why: "Gefühle benennen und Empathie – wichtig in der Trotzphase. Und Worte für Streit im Kindergarten statt zurückhauen.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-14",
