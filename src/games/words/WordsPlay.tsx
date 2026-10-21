@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";

@@ -28,7 +28,7 @@ jobs:
       - run: npm run build
         env:
           # The site is served from https://<user>.github.io/<repo>/
-          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

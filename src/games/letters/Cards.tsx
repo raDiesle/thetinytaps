@@ -1,5 +1,3 @@
-"use client";
-
 import type { PointerEventHandler, ReactNode } from "react";
 import { Picture } from "@/components/Picture";
 import type { Countable, LetterEntry, WordEntry } from "@/content/types";

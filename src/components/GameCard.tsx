@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router";
 
 export interface GameCardProps {
   /** Without a link the card is shown greyed out as "coming soon". */
@@ -21,7 +21,7 @@ export function GameCard({ href, emoji, title, text }: GameCardProps) {
   );
   if (href) {
     return (
-      <Link href={href} className="game-card">
+      <Link to={href} className="game-card">
         {content}
       </Link>
     );

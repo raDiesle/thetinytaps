@@ -1,6 +1,4 @@
-"use client";
-
-import Link from "next/link";
+import { Link } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { unlockAudio } from "@/lib/sfx";
@@ -89,7 +87,7 @@ export function GameShell({
 
   return (
     <main className="start-screen">
-      <Link href={backHref} className="back-link">
+      <Link to={backHref} className="back-link">
         ← {backLabel}
       </Link>
       <h1>
