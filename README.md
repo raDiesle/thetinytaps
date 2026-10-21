@@ -29,7 +29,7 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
 | `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/globals.css` |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
-| `src/games/letters/` | Game "Buchstaben & Zahlen" |
+| `src/games/letters/` | Game "Buchstaben & Zahlen": free typing, or "Wo ist das B?" (find the key for a shown letter, `FindPlay.tsx`) |
 | `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes `baustelle/`, `stadt/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
 | `src/games/words/` | Game "Wörter tippen" (words come from `de.ts`, filtered by length and theme) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |

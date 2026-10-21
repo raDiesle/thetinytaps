@@ -4,7 +4,15 @@ import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
-import { DEFAULT_LETTERS_SETTINGS, LETTERS_SETTINGS_KEY, type Announce, type LetterCase, type LettersSettings } from "./settings";
+import {
+  DEFAULT_LETTERS_SETTINGS,
+  LETTERS_SETTINGS_KEY,
+  type Announce,
+  type LetterCase,
+  type LettersMode,
+  type LettersSettings,
+} from "./settings";
+import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
 
 const pack = de;
@@ -18,6 +26,25 @@ export function LettersGame() {
       emoji="🔤"
       settings={
         <>
+          <SettingsGroup title="Spielart">
+            <Choice<LettersMode>
+              label="Spiel"
+              value={settings.mode}
+              onChange={(mode) => update({ mode })}
+              options={[
+                { value: "free", label: "⌨️ Frei tippen" },
+                { value: "find", label: "🔍 Wo ist das B?" },
+              ]}
+            />
+            {settings.mode === "find" && (
+              <Toggle
+                label="Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"
+                checked={settings.hints}
+                onChange={(hints) => update({ hints })}
+              />
+            )}
+          </SettingsGroup>
+
           <SettingsGroup title="Anzeige">
             <Choice<LetterCase>
               label="Buchstaben"
@@ -44,7 +71,7 @@ export function LettersGame() {
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
             {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Be, wie Bär!" />}
-            {settings.speech && (
+            {settings.speech && settings.mode === "free" && (
               <Choice<Announce>
                 label="Ansage"
                 value={settings.announce}
@@ -60,17 +87,19 @@ export function LettersGame() {
           </SettingsGroup>
 
           <SettingsGroup title="Verhalten">
-            <Toggle
-              label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
-              checked={settings.stepByStep}
-              onChange={(stepByStep) => update({ stepByStep })}
-            />
+            {settings.mode === "free" && (
+              <Toggle
+                label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
+                checked={settings.stepByStep}
+                onChange={(stepByStep) => update({ stepByStep })}
+              />
+            )}
             <Toggle
               label="Ruhiger Modus (leiser, weniger Bewegung)"
               checked={settings.calm}
               onChange={(calm) => update({ calm })}
             />
-            {!settings.stepByStep && (
+            {settings.mode === "free" && !settings.stepByStep && (
               <Toggle
                 label="Zählen nicht unterbrechen"
                 checked={settings.finishCounting}
@@ -85,7 +114,11 @@ export function LettersGame() {
         </>
       }
     >
-      <LettersPlay pack={pack} settings={settings} />
+      {settings.mode === "find" ? (
+        <FindPlay pack={pack} settings={settings} />
+      ) : (
+        <LettersPlay pack={pack} settings={settings} />
+      )}
     </GameShell>
   );
 }

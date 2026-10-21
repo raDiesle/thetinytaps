@@ -57,6 +57,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Umgekehrter Modus: Ein Bild erscheint (🐻), das Kind sucht die passende Taste. Nach ein paar Fehlversuchen leuchtet die Taste auf einer kleinen Tastatur-Abbildung auf.",
         why: "Erster Schritt vom zufälligen Drücken zum gezielten Suchen; Brücke zu „Wörter tippen“.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-03",

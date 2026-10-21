@@ -3,10 +3,16 @@ import type { ThemeId } from "@/content/types";
 
 export type LetterCase = "upper" | "both" | "lower";
 
+/** "free": every key shows its letter or number. "find": a letter is shown and the child looks for its key. */
+export type LettersMode = "free" | "find";
+
 /** What is spoken for a letter: "Be, wie Bär!", "Bär!" or "Be!". */
 export type Announce = "letterAndWord" | "word" | "letter";
 
 export interface LettersSettings {
+  mode: LettersMode;
+  /** Find mode: after a few wrong keys, light up the wanted key on a little keyboard picture. */
+  hints: boolean;
   letterCase: LetterCase;
   /** Show the word under the picture, with its first letter highlighted. */
   showWord: boolean;
@@ -28,6 +34,8 @@ export interface LettersSettings {
 }
 
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
+  mode: "free",
+  hints: true,
   letterCase: "upper",
   showWord: true,
   speech: false,

@@ -48,6 +48,10 @@ export interface LanguagePack {
   zero: { emoji: string; sentence: string };
   /** "A wie Affe" */
   letterSentence: (letter: LetterEntry, word: WordEntry) => string;
+  /** "Wo ist das Be?", asked when a letter is to be found on the keyboard. */
+  findPrompt: (letter: LetterEntry) => string;
+  /** The keyboard as printed on the keys, one string per row from the top. */
+  keyboardRows: string[];
   /** "drei Äpfel" / "ein Apfel" */
   countSentence: (n: number, thing: Countable) => string;
   /** Short cheers, one is picked when a word has been typed. */
