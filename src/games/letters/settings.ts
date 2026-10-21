@@ -1,3 +1,4 @@
+import type { TouchKeysMode } from "@/components/TouchKeyboard";
 import type { ThemeId } from "@/content/types";
 
 export type LetterCase = "upper" | "both" | "lower";
@@ -22,6 +23,8 @@ export interface LettersSettings {
   stepByStep: boolean;
   /** Automatic mode only: ignore new letters/numbers until counting has finished. */
   finishCounting: boolean;
+  /** Big letter keys on the screen, for tablets without a keyboard. */
+  touchKeys: TouchKeysMode;
 }
 
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
@@ -34,6 +37,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   calm: false,
   stepByStep: true,
   finishCounting: true,
+  touchKeys: "auto",
 };
 
 // v2: speech is off by default now, so old saved settings start fresh.
