@@ -12,6 +12,11 @@ function audio(): AudioContext | null {
   return ctx;
 }
 
+/** The shared audio context, e.g. to listen to the microphone; unlockAudio() resumes it. */
+export function audioContext(): AudioContext | null {
+  return audio();
+}
+
 /** Scales all effects, e.g. 0.4 for calm mode. */
 export function setSfxVolume(volume: number) {
   masterVolume = volume;

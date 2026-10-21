@@ -759,6 +759,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Mit dem Mikrofon: Ruft das Kind laut, brüllt der Löwe und springt; flüstert es, piepst die kleine Maus. Keine Aufnahme, nur die Lautstärke wird gemessen. Eltern erlauben das Mikrofon einmal.",
         why: "Ursache und Wirkung mit der eigenen Stimme – ganz ohne Tippen.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-30",
