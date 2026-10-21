@@ -98,7 +98,7 @@ function Cornfield() {
   const ears = Array.from({ length: 40 }, (_, i) => `M${x1 + 6 + i * 12.4} ${top + 2} l${i % 2 ? 3 : -3} -9`);
   return (
     <g>
-      <path d={`M${x1} ${top} H${x2} V${FENCE} H${x1} Z`} fill="url(#bh-field)" />
+      <path d={`M${x1} ${top} H${x2} V${FENCE} H${x1} Z`} fill="url(#hf-field)" />
       <path d={rows.join(" ")} stroke="#e9b949" strokeWidth="3" />
       <path d={ears.join(" ")} stroke="#e9c46a" strokeWidth="4" strokeLinecap="round" />
     </g>
@@ -135,7 +135,7 @@ function Pond() {
   return (
     <g>
       <ellipse cx={cx} cy={cy + 4} rx={rx + 12} ry={ry + 10} fill="#6a994e" opacity="0.5" />
-      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#bh-pond)" />
+      <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#hf-pond)" />
       <path d={`M${cx - rx + 30} ${cy - 18} q30 -10 60 0 M${cx + 40} ${cy + 26} q30 -8 56 0`} stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.5" fill="none" />
       {[
         [cx - 120, cy + 22],
@@ -160,39 +160,39 @@ export function Background() {
   return (
     <>
       <defs>
-        <linearGradient id="bh-sky" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="hf-sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#7cc8fb" />
           <stop offset="1" stopColor="#e3f4ff" />
         </linearGradient>
-        <linearGradient id="bh-haze" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="hf-haze" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#e3f4ff" stopOpacity="0" />
           <stop offset="1" stopColor="#e3f4ff" stopOpacity="0.7" />
         </linearGradient>
-        <linearGradient id="bh-meadow" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="hf-meadow" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#b5e3a1" />
           <stop offset="1" stopColor="#74c365" />
         </linearGradient>
-        <linearGradient id="bh-field" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="hf-field" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#f6e3a1" />
           <stop offset="1" stopColor="#f4d35e" />
         </linearGradient>
-        <linearGradient id="bh-track" x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id="hf-track" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#e6c99a" />
           <stop offset="1" stopColor="#d4ac74" />
         </linearGradient>
-        <radialGradient id="bh-pond" cx="0.45" cy="0.4">
+        <radialGradient id="hf-pond" cx="0.45" cy="0.4">
           <stop offset="0" stopColor="#8fd3ff" />
           <stop offset="1" stopColor="#4ea8de" />
         </radialGradient>
-        <radialGradient id="bh-sunglow">
+        <radialGradient id="hf-sunglow">
           <stop offset="0" stopColor="#fff3b0" stopOpacity="0.9" />
           <stop offset="1" stopColor="#fff3b0" stopOpacity="0" />
         </radialGradient>
       </defs>
-      <rect width="1600" height={HORIZON + 20} fill="url(#bh-sky)" />
-      <circle cx="1520" cy="88" r="140" fill="url(#bh-sunglow)" />
-      <Cloud x={250} y={200} scale={0.3} className="bh-cloud bh-cloud-slow" />
-      <Cloud x={1200} y={176} scale={0.4} className="bh-cloud" />
+      <rect width="1600" height={HORIZON + 20} fill="url(#hf-sky)" />
+      <circle cx="1520" cy="88" r="140" fill="url(#hf-sunglow)" />
+      <Cloud x={250} y={200} scale={0.3} className="hf-cloud hf-cloud-slow" />
+      <Cloud x={1200} y={176} scale={0.4} className="hf-cloud" />
       <path d="M700 160 q6 -6 12 0 q6 -6 12 0 M740 146 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
 
       {/* Far hills with a patchwork of fields */}
@@ -205,10 +205,10 @@ export function Background() {
       <path d="M0 330 Q240 300 520 326 T1000 318 T1600 324 V360 H0 Z" fill="#bfe3b0" />
       {/* The windmill's hill */}
       <path d="M560 410 Q760 350 990 410 Z" fill="#a9d99a" />
-      <rect y="250" width="1600" height="110" fill="url(#bh-haze)" />
+      <rect y="250" width="1600" height="110" fill="url(#hf-haze)" />
 
       {/* Ground, cornfield and fence */}
-      <rect y={HORIZON + 20} width="1600" height={1000 - HORIZON - 20} fill="url(#bh-meadow)" />
+      <rect y={HORIZON + 20} width="1600" height={1000 - HORIZON - 20} fill="url(#hf-meadow)" />
       <path d="M0 340 Q400 330 800 344 T1600 338 V420 H0 Z" fill="#a8dc93" opacity="0.6" />
       <Cornfield />
       {FENCES.map(([x1, x2]) => (
@@ -216,11 +216,11 @@ export function Background() {
       ))}
 
       {/* Dirt track across the yard, with paths up to the farmhouse door and the barn */}
-      <path d={`M210 ${HOF - 6} H250 L300 ${TRACK_TOP + 4} H150 Z`} fill="url(#bh-track)" />
-      <path d={`M944 ${HOF} H1096 L1150 ${TRACK_TOP + 4} H900 Z`} fill="url(#bh-track)" />
+      <path d={`M210 ${HOF - 6} H250 L300 ${TRACK_TOP + 4} H150 Z`} fill="url(#hf-track)" />
+      <path d={`M944 ${HOF} H1096 L1150 ${TRACK_TOP + 4} H900 Z`} fill="url(#hf-track)" />
       <path
         d={`M0 ${TRACK_TOP + 6} Q400 ${TRACK_TOP - 8} 800 ${TRACK_TOP + 2} T1600 ${TRACK_TOP} V${TRACK_BOTTOM - 4} Q1200 ${TRACK_BOTTOM + 10} 800 ${TRACK_BOTTOM} T0 ${TRACK_BOTTOM + 4} Z`}
-        fill="url(#bh-track)"
+        fill="url(#hf-track)"
       />
       <path d={`M0 ${TRACK_TOP + 34} Q400 ${TRACK_TOP + 22} 800 ${TRACK_TOP + 32} T1600 ${TRACK_TOP + 30}`} stroke="#c49a63" strokeWidth="5" fill="none" />
       <path d={`M0 ${TRACK_BOTTOM - 26} Q400 ${TRACK_BOTTOM - 36} 800 ${TRACK_BOTTOM - 28} T1600 ${TRACK_BOTTOM - 30}`} stroke="#c49a63" strokeWidth="7" fill="none" />

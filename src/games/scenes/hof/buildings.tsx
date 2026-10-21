@@ -25,7 +25,7 @@ export function Scheune() {
       <rect x="-92" y="-178" width="184" height="178" fill="#3d2314" />
       <path d="M-92 0 Q-70 -84 -20 -72 Q30 -104 92 -38 V0 Z" fill="#e9c46a" />
       <path d="M-60 -50 l-8 -14 M-20 -60 l2 -14 M30 -66 l8 -12 M60 -40 l10 -10" stroke="#d4a373" strokeWidth="3" strokeLinecap="round" />
-      <g className="bh-scheune-bird">
+      <g className="hf-scheune-bird">
         <path d="M-14 -124 L-34 -132 L-26 -120 L-36 -112 Z" fill="#1d3557" />
         <ellipse cx="0" cy="-120" rx="16" ry="8" fill="#1d3557" />
         <ellipse cx="2" cy="-116" rx="9" ry="4" fill="#f8f9fa" />
@@ -38,7 +38,7 @@ export function Scheune() {
         [-92, 1],
         [92, -1],
       ].map(([hinge, dir]) => (
-        <g key={hinge} className="bh-scheune-door" style={{ transformOrigin: `${hinge}px -89px` }}>
+        <g key={hinge} className="hf-scheune-door" style={{ transformOrigin: `${hinge}px -89px` }}>
           <rect x={Math.min(hinge, 0)} y="-178" width="92" height="178" fill="#c1121f" />
           <rect x={Math.min(hinge, 0) + 5} y="-173" width="82" height="168" fill="none" stroke="#f8f9fa" strokeWidth="7" />
           <path d={`M${hinge + 5 * dir} -173 L${-5 * dir} -5 M${-5 * dir} -173 L${hinge + 5 * dir} -5`} stroke="#f8f9fa" strokeWidth="7" />
@@ -57,7 +57,7 @@ const WINDOW = "M-36 -226 H36 V-152 H-36 Z";
 export function Bauernhaus() {
   return (
     <>
-      <g className="bh-haus-smoke" fill="#fff">
+      <g className="hf-haus-smoke" fill="#fff">
         {[0, 1, 2].map((i) => (
           <circle key={i} cx={88 + i * 4} cy={-384 - i * 6} r={12 + i * 3} style={nth(i)} />
         ))}
@@ -87,7 +87,7 @@ export function Bauernhaus() {
         <circle cx="-8" cy="-200" r="2" fill="#fff" />
         <circle cx="6" cy="-202" r="2" fill="#fff" />
         <Face cx={0} cy={-184} size={0.6} />
-        <g className="bh-haus-arm" style={{ transformOrigin: "16px -160px" }}>
+        <g className="hf-haus-arm" style={{ transformOrigin: "16px -160px" }}>
           <path d="M16 -160 L28 -194" stroke="#e63946" strokeWidth="9" strokeLinecap="round" />
           <circle cx="29" cy="-198" r="6" fill={SKIN} />
         </g>
@@ -97,7 +97,7 @@ export function Bauernhaus() {
         [-36, 1],
         [36, -1],
       ].map(([hinge, dir]) => (
-        <g key={hinge} className="bh-haus-shutter" style={{ transformOrigin: `${hinge}px -189px` }}>
+        <g key={hinge} className="hf-haus-shutter" style={{ transformOrigin: `${hinge}px -189px` }}>
           <rect x={Math.min(hinge, 0)} y="-226" width="36" height="74" fill="#2a9d8f" stroke="#21867a" strokeWidth="3" />
           <path d={`M${hinge + 8 * dir} -214 H${-8 * dir} M${hinge + 8 * dir} -189 H${-8 * dir} M${hinge + 8 * dir} -164 H${-8 * dir}`} stroke="#21867a" strokeWidth="4" />
         </g>
@@ -139,8 +139,8 @@ export function Huehnerstall() {
       <circle cx="56" cy="-108" r="15" fill="#3d2314" />
       <path d="M48 -116 Q56 -126 64 -116" stroke="#e9c46a" strokeWidth="3" fill="none" />
       <path d={STALL_DOOR} fill="#3d2314" />
-      <ellipse className="bh-stall-egg" cx="0" cy="-62" rx="9" ry="12" fill="#fff8e7" />
-      <path className="bh-stall-door" d={STALL_DOOR} fill="#a0522d" style={{ transformOrigin: "-26px -83px" }} />
+      <ellipse className="hf-stall-egg" cx="0" cy="-62" rx="9" ry="12" fill="#fff8e7" />
+      <path className="hf-stall-door" d={STALL_DOOR} fill="#a0522d" style={{ transformOrigin: "-26px -83px" }} />
       <path d="M-30 -50 L-100 0 H-72 L-6 -50 Z" fill="#bc8a5f" />
       <path d="M-34 -40 h22 M-48 -30 h22 M-62 -20 h22 M-76 -10 h22" stroke="#8d5a2b" strokeWidth="3" />
       <path d="M-58 -130 c-6 -8 -16 0 -8 8 l8 8 l8 -8 c8 -8 -2 -16 -8 -8 Z" fill="#ff5d73" />
@@ -158,7 +158,7 @@ export function Windmuehle() {
       <rect x="-8" y="-128" width="16" height="22" rx="3" fill="#a98467" />
       <rect x="-48" y="-152" width="96" height="8" rx="3" fill="#a98467" />
       <path d="M-42 -192 Q0 -252 42 -192 Z" fill="#b08968" />
-      <g className="bh-muehle-sails" style={{ transformOrigin: "0px -214px" }}>
+      <g className="hf-muehle-sails" style={{ transformOrigin: "0px -214px" }}>
         {[45, 135, 225, 315].map((a) => (
           <g key={a} transform={`rotate(${a} 0 -214)`}>
             <rect x="-4" y="-334" width="8" height="120" fill="#9c6644" />
@@ -181,7 +181,7 @@ export function Bienenkorb() {
       <rect x="-38" y="-16" width="9" height="16" fill="#7f5539" />
       <rect x="29" y="-16" width="9" height="16" fill="#7f5539" />
       <rect x="-48" y="-26" width="96" height="11" rx="3" fill="#8d5a2b" />
-      <g className="bh-korb-body" style={{ transformOrigin: "0px -26px" }}>
+      <g className="hf-korb-body" style={{ transformOrigin: "0px -26px" }}>
         <path d="M-42 -26 Q-46 -104 0 -108 Q46 -104 42 -26 Z" fill="#e9c46a" />
         {COILS.map((y) => {
           const w = 44 - ((y + 36) * (y + 36)) / 160;
@@ -190,7 +190,7 @@ export function Bienenkorb() {
         <ellipse cx="-14" cy="-84" rx="8" ry="14" fill="#fff" opacity="0.35" />
         <ellipse cx="0" cy="-38" rx="11" ry="8" fill="#3d2314" />
       </g>
-      <g className="bh-korb-bees">
+      <g className="hf-korb-bees">
         {[0, 1, 2].map((i) => (
           <g key={i} style={nth(i)}>
             <ellipse cx="0" cy="-42" rx="6" ry="4.5" fill="#ffd60a" />

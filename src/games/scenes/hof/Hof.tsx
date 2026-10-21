@@ -9,15 +9,15 @@ import { Biene, Frosch, Hase, Katze, Maus, Schmetterling, Schnecke } from "./cri
 import { Bauer, Traktor, Vogelscheuche } from "./farmer";
 import { BIENEN, HAUS, HEU, SCHEUNE, STALL, WIESE } from "./layout";
 import { Apfelbaum, Blumen, Heuballen, Kuerbis } from "./nature";
-import "./bauernhof.css";
+import "./hof.css";
 
 // Items are listed from back to front, which is also the drawing order.
 
-export const bauernhof: Scene = {
-  id: "bauernhof",
-  title: "Bauernhof",
-  emoji: "🐮",
-  description: "Kuh, Schwein und Traktor auf dem Bauernhof.",
+export const hof: Scene = {
+  id: "hof",
+  title: "Hof am Teich",
+  emoji: "🐣",
+  description: "Ente, Frosch und Ferkel am Teich auf dem Hof.",
   width: 1600,
   height: 1000,
   sky: "#8fd3ff",

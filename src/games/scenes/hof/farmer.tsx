@@ -5,7 +5,7 @@ import { Face, GLASS, INK, Inside, Rider, SKIN, nth } from "../shared";
 /** Big tractor wheel with tread blocks, centred on (cx, cy). */
 function TractorWheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
   return (
-    <g className="bh-traktor-wheel" style={{ transformOrigin: `${cx}px ${cy}px` }}>
+    <g className="hf-traktor-wheel" style={{ transformOrigin: `${cx}px ${cy}px` }}>
       <circle cx={cx} cy={cy} r={r} fill="#2b2d42" />
       {Array.from({ length: 12 }, (_, i) => (
         <rect key={i} x={cx - r * 0.12} y={cy - r - 3} width={r * 0.24} height={r * 0.2} rx="3" fill="#2b2d42" transform={`rotate(${i * 30} ${cx} ${cy})`} />
@@ -25,8 +25,8 @@ const CAB = "M-122 -196 H-14 V-112 H-122 Z";
 /** Red tractor, facing right, with the farmer in the cab; it drives a bit and puffs. */
 export function Traktor() {
   return (
-    <g className="bh-traktor-body">
-      <g className="bh-traktor-puff" fill="#dee2e6">
+    <g className="hf-traktor-body">
+      <g className="hf-traktor-puff" fill="#dee2e6">
         {[0, 1, 2].map((i) => (
           <circle key={i} cx={102 + i * 6} cy={-208 - i * 4} r={11 + i * 3} style={nth(i)} />
         ))}
@@ -56,7 +56,7 @@ export function Traktor() {
 /** The farmer pushing a wheelbarrow full of vegetables; he whistles and lifts his hat. */
 export function Bauer() {
   return (
-    <g className="bh-bauer-walk">
+    <g className="hf-bauer-walk">
       <path d="M-34 -78 L22 -62" stroke="#7f5539" strokeWidth="7" strokeLinecap="round" />
       <circle cx="30" cy="-106" r="16" fill="#95d5b2" />
       <circle cx="30" cy="-106" r="9" fill="#b7e4c7" />
@@ -71,7 +71,7 @@ export function Bauer() {
       <path d="M-2 -100 H122 L102 -50 H20 Z" fill="#2a9d8f" />
       <rect x="-6" y="-104" width="132" height="9" rx="4" fill="#21867a" />
       <path d="M36 -50 L28 0 M64 -50 L100 -24" stroke="#7f5539" strokeWidth="6" strokeLinecap="round" />
-      <g className="bh-bauer-wheel" style={{ transformOrigin: "100px -24px" }}>
+      <g className="hf-bauer-wheel" style={{ transformOrigin: "100px -24px" }}>
         <circle cx="100" cy="-24" r="24" fill="#2b2d42" />
         <circle cx="100" cy="-24" r="11" fill="#adb5bd" />
         <path d="M89 -24 H111 M100 -35 V-13" stroke="#6c757d" strokeWidth="3" />
@@ -91,13 +91,13 @@ export function Bauer() {
       <circle cx="-70" cy="-170" r="22" fill={SKIN} />
       <path d="M-86 -160 Q-70 -144 -54 -160 Q-60 -148 -70 -148 Q-80 -148 -86 -160 Z" fill="#a0522d" />
       <Face cx={-66} cy={-172} size={0.7} />
-      <g className="bh-bauer-hat" style={{ transformOrigin: "-70px -186px" }}>
+      <g className="hf-bauer-hat" style={{ transformOrigin: "-70px -186px" }}>
         <ellipse cx="-70" cy="-186" rx="38" ry="8" fill="#e9c46a" />
         <path d="M-90 -186 Q-90 -212 -70 -212 Q-50 -212 -50 -186 Z" fill="#e9c46a" />
         <rect x="-90" y="-196" width="40" height="7" fill="#e63946" />
         <path d="M-102 -186 h64" stroke="#d4a373" strokeWidth="2" />
       </g>
-      <g className="bh-bauer-notes" fill={INK} fontSize="24" fontWeight="700">
+      <g className="hf-bauer-notes" fill={INK} fontSize="24" fontWeight="700">
         <text x="-44" y="-184" style={nth(0)}>
           ♪
         </text>
@@ -113,7 +113,7 @@ export function Bauer() {
 function Crow({ x, y, dir, i }: { x: number; y: number; dir: number; i: number }) {
   return (
     <g transform={`translate(${x} ${y}) scale(${dir} 1)`}>
-      <g className="bh-scheuche-crow" style={nth(i)}>
+      <g className="hf-scheuche-crow" style={nth(i)}>
         <path d="M-12 -10 L-24 -4 L-12 -2 Z" fill="#343a40" />
         <ellipse cx="0" cy="-10" rx="13" ry="9" fill="#343a40" />
         <circle cx="10" cy="-20" r="7" fill="#343a40" />
@@ -129,7 +129,7 @@ function Crow({ x, y, dir, i }: { x: number; y: number; dir: number; i: number }
 export function Vogelscheuche() {
   return (
     <>
-      <g className="bh-scheuche-body" style={{ transformOrigin: "0px 0px" }}>
+      <g className="hf-scheuche-body" style={{ transformOrigin: "0px 0px" }}>
         <rect x="-5" y="-150" width="10" height="150" fill="#8d5a2b" />
         <rect x="-72" y="-152" width="144" height="9" rx="3" fill="#8d5a2b" />
         <path d="M-84 -150 l12 -4 M-84 -146 h12 M-84 -142 l12 4 M84 -150 l-12 -4 M84 -146 h-12 M84 -142 l-12 4" stroke="#e9c46a" strokeWidth="3" strokeLinecap="round" />
@@ -142,7 +142,7 @@ export function Vogelscheuche() {
         <path d="M-12 -182 h6 M6 -182 h6" stroke={INK} strokeWidth="4" strokeLinecap="round" />
         <path d="M0 -178 L12 -174 L0 -170 Z" fill="#f77f00" />
         <path d="M-10 -168 Q0 -160 10 -168" stroke={INK} strokeWidth="2.5" strokeLinecap="round" strokeDasharray="3 3" fill="none" />
-        <g className="bh-scheuche-hat" style={{ transformOrigin: "0px -198px" }}>
+        <g className="hf-scheuche-hat" style={{ transformOrigin: "0px -198px" }}>
           <ellipse cx="0" cy="-198" rx="34" ry="7" fill="#bc6c25" />
           <path d="M-20 -198 Q-20 -226 0 -226 Q20 -226 20 -198 Z" fill="#bc6c25" />
           <rect x="-20" y="-206" width="40" height="6" fill="#e63946" />

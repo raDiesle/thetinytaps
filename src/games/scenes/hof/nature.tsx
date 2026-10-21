@@ -27,7 +27,7 @@ export function Apfelbaum() {
       <path d="M-18 0 Q-10 -70 -12 -124 H12 Q10 -70 18 0 Z" fill="#8d5a2b" />
       <path d="M-4 -40 q4 -8 8 0" stroke="#6b4423" strokeWidth="3" fill="none" />
       <path d="M0 -84 L-36 -128 M2 -100 L34 -142" stroke="#8d5a2b" strokeWidth="10" strokeLinecap="round" />
-      <g className="bh-baum-crown" style={{ transformOrigin: "0px -124px" }}>
+      <g className="hf-baum-crown" style={{ transformOrigin: "0px -124px" }}>
         {CROWN.map(([cx, cy, r, fill]) => (
           <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r={r} fill={fill} />
         ))}
@@ -40,7 +40,7 @@ export function Apfelbaum() {
           </g>
         ))}
       </g>
-      <g className="bh-baum-fall">
+      <g className="hf-baum-fall">
         {[
           [-64, -140],
           [52, -134],
@@ -64,7 +64,7 @@ export function Kuerbis() {
     <>
       <path d="M-70 -6 Q-50 -24 -30 -8" stroke="#40916c" strokeWidth="5" fill="none" />
       <path d="M-74 -12 Q-90 -30 -70 -40 Q-60 -26 -74 -12 Z" fill="#52b788" />
-      <g className="bh-kuerbis-body" style={{ transformOrigin: "0px 0px" }}>
+      <g className="hf-kuerbis-body" style={{ transformOrigin: "0px 0px" }}>
         <ellipse cx="-32" cy="-44" rx="30" ry="40" fill="#f77f00" />
         <ellipse cx="32" cy="-44" rx="30" ry="40" fill="#f77f00" />
         <ellipse cx="0" cy="-46" rx="34" ry="46" fill="#fb8b24" />
@@ -86,7 +86,7 @@ export function Heuballen() {
       <rect x="40" y="-62" width="96" height="62" rx="4" fill="#e9c46a" />
       <path d="M70 -62 V0 M106 -62 V0 M86 -78 L70 -62 M122 -78 L106 -62" stroke="#bc6c25" strokeWidth="3" />
       <path d="M50 -44 h10 M90 -30 h12 M56 -16 h8 M116 -48 h10" stroke="#d4a373" strokeWidth="3" strokeLinecap="round" />
-      <g className="bh-heu-round" style={{ transformOrigin: "0px 0px" }}>
+      <g className="hf-heu-round" style={{ transformOrigin: "0px 0px" }}>
         <circle cx="0" cy="-62" r="62" fill="#e9c46a" />
         <path
           d="M0 -62 m-6 0 a6 6 0 1 1 12 0 a14 14 0 1 1 -28 0 a22 22 0 1 1 44 0 a30 30 0 1 1 -60 0 a38 38 0 1 1 76 0 a46 46 0 1 1 -92 0"
@@ -96,7 +96,7 @@ export function Heuballen() {
         />
         <ellipse cx="-24" cy="-100" rx="18" ry="7" fill="#fff" opacity="0.3" />
       </g>
-      <g className="bh-heu-straw" stroke="#e9c46a" strokeWidth="4" strokeLinecap="round">
+      <g className="hf-heu-straw" stroke="#e9c46a" strokeWidth="4" strokeLinecap="round">
         {[-40, -10, 24, 50].map((x, i) => (
           <path key={x} d={`M${x} -110 l8 -8`} style={nth(i)} />
         ))}
@@ -120,7 +120,7 @@ export function Blumen() {
       <path d={WILD.map(([x, y]) => `M${x} ${y} Q${x * 0.6} ${y / 2} ${x * 0.3} 0`).join(" ")} stroke="#40916c" strokeWidth="4" fill="none" />
       <path d="M-30 -20 q-14 -10 -22 -4 q10 8 22 4 M20 -28 q14 -10 22 -4 q-10 8 -22 4" fill="#52b788" />
       {WILD.map(([cx, cy, petals, middle], i) => (
-        <g key={cx} className="bh-blume-head" style={nth(i)}>
+        <g key={cx} className="hf-blume-head" style={nth(i)}>
           {[0, 72, 144, 216, 288].map((a) => (
             <circle key={a} cx={cx} cy={cy - 9} r="8.5" fill={petals} transform={`rotate(${a} ${cx} ${cy})`} />
           ))}

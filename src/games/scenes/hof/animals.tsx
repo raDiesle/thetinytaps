@@ -18,7 +18,7 @@ function Leg({ x, top, w, fill, hoof = "#495057" }: { x: number; top: number; w:
 export function Kuh() {
   return (
     <>
-      <g className="bh-kuh-tail" style={{ transformOrigin: "-118px -136px" }}>
+      <g className="hf-kuh-tail" style={{ transformOrigin: "-118px -136px" }}>
         <path d="M-118 -136 Q-136 -104 -128 -64" stroke="#f1f3f5" strokeWidth="7" strokeLinecap="round" fill="none" />
         <ellipse cx="-128" cy="-56" rx="8" ry="13" fill={SPOT} />
       </g>
@@ -33,7 +33,7 @@ export function Kuh() {
       <path d="M-48 -54 v8 M-38 -52 v8 M-28 -54 v8" stroke="#ff8fa3" strokeWidth="5" strokeLinecap="round" />
       <Leg x={-64} top={-84} w={22} fill="#fff" />
       <Leg x={90} top={-84} w={22} fill="#fff" />
-      <g className="bh-kuh-head" style={{ transformOrigin: "96px -124px" }}>
+      <g className="hf-kuh-head" style={{ transformOrigin: "96px -124px" }}>
         <path d="M78 -152 Q118 -156 128 -114 L102 -82 Q86 -100 78 -152 Z" fill="#fff" />
         <ellipse cx="98" cy="-158" rx="19" ry="9" transform="rotate(-24 98 -158)" fill="#fff" />
         <ellipse cx="98" cy="-158" rx="11" ry="5" transform="rotate(-24 98 -158)" fill="#ffb3c1" />
@@ -52,7 +52,7 @@ export function Kuh() {
         <circle cx="121.4" cy="-137.4" r="1.4" fill="#fff" />
         <circle cx="147.4" cy="-137.4" r="1.4" fill="#fff" />
         <path d="M110 -84 Q133 -70 156 -84" stroke="#e63946" strokeWidth="6" fill="none" />
-        <g className="bh-kuh-bell" style={{ transformOrigin: "133px -77px" }}>
+        <g className="hf-kuh-bell" style={{ transformOrigin: "133px -77px" }}>
           <path d="M126 -77 H140 L145 -58 H121 Z" fill="#ffd60a" />
           <circle cx="133" cy="-56" r="3.5" fill="#c9a227" />
           <path d="M129 -74 L127 -62" stroke="#fff" strokeWidth="2" opacity="0.6" />
@@ -68,9 +68,9 @@ const MANE = "#4a2511";
 /** Brown horse, facing right; it rears up, shakes its mane and swishes its tail. */
 export function Pferd() {
   return (
-    <g className="bh-pferd-body" style={{ transformOrigin: "-70px 0px" }}>
+    <g className="hf-pferd-body" style={{ transformOrigin: "-70px 0px" }}>
       <path
-        className="bh-pferd-tail"
+        className="hf-pferd-tail"
         d="M-108 -152 Q-142 -140 -140 -90 Q-134 -62 -122 -56 Q-128 -100 -100 -136 Z"
         fill={MANE}
         style={{ transformOrigin: "-108px -150px" }}
@@ -83,7 +83,7 @@ export function Pferd() {
       <Leg x={-56} top={-112} w={18} fill={COAT} hoof="#3d2314" />
       <Leg x={86} top={-112} w={18} fill={COAT} hoof="#3d2314" />
       <rect x="77" y="-34" width="18" height="21" fill="#fff" />
-      <g className="bh-pferd-head" style={{ transformOrigin: "80px -150px" }}>
+      <g className="hf-pferd-head" style={{ transformOrigin: "80px -150px" }}>
         <path d="M46 -166 Q70 -214 104 -238 L128 -216 Q104 -176 98 -118 Q60 -108 46 -166 Z" fill={COAT} />
         <path d="M104 -240 Q124 -258 140 -240 L176 -178 Q180 -156 160 -154 Q146 -154 136 -168 L102 -214 Z" fill={COAT} />
         <ellipse cx="163" cy="-166" rx="17" ry="13" fill="#7f3e1d" />
@@ -95,7 +95,7 @@ export function Pferd() {
         <circle cx="128.6" cy="-223.6" r="1.6" fill="#fff" />
         <path d="M156 -158 Q164 -154 172 -158" stroke="#3d2314" strokeWidth="2.5" strokeLinecap="round" fill="none" />
         <path
-          className="bh-pferd-mane"
+          className="hf-pferd-mane"
           d="M106 -242 Q84 -228 70 -202 Q56 -182 44 -164 Q58 -168 62 -180 Q74 -182 74 -196 Q88 -202 90 -218 Q104 -222 106 -242 Z"
           fill={MANE}
           style={{ transformOrigin: "106px -240px" }}
@@ -119,7 +119,7 @@ const WOOL = [
 /** A sheep facing right; `face` is the colour of its head. */
 function Sheep({ face }: { face: string }) {
   return (
-    <g className="bh-schaf-body">
+    <g className="hf-schaf-body">
       {[-40, -22, 24, 42].map((x) => (
         <rect key={x} x={x - 5} y="-46" width="10" height="46" rx="4" fill="#495057" />
       ))}
@@ -130,7 +130,7 @@ function Sheep({ face }: { face: string }) {
         <circle key={cx} cx={cx} cy={cy} r={r} fill="#fff" />
       ))}
       <ellipse cx="-10" cy="-92" rx="22" ry="7" fill="#fff" opacity="0.8" />
-      <g className="bh-schaf-head" style={{ transformOrigin: "56px -66px" }}>
+      <g className="hf-schaf-head" style={{ transformOrigin: "56px -66px" }}>
         <ellipse cx="54" cy="-80" rx="13" ry="6" transform="rotate(-24 54 -80)" fill={face} />
         <ellipse cx="88" cy="-80" rx="13" ry="6" transform="rotate(24 88 -80)" fill={face} />
         <ellipse cx="71" cy="-68" rx="18" ry="23" fill={face} />
@@ -165,7 +165,7 @@ const GOAT = "#ede0d4";
 /** Goat with horns and a beard, facing left; it butts with its head. */
 export function Ziege() {
   return (
-    <g className="bh-ziege-body">
+    <g className="hf-ziege-body">
       <path d="M58 -98 L74 -116 L66 -92 Z" fill={GOAT} />
       <Leg x={-36} top={-70} w={12} fill="#d6ccc2" />
       <Leg x={46} top={-70} w={12} fill="#d6ccc2" />
@@ -174,7 +174,7 @@ export function Ziege() {
       <ellipse cx="-4" cy="-60" rx="44" ry="8" fill="#d6ccc2" />
       <Leg x={-22} top={-70} w={13} fill={GOAT} />
       <Leg x={30} top={-70} w={13} fill={GOAT} />
-      <g className="bh-ziege-head" style={{ transformOrigin: "-36px -96px" }}>
+      <g className="hf-ziege-head" style={{ transformOrigin: "-36px -96px" }}>
         <path d="M-28 -104 L-50 -132 L-68 -118 L-46 -84 Z" fill={GOAT} />
         <path d="M-58 -142 Q-46 -170 -22 -162 Q-38 -158 -50 -138 Z" fill="#a5a58d" />
         <path d="M-50 -144 Q-34 -168 -12 -158 Q-28 -154 -42 -136 Z" fill="#b7b7a4" />
@@ -208,9 +208,9 @@ export function Hund() {
       </text>
       <ellipse cx="-4" cy="-6" rx="18" ry="6" fill="#e63946" />
       <path d="M-14 -10 l4 -6 M-4 -11 l2 -6" stroke="#f1c27d" strokeWidth="4" strokeLinecap="round" />
-      <g className="bh-hund-body">
+      <g className="hf-hund-body">
         <path
-          className="bh-hund-tail"
+          className="hf-hund-tail"
           d="M92 -28 Q118 -40 116 -66"
           stroke={DOG}
           strokeWidth="10"
@@ -228,13 +228,13 @@ export function Hund() {
         <ellipse cx="55" cy="-4" rx="9" ry="5" fill="#ede0d4" />
         <path d="M24 -80 Q46 -70 68 -80" stroke="#3a86ff" strokeWidth="7" strokeLinecap="round" fill="none" />
         <circle cx="46" cy="-72" r="5" fill="#ffd60a" />
-        <g className="bh-hund-head" style={{ transformOrigin: "46px -84px" }}>
+        <g className="hf-hund-head" style={{ transformOrigin: "46px -84px" }}>
           <path d="M26 -126 Q8 -122 12 -88 Q24 -92 32 -114 Z" fill="#7f5539" />
           <path d="M66 -126 Q84 -122 80 -88 Q68 -92 60 -114 Z" fill="#7f5539" />
           <circle cx="46" cy="-108" r="26" fill={DOG} />
           <ellipse cx="57" cy="-114" rx="10" ry="9" fill="#7f5539" />
           <ellipse cx="46" cy="-93" rx="15" ry="11" fill="#ede0d4" />
-          <ellipse className="bh-hund-tongue" cx="48" cy="-80" rx="5" ry="7" fill="#ff5d73" />
+          <ellipse className="hf-hund-tongue" cx="48" cy="-80" rx="5" ry="7" fill="#ff5d73" />
           <ellipse cx="46" cy="-99" rx="6" ry="4.5" fill={INK} />
           <circle cx="44.5" cy="-100.5" r="1.5" fill="#fff" />
           <path d="M40 -89 Q46 -84 52 -89" stroke={INK} strokeWidth="2.4" strokeLinecap="round" fill="none" />
@@ -257,7 +257,7 @@ export function Schwein() {
     <>
       <ellipse cx="0" cy="-12" rx="124" ry="22" fill={MUD} />
       <ellipse cx="-30" cy="-16" rx="70" ry="9" fill="#9c6644" />
-      <g className="bh-schwein-splash" fill={MUD}>
+      <g className="hf-schwein-splash" fill={MUD}>
         {[
           [-96, -30],
           [-66, -36],
@@ -267,9 +267,9 @@ export function Schwein() {
           <circle key={cx} cx={cx} cy={cy} r={i % 2 ? 6 : 8} style={nth(i)} />
         ))}
       </g>
-      <g className="bh-schwein-body" style={{ transformOrigin: "0px -14px" }}>
+      <g className="hf-schwein-body" style={{ transformOrigin: "0px -14px" }}>
         <path
-          className="bh-schwein-tail"
+          className="hf-schwein-tail"
           d="M-82 -86 q-16 -4 -14 -18 q4 -12 14 -5 q5 9 -6 11"
           stroke="#ff8fab"
           strokeWidth="5"
@@ -289,7 +289,7 @@ export function Schwein() {
         {[-28, 60].map((x) => (
           <rect key={x} x={x - 10} y="-48" width="20" height="40" rx="8" fill={PIG} />
         ))}
-        <g className="bh-schwein-head" style={{ transformOrigin: "62px -80px" }}>
+        <g className="hf-schwein-head" style={{ transformOrigin: "62px -80px" }}>
           <path d="M60 -110 L56 -136 L80 -118 Z" fill="#f497b6" />
           <path d="M96 -114 L108 -134 L110 -108 Z" fill="#f497b6" />
           <circle cx="82" cy="-84" r="36" fill={PIG} />
@@ -314,7 +314,7 @@ export function Schwein() {
 function Piglet({ x, dir, i }: { x: number; dir: number; i: number }) {
   return (
     <g transform={`translate(${x} 0) scale(${dir} 1)`}>
-      <g className="bh-ferkel-pig" style={nth(i)}>
+      <g className="hf-ferkel-pig" style={nth(i)}>
         <path d="M-26 -30 q-10 -2 -8 -10 q4 -6 9 0" stroke="#ff8fab" strokeWidth="3" strokeLinecap="round" fill="none" />
         {[-14, 12].map((lx) => (
           <rect key={lx} x={lx - 5} y="-18" width="10" height="18" rx="4" fill="#ffafcc" />
