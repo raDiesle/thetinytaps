@@ -412,6 +412,25 @@ a.game-card:focus-visible {
   line-height: 1.7;
 }
 
+.ideas-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 6px 24px;
+  line-height: 1.5;
+}
+
+.ideas-intro {
+  max-width: 70ch;
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
 .ideas-nav {
   display: flex;
   flex-wrap: wrap;

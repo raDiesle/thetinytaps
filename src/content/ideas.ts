@@ -32,6 +32,8 @@ export interface IdeaArea {
   prefix: string;
   emoji: string;
   title: string;
+  /** Short note that holds for every idea of the area. */
+  intro?: string;
   ideas: Idea[];
 }
 
@@ -379,6 +381,22 @@ export const IDEA_AREAS: IdeaArea[] = [
         why: "Roter Faden durch das Bild, Figur zum Mögen.",
         effort: "L",
       },
+      {
+        id: "B-15",
+        emoji: "👋",
+        title: "„Hier bin ich!“",
+        text: "Tippt eine Weile niemand, winkt ein einzelnes Ding sanft und ruft leise „Hallo!“ – eine Einladung, kein Auftrag. Nach dem ersten Tippen ist es wieder still.",
+        why: "Hilft, wenn das Kind nicht weiß, wo es anfangen soll – ohne das Bild unruhig zu machen.",
+        effort: "S",
+      },
+      {
+        id: "B-16",
+        emoji: "🤸",
+        title: "Mitmach-Bewegungen",
+        text: "Manche Dinge laden zum Nachmachen ein: Der Frosch hüpft – „Hüpf mit!“, der Kran streckt sich – „Mach dich ganz groß!“, die Ente watschelt. Das Bild wartet kurz, damit das Kind mitmachen kann.",
+        why: "Bewegung weg vom Bildschirm; 2-Jährige lieben Nachmachen.",
+        effort: "S",
+      },
     ],
   },
   {
@@ -693,6 +711,151 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "🔴🔵🔴🔵❓ – welche Farbe kommt als Nächstes? Zwei große Knöpfe zur Wahl.",
         effort: "S",
       },
+      {
+        id: "N-26",
+        emoji: "🌫️",
+        title: "Beschlagenes Fenster",
+        text: "Der Bildschirm ist wie eine beschlagene Scheibe. Wo der Finger wischt, wird sie klar und dahinter sitzt ein Tier, das winkt. Nach einer Weile beschlägt sie wieder – neues Tier. Tastatur: jede Taste wischt ein Stück frei.",
+        why: "Nur wischen, nichts falsch machen, sofort eine Belohnung – ideal ab 2.",
+        effort: "S",
+      },
+      {
+        id: "N-27",
+        emoji: "📞",
+        title: "Tier-Telefon",
+        text: "Ein großes Spielzeug-Telefon klingelt. Antippen = abheben: „Hallo, hier ist die Kuh! Muuuh!“, das Tier ist im Bild zu sehen. Auflegen mit einem zweiten Tippen, dann ruft das nächste Tier an.",
+        why: "Telefonieren spielen ist bei 2-Jährigen beliebt; ein einziger Knopf.",
+        effort: "S",
+      },
+      {
+        id: "N-28",
+        emoji: "🧸",
+        title: "Aufräumen",
+        text: "Spielsachen liegen herum. Antippen – das Ding fliegt von allein in die Kiste und sagt „Tschüss!“. Ist alles drin, geht der Deckel zu und die Kiste lächelt. Kein Ziehen nötig.",
+        why: "Übt eine Alltags-Routine und endet von selbst ruhig.",
+        effort: "S",
+      },
+      {
+        id: "N-29",
+        emoji: "🦁",
+        title: "Laut und leise",
+        text: "Mit dem Mikrofon: Ruft das Kind laut, brüllt der Löwe und springt; flüstert es, piepst die kleine Maus. Keine Aufnahme, nur die Lautstärke wird gemessen. Eltern erlauben das Mikrofon einmal.",
+        why: "Ursache und Wirkung mit der eigenen Stimme – ganz ohne Tippen.",
+        effort: "M",
+      },
+      {
+        id: "N-30",
+        emoji: "🪞",
+        title: "Zauberspiegel",
+        text: "Die Frontkamera zeigt das Kind wie in einem Spiegel. Antippen setzt ihm einen anderen Hut oder Tierohren auf (Hasenohren, Feuerwehrhelm, Krone). Nichts wird gespeichert oder gesendet.",
+        why: "Kleinkinder lieben ihr eigenes Gesicht; jede Berührung verändert sofort etwas.",
+        effort: "M",
+      },
+    ],
+  },
+  {
+    prefix: "E",
+    emoji: "📱",
+    title: "Eltern-Handy verbinden",
+    intro:
+      "Das Kind sieht von der Technik nichts: kein QR-Code, kein Knopf, kein Text im Spiel. Das Handy ist nur für Eltern. Verbinden auf dem Eltern-Startbildschirm per QR-Code, ohne App und ohne Konto; die Daten gehen direkt von Gerät zu Gerät und nichts wird gespeichert. Bricht die Verbindung ab, spielt das Kind einfach weiter.",
+    ideas: [
+      {
+        id: "E-01",
+        emoji: "🔗",
+        title: "Handy koppeln per QR-Code",
+        text: "Auf dem Eltern-Startbildschirm erscheint ein QR-Code. Handy-Kamera drauf → im Handy-Browser öffnet sich die Eltern-Seite und ist verbunden. Technik: WebRTC direkt zwischen den Geräten; weil die Seite statisch auf GitHub Pages liegt, braucht nur das erste „Hallo“ einen kleinen Vermittler (z. B. PeerJS oder ein Cloudflare-Worker).",
+        why: "Grundlage für alle E-Ideen. In fünf Sekunden verbunden, nichts zu installieren.",
+        effort: "M",
+      },
+      {
+        id: "E-02",
+        emoji: "🎛️",
+        title: "Fernbedienung",
+        text: "Auf dem Handy große Bilder aller Spiele und Szenen. Antippen wechselt auf dem Tablet sanft zum anderen Spiel (Bild blendet über). Dazu: Sprache an/aus, leiser, Ruhiger Modus. Braucht E-01.",
+        why: "Man muss dem Kind das Tablet nicht wegnehmen – das gibt bei 2-Jährigen oft Tränen.",
+        effort: "S",
+      },
+      {
+        id: "E-03",
+        emoji: "🌙",
+        title: "„Gleich ist Schluss“ vom Handy",
+        text: "Ein Knopf auf dem Handy: Auf dem Tablet geht langsam die Sonne unter, alle Figuren gähnen und winken, die Stimme sagt „Tschüss, bis morgen!“, dann wird es dunkel und bleibt ruhig. Optional zwei Minuten vorher ein Mond, der sich langsam ins Bild schiebt. Braucht E-01.",
+        why: "Nicht Mama macht das Spiel aus, das Spiel geht schlafen – viel weniger Streit. Passt zu N-03 und A-03.",
+        effort: "S",
+      },
+      {
+        id: "E-04",
+        emoji: "🎙️",
+        title: "Mamas Stimme im Spiel",
+        text: "Auf dem Handy einen Knopf gedrückt halten und sprechen: Auf dem Tablet spricht eine Figur (Bär, Baggerfahrer) mit Mamas oder Papas Stimme, ihr Mund bewegt sich. „Wo ist der Bagger?“, „Super gemacht!“ – auch aus der Küche. Braucht E-01.",
+        why: "Die vertraute Stimme wirkt bei Kleinkindern viel stärker als die Computerstimme.",
+        effort: "M",
+      },
+      {
+        id: "E-05",
+        emoji: "👉",
+        title: "Suchauftrag vom Handy",
+        text: "Das Handy zeigt die Dinge der aktuellen Szene als kleine Bilder. Mama tippt die Kuh an → auf dem Tablet fragt die Stimme „Wo ist die Kuh?“, nach ein paar Sekunden wackelt die Kuh leicht als Hilfe. Findet das Kind sie, erscheint auf dem Handy ein Stern. Braucht E-01.",
+        why: "Eltern stellen genau die Frage, die zum Kind passt; das Kind muss nur tippen.",
+        effort: "M",
+      },
+      {
+        id: "E-06",
+        emoji: "🎈",
+        title: "Überraschung schicken",
+        text: "Vier große Knöpfe auf dem Handy: 🎈 Ballons, ⭐ Sternregen, 🐶 ein Hund läuft durchs Bild, 🫧 Seifenblasen. Auf dem Tablet passiert es sofort, ohne das Spiel zu unterbrechen. Braucht E-01.",
+        why: "Kleiner Zaubermoment („Papa hat dir Ballons geschickt!“); fast nichts Neues zu zeichnen.",
+        effort: "S",
+      },
+      {
+        id: "E-07",
+        emoji: "📸",
+        title: "Foto vom Handy ins Spiel",
+        text: "Eltern fotografieren Kuscheltier, Oma, Hund oder Laufrad und schicken das Bild ans Tablet. Es wird zur Bildkarte (L-03), zum eigenen Wort (W-06) oder taucht als Überraschung in einer Szene auf. Bleibt nur auf dem Tablet. Braucht E-01.",
+        why: "Das eigene Kuscheltier im Spiel ist für 2-Jährige das Größte.",
+        effort: "M",
+      },
+      {
+        id: "E-08",
+        emoji: "⚽",
+        title: "Ball hin und her",
+        text: "Handy und Tablet liegen nebeneinander. Das Kind schubst einen Ball – er rollt aus dem Tablet heraus und kommt auf Mamas Handy an. Mama tippt, er rollt zurück. Genauso: Ein Tier läuft hinüber und versteckt sich auf dem anderen Gerät. Braucht E-01.",
+        why: "Abwechseln und „Wo ist es hin?“ ganz ohne Regeln – das einzige Ding ist der Ball.",
+        effort: "M",
+      },
+      {
+        id: "E-09",
+        emoji: "👀",
+        title: "Mitschauen aus der Küche",
+        text: "Auf dem Handy erscheinen ruhig kleine Bilder von dem, was das Kind gerade antippt (🐄, 🚜, „B – Bär“). So kann man mitreden („Oh, die Kuh!“), ohne danebenzusitzen. Kein Bildschirm-Übertragen, nichts wird gespeichert. Braucht E-01.",
+        why: "Gemeinsam über dasselbe sprechen fördert die Sprache.",
+        effort: "S",
+      },
+      {
+        id: "E-10",
+        emoji: "⏸️",
+        title: "Pause – alle schlafen kurz",
+        text: "Pause-Knopf auf dem Handy (Essen ist fertig, es klingelt): Auf dem Tablet schlafen alle Figuren ein und atmen ruhig, die Töne sind aus. „Weiter“ weckt sie wieder auf. Braucht E-01.",
+        why: "Unterbrechen ohne Drama – das Kind sieht, dass das Spiel auf es wartet.",
+        effort: "S",
+      },
+      {
+        id: "E-11",
+        emoji: "🔘",
+        title: "Altes Handy als Riesen-Knopf",
+        text: "Das Spiel läuft auf dem großen Bildschirm (Laptop, Fernseher), das Kind hält ein altes Handy mit nur 1–4 riesigen bunten Knöpfen. Jeder Knopf löst im großen Bild etwas aus: Hupe, Sprung, nächstes Ding. Gleiche Verbindung wie E-01.",
+        why: "Größerer Abstand zum Bildschirm; wenige große Knöpfe sind für 2-Jährige leichter als eine Tastatur.",
+        effort: "M",
+      },
+      {
+        id: "E-12",
+        emoji: "👵",
+        title: "Oma spielt mit (aus der Ferne)",
+        text: "Ein Link für Großeltern: Oma sieht dieselbe Szene auf ihrem Handy und kann auch antippen – dann muht die Kuh beim Enkel, und umgekehrt. Am besten zusammen mit einem Videoanruf. Gleiche Technik wie E-01, nur stehen die Geräte in verschiedenen Städten.",
+        why: "Videoanrufe mit 2-Jährigen sind oft kurz; gemeinsam etwas antippen hält sie länger und macht beiden Spaß.",
+        effort: "L",
+      },
     ],
   },
   {
@@ -792,6 +955,22 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Wärmere, dunklere Farben und leisere Töne nach 18 Uhr (oder per Schalter), passend zum Ruhigen Modus.",
         effort: "S",
       },
+      {
+        id: "A-13",
+        emoji: "✋",
+        title: "Ganze Hand erlaubt",
+        text: "2-Jährige legen oft die ganze Hand oder den Handballen auf den Bildschirm. Jeder Finger soll trotzdem etwas auslösen, ein aufliegender Ballen blockiert nichts, und Tippen ganz am Rand löst keine Systemgesten aus.",
+        why: "Sonst „geht es nicht“ – und das Kind gibt auf.",
+        effort: "S",
+      },
+      {
+        id: "A-14",
+        emoji: "🔐",
+        title: "Tablet sperren erklären",
+        text: "Auf dem Eltern-Startbildschirm kurz zeigen, wie man das Tablet auf das Spiel festsetzt: „Geführter Zugriff“ am iPad, „App anpinnen“ bei Android. Mit Bildern Schritt für Schritt.",
+        why: "Dann kann das Kind nicht aus Versehen in andere Apps, Fotos oder Nachrichten.",
+        effort: "S",
+      },
     ],
   },
 ];
@@ -806,4 +985,21 @@ export const TOP_PICKS: { id: string; reason: string }[] = [
   { id: "N-04", reason: "Wischen + Fahrzeuge = Dauerbrenner." },
   { id: "W-01", reason: "Kleine Änderung, macht „Wörter tippen“ für Kleine viel lohnender." },
   { id: "A-03", reason: "Spielzeit-Grenze, die das Spiel setzt – zusammen mit N-03 ein starkes Paar." },
+  { id: "N-26", reason: "Nur wischen, sofort ein Tier – einfacher geht es für 2-Jährige kaum." },
+  { id: "E-01", reason: "Öffnet die ganze Eltern-Handy-Reihe; danach sind E-03, E-06 und E-10 je nur klein." },
+  { id: "E-03", reason: "Spiel beenden, ohne dem Kind das Tablet wegzunehmen." },
+];
+
+/** What every idea has to meet so a 2-year-old can play it alone. */
+export const TODDLER_RULES: { emoji: string; text: string }[] = [
+  { emoji: "👆", text: "Ein Tippen = eine Reaktion, sofort sichtbar und hörbar." },
+  { emoji: "💚", text: "Es gibt kein Falsch: Daneben tippen macht auch etwas Schönes, nie ein Fehlerton." },
+  { emoji: "🖼️", text: "Kein Lesen nötig: Bilder, Töne und Stimme statt Text." },
+  { emoji: "🎯", text: "Riesige Ziele, mindestens daumengroß, mit Platz dazwischen." },
+  { emoji: "✌️", text: "Höchstens 2–4 Möglichkeiten auf einmal." },
+  { emoji: "🐢", text: "Keine Zeitnot, kein Verlieren, keine Punkte." },
+  { emoji: "🔁", text: "Wiederholen ist das Ziel: Das 50. Mal ist genauso lustig wie das erste." },
+  { emoji: "🛡️", text: "Nichts kann kaputtgehen: keine Menüs, kein Zurück, Verlassen nur für Eltern (Halten)." },
+  { emoji: "🌙", text: "Ruhig statt grell: sanfte Töne, kein Blinken, freundliches Ende." },
+  { emoji: "📱", text: "Alles für Eltern ist versteckt – oder auf dem Eltern-Handy (Bereich E)." },
 ];
