@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import {
   playBark,
@@ -29,16 +29,19 @@ import {
   playMoo,
   playOink,
   playBaa,
-  playNeigh,
   playCluck,
   playCrow,
+  playNeigh,
+  playHoot,
   playCroak,
   playTweet,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { assignKeys } from "./keys";
-import type { ScenesSettings } from "./settings";
+import { nextQuest, questsFor, type Quest } from "./quests";
+import { isQuestMode, type ScenesSettings } from "./settings";
 import { placeBox, type Box, type Scene, type SceneItem, type SceneSound } from "./types";
 
 const SOUNDS: Record<SceneSound, () => void> = {
@@ -70,19 +73,23 @@ const SOUNDS: Record<SceneSound, () => void> = {
   moo: playMoo,
   oink: playOink,
   baa: playBaa,
-  neigh: playNeigh,
   cluck: playCluck,
   crow: playCrow,
+  neigh: playNeigh,
+  hoot: playHoot,
   croak: playCroak,
 };
 
 /** Key presses closer together than this only spawn shapes. */
 const MIN_KEY_MS = 600;
-/** Find mode: a key press repeats the question at most this often. */
+/** Find modes: a key press repeats the question at most this often. */
 const REPEAT_QUESTION_MS = 3000;
-/** Find mode: pause after a found item before the next question. */
+/** Find modes: pause after a found item before the next question. */
 const NEXT_QUESTION_MS = 2600;
-/** Find mode: when the hint ring appears. */
+/** Sound riddle: the question is spoken after the sound, and the sound is repeated after a wrong tap. */
+const RIDDLE_QUESTION_MS = 1500;
+const RIDDLE_REPEAT_MS = 2200;
+/** Find modes: when the hint ring appears. */
 const HINT_AFTER_MS = 8000;
 const HINT_AFTER_MISSES = 2;
 /** Without taps for this long, the picture starts moving by itself… */
@@ -92,8 +99,18 @@ const AMBIENT_MIN_MS = 4000;
 const AMBIENT_MAX_MS = 9000;
 /** Hover mode: how long the pointer has to rest on an item, so just passing by doesn't count. */
 const HOVER_DWELL_MS = 200;
+/** Chain reactions: the next item reacts this long after the one before. */
+const CHAIN_STEP_MS = 1100;
+/** "Alles entdeckt!": the party starts a moment after the last item, and everything dances for a while. */
+const PARTY_AFTER_MS = 900;
+const PARTY_MS = 3600;
 
 const PROMPTS = { tap: "Tipp etwas an! 👆", hover: "Zeig auf etwas! 👆", keys: "Drück eine Taste! ⌨️" };
+const COLOUR_PROMPTS = {
+  tap: "Tipp etwas an – es wird bunt! 🖍️",
+  hover: "Zeig auf etwas – es wird bunt! 🖍️",
+  keys: "Drück eine Taste – es wird bunt! 🖍️",
+};
 
 const PRAISE = ["Super!", "Toll!", "Prima!", "Ja, genau!", "Richtig!"];
 
@@ -103,18 +120,40 @@ const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") +
 /** Per item: how often it was started (remounts restart the animation) and whether it is running. */
 type Plays = Record<string, { count: number; playing: boolean }>;
 
+/** Colour mode: how much of each colour is left in the grey picture; the rest is white. */
+const GREY_SLOPE = 0.55;
+
+/** Colour mode: a colour as the pale grey it has in the uncoloured picture (same as the grey filter). */
+function paleGrey(hex: string) {
+  const n = parseInt(hex.slice(1), 16);
+  const luminance = 0.2126 * (n >> 16) + 0.7152 * ((n >> 8) & 255) + 0.0722 * (n & 255);
+  const v = Math.round(luminance * GREY_SLOPE + 255 * (1 - GREY_SLOPE));
+  return `rgb(${v} ${v} ${v})`;
+}
+
 export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; settings: ScenesSettings; speechLang: string }) {
   const [plays, setPlays] = useState<Plays>({});
-  const [target, setTarget] = useState<SceneItem | null>(null);
+  const [quest, setQuest] = useState<Quest | null>(null);
+  /** Answers already found for the current question. */
+  const [answered, setAnswered] = useState<ReadonlySet<string>>(new Set());
   const [hint, setHint] = useState(false);
   const [found, setFound] = useState(0);
   const [touched, setTouched] = useState(false);
+  /** Explore and colour mode: items tapped at least once (in colour mode: the coloured ones). */
+  const [discovered, setDiscovered] = useState<ReadonlySet<string>>(new Set());
+  const [partying, setPartying] = useState(false);
+  /** Keys mode: the item in the glowing frame, moved with the arrow keys. */
+  const [focus, setFocus] = useState<SceneItem | null>(null);
   const { bursts, spawn } = useBursts();
 
-  const targetRef = useRef<SceneItem | null>(null);
+  const questRef = useRef<Quest | null>(null);
+  const answeredRef = useRef<ReadonlySet<string>>(answered);
+  const discoveredRef = useRef<ReadonlySet<string>>(discovered);
+  const focusRef = useRef<SceneItem | null>(null);
   const busyUntil = useRef(new Map<string, number>());
   const celebrating = useRef(false);
   const misses = useRef(0);
+  const riddleRepeat = useRef(false);
   const lastKey = useRef(0);
   const lastQuestion = useRef(0);
   const lastKeyItem = useRef<SceneItem | null>(null);
@@ -122,6 +161,16 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const sentenceIndex = useRef(new Map<string, number>());
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const svgRef = useRef<SVGSVGElement>(null);
+  // An SVG id without the colons React puts in, so it can go into url(#…).
+  const greyId = `scene-grey-${useId().replace(/[^\w-]/g, "")}`;
+
+  const questMode = isQuestMode(settings.mode);
+  const colouring = settings.mode === "colour";
+  /** In the sound riddle the sounds are the game, so they always play. */
+  const soundsOn = settings.sounds || settings.mode === "sounds";
+  const quests = useMemo(() => questsFor(settings.mode, scene), [settings.mode, scene]);
+  const itemsById = useMemo(() => new Map(scene.items.map((item) => [item.id, item])), [scene]);
+  const allDiscovered = discovered.size === scene.items.length;
 
   const later = useCallback((fn: () => void, ms: number) => {
     const timer = setTimeout(() => {
@@ -161,9 +210,9 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const funBurst = useCallback(
     (x?: number, y?: number) => {
       spawn(x, y);
-      if (settings.sounds) playRandomNote();
+      if (soundsOn) playRandomNote();
     },
-    [spawn, settings.sounds],
+    [spawn, soundsOn],
   );
 
   /** Start the item's animation and (unless quiet) its sound. Returns false while it is still running. */
@@ -174,53 +223,63 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       busyUntil.current.set(item.id, now + item.durationMs);
       setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (settings.sounds && !quiet) SOUNDS[item.sound]();
+      if (soundsOn && !quiet) SOUNDS[item.sound]();
       return true;
     },
-    [later, settings.sounds],
+    [later, soundsOn],
   );
 
+  /** Asks the question; a sound riddle plays its sound first and then asks "Wer macht das?". */
   const ask = useCallback(
-    (item: SceneItem, queue = false) => {
+    (quest: Quest, queue = false) => {
       lastQuestion.current = performance.now();
-      say(`Wo ist ${item.name}?`, queue);
+      if (!quest.sound) {
+        say(quest.question, queue);
+        return;
+      }
+      SOUNDS[quest.sound]();
+      later(() => say(quest.question, true), RIDDLE_QUESTION_MS);
     },
-    [say],
+    [say, later],
   );
 
   const newQuestion = useCallback(
     (queue: boolean) => {
-      const next = pick(scene.items.filter((item) => item !== targetRef.current));
-      targetRef.current = next;
+      const next = nextQuest(quests, questRef.current);
+      questRef.current = next;
+      answeredRef.current = new Set();
       celebrating.current = false;
       misses.current = 0;
-      setTarget(next);
+      setQuest(next);
+      setAnswered(answeredRef.current);
       setHint(false);
-      ask(next, queue);
+      if (next) ask(next, queue);
     },
-    [scene, ask],
+    [quests, ask],
   );
 
   // Settings can't change while playing, so this only runs once.
   useEffect(() => {
-    if (settings.mode === "find") newQuestion(false);
+    if (questMode) newQuestion(false);
   }, []);
 
+  // The hint ring marks an answer that hasn't been found yet; after each found one the wait starts again.
+  const hintItem = quest?.answers.find((item) => !answered.has(item.id));
   useEffect(() => {
-    if (!target || !settings.hints) return;
+    if (!quest || !settings.hints) return;
     const timer = setTimeout(() => setHint(true), HINT_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [target, settings.hints]);
+  }, [quest, answered, settings.hints]);
 
   // Ambient life (only if switched on): when nobody taps for a while, items move by themselves, silently.
-  // In find mode the item being looked for stays still, so it isn't given away.
+  // While something is looked for, the answers stay still, so they aren't given away.
   useEffect(() => {
     if (!settings.ambient || settings.calm) return;
     let timer: ReturnType<typeof setTimeout>;
     const schedule = () => {
       timer = setTimeout(() => {
         if (performance.now() - lastInteraction.current > AMBIENT_IDLE_MS) {
-          animate(pick(scene.items.filter((item) => item !== targetRef.current)), true);
+          animate(pick(scene.items.filter((item) => !questRef.current?.answers.includes(item))), true);
         }
         schedule();
       }, AMBIENT_MIN_MS + Math.random() * (AMBIENT_MAX_MS - AMBIENT_MIN_MS));
@@ -234,34 +293,90 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     setTouched(true);
   };
 
+  const moveFocus = useCallback((item: SceneItem) => {
+    focusRef.current = item;
+    setFocus(item);
+  }, []);
+
+  /** Everything was discovered: all items dance at once, with shapes all over the screen. */
+  const party = () => {
+    setPartying(true);
+    if (soundsOn) playMelody();
+    say(colouring ? "Hurra! Das ganze Bild ist bunt!" : "Hurra! Du hast alles entdeckt!");
+    scene.items.forEach((item, i) => later(() => animate(item, true), i * 40));
+    for (let i = 0; i < 14; i++) later(() => spawn(), i * 140);
+    later(() => setPartying(false), PARTY_MS);
+  };
+
+  const startOver = () => {
+    discoveredRef.current = new Set();
+    setDiscovered(discoveredRef.current);
+  };
+
+  /** Explore and colour mode: count the item (and colour it in), and celebrate when it was the last one. */
+  const discover = (item: SceneItem, x: number, y: number) => {
+    if (!colouring && !settings.goal) return;
+    if (discoveredRef.current.has(item.id)) return;
+    discoveredRef.current = new Set(discoveredRef.current).add(item.id);
+    setDiscovered(discoveredRef.current);
+    // A splash of paint where the colour comes back.
+    if (colouring) for (let i = 0; i < 3; i++) spawn(x + (Math.random() - 0.5) * 120, y + (Math.random() - 0.5) * 120);
+    if (settings.goal && discoveredRef.current.size === scene.items.length) later(party, PARTY_AFTER_MS);
+  };
+
+  /** Chain reaction: the items after this one react one by one, each telling its part of the story. */
+  const runChain = (item: SceneItem) => {
+    const chain = scene.chains?.find((c) => c.start === item.id);
+    chain?.steps.forEach((step, i) => {
+      later(() => {
+        const next = itemsById.get(step.item);
+        if (next && animate(next)) say(settings.announce === "name" ? describe(next) : step.sentence, true);
+      }, (i + 1) * CHAIN_STEP_MS);
+    });
+  };
+
   /**
    * An item was tapped, pointed at for a moment (hover mode) or its key was
-   * pressed (keys mode). Hovering is quieter in find mode: wrong items only
+   * pressed (keys mode). Hovering is quieter in the find modes: wrong items only
    * move, so sweeping the mouse or a finger across the picture doesn't start a
    * stream of talk.
    */
   const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover" | "key") => {
     interacted();
-    const wanted = targetRef.current;
+    if (settings.trigger === "keys") moveFocus(item);
+    const quest = questRef.current;
 
-    if (settings.mode === "explore" || !wanted) {
-      if (animate(item)) say(describe(item));
+    if (!quest) {
+      const started = animate(item);
+      if (started) say(describe(item));
       else if (how !== "hover") funBurst(x, y);
+      discover(item, x, y);
+      if (started) runChain(item);
       return;
     }
-    if (celebrating.current) {
+    const isAnswer = quest.answers.includes(item);
+    if (celebrating.current || (isAnswer && answeredRef.current.has(item.id))) {
       if (!animate(item) && how !== "hover") funBurst(x, y);
       return;
     }
-    if (item === wanted) {
-      celebrating.current = true;
+    if (isAnswer) {
+      answeredRef.current = new Set(answeredRef.current).add(item.id);
+      setAnswered(answeredRef.current);
       animate(item);
       for (let i = 0; i < 5; i++) spawn(x + (Math.random() - 0.5) * 200, y + (Math.random() - 0.5) * 200);
-      if (settings.sounds) playChime();
+      if (soundsOn) playChime();
       setHint(false);
       setFound((n) => n + 1);
-      say(`${pick(PRAISE)} Das ist ${item.name}!`);
-      later(() => newQuestion(true), NEXT_QUESTION_MS);
+      misses.current = 0;
+      say(`${pick(PRAISE)} ${quest.praise(item)}`);
+      if (answeredRef.current.size >= quest.needed) {
+        celebrating.current = true;
+        later(() => newQuestion(true), NEXT_QUESTION_MS);
+      } else {
+        // More answers to find: ask again.
+        lastQuestion.current = performance.now();
+        say(quest.question, true);
+      }
       return;
     }
     animate(item);
@@ -270,7 +385,17 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     misses.current++;
     if (settings.hints && misses.current >= HINT_AFTER_MISSES) setHint(true);
     lastQuestion.current = performance.now();
-    say(`Das ist ${item.name}. Wo ist ${wanted.name}?`);
+    if (!quest.sound) {
+      say(`Das ist ${item.name}. ${quest.question}`);
+      return;
+    }
+    say(`Das ist ${item.name}. Hör noch mal!`);
+    if (riddleRepeat.current) return;
+    riddleRepeat.current = true;
+    later(() => {
+      riddleRepeat.current = false;
+      if (questRef.current === quest && !celebrating.current) SOUNDS[quest.sound!]();
+    }, RIDDLE_REPEAT_MS);
   };
 
   // The key handler is set up once; this way it always calls the current activate.
@@ -302,7 +427,6 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   // Hover mode: whatever is under the mouse, or under a finger sliding over the
   // picture, comes alive after a short pause. Looking the item up by position
   // works for touch too, where the finger's events all go to where it started.
-  const itemsById = useMemo(() => new Map(scene.items.map((item) => [item.id, item])), [scene]);
   const hovered = useRef<string | null>(null);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -333,12 +457,22 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       // Keys mode: the key's own item; items sharing a key take turns.
       // Only the item's own animation limits how fast keys can be pressed.
       if (settings.trigger === "keys") {
+        // Arrow keys move the glowing frame, Space and Enter start the item in it.
+        const arrow = ARROWS[e.key];
+        if (arrow) {
+          interacted();
+          const from = focusRef.current;
+          moveFocus(from ? nextInDirection(scene.items, from, arrow) : middleItem(scene.items, scene.width, scene.height));
+          if (settings.sounds) playRandomNote();
+          return;
+        }
         const key = e.key.toLocaleUpperCase("de-DE");
         const list = keys.byKey.get(key);
-        const wanted = targetRef.current;
+        const open = (i: SceneItem) => questRef.current?.answers.includes(i) && !answeredRef.current.has(i.id);
         let item: SceneItem;
-        if (!list) item = pick(scene.items);
-        else if (wanted && list.includes(wanted)) item = wanted;
+        if (e.key === " " || e.key === "Enter") item = focusRef.current ?? pick(scene.items);
+        else if (!list) item = pick(scene.items);
+        else if (list.some(open)) item = list.find(open)!;
         else {
           const turn = keyTurns.current.get(key) ?? 0;
           keyTurns.current.set(key, turn + 1);
@@ -357,26 +491,39 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       lastKey.current = now;
       interacted();
 
-      const wanted = targetRef.current;
-      if (wanted) {
-        if (!celebrating.current && now - lastQuestion.current > REPEAT_QUESTION_MS) ask(wanted);
+      const quest = questRef.current;
+      if (quest) {
+        if (!celebrating.current && now - lastQuestion.current > REPEAT_QUESTION_MS) ask(quest);
         else funBurst();
         return;
       }
       // Exploring: every key brings another item to life.
       const item = pick(scene.items.filter((i) => i !== lastKeyItem.current));
       lastKeyItem.current = item;
-      if (animate(item)) say(describe(item));
-      else funBurst();
+      const [x, y] = screenPoint(item);
+      activateRef.current(item, x, y, "key");
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [scene, keys, screenPoint, settings.trigger, animate, ask, describe, funBurst, say]);
+  }, [scene, keys, screenPoint, settings.trigger, settings.sounds, ask, funBurst, moveFocus]);
+
+  // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
+  const grey = colouring && !allDiscovered;
+  const greyFilter = `url(#${greyId})`;
+  const sceneClass = [
+    "scene",
+    settings.calm && "calm",
+    settings.ambient && !settings.calm && "lively",
+    colouring && "colouring",
+    partying && "party",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <div
-      className={`scene${settings.calm ? " calm" : ""}${settings.ambient && !settings.calm ? " lively" : ""}`}
-      style={{ "--sky": scene.sky, "--ground": scene.ground } as CSSProperties}
+      className={sceneClass}
+      style={{ "--sky": grey ? paleGrey(scene.sky) : scene.sky, "--ground": grey ? paleGrey(scene.ground) : scene.ground } as CSSProperties}
       onPointerDown={onBackgroundPointer}
       onPointerMove={onPointerMove}
       onPointerLeave={endHover}
@@ -384,14 +531,30 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       onPointerCancel={endHover}
     >
       <svg ref={svgRef} className="scene-svg" viewBox={`0 0 ${scene.width} ${scene.height}`} preserveAspectRatio="xMidYMid meet">
-        <scene.Background />
-        {scene.items.map((item) => {
+        {colouring && (
+          <defs>
+            <filter id={greyId} x="-50%" y="-50%" width="200%" height="200%" colorInterpolationFilters="sRGB">
+              <feColorMatrix type="saturate" values="0" />
+              <feComponentTransfer>
+                <feFuncR type="linear" slope={GREY_SLOPE} intercept={1 - GREY_SLOPE} />
+                <feFuncG type="linear" slope={GREY_SLOPE} intercept={1 - GREY_SLOPE} />
+                <feFuncB type="linear" slope={GREY_SLOPE} intercept={1 - GREY_SLOPE} />
+              </feComponentTransfer>
+            </filter>
+          </defs>
+        )}
+        <g filter={grey ? greyFilter : undefined}>
+          <scene.Background />
+        </g>
+        {scene.items.map((item, i) => {
           const play = plays[item.id];
           const place = item.place;
           return (
             <g
               key={`${item.id}-${play?.count ?? 0}`}
               className={`scene-item item-${item.id}${play?.playing ? " playing" : ""}`}
+              style={{ "--party-i": i } as CSSProperties}
+              filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
               data-item={item.id}
               role="button"
               aria-label={capitalize(item.name)}
@@ -416,20 +579,30 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           );
         })}
         {settings.trigger === "keys" && settings.showKeys && <KeyBadges scene={scene} keyOf={keys.keyOf} />}
-        {hint && target && <HintRing box={placeBox(target.box, target.place)} />}
+        {settings.trigger === "keys" && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
+        {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
       </svg>
 
-      {target && (
+      {quest && (
         <button
-          key={target.id}
+          key={quest.id}
           className="find-question"
           onPointerDown={(e) => {
             e.stopPropagation();
-            ask(target);
+            ask(quest);
           }}
         >
-          <Thumbnail item={target} />
-          <span>Wo ist {target.name}?</span>
+          {quest.item && <Thumbnail item={quest.item} />}
+          {quest.sound && <span className="find-emoji">🔊</span>}
+          {quest.emoji && <span className="find-emoji">{quest.emoji}</span>}
+          <span>{quest.question}</span>
+          {quest.needed > 1 && (
+            <span className="find-progress" aria-label={`${answered.size} von ${quest.needed}`}>
+              {Array.from({ length: quest.needed }, (_, i) => (
+                <span key={i} className={i < answered.size ? "done" : undefined} />
+              ))}
+            </span>
+          )}
         </button>
       )}
       {found > 0 && (
@@ -438,9 +611,24 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           {found > 10 && <span className="find-count">{found}</span>}
         </div>
       )}
-      {settings.mode === "explore" && !touched && (
-        <p className="scene-prompt">{PROMPTS[settings.trigger]}</p>
+      {!questMode && settings.goal && (
+        <div className={`scene-goal${allDiscovered ? " done" : ""}`} aria-label={`${discovered.size} von ${scene.items.length} entdeckt`}>
+          <span className="scene-goal-star">{allDiscovered ? "🎉" : "⭐"}</span>
+          {discovered.size}/{scene.items.length}
+          {allDiscovered && (
+            <button
+              type="button"
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                startOver();
+              }}
+            >
+              {colouring ? "🖍️ Nochmal" : "🔄 Nochmal"}
+            </button>
+          )}
+        </div>
       )}
+      {!questMode && !touched && <p className="scene-prompt">{(colouring ? COLOUR_PROMPTS : PROMPTS)[settings.trigger]}</p>}
       <BurstLayer bursts={bursts} />
     </div>
   );
@@ -449,6 +637,18 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
 function HintRing({ box: [x, y, w, h] }: { box: Box }) {
   const pad = 14;
   return <rect className="scene-hint" x={x - pad} y={y - pad} width={w + 2 * pad} height={h + 2 * pad} rx={28} />;
+}
+
+/** Keys mode: the glowing frame the arrow keys move around. */
+function FocusRing({ box: [x, y, w, h] }: { box: Box }) {
+  const pad = 10;
+  const rect = { x: x - pad, y: y - pad, width: w + 2 * pad, height: h + 2 * pad, rx: 24 };
+  return (
+    <g className="scene-focus" aria-hidden>
+      <rect className="scene-focus-glow" {...rect} />
+      <rect className="scene-focus-line" {...rect} />
+    </g>
+  );
 }
 
 /** Keys mode: each item's key in a little bubble at its top left corner. */

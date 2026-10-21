@@ -20,7 +20,13 @@ export interface Idea {
   planned?: boolean;
   /** Already in the app. */
   done?: boolean;
+  /** Partly in the app: what is there already, so the rest is clear. */
+  partial?: string;
 }
+
+export type IdeaStatus = "done" | "partial" | "open";
+
+export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.partial ? "partial" : "open");
 
 export interface IdeaArea {
   prefix: string;
@@ -57,6 +63,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Umgekehrter Modus: Ein Bild erscheint (🐻), das Kind sucht die passende Taste. Nach ein paar Fehlversuchen leuchtet die Taste auf einer kleinen Tastatur-Abbildung auf.",
         why: "Erster Schritt vom zufälligen Drücken zum gezielten Suchen; Brücke zu „Wörter tippen“.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-03",
@@ -73,6 +80,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Statt automatisch zu zählen, tippt das Kind jedes Ding einzeln an; es hüpft und die Zahl wird gesagt. Erst wenn alle angetippt sind, erscheint die Ziffer.",
         why: "Übt die Eins-zu-eins-Zuordnung, die Grundlage des Zählens.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-05",
@@ -89,6 +97,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Jeder gedrückte Buchstabe wird ein Waggon an einer Lok. Bei 5 Waggons (oder Leertaste) pfeift der Zug und fährt mit allen Buchstaben davon, die Lok liest sie „vor“.",
         why: "Das Kind „schreibt“ eine Reihe, ohne es zu merken; sichtbares Ergebnis vieler Tastendrücke.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-07",
@@ -97,6 +106,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Leertaste = Konfetti-Sprung, Enter = Hupe/Pfiff, Pfeiltasten schieben das Bild, Rückschritt holt das letzte Bild zurück. Bisher machen sie nur Formen.",
         why: "Jede Taste tut etwas Eigenes – Kinder entdecken die ganze Tastatur.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-08",
@@ -105,6 +115,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Tippt man auf das Bild, kommt das nächste Wort zum selben Buchstaben: B – Bär → Ball → Bus.",
         why: "Zeigt, dass ein Buchstabe zu vielen Wörtern gehört.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-09",
@@ -113,6 +124,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Bei „A a“ hält der große Buchstabe den kleinen an der Hand, beide haben Augen und wackeln. Optional: Kleinbuchstabe „wächst“ zum Großbuchstaben.",
         why: "Macht den Zusammenhang Groß/Klein greifbar.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-10",
@@ -129,6 +141,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Großer Buchstabe aus Punkten; mit dem Finger oder der Maus darüberfahren lässt Sterne entlang der Linie erscheinen. Keine Bewertung, nur Spaß.",
         why: "Vorbereitung aufs Schreiben, Feinmotorik.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-12",
@@ -137,6 +150,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Weitere Bildthemen neben Tiere/Fahrzeuge/Essen: Körper, Kleidung, Familie, Musik, Natur, Weihnachten/Ostern.",
         why: "Wenig Aufwand (nur Inhalte in de.ts), viel Abwechslung.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-13",
@@ -168,6 +182,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Jeder richtige Buchstabe deckt ein Puzzleteil des Bildes auf. Beim letzten Buchstaben ist das Bild komplett und bewegt sich.",
         why: "Belohnung nach jedem Buchstaben statt erst am Ende – hält bei längeren Wörtern durch.",
         effort: "S",
+        done: true,
       },
       {
         id: "W-02",
@@ -176,6 +191,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Auf dem Tablet statt Tastatur 3–6 riesige Buchstabenknöpfe: der richtige plus ein paar andere. Anzahl einstellbar.",
         why: "Tablet-tauglich und für Anfänger viel leichter als 26 Tasten.",
         effort: "M",
+        partial: "Auf dem Tablet gibt es Bildschirmtasten mit hervorgehobenem Buchstaben, aber noch das ganze ABC statt weniger großer Knöpfe.",
       },
       {
         id: "W-03",
@@ -184,6 +200,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Nur das Bild wird gezeigt (🐻), gesucht ist der erste Buchstabe. Danach fliegt der Rest des Wortes von allein dazu.",
         why: "Kürzeste Form von „Wörter tippen“, ideal als Zwischenstufe.",
         effort: "S",
+        done: true,
       },
       {
         id: "W-04",
@@ -192,6 +209,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "ROT tippen → der ganze Bildschirm wird rot, rote Dinge hüpfen herein. Genauso BLAU, GELB, GRÜN.",
         why: "Wort und Bedeutung werden sofort sichtbar; Farben lernen nebenbei.",
         effort: "S",
+        done: true,
       },
       {
         id: "W-05",
@@ -200,6 +218,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "HÜPF, LAUF, SCHLAF, TANZ: Ist das Wort fertig, macht eine Figur genau das. Gerne als Einladung zum Mitmachen.",
         why: "Kinder bewegen sich mit – Wörter werden körperlich erlebt.",
         effort: "M",
+        done: true,
       },
       {
         id: "W-06",
@@ -247,6 +266,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Türen, Fenster, Sandhaufen, Container lassen sich öffnen: Dahinter sitzt jedes Mal etwas anderes (Katze, Maus, Geschenk). Guck-guck!",
         why: "Objektpermanenz und Neugier – genau das Alter, in dem „Wo ist es hin?“ fasziniert.",
         effort: "M",
+        partial: "Feste Gucker gibt es schon (Maus im Rohr und im Gully, Hase im Busch, Tor der Feuerwache); wechselnde Überraschungen fehlen.",
       },
       {
         id: "B-02",
@@ -255,6 +275,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Neuer Such-Modus: Nur das Geräusch wird gespielt (Hund bellt, Bagger brummt) – wer war das? Nutzt die vorhandenen sfx-Klänge.",
         why: "Genaues Hinhören; funktioniert auch ohne Sprachausgabe.",
         effort: "S",
+        done: true,
       },
       {
         id: "B-03",
@@ -271,6 +292,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "„Was ist rot?“, „Wer kann fliegen?“, „Was ist ganz groß?“ – mehrere richtige Antworten pro Frage, jede wird gefeiert.",
         why: "Kategorien bilden, Begriffe wie groß/klein, Farben.",
         effort: "M",
+        done: true,
       },
       {
         id: "B-05",
@@ -287,6 +309,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Wolke antippen löst Regen (Pfützen, Regenschirme), Schnee (alles wird weiß) oder Wind (Blätter fliegen) aus – die ganze Szene reagiert.",
         why: "Ursache und Wirkung im großen Maßstab.",
         effort: "L",
+        partial: "Die Wolke regnet schon („Plitsch, platsch“); Schnee, Wind und eine reagierende Szene fehlen.",
       },
       {
         id: "B-07",
@@ -295,6 +318,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Ding stößt ein anderes an: Hund bellt → Katze flitzt auf den Baum → Vogel fliegt weg. Pro Szene 2–3 solcher kleinen Geschichten.",
         why: "Erste Geschichten „wenn – dann“; Kinder wiederholen das endlos.",
         effort: "M",
+        done: true,
       },
       {
         id: "B-08",
@@ -311,6 +335,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Unauffälliger Zähler (z. B. Sterne am Rand). Wurde jedes Ding einmal angetippt, gibt es eine kleine Party, bei der alle Dinge gleichzeitig tanzen.",
         why: "Ein erreichbares Ziel ohne Druck.",
         effort: "S",
+        done: true,
       },
       {
         id: "B-10",
@@ -319,6 +344,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Im Tasten-Modus wandert ein Leuchtrahmen mit den Pfeiltasten von Ding zu Ding; Leertaste oder Enter löst es aus.",
         why: "Für Kinder, die Buchstaben noch nicht finden, aber Pfeile drücken können.",
         effort: "S",
+        done: true,
       },
       {
         id: "B-11",
@@ -335,6 +361,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Szene erst in Schwarz-Weiß; jedes angetippte Ding bekommt seine Farbe (oder eine Farbe aus einer Palette).",
         why: "Ruhige Variante; am Ende ist das ganze Bild bunt.",
         effort: "M",
+        done: true,
       },
       {
         id: "B-13",
@@ -366,7 +393,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Kuh, Schwein, Schaf, Hühner (Ei legen), Hahn weckt alle, Traktor, Scheune mit Katze, Misthaufen mit Fliegen, Pferd, Hofhund.",
         why: "Tierlaute sind das Lieblingsthema der Altersgruppe.",
         effort: "L",
-        planned: true,
+        done: true,
       },
       {
         id: "S-02",
@@ -513,6 +540,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "2-Minuten-Timer: Ein Gebiss mit kleinen Zuckermonstern, die nach und nach verschwinden. Musik und Hinweise „Jetzt oben!“. Kein Tippen nötig.",
         why: "Echter Alltagsnutzen für Eltern.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-06",
@@ -537,6 +565,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "„Der Hase hat Hunger!“ – Futter (Möhre, Knochen, Banane) zum richtigen Tier ziehen. Das Tier mampft und bedankt sich.",
         why: "Zuordnen und Wissen über Tiere; witzige Reaktionen.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-09",
@@ -544,6 +573,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Wer wohnt wo?",
         text: "Tiere ihren Häusern zuordnen: Hund → Hütte, Vogel → Nest, Fisch → Aquarium, Biene → Bienenstock.",
         effort: "M",
+        done: true,
       },
       {
         id: "N-10",
@@ -713,6 +743,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Englisch, Türkisch, Polnisch, … als weiteres LanguagePack. Optional zweisprachig: „Bär – bear“.",
         why: "Für mehrsprachige Familien; die Struktur dafür gibt es schon.",
         effort: "M",
+        partial: "Die Sprachpakete sind vorbereitet, es gibt aber nur Deutsch.",
       },
       {
         id: "A-06",

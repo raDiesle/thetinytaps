@@ -1,0 +1,390 @@
+/* ---------- Was gehört zum Tier? ---------- */
+
+.animals-play {
+  --gap: min(4vw, 32px);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff4d6;
+}
+
+.animals-play.kind-home {
+  background: #c4f1ff;
+}
+
+.ap-top,
+.ap-ground {
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+
+.ap-top {
+  flex: 1.1;
+  align-items: flex-end;
+  padding-top: max(64px, env(safe-area-inset-top));
+}
+
+.ap-ground {
+  flex: 1;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: #b5e48c;
+}
+
+.kind-home .ap-top {
+  flex: 1.3;
+}
+
+.ap-prompt {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: 50%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: calc(100vw - 130px);
+  margin: 0;
+  padding: 0.25em 0.9em;
+  border-radius: 999px;
+  background: #ffffffe0;
+  font-size: clamp(1.1rem, 3.4vh, 1.9rem);
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ap-emoji {
+  display: block;
+  font-family: var(--font-emoji);
+  line-height: 1;
+}
+
+.ap-name {
+  font-size: clamp(1.1rem, 3.4vh, 2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  pointer-events: none;
+}
+
+/* The animal: big in the middle when hungry, smaller and draggable when looking for its home. */
+.ap-animal {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition:
+    translate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    scale 0.3s;
+}
+
+.kind-feed .ap-animal .ap-emoji {
+  font-size: min(34vh, 44vw);
+  transition: scale 0.25s;
+}
+
+.kind-home .ap-animal {
+  cursor: grab;
+}
+
+.kind-home .ap-animal .ap-emoji {
+  font-size: min(22vh, 30vw);
+}
+
+.ap-animal:not(.dragging, .landed, .munch, .yuck) .ap-emoji {
+  animation: ap-breathe 2.6s ease-in-out infinite;
+}
+
+/* Food right in front of the mouth: the animal leans towards it. */
+.ap-animal.near .ap-emoji {
+  scale: 1.1;
+}
+
+.ap-animal.munch .ap-emoji {
+  animation: ap-munch 0.28s ease-in-out 0.45s 4;
+}
+
+.ap-animal.yuck .ap-emoji {
+  animation: shake 0.3s ease-in-out 3;
+}
+
+.ap-bubble {
+  position: absolute;
+  top: 0;
+  right: -0.4em;
+  padding: 0.15em 0.6em;
+  border: var(--outline);
+  border-radius: 1em;
+  background: #fff;
+  font-size: clamp(1.3rem, 4.5vh, 2.4rem);
+  font-weight: 800;
+  pointer-events: none;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ap-bubble.thanks {
+  animation-delay: 0.5s;
+  animation-fill-mode: backwards;
+}
+
+.ap-hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.ap-hearts span {
+  position: absolute;
+  bottom: 50%;
+  left: calc(25% + var(--i, 0) * 25%);
+  font-family: var(--font-emoji);
+  font-size: clamp(1.6rem, 6vh, 3rem);
+  opacity: 0;
+  animation: ap-float 1.6s ease-out 0.8s forwards;
+}
+
+.ap-hearts span:nth-child(2) {
+  --i: 1;
+  animation-delay: 1s;
+}
+
+.ap-hearts span:nth-child(3) {
+  --i: 2;
+  animation-delay: 1.2s;
+}
+
+/* The things to choose from, in one row; they shrink to fit 2, 3 or 4 side by side. */
+.ap-options {
+  --cols: var(--n);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Phones upright: two per row, so they stay big enough for a finger. */
+@media (max-aspect-ratio: 4/5) {
+  .ap-options {
+    --cols: min(var(--n), 2);
+  }
+}
+
+.ap-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  touch-action: none;
+  border-radius: 28px;
+  transition: scale 0.25s;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.ap-option:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.ap-option:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.ap-option:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.ap-option.focused {
+  outline: 6px solid var(--sunshine);
+  outline-offset: 6px;
+}
+
+/* A food lies on a plate; only the food is dragged, the plate stays. */
+.ap-plate {
+  --size: min(20vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 190px);
+  justify-content: center;
+  width: var(--size);
+  min-height: var(--size);
+  border: var(--outline);
+  background: #fff;
+  box-shadow: var(--lift);
+}
+
+.ap-food {
+  position: relative;
+  z-index: 4;
+  font-size: calc(var(--size) * 0.62);
+  cursor: grab;
+  transition:
+    translate 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    scale 0.25s;
+}
+
+.ap-food.dragging,
+.kind-home .ap-animal.dragging {
+  z-index: 6;
+  scale: 1.15;
+  cursor: grabbing;
+  transition: scale 0.2s;
+}
+
+/* The right food flies into the mouth and is gone. */
+.ap-food.landed {
+  transition:
+    translate 0.45s ease-in,
+    scale 0.45s ease-in;
+  animation: ap-gone 0.2s linear 0.45s forwards;
+}
+
+.ap-food.refused {
+  animation: ap-hop 0.4s ease-in-out;
+}
+
+.nudge-0 {
+  animation: ap-hop 0.45s ease-in-out;
+}
+
+.nudge-1 {
+  animation: ap-hop-again 0.45s ease-in-out;
+}
+
+/* A home; the drawing is a square, so the animal's spot can be given in per cent. */
+.ap-home {
+  --size: min(30vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 300px);
+  width: var(--size);
+}
+
+.ap-home-box {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  container-type: inline-size;
+}
+
+.home-drawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ap-home.near {
+  scale: 1.08;
+}
+
+.ap-home.happy .ap-home-box {
+  animation: wiggle 0.5s ease-in-out 0.7s 2;
+}
+
+.ap-home.peek .ap-home-box {
+  animation: wiggle 0.4s ease-in-out;
+}
+
+/* The animal goes into its home and stays in the doorway. */
+.kind-home .ap-animal.landed {
+  transition:
+    translate 0.7s cubic-bezier(0.45, 0, 0.3, 1.2),
+    scale 0.7s ease-in-out;
+}
+
+.kind-home .ap-animal.landed .ap-name {
+  opacity: 0;
+}
+
+/* The one who really lives there pops out for a moment. */
+.ap-resident {
+  position: absolute;
+  translate: -50% -50%;
+  font-size: calc(var(--fit) * 100cqw);
+  pointer-events: none;
+  animation: ap-peek 1.3s ease-in-out forwards;
+}
+
+@keyframes ap-breathe {
+  50% {
+    transform: scale(1.03, 0.98);
+  }
+}
+
+@keyframes ap-munch {
+  50% {
+    transform: scale(1.08, 0.88);
+  }
+}
+
+@keyframes ap-hop {
+  40% {
+    transform: translateY(-18%);
+  }
+}
+
+@keyframes ap-hop-again {
+  40% {
+    transform: translateY(-18%);
+  }
+}
+
+@keyframes ap-gone {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ap-float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-160%) scale(1.1);
+  }
+}
+
+@keyframes ap-peek {
+  0% {
+    opacity: 0;
+    transform: translateY(30%) scale(0.4);
+  }
+  25%,
+  80% {
+    opacity: 1;
+    transform: translateY(-15%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30%) scale(0.4);
+  }
+}
+
+/* Calm mode: no breathing or bouncing, slower moves. */
+.animals-play.calm .ap-animal:not(.munch, .yuck) .ap-emoji,
+.animals-play.calm .ap-option,
+.animals-play.calm .nudge-0,
+.animals-play.calm .nudge-1 {
+  animation: none;
+}
+
+.animals-play.calm .ap-animal,
+.animals-play.calm .ap-prompt {
+  animation: fade-in 0.7s ease-out;
+}
+
+.animals-play.calm .ap-home.happy .ap-home-box {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-animal:not(.dragging, .landed, .munch, .yuck) .ap-emoji {
+    animation: none;
+  }
+}

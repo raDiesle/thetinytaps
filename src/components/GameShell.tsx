@@ -98,14 +98,15 @@ export function GameShell({
       <h1 className="menu-title">
         <span aria-hidden>{emoji}</span> {title}
       </h1>
-      {settings && <section className="settings">{settings}</section>}
-      <ExitHelp />
+      {/* Right under the title, so it stays in sight however long the options get. */}
       <button className="start-button" onClick={start}>
         <span className="start-icon" aria-hidden>
           ▶
         </span>
         Los geht&apos;s!
       </button>
+      {settings && <section className="settings">{settings}</section>}
+      <ExitHelp />
     </main>
   );
 }

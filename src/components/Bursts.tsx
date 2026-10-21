@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 
+export const STAR_PATH = "M50 5 L61 38 L96 38 L68 59 L79 93 L50 72 L21 93 L32 59 L4 38 L39 38 Z";
+
 const SHAPES = {
-  star: "M50 5 L61 38 L96 38 L68 59 L79 93 L50 72 L21 93 L32 59 L4 38 L39 38 Z",
+  star: STAR_PATH,
   heart: "M50 88 C20 65 5 48 5 30 C5 15 17 5 30 5 C40 5 47 11 50 18 C53 11 60 5 70 5 C83 5 95 15 95 30 C95 48 80 65 50 88 Z",
   circle: "M50 5 A45 45 0 1 1 49.9 5 Z",
   triangle: "M50 8 L94 90 L6 90 Z",

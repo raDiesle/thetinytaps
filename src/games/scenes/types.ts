@@ -50,10 +50,14 @@ export type SceneSound =
   | "moo"
   | "oink"
   | "baa"
-  | "neigh"
   | "cluck"
   | "crow"
+  | "neigh"
+  | "hoot"
   | "croak";
+
+/** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */
+export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" | "small" | "animal" | "wheels";
 
 export interface SceneItem {
   id: string;
@@ -74,6 +78,8 @@ export interface SceneItem {
   key?: string;
   /** Keys mode: where the key badge sits, in the drawing's own coordinates; else the top of the first hit area. */
   badge?: [number, number];
+  /** Questions mode: what the item is like. Only clear cases, so every answer is obviously right. */
+  traits?: SceneTrait[];
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */
   durationMs: number;
   /**
@@ -81,6 +87,15 @@ export interface SceneItem {
    * group has the class `playing`; the scene's CSS animates the parts.
    */
   Art: ComponentType;
+}
+
+/**
+ * A little chain reaction: when `start` is tapped while exploring, the steps
+ * react one after another ("Der Hund bellt → die Katze erschrickt → der Vogel fliegt weg").
+ */
+export interface SceneChain {
+  start: string;
+  steps: { item: string; sentence: string }[];
 }
 
 /** A "living picture": a drawn scene whose items move and talk when tapped. */
@@ -99,4 +114,6 @@ export interface Scene {
   Background: ComponentType;
   /** Tappable items, in drawing order (later ones are on top). */
   items: SceneItem[];
+  /** Two or three chain reactions between items. */
+  chains?: SceneChain[];
 }

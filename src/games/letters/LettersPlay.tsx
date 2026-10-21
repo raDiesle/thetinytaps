@@ -3,7 +3,7 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { inTheme } from "@/content/themes";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
-import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
+import { playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { LetterCard, NumberCard, letterParts } from "./Cards";
 import type { LettersSettings } from "./settings";
@@ -16,6 +16,19 @@ const MIN_ADVANCE_MS = 350;
 const COUNT_STEP_MS = 800;
 /** Extra time after the last counted item for the total to be spoken. */
 const COUNT_SUMMARY_MS = 1500;
+/** How far one arrow key pushes the card, and how far it may go, in % of the stage. */
+const PUSH_STEP = 8;
+const MAX_PUSH = 32;
+/** How many earlier letters and numbers Backspace can bring back. */
+const MAX_HISTORY = 20;
+const CONFETTI_PIECES = 10;
+
+const ARROWS: Record<string, [number, number]> = {
+  ArrowLeft: [-1, 0],
+  ArrowRight: [1, 0],
+  ArrowUp: [0, -1],
+  ArrowDown: [0, 1],
+};
 
 const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#fff0e0"];
 
@@ -49,7 +62,10 @@ const lastStage = (s: Shown, showWord: boolean) =>
 export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [shown, setShown] = useState<Shown | null>(null);
   const [stage, setStage] = useState(0);
+  /** Counting by tapping: indices of the tapped things, in order. */
+  const [tapped, setTapped] = useState<number[]>([]);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
+  const [push, setPush] = useState<[number, number]>([0, 0]);
   const { bursts, spawn } = useBursts();
 
   const lastChange = useRef(0);
@@ -58,12 +74,23 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const wordIndex = useRef(new Map<string, number>());
   const lastThing = useRef<Countable | null>(null);
   const countTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  /** What is on screen right now (for the history), and what was before it. */
+  const current = useRef<Shown | null>(null);
+  const history = useRef<Shown[]>([]);
+  const hornCount = useRef(0);
+  const cardBox = useRef<HTMLDivElement>(null);
 
   const say = useCallback(
     (text: string, queue = false) => {
       if (settings.speech) speak(text, pack.speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
     },
     [settings.speech, settings.calm, pack.speechLang],
+  );
+
+  /** Counting by tapping applies to numbers with things to tap, not to the empty nest. */
+  const byTap = useCallback(
+    (s: Shown | null) => settings.countByTap && s?.kind === "number" && s.n > 0,
+    [settings.countByTap],
   );
 
   /** The full sentence for a fully revealed letter or number. */
@@ -123,15 +150,29 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     return lastThing.current;
   }, [pack, settings.theme]);
 
+  /** Put `next` on screen; the one before goes on the history for Backspace. */
+  const replace = useCallback((next: Shown) => {
+    countTimers.current.forEach(clearTimeout);
+    countTimers.current = [];
+    countingUntil.current = 0;
+    if (current.current) history.current = [...history.current.slice(-(MAX_HISTORY - 1)), current.current];
+    current.current = next;
+    setBackground(BACKGROUNDS[next.id % BACKGROUNDS.length]);
+    setPush([0, 0]);
+    setShown(next);
+    setTapped([]);
+  }, []);
+
   /** Show `next` from stage `from`, either waiting for clicks or running through the stages on its own. */
   const present = useCallback(
     (next: Shown, from: number) => {
-      countTimers.current.forEach(clearTimeout);
-      countTimers.current = [];
-      countingUntil.current = 0;
-      setBackground(BACKGROUNDS[next.id % BACKGROUNDS.length]);
-      setShown(next);
+      replace(next);
 
+      if (byTap(next)) {
+        // All things are there, waiting to be tapped one by one.
+        setStage(0);
+        return;
+      }
       if (settings.stepByStep) {
         setStage(from);
         announce(next, from);
@@ -156,7 +197,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       }
       countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + COUNT_SUMMARY_MS;
     },
-    [announce, settings.stepByStep, settings.showWord],
+    [announce, replace, byTap, settings.stepByStep, settings.showWord],
   );
 
   const show = useCallback(
@@ -171,9 +212,31 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     [pickWord, pickThing, present],
   );
 
+  /** Counting by tapping: the thing hops and gets the next number; after the last one the digit appears. */
+  const countItem = useCallback(
+    (index: number) => {
+      if (shown?.kind !== "number" || !byTap(shown) || stage > shown.n || tapped.includes(index)) return false;
+      const next = [...tapped, index];
+      const k = next.length === shown.n ? shown.n + 1 : next.length;
+      lastChange.current = performance.now();
+      setTapped(next);
+      setStage(k);
+      announce(shown, k);
+      return true;
+    },
+    [shown, stage, tapped, byTap, announce],
+  );
+
   /** Step-by-step: reveal the next part; once everything is shown, start a new word / new things. */
   const advance = useCallback(() => {
     if (!shown) return;
+    if (shown.kind === "number" && byTap(shown) && stage <= shown.n) {
+      // Keyboard: Space, Enter or the same digit counts the next thing.
+      let index = 0;
+      while (tapped.includes(index)) index++;
+      countItem(index);
+      return;
+    }
     if (stage < lastStage(shown, settings.showWord)) {
       setStage(stage + 1);
       announce(shown, stage + 1);
@@ -186,7 +249,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       const next: Shown = { ...shown, id, thing: pickThing() };
       present(next, firstStage(next));
     }
-  }, [shown, stage, settings.showWord, announce, present, pickWord, pickThing]);
+  }, [shown, stage, tapped, settings.showWord, byTap, countItem, announce, present, pickWord, pickThing]);
 
   /** Advance unless the last advance was too recent. */
   const tryAdvance = useCallback(() => {
@@ -197,15 +260,81 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     return true;
   }, [advance]);
 
+  /** Tapping the picture: the next word with the same letter, B – Bär → Ball → Bus. */
+  const nextWord = useCallback(
+    (e: PointerEvent) => {
+      e.stopPropagation();
+      if (shown?.kind !== "letter") return;
+      const now = performance.now();
+      if (now - lastChange.current >= MIN_ADVANCE_MS) {
+        lastChange.current = now;
+        const next: Shown = { ...shown, id: nextId.current++, word: pickWord(shown.letter) };
+        present(next, lastStage(next, settings.showWord));
+      }
+      funBurst(e.clientX, e.clientY);
+    },
+    [shown, present, pickWord, funBurst, settings.showWord],
+  );
+
+  /** Make the card move once, unless calm mode is on. */
+  const animateCard = useCallback(
+    (keyframes: Keyframe[], duration: number) => {
+      if (!settings.calm) cardBox.current?.animate(keyframes, { duration, easing: "ease-out" });
+    },
+    [settings.calm],
+  );
+
+  /**
+   * Keys that are not letters or numbers each do their own thing: Space jumps with confetti,
+   * Enter honks or whistles, arrows push the card, Backspace brings back the one before.
+   * Returns false for keys without a meaning of their own.
+   */
+  const specialKey = useCallback(
+    (key: string) => {
+      const sound = (play: () => void) => settings.sounds && play();
+      if (key === " ") {
+        sound(playBoing);
+        animateCard([{ transform: "none" }, { transform: "translateY(-18%) scale(1.06)" }, { transform: "none" }], 600);
+        for (let i = 0; i < CONFETTI_PIECES; i++) spawn(undefined, Math.random() * window.innerHeight * 0.6);
+        return true;
+      }
+      if (key === "Enter") {
+        sound(hornCount.current++ % 2 ? playWhistle : playHonk);
+        animateCard([{ transform: "none" }, { transform: "scale(1.12, 0.9)" }, { transform: "scale(0.95, 1.08)" }, { transform: "none" }], 500);
+        return true;
+      }
+      if (key in ARROWS) {
+        const [dx, dy] = ARROWS[key];
+        const clamp = (v: number) => Math.max(-MAX_PUSH, Math.min(MAX_PUSH, v));
+        setPush(([x, y]) => [clamp(x + dx * PUSH_STEP), clamp(y + dy * PUSH_STEP)]);
+        sound(() => playCountNote(Math.floor(Math.random() * 8)));
+        return true;
+      }
+      if (key === "Backspace") {
+        const previous = history.current.pop();
+        if (!previous) return false;
+        // Shown again in full, without putting the current one on the history.
+        current.current = null;
+        present(previous, lastStage(previous, settings.showWord));
+        return true;
+      }
+      return false;
+    },
+    [present, spawn, animateCard, settings.sounds, settings.showWord],
+  );
+
   /** A key was pressed, on the keyboard or on the screen. */
   const pressKey = useCallback(
     (key: string) => {
       const target = resolveKey(key, pack);
-      const isNextKey = key === " " || key === "Enter" || (shown !== null && isSame(target, shown));
-      if (settings.stepByStep && shown && isNextKey) {
+      // Step by step, Space and Enter reveal the next part until everything is shown; then they are special keys again.
+      const revealing = shown !== null && stage < lastStage(shown, settings.showWord);
+      const isNextKey = ((key === " " || key === "Enter") && revealing) || (shown !== null && isSame(target, shown));
+      if ((settings.stepByStep || byTap(shown)) && shown && isNextKey) {
         if (!tryAdvance()) funBurst();
         return;
       }
+      if (!target && specialKey(key)) return;
       const now = performance.now();
       const counting = settings.finishCounting && now < countingUntil.current;
       if (!target || counting || now - lastChange.current < MIN_CHANGE_MS) {
@@ -215,7 +344,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       lastChange.current = now;
       show(target);
     },
-    [pack, shown, show, tryAdvance, funBurst, settings.stepByStep, settings.finishCounting],
+    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, settings.stepByStep, settings.showWord, settings.finishCounting],
   );
 
   useEffect(() => {
@@ -238,10 +367,15 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   }, [settings.calm]);
 
   // Step-by-step: any click reveals the next part. Otherwise tapping the card
-  // repeats what it says, and tapping elsewhere makes shapes.
+  // repeats what it says, and tapping elsewhere makes shapes. Counting by
+  // tapping: only the things count; once all are counted, any click brings new ones.
   const onPlayAreaPointer = (e: PointerEvent) => {
-    if (settings.stepByStep && shown && tryAdvance()) return;
+    const waitingForTaps = shown?.kind === "number" && byTap(shown) && stage <= shown.n;
+    if ((settings.stepByStep || byTap(shown)) && shown && !waitingForTaps && tryAdvance()) return;
     funBurst(e.clientX, e.clientY);
+  };
+  const onItemPointer = (index: number, e: PointerEvent) => {
+    if (countItem(index)) e.stopPropagation();
   };
   const repeat = (e: PointerEvent) => {
     e.stopPropagation();
@@ -249,7 +383,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     if (shown && !counting) say(sentenceFor(shown));
     funBurst(e.clientX, e.clientY);
   };
-  const onCardPointer = settings.stepByStep ? undefined : repeat;
+  const onCardPointer = settings.stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
     <div
@@ -258,30 +392,36 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       onPointerDown={onPlayAreaPointer}
     >
       <div className="stage">
-        {shown === null && (
-          <p className="letters-welcome">{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>
-        )}
-        {shown?.kind === "letter" && (
-          <LetterCard
-            key={shown.id}
-            letter={shown.letter}
-            word={shown.word}
-            stage={stage}
-            settings={settings}
-            onPointerDown={onCardPointer}
-          />
-        )}
-        {shown?.kind === "number" && (
-          <NumberCard
-            key={shown.id}
-            n={shown.n}
-            thing={shown.thing}
-            zeroEmoji={pack.zero.emoji}
-            stage={stage}
-            hint={settings.stepByStep}
-            onPointerDown={onCardPointer}
-          />
-        )}
+        <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
+          {shown === null && (
+            <p className="letters-welcome">{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>
+          )}
+          {shown?.kind === "letter" && (
+            <LetterCard
+              key={shown.id}
+              letter={shown.letter}
+              word={shown.word}
+              stage={stage}
+              settings={settings}
+              onPointerDown={onCardPointer}
+              onPicturePointerDown={nextWord}
+            />
+          )}
+          {shown?.kind === "number" && (
+            <NumberCard
+              key={shown.id}
+              n={shown.n}
+              thing={shown.thing}
+              zeroEmoji={pack.zero.emoji}
+              stage={stage}
+              hint={settings.stepByStep || byTap(shown)}
+              tapped={byTap(shown) ? tapped : undefined}
+              trace={settings.trace ? { sounds: settings.sounds } : undefined}
+              onItemPointer={onItemPointer}
+              onPointerDown={onCardPointer}
+            />
+          )}
+        </div>
       </div>
       {touchKeys && (
         <TouchKeyboard

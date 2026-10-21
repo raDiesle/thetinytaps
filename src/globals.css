@@ -462,6 +462,7 @@ a.game-card:focus-visible {
 }
 
 .idea-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -561,7 +562,88 @@ button.idea-id {
 }
 
 .idea-done {
+  background: #3ec300;
+  color: #fff;
+}
+
+.idea-partial-tag {
+  padding: 2px 10px;
+  border-radius: 99px;
+  background: #fff0c2;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.idea-partial {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #fff8e0;
+  font-size: 0.9rem;
+}
+
+/* Done ideas step back: green edge, faded, a check in the corner. */
+.idea-card.done {
+  background: #f1fbec;
+  box-shadow: inset 0 0 0 3px #3ec30066;
+}
+
+.idea-card.done > :not(.idea-tags, .idea-done-stamp) {
+  opacity: 0.55;
+}
+
+.idea-card.done h3 {
+  text-decoration: line-through;
+  text-decoration-color: #3ec300;
+  text-decoration-thickness: 2px;
+}
+
+.idea-card.partial {
+  box-shadow: inset 0 0 0 3px #ffb70366;
+}
+
+.idea-done-stamp {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  font-family: var(--font-emoji);
+  font-size: 1.6rem;
+  rotate: 12deg;
+}
+
+.ideas-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.ideas-area .ideas-progress {
+  justify-content: flex-start;
+  margin-top: -6px;
+}
+
+.ideas-progress-bar {
+  width: 160px;
+  height: 10px;
+  border-radius: 99px;
+  background: #00000014;
+  overflow: hidden;
+}
+
+.ideas-progress-bar span {
+  display: block;
+  height: 100%;
+  background: #3ec300;
+}
+
+.ideas-nav-count {
+  padding: 0 6px;
+  border-radius: 99px;
   background: #d8f5d0;
+  font-size: 0.8rem;
 }
 
 /* ---------- Start screen (parents) ---------- */
@@ -908,6 +990,7 @@ kbd {
 
 /* The card's room: the whole screen, or what the on-screen keys leave. Cards size themselves to it (cqh / cqw). */
 .stage {
+  position: relative;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -996,6 +1079,144 @@ kbd {
   color: var(--accent);
 }
 
+/* Arrow keys push the card around the stage; see LettersPlay. */
+.card-box {
+  display: flex;
+  justify-content: center;
+  transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Tracing: the letter as dots on a canvas, stars wherever the finger has been. See TraceGlyphs. */
+.glyphs.trace {
+  position: relative;
+  display: block;
+}
+
+.glyphs.trace canvas {
+  display: block;
+}
+
+.trace-star {
+  position: absolute;
+  translate: -50% -50%;
+  rotate: var(--rotate);
+  pointer-events: none;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* "A a" as mother and baby, holding hands. */
+.glyphs.family {
+  gap: 0;
+  align-items: flex-end;
+}
+
+.glyphs.family .mama,
+.glyphs.family .baby {
+  position: relative;
+  transform-origin: 50% 90%;
+  animation: family-sway 2.2s ease-in-out infinite;
+}
+
+.glyphs.family .baby {
+  color: var(--accent);
+  animation-name: family-hop;
+  animation-delay: 0.3s;
+  cursor: pointer;
+}
+
+.glyphs.family .baby.grown {
+  animation: family-grow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glyphs.family .hands {
+  align-self: center;
+  width: 0.5em;
+  margin: 0.2em -0.1em 0;
+  overflow: visible;
+}
+
+.hands path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.hands circle {
+  fill: #ff7bd0;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+/* Eyes sit on top of the letter: at cap height for the big one, x-height for the small one. */
+.eyes {
+  position: absolute;
+  left: 50%;
+  top: 0.12em;
+  display: flex;
+  gap: 0.03em;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.baby:not(.grown) .eyes {
+  top: 0.36em;
+}
+
+.eyes span {
+  width: 0.17em;
+  height: 0.2em;
+  border: 0.025em solid var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 62%, var(--ink) 0 32%, #fff 34%);
+  animation: blink 4s infinite;
+}
+
+.baby .eyes span {
+  width: 0.13em;
+  height: 0.15em;
+}
+
+@keyframes family-sway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes family-hop {
+  0%,
+  100% {
+    transform: rotate(5deg);
+  }
+  25% {
+    transform: translateY(-0.08em);
+  }
+  50% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes family-grow {
+  from {
+    transform: scale(0.6);
+  }
+}
+
+@keyframes blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
 .picture {
   font-family: var(--font-emoji);
   font-size: min(30cqh, 40cqw);
@@ -1041,6 +1262,44 @@ kbd {
 .count-2 .count-item,
 .count-3 .count-item {
   font-size: min(22cqh, 24cqw);
+}
+
+/* Counting by tapping: things wait pale until tapped, then hop and keep their number. */
+.count-tap {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.count-tap .count-item {
+  filter: grayscale(1);
+  opacity: 0.45;
+  transition:
+    filter 0.3s,
+    opacity 0.3s;
+}
+
+.count-tap.counted .count-item {
+  filter: none;
+  opacity: 1;
+  animation: hop 0.45s ease-in-out;
+}
+
+.count-badge {
+  position: absolute;
+  top: -0.2em;
+  right: -0.35em;
+  min-width: 1.5em;
+  padding: 0.1em 0.3em;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: min(5cqh, 6cqw);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* Parts that appear later keep their space; see Reveal in Cards.tsx. */
@@ -1123,6 +1382,104 @@ kbd {
     opacity: 0;
     transform: translateY(-120px) scale(0.9) rotate(calc(var(--rotate) * 2));
   }
+}
+
+/* ---------- Wo ist das B? ---------- */
+
+/* The letter to look for, drawn like a key on the keyboard. */
+.find-key {
+  display: flex;
+  gap: 0.25em;
+  padding: 0.08em 0.3em;
+  border: 0.05em solid var(--ink);
+  border-radius: 0.2em;
+  background: #fff;
+  box-shadow: 0 0.09em 0 var(--ink);
+  font-size: min(20cqh, 26cqw);
+  font-weight: 800;
+  line-height: 1;
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+.find-key span:nth-child(2) {
+  color: var(--accent);
+}
+
+.find-key.nudge {
+  animation:
+    shake 0.4s ease-in-out,
+    waiting 1.8s ease-in-out 0.4s infinite;
+}
+
+/* Found: the key is pressed down and lights up. */
+.find-card.done .find-key {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(0.07em);
+  box-shadow: 0 0.02em 0 var(--ink);
+  animation: none;
+}
+
+.find-card.done .find-key span:nth-child(2) {
+  color: #fff;
+}
+
+.find-card.done .picture {
+  animation: hop 0.5s ease-in-out 3;
+}
+
+/* A small picture of the real keyboard; keeps its space so the card doesn't jump when it appears. */
+.keyboard-map {
+  --key: min(calc((100vw - 40px) / (var(--keys) + 1.5)), 46px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--key) * 0.12);
+  width: fit-content;
+  margin: 0 auto;
+  padding: 12px 16px max(14px, env(safe-area-inset-bottom));
+  visibility: hidden;
+}
+
+.keyboard-map.shown {
+  visibility: visible;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.keyboard-map-row {
+  display: flex;
+  gap: calc(var(--key) * 0.12);
+  padding-left: calc(var(--offset) * var(--key));
+}
+
+.keyboard-map-key {
+  display: grid;
+  place-items: center;
+  width: var(--key);
+  height: var(--key);
+  border: 2px solid #2b2d4240;
+  border-radius: calc(var(--key) * 0.2);
+  background: #ffffffb0;
+  color: #2b2d4280;
+  font-size: calc(var(--key) * 0.45);
+  font-weight: 700;
+}
+
+.keyboard-map-key.lit {
+  border: 3px solid var(--ink);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 4px #fff, 0 0 18px 8px var(--accent);
+  animation: waiting 1.2s ease-in-out infinite;
+}
+
+.calm .find-key,
+.calm .find-card.done .picture,
+.calm .keyboard-map-key.lit {
+  animation: none;
+}
+
+.calm .keyboard-map.shown {
+  animation: fade-in 0.7s ease-out;
 }
 
 /* ---------- Lebendige Bilder ---------- */
@@ -1254,6 +1611,118 @@ kbd {
   font-weight: 800;
 }
 
+/* Sound riddle and questions: a big symbol instead of the item's picture. */
+.find-emoji {
+  display: grid;
+  place-items: center;
+  width: min(12vh, 90px);
+  height: min(12vh, 90px);
+  border-radius: 50%;
+  background: #e3f6ff;
+  font-family: var(--font-emoji);
+  font-size: min(7vh, 54px);
+}
+
+/* Questions with several answers: one dot per answer still to find. */
+.find-progress {
+  display: flex;
+  gap: 6px;
+}
+
+.find-progress span {
+  width: 0.55em;
+  height: 0.55em;
+  border: 3px solid #2b2d4240;
+  border-radius: 50%;
+}
+
+.find-progress span.done {
+  border-color: var(--accent);
+  background: var(--accent);
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* "Alles entdeckt": how many items were tapped, small at the edge. */
+.scene-goal {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px 4px 8px;
+  border-radius: 99px;
+  background: #ffffffb0;
+  font-size: clamp(1rem, 2.2vw, 1.3rem);
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.scene-goal-star {
+  font-family: var(--font-emoji);
+  font-size: 1.3em;
+}
+
+.scene-goal.done {
+  background: #fff;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scene-goal button {
+  margin-left: 6px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Keys mode: the frame the arrow keys move. */
+.scene-focus {
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop-in 0.25s ease-out;
+}
+
+.scene-focus rect {
+  fill: none;
+}
+
+.scene-focus-glow {
+  stroke: #ffd60a;
+  stroke-width: 22;
+  stroke-opacity: 0.35;
+}
+
+.scene-focus-line {
+  stroke: #ffd60a;
+  stroke-width: 7;
+}
+
+/* Everything discovered: all items dance together for a moment. */
+.scene.party .scene-item {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: scene-dance 0.7s ease-in-out calc(var(--party-i) * 40ms) 4;
+}
+
+@keyframes scene-dance {
+  25% {
+    transform: translateY(-14px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-14px) rotate(5deg);
+  }
+}
+
+.calm.party .scene-item {
+  animation: none;
+}
+
 /* Unless the picture may move by itself, nothing moves without the child doing something. */
 .scene:not(.lively) .scene-prompt,
 .scene:not(.lively) .scene-hint {
@@ -1305,6 +1774,263 @@ kbd {
   animation: hop 0.5s ease-in-out calc(var(--i) * 80ms) 2;
 }
 
+/* First-letter game: the rest of the word waits unseen, then flies in letter by letter. */
+.slot.hidden {
+  visibility: hidden;
+}
+
+.slot.flown {
+  animation: fly-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 90ms) backwards;
+}
+
+.card.done .slot.flown {
+  animation:
+    fly-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 90ms) backwards,
+    hop 0.5s ease-in-out calc(0.6s + var(--i) * 80ms) 2;
+}
+
+@keyframes fly-in {
+  from {
+    opacity: 0;
+    transform: translate(1.5em, -0.6em) rotate(20deg) scale(0.4);
+  }
+}
+
+/* The picture and what lies on it: puzzle pieces, or the figure acting out a doing word. */
+.figure {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.card:not(.done) .figure.puzzle .picture,
+.figure.actor .picture {
+  animation: none;
+}
+
+.card.done .figure.puzzle .picture {
+  animation:
+    hop 0.5s ease-in-out 2,
+    wiggle 2.4s ease-in-out 1s infinite;
+}
+
+.puzzle-cover {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  gap: 3px;
+  pointer-events: none;
+}
+
+.piece {
+  border: 3px solid #fff;
+  border-radius: 14px;
+  transition:
+    transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.5s;
+}
+
+.piece.off {
+  opacity: 0;
+  transform: translateY(-40%) rotate(25deg) scale(0.2);
+}
+
+/* Colour game: the typed word colours the screen, and things of that colour hop in. */
+.colored .slot.typed {
+  -webkit-text-stroke: 0.04em var(--ink);
+  paint-order: stroke fill;
+}
+
+.color-parade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.parade-thing {
+  position: absolute;
+  font-family: var(--font-emoji);
+  font-size: min(12cqh, 14cqw);
+  line-height: 1;
+  animation:
+    hop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 120ms) backwards,
+    bob 1.4s ease-in-out calc(0.6s + var(--i) * 120ms) infinite;
+}
+
+@keyframes hop-in {
+  from {
+    opacity: 0;
+    transform: translateY(60cqh) scale(0.5);
+  }
+}
+
+/* Doing words: once typed, the figure does it until the next word. Calm mode does it slower. */
+.figure.actor {
+  --act-slow: 1;
+}
+
+.calm .figure.actor {
+  --act-slow: 2;
+}
+
+.act-hop {
+  animation: act-hop calc(0.7s * var(--act-slow)) ease-in-out infinite;
+}
+
+.act-run {
+  animation: act-run calc(2.4s * var(--act-slow)) linear infinite;
+}
+
+.act-sleep {
+  animation: act-sleep calc(3s * var(--act-slow)) ease-in-out infinite;
+}
+
+.act-sleep::after {
+  content: "💤";
+  position: absolute;
+  top: -0.2em;
+  right: -0.5em;
+  font-family: var(--font-emoji);
+  font-size: min(10cqh, 12cqw);
+  animation: act-zzz calc(2s * var(--act-slow)) ease-out infinite;
+}
+
+.act-dance {
+  animation: act-dance calc(1s * var(--act-slow)) ease-in-out infinite;
+}
+
+.act-wave {
+  transform-origin: 70% 90%;
+  animation: act-wave calc(0.6s * var(--act-slow)) ease-in-out infinite;
+}
+
+.act-spin {
+  animation: act-spin calc(1.4s * var(--act-slow)) ease-in-out infinite;
+}
+
+.act-fly {
+  animation: act-fly calc(1.6s * var(--act-slow)) ease-in-out infinite;
+}
+
+.act-swim {
+  animation: act-swim calc(2.4s * var(--act-slow)) ease-in-out infinite;
+}
+
+.act-clap {
+  animation: act-clap calc(0.5s * var(--act-slow)) ease-in-out infinite;
+}
+
+@keyframes act-hop {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.1, 0.9);
+  }
+  15% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-35%) scale(0.95, 1.05);
+  }
+  85% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* The runner faces left, so it runs in from the right. */
+@keyframes act-run {
+  from {
+    transform: translateX(60cqw);
+  }
+  to {
+    transform: translateX(-60cqw);
+  }
+}
+
+@keyframes act-sleep {
+  50% {
+    transform: rotate(-8deg) scale(0.96);
+  }
+}
+
+@keyframes act-zzz {
+  from {
+    opacity: 0;
+    transform: translate(0, 0.3em) scale(0.6);
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translate(0.4em, -0.6em) scale(1.1);
+  }
+}
+
+@keyframes act-dance {
+  25% {
+    transform: rotate(-14deg) translateX(-10%);
+  }
+  50% {
+    transform: translateY(-8%);
+  }
+  75% {
+    transform: rotate(14deg) translateX(10%);
+  }
+}
+
+@keyframes act-wave {
+  50% {
+    transform: rotate(-25deg);
+  }
+}
+
+@keyframes act-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes act-fly {
+  0%,
+  100% {
+    transform: translate(-25%, 0) rotate(-8deg);
+  }
+  50% {
+    transform: translate(25%, -30%) rotate(8deg);
+  }
+}
+
+/* Gentle waves towards where the fish looks (left), and drifting back. */
+@keyframes act-swim {
+  0%,
+  100% {
+    transform: translate(12%, 0) rotate(0);
+  }
+  25% {
+    transform: translate(0, -10%) rotate(-10deg);
+  }
+  50% {
+    transform: translate(-12%, 0) rotate(0);
+  }
+  75% {
+    transform: translate(0, 10%) rotate(10deg);
+  }
+}
+
+@keyframes act-clap {
+  50% {
+    transform: scale(0.82);
+  }
+}
+
+.join-in {
+  margin-top: 0.2em;
+  font-size: min(6cqh, 7cqw);
+  font-weight: 700;
+  text-align: center;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s backwards;
+}
+
 @keyframes shake {
   25% {
     transform: translateX(-0.06em);
@@ -1320,13 +2046,223 @@ kbd {
   }
 }
 
+/* ---------- Buchstaben-Zug ---------- */
+
+.train-play {
+  overflow: hidden;
+}
+
+/* One wagon is one unit wide; engine and five wagons fit the stage. */
+.train-scene {
+  --unit: min(12cqw, 24cqh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.train-hint {
+  margin-bottom: calc(var(--unit) * 0.4);
+}
+
+.train-hint.gone {
+  visibility: hidden;
+}
+
+.train {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(var(--unit) * 0.14);
+}
+
+/* Drives off to the left after the wagons have hopped one after another. */
+.train.leaving {
+  transform: translateX(-130cqw);
+  transition: transform 2.2s cubic-bezier(0.5, 0, 0.9, 0.5) 1s;
+}
+
+.train.arriving {
+  animation: train-arrive 1.4s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@keyframes train-arrive {
+  from {
+    transform: translateX(110cqw);
+  }
+}
+
+.engine {
+  position: relative;
+  width: calc(var(--unit) * 1.55);
+  cursor: pointer;
+}
+
+.engine svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.engine-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.train.leaving .engine-wheel,
+.train.arriving .engine-wheel,
+.train.leaving .wagon-wheels span,
+.train.arriving .wagon-wheels span {
+  animation: spin 0.6s linear infinite reverse;
+}
+
+.smoke {
+  position: absolute;
+  left: 22%;
+  top: 0;
+  pointer-events: none;
+}
+
+.smoke span {
+  position: absolute;
+  width: calc(var(--unit) * 0.3);
+  height: calc(var(--unit) * 0.3);
+  margin-left: calc(var(--unit) * -0.15);
+  border-radius: 50%;
+  background: #ffffffd0;
+  border: 3px solid #2a1e5c30;
+  animation: puff 1.2s ease-out infinite;
+}
+
+.smoke span:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.smoke span:nth-child(3) {
+  animation-delay: 0.8s;
+}
+
+@keyframes puff {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--unit) * 0.6), calc(var(--unit) * -0.9)) scale(1.6);
+  }
+}
+
+.wagon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: var(--unit);
+  cursor: pointer;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The coupling to the engine or the wagon in front. */
+.wagon:not(.slot)::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--unit) * -0.2);
+  bottom: calc(var(--unit) * 0.2);
+  width: calc(var(--unit) * 0.24);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+
+.wagon-cargo {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: calc(var(--unit) * 0.65);
+}
+
+.wagon-cargo .picture {
+  font-size: calc(var(--unit) * 0.55);
+}
+
+.wagon-cargo .picture-image {
+  width: calc(var(--unit) * 0.6);
+}
+
+.wagon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: calc(var(--unit) * 0.72);
+  border: 4px solid var(--ink);
+  border-radius: 10px;
+  background: var(--wagon);
+  color: #fff;
+  font-size: calc(var(--unit) * 0.5);
+  font-weight: 800;
+  line-height: 1;
+  -webkit-text-stroke: 0.08em var(--ink);
+  paint-order: stroke fill;
+}
+
+.wagon-wheels {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: calc(var(--unit) * -0.1);
+}
+
+/* A spoke, so turning shows. */
+.wagon-wheels span {
+  width: calc(var(--unit) * 0.26);
+  height: calc(var(--unit) * 0.26);
+  border: 4px solid var(--ink);
+  border-radius: 50%;
+  background: linear-gradient(var(--ink) 0 0) center / 4px 100% no-repeat, var(--cream);
+}
+
+/* Room for the wagons still to come. */
+.wagon.slot {
+  height: calc(var(--unit) * 0.72);
+  margin-bottom: calc(var(--unit) * 0.16);
+  border: 4px dashed #2b2d4230;
+  border-radius: 10px;
+  cursor: default;
+  animation: none;
+}
+
+.train.leaving .wagon.slot,
+.train.arriving .wagon.slot {
+  visibility: hidden;
+}
+
+.train.leaving .wagon:not(.slot) {
+  animation: wagon-hop 0.4s ease-in-out calc(var(--i) * 0.16s);
+}
+
+@keyframes wagon-hop {
+  50% {
+    transform: translateY(calc(var(--unit) * -0.3));
+  }
+}
+
+.rails {
+  width: 100%;
+  height: calc(var(--unit) * 0.16);
+  border-top: 5px solid #4a4e69;
+  background: repeating-linear-gradient(90deg, #a1887f 0 calc(var(--unit) * 0.12), transparent 0 calc(var(--unit) * 0.4));
+}
+
 /* Calm mode: no wiggling or bouncing, softer shapes, slower colour changes. */
 .letters-play.calm,
 .words-play.calm {
   transition-duration: 1.2s;
 }
 
-.calm .picture {
+.calm .picture,
+.calm .glyphs.family .mama,
+.calm .glyphs.family .baby:not(.grown) {
   animation: none;
 }
 
@@ -1335,10 +2271,23 @@ kbd {
   animation: fade-in 0.7s ease-out;
 }
 
+.calm .count-tap.counted .count-item {
+  animation: none;
+}
+
+.calm .count-badge,
+.calm .trace-star {
+  animation: fade-in 0.7s ease-out;
+}
+
 .calm .reveal.waiting,
 .calm .touch-key.wanted,
 .calm .slot.next,
 .calm .card.done .slot {
+  animation: none;
+}
+
+.calm .train.leaving .wagon:not(.slot) {
   animation: none;
 }
 
@@ -1362,6 +2311,8 @@ kbd {
 
 @media (prefers-reduced-motion: reduce) {
   .picture,
+  .glyphs.family .mama,
+  .glyphs.family .baby,
   .letters-welcome,
   .scene-prompt {
     animation: none;

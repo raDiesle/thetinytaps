@@ -4,13 +4,23 @@ import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
-import { DEFAULT_WORDS_SETTINGS, WORDS_SETTINGS_KEY, type WordCase, type WordLength, type WordsSettings } from "./settings";
+import {
+  DEFAULT_WORDS_SETTINGS,
+  WORDS_SETTINGS_KEY,
+  type PictureReveal,
+  type WordCase,
+  type WordLength,
+  type WordsMode,
+  type WordsSettings,
+} from "./settings";
 import { WordsPlay } from "./WordsPlay";
 
 const pack = de;
 
 export function WordsGame() {
   const [settings, update] = useStoredSettings(WORDS_SETTINGS_KEY, DEFAULT_WORDS_SETTINGS);
+  // Colours and doing words are short fixed lists, so length and theme only apply to the picture words.
+  const nouns = settings.mode === "spell" || settings.mode === "first";
 
   return (
     <GameShell
@@ -18,27 +28,43 @@ export function WordsGame() {
       emoji="✍️"
       settings={
         <>
-          <SettingsGroup title="Wörter">
-            <Choice<WordLength>
-              label="Länge"
-              value={settings.length}
-              onChange={(length) => update({ length })}
+          <SettingsGroup title="Spielart">
+            <Choice<WordsMode>
+              label="Spiel"
+              value={settings.mode}
+              onChange={(mode) => update({ mode })}
               options={[
-                { value: "short", label: "Bär" },
-                { value: "medium", label: "Hund" },
-                { value: "long", label: "Giraffe" },
-              ]}
-            />
-            <Choice<WordsSettings["theme"]>
-              label="Bilder"
-              value={settings.theme}
-              onChange={(theme) => update({ theme })}
-              options={[
-                { value: "all", label: "🌈 Alle" },
-                ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
+                { value: "spell", label: "✍️ Ganzes Wort" },
+                { value: "first", label: "🐻 Erster Buchstabe" },
+                { value: "colors", label: "🎨 Farben" },
+                { value: "actions", label: "🦘 Tu-Wörter" },
               ]}
             />
           </SettingsGroup>
+
+          {nouns && (
+            <SettingsGroup title="Wörter">
+              <Choice<WordLength>
+                label="Länge"
+                value={settings.length}
+                onChange={(length) => update({ length })}
+                options={[
+                  { value: "short", label: "Bär" },
+                  { value: "medium", label: "Hund" },
+                  { value: "long", label: "Giraffe" },
+                ]}
+              />
+              <Choice<WordsSettings["theme"]>
+                label="Bilder"
+                value={settings.theme}
+                onChange={(theme) => update({ theme })}
+                options={[
+                  { value: "all", label: "🌈 Alle" },
+                  ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
+                ]}
+              />
+            </SettingsGroup>
+          )}
 
           <SettingsGroup title="Anzeige">
             <Choice<WordCase>
@@ -51,11 +77,18 @@ export function WordsGame() {
                 { value: "lower", label: "bär" },
               ]}
             />
-            <Toggle
-              label="Bild gleich zeigen (sonst erst am Ende)"
-              checked={settings.showPicture}
-              onChange={(showPicture) => update({ showPicture })}
-            />
+            {settings.mode !== "first" && (
+              <Choice<PictureReveal>
+                label="Bild"
+                value={settings.picture}
+                onChange={(picture) => update({ picture })}
+                options={[
+                  { value: "now", label: "Gleich zeigen" },
+                  { value: "puzzle", label: "🧩 Baut sich auf" },
+                  { value: "end", label: "Erst am Ende" },
+                ]}
+              />
+            )}
           </SettingsGroup>
 
           <SettingsGroup title="Ton">

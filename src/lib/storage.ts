@@ -1,22 +1,23 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+
+/** The saved value merged into `defaults`, so adding a new setting later keeps the old ones. */
+function load<T extends object>(key: string, defaults: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return { ...defaults, ...(JSON.parse(raw) as Partial<T>) };
+  } catch {
+    // Ignore broken or unavailable storage and keep the defaults.
+  }
+  return defaults;
+}
 
 /**
- * Like useState, but saved in localStorage. Starts from `defaults` (so the
- * static HTML matches) and loads the saved value after mount. Saved values
- * are merged into `defaults`, so adding a new setting later keeps old ones.
+ * Like useState, but saved in localStorage. The saved value is read on the
+ * first render (the app renders only in the browser), so the start screen
+ * shows the parent's last choices right away.
  */
 export function useStoredSettings<T extends object>(key: string, defaults: T) {
-  const [value, setValue] = useState<T>(defaults);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw) setValue({ ...defaults, ...(JSON.parse(raw) as Partial<T>) });
-    } catch {
-      // Ignore broken or unavailable storage and keep the defaults.
-    }
-    // `defaults` is a constant per call site; only reload when the key changes.
-  }, [key]);
+  const [value, setValue] = useState<T>(() => load(key, defaults));
 
   const update = useCallback(
     (patch: Partial<T>) => {

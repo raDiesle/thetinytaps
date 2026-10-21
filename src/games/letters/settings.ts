@@ -3,11 +3,24 @@ import type { ThemeId } from "@/content/types";
 
 export type LetterCase = "upper" | "both" | "lower";
 
+/**
+ * "free": every key shows its letter or number. "find": a letter is shown and the child looks for its key.
+ * "train": every key adds a wagon to a train.
+ */
+export type LettersMode = "free" | "find" | "train";
+
 /** What is spoken for a letter: "Be, wie Bär!", "Bär!" or "Be!". */
 export type Announce = "letterAndWord" | "word" | "letter";
 
 export interface LettersSettings {
+  mode: LettersMode;
+  /** Find mode: after a few wrong keys, light up the wanted key on a little keyboard picture. */
+  hints: boolean;
   letterCase: LetterCase;
+  /** With "A a": the big letter holds the small one by the hand, both with eyes. */
+  letterFamily: boolean;
+  /** The letter as big dots to trace with a finger or the mouse; stars appear along the way. */
+  trace: boolean;
   /** Show the word under the picture, with its first letter highlighted. */
   showWord: boolean;
   /** Speak letters/words and count numbers aloud. */
@@ -21,6 +34,8 @@ export interface LettersSettings {
   calm: boolean;
   /** Reveal letter → word → picture and number items one click at a time. */
   stepByStep: boolean;
+  /** Numbers: the child taps every thing to count it; the digit appears after the last one. */
+  countByTap: boolean;
   /** Automatic mode only: ignore new letters/numbers until counting has finished. */
   finishCounting: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
@@ -28,7 +43,11 @@ export interface LettersSettings {
 }
 
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
+  mode: "free",
+  hints: true,
   letterCase: "upper",
+  letterFamily: true,
+  trace: false,
   showWord: true,
   speech: false,
   announce: "letterAndWord",
@@ -36,6 +55,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   sounds: true,
   calm: false,
   stepByStep: true,
+  countByTap: false,
   finishCounting: true,
   touchKeys: "auto",
 };

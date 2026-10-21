@@ -1,12 +1,18 @@
-import type { Countable, LanguagePack, LetterEntry, ThemeId, WordEntry } from "./types";
+import type { ActionWord, ColorWord, Countable, LanguagePack, LetterEntry, ThemeId, WordEntry } from "./types";
 
 const w = (word: string, emoji: string, image?: string): WordEntry => ({ word, emoji, image });
 const themed =
   (theme: ThemeId) =>
-  (word: string, emoji: string): WordEntry => ({ word, emoji, theme });
+  (word: string, emoji: string, image?: string): WordEntry => ({ word, emoji, image, theme });
 const tier = themed("animals");
 const fahrzeug = themed("vehicles");
 const essen = themed("food");
+const koerper = themed("body");
+const kleidung = themed("clothes");
+const familie = themed("family");
+const musik = themed("music");
+const natur = themed("nature");
+const fest = themed("holidays");
 
 const letter = (upper: string, spoken: string, words: WordEntry[]): LetterEntry => ({
   upper,
@@ -18,35 +24,35 @@ const letter = (upper: string, spoken: string, words: WordEntry[]): LetterEntry 
 // Words are picked so the first sound matches the letter (e.g. no "Sch…" for S).
 // The first word of each letter is the one shown first, so it should be the best-known.
 const letters: LetterEntry[] = [
-  letter("A", "A", [tier("Affe", "🐒"), essen("Apfel", "🍎"), fahrzeug("Auto", "🚗"), tier("Ameise", "🐜"), essen("Ananas", "🍍")]),
-  letter("B", "Be", [tier("Bär", "🐻"), w("Ball", "⚽"), essen("Banane", "🍌"), fahrzeug("Bus", "🚌"), tier("Biene", "🐝"), fahrzeug("Boot", "🚤"), essen("Brot", "🍞")]),
+  letter("A", "A", [tier("Affe", "🐒"), essen("Apfel", "🍎"), fahrzeug("Auto", "🚗"), tier("Ameise", "🐜"), essen("Ananas", "🍍"), koerper("Arm", "💪"), koerper("Auge", "👁️"), musik("Akkordeon", "🪗")]),
+  letter("B", "Be", [tier("Bär", "🐻"), w("Ball", "⚽"), essen("Banane", "🍌"), fahrzeug("Bus", "🚌"), tier("Biene", "🐝"), fahrzeug("Boot", "🚤"), essen("Brot", "🍞"), natur("Baum", "🌳"), familie("Baby", "👶"), koerper("Bein", "🦵"), natur("Blume", "🌸"), fest("Ballon", "🎈"), familie("Bruder", "👦"), natur("Berg", "⛰️"), natur("Blatt", "🍁"), kleidung("Bikini", "👙"), musik("Banjo", "🪕")]),
   letter("C", "Ze", [w("Clown", "🤡"), w("Computer", "💻"), essen("Croissant", "🥐"), w("Cowboy", "🤠")]),
-  letter("D", "De", [tier("Dino", "🦕"), tier("Delfin", "🐬"), essen("Donut", "🍩"), tier("Drache", "🐉")]),
-  letter("E", "E", [tier("Elefant", "🐘"), tier("Ente", "🦆"), essen("Eis", "🍦"), essen("Erdbeere", "🍓"), fahrzeug("Eisenbahn", "🚂"), tier("Eichhörnchen", "🐿️"), essen("Ei", "🥚")]),
-  letter("F", "Eff", [tier("Fisch", "🐟"), fahrzeug("Feuerwehr", "🚒"), tier("Frosch", "🐸"), fahrzeug("Flugzeug", "✈️"), tier("Fuchs", "🦊"), fahrzeug("Fahrrad", "🚲")]),
-  letter("G", "Ge", [tier("Giraffe", "🦒"), w("Geschenk", "🎁"), essen("Gurke", "🥒"), tier("Gorilla", "🦍"), w("Gitarre", "🎸"), fahrzeug("Gondel", "🚠")]),
-  letter("H", "Ha", [tier("Hund", "🐶"), w("Haus", "🏠"), fahrzeug("Hubschrauber", "🚁"), tier("Hase", "🐰"), essen("Honig", "🍯"), tier("Huhn", "🐔")]),
-  letter("I", "I", [tier("Igel", "🦔"), w("Insel", "🏝️")]),
-  letter("J", "Jott", [w("Jacke", "🧥"), w("Jeans", "👖")]),
-  letter("K", "Ka", [tier("Katze", "🐱"), essen("Keks", "🍪"), fahrzeug("Kran", "🏗️"), tier("Kuh", "🐮"), essen("Käse", "🧀"), fahrzeug("Krankenwagen", "🚑"), w("Krone", "👑"), essen("Kuchen", "🍰"), tier("Käfer", "🪲"), essen("Kirsche", "🍒")]),
-  letter("L", "Ell", [tier("Löwe", "🦁"), fahrzeug("Lokomotive", "🚂"), essen("Lutscher", "🍭"), tier("Lama", "🦙"), fahrzeug("Laster", "🚚"), w("Leiter", "🪜")]),
-  letter("M", "Emm", [tier("Maus", "🐭"), w("Mond", "🌙"), essen("Möhre", "🥕"), fahrzeug("Motorrad", "🏍️"), tier("Marienkäfer", "🐞"), essen("Milch", "🥛")]),
-  letter("N", "Enn", [tier("Nashorn", "🦏"), essen("Nudeln", "🍝"), w("Nase", "👃")]),
-  letter("O", "O", [w("Oma", "👵"), tier("Oktopus", "🐙"), essen("Orange", "🍊"), w("Opa", "👴"), w("Ohr", "👂")]),
-  letter("P", "Pe", [tier("Pinguin", "🐧"), essen("Pizza", "🍕"), fahrzeug("Polizei", "🚓"), tier("Pferd", "🐴"), tier("Panda", "🐼"), w("Pilz", "🍄")]),
+  letter("D", "De", [tier("Dino", "🦕"), tier("Delfin", "🐬"), essen("Donut", "🍩"), tier("Drache", "🐉"), koerper("Daumen", "👍")]),
+  letter("E", "E", [tier("Elefant", "🐘"), tier("Ente", "🦆"), essen("Eis", "🍦"), essen("Erdbeere", "🍓"), fahrzeug("Eisenbahn", "🚂"), tier("Eichhörnchen", "🐿️"), essen("Ei", "🥚"), fest("Engel", "👼"), natur("Erde", "🌍")]),
+  letter("F", "Eff", [tier("Fisch", "🐟"), fahrzeug("Feuerwehr", "🚒"), tier("Frosch", "🐸"), fahrzeug("Flugzeug", "✈️"), tier("Fuchs", "🦊"), fahrzeug("Fahrrad", "🚲"), koerper("Fuß", "🦶"), familie("Familie", "👪"), koerper("Finger", "☝️"), natur("Feuer", "🔥"), fest("Feuerwerk", "🎆"), kleidung("Flip-Flop", "🩴")]),
+  letter("G", "Ge", [tier("Giraffe", "🦒"), fest("Geschenk", "🎁"), essen("Gurke", "🥒"), tier("Gorilla", "🦍"), musik("Gitarre", "🎸"), fahrzeug("Gondel", "🚠"), musik("Glocke", "🔔"), natur("Gewitter", "⛈️"), koerper("Gehirn", "🧠")]),
+  letter("H", "Ha", [tier("Hund", "🐶"), w("Haus", "🏠"), fahrzeug("Hubschrauber", "🚁"), tier("Hase", "🐰"), essen("Honig", "🍯"), tier("Huhn", "🐔"), koerper("Hand", "✋"), kleidung("Hut", "👒"), koerper("Herz", "❤️"), kleidung("Handschuh", "🧤")]),
+  letter("I", "I", [tier("Igel", "🦔"), natur("Insel", "🏝️")]),
+  letter("J", "Jott", [kleidung("Jacke", "🧥"), familie("Junge", "👦"), kleidung("Jeans", "👖")]),
+  letter("K", "Ka", [tier("Katze", "🐱"), essen("Keks", "🍪"), fahrzeug("Kran", "🏗️"), tier("Kuh", "🐮"), essen("Käse", "🧀"), fahrzeug("Krankenwagen", "🚑"), w("Krone", "👑"), essen("Kuchen", "🍰"), tier("Käfer", "🪲"), essen("Kirsche", "🍒"), familie("Kind", "🧒"), kleidung("Kleid", "👗"), musik("Klavier", "🎹"), fest("Kerze", "🕯️"), natur("Kaktus", "🌵"), kleidung("Kappe", "🧢"), musik("Kopfhörer", "🎧"), fest("Konfetti", "🎊"), fest("Kürbis", "🎃"), natur("Kleeblatt", "🍀"), koerper("Knochen", "🦴"), kleidung("Krawatte", "👔")]),
+  letter("L", "Ell", [tier("Löwe", "🦁"), fahrzeug("Lokomotive", "🚂"), essen("Lutscher", "🍭"), tier("Lama", "🦙"), fahrzeug("Laster", "🚚"), w("Leiter", "🪜"), fest("Laterne", "🏮"), natur("Laub", "🍂")]),
+  letter("M", "Emm", [tier("Maus", "🐭"), natur("Mond", "🌙"), essen("Möhre", "🥕"), fahrzeug("Motorrad", "🏍️"), tier("Marienkäfer", "🐞"), essen("Milch", "🥛"), familie("Mama", "👩"), koerper("Mund", "👄"), familie("Mädchen", "👧"), musik("Mikrofon", "🎤"), natur("Muschel", "🐚")]),
+  letter("N", "Enn", [tier("Nashorn", "🦏"), essen("Nudeln", "🍝"), koerper("Nase", "👃"), fest("Nikolaus", "🎅"), musik("Noten", "🎵"), natur("Nebel", "🌫️")]),
+  letter("O", "O", [familie("Oma", "👵"), tier("Oktopus", "🐙"), essen("Orange", "🍊"), familie("Opa", "👴"), koerper("Ohr", "👂"), fest("Osterhase", "🐰"), fest("Osterei", "🥚"), familie("Onkel", "🧔"), natur("Ozean", "🌊")]),
+  letter("P", "Pe", [tier("Pinguin", "🐧"), essen("Pizza", "🍕"), fahrzeug("Polizei", "🚓"), tier("Pferd", "🐴"), tier("Panda", "🐼"), natur("Pilz", "🍄"), familie("Papa", "👨"), fest("Party", "🥳")]),
   letter("Q", "Ku", [tier("Qualle", "🪼")]),
-  letter("R", "Err", [fahrzeug("Rakete", "🚀"), w("Regenbogen", "🌈"), tier("Raupe", "🐛"), w("Roboter", "🤖"), fahrzeug("Roller", "🛴"), tier("Reh", "🦌")]),
-  letter("S", "Ess", [w("Sonne", "☀️"), tier("Seehund", "🦭"), w("Socke", "🧦"), fahrzeug("Segelboot", "⛵"), essen("Salat", "🥗"), w("Sofa", "🛋️"), essen("Suppe", "🍲")]),
-  letter("T", "Te", [tier("Tiger", "🐯"), fahrzeug("Traktor", "🚜"), essen("Tomate", "🍅"), w("Teddy", "🧸"), fahrzeug("Taxi", "🚕"), essen("Torte", "🎂"), w("Trommel", "🥁"), tier("Truthahn", "🦃")]),
-  letter("U", "U", [w("Uhr", "⏰"), fahrzeug("Ufo", "🛸"), tier("Uhu", "🦉"), fahrzeug("U-Bahn", "🚇"), w("Unterhose", "🩲")]),
-  letter("V", "Fau", [tier("Vogel", "🐦"), w("Vulkan", "🌋"), w("Violine", "🎻")]),
-  letter("W", "We", [tier("Wal", "🐳"), essen("Wassermelone", "🍉"), w("Wolke", "☁️"), tier("Wolf", "🐺"), fahrzeug("Wohnmobil", "🚐"), essen("Wurst", "🌭"), tier("Wurm", "🪱")]),
-  letter("X", "Ix", [w("Xylophon", "🎶", "images/xylophon.svg")]),
+  letter("R", "Err", [fahrzeug("Rakete", "🚀"), natur("Regenbogen", "🌈"), tier("Raupe", "🐛"), w("Roboter", "🤖"), fahrzeug("Roller", "🛴"), tier("Reh", "🦌"), natur("Regen", "🌧️"), natur("Rose", "🌹"), kleidung("Rucksack", "🎒"), musik("Radio", "📻"), kleidung("Ring", "💍")]),
+  letter("S", "Ess", [natur("Sonne", "☀️"), tier("Seehund", "🦭"), kleidung("Socke", "🧦"), fahrzeug("Segelboot", "⛵"), essen("Salat", "🥗"), w("Sofa", "🛋️"), essen("Suppe", "🍲"), musik("Saxofon", "🎷")]),
+  letter("T", "Te", [tier("Tiger", "🐯"), fahrzeug("Traktor", "🚜"), essen("Tomate", "🍅"), w("Teddy", "🧸"), fahrzeug("Taxi", "🚕"), essen("Torte", "🎂"), musik("Trommel", "🥁"), tier("Truthahn", "🦃"), musik("Trompete", "🎺"), natur("Tanne", "🌲"), natur("Tulpe", "🌷"), kleidung("T-Shirt", "👕"), familie("Tante", "👩‍🦰"), kleidung("Tasche", "👜")]),
+  letter("U", "U", [w("Uhr", "⏰"), fahrzeug("Ufo", "🛸"), tier("Uhu", "🦉"), fahrzeug("U-Bahn", "🚇"), kleidung("Unterhose", "🩲")]),
+  letter("V", "Fau", [tier("Vogel", "🐦"), natur("Vulkan", "🌋"), musik("Violine", "🎻")]),
+  letter("W", "We", [tier("Wal", "🐳"), essen("Wassermelone", "🍉"), natur("Wolke", "☁️"), tier("Wolf", "🐺"), fahrzeug("Wohnmobil", "🚐"), essen("Wurst", "🌭"), tier("Wurm", "🪱"), fest("Weihnachtsbaum", "🎄"), natur("Wasser", "💧")]),
+  letter("X", "Ix", [musik("Xylophon", "🎶", "images/xylophon.svg")]),
   letter("Y", "Üpsilon", [w("Yo-Yo", "🪀"), w("Yoga", "🧘")]),
-  letter("Z", "Zett", [tier("Zebra", "🦓"), fahrzeug("Zug", "🚆"), essen("Zitrone", "🍋"), tier("Ziege", "🐐"), w("Zahn", "🦷")]),
+  letter("Z", "Zett", [tier("Zebra", "🦓"), fahrzeug("Zug", "🚆"), essen("Zitrone", "🍋"), tier("Ziege", "🐐"), koerper("Zahn", "🦷"), koerper("Zunge", "👅")]),
   letter("Ä", "Ä", [essen("Äpfel", "🍏"), tier("Äffchen", "🐒")]),
-  letter("Ö", "Ö", [w("Öl", "🫒")]),
-  letter("Ü", "Ü", [w("Überraschung", "🎉")]),
+  letter("Ö", "Ö", [w("Öl", "🫗", "images/oel.svg")]),
+  letter("Ü", "Ü", [fest("Überraschung", "🎉")]),
 ];
 
 const countables: Countable[] = [
@@ -66,9 +72,54 @@ const countables: Countable[] = [
   { emoji: "🍌", singular: "Banane", plural: "Bananen", theme: "food" },
   { emoji: "🥕", singular: "Möhre", plural: "Möhren", theme: "food" },
   { emoji: "🍪", singular: "Keks", plural: "Kekse", theme: "food" },
+  // Only nouns whose article fits indefiniteArticle below, e.g. no "Hand" (eine) or "Auge" (ein).
+  { emoji: "🦷", singular: "Zahn", plural: "Zähne", theme: "body" },
+  { emoji: "👂", singular: "Ohr", plural: "Ohren", theme: "body" },
+  { emoji: "🦶", singular: "Fuß", plural: "Füße", theme: "body" },
+  { emoji: "🦴", singular: "Knochen", plural: "Knochen", theme: "body" },
+  { emoji: "🧦", singular: "Socke", plural: "Socken", theme: "clothes" },
+  { emoji: "🧢", singular: "Kappe", plural: "Kappen", theme: "clothes" },
+  { emoji: "👕", singular: "T-Shirt", plural: "T-Shirts", theme: "clothes" },
+  { emoji: "🧤", singular: "Handschuh", plural: "Handschuhe", theme: "clothes" },
+  { emoji: "👶", singular: "Baby", plural: "Babys", theme: "family" },
+  { emoji: "🧒", singular: "Kind", plural: "Kinder", theme: "family" },
+  { emoji: "👧", singular: "Mädchen", plural: "Mädchen", theme: "family" },
+  { emoji: "🎵", singular: "Note", plural: "Noten", theme: "music" },
+  { emoji: "🎸", singular: "Gitarre", plural: "Gitarren", theme: "music" },
+  { emoji: "🔔", singular: "Glocke", plural: "Glocken", theme: "music" },
+  { emoji: "🎺", singular: "Trompete", plural: "Trompeten", theme: "music" },
+  { emoji: "🌳", singular: "Baum", plural: "Bäume", theme: "nature" },
+  { emoji: "🍄", singular: "Pilz", plural: "Pilze", theme: "nature" },
+  { emoji: "🌷", singular: "Tulpe", plural: "Tulpen", theme: "nature" },
+  { emoji: "🌼", singular: "Blume", plural: "Blumen", theme: "nature" },
+  { emoji: "🎈", singular: "Ballon", plural: "Ballons", theme: "holidays" },
+  { emoji: "🎁", singular: "Geschenk", plural: "Geschenke", theme: "holidays" },
+  { emoji: "🕯️", singular: "Kerze", plural: "Kerzen", theme: "holidays" },
+  { emoji: "🥚", singular: "Osterei", plural: "Ostereier", theme: "holidays" },
   { emoji: "⭐", singular: "Stern", plural: "Sterne" },
-  { emoji: "🎈", singular: "Ballon", plural: "Ballons" },
-  { emoji: "🌼", singular: "Blume", plural: "Blumen" },
+];
+
+const colors: ColorWord[] = [
+  { word: "Rot", emoji: "🔴", color: "#ff4d5e", things: ["🍎", "🍓", "🍒", "🚒", "🐞", "🌹", "🍅", "❤️"] },
+  { word: "Blau", emoji: "🔵", color: "#3a86ff", things: ["🐳", "🫐", "🚙", "🦋", "💙", "🧢", "🐋", "💧"] },
+  { word: "Gelb", emoji: "🟡", color: "#ffd60a", things: ["🍌", "🌻", "🐥", "⭐", "🍋", "🚕", "🧀", "🌙"] },
+  { word: "Grün", emoji: "🟢", color: "#38b000", things: ["🐸", "🥒", "🥦", "🍀", "🦖", "🌲", "🐢", "🍏"] },
+  { word: "Lila", emoji: "🟣", color: "#9d4edd", things: ["🍇", "🍆", "🔮", "☂️", "💜", "🪻", "👾", "🦄"] },
+  { word: "Rosa", emoji: "🩷", color: "#ff8fc7", things: ["🐷", "🌸", "🦩", "🎀", "🍬", "🩰", "🐙", "💗"] },
+  { word: "Orange", emoji: "🟠", color: "#ff8c1a", things: ["🍊", "🥕", "🦊", "🎃", "🏀", "🦁", "🐯", "🧡"] },
+];
+
+// Short commands ("Hüpf!") the child can do along with the figure.
+const actions: ActionWord[] = [
+  { word: "Hüpf", emoji: "🐸", action: "hop" },
+  { word: "Lauf", emoji: "🏃", action: "run" },
+  { word: "Schlaf", emoji: "😴", action: "sleep" },
+  { word: "Tanz", emoji: "💃", action: "dance" },
+  { word: "Wink", emoji: "👋", action: "wave" },
+  { word: "Dreh", emoji: "🐱", action: "spin" },
+  { word: "Flieg", emoji: "🐦", action: "fly" },
+  { word: "Schwimm", emoji: "🐟", action: "swim" },
+  { word: "Klatsch", emoji: "👏", action: "clap" },
 ];
 
 /** German nouns ending in -e here are feminine ("eine Ente"); the rest take "ein". */
@@ -80,15 +131,27 @@ export const de: LanguagePack = {
     { id: "animals", label: "Tiere", emoji: "🐾" },
     { id: "vehicles", label: "Fahrzeuge", emoji: "🚗" },
     { id: "food", label: "Essen", emoji: "🍎" },
+    { id: "body", label: "Körper", emoji: "🖐️" },
+    { id: "clothes", label: "Kleidung", emoji: "👕" },
+    { id: "family", label: "Familie", emoji: "👪" },
+    { id: "music", label: "Musik", emoji: "🎵" },
+    { id: "nature", label: "Natur", emoji: "🌳" },
+    { id: "holidays", label: "Feste", emoji: "🎄" },
   ],
   letters,
   numberWords: ["null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun"],
   countables,
   zero: { emoji: "🪹", sentence: "Das Nest ist leer!" },
   letterSentence: (l, word) => `${l.spoken}, wie ${word.word}!`,
+  findPrompt: (l) => `Wo ist das ${l.spoken}?`,
+  keyboardRows: ["1234567890ß", "QWERTZUIOPÜ", "ASDFGHJKLÖÄ", "YXCVBNM"],
   countSentence: (n, thing) =>
     n === 1
       ? `${indefiniteArticle(thing.singular)} ${thing.singular}!`
       : `${de.numberWords[n]} ${thing.plural}!`,
   praise: ["Super!", "Toll!", "Prima!", "Juhu!", "Klasse!"],
+  firstLetterPrompt: (word) => `${word.word}! Womit fängt ${word.word} an?`,
+  colors,
+  actions,
+  joinIn: (word) => `${word.word} mit!`,
 };
