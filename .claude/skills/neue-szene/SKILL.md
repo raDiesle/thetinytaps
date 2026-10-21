@@ -62,6 +62,7 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   name: "der Traktor",           // with article
   sentences: ["Der Traktor tuckert los!", "Der Traktor ist rot."], // short, toddler German
   sound: "engine",               // SceneSound, synthesized in src/lib/sfx.ts
+  traits: ["red", "wheels"],     // for "Was ist rot?", "Was hat Räder?" – only clear cases
   key: "T",                      // optional wished key (big items: first letter)
   box: [x, y, w, h],             // bounds in the drawing's own coordinates
   hitAreas: [[...]],             // optional, when the box would cover other items
@@ -82,6 +83,16 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 - Keys are assigned in `src/games/scenes/keys.ts`: wished key → first letter → any
   free key (A–Z, 1–0); when keys run out, items share a key and take turns. Only
   set `key` for the most important items, so letters stay meaningful.
+- Traits (`SceneTrait`, questions in `src/games/scenes/quests.ts`): main colour
+  (red/yellow/blue/green, only if the item clearly is that colour), `flies`, `big`,
+  `small`, `animal`, `wheels`. No traits for plural names ("die Blumen"), the answer
+  is built as "<Name> ist rot!". A question is only asked with ≥ 2 answers.
+- Sound riddle: only distinctive sounds are asked (`RIDDLE_SOUNDS` in `quests.ts`);
+  every item with that sound counts as right, so give each item its most fitting sound.
+- Chain reactions: add 2–3 `chains` to the scene (`{ start, steps: [{ item, sentence }] }`),
+  little "wenn – dann" stories between items that are near each other or belong
+  together (Hund bellt → Katze erschrickt → Vogel fliegt weg). The steps use the
+  items' normal tap animations.
 - New sound? Add it to `SceneSound` (types.ts), `src/lib/sfx.ts` (built on
   `note()`) and the `SOUNDS` map in `ScenePlay.tsx`.
 
@@ -133,7 +144,9 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
    - `document.getAnimations()` is empty when nothing was tapped;
    - keys mode (trigger "⌨️ Jedes Ding hat eine Taste", "Tasten im Bild zeigen"):
      every item shows a badge on itself, badges don't overlap, the key triggers it;
-   - hover mode and find mode work; the hint ring sits on the item.
+   - hover mode and find mode work; the hint ring sits on the item;
+   - "Fragen" and "Geräusch-Rätsel" ask sensible questions; every chain plays through;
+   - "Ausmalen": everything starts grey and gets its colour when tapped.
 3. Screenshot the whole picture and look for items on one line, overlaps, empty
    areas and things that look flat; fix and check again.
 4. Update `README.md` (roadmap) and commit on a branch.
