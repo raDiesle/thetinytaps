@@ -3,7 +3,7 @@ export type BrushMinutes = "1" | "2" | "3";
 
 export interface TeethSettings {
   minutes: BrushMinutes;
-  /** Say where to brush next („Jetzt oben!“); the point of the game, so on by default. */
+  /** Say where to brush next and how; the point of the game, so on by default. */
   speech: boolean;
   /** Music while brushing, a poof for every monster, a chime when it is time to move on. */
   sounds: boolean;

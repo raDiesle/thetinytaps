@@ -537,7 +537,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "N-05",
         emoji: "🦷",
         title: "Zähneputz-Begleiter",
-        text: "2-Minuten-Timer: Ein Gebiss mit kleinen Zuckermonstern, die nach und nach verschwinden. Musik und Hinweise „Jetzt oben!“. Kein Tippen nötig.",
+        text: "2-Minuten-Timer: Ein Gebiss mit kleinen Zuckermonstern, die nach und nach verschwinden. Musik und Hinweise („Mund weit auf!“, „Zähne zusammenbeißen!“) in KAI-Reihenfolge, das Bild zeigt jeweils die richtige Ansicht. Kein Tippen nötig.",
         why: "Echter Alltagsnutzen für Eltern.",
         effort: "M",
         done: true,
