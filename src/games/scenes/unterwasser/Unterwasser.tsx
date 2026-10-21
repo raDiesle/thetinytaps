@@ -101,7 +101,7 @@ export const unterwasser: Scene = {
       sound: "honk",
       traits: ["red"],
       key: "B",
-      box: [-114, -140, 228, 178],
+      box: [-114, -152, 228, 190],
       place: BOAT,
       durationMs: 2200,
       Art: Boot,
