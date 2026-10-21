@@ -37,7 +37,7 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 ## Roadmap
 
 1. ~~Buchstaben & Zahlen (MVP)~~
-2. More options: letter sounds vs. names, themes (Tiere, Fahrzeuge, Baustelle), calm mode
-3. Own illustrations and recorded voice, offline (PWA)
+2. ~~Options: themes (Tiere, Fahrzeuge, Essen), announcement style, calm mode, uninterrupted counting~~
+3. Own illustrations and recorded voice (incl. letter sounds „b“ instead of „Be“), offline (PWA)
 4. Wörter tippen
 5. Wimmelbild Baustelle

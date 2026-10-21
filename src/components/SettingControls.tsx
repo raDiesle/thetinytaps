@@ -1,5 +1,7 @@
 "use client";
 
+import type { ReactNode } from "react";
+
 export function Toggle({
   label,
   checked,
@@ -44,5 +46,14 @@ export function Choice<T extends string>({
         </button>
       ))}
     </fieldset>
+  );
+}
+
+export function SettingsGroup({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="settings-group">
+      <h2>{title}</h2>
+      {children}
+    </div>
   );
 }

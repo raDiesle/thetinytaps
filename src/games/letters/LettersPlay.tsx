@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
-import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
+import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { LetterCard, NumberCard } from "./Cards";
 import type { LettersSettings } from "./settings";
@@ -12,6 +12,8 @@ import type { LettersSettings } from "./settings";
 const MIN_CHANGE_MS = 600;
 /** Time between counted items for number keys. */
 const COUNT_STEP_MS = 800;
+/** Extra time after the last counted item for the total to be spoken. */
+const COUNT_SUMMARY_MS = 1500;
 
 const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#fff0e0"];
 
@@ -29,6 +31,13 @@ function resolveKey(key: string, pack: LanguagePack): Target | null {
   return letter ? { kind: "letter", letter } : null;
 }
 
+/** Items matching the theme, or all items if none match (e.g. no animal starts with J). */
+function inTheme<T extends { theme?: string }>(items: T[], theme: LettersSettings["theme"]): T[] {
+  if (theme === "all") return items;
+  const matching = items.filter((item) => item.theme === theme);
+  return matching.length > 0 ? matching : items;
+}
+
 export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [shown, setShown] = useState<Shown | null>(null);
   const [counted, setCounted] = useState(0);
@@ -36,6 +45,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   const { bursts, spawn } = useBursts();
 
   const lastChange = useRef(0);
+  const countingUntil = useRef(0);
   const nextId = useRef(0);
   const wordIndex = useRef(new Map<string, number>());
   const lastThing = useRef<Countable | null>(null);
@@ -43,17 +53,19 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue });
+      if (settings.speech) speak(text, pack.speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
     },
-    [settings.speech, pack.speechLang],
+    [settings.speech, settings.calm, pack.speechLang],
   );
 
   const sentenceFor = useCallback(
     (s: Shown) => {
-      if (s.kind === "letter") return pack.letterSentence(s.letter, s.word);
-      return s.n === 0 ? pack.zero.sentence : pack.countSentence(s.n, s.thing);
+      if (s.kind === "number") return s.n === 0 ? pack.zero.sentence : pack.countSentence(s.n, s.thing);
+      if (settings.announce === "word") return `${s.word.word}!`;
+      if (settings.announce === "letter") return `${s.letter.spoken}!`;
+      return pack.letterSentence(s.letter, s.word);
     },
-    [pack],
+    [pack, settings.announce],
   );
 
   const funBurst = useCallback(
@@ -68,22 +80,24 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     (target: Target) => {
       countTimers.current.forEach(clearTimeout);
       countTimers.current = [];
+      countingUntil.current = 0;
       const id = nextId.current++;
       setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
 
       if (target.kind === "letter") {
         // Cycle through the letter's words so repeated presses stay interesting.
         const { letter } = target;
+        const words = inTheme(letter.words, settings.theme);
         const index = wordIndex.current.get(letter.upper) ?? 0;
         wordIndex.current.set(letter.upper, index + 1);
-        const next: Shown = { kind: "letter", id, letter, word: letter.words[index % letter.words.length] };
+        const next: Shown = { kind: "letter", id, letter, word: words[index % words.length] };
         setShown(next);
         if (settings.sounds) playChime();
         say(sentenceFor(next));
         return;
       }
 
-      const others = pack.countables.filter((c) => c !== lastThing.current);
+      const others = inTheme(pack.countables, settings.theme).filter((c) => c !== lastThing.current);
       const thing = others[Math.floor(Math.random() * others.length)];
       lastThing.current = thing;
       const next: Shown = { kind: "number", id, n: target.n, thing };
@@ -95,6 +109,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         return;
       }
       // Pop the items in one by one while counting aloud, then say the total.
+      countingUntil.current = performance.now() + target.n * COUNT_STEP_MS + COUNT_SUMMARY_MS;
       for (let i = 0; i < target.n; i++) {
         countTimers.current.push(
           setTimeout(() => {
@@ -106,7 +121,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       }
       countTimers.current.push(setTimeout(() => say(sentenceFor(next), true), target.n * COUNT_STEP_MS));
     },
-    [pack, say, sentenceFor, settings.sounds],
+    [pack, say, sentenceFor, settings.sounds, settings.theme],
   );
 
   useEffect(() => {
@@ -115,7 +130,8 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       if (e.repeat) return;
       const target = resolveKey(e.key, pack);
       const now = performance.now();
-      if (!target || now - lastChange.current < MIN_CHANGE_MS) {
+      const counting = settings.finishCounting && now < countingUntil.current;
+      if (!target || counting || now - lastChange.current < MIN_CHANGE_MS) {
         funBurst();
         return;
       }
@@ -124,19 +140,27 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pack, show, funBurst]);
+  }, [pack, show, funBurst, settings.finishCounting]);
 
   useEffect(() => () => countTimers.current.forEach(clearTimeout), []);
+
+  useEffect(() => {
+    setSfxVolume(settings.calm ? 0.4 : 1);
+  }, [settings.calm]);
 
   // Tapping the card repeats what it says; tapping elsewhere makes shapes.
   const repeat = (e: PointerEvent) => {
     e.stopPropagation();
-    if (shown) say(sentenceFor(shown));
+    const counting = settings.finishCounting && performance.now() < countingUntil.current;
+    if (shown && !counting) say(sentenceFor(shown));
     funBurst(e.clientX, e.clientY);
   };
 
   return (
-    <div className="letters-play" style={{ background }} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div
+      className={`letters-play${settings.calm ? " calm" : ""}`}
+      style={{ background }}       onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
+    >
       {shown === null && <p className="letters-welcome">Drück eine Taste! ⌨️</p>}
       {shown?.kind === "letter" && (
         <LetterCard key={shown.id} letter={shown.letter} word={shown.word} settings={settings} onPointerDown={repeat} />

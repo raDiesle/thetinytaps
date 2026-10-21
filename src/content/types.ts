@@ -1,3 +1,12 @@
+/** Language-independent theme ids; labels live in the language pack. */
+export type ThemeId = "animals" | "vehicles" | "food";
+
+export interface Theme {
+  id: ThemeId;
+  label: string;
+  emoji: string;
+}
+
 /** A word that starts with a given letter, with its picture. */
 export interface WordEntry {
   word: string;
@@ -5,6 +14,7 @@ export interface WordEntry {
   emoji: string;
   /** Optional illustration in /public, used instead of the emoji. */
   image?: string;
+  theme?: ThemeId;
 }
 
 export interface LetterEntry {
@@ -23,11 +33,13 @@ export interface Countable {
   emoji: string;
   singular: string;
   plural: string;
+  theme?: ThemeId;
 }
 
 export interface LanguagePack {
   /** BCP-47 tag used for speech synthesis, e.g. "de-DE". */
   speechLang: string;
+  themes: Theme[];
   letters: LetterEntry[];
   /** Spoken number words for 0–9. */
   numberWords: string[];

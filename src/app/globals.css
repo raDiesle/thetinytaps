@@ -115,21 +115,40 @@ a.game-card:hover {
 }
 
 .back-link {
-  position: absolute;
-  top: 20px;
-  left: 24px;
+  align-self: flex-start;
   color: inherit;
 }
 
 .settings {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 16px;
+  gap: 20px;
+  max-width: 640px;
   padding: 24px 28px;
   border-radius: 24px;
   background: #fff;
   font-size: 1.15rem;
+  text-align: left;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.settings-group + .settings-group {
+  padding-top: 20px;
+  border-top: 2px dashed #0000001a;
+}
+
+.settings-group h2 {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
 }
 
 .toggle {
@@ -180,6 +199,7 @@ a.game-card:hover {
 
 .choice {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   margin: 0;
@@ -419,6 +439,34 @@ a.game-card:hover {
   100% {
     opacity: 0;
     transform: translateY(-120px) scale(0.9) rotate(calc(var(--rotate) * 2));
+  }
+}
+
+/* Calm mode: no wiggling or bouncing, softer shapes, slower colour changes. */
+.letters-play.calm {
+  transition-duration: 1.2s;
+}
+
+.calm .picture {
+  animation: none;
+}
+
+.calm .card,
+.calm .count-item.visible {
+  animation: fade-in 0.7s ease-out;
+}
+
+.calm .burst-layer {
+  opacity: 0.45;
+}
+
+.calm .burst {
+  animation-duration: calc(var(--lifetime) * 1.6);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
   }
 }
 

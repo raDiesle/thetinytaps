@@ -4,11 +4,17 @@
 const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66, 1318.51];
 
 let ctx: AudioContext | null = null;
+let masterVolume = 1;
 
 function audio(): AudioContext | null {
   if (typeof window === "undefined" || !("AudioContext" in window)) return null;
   ctx ??= new AudioContext();
   return ctx;
+}
+
+/** Scales all effects, e.g. 0.4 for calm mode. */
+export function setSfxVolume(volume: number) {
+  masterVolume = volume;
 }
 
 /** Must be called from a user gesture so the browser allows audio. */
@@ -25,7 +31,7 @@ function tone(freq: number, duration: number, type: OscillatorType, volume: numb
   osc.type = type;
   osc.frequency.value = freq;
   gain.gain.setValueAtTime(0, now);
-  gain.gain.linearRampToValueAtTime(volume, now + 0.01);
+  gain.gain.linearRampToValueAtTime(volume * masterVolume, now + 0.01);
   gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
   osc.connect(gain).connect(ac.destination);
   osc.start(now);

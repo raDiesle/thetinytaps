@@ -25,14 +25,14 @@ function pickVoice(lang: string): SpeechSynthesisVoice | null {
  * Speak `text`. By default anything still being spoken is cut off, so the
  * voice always matches what is on screen; pass `queue` to append instead.
  */
-export function speak(text: string, lang: string, { queue = false } = {}) {
+export function speak(text: string, lang: string, { queue = false, rate = 0.85 } = {}) {
   if (!supported()) return;
   const synth = window.speechSynthesis;
   if (!queue) synth.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = lang;
   utterance.voice = pickVoice(lang);
-  utterance.rate = 0.85;
+  utterance.rate = rate;
   utterance.pitch = 1.1;
   synth.speak(utterance);
 }
