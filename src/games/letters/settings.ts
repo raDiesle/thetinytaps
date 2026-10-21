@@ -19,6 +19,8 @@ export interface LettersSettings {
   letterCase: LetterCase;
   /** With "A a": the big letter holds the small one by the hand, both with eyes. */
   letterFamily: boolean;
+  /** The letter as big dots to trace with a finger or the mouse; stars appear along the way. */
+  trace: boolean;
   /** Show the word under the picture, with its first letter highlighted. */
   showWord: boolean;
   /** Speak letters/words and count numbers aloud. */
@@ -45,6 +47,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   hints: true,
   letterCase: "upper",
   letterFamily: true,
+  trace: false,
   showWord: true,
   speech: false,
   announce: "letterAndWord",

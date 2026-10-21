@@ -141,6 +141,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Großer Buchstabe aus Punkten; mit dem Finger oder der Maus darüberfahren lässt Sterne entlang der Linie erscheinen. Keine Bewertung, nur Spaß.",
         why: "Vorbereitung aufs Schreiben, Feinmotorik.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-12",
@@ -149,6 +150,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Weitere Bildthemen neben Tiere/Fahrzeuge/Essen: Körper, Kleidung, Familie, Musik, Natur, Weihnachten/Ostern.",
         why: "Wenig Aufwand (nur Inhalte in de.ts), viel Abwechslung.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-13",

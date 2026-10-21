@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent, type PointerEventHandle
 import { Picture } from "@/components/Picture";
 import type { Countable, LetterEntry, WordEntry } from "@/content/types";
 import type { LettersSettings } from "./settings";
+import { TraceGlyphs } from "./TraceGlyphs";
 
 /** Item counts per row, arranged so small numbers are easy to count at a glance. */
 const ROWS: Record<number, number[]> = {
@@ -57,7 +58,9 @@ export function LetterCard({
 
   return (
     <div className="card" onPointerDown={onPointerDown}>
-      {settings.letterCase === "both" && settings.letterFamily ? (
+      {settings.trace ? (
+        <TraceGlyphs glyphs={glyphs} sounds={settings.sounds} />
+      ) : settings.letterCase === "both" && settings.letterFamily ? (
         <LetterFamily letter={letter} />
       ) : (
         <div className="glyphs">
@@ -136,6 +139,7 @@ export function NumberCard({
   stage,
   hint,
   tapped,
+  trace,
   onItemPointer,
   onPointerDown,
 }: {
@@ -150,6 +154,8 @@ export function NumberCard({
    * been tapped, in order. Each tapped item keeps its number.
    */
   tapped?: number[];
+  /** Show the digit as dots to trace, with stars; `sounds` plays notes while tracing. */
+  trace?: { sounds: boolean };
   onItemPointer?: (index: number, e: PointerEvent) => void;
   onPointerDown?: PointerEventHandler;
 }) {
@@ -193,9 +199,13 @@ export function NumberCard({
         </div>
       )}
       <Reveal visible={stage > n} hint={hint}>
-        <div className="glyphs">
-          <span>{n}</span>
-        </div>
+        {trace ? (
+          <TraceGlyphs glyphs={[String(n)]} sounds={trace.sounds} />
+        ) : (
+          <div className="glyphs">
+            <span>{n}</span>
+          </div>
+        )}
       </Reveal>
     </div>
   );

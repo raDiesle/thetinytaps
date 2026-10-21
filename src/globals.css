@@ -1085,6 +1085,24 @@ kbd {
   transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Tracing: the letter as dots on a canvas, stars wherever the finger has been. See TraceGlyphs. */
+.glyphs.trace {
+  position: relative;
+  display: block;
+}
+
+.glyphs.trace canvas {
+  display: block;
+}
+
+.trace-star {
+  position: absolute;
+  translate: -50% -50%;
+  rotate: var(--rotate);
+  pointer-events: none;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
 /* "A a" as mother and baby, holding hands. */
 .glyphs.family {
   gap: 0;
@@ -1887,7 +1905,8 @@ kbd {
   animation: none;
 }
 
-.calm .count-badge {
+.calm .count-badge,
+.calm .trace-star {
   animation: fade-in 0.7s ease-out;
 }
 

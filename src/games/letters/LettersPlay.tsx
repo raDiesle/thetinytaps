@@ -416,6 +416,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
               stage={stage}
               hint={settings.stepByStep || byTap(shown)}
               tapped={byTap(shown) ? tapped : undefined}
+              trace={settings.trace ? { sounds: settings.sounds } : undefined}
               onItemPointer={onItemPointer}
               onPointerDown={onCardPointer}
             />

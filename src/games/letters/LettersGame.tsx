@@ -58,7 +58,14 @@ export function LettersGame() {
                 { value: "lower", label: "a" },
               ]}
             />
-            {settings.letterCase === "both" && settings.mode === "free" && (
+            {settings.mode === "free" && (
+              <Toggle
+                label="Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen"
+                checked={settings.trace}
+                onChange={(trace) => update({ trace })}
+              />
+            )}
+            {settings.letterCase === "both" && settings.mode === "free" && !settings.trace && (
               <Toggle
                 label="Mama- und Baby-Buchstabe (mit Augen, an der Hand)"
                 checked={settings.letterFamily}

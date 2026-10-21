@@ -1,5 +1,5 @@
 /** Language-independent theme ids; labels live in the language pack. */
-export type ThemeId = "animals" | "vehicles" | "food";
+export type ThemeId = "animals" | "vehicles" | "food" | "body" | "clothes" | "family" | "music" | "nature" | "holidays";
 
 export interface Theme {
   id: ThemeId;
