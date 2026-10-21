@@ -6,7 +6,7 @@ import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 
-const EXIT_HOLD_MS = 2000;
+const EXIT_HOLD_MS = 1000;
 
 interface GameShellProps {
   title: string;
@@ -91,7 +91,7 @@ export function GameShell({ title, emoji, speechLang, settings, children }: Game
         Los geht&apos;s!
       </button>
       <p className="hint">
-        Zum Beenden die Taste <kbd>Esc</kbd> oder den Knopf oben rechts 2&nbsp;Sekunden gedrückt halten.
+        Zum Beenden die Taste <kbd>Esc</kbd> oder den Knopf oben rechts 1&nbsp;Sekunde gedrückt halten.
       </p>
     </main>
   );

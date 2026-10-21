@@ -30,7 +30,7 @@ To add a picture that has no emoji, put an SVG in `public/images/` and set
 
 ## Leaving the game
 
-Hold **Esc** or the ✕ button (top right) for 2 seconds. In Chrome/Edge the
+Hold **Esc** or the ✕ button (top right) for 1 second. In Chrome/Edge the
 keyboard is locked in fullscreen, so shortcuts like Cmd+W are captured;
 Cmd+Q / Cmd+Tab can't be blocked by any website.
 

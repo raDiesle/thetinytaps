@@ -84,7 +84,7 @@ export const de: LanguagePack = {
   letters,
   numberWords: ["null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun"],
   countables,
-  zero: { emoji: "🪹", sentence: "Null. Das Nest ist leer!" },
+  zero: { emoji: "🪹", sentence: "Das Nest ist leer!" },
   letterSentence: (l, word) => `${l.spoken}, wie ${word.word}!`,
   countSentence: (n, thing) =>
     n === 1

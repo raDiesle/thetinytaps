@@ -18,7 +18,9 @@ export interface LettersSettings {
   sounds: boolean;
   /** Quieter sounds, no wiggling, softer shapes. */
   calm: boolean;
-  /** Ignore new letters/numbers until counting has finished. */
+  /** Reveal letter → word → picture and number items one click at a time. */
+  stepByStep: boolean;
+  /** Automatic mode only: ignore new letters/numbers until counting has finished. */
   finishCounting: boolean;
 }
 
@@ -30,6 +32,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   theme: "all",
   sounds: true,
   calm: false,
+  stepByStep: true,
   finishCounting: true,
 };
 

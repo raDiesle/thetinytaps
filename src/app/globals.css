@@ -358,20 +358,19 @@ a.game-card:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1vh;
+  gap: max(1.5vh, 14px);
 }
 
 .count-row {
   display: flex;
-  gap: 2vw;
+  gap: max(2vw, 14px);
 }
 
 .count-item {
+  display: block;
   font-family: var(--font-emoji);
   font-size: min(14vh, 16vw);
   line-height: 1.1;
-  opacity: 0;
-  transform: scale(0);
 }
 
 .count-1 .count-item,
@@ -380,10 +379,30 @@ a.game-card:hover {
   font-size: min(22vh, 24vw);
 }
 
-.count-item.visible {
-  opacity: 1;
-  transform: scale(1);
-  animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* Parts that appear later keep their space; see Reveal in Cards.tsx. */
+.reveal {
+  border-radius: 24px;
+}
+
+.reveal:not(.shown) > * {
+  visibility: hidden;
+}
+
+.reveal.shown {
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reveal.waiting {
+  outline: 4px dashed #2b2d4230;
+  outline-offset: 2px;
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+@keyframes waiting {
+  50% {
+    outline-color: #2b2d4260;
+    transform: scale(1.03);
+  }
 }
 
 .burst-layer {
@@ -452,8 +471,12 @@ a.game-card:hover {
 }
 
 .calm .card,
-.calm .count-item.visible {
+.calm .reveal.shown {
   animation: fade-in 0.7s ease-out;
+}
+
+.calm .reveal.waiting {
+  animation: none;
 }
 
 .calm .burst-layer {

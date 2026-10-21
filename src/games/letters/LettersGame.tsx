@@ -61,15 +61,22 @@ export function LettersGame() {
 
           <SettingsGroup title="Verhalten">
             <Toggle
+              label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
+              checked={settings.stepByStep}
+              onChange={(stepByStep) => update({ stepByStep })}
+            />
+            <Toggle
               label="Ruhiger Modus (leiser, weniger Bewegung)"
               checked={settings.calm}
               onChange={(calm) => update({ calm })}
             />
-            <Toggle
-              label="Zählen nicht unterbrechen"
-              checked={settings.finishCounting}
-              onChange={(finishCounting) => update({ finishCounting })}
-            />
+            {!settings.stepByStep && (
+              <Toggle
+                label="Zählen nicht unterbrechen"
+                checked={settings.finishCounting}
+                onChange={(finishCounting) => update({ finishCounting })}
+              />
+            )}
           </SettingsGroup>
         </>
       }

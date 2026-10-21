@@ -5,12 +5,14 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { LetterCard, NumberCard } from "./Cards";
+import { LetterCard, NumberCard, letterParts } from "./Cards";
 import type { LettersSettings } from "./settings";
 
 /** Presses closer together than this only spawn shapes, so mashing doesn't strobe. */
 const MIN_CHANGE_MS = 600;
-/** Time between counted items for number keys. */
+/** Minimum time between two "next" clicks in step-by-step mode. */
+const MIN_ADVANCE_MS = 350;
+/** Time between counted items when counting automatically. */
 const COUNT_STEP_MS = 800;
 /** Extra time after the last counted item for the total to be spoken. */
 const COUNT_SUMMARY_MS = 1500;
@@ -31,6 +33,12 @@ function resolveKey(key: string, pack: LanguagePack): Target | null {
   return letter ? { kind: "letter", letter } : null;
 }
 
+function isSame(target: Target | null, shown: Shown) {
+  if (target?.kind === "letter" && shown.kind === "letter") return target.letter === shown.letter;
+  if (target?.kind === "number" && shown.kind === "number") return target.n === shown.n;
+  return false;
+}
+
 /** Items matching the theme, or all items if none match (e.g. no animal starts with J). */
 function inTheme<T extends { theme?: string }>(items: T[], theme: LettersSettings["theme"]): T[] {
   if (theme === "all") return items;
@@ -38,9 +46,16 @@ function inTheme<T extends { theme?: string }>(items: T[], theme: LettersSetting
   return matching.length > 0 ? matching : items;
 }
 
+// Stages: a letter reveals its parts one by one (see letterParts). A number
+// reveals one item per stage (stage k shows k items); the stage after the
+// last item shows the digit. Zero starts with the empty nest at stage 0.
+const firstStage = (s: Shown) => (s.kind === "letter" ? 0 : Math.min(1, s.n));
+const lastStage = (s: Shown, showWord: boolean) =>
+  s.kind === "letter" ? letterParts(showWord).length - 1 : s.n + 1;
+
 export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [shown, setShown] = useState<Shown | null>(null);
-  const [counted, setCounted] = useState(0);
+  const [stage, setStage] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
   const { bursts, spawn } = useBursts();
 
@@ -58,14 +73,36 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     [settings.speech, settings.calm, pack.speechLang],
   );
 
+  /** The full sentence for a fully revealed letter or number. */
   const sentenceFor = useCallback(
     (s: Shown) => {
-      if (s.kind === "number") return s.n === 0 ? pack.zero.sentence : pack.countSentence(s.n, s.thing);
+      if (s.kind === "number") return s.n === 0 ? `${pack.numberWords[0]}!` : pack.countSentence(s.n, s.thing);
       if (settings.announce === "word") return `${s.word.word}!`;
       if (settings.announce === "letter") return `${s.letter.spoken}!`;
       return pack.letterSentence(s.letter, s.word);
     },
     [pack, settings.announce],
+  );
+
+  /** Speak and play the sound for reaching `stage`. */
+  const announce = useCallback(
+    (s: Shown, stage: number, queue = false) => {
+      const sound = (play: () => void) => settings.sounds && play();
+      if (stage === lastStage(s, settings.showWord)) {
+        sound(playChime);
+        say(sentenceFor(s), queue);
+      } else if (s.kind === "letter") {
+        const part = letterParts(settings.showWord)[stage];
+        sound(() => (stage === 0 ? playChime() : playCountNote(stage)));
+        say(part === "letter" ? `${s.letter.spoken}!` : `${s.word.word}!`, queue);
+      } else if (stage === 0) {
+        say(pack.zero.sentence, queue);
+      } else {
+        sound(() => playCountNote(stage - 1));
+        say(pack.numberWords[stage], queue);
+      }
+    },
+    [pack, say, sentenceFor, settings.sounds, settings.showWord],
   );
 
   const funBurst = useCallback(
@@ -76,59 +113,107 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     [spawn, settings.sounds],
   );
 
-  const show = useCallback(
-    (target: Target) => {
+  // Cycle through the letter's words so repeated presses stay interesting.
+  const pickWord = useCallback(
+    (letter: LetterEntry) => {
+      const words = inTheme(letter.words, settings.theme);
+      const index = wordIndex.current.get(letter.upper) ?? 0;
+      wordIndex.current.set(letter.upper, index + 1);
+      return words[index % words.length];
+    },
+    [settings.theme],
+  );
+
+  const pickThing = useCallback(() => {
+    const others = inTheme(pack.countables, settings.theme).filter((c) => c !== lastThing.current);
+    lastThing.current = others[Math.floor(Math.random() * others.length)];
+    return lastThing.current;
+  }, [pack, settings.theme]);
+
+  /** Show `next` from stage `from`, either waiting for clicks or running through the stages on its own. */
+  const present = useCallback(
+    (next: Shown, from: number) => {
       countTimers.current.forEach(clearTimeout);
       countTimers.current = [];
       countingUntil.current = 0;
-      const id = nextId.current++;
-      setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
-
-      if (target.kind === "letter") {
-        // Cycle through the letter's words so repeated presses stay interesting.
-        const { letter } = target;
-        const words = inTheme(letter.words, settings.theme);
-        const index = wordIndex.current.get(letter.upper) ?? 0;
-        wordIndex.current.set(letter.upper, index + 1);
-        const next: Shown = { kind: "letter", id, letter, word: words[index % words.length] };
-        setShown(next);
-        if (settings.sounds) playChime();
-        say(sentenceFor(next));
-        return;
-      }
-
-      const others = inTheme(pack.countables, settings.theme).filter((c) => c !== lastThing.current);
-      const thing = others[Math.floor(Math.random() * others.length)];
-      lastThing.current = thing;
-      const next: Shown = { kind: "number", id, n: target.n, thing };
+      setBackground(BACKGROUNDS[next.id % BACKGROUNDS.length]);
       setShown(next);
-      setCounted(0);
 
-      if (target.n === 0) {
-        say(pack.zero.sentence);
+      if (settings.stepByStep) {
+        setStage(from);
+        announce(next, from);
         return;
       }
-      // Pop the items in one by one while counting aloud, then say the total.
-      countingUntil.current = performance.now() + target.n * COUNT_STEP_MS + COUNT_SUMMARY_MS;
-      for (let i = 0; i < target.n; i++) {
+      const last = lastStage(next, settings.showWord);
+      if (next.kind === "letter") {
+        setStage(last);
+        announce(next, last);
+        return;
+      }
+      // Pop the items in one by one while counting aloud, then show the digit.
+      setStage(from);
+      announce(next, from);
+      for (let k = from + 1; k <= last; k++) {
         countTimers.current.push(
           setTimeout(() => {
-            setCounted(i + 1);
-            if (settings.sounds) playCountNote(i);
-            say(pack.numberWords[i + 1], i > 0);
-          }, i * COUNT_STEP_MS),
+            setStage(k);
+            announce(next, k, true);
+          }, (k - from) * COUNT_STEP_MS),
         );
       }
-      countTimers.current.push(setTimeout(() => say(sentenceFor(next), true), target.n * COUNT_STEP_MS));
+      countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + COUNT_SUMMARY_MS;
     },
-    [pack, say, sentenceFor, settings.sounds, settings.theme],
+    [announce, settings.stepByStep, settings.showWord],
   );
+
+  const show = useCallback(
+    (target: Target) => {
+      const id = nextId.current++;
+      const next: Shown =
+        target.kind === "letter"
+          ? { kind: "letter", id, letter: target.letter, word: pickWord(target.letter) }
+          : { kind: "number", id, n: target.n, thing: pickThing() };
+      present(next, firstStage(next));
+    },
+    [pickWord, pickThing, present],
+  );
+
+  /** Step-by-step: reveal the next part; once everything is shown, start a new word / new things. */
+  const advance = useCallback(() => {
+    if (!shown) return;
+    if (stage < lastStage(shown, settings.showWord)) {
+      setStage(stage + 1);
+      announce(shown, stage + 1);
+      return;
+    }
+    const id = nextId.current++;
+    if (shown.kind === "letter") {
+      present({ ...shown, id, word: pickWord(shown.letter) }, 1);
+    } else {
+      const next: Shown = { ...shown, id, thing: pickThing() };
+      present(next, firstStage(next));
+    }
+  }, [shown, stage, settings.showWord, announce, present, pickWord, pickThing]);
+
+  /** Advance unless the last advance was too recent. */
+  const tryAdvance = useCallback(() => {
+    const now = performance.now();
+    if (now - lastChange.current < MIN_ADVANCE_MS) return false;
+    lastChange.current = now;
+    advance();
+    return true;
+  }, [advance]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
       if (e.repeat) return;
       const target = resolveKey(e.key, pack);
+      const isNextKey = e.key === " " || e.key === "Enter" || (shown !== null && isSame(target, shown));
+      if (settings.stepByStep && shown && isNextKey) {
+        if (!tryAdvance()) funBurst();
+        return;
+      }
       const now = performance.now();
       const counting = settings.finishCounting && now < countingUntil.current;
       if (!target || counting || now - lastChange.current < MIN_CHANGE_MS) {
@@ -140,7 +225,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pack, show, funBurst, settings.finishCounting]);
+  }, [pack, shown, show, tryAdvance, funBurst, settings.stepByStep, settings.finishCounting]);
 
   useEffect(() => () => countTimers.current.forEach(clearTimeout), []);
 
@@ -148,22 +233,36 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     setSfxVolume(settings.calm ? 0.4 : 1);
   }, [settings.calm]);
 
-  // Tapping the card repeats what it says; tapping elsewhere makes shapes.
+  // Step-by-step: any click reveals the next part. Otherwise tapping the card
+  // repeats what it says, and tapping elsewhere makes shapes.
+  const onPlayAreaPointer = (e: PointerEvent) => {
+    if (settings.stepByStep && shown && tryAdvance()) return;
+    funBurst(e.clientX, e.clientY);
+  };
   const repeat = (e: PointerEvent) => {
     e.stopPropagation();
     const counting = settings.finishCounting && performance.now() < countingUntil.current;
     if (shown && !counting) say(sentenceFor(shown));
     funBurst(e.clientX, e.clientY);
   };
+  const onCardPointer = settings.stepByStep ? undefined : repeat;
 
   return (
     <div
       className={`letters-play${settings.calm ? " calm" : ""}`}
-      style={{ background }}       onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
+      style={{ background }}
+      onPointerDown={onPlayAreaPointer}
     >
       {shown === null && <p className="letters-welcome">Drück eine Taste! ⌨️</p>}
       {shown?.kind === "letter" && (
-        <LetterCard key={shown.id} letter={shown.letter} word={shown.word} settings={settings} onPointerDown={repeat} />
+        <LetterCard
+          key={shown.id}
+          letter={shown.letter}
+          word={shown.word}
+          stage={stage}
+          settings={settings}
+          onPointerDown={onCardPointer}
+        />
       )}
       {shown?.kind === "number" && (
         <NumberCard
@@ -171,8 +270,9 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
           n={shown.n}
           thing={shown.thing}
           zeroEmoji={pack.zero.emoji}
-          counted={counted}
-          onPointerDown={repeat}
+          stage={stage}
+          hint={settings.stepByStep}
+          onPointerDown={onCardPointer}
         />
       )}
       <BurstLayer bursts={bursts} />

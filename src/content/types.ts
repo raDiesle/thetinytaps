@@ -44,7 +44,7 @@ export interface LanguagePack {
   /** Spoken number words for 0–9. */
   numberWords: string[];
   countables: Countable[];
-  /** Shown for 0. */
+  /** Shown for 0; the sentence is spoken when the empty picture appears. */
   zero: { emoji: string; sentence: string };
   /** "A wie Affe" */
   letterSentence: (letter: LetterEntry, word: WordEntry) => string;
