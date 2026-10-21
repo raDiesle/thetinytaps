@@ -1,0 +1,1913 @@
+/* Animations of the Feuerwache scene. Durations match durationMs in Feuerwache.tsx. Sun and cloud: ../sky.css. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .fw-cloud {
+  animation: fw-drift 26s ease-in-out infinite alternate;
+}
+
+.scene.lively .fw-cloud-slow {
+  animation-duration: 40s;
+}
+
+.scene.lively .fw-heli-rotor {
+  animation: fw-rotor 0.2s linear infinite alternate;
+}
+
+.scene.lively .fw-fahne-cloth {
+  animation: fw-wave-flag 1.4s ease-in-out infinite alternate;
+}
+
+.scene.lively .fw-hund-tail {
+  animation: fw-wag 0.6s ease-in-out infinite alternate;
+}
+
+.scene.lively .fw-katze-tail {
+  animation: fw-wag 2.4s ease-in-out infinite alternate;
+}
+
+.scene.lively .fw-falter-wings {
+  animation: fw-flap 0.35s ease-in-out infinite alternate;
+}
+
+.scene.lively .fw-turm-hose {
+  animation: fw-sway 3s ease-in-out calc(var(--i) * 0.4s) infinite alternate;
+}
+
+.scene.lively .fw-grill-smoke circle {
+  animation: fw-smoke 3s ease-out calc(var(--i) * 1s) infinite;
+}
+
+/* Lights, puffs, drops and sound lines are hidden until their animation shows them, and can't be tapped meanwhile. */
+.fw-sirene-waves > g,
+.fw-sirene-lamp,
+.fw-roof-glow,
+.fw-roof-light,
+.fw-wache-light,
+.fw-tor-glow,
+.fw-tor-light,
+.fw-tor-lamp,
+.fw-helme-glow,
+.fw-helme-sparkle,
+.fw-pole-lamp,
+.fw-glocke-ring path,
+.fw-taube-coo > g,
+.fw-vogel-notes > g,
+.fw-baum-leaves ellipse,
+.fw-katze-lids,
+.fw-katze-meow,
+.fw-elw-glow,
+.fw-elw-light,
+.fw-elw-beam,
+.fw-elw-toot path,
+.fw-hydrant-water circle,
+.fw-ambu-glow,
+.fw-ambu-light,
+.fw-grill-smoke circle,
+.fw-grill-glow,
+.fw-truck-glow,
+.fw-truck-light,
+.fw-truck-beam,
+.fw-truck-toot path,
+.fw-frau-jet,
+.fw-frau-jet-core,
+.fw-frau-splash circle,
+.fw-mann-cheeks,
+.fw-mann-whistle,
+.fw-mann-toot path,
+.fw-hund-tongue,
+.fw-hund-bark,
+.fw-kind-hearts path,
+.fw-loescher-foam circle,
+.fw-bobby-glow,
+.fw-bobby-light,
+.fw-bobby-toot path,
+.fw-ente-ripples ellipse,
+.fw-ente-quack,
+.fw-ente-drops circle,
+.fw-reel-drops circle,
+.fw-heli-drops ellipse,
+.fw-schnecke-hearts {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Parts that turn or grow around their own middle. */
+.fw-sirene-waves > g,
+.fw-sirene-lamp,
+.fw-roof-glow,
+.fw-tor-glow,
+.fw-tor-lamp,
+.fw-helme-sparkle,
+.fw-helme-helmet,
+.fw-helme-boot,
+.fw-pole-lamp,
+.fw-glocke-ring path,
+.fw-taube-coo > g,
+.fw-vogel-notes > g,
+.fw-baum-leaves ellipse,
+.fw-katze-meow,
+.fw-hoernchen-nut,
+.fw-elw-glow,
+.fw-elw-beam,
+.fw-elw-toot path,
+.fw-hydrant-water circle,
+.fw-ambu-glow,
+.fw-grill-smoke circle,
+.fw-grill-sausage,
+.fw-grill-glow,
+.fw-truck-glow,
+.fw-truck-beam,
+.fw-truck-toot path,
+.fw-frau-splash circle,
+.fw-mann-cheeks circle,
+.fw-mann-whistle,
+.fw-mann-toot path,
+.fw-hund-bark,
+.fw-kind-hearts path,
+.fw-loescher-foam circle,
+.fw-bobby-glow,
+.fw-bobby-toot path,
+.fw-ente-ripples ellipse,
+.fw-ente-quack,
+.fw-ente-drops circle,
+.fw-reel-drops circle,
+.fw-heli-drops ellipse,
+.fw-schnecke-hearts {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The firefighters in the upper windows wait below the sill (hidden by the window) until they peek out. */
+.fw-wache-peek {
+  transform: translateY(80px);
+}
+
+/* ---------- Shared keyframes ---------- */
+
+@keyframes fw-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes fw-rotor {
+  to {
+    transform: scaleX(0.15);
+  }
+}
+
+@keyframes fw-wave-flag {
+  to {
+    transform: scaleX(0.85) skewY(5deg);
+  }
+}
+
+@keyframes fw-wag {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes fw-flap {
+  to {
+    transform: scaleX(0.3);
+  }
+}
+
+@keyframes fw-sway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes fw-smoke {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.4);
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-90px) scale(1.4);
+  }
+}
+
+/* A light that goes on and stays on for most of the animation. */
+@keyframes fw-light {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+}
+
+/* A glow that grows and fades. */
+@keyframes fw-glow {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.3);
+  }
+}
+
+/* A blue light that flashes; used with several repeats. */
+@keyframes fw-blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes fw-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes fw-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes fw-nod {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(3px) rotate(-4deg);
+  }
+}
+
+@keyframes fw-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-28deg);
+  }
+}
+
+@keyframes fw-roll {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes fw-toot {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes fw-notes {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(16px, -34px);
+  }
+}
+
+@keyframes fw-heart {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.4);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+}
+
+@keyframes fw-blinklids {
+  0%,
+  30%,
+  42%,
+  100% {
+    opacity: 0;
+  }
+  34%,
+  38% {
+    opacity: 1;
+  }
+}
+
+@keyframes fw-drops-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+}
+
+/* ---------- Hubschrauber: the rotor whirls, it bobs, the bucket swings and drips ---------- */
+
+.item-hubschrauber.playing .fw-heli-rotor {
+  animation: fw-rotor 0.12s linear 21 alternate;
+}
+
+.item-hubschrauber.playing .fw-heli-tail {
+  animation: fw-heli-tail 0.16s linear 16;
+}
+
+.item-hubschrauber.playing .fw-heli-body {
+  animation: fw-heli-bob 2.6s ease-in-out;
+}
+
+.item-hubschrauber.playing .fw-heli-swing {
+  animation: fw-heli-swing 2.6s ease-in-out;
+}
+
+.item-hubschrauber.playing .fw-heli-drops ellipse {
+  animation: fw-drops-fall 0.6s ease-in calc(1s + var(--i) * 0.15s) 2;
+}
+
+.item-hubschrauber.playing .fw-heli-pilot {
+  animation: fw-nod 0.65s ease-in-out 4;
+}
+
+@keyframes fw-heli-tail {
+  50% {
+    transform: scaleY(0.2);
+  }
+}
+
+@keyframes fw-heli-bob {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  30% {
+    transform: translate(-20px, -16px) rotate(-5deg);
+  }
+  65% {
+    transform: translate(14px, 6px) rotate(3deg);
+  }
+}
+
+@keyframes fw-heli-swing {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  30% {
+    transform: translate(-20px, -16px) rotate(10deg);
+  }
+  65% {
+    transform: translate(14px, 6px) rotate(-12deg);
+  }
+  85% {
+    transform: rotate(5deg);
+  }
+}
+
+/* ---------- Schlauchturm: the hoses swing, the lights go on, the door opens ---------- */
+
+.item-turm.playing .fw-turm-hose {
+  animation: fw-hose-swing 0.7s ease-in-out calc(var(--i) * 0.1s) 3;
+}
+
+.item-turm.playing .fw-turm-light {
+  animation: fw-light 2s ease-in-out calc(var(--i) * 0.3s);
+}
+
+.item-turm.playing .fw-turm-door {
+  animation: fw-door 2.4s ease-in-out;
+}
+
+.item-turm.playing .fw-turm-peek {
+  animation: fw-peek-side 2.4s ease-in-out;
+}
+
+@keyframes fw-hose-swing {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  30% {
+    transform: rotate(9deg);
+  }
+  70% {
+    transform: rotate(-9deg);
+  }
+}
+
+/* A door on its hinge swings open and shut again. */
+@keyframes fw-door {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  25%,
+  75% {
+    transform: scaleX(0.12);
+  }
+}
+
+@keyframes fw-peek-side {
+  0%,
+  25%,
+  85%,
+  100% {
+    transform: translate(0, 0);
+  }
+  40%,
+  70% {
+    transform: translate(6px, -6px) rotate(4deg);
+  }
+  55% {
+    transform: translate(6px, -2px) rotate(-3deg);
+  }
+}
+
+/* ---------- Sirene: it shakes, the slats run round, sound waves go out ---------- */
+
+.item-sirene.playing .fw-sirene-head {
+  animation: fw-sirene-shake 0.2s ease-in-out 12;
+}
+
+.item-sirene.playing .fw-sirene-slats {
+  animation: fw-sirene-slats 0.3s linear 8;
+}
+
+.item-sirene.playing .fw-sirene-waves > g {
+  animation: fw-toot 0.8s ease-out calc(var(--i) * 0.2s) 2;
+}
+
+.item-sirene.playing .fw-sirene-lamp {
+  animation: fw-blink 0.4s ease-in-out 6;
+}
+
+@keyframes fw-sirene-shake {
+  25% {
+    transform: rotate(2deg);
+  }
+  75% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes fw-sirene-slats {
+  from {
+    transform: translateX(-10px);
+  }
+  to {
+    transform: translateX(10px);
+  }
+}
+
+/* ---------- Feuerwache: windows open, firefighters peek out, the clock turns, the door opens ---------- */
+
+.item-wache.playing .fw-wache-sash {
+  animation: fw-sash 2.2s ease-in-out calc(var(--i) * 0.1s);
+}
+
+.item-wache.playing .fw-wache-light {
+  animation: fw-light 2s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-wache.playing .fw-wache-peek {
+  animation: fw-wache-peek 2.4s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-wache.playing .fw-wache-arm {
+  animation: fw-wave 0.4s ease-in-out 0.8s 3;
+}
+
+.item-wache.playing .fw-wache-curtain {
+  animation: fw-curtain 2.2s ease-in-out;
+}
+
+.item-wache.playing .fw-wache-plant {
+  animation: fw-sway 0.4s ease-in-out 0.5s 4 alternate;
+}
+
+.item-wache.playing .fw-wache-hour {
+  animation: fw-roll 2.4s ease-in-out;
+}
+
+.item-wache.playing .fw-wache-minute {
+  animation: fw-roll 0.6s linear 4;
+}
+
+.item-wache.playing .fw-wache-door {
+  animation: fw-door 2.6s ease-in-out;
+}
+
+.item-wache.playing .fw-wache-guest {
+  animation: fw-peek-side 2.6s ease-in-out;
+}
+
+.item-wache.playing .fw-roof-glow {
+  animation: fw-glow 0.5s ease-in-out calc(var(--i) * 0.25s) 4;
+}
+
+.item-wache.playing .fw-roof-light {
+  animation: fw-blink 0.5s ease-in-out calc(var(--i) * 0.25s) 4;
+}
+
+.item-wache.playing .fw-wache-sign-shine {
+  animation: fw-shine 1.4s ease-in-out 0.4s;
+}
+
+/* Sashes fold towards their hinges. */
+@keyframes fw-sash {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  20%,
+  80% {
+    transform: scaleX(0.15);
+  }
+}
+
+@keyframes fw-wache-peek {
+  0%,
+  100% {
+    transform: translateY(80px);
+  }
+  25%,
+  75% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px) rotate(3deg);
+  }
+}
+
+@keyframes fw-curtain {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  30%,
+  70% {
+    transform: scaleX(0.4) skewY(4deg);
+  }
+}
+
+@keyframes fw-shine {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(420px);
+  }
+}
+
+/* ---------- Tor: the gate rolls up, the little fire engine blinks ---------- */
+
+.item-tor.playing .fw-tor-gate {
+  animation: fw-gate 2.6s ease-in-out;
+}
+
+.item-tor.playing .fw-tor-glow {
+  animation: fw-glow 0.5s ease-in-out 0.5s 4;
+}
+
+.item-tor.playing .fw-tor-light {
+  animation: fw-blink 0.5s ease-in-out 0.5s 4;
+}
+
+.item-tor.playing .fw-tor-lamp {
+  animation: fw-blink 0.6s ease-in-out 0.7s 2;
+}
+
+.item-tor.playing .fw-tor-driver,
+.item-tor.playing .fw-tor-mate {
+  animation: fw-nod 0.5s ease-in-out 0.6s 3;
+}
+
+.item-tor.playing .fw-tor-engine {
+  animation: fw-bounce 0.3s ease-in-out 0.8s 3;
+}
+
+/* A roller gate rolls up into its box and down again. */
+@keyframes fw-gate {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  25%,
+  75% {
+    transform: scaleY(0.08);
+  }
+}
+
+/* ---------- Helme: the light goes on, jackets swing, helmets hop ---------- */
+
+.item-helme.playing .fw-helme-glow {
+  animation: fw-helme-glow 2s ease-in-out;
+}
+
+.item-helme.playing .fw-helme-jacket {
+  animation: fw-swing-small 0.7s ease-in-out calc(var(--i) * 0.12s) 2;
+}
+
+.item-helme.playing .fw-helme-helmet {
+  animation: fw-hop-tilt 0.6s ease-in-out calc(0.2s + var(--i) * 0.15s) 2;
+}
+
+.item-helme.playing .fw-helme-sparkle {
+  animation: fw-sparkle 0.8s ease-out calc(0.4s + var(--i) * 0.2s);
+}
+
+.item-helme.playing .fw-helme-boot {
+  animation: fw-hop 0.4s ease-in-out calc(0.8s + var(--i) * 0.1s) 2;
+}
+
+@keyframes fw-helme-glow {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes fw-swing-small {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  30% {
+    transform: rotate(7deg);
+  }
+  70% {
+    transform: rotate(-7deg);
+  }
+}
+
+@keyframes fw-hop-tilt {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  40% {
+    transform: translateY(-16px) rotate(-10deg);
+  }
+}
+
+@keyframes fw-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) rotate(90deg);
+  }
+}
+
+/* ---------- Rutschstange: up through the ceiling, then wuuusch down the pole ---------- */
+
+.item-rutschstange.playing .fw-pole-man {
+  animation: fw-pole-man 2.4s ease-in-out;
+}
+
+.item-rutschstange.playing .fw-pole-wave {
+  animation: fw-wave 0.35s ease-in-out 1.65s 2;
+}
+
+.item-rutschstange.playing .fw-pole-lamp {
+  animation: fw-blink 0.4s ease-in-out 5;
+}
+
+@keyframes fw-pole-man {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  15%,
+  32% {
+    transform: translateY(-250px);
+    animation-timing-function: ease-in;
+  }
+  68% {
+    transform: translateY(0) scaleY(1);
+  }
+  74% {
+    transform: translateY(4px);
+  }
+}
+
+/* ---------- Alarmglocke: shakes and rings ---------- */
+
+.item-glocke.playing .fw-glocke-bell {
+  animation: fw-glocke 0.16s ease-in-out 10;
+}
+
+.item-glocke.playing .fw-glocke-clapper {
+  animation: fw-glocke-clapper 0.16s ease-in-out 10;
+}
+
+.item-glocke.playing .fw-glocke-ring path {
+  animation: fw-toot 0.5s ease-out calc(var(--i) * 0.12s) 3;
+}
+
+@keyframes fw-glocke {
+  25% {
+    transform: rotate(14deg);
+  }
+  75% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes fw-glocke-clapper {
+  25% {
+    transform: rotate(-20deg);
+  }
+  75% {
+    transform: rotate(20deg);
+  }
+}
+
+/* ---------- Taube: coos, bobs and flutters ---------- */
+
+.item-taube.playing .fw-taube-head {
+  animation: fw-coo-head 0.45s ease-in-out 4;
+}
+
+.item-taube.playing .fw-taube-wing {
+  animation: fw-wing 0.2s ease-in-out 0.9s 4 alternate;
+}
+
+.item-taube.playing .fw-taube-body {
+  animation: fw-hop 0.5s ease-in-out 0.75s 2;
+}
+
+.item-taube.playing .fw-taube-coo > g {
+  animation: fw-notes 1.2s ease-out calc(var(--i) * 0.3s);
+}
+
+@keyframes fw-coo-head {
+  50% {
+    transform: translate(6px, 4px) rotate(10deg);
+  }
+}
+
+@keyframes fw-wing {
+  to {
+    transform: rotate(-30deg);
+  }
+}
+
+/* ---------- Fahne: comes down a little, goes up again and waves ---------- */
+
+.item-fahne.playing .fw-fahne-hoist {
+  animation: fw-hoist 2.4s ease-in-out;
+}
+
+.item-fahne.playing .fw-fahne-cloth {
+  animation: fw-wave-flag 0.3s ease-in-out 8 alternate;
+}
+
+.item-fahne.playing .fw-fahne-rope {
+  animation: fw-sway 0.4s ease-in-out 6 alternate;
+}
+
+@keyframes fw-hoist {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  35%,
+  45% {
+    transform: translateY(140px);
+  }
+}
+
+/* ---------- Vogel: sings, flaps and hops ---------- */
+
+.item-vogel.playing .fw-vogel-wing {
+  animation: fw-wing 0.15s ease-in-out 8 alternate;
+}
+
+.item-vogel.playing .fw-vogel-body {
+  animation: fw-hop 0.5s ease-in-out 0.3s 3;
+}
+
+.item-vogel.playing .fw-vogel-notes > g {
+  animation: fw-notes 1.2s ease-out calc(0.2s + var(--i) * 0.35s);
+}
+
+/* ---------- Blumen: the heads nod one after the other ---------- */
+
+.item-blumen.playing .fw-blumen-head {
+  animation: fw-blume 0.75s ease-in-out calc(var(--i) * 0.12s) 2;
+}
+
+@keyframes fw-blume {
+  0%,
+  100% {
+    transform: rotate(0) scale(1);
+  }
+  40% {
+    transform: rotate(12deg) scale(1.2);
+  }
+  70% {
+    transform: rotate(-8deg) scale(1.1);
+  }
+}
+
+/* ---------- Schmetterling: flutters a loop ---------- */
+
+.item-schmetterling.playing .fw-falter-wings {
+  animation: fw-flap 0.15s ease-in-out 16 alternate;
+}
+
+.item-schmetterling.playing .fw-falter-body {
+  animation: fw-flutter 2.4s ease-in-out;
+}
+
+@keyframes fw-flutter {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(40px, -40px);
+  }
+  50% {
+    transform: translate(70px, 0);
+  }
+  75% {
+    transform: translate(30px, 30px);
+  }
+}
+
+/* ---------- Baum: the crown shakes, leaves fall ---------- */
+
+.item-baum.playing .fw-baum-crown {
+  animation: fw-shake 0.45s ease-in-out 4;
+}
+
+.item-baum.playing .fw-baum-leaves ellipse {
+  animation: fw-leaf 1.6s ease-in calc(var(--i) * 0.15s);
+}
+
+@keyframes fw-shake {
+  25% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes fw-leaf {
+  0%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(20px, 140px) rotate(200deg);
+  }
+}
+
+/* ---------- Katze: meows, blinks and waves a paw ---------- */
+
+.item-katze.playing .fw-katze-head {
+  animation: fw-tilt 0.7s ease-in-out 2;
+}
+
+.item-katze.playing .fw-katze-lids {
+  animation: fw-blinklids 2s linear;
+}
+
+.item-katze.playing .fw-katze-mouth {
+  animation: fw-mouth 0.5s ease-in-out 2;
+}
+
+.item-katze.playing .fw-katze-meow {
+  animation: fw-toot 0.6s ease-out 2;
+}
+
+.item-katze.playing .fw-katze-paw {
+  animation: fw-paw 0.4s ease-in-out 0.8s 3;
+}
+
+.item-katze.playing .fw-katze-tail {
+  animation: fw-wag 0.4s ease-in-out 5 alternate;
+}
+
+@keyframes fw-tilt {
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes fw-mouth {
+  50% {
+    transform: scale(1.6, 2.4);
+  }
+}
+
+@keyframes fw-paw {
+  50% {
+    transform: translate(10px, -16px) rotate(-30deg);
+  }
+}
+
+/* ---------- Eichhörnchen: peeks out and nibbles ---------- */
+
+.item-eichhoernchen.playing .fw-hoernchen-body {
+  animation: fw-hoernchen 1.8s ease-in-out;
+}
+
+.item-eichhoernchen.playing .fw-hoernchen-tail {
+  animation: fw-wag 0.3s ease-in-out 6 alternate;
+}
+
+.item-eichhoernchen.playing .fw-hoernchen-nut {
+  animation: fw-nibble 0.15s ease-in-out 0.5s 8 alternate;
+}
+
+@keyframes fw-hoernchen {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  30%,
+  70% {
+    transform: translate(8px, -10px);
+  }
+  50% {
+    transform: translate(8px, -18px);
+  }
+}
+
+@keyframes fw-nibble {
+  to {
+    transform: translateY(-3px) rotate(10deg);
+  }
+}
+
+/* ---------- Kommandowagen: blue lights, the door opens, the chief waves, it toots ---------- */
+
+.item-kommandowagen.playing .fw-elw-door {
+  animation: fw-door 2.2s ease-in-out;
+}
+
+.item-kommandowagen.playing .fw-elw-chief {
+  animation: fw-nod 0.5s ease-in-out 0.4s 3;
+}
+
+.item-kommandowagen.playing .fw-elw-glow {
+  animation: fw-glow 0.5s ease-in-out 4;
+}
+
+.item-kommandowagen.playing .fw-elw-light {
+  animation: fw-blink 0.5s ease-in-out 4;
+}
+
+.item-kommandowagen.playing .fw-elw-beam {
+  animation: fw-blink 0.5s ease-in-out 1.2s 2;
+}
+
+.item-kommandowagen.playing .fw-elw-toot path {
+  animation: fw-toot 0.4s ease-out calc(1.2s + var(--i) * 0.1s) 2;
+}
+
+.item-kommandowagen.playing .fw-elw-antenna {
+  animation: fw-antenna 0.3s ease-in-out 6;
+}
+
+.item-kommandowagen.playing .fw-elw-body {
+  animation: fw-bounce 0.3s ease-in-out 3;
+}
+
+.item-kommandowagen.playing .fw-wheel {
+  animation: fw-roll 0.8s ease-in-out;
+}
+
+@keyframes fw-antenna {
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+/* ---------- Hydrant: the valve turns, water bubbles up ---------- */
+
+.item-hydrant.playing .fw-hydrant-valve {
+  animation: fw-roll 0.6s ease-in-out 2;
+}
+
+.item-hydrant.playing .fw-hydrant-body {
+  animation: fw-wiggle 0.3s ease-in-out 0.9s 3;
+}
+
+.item-hydrant.playing .fw-hydrant-water circle {
+  animation: fw-fountain 0.8s ease-out calc(0.5s + var(--i) * 0.12s);
+}
+
+@keyframes fw-wiggle {
+  25% {
+    transform: rotate(4deg);
+  }
+  75% {
+    transform: rotate(-4deg);
+  }
+}
+
+@keyframes fw-fountain {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(calc((var(--i) - 2) * 14px), -40px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 2) * 26px), 40px);
+  }
+}
+
+/* ---------- Krankenwagen: the door slides open, the teddy waves, blue lights ---------- */
+
+.item-krankenwagen.playing .fw-ambu-door {
+  animation: fw-slide 2.4s ease-in-out;
+}
+
+.item-krankenwagen.playing .fw-ambu-teddy {
+  animation: fw-tilt 0.6s ease-in-out 0.6s 2;
+}
+
+.item-krankenwagen.playing .fw-ambu-paw {
+  animation: fw-wave 0.35s ease-in-out 0.7s 3;
+}
+
+.item-krankenwagen.playing .fw-ambu-glow {
+  animation: fw-glow 0.5s ease-in-out 4;
+}
+
+.item-krankenwagen.playing .fw-ambu-light {
+  animation: fw-blink 0.5s ease-in-out 4;
+}
+
+.item-krankenwagen.playing .fw-ambu-driver {
+  animation: fw-nod 0.6s ease-in-out 3;
+}
+
+.item-krankenwagen.playing .fw-ambu-body {
+  animation: fw-bounce 0.3s ease-in-out 2.1s;
+}
+
+.item-krankenwagen.playing .fw-wheel {
+  animation: fw-roll 0.8s ease-in-out;
+}
+
+@keyframes fw-slide {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20%,
+  80% {
+    transform: translateX(-62px);
+  }
+}
+
+/* ---------- Grill: the lid lifts, the sausages hop, a little smoke ---------- */
+
+.item-grill.playing .fw-grill-lid {
+  animation: fw-lid 2.2s ease-in-out;
+}
+
+.item-grill.playing .fw-grill-sausage {
+  animation: fw-sausage 0.5s ease-in-out calc(0.5s + var(--i) * 0.12s) 2;
+}
+
+.item-grill.playing .fw-grill-smoke circle {
+  animation: fw-smoke 1.4s ease-out calc(0.4s + var(--i) * 0.2s);
+}
+
+.item-grill.playing .fw-grill-glow {
+  animation: fw-light 2s ease-in-out;
+}
+
+@keyframes fw-lid {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  20%,
+  80% {
+    transform: rotate(70deg);
+  }
+}
+
+@keyframes fw-sausage {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+}
+
+/* ---------- Opa: turns the sausages, laughs, the hat hops ---------- */
+
+.item-opa.playing .fw-opa-arm {
+  animation: fw-tongs 0.6s ease-in-out 3;
+}
+
+.item-opa.playing .fw-opa-head {
+  animation: fw-laugh 0.35s ease-in-out 0.4s 4;
+}
+
+.item-opa.playing .fw-opa-hat {
+  animation: fw-hop 0.5s ease-in-out 0.6s 2;
+}
+
+.item-opa.playing .fw-opa-moustache {
+  animation: fw-mouth-wiggle 0.2s ease-in-out 0.4s 6 alternate;
+}
+
+.item-opa.playing .fw-opa-body {
+  animation: fw-bounce 0.35s ease-in-out 0.4s 4;
+}
+
+@keyframes fw-tongs {
+  50% {
+    transform: rotate(24deg);
+  }
+}
+
+@keyframes fw-laugh {
+  50% {
+    transform: rotate(-6deg) translateY(-3px);
+  }
+}
+
+@keyframes fw-mouth-wiggle {
+  to {
+    transform: scaleX(1.25) rotate(4deg);
+  }
+}
+
+/* ---------- Übungspuppe: wobbles on its spring ---------- */
+
+.item-puppe.playing .fw-puppe-body {
+  animation: fw-wobble 2s ease-out;
+}
+
+.item-puppe.playing .fw-puppe-spring {
+  animation: fw-spring 0.4s ease-in-out 3;
+}
+
+.item-puppe.playing .fw-puppe-arm {
+  animation: fw-flop 0.4s ease-in-out calc(var(--i) * 0.1s) 4;
+}
+
+.item-puppe.playing .fw-puppe-arm-r {
+  animation-name: fw-flop-r;
+}
+
+.item-puppe.playing .fw-puppe-head {
+  animation: fw-tilt 0.5s ease-in-out 0.3s 3;
+}
+
+.fw-puppe-spring {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+@keyframes fw-wobble {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  15% {
+    transform: rotate(-16deg);
+  }
+  35% {
+    transform: rotate(12deg);
+  }
+  55% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes fw-spring {
+  50% {
+    transform: scaleY(0.6);
+  }
+}
+
+@keyframes fw-flop {
+  50% {
+    transform: rotate(40deg);
+  }
+}
+
+@keyframes fw-flop-r {
+  50% {
+    transform: rotate(-40deg);
+  }
+}
+
+/* ---------- Feuerwehrauto: the ladder turns up to the cat and slides out, lockers open ---------- */
+
+.item-feuerwehrauto.playing .fw-truck-ladder {
+  animation: fw-ladder 3.2s ease-in-out;
+}
+
+.item-feuerwehrauto.playing .fw-truck-ext {
+  animation: fw-ladder-ext 3.2s ease-in-out;
+}
+
+.item-feuerwehrauto.playing .fw-truck-shutter {
+  animation: fw-shutter 2.6s ease-in-out calc(var(--i) * 0.2s);
+}
+
+.item-feuerwehrauto.playing .fw-truck-glow {
+  animation: fw-glow 0.5s ease-in-out 6;
+}
+
+.item-feuerwehrauto.playing .fw-truck-light {
+  animation: fw-blink 0.5s ease-in-out 6;
+}
+
+.item-feuerwehrauto.playing .fw-truck-beam {
+  animation: fw-blink 0.5s ease-in-out 0.2s 2;
+}
+
+.item-feuerwehrauto.playing .fw-truck-toot path {
+  animation: fw-toot 0.5s ease-out calc(var(--i) * 0.1s) 2;
+}
+
+.item-feuerwehrauto.playing .fw-truck-driver {
+  animation: fw-nod 0.6s ease-in-out 5;
+}
+
+.item-feuerwehrauto.playing .fw-truck-body {
+  animation: fw-truck-arrive 3.2s ease-in-out;
+}
+
+.item-feuerwehrauto.playing .fw-wheel {
+  animation: fw-roll-back 3.2s ease-in-out;
+}
+
+@keyframes fw-ladder {
+  0%,
+  12%,
+  92%,
+  100% {
+    transform: rotate(0);
+  }
+  32%,
+  78% {
+    transform: rotate(-26deg);
+  }
+}
+
+@keyframes fw-ladder-ext {
+  0%,
+  30%,
+  82%,
+  100% {
+    transform: translateX(0);
+  }
+  48%,
+  70% {
+    transform: translateX(132px);
+  }
+}
+
+@keyframes fw-shutter {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  20%,
+  75% {
+    transform: scaleY(0.12);
+  }
+}
+
+/* It drives up a little and stops before the ladder goes up. */
+@keyframes fw-truck-arrive {
+  0% {
+    transform: translateX(-24px);
+  }
+  12%,
+  100% {
+    transform: translateX(0);
+  }
+  14% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes fw-roll-back {
+  0% {
+    transform: rotate(-60deg);
+  }
+  12%,
+  100% {
+    transform: rotate(0);
+  }
+}
+
+/* ---------- Feuerwehrfrau: wasser marsch! The jet arcs over to the barbecue ---------- */
+
+.item-feuerwehrfrau.playing .fw-frau-jet,
+.item-feuerwehrfrau.playing .fw-frau-jet-core {
+  animation: fw-jet 2.2s ease-out;
+}
+
+.item-feuerwehrfrau.playing .fw-frau-splash circle {
+  animation: fw-splash 0.6s ease-out calc(0.8s + var(--i) * 0.1s) 2;
+}
+
+.item-feuerwehrfrau.playing .fw-frau-nozzle {
+  animation: fw-nozzle 2.2s ease-in-out;
+}
+
+.item-feuerwehrfrau.playing .fw-frau-body {
+  animation: fw-lean 2.2s ease-in-out;
+}
+
+.item-feuerwehrfrau.playing .fw-frau-ponytail {
+  animation: fw-wag 0.3s ease-in-out 7 alternate;
+}
+
+.fw-frau-jet,
+.fw-frau-jet-core {
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+@keyframes fw-jet {
+  0% {
+    opacity: 1;
+    stroke-dashoffset: 1;
+  }
+  35%,
+  80% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    opacity: 0;
+    stroke-dashoffset: -1;
+  }
+}
+
+@keyframes fw-splash {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1.5) * 22px), 30px) scale(1);
+  }
+}
+
+@keyframes fw-nozzle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  15%,
+  85% {
+    transform: rotate(-6deg);
+  }
+  50% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes fw-lean {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  15%,
+  85% {
+    transform: rotate(-3deg);
+  }
+}
+
+/* ---------- Feuerwehrmann: waves, visor down, trrrill! ---------- */
+
+.item-feuerwehrmann.playing .fw-mann-arm {
+  animation: fw-wave 0.45s ease-in-out 4;
+}
+
+.item-feuerwehrmann.playing .fw-mann-visor {
+  animation: fw-visor 2.2s ease-in-out;
+}
+
+.item-feuerwehrmann.playing .fw-mann-whistle {
+  animation: fw-light 1.6s ease-in-out 0.3s;
+}
+
+.item-feuerwehrmann.playing .fw-mann-cheeks {
+  animation: fw-cheeks 1.6s ease-in-out 0.3s;
+}
+
+.item-feuerwehrmann.playing .fw-mann-toot path {
+  animation: fw-toot 0.45s ease-out calc(0.4s + var(--i) * 0.1s) 3;
+}
+
+.item-feuerwehrmann.playing .fw-mann-head {
+  animation: fw-nod 0.55s ease-in-out 0.3s 3;
+}
+
+.item-feuerwehrmann.playing .fw-mann-body {
+  animation: fw-hop 0.5s ease-in-out 1.6s;
+}
+
+@keyframes fw-visor {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  15%,
+  70% {
+    transform: translateY(18px);
+  }
+}
+
+@keyframes fw-cheeks {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 0.8;
+  }
+}
+
+/* ---------- Hütchen: hops and spins ---------- */
+
+.item-huetchen.playing .fw-huetchen-body {
+  animation: fw-cone 1.6s ease-in-out;
+}
+
+@keyframes fw-cone {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  15% {
+    transform: translateY(0) scale(1.1, 0.85);
+  }
+  40% {
+    transform: translateY(-40px) scaleX(-1);
+  }
+  65% {
+    transform: translateY(0) scale(1.1, 0.88);
+  }
+  80% {
+    transform: translateY(-10px) scale(1);
+  }
+}
+
+/* ---------- Feuerwehrhund: barks, wags and hops ---------- */
+
+.item-hund.playing .fw-hund-tail {
+  animation: fw-wag 0.15s ease-in-out 12 alternate;
+}
+
+.item-hund.playing .fw-hund-head {
+  animation: fw-bark-head 0.3s ease-in-out 2;
+}
+
+.item-hund.playing .fw-hund-bark {
+  animation: fw-toot 0.4s ease-out 2;
+}
+
+.item-hund.playing .fw-hund-ear {
+  animation: fw-flop 0.3s ease-in-out 0.6s 3;
+}
+
+.item-hund.playing .fw-hund-tongue {
+  animation: fw-light 1.2s ease-in-out 0.6s;
+}
+
+.item-hund.playing .fw-hund-helmet {
+  animation: fw-hop-tilt 0.5s ease-in-out 0.9s;
+}
+
+.item-hund.playing .fw-hund-body {
+  animation: fw-hop 0.5s ease-in-out 0.7s 2;
+}
+
+@keyframes fw-bark-head {
+  50% {
+    transform: rotate(-10deg);
+  }
+}
+
+/* ---------- Kind: hops, waves, little hearts ---------- */
+
+.item-kind.playing .fw-kind-body {
+  animation: fw-hop 0.45s ease-in-out 3;
+}
+
+.item-kind.playing .fw-kind-arm {
+  animation: fw-wave-up 0.35s ease-in-out 4;
+}
+
+.item-kind.playing .fw-kind-head {
+  animation: fw-tilt 0.6s ease-in-out 0.4s 2;
+}
+
+.item-kind.playing .fw-kind-hearts path {
+  animation: fw-heart 1.2s ease-out calc(0.3s + var(--i) * 0.3s);
+}
+
+@keyframes fw-wave-up {
+  50% {
+    transform: rotate(-120deg);
+  }
+}
+
+/* ---------- Luftballon: tugs at its string ---------- */
+
+.item-luftballon.playing .fw-ballon-body {
+  animation: fw-ballon 2.2s ease-in-out;
+}
+
+@keyframes fw-ballon {
+  0%,
+  100% {
+    transform: rotate(0) translateY(0);
+  }
+  25% {
+    transform: rotate(-8deg) translateY(-14px);
+  }
+  55% {
+    transform: rotate(7deg) translateY(-6px);
+  }
+  80% {
+    transform: rotate(-3deg) translateY(-10px);
+  }
+}
+
+/* ---------- Feuerlöscher: lever down, pfffft, white foam ---------- */
+
+.item-feuerloescher.playing .fw-loescher-lever {
+  animation: fw-lever 1.6s ease-in-out;
+}
+
+.item-feuerloescher.playing .fw-loescher-foam circle {
+  animation: fw-foam 1.4s ease-out calc(0.3s + var(--i) * 0.1s);
+}
+
+.item-feuerloescher.playing .fw-loescher-needle {
+  animation: fw-needle 1.6s ease-in-out;
+}
+
+.item-feuerloescher.playing .fw-loescher-body {
+  animation: fw-hop 0.4s ease-in-out 1.5s;
+}
+
+@keyframes fw-lever {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  15%,
+  80% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes fw-needle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(-110deg);
+  }
+}
+
+@keyframes fw-foam {
+  0% {
+    opacity: 0;
+    transform: translate(-30px, 10px) scale(0.2);
+  }
+  30% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -10px) scale(1.4);
+  }
+}
+
+/* ---------- Bobbycar: rolls, steers and toots ---------- */
+
+.item-bobbycar.playing .fw-bobby-body {
+  animation: fw-bobby 2s ease-in-out;
+}
+
+.item-bobbycar.playing .fw-wheel {
+  animation: fw-bobby-wheel 2s ease-in-out;
+}
+
+.item-bobbycar.playing .fw-bobby-steer {
+  animation: fw-steer 0.5s ease-in-out 3;
+}
+
+.item-bobbycar.playing .fw-bobby-glow {
+  animation: fw-glow 0.5s ease-in-out 4;
+}
+
+.item-bobbycar.playing .fw-bobby-light {
+  animation: fw-blink 0.5s ease-in-out 4;
+}
+
+.item-bobbycar.playing .fw-bobby-toot path {
+  animation: fw-toot 0.5s ease-out calc(0.8s + var(--i) * 0.1s) 2;
+}
+
+@keyframes fw-bobby {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  40% {
+    transform: translateX(40px);
+  }
+  70% {
+    transform: translateX(-10px);
+  }
+}
+
+@keyframes fw-bobby-wheel {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  40% {
+    transform: rotate(200deg);
+  }
+  70% {
+    transform: rotate(-50deg);
+  }
+}
+
+@keyframes fw-steer {
+  50% {
+    transform: rotate(-14deg);
+  }
+}
+
+/* ---------- Entenküken: bobs, flaps, splashes ---------- */
+
+.item-ente.playing .fw-ente-body {
+  animation: fw-ente-bob 0.6s ease-in-out 3;
+}
+
+.item-ente.playing .fw-ente-head {
+  animation: fw-bark-head 0.3s ease-in-out 2;
+}
+
+.item-ente.playing .fw-ente-wing {
+  animation: fw-wing 0.15s ease-in-out 0.6s 6 alternate;
+}
+
+.item-ente.playing .fw-ente-ripples ellipse {
+  animation: fw-ripple 1.2s ease-out calc(var(--i) * 0.3s);
+}
+
+.item-ente.playing .fw-ente-quack {
+  animation: fw-toot 0.4s ease-out 2;
+}
+
+.item-ente.playing .fw-ente-drops circle {
+  animation: fw-ente-drop 0.7s ease-out calc(0.6s + var(--i) * 0.08s);
+}
+
+@keyframes fw-ente-bob {
+  50% {
+    transform: translateY(5px) rotate(-5deg);
+  }
+}
+
+@keyframes fw-ripple {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes fw-ente-drop {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(calc((var(--i) - 1.5) * 8px), -30px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1.5) * 14px), 0);
+  }
+}
+
+/* ---------- Schlauchrolle: the drum spins, the cart rocks ---------- */
+
+.item-schlauchrolle.playing .fw-reel-drum {
+  animation: fw-roll 1s ease-in-out 2;
+}
+
+.item-schlauchrolle.playing .fw-reel-body {
+  animation: fw-reel-rock 2s ease-in-out;
+}
+
+.item-schlauchrolle.playing .fw-reel-nozzle {
+  animation: fw-wiggle 0.25s ease-in-out 0.8s 4;
+}
+
+.item-schlauchrolle.playing .fw-reel-drops circle {
+  animation: fw-drops-fall 0.45s ease-in calc(0.7s + var(--i) * 0.15s) 2;
+}
+
+@keyframes fw-reel-rock {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0);
+  }
+  30% {
+    transform: translateX(14px) rotate(3deg);
+  }
+  65% {
+    transform: translateX(-8px) rotate(-2deg);
+  }
+}
+
+/* ---------- Stiefel: stamp, stamp ---------- */
+
+.item-stiefel.playing .fw-stiefel-boot {
+  animation: fw-stamp 0.4s ease-in-out calc(var(--i) * 0.2s) 3;
+}
+
+.item-stiefel.playing .fw-stiefel-braces {
+  animation: fw-bounce 0.2s ease-in-out 6;
+}
+
+@keyframes fw-stamp {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  40% {
+    transform: translateY(-22px) rotate(-6deg);
+  }
+  70% {
+    transform: translateY(0) scaleY(0.94);
+  }
+}
+
+/* ---------- Maus: pops up out of the boot and sniffs ---------- */
+
+.item-maus.playing .fw-maus-body {
+  animation: fw-maus 1.8s ease-in-out;
+}
+
+.item-maus.playing .fw-maus-nose {
+  animation: fw-sniff 0.15s ease-in-out 0.4s 8 alternate;
+}
+
+@keyframes fw-maus {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  20%,
+  70% {
+    transform: translateY(-22px);
+  }
+  45% {
+    transform: translateY(-18px) rotate(-6deg);
+  }
+  85% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes fw-sniff {
+  to {
+    transform: translateY(-2px) scale(1.15);
+  }
+}
+
+/* ---------- Schnecke: the feelers stretch, the shell wiggles ---------- */
+
+.item-schnecke.playing .fw-schnecke-feelers {
+  animation: fw-feelers 1s ease-in-out 2;
+}
+
+.item-schnecke.playing .fw-schnecke-shell {
+  animation: fw-wiggle 0.4s ease-in-out 0.4s 3;
+}
+
+.item-schnecke.playing .fw-schnecke-body {
+  animation: fw-creep 2s ease-in-out;
+}
+
+.item-schnecke.playing .fw-schnecke-hearts {
+  animation: fw-heart 1.2s ease-out 0.7s;
+}
+
+@keyframes fw-feelers {
+  50% {
+    transform: scaleY(1.35);
+  }
+}
+
+@keyframes fw-creep {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(14px);
+  }
+}
