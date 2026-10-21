@@ -1,0 +1,58 @@
+/* Animations of the sun and the rain cloud, shared by all scenes. */
+
+.scene.lively .sonne-rays {
+  animation: sky-spin 40s linear infinite;
+}
+
+.wolke-rain path {
+  opacity: 0;
+}
+
+/* ---------- Sonne: glows and turns its rays ---------- */
+
+.item-sonne.playing .sonne-body {
+  animation: sonne-pulse 1s ease-in-out 2;
+}
+
+.item-sonne.playing .sonne-rays {
+  animation: sky-spin 2s ease-in-out;
+}
+
+@keyframes sonne-pulse {
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes sky-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* ---------- Wolke: turns grey and rains ---------- */
+
+.item-wolke.playing .cloud-puffs {
+  animation: wolke-dark 2.6s ease-in-out;
+}
+
+.item-wolke.playing .wolke-rain path {
+  animation: wolke-drop 0.6s linear calc(var(--i) * 0.12s) 4;
+}
+
+@keyframes wolke-dark {
+  15%,
+  80% {
+    fill: #b8c4d6;
+  }
+}
+
+@keyframes wolke-drop {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+    transform: translateY(220px);
+  }
+}

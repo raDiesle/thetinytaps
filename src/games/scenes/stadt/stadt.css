@@ -1,0 +1,1070 @@
+/* Animations of the Stadt scene. Durations match durationMs in Stadt.tsx. Sun and cloud: ../sky.css. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .st-cloud {
+  animation: st-drift 26s ease-in-out infinite alternate;
+}
+
+.scene.lively .st-cloud-slow {
+  animation-duration: 40s;
+}
+
+/* A car passes in the far lane now and then. */
+.scene.lively .st-car {
+  animation: st-car 20s linear infinite;
+}
+
+.scene.lively .st-flug-prop {
+  animation: st-prop 0.15s linear infinite alternate;
+}
+
+.scene.lively .st-wache-flag {
+  animation: st-flag 1.2s ease-in-out infinite alternate;
+}
+
+.scene.lively .st-falter-wings {
+  animation: st-flap 0.35s ease-in-out infinite alternate;
+}
+
+.scene.lively .st-katze-tail {
+  animation: st-wag 2.5s ease-in-out infinite alternate;
+}
+
+.scene.lively .st-hund-tail {
+  animation: st-wag 0.6s ease-in-out infinite alternate;
+}
+
+.scene.lively .st-schaukel-swing {
+  animation: st-swing-soft 3s ease-in-out infinite;
+}
+
+.scene.lively .st-baecker-steam circle,
+.scene.lively .st-haus-smoke circle {
+  animation: st-smoke 3s ease-out calc(var(--i) * 1s) infinite;
+}
+
+/* Puffs, lights and drops are hidden until their animation shows them, and can't be tapped meanwhile. */
+.st-haus-smoke circle,
+.st-haus-light,
+.st-baecker-steam circle,
+.st-wache-glow,
+.st-post-letter,
+.st-laterne-glow,
+.st-laterne-light,
+.st-hydrant-water circle,
+.st-ampel-green,
+.st-eimer-junk > *,
+.st-brunnen-big,
+.st-brunnen-ripples ellipse,
+.st-polizei-glow,
+.st-polizei-light,
+.st-auto-puff circle,
+.st-feuer-glow,
+.st-feuer-light,
+.st-baum-leaves ellipse,
+.st-oma-heart,
+.st-hund-tongue,
+.st-kaefer-wings {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.st-haus-smoke circle,
+.st-baecker-steam circle,
+.st-auto-puff circle,
+.st-haus-light,
+.st-baecker-bread > g,
+.st-blumen-head,
+.st-laterne-glow,
+.st-wache-glow,
+.st-polizei-glow,
+.st-feuer-glow,
+.st-eimer-junk > *,
+.st-brunnen-ripples ellipse,
+.st-oma-heart,
+.st-baum-leaves ellipse,
+.st-hydrant-water circle,
+.st-post-letter,
+.st-kaefer-wings ellipse {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Ducks waddle on their feet. */
+.st-enten-duck {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+@keyframes st-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes st-car {
+  0% {
+    transform: translateX(0);
+  }
+  45%,
+  100% {
+    transform: translateX(-4200px);
+  }
+}
+
+@keyframes st-prop {
+  to {
+    transform: scaleY(0.2);
+  }
+}
+
+@keyframes st-flag {
+  to {
+    transform: scaleX(0.75) skewY(6deg);
+  }
+}
+
+@keyframes st-flap {
+  to {
+    transform: scaleX(0.3);
+  }
+}
+
+@keyframes st-wag {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes st-swing-soft {
+  25% {
+    transform: rotate(6deg);
+  }
+  75% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes st-smoke {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(16px, -80px) scale(1.8);
+  }
+}
+
+@keyframes st-pop {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes st-hop {
+  40% {
+    transform: translateY(-24px);
+  }
+  60% {
+    transform: translateY(-24px);
+  }
+}
+
+@keyframes st-glow {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  45%,
+  75% {
+    opacity: 0.55;
+  }
+  30%,
+  60%,
+  90% {
+    opacity: 0.15;
+  }
+}
+
+/* ---------- Flugzeug: flies a loop ---------- */
+
+.item-flugzeug.playing .st-flug-body {
+  transform-origin: 0px -50px;
+  animation: st-loop 2.6s ease-in-out;
+}
+
+.item-flugzeug.playing .st-flug-prop {
+  animation: st-prop 0.1s linear 26 alternate;
+}
+
+@keyframes st-loop {
+  0% {
+    transform: translateX(0) rotate(0turn);
+  }
+  15% {
+    transform: translateX(-40px) rotate(0turn);
+  }
+  80% {
+    transform: translateX(-40px) rotate(1turn);
+  }
+  100% {
+    transform: translateX(0) rotate(1turn);
+  }
+}
+
+/* ---------- Kirche: the bell swings, the clock turns, the cock looks around ---------- */
+
+.item-kirche.playing .st-kirche-bell {
+  animation: st-bell 0.8s ease-in-out 3;
+}
+
+.item-kirche.playing .st-kirche-minute {
+  animation: st-turn 2.4s ease-in-out;
+}
+
+.item-kirche.playing .st-kirche-hour {
+  animation: st-hour 2.4s ease-in-out;
+}
+
+.item-kirche.playing .st-kirche-hahn {
+  animation: st-weathercock 2.4s ease-in-out;
+}
+
+@keyframes st-bell {
+  25% {
+    transform: rotate(24deg);
+  }
+  75% {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes st-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes st-hour {
+  to {
+    transform: rotate(30deg);
+  }
+}
+
+@keyframes st-weathercock {
+  30% {
+    transform: scaleX(-1);
+  }
+  70% {
+    transform: scaleX(-1);
+  }
+}
+
+/* ---------- Haus: lights go on one after the other, a child waves, the chimney smokes ---------- */
+
+.item-haus.playing .st-haus-light {
+  animation: st-light 1.4s ease-in-out calc(var(--i) * 0.12s);
+}
+
+.item-haus.playing .st-haus-arm {
+  animation: st-wave 0.6s ease-in-out 4;
+}
+
+.item-haus.playing .st-haus-smoke circle {
+  animation: st-smoke 1.4s ease-out calc(var(--i) * 0.4s);
+}
+
+@keyframes st-light {
+  20%,
+  70% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes st-wave {
+  50% {
+    transform: rotate(-40deg);
+  }
+}
+
+/* ---------- Katze: stretches, tilts her head, waves her tail ---------- */
+
+.item-katze.playing .st-katze-body {
+  animation: st-stretch 1.8s ease-in-out;
+}
+
+.item-katze.playing .st-katze-head {
+  animation: st-tilt 0.9s ease-in-out 2;
+}
+
+.item-katze.playing .st-katze-tail {
+  animation: st-wag 0.3s ease-in-out 6 alternate;
+}
+
+@keyframes st-stretch {
+  30%,
+  60% {
+    transform: scaleY(1.12);
+  }
+}
+
+@keyframes st-tilt {
+  50% {
+    transform: rotate(-14deg);
+  }
+}
+
+/* ---------- Bäckerei: the pretzel swings, bread jumps, the baker hops, steam rises ---------- */
+
+.item-baeckerei.playing .st-baecker-sign {
+  animation: st-sign 1.1s ease-in-out 2;
+}
+
+.item-baeckerei.playing .st-baecker-bread > g {
+  animation: st-bread 0.6s ease-in-out calc(var(--i) * 0.15s) 2;
+}
+
+.item-baeckerei.playing .st-baecker-baker {
+  animation: st-hop 0.8s ease-in-out 0.5s 2;
+}
+
+.item-baeckerei.playing .st-baecker-steam circle {
+  animation: st-smoke 1.4s ease-out calc(var(--i) * 0.35s);
+}
+
+@keyframes st-sign {
+  25% {
+    transform: rotate(18deg);
+  }
+  75% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes st-bread {
+  50% {
+    transform: translateY(-12px) scale(1.1);
+  }
+}
+
+/* ---------- Feuerwache: the gate rolls up, the lamp glows ---------- */
+
+.item-feuerwache.playing .st-wache-gate {
+  animation: st-gate 2.6s ease-in-out;
+}
+
+.item-feuerwache.playing .st-wache-glow {
+  animation: st-glow 2.4s ease-in-out;
+}
+
+.item-feuerwache.playing .st-wache-flag {
+  animation: st-flag 0.4s ease-in-out 6 alternate;
+}
+
+@keyframes st-gate {
+  25%,
+  75% {
+    transform: scaleY(0.12);
+  }
+}
+
+/* ---------- Baum: the crown shakes, leaves fall ---------- */
+
+.item-baum.playing .st-baum-crown {
+  animation: st-shake 0.45s ease-in-out 4;
+}
+
+.item-baum.playing .st-baum-leaves ellipse {
+  animation: st-leaf 1.6s ease-in calc(var(--i) * 0.15s);
+}
+
+@keyframes st-shake {
+  25% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes st-leaf {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(20px, 120px) rotate(200deg);
+  }
+}
+
+/* ---------- Vogel: flies a round over the park ---------- */
+
+.item-vogel.playing .st-vogel-flight {
+  animation: st-bird 2.4s ease-in-out;
+}
+
+.item-vogel.playing .st-vogel-wing {
+  animation: st-flap 0.12s ease-in-out 18 alternate;
+}
+
+@keyframes st-bird {
+  25% {
+    transform: translate(60px, -70px);
+  }
+  50% {
+    transform: translate(-30px, -110px);
+  }
+  75% {
+    transform: translate(-70px, -40px);
+  }
+}
+
+/* ---------- Schaukel: swings high ---------- */
+
+.item-schaukel.playing .st-schaukel-swing {
+  animation: st-swing 1.2s ease-in-out 2;
+}
+
+@keyframes st-swing {
+  25% {
+    transform: rotate(26deg);
+  }
+  75% {
+    transform: rotate(-26deg);
+  }
+}
+
+/* ---------- Eiswagen: the cones jump, the parasol wobbles ---------- */
+
+.item-eiswagen.playing .st-eis-cones > g {
+  animation: st-hop 0.7s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+.item-eiswagen.playing .st-eis-schirm {
+  animation: st-tilt 1.1s ease-in-out 2;
+}
+
+/* ---------- Oma: waves, a heart rises ---------- */
+
+.item-oma.playing .st-oma-arm {
+  animation: st-oma-wave 2s ease-in-out;
+}
+
+.item-oma.playing .st-oma-heart {
+  animation: st-heart 2s ease-out;
+}
+
+@keyframes st-oma-wave {
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: rotate(-150deg);
+  }
+  30%,
+  50%,
+  70% {
+    transform: rotate(-120deg);
+  }
+}
+
+@keyframes st-heart {
+  15% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+}
+
+/* ---------- Briefkasten: the flap opens and a letter jumps out ---------- */
+
+.item-briefkasten.playing .st-post-flap {
+  animation: st-flap-open 1.8s ease-in-out;
+}
+
+.item-briefkasten.playing .st-post-letter {
+  animation: st-letter 1.8s ease-in-out;
+}
+
+@keyframes st-flap-open {
+  10%,
+  80% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes st-letter {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 1;
+    transform: translateY(-70px) rotate(-12deg);
+  }
+  65% {
+    opacity: 1;
+    transform: translateY(-60px) rotate(10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Spatz: hops and flutters ---------- */
+
+.item-spatz.playing .st-spatz-body {
+  animation: st-hop 0.8s ease-in-out 2;
+}
+
+.item-spatz.playing .st-spatz-wing {
+  animation: st-flap 0.1s ease-in-out 16 alternate;
+}
+
+/* ---------- Laterne: the light goes on ---------- */
+
+.item-laterne.playing .st-laterne-light {
+  animation: st-lamp 2.2s ease-in-out;
+}
+
+.item-laterne.playing .st-laterne-glow {
+  animation: st-lamp-glow 2.2s ease-in-out;
+}
+
+@keyframes st-lamp {
+  15%,
+  85% {
+    opacity: 1;
+  }
+}
+
+@keyframes st-lamp-glow {
+  15%,
+  85% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.15);
+  }
+}
+
+/* ---------- Hydrant: water sprays out ---------- */
+
+.item-hydrant.playing .st-hydrant-water circle {
+  animation: st-spray 0.6s ease-in calc(var(--i) * 0.12s) 2;
+}
+
+@keyframes st-spray {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(40px, -24px);
+  }
+  100% {
+    opacity: 0.2;
+    transform: translate(76px, 40px);
+  }
+}
+
+/* ---------- Bus: kneels, opens and closes the doors ---------- */
+
+.item-bus.playing .st-bus-body {
+  animation: st-kneel 2.4s ease-in-out;
+}
+
+.item-bus.playing .st-bus-door {
+  animation: st-doors 2.4s ease-in-out;
+}
+
+@keyframes st-kneel {
+  10%,
+  80% {
+    transform: translateY(5px);
+  }
+  90% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes st-doors {
+  25%,
+  70% {
+    transform: scaleX(0.15);
+  }
+}
+
+/* ---------- Polizei: the blue light glows ---------- */
+
+.item-polizei.playing .st-polizei-light {
+  animation: st-blue 2.2s ease-in-out;
+}
+
+.item-polizei.playing .st-polizei-glow {
+  animation: st-glow 2.2s ease-in-out;
+}
+
+.item-polizei.playing .st-polizei-body {
+  animation: st-bounce 0.55s ease-in-out 4;
+}
+
+@keyframes st-blue {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  45%,
+  75% {
+    opacity: 1;
+  }
+  30%,
+  60%,
+  90% {
+    opacity: 0.3;
+  }
+}
+
+@keyframes st-bounce {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* ---------- Fahrrad: rides a bit and comes back ---------- */
+
+.item-fahrrad.playing .st-rad-body {
+  animation: st-ride 2s ease-in-out;
+}
+
+.item-fahrrad.playing .st-rad-wheel,
+.item-fahrrad.playing .st-rad-pedal {
+  animation: st-spin-back 1s linear 2;
+}
+
+@keyframes st-ride {
+  50% {
+    transform: translateX(-60px);
+  }
+}
+
+@keyframes st-spin-back {
+  to {
+    transform: rotate(-1turn);
+  }
+}
+
+/* ---------- Enten: the family waddles ---------- */
+
+.item-enten.playing .st-enten-duck {
+  animation: st-waddle 0.5s ease-in-out calc(var(--i) * 0.1s) 3;
+}
+
+@keyframes st-waddle {
+  25% {
+    transform: translateY(-4px) rotate(-8deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(8deg);
+  }
+}
+
+/* ---------- Auto: hops and puffs ---------- */
+
+.item-auto.playing .st-auto-body {
+  animation: st-car-hop 0.8s ease-in-out 2;
+}
+
+.item-auto.playing .st-auto-puff circle {
+  animation: st-puff 1.2s ease-out calc(var(--i) * 0.2s);
+}
+
+@keyframes st-car-hop {
+  15% {
+    transform: scale(1.04, 0.94);
+  }
+  45% {
+    transform: translateY(-20px);
+  }
+  75% {
+    transform: scale(1.04, 0.95);
+  }
+}
+
+@keyframes st-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50px, -20px) scale(1.8);
+  }
+}
+
+/* ---------- Feuerwehr: the ladder goes up, blue lights glow ---------- */
+
+.item-feuerwehr.playing .st-feuer-ladder {
+  animation: st-ladder 2.8s ease-in-out;
+}
+
+.item-feuerwehr.playing .st-feuer-light {
+  animation: st-blue 2.6s ease-in-out;
+}
+
+.item-feuerwehr.playing .st-feuer-glow {
+  animation: st-glow 2.6s ease-in-out;
+}
+
+@keyframes st-ladder {
+  30%,
+  70% {
+    transform: rotate(-28deg);
+  }
+}
+
+/* ---------- Müllauto: lifts the bin and empties it ---------- */
+
+.item-muellauto.playing .st-muell-bin {
+  animation: st-bin 2.6s ease-in-out;
+}
+
+.item-muellauto.playing .st-muell-body {
+  animation: st-bounce 0.3s ease-in-out 1.1s 3;
+}
+
+@keyframes st-bin {
+  35%,
+  65% {
+    transform: rotate(160deg);
+  }
+  45% {
+    transform: rotate(150deg);
+  }
+  55% {
+    transform: rotate(160deg);
+  }
+}
+
+/* ---------- Ampel: red man, then green man, then red again ---------- */
+
+.item-ampel.playing .st-ampel-red {
+  animation: st-off 2.6s ease-in-out;
+}
+
+.item-ampel.playing .st-ampel-green {
+  animation: st-on 2.6s ease-in-out;
+}
+
+@keyframes st-off {
+  15%,
+  85% {
+    opacity: 0.12;
+  }
+}
+
+@keyframes st-on {
+  20%,
+  85% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Mülleimer: wobbles, rubbish hops out and back ---------- */
+
+.item-muelleimer.playing .st-eimer-bin {
+  animation: st-wobble 0.4s ease-in-out 4;
+}
+
+.item-muelleimer.playing .st-eimer-junk > * {
+  animation: st-junk 1.2s ease-out calc(var(--i) * 0.15s);
+}
+
+@keyframes st-wobble {
+  25% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes st-junk {
+  0% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-50px) rotate(90deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(0) rotate(180deg);
+  }
+}
+
+/* ---------- Blumen: the blossoms open wide ---------- */
+
+.item-blumen.playing .st-blumen-head {
+  animation: st-bloom 0.8s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+@keyframes st-bloom {
+  50% {
+    transform: scale(1.35) rotate(30deg);
+  }
+}
+
+/* ---------- Schmetterling: flutters around ---------- */
+
+.item-falter.playing .st-falter-flight {
+  animation: st-flutter 2.4s ease-in-out;
+}
+
+.item-falter.playing .st-falter-wings {
+  animation: st-flap 0.15s ease-in-out 16 alternate;
+}
+
+@keyframes st-flutter {
+  25% {
+    transform: translate(50px, -40px);
+  }
+  50% {
+    transform: translate(10px, -80px);
+  }
+  75% {
+    transform: translate(-30px, -30px);
+  }
+}
+
+/* ---------- Roller: rolls a bit and comes back ---------- */
+
+.item-roller.playing .st-roller-ride {
+  animation: st-scoot 1.8s ease-in-out;
+}
+
+.item-roller.playing .st-roller-wheel {
+  animation: st-turn 0.6s linear 3;
+}
+
+@keyframes st-scoot {
+  50% {
+    transform: translateX(60px);
+  }
+}
+
+/* ---------- Kinderwagen: rocks the baby ---------- */
+
+.item-kinderwagen.playing .st-wagen-body {
+  animation: st-rock 0.6s ease-in-out 3;
+}
+
+@keyframes st-rock {
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+/* ---------- Brunnen: the water shoots up high ---------- */
+
+.item-brunnen.playing .st-brunnen-big {
+  transform-origin: 0px -136px;
+  animation: st-fountain 2.4s ease-in-out;
+}
+
+.item-brunnen.playing .st-brunnen-jet {
+  animation: st-off 2.4s ease-in-out;
+}
+
+.item-brunnen.playing .st-brunnen-ripples ellipse {
+  animation: st-ripple 1.2s ease-out calc(var(--i) * 0.3s) 2;
+}
+
+@keyframes st-fountain {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  20%,
+  80% {
+    opacity: 0.9;
+    transform: scaleY(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleY(0.2);
+  }
+}
+
+@keyframes st-ripple {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* ---------- Luftballon: the balloon tugs at the string, the girl hops ---------- */
+
+.item-luftballon.playing .st-ballon-balloon {
+  animation: st-tug 1.1s ease-in-out 2;
+}
+
+.item-luftballon.playing .st-ballon-kid {
+  animation: st-hop 0.7s ease-in-out 0.3s 2;
+}
+
+@keyframes st-tug {
+  25% {
+    transform: rotate(12deg) translateY(-14px);
+  }
+  75% {
+    transform: rotate(-10deg) translateY(-6px);
+  }
+}
+
+/* ---------- Hund: jumps, sticks out the tongue, wags ---------- */
+
+.item-hund.playing .st-hund-body {
+  animation: st-hop 0.8s ease-in-out 2;
+}
+
+.item-hund.playing .st-hund-tail {
+  animation: st-wag 0.15s ease-in-out 10 alternate;
+}
+
+.item-hund.playing .st-hund-tongue {
+  animation: st-tongue 1.6s ease-in-out;
+}
+
+@keyframes st-tongue {
+  15%,
+  85% {
+    opacity: 1;
+    transform: scaleY(1.2);
+  }
+}
+
+/* ---------- Marienkäfer: opens her shell and flies a round ---------- */
+
+.item-marienkaefer.playing .st-kaefer-body {
+  animation: st-beetle 2.4s ease-in-out;
+}
+
+.item-marienkaefer.playing .st-kaefer-left {
+  animation: st-shell-left 2.4s ease-in-out;
+}
+
+.item-marienkaefer.playing .st-kaefer-right {
+  animation: st-shell-right 2.4s ease-in-out;
+}
+
+.item-marienkaefer.playing .st-kaefer-wings {
+  animation: st-wings 2.4s ease-in-out;
+}
+
+.item-marienkaefer.playing .st-kaefer-wings ellipse {
+  animation: st-flap 0.08s linear 0.3s 22 alternate;
+}
+
+@keyframes st-beetle {
+  15% {
+    transform: none;
+  }
+  40% {
+    transform: translate(40px, -60px);
+  }
+  65% {
+    transform: translate(-30px, -50px);
+  }
+  85%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes st-shell-left {
+  10%,
+  85% {
+    transform: rotate(35deg);
+  }
+}
+
+@keyframes st-shell-right {
+  10%,
+  85% {
+    transform: rotate(-35deg);
+  }
+}
+
+@keyframes st-wings {
+  12%,
+  85% {
+    opacity: 0.8;
+  }
+}
+
+/* ---------- Taube: pecks crumbs ---------- */
+
+.item-taube.playing .st-taube-head {
+  animation: st-peck 0.6s ease-in-out 3;
+}
+
+@keyframes st-peck {
+  50% {
+    transform: rotate(40deg);
+  }
+}
+
+/* ---------- Maus: pops out of the drain and back ---------- */
+
+.item-maus.playing .st-maus-body {
+  animation: st-peek 1.8s ease-in-out;
+}
+
+@keyframes st-peek {
+  20% {
+    transform: translateY(16px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+  65% {
+    transform: translateY(-20px) rotate(-8deg);
+  }
+  80% {
+    transform: translateY(-20px) rotate(8deg);
+  }
+}

@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { inTheme } from "@/content/themes";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
@@ -196,12 +197,11 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     return true;
   }, [advance]);
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-      if (e.repeat) return;
-      const target = resolveKey(e.key, pack);
-      const isNextKey = e.key === " " || e.key === "Enter" || (shown !== null && isSame(target, shown));
+  /** A key was pressed, on the keyboard or on the screen. */
+  const pressKey = useCallback(
+    (key: string) => {
+      const target = resolveKey(key, pack);
+      const isNextKey = key === " " || key === "Enter" || (shown !== null && isSame(target, shown));
       if (settings.stepByStep && shown && isNextKey) {
         if (!tryAdvance()) funBurst();
         return;
@@ -214,10 +214,22 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       }
       lastChange.current = now;
       show(target);
+    },
+    [pack, shown, show, tryAdvance, funBurst, settings.stepByStep, settings.finishCounting],
+  );
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
+      if (!e.repeat) pressKey(e.key);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pack, shown, show, tryAdvance, funBurst, settings.stepByStep, settings.finishCounting]);
+  }, [pressKey]);
+
+  // Tablets: digits, then the alphabet.
+  const touchKeys = useTouchKeys(settings.touchKeys);
+  const rows = useMemo(() => keyRows([..."1234567890", ...pack.letters.map((l) => l.upper)]), [pack]);
 
   useEffect(() => () => countTimers.current.forEach(clearTimeout), []);
 
@@ -245,26 +257,37 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       style={{ background }}
       onPointerDown={onPlayAreaPointer}
     >
-      {shown === null && <p className="letters-welcome">Drück eine Taste! ⌨️</p>}
-      {shown?.kind === "letter" && (
-        <LetterCard
-          key={shown.id}
-          letter={shown.letter}
-          word={shown.word}
-          stage={stage}
-          settings={settings}
-          onPointerDown={onCardPointer}
-        />
-      )}
-      {shown?.kind === "number" && (
-        <NumberCard
-          key={shown.id}
-          n={shown.n}
-          thing={shown.thing}
-          zeroEmoji={pack.zero.emoji}
-          stage={stage}
-          hint={settings.stepByStep}
-          onPointerDown={onCardPointer}
+      <div className="stage">
+        {shown === null && (
+          <p className="letters-welcome">{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>
+        )}
+        {shown?.kind === "letter" && (
+          <LetterCard
+            key={shown.id}
+            letter={shown.letter}
+            word={shown.word}
+            stage={stage}
+            settings={settings}
+            onPointerDown={onCardPointer}
+          />
+        )}
+        {shown?.kind === "number" && (
+          <NumberCard
+            key={shown.id}
+            n={shown.n}
+            thing={shown.thing}
+            zeroEmoji={pack.zero.emoji}
+            stage={stage}
+            hint={settings.stepByStep}
+            onPointerDown={onCardPointer}
+          />
+        )}
+      </div>
+      {touchKeys && (
+        <TouchKeyboard
+          rows={rows}
+          onKey={pressKey}
+          label={(key) => (settings.letterCase === "lower" ? key.toLocaleLowerCase("de-DE") : key)}
         />
       )}
       <BurstLayer bursts={bursts} />

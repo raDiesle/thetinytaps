@@ -113,6 +113,7 @@ function IdeaCard({ idea, starred, onStar }: { idea: Idea; starred: boolean; onS
           Aufwand {idea.effort} {EFFORT_LABELS[idea.effort]}
         </span>
         {idea.planned && <span className="idea-planned">schon geplant</span>}
+        {idea.done && <span className="idea-done">schon umgesetzt</span>}
       </div>
     </li>
   );

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";
+import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
@@ -140,25 +141,36 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
   // Start with a word right away; settings can't change while playing.
   useEffect(() => nextWord(), []);
 
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
-      if (e.repeat || !current) return;
+  /** A key was pressed, on the keyboard or on the screen. */
+  const pressKey = useCallback(
+    (key: string) => {
+      if (!current) return;
       if (done) {
         if (!tryNextWord()) funBurst();
         return;
       }
-      if (settings.anyKey || matches(e.key, letters[typed])) {
+      if (settings.anyKey || matches(key, letters[typed])) {
         if (!tryType()) funBurst();
         return;
       }
       funBurst();
       if ((nudges + 1) % HINT_AFTER_WRONG === 0) sayLetter(letters[typed]);
       setNudges(nudges + 1);
+    },
+    [current, done, letters, typed, nudges, settings.anyKey, tryType, tryNextWord, funBurst, sayLetter],
+  );
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
+      if (!e.repeat) pressKey(e.key);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [current, done, letters, typed, nudges, settings.anyKey, tryType, tryNextWord, funBurst, sayLetter]);
+  }, [pressKey]);
+
+  const touchKeys = useTouchKeys(settings.touchKeys);
+  const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
 
   useEffect(() => {
     setSfxVolume(settings.calm ? 0.4 : 1);
@@ -194,38 +206,48 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
       style={{ background }}
       onPointerDown={onPlayAreaPointer}
     >
-      {current && (
-        <div key={current.id} className={`card${done ? " done" : ""}`}>
-          <div className={`reveal ${settings.showPicture || done ? "shown" : "waiting"}`} onPointerDown={onPicturePointer}>
-            <Picture word={current.word} />
+      <div className="stage">
+        {current && (
+          <div key={current.id} className={`card${done ? " done" : ""}`}>
+            <div className={`reveal ${settings.showPicture || done ? "shown" : "waiting"}`} onPointerDown={onPicturePointer}>
+              <Picture word={current.word} />
+            </div>
+            <div className="slots" style={{ "--letters": letters.length } as CSSProperties}>
+              {letters.map((char, i) =>
+                i === typed ? (
+                  <span
+                    key={`${i}-${nudges}`}
+                    className={`slot next${nudges > 0 ? " nudge" : ""}`}
+                    onPointerDown={onNextLetterPointer}
+                  >
+                    {display(char)}
+                  </span>
+                ) : (
+                  <span
+                    key={i}
+                    className={`slot ${i < typed ? "typed" : "later"}`}
+                    style={
+                      {
+                        "--i": i,
+                        color: i < typed ? BRIGHT_COLORS[i % BRIGHT_COLORS.length] : undefined,
+                      } as CSSProperties
+                    }
+                  >
+                    {display(char)}
+                  </span>
+                ),
+              )}
+            </div>
           </div>
-          <div className="slots" style={{ "--letters": letters.length } as CSSProperties}>
-            {letters.map((char, i) =>
-              i === typed ? (
-                <span
-                  key={`${i}-${nudges}`}
-                  className={`slot next${nudges > 0 ? " nudge" : ""}`}
-                  onPointerDown={onNextLetterPointer}
-                >
-                  {display(char)}
-                </span>
-              ) : (
-                <span
-                  key={i}
-                  className={`slot ${i < typed ? "typed" : "later"}`}
-                  style={
-                    {
-                      "--i": i,
-                      color: i < typed ? BRIGHT_COLORS[i % BRIGHT_COLORS.length] : undefined,
-                    } as CSSProperties
-                  }
-                >
-                  {display(char)}
-                </span>
-              ),
-            )}
-          </div>
-        </div>
+        )}
+      </div>
+      {touchKeys && (
+        <TouchKeyboard
+          rows={rows}
+          onKey={pressKey}
+          label={(key) => (settings.letterCase === "lower" ? key.toLocaleLowerCase("de-DE") : key)}
+          highlight={done ? undefined : letters[typed]?.toLocaleUpperCase("de-DE")}
+        />
       )}
       <BurstLayer bursts={bursts} />
     </div>

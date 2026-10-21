@@ -3,21 +3,21 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev"],
       "port": 3000
     },
     {
       "name": "dev-test",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3100"],
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev", "--port", "3100"],
       "port": 3100,
       "autoPort": false
     },
     {
       "name": "dev-3010",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--", "--port", "3010"],
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev", "--port", "3010"],
       "port": 3010,
       "autoPort": false
     }

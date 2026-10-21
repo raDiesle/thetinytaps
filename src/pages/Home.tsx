@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
+import { Logo } from "@/components/Logo";
+import { Sky } from "@/components/Sky";
 import { useTitle } from "@/lib/title";
 
 const GAMES = [
@@ -28,20 +30,16 @@ export function Home() {
 
   return (
     <main className="home">
-      <h1>
-        The Tiny Ta
-        <span
-          className="secret-hold"
-          onPointerDown={beginHold}
-          onPointerUp={cancelHold}
-          onPointerLeave={cancelHold}
-          onPointerCancel={cancelHold}
-          onContextMenu={(e) => e.preventDefault()}
-        >
-          p
-        </span>
-        s
-      </h1>
+      <Sky />
+      <Logo
+        secretProps={{
+          onPointerDown: beginHold,
+          onPointerUp: cancelHold,
+          onPointerLeave: cancelHold,
+          onPointerCancel: cancelHold,
+          onContextMenu: (e) => e.preventDefault(),
+        }}
+      />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
       <ul className="game-list">
         {GAMES.map((g) => (

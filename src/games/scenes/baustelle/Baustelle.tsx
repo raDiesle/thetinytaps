@@ -18,7 +18,9 @@ import {
   Schnecke,
   Vogel,
 } from "./figures";
-import { DIGGER, FLOWERS, HAMMER, SITE, TREE, float, ground } from "./layout";
+import { float, ground } from "../layout";
+import { Sonne, Wolke } from "../sky";
+import { DIGGER, FLOWERS, HAMMER, SITE, TREE } from "./layout";
 import { Ampel, Bagger, Ballon, Betonmischer, Gabelstapler, Hubschrauber, Kipplaster, Kran, Walze } from "./machines";
 import {
   Bauwagen,
@@ -33,9 +35,7 @@ import {
   Sandhaufen,
   Schild,
   Schubkarre,
-  Sonne,
   Werkzeugkasten,
-  Wolke,
 } from "./site";
 import "./baustelle.css";
 

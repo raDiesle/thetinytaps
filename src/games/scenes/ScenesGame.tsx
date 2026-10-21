@@ -39,7 +39,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               options={[
                 { value: "tap", label: "👆 Antippen / Klicken" },
                 { value: "hover", label: "🖱️ Darüberfahren / Wischen" },
-                { value: "keys", label: "⌨️ Jedes Ding hat eine Taste" },
+                { value: "keys", label: "⌨️ Jedes Ding hat eine Taste (mit Tastatur)" },
               ]}
             />
             {settings.trigger === "keys" && (

@@ -5,15 +5,17 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 ## Development
 
 ```bash
-npm install
-npm run dev        # http://localhost:3000 (Rsbuild dev server)
-npm run typecheck
-npm run build      # static site in out/
-npm run preview    # serve the built site
+yarn install
+yarn dev           # http://localhost:3000 (Rsbuild dev server)
+yarn typecheck
+yarn build         # static site in out/
+yarn preview       # serve the built site
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 (repo settings → Pages → Source: **GitHub Actions**).
+
+Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 
 ## Structure
 
@@ -24,9 +26,11 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 | `src/pages/` | One component per page |
 | `src/components/GameShell.tsx` | Shared shell: parent start screen, fullscreen + keyboard lock, hold-to-exit |
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
+| `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
+| `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/globals.css` |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/games/letters/` | Game "Buchstaben & Zahlen" |
-| `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes, e.g. `baustelle/` |
+| `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes `baustelle/`, `stadt/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
 | `src/games/words/` | Game "Wörter tippen" (words come from `de.ts`, filtered by length and theme) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
 | `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
@@ -40,6 +44,14 @@ The full guide (depth, keys, drawing style, checks) is the Claude Code skill
 Defaults: speech is off and the picture only moves when someone taps, hovers or
 presses a key. Parents can turn on speech, idle movement and the keys mode
 ("Jedes Ding hat eine Taste") on the start screen.
+
+## Tablets
+
+All games work by touch. The letters and words games show big letter keys on
+the screen on touch-only devices (tablets, phones); parents can switch them to
+"Immer" or "Nie" on the start screen. On iPad the games go fullscreen; on
+iPhone (no fullscreen in Safari) add the page to the home screen to hide the
+browser bars.
 
 To add a picture that has no emoji, put an SVG in `public/images/` and set
 `image` on the word (see Xylophon).
@@ -57,4 +69,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 2. ~~Options: themes (Tiere, Fahrzeuge, Essen), announcement style, calm mode, uninterrupted counting~~
 3. Own illustrations and recorded voice (incl. letter sounds „b“ instead of „Be“), offline (PWA)
 4. ~~Wörter tippen~~
-5. ~~Lebendige Bilder: Wimmelbild Baustelle~~ – next: Bauernhof, Zoo, Stadt
+5. ~~Lebendige Bilder: Wimmelbild Baustelle, Stadt~~ – next: Bauernhof, Zoo

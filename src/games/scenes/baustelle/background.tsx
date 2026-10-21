@@ -1,6 +1,7 @@
-import { DIGGER, FLOWERS, HAMMER, HORIZON, SITE, depthScale, towardsHorizon, transformOf } from "./layout";
+import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
+import { DIGGER, FLOWERS, HAMMER, SITE } from "./layout";
 import type { ReactNode } from "react";
-import { Cloud, INK } from "./shared";
+import { Cloud, INK } from "../shared";
 
 // The sky ends at the fence (HORIZON). Behind it lies the city in a light haze;
 // in front of it the ground gets darker and pebbles, tufts and kerb joints get

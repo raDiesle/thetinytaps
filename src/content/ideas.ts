@@ -18,6 +18,8 @@ export interface Idea {
   effort: Effort;
   /** Already on the README roadmap or in the "bald" list. */
   planned?: boolean;
+  /** Already in the app. */
+  done?: boolean;
 }
 
 export interface IdeaArea {
@@ -46,6 +48,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Auf Geräten ohne Tastatur eine große ABC-Leiste (oder ein Raster mit 6–8 Buchstaben) einblenden. Antippen wirkt wie ein Tastendruck.",
         why: "Macht das Spiel auf iPad und Handy überhaupt erst richtig spielbar.",
         effort: "M",
+        done: true,
       },
       {
         id: "L-02",
@@ -380,7 +383,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ampel schaltet und Autos halten, Zebrastreifen, Müllabfuhr, Bus, Feuerwehr, Bäckerei mit Brezel, Taube, Baustellen-Cameo.",
         why: "Alltag des Kindes; Verkehrsregeln spielerisch.",
         effort: "L",
-        planned: true,
+        done: true,
       },
       {
         id: "S-04",
@@ -767,7 +770,6 @@ export const IDEA_AREAS: IdeaArea[] = [
 
 /** My suggestion of what to do first, with a short reason each. */
 export const TOP_PICKS: { id: string; reason: string }[] = [
-  { id: "L-01", reason: "Ohne Tastatur auf dem Tablet kaum spielbar – größter Hebel für alle Spiele." },
   { id: "N-01", reason: "Klein, sofort lustig, nutzt den vorhandenen Klang-Baukasten." },
   { id: "N-03", reason: "Löst das Problem „Bildschirmzeit beenden“." },
   { id: "B-01", reason: "Guck-guck passt perfekt zu 2-Jährigen und zur bestehenden Baustelle." },
@@ -775,4 +777,5 @@ export const TOP_PICKS: { id: string; reason: string }[] = [
   { id: "L-03", reason: "Der eigene Name ist der stärkste Motivator." },
   { id: "N-04", reason: "Wischen + Fahrzeuge = Dauerbrenner." },
   { id: "W-01", reason: "Kleine Änderung, macht „Wörter tippen“ für Kleine viel lohnender." },
+  { id: "A-03", reason: "Spielzeit-Grenze, die das Spiel setzt – zusammen mit N-03 ein starkes Paar." },
 ];

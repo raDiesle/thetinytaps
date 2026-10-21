@@ -17,6 +17,11 @@ export function GameCard({ href, emoji, title, text }: GameCardProps) {
       </span>
       <span className="game-title">{title}</span>
       {text && <span className="game-text">{text}</span>}
+      {href && (
+        <span className="game-go" aria-hidden>
+          ▶
+        </span>
+      )}
     </>
   );
   if (href) {

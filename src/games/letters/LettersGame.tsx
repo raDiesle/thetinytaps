@@ -1,5 +1,6 @@
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
+import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
@@ -76,6 +77,10 @@ export function LettersGame() {
                 onChange={(finishCounting) => update({ finishCounting })}
               />
             )}
+          </SettingsGroup>
+
+          <SettingsGroup title="Tablet">
+            <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} />
           </SettingsGroup>
         </>
       }

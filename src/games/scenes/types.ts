@@ -40,7 +40,13 @@ export type SceneSound =
   | "buzz"
   | "rumble"
   | "hum"
-  | "saw";
+  | "saw"
+  | "honk"
+  | "siren"
+  | "bells"
+  | "ring"
+  | "coo"
+  | "meow";
 
 export interface SceneItem {
   id: string;

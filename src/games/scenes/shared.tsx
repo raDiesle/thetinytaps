@@ -1,6 +1,6 @@
 import { useId, type CSSProperties, type ReactNode } from "react";
 
-// Everything in this scene is drawn in absolute scene coordinates (1600 × 1000),
+// Drawing helpers shared by all scenes. Everything is drawn in absolute scene coordinates (1600 × 1000),
 // so the transform-origin of an animated part is simply its pivot point in the picture.
 
 export const INK = "#3d405b";
