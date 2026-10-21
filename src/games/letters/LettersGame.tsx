@@ -58,6 +58,13 @@ export function LettersGame() {
                 { value: "lower", label: "a" },
               ]}
             />
+            {settings.letterCase === "both" && settings.mode === "free" && (
+              <Toggle
+                label="Mama- und Baby-Buchstabe (mit Augen, an der Hand)"
+                checked={settings.letterFamily}
+                onChange={(letterFamily) => update({ letterFamily })}
+              />
+            )}
             <Choice<LettersSettings["theme"]>
               label="Bilder"
               value={settings.theme}

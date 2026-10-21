@@ -17,6 +17,8 @@ export interface LettersSettings {
   /** Find mode: after a few wrong keys, light up the wanted key on a little keyboard picture. */
   hints: boolean;
   letterCase: LetterCase;
+  /** With "A a": the big letter holds the small one by the hand, both with eyes. */
+  letterFamily: boolean;
   /** Show the word under the picture, with its first letter highlighted. */
   showWord: boolean;
   /** Speak letters/words and count numbers aloud. */
@@ -40,6 +42,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   mode: "free",
   hints: true,
   letterCase: "upper",
+  letterFamily: true,
   showWord: true,
   speech: false,
   announce: "letterAndWord",

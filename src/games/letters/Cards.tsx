@@ -1,4 +1,4 @@
-import type { PointerEventHandler, ReactNode } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type PointerEventHandler, type ReactNode } from "react";
 import { Picture } from "@/components/Picture";
 import type { Countable, LetterEntry, WordEntry } from "@/content/types";
 import type { LettersSettings } from "./settings";
@@ -39,12 +39,15 @@ export function LetterCard({
   stage,
   settings,
   onPointerDown,
+  onPicturePointerDown,
 }: {
   letter: LetterEntry;
   word: WordEntry;
   stage: number;
   settings: LettersSettings;
   onPointerDown?: PointerEventHandler;
+  /** Tapping the picture, e.g. for the next word with the same letter. */
+  onPicturePointerDown?: PointerEventHandler;
 }) {
   const glyphs = { upper: [letter.upper], both: [letter.upper, letter.lower], lower: [letter.lower] }[
     settings.letterCase
@@ -54,11 +57,15 @@ export function LetterCard({
 
   return (
     <div className="card" onPointerDown={onPointerDown}>
-      <div className="glyphs">
-        {glyphs.map((g) => (
-          <span key={g}>{g}</span>
-        ))}
-      </div>
+      {settings.letterCase === "both" && settings.letterFamily ? (
+        <LetterFamily letter={letter} />
+      ) : (
+        <div className="glyphs">
+          {glyphs.map((g) => (
+            <span key={g}>{g}</span>
+          ))}
+        </div>
+      )}
       {settings.showWord && (
         <Reveal visible={visible("word")} hint={settings.stepByStep}>
           <div className="word">
@@ -68,9 +75,57 @@ export function LetterCard({
         </Reveal>
       )}
       <Reveal visible={visible("picture")} hint={settings.stepByStep}>
-        <Picture word={word} />
+        <div onPointerDown={visible("picture") ? onPicturePointerDown : undefined}>
+          <Picture word={word} />
+        </div>
       </Reveal>
     </div>
+  );
+}
+
+/** How long the baby letter stays grown up after a tap. */
+const GROWN_MS = 1600;
+
+/**
+ * "A a" as mother and baby: both have eyes and wiggle, holding hands.
+ * Tapping the baby makes it grow into the big letter for a moment.
+ */
+function LetterFamily({ letter }: { letter: LetterEntry }) {
+  const [grown, setGrown] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const grow = (e: PointerEvent) => {
+    e.stopPropagation();
+    setGrown(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setGrown(false), GROWN_MS);
+  };
+
+  return (
+    <div className="glyphs family">
+      <span className="mama">
+        {letter.upper}
+        <Eyes />
+      </span>
+      <svg className="hands" viewBox="0 0 40 24" aria-hidden>
+        <path d="M0 4 Q10 20 20 16 Q30 20 40 8" />
+        <circle cx="20" cy="16" r="6" />
+      </svg>
+      <span className={`baby${grown ? " grown" : ""}`} onPointerDown={grow}>
+        {grown ? letter.upper : letter.lower}
+        <Eyes />
+      </span>
+    </div>
+  );
+}
+
+function Eyes() {
+  return (
+    <span className="eyes" aria-hidden>
+      <span />
+      <span />
+    </span>
   );
 }
 
