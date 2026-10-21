@@ -212,6 +212,40 @@ export function playMeow() {
   note({ from: 900, to: 520, duration: 0.35, type: "triangle", volume: 0.2, delay: 0.17 });
 }
 
+/** "Oink, oink!" – two short grunts. */
+export function playOink() {
+  [0, 0.28].forEach((delay) => note({ from: 260, to: 180, duration: 0.14, type: "square", volume: 0.12, lowpass: 700, delay }));
+}
+
+/** "Mäh!" – a bleat: a quick wobble of short notes. */
+export function playBaa() {
+  for (let i = 0; i < 6; i++) note({ from: i % 2 ? 560 : 500, to: 470, duration: 0.09, type: "sawtooth", volume: 0.14, lowpass: 1500, delay: i * 0.08 });
+}
+
+/** "Gack, gack, gaaack!" – a hen. */
+export function playCluck() {
+  [0, 0.18, 0.36].forEach((delay, i) =>
+    note({ from: 700, to: i === 2 ? 900 : 500, duration: i === 2 ? 0.26 : 0.1, type: "triangle", volume: 0.18, lowpass: 2000, delay }),
+  );
+}
+
+/** "Kikeriki!" – the cock crows: three short notes and a long high one. */
+export function playCrow() {
+  [0, 0.14, 0.28].forEach((delay, i) => note({ from: 660 + i * 80, duration: 0.12, type: "sawtooth", volume: 0.12, lowpass: 2200, delay }));
+  note({ from: 980, to: 820, duration: 0.6, type: "sawtooth", volume: 0.12, lowpass: 2200, delay: 0.44 });
+}
+
+/** A horse's whinny: a high, trembling note that falls. */
+export function playNeigh() {
+  for (let i = 0; i < 8; i++) note({ from: 900 - i * 60, to: 840 - i * 60, duration: 0.1, type: "triangle", volume: 0.16, delay: i * 0.08 });
+}
+
+/** "Schuhu!" – an owl, two soft low hoots. */
+export function playHoot() {
+  note({ from: 420, to: 380, duration: 0.25, type: "sine", volume: 0.3 });
+  note({ from: 400, to: 340, duration: 0.5, type: "sine", volume: 0.3, delay: 0.35 });
+}
+
 /** Three hammer knocks. */
 export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));
