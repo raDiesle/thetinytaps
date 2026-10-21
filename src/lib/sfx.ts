@@ -200,6 +200,45 @@ export function playMeow() {
   note({ from: 900, to: 520, duration: 0.35, type: "triangle", volume: 0.2, delay: 0.17 });
 }
 
+/** "Muuuh!" – low, long and a little rising at first. */
+export function playMoo() {
+  note({ from: 130, to: 175, duration: 0.25, type: "sawtooth", volume: 0.25, lowpass: 600 });
+  note({ from: 175, to: 140, duration: 0.9, type: "sawtooth", volume: 0.25, lowpass: 600, delay: 0.22 });
+}
+
+/** "Oink, oink!" – two short grunts. */
+export function playOink() {
+  [0, 0.22].forEach((delay) => note({ from: 320, to: 200, duration: 0.13, type: "square", volume: 0.12, lowpass: 1000, delay }));
+}
+
+/** "Mäh!" – a wobbly bleat. */
+export function playBaa() {
+  for (let i = 0; i < 8; i++) note({ from: i % 2 ? 470 : 430, duration: 0.09, type: "sawtooth", volume: 0.1, lowpass: 1600, delay: i * 0.07 });
+}
+
+/** "Wieher!" – a trill that runs down. */
+export function playNeigh() {
+  for (let i = 0; i < 10; i++) note({ from: 950 - i * 45 + (i % 2) * 70, duration: 0.09, type: "triangle", volume: 0.15, delay: i * 0.07 });
+}
+
+/** "Gack, gack, gaaack!" */
+export function playCluck() {
+  [0, 0.16, 0.36].forEach((delay, i) =>
+    note({ from: 640, to: 460, duration: i === 2 ? 0.24 : 0.08, type: "square", volume: 0.08, lowpass: 1500, delay }),
+  );
+}
+
+/** "Kikeriki!" – three short notes up, then a long one down. */
+export function playCrow() {
+  [600, 800, 1000].forEach((from, i) => note({ from, duration: 0.12, type: "triangle", volume: 0.18, delay: i * 0.13 }));
+  note({ from: 1100, to: 700, duration: 0.6, type: "triangle", volume: 0.18, delay: 0.4 });
+}
+
+/** "Quak, quak!" of a frog – lower and rounder than the duck. */
+export function playCroak() {
+  [0, 0.3].forEach((delay) => note({ from: 190, to: 140, duration: 0.16, type: "sawtooth", volume: 0.25, lowpass: 600, delay }));
+}
+
 /** Three hammer knocks. */
 export function playKnocks() {
   [0, 0.18, 0.36].forEach((delay) => note({ from: 220, to: 120, duration: 0.09, type: "triangle", volume: 0.4, delay }));

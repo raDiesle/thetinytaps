@@ -46,7 +46,14 @@ export type SceneSound =
   | "bells"
   | "ring"
   | "coo"
-  | "meow";
+  | "meow"
+  | "moo"
+  | "oink"
+  | "baa"
+  | "neigh"
+  | "cluck"
+  | "crow"
+  | "croak";
 
 export interface SceneItem {
   id: string;
