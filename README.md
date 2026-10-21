@@ -29,6 +29,7 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 | `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore / find mode, tap, hover / swipe or keys) and the scenes, e.g. `baustelle/` |
 | `src/games/words/` | Game "Wörter tippen" (words come from `de.ts`, filtered by length and theme) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage |
+| `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
 
 To add a scene to "Lebendige Bilder", create a folder like `src/games/scenes/baustelle/`
 with the drawing (SVG in React, one component per tappable item), its texts and a
