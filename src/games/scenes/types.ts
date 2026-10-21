@@ -103,6 +103,8 @@ export interface SceneItem {
   key?: string;
   /** Questions mode: what the item is like. Only clear cases, so every answer is obviously right. */
   traits?: SceneTrait[];
+  /** The name is a plural ("die Küken"), so questions say "Wo sind …?". */
+  plural?: boolean;
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */
   durationMs: number;
   /**

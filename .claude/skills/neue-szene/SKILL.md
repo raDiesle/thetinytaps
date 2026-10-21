@@ -89,6 +89,7 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   (red/yellow/blue/green, only if the item clearly is that colour), `flies`, `big`,
   `small`, `animal`, `wheels`. No traits for plural names ("die Blumen"), the answer
   is built as "<Name> ist rot!". A question is only asked with ≥ 2 answers.
+- Plural names ("die Küken") get `plural: true`, so find mode asks "Wo sind die Küken?".
 - Sound riddle: only distinctive sounds are asked (`RIDDLE_SOUNDS` in `quests.ts`);
   every item with that sound counts as right, so give each item its most fitting sound.
 - Chain reactions: add 2–3 `chains` to the scene (`{ start, steps: [{ item, sentence }] }`),

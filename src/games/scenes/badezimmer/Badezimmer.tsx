@@ -381,6 +381,7 @@ export const badezimmer: Scene = {
     {
       id: "hausschuhe",
       name: "die Hausschuhe",
+      plural: true,
       sentences: ["Die Hasen-Hausschuhe hüpfen.", "Hopp, hopp! Die Ohren wackeln."],
       sound: "boing",
       box: [-78, -80, 156, 80],
@@ -428,6 +429,7 @@ export const badezimmer: Scene = {
     {
       id: "seifenblasen",
       name: "die Seifenblasen",
+      plural: true,
       sentences: ["Pust! Viele Seifenblasen fliegen.", "Plopp! Die Blase ist geplatzt."],
       sound: "pop",
       box: [-50, -224, 108, 224],

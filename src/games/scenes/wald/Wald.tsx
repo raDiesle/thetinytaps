@@ -268,6 +268,7 @@ export const wald: Scene = {
     {
       id: "frischlinge",
       name: "die Frischlinge",
+      plural: true,
       sentences: ["Die Frischlinge sind die Kinder vom Wildschwein.", "Die Frischlinge haben Streifen."],
       sound: "oink",
       box: [-70, -48, 156, 48],

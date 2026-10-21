@@ -21,6 +21,9 @@ export interface Quest {
   praise: (item: SceneItem) => string;
 }
 
+/** "ist" or "sind" ("war" or "waren" in the past), matching the item's name. */
+export const verb = (item: SceneItem, past = false) => (past ? (item.plural ? "waren" : "war") : item.plural ? "sind" : "ist");
+
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
 /** Questions mode: one question per trait, asked when the scene has at least two answers. */
@@ -96,11 +99,11 @@ const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.le
 function findQuest(item: SceneItem): Quest {
   return {
     id: item.id,
-    question: `Wo ist ${item.name}?`,
+    question: `Wo ${verb(item)} ${item.name}?`,
     answers: [item],
     needed: 1,
     item,
-    praise: (found) => `Das ist ${found.name}!`,
+    praise: (found) => `Das ${verb(found)} ${found.name}!`,
   };
 }
 
@@ -112,7 +115,7 @@ function soundQuest(scene: Scene, sound: SceneSound): Quest {
     answers: scene.items.filter((item) => item.sound === sound),
     needed: 1,
     sound,
-    praise: (found) => `Das war ${found.name}!`,
+    praise: (found) => `Das ${verb(found, true)} ${found.name}!`,
   };
 }
 

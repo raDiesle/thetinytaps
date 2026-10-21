@@ -65,7 +65,7 @@ import {
 import { speak } from "@/lib/speech";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { assignKeys } from "./keys";
-import { nextQuest, questsFor, type Quest } from "./quests";
+import { nextQuest, questsFor, verb, type Quest } from "./quests";
 import { isQuestMode, type ScenesSettings } from "./settings";
 import { placeBox, type Box, type Scene, type SceneItem, type SceneSound } from "./types";
 
@@ -444,10 +444,10 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     if (settings.hints && misses.current >= HINT_AFTER_MISSES) setHint(true);
     lastQuestion.current = performance.now();
     if (!quest.sound) {
-      say(`Das ist ${item.name}. ${quest.question}`);
+      say(`Das ${verb(item)} ${item.name}. ${quest.question}`);
       return;
     }
-    say(`Das ist ${item.name}. Hör noch mal!`);
+    say(`Das ${verb(item)} ${item.name}. Hör noch mal!`);
     if (riddleRepeat.current) return;
     riddleRepeat.current = true;
     later(() => {

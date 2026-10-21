@@ -62,6 +62,7 @@ export const weltall: Scene = {
     {
       id: "sterne",
       name: "die Sterne",
+      plural: true,
       sentences: ["Die Sterne funkeln.", "Funkel, funkel, kleiner Stern!"],
       sound: "twinkle",
       box: [-80, -46, 166, 80],
@@ -180,6 +181,7 @@ export const weltall: Scene = {
     {
       id: "solarzellen",
       name: "die Solarzellen",
+      plural: true,
       sentences: ["Die Solarzellen fangen Sonnenlicht.", "Damit gibt es Strom."],
       sound: "hum",
       box: [-114, -126, 228, 128],

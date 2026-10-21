@@ -120,6 +120,7 @@ export const feuerwache: Scene = {
     {
       id: "helme",
       name: "die Helme",
+      plural: true,
       sentences: ["Hier hängen die Jacken und die Helme.", "Schnell anziehen, dann geht es los!"],
       sound: "pop",
       box: [-278, -318, 356, 318],
@@ -194,6 +195,7 @@ export const feuerwache: Scene = {
     {
       id: "blumen",
       name: "die Blumen",
+      plural: true,
       sentences: ["Die Blumen blühen rot und gelb.", "Die Feuerwehr gießt die Blumen."],
       sound: "chime",
       box: [-78, -108, 156, 108],
@@ -480,6 +482,7 @@ export const feuerwache: Scene = {
     {
       id: "stiefel",
       name: "die Stiefel",
+      plural: true,
       sentences: ["Die Stiefel stehen bereit. Reinspringen und los!", "Stampf, stampf!"],
       sound: "knocks",
       box: [-62, -130, 152, 130],
