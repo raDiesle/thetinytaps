@@ -167,6 +167,18 @@ export function playHonk() {
   });
 }
 
+/** "Tschu-tschu!" – a steam whistle: two soft chords, the second one longer. */
+export function playWhistle() {
+  [
+    { delay: 0, duration: 0.3 },
+    { delay: 0.4, duration: 0.8 },
+  ].forEach(({ delay, duration }) => {
+    note({ from: 587, to: 622, duration, type: "triangle", volume: 0.16, delay });
+    note({ from: 740, to: 784, duration, type: "triangle", volume: 0.12, delay });
+    note({ from: 880, to: 932, duration, type: "sine", volume: 0.08, delay });
+  });
+}
+
 /** "Tatütata" – two alternating siren notes, soft enough for small ears. */
 export function playSiren() {
   [0, 0.4, 0.8, 1.2].forEach((delay, i) => note({ from: i % 2 ? 587 : 440, duration: 0.36, type: "triangle", volume: 0.18, delay }));

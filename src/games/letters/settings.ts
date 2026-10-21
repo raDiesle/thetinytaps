@@ -3,10 +3,14 @@ import type { ThemeId } from "@/content/types";
 
 export type LetterCase = "upper" | "both" | "lower";
 
+/** Cards: one big letter or number at a time. Train: every key adds a wagon to a train. */
+export type LettersMode = "cards" | "train";
+
 /** What is spoken for a letter: "Be, wie Bär!", "Bär!" or "Be!". */
 export type Announce = "letterAndWord" | "word" | "letter";
 
 export interface LettersSettings {
+  mode: LettersMode;
   letterCase: LetterCase;
   /** Show the word under the picture, with its first letter highlighted. */
   showWord: boolean;
@@ -28,6 +32,7 @@ export interface LettersSettings {
 }
 
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
+  mode: "cards",
   letterCase: "upper",
   showWord: true,
   speech: false,

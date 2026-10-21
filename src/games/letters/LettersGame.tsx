@@ -4,13 +4,15 @@ import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
-import { DEFAULT_LETTERS_SETTINGS, LETTERS_SETTINGS_KEY, type Announce, type LetterCase, type LettersSettings } from "./settings";
+import { DEFAULT_LETTERS_SETTINGS, LETTERS_SETTINGS_KEY, type Announce, type LetterCase, type LettersMode, type LettersSettings } from "./settings";
 import { LettersPlay } from "./LettersPlay";
+import { TrainPlay } from "./TrainPlay";
 
 const pack = de;
 
 export function LettersGame() {
   const [settings, update] = useStoredSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
+  const train = settings.mode === "train";
 
   return (
     <GameShell
@@ -18,6 +20,18 @@ export function LettersGame() {
       emoji="🔤"
       settings={
         <>
+          <SettingsGroup title="Spiel">
+            <Choice<LettersMode>
+              label="Spielart"
+              value={settings.mode}
+              onChange={(mode) => update({ mode })}
+              options={[
+                { value: "cards", label: "🃏 Karten" },
+                { value: "train", label: "🚂 Buchstaben-Zug" },
+              ]}
+            />
+          </SettingsGroup>
+
           <SettingsGroup title="Anzeige">
             <Choice<LetterCase>
               label="Buchstaben"
@@ -38,13 +52,15 @@ export function LettersGame() {
                 ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
               ]}
             />
-            <Toggle label="Wort anzeigen" checked={settings.showWord} onChange={(showWord) => update({ showWord })} />
+            {!train && (
+              <Toggle label="Wort anzeigen" checked={settings.showWord} onChange={(showWord) => update({ showWord })} />
+            )}
           </SettingsGroup>
 
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
             {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Be, wie Bär!" />}
-            {settings.speech && (
+            {settings.speech && !train && (
               <Choice<Announce>
                 label="Ansage"
                 value={settings.announce}
@@ -60,17 +76,19 @@ export function LettersGame() {
           </SettingsGroup>
 
           <SettingsGroup title="Verhalten">
-            <Toggle
-              label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
-              checked={settings.stepByStep}
-              onChange={(stepByStep) => update({ stepByStep })}
-            />
+            {!train && (
+              <Toggle
+                label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
+                checked={settings.stepByStep}
+                onChange={(stepByStep) => update({ stepByStep })}
+              />
+            )}
             <Toggle
               label="Ruhiger Modus (leiser, weniger Bewegung)"
               checked={settings.calm}
               onChange={(calm) => update({ calm })}
             />
-            {!settings.stepByStep && (
+            {!settings.stepByStep && !train && (
               <Toggle
                 label="Zählen nicht unterbrechen"
                 checked={settings.finishCounting}
@@ -85,7 +103,7 @@ export function LettersGame() {
         </>
       }
     >
-      <LettersPlay pack={pack} settings={settings} />
+      {train ? <TrainPlay pack={pack} settings={settings} /> : <LettersPlay pack={pack} settings={settings} />}
     </GameShell>
   );
 }
