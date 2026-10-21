@@ -20,7 +20,13 @@ export interface Idea {
   planned?: boolean;
   /** Already in the app. */
   done?: boolean;
+  /** Partly in the app: what is there already, so the rest is clear. */
+  partial?: string;
 }
+
+export type IdeaStatus = "done" | "partial" | "open";
+
+export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.partial ? "partial" : "open");
 
 export interface IdeaArea {
   prefix: string;
@@ -74,6 +80,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Statt automatisch zu zählen, tippt das Kind jedes Ding einzeln an; es hüpft und die Zahl wird gesagt. Erst wenn alle angetippt sind, erscheint die Ziffer.",
         why: "Übt die Eins-zu-eins-Zuordnung, die Grundlage des Zählens.",
         effort: "M",
+        partial: "Schritt-für-Schritt zeigt pro Klick ein Ding mehr und zählt mit; das Antippen einzelner Dinge fehlt noch.",
       },
       {
         id: "L-05",
@@ -99,6 +106,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Leertaste = Konfetti-Sprung, Enter = Hupe/Pfiff, Pfeiltasten schieben das Bild, Rückschritt holt das letzte Bild zurück. Bisher machen sie nur Formen.",
         why: "Jede Taste tut etwas Eigenes – Kinder entdecken die ganze Tastatur.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-08",
@@ -107,6 +115,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Tippt man auf das Bild, kommt das nächste Wort zum selben Buchstaben: B – Bär → Ball → Bus.",
         why: "Zeigt, dass ein Buchstabe zu vielen Wörtern gehört.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-09",
@@ -115,6 +124,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Bei „A a“ hält der große Buchstabe den kleinen an der Hand, beide haben Augen und wackeln. Optional: Kleinbuchstabe „wächst“ zum Großbuchstaben.",
         why: "Macht den Zusammenhang Groß/Klein greifbar.",
         effort: "S",
+        done: true,
       },
       {
         id: "L-10",
@@ -178,6 +188,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Auf dem Tablet statt Tastatur 3–6 riesige Buchstabenknöpfe: der richtige plus ein paar andere. Anzahl einstellbar.",
         why: "Tablet-tauglich und für Anfänger viel leichter als 26 Tasten.",
         effort: "M",
+        partial: "Auf dem Tablet gibt es Bildschirmtasten mit hervorgehobenem Buchstaben, aber noch das ganze ABC statt weniger großer Knöpfe.",
       },
       {
         id: "W-03",
@@ -249,6 +260,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Türen, Fenster, Sandhaufen, Container lassen sich öffnen: Dahinter sitzt jedes Mal etwas anderes (Katze, Maus, Geschenk). Guck-guck!",
         why: "Objektpermanenz und Neugier – genau das Alter, in dem „Wo ist es hin?“ fasziniert.",
         effort: "M",
+        partial: "Feste Gucker gibt es schon (Maus im Rohr und im Gully, Hase im Busch, Tor der Feuerwache); wechselnde Überraschungen fehlen.",
       },
       {
         id: "B-02",
@@ -289,6 +301,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Wolke antippen löst Regen (Pfützen, Regenschirme), Schnee (alles wird weiß) oder Wind (Blätter fliegen) aus – die ganze Szene reagiert.",
         why: "Ursache und Wirkung im großen Maßstab.",
         effort: "L",
+        partial: "Die Wolke regnet schon („Plitsch, platsch“); Schnee, Wind und eine reagierende Szene fehlen.",
       },
       {
         id: "B-07",
@@ -321,6 +334,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Im Tasten-Modus wandert ein Leuchtrahmen mit den Pfeiltasten von Ding zu Ding; Leertaste oder Enter löst es aus.",
         why: "Für Kinder, die Buchstaben noch nicht finden, aber Pfeile drücken können.",
         effort: "S",
+        partial: "Der Tasten-Modus gibt jedem Ding eine eigene Taste; der wandernde Leuchtrahmen fehlt.",
       },
       {
         id: "B-11",
@@ -715,6 +729,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Englisch, Türkisch, Polnisch, … als weiteres LanguagePack. Optional zweisprachig: „Bär – bear“.",
         why: "Für mehrsprachige Familien; die Struktur dafür gibt es schon.",
         effort: "M",
+        partial: "Die Sprachpakete sind vorbereitet, es gibt aber nur Deutsch.",
       },
       {
         id: "A-06",
