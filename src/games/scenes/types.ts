@@ -46,7 +46,14 @@ export type SceneSound =
   | "bells"
   | "ring"
   | "coo"
-  | "meow";
+  | "meow"
+  | "moo"
+  | "oink"
+  | "baa"
+  | "cluck"
+  | "crow"
+  | "neigh"
+  | "hoot";
 
 /** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */
 export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" | "small" | "animal" | "wheels";

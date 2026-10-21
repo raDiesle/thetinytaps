@@ -26,6 +26,13 @@ import {
   playRing,
   playCoo,
   playMeow,
+  playMoo,
+  playOink,
+  playBaa,
+  playCluck,
+  playCrow,
+  playNeigh,
+  playHoot,
   playTweet,
   setSfxVolume,
 } from "@/lib/sfx";
@@ -62,6 +69,13 @@ const SOUNDS: Record<SceneSound, () => void> = {
   ring: playRing,
   coo: playCoo,
   meow: playMeow,
+  moo: playMoo,
+  oink: playOink,
+  baa: playBaa,
+  cluck: playCluck,
+  crow: playCrow,
+  neigh: playNeigh,
+  hoot: playHoot,
 };
 
 /** Key presses closer together than this only spawn shapes. */

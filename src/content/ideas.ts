@@ -393,7 +393,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Kuh, Schwein, Schaf, Hühner (Ei legen), Hahn weckt alle, Traktor, Scheune mit Katze, Misthaufen mit Fliegen, Pferd, Hofhund.",
         why: "Tierlaute sind das Lieblingsthema der Altersgruppe.",
         effort: "L",
-        planned: true,
+        done: true,
       },
       {
         id: "S-02",
