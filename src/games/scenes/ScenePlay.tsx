@@ -154,7 +154,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** Explore and colour mode: items tapped at least once (in colour mode: the coloured ones). */
   const [discovered, setDiscovered] = useState<ReadonlySet<string>>(new Set());
   const [partying, setPartying] = useState(false);
-  /** Keys mode: the item in the glowing frame, moved with the arrow keys. */
+  /** Keys mode: the item in the glowing frame, moved with the arrow keys; hidden once an item starts. */
   const [focus, setFocus] = useState<SceneItem | null>(null);
   const { bursts, spawn } = useBursts();
 
@@ -355,7 +355,11 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
    */
   const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover" | "key") => {
     interacted();
-    if (settings.trigger === "keys") moveFocus(item);
+    // The arrow keys go on from the activated item, but it gets no frame.
+    if (settings.trigger === "keys") {
+      focusRef.current = item;
+      setFocus(null);
+    }
     const quest = questRef.current;
 
     if (!quest) {
