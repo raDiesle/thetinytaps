@@ -3,7 +3,7 @@ import { COMFORTS, COMFORTS_NEEDED, FEELINGS, type ComfortId, type Feeling } fro
 import { blendFace, MOODS } from "./Critter";
 import { PlaceDrawing } from "./places";
 import type { FeelingsSettings } from "./settings";
-import { Actor, FloaterLayer, useFloaters, useTimers, useVoice } from "./shared";
+import { Actor, ChoiceCard, FloaterLayer, useFloaters, useTimers, useVoice } from "./shared";
 import { GROUND, type Pose } from "./story";
 
 /** How long a kind thing plays before the next one can start. */
@@ -161,6 +161,13 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
         <span key={`${round.key}-${happy}`} className="story-tag feeling-tag">
           <span aria-hidden>{happy ? feeling.end.emoji : feeling.emoji}</span> {happy ? feeling.end.name : feeling.name}
         </span>
+        <span className="fg-hearts" aria-hidden>
+          {Array.from({ length: COMFORTS_NEEDED }, (_, i) => (
+            <span key={i} className={`fg-heart${i < level ? " full" : ""}`}>
+              💛
+            </span>
+          ))}
+        </span>
         <p key={round.narration}>{round.narration}</p>
       </header>
       <div className="story-stage-wrap place-room">
@@ -193,22 +200,15 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
           const c = COMFORTS[id];
           const done = used.includes(id);
           return (
-            <button
+            <ChoiceCard
               key={id}
-              type="button"
-              className={`story-button${done ? " done" : " next"}`}
-              disabled={done || round.busy || happy}
-              onPointerDown={(e: PointerEvent) => {
-                e.stopPropagation();
-                if (!done) comfort(id);
-              }}
-            >
-              <span className="story-button-emoji" aria-hidden>
-                {c.emoji}
-              </span>
-              {c.label}
-              {done && <span className="story-check">✓</span>}
-            </button>
+              picture={c.picture}
+              place="room"
+              label={c.label}
+              state={done ? "done" : round.busy || happy ? "rest" : "choose"}
+              small={happy}
+              onChoose={() => comfort(id)}
+            />
           );
         })}
         {happy && (

@@ -56,8 +56,9 @@ export function FeelingsGame() {
                 ]}
               />
               <p className="setting-note">
-                Beim Selbst-Wählen steht neben dem ersten Schritt eine nicht so gute Idee (z.&nbsp;B. zurückschubsen). Der Bär schüttelt dann
-                den Kopf und es wird erklärt, warum – gezeigt wird sie nicht.
+                Jede Antwort ist ein Bild, auf dem der Bär es vormacht – so kann das Kind ohne Lesen wählen. Beim Selbst-Wählen steht neben
+                dem ersten Schritt eine nicht so gute Idee (z.&nbsp;B. zurückschubsen). Tippt das Kind darauf, bekommt sie ein rotes Kreuz, der
+                Bär schüttelt den Kopf, denkt sie sich durchgestrichen und es wird erklärt, warum. Die gute Idee bekommt einen grünen Haken.
               </p>
             </SettingsGroup>
           )}

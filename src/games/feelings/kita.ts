@@ -3,7 +3,7 @@
 // Each one shows what the little bear can do instead of hitting back:
 // say "Stopp!", step away, get a grown-up, ask, wait, swap.
 
-import { GROUND, type Beat } from "./story";
+import { GROUND, type Beat, type Picture } from "./story";
 
 export type SituationId = "push" | "kick" | "grab" | "slide" | "want" | "angry";
 
@@ -12,8 +12,10 @@ export type Place = "playground" | "sandbox" | "slide" | "room";
 
 export interface KitaStep {
   emoji: string;
-  /** Short, on the button. */
+  /** Short, under the card's picture. */
   label: string;
+  /** What the card shows: the bear doing it. */
+  picture: Picture;
   beats: Beat[];
 }
 
@@ -26,12 +28,12 @@ export interface Situation {
   intro: Beat[];
   steps: KitaStep[];
   /** The not-so-good idea, offered next to the first step when children choose themselves. */
-  instead: { emoji: string; label: string; answer: string };
+  instead: { emoji: string; label: string; answer: string; picture: Picture };
   outro: Beat[];
 }
 
 /** Off stage, where the teacher waits until someone gets her. */
-const OFF_RIGHT = 118;
+const OFF_RIGHT = 160;
 /** Standing on top of the slide, and at the end of the chute; see the slide drawing in KitaPlay. */
 const SLIDE_TOP = { x: 36, y: 54 };
 const SLIDE_END = { x: 66, y: GROUND };
@@ -64,6 +66,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "✋",
         label: "Stopp! Nein!",
+        picture: { cast: { bear: { x: 66, pose: "stop", mood: "neutral", face: "left" }, fox: { x: 26, mood: "surprised" } }, signs: [{ emoji: "✋", x: 46, y: 60 }] },
         beats: [
           {
             narration: "Der kleine Bär sagt laut:",
@@ -75,6 +78,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "👣",
         label: "Weggehen",
+        picture: { cast: { bear: { x: 80, pose: "walk", mood: "neutral" }, fox: { x: 18 } }, signs: [{ emoji: "👣", x: 40, y: 2, size: 18 }, { emoji: "👣", x: 58, y: 2, size: 22 }] },
         beats: [
           { narration: "Dann geht er weg. So hat er Abstand.", cast: { bear: { x: 78, pose: "walk", mood: "neutral", face: "right" } } },
           { cast: { bear: { pose: "stand", face: "left" } } },
@@ -83,6 +87,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🙋",
         label: "Hilfe holen",
+        picture: { cast: { bear: { x: 28, pose: "reach", mood: "neutral" }, teacher: { x: 72, face: "left", mood: "happy" } } },
         beats: [
           {
             narration: "Er holt die Erzieherin.",
@@ -97,7 +102,12 @@ export const SITUATIONS: Situation[] = [
         ],
       },
     ],
-    instead: { emoji: "👊", label: "Zurückschubsen", answer: "Hmm, dann tut es noch mehr weh. Sag lieber laut: Stopp!" },
+    instead: {
+      emoji: "👊",
+      label: "Zurückschubsen",
+      answer: "Hmm, dann tut es noch mehr weh. Sag lieber laut: Stopp!",
+      picture: { cast: { bear: { x: 68, pose: "push", mood: "angry", face: "left" }, fox: { x: 24, pose: "fall", mood: "sad", face: "left" } }, signs: [{ emoji: "💥", x: 45, y: 30, size: 26 }] },
+    },
     outro: [
       {
         narration: "Super! Stopp sagen, weggehen, Hilfe holen.",
@@ -130,6 +140,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "✋",
         label: "Stopp!",
+        picture: { cast: { bear: { x: 34, pose: "stop", mood: "neutral" }, fox: { x: 74, mood: "surprised", face: "left" } }, signs: [{ emoji: "✋", x: 54, y: 60 }] },
         beats: [
           {
             narration: "Der kleine Bär sagt laut:",
@@ -141,6 +152,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "👣",
         label: "Weggehen",
+        picture: { cast: { bear: { x: 20, pose: "walk", mood: "neutral", face: "left" }, fox: { x: 82, face: "left" } }, signs: [{ emoji: "👣", x: 42, y: 2, size: 22 }, { emoji: "👣", x: 60, y: 2, size: 18 }] },
         beats: [
           { narration: "Er geht ein paar Schritte weg.", cast: { bear: { x: 20, pose: "walk", mood: "neutral", face: "left" } } },
           { cast: { bear: { pose: "stand", face: "right" } } },
@@ -149,6 +161,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🙋",
         label: "Hilfe holen",
+        picture: { cast: { bear: { x: 28, pose: "reach", mood: "neutral" }, teacher: { x: 72, face: "left", mood: "happy" } } },
         beats: [
           {
             narration: "Er ruft die Erzieherin.",
@@ -163,7 +176,12 @@ export const SITUATIONS: Situation[] = [
         ],
       },
     ],
-    instead: { emoji: "🦶", label: "Zurücktreten", answer: "Hmm, dann tut es beiden weh. Sag lieber laut: Stopp!" },
+    instead: {
+      emoji: "🦶",
+      label: "Zurücktreten",
+      answer: "Hmm, dann tut es beiden weh. Sag lieber laut: Stopp!",
+      picture: { cast: { bear: { x: 36, pose: "kick", mood: "angry" }, fox: { x: 72, pose: "fall", mood: "sad" } }, signs: [{ emoji: "💥", x: 56, y: 16, size: 26 }] },
+    },
     outro: [
       {
         narration: "Prima! Stopp sagen, Abstand halten, Hilfe holen.",
@@ -198,6 +216,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "✋",
         label: "Das ist meins!",
+        picture: { cast: { bear: { x: 32, pose: "stop", mood: "neutral" }, fox: { x: 74, mood: "surprised", face: "left", holds: "🚜" } }, signs: [{ emoji: "✋", x: 52, y: 60 }] },
         beats: [
           {
             narration: "Der kleine Bär sagt laut:",
@@ -209,6 +228,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🤲",
         label: "Zurück, bitte",
+        picture: { cast: { bear: { x: 30, pose: "reach", mood: "happy" }, fox: { x: 70, pose: "give", mood: "sorry", face: "left", holds: "🚜" } } },
         beats: [
           { line: { who: "bear", text: "Gib ihn mir bitte zurück." }, cast: { bear: { pose: "reach", mood: "neutral" } } },
           { line: { who: "fox", text: "Hier. Entschuldigung." }, cast: { fox: { x: 54, pose: "give", mood: "sorry" } } },
@@ -218,13 +238,19 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🤝",
         label: "Mitspielen?",
+        picture: { cast: { bear: { x: 28, mood: "joy", holds: "🚜" }, fox: { x: 72, mood: "joy", face: "left", holds: "🪣" } }, signs: [{ emoji: "🤝", x: 50, y: 66, size: 24 }] },
         beats: [
           { line: { who: "bear", text: "Willst du mitspielen? Du kannst den Eimer haben." } },
           { line: { who: "fox", text: "Au ja!" }, cast: { fox: { x: 60, mood: "joy", holds: "🪣" } } },
         ],
       },
     ],
-    instead: { emoji: "😤", label: "Wegreißen", answer: "Hmm, dann zerren beide und es gibt Streit. Sag lieber: Stopp, das ist meins!" },
+    instead: {
+      emoji: "😤",
+      label: "Wegreißen",
+      answer: "Hmm, dann zerren beide und es gibt Streit. Sag lieber: Stopp, das ist meins!",
+      picture: { cast: { bear: { x: 32, pose: "reach", mood: "angry" }, fox: { x: 68, pose: "reach", mood: "angry", face: "left" } }, signs: [{ emoji: "🚜", x: 50, y: 30, size: 22 }, { emoji: "💢", x: 50, y: 70, size: 22 }] },
+    },
     outro: [
       {
         narration: "Toll! Und gibt er es nicht zurück, holst du die Erzieherin.",
@@ -256,6 +282,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🚶",
         label: "Anstellen",
+        picture: { cast: { bear: { x: 18, mood: "neutral" }, fox: { x: 46, mood: "happy" } }, signs: [{ emoji: "🛝", x: 80, y: 6, size: 50 }] },
         beats: [
           {
             narration: "Er stellt sich hinten an.",
@@ -267,6 +294,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "⏳",
         label: "Warten",
+        picture: { cast: { bear: { x: 30, mood: "neutral" } }, signs: [{ emoji: "⏳", x: 30, y: 78, size: 20 }, { emoji: "🛝", x: 74, y: 6, size: 50 }] },
         beats: [
           { narration: "Er wartet. Erst rutscht der Hase …", cast: { bunny: { ...SLIDE_END, pose: "slide", mood: "joy" } } },
           {
@@ -280,13 +308,19 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🥳",
         label: "Jetzt ich!",
+        picture: { cast: { bear: { x: 34, pose: "hop", mood: "joy" } }, signs: [{ emoji: "🛝", x: 74, y: 6, size: 50 }] },
         beats: [
           { narration: "Jetzt ist der kleine Bär dran!", cast: { bear: { ...SLIDE_TOP, mood: "happy" } } },
           { line: { who: "bear", text: "Juhuu!" }, cast: { bear: { ...SLIDE_END, pose: "slide", mood: "joy" } }, sound: "boing" },
         ],
       },
     ],
-    instead: { emoji: "💥", label: "Vordrängeln", answer: "Hmm, auf der Rutsche kann jemand runterfallen. Lieber hinten anstellen." },
+    instead: {
+      emoji: "💥",
+      label: "Vordrängeln",
+      answer: "Hmm, auf der Rutsche kann jemand runterfallen. Lieber hinten anstellen.",
+      picture: { cast: { bear: { x: 24, pose: "push", mood: "angry" }, fox: { x: 60, pose: "fall", mood: "sad" } }, signs: [{ emoji: "💥", x: 43, y: 30, size: 24 }, { emoji: "🛝", x: 88, y: 6, size: 44 }] },
+    },
     outro: [
       {
         narration: "Super gewartet! Jeder kommt mal dran.",
@@ -317,6 +351,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🗣️",
         label: "Fragen",
+        picture: { cast: { bear: { x: 28, mood: "neutral" }, bunny: { x: 72, mood: "happy", face: "left", holds: "🚗" } }, signs: [{ emoji: "❓", x: 46, y: 64, size: 24 }] },
         beats: [
           { narration: "Er fragt:", line: { who: "bear", text: "Darf ich auch mal?" }, cast: { bear: { pose: "stand", mood: "neutral" } } },
           { line: { who: "bunny", text: "Gleich. Ich spiele noch." }, cast: { bunny: { mood: "happy" } } },
@@ -325,6 +360,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "⏳",
         label: "Warten",
+        picture: { cast: { bear: { x: 28, mood: "happy", holds: "⚽" }, bunny: { x: 72, mood: "joy", face: "left", holds: "🚗" } }, signs: [{ emoji: "⏳", x: 50, y: 70, size: 20 }] },
         beats: [
           {
             narration: "Der kleine Bär wartet. Solange spielt er mit dem Ball.",
@@ -337,13 +373,19 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🔄",
         label: "Tauschen",
+        picture: { cast: { bear: { x: 28, mood: "joy", holds: "🚗" }, bunny: { x: 72, mood: "joy", face: "left", holds: "⚽" } }, signs: [{ emoji: "🔄", x: 50, y: 68, size: 22 }] },
         beats: [
           { line: { who: "bunny", text: "Jetzt darfst du. Tauschen wir?" }, cast: { bunny: { x: 54 } } },
           { line: { who: "bear", text: "Ja! Danke!" }, cast: { bear: { x: 38, holds: "🚗", mood: "joy" }, bunny: { holds: "⚽" } }, sound: "pop" },
         ],
       },
     ],
-    instead: { emoji: "✊", label: "Wegnehmen", answer: "Hmm, dann ist der Hase traurig. Frag lieber: Darf ich auch mal?" },
+    instead: {
+      emoji: "✊",
+      label: "Wegnehmen",
+      answer: "Hmm, dann ist der Hase traurig. Frag lieber: Darf ich auch mal?",
+      picture: { cast: { bear: { x: 36, pose: "reach", mood: "angry" }, bunny: { x: 72, mood: "sad", face: "left", holds: "🚗" } }, signs: [{ emoji: "💢", x: 54, y: 68, size: 22 }] },
+    },
     outro: [
       {
         narration: "Prima! Fragen, warten, tauschen.",
@@ -378,6 +420,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🦶",
         label: "Stampfen",
+        picture: { cast: { bear: { x: 44, pose: "stomp", mood: "angry" } }, signs: [{ emoji: "🦶", x: 76, y: 4, size: 30 }] },
         beats: [
           { narration: "Aber er stampft lieber. Stampf, stampf!", cast: { bear: { pose: "stomp" } }, sound: "rumble" },
           { cast: { bear: { pose: "stand" } } },
@@ -386,6 +429,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "💨",
         label: "Tief pusten",
+        picture: { cast: { bear: { x: 40, pose: "breathe", mood: "sorry" } }, signs: [{ emoji: "💨", x: 76, y: 50, size: 26 }] },
         beats: [
           { narration: "Er atmet tief ein und pustet: Puuuh.", cast: { bear: { pose: "breathe", mood: "sorry" } } },
           { cast: { bear: { pose: "stand", mood: "neutral" } } },
@@ -394,6 +438,7 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🗣️",
         label: "Sagen",
+        picture: { cast: { bear: { x: 28, mood: "neutral" }, fox: { x: 72, mood: "sorry", face: "left" } }, signs: [{ emoji: "🗣️", x: 50, y: 64, size: 22 }] },
         beats: [
           { narration: "Dann sagt er:", line: { who: "bear", text: "Ich bin wütend! Mein Turm ist kaputt!" } },
           { line: { who: "fox", text: "Oh, Entschuldigung! Ich helfe dir." }, cast: { fox: { x: 70, mood: "sorry" } } },
@@ -401,7 +446,12 @@ export const SITUATIONS: Situation[] = [
         ],
       },
     ],
-    instead: { emoji: "👊", label: "Schubsen", answer: "Hmm, Schubsen tut weh. Lass die Wut lieber raus: Stampf ganz fest!" },
+    instead: {
+      emoji: "👊",
+      label: "Schubsen",
+      answer: "Hmm, Schubsen tut weh. Lass die Wut lieber raus: Stampf ganz fest!",
+      picture: { cast: { bear: { x: 28, pose: "push", mood: "angry" }, fox: { x: 70, pose: "fall", mood: "sad" } }, signs: [{ emoji: "💥", x: 50, y: 30, size: 26 }] },
+    },
     outro: [
       {
         narration: "Toll! Wütend sein ist okay. Stampfen, pusten, sagen – nicht hauen.",

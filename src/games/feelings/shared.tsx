@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { Critter, type Face, type Species } from "./Critter";
-import { SOUNDS, type ActorId, type ActorState, type SoundName } from "./story";
+import { Critter, MOODS, type Face, type Species } from "./Critter";
+import type { Place } from "./kita";
+import { applyCast, SOUNDS, type ActorId, type ActorState, type Picture, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
 
 const SPEECH_LANG = "de-DE";
@@ -106,12 +107,13 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
   );
 }
 
-/** One animal on the stage: where it stands, its pose, what it holds and says. */
+/** One animal on the stage: where it stands, its pose, what it holds, says and thinks. */
 export function Actor({
   id,
   state,
   face,
   line,
+  thought,
   className = "",
   onPointerDown,
 }: {
@@ -119,6 +121,8 @@ export function Actor({
   state: ActorState;
   face: Face;
   line?: string;
+  /** A thought cloud above the head, e.g. a ❓ while the bear waits for the child. */
+  thought?: ReactNode;
   className?: string;
   onPointerDown?: (e: PointerEvent) => void;
 }) {
@@ -133,10 +137,97 @@ export function Actor({
           {line}
         </div>
       )}
+      {!line && thought && <div className="fg-thought">{thought}</div>}
       <div className={`fg-figure${state.face === "left" ? " flip" : ""}`}>
         <Critter species={SPECIES[id]} face={face} teacher={id === "teacher"} />
         {state.holds && <span className="fg-held">{state.holds}</span>}
       </div>
     </div>
+  );
+}
+
+/** A small picture of a choice: the animals in their poses on a bit of ground, and big signs. */
+export function PictureScene({ picture, place }: { picture: Picture; place: Place }) {
+  const actors = applyCast({}, picture.cast);
+  return (
+    <span className={`fg-scene fg-scene-${place === "room" ? "room" : "outdoors"}`} aria-hidden>
+      {(Object.entries(actors) as [ActorId, ActorState][]).map(([id, state]) => (
+        <Actor key={id} id={id} state={state} face={MOODS[state.mood]} />
+      ))}
+      {picture.blanket && <span className="fg-scene-blanket" />}
+      {picture.signs?.map((sign) => (
+        <span
+          key={sign.emoji + sign.x}
+          className="fg-sign"
+          style={{ left: `${sign.x}%`, bottom: `${sign.y}%`, fontSize: `${sign.size ?? 30}cqh` }}
+        >
+          {sign.emoji}
+        </span>
+      ))}
+    </span>
+  );
+}
+
+/** A round green tick or red cross: good idea, or not so good. Drawn, so it reads the same everywhere. */
+export function Mark({ good, className = "" }: { good: boolean; className?: string }) {
+  return (
+    <svg className={`fg-mark ${good ? "good" : "bad"} ${className}`} viewBox="0 0 100 100" aria-hidden>
+      <circle cx="50" cy="50" r="44" />
+      <path d={good ? "M28 52 L44 68 L73 34" : "M32 32 L68 68 M68 32 L32 68"} />
+    </svg>
+  );
+}
+
+/**
+ * "choose": the child can tap it. "playing": chosen, the bear does it now.
+ * "done": done, with a tick. "wrong": the not-so-good idea, crossed out. "rest": waits.
+ */
+export type CardState = "choose" | "playing" | "done" | "wrong" | "rest";
+
+/** A big picture button: what the bear can do, to be understood without reading. */
+export function ChoiceCard({
+  picture,
+  place,
+  label,
+  state,
+  small = false,
+  onChoose,
+}: {
+  picture: Picture;
+  place: Place;
+  label: string;
+  state: CardState;
+  small?: boolean;
+  onChoose?: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`fg-card fg-card-${state}${small ? " small" : ""}`}
+      disabled={state !== "choose"}
+      aria-label={label}
+      onPointerDown={(e: PointerEvent) => {
+        e.stopPropagation();
+        if (state === "choose") onChoose?.();
+      }}
+    >
+      <PictureScene picture={picture} place={place} />
+      {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
+      {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
+      <span className="fg-card-label">{label}</span>
+    </button>
+  );
+}
+
+/** One dot per step at the top: green with a tick when done, yellow for the one that comes now. */
+export function StepDots({ total, done, current }: { total: number; done: number; current: boolean }) {
+  return (
+    <span className="fg-dots" aria-hidden>
+      {Array.from({ length: total }, (_, i) => (
+        <span key={i} className={`fg-dot${i < done ? " done" : ""}${i === done && current ? " now" : ""}`}>
+          {i < done ? "✓" : ""}
+        </span>
+      ))}
+    </span>
   );
 }

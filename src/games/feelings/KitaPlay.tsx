@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { MOODS } from "./Critter";
 import { QUESTION, SITUATIONS, type Situation } from "./kita";
 import { PlaceDrawing } from "./places";
 import type { FeelingsSettings } from "./settings";
-import { Actor, useTimers, useVoice } from "./shared";
+import { Actor, ChoiceCard, Mark, PictureScene, StepDots, useTimers, useVoice, type CardState } from "./shared";
 import { applyCast, beatMs, type ActorId, type ActorState, type Beat } from "./story";
 
 const NEXT_QUESTION = "Und jetzt?";
@@ -22,6 +22,8 @@ interface Run {
   stepsDone: number;
   /** The not-so-good idea was tried already. */
   tried: boolean;
+  /** The bear is shaking his head about it right now. */
+  trying: boolean;
   /** Whether the not-so-good idea sits left of the good one. */
   insteadFirst: boolean;
   /** Beats are playing; buttons wait. */
@@ -49,6 +51,7 @@ function freshRun(situation: Situation, key: number): Run {
     phase: "intro",
     stepsDone: 0,
     tried: false,
+    trying: false,
     insteadFirst: Math.random() < 0.5,
     busy: true,
   };
@@ -134,6 +137,8 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
       const { situation } = run;
       const step = situation.steps[i];
       setRun((r) => ({ ...r, stepsDone: i + 1 }));
+      // Choosing between a good and a not-so-good idea: the good one gets a happy chime.
+      if (choose && i === 0) sound("chime");
       playBeats(step.beats, () => {
         if (i + 1 < situation.steps.length) {
           ask(NEXT_QUESTION);
@@ -143,7 +148,7 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
         playBeats(situation.outro, () => setRun((r) => ({ ...r, phase: "done", busy: false })));
       });
     },
-    [run, playBeats, ask],
+    [run, choose, sound, playBeats, ask],
   );
 
   const tryInstead = useCallback(() => {
@@ -152,14 +157,19 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
     setRun((r) => ({
       ...r,
       tried: true,
+      trying: true,
       busy: true,
       narration: answer,
       line: null,
       actors: applyCast(r.actors, { bear: { pose: "shake", mood: "sorry" } }),
     }));
     say(answer);
-    later(() => setRun((r) => ({ ...r, busy: false, actors: applyCast(r.actors, { bear: before }) })), beatMs({ narration: answer }, settings.speech, settings.calm));
-  }, [run, say, later, settings.speech, settings.calm]);
+    sound("yuck");
+    later(
+      () => setRun((r) => ({ ...r, busy: false, trying: false, actors: applyCast(r.actors, { bear: before }) })),
+      beatMs({ narration: answer }, settings.speech, settings.calm),
+    );
+  }, [run, say, sound, later, settings.speech, settings.calm]);
 
   const ready = run.phase === "steps" && !run.busy;
   const offerInstead = choose && run.phase === "steps" && run.stepsDone === 0;
@@ -195,70 +205,71 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
     if (run.phase === "done") nextSituation();
   };
 
-  const stepButtons = run.situation.steps.map((step, i) => {
-    const done = i < run.stepsDone;
-    const next = i === run.stepsDone && run.phase === "steps";
-    return (
-      <button
-        key={step.label}
-        type="button"
-        className={`story-button${done ? " done" : ""}${next ? " next" : ""}`}
-        disabled={!next || !ready}
-        onPointerDown={(e: PointerEvent) => {
-          e.stopPropagation();
-          if (next && ready) doStep(i);
-        }}
-      >
-        <span className="story-button-emoji" aria-hidden>
-          {step.emoji}
-        </span>
-        {step.label}
-        {done && <span className="story-check">✓</span>}
-      </button>
-    );
-  });
+  const { situation } = run;
+  const place = situation.place;
 
-  if (offerInstead) {
-    const { instead } = run.situation;
-    const insteadButton = (
-      <button
-        key="instead"
-        type="button"
-        className={`story-button instead${run.tried ? " tried" : " next"}`}
-        disabled={run.tried || !ready}
-        onPointerDown={(e: PointerEvent) => {
-          e.stopPropagation();
-          if (ready && !run.tried) tryInstead();
-        }}
-      >
-        <span className="story-button-emoji" aria-hidden>
-          {instead.emoji}
-        </span>
-        {instead.label}
-      </button>
-    );
-    stepButtons.splice(run.insteadFirst ? 0 : 1, 0, insteadButton);
+  // Only what the child can choose from now is shown, big; at the end all good steps once more, small.
+  let cards: ReactNode = null;
+  if (run.phase === "outro" || run.phase === "done") {
+    cards = situation.steps.map((step) => (
+      <ChoiceCard key={step.label} picture={step.picture} place={place} label={step.label} state="done" small />
+    ));
+  } else if (run.phase === "steps") {
+    const playing = run.busy && !run.trying;
+    const index = playing ? Math.max(0, run.stepsDone - 1) : run.stepsDone;
+    const step = situation.steps[index];
+    const stepState: CardState = playing ? "playing" : run.trying ? "rest" : "choose";
+    const list = [
+      <ChoiceCard key={step.label} picture={step.picture} place={place} label={step.label} state={stepState} onChoose={() => doStep(index)} />,
+    ];
+    if (choose && index === 0) {
+      const { instead } = situation;
+      const insteadState: CardState = run.tried ? "wrong" : playing ? "rest" : "choose";
+      list.splice(
+        run.insteadFirst ? 0 : 1,
+        0,
+        <ChoiceCard key="instead" picture={instead.picture} place={place} label={instead.label} state={insteadState} onChoose={tryInstead} />,
+      );
+    }
+    cards = list;
   }
 
-  const { situation } = run;
+  // While the bear waits for the child he wonders; trying the not-so-good idea, he sees it crossed out.
+  const thought = run.trying ? (
+    <span className="fg-thought-picture">
+      <PictureScene picture={situation.instead.picture} place={place} />
+      <Mark good={false} className="fg-thought-mark" />
+    </span>
+  ) : ready ? (
+    <span className="fg-thought-ask">?</span>
+  ) : undefined;
+
   return (
     <div className={`story-play kita-play${settings.calm ? " calm" : ""}`} onPointerDown={onStagePointer}>
       <header className="story-narration">
         <span className="story-tag">
           <span aria-hidden>{situation.emoji}</span> {situation.title}
         </span>
+        <StepDots total={situation.steps.length} done={Math.min(run.stepsDone, situation.steps.length)} current={run.phase === "steps"} />
         <p key={run.narration}>{run.narration}</p>
       </header>
       <div className={`story-stage-wrap place-${situation.place}`}>
         <div key={run.key} className={`story-stage ${run.stage}`}>
           <PlaceDrawing place={situation.place} />
           {(Object.entries(run.actors) as [ActorId, ActorState][]).map(([id, state]) => (
-            <Actor key={id} id={id} state={state} face={MOODS[state.mood]} line={run.line?.who === id ? run.line.text : undefined} />
+            <Actor
+              key={id}
+              id={id}
+              state={state}
+              face={MOODS[state.mood]}
+              line={run.line?.who === id ? run.line.text : undefined}
+              thought={id === "bear" ? thought : undefined}
+            />
           ))}
         </div>
       </div>
       <footer className="story-buttons">
-        {stepButtons}
+        {cards}
         {run.phase === "done" && (
           <button
             type="button"

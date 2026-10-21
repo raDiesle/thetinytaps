@@ -455,14 +455,21 @@
   }
 }
 
-/* ---------- Buttons: what the bear can do ---------- */
+/* ---------- Picture cards: what the bear can do, to be seen without reading ---------- */
 
+.story-play {
+  --card-w: min(36vw, 32vh, 300px);
+}
+
+/* Room for one row of big cards, so the stage doesn't jump when they change. */
 .story-buttons {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  gap: 12px 16px;
-  padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+  gap: 12px clamp(14px, 4vw, 40px);
+  min-height: calc(var(--card-w) * 0.75 + 3.2rem);
+  padding: 14px 16px max(16px, env(safe-area-inset-bottom));
   background: #8fd16a;
 }
 
@@ -470,16 +477,323 @@
   background: #e3b07a;
 }
 
-.story-button {
+.fg-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  min-width: 130px;
-  padding: 6px 18px 10px;
+  width: var(--card-w);
+  padding: 6px 6px 4px;
   border: var(--outline);
   border-radius: 22px;
   background: #fff;
+  box-shadow: 0 6px 0 var(--ink);
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(0.9rem, 2.1vw, 1.25rem);
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    opacity 0.3s,
+    background 0.3s,
+    translate 0.15s,
+    box-shadow 0.15s;
+}
+
+.fg-card.small {
+  --card-w: min(20vw, 17vh, 150px);
+  border-radius: 16px;
+  font-size: clamp(0.75rem, 1.6vw, 1rem);
+}
+
+.fg-card-choose {
+  background: var(--sunshine);
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+/* Two cards to choose from take turns calling. */
+.fg-card-choose ~ .fg-card-choose {
+  animation-delay: -0.9s;
+}
+
+.fg-card:disabled {
+  translate: 0 3px;
+  box-shadow: 0 3px 0 var(--ink);
+  cursor: default;
+}
+
+.fg-card-playing,
+.fg-card-done {
+  background: #d9f7e6;
+}
+
+.fg-card-rest {
+  opacity: 0.55;
+}
+
+.fg-card-wrong {
+  background: #ffd6d6;
+}
+
+.fg-card-wrong .fg-scene {
+  filter: grayscale(0.7) opacity(0.65);
+}
+
+.fg-card-label {
+  padding: 4px 2px 2px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+/* The picture: a bit of sky and ground, the animals, the signs. */
+.fg-scene {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  container-type: size;
+  border-radius: 15px;
+  background: linear-gradient(#c4f1ff 0 87%, #8fd16a 87%);
+}
+
+.fg-scene-room {
+  background: linear-gradient(#ffe9c9 0 87%, #e3b07a 87%);
+}
+
+.fg-card.small .fg-scene {
+  border-radius: 10px;
+}
+
+.fg-scene .fg-actor {
+  height: 80%;
+  transition: none;
+}
+
+.fg-scene .fg-actor-teacher {
+  height: 92%;
+}
+
+.fg-scene-blanket {
+  position: absolute;
+  left: 50%;
+  bottom: 6%;
+  z-index: 2;
+  width: 62%;
+  height: 38%;
+  translate: -50% 0;
+  border: 3px solid var(--ink);
+  border-radius: 40% 40% 10px 10px / 30% 30% 10px 10px;
+  background: repeating-linear-gradient(45deg, #ff8fa3 0 8px, #ffb3c7 8px 16px);
+}
+
+/* Things in the paw are drawn bigger than on the stage, so they show on the small picture. */
+.fg-scene .fg-held {
+  font-size: 44cqh;
+}
+
+.fg-sign {
+  position: absolute;
+  z-index: 2;
+  translate: -50% 0;
+  font-family: var(--font-emoji);
+  line-height: 1;
+}
+
+/* Only the cards to choose from move; the others hold still. */
+.fg-card:not(.fg-card-choose) .fg-scene * {
+  animation: none;
+}
+
+/* ---------- Tick and cross ---------- */
+
+.fg-mark circle {
+  stroke: var(--ink);
+  stroke-width: 6;
+}
+
+.fg-mark.good circle {
+  fill: var(--mint);
+}
+
+.fg-mark.bad circle {
+  fill: #ff4d4d;
+}
+
+.fg-mark path {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 13;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fg-card-mark {
+  position: absolute;
+  top: -16px;
+  right: -16px;
+  z-index: 3;
+  width: 36%;
+  animation: fg-stamp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The cross for the not-so-good idea is bigger than the tick, but leaves the picture to be seen. */
+.fg-card-wrong .fg-card-mark {
+  top: -18px;
+  right: -18px;
+  width: 46%;
+}
+
+.fg-card.small .fg-card-mark {
+  top: -10px;
+  right: -10px;
+  width: 32%;
+}
+
+@keyframes fg-stamp {
+  from {
+    opacity: 0;
+    scale: 2.2;
+    rotate: -25deg;
+  }
+}
+
+/* ---------- The bear thinks ---------- */
+
+.fg-thought {
+  position: absolute;
+  bottom: 106%;
+  left: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  padding: 6px;
+  translate: -50% 0;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Two little bubbles lead down to the head. */
+.fg-thought::before,
+.fg-thought::after {
+  content: "";
+  position: absolute;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.fg-thought::before {
+  top: calc(100% + 3px);
+  left: 42%;
+  width: 16px;
+  height: 16px;
+}
+
+.fg-thought::after {
+  top: calc(100% + 24px);
+  left: 36%;
+  width: 9px;
+  height: 9px;
+}
+
+.fg-thought-ask {
+  display: grid;
+  place-items: center;
+  width: 1.3em;
+  height: 1.3em;
+  font-size: clamp(18px, 10cqh, 72px);
+  font-weight: 700;
+  line-height: 1;
+  animation: fg-wonder 1.6s ease-in-out infinite;
+}
+
+@keyframes fg-wonder {
+  50% {
+    rotate: 14deg;
+    scale: 1.12;
+  }
+}
+
+.fg-thought:has(.fg-thought-picture) {
+  padding: 10px 14px;
+  border-radius: 42%;
+}
+
+.fg-thought-picture {
+  position: relative;
+  display: block;
+  width: 46cqh;
+}
+
+.fg-thought-picture .fg-scene {
+  border-radius: 34%;
+}
+
+/* The cross sits on the corner, so the picture stays to be seen. */
+.fg-thought-mark {
+  position: absolute;
+  right: -8%;
+  bottom: -8%;
+  width: 40%;
+  animation: fg-stamp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s backwards;
+}
+
+/* ---------- How far along: dots for the steps, hearts for the bear ---------- */
+
+.fg-dots,
+.fg-hearts {
+  display: flex;
+  gap: 6px;
+}
+
+.fg-dot {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #ffffffb0;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.fg-dot.done {
+  background: var(--mint);
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fg-dot.now {
+  background: var(--sunshine);
+}
+
+.fg-heart {
+  font-family: var(--font-emoji);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  line-height: 1;
+}
+
+.fg-heart:not(.full) {
+  filter: grayscale(1) opacity(0.35);
+}
+
+.fg-heart.full {
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- "Weiter" ---------- */
+
+.story-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 6px 26px 10px;
+  border: var(--outline);
+  border-radius: 22px;
+  background: var(--sunshine);
   box-shadow: 0 6px 0 var(--ink);
   color: var(--ink);
   font: inherit;
@@ -487,51 +801,13 @@
   font-weight: 700;
   cursor: pointer;
   touch-action: manipulation;
+  animation: waiting 1.8s ease-in-out infinite;
 }
 
 .story-button-emoji {
   font-family: var(--font-emoji);
-  font-size: clamp(2rem, 6vh, 3.4rem);
-  line-height: 1.15;
-}
-
-.story-button.next:not(:disabled) {
-  background: var(--sunshine);
-  animation: waiting 1.8s ease-in-out infinite;
-}
-
-.story-button:disabled {
-  translate: 0 3px;
-  box-shadow: 0 3px 0 var(--ink);
-  cursor: default;
-}
-
-.story-button:disabled:not(.done) {
-  opacity: 0.5;
-}
-
-.story-button.done {
-  background: #d9f7e6;
-}
-
-.story-button.instead.tried {
-  opacity: 0.3;
-  text-decoration: line-through;
-}
-
-.story-check {
-  position: absolute;
-  top: -12px;
-  right: -12px;
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border: 3px solid var(--ink);
-  border-radius: 50%;
-  background: var(--mint);
-  font-size: 1rem;
-  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  font-size: clamp(2.6rem, 9vh, 4.6rem);
+  line-height: 1.1;
 }
 
 /* ---------- Kindergarten: the tower that falls over ---------- */
@@ -655,6 +931,18 @@
   }
 }
 
+/* Phones on their side: smaller sentences, so the stage keeps some room next to the cards. */
+@media (max-height: 500px) {
+  .story-narration {
+    min-height: 0;
+    padding-bottom: 6px;
+  }
+
+  .story-narration p {
+    font-size: clamp(1rem, 5vh, 1.5rem);
+  }
+}
+
 /* ---------- Calm mode and reduced motion ---------- */
 
 .story-play.calm .fg-actor {
@@ -666,6 +954,9 @@
 .story-play.calm .c-leg,
 .story-play.calm .c-head,
 .story-play.calm .story-button,
+.story-play.calm .fg-card,
+.story-play.calm .fg-scene *,
+.story-play.calm .fg-thought-ask,
 .story-play.calm .bear-thunder,
 .story-play.calm .c-tears {
   animation: none;
@@ -681,6 +972,9 @@
   .story-play .c-leg,
   .story-play .c-head,
   .story-play .story-button,
+  .story-play .fg-card,
+  .story-play .fg-scene *,
+  .story-play .fg-thought-ask,
   .bear-thunder {
     animation: none;
   }

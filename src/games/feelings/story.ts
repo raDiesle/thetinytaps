@@ -1,7 +1,7 @@
 // What both parts of the feelings game are made of: short beats in which the
 // animals move, change their face and say something.
 
-import { playBoing, playChime, playMelody, playPop, playRumble, playHum } from "@/lib/sfx";
+import { playBoing, playChime, playMelody, playPop, playRumble, playHum, playYuck } from "@/lib/sfx";
 import type { Mood } from "./Critter";
 
 export type ActorId = "bear" | "fox" | "bunny" | "teacher";
@@ -44,6 +44,7 @@ export const SOUNDS = {
   rumble: playRumble,
   melody: playMelody,
   hum: playHum,
+  yuck: playYuck,
 };
 
 export type SoundName = keyof typeof SOUNDS;
@@ -58,6 +59,27 @@ export interface Beat {
   /** A class on the stage for things that change, like the tower. */
   stage?: string;
   sound?: SoundName;
+}
+
+/** A big emoji drawn into a picture card, at x / y (from the bottom) in % of the card. */
+export interface Sign {
+  emoji: string;
+  x: number;
+  y: number;
+  /** In % of the card height; default 30. */
+  size?: number;
+}
+
+/**
+ * What a choice looks like on its card, so children who can't read yet see
+ * what the bear will do: the animals in their poses, plus a few signs like ✋
+ * or 👣. Positions are in % of the card; every actor needs an x.
+ */
+export interface Picture {
+  cast: Cast;
+  signs?: Sign[];
+  /** A blanket up to the chin, like the one on the stage. */
+  blanket?: boolean;
 }
 
 /** The ground line, in % of the stage height. */
