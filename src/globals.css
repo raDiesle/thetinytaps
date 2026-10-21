@@ -1611,6 +1611,118 @@ kbd {
   font-weight: 800;
 }
 
+/* Sound riddle and questions: a big symbol instead of the item's picture. */
+.find-emoji {
+  display: grid;
+  place-items: center;
+  width: min(12vh, 90px);
+  height: min(12vh, 90px);
+  border-radius: 50%;
+  background: #e3f6ff;
+  font-family: var(--font-emoji);
+  font-size: min(7vh, 54px);
+}
+
+/* Questions with several answers: one dot per answer still to find. */
+.find-progress {
+  display: flex;
+  gap: 6px;
+}
+
+.find-progress span {
+  width: 0.55em;
+  height: 0.55em;
+  border: 3px solid #2b2d4240;
+  border-radius: 50%;
+}
+
+.find-progress span.done {
+  border-color: var(--accent);
+  background: var(--accent);
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* "Alles entdeckt": how many items were tapped, small at the edge. */
+.scene-goal {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px 4px 8px;
+  border-radius: 99px;
+  background: #ffffffb0;
+  font-size: clamp(1rem, 2.2vw, 1.3rem);
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.scene-goal-star {
+  font-family: var(--font-emoji);
+  font-size: 1.3em;
+}
+
+.scene-goal.done {
+  background: #fff;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scene-goal button {
+  margin-left: 6px;
+  padding: 4px 12px;
+  border: 0;
+  border-radius: 99px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* Keys mode: the frame the arrow keys move. */
+.scene-focus {
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop-in 0.25s ease-out;
+}
+
+.scene-focus rect {
+  fill: none;
+}
+
+.scene-focus-glow {
+  stroke: #ffd60a;
+  stroke-width: 22;
+  stroke-opacity: 0.35;
+}
+
+.scene-focus-line {
+  stroke: #ffd60a;
+  stroke-width: 7;
+}
+
+/* Everything discovered: all items dance together for a moment. */
+.scene.party .scene-item {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: scene-dance 0.7s ease-in-out calc(var(--party-i) * 40ms) 4;
+}
+
+@keyframes scene-dance {
+  25% {
+    transform: translateY(-14px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-14px) rotate(5deg);
+  }
+}
+
+.calm.party .scene-item {
+  animation: none;
+}
+
 /* Unless the picture may move by itself, nothing moves without the child doing something. */
 .scene:not(.lively) .scene-prompt,
 .scene:not(.lively) .scene-hint {

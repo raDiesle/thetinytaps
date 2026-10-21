@@ -275,6 +275,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Neuer Such-Modus: Nur das Geräusch wird gespielt (Hund bellt, Bagger brummt) – wer war das? Nutzt die vorhandenen sfx-Klänge.",
         why: "Genaues Hinhören; funktioniert auch ohne Sprachausgabe.",
         effort: "S",
+        done: true,
       },
       {
         id: "B-03",
@@ -291,6 +292,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "„Was ist rot?“, „Wer kann fliegen?“, „Was ist ganz groß?“ – mehrere richtige Antworten pro Frage, jede wird gefeiert.",
         why: "Kategorien bilden, Begriffe wie groß/klein, Farben.",
         effort: "M",
+        done: true,
       },
       {
         id: "B-05",
@@ -316,6 +318,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Ding stößt ein anderes an: Hund bellt → Katze flitzt auf den Baum → Vogel fliegt weg. Pro Szene 2–3 solcher kleinen Geschichten.",
         why: "Erste Geschichten „wenn – dann“; Kinder wiederholen das endlos.",
         effort: "M",
+        done: true,
       },
       {
         id: "B-08",
@@ -332,6 +335,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Unauffälliger Zähler (z. B. Sterne am Rand). Wurde jedes Ding einmal angetippt, gibt es eine kleine Party, bei der alle Dinge gleichzeitig tanzen.",
         why: "Ein erreichbares Ziel ohne Druck.",
         effort: "S",
+        done: true,
       },
       {
         id: "B-10",
@@ -340,7 +344,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Im Tasten-Modus wandert ein Leuchtrahmen mit den Pfeiltasten von Ding zu Ding; Leertaste oder Enter löst es aus.",
         why: "Für Kinder, die Buchstaben noch nicht finden, aber Pfeile drücken können.",
         effort: "S",
-        partial: "Der Tasten-Modus gibt jedem Ding eine eigene Taste; der wandernde Leuchtrahmen fehlt.",
+        done: true,
       },
       {
         id: "B-11",
@@ -357,6 +361,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Szene erst in Schwarz-Weiß; jedes angetippte Ding bekommt seine Farbe (oder eine Farbe aus einer Palette).",
         why: "Ruhige Variante; am Ende ist das ganze Bild bunt.",
         effort: "M",
+        done: true,
       },
       {
         id: "B-13",

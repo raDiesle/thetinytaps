@@ -5,7 +5,14 @@ import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
 import { findScene } from ".";
 import { ScenePlay } from "./ScenePlay";
-import { DEFAULT_SCENES_SETTINGS, SCENES_SETTINGS_KEY, type SceneAnnounce, type SceneMode, type SceneTrigger } from "./settings";
+import {
+  DEFAULT_SCENES_SETTINGS,
+  isQuestMode,
+  SCENES_SETTINGS_KEY,
+  type SceneAnnounce,
+  type SceneMode,
+  type SceneTrigger,
+} from "./settings";
 
 const pack = de;
 
@@ -13,6 +20,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
   const [settings, update] = useStoredSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
   const scene = findScene(sceneId);
   if (!scene) return null;
+  const questMode = isQuestMode(settings.mode);
 
   return (
     <GameShell
@@ -30,6 +38,9 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               options={[
                 { value: "explore", label: "👆 Entdecken" },
                 { value: "find", label: "🔍 Suchen" },
+                { value: "sounds", label: "🔊 Geräusch-Rätsel" },
+                { value: "questions", label: "❓ Fragen („Was ist rot?“)" },
+                { value: "colour", label: "🖍️ Ausmalen" },
               ]}
             />
             <Choice<SceneTrigger>
@@ -39,7 +50,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               options={[
                 { value: "tap", label: "👆 Antippen / Klicken" },
                 { value: "hover", label: "🖱️ Darüberfahren / Wischen" },
-                { value: "keys", label: "⌨️ Jedes Ding hat eine Taste (mit Tastatur)" },
+                { value: "keys", label: "⌨️ Jedes Ding hat eine Taste, oder Pfeile + Leertaste (mit Tastatur)" },
               ]}
             />
             {settings.trigger === "keys" && (
@@ -49,7 +60,14 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
                 onChange={(showKeys) => update({ showKeys })}
               />
             )}
-            {settings.mode === "find" && (
+            {!questMode && (
+              <Toggle
+                label="Mitzählen – wenn alles entdeckt ist, gibt es eine Party"
+                checked={settings.goal}
+                onChange={(goal) => update({ goal })}
+              />
+            )}
+            {questMode && (
               <Toggle
                 label="Tipp zeigen, wenn es länger dauert"
                 checked={settings.hints}
@@ -61,7 +79,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
             {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Der Bagger baggert!" />}
-            {settings.speech && settings.mode === "explore" && (
+            {settings.speech && !questMode && (
               <Choice<SceneAnnounce>
                 label="Ansage"
                 value={settings.announce}
@@ -72,7 +90,10 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
                 ]}
               />
             )}
-            <Toggle label="Geräusche" checked={settings.sounds} onChange={(sounds) => update({ sounds })} />
+            {/* The sound riddle needs its sounds, so they can't be switched off there. */}
+            {settings.mode !== "sounds" && (
+              <Toggle label="Geräusche" checked={settings.sounds} onChange={(sounds) => update({ sounds })} />
+            )}
           </SettingsGroup>
 
           <SettingsGroup title="Verhalten">

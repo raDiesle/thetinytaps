@@ -1,5 +1,12 @@
-/** Explore: tap anything to see and hear it. Find: "Wo ist der Bagger?" */
-export type SceneMode = "explore" | "find";
+/**
+ * Explore: tap anything to see and hear it. Find: "Wo ist der Bagger?"
+ * Sounds: only a sound is played, who made it? Questions: "Was ist rot?", several right answers.
+ * Colour: the picture starts grey, every tapped item gets its colour back.
+ */
+export type SceneMode = "explore" | "find" | "sounds" | "questions" | "colour";
+
+/** Modes in which the child looks for something that was asked. */
+export const isQuestMode = (mode: SceneMode) => mode === "find" || mode === "sounds" || mode === "questions";
 
 /** What is spoken for a tapped item: "Der Bagger baggert!" or "Der Bagger!". */
 export type SceneAnnounce = "sentence" | "name";
@@ -20,7 +27,9 @@ export interface ScenesSettings {
   sounds: boolean;
   /** Quieter sounds, no idle movement, softer shapes. */
   calm: boolean;
-  /** Find mode: mark the item that is looked for after a while or a few wrong taps. */
+  /** Explore and colour mode: count the discovered items and throw a party when all were tapped. */
+  goal: boolean;
+  /** Find, sounds and questions mode: mark an item that is looked for after a while or a few wrong taps. */
   hints: boolean;
   /**
    * The picture lives on its own (not in calm mode): clouds drift, rotors turn,
@@ -39,6 +48,7 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   announce: "sentence",
   sounds: true,
   calm: false,
+  goal: true,
   hints: true,
   ambient: false,
   showKeys: true,
