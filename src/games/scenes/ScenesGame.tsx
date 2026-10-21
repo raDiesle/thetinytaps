@@ -2,6 +2,7 @@
 
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
+import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
 import { findScene } from ".";
@@ -19,7 +20,6 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
     <GameShell
       title={scene.title}
       emoji={scene.emoji}
-      speechLang={pack.speechLang}
       backHref="/bilder/"
       backLabel="Alle Bilder"
       settings={
@@ -54,6 +54,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
 
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
+            {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Der Bagger baggert!" />}
             {settings.speech && settings.mode === "explore" && (
               <Choice<SceneAnnounce>
                 label="Ansage"

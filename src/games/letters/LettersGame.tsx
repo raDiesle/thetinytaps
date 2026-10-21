@@ -2,6 +2,7 @@
 
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
+import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
 import { useStoredSettings } from "@/lib/storage";
 import { DEFAULT_LETTERS_SETTINGS, LETTERS_SETTINGS_KEY, type Announce, type LetterCase, type LettersSettings } from "./settings";
@@ -16,7 +17,6 @@ export function LettersGame() {
     <GameShell
       title="Buchstaben & Zahlen"
       emoji="🔤"
-      speechLang={pack.speechLang}
       settings={
         <>
           <SettingsGroup title="Anzeige">
@@ -44,6 +44,7 @@ export function LettersGame() {
 
           <SettingsGroup title="Ton">
             <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
+            {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Be, wie Bär!" />}
             {settings.speech && (
               <Choice<Announce>
                 label="Ansage"

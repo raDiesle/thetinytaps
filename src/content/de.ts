@@ -90,4 +90,5 @@ export const de: LanguagePack = {
     n === 1
       ? `${indefiniteArticle(thing.singular)} ${thing.singular}!`
       : `${de.numberWords[n]} ${thing.plural}!`,
+  praise: ["Super!", "Toll!", "Prima!", "Juhu!", "Klasse!"],
 };

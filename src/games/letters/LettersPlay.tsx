@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { inTheme } from "@/content/themes";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -37,13 +38,6 @@ function isSame(target: Target | null, shown: Shown) {
   if (target?.kind === "letter" && shown.kind === "letter") return target.letter === shown.letter;
   if (target?.kind === "number" && shown.kind === "number") return target.n === shown.n;
   return false;
-}
-
-/** Items matching the theme, or all items if none match (e.g. no animal starts with J). */
-function inTheme<T extends { theme?: string }>(items: T[], theme: LettersSettings["theme"]): T[] {
-  if (theme === "all") return items;
-  const matching = items.filter((item) => item.theme === theme);
-  return matching.length > 0 ? matching : items;
 }
 
 // Stages: a letter reveals its parts one by one (see letterParts). A number

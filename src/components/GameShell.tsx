@@ -11,7 +11,6 @@ const EXIT_HOLD_MS = 1000;
 interface GameShellProps {
   title: string;
   emoji: string;
-  speechLang: string;
   /** Parent-facing options shown on the start screen. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
@@ -29,7 +28,6 @@ interface GameShellProps {
 export function GameShell({
   title,
   emoji,
-  speechLang,
   settings,
   children,
   backHref = "/",
@@ -40,7 +38,7 @@ export function GameShell({
   const start = async () => {
     // These need the click as a user gesture, so run them before any await.
     unlockAudio();
-    unlockSpeech(speechLang);
+    unlockSpeech();
     setPlaying(true);
     await enterKidMode();
   };

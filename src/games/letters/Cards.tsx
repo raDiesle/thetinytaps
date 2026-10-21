@@ -1,8 +1,8 @@
 "use client";
 
 import type { PointerEventHandler, ReactNode } from "react";
+import { Picture } from "@/components/Picture";
 import type { Countable, LetterEntry, WordEntry } from "@/content/types";
-import { asset } from "@/lib/asset";
 import type { LettersSettings } from "./settings";
 
 /** Item counts per row, arranged so small numbers are easy to count at a glance. */
@@ -33,17 +33,6 @@ export function letterParts(showWord: boolean): LetterPart[] {
 function Reveal({ visible, hint, children }: { visible: boolean; hint: boolean; children: ReactNode }) {
   const state = visible ? "shown" : hint ? "waiting" : "hidden";
   return <div className={`reveal ${state}`}>{children}</div>;
-}
-
-function Picture({ word }: { word: WordEntry }) {
-  if (word.image) {
-    return <img className="picture picture-image" src={asset(word.image)} alt={word.word} />;
-  }
-  return (
-    <span className="picture" role="img" aria-label={word.word}>
-      {word.emoji}
-    </span>
-  );
 }
 
 export function LetterCard({
