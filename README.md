@@ -6,9 +6,10 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 
 ```bash
 npm install
-npm run dev        # http://localhost:3000
+npm run dev        # http://localhost:3000 (Rsbuild dev server)
 npm run typecheck
 npm run build      # static site in out/
+npm run preview    # serve the built site
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
@@ -18,7 +19,9 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 
 | Path | What |
 | --- | --- |
-| `src/app/` | Pages (Next.js App Router, static export) |
+| `rsbuild.config.ts`, `index.html` | Build setup (Rsbuild, single-page app; `404.html` fallback for GitHub Pages deep links) |
+| `src/App.tsx` | Routes (React Router) |
+| `src/pages/` | One component per page |
 | `src/components/GameShell.tsx` | Shared shell: parent start screen, fullscreen + keyboard lock, hold-to-exit |
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |

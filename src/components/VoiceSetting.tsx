@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { onVoicesChanged, pickVoice, saveVoiceName, speak, voicesFor } from "@/lib/speech";
 

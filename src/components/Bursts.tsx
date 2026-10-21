@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 
 const SHAPES = {

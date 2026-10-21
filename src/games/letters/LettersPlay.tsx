@@ -1,5 +1,3 @@
-"use client";
-
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { inTheme } from "@/content/themes";

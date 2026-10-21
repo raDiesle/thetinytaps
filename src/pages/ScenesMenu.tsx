@@ -1,16 +1,13 @@
-import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "react-router";
 import { GameCard } from "@/components/GameCard";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
+import { useTitle } from "@/lib/title";
 
-export const metadata: Metadata = {
-  title: "Lebendige Bilder – The Tiny Taps",
-};
-
-export default function ScenesMenu() {
+export function ScenesMenu() {
+  useTitle("Lebendige Bilder");
   return (
     <main className="home">
-      <Link href="/" className="back-link">
+      <Link to="/" className="back-link">
         ← Alle Spiele
       </Link>
       <h1>

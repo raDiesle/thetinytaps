@@ -1,5 +1,3 @@
-"use client";
-
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
