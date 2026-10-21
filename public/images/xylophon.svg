@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160">
+  <!-- rails -->
+  <rect x="18" y="52" width="164" height="8" rx="4" fill="#8d5a2b" transform="rotate(-8 100 56)"/>
+  <rect x="18" y="104" width="164" height="8" rx="4" fill="#8d5a2b" transform="rotate(8 100 108)"/>
+  <!-- bars, longest to shortest -->
+  <rect x="24"  y="30" width="20" height="104" rx="6" fill="#ff5d73"/>
+  <rect x="50"  y="36" width="20" height="92"  rx="6" fill="#ff8c42"/>
+  <rect x="76"  y="42" width="20" height="80"  rx="6" fill="#ffb703"/>
+  <rect x="102" y="48" width="20" height="68"  rx="6" fill="#3ec300"/>
+  <rect x="128" y="54" width="20" height="56"  rx="6" fill="#00b4d8"/>
+  <rect x="154" y="60" width="20" height="44"  rx="6" fill="#8e7dff"/>
+  <!-- screws -->
+  <g fill="#fff" opacity="0.8">
+    <circle cx="34" cy="40" r="3"/><circle cx="34" cy="124" r="3"/>
+    <circle cx="60" cy="46" r="3"/><circle cx="60" cy="118" r="3"/>
+    <circle cx="86" cy="52" r="3"/><circle cx="86" cy="112" r="3"/>
+    <circle cx="112" cy="58" r="3"/><circle cx="112" cy="106" r="3"/>
+    <circle cx="138" cy="64" r="3"/><circle cx="138" cy="100" r="3"/>
+    <circle cx="164" cy="70" r="3"/><circle cx="164" cy="94" r="3"/>
+  </g>
+  <!-- mallets -->
+  <line x1="120" y1="150" x2="170" y2="118" stroke="#8d5a2b" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="172" cy="116" r="9" fill="#e63946"/>
+  <line x1="80" y1="150" x2="40" y2="122" stroke="#8d5a2b" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="37" cy="120" r="9" fill="#e63946"/>
+</svg>
