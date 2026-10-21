@@ -21,14 +21,45 @@
   font-variant-numeric: tabular-nums;
 }
 
+.teeth-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6vmin;
+  text-align: center;
+}
+
 .teeth-cue {
   margin: 0;
-  font-size: clamp(2rem, 9vmin, 4.5rem);
+  font-size: clamp(1.8rem, 7.5vmin, 4rem);
   font-weight: 700;
   color: #fff;
   -webkit-text-stroke: 0.07em var(--ink);
   paint-order: stroke fill;
   animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.teeth-mouth {
+  margin: 0;
+  padding: 0.15em 0.8em;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  font-size: clamp(1rem, 3.6vmin, 1.7rem);
+  font-weight: 700;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards;
+}
+
+.teeth-mouth.open {
+  background: #ffd6e0;
+}
+
+.teeth-mouth.closed {
+  background: #d6f5ff;
+}
+
+.teeth-hint {
+  font-weight: 500;
+  opacity: 0.75;
 }
 
 .teeth-stage {
@@ -42,17 +73,20 @@
 .mouth {
   width: 100%;
   height: 100%;
-  overflow: visible;
 }
 
-.mouth-glow {
-  opacity: 0.45;
-  animation: glow-pulse 1.4s ease-in-out infinite;
+.mouth {
+  max-width: min(100%, 880px);
+}
+
+/* The surfaces to brush now shine. */
+.zone-glow {
+  animation: glow-pulse 1.2s ease-in-out infinite;
 }
 
 @keyframes glow-pulse {
   50% {
-    opacity: 0.2;
+    opacity: 0.25;
   }
 }
 
@@ -127,12 +161,12 @@
   }
 }
 
-/* The brush glides from corner to corner and scrubs back and forth. */
+/* The brush glides from tooth to tooth: back and forth on top, circles outside, flicks from the gum inside. */
 .brush {
   opacity: 0;
   pointer-events: none;
   transition:
-    transform 0.9s ease-in-out,
+    transform 0.5s ease-out,
     opacity 0.5s;
 }
 
@@ -140,16 +174,51 @@
   opacity: 1;
 }
 
-.brush-scrub {
-  animation: scrub 0.45s ease-in-out infinite alternate;
+.brush-move.scrub {
+  animation: scrub 0.4s ease-in-out infinite alternate;
+}
+
+.brush-move.circle {
+  animation: circle 0.7s linear infinite;
+}
+
+.brush-move.wipe {
+  animation: wipe 0.6s ease-in infinite;
 }
 
 @keyframes scrub {
   from {
-    transform: translateX(-22px);
+    transform: translateX(-16px);
   }
   to {
-    transform: translateX(22px);
+    transform: translateX(16px);
+  }
+}
+
+@keyframes circle {
+  0% {
+    transform: translate(8px, 0);
+  }
+  25% {
+    transform: translate(0, 8px);
+  }
+  50% {
+    transform: translate(-8px, 0);
+  }
+  75% {
+    transform: translate(0, -8px);
+  }
+  100% {
+    transform: translate(8px, 0);
+  }
+}
+
+@keyframes wipe {
+  from {
+    transform: translate(-14px, 4px) rotate(-8deg);
+  }
+  to {
+    transform: translate(14px, -2px) rotate(6deg);
   }
 }
 
@@ -208,8 +277,51 @@
   transition: width 0.2s linear;
 }
 
+.teeth-segment.top > span {
+  background: var(--sunshine);
+}
+
+.teeth-segment.inner > span {
+  background: #ff8fab;
+}
+
 .teeth-segment.now {
   outline: 4px solid var(--sunshine);
+}
+
+/* Pause: brush, monsters and glow stand still under a big button that goes on. */
+.teeth-play.paused .brush-move,
+.teeth-play.paused .brush-foam circle,
+.teeth-play.paused .monster-body,
+.teeth-play.paused .zone-glow {
+  animation-play-state: paused;
+}
+
+.teeth-paused {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1vmin;
+  border: 0;
+  background: #ffffffb0;
+  color: var(--ink);
+  font: inherit;
+  font-size: clamp(2.4rem, 10vmin, 5rem);
+  font-weight: 700;
+  cursor: pointer;
+  animation: pop-in 0.3s ease-out;
+}
+
+.teeth-paused-icon {
+  font-size: 1.6em;
+}
+
+.teeth-paused small {
+  font-size: 0.35em;
+  font-weight: 500;
 }
 
 .teeth-again {
@@ -232,13 +344,13 @@
 }
 
 /* Calm mode: a slow brush, no swaying or twinkling. */
-.teeth-play.calm .brush-scrub {
-  animation-duration: 1s;
+.teeth-play.calm .brush-move {
+  animation-duration: 1.2s;
 }
 
 .teeth-play.calm .monster-body,
 .teeth-play.calm .brush-foam circle,
-.teeth-play.calm .mouth-glow,
+.teeth-play.calm .zone-glow,
 .teeth-play.calm .tooth-sparkle {
   animation: none;
 }
@@ -256,13 +368,14 @@
 @media (prefers-reduced-motion: reduce) {
   .monster-body,
   .brush-foam circle,
-  .mouth-glow,
+  .zone-glow,
   .tooth-sparkle,
-  .teeth-cue {
+  .teeth-cue,
+  .teeth-mouth {
     animation: none;
   }
 
-  .brush-scrub {
-    animation-duration: 1s;
+  .brush-move {
+    animation-duration: 1.2s;
   }
 }
