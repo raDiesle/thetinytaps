@@ -543,3 +543,9 @@ export function playDrum() {
   note({ from: 150, to: 48, duration: 0.6, type: "sine", volume: 0.55 });
   hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
 }
+
+/** "Wiiieee!" – down the slide: a quick slide-whistle up, then a long wobbly glide down. */
+export function playSlide() {
+  note({ from: 700, to: 1500, duration: 0.18, type: "sine", volume: 0.16 });
+  for (let i = 0; i < 6; i++) note({ from: 1500 - i * 170, to: 1380 - i * 170, duration: 0.16, type: "sine", volume: 0.16, delay: 0.18 + i * 0.14 });
+}
