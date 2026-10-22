@@ -8,10 +8,11 @@ import type { Scene } from "./types";
 import { unterwasser } from "./unterwasser/Unterwasser";
 import { wald } from "./wald/Wald";
 import { weltall } from "./weltall/Weltall";
+import { winterbaustelle } from "./winterbaustelle/WinterBaustelle";
 import { zoo } from "./zoo/Zoo";
 
 /** All playable scenes, in menu order. */
-export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall];
+export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall, winterbaustelle];
 
 /** Shown greyed out in the menu so children (and parents) know more is coming. */
 export const UPCOMING_SCENES: { emoji: string; title: string }[] = [];

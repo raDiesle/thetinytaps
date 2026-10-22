@@ -1,0 +1,1170 @@
+/* Animations of the Winter-Baustelle. Durations match durationMs in WinterBaustelle.tsx.
+   Items drawn by the Baustelle keep their ids and move with baustelle.css; only the new winter
+   items (wb- classes) are animated here. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .wb-cloud {
+  animation: wb-drift 26s ease-in-out infinite alternate;
+}
+
+.scene.lively .wb-cloud-slow {
+  animation-duration: 40s;
+}
+
+/* Falling snow: two layers of flakes that loop, the near one faster. */
+.wb-snowfall {
+  display: none;
+}
+
+.scene.lively .wb-snowfall {
+  display: inline;
+}
+
+.scene.lively .wb-snow-near {
+  animation: wb-fall 16s linear infinite;
+}
+
+.scene.lively .wb-snow-far {
+  animation: wb-fall 26s linear infinite;
+}
+
+.scene.lively .wb-lichter circle,
+.scene.lively .wb-xmas-light {
+  animation: wb-twinkle 1.6s ease-in-out calc(var(--i, 0) * 0.8s) infinite;
+}
+
+.scene.lively .wb-feuer-flames {
+  animation: wb-flare 0.5s ease-in-out infinite alternate;
+}
+
+.scene.lively .wb-fuchs-tail {
+  animation: wb-tail-idle 3s ease-in-out infinite alternate;
+}
+
+.scene.lively .wb-iglu-flag {
+  animation: wb-flag 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes wb-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes wb-fall {
+  to {
+    transform: translateY(1000px);
+  }
+}
+
+@keyframes wb-twinkle {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes wb-tail-idle {
+  to {
+    transform: rotate(-6deg);
+  }
+}
+
+/* ---------- Hidden until their animation shows them ---------- */
+
+.wb-wolke-flakes > g,
+.wb-tanne-puff circle,
+.wb-fuchs-snow circle,
+.wb-robin-notes > g,
+.wb-vh-flakes > g,
+.wb-meise-glints path,
+.wb-sm-flakes > g,
+.wb-schlitten-spray circle,
+.wb-kinder-ball,
+.wb-kinder-splat circle,
+.wb-tee-breath circle,
+.wb-tee-steam circle,
+.wb-tee-glints path,
+.wb-iglu-glow,
+.wb-iglu-sparkle path,
+.wb-feuer-smoke circle,
+.wb-feuer-sparks circle,
+.wb-feuer-glow circle,
+.wb-schaufel-snow circle,
+.wb-spur-glow,
+.wb-spur-sparkle,
+.wb-eis-drop circle,
+.wb-eis-glint path,
+.wb-xmas-glow,
+.wb-pflug-spray circle,
+.wb-pflug-smoke circle,
+.wb-pflug-light,
+.wb-streu-grit circle,
+.wb-streu-light {
+  opacity: 0;
+}
+
+.wb-wolke-flakes > g,
+.wb-tanne-lump,
+.wb-tanne-puff circle,
+.wb-fuchs-snow circle,
+.wb-robin-notes > g,
+.wb-vh-seeds ellipse,
+.wb-vh-flakes > g,
+.wb-meise-glints path,
+.wb-sm-flakes > g,
+.wb-bobble,
+.wb-tee-bobble,
+.wb-schlitten-spray circle,
+.wb-kinder-splat circle,
+.wb-tee-breath circle,
+.wb-tee-steam circle,
+.wb-tee-glints path,
+.wb-iglu-sparkle path,
+.wb-feuer-smoke circle,
+.wb-feuer-sparks circle,
+.wb-feuer-glow circle,
+.wb-schaufel-snow circle,
+.wb-spur,
+.wb-spur-sparkle,
+.wb-eis-drop circle,
+.wb-eis-glint path,
+.wb-xmas-light,
+.wb-xmas-glow,
+.wb-pflug-spray circle,
+.wb-pflug-smoke circle,
+.wb-streu-grit circle,
+.wb-lichter circle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Icicles swing from their top. */
+.wb-eis-zapfen {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+/* ---------- Shared keyframes ---------- */
+
+@keyframes wb-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  25% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(1.8);
+  }
+}
+
+@keyframes wb-steam {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.4);
+  }
+}
+
+@keyframes wb-glint {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(90deg);
+  }
+}
+
+@keyframes wb-glow-on {
+  15%,
+  80% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes wb-flake-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(70px) rotate(120deg);
+  }
+}
+
+/* A wiggle around the rest pose: one turn left, one right, back to the middle. */
+@keyframes wb-wiggle {
+  25% {
+    transform: rotate(-14deg);
+  }
+  75% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes wb-sway {
+  25% {
+    transform: rotate(-3deg);
+  }
+  75% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes wb-flap {
+  to {
+    transform: rotate(-35deg) scaleY(0.8);
+  }
+}
+
+@keyframes wb-flick {
+  to {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes wb-wave {
+  50% {
+    transform: rotate(-28deg);
+  }
+}
+
+@keyframes wb-bobble {
+  to {
+    transform: translateY(-4px) scale(1.2);
+  }
+}
+
+@keyframes wb-hop {
+  40% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes wb-flag {
+  to {
+    transform: scaleX(0.75) skewY(6deg);
+  }
+}
+
+@keyframes wb-flare {
+  to {
+    transform: scale(1.12, 1.4) skewX(-4deg);
+  }
+}
+
+/* ---------- Schneewolke: puffs up and lets snowflakes fall ---------- */
+
+.item-schneewolke.playing .wb-wolke-body {
+  animation: wb-squish 0.5s ease-in-out 2 alternate;
+}
+
+.item-schneewolke.playing .wb-wolke-flakes > g {
+  animation: wb-flake-fall 1.4s ease-in calc(0.3s + var(--i) * 0.13s);
+}
+
+@keyframes wb-squish {
+  to {
+    transform: scale(1.08, 0.92);
+  }
+}
+
+/* ---------- Tanne: shakes, and the snow drops off its branches ---------- */
+
+.item-schneetanne.playing .wb-tanne-crown {
+  animation: wb-sway 0.5s ease-in-out 2;
+}
+
+.item-schneetanne.playing .wb-tanne-lump {
+  animation: wb-lump 1.7s ease-in calc(0.2s + var(--i) * 0.12s);
+}
+
+.item-schneetanne.playing .wb-tanne-puff circle {
+  animation: wb-puff 0.8s ease-out calc(0.965s + var(--i) * 0.12s);
+}
+
+@keyframes wb-lump {
+  0%,
+  10% {
+    transform: none;
+    opacity: 1;
+  }
+  45% {
+    transform: translateY(var(--d));
+    opacity: 1;
+  }
+  55% {
+    transform: translateY(var(--d));
+    opacity: 0;
+  }
+  56%,
+  85% {
+    transform: none;
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Fuchs: listens, leaps and dives head first into the snow ---------- */
+
+.item-winterfuchs.playing .wb-fuchs-jump {
+  animation: wb-pounce 2.2s ease-in-out;
+}
+
+.item-winterfuchs.playing .wb-fuchs-head {
+  animation: wb-listen 2.2s ease-in-out;
+}
+
+.item-winterfuchs.playing .wb-fuchs-ear {
+  animation: wb-ears 0.2s ease-in-out 0.1s 4 alternate;
+}
+
+.item-winterfuchs.playing .wb-fuchs-tail {
+  animation: wb-wiggle 0.4s ease-in-out 4;
+}
+
+.item-winterfuchs.playing .wb-fuchs-snow circle {
+  animation: wb-puff 0.8s ease-out calc(1.15s + var(--i) * 0.08s);
+}
+
+@keyframes wb-pounce {
+  15% {
+    transform: translateY(6px) scaleY(0.92);
+  }
+  38% {
+    transform: translate(-50px, -80px) rotate(14deg);
+  }
+  55%,
+  70% {
+    transform: translate(-90px, -6px) rotate(-38deg);
+  }
+  88% {
+    transform: translate(-30px, -16px) rotate(4deg);
+  }
+}
+
+@keyframes wb-listen {
+  5%,
+  14% {
+    transform: rotate(-10deg);
+  }
+  20% {
+    transform: none;
+  }
+}
+
+@keyframes wb-ears {
+  to {
+    transform: rotate(-12deg);
+  }
+}
+
+/* ---------- Rotkehlchen: hops along and sings ---------- */
+
+.item-rotkehlchen.playing .wb-robin-hop {
+  animation: wb-robin-hop 1.8s ease-in-out;
+}
+
+.item-rotkehlchen.playing .wb-robin-head {
+  animation: wb-tilt 0.3s ease-in-out 1.1s 2 alternate;
+}
+
+.item-rotkehlchen.playing .wb-robin-wing {
+  animation: wb-flap 0.12s ease-in-out 6 alternate;
+}
+
+.item-rotkehlchen.playing .wb-robin-tail {
+  animation: wb-flick 0.15s ease-in-out 0.3s 4 alternate;
+}
+
+.item-rotkehlchen.playing .wb-robin-notes > g {
+  animation: wb-note 0.9s ease-out calc(0.6s + var(--i) * 0.25s);
+}
+
+@keyframes wb-robin-hop {
+  14% {
+    transform: translate(-10px, -20px);
+  }
+  26% {
+    transform: translate(-20px, 0);
+  }
+  40% {
+    transform: translate(-30px, -20px);
+  }
+  52%,
+  62% {
+    transform: translate(-40px, 0);
+  }
+  80% {
+    transform: translate(-20px, -24px);
+  }
+  92% {
+    transform: none;
+  }
+}
+
+@keyframes wb-tilt {
+  to {
+    transform: rotate(-15deg);
+  }
+}
+
+@keyframes wb-note {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-8px, -26px);
+  }
+}
+
+/* ---------- Vogelhaus: wobbles, the seeds jump, the fat ball swings ---------- */
+
+.item-vogelhaus.playing .wb-vh-house {
+  animation: wb-wobble 0.6s ease-in-out 2;
+}
+
+.item-vogelhaus.playing .wb-vh-seeds ellipse {
+  animation: wb-seed 0.5s ease-out calc(var(--i) * 0.1s) 2;
+}
+
+.item-vogelhaus.playing .wb-vh-ball {
+  animation: wb-swing 0.7s ease-in-out 0.1s 2;
+}
+
+.item-vogelhaus.playing .wb-vh-flakes > g {
+  animation: wb-flake-fall 1.2s ease-in calc(0.3s + var(--i) * 0.15s);
+}
+
+@keyframes wb-wobble {
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes wb-seed {
+  40% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes wb-swing {
+  25% {
+    transform: rotate(18deg);
+  }
+  75% {
+    transform: rotate(-14deg);
+  }
+}
+
+/* ---------- Meise: hops, pecks seeds, flutters ---------- */
+
+.item-meise.playing .wb-meise-body {
+  animation: wb-meise 1.8s ease-in-out;
+}
+
+.item-meise.playing .wb-meise-head {
+  animation: wb-peck 0.22s ease-in-out 0.5s 4 alternate;
+}
+
+.item-meise.playing .wb-meise-wing {
+  animation: wb-flap 0.12s ease-in-out 6 alternate;
+}
+
+.item-meise.playing .wb-meise-tail {
+  animation: wb-flick 0.15s ease-in-out 1.4s 2 alternate;
+}
+
+.item-meise.playing .wb-meise-glints path {
+  animation: wb-glint 0.6s ease-in-out calc(0.2s + var(--i) * 0.3s);
+}
+
+@keyframes wb-meise {
+  10% {
+    transform: translateY(-14px);
+  }
+  20%,
+  80% {
+    transform: none;
+  }
+  88% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes wb-peck {
+  to {
+    transform: rotate(-45deg);
+  }
+}
+
+/* ---------- Schneemann: wobbles, lifts his hat, waves and wiggles his nose ---------- */
+
+.item-schneemann.playing .wb-sm-body {
+  animation: wb-sm-wobble 2.4s ease-in-out;
+}
+
+.item-schneemann.playing .wb-sm-head {
+  animation: wb-wobble 0.5s ease-in-out 0.2s 2;
+}
+
+.item-schneemann.playing .wb-sm-hat {
+  animation: wb-sm-hat 1.4s ease-in-out 0.6s;
+}
+
+.item-schneemann.playing .wb-sm-arm {
+  animation: wb-wave 0.4s ease-in-out 0.5s 4;
+}
+
+.item-schneemann.playing .wb-sm-arm-l {
+  animation: wb-sm-arm-l 0.6s ease-in-out 0.7s 2;
+}
+
+.item-schneemann.playing .wb-sm-nose {
+  animation: wb-flick 0.15s ease-in-out 1.6s 4 alternate;
+}
+
+.item-schneemann.playing .wb-sm-scarf {
+  animation: wb-wiggle 0.5s ease-in-out 3;
+}
+
+.item-schneemann.playing .wb-sm-flakes > g {
+  animation: wb-glint 0.9s ease-in-out calc(0.4s + var(--i) * 0.25s);
+}
+
+@keyframes wb-sm-wobble {
+  10% {
+    transform: rotate(-4deg);
+  }
+  25% {
+    transform: rotate(4deg);
+  }
+  40% {
+    transform: rotate(-3deg);
+  }
+  55% {
+    transform: none;
+  }
+}
+
+@keyframes wb-sm-hat {
+  30%,
+  60% {
+    transform: translateY(-34px) rotate(-14deg);
+  }
+}
+
+@keyframes wb-sm-arm-l {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+/* ---------- Schlitten: scoots off and rolls back, the child waves, the bell rings ---------- */
+
+.item-schlitten.playing .wb-schlitten-ride {
+  animation: wb-ride 2.4s ease-in-out;
+}
+
+.item-schlitten.playing .wb-schlitten-arm {
+  animation: wb-wave 0.4s ease-in-out 0.8s 3;
+}
+
+.item-schlitten.playing .wb-bobble {
+  animation: wb-bobble 0.3s ease-in-out 6 alternate;
+}
+
+.item-schlitten.playing .wb-schlitten-scarf {
+  animation: wb-flutter 0.2s ease-in-out 0.2s 8 alternate;
+}
+
+.item-schlitten.playing .wb-schlitten-bell {
+  animation: wb-wiggle 0.3s ease-in-out 6;
+}
+
+.item-schlitten.playing .wb-schlitten-spray circle {
+  animation: wb-puff 0.7s ease-out calc(0.3s + var(--i) * 0.12s);
+}
+
+@keyframes wb-ride {
+  10% {
+    transform: translateX(8px);
+  }
+  40% {
+    transform: translate(-60px, -6px) rotate(-3deg);
+  }
+  50%,
+  70% {
+    transform: translateX(-64px);
+  }
+}
+
+@keyframes wb-flutter {
+  to {
+    transform: rotate(-14deg) scaleX(1.1);
+  }
+}
+
+/* ---------- Schneeball-Kinder: a snowball flies, the other child ducks and pops up again ---------- */
+
+.item-schneeballkinder.playing .wb-kinder-throw {
+  animation: wb-throw 1s ease-in-out;
+}
+
+.item-schneeballkinder.playing .wb-kinder-handball {
+  animation: wb-handball 2.4s linear;
+}
+
+.item-schneeballkinder.playing .wb-kinder-ball {
+  animation: wb-ball 2.4s ease-in-out;
+}
+
+.item-schneeballkinder.playing .wb-kinder-splat circle {
+  animation: wb-puff 0.7s ease-out calc(0.9s + var(--i) * 0.05s);
+}
+
+.item-schneeballkinder.playing .wb-kinder-b {
+  animation: wb-duck 2.4s ease-in-out;
+}
+
+.item-schneeballkinder.playing .wb-kinder-a {
+  animation: wb-hop 0.5s ease-out 1.4s 2;
+}
+
+.item-schneeballkinder.playing .wb-bobble {
+  animation: wb-bobble 0.3s ease-in-out 1.2s 4 alternate;
+}
+
+@keyframes wb-throw {
+  20% {
+    transform: rotate(-30deg);
+  }
+  32%,
+  50% {
+    transform: rotate(100deg);
+  }
+  75% {
+    transform: none;
+  }
+}
+
+@keyframes wb-handball {
+  12% {
+    opacity: 1;
+  }
+  13%,
+  85% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes wb-ball {
+  12% {
+    opacity: 0;
+    transform: none;
+  }
+  13% {
+    opacity: 1;
+    transform: none;
+  }
+  25% {
+    transform: translate(50px, -46px);
+  }
+  37% {
+    opacity: 1;
+    transform: translate(94px, 80px);
+  }
+  38%,
+  100% {
+    opacity: 0;
+    transform: translate(94px, 80px);
+  }
+}
+
+@keyframes wb-duck {
+  15%,
+  40% {
+    transform: translateY(58px);
+  }
+  55% {
+    transform: translateY(-16px);
+  }
+  65% {
+    transform: none;
+  }
+  75% {
+    transform: translateY(-12px);
+  }
+  85% {
+    transform: none;
+  }
+}
+
+/* ---------- Bauarbeiter mit Tee: drinks, steam rises, warms his hand ---------- */
+
+.item-teearbeiter.playing .wb-tee-mug {
+  animation: wb-drink 2.4s ease-in-out;
+}
+
+.item-teearbeiter.playing .wb-tee-steam circle {
+  animation: wb-steam 0.9s ease-out calc(var(--i) * 0.2s) 2;
+}
+
+.item-teearbeiter.playing .wb-tee-breath circle {
+  animation: wb-steam 0.7s ease-out calc(1.45s + var(--i) * 0.1s);
+}
+
+.item-teearbeiter.playing .wb-tee-warm {
+  animation: wb-warm 0.25s ease-in-out 8 alternate;
+}
+
+.item-teearbeiter.playing .wb-tee-bobble {
+  animation: wb-bobble 0.3s ease-in-out 0.6s 6 alternate;
+}
+
+.item-teearbeiter.playing .wb-tee-glints path {
+  animation: wb-glint 0.8s ease-in-out 0.3s;
+}
+
+.item-teearbeiter.playing .wb-tee-body {
+  animation: wb-bounce 0.4s ease-in-out 1.8s;
+}
+
+@keyframes wb-drink {
+  10% {
+    transform: none;
+  }
+  30%,
+  60% {
+    transform: translate(-6px, -38px) rotate(-18deg);
+  }
+  80% {
+    transform: none;
+  }
+}
+
+@keyframes wb-warm {
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes wb-bounce {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* ---------- Iglu: the light goes on and a child peeks out ---------- */
+
+.wb-iglu-peek {
+  transform: translateY(44px);
+}
+
+.item-iglu.playing .wb-iglu-glow {
+  animation: wb-glow-on 2.2s ease-in-out;
+}
+
+.item-iglu.playing .wb-iglu-peek {
+  animation: wb-iglu-peek 2.4s ease-in-out;
+}
+
+.item-iglu.playing .wb-iglu-flag {
+  animation: wb-flag 0.3s ease-in-out 6 alternate;
+}
+
+.item-iglu.playing .wb-iglu-dome {
+  animation: wb-squash 0.6s ease-in-out;
+}
+
+.item-iglu.playing .wb-iglu-sparkle path {
+  animation: wb-glint 0.7s ease-in-out calc(0.6s + var(--i) * 0.3s);
+}
+
+@keyframes wb-iglu-peek {
+  0%,
+  15% {
+    transform: translateY(44px);
+  }
+  35% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-3px) rotate(-8deg);
+  }
+  70% {
+    transform: none;
+  }
+  90%,
+  100% {
+    transform: translateY(44px);
+  }
+}
+
+@keyframes wb-squash {
+  50% {
+    transform: scale(1.04, 0.95);
+  }
+}
+
+/* ---------- Feuertonne: the fire flares, sparks fly, smoke rises ---------- */
+
+.item-feuertonne.playing .wb-feuer-flames {
+  animation: wb-flare 0.25s ease-in-out 8 alternate;
+}
+
+.item-feuertonne.playing .wb-feuer-sparks circle {
+  animation: wb-spark 0.9s ease-out calc(var(--i) * 0.25s);
+}
+
+.item-feuertonne.playing .wb-feuer-smoke circle {
+  animation: wb-smoke 1.2s ease-out calc(0.3s + var(--i) * 0.2s);
+}
+
+.item-feuertonne.playing .wb-feuer-glow circle {
+  animation: wb-glow-on 1.6s ease-in-out calc(var(--i) * 0.06s);
+}
+
+@keyframes wb-spark {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), -70px) scale(0.5);
+  }
+}
+
+@keyframes wb-smoke {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  25% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-10px, -60px) scale(1.8);
+  }
+}
+
+/* ---------- Schneeschaufel: scoops the snow and throws it up ---------- */
+
+.item-schneeschaufel.playing .wb-schaufel-tool {
+  animation: wb-shovel 1.8s ease-in-out;
+}
+
+.item-schneeschaufel.playing .wb-schaufel-heap {
+  animation: wb-squash 0.4s ease-in-out 0.3s;
+}
+
+.item-schneeschaufel.playing .wb-schaufel-snow circle {
+  animation: wb-fling 0.9s ease-out calc(0.75s + var(--i) * 0.05s);
+}
+
+@keyframes wb-shovel {
+  20% {
+    transform: rotate(10deg) translateY(4px);
+  }
+  45%,
+  60% {
+    transform: rotate(-18deg) translateY(-18px);
+  }
+  85% {
+    transform: none;
+  }
+}
+
+@keyframes wb-fling {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), -70px) scale(0.6);
+  }
+}
+
+/* ---------- Fußspuren: the paw prints light up one after the other ---------- */
+
+.item-fussspuren.playing .wb-spur {
+  animation: wb-spur 0.5s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-fussspuren.playing .wb-spur-glow {
+  animation: wb-spur-glow 0.6s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-fussspuren.playing .wb-spur-sparkle {
+  animation: wb-glint 0.7s ease-in-out 1.25s;
+}
+
+@keyframes wb-spur {
+  50% {
+    transform: scale(1.35);
+  }
+}
+
+@keyframes wb-spur-glow {
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ---------- Eiszapfen: wobble, glitter and drip ---------- */
+
+.item-eiszapfen.playing .wb-eis-zapfen {
+  animation: wb-icicle 0.4s ease-in-out calc(var(--i) * 0.08s) 3;
+}
+
+.item-eiszapfen.playing .wb-eis-drop circle {
+  animation: wb-drip 1s ease-in calc(0.4s + var(--i) * 0.3s);
+}
+
+.item-eiszapfen.playing .wb-eis-glint path {
+  animation: wb-glint 0.7s ease-in-out calc(0.2s + var(--i) * 0.5s);
+}
+
+@keyframes wb-icicle {
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes wb-drip {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  20% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+}
+
+/* ---------- Weihnachtsbaum: the lights blink and the star spins ---------- */
+
+.item-weihnachtsbaum.playing .wb-xmas-tree {
+  animation: wb-sway 0.6s ease-in-out 2;
+}
+
+.item-weihnachtsbaum.playing .wb-xmas-star {
+  animation: wb-star 1.6s ease-in-out 0.3s;
+}
+
+.item-weihnachtsbaum.playing .wb-xmas-glow {
+  animation: wb-glow-on 2s ease-in-out 0.2s;
+}
+
+.item-weihnachtsbaum.playing .wb-xmas-light {
+  animation: wb-blink 0.4s steps(1) calc(var(--i) * 0.13s) 5;
+}
+
+@keyframes wb-star {
+  50% {
+    transform: rotate(180deg) scale(1.4);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wb-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- Schneepflug: lifts the blade and pushes the snow away ---------- */
+
+.item-schneepflug.playing .wb-pflug-truck {
+  animation: wb-pflug-drive 2.6s ease-in-out;
+}
+
+.item-schneepflug.playing .wb-pflug-wheel {
+  animation: wb-pflug-wheel 2.6s ease-in-out;
+}
+
+.item-schneepflug.playing .wb-pflug-blade {
+  animation: wb-blade 2.6s ease-in-out;
+}
+
+.item-schneepflug.playing .wb-pflug-heap {
+  animation: wb-heap 2.6s ease-in-out;
+}
+
+.item-schneepflug.playing .wb-pflug-spray circle {
+  animation: wb-puff 0.8s ease-out calc(0.5s + var(--i) * 0.18s);
+}
+
+.item-schneepflug.playing .wb-pflug-smoke circle {
+  animation: wb-exhaust 1s ease-out calc(var(--i) * 0.3s);
+}
+
+.item-schneepflug.playing .wb-pflug-light {
+  animation: wb-glow-on 2.2s ease-in-out;
+}
+
+@keyframes wb-pflug-drive {
+  10% {
+    transform: none;
+  }
+  55%,
+  65% {
+    transform: translateX(-36px);
+  }
+}
+
+/* 36 units on a wheel of radius 30 is about 69°. */
+@keyframes wb-pflug-wheel {
+  10% {
+    transform: none;
+  }
+  55%,
+  65% {
+    transform: rotate(-69deg);
+  }
+}
+
+@keyframes wb-blade {
+  8% {
+    transform: translateY(-14px);
+  }
+  16% {
+    transform: none;
+  }
+}
+
+@keyframes wb-heap {
+  12% {
+    transform: none;
+  }
+  55%,
+  70% {
+    transform: translateX(-36px) scale(1.35, 1.25);
+  }
+}
+
+@keyframes wb-exhaust {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -40px) scale(1.8);
+  }
+}
+
+/* ---------- Streuwagen: rolls on, the disc spins and throws grit ---------- */
+
+.item-streuwagen.playing .wb-streu-truck {
+  animation: wb-streu-drive 2.4s ease-in-out;
+}
+
+.item-streuwagen.playing .wb-streu-wheel {
+  animation: wb-streu-wheel 2.4s ease-in-out;
+}
+
+.item-streuwagen.playing .wb-streu-disc {
+  animation: wb-disc 0.15s linear 14;
+}
+
+.item-streuwagen.playing .wb-streu-grit circle {
+  animation: wb-grit 0.55s ease-out calc(0.2s + var(--i) * 0.1s) 3;
+}
+
+.item-streuwagen.playing .wb-streu-light {
+  animation: wb-glow-on 2.2s ease-in-out;
+}
+
+@keyframes wb-streu-drive {
+  10% {
+    transform: none;
+  }
+  50%,
+  60% {
+    transform: translateX(-24px);
+  }
+}
+
+/* 24 units on a wheel of radius 26 is about 53°. */
+@keyframes wb-streu-wheel {
+  10% {
+    transform: none;
+  }
+  50%,
+  60% {
+    transform: rotate(-53deg);
+  }
+}
+
+@keyframes wb-disc {
+  50% {
+    transform: scaleX(0.3);
+  }
+}
+
+@keyframes wb-grit {
+  0% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy));
+  }
+}
