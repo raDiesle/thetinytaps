@@ -562,4 +562,5 @@ export const wald: Scene = {
       ],
     },
   ],
+  seasons: { weather: true, tree: [300, 755, 0.8], snowman: [1440, 750, 0.8], pumpkin: [790, 1000, 0.85], egg: [1100, 975] },
 };

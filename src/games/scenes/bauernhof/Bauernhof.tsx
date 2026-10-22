@@ -465,4 +465,5 @@ export const bauernhof: Scene = {
       ],
     },
   ],
+  seasons: { weather: true, tree: [500, 425], snowman: [1215, 640, 0.85], pumpkin: [800, 975], egg: [400, 870] },
 };

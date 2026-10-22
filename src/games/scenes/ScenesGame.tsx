@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
@@ -6,6 +7,8 @@ import { useDevice, type Device } from "@/lib/device";
 import { useStoredSettings } from "@/lib/storage";
 import { findScene } from ".";
 import { ScenePlay } from "./ScenePlay";
+import { activeSeason, SEASON_LABELS, seasonOn, type Season, type SeasonSetting } from "./season";
+import { withSeason } from "./seasonal";
 import {
   DEFAULT_SCENES_SETTINGS,
   isQuestMode,
@@ -22,7 +25,11 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
   const device = useDevice();
   // Tablets and phones have no keys, and the finger is right on the picture anyway.
   const settings = device.touchOnly && stored.trigger === "keys" ? { ...stored, trigger: "tap" as const } : stored;
-  const scene = findScene(sceneId);
+  const season = activeSeason(settings.season);
+  const scene = useMemo(() => {
+    const found = findScene(sceneId);
+    return found && withSeason(found, season);
+  }, [sceneId, season]);
   if (!scene) return null;
   const questMode = isQuestMode(settings.mode);
 
@@ -96,6 +103,15 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
             )}
           </SettingsGroup>
 
+          <SettingsGroup title="Bild">
+            <Choice<SeasonSetting>
+              label="Jahreszeit"
+              value={settings.season}
+              onChange={(season) => update({ season })}
+              options={seasonOptions()}
+            />
+          </SettingsGroup>
+
           <SettingsGroup title="Verhalten">
             <Toggle
               label="Ruhiger Modus (leiser, weniger Bewegung)"
@@ -116,6 +132,17 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       <ScenePlay scene={scene} settings={settings} speechLang={pack.speechLang} />
     </GameShell>
   );
+}
+
+/** Calendar (saying what it is today), each season to look at any time, or none. */
+function seasonOptions(): { value: SeasonSetting; label: string }[] {
+  const today = seasonOn(new Date());
+  const seasons = Object.entries(SEASON_LABELS) as [Season, string][];
+  return [
+    { value: "auto", label: `📅 Wie im Kalender (jetzt: ${today ? SEASON_LABELS[today] : "nichts Besonderes"})` },
+    ...seasons.map(([value, label]) => ({ value, label })),
+    { value: "none", label: "Ohne" },
+  ];
 }
 
 /** The ways to bring the picture to life, worded for this device; the keys only where there is a keyboard. */

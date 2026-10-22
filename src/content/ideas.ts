@@ -429,6 +429,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Die Szenen folgen dem Kalender: Im Herbst fallen Blätter und ein Kürbis liegt da, im Winter liegt Schnee, im Dezember steht ein Tannenbaum mit Lichtern, an Ostern ist ein Ei versteckt. Kleine Zusätze, die Szene bleibt dieselbe.",
         why: "Das bekannte Bild wird neu entdeckt; Jahreszeiten und Feste werden Gesprächsthema.",
         effort: "M",
+        done: true,
       },
       {
         id: "B-19",

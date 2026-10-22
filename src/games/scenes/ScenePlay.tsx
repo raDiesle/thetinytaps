@@ -636,6 +636,11 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
             </g>
           );
         })}
+        {scene.Overlay && (
+          <g className="scene-overlay" filter={grey ? greyFilter : undefined}>
+            <scene.Overlay />
+          </g>
+        )}
         {settings.trigger === "keys" && settings.showKeys && <KeyBadges scene={scene} keyOf={keys.keyOf} lit={lit} />}
         {settings.trigger === "keys" && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
