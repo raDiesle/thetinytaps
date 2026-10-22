@@ -17,6 +17,7 @@ und wie die Welt antwortet.
 | `movements/*.ts` | **Ergebnis B**: 94 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–8 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
 | `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–11 Bewegungen und Sekunden, 153–186 s lang |
+| `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 67 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
 | diese Datei | **Ergebnis E**: Qualitätskontrolle |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
@@ -28,7 +29,31 @@ stehen in `../three/clips.ts` (67 Clips, keiner fehlt).
 1. In der passenden Datei unter `movements/` anlegen. Die ID ist englisch und in `snake_case`, alle Texte sind deutsch.
 2. Einen vorhandenen `motion`-Clip wählen oder in `../three/clips.ts` einen neuen bauen.
 3. In mindestens einem Szenario (`scenarios.ts`) einsetzen.
-4. `yarn typecheck`.
+4. Bei einem neuen Clip: in `situations.ts` sechs Situationen dazuschreiben, mindestens zwei aus dem Alltag.
+5. `yarn typecheck`.
+
+## Ergebnis F: Situationskatalog
+
+`scenarios.ts` geht von der Welt aus: Was passiert im Dschungel? `situations.ts` geht von der
+Bewegung aus: Wann duckt man sich, ohne dass es einer sagt? Eine Bewegung erklärt sich am
+besten selbst, wenn die Situation sie verlangt. Hängt die Wäscheleine tief, duckt man sich.
+Sind die Hände nass und kein Handtuch da, schüttelt man sie aus.
+
+Der Katalog hängt am Clip, also an der reinen Körperbewegung. Darum gilt jede Idee für alle
+Bewegungen mit diesem Clip (`push_forward` passt zu Zaubertür, Schneeball und Glaswand).
+
+- Jede Situation hat ein Gegenüber, auf das die Bewegung wirkt, und eine Antwort der Welt.
+  Auch hier behauptet keine Antwort, das Kind gesehen zu haben.
+- **Alltag** (`everyday`): Kennt das Kind aus seinem eigenen Tag, z. B. Socke anziehen, Ampelknopf
+  drücken, links und rechts schauen. Daran knüpft eine Geschichte an, ohne zu erklären. Und
+  das Kind findet die Bewegung später im echten Leben wieder.
+- **Welten** (`worlds`): Wo die Idee hinpasst. Bauen sich daraus neue Szenarien oder
+  Abläufe, steht der Moment danach in `scenarios.ts` bzw. `sequences.ts`.
+
+Stand: 67 Clips (alle außer `idle`), 402 Situationen, davon 173 aus dem Alltag, jeder Clip mit
+mindestens zwei. Am wenigsten Ideen haben Baustelle (5) und Eisenbahn (6). Keine Idee
+verlangt mehr, als die Bewegung schon erlaubt: Es gibt kein schnelles Drehen und kein Drücken
+gegen echte Möbel, und auf Schienen balanciert niemand.
 
 ## Ergebnis E: Qualitätskontrolle
 
