@@ -247,29 +247,24 @@ export function makeCanoe() {
   const seat = solid(new THREE.BoxGeometry(1.1, 0.06, 0.3), wood);
   seat.position.set(0, 0.32, 0.5);
   group.add(seat);
-  // A little flag at the back.
-  const pole = solid(new THREE.CylinderGeometry(0.02, 0.02, 1.1, 6), woodDark);
-  pole.position.set(0, 0.85, 2.0);
-  group.add(pole);
-  const flag = solid(new THREE.PlaneGeometry(0.45, 0.3), new THREE.MeshStandardMaterial({ color: "#e8423f", side: THREE.DoubleSide }));
-  flag.position.set(0.23, 1.25, 2.0);
-  group.add(flag);
   return group;
 }
 
-/** A paddle: shaft along y, blade at the bottom. */
+/** Half the length of the double paddle, from the middle to the tip of a blade. */
+export const PADDLE_REACH = 1.2;
+
+/** A double paddle: the shaft along y with a blade at each end, the blades facing ±z. */
 export function makePaddle() {
   const group = new THREE.Group();
-  const shaft = solid(new THREE.CylinderGeometry(0.025, 0.025, 1.3, 8), mat("#c98d52", 0.6));
-  group.add(shaft);
-  const bladeGeo = new THREE.SphereGeometry(0.16, 16, 10);
-  bladeGeo.scale(0.9, 1.9, 0.18);
-  const blade = solid(bladeGeo, mat("#e0a464", 0.6));
-  blade.position.y = -0.75;
-  group.add(blade);
-  const grip = solid(new THREE.SphereGeometry(0.05, 10, 8), mat("#c98d52", 0.6));
-  grip.position.y = 0.66;
-  group.add(grip);
+  const wood = mat("#c98d52", 0.6);
+  group.add(solid(new THREE.CylinderGeometry(0.025, 0.025, PADDLE_REACH * 2 - 0.3, 8), wood));
+  const bladeGeo = new THREE.SphereGeometry(0.15, 16, 10);
+  bladeGeo.scale(0.85, 1.6, 0.16);
+  for (const end of [1, -1]) {
+    const blade = solid(bladeGeo, mat("#e0a464", 0.6));
+    blade.position.y = end * (PADDLE_REACH - 0.24);
+    group.add(blade);
+  }
   return group;
 }
 
