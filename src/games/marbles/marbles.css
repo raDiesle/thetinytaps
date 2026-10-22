@@ -18,6 +18,26 @@
   background: #fff1d0;
 }
 
+.marble-play:has([aria-label="Verrückte Küche"]) {
+  background: #dff3ea;
+}
+
+.marble-play:has([aria-label="Im Garten"]) {
+  background: #8fd5ff;
+}
+
+.marble-play:has([aria-label="Baustelle"]) {
+  background: #bfe9ff;
+}
+
+.marble-play:has([aria-label="Zirkus"]) {
+  background: #c8323f;
+}
+
+.marble-play:has([aria-label="Raketenstart"]) {
+  background: #0d1446;
+}
+
 .marble-svg {
   display: block;
   width: 100%;
