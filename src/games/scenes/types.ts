@@ -79,7 +79,9 @@ export type SceneSound =
   | "splash"
   | "tick"
   | "peck"
-  | "cuckoo";
+  | "cuckoo"
+  | "yawn"
+  | "musicbox";
 
 /** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */
 export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" | "small" | "animal" | "wheels";
@@ -141,4 +143,9 @@ export interface Scene {
   items: SceneItem[];
   /** Two or three chain reactions between items. */
   chains?: SceneChain[];
+  /**
+   * Bedtime picture (explore mode): a tapped item says good night and stays asleep (class `asleep`),
+   * and once all are asleep the room goes dark (class `night` on the scene) instead of the party.
+   */
+  bedtime?: boolean;
 }

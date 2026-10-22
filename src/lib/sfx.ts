@@ -543,3 +543,17 @@ export function playDrum() {
   note({ from: 150, to: 48, duration: 0.6, type: "sine", volume: 0.55 });
   hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
 }
+
+/** "Uaaah!" – a sleepy yawn: a soft voice that rises a little, then sinks slowly. */
+export function playYawn() {
+  note({ from: 330, to: 440, duration: 0.35, type: "triangle", volume: 0.14, lowpass: 900 });
+  note({ from: 440, to: 220, duration: 1, type: "triangle", volume: 0.14, lowpass: 900, delay: 0.3 });
+}
+
+/** "Pling, pling" – a music box: slow, high, bell-like notes of a lullaby. */
+export function playMusicbox() {
+  [4, 2, 4, 2, 1, 0].forEach((step, i) => {
+    note({ from: PENTATONIC[step] * 2, duration: 0.6, type: "sine", volume: 0.1, delay: i * 0.3 });
+    note({ from: PENTATONIC[step] * 4, duration: 0.25, type: "sine", volume: 0.025, delay: i * 0.3 });
+  });
+}
