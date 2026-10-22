@@ -94,6 +94,10 @@ noch ein ruhiger Abschied dazukommen.
 - **Kein Text im Spiel.** Kinder in diesem Alter lesen nicht. Alles sagt der Fuchs, und unten
   zeigt die Leiste nur Bilder. Ist die Sprachausgabe aus, bleibt nur das Vormachen. Deshalb
   müssen die Bewegungen des Fuchses deutlich sein.
+- **Leuchtende Kontur am Fuchs** (`../three/contour.ts`): Während einer Bewegung leuchtet,
+  was sich gerade bewegt. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen
+  Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
+  gewollt, aber noch nicht mit Kindern ausprobiert.
 - **Umriss-Hilfe** (leuchtende Kinderfigur wie bei „Just Dance“, `../three/silhouette.ts`):
   bisher nur beim Winken (`wave_hello`) zum Ausprobieren. Sie zeigt eine Vorderansicht. Bei
   Bewegungen nach vorn (ducken, drücken, paddeln) sieht man von vorn wenig Tiefe, und die Figur

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Contour, CONTOUR_PARTS, type ContourPart } from "./contour";
 
 // Tapsi, the guide: a little fox explorer with a red bandana, built from
 // simple rounded shapes and posed by joint angles, so any movement of the
@@ -164,6 +165,12 @@ export class Guide {
   readonly handL = new THREE.Group();
   readonly handR = new THREE.Group();
   private talking = false;
+  private readonly contour: Contour;
+  /** How much moving body parts glow (0..1); the story turns it up during a movement. */
+  highlight = 0;
+  private readonly activity: Record<ContourPart, number> = { armL: 0, armR: 0, legL: 0, legR: 0, body: 0, head: 0 };
+  private previous: Pose | null = null;
+  private previousTime = 0;
 
   constructor() {
     const furMat = fur(FUR);
@@ -339,6 +346,21 @@ export class Guide {
     };
     this.legL = makeLeg(1);
     this.legR = makeLeg(-1);
+
+    const parts: [THREE.Object3D, ContourPart][] = [
+      [this.armL.shoulder, "armL"],
+      [this.armR.shoulder, "armR"],
+      [this.legL.hip, "legL"],
+      [this.legR.hip, "legR"],
+      [this.head, "head"],
+    ];
+    this.contour = new Contour(this.root, (mesh) => {
+      for (let o: THREE.Object3D | null = mesh; o; o = o.parent) {
+        const found = parts.find(([group]) => group === o);
+        if (found) return found[1];
+      }
+      return "body";
+    });
   }
 
   /** Talking moves the mouth while the voice speaks. */
@@ -383,5 +405,38 @@ export class Guide {
 
     const open = this.talking ? 0.6 + Math.abs(Math.sin(time * 14)) * 0.9 : 0.6;
     this.mouth.scale.set(1, open, 1);
+
+    this.glowMoving(p, time);
+  }
+
+  /** Lets the parts that move right now glow, so the movement stands out. */
+  private glowMoving(p: Pose, time: number) {
+    const q = this.previous;
+    const dt = time - this.previousTime;
+    this.previous = structuredClone(p);
+    this.previousTime = time;
+    // After a jump in the story there is no speed to measure.
+    if (!q || dt <= 0 || dt > 0.2) return;
+    const d = (a: number, b: number) => Math.abs(a - b);
+    const arm = (a: ArmPose, b: ArmPose) => d(a.raise, b.raise) + d(a.spread, b.spread) + d(a.elbow, b.elbow) * 0.7 + d(a.twist, b.twist) * 0.5;
+    const leg = (a: LegPose, b: LegPose) => d(a.lift, b.lift) + d(a.knee, b.knee) * 0.6 + d(a.spread, b.spread);
+    const body = d(p.lean, q.lean) + d(p.bend, q.bend) + d(p.twist, q.twist) + d(p.turn, q.turn) * 0.5 + (d(p.lift, q.lift) + d(p.shift, q.shift)) * 4;
+    const head = d(p.headPitch, q.headPitch) + d(p.headYaw, q.headYaw) + d(p.headTilt, q.headTilt);
+    // Change per second (radians, roughly); a calm movement is about 1.
+    const speed: Record<ContourPart, number> = {
+      armL: arm(p.armL, q.armL) / dt,
+      armR: arm(p.armR, q.armR) / dt,
+      legL: leg(p.legL, q.legL) / dt,
+      legR: leg(p.legR, q.legR) / dt,
+      body: body / dt,
+      head: Math.max(head, body * 0.8) / dt,
+    };
+    for (const part of CONTOUR_PARTS) {
+      const target = THREE.MathUtils.smoothstep(speed[part], 0.35, 1.4);
+      const now = this.activity[part];
+      // Comes on quickly, fades slowly, so it stays on through the pauses of a movement.
+      this.activity[part] = now + (target - now) * Math.min(1, dt * (target > now ? 8 : 1.2));
+      this.contour.set(part, this.activity[part] * this.highlight);
+    }
   }
 }

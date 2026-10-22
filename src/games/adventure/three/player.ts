@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { movement } from "../library/movements";
 import type { Cue, Story, StoryFrame, StoryWorld } from "../stories/story";
 import { clipPose } from "./clips";
@@ -40,6 +41,8 @@ export class StoryPlayer {
   /** How much slower than written the story runs, e.g. 1.3 for calm mode. */
   private readonly pace: number;
   paused = false;
+  /** The parts of the guide that move glow during a movement. */
+  highlight = true;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -139,6 +142,9 @@ export class StoryPlayer {
 
     const result = this.world.update(frame);
     const pose = this.pose(frame, result.walking, dt);
+    // From just before the movement until the praise.
+    const smooth = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
+    this.guide.highlight = this.highlight ? smooth((frame.act + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8)) : 0;
     this.guide.apply(pose, this.elapsed);
     this.events.onPose?.(pose, frame);
     this.guide.setTalking(typeof speechSynthesis !== "undefined" && speechSynthesis.speaking);

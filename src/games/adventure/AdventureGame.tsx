@@ -43,6 +43,11 @@ export function AdventureGame() {
               ]}
             />
             <Toggle
+              label="Was sich am Fuchs gerade bewegt, leuchtet (Arme, Beine oder der ganze Körper)"
+              checked={settings.glow}
+              onChange={(glow) => update({ glow })}
+            />
+            <Toggle
               label="Umriss-Hilfe: eine leuchtende Figur macht die Bewegung groß mit (zum Ausprobieren erst beim Winken)"
               checked={settings.outline}
               onChange={(outline) => update({ outline })}
