@@ -437,6 +437,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Fahrzeuge fahren aus einer Szene hinaus und kommen in der nächsten an: Das Feuerwehrauto verlässt die Stadt und parkt in der Feuerwache, der Traktor fährt vom Bauernhof in den Wald. Antippen am Bildrand folgt ihm.",
         why: "Aus einzelnen Bildern wird eine Welt; macht Lust, die anderen Szenen zu besuchen.",
         effort: "L",
+        done: true,
       },
     ],
   },
