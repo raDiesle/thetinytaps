@@ -32,9 +32,12 @@ import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from 
 //
 // First a red dotted trail draws the way across the island to the chest, like
 // on a treasure map. Then, at every station, Tapsi first shows the movement
-// alone and the child joins in; meanwhile the camera looks at Tapsi from the
-// front (only the paddling is seen from behind, as if sitting in the canoe
-// too), so the whole body is big in the middle of the picture.
+// alone and the child joins in. Tapsi always faces the island and the camera
+// looks from behind, a little raised and to the side where the arms would
+// hide behind the body: the child sees what Tapsi sees, and left is left.
+// Every movement does something to a thing in front of Tapsi – Kiki, the
+// paddle, the stones, the branch, the flowers, the coconuts, the door, the
+// rope, the chest, the crabs.
 //
 // Island layout along the path (x ≈ 0), from the sea at +z to the bay at -z:
 // beach 35 · brook 25.4 · swinging branch 16.5 · flowers 9.5 · coconuts 2.5 ·
@@ -268,15 +271,15 @@ function makeDoor() {
   const light = new THREE.PointLight("#ffd27a", 0, 14, 1.4);
   light.position.set(0, 2, -1.2);
   group.add(light);
-  // The spiral's light falls on whoever pushes, so it shows even with the door behind the camera.
+  // The spiral's light falls on whoever pushes.
   const spiralLight = new THREE.PointLight("#7ff3ff", 0, 9, 1.4);
   spiralLight.position.set(0, 1.8, 1.6);
   group.add(spiralLight);
   return {
     group,
-    /** k: 0 shut, 1 fully open (sunk into the ground); glow: 0..1 how bright the spiral is. */
+    /** push: how many steps it moved back; open: 0 shut, 1 sunk into the ground; glowK: 0..1 how bright the spiral is. */
     set(push: number, open: number, glowK: number) {
-      slab.position.set(0, -open * 3.6, -push * 0.35);
+      slab.position.set(0, -open * 3.6, -push * DOOR_STEP);
       spiralMat.emissiveIntensity = 0.4 + glowK * 3;
       (glow.material as THREE.MeshBasicMaterial).opacity = Math.max(glowK * 0.25, open);
       light.intensity = glowK * 6 + open * 30;
@@ -381,22 +384,24 @@ const BOAT_END = 35;
 const BROOK_FROM = 27.3;
 const BROOK_TO = 23.4;
 const SWING_Z = 16.5;
-/** The branch hangs behind Tapsi, so it never hides the front view, and swings over towards us. */
+/** The branch hangs in front of Tapsi and swings over towards Tapsi and us. */
 const SWING_PIVOT_Z = SWING_Z - 1.9;
-/** Afterwards the branch stays hooked up high, out of the way. */
-const SWING_PARKED = -1.1;
+/** Afterwards the branch stays hooked up high behind us, out of the way. */
+const SWING_PARKED = 1.1;
 const FLOWERS_Z = 9.5;
 const COCONUT_Z = 2.5;
 const DOOR_Z = -9.9;
-/** Far enough from the door that the camera fits in between. */
-const DOOR_GUIDE_Z = -6.6;
+/** Close enough to the door that Tapsi's paws reach it. */
+const DOOR_STAND = DOOR_Z + 0.68;
+/** How far each push moves the door (and Tapsi with it). */
+const DOOR_STEP = 0.35;
 const SHORE = v3(0, 0, -21.8);
 /** Where Tapsi stands in the canoe. */
 const CANOE_FLOOR = -0.08;
 const RAFT_X = 1.3;
 const RAFT_FROM = -35;
-/** Pulled up onto the beach, beside Tapsi. */
-const RAFT_TO = -22.9;
+/** Pulled up to the beach, in front of Tapsi on the right. */
+const RAFT_TO = -23.6;
 
 /** The step indices of the sequence, by name. */
 const S = { hello: 0, paddle: 1, brook: 2, duck: 3, flowers: 4, coconuts: 5, door: 6, rope: 7, hooray: 8, party: 9, bye: 10 } as const;
@@ -419,11 +424,11 @@ const ARRIVE: Record<number, number> = {
   [S.duck]: SWING_Z,
   [S.flowers]: FLOWERS_Z,
   [S.coconuts]: COCONUT_Z,
-  [S.door]: DOOR_GUIDE_Z,
+  [S.door]: DOOR_STAND,
 };
 
-/** Which way the guide looks during each movement (0 faces the sea, π the island). */
-const ACT_YAW = [Math.PI, Math.PI, Math.PI, 0, 0, 0, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI];
+/** Tapsi always faces the island (-z); 0 would face the sea. */
+const ISLAND = Math.PI;
 
 /** Seconds of one paddle stroke cycle, as in the paddle clip. */
 const PADDLE_PERIOD = 2.8;
@@ -553,11 +558,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   scene.add(swing.group);
 
   const flowerSpots: [number, number, number, string][] = [
-    [-2.7, FLOWERS_Z - 2.2, 2.3, "#ff6fa8"],
-    [2.8, FLOWERS_Z - 1.8, 2.0, "#b388ff"],
-    [-1.4, FLOWERS_Z - 3.6, 2.7, "#ff9f43"],
-    [1.6, FLOWERS_Z - 4.0, 2.5, "#ff5d73"],
-    [-3.9, FLOWERS_Z - 4.4, 3.0, "#64c8ff"],
+    // Two right beside Tapsi's paws, which open them; the others a little further on.
+    [-1.2, FLOWERS_Z - 0.5, 1.2, "#ff6fa8"],
+    [1.2, FLOWERS_Z - 0.5, 1.15, "#b388ff"],
+    [-2.3, FLOWERS_Z - 1.7, 1.8, "#ff9f43"],
+    [2.4, FLOWERS_Z - 1.9, 2.0, "#ff5d73"],
+    [-3.5, FLOWERS_Z - 3.2, 2.6, "#64c8ff"],
   ];
   const flowers = flowerSpots.map(([x, z, h, color], i) => {
     const f = makeFlower(h, color, 80 + i);
@@ -588,21 +594,18 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   scene.add(raft);
   const chest = makeChest();
   chest.group.position.y = 0.2;
-  chest.group.rotation.y = Math.PI;
   raft.add(chest.group);
   const ropeMat = mat("#d9b77a", 0.9);
   let rope: THREE.Mesh | null = null;
 
   const crabs = Array.from({ length: 5 }, (_, i) => {
     const crab = makeCrab();
-    const x = [-2.1, 2.6, -3.4, 3.8, -1.2][i];
-    const z = SHORE.z + [-0.2, 0.6, 1.0, -0.3, 1.6][i];
-    crab.group.position.set(x, groundHeight(x, z), z);
-    crab.group.rotation.y = Math.PI;
+    // In a ring around Tapsi, all looking at Tapsi, so they dance together.
+    const x = [-1.5, 1.7, -2.6, 2.9, -0.7][i];
+    const z = SHORE.z + [-0.3, 0.1, 0.7, 0.8, 1.4][i];
     const holder = new THREE.Group();
     holder.position.set(x, groundHeight(x, z) - 0.6, z);
-    holder.rotation.y = Math.PI + (x > 0 ? -0.4 : 0.4);
-    crab.group.position.set(0, 0, 0);
+    holder.rotation.y = Math.atan2(SHORE.x - x, SHORE.z - z);
     holder.add(crab.group);
     scene.add(holder);
     return { ...crab, holder, ground: groundHeight(x, z) };
@@ -664,12 +667,16 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     return Math.max(1.15 / Math.tan(v), 0.95 / Math.tan(h));
   };
 
-  /** Tapsi standing at `at` and facing `yaw`, seen from the front (or from behind), big in the middle. */
-  function portrait(at: THREE.Vector3, yaw: number, pos: THREE.Vector3, look: THREE.Vector3, behind = false, height = 1.0, far = 1) {
+  /**
+   * Tapsi standing at `at`, seen from behind, big in the middle. `side` turns
+   * the camera round towards Tapsi's right (radians), so arms in front of the
+   * body still show; `height` raises it to look over Tapsi's shoulders.
+   */
+  function rear(at: THREE.Vector3, pos: THREE.Vector3, look: THREE.Vector3, side = 0, height = 1.45, far = 1) {
     const d = frameDistance() * far;
-    const a = behind ? yaw + Math.PI : yaw;
-    pos.set(at.x + Math.sin(a) * d, at.y + (behind ? 1.45 : height), at.z + Math.cos(a) * d);
-    look.set(at.x, at.y + 0.8, at.z);
+    const a = ISLAND + Math.PI + side;
+    pos.set(at.x + Math.sin(a) * d, at.y + height, at.z + Math.cos(a) * d);
+    look.set(at.x, at.y + 0.75, at.z);
   }
 
   /** Where Tapsi stands while showing and doing a step's movement (smoothed while hopping). */
@@ -679,68 +686,91 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       const k = clamp01((act - STONE_HOP_START) / ((stoneCount + 1) * STONE_PERIOD));
       return out.set(0, 0.45, BROOK_FROM + (BROOK_TO - BROOK_FROM) * smooth(k));
     }
+    if (step === S.door) {
+      const z = DOOR_STAND - doorPush(act) * DOOR_STEP;
+      return out.set(0, groundHeight(0, z), z);
+    }
     const z = step >= S.rope ? SHORE.z : step === S.duck ? SWING_Z : ARRIVE[step];
     return out.set(0, groundHeight(0, z), z);
+  }
+
+  /** How far the door has been pushed at a moment of the door step: one step per push, three at most. */
+  function doorPush(act: number) {
+    if (act <= 0) return 0;
+    const cycles = act / PUSH_PERIOD;
+    return Math.min(3, Math.floor(cycles) + smooth(((cycles % 1) - 0.05) / 0.35));
   }
 
   /** The camera of a step from when Tapsi shows the movement until the praise: position and point looked at. */
   function actShot(step: number, f: { local: number; act: number; praise: number; time: number }, pos: THREE.Vector3, look: THREE.Vector3) {
     const at = actSpot(step, f.act, spot);
     switch (step) {
+      case S.hello:
+        // Kiki flutters in front on the right, where Tapsi waves.
+        rear(at, pos, look, 0.35, 1.6);
+        return;
       case S.paddle:
-        // From behind, as if sitting in the canoe too: left and right are the child's left and right.
-        portrait(at, ACT_YAW[step], pos, look, true);
+        // As if sitting in the canoe too.
+        rear(at, pos, look);
+        return;
+      case S.brook:
+        // Raised and a little to the side, so the stones ahead show past Tapsi.
+        rear(at, pos, look, 0.4, 2.1);
         return;
       case S.duck: {
         // The camera ducks along, so the branch sweeps over us too.
         const t = f.act + DEMO[step];
         const dip = t > 0 && f.act < actLength(step) ? duckDepth(t) : 0;
-        portrait(at, ACT_YAW[step], pos, look);
+        rear(at, pos, look);
         pos.y -= dip * 0.55;
         look.y -= dip * 0.3;
         return;
       }
+      case S.flowers:
+        // Raised and to the side: the paws that come together in front show, and the flowers beside them.
+        rear(at, pos, look, 0.5, 1.9);
+        return;
       case S.door: {
-        // In front of the door, so Tapsi pushes towards us; once it is open, round behind Tapsi to see it sink away.
-        portrait(at, ACT_YAW[step], pos, look);
+        // Well to the side (the gorge only starts at the door), so the paws on the door show; once it
+        // is open, round behind Tapsi and up a little to look through the gorge as it sinks away.
         const reveal = smooth(f.praise / 1.6);
-        if (reveal > 0) {
-          tmpA.set(0.7, at.y + 2.1, at.z + 2.8);
-          tmpB.set(0, at.y + 1.6, DOOR_Z);
-          orbitBlend(at, pos, look, tmpA, tmpB, reveal, pos, look);
-        }
+        rear(at, pos, look, 0.85 - reveal * 0.75, 1.9 + reveal * 0.6, 0.85 + reveal * 0.35);
+        look.lerp(tmpB.set(0, at.y + 1.4, DOOR_Z - 1), reveal * 0.6);
         return;
       }
-      case S.rope: {
-        // A little higher, so the chest shows when it arrives; then back to see it beside Tapsi.
-        portrait(at, ACT_YAW[step], pos, look, false, 1.5, 1.1);
-        const reveal = smooth(f.praise / 1.6);
-        tmpA.set(at.x - 0.5, at.y + 1.9, at.z - 4.2);
-        tmpB.set(at.x + 0.4, at.y + 0.6, at.z - 0.5);
-        pos.lerp(tmpA, reveal);
-        look.lerp(tmpB, reveal);
+      case S.rope:
+        // To the side, so the pulling paws show, and high enough to see the chest come; then back to the chest.
+        rear(at, pos, look, 0.55, 2.0, 1.1);
+        tmpA.copy(pos);
+        tmpB.copy(look);
+        cheerShot(at, pos, look);
+        pos.lerpVectors(tmpA, pos, smooth(f.praise / 1.6));
+        look.lerpVectors(tmpB, look, smooth(f.praise / 1.6));
         return;
-      }
       case S.hooray:
-        // Further back: the open chest in front, Tapsi cheering in the middle.
-        pos.set(at.x - 0.5, at.y + 1.9, at.z - 4.2);
-        look.set(at.x + 0.4, at.y + 0.6, at.z - 0.5);
+        cheerShot(at, pos, look);
         return;
       case S.party:
         // Slowly a little to and fro, the crabs dancing around.
-        portrait(at, ACT_YAW[step] + Math.sin(f.local * 0.35) * 0.3, pos, look, false, 1.1, 1.15);
+        rear(at, pos, look, Math.sin(f.local * 0.35) * 0.4, 2.0, 1.3);
         return;
       case S.bye: {
-        // At the end the camera rises and flies back to show the whole island at sunset.
-        portrait(at, ACT_YAW[step], pos, look, false, 1.1, 1.15);
+        // Kiki flies off to the right; at the end the camera rises and flies back to show the whole island at sunset.
+        rear(at, pos, look, 0.4, 1.7, 1.15);
         const k = smooth((f.act - actLength(step) + 1.5) / 7);
         pos.lerp(tmpA.set(-12, 21, SHORE.z - 26), k);
         look.lerp(tmpA.set(0, 2, 2), k);
         return;
       }
       default:
-        portrait(at, ACT_YAW[step], pos, look);
+        rear(at, pos, look, 0, 1.6);
     }
+  }
+
+  /** Behind Tapsi and above, the chest in front: for the cheering. */
+  function cheerShot(at: THREE.Vector3, pos: THREE.Vector3, look: THREE.Vector3) {
+    pos.set(at.x - 0.6, at.y + 2.2, at.z + 3.6);
+    look.set(at.x + 0.4, at.y + 0.7, at.z - 1.0);
   }
 
   /**
@@ -806,15 +836,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     let x = 0;
     let z = 0;
     let y: number | null = null;
-    let yaw = ACT_YAW[step];
+    const yaw = ISLAND;
     const walkStart = (from: number, to: number, startAt = 0.3) => {
       const end = f.lead - f.demo - 0.5;
       const k = clamp01((f.local - startAt) / (end - startAt));
       walking = f.local > startAt && f.local < end;
       z = from + (to - from) * k;
-      // Face the way it walks, then turn to the act's direction before showing it.
-      const turn = smooth((f.local - (end - 0.6)) / 0.8);
-      yaw = Math.PI + (ACT_YAW[step] - Math.PI) * turn;
     };
 
     if (step <= S.paddle) {
@@ -829,7 +856,6 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
           const k = smooth(f.local);
           z = BOAT_END + 0.4 - k * 1.6;
           y = (1 - k) * 0.02 + k * groundHeight(0, z) + Math.sin(k * Math.PI) * 0.5;
-          yaw = Math.PI;
         } else {
           walkStart(BOAT_END - 1.2, BROOK_FROM, 1);
         }
@@ -850,12 +876,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     } else if (step >= S.flowers && step <= S.door) {
       const from = step === S.flowers ? SWING_Z : step === S.coconuts ? FLOWERS_Z : COCONUT_Z;
       if (f.act < 0) walkStart(from, ARRIVE[step]);
-      else z = ARRIVE[step];
+      // At the door Tapsi steps after it with every push, the paws staying on it.
+      else z = step === S.door ? actSpot(step, f.act, spot).z : ARRIVE[step];
     } else if (step === S.rope && f.local < 2.5) {
       // Into the light behind the door; the flash hides the jump to the bay.
       walking = f.local > 0.3;
-      z = DOOR_GUIDE_Z - smooth((f.local - 0.3) / 2.2) * 3.4;
-      yaw = Math.PI;
+      z = DOOR_STAND - 3 * DOOR_STEP - smooth((f.local - 0.3) / 2.2) * 3.4;
     } else {
       x = SHORE.x;
       z = SHORE.z;
@@ -959,32 +985,31 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       b.flap(time + i);
     });
 
-    // Coconuts roll past, each on the side the fox leans away from.
+    // Coconuts roll down from the hill towards Tapsi, each passing on the side Tapsi leans away from.
     coconuts.forEach((nut, i) => {
       const pass = 0.25 * LEAN_PERIOD + i * (LEAN_PERIOD / 2);
       const dt = act - pass;
-      const on = step === S.coconuts && dt > -2.8 && dt < 2.6 && pass < len;
+      // Gone once it has rolled past us.
+      const on = step === S.coconuts && dt > -2.8 && dt < 1.2 && pass < len;
       nut.visible = on;
       if (!on) return;
       const z = COCONUT_Z + dt * 4.2;
-      const x = i % 2 ? 0.95 : -0.95;
+      const x = i % 2 ? -0.95 : 0.95;
       nut.position.set(x, groundHeight(x, z) + 0.5 + Math.abs(Math.sin(dt * 5)) * 0.06, z);
       nut.rotation.set(z / 0.5, 0, 0);
       if (crossed(f, LEAD[S.coconuts] + pass - 0.25)) cue("whoosh");
     });
 
     // The door: every push moves it a little and makes the spiral glow; then it sinks away.
-    let push = 0;
+    let push = step > S.door ? 3 : 0;
     let open = step > S.door ? 1 : 0;
     if (step === S.door && act > 0) {
-      const cycles = act / PUSH_PERIOD;
-      const n = Math.floor(cycles);
-      push = Math.min(3, n + smooth(((cycles % 1) - 0.05) / 0.35));
+      push = doorPush(act);
       open = smooth((act - len + 0.5) / 2.5);
       for (let c = 0; c < 4; c++) if (crossed(f, LEAD[S.door] + 0.5 + c * PUSH_PERIOD)) cue("rumble");
       if (crossed(f, LEAD[S.door] + len - 0.3)) cue("chime");
     }
-    door.set(push * (1 - open), open, step === S.door ? clamp01(push / 3) : open);
+    door.set(push, open, step === S.door ? clamp01(push / 3) : open);
 
     // The chest on its raft comes closer with the pulling, then opens.
     const raftZ = raftAt(step, act);
@@ -1051,23 +1076,51 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
     }
 
-    // Kiki: on the chest at the party, otherwise flying around the fox.
+    // Kiki: flies in from the island to be waved at, leads the way to the
+    // beach, then circles Tapsi; sits on the chest from the treasure on, and
+    // at the end flies off over the bay to be waved goodbye.
     const g = guide.root.position;
-    const perch = step >= S.hooray ? chest.group.getWorldPosition(new THREE.Vector3()).add(v3(0, 1.0, 0)) : null;
-    const fly = v3(g.x + Math.cos(time * 1.1) * 1.1, g.y + 2.3 + Math.sin(time * 2.3) * 0.2, g.z + Math.sin(time * 1.1) * 0.8);
+    const p = parrot.group.position;
+    const front = v3(g.x + 1.1 + Math.sin(time * 1.3) * 0.25, g.y + 1.45 + Math.sin(time * 2.3) * 0.12, g.z - 2.8 + Math.cos(time * 1.3) * 0.2);
+    const around = v3(g.x + Math.cos(time * 1.1) * 1.1, g.y + 2.3 + Math.sin(time * 2.3) * 0.2, g.z + Math.sin(time * 1.1) * 0.8);
+    const perch = chest.group.getWorldPosition(new THREE.Vector3()).add(v3(0.3, 1.0, 0));
     let flying = true;
-    if (perch) {
-      const settle = step === S.hooray ? smooth((f.local - 1) / 1.5) : 1;
-      parrot.group.position.copy(fly).lerp(perch, settle);
-      flying = settle < 0.95;
-      if (step === S.party) parrot.group.position.y += Math.abs(Math.sin(time * 6)) * 0.12;
+    let circling = false;
+    if (f.opening !== null || step === S.hello) {
+      const come = f.opening !== null ? 0 : smooth((f.local - 0.3) / 2.5);
+      p.set(5, 7, BOAT_START - 22).lerp(front, come);
+      // A little hop in the air whenever Tapsi waves.
+      if (step === S.hello && act + f.demo > 0) p.y += Math.abs(Math.sin(time * 4.5)) * 0.15;
+    } else if (step === S.paddle) {
+      // Leading the way, high above the bow, out of the paddle's reach.
+      p.copy(front).lerp(v3(g.x + 0.3 + Math.sin(time * 1.3) * 0.3, g.y + 2.6 + Math.sin(time * 2.3) * 0.15, g.z - 4.5), smooth(f.local / 2));
+    } else if (step < S.hooray) {
+      circling = true;
+      p.copy(front).lerp(around, step === S.brook ? smooth(f.local / 2) : 1);
+    } else if (step === S.bye) {
+      const away = v3(1.2 + Math.sin(time * 0.9) * 0.5, 2.5 + Math.sin(time * 1.7) * 0.25, SHORE.z - 5 + Math.cos(time * 0.9) * 0.5);
+      const k = smooth((f.local - 0.3) / 3);
+      p.copy(perch).lerp(away, k);
+      flying = k > 0.02;
     } else {
-      parrot.group.position.copy(fly);
+      const settle = step === S.hooray ? smooth((f.local - 1) / 1.5) : 1;
+      p.copy(around).lerp(perch, settle);
+      flying = settle < 0.95;
+      if (step === S.party) p.y += Math.abs(Math.sin(time * 6)) * 0.12;
     }
-    const face = flying ? Math.atan2(-Math.sin(time * 1.1), Math.cos(time * 1.1)) : Math.atan2(camPos.x - parrot.group.position.x, camPos.z - parrot.group.position.z);
+    // Looking at Tapsi, except while circling; sitting on the chest it looks at us.
+    const face = circling
+      ? Math.atan2(-Math.sin(time * 1.1), Math.cos(time * 1.1))
+      : flying
+        ? Math.atan2(g.x - p.x, g.z - p.z)
+        : Math.atan2(camPos.x - p.x, camPos.z - p.z);
     parrot.group.rotation.set(0, face, 0);
     parrot.flap(time, flying);
-    if (perch === null && crossed(f, 2)) cue("tweet");
+    if (step === S.hello) {
+      for (const at of [1.2, TRAVEL[S.hello] + 0.6, LEAD[S.hello] + 1, LEAD[S.hello] + 4]) if (crossed(f, at)) cue("tweet");
+    } else if (step === S.bye) {
+      if (crossed(f, LEAD[S.bye] + 0.5) || crossed(f, LEAD[S.bye] + 3)) cue("tweet");
+    } else if (step < S.hooray && crossed(f, 2)) cue("tweet");
 
     // Sunset during the party and the goodbye.
     const dusk = step === S.party ? smooth(f.local / sequence.steps[S.party].seconds) * 0.7 : step > S.party ? 0.7 + smooth(f.local / 6) * 0.3 : 0;
@@ -1170,7 +1223,7 @@ export const TREASURE_ISLAND: Story = {
   demo: DEMO,
   praise: PRAISE,
   lines: [
-    { icon: "👋", situation: "Ahoi! Ich bin Tapsi. Und das ist Kiki, mein Papagei.", instruction: "Ich winke dir mal Hallo!", turn: "Winkst du auch?", again: "Hallo, hallo!", praise: "Schön, dass du da bist!" },
+    { icon: "👋", situation: "Ahoi! Ich bin Tapsi. Und da kommt Kiki, mein Papagei!", instruction: "Ich winke Kiki Hallo – so!", turn: "Winkst du Kiki auch?", again: "Hallo, Kiki!", praise: "Kiki freut sich, dass du da bist!" },
     { icon: "🛶", situation: "Los geht's – zur Schatzinsel!", instruction: "Schau: das Paddel rechts ins Wasser – und links.", turn: "Paddel mit!", again: "Paddeln, paddeln – die Insel kommt näher!", praise: "Geschafft! Wir sind am Strand." },
     { icon: "🪨", situation: "Oh, ein Bach! Da liegen Steine.", instruction: "Schau: Knie ganz hoch – so!", turn: "Jetzt du – von Stein zu Stein!", again: "Hoch das Knie – platsch!", praise: "Super, trockene Füße!" },
     { icon: "🌿", situation: "Huch, was schaukelt denn da?", instruction: "Wenn der Ast kommt, ducken wir uns – so!", turn: "Er kommt! Duck dich!", again: "Und nochmal ducken!", praise: "Puh, der Ast ist vorbei!" },
@@ -1179,8 +1232,8 @@ export const TREASURE_ISLAND: Story = {
     { icon: "🚪", situation: "Eine Tür im Felsen! Die ist aber schwer.", instruction: "Mit beiden Händen fest drücken – so!", turn: "Jetzt du – drück mit!", again: "Fest drücken – sie bewegt sich!", praise: "Die Tür ist offen!" },
     { icon: "🪢", situation: "Da schwimmt die Schatztruhe!", instruction: "Hand über Hand am Seil ziehen – so!", turn: "Zieh mit!", again: "Ziehen, ziehen – sie kommt!", praise: "Die Truhe ist da!" },
     { icon: "🙌", situation: "Oh! Was ist da drin?", instruction: "Gold! Arme hoch – Hurra!", turn: "Du auch – Hurra!", again: "Hurra, ein Schatz!", praise: "So viel Gold!" },
-    { icon: "💃", situation: "Jetzt wird gefeiert!", instruction: "Ich schüttel mich – so!", turn: "Tanz mit!", again: "Die Krebse tanzen auch!", praise: "Was für eine Party!" },
-    { icon: "🌅", situation: "Die Sonne geht unter.", instruction: "Ich winke Tschüss!", turn: "Winkst du mit?", again: "Tschüss, Kiki! Tschüss, Insel!", praise: "Danke fürs Mitmachen! Bis bald!" },
+    { icon: "💃", situation: "Jetzt wird gefeiert!", instruction: "Die Krebse tanzen! Ich schüttel mich mit – so!", turn: "Tanz mit den Krebsen!", again: "Die Krebse tanzen mit dir!", praise: "Was für eine Party!" },
+    { icon: "🌅", situation: "Die Sonne geht unter. Kiki fliegt nach Hause.", instruction: "Ich winke Kiki Tschüss – so!", turn: "Winkst du mit?", again: "Tschüss, Kiki! Tschüss, Insel!", praise: "Danke fürs Mitmachen! Bis bald!" },
   ],
   build,
 };

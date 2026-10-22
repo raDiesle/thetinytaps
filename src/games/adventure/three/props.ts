@@ -247,6 +247,21 @@ export function makeCanoe() {
   const seat = solid(new THREE.BoxGeometry(1.1, 0.06, 0.3), wood);
   seat.position.set(0, 0.32, 0.5);
   group.add(seat);
+  // Low in the hull, where Tapsi stands; small enough to stay inside the curve.
+  const floor = solid(new THREE.BoxGeometry(0.36, 0.02, 1.4), woodDark);
+  floor.position.y = -0.045;
+  group.add(floor);
+  // The sea is a flat plane and would show inside the open hull, as if the
+  // canoe was full of water. An invisible lid over the hull fills in depth
+  // after everything solid is drawn, so the water behind it is hidden while
+  // Tapsi and the floor inside stay.
+  const lidGeo = new THREE.CircleGeometry(1, 48);
+  lidGeo.rotateX(-Math.PI / 2);
+  lidGeo.scale(0.62, 1, 2.3);
+  const waterMask = new THREE.Mesh(lidGeo, new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide }));
+  waterMask.position.y = 0.42;
+  waterMask.renderOrder = 1;
+  group.add(waterMask);
   return group;
 }
 

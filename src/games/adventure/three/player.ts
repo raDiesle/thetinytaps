@@ -20,8 +20,11 @@ export interface PlayerEvents {
   onFlash(amount: number): void;
   onCue(cue: Cue): void;
   onEnd(): void;
-  /** Every frame: the guide's pose, e.g. for the outline helper. */
-  onPose?(pose: Pose, frame: StoryFrame): void;
+  /**
+   * Every frame: the guide's pose, e.g. for the outline helper, and from
+   * where the camera sees the guide (radians round it, 0 = from the front).
+   */
+  onPose?(pose: Pose, frame: StoryFrame, view: number): void;
 }
 
 const ACT_BLEND = 0.7;
@@ -167,7 +170,9 @@ export class StoryPlayer {
     const smooth = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
     this.guide.highlight = this.highlight ? smooth((frame.act + frame.demo + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8)) : 0;
     this.guide.apply(pose, this.elapsed);
-    this.events.onPose?.(pose, frame);
+    const root = this.guide.root;
+    const cam = this.stage.camera.position;
+    this.events.onPose?.(pose, frame, Math.atan2(cam.x - root.position.x, cam.z - root.position.z) - root.rotation.y);
     this.guide.setTalking(typeof speechSynthesis !== "undefined" && speechSynthesis.speaking);
     this.events.onFlash(result.flash);
     this.stage.focusShadow(this.world.focus);
