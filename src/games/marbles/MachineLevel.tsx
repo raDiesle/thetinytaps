@@ -1,9 +1,8 @@
-import { useEffect, useId, useMemo, useRef } from "react";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
+import { useId, useMemo } from "react";
+import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BALL,
   BARS,
-  beside,
   BELL,
   BUCKET,
   BUTTON,
@@ -23,7 +22,6 @@ import {
   PULLEYS,
   RAMP,
   rampY,
-  seg,
   SEESAW,
   STAIRS,
   TABLE,
@@ -31,16 +29,11 @@ import {
   WORLD_W,
   type Machine,
 } from "./machine";
+import { beside, deg, seg } from "./machineKit";
+import { MachineStage, TapHint } from "./MachineStage";
+import { DARK_WOOD, Hopper, INK, MARBLE_COLOR, Picture, WallClock, Window, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./track";
 import { BAR_COLORS, Ball, Rail } from "./TrackLevel";
-
-const INK = "#2a1e5c";
-const WOOD = "#d08c4b";
-const DARK_WOOD = "#8a5a2b";
-/** How fast the camera catches up with the action, per second. */
-const CAMERA_FOLLOW = 2.6;
-const MARBLE_COLOR = "#3a86ff";
-const deg = (r: number) => (r * 180) / Math.PI;
 
 /**
  * Level 3: the big machine. One tap lets the marble go, and then one thing
@@ -50,56 +43,14 @@ const deg = (r: number) => (r * 180) / Math.PI;
  * the button for the jack-in-the-box. The camera travels along with whatever
  * moves.
  */
-export function MachineLevel({ sound, say, onDone }: LevelProps) {
+export function MachineLevel(props: LevelProps) {
   const machine = useMemo(buildMachine, []);
-  /** Seconds since the tap; below 0 until then. */
-  const clock = useRef(-1);
-  const fired = useRef(0);
-  const camera = useRef(0);
   const ids = useId();
 
-  useFrames((dt) => {
-    if (clock.current >= 0) {
-      clock.current += dt;
-      const { events } = machine;
-      while (fired.current < events.length && events[fired.current].at <= clock.current) {
-        const e = events[fired.current++];
-        if (e.sound) sound(e.sound);
-        if (e.say) say(e.say);
-        if (e.done) onDone();
-      }
-    }
-    const target = machine.cameraTarget(clock.current);
-    camera.current += (target - camera.current) * (1 - Math.exp(-dt * CAMERA_FOLLOW));
-  });
-
-  // For trying out the machine in the browser console: __machine.seek(20)
-  useEffect(() => {
-    if (import.meta.env.PROD) return;
-    Object.assign(window, {
-      __machine: {
-        duration: machine.duration,
-        seek(seconds: number) {
-          clock.current = seconds;
-          fired.current = machine.events.findIndex((e) => e.at > seconds);
-          if (fired.current < 0) fired.current = machine.events.length;
-          camera.current = machine.cameraTarget(seconds);
-        },
-      },
-    });
-  }, [machine]);
-
-  const start = () => {
-    if (clock.current < 0) clock.current = 0;
-  };
-  useAnyKey(start);
-
-  const t = clock.current;
-
   return (
-    <div className="marble-level" onPointerDown={start}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label="Große Maschine">
-        <g transform={`translate(${-camera.current} 0)`}>
+    <MachineStage machine={machine} label="Große Maschine" {...props}>
+      {(t) => (
+        <>
           <Room stripes={`${ids}-stripes`} />
           <Table />
           <XylophoneRamp machine={machine} t={t} />
@@ -120,20 +71,16 @@ export function MachineLevel({ sound, say, onDone }: LevelProps) {
 
           <MovingThings machine={machine} t={t} />
 
-          <Hopper />
+          <Hopper x={HOPPER.x} y={HOPPER.y} />
           <Bell age={t - machine.tBell} />
           <FunnelFront />
           <BucketFront drop={machine.bucketDrop(t)} />
           <Gate lift={machine.bucketDrop(t)} />
 
-          {t < 0 && (
-            <text className="marble-hint" x={HOPPER.x + 92} y={HOPPER.y + 96} fontSize="90" textAnchor="middle">
-              👆
-            </text>
-          )}
-        </g>
-      </svg>
-    </div>
+          <TapHint t={t} x={HOPPER.x + 92} y={HOPPER.y + 96} />
+        </>
+      )}
+    </MachineStage>
   );
 }
 
@@ -169,7 +116,7 @@ function Room({ stripes }: { stripes: string }) {
       <Window x={1460} />
       <Picture x={2420} y={110} />
       <Window x={3150} />
-      <Clock x={4330} y={230} />
+      <WallClock x={4330} y={230} />
       <Picture x={5300} y={110} />
       <Window x={5850} />
       {Array.from({ length: 13 }, (_, i) => {
@@ -187,52 +134,7 @@ function Room({ stripes }: { stripes: string }) {
   );
 }
 
-function Window({ x }: { x: number }) {
-  return (
-    <g transform={`translate(${x} 60)`}>
-      <rect width="280" height="200" rx="10" fill="#bfe9ff" stroke={INK} strokeWidth="5" />
-      <circle cx="210" cy="56" r="26" fill="#ffd23f" />
-      <path d="M36 140 q20 -30 50 -10 q25 -25 55 0 q25 0 25 20 h-130 z" fill="#fff" />
-      <line x1="140" y1="0" x2="140" y2="200" stroke={INK} strokeWidth="5" />
-      <line x1="0" y1="100" x2="280" y2="100" stroke={INK} strokeWidth="5" />
-    </g>
-  );
-}
-
-function Picture({ x, y }: { x: number; y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <rect width="190" height="140" rx="6" fill="#fff" stroke="#b8763d" strokeWidth="12" />
-      <path d="M28 112 L76 56 L104 88 L128 64 L166 112 Z" fill="#3ec300" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-      <circle cx="146" cy="38" r="13" fill="#ff8c42" />
-    </g>
-  );
-}
-
-function Clock({ x, y }: { x: number; y: number }) {
-  return (
-    <g transform={`translate(${x} ${y})`}>
-      <circle r="52" fill="#fff" stroke="#ff8c42" strokeWidth="10" />
-      {Array.from({ length: 12 }, (_, i) => (
-        <circle key={i} cx={38 * Math.cos((i * Math.PI) / 6)} cy={38 * Math.sin((i * Math.PI) / 6)} r="3" fill={INK} />
-      ))}
-      <line x1="0" y1="0" x2="0" y2="-30" stroke={INK} strokeWidth="5" strokeLinecap="round" />
-      <line x1="0" y1="0" x2="22" y2="8" stroke={INK} strokeWidth="5" strokeLinecap="round" />
-      <circle r="5" fill={INK} />
-    </g>
-  );
-}
-
 /* ---------- Marble, xylophone, bell and funnel ---------- */
-
-function Hopper() {
-  return (
-    <g>
-      <path d={`M${HOPPER.x - 58} -10 L${HOPPER.x + 58} -10 L${HOPPER.x + 28} 62 L${HOPPER.x - 28} 62 Z`} fill="#8e7dff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path d={`M${HOPPER.x - 36} 8 L${HOPPER.x + 36} 8`} stroke="#fff8" strokeWidth="6" strokeLinecap="round" />
-    </g>
-  );
-}
 
 function XylophoneRamp({ machine, t }: { machine: Machine; t: number }) {
   const slope = deg(Math.atan2(RAMP.to.y - RAMP.from.y, RAMP.to.x - RAMP.from.x));

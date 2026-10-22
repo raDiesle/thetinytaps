@@ -22,9 +22,15 @@ export function MarbleGame() {
               onChange={(levels) => update({ levels })}
               options={[
                 { value: "all", label: "Alle nacheinander" },
+                { value: "machines", label: "⚙️ Alle Maschinen nacheinander" },
                 { value: "track", label: "🎢 Nur Kugelbahn" },
                 { value: "topple", label: "📚 Nur Alles fällt um" },
                 { value: "machine", label: "⚙️ Nur Große Maschine" },
+                { value: "kitchen", label: "🍳 Nur Verrückte Küche" },
+                { value: "garden", label: "🌻 Nur Im Garten" },
+                { value: "building", label: "🚧 Nur Baustelle" },
+                { value: "circus", label: "🎪 Nur Zirkus" },
+                { value: "space", label: "🚀 Nur Raketenstart" },
               ]}
             />
             <p className="setting-note">
@@ -41,6 +47,27 @@ export function MarbleGame() {
               zehn Dominosteine, ein Auto durch den Looping auf die Wippe, ein Ball die Treppe hinunter in den Eimer, der das Tor für
               den Zug hochzieht, und der Zug drückt den Knopf für den Springteufel. Das Bild fährt mit.
             </p>
+            <p className="setting-note">
+              Verrückte Küche: Kochlöffel, Küchenrolle, Nudelholz, Suppenkelle, rollender Teller, Popcorn und ein Toaster, der zum
+              Schluss den Toast zum Hasen schießt.
+            </p>
+            <p className="setting-note">
+              Im Garten: Vogelhaus, Windspiel, Gießkanne, Wasserrad, Schubkarre, Rechen, Apfelbaum, Rutsche, Krocketkugel, Wasserhahn
+              und Rasensprenger, bis die Sonnenblume blüht.
+            </p>
+            <p className="setting-note">
+              Baustelle: Betonmischer, Wasserwaage, Schuttrutsche, Förderband, Leitkegel, Abrissbirne, Ziegelturm, Kabeltrommel und
+              Kurbel, bis der Kran das Dach auf das Haus setzt und der Richtbaum steht.
+            </p>
+            <p className="setting-note">
+              Zirkus: Zauberhut, Trommelwirbel, Trampolin, Seehund, der Elefant wirft die Kugel dem Teddy in den Korb, der fährt auf dem
+              Einrad durch den Feuerring und zieht am Band der Kanone – der Clown fliegt ins Netz, und der Vorhang geht auf.
+            </p>
+            <p className="setting-note">
+              Raketenstart: Satellitenschüssel, Leuchtringe, Zickzack-Rohr, Roboter, Mondbuggy, Planeten-Mobile, Magnet und
+              Countdown – 3, 2, 1, und die Rakete fliegt zum Mond.
+            </p>
+            <p className="setting-note">Jede Maschine läuft nach einem Tipp etwa eine halbe Minute, und das Bild fährt mit.</p>
           </SettingsGroup>
 
           <SettingsGroup title="Ton">
