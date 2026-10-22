@@ -18,12 +18,13 @@ export function MarbleGame() {
           <SettingsGroup title="Bahnen">
             <Choice<MarbleLevels>
               label="Spielen"
-              value={settings.levels}
+              value={settings.levels === "both" ? "all" : settings.levels}
               onChange={(levels) => update({ levels })}
               options={[
-                { value: "both", label: "Beide nacheinander" },
+                { value: "all", label: "Alle nacheinander" },
                 { value: "track", label: "🎢 Nur Kugelbahn" },
                 { value: "topple", label: "📚 Nur Alles fällt um" },
+                { value: "machine", label: "⚙️ Nur Große Maschine" },
               ]}
             />
             <p className="setting-note">
@@ -34,6 +35,11 @@ export function MarbleGame() {
             <p className="setting-note">
               Alles fällt um: Buntstift, Bauklotz, Bücher, Flasche, Müslipackung … stehen in einer Reihe. Ein Tipp schubst das erste
               Ding an, und eins fällt nach dem anderen um, bis zur Trommel. Jedes Mal stehen andere Sachen da.
+            </p>
+            <p className="setting-note">
+              Große Maschine: Ein Tipp, und eine halbe Minute lang stößt eins das nächste an – Kugel, Xylophon, Glocke, Trichter,
+              zehn Dominosteine, ein Auto durch den Looping auf die Wippe, ein Ball die Treppe hinunter in den Eimer, der das Tor für
+              den Zug hochzieht, und der Zug drückt den Knopf für den Springteufel. Das Bild fährt mit.
             </p>
           </SettingsGroup>
 
