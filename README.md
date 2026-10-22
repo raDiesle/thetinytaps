@@ -33,7 +33,7 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on their start screens (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
 | `src/games/letters/` | Game "Buchstaben & Zahlen": free typing (numbers optionally counted by tapping each thing), "Wo ist das B?" (find the key for a shown letter, `FindPlay.tsx`) or the Buchstaben-Zug (keys become wagons, `TrainPlay.tsx`) |
-| `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore with chain reactions and "alles entdeckt" party, find, sound riddle, trait questions in `quests.ts`, colouring in; tap, hover / swipe or keys with arrow-key frame in `focus.ts`) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
+| `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore with chain reactions and "alles entdeckt" party, find, sound riddle, trait questions in `quests.ts`, colouring in; tap, hover / swipe or keys with arrow-key frame in `focus.ts`) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`; shared depth helpers, drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx` |
 | `src/games/animals/` | Game "Was gehört zum Tier?": drag (or tap) the food to the hungry animal, or the animal into its home; the homes are drawn in `homes.tsx`, animals, foods and sentences are in `content.ts` |
 | `src/games/shadows/` | Game "Schatten finden": a picture looks for its shadow among 2–4 black ones (the same emoji with `filter: brightness(0)`); tap the right shadow or drag the picture onto it, or choose with arrow keys + Enter / 1–4. A wrong shadow shows its colours for a moment ("Das ist die Giraffe."). Pictures and texts in `content.ts`, by theme (Tiere, Fahrzeuge, Essen, Dinge) |
 | `src/games/words/` | Game "Wörter tippen": whole word, first letter only, colour words, doing words (all from `de.ts`) |
@@ -114,7 +114,7 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 2. ~~Options: themes (Tiere, Fahrzeuge, Essen), announcement style, calm mode, uninterrupted counting~~
 3. Own illustrations and recorded voice (incl. letter sounds „b“ instead of „Be“), ~~offline (PWA)~~
 4. ~~Wörter tippen~~
-5. ~~Lebendige Bilder: Wimmelbild Baustelle, Stadt, Bauernhof, Hof am Teich, Zoo, Unterwasser, Badezimmer, Wald, Feuerwache, Weltall~~ – next: Gute-Nacht-Zimmer
+5. ~~Lebendige Bilder: Wimmelbild Baustelle, Stadt, Bauernhof, Hof am Teich, Zoo, Unterwasser, Badezimmer, Wald, Feuerwache, Weltall, Spielplatz~~ – next: Gute-Nacht-Zimmer
 6. ~~Was gehört zum Tier? (Tiere füttern, Wer wohnt wo?)~~
 7. ~~Gefühle: Bär trösten, Kindergarten-Geschichten~~
 8. ~~Schatten finden~~

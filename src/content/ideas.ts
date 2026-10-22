@@ -477,6 +477,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Spielplatz",
         text: "Rutsche, Schaukel, Wippe, Sandkasten mit Förmchen, Klettergerüst, Eiswagen mit Glocke, Seifenblasen.",
         effort: "L",
+        done: true,
       },
       {
         id: "S-09",
