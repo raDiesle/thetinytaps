@@ -80,7 +80,6 @@ export type SceneSound =
   | "tick"
   | "peck"
   | "cuckoo"
-  | "slide"
   | "kettle"
   | "sizzle"
   | "crunch"

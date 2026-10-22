@@ -544,12 +544,6 @@ export function playDrum() {
   hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
 }
 
-/** "Wiiieee!" – down the slide: a quick slide-whistle up, then a long wobbly glide down. */
-export function playSlide() {
-  note({ from: 700, to: 1500, duration: 0.18, type: "sine", volume: 0.16 });
-  for (let i = 0; i < 6; i++) note({ from: 1500 - i * 170, to: 1380 - i * 170, duration: 0.16, type: "sine", volume: 0.16, delay: 0.18 + i * 0.14 });
-}
-
 /** "Fiiiiep!" – a whistling kettle: steam hisses, then the whistle rises and wobbles. */
 export function playKettle() {
   hiss({ from: 2500, to: 3200, duration: 1.4, volume: 0.1, q: 1.2 });

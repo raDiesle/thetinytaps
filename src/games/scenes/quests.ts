@@ -96,7 +96,6 @@ const RIDDLE_SOUNDS = new Set<SceneSound>([
   "sizzle",
   "train",
   "jet",
-  "slide",
   "sleigh",
   "yawn",
 ]);
