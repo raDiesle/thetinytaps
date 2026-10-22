@@ -543,3 +543,16 @@ export function playDrum() {
   note({ from: 150, to: 48, duration: 0.6, type: "sine", volume: 0.55 });
   hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
 }
+
+/** "Fiiiiep!" – a whistling kettle: steam hisses, then the whistle rises and wobbles. */
+export function playKettle() {
+  hiss({ from: 2500, to: 3200, duration: 1.4, volume: 0.1, q: 1.2 });
+  for (let i = 0; i < 6; i++) note({ from: 1180 + i * 40, to: 1240 + i * 40, duration: 0.2, type: "sine", volume: 0.1, delay: 0.3 + i * 0.18 });
+  note({ from: 1400, to: 1480, duration: 0.5, type: "sine", volume: 0.12, delay: 1.38 });
+}
+
+/** "Brutzel, brutzel!" – an egg sizzling in the pan: crackling hiss with tiny pops. */
+export function playSizzle() {
+  hiss({ from: 5000, to: 4200, duration: 1.3, volume: 0.12, q: 0.7 });
+  for (let i = 0; i < 9; i++) note({ from: 2600 + (i % 3) * 400, to: 1800, duration: 0.03, type: "triangle", volume: 0.07, delay: 0.1 + i * 0.13 + (i % 2) * 0.04 });
+}

@@ -79,7 +79,9 @@ export type SceneSound =
   | "splash"
   | "tick"
   | "peck"
-  | "cuckoo";
+  | "cuckoo"
+  | "kettle"
+  | "sizzle";
 
 /** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */
 export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" | "small" | "animal" | "wheels";
