@@ -496,4 +496,5 @@ export const flughafen: Scene = {
       ],
     },
   ],
+  seasons: { weather: true, tree: [55, 510, 0.7], snowman: [970, 705, 0.7], pumpkin: [1015, 720], egg: [1405, 585] },
 };

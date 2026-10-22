@@ -524,4 +524,5 @@ export const gutenacht: Scene = {
       ],
     },
   ],
+  seasons: { tree: [340, 840, 0.85], pumpkin: [1510, 690], egg: [1165, 525] },
 };

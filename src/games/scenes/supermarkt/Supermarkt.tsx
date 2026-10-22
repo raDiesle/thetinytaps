@@ -510,4 +510,5 @@ export const supermarkt: Scene = {
       ],
     },
   ],
+  seasons: { tree: [880, 765], pumpkin: [220, 705], egg: [775, 570] },
 };
