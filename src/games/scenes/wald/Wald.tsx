@@ -192,7 +192,7 @@ export const wald: Scene = {
       id: "eichhoernchen",
       name: "das Eichhörnchen",
       sentences: ["Das Eichhörnchen versteckt eine Nuss.", "Das Eichhörnchen hat einen buschigen Schwanz."],
-      sound: "chatter",
+      sound: "squeak",
       traits: ["animal", "small"],
       box: [-48, -108, 96, 108],
       hitAreas: [[-58, -122, 112, 124]],
@@ -562,4 +562,5 @@ export const wald: Scene = {
       ],
     },
   ],
+  seasons: { weather: true, tree: [555, 780, 0.68], snowman: [1440, 750, 0.8], pumpkin: [790, 1000, 0.85], egg: [1100, 975] },
 };

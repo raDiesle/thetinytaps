@@ -25,7 +25,7 @@
   right: max(2vw, env(safe-area-inset-right));
   bottom: calc(max(14px, env(safe-area-inset-bottom)) + clamp(48px, 7vw, 70px));
   width: min(30vw, 34vh);
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 2 / 2.15;
   border-radius: 28px;
   background: radial-gradient(circle at 50% 40%, rgb(40 52 92 / 82%), rgb(12 16 34 / 88%));
   box-shadow:
@@ -54,6 +54,7 @@
   bottom: max(14px, env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
+  z-index: 1;
   display: flex;
   gap: clamp(4px, 1vw, 12px);
   margin: 0;
@@ -62,21 +63,28 @@
   border-radius: 999px;
   background: rgb(255 255 255 / 55%);
   backdrop-filter: blur(6px);
-  pointer-events: none;
 }
 
 .adventure-route li {
-  display: grid;
-  place-items: center;
-  width: clamp(26px, 4vw, 44px);
-  height: clamp(26px, 4vw, 44px);
   border-radius: 50%;
-  font-size: clamp(15px, 2.4vw, 26px);
   opacity: 0.45;
   filter: grayscale(0.7);
   transition:
     transform 0.4s,
     opacity 0.4s;
+}
+
+.adventure-route button {
+  display: grid;
+  place-items: center;
+  width: clamp(22px, 3.4vw, 40px);
+  height: clamp(22px, 3.4vw, 40px);
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  font-size: clamp(13px, 2.1vw, 24px);
+  cursor: pointer;
 }
 
 .adventure-route li.done {
@@ -92,13 +100,45 @@
   box-shadow: 0 2px 10px rgb(0 0 0 / 15%);
 }
 
+/* For grown-ups: back, pause and forward, small and out of the way. */
+.adventure-controls {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 55%);
+  backdrop-filter: blur(6px);
+}
+
+.adventure-controls button {
+  display: grid;
+  place-items: center;
+  width: clamp(34px, 4.4vw, 48px);
+  height: clamp(34px, 4.4vw, 48px);
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+  color: #23395d;
+  font-size: clamp(15px, 2vw, 22px);
+  cursor: pointer;
+}
+
 .adventure-paused {
   position: absolute;
   inset: 0;
   display: grid;
   place-content: center;
+  border: none;
   background: rgb(10 30 60 / 35%);
+  color: #fff;
   font-size: clamp(64px, 12vw, 128px);
+  cursor: pointer;
 }
 
 .adventure-again {

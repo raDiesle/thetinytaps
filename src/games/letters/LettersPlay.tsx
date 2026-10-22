@@ -5,13 +5,18 @@ import { toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import { translate, translateCountable } from "@/content/translate";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
-import { playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, setSfxVolume } from "@/lib/sfx";
+import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, recorded, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { LetterCard, NumberCard } from "./Cards";
 import type { LettersSettings } from "./settings";
 
 /** Presses closer together than this only spawn shapes, so mashing doesn't strobe. */
 const MIN_CHANGE_MS = 600;
+
+/** Enter: a real car horn and train whistle (src/lib/sounds/), synthesized until loaded. */
+const honk = recorded("honk", playHonk);
+const whistle = recorded("whistle", playWhistle);
+
 /** Minimum time between two "next" clicks in step-by-step mode. */
 const MIN_ADVANCE_MS = 350;
 /** Time between counted items when counting automatically. */
@@ -333,7 +338,7 @@ export function LettersPlay({
         return true;
       }
       if (key === "Enter") {
-        sound(hornCount.current++ % 2 ? playWhistle : playHonk);
+        sound(hornCount.current++ % 2 ? whistle : honk);
         animateCard([{ transform: "none" }, { transform: "scale(1.12, 0.9)" }, { transform: "scale(0.95, 1.08)" }, { transform: "none" }], 500);
         return true;
       }
@@ -399,6 +404,10 @@ export function LettersPlay({
   useEffect(() => {
     setSfxVolume(settings.calm ? 0.4 : 1);
   }, [settings.calm]);
+
+  useEffect(() => {
+    loadRecordings(["honk", "whistle"]);
+  }, []);
 
   // Step-by-step: any click reveals the next part. Otherwise tapping the card
   // repeats what it says, and tapping elsewhere makes shapes. Counting by

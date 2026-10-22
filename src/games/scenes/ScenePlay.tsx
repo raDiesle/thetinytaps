@@ -64,6 +64,8 @@ import {
   playGiggle,
   playCreak,
   playLeaves,
+  loadRecordings,
+  playRecorded,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -138,6 +140,9 @@ const SOUNDS: Record<SceneSound, () => void> = {
   creak: playCreak,
   rustle: playLeaves,
 };
+
+/** A scene sound: the real recording where there is one (src/lib/sounds/), else synthesized. */
+const playSound = (sound: SceneSound) => playRecorded(sound, SOUNDS[sound]);
 
 /** Key presses closer together than this only spawn shapes. */
 const MIN_KEY_MS = 600;
@@ -284,6 +289,10 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     setSfxVolume(settings.calm ? 0.4 : 1);
   }, [settings.calm]);
 
+  useEffect(() => {
+    loadRecordings(new Set(items.map((item) => item.sound)));
+  }, [items]);
+
   const say = useCallback(
     (text: string, queue = false) => {
       if (settings.speech) speak(text, speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
@@ -318,7 +327,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       busyUntil.current.set(item.id, now + item.durationMs);
       setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (soundsOn && !quiet) SOUNDS[item.sound]();
+      if (soundsOn && !quiet) playSound(item.sound);
       return true;
     },
     [later, soundsOn],
@@ -332,7 +341,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         say(quest.question, queue);
         return;
       }
-      SOUNDS[quest.sound]();
+      playSound(quest.sound);
       later(() => say(quest.question, true), RIDDLE_QUESTION_MS);
     },
     [say, later],
@@ -450,7 +459,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     const item = guest?.item ?? itemsById.get(road.item);
     if (!item) return;
     driveIn(item, road);
-    if (soundsOn) SOUNDS[item.sound]();
+    if (soundsOn) playSound(item.sound);
     const name = capitalize(item.name);
     say(home ? `${name} ist wieder ${PLACES[scene.id].at}!` : `${name} kommt ${PLACES[road.from].from}!`);
     // So a reload doesn't bring it once more.
@@ -469,7 +478,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     const ms = driveMs(dx);
     busyUntil.current.set(item.id, Infinity);
     setDrives((prev) => ({ ...prev, [item.id]: { phase: "out", dx, ms } }));
-    if (soundsOn) SOUNDS[item.sound]();
+    if (soundsOn) playSound(item.sound);
     say(`Tschüss! ${capitalize(item.name)} fährt ${PLACES[to].to}.`, true);
     later(() => {
       setDrives((prev) => ({ ...prev, [item.id]: { phase: "gone", dx, ms } }));
@@ -571,7 +580,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     riddleRepeat.current = true;
     later(() => {
       riddleRepeat.current = false;
-      if (questRef.current === quest && !celebrating.current) SOUNDS[quest.sound!]();
+      if (questRef.current === quest && !celebrating.current) playSound(quest.sound!);
     }, RIDDLE_REPEAT_MS);
   };
 
@@ -764,6 +773,11 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
             </g>
           );
         })}
+        {scene.Overlay && (
+          <g className="scene-overlay" filter={grey ? greyFilter : undefined}>
+            <scene.Overlay />
+          </g>
+        )}
         {exits.map((exit) => (
           <ExitSign
             key={exit.item.id}

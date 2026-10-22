@@ -18,6 +18,8 @@ export interface StepLines {
   turn?: string;
   /** Halfway through, to keep going. */
   again: string;
+  /** More lines during the movement, `at` seconds after the child joined in. */
+  more?: { at: number; text: string }[];
   /** At the end. */
   praise: string;
 }
@@ -53,6 +55,8 @@ export interface FrameResult {
   flash: number;
   /** During the opening: the step whose place the map is showing. */
   pointing?: number;
+  /** How much the guide sits (0 stands, 1 sits, e.g. in the canoe); arms and body keep moving. */
+  sitting?: number;
 }
 
 export interface StoryWorld {

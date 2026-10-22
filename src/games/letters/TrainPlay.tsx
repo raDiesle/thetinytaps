@@ -5,12 +5,14 @@ import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard
 import { toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, WordEntry } from "@/content/types";
-import { playChime, playCountNote, playRandomNote, playWhistle, setSfxVolume } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playRandomNote, playWhistle, recorded, setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import type { LettersSettings } from "./settings";
 
 /** Wagons per train; the train leaves on its own when it is full. */
 const TRAIN_LENGTH = 5;
+/** A real train whistle (src/lib/sounds/), synthesized until loaded. */
+const whistle = recorded("whistle", playWhistle);
 /** Presses closer together than this only spawn shapes, so mashing doesn't fill the train at once. */
 const MIN_WAGON_MS = 300;
 /** Time to look at the full train before it leaves. */
@@ -108,7 +110,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** Whistle, read the wagons out and roll off; then bring in an empty train. */
   const depart = useCallback(() => {
     if (phase !== "waiting") return;
-    if (settings.sounds) playWhistle();
+    if (settings.sounds) whistle();
     if (wagons.length === 0) {
       say(pack.whistle);
       return;
@@ -170,6 +172,10 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   useEffect(() => {
     setSfxVolume(settings.calm ? 0.4 : 1);
   }, [settings.calm]);
+
+  useEffect(() => {
+    loadRecordings(["whistle"]);
+  }, []);
 
   // Tablets: digits, then the alphabet.
   const touchKeys = useTouchKeys(settings.touchKeys);

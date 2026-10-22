@@ -28,6 +28,13 @@ export interface PlayerEvents {
 }
 
 const ACT_BLEND = 0.7;
+
+/** The legs folded to sit (thighs forward, shins down), blended in by `k`; the rest of the pose stays. */
+function sitDown(p: Pose, k: number): Pose {
+  if (k <= 0) return p;
+  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.45, spread: 0.18, knee: 1.5 }, legR: { lift: 1.45, spread: 0.18, knee: 1.5 } };
+  return lerpPose(p, sit, k);
+}
 const PRAISE_BLEND = 0.9;
 
 export class StoryPlayer {
@@ -99,6 +106,17 @@ export class StoryPlayer {
     this.ended = false;
   }
 
+  /** Jumps to the start of a step; -1 is the opening. */
+  jump(step: number) {
+    const target = Math.max(-1, Math.min(this.starts.length - 1, step));
+    this.seek(target < 0 ? 0 : this.starts[target]);
+  }
+
+  /** The step playing now, or -1 during the opening. */
+  get step() {
+    return this.elapsed < this.opening ? -1 : this.stepAt(this.elapsed).step;
+  }
+
   /** Jumps to a moment of the story, in seconds (for trying out scenes). */
   seek(seconds: number) {
     this.elapsed = Math.max(0, Math.min(this.total, seconds));
@@ -165,7 +183,7 @@ export class StoryPlayer {
       this.pointing = pointing;
       this.events.onPointing?.(pointing);
     }
-    const pose = this.pose(frame, result.walking, dt);
+    const pose = sitDown(this.pose(frame, result.walking, dt), result.sitting ?? 0);
     // From just before the guide shows the movement until the praise.
     const smooth = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
     this.guide.highlight = this.highlight ? smooth((frame.act + frame.demo + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8)) : 0;
@@ -207,6 +225,7 @@ export class StoryPlayer {
     if (at(instructionAt)) this.events.onLine(lines.instruction, "instruction", f.step);
     if (f.demo > 0 && at(f.lead)) this.events.onLine(lines.turn ?? "Jetzt du!", "turn", f.step);
     if (at(f.lead + f.actLength * 0.55)) this.events.onLine(lines.again, "again", f.step);
+    for (const line of lines.more ?? []) if (at(f.lead + line.at)) this.events.onLine(line.text, "again", f.step);
     if (at(f.lead + f.actLength + 0.1)) this.events.onLine(lines.praise, "praise", f.step);
   }
 

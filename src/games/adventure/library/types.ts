@@ -157,7 +157,10 @@ export type MotionClipId =
   | "drum"
   | "wand"
   | "ring_bell"
-  | "press_button";
+  | "press_button"
+  | "crank"
+  | "shapes"
+  | "turn_key";
 
 /** What a movement asks of the room and the body, so parents and sequences can filter. */
 export interface MovementNeeds {
