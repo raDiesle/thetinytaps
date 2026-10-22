@@ -380,7 +380,7 @@ export const bauernhof: Scene = {
       id: "frosch",
       name: "der Frosch",
       sentences: ["Quak! Der Frosch springt hoch.", "Der Frosch sitzt auf dem Seerosenblatt."],
-      sound: "quack",
+      sound: "croak",
       traits: ["green", "animal", "small"],
       key: "F",
       box: [-46, -56, 92, 56],

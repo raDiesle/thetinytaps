@@ -60,6 +60,8 @@ import {
   playTick,
   playPeck,
   playCuckoo,
+  loadRecordings,
+  playRecorded,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -129,6 +131,9 @@ const SOUNDS: Record<SceneSound, () => void> = {
   peck: playPeck,
   cuckoo: playCuckoo,
 };
+
+/** A scene sound: the real recording where there is one (src/lib/sounds/), else synthesized. */
+const playSound = (sound: SceneSound) => playRecorded(sound, SOUNDS[sound]);
 
 /** Key presses closer together than this only spawn shapes. */
 const MIN_KEY_MS = 600;
@@ -242,6 +247,10 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     setSfxVolume(settings.calm ? 0.4 : 1);
   }, [settings.calm]);
 
+  useEffect(() => {
+    loadRecordings(new Set(scene.items.map((item) => item.sound)));
+  }, [scene]);
+
   const say = useCallback(
     (text: string, queue = false) => {
       if (settings.speech) speak(text, speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
@@ -276,7 +285,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       busyUntil.current.set(item.id, now + item.durationMs);
       setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (soundsOn && !quiet) SOUNDS[item.sound]();
+      if (soundsOn && !quiet) playSound(item.sound);
       return true;
     },
     [later, soundsOn],
@@ -290,7 +299,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         say(quest.question, queue);
         return;
       }
-      SOUNDS[quest.sound]();
+      playSound(quest.sound);
       later(() => say(quest.question, true), RIDDLE_QUESTION_MS);
     },
     [say, later],
@@ -452,7 +461,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     riddleRepeat.current = true;
     later(() => {
       riddleRepeat.current = false;
-      if (questRef.current === quest && !celebrating.current) SOUNDS[quest.sound!]();
+      if (questRef.current === quest && !celebrating.current) playSound(quest.sound!);
     }, RIDDLE_REPEAT_MS);
   };
 

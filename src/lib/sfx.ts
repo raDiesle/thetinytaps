@@ -27,6 +27,54 @@ export function unlockAudio() {
   void audio()?.resume();
 }
 
+// Real recordings for sounds that should sound like the real thing (animals,
+// bells, water …), one file per sound name; sources in sounds/README.md.
+const files = import.meta.webpackContext("./sounds", { regExp: /\.mp3$/ });
+const RECORDING_URLS = new Map<string, string>();
+for (const key of files.keys()) {
+  const module = files(key) as string | { default: string };
+  RECORDING_URLS.set(key.replace(/^\.\//, "").replace(/\.mp3$/, ""), typeof module === "string" ? module : module.default);
+}
+const recordings = new Map<string, Promise<AudioBuffer | null>>();
+const loaded = new Map<string, AudioBuffer>();
+
+/** Starts loading these recordings, so they are ready by the first tap; names without a file are skipped. */
+export function loadRecordings(names: Iterable<string>) {
+  const ac = audio();
+  if (!ac) return;
+  for (const name of names) {
+    const url = RECORDING_URLS.get(name);
+    if (!url || recordings.has(name)) continue;
+    const buffer = fetch(url)
+      .then((response) => response.arrayBuffer())
+      .then((data) => ac.decodeAudioData(data))
+      .then((decoded) => (loaded.set(name, decoded), decoded))
+      .catch(() => null);
+    recordings.set(name, buffer);
+  }
+}
+
+/** Plays the recording `name`, slightly higher or lower each time; `synth` while it is still loading or if there is none. */
+export function playRecorded(name: string, synth: () => void) {
+  const ac = audio();
+  const buffer = loaded.get(name);
+  if (!ac || !buffer) {
+    loadRecordings([name]);
+    synth();
+    return;
+  }
+  const source = ac.createBufferSource();
+  source.buffer = buffer;
+  source.playbackRate.value = 0.96 + Math.random() * 0.08;
+  const gain = ac.createGain();
+  gain.gain.value = masterVolume;
+  source.connect(gain).connect(ac.destination);
+  source.start();
+}
+
+/** `synth` as a recording where there is one, e.g. `recorded("honk", playHonk)`. */
+export const recorded = (name: string, synth: () => void) => () => playRecorded(name, synth);
+
 interface Note {
   /** Start pitch in Hz; glides to `to` if given. */
   from: number;

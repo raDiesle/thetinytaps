@@ -192,7 +192,7 @@ export const wald: Scene = {
       id: "eichhoernchen",
       name: "das Eichhörnchen",
       sentences: ["Das Eichhörnchen versteckt eine Nuss.", "Das Eichhörnchen hat einen buschigen Schwanz."],
-      sound: "chatter",
+      sound: "squeak",
       traits: ["animal", "small"],
       box: [-48, -108, 96, 108],
       hitAreas: [[-58, -122, 112, 124]],
