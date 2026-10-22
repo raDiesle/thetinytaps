@@ -27,6 +27,54 @@ export function unlockAudio() {
   void audio()?.resume();
 }
 
+// Real recordings for sounds that should sound like the real thing (animals,
+// bells, water …), one file per sound name; sources in sounds/README.md.
+const files = import.meta.webpackContext("./sounds", { regExp: /\.mp3$/ });
+const RECORDING_URLS = new Map<string, string>();
+for (const key of files.keys()) {
+  const module = files(key) as string | { default: string };
+  RECORDING_URLS.set(key.replace(/^\.\//, "").replace(/\.mp3$/, ""), typeof module === "string" ? module : module.default);
+}
+const recordings = new Map<string, Promise<AudioBuffer | null>>();
+const loaded = new Map<string, AudioBuffer>();
+
+/** Starts loading these recordings, so they are ready by the first tap; names without a file are skipped. */
+export function loadRecordings(names: Iterable<string>) {
+  const ac = audio();
+  if (!ac) return;
+  for (const name of names) {
+    const url = RECORDING_URLS.get(name);
+    if (!url || recordings.has(name)) continue;
+    const buffer = fetch(url)
+      .then((response) => response.arrayBuffer())
+      .then((data) => ac.decodeAudioData(data))
+      .then((decoded) => (loaded.set(name, decoded), decoded))
+      .catch(() => null);
+    recordings.set(name, buffer);
+  }
+}
+
+/** Plays the recording `name`, slightly higher or lower each time; `synth` while it is still loading or if there is none. */
+export function playRecorded(name: string, synth: () => void) {
+  const ac = audio();
+  const buffer = loaded.get(name);
+  if (!ac || !buffer) {
+    loadRecordings([name]);
+    synth();
+    return;
+  }
+  const source = ac.createBufferSource();
+  source.buffer = buffer;
+  source.playbackRate.value = 0.96 + Math.random() * 0.08;
+  const gain = ac.createGain();
+  gain.gain.value = masterVolume;
+  source.connect(gain).connect(ac.destination);
+  source.start();
+}
+
+/** `synth` as a recording where there is one, e.g. `recorded("honk", playHonk)`. */
+export const recorded = (name: string, synth: () => void) => () => playRecorded(name, synth);
+
 interface Note {
   /** Start pitch in Hz; glides to `to` if given. */
   from: number;
@@ -455,6 +503,11 @@ function hiss({ from, to = from, duration, volume, delay = 0, q = 1 }: { from: n
   source.stop(start + duration);
 }
 
+/** "Ssssss!" – a snake hissing, twice. */
+export function playHiss() {
+  [0, 0.55].forEach((delay) => hiss({ from: 5200, to: 4200, duration: 0.45, volume: 0.14, delay, q: 1.4 }));
+}
+
 /** "Wuuusch!" – the toilet flushes: rushing water that swirls down, and a gurgle at the end. */
 export function playFlush() {
   hiss({ from: 500, to: 1600, duration: 0.7, volume: 0.35, q: 0.8 });
@@ -495,6 +548,26 @@ export function playCuckoo() {
     note({ from: 784, to: 770, duration: 0.24, type: "sine", volume: 0.28, delay });
     note({ from: 622, to: 610, duration: 0.34, type: "sine", volume: 0.28, delay: delay + 0.3 });
   });
+}
+
+/** "Hihihi!" – a child giggling: quick little notes that hop and fall. */
+export function playGiggle() {
+  [0, 0.13, 0.26, 0.39, 0.52].forEach((delay, i) =>
+    note({ from: 880 - i * 40, to: 1180 - i * 50, duration: 0.09, type: "triangle", volume: 0.16, delay }),
+  );
+}
+
+/** "Quietsch, quietsch!" – a swing's chain creaking forward and back. */
+export function playCreak() {
+  [0, 0.6].forEach((delay) => {
+    note({ from: 520, to: 880, duration: 0.22, type: "sawtooth", volume: 0.05, lowpass: 1800, delay });
+    note({ from: 820, to: 560, duration: 0.2, type: "sawtooth", volume: 0.04, lowpass: 1800, delay: delay + 0.24 });
+  });
+}
+
+/** "Rauschel" – wind in the leaves of a tree: soft high noise swelling and fading. */
+export function playLeaves() {
+  [0, 0.35, 0.7].forEach((delay, i) => hiss({ from: 2600 + i * 400, to: 3600, duration: 0.6, volume: 0.1, delay, q: 0.8 }));
 }
 
 /** "Ding!" – a small bright bell that rings out. */

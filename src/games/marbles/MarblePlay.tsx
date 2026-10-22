@@ -1,31 +1,54 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type ComponentType, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playMelody } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import type { MarbleSettings } from "./settings";
+import { BuildingLevel } from "./BuildingLevel";
+import { CircusLevel } from "./CircusLevel";
+import { GardenLevel } from "./GardenLevel";
+import { KitchenLevel } from "./KitchenLevel";
+import type { LevelProps } from "./level";
+import { MachineLevel } from "./MachineLevel";
+import type { MarbleLevel, MarbleSettings } from "./settings";
+import { SpaceLevel } from "./SpaceLevel";
 import { ToppleLevel } from "./ToppleLevel";
 import { TrackLevel } from "./TrackLevel";
 import "./marbles.css";
 
-type Level = "track" | "topple";
+const LEVELS: { id: MarbleLevel; intro: string; Level: ComponentType<LevelProps> }[] = [
+  { id: "track", intro: "Tipp! Dann rollt die Kugel.", Level: TrackLevel },
+  { id: "topple", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
+  { id: "machine", intro: "Tipp! Dann läuft die große Maschine.", Level: MachineLevel },
+  { id: "kitchen", intro: "Tipp! Dann wird in der Küche gezaubert.", Level: KitchenLevel },
+  { id: "garden", intro: "Tipp! Dann wacht der Garten auf.", Level: GardenLevel },
+  { id: "building", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
+  { id: "circus", intro: "Tipp! Manege frei!", Level: CircusLevel },
+  { id: "space", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
+];
 
-const INTRO: Record<Level, string> = {
-  track: "Tipp! Dann rollt die Kugel.",
-  topple: "Tipp an, dann fällt alles um!",
-};
+/** The Rube Goldberg machines: one tap, and one thing sets off the next. */
+const MACHINES: MarbleLevel[] = ["machine", "kitchen", "garden", "building", "circus", "space"];
+
+/** Which levels to play, in turn; in development `?level=garden` in the address picks one. */
+function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
+  const fromUrl = import.meta.env.DEV ? new URLSearchParams(window.location.search).get("level") : null;
+  const one = LEVELS.find((l) => l.id === (fromUrl ?? choice));
+  if (one) return [one.id];
+  return choice === "machines" ? MACHINES : LEVELS.map((l) => l.id);
+}
 
 /** Party time after a level, before the next one starts. */
 const PARTY_MS = 3200;
 
 /**
- * "Kugelbahn": the marble run and the row of things that fall over, one level
- * after the other (or only one of them, as the grown-up chose).
+ * "Kugelbahn": the marble run, the row of things that fall over and the Rube
+ * Goldberg machines, one level after the other (or only some of them, as the
+ * grown-up chose).
  */
 export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings; speechLang: string }) {
-  const levels: Level[] = settings.levels === "both" ? ["track", "topple"] : [settings.levels];
+  const levels = chosenLevels(settings.levels);
   const [round, setRound] = useState(0);
   const [party, setParty] = useState(false);
-  const level = levels[round % levels.length];
+  const level = LEVELS.find((l) => l.id === levels[round % levels.length]) ?? LEVELS[0];
   const { bursts, spawn } = useBursts();
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -43,7 +66,7 @@ export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings;
   );
 
   useEffect(() => {
-    say(INTRO[level]);
+    say(level.intro);
   }, [level, round, say]);
 
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
@@ -67,11 +90,7 @@ export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings;
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
-      {level === "track" ? (
-        <TrackLevel key={round} sound={sound} say={say} onDone={onDone} />
-      ) : (
-        <ToppleLevel key={round} sound={sound} say={say} onDone={onDone} />
-      )}
+      <level.Level key={round} sound={sound} say={say} onDone={onDone} />
       <BurstLayer bursts={bursts} />
     </div>
   );

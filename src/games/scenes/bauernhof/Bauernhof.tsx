@@ -380,7 +380,7 @@ export const bauernhof: Scene = {
       id: "frosch",
       name: "der Frosch",
       sentences: ["Quak! Der Frosch springt hoch.", "Der Frosch sitzt auf dem Seerosenblatt."],
-      sound: "quack",
+      sound: "croak",
       traits: ["green", "animal", "small"],
       key: "F",
       box: [-46, -56, 92, 56],
@@ -465,4 +465,5 @@ export const bauernhof: Scene = {
       ],
     },
   ],
+  seasons: { weather: true, tree: [500, 425], snowman: [1215, 640, 0.85], pumpkin: [800, 975], egg: [400, 870] },
 };

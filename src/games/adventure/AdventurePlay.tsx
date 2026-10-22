@@ -32,9 +32,6 @@ const CUES: Record<Cue, () => void> = {
   drum: playDrum,
 };
 
-/** Movements that show the glowing outline next to the fox – to try it out, waving first. */
-const OUTLINED = new Set(["wave_hello"]);
-
 const smooth = (k: number) => {
   const c = Math.min(1, Math.max(0, k));
   return c * c * (3 - 2 * c);
@@ -46,8 +43,9 @@ const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (
 /**
  * A 3D movement story: the fox Tapsi shows each movement and the child does
  * it along in front of the screen; the world answers on its own time. Nobody
- * has to tap, and nothing has to be read – Tapsi says everything. Arrow keys
- * jump between steps, Space pauses.
+ * has to tap, and nothing has to be read – Tapsi says everything. Grown-ups
+ * can pause and jump between steps with the buttons in the corner, by tapping
+ * a picture on the route, or with the keys (arrows jump, Space pauses).
  */
 export function AdventurePlay({ story, speechLang, settings }: { story: Story; speechLang: string; settings: AdventureSettings }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -61,12 +59,14 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
   const [failed, setFailed] = useState(false);
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
+  const musicRef = useRef<Music | null>(null);
 
   useWakeLock(!ended && !paused);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
     const music = new Music();
+    musicRef.current = music;
     const silhouette = new Silhouette();
     outlineRef.current?.append(silhouette.svg);
     let player: StoryPlayer;
@@ -95,12 +95,12 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
           onEnd() {
             setEnded(true);
           },
-          onPose(pose, frame) {
+          onPose(pose, frame, view) {
             const box = outlineRef.current;
             if (!box) return;
-            const shown = settingsRef.current.outline && OUTLINED.has(story.sequence.steps[frame.step].movement) ? outlineShown(frame) : 0;
+            const shown = settingsRef.current.outline ? outlineShown(frame) : 0;
             box.style.opacity = String(shown);
-            if (shown > 0) silhouette.update(pose);
+            if (shown > 0) silhouette.update(pose, view);
           },
         },
         settings.pace === "calm" ? CALM_PACE : 1,
@@ -127,20 +127,41 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       player.dispose();
       silhouette.svg.remove();
       playerRef.current = null;
+      musicRef.current = null;
     };
     // The story is built once; changing settings mid-play is not possible anyway.
   }, [story]);
 
+  const togglePause = () => {
+    const player = playerRef.current;
+    if (!player) return;
+    player.paused = !player.paused;
+    setPaused(player.paused);
+    if (player.paused) {
+      stopSpeaking();
+      musicRef.current?.stop();
+    } else if (settingsRef.current.music) {
+      musicRef.current?.start();
+    }
+  };
+
+  /** Jumps to a step (-1 is the opening); what was being said stops, the step's first line comes again. */
+  const jump = (to: (player: StoryPlayer) => void) => {
+    const player = playerRef.current;
+    if (!player) return;
+    stopSpeaking();
+    to(player);
+  };
+
+  const keys = useRef({ togglePause, jump });
+  keys.current = { togglePause, jump };
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      const player = playerRef.current;
-      if (!player) return;
-      if (e.key === "ArrowRight") player.skip(1);
-      else if (e.key === "ArrowLeft") player.skip(-1);
+      if (e.key === "ArrowRight") keys.current.jump((p) => p.skip(1));
+      else if (e.key === "ArrowLeft") keys.current.jump((p) => p.skip(-1));
       else if (e.key === " ") {
-        player.paused = !player.paused;
-        setPaused(player.paused);
-        if (player.paused) stopSpeaking();
+        e.preventDefault();
+        keys.current.togglePause();
       }
     };
     window.addEventListener("keydown", onKey);
@@ -169,15 +190,28 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       <div ref={outlineRef} className="adventure-outline" aria-hidden />
       <ol className="adventure-route" aria-label={story.sequence.title}>
         {story.sequence.steps.map((s, i) => (
-          <li key={i} className={pointing !== null ? (i === pointing ? "now" : "") : i < step ? "done" : i === step ? "now" : ""} title={movement(s.movement).name}>
-            {story.lines[i].icon}
+          <li key={i} className={pointing !== null ? (i === pointing ? "now" : "") : i < step ? "done" : i === step ? "now" : ""}>
+            <button type="button" title={movement(s.movement).name} onClick={() => jump((p) => p.jump(i))}>
+              {story.lines[i].icon}
+            </button>
           </li>
         ))}
       </ol>
+      <div className="adventure-controls">
+        <button type="button" onClick={() => jump((p) => p.skip(-1))} aria-label="Zurück" title="Zurück (←)">
+          ⏮
+        </button>
+        <button type="button" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"} title={paused ? "Weiter (Leertaste)" : "Pause (Leertaste)"}>
+          {paused ? "▶" : "⏸"}
+        </button>
+        <button type="button" onClick={() => jump((p) => p.skip(1))} aria-label="Vor" title="Vor (→)">
+          ⏭
+        </button>
+      </div>
       {paused && (
-        <div className="adventure-paused" aria-label="Pause">
-          ⏸
-        </div>
+        <button type="button" className="adventure-paused" onClick={togglePause} aria-label="Weiter">
+          ▶
+        </button>
       )}
       {ended && (
         <button type="button" className="adventure-again" onClick={again} aria-label="Nochmal">

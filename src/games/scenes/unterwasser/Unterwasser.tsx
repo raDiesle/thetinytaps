@@ -485,4 +485,6 @@ export const unterwasser: Scene = {
       ],
     },
   ],
+  // Under water there is no autumn or winter, but the Easter bunny hides an egg in the sand.
+  seasons: { egg: [1020, 760] },
 };

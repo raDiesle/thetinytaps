@@ -48,13 +48,13 @@ export function AdventureGame() {
               onChange={(glow) => update({ glow })}
             />
             <Toggle
-              label="Umriss-Hilfe: eine leuchtende Figur macht die Bewegung groß mit (zum Ausprobieren erst beim Winken)"
+              label="Umriss-Hilfe: eine dunkle Figur mit leuchtendem Rand macht jede Bewegung groß mit"
               checked={settings.outline}
               onChange={(outline) => update({ outline })}
             />
             {!touchOnly && (
               <p className="setting-note">
-                Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zur vorigen oder nächsten Bewegung, die <kbd>Leertaste</kbd> pausiert.
+                Oben links: pausieren und zur vorigen oder nächsten Bewegung springen; ein Bild unten springt zu dieser Bewegung. Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> und die <kbd>Leertaste</kbd>.
               </p>
             )}
           </SettingsGroup>

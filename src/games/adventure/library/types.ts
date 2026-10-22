@@ -8,6 +8,7 @@
 //   plus one default situation as an example.
 // - World / Scenario: where a movement can happen and what it means there.
 // - Sequence: movements in order with seconds and energy, i.e. the timing.
+// - SituationIdea: when a child does a body movement anyway, per clip.
 // The 3D story script (../stories/) adds camera and world animation on top of
 // a sequence.
 
@@ -156,7 +157,10 @@ export type MotionClipId =
   | "drum"
   | "wand"
   | "ring_bell"
-  | "press_button";
+  | "press_button"
+  | "crank"
+  | "shapes"
+  | "turn_key";
 
 /** What a movement asks of the room and the body, so parents and sequences can filter. */
 export interface MovementNeeds {
@@ -250,6 +254,22 @@ export interface Scenario {
   /** The adventure in one or two sentences. */
   premise: string;
   moments: ScenarioMoment[];
+}
+
+/**
+ * A situation in which a body movement is the obvious thing to do, so a story
+ * can ask for it without explaining it. Keyed by the guide's clip (the pure
+ * body movement), so the idea fits every movement that uses that clip.
+ */
+export interface SituationIdea {
+  /** What is there and calls for the movement: the thing the movement acts on. */
+  situation: string;
+  /** What the movement does to it (timed, never "detected"). */
+  reaction: string;
+  /** Known from the child's own day, so the movement needs no explanation. */
+  everyday?: boolean;
+  /** Worlds it fits; none = fits many. */
+  worlds?: WorldId[];
 }
 
 /** One action of a sequence, in the order played. */

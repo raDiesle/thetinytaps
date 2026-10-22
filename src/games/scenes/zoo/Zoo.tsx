@@ -484,4 +484,5 @@ export const zoo: Scene = {
       ],
     },
   ],
+  seasons: { weather: true, tree: [1290, 610, 0.8], snowman: [52, 660, 0.8], pumpkin: [665, 745, 0.85], egg: [510, 860] },
 };

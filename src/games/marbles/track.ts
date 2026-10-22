@@ -89,12 +89,12 @@ export function seesawSpot(k: number, tilt: number): Pt {
 
 /* ---------- Building the route ---------- */
 
-function line(a: Pt, b: Pt, step = 16): Pt[] {
+export function line(a: Pt, b: Pt, step = 16): Pt[] {
   const n = Math.max(1, Math.ceil(Math.hypot(b.x - a.x, b.y - a.y) / step));
   return Array.from({ length: n + 1 }, (_, i) => ({ x: a.x + ((b.x - a.x) * i) / n, y: a.y + ((b.y - a.y) * i) / n }));
 }
 
-function quad(a: Pt, c: Pt, b: Pt, n = 12): Pt[] {
+export function quad(a: Pt, c: Pt, b: Pt, n = 12): Pt[] {
   return Array.from({ length: n + 1 }, (_, i) => {
     const t = i / n;
     const u = 1 - t;
@@ -103,7 +103,7 @@ function quad(a: Pt, c: Pt, b: Pt, n = 12): Pt[] {
 }
 
 /** An arc around (cx, cy) from angle `a0` to `a1` in degrees (SVG angles: 90 is straight down). */
-function arc(cx: number, cy: number, r: number, a0: number, a1: number): Pt[] {
+export function arc(cx: number, cy: number, r: number, a0: number, a1: number): Pt[] {
   const n = Math.ceil(Math.abs(a1 - a0) / 4);
   return Array.from({ length: n + 1 }, (_, i) => {
     const a = rad(a0 + ((a1 - a0) * i) / n);
@@ -208,7 +208,7 @@ export function buildRoute(): Route {
 }
 
 /** Index of the point at or before distance `d`. */
-export function indexAt(route: Route, d: number): number {
+export function indexAt(route: Pick<Route, "s">, d: number): number {
   let lo = 0;
   let hi = route.s.length - 1;
   while (lo < hi) {

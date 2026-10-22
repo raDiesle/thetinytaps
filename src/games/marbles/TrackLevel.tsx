@@ -1,7 +1,7 @@
 import { useId, useMemo, useRef } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
 import { playBoing, playCountNote, playDing, playPlop, playPop, playSwirl, playTick } from "@/lib/sfx";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import {
   BALL_R,
   BARS,
@@ -35,7 +35,7 @@ const SPAWN_GAP_MS = 450;
 const MAX_ROLLING = 8;
 const LAND_MS = 380;
 
-const BAR_COLORS = ["#ff5d73", "#ff8c42", "#ffb703", "#3ec300", "#00b4d8", "#3a86ff", "#8e7dff", "#ff7bd0"];
+export const BAR_COLORS = ["#ff5d73", "#ff8c42", "#ffb703", "#3ec300", "#00b4d8", "#3a86ff", "#8e7dff", "#ff7bd0"];
 const INK = "#2a1e5c";
 
 interface Marble {
@@ -59,10 +59,6 @@ interface Landed {
   to: Pt;
   at: number;
 }
-
-/** A wobble that starts at `amp` and dies away, `age` seconds after a hit. */
-const wobble = (age: number, amp: number, freq: number, damp: number) =>
-  age < 0 || age > 4 ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq);
 
 /**
  * Level 1: a wooden marble run on the wall. Each tap lets a marble out of the
@@ -263,7 +259,7 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
 }
 
 /** A wooden rail just under the marbles' path from `a` to `b`, with a peg at each end. */
-function Rail({ a, b }: { a: Pt; b: Pt }) {
+export function Rail({ a, b }: { a: Pt; b: Pt }) {
   const off = BALL_R + 7;
   return (
     <g>
@@ -275,7 +271,7 @@ function Rail({ a, b }: { a: Pt; b: Pt }) {
   );
 }
 
-function Ball({ color, x, y, spin }: { color: string; x: number; y: number; spin: number }) {
+export function Ball({ color, x, y, spin }: { color: string; x: number; y: number; spin: number }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <circle r={BALL_R} fill={color} stroke={INK} strokeWidth="3" />

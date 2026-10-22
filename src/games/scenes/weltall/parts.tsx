@@ -1,4 +1,4 @@
-import { Face, Inside, SKIN, nth } from "../shared";
+import { Face, Inside, SKIN, nth, sparklePath } from "../shared";
 
 // Small parts many drawings of the Weltall scene share.
 
@@ -16,18 +16,8 @@ export function starPath(cx: number, cy: number, outer: number, inner = outer * 
   return `M${points.join(" L")} Z`;
 }
 
-/** A four-pointed sparkle centred on (x, y). */
-export function sparklePath(x: number, y: number, r: number) {
-  return `M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r} Z`;
-}
-
 export function ellipsePath(cx: number, cy: number, rx: number, ry = rx) {
   return `M${cx - rx} ${cy} a${rx} ${ry} 0 1 0 ${2 * rx} 0 a${rx} ${ry} 0 1 0 ${-2 * rx} 0 Z`;
-}
-
-/** A little heart with its middle at (x, y). */
-export function heartPath(x: number, y: number, r: number) {
-  return `M${x} ${y + r * 0.9} C${x - r * 1.6} ${y - r * 0.2} ${x - r * 0.6} ${y - r * 1.3} ${x} ${y - r * 0.4} C${x + r * 0.6} ${y - r * 1.3} ${x + r * 1.6} ${y - r * 0.2} ${x} ${y + r * 0.9} Z`;
 }
 
 /** Sparkles that only show while the item plays; `className` picks the animation. */

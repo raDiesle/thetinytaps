@@ -229,29 +229,51 @@ export function makeButterfly(color: string) {
 }
 
 /** A wooden canoe pointing along -z. */
+/** Height of the canoe's rim above its bottom (local y); the paddle has to stay above it. */
+export const CANOE_RIM = 0.3;
+/** Half the width of the canoe in the middle, and half its length. */
+export const CANOE_HALF_WIDTH = 0.62;
+export const CANOE_HALF_LENGTH = 2.3;
+
 export function makeCanoe() {
   const group = new THREE.Group();
   const wood = mat("#b5753f", 0.6);
   const woodDark = mat("#8a522a", 0.7);
+  // Shallow, so a sitting Tapsi shows from the hips up and the paddle passes over the rim.
   const hullGeo = new THREE.SphereGeometry(1, 40, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-  hullGeo.scale(0.62, 0.5, 2.3);
+  hullGeo.scale(CANOE_HALF_WIDTH, 0.38, CANOE_HALF_LENGTH);
   const hull = solid(hullGeo, new THREE.MeshStandardMaterial({ color: "#b5753f", roughness: 0.6, side: THREE.DoubleSide }));
-  hull.position.y = 0.42;
+  hull.position.y = CANOE_RIM;
   group.add(hull);
   const rimGeo = new THREE.TorusGeometry(1, 0.05, 8, 48);
   rimGeo.rotateX(Math.PI / 2);
-  rimGeo.scale(0.62, 1, 2.3);
+  rimGeo.scale(CANOE_HALF_WIDTH, 1, CANOE_HALF_LENGTH);
   const rim = solid(rimGeo, woodDark);
-  rim.position.y = 0.42;
+  rim.position.y = CANOE_RIM;
   group.add(rim);
-  const seat = solid(new THREE.BoxGeometry(1.1, 0.06, 0.3), wood);
-  seat.position.set(0, 0.32, 0.5);
+  // The seat Tapsi sits on, low in the hull.
+  const seat = solid(new THREE.BoxGeometry(0.8, 0.06, 0.32), wood);
+  seat.position.set(0, 0.16, 0.5);
   group.add(seat);
+  const floor = solid(new THREE.BoxGeometry(0.36, 0.02, 1.4), woodDark);
+  floor.position.y = -0.045;
+  group.add(floor);
+  // The sea is a flat plane and would show inside the open hull, as if the
+  // canoe was full of water. An invisible lid over the hull fills in depth
+  // after everything solid is drawn, so the water behind it is hidden while
+  // Tapsi and the floor inside stay.
+  const lidGeo = new THREE.CircleGeometry(1, 48);
+  lidGeo.rotateX(-Math.PI / 2);
+  lidGeo.scale(CANOE_HALF_WIDTH, 1, CANOE_HALF_LENGTH);
+  const waterMask = new THREE.Mesh(lidGeo, new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide }));
+  waterMask.position.y = CANOE_RIM;
+  waterMask.renderOrder = 1;
+  group.add(waterMask);
   return group;
 }
 
 /** Half the length of the double paddle, from the middle to the tip of a blade. */
-export const PADDLE_REACH = 1.2;
+export const PADDLE_REACH = 1.45;
 
 /** A double paddle: the shaft along y with a blade at each end, the blades facing ±z. */
 export function makePaddle() {
@@ -265,6 +287,189 @@ export function makePaddle() {
     blade.position.y = end * (PADDLE_REACH - 0.24);
     group.add(blade);
   }
+  return group;
+}
+
+/**
+ * A little cartoon scorpion, about 0.4 m long, looking along +z: round body,
+ * two claws and the tail curled up over its back. `walk(t)` wiggles its legs.
+ */
+export function makeScorpion(color = "#e2683c") {
+  const group = new THREE.Group();
+  const shell = mat(color, 0.45, { metalness: 0.1 });
+  const dark = mat("#7a2e17", 0.5);
+  const body = solid(new THREE.SphereGeometry(0.1, 16, 12), shell);
+  body.scale.set(1, 0.55, 1.3);
+  body.position.y = 0.06;
+  group.add(body);
+  const head = solid(new THREE.SphereGeometry(0.07, 14, 10), shell);
+  head.scale.set(1.1, 0.7, 0.9);
+  head.position.set(0, 0.07, 0.12);
+  group.add(head);
+  const eyeWhite = mat("#ffffff", 0.3);
+  const pupil = mat("#1b1210", 0.2);
+  for (const side of [1, -1]) {
+    const eye = solid(new THREE.SphereGeometry(0.026, 10, 8), eyeWhite, false);
+    eye.position.set(0.03 * side, 0.12, 0.15);
+    group.add(eye);
+    const dot = solid(new THREE.SphereGeometry(0.013, 8, 6), pupil, false);
+    dot.position.set(0.032 * side, 0.125, 0.172);
+    group.add(dot);
+    // A claw on a short arm.
+    const arm = solid(new THREE.CapsuleGeometry(0.018, 0.1, 4, 8), shell);
+    arm.rotation.set(Math.PI / 2, 0, -0.5 * side);
+    arm.position.set(0.08 * side, 0.05, 0.2);
+    group.add(arm);
+    for (const k of [1, -1]) {
+      const pincer = solid(new THREE.ConeGeometry(0.025, 0.08, 8), dark);
+      pincer.rotation.set(Math.PI / 2, 0, 0.35 * k);
+      pincer.position.set(0.12 * side + 0.015 * k, 0.05, 0.29);
+      group.add(pincer);
+    }
+  }
+  const legs: THREE.Mesh[] = [];
+  for (const side of [1, -1]) {
+    for (let i = 0; i < 3; i++) {
+      const leg = solid(new THREE.CapsuleGeometry(0.01, 0.08, 4, 6), dark, false);
+      leg.rotation.z = (Math.PI / 2 - 0.5) * side;
+      leg.position.set(0.1 * side, 0.03, -0.05 + i * 0.06);
+      group.add(leg);
+      legs.push(leg);
+    }
+  }
+  // The tail: beads curling up over the back, with a little sting.
+  const curl = [
+    [0, 0.07, -0.14],
+    [0, 0.12, -0.21],
+    [0, 0.2, -0.23],
+    [0, 0.27, -0.19],
+    [0, 0.3, -0.12],
+  ];
+  for (const [i, [x, y, z]] of curl.entries()) {
+    const bead = solid(new THREE.SphereGeometry(0.045 - i * 0.005, 12, 8), shell);
+    bead.position.set(x, y, z);
+    group.add(bead);
+  }
+  const sting = solid(new THREE.ConeGeometry(0.02, 0.06, 8), dark);
+  sting.position.set(0, 0.28, -0.07);
+  sting.rotation.x = 2.2;
+  group.add(sting);
+  return {
+    group,
+    walk(t: number) {
+      legs.forEach((leg, i) => (leg.rotation.x = Math.sin(t * 22 + i * 1.7) * 0.5));
+    },
+  };
+}
+
+/**
+ * A cheeky monkey sitting in a palm, about 0.7 m tall, looking along +z.
+ * `pose(throwK, cheer, t)`: throwK 0..1 swings the right arm from behind the
+ * head forward to throw; cheer bounces and waves both arms.
+ */
+export function makeMonkey() {
+  const group = new THREE.Group();
+  const furMat = mat("#7a4a2a", 0.85);
+  const face = mat("#f0c9a0", 0.7);
+  const body = solid(new THREE.SphereGeometry(0.2, 18, 14), furMat);
+  body.scale.set(1, 1.2, 0.9);
+  body.position.y = 0.25;
+  group.add(body);
+  const belly = solid(new THREE.SphereGeometry(0.14, 16, 12), face, false);
+  belly.scale.set(1, 1.2, 0.6);
+  belly.position.set(0, 0.23, 0.1);
+  group.add(belly);
+  const head = new THREE.Group();
+  head.position.y = 0.56;
+  group.add(head);
+  head.add(solid(new THREE.SphereGeometry(0.17, 18, 14), furMat));
+  const mask = solid(new THREE.SphereGeometry(0.13, 16, 12), face);
+  mask.scale.set(1.1, 0.9, 0.7);
+  mask.position.set(0, -0.02, 0.08);
+  head.add(mask);
+  const eye = mat("#1b1210", 0.2);
+  for (const side of [1, -1]) {
+    const e = solid(new THREE.SphereGeometry(0.025, 10, 8), eye, false);
+    e.position.set(0.05 * side, 0.03, 0.16);
+    head.add(e);
+    const ear = solid(new THREE.SphereGeometry(0.06, 12, 8), face);
+    ear.scale.set(1, 1, 0.4);
+    ear.position.set(0.17 * side, 0.02, 0);
+    head.add(ear);
+  }
+  const grin = solid(new THREE.TorusGeometry(0.045, 0.01, 6, 16, Math.PI), mat("#5a2a1a"), false);
+  grin.rotation.z = Math.PI;
+  grin.position.set(0, -0.05, 0.17);
+  head.add(grin);
+  const arms: THREE.Group[] = [];
+  for (const side of [1, -1]) {
+    const shoulder = new THREE.Group();
+    shoulder.position.set(0.18 * side, 0.36, 0);
+    const arm = solid(new THREE.CapsuleGeometry(0.045, 0.32, 4, 8), furMat);
+    arm.position.y = -0.18;
+    shoulder.add(arm);
+    const hand = solid(new THREE.SphereGeometry(0.05, 10, 8), face);
+    hand.position.y = -0.38;
+    shoulder.add(hand);
+    group.add(shoulder);
+    arms.push(shoulder);
+  }
+  const tail = solid(new THREE.TorusGeometry(0.16, 0.025, 6, 20, Math.PI * 1.4), furMat);
+  tail.position.set(0, 0.15, -0.22);
+  tail.rotation.y = Math.PI / 2;
+  group.add(tail);
+  const right = arms[1];
+  return {
+    group,
+    /** Where a thrown nut leaves the right hand. */
+    hand: right.children[1] as THREE.Object3D,
+    pose(throwK: number, cheer: number, t: number) {
+      // Right arm: from hanging, up and back behind the head, then fast forward over the top.
+      const wind = Math.sin(Math.min(1, throwK / 0.6) * Math.PI * 0.5);
+      const release = Math.sin(Math.max(0, (throwK - 0.6) / 0.4) * Math.PI * 0.5);
+      right.rotation.x = throwK > 0 && throwK < 1 ? -3.5 * wind + 1.9 * release : 0;
+      arms[0].rotation.z = 0.4 + cheer * (1.6 + Math.sin(t * 12) * 0.3);
+      right.rotation.z = -0.4 - cheer * (1.6 + Math.sin(t * 12 + 1) * 0.3);
+      group.position.y = Math.abs(Math.sin(t * 6)) * 0.08 * cheer;
+      head.rotation.z = Math.sin(t * 3) * 0.1;
+    },
+  };
+}
+
+/** A big golden key, about 0.45 m long, along +z (bit at the far end). */
+export function makeKey() {
+  const group = new THREE.Group();
+  const gold = mat("#ffcc33", 0.25, { metalness: 0.9, emissive: "#7a5600", emissiveIntensity: 0.35 });
+  const bow = solid(new THREE.TorusGeometry(0.07, 0.022, 10, 24), gold);
+  bow.position.z = -0.12;
+  group.add(bow);
+  const shaft = solid(new THREE.CylinderGeometry(0.02, 0.02, 0.32, 10), gold);
+  shaft.rotation.x = Math.PI / 2;
+  shaft.position.z = 0.08;
+  group.add(shaft);
+  for (const z of [0.18, 0.23]) {
+    const tooth = solid(new THREE.BoxGeometry(0.02, 0.07, 0.035), gold);
+    tooth.position.set(0, -0.04, z);
+    group.add(tooth);
+  }
+  return group;
+}
+
+/** A woven basket, open at the top; `fill` stacks things inside. */
+export function makeBasket() {
+  const group = new THREE.Group();
+  const weave = mat("#c48a4a", 0.95);
+  const wall = solid(new THREE.CylinderGeometry(0.32, 0.24, 0.28, 20, 1, true), new THREE.MeshStandardMaterial({ color: "#c48a4a", roughness: 0.95, side: THREE.DoubleSide }));
+  wall.position.y = 0.14;
+  group.add(wall);
+  const bottom = solid(new THREE.CircleGeometry(0.24, 20), weave);
+  bottom.rotation.x = -Math.PI / 2;
+  bottom.position.y = 0.01;
+  group.add(bottom);
+  const rim = solid(new THREE.TorusGeometry(0.32, 0.025, 6, 24), mat("#a06a33", 0.9));
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = 0.28;
+  group.add(rim);
   return group;
 }
 
@@ -451,12 +656,20 @@ export function makeConfetti(count: number, colors = ["#ff5d73", "#ffd23f", "#3e
   const one = new THREE.Vector3(1, 1, 1);
   return {
     mesh,
-    burst(origin: THREE.Vector3, amount: number, power = 4) {
+    /** Throws `amount` pieces up from `origin`; `round` throws them out in all directions, like a firework. */
+    burst(origin: THREE.Vector3, amount: number, power = 4, round = false) {
       for (let i = 0; i < amount; i++) {
         const it = items[next];
         next = (next + 1) % count;
         it.p.copy(origin);
         const a = rnd() * Math.PI * 2;
+        if (round) {
+          const y = rnd() * 2 - 1;
+          const r = Math.sqrt(1 - y * y) * power * (0.8 + rnd() * 0.2);
+          it.v.set(Math.cos(a) * r, y * power + power * 0.2, Math.sin(a) * r);
+          it.life = 4;
+          continue;
+        }
         const up = 0.6 + rnd() * 0.8;
         it.v.set(Math.cos(a) * power * 0.4 * rnd(), power * up, Math.sin(a) * power * 0.4 * rnd());
         it.life = 4;

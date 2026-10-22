@@ -135,3 +135,13 @@ export function Cloud({ x, y, scale = 1, className }: { x: number; y: number; sc
     </g>
   );
 }
+
+/** A four-pointed sparkle centred on (x, y). */
+export function sparklePath(x: number, y: number, r: number) {
+  return `M${x} ${y - r} Q${x} ${y} ${x + r} ${y} Q${x} ${y} ${x} ${y + r} Q${x} ${y} ${x - r} ${y} Q${x} ${y} ${x} ${y - r} Z`;
+}
+
+/** A little heart with its middle at (x, y). */
+export function heartPath(x: number, y: number, r: number) {
+  return `M${x} ${y + r * 0.9} C${x - r * 1.6} ${y - r * 0.2} ${x - r * 0.6} ${y - r * 1.3} ${x} ${y - r * 0.4} C${x + r * 0.6} ${y - r * 1.3} ${x + r * 1.6} ${y - r * 0.2} ${x} ${y + r * 0.9} Z`;
+}

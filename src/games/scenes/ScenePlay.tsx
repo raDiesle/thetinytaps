@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import {
   playBark,
@@ -70,12 +71,19 @@ import {
   playLullaby,
   playTrain,
   playJet,
+  playGiggle,
+  playCreak,
+  playLeaves,
+  loadRecordings,
+  playRecorded,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { findScene } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { assignKeys } from "./keys";
 import { nextQuest, questsFor, verb, type Quest } from "./quests";
+import { driveDistance, guestFor, PLACES, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { isQuestMode, type ScenesSettings } from "./settings";
 import { placeBox, type Box, type Scene, type SceneItem, type SceneSound } from "./types";
 
@@ -147,7 +155,13 @@ const SOUNDS: Record<SceneSound, () => void> = {
   musicbox: playMusicbox,
   train: playTrain,
   jet: playJet,
+  giggle: playGiggle,
+  creak: playCreak,
+  rustle: playLeaves,
 };
+
+/** A scene sound: the real recording where there is one (src/lib/sounds/), else synthesized. */
+const playSound = (sound: SceneSound) => playRecorded(sound, SOUNDS[sound]);
 
 /** Key presses closer together than this only spawn shapes. */
 const MIN_KEY_MS = 600;
@@ -173,6 +187,12 @@ const CHAIN_STEP_MS = 1100;
 /** "Alles entdeckt!": the party starts a moment after the last item, and everything dances for a while. */
 const PARTY_AFTER_MS = 900;
 const PARTY_MS = 3600;
+/** Vehicles driving into another picture (idea B-19): how fast they drive, in scene units per second… */
+const DRIVE_SPEED = 600;
+const DRIVE_MIN_MS = 1400;
+const DRIVE_MAX_MS = 3000;
+/** …and how long the sign at the edge waits to be followed before the vehicle comes back. */
+const GONE_MS = 15000;
 
 const PROMPTS = { tap: "Tipp etwas an! 👆", hover: "Zeig auf etwas! 👆", keys: "Drück eine Taste! ⌨️" };
 const COLOUR_PROMPTS = {
@@ -190,6 +210,12 @@ const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") +
 type Plays = Record<string, { count: number; playing: boolean }>;
 /** Keys mode: the badge that lights up; the count restarts its animation on every press. */
 type Lit = { id: string; count: number };
+/** A vehicle driving out of the picture, gone from it, or driving in; dx is how far off the picture it is then. */
+type Drive = { phase: "out" | "gone" | "in"; dx: number; ms: number };
+/** The sign at the edge where a vehicle drove off; tapping it follows the vehicle into the other picture. */
+type Exit = { item: SceneItem; to: string; trip: Trip };
+
+const driveMs = (dx: number) => Math.min(DRIVE_MAX_MS, Math.max(DRIVE_MIN_MS, (Math.abs(dx) / DRIVE_SPEED) * 1000));
 
 /** Colour mode: how much of each colour is left in the grey picture; the rest is white. */
 const GREY_SLOPE = 0.55;
@@ -219,6 +245,24 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const [focus, setFocus] = useState<SceneItem | null>(null);
   const [lit, setLit] = useState<Lit | null>(null);
   const { bursts, spawn } = useBursts();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const roadsOn = settings.roads && settings.mode === "explore";
+  // Opened by following a vehicle: it drives in, as a guest or back at home. Read once, the play is keyed by scene.
+  const [arrival] = useState(() => (roadsOn ? tripTo(scene.id, location.state) : null));
+  const [guest] = useState(() => (arrival && !arrival.home ? (guestFor(arrival.road) ?? null) : null));
+  const items = useMemo(() => (guest ? withGuest(scene.items, guest) : scene.items), [scene, guest]);
+  const [drives, setDrives] = useState<Record<string, Drive>>(() => {
+    const item = guest?.item ?? scene.items.find((i) => i.id === arrival?.road.item);
+    if (!arrival || !item) return {};
+    const dx = driveDistance(item, arrival.road.faces, scene.width, false);
+    return { [item.id]: { phase: "in", dx, ms: driveMs(dx) } };
+  });
+  const [exits, setExits] = useState<Exit[]>([]);
+  const exitsRef = useRef(exits);
+  exitsRef.current = exits;
+  /** Random picks leave out vehicles that drove off: only their own key or sign follows them. */
+  const here = useCallback((list: SceneItem[]) => list.filter((i) => !exitsRef.current.some((e) => e.item === i)), []);
 
   const questRef = useRef<Quest | null>(null);
   const answeredRef = useRef<ReadonlySet<string>>(answered);
@@ -232,6 +276,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const lastQuestion = useRef(0);
   const lastKeyItem = useRef<SceneItem | null>(null);
   const lastInteraction = useRef(0);
+  /** Taps per vehicle that can drive off: every second one sends it on its way. */
+  const driveTaps = useRef(new Map<string, number>());
   const sentenceIndex = useRef(new Map<string, number>());
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const svgRef = useRef<SVGSVGElement>(null);
@@ -243,7 +289,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** In the sound riddle the sounds are the game, so they always play. */
   const soundsOn = settings.sounds || settings.mode === "sounds";
   const quests = useMemo(() => questsFor(settings.mode, scene), [settings.mode, scene]);
-  const itemsById = useMemo(() => new Map(scene.items.map((item) => [item.id, item])), [scene]);
+  const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
+  const roads = useMemo(() => roadsFrom(scene.id), [scene]);
   const allDiscovered = discovered.size === scene.items.length;
   /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the party. */
   const bedtime = !!scene.bedtime && !colouring && !questMode;
@@ -264,6 +311,10 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   useEffect(() => {
     setSfxVolume(settings.calm ? 0.4 : 1);
   }, [settings.calm]);
+
+  useEffect(() => {
+    loadRecordings(new Set(items.map((item) => item.sound)));
+  }, [items]);
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -299,7 +350,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       busyUntil.current.set(item.id, now + item.durationMs);
       setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (soundsOn && !quiet) SOUNDS[item.sound]();
+      if (soundsOn && !quiet) playSound(item.sound);
       return true;
     },
     [later, soundsOn],
@@ -313,7 +364,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         say(quest.question, queue);
         return;
       }
-      SOUNDS[quest.sound]();
+      playSound(quest.sound);
       later(() => say(quest.question, true), RIDDLE_QUESTION_MS);
     },
     [say, later],
@@ -355,14 +406,14 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     const schedule = () => {
       timer = setTimeout(() => {
         if (performance.now() - lastInteraction.current > AMBIENT_IDLE_MS) {
-          animate(pick(scene.items.filter((item) => !questRef.current?.answers.includes(item))), true);
+          animate(pick(items.filter((item) => !questRef.current?.answers.includes(item))), true);
         }
         schedule();
       }, AMBIENT_MIN_MS + Math.random() * (AMBIENT_MAX_MS - AMBIENT_MIN_MS));
     };
     schedule();
     return () => clearTimeout(timer);
-  }, [scene, animate, settings.ambient, settings.calm]);
+  }, [items, animate, settings.ambient, settings.calm]);
 
   const interacted = () => {
     lastInteraction.current = performance.now();
@@ -379,7 +430,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     setPartying(true);
     if (soundsOn) playMelody();
     say(colouring ? "Hurra! Das ganze Bild ist bunt!" : "Hurra! Du hast alles entdeckt!");
-    scene.items.forEach((item, i) => later(() => animate(item, true), i * 40));
+    items.forEach((item, i) => later(() => animate(item, true), i * 40));
     for (let i = 0; i < 14; i++) later(() => spawn(), i * 140);
     later(() => setPartying(false), PARTY_MS);
   };
@@ -400,7 +451,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** Explore and colour mode: count the item (and colour it in), and celebrate when it was the last one. */
   const discover = (item: SceneItem, x: number, y: number) => {
     if (!colouring && !settings.goal && !bedtime) return;
-    if (discoveredRef.current.has(item.id)) return;
+    // A guest from another picture isn't part of this one.
+    if (item === guest?.item || discoveredRef.current.has(item.id)) return;
     discoveredRef.current = new Set(discoveredRef.current).add(item.id);
     setDiscovered(discoveredRef.current);
     // A splash of paint where the colour comes back.
@@ -421,6 +473,73 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     });
   };
 
+  /** A vehicle drives into the picture from behind itself, to where it stands. */
+  const driveIn = useCallback(
+    (item: SceneItem, road: Road) => {
+      const dx = driveDistance(item, road.faces, scene.width, false);
+      const ms = driveMs(dx);
+      busyUntil.current.set(item.id, performance.now() + ms);
+      setDrives((prev) => ({ ...prev, [item.id]: { phase: "in", dx, ms } }));
+      later(() => setDrives(({ [item.id]: _, ...rest }) => rest), ms);
+    },
+    [scene, later],
+  );
+
+  // Arrived by following a vehicle: it drives in and says hello.
+  useEffect(() => {
+    if (!arrival) return;
+    const { road, home } = arrival;
+    const item = guest?.item ?? itemsById.get(road.item);
+    if (!item) return;
+    driveIn(item, road);
+    if (soundsOn) playSound(item.sound);
+    const name = capitalize(item.name);
+    say(home ? `${name} ist wieder ${PLACES[scene.id].at}!` : `${name} kommt ${PLACES[road.from].from}!`);
+    // So a reload doesn't bring it once more.
+    const { trip: _, ...state } = location.state as { trip?: Trip };
+    navigate(location.pathname, { replace: true, state });
+  }, []);
+
+  /**
+   * The vehicle drives off forwards, out of the picture; a sign at that edge
+   * follows it. A vehicle of this picture comes back after a while, a guest has gone home.
+   */
+  const driveOff = (item: SceneItem, road: Road) => {
+    const goingHome = item === guest?.item;
+    const to = goingHome ? road.from : road.to;
+    const dx = driveDistance(item, road.faces, scene.width, true);
+    const ms = driveMs(dx);
+    busyUntil.current.set(item.id, Infinity);
+    setDrives((prev) => ({ ...prev, [item.id]: { phase: "out", dx, ms } }));
+    if (soundsOn) playSound(item.sound);
+    say(`Tschüss! ${capitalize(item.name)} fährt ${PLACES[to].to}.`, true);
+    later(() => {
+      setDrives((prev) => ({ ...prev, [item.id]: { phase: "gone", dx, ms } }));
+      const exit: Exit = { item, to, trip: { road: roadId(road), home: goingHome } };
+      setExits((prev) => [...prev, exit]);
+      later(() => {
+        setExits((prev) => prev.filter((e) => e !== exit));
+        if (!goingHome) driveIn(item, road);
+      }, GONE_MS);
+    }, ms);
+  };
+
+  /** Explore mode: every second tap on a vehicle that can drive off sends it away, once its animation is over. */
+  const maybeDriveOff = (item: SceneItem) => {
+    const road = item === guest?.item ? guest.road : roads.get(item.id);
+    if (!roadsOn || !road) return;
+    const taps = (driveTaps.current.get(item.id) ?? 0) + 1;
+    driveTaps.current.set(item.id, taps);
+    if (taps % 2) return;
+    busyUntil.current.set(item.id, Infinity);
+    later(() => driveOff(item, road), item.durationMs);
+  };
+
+  /** Into the other picture, where the vehicle arrives. The game stays open (fullscreen, kid mode). */
+  const follow = (exit: Exit) => {
+    navigate(`/bilder/${exit.to}/`, { replace: true, state: { ...(location.state as object | null), trip: exit.trip } });
+  };
+
   /**
    * An item was tapped, pointed at for a moment (hover mode) or its key was
    * pressed (keys mode). Hovering is quieter in the find modes: wrong items only
@@ -429,6 +548,12 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
    */
   const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover" | "key") => {
     interacted();
+    // A vehicle that drove off: its sign (or its key) follows it.
+    const exit = exits.find((e) => e.item === item);
+    if (exit) {
+      follow(exit);
+      return;
+    }
     // The arrow keys go on from the activated item, but it gets no frame; its key badge lights up instead.
     if (settings.trigger === "keys") {
       focusRef.current = item;
@@ -442,7 +567,10 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       if (started) say(describe(item));
       else if (how !== "hover") funBurst(x, y);
       discover(item, x, y);
-      if (started) runChain(item);
+      if (started) {
+        runChain(item);
+        maybeDriveOff(item);
+      }
       return;
     }
     const isAnswer = quest.answers.includes(item);
@@ -485,7 +613,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     riddleRepeat.current = true;
     later(() => {
       riddleRepeat.current = false;
-      if (questRef.current === quest && !celebrating.current) SOUNDS[quest.sound!]();
+      if (questRef.current === quest && !celebrating.current) playSound(quest.sound!);
     }, RIDDLE_REPEAT_MS);
   };
 
@@ -553,7 +681,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         if (arrow) {
           interacted();
           const from = focusRef.current;
-          moveFocus(from ? nextInDirection(scene.items, from, arrow) : middleItem(scene.items, scene.width, scene.height));
+          moveFocus(from ? nextInDirection(items, from, arrow) : middleItem(items, scene.width, scene.height));
           if (settings.sounds) playRandomNote();
           return;
         }
@@ -561,8 +689,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         const list = keys.byKey.get(key);
         const open = (i: SceneItem) => questRef.current?.answers.includes(i) && !answeredRef.current.has(i.id);
         let item: SceneItem;
-        if (e.key === " " || e.key === "Enter") item = focusRef.current ?? pick(scene.items);
-        else if (!list) item = pick(scene.items);
+        if (e.key === " " || e.key === "Enter") item = focusRef.current ?? pick(here(items));
+        else if (!list) item = pick(here(scene.items));
         else if (list.some(open)) item = list.find(open)!;
         else {
           const turn = keyTurns.current.get(key) ?? 0;
@@ -589,14 +717,14 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         return;
       }
       // Exploring: every key brings another item to life.
-      const item = pick(scene.items.filter((i) => i !== lastKeyItem.current));
+      const item = pick(here(items).filter((i) => i !== lastKeyItem.current));
       lastKeyItem.current = item;
       const [x, y] = screenPoint(item);
       activateRef.current(item, x, y, "key");
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [scene, keys, screenPoint, settings.trigger, settings.sounds, ask, funBurst, moveFocus]);
+  }, [scene, items, here, keys, screenPoint, settings.trigger, settings.sounds, ask, funBurst, moveFocus]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
@@ -638,38 +766,65 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         <g filter={grey ? greyFilter : undefined}>
           <scene.Background />
         </g>
-        {scene.items.map((item, i) => {
+        {items.map((item, i) => {
           const play = plays[item.id];
           const place = item.place;
+          const drive = drives[item.id];
+          // A guest keeps the class of its own picture, which its animations use.
+          const look = item === guest?.item ? guest.look : item.id;
           return (
             <g
-              key={`${item.id}-${play?.count ?? 0}`}
-              className={`scene-item item-${item.id}${play?.playing ? " playing" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
-              style={{ "--party-i": i } as CSSProperties}
-              filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
-              data-item={item.id}
-              role="button"
-              aria-label={capitalize(item.name)}
-              onPointerDown={(e) => tapItem(item, e)}
+              key={item.id}
+              className={drive && `scene-drive ${drive.phase}`}
+              style={drive && ({ "--drive-dx": `${drive.dx}px`, "--drive-ms": `${drive.ms}ms` } as CSSProperties)}
             >
-              <g transform={place && `translate(${place.x} ${place.y}) scale(${place.scale})`}>
-                {item.shadow && (
-                  <ellipse
-                    className="scene-shadow"
-                    cx={item.shadow[0]}
-                    cy={item.shadow[1]}
-                    rx={item.shadow[2]}
-                    ry={Math.max(6, item.shadow[2] * 0.12)}
-                  />
-                )}
-                <item.Art />
-                {(item.hitAreas ?? [item.box]).map(([x, y, w, h], i) => (
-                  <rect key={i} className="scene-hit" x={x} y={y} width={w} height={h} />
-                ))}
+              <g
+                key={`${item.id}-${play?.count ?? 0}`}
+                className={`scene-item item-${look}${play?.playing ? " playing" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
+                style={{ "--party-i": i } as CSSProperties}
+                filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
+                data-item={item.id}
+                role="button"
+                aria-label={capitalize(item.name)}
+                onPointerDown={(e) => tapItem(item, e)}
+              >
+                <g transform={place && `translate(${place.x} ${place.y}) scale(${place.scale})`}>
+                  {item.shadow && (
+                    <ellipse
+                      className="scene-shadow"
+                      cx={item.shadow[0]}
+                      cy={item.shadow[1]}
+                      rx={item.shadow[2]}
+                      ry={Math.max(6, item.shadow[2] * 0.12)}
+                    />
+                  )}
+                  <item.Art />
+                  {(item.hitAreas ?? [item.box]).map(([x, y, w, h], i) => (
+                    <rect key={i} className="scene-hit" x={x} y={y} width={w} height={h} />
+                  ))}
+                </g>
               </g>
             </g>
           );
         })}
+        {scene.Overlay && (
+          <g className="scene-overlay" filter={grey ? greyFilter : undefined}>
+            <scene.Overlay />
+          </g>
+        )}
+        {exits.map((exit) => (
+          <ExitSign
+            key={exit.item.id}
+            exit={exit}
+            right={(drives[exit.item.id]?.dx ?? 0) > 0}
+            width={scene.width}
+            onFollow={(e) => {
+              e.stopPropagation();
+              interacted();
+              follow(exit);
+            }}
+          />
+        ))}
         {settings.trigger === "keys" && settings.showKeys && <KeyBadges scene={scene} keyOf={keys.keyOf} lit={lit} />}
         {settings.trigger === "keys" && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
@@ -730,6 +885,48 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       </p>
       <BurstLayer bursts={bursts} />
     </div>
+  );
+}
+
+/**
+ * Where a vehicle drove off: a bubble at the edge with the vehicle in it, an
+ * arrow out of the picture and the emoji of the picture it went to.
+ */
+function ExitSign({
+  exit,
+  right,
+  width,
+  onFollow,
+}: {
+  exit: Exit;
+  right: boolean;
+  width: number;
+  onFollow: (e: PointerEvent) => void;
+}) {
+  const [, y, , h] = placeBox(exit.item.box, exit.item.place);
+  const cy = Math.min(860, Math.max(140, y + h / 2));
+  const [bx, by, bw, bh] = exit.item.box;
+  const dir = right ? 1 : -1;
+  return (
+    <g
+      className="scene-exit"
+      transform={`translate(${right ? width - 140 : 140} ${cy})`}
+      data-item={exit.item.id}
+      role="button"
+      aria-label={`${capitalize(exit.item.name)} hinterher`}
+      onPointerDown={onFollow}
+    >
+      <g className="scene-exit-pulse">
+        <path className="scene-exit-arrow" d={`M ${70 * dir} -50 L ${126 * dir} 0 L ${70 * dir} 50 Z`} />
+        <rect className="scene-exit-bubble" x={-86} y={-70} width={172} height={140} rx={36} />
+        <svg x={-70} y={-58} width={140} height={84} viewBox={`${bx} ${by} ${bw} ${bh}`}>
+          <exit.item.Art />
+        </svg>
+        <text className="scene-exit-emoji" x={0} y={46}>
+          {findScene(exit.to)?.emoji}
+        </text>
+      </g>
+    </g>
   );
 }
 
