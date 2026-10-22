@@ -54,7 +54,7 @@ export function AdventureGame() {
             />
             {!touchOnly && (
               <p className="setting-note">
-                Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zur vorigen oder nächsten Bewegung, die <kbd>Leertaste</kbd> pausiert.
+                Oben links: pausieren und zur vorigen oder nächsten Bewegung springen; ein Bild unten springt zu dieser Bewegung. Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> und die <kbd>Leertaste</kbd>.
               </p>
             )}
           </SettingsGroup>

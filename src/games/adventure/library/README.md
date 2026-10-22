@@ -14,14 +14,14 @@ und wie die Welt antwortet.
 | --- | --- |
 | `types.ts` | Datenmodell (Bewegung, Welt, Szenario, Ablauf) |
 | `categories.ts` | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was *nicht* dazugehört |
-| `movements/*.ts` | **Ergebnis B**: 94 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
-| `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–8 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
+| `movements/*.ts` | **Ergebnis B**: 98 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
+| `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
 | `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–11 Bewegungen und Sekunden, 153–186 s lang |
 | diese Datei | **Ergebnis E**: Qualitätskontrolle |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
 bleibt bis zum Aufräumen. Jede Bewegung nennt einen `motion`-Clip; die Clips für den Fuchs
-stehen in `../three/clips.ts` (67 Clips, keiner fehlt).
+stehen in `../three/clips.ts` (70 Clips, keiner fehlt).
 
 ## Neue Bewegung
 
@@ -32,7 +32,7 @@ stehen in `../three/clips.ts` (67 Clips, keiner fehlt).
 
 ## Ergebnis E: Qualitätskontrolle
 
-Stand: 94 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
+Stand: 98 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
 verweist nur auf vorhandene Bewegungen, und jede Bewegung hat eine Sitz-Variante
 (`adaptations.seated`). 74 Bewegungen sind „leicht“, 20 „mittel“, keine ist „schwer“.
 
@@ -76,15 +76,18 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 | Ablauf | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
 | --- | --- | --- | --- |
-| `treasure_island` (spielbar) | 11 | 186 s | r m m l r m m m l l r |
+| `treasure_island` (spielbar) | 16 | 214 s | r m l l r m m l r r m m r l l r |
 | `space_trip` | 9 | 160 s | r m l m m m l r l |
 | `underwater_dive` | 9 | 158 s | r m m m m l r m l |
 | `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
 | `farm_morning` | 9 | 153 s | r r m l m l m r m |
 
-Die 3D-Geschichte der Schatzinsel dauert länger als die 186 s der Tabelle, etwa 3:55. Vorher
-zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (16 s). Danach macht
-Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung).
+Die 3D-Geschichte der Schatzinsel dauert länger als die 214 s der Tabelle, etwa 4:25. Vorher
+zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
+Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung). Die
+Wege zwischen den Stationen sind kurz (2–5 s), damit es ohne lange Pausen weitergeht. Eltern
+können oben links pausieren und vor- oder zurückspringen, unten auf ein Bild tippen springt zu
+dieser Bewegung.
 
 Alle beginnen ruhig, und nach jeder lebhaften Bewegung kommt bald eine ruhige. `space_trip`
 und `underwater_dive` enden lebhaft. Wenn die Geschichte vor dem Schlafen läuft, sollte dort
@@ -99,24 +102,33 @@ noch ein ruhiger Abschied dazukommen.
   zeigt die Leiste nur Bilder. Ist die Sprachausgabe aus, bleibt nur das Vormachen. Deshalb
   müssen die Bewegungen des Fuchses deutlich sein.
 - **Leuchtende Kontur am Fuchs** (`../three/contour.ts`): Während einer Bewegung leuchtet,
-  was sich gerade bewegt. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen
+  was sich gerade bewegt, als schmaler neongrüner Rand ohne Muster. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen
   Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
   gewollt, aber noch nicht mit Kindern ausprobiert.
 - **Umriss-Hilfe** (dunkle Kinderfigur mit leuchtendem Rand wie bei „Just Dance“,
-  `../three/silhouette.ts`): bei allen Bewegungen. Sie zeigt die Figur von derselben Seite, von
+  `../three/silhouette.ts`): bei allen Bewegungen, mit einem hellen Strichskelett, Gelenkpunkten
+  und Fingern, damit man die Gelenke gut erkennt. Sie zeigt die Figur von derselben Seite, von
   der die Kamera Tapsi sieht, meist also von hinten. Beim Drücken und Ziehen sieht man sie
   deshalb schräg von der Seite, sonst wären die Arme hinter dem Körper versteckt.
 - **Kamera von hinten.** Tapsi schaut immer zur Insel, und die Kamera steht hinter Tapsi: Das
   Kind sieht, was Tapsi sieht, und links ist links. Wo die Arme vor dem Körper arbeiten (Tür,
   Seil, Blumen), steht sie höher und seitlich, damit die Arme sichtbar bleiben. Tapsis Gesicht
-  sieht das Kind dabei kaum. Ob Kinder so besser mitmachen als mit einem Fuchs, der sie
-  anschaut, ist noch offen.
+  sieht das Kind dabei kaum; erst nach dem Aufschließen der Truhe dreht Tapsi sich um und jubelt,
+  tanzt und winkt uns von vorne zu, mit fröhlichem Gesicht. Ob Kinder so besser mitmachen als mit
+  einem Fuchs, der sie anschaut, ist noch offen.
 - **Jede Bewegung hat ein Gegenüber.** Tapsi winkt Kiki zu (Kiki fliegt am Anfang heran und am
-  Ende davon), paddelt, hüpft über Steine, duckt sich unter dem Ast, öffnet mit den Armen die
-  Blumen neben sich, weicht Kokosnüssen aus, drückt mit den Pfoten an die Tür (und geht mit ihr
-  mit), zieht am Seil, jubelt vor der offenen Truhe und tanzt mit den Krebsen.
-- **Clips nur teilweise angeschaut.** Im Browser geprüft sind die 10 Clips der Schatzinsel
-  (`wave`, `paddle`, `high_knees`, `duck`, `bloom`, `lean_side`, `push_forward`, `pull_rope`,
-  `cheer`, `shake`). Die übrigen 57 sind programmiert und typgeprüft, aber noch nicht angesehen.
+  Ende davon), paddelt im Kanu sitzend, stampft Skorpione platt, duckt sich unter dem
+  schaukelnden Baumstamm, öffnet mit den Armen die Blumen, kurbelt das Holztor hoch, macht den
+  rollenden Kokosnüssen Platz, weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
+  pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), drückt die
+  Tür auf (die Pfoten bleiben an der Tür), zieht die Truhe am Seil heran, schließt sie mit dem
+  Schlüssel auf, jubelt und tanzt mit den Krebsen, und zum Schluss gibt es ein Feuerwerk.
+- **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Deshalb gibt es
+  nur Bewegungen auf der Stelle (Stampfen statt über Steine hüpfen) und kleine Schritte zur
+  Seite und zurück.
+- **Clips nur teilweise angeschaut.** Im Browser geprüft sind die Clips der Schatzinsel
+  (`wave`, `paddle`, `stomp`, `duck`, `bloom`, `crank`, `step_side`, `lean_side`, `reach_up`,
+  `shapes`, `push_forward`, `pull_rope`, `turn_key`, `cheer`, `shake`). Die übrigen sind
+  programmiert und typgeprüft, aber noch nicht angesehen.
 - **Zeiten sind geschätzt.** Die Sekunden der Abläufe sind nicht mit Kindern gemessen. Wird
   eine Bewegung zu lang, merkt man das daran, dass das Kind aufhört; dann diese Bewegung kürzen.

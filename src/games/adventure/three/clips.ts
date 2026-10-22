@@ -42,6 +42,16 @@ function steps(p: Pose, t: number, period: number, lift: number) {
 /** How far down the duck clip is, 0..1; stories time swinging branches by it. */
 export const duckDepth = (t: number) => hold(phase(t, 3), 0.05, 0.28, 0.72, 0.92);
 
+/** Seconds of one turn of the crank clip; stories turn their crank with it. */
+export const CRANK_PERIOD = 2.4;
+/** Seconds of each shape (tall, wide, small) in the shapes clip. */
+export const SHAPE_SECONDS = 4;
+/** The key clip: picking the key up takes this long, then each turn this long. */
+export const KEY_PICKUP = 2;
+export const KEY_TURN = 1.6;
+/** How far the key is turned, 0..1 (a quarter turn), at `t` seconds into the key clip. */
+export const keyTurn = (t: number) => (t < KEY_PICKUP ? 0 : hold(phase(t - KEY_PICKUP, KEY_TURN), 0.1, 0.45, 0.6, 0.9));
+
 /** Hands come together in front at this spread. */
 const TOGETHER = -0.42;
 
@@ -825,6 +835,81 @@ const CLIPS: Record<MotionClipId, Clip> = {
     p.armR.elbow = 0.9;
     p.headTilt = Math.sin(t * 6.5) * 0.12;
     p.lift = Math.abs(Math.sin(t * 6.5)) * 0.01;
+  },
+
+  crank: (t, p) => {
+    // Both hands on the handle of a crank in front, turning big circles: up, over to one side, down, over to the other.
+    const a = phase(t, CRANK_PERIOD) * TAU;
+    const side = Math.cos(a);
+    const up = Math.sin(a);
+    for (const arm of [p.armL, p.armR]) {
+      arm.raise = 1.2 + up * 0.5;
+      arm.elbow = 0.7 - up * 0.35;
+    }
+    p.armL.spread = TOGETHER + 0.3 + side * 0.45;
+    p.armR.spread = TOGETHER + 0.3 - side * 0.45;
+    p.twist = side * 0.18;
+    p.lean = side * 0.06;
+    p.bend = 0.1 - up * 0.06;
+  },
+
+  shapes: (t, p) => {
+    // A riddle of three shapes, one after the other: very tall, very wide, very small.
+    const n = Math.floor(phase(t, SHAPE_SECONDS * 3) * 3);
+    const k = hold(phase(t, SHAPE_SECONDS), 0.05, 0.3, 0.8, 0.98);
+    if (n === 0) {
+      for (const a of [p.armL, p.armR]) {
+        a.raise = 0.1 + k * 2.8;
+        a.spread = 0.25;
+        a.elbow = 0.3 - k * 0.3;
+      }
+      p.toes = k * 0.9;
+      p.headPitch = -0.3 * k;
+    } else if (n === 1) {
+      p.armL.spread = p.armR.spread = 0.3 + k * 1.95;
+      p.armL.elbow = p.armR.elbow = 0.1;
+      p.legL.spread = p.legR.spread = 0.04 + k * 0.3;
+    } else {
+      crouch(p, k);
+      p.bend += k * 0.4;
+      p.headPitch = k * 0.5;
+      for (const a of [p.armL, p.armR]) {
+        a.raise = k * 1.0;
+        a.spread = 0.25 - k * 0.3;
+        a.elbow = 0.3 + k * 1.9;
+      }
+    }
+  },
+
+  turn_key: (t, p) => {
+    if (t < KEY_PICKUP) {
+      // Bend down, pick the key up from the ground with the right paw, come back up.
+      const down = hold(t / KEY_PICKUP, 0.05, 0.35, 0.5, 0.9);
+      const rise = smooth(clamp01((t / KEY_PICKUP - 0.5) / 0.4));
+      crouch(p, down * 0.6);
+      p.bend += down * 0.35 + rise * 0.12;
+      p.headPitch = down * 0.4;
+      p.armR.raise = 0.3 + down * 0.6 + (1 - down) * rise * 0.95;
+      p.armR.spread = 0.1 - rise * 0.22;
+      p.armR.elbow = 0.2 + (1 - down) * rise * 0.35;
+      p.armL.raise = 0.05 + rise * 0.55;
+      p.armL.spread = 0.18 + rise * 0.12;
+      p.armL.elbow = 0.25 + rise * 0.95;
+      return;
+    }
+    // The key in the lock in front: the paw turns it a quarter round and back.
+    const k = keyTurn(t);
+    p.armR.raise = 1.25;
+    p.armR.spread = -0.12;
+    p.armR.elbow = 0.55;
+    p.armR.twist = k * 1.1;
+    p.armL.raise = 0.6;
+    p.armL.spread = 0.3;
+    p.armL.elbow = 1.2;
+    p.twist = -k * 0.12;
+    p.lean = -k * 0.05;
+    p.headTilt = -k * 0.15;
+    p.bend = 0.12;
   },
 
   press_button: (t, p) => {
