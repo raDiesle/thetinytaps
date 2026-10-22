@@ -48,7 +48,7 @@ export function AdventureGame() {
               onChange={(glow) => update({ glow })}
             />
             <Toggle
-              label="Umriss-Hilfe: eine leuchtende Figur macht die Bewegung groß mit (zum Ausprobieren erst beim Winken)"
+              label="Umriss-Hilfe: eine dunkle Figur mit leuchtendem Rand macht jede Bewegung groß mit"
               checked={settings.outline}
               onChange={(outline) => update({ outline })}
             />

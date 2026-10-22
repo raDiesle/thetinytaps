@@ -102,15 +102,19 @@ noch ein ruhiger Abschied dazukommen.
   was sich gerade bewegt. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen
   Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
   gewollt, aber noch nicht mit Kindern ausprobiert.
-- **Umriss-Hilfe** (leuchtende Kinderfigur wie bei „Just Dance“, `../three/silhouette.ts`):
-  bisher nur beim Winken (`wave_hello`) zum Ausprobieren. Sie zeigt eine Vorderansicht. Bei
-  Bewegungen nach vorn (ducken, drücken, paddeln) sieht man von vorn wenig Tiefe, und die Figur
-  bräuchte dort wohl einen leicht schrägen Blick.
-- **Kamera von vorn.** Während Tapsi eine Bewegung vormacht und das Kind mitmacht, steht die
-  Kamera vor Tapsi, und Tapsi ist groß in der Mitte. Nur beim Paddeln sieht man Tapsi von
-  hinten, wie aus dem Kanu. Bei der Tür und beim Seil liegt das, worauf Tapsi zugeht, deshalb
-  hinter der Kamera: Die Tür zeigt sich nur durch ihr Licht auf Tapsi, die Truhe erst am Ende.
-  Ob Kinder das verstehen, ist noch offen.
+- **Umriss-Hilfe** (dunkle Kinderfigur mit leuchtendem Rand wie bei „Just Dance“,
+  `../three/silhouette.ts`): bei allen Bewegungen. Sie zeigt die Figur von derselben Seite, von
+  der die Kamera Tapsi sieht, meist also von hinten. Beim Drücken und Ziehen sieht man sie
+  deshalb schräg von der Seite, sonst wären die Arme hinter dem Körper versteckt.
+- **Kamera von hinten.** Tapsi schaut immer zur Insel, und die Kamera steht hinter Tapsi: Das
+  Kind sieht, was Tapsi sieht, und links ist links. Wo die Arme vor dem Körper arbeiten (Tür,
+  Seil, Blumen), steht sie höher und seitlich, damit die Arme sichtbar bleiben. Tapsis Gesicht
+  sieht das Kind dabei kaum. Ob Kinder so besser mitmachen als mit einem Fuchs, der sie
+  anschaut, ist noch offen.
+- **Jede Bewegung hat ein Gegenüber.** Tapsi winkt Kiki zu (Kiki fliegt am Anfang heran und am
+  Ende davon), paddelt, hüpft über Steine, duckt sich unter dem Ast, öffnet mit den Armen die
+  Blumen neben sich, weicht Kokosnüssen aus, drückt mit den Pfoten an die Tür (und geht mit ihr
+  mit), zieht am Seil, jubelt vor der offenen Truhe und tanzt mit den Krebsen.
 - **Clips nur teilweise angeschaut.** Im Browser geprüft sind die 10 Clips der Schatzinsel
   (`wave`, `paddle`, `high_knees`, `duck`, `bloom`, `lean_side`, `push_forward`, `pull_rope`,
   `cheer`, `shake`). Die übrigen 57 sind programmiert und typgeprüft, aber noch nicht angesehen.

@@ -2,9 +2,10 @@ import * as THREE from "three";
 import type { Pose } from "./guide";
 
 // A glowing outline of a child doing the guide's movement, like the dancers
-// in "Just Dance": a dark body with a bright rim, seen from the front. It
-// takes the same pose as the fox but with a child's proportions (longer arms
-// and legs), so the movement is easy to read and to copy like in a mirror.
+// in "Just Dance": a dark body with a bright rim, seen from where the camera
+// sees the fox (mostly from behind, so left is left). It takes the same pose
+// as the fox but with a child's proportions (longer arms and legs), so the
+// movement is easy to read and to copy.
 
 const NS = "http://www.w3.org/2000/svg";
 
@@ -115,8 +116,9 @@ export class Silhouette {
     this.bones.push({ from, to, width, lines: [] });
   }
 
-  /** Puts the figure into the guide's pose. */
-  update(p: Pose) {
+  /** Puts the figure into the guide's pose, seen from `view` (radians round it, 0 = front, π = behind). */
+  update(p: Pose, view = 0) {
+    this.root.rotation.y = -view;
     const legHeight = (l: Pose["legL"]) => THIGH * Math.cos(l.lift) * Math.cos(l.spread) + SHIN * Math.cos(l.lift - l.knee);
     // Jumps are scaled up a little, as the child is taller than the fox.
     this.hips.position.set(p.shift * 1.4, Math.max(legHeight(p.legL), legHeight(p.legR)) + p.lift * 1.4, 0);
@@ -137,7 +139,7 @@ export class Silhouette {
     });
     this.root.updateMatrixWorld(true);
 
-    // Seen from the front: x stays, y points down in the picture.
+    // The figure is turned instead of the eye, so it is seen from the front: x stays, y points down in the picture.
     for (const bone of this.bones) {
       bone.from.getWorldPosition(this.at);
       const x1 = this.at.x.toFixed(3);

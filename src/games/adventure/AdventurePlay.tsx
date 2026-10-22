@@ -32,9 +32,6 @@ const CUES: Record<Cue, () => void> = {
   drum: playDrum,
 };
 
-/** Movements that show the glowing outline next to the fox – to try it out, waving first. */
-const OUTLINED = new Set(["wave_hello"]);
-
 const smooth = (k: number) => {
   const c = Math.min(1, Math.max(0, k));
   return c * c * (3 - 2 * c);
@@ -95,12 +92,12 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
           onEnd() {
             setEnded(true);
           },
-          onPose(pose, frame) {
+          onPose(pose, frame, view) {
             const box = outlineRef.current;
             if (!box) return;
-            const shown = settingsRef.current.outline && OUTLINED.has(story.sequence.steps[frame.step].movement) ? outlineShown(frame) : 0;
+            const shown = settingsRef.current.outline ? outlineShown(frame) : 0;
             box.style.opacity = String(shown);
-            if (shown > 0) silhouette.update(pose);
+            if (shown > 0) silhouette.update(pose, view);
           },
         },
         settings.pace === "calm" ? CALM_PACE : 1,
