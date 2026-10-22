@@ -53,6 +53,11 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   `depthScale(y)`; lines on the ground run towards the vanishing point
   (`towardsHorizon`). Far away = lighter colours and a little haze.
 - Leave space: items must not cover each other's hit areas. 35–45 items fit.
+- Rooms (`badezimmer/`, `kueche/`, `supermarkt/`, `gutenacht/`): the back wall stands on
+  the horizon; floor tiles and lines come from `onFloor` in `../layout`.
+- Bedtime pictures: `bedtime: true` on the scene makes tapped items keep the class
+  `asleep` and darkens the room (class `night` on the scene) once all sleep, instead
+  of the party – see `gutenacht/`.
 
 ## An item
 

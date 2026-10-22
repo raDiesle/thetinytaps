@@ -462,6 +462,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Küche",
         text: "Topf blubbert, Toaster springt, Kühlschrank geht auf, Mixer, Backofen mit Kuchen der aufgeht, Wasserkocher pfeift, Katze am Napf.",
         effort: "M",
+        done: true,
       },
       {
         id: "S-07",
@@ -470,6 +471,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Kinderzimmer am Abend: Spieluhr, Kuscheltiere gähnen, Nachtlicht, Mond am Fenster. Jedes Ding sagt „Gute Nacht“ und schläft ein, bis alles dunkel ist.",
         why: "Ritual zum Beenden der Bildschirmzeit – sehr wertvoll für Eltern.",
         effort: "M",
+        done: true,
       },
       {
         id: "S-08",
@@ -477,6 +479,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Spielplatz",
         text: "Rutsche, Schaukel, Wippe, Sandkasten mit Förmchen, Klettergerüst, Eiswagen mit Glocke, Seifenblasen.",
         effort: "L",
+        done: true,
       },
       {
         id: "S-09",
@@ -509,6 +512,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Supermarkt",
         text: "Kasse piept, Einkaufswagen rollt, Obst wiegen, Kühlregal dampft, Brot-Theke, Laufband.",
         effort: "M",
+        done: true,
       },
       {
         id: "S-13",
@@ -516,6 +520,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         title: "Flughafen & Bahnhof",
         text: "Flugzeug startet, Gepäckband, Tankwagen, Lotsen-Turm, Zug fährt ein, Schaffner pfeift.",
         effort: "L",
+        done: true,
       },
       {
         id: "S-14",
@@ -524,6 +529,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Die bestehende Baustelle im Schnee: Schneepflug statt Walze, Schneemann, Bagger schaufelt Schnee. Wiederverwendet viele Zeichnungen.",
         why: "Günstige neue Szene; Jahreszeiten kennenlernen.",
         effort: "M",
+        done: true,
       },
     ],
   },
