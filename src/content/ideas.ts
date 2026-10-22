@@ -863,7 +863,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "N-34",
         emoji: "🎢",
         title: "Kugelbahn",
-        text: "Antippen lässt eine Kugel oben los; sie rollt durch eine bunte Bahn mit Glocke, Trichter, Wippe und Wasserrad und plumpst unten in einen Korb. Mehrere Kugeln gleichzeitig erlaubt. Als zweites Level fallen statt der Kugel Alltagsgegenstände nacheinander um (Buntstift, Bücher, Flasche, Müslipackung … bis zur Trommel).",
+        text: "Antippen lässt eine Kugel oben los; sie rollt durch eine bunte Bahn mit Glocke, Trichter, Wippe und Wasserrad und plumpst unten in einen Korb. Mehrere Kugeln gleichzeitig erlaubt. Als zweites Level fallen statt der Kugel Alltagsgegenstände nacheinander um (Buntstift, Bücher, Flasche, Müslipackung … bis zur Trommel). Als drittes Level eine große Kettenreaktions-Maschine (Rube Goldberg), die nach einem Tipp eine halbe Minute läuft, und das Bild fährt mit.",
         why: "Zuschauen und wieder starten – beruhigend und spannend zugleich.",
         effort: "M",
         done: true,
