@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { AnimalsPage } from "@/pages/AnimalsPage";
 import { FeelingsPage } from "@/pages/FeelingsPage";
@@ -13,6 +14,9 @@ import { ShadowsPage } from "@/pages/ShadowsPage";
 import { TeethPage } from "@/pages/TeethPage";
 import { WordsPage } from "@/pages/WordsPage";
 
+// The 3D game brings three.js along; loaded only when it is opened.
+const AdventurePage = lazy(() => import("@/pages/AdventurePage").then((m) => ({ default: m.AdventurePage })));
+
 export function App() {
   return (
     <Routes>
@@ -27,6 +31,14 @@ export function App() {
       <Route path="schatten" element={<ShadowsPage />} />
       <Route path="laut-leise" element={<LoudPage />} />
       <Route path="kugelbahn" element={<MarblePage />} />
+      <Route
+        path="abenteuer"
+        element={
+          <Suspense fallback={null}>
+            <AdventurePage />
+          </Suspense>
+        }
+      />
       <Route path="kinder" element={<KidHome />} />
       <Route path="ideen" element={<IdeasPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
