@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
-import { HORIZON, depthScale } from "../layout";
+import { HORIZON, depthScale, onFloor } from "../layout";
 import { STEEL } from "../shared";
-import { COUNTER_END, COUNTER_END_BACK, COUNTER_FOOT, WORKTOP_BACK, WORKTOP_FRONT, onFloor } from "./layout";
+import { COUNTER_END, COUNTER_END_BACK, COUNTER_FOOT, WORKTOP_BACK, WORKTOP_FRONT } from "./layout";
 
 // The back wall: warm paint, a band of small tiles behind the worktop and a shelf strip. The
 // kitchen counter runs in front of it: the worktop seen from above, the cupboard fronts that

@@ -1,7 +1,6 @@
 import type { ReactElement } from "react";
-import { HORIZON, depthScale } from "../layout";
+import { HORIZON, depthScale, onFloor } from "../layout";
 import { STEEL } from "../shared";
-import { onFloor } from "./layout";
 
 // The back wall: painted at the top, small tiles below with a blue border, and a skirting
 // at the bottom. The floor is a checkered tiled floor; its tiles get smaller and paler towards

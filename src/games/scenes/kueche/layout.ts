@@ -44,14 +44,6 @@ export function onTable(x: number, y: number, size = 1): Placement {
   return float(0, 0, x, y, depthScale(TABLE_BACK_FOOT + t * (TABLE_FOOT - TABLE_BACK_FOOT)) * size);
 }
 
-/** Where the floor's lines meet: the eye height of the picture (depthScale is 0 there). */
-export const EYE_Y = HORIZON - (0.45 * (1000 - HORIZON)) / 0.5;
-
-/** Floor point: world x (relative to the middle) at depth scale `s`. */
-export function onFloor(worldX: number, s: number): [number, number] {
-  return [800 + worldX * s, EYE_Y + (1000 - EYE_Y) * (s / depthScale(1000))];
-}
-
 /** A point on the back wall's plane at the counter front's depth moved back to the wall: for side faces. */
 export function toWall(x: number) {
   return 800 + ((x - 800) / COUNTER_FRONT_SCALE) * depthScale(HORIZON);

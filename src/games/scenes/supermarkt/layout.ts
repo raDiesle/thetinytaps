@@ -1,18 +1,10 @@
-import { HORIZON, depthScale, ground } from "../layout";
+import { ground, onFloor } from "../layout";
 
 // A supermarket, seen from the checkout. The back wall stands on the horizon: from left to
 // right the entrance with the sliding door, the bakery, the cheese and the fish counter, the
 // cooling shelf, the milk and the bottle machine. Two shelf aisles run from the wall towards
 // us. On the floor in front: the fruit stand, the scale, the can tower, the freezer, the
 // shopping carts, and at the front the checkout with the belt and the cashier.
-
-/** Where the floor's lines meet: the eye height of the picture (depthScale is 0 there). */
-export const EYE_Y = HORIZON - (0.45 * (1000 - HORIZON)) / 0.5;
-
-/** Floor point: (x, y) on the floor seen from the front at scale 1 (x relative to the middle) as seen at depth scale `s`. */
-export function onFloor(worldX: number, s: number): [number, number] {
-  return [800 + worldX * s, EYE_Y + (1000 - EYE_Y) * (s / depthScale(1000))];
-}
 
 /** The two shelf aisles: world x of their sides, how far they reach towards us, and their height. */
 export const GONDOLA = { inner: 460, outer: 700, front: 0.6, height: 240 };

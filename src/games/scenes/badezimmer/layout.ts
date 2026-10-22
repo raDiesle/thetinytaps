@@ -1,4 +1,4 @@
-import { depthScale, ground } from "../layout";
+import { ground } from "../layout";
 
 // A bathroom, seen from the door. The back wall stands on the horizon: tiles below, the
 // window, the mirror and the shelf above. Against it from left to right the bathtub, the
@@ -14,11 +14,3 @@ export const SINK = ground(0, 0, 720, 450, 1.445);
 export const TOILET = ground(0, 0, 1060, 470, 1.32);
 /** The washing machine. */
 export const WASHER = ground(0, 0, 1290, 425, 1.4);
-
-/** Where the floor's lines meet: the eye height of the picture (depthScale is 0 there). */
-export const EYE_Y = 330 - (0.45 * 670) / 0.5;
-
-/** Floor point: (x, y) on the floor seen from the front at scale 1 (x relative to the middle) as seen at depth scale `s`. */
-export function onFloor(worldX: number, s: number): [number, number] {
-  return [800 + worldX * s, EYE_Y + (1000 - EYE_Y) * (s / depthScale(1000))];
-}

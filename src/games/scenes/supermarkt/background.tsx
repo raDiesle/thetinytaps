@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
-import { HORIZON, depthScale, transformOf } from "../layout";
+import { HORIZON, depthScale, transformOf, onFloor } from "../layout";
 import { INK, STEEL } from "../shared";
-import { GONDOLA, STAND, onFloor } from "./layout";
+import { GONDOLA, STAND } from "./layout";
 
 // The back wall: a ceiling strip with lamps, a fruit border, tiles behind the bakery, the cheese
 // and the fish counter, and a skirting at the bottom. The floor has big pale tiles that get smaller

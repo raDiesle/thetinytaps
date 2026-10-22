@@ -28,6 +28,14 @@ export function ground(fromX: number, fromY: number, toX: number, toY: number, s
   return float(fromX, fromY, toX, toY, depthScale(toY) * size);
 }
 
+/** Indoor pictures: where the floor's lines meet, the eye height of the picture (depthScale is 0 there). */
+export const EYE_Y = HORIZON - (0.45 * (1000 - HORIZON)) / 0.5;
+
+/** Indoor pictures: a point on the floor, world x (relative to the middle) at depth scale `s`. */
+export function onFloor(worldX: number, s: number): [number, number] {
+  return [VANISHING_X + worldX * s, EYE_Y + (1000 - EYE_Y) * (s / depthScale(1000))];
+}
+
 /** Placement as an SVG transform, for parts of the background that move along. */
 export const transformOf = ({ x, y, scale }: Placement) => `translate(${x} ${y}) scale(${scale})`;
 
