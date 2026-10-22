@@ -1,8 +1,11 @@
 /** One level of the game. */
-export type MarbleLevel = "track" | "topple" | "machine";
+export type MarbleLevel = "track" | "topple" | "machine" | "kitchen" | "garden" | "building" | "circus" | "space";
 
-/** Which levels to play: all in turn, or only one of them. ("both" is what it was called when there were two.) */
-export type MarbleLevels = "all" | "both" | MarbleLevel;
+/**
+ * Which levels to play: all in turn, only the Rube Goldberg machines in turn,
+ * or only one of them. ("both" is what it was called when there were two.)
+ */
+export type MarbleLevels = "all" | "both" | "machines" | MarbleLevel;
 
 export interface MarbleSettings {
   levels: MarbleLevels;
