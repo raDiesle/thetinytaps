@@ -10,11 +10,13 @@ import { Stage } from "./stage";
 // react and renders. Everything is a function of the story clock, so jumping
 // to another step just works.
 
-export type LineKind = "situation" | "instruction" | "again" | "praise";
+export type LineKind = "opening" | "situation" | "instruction" | "turn" | "again" | "praise";
 
 export interface PlayerEvents {
   onLine(text: string, kind: LineKind, step: number): void;
   onStep(step: number): void;
+  /** During the opening: the step the map points at (null when it does not). */
+  onPointing?(step: number | null): void;
   onFlash(amount: number): void;
   onCue(cue: Cue): void;
   onEnd(): void;
@@ -37,6 +39,9 @@ export class StoryPlayer {
   private frame = 0;
   private walkWeight = 0;
   private currentStep = -1;
+  private pointing: number | null = null;
+  /** Seconds of the opening before the first step. */
+  private readonly opening: number;
   private ended = false;
   /** How much slower than written the story runs, e.g. 1.3 for calm mode. */
   private readonly pace: number;
@@ -54,10 +59,11 @@ export class StoryPlayer {
     this.stage = new Stage(canvas);
     this.stage.scene.add(this.guide.root);
     this.world = story.build(this.stage, this.guide, (c) => events.onCue(c));
-    let t = 0;
-    this.starts = story.sequence.steps.map((s) => {
+    this.opening = story.opening?.seconds ?? 0;
+    let t = this.opening;
+    this.starts = story.sequence.steps.map((s, i) => {
       const start = t;
-      t += s.seconds;
+      t += this.stepSeconds(i);
       return start;
     });
     this.total = t;
@@ -79,11 +85,12 @@ export class StoryPlayer {
     this.stage.resize(width, height);
   }
 
-  /** Jumps to the start of the next (+1) or previous (-1) step. */
+  /** Jumps to the start of the next (+1) or previous (-1) step; back from the first step is the opening. */
   skip(direction: 1 | -1) {
-    const step = this.stepAt(this.elapsed).step;
-    const target = Math.max(0, Math.min(this.starts.length - 1, step + direction));
-    this.elapsed = this.starts[target];
+    const inOpening = this.elapsed < this.opening;
+    const step = inOpening ? -1 : this.stepAt(this.elapsed).step;
+    const target = Math.max(-1, Math.min(this.starts.length - 1, step + direction));
+    this.elapsed = target < 0 ? 0 : this.starts[target];
     // Just before the start, so the step's first line is said again.
     this.prevElapsed = this.elapsed - 0.001;
     this.ended = false;
@@ -107,29 +114,38 @@ export class StoryPlayer {
     return this.story.sequence.steps.length;
   }
 
+  /** A step's length: the sequence's seconds plus showing the movement first. */
+  private stepSeconds(step: number) {
+    return this.story.sequence.steps[step].seconds + this.story.demo[step];
+  }
+
   private stepAt(t: number) {
     let step = this.starts.length - 1;
     while (step > 0 && t < this.starts[step]) step--;
-    const local = Math.min(t - this.starts[step], this.story.sequence.steps[step].seconds);
+    const local = Math.max(0, Math.min(t - this.starts[step], this.stepSeconds(step)));
     return { step, local };
   }
 
   private tick(dt: number) {
     const t = Math.min(this.elapsed, this.total);
     const { step, local } = this.stepAt(t);
-    const prevLocal = this.prevElapsed - this.starts[step];
+    const opening = t < this.opening ? t : null;
+    // The opening holds the first step at its very start, so nothing in it happens yet.
+    const prevLocal = opening === null ? this.prevElapsed - this.starts[step] : 0;
+    if (opening !== null) this.speakOpening(t);
     this.prevElapsed = t;
-    const seconds = this.story.sequence.steps[step].seconds;
     const lead = this.story.lead[step];
-    const actLength = seconds - lead - this.story.praise;
+    const actLength = this.stepSeconds(step) - lead - this.story.praise;
     const frame: StoryFrame = {
       step,
       local,
       prevLocal,
       lead,
+      demo: this.story.demo[step],
       act: local - lead,
       actLength,
       praise: local - lead - actLength,
+      opening,
       time: this.elapsed,
       dt,
     };
@@ -141,10 +157,15 @@ export class StoryPlayer {
     this.speak(frame);
 
     const result = this.world.update(frame);
+    const pointing = result.pointing ?? null;
+    if (pointing !== this.pointing) {
+      this.pointing = pointing;
+      this.events.onPointing?.(pointing);
+    }
     const pose = this.pose(frame, result.walking, dt);
-    // From just before the movement until the praise.
+    // From just before the guide shows the movement until the praise.
     const smooth = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
-    this.guide.highlight = this.highlight ? smooth((frame.act + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8)) : 0;
+    this.guide.highlight = this.highlight ? smooth((frame.act + frame.demo + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8)) : 0;
     this.guide.apply(pose, this.elapsed);
     this.events.onPose?.(pose, frame);
     this.guide.setTalking(typeof speechSynthesis !== "undefined" && speechSynthesis.speaking);
@@ -161,10 +182,12 @@ export class StoryPlayer {
   private pose(f: StoryFrame, walking: boolean, dt: number): Pose {
     this.walkWeight += ((walking ? 1 : 0) - this.walkWeight) * Math.min(1, dt * 6);
     const lead = lerpPose(clipPose("idle", f.time), clipPose("march", f.time * 1.25), this.walkWeight);
-    if (f.act < 0) return lead;
+    // The clip runs on from showing it into doing it together.
+    const clipTime = f.act + f.demo;
+    if (clipTime < 0) return lead;
     const motion = movement(this.story.sequence.steps[f.step].movement).motion;
-    const acting = clipPose(motion, f.act);
-    let pose = lerpPose(lead, acting, Math.min(1, f.act / ACT_BLEND));
+    const acting = clipPose(motion, clipTime);
+    let pose = lerpPose(lead, acting, Math.min(1, clipTime / ACT_BLEND));
     if (f.praise > 0) pose = lerpPose(pose, restPose(), Math.min(1, f.praise / PRAISE_BLEND));
     return pose;
   }
@@ -173,11 +196,19 @@ export class StoryPlayer {
     const lines = this.story.lines[f.step];
     const at = (time: number) => f.prevLocal < time && f.local >= time;
     if (lines.situation && at(0.05)) this.events.onLine(lines.situation, "situation", f.step);
-    // Without a walk, the instruction follows the situation once it had time to be said.
-    const instructionAt = f.lead > 0 ? f.lead : lines.situation ? 2.6 : 0.05;
+    // Said while the guide shows the movement; without a walk, once the situation had time to be said.
+    const travel = f.lead - f.demo;
+    const instructionAt = travel > 0 ? travel : lines.situation ? 2.6 : 0.05;
     if (at(instructionAt)) this.events.onLine(lines.instruction, "instruction", f.step);
+    if (f.demo > 0 && at(f.lead)) this.events.onLine(lines.turn ?? "Jetzt du!", "turn", f.step);
     if (at(f.lead + f.actLength * 0.55)) this.events.onLine(lines.again, "again", f.step);
     if (at(f.lead + f.actLength + 0.1)) this.events.onLine(lines.praise, "praise", f.step);
+  }
+
+  private speakOpening(t: number) {
+    for (const line of this.story.opening?.lines ?? []) {
+      if (this.prevElapsed < line.at && t >= line.at) this.events.onLine(line.text, "opening", 0);
+    }
   }
 
   dispose() {

@@ -12,6 +12,7 @@ import {
   makeCrab,
   makeFlower,
   makePaddle,
+  PADDLE_REACH,
   makePalm,
   makeParrot,
   makeRock,
@@ -28,6 +29,12 @@ import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from 
 // a stone door and pulls the treasure chest ashore – then there is a party at
 // sunset. Every world reaction is timed to the guide's clip, so it happens
 // together with the child's movement.
+//
+// First a red dotted trail draws the way across the island to the chest, like
+// on a treasure map. Then, at every station, Tapsi first shows the movement
+// alone and the child joins in; meanwhile the camera looks at Tapsi from the
+// front (only the paddling is seen from behind, as if sitting in the canoe
+// too), so the whole body is big in the middle of the picture.
 //
 // Island layout along the path (x ≈ 0), from the sea at +z to the bay at -z:
 // beach 35 · brook 25.4 · swinging branch 16.5 · flowers 9.5 · coconuts 2.5 ·
@@ -261,6 +268,10 @@ function makeDoor() {
   const light = new THREE.PointLight("#ffd27a", 0, 14, 1.4);
   light.position.set(0, 2, -1.2);
   group.add(light);
+  // The spiral's light falls on whoever pushes, so it shows even with the door behind the camera.
+  const spiralLight = new THREE.PointLight("#7ff3ff", 0, 9, 1.4);
+  spiralLight.position.set(0, 1.8, 1.6);
+  group.add(spiralLight);
   return {
     group,
     /** k: 0 shut, 1 fully open (sunk into the ground); glow: 0..1 how bright the spiral is. */
@@ -269,6 +280,7 @@ function makeDoor() {
       spiralMat.emissiveIntensity = 0.4 + glowK * 3;
       (glow.material as THREE.MeshBasicMaterial).opacity = Math.max(glowK * 0.25, open);
       light.intensity = glowK * 6 + open * 30;
+      spiralLight.intensity = glowK * 9 * (1 - open);
     },
   };
 }
@@ -315,26 +327,91 @@ function makeRaft() {
   return group;
 }
 
+/** Water or ground at (x, z), whichever is higher: where the trail lies. */
+function surface(x: number, z: number) {
+  let y = Math.max(groundHeight(x, z), 0.02);
+  if (Math.abs(z - 25.4) < 1.8) y = Math.max(y, 0.44);
+  if (Math.hypot(x - LAGOON.x, z - LAGOON.y) < 7.8) y = Math.max(y, LAGOON_LEVEL + 0.02);
+  return y;
+}
+
+/**
+ * The way of the story as red dots, like on a treasure map: across the sea,
+ * along the path, through the door and over the bay to the chest. `show(k)`
+ * draws it up to k (0..1); `head(k)` is where the drawing has got to.
+ */
+function makeTrail() {
+  const points: THREE.Vector3[] = [];
+  for (let z = BOAT_START - 2.8; z > BOAT_END; z -= 3) points.push(v3(0, 0, z));
+  // Along the sandy path, straight through the door.
+  for (let z = BOAT_END; z > SHORE.z; z -= 2) points.push(v3(Math.abs(z - DOOR_Z) < 4 ? 0 : Math.sin(z * 0.2) * 0.5, 0, z));
+  points.push(v3(0, 0, SHORE.z), v3(RAFT_X * 0.6, 0, (SHORE.z + RAFT_FROM) / 2), v3(RAFT_X, 0, RAFT_FROM + 1.6));
+  const curve = new THREE.CatmullRomCurve3(points);
+  const count = Math.round(curve.getLength() / 0.9);
+  const dots = curve.getSpacedPoints(count);
+  for (const d of dots) d.y = surface(d.x, d.z) + 0.04;
+  const mesh = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.24, 0.24, 0.05, 14), new THREE.MeshBasicMaterial({ color: "#e8423f" }), dots.length);
+  const m = new THREE.Matrix4();
+  const q = new THREE.Quaternion();
+  const scale = new THREE.Vector3();
+  return {
+    mesh,
+    show(k: number) {
+      mesh.visible = k > 0;
+      if (!mesh.visible) return;
+      for (const [i, d] of dots.entries()) {
+        // Each dot pops up a little bigger when the drawing reaches it.
+        const s = clamp01((k * count - i) / 2);
+        scale.setScalar(smooth(s) * (1 + 0.6 * Math.sin(Math.PI * s)));
+        mesh.setMatrixAt(i, m.compose(d, q, scale));
+      }
+      mesh.instanceMatrix.needsUpdate = true;
+    },
+    head(k: number, out: THREE.Vector3) {
+      curve.getPointAt(clamp01(k), out);
+      out.y = surface(out.x, out.z);
+      return out;
+    },
+  };
+}
+
 /** Where things happen; z along the path. */
 const BOAT_START = 62;
 const BOAT_END = 35;
 const BROOK_FROM = 27.3;
 const BROOK_TO = 23.4;
 const SWING_Z = 16.5;
+/** The branch hangs behind Tapsi, so it never hides the front view, and swings over towards us. */
+const SWING_PIVOT_Z = SWING_Z - 1.9;
+/** Afterwards the branch stays hooked up high, out of the way. */
+const SWING_PARKED = -1.1;
 const FLOWERS_Z = 9.5;
 const COCONUT_Z = 2.5;
 const DOOR_Z = -9.9;
-const DOOR_GUIDE_Z = -8.5;
+/** Far enough from the door that the camera fits in between. */
+const DOOR_GUIDE_Z = -6.6;
 const SHORE = v3(0, 0, -21.8);
-const RAFT_X = 1.35;
+/** Where Tapsi stands in the canoe. */
+const CANOE_FLOOR = -0.08;
+const RAFT_X = 1.3;
 const RAFT_FROM = -35;
-const RAFT_TO = -23.5;
+/** Pulled up onto the beach, beside Tapsi. */
+const RAFT_TO = -22.9;
 
 /** The step indices of the sequence, by name. */
 const S = { hello: 0, paddle: 1, brook: 2, duck: 3, flowers: 4, coconuts: 5, door: 6, rope: 7, hooray: 8, party: 9, bye: 10 } as const;
 
-const LEAD = [0, 2, 5, 5, 5, 5, 6, 5, 0, 1, 1];
+/** Seconds of travel before each step: walking or paddling there, or the camera coming in. */
+const TRAVEL = [3, 2.5, 5, 5, 5, 5, 6, 5, 2, 1, 1];
+/** Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step. */
+const DEMO = [2.5, 2.8, 4, 3, 4, 3.4, 2.6, 3.6, 2, 2.5, 2];
+const LEAD = TRAVEL.map((t, i) => t + DEMO[i]);
 const PRAISE = 3;
+const OPENING = 16;
+/** In the opening: when the trail starts and reaches the chest, and the flash back to the canoe. */
+const TRAIL_FROM = 2;
+const TRAIL_TO = 11.5;
+const OPENING_CUT = 13.6;
 
 /** Where each walk ends: the guide's position when the step's movement starts. */
 const ARRIVE: Record<number, number> = {
@@ -345,11 +422,13 @@ const ARRIVE: Record<number, number> = {
   [S.door]: DOOR_GUIDE_Z,
 };
 
-/** Which way the guide looks during each movement (0 faces the sea, i.e. the camera on the path). */
-const ACT_YAW = [Math.PI, Math.PI - 0.5, Math.PI - 0.7, 0.45, 0, 0, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI];
+/** Which way the guide looks during each movement (0 faces the sea, π the island). */
+const ACT_YAW = [Math.PI, Math.PI, Math.PI, 0, 0, 0, Math.PI, Math.PI, Math.PI, Math.PI, Math.PI];
 
 /** Seconds of one paddle stroke cycle, as in the paddle clip. */
 const PADDLE_PERIOD = 2.8;
+/** How much more the paddle tips than the line between the hands. */
+const PADDLE_TILT = 1.3;
 const LEAN_PERIOD = 3.4;
 const PUSH_PERIOD = 2.6;
 const STONE_PERIOD = 2;
@@ -442,7 +521,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const z = 30 - i * 1.6;
     const side = i % 2 ? 1 : -1;
     const x = side * (2.6 + rnd() * 1.2);
-    if (Math.abs(z - 25.4) < 2.2 || Math.abs(z - SWING_Z) < 1.4) continue;
+    if (Math.abs(z - 25.4) < 2.2 || Math.abs(z - SWING_PIVOT_Z) < 1.4) continue;
     const bush = makeBush(0.6 + rnd() * 0.5, 700 + i);
     bush.position.set(x, groundHeight(x, z) - 0.05, z);
     scenery.add(bush);
@@ -470,7 +549,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   }
 
   const swing = makeSwing();
-  swing.group.position.set(0, groundHeight(0, SWING_Z + 1.9), SWING_Z + 1.9);
+  swing.group.position.set(0, groundHeight(0, SWING_PIVOT_Z), SWING_PIVOT_Z);
   scene.add(swing.group);
 
   const flowerSpots: [number, number, number, string][] = [
@@ -533,17 +612,29 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const spray = makeConfetti(240, ["#ffffff", "#d8f6ff", "#9fe4ff"], 0.9);
   const gold = makeConfetti(160, ["#ffd23f", "#ffcc33", "#fff1a8"], 1.4);
   scene.add(confetti.mesh, spray.mesh, gold.mesh);
+  const trail = makeTrail();
+  scene.add(trail.mesh);
 
   // --- Helpers -------------------------------------------------------------
   const focus = v3(0, 0, BOAT_START);
   const camPos = new THREE.Vector3();
   const camLook = new THREE.Vector3();
+  const fromPos = new THREE.Vector3();
+  const fromLook = new THREE.Vector3();
+  const midPos = new THREE.Vector3();
+  const midLook = new THREE.Vector3();
+  const spot = new THREE.Vector3();
   const tmpA = new THREE.Vector3();
   const tmpB = new THREE.Vector3();
+  const restQ = new THREE.Quaternion();
+  const heldQ = new THREE.Quaternion();
+  const basis = new THREE.Matrix4();
+  const bladeY = [1, 1];
   let sunsetDone = -1;
   let lastTime = 0;
+  let lastOpening = -1;
 
-  const actLength = (step: number) => sequence.steps[step].seconds - LEAD[step] - PRAISE;
+  const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL[step] - PRAISE;
 
   /** Boat position (z) at a moment of the story. */
   const boatZ = (step: number, act: number) => {
@@ -565,77 +656,147 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     return RAFT_FROM + (RAFT_TO - RAFT_FROM) * (k + Math.sin((act * TAU) / 0.9) * 0.01 * (1 - k));
   };
 
-  /** The camera of a step's movement: position and point looked at. */
-  function actShot(step: number, f: { local: number; act: number; time: number }, pos: THREE.Vector3, look: THREE.Vector3) {
+  /** How far the camera stands from Tapsi, so the whole body with the arms up fills most of the picture. */
+  const frameDistance = () => {
+    const cam = stage.camera;
+    const v = THREE.MathUtils.degToRad(cam.fov / 2);
+    const h = Math.atan(Math.tan(v) * cam.aspect);
+    return Math.max(1.15 / Math.tan(v), 0.95 / Math.tan(h));
+  };
+
+  /** Tapsi standing at `at` and facing `yaw`, seen from the front (or from behind), big in the middle. */
+  function portrait(at: THREE.Vector3, yaw: number, pos: THREE.Vector3, look: THREE.Vector3, behind = false, height = 1.0, far = 1) {
+    const d = frameDistance() * far;
+    const a = behind ? yaw + Math.PI : yaw;
+    pos.set(at.x + Math.sin(a) * d, at.y + (behind ? 1.45 : height), at.z + Math.cos(a) * d);
+    look.set(at.x, at.y + 0.8, at.z);
+  }
+
+  /** Where Tapsi stands while showing and doing a step's movement (smoothed while hopping). */
+  function actSpot(step: number, act: number, out: THREE.Vector3) {
+    if (step <= S.paddle) return out.set(0, CANOE_FLOOR, boatZ(step, act) + 0.4);
+    if (step === S.brook) {
+      const k = clamp01((act - STONE_HOP_START) / ((stoneCount + 1) * STONE_PERIOD));
+      return out.set(0, 0.45, BROOK_FROM + (BROOK_TO - BROOK_FROM) * smooth(k));
+    }
+    const z = step >= S.rope ? SHORE.z : step === S.duck ? SWING_Z : ARRIVE[step];
+    return out.set(0, groundHeight(0, z), z);
+  }
+
+  /** The camera of a step from when Tapsi shows the movement until the praise: position and point looked at. */
+  function actShot(step: number, f: { local: number; act: number; praise: number; time: number }, pos: THREE.Vector3, look: THREE.Vector3) {
+    const at = actSpot(step, f.act, spot);
     switch (step) {
-      case S.hello: {
-        const k = smooth((f.local - 0.5) / 6);
-        // Low over the water, so Kiki on the flag stays above the fox's head.
-        pos.set(14, 9, BOAT_START + 14).lerp(tmpA.set(0.6, 1.3, BOAT_START - 5.2), k);
-        look.set(0, 2, 25).lerp(tmpA.set(0, 1.15, BOAT_START), k);
+      case S.paddle:
+        // From behind, as if sitting in the canoe too: left and right are the child's left and right.
+        portrait(at, ACT_YAW[step], pos, look, true);
         return;
-      }
-      case S.paddle: {
-        // From ahead, so the fox paddles towards us (and we towards it).
-        const z = boatZ(step, f.act);
-        pos.set(3.2, 1.9, z - 4.2);
-        look.set(0, 1.0, z + 0.4);
-        return;
-      }
-      case S.brook:
-        pos.set(4.3, 1.9, 25.3);
-        look.set(0, 0.9, 25.2);
-        return;
-      // On the island the heights are above the ground where the fox stands.
       case S.duck: {
-        const dip = f.act > 0 && f.act < actLength(step) ? duckDepth(f.act) : 0;
-        const ground = groundHeight(0, SWING_Z);
-        pos.set(0.15, ground + 1.35 - dip * 0.55, SWING_Z + 3.8);
-        look.set(0, ground + 1.05 - dip * 0.3, SWING_Z);
-        return;
-      }
-      case S.flowers: {
-        const ground = groundHeight(0, FLOWERS_Z);
-        pos.set(0, ground + 1.75, FLOWERS_Z + 4.7);
-        look.set(0, ground + 1.55, FLOWERS_Z - 1.3);
-        return;
-      }
-      case S.coconuts: {
-        const ground = groundHeight(0, COCONUT_Z);
-        pos.set(0, ground + 1.5, COCONUT_Z + 4.1);
-        look.set(0, ground + 1.0, COCONUT_Z - 2.5);
+        // The camera ducks along, so the branch sweeps over us too.
+        const t = f.act + DEMO[step];
+        const dip = t > 0 && f.act < actLength(step) ? duckDepth(t) : 0;
+        portrait(at, ACT_YAW[step], pos, look);
+        pos.y -= dip * 0.55;
+        look.y -= dip * 0.3;
         return;
       }
       case S.door: {
-        const ground = groundHeight(0, DOOR_GUIDE_Z);
-        pos.set(3.3, ground + 1.9, DOOR_GUIDE_Z + 3.6);
-        look.set(0, ground + 1.6, DOOR_Z + 0.4);
+        // In front of the door, so Tapsi pushes towards us; once it is open, round behind Tapsi to see it sink away.
+        portrait(at, ACT_YAW[step], pos, look);
+        const reveal = smooth(f.praise / 1.6);
+        if (reveal > 0) {
+          tmpA.set(0.7, at.y + 2.1, at.z + 2.8);
+          tmpB.set(0, at.y + 1.6, DOOR_Z);
+          orbitBlend(at, pos, look, tmpA, tmpB, reveal, pos, look);
+        }
         return;
       }
       case S.rope: {
-        // Behind the raft, so the chest comes along towards the fox.
-        pos.set(RAFT_X - 0.6, 2.4, raftAt(step, f.act) - 4.2);
-        look.set(0.6, 1.0, SHORE.z - 0.4);
+        // A little higher, so the chest shows when it arrives; then back to see it beside Tapsi.
+        portrait(at, ACT_YAW[step], pos, look, false, 1.5, 1.1);
+        const reveal = smooth(f.praise / 1.6);
+        tmpA.set(at.x - 0.5, at.y + 1.9, at.z - 4.2);
+        tmpB.set(at.x + 0.4, at.y + 0.6, at.z - 0.5);
+        pos.lerp(tmpA, reveal);
+        look.lerp(tmpB, reveal);
         return;
       }
       case S.hooray:
-        pos.set(-2.3, 2.1, SHORE.z - 6.6);
-        look.set(0.6, 1.2, SHORE.z - 0.8);
+        // Further back: the open chest in front, Tapsi cheering in the middle.
+        pos.set(at.x - 0.5, at.y + 1.9, at.z - 4.2);
+        look.set(at.x + 0.4, at.y + 0.6, at.z - 0.5);
         return;
-      case S.party: {
-        const a = -0.35 + f.local * 0.045;
-        pos.set(Math.sin(a) * 6.4, 2.0, SHORE.z - Math.cos(a) * 6.4);
-        look.set(0.4, 1.0, SHORE.z - 0.5);
+      case S.party:
+        // Slowly a little to and fro, the crabs dancing around.
+        portrait(at, ACT_YAW[step] + Math.sin(f.local * 0.35) * 0.3, pos, look, false, 1.1, 1.15);
+        return;
+      case S.bye: {
+        // At the end the camera rises and flies back to show the whole island at sunset.
+        portrait(at, ACT_YAW[step], pos, look, false, 1.1, 1.15);
+        const k = smooth((f.act - actLength(step) + 1.5) / 7);
+        pos.lerp(tmpA.set(-12, 21, SHORE.z - 26), k);
+        look.lerp(tmpA.set(0, 2, 2), k);
         return;
       }
-      default: {
-        // Goodbye: the camera rises and flies back to show the whole island at sunset.
-        const k = smooth((f.local - 2) / 9);
-        const a = -0.35 + (sequence.steps[S.party].seconds + f.local) * 0.045;
-        pos.set(Math.sin(a) * 6.4, 2.0, SHORE.z - Math.cos(a) * 6.4).lerp(tmpA.set(-12, 21, SHORE.z - 26), k);
-        look.set(0.4, 1.0, SHORE.z - 0.5).lerp(tmpA.set(0, 2, 2), k);
-      }
+      default:
+        portrait(at, ACT_YAW[step], pos, look);
     }
+  }
+
+  /**
+   * Blends two camera shots by going round `center` (Tapsi) instead of
+   * straight through: from behind to the front the camera circles past.
+   */
+  function orbitBlend(center: THREE.Vector3, aPos: THREE.Vector3, aLook: THREE.Vector3, bPos: THREE.Vector3, bLook: THREE.Vector3, k: number, pos: THREE.Vector3, look: THREE.Vector3) {
+    const ax = aPos.x - center.x;
+    const az = aPos.z - center.z;
+    const bx = bPos.x - center.x;
+    const bz = bPos.z - center.z;
+    const from = Math.atan2(ax, az);
+    let turn = Math.atan2(bx, bz) - from;
+    turn -= Math.round(turn / TAU) * TAU;
+    // Nearly opposite: always the same way round, so it never flips between frames.
+    if (Math.abs(turn) > Math.PI - 0.25) turn = Math.abs(turn);
+    const a = from + turn * k;
+    const r = Math.hypot(ax, az) + (Math.hypot(bx, bz) - Math.hypot(ax, az)) * k;
+    const y = aPos.y + (bPos.y - aPos.y) * k;
+    look.lerpVectors(aLook, bLook, k);
+    pos.set(center.x + Math.sin(a) * r, y, center.z + Math.cos(a) * r);
+  }
+
+  /** The camera in the opening: the island from above the sea, then along the trail to the chest; after the cut, above the canoe. */
+  function openingShot(t: number, pos: THREE.Vector3, look: THREE.Vector3) {
+    if (t >= OPENING_CUT) {
+      const k = smooth((t - OPENING_CUT) / (OPENING - OPENING_CUT));
+      pos.set(4, 5.5 - k * 1.2, BOAT_START + 7 - k);
+      look.set(0, 1, BOAT_START);
+      return;
+    }
+    const head = trail.head(trailAt(t), tmpA);
+    // High up like over a map, so the drawn part of the trail shows; closer once it has reached the chest.
+    const near = 1 - 0.45 * smooth((t - TRAIL_TO) / 2);
+    const into = smooth((t - 1) / 2.5);
+    pos.set(12, 30, BOAT_START + 24).lerp(tmpB.set(head.x + 2 * near, head.y + 22 * near, head.z + 16 * near), into);
+    look.set(0, 0, 12).lerp(tmpB.set(head.x, head.y, head.z - 2), into);
+  }
+
+  /** How far the trail is drawn at a moment of the opening, 0..1. */
+  const trailAt = (t: number) => smooth((t - TRAIL_FROM) / (TRAIL_TO - TRAIL_FROM));
+
+  /** Which step's place the trail is passing in the opening. */
+  function pointingAt(t: number) {
+    if (t >= OPENING_CUT) return undefined;
+    if (t < TRAIL_FROM) return S.hello;
+    const z = trail.head(trailAt(t), tmpA).z;
+    const places: [number, number][] = [
+      [S.rope, SHORE.z + 1],
+      [S.door, DOOR_Z + 2],
+      [S.coconuts, COCONUT_Z + 2],
+      [S.flowers, FLOWERS_Z + 2],
+      [S.duck, SWING_Z + 2],
+      [S.brook, BROOK_FROM + 2],
+    ];
+    return places.find(([, at]) => z < at)?.[0] ?? S.paddle;
   }
 
   /** The guide's place and facing during a step. */
@@ -647,22 +808,22 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     let y: number | null = null;
     let yaw = ACT_YAW[step];
     const walkStart = (from: number, to: number, startAt = 0.3) => {
-      const end = f.lead - 0.5;
+      const end = f.lead - f.demo - 0.5;
       const k = clamp01((f.local - startAt) / (end - startAt));
       walking = f.local > startAt && f.local < end;
       z = from + (to - from) * k;
-      // Face the way it walks, then turn to the act's direction.
-      const turn = smooth((f.local - (end - 0.2)) / 0.8);
+      // Face the way it walks, then turn to the act's direction before showing it.
+      const turn = smooth((f.local - (end - 0.6)) / 0.8);
       yaw = Math.PI + (ACT_YAW[step] - Math.PI) * turn;
     };
 
     if (step <= S.paddle) {
       const bz = boatZ(step, f.act);
       z = bz + 0.4;
-      y = 0.02 + Math.sin(f.time * 1.3) * 0.03;
-      if (step === S.paddle && f.local < 1.2) yaw = Math.PI + (ACT_YAW[S.paddle] - Math.PI) * smooth(f.local / 1.2);
+      // Standing on the floor of the canoe, low enough for the paddle to reach the water.
+      y = CANOE_FLOOR + Math.sin(f.time * 1.3) * 0.03;
     } else if (step === S.brook) {
-      if (f.act < 0) {
+      if (f.act < -f.demo) {
         // Hop out of the canoe, then walk to the brook.
         if (f.local < 1) {
           const k = smooth(f.local);
@@ -717,28 +878,41 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       canoe.position.y = 0.05;
       canoe.rotation.set(0.04, 0.15, 0.06);
     }
-    const holding = step === S.paddle && f.local > 0.8;
-    if (holding) {
+    // The paddle lies flat across the canoe in front of Tapsi, who takes it up
+    // in both hands when showing how to paddle and puts it back down after.
+    canoe.updateMatrixWorld(true);
+    const restPos = canoe.localToWorld(tmpA.set(0, 0.47, 0.05));
+    basis.extractRotation(canoe.matrixWorld);
+    restQ.setFromRotationMatrix(basis.multiply(new THREE.Matrix4().makeBasis(v3(0, 0, 1), v3(1, 0, 0), v3(0, 1, 0))));
+    const hold = step === S.paddle && f.opening === null ? smooth((act + f.demo) / 0.7) * (1 - smooth(f.praise / 0.9)) : 0;
+    if (hold > 0) {
       guide.root.updateMatrixWorld(true);
-      guide.handL.getWorldPosition(tmpA);
-      guide.handR.getWorldPosition(tmpB);
-      const upper = tmpA.y > tmpB.y ? tmpA : tmpB;
-      const lower = upper === tmpA ? tmpB : tmpA;
-      paddle.position.copy(upper).add(lower).multiplyScalar(0.5);
-      paddle.quaternion.setFromUnitVectors(v3(0, 1, 0), upper.clone().sub(lower).normalize());
+      const left = guide.handL.getWorldPosition(new THREE.Vector3());
+      const right = guide.handR.getWorldPosition(new THREE.Vector3());
+      // The shaft runs from hand to hand; tipped a little more than the hands, so the low blade reaches the water.
+      const along = left.clone().sub(right);
+      const flat = Math.hypot(along.x, along.z);
+      const tilt = Math.atan2(along.y, flat) * PADDLE_TILT;
+      const shaft = v3((along.x / flat) * Math.cos(tilt), Math.sin(tilt), (along.z / flat) * Math.cos(tilt));
+      // The blades face the way the canoe goes.
+      const ahead = v3(Math.sin(guide.root.rotation.y), 0, Math.cos(guide.root.rotation.y));
+      ahead.addScaledVector(shaft, -ahead.dot(shaft)).normalize();
+      heldQ.setFromRotationMatrix(basis.makeBasis(new THREE.Vector3().crossVectors(shaft, ahead), shaft, ahead));
+      paddle.position.lerpVectors(restPos, left.add(right).multiplyScalar(0.5), hold);
+      paddle.quaternion.slerpQuaternions(restQ, heldQ, hold);
     } else {
-      paddle.position.set(0.25, canoe.position.y + 0.45, bz + 1.2);
-      paddle.rotation.set(Math.PI / 2, 0, 0.3);
+      paddle.position.copy(restPos);
+      paddle.quaternion.copy(restQ);
     }
-    if (step === S.paddle && inAct) {
-      // A splash at each stroke, on the side the blade dips in.
-      for (let n = 0; n < 12; n++) {
-        const at = LEAD[S.paddle] + 0.35 * PADDLE_PERIOD + n * (PADDLE_PERIOD / 2);
-        if (crossed(f, at)) {
-          spray.burst(v3(n % 2 ? -0.9 : 0.9, 0.1, bz - 0.4), 22, 3);
-          cue("splash");
-        }
+    // A splash whenever a blade dips into the water.
+    paddle.updateMatrixWorld(true);
+    for (const [i, end] of [1, -1].entries()) {
+      const tip = paddle.localToWorld(tmpB.set(0, end * (PADDLE_REACH - 0.15), 0));
+      if (hold > 0.9 && bladeY[i] >= 0.12 && tip.y < 0.12) {
+        spray.burst(v3(tip.x, 0.1, tip.z), 22, 3);
+        cue("splash");
       }
+      bladeY[i] = tip.y;
     }
 
     // Brook: a splash whenever the fox lands on a stone.
@@ -752,12 +926,15 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
     for (const [i, stone] of stones.entries()) stone.position.y = 0.42 + Math.sin(time * 2 + i) * 0.01;
 
-    // The swinging branch: one pass for every duck of the clip.
+    // The swinging branch: one pass over Tapsi for every duck of the clip; then it swings up and stays there.
     let swingAngle = Math.sin(time * 0.8) * 0.05;
     if (step === S.duck && act > -1.5) {
       const amp = 0.77 * smooth((act + 1.5) / 1.5) * (1 - smooth((act - len) / 2.5));
       swingAngle = amp * Math.cos((act / 6) * TAU);
+      swingAngle += (SWING_PARKED - swingAngle) * smooth((act - len - 0.5) / 2);
       for (let n = 0; n < 5; n++) if (crossed(f, LEAD[S.duck] + 0.9 + n * 3)) cue("whoosh");
+    } else if (step > S.duck) {
+      swingAngle = SWING_PARKED + Math.sin(time * 0.8) * 0.03;
     }
     swing.pivot.rotation.x = -swingAngle;
 
@@ -816,16 +993,18 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
     raft.position.set(RAFT_X, LAGOON_LEVEL + Math.sin(time * 1.4) * 0.03, raftZ);
     raft.rotation.z = Math.sin(time * 1.1) * 0.03;
-    raft.visible = step >= S.door;
+    // In the opening the chest waits far out in the bay, at the end of the trail.
+    raft.visible = step >= S.door || f.opening !== null;
     let lid = step > S.hooray ? 1 : 0;
     if (step === S.hooray) {
-      lid = smooth((act - 0.6) / 1.2);
-      if (crossed(f, LEAD[S.hooray] + 0.8)) cue("chime");
+      // It opens first, then Tapsi cheers.
+      lid = smooth((f.local - 0.6) / 1.2);
+      if (crossed(f, 0.8)) cue("chime");
     }
     chest.open(lid);
-    if (step === S.hooray && act > 0.6) {
-      for (let n = 0; n < 8; n++) {
-        if (crossed(f, LEAD[S.hooray] + 1.0 + n * 1.1)) {
+    if (step === S.hooray) {
+      for (let n = 0; n < 10; n++) {
+        if (crossed(f, 1.0 + n * 1.1)) {
           raft.updateMatrixWorld(true);
           gold.burst(chest.group.getWorldPosition(tmpA).add(v3(0, 0.9, 0)), 18, 4.5);
           confetti.burst(tmpA.add(v3(-1, 0.6, 0.5)), 30, 5);
@@ -872,9 +1051,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
     }
 
-    // Kiki: on the canoe's flag, on the chest at the party, otherwise flying around the fox.
+    // Kiki: on the chest at the party, otherwise flying around the fox.
     const g = guide.root.position;
-    const perch = step <= S.paddle ? v3(0, canoe.position.y + 1.6, bz + 2.0) : step >= S.hooray ? chest.group.getWorldPosition(new THREE.Vector3()).add(v3(0, 1.0, 0)) : null;
+    const perch = step >= S.hooray ? chest.group.getWorldPosition(new THREE.Vector3()).add(v3(0, 1.0, 0)) : null;
     const fly = v3(g.x + Math.cos(time * 1.1) * 1.1, g.y + 2.3 + Math.sin(time * 2.3) * 0.2, g.z + Math.sin(time * 1.1) * 0.8);
     let flying = true;
     if (perch) {
@@ -883,8 +1062,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       flying = settle < 0.95;
       if (step === S.party) parrot.group.position.y += Math.abs(Math.sin(time * 6)) * 0.12;
     } else {
-      const leave = step === S.brook ? smooth(f.local / 1.5) : 1;
-      parrot.group.position.copy(v3(0, 1.6, BOAT_END + 2.0)).lerp(fly, leave);
+      parrot.group.position.copy(fly);
     }
     const face = flying ? Math.atan2(-Math.sin(time * 1.1), Math.cos(time * 1.1)) : Math.atan2(camPos.x - parrot.group.position.x, camPos.z - parrot.group.position.z);
     parrot.group.rotation.set(0, face, 0);
@@ -899,6 +1077,16 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       sunsetDone = band;
       stage.updateReflections();
     }
+
+    // The opening: the trail draws itself to the chest, which sparkles when it gets there.
+    const opening = f.opening ?? OPENING;
+    trail.show(opening < OPENING_CUT ? trailAt(opening) : 0);
+    if (lastOpening < TRAIL_TO + 0.2 && opening >= TRAIL_TO + 0.2 && opening < OPENING_CUT) {
+      raft.updateMatrixWorld(true);
+      gold.burst(chest.group.getWorldPosition(tmpA).add(v3(0, 0.9, 0)), 40, 5);
+      cue("chime");
+    }
+    lastOpening = opening;
 
     for (const [i, cloud] of clouds.entries()) cloud.position.x += Math.sin(i) * 0.002;
     sea.time.value = time;
@@ -915,28 +1103,34 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       const walking = placeGuide(f);
       updateWorld(f);
 
-      // Camera: follow the walk from behind, then glide to the movement's shot.
-      actShot(f.step, f, camPos, camLook);
-      if (f.step > 0 && !(f.step === S.rope && f.local >= 2.5)) {
+      // Camera: follow the walk from behind, then come round to Tapsi's front
+      // (behind, for paddling) before the movement is shown.
+      const g = guide.root.position;
+      const travel = f.lead - f.demo;
+      if (f.opening !== null) {
+        openingShot(f.opening, camPos, camLook);
+      } else if (f.step === S.hello) {
+        actShot(f.step, f, camPos, camLook);
+        openingShot(OPENING, fromPos, fromLook);
+        orbitBlend(g, fromPos, fromLook, camPos, camLook, smooth(f.local / travel), camPos, camLook);
+      } else if (f.step === S.rope && f.local >= 2.5) {
+        // After the flash, straight in front of Tapsi at the bay.
+        actShot(f.step, f, camPos, camLook);
+      } else {
+        actShot(f.step, f, camPos, camLook);
         const prev = f.step - 1;
-        const prevEnd = { local: sequence.steps[prev].seconds, act: actLength(prev) + PRAISE, time: f.time };
-        const fromPos = new THREE.Vector3();
-        const fromLook = new THREE.Vector3();
+        const prevEnd = { local: sequence.steps[prev].seconds + DEMO[prev], act: actLength(prev) + PRAISE, praise: PRAISE, time: f.time };
         actShot(prev, prevEnd, fromPos, fromLook);
-        const g = guide.root.position;
-        let midPos = fromPos;
-        let midLook = fromLook;
-        if (f.lead >= 4) {
+        midPos.copy(fromPos);
+        midLook.copy(fromLook);
+        if (travel >= 4) {
           // A chase camera behind the fox while it walks.
-          midPos = v3(g.x + 0.9, g.y + 2.4, g.z + 4.6);
-          midLook = v3(g.x, g.y + 1.0, g.z - 3);
-          const into = smooth(f.local / 1.3);
-          midPos = fromPos.clone().lerp(midPos, into);
-          midLook = fromLook.clone().lerp(midLook, into);
+          tmpA.set(g.x + 0.9, g.y + 2.4, g.z + 4.6);
+          tmpB.set(g.x, g.y + 1.0, g.z - 3);
+          orbitBlend(g, fromPos, fromLook, tmpA, tmpB, smooth(f.local / 1.3), midPos, midLook);
         }
-        const settle = f.lead >= 4 ? smooth((f.local - (f.lead - 1.6)) / 1.8) : smooth(f.local / 1.8);
-        camPos.lerpVectors(midPos, camPos, settle);
-        camLook.lerpVectors(midLook, camLook, settle);
+        const settle = travel >= 4 ? smooth((f.local - (travel - 1.6)) / 1.8) : smooth(f.local / Math.max(1.2, travel));
+        orbitBlend(g, midPos, midLook, camPos, camLook, settle, camPos, camLook);
       }
       // A gentle breathing of the camera, like it is held by hand.
       camPos.x += Math.sin(f.time * 0.6) * 0.03;
@@ -949,28 +1143,44 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
       focus.copy(guide.root.position);
 
-      const flash = f.step === S.rope ? Math.max(0, 1 - Math.abs(f.local - 2.5) / 0.9) : 0;
-      return { walking, flash };
+      const flash =
+        f.opening !== null
+          ? Math.max(0, 1 - Math.abs(f.opening - OPENING_CUT) / 0.6)
+          : f.step === S.rope
+            ? Math.max(0, 1 - Math.abs(f.local - 2.5) / 0.9)
+            : 0;
+      return { walking, flash, pointing: f.opening !== null ? pointingAt(f.opening) : undefined };
     },
   };
 }
 
 export const TREASURE_ISLAND: Story = {
   sequence,
+  opening: {
+    seconds: OPENING,
+    lines: [
+      { at: 0.4, text: "Schau mal – da hinten ist die Schatzinsel!" },
+      { at: 3.2, text: "Wir paddeln mit dem Kanu hinüber, hüpfen über den Bach …" },
+      { at: 7.4, text: "… und laufen durch den Dschungel bis zur Tür im Felsen." },
+      { at: 11, text: "Und dahinter liegt ein Schatz!" },
+      { at: 13.9, text: "Kommst du mit?" },
+    ],
+  },
   lead: LEAD,
+  demo: DEMO,
   praise: PRAISE,
   lines: [
-    { icon: "👋", situation: "Ahoi! Ich bin Tapsi. Und das ist Kiki, mein Papagei.", instruction: "Wink mal Hallo!", again: "Hallo, hallo!", praise: "Schön, dass du da bist!" },
-    { icon: "🛶", situation: "Da hinten ist die Schatzinsel!", instruction: "Paddel mit! Zur einen Seite – und zur anderen.", again: "Paddeln, paddeln – die Insel kommt näher!", praise: "Geschafft! Wir sind am Strand." },
-    { icon: "🪨", situation: "Oh, ein Bach! Da liegen Steine.", instruction: "Knie hoch – von Stein zu Stein!", again: "Hoch das Knie – platsch!", praise: "Super, trockene Füße!" },
-    { icon: "🌿", situation: "Huch, was schaukelt denn da?", instruction: "Der Ast kommt! Duck dich!", again: "Und nochmal ducken!", praise: "Puh, der Ast ist vorbei!" },
-    { icon: "🌸", situation: "Psst … die Blumen schlafen noch.", instruction: "Hände zusammen – und ganz weit auf!", again: "Langsam auf … und wieder zu.", praise: "Wie schön! Alle Blumen sind wach." },
-    { icon: "🥥", situation: "Da oben kullert etwas!", instruction: "Kokosnuss! Neig dich zur Seite!", again: "Und zur anderen Seite!", praise: "Alle Kokosnüsse sind vorbeigekullert." },
-    { icon: "🚪", situation: "Eine Tür im Felsen! Die ist aber schwer.", instruction: "Drück mit beiden Händen!", again: "Fest drücken – sie bewegt sich!", praise: "Die Tür ist offen!" },
-    { icon: "🪢", situation: "Da schwimmt die Schatztruhe!", instruction: "Zieh am Seil – Hand über Hand!", again: "Ziehen, ziehen – sie kommt!", praise: "Die Truhe ist da!" },
-    { icon: "🙌", instruction: "Arme hoch – Hurra!", again: "Hurra, ein Schatz!", praise: "So viel Gold!" },
-    { icon: "💃", situation: "Jetzt wird gefeiert!", instruction: "Schüttel dich – tanz mit!", again: "Die Krebse tanzen auch!", praise: "Was für eine Party!" },
-    { icon: "🌅", situation: "Die Sonne geht unter.", instruction: "Wink Tschüss!", again: "Tschüss, Kiki! Tschüss, Insel!", praise: "Danke fürs Mitmachen! Bis bald!" },
+    { icon: "👋", situation: "Ahoi! Ich bin Tapsi. Und das ist Kiki, mein Papagei.", instruction: "Ich winke dir mal Hallo!", turn: "Winkst du auch?", again: "Hallo, hallo!", praise: "Schön, dass du da bist!" },
+    { icon: "🛶", situation: "Los geht's – zur Schatzinsel!", instruction: "Schau: das Paddel rechts ins Wasser – und links.", turn: "Paddel mit!", again: "Paddeln, paddeln – die Insel kommt näher!", praise: "Geschafft! Wir sind am Strand." },
+    { icon: "🪨", situation: "Oh, ein Bach! Da liegen Steine.", instruction: "Schau: Knie ganz hoch – so!", turn: "Jetzt du – von Stein zu Stein!", again: "Hoch das Knie – platsch!", praise: "Super, trockene Füße!" },
+    { icon: "🌿", situation: "Huch, was schaukelt denn da?", instruction: "Wenn der Ast kommt, ducken wir uns – so!", turn: "Er kommt! Duck dich!", again: "Und nochmal ducken!", praise: "Puh, der Ast ist vorbei!" },
+    { icon: "🌸", situation: "Psst … die Blumen schlafen noch.", instruction: "Hände zusammen – und ganz weit auf. So!", turn: "Jetzt du – weck die Blumen!", again: "Langsam auf … und wieder zu.", praise: "Wie schön! Alle Blumen sind wach." },
+    { icon: "🥥", situation: "Da oben kullert etwas!", instruction: "Wir neigen uns zur Seite – so!", turn: "Kokosnuss! Neig dich mit!", again: "Und zur anderen Seite!", praise: "Alle Kokosnüsse sind vorbeigekullert." },
+    { icon: "🚪", situation: "Eine Tür im Felsen! Die ist aber schwer.", instruction: "Mit beiden Händen fest drücken – so!", turn: "Jetzt du – drück mit!", again: "Fest drücken – sie bewegt sich!", praise: "Die Tür ist offen!" },
+    { icon: "🪢", situation: "Da schwimmt die Schatztruhe!", instruction: "Hand über Hand am Seil ziehen – so!", turn: "Zieh mit!", again: "Ziehen, ziehen – sie kommt!", praise: "Die Truhe ist da!" },
+    { icon: "🙌", situation: "Oh! Was ist da drin?", instruction: "Gold! Arme hoch – Hurra!", turn: "Du auch – Hurra!", again: "Hurra, ein Schatz!", praise: "So viel Gold!" },
+    { icon: "💃", situation: "Jetzt wird gefeiert!", instruction: "Ich schüttel mich – so!", turn: "Tanz mit!", again: "Die Krebse tanzen auch!", praise: "Was für eine Party!" },
+    { icon: "🌅", situation: "Die Sonne geht unter.", instruction: "Ich winke Tschüss!", turn: "Winkst du mit?", again: "Tschüss, Kiki! Tschüss, Insel!", praise: "Danke fürs Mitmachen! Bis bald!" },
   ],
   build,
 };

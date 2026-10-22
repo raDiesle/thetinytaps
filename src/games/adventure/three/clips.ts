@@ -371,17 +371,19 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   paddle: (t, p) => {
-    const s = Math.sin(phase(t, 2.8) * TAU);
-    p.twist = s * 0.55;
-    p.lean = -s * 0.08;
-    p.bend = 0.2;
-    // One hand on top of the paddle, one low near the blade.
-    p.armL.raise = 1.2 + s * 0.6;
-    p.armR.raise = 1.2 - s * 0.6;
-    p.armL.spread = p.armR.spread = 0.1;
-    p.armL.elbow = 1.0 - s * 0.4;
-    p.armR.elbow = 1.0 + s * 0.4;
-    p.headYaw = s * 0.2;
+    // A double paddle in both hands: the first half of the loop the right blade
+    // pulls through the water from front to back, the second half the left one.
+    const k = phase(t, 2.8) * TAU;
+    const s = Math.sin(k);
+    p.twist = Math.cos(k) * 0.45;
+    p.lean = -s * 0.2;
+    p.bend = 0.15;
+    p.armL.raise = 1.15 + s * 0.5;
+    p.armR.raise = 1.15 - s * 0.5;
+    p.armL.spread = p.armR.spread = 0.25;
+    p.armL.elbow = 0.9 - s * 0.35;
+    p.armR.elbow = 0.9 + s * 0.35;
+    p.headYaw = -s * 0.15;
   },
 
   row: (t, p) => {

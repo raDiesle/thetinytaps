@@ -12,8 +12,10 @@ export interface StepLines {
   icon: string;
   /** At the start of the step, while walking there. */
   situation?: string;
-  /** When the movement starts. */
+  /** When the guide starts to show the movement. */
   instruction: string;
+  /** When the child joins in, after the guide showed it once. */
+  turn?: string;
   /** Halfway through, to keep going. */
   again: string;
   /** At the end. */
@@ -27,14 +29,18 @@ export interface StoryFrame {
   local: number;
   /** `local` one frame ago, to find events in between. */
   prevLocal: number;
-  /** Walking or travelling before the movement. */
+  /** Seconds before the movement: travelling there, then showing it once. */
   lead: number;
+  /** The last part of `lead`, in which the guide shows the movement alone. */
+  demo: number;
   /** Since the movement began (negative while still travelling). */
   act: number;
   /** How long the movement lasts. */
   actLength: number;
   /** Since the praise began (negative before). */
   praise: number;
+  /** Seconds into the opening while it runs (the step is then 0 at its start), else null. */
+  opening: number | null;
   /** Seconds since the story began, for idle motion like waves. */
   time: number;
   dt: number;
@@ -45,6 +51,8 @@ export interface FrameResult {
   walking: boolean;
   /** White flash over the picture, 0..1, to jump to another place. */
   flash: number;
+  /** During the opening: the step whose place the map is showing. */
+  pointing?: number;
 }
 
 export interface StoryWorld {
@@ -60,8 +68,12 @@ export type Cue = "splash" | "whoosh" | "rumble" | "chime" | "sparkle" | "pop" |
 export interface Story {
   sequence: Sequence;
   lines: StepLines[];
-  /** Seconds of travel before each step's movement. */
+  /** Before the first step: what the story is about, e.g. the way on a map. */
+  opening?: { seconds: number; lines: { at: number; text: string }[] };
+  /** Seconds before each step's movement: travel, then showing it (`demo`). */
   lead: number[];
+  /** Seconds the guide shows each movement alone before the child joins in. */
+  demo: number[];
   /** Seconds of praise at the end of each step. */
   praise: number;
   build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld;

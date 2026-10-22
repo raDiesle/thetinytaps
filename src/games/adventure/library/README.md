@@ -82,6 +82,10 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 | `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
 | `farm_morning` | 9 | 153 s | r r m l m l m r m |
 
+Die 3D-Geschichte der Schatzinsel dauert länger als die 186 s der Tabelle, etwa 3:55. Vorher
+zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (16 s). Danach macht
+Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung).
+
 Alle beginnen ruhig, und nach jeder lebhaften Bewegung kommt bald eine ruhige. `space_trip`
 und `underwater_dive` enden lebhaft. Wenn die Geschichte vor dem Schlafen läuft, sollte dort
 noch ein ruhiger Abschied dazukommen.
@@ -102,6 +106,11 @@ noch ein ruhiger Abschied dazukommen.
   bisher nur beim Winken (`wave_hello`) zum Ausprobieren. Sie zeigt eine Vorderansicht. Bei
   Bewegungen nach vorn (ducken, drücken, paddeln) sieht man von vorn wenig Tiefe, und die Figur
   bräuchte dort wohl einen leicht schrägen Blick.
+- **Kamera von vorn.** Während Tapsi eine Bewegung vormacht und das Kind mitmacht, steht die
+  Kamera vor Tapsi, und Tapsi ist groß in der Mitte. Nur beim Paddeln sieht man Tapsi von
+  hinten, wie aus dem Kanu. Bei der Tür und beim Seil liegt das, worauf Tapsi zugeht, deshalb
+  hinter der Kamera: Die Tür zeigt sich nur durch ihr Licht auf Tapsi, die Truhe erst am Ende.
+  Ob Kinder das verstehen, ist noch offen.
 - **Clips nur teilweise angeschaut.** Im Browser geprüft sind die 10 Clips der Schatzinsel
   (`wave`, `paddle`, `high_knees`, `duck`, `bloom`, `lean_side`, `push_forward`, `pull_rope`,
   `cheer`, `shake`). Die übrigen 57 sind programmiert und typgeprüft, aber noch nicht angesehen.

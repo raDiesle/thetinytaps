@@ -40,8 +40,8 @@ const smooth = (k: number) => {
   return c * c * (3 - 2 * c);
 };
 
-/** How much the outline shows: it comes in just before the movement and goes with the praise. */
-const outlineShown = (f: StoryFrame) => smooth((f.act + 0.8) / 0.8) * (1 - smooth(f.praise / 0.8));
+/** How much the outline shows: it comes in when Tapsi starts to show the movement and goes with the praise. */
+const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (1 - smooth(f.praise / 0.8));
 
 /**
  * A 3D movement story: the fox Tapsi shows each movement and the child does
@@ -55,6 +55,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
   const flashRef = useRef<HTMLDivElement>(null);
   const outlineRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(0);
+  const [pointing, setPointing] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
   const [ended, setEnded] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -79,6 +80,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
             // A new step starts fresh; within a step, lines wait for each other.
             speak(text, speechLang, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
           },
+          onPointing: setPointing,
           onStep(at) {
             setStep(at);
             setEnded(false);
@@ -167,7 +169,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       <div ref={outlineRef} className="adventure-outline" aria-hidden />
       <ol className="adventure-route" aria-label={story.sequence.title}>
         {story.sequence.steps.map((s, i) => (
-          <li key={i} className={i < step ? "done" : i === step ? "now" : ""} title={movement(s.movement).name}>
+          <li key={i} className={pointing !== null ? (i === pointing ? "now" : "") : i < step ? "done" : i === step ? "now" : ""} title={movement(s.movement).name}>
             {story.lines[i].icon}
           </li>
         ))}
