@@ -431,8 +431,9 @@ export class Guide {
       body: body / dt,
       head: Math.max(head, body * 0.8) / dt,
     };
+    this.contour.setTime(time);
     for (const part of CONTOUR_PARTS) {
-      const target = THREE.MathUtils.smoothstep(speed[part], 0.35, 1.4);
+      const target = THREE.MathUtils.smoothstep(speed[part], 0.25, 1.0);
       const now = this.activity[part];
       // Comes on quickly, fades slowly, so it stays on through the pauses of a movement.
       this.activity[part] = now + (target - now) * Math.min(1, dt * (target > now ? 8 : 1.2));
