@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent, type PointerEventHandle
 import { Picture } from "@/components/Picture";
 import type { Countable, LetterEntry, WordEntry } from "@/content/types";
 import type { LettersSettings } from "./settings";
+import { LivingLetter } from "./LivingLetter";
 import { TraceGlyphs } from "./TraceGlyphs";
 
 /** Item counts per row, arranged so small numbers are easy to count at a glance. */
@@ -57,9 +58,13 @@ export function LetterCard({
         <LetterFamily letter={letter} />
       ) : (
         <div className="glyphs">
-          {glyphs.map((g) => (
-            <span key={g}>{g}</span>
-          ))}
+          {glyphs.map((g) =>
+            settings.livingLetters && g === letter.upper ? (
+              <LivingLetter key={g} glyph={g} sounds={settings.sounds} />
+            ) : (
+              <span key={g}>{g}</span>
+            ),
+          )}
         </div>
       )}
       <div onPointerDown={onPicturePointerDown}>

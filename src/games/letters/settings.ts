@@ -19,6 +19,8 @@ export interface LettersSettings {
   letterCase: LetterCase;
   /** With "A a": the big letter holds the small one by the hand, both with eyes. */
   letterFamily: boolean;
+  /** The capital turns into its animal for a moment: S slithers as a snake, M gets mouse ears. */
+  livingLetters: boolean;
   /** The letter as big dots to trace with a finger or the mouse; stars appear along the way. */
   trace: boolean;
   /** Show the word under the picture, with its first letter highlighted. */
@@ -47,6 +49,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   hints: true,
   letterCase: "upper",
   letterFamily: true,
+  livingLetters: true,
   trace: false,
   showWord: true,
   speech: false,
