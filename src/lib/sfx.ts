@@ -600,3 +600,15 @@ export function playMusicbox() {
     note({ from: PENTATONIC[step] * 4, duration: 0.25, type: "sine", volume: 0.025, delay: i * 0.3 });
   });
 }
+
+/** "Tschu-tschu, tüüt!" – a train rolls in: rhythmic chuffs that slow down, then its two-tone horn. */
+export function playTrain() {
+  [0, 0.2, 0.42, 0.68].forEach((delay, i) => hiss({ from: 1100, to: 650, duration: 0.15, volume: 0.28 - i * 0.04, delay, q: 1.2 }));
+  [370, 466].forEach((from, i) => note({ from, duration: 0.7, type: "triangle", volume: i ? 0.12 : 0.16, delay: 1 }));
+}
+
+/** "Wuuuusch!" – a jet takes off: a deep roar that swells and rushes higher and higher. */
+export function playJet() {
+  hiss({ from: 350, to: 2600, duration: 1.8, volume: 0.3, q: 0.7 });
+  note({ from: 80, to: 150, duration: 1.6, type: "sawtooth", volume: 0.12, lowpass: 500 });
+}

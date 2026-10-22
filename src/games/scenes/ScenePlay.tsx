@@ -69,6 +69,8 @@ import {
   playYawn,
   playMusicbox,
   playLullaby,
+  playTrain,
+  playJet,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -145,6 +147,8 @@ const SOUNDS: Record<SceneSound, () => void> = {
   crackle: playCrackle,
   yawn: playYawn,
   musicbox: playMusicbox,
+  train: playTrain,
+  jet: playJet,
 };
 
 /** Key presses closer together than this only spawn shapes. */
