@@ -108,6 +108,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       setFailed(true);
       return;
     }
+    player.highlight = settings.glow;
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
     if (!import.meta.env.PROD) Object.assign(window, { __adventure: player });

@@ -11,6 +11,8 @@ export interface AdventureSettings {
   pace: AdventurePace;
   /** A glowing outline of a child shows the movement next to the fox. */
   outline: boolean;
+  /** The fox's moving arms, legs or body get a glowing outline. */
+  glow: boolean;
 }
 
 export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
@@ -19,6 +21,7 @@ export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
   sounds: true,
   pace: "normal",
   outline: true,
+  glow: true,
 };
 
 export const ADVENTURE_SETTINGS_KEY = "tinytaps.adventure.v1";
