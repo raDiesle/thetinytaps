@@ -1,7 +1,6 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
-import { nth } from "../shared";
+import { nth, sparklePath } from "../shared";
 import { ROCKET } from "./layout";
-import { sparklePath } from "./parts";
 
 // Deep blue space with tiny stars and a soft purple haze; at the horizon the moon's grey hills,
 // and the moon itself runs from the hazy back to the light front. Craters, pebbles, rover tracks

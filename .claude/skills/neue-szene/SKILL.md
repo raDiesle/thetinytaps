@@ -102,6 +102,11 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   184 × 264 units before depth scaling, pumpkin ≈ 220 × 116, egg ≈ 108 × 80). Leave
   out what doesn't fit the place (no snow indoors, no pumpkin if the scene has one);
   `weather: true` only outdoors. Check every season with the "Jahreszeit" setting.
+- Roads to other pictures (optional): a vehicle can drive into another scene
+  (`ROADS` in `roads.ts`: `from`, `item`, `to`, the free ground spot `park` where it
+  stands as a guest there, and the way the drawing `faces`); add the scene's
+  phrases to `PLACES` ("in den Wald", "aus dem Wald", "im Wald"). Pick the park
+  spot where it covers little, and check its arrival in the browser.
 - New sound? Add it to `SceneSound` (types.ts), `src/lib/sfx.ts` (built on
   `note()`) and the `SOUNDS` map in `ScenePlay.tsx`.
 

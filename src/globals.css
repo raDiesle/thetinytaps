@@ -2318,6 +2318,85 @@ kbd {
   }
 }
 
+/* Idea B-19: a vehicle drives out of the picture (into another one) and comes back in from behind itself. */
+.scene-drive.out {
+  animation: scene-drive-out var(--drive-ms) ease-in forwards;
+}
+
+.scene-drive.gone {
+  transform: translateX(var(--drive-dx));
+  visibility: hidden;
+}
+
+.scene-drive.in {
+  animation: scene-drive-in var(--drive-ms) ease-out both;
+}
+
+/* Nobody taps it on the way. */
+.scene-drive.out,
+.scene-drive.in {
+  pointer-events: none;
+}
+
+@keyframes scene-drive-out {
+  to {
+    transform: translateX(var(--drive-dx));
+  }
+}
+
+@keyframes scene-drive-in {
+  from {
+    transform: translateX(var(--drive-dx));
+  }
+}
+
+/* Where it drove off: a bubble with the vehicle and an arrow out of the picture; tapping it follows. */
+.scene-exit {
+  cursor: pointer;
+}
+
+.scene-exit-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: exit-pop 0.4s ease-out both, exit-pulse 1.6s 0.4s ease-in-out infinite;
+}
+
+.calm .scene-exit-pulse {
+  animation: exit-pop 0.4s ease-out both;
+}
+
+.scene-exit-bubble {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 5;
+}
+
+.scene-exit-arrow {
+  fill: var(--accent);
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+
+.scene-exit-emoji {
+  font-family: var(--font-emoji);
+  font-size: 34px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+@keyframes exit-pop {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes exit-pulse {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
 .scene-prompt,
 .find-question {
   position: absolute;

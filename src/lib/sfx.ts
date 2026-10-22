@@ -502,6 +502,26 @@ export function playCuckoo() {
   });
 }
 
+/** "Hihihi!" – a child giggling: quick little notes that hop and fall. */
+export function playGiggle() {
+  [0, 0.13, 0.26, 0.39, 0.52].forEach((delay, i) =>
+    note({ from: 880 - i * 40, to: 1180 - i * 50, duration: 0.09, type: "triangle", volume: 0.16, delay }),
+  );
+}
+
+/** "Quietsch, quietsch!" – a swing's chain creaking forward and back. */
+export function playCreak() {
+  [0, 0.6].forEach((delay) => {
+    note({ from: 520, to: 880, duration: 0.22, type: "sawtooth", volume: 0.05, lowpass: 1800, delay });
+    note({ from: 820, to: 560, duration: 0.2, type: "sawtooth", volume: 0.04, lowpass: 1800, delay: delay + 0.24 });
+  });
+}
+
+/** "Rauschel" – wind in the leaves of a tree: soft high noise swelling and fading. */
+export function playLeaves() {
+  [0, 0.35, 0.7].forEach((delay, i) => hiss({ from: 2600 + i * 400, to: 3600, duration: 0.6, volume: 0.1, delay, q: 0.8 }));
+}
+
 /** "Ding!" – a small bright bell that rings out. */
 export function playDing() {
   note({ from: 1568, duration: 1.3, type: "sine", volume: 0.22 });

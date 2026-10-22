@@ -1,5 +1,5 @@
-import { CHEEK, Eye, INK, nth } from "../shared";
-import { Dust, Lid, Sparkles, heartPath, starPath } from "./parts";
+import { CHEEK, Eye, INK, heartPath, nth } from "../shared";
+import { Dust, Lid, Sparkles, starPath } from "./parts";
 
 // Who lives on the moon: the green alien, the alien baby, the space flower, the moon rabbit and
 // the mouse in the cheese. Each drawing has its foot point at (0, 0) and is placed with `ground`.

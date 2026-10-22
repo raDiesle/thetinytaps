@@ -74,6 +74,13 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
                 onChange={(goal) => update({ goal })}
               />
             )}
+            {settings.mode === "explore" && (
+              <Toggle
+                label="Fahrzeuge fahren in andere Bilder – am Rand antippen und mitfahren"
+                checked={settings.roads}
+                onChange={(roads) => update({ roads })}
+              />
+            )}
             {questMode && (
               <Toggle
                 label="Tipp zeigen, wenn es länger dauert"
@@ -129,7 +136,8 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
         </>
       }
     >
-      <ScenePlay scene={scene} settings={settings} speechLang={pack.speechLang} />
+      {/* A new picture (a vehicle was followed into it) starts afresh. */}
+      <ScenePlay key={scene.id} scene={scene} settings={settings} speechLang={pack.speechLang} />
     </GameShell>
   );
 }

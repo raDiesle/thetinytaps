@@ -14,6 +14,10 @@
   background: #ffe9c7;
 }
 
+.marble-play:has([aria-label="Große Maschine"]) {
+  background: #fff1d0;
+}
+
 .marble-svg {
   display: block;
   width: 100%;

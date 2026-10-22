@@ -43,6 +43,8 @@ export interface ScenesSettings {
   showKeys: boolean;
   /** Seasonal extras in the picture: by the calendar, a fixed season or none. */
   season: SeasonSetting;
+  /** Explore mode: some vehicles drive into other pictures, and a sign at the edge follows them (see roads.ts). */
+  roads: boolean;
 }
 
 export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
@@ -57,6 +59,7 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   ambient: false,
   showKeys: true,
   season: "auto",
+  roads: true,
 };
 
 // v2: speech is off and the picture stands still by default now, so old saved settings start fresh.

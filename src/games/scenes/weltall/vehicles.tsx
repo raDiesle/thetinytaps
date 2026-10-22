@@ -1,5 +1,5 @@
-import { INK, Pane, STEEL, nth } from "../shared";
-import { Dust, Helmet, SUIT, sparklePath } from "./parts";
+import { INK, Pane, STEEL, nth, sparklePath } from "../shared";
+import { Dust, Helmet, SUIT } from "./parts";
 
 // Everything with wheels or a motor on the moon: digger, rover, robot and robot dog. Each
 // drawing has its foot point at (0, 0) and is placed with `ground`.
