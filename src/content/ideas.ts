@@ -135,6 +135,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Buchstaben verwandeln sich kurz in ihr Wort-Tier: S schlängelt als Schlange, M wird zu Mäuseohren, O rollt als Ball. Als SVG-Animation pro Buchstabe.",
         why: "Merkhilfe über die Form – sehr einprägsam.",
         effort: "L",
+        done: true,
       },
       {
         id: "L-11",

@@ -455,6 +455,11 @@ function hiss({ from, to = from, duration, volume, delay = 0, q = 1 }: { from: n
   source.stop(start + duration);
 }
 
+/** "Ssssss!" – a snake hissing, twice. */
+export function playHiss() {
+  [0, 0.55].forEach((delay) => hiss({ from: 5200, to: 4200, duration: 0.45, volume: 0.14, delay, q: 1.4 }));
+}
+
 /** "Wuuusch!" – the toilet flushes: rushing water that swirls down, and a gurgle at the end. */
 export function playFlush() {
   hiss({ from: 500, to: 1600, duration: 0.7, volume: 0.35, q: 0.8 });
