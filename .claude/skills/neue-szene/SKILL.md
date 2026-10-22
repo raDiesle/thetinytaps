@@ -61,7 +61,7 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   id: "traktor",                 // CSS class item-traktor, unique, ascii
   name: "der Traktor",           // with article
   sentences: ["Der Traktor tuckert los!", "Der Traktor ist rot."], // short, toddler German
-  sound: "engine",               // SceneSound, synthesized in src/lib/sfx.ts
+  sound: "engine",               // SceneSound: recording in src/lib/sounds/ or synthesized in src/lib/sfx.ts
   traits: ["red", "wheels"],     // for "Was ist rot?", "Was hat Räder?" – only clear cases
   key: "T",                      // optional wished key (big items: first letter)
   box: [x, y, w, h],             // bounds in the drawing's own coordinates
@@ -108,7 +108,10 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   phrases to `PLACES` ("in den Wald", "aus dem Wald", "im Wald"). Pick the park
   spot where it covers little, and check its arrival in the browser.
 - New sound? Add it to `SceneSound` (types.ts), `src/lib/sfx.ts` (built on
-  `note()`) and the `SOUNDS` map in `ScenePlay.tsx`.
+  `note()`) and the `SOUNDS` map in `ScenePlay.tsx`. For a real recording, put
+  `src/lib/sounds/<sound>.mp3` next to it (CC0 only, source in that folder's
+  `README.md`); the scene plays it instead of the synthesized one. Recordings
+  are specific (a real dog barks like a dog), so check every item with that sound.
 
 ## Drawing style
 
