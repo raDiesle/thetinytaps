@@ -562,3 +562,27 @@ export function playSizzle() {
   hiss({ from: 5000, to: 4200, duration: 1.3, volume: 0.12, q: 0.7 });
   for (let i = 0; i < 9; i++) note({ from: 2600 + (i % 3) * 400, to: 1800, duration: 0.03, type: "triangle", volume: 0.07, delay: 0.1 + i * 0.13 + (i % 2) * 0.04 });
 }
+
+/** "Knirsch, knirsch" – footsteps or a shovel in fresh snow: short, dry, muffled crunches. */
+export function playCrunch() {
+  for (let i = 0; i < 4; i++) {
+    hiss({ from: 1800, to: 900, duration: 0.14, volume: 0.22, delay: i * 0.32, q: 0.8 });
+    hiss({ from: 3600, duration: 0.06, volume: 0.08, delay: i * 0.32 + 0.03, q: 2 });
+  }
+}
+
+/** "Kling-kling" – sleigh bells jingling in a quick rhythm over the swish of the runners. */
+export function playSleigh() {
+  hiss({ from: 2500, to: 1200, duration: 1.4, volume: 0.06, q: 0.6 });
+  for (let i = 0; i < 8; i++) {
+    const delay = i * 0.17;
+    note({ from: 2350, to: 2300, duration: 0.12, type: "sine", volume: 0.09, delay });
+    note({ from: 3140, to: 3100, duration: 0.1, type: "triangle", volume: 0.04, delay: delay + 0.02 });
+  }
+}
+
+/** "Knister, knack" – a fire crackling: small random pops over a soft roar. */
+export function playCrackle() {
+  hiss({ from: 400, to: 250, duration: 1.4, volume: 0.1, q: 0.5 });
+  for (let i = 0; i < 10; i++) hiss({ from: 2000 + Math.random() * 3000, duration: 0.03, volume: 0.2, delay: Math.random() * 1.3, q: 3 });
+}
