@@ -1,0 +1,1520 @@
+/* Animations of the Flughafen & Bahnhof scene. Durations match durationMs in Flughafen.tsx. Sun and cloud: ../sky.css. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .fh-cloud {
+  animation: fh-drift 26s ease-in-out infinite alternate;
+}
+
+.scene.lively .fh-cloud-slow {
+  animation-duration: 40s;
+}
+
+.scene.lively .fh-heli-rotor {
+  animation: fh-rotor 0.2s linear infinite alternate;
+}
+
+.scene.lively .fh-blimp-prop {
+  animation: fh-prop 0.2s linear infinite alternate;
+}
+
+.scene.lively .fh-turm-radar {
+  animation: fh-radar 2.4s ease-in-out infinite;
+}
+
+.scene.lively .fh-sack-sock {
+  animation: fh-flutter 1.6s ease-in-out infinite alternate;
+}
+
+.scene.lively .fh-hund-tail {
+  animation: fh-wag 0.6s ease-in-out infinite alternate;
+}
+
+/* Lights, puffs, notes and sound lines are hidden until their animation shows them, and can't be tapped meanwhile. */
+.fh-flug-puffs circle,
+.fh-blimp-hearts path,
+.fh-turm-waves path,
+.fh-turm-glow,
+.fh-hangar-lamp,
+.fh-sack-wind path,
+.fh-licht-glow,
+.fh-licht-lamp,
+.fh-lok-beam,
+.fh-lok-spark,
+.fh-lok-lamp,
+.fh-lok-toot path,
+.fh-wagen-lamp,
+.fh-speise-steam circle,
+.fh-signal-redoff,
+.fh-signal-glow,
+.fh-signal-green,
+.fh-uhr-ring path,
+.fh-spatz-notes path,
+.fh-tafel-waves path,
+.fh-auto-screen,
+.fh-auto-btn,
+.fh-auto-ticket,
+.fh-schaffner-cheeks,
+.fh-schaffner-whistle,
+.fh-schaffner-toot path,
+.fh-kind-zoom path,
+.fh-pilotin-sparkle path,
+.fh-katze-meow,
+.fh-hund-bark,
+.fh-hund-tongue,
+.fh-treppe-glow,
+.fh-treppe-light,
+.fh-treppe-guest,
+.fh-tank-drops ellipse,
+.fh-follow-glow,
+.fh-follow-light,
+.fh-follow-signlight,
+.fh-follow-beam,
+.fh-bus-blink,
+.fh-bus-toot path,
+.fh-taxi-signlight,
+.fh-taxi-toot path,
+.fh-gzug-glow,
+.fh-gzug-light {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Parts that turn or grow around their own middle. */
+.fh-flug-puffs circle,
+.fh-blimp-hearts path,
+.fh-turm-waves path,
+.fh-turm-glow,
+.fh-hangar-lamp,
+.fh-sack-wind path,
+.fh-licht-glow,
+.fh-lok-beam,
+.fh-lok-spark,
+.fh-lok-toot path,
+.fh-wagen-lamp,
+.fh-speise-steam circle,
+.fh-speise-pancake,
+.fh-signal-glow,
+.fh-uhr-ring path,
+.fh-spatz-notes path,
+.fh-tafel-waves path,
+.fh-auto-btn,
+.fh-schaffner-cheeks,
+.fh-schaffner-whistle,
+.fh-schaffner-toot path,
+.fh-kind-zoom path,
+.fh-pilotin-sparkle path,
+.fh-katze-meow,
+.fh-hund-bark,
+.fh-hund-tongue,
+.fh-treppe-glow,
+.fh-treppe-guest,
+.fh-tank-drops ellipse,
+.fh-follow-glow,
+.fh-follow-beam,
+.fh-bus-toot path,
+.fh-taxi-toot path,
+.fh-gzug-glow,
+.fh-hase-nose,
+.fh-taube-crumbs circle,
+.fh-gzug-case,
+.fh-kuli-case,
+.item-flugzeug .scene-shadow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Suitcases hop on their bottom edge. */
+.fh-gzug-case,
+.fh-kuli-case {
+  transform-origin: center bottom;
+}
+
+/* The locomotive's pantograph is folded down until the train gets going. */
+.fh-lok-panto {
+  transform: scaleY(0.55);
+}
+
+/* ---------- Shared keyframes ---------- */
+
+@keyframes fh-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes fh-rotor {
+  to {
+    transform: scaleX(0.15);
+  }
+}
+
+@keyframes fh-prop {
+  to {
+    transform: scaleY(0.15);
+  }
+}
+
+@keyframes fh-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes fh-radar {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes fh-flutter {
+  from {
+    transform: rotate(4deg) scaleY(0.9);
+  }
+  to {
+    transform: rotate(-4deg) scaleY(1.05);
+  }
+}
+
+@keyframes fh-wag {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+/* A light that goes on and stays on for most of the animation. */
+@keyframes fh-light {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+}
+
+/* A glow that grows and fades. */
+@keyframes fh-glow {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.3);
+  }
+}
+
+/* A light that flashes; used with several repeats. */
+@keyframes fh-blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* A visible light that dims and comes back; used with several repeats. */
+@keyframes fh-dim {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* Sound lines, notes and hearts: pop up, grow and fade. */
+@keyframes fh-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30%,
+  70% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+/* A puff of exhaust or steam that rises and grows. */
+@keyframes fh-puff {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-30px, -40px) scale(1.6);
+  }
+}
+
+@keyframes fh-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.5);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(1.2);
+  }
+}
+
+@keyframes fh-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-26px);
+  }
+  55% {
+    transform: translateY(0) scale(1.04, 0.96);
+  }
+}
+
+@keyframes fh-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes fh-nod {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  30% {
+    transform: rotate(-8deg);
+  }
+  65% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes fh-wave {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25%,
+  75% {
+    transform: rotate(-24deg);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+}
+
+/* A door that swings open on its hinge and closes again. */
+@keyframes fh-door {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  20%,
+  75% {
+    transform: scaleX(0.12);
+  }
+}
+
+/* ---------- Flugzeug: rolls off, takes off into the sky and lands again ---------- */
+
+.item-flugzeug.playing .fh-flug-body {
+  animation: fh-takeoff 4s ease-in-out;
+}
+
+.item-flugzeug.playing .fh-flug-gear {
+  animation: fh-gear 4s ease-in-out;
+}
+
+.item-flugzeug.playing .fh-wheel {
+  animation: fh-spin 0.4s linear 3;
+}
+
+.item-flugzeug.playing .fh-flug-puffs circle {
+  animation: fh-puff 0.7s ease-out calc(var(--i) * 0.18s) 3;
+}
+
+.item-flugzeug.playing .fh-flug-guest {
+  animation: fh-bob 0.5s ease-in-out calc(1.2s + var(--i) * 0.15s) 3;
+}
+
+.item-flugzeug.playing .fh-flug-rudder {
+  animation: fh-nod 1s ease-in-out 1s 2;
+}
+
+.item-flugzeug.playing .fh-flug-blink,
+.item-flugzeug.playing .fh-flug-beacon {
+  animation: fh-dim 0.5s linear 8;
+}
+
+.item-flugzeug.playing .scene-shadow {
+  animation: fh-shadow 4s ease-in-out;
+}
+
+@keyframes fh-takeoff {
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+  22% {
+    transform: translateX(170px);
+  }
+  42% {
+    transform: translate(420px, -190px) rotate(-12deg);
+    opacity: 1;
+  }
+  54% {
+    transform: translate(560px, -320px) rotate(-14deg) scale(0.7);
+    opacity: 0;
+  }
+  56% {
+    transform: translate(-520px, -260px) rotate(8deg) scale(0.7);
+    opacity: 0;
+  }
+  66% {
+    transform: translate(-380px, -170px) rotate(9deg) scale(0.85);
+    opacity: 1;
+  }
+  88% {
+    transform: translate(-50px, -8px) rotate(2deg);
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes fh-gear {
+  0%,
+  30% {
+    transform: none;
+  }
+  38%,
+  72% {
+    transform: scaleY(0);
+  }
+  80%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes fh-shadow {
+  0%,
+  20%,
+  100% {
+    transform: scale(1);
+  }
+  45%,
+  80% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* ---------- Hubschrauber: the rotor whirls, it bobs and tips its nose ---------- */
+
+.item-hubschrauber.playing .fh-heli-rotor {
+  animation: fh-rotor 0.1s linear 26;
+}
+
+.item-hubschrauber.playing .fh-heli-tail {
+  animation: fh-prop 0.1s linear 26;
+}
+
+.item-hubschrauber.playing .fh-heli-body {
+  animation: fh-heli 2.6s ease-in-out;
+}
+
+.item-hubschrauber.playing .fh-heli-pilot {
+  animation: fh-nod 0.8s ease-in-out 0.4s 2;
+}
+
+.item-hubschrauber.playing .fh-heli-light {
+  animation: fh-dim 0.4s linear 6;
+}
+
+@keyframes fh-heli {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translate(-20px, -30px) rotate(-6deg);
+  }
+  50% {
+    transform: translate(-40px, -16px) rotate(-3deg);
+  }
+  75% {
+    transform: translate(-16px, -28px) rotate(4deg);
+  }
+}
+
+/* ---------- Luftschiff: bobs, its propeller turns and the people wave ---------- */
+
+.item-luftschiff.playing .fh-blimp-body {
+  animation: fh-blimp 2.6s ease-in-out;
+}
+
+.item-luftschiff.playing .fh-blimp-prop {
+  animation: fh-prop 0.1s linear 26;
+}
+
+.item-luftschiff.playing .fh-blimp-fin {
+  animation: fh-nod 1.3s ease-in-out 2;
+}
+
+.item-luftschiff.playing .fh-blimp-guest {
+  animation: fh-bob 0.5s ease-in-out calc(var(--i) * 0.2s) 4;
+}
+
+.item-luftschiff.playing .fh-blimp-hearts path {
+  animation: fh-rise 1.2s ease-out calc(0.6s + var(--i) * 0.4s);
+}
+
+@keyframes fh-blimp {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translate(-30px, -14px) rotate(-3deg);
+  }
+  65% {
+    transform: translate(-50px, 6px) rotate(2deg);
+  }
+}
+
+/* ---------- Tower: radar turns, light blinks, the controller waves, the door opens ---------- */
+
+.item-tower.playing .fh-turm-radar {
+  animation: fh-radar 0.65s ease-in-out 4;
+}
+
+.item-tower.playing .fh-turm-light {
+  animation: fh-dim 0.4s linear 6;
+}
+
+.item-tower.playing .fh-turm-glow {
+  animation: fh-glow 0.8s ease-in-out 3;
+}
+
+.item-tower.playing .fh-turm-waves path {
+  animation: fh-pop 0.9s ease-out calc(var(--i) * 0.2s) 2;
+}
+
+.item-tower.playing .fh-turm-door {
+  animation: fh-door 2.6s ease-in-out;
+}
+
+.item-tower.playing .fh-turm-lotse {
+  animation: fh-nod 1.2s ease-in-out 2;
+}
+
+.item-tower.playing .fh-turm-arm {
+  animation: fh-wave 1.2s ease-in-out 0.2s 2;
+}
+
+/* ---------- Lichter: light up one after the other ---------- */
+
+.item-lichter.playing .fh-licht-lamp {
+  animation: fh-light 1.4s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-lichter.playing .fh-licht-glow {
+  animation: fh-glow 1s ease-in-out calc(var(--i) * 0.15s) 1;
+}
+
+/* ---------- Windsack: fills with wind and flutters ---------- */
+
+.item-windsack.playing .fh-sack-sock {
+  animation: fh-sock 0.55s ease-in-out 4;
+}
+
+.item-windsack.playing .fh-sack-wind path {
+  animation: fh-wind 1s ease-out calc(var(--i) * 0.25s) 2;
+}
+
+@keyframes fh-sock {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: rotate(-8deg) scaleY(1.15);
+  }
+  70% {
+    transform: rotate(6deg) scaleY(0.9) scaleX(1.05);
+  }
+}
+
+@keyframes fh-wind {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+}
+
+/* ---------- Hangar: the doors slide open, the little plane rolls forward ---------- */
+
+.item-hangar.playing .fh-hangar-door {
+  animation: fh-slide-l 2.8s ease-in-out;
+}
+
+.item-hangar.playing .fh-hangar-door-r {
+  animation-name: fh-slide-r;
+}
+
+.item-hangar.playing .fh-hangar-plane {
+  animation: fh-roll-out 2.8s ease-in-out;
+}
+
+.item-hangar.playing .fh-hangar-prop {
+  animation: fh-prop 0.08s linear 0.5s 26;
+}
+
+.item-hangar.playing .fh-hangar-lamp {
+  animation: fh-blink 0.5s linear 5;
+}
+
+@keyframes fh-slide-l {
+  0%,
+  100% {
+    transform: none;
+  }
+  25%,
+  75% {
+    transform: translateX(-118px) scaleX(0.15);
+  }
+}
+
+@keyframes fh-slide-r {
+  0%,
+  100% {
+    transform: none;
+  }
+  25%,
+  75% {
+    transform: translateX(118px) scaleX(0.15);
+  }
+}
+
+@keyframes fh-roll-out {
+  0%,
+  25%,
+  100% {
+    transform: none;
+  }
+  45%,
+  65% {
+    transform: translateY(14px) scale(1.18);
+  }
+}
+
+/* ---------- Hase: hops, twitches nose and ears ---------- */
+
+.item-hase.playing .fh-hase-body {
+  animation: fh-hop 0.9s ease-in-out 2;
+}
+
+.item-hase.playing .fh-hase-ear {
+  animation: fh-nod 0.45s ease-in-out 4;
+}
+
+.item-hase.playing .fh-hase-ear-r {
+  animation-delay: 0.1s;
+}
+
+.item-hase.playing .fh-hase-nose {
+  animation: fh-twitch 0.2s ease-in-out 8;
+}
+
+@keyframes fh-twitch {
+  50% {
+    transform: scale(1.4, 0.8);
+  }
+}
+
+/* ---------- Signal: red turns into green, then back ---------- */
+
+.item-signal.playing .fh-signal-redoff,
+.item-signal.playing .fh-signal-green {
+  animation: fh-light 2.4s ease-in-out;
+}
+
+.item-signal.playing .fh-signal-glow {
+  animation: fh-glow 0.8s ease-in-out 0.4s 2;
+}
+
+.item-signal.playing .fh-signal-sign {
+  animation: fh-nod 0.8s ease-in-out 3;
+}
+
+/* ---------- The train: every car rolls a little, its wheels turn ---------- */
+
+.item-lok.playing .fh-roll,
+.item-wagen.playing .fh-roll,
+.item-speisewagen.playing .fh-roll {
+  animation: fh-roll 2.4s ease-in-out;
+}
+
+.item-lok.playing .fh-wheel,
+.item-wagen.playing .fh-wheel,
+.item-speisewagen.playing .fh-wheel {
+  animation: fh-spin-back 0.6s linear 4;
+}
+
+@keyframes fh-roll {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-16px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-10px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes fh-spin-back {
+  to {
+    transform: rotate(-1turn);
+  }
+}
+
+/* Lok: the pantograph rises with a spark, the lights flash, the door opens, it toots. */
+
+.item-lok.playing .fh-lok-panto {
+  animation: fh-panto 2.8s ease-in-out;
+}
+
+.item-lok.playing .fh-lok-spark {
+  animation: fh-pop 0.5s ease-out 0.6s 2;
+}
+
+.item-lok.playing .fh-lok-beam {
+  animation: fh-glow 0.7s ease-in-out 3;
+}
+
+.item-lok.playing .fh-lok-lamp {
+  animation: fh-blink 0.5s linear 5;
+}
+
+.item-lok.playing .fh-lok-door {
+  animation: fh-door 2.6s ease-in-out;
+}
+
+.item-lok.playing .fh-lok-driver {
+  animation: fh-bob 0.6s ease-in-out 3;
+}
+
+.item-lok.playing .fh-lok-toot path {
+  animation: fh-pop 0.8s ease-out calc(1.4s + var(--i) * 0.15s);
+}
+
+@keyframes fh-panto {
+  0%,
+  100% {
+    transform: scaleY(0.55);
+  }
+  20%,
+  80% {
+    transform: scaleY(1);
+  }
+}
+
+/* Wagen: the door opens, the traveller waves, the people inside look out. */
+
+.item-wagen.playing .fh-wagen-door {
+  animation: fh-door 2.6s ease-in-out;
+}
+
+.item-wagen.playing .fh-wagen-wave {
+  animation: fh-wave 0.9s ease-in-out 0.5s 2;
+}
+
+.item-wagen.playing .fh-wagen-guest {
+  animation: fh-bob 0.5s ease-in-out calc(var(--i) * 0.15s) 4;
+}
+
+.item-wagen.playing .fh-wagen-lamp {
+  animation: fh-light 2.4s ease-in-out;
+}
+
+/* Speisewagen: the cook flips a pancake, the guests eat, the coffee steams. */
+
+.item-speisewagen.playing .fh-speise-cook {
+  animation: fh-bob 0.6s ease-in-out 4;
+}
+
+.item-speisewagen.playing .fh-speise-pancake {
+  animation: fh-flip 1.1s ease-in-out 0.2s 2;
+}
+
+.item-speisewagen.playing .fh-speise-guest {
+  animation: fh-nod 0.6s ease-in-out calc(var(--i) * 0.3s) 3;
+}
+
+.item-speisewagen.playing .fh-speise-steam circle {
+  animation: fh-rise 1s ease-out calc(var(--i) * 0.35s) 2;
+}
+
+@keyframes fh-flip {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(-34px) rotate(180deg);
+  }
+}
+
+/* ---------- Bahnhofsuhr: the hands race round once ---------- */
+
+.item-uhr.playing .fh-uhr-min {
+  animation: fh-spin 2s ease-in-out;
+}
+
+.item-uhr.playing .fh-uhr-hour {
+  animation: fh-spin 2.2s ease-in-out;
+}
+
+.item-uhr.playing .fh-uhr-sec {
+  animation: fh-spin 0.7s linear 3;
+}
+
+.item-uhr.playing .fh-uhr-head {
+  animation: fh-nod 1.2s ease-in-out 2;
+}
+
+.item-uhr.playing .fh-uhr-ring path {
+  animation: fh-pop 0.6s ease-out calc(var(--i) * 0.1s) 3;
+}
+
+/* ---------- Spatz: hops, flaps and chirps ---------- */
+
+.item-spatz.playing .fh-spatz-body {
+  animation: fh-hop 0.6s ease-in-out 3;
+}
+
+.item-spatz.playing .fh-spatz-wing {
+  animation: fh-flap 0.15s linear 12;
+}
+
+.item-spatz.playing .fh-spatz-notes path {
+  animation: fh-rise 1s ease-out calc(var(--i) * 0.4s) 1;
+}
+
+@keyframes fh-flap {
+  50% {
+    transform: rotate(-35deg);
+  }
+}
+
+/* ---------- Schaffner: lifts the signal disc and whistles ---------- */
+
+.item-schaffner.playing .fh-schaffner-kelle {
+  animation: fh-kelle 2.4s ease-in-out;
+}
+
+.item-schaffner.playing .fh-schaffner-body {
+  animation: fh-bob 0.6s ease-in-out 4;
+}
+
+.item-schaffner.playing .fh-schaffner-head {
+  animation: fh-nod 1.2s ease-in-out 2;
+}
+
+.item-schaffner.playing .fh-schaffner-cheeks,
+.item-schaffner.playing .fh-schaffner-whistle {
+  animation: fh-light 2.4s ease-in-out;
+}
+
+.item-schaffner.playing .fh-schaffner-toot path {
+  animation: fh-pop 0.6s ease-out calc(0.4s + var(--i) * 0.12s) 3;
+}
+
+.item-schaffner.playing .fh-schaffner-arm {
+  animation: fh-whistle-arm 2.4s ease-in-out;
+}
+
+@keyframes fh-kelle {
+  0%,
+  100% {
+    transform: none;
+  }
+  25%,
+  75% {
+    transform: rotate(140deg);
+  }
+  50% {
+    transform: rotate(125deg);
+  }
+}
+
+@keyframes fh-whistle-arm {
+  0%,
+  100% {
+    transform: none;
+  }
+  15%,
+  80% {
+    transform: rotate(-130deg);
+  }
+}
+
+/* ---------- Anzeigetafel: the flaps flip, a train runs across, ding dong ---------- */
+
+.item-tafel.playing .fh-tafel-row {
+  animation: fh-flap-row 0.4s ease-in-out calc(var(--i) * 0.15s) 4;
+}
+
+.item-tafel.playing .fh-tafel-train {
+  animation: fh-tafel-train 2.4s ease-in-out;
+}
+
+.item-tafel.playing .fh-tafel-waves path {
+  animation: fh-pop 0.7s ease-out calc(var(--i) * 0.15s) 3;
+}
+
+@keyframes fh-flap-row {
+  50% {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes fh-tafel-train {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateX(150px);
+  }
+}
+
+/* ---------- Reisende: lifts her hat, waves, the suitcase rolls ---------- */
+
+.item-reisende.playing .fh-reise-hat {
+  animation: fh-hat 2.2s ease-in-out;
+}
+
+.item-reisende.playing .fh-reise-arm {
+  animation: fh-wave 1s ease-in-out 0.2s 2;
+}
+
+.item-reisende.playing .fh-reise-case {
+  animation: fh-case 2.2s ease-in-out;
+}
+
+.item-reisende.playing .fh-reise-scarf {
+  animation: fh-nod 0.5s ease-in-out 4;
+}
+
+.item-reisende.playing .fh-reise-head {
+  animation: fh-nod 1.1s ease-in-out 2;
+}
+
+@keyframes fh-hat {
+  0%,
+  100% {
+    transform: none;
+  }
+  25%,
+  65% {
+    transform: translateY(-22px) rotate(-10deg);
+  }
+}
+
+@keyframes fh-case {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateX(16px) rotate(-3deg);
+  }
+  65% {
+    transform: translateX(-8px) rotate(2deg);
+  }
+}
+
+/* ---------- Fahrkartenautomat: screen, buttons and a ticket ---------- */
+
+.item-automat.playing .fh-auto-screen {
+  animation: fh-light 2.2s ease-in-out;
+}
+
+.item-automat.playing .fh-auto-btn {
+  animation: fh-blink 0.35s linear calc(var(--i) * 0.12s) 2;
+}
+
+.item-automat.playing .fh-auto-ticket {
+  animation: fh-ticket 2.2s ease-in-out;
+}
+
+@keyframes fh-ticket {
+  0%,
+  40% {
+    opacity: 0;
+    transform: translateY(-20px) scaleY(0.2);
+  }
+  60%,
+  85% {
+    opacity: 1;
+    transform: translateY(14px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* ---------- Treppenwagen: the stairs lift, someone waves at the top ---------- */
+
+.item-treppenwagen.playing .fh-treppe-stairs {
+  animation: fh-stairs 2.4s ease-in-out;
+}
+
+.item-treppenwagen.playing .fh-treppe-guest {
+  animation: fh-light 2.4s ease-in-out;
+}
+
+.item-treppenwagen.playing .fh-treppe-light {
+  animation: fh-blink 0.4s linear 6;
+}
+
+.item-treppenwagen.playing .fh-treppe-glow {
+  animation: fh-glow 0.8s ease-in-out 3;
+}
+
+.item-treppenwagen.playing .fh-wheel,
+.item-tankwagen.playing .fh-wheel,
+.item-followme.playing .fh-wheel,
+.item-gepaeckzug.playing .fh-wheel,
+.item-kofferkuli.playing .fh-wheel {
+  animation: fh-spin 0.6s linear 3;
+}
+
+.item-bus.playing .fh-wheel,
+.item-taxi.playing .fh-wheel {
+  animation: fh-spin-back 0.6s linear 3;
+}
+
+.item-treppenwagen.playing .fh-treppe-driver,
+.item-tankwagen.playing .fh-tank-driver,
+.item-followme.playing .fh-follow-driver,
+.item-bus.playing .fh-bus-driver,
+.item-taxi.playing .fh-taxi-driver,
+.item-gepaeckzug.playing .fh-gzug-driver {
+  animation: fh-bob 0.5s ease-in-out 3;
+}
+
+@keyframes fh-stairs {
+  0%,
+  100% {
+    transform: none;
+  }
+  30%,
+  75% {
+    transform: rotate(-9deg);
+  }
+}
+
+/* ---------- Tankwagen: hose unwinds, fuel drips, gauge swings ---------- */
+
+.item-tankwagen.playing .fh-tank-reel {
+  animation: fh-spin 1s ease-in-out 2;
+}
+
+.item-tankwagen.playing .fh-tank-hose {
+  animation: fh-hose 2.6s ease-in-out;
+}
+
+.item-tankwagen.playing .fh-tank-drops ellipse {
+  animation: fh-drop 0.6s ease-in calc(0.6s + var(--i) * 0.2s) 2;
+}
+
+.item-tankwagen.playing .fh-tank-needle {
+  animation: fh-needle 2.6s ease-in-out;
+}
+
+.item-tankwagen.playing .fh-tank-body {
+  animation: fh-shake 0.3s ease-in-out 4;
+}
+
+@keyframes fh-hose {
+  0%,
+  100% {
+    transform: none;
+  }
+  30%,
+  70% {
+    transform: rotate(14deg) scale(1.1);
+  }
+}
+
+@keyframes fh-drop {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+@keyframes fh-needle {
+  0%,
+  100% {
+    transform: none;
+  }
+  45%,
+  70% {
+    transform: rotate(95deg);
+  }
+}
+
+@keyframes fh-shake {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* ---------- Follow-me: the sign pops up and lights, it drives ahead and back ---------- */
+
+.item-followme.playing .fh-follow-body {
+  animation: fh-drive 2.4s ease-in-out;
+}
+
+.item-followme.playing .fh-follow-sign {
+  animation: fh-sign 2.4s ease-in-out;
+}
+
+.item-followme.playing .fh-follow-signlight {
+  animation: fh-blink 0.5s linear 4;
+}
+
+.item-followme.playing .fh-follow-light {
+  animation: fh-blink 0.4s linear 6;
+}
+
+.item-followme.playing .fh-follow-glow {
+  animation: fh-glow 0.8s ease-in-out 3;
+}
+
+.item-followme.playing .fh-follow-beam {
+  animation: fh-light 2.4s ease-in-out;
+}
+
+@keyframes fh-drive {
+  0%,
+  100% {
+    transform: none;
+  }
+  40%,
+  55% {
+    transform: translateX(34px);
+  }
+}
+
+@keyframes fh-sign {
+  0%,
+  100% {
+    transform: none;
+  }
+  20%,
+  80% {
+    transform: scale(1.15);
+  }
+  50% {
+    transform: scale(1.15) rotate(-4deg);
+  }
+}
+
+/* ---------- Bus: doors fold open, someone hops on, it toots ---------- */
+
+.item-bus.playing .fh-bus-body {
+  animation: fh-shake 0.4s ease-in-out 3;
+}
+
+.item-bus.playing .fh-bus-door {
+  animation: fh-door 2.4s ease-in-out;
+}
+
+.item-bus.playing .fh-bus-guest {
+  animation: fh-hop 0.8s ease-in-out 0.5s 2;
+}
+
+.item-bus.playing .fh-bus-passenger {
+  animation: fh-bob 0.5s ease-in-out calc(var(--i) * 0.15s) 4;
+}
+
+.item-bus.playing .fh-bus-blink {
+  animation: fh-blink 0.5s linear 4;
+}
+
+.item-bus.playing .fh-bus-toot path {
+  animation: fh-pop 0.5s ease-out calc(1.6s + var(--i) * 0.1s) 1;
+}
+
+/* ---------- Hütchen: wobbles and hops ---------- */
+
+.item-huetchen.playing .fh-huet-body {
+  animation: fh-wobble 1.6s ease-in-out;
+}
+
+@keyframes fh-wobble {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: rotate(-12deg);
+  }
+  40% {
+    transform: rotate(10deg) translateY(-14px);
+  }
+  60% {
+    transform: rotate(-6deg);
+  }
+  80% {
+    transform: rotate(3deg);
+  }
+}
+
+/* ---------- Einweiser: waves the paddles ---------- */
+
+.item-einweiser.playing .fh-einweiser-arm-l {
+  animation: fh-paddle-l 0.8s ease-in-out 3;
+}
+
+.item-einweiser.playing .fh-einweiser-arm-r {
+  animation: fh-paddle-r 0.8s ease-in-out 3;
+}
+
+.item-einweiser.playing .fh-einweiser-head {
+  animation: fh-nod 0.8s ease-in-out 3;
+}
+
+.item-einweiser.playing .fh-einweiser-body {
+  animation: fh-bob 0.4s ease-in-out 6;
+}
+
+@keyframes fh-paddle-l {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: rotate(-60deg);
+  }
+}
+
+@keyframes fh-paddle-r {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: rotate(60deg);
+  }
+}
+
+/* ---------- Taxi: sign lights, back door opens, passenger waves ---------- */
+
+.item-taxi.playing .fh-taxi-body {
+  animation: fh-shake 0.35s ease-in-out 3;
+}
+
+.item-taxi.playing .fh-taxi-signlight {
+  animation: fh-light 2.2s ease-in-out;
+}
+
+.item-taxi.playing .fh-taxi-door {
+  animation: fh-door 2.2s ease-in-out;
+}
+
+.item-taxi.playing .fh-taxi-guest {
+  animation: fh-bob 0.5s ease-in-out 0.4s 3;
+}
+
+.item-taxi.playing .fh-taxi-toot path {
+  animation: fh-pop 0.5s ease-out calc(var(--i) * 0.1s) 2;
+}
+
+/* ---------- Gepäckwagen: drives off and back, the suitcases hop ---------- */
+
+.item-gepaeckzug.playing .fh-gzug-body {
+  animation: fh-drive 2.4s ease-in-out;
+}
+
+.item-gepaeckzug.playing .fh-gzug-case {
+  animation: fh-case-hop 0.5s ease-in-out calc(var(--i) * 0.08s) 3;
+}
+
+.item-gepaeckzug.playing .fh-gzug-light {
+  animation: fh-blink 0.4s linear 6;
+}
+
+.item-gepaeckzug.playing .fh-gzug-glow {
+  animation: fh-glow 0.8s ease-in-out 3;
+}
+
+@keyframes fh-case-hop {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(-12px) rotate(-4deg);
+  }
+}
+
+/* ---------- Gepäckband: suitcases ride up the belt ---------- */
+
+.item-gepaeckband.playing .fh-band-case {
+  animation: fh-belt-case 2.4s linear;
+}
+
+.item-gepaeckband.playing .fh-band-belt {
+  animation: fh-belt 0.4s linear 6;
+}
+
+@keyframes fh-belt-case {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  80% {
+    opacity: 1;
+    transform: translateX(83px);
+  }
+  88% {
+    opacity: 0;
+    transform: translateX(96px);
+  }
+  89% {
+    opacity: 0;
+    transform: none;
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fh-belt {
+  to {
+    stroke-dashoffset: -22;
+  }
+}
+
+/* ---------- Kind: the toy plane flies round ---------- */
+
+.item-kind.playing .fh-kind-body {
+  animation: fh-hop 0.7s ease-in-out 0.2s 2;
+}
+
+.item-kind.playing .fh-kind-arm {
+  animation: fh-zoom 2s ease-in-out;
+}
+
+.item-kind.playing .fh-kind-zoom path {
+  animation: fh-pop 0.6s ease-out calc(var(--i) * 0.12s) 2;
+}
+
+.item-kind.playing .fh-kind-head {
+  animation: fh-nod 1s ease-in-out 2;
+}
+
+@keyframes fh-zoom {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: rotate(-30deg);
+  }
+  50% {
+    transform: rotate(12deg);
+  }
+  75% {
+    transform: rotate(-22deg);
+  }
+}
+
+/* ---------- Tauben: peck and flutter ---------- */
+
+.item-tauben.playing .fh-taube-bird {
+  animation: fh-hop 0.9s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+.item-tauben.playing .fh-taube-head {
+  animation: fh-peck 0.3s ease-in-out 5;
+}
+
+.item-tauben.playing .fh-taube-wing {
+  animation: fh-flap 0.15s linear 10;
+}
+
+.item-tauben.playing .fh-taube-crumbs circle {
+  animation: fh-crumb 0.5s ease-out calc(var(--i) * 0.15s) 2;
+}
+
+@keyframes fh-peck {
+  50% {
+    transform: rotate(32deg);
+  }
+}
+
+@keyframes fh-crumb {
+  50% {
+    transform: translateY(-8px) scale(0.6);
+  }
+}
+
+/* ---------- Kofferkuli: rocks, the suitcases wobble ---------- */
+
+.item-kofferkuli.playing .fh-kuli-body {
+  animation: fh-kuli 2s ease-in-out;
+}
+
+.item-kofferkuli.playing .fh-kuli-case {
+  animation: fh-case-hop 0.5s ease-in-out calc(var(--i) * 0.15s) 3;
+}
+
+@keyframes fh-kuli {
+  0%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translateX(14px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-10px) rotate(-2deg);
+  }
+}
+
+/* ---------- Katze: the box door opens, the cat peeks out and meows ---------- */
+
+.item-katze.playing .fh-katze-door {
+  animation: fh-door 1.8s ease-in-out;
+}
+
+.item-katze.playing .fh-katze-face {
+  animation: fh-peek 1.8s ease-in-out;
+}
+
+.item-katze.playing .fh-katze-meow {
+  animation: fh-pop 0.8s ease-out 0.6s;
+}
+
+@keyframes fh-peek {
+  0%,
+  100% {
+    transform: none;
+  }
+  30%,
+  70% {
+    transform: translateX(10px) scale(1.12);
+  }
+  50% {
+    transform: translateX(10px) scale(1.12) rotate(8deg);
+  }
+}
+
+/* ---------- Hund: jumps, wags, barks ---------- */
+
+.item-hund.playing .fh-hund-body {
+  animation: fh-hop 0.8s ease-in-out 2;
+}
+
+.item-hund.playing .fh-hund-tail {
+  animation: fh-wag 0.15s ease-in-out 10 alternate;
+}
+
+.item-hund.playing .fh-hund-head {
+  animation: fh-nod 0.8s ease-in-out 2;
+}
+
+.item-hund.playing .fh-hund-tongue {
+  animation: fh-light 1.6s ease-in-out;
+}
+
+.item-hund.playing .fh-hund-bark {
+  animation: fh-pop 0.5s ease-out 0.2s 2;
+}
+
+/* ---------- Pilotin: salutes, nods, her badge sparkles ---------- */
+
+.item-pilotin.playing .fh-pilotin-arm {
+  animation: fh-salute 2s ease-in-out;
+}
+
+.item-pilotin.playing .fh-pilotin-head {
+  animation: fh-nod 1s ease-in-out 2;
+}
+
+.item-pilotin.playing .fh-pilotin-badge {
+  animation: fh-twitch 0.4s ease-in-out 4;
+}
+
+.item-pilotin.playing .fh-pilotin-sparkle path {
+  animation: fh-pop 0.7s ease-out calc(0.4s + var(--i) * 0.3s);
+}
+
+.item-pilotin.playing .fh-pilotin-body {
+  animation: fh-bob 0.5s ease-in-out 4;
+}
+
+@keyframes fh-salute {
+  0%,
+  100% {
+    transform: none;
+  }
+  20%,
+  75% {
+    transform: rotate(-165deg);
+  }
+}
