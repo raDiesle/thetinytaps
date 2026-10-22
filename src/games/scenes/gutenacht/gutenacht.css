@@ -1,0 +1,1496 @@
+/* Animations of the Gute-Nacht scene. Durations match durationMs in GuteNacht.tsx.
+   This is a bedtime picture (Scene.bedtime): a tapped item gets the class `asleep` and keeps
+   it, and when all items sleep the scene gets the class `night`. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .gn-kuckuck-pendel {
+  animation: gn-pendulum 1.4s ease-in-out infinite;
+}
+
+.scene.lively .gn-decke {
+  animation: gn-breathe 4s ease-in-out infinite;
+}
+
+.scene.lively :where(.scene-item:not(.asleep)) .gn-fly {
+  animation: gn-fly-loop 4s ease-in-out calc(var(--i) * -1.3s) infinite;
+}
+
+.scene.lively :where(.scene-item:not(.asleep)) .gn-mobile-bar {
+  animation: gn-mobile-turn 6s ease-in-out infinite;
+}
+
+.scene.lively :where(.scene-item:not(.asleep)) .gn-katze-tail {
+  animation: gn-tail-swish 3s ease-in-out infinite;
+}
+
+.scene.lively :where(.scene-item:not(.asleep)) .gn-fisch {
+  animation: gn-fish-swim 6s ease-in-out infinite;
+}
+
+/* Parts that only show up in an animation (or once asleep); they can't be tapped meanwhile. */
+.gn-shut,
+.gn-yawn,
+.gn-zzz,
+.gn-notes > g,
+.gn-sparkles path,
+.gn-heart,
+.gn-bild-moon,
+.gn-kuckuck-bird,
+.gn-eule-hoot path,
+.gn-tisch-sock,
+.gn-wecker-tick > g,
+.gn-fisch-bubbles circle,
+.gn-zug-smoke circle,
+.gn-kreisel-swoosh path,
+.gn-ele-toot path,
+.gn-mama-kiss {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Glows never catch a tap; the hit areas do that. */
+.gn-on,
+.gn-nacht-halo,
+.gn-mond-halo,
+.gn-haus-light {
+  pointer-events: none;
+}
+
+.gn-yawn,
+.gn-zzz,
+.gn-notes > g,
+.gn-sparkles path,
+.gn-heart,
+.gn-fisch-bubbles circle,
+.gn-zug-smoke circle,
+.gn-kette-glow,
+.gn-schaf-puff,
+.gn-nacht-halo,
+.gn-mond-halo,
+.gn-mama-kiss {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Resting pose: the toy chest stands open, the toys peek out. */
+.gn-kiste-lid {
+  transform: rotate(28deg);
+}
+
+/* ---------- Falling asleep (all items) ---------- */
+
+/* Asleep: eyes shut, "z Z" shows, lights are out, colours a little dimmer. */
+.asleep .gn-open {
+  opacity: 0;
+}
+
+.asleep .gn-shut,
+.asleep .gn-zzz {
+  opacity: 1;
+}
+
+.asleep .gn-on,
+.asleep .gn-haus-light {
+  opacity: 0;
+}
+
+.scene-item.asleep {
+  --gn-dim: brightness(0.86) saturate(0.85);
+  filter: var(--gn-dim);
+}
+
+/* Tapped again while asleep: it wakes up for a moment, yawns, and falls asleep again. */
+.scene-item.asleep.playing {
+  animation: gn-wake 1.8s ease-in-out;
+}
+
+.asleep.playing .gn-open {
+  animation: gn-eyes-open 1.8s ease-in-out;
+}
+
+.asleep.playing .gn-shut {
+  animation: gn-eyes-shut 1.8s ease-in-out;
+}
+
+.asleep.playing .gn-zzz {
+  animation: gn-zzz-back 1.8s ease-out;
+}
+
+.asleep.playing .gn-on {
+  animation: gn-light-wake 1.8s ease-in-out;
+}
+
+.playing:not(.asleep) .gn-shut {
+  animation: gn-blink 1.8s linear;
+}
+
+.playing .gn-yawn {
+  animation: gn-yawn 1.8s ease-in-out;
+}
+
+/* ---------- Night: everything sleeps, the room goes dark ---------- */
+
+.gn-room {
+  transition: filter 3s ease-in-out;
+}
+
+.scene.night .gn-room {
+  filter: brightness(0.42) saturate(0.7);
+}
+
+.scene.night {
+  background: linear-gradient(#3b3561 50%, #4d3f3f 50%);
+}
+
+.scene.night .scene-item {
+  --gn-dim: brightness(0.5) saturate(0.7);
+  filter: var(--gn-dim);
+  transition: filter 3s ease-in-out;
+}
+
+/* The night light and the moon keep shining. */
+.scene-item.asleep.item-nachtlicht,
+.scene-item.asleep.item-mond,
+.scene.night .scene-item.item-nachtlicht,
+.scene.night .scene-item.item-mond {
+  filter: none;
+  animation: none;
+}
+
+.gn-nightglow {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 3s ease-in-out;
+}
+
+.scene.night .gn-nightglow {
+  opacity: 1;
+}
+
+.gn-nacht-halo,
+.gn-mond-halo {
+  transition: transform 3s ease-in-out;
+}
+
+.scene.night .gn-nacht-halo {
+  transform: scale(1.6);
+}
+
+.scene.night .gn-mond-halo {
+  transform: scale(1.4);
+}
+
+/* ---------- Shared keyframes ---------- */
+
+@keyframes gn-wake {
+  0%,
+  70% {
+    filter: none;
+  }
+  100% {
+    filter: var(--gn-dim);
+  }
+}
+
+@keyframes gn-eyes-open {
+  0% {
+    opacity: 0;
+  }
+  8%,
+  72% {
+    opacity: 1;
+  }
+  86%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes gn-eyes-shut {
+  0% {
+    opacity: 1;
+  }
+  8%,
+  72% {
+    opacity: 0;
+  }
+  86%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes gn-blink {
+  0%,
+  40%,
+  48%,
+  100% {
+    opacity: 0;
+  }
+  42%,
+  46% {
+    opacity: 1;
+  }
+}
+
+@keyframes gn-zzz-back {
+  0%,
+  78% {
+    opacity: 0;
+    transform: translate(-6px, 8px) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gn-light-wake {
+  0% {
+    opacity: 0;
+  }
+  10%,
+  70% {
+    opacity: 1;
+  }
+  90%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes gn-yawn {
+  0%,
+  15% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30%,
+  55% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+
+@keyframes gn-light-off {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes gn-note {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.6);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1) * 10px), -40px) scale(1);
+  }
+}
+
+@keyframes gn-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2) rotate(90deg);
+  }
+}
+
+@keyframes gn-lines {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes gn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gn-wiggle {
+  25% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes gn-wiggle-small {
+  25% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes gn-swing {
+  25% {
+    transform: rotate(12deg);
+  }
+  75% {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes gn-pendulum {
+  25% {
+    transform: rotate(14deg);
+  }
+  75% {
+    transform: rotate(-14deg);
+  }
+}
+
+@keyframes gn-pulse {
+  50% {
+    transform: scale(1.25);
+  }
+}
+
+@keyframes gn-star-twinkle {
+  50% {
+    transform: scale(1.35) rotate(18deg);
+  }
+}
+
+@keyframes gn-halo-pulse {
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+@keyframes gn-hop {
+  30% {
+    transform: translateY(-16px);
+  }
+  50% {
+    transform: scale(1.06, 0.94);
+  }
+  65%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes gn-wave {
+  50% {
+    transform: rotate(-28deg);
+  }
+}
+
+@keyframes gn-head-tilt {
+  20%,
+  45% {
+    transform: rotate(-10deg);
+  }
+  60%,
+  80% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes gn-breathe {
+  50% {
+    transform: scaleY(1.07);
+  }
+}
+
+@keyframes gn-tail-swish {
+  25% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes gn-fly-loop {
+  25% {
+    transform: translate(12px, -10px);
+  }
+  50% {
+    transform: translate(0, -18px);
+  }
+  75% {
+    transform: translate(-12px, -8px);
+  }
+}
+
+@keyframes gn-mobile-turn {
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes gn-fish-swim {
+  25% {
+    transform: translateX(-14px);
+  }
+  30%,
+  50% {
+    transform: translateX(-14px) scaleX(-1);
+  }
+  55% {
+    transform: translateX(14px) scaleX(-1);
+  }
+  60%,
+  80% {
+    transform: translateX(14px);
+  }
+}
+
+/* ---------- Parts many items share ---------- */
+
+.playing .gn-notes > g {
+  animation: gn-note 1.4s ease-out calc(var(--i) * 0.3s);
+}
+
+.playing .gn-sparkles path {
+  animation: gn-sparkle 0.9s ease-in-out calc(0.2s + var(--i) * 0.2s);
+}
+
+/* ---------- Lichterkette: the bulbs swing and glow one after another ---------- */
+
+.item-lichterkette.playing .gn-kette-bulb {
+  animation: gn-swing 0.6s ease-in-out calc(var(--i) * 0.12s) 3;
+}
+
+.item-lichterkette.playing .gn-kette-glow {
+  animation: gn-halo-pulse 0.85s ease-in-out calc(var(--i) * 0.15s) 2;
+}
+
+/* ---------- Bild: the frame swings; asleep, the sun sets and the moon comes out ---------- */
+
+.item-bild.playing .gn-bild-frame {
+  animation: gn-picture 2.4s ease-in-out;
+}
+
+.asleep .gn-bild-sun {
+  transform: translateY(46px);
+}
+
+.asleep .gn-bild-moon {
+  opacity: 1;
+}
+
+.item-bild.asleep.playing .gn-bild-sun {
+  animation: gn-sun-set 2s ease-in-out;
+}
+
+.item-bild.asleep.playing .gn-bild-moon {
+  animation: gn-moon-out 2s ease-in-out;
+}
+
+.item-bild.playing:not(.asleep) .gn-bild-sun {
+  animation: gn-hop 0.8s ease-in-out 2;
+}
+
+@keyframes gn-picture {
+  15% {
+    transform: rotate(5deg);
+  }
+  35% {
+    transform: rotate(-4deg);
+  }
+  55% {
+    transform: rotate(3deg);
+  }
+  75% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+@keyframes gn-sun-set {
+  0%,
+  55% {
+    transform: none;
+  }
+  95%,
+  100% {
+    transform: translateY(46px);
+  }
+}
+
+@keyframes gn-moon-out {
+  0%,
+  70% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Mobile: it turns, the figures swing, notes float ---------- */
+
+.item-mobile.playing .gn-mobile-bar {
+  animation: gn-mobile-turn 1.3s ease-in-out 2;
+}
+
+.item-mobile.playing .gn-mobile-hang {
+  animation: gn-swing 0.75s ease-in-out calc(var(--i) * 0.1s) 3;
+}
+
+/* ---------- Kuckucksuhr: door opens, the cuckoo bows, the pendulum swings ---------- */
+
+.item-kuckucksuhr.playing .gn-kuckuck-door {
+  animation: gn-hatch 1.8s ease-in-out;
+}
+
+.item-kuckucksuhr.playing .gn-kuckuck-bird {
+  animation: gn-cuckoo 1.8s ease-in-out;
+}
+
+.item-kuckucksuhr.playing .gn-kuckuck-pendel {
+  animation: gn-pendulum 0.6s ease-in-out 4;
+}
+
+.item-kuckucksuhr.playing .gn-kuckuck-weight {
+  animation: gn-wiggle-small 0.6s ease-in-out calc(var(--i) * 0.15s) 3;
+}
+
+.item-kuckucksuhr.playing .gn-kuckuck-hand {
+  animation: gn-spin 2s ease-in-out;
+}
+
+@keyframes gn-hatch {
+  15%,
+  70% {
+    transform: scaleX(0.1);
+  }
+}
+
+@keyframes gn-cuckoo {
+  0%,
+  12% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  24% {
+    opacity: 1;
+    transform: translateY(6px) scale(1.25);
+  }
+  34% {
+    transform: translateY(8px) rotate(-14deg) scale(1.25);
+  }
+  44% {
+    transform: translateY(6px) scale(1.25);
+  }
+  54% {
+    opacity: 1;
+    transform: translateY(8px) rotate(-14deg) scale(1.25);
+  }
+  66%,
+  100% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+/* ---------- Mond: rocks, swings its pompom, glows ---------- */
+
+.item-mond.playing .gn-mond {
+  animation: gn-rock 2.2s ease-in-out;
+}
+
+.item-mond.playing .gn-mond-pompom {
+  animation: gn-swing 0.55s ease-in-out 4;
+}
+
+.item-mond.playing .gn-mond-halo {
+  animation: gn-halo-pulse 1.1s ease-in-out 2;
+}
+
+@keyframes gn-rock {
+  15% {
+    transform: rotate(-9deg);
+  }
+  40% {
+    transform: rotate(7deg);
+  }
+  65% {
+    transform: rotate(-5deg);
+  }
+  85% {
+    transform: rotate(2deg);
+  }
+}
+
+/* ---------- Sterne: they twinkle one after another ---------- */
+
+.item-sterne.playing .gn-stern {
+  animation: gn-star-twinkle 0.7s ease-in-out calc(var(--i) * 0.3s) 2;
+}
+
+/* ---------- Glühwürmchen: they fly a loop, wings buzzing ---------- */
+
+.item-gluehwuermchen.playing .gn-fly {
+  animation: gn-fly-loop 2s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-gluehwuermchen.playing .gn-fly-wings {
+  animation: gn-flutter 0.15s linear 14;
+}
+
+@keyframes gn-flutter {
+  50% {
+    transform: scaleY(0.4);
+  }
+}
+
+/* ---------- Eule: flaps, turns its head, hoots ---------- */
+
+.item-eule.playing .gn-eule-wing {
+  animation: gn-flap 0.4s ease-in-out 4;
+}
+
+.item-eule.playing .gn-eule-head {
+  animation: gn-head-tilt 2.2s ease-in-out;
+}
+
+.item-eule.playing .gn-eule-hoot path {
+  animation: gn-lines 0.5s ease-out calc(0.3s + var(--i) * 0.12s) 3;
+}
+
+@keyframes gn-flap {
+  50% {
+    transform: rotate(calc((1 - 2 * var(--i)) * 30deg));
+  }
+}
+
+/* ---------- Vorhang: sways and swings shut for a moment ---------- */
+
+.item-vorhang.playing .gn-vorhang-l,
+.item-vorhang.playing .gn-vorhang-r {
+  animation: gn-curtain 2.4s ease-in-out;
+}
+
+@keyframes gn-curtain {
+  15% {
+    transform: skewX(4deg);
+  }
+  40%,
+  60% {
+    transform: scaleX(1.6);
+  }
+  80% {
+    transform: skewX(-3deg);
+  }
+}
+
+/* ---------- Schlafanzug: swings on its hook, waves its sleeves ---------- */
+
+.item-schlafanzug.playing .gn-anzug {
+  animation: gn-hanger 2.2s ease-in-out;
+}
+
+.item-schlafanzug.playing .gn-anzug-sleeve {
+  animation: gn-sleeve 0.55s ease-in-out calc(var(--i) * 0.1s) 3;
+}
+
+@keyframes gn-hanger {
+  15% {
+    transform: rotate(10deg);
+  }
+  40% {
+    transform: rotate(-8deg);
+  }
+  62% {
+    transform: rotate(5deg);
+  }
+  82% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes gn-sleeve {
+  50% {
+    transform: rotate(calc((1 - 2 * var(--i)) * 22deg));
+  }
+}
+
+/* ---------- Nachtlicht: wiggles, its glow swells ---------- */
+
+.item-nachtlicht.playing .gn-nacht-star {
+  animation: gn-wiggle 0.55s ease-in-out 4;
+}
+
+.item-nachtlicht.playing .gn-nacht-halo {
+  animation: gn-halo-pulse 1.1s ease-in-out 2;
+}
+
+/* ---------- Maus: pops out, twitches its ears ---------- */
+
+.item-maus.playing .gn-maus {
+  animation: gn-mouse 2s ease-in-out;
+}
+
+.item-maus.playing .gn-maus-ear {
+  animation: gn-wiggle 0.3s ease-in-out calc(var(--i) * 0.1s) 4;
+}
+
+@keyframes gn-mouse {
+  20%,
+  55% {
+    transform: translateY(-12px);
+  }
+  65% {
+    transform: translateY(-4px);
+  }
+  72% {
+    transform: translateY(-12px);
+  }
+  90%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Tür: swings open wider and back; the hall lamp sways ---------- */
+
+.item-tuer.playing .gn-tuer-leaf {
+  animation: gn-door-swing 2.4s ease-in-out;
+}
+
+.item-tuer.playing .gn-tuer-lamp {
+  animation: gn-wiggle-small 0.6s ease-in-out 4;
+  transform-origin: 1470px 26px;
+}
+
+@keyframes gn-door-swing {
+  25%,
+  60% {
+    transform: scaleX(2.2);
+  }
+}
+
+/* ---------- Mama: leans in, waves and blows a kiss ---------- */
+
+.item-mama.playing .gn-mama {
+  animation: gn-lean 2.6s ease-in-out;
+}
+
+.item-mama.playing .gn-mama-arm {
+  animation: gn-wave 0.5s ease-in-out 4;
+}
+
+.item-mama.playing .gn-mama-kiss {
+  animation: gn-kiss 2.6s ease-in-out;
+}
+
+.item-mama.playing .gn-heart {
+  animation: gn-heart-rise 1.6s ease-out 0.9s;
+}
+
+@keyframes gn-lean {
+  25%,
+  70% {
+    transform: rotate(3deg) translateY(-4px);
+  }
+}
+
+@keyframes gn-kiss {
+  0%,
+  25% {
+    opacity: 0;
+  }
+  32%,
+  45% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+  55%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes gn-heart-rise {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-30px, -30px) scale(1.4);
+  }
+}
+
+/* ---------- Goldfisch: swims round and blows bubbles ---------- */
+
+.item-goldfisch.playing .gn-fisch {
+  animation: gn-fish-swim 2.4s ease-in-out;
+}
+
+.item-goldfisch.playing .gn-fisch-bubbles circle {
+  animation: gn-bubble 0.95s ease-out calc(var(--i) * 0.25s) 2;
+}
+
+.item-goldfisch.playing .gn-fisch-plant {
+  animation: gn-wiggle 0.8s ease-in-out 3;
+}
+
+@keyframes gn-bubble {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.2);
+  }
+}
+
+/* ---------- Buch: opens, stars fly out, closes ---------- */
+
+.item-buch.playing .gn-buch-cover {
+  animation: gn-book 2.4s ease-in-out;
+}
+
+@keyframes gn-book {
+  20%,
+  70% {
+    transform: scaleX(-0.85);
+  }
+  90%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Spieluhr: the crank turns, the bear twirls ---------- */
+
+.item-spieluhr.playing .gn-spieluhr-crank {
+  animation: gn-spin 0.6s linear 4;
+}
+
+.item-spieluhr.playing .gn-spieluhr-bear {
+  animation: gn-twirl 1.2s ease-in-out 2;
+}
+
+@keyframes gn-twirl {
+  25% {
+    transform: scaleX(0.1) translateY(-4px);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+  75% {
+    transform: scaleX(0.1) translateY(-4px);
+  }
+}
+
+/* ---------- Puppenhaus: door opens, the doll bobs; asleep, lights go out one by one ---------- */
+
+.item-puppenhaus.playing .gn-haus-door {
+  animation: gn-hatch 1.8s ease-in-out 0.2s;
+}
+
+.item-puppenhaus.playing .gn-haus-doll {
+  animation: gn-hop 0.8s ease-in-out 3;
+}
+
+.item-puppenhaus.asleep.playing .gn-haus-light {
+  animation: gn-light-off 0.4s ease-in calc(1s + var(--i) * 0.25s) both;
+}
+
+/* ---------- Nachttisch: the drawer slides out, a sock peeks out ---------- */
+
+.item-nachttisch.playing .gn-tisch-drawer {
+  animation: gn-drawer 2s ease-in-out;
+}
+
+.item-nachttisch.playing .gn-tisch-sock {
+  animation: gn-sock 2s ease-in-out;
+}
+
+@keyframes gn-drawer {
+  20%,
+  70% {
+    transform: translateY(6px) scale(1.1);
+  }
+}
+
+@keyframes gn-sock {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  30%,
+  62% {
+    opacity: 1;
+    transform: translateY(-4px) rotate(-8deg);
+  }
+  78%,
+  100% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* ---------- Lampe: the cord is pulled, the shade wobbles ---------- */
+
+.item-lampe.playing .gn-lampe-cord {
+  animation: gn-pull 0.5s ease-in-out 2;
+}
+
+.item-lampe.playing .gn-lampe-shade {
+  animation: gn-wiggle-small 0.5s ease-in-out 0.3s 3;
+}
+
+@keyframes gn-pull {
+  40% {
+    transform: translateY(10px);
+  }
+}
+
+/* ---------- Wecker: jiggles, the hand goes round ---------- */
+
+.item-wecker.playing .gn-wecker {
+  animation: gn-jiggle 0.25s ease-in-out 6;
+}
+
+.item-wecker.playing .gn-wecker-hand {
+  animation: gn-spin 1.6s ease-in-out;
+}
+
+.item-wecker.playing .gn-wecker-tick > g {
+  animation: gn-lines 0.5s ease-out calc(var(--i) * 0.25s) 3;
+}
+
+@keyframes gn-jiggle {
+  25% {
+    transform: rotate(6deg) translateY(-3px);
+  }
+  75% {
+    transform: rotate(-6deg) translateY(-3px);
+  }
+}
+
+/* ---------- Bett: the heart beats, the boards wobble, the stars twinkle ---------- */
+
+.item-bett.playing .gn-bett-heart {
+  animation: gn-pulse 0.6s ease-in-out 3;
+}
+
+.item-bett.playing .gn-bett-head,
+.item-bett.playing .gn-bett-foot {
+  animation: gn-wiggle-small 0.6s ease-in-out 3;
+}
+
+.item-bett.playing .gn-bett-star {
+  animation: gn-star-twinkle 0.8s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+/* ---------- Decke: breathes, its stars twinkle ---------- */
+
+.item-decke.playing .gn-decke {
+  animation: gn-breathe 1.2s ease-in-out 2;
+}
+
+.item-decke.playing .gn-decke-star {
+  animation: gn-star-twinkle 0.8s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+/* ---------- Kind: sits up, waves, tilts its head, snuggles down ---------- */
+
+.item-kind.playing .gn-kind {
+  animation: gn-sit-up 2.6s ease-in-out;
+}
+
+.item-kind.playing .gn-kind-arm {
+  animation: gn-wave 0.5s ease-in-out 0.4s 3;
+}
+
+.item-kind.playing .gn-kind-head {
+  animation: gn-head-tilt 2.6s ease-in-out;
+}
+
+@keyframes gn-sit-up {
+  20%,
+  60% {
+    transform: translateY(-14px) rotate(-6deg);
+  }
+  80%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Teddy: waves, tilts its head ---------- */
+
+.item-teddy.playing .gn-teddy-arm {
+  animation: gn-wave 0.5s ease-in-out 4;
+}
+
+.item-teddy.playing .gn-teddy-head {
+  animation: gn-head-tilt 2.4s ease-in-out;
+}
+
+.item-teddy.playing .gn-teddy {
+  animation: gn-hop 1.2s ease-in-out 2;
+}
+
+/* ---------- Teppich: rings pulse, stars twinkle ---------- */
+
+.item-teppich.playing .gn-teppich-ring {
+  animation: gn-ring 1.2s ease-in-out 2;
+}
+
+.item-teppich.playing .gn-teppich-star {
+  animation: gn-star-twinkle 0.8s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+@keyframes gn-ring {
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* ---------- Hase: sniffs, one ear flops ---------- */
+
+.item-hase.playing .gn-hase-ear {
+  animation: gn-ear-flop 2.2s ease-in-out;
+}
+
+.item-hase.playing .gn-hase-nose {
+  animation: gn-pulse 0.2s ease-in-out 6;
+}
+
+.item-hase.playing .gn-hase {
+  animation: gn-hop 1.1s ease-in-out 2;
+}
+
+@keyframes gn-ear-flop {
+  25%,
+  65% {
+    transform: rotate(calc(var(--i) * 70deg - 50deg));
+  }
+}
+
+/* ---------- Bauklötze: the tower wobbles, the blocks hop ---------- */
+
+.item-bausteine.playing .gn-turm {
+  animation: gn-wiggle 0.5s ease-in-out 4;
+}
+
+.item-bausteine.playing .gn-block {
+  animation: gn-block-hop 0.6s ease-in-out calc(var(--i) * 0.25s);
+}
+
+@keyframes gn-block-hop {
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+/* ---------- Katze: lifts its head, twitches its ears, swishes its tail ---------- */
+
+.item-katze.playing .gn-katze-head {
+  animation: gn-cat-head 2.4s ease-in-out;
+}
+
+.item-katze.playing .gn-katze-ear {
+  animation: gn-wiggle 0.3s ease-in-out calc(var(--i) * 0.1s) 4;
+}
+
+.item-katze.playing .gn-katze-tail {
+  animation: gn-tail-swish 0.8s ease-in-out 3;
+}
+
+@keyframes gn-cat-head {
+  20%,
+  65% {
+    transform: translateY(-12px) rotate(-8deg);
+  }
+  85%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Schaukelpferd: rocks to and fro, mane and tail fly ---------- */
+
+.item-schaukelpferd.playing .gn-pferd {
+  animation: gn-rocking 2.4s ease-in-out;
+}
+
+.item-schaukelpferd.playing .gn-pferd-mane,
+.item-schaukelpferd.playing .gn-pferd-tail {
+  animation: gn-wiggle 0.4s ease-in-out 6;
+}
+
+.item-schaukelpferd.playing .gn-pferd-head {
+  animation: gn-head-tilt 2.4s ease-in-out;
+}
+
+@keyframes gn-rocking {
+  12% {
+    transform: rotate(-9deg);
+  }
+  30% {
+    transform: rotate(8deg);
+  }
+  48% {
+    transform: rotate(-7deg);
+  }
+  64% {
+    transform: rotate(5deg);
+  }
+  80% {
+    transform: rotate(-3deg);
+  }
+  92% {
+    transform: rotate(1deg);
+  }
+}
+
+/* ---------- Eisenbahn: chugs along and back, wheels turn, smoke puffs ---------- */
+
+.item-eisenbahn.playing .gn-zug {
+  animation: gn-chug 2.4s ease-in-out;
+}
+
+.item-eisenbahn.playing .gn-zug-wheel {
+  animation: gn-spin 1.2s linear reverse 2;
+}
+
+.item-eisenbahn.playing .gn-zug-smoke circle {
+  animation: gn-puff 0.9s ease-out calc(var(--i) * 0.2s) 2;
+}
+
+@keyframes gn-chug {
+  40%,
+  50% {
+    transform: translateX(-40px);
+  }
+  90%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes gn-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -24px) scale(1.4);
+  }
+}
+
+/* ---------- Ball: bounces and rolls ---------- */
+
+.item-ball.playing .gn-ball {
+  animation: gn-bounce 2s ease-in-out;
+}
+
+.item-ball.playing .gn-ball-spin {
+  animation: gn-spin 2s ease-in-out;
+}
+
+@keyframes gn-bounce {
+  15% {
+    transform: translateY(-50px);
+  }
+  30% {
+    transform: scale(1.1, 0.9);
+  }
+  45% {
+    transform: translateY(-26px);
+  }
+  60% {
+    transform: none;
+  }
+  70% {
+    transform: translateY(-10px);
+  }
+  80%,
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Puppenwagen: rocks gently, the doll nods ---------- */
+
+.item-puppenwagen.playing .gn-wagen {
+  animation: gn-wiggle-small 0.8s ease-in-out 3;
+}
+
+.item-puppenwagen.playing .gn-wagen-doll {
+  animation: gn-head-tilt 2.4s ease-in-out;
+}
+
+/* ---------- Roboter: waves its arms, turns its head, buttons glow ---------- */
+
+.item-roboter.playing .gn-robo-arm {
+  animation: gn-robo-arm 0.55s ease-in-out calc(var(--i) * 0.1s) 3;
+}
+
+.item-roboter.playing .gn-robo-head {
+  animation: gn-head-tilt 2.2s ease-in-out;
+}
+
+.item-roboter.playing .gn-robo-btn {
+  animation: gn-soft-blink 0.5s ease-in-out calc(var(--i) * 0.25s) 3;
+}
+
+.item-roboter.playing .gn-robo {
+  animation: gn-hop 1.1s ease-in-out 2;
+}
+
+@keyframes gn-robo-arm {
+  50% {
+    transform: rotate(calc((2 * var(--i) - 1) * 40deg));
+  }
+}
+
+@keyframes gn-soft-blink {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* ---------- Kreisel: spins, wobbles and slows down ---------- */
+
+.item-kreisel.playing .gn-kreisel {
+  animation: gn-top 2.4s ease-out;
+}
+
+.item-kreisel.playing .gn-kreisel-band {
+  animation: gn-band 0.3s linear 8;
+}
+
+.item-kreisel.playing .gn-kreisel-swoosh path {
+  animation: gn-lines 0.5s ease-out calc(var(--i) * 0.15s) 3;
+}
+
+@keyframes gn-top {
+  10% {
+    transform: rotate(6deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  40% {
+    transform: rotate(4deg);
+  }
+  55% {
+    transform: rotate(-3deg);
+  }
+  70% {
+    transform: rotate(2deg);
+  }
+  85% {
+    transform: rotate(-1deg);
+  }
+}
+
+@keyframes gn-band {
+  to {
+    transform: translateX(24px);
+  }
+}
+
+/* ---------- Schaf: wool puffs, nods, ears flop ---------- */
+
+.item-schaf.playing .gn-schaf-puff {
+  animation: gn-puff-wool 0.7s ease-in-out calc(var(--i) * 0.15s) 2;
+}
+
+.item-schaf.playing .gn-schaf-head {
+  animation: gn-head-tilt 2.2s ease-in-out;
+}
+
+.item-schaf.playing .gn-schaf-ear {
+  animation: gn-wiggle 0.4s ease-in-out calc(var(--i) * 0.1s) 4;
+}
+
+@keyframes gn-puff-wool {
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+/* ---------- Elefant: lifts its trunk and toots softly, flaps its ears ---------- */
+
+.item-elefant.playing .gn-ele-trunk {
+  animation: gn-trunk 2.4s ease-in-out;
+}
+
+.item-elefant.playing .gn-ele-ear {
+  animation: gn-ear-flap 0.4s ease-in-out calc(var(--i) * 0.05s) 5;
+}
+
+.item-elefant.playing .gn-ele-toot path {
+  animation: gn-lines 0.5s ease-out calc(0.6s + var(--i) * 0.12s) 2;
+}
+
+@keyframes gn-trunk {
+  25%,
+  60% {
+    transform: rotate(90deg);
+  }
+  85%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes gn-ear-flap {
+  50% {
+    transform: scaleX(1.15) rotate(calc((2 * var(--i) - 1) * 6deg));
+  }
+}
+
+/* ---------- Hausschuhe: hop one after the other, ears wiggle ---------- */
+
+.item-hausschuhe.playing .gn-schuh {
+  animation: gn-hop 0.8s ease-in-out calc(var(--i) * 0.3s) 2;
+}
+
+.item-hausschuhe.playing .gn-schuh-ear {
+  animation: gn-wiggle 0.35s ease-in-out calc(var(--i) * 0.1s) 4;
+}
+
+/* ---------- Taschenlampe: the button clicks, the torch rolls a little ---------- */
+
+.item-taschenlampe.playing .gn-tlampe-btn {
+  animation: gn-press 0.3s ease-in-out 2;
+}
+
+.item-taschenlampe.playing .gn-tlampe {
+  animation: gn-wiggle-small 0.5s ease-in-out 0.4s 3;
+}
+
+@keyframes gn-press {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+/* ---------- Spielzeugkiste: the toys duck in and the lid shuts for the night ---------- */
+
+.asleep .gn-kiste-lid {
+  transform: none;
+}
+
+.asleep .gn-kiste-toys {
+  transform: translateY(44px);
+}
+
+.item-spielzeugkiste.asleep.playing .gn-kiste-lid {
+  animation: gn-lid-shut 2.4s ease-in-out;
+}
+
+.item-spielzeugkiste.asleep.playing .gn-kiste-toys {
+  animation: gn-toys-in 2.4s ease-in-out;
+}
+
+.item-spielzeugkiste.playing:not(.asleep) .gn-kiste-lid {
+  animation: gn-lid-flap 2.4s ease-in-out;
+}
+
+.item-spielzeugkiste.playing:not(.asleep) .gn-kiste-toys {
+  animation: gn-hop 0.8s ease-in-out 3;
+}
+
+@keyframes gn-lid-shut {
+  0% {
+    transform: rotate(28deg);
+  }
+  12% {
+    transform: rotate(40deg);
+  }
+  25%,
+  65% {
+    transform: rotate(28deg);
+  }
+  85% {
+    transform: rotate(-2deg);
+  }
+  92% {
+    transform: rotate(2deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes gn-toys-in {
+  15% {
+    transform: translateY(-12px);
+  }
+  30% {
+    transform: none;
+  }
+  45% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: none;
+  }
+  80%,
+  100% {
+    transform: translateY(44px);
+  }
+}
+
+@keyframes gn-lid-flap {
+  0%,
+  100% {
+    transform: rotate(28deg);
+  }
+  30%,
+  60% {
+    transform: rotate(44deg);
+  }
+}

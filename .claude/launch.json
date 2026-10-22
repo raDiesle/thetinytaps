@@ -22,13 +22,6 @@
       "autoPort": false
     },
     {
-      "name": "dev-3302",
-      "runtimeExecutable": "yarn",
-      "runtimeArgs": ["--cwd", "/Users/amend/Personal/thetinytaps/.claude/worktrees/agent-af88dc47129552ec8", "dev", "--port", "3302"],
-      "port": 3302,
-      "autoPort": false
-    },
-    {
       "name": "preview-pages",
       "runtimeExecutable": "sh",
       "runtimeArgs": ["-c", "export PUBLIC_BASE_PATH=/thetinytaps && yarn build && yarn preview --port 3200"],

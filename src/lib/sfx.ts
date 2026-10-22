@@ -586,3 +586,17 @@ export function playCrackle() {
   hiss({ from: 400, to: 250, duration: 1.4, volume: 0.1, q: 0.5 });
   for (let i = 0; i < 10; i++) hiss({ from: 2000 + Math.random() * 3000, duration: 0.03, volume: 0.2, delay: Math.random() * 1.3, q: 3 });
 }
+
+/** "Uaaah!" – a sleepy yawn: a soft voice that rises a little, then sinks slowly. */
+export function playYawn() {
+  note({ from: 330, to: 440, duration: 0.35, type: "triangle", volume: 0.14, lowpass: 900 });
+  note({ from: 440, to: 220, duration: 1, type: "triangle", volume: 0.14, lowpass: 900, delay: 0.3 });
+}
+
+/** "Pling, pling" – a music box: slow, high, bell-like notes of a lullaby. */
+export function playMusicbox() {
+  [4, 2, 4, 2, 1, 0].forEach((step, i) => {
+    note({ from: PENTATONIC[step] * 2, duration: 0.6, type: "sine", volume: 0.1, delay: i * 0.3 });
+    note({ from: PENTATONIC[step] * 4, duration: 0.25, type: "sine", volume: 0.025, delay: i * 0.3 });
+  });
+}

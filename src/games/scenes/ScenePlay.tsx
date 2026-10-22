@@ -66,6 +66,9 @@ import {
   playCrunch,
   playSleigh,
   playCrackle,
+  playYawn,
+  playMusicbox,
+  playLullaby,
   setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -140,6 +143,8 @@ const SOUNDS: Record<SceneSound, () => void> = {
   crunch: playCrunch,
   sleigh: playSleigh,
   crackle: playCrackle,
+  yawn: playYawn,
+  musicbox: playMusicbox,
 };
 
 /** Key presses closer together than this only spawn shapes. */
@@ -206,6 +211,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** Explore and colour mode: items tapped at least once (in colour mode: the coloured ones). */
   const [discovered, setDiscovered] = useState<ReadonlySet<string>>(new Set());
   const [partying, setPartying] = useState(false);
+  /** Bedtime pictures: everything is asleep and the room is dark. */
+  const [night, setNight] = useState(false);
   /** Keys mode: the item in the glowing frame, moved with the arrow keys; hidden once an item starts. */
   const [focus, setFocus] = useState<SceneItem | null>(null);
   const [lit, setLit] = useState<Lit | null>(null);
@@ -236,6 +243,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const quests = useMemo(() => questsFor(settings.mode, scene), [settings.mode, scene]);
   const itemsById = useMemo(() => new Map(scene.items.map((item) => [item.id, item])), [scene]);
   const allDiscovered = discovered.size === scene.items.length;
+  /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the party. */
+  const bedtime = !!scene.bedtime && !colouring && !questMode;
 
   const later = useCallback((fn: () => void, ms: number) => {
     const timer = setTimeout(() => {
@@ -373,20 +382,30 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     later(() => setPartying(false), PARTY_MS);
   };
 
+  /** Bedtime picture: everything is asleep, so the room goes dark – softly, without dancing or shapes. */
+  const goodNight = () => {
+    setNight(true);
+    if (soundsOn) playLullaby();
+    say("Gute Nacht! Alle schlafen jetzt.");
+  };
+
   const startOver = () => {
     discoveredRef.current = new Set();
     setDiscovered(discoveredRef.current);
+    setNight(false);
   };
 
   /** Explore and colour mode: count the item (and colour it in), and celebrate when it was the last one. */
   const discover = (item: SceneItem, x: number, y: number) => {
-    if (!colouring && !settings.goal) return;
+    if (!colouring && !settings.goal && !bedtime) return;
     if (discoveredRef.current.has(item.id)) return;
     discoveredRef.current = new Set(discoveredRef.current).add(item.id);
     setDiscovered(discoveredRef.current);
     // A splash of paint where the colour comes back.
     if (colouring) for (let i = 0; i < 3; i++) spawn(x + (Math.random() - 0.5) * 120, y + (Math.random() - 0.5) * 120);
-    if (settings.goal && discoveredRef.current.size === scene.items.length) later(party, PARTY_AFTER_MS);
+    if (discoveredRef.current.size !== scene.items.length) return;
+    if (bedtime) later(goodNight, PARTY_AFTER_MS);
+    else if (settings.goal) later(party, PARTY_AFTER_MS);
   };
 
   /** Chain reaction: the items after this one react one by one, each telling its part of the story. */
@@ -586,6 +605,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     settings.ambient && !settings.calm && "lively",
     colouring && "colouring",
     partying && "party",
+    night && "night",
   ]
     .filter(Boolean)
     .join(" ");
@@ -622,7 +642,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           return (
             <g
               key={`${item.id}-${play?.count ?? 0}`}
-              className={`scene-item item-${item.id}${play?.playing ? " playing" : ""}`}
+              className={`scene-item item-${item.id}${play?.playing ? " playing" : ""}${bedtime && discovered.has(item.id) ? " asleep" : ""}`}
               style={{ "--party-i": i } as CSSProperties}
               filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
               data-item={item.id}
@@ -683,7 +703,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       )}
       {!questMode && settings.goal && (
         <div className={`scene-goal${allDiscovered ? " done" : ""}`} aria-label={`${discovered.size} von ${scene.items.length} entdeckt`}>
-          <span className="scene-goal-star">{allDiscovered ? "🎉" : "⭐"}</span>
+          <span className="scene-goal-star">{allDiscovered ? (bedtime ? "🌙" : "🎉") : "⭐"}</span>
           {discovered.size}/{scene.items.length}
           {allDiscovered && (
             <button
