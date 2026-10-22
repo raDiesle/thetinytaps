@@ -83,6 +83,16 @@ export function LettersGame() {
                 onChange={(letterFamily) => update({ letterFamily })}
               />
             )}
+            {settings.letterCase !== "lower" &&
+              settings.mode === "free" &&
+              !settings.trace &&
+              !(settings.letterCase === "both" && settings.letterFamily) && (
+                <Toggle
+                  label="Lebende Buchstaben (der Buchstabe wird kurz zum Tier: S zur Schlange, M zur Maus)"
+                  checked={settings.livingLetters}
+                  onChange={(livingLetters) => update({ livingLetters })}
+                />
+              )}
             <Choice<LettersSettings["theme"]>
               label="Bilder"
               value={settings.theme}
