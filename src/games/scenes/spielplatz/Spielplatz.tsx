@@ -508,4 +508,5 @@ export const spielplatz: Scene = {
       ],
     },
   ],
+  seasons: { weather: true, tree: [64, 665, 0.8], snowman: [1540, 780, 0.8], pumpkin: [1185, 998, 0.8], egg: [1010, 850] },
 };
