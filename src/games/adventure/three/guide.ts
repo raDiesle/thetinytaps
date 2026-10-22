@@ -157,6 +157,11 @@ export class Guide {
   private readonly tail = new THREE.Group();
   private readonly eyes: THREE.Object3D[] = [];
   private readonly mouth: THREE.Mesh;
+  /** The happy face: eyes squeezed into arcs, a wide open laugh and red cheeks. */
+  private readonly happyEyes: THREE.Object3D[] = [];
+  private readonly laugh: THREE.Group;
+  private readonly blush: THREE.Mesh[] = [];
+  private readonly ears: THREE.Group[] = [];
   private readonly armL: Arm;
   private readonly armR: Arm;
   private readonly legL: Leg;
@@ -168,6 +173,8 @@ export class Guide {
   private readonly contour: Contour;
   /** How much moving body parts glow (0..1); the story turns it up during a movement. */
   highlight = 0;
+  /** How happy the face looks (0..1): at the treasure Tapsi laughs with the whole face. */
+  joy = 0;
   private readonly activity: Record<ContourPart, number> = { armL: 0, armR: 0, legL: 0, legR: 0, body: 0, head: 0 };
   private previous: Pose | null = null;
   private previousTime = 0;
@@ -224,6 +231,19 @@ export class Guide {
     this.mouth.rotation.z = Math.PI;
     this.mouth.position.set(0, 0.04, 0.33);
     this.head.add(this.mouth);
+    // The laugh: a wide open half-moon with a pink tongue.
+    this.laugh = new THREE.Group();
+    this.laugh.position.set(0, 0.045, 0.325);
+    this.laugh.rotation.x = -0.35;
+    const laughGeo = new THREE.CircleGeometry(0.06, 24, Math.PI, Math.PI);
+    laughGeo.scale(1.15, 1, 1);
+    this.laugh.add(new THREE.Mesh(laughGeo, new THREE.MeshStandardMaterial({ color: "#5a1a1f", roughness: 0.6, side: THREE.DoubleSide })));
+    const tongue = new THREE.Mesh(new THREE.CircleGeometry(0.03, 16), new THREE.MeshStandardMaterial({ color: "#ff7c8f", roughness: 0.5 }));
+    tongue.scale.set(1.2, 0.6, 1);
+    tongue.position.set(0, -0.042, 0.002);
+    this.laugh.add(tongue);
+    this.laugh.visible = false;
+    this.head.add(this.laugh);
 
     const eyeMat = new THREE.MeshPhysicalMaterial({ color: "#1d1411", roughness: 0.1, clearcoat: 1 });
     const shine = new THREE.MeshBasicMaterial({ color: "#ffffff" });
@@ -238,6 +258,21 @@ export class Guide {
       eye.add(glint);
       this.head.add(eye);
       this.eyes.push(eye);
+      // A happy eye: a little arch, like ^.
+      const arc = mesh(new THREE.TorusGeometry(0.04, 0.012, 8, 20, Math.PI), darkMat, false);
+      arc.position.set(0.1 * side, 0.2, 0.262);
+      arc.rotation.x = -0.25;
+      arc.visible = false;
+      this.head.add(arc);
+      this.happyEyes.push(arc);
+      const cheek = new THREE.Mesh(
+        new THREE.CircleGeometry(0.045, 20),
+        new THREE.MeshBasicMaterial({ color: "#ff6f8e", transparent: true, opacity: 0, depthWrite: false }),
+      );
+      cheek.position.set(0.16 * side, 0.1, 0.235);
+      cheek.rotation.y = 0.55 * side;
+      this.head.add(cheek);
+      this.blush.push(cheek);
 
       const ear = new THREE.Group();
       ear.position.set(0.17 * side, 0.36, -0.02);
@@ -255,6 +290,7 @@ export class Guide {
       tip.position.y = 0.19;
       ear.add(tip);
       this.head.add(ear);
+      this.ears.push(ear);
     }
 
     // The bandana: a cap over the top of the head with a knot at the back.
@@ -401,10 +437,25 @@ export class Guide {
 
     // Blink every few seconds.
     const blink = time % 3.7 < 0.12 ? 0.1 : 1;
-    for (const eye of this.eyes) eye.scale.y = blink;
+    const happy = this.joy > 0.5;
+    for (const eye of this.eyes) {
+      eye.scale.y = blink;
+      eye.visible = !happy;
+    }
+    for (const arc of this.happyEyes) arc.visible = happy;
+    for (const cheek of this.blush) (cheek.material as THREE.MeshBasicMaterial).opacity = this.joy * 0.75;
+    // The ears wiggle with joy.
+    this.ears.forEach((ear, i) => {
+      const side = i === 0 ? 1 : -1;
+      ear.rotation.z = (-0.35 + Math.sin(time * 9 + i) * 0.18 * this.joy) * side;
+    });
 
     const open = this.talking ? 0.6 + Math.abs(Math.sin(time * 14)) * 0.9 : 0.6;
     this.mouth.scale.set(1, open, 1);
+    this.mouth.visible = !happy;
+    this.laugh.visible = happy;
+    const laughOpen = 0.85 + (this.talking ? Math.abs(Math.sin(time * 14)) * 0.35 : Math.sin(time * 6) * 0.08);
+    this.laugh.scale.set(1, laughOpen, 1);
 
     this.glowMoving(p, time);
   }
@@ -431,7 +482,6 @@ export class Guide {
       body: body / dt,
       head: Math.max(head, body * 0.8) / dt,
     };
-    this.contour.setTime(time);
     for (const part of CONTOUR_PARTS) {
       const target = THREE.MathUtils.smoothstep(speed[part], 0.25, 1.0);
       const now = this.activity[part];
