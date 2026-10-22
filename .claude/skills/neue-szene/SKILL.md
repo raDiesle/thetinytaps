@@ -96,6 +96,11 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   little "wenn – dann" stories between items that are near each other or belong
   together (Hund bellt → Katze erschrickt → Vogel fliegt weg). The steps use the
   items' normal tap animations.
+- Roads to other pictures (optional): a vehicle can drive into another scene
+  (`ROADS` in `roads.ts`: `from`, `item`, `to`, the free ground spot `park` where it
+  stands as a guest there, and the way the drawing `faces`); add the scene's
+  phrases to `PLACES` ("in den Wald", "aus dem Wald", "im Wald"). Pick the park
+  spot where it covers little, and check its arrival in the browser.
 - New sound? Add it to `SceneSound` (types.ts), `src/lib/sfx.ts` (built on
   `note()`) and the `SOUNDS` map in `ScenePlay.tsx`.
 

@@ -39,6 +39,8 @@ export interface ScenesSettings {
   ambient: boolean;
   /** Keys trigger: show each item's key in the picture. */
   showKeys: boolean;
+  /** Explore mode: some vehicles drive into other pictures, and a sign at the edge follows them (see roads.ts). */
+  roads: boolean;
 }
 
 export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
@@ -52,6 +54,7 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   hints: true,
   ambient: false,
   showKeys: true,
+  roads: true,
 };
 
 // v2: speech is off and the picture stands still by default now, so old saved settings start fresh.
