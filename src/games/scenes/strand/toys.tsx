@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { CHEEK, Eye, Face, INK, nth } from "../shared";
 import { Drops, Notes, Puffs, SAND, SAND_DARK, Sparkles, SEA } from "./parts";
 
@@ -149,6 +150,8 @@ export function Schatztruhe() {
           <circle key={x} cx={x} cy={-70} r="10" style={nth(i)} />
         ))}
       </g>
+      {/* Someone climbs out of the chest, from behind the coins */}
+      <Hideout x={-64} y={-176} w={128} h={104} size={78} />
       <rect x="-70" y="-72" width="140" height="70" rx="6" fill="#a0673a" />
       <path d="M-70 -52 H70 M-70 -28 H70" stroke="#8d5a2b" strokeWidth="4" />
       <path d="M-56 -72 V-2 M56 -72 V-2" stroke="#fab005" strokeWidth="9" />

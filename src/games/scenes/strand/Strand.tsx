@@ -242,6 +242,7 @@ export const strand: Scene = {
       place: ground(0, 0, 1514, 600, 1.2),
       shadow: [0, 0, 120],
       durationMs: 2800,
+      hideout: [0.15, 0.8],
       Art: Strandhaus,
     },
     {
@@ -456,12 +457,13 @@ export const strand: Scene = {
     {
       id: "schatztruhe",
       name: "die Schatztruhe",
-      sentences: ["Eine Schatztruhe im Sand!", "Der Deckel geht auf. Gold glitzert!", "Oh, so viele Taler!"],
+      sentences: ["Eine Schatztruhe im Sand!", "Der Deckel geht auf. Gold glitzert!", "Oh, so viele Taler! Und wer sitzt da drin?"],
       sound: "twinkle",
       key: "T",
       box: [-100, -122, 200, 126],
       place: ground(0, 0, 1146, 958),
       durationMs: 2600,
+      hideout: [0.15, 0.8],
       Art: Schatztruhe,
     },
     {

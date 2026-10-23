@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, Inside, SKIN, nth } from "../shared";
 import { Arm, Head, Hearts, Leg, Lid, Notes, Puffs, SAND } from "./parts";
 
@@ -261,24 +262,15 @@ export function Strandhaus() {
       <rect className="sd-haus-light" x="-18" y="-244" width="36" height="30" rx="4" fill="#ffe066" />
       <rect className="sd-haus-shutter" x="-20" y="-246" width="20" height="34" rx="3" fill="#ffd43b" style={{ transformOrigin: "-20px -229px" }} />
       <rect className="sd-haus-shutter" x="0" y="-246" width="20" height="34" rx="3" fill="#fcc419" style={{ transformOrigin: "20px -229px" }} />
-      {/* Door frame, the girl behind the door and the door itself */}
+      {/* Door frame, someone else behind the door every time, and the door itself */}
       <path d="M-42 -4 V-122 Q-42 -138 -24 -138 H24 Q42 -138 42 -122 V-4 Z" fill="#ffd43b" />
       <path d={HUT_DOOR} fill="#2b2d42" />
-      <Inside d={HUT_DOOR}>
-        <g className="sd-haus-girl">
-          <rect x="-24" y="-70" width="48" height="60" rx="16" fill="#f06595" />
-          <Head cx={0} cy={-92} r={22} hair="#e9c46a" style="pigtails" />
-        </g>
-      </Inside>
+      <Hideout x={-36} y={-132} w={72} h={122} size={84} />
       <g className="sd-haus-door" style={{ transformOrigin: "-36px -70px" }}>
         <path d={HUT_DOOR} fill="#e63946" />
         <rect x="-24" y="-118" width="48" height="40" rx="8" fill="#ff8787" />
         <path d="M-20 -60 H20 M-20 -44 H20 M-20 -28 H20" stroke="#c92a2a" strokeWidth="5" strokeLinecap="round" />
         <circle cx="24" cy="-66" r="5" fill="#ffd43b" />
-      </g>
-      <g className="sd-haus-hand" style={{ transformOrigin: "44px -60px" }}>
-        <path d="M40 -64 L60 -96" stroke={SKIN} strokeWidth="9" strokeLinecap="round" />
-        <circle cx="61" cy="-99" r="7" fill={SKIN} />
       </g>
       {/* Steps */}
       <rect x="-54" y="-10" width="108" height="12" rx="3" fill="#c08552" />

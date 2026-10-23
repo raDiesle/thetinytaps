@@ -174,7 +174,6 @@
 .sd-turm-arm,
 .sd-bude-steam circle,
 .sd-haus-light,
-.sd-haus-hand,
 .sd-mama-hearts path,
 .sd-pommes-sparkle path,
 .sd-moewe-chip,
@@ -1094,14 +1093,6 @@
 
 .item-strandhaus.playing .sd-haus-door {
   animation: sd-open-x 2.8s ease-in-out;
-}
-
-.item-strandhaus.playing .sd-haus-girl {
-  animation: sd-baby 2.8s ease-in-out;
-}
-
-.item-strandhaus.playing .sd-haus-hand {
-  animation: sd-arm-wave 2.8s ease-in-out;
 }
 
 .item-strandhaus.playing .sd-haus-shutter {
