@@ -175,6 +175,10 @@ export class Guide {
   highlight = 0;
   /** How happy the face looks (0..1): at the treasure Tapsi laughs with the whole face. */
   joy = 0;
+  /** The ears folded back flat (0..1), e.g. when the head bumps into something. */
+  earsBack = 0;
+  /** The parts that may glow: only where the movement is (the arms for a crank), not everything that moves. */
+  focus: readonly ContourPart[] = CONTOUR_PARTS;
   private readonly activity: Record<ContourPart, number> = { armL: 0, armR: 0, legL: 0, legR: 0, body: 0, head: 0 };
   private previous: Pose | null = null;
   private previousTime = 0;
@@ -313,8 +317,10 @@ export class Guide {
       this.head.add(knot);
     }
 
-    // Tail: a bushy curve with a cream tip, wagging from the hips.
-    this.tail.position.set(0, 0.12, -0.18);
+    // Tail: a bushy curve with a cream tip, wagging from the hips; small, so seen from behind it
+    // does not hide the legs.
+    this.tail.position.set(0, 0.1, -0.17);
+    this.tail.scale.setScalar(0.42);
     this.hips.add(this.tail);
     const tailCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0, 0, 0),
@@ -341,21 +347,42 @@ export class Guide {
     tailTip.position.set(0, 0.32, -0.42);
     this.tail.add(tailTip);
 
+    // Arms: orange fur above the elbow and dark "gloves" below, like a real fox's legs, so they
+    // stand out against the body; paws with a pink pad, four short fingers and a thumb.
+    const padMat = fur("#e7a3a0");
     const makeArm = (side: 1 | -1, hand: THREE.Group): Arm => {
       const shoulder = new THREE.Group();
       shoulder.position.set(0.2 * side, 0.36, 0);
       const upper = new THREE.Group();
       shoulder.add(upper);
-      upper.add(limb(UPPER_ARM, 0.06, furMat));
+      const joint = mesh(new THREE.SphereGeometry(0.08, 20, 16), furMat);
+      upper.add(joint);
+      upper.add(limb(UPPER_ARM, 0.072, furMat));
       const elbow = new THREE.Group();
       elbow.position.y = -UPPER_ARM;
       upper.add(elbow);
-      elbow.add(limb(FOREARM, 0.055, furMat));
+      elbow.add(limb(FOREARM, 0.064, darkMat));
       hand.position.y = -FOREARM;
       elbow.add(hand);
-      const paw = mesh(new THREE.SphereGeometry(0.068, 20, 16), darkMat);
-      paw.scale.set(1, 1.1, 0.85);
-      hand.add(paw);
+      const palm = mesh(new THREE.SphereGeometry(0.07, 20, 16), darkMat);
+      palm.scale.set(1.05, 1.05, 0.72);
+      palm.position.y = -0.035;
+      hand.add(palm);
+      // The palm faces the body while the arm hangs.
+      const pad = mesh(new THREE.SphereGeometry(0.04, 14, 10), padMat, false);
+      pad.scale.set(0.35, 1, 0.9);
+      pad.position.set(-0.05 * side, -0.04, 0);
+      hand.add(pad);
+      for (let i = 0; i < 4; i++) {
+        const finger = mesh(new THREE.CapsuleGeometry(0.019, 0.045, 4, 8), darkMat, false);
+        finger.position.set((i - 1.5) * 0.028, -0.105, 0.012);
+        finger.rotation.set(0.35, 0, (i - 1.5) * 0.12);
+        hand.add(finger);
+      }
+      const thumb = mesh(new THREE.CapsuleGeometry(0.02, 0.04, 4, 8), darkMat, false);
+      thumb.position.set(-0.055 * side, -0.06, 0.035);
+      thumb.rotation.set(0.5, 0, 0.6 * side);
+      hand.add(thumb);
       this.spine.add(shoulder);
       return { shoulder, upper, elbow };
     };
@@ -427,8 +454,9 @@ export class Guide {
     const leg = (l: Leg, pose: LegPose, side: 1 | -1) => {
       l.hip.rotation.set(-pose.lift, 0, pose.spread * side);
       l.knee.rotation.x = pose.knee;
-      // Keep the sole level, tipped up onto the toes when asked.
+      // Keep the sole level, also with the legs apart, tipped up onto the toes when asked.
       l.foot.rotation.x = pose.lift - pose.knee + p.toes * 0.6;
+      l.foot.rotation.z = -pose.spread * side;
     };
     leg(this.legL, p.legL, 1);
     leg(this.legR, p.legR, -1);
@@ -448,6 +476,7 @@ export class Guide {
     this.ears.forEach((ear, i) => {
       const side = i === 0 ? 1 : -1;
       ear.rotation.z = (-0.35 + Math.sin(time * 9 + i) * 0.18 * this.joy) * side;
+      ear.rotation.x = -0.15 - this.earsBack * 1.35;
     });
 
     const open = this.talking ? 0.6 + Math.abs(Math.sin(time * 14)) * 0.9 : 0.6;
@@ -483,7 +512,7 @@ export class Guide {
       head: Math.max(head, body * 0.8) / dt,
     };
     for (const part of CONTOUR_PARTS) {
-      const target = THREE.MathUtils.smoothstep(speed[part], 0.25, 1.0);
+      const target = this.focus.includes(part) ? THREE.MathUtils.smoothstep(speed[part], 0.25, 1.0) : 0;
       const now = this.activity[part];
       // Comes on quickly, fades slowly, so it stays on through the pauses of a movement.
       this.activity[part] = now + (target - now) * Math.min(1, dt * (target > now ? 8 : 1.2));

@@ -1,4 +1,5 @@
 import type { MotionClipId } from "../library/types";
+import type { ContourPart } from "./contour";
 import { restPose, type Pose } from "./guide";
 
 // The guide's body animations, one per MotionClipId. A clip turns the time
@@ -38,6 +39,88 @@ function steps(p: Pose, t: number, period: number, lift: number) {
   p.legR.lift = Math.max(0, -s) * lift;
   p.legR.knee = Math.max(0, -s) * lift * 1.6;
 }
+
+/** The fox's hips half apart, and the length of a straight leg (thigh and shin, see guide.ts). */
+const HIP = 0.11;
+const LEG = 0.48;
+
+/**
+ * Feet set down sideways at `footL` and `footR` (m from the middle, positive
+ * to the fox's left) under hips shifted by `p.shift`: each leg spreads to reach
+ * its foot, and the standing legs bend at the knees so both soles stay on the
+ * ground in a wide stance. `upL`/`upR` (0..1) lift a foot off the ground.
+ */
+function feetAt(p: Pose, footL: number, footR: number, upL: number, upR: number) {
+  const reach = (offset: number) => Math.asin(Math.max(-0.9, Math.min(0.9, offset / LEG)));
+  const spreadL = reach(footL - (p.shift + HIP));
+  const spreadR = reach(-(footR - (p.shift - HIP)));
+  // The hips sink to the lower of the two standing legs; a lifted foot does not hold them up.
+  const height = (spread: number) => (LEG / 2) * (1 + Math.cos(spread));
+  const hips = Math.min(height(spreadL) + upL * 0.2, height(spreadR) + upR * 0.2, LEG);
+  const leg = (l: Pose["legL"], spread: number, up: number) => {
+    const bend = Math.acos(Math.min(1, hips / height(spread)));
+    l.spread = spread;
+    l.lift = bend + up * 0.55;
+    l.knee = bend * 2 + up * 1.1;
+  };
+  leg(p.legL, spreadL, upL);
+  leg(p.legR, spreadR, upR);
+}
+
+/** Seconds of one jump of the jump clip; every third one goes straight up, to bump the head. */
+export const JUMP_PERIOD = 1.6;
+/** When the feet leave the ground and land again, as parts of one jump. */
+const TAKE_OFF = 0.4;
+const LANDING = 0.75;
+/** How high the jumps go (m): forwards from stone to stone, and straight up to bump the head. */
+export const JUMP_HEIGHT = 0.3;
+export const BUMP_HEIGHT = 0.42;
+/** Seconds into a jump when it is highest. */
+export const JUMP_PEAK = ((TAKE_OFF + LANDING) / 2) * JUMP_PERIOD;
+/** True if jump number `n` (from 0) of the jump clip is the one up to bump the head. */
+export const isBump = (n: number) => n % 3 === 2;
+/** How far through the current jump of the jump clip `t` is: 0 until take-off, 1 from the landing on. */
+export function jumpProgress(t: number) {
+  return clamp01((phase(t, JUMP_PERIOD) - TAKE_OFF) / (LANDING - TAKE_OFF));
+}
+/** Seconds into a jump when the feet land. */
+export const JUMP_LANDING = LANDING * JUMP_PERIOD;
+
+/**
+ * One jump, k 0..1 of it: dip into the knees with the arms swinging back,
+ * push off onto the toes with the arms swinging up, fly with the knees a
+ * little tucked, and land softly into the knees again. Returns the flight
+ * (0..1) or -1 on the ground.
+ */
+function jump(p: Pose, k: number, height: number, takeOff = TAKE_OFF, landing = LANDING) {
+  const ready = takeOff * 0.7;
+  const push = k > ready && k < takeOff ? (k - ready) / (takeOff - ready) : 0;
+  const dip = k < ready ? smooth(k / ready) : k < takeOff ? 1 - smooth(push) : 0;
+  const land = k > landing ? Math.sin(((k - landing) / (1 - landing)) * Math.PI) : 0;
+  const flight = k > takeOff && k < landing ? (k - takeOff) / (landing - takeOff) : -1;
+  crouch(p, dip * 0.5 + land * 0.4);
+  p.toes = Math.max(push, flight >= 0 ? 1 - Math.sin(flight * Math.PI) * 0.4 : 0);
+  if (flight >= 0) {
+    p.lift = 4 * flight * (1 - flight) * height;
+    const tuck = Math.sin(flight * Math.PI);
+    p.legL.lift = p.legR.lift = tuck * 0.55;
+    p.legL.knee = p.legR.knee = tuck * 1.15;
+  }
+  // Arms back while dipping, up with the push, down again to land.
+  const armsUp = flight >= 0 ? 1 - flight * 0.6 : push;
+  for (const a of [p.armL, p.armR]) {
+    a.raise = -0.45 * dip + armsUp * 1.5 + land * 0.4;
+    a.spread = 0.25;
+    a.elbow = 0.35 + dip * 0.3;
+  }
+  p.headPitch = dip * 0.25 - armsUp * 0.1;
+  return flight;
+}
+
+/** Seconds of one go of the brush clip: the left paw sweeps, then the right. */
+export const BRUSH_PERIOD = 2.4;
+/** Seconds into each half when the sweeping paw is fastest, right through the cobweb. */
+export const BRUSH_HIT = 0.6;
 
 /** How far down the duck clip is, 0..1; stories time swinging branches by it. */
 export const duckDepth = (t: number) => hold(phase(t, 3), 0.05, 0.28, 0.72, 0.92);
@@ -181,19 +264,25 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   step_side: (t, p) => {
+    // A real step to the side and back, one foot after the other: the left foot steps out, the
+    // weight shifts over, the right foot follows; back the other way round.
     const k = phase(t, 3);
-    const out = hold(k, 0.05, 0.3, 0.55, 0.8);
-    p.shift = out * 0.28;
-    // The leading foot lifts while moving out, the other while coming back.
-    const moving = Math.sin(clamp01((k - 0.05) / 0.25) * Math.PI) * 0.5;
-    const back = Math.sin(clamp01((k - 0.55) / 0.25) * Math.PI) * 0.5;
-    p.legL.lift = moving;
-    p.legL.knee = moving * 1.4;
-    p.legR.lift = back;
-    p.legR.knee = back * 1.4;
-    p.armL.spread = 0.4 + out * 0.3;
-    p.armR.spread = 0.4 + out * 0.3;
-    p.lean = (moving - back) * 0.08;
+    const part = (from: number, to: number) => clamp01((k - from) / (to - from));
+    const lift = (u: number) => Math.sin(u * Math.PI);
+    const outL = smooth(part(0.05, 0.2));
+    const outR = smooth(part(0.25, 0.4));
+    const backR = smooth(part(0.55, 0.7));
+    const backL = smooth(part(0.75, 0.9));
+    p.shift = (smooth(part(0.14, 0.32)) - smooth(part(0.64, 0.82))) * 0.28;
+    const upL = lift(part(0.05, 0.2)) + lift(part(0.75, 0.9));
+    const upR = lift(part(0.25, 0.4)) + lift(part(0.55, 0.7));
+    feetAt(p, 0.13 + (outL - backL) * 0.3, -0.13 + (outR - backR) * 0.28, upL, upR);
+    // Over the standing leg, arms a little out for balance.
+    p.lean = (upR - upL) * 0.07;
+    p.armL.spread = 0.35 + upR * 0.25;
+    p.armR.spread = 0.35 + upL * 0.25;
+    p.armL.elbow = p.armR.elbow = 0.5;
+    p.headPitch = 0.1;
   },
 
   march: (t, p) => {
@@ -207,24 +296,29 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   stomp: (t, p) => {
-    const k = phase(t, 1.6);
-    const s = Math.sin(k * TAU);
-    // Up slowly, down fast.
-    const up = (v: number) => (v > 0 ? Math.pow(v, 0.6) : 0);
-    p.legL.lift = up(s) * 1.0;
-    p.legL.knee = up(s) * 1.5;
-    p.legR.lift = up(-s) * 1.0;
-    p.legR.knee = up(-s) * 1.5;
-    crouch(p, 0.12);
-    p.legL.lift += 0.12;
-    p.legR.lift += 0.12;
-    for (const a of [p.armL, p.armR]) {
-      a.raise = 1.0;
-      a.spread = 0.35;
-      a.elbow = 1.7;
-    }
-    p.lean = s * 0.1;
-    p.headPitch = 0.1;
+    // One foot after the other, right on the beat: whipped up and slammed down hard – the left foot
+    // lands at 0.8 s, the right at 1.6 s. The knee gives a little after each stamp.
+    const foot = (impact: number) => {
+      let d = (((t - impact) % 1.6) + 1.6) % 1.6;
+      if (d > 0.8) d -= 1.6;
+      const up = d < -0.3 || d >= 0 ? 0 : d < -0.13 ? smooth((d + 0.3) / 0.17) : d < -0.07 ? 1 : 1 - smooth((d + 0.07) / 0.07);
+      const give = d >= 0 && d < 0.3 ? Math.sin((d / 0.3) * Math.PI) : 0;
+      return { up, give };
+    };
+    const l = foot(0.8);
+    const r = foot(1.6);
+    crouch(p, 0.1 + (l.give + r.give) * 0.14);
+    p.legL.lift += l.up * 1.1;
+    p.legL.knee += l.up * 1.6;
+    p.legR.lift += r.up * 1.1;
+    p.legR.knee += r.up * 1.6;
+    // Over the standing leg; the arms pump with it.
+    p.lean = (r.up - l.up) * 0.1;
+    p.armL.raise = 0.7 + r.up * 0.5;
+    p.armR.raise = 0.7 + l.up * 0.5;
+    p.armL.spread = p.armR.spread = 0.35;
+    p.armL.elbow = p.armR.elbow = 1.5;
+    p.headPitch = 0.25;
   },
 
   high_knees: (t, p) => {
@@ -346,15 +440,14 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   cheer: (t, p) => {
-    const b = Math.abs(Math.sin(t * 5));
+    // Jumping for joy with both arms up: into the knees, off the toes, land softly.
+    jump(p, phase(t, 0.8), 0.14, 0.35, 0.72);
     for (const a of [p.armL, p.armR]) {
       a.raise = 0.4;
       a.spread = 2.65 + Math.sin(t * 10) * 0.12;
       a.elbow = 0.2;
     }
-    p.lift = b * 0.05;
     p.headPitch = -0.2;
-    p.toes = 0.5;
   },
 
   arms_wide: (t, p) => {
@@ -430,15 +523,29 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   reach_up: (t, p) => {
+    // Stretching the whole body, one side after the other: up on the toes, the paw as high as it
+    // goes, the side long, the other arm and leg reaching away, the head looking up.
     const s = Math.sin(phase(t, 2.6) * TAU);
-    p.armL.raise = 0.3 + Math.max(0, s) * 2.75;
-    p.armR.raise = 0.3 + Math.max(0, -s) * 2.75;
-    p.armL.spread = p.armR.spread = 0.25;
-    p.armL.elbow = 0.5 - Math.max(0, s) * 0.45;
-    p.armR.elbow = 0.5 - Math.max(0, -s) * 0.45;
-    p.toes = Math.abs(s) * 0.8;
-    p.lean = s * 0.08;
-    p.headPitch = -0.3 * Math.abs(s);
+    const l = Math.max(0, s);
+    const r = Math.max(0, -s);
+    const reach = (a: Pose["armL"], up: number, other: number) => {
+      a.raise = 0.3 + up * 2.85 - other * 0.4;
+      a.spread = 0.25 + up * 0.1 + other * 0.25;
+      a.elbow = 0.5 - up * 0.48;
+    };
+    reach(p.armL, l, r);
+    reach(p.armR, r, l);
+    p.toes = Math.abs(s);
+    p.lift = Math.abs(s) * 0.02;
+    p.shift = s * 0.04;
+    p.lean = -s * 0.14;
+    p.bend = -0.12 * Math.abs(s);
+    p.legL.spread = 0.04 + r * 0.22;
+    p.legR.spread = 0.04 + l * 0.22;
+    p.legL.lift = -r * 0.12;
+    p.legR.lift = -l * 0.12;
+    p.headPitch = -0.45 * Math.abs(s);
+    p.headTilt = s * 0.12;
   },
 
   tap_forward: (t, p) => {
@@ -912,6 +1019,56 @@ const CLIPS: Record<MotionClipId, Clip> = {
     p.bend = 0.12;
   },
 
+  jump: (t, p) => {
+    // From stone to stone, leaning into it; every third jump goes straight up, the head first, to
+    // bump something above with it.
+    const n = Math.floor(t / JUMP_PERIOD);
+    const bump = isBump(n);
+    const flight = jump(p, phase(t, JUMP_PERIOD), bump ? BUMP_HEIGHT : JUMP_HEIGHT);
+    const air = flight >= 0 ? Math.sin(flight * Math.PI) : 0;
+    if (bump) {
+      // Arms down by the sides, chin up: the head bumps it.
+      for (const a of [p.armL, p.armR]) {
+        a.raise = Math.min(a.raise, 0.4);
+        a.spread = 0.35 + air * 0.3;
+      }
+      p.headPitch -= air * 0.35;
+    } else {
+      p.bend += air * 0.15;
+    }
+  },
+
+  brush_away: (t, p) => {
+    // The left paw reaches high across in front and sweeps out wide to the side, then the right:
+    // like wiping a cobweb away.
+    const sweep = (a: Pose["armL"], q: number) => {
+      const reach = smooth(clamp01(q / 0.35));
+      const out = smooth(clamp01((q - 0.35) / 0.3));
+      const back = smooth(clamp01((q - 0.68) / 0.32));
+      const up = reach * (1 - back);
+      a.raise = 0.3 + up * 1.45 - out * up * 0.3;
+      a.spread = 0.2 - reach * 0.45 + out * 1.7 - back * 1.25;
+      a.elbow = 0.3 + reach * 0.9 - out * 1.05 + back * 0.15;
+      return out * (1 - back);
+    };
+    const q = phase(t, BRUSH_PERIOD) * 2;
+    const left = q < 1;
+    const k = left ? q : q - 1;
+    const busy = left ? p.armL : p.armR;
+    const other = left ? p.armR : p.armL;
+    const swept = sweep(busy, k);
+    other.raise = 0.25;
+    other.spread = 0.25;
+    other.elbow = 0.6;
+    // The chest turns with the sweep, the head follows the paw.
+    const dir = left ? 1 : -1;
+    const turn = Math.sin(clamp01((k - 0.2) / 0.7) * Math.PI);
+    p.twist = dir * (swept - 0.4) * 0.35 * turn;
+    p.lean = dir * swept * 0.06;
+    p.headYaw = dir * (swept - 0.3) * 0.45 * turn;
+    p.headPitch = -0.15;
+  },
+
   press_button: (t, p) => {
     const press = hold(phase(t, 2.6), 0.3, 0.45, 0.6, 0.85);
     p.armL.raise = 1.15 + press * 0.4;
@@ -921,6 +1078,93 @@ const CLIPS: Record<MotionClipId, Clip> = {
     p.legR.lift = -press * 0.2;
   },
 };
+
+/** Where a clip's movement is; only that part glows while it moves (the crank is about the arms). */
+type Focus = "arms" | "legs" | "body" | "all";
+const FOCUS: Record<MotionClipId, Focus> = {
+  idle: "all",
+  wave: "arms",
+  push_forward: "arms",
+  push_up: "arms",
+  pull_rope: "arms",
+  pull_down: "arms",
+  heave: "all",
+  lean_side: "body",
+  lean_forward: "body",
+  duck: "legs",
+  sway: "body",
+  step_side: "legs",
+  march: "legs",
+  stomp: "legs",
+  high_knees: "legs",
+  tiptoe: "legs",
+  bounce: "legs",
+  hop: "legs",
+  shake: "all",
+  hip_circle: "body",
+  robot: "arms",
+  waddle: "legs",
+  snake: "arms",
+  flutter: "arms",
+  cheer: "arms",
+  arms_wide: "arms",
+  flap: "arms",
+  paddle: "arms",
+  row: "arms",
+  swim: "arms",
+  steer: "arms",
+  reach_up: "arms",
+  tap_forward: "arms",
+  point: "arms",
+  wipe: "arms",
+  clap: "arms",
+  throw_overhand: "arms",
+  throw_underhand: "arms",
+  cast: "arms",
+  scatter: "arms",
+  catch: "arms",
+  stretch_up: "arms",
+  curl_small: "all",
+  grow: "all",
+  star_shape: "all",
+  bloom: "arms",
+  arc: "arms",
+  turn_around: "all",
+  twist: "body",
+  look_around: "body",
+  freeze: "all",
+  melt: "all",
+  one_leg: "legs",
+  balance_walk: "legs",
+  carry: "legs",
+  kite: "arms",
+  trunk_swing: "arms",
+  snap: "arms",
+  scratch: "arms",
+  hammer: "arms",
+  dig: "arms",
+  pour: "arms",
+  stir: "arms",
+  pump: "arms",
+  drum: "arms",
+  wand: "arms",
+  ring_bell: "arms",
+  press_button: "arms",
+  crank: "arms",
+  shapes: "all",
+  turn_key: "arms",
+  jump: "legs",
+  brush_away: "arms",
+};
+const FOCUS_PARTS: Record<Focus, ContourPart[]> = {
+  arms: ["armL", "armR"],
+  legs: ["legL", "legR"],
+  body: ["body", "head"],
+  all: ["armL", "armR", "legL", "legR", "body", "head"],
+};
+
+/** The parts of the guide that may glow during clip `id`. */
+export const clipFocus = (id: MotionClipId) => FOCUS_PARTS[FOCUS[id]];
 
 /** The pose of clip `id`, `t` seconds after it started. */
 export function clipPose(id: MotionClipId, t: number): Pose {

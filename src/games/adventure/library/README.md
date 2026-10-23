@@ -14,15 +14,15 @@ und wie die Welt antwortet.
 | --- | --- |
 | `types.ts` | Datenmodell (Bewegung, Welt, Szenario, Ablauf) |
 | `categories.ts` | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was *nicht* dazugehört |
-| `movements/*.ts` | **Ergebnis B**: 98 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
+| `movements/*.ts` | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
-| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–11 Bewegungen und Sekunden, 153–186 s lang |
-| `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 70 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
+| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–228 s lang |
+| `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
 | diese Datei | **Ergebnis E**: Qualitätskontrolle |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
 bleibt bis zum Aufräumen. Jede Bewegung nennt einen `motion`-Clip; die Clips für den Fuchs
-stehen in `../three/clips.ts` (70 Clips, keiner fehlt).
+stehen in `../three/clips.ts` (72 Clips, keiner fehlt).
 
 ## Neue Bewegung
 
@@ -50,16 +50,16 @@ Bewegungen mit diesem Clip (`push_forward` passt zu Zaubertür, Schneeball und G
 - **Welten** (`worlds`): Wo die Idee hinpasst. Bauen sich daraus neue Szenarien oder
   Abläufe, steht der Moment danach in `scenarios.ts` bzw. `sequences.ts`.
 
-Stand: 70 Clips (alle außer `idle`), 420 Situationen, davon 182 aus dem Alltag, jeder Clip mit
+Stand: 72 Clips (alle außer `idle`), 432 Situationen, davon 188 aus dem Alltag, jeder Clip mit
 mindestens zwei. Am wenigsten Ideen haben Baustelle (5) und Eisenbahn (6). Keine Idee
 verlangt mehr, als die Bewegung schon erlaubt: Es gibt kein schnelles Drehen und kein Drücken
 gegen echte Möbel, und auf Schienen balanciert niemand.
 
 ## Ergebnis E: Qualitätskontrolle
 
-Stand: 98 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
+Stand: 100 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
 verweist nur auf vorhandene Bewegungen, und jede Bewegung hat eine Sitz-Variante
-(`adaptations.seated`). 74 Bewegungen sind „leicht“, 20 „mittel“, keine ist „schwer“.
+(`adaptations.seated`). 79 Bewegungen sind „leicht“, 21 „mittel“, keine ist „schwer“.
 
 ### Bewegungen, die sich sehr ähnlich sind
 
@@ -72,6 +72,7 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 - `sleeping_giant` und `tiptoe_sneak`: beide auf Zehenspitzen schleichen
 - `jungle_stomp` und `train_march`: beide stampfen bzw. marschieren
 - `bubble_wipe` und `window_wipe`: beide Kreise wischen
+- `cobweb_brush` und `bubble_wipe`: beide mit der Pfote vor sich weg wischen
 - `big_ball_catch` und `raindrop_catch`: beide mit den Armen auffangen
 - `carousel_turn` und `turn_and_look`: beide sich drehen
 - `rocket_countdown` und `seed_grow`: beide klein machen und dann groß werden
@@ -86,28 +87,28 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 ### Springen, Gleichgewicht, Platz
 
 - **Springen** (`needs.jump`): `mushroom_bounce`, `puddle_jump`, `popcorn_pop`, `frog_hop`,
-  `kangaroo_hop`, `rocket_countdown`. Nicht auf glattem Boden und nicht in Socken. Zweijährige
+  `kangaroo_hop`, `rocket_countdown`, `stone_jump`. Nicht auf glattem Boden und nicht in Socken. Zweijährige
   springen oft noch nicht beidbeinig ab. Darum hat jede dieser Bewegungen eine leichtere Variante
-  ohne Sprung: in den Knien federn, aufstampfen oder schnell aus der Hocke aufstehen. Von den Abläufen hat nur `space_trip` einen Sprung (`rocket_countdown`).
+  ohne Sprung: in den Knien federn, aufstampfen oder schnell aus der Hocke aufstehen. Von den Abläufen haben `space_trip` (`rocket_countdown`) und `treasure_island` (`stone_jump`) einen Sprung.
 - **Gleichgewicht** (`needs.balance`): `bridge_balance`, `tiptoe_sneak`, `flamingo_stand`,
   `line_walk`, `tray_carry`, `sleeping_giant`. Hier kippen Kleine leicht um. Jede hat deshalb eine
   leichtere Variante: auf der Stelle bleiben, auf ganzen Füßen gehen oder sich festhalten.
 - **Viel Platz** (`needs.space: "large"`): `starfish_shape` (Arme und Beine weit) und
   `carousel_turn` (sich drehen; manchen wird dabei schwindlig, die leichtere Variante ist eine
   halbe Drehung und zurück).
-  29 weitere brauchen „mittel“, also einen Schritt Platz zu jeder Seite.
+  31 weitere brauchen „mittel“, also einen Schritt Platz zu jeder Seite.
 
 ### Abläufe (Ergebnis D)
 
 | Ablauf | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
 | --- | --- | --- | --- |
-| `treasure_island` (spielbar) | 16 | 214 s | r m l l r m m l r r m m r l l r |
+| `treasure_island` (spielbar) | 17 | 228 s | r m l l l r m m l r r m m r l l r |
 | `space_trip` | 9 | 160 s | r m l m m m l r l |
 | `underwater_dive` | 9 | 158 s | r m m m m l r m l |
 | `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
 | `farm_morning` | 9 | 153 s | r r m l m l m r m |
 
-Die 3D-Geschichte der Schatzinsel dauert länger als die 214 s der Tabelle, etwa 4:25. Vorher
+Die 3D-Geschichte der Schatzinsel dauert länger als die 228 s der Tabelle, etwa 4:45. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
 Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung). Die
 Wege zwischen den Stationen sind kurz (2–5 s), damit es ohne lange Pausen weitergeht. Eltern
@@ -126,9 +127,10 @@ noch ein ruhiger Abschied dazukommen.
 - **Kein Text im Spiel.** Kinder in diesem Alter lesen nicht. Alles sagt der Fuchs, und unten
   zeigt die Leiste nur Bilder. Ist die Sprachausgabe aus, bleibt nur das Vormachen. Deshalb
   müssen die Bewegungen des Fuchses deutlich sein.
-- **Leuchtende Kontur am Fuchs** (`../three/contour.ts`): Während einer Bewegung leuchtet,
-  was sich gerade bewegt, als schmaler neongrüner Rand ohne Muster. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen
-  Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
+- **Leuchtende Kontur am Fuchs** (`../three/contour.ts`): Während einer Bewegung leuchtet
+  nur der Körperteil, um den es geht (`clipFocus` in `../three/clips.ts`: an der Kurbel die Arme,
+  beim Stampfen die Beine), als schmaler neongrüner Rand ohne Muster, und nur solange er sich
+  bewegt. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
   gewollt, aber noch nicht mit Kindern ausprobiert.
 - **Umriss-Hilfe** (dunkle Kinderfigur mit leuchtendem Rand wie bei „Just Dance“,
   `../three/silhouette.ts`): bei allen Bewegungen, mit einem hellen Strichskelett, Gelenkpunkten
@@ -142,18 +144,19 @@ noch ein ruhiger Abschied dazukommen.
   tanzt und winkt uns von vorne zu, mit fröhlichem Gesicht. Ob Kinder so besser mitmachen als mit
   einem Fuchs, der sie anschaut, ist noch offen.
 - **Jede Bewegung hat ein Gegenüber.** Tapsi winkt Kiki zu (Kiki fliegt am Anfang heran und am
-  Ende davon), paddelt im Kanu sitzend, stampft Skorpione platt, duckt sich unter dem
+  Ende davon), paddelt im Kanu sitzend, stampft Skorpione platt, springt über die Steine im Bach und stößt
+  mit dem Kopf an schwebende Sternkisten (von der Seite gefilmt wie ein Jump-and-Run), duckt sich unter dem
   schaukelnden Baumstamm, öffnet mit den Armen die Blumen, kurbelt das Holztor hoch, macht den
   rollenden Kokosnüssen Platz, weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
-  pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), drückt die
-  Tür auf (die Pfoten bleiben an der Tür), zieht die Truhe am Seil heran, schließt sie mit dem
+  pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), wedelt die
+  Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), zieht die Truhe am Seil heran, schließt sie mit dem
   Schlüssel auf, jubelt und tanzt mit den Krebsen, und zum Schluss gibt es ein Feuerwerk.
-- **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Deshalb gibt es
-  nur Bewegungen auf der Stelle (Stampfen statt über Steine hüpfen) und kleine Schritte zur
-  Seite und zurück.
+- **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Tapsi springt
+  zwar von Stein zu Stein, das Kind aber auf der Stelle (`stone_jump`, leichter: auf die Zehenspitzen
+  und den Kopf hochstrecken). Sonst gibt es nur kleine Schritte zur Seite und zurück.
 - **Clips nur teilweise angeschaut.** Im Browser geprüft sind die Clips der Schatzinsel
-  (`wave`, `paddle`, `stomp`, `duck`, `bloom`, `crank`, `step_side`, `lean_side`, `reach_up`,
-  `shapes`, `push_forward`, `pull_rope`, `turn_key`, `cheer`, `shake`). Die übrigen sind
+  (`wave`, `paddle`, `stomp`, `jump`, `duck`, `bloom`, `crank`, `step_side`, `lean_side`,
+  `reach_up`, `shapes`, `brush_away`, `pull_rope`, `turn_key`, `cheer`, `shake`). Die übrigen sind
   programmiert und typgeprüft, aber noch nicht angesehen.
 - **Zeiten sind geschätzt.** Die Sekunden der Abläufe sind nicht mit Kindern gemessen. Wird
   eine Bewegung zu lang, merkt man das daran, dass das Kind aufhört; dann diese Bewegung kürzen.

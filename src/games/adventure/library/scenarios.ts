@@ -138,6 +138,8 @@ export const SCENARIOS: Scenario[] = [
       { movement: "fishing_cast", situation: "Am Steg ziehen Fische vorbei.", reaction: "Die Angel holt eine Flaschenpost mit Schatzkarte." },
       { movement: "line_walk", situation: "Ein schmales Brett führt vom Schiff an den Strand.", reaction: "Wir kommen sicher an, der Papagei klatscht." },
       { movement: "flamingo_stand", situation: "Eine Welle schwappt über die Steine.", reaction: "Ein Fuß bleibt trocken, die Welle kitzelt den anderen." },
+      { movement: "stone_jump", situation: "Ein Bach mit Steinen, darüber schweben Kisten.", reaction: "Von Stein zu Stein; bumm mit dem Kopf, ein Stern springt heraus." },
+      { movement: "cobweb_brush", situation: "Im Höhlengang hängen dicke Spinnweben.", reaction: "Sie wehen zur Seite, dahinter glitzert das Meer." },
       { movement: "crocodile_snap", situation: "Das freundliche Krokodil zeigt sein großes Maul.", reaction: "Schnapp! Es lacht und gähnt ganz laut." },
       { movement: "peek_around", situation: "Der Papagei versteckt sich hinter der Palme.", reaction: "Kuckuck! Er zeigt mit dem Flügel auf ein X." },
       { movement: "shovel_dig", situation: "Im Sand ist ein großes X.", reaction: "Etwas Goldenes blitzt im Sand auf." },

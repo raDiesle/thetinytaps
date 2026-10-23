@@ -110,6 +110,15 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Ein Hase hüpft vor zur Möhre.", reaction: "Er hüpft mit und knabbert.", worlds: ["garden"] },
   ],
 
+  jump: [
+    { situation: "Auf dem Gehweg sind Pflastersteine in zwei Farben.", reaction: "Hopp, hopp, nur auf die roten – der Weg ist geschafft.", everyday: true },
+    { situation: "Mama hält die Hand hoch über den Kopf.", reaction: "Hochgesprungen und mit dem Kopf drangestupst, Mama lacht.", everyday: true },
+    { situation: "Im Garten liegen Trittplatten über dem Beet.", reaction: "Von Platte zu Platte, die Füße bleiben sauber.", everyday: true },
+    { situation: "Über dem Bach schweben Kisten mit goldenem Stern.", reaction: "Bumm mit dem Kopf, ein Stern springt heraus.", worlds: ["pirate_island", "jungle"] },
+    { situation: "Seerosenblätter liegen im Teich, ein Frosch wartet.", reaction: "Von Blatt zu Blatt, der Frosch hüpft hinterher.", worlds: ["garden", "jungle"] },
+    { situation: "Eine Glocke hängt an einem Bogen über dem Weg.", reaction: "Mit dem Kopf angestupst, sie bimmelt.", worlds: ["toy_town", "circus"] },
+  ],
+
   // Schütteln und Tanzen
   shake: [
     { situation: "Nach dem Händewaschen sind die Hände nass, kein Handtuch da.", reaction: "Die Tropfen fliegen und glitzern.", everyday: true },
@@ -266,6 +275,15 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Eine große Schneeflocke fällt.", reaction: "Sie liegt als Stern zwischen den Händen.", worlds: ["winter_forest"] },
     { situation: "Der Seehund in der Manege wartet auf Beifall.", reaction: "Er klatscht mit den Flossen zurück.", worlds: ["circus"] },
     { situation: "Ein Sternchen fällt langsam herab.", reaction: "Es leuchtet zwischen den Händen.", worlds: ["space"] },
+  ],
+
+  brush_away: [
+    { situation: "Im Keller hängt eine Spinnwebe vor dem Regal.", reaction: "Weggewedelt, das Fahrrad ist zu sehen.", everyday: true },
+    { situation: "Seifenblasen schweben vor dem Gesicht.", reaction: "Plopp, plopp, sie platzen zur Seite.", everyday: true },
+    { situation: "Der Vorhang aus Perlenschnüren hängt in der Tür.", reaction: "Er klimpert zur Seite, das Zimmer ist frei.", everyday: true },
+    { situation: "Hinter der Steintür hängen dicke Spinnweben im Gang.", reaction: "Sie reißen und wehen davon, der Gang wird hell.", worlds: ["pirate_island", "crystal_cave"] },
+    { situation: "Dichte Lianen hängen über dem Dschungelpfad.", reaction: "Sie schwingen zur Seite, ein Tukan schaut heraus.", worlds: ["jungle"] },
+    { situation: "Nebel liegt über dem Schlossgraben.", reaction: "Er weht weg, die Zugbrücke ist zu sehen.", worlds: ["magic_castle", "winter_forest"] },
   ],
 
   // Werfen und Fangen

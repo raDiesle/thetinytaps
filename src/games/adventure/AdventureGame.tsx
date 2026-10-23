@@ -25,8 +25,8 @@ export function AdventureGame() {
           <SettingsGroup title={`Die Schatzinsel (etwa ${minutes(seconds)} Minuten)`}>
             <p className="setting-note">
               Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit: Paddeln, von Stein zu Stein
-              steigen, sich unter einem schaukelnden Ast ducken, Blumen mit den Armen öffnen, Kokosnüssen ausweichen, eine Steintür
-              aufdrücken, die Schatztruhe am Seil heranziehen und zum Schluss tanzen. Die Welt reagiert von selbst im Takt der Bewegung –
+              springen und mit dem Kopf an Sternkisten stoßen, sich unter einem schaukelnden Ast ducken, Blumen mit den Armen öffnen,
+              Kokosnüssen ausweichen, Spinnweben wegwedeln, die Schatztruhe am Seil heranziehen und zum Schluss tanzen. Die Welt reagiert von selbst im Takt der Bewegung –
               es gibt keine Kamera und kein „falsch“.
             </p>
             <p className="setting-note">
@@ -43,7 +43,7 @@ export function AdventureGame() {
               ]}
             />
             <Toggle
-              label="Was sich am Fuchs gerade bewegt, leuchtet (Arme, Beine oder der ganze Körper)"
+              label="Am Fuchs leuchtet, worauf es bei der Bewegung ankommt (z. B. nur die Arme an der Kurbel)"
               checked={settings.glow}
               onChange={(glow) => update({ glow })}
             />

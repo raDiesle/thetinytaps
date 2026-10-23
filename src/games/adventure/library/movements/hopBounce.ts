@@ -204,4 +204,58 @@ export const HOP_BOUNCE: Movement[] = [
     ],
     tags: ["pop", "jump", "crouch", "surprise", "circus"],
   },
+  {
+    id: "stone_jump",
+    name: "Von Stein zu Stein springen",
+    category: "hop_bounce",
+    ageRange: { min: 2, max: 4 },
+    difficulty: "medium",
+    bodyZone: "legs",
+    bodyParts: ["legs", "knees", "feet", "head"],
+    bodyMovement:
+      "Das Kind hüpft mit beiden Füßen auf der Stelle, zweimal klein und beim dritten Mal hoch mit dem Kopf voran, als stoße es mit dem Kopf von unten an eine Kiste.",
+    startingPose: "Gerade stehen, Knie leicht gebeugt, Arme locker.",
+    movementSteps: [
+      "In die Knie gehen und die Arme nach hinten schwingen.",
+      "Hopp – mit beiden Füßen abspringen, die Arme schwingen nach vorn.",
+      "Weich in den Knien landen; noch einmal.",
+      "Beim dritten Mal hoch springen und den Kopf nach oben strecken – bumm!",
+    ],
+    durationSeconds: 14,
+    repetitions: 3,
+    instruction: "Hopp, hopp – und Kopf hoch!",
+    motion: "jump",
+    demonstration:
+      "Der Guide wird von der Seite gezeigt wie in einem Hüpfspiel: Er springt von Stein zu Stein über den Bach, und über jedem zweiten Stein schwebt eine Kiste, an die er beim dritten Sprung von unten mit dem Kopf stößt. Erst springt er allein, dann im gemeinsamen Takt.",
+    scenario: {
+      world: "pirate_island",
+      setup: "Ein Bach mit flachen Steinen versperrt den Weg; über den Steinen schweben Holzkisten mit einem goldenen Stern.",
+      trigger: "Der nächste Stein glitzert, die Kiste darüber wackelt.",
+      reaction: "Bei jedem Sprung landet der Guide auf dem nächsten Stein, es spritzt; stößt er an eine Kiste, hüpft sie hoch und ein goldener Stern springt heraus.",
+      payoff: "Am anderen Ufer funkeln alle Sterne zusammen über dem Bach.",
+    },
+    audio: {
+      voiceCue: "Hopp, hopp – bumm!",
+      soundEffects: ["Platschen", "Bumm an der Kiste", "Glitzern"],
+      musicSync: true,
+    },
+    visualDirection: { camera: "follow", movementDirection: "up", intensity: "lively" },
+    variants: [
+      "Nur kleine Hüpfer, die Kiste hängt tiefer und wird mit den Händen angestoßen.",
+      "Seerosenblätter statt Steine, ein Frosch hüpft mit.",
+      "Wolken als Trittsteine, die Kisten sind Sterne am Himmel.",
+    ],
+    adaptations: {
+      easier: "Statt zu hüpfen auf die Zehenspitzen gehen und den Kopf nach oben strecken.",
+      seated: "Im Sitzen mit beiden Füßen auf den Boden tippen und beim dritten Mal Arme und Kopf nach oben strecken.",
+      higherEnergy: "Höher springen und bei jeder Kiste laut „Bumm!“ rufen.",
+    },
+    needs: { jump: true, space: "small", balance: false },
+    safetyNotes: [
+      "Auf der Stelle hüpfen, nicht nach vorn springen – nur der Fuchs springt über den Bach.",
+      "Nach oben ist nichts zum Anstoßen: über dem Kind frei lassen (keine Regale oder Lampen).",
+      "Weich auf den ganzen Füßen landen, rutschfester Boden, keine Socken auf Fliesen.",
+    ],
+    tags: ["jump", "stones", "brook", "head", "jump_and_run"],
+  },
 ];

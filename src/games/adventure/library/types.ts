@@ -160,7 +160,9 @@ export type MotionClipId =
   | "press_button"
   | "crank"
   | "shapes"
-  | "turn_key";
+  | "turn_key"
+  | "jump"
+  | "brush_away";
 
 /** What a movement asks of the room and the body, so parents and sequences can filter. */
 export interface MovementNeeds {

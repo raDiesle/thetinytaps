@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { movement } from "../library/movements";
 import type { Cue, Story, StoryFrame, StoryWorld } from "../stories/story";
-import { clipPose } from "./clips";
+import { clipFocus, clipPose } from "./clips";
 import { Guide, lerpPose, restPose, type Pose } from "./guide";
 import { Stage } from "./stage";
 
@@ -187,6 +187,7 @@ export class StoryPlayer {
     // From just before the guide shows the movement until the praise.
     const smooth = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
     this.guide.highlight = this.highlight ? smooth((frame.act + frame.demo + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8)) : 0;
+    this.guide.focus = clipFocus(movement(this.story.sequence.steps[step].movement).motion);
     this.guide.apply(pose, this.elapsed);
     const root = this.guide.root;
     const cam = this.stage.camera.position;

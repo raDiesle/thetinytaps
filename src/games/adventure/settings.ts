@@ -2,7 +2,7 @@
 export type AdventurePace = "normal" | "calm";
 
 export interface AdventureSettings {
-  /** The guide speaks every situation and movement; the point of the game, so on by default. */
+  /** The guide speaks every situation and movement; off by default, the fox shows everything. */
   speech: boolean;
   /** Background music. */
   music: boolean;
@@ -11,12 +11,12 @@ export interface AdventureSettings {
   pace: AdventurePace;
   /** A glowing outline of a child shows the movement next to the fox. */
   outline: boolean;
-  /** The fox's moving arms, legs or body get a glowing outline. */
+  /** The body part the movement is about (arms, legs or body) gets a glowing outline while it moves. */
   glow: boolean;
 }
 
 export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
-  speech: true,
+  speech: false,
   music: true,
   sounds: true,
   pace: "normal",
@@ -24,7 +24,8 @@ export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
   glow: true,
 };
 
-export const ADVENTURE_SETTINGS_KEY = "tinytaps.adventure.v1";
+// v2: speech is off by default now, so old saved settings start fresh.
+export const ADVENTURE_SETTINGS_KEY = "tinytaps.adventure.v2";
 
 /** How much slower the calm pace runs. */
 export const CALM_PACE = 1.3;
