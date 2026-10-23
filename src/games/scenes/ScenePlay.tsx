@@ -370,12 +370,12 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
       if (soundsOn && !quiet) {
         playSound(item.sound);
-        // The surprise says hello once it is out of its hideout.
-        if (surprise !== undefined) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
+        // The surprise says hello once it is out of its hideout; not while looking for a sound or a thing, it would mislead.
+        if (surprise !== undefined && !questMode) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
       }
       return true;
     },
-    [later, soundsOn, nextSurprise],
+    [later, soundsOn, nextSurprise, questMode],
   );
 
   /** Asks the question; a sound riddle plays its sound first and then asks "Wer macht das?". */
