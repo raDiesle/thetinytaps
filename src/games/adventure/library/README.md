@@ -17,7 +17,7 @@ und wie die Welt antwortet.
 | `movements/*.ts` | **Ergebnis B**: 98 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
 | `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–11 Bewegungen und Sekunden, 153–186 s lang |
-| `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 67 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
+| `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 70 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
 | diese Datei | **Ergebnis E**: Qualitätskontrolle |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
@@ -50,7 +50,7 @@ Bewegungen mit diesem Clip (`push_forward` passt zu Zaubertür, Schneeball und G
 - **Welten** (`worlds`): Wo die Idee hinpasst. Bauen sich daraus neue Szenarien oder
   Abläufe, steht der Moment danach in `scenarios.ts` bzw. `sequences.ts`.
 
-Stand: 67 Clips (alle außer `idle`), 402 Situationen, davon 173 aus dem Alltag, jeder Clip mit
+Stand: 70 Clips (alle außer `idle`), 420 Situationen, davon 182 aus dem Alltag, jeder Clip mit
 mindestens zwei. Am wenigsten Ideen haben Baustelle (5) und Eisenbahn (6). Keine Idee
 verlangt mehr, als die Bewegung schon erlaubt: Es gibt kein schnelles Drehen und kein Drücken
 gegen echte Möbel, und auf Schienen balanciert niemand.

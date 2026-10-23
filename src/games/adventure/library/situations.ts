@@ -359,6 +359,14 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Über dem Burggraben fehlt eine Brücke.", reaction: "Eine Brücke aus Licht erscheint.", worlds: ["magic_castle"] },
     { situation: "Ein Komet zieht über den Himmel.", reaction: "Sein Schweif glitzert.", worlds: ["space"] },
   ],
+  shapes: [
+    { situation: "Im Flur hängt ein großer Spiegel.", reaction: "Darin steht erst ein Riese, dann ein Stern, dann eine kleine Maus.", everyday: true },
+    { situation: "Abends leuchtet die Taschenlampe an die Wand im Kinderzimmer.", reaction: "Ein großer, ein breiter und ein kleiner Schatten tanzen.", everyday: true },
+    { situation: "Papa hält drei Karten hoch: Turm, Stern und Maus.", reaction: "Er rät jedes Bild und lacht.", everyday: true },
+    { situation: "Eine Zaubertür hat kein Schloss, nur drei Bilder.", reaction: "Ein Bild nach dem anderen leuchtet, die Tür summt.", worlds: ["magic_castle"] },
+    { situation: "Die Wolken haben noch keine Form.", reaction: "Eine wird ein Turm, eine ein Stern, eine ein kleines Schaf.", worlds: ["cloud_world"] },
+    { situation: "Der Clown hält einen hohen, einen breiten und einen kleinen Reifen hoch.", reaction: "In jeden passt eine Figur, das Publikum klatscht.", worlds: ["circus"] },
+  ],
 
   // Marschieren und Stampfen
   high_knees: [
@@ -570,6 +578,22 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Die Lok hat einen Knopf für die Pfeife.", reaction: "Tuut tuut.", worlds: ["railway"] },
     { situation: "In der Feuerwache ist ein großer roter Knopf.", reaction: "Die Lichter blinken, alle rutschen die Stange herunter.", worlds: ["fire_station"] },
     { situation: "Am Karussell ist der Startknopf.", reaction: "Die Musik beginnt, das Karussell dreht sich.", worlds: ["toy_town"] },
+  ],
+  crank: [
+    { situation: "Die Markise am Balkon ist eingerollt.", reaction: "Sie rollt aus, jetzt gibt es Schatten.", everyday: true },
+    { situation: "Die Spieluhr am Bett ist still.", reaction: "Sie spielt ein leises Lied.", everyday: true },
+    { situation: "Am Sandkasten hängt ein Eimer unten am Seil.", reaction: "Er kommt voller Sand nach oben.", everyday: true },
+    { situation: "Der Eimer hängt tief unten im Brunnen.", reaction: "Er kommt voll Wasser herauf.", worlds: ["farm"] },
+    { situation: "Die Zugbrücke ist oben, daneben steckt eine Kurbel.", reaction: "Die Kette rattert, die Brücke senkt sich.", worlds: ["magic_castle"] },
+    { situation: "Der Anker des Piratenschiffs liegt noch im Wasser.", reaction: "Die Kette rasselt, das Schiff kann los.", worlds: ["pirate_island"] },
+  ],
+  turn_key: [
+    { situation: "Die Haustür ist abgeschlossen, Papa gibt den Schlüssel.", reaction: "Klick, die Tür geht auf, wir sind zu Hause.", everyday: true },
+    { situation: "Am Fahrrad hängt ein Schloss mit kleinem Schlüssel.", reaction: "Klick, das Rad ist frei.", everyday: true },
+    { situation: "Der Briefkasten ist zu.", reaction: "Die Klappe springt auf, ein Brief ist drin.", everyday: true },
+    { situation: "Vor der Schatztruhe hängt ein dickes Schloss.", reaction: "Klick, der Deckel springt auf, Gold glitzert.", worlds: ["pirate_island"] },
+    { situation: "Die Tür zum Turmzimmer ist verschlossen.", reaction: "Sie knarrt auf, drinnen schläft ein kleiner Drache.", worlds: ["magic_castle"] },
+    { situation: "Im Spielzeugladen steht ein Blechroboter, hinten steckt ein Schlüssel.", reaction: "Er schnarrt los und winkt.", worlds: ["toy_town"] },
   ],
 };
 
