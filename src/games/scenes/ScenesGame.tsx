@@ -12,6 +12,7 @@ import { withSeason } from "./seasonal";
 import {
   carryOverScenesSettings,
   DEFAULT_SCENES_SETTINGS,
+  hasHints,
   isQuestMode,
   SCENES_SETTINGS_KEY,
   type SceneAnnounce,
@@ -84,7 +85,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
                 onChange={(roads) => update({ roads })}
               />
             )}
-            {questMode && (
+            {hasHints(settings.mode) && (
               <Toggle
                 label="Tipp zeigen, wenn es länger dauert"
                 checked={settings.hints}
