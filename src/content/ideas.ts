@@ -285,7 +285,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Türen, Fenster, Sandhaufen, Container lassen sich öffnen: Dahinter sitzt jedes Mal etwas anderes (Katze, Maus, Geschenk). Guck-guck!",
         why: "Objektpermanenz und Neugier – genau das Alter, in dem „Wo ist es hin?“ fasziniert.",
         effort: "M",
-        partial: "Feste Gucker gibt es schon (Maus im Rohr und im Gully, Hase im Busch, Tor der Feuerwache); wechselnde Überraschungen fehlen.",
+        done: true,
       },
       {
         id: "B-02",

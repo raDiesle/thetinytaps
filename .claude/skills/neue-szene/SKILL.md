@@ -74,6 +74,7 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   place: ground(footX, footY, toX, toY, size),
   shadow: [cx, cy, rx],          // ellipse under the foot, own coordinates
   durationMs: 2000,              // matches the CSS animation length
+  hideout: [0.15, 0.8],          // optional: something peeks out of a <Hideout> while the door is open
   Art: Traktor,
 }
 ```
@@ -107,6 +108,14 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   184 × 264 units before depth scaling, pumpkin ≈ 220 × 116, egg ≈ 108 × 80). Leave
   out what doesn't fit the place (no snow indoors, no pumpkin if the scene has one);
   `weather: true` only outdoors. Check every season with the "Jahreszeit" setting.
+- Hidden surprises (idea B-01, `hideout.tsx`): give 2–4 items with a door, window,
+  lid, box, hole or sand pile a `<Hideout x y w h size? />` in their drawing, drawn
+  **behind** the door (dark interior → Hideout → door), and set `hideout` on the item:
+  `true` (out from 20 % to 80 % of `durationMs`) or `[open, close]` matching the
+  door's keyframes. Every tap something else peeks out (cat, mouse, present …),
+  with its own sound and "Guck-guck! Da ist ja eine Katze!". It draws nothing at
+  rest, so the picture stays the same. Reference: Klo, Bauwagen and Sandhaufen in
+  `baustelle/site.tsx`.
 - Roads to other pictures (optional): a vehicle can drive into another scene
   (`ROADS` in `roads.ts`: `from`, `item`, `to`, the free ground spot `park` where it
   stands as a guest there, and the way the drawing `faces`); add the scene's
@@ -155,7 +164,8 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
     (notes, hearts, drops, sparks) and vanish again.
   Draw these parts as separate elements with their own class from the start, so
   they can move – a door painted into the wall can't open.
-- **The picture is still unless someone acts.** Idle movement (clouds, rotors,
+- **The picture is still and silent unless someone acts.** No sound ever plays
+  without a tap, hover or key (also not with idle movement on). Idle movement (clouds, rotors,
   blinking lights, wagging tails) only under `.scene.lively …` – that class is set
   only when the parent turns on "Bild bewegt sich auch von allein". Check with
   `document.getAnimations().length === 0` after load.
