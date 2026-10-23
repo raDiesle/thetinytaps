@@ -63,4 +63,20 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
 };
 
 // v2: speech is off and the picture stands still by default now, so old saved settings start fresh.
-export const SCENES_SETTINGS_KEY = "tinytaps.scenes.v2";
+// v3: every picture is still and silent until the child does something, so a "lively" picture
+// saved before is switched off once; all other choices are carried over.
+export const SCENES_SETTINGS_KEY = "tinytaps.scenes.v3";
+const OLD_SCENES_SETTINGS_KEY = "tinytaps.scenes.v2";
+
+/** Takes over the settings saved under v2, without the picture moving by itself. Call before reading the settings. */
+export function carryOverScenesSettings() {
+  try {
+    const old = localStorage.getItem(OLD_SCENES_SETTINGS_KEY);
+    if (old === null || localStorage.getItem(SCENES_SETTINGS_KEY) !== null) return;
+    const { ambient: _, ...rest } = JSON.parse(old) as Partial<ScenesSettings>;
+    localStorage.setItem(SCENES_SETTINGS_KEY, JSON.stringify(rest));
+    localStorage.removeItem(OLD_SCENES_SETTINGS_KEY);
+  } catch {
+    // Broken or unavailable storage: the defaults apply.
+  }
+}

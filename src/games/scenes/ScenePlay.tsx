@@ -81,6 +81,7 @@ import {
 import { speak } from "@/lib/speech";
 import { findScene } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
+import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys } from "./keys";
 import { nextQuest, questsFor, verb, type Quest } from "./quests";
 import { driveDistance, guestFor, PLACES, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
@@ -206,8 +207,11 @@ const PRAISE = ["Super!", "Toll!", "Prima!", "Ja, genau!", "Richtig!"];
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
-/** Per item: how often it was started (remounts restart the animation) and whether it is running. */
-type Plays = Record<string, { count: number; playing: boolean }>;
+/**
+ * Per item: how often it was started (remounts restart the animation), whether it is running
+ * and, for an item with a hideout, which surprise peeks out this time (index into SURPRISES).
+ */
+type Plays = Record<string, { count: number; playing: boolean; surprise?: number }>;
 /** Keys mode: the badge that lights up; the count restarts its animation on every press. */
 type Lit = { id: string; count: number };
 /** A vehicle driving out of the picture, gone from it, or driving in; dx is how far off the picture it is then. */
@@ -279,6 +283,9 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** Taps per vehicle that can drive off: every second one sends it on its way. */
   const driveTaps = useRef(new Map<string, number>());
   const sentenceIndex = useRef(new Map<string, number>());
+  /** Hidden surprises: the one each hideout showed last, and the last one shown anywhere. */
+  const lastSurprise = useRef(new Map<string, number>());
+  const lastSurpriseAnywhere = useRef(-1);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const svgRef = useRef<SVGSVGElement>(null);
   // An SVG id without the colons React puts in, so it can go into url(#…).
@@ -342,18 +349,33 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     [spawn, soundsOn],
   );
 
+  /** Hidden surprises: never the same twice in a row, neither in one hideout nor one after the other. */
+  const nextSurprise = useCallback((item: SceneItem) => {
+    const avoid = [lastSurprise.current.get(item.id), lastSurpriseAnywhere.current];
+    const choices = SURPRISES.map((_, i) => i).filter((i) => !avoid.includes(i));
+    const next = pick(choices);
+    lastSurprise.current.set(item.id, next);
+    lastSurpriseAnywhere.current = next;
+    return next;
+  }, []);
+
   /** Start the item's animation and (unless quiet) its sound. Returns false while it is still running. */
   const animate = useCallback(
     (item: SceneItem, quiet = false) => {
       const now = performance.now();
       if (now < (busyUntil.current.get(item.id) ?? 0)) return false;
       busyUntil.current.set(item.id, now + item.durationMs);
-      setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true } }));
+      const surprise = item.hideout ? nextSurprise(item) : undefined;
+      setPlays((prev) => ({ ...prev, [item.id]: { count: (prev[item.id]?.count ?? 0) + 1, playing: true, surprise } }));
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
-      if (soundsOn && !quiet) playSound(item.sound);
+      if (soundsOn && !quiet) {
+        playSound(item.sound);
+        // The surprise says hello once it is out of its hideout.
+        if (surprise !== undefined) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
+      }
       return true;
     },
-    [later, soundsOn],
+    [later, soundsOn, nextSurprise],
   );
 
   /** Asks the question; a sound riddle plays its sound first and then asks "Wer macht das?". */
@@ -564,7 +586,10 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
 
     if (!quest) {
       const started = animate(item);
-      if (started) say(describe(item));
+      if (started) {
+        say(describe(item));
+        if (item.hideout) say(`Guck-guck! ${SURPRISES[lastSurprise.current.get(item.id)!].found}`, true);
+      }
       else if (how !== "hover") funBurst(x, y);
       discover(item, x, y);
       if (started) {
@@ -772,6 +797,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           const drive = drives[item.id];
           // A guest keeps the class of its own picture, which its animations use.
           const look = item === guest?.item ? guest.look : item.id;
+          const peek = play?.playing && play.surprise !== undefined ? { surprise: SURPRISES[play.surprise], ...peekTimes(item) } : null;
           return (
             <g
               key={item.id}
@@ -798,7 +824,9 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
                       ry={Math.max(6, item.shadow[2] * 0.12)}
                     />
                   )}
-                  <item.Art />
+                  <HideoutContext.Provider value={peek}>
+                    <item.Art />
+                  </HideoutContext.Provider>
                   {(item.hitAreas ?? [item.box]).map(([x, y, w, h], i) => (
                     <rect key={i} className="scene-hit" x={x} y={y} width={w} height={h} />
                   ))}

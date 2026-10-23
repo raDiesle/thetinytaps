@@ -1,0 +1,61 @@
+/* Hidden surprises (idea B-01): rises out of the opening, looks around, ducks away again. */
+
+.scene-surprise {
+  transform-origin: 0px 0px;
+  transform: translateY(110px);
+  animation-name: surprise-peek;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+@keyframes surprise-peek {
+  0% {
+    transform: translateY(110px);
+  }
+  22% {
+    transform: translateY(-6px);
+  }
+  30% {
+    transform: none;
+  }
+  45% {
+    transform: rotate(-7deg);
+  }
+  60% {
+    transform: rotate(7deg);
+  }
+  72%,
+  80% {
+    transform: none;
+  }
+  100% {
+    transform: translateY(110px);
+  }
+}
+
+.scene-surprise .surprise-sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: surprise-sparkle 0.5s ease-in-out 0.3s 2 alternate;
+}
+
+@keyframes surprise-sparkle {
+  to {
+    transform: scale(1.5) rotate(45deg);
+  }
+}
+
+.calm .scene-surprise {
+  animation-name: surprise-peek-calm;
+}
+
+@keyframes surprise-peek-calm {
+  0%,
+  100% {
+    transform: translateY(110px);
+  }
+  25%,
+  75% {
+    transform: none;
+  }
+}

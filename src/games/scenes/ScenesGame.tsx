@@ -10,6 +10,7 @@ import { ScenePlay } from "./ScenePlay";
 import { activeSeason, SEASON_LABELS, seasonOn, type Season, type SeasonSetting } from "./season";
 import { withSeason } from "./seasonal";
 import {
+  carryOverScenesSettings,
   DEFAULT_SCENES_SETTINGS,
   isQuestMode,
   SCENES_SETTINGS_KEY,
@@ -19,6 +20,8 @@ import {
 } from "./settings";
 
 const pack = de;
+
+carryOverScenesSettings();
 
 export function ScenesGame({ sceneId }: { sceneId: string }) {
   const [stored, update] = useStoredSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
@@ -127,7 +130,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
             />
             {!settings.calm && (
               <Toggle
-                label="Bild bewegt sich auch von allein (Wolken, Rotor, Blinklichter …)"
+                label="Bild bewegt sich auch von allein, ohne Ton (Wolken, Rotor, Blinklichter …)"
                 checked={settings.ambient}
                 onChange={(ambient) => update({ ambient })}
               />
