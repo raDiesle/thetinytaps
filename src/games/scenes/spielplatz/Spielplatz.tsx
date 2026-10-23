@@ -191,6 +191,7 @@ export const spielplatz: Scene = {
       place: TOWER,
       shadow: [-10, 0, 130],
       durationMs: 2600,
+      hideout: [0.25, 0.8],
       Art: Kletterturm,
     },
     {
@@ -378,11 +379,12 @@ export const spielplatz: Scene = {
     {
       id: "sandburg",
       name: "die Sandburg",
-      sentences: ["Das ist eine Sandburg!", "Das Tor geht auf. Hallo, kleiner Krebs!", "Die Fahne weht auf der Sandburg."],
+      sentences: ["Das ist eine Sandburg!", "Das Tor geht auf. Wer wohnt da drin?", "Die Fahne weht auf der Sandburg."],
       sound: "pop",
       box: [-100, -212, 200, 212],
       place: ground(0, 0, 800, 906),
       durationMs: 2400,
+      hideout: [0.15, 0.8],
       Art: Sandburg,
     },
     {
@@ -456,6 +458,7 @@ export const spielplatz: Scene = {
       place: ground(0, 0, 350, 966),
       shadow: [0, 0, 40],
       durationMs: 2000,
+      hideout: [0.22, 0.68],
       Art: Eimer,
     },
     {

@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Eye, Face, Inside, nth } from "../shared";
 import { Dust, Helmet, SUIT, SUIT_SHADE, Sparkles, ellipsePath, starPath } from "./parts";
 
@@ -17,6 +18,8 @@ export function Krater() {
       <Dust className="wa-krater-dust" spots={[[-84, -36], [-30, -48], [30, -48], [84, -36]]} r={18} />
       <ellipse cx="0" cy="-22" rx="136" ry="32" fill="#c3c5d3" />
       <ellipse cx="0" cy="-20" rx="112" ry="22" fill="#8f92a8" />
+      {/* Something climbs out of the hole */}
+      <Hideout x={-60} y={-130} w={120} h={116} size={64} />
       <path d="M-112 -20 A112 22 0 0 0 112 -20 A112 12 0 0 1 -112 -20 Z" fill="#a9abbf" />
       <path d="M-136 -22 A136 32 0 0 0 136 -22" stroke="#e2e3ec" strokeWidth="6" fill="none" />
       <path d="M-120 -36 A136 32 0 0 1 -40 -52" stroke="#a9abbf" strokeWidth="5" fill="none" strokeLinecap="round" />

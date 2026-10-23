@@ -103,6 +103,7 @@ export const feuerwache: Scene = {
       ],
       place: STATION,
       durationMs: 2600,
+      hideout: [0.22, 0.7],
       Art: Wache,
     },
     {
@@ -271,6 +272,7 @@ export const feuerwache: Scene = {
       place: ground(0, 0, 640, 600),
       shadow: [0, 0, 130],
       durationMs: 2200,
+      hideout: [0.25, 0.75],
       Art: Kommandowagen,
     },
     {
@@ -348,6 +350,7 @@ export const feuerwache: Scene = {
       place: TRUCK,
       shadow: [0, 0, 250],
       durationMs: 3200,
+      hideout: [0.29, 0.73],
       Art: Feuerwehrauto,
     },
 

@@ -91,6 +91,7 @@ export const kueche: Scene = {
       sound: "pop",
       box: [1060, 2, 248, 110],
       durationMs: 2400,
+      hideout: [0.21, 0.67],
       Art: Keksschrank,
     },
     {
@@ -106,6 +107,7 @@ export const kueche: Scene = {
         [1320, 34, 80, 150],
       ],
       durationMs: 2600,
+      hideout: [0.28, 0.77],
       Art: Kuehlschrank,
     },
 
@@ -126,6 +128,7 @@ export const kueche: Scene = {
       sound: "blub",
       box: [352, 200, 216, 206],
       durationMs: 2400,
+      hideout: [0.3, 0.74],
       Art: Spuele,
     },
     {

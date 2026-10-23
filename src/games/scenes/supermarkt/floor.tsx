@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, INK, SKIN, STEEL, Wheel, nth } from "../shared";
 import { Lid, Lines, Mist, Notes, Sparkles } from "./parts";
 
@@ -316,6 +317,8 @@ export function Eistruhe() {
         <circle cx="-66" cy="-171" r="1.8" fill={INK} />
         <path d="M-74 -166 q4 3 8 0" stroke={INK} strokeWidth="1.5" fill="none" />
       </g>
+      {/* Someone else climbs out of the open side every time */}
+      <Hideout x={28} y={-210} w={100} h={100} size={64} />
       {/* Rim and what is inside */}
       <path d="M-150 -96 L-138 -130 H138 L150 -96 Z" fill="#f8f9fa" />
       <path d="M-136 -100 L-128 -124 H128 L136 -100 Z" fill="#d0ebff" />

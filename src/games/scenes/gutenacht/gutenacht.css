@@ -922,6 +922,13 @@
   }
 }
 
+/* ---------- Hidden surprises: at bedtime they peek out gently, without wiggling ---------- */
+
+.item-puppenhaus .scene-surprise,
+.item-spielzeugkiste .scene-surprise {
+  animation-name: surprise-peek-calm;
+}
+
 /* ---------- Puppenhaus: door opens, the doll bobs; asleep, lights go out one by one ---------- */
 
 .item-puppenhaus.playing .gn-haus-door {

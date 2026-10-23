@@ -1,4 +1,5 @@
-import { Face, INK, Inside, SKIN, nth } from "../shared";
+import { Hideout } from "../hideout";
+import { INK, Inside, nth } from "../shared";
 import { ICE, SNOW, SNOW_SHADE, glint, vars } from "./parts";
 
 // Things of the winter site. Each drawing stands with its foot point on (0, 0), except the icicles
@@ -8,7 +9,7 @@ import { ICE, SNOW, SNOW_SHADE, glint, vars } from "./parts";
 const domeX = (y: number) => 120 * Math.sqrt(1 - (y / 108) ** 2);
 const DOOR = "M-40 0 V-30 Q-40 -50 -10 -50 Q20 -50 20 -30 V0 Z";
 
-/** An igloo of snow blocks; the light goes on inside and a child peeks out of the door. */
+/** An igloo of snow blocks; the light goes on inside and someone peeks out of the door. */
 export function Iglu() {
   return (
     <>
@@ -27,13 +28,9 @@ export function Iglu() {
         <path d="M-64 0 V-38 Q-64 -72 -10 -72 Q44 -72 44 -38 V0 Z" fill="#f7fbff" stroke="#c9dcf0" strokeWidth="3" />
         <path d={DOOR} fill="#35577a" />
         <path className="wb-iglu-glow" d={DOOR} fill="#ffd166" />
+        {/* Who lives in the igloo? Someone else every time. */}
         <Inside d={DOOR}>
-          <g className="wb-iglu-peek">
-            <circle cx="-10" cy="-20" r="15" fill={SKIN} />
-            <Face cx={-10} cy={-21} size={0.5} />
-            <path d="M-26 -24 Q-26 -40 -10 -40 Q6 -40 6 -24 Z" fill="#4895ef" />
-            <circle cx="-10" cy="-42" r="5" fill="#fff" />
-          </g>
+          <Hideout x={-40} y={-50} w={60} h={50} size={44} />
         </Inside>
       </g>
       <g className="wb-iglu-sparkle" fill="#fff">
