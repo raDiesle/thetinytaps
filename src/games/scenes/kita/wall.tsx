@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Cloud, Eye, Face, INK, Inside, SKIN, STEEL, nth } from "../shared";
 import { SLEEP_WINDOW, WINDOW, WINDOW_GLASS } from "./layout";
 import { Hearts, Lines, Notes, Puffs, Sparkles } from "./parts";
@@ -487,7 +488,8 @@ export function Schrank() {
       <rect x="1010" y="150" width="210" height="180" rx="6" fill="#4dabf7" />
       <rect x="1018" y="158" width="194" height="164" fill="#fff9ec" />
       <rect x="1018" y="238" width="194" height="6" fill="#e9d8b4" />
-      {/* Upper shelf: paint pots and a cup with brushes */}
+      {/* Upper shelf: paint pots and a cup with brushes; behind the pots someone else hides every time */}
+      <Hideout x={1026} y={160} w={104} h={70} size={66} />
       {pots.map(({ x, colour }, i) => (
         <g key={x} className="ki-schrank-pot" style={nth(i)}>
           <rect x={x - 13} y="212" width="26" height="26" rx="4" fill="#fff" stroke="#dee2e6" strokeWidth="2" />

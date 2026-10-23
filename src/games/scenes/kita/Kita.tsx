@@ -129,11 +129,12 @@ export const kita: Scene = {
     {
       id: "schrank",
       name: "der Bastelschrank",
-      sentences: ["Der Bastelschrank geht auf.", "Da sind Farben, Pinsel und Glitzer."],
+      sentences: ["Der Bastelschrank geht auf.", "Da sind Farben, Pinsel und Glitzer.", "Guck mal, wer hinter den Farben sitzt!"],
       sound: "twinkle",
       traits: ["blue", "big"],
       box: [1008, 150, 214, 180],
       durationMs: 2400,
+      hideout: [0.22, 0.68],
       Art: Schrank,
     },
     {
