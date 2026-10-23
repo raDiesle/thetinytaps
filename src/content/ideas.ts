@@ -1079,6 +1079,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Musik läuft, Tapsi tanzt. Hört die Musik auf, friert Tapsi ein – und alle Tiere im Bild auch. Mal wackelig, mal als Statue auf einem Bein. Die Pausen sind unterschiedlich lang.",
         why: "Klassiker vom Kindergeburtstag; Zuhören und Körperkontrolle.",
         effort: "S",
+        done: true,
       },
     ],
   },

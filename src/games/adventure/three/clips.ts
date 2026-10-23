@@ -1,5 +1,5 @@
 import type { MotionClipId } from "../library/types";
-import { restPose, type Pose } from "./guide";
+import { lerpPose, restPose, type Pose } from "./guide";
 
 // The guide's body animations, one per MotionClipId. A clip turns the time
 // since it started (s) into a pose; it loops by itself. Everything is slow and
@@ -51,6 +51,74 @@ export const KEY_PICKUP = 2;
 export const KEY_TURN = 1.6;
 /** How far the key is turned, 0..1 (a quarter turn), at `t` seconds into the key clip. */
 export const keyTurn = (t: number) => (t < KEY_PICKUP ? 0 : hold(phase(t - KEY_PICKUP, KEY_TURN), 0.1, 0.45, 0.6, 0.9));
+
+/** How Tapsi stands still in the stop dance. */
+type Statue = "wobbly" | "one_leg" | "funny";
+
+/**
+ * The stop dance: dance, then everyone holds still until the music comes
+ * back. The pauses differ, so nobody can count along; stories stop their
+ * music and freeze their animals with it (`stopDance`).
+ */
+export const STOP_DANCE: { dance: number; hold: number; statue: Statue }[] = [
+  { dance: 3, hold: 2.2, statue: "wobbly" },
+  { dance: 3.6, hold: 3, statue: "one_leg" },
+  { dance: 2.4, hold: 1.5, statue: "funny" },
+  { dance: 4, hold: 2.6, statue: "wobbly" },
+];
+const STOP_DANCE_LOOP = STOP_DANCE.reduce((sum, r) => sum + r.dance + r.hold, 0);
+
+/** Where the stop dance is at `t` seconds into its clip: the round, and since when everyone is still (null while dancing) or dancing. */
+export function stopDance(t: number): { round: number; still: number | null; dancing: number } {
+  let k = ((t % STOP_DANCE_LOOP) + STOP_DANCE_LOOP) % STOP_DANCE_LOOP;
+  for (const [round, r] of STOP_DANCE.entries()) {
+    if (k < r.dance) return { round, still: null, dancing: k };
+    k -= r.dance;
+    if (k < r.hold) return { round, still: k, dancing: 0 };
+    k -= r.hold;
+  }
+  return { round: 0, still: null, dancing: 0 };
+}
+
+const STATUES: Record<Statue, Clip> = {
+  // Arms out like on a wobbly bridge, one foot a little up; the body tips to and fro.
+  wobbly: (t, p) => {
+    const s = Math.sin(t * 4.2);
+    p.lean = s * 0.13;
+    p.headTilt = -s * 0.12;
+    p.armL.spread = 1.45 + s * 0.3;
+    p.armR.spread = 1.45 - s * 0.3;
+    p.armL.elbow = p.armR.elbow = 0.15;
+    p.legR.lift = 0.3;
+    p.legR.knee = 0.7;
+  },
+  // A statue on one leg with the arms up high.
+  one_leg: (_t, p) => {
+    p.legL.lift = 0.75;
+    p.legL.knee = 1.7;
+    p.armL.spread = p.armR.spread = 2.7;
+    p.armL.elbow = p.armR.elbow = 0.35;
+    p.lean = -0.05;
+    p.headPitch = -0.1;
+  },
+  // A funny statue: one arm up, one out, a little tilt.
+  funny: (_t, p) => {
+    p.armL.raise = 0.3;
+    p.armL.spread = 2.6;
+    p.armL.elbow = 0.2;
+    p.armR.spread = 1.3;
+    p.armR.elbow = 0.8;
+    p.lean = 0.12;
+    p.headTilt = 0.2;
+  },
+};
+
+/** The pose of a statue, `still` seconds after the music stopped. */
+const statuePose = (statue: Statue, still: number) => {
+  const p = restPose();
+  STATUES[statue](still, p);
+  return p;
+};
 
 /** Hands come together in front at this spread. */
 const TOGETHER = -0.42;
@@ -634,19 +702,16 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   freeze: (t, p) => {
-    const k = phase(t, 4);
-    if (k < 0.55) {
-      CLIPS.shake(t, p);
+    const { round, still, dancing } = stopDance(t);
+    if (still === null) {
+      // Out of the statue back into the dance; not at the very start, which comes from standing.
+      const before = STOP_DANCE[(round + STOP_DANCE.length - 1) % STOP_DANCE.length];
+      const back = t > dancing ? smooth(clamp01(dancing / 0.25)) : 1;
+      Object.assign(p, lerpPose(statuePose(before.statue, before.hold), clipPose("shake", t), back));
       return;
     }
-    // A funny statue: one arm up, one out, a little tilt.
-    p.armL.raise = 0.3;
-    p.armL.spread = 2.6;
-    p.armL.elbow = 0.2;
-    p.armR.spread = 1.3;
-    p.armR.elbow = 0.8;
-    p.lean = 0.12;
-    p.headTilt = 0.2;
+    // Caught in the middle of the dance, and quickly into the statue.
+    Object.assign(p, lerpPose(clipPose("shake", t - still), statuePose(STOP_DANCE[round].statue, still), smooth(clamp01(still / 0.25))));
   },
 
   melt: (t, p) => {
