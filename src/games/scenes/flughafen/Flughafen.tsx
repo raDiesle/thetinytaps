@@ -388,6 +388,7 @@ export const flughafen: Scene = {
       name: "das Gepäckband",
       sentences: ["Auf dem Band fahren die Koffer nach oben.", "Rauf, rauf, rauf!"],
       sound: "rattle",
+      traits: ["wheels"],
       box: [-122, -212, 242, 212],
       hitAreas: [
         [-122, -110, 242, 110],
