@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Inside, nth, sparklePath } from "../shared";
 import { Cheek, DinoEye, Notes, Puff, Smile } from "./parts";
 
@@ -121,12 +122,8 @@ export function Baumstamm() {
       <ellipse cx="112" cy="-47" rx="30" ry="42" fill="#d4a373" />
       <path d="M112 -76 a20 29 0 1 1 -0.1 0 M112 -64 a12 17 0 1 1 -0.1 0" stroke="#b5835a" strokeWidth="3" fill="none" />
       <ellipse className="dt-stamm-hole" cx="114" cy="-44" rx="18" ry="26" fill="#3b2f2f" />
-      <g className="dt-stamm-eyes">
-        <circle cx="106" cy="-48" r="5" fill="#fff3b0" />
-        <circle cx="122" cy="-48" r="5" fill="#fff3b0" />
-        <circle cx="107" cy="-47" r="2.5" fill="#2b2d42" />
-        <circle cx="123" cy="-47" r="2.5" fill="#2b2d42" />
-      </g>
+      {/* Somebody else looks out of the hole every time */}
+      <Hideout x={99} y={-66} w={30} h={46} size={40} />
       <g className="dt-stamm-leaves" fill="#6bb26f">
         {[0, 1, 2].map((i) => (
           <ellipse key={i} cx={-40 + i * 40} cy={-92} rx="9" ry="5" style={nth(i)} />

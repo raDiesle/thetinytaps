@@ -101,7 +101,6 @@
 .dt-vulkan-sparks path,
 .dt-hoehle-eyes,
 .dt-hoehle-peek,
-.dt-stamm-eyes,
 .dt-stamm-leaves ellipse,
 .dt-pfuetze-rings ellipse,
 .dt-pfuetze-drops circle,
@@ -134,7 +133,6 @@
 .dt-vulkan-heart,
 .dt-vulkan-sparks path,
 .dt-hoehle-eyes,
-.dt-stamm-eyes,
 .dt-stamm-leaves ellipse,
 .dt-pfuetze-rings ellipse,
 .dt-pfuetze-drops circle,
@@ -1489,10 +1487,6 @@
   70% {
     transform: rotate(0);
   }
-}
-
-.item-baumstamm.playing .dt-stamm-eyes {
-  animation: dt-eyes 2.2s linear 0.2s;
 }
 
 .item-baumstamm.playing .dt-stamm-pilz {

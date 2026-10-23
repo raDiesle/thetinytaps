@@ -353,6 +353,7 @@ export const dinotal: Scene = {
       place: STAMM,
       shadow: [0, 0, 120],
       durationMs: 2200,
+      hideout: true,
       Art: Baumstamm,
     },
     {
