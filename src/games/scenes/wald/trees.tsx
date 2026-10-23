@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { Hideout } from "../hideout";
 import { Inside, nth } from "../shared";
 
 // The big trees, the stump and the log pile. Foot point at (0, 0). The birds and the
@@ -178,6 +179,8 @@ export function Baumstumpf() {
   const { cx, cy, rx, ry } = STUMP_HOLE;
   return (
     <>
+      {/* Someone else peeks out from behind the stump every time */}
+      <Hideout x={-55} y={-222} w={110} h={118} size={86} />
       <path d="M-104 0 Q-90 -14 -84 -30 L-82 -96 H82 L84 -30 Q90 -14 104 0 Z" fill="#9c6644" />
       <path d="M-60 -10 q-4 -40 0 -76 M-20 -6 q-4 -40 0 -80 M30 -8 q4 -40 0 -80 M64 -10 q4 -36 0 -74" stroke="#7f5539" strokeWidth="4" strokeLinecap="round" fill="none" />
       <path d="M-104 0 Q-120 -4 -128 6 M104 0 Q124 -2 132 8" stroke="#9c6644" strokeWidth="12" strokeLinecap="round" />
@@ -237,6 +240,8 @@ export function Holzstapel() {
   return (
     <>
       <path d="M-94 -2 L-60 -24 H130 L104 -2 Z" fill="#7f5539" opacity="0.4" />
+      {/* Someone else peeks out from behind the logs every time */}
+      <Hideout x={82} y={-150} w={64} h={92} size={64} />
       {LOGS.map(([cx, cy], i) => (
         <g key={`${cx}-${cy}`} className="wd-holz-log" style={{ transformOrigin: `${cx}px ${cy}px`, ...nth(i) }}>
           <path d={`M${cx} ${cy - 30} H${cx + 46} A12 30 0 0 1 ${cx + 46} ${cy + 30} H${cx} Z`} fill="#9c6644" />

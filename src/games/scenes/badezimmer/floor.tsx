@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, INK, nth } from "../shared";
 import { Bubbles, Lid, Splash } from "./parts";
 
@@ -42,6 +43,8 @@ export function Foehn() {
 export function Muelleimer() {
   return (
     <>
+      {/* Someone else peeks out of the bin every time */}
+      <Hideout x={-36} y={-170} w={72} h={70} size={50} />
       <g className="bz-eimer-ball">
         <circle cx="0" cy="-150" r="13" fill="#fff" stroke="#adb5bd" strokeWidth="2" />
         <path d="M-6 -156 L2 -148 L-4 -142 M4 -158 L8 -150" stroke="#adb5bd" strokeWidth="2" fill="none" />
@@ -118,6 +121,8 @@ export function Waeschekorb() {
         <path d="M-16 -140 H14 M-16 -124 H14" stroke="#e63946" strokeWidth="6" />
         <path d="M-16 -160 H14 V-152 H-16 Z" fill="#e63946" />
       </g>
+      {/* Next to the sock someone else hides in the laundry */}
+      <Hideout x={-56} y={-170} w={42} h={66} size={46} />
       <path d="M-56 -104 H56 L46 -4 Q46 0 40 0 H-40 Q-46 0 -46 -4 Z" fill="#d4a373" />
       <path d="M-54 -80 H54 M-52 -56 H52 M-50 -32 H50" stroke="#bc8a5f" strokeWidth="4" />
       <path d="M-30 -104 L-26 0 M0 -104 V0 M30 -104 L26 0" stroke="#bc8a5f" strokeWidth="3" opacity="0.6" />

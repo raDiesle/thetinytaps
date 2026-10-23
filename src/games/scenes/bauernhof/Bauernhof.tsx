@@ -69,6 +69,7 @@ export const bauernhof: Scene = {
       box: [-175, -445, 350, 445],
       place: ground(0, 0, 1470, 430, 1.5),
       durationMs: 2400,
+      hideout: [0.25, 0.75],
       Art: Windmuehle,
     },
     {
@@ -89,12 +90,13 @@ export const bauernhof: Scene = {
     {
       id: "bauernhaus",
       name: "das Bauernhaus",
-      sentences: ["Im Bauernhaus wohnt die Bauernfamilie.", "Hallo! Die Bäuerin winkt aus dem Fenster.", "Die Tür geht auf. Hallo!", "Das Licht geht an!"],
+      sentences: ["Im Bauernhaus wohnt die Bauernfamilie.", "Hallo! Die Bäuerin winkt aus dem Fenster.", "Die Tür geht auf. Wer ist da drin?", "Das Licht geht an!"],
       sound: "knocks",
       traits: ["big"],
       box: [-178, -372, 356, 372],
       place: HOF,
       durationMs: 2400,
+      hideout: [0.25, 0.75],
       Art: Bauernhaus,
     },
     {
@@ -130,6 +132,7 @@ export const bauernhof: Scene = {
       box: [-172, -400, 344, 400],
       place: SCHEUNE,
       durationMs: 2400,
+      hideout: [0.25, 0.75],
       Art: Scheune,
     },
     {

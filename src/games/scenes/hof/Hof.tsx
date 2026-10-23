@@ -80,6 +80,7 @@ export const hof: Scene = {
       box: [-186, -400, 372, 400],
       place: HAUS,
       durationMs: 2600,
+      hideout: true,
       Art: Bauernhaus,
     },
     {
@@ -91,6 +92,7 @@ export const hof: Scene = {
       box: [-206, -376, 412, 376],
       place: SCHEUNE,
       durationMs: 2600,
+      hideout: true,
       Art: Scheune,
     },
     {
@@ -153,6 +155,7 @@ export const hof: Scene = {
       place: STALL,
       shadow: [0, 0, 100],
       durationMs: 2400,
+      hideout: true,
       Art: Huehnerstall,
     },
     {
