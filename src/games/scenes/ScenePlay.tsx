@@ -74,6 +74,7 @@ import {
   playGiggle,
   playCreak,
   playLeaves,
+  playSneeze,
   loadRecordings,
   playRecorded,
   setSfxVolume,
@@ -158,6 +159,7 @@ const SOUNDS: Record<SceneSound, () => void> = {
   giggle: playGiggle,
   creak: playCreak,
   rustle: playLeaves,
+  sneeze: playSneeze,
 };
 
 /** A scene sound: the real recording where there is one (src/lib/sounds/), else synthesized. */
