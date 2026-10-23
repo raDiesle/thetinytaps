@@ -89,6 +89,9 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
           onFlash(amount) {
             if (flashRef.current) flashRef.current.style.opacity = String(amount);
           },
+          onQuiet(quiet) {
+            music.hush(quiet);
+          },
           onCue(cue) {
             if (settingsRef.current.sounds) CUES[cue]();
           },

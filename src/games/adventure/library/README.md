@@ -101,15 +101,15 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 | Ablauf | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
 | --- | --- | --- | --- |
-| `treasure_island` (spielbar) | 16 | 214 s | r m l l r m m l r r m m r l l r |
+| `treasure_island` (spielbar) | 16 | 226 s | r m l l r m m l r r m m r l l r |
 | `space_trip` | 9 | 160 s | r m l m m m l r l |
 | `underwater_dive` | 9 | 158 s | r m m m m l r m l |
 | `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
 | `farm_morning` | 9 | 153 s | r r m l m l m r m |
 
-Die 3D-Geschichte der Schatzinsel dauert länger als die 214 s der Tabelle, etwa 4:25. Vorher
+Die 3D-Geschichte der Schatzinsel dauert länger als die 226 s der Tabelle, etwa 4:40. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
-Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung). Die
+Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung, beim Stopptanz eine ganze Runde). Die
 Wege zwischen den Stationen sind kurz (2–5 s), damit es ohne lange Pausen weitergeht. Eltern
 können oben links pausieren und vor- oder zurückspringen, unten auf ein Bild tippen springt zu
 dieser Bewegung.
@@ -147,7 +147,12 @@ noch ein ruhiger Abschied dazukommen.
   rollenden Kokosnüssen Platz, weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
   pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), drückt die
   Tür auf (die Pfoten bleiben an der Tür), zieht die Truhe am Seil heran, schließt sie mit dem
-  Schlüssel auf, jubelt und tanzt mit den Krebsen, und zum Schluss gibt es ein Feuerwerk.
+  Schlüssel auf, jubelt und macht mit Kiki und den Krebsen Stopptanz, und zum Schluss gibt es ein Feuerwerk.
+- **Stopptanz** (`freeze` in `../three/clips.ts`, `STOP_DANCE`): Musik an, alle tanzen; hört sie
+  auf, frieren Tapsi, Kiki und die Krebse ein, mal wackelig, mal als Statue auf einem Bein, mal
+  lustig mit einem Arm hoch. Die Pausen sind verschieden lang (1,5–3 s), damit niemand mitzählen
+  kann. Das Zeichen ist nur die Stille: Tapsi sagt kein „Stopp!“. Ist die Musik ausgeschaltet,
+  bleibt nur das Bild, dann frieren alle trotzdem ein.
 - **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Deshalb gibt es
   nur Bewegungen auf der Stelle (Stampfen statt über Steine hüpfen) und kleine Schritte zur
   Seite und zurück.
