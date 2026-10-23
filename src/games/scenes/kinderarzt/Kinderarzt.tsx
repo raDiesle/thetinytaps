@@ -135,12 +135,13 @@ export const kinderarzt: Scene = {
     {
       id: "waschbecken",
       name: "das Waschbecken",
-      sentences: ["Plitsch, platsch! Das Wasser läuft.", "Im Schrank sind Handtücher und eine Ente."],
+      sentences: ["Plitsch, platsch! Das Wasser läuft.", "Im Schrank sind Handtücher und eine Ente. Und wer noch?"],
       sound: "splash",
       box: [-112, -272, 224, 272],
       place: ground(0, 0, 1360, 425),
       shadow: [0, 0, 104],
       durationMs: 2400,
+      hideout: [0.42, 0.8],
       Art: Waschbecken,
     },
     {
@@ -152,6 +153,7 @@ export const kinderarzt: Scene = {
       place: ground(0, 0, 430, 440),
       shadow: [0, 0, 128],
       durationMs: 2600,
+      hideout: [0.5, 0.8],
       Art: Aquarium,
     },
     {

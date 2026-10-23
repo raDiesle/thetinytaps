@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { CHEEK, Eye, Face, INK, SKIN, STEEL, heartPath, nth, side, sparklePath } from "../shared";
 import { Hearts, Lid, Lines, Plaster, Sparkles } from "./parts";
 
@@ -54,6 +55,7 @@ export function Waschbecken() {
           </g>
         ))}
       </g>
+      <Hideout x={-92} y={-160} w={96} h={100} size={80} />
       <g className="ka-becken-duck" style={nth(1)}>
         <ellipse cx="46" cy="-28" rx="22" ry="16" fill="#ffd43b" />
         <circle cx="58" cy="-50" r="13" fill="#ffd43b" />

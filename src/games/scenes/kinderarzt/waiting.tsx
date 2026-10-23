@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { CHEEK, Eye, Face, INK, SKIN, STEEL, Wheel, heartPath, nth, sparklePath } from "../shared";
 import { Bubbles, Hearts, Lid, Lines, Notes, Sparkles } from "./parts";
 
@@ -104,6 +105,7 @@ export function Aquarium() {
         <path d="M40 -20 L70 -110" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" />
         <ellipse cx="78" cy="-124" rx="22" ry="16" fill="#a5d8ff" fillOpacity="0.7" stroke="#4dabf7" strokeWidth="3" />
       </g>
+      <Hideout x={-46} y={-160} w={82} h={150} size={84} />
       {[
         { x: -126, hinge: -126, knob: -16 },
         { x: 2, hinge: 126, knob: 16 },
