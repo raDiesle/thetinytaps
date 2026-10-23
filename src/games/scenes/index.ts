@@ -5,6 +5,7 @@ import { feuerwache } from "./feuerwache/Feuerwache";
 import { flughafen } from "./flughafen/Flughafen";
 import { gutenacht } from "./gutenacht/GuteNacht";
 import { hof } from "./hof/Hof";
+import { kinderarzt } from "./kinderarzt/Kinderarzt";
 import { kueche } from "./kueche/Kueche";
 import { spielplatz } from "./spielplatz/Spielplatz";
 import { stadt } from "./stadt/Stadt";
@@ -17,7 +18,7 @@ import { winterbaustelle } from "./winterbaustelle/WinterBaustelle";
 import { zoo } from "./zoo/Zoo";
 
 /** All playable scenes, in menu order. */
-export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall, spielplatz, kueche, supermarkt, flughafen, winterbaustelle, gutenacht];
+export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall, spielplatz, kueche, supermarkt, flughafen, winterbaustelle, kinderarzt, gutenacht];
 
 /** Shown greyed out in the menu so children (and parents) know more is coming. */
 export const UPCOMING_SCENES: { emoji: string; title: string }[] = [];

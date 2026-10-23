@@ -679,3 +679,11 @@ export function playJet() {
   hiss({ from: 350, to: 2600, duration: 1.8, volume: 0.3, q: 0.7 });
   note({ from: 80, to: 150, duration: 1.6, type: "sawtooth", volume: 0.12, lowpass: 500 });
 }
+
+/** "Bumbum, bumbum" – a heart heard through the stethoscope: two soft, low thumps, twice. */
+export function playHeartbeat() {
+  [0, 0.75].forEach((delay) => {
+    note({ from: 70, to: 45, duration: 0.18, type: "sine", volume: 0.55, delay });
+    note({ from: 62, to: 40, duration: 0.16, type: "sine", volume: 0.4, delay: delay + 0.22 });
+  });
+}
