@@ -16,7 +16,7 @@ und wie die Welt antwortet.
 | `categories.ts` | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was *nicht* dazugehört |
 | `movements/*.ts` | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
-| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–228 s lang |
+| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–240 s lang |
 | `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
 | diese Datei | **Ergebnis E**: Qualitätskontrolle |
 
@@ -102,15 +102,15 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 | Ablauf | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
 | --- | --- | --- | --- |
-| `treasure_island` (spielbar) | 17 | 228 s | r m l l l r m m l r r m m r l l r |
+| `treasure_island` (spielbar) | 17 | 240 s | r m l l l r m m l r r m m r l l r |
 | `space_trip` | 9 | 160 s | r m l m m m l r l |
 | `underwater_dive` | 9 | 158 s | r m m m m l r m l |
 | `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
 | `farm_morning` | 9 | 153 s | r r m l m l m r m |
 
-Die 3D-Geschichte der Schatzinsel dauert länger als die 228 s der Tabelle, etwa 4:45. Vorher
+Die 3D-Geschichte der Schatzinsel dauert länger als die 240 s der Tabelle, etwa 5 Minuten. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
-Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung). Die
+Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung, beim Stopptanz eine ganze Runde). Die
 Wege zwischen den Stationen sind kurz (2–5 s), damit es ohne lange Pausen weitergeht. Eltern
 können oben links pausieren und vor- oder zurückspringen, unten auf ein Bild tippen springt zu
 dieser Bewegung.
@@ -150,7 +150,12 @@ noch ein ruhiger Abschied dazukommen.
   rollenden Kokosnüssen Platz, weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
   pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), wedelt die
   Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), zieht die Truhe am Seil heran, schließt sie mit dem
-  Schlüssel auf, jubelt und tanzt mit den Krebsen, und zum Schluss gibt es ein Feuerwerk.
+  Schlüssel auf, jubelt und macht mit Kiki und den Krebsen Stopptanz, und zum Schluss gibt es ein Feuerwerk.
+- **Stopptanz** (`freeze` in `../three/clips.ts`, `STOP_DANCE`): Musik an, alle tanzen; hört sie
+  auf, frieren Tapsi, Kiki und die Krebse ein, mal wackelig, mal als Statue auf einem Bein, mal
+  lustig mit einem Arm hoch. Die Pausen sind verschieden lang (1,5–3 s), damit niemand mitzählen
+  kann. Das Zeichen ist nur die Stille: Tapsi sagt kein „Stopp!“. Ist die Musik ausgeschaltet,
+  bleibt nur das Bild, dann frieren alle trotzdem ein.
 - **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Tapsi springt
   zwar von Stein zu Stein, das Kind aber auf der Stelle (`stone_jump`, leichter: auf die Zehenspitzen
   und den Kopf hochstrecken). Sonst gibt es nur kleine Schritte zur Seite und zurück.

@@ -57,6 +57,8 @@ export interface FrameResult {
   pointing?: number;
   /** How much the guide sits (0 stands, 1 sits, e.g. in the canoe); arms and body keep moving. */
   sitting?: number;
+  /** The music stops for a moment, e.g. for everyone to freeze in the stop dance. */
+  quiet?: boolean;
 }
 
 export interface StoryWorld {

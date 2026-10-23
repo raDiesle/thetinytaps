@@ -903,6 +903,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Haus mit drei Stockwerken und riesigen Knöpfen 1, 2, 3. Knopf drücken – der Aufzug fährt, „Pling“, die Tür geht auf, und auf jeder Etage steigt ein anderes Tier ein oder aus.",
         why: "Kleinkinder lieben Aufzugknöpfe; Zahlen und oben/unten nebenbei.",
         effort: "S",
+        done: true,
       },
       {
         id: "N-38",
@@ -1079,6 +1080,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Musik läuft, Tapsi tanzt. Hört die Musik auf, friert Tapsi ein – und alle Tiere im Bild auch. Mal wackelig, mal als Statue auf einem Bein. Die Pausen sind unterschiedlich lang.",
         why: "Klassiker vom Kindergeburtstag; Zuhören und Körperkontrolle.",
         effort: "S",
+        done: true,
       },
     ],
   },

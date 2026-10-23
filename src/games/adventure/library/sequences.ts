@@ -115,10 +115,10 @@ export const SEQUENCES: Sequence[] = [
         transition: "Die Krebse kommen zum Feiern aus dem Sand.",
       },
       {
-        movement: "body_shake",
-        seconds: 11.5,
+        movement: "freeze_statue",
+        seconds: 23.4,
         energy: "lively",
-        situation: "Strandparty: Tapsi, Kiki und die Krebse tanzen, die Sonne geht unter.",
+        situation: "Strandparty mit Stopptanz: Tapsi, Kiki und die Krebse tanzen; hört die Musik auf, frieren alle ein – mal wackelig, mal auf einem Bein. Die Sonne geht unter.",
         transition: "Es wird Abend, alle werden ruhig.",
       },
       {

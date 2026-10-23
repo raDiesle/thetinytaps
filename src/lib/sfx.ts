@@ -576,6 +576,16 @@ export function playDing() {
   note({ from: 3920, duration: 0.5, type: "sine", volume: 0.05 });
 }
 
+/** "Ssssch" – sliding lift doors. */
+export function playSlide() {
+  hiss({ from: 900, to: 600, duration: 0.5, volume: 0.08, q: 0.7 });
+}
+
+/** "Wuuumm" – a lift humming up or down for `seconds`. */
+export function playLift(seconds: number, up: boolean) {
+  note({ from: up ? 110 : 140, to: up ? 140 : 110, duration: seconds, type: "triangle", volume: 0.18, lowpass: 500 });
+}
+
 /** "Wirrr" – a marble running round and round a funnel, getting faster and lower. */
 export function playSwirl() {
   for (let i = 0; i < 12; i++) note({ from: 1000 - i * 55, to: 940 - i * 55, duration: 0.1, type: "sine", volume: 0.07, delay: i * (0.16 - i * 0.006) });

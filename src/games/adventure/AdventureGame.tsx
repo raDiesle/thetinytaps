@@ -26,7 +26,7 @@ export function AdventureGame() {
             <p className="setting-note">
               Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit: Paddeln, von Stein zu Stein
               springen und mit dem Kopf an Sternkisten stoßen, sich unter einem schaukelnden Ast ducken, Blumen mit den Armen öffnen,
-              Kokosnüssen ausweichen, Spinnweben wegwedeln, die Schatztruhe am Seil heranziehen und zum Schluss tanzen. Die Welt reagiert von selbst im Takt der Bewegung –
+              Kokosnüssen ausweichen, Spinnweben wegwedeln, die Schatztruhe am Seil heranziehen und zum Schluss Stopptanz am Strand: Hört die Musik auf, frieren Tapsi, der Papagei und die Krebse ein. Die Welt reagiert von selbst im Takt der Bewegung –
               es gibt keine Kamera und kein „falsch“.
             </p>
             <p className="setting-note">

@@ -14,6 +14,8 @@ import {
   KEY_TURN,
   keyTurn,
   SHAPE_SECONDS,
+  STOP_DANCE,
+  stopDance,
 } from "../three/clips";
 import type { Guide } from "../three/guide";
 import {
@@ -52,7 +54,8 @@ import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from 
 // dodges the monkeys' nuts in slow motion, picks apples, solves the riddle of
 // the stone door, brushes the cobwebs out of the passage behind it, pulls the
 // treasure chest ashore and unlocks it with the key Kiki brings – then Tapsi
-// turns round to us and there is a party at sunset with fireworks. Every world reaction is timed to the
+// turns round to us and there is a party at sunset with a stop dance (when
+// the music stops, Tapsi, Kiki and the crabs freeze) and fireworks. Every world reaction is timed to the
 // guide's clip, so it happens together with the child's movement. Every
 // movement stays on the spot: the child in front of the screen never has to
 // go forwards.
@@ -656,9 +659,9 @@ const S = {
 } as const;
 
 /** Seconds of travel before each step: walking or paddling there, or the camera coming in. */
-const TRAVEL = [2.5, 3, 3, 3.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 3.5, 2.5, 2.5, 1, 1];
+const TRAVEL = [2.5, 3, 3, 3.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 3.5, 2.5, 2.5, 2, 1];
 /** Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step. */
-const DEMO = [2.5, 2.8, 1.6, 3 * JUMP_PERIOD, 3, 4, CRANK_PERIOD, 3, 3.4, 2.6, 2, BRUSH_PERIOD, 3.6, KEY_PICKUP + KEY_TURN, 2, 2.5, 2];
+const DEMO = [2.5, 2.8, 1.6, 3 * JUMP_PERIOD, 3, 4, CRANK_PERIOD, 3, 3.4, 2.6, 2, BRUSH_PERIOD, 3.6, KEY_PICKUP + KEY_TURN, 2, STOP_DANCE[0].dance + STOP_DANCE[0].hold, 2];
 const LEAD = TRAVEL.map((t, i) => t + DEMO[i]);
 const PRAISE = 2.5;
 const OPENING = 8;
@@ -1227,6 +1230,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   let lastOpening = -1;
 
   const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL[step] - PRAISE;
+  /** The stop dance at the party: since when everyone is still, or null while the music plays (and before and after). */
+  const stillAt = (step: number, clip: number) =>
+    step === S.party && clip >= 0 && clip - DEMO[step] < actLength(step) ? stopDance(clip).still : null;
   /** Seconds of a step's clip that the world follows: from when Tapsi shows it until the praise. */
   const clipLength = (step: number) => DEMO[step] + actLength(step);
 
@@ -1955,7 +1961,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       if (crossed(f, 0.8)) cue("chime");
     }
     chest.open(lid);
-    if (step >= S.hooray && step <= S.party) {
+    // The stop dance: when the music stops, the crabs and Kiki freeze with Tapsi; their dance clock stands still.
+    const still = stillAt(step, clip);
+    const wasStill = stillAt(step, f.prevLocal - TRAVEL[step]);
+    const partyTime = still === null ? time : time - still;
+    const wobbly = still !== null && STOP_DANCE[stopDance(clip).round].statue === "wobbly";
+    if (step >= S.hooray && step <= S.party && still === null) {
       for (let n = 0; n < 10; n++) {
         if (crossed(f, 1.0 + n * 1.1)) {
           gold.burst(chest.group.getWorldPosition(tmpA).add(v3(0, 0.9, 0)), 18, 4.5);
@@ -1985,21 +1996,20 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       scene.add(rope);
     }
 
-    // Party: crabs come out of the sand and dance, hopping with their claws up; confetti now and then.
+    // Party: crabs come out of the sand and dance, hopping with their claws up; frozen they hang in mid-hop
+    // (and tremble when Tapsi wobbles). Confetti at the start and whenever the music comes back.
     const party = step === S.party ? smooth(f.local / 1.5) : step > S.party ? 1 : step === S.hooray ? smooth((f.local - 3) / 1.5) : 0;
     crabs.forEach((crab, i) => {
-      const hop = step >= S.party ? Math.abs(Math.sin(time * 5 + i * 1.3)) * 0.18 : 0;
+      const hop = step >= S.party ? Math.abs(Math.sin(partyTime * 5 + i * 1.3)) * 0.18 : 0;
       crab.holder.position.y = crab.ground - 0.6 + party * 0.6 + hop;
+      crab.holder.rotation.z = wobbly ? Math.sin(time * 7 + i * 2) * 0.1 : 0;
       crab.holder.visible = step >= S.hooray;
-      crab.dance(time + i * 0.4, step === S.party ? 1 : 0.4);
+      crab.dance(partyTime + i * 0.4, step === S.party ? 1 : 0.4);
     });
-    if (step === S.party) {
-      for (let n = 0; n < 5; n++) {
-        if (crossed(f, 1 + n * 2.2)) {
-          confetti.burst(v3(PARTY.x + (n % 2 ? 1 : -1) * 2.5, 2.5, PARTY.z - 1), 40, 4);
-          cue("pop");
-        }
-      }
+    if (step === S.party && (crossed(f, 1) || (wasStill !== null && still === null))) {
+      const side = stopDance(clip).round % 2 ? 1 : -1;
+      confetti.burst(v3(PARTY.x + side * 2.5, 2.5, PARTY.z - 1), 40, 4);
+      cue("pop");
     }
 
     // Fireworks over the bay at the end, behind Tapsi.
@@ -2066,7 +2076,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       p.copy(around).lerp(perch, settle);
       flying = settle < 0.95;
       // Hopping on the chest with joy.
-      if (step >= S.hooray) p.y += Math.abs(Math.sin(time * 6)) * 0.12;
+      if (step >= S.hooray) p.y += Math.abs(Math.sin(partyTime * 6)) * 0.12;
     }
     // Looking at Tapsi, except while circling; sitting on the chest it looks at us.
     const face = circling
@@ -2074,8 +2084,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       : flying
         ? Math.atan2(g.x - p.x, g.z - p.z)
         : Math.atan2(camPos.x - p.x, camPos.z - p.z);
-    parrot.group.rotation.set(0, face, 0);
-    parrot.flap(time, flying || step >= S.hooray);
+    parrot.group.rotation.set(0, face, wobbly ? Math.sin(time * 6) * 0.15 : 0);
+    parrot.flap(partyTime, flying || step >= S.hooray);
     if (step === S.hello) {
       for (const at of [1.2, TRAVEL[S.hello] + 0.6, LEAD[S.hello] + 1, LEAD[S.hello] + 4]) if (crossed(f, at)) cue("tweet");
     } else if (step === S.bye) {
@@ -2168,7 +2178,13 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
           : f.step === S.rope
             ? Math.max(0, 1 - Math.abs(f.local - 2.5) / 0.9)
             : 0;
-      return { walking, flash, sitting: f.opening !== null ? 1 : sitting, pointing: f.opening !== null ? pointingAt(f.opening) : undefined };
+      return {
+        walking,
+        flash,
+        sitting: f.opening !== null ? 1 : sitting,
+        pointing: f.opening !== null ? pointingAt(f.opening) : undefined,
+        quiet: stillAt(f.step, f.act + f.demo) !== null,
+      };
     },
   };
 }
@@ -2217,7 +2233,15 @@ export const TREASURE_ISLAND: Story = {
     { icon: "🪢", situation: "Da schwimmt die Schatztruhe!", instruction: "Hand über Hand am Seil ziehen – so!", turn: "Zieh mit!", again: "Ziehen, ziehen – sie kommt!", praise: "Die Truhe ist da!" },
     { icon: "🔑", situation: "Oh, ein Schloss! Kiki bringt den Schlüssel.", instruction: "Aufheben, reinstecken und umdrehen – so!", turn: "Jetzt du – dreh den Schlüssel!", again: "Klick – und nochmal!", praise: "Das Schloss ist auf!" },
     { icon: "🙌", situation: "Oh! Was ist da drin?", instruction: "Gold! Arme hoch – Hurra!", turn: "Du auch – Hurra!", again: "Hurra, ein Schatz!", praise: "So viel Gold!" },
-    { icon: "💃", situation: "Jetzt wird gefeiert!", instruction: "Die Krebse tanzen! Ich schüttel mich mit – so!", turn: "Tanz mit den Krebsen!", again: "Alle tanzen mit dir!", praise: "Was für eine Party!" },
+    {
+      icon: "🎵",
+      situation: "Party! Wir machen Stopptanz.",
+      instruction: "Wir tanzen – und hört die Musik auf: stopp!",
+      turn: "Jetzt du! Tanz mit und hör gut hin!",
+      more: [{ at: 6.7, text: "Kiki und die Krebse machen auch mit!" }],
+      again: "Und weiter tanzen!",
+      praise: "Was für eine Party!",
+    },
     { icon: "🌅", situation: "Die Sonne geht unter. Schau, ein Feuerwerk!", instruction: "Ich winke Kiki Tschüss – so!", turn: "Winkst du mit?", again: "Tschüss, Kiki! Tschüss, Insel!", praise: "Danke fürs Mitmachen! Bis bald!" },
   ],
   build,

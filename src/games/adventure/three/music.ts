@@ -18,13 +18,14 @@ export class Music {
   private nextAt = 0;
   private eighth = 0;
   private gain: GainNode | null = null;
+  private quiet = false;
   energy: Energy = "medium";
 
   start() {
     const ac = audioContext();
     if (!ac || this.timer) return;
     this.gain = ac.createGain();
-    this.gain.gain.value = 0.5;
+    this.gain.gain.value = this.quiet ? 0 : 0.5;
     this.gain.connect(ac.destination);
     this.nextAt = ac.currentTime + 0.1;
     this.timer = setInterval(() => this.schedule(), 50);
@@ -46,9 +47,21 @@ export class Music {
     if (this.gain) this.gain.gain.setTargetAtTime(volume * 0.5, this.gain.context.currentTime, 0.3);
   }
 
+  /** Stops the music at once (true), and it goes on from there (false); for the stop dance. */
+  hush(quiet: boolean) {
+    if (quiet === this.quiet) return;
+    this.quiet = quiet;
+    if (this.gain) this.gain.gain.setTargetAtTime(quiet ? 0 : 0.5, this.gain.context.currentTime, quiet ? 0.01 : 0.03);
+  }
+
   private schedule() {
     const ac = audioContext();
     if (!ac || !this.gain) return;
+    if (this.quiet) {
+      // Nothing new while quiet; the tune waits where it stopped.
+      this.nextAt = Math.max(this.nextAt, ac.currentTime + 0.05);
+      return;
+    }
     while (this.nextAt < ac.currentTime + 0.25) {
       this.play(ac, this.nextAt, this.eighth);
       this.nextAt += BEAT / 2;

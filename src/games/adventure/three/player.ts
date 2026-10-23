@@ -18,6 +18,8 @@ export interface PlayerEvents {
   /** During the opening: the step the map points at (null when it does not). */
   onPointing?(step: number | null): void;
   onFlash(amount: number): void;
+  /** The music stops (true) or goes on (false), e.g. in the stop dance. */
+  onQuiet?(quiet: boolean): void;
   onCue(cue: Cue): void;
   onEnd(): void;
   /**
@@ -50,6 +52,7 @@ export class StoryPlayer {
   private walkWeight = 0;
   private currentStep = -1;
   private pointing: number | null = null;
+  private quiet = false;
   /** Seconds of the opening before the first step. */
   private readonly opening: number;
   private ended = false;
@@ -182,6 +185,11 @@ export class StoryPlayer {
     if (pointing !== this.pointing) {
       this.pointing = pointing;
       this.events.onPointing?.(pointing);
+    }
+    const quiet = result.quiet ?? false;
+    if (quiet !== this.quiet) {
+      this.quiet = quiet;
+      this.events.onQuiet?.(quiet);
     }
     const pose = sitDown(this.pose(frame, result.walking, dt), result.sitting ?? 0);
     // From just before the guide shows the movement until the praise.

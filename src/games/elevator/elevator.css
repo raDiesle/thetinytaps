@@ -1,0 +1,362 @@
+/* ---------- Aufzug ---------- */
+
+.elevator-play {
+  --grass: 3vh;
+  --btn: min(calc((100vh - 140px) / (var(--floors) + 1.4)), 17vw, 150px);
+  --ease-ride: cubic-bezier(0.45, 0, 0.55, 1);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 3vw;
+  padding: max(64px, env(safe-area-inset-top)) 3vw 0;
+  background:
+    linear-gradient(to top, #80b918 0 var(--grass), transparent var(--grass)),
+    linear-gradient(#a2d2ff, #e3f2ff);
+}
+
+/* The house in cross-section: rooms on the left, the lift shaft on the right. */
+.el-house {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 130vh;
+  margin-left: auto;
+}
+
+.el-roof {
+  flex: 0 0 11%;
+  margin: 0 -3%;
+  background: #d1495b;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.el-floors {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  container-type: size;
+  border: 6px solid #8d5a3c;
+  border-bottom: 0;
+  background: #fff;
+}
+
+.el-ground {
+  flex: 0 0 var(--grass);
+}
+
+.el-floor {
+  position: absolute;
+  right: 0;
+  bottom: calc(var(--f) * 100% / var(--floors));
+  left: 0;
+  height: calc(100% / var(--floors));
+}
+
+/* The ceiling of the floor below. */
+.el-floor::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 7%;
+  background: #a47148;
+  content: "";
+}
+
+.el-window {
+  position: absolute;
+  top: 16%;
+  left: 5%;
+  width: 13%;
+  height: 42%;
+  border: 0.8cqh solid #fff;
+  border-radius: 6px;
+  background:
+    linear-gradient(#fff 0 0) center / 8% 100% no-repeat,
+    linear-gradient(#fff 0 0) center / 100% 8% no-repeat,
+    linear-gradient(#8ecae6, #d6f0ff);
+  box-shadow: 0 0 0 2px #0000001a;
+}
+
+.el-thing,
+.el-animal {
+  position: absolute;
+  font-family: var(--font-emoji);
+  line-height: 1;
+  translate: -50% 0;
+}
+
+.el-thing {
+  bottom: 7%;
+  font-size: min(calc(100cqh / var(--floors) * 0.42), 9cqw);
+  pointer-events: none;
+}
+
+.el-thing-0 {
+  left: 25%;
+}
+
+.el-thing-1 {
+  left: 49%;
+}
+
+/* The floor's number next to the lift door; it lights up while the lift stands there. */
+.el-plate {
+  position: absolute;
+  top: 9%;
+  left: 67%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(calc(100cqh / var(--floors) * 0.24), 5cqw);
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border: 3px solid #455a64;
+  border-radius: 50%;
+  background: #fff;
+  font-size: min(calc(100cqh / var(--floors) * 0.15), 3cqw);
+  font-weight: 800;
+  transition:
+    background 0.3s,
+    scale 0.3s;
+}
+
+.el-plate.here {
+  background: var(--sunshine);
+  scale: 1.15;
+}
+
+/* The shaft is open to the front, so the cabin can be watched going up and down. */
+.el-shaft {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 72%;
+  width: 20%;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent 12%, #37474f 12% 14%, transparent 14% 86%, #37474f 86% 88%, transparent 88%),
+    #607d8b;
+}
+
+.el-cabin,
+.el-doors {
+  position: absolute;
+  bottom: calc((var(--f) + 0.07) * 100% / var(--floors));
+  left: 5%;
+  width: 90%;
+  height: calc(0.84 * 100% / var(--floors));
+  transition: bottom var(--ride) var(--ease-ride);
+}
+
+.el-cabin {
+  z-index: 1;
+  border-radius: 8px 8px 0 0;
+  background:
+    linear-gradient(#c9a227 0 0) 0 62% / 100% 5% no-repeat,
+    linear-gradient(#ffe8a3, #f6d186);
+}
+
+/* The rope it hangs on. */
+.el-cabin::before {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  width: 4px;
+  height: 100cqh;
+  translate: -50% 0;
+  background: #263238;
+  content: "";
+}
+
+/* In front of the riders, so they disappear behind the closing doors. */
+.el-doors {
+  z-index: 3;
+  display: flex;
+  pointer-events: none;
+}
+
+.el-doors span {
+  flex: 1;
+  border: 2px solid #78909c;
+  background: linear-gradient(90deg, #cfd8dc, #eceff1 50%, #cfd8dc);
+  transition: scale 0.65s ease-in-out;
+}
+
+.el-doors span:first-child {
+  transform-origin: left;
+}
+
+.el-doors span:last-child {
+  transform-origin: right;
+}
+
+.el-doors.open span {
+  scale: 0.06 1;
+}
+
+.el-animal {
+  z-index: 2;
+  bottom: calc((var(--f) + 0.07) * 100% / var(--floors));
+  font-size: min(calc(100cqh / var(--floors) * 0.48), 10cqw);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    left var(--walk) linear,
+    bottom var(--ride) var(--ease-ride),
+    opacity 0.6s;
+}
+
+.el-animal.gone {
+  opacity: 0;
+}
+
+.el-face,
+.el-body {
+  display: block;
+}
+
+.el-animal.right .el-face {
+  scale: -1 1;
+}
+
+.el-animal.walking .el-body {
+  animation: el-waddle 0.3s ease-in-out infinite alternate;
+}
+
+.el-body.hop-0 {
+  animation: el-hop 0.45s ease-in-out;
+}
+
+.el-body.hop-1 {
+  animation: el-hop-again 0.45s ease-in-out;
+}
+
+/* The button panel, like the one inside a real lift. */
+.el-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--btn) * 0.18);
+  align-self: center;
+  margin-right: auto;
+  padding: calc(var(--btn) * 0.22);
+  border: 4px solid #90a4ae;
+  border-radius: 24px;
+  background: linear-gradient(#eceff1, #cfd8dc);
+  box-shadow: var(--lift);
+}
+
+.el-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15em;
+  min-width: calc(var(--btn) * 1.2);
+  padding: 0.05em 0.3em;
+  border-radius: 10px;
+  background: #1b1b1b;
+  color: #ff9f1c;
+  font-size: calc(var(--btn) * 0.5);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.el-arrow {
+  width: 0.7em;
+  font-size: 0.6em;
+}
+
+.el-button {
+  width: var(--btn);
+  height: var(--btn);
+  border: 5px solid #90a4ae;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #fff, #e0e0e0);
+  box-shadow: 0 6px 0 #78909c;
+  color: #37474f;
+  font: inherit;
+  font-size: calc(var(--btn) * 0.5);
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition:
+    translate 0.1s,
+    box-shadow 0.1s,
+    background 0.3s;
+}
+
+.el-button:active {
+  translate: 0 4px;
+  box-shadow: 0 2px 0 #78909c;
+}
+
+/* Pressed: it glows until the lift is there. */
+.el-button.lit {
+  border-color: #ffb703;
+  background: radial-gradient(circle at 40% 35%, #fffbe0, #ffe066);
+  box-shadow:
+    0 6px 0 #78909c,
+    0 0 calc(var(--btn) * 0.3) #ffd60a;
+  color: #e85d04;
+}
+
+/* Phones upright: the buttons go in a row under the house, 1 on the left. The
+   display makes room for them; the lit number plate in the house shows the floor. */
+@media (max-aspect-ratio: 4/5) {
+  .elevator-play {
+    --btn: min(calc((94vw - 20px) / (var(--floors) * 1.18 + 0.44)), 14vh, 130px);
+    flex-direction: column;
+    gap: 2vh;
+    padding-bottom: 2vh;
+  }
+
+  .el-house {
+    width: 100%;
+    margin: 0;
+  }
+
+  .el-panel {
+    flex-direction: row-reverse;
+    margin: 0;
+  }
+
+  .el-display {
+    display: none;
+  }
+}
+
+@keyframes el-waddle {
+  from {
+    transform: rotate(-7deg) translateY(0);
+  }
+  to {
+    transform: rotate(7deg) translateY(-6%);
+  }
+}
+
+@keyframes el-hop {
+  40% {
+    transform: translateY(-25%);
+  }
+}
+
+@keyframes el-hop-again {
+  40% {
+    transform: translateY(-25%);
+  }
+}
+
+/* Calm mode: a gentler walk. */
+.elevator-play.calm .el-animal.walking .el-body {
+  animation-duration: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .el-animal.walking .el-body {
+    animation: none;
+  }
+}
