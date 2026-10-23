@@ -788,18 +788,10 @@
   }
 }
 
-/* ---------- Iglu: the light goes on and a child peeks out ---------- */
-
-.wb-iglu-peek {
-  transform: translateY(44px);
-}
+/* ---------- Iglu: the light goes on and someone peeks out ---------- */
 
 .item-iglu.playing .wb-iglu-glow {
   animation: wb-glow-on 2.2s ease-in-out;
-}
-
-.item-iglu.playing .wb-iglu-peek {
-  animation: wb-iglu-peek 2.4s ease-in-out;
 }
 
 .item-iglu.playing .wb-iglu-flag {
@@ -812,26 +804,6 @@
 
 .item-iglu.playing .wb-iglu-sparkle path {
   animation: wb-glint 0.7s ease-in-out calc(0.6s + var(--i) * 0.3s);
-}
-
-@keyframes wb-iglu-peek {
-  0%,
-  15% {
-    transform: translateY(44px);
-  }
-  35% {
-    transform: none;
-  }
-  50% {
-    transform: translateY(-3px) rotate(-8deg);
-  }
-  70% {
-    transform: none;
-  }
-  90%,
-  100% {
-    transform: translateY(44px);
-  }
 }
 
 @keyframes wb-squash {

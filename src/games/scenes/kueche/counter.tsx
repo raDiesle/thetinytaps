@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, STEEL, nth } from "../shared";
 import { CUPBOARD, CUPBOARD_DARK } from "./background";
 import { Bubbles, Lines, Steam } from "./parts";
@@ -66,6 +67,7 @@ export function Spuele() {
       <path d="M398 352 Q424 330 450 352" stroke="#1c7ed6" strokeWidth="4" fill="none" />
       <rect x="490" y="370" width="50" height="16" rx="6" fill="#ffd43b" />
       <path d="M494 386 v10 M504 386 v10 M514 386 v10 M524 386 v10 M534 386 v10" stroke="#e67700" strokeWidth="3" />
+      <Hideout x={400} y={290} w={120} h={110} size={72} />
       {[
         { x: 352, hinge: "left" as const },
         { x: 462, hinge: "right" as const },

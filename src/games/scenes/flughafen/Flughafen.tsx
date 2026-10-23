@@ -172,12 +172,13 @@ export const flughafen: Scene = {
     {
       id: "wagen",
       name: "der Wagen",
-      sentences: ["Die Tür geht auf. Alle aussteigen!", "Im Wagen sitzen viele Leute."],
+      sentences: ["Die Tür geht auf. Wer steigt denn da aus?", "Im Wagen sitzen viele Leute."],
       sound: "knocks",
       traits: ["blue", "wheels"],
       box: [-174, -204, 348, 204],
       place: trainAt(660),
       durationMs: 2600,
+      hideout: [0.2, 0.75],
       Art: Wagen,
     },
     {
@@ -379,6 +380,7 @@ export const flughafen: Scene = {
       place: ground(0, 0, 412, 884),
       shadow: [0, 0, 230],
       durationMs: 2400,
+      hideout: true,
       Art: Gepaeckzug,
     },
     {

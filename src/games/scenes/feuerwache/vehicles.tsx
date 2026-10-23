@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { GLASS, INK, Inside, Rider, Wheel, nth } from "../shared";
 import { BlueLight, DARK_RED, FIRE_RED, HelmetHead, NAVY, STRIPE, Toot, TurningWheel, guard } from "./parts";
 
@@ -44,6 +45,8 @@ export function Feuerwehrauto() {
             <>
               <path d={`M${x + 22} -104 Q${x + 22} -140 ${x + 50} -140 Q${x + 78} -140 ${x + 78} -104 Z`} fill={STRIPE} />
               <rect x={x + 16} y="-108" width="68" height="8" rx="3" fill={STRIPE} />
+              {/* Who is sitting on the helmet this time? */}
+              <Hideout x={x} y={-166} w={100} h={78} size={62} />
             </>
           )}
           {i === 2 && (
@@ -112,6 +115,7 @@ export function Kommandowagen() {
       </text>
       {/* The driver's door swings open */}
       <rect x="-104" y="-98" width="84" height="62" fill="#5c1a1a" />
+      <Hideout x={-104} y={-98} w={84} h={62} size={52} />
       <g className="fw-elw-door" style={{ transformOrigin: "-104px -66px" }}>
         <rect x="-104" y="-98" width="84" height="62" rx="4" fill={FIRE_RED} />
         <rect x="-104" y="-74" width="84" height="16" fill="#fff" />

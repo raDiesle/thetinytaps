@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { GLASS, Inside, Pane, Rider, nth } from "../shared";
 import { Dust, Helmet, SUIT, Sparkles, ellipsePath, starPath } from "./parts";
 
@@ -97,11 +98,8 @@ export function Landefaehre() {
           </g>
         </Pane>
         <path d={hatch} fill="#343a40" />
-        <Inside d={hatch}>
-          <g className="wa-lander-peek">
-            <Helmet cx={26} cy={-180} r={17} hair="#2b2d42" />
-          </g>
-        </Inside>
+        {/* Who looks out of the hatch? Someone else every time. */}
+        <Hideout x={6} y={-204} w={40} h={42} size={38} />
         <g className="wa-lander-hatch" style={{ transformOrigin: "6px -183px" }}>
           <path d={hatch} fill="#ced4da" stroke="#adb5bd" strokeWidth="3" />
           <circle cx="38" cy="-183" r="3.5" fill="#868e96" />
@@ -271,6 +269,7 @@ export function Gewaechshaus() {
       <path d={glass} fill="none" stroke="#adb5bd" strokeWidth="5" />
       <path d="M-84 -66 Q-66 -100 -26 -114" stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.75" />
       <rect x="-22" y="-70" width="44" height="54" rx="4" fill="#c3fae8" />
+      <Hideout x={-22} y={-70} w={44} h={54} size={42} />
       <g className="wa-gh-door" style={{ transformOrigin: "-22px -43px" }}>
         <rect x="-22" y="-70" width="44" height="54" rx="4" fill={GLASS} stroke="#adb5bd" strokeWidth="3" />
         <circle cx="13" cy="-42" r="3" fill="#868e96" />

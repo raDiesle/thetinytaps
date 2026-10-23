@@ -223,6 +223,7 @@ export const gutenacht: Scene = {
       place: DOLLHOUSE,
       shadow: [0, 0, 150],
       durationMs: 2400,
+      hideout: [0.2, 0.61],
       Art: Puppenhaus,
     },
     {
@@ -497,6 +498,7 @@ export const gutenacht: Scene = {
       place: ground(0, 0, 1440, 955),
       shadow: [0, 0, 104],
       durationMs: 2400,
+      hideout: [0.12, 0.72],
       Art: Spielzeugkiste,
     },
   ],

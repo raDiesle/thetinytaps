@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, Inside, SKIN, nth } from "../shared";
 import { SHELF_BOARD_1, SHELF_BOARD_2, SHELF_TOP } from "./layout";
 import { Eyes, Notes, Sparkles, Zzz, star } from "./parts";
@@ -149,6 +150,8 @@ export function Puppenhaus() {
       {/* Door */}
       <rect x="-24" y="-90" width="48" height="76" rx="6" fill="#5a4f7d" />
       <rect className="gn-haus-light" style={nth(2)} x="-24" y="-90" width="48" height="76" rx="6" fill="#ffe066" />
+      {/* Who says good night at the door? */}
+      <Hideout x={-24} y={-90} w={48} h={76} size={50} />
       <g className="gn-haus-door" style={{ transformOrigin: "-24px -52px" }}>
         <rect x="-24" y="-90" width="48" height="76" rx="6" fill="#b5838d" />
         <circle cx="14" cy="-50" r="4" fill="#fcc419" />

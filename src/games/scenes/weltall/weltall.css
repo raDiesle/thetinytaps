@@ -857,10 +857,6 @@
   animation: wa-door 2.6s ease-in-out;
 }
 
-.item-landefaehre.playing .wa-lander-peek {
-  animation: wa-lander-peek 2.6s ease-in-out;
-}
-
 .item-landefaehre.playing .wa-lander-pilot {
   animation: wa-nod 0.4s ease-in-out 4;
 }
@@ -885,26 +881,6 @@
   }
   44% {
     transform: none;
-  }
-}
-
-@keyframes wa-lander-peek {
-  0%,
-  30% {
-    transform: translateY(12px);
-  }
-  45% {
-    transform: none;
-  }
-  55% {
-    transform: translateY(-3px);
-  }
-  65% {
-    transform: none;
-  }
-  80%,
-  100% {
-    transform: translateY(12px);
   }
 }
 
