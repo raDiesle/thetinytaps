@@ -167,6 +167,7 @@ export const badezimmer: Scene = {
       place: SINK,
       shadow: [0, 0, 150],
       durationMs: 2400,
+      hideout: [0.2, 0.68],
       Art: Waschbecken,
     },
     {
@@ -279,6 +280,7 @@ export const badezimmer: Scene = {
       place: ground(0, 0, 900, 565, 1.12),
       shadow: [0, 0, 40],
       durationMs: 1800,
+      hideout: [0.12, 0.62],
       Art: Muelleimer,
     },
     {
@@ -290,6 +292,7 @@ export const badezimmer: Scene = {
       place: ground(0, 0, 1480, 612, 1.2),
       shadow: [0, 0, 52],
       durationMs: 2200,
+      hideout: [0.12, 0.72],
       Art: Waeschekorb,
     },
     {

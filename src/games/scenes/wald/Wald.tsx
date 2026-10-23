@@ -300,6 +300,7 @@ export const wald: Scene = {
       place: HOLZ,
       shadow: [10, 0, 110],
       durationMs: 2200,
+      hideout: true,
       Art: Holzstapel,
     },
     {
@@ -429,6 +430,7 @@ export const wald: Scene = {
       place: STUMPF,
       shadow: [0, 0, 110],
       durationMs: 2200,
+      hideout: true,
       Art: Baumstumpf,
     },
     {
@@ -454,6 +456,7 @@ export const wald: Scene = {
       place: BEEREN,
       shadow: [0, 0, 96],
       durationMs: 2200,
+      hideout: true,
       Art: Beerenstrauch,
     },
     {

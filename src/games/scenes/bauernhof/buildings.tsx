@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, Pane, SKIN, nth } from "../shared";
 
 // Barn, farmhouse, windmill and the water pump. Foot point at (0, 0).
@@ -37,6 +38,8 @@ export function Scheune() {
       <path d="M-38 -214 q10 -16 20 -6 q10 -14 22 -4 q10 -14 22 -2 q6 -6 12 -2 V-214 Z" fill="#f4c95d" />
       {/* Inside the doors: hay and a lantern */}
       <rect x="-86" y="-176" width="172" height="176" fill="#3b2418" />
+      {/* Someone else climbs over the hay every time */}
+      <Hideout x={-20} y={-160} w={64} h={98} size={58} />
       <path d="M-80 0 Q-60 -70 -10 -64 Q30 -90 80 -40 V0 Z" fill="#e9b949" />
       <path d="M-60 -20 l14 -16 M-20 -40 l10 -18 M30 -30 l16 -14" stroke="#c89b2c" strokeWidth="3" />
       <g className="bh-scheune-mouse">
@@ -125,14 +128,9 @@ export function Bauernhaus() {
           ))}
         </g>
       ))}
-      {/* Door; behind it a child peeks out when it opens */}
+      {/* Door; behind it someone else peeks out every time it opens */}
       <path d="M-130 0 V-104 Q-100 -136 -70 -104 V0 Z" fill="#3b2418" />
-      <rect x="-114" y="-50" width="28" height="44" rx="10" fill="#4cc9f0" />
-      <circle cx="-100" cy="-66" r="15" fill={SKIN} />
-      <path d="M-114 -68 Q-112 -86 -100 -84 Q-88 -86 -86 -68 Q-94 -78 -114 -68 Z" fill="#e9c46a" />
-      <circle cx="-105" cy="-66" r="2" fill="#2b2d42" />
-      <circle cx="-95" cy="-66" r="2" fill="#2b2d42" />
-      <path d="M-104 -59 Q-100 -55 -96 -59" stroke="#2b2d42" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+      <Hideout x={-130} y={-104} w={60} h={98} size={70} />
       <g className="bh-haus-door" style={{ transformOrigin: "-130px -52px" }}>
         <path d="M-130 0 V-104 Q-100 -136 -70 -104 V0 Z" fill="#6b4423" />
         <path d="M-122 -6 V-100 Q-100 -124 -78 -100 V-6" stroke="#8d5a2b" strokeWidth="4" fill="none" />
@@ -153,11 +151,7 @@ export function Windmuehle() {
       <path d="M30 -250 H42 L62 0 H42 Z" fill="#e0cba8" />
       <path d="M-58 -60 H58 M-50 -150 H50" stroke="#e0cba8" strokeWidth="5" />
       <path d="M-18 0 V-46 Q0 -64 18 -46 V0 Z" fill="#3b2418" />
-      <circle cx="0" cy="-28" r="11" fill={SKIN} />
-      <path d="M-11 -32 Q-12 -46 0 -46 Q12 -46 11 -32 Z" fill="#fff" />
-      <circle cx="-4" cy="-28" r="1.6" fill="#2b2d42" />
-      <circle cx="4" cy="-28" r="1.6" fill="#2b2d42" />
-      <path d="M-3 -23 Q0 -20 3 -23" stroke="#2b2d42" strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      <Hideout x={-18} y={-46} w={36} h={46} size={36} />
       <path className="bh-muehle-door" d="M-18 0 V-46 Q0 -64 18 -46 V0 Z" fill="#7f5539" style={{ transformOrigin: "-18px -30px" }} />
       <g className="bh-muehle-flour" fill="#fff">
         {[0, 1, 2].map((i) => (

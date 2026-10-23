@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, GLASS, INK, Inside, Pane, SKIN, nth } from "../shared";
 
 // Buildings of the farm. Each drawing has its foot point (the middle of its front, on
@@ -33,6 +34,8 @@ export function Scheune() {
       <circle cx="0" cy="-202" r="6" fill="#fff4d6" />
       {/* Inside: hay and the swallow */}
       <rect x="-92" y="-178" width="184" height="178" fill="#3d2314" />
+      {/* Someone else climbs out of the hay every time */}
+      <Hideout x={-36} y={-176} w={64} h={110} size={70} />
       <path d="M-92 0 Q-70 -84 -20 -72 Q30 -104 92 -38 V0 Z" fill="#e9c46a" />
       <path d="M-60 -50 l-8 -14 M-20 -60 l2 -14 M30 -66 l8 -12 M60 -40 l10 -10" stroke="#d4a373" strokeWidth="3" strokeLinecap="round" />
       <g className="hf-scheune-bird">
@@ -66,7 +69,7 @@ const DOOR = "M-30 0 V-86 Q-30 -116 0 -116 Q30 -116 30 -86 V0 Z";
 
 /**
  * Half-timbered farmhouse; the shutters open and the farmer's wife waves, the chimney
- * smokes, the windows light up, the flowers nod and the child waves from the front door.
+ * smokes, the windows light up, the flowers nod and someone peeks out of the front door.
  */
 export function Bauernhaus() {
   return (
@@ -134,20 +137,9 @@ export function Bauernhaus() {
           <rect x={x - 4} y="-52" width="58" height="12" rx="3" fill="#bc6c25" />
         </g>
       ))}
-      {/* Front door: it opens and the farmer's child waves from the hall */}
+      {/* Front door: it opens and someone else peeks out of the hall every time */}
       <path d={DOOR} fill="#3d2314" />
-      <Inside d={DOOR}>
-        <g className="hf-haus-kid">
-          <rect x="-15" y="-48" width="30" height="48" rx="10" fill="#ffd60a" />
-          <circle cx="0" cy="-64" r="15" fill={SKIN} />
-          <path d="M-15 -66 Q-16 -82 0 -82 Q16 -82 15 -66 Q6 -74 -15 -66 Z" fill="#6b4423" />
-          <Face cx={0} cy={-64} size={0.55} />
-          <g className="hf-haus-kid-arm" style={{ transformOrigin: "12px -40px" }}>
-            <path d="M12 -40 L22 -66" stroke="#ffd60a" strokeWidth="8" strokeLinecap="round" />
-            <circle cx="23" cy="-70" r="5" fill={SKIN} />
-          </g>
-        </g>
-      </Inside>
+      <Hideout x={-30} y={-90} w={60} h={88} size={66} />
       <g className="hf-haus-door" style={{ transformOrigin: "-30px -58px" }}>
         <path d={DOOR} fill="#2d6a4f" />
         <path d="M-22 -10 V-84 Q-22 -106 0 -106 Q22 -106 22 -84 V-10 Z" fill="none" stroke="#1b4332" strokeWidth="4" />
@@ -186,6 +178,7 @@ export function Huehnerstall() {
       </Inside>
       <path d="M48 -116 Q56 -126 64 -116" stroke="#e9c46a" strokeWidth="3" fill="none" />
       <path d={STALL_DOOR} fill="#3d2314" />
+      <Hideout x={-26} y={-96} w={52} h={46} size={40} />
       <ellipse className="hf-stall-egg" cx="0" cy="-62" rx="9" ry="12" fill="#fff8e7" />
       <path className="hf-stall-door" d={STALL_DOOR} fill="#a0522d" style={{ transformOrigin: "-26px -83px" }} />
       <path d="M-30 -50 L-100 0 H-72 L-6 -50 Z" fill="#bc8a5f" />

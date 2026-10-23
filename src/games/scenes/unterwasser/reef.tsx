@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Eye, Face, INK, Inside, SKIN, nth, side } from "../shared";
 import { Bubbles, Heart, Lid, Sand } from "./parts";
 
@@ -41,6 +42,12 @@ export function Schiff() {
         {[-150, -70, 10].map((cx) => (
           <g key={cx}>
             <circle cx={cx} cy={-100} r="20" fill="#1b4965" />
+            {/* In the last porthole someone else looks out every time. */}
+            {cx === 10 && (
+              <Inside d={`M${cx - 20} -100 a20 20 0 1 0 40 0 a20 20 0 1 0 -40 0 Z`}>
+                <Hideout x={cx - 20} y={-120} w={40} h={40} size={34} />
+              </Inside>
+            )}
             <circle cx={cx} cy={-100} r="20" stroke="#e9c46a" strokeWidth="5" fill="none" />
           </g>
         ))}

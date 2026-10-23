@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { CHEEK, Eye, Face, INK, nth, side } from "../shared";
 import { Bubbles, Heart, Lid, Sand, Sparkle } from "./parts";
 
@@ -13,6 +14,8 @@ export function Schatztruhe() {
       <path d="M-80 -88 Q-50 -120 -10 -106 Q30 -124 80 -88 Z" fill="#ffd60a" />
       <circle cx="-30" cy="-104" r="6" fill="#ffe066" />
       <circle cx="26" cy="-110" r="6" fill="#ffe066" />
+      {/* On the gold someone else sits every time */}
+      <Hideout x={-84} y={-160} w={64} h={70} size={58} />
       <rect x="-90" y="-90" width="180" height="90" rx="10" fill="#9c6644" />
       <path d="M-90 -46 H90 M-90 -20 H90" stroke="#7f5539" strokeWidth="4" />
       <rect x="-64" y="-90" width="14" height="90" fill="#e9c46a" />
@@ -133,6 +136,8 @@ export function Muschel() {
     <>
       <path d="M-62 -20 Q-58 0 0 0 Q58 0 62 -20 Z" fill="#f4acb7" />
       <path d="M-40 -8 H40" stroke="#e5989b" strokeWidth="3" strokeLinecap="round" />
+      {/* Next to the pearl someone tiny lives in the shell */}
+      <Hideout x={-58} y={-56} w={40} h={36} size={30} />
       <g className="uw-muschel-pearl">
         <circle cx="0" cy="-30" r="12" fill="#fff" />
         <circle cx="-4" cy="-34" r="4" fill="#e7f5ff" />
