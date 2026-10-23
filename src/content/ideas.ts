@@ -903,6 +903,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Haus mit drei Stockwerken und riesigen Knöpfen 1, 2, 3. Knopf drücken – der Aufzug fährt, „Pling“, die Tür geht auf, und auf jeder Etage steigt ein anderes Tier ein oder aus.",
         why: "Kleinkinder lieben Aufzugknöpfe; Zahlen und oben/unten nebenbei.",
         effort: "S",
+        done: true,
       },
       {
         id: "N-38",
