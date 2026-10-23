@@ -87,7 +87,7 @@ import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys } from "./keys";
 import { nextQuest, questsFor, verb, type Quest } from "./quests";
 import { driveDistance, guestFor, PLACES, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
-import { isQuestMode, type ScenesSettings } from "./settings";
+import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
 import { placeBox, type Box, type Scene, type SceneItem, type SceneSound } from "./types";
 
 const SOUNDS: Record<SceneSound, () => void> = {
@@ -418,12 +418,14 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   }, []);
 
   // The hint ring marks an answer that hasn't been found yet; after each found one the wait starts again.
+  // Not when looking for a named thing: a ring around it would give it away.
+  const hintsOn = settings.hints && hasHints(settings.mode);
   const hintItem = quest?.answers.find((item) => !answered.has(item.id));
   useEffect(() => {
-    if (!quest || !settings.hints) return;
+    if (!quest || !hintsOn) return;
     const timer = setTimeout(() => setHint(true), HINT_AFTER_MS);
     return () => clearTimeout(timer);
-  }, [quest, answered, settings.hints]);
+  }, [quest, answered, hintsOn]);
 
   // Ambient life (only if switched on): when nobody taps for a while, items move by themselves, silently.
   // While something is looked for, the answers stay still, so they aren't given away.
@@ -632,7 +634,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     if (how === "hover") return;
     // Wrong item: no "wrong", just say what it is and ask again.
     misses.current++;
-    if (settings.hints && misses.current >= HINT_AFTER_MISSES) setHint(true);
+    if (hintsOn && misses.current >= HINT_AFTER_MISSES) setHint(true);
     lastQuestion.current = performance.now();
     if (!quest.sound) {
       say(`Das ${verb(item)} ${item.name}. ${quest.question}`);

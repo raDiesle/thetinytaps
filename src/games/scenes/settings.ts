@@ -10,6 +10,9 @@ export type SceneMode = "explore" | "find" | "sounds" | "questions" | "colour";
 /** Modes in which the child looks for something that was asked. */
 export const isQuestMode = (mode: SceneMode) => mode === "find" || mode === "sounds" || mode === "questions";
 
+/** Quest modes that can mark an answer; in find mode that would make it too easy. */
+export const hasHints = (mode: SceneMode) => mode === "sounds" || mode === "questions";
+
 /** What is spoken for a tapped item: "Der Bagger baggert!" or "Der Bagger!". */
 export type SceneAnnounce = "sentence" | "name";
 
@@ -31,7 +34,7 @@ export interface ScenesSettings {
   calm: boolean;
   /** Explore and colour mode: count the discovered items and throw a party when all were tapped. */
   goal: boolean;
-  /** Find, sounds and questions mode: mark an item that is looked for after a while or a few wrong taps. */
+  /** Sounds and questions mode: mark an item that is looked for after a while or a few wrong taps. */
   hints: boolean;
   /**
    * The picture lives on its own (not in calm mode): clouds drift, rotors turn,
