@@ -679,3 +679,23 @@ export function playJet() {
   hiss({ from: 350, to: 2600, duration: 1.8, volume: 0.3, q: 0.7 });
   note({ from: 80, to: 150, duration: 1.6, type: "sawtooth", volume: 0.12, lowpass: 500 });
 }
+
+/** "Rrr … ha … ha … hatschi!" – a dinosaur's very soft roar, two breaths in, then a big sneeze. */
+export function playSneeze() {
+  note({ from: 110, to: 150, duration: 0.5, type: "sawtooth", volume: 0.12, lowpass: 420 });
+  note({ from: 150, to: 100, duration: 0.4, type: "sawtooth", volume: 0.1, lowpass: 420, delay: 0.4 });
+  [0.95, 1.3].forEach((delay, i) => {
+    note({ from: 380 + i * 60, to: 520 + i * 80, duration: 0.25, type: "triangle", volume: 0.12, lowpass: 1400, delay });
+    hiss({ from: 900, to: 1400, duration: 0.25, volume: 0.06, delay, q: 0.8 });
+  });
+  note({ from: 820, to: 300, duration: 0.18, type: "triangle", volume: 0.18, lowpass: 2000, delay: 1.75 });
+  hiss({ from: 4200, to: 2200, duration: 0.45, volume: 0.32, delay: 1.78, q: 0.9 });
+}
+
+/** "Bumbum, bumbum" – a heart heard through the stethoscope: two soft, low thumps, twice. */
+export function playHeartbeat() {
+  [0, 0.75].forEach((delay) => {
+    note({ from: 70, to: 45, duration: 0.18, type: "sine", volume: 0.55, delay });
+    note({ from: 62, to: 40, duration: 0.16, type: "sine", volume: 0.4, delay: delay + 0.22 });
+  });
+}

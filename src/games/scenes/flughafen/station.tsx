@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, GLASS, INK, Inside, Pane, Rider, SKIN, STEEL, Wheel, nth } from "../shared";
 import { NAVY, RAIL_RED, Toot } from "./parts";
 
@@ -94,21 +95,9 @@ export function Wagen() {
           </g>
         </Pane>
       ))}
-      {/* Behind the door: a traveller with a backpack, getting off */}
-      <Inside d="M-44 -178 h50 v124 h-50 Z">
-        <rect x="-44" y="-178" width="50" height="124" fill="#495057" />
-        <g className="fh-wagen-traveller">
-          <rect x="-36" y="-130" width="34" height="60" rx="12" fill="#06d6a0" />
-          <rect x="-40" y="-126" width="12" height="40" rx="5" fill="#bc6c25" />
-          <circle cx="-19" cy="-146" r="15" fill={SKIN} />
-          <path d="M-34 -148 Q-34 -164 -19 -163 Q-4 -164 -4 -148 Q-12 -156 -34 -148 Z" fill="#e9c46a" />
-          <Face cx={-19} cy={-146} size={0.5} />
-          <g className="fh-wagen-wave" style={{ transformOrigin: "-4px -120px" }}>
-            <path d="M-4 -120 L10 -150" stroke="#06d6a0" strokeWidth="9" strokeLinecap="round" />
-            <circle cx="11" cy="-153" r="6" fill={SKIN} />
-          </g>
-        </g>
-      </Inside>
+      {/* Behind the door: who gets off this time? */}
+      <rect x="-44" y="-178" width="50" height="124" fill="#495057" />
+      <Hideout x={-44} y={-178} w={50} h={124} size={54} />
       <g className="fh-wagen-door" style={{ transformOrigin: "-44px -116px" }}>
         <rect x="-44" y="-178" width="50" height="124" rx="4" fill="#4cc9f0" stroke="#2667cc" strokeWidth="3" />
         <rect x="-36" y="-168" width="34" height="40" rx="5" fill={GLASS} />

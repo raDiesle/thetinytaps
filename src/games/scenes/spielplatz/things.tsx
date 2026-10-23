@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, Wheel, nth } from "../shared";
 import { Notes, Puffs, Sparkles } from "./parts";
 
@@ -53,6 +54,8 @@ export function Eimer() {
   return (
     <>
       <Puffs className="sp-eimer-sand" spots={[[58, -14], [80, -8], [70, -28], [96, -18]]} r={11} fill={SAND} />
+      {/* Something was hiding under the bucket and digs itself out of the sand. */}
+      <Hideout x={-40} y={-90} w={80} h={90} size={60} />
       <g className="sp-eimer-tip" style={{ transformOrigin: "40px 0px" }}>
         <path d="M-40 -86 H40 L32 -4 Q32 0 26 0 H-26 Q-32 0 -32 -4 Z" fill="#e63946" />
         <ellipse cx="0" cy="-86" rx="40" ry="10" fill="#c92a3a" />
@@ -106,7 +109,7 @@ export function Foermchen() {
   );
 }
 
-/** The sand castle: the flag waves, the gate opens and a little crab peeks out, sand trickles from a tower. */
+/** The sand castle: the flag waves, the gate opens and someone peeks out, sand trickles from a tower. */
 export function Sandburg() {
   return (
     <>
@@ -125,15 +128,9 @@ export function Sandburg() {
       <path d="M-66 -70 h30 M34 -80 h30 M-16 -120 h30" stroke={SAND_DARK} strokeWidth="3" />
       <circle cx="-50" cy="-86" r="5" fill="#fff" />
       <circle cx="50" cy="-50" r="4" fill="#4dabf7" />
-      {/* The crab behind the gate */}
-      <g className="sp-burg-crab">
-        <ellipse cx="0" cy="-30" rx="15" ry="10" fill="#ff6b6b" />
-        <path d="M-14 -34 l-8 -8 M14 -34 l8 -8" stroke="#ff6b6b" strokeWidth="5" strokeLinecap="round" />
-        <circle cx="-5" cy="-40" r="3" fill="#fff" />
-        <circle cx="5" cy="-40" r="3" fill="#fff" />
-        <circle cx="-5" cy="-40" r="1.5" fill={INK} />
-        <circle cx="5" cy="-40" r="1.5" fill={INK} />
-      </g>
+      {/* Behind the gate someone else lives every time */}
+      <path d="M-14 -20 V-44 Q0 -60 14 -44 V-20 Z" fill="#8d5a2b" />
+      <Hideout x={-14} y={-56} w={28} h={36} size={32} />
       <g className="sp-burg-gate" style={{ transformOrigin: "-14px -20px" }}>
         <path d="M-14 -20 V-44 Q0 -60 14 -44 V-20 Z" fill="#a0673a" />
         <path d="M-6 -22 V-46 M6 -22 V-46" stroke="#8d5a2b" strokeWidth="2" />

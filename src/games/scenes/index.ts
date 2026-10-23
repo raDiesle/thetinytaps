@@ -1,13 +1,17 @@
 import { badezimmer } from "./badezimmer/Badezimmer";
 import { bauernhof } from "./bauernhof/Bauernhof";
 import { baustelle } from "./baustelle/Baustelle";
+import { dinotal } from "./dinotal/Dinotal";
 import { feuerwache } from "./feuerwache/Feuerwache";
 import { flughafen } from "./flughafen/Flughafen";
 import { gutenacht } from "./gutenacht/GuteNacht";
 import { hof } from "./hof/Hof";
+import { kinderarzt } from "./kinderarzt/Kinderarzt";
+import { kita } from "./kita/Kita";
 import { kueche } from "./kueche/Kueche";
 import { spielplatz } from "./spielplatz/Spielplatz";
 import { stadt } from "./stadt/Stadt";
+import { strand } from "./strand/Strand";
 import { supermarkt } from "./supermarkt/Supermarkt";
 import type { Scene } from "./types";
 import { unterwasser } from "./unterwasser/Unterwasser";
@@ -17,7 +21,7 @@ import { winterbaustelle } from "./winterbaustelle/WinterBaustelle";
 import { zoo } from "./zoo/Zoo";
 
 /** All playable scenes, in menu order. */
-export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall, spielplatz, kueche, supermarkt, flughafen, winterbaustelle, gutenacht];
+export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall, spielplatz, kueche, supermarkt, flughafen, winterbaustelle, kita, kinderarzt, strand, dinotal, gutenacht];
 
 /** Shown greyed out in the menu so children (and parents) know more is coming. */
 export const UPCOMING_SCENES: { emoji: string; title: string }[] = [];

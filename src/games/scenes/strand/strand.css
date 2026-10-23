@@ -1,0 +1,1690 @@
+/* Animations of the Strand scene. Durations match durationMs in Strand.tsx. The dog and the
+   beach ball are the playground's drawings and are animated in spielplatz.css, as are the
+   blinking eyelids (sp-lid) and the floating words (sp-notes). */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .sd-cloud {
+  animation: sd-drift 26s ease-in-out infinite alternate;
+}
+
+.scene.lively .sd-cloud-slow {
+  animation-duration: 40s;
+}
+
+.scene.lively .sd-sea-wave {
+  animation: sd-sea 3s ease-in-out calc(var(--i) * -0.75s) infinite alternate;
+}
+
+.scene.lively .sd-foam {
+  animation: sd-foam 3.2s ease-in-out infinite alternate;
+}
+
+.scene.lively .sd-welle {
+  animation: sd-welle-idle 2.6s ease-in-out calc(var(--i) * -0.8s) infinite alternate;
+}
+
+.scene.lively .sd-leucht-beams path {
+  animation: sd-beam-idle 6s ease-in-out infinite;
+}
+
+.scene.lively .sd-leucht-beam-right {
+  animation-delay: -3s;
+}
+
+.scene.lively .sd-segel-rock,
+.scene.lively .sd-boot-rock {
+  animation: sd-rock-idle 3.4s ease-in-out infinite alternate;
+}
+
+.scene.lively .sd-schiff-body,
+.scene.lively .sd-boje-body,
+.scene.lively .sd-ring-bob,
+.scene.lively .sd-ente-bob,
+.scene.lively .sd-matratze-rock {
+  animation: sd-bob-idle 2.8s ease-in-out infinite alternate;
+}
+
+.scene.lively .sd-schiff-flag,
+.scene.lively .sd-segel-flag,
+.scene.lively .sd-turm-flag,
+.scene.lively .sd-burg-flag {
+  animation: sd-flag 0.9s ease-in-out infinite alternate;
+}
+
+.scene.lively .sd-haus-pennants path {
+  animation: sd-pennant 1.2s ease-in-out calc(var(--i) * -0.2s) infinite alternate;
+}
+
+.scene.lively .sd-windrad-blades {
+  animation: sd-spin 4s linear infinite;
+}
+
+.scene.lively .sd-drachen-tail {
+  animation: sd-wiggle 1.4s ease-in-out infinite alternate;
+}
+
+.scene.lively .sd-schirm-flaps path {
+  animation: sd-flap 0.8s ease-in-out calc(var(--i) * -0.13s) infinite alternate;
+}
+
+@keyframes sd-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes sd-sea {
+  to {
+    transform: translateX(8px);
+  }
+}
+
+@keyframes sd-foam {
+  to {
+    transform: translateY(5px);
+    opacity: 0.6;
+  }
+}
+
+@keyframes sd-welle-idle {
+  to {
+    transform: translateX(10px) scaleY(1.08);
+  }
+}
+
+@keyframes sd-beam-idle {
+  0%,
+  30%,
+  100% {
+    opacity: 0;
+  }
+  12%,
+  18% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes sd-rock-idle {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes sd-bob-idle {
+  to {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes sd-flag {
+  to {
+    transform: scaleX(0.75) skewY(6deg);
+  }
+}
+
+@keyframes sd-pennant {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes sd-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes sd-wiggle {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes sd-flap {
+  to {
+    transform: scaleY(1.4);
+  }
+}
+
+/* ---------- Hidden until an item plays; they can't be tapped meanwhile ---------- */
+
+.sd-drops path,
+.sd-ripples ellipse,
+.sd-leucht-beams path,
+.sd-leucht-window,
+.sd-leucht-splash circle,
+.sd-segel-arm,
+.sd-schiff-puff circle,
+.sd-schiff-light,
+.sd-schiff-arm,
+.sd-boot-fish,
+.sd-welle-foam circle,
+.sd-korb-yawn,
+.sd-zelt-hearts path,
+.sd-turm-arm,
+.sd-bude-steam circle,
+.sd-haus-light,
+.sd-mama-hearts path,
+.sd-pommes-sparkle path,
+.sd-moewe-chip,
+.sd-krebs-sand circle,
+.sd-stern-sparkle path,
+.sd-muschel-pearl,
+.sd-muschel-sparkle path,
+.sd-burg-top,
+.sd-burg-sand circle,
+.sd-burg-sparkle path,
+.sd-eimer-fish,
+.sd-schaufel-sand circle,
+.sd-haufen-worm,
+.sd-haufen-sand circle,
+.sd-truhe-glow,
+.sd-truhe-coins circle,
+.sd-truhe-sparkle path,
+.sd-kuehl-cold circle,
+.sd-kuehl-eis,
+.sd-creme-blob,
+.sd-flug-hand {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Puffs, drops, sparkles and other little things move around their own middle. */
+.sd-drops path,
+.sd-ripples ellipse,
+.sd-leucht-lamp,
+.sd-leucht-splash circle,
+.sd-schiff-puff circle,
+.sd-welle-foam circle,
+.sd-zelt-hearts path,
+.sd-bude-steam circle,
+.sd-mama-hearts path,
+.sd-pommes-sparkle path,
+.sd-krebs-sand circle,
+.sd-stern-sparkle path,
+.sd-muschel-sparkle path,
+.sd-burg-sand circle,
+.sd-burg-sparkle path,
+.sd-schaufel-sand circle,
+.sd-haufen-sand circle,
+.sd-truhe-coins circle,
+.sd-truhe-sparkle path,
+.sd-kuehl-cold circle,
+.sd-schirm-flaps path,
+.sd-turm-whistle,
+.sd-creme-blob {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.sd-schirm-flaps path {
+  transform-origin: 50% 0%;
+}
+
+/* Waiting inside until they come out: the worm in the sand pile, the ice lolly in the cool box,
+   the top tower inside the keep of the sand castle. */
+.sd-haufen-worm {
+  transform: translateY(46px);
+}
+
+.sd-kuehl-eis {
+  transform: translateY(50px);
+}
+
+.sd-burg-top {
+  transform: translateY(80px);
+}
+
+/* Dad's arm lies across his belly until he waves. */
+.sd-matratze-arm {
+  transform: rotate(86deg);
+}
+
+/* ---------- Parts many items share ---------- */
+
+.scene-item.playing .sd-drops path {
+  animation: sd-drop 0.85s ease-out calc(0.2s + var(--i) * 0.1s) 2;
+}
+
+.scene-item.playing .sd-ripples ellipse {
+  animation: sd-ripple 1.2s ease-out calc(var(--i) * 0.5s);
+}
+
+@keyframes sd-drop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(calc((var(--i) - 1.5) * 8px), -26px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1.5) * 18px), 8px) scale(0.8);
+  }
+}
+
+@keyframes sd-ripple {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes sd-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--i) * 6px - 8px), -30px) scale(1.5);
+  }
+}
+
+@keyframes sd-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) rotate(90deg);
+  }
+}
+
+@keyframes sd-heart {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-10px) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(0.9);
+  }
+}
+
+/* A door or shutter opens (scaleX/scaleY towards its hinge), stays open and closes again. */
+@keyframes sd-open-x {
+  15%,
+  80% {
+    transform: scaleX(0.1);
+  }
+}
+
+@keyframes sd-open-y {
+  15%,
+  82% {
+    transform: scaleY(0.08);
+  }
+}
+
+/* A light goes on and off again. */
+@keyframes sd-glow {
+  15%,
+  80% {
+    opacity: 1;
+  }
+}
+
+/* An arm appears, waves three times and is put away again. */
+@keyframes sd-arm-wave {
+  0%,
+  100% {
+    opacity: 0;
+    transform: rotate(0);
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  25%,
+  45%,
+  65% {
+    transform: rotate(-18deg);
+  }
+  35%,
+  55%,
+  75% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes sd-bob {
+  50% {
+    transform: translateY(-10px) rotate(-4deg);
+  }
+}
+
+/* ---------- Flugzeug: swoops, the propeller whirls, the banner waves, the pilot waves ---------- */
+
+.item-flugzeug.playing .sd-flug-fly {
+  animation: sd-plane-fly 2.6s ease-in-out;
+}
+
+.item-flugzeug.playing .sd-flug-tilt {
+  animation: sd-plane-tilt 0.65s ease-in-out 4;
+}
+
+.item-flugzeug.playing .sd-flug-prop {
+  animation: sd-prop 0.12s linear 21;
+}
+
+.item-flugzeug.playing .sd-flug-banner {
+  animation: sd-banner 0.325s ease-in-out 8 alternate;
+}
+
+.item-flugzeug.playing .sd-flug-hand {
+  animation: sd-arm-wave 2.4s ease-in-out;
+}
+
+@keyframes sd-plane-fly {
+  35% {
+    transform: translate(-60px, -12px);
+  }
+  70% {
+    transform: translate(40px, 8px);
+  }
+}
+
+@keyframes sd-plane-tilt {
+  25% {
+    transform: rotate(6deg);
+  }
+  75% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes sd-prop {
+  50% {
+    transform: scaleY(-1);
+  }
+}
+
+@keyframes sd-banner {
+  from {
+    transform: skewY(-3deg) scaleY(0.94);
+  }
+  to {
+    transform: skewY(3deg) scaleY(1.04);
+  }
+}
+
+/* ---------- Drachen: swoops on the wind, the tail wiggles ---------- */
+
+.item-drachen.playing .sd-drachen-swoop {
+  animation: sd-kite 2.4s ease-in-out;
+}
+
+.item-drachen.playing .sd-drachen-tail {
+  animation: sd-wiggle 0.4s ease-in-out 6 alternate;
+}
+
+@keyframes sd-kite {
+  20% {
+    transform: translate(-30px, -10px) rotate(-18deg);
+  }
+  45% {
+    transform: translate(40px, -24px) rotate(16deg);
+  }
+  70% {
+    transform: translate(-16px, 6px) rotate(-10deg);
+  }
+  88% {
+    transform: translate(8px, -4px) rotate(4deg);
+  }
+}
+
+/* ---------- Leuchtturm: the light flashes round, the window lights up, the keeper opens the door ---------- */
+
+.item-leuchtturm.playing .sd-leucht-beam-left {
+  animation: sd-beam-left 2.8s ease-in-out;
+}
+
+.item-leuchtturm.playing .sd-leucht-beam-right {
+  animation: sd-beam-right 2.8s ease-in-out;
+}
+
+.item-leuchtturm.playing .sd-leucht-lamp {
+  animation: sd-lamp 0.7s ease-in-out 4;
+}
+
+.item-leuchtturm.playing .sd-leucht-window {
+  animation: sd-glow 2.8s ease-in-out;
+}
+
+.item-leuchtturm.playing .sd-leucht-door {
+  animation: sd-open-x 2.8s ease-in-out;
+}
+
+.item-leuchtturm.playing .sd-leucht-keeper {
+  animation: sd-keeper 2.8s ease-in-out;
+}
+
+.item-leuchtturm.playing .sd-leucht-splash circle {
+  animation: sd-puff 0.9s ease-out calc(0.4s + var(--i) * 0.2s) 2;
+}
+
+@keyframes sd-beam-left {
+  0%,
+  20%,
+  50%,
+  70%,
+  100% {
+    opacity: 0;
+  }
+  8%,
+  12%,
+  58%,
+  62% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes sd-beam-right {
+  0%,
+  20%,
+  30%,
+  50%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  33%,
+  37%,
+  83%,
+  87% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes sd-lamp {
+  50% {
+    transform: scale(1.35);
+    fill: #fff9db;
+  }
+}
+
+@keyframes sd-keeper {
+  20%,
+  80% {
+    transform: translateX(-2px);
+  }
+  40%,
+  60% {
+    transform: translate(-2px, -3px);
+  }
+}
+
+/* ---------- Segelboot: rocks, the sails fill with wind, the sailor waves ---------- */
+
+.item-segelboot.playing .sd-segel-rock {
+  animation: sd-rock 1.3s ease-in-out 2;
+}
+
+.item-segelboot.playing .sd-segel-main {
+  animation: sd-sail 1.3s ease-in-out 2;
+}
+
+.item-segelboot.playing .sd-segel-jib {
+  animation: sd-sail 1.2s ease-in-out 0.2s 2 reverse;
+}
+
+.item-segelboot.playing .sd-segel-flag {
+  animation: sd-flag 0.2s ease-in-out 12 alternate;
+}
+
+.item-segelboot.playing .sd-segel-arm {
+  animation: sd-arm-wave 2.6s ease-in-out;
+}
+
+@keyframes sd-rock {
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes sd-sail {
+  50% {
+    transform: scaleX(1.14);
+  }
+}
+
+/* ---------- Schiff: toots, smoke puffs, the lights go on, the captain waves ---------- */
+
+.item-schiff.playing .sd-schiff-body {
+  animation: sd-ship 1.4s ease-in-out 2;
+}
+
+.item-schiff.playing .sd-schiff-puff circle {
+  animation: sd-puff 1.1s ease-out calc(var(--i) * 0.3s) 2;
+}
+
+.item-schiff.playing .sd-schiff-light {
+  animation: sd-glow 2.2s ease-in-out calc(var(--i) * 0.06s);
+}
+
+.item-schiff.playing .sd-schiff-arm {
+  animation: sd-arm-wave 2.6s ease-in-out;
+}
+
+.item-schiff.playing .sd-schiff-flag {
+  animation: sd-flag 0.25s ease-in-out 10 alternate;
+}
+
+@keyframes sd-ship {
+  50% {
+    transform: translateY(-5px) rotate(-1.5deg);
+  }
+}
+
+/* ---------- Delfin: leaps out in an arc and dives back in ---------- */
+
+.item-delfin.playing .sd-delfin-jump {
+  animation: sd-dolphin 2.4s ease-in-out;
+}
+
+.item-delfin.playing .sd-delfin-splash path {
+  animation: sd-drop 0.9s ease-out calc(1.2s + var(--i) * 0.08s);
+}
+
+@keyframes sd-dolphin {
+  0% {
+    transform: none;
+  }
+  25% {
+    transform: translate(30px, -90px) rotate(20deg);
+  }
+  45% {
+    transform: translate(60px, -110px) rotate(55deg);
+  }
+  62% {
+    transform: translate(80px, -40px) rotate(90deg);
+  }
+  70% {
+    transform: translate(80px, 60px) rotate(100deg);
+  }
+  71% {
+    transform: translate(0, 110px) rotate(0);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* ---------- Boot: rocks, the fisher rows, a fish hangs on the line ---------- */
+
+.item-boot.playing .sd-boot-rock {
+  animation: sd-rock 0.93s ease-in-out 3;
+}
+
+.item-boot.playing .sd-boot-oar {
+  animation: sd-oar 0.93s ease-in-out 3;
+}
+
+.item-boot.playing .sd-boot-rod {
+  animation: sd-rod 2.8s ease-in-out;
+}
+
+.item-boot.playing .sd-boot-fish {
+  animation: sd-fish 2.8s ease-in-out;
+}
+
+@keyframes sd-oar {
+  50% {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes sd-rod {
+  30%,
+  80% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes sd-fish {
+  0%,
+  30%,
+  86%,
+  100% {
+    opacity: 0;
+  }
+  38%,
+  78% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Boje: bobs and tilts, the bell swings ---------- */
+
+.item-boje.playing .sd-boje-body {
+  animation: sd-buoy 1.1s ease-in-out 2;
+}
+
+.item-boje.playing .sd-boje-bell {
+  animation: sd-bell 0.55s ease-in-out 4;
+}
+
+@keyframes sd-buoy {
+  25% {
+    transform: rotate(-12deg) translateY(-6px);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes sd-bell {
+  25% {
+    transform: rotate(-26deg);
+  }
+  75% {
+    transform: rotate(26deg);
+  }
+}
+
+/* ---------- Wellen: roll in one after the other, foam and spray ---------- */
+
+.item-wellen.playing .sd-welle {
+  animation: sd-roll 1.4s ease-in-out calc(var(--i) * 0.4s);
+}
+
+.item-wellen.playing .sd-welle-foam circle {
+  animation: sd-puff 0.8s ease-out calc(0.4s + var(--i) * 0.12s) 2;
+}
+
+.item-wellen.playing .sd-drops path {
+  animation: sd-drop 0.9s ease-out calc(0.5s + var(--i) * 0.15s);
+}
+
+@keyframes sd-roll {
+  50% {
+    transform: translateX(34px) scale(1.12, 1.35);
+  }
+  75% {
+    transform: translateX(44px) scale(1.2, 0.8);
+  }
+}
+
+/* ---------- Schwimmring: bobs, splashes with both arms ---------- */
+
+.item-schwimmring.playing .sd-ring-bob {
+  animation: sd-bob 0.8s ease-in-out 3;
+}
+
+.item-schwimmring.playing .sd-ring-arm {
+  animation: sd-splash-arm 0.4s ease-in-out 6 alternate;
+}
+
+.item-schwimmring.playing .sd-ring-arm-right {
+  animation-name: sd-splash-arm-right;
+}
+
+@keyframes sd-splash-arm {
+  to {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes sd-splash-arm-right {
+  to {
+    transform: rotate(40deg);
+  }
+}
+
+/* ---------- Badeente: bobs, nods and quacks ---------- */
+
+.item-badeente.playing .sd-ente-bob {
+  animation: sd-bob 1.1s ease-in-out 2;
+}
+
+.item-badeente.playing .sd-ente-head {
+  animation: sd-nod 0.55s ease-in-out 4;
+}
+
+.item-badeente.playing .sd-ente-beak {
+  animation: sd-beak 0.275s ease-in-out 8 alternate;
+}
+
+@keyframes sd-nod {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes sd-beak {
+  to {
+    transform: rotate(24deg);
+  }
+}
+
+/* ---------- Luftmatratze: rocks, dad waves and kicks, his hat flies up ---------- */
+
+.item-luftmatratze.playing .sd-matratze-rock {
+  animation: sd-mattress 1.3s ease-in-out 2;
+}
+
+.item-luftmatratze.playing .sd-matratze-hat {
+  animation: sd-hat-fly 2.6s ease-in-out;
+}
+
+.item-luftmatratze.playing .sd-matratze-leg {
+  animation: sd-kick 0.32s ease-in-out 8 alternate;
+}
+
+.item-luftmatratze.playing .sd-matratze-arm {
+  animation: sd-dad-wave 2.6s ease-in-out;
+}
+
+@keyframes sd-mattress {
+  25% {
+    transform: rotate(-7deg) translateY(-4px);
+  }
+  75% {
+    transform: rotate(6deg) translateY(2px);
+  }
+}
+
+@keyframes sd-hat-fly {
+  35% {
+    transform: translate(10px, -70px) rotate(-30deg);
+  }
+  60% {
+    transform: translate(-6px, -40px) rotate(20deg);
+  }
+  85% {
+    transform: none;
+  }
+}
+
+@keyframes sd-kick {
+  to {
+    transform: rotate(-22deg);
+  }
+}
+
+@keyframes sd-dad-wave {
+  0%,
+  100% {
+    transform: rotate(86deg);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: rotate(-12deg);
+  }
+  30%,
+  50%,
+  70% {
+    transform: rotate(16deg);
+  }
+}
+
+/* ---------- Strandkorb: grandpa stretches and yawns, lifts his hat, the footrest slides out ---------- */
+
+.item-strandkorb.playing .sd-korb-hat {
+  animation: sd-lift-hat 2.8s ease-in-out;
+}
+
+.item-strandkorb.playing .sd-korb-arm {
+  animation: sd-stretch 2.8s ease-in-out;
+}
+
+.item-strandkorb.playing .sd-korb-arm-right {
+  animation-name: sd-stretch-right;
+}
+
+.item-strandkorb.playing .sd-korb-yawn {
+  animation: sd-glow 2.8s ease-in-out;
+}
+
+.item-strandkorb.playing .sd-korb-foot {
+  animation: sd-footrest 2.8s ease-in-out;
+}
+
+.item-strandkorb.playing .sd-korb-opa {
+  animation: sd-opa 2.8s ease-in-out;
+}
+
+@keyframes sd-lift-hat {
+  20%,
+  70% {
+    transform: translateY(-34px) rotate(-14deg);
+  }
+  45% {
+    transform: translateY(-40px) rotate(10deg);
+  }
+}
+
+@keyframes sd-stretch {
+  15%,
+  60% {
+    transform: rotate(115deg);
+  }
+  37% {
+    transform: rotate(100deg);
+  }
+}
+
+@keyframes sd-stretch-right {
+  15%,
+  60% {
+    transform: rotate(-115deg);
+  }
+  37% {
+    transform: rotate(-100deg);
+  }
+}
+
+@keyframes sd-footrest {
+  20%,
+  80% {
+    transform: translateY(20px);
+  }
+}
+
+@keyframes sd-opa {
+  30%,
+  60% {
+    transform: translateY(-6px);
+  }
+}
+
+/* ---------- Strandzelt: the flap rolls up, the baby claps, hearts fly ---------- */
+
+.item-strandzelt.playing .sd-zelt-flap {
+  animation: sd-open-y 2.6s ease-in-out;
+}
+
+.item-strandzelt.playing .sd-zelt-hand {
+  animation: sd-clap 0.3s ease-in-out 0.5s 6 alternate;
+}
+
+.item-strandzelt.playing .sd-zelt-hand-right {
+  animation-name: sd-clap-right;
+}
+
+.item-strandzelt.playing .sd-zelt-baby {
+  animation: sd-baby 2.6s ease-in-out;
+}
+
+.item-strandzelt.playing .sd-zelt-hearts path {
+  animation: sd-heart 1.2s ease-out calc(0.6s + var(--i) * 0.35s);
+}
+
+@keyframes sd-clap {
+  to {
+    transform: translate(14px, -10px);
+  }
+}
+
+@keyframes sd-clap-right {
+  to {
+    transform: translate(-14px, -10px);
+  }
+}
+
+@keyframes sd-baby {
+  30%,
+  70% {
+    transform: translateY(-6px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+}
+
+/* ---------- Sonnenschirm: spins round, the flaps flutter, it closes and opens again ---------- */
+
+.item-sonnenschirm.playing .sd-schirm-spin {
+  animation: sd-umbrella-spin 0.6s linear 2;
+}
+
+.item-sonnenschirm.playing .sd-schirm-top {
+  animation: sd-umbrella-close 2.4s ease-in-out;
+}
+
+.item-sonnenschirm.playing .sd-schirm-flaps path {
+  animation: sd-flap 0.2s ease-in-out calc(var(--i) * 0.05s) 10 alternate;
+}
+
+@keyframes sd-umbrella-spin {
+  25% {
+    transform: scaleX(0.3);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+  75% {
+    transform: scaleX(-0.3);
+  }
+}
+
+@keyframes sd-umbrella-close {
+  0%,
+  50%,
+  100% {
+    transform: none;
+  }
+  65%,
+  75% {
+    transform: scale(0.3, 1.25);
+  }
+}
+
+/* ---------- Rettungsturm: whistles, waves, the flag flies and the ring swings ---------- */
+
+.item-rettungsturm.playing .sd-turm-guard {
+  animation: sd-keeper 2.6s ease-in-out;
+}
+
+.item-rettungsturm.playing .sd-turm-whistle {
+  animation: sd-whistle 0.35s ease-in-out 4 alternate;
+}
+
+.item-rettungsturm.playing .sd-turm-arm {
+  animation: sd-arm-wave 2.6s ease-in-out;
+}
+
+.item-rettungsturm.playing .sd-turm-flag {
+  animation: sd-flag 0.2s ease-in-out 12 alternate;
+}
+
+.item-rettungsturm.playing .sd-turm-ring {
+  animation: sd-swing 1.3s ease-in-out 2;
+}
+
+@keyframes sd-whistle {
+  to {
+    transform: scale(1.4, 1.2);
+  }
+}
+
+@keyframes sd-swing {
+  25% {
+    transform: rotate(14deg);
+  }
+  75% {
+    transform: rotate(-12deg);
+  }
+}
+
+/* ---------- Pommesbude: the shutter rolls up, the cook waves a cone, steam, the sign wobbles ---------- */
+
+.item-pommesbude.playing .sd-bude-shutter {
+  animation: sd-open-y 2.8s ease-in-out;
+}
+
+.item-pommesbude.playing .sd-bude-cook {
+  animation: sd-keeper 2.8s ease-in-out;
+}
+
+.item-pommesbude.playing .sd-bude-arm {
+  animation: sd-cone 2.8s ease-in-out;
+}
+
+.item-pommesbude.playing .sd-bude-steam circle {
+  animation: sd-puff 0.9s ease-out calc(0.4s + var(--i) * 0.2s) 2;
+}
+
+.item-pommesbude.playing .sd-bude-sign {
+  animation: sd-sign 0.7s ease-in-out 4;
+}
+
+@keyframes sd-cone {
+  30%,
+  70% {
+    transform: rotate(-24deg);
+  }
+  45%,
+  55% {
+    transform: rotate(-34deg);
+  }
+}
+
+@keyframes sd-sign {
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+/* ---------- Strandhaus: the door opens, the girl waves, the shutters open, pennants flutter ---------- */
+
+.item-strandhaus.playing .sd-haus-door {
+  animation: sd-open-x 2.8s ease-in-out;
+}
+
+.item-strandhaus.playing .sd-haus-shutter {
+  animation: sd-open-x 2.8s ease-in-out;
+}
+
+.item-strandhaus.playing .sd-haus-light {
+  animation: sd-glow 2.8s ease-in-out;
+}
+
+.item-strandhaus.playing .sd-haus-pennants path {
+  animation: sd-pennant 0.25s ease-in-out calc(var(--i) * 0.05s) 10 alternate;
+}
+
+.item-strandhaus.playing .sd-haus-towel {
+  animation: sd-swing 1.4s ease-in-out 2;
+}
+
+/* ---------- Mama: pushes up her sunglasses, waves, sends hearts ---------- */
+
+.item-mama.playing .sd-mama-glasses {
+  animation: sd-glasses 2.4s ease-in-out;
+}
+
+.item-mama.playing .sd-mama-arm {
+  animation: sd-mama-wave 2.4s ease-in-out;
+}
+
+.item-mama.playing .sd-mama-hearts path {
+  animation: sd-heart 1.2s ease-out calc(0.5s + var(--i) * 0.35s);
+}
+
+@keyframes sd-glasses {
+  15%,
+  80% {
+    transform: translateY(-22px);
+  }
+}
+
+@keyframes sd-mama-wave {
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: rotate(-120deg);
+  }
+  30%,
+  50%,
+  70% {
+    transform: rotate(-95deg);
+  }
+}
+
+/* ---------- Pommes: the chips hop out one after the other ---------- */
+
+.item-pommes.playing .sd-pommes-chip {
+  animation: sd-chip 0.6s ease-out calc(var(--i) * 0.15s) 2;
+}
+
+.item-pommes.playing .sd-pommes-sparkle path {
+  animation: sd-sparkle 0.8s ease-out calc(0.3s + var(--i) * 0.3s);
+}
+
+@keyframes sd-chip {
+  40% {
+    transform: translateY(-22px) rotate(-12deg);
+  }
+}
+
+/* ---------- Möwe: hops to the chips, grabs one, flaps up and lands ---------- */
+
+.item-moewe.playing .sd-moewe-body {
+  animation: sd-gull 2.4s ease-in-out;
+}
+
+.item-moewe.playing .sd-moewe-wing {
+  animation: sd-gull-wing 0.2s ease-in-out 0.7s 8 alternate;
+}
+
+.item-moewe.playing .sd-moewe-chip {
+  animation: sd-gull-chip 2.4s linear;
+}
+
+@keyframes sd-gull {
+  15% {
+    transform: translate(-24px, 0);
+  }
+  25% {
+    transform: translate(-30px, 8px) rotate(-10deg);
+  }
+  45% {
+    transform: translate(-10px, -60px) rotate(4deg);
+  }
+  70% {
+    transform: translate(10px, -50px);
+  }
+  90% {
+    transform: translate(0, -4px);
+  }
+}
+
+@keyframes sd-gull-wing {
+  to {
+    transform: rotate(-38deg);
+  }
+}
+
+@keyframes sd-gull-chip {
+  0%,
+  24%,
+  96%,
+  100% {
+    opacity: 0;
+  }
+  27%,
+  92% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Kind: hops, swings the net, waves ---------- */
+
+.item-kind.playing .sd-kind-hop {
+  animation: sd-hop 1.1s ease-in-out 2;
+}
+
+.item-kind.playing .sd-kind-net {
+  animation: sd-net 1.1s ease-in-out 2;
+}
+
+.item-kind.playing .sd-kind-arm {
+  animation: sd-kid-wave 0.36s ease-in-out 6 alternate;
+}
+
+@keyframes sd-hop {
+  40% {
+    transform: translateY(-26px);
+  }
+  70% {
+    transform: translateY(0) scale(1.03, 0.96);
+  }
+}
+
+@keyframes sd-net {
+  35% {
+    transform: rotate(-24deg);
+  }
+  70% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes sd-kid-wave {
+  to {
+    transform: rotate(-26deg);
+  }
+}
+
+/* ---------- Krebs: runs sideways, snaps its claws ---------- */
+
+.item-krebs.playing .sd-krebs-run {
+  animation: sd-crab-run 2.4s ease-in-out;
+}
+
+.item-krebs.playing .sd-krebs-legs {
+  animation: sd-crab-legs 0.15s ease-in-out 16 alternate;
+}
+
+.item-krebs.playing .sd-krebs-claw {
+  animation: sd-claw 0.6s ease-in-out 4;
+}
+
+.item-krebs.playing .sd-krebs-pincer {
+  animation: sd-pincer 0.3s ease-in-out 8;
+}
+
+.item-krebs.playing .sd-krebs-sand circle {
+  animation: sd-puff 0.8s ease-out calc(var(--i) * 0.25s) 2;
+}
+
+@keyframes sd-crab-run {
+  25% {
+    transform: translate(-56px, 0);
+  }
+  30% {
+    transform: translate(-56px, -6px);
+  }
+  65% {
+    transform: translate(44px, 0);
+  }
+  70% {
+    transform: translate(44px, -6px);
+  }
+}
+
+@keyframes sd-crab-legs {
+  to {
+    transform: rotate(calc(var(--s) * 12deg));
+  }
+}
+
+@keyframes sd-claw {
+  50% {
+    transform: rotate(calc(var(--s) * -16deg));
+  }
+}
+
+@keyframes sd-pincer {
+  50% {
+    transform: rotate(calc(var(--s) * 28deg));
+  }
+}
+
+/* ---------- Sonnencreme: squeezes, the cap pops open, a blob comes out ---------- */
+
+.item-sonnencreme.playing .sd-creme-bottle {
+  animation: sd-squeeze 2s ease-in-out;
+}
+
+.item-sonnencreme.playing .sd-creme-cap {
+  animation: sd-cap 2s ease-in-out;
+}
+
+.item-sonnencreme.playing .sd-creme-blob {
+  animation: sd-blob 2s ease-out;
+}
+
+@keyframes sd-squeeze {
+  30%,
+  45% {
+    transform: scale(1.12, 0.86);
+  }
+  60% {
+    transform: scale(0.96, 1.04);
+  }
+}
+
+@keyframes sd-cap {
+  15%,
+  80% {
+    transform: rotate(110deg);
+  }
+}
+
+@keyframes sd-blob {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.3);
+  }
+  45%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px) scale(1.1);
+  }
+}
+
+/* ---------- Seestern: wiggles and hops, sparkles ---------- */
+
+.item-seestern.playing .sd-stern-wiggle {
+  animation: sd-star 0.73s ease-in-out 3;
+}
+
+.item-seestern.playing .sd-stern-sparkle path {
+  animation: sd-sparkle 0.8s ease-out calc(0.3s + var(--i) * 0.4s);
+}
+
+@keyframes sd-star {
+  30% {
+    transform: translateY(-16px) rotate(-14deg);
+  }
+  70% {
+    transform: translateY(-6px) rotate(12deg);
+  }
+}
+
+/* ---------- Muschel: opens, a pearl shines, closes again ---------- */
+
+.item-muschel.playing .sd-muschel-top {
+  animation: sd-shell 2.4s ease-in-out;
+}
+
+.item-muschel.playing .sd-muschel-pearl {
+  animation: sd-glow 2.4s ease-in-out;
+}
+
+.item-muschel.playing .sd-muschel-sparkle path {
+  animation: sd-sparkle 0.8s ease-out calc(0.6s + var(--i) * 0.3s);
+}
+
+@keyframes sd-shell {
+  15%,
+  80% {
+    transform: translate(0, -28px) rotate(-12deg);
+  }
+}
+
+/* ---------- Sandburg: grows tower by tower, the top tower rises with its flag ---------- */
+
+.item-sandburg.playing .sd-burg-tower {
+  animation: sd-grow 2.5s ease-in-out calc(var(--i) * 0.15s);
+}
+
+.item-sandburg.playing .sd-burg-keep {
+  animation: sd-grow-keep 2.8s ease-in-out;
+}
+
+.item-sandburg.playing .sd-burg-top {
+  animation: sd-rise 2.8s ease-in-out;
+}
+
+.item-sandburg.playing .sd-burg-flag,
+.item-sandburg.playing .sd-burg-flag-top {
+  animation: sd-flag 0.2s ease-in-out 14 alternate;
+}
+
+.item-sandburg.playing .sd-burg-sand circle {
+  animation: sd-puff 0.8s ease-out calc(0.3s + var(--i) * 0.2s) 2;
+}
+
+.item-sandburg.playing .sd-burg-sparkle path {
+  animation: sd-sparkle 0.8s ease-out calc(1s + var(--i) * 0.3s);
+}
+
+@keyframes sd-grow {
+  20%,
+  85% {
+    transform: scaleY(1.4);
+  }
+  30% {
+    transform: scaleY(1.5);
+  }
+}
+
+@keyframes sd-grow-keep {
+  20%,
+  85% {
+    transform: scale(1.06, 1.14);
+  }
+}
+
+@keyframes sd-rise {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+  20% {
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-20px);
+  }
+  48%,
+  80% {
+    opacity: 1;
+    transform: translateY(-14px);
+  }
+  95% {
+    opacity: 1;
+    transform: translateY(80px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(80px);
+  }
+}
+
+/* ---------- Eimer: wobbles, the handle swings, a fish jumps out and back in ---------- */
+
+.item-eimer.playing .sd-eimer-body {
+  animation: sd-rock 0.73s ease-in-out 3;
+}
+
+.item-eimer.playing .sd-eimer-handle {
+  animation: sd-swing 0.73s ease-in-out 3;
+}
+
+.item-eimer.playing .sd-eimer-fish {
+  animation: sd-bucket-fish 2.2s ease-in-out;
+}
+
+@keyframes sd-bucket-fish {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  20% {
+    opacity: 1;
+  }
+  45% {
+    transform: translate(30px, -70px) rotate(40deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(10px, -10px) rotate(120deg);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: translateY(16px) rotate(180deg);
+  }
+}
+
+/* ---------- Windrad: spins fast and slows down ---------- */
+
+.item-windrad.playing .sd-windrad-blades {
+  animation: sd-pinwheel 2s cubic-bezier(0.2, 0.6, 0.4, 1);
+}
+
+@keyframes sd-pinwheel {
+  to {
+    transform: rotate(4turn);
+  }
+}
+
+/* ---------- Schaufel: digs, throws sand, sticks back in ---------- */
+
+.item-schaufel.playing .sd-schaufel-dig {
+  animation: sd-dig 2.2s ease-in-out;
+}
+
+.item-schaufel.playing .sd-schaufel-sand circle {
+  animation: sd-puff 0.8s ease-out calc(1s + var(--i) * 0.12s);
+}
+
+@keyframes sd-dig {
+  20% {
+    transform: translateY(-34px) rotate(-8deg);
+  }
+  40% {
+    transform: translate(10px, -10px) rotate(22deg);
+  }
+  55% {
+    transform: translate(-6px, -44px) rotate(-26deg);
+  }
+  80% {
+    transform: translateY(-24px);
+  }
+}
+
+/* ---------- Sandhaufen: the top lifts and the lugworm pops out ---------- */
+
+.item-sandhaufen.playing .sd-haufen-cap {
+  animation: sd-pile-cap 2.4s ease-in-out;
+}
+
+.item-sandhaufen.playing .sd-haufen-worm {
+  animation: sd-worm 2.4s ease-in-out;
+}
+
+.item-sandhaufen.playing .sd-haufen-sand circle {
+  animation: sd-puff 0.8s ease-out calc(0.2s + var(--i) * 0.15s);
+}
+
+@keyframes sd-pile-cap {
+  15%,
+  80% {
+    transform: translate(30px, -12px) rotate(30deg);
+  }
+}
+
+@keyframes sd-worm {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translateY(46px);
+  }
+  18% {
+    opacity: 1;
+  }
+  32%,
+  70% {
+    opacity: 1;
+    transform: none;
+  }
+  45% {
+    transform: rotate(-10deg);
+  }
+  58% {
+    transform: rotate(10deg);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(46px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(46px);
+  }
+}
+
+/* ---------- Schatztruhe: the lid flies open, it glows, coins and sparkles jump out ---------- */
+
+.item-schatztruhe.playing .sd-truhe-lid {
+  animation: sd-chest-lid 2.6s ease-in-out;
+}
+
+.item-schatztruhe.playing .sd-truhe-glow {
+  animation: sd-glow 2.6s ease-in-out;
+}
+
+.item-schatztruhe.playing .sd-truhe-coins circle {
+  animation: sd-coin 0.8s ease-out calc(0.4s + var(--i) * 0.15s) 2;
+}
+
+.item-schatztruhe.playing .sd-truhe-sparkle path {
+  animation: sd-sparkle 0.8s ease-out calc(0.5s + var(--i) * 0.25s);
+}
+
+@keyframes sd-chest-lid {
+  15%,
+  80% {
+    transform: rotate(-62deg);
+  }
+  25% {
+    transform: rotate(-70deg);
+  }
+}
+
+@keyframes sd-coin {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  20% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc((var(--i) - 1.5) * 14px), -54px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1.5) * 20px), -10px);
+  }
+}
+
+/* ---------- Kühlbox: the lid lifts, cold air, an ice lolly pops up ---------- */
+
+.item-kuehlbox.playing .sd-kuehl-lid {
+  animation: sd-cool-lid 2.4s ease-in-out;
+}
+
+.item-kuehlbox.playing .sd-kuehl-eis {
+  animation: sd-lolly 2.4s ease-in-out;
+}
+
+.item-kuehlbox.playing .sd-kuehl-cold circle {
+  animation: sd-puff 0.8s ease-out calc(0.2s + var(--i) * 0.15s) 2;
+}
+
+@keyframes sd-cool-lid {
+  15%,
+  80% {
+    transform: rotate(36deg);
+  }
+  25% {
+    transform: rotate(40deg);
+  }
+}
+
+@keyframes sd-lolly {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  18% {
+    opacity: 1;
+  }
+  32%,
+  68% {
+    opacity: 1;
+    transform: none;
+  }
+  45% {
+    transform: translateY(-8px) rotate(-6deg);
+  }
+  56% {
+    transform: translateY(-8px) rotate(6deg);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(50px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}

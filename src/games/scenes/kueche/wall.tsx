@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Cloud, Eye, INK, Inside, STEEL, nth } from "../shared";
 import { CUPBOARD, CUPBOARD_DARK } from "./background";
 import { Lines, Notes, Steam } from "./parts";
@@ -258,6 +259,8 @@ export function Keksschrank() {
         <circle cx="1184" cy="72" r="5" fill="#ff8787" />
       </g>
       <rect x="1226" y="76" width="56" height="32" rx="3" fill="#74c0fc" />
+      {/* Who wants a cookie, too? */}
+      <Hideout x={1072} y={64} w={84} h={44} size={40} />
       <path d="M1236 86 H1272" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
       <WallDoor x={1068} y={10} w={114} h={100} hinge="left" cls="kc-keks-door" i={0} />
       <WallDoor x={1186} y={10} w={114} h={100} hinge="right" cls="kc-keks-door" i={1} />
@@ -286,6 +289,8 @@ export function Kuehlschrank() {
       <rect x="1444" y="138" width="20" height="18" rx="3" fill="#e7f5ff" stroke="#a5d8ff" strokeWidth="2" />
       <path d="M1520 126 L1532 160 L1544 126 Z" fill="#e9b872" />
       <circle cx="1532" cy="120" r="12" fill="#ffc9c9" />
+      {/* Brr! Someone is hiding in the freezer. */}
+      <Hideout x={1466} y={90} w={52} h={74} size={48} />
       {/* Milk, cheese, eggs */}
       <path d="M1428 236 V200 L1438 188 H1452 L1462 200 V236 Z" fill="#fff" stroke="#dee2e6" strokeWidth="2" />
       <rect x="1430" y="206" width="30" height="12" fill="#4dabf7" />

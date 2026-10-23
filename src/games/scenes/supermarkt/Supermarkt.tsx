@@ -124,6 +124,7 @@ export const supermarkt: Scene = {
       traits: ["big"],
       box: [1188, 118, 206, 212],
       durationMs: 2600,
+      hideout: [0.24, 0.62],
       Art: Kuehlregal,
     },
     {
@@ -292,6 +293,7 @@ export const supermarkt: Scene = {
       place: ground(0, 0, 1410, 612, 1),
       shadow: [0, 0, 150],
       durationMs: 2600,
+      hideout: [0.18, 0.78],
       Art: Eistruhe,
     },
     {

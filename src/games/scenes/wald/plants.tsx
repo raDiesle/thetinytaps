@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { nth } from "../shared";
 
 // Mushroom, berry bush and fern at the front. Foot point at (0, 0).
@@ -66,6 +67,8 @@ export function Beerenstrauch() {
   return (
     <>
       <g className="wd-beeren-bush" style={{ transformOrigin: "0px 0px" }}>
+        {/* Someone else hides in the bush every time */}
+        <Hideout x={-72} y={-232} w={88} h={122} size={90} />
         {LEAVES.map(([cx, cy, r], i) => (
           <circle key={cx} cx={cx} cy={cy} r={r} fill={i % 2 ? "#2d6a4f" : "#40916c"} />
         ))}

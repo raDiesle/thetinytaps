@@ -767,10 +767,6 @@
   animation: fh-door 2.6s ease-in-out;
 }
 
-.item-wagen.playing .fh-wagen-wave {
-  animation: fh-wave 0.9s ease-in-out 0.5s 2;
-}
-
 .item-wagen.playing .fh-wagen-guest {
   animation: fh-bob 0.5s ease-in-out calc(var(--i) * 0.15s) 4;
 }

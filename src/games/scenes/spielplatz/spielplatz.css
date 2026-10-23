@@ -102,7 +102,6 @@
 .sp-eimer-sand circle,
 .sp-form-cake,
 .sp-form-sparkle path,
-.sp-burg-crab,
 .sp-burg-sand circle,
 .sp-bagger-sand circle,
 .sp-pumpe-water,
@@ -139,11 +138,6 @@
 .sp-pumpe-water {
   transform-box: fill-box;
   transform-origin: 50% 0%;
-}
-
-/* The child in the tower waits below the porthole until it peeks out. */
-.sp-turm-kid {
-  transform: translateY(44px);
 }
 
 /* The children on the roundabout sit opposite each other. */
@@ -683,10 +677,6 @@
   animation: sp-wheel-turn 2.4s ease-in-out;
 }
 
-.item-kletterturm.playing .sp-turm-kid {
-  animation: sp-peek 2.6s ease-in-out;
-}
-
 .item-kletterturm.playing .sp-turm-ladder {
   animation: sp-ladder 0.4s ease-in-out 4;
 }
@@ -697,23 +687,6 @@
   }
   100% {
     transform: rotate(360deg);
-  }
-}
-
-@keyframes sp-peek {
-  0%,
-  100% {
-    transform: translateY(44px);
-  }
-  25%,
-  80% {
-    transform: translateY(0);
-  }
-  45% {
-    transform: translateY(0) rotate(-8deg);
-  }
-  60% {
-    transform: translateY(0) rotate(8deg);
   }
 }
 
@@ -1404,7 +1377,7 @@
   }
 }
 
-/* ---------- Sandburg: the flag waves, the gate opens and a crab peeks out ---------- */
+/* ---------- Sandburg: the flag waves, the gate opens and someone peeks out ---------- */
 
 .item-sandburg.playing .sp-burg-flag {
   animation: sp-flag 0.3s ease-in-out 8 alternate;
@@ -1412,10 +1385,6 @@
 
 .item-sandburg.playing .sp-burg-gate {
   animation: sp-gate 2.4s ease-in-out;
-}
-
-.item-sandburg.playing .sp-burg-crab {
-  animation: sp-crab 2.4s ease-in-out;
 }
 
 .item-sandburg.playing .sp-burg-sand circle {
@@ -1426,31 +1395,6 @@
   15%,
   80% {
     transform: scaleX(0.12);
-  }
-}
-
-@keyframes sp-crab {
-  0%,
-  15%,
-  88%,
-  100% {
-    opacity: 0;
-    transform: none;
-  }
-  25%,
-  78% {
-    opacity: 1;
-    transform: translateY(14px);
-  }
-  40%,
-  60% {
-    opacity: 1;
-    transform: translate(-6px, 14px) rotate(-10deg);
-  }
-  50%,
-  70% {
-    opacity: 1;
-    transform: translate(6px, 14px) rotate(10deg);
   }
 }
 

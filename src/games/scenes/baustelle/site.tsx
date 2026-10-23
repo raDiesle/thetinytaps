@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, INK, Inside, Pane, SAND, SKIN, STEEL, Wheel, nth } from "../shared";
 
 /** A worker's head with a hard hat, peeking out of doors and windows. */
@@ -86,9 +87,9 @@ export function Klo() {
       <rect x="772" y="480" width="70" height="120" rx="6" fill="#2a9d8f" />
       <rect x="830" y="480" width="12" height="120" rx="4" fill="#21867a" />
       <path d="M766 486 Q807 456 848 486 Z" fill="#21867a" />
-      {/* Inside sits someone, who waves through the open door */}
+      {/* Inside sits someone else every time, who peeks through the open door */}
       <rect x="782" y="496" width="48" height="98" rx="4" fill="#1b4d47" />
-      <Peeker cx={806} cy={540} size={0.85} />
+      <Hideout x={782} y={496} w={48} h={98} size={52} />
       <g className="klo-door" style={{ transformOrigin: "782px 545px" }}>
         <rect x="782" y="496" width="48" height="98" rx="4" fill="#3bb3a4" />
         <rect x="782" y="496" width="48" height="98" rx="4" fill="none" stroke="#21867a" strokeWidth="2" />
@@ -135,6 +136,7 @@ export function Bauwagen() {
       <rect x="1520" y="548" width="44" height="80" fill="#2b2d42" />
       <g className="wagen-light">
         <rect x="1520" y="548" width="44" height="80" fill="#ffd166" />
+        <Hideout x={1520} y={548} w={44} h={80} size={50} />
         {/* A mug of cocoa inside */}
         <rect x="1532" y="586" width="18" height="20" rx="4" fill="#ff5d73" />
         <path d="M1550 592 q8 0 8 6 q0 6 -8 6" stroke="#ff5d73" strokeWidth="3" fill="none" />
@@ -370,6 +372,8 @@ export function Sandhaufen() {
         <path d="M824 902 h18" stroke={INK} strokeWidth="6" strokeLinecap="round" />
         <path d="M790 952 L812 962 L804 984 Q792 990 784 978 Z" fill={STEEL} />
       </g>
+      {/* Something digs itself out of the sand. */}
+      <Hideout x={736} y={900} w={100} h={86} size={62} />
       <path d="M730 1000 Q786 960 846 1000 Z" fill="#f4d58d" />
     </>
   );

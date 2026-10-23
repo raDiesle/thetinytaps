@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Hideout } from "../hideout";
 import { Face, GLASS, INK, Pane, SKIN, nth } from "../shared";
 
 // Houses and street furniture. Each drawing has its foot point at (0, 0).
@@ -81,6 +82,7 @@ export function Kirche() {
       <path d="M-30 0 V-64 a30 30 0 0 1 60 0 V0 Z" fill="#4a2f1d" />
       <ellipse cx="0" cy="-40" rx="18" ry="30" fill="#ffd166" opacity="0.6" />
       <path d="M-4 -14 V-34 M4 -14 V-30" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+      <Hideout x={-30} y={-64} w={60} h={58} size={52} />
       <path className="st-kirche-door" d="M-30 0 V-64 a30 30 0 0 1 30 -30 V0 Z" fill="#8d5a2b" style={{ transformOrigin: "-30px 0px" }} />
       <path className="st-kirche-door" d="M0 0 V-94 a30 30 0 0 1 30 30 V0 Z" fill="#8d5a2b" style={{ transformOrigin: "30px 0px" }} />
       <g className="st-kirche-door" style={{ transformOrigin: "-30px 0px" }}>
@@ -154,12 +156,9 @@ export function Haus() {
       {/* Ground floor */}
       <Window x={-112} y={-118} h={60} light="st-haus-light" i={6} />
       <Window x={56} y={-118} h={60} light="st-haus-light" i={7} />
-      {/* Behind the front door: the hall, and a child who comes to say hello */}
+      {/* Behind the front door: the hall, and someone else every time who comes to say hello */}
       <path d="M-28 -2 V-76 a28 28 0 0 1 56 0 V-2 Z" fill="#6d4c5a" />
-      <rect x="-14" y="-48" width="28" height="46" rx="10" fill="#ffb703" />
-      <circle cx="0" cy="-60" r="14" fill={SKIN} />
-      <path d="M-14 -62 Q-14 -78 0 -77 Q14 -78 14 -62 Q4 -70 -14 -62 Z" fill="#6b4423" />
-      <Face cx={0} cy={-62} size={0.55} />
+      <Hideout x={-28} y={-76} w={56} h={74} size={56} />
       <g className="st-haus-door" style={{ transformOrigin: "-28px 0px" }}>
         <path d="M-28 -2 V-76 a28 28 0 0 1 56 0 V-2 Z" fill="#3a86ff" />
         <path d="M-16 -70 a16 16 0 0 1 32 0 Z" fill={GLASS} />
@@ -311,6 +310,8 @@ export function Feuerwache() {
         <circle cx="96" cy="-120" r="12" fill="none" stroke="#e63946" strokeWidth="7" />
         <path d="M96 -146 V-94" stroke="#c1121f" strokeWidth="4" />
       </g>
+      {/* Something else hides in the corner every time */}
+      <Hideout x={-62} y={-124} w={84} h={124} size={70} />
       {/* A firefighter waves from inside */}
       <g className="st-wache-man">
         <rect x="26" y="-34" width="10" height="34" rx="4" fill="#1d3557" />
@@ -464,6 +465,8 @@ export function Muelleimer() {
       </g>
       <rect x="-4" y="-60" width="8" height="60" fill="#495057" />
       <g className="st-eimer-bin" style={{ transformOrigin: "0px -60px" }}>
+        {/* Someone peeks out of the bin */}
+        <Hideout x={-28} y={-200} w={56} h={72} size={50} />
         <path d="M6 -124 l10 -10 l6 8 Z" fill="#f8f9fa" />
         <rect x="-30" y="-126" width="60" height="70" rx="10" fill="#ff8c42" />
         <rect x="-34" y="-132" width="68" height="10" rx="5" fill="#f77f00" />

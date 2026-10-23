@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Hideout } from "../hideout";
 import { GLASS, INK, Inside, Rider, SKIN, nth } from "../shared";
 import { BlueLight, DARK_RED, FIRE_RED, HelmetHead, Jacket, NAVY, STRIPE, Toot } from "./parts";
 
@@ -143,6 +144,8 @@ export function Wache() {
         </g>
       </Window>
       <Window x={-480} i={1}>
+        {/* Behind the curtain someone else peeks out every time */}
+        <Hideout x={-480} y={-470} w={110} h={100} size={74} />
         <path className="fw-wache-curtain" d="M-480 -470 H-430 Q-440 -420 -470 -370 H-480 Z" fill="#ffadad" style={{ transformOrigin: "-480px -470px" }} />
       </Window>
       <Window x={210} i={2}>

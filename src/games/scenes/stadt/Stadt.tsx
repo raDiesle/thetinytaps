@@ -73,6 +73,7 @@ export const stadt: Scene = {
       ],
       place: ground(0, 0, 110, HOUSES, 1.2),
       durationMs: 2400,
+      hideout: [0.2, 0.75],
       Art: Kirche,
     },
     {
@@ -84,6 +85,7 @@ export const stadt: Scene = {
       box: [-148, -490, 296, 490],
       place: HAUS,
       durationMs: 2400,
+      hideout: [0.2, 0.75],
       Art: Haus,
     },
     {
@@ -126,6 +128,7 @@ export const stadt: Scene = {
       ],
       place: ground(0, 0, 930, HOUSES, 1.4),
       durationMs: 2600,
+      hideout: [0.25, 0.75],
       Art: Feuerwache,
     },
 
@@ -367,6 +370,7 @@ export const stadt: Scene = {
       place: ground(0, 0, 1010, 842),
       shadow: [0, 0, 16],
       durationMs: 1600,
+      hideout: true,
       Art: Muelleimer,
     },
     {

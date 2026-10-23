@@ -182,6 +182,7 @@ export const unterwasser: Scene = {
       ],
       place: ground(0, 0, 1410, 480, 1.7),
       durationMs: 2400,
+      hideout: true,
       Art: Schiff,
     },
     {
@@ -339,6 +340,7 @@ export const unterwasser: Scene = {
       place: ground(0, 0, 800, 790, 1.1),
       shadow: [0, 0, 96],
       durationMs: 2400,
+      hideout: [0.2, 0.75],
       Art: Schatztruhe,
     },
     {
@@ -458,6 +460,7 @@ export const unterwasser: Scene = {
       place: ground(0, 0, 1520, 960),
       shadow: [0, 0, 60],
       durationMs: 2000,
+      hideout: [0.25, 0.7],
       Art: Muschel,
     },
   ],

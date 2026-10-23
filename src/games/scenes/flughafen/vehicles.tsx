@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, GLASS, INK, Inside, Pane, Rider, SKIN, STEEL, nth } from "../shared";
 import { Beacon, NAVY, RAIL_RED, SIGNAL_ORANGE, Suitcase, Toot, TurningWheel, guard } from "./parts";
 
@@ -243,6 +244,8 @@ const CART_CASES = [
 export function Gepaeckzug() {
   return (
     <g className="fh-gzug-body" style={{ transformOrigin: "0px 0px" }}>
+      {/* Someone else rides along behind the purple suitcase every time */}
+      <Hideout x={-22} y={-184} w={62} h={94} size={62} />
       {[-170, 6].map((cx, c) => (
         <g key={cx}>
           <rect x={cx - 84} y="-46" width="168" height="14" rx="4" fill="#6c757d" />

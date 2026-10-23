@@ -152,13 +152,14 @@ export const baustelle: Scene = {
     {
       id: "klo",
       name: "das Klo",
-      sentences: ["Klopf, klopf! Das Klo ist besetzt.", "Das ist das Baustellen-Klo.", "Die Tür geht auf. Hallo!"],
+      sentences: ["Klopf, klopf! Das Klo ist besetzt.", "Das ist das Baustellen-Klo.", "Die Tür geht auf. Wer ist da drin?"],
       sound: "knocks",
       traits: ["green"],
       box: [764, 456, 90, 146],
       place: ground(807, 602, 1200, 395, 1.4),
       shadow: [807, 603, 44],
       durationMs: 2400,
+      hideout: [0.44, 0.8],
       Art: Klo,
     },
     {
@@ -171,6 +172,7 @@ export const baustelle: Scene = {
       place: ground(1480, 658, 1490, 400, 1.4),
       shadow: [1480, 657, 112],
       durationMs: 2600,
+      hideout: [0.15, 0.8],
       Art: Bauwagen,
     },
     {
@@ -439,6 +441,7 @@ export const baustelle: Scene = {
       box: [716, 890, 142, 110],
       place: ground(787, 1000, 902, 880),
       durationMs: 1600,
+      hideout: [0.3, 1],
       Art: Sandhaufen,
     },
     {

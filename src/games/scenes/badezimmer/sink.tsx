@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, nth } from "../shared";
 import { Bubbles } from "./parts";
 
@@ -25,6 +26,8 @@ export function Waschbecken() {
       <rect x="70" y="-184" width="20" height="14" rx="3" fill="#fff" />
       <rect x="-40" y="-52" width="70" height="34" rx="6" fill="#ffd60a" />
       <rect x="-40" y="-52" width="70" height="10" rx="4" fill="#40c057" />
+      {/* Someone else sits in the cupboard every time */}
+      <Hideout x={-140} y={-106} w={90} h={88} size={62} />
       {/* Doors */}
       {[
         { x: -146, hinge: "-146px -110px", knob: -18 },

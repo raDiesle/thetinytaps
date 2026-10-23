@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { Face, INK, Pane, Rider, SKIN, Wheel, nth } from "../shared";
 import { Drops, Lid } from "./parts";
 
@@ -99,6 +100,8 @@ export function Tierpfleger() {
         {/* The bucket of fish */}
         <path d="M-74 -84 Q-46 -110 -20 -84" stroke="#495057" strokeWidth="3" fill="none" />
         <path className="zo-pfleger-bucketfish" d="M-60 -84 l-6 -12 l12 4 Z M-40 -84 l4 -14 l6 12 Z" fill="#4dabf7" />
+        {/* Who sits in the bucket today? */}
+        <Hideout x={-68} y={-130} w={42} h={46} size={36} />
         <path d="M-72 -84 H-22 L-28 -40 H-66 Z" fill="#adb5bd" />
         <path d="M-70 -76 H-24" stroke="#ced4da" strokeWidth="4" />
       </g>
@@ -172,6 +175,8 @@ export function Eiswagen() {
         <circle cx="40" cy="-128" r="11" fill="#a0522d" />
         <circle cx="40" cy="-142" r="10" fill="#ffafcc" />
       </g>
+      {/* Behind the cart someone else hides every time */}
+      <Hideout x={-84} y={-194} w={72} h={70} size={58} />
       <rect x="-90" y="-124" width="180" height="96" rx="16" fill="#fff0f3" />
       <path d="M-90 -100 H90 M-90 -56 H90" stroke="#ffafcc" strokeWidth="10" />
       <g className="zo-eis-sign" style={{ transformOrigin: "-30px -50px" }}>

@@ -216,6 +216,7 @@ export const weltall: Scene = {
       place: ground(0, 0, 720, 450, 1.3),
       shadow: [0, -4, 140],
       durationMs: 2600,
+      hideout: [0.22, 0.82],
       Art: Landefaehre,
     },
     {
@@ -275,6 +276,7 @@ export const weltall: Scene = {
       place: ground(0, 0, 140, 600, 1.2),
       shadow: [0, 0, 120],
       durationMs: 2400,
+      hideout: [0.22, 0.82],
       Art: Gewaechshaus,
     },
     {
@@ -350,6 +352,7 @@ export const weltall: Scene = {
       box: [-138, -56, 276, 58],
       place: ground(0, 0, 640, 745, 1.4),
       durationMs: 2000,
+      hideout: true,
       Art: Krater,
     },
     {

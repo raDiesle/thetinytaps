@@ -91,7 +91,9 @@ export type SceneSound =
   | "jet"
   | "giggle"
   | "creak"
-  | "rustle";
+  | "rustle"
+  | "sneeze"
+  | "heartbeat";
 
 /** What an item is like, for the questions "Was ist rot?", "Wer kann fliegen?" (see quests.ts). */
 export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" | "small" | "animal" | "wheels";
@@ -119,6 +121,12 @@ export interface SceneItem {
   plural?: boolean;
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */
   durationMs: number;
+  /**
+   * The drawing has a `<Hideout>` behind a door, window, lid or in a sand pile, where
+   * something else peeks out on every tap (idea B-01, see hideout.tsx). `true`: it is
+   * out from 20 % to 80 % of the animation; or [open, close] to match when the door is open.
+   */
+  hideout?: true | [open: number, close: number];
   /**
    * The drawing, in its own scene coordinates (before `place`). While the animation runs its
    * group has the class `playing`; the scene's CSS animates the parts.

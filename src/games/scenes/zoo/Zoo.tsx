@@ -291,6 +291,7 @@ export const zoo: Scene = {
       place: ground(0, 0, 1000, 770, 1.15),
       shadow: [0, 0, 44],
       durationMs: 2000,
+      hideout: true,
       Art: Tierpfleger,
     },
     {
@@ -329,6 +330,7 @@ export const zoo: Scene = {
       place: ground(0, 0, 1490, 782, 1.05),
       shadow: [0, 0, 110],
       durationMs: 2000,
+      hideout: [0.2, 0.7],
       Art: Eiswagen,
     },
 

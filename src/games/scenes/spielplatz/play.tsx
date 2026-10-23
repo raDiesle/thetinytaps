@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, Inside, SKIN } from "../shared";
 import { Arm, Head, Hearts, Leg, Lid, Notes, Puffs } from "./parts";
 
@@ -23,7 +24,7 @@ function ShipWheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 
 /**
  * The climbing tower: a wooden platform on posts with a red roof, a ladder, a porthole and a
- * ship's wheel. The flag waves, the wheel turns, a child peeks out of the porthole and the
+ * ship's wheel. The flag waves, the wheel turns, someone peeks out of the porthole and the
  * ladder wobbles.
  */
 export function Kletterturm() {
@@ -47,11 +48,9 @@ export function Kletterturm() {
       <rect x="-100" y="-252" width="200" height="12" rx="6" fill="#74c0fc" />
       <rect x="-100" y="-190" width="200" height="12" fill="#339af0" />
       <path d={porthole} fill="#d0ebff" />
+      {/* Who peeks out of the porthole? Someone else every time. */}
       <Inside d={porthole}>
-        <g className="sp-turm-kid">
-          <rect x="-48" y="-194" width="40" height="26" rx="10" fill="#ff922b" />
-          <Head cx={-28} cy={-206} r={17} hair="#2b2d42" style="curly" />
-        </g>
+        <Hideout x={-56} y={-234} w={56} h={56} size={46} />
       </Inside>
       <path d={porthole} fill="none" stroke="#ffd60a" strokeWidth="7" />
       <path d="M-46 -218 q8 -10 18 -10" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />

@@ -94,13 +94,14 @@ export const winterbaustelle: Scene = {
     {
       id: "klo",
       name: "das Klo",
-      sentences: ["Klopf, klopf! Das Klo ist besetzt.", "Auf dem Klo liegt Schnee.", "Die Tür geht auf. Hallo!"],
+      sentences: ["Klopf, klopf! Das Klo ist besetzt.", "Auf dem Klo liegt Schnee.", "Die Tür geht auf. Wer ist da drin?"],
       sound: "knocks",
       traits: ["green"],
       box: [764, 448, 90, 154],
       place: ground(807, 602, 1200, 395, 1.4),
       shadow: [807, 603, 44],
       durationMs: 2400,
+      hideout: [0.44, 0.8],
       Art: WinterKlo,
     },
     {
@@ -113,6 +114,7 @@ export const winterbaustelle: Scene = {
       place: ground(1480, 658, 1490, 400, 1.4),
       shadow: [1480, 657, 112],
       durationMs: 2600,
+      hideout: [0.15, 0.8],
       Art: WinterBauwagen,
     },
     {
@@ -175,6 +177,7 @@ export const winterbaustelle: Scene = {
       place: ground(0, 0, 598, 454, 1.2),
       shadow: [0, 0, 120],
       durationMs: 2400,
+      hideout: [0.15, 0.9],
       Art: Iglu,
     },
 

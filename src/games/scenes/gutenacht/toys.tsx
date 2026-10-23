@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, Inside, Wheel, nth } from "../shared";
 import { Eyes, SleepyFace, Sparkles, Zzz, star } from "./parts";
 
@@ -347,6 +348,8 @@ export function Spielzeugkiste() {
         <path d="M46 -110 L58 -148" stroke="#be4bdb" strokeWidth="5" strokeLinecap="round" />
         <path d={star(60, -152, 14)} fill="#ffe066" />
       </g>
+      {/* Someone else is hiding in the toy chest every time */}
+      <Hideout x={-90} y={-210} w={180} h={120} size={70} />
       <rect x="-100" y="-112" width="200" height="112" rx="8" fill="#e76f51" />
       <path d="M-100 -76 H100 M-100 -40 H100" stroke="#d65a3c" strokeWidth="4" />
       <rect x="-100" y="-14" width="200" height="14" rx="4" fill="#c4553b" />

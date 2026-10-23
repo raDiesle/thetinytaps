@@ -285,7 +285,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Türen, Fenster, Sandhaufen, Container lassen sich öffnen: Dahinter sitzt jedes Mal etwas anderes (Katze, Maus, Geschenk). Guck-guck!",
         why: "Objektpermanenz und Neugier – genau das Alter, in dem „Wo ist es hin?“ fasziniert.",
         effort: "M",
-        partial: "Feste Gucker gibt es schon (Maus im Rohr und im Gully, Hase im Busch, Tor der Feuerwache); wechselnde Überraschungen fehlen.",
+        done: true,
       },
       {
         id: "B-02",
@@ -573,6 +573,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Garderobe mit Bildchen am Haken, Bauecke, Mittagessen am kleinen Tisch, Schlafraum mit Matten, Erzieherin liest vor, Kinder winken am Fenster zum Abschied.",
         why: "Macht die Kita vertraut, gut vor der Eingewöhnung; passt zu den Kita-Geschichten im Spiel Gefühle.",
         effort: "M",
+        done: true,
       },
       {
         id: "S-16",
@@ -581,6 +582,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Wartezimmer mit Spielzeug, Waage, Messlatte, Stethoskop macht „Bumbum“, Ohren anschauen mit Lampe, Pflaster, Teddy mit Verband, Aufkleber zum Schluss.",
         why: "Nimmt die Angst vor der U-Untersuchung; alles, was dort passiert, ist hier freundlich.",
         effort: "M",
+        done: true,
       },
       {
         id: "S-17",
@@ -589,6 +591,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Wellen rollen, Sandburg wächst beim Antippen, Krebs läuft seitwärts, Möwe klaut Pommes, Eimer und Schaufel, Leuchtturm blinkt, Boot schaukelt. Viele Teile gibt es schon im Bewegungsabenteuer.",
         why: "Urlaubsthema; Formen und Farben aus der Schatzinsel wiederverwendbar.",
         effort: "M",
+        done: true,
       },
       {
         id: "S-18",
@@ -597,6 +600,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Brachiosaurus frisst oben am Baum, kleiner Dino schlüpft aus dem Ei, Vulkan raucht freundlich, Flugsaurier kreist, T-Rex brüllt ganz leise und muss dann niesen.",
         why: "Dinos sind ab 3 ein riesiges Thema; das Niesen nimmt dem T-Rex den Schrecken.",
         effort: "M",
+        done: true,
       },
     ],
   },

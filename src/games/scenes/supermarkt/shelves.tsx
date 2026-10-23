@@ -1,3 +1,4 @@
+import { Hideout } from "../hideout";
 import { INK, STEEL, nth } from "../shared";
 import { Lines, Mist, Sparkles } from "./parts";
 
@@ -31,6 +32,8 @@ export function Kuehlregal() {
           <rect x="1194" y={y} width="194" height="5" fill="#a5d8ff" />
         </g>
       ))}
+      {/* Brrr! Who sits on the yoghurts behind the middle door? */}
+      <Hideout x={1262} y={150} w={58} h={102} size={54} />
       {COOL_DOORS.map((x, i) => (
         <g key={x} className="sm-kuehl-door" style={{ ...nth(i), transformOrigin: `${x}px 236px` }}>
           <rect x={x} y="148" width="62" height="174" fill="#d0ebff" fillOpacity="0.4" stroke="#adb5bd" strokeWidth="4" />
