@@ -11,6 +11,7 @@ yarn format        # format everything and apply safe lint fixes (Biome)
 yarn test          # unit tests only (Rstest, ~1 s); yarn test:watch while working
 yarn build         # production build into out/
 yarn image ...     # picture with Gemini, see /bild-erzeugen
+yarn song ...      # measure a song from Suno, see /musik-erzeugen
 ```
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
@@ -91,7 +92,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`) – use `/neues-spiel`.
-- A new Lebendige-Bilder picture: `/neue-szene`. A generated picture: `/bild-erzeugen`.
+- A new Lebendige-Bilder picture: `/neue-szene`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`.
 
 ## Checking your work
 
