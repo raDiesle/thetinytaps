@@ -45,11 +45,7 @@
   }
 }
 
-.calm .scene-surprise {
-  animation-name: surprise-peek-calm;
-}
-
-@keyframes surprise-peek-calm {
+@keyframes surprise-peek-gentle {
   0%,
   100% {
     transform: translateY(110px);

@@ -970,29 +970,6 @@
   }
 }
 
-/* ---------- Calm mode and reduced motion ---------- */
-
-.story-play.calm .fg-actor {
-  transition-duration: 1.6s;
-}
-
-.story-play.calm .fg-critter,
-.story-play.calm .c-arm,
-.story-play.calm .c-leg,
-.story-play.calm .c-head,
-.story-play.calm .story-button,
-.story-play.calm .fg-card,
-.story-play.calm .fg-scene *,
-.story-play.calm .fg-thought-ask,
-.story-play.calm .bear-thunder,
-.story-play.calm .c-tears {
-  animation: none;
-}
-
-.story-play.calm .fg-floater {
-  animation-duration: calc(var(--float-ms) * 1.4);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .story-play .fg-critter,
   .story-play .c-arm,

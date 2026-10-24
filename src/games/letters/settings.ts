@@ -32,8 +32,6 @@ export interface LettersSettings {
   theme: "all" | ThemeId;
   /** Chimes and notes. */
   sounds: boolean;
-  /** Quieter sounds, no wiggling, softer shapes. */
-  calm: boolean;
   /** Reveal number items one click at a time; each click on a letter brings its next word. */
   stepByStep: boolean;
   /** Numbers: the child taps every thing to count it; the digit appears after the last one. */
@@ -56,7 +54,6 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   announce: "letterAndWord",
   theme: "all",
   sounds: true,
-  calm: false,
   stepByStep: true,
   countByTap: false,
   finishCounting: true,

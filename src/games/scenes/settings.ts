@@ -1,5 +1,3 @@
-import type { SeasonSetting } from "./season";
-
 /**
  * Explore: tap anything to see and hear it. Find: "Wo ist der Bagger?"
  * Sounds: only a sound is played, who made it? Questions: "Was ist rot?", several right answers.
@@ -30,22 +28,18 @@ export interface ScenesSettings {
   announce: SceneAnnounce;
   /** Engine noises, beeps and chimes. */
   sounds: boolean;
-  /** Quieter sounds, no idle movement, softer shapes. */
-  calm: boolean;
   /** Explore and colour mode: count the discovered items and throw a party when all were tapped. */
   goal: boolean;
   /** Sounds and questions mode: mark an item that is looked for after a while or a few wrong taps. */
   hints: boolean;
   /**
-   * The picture lives on its own (not in calm mode): clouds drift, rotors turn,
+   * The picture lives on its own: clouds drift, rotors turn,
    * and when nobody taps for a while, items move by themselves. Off: nothing
    * moves unless the child does something.
    */
   ambient: boolean;
   /** Keys trigger: show each item's key in the picture. */
   showKeys: boolean;
-  /** Seasonal extras in the picture: by the calendar, a fixed season or none. */
-  season: SeasonSetting;
   /** Explore mode: some vehicles drive into other pictures, and a sign at the edge follows them (see roads.ts). */
   roads: boolean;
 }
@@ -56,12 +50,10 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   speech: false,
   announce: "sentence",
   sounds: true,
-  calm: false,
   goal: true,
   hints: true,
   ambient: false,
   showKeys: true,
-  season: "auto",
   roads: true,
 };
 

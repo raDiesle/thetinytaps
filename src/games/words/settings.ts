@@ -32,8 +32,6 @@ export interface WordsSettings {
   speech: boolean;
   /** Notes and chimes. */
   sounds: boolean;
-  /** Quieter sounds, no wiggling, softer shapes. */
-  calm: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
   touchKeys: TouchKeysMode;
 }
@@ -47,7 +45,6 @@ export const DEFAULT_WORDS_SETTINGS: WordsSettings = {
   anyKey: false,
   speech: false,
   sounds: true,
-  calm: false,
   touchKeys: "auto",
 };
 

@@ -15,8 +15,6 @@ export interface AnimalsSettings {
   speech: boolean;
   /** Munching, animal noises and chimes. */
   sounds: boolean;
-  /** Quieter sounds, less bouncing. */
-  calm: boolean;
 }
 
 export const DEFAULT_ANIMALS_SETTINGS: AnimalsSettings = {
@@ -26,7 +24,6 @@ export const DEFAULT_ANIMALS_SETTINGS: AnimalsSettings = {
   names: false,
   speech: false,
   sounds: true,
-  calm: false,
 };
 
 export const ANIMALS_SETTINGS_KEY = "tinytaps.animals.v1";

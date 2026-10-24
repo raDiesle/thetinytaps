@@ -5,18 +5,16 @@ export interface GameCardProps {
   href?: string;
   emoji: string;
   title: string;
-  text?: string;
 }
 
 /** A big tappable card for the game and scene menus. */
-export function GameCard({ href, emoji, title, text }: GameCardProps) {
+export function GameCard({ href, emoji, title }: GameCardProps) {
   const content = (
     <>
       <span className="game-emoji" aria-hidden>
         {emoji}
       </span>
       <span className="game-title">{title}</span>
-      {text && <span className="game-text">{text}</span>}
       {href && (
         <span className="game-go" aria-hidden>
           ▶

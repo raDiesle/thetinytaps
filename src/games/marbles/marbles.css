@@ -44,6 +44,29 @@
   height: 100%;
 }
 
+.spot-tap {
+  cursor: pointer;
+}
+
+.spot-wrench {
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.spot-wrench.busy {
+  animation: spot-wrench 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes spot-wrench {
+  from {
+    transform: rotate(-20deg);
+  }
+  to {
+    transform: rotate(20deg);
+  }
+}
+
 .marble-hint,
 .topple-hint {
   transform-box: fill-box;
@@ -97,7 +120,8 @@
 @media (prefers-reduced-motion: reduce) {
   .marble-hint,
   .topple-hint,
-  .thing-drop {
+  .thing-drop,
+  .spot-wrench.busy {
     animation: none;
     opacity: 1;
   }

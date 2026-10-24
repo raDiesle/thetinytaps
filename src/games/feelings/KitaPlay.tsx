@@ -88,11 +88,11 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
           const text = [beat.narration, beat.line?.text].filter(Boolean).join(" ");
           if (text) say(text, i > 0);
         }, delay);
-        delay += beatMs(beat, settings.speech, settings.calm);
+        delay += beatMs(beat, settings.speech);
       });
       later(then, delay);
     },
-    [later, say, sound, settings.speech, settings.calm],
+    [later, say, sound, settings.speech],
   );
 
   const ask = useCallback(
@@ -173,9 +173,9 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
     sound("yuck");
     later(
       () => setRun((r) => ({ ...r, busy: false, trying: false, actors: applyCast(r.actors, { bear: before }) })),
-      beatMs({ narration: answer }, settings.speech, settings.calm),
+      beatMs({ narration: answer }, settings.speech),
     );
-  }, [run, say, sound, later, settings.speech, settings.calm]);
+  }, [run, say, sound, later, settings.speech]);
 
   const ready = run.phase === "steps" && !run.busy;
   const offerInstead = choose && run.phase === "steps" && run.stepsDone === 0;
@@ -277,7 +277,7 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   const problemImage = imageFor(storyImages.problem(situation.id));
 
   return (
-    <div className={`story-play kita-play${settings.calm ? " calm" : ""}`} onPointerDown={onStagePointer}>
+    <div className={`story-play kita-play`} onPointerDown={onStagePointer}>
       <header className="story-narration">
         {problemImage ? (
           <img key={situation.id} className="story-picture" src={problemImage} alt={situation.title} draggable={false} />

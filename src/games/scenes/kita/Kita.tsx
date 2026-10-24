@@ -484,5 +484,4 @@ export const kita: Scene = {
       ],
     },
   ],
-  seasons: { tree: [1490, 965, 0.8], pumpkin: [1490, 975, 0.8], egg: [282, 996] },
 };

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { useDevice } from "@/lib/device";
-import { playChime, playCountNote, playPoof, playSqueak, playTuneNote, setSfxVolume } from "@/lib/sfx";
+import { playChime, playCountNote, playPoof, playSqueak, playTuneNote } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { lerpView, type ToothId, type View } from "./jaw";
@@ -153,16 +153,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, speechLang, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm, speechLang],
+    [settings.speech, speechLang],
   );
 
   useWakeLock(!done);
-
-  useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
 
   useEffect(() => {
     if (done || paused) return;
@@ -172,11 +168,11 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   const brushing = step !== null && !paused;
   useEffect(() => {
-    if (!brushing || !settings.sounds) return;
+    if (!brushing || !settings.music) return;
     let beat = 0;
     const timer = setInterval(() => playTuneNote(beat++), BEAT_MS);
     return () => clearInterval(timer);
-  }, [brushing, settings.sounds, round]);
+  }, [brushing, settings.music, round]);
 
   // What to say and play when a new part begins.
   useEffect(() => {
@@ -189,7 +185,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
       say("Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!");
-      for (let i = 0; i < (settings.calm ? 4 : 12); i++) setTimeout(() => spawn(), i * 150);
+      for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 150);
     }
     // Only when the part changes, not when a setting does.
   }, [part, round]);
@@ -270,7 +266,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const action: MouthAction | null =
     step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
   const target = step?.view ?? GRIN_VIEW;
-  const view = useGlidingView(target, (settings.calm ? 1.5 : 1) * (mouthMoves ? MOUTH_MS : TURN_MS));
+  const view = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
   // The brush glides along the step's teeth and reaches each monster just as it goes.
   const inStep = monsters.filter((m) => m.step === phase);
@@ -296,7 +292,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     }));
 
   return (
-    <div className={`teeth-play${settings.calm ? " calm" : ""}${done ? " done" : ""}${paused ? " paused" : ""}`}>
+    <div className={`teeth-play${done ? " done" : ""}${paused ? " paused" : ""}`}>
       <p className="teeth-clock" aria-label="Restzeit">
         {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
       </p>
@@ -338,7 +334,6 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             happy={done}
             action={action}
             paused={paused}
-            calm={settings.calm}
             onTickle={tickle}
           />
         )}

@@ -5,7 +5,7 @@ import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard
 import { toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, WordEntry } from "@/content/types";
-import { loadRecordings, playChime, playCountNote, playRandomNote, playWhistle, recorded, setSfxVolume } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playRandomNote, playWhistle, recorded } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import type { LettersSettings } from "./settings";
 
@@ -56,9 +56,9 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
 
   const say = useCallback(
     (text: string) => {
-      if (settings.speech) speak(text, pack.speechLang, { rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, pack.speechLang, { rate: 0.85 });
     },
-    [settings.speech, settings.calm, pack.speechLang],
+    [settings.speech, pack.speechLang],
   );
 
   const funBurst = useCallback(
@@ -170,10 +170,6 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   useEffect(() => () => timers.current.forEach(clearTimeout), []);
 
   useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
-  useEffect(() => {
     loadRecordings(["whistle"]);
   }, []);
 
@@ -195,7 +191,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
 
   return (
     <div
-      className={`letters-play train-play${settings.calm ? " calm" : ""}`}
+      className={`letters-play train-play`}
       style={{ background: BACKGROUND }}
       onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
     >

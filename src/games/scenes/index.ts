@@ -5,10 +5,12 @@ import { dinotal } from "./dinotal/Dinotal";
 import { feuerwache } from "./feuerwache/Feuerwache";
 import { flughafen } from "./flughafen/Flughafen";
 import { gutenacht } from "./gutenacht/GuteNacht";
+import { herbst } from "./herbst/Herbst";
 import { hof } from "./hof/Hof";
 import { kinderarzt } from "./kinderarzt/Kinderarzt";
 import { kita } from "./kita/Kita";
 import { kueche } from "./kueche/Kueche";
+import { ostern } from "./ostern/Ostern";
 import { spielplatz } from "./spielplatz/Spielplatz";
 import { stadt } from "./stadt/Stadt";
 import { strand } from "./strand/Strand";
@@ -17,11 +19,12 @@ import type { Scene } from "./types";
 import { unterwasser } from "./unterwasser/Unterwasser";
 import { wald } from "./wald/Wald";
 import { weltall } from "./weltall/Weltall";
+import { winter } from "./winter/Winter";
 import { winterbaustelle } from "./winterbaustelle/WinterBaustelle";
 import { zoo } from "./zoo/Zoo";
 
 /** All playable scenes, in menu order. */
-export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall, spielplatz, kueche, supermarkt, flughafen, winterbaustelle, kita, kinderarzt, strand, dinotal, gutenacht];
+export const SCENES: Scene[] = [baustelle, stadt, bauernhof, hof, zoo, unterwasser, badezimmer, wald, feuerwache, weltall, spielplatz, kueche, supermarkt, flughafen, winterbaustelle, kita, kinderarzt, strand, dinotal, gutenacht, winter, herbst, ostern];
 
 /** Shown greyed out in the menu so children (and parents) know more is coming. */
 export const UPCOMING_SCENES: { emoji: string; title: string }[] = [];

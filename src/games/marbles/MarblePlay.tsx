@@ -16,34 +16,31 @@ import { TrackLevel } from "./TrackLevel";
 import "./marbles.css";
 
 const LEVELS: { id: MarbleLevel; emoji: string; name: string; intro: string; Level: ComponentType<LevelProps> }[] = [
-  { id: "track", emoji: "🎢", name: "Kugelbahn", intro: "Tipp! Dann rollt die Kugel.", Level: TrackLevel },
-  { id: "topple", emoji: "📚", name: "Alles fällt um", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
   { id: "machine", emoji: "⚙️", name: "Große Maschine", intro: "Tipp! Dann läuft die große Maschine.", Level: MachineLevel },
   { id: "kitchen", emoji: "🍳", name: "Verrückte Küche", intro: "Tipp! Dann wird in der Küche gezaubert.", Level: KitchenLevel },
   { id: "garden", emoji: "🌻", name: "Im Garten", intro: "Tipp! Dann wacht der Garten auf.", Level: GardenLevel },
+  { id: "topple", emoji: "📚", name: "Alles fällt um", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
   { id: "building", emoji: "🚧", name: "Baustelle", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
   { id: "circus", emoji: "🎪", name: "Zirkus", intro: "Tipp! Manege frei!", Level: CircusLevel },
+  { id: "track", emoji: "🎢", name: "Kugelbahn", intro: "Tipp! Dann rollen die Kugeln.", Level: TrackLevel },
   { id: "space", emoji: "🚀", name: "Raketenstart", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
 ];
-
-/** The Rube Goldberg machines: one tap, and one thing sets off the next. */
-const MACHINES: MarbleLevel[] = ["machine", "kitchen", "garden", "building", "circus", "space"];
 
 /** Which levels to play, in turn; in development `?level=garden` in the address picks one. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
   const fromUrl = import.meta.env.DEV ? new URLSearchParams(window.location.search).get("level") : null;
   const one = LEVELS.find((l) => l.id === (fromUrl ?? choice));
-  if (one) return [one.id];
-  return choice === "machines" ? MACHINES : LEVELS.map((l) => l.id);
+  return one ? [one.id] : LEVELS.map((l) => l.id);
 }
 
 /** Party time after a level, before "Nochmal" and "Weiter" come. */
 const PARTY_MS = 3200;
 
 /**
- * "Kugelbahn": the marble run, the row of things that fall over and the Rube
- * Goldberg machines, one level after the other (or only some of them, as the
- * grown-up chose). After each level the child plays it again or goes on.
+ * "Kettenreaktion": one tap, and one thing sets off the next – the Rube
+ * Goldberg machines, the long row of things that fall over and the marble
+ * run, one level after the other (or only one of them, as the grown-up chose).
+ * After each level the child plays it again or goes on.
  */
 export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings; speechLang: string }) {
   const levels = chosenLevels(settings.levels);
@@ -109,7 +106,7 @@ export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings;
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
-      <level.Level key={round} sound={sound} say={say} onDone={onDone} />
+      <level.Level key={round} sound={sound} say={say} onDone={onDone} rebuild={settings.rebuild} />
       {ended && <GameEnd onAgain={again} next={next ? { emoji: next.emoji, name: next.name, onNext: goOn } : undefined} />}
       <BurstLayer bursts={bursts} />
     </div>
