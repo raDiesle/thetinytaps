@@ -95,12 +95,7 @@ export function Kraehe() {
           <circle cx="-19" cy="-113" r="4" fill="#fff" />
           <Eye cx={-19} cy={-113} r={2.6} />
         </g>
-        <path
-          className="he-kraehe-wing"
-          d="M-6 -98 Q14 -112 30 -96 Q18 -84 -2 -86 Z"
-          fill="#212529"
-          style={{ transformOrigin: "-2px -96px" }}
-        />
+        <path className="he-kraehe-wing" d="M-6 -98 Q14 -112 30 -96 Q18 -84 -2 -86 Z" fill="#212529" style={{ transformOrigin: "-2px -96px" }} />
       </g>
       <text className="he-kraehe-call" x="-46" y="-138" fontSize="20" fontWeight="800" fill={INK}>
         Krah!
@@ -252,7 +247,13 @@ export function Schnecke() {
       </g>
       <g className="he-schnecke-shell" style={{ transformOrigin: "-6px -12px" }}>
         <circle cx="-6" cy="-36" r="28" fill="#d4a373" />
-        <path d="M-6 -36 m0 4 a4 4 0 1 1 4 -4 a10 10 0 1 1 -10 -10 a16 16 0 1 1 16 16 a22 22 0 0 1 -26 -10" stroke="#9c6644" strokeWidth="4" strokeLinecap="round" fill="none" />
+        <path
+          d="M-6 -36 m0 4 a4 4 0 1 1 4 -4 a10 10 0 1 1 -10 -10 a16 16 0 1 1 16 16 a22 22 0 0 1 -26 -10"
+          stroke="#9c6644"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+        />
         <ellipse cx="-16" cy="-52" rx="8" ry="5" fill="#fff" opacity="0.45" />
       </g>
       <g className="he-schnecke-drops" fill="#74c0fc">

@@ -82,7 +82,13 @@ export function Palmfarn() {
       {FRONDS.map(([a, len], i) => (
         <g key={a} transform={`rotate(${a} 0 -108)`}>
           <g className="dt-palm-frond" style={{ ...nth(i), transformOrigin: "0px -108px" }}>
-            <path d={`M0 -108 Q${len * 0.1} ${-108 - len * 0.6} ${len * 0.3} ${-108 - len}`} stroke="#4f9d5d" strokeWidth="6" strokeLinecap="round" fill="none" />
+            <path
+              d={`M0 -108 Q${len * 0.1} ${-108 - len * 0.6} ${len * 0.3} ${-108 - len}`}
+              stroke="#4f9d5d"
+              strokeWidth="6"
+              strokeLinecap="round"
+              fill="none"
+            />
             {Array.from({ length: 6 }, (_, k) => {
               const t = (k + 1) / 7;
               const x = len * (0.2 * t * (1 - t) + 0.3 * t * t);
@@ -201,7 +207,12 @@ export function Blume() {
       <g transform="translate(0 -110)">
         {[-60, -30, 30, 60].map((a, i) => (
           <g key={a} transform={`rotate(${a})`}>
-            <path className="dt-blume-petal" d={leafPath(0, 0, 14, 40)} fill={i % 3 ? "#ffafcc" : "#ffc8dd"} style={{ ...nth(i), transformOrigin: "0px 0px" }} />
+            <path
+              className="dt-blume-petal"
+              d={leafPath(0, 0, 14, 40)}
+              fill={i % 3 ? "#ffafcc" : "#ffc8dd"}
+              style={{ ...nth(i), transformOrigin: "0px 0px" }}
+            />
           </g>
         ))}
         <path d={leafPath(0, 0, 16, 44)} fill="#ffd6e6" />

@@ -48,5 +48,4 @@ export function keyMatches(key: string, letter: string, pack: LanguagePack) {
 }
 
 /** The letter for B, for examples on the start screen ("Be, wie Bär!"). */
-export const sampleLetter = (pack: LanguagePack): LetterEntry =>
-  pack.letters.find((l) => l.upper === "B") ?? pack.letters[0];
+export const sampleLetter = (pack: LanguagePack): LetterEntry => pack.letters.find((l) => l.upper === "B") ?? pack.letters[0];

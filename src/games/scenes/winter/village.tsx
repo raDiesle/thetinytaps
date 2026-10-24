@@ -42,7 +42,12 @@ function HouseWindow({ x, kid }: { x: number; kid?: boolean }) {
         </Inside>
       )}
       <path className="wi-haus-curtain" d={`M${x + 2} 530 h16 q-4 22 -16 30 Z`} fill="#ff8fa3" style={{ transformOrigin: `${x + 2}px 530px` }} />
-      <path className="wi-haus-curtain wi-haus-curtain-r" d={`M${x + 50} 530 h-16 q4 22 16 30 Z`} fill="#ff8fa3" style={{ transformOrigin: `${x + 50}px 530px` }} />
+      <path
+        className="wi-haus-curtain wi-haus-curtain-r"
+        d={`M${x + 50} 530 h-16 q4 22 16 30 Z`}
+        fill="#ff8fa3"
+        style={{ transformOrigin: `${x + 50}px 530px` }}
+      />
       <path d={`M${x + 26} 530 V582 M${x + 2} 556 H${x + 50}`} stroke={TRIM} strokeWidth="4" />
       <path d={`M${x + 8} 576 L${x + 20} 536`} stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.45" />
       <rect x={x - 6} y="584" width="64" height="7" rx="2" fill={TRIM} />

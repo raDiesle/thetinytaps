@@ -397,8 +397,20 @@ function LadleFront() {
   const { bowl, bowlR } = LADLE;
   return (
     <g>
-      <path d={`M${bowl.x - bowlR} ${bowl.y} A${bowlR} ${bowlR} 0 0 0 ${bowl.x + bowlR} ${bowl.y} A${bowlR} 8 0 0 1 ${bowl.x - bowlR} ${bowl.y} Z`} fill={STEEL} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <path d={`M${bowl.x - bowlR + 10} ${bowl.y + 12} Q${bowl.x - bowlR + 14} ${bowl.y + 26} ${bowl.x - 12} ${bowl.y + 32}`} fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+      <path
+        d={`M${bowl.x - bowlR} ${bowl.y} A${bowlR} ${bowlR} 0 0 0 ${bowl.x + bowlR} ${bowl.y} A${bowlR} 8 0 0 1 ${bowl.x - bowlR} ${bowl.y} Z`}
+        fill={STEEL}
+        stroke={INK}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${bowl.x - bowlR + 10} ${bowl.y + 12} Q${bowl.x - bowlR + 14} ${bowl.y + 26} ${bowl.x - 12} ${bowl.y + 32}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
     </g>
   );
 }
@@ -430,12 +442,30 @@ function Spaghetti() {
   const h = w / 2;
   return (
     <g>
-      <path d={`M${cx - h + 8} ${rimY} Q${cx - h + 20} ${rimY - 30} ${cx} ${rimY - 30} Q${cx + h - 20} ${rimY - 30} ${cx + h - 8} ${rimY} Z`} fill="#ffe08a" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M${cx - h + 8} ${rimY} Q${cx - h + 20} ${rimY - 30} ${cx} ${rimY - 30} Q${cx + h - 20} ${rimY - 30} ${cx + h - 8} ${rimY} Z`}
+        fill="#ffe08a"
+        stroke={INK}
+        strokeWidth="3"
+      />
       {[-40, -18, 6, 28].map((dx, i) => (
-        <path key={dx} d={`M${cx + dx} ${rimY - 4} q8 -${12 + (i % 2) * 6} 16 0 q8 -14 16 0`} fill="none" stroke="#e8b84a" strokeWidth="2.5" strokeLinecap="round" />
+        <path
+          key={dx}
+          d={`M${cx + dx} ${rimY - 4} q8 -${12 + (i % 2) * 6} 16 0 q8 -14 16 0`}
+          fill="none"
+          stroke="#e8b84a"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
       ))}
       <ellipse cx={cx} cy={rimY - 18} rx="30" ry="10" fill="#ff5d3a" />
-      <path d={`M${cx - h} ${rimY} L${cx + h} ${rimY} Q${cx + h - 6} ${COUNTER - 4} ${cx + 34} ${COUNTER} L${cx - 34} ${COUNTER} Q${cx - h + 6} ${COUNTER - 4} ${cx - h} ${rimY} Z`} fill="#00b4d8" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${cx - h} ${rimY} L${cx + h} ${rimY} Q${cx + h - 6} ${COUNTER - 4} ${cx + 34} ${COUNTER} L${cx - 34} ${COUNTER} Q${cx - h + 6} ${COUNTER - 4} ${cx - h} ${rimY} Z`}
+        fill="#00b4d8"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       {[-36, -12, 12, 36].map((dx) => (
         <circle key={dx} cx={cx + dx} cy={rimY + 16} r="5" fill="#fff" />
       ))}
@@ -522,7 +552,14 @@ function Kettle() {
       <ellipse cx={cx} cy={top + 20} rx="28" ry="7" fill="#0096b4" stroke={INK} strokeWidth="3" />
       <circle cx={cx} cy={top + 10} r="7" fill="#ff5d73" stroke={INK} strokeWidth="2.5" />
       <rect x={cx - 64} y={COUNTER - 12} width="128" height="10" rx="4" fill={INK} />
-      <path d={`M${cx - 38} ${top + 50} Q${cx - 46} ${top + 76} ${cx - 42} ${top + 96}`} fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" opacity="0.8" />
+      <path
+        d={`M${cx - 38} ${top + 50} Q${cx - 46} ${top + 76} ${cx - 42} ${top + 96}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="6"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
     </g>
   );
 }
@@ -540,7 +577,9 @@ function Steam({ kitchen, t }: { kitchen: Kitchen; t: number }) {
     const big = te >= whistle;
     const x = KETTLE.cx - 100 + (big ? 30 : 10) * age;
     const y = COUNTER - 108 - 80 * age;
-    puffs.push(<circle key={te} cx={x} cy={y} r={(big ? 14 : 8) + 18 * age} fill="#f4f5fb" stroke="#b9bdd6" strokeWidth="3" opacity={0.9 * (1 - age / life)} />);
+    puffs.push(
+      <circle key={te} cx={x} cy={y} r={(big ? 14 : 8) + 18 * age} fill="#f4f5fb" stroke="#b9bdd6" strokeWidth="3" opacity={0.9 * (1 - age / life)} />,
+    );
   }
   return <g>{puffs}</g>;
 }
@@ -595,7 +634,13 @@ function PotFront() {
       {[-1, 1].map((side) => (
         <rect key={side} x={cx + side * (half + 6) - 14} y={POT_RIM + 14} width="28" height="12" rx="6" fill={INK} />
       ))}
-      <path d={`M${cx - half} ${POT_RIM} A${half} 12 0 0 0 ${cx + half} ${POT_RIM} L${cx + half - 4} ${COUNTER - 10} Q${cx + half - 6} ${COUNTER - 2} ${cx + half - 18} ${COUNTER - 2} L${cx - half + 18} ${COUNTER - 2} Q${cx - half + 6} ${COUNTER - 2} ${cx - half + 4} ${COUNTER - 10} Z`} fill="#ff5d73" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${cx - half} ${POT_RIM} A${half} 12 0 0 0 ${cx + half} ${POT_RIM} L${cx + half - 4} ${COUNTER - 10} Q${cx + half - 6} ${COUNTER - 2} ${cx + half - 18} ${COUNTER - 2} L${cx - half + 18} ${COUNTER - 2} Q${cx - half + 6} ${COUNTER - 2} ${cx - half + 4} ${COUNTER - 10} Z`}
+        fill="#ff5d73"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <path d={`M${cx - half + 16} ${POT_RIM + 22} L${cx - half + 16} ${COUNTER - 22}`} stroke="#fff8" strokeWidth="7" strokeLinecap="round" />
       {[-30, 0, 30].map((dx) => (
         <circle key={dx} cx={cx + dx} cy={POT_RIM + 46} r="7" fill="#fff" opacity="0.85" />
@@ -667,7 +712,16 @@ function Toaster({ kitchen, t }: { kitchen: Kitchen; t: number }) {
       <rect x={slotX - 50} y={top} width="100" height="6" rx="3" fill="#ff8c42" opacity={hot} />
       <path d={`M${x0 + 26} ${top + 24} L${x0 + 26} ${top + 78}`} stroke="#fff" strokeWidth="8" strokeLinecap="round" opacity="0.8" />
       <circle cx={x1 - 40} cy={top + 56} r="14" fill="#fff" stroke={INK} strokeWidth="3" />
-      <line x1={x1 - 40} y1={top + 56} x2={x1 - 40} y2={top + 46} stroke={INK} strokeWidth="3" strokeLinecap="round" transform={`rotate(${dial} ${x1 - 40} ${top + 56})`} />
+      <line
+        x1={x1 - 40}
+        y1={top + 56}
+        x2={x1 - 40}
+        y2={top + 46}
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinecap="round"
+        transform={`rotate(${dial} ${x1 - 40} ${top + 56})`}
+      />
       <circle cx={x1 - 78} cy={top + 56} r="6" fill={hot ? "#ff3b3b" : "#7a2a3a"} stroke={INK} strokeWidth="2" />
       {/* The slot the lever runs in */}
       <rect x={x0 + 6} y={LEVER.up - 12} width="8" height={LEVER.down - LEVER.up + 24} rx="4" fill="#3b3b4f" />
@@ -701,10 +755,22 @@ function BreakfastPlate() {
   const { cx, top } = BREAKFAST;
   return (
     <g>
-      <path d={`M5130 ${COUNTER} L5140 ${COUNTER - 62} L5212 ${COUNTER - 62} L5222 ${COUNTER} Z`} fill="#ff7bd0" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <path
+        d={`M5130 ${COUNTER} L5140 ${COUNTER - 62} L5212 ${COUNTER - 62} L5222 ${COUNTER} Z`}
+        fill="#ff7bd0"
+        stroke={INK}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
       <ellipse cx="5176" cy={COUNTER - 62} rx="36" ry="7" fill="#7a3b1c" stroke={INK} strokeWidth="2.5" />
       <path d={`M5222 ${COUNTER - 48} q24 4 0 30`} fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" />
-      <path d={`M${cx - 40} ${COUNTER} L${cx - 30} ${top + 8} L${cx + 30} ${top + 8} L${cx + 40} ${COUNTER} Z`} fill="#e8eefc" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d={`M${cx - 40} ${COUNTER} L${cx - 30} ${top + 8} L${cx + 30} ${top + 8} L${cx + 40} ${COUNTER} Z`}
+        fill="#e8eefc"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       <ellipse cx={cx} cy={top} rx="92" ry="14" fill="#fff" stroke={INK} strokeWidth="3.5" />
       <ellipse cx={cx} cy={top} rx="70" ry="9" fill="none" stroke="#3a86ff" strokeWidth="3" />
       <rect x="5690" y={COUNTER - 74} width="56" height="74" rx="10" fill="#ff3b3bcc" stroke={INK} strokeWidth="3.5" />

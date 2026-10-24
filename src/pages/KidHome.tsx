@@ -27,6 +27,7 @@ const TILES: KidTile[] = [
   // Keeps its old id, so a tile hidden before the rename stays hidden.
   { id: "kugelbahn", href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
   { id: "aufzug", href: "/aufzug/", emoji: "🛗", title: "Spaß im Aufzug" },
+  { id: "ampel", href: "/ampel/", emoji: "🚦", title: "Ampel und Zebrastreifen" },
   { id: "abenteuer", href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
   { id: "gefuehle", href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
   ...SCENES.map((s) => ({ id: `bild-${s.id}`, href: `/bilder/${s.id}/`, emoji: s.emoji, title: s.title })),
@@ -111,9 +112,7 @@ export function KidHome() {
               key={t.id}
               label={`${t.emoji} ${t.title}`}
               checked={!settings.hidden.includes(t.id)}
-              onChange={(on) =>
-                update({ hidden: on ? settings.hidden.filter((id) => id !== t.id) : [...settings.hidden, t.id] })
-              }
+              onChange={(on) => update({ hidden: on ? settings.hidden.filter((id) => id !== t.id) : [...settings.hidden, t.id] })}
             />
           ))}
           <p className="setting-note">Jedes Spiel startet mit den Einstellungen, die zuletzt auf seiner eigenen Startseite gewählt wurden.</p>
@@ -121,18 +120,10 @@ export function KidHome() {
       }
     >
       <div className="kid-home">
-        <ul
-          className="kid-tiles"
-          style={{ "--tile": `${fit.tile}px`, "--gap": `${fit.gap}px`, "--columns": fit.columns } as CSSProperties}
-        >
+        <ul className="kid-tiles" style={{ "--tile": `${fit.tile}px`, "--gap": `${fit.gap}px`, "--columns": fit.columns } as CSSProperties}>
           {tiles.map((t) => (
             <li key={t.id}>
-              <button
-                type="button"
-                className={`kid-tile${opening === t.id ? " opening" : ""}`}
-                aria-label={t.title}
-                onClick={() => open(t)}
-              >
+              <button type="button" className={`kid-tile${opening === t.id ? " opening" : ""}`} aria-label={t.title} onClick={() => open(t)}>
                 {t.emoji}
               </button>
             </li>

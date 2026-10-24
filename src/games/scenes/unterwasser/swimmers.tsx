@@ -231,7 +231,15 @@ export function Seepferdchen() {
       <g className="uw-seepferd-fin" style={{ transformOrigin: "20px -8px" }}>
         <path d="M18 -26 Q42 -22 40 4 Q28 -2 18 2 Z" fill="#ffe8a3" />
       </g>
-      <path className="uw-seepferd-tail" d="M6 24 Q16 50 4 66 Q-10 80 -22 70 Q-30 58 -18 52 Q-8 50 -8 58" stroke="#ffc300" strokeWidth="14" strokeLinecap="round" fill="none" style={{ transformOrigin: "6px 24px" }} />
+      <path
+        className="uw-seepferd-tail"
+        d="M6 24 Q16 50 4 66 Q-10 80 -22 70 Q-30 58 -18 52 Q-8 50 -8 58"
+        stroke="#ffc300"
+        strokeWidth="14"
+        strokeLinecap="round"
+        fill="none"
+        style={{ transformOrigin: "6px 24px" }}
+      />
       <path d="M-14 -42 Q-28 -10 -16 14 Q-6 34 10 28 Q26 18 22 -10 Q20 -36 4 -50 Z" fill="#ffd60a" />
       <path d="M-20 -16 q8 4 16 0 M-19 -2 q8 4 18 0 M-14 12 q8 4 16 -2" stroke="#ffb703" strokeWidth="3" fill="none" strokeLinecap="round" />
       <path d="M-12 -63 L-38 -60 Q-43 -54 -38 -48 L-12 -46 Z" fill="#ffd60a" />
@@ -367,7 +375,14 @@ export function Hai() {
       <path d="M-132 4 Q-130 -36 -60 -40 Q40 -44 106 -6 Q40 40 -50 38 Q-122 36 -132 4 Z" fill="#8fa9c4" />
       <path d="M-128 12 Q-110 34 -50 36 Q30 34 92 4 Q20 20 -50 18 Q-100 18 -128 12 Z" fill="#eef3f8" />
       <path d="M-100 -28 Q-60 -40 0 -36" stroke="#fff" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.4" />
-      <path className="uw-hai-gills" d="M-56 -14 q-4 10 0 20 M-46 -16 q-4 12 0 22 M-36 -16 q-4 12 0 22" stroke="#5b7ba3" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path
+        className="uw-hai-gills"
+        d="M-56 -14 q-4 10 0 20 M-46 -16 q-4 12 0 22 M-36 -16 q-4 12 0 22"
+        stroke="#5b7ba3"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
       <path className="uw-hai-pfin" d="M-40 20 Q-30 50 -6 60 Q-10 36 -20 20 Z" fill="#6a8db5" style={{ transformOrigin: "-30px 20px" }} />
       <circle cx="-94" cy="-10" r="9" fill="#fff" />
       <Eye cx={-95} cy={-10} r={5.6} />

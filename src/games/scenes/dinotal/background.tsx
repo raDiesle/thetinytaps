@@ -185,7 +185,13 @@ function Reeds({ x, y, flip = 1 }: { x: number; y: number; flip?: 1 | -1 }) {
   const s = depthScale(y);
   return (
     <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`}>
-      <path d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44" stroke="#40916c" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path
+        d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44"
+        stroke="#40916c"
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+      />
       <ellipse cx="-12" cy="-90" rx="5" ry="13" fill="#9c6644" />
       <ellipse cx="16" cy="-108" rx="5" ry="13" fill="#9c6644" />
     </g>
@@ -227,7 +233,10 @@ export function Background() {
       <Cloud x={1130} y={130} scale={0.34} className="dt-cloud" />
       <g fill="#c9bfe0">
         {MOUNTAINS.map(([x, h, w]) => (
-          <path key={x} d={`M${x - w / 2} ${HORIZON + 4} Q${x - w * 0.22} ${HORIZON - h} ${x} ${HORIZON - h} Q${x + w * 0.22} ${HORIZON - h} ${x + w / 2} ${HORIZON + 4} Z`} />
+          <path
+            key={x}
+            d={`M${x - w / 2} ${HORIZON + 4} Q${x - w * 0.22} ${HORIZON - h} ${x} ${HORIZON - h} Q${x + w * 0.22} ${HORIZON - h} ${x + w / 2} ${HORIZON + 4} Z`}
+          />
         ))}
       </g>
       <g fill="#ffffff" opacity="0.6">

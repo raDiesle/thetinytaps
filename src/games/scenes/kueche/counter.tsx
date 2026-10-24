@@ -25,7 +25,11 @@ export function Geschirrspueler() {
           [290, 318],
           [262, 382],
         ].map(([x, y], i) => (
-          <path key={i} style={nth(i)} d={`M${x} ${y - 9} L${x + 3} ${y - 3} L${x + 9} ${y} L${x + 3} ${y + 3} L${x} ${y + 9} L${x - 3} ${y + 3} L${x - 9} ${y} L${x - 3} ${y - 3} Z`} />
+          <path
+            key={i}
+            style={nth(i)}
+            d={`M${x} ${y - 9} L${x + 3} ${y - 3} L${x + 9} ${y} L${x + 3} ${y + 3} L${x} ${y + 9} L${x - 3} ${y + 3} L${x - 9} ${y} L${x - 3} ${y - 3} Z`}
+          />
         ))}
       </g>
       {/* Control strip */}
@@ -171,7 +175,8 @@ export function Schubladen() {
           <g className="kc-schublade-inside">
             <rect x="1072" y={y - 14} width="158" height="16" rx="3" fill="#e9d8b4" />
             {i === 0 && <path d={`M1086 ${y - 6} h40 M1094 ${y - 10} h44 M1150 ${y - 6} h50`} stroke={STEEL} strokeWidth="4" strokeLinecap="round" />}
-            {i === 1 && [1090, 1124, 1158, 1192].map((x, k) => <circle key={x} cx={x} cy={y - 6} r="6" fill={["#ff8787", "#ffd43b", "#74c0fc", "#69db7c"][k]} />)}
+            {i === 1 &&
+              [1090, 1124, 1158, 1192].map((x, k) => <circle key={x} cx={x} cy={y - 6} r="6" fill={["#ff8787", "#ffd43b", "#74c0fc", "#69db7c"][k]} />)}
             {i === 2 && <path d={`M1090 ${y - 6} h120`} stroke="#c88b3a" strokeWidth="7" strokeLinecap="round" />}
           </g>
           <rect x="1064" y={y} width="174" height="40" rx="5" fill={CUPBOARD} stroke={CUPBOARD_DARK} strokeWidth="3" />

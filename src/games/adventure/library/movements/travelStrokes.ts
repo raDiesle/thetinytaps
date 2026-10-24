@@ -10,7 +10,8 @@ export const TRAVEL_STROKES: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["hands", "arms", "shoulders"],
-    bodyMovement: "Das Kind hält mit beiden Händen ein gedachtes Lenkrad vor der Brust und dreht es langsam zur einen Seite, zurück zur Mitte und zur anderen Seite.",
+    bodyMovement:
+      "Das Kind hält mit beiden Händen ein gedachtes Lenkrad vor der Brust und dreht es langsam zur einen Seite, zurück zur Mitte und zur anderen Seite.",
     startingPose: "Stehen, Hände vorn an einem gedachten Lenkrad.",
     movementSteps: ["Lenkrad mit beiden Händen fassen", "Zur einen Seite drehen", "Zurück zur Mitte", "Zur anderen Seite drehen"],
     durationSeconds: 16,
@@ -54,7 +55,8 @@ export const TRAVEL_STROKES: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["arms", "torso", "shoulders"],
-    bodyMovement: "Das Kind breitet die Arme weit aus und neigt den Oberkörper langsam und sanft zur einen Seite in die Kurve, dann zur anderen, die Füße bleiben stehen.",
+    bodyMovement:
+      "Das Kind breitet die Arme weit aus und neigt den Oberkörper langsam und sanft zur einen Seite in die Kurve, dann zur anderen, die Füße bleiben stehen.",
     startingPose: "Stehen, Arme weit zur Seite ausgebreitet.",
     movementSteps: ["Arme ausbreiten", "Sanft zur einen Seite in die Kurve", "Zurück gerade", "Zur anderen Seite"],
     durationSeconds: 16,
@@ -98,9 +100,15 @@ export const TRAVEL_STROKES: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["hands", "arms", "shoulders", "torso"],
-    bodyMovement: "Das Kind hält mit beiden Händen ein gedachtes Doppelpaddel quer vor dem Bauch und zieht abwechselnd rechts und links ein Blatt von vorn nach hinten durchs Wasser.",
+    bodyMovement:
+      "Das Kind hält mit beiden Händen ein gedachtes Doppelpaddel quer vor dem Bauch und zieht abwechselnd rechts und links ein Blatt von vorn nach hinten durchs Wasser.",
     startingPose: "Stehen, beide Hände schulterbreit an einem gedachten Doppelpaddel.",
-    movementSteps: ["Paddel mit beiden Händen quer fassen", "Rechts eintauchen und nach hinten ziehen", "Links eintauchen und nach hinten ziehen", "Immer abwechselnd"],
+    movementSteps: [
+      "Paddel mit beiden Händen quer fassen",
+      "Rechts eintauchen und nach hinten ziehen",
+      "Links eintauchen und nach hinten ziehen",
+      "Immer abwechselnd",
+    ],
     durationSeconds: 16,
     repetitions: 2,
     instruction: "Paddel mit!",
@@ -186,7 +194,8 @@ export const TRAVEL_STROKES: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["arms", "hands", "shoulders"],
-    bodyMovement: "Das Kind schiebt die zusammengelegten Hände nach vorn, öffnet die Arme in einem Bogen zur Seite und holt sie zur Brust zurück, wie beim Brustschwimmen.",
+    bodyMovement:
+      "Das Kind schiebt die zusammengelegten Hände nach vorn, öffnet die Arme in einem Bogen zur Seite und holt sie zur Brust zurück, wie beim Brustschwimmen.",
     startingPose: "Stehen, Hände vor der Brust zusammen.",
     movementSteps: ["Hände zusammen nach vorn schieben", "Arme zur Seite öffnen", "Zurück zur Brust holen", "Wieder nach vorn"],
     durationSeconds: 15,

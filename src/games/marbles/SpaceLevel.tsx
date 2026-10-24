@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { useId, useMemo, type ReactNode } from "react";
 import { VIEW_H, wobble, type LevelProps } from "./level";
 import { beside, deg, hop, lerp, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
@@ -296,8 +296,21 @@ function DishFront() {
   const { x, y, rx } = DISH;
   return (
     <g>
-      <path d={`M${x - rx} ${y - 8} Q${x} ${y + 60} ${x + rx} ${y - 8} A${rx} 18 0 0 1 ${x - rx} ${y - 8} Z`} fill={STEEL} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path d={`M${x - rx + 26} ${y + 8} Q${x - 30} ${y + 26} ${x - 6} ${y + 26}`} fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.8" />
+      <path
+        d={`M${x - rx} ${y - 8} Q${x} ${y + 60} ${x + rx} ${y - 8} A${rx} 18 0 0 1 ${x - rx} ${y - 8} Z`}
+        fill={STEEL}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${x - rx + 26} ${y + 8} Q${x - 30} ${y + 26} ${x - 6} ${y + 26}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
       <Beam
         pts={[
           { x: x + rx - 10, y: y - 10 },
@@ -391,7 +404,15 @@ function PipeFront({ space }: { space: Space }) {
     <g>
       <path d={svgLine(inside)} fill="none" stroke="#bde9ff" strokeWidth={2 * BALL_R + 12} strokeLinecap="round" strokeLinejoin="round" opacity="0.14" />
       {[-1, 1].map((side) => (
-        <path key={side} d={svgLine(beside(inside, side * (BALL_R + 6)))} fill="none" stroke="#e8f8ff" strokeWidth="3.5" strokeLinejoin="round" opacity="0.85" />
+        <path
+          key={side}
+          d={svgLine(beside(inside, side * (BALL_R + 6)))}
+          fill="none"
+          stroke="#e8f8ff"
+          strokeWidth="3.5"
+          strokeLinejoin="round"
+          opacity="0.85"
+        />
       ))}
       <path d={svgLine(beside(inside, -BALL_R + 2))} fill="none" stroke="#fff" strokeWidth="3" strokeLinejoin="round" opacity="0.4" />
       {clamps.map((p, i) => (
@@ -525,13 +546,7 @@ function Buggy({ turned, bob }: { turned: number; bob: number }) {
         <path d="M5 -74 Q12 -68 19 -74" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
         <circle cx="12" cy="-80" r="27" fill="#bde9ff" opacity="0.3" stroke={INK} strokeWidth="3" />
         <path d="M-6 -94 Q0 -101 8 -103" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
-        <path
-          d="M-80 -30 L-80 -58 Q-80 -64 -74 -64 L66 -64 Q80 -64 80 -52 L80 -30 Z"
-          fill="#ffd23f"
-          stroke={INK}
-          strokeWidth="3.5"
-          strokeLinejoin="round"
-        />
+        <path d="M-80 -30 L-80 -58 Q-80 -64 -74 -64 L66 -64 Q80 -64 80 -52 L80 -30 Z" fill="#ffd23f" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
         <rect x="-70" y="-58" width="34" height="5" rx="2.5" fill="#fff" opacity="0.7" />
         <rect x={BUGGY.nose - 12} y="-62" width="12" height="18" rx="5" fill="#ff5d73" stroke={INK} strokeWidth="2.5" />
         <circle cx="-40" cy="-44" r="6" fill="#ff8c42" stroke={INK} strokeWidth="2" />
@@ -613,10 +628,18 @@ function StationTruss({ space, t }: { space: Space; t: number }) {
       <path d={svgLine(cable)} fill="none" stroke={on ? "#ffd23f" : "#9a8a50"} strokeWidth="4" strokeLinejoin="round" />
       {on && t >= 0 && <path d={svgLine(cable)} fill="none" stroke="#fff" strokeWidth="3" strokeDasharray="4 26" strokeDashoffset={-t * 90} />}
       {/* The clamp and the magnet's cable */}
-      <path d={`M${MAGNET.x - 20} ${jibLow - 2} L${MAGNET.x + 20} ${jibLow - 2} L${MAGNET.x + 10} ${jibLow + 18} L${MAGNET.x - 10} ${jibLow + 18} Z`} fill={DARK_STEEL} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d={`M${MAGNET.x - 20} ${jibLow - 2} L${MAGNET.x + 20} ${jibLow - 2} L${MAGNET.x + 10} ${jibLow + 18} L${MAGNET.x - 10} ${jibLow + 18} Z`}
+        fill={DARK_STEEL}
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke={INK} strokeWidth="8" />
       <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke={on ? "#ffd23f" : "#9a8a50"} strokeWidth="4" />
-      {on && t >= 0 && <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke="#fff" strokeWidth="3" strokeDasharray="4 26" strokeDashoffset={-t * 90} />}
+      {on && t >= 0 && (
+        <line x1={MAGNET.x} y1={jibLow + 16} x2={MAGNET.x} y2={drop} stroke="#fff" strokeWidth="3" strokeDasharray="4 26" strokeDashoffset={-t * 90} />
+      )}
       <Magnet on={on} t={t} />
     </g>
   );
@@ -663,7 +686,7 @@ function IronBall({ at }: { at: Pt }) {
 
 function PlanetBody({ p, scale }: { p: Planet; scale: number }) {
   const r = p.r;
-  let body;
+  let body: ReactNode;
   if (p.kind === "earth")
     body = (
       <>
@@ -731,7 +754,15 @@ function Mobile({ spin }: { spin: number }) {
       {bar(spots[1], spots[3])}
       <g transform={`translate(${cx} ${sun.y}) rotate(${deg(spin) / 4})`}>
         {Array.from({ length: 10 }, (_, i) => (
-          <path key={i} transform={`rotate(${i * 36})`} d={`M-8 ${-sun.r + 2} L0 ${-sun.r - 14} L8 ${-sun.r + 2} Z`} fill="#ff8c42" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+          <path
+            key={i}
+            transform={`rotate(${i * 36})`}
+            d={`M-8 ${-sun.r + 2} L0 ${-sun.r - 14} L8 ${-sun.r + 2} Z`}
+            fill="#ff8c42"
+            stroke={INK}
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
         ))}
       </g>
       <circle cx={cx} cy={sun.y} r={sun.r} fill="#ffd23f" stroke={INK} strokeWidth="3.5" />
@@ -964,7 +995,14 @@ function Rocket({ space, t }: { space: Space; t: number }) {
       <circle cy={-WINDOW_UP} r="30" fill="none" stroke={DARK_STEEL} strokeWidth="8" />
       <circle cy={-WINDOW_UP} r="34" fill="none" stroke={INK} strokeWidth="3" />
       <circle cy={-WINDOW_UP} r="26" fill="none" stroke={INK} strokeWidth="3" />
-      <path d={`M-16 ${-WINDOW_UP - 14} Q-10 ${-WINDOW_UP - 20} -2 ${-WINDOW_UP - 21}`} fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+      <path
+        d={`M-16 ${-WINDOW_UP - 14} Q-10 ${-WINDOW_UP - 20} -2 ${-WINDOW_UP - 21}`}
+        fill="none"
+        stroke="#fff"
+        strokeWidth="4"
+        strokeLinecap="round"
+        opacity="0.8"
+      />
     </g>
   );
 }
@@ -976,7 +1014,13 @@ function Flame({ size, t }: { size: number; t: number }) {
   const wide = 36 + 10 * size;
   return (
     <g>
-      <path d={`M${-wide} 0 Q${-wide - 6} ${len * 0.5} 0 ${len} Q${wide + 6} ${len * 0.5} ${wide} 0 Z`} fill="#ff8c42" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d={`M${-wide} 0 Q${-wide - 6} ${len * 0.5} 0 ${len} Q${wide + 6} ${len * 0.5} ${wide} 0 Z`}
+        fill="#ff8c42"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       <path d={`M${-wide * 0.6} 0 Q${-wide * 0.6} ${len * 0.35} 0 ${len * 0.66} Q${wide * 0.6} ${len * 0.35} ${wide * 0.6} 0 Z`} fill="#ffd23f" />
       <path d={`M${-wide * 0.28} 0 Q${-wide * 0.28} ${len * 0.18} 0 ${len * 0.34} Q${wide * 0.28} ${len * 0.18} ${wide * 0.28} 0 Z`} fill="#fff" />
     </g>

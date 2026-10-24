@@ -67,7 +67,10 @@ function Block({ x, y, w, colour, mark, i }: { x: number; y: number; w: number; 
       {mark === "circle" && <circle cx={cx} cy={cy} r={w * 0.2} fill="#fff" />}
       {mark === "star" && <path d={star(cx, cy, w * 0.28)} fill="#fff" />}
       {mark === "heart" && (
-        <path d={`M${cx} ${cy + 9} C${cx - 16} ${cy - 2} ${cx - 10} ${cy - 16} ${cx} ${cy - 6} C${cx + 10} ${cy - 16} ${cx + 16} ${cy - 2} ${cx} ${cy + 9} Z`} fill="#fff" />
+        <path
+          d={`M${cx} ${cy + 9} C${cx - 16} ${cy - 2} ${cx - 10} ${cy - 16} ${cx} ${cy - 6} C${cx + 10} ${cy - 16} ${cx + 16} ${cy - 2} ${cx} ${cy + 9} Z`}
+          fill="#fff"
+        />
       )}
     </g>
   );
@@ -114,7 +117,14 @@ export function Schaukelpferd() {
           <path d="M-90 -180 L-56 -136" stroke="#e63946" strokeWidth="3" />
         </g>
         <g className="gn-pferd-mane" style={{ transformOrigin: "-70px -170px" }}>
-          <path d="M-80 -206 q14 2 10 14 q14 0 8 14 q14 2 6 16 q12 2 4 16" stroke="#e8590c" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <path
+            d="M-80 -206 q14 2 10 14 q14 0 8 14 q14 2 6 16 q12 2 4 16"
+            stroke="#e8590c"
+            strokeWidth="9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
         </g>
       </g>
       <Zzz x={-60} y={-226} />

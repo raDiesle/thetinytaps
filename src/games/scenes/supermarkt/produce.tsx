@@ -59,7 +59,13 @@ export function Karotten() {
       {[-56, -30, -4, 22, 48].map((x, i) => (
         <g key={x} className="sm-karotte" style={{ ...nth(i), transformOrigin: `${x}px -214px` }}>
           <g className="sm-karotte-leaf" style={{ ...nth(i), transformOrigin: `${x}px -236px` }}>
-            <path d={`M${x} -236 q-10 -16 -6 -28 M${x} -236 q0 -18 4 -30 M${x} -236 q10 -14 12 -24`} stroke="#40c057" strokeWidth="5" strokeLinecap="round" fill="none" />
+            <path
+              d={`M${x} -236 q-10 -16 -6 -28 M${x} -236 q0 -18 4 -30 M${x} -236 q10 -14 12 -24`}
+              stroke="#40c057"
+              strokeWidth="5"
+              strokeLinecap="round"
+              fill="none"
+            />
           </g>
           <path d={`M${x - 11} -238 Q${x} -242 ${x + 11} -238 L${x + 2} -190 Q${x} -186 ${x - 2} -190 Z`} fill={i % 2 ? "#ff922b" : "#fd7e14"} />
           <path d={`M${x - 6} -226 h5 M${x + 1} -214 h5 M${x - 4} -204 h4`} stroke="#e8590c" strokeWidth="2" strokeLinecap="round" />
@@ -127,7 +133,10 @@ export function Aepfel() {
       </g>
       {APPLES.map(([x, y], i) => (
         <g key={i} className="sm-apfel" style={{ ...nth(i % 5), transformOrigin: `${x}px ${y + 16}px` }}>
-          <path d={`M${x} ${y - 12} Q${x + 18} ${y - 20} ${x + 17} ${y} Q${x + 14} ${y + 16} ${x} ${y + 14} Q${x - 14} ${y + 16} ${x - 17} ${y} Q${x - 18} ${y - 20} ${x} ${y - 12} Z`} fill={i % 4 === 3 ? "#94d82d" : "#f03e3e"} />
+          <path
+            d={`M${x} ${y - 12} Q${x + 18} ${y - 20} ${x + 17} ${y} Q${x + 14} ${y + 16} ${x} ${y + 14} Q${x - 14} ${y + 16} ${x - 17} ${y} Q${x - 18} ${y - 20} ${x} ${y - 12} Z`}
+            fill={i % 4 === 3 ? "#94d82d" : "#f03e3e"}
+          />
           <path d={`M${x} ${y - 12} q1 -6 4 -9`} stroke="#8d5a2b" strokeWidth="3" strokeLinecap="round" fill="none" />
           <circle cx={x - 7} cy={y - 4} r="3.5" fill="#fff" opacity="0.45" />
         </g>

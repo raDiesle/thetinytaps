@@ -29,20 +29,7 @@ import {
   recorded,
 } from "@/lib/sfx";
 import type { Holding, Outfit, PicId, Pose } from "./kid";
-import {
-  Bad,
-  Dachboden,
-  Flur,
-  Garten,
-  Keller,
-  Kinderzimmer,
-  Kueche,
-  Schlafzimmer,
-  Terrasse,
-  Wohnzimmer,
-  type RoomProps,
-  type Weather,
-} from "./rooms";
+import { Bad, Dachboden, Flur, Garten, Keller, Kinderzimmer, Kueche, Schlafzimmer, Terrasse, Wohnzimmer, type RoomProps, type Weather } from "./rooms";
 
 // The stories of "Aufzug". A thought bubble shows what the child needs next; the floor where that
 // thing is drawn is the one to ride to. There the first move happens by itself, then the action button

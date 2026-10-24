@@ -59,7 +59,13 @@ export function Topf() {
   return (
     <>
       <ellipse cx="0" cy="0" rx="74" ry="12" fill="#e8590c" opacity="0.35" />
-      <path d="M-82 -70 Q-96 -72 -94 -58 Q-92 -50 -78 -54 M82 -70 Q96 -72 94 -58 Q92 -50 78 -54" stroke="#343a40" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <path
+        d="M-82 -70 Q-96 -72 -94 -58 Q-92 -50 -78 -54 M82 -70 Q96 -72 94 -58 Q92 -50 78 -54"
+        stroke="#343a40"
+        strokeWidth="8"
+        strokeLinecap="round"
+        fill="none"
+      />
       <path d="M-74 -80 V-12 Q-74 0 -60 0 H60 Q74 0 74 -12 V-80 Z" fill="#e03131" />
       <path d="M-60 -70 V-16" stroke="#fff" strokeWidth="8" strokeLinecap="round" opacity="0.35" />
       <path d="M-74 -40 H74" stroke="#c92a2a" strokeWidth="4" opacity="0.5" />
@@ -142,7 +148,12 @@ export function Toaster() {
     <>
       {[-24, 22].map((x, i) => (
         <g key={x} className="kc-toast" style={nth(i)}>
-          <path d={`M${x - 20} -84 V-122 Q${x - 24} -138 ${x - 10} -140 Q${x} -146 ${x + 10} -140 Q${x + 24} -138 ${x + 20} -122 V-84 Z`} fill="#e9b872" stroke="#c88b3a" strokeWidth="3" />
+          <path
+            d={`M${x - 20} -84 V-122 Q${x - 24} -138 ${x - 10} -140 Q${x} -146 ${x + 10} -140 Q${x + 24} -138 ${x + 20} -122 V-84 Z`}
+            fill="#e9b872"
+            stroke="#c88b3a"
+            strokeWidth="3"
+          />
           <path d={`M${x - 12} -88 V-122 Q${x} -132 ${x + 12} -122 V-88 Z`} fill="#ffe8b6" />
         </g>
       ))}

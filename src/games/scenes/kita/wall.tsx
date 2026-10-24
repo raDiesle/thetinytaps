@@ -6,7 +6,7 @@ import { Hearts, Lines, Notes, Puffs, Sparkles } from "./parts";
 // Things on the back wall, all drawn in picture coordinates.
 
 /** A sun, a duck, a star or an apple: the little pictures that show each child its own hook. */
-function Symbol({ kind, x, y }: { kind: "sun" | "duck" | "star" | "apple"; x: number; y: number }) {
+function WallSymbol({ kind, x, y }: { kind: "sun" | "duck" | "star" | "apple"; x: number; y: number }) {
   if (kind === "sun")
     return (
       <>
@@ -40,7 +40,7 @@ function Tile({ x, y, kind, cls, i }: { x: number; y: number; kind: "sun" | "duc
   return (
     <g className={cls} style={nth(i ?? 0)}>
       <rect x={x - 18} y={y - 18} width="36" height="36" rx="6" fill="#fff" stroke="#e9ecef" strokeWidth="2" />
-      <Symbol kind={kind} x={x} y={y} />
+      <WallSymbol kind={kind} x={x} y={y} />
     </g>
   );
 }
@@ -166,15 +166,42 @@ export function Uhr() {
         <circle cx={cx} cy={cy} r="38" fill="#74c0fc" />
         <circle cx={cx} cy={cy} r="31" fill="#fff" />
         {Array.from({ length: 12 }, (_, i) => (
-          <circle key={i} cx={cx + 25 * Math.sin((i * Math.PI) / 6)} cy={cy - 25 * Math.cos((i * Math.PI) / 6)} r={i % 3 ? 1.6 : 3} fill={["#ff6b6b", "#fab005", "#51cf66", "#7950f2"][i % 4]} />
+          <circle
+            key={i}
+            cx={cx + 25 * Math.sin((i * Math.PI) / 6)}
+            cy={cy - 25 * Math.cos((i * Math.PI) / 6)}
+            r={i % 3 ? 1.6 : 3}
+            fill={["#ff6b6b", "#fab005", "#51cf66", "#7950f2"][i % 4]}
+          />
         ))}
         <circle cx={cx - 9} cy={cy + 10} r="2.6" fill={INK} />
         <circle cx={cx + 9} cy={cy + 10} r="2.6" fill={INK} />
         <path d={`M${cx - 7} ${cy + 17} Q${cx} ${cy + 22} ${cx + 7} ${cy + 17}`} stroke={INK} strokeWidth="2.2" strokeLinecap="round" fill="none" />
-        <path className="ki-uhr-hour" d={`M${cx} ${cy} L${cx + 12} ${cy - 8}`} stroke={INK} strokeWidth="4.5" strokeLinecap="round" style={{ transformOrigin: `${cx}px ${cy}px` }} />
-        <path className="ki-uhr-minute" d={`M${cx} ${cy} V${cy - 22}`} stroke="#ff6b6b" strokeWidth="3.2" strokeLinecap="round" style={{ transformOrigin: `${cx}px ${cy}px` }} />
+        <path
+          className="ki-uhr-hour"
+          d={`M${cx} ${cy} L${cx + 12} ${cy - 8}`}
+          stroke={INK}
+          strokeWidth="4.5"
+          strokeLinecap="round"
+          style={{ transformOrigin: `${cx}px ${cy}px` }}
+        />
+        <path
+          className="ki-uhr-minute"
+          d={`M${cx} ${cy} V${cy - 22}`}
+          stroke="#ff6b6b"
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          style={{ transformOrigin: `${cx}px ${cy}px` }}
+        />
         <circle cx={cx} cy={cy} r="3.5" fill={INK} />
-        <path d={`M${cx - 27} ${cy - 20} Q${cx - 18} ${cy - 32} ${cx - 4} ${cy - 35}`} stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
+        <path
+          d={`M${cx - 27} ${cy - 20} Q${cx - 18} ${cy - 32} ${cx - 4} ${cy - 35}`}
+          stroke="#fff"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.6"
+        />
       </g>
       <Lines x={cx + 46} y={cy} colour="#74c0fc" />
     </>
@@ -270,7 +297,17 @@ export function Bilder() {
         const y = sag(x);
         return (
           <g key={x} className="ki-bilder-sheet" style={{ ...nth(i), transformOrigin: `${x}px ${y}px` }}>
-            <rect x={x - 34} y={y + 2} width="68" height="52" rx="2" fill="#fff" stroke="#e9ecef" strokeWidth="2" transform={`rotate(${(i % 2 ? 1 : -1) * 3} ${x} ${y})`} />
+            <rect
+              x={x - 34}
+              y={y + 2}
+              width="68"
+              height="52"
+              rx="2"
+              fill="#fff"
+              stroke="#e9ecef"
+              strokeWidth="2"
+              transform={`rotate(${(i % 2 ? 1 : -1) * 3} ${x} ${y})`}
+            />
             {i === 0 && (
               <>
                 <rect x={x - 18} y={y + 24} width="24" height="20" fill="#ff8787" />
@@ -301,7 +338,9 @@ export function Bilder() {
                 {[-16, 0, 16].map((dx, k) => (
                   <g key={dx}>
                     <circle cx={x + dx} cy={y + 18 + (k === 1 ? 4 : 0)} r="5" fill={["#f783ac", "#ffd43b", "#74c0fc"][k]} stroke="none" />
-                    <path d={`M${x + dx} ${y + 24 + (k === 1 ? 4 : 0)} V${y + 38} M${x + dx - 6} ${y + 30} H${x + dx + 6} M${x + dx} ${y + 38} l-5 8 M${x + dx} ${y + 38} l5 8`} />
+                    <path
+                      d={`M${x + dx} ${y + 24 + (k === 1 ? 4 : 0)} V${y + 38} M${x + dx - 6} ${y + 30} H${x + dx + 6} M${x + dx} ${y + 38} l-5 8 M${x + dx} ${y + 38} l5 8`}
+                    />
                   </g>
                 ))}
               </g>
@@ -360,7 +399,13 @@ export function Fenster() {
       ].map(({ d, origin, knob }, i) => (
         <g key={i} className="ki-fenster-sash" style={{ ...nth(i), transformOrigin: origin }}>
           <path d={d} fill="#d0ebff" fillOpacity="0.2" stroke="#fff" strokeWidth="8" />
-          <path d={i ? `M${MID + 40} ${g.y + 120} L${MID + 80} ${g.y + 20}` : `M${g.x + 30} ${g.y + 120} L${g.x + 70} ${g.y + 20}`} stroke="#fff" strokeWidth="6" strokeLinecap="round" opacity="0.45" />
+          <path
+            d={i ? `M${MID + 40} ${g.y + 120} L${MID + 80} ${g.y + 20}` : `M${g.x + 30} ${g.y + 120} L${g.x + 70} ${g.y + 20}`}
+            stroke="#fff"
+            strokeWidth="6"
+            strokeLinecap="round"
+            opacity="0.45"
+          />
           <rect x={knob - 3} y={g.y + 64} width="6" height="18" rx="3" fill="#ced4da" />
         </g>
       ))}
@@ -371,7 +416,10 @@ export function Fenster() {
         { cx: x + w - 6, s: -1, origin: `${x + w - 6}px ${y}px` },
       ].map(({ cx, s, origin }, i) => (
         <g key={i} className="ki-fenster-curtain" style={{ ...nth(i), transformOrigin: origin }}>
-          <path d={`M${cx - 18 * s} ${y + 2} H${cx + 34 * s} Q${cx + 26 * s} ${y + 80} ${cx + 34 * s} ${y + 160} Q${cx + 8 * s} ${y + 170} ${cx - 18 * s} ${y + 160} Z`} fill="#ffe066" />
+          <path
+            d={`M${cx - 18 * s} ${y + 2} H${cx + 34 * s} Q${cx + 26 * s} ${y + 80} ${cx + 34 * s} ${y + 160} Q${cx + 8 * s} ${y + 170} ${cx - 18 * s} ${y + 160} Z`}
+            fill="#ffe066"
+          />
           {[0, 1, 2].map((k) => (
             <circle key={k} cx={cx + 8 * s} cy={y + 34 + k * 46} r="6" fill="#ff922b" opacity="0.7" />
           ))}

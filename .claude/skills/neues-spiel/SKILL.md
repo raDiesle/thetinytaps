@@ -31,7 +31,7 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
    Lazy-load it like the other pages.
 2. `CATEGORIES` in `src/content/games.ts`: the game in the fitting category.
 3. `TILES` in `src/pages/KidHome.tsx`: a tile with a stable `id` (hidden tiles are saved by id).
-4. The idea in `src/content/ideas.ts`: `done: true` (or `partial: "…"`).
+4. The idea in `src/content/ideas/<area>.ts`: `done: true` (or `partial: "…"`).
 5. One line in the README structure table and the roadmap.
 
 ## Settings and shared parts
@@ -41,7 +41,7 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
   Defaults: `speech: false`, `sounds: true`.
 - Parent options go into `settings` with `SettingsGroup`, `Toggle`, `Choice`
   (`src/components/SettingControls.tsx`); keyboard hints only when `!useDevice().touchOnly`.
-- Sounds: build on `note()` and friends in `src/lib/sfx.ts`, or `playRecorded(name, fallback)`
+- Sounds: build on `note()` and friends in `src/lib/sfx/core.ts` (the new sound goes into the topic file it fits), or `playRecorded(name, fallback)`
   for a recording in `src/lib/sounds/`. Speech: `speak()` from `src/lib/speech.ts`, only if
   `settings.speech`.
 - End of a level: `<GameEnd onAgain next />` from `src/components/GameEnd.tsx`.

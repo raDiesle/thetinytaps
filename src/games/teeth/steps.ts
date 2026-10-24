@@ -18,12 +18,10 @@ export interface Step {
   view: View;
 }
 
-const teeth = (jaws: Jaw[], sides: Side[], ns: number[]) =>
-  ALL_TEETH.filter((t) => jaws.includes(t.jaw) && sides.includes(t.side) && ns.includes(t.n));
+const teeth = (jaws: Jaw[], sides: Side[], ns: number[]) => ALL_TEETH.filter((t) => jaws.includes(t.jaw) && sides.includes(t.side) && ns.includes(t.n));
 
 /** Screen order, left to right, back teeth first on the left. */
-const leftToRight = (ids: ToothId[]) =>
-  [...ids].sort((a, b) => (a.side === b.side ? (a.side === "left" ? b.n - a.n : a.n - b.n) : a.side === "left" ? -1 : 1));
+const leftToRight = (ids: ToothId[]) => [...ids].sort((a, b) => (a.side === b.side ? (a.side === "left" ? b.n - a.n : a.n - b.n) : a.side === "left" ? -1 : 1));
 
 const FLAT = { upper: 0, lower: 0 };
 const CLOSED_FRONT: View = { open: 0, pitch: 6, yaw: 0, look: [0, 8, 100], zoom: 1.3, tilt: FLAT };
