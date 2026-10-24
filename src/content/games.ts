@@ -44,18 +44,18 @@ export const CATEGORIES: Category[] = [
       { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
       { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
       { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
+      { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
+      { href: "/aufzug/", emoji: "🛗", title: "Spaß im Aufzug" },
     ],
   },
   {
     id: "weitere",
     emoji: "🎈",
     title: "Weitere",
-    subtitle: "Putzen, rufen, Dinge umfallen lassen und Aufzug fahren.",
+    subtitle: "Zähne putzen und laut oder leise rufen.",
     games: [
       { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen" },
       { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise" },
-      { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
-      { href: "/aufzug/", emoji: "🛗", title: "Aufzug" },
     ],
   },
 ];

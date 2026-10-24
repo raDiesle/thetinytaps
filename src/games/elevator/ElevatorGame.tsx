@@ -12,7 +12,7 @@ export function ElevatorGame() {
 
   return (
     <GameShell
-      title="Aufzug"
+      title="Spaß im Aufzug"
       emoji="🛗"
       modes={[
         { id: "hunger", emoji: "🥞", title: "Pfannkuchen" },
