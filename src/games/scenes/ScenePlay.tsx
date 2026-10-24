@@ -174,9 +174,6 @@ const MIN_KEY_MS = 600;
 const REPEAT_QUESTION_MS = 3000;
 /** Find modes: pause after a found item before the next question. */
 const NEXT_QUESTION_MS = 2600;
-/** Sound riddle: the question is spoken after the sound, and the sound is repeated after a wrong tap. */
-const RIDDLE_QUESTION_MS = 1500;
-const RIDDLE_REPEAT_MS = 2200;
 /** Find modes: when the hint ring appears. */
 const HINT_AFTER_MS = 8000;
 const HINT_AFTER_MISSES = 2;
@@ -230,6 +227,12 @@ const driveMs = (dx: number) => Math.min(DRIVE_MAX_MS, Math.max(DRIVE_MIN_MS, (M
 /** Colour mode: how much of each colour is left in the grey picture; the rest is white. */
 const GREY_SLOPE = 0.55;
 
+/** Colour mode: a dab of paint on the background is this share of the picture's width across. */
+const PAINT_RADIUS = 0.14;
+
+/** Colour mode: a round patch of the background (and overlay) that got its colour back, in picture units. */
+type Dab = { x: number; y: number };
+
 /** Colour mode: a colour as the pale grey it has in the uncoloured picture (same as the grey filter). */
 function paleGrey(hex: string) {
   const n = parseInt(hex.slice(1), 16);
@@ -249,6 +252,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** Explore and colour mode: items tapped at least once (in colour mode: the coloured ones). */
   const [discovered, setDiscovered] = useState<ReadonlySet<string>>(new Set());
   const [partying, setPartying] = useState(false);
+  /** Colour mode: where the background was painted, by tapping it or an item. */
+  const [dabs, setDabs] = useState<Dab[]>([]);
   /** Bedtime pictures: everything is asleep and the room is dark. */
   const [night, setNight] = useState(false);
   /** Keys mode: the item in the glowing frame, moved with the arrow keys; hidden once an item starts. */
@@ -281,7 +286,6 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const busyUntil = useRef(new Map<string, number>());
   const celebrating = useRef(false);
   const misses = useRef(0);
-  const riddleRepeat = useRef(false);
   const lastKey = useRef(0);
   const lastQuestion = useRef(0);
   const lastKeyItem = useRef<SceneItem | null>(null);
@@ -295,12 +299,12 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   const svgRef = useRef<SVGSVGElement>(null);
   // An SVG id without the colons React puts in, so it can go into url(#…).
-  const greyId = `scene-grey-${useId().replace(/[^\w-]/g, "")}`;
+  const svgId = `scene-${useId().replace(/[^\w-]/g, "")}`;
+  const greyId = `${svgId}-grey`;
 
   const questMode = isQuestMode(settings.mode);
   const colouring = settings.mode === "colour";
-  /** In the sound riddle the sounds are the game, so they always play. */
-  const soundsOn = settings.sounds || settings.mode === "sounds";
+  const soundsOn = settings.sounds;
   const quests = useMemo(() => questsFor(settings.mode, scene), [settings.mode, scene]);
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
   const roads = useMemo(() => roadsFrom(scene.id), [scene]);
@@ -372,7 +376,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       later(() => setPlays((prev) => ({ ...prev, [item.id]: { ...prev[item.id], playing: false } })), item.durationMs);
       if (soundsOn && !quiet) {
         playSound(item.sound);
-        // The surprise says hello once it is out of its hideout; not while looking for a sound or a thing, it would
+        // The surprise says hello once it is out of its hideout; not while looking for something, it would
         // mislead, and not at bedtime, where a bark would wake everyone up.
         if (surprise !== undefined && !questMode && !bedtime) later(() => playSound(SURPRISES[surprise].sound), peekTimes(item).delayMs + 300);
       }
@@ -381,18 +385,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     [later, soundsOn, nextSurprise, questMode, bedtime],
   );
 
-  /** Asks the question; a sound riddle plays its sound first and then asks "Wer macht das?". */
+  /** Asks the question (again). */
   const ask = useCallback(
     (quest: Quest, queue = false) => {
       lastQuestion.current = performance.now();
-      if (!quest.sound) {
-        say(quest.question, queue);
-        return;
-      }
-      playSound(quest.sound);
-      later(() => say(quest.question, true), RIDDLE_QUESTION_MS);
+      say(quest.question, queue);
     },
-    [say, later],
+    [say],
   );
 
   const newQuestion = useCallback(
@@ -472,6 +471,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const startOver = () => {
     discoveredRef.current = new Set();
     setDiscovered(discoveredRef.current);
+    setDabs([]);
     setNight(false);
   };
 
@@ -494,6 +494,19 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     if (discoveredRef.current.size !== scene.items.length) return;
     if (bedtime) later(goodNight, PARTY_AFTER_MS);
     else if (settings.goal) later(party, PARTY_AFTER_MS);
+  };
+
+  /**
+   * Colour mode: the background gets its colour back in a big round patch
+   * around the tap, so the houses, trees and hills that don't move can be
+   * painted too. A dab right on top of an earlier one adds nothing.
+   */
+  const paint = (clientX: number, clientY: number) => {
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!colouring || !matrix) return;
+    const { x, y } = new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+    const near = (scene.width * PAINT_RADIUS) / 4;
+    setDabs((prev) => (prev.some((d) => Math.hypot(d.x - x, d.y - y) < near) ? prev : [...prev, { x, y }]));
   };
 
   /** Chain reaction: the items after this one react one by one, each telling its part of the story. */
@@ -603,6 +616,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         if (item.hideout) say(`Guck-guck! ${SURPRISES[lastSurprise.current.get(item.id)!].found}`, true);
       }
       else if (how !== "hover") funBurst(x, y);
+      paint(x, y);
       discover(item, x, y);
       if (started) {
         runChain(item);
@@ -641,17 +655,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     misses.current++;
     if (hintsOn && misses.current >= HINT_AFTER_MISSES) setHint(true);
     lastQuestion.current = performance.now();
-    if (!quest.sound) {
-      say(`Das ${verb(item)} ${item.name}. ${quest.question}`);
-      return;
-    }
-    say(`Das ${verb(item)} ${item.name}. Hör noch mal!`);
-    if (riddleRepeat.current) return;
-    riddleRepeat.current = true;
-    later(() => {
-      riddleRepeat.current = false;
-      if (questRef.current === quest && !celebrating.current) playSound(quest.sound!);
-    }, RIDDLE_REPEAT_MS);
+    say(`Das ${verb(item)} ${item.name}. ${quest.question}`);
   };
 
   // The key handler is set up once; this way it always calls the current activate.
@@ -678,6 +682,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const onBackgroundPointer = (e: PointerEvent) => {
     interacted();
     funBurst(e.clientX, e.clientY);
+    paint(e.clientX, e.clientY);
   };
 
   // Hover mode: whatever is under the mouse, or under a finger sliding over the
@@ -766,6 +771,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
   const greyFilter = `url(#${greyId})`;
+  // The grey copy of the background, with holes where it was painted.
+  const greyCopy = { filter: greyFilter, mask: `url(#${svgId}-paint)` };
   const sceneClass = [
     "scene",
     settings.ambient && "lively",
@@ -797,11 +804,23 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
                 <feFuncB type="linear" slope={GREY_SLOPE} intercept={1 - GREY_SLOPE} />
               </feComponentTransfer>
             </filter>
+            <radialGradient id={`${svgId}-dab`}>
+              <stop offset="0.6" stopColor="#000" />
+              <stop offset="1" stopColor="#000" stopOpacity="0" />
+            </radialGradient>
+            <mask id={`${svgId}-paint`} maskUnits="userSpaceOnUse" x={-scene.width} y={-scene.height} width={3 * scene.width} height={3 * scene.height}>
+              <rect x={-scene.width} y={-scene.height} width={3 * scene.width} height={3 * scene.height} fill="#fff" />
+              {dabs.map(({ x, y }, i) => (
+                <circle key={i} className="scene-dab" cx={x} cy={y} r={scene.width * PAINT_RADIUS} fill={`url(#${svgId}-dab)`} />
+              ))}
+            </mask>
           </defs>
         )}
-        <g filter={grey ? greyFilter : undefined}>
+        {/* Colour mode: the picture in colour, and its grey copy on top until it is all painted. */}
+        <g id={`${svgId}-bg`}>
           <scene.Background />
         </g>
+        {grey && <use href={`#${svgId}-bg`} {...greyCopy} />}
         {items.map((item, i) => {
           const play = plays[item.id];
           const place = item.place;
@@ -847,8 +866,11 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           );
         })}
         {scene.Overlay && (
-          <g className="scene-overlay" filter={grey ? greyFilter : undefined}>
-            <scene.Overlay />
+          <g className="scene-overlay">
+            <g id={`${svgId}-overlay`}>
+              <scene.Overlay />
+            </g>
+            {grey && <use href={`#${svgId}-overlay`} {...greyCopy} />}
           </g>
         )}
         {exits.map((exit) => (
@@ -879,7 +901,6 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           }}
         >
           {quest.item && <Thumbnail item={quest.item} />}
-          {quest.sound && <span className="find-emoji">🔊</span>}
           {quest.emoji && <span className="find-emoji">{quest.emoji}</span>}
           <span>{quest.question}</span>
           {quest.needed > 1 && (

@@ -72,8 +72,8 @@ describe.each(SCENES.map((scene) => [scene.id, scene] as const))("scene %s", (_,
     expect(wished.filter((key, i) => wished.indexOf(key) !== i)).toEqual([]);
   });
 
-  test("questions and riddles talk about the item with the right verb", () => {
-    for (const mode of ["find", "sounds", "questions"] as const) {
+  test("questions talk about the item with the right verb", () => {
+    for (const mode of ["find", "questions"] as const) {
       for (const quest of questsFor(mode, scene)) {
         expect(quest.answers.length, quest.id).toBeGreaterThan(0);
         for (const item of quest.answers) {

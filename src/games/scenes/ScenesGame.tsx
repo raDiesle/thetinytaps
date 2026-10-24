@@ -33,11 +33,10 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       backHref="/bilder/"
       backLabel="Alle Bilder"
       modes={[
-        { id: "explore", emoji: "👆", title: "Entdecken" },
-        { id: "find", emoji: "🔍", title: "Suchen" },
-        { id: "sounds", emoji: "🔊", title: "Geräusch-Rätsel" },
-        { id: "questions", emoji: "❓", title: "Fragen" },
         { id: "colour", emoji: "🖍️", title: "Ausmalen" },
+        { id: "find", emoji: "🔍", title: "Suchen" },
+        { id: "questions", emoji: "❓", title: "Fragen" },
+        { id: "explore", emoji: "👆", title: "Freies Entdecken" },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as SceneMode })}
@@ -68,7 +67,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               onChange={(roads) => update({ roads })}
             />
             <Toggle
-              label="Geräusch-Rätsel und Fragen: Tipp zeigen, wenn es länger dauert"
+              label="Fragen: Tipp zeigen, wenn es länger dauert"
               checked={settings.hints}
               onChange={(hints) => update({ hints })}
             />

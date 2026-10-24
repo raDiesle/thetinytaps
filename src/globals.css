@@ -2213,6 +2213,19 @@ kbd {
   pointer-events: none;
 }
 
+/* Colour mode: a dab of paint spreads out where the background was tapped. */
+.scene-dab {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scene-dab-grow 0.35s ease-out;
+}
+
+@keyframes scene-dab-grow {
+  from {
+    transform: scale(0.2);
+  }
+}
+
 .scene-shadow {
   fill: #3d405b;
   opacity: 0.14;
@@ -2414,6 +2427,7 @@ kbd {
   gap: 14px;
   padding: 8px 28px 8px 8px;
   border: 0;
+  border-radius: 36px;
   color: inherit;
   font-family: inherit;
   font-size: clamp(1.3rem, 3.5vw, 2.2rem);
@@ -2421,11 +2435,13 @@ kbd {
   animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* Find mode: the thing to look for, big and framed, so it can be recognised without reading. */
 .find-thumb {
-  width: min(16vh, 120px);
-  height: min(12vh, 90px);
-  padding: 6px;
-  border-radius: 99px;
+  width: min(34vh, 260px);
+  height: min(25vh, 190px);
+  padding: 10px;
+  border: 5px solid var(--accent);
+  border-radius: 28px;
   background: #e3f6ff;
 }
 
@@ -2445,7 +2461,7 @@ kbd {
   font-weight: 800;
 }
 
-/* Sound riddle and questions: a big symbol instead of the item's picture. */
+/* Questions: a big symbol instead of the item's picture. */
 .find-emoji {
   display: grid;
   place-items: center;
