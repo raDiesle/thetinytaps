@@ -118,7 +118,12 @@ export function Schubkarre() {
       ].map(([cx, cy, r], i) => (
         <g key={cx} className="bh-karre-pumpkin" style={nth(i)}>
           <ellipse cx={cx} cy={cy} rx={r} ry={r * 0.82} fill="#f77f00" />
-          <path d={`M${cx - r * 0.4} ${cy - r * 0.7} Q${cx - r * 0.55} ${cy} ${cx - r * 0.4} ${cy + r * 0.7} M${cx + r * 0.4} ${cy - r * 0.7} Q${cx + r * 0.55} ${cy} ${cx + r * 0.4} ${cy + r * 0.7}`} stroke="#d65f00" strokeWidth="3" fill="none" />
+          <path
+            d={`M${cx - r * 0.4} ${cy - r * 0.7} Q${cx - r * 0.55} ${cy} ${cx - r * 0.4} ${cy + r * 0.7} M${cx + r * 0.4} ${cy - r * 0.7} Q${cx + r * 0.55} ${cy} ${cx + r * 0.4} ${cy + r * 0.7}`}
+            stroke="#d65f00"
+            strokeWidth="3"
+            fill="none"
+          />
           <path d={`M${cx} ${cy - r * 0.8} q2 -10 8 -12`} stroke="#6a994e" strokeWidth="5" strokeLinecap="round" fill="none" />
         </g>
       ))}

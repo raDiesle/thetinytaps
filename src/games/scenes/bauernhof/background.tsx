@@ -70,7 +70,11 @@ function Field() {
       <path d={`M${FIELD_X} ${bottom} L${towardsHorizon(FIELD_X, bottom, top)} ${top} H1600 V${bottom} Z`} fill="url(#bh-field)" />
       <path d={furrows.join(" ")} stroke="#e9b949" strokeWidth="3" />
       {/* Already harvested strip behind the combine */}
-      <path d={`M1340 ${bottom} L${towardsHorizon(1340, bottom, top)} ${top} H${towardsHorizon(1430, bottom, top)} L1430 ${bottom} Z`} fill="#e6cf8f" opacity="0.8" />
+      <path
+        d={`M1340 ${bottom} L${towardsHorizon(1340, bottom, top)} ${top} H${towardsHorizon(1430, bottom, top)} L1430 ${bottom} Z`}
+        fill="#e6cf8f"
+        opacity="0.8"
+      />
     </g>
   );
 }
@@ -154,7 +158,13 @@ function Pond() {
     <g>
       <ellipse cx={cx} cy={cy + 4} rx={rx + 14} ry={ry + 8} fill="#95d5b2" />
       <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#bh-pond)" />
-      <path d={`M${cx - 150} ${cy - 20} h60 M${cx + 30} ${cy - 30} h50 M${cx - 80} ${cy + 20} h40`} stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.6" />
+      <path
+        d={`M${cx - 150} ${cy - 20} h60 M${cx + 30} ${cy - 30} h50 M${cx - 80} ${cy + 20} h40`}
+        stroke="#fff"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
       {pads.map(([x, y]) => (
         <g key={x} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
           <path d="M-26 0 A26 8 0 1 0 0 -8 L-2 0 Z" fill="#52b788" />
@@ -166,7 +176,13 @@ function Pond() {
       </g>
       {/* Reeds on the left bank */}
       <g transform={`translate(${cx - rx + 6} ${cy - 6}) scale(${depthScale(cy)})`}>
-        <path d="M-8 0 Q-12 -60 -20 -110 M0 0 V-120 M8 0 Q14 -50 24 -96 M-16 0 Q-26 -30 -40 -60" stroke="#40916c" strokeWidth="5" fill="none" strokeLinecap="round" />
+        <path
+          d="M-8 0 Q-12 -60 -20 -110 M0 0 V-120 M8 0 Q14 -50 24 -96 M-16 0 Q-26 -30 -40 -60"
+          stroke="#40916c"
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
         <rect x="-4" y="-130" width="8" height="26" rx="4" fill="#7f5539" />
         <rect x="-24" y="-118" width="8" height="24" rx="4" fill="#7f5539" />
       </g>

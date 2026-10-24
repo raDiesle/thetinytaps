@@ -12,16 +12,13 @@ export const STOP_GO: Movement[] = [
     bodyParts: ["arms", "legs", "hips", "torso"],
     bodyMovement: "Das Kind tanzt frei, solange Musik spielt, und bleibt ganz still stehen wie eine Statue, sobald die Musik stoppt.",
     startingPose: "Locker stehen, bereit zum Tanzen.",
-    movementSteps: [
-      "Musik an – tanzen!",
-      "Musik aus – einfrieren!",
-      "Musik an – weitertanzen!",
-    ],
+    movementSteps: ["Musik an – tanzen!", "Musik aus – einfrieren!", "Musik an – weitertanzen!"],
     durationSeconds: 20,
     repetitions: 3,
     instruction: "Tanz – und stopp!",
     motion: "freeze",
-    demonstration: "Die Figur tanzt locker zur Musik, hebt den Finger, und wenn die Musik aufhört, erstarrt sie übertrieben in einer lustigen Pose und blinzelt dem Kind zu. Dann spielen beide zusammen, erst mit langen, später mit kürzeren Tanzphasen.",
+    demonstration:
+      "Die Figur tanzt locker zur Musik, hebt den Finger, und wenn die Musik aufhört, erstarrt sie übertrieben in einer lustigen Pose und blinzelt dem Kind zu. Dann spielen beide zusammen, erst mit langen, später mit kürzeren Tanzphasen.",
     scenario: {
       world: "magic_castle",
       setup: "Im Burgsaal tanzen Ritter und Prinzessinnen, ein Zauberer spielt Musik.",
@@ -46,10 +43,7 @@ export const STOP_GO: Movement[] = [
       higherEnergy: "Kürzere Tanz- und Stopp-Phasen nacheinander.",
     },
     needs: { jump: false, space: "medium", balance: false },
-    safetyNotes: [
-      "Rund um das Kind Platz zum Tanzen freiräumen.",
-      "Wackeln beim Einfrieren ist völlig in Ordnung – jede Statue ist schön.",
-    ],
+    safetyNotes: ["Rund um das Kind Platz zum Tanzen freiräumen.", "Wackeln beim Einfrieren ist völlig in Ordnung – jede Statue ist schön."],
     tags: ["freeze", "dance", "self_control", "music", "listening"],
   },
   {
@@ -62,16 +56,13 @@ export const STOP_GO: Movement[] = [
     bodyParts: ["legs", "knees", "feet", "arms"],
     bodyMovement: "Anders als bei der Statue gibt hier ein Bild das Zeichen: Bei Grün marschiert das Kind auf der Stelle, bei Rot steht es ruhig still.",
     startingPose: "Gerade stehen, Arme an der Seite.",
-    movementSteps: [
-      "Grün – marschieren!",
-      "Rot – stehen bleiben.",
-      "Wieder grün – weiter!",
-    ],
+    movementSteps: ["Grün – marschieren!", "Rot – stehen bleiben.", "Wieder grün – weiter!"],
     durationSeconds: 18,
     repetitions: 3,
     instruction: "Grün: geh! Rot: steh!",
     motion: "march",
-    demonstration: "Die Figur zeigt auf die Ampel, marschiert bei Grün langsam mit hohen Knien und bleibt bei Rot übertrieben stehen, mit der Hand wie ein Stoppschild. Danach marschiert sie mit dem Kind und schaut dabei immer wieder zur Ampel.",
+    demonstration:
+      "Die Figur zeigt auf die Ampel, marschiert bei Grün langsam mit hohen Knien und bleibt bei Rot übertrieben stehen, mit der Hand wie ein Stoppschild. Danach marschiert sie mit dem Kind und schaut dabei immer wieder zur Ampel.",
     scenario: {
       world: "toy_town",
       setup: "In der Spielzeugstadt gehen alle über die Straße, eine große Ampel regelt den Weg.",
@@ -96,9 +87,7 @@ export const STOP_GO: Movement[] = [
       higherEnergy: "Bei Grün mit hohen Knien und schwingenden Armen marschieren.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Auf der Stelle marschieren, nicht durch den Raum laufen.",
-    ],
+    safetyNotes: ["Auf der Stelle marschieren, nicht durch den Raum laufen."],
     tags: ["traffic_light", "march", "colors", "self_control", "stop_go"],
   },
   {
@@ -121,7 +110,8 @@ export const STOP_GO: Movement[] = [
     repetitions: 2,
     instruction: "Psst, ganz leise!",
     motion: "tiptoe",
-    demonstration: "Die Figur legt den Finger an den Mund, flüstert „Psst“ zum Kind und schleicht ganz langsam auf Zehenspitzen auf der Stelle. Als der Riese gähnt, erstarrt sie mit großen Augen, dann geht es leise weiter – gemeinsam mit dem Kind.",
+    demonstration:
+      "Die Figur legt den Finger an den Mund, flüstert „Psst“ zum Kind und schleicht ganz langsam auf Zehenspitzen auf der Stelle. Als der Riese gähnt, erstarrt sie mit großen Augen, dann geht es leise weiter – gemeinsam mit dem Kind.",
     scenario: {
       world: "cloud_world",
       setup: "Auf einer großen Wolke schläft ein freundlicher, dicker Riese, hinter ihm liegt ein goldener Ball.",
@@ -145,10 +135,7 @@ export const STOP_GO: Movement[] = [
       seated: "Im Sitzen leise mit den Fingern auf den Knien schleichen und still halten.",
     },
     needs: { jump: false, space: "small", balance: true },
-    safetyNotes: [
-      "Zehenspitzen nur kurz; gern an einer Hand oder Stuhllehne festhalten.",
-      "Der Riese ist lieb und wird nie böse – kein Erschrecken.",
-    ],
+    safetyNotes: ["Zehenspitzen nur kurz; gern an einer Hand oder Stuhllehne festhalten.", "Der Riese ist lieb und wird nie böse – kein Erschrecken."],
     tags: ["tiptoe", "quiet", "freeze", "self_control", "listening"],
   },
   {
@@ -159,19 +146,16 @@ export const STOP_GO: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["arms", "torso", "knees", "legs"],
-    bodyMovement: "Das Kind steht erst ganz steif und still wie ein Schneemann und sinkt dann, wenn die Sonne kommt, ganz langsam zusammen bis in die Hocke oder ins Sitzen.",
+    bodyMovement:
+      "Das Kind steht erst ganz steif und still wie ein Schneemann und sinkt dann, wenn die Sonne kommt, ganz langsam zusammen bis in die Hocke oder ins Sitzen.",
     startingPose: "Steif und gerade stehen, Arme leicht zur Seite wie Stöcke.",
-    movementSteps: [
-      "Steif stehen wie ein Schneemann.",
-      "Die Sonne kommt.",
-      "Ganz langsam zusammensinken.",
-      "Unten ausruhen.",
-    ],
+    movementSteps: ["Steif stehen wie ein Schneemann.", "Die Sonne kommt.", "Ganz langsam zusammensinken.", "Unten ausruhen."],
     durationSeconds: 18,
     repetitions: 2,
     instruction: "Schmilz ganz langsam!",
     motion: "melt",
-    demonstration: "Die Figur stellt sich steif hin und guckt starr, dann zeigt sie auf die Sonne und sinkt dem Kind zugewandt ganz langsam zusammen, mit einem langen „Schhhh…“. Beim zweiten Mal schmelzen beide gemeinsam.",
+    demonstration:
+      "Die Figur stellt sich steif hin und guckt starr, dann zeigt sie auf die Sonne und sinkt dem Kind zugewandt ganz langsam zusammen, mit einem langen „Schhhh…“. Beim zweiten Mal schmelzen beide gemeinsam.",
     scenario: {
       world: "winter_forest",
       setup: "Im Winterwald steht ein Schneemann, der Frühling kommt.",
@@ -195,10 +179,7 @@ export const STOP_GO: Movement[] = [
       seated: "Im Sitzen steif werden und dann langsam nach vorn zusammensinken.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Langsam absinken, nicht fallen lassen.",
-      "Gut als ruhiger Abschluss nach wilden Bewegungen.",
-    ],
+    safetyNotes: ["Langsam absinken, nicht fallen lassen.", "Gut als ruhiger Abschluss nach wilden Bewegungen."],
     tags: ["melt", "freeze", "calm", "winter", "cool_down"],
   },
 ];

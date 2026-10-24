@@ -154,8 +154,7 @@ const FOAM: Vec3[] = [
 const fmt = (p: { x: number; y: number }) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
 
 function drawBox(box: Box, pose: Pose, w: Vec3, project: Projector, key: number) {
-  const corner = (su: number, sw: number, sb: number) =>
-    project.point(add(pose.at, scale(add(scale(pose.u, su), add(scale(w, sw), scale(pose.b, sb))), SIZE)));
+  const corner = (su: number, sw: number, sb: number) => project.point(add(pose.at, scale(add(scale(pose.u, su), add(scale(w, sw), scale(pose.b, sb))), SIZE)));
   const [u0, u1] = box.u;
   const [w0, w1] = box.w;
   const [b0, b1] = box.b;

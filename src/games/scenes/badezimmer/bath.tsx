@@ -61,8 +61,17 @@ export function Badewanne() {
       ))}
       {/* Body */}
       <path d="M-266 -206 H266 Q264 -72 226 -46 Q204 -30 168 -30 H-168 Q-204 -30 -226 -46 Q-264 -72 -266 -206 Z" fill="#f8fbff" />
-      <path d="M-260 -124 Q-252 -64 -222 -48 Q-200 -34 -168 -34 H168 Q200 -34 222 -48 Q252 -64 260 -124 Q246 -82 196 -72 H-196 Q-246 -82 -260 -124 Z" fill="#dbe7f0" />
-      <path d="M-238 -150 q20 -12 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t36 0" stroke="#a5d8ff" strokeWidth="7" strokeLinecap="round" fill="none" />
+      <path
+        d="M-260 -124 Q-252 -64 -222 -48 Q-200 -34 -168 -34 H168 Q200 -34 222 -48 Q252 -64 260 -124 Q246 -82 196 -72 H-196 Q-246 -82 -260 -124 Z"
+        fill="#dbe7f0"
+      />
+      <path
+        d="M-238 -150 q20 -12 40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t40 0 t36 0"
+        stroke="#a5d8ff"
+        strokeWidth="7"
+        strokeLinecap="round"
+        fill="none"
+      />
       <path d="M-240 -186 Q-238 -124 -206 -90" stroke="#fff" strokeWidth="10" strokeLinecap="round" fill="none" />
       <rect x="-272" y="-216" width="544" height="18" rx="9" fill="#fff" stroke="#d0dde8" strokeWidth="3" />
       <Splash x={-20} y={-232} count={6} spread={60} className="bz-wanne-splash" />

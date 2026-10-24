@@ -136,7 +136,10 @@ export function Kuckucksuhr() {
       {[480, 510].map((x, i) => (
         <g key={x} className="gn-kuckuck-weight" style={{ ...nth(i), transformOrigin: `${x}px 160px` }}>
           <path d={`M${x} 158 V${206 + i * 14}`} stroke="#adb5bd" strokeWidth="2" strokeDasharray="3 2" />
-          <path d={`M${x - 7} ${206 + i * 14} Q${x - 8} ${226 + i * 14} ${x} ${232 + i * 14} Q${x + 8} ${226 + i * 14} ${x + 7} ${206 + i * 14} Z`} fill="#8d6e63" />
+          <path
+            d={`M${x - 7} ${206 + i * 14} Q${x - 8} ${226 + i * 14} ${x} ${232 + i * 14} Q${x + 8} ${226 + i * 14} ${x + 7} ${206 + i * 14} Z`}
+            fill="#8d6e63"
+          />
         </g>
       ))}
       <g className="gn-kuckuck-pendel" style={{ transformOrigin: "495px 156px" }}>

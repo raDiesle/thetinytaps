@@ -14,7 +14,21 @@ export function Lid({ cx, cy, r, fill }: { cx: number; cy: number; r: number; fi
 }
 
 /** Little hearts above (x, y) that rise and fade while the item plays. */
-export function Hearts({ x, y, count = 3, spread = 30, r = 12, colour = "#ff6b8b" }: { x: number; y: number; count?: number; spread?: number; r?: number; colour?: string }) {
+export function Hearts({
+  x,
+  y,
+  count = 3,
+  spread = 30,
+  r = 12,
+  colour = "#ff6b8b",
+}: {
+  x: number;
+  y: number;
+  count?: number;
+  spread?: number;
+  r?: number;
+  colour?: string;
+}) {
   return (
     <g className="ka-hearts" fill={colour}>
       {Array.from({ length: count }, (_, i) => (
@@ -25,7 +39,21 @@ export function Hearts({ x, y, count = 3, spread = 30, r = 12, colour = "#ff6b8b
 }
 
 /** Sparkles around (x, y) that twinkle while the item plays. */
-export function Sparkles({ x, y, count = 3, spread = 30, r = 10, colour = "#ffd43b" }: { x: number; y: number; count?: number; spread?: number; r?: number; colour?: string }) {
+export function Sparkles({
+  x,
+  y,
+  count = 3,
+  spread = 30,
+  r = 10,
+  colour = "#ffd43b",
+}: {
+  x: number;
+  y: number;
+  count?: number;
+  spread?: number;
+  r?: number;
+  colour?: string;
+}) {
   return (
     <g className="ka-sparkles" fill={colour}>
       {Array.from({ length: count }, (_, i) => (
@@ -69,7 +97,15 @@ export function Bubbles({ x, y, count = 3, spread = 14, r = 7 }: { x: number; y:
     <g className="ka-bubbles">
       {Array.from({ length: count }, (_, i) => (
         <g key={i} style={nth(i)}>
-          <circle cx={x + (i - (count - 1) / 2) * spread} cy={y - (i % 2) * spread * 0.7} r={r - (i % 3) * 1.5} fill="#e7f5ff" fillOpacity="0.6" stroke="#a5d8ff" strokeWidth="2" />
+          <circle
+            cx={x + (i - (count - 1) / 2) * spread}
+            cy={y - (i % 2) * spread * 0.7}
+            r={r - (i % 3) * 1.5}
+            fill="#e7f5ff"
+            fillOpacity="0.6"
+            stroke="#a5d8ff"
+            strokeWidth="2"
+          />
           <circle cx={x + (i - (count - 1) / 2) * spread - r * 0.35} cy={y - (i % 2) * spread * 0.7 - r * 0.35} r={r * 0.25} fill="#fff" />
         </g>
       ))}

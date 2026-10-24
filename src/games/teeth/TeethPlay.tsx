@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { useDevice } from "@/lib/device";
 import { playChime, playCountNote, playPoof, playSqueak, playTuneNote } from "@/lib/sfx";
@@ -23,6 +23,8 @@ const TURN_MS = 1100;
 const MOUTH_MS = 1800;
 /** How long the arrows on the lips show after the mouth has to open or close. */
 const ACTION_MS = 3500;
+/** Dragging on the progress bar stops this far before the end. */
+const SEEK_END_MS = 1000;
 
 /** Before the clock starts: get the brush, toothpaste on, and meet the monsters. */
 type Prelude = "brush" | "paste" | "monsters";
@@ -120,7 +122,8 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
  * A brushing timer that needs no tapping: first it shows fetching the brush
  * and putting toothpaste on, then the mirror shows where to brush next
  * (chewing surfaces, outside, inside), and the sugar monsters there vanish
- * one by one. Arrow keys skip ahead or back, Space pauses.
+ * one by one. Arrow keys skip ahead or back, Space or the pause button pauses,
+ * and tapping the progress bar jumps there.
  */
 export function TeethPlay({ speechLang, settings }: { speechLang: string; settings: TeethSettings }) {
   const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now() }));
@@ -240,19 +243,33 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     // Only when pausing or going on.
   }, [paused]);
 
+  /** Move the clock to `at` ms after the start; a paused clock stays paused. */
+  const seek = useCallback((at: number) => {
+    const t = performance.now();
+    setNow(t);
+    setClock((c) => ({ banked: at, since: c.since === null ? null : t }));
+  }, []);
+
   /** Jump to the start of a part: the prelude ones first, then the steps, then the end. */
   const jumpTo = useCallback(
-    (target: number) => {
-      const t = performance.now();
-      const at =
+    (target: number) =>
+      seek(
         target < prelude.length
           ? prelude.slice(0, target).reduce((sum, p) => sum + PRELUDE[p].ms, 0)
-          : introMs + Math.min(target - prelude.length, STEPS.length) * stepMs;
-      setNow(t);
-      setClock((c) => ({ banked: at, since: c.since === null ? null : t }));
-    },
-    [prelude, introMs, stepMs],
+          : introMs + Math.min(target - prelude.length, STEPS.length) * stepMs,
+      ),
+    [seek, prelude, introMs, stepMs],
   );
+
+  /** Tapping or dragging on the progress bar jumps to that point of the brushing. */
+  const seekFromPointer = (e: PointerEvent<HTMLDivElement>) => {
+    const segments = [...e.currentTarget.children];
+    const i = segments.findIndex((s, k) => k === segments.length - 1 || e.clientX < s.getBoundingClientRect().right);
+    const rect = segments[i].getBoundingClientRect();
+    const k = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    // Stop just short of the end, so dragging to the right edge doesn't finish at once.
+    seek(introMs + Math.min((i + k) * stepMs, totalMs - SEEK_END_MS));
+  };
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -273,8 +290,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   // When the mouth has to open or close, the picture does it slowly and arrows on the lips show the way.
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
   const mouthMoves = step !== null && step.mouth !== mouthBefore;
-  const action: MouthAction | null =
-    step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
+  const action: MouthAction | null = step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
   const target = step?.view ?? GRIN_VIEW;
   const view = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
@@ -341,9 +357,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             view={view}
             zone={step && { surface: step.surface, teeth: step.teeth }}
             monsters={spots}
-            brush={
-              step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }
-            }
+            brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
             happy={done}
             daytime={daytime}
             action={action}
@@ -356,22 +370,41 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       {done ? (
         <div className="teeth-end">
           {settings.week && <Week log={week} today={new Date()} now={daytime} />}
-          <button className="teeth-again" onClick={again}>
+          <button type="button" className="teeth-again" onClick={again}>
             🔁 Nochmal
           </button>
         </div>
       ) : (
-        <div className="teeth-progress" aria-hidden>
-          {STEPS.map((s, i) => (
-            <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
-              <span style={{ width: `${Math.max(0, Math.min(1, (brushed - i * stepMs) / stepMs)) * 100}%` }} />
-            </span>
-          ))}
+        <div className="teeth-controls">
+          <button type="button" className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>
+            {paused ? "▶️" : "⏸️"}
+          </button>
+          <div
+            className="teeth-progress"
+            role="slider"
+            aria-label="Fortschritt"
+            aria-valuemin={0}
+            aria-valuemax={Math.round(totalMs / 1000)}
+            aria-valuenow={Math.round(Math.max(0, Math.min(brushed, totalMs)) / 1000)}
+            onPointerDown={(e) => {
+              e.currentTarget.setPointerCapture(e.pointerId);
+              seekFromPointer(e);
+            }}
+            onPointerMove={(e) => {
+              if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e);
+            }}
+          >
+            {STEPS.map((s, i) => (
+              <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
+                <span style={{ width: `${Math.max(0, Math.min(1, (brushed - i * stepMs) / stepMs)) * 100}%` }} />
+              </span>
+            ))}
+          </div>
         </div>
       )}
 
       {paused && (
-        <button className="teeth-paused" onClick={togglePause}>
+        <button type="button" className="teeth-paused" onClick={togglePause}>
           <span className="teeth-paused-icon" aria-hidden>
             ⏸️
           </span>

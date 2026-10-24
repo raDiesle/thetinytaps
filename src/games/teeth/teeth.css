@@ -193,10 +193,36 @@
     twinkle 1.6s ease-in-out calc(var(--delay) + 0.4s) infinite;
 }
 
+/* Pause button and progress bar sit above the pause screen, so a grown-up can jump around while paused. */
+.teeth-controls {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(90vw, 780px);
+}
+
+.teeth-pause {
+  flex: none;
+  width: clamp(44px, 8vmin, 60px);
+  height: clamp(44px, 8vmin, 60px);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  font-size: clamp(1.2rem, 4vmin, 1.8rem);
+  line-height: 1;
+  cursor: pointer;
+}
+
 .teeth-progress {
+  flex: 1;
   display: flex;
   gap: 10px;
-  width: min(90vw, 720px);
+  /* Room above and below the thin bar, so a finger hits it easily. */
+  padding: 12px 0;
+  cursor: pointer;
+  touch-action: none;
 }
 
 .teeth-segment {
@@ -629,12 +655,24 @@
   animation: pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
-.teeth-day:nth-child(2) { animation-delay: 0.05s; }
-.teeth-day:nth-child(3) { animation-delay: 0.1s; }
-.teeth-day:nth-child(4) { animation-delay: 0.15s; }
-.teeth-day:nth-child(5) { animation-delay: 0.2s; }
-.teeth-day:nth-child(6) { animation-delay: 0.25s; }
-.teeth-day:nth-child(7) { animation-delay: 0.3s; }
+.teeth-day:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.teeth-day:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.teeth-day:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.teeth-day:nth-child(5) {
+  animation-delay: 0.2s;
+}
+.teeth-day:nth-child(6) {
+  animation-delay: 0.25s;
+}
+.teeth-day:nth-child(7) {
+  animation-delay: 0.3s;
+}
 
 .teeth-day.today {
   outline: 5px solid var(--sunshine);

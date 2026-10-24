@@ -114,7 +114,11 @@ export function Aquarium() {
           <rect x={x} y="-178" width="124" height="172" rx="6" fill="#e9b872" stroke="#c88b3a" strokeWidth="3" />
           <rect x={x + 12} y="-166" width="100" height="148" rx="5" fill="none" stroke="#fff" strokeWidth="3" opacity="0.4" />
           <circle cx={knob} cy="-92" r="7" fill="#ffd166" stroke="#e9a23b" strokeWidth="2" />
-          <path d={i ? "M78 -112 q14 -8 28 0 q-14 8 -28 0 Z M106 -112 l10 -8 v16 Z" : "M-100 -112 q14 -8 28 0 q-14 8 -28 0 Z M-72 -112 l10 -8 v16 Z"} fill="#ffa94d" opacity="0.8" />
+          <path
+            d={i ? "M78 -112 q14 -8 28 0 q-14 8 -28 0 Z M106 -112 l10 -8 v16 Z" : "M-100 -112 q14 -8 28 0 q-14 8 -28 0 Z M-72 -112 l10 -8 v16 Z"}
+            fill="#ffa94d"
+            opacity="0.8"
+          />
         </g>
       ))}
       {/* The tank */}
@@ -124,7 +128,13 @@ export function Aquarium() {
       <path d="M-118 -202 Q-80 -214 -40 -204 Q0 -196 40 -206 Q80 -214 118 -202 V-186 H-118 Z" fill="#ffe066" />
       {[-96, -70, 74, 100].map((x, i) => (
         <g key={x} className="ka-aqua-plant" style={{ ...nth(i), transformOrigin: `${x}px -200px` }}>
-          <path d={`M${x} -200 Q${x - 14} -236 ${x} -262 Q${x + 12} -286 ${x - 4} -300`} stroke={i % 2 ? "#40c057" : "#69db7c"} strokeWidth="9" strokeLinecap="round" fill="none" />
+          <path
+            d={`M${x} -200 Q${x - 14} -236 ${x} -262 Q${x + 12} -286 ${x - 4} -300`}
+            stroke={i % 2 ? "#40c057" : "#69db7c"}
+            strokeWidth="9"
+            strokeLinecap="round"
+            fill="none"
+          />
         </g>
       ))}
       {/* Treasure chest; its lid pops open */}
@@ -238,7 +248,10 @@ export function Telefon() {
         <path d="M-108 -310 q10 6 4 14 q-8 6 -2 14 q8 6 0 12" stroke="#c92a2a" strokeWidth="3" fill="none" strokeLinecap="round" />
       </g>
       <g className="ka-telefon-receiver" style={{ transformOrigin: "-148px -344px" }}>
-        <path d="M-192 -344 Q-194 -362 -176 -360 H-120 Q-102 -362 -104 -344 Q-108 -336 -118 -338 L-124 -348 H-172 L-178 -338 Q-188 -336 -192 -344 Z" fill="#e03131" />
+        <path
+          d="M-192 -344 Q-194 -362 -176 -360 H-120 Q-102 -362 -104 -344 Q-108 -336 -118 -338 L-124 -348 H-172 L-178 -338 Q-188 -336 -192 -344 Z"
+          fill="#e03131"
+        />
       </g>
       <Lines x={-96} y={-360} colour="#fa5252" />
       <Lines x={-200} y={-360} dir={-1} colour="#fa5252" />
@@ -256,7 +269,13 @@ export function Aufkleber() {
     { x: 124, y: -308, c: "#b197fc", kind: "dot" },
   ];
   const shape = (x: number, y: number, kind: string, c: string, r = 10) =>
-    kind === "star" ? <path d={sparklePath(x, y, r * 1.2)} fill={c} /> : kind === "heart" ? <path d={heartPath(x, y, r)} fill={c} /> : <circle cx={x} cy={y} r={r * 0.8} fill={c} />;
+    kind === "star" ? (
+      <path d={sparklePath(x, y, r * 1.2)} fill={c} />
+    ) : kind === "heart" ? (
+      <path d={heartPath(x, y, r)} fill={c} />
+    ) : (
+      <circle cx={x} cy={y} r={r * 0.8} fill={c} />
+    );
   return (
     <>
       <g className="ka-sticker-jar" style={{ transformOrigin: "142px -300px" }}>
@@ -338,7 +357,13 @@ export function Spielkiste() {
     <>
       {/* Toys inside, hidden by the front until the lid opens */}
       <g className="ka-kiste-bunny">
-        <path d="M-50 -60 l14 -8 l-14 -8 l14 -8 l-14 -8 l14 -8 l-14 -8 l14 -8 l-14 -8 l14 -8" stroke={STEEL} strokeWidth="4" fill="none" strokeLinejoin="round" />
+        <path
+          d="M-50 -60 l14 -8 l-14 -8 l14 -8 l-14 -8 l14 -8 l-14 -8 l14 -8 l-14 -8 l14 -8"
+          stroke={STEEL}
+          strokeWidth="4"
+          fill="none"
+          strokeLinejoin="round"
+        />
         <ellipse cx="-56" cy="-188" rx="8" ry="22" fill="#fff" />
         <ellipse cx="-30" cy="-188" rx="8" ry="22" fill="#fff" />
         <ellipse cx="-56" cy="-186" rx="4" ry="14" fill="#ffc9de" />
@@ -406,35 +431,33 @@ export function Pflanze() {
 /** The rocking horse; it rocks, nods its head, its mane and tail fly. */
 export function Schaukelpferd() {
   return (
-    <>
-      <g className="ka-pferd-rock" style={{ transformOrigin: "0px -300px" }}>
-        <path d="M-170 -46 Q0 26 170 -46" stroke="#c92a2a" strokeWidth="16" strokeLinecap="round" fill="none" />
-        <path d="M-160 -40 Q0 22 160 -40" stroke="#ff8787" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
-        <path d="M-80 -150 L-96 -24 M-48 -150 L-56 -14 M48 -150 L56 -14 M80 -150 L96 -24" stroke="#e9b872" strokeWidth="16" strokeLinecap="round" />
-        <g className="ka-pferd-tail" style={{ transformOrigin: "-96px -176px" }}>
-          <path d="M-96 -176 Q-140 -170 -146 -110 Q-128 -140 -112 -134 Q-128 -120 -126 -96 Q-104 -130 -96 -160 Z" fill="#8d5a3b" />
-        </g>
-        <ellipse cx="0" cy="-168" rx="104" ry="44" fill="#ffd8a8" />
-        <path d="M-80 -190 Q0 -214 80 -190" stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.5" />
-        <path d="M-34 -204 Q0 -218 34 -204 L28 -150 H-28 Z" fill="#e03131" />
-        <circle cx="-12" cy="-144" r="7" fill="#ffd43b" />
-        <g className="ka-pferd-head" style={{ transformOrigin: "70px -190px" }}>
-          <path d="M50 -196 L92 -276 L130 -258 L96 -176 Z" fill="#ffd8a8" />
-          <g className="ka-pferd-mane" style={{ transformOrigin: "86px -270px" }}>
-            <path d="M88 -284 Q60 -270 62 -236 Q52 -220 54 -194 Q70 -214 74 -232 Q82 -252 96 -264 Z" fill="#8d5a3b" />
-          </g>
-          <ellipse cx="132" cy="-262" rx="44" ry="28" fill="#ffd8a8" transform="rotate(18 132 -262)" />
-          <ellipse cx="160" cy="-248" rx="16" ry="14" fill="#ffc078" />
-          <circle cx="164" cy="-250" r="3" fill="#8d5a3b" />
-          <path d="M102 -290 L96 -318 L118 -296 Z" fill="#ffc078" />
-          <Eye cx={128} cy={-272} r={5} />
-          <Lid cx={128} cy={-272} r={5} fill="#ffd8a8" />
-          <circle cx="140" cy="-254" r="6" fill={CHEEK} opacity="0.5" />
-          <path d="M120 -268 H146" stroke="#e03131" strokeWidth="5" strokeLinecap="round" />
-          <rect x="104" y="-246" width="30" height="8" rx="4" fill="#c88b3a" />
-        </g>
+    <g className="ka-pferd-rock" style={{ transformOrigin: "0px -300px" }}>
+      <path d="M-170 -46 Q0 26 170 -46" stroke="#c92a2a" strokeWidth="16" strokeLinecap="round" fill="none" />
+      <path d="M-160 -40 Q0 22 160 -40" stroke="#ff8787" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
+      <path d="M-80 -150 L-96 -24 M-48 -150 L-56 -14 M48 -150 L56 -14 M80 -150 L96 -24" stroke="#e9b872" strokeWidth="16" strokeLinecap="round" />
+      <g className="ka-pferd-tail" style={{ transformOrigin: "-96px -176px" }}>
+        <path d="M-96 -176 Q-140 -170 -146 -110 Q-128 -140 -112 -134 Q-128 -120 -126 -96 Q-104 -130 -96 -160 Z" fill="#8d5a3b" />
       </g>
-    </>
+      <ellipse cx="0" cy="-168" rx="104" ry="44" fill="#ffd8a8" />
+      <path d="M-80 -190 Q0 -214 80 -190" stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.5" />
+      <path d="M-34 -204 Q0 -218 34 -204 L28 -150 H-28 Z" fill="#e03131" />
+      <circle cx="-12" cy="-144" r="7" fill="#ffd43b" />
+      <g className="ka-pferd-head" style={{ transformOrigin: "70px -190px" }}>
+        <path d="M50 -196 L92 -276 L130 -258 L96 -176 Z" fill="#ffd8a8" />
+        <g className="ka-pferd-mane" style={{ transformOrigin: "86px -270px" }}>
+          <path d="M88 -284 Q60 -270 62 -236 Q52 -220 54 -194 Q70 -214 74 -232 Q82 -252 96 -264 Z" fill="#8d5a3b" />
+        </g>
+        <ellipse cx="132" cy="-262" rx="44" ry="28" fill="#ffd8a8" transform="rotate(18 132 -262)" />
+        <ellipse cx="160" cy="-248" rx="16" ry="14" fill="#ffc078" />
+        <circle cx="164" cy="-250" r="3" fill="#8d5a3b" />
+        <path d="M102 -290 L96 -318 L118 -296 Z" fill="#ffc078" />
+        <Eye cx={128} cy={-272} r={5} />
+        <Lid cx={128} cy={-272} r={5} fill="#ffd8a8" />
+        <circle cx="140" cy="-254" r="6" fill={CHEEK} opacity="0.5" />
+        <path d="M120 -268 H146" stroke="#e03131" strokeWidth="5" strokeLinecap="round" />
+        <rect x="104" y="-246" width="30" height="8" rx="4" fill="#c88b3a" />
+      </g>
+    </g>
   );
 }
 
@@ -480,23 +503,21 @@ export function Kugelbahn() {
 /** A tower of wooden blocks; it wobbles block by block and the roof hops. */
 export function Bauklotz() {
   return (
-    <>
-      <g className="ka-klotz" style={{ ...nth(0), transformOrigin: "0px 0px" }}>
-        <rect x="-72" y="-74" width="144" height="74" rx="8" fill="#fa5252" />
-        <path d={sparklePath(0, -37, 22)} fill="#fff" opacity="0.85" />
-        <g className="ka-klotz" style={{ ...nth(1), transformOrigin: "0px -74px" }}>
-          <rect x="-60" y="-140" width="120" height="66" rx="8" fill="#fcc419" />
-          <circle cx="0" cy="-107" r="20" fill="#fff" opacity="0.85" />
-          <g className="ka-klotz" style={{ ...nth(2), transformOrigin: "0px -140px" }}>
-            <rect x="-50" y="-196" width="100" height="56" rx="8" fill="#4dabf7" />
-            <path d={heartPath(0, -168, 16)} fill="#fff" opacity="0.85" />
-            <g className="ka-klotz-roof" style={{ transformOrigin: "0px -196px" }}>
-              <path d="M-52 -196 L0 -250 L52 -196 Z" fill="#51cf66" strokeLinejoin="round" stroke="#51cf66" strokeWidth="6" />
-            </g>
+    <g className="ka-klotz" style={{ ...nth(0), transformOrigin: "0px 0px" }}>
+      <rect x="-72" y="-74" width="144" height="74" rx="8" fill="#fa5252" />
+      <path d={sparklePath(0, -37, 22)} fill="#fff" opacity="0.85" />
+      <g className="ka-klotz" style={{ ...nth(1), transformOrigin: "0px -74px" }}>
+        <rect x="-60" y="-140" width="120" height="66" rx="8" fill="#fcc419" />
+        <circle cx="0" cy="-107" r="20" fill="#fff" opacity="0.85" />
+        <g className="ka-klotz" style={{ ...nth(2), transformOrigin: "0px -140px" }}>
+          <rect x="-50" y="-196" width="100" height="56" rx="8" fill="#4dabf7" />
+          <path d={heartPath(0, -168, 16)} fill="#fff" opacity="0.85" />
+          <g className="ka-klotz-roof" style={{ transformOrigin: "0px -196px" }}>
+            <path d="M-52 -196 L0 -250 L52 -196 Z" fill="#51cf66" strokeLinejoin="round" stroke="#51cf66" strokeWidth="6" />
           </g>
         </g>
       </g>
-    </>
+    </g>
   );
 }
 
@@ -558,17 +579,15 @@ export function Feuerwehr() {
 /** A big colourful ball; it bounces twice and squishes. */
 export function Ball() {
   return (
-    <>
-      <g className="ka-ball" style={{ transformOrigin: "0px 0px" }}>
-        <g className="ka-ball-spin" style={{ transformOrigin: "0px -56px" }}>
-          <circle cx="0" cy="-56" r="56" fill="#ffd43b" />
-          <path d="M0 -112 A56 56 0 0 1 56 -56 H0 Z" fill="#ff6b6b" />
-          <path d="M0 0 A56 56 0 0 1 -56 -56 H0 Z" fill="#4dabf7" />
-          <path d="M-56 -56 A56 56 0 0 1 0 -112 V-56 Z" fill="#69db7c" />
-          <circle cx="0" cy="-56" r="14" fill="#fff" />
-        </g>
-        <path d="M-34 -84 Q-22 -100 -4 -104" stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.5" />
+    <g className="ka-ball" style={{ transformOrigin: "0px 0px" }}>
+      <g className="ka-ball-spin" style={{ transformOrigin: "0px -56px" }}>
+        <circle cx="0" cy="-56" r="56" fill="#ffd43b" />
+        <path d="M0 -112 A56 56 0 0 1 56 -56 H0 Z" fill="#ff6b6b" />
+        <path d="M0 0 A56 56 0 0 1 -56 -56 H0 Z" fill="#4dabf7" />
+        <path d="M-56 -56 A56 56 0 0 1 0 -112 V-56 Z" fill="#69db7c" />
+        <circle cx="0" cy="-56" r="14" fill="#fff" />
       </g>
-    </>
+      <path d="M-34 -84 Q-22 -100 -4 -104" stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.5" />
+    </g>
   );
 }

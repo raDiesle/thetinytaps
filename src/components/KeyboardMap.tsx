@@ -9,11 +9,7 @@ const ROW_OFFSETS = [0, 0.5, 0.75, 1.25];
  */
 export function KeyboardMap({ rows, highlight, visible }: { rows: string[]; highlight?: string; visible: boolean }) {
   return (
-    <div
-      className={`keyboard-map${visible ? " shown" : ""}`}
-      style={{ "--keys": Math.max(...rows.map((r) => r.length)) } as CSSProperties}
-      aria-hidden
-    >
+    <div className={`keyboard-map${visible ? " shown" : ""}`} style={{ "--keys": Math.max(...rows.map((r) => r.length)) } as CSSProperties} aria-hidden>
       {rows.map((row, r) => (
         <div key={r} className="keyboard-map-row" style={{ "--offset": ROW_OFFSETS[r] ?? 0 } as CSSProperties}>
           {Array.from(row).map((key) => (

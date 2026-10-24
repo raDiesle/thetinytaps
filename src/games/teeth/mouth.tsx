@@ -204,7 +204,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
 
       <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} fill="#dff6ff" />
       <g clipPath="url(#mirror)">
-        <Face project={project} head={head} happy={happy} open={view.open} crumbs={daytime === "morning" && !happy} />
+        <KidFace project={project} head={head} happy={happy} open={view.open} crumbs={daytime === "morning" && !happy} />
 
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill="#5c1430" />
@@ -215,17 +215,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
             const face = toothFace(id, zone.surface);
             const at = all[id.jaw];
             if (at.facing(face.normal) <= MIN_FACING) return null;
-            return (
-              <path
-                key={toothKey(id)}
-                className="zone-glow"
-                d={facePath(face, at)}
-                fill="none"
-                stroke="#ffd23f"
-                strokeWidth={5}
-                strokeLinejoin="round"
-              />
-            );
+            return <path key={toothKey(id)} className="zone-glow" d={facePath(face, at)} fill="none" stroke="#ffd23f" strokeWidth={5} strokeLinejoin="round" />;
           })}
         </g>
 
@@ -277,26 +267,19 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
             );
           })}
 
-        {brush && brush.stops.length > 0 && (() => {
-          // Glide between the two stops either side of `at`.
-          const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
-          const next = Math.min(brush.stops.length - 1, i + 1);
-          const k = Math.min(1, Math.max(0, brush.at - i));
-          const a = anchorAt(brush.stops[i], brush.surface);
-          const b = anchorAt(brush.stops[next], brush.surface);
-          const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
-          const tooth = brush.stops[k < 0.5 ? i : next].tooth;
-          return (
-            <Brush
-              anchor={anchor}
-              surface={brush.surface}
-              tooth={tooth}
-              motion={brush.motion}
-              project={all[tooth.jaw]}
-              paused={paused}
-            />
-          );
-        })()}
+        {brush &&
+          brush.stops.length > 0 &&
+          (() => {
+            // Glide between the two stops either side of `at`.
+            const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
+            const next = Math.min(brush.stops.length - 1, i + 1);
+            const k = Math.min(1, Math.max(0, brush.at - i));
+            const a = anchorAt(brush.stops[i], brush.surface);
+            const b = anchorAt(brush.stops[next], brush.surface);
+            const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
+            const tooth = brush.stops[k < 0.5 ? i : next].tooth;
+            return <Brush anchor={anchor} surface={brush.surface} tooth={tooth} motion={brush.motion} project={all[tooth.jaw]} paused={paused} />;
+          })()}
 
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
 
@@ -306,16 +289,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
           <path d="M160 10 L178 10 L10 178 L10 160 Z" />
         </g>
       </g>
-      <rect
-        x={10}
-        y={10}
-        width={PICTURE.width - 20}
-        height={PICTURE.height - 20}
-        rx={70}
-        fill="none"
-        stroke={INK}
-        strokeWidth={14}
-      />
+      <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} fill="none" stroke={INK} strokeWidth={14} />
       <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} fill="none" stroke="#b9a8ff" strokeWidth={7} />
     </svg>
   );
@@ -372,19 +346,7 @@ const CRUMBS: [number, number, number][] = [
   [174, -50, 8],
 ];
 
-function Face({
-  project,
-  head,
-  happy,
-  open,
-  crumbs,
-}: {
-  project: Project;
-  head: Point2;
-  happy: boolean;
-  open: number;
-  crumbs: boolean;
-}) {
+function KidFace({ project, head, happy, open, crumbs }: { project: Project; head: Point2; happy: boolean; open: number; crumbs: boolean }) {
   const p = project.point;
   const feature = (x: number, y: number, z: number) => ({ at: p([x, y, z]), facing: project.facing([x / 200, 0.1, 0.95]) });
   const ears = [-1, 1].map((s) => ({ s, at: p([s * HEAD * 0.97, 70, -60]) }));
@@ -405,7 +367,16 @@ function Face({
         <circle cx={head.x} cy={head.y} r={HEAD * project.zoom} />
       </clipPath>
       {/* Hair: a fringe that moves with the head. */}
-      <ellipse clipPath="url(#head-shape)" cx={head.x} cy={head.y - 250 * project.zoom} rx={270 * project.zoom} ry={110 * project.zoom} fill="#8a5a3c" stroke={INK} strokeWidth={6} />
+      <ellipse
+        clipPath="url(#head-shape)"
+        cx={head.x}
+        cy={head.y - 250 * project.zoom}
+        rx={270 * project.zoom}
+        ry={110 * project.zoom}
+        fill="#8a5a3c"
+        stroke={INK}
+        strokeWidth={6}
+      />
       {cheeks.map(({ at, facing }, i) =>
         facing > 0 ? <ellipse key={i} cx={at.x} cy={at.y} rx={30 * squash(facing)} ry={20} fill="#ff8fa3" opacity={0.55} /> : null,
       )}
@@ -445,7 +416,20 @@ function Face({
           const { at, facing } = feature(x, -(54 + 62 * open) - below, 110 - Math.abs(x) / 4);
           if (facing <= 0) return null;
           const r = size * project.zoom * squash(facing);
-          return <rect key={i} x={at.x - r} y={at.y - r} width={2 * r} height={1.6 * r} rx={r / 2} fill="#e0a85a" stroke="#a8682a" strokeWidth={2} transform={`rotate(${i * 37} ${at.x} ${at.y})`} />;
+          return (
+            <rect
+              key={i}
+              x={at.x - r}
+              y={at.y - r}
+              width={2 * r}
+              height={1.6 * r}
+              rx={r / 2}
+              fill="#e0a85a"
+              stroke="#a8682a"
+              strokeWidth={2}
+              transform={`rotate(${i * 37} ${at.x} ${at.y})`}
+            />
+          );
         })}
     </g>
   );

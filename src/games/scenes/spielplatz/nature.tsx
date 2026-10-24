@@ -92,7 +92,17 @@ export function Blumen() {
           <circle cx={x - 3} cy={-h - 3} r="3" fill="#fff" opacity="0.7" />
         </g>
       ))}
-      <Sparkles className="sp-blumen-sparkle" spots={[[-110, -110], [50, -146], [104, -110], [-60, -136]]} r={10} fill="#fff9db" />
+      <Sparkles
+        className="sp-blumen-sparkle"
+        spots={[
+          [-110, -110],
+          [50, -146],
+          [104, -110],
+          [-60, -136],
+        ]}
+        r={10}
+        fill="#fff9db"
+      />
     </>
   );
 }

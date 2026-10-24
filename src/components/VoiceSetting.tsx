@@ -3,8 +3,7 @@ import { LANGUAGES } from "@/content/languages";
 import { onVoicesChanged, pickVoice, saveVoiceName, speak, voicesFor } from "@/lib/speech";
 
 /** "Eddy (German (Germany))" → "Eddy", "Microsoft Katja Online (Natural) - German (Germany)" → "Microsoft Katja Online (Natural)" */
-const shortName = (voice: SpeechSynthesisVoice) =>
-  voice.name.replace(/\s*(-|\()\s*(German|Deutsch|English|Englisch|Turkish|Türkisch|Polish|Polnisch).*$/i, "");
+const shortName = (voice: SpeechSynthesisVoice) => voice.name.replace(/\s*(-|\()\s*(German|Deutsch|English|Englisch|Turkish|Türkisch|Polish|Polnisch).*$/i, "");
 
 /**
  * Lets parents pick and try the voice. If the browser has no voice for the
@@ -35,11 +34,7 @@ export function VoiceSetting({ lang, sample }: { lang: string; sample: string })
   if (voices === null) return null;
   if (voices.length === 0) {
     const adjective = LANGUAGES.find((l) => l.pack.speechLang === lang)?.adjective ?? "passende";
-    return (
-      <p className="setting-note">
-        Dieser Browser hat keine {adjective} Stimme, deshalb wird nichts vorgelesen. In Chrome, Edge oder Safari klappt es.
-      </p>
-    );
+    return <p className="setting-note">Dieser Browser hat keine {adjective} Stimme, deshalb wird nichts vorgelesen. In Chrome, Edge oder Safari klappt es.</p>;
   }
 
   const choose = (name: string) => {
@@ -66,8 +61,8 @@ export function VoiceSetting({ lang, sample }: { lang: string; sample: string })
       </button>
       {lang.startsWith("de") && (
         <p className="setting-note">
-          Klingt blechern? Auf dem Mac unter Systemeinstellungen → Bedienungshilfen → Gesprochene Inhalte eine
-          bessere Stimme laden (z.&nbsp;B. „Anna (Premium)“). In Chrome klingt „Google Deutsch“ am natürlichsten.
+          Klingt blechern? Auf dem Mac unter Systemeinstellungen → Bedienungshilfen → Gesprochene Inhalte eine bessere Stimme laden (z.&nbsp;B. „Anna
+          (Premium)“). In Chrome klingt „Google Deutsch“ am natürlichsten.
         </p>
       )}
     </div>

@@ -80,7 +80,10 @@ function Window({ daytime }: { daytime: Daytime }) {
           <circle className="prep-sun" cx={x + width / 2} cy={y + 60} r={24} fill="#ffd23f" stroke={INK} strokeWidth={3} />
         )}
         {/* Far hills, so the sun has something to rise behind. */}
-        <path d={`M${x} ${y + 92} Q${x + 30} ${y + 74} ${x + 60} ${y + 90} T${x + width} ${y + 84} V${y + height} H${x} Z`} fill={evening ? "#1d4a5c" : "#8bd346"} />
+        <path
+          d={`M${x} ${y + 92} Q${x + 30} ${y + 74} ${x + 60} ${y + 90} T${x + width} ${y + 84} V${y + height} H${x} Z`}
+          fill={evening ? "#1d4a5c" : "#8bd346"}
+        />
       </g>
       <rect x={x} y={y} width={width} height={height} rx={10} fill="none" stroke="#fff" strokeWidth={10} />
       <path d={`M${x + width / 2} ${y} V${y + height} M${x} ${y + height / 2} H${x + width}`} stroke="#fff" strokeWidth={6} />

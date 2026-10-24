@@ -10,24 +10,25 @@ der Körper tut. Wo sie passiert, steht in `scenarios.ts`, und wie lange sie in 
 dauert, steht in `sequences.ts`. Die 3D-Geschichte (`../stories/`) fügt hinzu, was der Fuchs sagt
 und wie die Welt antwortet.
 
-| Datei | Inhalt |
-| --- | --- |
-| `types.ts` | Datenmodell (Bewegung, Welt, Szenario, Ablauf) |
-| `categories.ts` | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was *nicht* dazugehört |
-| `movements/*.ts` | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
-| `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
-| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–240 s lang |
-| `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
-| diese Datei | **Ergebnis E**: Qualitätskontrolle |
+| Datei                       | Inhalt                                                                                                                                          |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `types.ts`                  | Datenmodell (Bewegung, Welt, Szenario, Ablauf)                                                                                                  |
+| `categories.ts`             | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was _nicht_ dazugehört                                                                          |
+| `movements/*.ts`            | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
+| `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor                                              |
+| `sequences.ts`              | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–240 s lang                                                                      |
+| `situations.ts`             | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
+| diese Datei                 | **Ergebnis E**: Qualitätskontrolle                                                                                                              |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
 bleibt bis zum Aufräumen. Jede Bewegung nennt einen `motion`-Clip; die Clips für den Fuchs
-stehen in `../three/clips.ts` (72 Clips, keiner fehlt).
+stehen in `../three/clips/` (73 Clips, keiner fehlt): eine Datei je Körperteil (`arms.ts`, `legs.ts`,
+`body.ts`, `whole.ts`), Bausteine und Takte in `motion.ts`.
 
 ## Neue Bewegung
 
 1. In der passenden Datei unter `movements/` anlegen. Die ID ist englisch und in `snake_case`, alle Texte sind deutsch.
-2. Einen vorhandenen `motion`-Clip wählen oder in `../three/clips.ts` einen neuen bauen.
+2. Einen vorhandenen `motion`-Clip wählen oder in `../three/clips/` einen neuen bauen, in der Datei des Körperteils, um den es geht – sie bestimmt, was leuchtet.
 3. In mindestens einem Szenario (`scenarios.ts`) einsetzen.
 4. Bei einem neuen Clip: in `situations.ts` sechs Situationen dazuschreiben, mindestens zwei aus dem Alltag.
 5. `yarn typecheck`.
@@ -41,7 +42,6 @@ Sind die Hände nass und kein Handtuch da, schüttelt man sie aus.
 
 Der Katalog hängt am Clip, also an der reinen Körperbewegung. Darum gilt jede Idee für alle
 Bewegungen mit diesem Clip (`push_forward` passt zu Zaubertür, Schneeball und Glaswand).
-
 - Jede Situation hat ein Gegenüber, auf das die Bewegung wirkt, und eine Antwort der Welt.
   Auch hier behauptet keine Antwort, das Kind gesehen zu haben.
 - **Alltag** (`everyday`): Kennt das Kind aus seinem eigenen Tag, z. B. Socke anziehen, Ampelknopf
@@ -65,7 +65,6 @@ verweist nur auf vorhandene Bewegungen, und jede Bewegung hat eine Sitz-Variante
 
 Die Paare sind gewollt, weil derselbe Körper in einer anderen Welt eine andere Geschichte
 erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
-
 - `magic_door_push` und `invisible_wall`: beide mit den Händen nach vorn drücken
 - `rolling_ball_lean` und `peek_around`: beide zur Seite neigen
 - `popcorn_pop` und `rocket_countdown`: beide aus der Hocke hochschnellen
@@ -100,13 +99,13 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 ### Abläufe (Ergebnis D)
 
-| Ablauf | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
-| --- | --- | --- | --- |
-| `treasure_island` (spielbar) | 17 | 240 s | r m l l l r m m l r r m m r l l r |
-| `space_trip` | 9 | 160 s | r m l m m m l r l |
-| `underwater_dive` | 9 | 158 s | r m m m m l r m l |
-| `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
-| `farm_morning` | 9 | 153 s | r r m l m l m r m |
+| Ablauf                       | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
+| ---------------------------- | ---------- | ----- | -------------------------------------------- |
+| `treasure_island` (spielbar) | 17         | 240 s | r m l l l r m m l r r m m r l l r            |
+| `space_trip`                 | 9          | 160 s | r m l m m m l r l                            |
+| `underwater_dive`            | 9          | 158 s | r m m m m l r m l                            |
+| `winter_forest_walk`         | 9          | 156 s | r m m m l r r l m                            |
+| `farm_morning`               | 9          | 153 s | r r m l m l m r m                            |
 
 Die 3D-Geschichte der Schatzinsel dauert länger als die 240 s der Tabelle, etwa 5 Minuten. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
@@ -128,7 +127,7 @@ noch ein ruhiger Abschied dazukommen.
   zeigt die Leiste nur Bilder. Ist die Sprachausgabe aus, bleibt nur das Vormachen. Deshalb
   müssen die Bewegungen des Fuchses deutlich sein.
 - **Leuchtende Kontur am Fuchs** (`../three/contour.ts`): Während einer Bewegung leuchtet
-  nur der Körperteil, um den es geht (`clipFocus` in `../three/clips.ts`: an der Kurbel die Arme,
+  nur der Körperteil, um den es geht (`clipFocus` in `../three/clips/`, nach der Datei des Clips: an der Kurbel die Arme,
   beim Stampfen die Beine), als schmaler neongrüner Rand ohne Muster, und nur solange er sich
   bewegt. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
   gewollt, aber noch nicht mit Kindern ausprobiert.
@@ -155,7 +154,7 @@ noch ein ruhiger Abschied dazukommen.
   pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), wedelt die
   Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), zieht die Truhe am Seil heran, schließt sie mit dem
   Schlüssel auf, jubelt und macht mit Kiki und den Krebsen Stopptanz, und zum Schluss gibt es ein Feuerwerk.
-- **Stopptanz** (`freeze` in `../three/clips.ts`, `STOP_DANCE`): Musik an, alle tanzen; hört sie
+- **Stopptanz** (`freeze` in `../three/clips/whole.ts`, `STOP_DANCE` in `motion.ts`): Musik an, alle tanzen; hört sie
   auf, frieren Tapsi, Kiki und die Krebse ein, mal wackelig, mal als Statue auf einem Bein, mal
   lustig mit einem Arm hoch. Die Pausen sind verschieden lang (1,5–3 s), damit niemand mitzählen
   kann. Das Zeichen ist nur die Stille: Tapsi sagt kein „Stopp!“. Ist die Musik ausgeschaltet,

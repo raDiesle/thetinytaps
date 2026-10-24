@@ -1,7 +1,28 @@
 import { float, ground } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
-import { Biene, Ente, Eule, Ferkel, Frosch, Gans, Hahn, Hase, Huhn, Hund, Katze, Kueken, Kuh, Pferd, Schaf, Schnecke, Schwalbe, Schwein, Storch, Ziege } from "./animals";
+import {
+  Biene,
+  Ente,
+  Eule,
+  Ferkel,
+  Frosch,
+  Gans,
+  Hahn,
+  Hase,
+  Huhn,
+  Hund,
+  Katze,
+  Kueken,
+  Kuh,
+  Pferd,
+  Schaf,
+  Schnecke,
+  Schwalbe,
+  Schwein,
+  Storch,
+  Ziege,
+} from "./animals";
 import { Background } from "./background";
 import { Bauernhaus, Pumpe, Scheune, Windmuehle } from "./buildings";
 import { Bauer, Vogelscheuche } from "./figures";
@@ -90,7 +111,12 @@ export const bauernhof: Scene = {
     {
       id: "bauernhaus",
       name: "das Bauernhaus",
-      sentences: ["Im Bauernhaus wohnt die Bauernfamilie.", "Hallo! Die Bäuerin winkt aus dem Fenster.", "Die Tür geht auf. Wer ist da drin?", "Das Licht geht an!"],
+      sentences: [
+        "Im Bauernhaus wohnt die Bauernfamilie.",
+        "Hallo! Die Bäuerin winkt aus dem Fenster.",
+        "Die Tür geht auf. Wer ist da drin?",
+        "Das Licht geht an!",
+      ],
       sound: "knocks",
       traits: ["big"],
       box: [-178, -372, 356, 372],
