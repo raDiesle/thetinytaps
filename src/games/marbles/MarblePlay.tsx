@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { GameEnd } from "@/components/GameEnd";
 import { playMelody } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { BuildingLevel } from "./BuildingLevel";
 import { CircusLevel } from "./CircusLevel";
 import { GardenLevel } from "./GardenLevel";
 import { KitchenLevel } from "./KitchenLevel";
-import type { LevelProps } from "./level";
+import { useAnyKey, type LevelProps } from "./level";
 import { MachineLevel } from "./MachineLevel";
 import type { MarbleLevel, MarbleSettings } from "./settings";
 import { SpaceLevel } from "./SpaceLevel";
@@ -14,15 +15,15 @@ import { ToppleLevel } from "./ToppleLevel";
 import { TrackLevel } from "./TrackLevel";
 import "./marbles.css";
 
-const LEVELS: { id: MarbleLevel; intro: string; Level: ComponentType<LevelProps> }[] = [
-  { id: "machine", intro: "Tipp! Dann läuft die große Maschine.", Level: MachineLevel },
-  { id: "kitchen", intro: "Tipp! Dann wird in der Küche gezaubert.", Level: KitchenLevel },
-  { id: "garden", intro: "Tipp! Dann wacht der Garten auf.", Level: GardenLevel },
-  { id: "topple", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
-  { id: "building", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
-  { id: "circus", intro: "Tipp! Manege frei!", Level: CircusLevel },
-  { id: "track", intro: "Tipp! Dann rollen die Kugeln.", Level: TrackLevel },
-  { id: "space", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
+const LEVELS: { id: MarbleLevel; emoji: string; name: string; intro: string; Level: ComponentType<LevelProps> }[] = [
+  { id: "machine", emoji: "⚙️", name: "Große Maschine", intro: "Tipp! Dann läuft die große Maschine.", Level: MachineLevel },
+  { id: "kitchen", emoji: "🍳", name: "Verrückte Küche", intro: "Tipp! Dann wird in der Küche gezaubert.", Level: KitchenLevel },
+  { id: "garden", emoji: "🌻", name: "Im Garten", intro: "Tipp! Dann wacht der Garten auf.", Level: GardenLevel },
+  { id: "topple", emoji: "📚", name: "Alles fällt um", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
+  { id: "building", emoji: "🚧", name: "Baustelle", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
+  { id: "circus", emoji: "🎪", name: "Zirkus", intro: "Tipp! Manege frei!", Level: CircusLevel },
+  { id: "track", emoji: "🎢", name: "Kugelbahn", intro: "Tipp! Dann rollen die Kugeln.", Level: TrackLevel },
+  { id: "space", emoji: "🚀", name: "Raketenstart", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
 ];
 
 /** Which levels to play, in turn; in development `?level=garden` in the address picks one. */
@@ -32,19 +33,25 @@ function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
   return one ? [one.id] : LEVELS.map((l) => l.id);
 }
 
-/** Party time after a level, before the next one starts. */
+/** Party time after a level, before "Nochmal" and "Weiter" come. */
 const PARTY_MS = 3200;
 
 /**
  * "Kettenreaktion": one tap, and one thing sets off the next – the Rube
  * Goldberg machines, the long row of things that fall over and the marble
  * run, one level after the other (or only one of them, as the grown-up chose).
+ * After each level the child plays it again or goes on.
  */
 export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings; speechLang: string }) {
   const levels = chosenLevels(settings.levels);
+  /** Which of the chosen levels is on, and how often a level was started (a new one or the same again). */
+  const [index, setIndex] = useState(0);
   const [round, setRound] = useState(0);
   const [party, setParty] = useState(false);
-  const level = LEVELS.find((l) => l.id === levels[round % levels.length]) ?? LEVELS[0];
+  const [ended, setEnded] = useState(false);
+  const levelAt = (i: number) => LEVELS.find((l) => l.id === levels[i % levels.length]) ?? LEVELS[0];
+  const level = levelAt(index);
+  const next = levels.length > 1 ? levelAt(index + 1) : null;
   const { bursts, spawn } = useBursts();
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -74,10 +81,23 @@ export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings;
     timers.current.push(
       setTimeout(() => {
         setParty(false);
-        setRound((r) => r + 1);
+        setEnded(true);
       }, PARTY_MS),
     );
   }, [sound, spawn]);
+
+  const startLevel = (nextIndex: number) => {
+    setEnded(false);
+    setIndex(nextIndex);
+    setRound((r) => r + 1);
+  };
+  const again = () => startLevel(index);
+  const goOn = () => startLevel(index + 1);
+
+  // Keys start each level, so a key goes on after one too (with a single level chosen, it plays that again).
+  useAnyKey(() => {
+    if (ended) goOn();
+  });
 
   // While the party is on, taps make more shapes.
   const onPointerDown = (e: PointerEvent) => {
@@ -87,6 +107,7 @@ export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings;
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
       <level.Level key={round} sound={sound} say={say} onDone={onDone} rebuild={settings.rebuild} />
+      {ended && <GameEnd onAgain={again} next={next ? { emoji: next.emoji, name: next.name, onNext: goOn } : undefined} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

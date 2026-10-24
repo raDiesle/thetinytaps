@@ -218,19 +218,34 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
           );
         })}
         {happy && (
-          <button
-            type="button"
-            className="story-button next again"
-            onPointerDown={(e: PointerEvent) => {
-              e.stopPropagation();
-              nextFeeling();
-            }}
-          >
-            <span className="story-button-emoji" aria-hidden>
-              ▶
-            </span>
-            Weiter
-          </button>
+          <>
+            <button
+              type="button"
+              className="story-button replay"
+              onPointerDown={(e: PointerEvent) => {
+                e.stopPropagation();
+                startFeeling(feeling);
+              }}
+            >
+              <span className="story-button-emoji" aria-hidden>
+                🔁
+              </span>
+              Nochmal
+            </button>
+            <button
+              type="button"
+              className="story-button next again"
+              onPointerDown={(e: PointerEvent) => {
+                e.stopPropagation();
+                nextFeeling();
+              }}
+            >
+              <span className="story-button-emoji" aria-hidden>
+                ▶
+              </span>
+              Weiter
+            </button>
+          </>
         )}
       </footer>
     </div>

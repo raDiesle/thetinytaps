@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { GameEnd } from "@/components/GameEnd";
 import {
   playBark,
   playBeeps,
@@ -80,7 +81,7 @@ import {
   playRecorded,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { findScene } from ".";
+import { findScene, SCENES } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys } from "./keys";
@@ -191,6 +192,8 @@ const CHAIN_STEP_MS = 1100;
 /** "Alles entdeckt!": the party starts a moment after the last item, and everything dances for a while. */
 const PARTY_AFTER_MS = 900;
 const PARTY_MS = 3600;
+/** "Nochmal" and the next picture come once the party (or the room going dark) has had its moment. */
+const END_BUTTONS_MS = PARTY_AFTER_MS + 2400;
 /** Vehicles driving into another picture (idea B-19): how fast they drive, in scene units per second… */
 const DRIVE_SPEED = 600;
 const DRIVE_MIN_MS = 1400;
@@ -470,6 +473,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     discoveredRef.current = new Set();
     setDiscovered(discoveredRef.current);
     setNight(false);
+  };
+
+  /** The next picture in menu order (after the last one the first). The game stays open, like following a vehicle. */
+  const nextScene = SCENES[(SCENES.findIndex((s) => s.id === scene.id) + 1) % SCENES.length];
+  const goToNextScene = () => {
+    const { trip: _, ...state } = (location.state ?? {}) as { trip?: Trip };
+    navigate(`/bilder/${nextScene.id}/`, { replace: true, state });
   };
 
   /** Explore and colour mode: count the item (and colour it in), and celebrate when it was the last one. */
@@ -891,18 +901,15 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         <div className={`scene-goal${allDiscovered ? " done" : ""}`} aria-label={`${discovered.size} von ${scene.items.length} entdeckt`}>
           <span className="scene-goal-star">{allDiscovered ? (bedtime ? "🌙" : "🎉") : "⭐"}</span>
           {discovered.size}/{scene.items.length}
-          {allDiscovered && (
-            <button
-              type="button"
-              onPointerDown={(e) => {
-                e.stopPropagation();
-                startOver();
-              }}
-            >
-              {colouring ? "🖍️ Nochmal" : "🔄 Nochmal"}
-            </button>
-          )}
         </div>
+      )}
+      {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
+      {!questMode && allDiscovered && (
+        <GameEnd
+          delayMs={END_BUTTONS_MS}
+          onAgain={startOver}
+          next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }}
+        />
       )}
       {!questMode && !touched && <p className="scene-prompt">{(colouring ? COLOUR_PROMPTS : PROMPTS)[settings.trigger]}</p>}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
