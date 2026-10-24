@@ -2,10 +2,12 @@ import { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
 import { KID_HOME } from "@/components/GameShell";
+import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref } from "@/content/games";
+import { useFitGrid } from "@/lib/fitGrid";
 import { useTitle } from "@/lib/title";
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
@@ -14,6 +16,7 @@ const IDEAS_HOLD_MS = 2000;
 export function Home() {
   useTitle();
   const navigate = useNavigate();
+  const grid = useFitGrid(CATEGORIES.length);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const beginHold = () => {
@@ -28,6 +31,7 @@ export function Home() {
   return (
     <main className="home">
       <Sky />
+      <HomeOptions />
       <Logo
         secretProps={{
           onPointerDown: beginHold,
@@ -38,15 +42,10 @@ export function Home() {
         }}
       />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
-      <ul className="game-list category-list">
+      <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {CATEGORIES.map((c) => (
           <li key={c.id}>
-            <GameCard
-              href={categoryHref(c)}
-              emoji={c.emoji}
-              title={c.title}
-              text={c.games.map((g) => g.title).join(" · ")}
-            />
+            <GameCard href={categoryHref(c)} emoji={c.emoji} title={c.title} />
           </li>
         ))}
       </ul>

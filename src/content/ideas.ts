@@ -426,7 +426,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "B-18",
         emoji: "🍂",
         title: "Jahreszeiten im Bild",
-        text: "Die Szenen folgen dem Kalender: Im Herbst fallen Blätter und ein Kürbis liegt da, im Winter liegt Schnee, im Dezember steht ein Tannenbaum mit Lichtern, an Ostern ist ein Ei versteckt. Kleine Zusätze, die Szene bleibt dieselbe.",
+        text: "Eigene Bilder für die Jahreszeiten statt einer Einstellung: ein Winterbild mit Schnee und Schneemann, ein Herbstbild mit Blättern und Kürbis, ein Osterbild mit Hasen und versteckten Eiern.",
         why: "Das bekannte Bild wird neu entdeckt; Jahreszeiten und Feste werden Gesprächsthema.",
         effort: "M",
         done: true,
@@ -1121,6 +1121,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Bei Schatten finden: Nur ein Stück schaut hinter einem Busch hervor (Ohren, Schwanz, Rüssel). Wer ist das? Antippen – das ganze Tier kommt heraus.",
         why: "Aus einem Teil das Ganze erkennen; nächste Stufe nach den Schatten.",
         effort: "M",
+        done: true,
       },
       {
         id: "X-05",
@@ -1137,6 +1138,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Laut und leise bekommt einen Puste-Modus: Ins Mikrofon pusten bläst Kerzen aus, lässt eine Pusteblume fliegen, dreht ein Windrad oder treibt ein Segelboot an.",
         why: "Pusten ist für Kleine ein großer Spaß und eine gute Mundmotorik-Übung.",
         effort: "S",
+        done: true,
       },
       {
         id: "X-07",
@@ -1153,6 +1155,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "An drei Stellen der Bahn ist ein Platz frei; Antippen wechselt das Teil (Glocke, Trampolin, Trichter, Wasserrad). Die nächste Kugel nimmt den neuen Weg.",
         why: "Erstes Bauen und Ausprobieren: Was passiert, wenn ich das ändere?",
         effort: "M",
+        done: true,
       },
       {
         id: "X-09",
@@ -1290,6 +1293,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Drei bis vier leere Lücken in der Bahn. Antippen einer Lücke wechselt reihum das Teil: Glocke, Trampolin, Trichter, Looping, Trommel. Jede Mischung funktioniert, die Kugel kommt immer durch. Eltern-Version für Ältere: Teile aus einer Leiste in die Lücken ziehen.",
         why: "Eigene Bahn = eigenes Werk; dasselbe Spiel klingt jedes Mal anders.",
         effort: "L",
+        partial: "Drei Plätze auf der Kugelbahn wechseln beim Antippen reihum Glocke, Trampolin, Trichter und Wasserrad (X-08); Looping, Trommel und das Ziehen aus einer Leiste fehlen.",
       },
       {
         id: "K-13",

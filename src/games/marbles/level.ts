@@ -8,6 +8,8 @@ export interface LevelProps {
   say: (text: string) => void;
   /** The level is finished: basket full, or everything has fallen over. */
   onDone: () => void;
+  /** Kugelbahn: tapping one of the three spots swaps its part. */
+  rebuild: boolean;
 }
 
 /** The picture's size; both levels draw in these coordinates. */

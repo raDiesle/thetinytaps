@@ -1,0 +1,33 @@
+/* Leaves and snow in the air and on the ground (weather.tsx). */
+
+.weather-sway {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Only with "Bild bewegt sich auch von allein" (.lively). */
+.scene.lively .weather-fall {
+  animation: weather-fall var(--fall) linear var(--delay) infinite;
+}
+
+.scene.lively .weather-leaf .weather-sway {
+  animation: weather-sway 2.4s ease-in-out calc(var(--i) * -0.5s) infinite alternate;
+}
+
+@keyframes weather-fall {
+  from {
+    transform: translateY(var(--from));
+  }
+  to {
+    transform: translateY(var(--to));
+  }
+}
+
+@keyframes weather-sway {
+  from {
+    transform: translateX(-24px) rotate(-40deg);
+  }
+  to {
+    transform: translateX(24px) rotate(40deg);
+  }
+}

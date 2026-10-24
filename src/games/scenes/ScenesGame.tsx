@@ -1,19 +1,13 @@
-import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { VoiceSetting } from "@/components/VoiceSetting";
 import { de } from "@/content/de";
+import { useGameSettings } from "@/lib/common";
 import { useDevice, type Device } from "@/lib/device";
-import { useStoredSettings } from "@/lib/storage";
 import { findScene } from ".";
 import { ScenePlay } from "./ScenePlay";
-import { activeSeason, SEASON_LABELS, seasonOn, type Season, type SeasonSetting } from "./season";
-import { withSeason } from "./seasonal";
 import {
   carryOverScenesSettings,
   DEFAULT_SCENES_SETTINGS,
-  hasHints,
-  isQuestMode,
   SCENES_SETTINGS_KEY,
   type SceneAnnounce,
   type SceneMode,
@@ -25,17 +19,12 @@ const pack = de;
 carryOverScenesSettings();
 
 export function ScenesGame({ sceneId }: { sceneId: string }) {
-  const [stored, update] = useStoredSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
+  const [stored, update] = useGameSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
   const device = useDevice();
   // Tablets and phones have no keys, and the finger is right on the picture anyway.
   const settings = device.touchOnly && stored.trigger === "keys" ? { ...stored, trigger: "tap" as const } : stored;
-  const season = activeSeason(settings.season);
-  const scene = useMemo(() => {
-    const found = findScene(sceneId);
-    return found && withSeason(found, season);
-  }, [sceneId, season]);
+  const scene = findScene(sceneId);
   if (!scene) return null;
-  const questMode = isQuestMode(settings.mode);
 
   return (
     <GameShell
@@ -43,21 +32,18 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       emoji={scene.emoji}
       backHref="/bilder/"
       backLabel="Alle Bilder"
+      modes={[
+        { id: "explore", emoji: "👆", title: "Entdecken" },
+        { id: "find", emoji: "🔍", title: "Suchen" },
+        { id: "sounds", emoji: "🔊", title: "Geräusch-Rätsel" },
+        { id: "questions", emoji: "❓", title: "Fragen" },
+        { id: "colour", emoji: "🖍️", title: "Ausmalen" },
+      ]}
+      mode={settings.mode}
+      onMode={(mode) => update({ mode: mode as SceneMode })}
       settings={
         <>
-          <SettingsGroup title="Spielart">
-            <Choice<SceneMode>
-              label="Spiel"
-              value={settings.mode}
-              onChange={(mode) => update({ mode })}
-              options={[
-                { value: "explore", label: "👆 Entdecken" },
-                { value: "find", label: "🔍 Suchen" },
-                { value: "sounds", label: "🔊 Geräusch-Rätsel" },
-                { value: "questions", label: "❓ Fragen („Was ist rot?“)" },
-                { value: "colour", label: "🖍️ Ausmalen" },
-              ]}
-            />
+          <SettingsGroup title="Spiel">
             <Choice<SceneTrigger>
               label="Auslösen"
               value={settings.trigger}
@@ -71,35 +57,24 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
                 onChange={(showKeys) => update({ showKeys })}
               />
             )}
-            {!questMode && (
-              <Toggle
-                label="Mitzählen – wenn alles entdeckt ist, gibt es eine Party"
-                checked={settings.goal}
-                onChange={(goal) => update({ goal })}
-              />
-            )}
-            {settings.mode === "explore" && (
-              <Toggle
-                label="Fahrzeuge fahren in andere Bilder – am Rand antippen und mitfahren"
-                checked={settings.roads}
-                onChange={(roads) => update({ roads })}
-              />
-            )}
-            {hasHints(settings.mode) && (
-              <Toggle
-                label="Tipp zeigen, wenn es länger dauert"
-                checked={settings.hints}
-                onChange={(hints) => update({ hints })}
-              />
-            )}
-          </SettingsGroup>
-
-          <SettingsGroup title="Ton">
-            <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
-            {settings.speech && <VoiceSetting lang={pack.speechLang} sample="Der Bagger baggert!" />}
-            {settings.speech && !questMode && (
+            <Toggle
+              label="Entdecken und Ausmalen: Mitzählen – wenn alles entdeckt ist, gibt es eine Party"
+              checked={settings.goal}
+              onChange={(goal) => update({ goal })}
+            />
+            <Toggle
+              label="Entdecken: Fahrzeuge fahren in andere Bilder – am Rand antippen und mitfahren"
+              checked={settings.roads}
+              onChange={(roads) => update({ roads })}
+            />
+            <Toggle
+              label="Geräusch-Rätsel und Fragen: Tipp zeigen, wenn es länger dauert"
+              checked={settings.hints}
+              onChange={(hints) => update({ hints })}
+            />
+            {settings.speech && (
               <Choice<SceneAnnounce>
-                label="Ansage"
+                label="Ansage beim Entdecken"
                 value={settings.announce}
                 onChange={(announce) => update({ announce })}
                 options={[
@@ -108,34 +83,14 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
                 ]}
               />
             )}
-            {/* The sound riddle needs its sounds, so they can't be switched off there. */}
-            {settings.mode !== "sounds" && (
-              <Toggle label="Geräusche" checked={settings.sounds} onChange={(sounds) => update({ sounds })} />
-            )}
           </SettingsGroup>
 
           <SettingsGroup title="Bild">
-            <Choice<SeasonSetting>
-              label="Jahreszeit"
-              value={settings.season}
-              onChange={(season) => update({ season })}
-              options={seasonOptions()}
-            />
-          </SettingsGroup>
-
-          <SettingsGroup title="Verhalten">
             <Toggle
-              label="Ruhiger Modus (leiser, weniger Bewegung)"
-              checked={settings.calm}
-              onChange={(calm) => update({ calm })}
+              label="Bild bewegt sich auch von allein, ohne Ton (Wolken, Rotor, Blinklichter …)"
+              checked={settings.ambient}
+              onChange={(ambient) => update({ ambient })}
             />
-            {!settings.calm && (
-              <Toggle
-                label="Bild bewegt sich auch von allein, ohne Ton (Wolken, Rotor, Blinklichter …)"
-                checked={settings.ambient}
-                onChange={(ambient) => update({ ambient })}
-              />
-            )}
           </SettingsGroup>
         </>
       }
@@ -144,17 +99,6 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       <ScenePlay key={scene.id} scene={scene} settings={settings} speechLang={pack.speechLang} />
     </GameShell>
   );
-}
-
-/** Calendar (saying what it is today), each season to look at any time, or none. */
-function seasonOptions(): { value: SeasonSetting; label: string }[] {
-  const today = seasonOn(new Date());
-  const seasons = Object.entries(SEASON_LABELS) as [Season, string][];
-  return [
-    { value: "auto", label: `📅 Wie im Kalender (jetzt: ${today ? SEASON_LABELS[today] : "nichts Besonderes"})` },
-    ...seasons.map(([value, label]) => ({ value, label })),
-    { value: "none", label: "Ohne" },
-  ];
 }
 
 /** The ways to bring the picture to life, worded for this device; the keys only where there is a keyboard. */

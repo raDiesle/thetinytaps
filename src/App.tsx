@@ -33,7 +33,9 @@ export function App() {
       <Route path="gefuehle" element={<FeelingsPage />} />
       <Route path="schatten" element={<ShadowsPage />} />
       <Route path="laut-leise" element={<LoudPage />} />
-      <Route path="kugelbahn" element={<MarblePage />} />
+      <Route path="kettenreaktion" element={<MarblePage />} />
+      {/* Its old name and address, for bookmarks and the home screen. */}
+      <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
       <Route path="aufzug" element={<ElevatorPage />} />
       <Route
         path="abenteuer"

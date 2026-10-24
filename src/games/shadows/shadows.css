@@ -218,6 +218,169 @@
   animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/* ---------- Wer schaut da raus? (X-04) ---------- */
+
+/* 600 × 400 units: the hiding place stands on the meadow, the animal behind it. */
+.pk-stage {
+  position: relative;
+  container-type: inline-size;
+  height: min(calc(56vh - 72px), 60vw);
+  aspect-ratio: 3 / 2;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.pk-animal {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+  transition:
+    left 0.45s cubic-bezier(0.34, 1.3, 0.64, 1),
+    top 0.45s cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.pk-emoji {
+  font-size: 30cqw;
+}
+
+/* It peeks out a little later than the hiding place appears, then keeps looking about. */
+.pk-animal.pk-hidden {
+  animation:
+    pk-peek-in 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 0.35s backwards,
+    pk-look 2.8s ease-in-out 1.2s infinite;
+}
+
+.pk-animal.again-0 {
+  animation: pk-wiggle 0.5s ease-in-out;
+}
+
+.pk-animal.again-1 {
+  animation: pk-wiggle-again 0.5s ease-in-out;
+}
+
+/* In front of the bush, bigger, and happy. */
+.pk-animal.pk-front {
+  z-index: 3;
+  animation: pk-hooray 0.6s ease-in-out 0.45s 3;
+  transform-origin: 50% 100%;
+  transition:
+    left 0.5s ease-in-out,
+    top 0.5s cubic-bezier(0.5, -0.9, 0.5, 1);
+}
+
+.pk-hideout {
+  position: absolute;
+  z-index: 2;
+  transform-origin: 50% 100%;
+}
+
+.pk-hideout svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.pk-hideout.again-0,
+.pk-hideout.rustle {
+  animation: pk-rustle 0.45s ease-in-out;
+}
+
+.pk-hideout.again-1 {
+  animation: pk-rustle-again 0.45s ease-in-out;
+}
+
+/* Whole animals to choose from, in colour. */
+.pk-option {
+  flex-direction: column;
+}
+
+.pk-choice {
+  font-size: calc(var(--size) * 0.62);
+  pointer-events: none;
+}
+
+.pk-name {
+  margin-top: -0.2em;
+  font-size: clamp(0.9rem, 2.6vh, 1.4rem);
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.pk-option.nope {
+  animation: shake 0.3s ease-in-out 3;
+  opacity: 0.55;
+}
+
+@keyframes pk-peek-in {
+  from {
+    transform: translate(var(--hide-x), var(--hide-y));
+  }
+}
+
+@keyframes pk-look {
+  0%,
+  60%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translate(calc(var(--hide-x) * 0.25), calc(var(--hide-y) * 0.25));
+  }
+}
+
+@keyframes pk-wiggle {
+  25% {
+    transform: rotate(-6deg);
+  }
+  75% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes pk-wiggle-again {
+  25% {
+    transform: rotate(6deg);
+  }
+  75% {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes pk-hooray {
+  50% {
+    transform: translateY(-8%) scale(1.05, 0.97);
+  }
+}
+
+@keyframes pk-rustle {
+  20% {
+    transform: rotate(-2.5deg) scaleY(1.02);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+  80% {
+    transform: rotate(-1deg);
+  }
+}
+
+@keyframes pk-rustle-again {
+  20% {
+    transform: rotate(2.5deg) scaleY(1.02);
+  }
+  50% {
+    transform: rotate(-2deg);
+  }
+  80% {
+    transform: rotate(1deg);
+  }
+}
+
 @keyframes sh-breathe {
   50% {
     transform: scale(1.03, 0.98);
@@ -236,19 +399,12 @@
   }
 }
 
-/* Calm mode: no breathing or bouncing, slower moves. */
-.shadows-play.calm .sh-picture:not(.wrong),
-.shadows-play.calm .sh-option,
-.shadows-play.calm .sh-picture-box {
-  animation: none;
-}
-
-.shadows-play.calm .sh-prompt {
-  animation: fade-in 0.7s ease-out;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sh-picture:not(.dragging, .landed, .wrong, .nudge-0, .nudge-1) {
+    animation: none;
+  }
+
+  .pk-animal.pk-hidden {
     animation: none;
   }
 }

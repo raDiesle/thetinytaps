@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 
 /** The saved value merged into `defaults`, so adding a new setting later keeps the old ones. */
-function load<T extends object>(key: string, defaults: T): T {
+export function loadStored<T extends object>(key: string, defaults: T): T {
   try {
     const raw = localStorage.getItem(key);
     if (raw) return { ...defaults, ...(JSON.parse(raw) as Partial<T>) };
@@ -17,7 +17,7 @@ function load<T extends object>(key: string, defaults: T): T {
  * shows the parent's last choices right away.
  */
 export function useStoredSettings<T extends object>(key: string, defaults: T) {
-  const [value, setValue] = useState<T>(() => load(key, defaults));
+  const [value, setValue] = useState<T>(() => loadStored(key, defaults));
 
   const update = useCallback(
     (patch: Partial<T>) => {

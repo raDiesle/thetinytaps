@@ -205,7 +205,6 @@ export function Brush({
   motion,
   project,
   paused,
-  calm,
 }: {
   anchor: BrushAnchor;
   surface: Surface;
@@ -213,9 +212,8 @@ export function Brush({
   motion: Motion;
   project: Projector;
   paused: boolean;
-  calm: boolean;
 }) {
-  const slow = calm || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const slow = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const t = useBrushTime(paused, slow ? 0.5 : 1);
   const target = poseFor(anchor, surface, tooth);
   const current = useRef<{ pose: Pose; at: number } | null>(null);
