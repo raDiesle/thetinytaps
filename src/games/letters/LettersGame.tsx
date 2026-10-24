@@ -1,10 +1,9 @@
 import { GameShell } from "@/components/GameShell";
-import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
+import { useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting, useTouchKeys } from "@/components/TouchKeyboard";
-import { VoiceSetting } from "@/components/VoiceSetting";
 import { sampleLetter } from "@/content/languages";
-import { useStoredSettings } from "@/lib/storage";
+import { useGameSettings } from "@/lib/common";
 import {
   DEFAULT_LETTERS_SETTINGS,
   LETTERS_SETTINGS_KEY,
@@ -18,7 +17,7 @@ import { LettersPlay } from "./LettersPlay";
 import { TrainPlay } from "./TrainPlay";
 
 export function LettersGame() {
-  const [settings, update] = useStoredSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
+  const [settings, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
   const languages = useLanguages();
   const pack = languages.language.pack;
   const second = languages.second?.pack ?? null;
@@ -32,69 +31,28 @@ export function LettersGame() {
     <GameShell
       title="Buchstaben & Zahlen"
       emoji="🔤"
+      modes={[
+        { id: "free", emoji: "⌨️", title: "Frei tippen", text: "Jede Taste zeigt ihren Buchstaben oder ihre Zahl – mit Bild." },
+        { id: "find", emoji: "🔍", title: `Wo ist das ${b.upper}?`, text: "Ein Buchstabe erscheint, das Kind sucht die Taste." },
+        { id: "train", emoji: "🚂", title: "Buchstaben-Zug", text: "Jede Taste hängt einen Wagen an den Zug." },
+      ]}
+      mode={settings.mode}
+      onMode={(mode) => update({ mode: mode as LettersMode })}
+      level={
+        <Choice<LetterCase>
+          label="Buchstaben"
+          value={settings.letterCase}
+          onChange={(letterCase) => update({ letterCase })}
+          options={[
+            { value: "upper", label: "A" },
+            { value: "both", label: "A a" },
+            { value: "lower", label: "a" },
+          ]}
+        />
+      }
       settings={
         <>
-          <SettingsGroup title="Spielart">
-            <Choice<LettersMode>
-              label="Spiel"
-              value={settings.mode}
-              onChange={(mode) => update({ mode })}
-              options={[
-                { value: "free", label: "⌨️ Frei tippen" },
-                { value: "find", label: "🔍 Wo ist das B?" },
-                { value: "train", label: "🚂 Buchstaben-Zug" },
-              ]}
-            />
-            {settings.mode === "find" && (
-              <Toggle
-                label={
-                  touchKeys
-                    ? "Gesuchte Taste aufleuchten lassen, wenn es länger dauert"
-                    : "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"
-                }
-                checked={settings.hints}
-                onChange={(hints) => update({ hints })}
-              />
-            )}
-          </SettingsGroup>
-
-          <LanguageSetting settings={languages.settings} update={languages.update} />
-
           <SettingsGroup title="Anzeige">
-            <Choice<LetterCase>
-              label="Buchstaben"
-              value={settings.letterCase}
-              onChange={(letterCase) => update({ letterCase })}
-              options={[
-                { value: "upper", label: "A" },
-                { value: "both", label: "A a" },
-                { value: "lower", label: "a" },
-              ]}
-            />
-            {settings.mode === "free" && (
-              <Toggle
-                label="Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen"
-                checked={settings.trace}
-                onChange={(trace) => update({ trace })}
-              />
-            )}
-            {settings.letterCase === "both" && settings.mode === "free" && !settings.trace && (
-              <Toggle
-                label="Mama- und Baby-Buchstabe (mit Augen, an der Hand)"
-                checked={settings.letterFamily}
-                onChange={(letterFamily) => update({ letterFamily })}
-              />
-            )}
-            {settings.letterCase !== "lower" &&
-              settings.mode === "free" &&
-              !settings.trace &&
-              !(settings.letterCase === "both" && settings.letterFamily) && (
-                <Toggle
-                  label="Lebende Buchstaben (der Buchstabe wird kurz zum Tier: S zur Schlange, M zur Maus)"
-                  checked={settings.livingLetters}
-                  onChange={(livingLetters) => update({ livingLetters })}
-                />
-              )}
             <Choice<LettersSettings["theme"]>
               label="Bilder"
               value={settings.theme}
@@ -104,15 +62,34 @@ export function LettersGame() {
                 ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
               ]}
             />
-            {settings.mode !== "train" && (
-              <Toggle label="Wort anzeigen" checked={settings.showWord} onChange={(showWord) => update({ showWord })} />
-            )}
+            <Toggle
+              label="Wort anzeigen (nicht beim Zug)"
+              checked={settings.showWord}
+              onChange={(showWord) => update({ showWord })}
+            />
           </SettingsGroup>
 
-          <SettingsGroup title="Ton">
-            <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
-            {settings.speech && <VoiceSetting lang={pack.speechLang} sample={pack.letterSentence(b, b.words[0])} />}
-            {settings.speech && settings.mode === "free" && (
+          <SettingsGroup title="⌨️ Frei tippen">
+            <Toggle
+              label="Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen"
+              checked={settings.trace}
+              onChange={(trace) => update({ trace })}
+            />
+            {settings.letterCase === "both" && !settings.trace && (
+              <Toggle
+                label="Mama- und Baby-Buchstabe (mit Augen, an der Hand)"
+                checked={settings.letterFamily}
+                onChange={(letterFamily) => update({ letterFamily })}
+              />
+            )}
+            {settings.letterCase !== "lower" && !settings.trace && !(settings.letterCase === "both" && settings.letterFamily) && (
+              <Toggle
+                label="Lebende Buchstaben (der Buchstabe wird kurz zum Tier: S zur Schlange, M zur Maus)"
+                checked={settings.livingLetters}
+                onChange={(livingLetters) => update({ livingLetters })}
+              />
+            )}
+            {settings.speech && (
               <Choice<Announce>
                 label="Ansage"
                 value={settings.announce}
@@ -124,36 +101,35 @@ export function LettersGame() {
                 ]}
               />
             )}
-            <Toggle label="Töne" checked={settings.sounds} onChange={(sounds) => update({ sounds })} />
-          </SettingsGroup>
-
-          <SettingsGroup title="Verhalten">
-            {settings.mode === "free" && (
-              <Toggle
-                label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
-                checked={settings.stepByStep}
-                onChange={(stepByStep) => update({ stepByStep })}
-              />
-            )}
-            {settings.mode === "free" && (
-              <Toggle
-                label="Selbst zählen (jedes Ding antippen)"
-                checked={settings.countByTap}
-                onChange={(countByTap) => update({ countByTap })}
-              />
-            )}
             <Toggle
-              label="Ruhiger Modus (leiser, weniger Bewegung)"
-              checked={settings.calm}
-              onChange={(calm) => update({ calm })}
+              label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
+              checked={settings.stepByStep}
+              onChange={(stepByStep) => update({ stepByStep })}
             />
-            {settings.mode === "free" && !settings.stepByStep && !settings.countByTap && (
+            <Toggle
+              label="Selbst zählen (jedes Ding antippen)"
+              checked={settings.countByTap}
+              onChange={(countByTap) => update({ countByTap })}
+            />
+            {!settings.stepByStep && !settings.countByTap && (
               <Toggle
                 label="Zählen nicht unterbrechen"
                 checked={settings.finishCounting}
                 onChange={(finishCounting) => update({ finishCounting })}
               />
             )}
+          </SettingsGroup>
+
+          <SettingsGroup title={`🔍 Wo ist das ${b.upper}?`}>
+            <Toggle
+              label={
+                touchKeys
+                  ? "Gesuchte Taste aufleuchten lassen, wenn es länger dauert"
+                  : "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"
+              }
+              checked={settings.hints}
+              onChange={(hints) => update({ hints })}
+            />
           </SettingsGroup>
 
           <TouchKeysSetting

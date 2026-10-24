@@ -1,5 +1,7 @@
 // Thin wrapper around the browser's Web Speech API.
 
+import { silent } from "./silent";
+
 // Nicer voices first: online/neural voices sound far more natural than the
 // compact system ones. Voices matching none of these come last.
 const VOICE_RANKING = [/Google/, /Natural/, /Premium/, /Enhanced|Erweitert/, /Anna|Petra|Helena|Katja|Markus|Yannick|Viktor/];
@@ -68,7 +70,7 @@ export function pickVoice(lang: string): SpeechSynthesisVoice | null {
  * reading German words sounds wrong.
  */
 export function speak(text: string, lang: string, { queue = false, rate = 0.85 } = {}) {
-  if (!supported()) return;
+  if (!supported() || silent) return;
   const voice = pickVoice(lang);
   if (!voice) return;
   const synth = window.speechSynthesis;

@@ -355,6 +355,11 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     [spawn, settings.sounds],
   );
 
+  // The story picked on the start screen begins at once; the picture cards come back after it.
+  useEffect(() => {
+    void play(STORIES.find((s) => s.id === settings.story) ?? STORIES[0]);
+  }, []);
+
   // 1–4 fetch the lift (or pick a story on the cards), arrows ride one floor up or down, any other key makes a burst.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {

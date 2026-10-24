@@ -285,23 +285,27 @@ html:has(.play-area) body {
     rotate 0.2s;
 }
 
-a.game-card:active {
+a.game-card:active,
+button.game-card:active {
   transform: translateY(6px);
   box-shadow: 0 2px 0 var(--ink);
 }
 
-a.game-card:focus-visible {
+a.game-card:focus-visible,
+button.game-card:focus-visible {
   outline: 5px solid #fff;
   outline-offset: 4px;
 }
 
 @media (hover: hover) {
-  a.game-card:hover {
+  a.game-card:hover,
+  button.game-card:hover {
     rotate: calc(var(--tilt) * -1);
     transform: translateY(-6px) scale(1.03);
   }
 
-  a.game-card:hover .game-emoji {
+  a.game-card:hover .game-emoji,
+  button.game-card:hover .game-emoji {
     animation: wiggle 0.8s ease-in-out;
   }
 }
@@ -744,8 +748,7 @@ button.idea-id {
   box-shadow: 0 1px 0 var(--ink);
 }
 
-.settings,
-.exit-help {
+.settings {
   width: 100%;
   max-width: 680px;
   border: var(--outline);
@@ -993,31 +996,6 @@ button.idea-id {
   }
 }
 
-.exit-help {
-  padding: 18px 24px;
-  background: #fff6cc;
-}
-
-.exit-help h2 {
-  margin: 0 0 8px;
-  font-size: 1.1rem;
-}
-
-.exit-help ul {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 6px;
-  font-size: 1.05rem;
-}
-
-.exit-help p {
-  margin: 10px 0 0;
-  font-size: 0.9rem;
-  opacity: 0.75;
-}
-
 kbd {
   padding: 1px 8px;
   border: 2px solid var(--ink);
@@ -1028,18 +1006,6 @@ kbd {
   font-weight: 600;
 }
 
-.exit-sample {
-  display: inline-grid;
-  place-items: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: #00000014;
-  color: #00000088;
-  font-size: 0.8rem;
-  vertical-align: middle;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sky-sun-rays,
   .sky-cloud,
@@ -1047,6 +1013,169 @@ kbd {
   .start-button {
     animation: none;
   }
+}
+
+/* Ways to play: big cards under the title; a tap picks one and starts. */
+.mode-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 1040px;
+}
+
+.mode-heading {
+  margin: 0;
+  padding: 4px 20px;
+  border-radius: 999px;
+  background: #ffffffb0;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+}
+
+.mode-level {
+  padding: 10px 20px;
+  border: 3px solid var(--ink);
+  border-radius: 28px;
+  background: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.mode-level .choice {
+  justify-content: center;
+}
+
+.mode-list {
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 26px 24px;
+  text-align: center;
+}
+
+.mode-card {
+  width: 100%;
+  padding: 20px 18px 26px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.mode-card .game-emoji {
+  width: 84px;
+  height: 84px;
+  font-size: 2.7rem;
+}
+
+.mode-card .game-title {
+  font-size: 1.35rem;
+}
+
+.mode-card .game-text {
+  font-size: 0.98rem;
+}
+
+/* Play time, language, read aloud … are set on the home page for all games. */
+.shared-settings-note {
+  max-width: 680px;
+  margin: 0;
+  padding: 6px 18px;
+  border-radius: 20px;
+  background: #ffffffb0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.shared-settings-note a {
+  color: inherit;
+  font-weight: 700;
+}
+
+.playtime-over-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+  margin: 0;
+  padding: 10px 20px;
+  border: 3px solid var(--ink);
+  border-radius: 28px;
+  background: #232a6b;
+  color: #fff4d6;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.playtime-over-note button,
+.playtime-status button {
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+
+.playtime-over-note button:active,
+.playtime-status button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+/* ---------- Home: play time and options for all games ---------- */
+
+.home-options {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin: 0 auto 44px;
+  max-width: 760px;
+}
+
+.playtime-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 18px 24px;
+  border: var(--outline);
+  border-radius: 28px;
+  background: #fff;
+  box-shadow: var(--lift);
+}
+
+.playtime-bar h2 {
+  margin: 0;
+  font-size: clamp(1.3rem, 3.4vw, 1.7rem);
+}
+
+.playtime-bar h2 span {
+  font-family: var(--font-emoji);
+}
+
+.playtime-bar .choice {
+  justify-content: center;
+}
+
+.playtime-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 14px;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.playtime-bar .setting-note {
+  max-width: 56ch;
 }
 
 /* ---------- Playing ---------- */
@@ -1062,11 +1191,47 @@ kbd {
   -webkit-touch-callout: none;
 }
 
-.hold-exit {
+.exit-corner {
   position: absolute;
   top: max(12px, env(safe-area-inset-top));
   right: max(12px, env(safe-area-inset-right));
   z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* "Zurück zum Menü": shown for a moment when a game starts, and while leaving. */
+.exit-hint {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #ffffffd0;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  translate: 6px 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s,
+    translate 0.4s;
+}
+
+.exit-corner.hinted .exit-hint {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (hover: hover) {
+  .exit-corner:hover .exit-hint {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.hold-exit {
+  flex-shrink: 0;
   width: 44px;
   height: 44px;
   border: 0;

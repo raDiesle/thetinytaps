@@ -1,10 +1,8 @@
 import { GameShell } from "@/components/GameShell";
-import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
+import { useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting } from "@/components/TouchKeyboard";
-import { VoiceSetting } from "@/components/VoiceSetting";
-import { sampleLetter } from "@/content/languages";
-import { useStoredSettings } from "@/lib/storage";
+import { useGameSettings } from "@/lib/common";
 import {
   DEFAULT_WORDS_SETTINGS,
   WORDS_SETTINGS_KEY,
@@ -17,57 +15,49 @@ import {
 import { WordsPlay } from "./WordsPlay";
 
 export function WordsGame() {
-  const [settings, update] = useStoredSettings(WORDS_SETTINGS_KEY, DEFAULT_WORDS_SETTINGS);
+  const [settings, update] = useGameSettings(WORDS_SETTINGS_KEY, DEFAULT_WORDS_SETTINGS);
   const languages = useLanguages();
   const pack = languages.language.pack;
-  // Colours and doing words are short fixed lists, so length and theme only apply to the picture words.
-  const nouns = settings.mode === "spell" || settings.mode === "first";
 
   return (
     <GameShell
       title="Wörter tippen"
       emoji="✍️"
+      modes={[
+        { id: "spell", emoji: "✍️", title: "Ganzes Wort", text: "Das Wort Buchstabe für Buchstabe tippen." },
+        { id: "first", emoji: "🐻", title: "Erster Buchstabe", text: "Nur den ersten Buchstaben – der Rest fliegt von allein." },
+        { id: "colors", emoji: "🎨", title: "Farben", text: "Farbwörter tippen, der Bildschirm wird bunt." },
+        { id: "actions", emoji: "🦘", title: "Tu-Wörter", text: "Hüpfen, schlafen … eine Figur macht es vor." },
+      ]}
+      mode={settings.mode}
+      onMode={(mode) => update({ mode: mode as WordsMode })}
+      level={
+        // Colours and doing words are short fixed lists, so the length only applies to the picture words.
+        <Choice<WordLength>
+          label="Wortlänge"
+          value={settings.length}
+          onChange={(length) => update({ length })}
+          options={[
+            { value: "short", label: "Bär" },
+            { value: "medium", label: "Hund" },
+            { value: "long", label: "Giraffe" },
+          ]}
+        />
+      }
       settings={
         <>
-          <SettingsGroup title="Spielart">
-            <Choice<WordsMode>
-              label="Spiel"
-              value={settings.mode}
-              onChange={(mode) => update({ mode })}
+          <SettingsGroup title="Wörter">
+            <Choice<WordsSettings["theme"]>
+              label="Bilder"
+              value={settings.theme}
+              onChange={(theme) => update({ theme })}
               options={[
-                { value: "spell", label: "✍️ Ganzes Wort" },
-                { value: "first", label: "🐻 Erster Buchstabe" },
-                { value: "colors", label: "🎨 Farben" },
-                { value: "actions", label: "🦘 Tu-Wörter" },
+                { value: "all", label: "🌈 Alle" },
+                ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
               ]}
             />
+            <p className="setting-note">Wortlänge und Bilder gelten für „Ganzes Wort“ und „Erster Buchstabe“.</p>
           </SettingsGroup>
-
-          <LanguageSetting settings={languages.settings} update={languages.update} />
-
-          {nouns && (
-            <SettingsGroup title="Wörter">
-              <Choice<WordLength>
-                label="Länge"
-                value={settings.length}
-                onChange={(length) => update({ length })}
-                options={[
-                  { value: "short", label: "Bär" },
-                  { value: "medium", label: "Hund" },
-                  { value: "long", label: "Giraffe" },
-                ]}
-              />
-              <Choice<WordsSettings["theme"]>
-                label="Bilder"
-                value={settings.theme}
-                onChange={(theme) => update({ theme })}
-                options={[
-                  { value: "all", label: "🌈 Alle" },
-                  ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
-                ]}
-              />
-            </SettingsGroup>
-          )}
 
           <SettingsGroup title="Anzeige">
             <Choice<WordCase>
@@ -80,24 +70,17 @@ export function WordsGame() {
                 { value: "lower", label: "bär" },
               ]}
             />
-            {settings.mode !== "first" && (
-              <Choice<PictureReveal>
-                label="Bild"
-                value={settings.picture}
-                onChange={(picture) => update({ picture })}
-                options={[
-                  { value: "now", label: "Gleich zeigen" },
-                  { value: "puzzle", label: "🧩 Baut sich auf" },
-                  { value: "end", label: "Erst am Ende" },
-                ]}
-              />
-            )}
-          </SettingsGroup>
-
-          <SettingsGroup title="Ton">
-            <Toggle label="Vorlesen" checked={settings.speech} onChange={(speech) => update({ speech })} />
-            {settings.speech && <VoiceSetting lang={pack.speechLang} sample={`${sampleLetter(pack).words[0].word}! ${pack.praise[0]}`} />}
-            <Toggle label="Töne" checked={settings.sounds} onChange={(sounds) => update({ sounds })} />
+            <Choice<PictureReveal>
+              label="Bild"
+              value={settings.picture}
+              onChange={(picture) => update({ picture })}
+              options={[
+                { value: "now", label: "Gleich zeigen" },
+                { value: "puzzle", label: "🧩 Baut sich auf" },
+                { value: "end", label: "Erst am Ende" },
+              ]}
+            />
+            <p className="setting-note">Beim ersten Buchstaben ist das Bild immer gleich da – es ist der einzige Hinweis.</p>
           </SettingsGroup>
 
           <SettingsGroup title="Verhalten">
@@ -105,11 +88,6 @@ export function WordsGame() {
               label="Jede Taste schreibt den nächsten Buchstaben (für die Kleinsten)"
               checked={settings.anyKey}
               onChange={(anyKey) => update({ anyKey })}
-            />
-            <Toggle
-              label="Ruhiger Modus (leiser, weniger Bewegung)"
-              checked={settings.calm}
-              onChange={(calm) => update({ calm })}
             />
           </SettingsGroup>
 
