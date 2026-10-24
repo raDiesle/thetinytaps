@@ -16,23 +16,23 @@
 
 /* ---------- Kürbis: hops, the leaves whirl up, a mouse peeks out ---------- */
 
-.item-kuerbis.playing .he-kuerbis-body {
+.item-riesenkuerbis.playing .he-kuerbis-body {
   animation: he-kuerbis-hop 0.9s ease-in-out 2;
 }
 
-.item-kuerbis.playing .he-kuerbis-leafy {
+.item-riesenkuerbis.playing .he-kuerbis-leafy {
   animation: he-kuerbis-flap 0.45s ease-in-out 4;
 }
 
-.item-kuerbis.playing .he-kuerbis-vine {
+.item-riesenkuerbis.playing .he-kuerbis-vine {
   animation: he-kuerbis-curl 1.8s ease-in-out;
 }
 
-.item-kuerbis.playing .he-kuerbis-leaf {
+.item-riesenkuerbis.playing .he-kuerbis-leaf {
   animation: he-kuerbis-whirl 1.4s ease-out calc(var(--i) * 0.07s);
 }
 
-.item-kuerbis.playing .he-kuerbis-mouse {
+.item-riesenkuerbis.playing .he-kuerbis-mouse {
   animation: he-kuerbis-peek 2s ease-in-out;
 }
 

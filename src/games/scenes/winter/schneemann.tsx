@@ -2,7 +2,7 @@ import { CHEEK, Eye, INK, nth } from "../shared";
 import type { Placement, SceneItem } from "../types";
 import "./schneemann.css";
 
-// The snowman and the Christmas tree from the former winter and Advent extras. They stand on their foot point (0, 0).
+// The snowman and the lit Christmas tree of the winter picture. They stand on their foot point (0, 0).
 
 // ---------- Tannenbaum ----------
 
@@ -171,19 +171,5 @@ export function tannenbaum(place: Placement): SceneItem {
     shadow: [0, 0, 100],
     durationMs: 2400,
     Art: Tannenbaum,
-  };
-}
-
-export function schneemann(place: Placement): SceneItem {
-  return {
-    id: "schneemann",
-    name: "der Schneemann",
-    sentences: ["Der Schneemann winkt!", "Der Schneemann hat eine Möhrennase.", "Brrr, ist das kalt!"],
-    sound: "whoosh",
-    box: [-92, -264, 184, 264],
-    hitAreas: [[-70, -264, 140, 264]],
-    place,
-    durationMs: 2400,
-    Art: Schneemann,
   };
 }

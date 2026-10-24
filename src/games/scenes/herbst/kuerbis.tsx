@@ -53,7 +53,7 @@ export function Kuerbis() {
 
 export function kuerbis(place: Placement): SceneItem {
   return {
-    id: "kuerbis",
+    id: "riesenkuerbis",
     name: "der Kürbis",
     sentences: ["Der Kürbis hüpft! Raschel, raschel!", "Der Kürbis ist dick und rund.", "Hinter dem Kürbis wohnt eine Maus."],
     sound: "boing",
