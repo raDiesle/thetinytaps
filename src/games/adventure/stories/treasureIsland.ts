@@ -602,9 +602,9 @@ const GATE_LIFT = 1.9;
 const WINCH_X = -2.55;
 const WINCH_Z = GATE_Z + 0.35;
 /** How far in front of Tapsi and how high the paws turn the crank (measured on the clip). */
-const CRANK_REACH = 0.42 * GUIDE_SIZE;
+const CRANK_REACH = 0.39 * GUIDE_SIZE;
 const CRANK_HEIGHT = 0.86 * GUIDE_SIZE;
-const CRANK_ARM = 0.2 * GUIDE_SIZE;
+const CRANK_ARM = 0.24 * GUIDE_SIZE;
 const ROLL_Z = 6.6;
 const MONKEY_Z = 2.4;
 const APPLE_Z = -1.4;
