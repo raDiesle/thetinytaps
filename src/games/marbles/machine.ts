@@ -42,7 +42,7 @@ import {
   steady,
   timeWhen,
 } from "./machineKit";
-import { arc, BALL_R, line, quad, type Pt } from "./track";
+import { arc, BALL_R, line, quad, type Pt } from "./path";
 
 export const WORLD_W = 6900;
 export const FLOOR = 800;

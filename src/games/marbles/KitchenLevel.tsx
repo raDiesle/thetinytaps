@@ -35,8 +35,8 @@ import {
 import { deg, hop, seg } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { Bunting, DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WallClock, Window, WOOD } from "./scenery";
-import type { Pt } from "./track";
-import { BAR_COLORS, Ball } from "./TrackLevel";
+import type { Pt } from "./path";
+import { BAR_COLORS, Ball } from "./parts";
 
 /** The tiled wall; also the page colour around the picture. */
 const WALL = "#dff3ea";

@@ -52,7 +52,7 @@ import {
   turn,
   type Path,
 } from "./machineKit";
-import { BALL_R, line, quad, type Pt } from "./track";
+import { BALL_R, line, quad, type Pt } from "./path";
 
 export const WORLD_W = 5200;
 export const FLOOR = 800;

@@ -631,6 +631,20 @@ export function playDrum() {
   hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
 }
 
+/** "Bumm, bamm, bimm" – toy drums from big and low (0) to small and high. */
+export function playDrumNote(i: number) {
+  const pitch = 130 * 1.4 ** i;
+  note({ from: pitch, to: pitch * 0.4, duration: 0.45, type: "sine", volume: 0.5 });
+  hiss({ from: 900 + i * 300, to: 250, duration: 0.18, volume: 0.14, q: 0.6 });
+}
+
+/** "Plinng" – a hanging metal chime, low (0) to high, ringing on softly. */
+export function playChimeNote(i: number) {
+  const freq = PENTATONIC[i % PENTATONIC.length];
+  note({ from: freq, duration: 1.6, type: "sine", volume: 0.16 });
+  note({ from: freq * 2.76, duration: 0.5, type: "sine", volume: 0.04 });
+}
+
 /** "Fiiiiep!" – a whistling kettle: steam hisses, then the whistle rises and wobbles. */
 export function playKettle() {
   hiss({ from: 2500, to: 3200, duration: 1.4, volume: 0.1, q: 1.2 });

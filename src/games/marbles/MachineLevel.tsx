@@ -32,8 +32,8 @@ import {
 import { beside, deg, seg } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { DARK_WOOD, Hopper, INK, MARBLE_COLOR, Picture, WallClock, Window, WOOD } from "./scenery";
-import { BALL_R, type Pt } from "./track";
-import { BAR_COLORS, Ball, Rail } from "./TrackLevel";
+import { BALL_R, type Pt } from "./path";
+import { BAR_COLORS, Ball, Rail } from "./parts";
 
 /**
  * Level 3: the big machine. One tap lets the marble go, and then one thing

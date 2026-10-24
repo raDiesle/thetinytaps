@@ -41,8 +41,8 @@ import {
 import { deg } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
-import { BALL_R, type Pt } from "./track";
-import { BAR_COLORS, Ball } from "./TrackLevel";
+import { BALL_R, type Pt } from "./path";
+import { BAR_COLORS, Ball } from "./parts";
 
 /** The sky behind the building site. */
 const SKY = "#bfe9ff";

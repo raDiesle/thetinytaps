@@ -1,6 +1,6 @@
 // Drawings the machines share: ink and wood colours, and things on the wall.
 
-import { BAR_COLORS } from "./TrackLevel";
+import { BAR_COLORS } from "./parts";
 
 export const INK = "#2a1e5c";
 export const WOOD = "#d08c4b";

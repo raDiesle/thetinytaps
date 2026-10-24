@@ -39,8 +39,8 @@ import {
 import { beside, deg, seg, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
-import { BALL_R, type Pt } from "./track";
-import { BAR_COLORS, Ball } from "./TrackLevel";
+import { BALL_R, type Pt } from "./path";
+import { BAR_COLORS, Ball } from "./parts";
 
 const LAWN = "#7fd34e";
 const LEAF = "#4caf50";

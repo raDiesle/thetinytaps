@@ -49,6 +49,13 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
+    id: "kugelbahn",
+    emoji: "🎢",
+    title: "Kugelbahn",
+    subtitle: "Ein Tipp, und die Kugeln rollen eine lange Bahn hinunter.",
+    games: [{ href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn" }],
+  },
+  {
     id: "weitere",
     emoji: "🎈",
     title: "Weitere",

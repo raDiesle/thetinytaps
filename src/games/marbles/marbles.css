@@ -1,4 +1,4 @@
-/* ---------- Kugelbahn ---------- */
+/* ---------- Kettenreaktion ---------- */
 
 .marble-play,
 .marble-level {
@@ -42,29 +42,6 @@
   display: block;
   width: 100%;
   height: 100%;
-}
-
-.spot-tap {
-  cursor: pointer;
-}
-
-.spot-wrench {
-  pointer-events: none;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-
-.spot-wrench.busy {
-  animation: spot-wrench 0.3s ease-in-out infinite alternate;
-}
-
-@keyframes spot-wrench {
-  from {
-    transform: rotate(-20deg);
-  }
-  to {
-    transform: rotate(20deg);
-  }
 }
 
 .marble-hint,
@@ -120,8 +97,7 @@
 @media (prefers-reduced-motion: reduce) {
   .marble-hint,
   .topple-hint,
-  .thing-drop,
-  .spot-wrench.busy {
+  .thing-drop {
     animation: none;
     opacity: 1;
   }

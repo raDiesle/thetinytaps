@@ -3,7 +3,7 @@ import { playDrum, playKnock } from "@/lib/sfx";
 import { useAnyKey, useFrames, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { cameraOn } from "./machineKit";
 import { pickThings, type Thing } from "./things";
-import type { Pt } from "./track";
+import type { Pt } from "./path";
 
 const INK = "#2a1e5c";
 const FLOOR = 790;

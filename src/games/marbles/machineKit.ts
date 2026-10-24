@@ -4,7 +4,7 @@
 // tap, so its level only asks where each thing is at a moment.
 
 import { VIEW_W } from "./level";
-import { indexAt, line, quad, type Pt } from "./track";
+import { indexAt, line, quad, type Pt } from "./path";
 
 export const STEP = 1 / 120;
 export const GRAVITY = 1500;

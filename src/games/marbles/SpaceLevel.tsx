@@ -39,8 +39,8 @@ import {
   WORLD_W,
   type Space,
 } from "./space";
-import { BALL_R, type Pt } from "./track";
-import { BAR_COLORS, Ball } from "./TrackLevel";
+import { BALL_R, type Pt } from "./path";
+import { BAR_COLORS, Ball } from "./parts";
 
 const SKY_TOP = "#0d1446";
 const SKY_LOW = "#2b3a88";

@@ -36,8 +36,8 @@ import {
 import { beside, deg, lerp, rad, seg, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { Bunting, INK, MARBLE_COLOR, Sparkles } from "./scenery";
-import { BALL_R, type Pt } from "./track";
-import { BAR_COLORS, Ball } from "./TrackLevel";
+import { BALL_R, type Pt } from "./path";
+import { BAR_COLORS, Ball } from "./parts";
 
 /** The tent's two stripe colours; the red one is the level's main colour. */
 const TENT_RED = "#e8505b";
