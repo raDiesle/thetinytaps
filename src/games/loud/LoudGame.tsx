@@ -12,7 +12,7 @@ import "./loud.css";
 const MODES = [
   { id: "all", emoji: "🌈", title: "Beides nacheinander", featured: true },
   { id: "voice", emoji: "🦁", title: "Löwe und Maus" },
-  { id: "blow", emoji: "🌬️", title: "Pusten" },
+  { id: "blow", emoji: "🎂", title: "Pusten" },
 ];
 
 export function LoudGame() {
