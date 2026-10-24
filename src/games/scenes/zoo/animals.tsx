@@ -15,7 +15,15 @@ export function Affe() {
       <path d="M-150 -318 V-176" stroke="#d4a373" strokeWidth="6" strokeLinecap="round" />
       <circle cx="-150" cy="-176" r="5" fill="#bc8a5f" />
       <path d="M-164 -128 Q-170 -160 -156 -180 M-136 -128 Q-130 -160 -144 -180" stroke={MONKEY} strokeWidth="10" strokeLinecap="round" fill="none" />
-      <path className="zo-affe-tail" d="M-150 -84 Q-150 -50 -122 -54 Q-104 -60 -114 -76 Q-122 -84 -128 -74" stroke={MONKEY} strokeWidth="6" strokeLinecap="round" fill="none" style={{ transformOrigin: "-150px -84px" }} />
+      <path
+        className="zo-affe-tail"
+        d="M-150 -84 Q-150 -50 -122 -54 Q-104 -60 -114 -76 Q-122 -84 -128 -74"
+        stroke={MONKEY}
+        strokeWidth="6"
+        strokeLinecap="round"
+        fill="none"
+        style={{ transformOrigin: "-150px -84px" }}
+      />
       <g className="zo-affe-legs" style={{ transformOrigin: "-150px -92px" }}>
         <path d="M-160 -90 Q-176 -70 -170 -54 M-140 -90 Q-124 -70 -130 -54" stroke={MONKEY} strokeWidth="10" strokeLinecap="round" fill="none" />
         <ellipse cx="-172" cy="-52" rx="8" ry="5" fill={MONKEY_FACE} />
@@ -43,7 +51,15 @@ export function Affe() {
 export function Aeffchen() {
   return (
     <g className="zo-aeffchen-body" style={{ transformOrigin: "120px -168px" }}>
-      <path className="zo-aeffchen-tail" d="M104 -172 Q90 -150 96 -126 Q104 -114 112 -126" stroke={MONKEY} strokeWidth="5" strokeLinecap="round" fill="none" style={{ transformOrigin: "104px -172px" }} />
+      <path
+        className="zo-aeffchen-tail"
+        d="M104 -172 Q90 -150 96 -126 Q104 -114 112 -126"
+        stroke={MONKEY}
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+        style={{ transformOrigin: "104px -172px" }}
+      />
       <ellipse cx="106" cy="-172" rx="10" ry="6" fill={MONKEY} />
       <ellipse cx="134" cy="-172" rx="10" ry="6" fill={MONKEY} />
       <ellipse cx="120" cy="-194" rx="18" ry="22" fill={MONKEY} />
@@ -119,7 +135,12 @@ export function Panda() {
       <g className="zo-panda-arm" style={{ transformOrigin: "36px -94px" }}>
         <path d="M66 -12 L80 -170" stroke="#74c69d" strokeWidth="10" strokeLinecap="round" />
         <path d="M68 -50 h12 M72 -100 h12 M76 -146 h10" stroke="#52b788" strokeWidth="4" />
-        <path className="zo-panda-leaves" d="M78 -150 q24 -14 30 -36 q-24 8 -30 36 Z M76 -120 q-24 -8 -34 -28 q24 4 34 28 Z" fill="#52b788" style={{ transformOrigin: "77px -135px" }} />
+        <path
+          className="zo-panda-leaves"
+          d="M78 -150 q24 -14 30 -36 q-24 8 -30 36 Z M76 -120 q-24 -8 -34 -28 q24 4 34 28 Z"
+          fill="#52b788"
+          style={{ transformOrigin: "77px -135px" }}
+        />
         <path d="M36 -94 Q60 -86 72 -64" stroke={INK} strokeWidth="22" strokeLinecap="round" fill="none" />
       </g>
       <g className="zo-panda-head" style={{ transformOrigin: "0px -110px" }}>
@@ -152,7 +173,15 @@ export function Kaenguru() {
     <>
       <Drops x={10} y={-6} className="zo-dust" fill="#d6c3a5" count={4} spread={30} />
       <g className="zo-kaenguru-body" style={{ transformOrigin: "0px 0px" }}>
-        <path className="zo-kaenguru-tail" d="M30 -40 Q90 -30 130 -4" stroke={KANGAROO} strokeWidth="20" strokeLinecap="round" fill="none" style={{ transformOrigin: "30px -40px" }} />
+        <path
+          className="zo-kaenguru-tail"
+          d="M30 -40 Q90 -30 130 -4"
+          stroke={KANGAROO}
+          strokeWidth="20"
+          strokeLinecap="round"
+          fill="none"
+          style={{ transformOrigin: "30px -40px" }}
+        />
         <path d="M-30 -4 H16 Q24 -20 10 -60 Q0 -80 -14 -60 Z" fill="#b5652c" />
         <ellipse cx="6" cy="-92" rx="44" ry="66" fill={KANGAROO} transform="rotate(12 6 -92)" />
         <ellipse cx="-6" cy="-84" rx="24" ry="40" fill="#f1c9a0" transform="rotate(12 -6 -84)" />
@@ -340,7 +369,15 @@ export function Schmetterling() {
         <circle cx="22" cy="-16" r="6" fill="#f77f00" />
       </g>
       <ellipse cx="0" cy="4" rx="3.5" ry="16" fill={INK} />
-      <path className="zo-schmetterling-antennae" d="M-1 -10 Q-6 -22 -12 -26 M1 -10 Q6 -22 12 -26" stroke={INK} strokeWidth="1.8" fill="none" strokeLinecap="round" style={{ transformOrigin: "0px -10px" }} />
+      <path
+        className="zo-schmetterling-antennae"
+        d="M-1 -10 Q-6 -22 -12 -26 M1 -10 Q6 -22 12 -26"
+        stroke={INK}
+        strokeWidth="1.8"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "0px -10px" }}
+      />
       <g className="zo-schmetterling-hearts" fill="#ff8fa3">
         {[0, 1].map((i) => (
           <path key={i} d={`M${-8 + i * 16} -36 c-4 -6 -12 0 0 8 c12 -8 4 -14 0 -8 Z`} style={nth(i)} />

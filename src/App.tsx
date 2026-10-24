@@ -16,7 +16,6 @@ const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage");
 const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage");
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage");
 const IdeasPage = page(() => import("@/pages/IdeasPage"), "IdeasPage");
-const KidHome = page(() => import("@/pages/KidHome"), "KidHome");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage");
 const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
@@ -46,7 +45,6 @@ export function App() {
         <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
         <Route path="aufzug" element={<ElevatorPage />} />
         <Route path="abenteuer" element={<AdventurePage />} />
-        <Route path="kinder" element={<KidHome />} />
         <Route path="ideen" element={<IdeasPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

@@ -31,18 +31,24 @@ export function MarbleGame() {
       onMode={(levels) => update({ levels: levels as MarbleLevels })}
       settings={
         <>
-          <p className="setting-note">
-            Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft von selbst bis zum Ende, und das Bild fährt mit.
-          </p>
+          <p className="setting-note">Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft von selbst bis zum Ende, und das Bild fährt mit.</p>
           <SettingsGroup title="Kugelbahn">
+            <Toggle
+              label="Was rollt denn da? Oben liegen drei Dinge zur Wahl, ein Tipp lässt genau dieses los"
+              checked={settings.pick}
+              onChange={(pick) => update({ pick })}
+            />
+            <p className="setting-note">
+              Murmel, Tennisball, Eisenkugel, Apfel und Seifenblase rollen jedes anders. Ausgeschaltet öffnet ein Tipp den Trichter, und sechs Kugeln rollen von
+              selbst.
+            </p>
             <Toggle
               label="Umbauen: Tippen auf einen der drei Plätze mit 🔧 wechselt das Teil"
               checked={settings.rebuild}
               onChange={(rebuild) => update({ rebuild })}
             />
             <p className="setting-note">
-              Glocke, Trampolin, Trichter und Wasserrad gehen reihum; die nächste Kugel nimmt den neuen Weg. Ausgeschaltet bleibt die Bahn
-              wie immer.
+              Glocke, Trampolin, Trichter und Wasserrad gehen reihum; die nächste Kugel nimmt den neuen Weg. Ausgeschaltet bleibt die Bahn wie immer.
             </p>
           </SettingsGroup>
         </>

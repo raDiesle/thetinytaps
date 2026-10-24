@@ -19,11 +19,7 @@ export type Piece = "bell" | "trampoline" | "funnel" | "wheel";
 export const PIECES: Piece[] = ["bell", "trampoline", "funnel", "wheel"];
 
 /** Something along the way that sounds or moves when a marble gets there. */
-export type TrackEvent =
-  | { kind: "note"; bar: number }
-  | { kind: Piece; slot: number }
-  | { kind: "seesaw" }
-  | { kind: "basket" };
+export type TrackEvent = { kind: "note"; bar: number } | { kind: Piece; slot: number } | { kind: "seesaw" } | { kind: "basket" };
 
 /* ---------- Layout ---------- */
 
@@ -74,6 +70,37 @@ export const BASKET_SLOTS: Pt[] = [
 
 /** Marbles in the basket that make it full. */
 export const BASKET_FULL = 6;
+
+/* ---------- Things that roll (K-07) ---------- */
+
+/** Something that can roll down the run; with the shelf on, the child picks which. */
+export type Roller = "marble" | "tennis" | "iron" | "apple" | "bubble";
+
+export const ROLLERS: Roller[] = ["marble", "tennis", "iron", "apple", "bubble"];
+
+/** How a thing rolls. */
+export interface RollerKind {
+  /** Radius on the run; bigger things are drawn a little higher, so they still sit on the rail. */
+  r: number;
+  /** How fast it goes compared to a marble, in the parts with a fixed speed too. */
+  pace: number;
+  /** Floats along at an even speed instead of rolling faster downhill. */
+  float?: boolean;
+}
+
+export const ROLLER: Record<Roller, RollerKind> = {
+  marble: { r: BALL_R, pace: 1 },
+  tennis: { r: 24, pace: 1.1 },
+  iron: { r: 25, pace: 0.55 },
+  apple: { r: 24, pace: 0.85 },
+  bubble: { r: 27, pace: 0.8, float: true },
+};
+
+/** The shelf over row 1a with three things to pick from, drawn this much bigger than on the run. */
+export const SHELF = { x0: 205, x1: 560, y: 74, things: [262, 382, 502], scale: 1.55 };
+
+/** The middle of `kind` lying in the i-th place on the shelf. */
+export const shelfSpot = (i: number, kind: Roller): Pt => ({ x: SHELF.things[i], y: SHELF.y - ROLLER[kind].r * SHELF.scale });
 
 /* ---------- Spots ---------- */
 

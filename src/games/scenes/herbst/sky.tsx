@@ -103,7 +103,14 @@ export function Drachen() {
   const [hx, hy] = HAND;
   return (
     <g className="he-drachen-fly" style={{ transformOrigin: `${hx}px ${hy}px` }}>
-      <path className="he-drachen-string" d={`M1030 130 Q1044 ${(130 + hy) / 2 + 30} ${hx} ${hy}`} stroke={INK} strokeOpacity="0.55" strokeWidth="2" fill="none" />
+      <path
+        className="he-drachen-string"
+        d={`M1030 130 Q1044 ${(130 + hy) / 2 + 30} ${hx} ${hy}`}
+        stroke={INK}
+        strokeOpacity="0.55"
+        strokeWidth="2"
+        fill="none"
+      />
       <g className="he-drachen-tail" style={{ transformOrigin: "1030px 200px" }}>
         <path d="M1030 200 q-16 22 -4 44 q12 22 -6 46 q-14 20 -2 42" stroke={INK} strokeOpacity="0.6" strokeWidth="2.5" fill="none" />
         {BOWS.map(([x, y, c], i) => (

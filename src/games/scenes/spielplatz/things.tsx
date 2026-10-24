@@ -53,7 +53,17 @@ export function Ball() {
 export function Eimer() {
   return (
     <>
-      <Puffs className="sp-eimer-sand" spots={[[58, -14], [80, -8], [70, -28], [96, -18]]} r={11} fill={SAND} />
+      <Puffs
+        className="sp-eimer-sand"
+        spots={[
+          [58, -14],
+          [80, -8],
+          [70, -28],
+          [96, -18],
+        ]}
+        r={11}
+        fill={SAND}
+      />
       {/* Something was hiding under the bucket and digs itself out of the sand. */}
       <Hideout x={-40} y={-90} w={80} h={90} size={60} />
       <g className="sp-eimer-tip" style={{ transformOrigin: "40px 0px" }}>
@@ -87,7 +97,8 @@ function mouldPath(shape: string, x: number, y: number, r: number) {
       " Z"
     );
   }
-  if (shape === "fish") return `M${x - r} ${y} Q${x - r * 0.2} ${y - r} ${x + r * 0.5} ${y} Q${x - r * 0.2} ${y + r} ${x - r} ${y} Z M${x + r * 0.4} ${y} L${x + r} ${y - r * 0.6} V${y + r * 0.6} Z`;
+  if (shape === "fish")
+    return `M${x - r} ${y} Q${x - r * 0.2} ${y - r} ${x + r * 0.5} ${y} Q${x - r * 0.2} ${y + r} ${x - r} ${y} Z M${x + r * 0.4} ${y} L${x + r} ${y - r * 0.6} V${y + r * 0.6} Z`;
   return `M${x} ${y + r * 0.8} C${x - r * 1.5} ${y - r * 0.2} ${x - r * 0.6} ${y - r * 1.2} ${x} ${y - r * 0.4} C${x + r * 0.6} ${y - r * 1.2} ${x + r * 1.5} ${y - r * 0.2} ${x} ${y + r * 0.8} Z`;
 }
 
@@ -104,7 +115,16 @@ export function Foermchen() {
           </g>
         </g>
       ))}
-      <Sparkles className="sp-form-sparkle" spots={[[-60, -60], [0, -60], [60, -60]]} r={9} fill="#fff9db" />
+      <Sparkles
+        className="sp-form-sparkle"
+        spots={[
+          [-60, -60],
+          [0, -60],
+          [60, -60],
+        ]}
+        r={9}
+        fill="#fff9db"
+      />
     </>
   );
 }
@@ -140,7 +160,16 @@ export function Sandburg() {
       <g className="sp-burg-flag" style={{ transformOrigin: "0px -204px" }}>
         <path d="M0 -206 Q16 -212 32 -202 Q22 -196 32 -188 Q16 -194 0 -190 Z" fill="#e63946" />
       </g>
-      <Puffs className="sp-burg-sand" spots={[[-62, -124], [-56, -140], [48, -124]]} r={6} fill={SAND_DARK} />
+      <Puffs
+        className="sp-burg-sand"
+        spots={[
+          [-62, -124],
+          [-56, -140],
+          [48, -124],
+        ]}
+        r={6}
+        fill={SAND_DARK}
+      />
     </>
   );
 }
@@ -149,7 +178,16 @@ export function Sandburg() {
 export function Bagger() {
   return (
     <>
-      <Puffs className="sp-bagger-sand" spots={[[118, -18], [134, -30], [104, -32]]} r={8} fill={SAND} />
+      <Puffs
+        className="sp-bagger-sand"
+        spots={[
+          [118, -18],
+          [134, -30],
+          [104, -32],
+        ]}
+        r={8}
+        fill={SAND}
+      />
       <g className="sp-bagger-body">
         <rect x="-70" y="-56" width="104" height="30" rx="8" fill="#fab005" />
         <rect x="-60" y="-104" width="52" height="52" rx="10" fill="#ffd43b" />

@@ -555,10 +555,12 @@ export class Guide {
       return "body";
     });
     // The root of the arm and leg sits inside the body anyway; only what reaches out of it shows through.
-    this.seeThrough(
-      parts.slice(0, 4) as [THREE.Object3D, ContourPart][],
-      [this.armL.upper.children[0], this.armR.upper.children[0], this.legL.hip.children[0], this.legR.hip.children[0]],
-    );
+    this.seeThrough(parts.slice(0, 4) as [THREE.Object3D, ContourPart][], [
+      this.armL.upper.children[0],
+      this.armR.upper.children[0],
+      this.legL.hip.children[0],
+      this.legR.hip.children[0],
+    ]);
     this.root.scale.setScalar(GUIDE_SIZE);
   }
 

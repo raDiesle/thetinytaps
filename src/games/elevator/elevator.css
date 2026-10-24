@@ -43,7 +43,6 @@
 }
 
 .el-bubble,
-.el-tap,
 .el-cabin-front,
 .el-hint,
 .el-night,
@@ -206,9 +205,13 @@
   animation: el-tuck 1s ease-in-out infinite;
 }
 
-/* The thought bubble pops up out of the child's head. */
+/* The thought bubble pops up out of the child's head once per wish; a reminder runs a light along its outline. */
 .el-bubble {
   animation: el-pop 0.55s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+.el-bubble-trace {
+  animation: el-trace 2.2s linear both;
 }
 
 /* ---------- Things in the rooms ---------- */
@@ -338,6 +341,11 @@
 }
 
 /* Cooking: eggshells fall apart, flour puffs up, the mixer whirls, the pancake flies onto the plate. */
+/* The batter fades in while the mixer whirls. */
+.el-blend {
+  animation: el-fade-in 1.2s ease-in both;
+}
+
 .el-shell-l {
   animation: el-shell-l 0.7s ease-out forwards;
 }
@@ -371,18 +379,6 @@
   transform-box: fill-box;
   transform-origin: center;
   animation: el-fly 0.9s ease-in-out forwards;
-}
-
-.el-cupboard-door {
-  transition: transform 0.45s ease-in-out;
-}
-
-.el-cupboard-door.open {
-  transform: scaleX(-0.3);
-}
-
-.el-rock {
-  animation: el-rock 0.9s ease-in-out;
 }
 
 .el-sparkle path {
@@ -435,20 +431,64 @@
   animation: el-twinkle 2s ease-in-out infinite alternate;
 }
 
-/* ---------- The hand that shows where to tap ---------- */
+/* ---------- The action button ---------- */
 
-.el-tap-pop {
-  animation: el-pop 0.45s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+/* Grey and still while there is nothing to do; red with a glowing ring while it waits for a tap. */
+.el-action {
+  cursor: pointer;
 }
 
-.el-tap-ring {
+.el-action-base {
+  fill: #adb5bd;
+  transition: fill 0.3s;
+}
+
+.el-action-face {
+  fill: #dee2e6;
+  stroke: #f8f9fa;
+  transition: fill 0.3s;
+}
+
+.el-action-star {
+  fill: #f1f3f5;
+  stroke: #ced4da;
+  transition: fill 0.3s;
+}
+
+.el-action-glow {
+  opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
-  animation: el-ring 0.9s ease-in-out infinite alternate;
 }
 
-.el-tap-hand {
-  animation: el-press 0.9s ease-in-out infinite;
+.el-action.on .el-action-base {
+  fill: #c92a2a;
+}
+
+.el-action.on .el-action-face {
+  fill: #fa5252;
+  stroke: #fff;
+}
+
+.el-action.on .el-action-star {
+  fill: #ffe066;
+  stroke: #fff;
+}
+
+.el-action.on .el-action-glow {
+  animation: el-action-glow 0.9s ease-in-out infinite alternate;
+}
+
+.el-action.on .el-action-jump {
+  animation: el-action-jump 0.6s cubic-bezier(0.3, 1.6, 0.6, 1);
+}
+
+.el-action-press {
+  transition: transform 0.1s;
+}
+
+.el-action:active .el-action-press {
+  transform: translateY(8px);
 }
 
 /* ---------- Lift, buttons, hint, night, party ---------- */
@@ -872,15 +912,6 @@
   }
 }
 
-@keyframes el-rock {
-  25% {
-    transform: rotate(-8deg);
-  }
-  75% {
-    transform: rotate(8deg);
-  }
-}
-
 @keyframes el-sparkle {
   from {
     transform: scale(0);
@@ -889,25 +920,6 @@
   to {
     transform: scale(1.5);
     opacity: 0;
-  }
-}
-
-@keyframes el-ring {
-  from {
-    transform: scale(0.85);
-  }
-  to {
-    transform: scale(1.1);
-  }
-}
-
-@keyframes el-press {
-  0%,
-  100% {
-    transform: translate(12px, -16px);
-  }
-  50% {
-    transform: translate(0, 0);
   }
 }
 
@@ -1039,6 +1051,41 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes el-action-glow {
+  from {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes el-action-jump {
+  0% {
+    transform: scale(0.85);
+  }
+  50% {
+    transform: scale(1.12);
+  }
+}
+
+@keyframes el-trace {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  10%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -200;
+    opacity: 0;
   }
 }
 

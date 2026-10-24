@@ -10,9 +10,15 @@ export const BALANCE: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["legs", "feet", "arms", "torso"],
-    bodyMovement: "Das Kind macht auf der Stelle langsame, vorsichtige Schritte mit normal breiten Füßen und hält die Arme weit zur Seite ausgestreckt, um mit dem leichten Schaukeln der Brücke mitzugehen.",
+    bodyMovement:
+      "Das Kind macht auf der Stelle langsame, vorsichtige Schritte mit normal breiten Füßen und hält die Arme weit zur Seite ausgestreckt, um mit dem leichten Schaukeln der Brücke mitzugehen.",
     startingPose: "Stehen, Arme weit zur Seite ausgestreckt.",
-    movementSteps: ["Arme zur Seite wie Flügel", "Langsam einen Fuß heben und absetzen", "Wenn die Brücke schaukelt: mitwackeln", "Weiter, Schritt für Schritt"],
+    movementSteps: [
+      "Arme zur Seite wie Flügel",
+      "Langsam einen Fuß heben und absetzen",
+      "Wenn die Brücke schaukelt: mitwackeln",
+      "Weiter, Schritt für Schritt",
+    ],
     durationSeconds: 18,
     repetitions: 1,
     instruction: "Arme raus, ganz langsam!",
@@ -96,7 +102,8 @@ export const BALANCE: Movement[] = [
     difficulty: "medium",
     bodyZone: "legs",
     bodyParts: ["legs", "knees", "feet", "arms"],
-    bodyMovement: "Das Kind hebt einen Fuß ein kleines Stück vom Boden, steht einen Moment auf dem anderen Bein und stellt den Fuß wieder ab; dann wechselt es das Bein.",
+    bodyMovement:
+      "Das Kind hebt einen Fuß ein kleines Stück vom Boden, steht einen Moment auf dem anderen Bein und stellt den Fuß wieder ab; dann wechselt es das Bein.",
     startingPose: "Stehen, Arme zur Seite oder Hand an einer Stuhllehne.",
     movementSteps: ["Arme zur Seite", "Einen Fuß ein bisschen anheben", "Kurz halten: 1, 2", "Abstellen, anderes Bein"],
     durationSeconds: 15,
@@ -143,7 +150,8 @@ export const BALANCE: Movement[] = [
     difficulty: "medium",
     bodyZone: "legs",
     bodyParts: ["feet", "legs", "arms"],
-    bodyMovement: "Das Kind setzt einen Fuß direkt vor den anderen, Ferse an Zehen, und geht so langsam auf einer gedachten schmalen Linie vorwärts – anders als bei der Hängebrücke sind die Füße ganz eng hintereinander.",
+    bodyMovement:
+      "Das Kind setzt einen Fuß direkt vor den anderen, Ferse an Zehen, und geht so langsam auf einer gedachten schmalen Linie vorwärts – anders als bei der Hängebrücke sind die Füße ganz eng hintereinander.",
     startingPose: "Stehen, ein Fuß direkt vor dem anderen, Arme zur Seite.",
     movementSteps: ["Arme zur Seite", "Fuß genau vor den anderen setzen", "Nächster Fuß davor", "Langsam ein paar Schritte"],
     durationSeconds: 18,
@@ -190,7 +198,8 @@ export const BALANCE: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["hands", "arms", "legs", "feet"],
-    bodyMovement: "Das Kind hält mit beiden Händen ein gedachtes Tablett waagerecht vor dem Bauch und geht ganz langsam mit kleinen Schritten auf der Stelle, ohne dass das Tablett kippt.",
+    bodyMovement:
+      "Das Kind hält mit beiden Händen ein gedachtes Tablett waagerecht vor dem Bauch und geht ganz langsam mit kleinen Schritten auf der Stelle, ohne dass das Tablett kippt.",
     startingPose: "Stehen, beide Hände vorn, Handflächen nach oben.",
     movementSteps: ["Tablett mit beiden Händen halten", "Ganz gerade halten", "Kleine, langsame Schritte", "Vorsichtig abstellen"],
     durationSeconds: 16,

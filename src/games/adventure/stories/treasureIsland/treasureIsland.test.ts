@@ -1,5 +1,6 @@
 import { expect, test } from "@rstest/core";
-import { clipLength, CYCLES, TREASURE_ISLAND } from "./treasureIsland";
+import { TREASURE_ISLAND } from ".";
+import { CYCLES, clipLength } from "./script";
 
 test("every movement of the Schatzinsel ends after whole goes, so each go has its target", () => {
   CYCLES.forEach((cycle, step) => {

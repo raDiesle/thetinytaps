@@ -1,6 +1,7 @@
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
+import { FEELINGS } from "./bear";
 import { BearPlay } from "./BearPlay";
 import { SITUATIONS } from "./kita";
 import { KitaPlay } from "./KitaPlay";
@@ -29,34 +30,41 @@ export function FeelingsGame() {
       ]}
       mode={kita ? `kita-${settings.answers}` : "bear"}
       onMode={(id) => update(MODE_PATCH[id])}
+      level={
+        <>
+          <Choice<FeelingsSettings["feeling"]>
+            label="🐻 Bär trösten: Gefühl"
+            value={settings.feeling}
+            onChange={(feeling) => update({ feeling })}
+            options={[{ value: "all", label: "🌈 Alle" }, ...FEELINGS.map((f) => ({ value: f.id, label: `${f.emoji} ${f.title}` }))]}
+          />
+          <Choice<FeelingsSettings["situation"]>
+            label="🏫 Kindergarten: Geschichte"
+            value={settings.situation}
+            onChange={(situation) => update({ situation })}
+            options={[{ value: "all", label: "🌈 Alle" }, ...SITUATIONS.map((s) => ({ value: s.id, label: `${s.emoji} ${s.title}` }))]}
+          />
+        </>
+      }
       settings={
         <>
           <SettingsGroup title="🏫 Im Kindergarten">
-            <Choice<FeelingsSettings["situation"]>
-              label="Geschichte"
-              value={settings.situation}
-              onChange={(situation) => update({ situation })}
-              options={[
-                { value: "all", label: "🌈 Alle" },
-                ...SITUATIONS.map((s) => ({ value: s.id, label: `${s.emoji} ${s.title}` })),
-              ]}
-            />
             <p className="setting-note">
-              Kleine Geschichten: Jemand schubst, tritt oder nimmt etwas weg, die Rutsche ist voll, ein anderes Kind hat das tolle
-              Spielzeug – oder der kleine Bär ist selbst wütend. Das Kind tippt, was der Bär tun kann: laut „Stopp! Nein!“ sagen,
-              weggehen und Abstand halten, Hilfe holen, fragen, warten, tauschen.
+              Kleine Geschichten: Jemand schubst, tritt oder nimmt etwas weg, die Rutsche ist voll, ein anderes Kind hat das tolle Spielzeug – oder der kleine
+              Bär ist selbst wütend. Das Kind tippt, was der Bär tun kann: laut „Stopp! Nein!“ sagen, weggehen und Abstand halten, Hilfe holen, fragen, warten,
+              tauschen.
             </p>
             <p className="setting-note">
-              Jede Antwort ist ein Bild, auf dem der Bär es vormacht – so kann das Kind ohne Lesen wählen. Beim Selbst-Wählen steht neben
-              dem ersten Schritt eine nicht so gute Idee (z.&nbsp;B. zurückschubsen). Tippt das Kind darauf, erscheint sie groß in der Mitte
-              mit rotem Kreuz und es wird erklärt, warum. Die gute Idee bekommt einen grünen Haken.
+              Jede Antwort ist ein Bild, auf dem der Bär es vormacht – so kann das Kind ohne Lesen wählen. Beim Selbst-Wählen steht neben dem ersten Schritt
+              eine nicht so gute Idee (z.&nbsp;B. zurückschubsen). Tippt das Kind darauf, erscheint sie groß in der Mitte mit rotem Kreuz und es wird erklärt,
+              warum. Die gute Idee bekommt einen grünen Haken.
             </p>
           </SettingsGroup>
 
           {!settings.speech && (
             <p className="setting-note">
-              Im Spiel steht kein Text, nur Bilder. Mit Vorlesen (auf der Startseite) wird die Geschichte erzählt, sonst erzählen
-              Erwachsene sie anhand der Bilder.
+              Im Spiel steht kein Text, nur Bilder. Mit Vorlesen (auf der Startseite) wird die Geschichte erzählt, sonst erzählen Erwachsene sie anhand der
+              Bilder.
             </p>
           )}
         </>

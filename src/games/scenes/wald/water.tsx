@@ -26,9 +26,25 @@ export function Bruecke() {
           <circle key={x} cx={x} cy={8} r="7" style={nth(i)} />
         ))}
       </g>
-      <path d={`M-150 ${deck(-150)} ${PLANKS.map((x) => `L${x + 25} ${deck(x + 25)}`).join(" ")} V${deck(150) + 18} ${[...PLANKS].reverse().map((x) => `L${x} ${deck(x) + 18}`).join(" ")} Z`} fill="#6f4e37" />
+      <path
+        d={`M-150 ${deck(-150)} ${PLANKS.map((x) => `L${x + 25} ${deck(x + 25)}`).join(" ")} V${deck(150) + 18} ${[...PLANKS]
+          .reverse()
+          .map((x) => `L${x} ${deck(x) + 18}`)
+          .join(" ")} Z`}
+        fill="#6f4e37"
+      />
       {PLANKS.map((x, i) => (
-        <rect key={x} className="wd-bruecke-plank" x={x + 1} y={deck(x + 12.5) - 9} width="23" height="16" rx="3" fill={i % 2 ? "#c49a6c" : "#b08968"} style={nth(i)} />
+        <rect
+          key={x}
+          className="wd-bruecke-plank"
+          x={x + 1}
+          y={deck(x + 12.5) - 9}
+          width="23"
+          height="16"
+          rx="3"
+          fill={i % 2 ? "#c49a6c" : "#b08968"}
+          style={nth(i)}
+        />
       ))}
       {/* Front railing */}
       <g className="wd-bruecke-rail" style={{ transformOrigin: "0px -40px", ...nth(1) }}>

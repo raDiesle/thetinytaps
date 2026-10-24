@@ -44,7 +44,8 @@
   height: 100%;
 }
 
-.spot-tap {
+.spot-tap,
+.shelf-thing {
   cursor: pointer;
 }
 

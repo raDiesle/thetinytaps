@@ -7,7 +7,8 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 ```bash
 yarn install
 yarn dev           # http://localhost:3000 (Rsbuild dev server)
-yarn verify        # typecheck + unit tests (Rstest)
+yarn verify        # lint + format check (Biome), typecheck, unit tests (Rstest)
+yarn format        # format and apply safe lint fixes
 yarn test          # unit tests only
 yarn build         # static site in out/
 yarn preview       # serve the built site
@@ -32,13 +33,13 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `public/icons/` | App icon: `icon.svg` (rounded) and `icon-maskable.svg` (full bleed, for home screens); the PNGs are made from them, see [App icon](#app-icon) |
 | `src/App.tsx` | Routes (React Router) |
 | `src/pages/` | One component per page |
-| `src/content/games.ts` | The home menu: four categories (Buchstaben & Zahlen, Zuordnen, Lebendige Stories, Weitere), each with its games on `/spiele/<id>/` (`src/pages/CategoryPage.tsx`); a game's back link leads to its category. New games go here (and into `TILES` in `src/pages/KidHome.tsx`) |
+| `src/content/games.ts` | The home menu: four categories (Buchstaben & Zahlen, Zuordnen, Lebendige Stories, Weitere), each with its games on `/spiele/<id>/` (`src/pages/CategoryPage.tsx`); a game's back link leads to its category. New games go here |
 | `src/components/GameShell.tsx` | Shared shell: parent start screen with a big card per way to play (mode or level; a tap picks it and starts) and the game's own options folded away, fullscreen + keyboard lock, the ✕ in the corner (a click leaves after half a second, „Zurück zum Menü“ shows next to it for a moment; Esc has to be held) |
 | `src/components/GameEnd.tsx` | End of a level: „Nochmal“ and „Weiter“ with the next level's picture, so a child plays on without the menu („Lebendige Bilder“ goes on to the next picture, „Kettenreaktion“ and „Laut und leise“ to the next level; „Gefühle“ has the same two buttons under its stories) |
 | `src/components/HomeOptions.tsx`, `src/lib/common.ts`, `src/lib/playtime.ts` | On the home page, for all games: the play time per day (every minute in any game counts, kept in localStorage per day; the last minute winds down, then „Gute Nacht“), and folded away language, read aloud, sounds and calm mode. Games read their own settings through `useGameSettings`, which fills in the shared ones |
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
-| `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/globals.css` |
+| `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/styles/` (all loaded in order by `src/globals.css`) |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on the home page (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
 | `src/games/letters/` | Game „Buchstaben & Zahlen“: free typing, „Wo ist das B?“ and the Buchstaben-Zug. Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
@@ -53,9 +54,9 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/elevator/` | Game „Spaß im Aufzug“: picture stories in a house with a lift. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md) |
 | `src/games/adventure/` | Game „Bewegungsabenteuer“: 3D movement story with the fox Tapsi (three.js, lazy-loaded). Details in its [`CLAUDE.md`](src/games/adventure/CLAUDE.md) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
-| `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Spaß im Aufzug" use them (`playRecorded` / `recorded` in `src/lib/sfx.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
+| `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Spaß im Aufzug" use them (`playRecorded` / `recorded` in `src/lib/sfx/core.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
 | `scripts/gemini-image.mjs` | `yarn image <out.webp> "<prompt>"`: makes a picture with Gemini (needs `GEMINI_API_KEY` in your shell), optionally cut out (`--transparent`), sized and saved as WebP; the raw result stays in `.image-raw/`. Guide: the Claude Code skill [`.claude/skills/bild-erzeugen/SKILL.md`](.claude/skills/bild-erzeugen/SKILL.md) (`/bild-erzeugen`) |
-| `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
+| `src/content/ideas/` | Idea collection, one file per area (`n-new-games.ts` …) with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
 
 To add a scene to "Lebendige Bilder", create a folder like `src/games/scenes/baustelle/`
 with the drawing (SVG in React, one component per tappable item), its texts and a
@@ -80,8 +81,9 @@ tablets and phones (every pointer is a finger) the keys mode of "Lebendige
 Bilder" and the keyboard hints (Esc, arrow keys) are hidden, and a saved keys
 mode falls back to tapping; on computers without a touch screen the on-screen
 keys option is hidden and the keys stay off. On a phone held upright the
-pictures show a "Quer halten" note, since the wide picture gets tiny. On iPad the games go fullscreen; on
-iPhone (no fullscreen in Safari) add the page to the home screen to hide the
+pictures show a "Quer halten" note, since the wide picture gets tiny. On iPad the games go fullscreen, and the
+app stays in fullscreen after a game, menus included (the ⛶ button on the home page
+switches it on or off, and the other menus show it in the top right corner while in fullscreen); on iPhone (no fullscreen in Safari) add the page to the home screen to hide the
 browser bars.
 
 ## Offline and as an app
@@ -119,7 +121,8 @@ To add a picture that has no emoji, put an SVG in `public/images/` and set
 
 Hold **Esc** or the ✕ button (top right) for 1 second; the start screen of
 every game explains this before it starts. In Chrome/Edge the
-keyboard is locked in fullscreen, so shortcuts like Cmd+W are captured;
+keyboard is locked while a game runs, so shortcuts like Cmd+W are captured
+(in the menus a single Esc leaves fullscreen);
 Cmd+Q / Cmd+Tab can't be blocked by any website.
 
 ## Roadmap

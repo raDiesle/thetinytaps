@@ -17,9 +17,19 @@ function Wagon({ x, color, stripe }: { x: number; color: string; stripe: string 
         [x + 100, "#ffb703"],
       ].map(([cx, hair], i) => (
         <g key={cx} className="zo-bahn-kid" style={{ ...nth(i), transformOrigin: `${cx}px -100px` }}>
-          <path className="zo-bahn-wave" d={`M${(cx as number) + 12} -102 L${(cx as number) + 22} -136`} stroke={SKIN} strokeWidth="7" strokeLinecap="round" style={{ transformOrigin: `${(cx as number) + 12}px -102px` }} />
+          <path
+            className="zo-bahn-wave"
+            d={`M${(cx as number) + 12} -102 L${(cx as number) + 22} -136`}
+            stroke={SKIN}
+            strokeWidth="7"
+            strokeLinecap="round"
+            style={{ transformOrigin: `${(cx as number) + 12}px -102px` }}
+          />
           <circle cx={cx} cy="-118" r="17" fill={SKIN} />
-          <path d={`M${(cx as number) - 17} -120 Q${(cx as number) - 18} -138 ${cx} -137 Q${(cx as number) + 18} -138 ${(cx as number) + 17} -120 Q${(cx as number) + 4} -130 ${(cx as number) - 17} -120 Z`} fill={hair as string} />
+          <path
+            d={`M${(cx as number) - 17} -120 Q${(cx as number) - 18} -138 ${cx} -137 Q${(cx as number) + 18} -138 ${(cx as number) + 17} -120 Q${(cx as number) + 4} -130 ${(cx as number) - 17} -120 Z`}
+            fill={hair as string}
+          />
           <Face cx={cx as number} cy={-118} size={0.6} />
         </g>
       ))}
@@ -207,7 +217,14 @@ export function Eiswagen() {
 export function Luftballon() {
   return (
     <g className="zo-ballon-body" style={{ transformOrigin: "0px 0px" }}>
-      <path className="zo-ballon-string" d="M0 4 Q-12 30 4 52 Q18 72 4 96" stroke="#6c757d" strokeWidth="2.5" fill="none" style={{ transformOrigin: "0px 4px" }} />
+      <path
+        className="zo-ballon-string"
+        d="M0 4 Q-12 30 4 52 Q18 72 4 96"
+        stroke="#6c757d"
+        strokeWidth="2.5"
+        fill="none"
+        style={{ transformOrigin: "0px 4px" }}
+      />
       <ellipse cx="0" cy="-46" rx="36" ry="44" fill="#e63946" />
       <ellipse cx="-12" cy="-64" rx="9" ry="14" fill="#fff" opacity="0.5" transform="rotate(20 -12 -64)" />
       <path className="zo-ballon-twinkle" d="M22 -78 Q22 -68 32 -68 Q22 -68 22 -58 Q22 -68 12 -68 Q22 -68 22 -78 Z" fill="#fff" />

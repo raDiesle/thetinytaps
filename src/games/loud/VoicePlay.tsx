@@ -134,14 +134,7 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
   return (
     <div
       ref={rootRef}
-      className={[
-        "loud-play",
-        active === "lion" && "roaring",
-        active === "mouse" && "squeaking",
-        nudge && `nudge-${nudge}`,
-      ]
-        .filter(Boolean)
-        .join(" ")}
+      className={["loud-play", active === "lion" && "roaring", active === "mouse" && "squeaking", nudge && `nudge-${nudge}`].filter(Boolean).join(" ")}
     >
       <svg className="loud-scene" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax meet" role="img" aria-label="Löwe und Maus">
         <circle cx="120" cy="110" r="56" fill="#ffd166" />

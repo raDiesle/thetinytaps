@@ -81,7 +81,15 @@ export function Goldfisch() {
       {[-24, -8, 10, 24].map((dx, i) => (
         <circle key={dx} cx={x + dx} cy={y + r - 12 + (i % 2) * 3} r="4" fill={["#ff8fa3", "#ffe066", "#8ce99a", "#d0bfff"][i]} />
       ))}
-      <path className="gn-fisch-plant" style={{ transformOrigin: `${x + 26}px ${y + r - 12}px` }} d={`M${x + 26} ${y + r - 12} q-8 -18 0 -30 q8 -12 0 -24`} stroke="#51cf66" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path
+        className="gn-fisch-plant"
+        style={{ transformOrigin: `${x + 26}px ${y + r - 12}px` }}
+        d={`M${x + 26} ${y + r - 12} q-8 -18 0 -30 q8 -12 0 -24`}
+        stroke="#51cf66"
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+      />
       <g className="gn-fisch" style={{ transformOrigin: `${x - 4}px ${y + 6}px` }}>
         <path d={`M${x + 12} ${y + 6} L${x + 28} ${y - 6} Q${x + 24} ${y + 6} ${x + 28} ${y + 18} Z`} fill="#ff922b" />
         <ellipse cx={x - 4} cy={y + 6} rx="18" ry="12" fill="#ffa94d" />
@@ -96,7 +104,14 @@ export function Goldfisch() {
         ))}
       </g>
       <ellipse cx={x} cy={y - r + 4} rx={r * 0.6} ry="6" fill="none" stroke="#a5d8ff" strokeWidth="3" />
-      <path d={`M${x - r + 12} ${y - 14} Q${x - r + 10} ${y + 10} ${x - r + 22} ${y + 26}`} stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.7" fill="none" />
+      <path
+        d={`M${x - r + 12} ${y - 14} Q${x - r + 10} ${y + 10} ${x - r + 22} ${y + 26}`}
+        stroke="#fff"
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.7"
+        fill="none"
+      />
       <Zzz x={x + 36} y={y - r - 4} size={0.9} />
     </>
   );
@@ -134,7 +149,10 @@ export function Puppenhaus() {
               <g className="gn-haus-doll" style={{ transformOrigin: `${x + 30}px ${y + 50}px` }}>
                 <rect x={x + 18} y={y + 32} width="24" height="22" rx="8" fill="#74c0fc" />
                 <circle cx={x + 30} cy={y + 24} r="12" fill={SKIN} />
-                <path d={`M${x + 18} ${y + 22} Q${x + 20} ${y + 8} ${x + 30} ${y + 9} Q${x + 40} ${y + 8} ${x + 42} ${y + 22} Q${x + 30} ${y + 14} ${x + 18} ${y + 22} Z`} fill="#f6bd60" />
+                <path
+                  d={`M${x + 18} ${y + 22} Q${x + 20} ${y + 8} ${x + 30} ${y + 9} Q${x + 40} ${y + 8} ${x + 42} ${y + 22} Q${x + 30} ${y + 14} ${x + 18} ${y + 22} Z`}
+                  fill="#f6bd60"
+                />
                 <Eyes cx={x + 30} cy={y + 25} gap={4.5} r={1.8} />
               </g>
             </Inside>

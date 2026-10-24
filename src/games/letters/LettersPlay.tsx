@@ -39,9 +39,7 @@ const ARROWS: Record<string, [number, number]> = {
 
 const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#fff0e0"];
 
-type Shown =
-  | { kind: "letter"; id: number; letter: LetterEntry; word: WordEntry }
-  | { kind: "number"; id: number; n: number; thing: Countable };
+type Shown = { kind: "letter"; id: number; letter: LetterEntry; word: WordEntry } | { kind: "number"; id: number; n: number; thing: Countable };
 
 type Target = { kind: "letter"; letter: LetterEntry } | { kind: "number"; n: number };
 
@@ -104,10 +102,7 @@ export function LettersPlay({
   );
 
   /** Counting by tapping applies to numbers with things to tap, not to the empty nest. */
-  const byTap = useCallback(
-    (s: Shown | null) => settings.numbers === "tap" && s?.kind === "number" && s.n > 0,
-    [settings.numbers],
-  );
+  const byTap = useCallback((s: Shown | null) => settings.numbers === "tap" && s?.kind === "number" && s.n > 0, [settings.numbers]);
 
   /** The full sentence for a fully revealed letter or number. */
   const sentenceFor = useCallback(
@@ -229,10 +224,13 @@ export function LettersPlay({
       announce(next, from);
       for (let k = from + 1; k <= last; k++) {
         countTimers.current.push(
-          setTimeout(() => {
-            setStage(k);
-            announce(next, k, true);
-          }, (k - from) * COUNT_STEP_MS),
+          setTimeout(
+            () => {
+              setStage(k);
+              announce(next, k, true);
+            },
+            (k - from) * COUNT_STEP_MS,
+          ),
         );
       }
       countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + COUNT_SUMMARY_MS;
@@ -423,16 +421,10 @@ export function LettersPlay({
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
-    <div
-      className={`letters-play`}
-      style={{ background }}
-      onPointerDown={onPlayAreaPointer}
-    >
+    <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
-          {shown === null && (
-            <p className="letters-welcome">{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>
-          )}
+          {shown === null && <p className="letters-welcome">{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>}
           {shown?.kind === "letter" && (
             <LetterCard
               key={shown.id}
@@ -460,13 +452,7 @@ export function LettersPlay({
           )}
         </div>
       </div>
-      {touchKeys && (
-        <TouchKeyboard
-          rows={rows}
-          onKey={pressKey}
-          label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
-        />
-      )}
+      {touchKeys && <TouchKeyboard rows={rows} onKey={pressKey} label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

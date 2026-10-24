@@ -112,9 +112,7 @@ export function Spinne() {
       <g className="bz-spinne-body">
         <g className="bz-spinne-legs" stroke="#5f3dc4" strokeWidth="3.5" strokeLinecap="round" fill="none" style={{ transformOrigin: "1385px 142px" }}>
           {[-1, 1].map((s) =>
-            [0, 1, 2, 3].map((k) => (
-              <path key={`${s}${k}`} d={`M${1385 + s * 12} ${134 + k * 5} q${s * 12} ${-12 + k * 6} ${s * 20} ${-2 + k * 8}`} />
-            )),
+            [0, 1, 2, 3].map((k) => <path key={`${s}${k}`} d={`M${1385 + s * 12} ${134 + k * 5} q${s * 12} ${-12 + k * 6} ${s * 20} ${-2 + k * 8}`} />),
           )}
         </g>
         <circle cx="1385" cy="142" r="16" fill="#7950f2" />

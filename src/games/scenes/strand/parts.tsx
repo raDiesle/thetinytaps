@@ -12,7 +12,8 @@ export const SEA = "#4dabf7";
 export const FOAM = "#e7f5ff";
 
 /** A drop of water with its tip up, centred on (x, y). */
-export const dropPath = (x: number, y: number, r: number) => `M${x} ${y - r * 1.6} Q${x + r} ${y - r * 0.2} ${x} ${y + r} Q${x - r} ${y - r * 0.2} ${x} ${y - r * 1.6} Z`;
+export const dropPath = (x: number, y: number, r: number) =>
+  `M${x} ${y - r * 1.6} Q${x + r} ${y - r * 0.2} ${x} ${y + r} Q${x - r} ${y - r * 0.2} ${x} ${y - r * 1.6} Z`;
 
 /** Water drops that splash up while the item plays (fill-box, so each one can fly on its own). */
 export function Drops({ className, spots, r = 7, fill = "#a5d8ff" }: { className: string; spots: number[][]; r?: number; fill?: string }) {

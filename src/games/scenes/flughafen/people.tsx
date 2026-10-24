@@ -171,7 +171,11 @@ export function Pilotin() {
             [34, -154],
             [0, -148],
           ].map(([x, y], i) => (
-            <path key={i} d={`M${x} ${y - 9} Q${x} ${y} ${x + 9} ${y} Q${x} ${y} ${x} ${y + 9} Q${x} ${y} ${x - 9} ${y} Q${x} ${y} ${x} ${y - 9} Z`} style={nth(i)} />
+            <path
+              key={i}
+              d={`M${x} ${y - 9} Q${x} ${y} ${x + 9} ${y} Q${x} ${y} ${x} ${y + 9} Q${x} ${y} ${x - 9} ${y} Q${x} ${y} ${x} ${y - 9} Z`}
+              style={nth(i)}
+            />
           ))}
         </g>
       </g>

@@ -1,5 +1,5 @@
 // Result D: five playable sequences of about three minutes each. The first,
-// treasure_island, is the one with a 3D story (../stories/treasureIsland.ts).
+// treasure_island, is the one with a 3D story (../stories/treasureIsland/).
 import type { Sequence } from "./types";
 
 export const SEQUENCES: Sequence[] = [
@@ -41,7 +41,8 @@ export const SEQUENCES: Sequence[] = [
         movement: "stone_jump",
         seconds: 20.4,
         energy: "lively",
-        situation: "Von der Seite wie in einem Hüpfspiel: Ole trägt Tapsi über die kleine Brücke, Tapsi hüpft auf der Stelle, bei jedem dritten Sprung mit dem Kopf an eine Kiste stoßen, ein Stern springt heraus.",
+        situation:
+          "Von der Seite wie in einem Hüpfspiel: Ole trägt Tapsi über die kleine Brücke, Tapsi hüpft auf der Stelle, bei jedem dritten Sprung mit dem Kopf an eine Kiste stoßen, ein Stern springt heraus.",
         transition: "Am anderen Ufer geht es in den Dschungel.",
       },
       {
