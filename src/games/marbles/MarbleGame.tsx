@@ -38,6 +38,15 @@ export function MarbleGame() {
               fährt mit dem Schaufelrad und der Wippe und plumpst in den Korb – mehrere Kugeln dürfen gleichzeitig rollen. Ist der Korb
               voll, kommt die nächste Bahn.
             </p>
+            <Toggle
+              label="Kugelbahn umbauen: Tippen auf einen der drei Plätze mit 🔧 wechselt das Teil"
+              checked={settings.rebuild}
+              onChange={(rebuild) => update({ rebuild })}
+            />
+            <p className="setting-note">
+              Glocke, Trampolin, Trichter und Wasserrad gehen reihum; die nächste Kugel nimmt den neuen Weg. Ausgeschaltet bleibt die Bahn
+              wie immer, und jedes Tippen lässt eine Kugel los.
+            </p>
             <p className="setting-note">
               Alles fällt um: Buntstift, Bauklotz, Bücher, Flasche, Müslipackung … stehen in einer Reihe. Ein Tipp schubst das erste
               Ding an, und eins fällt nach dem anderen um, bis zur Trommel. Jedes Mal stehen andere Sachen da.
