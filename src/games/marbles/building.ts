@@ -23,24 +23,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { wobble } from "./level";
-import {
-  along,
-  cameraOn,
-  distAt,
-  easeIn,
-  easeInOut,
-  easeOut,
-  GRAVITY,
-  hop,
-  lerp,
-  pathOf,
-  rad,
-  roll,
-  seg,
-  STEP,
-  timeline,
-  timeWhen,
-} from "./machineKit";
+import { along, cameraOn, distAt, easeIn, easeInOut, easeOut, GRAVITY, hop, lerp, pathOf, rad, roll, seg, STEP, timeline, timeWhen } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
 export const WORLD_W = 5100;
@@ -192,11 +175,7 @@ export function buildBuilding() {
   /* The marble: out of the drum's mouth and along the spirit level. */
   const lip = inDrum(MIXER.mouth + 6, MIXER.tipped);
   const levelRun = roll(
-    pathOf(
-      line(inDrum(IN_DRUM, MIXER.tipped), lip, 4),
-      quad(lip, { x: lip.x + 12, y: SPIRIT.from.y - 2 }, SPIRIT.from),
-      line(SPIRIT.from, SPIRIT.to),
-    ),
+    pathOf(line(inDrum(IN_DRUM, MIXER.tipped), lip, 4), quad(lip, { x: lip.x + 12, y: SPIRIT.from.y - 2 }, SPIRIT.from), line(SPIRIT.from, SPIRIT.to)),
     60,
     120,
     240,
@@ -368,13 +347,7 @@ export function buildBuilding() {
 
   /* The cable drum rolls along the deck unrolling its cable, over the edge, and onto the winch's crank. */
   const edge = { x: DECK2.x1, y: DECK2.y };
-  const spoolRun = roll(
-    pathOf(line({ x: SPOOL_X0, y: spoolY }, { x: edge.x, y: spoolY }), arc(edge.x, edge.y, SPOOL.r, -90, -56)),
-    470,
-    150,
-    600,
-    0.45,
-  );
+  const spoolRun = roll(pathOf(line({ x: SPOOL_X0, y: spoolY }, { x: edge.x, y: spoolY }), arc(edge.x, edge.y, SPOOL.r, -90, -56)), 470, 150, 600, 0.45);
   const tEdge = tPush + spoolRun.duration;
   const spoolOff = spoolRun.path.pts[spoolRun.path.pts.length - 1];
   /** The drum resting on the crank's knob; `lean` tips it over to the left of the knob as the knob goes down. */

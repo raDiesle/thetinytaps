@@ -19,6 +19,16 @@ Fehler in späteren Leveln nicht wieder passiert.
   Durchscheinen folgen `clipFocus`.
 - Erst zeigt der Fuchs die Bewegung allein, dann „Jetzt du!“. Bewegungen sind groß und halten kurz
   an ihren Enden, damit man sie gut erkennt.
+- **Jede Bewegung oft genug.** Zeigen und Mitmachen zusammen dauern etwa 12–25 s, also viele
+  Runden, bevor es weitergeht. Lieber eine Station länger als eine mehr.
+- **Das Level beginnt im Stehen und gleich mit einer Bewegung** (Schatzinsel: die Angel auswerfen),
+  nicht mit Sitzen und Zuschauen. Hinsetzen ist dann selbst ein Schritt, den man sieht.
+- **Lieber ein klarer Treffer mit Ton als eine vage Bewegung.** Blumen mit den Armen „aufwecken“
+  war zu unbestimmt; auf eine Trommel schlagen (bumm, ein Schmetterling fliegt heraus) kennt jedes
+  Kind.
+- **Das Ende ist kurz und bleibt Bewegung mit Wirkung**, kein langes Tanzen: Tanzen bewirkt nichts
+  und trainiert nichts Bestimmtes. Schatzinsel: Arme hochstoßen, und aus jeder Pfote zischt eine
+  Rakete.
 
 ## Die Welt antwortet im Takt
 
@@ -27,7 +37,13 @@ Fehler in späteren Leveln nicht wieder passiert.
   krabbelt noch, wenn der Fuß auf ihn tritt; er wartet nicht unter dem Fuß.
 - **Zu jedem Treffer gibt es ein Ziel.** Tritt der Fuchs zehnmal, kommen zehn Skorpione, und die
   letzten Tritte gehen nicht ins Leere. Zählen: Anzahl der Treffer im Clip (Zeigen + Mitmachen)
-  gegen die Anzahl der Dinge.
+  gegen die Anzahl der Dinge. Auch am Ende: Der Clip läuft eine ganze Zahl von Runden, sonst weicht
+  der Fuchs zum Schluss noch aus, obwohl keine Nuss mehr kommt. Die Anzahl der Dinge aus der Länge
+  rechnen, nicht von Hand (`CYCLES` in der Geschichte, ein Test prüft die ganzen Runden).
+- **Was getroffen wird, hängt dort, wo die Pfote im Clip wirklich ankommt**: am Clip messen, nicht
+  schätzen, und seitlich vom Körper, damit man den Treffer von hinten sieht.
+- **Die Pfoten sind an dem, was sie drehen oder halten** (Kurbel, Paddel, Angel, Schlüssel): Hand
+  und Ding bewegen sich zusammen, sonst dreht sich etwas wie von Geisterhand.
 - Kein Satz behauptet, das Kind gesehen zu haben (es gibt keine Kamera).
 
 ## Fuchs und Darstellung
@@ -41,6 +57,16 @@ Fehler in späteren Leveln nicht wieder passiert.
   Körperteilen (im Bild berechnet, nicht pro Teil), mit einem kleinen Abstand zum Körper. Was vor
   dem Fuchs steht, verdeckt auch das Leuchten.
 - Kamera von hinten, damit links links ist; wo die Arme vor dem Körper arbeiten, höher und seitlich.
+- **Was die Hände tun, ist im Bild.** Verdeckt der Körper die Hände, geht die Kamera über die
+  Schulter (Schlüssel im Schloss). Was gedreht wird, muss so gebaut sein, dass man die Drehung
+  sieht: Ein Schlüsselring steht längs zum Schaft; ein flacher Ring, der sich um sich selbst dreht,
+  sieht aus, als stünde er still.
+- **Kommt etwas auf den Fuchs zu** (rollende Kokosnüsse), steht die Kamera genau mittig hinter ihm
+  und etwas tiefer, damit man sieht, wie es heranrollt.
+- **Keine Grafik geht in eine andere.** Füße, Beine und Körper bleiben über dem Panzer (im Sitzen:
+  Beine gerade nach vorn, auf den Fersen), Stangen, Seile und Taschen gehen nicht durch den Körper.
+  Im Zweifel weglassen (ein Taschenriemen lief als brauner Ring durch den Fuchs). Von der Seite
+  anschauen und nachmessen.
 - Der Schwanz ist klein und verdeckt keine Beine.
 
 ## Technik
@@ -50,3 +76,7 @@ Fehler in späteren Leveln nicht wieder passiert.
   schwarz. Vor dem Abschluss die ganze Geschichte Bild für Bild durchlaufen und auf schwarze Bilder
   und `NaN` prüfen (Konsole: `__adventure.seek(t)`).
 - Neue Stationen im Browser anschauen, nicht nur typprüfen.
+- **Keine Schnitte und kein Weiß zwischen den Stationen.** Ole trägt Tapsi den ganzen Weg, und die
+  Kamera fährt mit (in engen Schluchten dicht hinter Tapsi, nie durch Felsen). Nichts Großes, Helles
+  steht im Weg von Kamera oder Figur: Ein Lichtschein in einer Türöffnung wird ausgeblendet, bevor
+  jemand hindurchgeht, sonst wird das ganze Bild weiß.

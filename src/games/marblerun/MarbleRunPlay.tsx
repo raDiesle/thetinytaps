@@ -71,7 +71,7 @@ export function MarbleRunPlay({ settings, speechLang }: { settings: MarbleRunSet
 
   return (
     <div className="run-play" onPointerDown={onPointerDown}>
-      <TrackLevel key={round} sound={sound} say={say} onDone={onDone} rebuild={settings.rebuild} />
+      <TrackLevel key={round} sound={sound} say={say} onDone={onDone} rebuild={settings.rebuild} pick={settings.pick} />
       {ended && <GameEnd onAgain={again} />}
       <BurstLayer bursts={bursts} />
     </div>

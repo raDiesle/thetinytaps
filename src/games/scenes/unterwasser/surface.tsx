@@ -97,7 +97,15 @@ export function Boot() {
         <path d="M40 -64 L46 -92" stroke="#ffd166" strokeWidth="8" strokeLinecap="round" />
         <circle cx="47" cy="-96" r="6" fill={SKIN} />
       </g>
-      <path className="uw-boot-flag" d="M66 -126 V-150 L88 -143 L66 -136" fill="#ffd60a" stroke={INK} strokeWidth="2" strokeLinejoin="round" style={{ transformOrigin: "66px -143px" }} />
+      <path
+        className="uw-boot-flag"
+        d="M66 -126 V-150 L88 -143 L66 -136"
+        fill="#ffd60a"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinejoin="round"
+        style={{ transformOrigin: "66px -143px" }}
+      />
       <Lines x={74} y={-120} dir={1} size={0.9} delay={0.2} />
       <path d={HULL} fill="#e63946" />
       <path d="M-112 -30 H114 L112 -18 H-108 Z" fill="#fff" />
@@ -138,7 +146,15 @@ export function Anker() {
         <path d="M-46 -40 Q-44 -2 0 -2 Q44 -2 46 -40" stroke="#6c757d" strokeWidth="13" fill="none" strokeLinecap="round" />
         <path d="M-46 -54 L-60 -30 L-36 -34 Z M46 -54 L60 -30 L36 -34 Z" fill="#495057" />
         <path d="M-2 -88 V-20" stroke="#fff" strokeWidth="3" opacity="0.4" />
-        <path className="uw-anker-weed" d="M30 -20 q6 -14 0 -26 M36 -18 q8 -10 6 -22" stroke="#52b788" strokeWidth="4" fill="none" strokeLinecap="round" style={{ transformOrigin: "33px -19px" }} />
+        <path
+          className="uw-anker-weed"
+          d="M30 -20 q6 -14 0 -26 M36 -18 q8 -10 6 -22"
+          stroke="#52b788"
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+          style={{ transformOrigin: "33px -19px" }}
+        />
       </g>
       <Bubbles x={-30} y={-20} count={3} size={6} delay={0.4} />
       <Sand xs={[-56, 56]} y={-6} r={9} className="uw-anker-dust" />

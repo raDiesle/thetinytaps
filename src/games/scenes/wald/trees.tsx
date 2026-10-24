@@ -28,7 +28,13 @@ export function Tanne() {
         <g key={top} className="wd-tanne-tier" style={{ transformOrigin: `0px ${bottom}px`, ...nth(i) }}>
           <path d={tier(bottom, top, hw)} fill="#2d6a4f" />
           <path d={`M0 ${top} Q${-hw * 0.4} ${(top + bottom) / 2} ${-hw} ${bottom} Q${-hw * 0.5} ${bottom - 16} 0 ${bottom - 4} Z`} fill="#40916c" />
-          <path d={`M${-hw * 0.5} ${bottom - 30} q12 -8 24 0 M${hw * 0.2} ${bottom - 44} q12 -8 24 0`} stroke="#1b4332" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <path
+            d={`M${-hw * 0.5} ${bottom - 30} q12 -8 24 0 M${hw * 0.2} ${bottom - 44} q12 -8 24 0`}
+            stroke="#1b4332"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
         </g>
       ))}
       {[
@@ -182,7 +188,13 @@ export function Baumstumpf() {
       {/* Someone else peeks out from behind the stump every time */}
       <Hideout x={-55} y={-222} w={110} h={118} size={86} />
       <path d="M-104 0 Q-90 -14 -84 -30 L-82 -96 H82 L84 -30 Q90 -14 104 0 Z" fill="#9c6644" />
-      <path d="M-60 -10 q-4 -40 0 -76 M-20 -6 q-4 -40 0 -80 M30 -8 q4 -40 0 -80 M64 -10 q4 -36 0 -74" stroke="#7f5539" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path
+        d="M-60 -10 q-4 -40 0 -76 M-20 -6 q-4 -40 0 -80 M30 -8 q4 -40 0 -80 M64 -10 q4 -36 0 -74"
+        stroke="#7f5539"
+        strokeWidth="4"
+        strokeLinecap="round"
+        fill="none"
+      />
       <path d="M-104 0 Q-120 -4 -128 6 M104 0 Q124 -2 132 8" stroke="#9c6644" strokeWidth="12" strokeLinecap="round" />
       <ellipse cx={cx} cy={cy} rx={rx + 5} ry={ry + 5} fill="#7f5539" />
       <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#3d2b1f" />

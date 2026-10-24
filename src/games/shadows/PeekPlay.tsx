@@ -262,13 +262,7 @@ export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSetti
       <div className="sh-top">
         <div key={`stage-${round.id}`} className="pk-stage" onPointerDown={onHideoutDown}>
           {glyph.url ? (
-            <img
-              src={glyph.url}
-              alt=""
-              draggable={false}
-              className={`pk-animal pk-${phase}${phase === "hidden" ? wiggle : ""}`}
-              style={animalStyle}
-            />
+            <img src={glyph.url} alt="" draggable={false} className={`pk-animal pk-${phase}${phase === "hidden" ? wiggle : ""}`} style={animalStyle} />
           ) : (
             // Without a canvas: the emoji itself, roughly in place.
             <span className={`pk-animal pk-emoji sh-emoji pk-${phase}`} style={animalStyle}>

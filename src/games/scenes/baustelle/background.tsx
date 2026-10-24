@@ -297,9 +297,7 @@ export function Background() {
         <rect x="676" y="644" width="88" height="10" rx="2" fill="#8d5a2b" />
         <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
           {[0, 1, 2].map((row) =>
-            [0, 1, 2].map((col) => (
-              <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />
-            )),
+            [0, 1, 2].map((col) => <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />),
           )}
         </g>
       </g>
@@ -336,11 +334,7 @@ export function Background() {
       {/* Grass tufts and flowers */}
       <g stroke="#52b788" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path
-            key={`${x}-${y}`}
-            d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26"
-            transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
-          />
+          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
         ))}
       </g>
       <Flowers />

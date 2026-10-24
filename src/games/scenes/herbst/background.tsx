@@ -118,8 +118,7 @@ function Field() {
 
 /** The sandy path from the front up to the pumpkin stall. */
 function Path() {
-  const d =
-    "M700 1010 C760 880 870 790 846 680 C828 600 850 520 872 452 L936 452 C948 520 968 600 976 690 C990 820 1060 900 1130 1010 Z";
+  const d = "M700 1010 C760 880 870 790 846 680 C828 600 850 520 872 452 L936 452 C948 520 968 600 976 690 C990 820 1060 900 1130 1010 Z";
   return (
     <g>
       <path d={d} fill="#e6c48f" />

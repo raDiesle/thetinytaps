@@ -78,7 +78,11 @@ function parseArgs(argv) {
 
 /** One request: one picture, or one grid cut into several. Paths relative to the checkout. */
 function toJob(o) {
-  const outs = Array.isArray(o.out) ? o.out : String(o.out ?? "").split(",").filter(Boolean);
+  const outs = Array.isArray(o.out)
+    ? o.out
+    : String(o.out ?? "")
+        .split(",")
+        .filter(Boolean);
   if (!outs.length || !o.prompt) fail('usage: yarn image <out.webp> "<prompt>" [options]  (see the top of scripts/gemini-image.mjs)');
   const job = {
     outs,
@@ -171,7 +175,10 @@ function pictureIn(answer) {
   const candidate = answer?.candidates?.[0];
   const image = candidate?.content?.parts?.find((p) => p.inlineData)?.inlineData;
   if (image) return { picture: Buffer.from(image.data, "base64") };
-  const said = candidate?.content?.parts?.map((p) => p.text).filter(Boolean).join(" ");
+  const said = candidate?.content?.parts
+    ?.map((p) => p.text)
+    .filter(Boolean)
+    .join(" ");
   const reason = candidate?.finishReason ?? answer?.promptFeedback?.blockReason ?? "no picture";
   return { error: `Gemini returned no picture (${reason})${said ? `: ${said}` : ""}` };
 }
@@ -230,8 +237,7 @@ async function check(record) {
     closeRecord(record, "failed");
     return true;
   }
-  const answers =
-    batch.response?.inlinedResponses?.inlinedResponses ?? batch.dest?.inlinedResponses ?? batch.response?.inlinedResponses ?? [];
+  const answers = batch.response?.inlinedResponses?.inlinedResponses ?? batch.dest?.inlinedResponses ?? batch.response?.inlinedResponses ?? [];
   // A worktree can be gone by now; then the pictures land in this checkout.
   const root = existsSync(record.checkout) ? record.checkout : ROOT;
   if (root !== record.checkout) console.warn(`${record.checkout} is gone – saving into ${root} instead`);
@@ -346,7 +352,12 @@ async function splitGrid(input, cols, rows, gapHex) {
       if (c < cols - 1) x1 -= insetX;
       if (r > 0) y0 += insetY;
       if (r < rows - 1) y1 -= insetY;
-      pieces.push(await sharp(input).extract({ left: x0, top: y0, width: x1 - x0, height: y1 - y0 }).png().toBuffer());
+      pieces.push(
+        await sharp(input)
+          .extract({ left: x0, top: y0, width: x1 - x0, height: y1 - y0 })
+          .png()
+          .toBuffer(),
+      );
     }
   }
   return pieces;
@@ -361,8 +372,7 @@ async function cutOut(input, keyHex) {
   let key = [0, 2, 4].map((i) => parseInt(keyHex.slice(i, i + 2), 16));
   const HARD = 70;
   const SOFT = 150;
-  const dist = (p) =>
-    Math.hypot(data[p * 4] - key[0], data[p * 4 + 1] - key[1], data[p * 4 + 2] - key[2]);
+  const dist = (p) => Math.hypot(data[p * 4] - key[0], data[p * 4 + 1] - key[1], data[p * 4 + 2] - key[2]);
 
   const edge = [];
   for (let x = 0; x < w; x++) edge.push(x, (h - 1) * w + x);
@@ -471,9 +481,7 @@ if (opts.out === "status") {
   }
 } else {
   const shared = { refs: opts.refs, aspect: opts.aspect, size: opts.size, quality: opts.quality, transparent: opts.transparent, key: opts.key };
-  const jobs = opts.jobs
-    ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((o) => toJob({ ...shared, ...o }))
-    : [toJob(opts)];
+  const jobs = opts.jobs ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((o) => toJob({ ...shared, ...o })) : [toJob(opts)];
   if (opts.now) {
     for (const job of jobs) {
       const answer = await call(`models/${modelOf(opts)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });

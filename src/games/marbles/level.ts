@@ -15,8 +15,7 @@ export const VIEW_W = 1600;
 export const VIEW_H = 900;
 
 /** A wobble that starts at `amp` and dies away, `age` seconds after a hit. */
-export const wobble = (age: number, amp: number, freq: number, damp: number) =>
-  age < 0 || age > 4 ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq);
+export const wobble = (age: number, amp: number, freq: number, damp: number) => (age < 0 || age > 4 ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq));
 
 /**
  * Calls `step(dt, now)` on every animation frame and renders again after it.

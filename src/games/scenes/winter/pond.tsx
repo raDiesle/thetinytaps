@@ -124,7 +124,14 @@ export function Schlittschuhe() {
     <>
       <path d="M-66 2 Q0 -12 66 2 Z" fill="#fff" />
       <g className="wi-skates-hop" style={{ transformOrigin: "0px 0px" }}>
-        <path className="wi-skates-lace" d="M-10 -62 Q-2 -84 8 -60 M-10 -62 Q-26 -80 -14 -84" stroke="#e63946" strokeWidth="2.5" fill="none" style={{ transformOrigin: "-2px -62px" }} />
+        <path
+          className="wi-skates-lace"
+          d="M-10 -62 Q-2 -84 8 -60 M-10 -62 Q-26 -80 -14 -84"
+          stroke="#e63946"
+          strokeWidth="2.5"
+          fill="none"
+          style={{ transformOrigin: "-2px -62px" }}
+        />
         <g className="wi-skate-a" style={{ transformOrigin: "-30px 0px" }}>
           <g transform="translate(-30 -2) scale(0.95)">
             <Skate boot="#f1f3f5" shade="#ced4da" />

@@ -22,7 +22,13 @@ export function Ball({ color, x, y, spin }: { color: string; x: number; y: numbe
   return (
     <g transform={`translate(${x} ${y})`}>
       <circle r={BALL_R} fill={color} stroke={INK} strokeWidth="3" />
-      <path d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`} transform={`rotate(${(spin * 180) / Math.PI})`} fill="none" stroke="#fff6" strokeWidth="5" />
+      <path
+        d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`}
+        transform={`rotate(${(spin * 180) / Math.PI})`}
+        fill="none"
+        stroke="#fff6"
+        strokeWidth="5"
+      />
       <circle cx="-7" cy="-8" r="5.5" fill="#fff" opacity="0.75" />
     </g>
   );

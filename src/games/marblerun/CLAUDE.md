@@ -9,6 +9,12 @@ hops over three drums, knocks five chimes and plays a whole scale on the second 
 A full basket raises the flag and ends the round („Nochmal“; any key starts again). A first marble takes about 21 s, the
 whole round about 35 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel); a setting turns this off.
 
+„Was rollt denn da?“ (K-07, a setting, on by default): instead of six marbles in a row, a shelf over the first row holds
+three of five things (marble, tennis ball, iron ball, apple, soap bubble; `ROLLER` in `track.ts`); tapping one flies it into
+the hopper and something else pops up in its place, a key or a tap on the wall takes them in turn. Each rolls its own way on
+the same route: the tennis ball hops along the rows, the iron ball is slow with deep notes and thumps, the apple bumps, the
+soap bubble floats at an even speed and bursts above the basket instead of landing (so it doesn't fill it).
+
 - `track.ts`: all the numbers. The route comes in sections – a fixed stretch before every spot, one section per part and
   spot, and the stretch to the basket – so a marble takes whatever part is in a spot when it gets there. `TURNS` are the walls
   the marble bounces off to change direction. `track.test.ts` checks that sections join up, nothing leaves the wall and spot
@@ -16,7 +22,7 @@ whole round about 35 s. Tapping a spot swaps its part (bell, trampoline, funnel,
 - `TrackLevel.tsx`: the marbles (rolling downhill with gravity and friction, fixed speed on wheel, funnel, seesaw and loop),
   the drawing, and the camera. The camera follows the marbles down: on a tall screen it shows more of the wall (up to all of
   it), before the tap the hopper, after the last marble the basket.
-- `MarbleRunPlay.tsx`: the round, party and „Nochmal“; `MarbleRunGame.tsx`: start screen and the rebuild setting.
+- `MarbleRunPlay.tsx`: the round, party and „Nochmal“; `MarbleRunGame.tsx`: start screen with the pick and rebuild settings.
 - Shared with Kettenreaktion (`src/games/marbles/`): `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and
   `level.ts` (useFrames, useAnyKey, wobble).
 

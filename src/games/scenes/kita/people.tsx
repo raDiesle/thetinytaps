@@ -73,7 +73,23 @@ function Hair({ cx, cy, r, look, tail }: { cx: number; cy: number; r: number; lo
 }
 
 /** A child's head on its neck; it tilts with the class `cls` (pivot at the chin). */
-function Head({ cx, cy, r = 44, look, cls, tail, children }: { cx: number; cy: number; r?: number; look: Look; cls?: string; tail?: string; children?: ReactNode }) {
+function Head({
+  cx,
+  cy,
+  r = 44,
+  look,
+  cls,
+  tail,
+  children,
+}: {
+  cx: number;
+  cy: number;
+  r?: number;
+  look: Look;
+  cls?: string;
+  tail?: string;
+  children?: ReactNode;
+}) {
   const skin = look.skin ?? SKIN;
   const size = r / 34;
   return (
@@ -95,7 +111,31 @@ function Head({ cx, cy, r = 44, look, cls, tail, children }: { cx: number; cy: n
  * An arm hanging from the shoulder (x, y), turned by `angle` degrees (0 = straight down,
  * negative = the hand goes to the right). `children` sit in the hand at (x, y + len + 4).
  */
-function Arm({ x, y, angle, colour, cls, i = 0, s, len = 72, w = 17, skin = SKIN, children }: { x: number; y: number; angle: number; colour: string; cls?: string; i?: number; s?: 1 | -1; len?: number; w?: number; skin?: string; children?: ReactNode }) {
+function Arm({
+  x,
+  y,
+  angle,
+  colour,
+  cls,
+  i = 0,
+  s,
+  len = 72,
+  w = 17,
+  skin = SKIN,
+  children,
+}: {
+  x: number;
+  y: number;
+  angle: number;
+  colour: string;
+  cls?: string;
+  i?: number;
+  s?: 1 | -1;
+  len?: number;
+  w?: number;
+  skin?: string;
+  children?: ReactNode;
+}) {
   return (
     <g className={cls} style={{ ...nth(i), ...(s ? side(s) : {}), transformOrigin: `${x}px ${y}px` }}>
       <g transform={`rotate(${angle} ${x} ${y})`}>
@@ -108,7 +148,23 @@ function Arm({ x, y, angle, colour, cls, i = 0, s, len = 72, w = 17, skin = SKIN
 }
 
 /** A standing child, feet at (0, 0); `left` and `right` are the arms on our left and right. */
-function StandingKid({ look, shirt, pants, cls, i, left, right }: { look: Look; shirt: string; pants: string; cls: string; i: number; left: number; right: number }) {
+function StandingKid({
+  look,
+  shirt,
+  pants,
+  cls,
+  i,
+  left,
+  right,
+}: {
+  look: Look;
+  shirt: string;
+  pants: string;
+  cls: string;
+  i: number;
+  left: number;
+  right: number;
+}) {
   const skin = look.skin ?? SKIN;
   return (
     <g className={`${cls}-body`} style={{ ...nth(i), transformOrigin: "0px 0px" }}>
@@ -127,7 +183,21 @@ function StandingKid({ look, shirt, pants, cls, i, left, right }: { look: Look; 
 }
 
 /** A child sitting cross-legged on the floor, feet at (0, 0). */
-function SittingKid({ look, shirt, pants, cls, arms, children }: { look: Look; shirt: string; pants: string; cls: string; arms: ReactNode; children?: ReactNode }) {
+function SittingKid({
+  look,
+  shirt,
+  pants,
+  cls,
+  arms,
+  children,
+}: {
+  look: Look;
+  shirt: string;
+  pants: string;
+  cls: string;
+  arms: ReactNode;
+  children?: ReactNode;
+}) {
   const skin = look.skin ?? SKIN;
   return (
     <g className={`${cls}-body`} style={{ transformOrigin: "0px 0px" }}>
@@ -381,7 +451,13 @@ export function KindNudeln() {
         <Head cx={0} cy={-288} look={EATER} cls="ki-nudel-head" tail="ki-nudel-tail" />
         <Arm x={30} y={-218} angle={-6} colour="#fab005" skin={skin} cls="ki-nudel-arm" len={64}>
           {/* The fork with a noodle dangling from it */}
-          <path d="M30 -150 V-196 M24 -196 V-210 M30 -196 V-212 M36 -196 V-210 M23 -196 H37" stroke="#adb5bd" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+          <path
+            d="M30 -150 V-196 M24 -196 V-210 M30 -196 V-212 M36 -196 V-210 M23 -196 H37"
+            stroke="#adb5bd"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            fill="none"
+          />
           <g className="ki-nudel-strand" style={{ transformOrigin: "30px -200px" }}>
             <path d="M30 -200 Q42 -186 32 -172 Q22 -158 34 -146" stroke="#ffe066" strokeWidth="5" strokeLinecap="round" fill="none" />
           </g>

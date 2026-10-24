@@ -18,7 +18,21 @@ function Sparkles({ className, spots, r = 10, fill = "#fff3bf" }: { className: s
 }
 
 /** A wheel with spokes that can turn around its centre. */
-function SpokeWheel({ cx, cy, r, className, rim = "#495057", hub = "#ffd43b" }: { cx: number; cy: number; r: number; className: string; rim?: string; hub?: string }) {
+function SpokeWheel({
+  cx,
+  cy,
+  r,
+  className,
+  rim = "#495057",
+  hub = "#ffd43b",
+}: {
+  cx: number;
+  cy: number;
+  r: number;
+  className: string;
+  rim?: string;
+  hub?: string;
+}) {
   return (
     <g className={className} style={{ transformOrigin: `${cx}px ${cy}px` }}>
       <circle cx={cx} cy={cy} r={r} fill={rim} />
@@ -99,7 +113,12 @@ export function Gartenhaus() {
       <rect x="-6" y="-80" width="122" height="18" rx="3" fill="#a0673d" />
       {/* A rake leaning against the wall */}
       <path d="M150 -4 L176 -180" stroke="#a47148" strokeWidth="6" strokeLinecap="round" />
-      <path d="M160 -186 L194 -178 M164 -186 l-2 12 M172 -184 l-2 12 M180 -182 l-2 12 M188 -180 l-2 12" stroke="#868e96" strokeWidth="4" strokeLinecap="round" />
+      <path
+        d="M160 -186 L194 -178 M164 -186 l-2 12 M172 -184 l-2 12 M180 -182 l-2 12 M188 -180 l-2 12"
+        stroke="#868e96"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
     </>
   );
 }
@@ -203,7 +222,16 @@ export function Schubkarre() {
       <path d="M-80 -104 H102" stroke="#2f9e44" strokeWidth="7" strokeLinecap="round" />
       <path d="M72 -42 L80 -30" stroke="#495057" strokeWidth="6" />
       <SpokeWheel cx={80} cy={-30} r={30} className="os-karre-wheel" rim="#343a40" />
-      <Puffs className="os-karre-dust" spots={[[40, -6], [110, -4], [130, -14]]} r={10} fill="#e9ecef" />
+      <Puffs
+        className="os-karre-dust"
+        spots={[
+          [40, -6],
+          [110, -4],
+          [130, -14],
+        ]}
+        r={10}
+        fill="#e9ecef"
+      />
     </g>
   );
 }
@@ -237,7 +265,18 @@ export function Vogelbad() {
         <path d="M14 -136 L4 -132 L14 -130 Z" fill="#495057" />
         <path d="M40 -108 V-100 M48 -108 V-100" stroke="#f08c00" strokeWidth="3" />
       </g>
-      <Puffs className="os-bad-drop" spots={[[-30, -120], [-6, -130], [16, -124], [-44, -110], [6, -116]]} r={6} fill="#74c0fc" />
+      <Puffs
+        className="os-bad-drop"
+        spots={[
+          [-30, -120],
+          [-6, -130],
+          [16, -124],
+          [-44, -110],
+          [6, -116],
+        ]}
+        r={6}
+        fill="#74c0fc"
+      />
       <Notes x={-70} y={-150} texts={["Plitsch!"]} colour="#e7f5ff" size={22} />
     </>
   );
@@ -253,8 +292,16 @@ export function Maltisch() {
       <path d="M-100 -136 L-96 -10 M92 -136 L88 -10" stroke="#a0673d" strokeWidth="9" strokeLinecap="round" />
       {/* Checked table cloth */}
       <rect x="-146" y="-158" width="292" height="20" rx="4" fill="#fff" />
-      <path d="M-146 -138 H146 L140 -112 L124 -126 L108 -112 L92 -126 L76 -112 L60 -126 L44 -112 L28 -126 L12 -112 L-4 -126 L-20 -112 L-36 -126 L-52 -112 L-68 -126 L-84 -112 L-100 -126 L-116 -112 L-132 -126 L-140 -112 Z" fill="#fff" />
-      <path d="M-130 -158 V-118 M-98 -158 V-118 M-66 -158 V-118 M-34 -158 V-118 M-2 -158 V-118 M30 -158 V-118 M62 -158 V-118 M94 -158 V-118 M126 -158 V-118 M-146 -148 H146 M-146 -128 H146" stroke="#a5d8ff" strokeWidth="8" opacity="0.8" />
+      <path
+        d="M-146 -138 H146 L140 -112 L124 -126 L108 -112 L92 -126 L76 -112 L60 -126 L44 -112 L28 -126 L12 -112 L-4 -126 L-20 -112 L-36 -126 L-52 -112 L-68 -126 L-84 -112 L-100 -126 L-116 -112 L-132 -126 L-140 -112 Z"
+        fill="#fff"
+      />
+      <path
+        d="M-130 -158 V-118 M-98 -158 V-118 M-66 -158 V-118 M-34 -158 V-118 M-2 -158 V-118 M30 -158 V-118 M62 -158 V-118 M94 -158 V-118 M126 -158 V-118 M-146 -148 H146 M-146 -128 H146"
+        stroke="#a5d8ff"
+        strokeWidth="8"
+        opacity="0.8"
+      />
       {/* Water jar */}
       <rect x="-128" y="-198" width="34" height="42" rx="6" fill="#d0ebff" opacity="0.9" />
       <rect x="-128" y="-182" width="34" height="26" rx="5" fill="#a5d8ff" />
@@ -289,7 +336,15 @@ export function Maltisch() {
         <path d="M-110 -176 L-109 -188" stroke="#868e96" strokeWidth="7" />
         <path d="M-114 -176 Q-111 -164 -108 -176 Z" fill="#e03131" />
       </g>
-      <Sparkles className="os-mal-spark" spots={[[-6, -214], [44, -204], [18, -232]]} r={9} />
+      <Sparkles
+        className="os-mal-spark"
+        spots={[
+          [-6, -214],
+          [44, -204],
+          [18, -232],
+        ]}
+        r={9}
+      />
       <Notes x={-140} y={-230} texts={["Bunt!"]} colour="#ff8fab" size={24} />
     </>
   );
@@ -320,7 +375,16 @@ export function Schokohase() {
           <circle cx="96" cy="-192" r="2.5" fill="#f59f00" />
         </g>
       </g>
-      <Sparkles className="os-schoko-spark" spots={[[60, -270], [134, -250], [140, -186], [58, -196]]} r={10} />
+      <Sparkles
+        className="os-schoko-spark"
+        spots={[
+          [60, -270],
+          [134, -250],
+          [140, -186],
+          [58, -196],
+        ]}
+        r={10}
+      />
     </>
   );
 }

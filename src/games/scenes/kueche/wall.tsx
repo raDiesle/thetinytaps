@@ -118,20 +118,20 @@ export function Vogel() {
     <>
       <Inside d={PANE}>
         <g transform="translate(-10 0)">
-        <g className="kc-vogel-body" style={{ transformOrigin: "430px 144px" }}>
-          <path d="M412 132 L396 128 L404 140 Z" fill="#fab005" />
-          <ellipse cx="424" cy="132" rx="16" ry="13" fill="#ffd43b" />
-          <circle cx="438" cy="118" r="10" fill="#ffd43b" />
-          <path d="M430 110 Q438 104 446 112" stroke="#4dabf7" strokeWidth="6" strokeLinecap="round" fill="none" />
-          <g className="kc-vogel-beak" style={{ transformOrigin: "447px 118px" }}>
-            <path d="M446 115 L456 118 L446 121 Z" fill="#f76707" />
+          <g className="kc-vogel-body" style={{ transformOrigin: "430px 144px" }}>
+            <path d="M412 132 L396 128 L404 140 Z" fill="#fab005" />
+            <ellipse cx="424" cy="132" rx="16" ry="13" fill="#ffd43b" />
+            <circle cx="438" cy="118" r="10" fill="#ffd43b" />
+            <path d="M430 110 Q438 104 446 112" stroke="#4dabf7" strokeWidth="6" strokeLinecap="round" fill="none" />
+            <g className="kc-vogel-beak" style={{ transformOrigin: "447px 118px" }}>
+              <path d="M446 115 L456 118 L446 121 Z" fill="#f76707" />
+            </g>
+            <Eye cx={441} cy={116} r={2.4} />
+            <g className="kc-vogel-wing" style={{ transformOrigin: "424px 126px" }}>
+              <path d="M412 128 Q424 118 434 130 Q424 142 412 128 Z" fill="#fcc419" />
+            </g>
+            <path d="M422 145 V150 M430 145 V150" stroke="#f76707" strokeWidth="2.5" strokeLinecap="round" />
           </g>
-          <Eye cx={441} cy={116} r={2.4} />
-          <g className="kc-vogel-wing" style={{ transformOrigin: "424px 126px" }}>
-            <path d="M412 128 Q424 118 434 130 Q424 142 412 128 Z" fill="#fcc419" />
-          </g>
-          <path d="M422 145 V150 M430 145 V150" stroke="#f76707" strokeWidth="2.5" strokeLinecap="round" />
-        </g>
         </g>
       </Inside>
       <Notes x={452} y={84} colour="#f59f00" size={0.7} />
@@ -174,10 +174,31 @@ export function Uhr() {
         {Array.from({ length: 12 }, (_, i) => (
           <circle key={i} cx={cx + 23 * Math.sin((i * Math.PI) / 6)} cy={cy - 23 * Math.cos((i * Math.PI) / 6)} r={i % 3 ? 1.5 : 2.8} fill={INK} />
         ))}
-        <path className="kc-uhr-hour" d={`M${cx} ${cy} L${cx + 12} ${cy - 7}`} stroke={INK} strokeWidth="4.5" strokeLinecap="round" style={{ transformOrigin: `${cx}px ${cy}px` }} />
-        <path className="kc-uhr-minute" d={`M${cx} ${cy} V${cy - 21}`} stroke="#4dabf7" strokeWidth="3.2" strokeLinecap="round" style={{ transformOrigin: `${cx}px ${cy}px` }} />
+        <path
+          className="kc-uhr-hour"
+          d={`M${cx} ${cy} L${cx + 12} ${cy - 7}`}
+          stroke={INK}
+          strokeWidth="4.5"
+          strokeLinecap="round"
+          style={{ transformOrigin: `${cx}px ${cy}px` }}
+        />
+        <path
+          className="kc-uhr-minute"
+          d={`M${cx} ${cy} V${cy - 21}`}
+          stroke="#4dabf7"
+          strokeWidth="3.2"
+          strokeLinecap="round"
+          style={{ transformOrigin: `${cx}px ${cy}px` }}
+        />
         <circle cx={cx} cy={cy} r="3.5" fill={INK} />
-        <path d={`M${cx - 25} ${cy - 20} Q${cx - 16} ${cy - 31} ${cx - 3} ${cy - 33}`} stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
+        <path
+          d={`M${cx - 25} ${cy - 20} Q${cx - 16} ${cy - 31} ${cx - 3} ${cy - 33}`}
+          stroke="#fff"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.6"
+        />
       </g>
       <Lines x={cx + 44} y={cy} colour="#ff6b6b" />
     </>
@@ -187,18 +208,16 @@ export function Uhr() {
 /** The lamp hanging over the table; it swings, switches on and shines on the table. */
 export function Lampe() {
   return (
-    <>
-      <g className="kc-lampe-swing" style={{ transformOrigin: "760px 4px" }}>
-        <path d="M760 4 V110" stroke={INK} strokeWidth="3" />
-        <path className="kc-lampe-light" d="M722 158 L640 330 H880 L798 158 Z" fill="#fff3bf" />
-        <circle className="kc-lampe-glow" cx="760" cy="160" r="26" fill="#ffe066" />
-        <circle cx="760" cy="158" r="12" fill="#fff9db" />
-        <path d="M714 160 Q714 112 760 108 Q806 112 806 160 Z" fill="#ff922b" />
-        <path d="M712 156 H808" stroke="#f76707" strokeWidth="6" strokeLinecap="round" />
-        <path d="M730 148 Q732 124 752 118" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.5" />
-        <rect x="752" y="100" width="16" height="12" rx="3" fill="#e8590c" />
-      </g>
-    </>
+    <g className="kc-lampe-swing" style={{ transformOrigin: "760px 4px" }}>
+      <path d="M760 4 V110" stroke={INK} strokeWidth="3" />
+      <path className="kc-lampe-light" d="M722 158 L640 330 H880 L798 158 Z" fill="#fff3bf" />
+      <circle className="kc-lampe-glow" cx="760" cy="160" r="26" fill="#ffe066" />
+      <circle cx="760" cy="158" r="12" fill="#fff9db" />
+      <path d="M714 160 Q714 112 760 108 Q806 112 806 160 Z" fill="#ff922b" />
+      <path d="M712 156 H808" stroke="#f76707" strokeWidth="6" strokeLinecap="round" />
+      <path d="M730 148 Q732 124 752 118" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.5" />
+      <rect x="752" y="100" width="16" height="12" rx="3" fill="#e8590c" />
+    </g>
   );
 }
 
@@ -326,9 +345,15 @@ export function Kuehlschrank() {
         <circle cx="1446" cy="214" r="6" fill="#ff6b6b" />
         <circle cx="1520" cy="210" r="6" fill="#51cf66" />
         {/* Letter magnets */}
-        <text x="1440" y="340" fontSize="30" fontWeight="800" fontFamily="sans-serif" fill="#ff6b6b">A</text>
-        <text x="1470" y="352" fontSize="30" fontWeight="800" fontFamily="sans-serif" fill="#fab005">B</text>
-        <text x="1500" y="336" fontSize="30" fontWeight="800" fontFamily="sans-serif" fill="#7950f2">C</text>
+        <text x="1440" y="340" fontSize="30" fontWeight="800" fontFamily="sans-serif" fill="#ff6b6b">
+          A
+        </text>
+        <text x="1470" y="352" fontSize="30" fontWeight="800" fontFamily="sans-serif" fill="#fab005">
+          B
+        </text>
+        <text x="1500" y="336" fontSize="30" fontWeight="800" fontFamily="sans-serif" fill="#7950f2">
+          C
+        </text>
       </g>
       <g className="kc-fridge-cold" stroke="#d0ebff" strokeWidth="5" strokeLinecap="round" fill="none">
         {[220, 270, 320].map((y, i) => (

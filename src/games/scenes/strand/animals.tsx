@@ -32,7 +32,17 @@ export function Moewe() {
 export function Krebs() {
   return (
     <>
-      <Puffs className="sd-krebs-sand" spots={[[-70, -6], [-50, -2], [50, -2], [70, -6]]} r={8} fill="#e2b46a" />
+      <Puffs
+        className="sd-krebs-sand"
+        spots={[
+          [-70, -6],
+          [-50, -2],
+          [50, -2],
+          [70, -6],
+        ]}
+        r={8}
+        fill="#e2b46a"
+      />
       <g className="sd-krebs-run">
         <g stroke="#e8590c" strokeWidth="6" strokeLinecap="round" fill="none">
           {[-1, 1].map((s) => (
@@ -106,7 +116,16 @@ export function Seestern() {
         <Lid cx={-5.6} cy={-38} r={2.6} fill="#ffa94d" />
         <Lid cx={5.6} cy={-38} r={2.6} fill="#ffa94d" />
       </g>
-      <Sparkles className="sd-stern-sparkle" spots={[[-56, -80], [0, -100], [56, -80]]} r={10} fill="#fff9db" />
+      <Sparkles
+        className="sd-stern-sparkle"
+        spots={[
+          [-56, -80],
+          [0, -100],
+          [56, -80],
+        ]}
+        r={10}
+        fill="#fff9db"
+      />
     </>
   );
 }
@@ -125,12 +144,28 @@ export function Muschel() {
       <g className="sd-muschel-top" style={{ transformOrigin: "0px -10px" }}>
         <path d="M-48 -12 Q-50 -62 0 -66 Q50 -62 48 -12 Q24 -22 0 -20 Q-24 -22 -48 -12 Z" fill="#ffa8a8" />
         {ribs.map((x) => (
-          <path key={x} d={`M${x * 0.2} -22 Q${x * 0.9} -40 ${x * 1.1} -${56 - Math.abs(x) * 0.4}`} stroke="#ff8787" strokeWidth="4" fill="none" strokeLinecap="round" />
+          <path
+            key={x}
+            d={`M${x * 0.2} -22 Q${x * 0.9} -40 ${x * 1.1} -${56 - Math.abs(x) * 0.4}`}
+            stroke="#ff8787"
+            strokeWidth="4"
+            fill="none"
+            strokeLinecap="round"
+          />
         ))}
         <path d="M-34 -42 Q-20 -58 0 -60" stroke="#fff" strokeOpacity="0.5" strokeWidth="5" strokeLinecap="round" fill="none" />
         <path d="M-12 -14 L0 -2 L12 -14 Z" fill="#ff8787" />
       </g>
-      <Sparkles className="sd-muschel-sparkle" spots={[[-30, -70], [34, -76], [0, -90]]} r={9} fill="#fff" />
+      <Sparkles
+        className="sd-muschel-sparkle"
+        spots={[
+          [-30, -70],
+          [34, -76],
+          [0, -90],
+        ]}
+        r={9}
+        fill="#fff"
+      />
     </>
   );
 }

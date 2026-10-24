@@ -104,7 +104,13 @@ function BackFence() {
 function Acacia() {
   return (
     <g transform={transformOf(ACACIA)}>
-      <path d="M-8 0 Q-4 -150 -20 -250 M-4 -170 Q30 -230 80 -280 M-14 -220 Q-60 -260 -90 -290" stroke="#8d5a2b" strokeWidth="16" strokeLinecap="round" fill="none" />
+      <path
+        d="M-8 0 Q-4 -150 -20 -250 M-4 -170 Q30 -230 80 -280 M-14 -220 Q-60 -260 -90 -290"
+        stroke="#8d5a2b"
+        strokeWidth="16"
+        strokeLinecap="round"
+        fill="none"
+      />
       <path d="M-14 0 Q-10 -120 -14 -200 L4 -200 Q8 -120 12 0 Z" fill="#8d5a2b" />
       <ellipse cx="20" cy="-312" rx="150" ry="34" fill="#74a957" />
       <ellipse cx="-70" cy="-300" rx="70" ry="24" fill="#6a994e" />
@@ -277,7 +283,13 @@ function PenguinPool() {
     <g>
       <ellipse cx={cx} cy={cy + 6} rx={rx + 22} ry={ry + 16} fill="#e9f5fb" />
       <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#zo-pool)" />
-      <path d={`M${cx - 180} ${cy - 20} h60 M${cx + 40} ${cy - 34} h70 M${cx - 40} ${cy + 22} h50`} stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.7" />
+      <path
+        d={`M${cx - 180} ${cy - 20} h60 M${cx + 40} ${cy - 34} h70 M${cx - 40} ${cy + 22} h50`}
+        stroke="#fff"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
       {/* Ice floe */}
       <path d={`M${cx + 110} ${cy + 20} l30 -14 h60 l20 14 Z`} fill="#fff" />
     </g>
@@ -301,8 +313,14 @@ function IceRock() {
 function River() {
   return (
     <g>
-      <path d={`M${RIVER_X} 1000 Q${RIVER_X - 70} 940 ${RIVER_X + 30} ${RIVER_TOP + 10} Q${RIVER_X + 80} ${RIVER_TOP - 12} 1200 ${RIVER_TOP - 6} H1600 V1000 Z`} fill="#c9b18e" />
-      <path d={`M${RIVER_X + 26} 1000 Q${RIVER_X - 40} 946 ${RIVER_X + 50} ${RIVER_TOP + 20} Q${RIVER_X + 90} ${RIVER_TOP + 2} 1200 ${RIVER_TOP + 6} H1600 V1000 Z`} fill="url(#zo-river)" />
+      <path
+        d={`M${RIVER_X} 1000 Q${RIVER_X - 70} 940 ${RIVER_X + 30} ${RIVER_TOP + 10} Q${RIVER_X + 80} ${RIVER_TOP - 12} 1200 ${RIVER_TOP - 6} H1600 V1000 Z`}
+        fill="#c9b18e"
+      />
+      <path
+        d={`M${RIVER_X + 26} 1000 Q${RIVER_X - 40} 946 ${RIVER_X + 50} ${RIVER_TOP + 20} Q${RIVER_X + 90} ${RIVER_TOP + 2} 1200 ${RIVER_TOP + 6} H1600 V1000 Z`}
+        fill="url(#zo-river)"
+      />
       <path d="M1120 930 h70 M1400 960 h80 M1180 990 h60 M1460 900 h40" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
       <g transform={`translate(1590 ${RIVER_TOP + 10}) scale(${depthScale(RIVER_TOP)})`}>
         <path d="M-8 0 Q-12 -60 -20 -110 M0 0 V-120 M8 0 Q14 -50 24 -96" stroke="#40916c" strokeWidth="5" fill="none" strokeLinecap="round" />

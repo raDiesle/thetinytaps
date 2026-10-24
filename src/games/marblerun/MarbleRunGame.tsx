@@ -15,18 +15,19 @@ export function MarbleRunGame() {
       settings={
         <>
           <p className="setting-note">
-            Ein Tipp öffnet den Trichter: Sechs Kugeln rollen nacheinander die lange Bahn hinunter, über Xylophon, Wippe, Looping, Trommeln
-            und Klangröhren bis in den Korb. Das Bild fährt mit.
+            Die Kugeln rollen die lange Bahn hinunter, über Xylophon, Wippe, Looping, Trommeln und Klangröhren bis in den Korb. Das Bild fährt mit.
           </p>
-          <SettingsGroup title="Umbauen">
-            <Toggle
-              label="Tippen auf einen der sechs Plätze mit 🔧 wechselt das Teil"
-              checked={settings.rebuild}
-              onChange={(rebuild) => update({ rebuild })}
-            />
+          <SettingsGroup title="Was rollt denn da?">
+            <Toggle label="Oben liegen drei Dinge zur Wahl, ein Tipp lässt genau dieses los" checked={settings.pick} onChange={(pick) => update({ pick })} />
             <p className="setting-note">
-              Glocke, Trampolin, Trichter und Wasserrad gehen reihum; die nächste Kugel nimmt den neuen Weg. Ausgeschaltet bleibt die Bahn
-              wie immer.
+              Murmel, Tennisball, Eisenkugel, Apfel und Seifenblase rollen jedes anders. Ausgeschaltet öffnet ein Tipp den Trichter, und sechs Kugeln rollen von
+              selbst.
+            </p>
+          </SettingsGroup>
+          <SettingsGroup title="Umbauen">
+            <Toggle label="Tippen auf einen der sechs Plätze mit 🔧 wechselt das Teil" checked={settings.rebuild} onChange={(rebuild) => update({ rebuild })} />
+            <p className="setting-note">
+              Glocke, Trampolin, Trichter und Wasserrad gehen reihum; die nächste Kugel nimmt den neuen Weg. Ausgeschaltet bleibt die Bahn wie immer.
             </p>
           </SettingsGroup>
         </>

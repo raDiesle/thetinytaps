@@ -58,16 +58,9 @@ export function LettersGame() {
               label="Bilder"
               value={settings.theme}
               onChange={(theme) => update({ theme })}
-              options={[
-                { value: "all", label: "🌈 Alle" },
-                ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
-              ]}
+              options={[{ value: "all", label: "🌈 Alle" }, ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` }))]}
             />
-            <Toggle
-              label="Wort anzeigen (nicht beim Zug)"
-              checked={settings.showWord}
-              onChange={(showWord) => update({ showWord })}
-            />
+            <Toggle label="Wort anzeigen (nicht beim Zug)" checked={settings.showWord} onChange={(showWord) => update({ showWord })} />
           </SettingsGroup>
 
           <SettingsGroup title="⌨️ Frei tippen">
@@ -107,31 +100,19 @@ export function LettersGame() {
               ]}
             />
             {settings.numbers === "count" && (
-              <Toggle
-                label="Zählen nicht unterbrechen"
-                checked={settings.finishCounting}
-                onChange={(finishCounting) => update({ finishCounting })}
-              />
+              <Toggle label="Zählen nicht unterbrechen" checked={settings.finishCounting} onChange={(finishCounting) => update({ finishCounting })} />
             )}
           </SettingsGroup>
 
           <SettingsGroup title={`🔍 Wo ist das ${b.upper}?`}>
             <Toggle
-              label={
-                touchKeys
-                  ? "Gesuchte Taste aufleuchten lassen, wenn es länger dauert"
-                  : "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"
-              }
+              label={touchKeys ? "Gesuchte Taste aufleuchten lassen, wenn es länger dauert" : "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert"}
               checked={settings.hints}
               onChange={(hints) => update({ hints })}
             />
           </SettingsGroup>
 
-          <TouchKeysSetting
-            value={settings.touchKeys}
-            onChange={(touchKeys) => update({ touchKeys })}
-            anyTouch={anyTouch}
-          />
+          <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} anyTouch={anyTouch} />
         </>
       }
     >

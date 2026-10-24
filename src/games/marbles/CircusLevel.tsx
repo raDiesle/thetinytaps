@@ -201,7 +201,13 @@ function Tub({ cx, top, w, color }: { cx: number; top: number; w: number; color:
   const narrow = half * 0.86;
   return (
     <g>
-      <path d={`M${cx - narrow} ${top} L${cx + narrow} ${top} L${cx + half} ${FLOOR} L${cx - half} ${FLOOR} Z`} fill={color} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${cx - narrow} ${top} L${cx + narrow} ${top} L${cx + half} ${FLOOR} L${cx - half} ${FLOOR} Z`}
+        fill={color}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <rect x={cx - half - 2} y={FLOOR - 26} width={w + 4} height="22" rx="6" fill={GOLD} stroke={INK} strokeWidth="3" />
       <Star x={cx} y={(top + FLOOR) / 2} r={Math.min(40, (FLOOR - top) / 5)} fill={GOLD} />
       <ellipse cx={cx} cy={top} rx={narrow + 6} ry="12" fill={GOLD} stroke={INK} strokeWidth="3.5" />
@@ -221,7 +227,13 @@ function TopHat() {
     <g>
       <line x1={x - 80} y1={top} x2={x - 60} y2="30" stroke="#8a6a4a" strokeWidth="4" />
       <line x1={x + 80} y1={top} x2={x + 60} y2="30" stroke="#8a6a4a" strokeWidth="4" />
-      <path d={`M${x - 64} ${top} L${x - 58} ${bottom} Q${x} ${bottom + 12} ${x + 58} ${bottom} L${x + 64} ${top} Z`} fill="#3b3b4f" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x - 64} ${top} L${x - 58} ${bottom} Q${x} ${bottom + 12} ${x + 58} ${bottom} L${x + 64} ${top} Z`}
+        fill="#3b3b4f"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <path d={`M${x - 63} ${top + 14} L${x + 63} ${top + 14} L${x + 62} ${top + 36} L${x - 62} ${top + 36} Z`} fill="#ff3b5c" stroke={INK} strokeWidth="3" />
       <ellipse cx={x} cy={top} rx="96" ry="16" fill="#3b3b4f" stroke={INK} strokeWidth="4" />
       <ellipse cx={x} cy={top - 2} rx="60" ry="9" fill="#1d1d2b" />
@@ -301,7 +313,12 @@ function Trampoline({ dip }: { dip: number }) {
       ))}
       <path d={`M${cx - half} ${y} A${half} 16 0 0 1 ${cx + half} ${y}`} fill="none" stroke={INK} strokeWidth="12" />
       <path d={`M${cx - half} ${y} A${half} 16 0 0 1 ${cx + half} ${y}`} fill="none" stroke="#ff5d73" strokeWidth="6" />
-      <path d={`M${cx - inner} ${y} Q${cx} ${y + 2 * dip - 12} ${cx + inner} ${y} Q${cx} ${y + 2 * dip + 12} ${cx - inner} ${y} Z`} fill="#2b2d6e" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M${cx - inner} ${y} Q${cx} ${y + 2 * dip - 12} ${cx + inner} ${y} Q${cx} ${y + 2 * dip + 12} ${cx - inner} ${y} Z`}
+        fill="#2b2d6e"
+        stroke={INK}
+        strokeWidth="3"
+      />
       <path d={`M${cx - half} ${y} A${half} 16 0 0 0 ${cx + half} ${y}`} fill="none" stroke={INK} strokeWidth="12" />
       <path d={`M${cx - half} ${y} A${half} 16 0 0 0 ${cx + half} ${y}`} fill="none" stroke="#ff5d73" strokeWidth="6" />
       {[-0.6, -0.2, 0.2, 0.6].map((k) => (
@@ -320,7 +337,13 @@ function Seal({ nod, clap }: { nod: number; clap: number }) {
   return (
     <g transform={`translate(${SEAL.x} ${SEAL.base})`}>
       <path d="M-70 0 C-118 -4 -128 -24 -112 -34 C-100 -24 -86 -14 -62 -12 Z" fill={SEAL_COLOR} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-      <path d="M-74 0 C-92 -50 -60 -126 -24 -150 C4 -168 32 -158 34 -126 C38 -84 54 -36 66 0 Z" fill={SEAL_COLOR} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d="M-74 0 C-92 -50 -60 -126 -24 -150 C4 -168 32 -158 34 -126 C38 -84 54 -36 66 0 Z"
+        fill={SEAL_COLOR}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <ellipse cx="18" cy="-62" rx="30" ry="52" fill="#a9c3ea" />
       <path d="M-46 -40 C-50 -80 -40 -110 -22 -128" stroke="#fff5" strokeWidth="8" fill="none" strokeLinecap="round" />
       <g transform={`rotate(${-70 * clap} 26 -96)`}>
@@ -372,7 +395,13 @@ function Elephant({ circus, t }: { circus: Circus; t: number }) {
       {[-88, 58].map((dx) => (
         <rect key={dx} x={x + dx + 14} y={bodyY + 30} width="34" height={tubTop - bodyY - 30} rx="10" fill="#9a98b4" stroke={INK} strokeWidth="3" />
       ))}
-      <path d={`M${x - 136} ${bodyY - 10} C${x - 170} ${bodyY + 10} ${x - 168} ${bodyY + 50} ${x - 156} ${bodyY + 62}`} stroke={INK} strokeWidth="5" fill="none" strokeLinecap="round" />
+      <path
+        d={`M${x - 136} ${bodyY - 10} C${x - 170} ${bodyY + 10} ${x - 168} ${bodyY + 50} ${x - 156} ${bodyY + 62}`}
+        stroke={INK}
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
       <ellipse cx={x} cy={bodyY} rx="140" ry="84" fill={ELEPHANT_COLOR} stroke={INK} strokeWidth="4" />
       {[-104, 30].map((dx) => (
         <rect key={dx} x={x + dx} y={bodyY + 30} width="38" height={tubTop - bodyY - 30} rx="10" fill={ELEPHANT_COLOR} stroke={INK} strokeWidth="3" />
@@ -400,7 +429,13 @@ function Elephant({ circus, t }: { circus: Circus; t: number }) {
       <circle cx={HEAD.x + 28} cy={HEAD.y - 14} r="8" fill={INK} />
       <circle cx={HEAD.x + 30} cy={HEAD.y - 17} r="2.5" fill="#fff" />
       <circle cx={HEAD.x + 14} cy={HEAD.y + 20} r="10" fill="#ff9bb5" opacity="0.8" />
-      <path d={`M${HEAD.x + 38} ${HEAD.y + 36} Q${HEAD.x + 52} ${HEAD.y + 44} ${HEAD.x + 60} ${HEAD.y + 34}`} stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />
+      <path
+        d={`M${HEAD.x + 38} ${HEAD.y + 36} Q${HEAD.x + 52} ${HEAD.y + 44} ${HEAD.x + 60} ${HEAD.y + 34}`}
+        stroke={INK}
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+      />
       {toot >= 0 && toot < 1.2 && (
         <g opacity={1 - toot / 1.2} stroke={INK} strokeWidth="4" fill="none" strokeLinecap="round">
           {[0, 1, 2].map((k) => (
@@ -541,7 +576,15 @@ const WICKER = "#d9a05b";
 /** The inside back of the teddy's basket; the marble sits in front of it. */
 function BasketBack() {
   const { x, y } = BASKET;
-  return <path d={`M${x - 31} ${y - 6} Q${x} ${y - 16} ${x + 31} ${y - 6} L${x + 26} ${y + 6} L${x - 26} ${y + 6} Z`} fill="#a8743f" stroke={INK} strokeWidth="3" strokeLinejoin="round" />;
+  return (
+    <path
+      d={`M${x - 31} ${y - 6} Q${x} ${y - 16} ${x + 31} ${y - 6} L${x + 26} ${y + 6} L${x - 26} ${y + 6} Z`}
+      fill="#a8743f"
+      stroke={INK}
+      strokeWidth="3"
+      strokeLinejoin="round"
+    />
+  );
 }
 
 /** The front of the teddy's basket, drawn over the marble; same place and lean as the unicycle. */
@@ -550,9 +593,21 @@ function Basket({ at, lean }: { at: Pt; lean: number }) {
   const rim = y - 6;
   return (
     <g transform={`translate(${at.x} ${at.y}) rotate(${lean})`}>
-      <path d={`M${x - 32} ${rim} L${x + 32} ${rim} Q${x + 30} ${y + 30} ${x} ${y + 30} Q${x - 30} ${y + 30} ${x - 32} ${rim} Z`} fill={WICKER} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d={`M${x - 32} ${rim} L${x + 32} ${rim} Q${x + 30} ${y + 30} ${x} ${y + 30} Q${x - 30} ${y + 30} ${x - 32} ${rim} Z`}
+        fill={WICKER}
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       {[0, 1].map((k) => (
-        <path key={k} d={`M${x - 29 + k * 4} ${y + 6 + k * 11} Q${x} ${y + 12 + k * 11} ${x + 29 - k * 4} ${y + 6 + k * 11}`} stroke="#a8743f" strokeWidth="3" fill="none" />
+        <path
+          key={k}
+          d={`M${x - 29 + k * 4} ${y + 6 + k * 11} Q${x} ${y + 12 + k * 11} ${x + 29 - k * 4} ${y + 6 + k * 11}`}
+          stroke="#a8743f"
+          strokeWidth="3"
+          fill="none"
+        />
       ))}
       {[-16, 0, 16].map((dx) => (
         <line key={dx} x1={x + dx} y1={rim + 2} x2={x + dx * 0.8} y2={y + 28} stroke="#a8743f" strokeWidth="2.5" />
@@ -622,9 +677,21 @@ function Cannon({ age }: { age: number }) {
   const wheelR = FLOOR - y;
   return (
     <g>
-      <path d={`M${x - 70} ${FLOOR} L${x - 20} ${y - 26} L${x + 34} ${y - 26} L${x + 70} ${FLOOR} Z`} fill="#8a5a2b" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x - 70} ${FLOOR} L${x - 20} ${y - 26} L${x + 34} ${y - 26} L${x + 70} ${FLOOR} Z`}
+        fill="#8a5a2b"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <g transform={`translate(${x} ${y}) rotate(${-angle}) translate(${kick} 0)`}>
-        <path d={`M${-back} ${-r} L${len - 10} ${-r + 6} L${len - 10} ${r - 6} L${-back} ${r} A${r} ${r} 0 0 1 ${-back} ${-r} Z`} fill="#3a86ff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        <path
+          d={`M${-back} ${-r} L${len - 10} ${-r + 6} L${len - 10} ${r - 6} L${-back} ${r} A${r} ${r} 0 0 1 ${-back} ${-r} Z`}
+          fill="#3a86ff"
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
         <rect x={len - 22} y={-r - 6} width="30" height={2 * r + 12} rx="8" fill="#ff3b5c" stroke={INK} strokeWidth="4" />
         <rect x={20} y={-r + 2} width="18" height={2 * r - 4} fill={GOLD} stroke={INK} strokeWidth="3" />
         <Star x={90} y={-2} r={16} fill={GOLD} turn={angle} />
@@ -673,7 +740,13 @@ function Clown({ at, turn, wave }: { at: Pt; turn: number; wave: number }) {
       <circle cx="9" cy={-CLOWN.head - 6} r="3.5" fill={INK} />
       <path d={`M-12 ${-CLOWN.head + 8} Q0 ${-CLOWN.head + 20} 12 ${-CLOWN.head + 8}`} stroke="#ff3b3b" strokeWidth="4" fill="none" strokeLinecap="round" />
       <circle cx="0" cy={-CLOWN.head + 2} r="7" fill="#ff3b3b" stroke={INK} strokeWidth="2" />
-      <path d={`M-16 ${-CLOWN.head - 20} L0 ${-CLOWN.head - 62} L16 ${-CLOWN.head - 20} Z`} fill="#3ec300" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d={`M-16 ${-CLOWN.head - 20} L0 ${-CLOWN.head - 62} L16 ${-CLOWN.head - 20} Z`}
+        fill="#3ec300"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       <circle cx="0" cy={-CLOWN.head - 64} r="7" fill={GOLD} stroke={INK} strokeWidth="2.5" />
     </g>
   );
@@ -744,16 +817,33 @@ function Stage({ open }: { open: number }) {
       <rect x={x0} y={top} width={x1 - x0} height={FLOOR - top} rx="10" fill="#c8323f" stroke={INK} strokeWidth="4" />
       <rect x={inner.x0} y={inner.top} width={inner.x1 - inner.x0} height={FLOOR - 34 - inner.top} fill="#2b2d6e" stroke={INK} strokeWidth="3" />
       {Array.from({ length: 14 }, (_, i) => (
-        <circle key={i} cx={inner.x0 + 30 + ((i * 131) % (inner.x1 - inner.x0 - 60))} cy={inner.top + 30 + ((i * 89) % 380)} r={i % 3 ? 3 : 5} fill="#fff" opacity="0.8" />
+        <circle
+          key={i}
+          cx={inner.x0 + 30 + ((i * 131) % (inner.x1 - inner.x0 - 60))}
+          cy={inner.top + 30 + ((i * 89) % 380)}
+          r={i % 3 ? 3 : 5}
+          fill="#fff"
+          opacity="0.8"
+        />
       ))}
       <Star x={mid} y={inner.top + 150} r={90} fill={GOLD} turn={open * 20} />
-      {open > 0 && <circle cx={mid} cy={inner.top + 150} r={110 + 10 * Math.sin(open * 12)} fill="none" stroke="#fff6b0" strokeWidth="8" opacity={open * 0.7} />}
+      {open > 0 && (
+        <circle cx={mid} cy={inner.top + 150} r={110 + 10 * Math.sin(open * 12)} fill="none" stroke="#fff6b0" strokeWidth="8" opacity={open * 0.7} />
+      )}
       {curtain(-1)}
       {curtain(1)}
       {/* The valance with the little lamps */}
       <rect x={x0} y={top} width={x1 - x0} height="70" rx="10" fill={GOLD} stroke={INK} strokeWidth="4" />
       {Array.from({ length: 9 }, (_, i) => (
-        <circle key={i} cx={x0 + 40 + i * ((x1 - x0 - 80) / 8)} cy={top + 35} r="11" fill={open > 0 && (i + Math.floor(open * 10)) % 2 ? "#fff6b0" : BAR_COLORS[i % BAR_COLORS.length]} stroke={INK} strokeWidth="2.5" />
+        <circle
+          key={i}
+          cx={x0 + 40 + i * ((x1 - x0 - 80) / 8)}
+          cy={top + 35}
+          r="11"
+          fill={open > 0 && (i + Math.floor(open * 10)) % 2 ? "#fff6b0" : BAR_COLORS[i % BAR_COLORS.length]}
+          stroke={INK}
+          strokeWidth="2.5"
+        />
       ))}
     </g>
   );
@@ -809,7 +899,20 @@ function ConfettiRain({ age }: { age: number }) {
         const falling = y < c.rest;
         const x = c.x + (falling ? c.sway * Math.sin(age * 4 + i) : c.sway * Math.sin(((c.rest - c.y0) / c.speed) * 4 + i));
         const spin = falling ? age * 300 + i * 40 : i * 40;
-        return <rect key={i} transform={`translate(${x} ${y}) rotate(${spin})`} x="-6" y="-9" width="12" height="18" rx="2" fill={c.color} stroke={INK} strokeWidth="1.5" />;
+        return (
+          <rect
+            key={i}
+            transform={`translate(${x} ${y}) rotate(${spin})`}
+            x="-6"
+            y="-9"
+            width="12"
+            height="18"
+            rx="2"
+            fill={c.color}
+            stroke={INK}
+            strokeWidth="1.5"
+          />
+        );
       })}
     </g>
   );
@@ -827,7 +930,18 @@ function ConfettiBurst({ age }: { age: number }) {
         const x = MUZZLE.x + v * Math.cos(a) * age;
         const y = MUZZLE.y - v * Math.sin(a) * age + 500 * age * age;
         return (
-          <rect key={i} transform={`translate(${x} ${y}) rotate(${age * 600 + i * 30})`} x="-5" y="-8" width="10" height="16" rx="2" fill={BAR_COLORS[i % BAR_COLORS.length]} stroke={INK} strokeWidth="1.5" />
+          <rect
+            key={i}
+            transform={`translate(${x} ${y}) rotate(${age * 600 + i * 30})`}
+            x="-5"
+            y="-8"
+            width="10"
+            height="16"
+            rx="2"
+            fill={BAR_COLORS[i % BAR_COLORS.length]}
+            stroke={INK}
+            strokeWidth="1.5"
+          />
         );
       })}
     </g>

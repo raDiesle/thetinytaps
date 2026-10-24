@@ -4,7 +4,7 @@ import { INK, nth } from "../shared";
 // Small parts many Unterwasser drawings share. They only show while their item plays; the
 // timing is in unterwasser.css ("Parts many items share"). `delay` sets --d, when they start.
 
-const after = (delay?: number) => (delay === undefined ? undefined : ({ "--d": `${delay}s` }) as CSSProperties);
+const after = (delay?: number) => (delay === undefined ? undefined : ({ "--d": `${delay}s` } as CSSProperties));
 
 /** An eyelid over an `Eye`, in the colour around it; the eye blinks twice while the item plays. */
 export function Lid({ cx, cy, r, fill }: { cx: number; cy: number; r: number; fill: string }) {

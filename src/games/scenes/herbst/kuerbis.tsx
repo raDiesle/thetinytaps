@@ -30,7 +30,15 @@ export function Kuerbis() {
         <circle cx="53" cy="-60" r="3" fill={CHEEK} />
       </g>
       <g className="he-kuerbis-body" style={{ transformOrigin: "0px 0px" }}>
-        <path className="he-kuerbis-vine" d="M8 -92 C24 -110 44 -100 38 -88 C33 -80 24 -88 32 -94" stroke="#52b788" strokeWidth="3.5" strokeLinecap="round" fill="none" style={{ transformOrigin: "8px -92px" }} />
+        <path
+          className="he-kuerbis-vine"
+          d="M8 -92 C24 -110 44 -100 38 -88 C33 -80 24 -88 32 -94"
+          stroke="#52b788"
+          strokeWidth="3.5"
+          strokeLinecap="round"
+          fill="none"
+          style={{ transformOrigin: "8px -92px" }}
+        />
         <ellipse cx="0" cy="-48" rx="64" ry="48" fill="#f77f00" />
         <ellipse cx="-34" cy="-48" rx="30" ry="46" fill="#f8961e" />
         <ellipse cx="34" cy="-48" rx="30" ry="46" fill="#f3722c" />
@@ -38,7 +46,12 @@ export function Kuerbis() {
         <path d="M-14 -94 Q-20 -48 -14 -2 M14 -94 Q20 -48 14 -2" stroke="#d9620f" strokeWidth="2.5" fill="none" opacity="0.6" />
         <path d="M-50 -76 Q-56 -60 -54 -44" stroke="#fff" strokeOpacity="0.45" strokeWidth="6" strokeLinecap="round" fill="none" />
         <path d="M-6 -92 Q-4 -108 6 -114 L12 -110 Q6 -104 6 -92 Z" fill="#6b4423" />
-        <path className="he-kuerbis-leafy" d="M4 -100 C-14 -116 -34 -108 -36 -96 C-20 -94 -8 -96 4 -100 Z" fill="#40916c" style={{ transformOrigin: "4px -100px" }} />
+        <path
+          className="he-kuerbis-leafy"
+          d="M4 -100 C-14 -116 -34 -108 -36 -96 C-20 -94 -8 -96 4 -100 Z"
+          fill="#40916c"
+          style={{ transformOrigin: "4px -100px" }}
+        />
       </g>
       <g className="he-kuerbis-pile">
         {PILE.map(([x, y, angle, c], i) => (

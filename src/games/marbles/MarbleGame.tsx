@@ -28,9 +28,7 @@ export function MarbleGame() {
       mode={mode}
       onMode={(levels) => update({ levels: levels as MarbleLevels })}
       settings={
-        <p className="setting-note">
-          Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft von selbst bis zum Ende, und das Bild fährt mit.
-        </p>
+        <p className="setting-note">Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft von selbst bis zum Ende, und das Bild fährt mit.</p>
       }
     >
       <MarblePlay speechLang={de.speechLang} settings={settings} />
