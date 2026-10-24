@@ -97,8 +97,7 @@ export function applyCast(actors: Partial<Record<ActorId, ActorState>>, cast: Ca
 }
 
 /** How long a beat stays before the next one: long enough to read it out, or to have it read aloud. */
-export function beatMs(beat: Beat, speech: boolean, calm: boolean) {
+export function beatMs(beat: Beat, speech: boolean) {
   const chars = (beat.narration?.length ?? 0) + (beat.line?.text.length ?? 0);
-  const ms = speech ? 1100 + chars * 62 : 1400 + chars * 22;
-  return Math.round(calm ? ms * 1.3 : ms);
+  return speech ? 1100 + chars * 62 : 1400 + chars * 22;
 }

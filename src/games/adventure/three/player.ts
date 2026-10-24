@@ -56,8 +56,6 @@ export class StoryPlayer {
   /** Seconds of the opening before the first step. */
   private readonly opening: number;
   private ended = false;
-  /** How much slower than written the story runs, e.g. 1.3 for calm mode. */
-  private readonly pace: number;
   paused = false;
   /** The parts of the guide that move glow during a movement. */
   highlight = true;
@@ -66,9 +64,7 @@ export class StoryPlayer {
     canvas: HTMLCanvasElement,
     private readonly story: Story,
     private readonly events: PlayerEvents,
-    pace = 1,
   ) {
-    this.pace = pace;
     this.stage = new Stage(canvas);
     this.stage.scene.add(this.guide.root);
     this.world = story.build(this.stage, this.guide, (c) => events.onCue(c));
@@ -88,7 +84,7 @@ export class StoryPlayer {
       this.frame = requestAnimationFrame(loop);
       const dt = Math.min(0.1, (now - this.lastNow) / 1000);
       this.lastNow = now;
-      if (!this.paused) this.elapsed += dt / this.pace;
+      if (!this.paused) this.elapsed += dt;
       this.tick(dt);
     };
     this.frame = requestAnimationFrame(loop);

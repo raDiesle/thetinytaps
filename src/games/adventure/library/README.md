@@ -123,7 +123,7 @@ noch ein ruhiger Abschied dazukommen.
 
 - **Keine Erkennung.** Die Welt reagiert, auch wenn das Kind nur zuschaut. Das ist gewollt,
   denn es gibt kein „falsch“. Es heißt aber auch, dass das Spiel nie erfährt, ob eine Bewegung
-  zu schwer war. Das sehen nur die Eltern, und dafür gibt es das ruhige Tempo (×1,3).
+  zu schwer war. Das sehen nur die Eltern.
 - **Kein Text im Spiel.** Kinder in diesem Alter lesen nicht. Alles sagt der Fuchs, und unten
   zeigt die Leiste nur Bilder. Ist die Sprachausgabe aus, bleibt nur das Vormachen. Deshalb
   müssen die Bewegungen des Fuchses deutlich sein.

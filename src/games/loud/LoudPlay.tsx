@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playRoar, playSqueak, setSfxVolume } from "@/lib/sfx";
+import { playRoar, playSqueak } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { Acacia, Lion, Mouse, Tuft } from "./animals";
@@ -53,21 +53,17 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
   useWakeLock(true);
 
   useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
-  useEffect(() => {
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
   }, []);
 
   const say = useCallback(
     (text: string) => {
-      const rate = settings.calm ? 0.75 : 0.85;
+      const rate = 0.85;
       deafUntil.current = Math.max(deafUntil.current, performance.now() + (text.length * SPEECH_MS_PER_CHAR) / rate + 600);
       speak(text, speechLang, { rate });
     },
-    [settings.calm, speechLang],
+    [speechLang],
   );
 
   const later = useCallback((ms: number, run: () => void) => {
@@ -91,7 +87,7 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
       if (who === "lion") {
         playRoar();
         const box = lionRef.current?.getBoundingClientRect();
-        if (box && !settings.calm) {
+        if (box) {
           // On both sides of the lion, so his open mouth stays in sight.
           for (let i = 0; i < 6; i++) {
             const x = i % 2 ? box.right + Math.random() * box.width * 0.2 : box.left - Math.random() * box.width * 0.2;
@@ -105,7 +101,7 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
       if (settings.speech) later(SPEECH_DELAY_MS, () => say(pick(SAYS[who])));
       later(REACT_MS[who], () => setActive((a) => (a === who ? null : a)));
     },
-    [later, say, spawn, settings.calm, settings.speech],
+    [later, say, spawn, settings.speech],
   );
 
   const mic: MicState = useMicrophone(true, (db, ms) => {
@@ -134,7 +130,6 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
       ref={rootRef}
       className={[
         "loud-play",
-        settings.calm && "calm",
         active === "lion" && "roaring",
         active === "mouse" && "squeaking",
         nudge && `nudge-${nudge}`,

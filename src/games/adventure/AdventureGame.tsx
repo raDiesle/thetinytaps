@@ -4,7 +4,7 @@ import { de } from "@/content/de";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { AdventurePlay } from "./AdventurePlay";
-import { ADVENTURE_SETTINGS_KEY, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS, type AdventurePace } from "./settings";
+import { ADVENTURE_SETTINGS_KEY, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 
 carryOverAdventureSettings();
@@ -18,12 +18,7 @@ export function AdventureGame() {
     <GameShell
       title="Bewegungsabenteuer"
       emoji="🏝️"
-      modes={[
-        { id: "normal", emoji: "🏝️", title: "Die Schatzinsel" },
-        { id: "calm", emoji: "🐢", title: "Die Schatzinsel, ruhiger" },
-      ]}
-      mode={settings.pace}
-      onMode={(pace) => update({ pace: pace as AdventurePace })}
+      modes={[{ id: "normal", emoji: "🏝️", title: "Die Schatzinsel" }]}
       settings={
         <>
           <SettingsGroup title="Die Schatzinsel">

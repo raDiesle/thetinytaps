@@ -15,8 +15,6 @@ export interface ShadowsSettings {
   speech: boolean;
   /** Animal and vehicle noises and chimes. */
   sounds: boolean;
-  /** Quieter sounds, less bouncing. */
-  calm: boolean;
 }
 
 export const DEFAULT_SHADOWS_SETTINGS: ShadowsSettings = {
@@ -26,7 +24,6 @@ export const DEFAULT_SHADOWS_SETTINGS: ShadowsSettings = {
   names: false,
   speech: false,
   sounds: true,
-  calm: false,
 };
 
 export const SHADOWS_SETTINGS_KEY = "tinytaps.shadows.v1";

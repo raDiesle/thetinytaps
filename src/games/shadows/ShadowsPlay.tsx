@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playChime, playPop, playRandomNote, setSfxVolume } from "@/lib/sfx";
+import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { ITEMS, texts, type ShadowItem } from "./content";
 import type { ShadowsSettings } from "./settings";
@@ -85,15 +85,11 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, lang, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, lang, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm, lang],
+    [settings.speech, lang],
   );
 
   const pool = settings.theme === "all" ? ITEMS : ITEMS.filter((i) => i.theme === settings.theme);
@@ -180,7 +176,7 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
     say(texts.found(round.item));
     setStars((n) => n + 1);
     later(700, () => {
-      for (let i = 0; i < (settings.calm ? 3 : 8); i++) spawn();
+      for (let i = 0; i < 8; i++) spawn();
     });
     later(CELEBRATE_MS, nextRound);
   };
@@ -294,7 +290,7 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
   const offset = landed ?? drag;
 
   return (
-    <div className={`shadows-play${settings.calm ? " calm" : ""}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
+    <div className={`shadows-play`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
       <p key={`${round.id}-${won}`} className="sh-prompt">
         {won ? texts.found(round.item) : texts.search(round.item)}
       </p>

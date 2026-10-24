@@ -15,8 +15,6 @@ export interface FeelingsSettings {
   speech: boolean;
   /** Little sounds for hugs, stomping, lullabies. */
   sounds: boolean;
-  /** Quieter sounds, no wiggling, slower moves. */
-  calm: boolean;
 }
 
 export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
@@ -25,7 +23,6 @@ export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
   answers: "show",
   speech: false,
   sounds: true,
-  calm: false,
 };
 
 export const FEELINGS_SETTINGS_KEY = "tinytaps.feelings.v1";
