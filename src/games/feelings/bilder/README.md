@@ -161,7 +161,7 @@ kommen, nie ein ganzes Kind.
 
 `baer-…` zeigt in der Mitte, wie es dem Bären am Anfang geht, `trost-…` sind die
 Karten (und danach das Bild in der Mitte), `baer-…-gut` zeigt ihn am Ende wieder froh.
-Alle mit zweitem Frame `…-b`.
+Alle mit zweitem Frame `…-b`, außer `trost-hug`.
 
 | Datei | Prompt |
 | --- | --- |
@@ -170,7 +170,7 @@ Alle mit zweitem Frame `…-b`.
 | `baer-tired` | Night, a moon in the window. The little bear yawns widely and rubs his eyes. |
 | `baer-scared` | Night, a thunderstorm with lightning outside the window. The little bear hides behind a pillow, big scared eyes. |
 | `trost-stroke` | A child's hand gently strokes the little bear's head. The bear smiles with closed eyes; small hearts. |
-| `trost-hug` | A child's arms hug the little bear tight (seen from the viewer's side). The bear smiles happily. |
+| `trost-hug` | Three-quarter view, the bear turned to the left: a child just outside the left edge hugs him (only rainbow-striped sleeves and a bit of sweater, no face), both arms all the way around his back; the bear hugs back with both arms, head on the child's shoulder, eyes closed, blissful smile, small pink hearts. Only one frame: from the front a hug was never readable. |
 | `trost-teddy` | A child's hands give the little bear a small teddy. He hugs it and smiles. |
 | `trost-stomp` | The little bear stomps with both feet to let the anger out, determined face, motion lines at his feet. He is alone. |
 | `trost-blow` | The little bear breathes in deeply and blows out a big puff of air, cheeks round. |
