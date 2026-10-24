@@ -2501,6 +2501,10 @@ kbd {
   fill: transparent;
 }
 
+.scene-overlay {
+  pointer-events: none;
+}
+
 .scene-shadow {
   fill: #3d405b;
   opacity: 0.14;

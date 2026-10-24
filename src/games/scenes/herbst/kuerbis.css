@@ -1,0 +1,95 @@
+/* Kürbis (kuerbis.tsx). */
+
+.he-kuerbis-mouse {
+  opacity: 0;
+}
+
+/* The leaves around the pumpkin are only decoration: taps go through to what is below. */
+.he-kuerbis-pile {
+  pointer-events: none;
+}
+
+.he-kuerbis-leaf {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ---------- Kürbis: hops, the leaves whirl up, a mouse peeks out ---------- */
+
+.item-riesenkuerbis.playing .he-kuerbis-body {
+  animation: he-kuerbis-hop 0.9s ease-in-out 2;
+}
+
+.item-riesenkuerbis.playing .he-kuerbis-leafy {
+  animation: he-kuerbis-flap 0.45s ease-in-out 4;
+}
+
+.item-riesenkuerbis.playing .he-kuerbis-vine {
+  animation: he-kuerbis-curl 1.8s ease-in-out;
+}
+
+.item-riesenkuerbis.playing .he-kuerbis-leaf {
+  animation: he-kuerbis-whirl 1.4s ease-out calc(var(--i) * 0.07s);
+}
+
+.item-riesenkuerbis.playing .he-kuerbis-mouse {
+  animation: he-kuerbis-peek 2s ease-in-out;
+}
+
+@keyframes he-kuerbis-hop {
+  0%,
+  100% {
+    transform: none;
+  }
+  15% {
+    transform: scale(1.1, 0.88);
+  }
+  45% {
+    transform: translateY(-36px) scale(0.94, 1.08);
+  }
+  75% {
+    transform: scale(1.06, 0.94);
+  }
+}
+
+@keyframes he-kuerbis-flap {
+  50% {
+    transform: rotate(-24deg);
+  }
+}
+
+@keyframes he-kuerbis-curl {
+  50% {
+    transform: rotate(18deg) scale(1.1);
+  }
+}
+
+@keyframes he-kuerbis-whirl {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translate(calc(var(--s) * 30px), -90px) rotate(200deg);
+  }
+  70% {
+    transform: translate(calc(var(--s) * 44px), -40px) rotate(320deg);
+  }
+}
+
+@keyframes he-kuerbis-peek {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  30%,
+  75% {
+    opacity: 1;
+    transform: translate(12px, -14px);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(14px, -18px) rotate(8deg);
+  }
+}

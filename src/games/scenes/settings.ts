@@ -1,5 +1,3 @@
-import type { SeasonSetting } from "./season";
-
 /**
  * Explore: tap anything to see and hear it. Find: "Wo ist der Bagger?"
  * Sounds: only a sound is played, who made it? Questions: "Was ist rot?", several right answers.
@@ -42,8 +40,6 @@ export interface ScenesSettings {
   ambient: boolean;
   /** Keys trigger: show each item's key in the picture. */
   showKeys: boolean;
-  /** Seasonal extras in the picture: by the calendar, a fixed season or none. */
-  season: SeasonSetting;
   /** Explore mode: some vehicles drive into other pictures, and a sign at the edge follows them (see roads.ts). */
   roads: boolean;
 }
@@ -58,7 +54,6 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   hints: true,
   ambient: false,
   showKeys: true,
-  season: "auto",
   roads: true,
 };
 
