@@ -17,9 +17,12 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
 - Image models need billing enabled in AI Studio (the free tier allows 0 pictures;
   a `429 … free_tier … limit: 0` means billing is off). Don't generate dozens of
   variants without asking.
-- Default model `gemini-nano-banana-2.1` (about $0.034 per 1K picture, Oct 2026);
-  `--model` or `GEMINI_IMAGE_MODEL` switches, e.g. `gemini-3-pro-image` (Nano Banana
-  Pro, about $0.13) for hard scenes with many characters. `gemini-2.5-flash-image` is
+- Default model `gemini-3.1-flash-lite-image` (Nano Banana 2 Lite, $0.034 per 1K
+  picture, Oct 2026 – the cheapest; 1K is its smallest size, enough for these simple
+  pictures, also for second frames with `--ref`). `--model` or `GEMINI_IMAGE_MODEL`
+  switches, e.g. `gemini-3.1-flash-image` (Nano Banana 2, $0.067) or
+  `gemini-3-pro-image` (Nano Banana Pro, $0.134) only for hard scenes with many
+  characters. `gemini-2.5-flash-image` is
   switched off. List the models the key can use:
   `curl -s -H "x-goog-api-key: $GEMINI_API_KEY" https://generativelanguage.googleapis.com/v1beta/models`
 - The key must be **exported** (`export GEMINI_API_KEY=…` in `~/.zshrc`); if the shell

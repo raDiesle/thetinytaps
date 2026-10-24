@@ -3,19 +3,14 @@
 // Each one shows what the little bear can do instead of hitting back:
 // say "Stopp!", step away, get a grown-up, ask, wait, swap.
 
-import { GROUND, type Beat, type Picture } from "./story";
+import type { Beat } from "./story";
 
 export type SituationId = "push" | "kick" | "grab" | "slide" | "want" | "angry";
 
-/** Where it happens; draws the background and its things (see KitaPlay). */
-export type Place = "playground" | "sandbox" | "slide" | "room";
-
 export interface KitaStep {
   emoji: string;
-  /** Short, under the card's picture. */
+  /** Not shown: the card is only a picture. Said by screen readers. */
   label: string;
-  /** What the card shows: the bear doing it. */
-  picture: Picture;
   beats: Beat[];
 }
 
@@ -23,21 +18,13 @@ export interface Situation {
   id: SituationId;
   emoji: string;
   title: string;
-  place: Place;
-  /** How it starts: the first beat sets everyone up, the others show what happens. */
+  /** What happens, told while the picture of it is shown. */
   intro: Beat[];
   steps: KitaStep[];
   /** The not-so-good idea, offered next to the first step when children choose themselves. */
-  instead: { emoji: string; label: string; answer: string; picture: Picture };
+  instead: { emoji: string; label: string; answer: string };
   outro: Beat[];
 }
-
-/** Off stage, where the teacher waits until someone gets her. */
-const OFF_RIGHT = 160;
-/** Standing on top of the slide, and at the end of the chute; see the slide drawing in KitaPlay. */
-const SLIDE_TOP = { x: 36, y: 54 };
-const SLIDE_END = { x: 66, y: GROUND };
-const LADDER = { x: 29, y: GROUND };
 
 export const QUESTION = "Was kann der kleine Bär tun?";
 
@@ -46,59 +33,32 @@ export const SITUATIONS: Situation[] = [
     id: "push",
     emoji: "💥",
     title: "Geschubst",
-    place: "playground",
     intro: [
-      {
-        narration: "Der kleine Bär spielt draußen.",
-        cast: {
-          bear: { x: 46, mood: "happy", face: "right" },
-          fox: { x: 24, mood: "neutral", face: "right" },
-          teacher: { x: OFF_RIGHT, face: "left" },
-        },
-      },
-      {
-        narration: "Der Fuchs schubst den kleinen Bären. Aua!",
-        cast: { fox: { x: 36, pose: "push", mood: "angry" }, bear: { x: 54, pose: "fall", mood: "sad" } },
-        sound: "boing",
-      },
+      { narration: "Der kleine Bär spielt draußen." },
+      { narration: "Der Fuchs schubst den kleinen Bären. Aua!", sound: "boing" },
     ],
     steps: [
       {
         emoji: "✋",
         label: "Stopp! Nein!",
-        picture: { cast: { bear: { x: 66, pose: "stop", mood: "neutral", face: "left" }, fox: { x: 26, mood: "surprised" } }, signs: [{ emoji: "✋", x: 46, y: 60 }] },
         beats: [
-          {
-            narration: "Der kleine Bär sagt laut:",
-            line: { who: "bear", text: "Stopp! Nein! Ich will das nicht!" },
-            cast: { bear: { pose: "stop", mood: "angry", face: "left" }, fox: { pose: "stand", mood: "surprised" } },
-          },
+          { narration: "Der kleine Bär sagt laut:", line: "Stopp! Nein! Ich will das nicht!" },
         ],
       },
       {
         emoji: "👣",
         label: "Weggehen",
-        picture: { cast: { bear: { x: 80, pose: "walk", mood: "neutral" }, fox: { x: 18 } }, signs: [{ emoji: "👣", x: 40, y: 2, size: 18 }, { emoji: "👣", x: 58, y: 2, size: 22 }] },
         beats: [
-          { narration: "Dann geht er weg. So hat er Abstand.", cast: { bear: { x: 78, pose: "walk", mood: "neutral", face: "right" } } },
-          { cast: { bear: { pose: "stand", face: "left" } } },
+          { narration: "Dann geht er weg. So hat er Abstand." },
         ],
       },
       {
         emoji: "🙋",
         label: "Hilfe holen",
-        picture: { cast: { bear: { x: 28, pose: "reach", mood: "neutral" }, teacher: { x: 72, face: "left", mood: "happy" } } },
         beats: [
-          {
-            narration: "Er holt die Erzieherin.",
-            line: { who: "bear", text: "Der Fuchs hat mich geschubst!" },
-            cast: { teacher: { x: 60, pose: "walk" } },
-          },
-          {
-            line: { who: "teacher", text: "Stopp, Fuchs. Schubsen tut weh." },
-            cast: { teacher: { pose: "stand", mood: "neutral" } },
-          },
-          { line: { who: "fox", text: "Entschuldigung, Bär." }, cast: { fox: { mood: "sorry" } } },
+          { narration: "Er holt die Erzieherin.", line: "Der Fuchs hat mich geschubst!" },
+          { line: "Stopp, Fuchs. Schubsen tut weh." },
+          { line: "Entschuldigung, Bär." },
         ],
       },
     ],
@@ -106,73 +66,41 @@ export const SITUATIONS: Situation[] = [
       emoji: "👊",
       label: "Zurückschubsen",
       answer: "Hmm, dann tut es noch mehr weh. Sag lieber laut: Stopp!",
-      picture: { cast: { bear: { x: 68, pose: "push", mood: "angry", face: "left" }, fox: { x: 24, pose: "fall", mood: "sad", face: "left" } }, signs: [{ emoji: "💥", x: 45, y: 30, size: 26 }] },
     },
     outro: [
-      {
-        narration: "Super! Stopp sagen, weggehen, Hilfe holen.",
-        cast: { bear: { pose: "hop", mood: "joy" }, teacher: { mood: "happy" }, fox: { mood: "happy" } },
-        sound: "chime",
-      },
+      { narration: "Super! Stopp sagen, weggehen, Hilfe holen.", sound: "chime" },
     ],
   },
   {
     id: "kick",
     emoji: "🦶",
     title: "Getreten",
-    place: "playground",
     intro: [
-      {
-        narration: "Der kleine Bär und der Fuchs sind draußen.",
-        cast: {
-          bear: { x: 40, mood: "happy", face: "right" },
-          fox: { x: 60, mood: "neutral", face: "left" },
-          teacher: { x: OFF_RIGHT, face: "left" },
-        },
-      },
-      {
-        narration: "Der Fuchs tritt den kleinen Bären ans Bein. Aua!",
-        cast: { fox: { x: 55, pose: "kick", mood: "angry" }, bear: { x: 36, pose: "fall", mood: "sad" } },
-        sound: "boing",
-      },
+      { narration: "Der kleine Bär und der Fuchs sind draußen." },
+      { narration: "Der Fuchs tritt den kleinen Bären ans Bein. Aua!", sound: "boing" },
     ],
     steps: [
       {
         emoji: "✋",
         label: "Stopp!",
-        picture: { cast: { bear: { x: 34, pose: "stop", mood: "neutral" }, fox: { x: 74, mood: "surprised", face: "left" } }, signs: [{ emoji: "✋", x: 54, y: 60 }] },
         beats: [
-          {
-            narration: "Der kleine Bär sagt laut:",
-            line: { who: "bear", text: "Stopp! Nicht treten!" },
-            cast: { bear: { pose: "stop", mood: "angry" }, fox: { pose: "stand", mood: "surprised" } },
-          },
+          { narration: "Der kleine Bär sagt laut:", line: "Stopp! Nicht treten!" },
         ],
       },
       {
         emoji: "👣",
         label: "Weggehen",
-        picture: { cast: { bear: { x: 20, pose: "walk", mood: "neutral", face: "left" }, fox: { x: 82, face: "left" } }, signs: [{ emoji: "👣", x: 42, y: 2, size: 22 }, { emoji: "👣", x: 60, y: 2, size: 18 }] },
         beats: [
-          { narration: "Er geht ein paar Schritte weg.", cast: { bear: { x: 20, pose: "walk", mood: "neutral", face: "left" } } },
-          { cast: { bear: { pose: "stand", face: "right" } } },
+          { narration: "Er geht ein paar Schritte weg." },
         ],
       },
       {
         emoji: "🙋",
         label: "Hilfe holen",
-        picture: { cast: { bear: { x: 28, pose: "reach", mood: "neutral" }, teacher: { x: 72, face: "left", mood: "happy" } } },
         beats: [
-          {
-            narration: "Er ruft die Erzieherin.",
-            line: { who: "bear", text: "Hilfe! Der Fuchs hat mich getreten." },
-            cast: { teacher: { x: 80, pose: "walk" } },
-          },
-          {
-            line: { who: "teacher", text: "Fuchs, Treten tut weh. Das machen wir nicht." },
-            cast: { teacher: { pose: "stand" }, fox: { face: "right" } },
-          },
-          { line: { who: "fox", text: "Entschuldigung." }, cast: { fox: { mood: "sorry", face: "left" } } },
+          { narration: "Er ruft die Erzieherin.", line: "Hilfe! Der Fuchs hat mich getreten." },
+          { line: "Fuchs, Treten tut weh. Das machen wir nicht." },
+          { line: "Entschuldigung." },
         ],
       },
     ],
@@ -180,68 +108,43 @@ export const SITUATIONS: Situation[] = [
       emoji: "🦶",
       label: "Zurücktreten",
       answer: "Hmm, dann tut es beiden weh. Sag lieber laut: Stopp!",
-      picture: { cast: { bear: { x: 36, pose: "kick", mood: "angry" }, fox: { x: 72, pose: "fall", mood: "sad" } }, signs: [{ emoji: "💥", x: 56, y: 16, size: 26 }] },
     },
     outro: [
-      {
-        narration: "Prima! Stopp sagen, Abstand halten, Hilfe holen.",
-        cast: { bear: { pose: "hop", mood: "joy" }, teacher: { mood: "happy" }, fox: { mood: "happy" } },
-        sound: "chime",
-      },
+      { narration: "Prima! Stopp sagen, Abstand halten, Hilfe holen.", sound: "chime" },
     ],
   },
   {
     id: "grab",
     emoji: "🚜",
     title: "Weggenommen",
-    place: "sandbox",
     intro: [
-      {
-        narration: "Der kleine Bär spielt mit seinem Traktor.",
-        cast: {
-          bear: { x: 38, mood: "happy", face: "right", holds: "🚜" },
-          fox: { x: 68, mood: "neutral", face: "left" },
-        },
-      },
-      {
-        narration: "Da nimmt ihm der Fuchs einfach den Traktor weg!",
-        cast: { fox: { x: 52, pose: "reach", mood: "neutral" } },
-      },
-      {
-        cast: { fox: { x: 66, pose: "stand", holds: "🚜" }, bear: { holds: "", mood: "sad" } },
-        sound: "pop",
-      },
+      { narration: "Der kleine Bär spielt mit seinem Traktor." },
+      { narration: "Da nimmt ihm der Fuchs einfach den Traktor weg!" },
+      { sound: "pop" },
     ],
     steps: [
       {
         emoji: "✋",
         label: "Das ist meins!",
-        picture: { cast: { bear: { x: 32, pose: "stop", mood: "neutral" }, fox: { x: 74, mood: "surprised", face: "left", holds: "🚜" } }, signs: [{ emoji: "✋", x: 52, y: 60 }] },
         beats: [
-          {
-            narration: "Der kleine Bär sagt laut:",
-            line: { who: "bear", text: "Stopp! Das ist mein Traktor!" },
-            cast: { bear: { pose: "stop", mood: "angry" }, fox: { mood: "surprised" } },
-          },
+          { narration: "Der kleine Bär sagt laut:", line: "Stopp! Das ist mein Traktor!" },
         ],
       },
       {
         emoji: "🤲",
         label: "Zurück, bitte",
-        picture: { cast: { bear: { x: 30, pose: "reach", mood: "happy" }, fox: { x: 70, pose: "give", mood: "sorry", face: "left", holds: "🚜" } } },
         beats: [
-          { line: { who: "bear", text: "Gib ihn mir bitte zurück." }, cast: { bear: { pose: "reach", mood: "neutral" } } },
-          { line: { who: "fox", text: "Hier. Entschuldigung." }, cast: { fox: { x: 54, pose: "give", mood: "sorry" } } },
-          { cast: { fox: { x: 64, pose: "stand", holds: "" }, bear: { pose: "stand", holds: "🚜", mood: "happy" } }, sound: "pop" },
+          { line: "Gib ihn mir bitte zurück." },
+          { line: "Hier. Entschuldigung." },
+          { sound: "pop" },
         ],
       },
       {
         emoji: "🤝",
         label: "Mitspielen?",
-        picture: { cast: { bear: { x: 28, mood: "joy", holds: "🚜" }, fox: { x: 72, mood: "joy", face: "left", holds: "🪣" } }, signs: [{ emoji: "🤝", x: 50, y: 66, size: 24 }] },
         beats: [
-          { line: { who: "bear", text: "Willst du mitspielen? Du kannst den Eimer haben." } },
-          { line: { who: "fox", text: "Au ja!" }, cast: { fox: { x: 60, mood: "joy", holds: "🪣" } } },
+          { line: "Willst du mitspielen? Du kannst den Eimer haben." },
+          { line: "Au ja!" },
         ],
       },
     ],
@@ -249,69 +152,41 @@ export const SITUATIONS: Situation[] = [
       emoji: "😤",
       label: "Wegreißen",
       answer: "Hmm, dann zerren beide und es gibt Streit. Sag lieber: Stopp, das ist meins!",
-      picture: { cast: { bear: { x: 32, pose: "reach", mood: "angry" }, fox: { x: 68, pose: "reach", mood: "angry", face: "left" } }, signs: [{ emoji: "🚜", x: 50, y: 30, size: 22 }, { emoji: "💢", x: 50, y: 70, size: 22 }] },
     },
     outro: [
-      {
-        narration: "Toll! Und gibt er es nicht zurück, holst du die Erzieherin.",
-        cast: { bear: { pose: "hop", mood: "joy" }, fox: { pose: "hop", mood: "joy" } },
-        sound: "chime",
-      },
+      { narration: "Toll! Und gibt er es nicht zurück, holst du die Erzieherin.", sound: "chime" },
     ],
   },
   {
     id: "slide",
     emoji: "🎢",
     title: "Rutsche voll",
-    place: "slide",
     intro: [
-      {
-        narration: "Alle wollen rutschen.",
-        cast: {
-          bunny: { ...SLIDE_TOP, mood: "happy", face: "right" },
-          fox: { ...LADDER, mood: "neutral", face: "right" },
-          bear: { x: 4, mood: "happy", face: "right", pose: "walk" },
-        },
-      },
-      {
-        narration: "Der kleine Bär will sofort rutschen. Aber die Rutsche ist voll!",
-        cast: { bear: { x: 23, pose: "stand", mood: "sad" } },
-      },
+      { narration: "Alle wollen rutschen." },
+      { narration: "Der kleine Bär will sofort rutschen. Aber die Rutsche ist voll!" },
     ],
     steps: [
       {
         emoji: "🚶",
         label: "Anstellen",
-        picture: { cast: { bear: { x: 18, mood: "neutral" }, fox: { x: 46, mood: "happy" } }, signs: [{ emoji: "🛝", x: 80, y: 6, size: 50 }] },
         beats: [
-          {
-            narration: "Er stellt sich hinten an.",
-            line: { who: "bear", text: "Ich bin nach dem Fuchs dran." },
-            cast: { bear: { x: 15, mood: "neutral" } },
-          },
+          { narration: "Er stellt sich hinten an.", line: "Ich bin nach dem Fuchs dran." },
         ],
       },
       {
         emoji: "⏳",
         label: "Warten",
-        picture: { cast: { bear: { x: 30, mood: "neutral" } }, signs: [{ emoji: "⏳", x: 30, y: 78, size: 20 }, { emoji: "🛝", x: 74, y: 6, size: 50 }] },
         beats: [
-          { narration: "Er wartet. Erst rutscht der Hase …", cast: { bunny: { ...SLIDE_END, pose: "slide", mood: "joy" } } },
-          {
-            narration: "… dann der Fuchs.",
-            cast: { bunny: { x: 88, pose: "walk" }, fox: { ...SLIDE_TOP }, bear: { ...LADDER, pose: "walk" } },
-          },
-          { cast: { fox: { ...SLIDE_END, pose: "slide", mood: "joy" }, bear: { pose: "stand" }, bunny: { pose: "stand", face: "left" } } },
-          { cast: { fox: { x: 78, pose: "stand", face: "left" } } },
+          { narration: "Er wartet. Erst rutscht der Hase …" },
+          { narration: "… dann der Fuchs." },
         ],
       },
       {
         emoji: "🥳",
         label: "Jetzt ich!",
-        picture: { cast: { bear: { x: 34, pose: "hop", mood: "joy" } }, signs: [{ emoji: "🛝", x: 74, y: 6, size: 50 }] },
         beats: [
-          { narration: "Jetzt ist der kleine Bär dran!", cast: { bear: { ...SLIDE_TOP, mood: "happy" } } },
-          { line: { who: "bear", text: "Juhuu!" }, cast: { bear: { ...SLIDE_END, pose: "slide", mood: "joy" } }, sound: "boing" },
+          { narration: "Jetzt ist der kleine Bär dran!" },
+          { line: "Juhuu!", sound: "boing" },
         ],
       },
     ],
@@ -319,64 +194,41 @@ export const SITUATIONS: Situation[] = [
       emoji: "💥",
       label: "Vordrängeln",
       answer: "Hmm, auf der Rutsche kann jemand runterfallen. Lieber hinten anstellen.",
-      picture: { cast: { bear: { x: 24, pose: "push", mood: "angry" }, fox: { x: 60, pose: "fall", mood: "sad" } }, signs: [{ emoji: "💥", x: 43, y: 30, size: 24 }, { emoji: "🛝", x: 88, y: 6, size: 44 }] },
     },
     outro: [
-      {
-        narration: "Super gewartet! Jeder kommt mal dran.",
-        cast: { bear: { x: 58, pose: "hop", mood: "joy" }, fox: { pose: "hop" }, bunny: { pose: "hop" } },
-        sound: "chime",
-      },
+      { narration: "Super gewartet! Jeder kommt mal dran.", sound: "chime" },
     ],
   },
   {
     id: "want",
     emoji: "🚗",
     title: "Haben wollen",
-    place: "playground",
     intro: [
-      {
-        narration: "Der Hase spielt mit einem tollen Auto.",
-        cast: {
-          bunny: { x: 62, mood: "joy", face: "left", holds: "🚗" },
-          bear: { x: 30, mood: "neutral", face: "right" },
-        },
-      },
-      {
-        narration: "Der kleine Bär will das Auto auch haben!",
-        cast: { bear: { x: 40, pose: "reach", mood: "sorry" } },
-      },
+      { narration: "Der Hase spielt mit einem tollen Auto." },
+      { narration: "Der kleine Bär will das Auto auch haben!" },
     ],
     steps: [
       {
         emoji: "🗣️",
         label: "Fragen",
-        picture: { cast: { bear: { x: 28, mood: "neutral" }, bunny: { x: 72, mood: "happy", face: "left", holds: "🚗" } }, signs: [{ emoji: "❓", x: 46, y: 64, size: 24 }] },
         beats: [
-          { narration: "Er fragt:", line: { who: "bear", text: "Darf ich auch mal?" }, cast: { bear: { pose: "stand", mood: "neutral" } } },
-          { line: { who: "bunny", text: "Gleich. Ich spiele noch." }, cast: { bunny: { mood: "happy" } } },
+          { narration: "Er fragt:", line: "Darf ich auch mal?" },
+          { line: "Gleich. Ich spiele noch." },
         ],
       },
       {
         emoji: "⏳",
         label: "Warten",
-        picture: { cast: { bear: { x: 28, mood: "happy", holds: "⚽" }, bunny: { x: 72, mood: "joy", face: "left", holds: "🚗" } }, signs: [{ emoji: "⏳", x: 50, y: 70, size: 20 }] },
         beats: [
-          {
-            narration: "Der kleine Bär wartet. Solange spielt er mit dem Ball.",
-            cast: { bear: { x: 30, holds: "⚽", mood: "happy", pose: "hop" } },
-            sound: "boing",
-          },
-          { cast: { bear: { pose: "stand" } } },
+          { narration: "Der kleine Bär wartet. Solange spielt er mit dem Ball.", sound: "boing" },
         ],
       },
       {
         emoji: "🔄",
         label: "Tauschen",
-        picture: { cast: { bear: { x: 28, mood: "joy", holds: "🚗" }, bunny: { x: 72, mood: "joy", face: "left", holds: "⚽" } }, signs: [{ emoji: "🔄", x: 50, y: 68, size: 22 }] },
         beats: [
-          { line: { who: "bunny", text: "Jetzt darfst du. Tauschen wir?" }, cast: { bunny: { x: 54 } } },
-          { line: { who: "bear", text: "Ja! Danke!" }, cast: { bear: { x: 38, holds: "🚗", mood: "joy" }, bunny: { holds: "⚽" } }, sound: "pop" },
+          { line: "Jetzt darfst du. Tauschen wir?" },
+          { line: "Ja! Danke!", sound: "pop" },
         ],
       },
     ],
@@ -384,65 +236,41 @@ export const SITUATIONS: Situation[] = [
       emoji: "✊",
       label: "Wegnehmen",
       answer: "Hmm, dann ist der Hase traurig. Frag lieber: Darf ich auch mal?",
-      picture: { cast: { bear: { x: 36, pose: "reach", mood: "angry" }, bunny: { x: 72, mood: "sad", face: "left", holds: "🚗" } }, signs: [{ emoji: "💢", x: 54, y: 68, size: 22 }] },
     },
     outro: [
-      {
-        narration: "Prima! Fragen, warten, tauschen.",
-        cast: { bear: { pose: "hop", mood: "joy" }, bunny: { pose: "hop", mood: "joy" } },
-        sound: "chime",
-      },
+      { narration: "Prima! Fragen, warten, tauschen.", sound: "chime" },
     ],
   },
   {
     id: "angry",
     emoji: "😠",
     title: "Selbst wütend",
-    place: "room",
     intro: [
-      {
-        narration: "Der kleine Bär baut einen hohen Turm.",
-        cast: {
-          bear: { x: 32, mood: "happy", face: "right" },
-          fox: { x: 86, mood: "neutral", face: "left" },
-        },
-        stage: "tower-up",
-      },
-      { cast: { fox: { x: 66, pose: "walk" } } },
-      {
-        narration: "Rums! Der Fuchs stößt den Turm um. Der kleine Bär ist sooo wütend. Er will schubsen!",
-        cast: { fox: { pose: "stand", mood: "surprised" }, bear: { mood: "angry", pose: "push" } },
-        stage: "tower-down",
-        sound: "rumble",
-      },
+      { narration: "Der kleine Bär baut einen hohen Turm." },
+      { narration: "Rums! Der Fuchs stößt den Turm um. Der kleine Bär ist sooo wütend. Er will schubsen!", sound: "rumble" },
     ],
     steps: [
       {
         emoji: "🦶",
         label: "Stampfen",
-        picture: { cast: { bear: { x: 44, pose: "stomp", mood: "angry" } }, signs: [{ emoji: "🦶", x: 76, y: 4, size: 30 }] },
         beats: [
-          { narration: "Aber er stampft lieber. Stampf, stampf!", cast: { bear: { pose: "stomp" } }, sound: "rumble" },
-          { cast: { bear: { pose: "stand" } } },
+          { narration: "Aber er stampft lieber. Stampf, stampf!", sound: "rumble" },
         ],
       },
       {
         emoji: "💨",
         label: "Tief pusten",
-        picture: { cast: { bear: { x: 40, pose: "breathe", mood: "sorry" } }, signs: [{ emoji: "💨", x: 76, y: 50, size: 26 }] },
         beats: [
-          { narration: "Er atmet tief ein und pustet: Puuuh.", cast: { bear: { pose: "breathe", mood: "sorry" } } },
-          { cast: { bear: { pose: "stand", mood: "neutral" } } },
+          { narration: "Er atmet tief ein und pustet: Puuuh." },
         ],
       },
       {
         emoji: "🗣️",
         label: "Sagen",
-        picture: { cast: { bear: { x: 28, mood: "neutral" }, fox: { x: 72, mood: "sorry", face: "left" } }, signs: [{ emoji: "🗣️", x: 50, y: 64, size: 22 }] },
         beats: [
-          { narration: "Dann sagt er:", line: { who: "bear", text: "Ich bin wütend! Mein Turm ist kaputt!" } },
-          { line: { who: "fox", text: "Oh, Entschuldigung! Ich helfe dir." }, cast: { fox: { x: 70, mood: "sorry" } } },
-          { stage: "tower-up", cast: { fox: { mood: "happy" }, bear: { mood: "happy" } }, sound: "pop" },
+          { narration: "Dann sagt er:", line: "Ich bin wütend! Mein Turm ist kaputt!" },
+          { line: "Oh, Entschuldigung! Ich helfe dir." },
+          { sound: "pop" },
         ],
       },
     ],
@@ -450,14 +278,9 @@ export const SITUATIONS: Situation[] = [
       emoji: "👊",
       label: "Schubsen",
       answer: "Hmm, Schubsen tut weh. Lass die Wut lieber raus: Stampf ganz fest!",
-      picture: { cast: { bear: { x: 28, pose: "push", mood: "angry" }, fox: { x: 70, pose: "fall", mood: "sad" } }, signs: [{ emoji: "💥", x: 50, y: 30, size: 26 }] },
     },
     outro: [
-      {
-        narration: "Toll! Wütend sein ist okay. Stampfen, pusten, sagen – nicht hauen.",
-        cast: { bear: { pose: "hop", mood: "joy" }, fox: { pose: "hop", mood: "joy" } },
-        sound: "chime",
-      },
+      { narration: "Toll! Wütend sein ist okay. Stampfen, pusten, sagen – nicht hauen.", sound: "chime" },
     ],
   },
 ];

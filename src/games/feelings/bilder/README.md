@@ -1,22 +1,26 @@
 # Bilder für „Gefühle“
 
-Lege hier die Bilder ab, dann erscheinen sie im Spiel. Den Code musst du nicht
-anfassen. Solange ein Bild fehlt, zeigt die Karte die gezeichnete Szene.
+Das Spiel besteht nur aus diesen Bildern, ohne gezeichnete Figuren und ohne Text:
+ein großes Bild in der Mitte zeigt, was gerade passiert, darunter stehen die
+Auswahl-Karten. Fehlt ein Bild, bleibt die Stelle leer.
 
 - **Dateiname** genau wie in den Listen unten, z. B. `push-1.webp`
-- **Format:** WebP (am besten), PNG oder JPG
-- **Größe:** 1200 × 900 Pixel (4:3, quer). Andere Formate werden auf 4:3 zugeschnitten.
-- **Dateigröße:** möglichst unter 200 KB, also WebP mit Qualität ~80.
-  Große PNGs gehen auch, machen das Spiel auf dem Tablet aber langsam.
+- **Format:** WebP, 1200 × 900 Pixel (4:3, quer), Qualität 65 – so bleibt jedes Bild unter ~60 KB.
+- **Bewegung:** Ein zweites Bild mit `-b` dahinter (`push-1-b.webp`) ist der zweite
+  Frame. Er zeigt dieselbe Szene mit einer kleinen Bewegung; in der Mitte blenden
+  die Frames im Wechsel ineinander über, wie ein kleines GIF. Die Karten zeigen nur
+  den ersten Frame.
 
-Die Bühne (die laufenden Figuren in der Mitte) bleibt gezeichnet und bewegt. Bilder
-ersetzen die **Auswahl-Karten**, die **Denkblase** bei der schlechten Idee und
-das **„Was ist passiert“-Bild** oben neben der Frage.
-
-Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`), z. B.:
+Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`, Modell Nano Banana 2 Lite – das günstigste, 1K reicht):
 
 ```
-yarn image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --ref .image-raw/figurenbogen.png
+yarn image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --quality 65 --ref src/games/feelings/bilder/push-2.webp
+```
+
+Zweiter Frame: das erste Bild als Referenz mitgeben und nur die Bewegung beschreiben:
+
+```
+yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters, clothes, colours, background, camera framing, composition, line style and sizes. Change only this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
 ```
 
 ## So bleiben die Figuren gleich
@@ -69,7 +73,8 @@ side by side, front view, neutral friendly faces, plain white background.
 ## Im Kindergarten
 
 Pro Geschichte: `…-passiert` (was passiert ist), `…-1` bis `…-3` (die guten
-Schritte in dieser Reihenfolge) und `…-nein` (die nicht so gute Idee).
+Schritte in dieser Reihenfolge), `…-nein` (die nicht so gute Idee) und `…-ende`
+(alle fröhlich, das Bild am Schluss) – jeweils mit zweitem Frame `…-b`.
 
 ### Geschubst (`push`) – draußen auf dem Spielplatz, Wiese, ein Baum
 
@@ -131,14 +136,26 @@ Schritte in dieser Reihenfolge) und `…-nein` (die nicht so gute Idee).
 | `angry-3` | „Sagen“ – The little bear tells the fox how he feels, one paw on his chest. The fox looks sorry and starts to rebuild the tower with him. |
 | `angry-nein` | „Schubsen“ – The angry little bear pushes the fox. The fox falls on the floor and cries. |
 
+### Das gute Ende (`…-ende`)
+
+| Datei | Prompt |
+| --- | --- |
+| `push-ende` | Playground. The little bear jumps for joy with both arms up; the fox smiles and waves, friends again; the teacher smiles proudly. |
+| `kick-ende` | Playground. The little bear jumps for joy; the fox smiles shyly and offers a high five; the teacher smiles proudly. |
+| `grab-ende` | Sandbox. The little bear proudly holds up the red toy tractor and laughs; the fox claps and laughs too. |
+| `slide-ende` | At the bottom of the slide the little bear, the fox and the bunny cheer together with paws up high. |
+| `want-ende` | The little bear drives the red toy car, the bunny holds the ball up high; both laugh and play together. |
+| `angry-ende` | Playroom. The tower of blocks stands again; the little bear and the fox stand next to it, laughing proudly. |
+
 ## Bär trösten
 
 Nur der kleine Bär, in einem gemütlichen Kinderzimmer. Wer tröstet, ist das Kind
 vor dem Bildschirm: zeige nur **Kinderhände oder -arme**, die von vorn ins Bild
 kommen, nie ein ganzes Kind.
 
-`baer-…` zeigt, wie es dem Bären am Anfang geht (oben neben dem Satz),
-`trost-…` die Karten.
+`baer-…` zeigt in der Mitte, wie es dem Bären am Anfang geht, `trost-…` sind die
+Karten (und danach das Bild in der Mitte), `baer-…-gut` zeigt ihn am Ende wieder froh.
+Alle mit zweitem Frame `…-b`.
 
 | Datei | Prompt |
 | --- | --- |
@@ -155,3 +172,7 @@ kommen, nie ein ganzes Kind.
 | `trost-lullaby` | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile. |
 | `trost-hand` | A child's hand holds the little bear's paw. The bear looks calm and smiles a little. |
 | `trost-light` | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles. |
+| `baer-sad-gut` | The little bear in his cosy room is happy again: he laughs, jumps up with both arms raised, small hearts float around him. |
+| `baer-angry-gut` | The little bear is calm again: he sits relaxed next to a rebuilt tall tower of colourful blocks and smiles contentedly. |
+| `baer-tired-gut` | Night, a moon in the window. The little bear sleeps peacefully in his bed under a pink striped blanket, holding a small teddy. |
+| `baer-scared-gut` | The storm is over: a rainbow outside the window, the lamp is on. Only the little bear: he sits on his bed, laughs and waves. |

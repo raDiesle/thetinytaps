@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { speak } from "@/lib/speech";
-import { Critter, MOODS, type Face, type Species } from "./Critter";
-import type { Place } from "./kita";
-import { applyCast, SOUNDS, type ActorId, type ActorState, type Picture, type SoundName } from "./story";
+import { framesFor, imageFor } from "./images";
+import { SOUNDS, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
 
 const SPEECH_LANG = "de-DE";
 
-const SPECIES: Record<ActorId, Species> = { bear: "bear", fox: "fox", bunny: "bunny", teacher: "mouse" };
+/** How long each frame of a picture stays before the next one fades in. */
+const FRAME_MS = 900;
 
 /** Timeouts that are all cleared when the game ends or a new story starts. */
 export function useTimers() {
@@ -102,75 +102,40 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
   );
 }
 
-/** One animal on the stage: where it stands, its pose, what it holds, says and thinks. */
-export function Actor({
-  id,
-  state,
-  face,
-  line,
-  thought,
-  className = "",
+/**
+ * The big picture in the middle: what happens right now. Its frames fade into
+ * each other in a loop, like a tiny GIF, so the animals seem to move a little.
+ * Give it a new `key` with every new picture, so it starts at the first frame.
+ */
+export function StoryPicture({
+  name,
+  children,
   onPointerDown,
 }: {
-  id: ActorId;
-  state: ActorState;
-  face: Face;
-  line?: string;
-  /** A thought cloud above the head, e.g. a ❓ while the bear waits for the child. */
-  thought?: ReactNode;
-  className?: string;
+  name: string;
+  /** Things on top of the picture: a cross, floating hearts. */
+  children?: ReactNode;
   onPointerDown?: (e: PointerEvent) => void;
 }) {
+  const frames = framesFor(name);
+  const [frame, setFrame] = useState(0);
+  const moving = frames.length > 1;
+
+  useEffect(() => {
+    if (!moving || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
+    return () => clearInterval(timer);
+  }, [moving]);
+
+  const shown = frame % Math.max(frames.length, 1);
+
   return (
-    <div
-      className={`fg-actor fg-actor-${id} pose-${state.pose}${state.x < 0 || state.x > 100 ? " offstage" : ""} ${className}`}
-      style={{ left: `${state.x}%`, bottom: `${state.y}%` }}
-      onPointerDown={onPointerDown}
-    >
-      {line && (
-        <div key={line} className="fg-bubble">
-          {line}
-        </div>
-      )}
-      {!line && thought && <div className="fg-thought">{thought}</div>}
-      <div className={`fg-figure${state.face === "left" ? " flip" : ""}`}>
-        <Critter species={SPECIES[id]} face={face} teacher={id === "teacher"} />
-        {state.holds && <span className="fg-held">{state.holds}</span>}
-      </div>
+    <div className="fg-picture" onPointerDown={onPointerDown}>
+      {frames.map((src, i) => (
+        <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
+      ))}
+      {children}
     </div>
-  );
-}
-
-/** A small picture of a choice: the illustration if there is one, else the animals drawn in their poses with big signs. */
-export function PictureScene({ picture, place, image }: { picture: Picture; place: Place; image?: string }) {
-  if (image) return <img className="fg-scene fg-scene-image" src={image} alt="" decoding="async" draggable={false} />;
-  const actors = applyCast({}, picture.cast);
-  return (
-    <span className={`fg-scene fg-scene-${place === "room" ? "room" : "outdoors"}`} aria-hidden>
-      {(Object.entries(actors) as [ActorId, ActorState][]).map(([id, state]) => (
-        <Actor key={id} id={id} state={state} face={MOODS[state.mood]} />
-      ))}
-      {picture.blanket && <span className="fg-scene-blanket" />}
-      {picture.signs?.map((sign) => (
-        <span
-          key={sign.emoji + sign.x}
-          className="fg-sign"
-          style={{ left: `${sign.x}%`, bottom: `${sign.y}%`, fontSize: `${sign.size ?? 30}cqh` }}
-        >
-          {sign.emoji}
-        </span>
-      ))}
-    </span>
-  );
-}
-
-/** A round green tick or red cross: good idea, or not so good. Drawn, so it reads the same everywhere. */
-export function Mark({ good, className = "" }: { good: boolean; className?: string }) {
-  return (
-    <svg className={`fg-mark ${good ? "good" : "bad"} ${className}`} viewBox="0 0 100 100" aria-hidden>
-      <circle cx="50" cy="50" r="44" />
-      <path d={good ? "M28 52 L44 68 L73 34" : "M32 32 L68 68 M68 32 L32 68"} />
-    </svg>
   );
 }
 
@@ -182,18 +147,15 @@ export type CardState = "choose" | "playing" | "done" | "wrong" | "rest";
 
 /** A big picture button: what the bear can do, to be understood without reading. */
 export function ChoiceCard({
-  picture,
-  place,
-  label,
   image,
+  label,
   state,
   small = false,
   onChoose,
 }: {
-  picture: Picture;
-  place: Place;
-  /** An illustration to show instead of the drawn picture. */
-  image?: string;
+  /** Name of the picture, see images.ts. */
+  image: string;
+  /** Not shown, for screen readers. */
   label: string;
   state: CardState;
   small?: boolean;
@@ -210,11 +172,20 @@ export function ChoiceCard({
         if (state === "choose") onChoose?.();
       }}
     >
-      <PictureScene picture={picture} place={place} image={image} />
+      <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} />
       {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
       {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
-      <span className="fg-card-label">{label}</span>
     </button>
+  );
+}
+
+/** A round green tick or red cross: good idea, or not so good. Drawn, so it reads the same everywhere. */
+export function Mark({ good, className = "" }: { good: boolean; className?: string }) {
+  return (
+    <svg className={`fg-mark ${good ? "good" : "bad"} ${className}`} viewBox="0 0 100 100" aria-hidden>
+      <circle cx="50" cy="50" r="44" />
+      <path d={good ? "M28 52 L44 68 L73 34" : "M32 32 L68 68 M68 32 L32 68"} />
+    </svg>
   );
 }
 
@@ -228,5 +199,30 @@ export function StepDots({ total, done, current }: { total: number; done: number
         </span>
       ))}
     </span>
+  );
+}
+
+/** At the end of a story: play it again (small, white) or go on to the next one (big, yellow). Only pictures, no words. */
+export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: () => void }) {
+  // Pointer down, not click: it reacts right away, and the picture underneath doesn't get the tap.
+  const press = (action: () => void) => (e: PointerEvent) => {
+    e.stopPropagation();
+    action();
+  };
+
+  return (
+    <div className="fg-end">
+      <button type="button" className="fg-round again" aria-label="Nochmal" onPointerDown={press(onAgain)}>
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />
+          <path d="M2.5 3.5v5h5" />
+        </svg>
+      </button>
+      <button type="button" className="fg-round next" aria-label="Weiter" onPointerDown={press(onNext)}>
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <path d="M8 4.5v15l12-7.5z" />
+        </svg>
+      </button>
+    </div>
   );
 }

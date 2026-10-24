@@ -1,17 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { COMFORTS, COMFORTS_NEEDED, FEELINGS, type ComfortId, type Feeling } from "./bear";
-import { blendFace, MOODS } from "./Critter";
-import { bearImages, imageFor, preloadImages } from "./images";
-import { PlaceDrawing } from "./places";
+import { bearImages, preloadImages } from "./images";
 import type { FeelingsSettings } from "./settings";
-import { Actor, ChoiceCard, FloaterLayer, useFloaters, useTimers, useVoice } from "./shared";
-import { GROUND, type Pose } from "./story";
+import { ChoiceCard, EndButtons, FloaterLayer, StoryPicture, useFloaters, useTimers, useVoice } from "./shared";
 
 /** How long a kind thing plays before the next one can start. */
 const COMFORT_MS = 1600;
 /** Time to enjoy the happy bear before a tap or key brings the next feeling. */
 const CELEBRATE_MS = 1500;
-/** Where hearts and notes float up from: the bear's chest. */
+/** Where hearts and notes float up from: the middle of the picture. */
 const BEAR_CHEST = { x: 50, y: 42 };
 
 const QUESTION = "Wie kannst du ihm helfen?";
@@ -20,9 +17,6 @@ interface Round {
   key: number;
   feeling: Feeling;
   used: ComfortId[];
-  pose: Pose;
-  narration: string;
-  line: string | null;
   busy: boolean;
   /** All kind things done and the bear has said thanks. */
   happy: boolean;
@@ -37,16 +31,7 @@ function shuffle<T>(items: T[]): T[] {
   return result;
 }
 
-const freshRound = (feeling: Feeling, key: number): Round => ({
-  key,
-  feeling,
-  used: [],
-  pose: "stand",
-  narration: feeling.intro,
-  line: feeling.sound,
-  busy: false,
-  happy: false,
-});
+const freshRound = (feeling: Feeling, key: number): Round => ({ key, feeling, used: [], busy: false, happy: false });
 
 export function BearPlay({ settings }: { settings: FeelingsSettings }) {
   const deck = useRef<Feeling[]>([]);
@@ -59,13 +44,11 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
 
   const { feeling, used, happy } = round;
   const level = Math.min(used.length, COMFORTS_NEEDED);
-  const face = blendFace(MOODS[feeling.mood], MOODS[feeling.end.mood], level / COMFORTS_NEEDED);
-  const holdsTeddy = used.includes("teddy");
 
   const startFeeling = useCallback(
     (next: Feeling) => {
       clearAll();
-      preloadImages([bearImages.feeling(next.id), ...next.comforts.map(bearImages.comfort)]);
+      preloadImages([bearImages.feeling(next.id), bearImages.happy(next.id), ...next.comforts.map(bearImages.comfort)]);
       setRound(freshRound(next, nextKey.current++));
       say(`${next.intro} ${QUESTION}`);
       if (next.id === "scared") sound("rumble");
@@ -94,29 +77,22 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
       const c = COMFORTS[id];
       const nowUsed = used.includes(id) ? used : [...used, id];
       const nowHappy = nowUsed.length >= COMFORTS_NEEDED;
-      setRound((r) => ({ ...r, used: nowUsed, pose: c.pose, narration: c.narration, line: null, busy: true }));
+      setRound((r) => ({ ...r, used: nowUsed, busy: true }));
       say(c.narration);
       sound(c.sound);
       float(c.float, BEAR_CHEST.x, BEAR_CHEST.y);
 
       later(() => {
         if (!nowHappy) {
-          setRound((r) => ({ ...r, pose: "stand", busy: false }));
+          setRound((r) => ({ ...r, busy: false }));
           return;
         }
         const { end } = feeling;
         happyAt.current = performance.now();
-        setRound((r) => ({
-          ...r,
-          pose: end.mood === "asleep" ? "breathe" : "hop",
-          narration: end.narration,
-          line: end.line,
-          busy: false,
-          happy: true,
-        }));
+        setRound((r) => ({ ...r, busy: false, happy: true }));
         say(`${end.narration} ${end.line}`, true);
         sound("chime");
-        float(end.mood === "asleep" ? "💤" : "💛", BEAR_CHEST.x, BEAR_CHEST.y + 20, 5);
+        float(feeling.id === "tired" ? "💤" : "💛", BEAR_CHEST.x, BEAR_CHEST.y + 20, 5);
       }, COMFORT_MS);
     },
     [round.busy, happy, used, feeling, say, sound, float, later],
@@ -147,25 +123,13 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pressKey]);
 
-  const stageClass = [
-    `feel-${feeling.id}`,
-    (feeling.id === "tired" || feeling.id === "scared") && "night",
-    used.includes("light") && "lit",
-    happy && "happy",
-    feeling.id === "angry" && "tower-down",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
-  const feelingImage = imageFor(bearImages.feeling(feeling.id));
+  // The bear as he feels at first, then the last kind thing the child did, and at the end happy again.
+  const last = used.at(-1);
+  const picture = happy ? bearImages.happy(feeling.id) : last ? bearImages.comfort(last) : bearImages.feeling(feeling.id);
 
   return (
-    <div className={`story-play bear-play`} onPointerDown={() => happy && tryNextFeeling()}>
-      <header className="story-narration">
-        {feelingImage && <img key={feeling.id} className="story-picture" src={feelingImage} alt="" draggable={false} />}
-        <span key={`${round.key}-${happy}`} className="story-tag feeling-tag">
-          <span aria-hidden>{happy ? feeling.end.emoji : feeling.emoji}</span> {happy ? feeling.end.name : feeling.name}
-        </span>
+    <div className="story-play bear-play" onPointerDown={() => happy && tryNextFeeling()}>
+      <header className="story-top">
         <span className="fg-hearts" aria-hidden>
           {Array.from({ length: COMFORTS_NEEDED }, (_, i) => (
             <span key={i} className={`fg-heart${i < level ? " full" : ""}`}>
@@ -173,79 +137,25 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
             </span>
           ))}
         </span>
-        <p key={round.narration}>{round.narration}</p>
       </header>
-      <div className="story-stage-wrap place-room">
-        <div key={round.key} className={`story-stage ${stageClass}`}>
-          <PlaceDrawing place="room" tower={feeling.id === "angry"} />
-          {feeling.id === "tired" && (
-            <span className="bear-moon" aria-hidden>
-              🌙
-            </span>
-          )}
-          {feeling.id === "scared" && (
-            <span className="bear-thunder" aria-hidden>
-              ⛈️
-            </span>
-          )}
-          <Actor
-            id="bear"
-            className="big"
-            state={{ x: 50, y: GROUND - 4, pose: round.pose, mood: feeling.mood, face: "right", holds: holdsTeddy ? "🧸" : "" }}
-            face={face}
-            line={round.line ?? undefined}
-            onPointerDown={onBearPointer}
-          />
-          {used.includes("blanket") && <div className="bear-blanket" aria-hidden />}
+      <main className="story-middle">
+        <StoryPicture key={`${round.key}-${picture}`} name={picture} onPointerDown={onBearPointer}>
           <FloaterLayer floaters={floaters} />
-        </div>
-      </div>
-      <footer className="story-buttons">
-        {feeling.comforts.map((id) => {
-          const c = COMFORTS[id];
-          const done = used.includes(id);
-          return (
+        </StoryPicture>
+      </main>
+      <footer className="story-choices">
+        {happy ? (
+          <EndButtons onAgain={() => startFeeling(feeling)} onNext={nextFeeling} />
+        ) : (
+          feeling.comforts.map((id) => (
             <ChoiceCard
               key={id}
-              picture={c.picture}
-              image={imageFor(bearImages.comfort(id))}
-              place="room"
-              label={c.label}
-              state={done ? "done" : round.busy || happy ? "rest" : "choose"}
-              small={happy}
+              image={bearImages.comfort(id)}
+              label={COMFORTS[id].label}
+              state={used.includes(id) ? "done" : round.busy ? "rest" : "choose"}
               onChoose={() => comfort(id)}
             />
-          );
-        })}
-        {happy && (
-          <>
-            <button
-              type="button"
-              className="story-button replay"
-              onPointerDown={(e: PointerEvent) => {
-                e.stopPropagation();
-                startFeeling(feeling);
-              }}
-            >
-              <span className="story-button-emoji" aria-hidden>
-                🔁
-              </span>
-              Nochmal
-            </button>
-            <button
-              type="button"
-              className="story-button next again"
-              onPointerDown={(e: PointerEvent) => {
-                e.stopPropagation();
-                nextFeeling();
-              }}
-            >
-              <span className="story-button-emoji" aria-hidden>
-                ▶
-              </span>
-              Weiter
-            </button>
-          </>
+          ))
         )}
       </footer>
     </div>

@@ -1,29 +1,23 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
-import { MOODS } from "./Critter";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { imageFor, preloadImages, storyImages } from "./images";
 import { QUESTION, SITUATIONS, type Situation } from "./kita";
-import { PlaceDrawing } from "./places";
 import type { FeelingsSettings } from "./settings";
-import { Actor, ChoiceCard, Mark, PictureScene, StepDots, useTimers, useVoice, type CardState } from "./shared";
-import { applyCast, beatMs, type ActorId, type ActorState, type Beat } from "./story";
+import { ChoiceCard, EndButtons, Mark, StepDots, StoryPicture, useTimers, useVoice, type CardState } from "./shared";
+import { beatMs, type Beat } from "./story";
 
 const NEXT_QUESTION = "Und jetzt?";
 
 type Phase = "intro" | "steps" | "outro" | "done";
 
 interface Run {
-  /** Changes with every new story, so the actors start in place instead of walking in. */
+  /** Changes with every new story, so a story played again starts fresh. */
   key: number;
   situation: Situation;
-  actors: Partial<Record<ActorId, ActorState>>;
-  stage: string;
-  narration: string;
-  line: Beat["line"] | null;
   phase: Phase;
   stepsDone: number;
   /** The not-so-good idea was tried already. */
   tried: boolean;
-  /** The bear is shaking his head about it right now. */
+  /** The not-so-good idea is shown crossed out right now. */
   trying: boolean;
   /** Whether the not-so-good idea sits left of the good one. */
   insteadFirst: boolean;
@@ -41,14 +35,9 @@ function shuffle<T>(items: T[]): T[] {
 }
 
 function freshRun(situation: Situation, key: number): Run {
-  const first = situation.intro[0];
   return {
     key,
     situation,
-    actors: applyCast({}, first.cast),
-    stage: first.stage ?? "",
-    narration: first.narration ?? "",
-    line: first.line ?? null,
     phase: "intro",
     stepsDone: 0,
     tried: false,
@@ -56,6 +45,16 @@ function freshRun(situation: Situation, key: number): Run {
     insteadFirst: Math.random() < 0.5,
     busy: true,
   };
+}
+
+/** The big picture for this moment: what happened, the step the bear just did, the not-so-good idea, or the happy end. */
+function pictureName({ situation, phase, stepsDone, trying }: Run): string {
+  const { id, steps } = situation;
+  if (trying) return storyImages.instead(id);
+  if (phase === "outro" || phase === "done") {
+    return imageFor(storyImages.end(id)) ? storyImages.end(id) : storyImages.step(id, steps.length - 1);
+  }
+  return stepsDone > 0 ? storyImages.step(id, stepsDone - 1) : storyImages.problem(id);
 }
 
 export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
@@ -77,15 +76,8 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
       let delay = 0;
       beats.forEach((beat, i) => {
         later(() => {
-          setRun((r) => ({
-            ...r,
-            actors: applyCast(r.actors, beat.cast),
-            stage: beat.stage ?? r.stage,
-            narration: beat.narration ?? r.narration,
-            line: beat.line ?? null,
-          }));
           sound(beat.sound);
-          const text = [beat.narration, beat.line?.text].filter(Boolean).join(" ");
+          const text = [beat.narration, beat.line].filter(Boolean).join(" ");
           if (text) say(text, i > 0);
         }, delay);
         delay += beatMs(beat, settings.speech);
@@ -97,7 +89,7 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
 
   const ask = useCallback(
     (question: string) => {
-      setRun((r) => ({ ...r, busy: false, narration: question }));
+      setRun((r) => ({ ...r, busy: false }));
       say(question, true);
     },
     [say],
@@ -109,6 +101,7 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
       preloadImages([
         storyImages.problem(situation.id),
         storyImages.instead(situation.id),
+        storyImages.end(situation.id),
         ...situation.steps.map((_, i) => storyImages.step(situation.id, i)),
       ]);
       setRun(freshRun(situation, nextKey.current++));
@@ -159,22 +152,10 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
 
   const tryInstead = useCallback(() => {
     const { answer } = run.situation.instead;
-    const before = run.actors.bear;
-    setRun((r) => ({
-      ...r,
-      tried: true,
-      trying: true,
-      busy: true,
-      narration: answer,
-      line: null,
-      actors: applyCast(r.actors, { bear: { pose: "shake", mood: "sorry" } }),
-    }));
+    setRun((r) => ({ ...r, tried: true, trying: true, busy: true }));
     say(answer);
     sound("yuck");
-    later(
-      () => setRun((r) => ({ ...r, busy: false, trying: false, actors: applyCast(r.actors, { bear: before }) })),
-      beatMs({ narration: answer }, settings.speech),
-    );
+    later(() => setRun((r) => ({ ...r, busy: false, trying: false })), beatMs({ narration: answer }, settings.speech));
   }, [run, say, sound, later, settings.speech]);
 
   const ready = run.phase === "steps" && !run.busy;
@@ -207,26 +188,15 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pressKey]);
 
-  const onStagePointer = () => {
-    if (run.phase === "done") nextSituation();
-  };
-
   const { situation } = run;
-  const place = situation.place;
 
-  // Only what the child can choose from now is shown, big; at the end all good steps once more, small.
-  let cards: ReactNode = null;
-  if (run.phase === "outro" || run.phase === "done") {
-    cards = situation.steps.map((step, i) => (
-      <ChoiceCard
-        key={step.label}
-        picture={step.picture}
-        image={imageFor(storyImages.step(situation.id, i))}
-        place={place}
-        label={step.label}
-        state="done"
-        small
-      />
+  // Only what the child can choose from now is shown, big; while the happy end plays all good steps once more, small.
+  let choices: ReactNode = null;
+  if (run.phase === "done") {
+    choices = <EndButtons onAgain={() => startSituation(situation)} onNext={nextSituation} />;
+  } else if (run.phase === "outro") {
+    choices = situation.steps.map((step, i) => (
+      <ChoiceCard key={step.label} image={storyImages.step(situation.id, i)} label={step.label} state="done" small />
     ));
   } else if (run.phase === "steps") {
     const playing = run.busy && !run.trying;
@@ -236,107 +206,42 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
     const list = [
       <ChoiceCard
         key={step.label}
-        picture={step.picture}
-        image={imageFor(storyImages.step(situation.id, index))}
-        place={place}
+        image={storyImages.step(situation.id, index)}
         label={step.label}
         state={stepState}
         onChoose={() => doStep(index)}
       />,
     ];
     if (choose && index === 0) {
-      const { instead } = situation;
       const insteadState: CardState = run.tried ? "wrong" : playing ? "rest" : "choose";
       list.splice(
         run.insteadFirst ? 0 : 1,
         0,
         <ChoiceCard
           key="instead"
-          picture={instead.picture}
-          image={imageFor(storyImages.instead(situation.id))}
-          place={place}
-          label={instead.label}
+          image={storyImages.instead(situation.id)}
+          label={situation.instead.label}
           state={insteadState}
           onChoose={tryInstead}
         />,
       );
     }
-    cards = list;
+    choices = list;
   }
 
-  // While the bear waits for the child he wonders; trying the not-so-good idea, he sees it crossed out.
-  const thought = run.trying ? (
-    <span className="fg-thought-picture">
-      <PictureScene picture={situation.instead.picture} place={place} image={imageFor(storyImages.instead(situation.id))} />
-      <Mark good={false} className="fg-thought-mark" />
-    </span>
-  ) : ready ? (
-    <span className="fg-thought-ask">?</span>
-  ) : undefined;
-
-  const problemImage = imageFor(storyImages.problem(situation.id));
+  const picture = pictureName(run);
 
   return (
-    <div className={`story-play kita-play`} onPointerDown={onStagePointer}>
-      <header className="story-narration">
-        {problemImage ? (
-          <img key={situation.id} className="story-picture" src={problemImage} alt={situation.title} draggable={false} />
-        ) : (
-          <span className="story-tag">
-            <span aria-hidden>{situation.emoji}</span> {situation.title}
-          </span>
-        )}
+    <div className="story-play kita-play" onPointerDown={() => run.phase === "done" && nextSituation()}>
+      <header className="story-top">
         <StepDots total={situation.steps.length} done={Math.min(run.stepsDone, situation.steps.length)} current={run.phase === "steps"} />
-        <p key={run.narration}>{run.narration}</p>
       </header>
-      <div className={`story-stage-wrap place-${situation.place}`}>
-        <div key={run.key} className={`story-stage ${run.stage}`}>
-          <PlaceDrawing place={situation.place} />
-          {(Object.entries(run.actors) as [ActorId, ActorState][]).map(([id, state]) => (
-            <Actor
-              key={id}
-              id={id}
-              state={state}
-              face={MOODS[state.mood]}
-              line={run.line?.who === id ? run.line.text : undefined}
-              thought={id === "bear" ? thought : undefined}
-            />
-          ))}
-        </div>
-      </div>
-      <footer className="story-buttons">
-        {cards}
-        {run.phase === "done" && (
-          <>
-            <button
-              type="button"
-              className="story-button replay"
-              onPointerDown={(e: PointerEvent) => {
-                e.stopPropagation();
-                startSituation(situation);
-              }}
-            >
-              <span className="story-button-emoji" aria-hidden>
-                🔁
-              </span>
-              Nochmal
-            </button>
-            <button
-              type="button"
-              className="story-button next again"
-              onPointerDown={(e: PointerEvent) => {
-                e.stopPropagation();
-                nextSituation();
-              }}
-            >
-              <span className="story-button-emoji" aria-hidden>
-                ▶
-              </span>
-              Weiter
-            </button>
-          </>
-        )}
-      </footer>
+      <main className="story-middle">
+        <StoryPicture key={`${run.key}-${picture}`} name={picture}>
+          {run.trying && <Mark good={false} className="fg-picture-mark" />}
+        </StoryPicture>
+      </main>
+      <footer className="story-choices">{choices}</footer>
     </div>
   );
 }

@@ -1,6 +1,6 @@
-// Illustrations for the cards and stories. Drop a file into ./bilder/ with the
-// right name (see bilder/README.md) and it shows instead of the drawing; until
-// then the drawn picture stays.
+// The pictures of the feelings game, all in ./bilder/ (see bilder/README.md).
+// A picture can have more frames for a little movement: "push-1" is the first,
+// "push-1-b" the second; they fade into each other in a loop.
 
 const files = import.meta.webpackContext("./bilder", { regExp: /\.(webp|png|jpe?g)$/ });
 
@@ -11,32 +11,42 @@ for (const key of files.keys()) {
   IMAGES.set(name, typeof module === "string" ? module : module.default);
 }
 
-/** The illustration called `name` ("push-1", "baer-hug"), if there is one. */
+const FRAME_SUFFIXES = ["", "-b", "-c"];
+
+/** The picture called `name` ("push-1", "baer-sad"), if there is one. */
 export function imageFor(name: string): string | undefined {
   return IMAGES.get(name);
 }
 
-/** Starts loading these illustrations, so the cards don't pop in empty. */
+/** All frames of the picture `name`, first one first; empty if there is none. */
+export function framesFor(name: string): string[] {
+  return FRAME_SUFFIXES.map((suffix) => IMAGES.get(name + suffix)).filter((src) => src !== undefined);
+}
+
+/** Starts loading these pictures with all their frames, so they don't pop in empty. */
 export function preloadImages(names: string[]) {
   for (const name of names) {
-    const src = IMAGES.get(name);
-    if (src) new Image().src = src;
+    for (const src of framesFor(name)) new Image().src = src;
   }
 }
 
-/** Names of the illustrations for one kindergarten story. */
+/** Names of the pictures for one kindergarten story. */
 export const storyImages = {
-  /** What happened, shown at the top while the child chooses. */
+  /** What happened. */
   problem: (id: string) => `${id}-passiert`,
   /** The n-th good step, counted from 0. */
   step: (id: string, i: number) => `${id}-${i + 1}`,
   /** The not-so-good idea. */
   instead: (id: string) => `${id}-nein`,
+  /** Everybody happy at the end. */
+  end: (id: string) => `${id}-ende`,
 };
 
-/** Names of the illustrations for comforting the bear. */
+/** Names of the pictures for comforting the bear. */
 export const bearImages = {
   /** How the bear feels at the start. */
   feeling: (id: string) => `baer-${id}`,
   comfort: (id: string) => `trost-${id}`,
+  /** Happy (or asleep) again at the end. */
+  happy: (id: string) => `baer-${id}-gut`,
 };

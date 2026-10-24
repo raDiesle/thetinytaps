@@ -12,7 +12,7 @@ import { basename, dirname, extname, join } from "node:path";
 import sharp from "sharp";
 
 const RAW_DIR = ".image-raw";
-const DEFAULT_MODEL = "gemini-nano-banana-2.1";
+const DEFAULT_MODEL = "gemini-3.1-flash-lite-image";
 const MIME = { ".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp" };
 
 function parseArgs(argv) {
