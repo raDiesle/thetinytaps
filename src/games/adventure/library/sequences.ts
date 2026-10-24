@@ -34,7 +34,8 @@ export const SEQUENCES: Sequence[] = [
         movement: "stone_jump",
         seconds: 15.6,
         energy: "lively",
-        situation: "Von der Seite wie in einem Hüpfspiel: Ole trägt Tapsi über die kleine Brücke, Tapsi hüpft auf der Stelle, beim dritten Sprung mit dem Kopf an eine Kiste stoßen, ein Stern springt heraus.",
+        situation:
+          "Von der Seite wie in einem Hüpfspiel: Ole trägt Tapsi über die kleine Brücke, Tapsi hüpft auf der Stelle, beim dritten Sprung mit dem Kopf an eine Kiste stoßen, ein Stern springt heraus.",
         transition: "Am anderen Ufer geht es in den Dschungel.",
       },
       {
@@ -118,7 +119,8 @@ export const SEQUENCES: Sequence[] = [
         movement: "freeze_statue",
         seconds: 23.4,
         energy: "lively",
-        situation: "Strandparty mit Stopptanz: Tapsi, Kiki und die Krebse tanzen; hört die Musik auf, frieren alle ein – mal wackelig, mal auf einem Bein. Die Sonne geht unter.",
+        situation:
+          "Strandparty mit Stopptanz: Tapsi, Kiki und die Krebse tanzen; hört die Musik auf, frieren alle ein – mal wackelig, mal auf einem Bein. Die Sonne geht unter.",
         transition: "Es wird Abend, alle werden ruhig.",
       },
       {

@@ -431,12 +431,15 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     if (!settings.ambient) return;
     let timer: ReturnType<typeof setTimeout>;
     const schedule = () => {
-      timer = setTimeout(() => {
-        if (performance.now() - lastInteraction.current > AMBIENT_IDLE_MS) {
-          animate(pick(items.filter((item) => !questRef.current?.answers.includes(item))), true);
-        }
-        schedule();
-      }, AMBIENT_MIN_MS + Math.random() * (AMBIENT_MAX_MS - AMBIENT_MIN_MS));
+      timer = setTimeout(
+        () => {
+          if (performance.now() - lastInteraction.current > AMBIENT_IDLE_MS) {
+            animate(pick(items.filter((item) => !questRef.current?.answers.includes(item))), true);
+          }
+          schedule();
+        },
+        AMBIENT_MIN_MS + Math.random() * (AMBIENT_MAX_MS - AMBIENT_MIN_MS),
+      );
     };
     schedule();
     return () => clearTimeout(timer);
@@ -500,10 +503,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const runChain = (item: SceneItem) => {
     const chain = scene.chains?.find((c) => c.start === item.id);
     chain?.steps.forEach((step, i) => {
-      later(() => {
-        const next = itemsById.get(step.item);
-        if (next && animate(next)) say(settings.announce === "name" ? describe(next) : step.sentence, true);
-      }, (i + 1) * CHAIN_STEP_MS);
+      later(
+        () => {
+          const next = itemsById.get(step.item);
+          if (next && animate(next)) say(settings.announce === "name" ? describe(next) : step.sentence, true);
+        },
+        (i + 1) * CHAIN_STEP_MS,
+      );
     });
   };
 
@@ -601,8 +607,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       if (started) {
         say(describe(item));
         if (item.hideout) say(`Guck-guck! ${SURPRISES[lastSurprise.current.get(item.id)!].found}`, true);
-      }
-      else if (how !== "hover") funBurst(x, y);
+      } else if (how !== "hover") funBurst(x, y);
       discover(item, x, y);
       if (started) {
         runChain(item);
@@ -766,15 +771,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
   const greyFilter = `url(#${greyId})`;
-  const sceneClass = [
-    "scene",
-    settings.ambient && "lively",
-    colouring && "colouring",
-    partying && "party",
-    night && "night",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const sceneClass = ["scene", settings.ambient && "lively", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
 
   return (
     <div
@@ -827,13 +824,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
               >
                 <g transform={place && `translate(${place.x} ${place.y}) scale(${place.scale})`}>
                   {item.shadow && (
-                    <ellipse
-                      className="scene-shadow"
-                      cx={item.shadow[0]}
-                      cy={item.shadow[1]}
-                      rx={item.shadow[2]}
-                      ry={Math.max(6, item.shadow[2] * 0.12)}
-                    />
+                    <ellipse className="scene-shadow" cx={item.shadow[0]} cy={item.shadow[1]} rx={item.shadow[2]} ry={Math.max(6, item.shadow[2] * 0.12)} />
                   )}
                   <HideoutContext.Provider value={peek}>
                     <item.Art />
@@ -871,6 +862,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
 
       {quest && (
         <button
+          type="button"
           key={quest.id}
           className="find-question"
           onPointerDown={(e) => {
@@ -905,11 +897,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       )}
       {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
       {!questMode && allDiscovered && (
-        <GameEnd
-          delayMs={END_BUTTONS_MS}
-          onAgain={startOver}
-          next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }}
-        />
+        <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }} />
       )}
       {!questMode && !touched && <p className="scene-prompt">{(colouring ? COLOUR_PROMPTS : PROMPTS)[settings.trigger]}</p>}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
@@ -928,17 +916,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
  * Where a vehicle drove off: a bubble at the edge with the vehicle in it, an
  * arrow out of the picture and the emoji of the picture it went to.
  */
-function ExitSign({
-  exit,
-  right,
-  width,
-  onFollow,
-}: {
-  exit: Exit;
-  right: boolean;
-  width: number;
-  onFollow: (e: PointerEvent) => void;
-}) {
+function ExitSign({ exit, right, width, onFollow }: { exit: Exit; right: boolean; width: number; onFollow: (e: PointerEvent) => void }) {
   const [, y, , h] = placeBox(exit.item.box, exit.item.place);
   const cy = Math.min(860, Math.max(140, y + h / 2));
   const [bx, by, bw, bh] = exit.item.box;

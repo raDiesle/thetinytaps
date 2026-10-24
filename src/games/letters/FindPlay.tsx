@@ -185,17 +185,11 @@ export function FindPlay({
   };
 
   const glyphs = current
-    ? { upper: [current.letter.upper], both: [current.letter.upper, current.letter.lower], lower: [current.letter.lower] }[
-        settings.letterCase
-      ]
+    ? { upper: [current.letter.upper], both: [current.letter.upper, current.letter.lower], lower: [current.letter.lower] }[settings.letterCase]
     : [];
 
   return (
-    <div
-      className={`letters-play`}
-      style={{ background }}
-      onPointerDown={onPlayAreaPointer}
-    >
+    <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
         {current && (
           <div key={current.id} className={`card find-card${found ? " done" : ""}`} onPointerDown={onCardPointer}>
@@ -207,11 +201,7 @@ export function FindPlay({
               </div>
             )}
             {settings.showWord && translation && <div className="translation">{translation}</div>}
-            <div
-              key={wrong}
-              className={`find-key${wrong > 0 ? " nudge" : ""}`}
-              aria-label={pack.findPrompt(current.letter)}
-            >
+            <div key={wrong} className={`find-key${wrong > 0 ? " nudge" : ""}`} aria-label={pack.findPrompt(current.letter)}>
               {glyphs.map((g) => (
                 <span key={g}>{g}</span>
               ))}
@@ -233,9 +223,7 @@ export function FindPlay({
           highlight={showHint || found ? current?.letter.upper : undefined}
         />
       ) : (
-        settings.hints && (
-          <KeyboardMap rows={pack.keyboardRows} highlight={current?.letter.upper} visible={showHint} />
-        )
+        settings.hints && <KeyboardMap rows={pack.keyboardRows} highlight={current?.letter.upper} visible={showHint} />
       )}
       <BurstLayer bursts={bursts} />
     </div>

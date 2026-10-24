@@ -169,7 +169,7 @@
 }
 
 /* Phones upright: two per row, so they stay big enough for a finger. */
-@media (max-aspect-ratio: 4/5) {
+@media (max-aspect-ratio: 4 / 5) {
   .ap-options {
     --cols: min(var(--n), 2);
   }

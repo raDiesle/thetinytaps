@@ -40,7 +40,7 @@ export function Egg({
   const x0 = cx - w / 2;
   const sw = Math.max(2, w * 0.1);
   const zig = (y: number) =>
-    `M${x0 - 4} ${y} ` + Array.from({ length: 6 }, (_, i) => `L${x0 + ((i + 0.5) * w) / 6} ${y + (i % 2 ? sw : -sw) * 1.4}`).join(" ") + ` L${x0 + w + 4} ${y}`;
+    `M${x0 - 4} ${y} ${Array.from({ length: 6 }, (_, i) => `L${x0 + ((i + 0.5) * w) / 6} ${y + (i % 2 ? sw : -sw) * 1.4}`).join(" ")} L${x0 + w + 4} ${y}`;
   const wave = (y: number) => `M${x0 - 4} ${y} q${w / 8} ${-sw * 1.6} ${w / 4} 0 t${w / 4} 0 t${w / 4} 0 t${w / 4} 0 t${w / 4} 0`;
   return (
     <>
@@ -103,7 +103,23 @@ export function Blades({ xs, shade, height = 36 }: { xs: number[]; shade: string
 }
 
 /** A little five-petal flower (primrose, daisy) centred on (x, y). */
-export function Blossom({ x, y, r, fill, centre = "#ffd43b", className, i }: { x: number; y: number; r: number; fill: string; centre?: string; className?: string; i?: number }) {
+export function Blossom({
+  x,
+  y,
+  r,
+  fill,
+  centre = "#ffd43b",
+  className,
+  i,
+}: {
+  x: number;
+  y: number;
+  r: number;
+  fill: string;
+  centre?: string;
+  className?: string;
+  i?: number;
+}) {
   return (
     <g className={className} style={i === undefined ? undefined : nth(i)}>
       {[0, 72, 144, 216, 288].map((a) => (

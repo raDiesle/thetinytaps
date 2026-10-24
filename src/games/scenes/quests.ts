@@ -103,7 +103,7 @@ const RIDDLE_SOUNDS = new Set<SceneSound>([
   "heartbeat",
 ]);
 
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
+const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 function findQuest(item: SceneItem): Quest {
   return {

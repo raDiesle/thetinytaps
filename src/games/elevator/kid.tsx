@@ -158,19 +158,7 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
 }
 
 /** A child. `face` -1 mirrors it, so it turns to where it walks or reaches. */
-export function Kid({
-  look,
-  pose,
-  holding,
-  wear,
-  face,
-}: {
-  look: Look;
-  pose: Pose;
-  holding: Holding | null;
-  wear: Outfit[];
-  face: 1 | -1;
-}) {
+export function Kid({ look, pose, holding, wear, face }: { look: Look; pose: Pose; holding: Holding | null; wear: Outfit[]; face: 1 | -1 }) {
   const pyjama = wear.includes("pyjama");
   const coat = wear.includes("coat");
   const boots = wear.includes("boots");
@@ -265,15 +253,7 @@ export function Kid({
             {pyjama ? (
               <path d="M-24 -92 H24 M-26 -76 H26 M-25 -60 H25" stroke="#74c0fc" strokeWidth="5" />
             ) : (
-              <path
-                d="M-10 -82 l4 -9 l4 9 l4 -9 l4 9"
-                stroke="#fff"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-                opacity="0.8"
-              />
+              <path d="M-10 -82 l4 -9 l4 9 l4 -9 l4 9" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.8" />
             )}
             <path
               className="el-rumble"

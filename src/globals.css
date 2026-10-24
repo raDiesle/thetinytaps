@@ -1611,8 +1611,7 @@ kbd {
   inset: 0;
   display: grid;
   place-items: center;
-  padding: max(64px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
-    max(24px, env(safe-area-inset-left));
+  padding: max(64px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   background: linear-gradient(var(--sky-top), var(--sky-bottom) 70%);
 }
 
@@ -1721,8 +1720,7 @@ kbd {
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
-  padding: clamp(8px, 1.6vh, 16px) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom))
-    max(10px, env(safe-area-inset-left));
+  padding: clamp(8px, 1.6vh, 16px) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
 }
 
 /* Ten keys per row; a shorter last row is centred. */
@@ -2181,7 +2179,9 @@ kbd {
   border: 3px solid var(--ink);
   background: var(--accent);
   color: #fff;
-  box-shadow: 0 0 0 4px #fff, 0 0 18px 8px var(--accent);
+  box-shadow:
+    0 0 0 4px #fff,
+    0 0 18px 8px var(--accent);
   animation: waiting 1.2s ease-in-out infinite;
 }
 
@@ -2350,7 +2350,9 @@ kbd {
 .scene-exit-pulse {
   transform-box: fill-box;
   transform-origin: center;
-  animation: exit-pop 0.4s ease-out both, exit-pulse 1.6s 0.4s ease-in-out infinite;
+  animation:
+    exit-pop 0.4s ease-out both,
+    exit-pulse 1.6s 0.4s ease-in-out infinite;
 }
 
 .scene-exit-bubble {
@@ -3076,7 +3078,9 @@ kbd {
   height: calc(var(--unit) * 0.26);
   border: 4px solid var(--ink);
   border-radius: 50%;
-  background: linear-gradient(var(--ink) 0 0) center / 4px 100% no-repeat, var(--cream);
+  background:
+    linear-gradient(var(--ink) 0 0) center / 4px 100% no-repeat,
+    var(--cream);
 }
 
 /* Room for the wagons still to come. */
@@ -3137,4 +3141,3 @@ kbd {
 .colored .translation {
   color: #fffc;
 }
-

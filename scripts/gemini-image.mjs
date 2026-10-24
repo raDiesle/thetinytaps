@@ -7,7 +7,7 @@
 //
 // The untouched Gemini picture is kept in .image-raw/ (not committed), so it can
 // be processed again with --from or passed as --ref for the next picture.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { basename, dirname, extname, join } from "node:path";
 import sharp from "sharp";
 
@@ -76,7 +76,10 @@ async function generate({ prompt, refs, aspect, transparent, key, model }) {
   const candidate = json.candidates?.[0];
   const image = candidate?.content?.parts?.find((p) => p.inlineData)?.inlineData;
   if (!image) {
-    const said = candidate?.content?.parts?.map((p) => p.text).filter(Boolean).join(" ");
+    const said = candidate?.content?.parts
+      ?.map((p) => p.text)
+      .filter(Boolean)
+      .join(" ");
     const reason = candidate?.finishReason ?? json.promptFeedback?.blockReason ?? "no picture";
     fail(`Gemini returned no picture (${reason})${said ? `: ${said}` : ""}`);
   }
@@ -92,8 +95,7 @@ async function cutOut(input, keyHex) {
   let key = [0, 2, 4].map((i) => parseInt(keyHex.slice(i, i + 2), 16));
   const HARD = 70;
   const SOFT = 150;
-  const dist = (p) =>
-    Math.hypot(data[p * 4] - key[0], data[p * 4 + 1] - key[1], data[p * 4 + 2] - key[2]);
+  const dist = (p) => Math.hypot(data[p * 4] - key[0], data[p * 4 + 1] - key[1], data[p * 4 + 2] - key[2]);
 
   const edge = [];
   for (let x = 0; x < w; x++) edge.push(x, (h - 1) * w + x);

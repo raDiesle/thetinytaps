@@ -10,15 +10,15 @@ der Körper tut. Wo sie passiert, steht in `scenarios.ts`, und wie lange sie in 
 dauert, steht in `sequences.ts`. Die 3D-Geschichte (`../stories/`) fügt hinzu, was der Fuchs sagt
 und wie die Welt antwortet.
 
-| Datei | Inhalt |
-| --- | --- |
-| `types.ts` | Datenmodell (Bewegung, Welt, Szenario, Ablauf) |
-| `categories.ts` | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was *nicht* dazugehört |
-| `movements/*.ts` | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
-| `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
-| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–240 s lang |
-| `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
-| diese Datei | **Ergebnis E**: Qualitätskontrolle |
+| Datei                       | Inhalt                                                                                                                                          |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `types.ts`                  | Datenmodell (Bewegung, Welt, Szenario, Ablauf)                                                                                                  |
+| `categories.ts`             | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was _nicht_ dazugehört                                                                          |
+| `movements/*.ts`            | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
+| `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor                                              |
+| `sequences.ts`              | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–240 s lang                                                                      |
+| `situations.ts`             | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
+| diese Datei                 | **Ergebnis E**: Qualitätskontrolle                                                                                                              |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
 bleibt bis zum Aufräumen. Jede Bewegung nennt einen `motion`-Clip; die Clips für den Fuchs
@@ -41,7 +41,6 @@ Sind die Hände nass und kein Handtuch da, schüttelt man sie aus.
 
 Der Katalog hängt am Clip, also an der reinen Körperbewegung. Darum gilt jede Idee für alle
 Bewegungen mit diesem Clip (`push_forward` passt zu Zaubertür, Schneeball und Glaswand).
-
 - Jede Situation hat ein Gegenüber, auf das die Bewegung wirkt, und eine Antwort der Welt.
   Auch hier behauptet keine Antwort, das Kind gesehen zu haben.
 - **Alltag** (`everyday`): Kennt das Kind aus seinem eigenen Tag, z. B. Socke anziehen, Ampelknopf
@@ -65,7 +64,6 @@ verweist nur auf vorhandene Bewegungen, und jede Bewegung hat eine Sitz-Variante
 
 Die Paare sind gewollt, weil derselbe Körper in einer anderen Welt eine andere Geschichte
 erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
-
 - `magic_door_push` und `invisible_wall`: beide mit den Händen nach vorn drücken
 - `rolling_ball_lean` und `peek_around`: beide zur Seite neigen
 - `popcorn_pop` und `rocket_countdown`: beide aus der Hocke hochschnellen
@@ -100,13 +98,13 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 ### Abläufe (Ergebnis D)
 
-| Ablauf | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
-| --- | --- | --- | --- |
-| `treasure_island` (spielbar) | 17 | 240 s | r m l l l r m m l r r m m r l l r |
-| `space_trip` | 9 | 160 s | r m l m m m l r l |
-| `underwater_dive` | 9 | 158 s | r m m m m l r m l |
-| `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
-| `farm_morning` | 9 | 153 s | r r m l m l m r m |
+| Ablauf                       | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
+| ---------------------------- | ---------- | ----- | -------------------------------------------- |
+| `treasure_island` (spielbar) | 17         | 240 s | r m l l l r m m l r r m m r l l r            |
+| `space_trip`                 | 9          | 160 s | r m l m m m l r l                            |
+| `underwater_dive`            | 9          | 158 s | r m m m m l r m l                            |
+| `winter_forest_walk`         | 9          | 156 s | r m m m l r r l m                            |
+| `farm_morning`               | 9          | 153 s | r r m l m l m r m                            |
 
 Die 3D-Geschichte der Schatzinsel dauert länger als die 240 s der Tabelle, etwa 5 Minuten. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht

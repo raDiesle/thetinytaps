@@ -70,17 +70,7 @@ export type Difficulty = "easy" | "medium";
 export type Energy = "calm" | "medium" | "lively";
 
 /** Where the motion goes, as the child sees it on screen. */
-export type MotionDirection =
-  | "back_to_front"
-  | "front_to_back"
-  | "up"
-  | "down"
-  | "up_down"
-  | "side_to_side"
-  | "outwards"
-  | "inwards"
-  | "around"
-  | "in_place";
+export type MotionDirection = "back_to_front" | "front_to_back" | "up" | "down" | "up_down" | "side_to_side" | "outwards" | "inwards" | "around" | "in_place";
 
 export type CameraStyle = "stationary" | "slow_push_in" | "follow" | "orbit" | "first_person";
 

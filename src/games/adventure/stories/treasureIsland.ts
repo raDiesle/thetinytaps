@@ -698,7 +698,6 @@ function bridgeTop(x: number, z: number) {
   return BRIDGE_END + BRIDGE_ARCH * Math.sin((Math.PI * (BRIDGE_FROM - z)) / (BRIDGE_FROM - BRIDGE_TO));
 }
 
-
 /** The step indices of the sequence, by name. */
 const S = {
   hello: 0,
@@ -723,7 +722,25 @@ const S = {
 /** Seconds of travel before each step: walking or paddling there, or the camera coming in. */
 const TRAVEL = [2.5, 3, 3, 3.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 3.5, 2.5, 2.5, 2, 1];
 /** Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step. */
-const DEMO = [2.5, 2.8, 1.6, 3 * JUMP_PERIOD, 3, 4, CRANK_PERIOD, 3, 3.4, 2.6, 2, BRUSH_PERIOD, 3.6, KEY_PICKUP + KEY_TURN, 2, STOP_DANCE[0].dance + STOP_DANCE[0].hold, 2];
+const DEMO = [
+  2.5,
+  2.8,
+  1.6,
+  3 * JUMP_PERIOD,
+  3,
+  4,
+  CRANK_PERIOD,
+  3,
+  3.4,
+  2.6,
+  2,
+  BRUSH_PERIOD,
+  3.6,
+  KEY_PICKUP + KEY_TURN,
+  2,
+  STOP_DANCE[0].dance + STOP_DANCE[0].hold,
+  2,
+];
 const LEAD = TRAVEL.map((t, i) => t + DEMO[i]);
 const PRAISE = 2.5;
 /** Seconds the child moves along in a step, after Tapsi has shown it. */
@@ -1316,8 +1333,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   let lastOpening = -1;
 
   /** The stop dance at the party: since when everyone is still, or null while the music plays (and before and after). */
-  const stillAt = (step: number, clip: number) =>
-    step === S.party && clip >= 0 && clip - DEMO[step] < actLength(step) ? stopDance(clip).still : null;
+  const stillAt = (step: number, clip: number) => (step === S.party && clip >= 0 && clip - DEMO[step] < actLength(step) ? stopDance(clip).still : null);
   /** Ole's place (z) at sea: waiting, swimming to the island while Tapsi paddles, and up onto the beach in the praise. */
   const boatZ = (step: number, act: number, praise = -1) => {
     if (step < S.paddle) return BOAT_START;
@@ -1425,8 +1441,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const wave = (x: number, z: number, time: number) =>
     Math.sin(x * 0.35 + time * 1.1) * 0.12 + Math.sin(z * 0.28 - time * 0.9) * 0.1 + Math.sin((x + z) * 0.9 + time * 2.0) * 0.035;
   /** The water at (x, z): the sea with its waves, or the lagoon. */
-  const waterAt = (x: number, z: number, time: number) =>
-    Math.max(wave(x, z, time), Math.hypot(x - LAGOON.x, z - LAGOON.y) < 7.8 ? LAGOON_LEVEL : -Infinity);
+  const waterAt = (x: number, z: number, time: number) => Math.max(wave(x, z, time), Math.hypot(x - LAGOON.x, z - LAGOON.y) < 7.8 ? LAGOON_LEVEL : -Infinity);
   /** Where Ole's belly is at (x, z): on the ground or the bridge, or swimming in the water. */
   const turtleY = (x: number, z: number, time: number) => Math.max(groundHeight(x, z), bridgeTop(x, z), waterAt(x, z, time) - TURTLE_FLOAT);
 
@@ -1573,7 +1588,16 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
    * Blends two camera shots by going round `center` (Tapsi) instead of
    * straight through: from behind to the front the camera circles past.
    */
-  function orbitBlend(center: THREE.Vector3, aPos: THREE.Vector3, aLook: THREE.Vector3, bPos: THREE.Vector3, bLook: THREE.Vector3, k: number, pos: THREE.Vector3, look: THREE.Vector3) {
+  function orbitBlend(
+    center: THREE.Vector3,
+    aPos: THREE.Vector3,
+    aLook: THREE.Vector3,
+    bPos: THREE.Vector3,
+    bLook: THREE.Vector3,
+    k: number,
+    pos: THREE.Vector3,
+    look: THREE.Vector3,
+  ) {
     const ax = aPos.x - center.x;
     const az = aPos.z - center.z;
     const bx = bPos.x - center.x;
@@ -1764,7 +1788,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       tmpC.copy(lapPos).lerp(sandPos, 0.4);
       tmpC.y = lapPos.y + 0.3;
       const u = 1 - put;
-      paddle.position.set(0, 0, 0).addScaledVector(lapPos, u * u).addScaledVector(tmpC, 2 * u * put).addScaledVector(sandPos, put * put);
+      paddle.position
+        .set(0, 0, 0)
+        .addScaledVector(lapPos, u * u)
+        .addScaledVector(tmpC, 2 * u * put)
+        .addScaledVector(sandPos, put * put);
       paddle.quaternion.slerpQuaternions(lapQ, ON_SAND, smooth(put));
     } else if (hold > 0) {
       // The shaft runs from paw to paw; tipped a little more than the paws, so the low blade reaches the water.
@@ -2111,7 +2139,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       if (f.local < 1.3) {
         // Falling from Kiki's feet.
         const k = clamp01((f.local - 0.9) / 0.4);
-        key.position.copy(parrot.group.position).add(v3(0, -0.15, 0)).lerp(lying, k * k);
+        key.position
+          .copy(parrot.group.position)
+          .add(v3(0, -0.15, 0))
+          .lerp(lying, k * k);
         key.rotation.set(0, time * 3, 0);
         if (crossed(f, 1.3)) {
           gold.burst(lying, 14, 2);
@@ -2360,11 +2391,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       focus.copy(guide.root.position);
 
       const flash =
-        f.opening !== null
-          ? Math.max(0, 1 - Math.abs(f.opening - OPENING_CUT) / 0.5)
-          : f.step === S.rope
-            ? Math.max(0, 1 - Math.abs(f.local - 2.5) / 0.9)
-            : 0;
+        f.opening !== null ? Math.max(0, 1 - Math.abs(f.opening - OPENING_CUT) / 0.5) : f.step === S.rope ? Math.max(0, 1 - Math.abs(f.local - 2.5) / 0.9) : 0;
       return {
         // Ole walks; Tapsi never does.
         walking: false,
@@ -2394,9 +2421,30 @@ export const TREASURE_ISLAND: Story = {
   demo: DEMO,
   praise: PRAISE,
   lines: [
-    { icon: "👋", situation: "Ahoi! Ich bin Tapsi. Und da kommt Kiki, mein Papagei!", instruction: "Ich winke Kiki Hallo – so!", turn: "Winkst du Kiki auch?", again: "Hallo, Kiki!", praise: "Kiki freut sich, dass du da bist!" },
-    { icon: "🛶", situation: "Ole schwimmt los – zur Schatzinsel!", instruction: "Schau: das Paddel rechts ins Wasser – und links.", turn: "Paddel mit!", again: "Paddeln, paddeln – die Insel kommt näher!", praise: "Geschafft! Ole ist am Strand." },
-    { icon: "🦂", situation: "Huch! Skorpione krabbeln auf Ole!", instruction: "Fuß hoch – und schnell feste stampfen, so!", turn: "Jetzt du – stampf mit!", again: "Stampf, stampf – plopp!", praise: "Alle Skorpione sind weg!" },
+    {
+      icon: "👋",
+      situation: "Ahoi! Ich bin Tapsi. Und da kommt Kiki, mein Papagei!",
+      instruction: "Ich winke Kiki Hallo – so!",
+      turn: "Winkst du Kiki auch?",
+      again: "Hallo, Kiki!",
+      praise: "Kiki freut sich, dass du da bist!",
+    },
+    {
+      icon: "🛶",
+      situation: "Ole schwimmt los – zur Schatzinsel!",
+      instruction: "Schau: das Paddel rechts ins Wasser – und links.",
+      turn: "Paddel mit!",
+      again: "Paddeln, paddeln – die Insel kommt näher!",
+      praise: "Geschafft! Ole ist am Strand.",
+    },
+    {
+      icon: "🦂",
+      situation: "Huch! Skorpione krabbeln auf Ole!",
+      instruction: "Fuß hoch – und schnell feste stampfen, so!",
+      turn: "Jetzt du – stampf mit!",
+      again: "Stampf, stampf – plopp!",
+      praise: "Alle Skorpione sind weg!",
+    },
     {
       icon: "🌉",
       situation: "Eine kleine Brücke! Und da oben schweben Kisten.",
@@ -2405,12 +2453,54 @@ export const TREASURE_ISLAND: Story = {
       again: "Hopp, hopp – Kopf hoch!",
       praise: "Drüben! Und drei goldene Sterne!",
     },
-    { icon: "🪵", situation: "Achtung! Da oben schaukelt ein Baumstamm.", instruction: "Wenn er kommt, ducken wir uns – so!", turn: "Er kommt! Duck dich!", again: "Und nochmal ducken!", praise: "Puh, der Stamm ist vorbei!" },
-    { icon: "🌸", situation: "Psst … die Blumen schlafen noch.", instruction: "Hände zusammen – und ganz weit auf. So!", turn: "Jetzt du – weck die Blumen!", again: "Langsam auf … und wieder zu.", praise: "Wie schön! Alle Blumen sind wach." },
-    { icon: "⚙️", situation: "Ein Tor! Und da ist eine Kurbel.", instruction: "Wir drehen die Kurbel – rundherum, so!", turn: "Jetzt du – dreh mit!", again: "Rundherum – das Tor geht hoch!", praise: "Das Tor ist offen!" },
-    { icon: "🥥", situation: "Da kullern Kokosnüsse den Weg herunter!", instruction: "Ein Schritt zur Seite – und zurück. So!", turn: "Kokosnuss! Schritt zur Seite!", again: "Und nochmal Platz machen!", praise: "Alle Kokosnüsse sind vorbeigekullert." },
-    { icon: "🐒", situation: "Oh, Affen! Die werfen mit Kokosnüssen!", instruction: "Wir weichen ganz langsam aus – zur Seite, so!", turn: "Jetzt du – weich aus!", again: "Und zur anderen Seite!", praise: "Daneben! Die Affen klatschen." },
-    { icon: "🍎", situation: "Ein Apfelbaum! Und da steht ein Korb.", instruction: "Ganz hoch strecken und pflücken – so!", turn: "Jetzt du – pflück einen Apfel!", again: "Hoch – und plumps in den Korb!", praise: "Der Korb ist voll!" },
+    {
+      icon: "🪵",
+      situation: "Achtung! Da oben schaukelt ein Baumstamm.",
+      instruction: "Wenn er kommt, ducken wir uns – so!",
+      turn: "Er kommt! Duck dich!",
+      again: "Und nochmal ducken!",
+      praise: "Puh, der Stamm ist vorbei!",
+    },
+    {
+      icon: "🌸",
+      situation: "Psst … die Blumen schlafen noch.",
+      instruction: "Hände zusammen – und ganz weit auf. So!",
+      turn: "Jetzt du – weck die Blumen!",
+      again: "Langsam auf … und wieder zu.",
+      praise: "Wie schön! Alle Blumen sind wach.",
+    },
+    {
+      icon: "⚙️",
+      situation: "Ein Tor! Und da ist eine Kurbel.",
+      instruction: "Wir drehen die Kurbel – rundherum, so!",
+      turn: "Jetzt du – dreh mit!",
+      again: "Rundherum – das Tor geht hoch!",
+      praise: "Das Tor ist offen!",
+    },
+    {
+      icon: "🥥",
+      situation: "Da kullern Kokosnüsse den Weg herunter!",
+      instruction: "Ein Schritt zur Seite – und zurück. So!",
+      turn: "Kokosnuss! Schritt zur Seite!",
+      again: "Und nochmal Platz machen!",
+      praise: "Alle Kokosnüsse sind vorbeigekullert.",
+    },
+    {
+      icon: "🐒",
+      situation: "Oh, Affen! Die werfen mit Kokosnüssen!",
+      instruction: "Wir weichen ganz langsam aus – zur Seite, so!",
+      turn: "Jetzt du – weich aus!",
+      again: "Und zur anderen Seite!",
+      praise: "Daneben! Die Affen klatschen.",
+    },
+    {
+      icon: "🍎",
+      situation: "Ein Apfelbaum! Und da steht ein Korb.",
+      instruction: "Ganz hoch strecken und pflücken – so!",
+      turn: "Jetzt du – pflück einen Apfel!",
+      again: "Hoch – und plumps in den Korb!",
+      praise: "Der Korb ist voll!",
+    },
     {
       icon: "🧩",
       situation: "Eine Tür mit drei Bildern. Ein Rätsel!",
@@ -2420,10 +2510,38 @@ export const TREASURE_ISLAND: Story = {
       again: "Und jetzt ganz klein!",
       praise: "Rätsel gelöst! Die Tür geht auf.",
     },
-    { icon: "🕸️", situation: "Oh, lauter Spinnweben! Da kommen wir nicht durch.", instruction: "Mit der Pfote hoch – und weit zur Seite wedeln, so!", turn: "Jetzt du – wedel mit!", again: "Links – und rechts – weg damit!", praise: "Der Weg ist frei! Die Spinne winkt." },
-    { icon: "🪢", situation: "Da schwimmt die Schatztruhe!", instruction: "Hand über Hand am Seil ziehen – so!", turn: "Zieh mit!", again: "Ziehen, ziehen – sie kommt!", praise: "Die Truhe ist da!" },
-    { icon: "🔑", situation: "Oh, ein Schloss! Kiki bringt den Schlüssel.", instruction: "Aufheben, reinstecken und umdrehen – so!", turn: "Jetzt du – dreh den Schlüssel!", again: "Klick – und nochmal!", praise: "Das Schloss ist auf!" },
-    { icon: "🙌", situation: "Oh! Was ist da drin?", instruction: "Gold! Arme hoch – Hurra!", turn: "Du auch – Hurra!", again: "Hurra, ein Schatz!", praise: "So viel Gold!" },
+    {
+      icon: "🕸️",
+      situation: "Oh, lauter Spinnweben! Da kommen wir nicht durch.",
+      instruction: "Mit der Pfote hoch – und weit zur Seite wedeln, so!",
+      turn: "Jetzt du – wedel mit!",
+      again: "Links – und rechts – weg damit!",
+      praise: "Der Weg ist frei! Die Spinne winkt.",
+    },
+    {
+      icon: "🪢",
+      situation: "Da schwimmt die Schatztruhe!",
+      instruction: "Hand über Hand am Seil ziehen – so!",
+      turn: "Zieh mit!",
+      again: "Ziehen, ziehen – sie kommt!",
+      praise: "Die Truhe ist da!",
+    },
+    {
+      icon: "🔑",
+      situation: "Oh, ein Schloss! Kiki bringt den Schlüssel.",
+      instruction: "Aufheben, reinstecken und umdrehen – so!",
+      turn: "Jetzt du – dreh den Schlüssel!",
+      again: "Klick – und nochmal!",
+      praise: "Das Schloss ist auf!",
+    },
+    {
+      icon: "🙌",
+      situation: "Oh! Was ist da drin?",
+      instruction: "Gold! Arme hoch – Hurra!",
+      turn: "Du auch – Hurra!",
+      again: "Hurra, ein Schatz!",
+      praise: "So viel Gold!",
+    },
     {
       icon: "🎵",
       situation: "Party! Wir machen Stopptanz.",
@@ -2433,7 +2551,14 @@ export const TREASURE_ISLAND: Story = {
       again: "Und weiter tanzen!",
       praise: "Was für eine Party!",
     },
-    { icon: "🌅", situation: "Die Sonne geht unter. Schau, ein Feuerwerk!", instruction: "Ich winke Kiki Tschüss – so!", turn: "Winkst du mit?", again: "Tschüss, Kiki! Tschüss, Insel!", praise: "Danke fürs Mitmachen! Bis bald!" },
+    {
+      icon: "🌅",
+      situation: "Die Sonne geht unter. Schau, ein Feuerwerk!",
+      instruction: "Ich winke Kiki Tschüss – so!",
+      turn: "Winkst du mit?",
+      again: "Tschüss, Kiki! Tschüss, Insel!",
+      praise: "Danke fürs Mitmachen! Bis bald!",
+    },
   ],
   build,
 };

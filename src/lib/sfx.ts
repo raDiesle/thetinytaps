@@ -52,7 +52,10 @@ export function loadRecordings(names: Iterable<string>) {
     const buffer = fetch(url)
       .then((response) => response.arrayBuffer())
       .then((data) => ac.decodeAudioData(data))
-      .then((decoded) => (loaded.set(name, decoded), decoded))
+      .then((decoded) => {
+        loaded.set(name, decoded);
+        return decoded;
+      })
       .catch(() => null);
     recordings.set(name, buffer);
   }
@@ -178,9 +181,7 @@ export function playSqueak() {
 
 /** A short happy tune from the radio. */
 export function playMelody() {
-  [0, 2, 4, 2, 5, 4].forEach((step, i) =>
-    note({ from: PENTATONIC[step], duration: 0.22, type: "triangle", volume: 0.18, delay: i * 0.24 }),
-  );
+  [0, 2, 4, 2, 5, 4].forEach((step, i) => note({ from: PENTATONIC[step], duration: 0.22, type: "triangle", volume: 0.18, delay: i * 0.24 }));
 }
 
 /** Quick little sniffs, for the hedgehog. */
@@ -424,9 +425,7 @@ export function playPoof() {
 
 /** A slow, soft lullaby falling down the scale, for good night. */
 export function playLullaby() {
-  [5, 4, 2, 3, 1, 0].forEach((step, i) =>
-    note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }),
-  );
+  [5, 4, 2, 3, 1, 0].forEach((step, i) => note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }));
 }
 
 /** "Wuuusch!" – a rocket lifts off: a deep rumble and a rush that climbs higher and higher. */
@@ -483,7 +482,21 @@ export function playTrill() {
 }
 
 /** White noise through a band-pass filter gliding from `from` to `to` Hz: rushing water, blowing air. */
-function hiss({ from, to = from, duration, volume, delay = 0, q = 1 }: { from: number; to?: number; duration: number; volume: number; delay?: number; q?: number }) {
+function hiss({
+  from,
+  to = from,
+  duration,
+  volume,
+  delay = 0,
+  q = 1,
+}: {
+  from: number;
+  to?: number;
+  duration: number;
+  volume: number;
+  delay?: number;
+  q?: number;
+}) {
   const ac = audio();
   if (!ac) return;
   const start = ac.currentTime + delay;
@@ -556,9 +569,7 @@ export function playCuckoo() {
 
 /** "Hihihi!" – a child giggling: quick little notes that hop and fall. */
 export function playGiggle() {
-  [0, 0.13, 0.26, 0.39, 0.52].forEach((delay, i) =>
-    note({ from: 880 - i * 40, to: 1180 - i * 50, duration: 0.09, type: "triangle", volume: 0.16, delay }),
-  );
+  [0, 0.13, 0.26, 0.39, 0.52].forEach((delay, i) => note({ from: 880 - i * 40, to: 1180 - i * 50, duration: 0.09, type: "triangle", volume: 0.16, delay }));
 }
 
 /** "Quietsch, quietsch!" – a swing's chain creaking forward and back. */
@@ -641,7 +652,8 @@ export function playKettle() {
 /** "Brutzel, brutzel!" – an egg sizzling in the pan: crackling hiss with tiny pops. */
 export function playSizzle() {
   hiss({ from: 5000, to: 4200, duration: 1.3, volume: 0.12, q: 0.7 });
-  for (let i = 0; i < 9; i++) note({ from: 2600 + (i % 3) * 400, to: 1800, duration: 0.03, type: "triangle", volume: 0.07, delay: 0.1 + i * 0.13 + (i % 2) * 0.04 });
+  for (let i = 0; i < 9; i++)
+    note({ from: 2600 + (i % 3) * 400, to: 1800, duration: 0.03, type: "triangle", volume: 0.07, delay: 0.1 + i * 0.13 + (i % 2) * 0.04 });
 }
 
 /** "Knack!" – an egg cracked on the rim of a bowl: a dry snap, then the egg plops in. */

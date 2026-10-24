@@ -5,10 +5,12 @@
   "scripts": {
     "dev": "rsbuild dev",
     "build": "rsbuild build",
-    "typecheck": "tsc --noEmit",
+    "verify": "biome check && tsc --noEmit && rstest run",
     "test": "rstest run",
     "test:watch": "rstest",
-    "verify": "tsc --noEmit && rstest run",
+    "lint": "biome check",
+    "format": "biome check --write",
+    "typecheck": "tsc --noEmit",
     "preview": "rsbuild preview",
     "image": "node scripts/gemini-image.mjs"
   },
@@ -20,6 +22,7 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.6.2",
     "@rsbuild/core": "^2.2.14",
     "@rsbuild/plugin-react": "^2.1.1",
     "@rstest/core": "^0.12.4",

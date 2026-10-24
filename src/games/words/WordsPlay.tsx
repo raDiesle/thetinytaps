@@ -21,9 +21,7 @@ const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#ff
 
 /** Words that can be typed letter by letter: no hyphens or spaces, and not too long. */
 function typeableWords(pack: LanguagePack, maxLetters: number, theme: "all" | ThemeId): WordEntry[] {
-  const words = pack.letters
-    .flatMap((l) => l.words)
-    .filter((w) => /^\p{L}+$/u.test(w.word) && w.word.length <= maxLetters);
+  const words = pack.letters.flatMap((l) => l.words).filter((w) => /^\p{L}+$/u.test(w.word) && w.word.length <= maxLetters);
   return inTheme(words, theme);
 }
 
@@ -236,21 +234,9 @@ export function WordsPlay({
   const wanted = letters[typed] && toUpper(letters[typed], pack);
   const wantedKey = !wanted || pack.letters.some((l) => l.upper === wanted) ? wanted : wanted.normalize("NFD")[0];
 
-  const display = (char: string) =>
-    settings.letterCase === "upper"
-      ? toUpper(char, pack)
-      : settings.letterCase === "lower"
-        ? toLower(char, pack)
-        : char;
+  const display = (char: string) => (settings.letterCase === "upper" ? toUpper(char, pack) : settings.letterCase === "lower" ? toLower(char, pack) : char);
 
-  const figureClass = [
-    "figure",
-    puzzle && "puzzle",
-    action && "actor",
-    done && action && `act-${action.action}`,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const figureClass = ["figure", puzzle && "puzzle", action && "actor", done && action && `act-${action.action}`].filter(Boolean).join(" ");
 
   /** Typed letters are bright; colour words are written in their colour, and in white once the screen has it. */
   const typedColor = (i: number) => (color ? (done ? "#fff" : color.color) : BRIGHT_COLORS[i % BRIGHT_COLORS.length]);
@@ -261,20 +247,12 @@ export function WordsPlay({
   };
 
   return (
-    <div
-      className={`words-play${color && done ? " colored" : ""}`}
-      style={{ background }}
-      onPointerDown={onPlayAreaPointer}
-    >
+    <div className={`words-play${color && done ? " colored" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
         {color && done && (
           <div key={`parade-${current?.id}`} className="color-parade" aria-hidden>
             {parade.map((spot, i) => (
-              <span
-                key={i}
-                className="parade-thing"
-                style={{ left: `${spot.left}%`, top: `${spot.top}%`, "--i": i } as CSSProperties}
-              >
+              <span key={i} className="parade-thing" style={{ left: `${spot.left}%`, top: `${spot.top}%`, "--i": i } as CSSProperties}>
                 {color.things[i]}
               </span>
             ))}
@@ -282,10 +260,7 @@ export function WordsPlay({
         )}
         {current && (
           <div key={current.id} className={`card${done ? " done" : ""}`}>
-            <div
-              className={`reveal ${reveal !== "end" || done ? "shown" : "waiting"}`}
-              onPointerDown={onPicturePointer}
-            >
+            <div className={`reveal ${reveal !== "end" || done ? "shown" : "waiting"}`} onPointerDown={onPicturePointer}>
               <div className={figureClass}>
                 <Picture word={current.word} />
                 {puzzle && (
@@ -309,19 +284,11 @@ export function WordsPlay({
             <div className="slots" style={{ "--letters": letters.length } as CSSProperties}>
               {letters.map((char, i) =>
                 i === typed ? (
-                  <span
-                    key={`${i}-${nudges}`}
-                    className={`slot next${nudges > 0 ? " nudge" : ""}`}
-                    onPointerDown={onNextLetterPointer}
-                  >
+                  <span key={`${i}-${nudges}`} className={`slot next${nudges > 0 ? " nudge" : ""}`} onPointerDown={onNextLetterPointer}>
                     {display(char)}
                   </span>
                 ) : (
-                  <span
-                    key={i}
-                    className={slotClass(i)}
-                    style={{ "--i": i, color: i < typed ? typedColor(i) : undefined } as CSSProperties}
-                  >
+                  <span key={i} className={slotClass(i)} style={{ "--i": i, color: i < typed ? typedColor(i) : undefined } as CSSProperties}>
                     {display(char)}
                   </span>
                 ),

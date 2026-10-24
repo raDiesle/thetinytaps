@@ -17,7 +17,11 @@ export function Drachen() {
           [-12, 128, "#4dabf7"],
           [0, 170, "#40c057"],
         ].map(([x, y, colour], i) => (
-          <path key={i} d={`M${Number(x) - 12} ${Number(y) - 7} L${x} ${y} L${Number(x) - 12} ${Number(y) + 7} Z M${Number(x) + 12} ${Number(y) - 7} L${x} ${y} L${Number(x) + 12} ${Number(y) + 7} Z`} fill={String(colour)} />
+          <path
+            key={i}
+            d={`M${Number(x) - 12} ${Number(y) - 7} L${x} ${y} L${Number(x) - 12} ${Number(y) + 7} Z M${Number(x) + 12} ${Number(y) - 7} L${x} ${y} L${Number(x) + 12} ${Number(y) + 7} Z`}
+            fill={String(colour)}
+          />
         ))}
       </g>
       <path d="M0 -70 L48 -6 L0 54 L-48 -6 Z" fill="#e63946" />

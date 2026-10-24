@@ -68,14 +68,34 @@ export function Notes({ x, y, colour = "#7950f2", size = 1 }: { x: number; y: nu
 }
 
 /** Small hearts around (x, y) that pop up while the item plays. */
-export function Hearts({ x, y, count = 3, spread = 30, colour = "#ff6b6b", size = 1 }: { x: number; y: number; count?: number; spread?: number; colour?: string; size?: number }) {
+export function Hearts({
+  x,
+  y,
+  count = 3,
+  spread = 30,
+  colour = "#ff6b6b",
+  size = 1,
+}: {
+  x: number;
+  y: number;
+  count?: number;
+  spread?: number;
+  colour?: string;
+  size?: number;
+}) {
   const s = size;
   return (
     <g className="ki-hearts" fill={colour}>
       {Array.from({ length: count }, (_, i) => {
         const hx = x + (i - (count - 1) / 2) * spread;
         const hy = y - (i % 2) * 16 * s;
-        return <path key={i} style={nth(i)} d={`M${hx} ${hy} c${-6 * s} ${-9 * s} ${-18 * s} ${-2 * s} ${-9 * s} ${7 * s} l${9 * s} ${8 * s} l${9 * s} ${-8 * s} c${9 * s} ${-9 * s} ${-3 * s} ${-16 * s} ${-9 * s} ${-7 * s} Z`} />;
+        return (
+          <path
+            key={i}
+            style={nth(i)}
+            d={`M${hx} ${hy} c${-6 * s} ${-9 * s} ${-18 * s} ${-2 * s} ${-9 * s} ${7 * s} l${9 * s} ${8 * s} l${9 * s} ${-8 * s} c${9 * s} ${-9 * s} ${-3 * s} ${-16 * s} ${-9 * s} ${-7 * s} Z`}
+          />
+        );
       })}
     </g>
   );
@@ -110,7 +130,21 @@ export function Sparkles({ x, y, spread = 40, size = 1, colour = "#fcc419" }: { 
 }
 
 /** Puffs (steam, smoke, dust) above (x, y) that rise and fade while the item plays. */
-export function Puffs({ x, y, count = 3, spread = 16, r = 10, colour = "#fff" }: { x: number; y: number; count?: number; spread?: number; r?: number; colour?: string }) {
+export function Puffs({
+  x,
+  y,
+  count = 3,
+  spread = 16,
+  r = 10,
+  colour = "#fff",
+}: {
+  x: number;
+  y: number;
+  count?: number;
+  spread?: number;
+  r?: number;
+  colour?: string;
+}) {
   return (
     <g className="ki-puffs" fill={colour}>
       {Array.from({ length: count }, (_, i) => (
@@ -124,7 +158,21 @@ export function Puffs({ x, y, count = 3, spread = 16, r = 10, colour = "#fff" }:
 }
 
 /** Water drops around (x, y) that splash up and fall while the item plays. */
-export function Drops({ x, y, count = 4, spread = 20, colour = "#74c0fc", size = 1 }: { x: number; y: number; count?: number; spread?: number; colour?: string; size?: number }) {
+export function Drops({
+  x,
+  y,
+  count = 4,
+  spread = 20,
+  colour = "#74c0fc",
+  size = 1,
+}: {
+  x: number;
+  y: number;
+  count?: number;
+  spread?: number;
+  colour?: string;
+  size?: number;
+}) {
   const s = size;
   return (
     <g className="ki-drops" fill={colour}>

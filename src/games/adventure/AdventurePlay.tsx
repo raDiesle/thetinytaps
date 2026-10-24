@@ -1,15 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  playChime,
-  playKnock,
-  playPop,
-  playRumble,
-  playSplash,
-  playTweet,
-  playTwinkle,
-  playWhoosh,
-  playDrum,
-} from "@/lib/sfx";
+import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
@@ -71,42 +61,38 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
     outlineRef.current?.append(silhouette.svg);
     let player: StoryPlayer;
     try {
-      player = new StoryPlayer(
-        canvas,
-        story,
-        {
-          onLine(text, kind, at) {
-            if (!settingsRef.current.speech) return;
-            // A new step starts fresh; within a step, lines wait for each other.
-            speak(text, speechLang, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
-          },
-          onPointing: setPointing,
-          onStep(at) {
-            setStep(at);
-            setEnded(false);
-            music.energy = story.sequence.steps[at].energy;
-          },
-          onFlash(amount) {
-            if (flashRef.current) flashRef.current.style.opacity = String(amount);
-          },
-          onQuiet(quiet) {
-            music.hush(quiet);
-          },
-          onCue(cue) {
-            if (settingsRef.current.sounds) CUES[cue]();
-          },
-          onEnd() {
-            setEnded(true);
-          },
-          onPose(pose, frame, view) {
-            const box = outlineRef.current;
-            if (!box) return;
-            const shown = settingsRef.current.outline ? outlineShown(frame) : 0;
-            box.style.opacity = String(shown);
-            if (shown > 0) silhouette.update(pose, view);
-          },
+      player = new StoryPlayer(canvas, story, {
+        onLine(text, kind, at) {
+          if (!settingsRef.current.speech) return;
+          // A new step starts fresh; within a step, lines wait for each other.
+          speak(text, speechLang, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
         },
-      );
+        onPointing: setPointing,
+        onStep(at) {
+          setStep(at);
+          setEnded(false);
+          music.energy = story.sequence.steps[at].energy;
+        },
+        onFlash(amount) {
+          if (flashRef.current) flashRef.current.style.opacity = String(amount);
+        },
+        onQuiet(quiet) {
+          music.hush(quiet);
+        },
+        onCue(cue) {
+          if (settingsRef.current.sounds) CUES[cue]();
+        },
+        onEnd() {
+          setEnded(true);
+        },
+        onPose(pose, frame, view) {
+          const box = outlineRef.current;
+          if (!box) return;
+          const shown = settingsRef.current.outline ? outlineShown(frame) : 0;
+          box.style.opacity = String(shown);
+          if (shown > 0) silhouette.update(pose, view);
+        },
+      });
     } catch {
       // No WebGL (very old device or switched off).
       setFailed(true);

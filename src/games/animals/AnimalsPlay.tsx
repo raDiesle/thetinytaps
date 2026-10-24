@@ -336,12 +336,9 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
 
   if (!round) return null;
 
-  const offsetOf = (who: Mover): Offset | null =>
-    landed?.who === who ? landed.to : drag?.who === who ? { x: drag.x, y: drag.y } : null;
+  const offsetOf = (who: Mover): Offset | null => (landed?.who === who ? landed.to : drag?.who === who ? { x: drag.x, y: drag.y } : null);
   const moverClass = (who: Mover) =>
-    `${drag?.who === who ? " dragging" : ""}${landed?.who === who ? " landed" : ""}${
-      nudge?.who === who && !drag ? ` nudge-${nudge.n % 2}` : ""
-    }`;
+    `${drag?.who === who ? " dragging" : ""}${landed?.who === who ? " landed" : ""}${nudge?.who === who && !drag ? ` nudge-${nudge.n % 2}` : ""}`;
 
   const won = outcome?.ok === true;
   const yuck = outcome?.ok === false && round.kind === "feed";
@@ -446,10 +443,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
     );
 
   return (
-    <div
-      className={`animals-play kind-${round.kind}`}
-      onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
-    >
+    <div className={`animals-play kind-${round.kind}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
       <p key={round.id} className="ap-prompt">
         {prompt(round)}
       </p>

@@ -111,12 +111,7 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
         celebrate={celebrate}
         onDone={levels.length > 1 ? () => setEnded(true) : undefined}
       />
-      {ended && (
-        <GameEnd
-          onAgain={() => startLevel(index)}
-          next={{ emoji: next.emoji, name: next.name, onNext: () => startLevel(index + 1) }}
-        />
-      )}
+      {ended && <GameEnd onAgain={() => startLevel(index)} next={{ emoji: next.emoji, name: next.name, onNext: () => startLevel(index + 1) }} />}
       <MicNote state={mic} tapHint={level.tapHint} />
       <BurstLayer bursts={bursts} />
     </div>

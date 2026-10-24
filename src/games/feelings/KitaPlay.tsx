@@ -58,10 +58,7 @@ function pictureName({ situation, phase, stepsDone, trying }: Run): string {
 }
 
 export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
-  const situations = useMemo(
-    () => (settings.situation === "all" ? SITUATIONS : SITUATIONS.filter((s) => s.id === settings.situation)),
-    [settings.situation],
-  );
+  const situations = useMemo(() => (settings.situation === "all" ? SITUATIONS : SITUATIONS.filter((s) => s.id === settings.situation)), [settings.situation]);
   const deck = useRef<Situation[]>([]);
   const nextKey = useRef(0);
   const [run, setRun] = useState<Run>(() => freshRun(situations[0], nextKey.current++));
@@ -195,35 +192,21 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   if (run.phase === "done") {
     choices = <EndButtons onAgain={() => startSituation(situation)} onNext={nextSituation} />;
   } else if (run.phase === "outro") {
-    choices = situation.steps.map((step, i) => (
-      <ChoiceCard key={step.label} image={storyImages.step(situation.id, i)} label={step.label} state="done" small />
-    ));
+    choices = situation.steps.map((step, i) => <ChoiceCard key={step.label} image={storyImages.step(situation.id, i)} label={step.label} state="done" small />);
   } else if (run.phase === "steps") {
     const playing = run.busy && !run.trying;
     const index = playing ? Math.max(0, run.stepsDone - 1) : run.stepsDone;
     const step = situation.steps[index];
     const stepState: CardState = playing ? "playing" : run.trying ? "rest" : "choose";
     const list = [
-      <ChoiceCard
-        key={step.label}
-        image={storyImages.step(situation.id, index)}
-        label={step.label}
-        state={stepState}
-        onChoose={() => doStep(index)}
-      />,
+      <ChoiceCard key={step.label} image={storyImages.step(situation.id, index)} label={step.label} state={stepState} onChoose={() => doStep(index)} />,
     ];
     if (choose && index === 0) {
       const insteadState: CardState = run.tried ? "wrong" : playing ? "rest" : "choose";
       list.splice(
         run.insteadFirst ? 0 : 1,
         0,
-        <ChoiceCard
-          key="instead"
-          image={storyImages.instead(situation.id)}
-          label={situation.instead.label}
-          state={insteadState}
-          onChoose={tryInstead}
-        />,
+        <ChoiceCard key="instead" image={storyImages.instead(situation.id)} label={situation.instead.label} state={insteadState} onChoose={tryInstead} />,
       );
     }
     choices = list;

@@ -85,8 +85,8 @@ export function Bagger() {
 }
 
 // Zigzag struts of the crane's lattice.
-const TOWER_STRUTS = "M" + Array.from({ length: 11 }, (_, i) => `${i % 2 ? 722 : 682} ${572 - i * 45}`).join(" L");
-const JIB_STRUTS = "M" + Array.from({ length: 19 }, (_, i) => `${530 + i * 40} ${i % 2 ? 120 : 140}`).join(" L");
+const TOWER_STRUTS = `M${Array.from({ length: 11 }, (_, i) => `${i % 2 ? 722 : 682} ${572 - i * 45}`).join(" L")}`;
+const JIB_STRUTS = `M${Array.from({ length: 19 }, (_, i) => `${530 + i * 40} ${i % 2 ? 120 : 140}`).join(" L")}`;
 
 export function Kran() {
   return (
@@ -120,16 +120,7 @@ export function Kran() {
         <rect x="1044" y="136" width="42" height="16" rx="4" fill={INK} />
         <circle cx="1054" cy="136" r="4" fill={STEEL} />
         <circle cx="1076" cy="136" r="4" fill={STEEL} />
-        <line
-          className="kran-cable"
-          x1="1065"
-          y1="152"
-          x2="1065"
-          y2="260"
-          stroke={INK}
-          strokeWidth="4"
-          style={{ transformOrigin: "1065px 152px" }}
-        />
+        <line className="kran-cable" x1="1065" y1="152" x2="1065" y2="260" stroke={INK} strokeWidth="4" style={{ transformOrigin: "1065px 152px" }} />
         <g className="kran-load">
           <g className="kran-swing" style={{ transformOrigin: "1065px 258px" }}>
             <path d="M1065 258 V270 M1065 270 L1022 300 M1065 270 L1108 300" stroke={INK} strokeWidth="3" fill="none" />

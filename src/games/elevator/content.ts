@@ -30,20 +30,7 @@ import {
   recorded,
 } from "@/lib/sfx";
 import type { Holding, Outfit, PicId, Pose } from "./kid";
-import {
-  Bad,
-  Dachboden,
-  Flur,
-  Garten,
-  Keller,
-  Kinderzimmer,
-  Kueche,
-  Schlafzimmer,
-  Terrasse,
-  Wohnzimmer,
-  type RoomProps,
-  type Weather,
-} from "./rooms";
+import { Bad, Dachboden, Flur, Garten, Keller, Kinderzimmer, Kueche, Schlafzimmer, Terrasse, Wohnzimmer, type RoomProps, type Weather } from "./rooms";
 
 // The stories of "Aufzug". A thought bubble shows what the child needs next; the floor where that
 // thing is drawn is the one to ride to. There a hand points at what to do: every tap (or click, or
@@ -226,7 +213,9 @@ export const STORIES: Story[] = [
         sounds: [[0, playCreak]],
         ask: "Was ist im Kühlschrank?",
         done: "Kühlschrank auf!",
-        tasks: [{ name: "eggs", taps: 1, at: [309, -114], pose: "reach", sound: playPlop, hold: "eggs", ask: "Eier und Milch, bitte!", done: "Eier und Milch!" }],
+        tasks: [
+          { name: "eggs", taps: 1, at: [309, -114], pose: "reach", sound: playPlop, hold: "eggs", ask: "Eier und Milch, bitte!", done: "Eier und Milch!" },
+        ],
       },
       {
         wish: "bowl",
@@ -526,7 +515,18 @@ export const STORIES: Story[] = [
             ask: "Aufräumen! Alles in die Kiste.",
             done: "Fertig aufgeräumt!",
           },
-          { name: "teddy", taps: 1, spot: 640, face: -1, at: [520, -104], pose: "reach", sound: playGiggle, hold: "teddy", ask: "Da ist mein Teddy!", done: "Da bist du ja!" },
+          {
+            name: "teddy",
+            taps: 1,
+            spot: 640,
+            face: -1,
+            at: [520, -104],
+            pose: "reach",
+            sound: playGiggle,
+            hold: "teddy",
+            ask: "Da ist mein Teddy!",
+            done: "Da bist du ja!",
+          },
         ],
       },
       {
@@ -650,7 +650,17 @@ export const STORIES: Story[] = [
         done: "Am Haken!",
         tasks: [
           { name: "hat", taps: 1, at: [290, -160], pose: "reach", sound: playPop, wear: "hat", ask: "Hut auf!" },
-          { name: "mirror", taps: 2, spot: 480, face: -1, at: [400, -130], pose: "cheer", sound: playGiggle, ask: "Schau in den Spiegel!", done: "Fertig für den Regen!" },
+          {
+            name: "mirror",
+            taps: 2,
+            spot: 480,
+            face: -1,
+            at: [400, -130],
+            pose: "cheer",
+            sound: playGiggle,
+            ask: "Schau in den Spiegel!",
+            done: "Fertig für den Regen!",
+          },
         ],
       },
       {

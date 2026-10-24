@@ -1007,7 +1007,8 @@ export const IDEA_AREAS: IdeaArea[] = [
     prefix: "M",
     emoji: "🏝️",
     title: "Bewegungsabenteuer",
-    intro: "Der Fuchs Tapsi macht vor, das Kind macht vor dem Bildschirm mit. Die Bewegungsbibliothek hat schon 18 Welten und 100 Bewegungen, gespielt wird bisher nur die Schatzinsel.",
+    intro:
+      "Der Fuchs Tapsi macht vor, das Kind macht vor dem Bildschirm mit. Die Bewegungsbibliothek hat schon 18 Welten und 100 Bewegungen, gespielt wird bisher nur die Schatzinsel.",
     ideas: [
       {
         id: "M-01",
@@ -1293,7 +1294,8 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Drei bis vier leere Lücken in der Bahn. Antippen einer Lücke wechselt reihum das Teil: Glocke, Trampolin, Trichter, Looping, Trommel. Jede Mischung funktioniert, die Kugel kommt immer durch. Eltern-Version für Ältere: Teile aus einer Leiste in die Lücken ziehen.",
         why: "Eigene Bahn = eigenes Werk; dasselbe Spiel klingt jedes Mal anders.",
         effort: "L",
-        partial: "Drei Plätze auf der Kugelbahn wechseln beim Antippen reihum Glocke, Trampolin, Trichter und Wasserrad (X-08); Looping, Trommel und das Ziehen aus einer Leiste fehlen.",
+        partial:
+          "Drei Plätze auf der Kugelbahn wechseln beim Antippen reihum Glocke, Trampolin, Trichter und Wasserrad (X-08); Looping, Trommel und das Ziehen aus einer Leiste fehlen.",
       },
       {
         id: "K-13",

@@ -1,0 +1,50 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["src/**", "scripts/**", "*.ts", "*.json", ".claude/*.json", "!package.json"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 160
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "trailingCommas": "all",
+      "semicolons": "always"
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "useExhaustiveDependencies": "off",
+        "noInvalidDirectionInLinearGradient": "off",
+        "noInvalidGridAreas": "off"
+      },
+      "suspicious": {
+        "noArrayIndexKey": "off",
+        "useIterableCallbackReturn": "off",
+        "noDuplicateProperties": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "noDescendingSpecificity": "off"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "useSemanticElements": "off",
+        "useFocusableInteractive": "off",
+        "useAriaPropsSupportedByRole": "off"
+      }
+    }
+  },
+  "assist": {
+    "enabled": false
+  }
+}

@@ -12,17 +12,13 @@ export const SHAKE_DANCE: Movement[] = [
     bodyParts: ["hands", "arms", "shoulders"],
     bodyMovement: "Das Kind schüttelt nacheinander die Hände, die Arme und die Schultern locker im Rhythmus der Musik aus.",
     startingPose: "Gerade stehen, Arme locker hängen lassen.",
-    movementSteps: [
-      "Hände schütteln.",
-      "Arme schütteln.",
-      "Schultern schütteln.",
-      "Alles ganz still – ausatmen.",
-    ],
+    movementSteps: ["Hände schütteln.", "Arme schütteln.", "Schultern schütteln.", "Alles ganz still – ausatmen."],
     durationSeconds: 16,
     repetitions: 1,
     instruction: "Schüttel dich aus!",
     motion: "shake",
-    demonstration: "Die Figur zeigt dem Kind ihre Hände, schüttelt sie erst ganz langsam und locker, sagt „Jetzt die Arme!“ und „Jetzt die Schultern!“, und schüttelt dann zur Musik mit dem Kind mit.",
+    demonstration:
+      "Die Figur zeigt dem Kind ihre Hände, schüttelt sie erst ganz langsam und locker, sagt „Jetzt die Arme!“ und „Jetzt die Schultern!“, und schüttelt dann zur Musik mit dem Kind mit.",
     scenario: {
       world: "beach",
       setup: "Die Figur kommt nass aus dem Meer, Wassertropfen hängen an Armen und Schultern.",
@@ -47,10 +43,7 @@ export const SHAKE_DANCE: Movement[] = [
       higherEnergy: "Am Ende auch die Beine nacheinander ausschütteln.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Locker schütteln, ohne die Arme zu werfen.",
-      "Um die Arme herum etwas Platz lassen.",
-    ],
+    safetyNotes: ["Locker schütteln, ohne die Arme zu werfen.", "Um die Arme herum etwas Platz lassen."],
     tags: ["shake", "loosen_up", "rhythm", "music", "warm_up"],
   },
   {
@@ -61,19 +54,16 @@ export const SHAKE_DANCE: Movement[] = [
     difficulty: "medium",
     bodyZone: "upper_body",
     bodyParts: ["arms", "hands", "head"],
-    bodyMovement: "Das Kind bewegt die Arme steif und eckig, immer nur einen Teil auf einmal: Arm hoch, Arm runter, Kopf zur Seite – mit kleinen Pausen dazwischen.",
+    bodyMovement:
+      "Das Kind bewegt die Arme steif und eckig, immer nur einen Teil auf einmal: Arm hoch, Arm runter, Kopf zur Seite – mit kleinen Pausen dazwischen.",
     startingPose: "Gerade stehen, Arme angewinkelt, Ellbogen an der Seite.",
-    movementSteps: [
-      "Ein Arm steif nach oben – piep.",
-      "Der andere Arm nach oben – piep.",
-      "Beide Arme runter – piep.",
-      "Kopf ruckelt zur Seite – piep.",
-    ],
+    movementSteps: ["Ein Arm steif nach oben – piep.", "Der andere Arm nach oben – piep.", "Beide Arme runter – piep.", "Kopf ruckelt zur Seite – piep."],
     durationSeconds: 18,
     repetitions: 2,
     instruction: "Tanz wie ein Roboter!",
     motion: "robot",
-    demonstration: "Die Figur macht vor dem Kind eine Bewegung nach der anderen, ganz langsam und eckig, mit einem lustigen „Piep“ nach jeder. Dann tanzt sie dieselbe Folge mit dem Kind im Takt.",
+    demonstration:
+      "Die Figur macht vor dem Kind eine Bewegung nach der anderen, ganz langsam und eckig, mit einem lustigen „Piep“ nach jeder. Dann tanzt sie dieselbe Folge mit dem Kind im Takt.",
     scenario: {
       world: "space",
       setup: "Auf einer Raumstation steht ein kleiner Roboter, der das Tanzen lernen möchte.",
@@ -98,9 +88,7 @@ export const SHAKE_DANCE: Movement[] = [
       higherEnergy: "Beim Piep zusätzlich einen Schritt auf der Stelle machen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Kopfbewegungen ganz klein und langsam, nicht ruckartig.",
-    ],
+    safetyNotes: ["Kopfbewegungen ganz klein und langsam, nicht ruckartig."],
     tags: ["robot", "dance", "sequence", "space", "funny"],
   },
   {
@@ -111,18 +99,16 @@ export const SHAKE_DANCE: Movement[] = [
     difficulty: "easy",
     bodyZone: "arms",
     bodyParts: ["hands", "arms"],
-    bodyMovement: "Anders als beim Ausschütteln bewegen sich nur die Hände: Das Kind hält zwei gedachte Rasseln und schüttelt sie erst hoch über dem Kopf, dann tief bei den Knien.",
+    bodyMovement:
+      "Anders als beim Ausschütteln bewegen sich nur die Hände: Das Kind hält zwei gedachte Rasseln und schüttelt sie erst hoch über dem Kopf, dann tief bei den Knien.",
     startingPose: "Gerade stehen, Fäuste vor dem Bauch wie um zwei Rasseln.",
-    movementSteps: [
-      "Rasseln festhalten.",
-      "Oben schütteln.",
-      "Unten schütteln.",
-    ],
+    movementSteps: ["Rasseln festhalten.", "Oben schütteln.", "Unten schütteln."],
     durationSeconds: 14,
     repetitions: 2,
     instruction: "Schüttel die Rasseln!",
     motion: "shake",
-    demonstration: "Die Figur zeigt dem Kind zwei bunte Rasseln, schüttelt sie langsam hoch über dem Kopf („oben!“) und dann tief unten („unten!“). Danach rasselt sie zur Musik mit dem Kind.",
+    demonstration:
+      "Die Figur zeigt dem Kind zwei bunte Rasseln, schüttelt sie langsam hoch über dem Kopf („oben!“) und dann tief unten („unten!“). Danach rasselt sie zur Musik mit dem Kind.",
     scenario: {
       world: "music_room",
       setup: "Im Musikzimmer spielt eine kleine Kapelle, nur die Rasseln fehlen noch.",
@@ -147,9 +133,7 @@ export const SHAKE_DANCE: Movement[] = [
       higherEnergy: "Beim Rasseln unten in die Knie gehen und oben auf die Zehenspitzen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Mit echten Rasseln: festhalten, nicht werfen.",
-    ],
+    safetyNotes: ["Mit echten Rasseln: festhalten, nicht werfen."],
     tags: ["shake", "music", "instruments", "rhythm", "hands"],
   },
   {
@@ -162,16 +146,13 @@ export const SHAKE_DANCE: Movement[] = [
     bodyParts: ["knees", "hips", "torso", "arms"],
     bodyMovement: "Mit weichen Knien wackelt das Kind mit dem ganzen Körper wie ein Wackelpudding und steht danach plötzlich ganz still.",
     startingPose: "Gerade stehen, Knie locker, Arme hängen.",
-    movementSteps: [
-      "Knie ganz weich.",
-      "Den ganzen Körper wackeln.",
-      "Ganz still stehen.",
-    ],
+    movementSteps: ["Knie ganz weich.", "Den ganzen Körper wackeln.", "Ganz still stehen."],
     durationSeconds: 14,
     repetitions: 2,
     instruction: "Wackel wie Pudding!",
     motion: "shake",
-    demonstration: "Die Figur stupst einen grünen Wackelpudding an, der zittert, dann wackelt sie selbst langsam und lustig mit dem ganzen Körper und steht plötzlich still. Beim zweiten Mal wackeln beide zusammen.",
+    demonstration:
+      "Die Figur stupst einen grünen Wackelpudding an, der zittert, dann wackelt sie selbst langsam und lustig mit dem ganzen Körper und steht plötzlich still. Beim zweiten Mal wackeln beide zusammen.",
     scenario: {
       world: "toy_town",
       setup: "Auf einem Puppentisch steht ein riesiger, bunter Wackelpudding.",
@@ -185,19 +166,14 @@ export const SHAKE_DANCE: Movement[] = [
       musicSync: true,
     },
     visualDirection: { camera: "stationary", movementDirection: "in_place", intensity: "lively" },
-    variants: [
-      "Unter Wasser als Qualle wabbeln.",
-      "Erst nur der Bauch wackelt, dann die Arme, dann alles.",
-    ],
+    variants: ["Unter Wasser als Qualle wabbeln.", "Erst nur der Bauch wackelt, dann die Arme, dann alles."],
     adaptations: {
       easier: "Nur die Arme und Schultern wackeln lassen.",
       seated: "Im Sitzen den Oberkörper wackeln lassen.",
       higherEnergy: "Länger und wilder wackeln, dann langsam einfrieren.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Die Füße bleiben am Boden, weich wackeln statt hüpfen.",
-    ],
+    safetyNotes: ["Die Füße bleiben am Boden, weich wackeln statt hüpfen."],
     tags: ["wobble", "shake", "whole_body", "silly", "stillness"],
   },
   {
@@ -210,16 +186,13 @@ export const SHAKE_DANCE: Movement[] = [
     bodyParts: ["hips", "hands", "knees"],
     bodyMovement: "Mit den Händen an den Hüften lässt das Kind die Hüften langsam im Kreis kreisen, die Füße bleiben stehen.",
     startingPose: "Breit stehen, Hände an den Hüften, Knie locker.",
-    movementSteps: [
-      "Hände an die Hüften.",
-      "Hüften langsam im Kreis.",
-      "Weiterkreisen, dann still.",
-    ],
+    movementSteps: ["Hände an die Hüften.", "Hüften langsam im Kreis.", "Weiterkreisen, dann still."],
     durationSeconds: 15,
     repetitions: 2,
     instruction: "Kreis die Hüften!",
     motion: "hip_circle",
-    demonstration: "Die Figur stellt einen leuchtenden Reifen um ihren Bauch, legt die Hände an die Hüften und kreist ganz langsam, übertrieben groß, dem Kind zugewandt. Dann kreist sie im Takt mit dem Kind.",
+    demonstration:
+      "Die Figur stellt einen leuchtenden Reifen um ihren Bauch, legt die Hände an die Hüften und kreist ganz langsam, übertrieben groß, dem Kind zugewandt. Dann kreist sie im Takt mit dem Kind.",
     scenario: {
       world: "circus",
       setup: "Im Zirkus liegt ein leuchtender Hula-Reifen in der Manege bereit.",
@@ -233,18 +206,13 @@ export const SHAKE_DANCE: Movement[] = [
       musicSync: true,
     },
     visualDirection: { camera: "orbit", movementDirection: "around", intensity: "medium" },
-    variants: [
-      "Am Strand mit einem Blumenkranz-Reifen tanzen.",
-      "Ganz langsam kreisen, als würde man Suppe im Bauch umrühren.",
-    ],
+    variants: ["Am Strand mit einem Blumenkranz-Reifen tanzen.", "Ganz langsam kreisen, als würde man Suppe im Bauch umrühren."],
     adaptations: {
       easier: "Die Hüften nur hin und her wackeln statt kreisen.",
       seated: "Im Sitzen den Oberkörper langsam im Kreis bewegen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Langsam kreisen, damit dem Kind nicht schwindelig wird.",
-    ],
+    safetyNotes: ["Langsam kreisen, damit dem Kind nicht schwindelig wird."],
     tags: ["hips", "circle", "dance", "circus", "rhythm"],
   },
   {
@@ -257,16 +225,13 @@ export const SHAKE_DANCE: Movement[] = [
     bodyParts: ["arms", "hands"],
     bodyMovement: "Das Kind reißt beide Arme hoch über den Kopf, wackelt mit den Fingern und jubelt laut.",
     startingPose: "Gerade stehen, Arme unten.",
-    movementSteps: [
-      "Arme hoch.",
-      "Finger wackeln.",
-      "Hurra rufen!",
-    ],
+    movementSteps: ["Arme hoch.", "Finger wackeln.", "Hurra rufen!"],
     durationSeconds: 10,
     repetitions: 2,
     instruction: "Arme hoch, hurra!",
     motion: "cheer",
-    demonstration: "Die Figur strahlt das Kind an, streckt beide Arme langsam hoch, wackelt mit den Fingern und ruft „Hurraaa!“. Beim zweiten Mal jubeln beide zusammen.",
+    demonstration:
+      "Die Figur strahlt das Kind an, streckt beide Arme langsam hoch, wackelt mit den Fingern und ruft „Hurraaa!“. Beim zweiten Mal jubeln beide zusammen.",
     scenario: {
       world: "pirate_island",
       setup: "Der Schatz ist gefunden, alle Inselfreunde sind am Strand versammelt.",
@@ -291,9 +256,7 @@ export const SHAKE_DANCE: Movement[] = [
       higherEnergy: "Beim Jubeln auf der Stelle trippeln.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Über dem Kopf muss Platz frei sein.",
-    ],
+    safetyNotes: ["Über dem Kopf muss Platz frei sein."],
     tags: ["cheer", "celebration", "arms", "finale", "joy"],
   },
 ];

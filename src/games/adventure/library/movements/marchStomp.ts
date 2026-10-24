@@ -54,7 +54,8 @@ export const MARCH_STOMP: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["legs", "feet", "arms", "hands"],
-    bodyMovement: "Das Kind geht auf der Stelle und schiebt dabei mit beiden Händen abwechselnd hohes Gras zur Seite – ein entdeckendes Gehen mit Armen vorn, kein gleichmäßiger Marsch.",
+    bodyMovement:
+      "Das Kind geht auf der Stelle und schiebt dabei mit beiden Händen abwechselnd hohes Gras zur Seite – ein entdeckendes Gehen mit Armen vorn, kein gleichmäßiger Marsch.",
     startingPose: "Stehen, Hände vor dem Körper.",
     movementSteps: ["Auf der Stelle gehen", "Hände schieben das Gras zur Seite", "Dabei umschauen", "Stehen bleiben und staunen"],
     durationSeconds: 16,
@@ -98,7 +99,8 @@ export const MARCH_STOMP: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["legs", "feet", "arms", "shoulders"],
-    bodyMovement: "Das Kind marschiert gleichmäßig im Takt auf der Stelle, die angewinkelten Arme bewegen sich wie Kolben vor und zurück – erst langsam, dann schneller, dann wieder langsam bis zum Halt.",
+    bodyMovement:
+      "Das Kind marschiert gleichmäßig im Takt auf der Stelle, die angewinkelten Arme bewegen sich wie Kolben vor und zurück – erst langsam, dann schneller, dann wieder langsam bis zum Halt.",
     startingPose: "Stehen, Arme angewinkelt an der Seite.",
     movementSteps: ["Langsam im Takt marschieren", "Arme wie Kolben mitbewegen", "Schneller werden", "Langsam werden und anhalten"],
     durationSeconds: 18,

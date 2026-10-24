@@ -34,9 +34,7 @@ export function WinterHaus() {
 
 // Bumpy snow along the top of the jib, from x 520 to 1270.
 const JIB_SNOW =
-  "M518 120 " +
-  Array.from({ length: 15 }, (_, i) => `Q${533 + i * 50} ${110 + (i % 3) * 2} ${568 + i * 50} 116`).join(" ") +
-  " L1272 121 H518 Z";
+  "M518 120 " + Array.from({ length: 15 }, (_, i) => `Q${533 + i * 50} ${110 + (i % 3) * 2} ${568 + i * 50} 116`).join(" ") + " L1272 121 H518 Z";
 
 export function WinterKran() {
   return (

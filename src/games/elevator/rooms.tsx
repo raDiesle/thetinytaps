@@ -154,10 +154,7 @@ function Window({ x, y = -178, w = 130, h = 104, curtains }: { x: number; y?: nu
       {curtains && (
         <>
           <path d={`M${x - 20} ${y - 14} H${x + 22} Q${x + 10} ${y + h * 0.5} ${x + 24} ${y + h + 6} H${x - 20} Z`} fill={curtains} />
-          <path
-            d={`M${x + w + 20} ${y - 14} H${x + w - 22} Q${x + w - 10} ${y + h * 0.5} ${x + w - 24} ${y + h + 6} H${x + w + 20} Z`}
-            fill={curtains}
-          />
+          <path d={`M${x + w + 20} ${y - 14} H${x + w - 22} Q${x + w - 10} ${y + h * 0.5} ${x + w - 24} ${y + h + 6} H${x + w + 20} Z`} fill={curtains} />
           <rect x={x - 28} y={y - 18} width={w + 56} height="6" rx="3" fill="#868e96" />
         </>
       )}
@@ -190,15 +187,7 @@ function Plant({ x, pot = "#e8590c", size = 1 }: { x: number; pot?: string; size
   return (
     <g transform={`translate(${x} 0) scale(${size})`}>
       {[-30, -10, 10, 30].map((a, i) => (
-        <ellipse
-          key={a}
-          cx={a * 0.6}
-          cy={-60 - (i % 2) * 14}
-          rx="11"
-          ry="26"
-          fill={i % 2 ? "#2f9e44" : "#40c057"}
-          transform={`rotate(${a} ${a * 0.6} -40)`}
-        />
+        <ellipse key={a} cx={a * 0.6} cy={-60 - (i % 2) * 14} rx="11" ry="26" fill={i % 2 ? "#2f9e44" : "#40c057"} transform={`rotate(${a} ${a * 0.6} -40)`} />
       ))}
       <path d="M-22 -40 H22 L17 0 H-17 Z" fill={pot} />
       <rect x="-25" y="-44" width="50" height="9" rx="3" fill={pot} />
@@ -382,11 +371,7 @@ export function Kueche({ playing, used, task, taps }: RoomProps) {
         <Stove cooking={cooking} pancake={baking} />
       </g>
       {flying && (
-        <g
-          key={flipped}
-          className="el-fly"
-          style={{ "--dx": "183px", "--dy": `${11 - (flipped - 1) * 8}px` } as CSSProperties}
-        >
+        <g key={flipped} className="el-fly" style={{ "--dx": "183px", "--dy": `${11 - (flipped - 1) * 8}px` } as CSSProperties}>
           <ellipse cx="627" cy="-118" rx="22" ry="6" fill="#d9902f" />
           <ellipse cx="627" cy="-121" rx="22" ry="5" fill="#f4b860" />
         </g>
@@ -461,9 +446,7 @@ export function Terrasse({ playing, used, taps }: RoomProps) {
       <Outside x={ROOM_L} y={-ROOM_H} w={W} h={ROOM_H} />
       {/* Roofs of the town far away */}
       <g fill="#b2bec3">
-        <path
-          d={`M${ROOM_L} -60 H140 V-110 L170 -130 L200 -110 V-80 H300 V-120 H360 V-70 H460 V-100 L500 -126 L540 -100 V-60 H${ROOM_R} V0 H${ROOM_L} Z`}
-        />
+        <path d={`M${ROOM_L} -60 H140 V-110 L170 -130 L200 -110 V-80 H300 V-120 H360 V-70 H460 V-100 L500 -126 L540 -100 V-60 H${ROOM_R} V0 H${ROOM_L} Z`} />
         <path d="M720 -60 V-116 H790 V-60 Z M860 -60 V-96 L900 -124 L940 -96 V-60 Z" />
       </g>
       {/* Railing */}
@@ -474,9 +457,7 @@ export function Terrasse({ playing, used, taps }: RoomProps) {
       {Array.from({ length: 12 }, (_, i) => {
         const x = 90 + i * 80;
         const y = -178 + Math.sin(((x - 60) / 480) * Math.PI) * 26;
-        return (
-          <path key={i} d={`M${x - 12} ${y} H${x + 12} L${x} ${y + 22} Z`} fill={["#ff6b6b", "#ffd43b", "#51cf66", "#4dabf7"][i % 4]} />
-        );
+        return <path key={i} d={`M${x - 12} ${y} H${x + 12} L${x} ${y + 22} Z`} fill={["#ff6b6b", "#ffd43b", "#51cf66", "#4dabf7"][i % 4]} />;
       })}
       {/* Sunshade */}
       <path d="M260 0 V-150" stroke="#868e96" strokeWidth="6" />
@@ -520,15 +501,7 @@ export function Wohnzimmer({ used, taps }: RoomProps) {
         <g key={y}>
           <rect x="658" y={y} width="114" height="44" fill="#8d5a2b" />
           {["#e03131", "#1c7ed6", "#fab005", "#2f9e44", "#7048e8"].map((colour, i) => (
-            <rect
-              key={colour}
-              x={662 + i * 20 + (y === -110 ? 10 : 0)}
-              y={y + 6 + (i % 2) * 6}
-              width="16"
-              height={38 - (i % 2) * 6}
-              rx="2"
-              fill={colour}
-            />
+            <rect key={colour} x={662 + i * 20 + (y === -110 ? 10 : 0)} y={y + 6 + (i % 2) * 6} width="16" height={38 - (i % 2) * 6} rx="2" fill={colour} />
           ))}
         </g>
       ))}
@@ -841,12 +814,7 @@ export function Garten({ playing, used, task, taps }: RoomProps) {
         ))}
       </g>
       <rect x={ROOM_L} y="-70" width={W} height="60" fill="#2f9e44" />
-      <path
-        d={Array.from({ length: 34 }, (_, i) => `M${ROOM_L + 10 + i * 30} -20 V-60`).join(" ")}
-        stroke="#fff"
-        strokeWidth="9"
-        strokeLinecap="round"
-      />
+      <path d={Array.from({ length: 34 }, (_, i) => `M${ROOM_L + 10 + i * 30} -20 V-60`).join(" ")} stroke="#fff" strokeWidth="9" strokeLinecap="round" />
       <path d={`M${ROOM_L} -50 H${ROOM_R}`} stroke="#fff" strokeWidth="6" />
       {/* Tree */}
       <rect x="912" y="-120" width="26" height="110" rx="6" fill="#8d5a2b" />

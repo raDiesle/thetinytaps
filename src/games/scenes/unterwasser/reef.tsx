@@ -67,7 +67,14 @@ export function Schiff() {
           </Inside>
         </g>
         <path d="M60 -70 l18 -24 l24 10 l14 -18 l18 26 l-10 26 Z" fill="#583101" />
-        <path className="uw-schiff-weed" d="M-200 -120 q10 -14 0 -30 M-188 -116 q12 -12 6 -30" stroke="#52b788" strokeWidth="5" fill="none" strokeLinecap="round" />
+        <path
+          className="uw-schiff-weed"
+          d="M-200 -120 q10 -14 0 -30 M-188 -116 q12 -12 6 -30"
+          stroke="#52b788"
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
+        />
         <path className="uw-schiff-weed" d="M170 -56 q8 -16 0 -30" stroke="#52b788" strokeWidth="5" fill="none" strokeLinecap="round" />
         <Bubbles x={88} y={-84} count={4} size={8} delay={0.5} />
         <Bubbles x={10} y={-110} count={3} size={6} delay={0.8} />
@@ -118,7 +125,13 @@ export function Koralle() {
       </g>
       <g className="uw-koralle-brain">
         <ellipse cx="6" cy="-14" rx="58" ry="22" fill="#c77dff" />
-        <path d="M-40 -16 q10 -10 20 0 t20 0 t20 0 t20 0 M-30 -26 q10 -8 20 0 t20 0 t20 0" stroke="#9d4edd" strokeWidth="3.5" fill="none" strokeLinecap="round" />
+        <path
+          d="M-40 -16 q10 -10 20 0 t20 0 t20 0 t20 0 M-30 -26 q10 -8 20 0 t20 0 t20 0"
+          stroke="#9d4edd"
+          strokeWidth="3.5"
+          fill="none"
+          strokeLinecap="round"
+        />
         <path d="M-30 -30 Q0 -40 30 -34" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.4" />
       </g>
       <Bubbles x={6} y={-40} count={3} size={6} delay={0.4} />
@@ -130,7 +143,11 @@ export function Koralle() {
           [-82, -166],
           [92, -62],
         ].map(([x, y], i) => (
-          <path key={x} d={`M${x} ${y - 10} L${x + 3} ${y - 3} L${x + 10} ${y} L${x + 3} ${y + 3} L${x} ${y + 10} L${x - 3} ${y + 3} L${x - 10} ${y} L${x - 3} ${y - 3} Z`} style={nth(i)} />
+          <path
+            key={x}
+            d={`M${x} ${y - 10} L${x + 3} ${y - 3} L${x + 10} ${y} L${x + 3} ${y + 3} L${x} ${y + 10} L${x - 3} ${y + 3} L${x - 10} ${y} L${x - 3} ${y - 3} Z`}
+            style={nth(i)}
+          />
         ))}
       </g>
     </>
@@ -144,8 +161,24 @@ export function Clownfisch() {
   return (
     <>
       <g className="uw-clown-fish" style={{ transformOrigin: "0px -96px" }}>
-        <path className="uw-clown-tail" d="M24 -96 L44 -112 Q40 -96 44 -80 Z" fill="#f77f00" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" style={{ transformOrigin: "26px -96px" }} />
-        <path className="uw-clown-fin" d="M-10 -111 Q4 -128 18 -109 Z" fill="#f77f00" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" style={{ transformOrigin: "4px -110px" }} />
+        <path
+          className="uw-clown-tail"
+          d="M24 -96 L44 -112 Q40 -96 44 -80 Z"
+          fill="#f77f00"
+          stroke={INK}
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+          style={{ transformOrigin: "26px -96px" }}
+        />
+        <path
+          className="uw-clown-fin"
+          d="M-10 -111 Q4 -128 18 -109 Z"
+          fill="#f77f00"
+          stroke={INK}
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+          style={{ transformOrigin: "4px -110px" }}
+        />
         <path d={CLOWN_BODY} fill="#f77f00" />
         <Inside d={CLOWN_BODY}>
           <path d="M-14 -118 q-6 22 0 44 h10 q-6 -22 0 -44 Z M10 -118 q-5 22 0 44 h9 q-5 -22 0 -44 Z" fill="#fff" stroke={INK} strokeWidth="2" />
@@ -160,7 +193,9 @@ export function Clownfisch() {
       <g className="uw-anemone" stroke="#e0aaff" strokeWidth="12" strokeLinecap="round" fill="none">
         {Array.from({ length: 11 }, (_, i) => {
           const x = -60 + i * 12;
-          return <path key={i} d={`M${x} -18 q${i % 2 ? 8 : -8} -28 ${(i - 5) * 3} ${-52 - (i % 3) * 8}`} style={{ ...nth(i), transformOrigin: `${x}px -18px` }} />;
+          return (
+            <path key={i} d={`M${x} -18 q${i % 2 ? 8 : -8} -28 ${(i - 5) * 3} ${-52 - (i % 3) * 8}`} style={{ ...nth(i), transformOrigin: `${x}px -18px` }} />
+          );
         })}
       </g>
       <ellipse cx="0" cy="-12" rx="62" ry="16" fill="#9d4edd" />
@@ -227,7 +262,12 @@ export function Meerjungfrau() {
           </g>
         ))}
       </g>
-      <path className="uw-mj-hair" d="M-30 -196 Q-38 -150 -26 -118 Q-6 -126 0 -136 Q8 -126 28 -118 Q38 -150 30 -196 Z" fill={HAIR} style={{ transformOrigin: "0px -196px" }} />
+      <path
+        className="uw-mj-hair"
+        d="M-30 -196 Q-38 -150 -26 -118 Q-6 -126 0 -136 Q8 -126 28 -118 Q38 -150 30 -196 Z"
+        fill={HAIR}
+        style={{ transformOrigin: "0px -196px" }}
+      />
       <path d="M-22 -106 Q-28 -84 -6 -78 Q40 -72 70 -60 Q92 -50 94 -34 L104 -38 Q104 -64 76 -78 Q44 -92 22 -104 Z" fill="#2ec4b6" />
       <path d="M0 -92 q6 6 12 0 M24 -84 q6 6 12 0 M48 -74 q6 6 12 0 M74 -60 q5 6 10 2" stroke="#00a896" strokeWidth="3" fill="none" strokeLinecap="round" />
       <g className="uw-mj-fin" style={{ transformOrigin: "99px -36px" }}>
@@ -278,7 +318,13 @@ export function Seegras() {
       </g>
       {BLADES.map(([x, color, h], i) => (
         <g key={x} className="uw-seegras-blade" style={{ ...nth(i), transformOrigin: `${x}px 0px` }}>
-          <path d={`M${x} 0 q-16 ${-60 * h} 0 ${-120 * h} q16 ${-60 * h} 0 ${-120 * h} q-10 ${-40 * h} 4 ${-80 * h}`} stroke={color} strokeWidth="15" strokeLinecap="round" fill="none" />
+          <path
+            d={`M${x} 0 q-16 ${-60 * h} 0 ${-120 * h} q16 ${-60 * h} 0 ${-120 * h} q-10 ${-40 * h} 4 ${-80 * h}`}
+            stroke={color}
+            strokeWidth="15"
+            strokeLinecap="round"
+            fill="none"
+          />
         </g>
       ))}
       <Bubbles x={0} y={-90} count={3} size={6} delay={0.3} />

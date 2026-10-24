@@ -56,12 +56,7 @@ const nest = (
     <path d="M70 99 Q104 98 106 70 H84 Q84 92 70 99 Z" fill="#8b5e3c" />
     <ellipse cx="60" cy="70" rx="46" ry="12" fill="#c08552" />
     <ellipse cx="60" cy="70" rx="36" ry="7" fill="#6f4e37" />
-    {[
-      "M20 80 Q40 88 58 82",
-      "M44 92 Q66 86 92 90",
-      "M26 74 Q34 66 46 68",
-      "M76 66 Q90 64 98 72",
-    ].map((d) => (
+    {["M20 80 Q40 88 58 82", "M44 92 Q66 86 92 90", "M26 74 Q34 66 46 68", "M76 66 Q90 64 98 72"].map((d) => (
       <path key={d} d={d} stroke="#e0b084" strokeWidth="2.5" strokeLinecap="round" fill="none" />
     ))}
   </>
@@ -211,8 +206,7 @@ const baum = (
 /** Spokes and rings of a spider web around (60, 58). */
 const WEB_CENTRE: [number, number] = [60, 58];
 const SPOKES = Array.from({ length: 8 }, (_, i) => (i * Math.PI) / 4 + Math.PI / 8);
-const ring = (r: number) =>
-  SPOKES.map((a, i) => `${i ? "L" : "M"}${WEB_CENTRE[0] + r * Math.cos(a)} ${WEB_CENTRE[1] + r * Math.sin(a)}`).join(" ") + " Z";
+const ring = (r: number) => `${SPOKES.map((a, i) => `${i ? "L" : "M"}${WEB_CENTRE[0] + r * Math.cos(a)} ${WEB_CENTRE[1] + r * Math.sin(a)}`).join(" ")} Z`;
 
 const netz = (
   <>
@@ -220,12 +214,7 @@ const netz = (
     <ellipse cx="104" cy="16" rx="8" ry="4" fill="#8ac926" transform="rotate(30 104 16)" />
     <path d="M20 8 L36 30 M100 10 L86 30 M60 4 V12" stroke="#adb5bd" strokeWidth="1.5" />
     {SPOKES.map((a) => (
-      <path
-        key={a}
-        d={`M60 58 L${60 + 54 * Math.cos(a)} ${58 + 54 * Math.sin(a)}`}
-        stroke="#adb5bd"
-        strokeWidth="1.8"
-      />
+      <path key={a} d={`M60 58 L${60 + 54 * Math.cos(a)} ${58 + 54 * Math.sin(a)}`} stroke="#adb5bd" strokeWidth="1.8" />
     ))}
     {[12, 24, 36, 48].map((r) => (
       <path key={r} d={ring(r)} stroke="#adb5bd" strokeWidth="1.8" fill="none" />

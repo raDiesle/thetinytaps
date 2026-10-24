@@ -46,7 +46,10 @@ export function Tisch() {
         <FruitBowl />
         {/* The cloth's front hem */}
         <g className="kc-tisch-hem" style={{ transformOrigin: "0px -276px" }}>
-          <path d="M-300 -280 H300 V-252 q-15 12 -30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 Z" fill="#fff" />
+          <path
+            d="M-300 -280 H300 V-252 q-15 12 -30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 t-30 0 Z"
+            fill="#fff"
+          />
           <path d="M-300 -268 H300" stroke="#ff8787" strokeWidth="8" opacity="0.8" />
         </g>
       </g>

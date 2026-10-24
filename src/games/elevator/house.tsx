@@ -69,10 +69,7 @@ export function Backdrop({ weather }: { weather: Weather }) {
       {weather === "rain" && (
         <g className="el-rain-lines" stroke="#e7f5ff" strokeWidth="3" strokeLinecap="round" opacity="0.8">
           {Array.from({ length: 60 }, (_, i) => (
-            <path
-              key={i}
-              d={`M${-380 + (i % 20) * 110 + Math.floor(i / 20) * 37} ${-200 + Math.floor(i / 20) * 380 + (i % 3) * 90} l-10 26`}
-            />
+            <path key={i} d={`M${-380 + (i % 20) * 110 + Math.floor(i / 20) * 37} ${-200 + Math.floor(i / 20) * 380 + (i % 3) * 90} l-10 26`} />
           ))}
         </g>
       )}
@@ -131,8 +128,7 @@ export function Shaft() {
   );
 }
 
-const rideStyle = (f: number, ride: number) =>
-  ({ transform: `translateY(${floorLine(f)}px)`, transitionDuration: `${ride}ms` }) as CSSProperties;
+const rideStyle = (f: number, ride: number) => ({ transform: `translateY(${floorLine(f)}px)`, transitionDuration: `${ride}ms` }) as CSSProperties;
 
 /** The inside of the cabin, behind the children, with the rope it hangs on. */
 export function CabinBack({ floor, ride }: { floor: number; ride: number }) {
@@ -179,26 +175,11 @@ export function CabinFront({ floor, ride, open }: { floor: number; ride: number;
               stroke="#90a4ae"
               strokeWidth="6"
             />
-            <path
-              d={`M${CABIN_MID + s * 18} ${-CABIN_H + 30} l${s * 22} 40`}
-              stroke="#fff"
-              strokeWidth="6"
-              strokeLinecap="round"
-              opacity="0.7"
-            />
+            <path d={`M${CABIN_MID + s * 18} ${-CABIN_H + 30} l${s * 22} 40`} stroke="#fff" strokeWidth="6" strokeLinecap="round" opacity="0.7" />
           </g>
         ))}
       </g>
-      <rect
-        x={CABIN_L - 6}
-        y={-CABIN_H - 6}
-        width={CABIN_W + 12}
-        height={CABIN_H + 6}
-        rx="12"
-        fill="none"
-        stroke="#78909c"
-        strokeWidth="10"
-      />
+      <rect x={CABIN_L - 6} y={-CABIN_H - 6} width={CABIN_W + 12} height={CABIN_H + 6} rx="12" fill="none" stroke="#78909c" strokeWidth="10" />
     </g>
   );
 }
@@ -250,15 +231,7 @@ export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: numb
   return (
     <>
       {FLOOR_LIST.map((f) => (
-        <rect
-          key={`room${f}`}
-          x={HOUSE_L}
-          y={floorLine(f) - ROOM_H}
-          width={SHAFT_R - HOUSE_L}
-          height={ROOM_H}
-          fill="transparent"
-          onPointerDown={down(f)}
-        />
+        <rect key={`room${f}`} x={HOUSE_L} y={floorLine(f) - ROOM_H} width={SHAFT_R - HOUSE_L} height={ROOM_H} fill="transparent" onPointerDown={down(f)} />
       ))}
       <rect x={BUTTON_X - 70} y={TOP + 20} width="140" height={GROUND - TOP - 40} rx="30" fill="#cfd8dc" stroke="#90a4ae" strokeWidth="6" />
       {FLOOR_LIST.map((f) => {

@@ -7,7 +7,8 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 ```bash
 yarn install
 yarn dev           # http://localhost:3000 (Rsbuild dev server)
-yarn verify        # typecheck + unit tests (Rstest)
+yarn verify        # lint + format check (Biome), typecheck, unit tests (Rstest)
+yarn format        # format and apply safe lint fixes
 yarn test          # unit tests only
 yarn build         # static site in out/
 yarn preview       # serve the built site

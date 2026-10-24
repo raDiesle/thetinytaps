@@ -21,13 +21,42 @@ export function Wellen() {
         <g key={x} className="sd-welle" style={{ ...nth(i), transformOrigin: `${x}px 0px` }}>
           <path d={crest(x, h)} fill="#3d9be9" />
           <path d={crest(x, h * 0.62)} fill={SEA} opacity="0.8" transform={`translate(14 0)`} />
-          <path d={`M${x - 70} ${-h * 0.8} Q${x - 30} ${-h * 1.04} ${x + 20} ${-h * 0.98} Q${x + 50} ${-h * 0.9} ${x + 62} ${-h * 0.66}`} stroke={FOAM} strokeWidth="9" strokeLinecap="round" fill="none" />
+          <path
+            d={`M${x - 70} ${-h * 0.8} Q${x - 30} ${-h * 1.04} ${x + 20} ${-h * 0.98} Q${x + 50} ${-h * 0.9} ${x + 62} ${-h * 0.66}`}
+            stroke={FOAM}
+            strokeWidth="9"
+            strokeLinecap="round"
+            fill="none"
+          />
           <circle cx={x + 58} cy={-h * 0.6} r="6" fill={FOAM} />
         </g>
       ))}
       <path d="M-240 0 Q-120 -10 0 0 Q120 10 240 0" stroke={FOAM} strokeWidth="8" strokeLinecap="round" fill="none" />
-      <Puffs className="sd-welle-foam" spots={[[-200, -10], [-90, -20], [-20, -14], [60, -26], [130, -12], [210, -18]]} r={13} fill={FOAM} />
-      <Drops className="sd-welle-spray" spots={[[-100, -84], [-60, -100], [50, -110], [90, -96], [200, -80]]} r={7} fill="#d0ebff" />
+      <Puffs
+        className="sd-welle-foam"
+        spots={[
+          [-200, -10],
+          [-90, -20],
+          [-20, -14],
+          [60, -26],
+          [130, -12],
+          [210, -18],
+        ]}
+        r={13}
+        fill={FOAM}
+      />
+      <Drops
+        className="sd-welle-spray"
+        spots={[
+          [-100, -84],
+          [-60, -100],
+          [50, -110],
+          [90, -96],
+          [200, -80],
+        ]}
+        r={7}
+        fill="#d0ebff"
+      />
       <Notes x={-60} y={-110} texts={["Rausch!", "Platsch!"]} colour="#d0ebff" size={28} />
     </>
   );
@@ -48,14 +77,27 @@ export function Schwimmring() {
         <g className="sd-ring-arm sd-ring-arm-right" style={{ transformOrigin: "22px -52px" }}>
           <Arm x1={22} y1={-52} x2={58} y2={-74} sleeve={SKIN} w={11} />
         </g>
-        <path d="M-60 -30 Q-60 -54 0 -54 Q60 -54 60 -30 Q60 -6 0 -6 Q-60 -6 -60 -30 Z M-30 -30 Q0 -20 30 -30 Q30 -40 0 -40 Q-30 -40 -30 -30 Z" fill="#e63946" fillRule="evenodd" />
+        <path
+          d="M-60 -30 Q-60 -54 0 -54 Q60 -54 60 -30 Q60 -6 0 -6 Q-60 -6 -60 -30 Z M-30 -30 Q0 -20 30 -30 Q30 -40 0 -40 Q-30 -40 -30 -30 Z"
+          fill="#e63946"
+          fillRule="evenodd"
+        />
         <path d="M-60 -30 Q-58 -18 -40 -12 L-30 -26 Z M40 -12 Q58 -18 60 -30 L30 -26 Z M-10 -6 H10 L8 -22 H-8 Z" fill="#fff" />
         <path d="M-48 -44 Q-30 -52 -10 -52" stroke="#fff" strokeOpacity="0.5" strokeWidth="5" strokeLinecap="round" fill="none" />
         <Inside d="M-60 -30 Q-60 -6 0 -6 Q60 -6 60 -30 Q60 -54 0 -54 Q-60 -54 -60 -30 Z">
           <rect x="-70" y="-18" width="140" height="20" fill={SEA} opacity="0.45" />
         </Inside>
       </g>
-      <Drops className="sd-ring-splash" spots={[[-70, -60], [-56, -84], [62, -86], [76, -62]]} r={7} />
+      <Drops
+        className="sd-ring-splash"
+        spots={[
+          [-70, -60],
+          [-56, -84],
+          [62, -86],
+          [76, -62],
+        ]}
+        r={7}
+      />
       <Notes x={36} y={-140} texts={["Juhu!"]} colour="#ffd43b" size={24} />
     </>
   );
@@ -102,7 +144,16 @@ export function Luftmatratze() {
           <rect x="-130" y="-4" width="260" height="14" fill={SEA} opacity="0.45" />
         </Inside>
       </g>
-      <Drops className="sd-matratze-splash" spots={[[-134, -14], [-118, -32], [122, -30], [138, -12]]} r={7} />
+      <Drops
+        className="sd-matratze-splash"
+        spots={[
+          [-134, -14],
+          [-118, -32],
+          [122, -30],
+          [138, -12],
+        ]}
+        r={7}
+      />
       <Notes x={-20} y={-110} texts={["Hoppla!"]} colour="#ffd43b" size={24} />
     </>
   );
@@ -134,7 +185,15 @@ export function Badeente() {
           <rect x="-70" y="-6" width="140" height="14" fill={SEA} opacity="0.45" />
         </Inside>
       </g>
-      <Drops className="sd-ente-splash" spots={[[-74, -14], [-60, -30], [72, -26]]} r={6} />
+      <Drops
+        className="sd-ente-splash"
+        spots={[
+          [-74, -14],
+          [-60, -30],
+          [72, -26],
+        ]}
+        r={6}
+      />
       <Notes x={84} y={-130} texts={["Quak!", "Quak!"]} colour="#ffd43b" size={24} />
     </>
   );

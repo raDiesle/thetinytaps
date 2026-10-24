@@ -104,7 +104,15 @@ export function Falter() {
         <circle cx="44" cy="-168" r="4" fill="#fff" opacity="0.7" />
       </g>
       <ellipse cx="32" cy="-160" rx="3.5" ry="14" fill="#2b2d42" />
-      <path className="st-falter-antennae" d="M30 -173 q-4 -10 -9 -12 M34 -173 q4 -10 9 -12" stroke="#2b2d42" strokeWidth="2" fill="none" strokeLinecap="round" style={{ transformOrigin: "32px -173px" }} />
+      <path
+        className="st-falter-antennae"
+        d="M30 -173 q-4 -10 -9 -12 M34 -173 q4 -10 9 -12"
+        stroke="#2b2d42"
+        strokeWidth="2"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "32px -173px" }}
+      />
     </g>
   );
 }
