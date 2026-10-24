@@ -22,12 +22,13 @@ und wie die Welt antwortet.
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
 bleibt bis zum Aufräumen. Jede Bewegung nennt einen `motion`-Clip; die Clips für den Fuchs
-stehen in `../three/clips.ts` (72 Clips, keiner fehlt).
+stehen in `../three/clips/` (73 Clips, keiner fehlt): eine Datei je Körperteil (`arms.ts`, `legs.ts`,
+`body.ts`, `whole.ts`), Bausteine und Takte in `motion.ts`.
 
 ## Neue Bewegung
 
 1. In der passenden Datei unter `movements/` anlegen. Die ID ist englisch und in `snake_case`, alle Texte sind deutsch.
-2. Einen vorhandenen `motion`-Clip wählen oder in `../three/clips.ts` einen neuen bauen.
+2. Einen vorhandenen `motion`-Clip wählen oder in `../three/clips/` einen neuen bauen, in der Datei des Körperteils, um den es geht – sie bestimmt, was leuchtet.
 3. In mindestens einem Szenario (`scenarios.ts`) einsetzen.
 4. Bei einem neuen Clip: in `situations.ts` sechs Situationen dazuschreiben, mindestens zwei aus dem Alltag.
 5. `yarn typecheck`.
@@ -126,7 +127,7 @@ noch ein ruhiger Abschied dazukommen.
   zeigt die Leiste nur Bilder. Ist die Sprachausgabe aus, bleibt nur das Vormachen. Deshalb
   müssen die Bewegungen des Fuchses deutlich sein.
 - **Leuchtende Kontur am Fuchs** (`../three/contour.ts`): Während einer Bewegung leuchtet
-  nur der Körperteil, um den es geht (`clipFocus` in `../three/clips.ts`: an der Kurbel die Arme,
+  nur der Körperteil, um den es geht (`clipFocus` in `../three/clips/`, nach der Datei des Clips: an der Kurbel die Arme,
   beim Stampfen die Beine), als schmaler neongrüner Rand ohne Muster, und nur solange er sich
   bewegt. Das wird aus der Geschwindigkeit der Gelenke berechnet, bei allen Bewegungen. Hält eine Bewegung lange still (z. B. Flamingo), verblasst das Leuchten. Das ist
   gewollt, aber noch nicht mit Kindern ausprobiert.
@@ -153,7 +154,7 @@ noch ein ruhiger Abschied dazukommen.
   pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), wedelt die
   Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), zieht die Truhe am Seil heran, schließt sie mit dem
   Schlüssel auf, jubelt und macht mit Kiki und den Krebsen Stopptanz, und zum Schluss gibt es ein Feuerwerk.
-- **Stopptanz** (`freeze` in `../three/clips.ts`, `STOP_DANCE`): Musik an, alle tanzen; hört sie
+- **Stopptanz** (`freeze` in `../three/clips/whole.ts`, `STOP_DANCE` in `motion.ts`): Musik an, alle tanzen; hört sie
   auf, frieren Tapsi, Kiki und die Krebse ein, mal wackelig, mal als Statue auf einem Bein, mal
   lustig mit einem Arm hoch. Die Pausen sind verschieden lang (1,5–3 s), damit niemand mitzählen
   kann. Das Zeichen ist nur die Stille: Tapsi sagt kein „Stopp!“. Ist die Musik ausgeschaltet,
