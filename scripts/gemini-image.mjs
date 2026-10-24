@@ -89,7 +89,7 @@ async function generate({ prompt, refs, aspect, transparent, key, model }) {
 async function cutOut(input, keyHex) {
   const { data, info } = await sharp(input).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width: w, height: h } = info;
-  const key = [0, 2, 4].map((i) => parseInt(keyHex.slice(i, i + 2), 16));
+  let key = [0, 2, 4].map((i) => parseInt(keyHex.slice(i, i + 2), 16));
   const HARD = 70;
   const SOFT = 150;
   const dist = (p) =>
@@ -98,13 +98,24 @@ async function cutOut(input, keyHex) {
   const edge = [];
   for (let x = 0; x < w; x++) edge.push(x, (h - 1) * w + x);
   for (let y = 1; y < h - 1; y++) edge.push(y * w, y * w + w - 1);
+
+  // The model never paints the exact colour asked for (ff00ff comes back as
+  // ff36f8), so key on what the border really is.
+  const near = edge.filter((p) => dist(p) < SOFT);
+  if (near.length) {
+    const median = (c) => near.map((p) => data[p * 4 + c]).sort((a, b) => a - b)[near.length >> 1];
+    key = [median(0), median(1), median(2)];
+  }
   const onKey = edge.filter((p) => dist(p) < HARD).length / edge.length;
   if (onKey < 0.9) {
     console.warn(`warning: only ${Math.round(onKey * 100)}% of the border is the key colour #${keyHex} – the cut-out may be wrong, better generate again`);
   }
 
-  const seen = new Uint8Array(w * h);
+  // Also start inside: holes the subject closes in (a window, between arms)
+  // show the backdrop too, and almost exactly the key colour is never the subject.
   const stack = edge;
+  for (let p = 0; p < w * h; p++) if (dist(p) < HARD / 2) stack.push(p);
+  const seen = new Uint8Array(w * h);
   while (stack.length) {
     const p = stack.pop();
     if (seen[p]) continue;
