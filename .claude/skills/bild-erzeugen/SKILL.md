@@ -1,0 +1,73 @@
+---
+name: bild-erzeugen
+description: Generate a raster picture (illustration, card, sprite with transparent background, backdrop) for The Tiny Taps with Gemini via `yarn image`, check it and put it into the game. Use when the user asks to make/generate a picture, Bild, illustration or asset with Gemini or AI, or to fill an image folder like src/games/feelings/bilder/.
+---
+
+# Pictures with Gemini
+
+`scripts/gemini-image.mjs` (run as `yarn image`) sends a prompt to the Gemini API,
+keeps the untouched result in `.image-raw/` (git-ignored) and saves a game-ready
+WebP/PNG. Drawn SVG stays the first choice for things that move or are tapped in a
+scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
+
+## Setup (the user does this, never ask for the key)
+
+- `GEMINI_API_KEY` must be exported in the user's shell (key from Google AI Studio).
+  If the script says it is missing, tell the user to set it themselves.
+- Image models usually need billing enabled in AI Studio; each picture costs a few cents.
+  Don't generate dozens of variants without asking.
+- Default model `gemini-2.5-flash-image`; `--model` or `GEMINI_IMAGE_MODEL` switches
+  (e.g. the Pro image model for harder scenes).
+
+## Commands
+
+```bash
+# card / illustration, cropped to an exact size
+yarn image src/games/feelings/bilder/push-1.webp "<style block> <prompt>" --aspect 4:3 --size 1200x900
+
+# single thing with transparent background (flat magenta backdrop is asked for and cut out)
+yarn image public/images/traktor.webp "<style block> A red tractor, side view" --transparent --size 512
+
+# same character again: pass earlier pictures as references
+yarn image public/images/fuchs-sprung.webp "The same fox from the reference, now jumping" --ref .image-raw/fuchs.png --transparent --size 512
+
+# process again without a new request (other size, cut-out, or a picture the user made in the Gemini app)
+yarn image public/images/traktor.webp --from .image-raw/traktor.png --transparent --size 768
+```
+
+Options: `--aspect` (1:1, 3:4, 4:3, 9:16, 16:9 …), `--size W` (longest side, no
+enlarging) or `WxH` (cover crop; with `--transparent` fitted inside), `--transparent`,
+`--key ff00ff` (backdrop colour to cut out – change it if the subject itself is
+magenta), `--quality 80`, `--ref` (repeatable), `--from`, `--model`.
+
+## Style
+
+Always start the prompt with the style block, so all pictures fit together:
+
+```
+Children's picture-book illustration for 2–4 year olds. Soft, flat, rounded
+shapes with thick dark-purple outlines (#2a1e5c), bright friendly colours, gentle
+shading. Simple, uncluttered background. No text, no letters, no numbers,
+no speech bubbles, no frames.
+```
+
+For `--transparent` drop "Simple, uncluttered background" – the script adds the
+flat backdrop instruction itself. Folders with their own guide (like
+`src/games/feelings/bilder/README.md`) have their own style block, characters and file
+names – use those.
+
+## Workflow
+
+1. Write the prompt in English: subject, pose, mood, what must be readable for a
+   toddler. One clear subject; describe characters with the same words every time.
+2. For a recurring character, make a reference first (character sheet or the best
+   picture) and pass it with `--ref` to every later picture.
+3. Run `yarn image …`, then **look at the saved file with Read**. Check: is it what was
+   asked, does a child who can't read understand it, faces/feelings clear, no text or
+   stray letters, no extra limbs, edges of a cut-out clean (no magenta fringe, nothing
+   of the subject cut away). A "warning: only N% of the border …" means the backdrop
+   was not flat – generate again.
+4. If it's wrong, change the prompt (be specific about what was wrong) and run again;
+   stop after about three tries and show the user the best one with what's off.
+5. Keep files small: cards ~1200×900 at quality 80 (< 200 KB), sprites 512–768 px.
+   Commit only the final file in the game folder, never `.image-raw/`.

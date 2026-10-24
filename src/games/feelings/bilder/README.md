@@ -13,6 +13,12 @@ Die Bühne (die laufenden Figuren in der Mitte) bleibt gezeichnet und bewegt. Bi
 ersetzen die **Auswahl-Karten**, die **Denkblase** bei der schlechten Idee und
 das **„Was ist passiert“-Bild** oben neben der Frage.
 
+Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`), z. B.:
+
+```
+yarn image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --ref .image-raw/figurenbogen.png
+```
+
 ## So bleiben die Figuren gleich
 
 Bildgeneratoren erfinden die Figuren sonst jedes Mal neu. Darum:
