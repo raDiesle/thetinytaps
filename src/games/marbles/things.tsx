@@ -219,8 +219,20 @@ function umbrella(): Thing {
         <path d={`M${w / 2} 0 L${w / 2 - 4} -14 L4 ${-h + 120} Q${w / 2} ${-h + 104} ${w - 4} ${-h + 120} L${w / 2 + 4} -14 Z`} fill={color} {...LINE} />
         <line x1={w / 2} y1="-14" x2={w / 2} y2={-h + 108} stroke="#0003" strokeWidth="3" />
         <rect x={w / 2 - 5} y={-h + 46} width="10" height="66" fill="#8a5a2b" {...LINE} />
-        <path d={`M${w / 2} ${-h + 48} L${w / 2} ${-h + 22} Q${w / 2} ${-h + 4} ${w / 2 + 14} ${-h + 4} Q${w} ${-h + 4} ${w} ${-h + 20}`} fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" />
-        <path d={`M${w / 2} ${-h + 48} L${w / 2} ${-h + 22} Q${w / 2} ${-h + 4} ${w / 2 + 14} ${-h + 4} Q${w} ${-h + 4} ${w} ${-h + 20}`} fill="none" stroke="#b8763d" strokeWidth="6" strokeLinecap="round" />
+        <path
+          d={`M${w / 2} ${-h + 48} L${w / 2} ${-h + 22} Q${w / 2} ${-h + 4} ${w / 2 + 14} ${-h + 4} Q${w} ${-h + 4} ${w} ${-h + 20}`}
+          fill="none"
+          stroke={INK}
+          strokeWidth="11"
+          strokeLinecap="round"
+        />
+        <path
+          d={`M${w / 2} ${-h + 48} L${w / 2} ${-h + 22} Q${w / 2} ${-h + 4} ${w / 2 + 14} ${-h + 4} Q${w} ${-h + 4} ${w} ${-h + 20}`}
+          fill="none"
+          stroke="#b8763d"
+          strokeWidth="6"
+          strokeLinecap="round"
+        />
       </>
     ),
   };

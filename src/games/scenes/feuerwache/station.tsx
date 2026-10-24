@@ -182,7 +182,14 @@ export function Wache() {
         <circle key={i} cx={600 + 38 * Math.sin((i * Math.PI) / 6)} cy={-420 - 38 * Math.cos((i * Math.PI) / 6)} r="3" fill={INK} />
       ))}
       <path className="fw-wache-hour" d="M600 -420 V-446" stroke={INK} strokeWidth="7" strokeLinecap="round" style={{ transformOrigin: "600px -420px" }} />
-      <path className="fw-wache-minute" d="M600 -420 H630" stroke={FIRE_RED} strokeWidth="5" strokeLinecap="round" style={{ transformOrigin: "600px -420px" }} />
+      <path
+        className="fw-wache-minute"
+        d="M600 -420 H630"
+        stroke={FIRE_RED}
+        strokeWidth="5"
+        strokeLinecap="round"
+        style={{ transformOrigin: "600px -420px" }}
+      />
       <circle cx="600" cy="-420" r="6" fill={INK} />
 
       {/* The side door: it opens and a firefighter says hello */}

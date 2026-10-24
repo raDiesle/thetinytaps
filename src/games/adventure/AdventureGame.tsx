@@ -20,36 +20,34 @@ export function AdventureGame() {
       emoji="🏝️"
       modes={[{ id: "normal", emoji: "🏝️", title: "Die Schatzinsel" }]}
       settings={
-        <>
-          <SettingsGroup title="Die Schatzinsel">
+        <SettingsGroup title="Die Schatzinsel">
+          <p className="setting-note">
+            Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit: Paddeln, über eine kleine Brücke hüpfen und mit dem
+            Kopf an Sternkisten stoßen, sich unter einem schaukelnden Ast ducken, Blumen mit den Armen öffnen, Kokosnüssen ausweichen, Spinnweben wegwedeln, die
+            Schatztruhe am Seil heranziehen und zum Schluss Stopptanz am Strand: Hört die Musik auf, frieren Tapsi, der Papagei und die Krebse ein. Die Welt
+            reagiert von selbst im Takt der Bewegung – es gibt keine Kamera und kein „falsch“.
+          </p>
+          <p className="setting-note">
+            Am besten auf einem großen Bildschirm, mit etwas Platz um das Kind herum (Arme ausbreiten, ein Schritt zur Seite). Niemand muss tippen.
+          </p>
+          <Toggle
+            label="Am Fuchs leuchtet, worauf es bei der Bewegung ankommt (z. B. nur die Arme an der Kurbel)"
+            checked={settings.glow}
+            onChange={(glow) => update({ glow })}
+          />
+          <Toggle
+            label="Umriss-Hilfe: eine dunkle Figur mit leuchtendem Rand macht jede Bewegung groß mit"
+            checked={settings.outline}
+            onChange={(outline) => update({ outline })}
+          />
+          <Toggle label="Musik" checked={settings.music} onChange={(music) => update({ music })} />
+          {!touchOnly && (
             <p className="setting-note">
-              Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit: Paddeln, über eine kleine Brücke
-              hüpfen und mit dem Kopf an Sternkisten stoßen, sich unter einem schaukelnden Ast ducken, Blumen mit den Armen öffnen,
-              Kokosnüssen ausweichen, Spinnweben wegwedeln, die Schatztruhe am Seil heranziehen und zum Schluss Stopptanz am Strand: Hört die Musik auf, frieren Tapsi, der Papagei und die Krebse ein. Die Welt reagiert von selbst im Takt der Bewegung –
-              es gibt keine Kamera und kein „falsch“.
+              Oben links: pausieren und zur vorigen oder nächsten Bewegung springen; ein Bild unten springt zu dieser Bewegung. Mit Tastatur: <kbd>←</kbd>{" "}
+              <kbd>→</kbd> und die <kbd>Leertaste</kbd>.
             </p>
-            <p className="setting-note">
-              Am besten auf einem großen Bildschirm, mit etwas Platz um das Kind herum (Arme ausbreiten, ein Schritt zur Seite). Niemand
-              muss tippen.
-            </p>
-            <Toggle
-              label="Am Fuchs leuchtet, worauf es bei der Bewegung ankommt (z. B. nur die Arme an der Kurbel)"
-              checked={settings.glow}
-              onChange={(glow) => update({ glow })}
-            />
-            <Toggle
-              label="Umriss-Hilfe: eine dunkle Figur mit leuchtendem Rand macht jede Bewegung groß mit"
-              checked={settings.outline}
-              onChange={(outline) => update({ outline })}
-            />
-            <Toggle label="Musik" checked={settings.music} onChange={(music) => update({ music })} />
-            {!touchOnly && (
-              <p className="setting-note">
-                Oben links: pausieren und zur vorigen oder nächsten Bewegung springen; ein Bild unten springt zu dieser Bewegung. Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> und die <kbd>Leertaste</kbd>.
-              </p>
-            )}
-          </SettingsGroup>
-        </>
+          )}
+        </SettingsGroup>
       }
     >
       <AdventurePlay story={story} speechLang={de.speechLang} settings={settings} />

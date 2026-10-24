@@ -1,0 +1,105 @@
+// Tunes, notes and game sounds (jumps, pops, chimes, sparkles).
+
+import { PENTATONIC, hiss, note, tone } from "./core";
+
+/** A springy jump. */
+export function playBoing() {
+  note({ from: 180, to: 620, duration: 0.4, type: "triangle", volume: 0.3 });
+}
+
+/** A short happy tune from the radio. */
+export function playMelody() {
+  [0, 2, 4, 2, 5, 4].forEach((step, i) => note({ from: PENTATONIC[step], duration: 0.22, type: "triangle", volume: 0.18, delay: i * 0.24 }));
+}
+
+/** A pop, as if something jumps out of a hole. */
+export function playPop() {
+  note({ from: 300, to: 1100, duration: 0.12, type: "sine", volume: 0.3 });
+}
+
+/** A random soft note, used for shapes and bubbles. */
+export function playRandomNote() {
+  const freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
+  tone(freq, 0.6, "sine", 0.25);
+}
+
+/** A rising note for the i-th counted item, so counting "climbs". */
+export function playCountNote(i: number) {
+  tone(PENTATONIC[i % PENTATONIC.length], 0.35, "triangle", 0.2);
+}
+
+/** "Dong" – the i-th note struck by something heavy: two octaves lower, long and dull. */
+export function playDeepNote(i: number) {
+  note({ from: PENTATONIC[i % PENTATONIC.length] / 4, duration: 0.7, type: "triangle", volume: 0.4, lowpass: 700 });
+}
+
+/** A short two-note chime when a new letter appears. */
+export function playChime() {
+  tone(PENTATONIC[2], 0.4, "sine", 0.2);
+  setTimeout(() => tone(PENTATONIC[5], 0.5, "sine", 0.2), 90);
+}
+
+/** A cheerful brushing tune in steps of the pentatonic scale; null is a rest. */
+const TUNE = [0, 2, 4, 4, 5, 4, 2, null, 1, 3, 4, 3, 2, null, null, null, 0, 2, 4, 4, 5, 4, 5, 6, 7, 5, 4, 2, 0, null, null, null];
+const TUNE_BASS = [130.81, 196.0, 146.83, 196.0];
+
+/** The i-th beat of the brushing tune, which loops; a soft bass note starts every bar. */
+export function playTuneNote(i: number) {
+  const step = TUNE[i % TUNE.length];
+  if (step !== null) note({ from: PENTATONIC[step], duration: 0.26, type: "triangle", volume: 0.12 });
+  if (i % 4 === 0) note({ from: TUNE_BASS[Math.floor(i / 4) % TUNE_BASS.length], duration: 0.9, type: "sine", volume: 0.14 });
+}
+
+/** "Puff!" – a little monster vanishes in a cloud, with a sparkle after. */
+export function playPoof() {
+  note({ from: 900, to: 180, duration: 0.25, type: "sine", volume: 0.25 });
+  note({ from: PENTATONIC[7] * 2, duration: 0.3, type: "sine", volume: 0.08, delay: 0.18 });
+}
+
+/** A slow, soft lullaby falling down the scale, for good night. */
+export function playLullaby() {
+  [5, 4, 2, 3, 1, 0].forEach((step, i) => note({ from: PENTATONIC[step], duration: 0.9, type: "sine", volume: 0.12, delay: i * 0.6 }));
+}
+
+/** Funkel, funkel: quick high notes, like a star glittering. */
+export function playTwinkle() {
+  [7, 5, 6, 4, 7].forEach((step, i) => note({ from: PENTATONIC[step] * 2, duration: 0.25, type: "sine", volume: 0.08, delay: i * 0.09 }));
+}
+
+/** "Wusch!" – something flies past: a soft sweep up and down. */
+export function playWhoosh() {
+  note({ from: 300, to: 1600, duration: 0.35, type: "sawtooth", volume: 0.05, lowpass: 1400 });
+  note({ from: 1600, to: 200, duration: 0.5, type: "sine", volume: 0.1, delay: 0.3 });
+}
+
+/** "Trrrillll!" – a whistle with a rolling pea inside. */
+export function playTrill() {
+  [0, 0.55].forEach((start, n) => {
+    for (let i = 0; i < (n ? 8 : 4); i++) note({ from: i % 2 ? 2350 : 2150, duration: 0.05, type: "sine", volume: 0.12, delay: start + i * 0.045 });
+  });
+}
+
+/** "Ding!" – a small bright bell that rings out. */
+export function playDing() {
+  note({ from: 1568, duration: 1.3, type: "sine", volume: 0.22 });
+  note({ from: 3920, duration: 0.5, type: "sine", volume: 0.05 });
+}
+
+/** "Wirrr" – a marble running round and round a funnel, getting faster and lower. */
+export function playSwirl() {
+  for (let i = 0; i < 12; i++) note({ from: 1000 - i * 55, to: 940 - i * 55, duration: 0.1, type: "sine", volume: 0.07, delay: i * (0.16 - i * 0.006) });
+}
+
+/** "Bumm!" – a big toy drum. */
+export function playDrum() {
+  note({ from: 150, to: 48, duration: 0.6, type: "sine", volume: 0.55 });
+  hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
+}
+
+/** "Pling, pling" – a music box: slow, high, bell-like notes of a lullaby. */
+export function playMusicbox() {
+  [4, 2, 4, 2, 1, 0].forEach((step, i) => {
+    note({ from: PENTATONIC[step] * 2, duration: 0.6, type: "sine", volume: 0.1, delay: i * 0.3 });
+    note({ from: PENTATONIC[step] * 4, duration: 0.25, type: "sine", volume: 0.025, delay: i * 0.3 });
+  });
+}

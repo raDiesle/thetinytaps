@@ -109,7 +109,18 @@ export function AlienBaby() {
 export function Weltraumblume() {
   return (
     <>
-      <Sparkles className="wa-blume-pollen" spots={[[-44, -176], [0, -204], [44, -172], [-36, -120], [38, -116]]} r={8} fill="#fff3bf" />
+      <Sparkles
+        className="wa-blume-pollen"
+        spots={[
+          [-44, -176],
+          [0, -204],
+          [44, -172],
+          [-36, -120],
+          [38, -116],
+        ]}
+        r={8}
+        fill="#fff3bf"
+      />
       <path d="M0 0 Q-10 -60 0 -112" stroke="#40c057" strokeWidth="8" fill="none" strokeLinecap="round" />
       <g className="wa-blume-leaf" style={{ transformOrigin: "-4px -40px" }}>
         <path d="M-4 -40 Q-40 -60 -50 -36 Q-26 -26 -4 -40 Z" fill="#69db7c" />
@@ -141,7 +152,15 @@ const BUNNY_LINE = "#c5c8d6";
 export function Mondhase() {
   return (
     <>
-      <Dust className="wa-hase-dust" spots={[[-30, -6], [30, -6], [0, 2]]} r={12} />
+      <Dust
+        className="wa-hase-dust"
+        spots={[
+          [-30, -6],
+          [30, -6],
+          [0, 2],
+        ]}
+        r={12}
+      />
       <g className="wa-hase-body" style={{ transformOrigin: "0px 0px" }}>
         <circle cx="-30" cy="-30" r="11" fill={BUNNY} stroke={BUNNY_LINE} strokeWidth="3" />
         <ellipse cx="-14" cy="-6" rx="16" ry="7" fill="#e9ecef" stroke={BUNNY_LINE} strokeWidth="3" />

@@ -12,8 +12,7 @@ const STATUS_ORDER: Record<IdeaStatus, number> = { open: 0, partial: 1, done: 2 
 
 const countDone = (ideas: Idea[]) => ideas.filter((i) => i.done).length;
 
-const matches = (idea: Idea, filter: StatusFilter) =>
-  filter === "all" || (filter === "done") === (ideaStatus(idea) === "done");
+const matches = (idea: Idea, filter: StatusFilter) => filter === "all" || (filter === "done") === (ideaStatus(idea) === "done");
 
 /** Open ideas first, then partly done, then done ones; otherwise in number order. */
 const byStatus = (a: Idea, b: Idea) => STATUS_ORDER[ideaStatus(a)] - STATUS_ORDER[ideaStatus(b)];
@@ -35,8 +34,7 @@ export function IdeasPage() {
   const done = countDone(ALL_IDEAS);
   const picks = TOP_PICKS.filter(({ id }) => !ALL_IDEAS.find((i) => i.id === id)?.done);
 
-  const toggleStar = (id: string) =>
-    update({ starred: starred.has(id) ? saved.starred.filter((s) => s !== id) : [...saved.starred, id] });
+  const toggleStar = (id: string) => update({ starred: starred.has(id) ? saved.starred.filter((s) => s !== id) : [...saved.starred, id] });
 
   return (
     <main className="home ideas">
@@ -47,8 +45,7 @@ export function IdeasPage() {
         <span aria-hidden>💡</span> Ideen
       </h1>
       <p className="home-subtitle">
-        {ALL_IDEAS.length} Ideen für neue und bestehende Spiele. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen
-        kann.
+        {ALL_IDEAS.length} Ideen für neue und bestehende Spiele. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
       <Progress done={done} total={ALL_IDEAS.length} />
 
@@ -99,11 +96,7 @@ export function IdeasPage() {
             { value: "done", label: `✅ Umgesetzt (${done})` },
           ]}
         />
-        <Toggle
-          label={`Nur gemerkte ⭐ (${saved.starred.length})`}
-          checked={saved.onlyStarred}
-          onChange={(onlyStarred) => update({ onlyStarred })}
-        />
+        <Toggle label={`Nur gemerkte ⭐ (${saved.starred.length})`} checked={saved.onlyStarred} onChange={(onlyStarred) => update({ onlyStarred })} />
         <span className="ideas-legend">
           Aufwand: <span className="effort effort-S">S {EFFORT_LABELS.S}</span> <span className="effort effort-M">M {EFFORT_LABELS.M}</span>{" "}
           <span className="effort effort-L">L {EFFORT_LABELS.L}</span>
@@ -111,9 +104,7 @@ export function IdeasPage() {
       </div>
 
       {IDEA_AREAS.map((area) => {
-        const ideas = area.ideas
-          .filter((i) => matches(i, saved.status) && (!saved.onlyStarred || starred.has(i.id)))
-          .sort(byStatus);
+        const ideas = area.ideas.filter((i) => matches(i, saved.status) && (!saved.onlyStarred || starred.has(i.id))).sort(byStatus);
         if (ideas.length === 0) return null;
         return (
           <section key={area.prefix} id={`area-${area.prefix}`} className="ideas-area">

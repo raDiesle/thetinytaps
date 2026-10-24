@@ -104,8 +104,9 @@ export function createEar() {
           quietMs = 0;
           return "quiet";
         }
-      } else if ((gapMs += dt) > QUIET_GAP_MS) {
-        quietMs = 0;
+      } else {
+        gapMs += dt;
+        if (gapMs > QUIET_GAP_MS) quietMs = 0;
       }
       return null;
     },
@@ -133,7 +134,10 @@ export function createWind() {
     blow(db: number, ms: number, deaf: boolean, sensitivity: Sensitivity): number {
       const dt = Math.min(ms, 100);
       floor.update(db, dt, deaf);
-      if (deaf) return (wind = Math.max(0, wind - (WIND_DEAF_FALL_PER_S * dt) / 1000));
+      if (deaf) {
+        wind = Math.max(0, wind - (WIND_DEAF_FALL_PER_S * dt) / 1000);
+        return wind;
+      }
       const from = Math.max(WIND_MIN_DB, floor.db + WIND_ABOVE_FLOOR_DB);
       const full = Math.max(loudDbAbove(floor.db, sensitivity), from + 6);
       const target = Math.min(1, Math.max(0, (db - from) / (full - from)));

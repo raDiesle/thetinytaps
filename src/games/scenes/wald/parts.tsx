@@ -33,7 +33,16 @@ export function Lines({ x, y, dir = 1, colour = "#fff", size = 1 }: { x: number;
 /** Little floating notes or words, e.g. "Kuckuck!", shown one after the other while the item plays. */
 export function Notes({ x, y, texts, colour = "#fff", size = 22 }: { x: number; y: number; texts: string[]; colour?: string; size?: number }) {
   return (
-    <g className="wd-notes" fill={colour} fontSize={size} fontWeight="800" fontFamily="system-ui, sans-serif" stroke="#2b2d42" strokeWidth={size / 8} paintOrder="stroke">
+    <g
+      className="wd-notes"
+      fill={colour}
+      fontSize={size}
+      fontWeight="800"
+      fontFamily="system-ui, sans-serif"
+      stroke="#2b2d42"
+      strokeWidth={size / 8}
+      paintOrder="stroke"
+    >
       {texts.map((text, i) => (
         <text key={i} x={x + i * size * 0.9} y={y - i * size * 0.6} style={nth(i)}>
           {text}

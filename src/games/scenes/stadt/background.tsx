@@ -75,7 +75,10 @@ function BackRow() {
       {BACK_ROW.map(([x, w, h, color]) => (
         <g key={x}>
           <rect x={x} y={HOUSES - Number(h)} width={w} height={h} fill={String(color)} />
-          <path d={`M${Number(x) - 6} ${HOUSES - Number(h)} L${Number(x) + Number(w) / 2} ${HOUSES - Number(h) - 40} L${Number(x) + Number(w) + 6} ${HOUSES - Number(h)} Z`} fill="#d6ccd8" />
+          <path
+            d={`M${Number(x) - 6} ${HOUSES - Number(h)} L${Number(x) + Number(w) / 2} ${HOUSES - Number(h) - 40} L${Number(x) + Number(w) + 6} ${HOUSES - Number(h)} Z`}
+            fill="#d6ccd8"
+          />
           {[0, 1, 2].map((row) => (
             <g key={row} fill="#eef3fb">
               <rect x={Number(x) + 16} y={HOUSES - Number(h) + 20 + row * 44} width="22" height="26" rx="3" />
@@ -239,11 +242,7 @@ export function Background() {
       {/* Grass tufts */}
       <g stroke="#52b788" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path
-            key={`${x}-${y}`}
-            d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26"
-            transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
-          />
+          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
         ))}
       </g>
     </>

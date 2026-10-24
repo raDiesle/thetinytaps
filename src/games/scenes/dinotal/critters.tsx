@@ -47,7 +47,12 @@ export function FlugsaurierBaby() {
       <ellipse cx="14" cy="-296" rx="50" ry="14" fill="#7f5539" />
       <g className="dt-flugbaby-body">
         <path className="dt-flugbaby-wing" d="M0 -310 Q-24 -326 -32 -304 Q-14 -302 0 -298 Z" fill={FLUG_WING} style={{ transformOrigin: "0px -306px" }} />
-        <path className="dt-flugbaby-wing dt-flugbaby-wing-r" d="M28 -310 Q52 -326 60 -304 Q42 -302 28 -298 Z" fill={FLUG_WING} style={{ transformOrigin: "28px -306px" }} />
+        <path
+          className="dt-flugbaby-wing dt-flugbaby-wing-r"
+          d="M28 -310 Q52 -326 60 -304 Q42 -302 28 -298 Z"
+          fill={FLUG_WING}
+          style={{ transformOrigin: "28px -306px" }}
+        />
         <ellipse cx="14" cy="-304" rx="22" ry="18" fill={FLUG} />
         <path d="M20 -338 Q6 -352 -6 -352 Q4 -340 12 -332 Z" fill="#c44536" />
         <circle cx="22" cy="-326" r="16" fill={FLUG} />
@@ -69,7 +74,12 @@ export function FlugsaurierBaby() {
 export function Urvogel() {
   return (
     <g className="dt-urvogel-body">
-      <path className="dt-urvogel-tail" d="M126 -362 Q150 -350 160 -322 Q146 -330 138 -326 Q140 -340 120 -352 Z" fill="#2f9e8f" style={{ transformOrigin: "124px -356px" }} />
+      <path
+        className="dt-urvogel-tail"
+        d="M126 -362 Q150 -350 160 -322 Q146 -330 138 -326 Q140 -340 120 -352 Z"
+        fill="#2f9e8f"
+        style={{ transformOrigin: "124px -356px" }}
+      />
       <path d="M104 -346 l-4 10 M114 -346 l2 10" stroke="#e08e2b" strokeWidth="3" strokeLinecap="round" />
       <ellipse cx="112" cy="-362" rx="22" ry="16" fill="#4cc9a6" />
       <ellipse cx="106" cy="-356" rx="12" ry="8" fill={CREAM} />
@@ -188,7 +198,15 @@ export function Seerose() {
       <g transform="translate(36 -12)">
         {[-50, -20, 20, 50].map((a, i) => (
           <g key={a} transform={`rotate(${a})`}>
-            <ellipse className="dt-rose-petal" cx="0" cy="-14" rx="8" ry="16" fill={i % 3 ? "#ffafcc" : "#ffc8dd"} style={{ ...nth(i), transformOrigin: "0px 0px" }} />
+            <ellipse
+              className="dt-rose-petal"
+              cx="0"
+              cy="-14"
+              rx="8"
+              ry="16"
+              fill={i % 3 ? "#ffafcc" : "#ffc8dd"}
+              style={{ ...nth(i), transformOrigin: "0px 0px" }}
+            />
           </g>
         ))}
         <ellipse cx="0" cy="-12" rx="7" ry="15" fill="#ffc8dd" />
@@ -281,7 +299,13 @@ function Egg({ x, y, rx, ry, baby, i, cls }: { x: number; y: number; rx: number;
         <path d={top} fill={CREAM} />
         <circle cx={x - rx * 0.4} cy={y - ry * 0.55} r={rx * 0.14} fill="#a5d8ff" />
         <circle cx={x + rx * 0.3} cy={y - ry * 0.7} r={rx * 0.1} fill="#a5d8ff" />
-        <path d={`M${x - rx * 0.5} ${y - ry * 0.4} Q${x - rx * 0.6} ${y - ry * 0.8} ${x - rx * 0.1} ${y - ry * 0.9}`} stroke="#fff" strokeWidth={rx * 0.12} strokeLinecap="round" fill="none" />
+        <path
+          d={`M${x - rx * 0.5} ${y - ry * 0.4} Q${x - rx * 0.6} ${y - ry * 0.8} ${x - rx * 0.1} ${y - ry * 0.9}`}
+          stroke="#fff"
+          strokeWidth={rx * 0.12}
+          strokeLinecap="round"
+          fill="none"
+        />
       </g>
       <circle cx={x + rx * 0.45} cy={y + ry * 0.4} r={rx * 0.12} fill="#a5d8ff" />
       <circle cx={x - rx * 0.3} cy={y + ry * 0.55} r={rx * 0.09} fill="#a5d8ff" />
@@ -317,8 +341,18 @@ export function DinoEi() {
       </g>
       <g className="dt-ei-egg">
         <g className="dt-ei-baby">
-          <path className="dt-ei-arm" d="M-24 -56 Q-44 -64 -46 -80 Q-38 -84 -34 -74 Q-30 -66 -20 -64 Z" fill={BABY} style={{ transformOrigin: "-22px -60px" }} />
-          <path className="dt-ei-arm dt-ei-arm-r" d="M24 -56 Q44 -64 46 -80 Q38 -84 34 -74 Q30 -66 20 -64 Z" fill={BABY} style={{ transformOrigin: "22px -60px" }} />
+          <path
+            className="dt-ei-arm"
+            d="M-24 -56 Q-44 -64 -46 -80 Q-38 -84 -34 -74 Q-30 -66 -20 -64 Z"
+            fill={BABY}
+            style={{ transformOrigin: "-22px -60px" }}
+          />
+          <path
+            className="dt-ei-arm dt-ei-arm-r"
+            d="M24 -56 Q44 -64 46 -80 Q38 -84 34 -74 Q30 -66 20 -64 Z"
+            fill={BABY}
+            style={{ transformOrigin: "22px -60px" }}
+          />
           <circle cx="0" cy="-66" r="27" fill={BABY} />
           <circle cx="-10" cy="-94" r="6" fill="#69db7c" />
           <circle cx="4" cy="-96" r="6" fill="#69db7c" />
@@ -335,7 +369,14 @@ export function DinoEi() {
           <circle cx="16" cy="-84" r="6" fill="#63e6be" />
           <circle cx="-14" cy="-74" r="4" fill="#63e6be" />
         </g>
-        <path className="dt-ei-crack" d="M-40 -56 L-28 -48 L-14 -60 L0 -48 L14 -60 L28 -48 L40 -56" stroke="#adb5bd" strokeWidth="3" strokeLinejoin="round" fill="none" />
+        <path
+          className="dt-ei-crack"
+          d="M-40 -56 L-28 -48 L-14 -60 L0 -48 L14 -60 L28 -48 L40 -56"
+          stroke="#adb5bd"
+          strokeWidth="3"
+          strokeLinejoin="round"
+          fill="none"
+        />
         <circle cx="20" cy="-26" r="7" fill="#63e6be" />
         <circle cx="-18" cy="-18" r="5" fill="#63e6be" />
         <circle cx="-4" cy="-36" r="4" fill="#63e6be" />
@@ -353,7 +394,12 @@ const LIZARD = "#f6bd60";
 export function Eidechse() {
   return (
     <g className="dt-echse-body">
-      <path className="dt-echse-tail" d="M-30 -96 Q0 -100 10 -112 Q20 -124 8 -128 Q2 -122 6 -116 Q-6 -104 -30 -104 Z" fill={LIZARD} style={{ transformOrigin: "-28px -100px" }} />
+      <path
+        className="dt-echse-tail"
+        d="M-30 -96 Q0 -100 10 -112 Q20 -124 8 -128 Q2 -122 6 -116 Q-6 -104 -30 -104 Z"
+        fill={LIZARD}
+        style={{ transformOrigin: "-28px -100px" }}
+      />
       <path d="M-60 -88 l-6 4 M-38 -88 l-4 5 M-80 -90 l-4 6" stroke="#e09f3e" strokeWidth="5" strokeLinecap="round" />
       <ellipse cx="-52" cy="-98" rx="30" ry="9" fill={LIZARD} />
       <g fill="#e09f3e">
@@ -387,7 +433,14 @@ export function Schnecke() {
       <path d="M50 -6 q4 3 8 0" stroke="#2b2d42" strokeWidth="2" strokeLinecap="round" fill="none" />
       <g className="dt-schnecke-shell" style={{ transformOrigin: "-4px -14px" }}>
         <circle cx="-4" cy="-36" r="28" fill="#f4a6c4" />
-        <path d="M-4 -36 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 1 1 12 12 a18 18 0 1 1 -18 -18" stroke="#d6336c" strokeOpacity="0.6" strokeWidth="4" strokeLinecap="round" fill="none" />
+        <path
+          d="M-4 -36 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 1 1 12 12 a18 18 0 1 1 -18 -18"
+          stroke="#d6336c"
+          strokeOpacity="0.6"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+        />
         <path d="M-26 -50 Q-18 -64 -4 -64" stroke="#fff" strokeOpacity="0.5" strokeWidth="5" strokeLinecap="round" fill="none" />
       </g>
     </g>

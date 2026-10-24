@@ -192,7 +192,12 @@ export function Eiszapfen() {
     <>
       {ICICLES.map(([x, len], i) => (
         <g key={x} className="wb-eis-zapfen" style={nth(i % 5)}>
-          <path d={`M${x - 5} 492 Q${x - 1} ${492 + len * 0.5} ${x} ${492 + len} Q${x + 1} ${492 + len * 0.5} ${x + 5} 492 Z`} fill={ICE} stroke="#9fd3f5" strokeWidth="1" />
+          <path
+            d={`M${x - 5} 492 Q${x - 1} ${492 + len * 0.5} ${x} ${492 + len} Q${x + 1} ${492 + len * 0.5} ${x + 5} 492 Z`}
+            fill={ICE}
+            stroke="#9fd3f5"
+            strokeWidth="1"
+          />
           <path d={`M${x - 2} 494 L${x - 1} ${492 + len * 0.6}`} stroke="#fff" strokeWidth="1.5" strokeLinecap="round" />
         </g>
       ))}

@@ -69,10 +69,7 @@ const BLOSSOMS = [
 export function Kirschbaum() {
   return (
     <>
-      <path
-        d="M-34 0 Q-24 -120 -22 -230 L-64 -330 L-46 -340 L-8 -262 L-4 -380 L14 -380 L16 -262 L58 -344 L76 -332 L26 -232 Q26 -120 34 0 Z"
-        fill="#8d5f45"
-      />
+      <path d="M-34 0 Q-24 -120 -22 -230 L-64 -330 L-46 -340 L-8 -262 L-4 -380 L14 -380 L16 -262 L58 -344 L76 -332 L26 -232 Q26 -120 34 0 Z" fill="#8d5f45" />
       <path d="M-4 -40 Q-2 -120 0 -220 M16 -60 Q14 -140 14 -200" stroke="#a47148" strokeWidth="5" strokeLinecap="round" fill="none" />
       {/* The branch to the nest */}
       <path d="M18 -228 Q100 -252 236 -246" stroke="#8d5f45" strokeWidth="13" strokeLinecap="round" fill="none" />
@@ -81,7 +78,11 @@ export function Kirschbaum() {
           <circle key={i} cx={cx} cy={cy} r={r} fill={fill} />
         ))}
         {/* Darker underside and soft light on top */}
-        <path d="M-270 -360 Q-200 -270 -100 -300 Q0 -280 100 -310 Q200 -290 276 -370 Q200 -320 100 -340 Q0 -310 -100 -330 Q-200 -300 -270 -360 Z" fill="#f799b9" opacity="0.5" />
+        <path
+          d="M-270 -360 Q-200 -270 -100 -300 Q0 -280 100 -310 Q200 -290 276 -370 Q200 -320 100 -340 Q0 -310 -100 -330 Q-200 -300 -270 -360 Z"
+          fill="#f799b9"
+          opacity="0.5"
+        />
         <ellipse cx="-80" cy="-600" rx="70" ry="26" fill="#fff" opacity="0.4" />
         {BLOSSOMS.map(([x, y], i) => (
           <Blossom key={i} x={x} y={y} r={13} fill="#fff" centre="#ff6b9a" className="os-kb-blossom" i={i} />
@@ -165,7 +166,18 @@ export function Osterstrauch() {
       {/* A yellow bow on the trunk */}
       <path d="M0 -120 L-24 -134 L-24 -106 Z M0 -120 L24 -134 L24 -106 Z" fill="#ffd43b" />
       <circle cx="0" cy="-120" r="6" fill="#fab005" />
-      <Sparkles className="os-strauch-spark" spots={[[-190, -380], [170, -400], [-200, -200], [200, -190], [0, -450]]} r={12} fill="#fff3bf" />
+      <Sparkles
+        className="os-strauch-spark"
+        spots={[
+          [-190, -380],
+          [170, -400],
+          [-200, -200],
+          [200, -190],
+          [0, -450],
+        ]}
+        r={12}
+        fill="#fff3bf"
+      />
     </>
   );
 }
@@ -198,15 +210,24 @@ export function HohlerBaum() {
             {[0.35, 0.55, 0.75, 0.95].map((t) => {
               const px = x * 0.25 + (x - x * 0.25) * t;
               const py = -284 + (y + 284) * t - 10 * Math.sin(t * Math.PI);
-              return <ellipse key={t} cx={px + 4} cy={py} rx="5" ry="8" fill="#e9ecef" stroke="#ced4da" strokeWidth="1.5" transform={`rotate(${x / 6} ${px + 4} ${py})`} />;
+              return (
+                <ellipse
+                  key={t}
+                  cx={px + 4}
+                  cy={py}
+                  rx="5"
+                  ry="8"
+                  fill="#e9ecef"
+                  stroke="#ced4da"
+                  strokeWidth="1.5"
+                  transform={`rotate(${x / 6} ${px + 4} ${py})`}
+                />
+              );
             })}
           </g>
         ))}
       </g>
-      <path
-        d="M-82 0 Q-70 -60 -64 -140 Q-68 -230 -88 -272 Q-50 -304 0 -296 Q50 -304 88 -272 Q68 -230 64 -140 Q70 -60 82 0 Z"
-        fill="#8d6e63"
-      />
+      <path d="M-82 0 Q-70 -60 -64 -140 Q-68 -230 -88 -272 Q-50 -304 0 -296 Q50 -304 88 -272 Q68 -230 64 -140 Q70 -60 82 0 Z" fill="#8d6e63" />
       <path d="M-88 -272 Q-50 -304 0 -296 Q50 -304 88 -272 Q50 -284 0 -278 Q-50 -284 -88 -272 Z" fill="#6d4c41" />
       <g stroke="#6d4c41" strokeWidth="4" strokeLinecap="round" fill="none">
         <path d="M-50 -250 Q-46 -200 -54 -150 M44 -260 Q50 -240 46 -232 M-30 -20 Q-34 -60 -50 -90 M54 -20 Q50 -60 56 -100" />
@@ -273,7 +294,11 @@ export function Forsythie() {
         {BUSH.map(([cx, cy, r, fill], i) => (
           <circle key={i} cx={cx} cy={cy} r={r} fill={fill} />
         ))}
-        <path d="M-180 -80 Q-150 -20 -60 -30 Q0 -14 60 -30 Q150 -20 180 -80 Q120 -50 60 -60 Q0 -44 -60 -60 Q-120 -50 -180 -80 Z" fill="#f59f00" opacity="0.45" />
+        <path
+          d="M-180 -80 Q-150 -20 -60 -30 Q0 -14 60 -30 Q150 -20 180 -80 Q120 -50 60 -60 Q0 -44 -60 -60 Q-120 -50 -180 -80 Z"
+          fill="#f59f00"
+          opacity="0.45"
+        />
         <g stroke="#a47148" strokeWidth="3" strokeLinecap="round" fill="none" opacity="0.7">
           <path d="M-150 -120 Q-80 -170 -40 -240 M150 -120 Q80 -170 40 -240 M-20 -60 Q-60 -110 -140 -140 M20 -60 Q60 -110 140 -140" />
         </g>
@@ -340,8 +365,18 @@ export function Tulpen() {
             <g className="os-tulpe-r" style={{ transformOrigin: `${x + 4}px ${top}px` }}>
               <path d={`M${x + 4} ${top} Q${x + 24} ${top - 6} ${x + 18} ${top - 40} Q${x + 6} ${top - 30} ${x} ${top - 20} Z`} fill={fill} />
             </g>
-            <path d={`M${x - 10} ${top - 2} Q${x} ${top + 4} ${x + 10} ${top - 2} L${x + 6} ${top - 36} L${x} ${top - 26} L${x - 6} ${top - 36} Z`} fill={fill} />
-            <path d={`M${x - 6} ${top - 10} Q${x - 8} ${top - 22} ${x - 4} ${top - 30}`} stroke="#fff" strokeOpacity="0.5" strokeWidth="3" strokeLinecap="round" fill="none" />
+            <path
+              d={`M${x - 10} ${top - 2} Q${x} ${top + 4} ${x + 10} ${top - 2} L${x + 6} ${top - 36} L${x} ${top - 26} L${x - 6} ${top - 36} Z`}
+              fill={fill}
+            />
+            <path
+              d={`M${x - 6} ${top - 10} Q${x - 8} ${top - 22} ${x - 4} ${top - 30}`}
+              stroke="#fff"
+              strokeOpacity="0.5"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+            />
           </g>
         );
       })}
@@ -350,7 +385,17 @@ export function Tulpen() {
         const a = Math.PI * (0.1 + (i * 0.8) / 8);
         return <ellipse key={i} cx={-124 * Math.cos(a)} cy={-10 + 22 * Math.sin(a)} rx="15" ry="9" fill={i % 2 ? "#ced4da" : "#dee2e6"} />;
       })}
-      <Sparkles className="os-tulpe-spark" spots={[[-110, -150], [-20, -180], [70, -190], [120, -130]]} r={11} fill="#fff3bf" />
+      <Sparkles
+        className="os-tulpe-spark"
+        spots={[
+          [-110, -150],
+          [-20, -180],
+          [70, -190],
+          [120, -130],
+        ]}
+        r={11}
+        fill="#fff3bf"
+      />
     </>
   );
 }
@@ -406,7 +451,10 @@ export function Pusteblume() {
   const cy = -168;
   return (
     <>
-      <path d="M0 0 Q-30 -10 -54 -34 Q-40 -30 -36 -40 Q-30 -26 -20 -30 Q-14 -18 0 0 Z M0 0 Q30 -6 52 -30 Q40 -26 36 -36 Q28 -22 20 -26 Q12 -14 0 0 Z" fill="#40916c" />
+      <path
+        d="M0 0 Q-30 -10 -54 -34 Q-40 -30 -36 -40 Q-30 -26 -20 -30 Q-14 -18 0 0 Z M0 0 Q30 -6 52 -30 Q40 -26 36 -36 Q28 -22 20 -26 Q12 -14 0 0 Z"
+        fill="#40916c"
+      />
       <path d={`M0 0 Q-10 -80 ${cx} ${cy}`} stroke="#69db7c" strokeWidth="5" fill="none" />
       <path d="M4 0 Q20 -60 38 -104" stroke="#69db7c" strokeWidth="5" fill="none" />
       <g className="os-puste-flower" style={{ transformOrigin: "38px -104px" }}>

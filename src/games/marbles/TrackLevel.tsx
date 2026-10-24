@@ -1,6 +1,20 @@
 import { useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
-import { playBells, playBlub, playBoing, playCountNote, playDeepNote, playDing, playKnock, playPlop, playPop, playRumble, playSwirl, playThump, playTick } from "@/lib/sfx";
+import {
+  playBells,
+  playBlub,
+  playBoing,
+  playCountNote,
+  playDeepNote,
+  playDing,
+  playKnock,
+  playPlop,
+  playPop,
+  playRumble,
+  playSwirl,
+  playThump,
+  playTick,
+} from "@/lib/sfx";
 import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import {
   BALL_R,
@@ -360,9 +374,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: LevelProps) {
   const t = now.current;
   const started = pick ? nextId.current > 0 : openedAt.current !== null;
   const flagAge = t - fullAt.current;
-  const spot = (i: number, layer: "back" | "front") => (
-    <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />
-  );
+  const spot = (i: number, layer: "back" | "front") => <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />;
 
   return (
     <div className="marble-level" onPointerDown={open}>
@@ -391,7 +403,13 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: LevelProps) {
         {SLOTS.map((_, i) => spot(i, "back"))}
 
         {/* Seesaw */}
-        <path d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`} fill="#8a5a2b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path
+          d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`}
+          fill="#8a5a2b"
+          stroke={INK}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
         <g transform={`translate(${SEESAW.cx} ${SEESAW.cy}) rotate(${tilt.current})`}>
           <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
           <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
@@ -411,7 +429,15 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: LevelProps) {
           return <RollerBody key={l.id} kind={l.kind} color={l.color} x={x} y={y} spin={0} />;
         })}
         {marbles.current.map((m) => (
-          <RollerBody key={m.id} kind={m.kind} color={m.color} x={m.x} y={m.y} spin={m.spin} scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : 1} />
+          <RollerBody
+            key={m.id}
+            kind={m.kind}
+            color={m.color}
+            x={m.x}
+            y={m.y}
+            spin={m.spin}
+            scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : 1}
+          />
         ))}
         {pops.current.map((p) => (
           <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
@@ -521,8 +547,22 @@ function RollerBody({ kind, color, x, y, spin, scale = 1 }: { kind: Roller; colo
       body = (
         <g>
           <circle r={r} fill="#d6f1ff" fillOpacity="0.35" stroke="#7fc8f8" strokeWidth="2.5" />
-          <path d={`M${-r * 0.8} ${r * 0.3} A${r * 0.85} ${r * 0.85} 0 0 0 ${r * 0.3} ${r * 0.8}`} fill="none" stroke="#ff7bd0" strokeWidth="3" opacity="0.6" strokeLinecap="round" />
-          <path d={`M${r * 0.45} ${-r * 0.62} A${r * 0.78} ${r * 0.78} 0 0 1 ${r * 0.75} ${-r * 0.1}`} fill="none" stroke="#ffd23f" strokeWidth="3" opacity="0.6" strokeLinecap="round" />
+          <path
+            d={`M${-r * 0.8} ${r * 0.3} A${r * 0.85} ${r * 0.85} 0 0 0 ${r * 0.3} ${r * 0.8}`}
+            fill="none"
+            stroke="#ff7bd0"
+            strokeWidth="3"
+            opacity="0.6"
+            strokeLinecap="round"
+          />
+          <path
+            d={`M${r * 0.45} ${-r * 0.62} A${r * 0.78} ${r * 0.78} 0 0 1 ${r * 0.75} ${-r * 0.1}`}
+            fill="none"
+            stroke="#ffd23f"
+            strokeWidth="3"
+            opacity="0.6"
+            strokeLinecap="round"
+          />
           <ellipse cx={-r * 0.38} cy={-r * 0.42} rx="7" ry="4" transform={`rotate(-40 ${-r * 0.38} ${-r * 0.42})`} fill="#fff" opacity="0.9" />
         </g>
       );
@@ -682,7 +722,13 @@ export function Ball({ color, x, y, spin }: { color: string; x: number; y: numbe
   return (
     <g transform={`translate(${x} ${y})`}>
       <circle r={BALL_R} fill={color} stroke={INK} strokeWidth="3" />
-      <path d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`} transform={`rotate(${(spin * 180) / Math.PI})`} fill="none" stroke="#fff6" strokeWidth="5" />
+      <path
+        d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`}
+        transform={`rotate(${(spin * 180) / Math.PI})`}
+        fill="none"
+        stroke="#fff6"
+        strokeWidth="5"
+      />
       <circle cx="-7" cy="-8" r="5.5" fill="#fff" opacity="0.75" />
     </g>
   );
@@ -691,7 +737,13 @@ export function Ball({ color, x, y, spin }: { color: string; x: number; y: numbe
 function Hopper() {
   return (
     <g>
-      <path d={`M${HOPPER.x - 58} -10 L${HOPPER.x + 58} -10 L${HOPPER.x + 28} 62 L${HOPPER.x - 28} 62 Z`} fill="#8e7dff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${HOPPER.x - 58} -10 L${HOPPER.x + 58} -10 L${HOPPER.x + 28} 62 L${HOPPER.x - 28} 62 Z`}
+        fill="#8e7dff"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <path d={`M${HOPPER.x - 36} 8 L${HOPPER.x + 36} 8`} stroke="#fff8" strokeWidth="6" strokeLinecap="round" />
     </g>
   );
@@ -735,7 +787,13 @@ function Flag({ rise, sway }: { rise: number; sway: number }) {
 function Bell({ x, y, angle }: { x: number; y: number; angle: number }) {
   return (
     <g transform={`translate(${x} ${y}) rotate(${angle})`}>
-      <path d="M-4 0 L4 0 L5 12 C22 16 28 34 30 58 L34 64 L-34 64 L-30 58 C-28 34 -22 16 -5 12 Z" fill="#ffc93c" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d="M-4 0 L4 0 L5 12 C22 16 28 34 30 58 L34 64 L-34 64 L-30 58 C-28 34 -22 16 -5 12 Z"
+        fill="#ffc93c"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       <path d="M-18 28 C-16 22 -12 19 -8 18" stroke="#fff9" strokeWidth="4" fill="none" strokeLinecap="round" />
       <circle cx="0" cy="70" r="7" fill="#c98a00" stroke={INK} strokeWidth="3" />
     </g>
@@ -809,7 +867,13 @@ function Basket() {
   const { x0, x1, rimY, bottomY } = BASKET;
   return (
     <g>
-      <path d={`M${x0} ${rimY} L${x1} ${rimY} L${x1 - 14} ${bottomY} L${x0 + 14} ${bottomY} Z`} fill="#c98a4b" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x0} ${rimY} L${x1} ${rimY} L${x1 - 14} ${bottomY} L${x0 + 14} ${bottomY} Z`}
+        fill="#c98a4b"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       {[0, 1, 2].map((i) => {
         const yy = rimY + 14 + i * 15;
         return <line key={i} x1={x0 + 6} y1={yy} x2={x1 - 6} y2={yy} stroke="#9b6330" strokeWidth="4" />;

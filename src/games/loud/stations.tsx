@@ -80,9 +80,15 @@ export function Candles({ step, done, sound }: StationProps) {
       <g className="bl-target">
         <ellipse cx="500" cy="470" rx="190" ry="16" fill="#fff" stroke="#e0d6c8" strokeWidth="4" />
         <rect x="350" y="380" width="300" height="88" rx="18" fill="#f4a3b4" />
-        <path d="M350 400 Q350 380 370 380 H630 Q650 380 650 400 V408 Q630 426 612 408 Q594 426 576 408 Q558 426 540 408 Q522 426 504 408 Q486 426 468 408 Q450 426 432 408 Q414 426 396 408 Q378 426 360 408 Q354 404 350 408 Z" fill="#fff" />
+        <path
+          d="M350 400 Q350 380 370 380 H630 Q650 380 650 400 V408 Q630 426 612 408 Q594 426 576 408 Q558 426 540 408 Q522 426 504 408 Q486 426 468 408 Q450 426 432 408 Q414 426 396 408 Q378 426 360 408 Q354 404 350 408 Z"
+          fill="#fff"
+        />
         <rect x="400" y="300" width="200" height="82" rx="16" fill="#9b5de5" />
-        <path d="M400 318 Q400 300 416 300 H584 Q600 300 600 318 V324 Q585 340 570 324 Q555 340 540 324 Q525 340 510 324 Q495 340 480 324 Q465 340 450 324 Q435 340 420 324 Q408 336 400 326 Z" fill="#fff" />
+        <path
+          d="M400 318 Q400 300 416 300 H584 Q600 300 600 318 V324 Q585 340 570 324 Q555 340 540 324 Q525 340 510 324 Q495 340 480 324 Q465 340 450 324 Q435 340 420 324 Q408 336 400 326 Z"
+          fill="#fff"
+        />
         {[380, 440, 500, 560, 620].map((x) => (
           <circle key={x} cx={x} cy="446" r="9" fill="#d62828" />
         ))}
@@ -93,7 +99,14 @@ export function Candles({ step, done, sound }: StationProps) {
             <path d={`M${x} 232 v-8`} stroke="#333" strokeWidth="3" strokeLinecap="round" />
             <g transform={`translate(${x} 226)`}>
               {out[i] ? (
-                <path className="bl-smoke" d="M0 0 q-10 -14 0 -28 q10 -14 0 -28 q-10 -14 0 -26" stroke="#9a9aa8" strokeWidth="5" fill="none" strokeLinecap="round" />
+                <path
+                  className="bl-smoke"
+                  d="M0 0 q-10 -14 0 -28 q10 -14 0 -28 q-10 -14 0 -26"
+                  stroke="#9a9aa8"
+                  strokeWidth="5"
+                  fill="none"
+                  strokeLinecap="round"
+                />
               ) : (
                 <g className="bl-flame">
                   <circle cy="-20" r="26" fill="#ffd16655" />
@@ -228,11 +241,7 @@ export function Dandelion({ step, done }: StationProps) {
         {flights.map(
           (f, i) =>
             f && (
-              <g
-                key={i}
-                className="bl-seed-fly"
-                style={{ "--dx": `${f.dx}px`, "--dy": `${f.dy}px`, animationDuration: `${f.seconds}s` } as CSSProperties}
-              >
+              <g key={i} className="bl-seed-fly" style={{ "--dx": `${f.dx}px`, "--dy": `${f.dy}px`, animationDuration: `${f.seconds}s` } as CSSProperties}>
                 {seed(i)}
               </g>
             ),
@@ -306,7 +315,11 @@ export function Pinwheel({ step, done, sound }: StationProps) {
       ))}
 
       <rect x="493" y={PIN.y} width="14" height={548 - PIN.y} rx="6" fill="#fff" stroke="#c9c2b8" strokeWidth="2" />
-      <path d={`M493 ${PIN.y + 40} l14 -12 M493 ${PIN.y + 100} l14 -12 M493 ${PIN.y + 160} l14 -12 M493 ${PIN.y + 220} l14 -12`} stroke="#ff5d73" strokeWidth="6" />
+      <path
+        d={`M493 ${PIN.y + 40} l14 -12 M493 ${PIN.y + 100} l14 -12 M493 ${PIN.y + 160} l14 -12 M493 ${PIN.y + 220} l14 -12`}
+        stroke="#ff5d73"
+        strokeWidth="6"
+      />
       <g className="bl-target">
         <g transform={`translate(${PIN.x} ${PIN.y})`}>
           <g ref={rotorRef}>
@@ -348,11 +361,7 @@ export function Boat({ step, done, sound }: StationProps) {
   };
 
   const waves = (y: number, color: string, className: string) => (
-    <path
-      className={className}
-      d={`M-1000 ${y} ${Array.from({ length: 40 }, () => "q20 -14 40 0 q20 14 40 0").join(" ")} V600 H-1000 Z`}
-      fill={color}
-    />
+    <path className={className} d={`M-1000 ${y} ${Array.from({ length: 40 }, () => "q20 -14 40 0 q20 14 40 0").join(" ")} V600 H-1000 Z`} fill={color} />
   );
 
   return (

@@ -25,7 +25,21 @@ export function Lines({ x, y, dir = 1, colour = INK, size = 1 }: { x: number; y:
 }
 
 /** Cold mist (or warm steam with `colour`) that puffs up from around (x, y) while the item plays. */
-export function Mist({ x, y, count = 3, spread = 24, r = 12, colour = "#e7f5ff" }: { x: number; y: number; count?: number; spread?: number; r?: number; colour?: string }) {
+export function Mist({
+  x,
+  y,
+  count = 3,
+  spread = 24,
+  r = 12,
+  colour = "#e7f5ff",
+}: {
+  x: number;
+  y: number;
+  count?: number;
+  spread?: number;
+  r?: number;
+  colour?: string;
+}) {
   return (
     <g className="sm-mist" fill={colour}>
       {Array.from({ length: count }, (_, i) => (

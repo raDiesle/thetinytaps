@@ -1,0 +1,407 @@
+/* Loaded for the whole app: src/globals.css imports it in order, so the cascade stays the same. */
+
+/* ---------- Letters & numbers ---------- */
+
+.letters-play,
+.words-play {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.4s;
+}
+
+/* The card's room: the whole screen, or what the on-screen keys leave. Cards size themselves to it (cqh / cqw). */
+.stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  container-type: size;
+}
+
+/* ---------- On-screen keys (tablets) ---------- */
+
+.touch-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.2vh, 12px);
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(8px, 1.6vh, 16px) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+}
+
+/* Ten keys per row; a shorter last row is centred. */
+.touch-row {
+  --gap: clamp(5px, 1vw, 12px);
+  display: flex;
+  justify-content: center;
+  gap: var(--gap);
+}
+
+.touch-key {
+  flex: 0 0 calc((100% - 9 * var(--gap)) / 10);
+  height: clamp(44px, 9vh, 84px);
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: var(--key);
+  color: #fff;
+  font-family: inherit;
+  font-size: clamp(1.4rem, 4.5vh, 2.6rem);
+  font-weight: 700;
+  -webkit-text-stroke: 0.08em var(--ink);
+  paint-order: stroke fill;
+  box-shadow: 0 5px 0 var(--ink);
+  touch-action: none;
+  cursor: pointer;
+}
+
+.touch-key:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.touch-key.wanted {
+  outline: 4px dashed var(--ink);
+  outline-offset: 3px;
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+.letters-welcome {
+  margin: 0;
+  padding: 0 24px;
+  text-align: center;
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 700;
+  animation: bob 1.6s ease-in-out infinite;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1cqh;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+
+.glyphs {
+  display: flex;
+  gap: 0.25em;
+  font-size: min(26cqh, 34cqw);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.glyphs span:nth-child(2) {
+  color: var(--accent);
+}
+
+/* Arrow keys push the card around the stage; see LettersPlay. */
+.card-box {
+  display: flex;
+  justify-content: center;
+  transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Tracing: the letter as dots on a canvas, stars wherever the finger has been. See TraceGlyphs. */
+.glyphs.trace {
+  position: relative;
+  display: block;
+}
+
+.glyphs.trace canvas {
+  display: block;
+}
+
+.trace-star {
+  position: absolute;
+  translate: -50% -50%;
+  rotate: var(--rotate);
+  pointer-events: none;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* "A a" as mother and baby, holding hands. */
+.glyphs.family {
+  gap: 0;
+  align-items: flex-end;
+}
+
+.glyphs.family .mama,
+.glyphs.family .baby {
+  position: relative;
+  transform-origin: 50% 90%;
+  animation: family-sway 2.2s ease-in-out infinite;
+}
+
+.glyphs.family .baby {
+  color: var(--accent);
+  animation-name: family-hop;
+  animation-delay: 0.3s;
+  cursor: pointer;
+}
+
+.glyphs.family .baby.grown {
+  animation: family-grow 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.glyphs.family .hands {
+  align-self: center;
+  width: 0.5em;
+  margin: 0.2em -0.1em 0;
+  overflow: visible;
+}
+
+.hands path {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.hands circle {
+  fill: #ff7bd0;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+/* Eyes sit on top of the letter: at cap height for the big one, x-height for the small one. */
+.eyes {
+  position: absolute;
+  left: 50%;
+  top: 0.12em;
+  display: flex;
+  gap: 0.03em;
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.baby:not(.grown) .eyes {
+  top: 0.36em;
+}
+
+.eyes span {
+  width: 0.17em;
+  height: 0.2em;
+  border: 0.025em solid var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 62%, var(--ink) 0 32%, #fff 34%);
+  animation: blink 4s infinite;
+}
+
+.baby .eyes span {
+  width: 0.13em;
+  height: 0.15em;
+}
+
+@keyframes family-sway {
+  0%,
+  100% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes family-hop {
+  0%,
+  100% {
+    transform: rotate(5deg);
+  }
+  25% {
+    transform: translateY(-0.08em);
+  }
+  50% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes family-grow {
+  from {
+    transform: scale(0.6);
+  }
+}
+
+@keyframes blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+
+.picture {
+  font-family: var(--font-emoji);
+  font-size: min(30cqh, 40cqw);
+  line-height: 1.1;
+  animation: wiggle 2.4s ease-in-out 0.5s infinite;
+}
+
+.picture-image {
+  width: min(36cqh, 48cqw);
+  height: auto;
+}
+
+.word {
+  font-size: min(9cqh, 12cqw);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.first-letter {
+  color: var(--accent);
+}
+
+.count-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: max(1.5cqh, 8px);
+}
+
+.count-row {
+  display: flex;
+  gap: max(2cqw, 8px);
+}
+
+.count-item {
+  display: block;
+  font-family: var(--font-emoji);
+  font-size: min(14cqh, 16cqw);
+  line-height: 1.1;
+}
+
+.count-1 .count-item,
+.count-2 .count-item,
+.count-3 .count-item {
+  font-size: min(22cqh, 24cqw);
+}
+
+/* Counting by tapping: things wait pale until tapped, then hop and keep their number. */
+.count-tap {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.count-tap .count-item {
+  filter: grayscale(1);
+  opacity: 0.45;
+  transition:
+    filter 0.3s,
+    opacity 0.3s;
+}
+
+.count-tap.counted .count-item {
+  filter: none;
+  opacity: 1;
+  animation: hop 0.45s ease-in-out;
+}
+
+.count-badge {
+  position: absolute;
+  top: -0.2em;
+  right: -0.35em;
+  min-width: 1.5em;
+  padding: 0.1em 0.3em;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-size: min(5cqh, 6cqw);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Parts that appear later keep their space; see Reveal in Cards.tsx. */
+.reveal {
+  border-radius: 24px;
+}
+
+.reveal:not(.shown) > * {
+  visibility: hidden;
+}
+
+.reveal.shown {
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.reveal.waiting {
+  outline: 4px dashed #2b2d4230;
+  outline-offset: 2px;
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+@keyframes waiting {
+  50% {
+    outline-color: #2b2d4260;
+    transform: scale(1.03);
+  }
+}
+
+.burst-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.burst {
+  position: absolute;
+  animation: burst var(--lifetime) ease-out forwards;
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-6deg) scale(1.04);
+  }
+  75% {
+    transform: rotate(6deg) scale(1.04);
+  }
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(0);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.15) rotate(var(--rotate));
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-120px) scale(0.9) rotate(calc(var(--rotate) * 2));
+  }
+}

@@ -13,7 +13,7 @@ const shoreLine = XS.map((x) => `${x} ${shoreY(x)}`).join(" L");
 
 /** Wave lines spread over the sea, denser far away, never below the water's edge. */
 const SEA_LINES = Array.from({ length: 52 }, (_, i) => {
-  const x = (i * 337) % 1640 - 20;
+  const x = ((i * 337) % 1640) - 20;
   const t = ((i * 53) % 52) / 52;
   const y = HORIZON + 14 + t * t * (shoreY(x) - HORIZON - 40);
   return [x, y];
@@ -21,7 +21,7 @@ const SEA_LINES = Array.from({ length: 52 }, (_, i) => {
 
 // Pebbles and shells on the sand: [x, y, kind].
 const PEBBLES = Array.from({ length: 46 }, (_, i) => {
-  const x = (i * 211) % 1620 - 10;
+  const x = ((i * 211) % 1620) - 10;
   const t = ((i * 37) % 46) / 46;
   const top = shoreY(x) + 40;
   return [x, top + Math.sqrt(t) * (990 - top), i % 5];
@@ -81,7 +81,15 @@ function Sea() {
       <g className="sd-sea-lines" stroke="#d0ebff" strokeLinecap="round" fill="none" opacity="0.8">
         {SEA_LINES.map(([x, y], i) => {
           const s = depthScale(y);
-          return <path key={i} className="sd-sea-wave" d={`M${x} ${y} q${10 * s} ${-7 * s} ${20 * s} 0 q${10 * s} ${7 * s} ${20 * s} 0`} strokeWidth={3 * s} style={nth(i % 4)} />;
+          return (
+            <path
+              key={i}
+              className="sd-sea-wave"
+              d={`M${x} ${y} q${10 * s} ${-7 * s} ${20 * s} 0 q${10 * s} ${7 * s} ${20 * s} 0`}
+              strokeWidth={3 * s}
+              style={nth(i % 4)}
+            />
+          );
         })}
       </g>
       {/* Foam where the waves break on the lighthouse rock */}
@@ -98,7 +106,13 @@ function Beach() {
   return (
     <g>
       <path d={`M${shoreLine} L1650 1010 H-50 Z`} fill="url(#sd-sand)" />
-      <path d={`M${shoreLine} L${[...XS].reverse().map((x) => `${x} ${shoreY(x) + 26 * depthScale(shoreY(x))}`).join(" L")} Z`} fill="#e4bf82" />
+      <path
+        d={`M${shoreLine} L${[...XS]
+          .reverse()
+          .map((x) => `${x} ${shoreY(x) + 26 * depthScale(shoreY(x))}`)
+          .join(" L")} Z`}
+        fill="#e4bf82"
+      />
       <path d={`M${wet}`} stroke="#ecd09a" strokeWidth="4" fill="none" opacity="0.8" />
       <g className="sd-foam">
         <path d={`M${XS.map((x) => `${x} ${shoreY(x) - 2}`).join(" L")}`} stroke="#fff" strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.9" />
@@ -119,7 +133,12 @@ function Beach() {
           [1500, 870],
         ].map(([x, y]) => {
           const s = depthScale(y);
-          return <path key={`${x}-${y}`} d={`M${x} ${y} q${30 * s} ${-10 * s} ${60 * s} 0 q${30 * s} ${10 * s} ${60 * s} 0 M${x + 20 * s} ${y + 14 * s} q${30 * s} ${-10 * s} ${60 * s} 0`} />;
+          return (
+            <path
+              key={`${x}-${y}`}
+              d={`M${x} ${y} q${30 * s} ${-10 * s} ${60 * s} 0 q${30 * s} ${10 * s} ${60 * s} 0 M${x + 20 * s} ${y + 14 * s} q${30 * s} ${-10 * s} ${60 * s} 0`}
+            />
+          );
         })}
       </g>
       {PEBBLES.map(([x, y, kind], i) => {
@@ -134,7 +153,11 @@ function Beach() {
       })}
       <g stroke="#94b86a" strokeWidth="5" strokeLinecap="round" fill="none">
         {GRASS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q-6 -30 -20 -44 M6 0 q0 -36 4 -56 M12 0 q8 -26 24 -38 M-6 0 q-10 -18 -26 -22" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <path
+            key={`${x}-${y}`}
+            d="M0 0 q-6 -30 -20 -44 M6 0 q0 -36 4 -56 M12 0 q8 -26 24 -38 M-6 0 q-10 -18 -26 -22"
+            transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
+          />
         ))}
       </g>
     </g>
