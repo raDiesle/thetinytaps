@@ -1137,6 +1137,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Laut und leise bekommt einen Puste-Modus: Ins Mikrofon pusten bläst Kerzen aus, lässt eine Pusteblume fliegen, dreht ein Windrad oder treibt ein Segelboot an.",
         why: "Pusten ist für Kleine ein großer Spaß und eine gute Mundmotorik-Übung.",
         effort: "S",
+        done: true,
       },
       {
         id: "X-07",

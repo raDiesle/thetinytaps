@@ -7,7 +7,7 @@ import { unlockAudio } from "@/lib/sfx";
 import { useStoredSettings } from "@/lib/storage";
 import { createEar, meterAt, useMicPermission, useMicrophone, type Heard } from "./mic";
 import { LoudPlay } from "./LoudPlay";
-import { DEFAULT_LOUD_SETTINGS, LOUD_SETTINGS_KEY, type Sensitivity } from "./settings";
+import { DEFAULT_LOUD_SETTINGS, LOUD_SETTINGS_KEY, type LoudLevels, type Sensitivity } from "./settings";
 import "./loud.css";
 
 export function LoudGame() {
@@ -19,14 +19,36 @@ export function LoudGame() {
       emoji="🦁"
       settings={
         <>
+          <SettingsGroup title="Spiele">
+            <Choice<LoudLevels>
+              label="Spielen"
+              value={settings.levels}
+              onChange={(levels) => update({ levels })}
+              options={[
+                { value: "all", label: "Beides nacheinander" },
+                { value: "voice", label: "🦁 Nur Löwe und Maus" },
+                { value: "blow", label: "🌬️ Nur Pusten" },
+              ]}
+            />
+            <p className="setting-note">
+              Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus.
+              Nacheinander geht es nach zehn Tönen weiter zum Pusten.
+            </p>
+            <p className="setting-note">
+              Pusten: Ins Mikrofon pusten bläst die Kerzen auf dem Geburtstagskuchen aus, lässt die Schirmchen der Pusteblume fliegen,
+              dreht ein Windrad, bis der Regenbogen fertig ist, und treibt das Segelboot mit der Maus zum Löwen. Lautes Rufen pustet
+              auch.
+            </p>
+          </SettingsGroup>
+
           <SettingsGroup title="Mikrofon">
             <p className="setting-note">
-              Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Das Spiel misst
-              nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch.
+              Das Spiel misst nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch:
+              Ein Tipp ist ein kurzer Puster, Finger draufhalten pustet weiter.
             </p>
             <MicCheck sensitivity={settings.sensitivity} />
             <Choice<Sensitivity>
-              label="Wie laut für den Löwen?"
+              label="Wie laut für den Löwen (und für ganz fest pusten)?"
               value={settings.sensitivity}
               onChange={(sensitivity) => update({ sensitivity })}
               options={[

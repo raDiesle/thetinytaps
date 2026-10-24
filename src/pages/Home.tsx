@@ -14,7 +14,7 @@ const GAMES = [
   { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen", text: "Zwei Minuten putzen, bis alle Zuckermonster weg sind." },
   { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?", text: "Tiere füttern und ihr Zuhause finden." },
   { href: "/schatten/", emoji: "👤", title: "Schatten finden", text: "Welcher Schatten gehört zum Bild? Antippen oder hinziehen." },
-  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise", text: "Laut rufen – der Löwe brüllt. Leise flüstern – die Maus piepst." },
+  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise", text: "Laut rufen – der Löwe brüllt. Leise flüstern – die Maus piepst. Pusten – die Kerzen gehen aus." },
   { href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn", text: "Tippen – die Kugel rollt, klingelt und plumpst in den Korb. Oder alles fällt um, oder eine ganze Maschine läuft los." },
   { href: "/aufzug/", emoji: "🛗", title: "Aufzug", text: "Großen Knopf drücken – der Aufzug fährt, pling, und ein Tier steigt ein oder aus." },
   { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer", text: "Mit dem Fuchs Tapsi zur Schatzinsel – paddeln, ducken, ziehen und mitmachen." },

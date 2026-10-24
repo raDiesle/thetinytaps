@@ -521,6 +521,11 @@ export function playBlow() {
   note({ from: 180, to: 200, duration: 1.2, type: "sawtooth", volume: 0.05, lowpass: 500 });
 }
 
+/** "Pfff" – a candle is blown out: a short soft breath. */
+export function playPuff() {
+  hiss({ from: 1300, to: 500, duration: 0.3, volume: 0.14, q: 0.7 });
+}
+
 /** "Schrubb, schrubb!" – a toothbrush going back and forth. */
 export function playScrub() {
   for (let i = 0; i < 6; i++) hiss({ from: i % 2 ? 3200 : 2400, duration: 0.13, volume: 0.2, delay: i * 0.17, q: 2 });
