@@ -44,7 +44,9 @@ export function App() {
         <Route path="kettenreaktion" element={<MarblePage />} />
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
-        <Route path="aufzug" element={<ElevatorPage />} />
+        <Route path="kleine-abenteuer" element={<ElevatorPage />} />
+        {/* Its old name and address, for bookmarks and the home screen. */}
+        <Route path="aufzug" element={<Navigate to="/kleine-abenteuer/" replace />} />
         <Route path="abenteuer" element={<AdventurePage />} />
         <Route path="kinder" element={<KidHome />} />
         <Route path="ideen" element={<IdeasPage />} />

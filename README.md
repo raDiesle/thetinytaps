@@ -50,10 +50,10 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/loud/` | Game „Laut und leise“: the microphone's loudness moves lion and mouse; „Pusten“. Details in its [`CLAUDE.md`](src/games/loud/CLAUDE.md) |
 | `src/games/feelings/` | Game „Gefühle“: comfort the bear, kindergarten stories with picture choices. Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |
 | `src/games/marbles/` | Game „Kettenreaktion“: marble run, „Alles fällt um“ and six Rube Goldberg machines. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
-| `src/games/elevator/` | Game „Spaß im Aufzug“: picture stories in a house with a lift. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md) |
+| `src/games/elevator/` | Game „Kleine Abenteuer“ (was „Spaß im Aufzug“): picture stories in a house with a lift, and trail adventures through a scrolling world with a bag of things. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md) |
 | `src/games/adventure/` | Game „Bewegungsabenteuer“: 3D movement story with the fox Tapsi (three.js, lazy-loaded). Details in its [`CLAUDE.md`](src/games/adventure/CLAUDE.md) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
-| `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Spaß im Aufzug" use them (`playRecorded` / `recorded` in `src/lib/sfx.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
+| `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Kleine Abenteuer" use them (`playRecorded` / `recorded` in `src/lib/sfx.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
 | `scripts/gemini-image.mjs` | `yarn image <out.webp> "<prompt>"`: makes a picture with Gemini (needs `GEMINI_API_KEY` in your shell), optionally cut out (`--transparent`), sized and saved as WebP; the raw result stays in `.image-raw/`. Guide: the Claude Code skill [`.claude/skills/bild-erzeugen/SKILL.md`](.claude/skills/bild-erzeugen/SKILL.md) (`/bild-erzeugen`) |
 | `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
 

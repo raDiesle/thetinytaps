@@ -401,7 +401,12 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
 
 /** A thought bubble with a picture, above the head of a child of height `height`; it pops up anew for every `n`. */
 export function Bubble({ pic, height }: { pic: PicId; height: number }) {
-  const { w, h, draw } = PICTURES[pic];
+  return <ThoughtBubble picture={PICTURES[pic]} height={height} />;
+}
+
+/** The thought bubble with any drawing of size `w` × `h` standing on (0, 0). */
+export function ThoughtBubble({ picture, height }: { picture: { w: number; h: number; draw: () => ReactNode }; height: number }) {
+  const { w, h, draw } = picture;
   const s = Math.min(150 / w, 104 / h);
   const puffs: [number, number, number][] = [
     [-58, 4, 46],

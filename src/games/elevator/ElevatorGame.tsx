@@ -1,37 +1,54 @@
+import { useState } from "react";
 import { GameShell } from "@/components/GameShell";
 import { de } from "@/content/de";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { ElevatorPlay } from "./ElevatorPlay";
-import { DEFAULT_ELEVATOR_SETTINGS, ELEVATOR_SETTINGS_KEY } from "./settings";
+import { DEFAULT_ELEVATOR_SETTINGS, ELEVATOR_SETTINGS_KEY, type ElevatorSettings } from "./settings";
+import { TRAIL_LEVELS } from "./trail/levels";
+import { TrailPlay } from "./trail/TrailPlay";
 import "./elevator.css";
 
+/** "Kleine Abenteuer": the lift stories in the house and the trail levels through the world. */
 export function ElevatorGame() {
   const [settings, update] = useGameSettings(ELEVATOR_SETTINGS_KEY, DEFAULT_ELEVATOR_SETTINGS);
   const device = useDevice();
 
   return (
     <GameShell
-      title="Spaß im Aufzug"
-      emoji="🛗"
+      title="Kleine Abenteuer"
+      emoji="🧭"
       modes={[
         { id: "hunger", emoji: "🥞", title: "Pfannkuchen" },
         { id: "gutenacht", emoji: "🌙", title: "Gute Nacht" },
         { id: "pfuetzen", emoji: "🌧️", title: "Pfützen" },
+        { id: "drachen", emoji: "🪁", title: "Der Drachen" },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}
       settings={
         device.touchOnly ? undefined : (
           <p className="setting-note">
-            Jede Geschichte dauert etwa 5 Minuten. Mit der Tastatur: 1–4 holen den Aufzug, Pfeil hoch und runter fahren einen Stock weiter;
-            zeigt eine Hand auf etwas, hilft jede Taste mit (Ei aufschlagen, rühren, Stiefel anziehen …); am Ende wählen 1–3 die nächste
-            Geschichte.
+            Jede Geschichte dauert etwa 5 Minuten. Im Haus holen 1–4 den Aufzug, Pfeil hoch und runter fahren einen Stock weiter. Draußen
+            geht jede Taste weiter, wenn die Hand zeigt; ist der Beutel offen, nehmen 1–3 ein Ding heraus. Zeigt eine Hand auf etwas, hilft
+            jede Taste mit; am Ende wählen 1–4 die nächste Geschichte.
           </p>
         )
       }
     >
-      <ElevatorPlay lang={de.speechLang} settings={settings} />
+      <Stories settings={settings} />
     </GameShell>
+  );
+}
+
+/** Plays the story picked on the start screen, and the one picked on the cards after it. */
+function Stories({ settings }: { settings: ElevatorSettings }) {
+  const [run, setRun] = useState({ story: settings.story, n: 0 });
+  const pick = (story: string) => setRun((r) => ({ story, n: r.n + 1 }));
+  const level = TRAIL_LEVELS.find((l) => l.id === run.story);
+  return level ? (
+    <TrailPlay key={run.n} lang={de.speechLang} settings={settings} level={level} onPick={pick} />
+  ) : (
+    <ElevatorPlay key={run.n} lang={de.speechLang} settings={settings} story={run.story} onPick={pick} />
   );
 }

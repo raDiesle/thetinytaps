@@ -12,9 +12,10 @@ import {
   playSlide,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { cardForKey, StoryCards } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs, TapMark } from "./house";
-import { BROTHER, Bubble, HERO, KID_H, Kid, PICTURES, type Holding, type Outfit, type PicId, type Pose } from "./kid";
+import { BROTHER, Bubble, HERO, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_W, floorLine } from "./layout";
 import { WeatherContext } from "./rooms";
 import type { ElevatorSettings } from "./settings";
@@ -112,7 +113,19 @@ const actorAt = (floor: number, x: number, face: 1 | -1, pose: Pose): Actor => (
 });
 
 /** "Aufzug": picture stories – the bubble shows what the child needs, and the lift takes it to the floor where it is. */
-export function ElevatorPlay({ lang, settings }: { lang: string; settings: ElevatorSettings }) {
+export function ElevatorPlay({
+  lang,
+  settings,
+  story: storyId,
+  onPick,
+}: {
+  lang: string;
+  settings: ElevatorSettings;
+  /** The story to play. */
+  story: string;
+  /** A card was picked at the end: the game starts that story or level. */
+  onPick: (id: string) => void;
+}) {
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(START);
   const { bursts, spawn } = useBursts();
@@ -420,7 +433,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   // The story picked on the start screen begins at once; the picture cards come back after it.
   useEffect(() => {
-    void play(STORIES.find((s) => s.id === settings.story) ?? STORIES[0]);
+    void play(STORIES.find((s) => s.id === storyId) ?? STORIES[0]);
   }, []);
 
   // 1–4 fetch the lift (or pick a story on the cards), arrows ride one floor up or down, any other key makes a burst.
@@ -430,8 +443,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
       const digit = Number(e.key);
       const v = viewRef.current;
       if (v.picking) {
-        if (Number.isInteger(digit) && digit >= 1 && digit <= STORIES.length) void play(STORIES[digit - 1]);
-        else if (e.key === "Enter" || e.key === " ") void play(STORIES[0]);
+        const card = cardForKey(e.key);
+        if (card) onPick(card.id);
         else funBurst();
         return;
       }
@@ -528,30 +541,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
         </WeatherContext.Provider>
       </svg>
 
-      {view.picking && (
-        <div className={`el-picker${story ? " again" : ""}`}>
-          {STORIES.map((s, i) => {
-            const { w, h, draw } = PICTURES[s.icon];
-            const scale = Math.min(200 / w, 150 / h);
-            return (
-              <button
-                key={s.id}
-                type="button"
-                className={`el-card el-card-${i}`}
-                aria-label={s.title}
-                onPointerDown={(e) => {
-                  e.stopPropagation();
-                  void play(s);
-                }}
-              >
-                <svg viewBox="-130 -100 260 200" aria-hidden>
-                  <g transform={`translate(0 ${(h * scale) / 2}) scale(${scale})`}>{draw()}</g>
-                </svg>
-              </button>
-            );
-          })}
-        </div>
-      )}
+      {view.picking && <StoryCards again={!!story} onPick={onPick} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

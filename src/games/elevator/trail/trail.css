@@ -1,0 +1,256 @@
+/* ---------- Weg-Abenteuer (trail levels of "Kleine Abenteuer") ---------- */
+
+.tl-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(#74c0fc, #d0ebff 70%);
+}
+
+/* The world and the far hills scroll with the child; the walker moves at the same pace. */
+.tl-pan,
+.tl-walker {
+  transition-property: transform;
+  transition-timing-function: linear;
+}
+
+.tl-flight,
+.tl-string,
+.tl-goal,
+.tl-play .el-tap,
+.tl-play .el-confetti {
+  pointer-events: none;
+}
+
+.tl-flight {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+}
+
+/* ---------- The bag ---------- */
+
+.tl-slot {
+  cursor: pointer;
+}
+
+.tl-slot-face {
+  fill: #fff9db;
+  transition: fill 0.3s;
+}
+
+.tl-bag.open .tl-slot-face {
+  fill: #fff3bf;
+}
+
+/* The bag opens: the slots hop once, one after the other. */
+.tl-bag.open .tl-slot {
+  animation: tl-slot-hop 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+.tl-bag.open .tl-slot.full .tl-slot-face {
+  stroke: #f59f00;
+}
+
+/* The thing that helps glows. */
+.tl-bag.open .tl-slot.hint .tl-slot-face {
+  fill: #ffe066;
+  animation: tl-glow-slot 0.8s ease-in-out infinite alternate;
+}
+
+/* ---------- The world's answers ---------- */
+
+/* A wrong thing: a shake of the head. */
+.tl-nope {
+  animation: tl-nope 0.8s ease-in-out;
+  transform-box: fill-box;
+  transform-origin: bottom center;
+}
+
+/* The child arrives: the obstacle looks up once. */
+.tl-meet {
+  animation: tl-meet 0.6s ease-out;
+  transform-box: fill-box;
+  transform-origin: bottom center;
+}
+
+.tl-dog,
+.tl-horse {
+  transition: transform 1.4s ease-in-out;
+}
+
+/* With the ball, the dog trots back into the meadow and wags. */
+.tl-dog.done {
+  transform: translate(110px, -56px) scale(0.8);
+}
+
+.tl-dog.done .tl-dog-tail {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: tl-wag 0.25s ease-in-out 12 alternate;
+}
+
+/* With the carrot, the horse steps back into its paddock and chews. */
+.tl-horse.done {
+  transform: translate(170px, -70px) scale(0.8);
+}
+
+.tl-horse.done .tl-horse-head,
+.tl-squirrel.done {
+  animation: tl-munch 0.5s ease-in-out 6 alternate;
+}
+
+.tl-chew {
+  animation: tl-shrink 3s ease-in both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.tl-squirrel.done .tl-squirrel-tail {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: tl-wag 0.3s ease-in-out 8 alternate;
+}
+
+.tl-fish {
+  opacity: 0;
+}
+
+.tl-fish.jump {
+  animation: tl-fish 1.2s ease-in-out 0.6s;
+}
+
+.tl-plank-laid {
+  animation: tl-drop 0.4s ease-in both;
+}
+
+.tl-dark {
+  transition: opacity 1.2s ease-out;
+  opacity: 0.94;
+}
+
+.tl-dark.lit {
+  opacity: 0;
+}
+
+.tl-lantern-glow {
+  animation: tl-flicker 1.2s ease-in-out 3 alternate;
+}
+
+/* At the end the kite sways in the wind. */
+.tl-sway {
+  animation: tl-sway 1.6s ease-in-out infinite alternate;
+  transform-origin: 0 0;
+}
+
+.tl-sway .tl-kite-tail {
+  animation: tl-tail 0.5s ease-in-out infinite alternate;
+  transform-origin: 0 0;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes tl-slot-hop {
+  from {
+    transform: scale(0.8);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes tl-glow-slot {
+  to {
+    fill: #fff;
+  }
+}
+
+@keyframes tl-nope {
+  20% {
+    transform: rotate(-4deg);
+  }
+  40% {
+    transform: rotate(4deg);
+  }
+  60% {
+    transform: rotate(-3deg);
+  }
+  80% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes tl-meet {
+  40% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes tl-wag {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes tl-munch {
+  to {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes tl-shrink {
+  to {
+    transform: scale(0.1);
+    opacity: 0;
+  }
+}
+
+@keyframes tl-fish {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(50px, -110px) rotate(-40deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(100px, 0) rotate(-10deg);
+  }
+}
+
+@keyframes tl-drop {
+  from {
+    transform: translateY(-80px) rotate(-12deg);
+  }
+}
+
+@keyframes tl-flicker {
+  to {
+    opacity: 0.15;
+  }
+}
+
+@keyframes tl-sway {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes tl-tail {
+  from {
+    transform: rotate(-10deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}

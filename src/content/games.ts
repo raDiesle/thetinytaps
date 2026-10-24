@@ -45,7 +45,7 @@ export const CATEGORIES: Category[] = [
       { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
       { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
       { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
-      { href: "/aufzug/", emoji: "🛗", title: "Spaß im Aufzug" },
+      { href: "/kleine-abenteuer/", emoji: "🧭", title: "Kleine Abenteuer" },
     ],
   },
   {

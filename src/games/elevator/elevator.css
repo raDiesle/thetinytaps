@@ -567,6 +567,11 @@
   animation-delay: 0.2s;
 }
 
+.el-card-3 {
+  background: #b2f2bb;
+  animation-delay: 0.3s;
+}
+
 /* ---------- Keyframes ---------- */
 
 @keyframes el-hop {
