@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { useDevice } from "@/lib/device";
-import { playChime, playCountNote, playPoof, playSqueak, playTuneNote } from "@/lib/sfx";
+import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
+import { useBrushingMusic } from "./music";
 import { Prep } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS } from "./steps";
@@ -14,7 +15,6 @@ import "./teeth.css";
 const MONSTER_COLORS = ["#8bd346", "#b388ff", "#ff9f43", "#ff7bd0", "#4cc9f0"];
 const MONSTER_VARIANTS = 3;
 const TICK_MS = 200;
-const BEAT_MS = 280;
 const TICKLE_MS = 700;
 const TURN_MS = 1100;
 /** Opening or closing the mouth glides slower, so the child can do it along with the picture. */
@@ -169,13 +169,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
-  const brushing = step !== null && !paused;
-  useEffect(() => {
-    if (!brushing || !settings.music) return;
-    let beat = 0;
-    const timer = setInterval(() => playTuneNote(beat++), BEAT_MS);
-    return () => clearInterval(timer);
-  }, [brushing, settings.music, round]);
+  useBrushingMusic({ enabled: settings.music, playing: step !== null && !paused, sync: clock, at: brushed });
 
   // What to say and play when a new part begins.
   useEffect(() => {

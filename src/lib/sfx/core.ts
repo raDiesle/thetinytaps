@@ -49,16 +49,59 @@ export function loadRecordings(names: Iterable<string>) {
   for (const name of names) {
     const url = RECORDING_URLS.get(name);
     if (!url || recordings.has(name)) continue;
-    const buffer = fetch(url)
-      .then((response) => response.arrayBuffer())
-      .then((data) => ac.decodeAudioData(data))
-      .then((decoded) => {
-        loaded.set(name, decoded);
-        return decoded;
-      })
-      .catch(() => null);
+    const buffer = loadSound(url).then((decoded) => {
+      if (decoded) loaded.set(name, decoded);
+      return decoded;
+    });
     recordings.set(name, buffer);
   }
+}
+
+/** Fetches and decodes the sound file at `url`; null without audio or if it fails. */
+export async function loadSound(url: string): Promise<AudioBuffer | null> {
+  const ac = audio();
+  if (!ac) return null;
+  try {
+    const response = await fetch(url);
+    return await ac.decodeAudioData(await response.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
+/** A sound playing on repeat, see playLoop. */
+export interface Loop {
+  /** Glides the loudness to `volume` (times the effects volume) over `seconds`. */
+  fade(volume: number, seconds: number): void;
+  /** Fades out quickly, so it ends without a click. */
+  stop(): void;
+}
+
+/** Plays `buffer` on repeat from `offset` seconds in, fading in to `volume`: background music. */
+export function playLoop(buffer: AudioBuffer, offset: number, volume: number): Loop | null {
+  const ac = audio();
+  if (!ac) return null;
+  const source = ac.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0, ac.currentTime);
+  source.connect(gain).connect(ac.destination);
+  source.start(0, offset % buffer.duration);
+  const fade = (to: number, seconds: number) => {
+    const t = ac.currentTime;
+    gain.gain.cancelScheduledValues(t);
+    gain.gain.setValueAtTime(gain.gain.value, t);
+    gain.gain.linearRampToValueAtTime(to * masterVolume, t + seconds);
+  };
+  fade(volume, 0.4);
+  return {
+    fade,
+    stop() {
+      fade(0, 0.15);
+      source.stop(ac.currentTime + 0.2);
+    },
+  };
 }
 
 /** Plays the recording `name`, slightly higher or lower each time; `synth` while it is still loading or if there is none. */
