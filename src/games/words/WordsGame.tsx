@@ -24,10 +24,10 @@ export function WordsGame() {
       title="Wörter tippen"
       emoji="✍️"
       modes={[
-        { id: "spell", emoji: "✍️", title: "Ganzes Wort", text: "Das Wort Buchstabe für Buchstabe tippen." },
-        { id: "first", emoji: "🐻", title: "Erster Buchstabe", text: "Nur den ersten Buchstaben – der Rest fliegt von allein." },
-        { id: "colors", emoji: "🎨", title: "Farben", text: "Farbwörter tippen, der Bildschirm wird bunt." },
-        { id: "actions", emoji: "🦘", title: "Tu-Wörter", text: "Hüpfen, schlafen … eine Figur macht es vor." },
+        { id: "spell", emoji: "✍️", title: "Ganzes Wort" },
+        { id: "first", emoji: "🐻", title: "Erster Buchstabe" },
+        { id: "colors", emoji: "🎨", title: "Farben" },
+        { id: "actions", emoji: "🦘", title: "Tu-Wörter" },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as WordsMode })}

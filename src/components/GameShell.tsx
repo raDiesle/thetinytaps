@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
+import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import {
   DEFAULT_PLAYTIME_SETTINGS,
@@ -41,7 +42,6 @@ export interface GameMode {
   id: string;
   emoji: string;
   title: string;
-  text?: string;
   /** Drawn bigger and across the whole row, e.g. for "all of them in turn". */
   featured?: boolean;
 }
@@ -93,6 +93,7 @@ export function GameShell({
   const playtime = usePlaytime(playing);
   // Bumped when the grown-up starts the play time afresh, to show it at once.
   const [, setResets] = useState(0);
+  const grid = useFitGrid(modes?.length ?? 0, modes?.filter((m) => m.featured).length);
 
   const start = async () => {
     // These need the click as a user gesture, so run them before any await.
@@ -197,7 +198,7 @@ export function GameShell({
         <section className="mode-picker" aria-label="Spielart wählen">
           <h2 className="mode-heading">Was spielen wir?</h2>
           {level && <div className="mode-level">{level}</div>}
-          <ul className="game-list mode-list">
+          <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {modes.map((m) => (
               <li key={m.id} className={m.featured ? "mode-featured" : undefined}>
                 <button type="button" className="game-card mode-card" onClick={() => pick(m.id)}>
@@ -205,7 +206,6 @@ export function GameShell({
                     {m.emoji}
                   </span>
                   <span className="game-title">{m.title}</span>
-                  {m.text && <span className="game-text">{m.text}</span>}
                   <span className="game-go" aria-hidden>
                     ▶
                   </span>

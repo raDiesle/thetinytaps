@@ -14,9 +14,9 @@ export function AnimalsGame() {
       title="Was gehört zum Tier?"
       emoji="🐰"
       modes={[
-        { id: "feed", emoji: "🥕", title: "Tiere füttern", text: "Das Essen zum hungrigen Tier bringen." },
-        { id: "home", emoji: "🏠", title: "Wer wohnt wo?", text: "Das Tier in sein Zuhause bringen." },
-        { id: "mix", emoji: "🔀", title: "Abwechselnd", text: "Mal füttern, mal das Zuhause finden." },
+        { id: "feed", emoji: "🥕", title: "Tiere füttern" },
+        { id: "home", emoji: "🏠", title: "Wer wohnt wo?" },
+        { id: "mix", emoji: "🔀", title: "Abwechselnd" },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as AnimalsMode })}

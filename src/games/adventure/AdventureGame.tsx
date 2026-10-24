@@ -7,28 +7,20 @@ import { AdventurePlay } from "./AdventurePlay";
 import { ADVENTURE_SETTINGS_KEY, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS, type AdventurePace } from "./settings";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 
-const minutes = (seconds: number) => Math.round(seconds / 30) / 2;
-
 carryOverAdventureSettings();
 
 export function AdventureGame() {
   const [settings, update] = useGameSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const { touchOnly } = useDevice();
   const story = TREASURE_ISLAND;
-  const seconds = story.sequence.steps.reduce((sum, s) => sum + s.seconds, 0);
 
   return (
     <GameShell
       title="Bewegungsabenteuer"
       emoji="🏝️"
       modes={[
-        {
-          id: "normal",
-          emoji: "🏝️",
-          title: "Die Schatzinsel",
-          text: `Mit Tapsi paddeln, springen, ducken und den Schatz finden – etwa ${minutes(seconds)} Minuten.`,
-        },
-        { id: "calm", emoji: "🐢", title: "Die Schatzinsel, ruhiger", text: "Mehr Zeit für jede Bewegung." },
+        { id: "normal", emoji: "🏝️", title: "Die Schatzinsel" },
+        { id: "calm", emoji: "🐢", title: "Die Schatzinsel, ruhiger" },
       ]}
       mode={settings.pace}
       onMode={(pace) => update({ pace: pace as AdventurePace })}

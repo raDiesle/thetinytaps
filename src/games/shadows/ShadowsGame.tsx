@@ -16,7 +16,7 @@ export function ShadowsGame() {
       title="Schatten finden"
       emoji="👤"
       modes={[
-        { id: "all", emoji: "🔀", title: "Gemischt", text: "Von allem etwas." },
+        { id: "all", emoji: "🔀", title: "Gemischt" },
         { id: "animals", emoji: "🐘", title: "Tiere" },
         { id: "vehicles", emoji: "🚗", title: "Fahrzeuge" },
         { id: "food", emoji: "🍌", title: "Essen" },

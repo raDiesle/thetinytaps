@@ -6,6 +6,7 @@ import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
+import { useFitGrid } from "@/lib/fitGrid";
 import { useTitle } from "@/lib/title";
 
 const GAMES = [
@@ -28,6 +29,7 @@ const IDEAS_HOLD_MS = 2000;
 export function Home() {
   useTitle();
   const navigate = useNavigate();
+  const grid = useFitGrid(GAMES.length);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const beginHold = () => {
@@ -53,7 +55,7 @@ export function Home() {
         }}
       />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
-      <ul className="game-list">
+      <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {GAMES.map((g) => (
           <li key={g.title}>
             <GameCard {...g} />

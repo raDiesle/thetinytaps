@@ -40,11 +40,11 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       backHref="/bilder/"
       backLabel="Alle Bilder"
       modes={[
-        { id: "explore", emoji: "👆", title: "Entdecken", text: "Alles antippen – es bewegt sich und macht Geräusche." },
-        { id: "find", emoji: "🔍", title: "Suchen", text: "„Wo ist …?“ – das Kind sucht es im Bild und tippt es an." },
-        { id: "sounds", emoji: "🔊", title: "Geräusch-Rätsel", text: "Nur ein Geräusch – wer war das?" },
-        { id: "questions", emoji: "❓", title: "Fragen", text: "„Was ist rot?“ – mehrere Antworten sind richtig." },
-        { id: "colour", emoji: "🖍️", title: "Ausmalen", text: "Das Bild ist grau, jedes angetippte Ding wird bunt." },
+        { id: "explore", emoji: "👆", title: "Entdecken" },
+        { id: "find", emoji: "🔍", title: "Suchen" },
+        { id: "sounds", emoji: "🔊", title: "Geräusch-Rätsel" },
+        { id: "questions", emoji: "❓", title: "Fragen" },
+        { id: "colour", emoji: "🖍️", title: "Ausmalen" },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as SceneMode })}

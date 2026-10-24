@@ -23,24 +23,9 @@ export function FeelingsGame() {
       title="Gefühle"
       emoji="🐻"
       modes={[
-        {
-          id: "bear",
-          emoji: "🐻",
-          title: "Bär trösten",
-          text: "Der Bär ist traurig, wütend, müde oder hat Angst – umarmen, Teddy geben, pusten, zudecken.",
-        },
-        {
-          id: "kita-show",
-          emoji: "🏫",
-          title: "Im Kindergarten",
-          text: "Jemand schubst oder nimmt etwas weg – der Bär zeigt, was man tun kann.",
-        },
-        {
-          id: "kita-choose",
-          emoji: "🤔",
-          title: "Kindergarten: selbst wählen",
-          text: "Ab 3: Neben der guten Idee steht eine nicht so gute.",
-        },
+        { id: "bear", emoji: "🐻", title: "Bär trösten" },
+        { id: "kita-show", emoji: "🏫", title: "Im Kindergarten" },
+        { id: "kita-choose", emoji: "🤔", title: "Kindergarten: selbst wählen" },
       ]}
       mode={kita ? `kita-${settings.answers}` : "bear"}
       onMode={(id) => update(MODE_PATCH[id])}

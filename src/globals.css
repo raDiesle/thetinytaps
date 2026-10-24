@@ -323,6 +323,7 @@ button.game-card:focus-visible {
 
 .game-emoji {
   display: grid;
+  flex-shrink: 0;
   place-items: center;
   width: 112px;
   height: 112px;
@@ -338,12 +339,6 @@ button.game-card:focus-visible {
   font-size: 1.6rem;
   font-weight: 700;
   line-height: 1.15;
-}
-
-.game-text {
-  max-width: 26ch;
-  font-size: 1.05rem;
-  font-weight: 500;
 }
 
 .game-go {
@@ -1070,10 +1065,6 @@ kbd {
   font-size: 1.35rem;
 }
 
-.mode-card .game-text {
-  font-size: 0.98rem;
-}
-
 /* The one card above the rest ("all of them in turn"): a whole row, in rainbow stripes. */
 .mode-list .mode-featured {
   grid-column: 1 / -1;
@@ -1096,6 +1087,76 @@ kbd {
 
 .mode-featured .mode-card .game-title {
   font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+/*
+ * On a tablet or computer, all cards and the buttons under them fit on one
+ * screen: useFitGrid picks the columns and row height, the cards scale with it.
+ */
+.home:has(> .game-list.fit),
+.start-screen:has(.game-list.fit) {
+  padding-bottom: 32px;
+}
+
+.game-list.fit {
+  grid-template-columns: repeat(var(--fit-columns), minmax(0, 1fr));
+  grid-auto-rows: var(--fit-row);
+  gap: 24px;
+}
+
+.game-list.fit li {
+  container-type: size;
+}
+
+.game-list.fit .game-card {
+  justify-content: center;
+  gap: 4cqh;
+  /* Keeps the title clear of the ▶ button in the corner. */
+  padding: 5cqh 14px max(7cqh, 30px);
+}
+
+.game-list.fit .game-emoji {
+  --size: min(112px, 46cqh);
+  width: var(--size);
+  height: var(--size);
+  font-size: calc(var(--size) * 0.5);
+}
+
+.game-list.fit .game-title {
+  font-size: clamp(0.95rem, min(13cqh, 9cqw), 1.6rem);
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
+.game-list.fit .game-go {
+  width: 44px;
+  height: 44px;
+  right: -8px;
+  bottom: -12px;
+  font-size: 1.1rem;
+}
+
+.game-list.fit .mode-featured .game-title {
+  font-size: clamp(1.2rem, 20cqh, 2.2rem);
+}
+
+/* More room for the cards on big screens: the back link moves up into the corner. */
+@media (min-width: 900px) and (min-height: 600px) {
+  .home > .back-link,
+  .start-screen > .back-link {
+    position: absolute;
+    top: max(24px, env(safe-area-inset-top));
+    left: max(20px, env(safe-area-inset-left));
+    margin: 0;
+  }
+
+  .start-screen {
+    gap: 20px;
+  }
+
+  .home-subtitle {
+    margin-bottom: 28px;
+  }
 }
 
 /* Play time, language, read aloud … are set on the home page for all games. */

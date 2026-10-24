@@ -17,9 +17,9 @@ export function LoudGame() {
       title="Laut und leise"
       emoji="🦁"
       modes={[
-        { id: "low", emoji: "📣", title: "Sehr laut rufen", text: "Der Löwe brüllt erst bei richtig lautem Rufen." },
-        { id: "mid", emoji: "🦁", title: "Laut rufen", text: "Für die meisten Zimmer und Mikrofone." },
-        { id: "high", emoji: "🗣️", title: "Etwas lauter reden", text: "Für leise Kinder oder ein schwaches Mikrofon." },
+        { id: "low", emoji: "📣", title: "Sehr laut rufen" },
+        { id: "mid", emoji: "🦁", title: "Laut rufen" },
+        { id: "high", emoji: "🗣️", title: "Etwas lauter reden" },
       ]}
       mode={settings.sensitivity}
       onMode={(sensitivity) => update({ sensitivity: sensitivity as Sensitivity })}

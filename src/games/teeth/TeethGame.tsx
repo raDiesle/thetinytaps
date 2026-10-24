@@ -18,9 +18,9 @@ export function TeethGame() {
       title="Zähne putzen"
       emoji="🦷"
       modes={[
-        { id: "1", emoji: "🪥", title: "1 Minute", text: "Kurz – für den Anfang." },
-        { id: "2", emoji: "🦷", title: "2 Minuten", text: "So empfehlen es Zahnärzte." },
-        { id: "3", emoji: "✨", title: "3 Minuten", text: "Ganz gründlich." },
+        { id: "1", emoji: "🪥", title: "1 Minute" },
+        { id: "2", emoji: "🦷", title: "2 Minuten" },
+        { id: "3", emoji: "✨", title: "3 Minuten" },
       ]}
       mode={settings.minutes}
       onMode={(minutes) => update({ minutes: minutes as BrushMinutes })}

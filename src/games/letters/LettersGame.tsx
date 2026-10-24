@@ -32,9 +32,9 @@ export function LettersGame() {
       title="Buchstaben & Zahlen"
       emoji="🔤"
       modes={[
-        { id: "free", emoji: "⌨️", title: "Frei tippen", text: "Jede Taste zeigt ihren Buchstaben oder ihre Zahl – mit Bild." },
-        { id: "find", emoji: "🔍", title: `Wo ist das ${b.upper}?`, text: "Ein Buchstabe erscheint, das Kind sucht die Taste." },
-        { id: "train", emoji: "🚂", title: "Buchstaben-Zug", text: "Jede Taste hängt einen Wagen an den Zug." },
+        { id: "free", emoji: "⌨️", title: "Frei tippen" },
+        { id: "find", emoji: "🔍", title: `Wo ist das ${b.upper}?` },
+        { id: "train", emoji: "🚂", title: "Buchstaben-Zug" },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as LettersMode })}

@@ -15,9 +15,9 @@ export function ElevatorGame() {
       title="Aufzug"
       emoji="🛗"
       modes={[
-        { id: "hunger", emoji: "🥞", title: "Pfannkuchen", text: "Hunger! Eier holen, backen, den Bruder rufen und zusammen essen." },
-        { id: "gutenacht", emoji: "🌙", title: "Gute Nacht", text: "Baden, Milch, Zähne putzen, den Teddy holen und ab ins Bett." },
-        { id: "pfuetzen", emoji: "🌧️", title: "Pfützen", text: "Stiefel, Regenjacke, Schirm und Boot – dann ab in die Pfützen." },
+        { id: "hunger", emoji: "🥞", title: "Pfannkuchen" },
+        { id: "gutenacht", emoji: "🌙", title: "Gute Nacht" },
+        { id: "pfuetzen", emoji: "🌧️", title: "Pfützen" },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}
