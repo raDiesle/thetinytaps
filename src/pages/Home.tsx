@@ -9,17 +9,17 @@ import { Sky } from "@/components/Sky";
 import { useTitle } from "@/lib/title";
 
 const GAMES = [
-  { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen", text: "Taste drücken – Bild, Buchstabe und Zahl erscheinen." },
-  { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder", text: "Wimmelbilder zum Antippen – alles bewegt sich und spricht." },
-  { href: "/woerter/", emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
-  { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen", text: "Zwei Minuten putzen, bis alle Zuckermonster weg sind." },
-  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?", text: "Tiere füttern und ihr Zuhause finden." },
-  { href: "/schatten/", emoji: "👤", title: "Schatten finden", text: "Welcher Schatten gehört zum Bild? Antippen oder hinziehen." },
-  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise", text: "Laut rufen – der Löwe brüllt. Leise flüstern – die Maus piepst." },
-  { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion", text: "Ein Tipp – und eins stößt das nächste an: Kugeln rollen, alles fällt um, eine ganze Maschine läuft los." },
-  { href: "/aufzug/", emoji: "🛗", title: "Aufzug", text: "Bildergeschichten: Die Gedankenblase zeigt, was das Kind braucht – mit dem Aufzug in die richtige Etage." },
-  { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer", text: "Mit dem Fuchs Tapsi zur Schatzinsel – paddeln, ducken, ziehen und mitmachen." },
-  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle", text: "Den Bären trösten – und üben, was man im Kindergarten tun kann." },
+  { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
+  { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
+  { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
+  { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen" },
+  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
+  { href: "/schatten/", emoji: "👤", title: "Schatten finden" },
+  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise" },
+  { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
+  { href: "/aufzug/", emoji: "🛗", title: "Aufzug" },
+  { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
+  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
 ];
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
@@ -42,6 +42,7 @@ export function Home() {
   return (
     <main className="home">
       <Sky />
+      <HomeOptions />
       <Logo
         secretProps={{
           onPointerDown: beginHold,
@@ -52,7 +53,6 @@ export function Home() {
         }}
       />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
-      <HomeOptions />
       <ul className="game-list">
         {GAMES.map((g) => (
           <li key={g.title}>
