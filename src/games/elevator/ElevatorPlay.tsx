@@ -1,265 +1,351 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { loadRecordings, playDing, playKnock, playLift, playRandomNote, playSlide, setSfxVolume } from "@/lib/sfx";
+import {
+  loadRecordings,
+  playDing,
+  playGiggle,
+  playKnock,
+  playLift,
+  playLullaby,
+  playMelody,
+  playRandomNote,
+  playSlide,
+  setSfxVolume,
+} from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { RECORDINGS, RIDERS, ROOMS, texts, type Rider } from "./content";
+import { STORIES, RECORDINGS, texts, type Step, type Story, type Who } from "./content";
+import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
+import { BROTHER, Bubble, HERO, KID_H, Kid, PICTURES, type Holding, type Outfit, type PicId, type Pose } from "./kid";
+import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_W, floorLine } from "./layout";
+import { WeatherContext } from "./rooms";
 import type { ElevatorSettings } from "./settings";
 
 /** Time the lift takes per floor. */
-const FLOOR_MS = 1300;
+const FLOOR_MS = 1200;
 /** Time the doors take to open or close. */
-const DOOR_MS = 650;
-/** Walking time per percent of the house's width. */
-const WALK_MS = 22;
-/** Time after the lift has left a floor before the next animal comes to wait there. */
-const NEXT_GUEST_MS = 2500;
+const DOOR_MS = 700;
+/** Walking time per SVG unit. */
+const WALK_MS = 2.6;
+/** While waiting for the right button: the bubble pops up again, and the first time the room starts to glow. */
+const NUDGE_MS = 7000;
+/** From the end of a story until the picture cards come back. */
+const END_MS = 5000;
 /** Calm mode: everything a bit slower. */
-const CALM_PACE = 1.4;
+const CALM_PACE = 1.35;
+const BUDDY_SCALE = 0.8;
 
-/** Where an animal is: walking in from the side, waiting at the lift, in the room, riding, or leaving for good. */
-type Spot = "outside" | "waiting" | "room" | "cabin" | "gone";
-
-/** Where each spot is, in percent of the house's width (the middle of the animal). */
-const SPOT_X: Record<Spot, number> = { outside: -12, waiting: 62, room: 38, cabin: 82, gone: -12 };
-
-interface Walker {
-  key: number;
-  rider: Rider;
-  /** Floor from the ground up, 0 is "1". */
+interface Actor {
   floor: number;
-  spot: Spot;
+  x: number;
   /** Length of the current walk in ms; 0 while standing. */
   walk: number;
-  /** Walking to the right: mirrored, since most animal emojis look left. */
-  right: boolean;
-  /** Bumped to make it hop again. */
+  pose: Pose;
+  face: 1 | -1;
+  holding: Holding | null;
+  wear: Outfit[];
+  /** In the bathtub or the bed. */
+  hidden: boolean;
+  /** Rides along with the cabin. */
+  inCabin: boolean;
+  /** The brother comes along. */
+  joined: boolean;
+  /** Bumped to make it hop when tapped. */
   hop: number;
 }
 
-function shuffle<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
+interface View {
+  story: Story | null;
+  /** The picture cards to choose a story are shown. */
+  picking: boolean;
+  cabin: number;
+  /** Length of the current ride, for the cabin's and the riders' transition. */
+  ride: number;
+  doors: boolean;
+  actors: Record<Who, Actor | null>;
+  bubble: { who: Who; pic: PicId; n: number } | null;
+  playing: string | null;
+  used: string[];
+  hint: number | null;
+  lit: number | null;
+  night: boolean;
+  /** The rain has stopped. */
+  cleared: boolean;
+  party: boolean;
 }
 
-/** "Aufzug" (N-37): big buttons fetch the lift; at every floor one animal gets out and another one in. */
-export function ElevatorPlay({ lang, settings }: { lang: string; settings: ElevatorSettings }) {
-  const count = Number(settings.floors);
-  const pace = settings.calm ? CALM_PACE : 1;
-  const floorMs = FLOOR_MS * pace;
+const START: View = {
+  story: null,
+  picking: true,
+  cabin: 0,
+  ride: 0,
+  doors: true,
+  actors: { hero: null, buddy: null },
+  bubble: null,
+  playing: null,
+  used: [],
+  hint: null,
+  lit: null,
+  night: false,
+  cleared: false,
+  party: false,
+};
 
-  const [walkers, setWalkers] = useState<Walker[]>([]);
-  const [cabin, setCabin] = useState(0);
-  const [doorsOpen, setDoorsOpen] = useState(true);
-  /** Length of the current ride, for the cabin's and the riders' transition. */
-  const [ride, setRide] = useState(0);
-  /** What the display next to the buttons shows: the floor the lift is passing, and where it is heading. */
-  const [shown, setShown] = useState(0);
-  const [heading, setHeading] = useState<"up" | "down" | null>(null);
-  /** Pressed buttons, lit until the lift gets there. */
-  const [lit, setLit] = useState<number[]>([]);
+const actorAt = (floor: number, x: number, face: 1 | -1, pose: Pose): Actor => ({
+  floor,
+  x,
+  walk: 0,
+  pose,
+  face,
+  holding: null,
+  wear: [],
+  hidden: false,
+  inCabin: false,
+  joined: false,
+  hop: 0,
+});
+
+/** "Aufzug": picture stories – the bubble shows what the child needs, and the lift takes it to the floor where it is. */
+export function ElevatorPlay({ lang, settings }: { lang: string; settings: ElevatorSettings }) {
+  const pace = settings.calm ? CALM_PACE : 1;
+  const [view, setView] = useState<View>(START);
+  const viewRef = useRef<View>(START);
   const { bursts, spawn } = useBursts();
 
-  // The ride logic runs from timers, so it reads and writes refs; the state above is only for drawing.
-  const walkersRef = useRef<Walker[]>([]);
-  const cabinRef = useRef(0);
-  const queue = useRef<number[]>([]);
-  /** From a button press until the lift has arrived and everyone got in and out. */
-  const busy = useRef(false);
-  const moving = useRef(false);
-  const nextKey = useRef(0);
-  const deck = useRef<Rider[]>([]);
-  const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  // A story is a script of waits; starting another one (or leaving) bumps the generation and drops its timers.
+  const generation = useRef(0);
+  const timers = useRef(new Set<number>());
+  /** Set while the script waits for a button: it gets the floor. */
+  const waiter = useRef<((floor: number) => void) | null>(null);
 
-  const later = useCallback((ms: number, run: () => void) => {
-    const timer = setTimeout(() => {
+  const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
+    const patch = typeof change === "function" ? change(viewRef.current) : change;
+    viewRef.current = { ...viewRef.current, ...patch };
+    setView(viewRef.current);
+  }, []);
+
+  const actor = (who: Who, patch: Partial<Actor>) =>
+    put((v) => {
+      const current = v.actors[who];
+      return current ? { actors: { ...v.actors, [who]: { ...current, ...patch } } } : {};
+    });
+
+  const later = (ms: number, run: () => void) => {
+    const g = generation.current;
+    const timer = window.setTimeout(() => {
       timers.current.delete(timer);
-      run();
+      if (g === generation.current) run();
     }, ms);
     timers.current.add(timer);
-  }, []);
+    return () => {
+      clearTimeout(timer);
+      timers.current.delete(timer);
+    };
+  };
 
-  useEffect(() => {
-    const pending = timers.current;
-    return () => pending.forEach(clearTimeout);
-  }, []);
+  /** Resolves after `ms`; never, if another story starts meanwhile, so the old script just stops. */
+  const wait = (ms: number) => new Promise<void>((resolve) => later(ms, resolve));
+
+  const cancel = () => {
+    generation.current++;
+    timers.current.forEach(clearTimeout);
+    timers.current.clear();
+    waiter.current = null;
+  };
+
+  useEffect(() => cancel, []);
 
   useEffect(() => {
     setSfxVolume(settings.calm ? 0.4 : 1);
   }, [settings.calm]);
 
-  const say = useCallback(
-    (text: string, queued = false) => {
-      if (settings.speech) speak(text, lang, { queue: queued, rate: settings.calm ? 0.75 : 0.85 });
-    },
-    [settings.speech, settings.calm, lang],
-  );
+  useEffect(() => {
+    if (settings.sounds) loadRecordings(RECORDINGS);
+  }, [settings.sounds]);
+
+  const say = (text: string) => {
+    if (settings.speech) speak(text, lang, { rate: settings.calm ? 0.75 : 0.85 });
+  };
 
   const sound = (play: () => void) => {
     if (settings.sounds) play();
   };
 
-  const updateWalkers = (change: (all: Walker[]) => Walker[]) => {
-    walkersRef.current = change(walkersRef.current);
-    setWalkers(walkersRef.current);
+  const cue = (sounds: [number, () => void][]) => sounds.forEach(([ms, play]) => later(ms * pace, () => sound(play)));
+
+  const showBubble = (who: Who, pic: PicId) => put((v) => ({ bubble: { who, pic, n: (v.bubble?.n ?? 0) + 1 } }));
+
+  /** Walks a child to `x` on its floor. */
+  const walk = async (who: Who, x: number) => {
+    const a = viewRef.current.actors[who];
+    if (!a) return;
+    const ms = Math.abs(x - a.x) * WALK_MS * pace;
+    if (ms < 1) return;
+    actor(who, { x, walk: ms, pose: "walk", face: x > a.x ? 1 : -1, inCabin: false });
+    await wait(ms);
+    actor(who, { walk: 0, pose: "stand", inCabin: x >= CABIN_L });
   };
 
-  const patch = (key: number, values: Partial<Walker>) =>
-    updateWalkers((all) => all.map((w) => (w.key === key ? { ...w, ...values } : w)));
-
-  /** Sends an animal to `spot` on its floor; returns how long the walk takes. */
-  const walkTo = (key: number, spot: Spot) => {
-    const walker = walkersRef.current.find((w) => w.key === key);
-    if (!walker) return 0;
-    const ms = Math.abs(SPOT_X[spot] - SPOT_X[walker.spot]) * WALK_MS * pace;
-    patch(key, { spot, walk: ms, right: SPOT_X[spot] > SPOT_X[walker.spot] });
-    later(ms, () => {
-      if (spot === "gone") updateWalkers((all) => all.filter((w) => w.key !== key));
-      else patch(key, { walk: 0, right: false });
-    });
-    return ms;
-  };
-
-  const hop = (key: number) => {
-    const walker = walkersRef.current.find((w) => w.key === key);
-    if (walker) patch(key, { hop: walker.hop + 1 });
-  };
-
-  /** An animal nobody can see right now, all of them in turn. */
-  const draw = () => {
-    const visible = new Set(walkersRef.current.filter((w) => w.spot !== "gone").map((w) => w.rider.id));
-    if (!deck.current.some((r) => !visible.has(r.id))) deck.current = shuffle(RIDERS);
-    return deck.current.splice(
-      deck.current.findIndex((r) => !visible.has(r.id)),
-      1,
-    )[0];
-  };
-
-  const guest = (floor: number, spot: Spot): Walker => ({
-    key: nextKey.current++,
-    rider: draw(),
-    floor,
-    spot,
-    walk: 0,
-    right: false,
-    hop: 0,
-  });
-
-  /** A new animal walks up to wait for the lift, unless the lift stands there or someone waits already. */
-  const nextGuest = (floor: number) => {
-    if (floor === cabinRef.current && !moving.current) return;
-    if (walkersRef.current.some((w) => w.floor === floor && w.spot === "waiting")) return;
-    const walker = guest(floor, "outside");
-    updateWalkers((all) => [...all, walker]);
-    // One frame on the outside first, so it walks in instead of popping up.
-    later(60, () => walkTo(walker.key, "waiting"));
-  };
-
-  /** The doors are open at `floor`: the rider gets out, the waiting animal gets in. */
-  const exchange = (floor: number) => {
-    const all = walkersRef.current;
-    const inside = all.find((w) => w.spot === "cabin");
-    const waiting = all.find((w) => w.spot === "waiting" && w.floor === floor);
-    const resident = all.find((w) => w.spot === "room" && w.floor === floor);
-    let wait = 0;
-    if (inside) {
-      // The one who got out here last time goes on its way and makes room.
-      if (resident) walkTo(resident.key, "gone");
-      const ms = walkTo(inside.key, "room");
-      later(ms, () => sound(inside.rider.sound));
-      say(texts.out(inside.rider), true);
-      wait = ms * 0.6;
-    }
-    if (waiting) {
-      const ms = Math.abs(SPOT_X.cabin - SPOT_X.waiting) * WALK_MS * pace;
-      later(wait, () => {
-        walkTo(waiting.key, "cabin");
-        later(ms, () => sound(waiting.rider.sound));
-      });
-      say(texts.in(waiting.rider), true);
-      wait += ms;
-    }
-    later(wait + 500, serveNext);
-  };
-
-  const arrive = (floor: number) => {
-    moving.current = false;
-    queue.current = queue.current.filter((f) => f !== floor);
-    setLit(queue.current);
-    setHeading(null);
-    sound(playDing);
-    say(texts.floor(floor));
-    setDoorsOpen(true);
-    later(150, () => sound(playSlide));
-    later(DOOR_MS, () => exchange(floor));
-  };
-
-  const move = (target: number) => {
-    const from = cabinRef.current;
-    const up = target > from;
-    const floors = Math.abs(target - from);
-    const ms = floors * floorMs;
-    moving.current = true;
-    cabinRef.current = target;
-    setCabin(target);
-    setRide(ms);
-    setHeading(up ? "up" : "down");
-    updateWalkers((all) => all.map((w) => (w.spot === "cabin" ? { ...w, floor: target } : w)));
-    // The display counts the floors as the lift passes them.
-    for (let i = 1; i <= floors; i++) later(i * floorMs - floorMs * 0.4, () => setShown(from + (up ? i : -i)));
-    say(up ? texts.up : texts.down);
-    sound(() => playLift(ms / 1000, up));
-    later(NEXT_GUEST_MS, () => nextGuest(from));
-    later(ms, () => arrive(target));
-  };
-
-  /** Rides to the first pressed button, or stops with the doors open. */
-  function serveNext() {
-    const target = queue.current[0];
-    if (target === undefined) {
-      busy.current = false;
-      return;
-    }
-    busy.current = true;
-    setDoorsOpen(false);
+  /** Doors shut, the lift goes to `target` with everyone in it, "Pling", doors open. */
+  const ride = async (target: number) => {
+    put({ doors: false, lit: target });
     sound(playSlide);
-    later(DOOR_MS, () => move(target));
-  }
-
-  /** The button of the floor where the lift already stands: "Pling", and the rider waves. */
-  const greet = () => {
+    await wait(DOOR_MS * pace);
+    const from = viewRef.current.cabin;
+    const ms = Math.abs(target - from) * FLOOR_MS * pace;
+    put((v) => ({
+      cabin: target,
+      ride: ms,
+      actors: {
+        hero: v.actors.hero?.inCabin ? { ...v.actors.hero, floor: target } : v.actors.hero,
+        buddy: v.actors.buddy?.inCabin ? { ...v.actors.buddy, floor: target } : v.actors.buddy,
+      },
+    }));
+    sound(() => playLift(ms / 1000, target > from));
+    await wait(ms);
+    put({ lit: null, doors: true });
     sound(playDing);
-    say(texts.floor(cabinRef.current));
-    const inside = walkersRef.current.find((w) => w.spot === "cabin");
-    if (inside) {
-      hop(inside.key);
-      later(300, () => sound(inside.rider.sound));
+    later(150, () => sound(playSlide));
+    await wait(DOOR_MS * pace);
+  };
+
+  const nextPress = () => new Promise<number>((resolve) => (waiter.current = resolve));
+
+  /** Shows the wish and waits until the child has brought the lift to the floor where it is. */
+  const reach = async (step: Step) => {
+    const who = step.who ?? "hero";
+    showBubble(who, step.wish);
+    say(step.ask);
+    for (;;) {
+      const stopNudging = (() => {
+        let stop = () => {};
+        const nudge = () => {
+          showBubble(who, step.wish);
+          put({ hint: step.floor });
+          stop = later(NUDGE_MS * pace, nudge);
+        };
+        stop = later(NUDGE_MS * pace, nudge);
+        return () => stop();
+      })();
+      const floor = await nextPress();
+      stopNudging();
+      if (floor === step.floor && floor === viewRef.current.cabin) return;
+      if (floor !== viewRef.current.cabin) {
+        sound(() => playKnock(1500));
+        await ride(floor);
+        if (floor === step.floor) return;
+      }
+      // Wrong floor: the child looks out, shakes its head and thinks of the wish again.
+      actor(who, { pose: "shake" });
+      say(texts.wrong);
+      await wait(1100);
+      actor(who, { pose: "stand" });
+      showBubble(who, step.wish);
+      put({ hint: step.floor });
     }
   };
 
-  const request = (floor: number) => {
-    if (floor < 0 || floor >= count || queue.current.includes(floor)) return;
-    if (floor === cabinRef.current && !moving.current) {
-      greet();
-      return;
+  const doStep = async (step: Step, last: boolean) => {
+    const who = step.who ?? "hero";
+    const other: Who = who === "hero" ? "buddy" : "hero";
+    await reach(step);
+    put({ bubble: null, hint: null });
+    const otherComes = viewRef.current.actors[other]?.inCabin;
+    await Promise.all([walk(who, step.spot), otherComes ? walk(other, step.otherSpot ?? step.spot + step.face * -110) : undefined]);
+
+    actor(who, {
+      pose: step.pose,
+      face: step.face,
+      hidden: !!step.hide,
+      ...(step.hold !== undefined && { holding: step.hold }),
+    });
+    if (viewRef.current.actors[other] && (otherComes || step.otherPose)) {
+      actor(other, {
+        pose: step.otherPose ?? "stand",
+        face: step.otherFace ?? viewRef.current.actors[other]!.face,
+        ...(step.otherHold !== undefined && { holding: step.otherHold }),
+      });
     }
-    sound(() => playKnock(1500));
-    queue.current = [...queue.current, floor];
-    setLit(queue.current);
-    if (!busy.current) serveNext();
+    put({ playing: step.prop });
+    cue(step.sounds);
+    say(step.done);
+    await wait(step.ms * pace);
+    if (last) return;
+
+    put((v) => ({ playing: null, used: [...v.used, step.prop] }));
+    const a = viewRef.current.actors[who]!;
+    actor(who, {
+      pose: "stand",
+      hidden: false,
+      ...(step.carry !== undefined && { holding: step.carry }),
+      ...(step.wear && { wear: [...a.wear, step.wear] }),
+    });
+    const o = viewRef.current.actors[other];
+    if (o) {
+      actor(other, {
+        pose: o.pose === "build" && !step.joins ? "build" : "stand",
+        joined: o.joined || !!step.joins,
+        ...(step.otherCarry !== undefined && { holding: step.otherCarry }),
+      });
+    }
+    await wait(500 * pace);
+    const withOther = other === "hero" || viewRef.current.actors[other]?.joined;
+    await Promise.all([walk(who, IN_CABIN[who]), withOther ? walk(other, IN_CABIN[other]) : undefined]);
   };
 
-  // An animal waits on every floor; the one at the bottom gets in right away.
-  useEffect(() => {
-    if (settings.sounds) loadRecordings(RECORDINGS);
-    walkersRef.current = Array.from({ length: count }, (_, floor) => guest(floor, "waiting"));
-    setWalkers(walkersRef.current);
-    busy.current = true;
-    later(900, () => exchange(0));
-  }, []);
+  const finish = async (story: Story) => {
+    const last = story.steps[story.steps.length - 1];
+    if (story.ending === "sleep") {
+      put((v) => ({ used: [...v.used, last.prop], night: true }));
+      sound(playLullaby);
+      say(texts.sleep);
+    } else {
+      put({ party: true, cleared: true });
+      sound(playMelody);
+      say(texts.party);
+      for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
+      later(1200 * pace, () => {
+        put((v) => ({ playing: null, used: [...v.used, last.prop] }));
+        (["hero", "buddy"] as Who[]).forEach((who) => actor(who, { pose: "cheer", hidden: false }));
+      });
+    }
+    await wait(END_MS * pace);
+    put({ picking: true });
+  };
+
+  const play = async (story: Story) => {
+    cancel();
+    const hero = actorAt(story.start, story.startX, -1, "stand");
+    const buddy = story.buddy ? actorAt(story.buddy.floor, story.buddy.x, story.buddy.face, story.buddy.pose) : null;
+    put({ ...START, picking: false, story, cabin: story.start, actors: { hero, buddy } });
+    await wait(700);
+    actor("hero", { pose: story.need.pose });
+    showBubble("hero", story.need.pic);
+    cue(story.need.sounds);
+    say(story.need.say);
+    await wait(2800 * pace);
+    actor("hero", { pose: "stand" });
+    await walk("hero", IN_CABIN.hero);
+    for (const [i, step] of story.steps.entries()) await doStep(step, i === story.steps.length - 1);
+    await finish(story);
+  };
+
+  /** A floor button or a room was tapped. */
+  const press = (floor: number) => {
+    if (floor < 0 || floor >= FLOORS || !viewRef.current.story || viewRef.current.picking) return;
+    const resolve = waiter.current;
+    if (resolve) {
+      waiter.current = null;
+      resolve(floor);
+    } else sound(() => playKnock(1500));
+  };
+
+  const tapKid = (who: Who) => (e: PointerEvent) => {
+    e.stopPropagation();
+    const a = viewRef.current.actors[who];
+    if (!a || a.walk) return;
+    actor(who, { hop: a.hop + 1 });
+    sound(playGiggle);
+  };
 
   const funBurst = useCallback(
     (x?: number, y?: number) => {
@@ -269,98 +355,125 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     [spawn, settings.sounds],
   );
 
-  const onAnimalDown = (walker: Walker) => (e: PointerEvent) => {
-    e.stopPropagation();
-    hop(walker.key);
-    sound(walker.rider.sound);
-  };
-
-  const onButtonDown = (floor: number) => (e: PointerEvent) => {
-    e.stopPropagation();
-    request(floor);
-  };
-
-  // 1–5 fetch the lift, arrows ride one floor up or down, any other key makes a burst.
+  // 1–4 fetch the lift (or pick a story on the cards), arrows ride one floor up or down, any other key makes a burst.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       const digit = Number(e.key);
-      const last = queue.current.at(-1) ?? cabinRef.current;
-      if (Number.isInteger(digit) && digit >= 1 && digit <= count) request(digit - 1);
-      else if (e.key === "ArrowUp") request(Math.min(count - 1, last + 1));
-      else if (e.key === "ArrowDown") request(Math.max(0, last - 1));
+      const v = viewRef.current;
+      if (v.picking) {
+        if (Number.isInteger(digit) && digit >= 1 && digit <= STORIES.length) void play(STORIES[digit - 1]);
+        else if (e.key === "Enter" || e.key === " ") void play(STORIES[0]);
+        else funBurst();
+        return;
+      }
+      if (Number.isInteger(digit) && digit >= 1 && digit <= FLOORS) press(digit - 1);
+      else if (e.key === "ArrowUp") press(Math.min(FLOORS - 1, v.cabin + 1));
+      else if (e.key === "ArrowDown") press(Math.max(0, v.cabin - 1));
       else funBurst();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const floors = Array.from({ length: count }, (_, i) => i);
+  const { story, actors, bubble } = view;
+  const weather = story ? (story.weather === "rain" && view.cleared ? "day" : story.weather) : "day";
+  const kids: Who[] = ["buddy", "hero"];
+
+  /** The floor and walking position of a child, as two nested moving groups. */
+  const place = (a: Actor) => ({
+    outer: { transform: `translateY(${floorLine(a.floor)}px)`, transitionDuration: `${view.ride}ms` } as CSSProperties,
+    inner: { transform: `translateX(${a.x}px)`, transitionDuration: `${a.walk}ms` } as CSSProperties,
+  });
 
   return (
     <div
-      className={`elevator-play${settings.calm ? " calm" : ""}`}
-      style={{ "--floors": count } as CSSProperties}
+      className={`elevator-play weather-${weather}${settings.calm ? " calm" : ""}`}
       onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
     >
-      <div className="el-house">
-        <div className="el-roof" />
-        <div className="el-floors" style={{ "--ride": `${ride}ms` } as CSSProperties}>
-          {floors.map((f) => (
-            <div key={f} className="el-floor" style={{ "--f": f, background: ROOMS[f].wall } as CSSProperties}>
-              <span className="el-window" />
-              {ROOMS[f].things.map((thing, i) => (
-                <span key={thing} className={`el-thing el-thing-${i}`} aria-hidden>
-                  {thing}
-                </span>
+      <svg className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
+        <WeatherContext.Provider value={weather}>
+          <Backdrop weather={weather} />
+          {story && (
+            <>
+              <Shell />
+              {story.rooms.map((Room, f) => (
+                <g key={`${story.id}${f}`} transform={`translate(0 ${floorLine(f)})`}>
+                  <clipPath id={`el-room-${f}`}>
+                    <rect x={ROOM_L} y={-ROOM_H} width={ROOM_R - ROOM_L} height={ROOM_H} />
+                  </clipPath>
+                  <g clipPath={`url(#el-room-${f})`}>
+                    <Room playing={view.playing} used={view.used} />
+                  </g>
+                </g>
               ))}
-              <span className={`el-plate${cabin === f && !heading ? " here" : ""}`} aria-hidden>
-                {f + 1}
-              </span>
-            </div>
-          ))}
-          <div className="el-shaft">
-            <div className="el-cabin" style={{ "--f": cabin } as CSSProperties} />
-            <div className={`el-doors${doorsOpen ? " open" : ""}`} style={{ "--f": cabin } as CSSProperties}>
-              <span />
-              <span />
-            </div>
-          </div>
-          {walkers.map((w) => (
-            <span
-              key={w.key}
-              className={`el-animal${w.walk ? " walking" : ""}${w.right ? " right" : ""}${w.spot === "gone" ? " gone" : ""}`}
-              style={{ "--f": w.floor, "--walk": `${w.walk}ms`, left: `${SPOT_X[w.spot]}%` } as CSSProperties}
-              role="img"
-              aria-label={w.rider.the}
-              onPointerDown={onAnimalDown(w)}
-            >
-              <span className="el-face">
-                <span className={`el-body${w.hop && !w.walk ? ` hop-${w.hop % 2}` : ""}`}>{w.rider.emoji}</span>
-              </span>
-            </span>
-          ))}
-        </div>
-        <div className="el-ground" />
-      </div>
+              <Slabs />
+              <Shaft />
+              <CabinBack floor={view.cabin} ride={view.ride} />
+              <Buttons lit={view.lit} hint={view.hint} onPress={press} />
+              {view.hint !== null && <Hint floor={view.hint} />}
+              {kids.map((who) => {
+                const a = actors[who];
+                if (!a || a.hidden) return null;
+                const { outer, inner } = place(a);
+                return (
+                  <g key={who} className="el-ride" style={outer}>
+                    <g className="el-walker" style={inner}>
+                      <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} onPointerDown={tapKid(who)}>
+                        <g transform={who === "buddy" ? `scale(${BUDDY_SCALE})` : undefined}>
+                          <Kid look={who === "hero" ? HERO : BROTHER} pose={a.pose} holding={a.holding} wear={a.wear} face={a.face} />
+                        </g>
+                      </g>
+                    </g>
+                  </g>
+                );
+              })}
+              <CabinFront floor={view.cabin} ride={view.ride} open={view.doors} />
+              {bubble && actors[bubble.who] && !actors[bubble.who]!.hidden && (
+                <g className="el-ride" style={place(actors[bubble.who]!).outer}>
+                  <g className="el-walker" style={place(actors[bubble.who]!).inner}>
+                    <Bubble key={bubble.n} pic={bubble.pic} height={KID_H * (bubble.who === "buddy" ? BUDDY_SCALE : 1)} />
+                  </g>
+                </g>
+              )}
+              <rect
+                className={`el-night${view.night ? " on" : ""}`}
+                x="-4000"
+                y="-4000"
+                width={VIEW_W + 8000}
+                height={VIEW_H + 8000}
+                fill="#0b1340"
+              />
+              {view.party && <Confetti />}
+            </>
+          )}
+        </WeatherContext.Provider>
+      </svg>
 
-      <div className="el-panel">
-        <div className="el-display" aria-live="polite">
-          <span className="el-arrow">{heading === "up" ? "▲" : heading === "down" ? "▼" : ""}</span>
-          {shown + 1}
+      {view.picking && (
+        <div className={`el-picker${story ? " again" : ""}`}>
+          {STORIES.map((s, i) => {
+            const { w, h, draw } = PICTURES[s.icon];
+            const scale = Math.min(200 / w, 150 / h);
+            return (
+              <button
+                key={s.id}
+                type="button"
+                className={`el-card el-card-${i}`}
+                aria-label={s.title}
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  void play(s);
+                }}
+              >
+                <svg viewBox="-130 -100 260 200" aria-hidden>
+                  <g transform={`translate(0 ${(h * scale) / 2}) scale(${scale})`}>{draw()}</g>
+                </svg>
+              </button>
+            );
+          })}
         </div>
-        {[...floors].reverse().map((f) => (
-          <button
-            key={f}
-            type="button"
-            className={`el-button${lit.includes(f) ? " lit" : ""}`}
-            aria-label={`Stock ${f + 1}`}
-            onPointerDown={onButtonDown(f)}
-          >
-            {f + 1}
-          </button>
-        ))}
-      </div>
+      )}
       <BurstLayer bursts={bursts} />
     </div>
   );

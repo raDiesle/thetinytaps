@@ -16,7 +16,7 @@ const GAMES = [
   { href: "/schatten/", emoji: "👤", title: "Schatten finden", text: "Welcher Schatten gehört zum Bild? Antippen oder hinziehen." },
   { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise", text: "Laut rufen – der Löwe brüllt. Leise flüstern – die Maus piepst." },
   { href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn", text: "Tippen – die Kugel rollt, klingelt und plumpst in den Korb. Oder alles fällt um, oder eine ganze Maschine läuft los." },
-  { href: "/aufzug/", emoji: "🛗", title: "Aufzug", text: "Großen Knopf drücken – der Aufzug fährt, pling, und ein Tier steigt ein oder aus." },
+  { href: "/aufzug/", emoji: "🛗", title: "Aufzug", text: "Bildergeschichten: Die Gedankenblase zeigt, was das Kind braucht – mit dem Aufzug in die richtige Etage." },
   { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer", text: "Mit dem Fuchs Tapsi zur Schatzinsel – paddeln, ducken, ziehen und mitmachen." },
   { href: "/gefuehle/", emoji: "🐻", title: "Gefühle", text: "Den Bären trösten – und üben, was man im Kindergarten tun kann." },
 ];
