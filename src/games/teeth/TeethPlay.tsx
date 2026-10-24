@@ -175,7 +175,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
-  useBrushingMusic({ enabled: settings.music, playing: step !== null && !paused, sync: clock, at: brushed });
+  useBrushingMusic({ enabled: settings.music, playing: step !== null && !paused, finished: done, sync: clock, at: brushed });
 
   // What to say and play when a new part begins.
   useEffect(() => {

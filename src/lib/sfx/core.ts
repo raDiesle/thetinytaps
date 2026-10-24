@@ -77,24 +77,44 @@ export interface Loop {
   stop(): void;
 }
 
-/** Plays `buffer` on repeat from `offset` seconds in, fading in to `volume`: background music. */
-export function playLoop(buffer: AudioBuffer, offset: number, volume: number): Loop | null {
+/** How playLoop plays a piece of music. */
+export interface LoopOptions {
+  /** Where to start, in seconds into the file. */
+  offset: number;
+  /** Loudness to fade in to, times the effects volume. */
+  volume: number;
+  /** The part that repeats, in seconds; the whole file if left out. */
+  loopStart?: number;
+  loopEnd?: number;
+  /** Play on to the end of the file once instead of repeating, e.g. a finale. */
+  once?: boolean;
+  /** Seconds to fade in; short to go on seamlessly from music that just stopped. */
+  fadeIn?: number;
+}
+
+/** Plays `buffer` on repeat (or once), fading in: background music. */
+export function playLoop(
+  buffer: AudioBuffer,
+  { offset, volume, loopStart = 0, loopEnd = buffer.duration, once = false, fadeIn = 0.4 }: LoopOptions,
+): Loop | null {
   const ac = audio();
   if (!ac) return null;
   const source = ac.createBufferSource();
   source.buffer = buffer;
-  source.loop = true;
+  source.loop = !once;
+  source.loopStart = loopStart;
+  source.loopEnd = loopEnd;
   const gain = ac.createGain();
   gain.gain.setValueAtTime(0, ac.currentTime);
   source.connect(gain).connect(ac.destination);
-  source.start(0, offset % buffer.duration);
+  source.start(0, Math.min(offset, buffer.duration));
   const fade = (to: number, seconds: number) => {
     const t = ac.currentTime;
     gain.gain.cancelScheduledValues(t);
     gain.gain.setValueAtTime(gain.gain.value, t);
     gain.gain.linearRampToValueAtTime(to * masterVolume, t + seconds);
   };
-  fade(volume, 0.4);
+  fade(volume, fadeIn);
   return {
     fade,
     stop() {
