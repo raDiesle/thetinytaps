@@ -399,6 +399,11 @@ export function playCountNote(i: number) {
   tone(PENTATONIC[i % PENTATONIC.length], 0.35, "triangle", 0.2);
 }
 
+/** "Dong" – the i-th note struck by something heavy: two octaves lower, long and dull. */
+export function playDeepNote(i: number) {
+  note({ from: PENTATONIC[i % PENTATONIC.length] / 4, duration: 0.7, type: "triangle", volume: 0.4, lowpass: 700 });
+}
+
 /** A short two-note chime when a new letter appears. */
 export function playChime() {
   tone(PENTATONIC[2], 0.4, "sine", 0.2);

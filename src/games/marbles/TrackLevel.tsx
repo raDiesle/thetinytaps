@@ -1,6 +1,6 @@
-import { useId, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
+import { useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
-import { playBells, playBoing, playCountNote, playDing, playKnock, playPlop, playPop, playSwirl, playTick } from "@/lib/sfx";
+import { playBells, playBlub, playBoing, playCountNote, playDeepNote, playDing, playKnock, playPlop, playPop, playRumble, playSwirl, playThump, playTick } from "@/lib/sfx";
 import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import {
   BALL_R,
@@ -20,10 +20,14 @@ import {
   ROW1B,
   ROW2,
   ROW2B,
+  ROLLER,
+  ROLLERS,
   ROW3,
   rowY,
   SEESAW,
   seesawSpot,
+  SHELF,
+  shelfSpot,
   slotBoard,
   slotMiddle,
   SLOTS,
@@ -33,6 +37,7 @@ import {
   wheelIn,
   type Piece,
   type Pt,
+  type Roller,
   type Route,
   type Row,
   type Slot,
@@ -49,18 +54,65 @@ const LAND_MS = 380;
 /** The flag springs up out of the full basket; then the level is done. */
 const FLAG_MS = 500;
 const DONE_AFTER_FULL_MS = 2200;
+/** A thing picked from the shelf flies into the hopper first. */
+const FLY_MS = 380;
+/** A new thing pops up on the shelf this long after one was taken. */
+const REFILL_MS = 250;
+/** The soap bubble's even speed, before its pace. */
+const FLOAT_SPEED = 330;
+/** The tennis ball's hops on the rows: how high, and how far apart. */
+const HOP_H = 34;
+const HOP_LEN = 130;
+/** The soap bubble bursts above the basket. */
+const POP_MS = 600;
 /** Sections of the run: a fixed one before every spot, the spot, and the fixed one to the basket. */
 const LAST_SECTION = SLOTS.length * 2;
 
 export const BAR_COLORS = ["#ff5d73", "#ff8c42", "#ffb703", "#3ec300", "#00b4d8", "#3a86ff", "#8e7dff", "#ff7bd0"];
 const INK = "#2a1e5c";
 
+/** What each thing sounds like as it goes into the hopper. */
+const RELEASE_SOUND: Record<Roller, () => void> = {
+  marble: playPop,
+  tennis: playBoing,
+  iron: playRumble,
+  apple: () => playKnock(480),
+  bubble: playBlub,
+};
+
+/**
+ * How far above its path a thing is drawn: bigger things sit higher on the
+ * rail, the tennis ball hops along the rows, the apple bumps a little because
+ * it isn't round, and the soap bubble floats over the rail, bobbing.
+ */
+function lift(m: Marble, t: number): number {
+  const sit = ROLLER[m.kind].r - BALL_R;
+  switch (m.kind) {
+    case "tennis":
+      return sit + HOP_H * m.hop * Math.abs(Math.sin((m.dist * Math.PI) / HOP_LEN));
+    case "apple":
+      return sit + 4 * Math.abs(Math.sin(m.spin));
+    case "bubble":
+      return sit + 14 + 6 * Math.sin(t / 260);
+    default:
+      return sit;
+  }
+}
+
 /** The parts in the spots, kept from one round to the next while the game is open. */
 let keptBuild = DEFAULT_BUILD;
 
 interface Marble {
   id: number;
+  /** What it is; without the shelf always a marble. */
+  kind: Roller;
   color: string;
+  /** Picked from the shelf: it flies from there into the hopper, starting at `at`. */
+  fly: { from: Pt; at: number } | null;
+  /** Distance rolled in all, for the tennis ball's hops. */
+  dist: number;
+  /** How much the tennis ball hops just now (0–1): on the rows, not in the parts. */
+  hop: number;
   /** Which section of the run it is on: even ones are fixed, odd ones are the spots. */
   section: number;
   /** The part in the spot it is passing through, taken when it got there. */
@@ -78,6 +130,7 @@ interface Marble {
 
 interface Landed {
   id: number;
+  kind: Roller;
   color: string;
   from: Pt;
   to: Pt;
@@ -102,8 +155,13 @@ interface SpotState {
  * is full a flag springs up out of it. If the grown-ups allow it, tapping a
  * spot swaps its part (bell, trampoline, funnel, paddle wheel), and the next
  * marble takes the new way.
+ *
+ * With `pick` (K-07) nothing comes out by itself: three big things lie on a
+ * shelf over the first row, and tapping one lets out just that one. Each rolls
+ * its own way – the tennis ball hops, the iron ball rumbles slowly with deep
+ * notes, the soap bubble floats and bursts above the basket.
  */
-export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
+export function TrackLevel({ sound, say, onDone, rebuild, pick }: LevelProps) {
   const routes = useMemo(buildRoutes, []);
   const build = useRef<Piece[]>(rebuild ? [...keptBuild] : [...DEFAULT_BUILD]);
   const spots = useRef<SpotState[]>(SLOTS.map(() => ({ hit: -Infinity, swapped: -Infinity, angle: 0, spin: 0, pending: null })));
@@ -117,16 +175,22 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
   const tilt = useRef(SEESAW.rest);
   const done = useRef(false);
   const now = useRef(performance.now());
+  /** The three things on the shelf, when each was put there, and which a key or a tap on the wall lets out next. */
+  const [firstShelf] = useState(() => [...ROLLERS].sort(() => Math.random() - 0.5).slice(0, SHELF.things.length));
+  const shelf = useRef(firstShelf);
+  const filled = useRef(SHELF.things.map(() => -Infinity));
+  const turn = useRef(0);
+  const pops = useRef<{ id: number; x: number; y: number; at: number }[]>([]);
   const pegs = useId();
 
   const routeOf = (m: Marble): Route => (m.section % 2 ? routes.pieces[(m.section - 1) / 2][m.piece] : routes.fixed[m.section / 2]);
   const zoneAt = (route: Route, s: number) => route.zones.find((z) => s >= z.s0 && s < z.s1);
 
-  const fire = (event: TrackEvent, t: number) => {
+  const fire = (event: TrackEvent, t: number, kind: Roller) => {
     switch (event.kind) {
       case "note":
         bars.current[event.bar] = t;
-        sound(() => playCountNote(event.bar));
+        sound(() => (kind === "iron" ? playDeepNote(event.bar) : playCountNote(event.bar)));
         break;
       case "bell":
         spots.current[event.slot].hit = t;
@@ -143,7 +207,7 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
         sound(playTick);
         break;
       case "seesaw":
-        sound(playBoing);
+        sound(kind === "iron" ? playThump : playBoing);
         break;
       case "basket":
         break;
@@ -152,8 +216,8 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
 
   const land = (m: Marble, t: number) => {
     const slot = Math.min(landed.current.length, BASKET_SLOTS.length - 1);
-    landed.current.push({ id: m.id, color: m.color, from: { x: m.x, y: m.y }, to: BASKET_SLOTS[slot], at: t });
-    sound(playPlop);
+    landed.current.push({ id: m.id, kind: m.kind, color: m.color, from: { x: m.x, y: m.y }, to: BASKET_SLOTS[slot], at: t });
+    sound(m.kind === "iron" ? playThump : playPlop);
     if (!done.current && landed.current.length >= BASKET_FULL) {
       done.current = true;
       fullAt.current = t;
@@ -184,21 +248,34 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
 
   useFrames((dt, t) => {
     now.current = t;
-    if (openedAt.current !== null && nextId.current < BASKET_FULL && t - openedAt.current >= nextId.current * RELEASE_GAP_MS) release();
+    if (!pick && openedAt.current !== null && nextId.current < BASKET_FULL && t - openedAt.current >= nextId.current * RELEASE_GAP_MS) release("marble");
     const onWheel = SLOTS.map(() => false);
     let onSeesaw = false;
     for (const m of marbles.current) {
+      if (m.fly) {
+        const k = (t - m.fly.at) / FLY_MS;
+        if (k < 1) {
+          // Up out of the shelf and over into the hopper.
+          m.x = m.fly.from.x + (HOPPER.x - m.fly.from.x) * k;
+          m.y = m.fly.from.y + (HOPPER.y - m.fly.from.y) * k - 90 * Math.sin(Math.PI * k);
+          continue;
+        }
+        m.fly = null;
+      }
+      const kind = ROLLER[m.kind];
       const zone = zoneAt(routeOf(m), m.s);
       if (zone?.speed) m.v = zone.speed;
+      else if (kind.float) m.v = FLOAT_SPEED;
       else {
         const { slope } = pointAt(routeOf(m), m.s);
         m.v = Math.min(MAX_SPEED, Math.max(MIN_SPEED, m.v + (GRAVITY * slope - FRICTION * m.v) * dt));
       }
-      m.s += m.v * dt;
+      m.s += m.v * kind.pace * dt;
+      m.dist += m.v * kind.pace * dt;
       // Fire what it passed; at the end of a section go on to the next one, taking the part that is in the spot now.
       for (;;) {
         const route = routeOf(m);
-        while (m.next < route.events.length && route.events[m.next].s <= m.s) fire(route.events[m.next++].event, t);
+        while (m.next < route.events.length && route.events[m.next].s <= m.s) fire(route.events[m.next++].event, t, m.kind);
         if (m.s < route.total || m.section === LAST_SECTION) break;
         m.s -= route.total;
         m.section++;
@@ -210,15 +287,23 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
       const pt = here?.seesaw ? seesawSpot((m.s - here.s0) / (here.s1 - here.s0), tilt.current) : pointAt(route, m.s).pt;
       if (here?.seesaw) onSeesaw = true;
       else if (here?.kind === "wheel") onWheel[(m.section - 1) / 2] = true;
-      m.spin += (pt.x - m.x) / BALL_R;
+      m.hop += ((!here && m.section % 2 === 0 ? 1 : 0) - m.hop) * Math.min(1, dt * 10);
+      m.spin += (pt.x - m.x) / kind.r;
       m.x = pt.x;
-      m.y = pt.y;
+      m.y = pt.y - lift(m, t);
     }
     const arrived = marbles.current.filter((m) => m.section === LAST_SECTION && m.s >= routes.fixed[SLOTS.length].total);
     if (arrived.length) {
       marbles.current = marbles.current.filter((m) => !arrived.includes(m));
-      arrived.forEach((m) => land(m, t));
+      arrived.forEach((m) => {
+        // The soap bubble doesn't land: "Plopp", and it is gone.
+        if (m.kind === "bubble") {
+          pops.current.push({ id: m.id, x: m.x, y: m.y, at: t });
+          sound(playPop);
+        } else land(m, t);
+      });
     }
+    pops.current = pops.current.filter((p) => t - p.at < POP_MS);
     spots.current.forEach((spot, i) => {
       if (spot.pending && !busy(i)) put(i, spot.pending, t);
       // A wheel turns while a marble rides it, then slowly stops.
@@ -231,31 +316,49 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
     tilt.current += (target - tilt.current) * Math.min(1, dt * (onSeesaw ? 10 : 4));
   });
 
-  const release = () => {
+  /** Lets a thing into the run at the hopper, or first flies it there from the shelf. */
+  const release = (kind: Roller, from?: Pt) => {
     const id = nextId.current++;
+    const start = from ?? HOPPER;
     marbles.current.push({
       id,
+      kind,
       color: BRIGHT_COLORS[id % BRIGHT_COLORS.length],
+      fly: from ? { from, at: performance.now() } : null,
+      dist: 0,
+      hop: 0,
       section: 0,
       piece: build.current[0],
       s: 0,
       v: 0,
       next: 0,
       spin: 0,
-      x: HOPPER.x,
-      y: HOPPER.y,
+      x: start.x,
+      y: start.y,
     });
-    sound(playPop);
+    sound(RELEASE_SOUND[kind]);
   };
 
+  /** The i-th thing on the shelf goes into the hopper, and something else pops up in its place. */
+  const take = (i: number) => {
+    if (done.current) return;
+    release(shelf.current[i], shelfSpot(i, shelf.current[i]));
+    const others = shelf.current.filter((_, j) => j !== i);
+    const choices = ROLLERS.filter((r) => r !== shelf.current[i] && !others.includes(r));
+    shelf.current[i] = choices[Math.floor(Math.random() * choices.length)];
+    filled.current[i] = performance.now();
+  };
+
+  /** A key or a tap on the wall: the hopper opens, or with the shelf the next thing on it goes in turn. */
   const open = () => {
-    if (openedAt.current === null) openedAt.current = performance.now();
+    if (pick) take(turn.current++ % SHELF.things.length);
+    else if (openedAt.current === null) openedAt.current = performance.now();
   };
 
   useAnyKey(open);
 
   const t = now.current;
-  const started = openedAt.current !== null;
+  const started = pick ? nextId.current > 0 : openedAt.current !== null;
   const flagAge = t - fullAt.current;
   const spot = (i: number, layer: "back" | "front") => (
     <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />
@@ -303,10 +406,15 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
         {landed.current.map((l) => {
           const k = Math.min(1, (t - l.at) / LAND_MS);
           const bounce = k < 1 ? 0 : wobble((t - l.at - LAND_MS) / 1000, 6, 20, 8);
-          return <Ball key={l.id} color={l.color} x={l.from.x + (l.to.x - l.from.x) * k} y={l.from.y + (l.to.y - l.from.y) * k * k - Math.abs(bounce)} spin={0} />;
+          const x = l.from.x + (l.to.x - l.from.x) * k;
+          const y = l.from.y + (l.to.y - l.from.y) * k * k - Math.abs(bounce) - (ROLLER[l.kind].r - BALL_R);
+          return <RollerBody key={l.id} kind={l.kind} color={l.color} x={x} y={y} spin={0} />;
         })}
         {marbles.current.map((m) => (
-          <Ball key={m.id} color={m.color} x={m.x} y={m.y} spin={m.spin} />
+          <RollerBody key={m.id} kind={m.kind} color={m.color} x={m.x} y={m.y} spin={m.spin} scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : 1} />
+        ))}
+        {pops.current.map((p) => (
+          <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
         ))}
 
         {/* In front of the marbles */}
@@ -332,8 +440,16 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
             );
           })}
 
+        {pick && <Shelf things={shelf.current} filled={filled.current} color={BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length]} t={t} onTake={take} />}
+
         {!started && (
-          <text className="marble-hint" x={HOPPER.x + 92} y={HOPPER.y + 96} fontSize="90" textAnchor="middle">
+          <text
+            className="marble-hint"
+            x={pick ? SHELF.things[1] + 40 : HOPPER.x + 92}
+            y={pick ? SHELF.y + 100 : HOPPER.y + 96}
+            fontSize="90"
+            textAnchor="middle"
+          >
             👆
           </text>
         )}
@@ -346,6 +462,121 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
 function SpotBoard({ slot }: { slot: Slot }) {
   const b = slotBoard(slot);
   return <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="#e9c08a" stroke="#c48a4d" strokeWidth="4" strokeDasharray="14 10" />;
+}
+
+/** A thing on the run (or bigger by `scale`, on the shelf), its middle at `x`, `y`, turned by `spin` as it rolls. */
+function RollerBody({ kind, color, x, y, spin, scale = 1 }: { kind: Roller; color: string; x: number; y: number; spin: number; scale?: number }) {
+  const r = ROLLER[kind].r;
+  const deg = (spin * 180) / Math.PI;
+  let body: ReactNode;
+  switch (kind) {
+    case "marble":
+      body = <Ball color={color} x={0} y={0} spin={spin} />;
+      break;
+    case "tennis":
+      body = (
+        <g>
+          <circle r={r} fill="#d8ec3f" stroke={INK} strokeWidth="3" />
+          <g transform={`rotate(${deg})`} fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round">
+            <path d={`M${-r * 0.62} ${-r * 0.78} Q${-r * 0.12} 0 ${-r * 0.62} ${r * 0.78}`} />
+            <path d={`M${r * 0.62} ${-r * 0.78} Q${r * 0.12} 0 ${r * 0.62} ${r * 0.78}`} />
+          </g>
+          <circle cx={-r * 0.32} cy={-r * 0.38} r="4.5" fill="#fff" opacity="0.6" />
+        </g>
+      );
+      break;
+    case "iron":
+      body = (
+        <g>
+          <circle r={r} fill="#5d6577" stroke={INK} strokeWidth="3.5" />
+          <circle cx="3" cy="4" r={r - 6} fill="#4a5161" />
+          <g transform={`rotate(${deg})`}>
+            {[0, 120, 240].map((a) => (
+              <circle key={a} cx={(r - 8) * Math.cos((a * Math.PI) / 180)} cy={(r - 8) * Math.sin((a * Math.PI) / 180)} r="2.8" fill="#2f3440" />
+            ))}
+          </g>
+          <ellipse cx={-r * 0.35} cy={-r * 0.4} rx="7" ry="4.5" transform={`rotate(-35 ${-r * 0.35} ${-r * 0.4})`} fill="#fff" opacity="0.55" />
+        </g>
+      );
+      break;
+    case "apple":
+      body = (
+        <g>
+          <g transform={`rotate(${deg})`}>
+            <path
+              d={`M0 ${-r * 0.7} C${r * 0.5} ${-r * 1.15} ${r * 1.1} ${-r * 0.6} ${r * 0.98} ${r * 0.15} C${r * 0.88} ${r * 0.85} ${r * 0.35} ${r * 1.05} 0 ${r * 0.88} C${-r * 0.35} ${r * 1.05} ${-r * 0.88} ${r * 0.85} ${-r * 0.98} ${r * 0.15} C${-r * 1.1} ${-r * 0.6} ${-r * 0.5} ${-r * 1.15} 0 ${-r * 0.7} Z`}
+              fill="#e63946"
+              stroke={INK}
+              strokeWidth="3"
+              strokeLinejoin="round"
+            />
+            <path d={`M0 ${-r * 0.68} Q-2 ${-r * 1.05} 3 ${-r * 1.25}`} fill="none" stroke="#6b4220" strokeWidth="4" strokeLinecap="round" />
+            <path d={`M2 ${-r * 1.0} Q12 ${-r * 1.4} 22 ${-r * 1.05} Q12 ${-r * 0.82} 2 ${-r * 1.0} Z`} fill="#3ec300" stroke={INK} strokeWidth="2" />
+          </g>
+          <ellipse cx={-r * 0.42} cy={-r * 0.3} rx="4.5" ry="7" fill="#fff" opacity="0.55" />
+        </g>
+      );
+      break;
+    case "bubble":
+      body = (
+        <g>
+          <circle r={r} fill="#d6f1ff" fillOpacity="0.35" stroke="#7fc8f8" strokeWidth="2.5" />
+          <path d={`M${-r * 0.8} ${r * 0.3} A${r * 0.85} ${r * 0.85} 0 0 0 ${r * 0.3} ${r * 0.8}`} fill="none" stroke="#ff7bd0" strokeWidth="3" opacity="0.6" strokeLinecap="round" />
+          <path d={`M${r * 0.45} ${-r * 0.62} A${r * 0.78} ${r * 0.78} 0 0 1 ${r * 0.75} ${-r * 0.1}`} fill="none" stroke="#ffd23f" strokeWidth="3" opacity="0.6" strokeLinecap="round" />
+          <ellipse cx={-r * 0.38} cy={-r * 0.42} rx="7" ry="4" transform={`rotate(-40 ${-r * 0.38} ${-r * 0.42})`} fill="#fff" opacity="0.9" />
+        </g>
+      );
+      break;
+  }
+  return <g transform={`translate(${x} ${y}) scale(${scale})`}>{body}</g>;
+}
+
+/** The soap bubble bursting, `age` from 0 to 1: a ring that widens and fades, and droplets flying out. */
+function BubblePop({ x, y, age }: { x: number; y: number; age: number }) {
+  const r = ROLLER.bubble.r;
+  return (
+    <g transform={`translate(${x} ${y})`} opacity={1 - age}>
+      <circle r={r * (1 + age * 0.8)} fill="none" stroke="#7fc8f8" strokeWidth={3 * (1 - age) + 0.5} />
+      {Array.from({ length: 8 }, (_, i) => {
+        const a = (i * Math.PI) / 4;
+        const d = r + 36 * age;
+        return <circle key={i} cx={d * Math.cos(a)} cy={d * Math.sin(a)} r="4" fill="#bde9ff" stroke="#7fc8f8" strokeWidth="1.5" />;
+      })}
+    </g>
+  );
+}
+
+/**
+ * The shelf over row 1a with three things to pick from (K-07). Tapping one
+ * lets it out; the new one in its place pops up from small. A marble on it
+ * has `color`, the colour it keeps on the run.
+ */
+function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled: number[]; color: string; t: number; onTake: (i: number) => void }) {
+  return (
+    <g>
+      <rect x={SHELF.x0} y={SHELF.y} width={SHELF.x1 - SHELF.x0} height="13" rx="6" fill="#b8763d" stroke={INK} strokeWidth="3" />
+      {things.map((kind, i) => {
+        const at = shelfSpot(i, kind);
+        const age = (t - filled[i] - REFILL_MS) / 1000;
+        const k = age < 0 ? 0 : age < 1.5 ? 1 - Math.exp(-age * 7) * Math.cos(age * 22) : 1;
+        return (
+          <g
+            key={i}
+            className="shelf-thing"
+            onPointerDown={(e: PointerEvent) => {
+              e.stopPropagation();
+              onTake(i);
+            }}
+          >
+            <rect x={at.x - 58} y="-10" width="116" height={SHELF.y + 26} fill="transparent" />
+            <g transform={`translate(${at.x} ${SHELF.y}) scale(${k}) translate(${-at.x} ${-SHELF.y})`}>
+              <RollerBody kind={kind} color={color} x={at.x} y={at.y} spin={0} scale={SHELF.scale} />
+            </g>
+          </g>
+        );
+      })}
+    </g>
+  );
 }
 
 /** A row's rails with the beam under its xylophone bars, which light up and dip when hit. */

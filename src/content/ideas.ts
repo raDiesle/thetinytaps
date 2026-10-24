@@ -1253,6 +1253,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Oben am Trichter liegen drei große Dinge zur Wahl: Murmel, Tennisball, schwere Eisenkugel, Apfel, Seifenblase. Antippen lässt genau dieses los, und jedes rollt anders: der Tennisball hüpft über die Stäbe, die Eisenkugel poltert langsam und dröhnt tief, die Seifenblase schwebt und macht unten „Plopp“.",
         why: "Wählen aus wenigen Bildern; nebenbei schwer und leicht, schnell und langsam.",
         effort: "M",
+        done: true,
       },
       {
         id: "K-08",

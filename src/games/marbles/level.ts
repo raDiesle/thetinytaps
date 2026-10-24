@@ -10,6 +10,8 @@ export interface LevelProps {
   onDone: () => void;
   /** Kugelbahn: tapping one of the three spots swaps its part. */
   rebuild: boolean;
+  /** Kugelbahn: three things to pick from at the hopper instead of six marbles in a row. */
+  pick: boolean;
 }
 
 /** The picture's size; both levels draw in these coordinates. */

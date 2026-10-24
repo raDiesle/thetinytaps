@@ -13,6 +13,8 @@ export interface MarbleSettings {
   speech: boolean;
   /** Kugelbahn: three spots on the run whose part a tap swaps (bell, trampoline, funnel, paddle wheel). */
   rebuild: boolean;
+  /** Kugelbahn: three things to pick from at the hopper, and a tap lets out just that one (K-07). */
+  pick: boolean;
   /** Bell, xylophone and the knocks of falling things. */
   sounds: boolean;
 }
@@ -20,6 +22,7 @@ export interface MarbleSettings {
 export const DEFAULT_MARBLE_SETTINGS: MarbleSettings = {
   levels: "all",
   rebuild: true,
+  pick: true,
   speech: false,
   sounds: true,
 };
