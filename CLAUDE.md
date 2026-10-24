@@ -92,7 +92,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`) – use `/neues-spiel`.
-- A new Lebendige-Bilder picture: `/neue-szene`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`.
+- A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`.
 
 ## Checking your work
 
