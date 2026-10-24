@@ -4,7 +4,7 @@ export type AdventurePace = "normal" | "calm";
 export interface AdventureSettings {
   /** The guide speaks every situation and movement; off by default, the fox shows everything. */
   speech: boolean;
-  /** Background music. */
+  /** Background music; off by default. */
   music: boolean;
   /** Splashes, whooshes and sparkles. */
   sounds: boolean;
@@ -17,7 +17,7 @@ export interface AdventureSettings {
 
 export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
   speech: false,
-  music: true,
+  music: false,
   sounds: true,
   pace: "normal",
   outline: true,
@@ -25,7 +25,22 @@ export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
 };
 
 // v2: speech is off by default now, so old saved settings start fresh.
-export const ADVENTURE_SETTINGS_KEY = "tinytaps.adventure.v2";
+// v3: no music by default, so music saved before is switched off once; all other choices are carried over.
+export const ADVENTURE_SETTINGS_KEY = "tinytaps.adventure.v3";
+const OLD_ADVENTURE_SETTINGS_KEY = "tinytaps.adventure.v2";
+
+/** Takes over the settings saved under v2, without the music. Call before reading the settings. */
+export function carryOverAdventureSettings() {
+  try {
+    const old = localStorage.getItem(OLD_ADVENTURE_SETTINGS_KEY);
+    if (old === null || localStorage.getItem(ADVENTURE_SETTINGS_KEY) !== null) return;
+    const { music: _, ...rest } = JSON.parse(old) as Partial<AdventureSettings>;
+    localStorage.setItem(ADVENTURE_SETTINGS_KEY, JSON.stringify(rest));
+    localStorage.removeItem(OLD_ADVENTURE_SETTINGS_KEY);
+  } catch {
+    // Broken or unavailable storage: the defaults apply.
+  }
+}
 
 /** How much slower the calm pace runs. */
 export const CALM_PACE = 1.3;

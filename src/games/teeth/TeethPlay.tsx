@@ -172,11 +172,11 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   const brushing = step !== null && !paused;
   useEffect(() => {
-    if (!brushing || !settings.sounds) return;
+    if (!brushing || !settings.music) return;
     let beat = 0;
     const timer = setInterval(() => playTuneNote(beat++), BEAT_MS);
     return () => clearInterval(timer);
-  }, [brushing, settings.sounds, round]);
+  }, [brushing, settings.music, round]);
 
   // What to say and play when a new part begins.
   useEffect(() => {

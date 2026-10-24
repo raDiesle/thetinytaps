@@ -1,5 +1,7 @@
 // Small synthesized sound effects, so no audio files are needed.
 
+import { silent } from "./silent";
+
 // C-major pentatonic: any sequence of these notes sounds pleasant.
 const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66, 1318.51];
 
@@ -8,7 +10,9 @@ let masterVolume = 1;
 
 function audio(): AudioContext | null {
   if (typeof window === "undefined" || !("AudioContext" in window)) return null;
-  ctx ??= new AudioContext();
+  // Silent: the context runs (timing, microphone) but has no speaker to play to.
+  // (`sinkId` is not in TypeScript's types yet.)
+  ctx ??= silent ? new AudioContext({ sinkId: { type: "none" } } as AudioContextOptions) : new AudioContext();
   return ctx;
 }
 

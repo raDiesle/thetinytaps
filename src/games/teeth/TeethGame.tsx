@@ -37,6 +37,7 @@ export function TeethGame() {
               checked={settings.speech}
               onChange={(speech) => update({ speech })}
             />
+            <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
             <p className="setting-note">
               Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes
               Mal, ob der Mund weit auf ist oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und
