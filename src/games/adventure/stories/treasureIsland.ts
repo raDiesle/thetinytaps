@@ -5,11 +5,9 @@ import {
   BRUSH_PERIOD,
   CRANK_PERIOD,
   duckDepth,
-  isBump,
   JUMP_LANDING,
   JUMP_PEAK,
   JUMP_PERIOD,
-  jumpProgress,
   KEY_PICKUP,
   KEY_TURN,
   keyTurn,
@@ -19,14 +17,9 @@ import {
 } from "../three/clips";
 import { GUIDE_SIZE, type Guide } from "../three/guide";
 import {
-  CANOE_FEET,
-  CANOE_HALF_LENGTH,
-  CANOE_HALF_WIDTH,
-  CANOE_RIM,
   makeBasket,
   makeBush,
   makeButterfly,
-  makeCanoe,
   makeChest,
   makeCloud,
   makeConfetti,
@@ -40,15 +33,20 @@ import {
   makeParrot,
   makeRock,
   makeScorpion,
+  makeTurtle,
   mat,
   mergeStatic,
   seeded,
   solid,
+  TURTLE_BACK,
+  TURTLE_HALF_WIDTH,
+  turtleTop,
 } from "../three/props";
 import { DAY, makeWater, SUNSET, type Stage } from "../three/stage";
 import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from "./story";
 
-// "Die Schatzinsel": Tapsi greets us from the canoe and paddles to an island,
+// "Die Schatzinsel": Tapsi greets us from the back of Ole, a big sea turtle,
+// and paddles to an island,
 // stomps the scorpions on the beach away, hops over the little bridge across
 // the brook and bumps star boxes with the head, ducks under a swinging log, wakes
 // the flowers, cranks a wooden gate open, steps aside for rolling coconuts,
@@ -59,7 +57,9 @@ import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from 
 // the music stops, Tapsi, Kiki and the crabs freeze) and fireworks. Every world reaction is timed to the
 // guide's clip, so it happens together with the child's movement. Every
 // movement stays on the spot: the child in front of the screen never has to
-// go forwards.
+// go forwards. So Tapsi never walks either: Ole carries Tapsi the whole way,
+// swimming and crawling from station to station, and at the treasure turns
+// round under Tapsi to face us.
 //
 // First a red dotted trail draws the way across the island to the chest, like
 // on a treasure map. Tapsi greets us from the front, then the camera swings
@@ -248,8 +248,8 @@ function makeSwing() {
   const pivot = new THREE.Group();
   pivot.position.y = 5.7;
   group.add(pivot);
-  // The log hangs just above Tapsi's ducked head: under it standing, over it ducked.
-  const length = 3.85;
+  // The log hangs just above Tapsi's ducked head, Tapsi on Ole's back: under it standing, over it ducked.
+  const length = 3.85 - TURTLE_BACK;
   const vine = mat("#3f7d2c", 0.9);
   for (const side of [1, -1]) {
     const rope = solid(new THREE.CylinderGeometry(0.04, 0.04, length, 6), vine);
@@ -616,18 +616,18 @@ function makeTrail() {
 /** Where things happen; z along the path. */
 const BOAT_START = 62;
 const BOAT_END = 35;
+/** Where Ole has crawled up the beach after the paddling, with Tapsi still on its back. */
+const BEACH_Z = 32.2;
 /** On the beach, where the scorpions come. */
 const STOMP_Z = 31.5;
 const BROOK_FROM = 27.3;
-/** The hops over the brook, along the little bridge from one bank to the other. */
+/** Over the brook Ole walks along the little bridge from one bank to the other, while Tapsi hops on its back. */
 const JUMP_FROM = BROOK_FROM + 0.4;
-const JUMP_STEP = 0.7;
-const JUMPS = 6;
-const JUMP_TO = JUMP_FROM - JUMPS * JUMP_STEP;
-/** The little wooden bridge: where it starts and ends (z), half its width, the top of its deck at the ends and how much higher it arches in the middle. */
+const JUMP_TO = JUMP_FROM - 4.2;
+/** The little wooden bridge: where it starts and ends (z), half its width (Ole walks over it), the top of its deck at the ends and how much higher it arches in the middle. */
 const BRIDGE_FROM = JUMP_FROM + 0.35;
 const BRIDGE_TO = JUMP_TO - 0.35;
-const BRIDGE_HALF = 0.6;
+const BRIDGE_HALF = 0.98;
 const BRIDGE_END = 0.87;
 const BRIDGE_ARCH = 0.12;
 /** How high above where Tapsi stands the star boxes float: the head just reaches them at the top of a jump. */
@@ -650,7 +650,14 @@ const WINCH_Z = GATE_Z + 0.35;
 const CRANK_REACH = 0.39 * GUIDE_SIZE;
 const CRANK_HEIGHT = 0.86 * GUIDE_SIZE;
 const CRANK_ARM = 0.24 * GUIDE_SIZE;
+/** The crank's axle above the ground: Tapsi turns it standing on Ole's back. */
+const CRANK_Y = TURTLE_BACK + CRANK_HEIGHT;
+/** How far behind the crank the winch's post stands: beyond Ole's head. */
+const WINCH_POST = 1.15;
 const ROLL_Z = 6.6;
+/** The coconuts roll down this far to Tapsi's right, just past Ole's head and over its shell, and are this big. */
+const ROLL_X = 0.55;
+const ROLL_RADIUS = 0.4;
 const MONKEY_Z = 2.4;
 const APPLE_Z = -1.4;
 const DOOR_Z = -9.9;
@@ -663,20 +670,27 @@ const WEB_Z = DOOR_Z - 0.3;
 const WEB_LAYERS = 4;
 const WEB_GAP = 0.12;
 const SHORE = v3(0, 0, -21.8);
-/** Where Tapsi sits in the canoe, for the cameras. */
-const CANOE_FLOOR = -0.08;
-/** Where Tapsi lands after hopping out of the canoe over its right side (x, z), wading in the shallow water: ahead of the paddle's blade. */
-const HOP_TO: [number, number] = [1.3, BOAT_END - 1.2];
-const WADE = -0.3;
-const RAFT_X = 1.3;
-const RAFT_FROM = -35;
-/** Pulled up to the beach, in front of Tapsi on the right. */
-const RAFT_TO = -23.6;
+/** How deep Ole's belly is under the water while swimming (m). */
+const TURTLE_FLOAT = 0.25;
+/** How much lower Tapsi's feet are than Ole's back while sitting on it, legs stretched out forwards (see sitDown in player.ts). */
+const SIT_DROP = 0.1;
+/** In the bay Ole swims at the water's edge, side on, with Tapsi on its back facing the water. */
+const BAY = v3(0.3, 0, -23);
 /** Where the lock hangs on the chest (the chest's own space), and where the turning paw is, from Tapsi. */
 const LOCK = v3(0, 0.62, 0.45);
 const KEY_HAND = v3(-0.1, 0.95, 0.42).multiplyScalar(GUIDE_SIZE);
-/** Where Tapsi celebrates, facing us. */
-const PARTY = v3(0.3, 0, SHORE.z + 0.2);
+const RAFT_FROM = -35;
+/** Pulled in to Ole's side, the chest right in front of Tapsi: x so the lock is at the turning paw, z just clear of the shell. */
+const RAFT_TO = BAY.z - TURTLE_HALF_WIDTH - 1.12;
+const RAFT_X = BAY.x - KEY_HAND.x - LOCK.x;
+/**
+ * The chest on its crate at the near end of the raft (the raft's own space): high enough that the
+ * lock is where Tapsi's paw turns the key, standing on Ole's back, and close enough to reach.
+ */
+const CHEST_Y = TURTLE_BACK - TURTLE_FLOAT + KEY_HAND.y - LOCK.y;
+const CHEST_Z = BAY.z - KEY_HAND.z - LOCK.z - RAFT_TO;
+/** Where Tapsi celebrates, facing us: Ole has turned round and crawled up the beach. */
+const PARTY = v3(BAY.x, 0, BAY.z + 1.9);
 
 /** The top of the bridge's deck at (x, z), or -Infinity off the bridge. */
 function bridgeTop(x: number, z: number) {
@@ -684,8 +698,6 @@ function bridgeTop(x: number, z: number) {
   return BRIDGE_END + BRIDGE_ARCH * Math.sin((Math.PI * (BRIDGE_FROM - z)) / (BRIDGE_FROM - BRIDGE_TO));
 }
 
-/** Where Tapsi lands after `at` hops over the brook, on the bridge. */
-const landingHeight = (at: number) => bridgeTop(0, JUMP_FROM - at * JUMP_STEP);
 
 /** The step indices of the sequence, by name. */
 const S = {
@@ -714,8 +726,19 @@ const TRAVEL = [2.5, 3, 3, 3.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 3.5, 2.5, 2.5, 2, 1];
 const DEMO = [2.5, 2.8, 1.6, 3 * JUMP_PERIOD, 3, 4, CRANK_PERIOD, 3, 3.4, 2.6, 2, BRUSH_PERIOD, 3.6, KEY_PICKUP + KEY_TURN, 2, STOP_DANCE[0].dance + STOP_DANCE[0].hold, 2];
 const LEAD = TRAVEL.map((t, i) => t + DEMO[i]);
 const PRAISE = 2.5;
+/** Seconds the child moves along in a step, after Tapsi has shown it. */
+const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL[step] - PRAISE;
+/** Seconds of a step's clip that the world follows: from when Tapsi shows it until the praise. */
+const clipLength = (step: number) => DEMO[step] + actLength(step);
+/** Seconds into the jump clip when the head bumps star box `n`: at the top of every third jump. */
+const bumpTime = (n: number) => (n * 3 + 2) * JUMP_PERIOD + JUMP_PEAK;
+/** Where Ole is on the bridge (z) `clip` seconds into the jump clip: walking steadily across while Tapsi hops on its back. */
+function jumpZ(clip: number) {
+  const k = clamp01(clip / clipLength(S.jump));
+  return JUMP_FROM + (JUMP_TO - JUMP_FROM) * (k * 0.8 + smooth(k) * 0.2);
+}
 const OPENING = 8;
-/** In the opening: when the trail starts and reaches the chest, and the flash back to the canoe. */
+/** In the opening: when the trail starts and reaches the chest, and the flash back to Ole at sea. */
 const TRAIL_FROM = 0.6;
 const TRAIL_TO = 5.2;
 const OPENING_CUT = 6.6;
@@ -729,16 +752,17 @@ const PADDLE_PERIOD = 2.8;
 const PADDLE_TILT = 1.3;
 /** How far from its middle each paw holds the paddle while it lies on the lap (m). */
 const PADDLE_GRIP = 0.22;
-/** The paddle lying across: its shaft (y) along x, the blades flat (z up), in Tapsi's lap and in the canoe. */
+/** The paddle lying across Tapsi's lap: its shaft (y) along x, the blades flat (z up); and on the sand, along z. */
 const ACROSS = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(v3(0, 0, 1), v3(1, 0, 0), v3(0, 1, 0)));
-const ACROSS_CANOE = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(v3(0, 0, -1), v3(-1, 0, 0), v3(0, 1, 0)));
+const ON_SAND = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(v3(-1, 0, 0), v3(0, 0, 1), v3(0, 1, 0)));
+/** Where Tapsi lets the paddle fall onto the beach, beside Ole on the right. */
+const PADDLE_DROP = v3(1.35, 0, BEACH_Z + 0.3);
 /** The stomp clip: a foot comes down every half period, the left one first. */
 const STOMP_PERIOD = 1.6;
 const SIDE_STEP_PERIOD = 3;
 const LEAN_PERIOD = 3.4;
 const REACH_PERIOD = 2.6;
 
-const SCORPIONS = 10;
 const ROLLERS = 4;
 const THROWS = 8;
 const APPLES = 8;
@@ -859,23 +883,24 @@ function makeGate() {
     gate.add(batten);
   }
 
-  // The winch: a block with a drum, its axle pointing at Tapsi, and the crank on the near end.
+  // The winch: a post beyond Ole's head, a long axle pointing at Tapsi with the drum on it, and
+  // the crank on the near end.
   const winch = new THREE.Group();
   winch.position.set(WINCH_X, 0, WINCH_Z - GATE_Z);
   group.add(winch);
-  const block = solid(new THREE.BoxGeometry(0.28, CRANK_HEIGHT, 0.28), dark);
-  block.position.set(0, CRANK_HEIGHT / 2, -0.45);
+  const block = solid(new THREE.BoxGeometry(0.28, CRANK_Y + 0.15, 0.28), dark);
+  block.position.set(0, (CRANK_Y + 0.15) / 2, -WINCH_POST);
   winch.add(block);
   const drum = solid(new THREE.CylinderGeometry(0.13, 0.13, 0.3, 14), wood);
   drum.rotation.x = Math.PI / 2;
-  drum.position.set(0, CRANK_HEIGHT, -0.22);
+  drum.position.set(0, CRANK_Y, -WINCH_POST + 0.3);
   winch.add(drum);
-  const axle = solid(new THREE.CylinderGeometry(0.03, 0.03, 0.5, 8), dark);
+  const axle = solid(new THREE.CylinderGeometry(0.03, 0.03, WINCH_POST + 0.05, 8), dark);
   axle.rotation.x = Math.PI / 2;
-  axle.position.set(0, CRANK_HEIGHT, -0.2);
+  axle.position.set(0, CRANK_Y, -WINCH_POST / 2 - 0.02);
   winch.add(axle);
   const crank = new THREE.Group();
-  crank.position.set(0, CRANK_HEIGHT, 0);
+  crank.position.set(0, CRANK_Y, 0);
   winch.add(crank);
   const arm = solid(new THREE.BoxGeometry(0.05, CRANK_ARM + 0.05, 0.04), dark);
   arm.position.y = CRANK_ARM / 2;
@@ -897,7 +922,7 @@ function makeGate() {
     r.scale.y = a.distanceTo(b);
     r.quaternion.setFromUnitVectors(v3(0, 1, 0), b.clone().sub(a).normalize());
   };
-  const drumTop = v3(WINCH_X, CRANK_HEIGHT + 0.13, WINCH_Z - GATE_Z - 0.22);
+  const drumTop = v3(WINCH_X, CRANK_Y + 0.13, WINCH_Z - GATE_Z - WINCH_POST + 0.3);
   const overPulley = v3(WINCH_X + 0.45, 3.25, 0.2);
   return {
     group,
@@ -911,16 +936,17 @@ function makeGate() {
   };
 }
 
-/** An apple tree leaning over the path, with its crown above Tapsi. */
+/** An apple tree leaning over the path, with its crown above Tapsi on Ole's back. */
 function makeAppleTree() {
   const group = new THREE.Group();
   const bark = mat("#7b5233", 0.95);
-  const trunk = solid(new THREE.CylinderGeometry(0.2, 0.3, 2.6, 10), bark);
-  trunk.position.set(-1.6, 1.25, -1.0);
+  const up = TURTLE_BACK;
+  const trunk = solid(new THREE.CylinderGeometry(0.2, 0.3, 2.6 + up, 10), bark);
+  trunk.position.set(-1.6, 1.25 + up / 2, -1.0);
   trunk.rotation.z = -0.18;
   group.add(trunk);
   const bough = solid(new THREE.CylinderGeometry(0.1, 0.16, 2.4, 8), bark);
-  bough.position.set(-0.5, 2.25, -0.75);
+  bough.position.set(-0.5, 2.25 + up, -0.75);
   bough.rotation.z = 1.25;
   group.add(bough);
   const leaves = ["#3d8f36", "#4ea640", "#5cb84a"];
@@ -930,7 +956,7 @@ function makeAppleTree() {
     [0.6, 2.05, -0.55, 1.15, 63],
   ]) {
     const crown = makeBush(size, seed, leaves);
-    crown.position.set(x, y, z);
+    crown.position.set(x, y + up, z);
     group.add(crown);
   }
   return group;
@@ -1056,27 +1082,33 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   scene.add(mergeStatic(scenery));
 
   // --- Things of the story -------------------------------------------------
-  const canoe = makeCanoe();
-  scene.add(canoe);
+  const turtle = makeTurtle();
+  scene.add(turtle.group);
   const paddle = makePaddle();
   scene.add(paddle);
 
   const parrot = makeParrot();
   scene.add(parrot.group);
 
-  const scorpions = Array.from({ length: SCORPIONS }, (_, i) => {
+  // A scorpion for every stomp of the clip, also the last ones; they crawl up onto Ole's shell.
+  const stompLandings: number[] = [];
+  for (let at = STOMP_PERIOD / 2; at <= clipLength(S.stomp) + 0.05; at += STOMP_PERIOD / 2) stompLandings.push(at);
+  const scorpions = stompLandings.map((land, i) => {
     const sc = makeScorpion(i % 3 === 0 ? "#d9543a" : "#e98a3c");
     sc.group.visible = false;
-    scene.add(sc.group);
-    return sc;
+    turtle.group.add(sc.group);
+    return { ...sc, land };
   });
 
   const bridge = makeBridge();
   scene.add(bridge);
-  // A star box over every second hop along the bridge: the third jump each time goes up into one.
-  const boxes = [2, 4, JUMPS].map((at) => {
+  // A star box over every jump that goes up: Ole walks on over the bridge, so each hangs where Tapsi is then.
+  const bumps: number[] = [];
+  for (let n = 0; bumpTime(n) < clipLength(S.jump) - 0.2; n++) bumps.push(bumpTime(n));
+  const boxes = bumps.map((at) => {
     const box = makeStarBox();
-    box.group.position.set(0, landingHeight(at) + BOX_ABOVE + 0.25, JUMP_FROM - at * JUMP_STEP);
+    const z = jumpZ(at);
+    box.group.position.set(0, bridgeTop(0, z) + TURTLE_BACK + BOX_ABOVE + 0.25, z);
     scene.add(box.group);
     return box;
   });
@@ -1086,9 +1118,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   scene.add(swing.group);
 
   const flowerSpots: [number, number, number, string][] = [
-    // Two right beside Tapsi's paws, which open them; the others a little further on.
-    [-1.2, FLOWERS_Z - 0.5, 1.2, "#ff6fa8"],
-    [1.2, FLOWERS_Z - 0.5, 1.15, "#b388ff"],
+    // Two right beside Tapsi's paws, which open them, as high as Tapsi on Ole's back; the others a little further on.
+    [-1.2, FLOWERS_Z - 0.5, 1.2 + TURTLE_BACK, "#ff6fa8"],
+    [1.2, FLOWERS_Z - 0.5, 1.15 + TURTLE_BACK, "#b388ff"],
     [-2.3, FLOWERS_Z - 1.7, 1.8, "#ff9f43"],
     [2.4, FLOWERS_Z - 1.9, 2.0, "#ff5d73"],
     [3.6, FLOWERS_Z - 3.4, 2.6, "#64c8ff"],
@@ -1113,7 +1145,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
 
   const rollers = Array.from({ length: ROLLERS }, (_, i) => {
     const nut = makeCoconut(i + 3);
-    nut.scale.setScalar(0.64);
+    nut.scale.setScalar(ROLL_RADIUS / 0.5);
     nut.visible = false;
     scene.add(nut);
     return nut;
@@ -1164,8 +1196,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   appleTree.position.set(0, groundHeight(0, APPLE_Z), APPLE_Z);
   scene.add(appleTree);
   const basket = makeBasket();
-  // Beside the path on the left, so Tapsi walks on past it.
-  const basketAt = v3(-0.6, groundHeight(-0.6, APPLE_Z - 0.5), APPLE_Z - 0.5);
+  // Beside Ole on the left, so Ole walks on past it.
+  const basketAt = v3(-1.3, groundHeight(-1.3, APPLE_Z - 0.5), APPLE_Z - 0.5);
   basket.position.copy(basketAt);
   scene.add(basket);
   const appleMat = mat("#e3262f", 0.35);
@@ -1206,7 +1238,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       new THREE.PlaneGeometry(1.6, 2.1),
       new THREE.MeshBasicMaterial({ map: cobwebTexture(90 + n), transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide }),
     );
-    const home = v3(side * (0.78 + layer * 0.03), webGround + 1.3 + layer * 0.05, WEB_Z - layer * WEB_GAP);
+    const home = v3(side * (0.78 + layer * 0.03), webGround + TURTLE_BACK + 1.3 + layer * 0.05, WEB_Z - layer * WEB_GAP);
     web.position.copy(home);
     // After the light of the open doorway, which would otherwise paint over the webs about as far away.
     web.renderOrder = 1;
@@ -1218,8 +1250,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
 
   const raft = makeRaft();
   scene.add(raft);
+  // A crate on the raft lifts the chest up to Tapsi on Ole's back.
+  const crate = solid(new THREE.BoxGeometry(1.0, CHEST_Y - 0.12, 0.62), mat("#a7733f", 0.85));
+  crate.position.set(0, 0.12 + (CHEST_Y - 0.12) / 2, CHEST_Z - 0.3);
+  raft.add(crate);
   const chest = makeChest();
-  chest.group.position.y = 0.2;
+  chest.group.position.set(0, CHEST_Y, CHEST_Z);
   raft.add(chest.group);
   const lock = makeLock();
   lock.group.position.copy(LOCK);
@@ -1232,9 +1268,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
 
   const crabs = Array.from({ length: 5 }, (_, i) => {
     const crab = makeCrab();
-    // Around Tapsi and a little behind, all facing us, so they dance along with Tapsi.
-    const x = PARTY.x + [-1.5, 1.7, -2.5, 2.7, -0.9][i];
-    const z = PARTY.z + [-0.4, -0.2, 0.4, 0.3, -1.2][i];
+    // Around Ole and a little behind, all facing us, so they dance along with Tapsi.
+    const x = PARTY.x + [-2.0, 2.1, -2.9, 3.0, -0.5][i];
+    const z = PARTY.z + [-0.5, -0.3, 0.4, 0.3, -1.1][i];
     const holder = new THREE.Group();
     holder.position.set(x, groundHeight(x, z) - 0.6, z);
     holder.add(crab.group);
@@ -1280,21 +1316,18 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   let lastTime = 0;
   let lastOpening = -1;
 
-  const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL[step] - PRAISE;
   /** The stop dance at the party: since when everyone is still, or null while the music plays (and before and after). */
   const stillAt = (step: number, clip: number) =>
     step === S.party && clip >= 0 && clip - DEMO[step] < actLength(step) ? stopDance(clip).still : null;
-  /** Seconds of a step's clip that the world follows: from when Tapsi shows it until the praise. */
-  const clipLength = (step: number) => DEMO[step] + actLength(step);
-
-  /** Boat position (z) at a moment of the story. */
-  const boatZ = (step: number, act: number) => {
+  /** Ole's place (z) at sea: waiting, swimming to the island while Tapsi paddles, and up onto the beach in the praise. */
+  const boatZ = (step: number, act: number, praise = -1) => {
     if (step < S.paddle) return BOAT_START;
-    if (step > S.paddle) return BOAT_END;
+    if (step > S.paddle) return BEACH_Z;
+    if (praise > 0) return BOAT_END + (BEACH_Z - BOAT_END) * smooth(praise / 2);
     if (act <= 0) return BOAT_START;
     const len = actLength(S.paddle);
     const k = clamp01(act / len);
-    // Each stroke pushes the canoe a bit, so it surges with the paddling.
+    // Each stroke pushes Ole a bit, so it surges with the paddling.
     const surge = Math.sin((act / (PADDLE_PERIOD / 2)) * TAU) * 0.012 * (1 - k);
     return BOAT_START + (BOAT_END - BOAT_START) * (smooth(k) * 0.4 + k * 0.6 + surge);
   };
@@ -1328,7 +1361,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     look.set(at.x, at.y + 0.75, at.z);
   }
 
-  /** Where Tapsi stands for a step's movement, (x, z). */
+  /** Where Ole carries Tapsi for a step's movement, (x, z). */
   function standAt(step: number): [number, number] {
     switch (step) {
       case S.stomp:
@@ -1351,9 +1384,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         return [0, RIDDLE_Z];
       case S.webs:
         return [0, WEB_STAND];
+      case S.rope:
       case S.key:
-        // Tapsi faces -z, so its left is -x: the paw is KEY_HAND in front of it.
-        return [RAFT_X + LOCK.x + KEY_HAND.x, RAFT_TO + LOCK.z + KEY_HAND.z];
+        return [BAY.x, BAY.z];
       case S.hooray:
       case S.party:
       case S.bye:
@@ -1363,12 +1396,16 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
   }
 
-  /** Where Tapsi is when a step's movement is over. */
+  /** Where Ole is when a step's movement is over. */
   const endAt = (step: number): [number, number] => (step === S.jump ? [0, JUMP_TO] : standAt(step));
 
-  /** The way to a step's place: from where the step before ended, round the winch after the gate. */
+  /** The way to a step's place: from where the step before ended, up the beach to the scorpions, round the winch after the gate. */
   const route = (step: number): [number, number][] =>
-    step === S.roll ? [endAt(S.gate), [-0.2, WINCH_Z + CRANK_REACH + 0.1], standAt(S.roll)] : [endAt(step - 1), standAt(step)];
+    step === S.stomp
+      ? [[0, BEACH_Z], standAt(S.stomp)]
+      : step === S.roll
+        ? [endAt(S.gate), [-0.2, WINCH_Z + CRANK_REACH + 0.1], standAt(S.roll)]
+        : [endAt(step - 1), standAt(step)];
 
   /** A point `k` (0..1) of the way along a route, by distance. */
   function along(points: [number, number][], k: number): [number, number] {
@@ -1383,35 +1420,22 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
     return points[points.length - 1];
   }
+  const routeLength = (points: [number, number][]) => points.slice(1).reduce((sum, p, i) => sum + Math.hypot(p[0] - points[i][0], p[1] - points[i][1]), 0);
 
-  /** Where Tapsi stands while showing and doing a step's movement. */
+  /** The sea's waves at (x, z), as the water's shader moves them. */
+  const wave = (x: number, z: number, time: number) =>
+    Math.sin(x * 0.35 + time * 1.1) * 0.12 + Math.sin(z * 0.28 - time * 0.9) * 0.1 + Math.sin((x + z) * 0.9 + time * 2.0) * 0.035;
+  /** The water at (x, z): the sea with its waves, or the lagoon. */
+  const waterAt = (x: number, z: number, time: number) =>
+    Math.max(wave(x, z, time), Math.hypot(x - LAGOON.x, z - LAGOON.y) < 7.8 ? LAGOON_LEVEL : -Infinity);
+  /** Where Ole's belly is at (x, z): on the ground or the bridge, or swimming in the water. */
+  const turtleY = (x: number, z: number, time: number) => Math.max(groundHeight(x, z), bridgeTop(x, z), waterAt(x, z, time) - TURTLE_FLOAT);
+
+  /** Where Tapsi's feet are while showing and doing a step's movement, for the cameras: on Ole's back. */
   function actSpot(step: number, act: number, out: THREE.Vector3) {
-    if (step <= S.paddle) return out.set(0, CANOE_FLOOR, boatZ(step, act) + 0.4);
-    if (step === S.jump) return jumpSpot(act + DEMO[S.jump], out);
-    const [x, z] = standAt(step);
-    return out.set(x, groundHeight(x, z), z);
-  }
-
-  /** How many jumps over the brook have moved Tapsi on at `clip` seconds into the jump clip (with the part in the air). */
-  function jumpsDone(clip: number) {
-    if (clip <= 0) return 0;
-    const n = Math.floor(clip / JUMP_PERIOD);
-    const before = n - Math.floor(n / 3);
-    const now = isBump(n) ? 0 : jumpProgress(clip);
-    return Math.min(JUMPS, before + now);
-  }
-
-  /** Seconds into the jump clip when the head bumps star box `n`: at the top of every third jump. */
-  const bumpTime = (n: number) => (n * 3 + 2) * JUMP_PERIOD + JUMP_PEAK;
-
-  /** Where Tapsi's feet are over the brook: on the bridge, or flying to the next spot on it (the clip adds the arc). */
-  function jumpSpot(clip: number, out: THREE.Vector3) {
-    const done = jumpsDone(clip);
-    const from = Math.floor(done);
-    const k = done - from;
-    // After the last hop there is no next spot: past the bridge's end its top is -Infinity, and -Infinity * 0 is NaN.
-    const y = k > 0 ? landingHeight(from) + (landingHeight(from + 1) - landingHeight(from)) * k : landingHeight(from);
-    return out.set(0, y - bridgeDip(clip), JUMP_FROM - done * JUMP_STEP);
+    if (step <= S.paddle) return out.set(0, TURTLE_BACK - TURTLE_FLOAT - SIT_DROP, boatZ(step, act));
+    const [x, z] = step === S.jump ? [0, jumpZ(act + DEMO[S.jump])] : standAt(step);
+    return out.set(x, Math.max(groundHeight(x, z), bridgeTop(x, z), (step >= S.rope && step <= S.key ? LAGOON_LEVEL : 0) - TURTLE_FLOAT) + TURTLE_BACK, z);
   }
 
   /** How far the bridge gives way under Tapsi's landings (m), `clip` seconds into the jump clip; it springs back. */
@@ -1435,7 +1459,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         look.y -= 0.15;
         return;
       case S.paddle:
-        // As if sitting in the canoe too.
+        // As if riding on Ole too.
         rear(at, pos, look, 0, 1.15);
         look.y -= 0.2;
         return;
@@ -1567,7 +1591,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     pos.set(center.x + Math.sin(a) * r, y, center.z + Math.cos(a) * r);
   }
 
-  /** The camera in the opening: the island from above the sea, then along the trail to the chest; after the cut, above the canoe. */
+  /** The camera in the opening: the island from above the sea, then along the trail to the chest; after the cut, above Ole at sea. */
   function openingShot(t: number, pos: THREE.Vector3, look: THREE.Vector3) {
     if (t >= OPENING_CUT) {
       const k = smooth((t - OPENING_CUT) / (OPENING - OPENING_CUT));
@@ -1607,28 +1631,119 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     return places.find(([, at]) => z < at)?.[0] ?? S.paddle;
   }
 
-  /** How far the canoe has run up onto the beach: during the praise after the paddling. */
-  const beached = (step: number, praise: number) => (step > S.paddle ? 1 : step === S.paddle ? smooth(praise / 1.2) : 0);
-
-  /** The canoe rocks on the water, and comes to rest a little askew on the beach. */
-  function placeCanoe(f: StoryFrame) {
-    const { step, time } = f;
-    const b = beached(step, f.praise);
-    const rock = 1 - b;
-    canoe.position.set(0, -0.05 + Math.sin(time * 1.3) * 0.03 * rock + b * 0.1, boatZ(step, f.act));
-    canoe.rotation.set(Math.sin(time * 1.1) * 0.02 * rock + b * 0.04, b * 0.15, Math.sin(time * 0.9) * 0.03 * rock + b * 0.03);
-    canoe.updateMatrixWorld(true);
-  }
-
-  /** How much Tapsi has put the paddle down on the rim of the canoe, in the praise after the paddling: over the knees and down. */
-  const putDown = (step: number, praise: number) => (step > S.paddle ? 1 : step === S.paddle ? smooth((praise - 0.9) / 0.8) : 0);
+  /** Where Ole is, which way it looks, how much it walks and how far through its steps it is. */
+  const ride = { x: 0, z: 0, yaw: ISLAND, walking: 0, stride: 0 };
+  /** Ole takes a step every this many metres. */
+  const STRIDE = 0.8;
+  /** 0 → 1 → 0 over a walk that takes k from 0 to 1: Ole starts and stops its steps softly. */
+  const walkingAt = (k: number) => (k > 0 && k < 1 ? ss(0, 0.08, k) * ss(1, 0.9, k) : 0);
 
   /**
-   * The paddle is always in Tapsi's paws while in the canoe: lying across the
-   * lap, then taken up to paddle – its shaft through both paws, tipped a little
-   * more, so the low blade reaches the water – and back on the lap; after the
-   * paddling Tapsi lays it across the rim in front and lets go. Waving hello,
-   * one paw lets go of it.
+   * Ole carries Tapsi through the story: swimming at sea, up the beach, along
+   * the routes between the stations and across the bridge, through the door,
+   * and in the bay side on at the water's edge; at the treasure it turns round
+   * to face us and crawls up the beach.
+   */
+  function rideAt(f: StoryFrame) {
+    const { step } = f;
+    const travel = f.lead - f.demo;
+    ride.yaw = ISLAND;
+    ride.walking = 0;
+    ride.stride = 0;
+    const go = (points: [number, number][], k: number) => {
+      const e = smooth(k) * 0.3 + k * 0.7;
+      [ride.x, ride.z] = along(points, e);
+      ride.walking = walkingAt(k);
+      ride.stride = ((e * routeLength(points)) / STRIDE) * TAU;
+      // Facing the way it goes, and round to the island again at the end.
+      const [ax, az] = along(points, Math.max(0, e - 0.08));
+      const [bx, bz] = along(points, Math.min(1, e + 0.08));
+      if (Math.hypot(bx - ax, bz - az) > 1e-3) {
+        let turn = Math.atan2(bx - ax, bz - az) - ISLAND;
+        turn -= Math.round(turn / TAU) * TAU;
+        ride.yaw = ISLAND + turn * ss(0, 0.15, k) * ss(1, 0.8, k);
+      }
+    };
+    if (step <= S.paddle) {
+      ride.x = 0;
+      ride.z = boatZ(step, f.act, step === S.paddle ? f.praise : -1);
+      if (step === S.paddle && f.praise > 0) {
+        ride.walking = walkingAt(f.praise / 2);
+        ride.stride = ((BOAT_END - ride.z) / STRIDE) * TAU;
+      }
+    } else if (step === S.rope && f.local < 2.5) {
+      // Into the light behind the door; the flash hides the jump to the bay.
+      go([standAt(S.webs), [0, WEB_STAND - 3.6]], clamp01((f.local - 0.3) / 2.2));
+    } else if (step === S.rope || step === S.key) {
+      // Side on, its head to the right, so the raft comes right up to Tapsi in front.
+      [ride.x, ride.z] = standAt(step);
+      ride.yaw = ISLAND - Math.PI / 2;
+    } else if (step === S.hooray) {
+      // Once the lid is open, Ole turns round under Tapsi to face us and crawls up the beach.
+      const k = clamp01((f.local - 1.3) / 1.8);
+      const e = smooth(k);
+      ride.x = BAY.x;
+      ride.z = BAY.z + (PARTY.z - BAY.z) * e;
+      ride.yaw = ISLAND - Math.PI / 2 - Math.PI * e;
+      ride.walking = walkingAt(k);
+      ride.stride = e * 5 * TAU;
+    } else if (step > S.hooray) {
+      [ride.x, ride.z] = standAt(step);
+      ride.yaw = ISLAND - Math.PI * 1.5;
+    } else if (f.act < -f.demo) {
+      // Standing up first after the sea, then off up the beach.
+      const startAt = step === S.stomp ? 0.6 : 0.3;
+      go(route(step), clamp01((f.local - startAt) / (travel - 0.5 - startAt)));
+    } else if (step === S.jump) {
+      // Steadily across the bridge while Tapsi hops on Ole's back.
+      const clip = f.act + f.demo;
+      ride.x = 0;
+      ride.z = jumpZ(clip);
+      ride.walking = clip < clipLength(S.jump) ? 0.6 : 0;
+      ride.stride = ((JUMP_FROM - ride.z) / STRIDE) * TAU;
+    } else {
+      [ride.x, ride.z] = standAt(step);
+    }
+  }
+
+  /** Ole on the water or the ground, tipped with the slope and the waves, rocking a little with its steps. */
+  function placeTurtle(f: StoryFrame) {
+    rideAt(f);
+    const { x, z, yaw } = ride;
+    const t = f.time;
+    const hx = Math.sin(yaw);
+    const hz = Math.cos(yaw);
+    const front = turtleY(x + hx * 0.75, z + hz * 0.75, t);
+    const back = turtleY(x - hx * 0.75, z - hz * 0.75, t);
+    const left = turtleY(x + hz * 0.6, z - hx * 0.6, t);
+    const right = turtleY(x - hz * 0.6, z + hx * 0.6, t);
+    const ground = Math.max(groundHeight(x, z), bridgeTop(x, z));
+    const y = Math.max(turtleY(x, z, t), (front + back) / 2, (left + right) / 2);
+    const swimming = clamp01((waterAt(x, z, t) - TURTLE_FLOAT - ground) / 0.15);
+    const dip = f.step === S.jump && bridgeTop(x, z) > -Infinity ? bridgeDip(f.act + f.demo) : 0;
+    const step = Math.sin(ride.stride) * ride.walking * (1 - swimming);
+    turtle.group.position.set(x, y + Math.abs(step) * 0.025 - dip, z);
+    turtle.group.rotation.set(Math.atan2(back - front, 1.5), yaw, Math.atan2(left - right, 1.2) + step * 0.03, "YXZ");
+    turtle.move(ride.stride, ride.walking, swimming, t);
+    turtle.group.updateMatrixWorld(true);
+  }
+
+  /** The top of Ole's back at (x, z) in the world, e.g. where something lies on it. */
+  function onOle(x: number, z: number, out: THREE.Vector3) {
+    turtle.group.worldToLocal(out.set(x, turtle.group.position.y, z));
+    out.y = turtleTop(out.x, out.z);
+    return turtle.group.localToWorld(out);
+  }
+
+  /** How far the paddle has gone from Tapsi's lap onto the sand, in the praise after the paddling. */
+  const putDown = (step: number, praise: number) => (step > S.paddle ? 1 : step === S.paddle ? clamp01((praise - 1.2) / 0.9) : 0);
+
+  /**
+   * The paddle is always in Tapsi's paws while at sea: lying across the lap,
+   * then taken up to paddle – its shaft through both paws, tipped a little
+   * more, so the low blade reaches the water – and back on the lap; on the
+   * beach Tapsi swings it out over Ole's side and lets it fall onto the sand.
+   * Waving hello, one paw lets go of it.
    */
   function holdPaddle(f: StoryFrame) {
     const { step, act, praise } = f;
@@ -1637,9 +1752,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // Across the lap, the blades flat; the paddle's own y (the shaft) to Tapsi's left.
     const lapPos = guide.lap.getWorldPosition(tmpA);
     lapQ.copy(guide.lap.getWorldQuaternion(tmpQ)).multiply(ACROSS);
-    // Across the rim in front of the seat, the same way round.
-    const rimPos = canoe.localToWorld(tmpB.set(0, CANOE_RIM + 0.075, CANOE_FEET.z - 0.4));
-    rimQ.copy(canoe.quaternion).multiply(ACROSS_CANOE);
+    const sandPos = tmpB.copy(PADDLE_DROP);
+    sandPos.y = Math.max(groundHeight(sandPos.x, sandPos.z), 0) + 0.03;
 
     const hold = step === S.paddle && f.opening === null ? smooth(clip / 0.7) * (1 - smooth(praise / 0.9)) : 0;
     const put = putDown(step, praise);
@@ -1647,25 +1761,30 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const right = guide.gripPoint("R", new THREE.Vector3());
     const mid = left.clone().add(right).multiplyScalar(0.5);
     if (put > 0) {
-      // Up over the knees, forwards and down onto the rim.
-      tmpC.set(rimPos.x, Math.max(lapPos.y, rimPos.y) + 0.12, rimPos.z);
+      // Up and out to the right, over Ole's side, and down onto the sand.
+      tmpC.copy(lapPos).lerp(sandPos, 0.4);
+      tmpC.y = lapPos.y + 0.3;
       const u = 1 - put;
-      paddle.position.set(0, 0, 0).addScaledVector(lapPos, u * u).addScaledVector(tmpC, 2 * u * put).addScaledVector(rimPos, put * put);
-      paddle.quaternion.slerpQuaternions(lapQ, rimQ, put);
+      paddle.position.set(0, 0, 0).addScaledVector(lapPos, u * u).addScaledVector(tmpC, 2 * u * put).addScaledVector(sandPos, put * put);
+      paddle.quaternion.slerpQuaternions(lapQ, ON_SAND, smooth(put));
     } else if (hold > 0) {
       // The shaft runs from paw to paw; tipped a little more than the paws, so the low blade reaches the water.
       const shaftAlong = left.clone().sub(right);
       const flat = Math.hypot(shaftAlong.x, shaftAlong.z);
       let tilt = Math.atan2(shaftAlong.y, flat) * PADDLE_TILT;
-      // But never so much that the shaft goes through the canoe: on the low side it has to pass over the rim.
+      // But never so much that the shaft goes through Ole: on the low side it has to pass over the shell.
       const lowX = (shaftAlong.x / flat) * (tilt > 0 ? -1 : 1);
       if (Math.abs(lowX) > 0.2) {
-        const toRim = (Math.sign(lowX) * CANOE_HALF_WIDTH * Math.sqrt(1 - (0.4 / CANOE_HALF_LENGTH) ** 2) - (mid.x - canoe.position.x)) / lowX;
-        const most = Math.atan2(mid.y - (canoe.position.y + CANOE_RIM + 0.1), toRim);
+        let most = Infinity;
+        for (const k of [0.3, 0.55, 0.8, 1]) {
+          const x = Math.sign(lowX) * TURTLE_HALF_WIDTH * k;
+          const toShell = (x - (mid.x - turtle.group.position.x)) / lowX;
+          if (toShell > 0.05) most = Math.min(most, Math.atan2(mid.y - (turtle.group.position.y + turtleTop(x, 0) + 0.08), toShell));
+        }
         tilt = Math.sign(tilt) * Math.min(Math.abs(tilt), Math.max(0, most));
       }
       const shaft = v3((shaftAlong.x / flat) * Math.cos(tilt), Math.sin(tilt), (shaftAlong.z / flat) * Math.cos(tilt));
-      // The blades face the way the canoe goes.
+      // The blades face the way Ole swims.
       const ahead = v3(Math.sin(guide.root.rotation.y), 0, Math.cos(guide.root.rotation.y));
       ahead.addScaledVector(shaft, -ahead.dot(shaft)).normalize();
       heldQ.setFromRotationMatrix(basis.makeBasis(new THREE.Vector3().crossVectors(shaft, ahead), shaft, ahead));
@@ -1678,11 +1797,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
     paddle.updateMatrixWorld(true);
 
-    // The paws on the shaft: a shoulder's width apart on the lap, where they are when paddling.
+    // The paws on the shaft: a shoulder's width apart on the lap, where they are when paddling; they
+    // let go as the paddle swings out to fall.
     if (step <= S.paddle) {
       const along = tmpC.set(0, 1, 0).applyQuaternion(paddle.quaternion);
       const center = paddle.position;
-      const letGo = step === S.paddle ? smooth((praise - 1.6) / 0.4) : 0;
+      const letGo = step === S.paddle ? smooth((praise - 1.35) / 0.3) : 0;
       const waving = step === S.hello && f.opening === null ? clamp01(clip / 0.7) * (1 - clamp01(praise / 0.9)) : 0;
       for (const [hand, at, lap, weight] of [
         ["L", left, PADDLE_GRIP, 1 - letGo],
@@ -1691,6 +1811,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         const s = lap + (at.clone().sub(center).dot(along) - lap) * hold;
         guide.hold(hand, center.clone().addScaledVector(along, s), along, weight);
       }
+    }
+    if (step === S.paddle && crossed(f, LEAD[S.paddle] + actLength(S.paddle) + 2.1)) {
+      sand.burst(sandPos, 14, 2);
+      cue("knock");
     }
 
     // A splash whenever a blade dips into the water.
@@ -1704,64 +1828,20 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
   }
 
-  /** The guide's place and facing during a step; returns whether it walks and how much it sits. */
+  /** Tapsi on Ole's back: sitting at sea, standing up on the beach, and always facing the way Ole carries it. */
   function placeGuide(f: StoryFrame) {
     const { step } = f;
-    let walking = false;
-    let sitting = 0;
-    let x = 0;
-    let z = 0;
-    let y: number | null = null;
-    let yaw = ISLAND;
-    const travel = f.lead - f.demo;
-
-    const seat = canoe.localToWorld(new THREE.Vector3().copy(CANOE_FEET));
-    if (step <= S.paddle) {
-      // Sitting on the seat of the canoe, rocking with it.
-      ({ x, y, z } = seat);
-      yaw = ISLAND + canoe.rotation.y;
-      sitting = 1;
-    } else if (step === S.stomp && f.local < 1.3) {
-      // Stand up, and hop out over the right side of the canoe – high, to clear the paddle and the rim – into the shallow water.
-      sitting = 1 - smooth(f.local / 0.4);
-      const k = clamp01((f.local - 0.4) / 0.9);
-      x = seat.x + (HOP_TO[0] - seat.x) * smooth(k);
-      z = seat.z + (HOP_TO[1] - seat.z) * smooth(k);
-      y = seat.y + (WADE - seat.y) * smooth(k) + Math.sin(k * Math.PI) * 0.8;
-      yaw = ISLAND + canoe.rotation.y * (1 - smooth(k));
-    } else if (step === S.rope && f.local < 2.5) {
-      // Into the light behind the door; the flash hides the jump to the bay.
-      walking = f.local > 0.3;
-      z = WEB_STAND - smooth((f.local - 0.3) / 2.2) * 3.6;
-    } else if (f.act < -f.demo && step !== S.rope && step <= S.hooray) {
-      const startAt = step === S.stomp ? 1.3 : 0.3;
-      const end = travel - 0.5;
-      const k = clamp01((f.local - startAt) / (end - startAt));
-      walking = f.local > startAt && f.local < end && step !== S.hooray;
-      const points = step === S.stomp ? [HOP_TO, standAt(S.stomp)] : route(step);
-      [x, z] = along(points, smooth(k) * 0.3 + k * 0.7);
-    } else if (step === S.jump) {
-      // Along the bridge with the jumps of the clip, which adds the arc in the air.
-      const at = actSpot(step, f.act, spot);
-      z = at.z;
-      y = at.y;
-    } else {
-      [x, z] = standAt(step);
-    }
+    const sitting = step <= S.paddle ? 1 : step === S.stomp ? 1 - smooth(f.local / 0.6) : 0;
     // The ears fold back flat when the head bumps a star box.
     const jumpClip = f.act + f.demo;
     const bumpNow = step === S.jump ? Math.round((jumpClip - JUMP_PEAK - 2 * JUMP_PERIOD) / (3 * JUMP_PERIOD)) : -1;
-    guide.earsBack = bumpNow >= 0 && bumpNow < 3 ? clamp01(1.4 - Math.abs(jumpClip - bumpTime(bumpNow)) / 0.3) : 0;
-    // At the treasure Tapsi turns round to us, and stays so.
-    if (step === S.hooray) yaw = ISLAND + Math.PI * smooth((f.local - 1.3) / 1.0);
-    else if (step > S.hooray) yaw = ISLAND + Math.PI;
-    // Over the bridge on its planks, out of the canoe wading in the shallow water.
-    let ground = Math.max(groundHeight(x, z), bridgeTop(x, z));
-    if (step === S.stomp) ground = Math.max(ground, WADE);
-    guide.root.position.set(x, y ?? (step >= S.key ? Math.max(ground, LAGOON_LEVEL - 0.08) : ground), z);
-    guide.root.rotation.y = yaw;
+    guide.earsBack = bumpNow >= 0 && bumpNow < boxes.length ? clamp01(1.4 - Math.abs(jumpClip - bumpTime(bumpNow)) / 0.3) : 0;
+    // In the bay Ole lies side on, Tapsi across its back facing the water; turning round, Ole turns Tapsi with it.
+    const sideOn = step > S.rope || (step === S.rope && f.local >= 2.5);
+    turtle.group.localToWorld(guide.root.position.set(0, TURTLE_BACK - SIT_DROP * sitting, 0));
+    guide.root.rotation.y = ride.yaw + (sideOn ? Math.PI / 2 : 0);
     guide.joy = step === S.hooray ? smooth((f.local - 0.8) / 0.6) : step > S.hooray ? 1 : 0;
-    return { walking, sitting };
+    return { sitting };
   }
 
   function updateWorld(f: StoryFrame) {
@@ -1774,35 +1854,35 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const atClip = (c: number) => crossed(f, TRAVEL[step] + c);
     guide.root.updateMatrixWorld(true);
 
-    // Tapsi lands in the water after hopping out of the canoe.
-    if (step === S.stomp && crossed(f, 1.3)) {
-      spray.burst(v3(HOP_TO[0], 0.05, HOP_TO[1]), 26, 3);
-      cue("splash");
-    }
-
-    // Scorpions crawl up to Tapsi's feet, one for every stomp; the foot comes down on it – plopp, flat, gone into the sand.
+    // Scorpions crawl over the sand and up onto Ole's shell, one for every stomp of the clip, straight
+    // to a foot at an even pace: they are still crawling when it comes down on them – plopp, flat, and
+    // gone in a puff of sand. They live on Ole, so x is Ole's left, which is Tapsi's left here.
+    const CRAWL = 1.6;
     scorpions.forEach((sc, n) => {
-      const land = (n + 1) * (STOMP_PERIOD / 2);
-      const t = clip - land;
-      const on = step === S.stomp && f.opening === null && t > -1.8 && t < 0.9 && land < clipLength(step) - 0.3;
+      const t = clip - sc.land;
+      const on = step === S.stomp && f.opening === null && t > -CRAWL && t < 0.6;
       sc.group.visible = on;
       if (!on) return;
-      // Even ones come to the left foot (Tapsi's left is -x while facing the island).
-      const side = n % 2 === 0 ? -1 : 1;
-      const footX = side * 0.12 * GUIDE_SIZE;
-      const footZ = STOMP_Z - 0.08;
-      const fromX = side * (1.4 + (n % 3) * 0.2);
-      const fromZ = STOMP_Z - 1.3 + (n % 3) * 0.35;
-      const k = 1 - (1 - clamp01((t + 1.8) / 1.65)) ** 2;
-      const px = fromX + (footX - fromX) * k;
-      const pz = fromZ + (footZ - fromZ) * k;
-      sc.group.position.set(px, groundHeight(px, pz) - Math.max(0, t - 0.35) * 0.5, pz);
-      sc.group.rotation.y = Math.atan2(footX - fromX, footZ - fromZ);
-      if (k < 1) sc.walk(time + n);
+      // Even ones come to the left foot, which stamps first.
+      const side = n % 2 === 0 ? 1 : -1;
+      const footX = side * 0.13 * GUIDE_SIZE;
+      const footZ = 0.05;
+      const fromX = side * (TURTLE_HALF_WIDTH + 0.55 + (n % 3) * 0.15);
+      const fromZ = 0.55 - (n % 3) * 0.45;
+      const at = (k: number) => [fromX + (footX - fromX) * k, fromZ + (footZ - fromZ) * k] as const;
+      const k = Math.min(1, (t + CRAWL) / CRAWL);
+      const [px, pz] = at(k);
+      const [qx, qz] = at(Math.min(1, k + 0.04));
+      sc.group.position.set(px, turtleTop(px, pz), pz);
+      // Nose up while climbing the shell's side.
+      const climb = Math.atan2(turtleTop(qx, qz) - turtleTop(px, pz), Math.hypot(qx - px, qz - pz) || 1);
+      sc.group.rotation.set(-climb, Math.atan2(footX - fromX, footZ - fromZ), 0, "YXZ");
+      if (t < 0) sc.walk(time * 1.5 + n);
       const flat = t > 0 ? Math.min(1, t * 10) : 0;
-      sc.group.scale.set(1 + flat * 0.45, 1 - flat * 0.85, 1 + flat * 0.45);
-      if (atClip(land)) {
-        sand.burst(v3(footX, groundHeight(footX, footZ) + 0.05, footZ), 16, 2.2);
+      const gone = 1 - smooth((t - 0.3) / 0.3);
+      sc.group.scale.set((1 + flat * 0.45) * gone, (1 - flat * 0.85) * gone, (1 + flat * 0.45) * gone);
+      if (atClip(sc.land)) {
+        sand.burst(turtle.group.localToWorld(tmpA.set(footX, TURTLE_BACK + 0.05, footZ)), 16, 2.2);
         cue("pop");
       }
     });
@@ -1861,14 +1941,15 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       const all = crankTurns(clipLength(step)) * 2;
       lift = GATE_LIFT * clamp01((Math.floor(q) + smooth(((q % 1) - 0.2) / 0.5)) / all);
       const hands = guide.handL.getWorldPosition(tmpA).add(guide.handR.getWorldPosition(tmpB)).multiplyScalar(0.5);
-      const axleY = gate.group.position.y + CRANK_HEIGHT;
+      const axleY = gate.group.position.y + CRANK_Y;
       crankAngle = Math.atan2(-(hands.x - WINCH_X), hands.y - axleY);
       for (let n = 1; n <= all; n++) if (atClip((n * CRANK_PERIOD) / 2 - 0.3)) cue("knock");
       if (atClip(clipLength(step) - 0.2)) cue("rumble");
     }
     gate.set(lift, crankAngle);
 
-    // Coconuts roll down the path, on Tapsi's right; Tapsi steps aside to the left as each one comes.
+    // Coconuts roll down the path, on Tapsi's right, past Ole's head and over its shell; Tapsi steps aside
+    // to the left on Ole's back as each one comes.
     rollers.forEach((nut, n) => {
       const pass = 1.3 + n * SIDE_STEP_PERIOD;
       const dt = clip - pass;
@@ -1876,9 +1957,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       nut.visible = on;
       if (!on) return;
       const z = ROLL_Z + dt * 4.2;
-      const x = 0.42;
-      nut.position.set(x, groundHeight(x, z) + 0.32 + Math.abs(Math.sin(dt * 5)) * 0.05, z);
-      nut.rotation.set(z / 0.32, 0, 0);
+      const x = ROLL_X;
+      const over = Math.max(groundHeight(x, z), onOle(x, z, tmpA).y);
+      nut.position.set(x, over + ROLL_RADIUS + Math.abs(Math.sin(dt * 5)) * 0.05, z);
+      nut.rotation.set(z / ROLL_RADIUS, 0, 0);
       if (atClip(pass - 0.5)) cue("whoosh");
     });
 
@@ -1897,7 +1979,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       if (!th.curve) {
         monkey.hand.updateMatrixWorld(true);
         const start = monkey.hand.getWorldPosition(new THREE.Vector3());
-        const g = groundHeight(0, MONKEY_Z);
+        const g = groundHeight(0, MONKEY_Z) + TURTLE_BACK;
         // Well clear of the head leaning away, and on out to the same side.
         const passAt = v3(side * 0.5, g + 1.35, MONKEY_Z);
         const end = v3(side * 1.2, g + 0.3, MONKEY_Z + 3.5);
@@ -1931,7 +2013,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       const pick = REACH_PERIOD / 4 + n * (REACH_PERIOD / 2);
       // Even: the left paw (Tapsi's left is -x).
       const side = n % 2 === 0 ? -1 : 1;
-      const g = groundHeight(0, APPLE_Z);
+      const g = groundHeight(0, APPLE_Z) + TURTLE_BACK;
       const hang = tmpA.set(side * REACH_TOP.x, g + REACH_TOP.y + 0.07, APPLE_Z - REACH_TOP.z).add(ap.jitter);
       const slot = tmpB.set(basketAt.x + Math.cos(n * 2.4) * 0.13, basketAt.y + 0.13 + Math.floor(n / 4) * 0.08, basketAt.z + Math.sin(n * 2.4) * 0.13);
       const dt = step === S.apples ? clip - pick : step > S.apples ? 99 : -99;
@@ -1999,7 +2081,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const lastWeb = BRUSH_HIT + (WEB_LAYERS * 2 - 1) * (BRUSH_PERIOD / 2);
     const climb = step > S.webs ? 1 : step === S.webs ? smooth((clip - lastWeb - 0.3) / 1.5) : 0;
     spider.group.visible = step >= S.riddle && climb < 1;
-    const hang = 2.0 + Math.sin(time * 1.6) * 0.05 + climb * 1.6;
+    const hang = 2.0 + TURTLE_BACK + Math.sin(time * 1.6) * 0.05 + climb * 1.6;
     spider.group.position.set(0.05, webGround + hang, WEB_Z - WEB_GAP * 0.5);
     spider.group.rotation.set(0, Math.sin(time * 0.9) * 0.4, 0);
     // The thread goes up to the stone above the door.
@@ -2025,7 +2107,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const unlocked = step > S.key ? 1 : step === S.key ? smooth((clip - lastTurn) / 0.3) : 0;
     key.visible = step === S.key && f.local > 0.4 && clip < lastTurn + 0.5;
     if (key.visible) {
-      const lying = v3(keyX + 0.15, groundHeight(keyX, keyZ - 0.35) + 0.03, keyZ - 0.35);
+      // On Ole's back in front of Tapsi's feet.
+      const lying = onOle(keyX + 0.15, keyZ - 0.35, new THREE.Vector3()).add(v3(0, 0.03, 0));
       if (f.local < 1.3) {
         // Falling from Kiki's feet.
         const k = clamp01((f.local - 0.9) / 0.4);
@@ -2158,7 +2241,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       p.copy(beside).lerp(v3(g.x + 0.3 + Math.sin(time * 1.3) * 0.3, g.y + 2.6 + Math.sin(time * 2.3) * 0.15, g.z - 4.5), smooth(f.local / 2));
     } else if (step === S.key) {
       // Over Tapsi with the key, lets it fall, then circles again.
-      const over = v3(keyX + 0.15, groundHeight(keyX, keyZ) + 1.9 + Math.sin(time * 4) * 0.08, keyZ - 0.35);
+      const over = v3(keyX + 0.15, g.y + 1.45 + Math.sin(time * 4) * 0.08, keyZ - 0.35);
       p.copy(around).lerp(over, smooth(f.local / 0.8) * (1 - smooth((f.local - 1.4) / 1.2)));
       circling = f.local > 2.6;
     } else if (step === S.jump) {
@@ -2229,8 +2312,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   return {
     focus,
     update(f) {
-      placeCanoe(f);
-      const { walking, sitting } = placeGuide(f);
+      placeTurtle(f);
+      const { sitting } = placeGuide(f);
       updateWorld(f);
 
       // Camera: follow the walk from behind, then come round to where the
@@ -2253,7 +2336,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         actShot(prev, prevEnd, fromPos, fromLook);
         midPos.copy(fromPos);
         midLook.copy(fromLook);
-        // Not in the canoe: there the camera swings round from the greeting in front to behind Tapsi.
+        // Not at sea: there the camera swings round from the greeting in front to behind Tapsi.
         const chase = travel >= 3 && f.step !== S.hooray && f.step !== S.paddle;
         if (chase) {
           // A chase camera behind the fox while it walks.
@@ -2284,11 +2367,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
             ? Math.max(0, 1 - Math.abs(f.local - 2.5) / 0.9)
             : 0;
       return {
-        walking,
+        // Ole walks; Tapsi never does.
+        walking: false,
         flash,
         sitting: f.opening !== null ? 1 : sitting,
-        // Leaning forwards to lay the paddle on the rim.
-        bend: f.step === S.paddle ? 0.32 * smooth((f.praise - 0.8) / 0.6) * (1 - smooth((f.praise - 1.8) / 0.6)) : 0,
+        // Leaning a little forwards to swing the paddle out over Ole's side.
+        bend: f.step === S.paddle ? 0.2 * smooth((f.praise - 1.0) / 0.4) * (1 - smooth((f.praise - 1.6) / 0.5)) : 0,
         pointing: f.opening !== null ? pointingAt(f.opening) : undefined,
         quiet: stillAt(f.step, f.act + f.demo) !== null,
       };
@@ -2312,8 +2396,8 @@ export const TREASURE_ISLAND: Story = {
   praise: PRAISE,
   lines: [
     { icon: "👋", situation: "Ahoi! Ich bin Tapsi. Und da kommt Kiki, mein Papagei!", instruction: "Ich winke Kiki Hallo – so!", turn: "Winkst du Kiki auch?", again: "Hallo, Kiki!", praise: "Kiki freut sich, dass du da bist!" },
-    { icon: "🛶", situation: "Los geht's – zur Schatzinsel!", instruction: "Schau: das Paddel rechts ins Wasser – und links.", turn: "Paddel mit!", again: "Paddeln, paddeln – die Insel kommt näher!", praise: "Geschafft! Wir sind am Strand." },
-    { icon: "🦂", situation: "Huch! Da krabbeln Skorpione!", instruction: "Fuß hoch – und schnell feste stampfen, so!", turn: "Jetzt du – stampf mit!", again: "Stampf, stampf – plopp!", praise: "Alle Skorpione sind weg!" },
+    { icon: "🛶", situation: "Ole schwimmt los – zur Schatzinsel!", instruction: "Schau: das Paddel rechts ins Wasser – und links.", turn: "Paddel mit!", again: "Paddeln, paddeln – die Insel kommt näher!", praise: "Geschafft! Ole ist am Strand." },
+    { icon: "🦂", situation: "Huch! Skorpione krabbeln auf Ole!", instruction: "Fuß hoch – und schnell feste stampfen, so!", turn: "Jetzt du – stampf mit!", again: "Stampf, stampf – plopp!", praise: "Alle Skorpione sind weg!" },
     {
       icon: "🌉",
       situation: "Eine kleine Brücke! Und da oben schweben Kisten.",

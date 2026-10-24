@@ -31,10 +31,10 @@ export interface PlayerEvents {
 
 const ACT_BLEND = 0.7;
 
-/** The legs folded to sit (thighs forward, shins down, the paws close together), blended in by `k`; the rest of the pose stays. */
+/** Sitting on the floor with the legs stretched out forwards, a little bent, blended in by `k`; the rest of the pose stays. */
 function sitDown(p: Pose, k: number): Pose {
   if (k <= 0) return p;
-  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.45, spread: 0.06, knee: 1.5 }, legR: { lift: 1.45, spread: 0.06, knee: 1.5 } };
+  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.45, spread: 0.1, knee: 0.2 }, legR: { lift: 1.45, spread: 0.1, knee: 0.2 } };
   return lerpPose(p, sit, k);
 }
 const PRAISE_BLEND = 0.9;
@@ -202,6 +202,7 @@ export class StoryPlayer {
     this.events.onFlash(result.flash);
     this.stage.focusShadow(this.world.focus);
     this.stage.render();
+    this.guide.drawGlow(this.stage.renderer, this.stage.camera);
 
     if (!this.ended && this.elapsed >= this.total) {
       this.ended = true;

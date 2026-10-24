@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Contour, CONTOUR_PARTS, type ContourPart } from "./contour";
+import { Contour, CONTOUR_PARTS, GLOW_LAYER, type ContourPart } from "./contour";
 
 // Tapsi, the guide: a little fox explorer with a red bandana, built from
 // simple rounded shapes and posed by joint angles, so any movement of the
@@ -140,26 +140,72 @@ function mesh(geometry: THREE.BufferGeometry, material: THREE.Material, castShad
   return m;
 }
 
-/** A capsule hanging down from its pivot, `length` long. */
-function limb(length: number, radius: number, material: THREE.Material) {
-  const m = mesh(new THREE.CapsuleGeometry(radius, length - radius, 6, 14), material);
-  m.position.y = -length / 2;
-  return m;
+/**
+ * A limb hanging down from its pivot, `length` long: `top` thick at the pivot, slimmer towards `bottom`
+ * at the end, and a little fuller (`full`) a third of the way down, like a muscle. Round at both ends.
+ */
+function limb(length: number, top: number, bottom: number, material: THREE.Material, full = 0.12) {
+  const lower = -length + bottom * 0.5;
+  const upper = -top * 0.5;
+  const points: THREE.Vector2[] = [];
+  for (let i = 0; i <= 6; i++) {
+    const a = (i / 6) * (Math.PI / 2);
+    points.push(new THREE.Vector2(Math.sin(a) * bottom, lower - Math.cos(a) * bottom));
+  }
+  for (let i = 1; i < 12; i++) {
+    const k = i / 12;
+    const swell = Math.exp(-(((k - 0.68) / 0.24) ** 2)) * full * top;
+    points.push(new THREE.Vector2(bottom + (top - bottom) * k + swell, lower + (upper - lower) * k));
+  }
+  for (let i = 0; i <= 6; i++) {
+    const a = ((6 - i) / 6) * (Math.PI / 2);
+    points.push(new THREE.Vector2(Math.sin(a) * top, upper + Math.cos(a) * top));
+  }
+  return mesh(new THREE.LatheGeometry(points, 18), material);
+}
+
+/** A value that follows its target as if on a spring: it lags behind, overshoots a little and settles. */
+class Spring {
+  value = 0;
+  private speed = 0;
+  constructor(
+    private readonly stiffness: number,
+    private readonly damping: number,
+  ) {}
+
+  step(target: number, dt: number) {
+    const n = Math.ceil(dt / 0.016);
+    for (let i = 0; i < n; i++) {
+      this.speed += (this.stiffness * (target - this.value) - this.damping * this.speed) * (dt / n);
+      this.value += this.speed * (dt / n);
+    }
+    return this.value;
+  }
+
+  reset() {
+    this.value = 0;
+    this.speed = 0;
+  }
 }
 
 interface Arm {
   shoulder: THREE.Group;
   upper: THREE.Group;
   elbow: THREE.Group;
-  /** The four fingers, each turning at its knuckle. */
+  /** The four fingers, each turning at its knuckle, and their front joints. */
   fingers: THREE.Group[];
+  tips: THREE.Group[];
   hand: THREE.Group;
+  /** Which way is out: +1 for the left arm (the fox's +x). */
+  side: 1 | -1;
 }
 
 interface Leg {
   hip: THREE.Group;
   knee: THREE.Group;
   foot: THREE.Group;
+  /** The toes, bending at the ball of the foot. */
+  toes: THREE.Group;
 }
 
 export class Guide {
@@ -199,6 +245,15 @@ export class Guide {
   private previousTime = 0;
   /** The limbs' materials that mark where they show through the body, by part. */
   private readonly markers: [ContourPart, THREE.Material][] = [];
+  /** Follow-through: the paws trail behind a quick arm, ears and tail bounce after the body. */
+  private readonly sway = {
+    wristL: [new Spring(160, 15), new Spring(160, 15)],
+    wristR: [new Spring(160, 15), new Spring(160, 15)],
+    ears: new Spring(90, 8),
+    tail: new Spring(70, 7),
+    tailSide: new Spring(70, 7),
+  };
+  private previousHeight = 0;
 
   constructor() {
     const furMat = fur(FUR);
@@ -384,43 +439,60 @@ export class Guide {
       shoulder.add(upper);
       const joint = mesh(new THREE.SphereGeometry(0.054, 20, 16), furMat);
       upper.add(joint);
-      upper.add(limb(UPPER_ARM, 0.046, furMat));
+      upper.add(limb(UPPER_ARM, 0.05, 0.039, furMat));
       const elbow = new THREE.Group();
       elbow.position.y = -UPPER_ARM;
       upper.add(elbow);
-      elbow.add(mesh(new THREE.SphereGeometry(0.045, 16, 12), furMat));
-      elbow.add(limb(FOREARM, 0.04, darkMat));
+      elbow.add(mesh(new THREE.SphereGeometry(0.042, 16, 12), furMat));
+      // The forearm narrows to a slim wrist; the wrist is round, so the paw can bend at it.
+      elbow.add(limb(FOREARM, 0.042, 0.028, darkMat, 0.1));
       hand.position.y = -FOREARM;
       elbow.add(hand);
+      hand.add(mesh(new THREE.SphereGeometry(0.029, 14, 10), darkMat));
       const palm = mesh(new THREE.SphereGeometry(0.048, 20, 16), pawMat);
-      palm.scale.set(1.1, 1.05, 0.6);
-      palm.position.y = -0.035;
+      palm.scale.set(1.08, 1.05, 0.62);
+      palm.position.y = -0.036;
       hand.add(palm);
       // The pad on the inside of the paw: towards us when the paw waves.
       const pad = mesh(new THREE.SphereGeometry(0.026, 14, 10), padMat, false);
       pad.scale.set(1, 1, 0.4);
       pad.position.set(0, -0.04, 0.026);
       hand.add(pad);
+      // Fingers in two parts, so they curl softly; each ends in a round tip with a little pad.
       const fingers: THREE.Group[] = [];
+      const tips: THREE.Group[] = [];
+      const finger = (knuckle: THREE.Group, base: number, end: number, radius: number) => {
+        const near = mesh(new THREE.CapsuleGeometry(radius, base, 4, 10), pawMat);
+        near.position.y = -base / 2;
+        knuckle.add(near);
+        const tip = new THREE.Group();
+        tip.position.y = -base;
+        knuckle.add(tip);
+        const far = mesh(new THREE.CapsuleGeometry(radius * 1.04, end, 4, 10), pawMat);
+        far.position.y = -end / 2 - radius * 0.2;
+        tip.add(far);
+        const bean = mesh(new THREE.SphereGeometry(radius * 0.62, 10, 8), padMat, false);
+        bean.scale.set(1, 1.1, 0.5);
+        bean.position.set(0, -end - radius * 0.35, radius * 0.72);
+        tip.add(bean);
+        return tip;
+      };
       for (let i = 0; i < 4; i++) {
         const knuckle = new THREE.Group();
-        knuckle.position.set((i - 1.5) * 0.022, -0.068, 0);
-        const long = i === 1 || i === 2 ? 0.012 : 0;
-        const finger = mesh(new THREE.CapsuleGeometry(0.0125, 0.032 + long, 4, 8), pawMat);
-        finger.position.y = -0.026 - long / 2;
-        knuckle.add(finger);
+        // The middle two are a little longer and the outer ones sit a little higher, like a real hand.
+        const middle = i === 1 || i === 2;
+        knuckle.position.set((i - 1.5) * 0.022, middle ? -0.068 : -0.064, 0);
+        tips.push(finger(knuckle, middle ? 0.024 : 0.019, middle ? 0.016 : 0.013, 0.012));
         hand.add(knuckle);
         fingers.push(knuckle);
       }
       const thumb = new THREE.Group();
-      thumb.position.set(-0.04 * side, -0.035, 0.008);
-      thumb.rotation.z = -0.95 * side;
-      const thumbTip = mesh(new THREE.CapsuleGeometry(0.0135, 0.028, 4, 8), pawMat);
-      thumbTip.position.y = -0.024;
-      thumb.add(thumbTip);
+      thumb.position.set(-0.04 * side, -0.033, 0.01);
+      thumb.rotation.set(-0.35, 0, -0.95 * side);
+      finger(thumb, 0.016, 0.012, 0.0135).rotation.x = -0.35;
       hand.add(thumb);
       this.spine.add(shoulder);
-      return { shoulder, upper, elbow, fingers, hand };
+      return { shoulder, upper, elbow, fingers, tips, hand, side };
     };
     this.armL = makeArm(1, this.handL);
     this.armR = makeArm(-1, this.handR);
@@ -429,27 +501,48 @@ export class Guide {
     const makeLeg = (side: 1 | -1): Leg => {
       const hip = new THREE.Group();
       hip.position.set(0.11 * side, 0.02, 0);
-      hip.add(limb(THIGH, 0.056, furMat));
+      hip.add(limb(THIGH, 0.062, 0.045, furMat));
       const knee = new THREE.Group();
       knee.position.y = -THIGH;
       hip.add(knee);
-      knee.add(mesh(new THREE.SphereGeometry(0.052, 16, 12), furMat));
-      knee.add(limb(SHIN, 0.043, darkMat));
+      knee.add(mesh(new THREE.SphereGeometry(0.05, 16, 12), furMat));
+      // The calf is fullest high up and the shin narrows to a slim ankle.
+      knee.add(limb(SHIN, 0.048, 0.03, darkMat, 0.16));
       const foot = new THREE.Group();
       foot.position.y = -SHIN;
       knee.add(foot);
-      const sole = mesh(new THREE.SphereGeometry(0.06, 20, 14), pawMat);
-      sole.scale.set(1, 0.58, 1.4);
-      sole.position.set(0, -0.035, 0.035);
+      foot.add(mesh(new THREE.SphereGeometry(0.033, 14, 10), darkMat));
+      // The paw: narrow at the heel, wide at the front, and soft round toes that bend at the ball.
+      const heel = mesh(new THREE.SphereGeometry(0.045, 18, 12), pawMat);
+      heel.scale.set(1, 0.72, 1.1);
+      heel.position.set(0, -0.038, -0.002);
+      foot.add(heel);
+      const sole = mesh(new THREE.SphereGeometry(0.056, 20, 14), pawMat);
+      sole.scale.set(1.06, 0.58, 1.05);
+      sole.position.set(0, -0.038, 0.048);
       foot.add(sole);
+      // Pink pads underneath: they show when the paw lifts, e.g. stamping, seen from behind.
+      const ball = mesh(new THREE.SphereGeometry(0.03, 14, 10), padMat, false);
+      ball.scale.set(1.3, 0.28, 0.95);
+      ball.position.set(0, -0.069, 0.045);
+      foot.add(ball);
+      const toes = new THREE.Group();
+      toes.position.set(0, -0.045, 0.08);
+      foot.add(toes);
       for (let i = 0; i < 4; i++) {
-        const toe = mesh(new THREE.SphereGeometry(0.023, 12, 10), pawMat);
-        toe.scale.set(1, 0.85, 1.1);
-        toe.position.set((i - 1.5) * 0.034, -0.05, 0.112 - Math.abs(i - 1.5) * 0.012);
-        foot.add(toe);
+        const x = (i - 1.5) * 0.03;
+        const reach = 0.026 - Math.abs(i - 1.5) * 0.009;
+        const toe = mesh(new THREE.SphereGeometry(0.021, 14, 10), pawMat);
+        toe.scale.set(0.95, 0.82, 1.2);
+        toe.position.set(x, -0.003, reach);
+        toes.add(toe);
+        const bean = mesh(new THREE.SphereGeometry(0.011, 10, 8), padMat, false);
+        bean.scale.set(1, 0.4, 1);
+        bean.position.set(x, -0.02, reach + 0.004);
+        toes.add(bean);
       }
       this.hips.add(hip);
-      return { hip, knee, foot };
+      return { hip, knee, foot, toes };
     };
     this.legL = makeLeg(1);
     this.legR = makeLeg(-1);
@@ -502,7 +595,7 @@ export class Guide {
       let c = cache.get(m);
       if (!c) {
         c = m.clone();
-        // The outline changes its uniforms later on the material it made, so the copy keeps them.
+        // The ink line's copy keeps sharing its uniforms.
         if (m instanceof THREE.ShaderMaterial) (c as THREE.ShaderMaterial).uniforms = m.uniforms;
         make(c);
         cache.set(m, c);
@@ -515,7 +608,8 @@ export class Guide {
     };
     const meshes: THREE.Mesh[] = [];
     this.root.traverse((o) => {
-      if (o instanceof THREE.Mesh) meshes.push(o);
+      // The glow's mask is drawn in a pass of its own.
+      if (o instanceof THREE.Mesh && !o.layers.isEnabled(GLOW_LAYER)) meshes.push(o);
     });
     for (const m of meshes) {
       const material = m.material as THREE.Material;
@@ -557,6 +651,11 @@ export class Guide {
     }
   }
 
+  /** Lays the glow around the moving parts over the picture just rendered. */
+  drawGlow(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera) {
+    this.contour.draw(renderer, camera);
+  }
+
   /** Talking moves the mouth while the voice speaks. */
   setTalking(on: boolean) {
     this.talking = on;
@@ -567,35 +666,66 @@ export class Guide {
     const legHeight = (l: LegPose) => THIGH * Math.cos(l.lift) * Math.cos(l.spread) + SHIN * Math.cos(l.lift - l.knee);
     const stand = Math.max(legHeight(p.legL), legHeight(p.legR));
     const breathe = Math.sin(time * 2.2) * 0.006;
-    this.hips.position.set(p.shift, stand + FOOT + p.toes * 0.05 + p.lift + breathe, 0);
+    const height = stand + FOOT + p.toes * 0.05 + p.lift + breathe;
+    this.hips.position.set(p.shift, height, 0);
     // The turn of a pose is on top of where the story points the fox (root).
     this.hips.rotation.y = p.turn;
 
-    this.spine.rotation.set(p.bend, p.twist, -p.lean);
-    this.head.rotation.set(p.headPitch, p.headYaw, -p.headTilt);
+    // How fast things move since the last frame, for the follow-through; after a jump in the story it settles at once.
+    const q = this.previous;
+    const dt = time - this.previousTime;
+    const live = q !== null && dt > 0 && dt <= 0.2;
+    if (!live) for (const spring of [...this.sway.wristL, ...this.sway.wristR, this.sway.ears, this.sway.tail, this.sway.tailSide]) spring.reset();
+    const rate = (now: number, before: number | undefined, limit: number) =>
+      live && before !== undefined ? THREE.MathUtils.clamp((now - before) / dt, -limit, limit) : 0;
+    const rise = rate(height, this.previousHeight, 3);
+    this.previousHeight = height;
+    const step = live ? dt : 0;
 
-    const arm = (a: Arm, pose: ArmPose, side: 1 | -1) => {
+    // Standing on one leg, the upper body leans a little over the other; the head stays more upright than the body.
+    const lifted = (l: LegPose) => stand - legHeight(l);
+    this.spine.rotation.set(p.bend, p.twist, -p.lean + THREE.MathUtils.clamp((lifted(p.legL) - lifted(p.legR)) * 0.4, -0.1, 0.1));
+    this.head.rotation.set(p.headPitch, p.headYaw - p.twist * 0.2, -p.headTilt + p.lean * 0.3);
+
+    const arm = (a: Arm, pose: ArmPose, before: ArmPose | undefined, wrist: Spring[]) => {
+      const side = a.side;
       a.shoulder.rotation.set(-pose.raise, 0, pose.spread * side);
       a.upper.rotation.y = pose.twist * side;
       a.elbow.rotation.x = -pose.elbow;
-      // Fingers close together while the arm hangs, and spread wide once it reaches out or up.
+      // The paw hangs a little bent at the wrist and trails behind when the arm swings fast.
+      const flop = wrist[0].step(rate(pose.raise, before?.raise, 6) * 0.06 + rate(pose.elbow, before?.elbow, 6) * 0.04, step);
+      const sway = wrist[1].step(-rate(pose.spread, before?.spread, 6) * 0.06 * side, step);
+      a.hand.rotation.set(-0.14 + THREE.MathUtils.clamp(flop, -0.5, 0.5), 0, THREE.MathUtils.clamp(sway, -0.4, 0.4));
+      // Fingers close together and curl softly while the arm hangs, and stretch and spread once it
+      // reaches out or up; the little finger curls most.
       const open = THREE.MathUtils.smoothstep(pose.raise + pose.spread, 0.5, 1.8);
-      a.fingers.forEach((finger, i) => finger.rotation.set(0, 0, (i - 1.5) * (0.1 + open * 0.2)));
+      a.fingers.forEach((finger, i) => {
+        const outward = side > 0 ? i : 3 - i;
+        const curl = (0.2 + outward * 0.1) * (1 - open * 0.75);
+        finger.rotation.set(-curl, 0, (i - 1.5) * (0.1 + open * 0.2));
+        a.tips[i].rotation.x = -curl * 1.3;
+      });
     };
-    arm(this.armL, p.armL, 1);
-    arm(this.armR, p.armR, -1);
+    arm(this.armL, p.armL, q?.armL, this.sway.wristL);
+    arm(this.armR, p.armR, q?.armR, this.sway.wristR);
 
     const leg = (l: Leg, pose: LegPose, side: 1 | -1) => {
       l.hip.rotation.set(-pose.lift, 0, pose.spread * side);
       l.knee.rotation.x = pose.knee;
-      // Keep the sole level, also with the legs apart, tipped up onto the toes when asked.
-      l.foot.rotation.x = pose.lift - pose.knee + p.toes * 0.6;
+      // Keep the sole level, also with the legs apart, tipped up onto the toes when asked; the toes stay
+      // on the ground then. A paw in the air hangs a little, toes down, and lands flat again.
+      const hang = THREE.MathUtils.smoothstep(lifted(pose), 0.01, 0.1);
+      l.foot.rotation.x = pose.lift - pose.knee + p.toes * 0.6 + hang * 0.3;
       l.foot.rotation.z = -pose.spread * side;
+      l.toes.rotation.x = -p.toes * 0.6 + hang * 0.2;
     };
     leg(this.legL, p.legL, 1);
     leg(this.legR, p.legR, -1);
 
-    this.tail.rotation.set(Math.sin(time * 1.7) * 0.05, Math.sin(time * 2.6) * 0.35, 0);
+    // The tail swings after the hips: down when they go up, aside when they turn.
+    const tailDip = this.sway.tail.step(-rise * 0.5, step);
+    const tailSide = this.sway.tailSide.step(-rate(p.turn, q?.turn, 8) * 0.12 - rate(p.shift, q?.shift, 3) * 1.5, step);
+    this.tail.rotation.set(Math.sin(time * 1.7) * 0.05 + tailDip, Math.sin(time * 2.6) * 0.35 + tailSide, 0);
 
     // Blink every few seconds.
     const blink = time % 3.7 < 0.12 ? 0.1 : 1;
@@ -606,11 +736,12 @@ export class Guide {
     }
     for (const arc of this.happyEyes) arc.visible = happy;
     for (const cheek of this.blush) (cheek.material as THREE.MeshBasicMaterial).opacity = this.joy * 0.75;
-    // The ears wiggle with joy.
+    // The ears wiggle with joy, and flop back when the fox goes up and forwards when it lands.
+    const earBounce = THREE.MathUtils.clamp(this.sway.ears.step(-rise * 0.35, step), -0.5, 0.4);
     this.ears.forEach((ear, i) => {
       const side = i === 0 ? 1 : -1;
       ear.rotation.z = (-0.35 + Math.sin(time * 9 + i) * 0.18 * this.joy) * side;
-      ear.rotation.x = -0.15 - this.earsBack * 1.35;
+      ear.rotation.x = -0.15 - this.earsBack * 1.35 + earBounce;
     });
 
     const open = this.talking ? 0.6 + Math.abs(Math.sin(time * 14)) * 0.9 : 0.6;
@@ -668,7 +799,12 @@ export class Guide {
     a.shoulder.quaternion.multiply(a.upper.quaternion).slerp(held, weight);
     a.upper.quaternion.identity();
     a.elbow.rotation.x += (-bend - a.elbow.rotation.x) * weight;
-    for (const finger of a.fingers) finger.rotation.x = -GRIP_CURL * weight;
+    a.hand.rotation.x *= 1 - weight;
+    a.hand.rotation.z *= 1 - weight;
+    a.fingers.forEach((finger, i) => {
+      finger.rotation.x += (-GRIP_CURL * 0.6 - finger.rotation.x) * weight;
+      a.tips[i].rotation.x += (-GRIP_CURL * 0.5 - a.tips[i].rotation.x) * weight;
+    });
     a.shoulder.updateMatrixWorld(true);
   }
 

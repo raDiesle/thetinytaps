@@ -10,6 +10,8 @@ Fehler in späteren Leveln nicht wieder passiert.
   vor dem Bildschirm im Zimmer und kann sich nicht frei durch den Raum bewegen. Darum geht, hüpft
   oder steigt die Figur nie von der Stelle: Sie wird getragen (Schatzinsel: auf dem Panzer einer
   Schildkröte) und macht alles auf der Stelle. Erlaubt sind nur kleine Schritte zur Seite und zurück.
+  Steht die Figur dadurch höher, muss alles, was sie erreichen soll (Kurbel, Äpfel, Spinnweben,
+  Schloss), mit hoch, und alles, was über sie hinweg soll (Baumstamm, Kisten), höher hängen.
 - **Nichts verlangen, wofür das Kind im Zimmer kein Gegenüber hat**: kein Drücken gegen eine Tür
   (stattdessen Spinnweben wegwedeln), kein Balancieren auf Schienen, kein schnelles Drehen.
 - **Nur zeigen, was zur Bewegung gehört.** Teile, die nicht Teil der Bewegung sind, sollen nicht
@@ -36,7 +38,8 @@ Fehler in späteren Leveln nicht wieder passiert.
 - Körper und Kopf verdecken keine Arme oder Beine, die gerade die Bewegung machen (halb
   durchsichtig dort), aber nur diese.
 - Das Leuchten am Fuchs ist ein sauberer Rand um die Umrisse, ohne Spalten oder Nähte zwischen den
-  Körperteilen (im Bild berechnet, nicht pro Teil).
+  Körperteilen (im Bild berechnet, nicht pro Teil), mit einem kleinen Abstand zum Körper. Was vor
+  dem Fuchs steht, verdeckt auch das Leuchten.
 - Kamera von hinten, damit links links ist; wo die Arme vor dem Körper arbeiten, höher und seitlich.
 - Der Schwanz ist klein und verdeckt keine Beine.
 

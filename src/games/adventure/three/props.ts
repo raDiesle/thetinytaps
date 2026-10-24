@@ -228,53 +228,181 @@ export function makeButterfly(color: string) {
   };
 }
 
-/** Height of the canoe's rim above its bottom (local y); the paddle has to stay above it. */
-export const CANOE_RIM = 0.3;
-/** Half the width of the canoe in the middle, and half its length. */
-export const CANOE_HALF_WIDTH = 0.62;
-export const CANOE_HALF_LENGTH = 2.3;
-/** Where the feet of someone sitting in the canoe stand: on the floor boards, in front of the seat (local). */
-export const CANOE_FEET = new THREE.Vector3(0, -0.03, 0.4);
-/** The top of the seat (local y): just under the bottom of a sitting Tapsi. */
-const CANOE_SEAT = 0.26;
+/** The turtle that carries Tapsi: how high its back is above its belly (local y), where Tapsi stands. */
+export const TURTLE_BACK = 0.45;
+/** Half the width and half the length of the shell. */
+export const TURTLE_HALF_WIDTH = 0.78;
+export const TURTLE_HALF_LENGTH = 0.95;
+/** How far in front of the turtle's middle its nose reaches. */
+export const TURTLE_NOSE = 1.42;
+/** The edge of the shell above the belly (local y). */
+const TURTLE_RIM = 0.13;
 
-/** A wooden canoe pointing along -z. */
-export function makeCanoe() {
+/**
+ * The top of the turtle at (x, z) from its middle (local): the shell, flat on
+ * top so Tapsi can step about on it, steep at the sides; down its flanks to
+ * the ground (0) just outside the edge.
+ */
+export function turtleTop(x: number, z: number) {
+  const r2 = (x / TURTLE_HALF_WIDTH) ** 2 + (z / TURTLE_HALF_LENGTH) ** 2;
+  if (r2 < 1) return TURTLE_RIM + (TURTLE_BACK - TURTLE_RIM) * Math.sqrt(1 - r2 ** 3);
+  return TURTLE_RIM * Math.max(0, 1 - (Math.sqrt(r2) - 1) / 0.12);
+}
+
+/**
+ * Ole, a big, friendly sea turtle looking along +z: a domed shell with scutes,
+ * flat on top, a round head with big eyes and a smile, and four flippers.
+ * `move` walks or swims it.
+ */
+export function makeTurtle() {
   const group = new THREE.Group();
-  const wood = mat("#b5753f", 0.6);
-  const woodDark = mat("#8a522a", 0.7);
-  // Shallow, so a sitting Tapsi shows from the hips up and the paddle passes over the rim.
-  const hullGeo = new THREE.SphereGeometry(1, 40, 16, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2);
-  hullGeo.scale(CANOE_HALF_WIDTH, 0.38, CANOE_HALF_LENGTH);
-  const hull = solid(hullGeo, new THREE.MeshStandardMaterial({ color: "#b5753f", roughness: 0.6, side: THREE.DoubleSide }));
-  hull.position.y = CANOE_RIM;
-  group.add(hull);
-  const rimGeo = new THREE.TorusGeometry(1, 0.05, 8, 48);
+  const skin = mat("#8fc97a", 0.65);
+  const skinDark = mat("#6aa65a", 0.7);
+
+  // The shell: a dome with a flat top, coloured into scutes – five down the middle, four on each side,
+  // and a ring of small ones round the edge – with dark seams between them.
+  const shellGeo = new THREE.SphereGeometry(1, 72, 28, 0, Math.PI * 2, 0, Math.PI / 2);
+  const pos = shellGeo.attributes.position;
+  const seeds: [number, number][] = [];
+  for (const z of [0.62, 0.31, 0, -0.31, -0.62]) seeds.push([0, z]);
+  for (const side of [1, -1]) for (const z of [0.47, 0.16, -0.16, -0.47]) seeds.push([side * 0.52, z]);
+  const scute = new THREE.Color("#7cb860");
+  const middle = new THREE.Color("#9ccf74");
+  const seam = new THREE.Color("#3f6b34");
+  const edge = new THREE.Color("#b8d87e");
+  const c = new THREE.Color();
+  const colors: number[] = [];
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+    const r2 = x * x + z * z;
+    let near = Infinity;
+    let next = Infinity;
+    for (const [sx, sz] of seeds) {
+      const d = Math.hypot(x - sx, z - sz);
+      if (d < near) [near, next] = [d, near];
+      else if (d < next) next = d;
+    }
+    const r = Math.sqrt(r2);
+    if (r > 0.86) {
+      // The small scutes round the edge.
+      const a = Math.atan2(z, x);
+      const line = Math.abs(Math.sin(a * 11)) < 0.12 || r < 0.88;
+      c.copy(line ? seam : edge);
+    } else {
+      c.copy(scute).lerp(middle, Math.max(0, 1 - near / 0.22) * 0.8);
+      if (next - near < 0.035) c.copy(seam);
+    }
+    colors.push(c.r, c.g, c.b);
+    pos.setXYZ(i, x * TURTLE_HALF_WIDTH, TURTLE_RIM + (TURTLE_BACK - TURTLE_RIM) * Math.sqrt(Math.max(0, 1 - r2 ** 3)), z * TURTLE_HALF_LENGTH);
+  }
+  shellGeo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+  shellGeo.computeVertexNormals();
+  group.add(solid(shellGeo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.55 })));
+  const rimGeo = new THREE.TorusGeometry(1, 0.045, 8, 72);
   rimGeo.rotateX(Math.PI / 2);
-  rimGeo.scale(CANOE_HALF_WIDTH, 1, CANOE_HALF_LENGTH);
-  const rim = solid(rimGeo, woodDark);
-  rim.position.y = CANOE_RIM;
+  rimGeo.scale(TURTLE_HALF_WIDTH + 0.01, 1, TURTLE_HALF_LENGTH + 0.01);
+  const rim = solid(rimGeo, mat("#5f9447", 0.6));
+  rim.position.y = TURTLE_RIM;
   group.add(rim);
-  // The seat Tapsi sits on: a plank from side to side, just under the rim.
-  const seat = solid(new THREE.BoxGeometry(1.12, 0.06, 0.32), wood);
-  seat.position.set(0, CANOE_SEAT - 0.03, CANOE_FEET.z + 0.1);
-  group.add(seat);
-  const floor = solid(new THREE.BoxGeometry(0.36, 0.02, 1.4), woodDark);
-  floor.position.y = -0.045;
-  group.add(floor);
-  // The sea is a flat plane and would show inside the open hull, as if the
-  // canoe was full of water. An invisible lid over the hull fills in depth
-  // after everything solid is drawn – Tapsi too, who is drawn late for the
-  // see-through body – so the water behind it is hidden while Tapsi's legs
-  // and the floor inside stay.
-  const lidGeo = new THREE.CircleGeometry(1, 48);
-  lidGeo.rotateX(-Math.PI / 2);
-  lidGeo.scale(CANOE_HALF_WIDTH, 1, CANOE_HALF_LENGTH);
-  const waterMask = new THREE.Mesh(lidGeo, new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide }));
-  waterMask.position.y = CANOE_RIM;
-  waterMask.renderOrder = 20;
-  group.add(waterMask);
-  return group;
+  // The belly underneath, light and flat.
+  const bellyGeo = new THREE.SphereGeometry(1, 40, 12);
+  bellyGeo.scale(TURTLE_HALF_WIDTH * 0.93, 0.11, TURTLE_HALF_LENGTH * 0.93);
+  const belly = solid(bellyGeo, mat("#efe0a4", 0.7));
+  belly.position.y = TURTLE_RIM - 0.01;
+  group.add(belly);
+
+  // The head on a short neck, big friendly eyes, a smile and rosy cheeks.
+  const head = new THREE.Group();
+  head.position.set(0, 0.2, TURTLE_HALF_LENGTH - 0.02);
+  group.add(head);
+  const neck = solid(new THREE.CylinderGeometry(0.11, 0.13, 0.32, 16), skin);
+  neck.rotation.x = Math.PI / 2 - 0.25;
+  neck.position.set(0, 0.03, 0.1);
+  head.add(neck);
+  const skull = solid(new THREE.SphereGeometry(0.19, 28, 20), skin);
+  skull.scale.set(1, 0.88, 1.18);
+  skull.position.set(0, 0.09, 0.27);
+  head.add(skull);
+  for (const [x, y, z, r] of [
+    [0.07, 0.2, 0.25, 0.03],
+    [-0.09, 0.19, 0.2, 0.025],
+    [0.0, 0.22, 0.13, 0.028],
+  ]) {
+    const spot = solid(new THREE.SphereGeometry(r, 10, 8), skinDark, false);
+    spot.scale.y = 0.4;
+    spot.position.set(x, y, z);
+    head.add(spot);
+  }
+  const eyes: THREE.Group[] = [];
+  for (const side of [1, -1]) {
+    const eye = new THREE.Group();
+    eye.position.set(0.1 * side, 0.15, 0.4);
+    eye.rotation.y = 0.35 * side;
+    const ball = solid(new THREE.SphereGeometry(0.058, 18, 14), mat("#ffffff", 0.3), false);
+    eye.add(ball);
+    const pupil = solid(new THREE.SphereGeometry(0.036, 14, 10), mat("#1b1210", 0.2), false);
+    pupil.position.z = 0.03;
+    eye.add(pupil);
+    const glint = new THREE.Mesh(new THREE.SphereGeometry(0.012, 8, 6), new THREE.MeshBasicMaterial({ color: "#ffffff" }));
+    glint.position.set(0.012, 0.015, 0.06);
+    eye.add(glint);
+    head.add(eye);
+    eyes.push(eye);
+    const cheek = new THREE.Mesh(new THREE.CircleGeometry(0.035, 16), new THREE.MeshBasicMaterial({ color: "#ff8fa3", transparent: true, opacity: 0.6 }));
+    cheek.position.set(0.15 * side, 0.06, 0.4);
+    cheek.rotation.y = 0.7 * side;
+    head.add(cheek);
+  }
+  const smile = solid(new THREE.TorusGeometry(0.06, 0.009, 6, 16, Math.PI), mat("#2d4a26", 0.6), false);
+  smile.rotation.z = Math.PI;
+  smile.position.set(0, 0.05, 0.48);
+  head.add(smile);
+
+  // Four flippers on pivots under the shell's edge; the front ones big, like wings.
+  const flipperGeo = new THREE.SphereGeometry(0.5, 18, 10);
+  flipperGeo.scale(1, 0.14, 0.42);
+  flipperGeo.translate(0.45, 0, 0);
+  const flippers: { pivot: THREE.Group; side: number; front: boolean }[] = [];
+  for (const front of [true, false]) {
+    for (const side of [1, -1]) {
+      const pivot = new THREE.Group();
+      pivot.position.set(side * (front ? 0.58 : 0.52), 0.1, front ? 0.5 : -0.58);
+      const flipper = solid(flipperGeo, skin);
+      flipper.scale.set(side * (front ? 0.72 : 0.42), 1, front ? 0.78 : 0.62);
+      pivot.add(flipper);
+      group.add(pivot);
+      flippers.push({ pivot, side, front });
+    }
+  }
+  const tail = solid(new THREE.ConeGeometry(0.07, 0.2, 10), skin);
+  tail.rotation.x = -Math.PI / 2 - 0.3;
+  tail.position.set(0, 0.1, -TURTLE_HALF_LENGTH - 0.05);
+  group.add(tail);
+
+  return {
+    group,
+    /**
+     * stride: how far through its steps it is (rad), walking: how much it walks (0..1),
+     * swimming: how much it is in the water (0..1), time for breathing, looking about and blinking.
+     */
+    move(stride: number, walking: number, swimming: number, time: number) {
+      for (const { pivot, side, front } of flippers) {
+        // On land the diagonal flippers step together: forwards in the air, back on the ground.
+        const s = Math.sin(stride + (front === side > 0 ? 0 : Math.PI));
+        const step = s * 0.45 * walking;
+        const lift = Math.max(0, Math.cos(stride + (front === side > 0 ? 0 : Math.PI))) * 0.35 * walking;
+        // In the water the front flippers beat like wings, the back ones steer.
+        const beat = Math.sin(time * 2.4 + (front ? 0 : 1.2)) * swimming * (front ? 0.55 : 0.2);
+        const rest = front ? -0.45 : 0.65;
+        pivot.rotation.set(0, side * (rest - step) + side * Math.cos(time * 2.4) * 0.25 * swimming * (front ? 1 : 0), side * (lift + beat - 0.1 * (1 - swimming)));
+      }
+      head.rotation.set(-0.08 + Math.sin(time * 1.3) * 0.04 - walking * 0.1, Math.sin(time * 0.45) * 0.25 * (1 - walking), 0);
+      head.position.z = TURTLE_HALF_LENGTH - 0.02 + walking * Math.sin(stride * 2) * 0.02;
+      const blink = time % 4.3 < 0.13 ? 0.15 : 1;
+      for (const eye of eyes) eye.scale.y = blink;
+    },
+  };
 }
 
 /** Half the length of the double paddle, from the middle to the tip of a blade. */

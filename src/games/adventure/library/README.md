@@ -143,8 +143,12 @@ noch ein ruhiger Abschied dazukommen.
   sieht das Kind dabei kaum; erst nach dem Aufschließen der Truhe dreht Tapsi sich um und jubelt,
   tanzt und winkt uns von vorne zu, mit fröhlichem Gesicht. Ob Kinder so besser mitmachen als mit
   einem Fuchs, der sie anschaut, ist noch offen.
+- **Ole trägt Tapsi.** Das Kind macht jede Bewegung nach, auch die zwischen den Stationen, und
+  kann sich im Zimmer nicht frei bewegen. Darum geht Tapsi nie selbst: Ole, eine große
+  Meeresschildkröte, schwimmt und krabbelt mit Tapsi auf dem Panzer durch das ganze Level, und
+  Tapsi macht alles auf der Stelle (siehe `../LEVEL-REGELN.md`).
 - **Jede Bewegung hat ein Gegenüber.** Tapsi winkt Kiki zu (Kiki fliegt am Anfang heran und am
-  Ende davon), paddelt im Kanu sitzend, stampft Skorpione platt, springt über die Steine im Bach und stößt
+  Ende davon), paddelt auf Ole sitzend, stampft Skorpione platt, hüpft auf Ole über die Brücke und stößt
   mit dem Kopf an schwebende Sternkisten (von der Seite gefilmt wie ein Jump-and-Run), duckt sich unter dem
   schaukelnden Baumstamm, öffnet mit den Armen die Blumen, kurbelt das Holztor hoch, macht den
   rollenden Kokosnüssen Platz, weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
