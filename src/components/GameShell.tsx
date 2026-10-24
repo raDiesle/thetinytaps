@@ -1,24 +1,28 @@
 import { Link, useLocation, useNavigate } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
-import { useDevice } from "@/lib/device";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import {
-  clearPlaytime,
   DEFAULT_PLAYTIME_SETTINGS,
   isPlaytimeOver,
-  PLAYTIME_OPTIONS,
+  playedToday,
   PLAYTIME_SETTINGS_KEY,
-  startPlaytime,
+  resetPlaytime,
   usePlaytime,
 } from "@/lib/playtime";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useStoredSettings } from "@/lib/storage";
 
-const EXIT_HOLD_MS = 1000;
+/** A click on ✕ leaves the game after this long; the ring fills meanwhile. */
+const EXIT_DELAY_MS = 500;
+
+/** Esc has to be held, since children press it while typing. */
+const ESC_HOLD_MS = 1000;
+
+/** How long the "Zurück zum Menü" note shows next to ✕ when a game starts. */
+const EXIT_HINT_MS = 4000;
 
 /** The child-friendly home page (idea A-04). */
 export const KID_HOME = "/kinder/";
@@ -32,9 +36,24 @@ export const KID_STATE = { kid: true };
 
 const isKidState = (state: unknown) => (state as { kid?: boolean } | null)?.kid === true;
 
+/** One way to play a game, picked on its start screen with a big card. */
+export interface GameMode {
+  id: string;
+  emoji: string;
+  title: string;
+  text?: string;
+}
+
 interface GameShellProps {
   title: string;
   emoji: string;
+  /** Ways to play, as big cards: tapping one picks it and starts the game. Without them there is one start button. */
+  modes?: GameMode[];
+  /** The mode played last, marked on its card. */
+  mode?: string;
+  onMode?: (id: string) => void;
+  /** A level or difficulty choice shown above the mode cards. */
+  level?: ReactNode;
   /** Parent-facing options shown on the start screen. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
@@ -47,13 +66,17 @@ interface GameShellProps {
 }
 
 /**
- * Wraps a game with a parent start screen, fullscreen + keyboard lock while
- * playing, and an exit that toddlers won't trigger by accident: hold the
- * corner button or the Esc key for two seconds.
+ * Wraps a game with a parent start screen (pick the way to play, options),
+ * fullscreen + keyboard lock while playing, and the exit: a click on the corner
+ * button, or holding Esc.
  */
 export function GameShell({
   title,
   emoji,
+  modes,
+  mode,
+  onMode,
+  level,
   settings,
   children,
   backHref = "/",
@@ -64,14 +87,15 @@ export function GameShell({
   const navigate = useNavigate();
   const kidMode = isKidState(location.state);
   const [playing, setPlaying] = useState(kidMode);
-  const [playtimeSettings, updatePlaytime] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
-  const playtime = usePlaytime();
+  const [playtimeSettings] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
+  const playtime = usePlaytime(playing);
+  // Bumped when the grown-up starts the play time afresh, to show it at once.
+  const [, setResets] = useState(0);
 
   const start = async () => {
     // These need the click as a user gesture, so run them before any await.
     unlockAudio();
     unlockSpeech();
-    startPlaytime(playtimeSettings.minutes);
     setPlaying(true);
     await enterKidMode();
   };
@@ -84,7 +108,6 @@ export function GameShell({
       navigate(KID_HOME, { state: KID_STATE });
       return;
     }
-    clearPlaytime();
     setPlaying(false);
     void exitKidMode();
     // Drop the kid state, so a reload shows the grown-ups' start screen.
@@ -102,7 +125,7 @@ export function GameShell({
       e.preventDefault();
       if (e.key !== "Escape") return;
       if (!e.repeat) escDownAt = performance.now();
-      else if (escDownAt !== null && performance.now() - escDownAt >= EXIT_HOLD_MS) stopRef.current();
+      else if (escDownAt !== null && performance.now() - escDownAt >= ESC_HOLD_MS) stopRef.current();
     };
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key === "Escape") escDownAt = null;
@@ -130,12 +153,19 @@ export function GameShell({
       <div className="play-area" onPointerDownCapture={unlockAudio}>
         {playtime.over ? <GoodNight /> : children}
         {!playtime.over && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
-        <HoldToExit onExit={stop} />
+        <ExitButton onExit={stop} label={kidHome ? "Beenden" : "Zurück zum Menü"} />
       </div>
     );
   }
 
   const minutes = playtimeSettings.minutes;
+  const playedMinutes = Math.floor(playedToday() / 60_000);
+  const over = isPlaytimeOver();
+
+  const pick = (id: string) => {
+    onMode?.(id);
+    void start();
+  };
 
   return (
     <main className="start-screen">
@@ -146,68 +176,70 @@ export function GameShell({
       <h1 className="menu-title">
         <span aria-hidden>{emoji}</span> {title}
       </h1>
+      {over && (
+        <p className="playtime-over-note" role="status">
+          <span aria-hidden>🌙</span> Die Spielzeit für heute ({minutes} Min.) ist vorbei.
+          <button
+            type="button"
+            onClick={() => {
+              resetPlaytime();
+              setResets((n) => n + 1);
+            }}
+          >
+            Noch einmal {minutes} Min.
+          </button>
+        </p>
+      )}
       {/* Right under the title, so it stays in sight however long the options get. */}
-      <button className="start-button" onClick={start}>
-        <span className="start-icon" aria-hidden>
-          ▶
-        </span>
-        Los geht&apos;s!
-      </button>
-      {/* Folded away by default, so the start screen stays short; the play time shows in the summary. */}
-      <details className="settings-panel">
-        <summary>
-          <span aria-hidden>⚙️</span> Einstellungen
-          {minutes > 0 && <span className="settings-summary-note">⏳ {minutes} Min.</span>}
-        </summary>
-        <section className="settings">
-          {settings}
-          <SettingsGroup title="Spielzeit">
-            <Choice
-              label="Spielzeit"
-              value={String(minutes)}
-              onChange={(value) => updatePlaytime({ minutes: Number(value) })}
-              options={PLAYTIME_OPTIONS.map((m) => ({ value: String(m), label: m ? `${m} Min.` : "∞ Ohne" }))}
-            />
-            <p className="setting-note">
-              In der letzten Minute wird alles dunkler, leiser und langsamer. Dann sagt das Spiel „Gute Nacht“ und endet von selbst.
-            </p>
-          </SettingsGroup>
+      {modes ? (
+        <section className="mode-picker" aria-label="Spielart wählen">
+          <h2 className="mode-heading">Was spielen wir?</h2>
+          {level && <div className="mode-level">{level}</div>}
+          <ul className="game-list mode-list">
+            {modes.map((m) => (
+              <li key={m.id}>
+                <button type="button" className="game-card mode-card" onClick={() => pick(m.id)}>
+                  <span className="game-emoji" aria-hidden>
+                    {m.emoji}
+                  </span>
+                  <span className="game-title">{m.title}</span>
+                  {m.text && <span className="game-text">{m.text}</span>}
+                  <span className="game-go" aria-hidden>
+                    ▶
+                  </span>
+                  {m.id === mode && modes.length > 1 && <span className="badge">zuletzt</span>}
+                </button>
+              </li>
+            ))}
+          </ul>
         </section>
-      </details>
-      <ExitHelp />
-    </main>
-  );
-}
-
-/** Tells the grown-up, before the game starts, how to get back out of fullscreen. Tablets and phones have no Esc key. */
-function ExitHelp() {
-  const seconds = EXIT_HOLD_MS / 1000;
-  const { touchOnly } = useDevice();
-  return (
-    <section className="exit-help" aria-label="So kommt man zurück zum Menü">
-      <h2>Zurück zum Menü und raus aus dem Vollbild</h2>
-      <ul>
-        {!touchOnly && (
-          <li>
-            <span aria-hidden>⌨️</span> Die Taste <kbd>Esc</kbd> {seconds}&nbsp;Sekunde gedrückt halten
-          </li>
-        )}
-        <li>
-          <span aria-hidden>👆</span> {touchOnly ? "Den" : "oder den"} Knopf <span className="exit-sample">✕</span> oben rechts{" "}
-          {seconds}&nbsp;Sekunde gedrückt halten, bis der Ring voll ist
-        </li>
-      </ul>
-      <p>
-        Kurz drücken reicht absichtlich nicht, damit Kinder das Spiel nicht aus Versehen beenden.
-        {!touchOnly && (
+      ) : (
+        <button className="start-button" onClick={start}>
+          <span className="start-icon" aria-hidden>
+            ▶
+          </span>
+          Los geht&apos;s!
+        </button>
+      )}
+      <p className="shared-settings-note">
+        {minutes > 0 ? (
           <>
-            {" "}
-            In Safari und Firefox beendet schon ein kurzer Druck auf <kbd>Esc</kbd> das Vollbild; zurück zum Menü geht es dann mit dem
-            Knopf <span className="exit-sample">✕</span>.
+            <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min. ·{" "}
           </>
-        )}
+        ) : null}
+        Spielzeit, Sprache, Vorlesen, Töne und ruhiger Modus gelten für alle Spiele – <Link to="/">auf der Startseite</Link>{" "}
+        einstellen.
       </p>
-    </section>
+      {settings && (
+        // Folded away by default, so the start screen stays short.
+        <details className="settings-panel">
+          <summary>
+            <span aria-hidden>⚙️</span> Einstellungen für dieses Spiel
+          </summary>
+          <section className="settings">{settings}</section>
+        </details>
+      )}
+    </main>
   );
 }
 
@@ -254,7 +286,7 @@ function GoodNight() {
         🧸<span className="good-night-zzz">💤</span>
       </span>
       <p className="good-night-text">Gute Nacht!</p>
-      <p className="good-night-hint">Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts gedrückt halten.</p>
+      <p className="good-night-hint">Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts antippen.</p>
     </div>
   );
 }
@@ -273,33 +305,45 @@ const STARS: [number, number, number][] = [
   [44, 40, 2.8],
 ];
 
-function HoldToExit({ onExit }: { onExit: () => void }) {
-  const [holding, setHolding] = useState(false);
+/**
+ * The ✕ in the corner: a click leaves the game after half a second, while the
+ * ring fills. A short note next to it says what it does when the game starts.
+ */
+function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
+  const [leaving, setLeaving] = useState(false);
+  const [hint, setHint] = useState(true);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const begin = (e: PointerEvent) => {
-    e.stopPropagation();
-    setHolding(true);
-    timer.current = setTimeout(onExit, EXIT_HOLD_MS);
-  };
-  const cancel = () => {
-    setHolding(false);
-    if (timer.current) clearTimeout(timer.current);
-  };
+  useEffect(() => {
+    const hide = setTimeout(() => setHint(false), EXIT_HINT_MS);
+    return () => {
+      clearTimeout(hide);
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, []);
 
-  useEffect(() => cancel, []);
+  const leave = () => {
+    if (timer.current) return;
+    setLeaving(true);
+    timer.current = setTimeout(onExit, EXIT_DELAY_MS);
+  };
 
   return (
-    <button
-      className={`hold-exit${holding ? " holding" : ""}`}
-      style={{ "--hold-ms": `${EXIT_HOLD_MS}ms` } as CSSProperties}
-      aria-label="Zum Beenden gedrückt halten"
-      onPointerDown={begin}
-      onPointerUp={cancel}
-      onPointerLeave={cancel}
-      onPointerCancel={cancel}
-    >
-      ✕
-    </button>
+    <div className={`exit-corner${hint || leaving ? " hinted" : ""}`}>
+      <span className="exit-hint" aria-hidden>
+        {label}
+      </span>
+      <button
+        type="button"
+        className={`hold-exit${leaving ? " holding" : ""}`}
+        style={{ "--hold-ms": `${EXIT_DELAY_MS}ms` } as CSSProperties}
+        aria-label={label}
+        // Keep the game from reacting to the tap on the button.
+        onPointerDown={(e: PointerEvent) => e.stopPropagation()}
+        onClick={leave}
+      >
+        ✕
+      </button>
+    </div>
   );
 }

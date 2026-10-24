@@ -1,55 +1,39 @@
 import { useMemo, useRef, useState, type CSSProperties } from "react";
 import { GameShell } from "@/components/GameShell";
-import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { VoiceSetting } from "@/components/VoiceSetting";
+import { SettingsGroup } from "@/components/SettingControls";
 import { de } from "@/content/de";
+import { useGameSettings } from "@/lib/common";
 import { unlockAudio } from "@/lib/sfx";
-import { useStoredSettings } from "@/lib/storage";
 import { createEar, meterAt, useMicPermission, useMicrophone, type Heard } from "./mic";
 import { LoudPlay } from "./LoudPlay";
 import { DEFAULT_LOUD_SETTINGS, LOUD_SETTINGS_KEY, type Sensitivity } from "./settings";
 import "./loud.css";
 
 export function LoudGame() {
-  const [settings, update] = useStoredSettings(LOUD_SETTINGS_KEY, DEFAULT_LOUD_SETTINGS);
+  const [settings, update] = useGameSettings(LOUD_SETTINGS_KEY, DEFAULT_LOUD_SETTINGS);
 
   return (
     <GameShell
       title="Laut und leise"
       emoji="🦁"
+      modes={[
+        { id: "low", emoji: "📣", title: "Sehr laut rufen", text: "Der Löwe brüllt erst bei richtig lautem Rufen." },
+        { id: "mid", emoji: "🦁", title: "Laut rufen", text: "Für die meisten Zimmer und Mikrofone." },
+        { id: "high", emoji: "🗣️", title: "Etwas lauter reden", text: "Für leise Kinder oder ein schwaches Mikrofon." },
+      ]}
+      mode={settings.sensitivity}
+      onMode={(sensitivity) => update({ sensitivity: sensitivity as Sensitivity })}
       settings={
-        <>
-          <SettingsGroup title="Mikrofon">
-            <p className="setting-note">
-              Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Das Spiel misst
-              nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch.
-            </p>
-            <MicCheck sensitivity={settings.sensitivity} />
-            <Choice<Sensitivity>
-              label="Wie laut für den Löwen?"
-              value={settings.sensitivity}
-              onChange={(sensitivity) => update({ sensitivity })}
-              options={[
-                { value: "low", label: "Sehr laut rufen" },
-                { value: "mid", label: "Laut rufen" },
-                { value: "high", label: "Etwas lauter reden" },
-              ]}
-            />
-          </SettingsGroup>
-
-          <SettingsGroup title="Ton">
-            <Toggle
-              label="Tiere sprechen („Roaaar! Ich bin der Löwe!“) und laden zum Rufen ein"
-              checked={settings.speech}
-              onChange={(speech) => update({ speech })}
-            />
-            {settings.speech && <VoiceSetting lang={de.speechLang} sample="Ruf mal ganz laut: Hallo, Löwe!" />}
-          </SettingsGroup>
-
-          <SettingsGroup title="Verhalten">
-            <Toggle label="Ruhiger Modus (leiser, weniger Bewegung)" checked={settings.calm} onChange={(calm) => update({ calm })} />
-          </SettingsGroup>
-        </>
+        <SettingsGroup title="Mikrofon">
+          <p className="setting-note">
+            Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Das Spiel misst
+            nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch.
+          </p>
+          <MicCheck sensitivity={settings.sensitivity} />
+          <p className="setting-note">
+            Mit „Vorlesen“ auf der Startseite sprechen die Tiere („Roaaar! Ich bin der Löwe!“) und laden zum Rufen ein.
+          </p>
+        </SettingsGroup>
       }
     >
       <LoudPlay speechLang={de.speechLang} settings={settings} />

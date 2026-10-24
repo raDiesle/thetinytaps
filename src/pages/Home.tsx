@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
 import { KID_HOME } from "@/components/GameShell";
+import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
@@ -51,6 +52,7 @@ export function Home() {
         }}
       />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
+      <HomeOptions />
       <ul className="game-list">
         {GAMES.map((g) => (
           <li key={g.title}>

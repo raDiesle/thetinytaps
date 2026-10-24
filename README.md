@@ -26,12 +26,13 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `public/icons/` | App icon: `icon.svg` (rounded) and `icon-maskable.svg` (full bleed, for home screens); the PNGs are made from them, see [App icon](#app-icon) |
 | `src/App.tsx` | Routes (React Router) |
 | `src/pages/` | One component per page |
-| `src/components/GameShell.tsx` | Shared shell: parent start screen, fullscreen + keyboard lock, hold-to-exit |
+| `src/components/GameShell.tsx` | Shared shell: parent start screen with a big card per way to play (mode or level; a tap picks it and starts) and the game's own options folded away, fullscreen + keyboard lock, the ✕ in the corner (a click leaves after half a second, „Zurück zum Menü“ shows next to it for a moment; Esc has to be held) |
+| `src/components/HomeOptions.tsx`, `src/lib/common.ts`, `src/lib/playtime.ts` | On the home page, for all games: the play time per day (every minute in any game counts, kept in localStorage per day; the last minute winds down, then „Gute Nacht“), and folded away language, read aloud, sounds and calm mode. Games read their own settings through `useGameSettings`, which fills in the shared ones |
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
 | `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/globals.css` |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
-| `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on their start screens (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
+| `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on the home page (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
 | `src/games/letters/` | Game "Buchstaben & Zahlen": free typing (numbers optionally counted by tapping each thing), "Wo ist das B?" (find the key for a shown letter, `FindPlay.tsx`) or the Buchstaben-Zug (keys become wagons, `TrainPlay.tsx`) |
 | `src/games/scenes/` | Game "Lebendige Bilder": scene engine (explore with chain reactions and "alles entdeckt" party, find, sound riddle, trait questions in `quests.ts`, colouring in; tap, hover / swipe or keys with arrow-key frame in `focus.ts`; vehicles that drive into another picture in `roads.ts` – every second tap sends the fire engine, the tractor, the bus or the dump truck off, a sign at the edge follows it, and in the other picture the same drawing drives in and parks as a guest) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`, `kueche/`, `supermarkt/`, `flughafen/`, `winterbaustelle/` (reuses the Baustelle drawings with snow on top), `kita/`, `kinderarzt/`, `strand/`, `dinotal/`, `gutenacht/` (bedtime picture: `bedtime` on the scene makes every tapped thing fall asleep, and when all sleep the room goes dark instead of the party); hidden surprises in `hideout.tsx` (an item with `hideout` draws a `<Hideout>` behind its door, lid or sand pile, and on every tap another animal or present peeks out); shared depth helpers (`onFloor` for rooms), drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx`; seasonal extras by the calendar or a parent setting (autumn leaves and pumpkin, snow and snowman, Advent tree, Easter egg) in `season.ts` and `seasonal.tsx`, placed by each scene's `seasons` spots |
 | `src/games/animals/` | Game "Was gehört zum Tier?": drag (or tap) the food to the hungry animal, or the animal into its home; the homes are drawn in `homes.tsx`, animals, foods and sentences are in `content.ts` |
@@ -53,9 +54,9 @@ CSS file for the tap animations, then add it to `SCENES` in `src/games/scenes/in
 The full guide (depth, keys, drawing style, checks) is the Claude Code skill
 [`.claude/skills/neue-szene/SKILL.md`](.claude/skills/neue-szene/SKILL.md) – run it with `/neue-szene`.
 
-Defaults: speech is off (except in "Zähne putzen", where the spoken hints are the point) and the picture only moves when someone taps, hovers or
-presses a key. Parents can turn on speech, idle movement and the keys mode
-("Jedes Ding hat eine Taste") on the start screen.
+Defaults: speech is off (except in "Zähne putzen", where the spoken hints are the point and have their own switch) and the picture only moves when someone taps, hovers or
+presses a key. Parents turn on speech for all games on the home page, and idle movement and the keys mode
+("Jedes Ding hat eine Taste") on the start screen of "Lebendige Bilder".
 
 ## Tablets
 
