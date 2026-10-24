@@ -37,4 +37,5 @@ New levels of this game should be **trail adventures**, not more lift stories (k
 - The Disney-style bag: up to three things; at an obstacle the child is asked what to use (bag opens, voice asks if „Vorlesen“ is on), taps one, and the child uses it automatically. Mix in a thing that is not needed yet, so there is a real choice; every wrong try is funny, never an error.
 - **No text anywhere the child looks: the child can't read.** Pictures, movement, sounds and the (optional) voice only. Titles exist only for the parents' start screen and screen readers.
 - Shape of a level: a goal goes away at the start → 8–12 stations (pickups, obstacles, one climb) → the goal comes back → a small party. About 3–5 minutes.
+- Make a new level with the skill `/neues-abenteuer` (`.claude/skills/neues-abenteuer/SKILL.md`).
 - Ideas for further levels and mechanics are in `src/content/ideas/g-little-adventures.ts`, area „G“ (G-02 onward). Mark them done there when built.
