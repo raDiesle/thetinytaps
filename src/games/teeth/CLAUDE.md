@@ -1,0 +1,5 @@
+# Zähne putzen
+
+Route `/zaehne/`.
+
+Brushing timer (1–3 minutes) in seven steps in KAI order (chewing surfaces, outside, inside). It starts at the sink (`prep.tsx`, can be turned off): a hand takes the brush out of its cup, the tube puts a blob of toothpaste on it. A small 3D mouth model (`jaw.ts`) shows each step from the right angle – mouth open or teeth together, head turned to the side, the jaw being brushed tipped to show its top or tongue side. Arrows on the lips show when to open or close the mouth. The brush is a small 3D model too (`brush.tsx`), held as dentists teach it for each side (flat on the chewing surfaces, in the cheek pocket with the handle out of the corner of the mouth, tipped towards the gum inside) and glides along the row scrubbing, circling or wiping from gum to tooth. Sugar monsters sit on every tooth not brushed yet; the ones to brush now glow, and each vanishes as the brush reaches it. Music and spoken hints, no tapping needed, keeps the screen on; arrow keys skip steps, Space pauses.

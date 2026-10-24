@@ -70,7 +70,7 @@ export class StoryPlayer {
     this.world = story.build(this.stage, this.guide, (c) => events.onCue(c));
     this.opening = story.opening?.seconds ?? 0;
     let t = this.opening;
-    this.starts = story.sequence.steps.map((s, i) => {
+    this.starts = story.sequence.steps.map((_, i) => {
       const start = t;
       t += this.stepSeconds(i);
       return start;

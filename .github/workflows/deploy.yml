@@ -24,7 +24,7 @@ jobs:
           node-version: 22
           cache: yarn
       - run: yarn install --frozen-lockfile
-      - run: yarn typecheck
+      - run: yarn verify
       - run: yarn build
         env:
           # The site is served from https://<user>.github.io/<repo>/

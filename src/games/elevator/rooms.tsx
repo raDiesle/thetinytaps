@@ -396,7 +396,7 @@ export function Kueche({ playing, used, task, taps }: RoomProps) {
 }
 
 /** The children's room: toys on the shelf, the tower of blocks and the raincoat on its hook. */
-export function Kinderzimmer({ playing, used, taps }: RoomProps) {
+export function Kinderzimmer({ playing, taps }: RoomProps) {
   return (
     <>
       <Wall colour="#d0ebff">

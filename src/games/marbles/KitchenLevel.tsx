@@ -21,7 +21,6 @@ import {
   PIN,
   PLATE,
   PLATE_PEG_DX,
-  PLATE_Y,
   POT,
   POT_RIM,
   ROLL,

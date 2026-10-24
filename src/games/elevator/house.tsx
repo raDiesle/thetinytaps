@@ -17,7 +17,6 @@ import {
   SHAFT_R,
   SLAB,
   TOP,
-  VIEW_H,
   VIEW_W,
   floorLine,
 } from "./layout";

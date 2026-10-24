@@ -70,7 +70,7 @@ export function CircusLevel(props: LevelProps) {
             <Spotlights on={seg(t, circus.tShow, circus.tShow + 0.4)} />
             <StripedRail a={{ x: RAIL.from.x - 20, y: RAIL.from.y - 5 }} b={RAIL.to} />
             <Pole x={RAIL.to.x - 24} y0={RAIL.to.y + BALL_R + 14} y1={FLOOR} />
-            {DRUMS.map((drum, i) => (
+            {DRUMS.map((_, i) => (
               <Drum key={i} i={i} age={t - circus.drumTimes[i]} />
             ))}
             <Cymbal age={t - circus.tCymbal} />

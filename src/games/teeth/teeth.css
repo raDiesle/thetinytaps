@@ -193,12 +193,6 @@
     twinkle 1.6s ease-in-out calc(var(--delay) + 0.4s) infinite;
 }
 
-@keyframes twinkle {
-  50% {
-    transform: scale(0.6) rotate(20deg);
-  }
-}
-
 .teeth-progress {
   display: flex;
   gap: 10px;
@@ -342,17 +336,6 @@
   animation: blink 4.6s ease-in-out 1.2s infinite;
 }
 
-@keyframes blink {
-  0%,
-  92%,
-  100% {
-    transform: scaleY(1);
-  }
-  96% {
-    transform: scaleY(0.1);
-  }
-}
-
 /* The next one to go knows the brush is coming. */
 .sugar-monster.scared .monster-body {
   animation: tremble 0.18s linear infinite;
@@ -476,12 +459,6 @@
 
 .prep.at-paste .prep-brush-bob {
   animation: bob 2s ease-in-out 5.5s infinite;
-}
-
-@keyframes bob {
-  50% {
-    transform: translateY(-5px);
-  }
 }
 
 .prep-tube {

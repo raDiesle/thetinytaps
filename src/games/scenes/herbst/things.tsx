@@ -104,7 +104,7 @@ export function Kuerbisstand() {
           <path key={x} d={`M${x - 11} -236 H${x + 11} L${x + 13} -196 H${x - 13} Z`} fill="#f77f00" />
         ))}
         <path
-          d={`M-140 -196 ${Array.from({ length: 10 }, (_, i) => `q14 14 28 0`).join(" ")} Z`}
+          d={`M-140 -196 ${Array.from({ length: 10 }, () => "q14 14 28 0").join(" ")} Z`}
           fill="#f77f00"
         />
       </g>

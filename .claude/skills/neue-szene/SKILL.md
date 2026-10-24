@@ -93,8 +93,8 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   set `key` for the most important items, so letters stay meaningful.
 - Traits (`SceneTrait`, questions in `src/games/scenes/quests.ts`): main colour
   (red/yellow/blue/green, only if the item clearly is that colour), `flies`, `big`,
-  `small`, `animal`, `wheels`. No traits for plural names ("die Blumen"), the answer
-  is built as "<Name> ist rot!". A question is only asked with ≥ 2 answers.
+  `small`, `animal`, `wheels`. The answer is built as "<Name> ist rot!" ("Die Tauben
+  sind Tiere!" with `plural`). A question is only asked with ≥ 2 answers.
 - Plural names ("die Küken") get `plural: true`, so find mode asks "Wo sind die Küken?".
 - Sound riddle: only distinctive sounds are asked (`RIDDLE_SOUNDS` in `quests.ts`);
   every item with that sound counts as right, so give each item its most fitting sound.
@@ -178,7 +178,8 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 
 ## Checks before you finish
 
-1. `yarn typecheck` and `yarn build` (always yarn, never npm).
+1. `yarn verify` (typecheck + `scenes.test.ts`: ids, articles, tap sizes, chains,
+   keys, question grammar, roads) and `yarn build` (always yarn, never npm).
 2. Preview (`.claude/launch.json`, `preview_start`) at `/bilder/<id>`, then:
    - every item is tappable: for each item, `document.elementFromPoint` inside its
      hit area returns an element within `.item-<id>`;
@@ -193,4 +194,4 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
    - "Ausmalen": everything starts grey and gets its colour when tapped.
 3. Screenshot the whole picture and look for items on one line, overlaps, empty
    areas and things that look flat; fix and check again.
-4. Update `README.md` (roadmap) and commit on a branch.
+4. Update `src/games/scenes/CLAUDE.md` (list of pictures) and the README roadmap, and commit on a branch.

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(yarn verify)",
+      "Bash(yarn test)",
+      "Bash(yarn test *)",
+      "Bash(yarn typecheck)",
+      "Bash(yarn build)",
+      "Bash(yarn install)",
+      "Bash(yarn install --frozen-lockfile)",
+      "Bash(yarn exec rstest *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)"
+    ],
+    "deny": ["Bash(npm *)", "Bash(npx *)"]
+  }
+}

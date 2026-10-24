@@ -1,53 +1,55 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ComponentType } from "react";
 import { Navigate, Route, Routes } from "react-router";
-import { AnimalsPage } from "@/pages/AnimalsPage";
 import { CategoryPage } from "@/pages/CategoryPage";
-import { ElevatorPage } from "@/pages/ElevatorPage";
-import { FeelingsPage } from "@/pages/FeelingsPage";
 import { Home } from "@/pages/Home";
-import { IdeasPage } from "@/pages/IdeasPage";
-import { KidHome } from "@/pages/KidHome";
-import { LettersPage } from "@/pages/LettersPage";
-import { LoudPage } from "@/pages/LoudPage";
-import { MarblePage } from "@/pages/MarblePage";
-import { ScenePage } from "@/pages/ScenePage";
-import { ScenesMenu } from "@/pages/ScenesMenu";
-import { ShadowsPage } from "@/pages/ShadowsPage";
-import { TeethPage } from "@/pages/TeethPage";
-import { WordsPage } from "@/pages/WordsPage";
 
-// The 3D game brings three.js along; loaded only when it is opened.
-const AdventurePage = lazy(() => import("@/pages/AdventurePage").then((m) => ({ default: m.AdventurePage })));
+/**
+ * A page loaded only when it is opened, so the first visit doesn't download every
+ * game (three.js, all pictures). Offline the service worker has them all anyway.
+ */
+function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) {
+  return lazy(() => load().then((module) => ({ default: module[name] })));
+}
+
+const AdventurePage = page(() => import("@/pages/AdventurePage"), "AdventurePage");
+const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage");
+const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage");
+const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage");
+const IdeasPage = page(() => import("@/pages/IdeasPage"), "IdeasPage");
+const KidHome = page(() => import("@/pages/KidHome"), "KidHome");
+const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage");
+const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage");
+const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
+const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
+const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
+const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
+const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage");
+const WordsPage = page(() => import("@/pages/WordsPage"), "WordsPage");
 
 export function App() {
   return (
-    <Routes>
-      <Route index element={<Home />} />
-      <Route path="spiele/:category" element={<CategoryPage />} />
-      <Route path="buchstaben" element={<LettersPage />} />
-      <Route path="woerter" element={<WordsPage />} />
-      <Route path="tiere" element={<AnimalsPage />} />
-      <Route path="bilder" element={<ScenesMenu />} />
-      <Route path="bilder/:scene" element={<ScenePage />} />
-      <Route path="zaehne" element={<TeethPage />} />
-      <Route path="gefuehle" element={<FeelingsPage />} />
-      <Route path="schatten" element={<ShadowsPage />} />
-      <Route path="laut-leise" element={<LoudPage />} />
-      <Route path="kettenreaktion" element={<MarblePage />} />
-      {/* Its old name and address, for bookmarks and the home screen. */}
-      <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
-      <Route path="aufzug" element={<ElevatorPage />} />
-      <Route
-        path="abenteuer"
-        element={
-          <Suspense fallback={null}>
-            <AdventurePage />
-          </Suspense>
-        }
-      />
-      <Route path="kinder" element={<KidHome />} />
-      <Route path="ideen" element={<IdeasPage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <Suspense fallback={null}>
+      <Routes>
+        <Route index element={<Home />} />
+        <Route path="spiele/:category" element={<CategoryPage />} />
+        <Route path="buchstaben" element={<LettersPage />} />
+        <Route path="woerter" element={<WordsPage />} />
+        <Route path="tiere" element={<AnimalsPage />} />
+        <Route path="bilder" element={<ScenesMenu />} />
+        <Route path="bilder/:scene" element={<ScenePage />} />
+        <Route path="zaehne" element={<TeethPage />} />
+        <Route path="gefuehle" element={<FeelingsPage />} />
+        <Route path="schatten" element={<ShadowsPage />} />
+        <Route path="laut-leise" element={<LoudPage />} />
+        <Route path="kettenreaktion" element={<MarblePage />} />
+        {/* Its old name and address, for bookmarks and the home screen. */}
+        <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
+        <Route path="aufzug" element={<ElevatorPage />} />
+        <Route path="abenteuer" element={<AdventurePage />} />
+        <Route path="kinder" element={<KidHome />} />
+        <Route path="ideen" element={<IdeasPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
