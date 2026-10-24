@@ -78,7 +78,7 @@ export const JUMP_PERIOD = 1.6;
 /** When the feet leave the ground and land again, as parts of one jump. */
 const TAKE_OFF = 0.4;
 const LANDING = 0.75;
-/** How high the jumps go (m): forwards from stone to stone, and straight up to bump the head. */
+/** How high the jumps go (m): forwards along the bridge, and straight up to bump the head. */
 export const JUMP_HEIGHT = 0.3;
 export const BUMP_HEIGHT = 0.42;
 /** Seconds into a jump when it is highest. */
@@ -1094,7 +1094,7 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   jump: (t, p) => {
-    // From stone to stone, leaning into it; every third jump goes straight up, the head first, to
+    // Forwards along the bridge, leaning into it; every third jump goes straight up, the head first, to
     // bump something above with it.
     const n = Math.floor(t / JUMP_PERIOD);
     const bump = isBump(n);
