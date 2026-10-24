@@ -1512,7 +1512,6 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Ein Menü nur aus großen Bildern, ohne Text, im Vollbild. Das Kind wählt selbst zwischen den Spielen, Eltern-Einstellungen sind versteckt.",
         why: "Selbstständigkeit, ohne dass das Kind ins Browser-Menü kommt.",
         effort: "M",
-        done: true,
       },
       {
         id: "A-05",

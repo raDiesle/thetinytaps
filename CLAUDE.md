@@ -85,7 +85,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Sounds: `src/lib/sfx.ts` synthesizes everything (Web Audio); `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`) and `TILES` (`src/pages/KidHome.tsx`) – use `/neues-spiel`.
+  (`src/content/games.ts`) – use `/neues-spiel`.
 - A new Lebendige-Bilder picture: `/neue-szene`. A generated picture: `/bild-erzeugen`.
 
 ## Checking your work

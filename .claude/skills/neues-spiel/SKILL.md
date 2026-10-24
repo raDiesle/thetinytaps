@@ -1,6 +1,6 @@
 ---
 name: neues-spiel
-description: Add a new game to The Tiny Taps – folder, start screen, settings, page, route, home menu, kid home tile, docs and checks. Use when the user asks for a new game or wants to build an idea from the ideas page (e.g. "mach N-12") that is a game of its own, not a new mode of an existing game.
+description: Add a new game to The Tiny Taps – folder, start screen, settings, page, route, home menu, docs and checks. Use when the user asks for a new game or wants to build an idea from the ideas page (e.g. "mach N-12") that is a game of its own, not a new mode of an existing game.
 ---
 
 # New game
@@ -30,9 +30,8 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 1. Route in `src/App.tsx`, German path with trailing slash in the link (`/aufzug/`).
    Lazy-load it like the other pages.
 2. `CATEGORIES` in `src/content/games.ts`: the game in the fitting category.
-3. `TILES` in `src/pages/KidHome.tsx`: a tile with a stable `id` (hidden tiles are saved by id).
-4. The idea in `src/content/ideas.ts`: `done: true` (or `partial: "…"`).
-5. One line in the README structure table and the roadmap.
+3. The idea in `src/content/ideas.ts`: `done: true` (or `partial: "…"`).
+4. One line in the README structure table and the roadmap.
 
 ## Settings and shared parts
 

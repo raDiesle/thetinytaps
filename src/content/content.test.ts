@@ -13,12 +13,6 @@ describe("home menu", () => {
     expect(routes).toContain(href);
   });
 
-  // "/bilder/" has a tile per picture instead: href: `/bilder/${s.id}/`.
-  const kidHome = readFileSync("src/pages/KidHome.tsx", "utf8");
-  test.each(games.map((game) => [game.href, game] as const))("%s has a tile on the kid home page", (href) => {
-    expect(kidHome).toMatch(new RegExp(`href: ["\`]${href}`));
-  });
-
   test("category ids and game addresses are unique", () => {
     const ids = CATEGORIES.map((category) => category.id);
     expect(new Set(ids).size).toBe(ids.length);
