@@ -17,7 +17,7 @@ import {
   STOP_DANCE,
   stopDance,
 } from "../three/clips";
-import type { Guide } from "../three/guide";
+import { GUIDE_SIZE, type Guide } from "../three/guide";
 import {
   CANOE_HALF_LENGTH,
   CANOE_HALF_WIDTH,
@@ -245,7 +245,7 @@ function makeSwing() {
 
   // The branch on two vines; the pivot turns around x so it swings along z.
   const pivot = new THREE.Group();
-  pivot.position.y = 5.6;
+  pivot.position.y = 5.7;
   group.add(pivot);
   // The log hangs just above Tapsi's ducked head: under it standing, over it ducked.
   const length = 3.85;
@@ -586,7 +586,7 @@ const JUMP_TO = JUMP_FROM - (STONES + 1) * JUMP_STEP;
 /** Where Tapsi stands on a stone. */
 const STONE_TOP = 0.52;
 /** How high above where Tapsi stands the star boxes float: the head just reaches them at the top of a jump. */
-const BOX_ABOVE = 1.7;
+const BOX_ABOVE = 1.88;
 const SWING_Z = 21;
 /** The log hangs right over Tapsi and swings through above the head, from the front towards us and back. */
 const SWING_PIVOT_Z = SWING_Z;
@@ -602,9 +602,9 @@ const GATE_LIFT = 1.9;
 const WINCH_X = -2.55;
 const WINCH_Z = GATE_Z + 0.35;
 /** How far in front of Tapsi and how high the paws turn the crank (measured on the clip). */
-const CRANK_REACH = 0.42;
-const CRANK_HEIGHT = 0.86;
-const CRANK_ARM = 0.2;
+const CRANK_REACH = 0.42 * GUIDE_SIZE;
+const CRANK_HEIGHT = 0.86 * GUIDE_SIZE;
+const CRANK_ARM = 0.2 * GUIDE_SIZE;
 const ROLL_Z = 6.6;
 const MONKEY_Z = 2.4;
 const APPLE_Z = -1.4;
@@ -626,7 +626,7 @@ const RAFT_FROM = -35;
 const RAFT_TO = -23.6;
 /** Where the lock hangs on the chest (the chest's own space), and where the turning paw is, from Tapsi. */
 const LOCK = v3(0, 0.62, 0.45);
-const KEY_HAND = v3(-0.1, 0.95, 0.42);
+const KEY_HAND = v3(-0.1, 0.95, 0.42).multiplyScalar(GUIDE_SIZE);
 /** Where Tapsi celebrates, facing us. */
 const PARTY = v3(0.3, 0, SHORE.z + 0.2);
 
@@ -1139,7 +1139,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     return { group, stem, jitter: v3((r() - 0.5) * 0.24, r() * 0.12, (r() - 0.5) * 0.2) };
   });
   /** Where the paws are at the top of a reach (measured on the clip), from Tapsi: x to Tapsi's left. */
-  const REACH_TOP = v3(0.28, 1.55, 0.05);
+  const REACH_TOP = v3(0.28, 1.55, 0.05).multiplyScalar(GUIDE_SIZE);
 
   const door = makeDoor();
   door.group.position.set(0, groundHeight(0, DOOR_Z), DOOR_Z);
@@ -1674,7 +1674,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       if (!on) return;
       // Even ones come to the left foot (Tapsi's left is -x while facing the island).
       const side = n % 2 === 0 ? -1 : 1;
-      const footX = side * 0.12;
+      const footX = side * 0.12 * GUIDE_SIZE;
       const footZ = STOMP_Z - 0.08;
       const fromX = side * (1.4 + (n % 3) * 0.2);
       const fromZ = STOMP_Z - 1.3 + (n % 3) * 0.35;
@@ -1795,7 +1795,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         const start = monkey.hand.getWorldPosition(new THREE.Vector3());
         const g = groundHeight(0, MONKEY_Z);
         // Well clear of the head leaning away, and on out to the same side.
-        const passAt = v3(side * 0.5, g + 1.2, MONKEY_Z);
+        const passAt = v3(side * 0.5, g + 1.35, MONKEY_Z);
         const end = v3(side * 1.2, g + 0.3, MONKEY_Z + 3.5);
         const control = passAt.clone().multiplyScalar(2).sub(start.clone().add(end).multiplyScalar(0.5));
         th.curve = new THREE.QuadraticBezierCurve3(start, control, end);
