@@ -1121,6 +1121,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Bei Schatten finden: Nur ein Stück schaut hinter einem Busch hervor (Ohren, Schwanz, Rüssel). Wer ist das? Antippen – das ganze Tier kommt heraus.",
         why: "Aus einem Teil das Ganze erkennen; nächste Stufe nach den Schatten.",
         effort: "M",
+        done: true,
       },
       {
         id: "X-05",

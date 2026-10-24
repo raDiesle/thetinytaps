@@ -3,6 +3,7 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { ITEMS, texts, type ShadowItem } from "./content";
+import { shuffle, useDeck } from "./deck";
 import type { ShadowsSettings } from "./settings";
 
 /** A finger that moves less than this is a tap, not a drag. */
@@ -25,15 +26,6 @@ interface Offset {
   x: number;
   y: number;
   scale?: number;
-}
-
-function shuffle<T>(items: T[]): T[] {
-  const result = [...items];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
 }
 
 const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
@@ -64,8 +56,6 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
   const { bursts, spawn } = useBursts();
 
   const nextId = useRef(0);
-  const deck = useRef<ShadowItem[]>([]);
-  const lastItem = useRef<ShadowItem | null>(null);
   const pictureRef = useRef<HTMLSpanElement>(null);
   const shadowRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -94,18 +84,7 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
 
   const pool = settings.theme === "all" ? ITEMS : ITEMS.filter((i) => i.theme === settings.theme);
 
-  /** Go through all pictures in random order before one comes again, and never the same one twice in a row. */
-  const drawItem = useCallback(() => {
-    if (deck.current.length === 0) deck.current.push(...shuffle(pool));
-    let next = deck.current.pop()!;
-    if (next === lastItem.current && deck.current.length > 0) {
-      const other = deck.current.pop()!;
-      deck.current.unshift(next);
-      next = other;
-    }
-    lastItem.current = next;
-    return next;
-  }, [pool]);
+  const drawItem = useDeck(pool);
 
   const nextRound = useCallback(() => {
     const item = drawItem();

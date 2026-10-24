@@ -127,6 +127,15 @@ export const ITEMS: ShadowItem[] = [
   ding("herz", "❤️", "das Herz"),
 ];
 
+/** Where an animal hides in "Wer schaut da raus?" (X-04): behind a bush, or in the pond. */
+export type Hideout = "bush" | "pond";
+
+const IN_THE_POND = new Set(["ente", "fisch", "krebs", "tintenfisch", "krokodil", "wal"]);
+
+export const PEEK_ITEMS = ITEMS.filter((i) => i.theme === "animals");
+
+export const hideoutOf = (item: ShadowItem): Hideout => (IN_THE_POND.has(item.id) ? "pond" : "bush");
+
 const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** "seinen" or "ihren" Schatten. */
@@ -137,4 +146,7 @@ export const texts = {
   found: (item: ShadowItem) => `Juhu! ${capital(item.the)} hat ${its(item)} Schatten gefunden.`,
   /** A wrong shadow shows who it belongs to. */
   thatIs: (item: ShadowItem) => `Das ist ${item.the}.`,
+  peek: "Wer schaut da raus?",
+  /** The animal has come out. */
+  there: (item: ShadowItem) => `Da ist ja ${item.the}!`,
 };
