@@ -1307,7 +1307,6 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const tmpB = new THREE.Vector3();
   const tmpC = new THREE.Vector3();
   const lapQ = new THREE.Quaternion();
-  const rimQ = new THREE.Quaternion();
   const heldQ = new THREE.Quaternion();
   const tmpQ = new THREE.Quaternion();
   const basis = new THREE.Matrix4();
