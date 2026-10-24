@@ -1409,7 +1409,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const done = jumpsDone(clip);
     const from = Math.floor(done);
     const k = done - from;
-    const y = landingHeight(from) + (landingHeight(from + 1) - landingHeight(from)) * k;
+    // After the last hop there is no next spot: past the bridge's end its top is -Infinity, and -Infinity * 0 is NaN.
+    const y = k > 0 ? landingHeight(from) + (landingHeight(from + 1) - landingHeight(from)) * k : landingHeight(from);
     return out.set(0, y - bridgeDip(clip), JUMP_FROM - done * JUMP_STEP);
   }
 
