@@ -24,7 +24,7 @@ In a fresh worktree run `yarn install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `yarn verify`, commit on the branch, merge into **local** `main`, never push.
-  Shared files many branches touch (`ScenePlay.tsx`, `sfx.ts`, `src/styles/`,
+  Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
@@ -87,7 +87,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
   defaults (so new fields need no migration); `speech`/`sounds` come from the shared
   options on the home page. Bump the key's `.vN` only when old values would break.
-- Sounds: `src/lib/sfx.ts` synthesizes everything (Web Audio); `playRecorded(name, fallback)`
+- Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`) and `TILES` (`src/pages/KidHome.tsx`) – use `/neues-spiel`.

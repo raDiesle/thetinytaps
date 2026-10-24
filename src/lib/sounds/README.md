@@ -1,7 +1,7 @@
 # Recorded sounds
 
 Real recordings for the sounds that should sound like the real thing (animals,
-bells, water …). `src/lib/sfx.ts` plays a file here when one has the sound's
+bells, water …). `src/lib/sfx/` plays a file here when one has the sound's
 name, otherwise – and until the file is loaded – its synthesized sound.
 
 All recordings are from [Freesound](https://freesound.org) under
