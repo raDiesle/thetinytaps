@@ -68,6 +68,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               checked={settings.ambient}
               onChange={(ambient) => update({ ambient })}
             />
+            <Toggle label="Musik im Hintergrund (beginnt beim ersten Tippen)" checked={settings.music} onChange={(music) => update({ music })} />
           </SettingsGroup>
         </>
       }
