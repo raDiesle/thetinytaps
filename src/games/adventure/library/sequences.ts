@@ -1,5 +1,5 @@
 // Result D: five playable sequences of about three minutes each. The first,
-// treasure_island, is the one with a 3D story (../stories/treasureIsland.ts).
+// treasure_island, is the one with a 3D story (../stories/treasureIsland/).
 import type { Sequence } from "./types";
 
 export const SEQUENCES: Sequence[] = [
