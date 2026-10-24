@@ -144,14 +144,7 @@ export function Background() {
 
       {/* Tracks of the rover, running back towards the horizon */}
       {[1057, 1203].map((x) => (
-        <path
-          key={x}
-          d={`M${x} 632 L${towardsHorizon(x, 632, 400)} 400`}
-          stroke="#a9abc0"
-          strokeWidth="10"
-          strokeDasharray="8 7"
-          opacity="0.7"
-        />
+        <path key={x} d={`M${x} 632 L${towardsHorizon(x, 632, 400)} 400`} stroke="#a9abc0" strokeWidth="10" strokeDasharray="8 7" opacity="0.7" />
       ))}
 
       {/* Footprints from the lander to the astronaut */}

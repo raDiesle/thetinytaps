@@ -25,40 +25,33 @@ export function TeethGame() {
       mode={settings.minutes}
       onMode={(minutes) => update({ minutes: minutes as BrushMinutes })}
       settings={
-        <>
-          <SettingsGroup title="Putzen">
-            <Toggle
-              label="Vorher zeigen: Zahnbürste holen, Zahnpasta drauf"
-              checked={settings.prep}
-              onChange={(prep) => update({ prep })}
-            />
-            <Toggle
-              label="Ansagen vorlesen („Mund weit auf!“) – auch wenn „Vorlesen“ auf der Startseite aus ist"
-              checked={settings.speech}
-              onChange={(speech) => update({ speech })}
-            />
-            <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
-            <p className="setting-note">
-              Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes
-              Mal, ob der Mund weit auf ist oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und
-              welche Zähne gerade dran sind. Auf allen noch nicht geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und
-              nach verschwinden. Der Bildschirm bleibt dabei an.
-            </p>
-            <p className="setting-note">
-              Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren
-              erbsengroß. Danach ausspucken, nicht nachspülen. Bis ins Grundschulalter putzen Eltern nach.
-            </p>
-            <p className="setting-note">
-              Unten neben dem Fortschrittsbalken pausiert ⏸️ das Putzen. Tippen oder Ziehen auf dem Balken springt an diese Stelle.
-              {!touchOnly && (
-                <>
-                  {" "}
-                  Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
-                </>
-              )}
-            </p>
-          </SettingsGroup>
-        </>
+        <SettingsGroup title="Putzen">
+          <Toggle label="Vorher zeigen: Zahnbürste holen, Zahnpasta drauf" checked={settings.prep} onChange={(prep) => update({ prep })} />
+          <Toggle
+            label="Ansagen vorlesen („Mund weit auf!“) – auch wenn „Vorlesen“ auf der Startseite aus ist"
+            checked={settings.speech}
+            onChange={(speech) => update({ speech })}
+          />
+          <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
+          <p className="setting-note">
+            Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist
+            oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht
+            geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und nach verschwinden. Der Bildschirm bleibt dabei an.
+          </p>
+          <p className="setting-note">
+            Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren erbsengroß. Danach ausspucken, nicht
+            nachspülen. Bis ins Grundschulalter putzen Eltern nach.
+          </p>
+          <p className="setting-note">
+            Unten neben dem Fortschrittsbalken pausiert ⏸️ das Putzen. Tippen oder Ziehen auf dem Balken springt an diese Stelle.
+            {!touchOnly && (
+              <>
+                {" "}
+                Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
+              </>
+            )}
+          </p>
+        </SettingsGroup>
       }
     >
       <TeethPlay speechLang={de.speechLang} settings={settings} />

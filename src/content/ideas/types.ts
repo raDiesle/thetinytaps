@@ -1,0 +1,39 @@
+/** S: a few hours, M: a day or two, L: several days or more. */
+export type Effort = "S" | "M" | "L";
+
+export interface Idea {
+  /** Area prefix and number, e.g. "N-04". */
+  id: string;
+  emoji: string;
+  title: string;
+  /** What it is and how it plays. */
+  text: string;
+  /** What the child gets out of it, or why it is worth doing. */
+  why?: string;
+  effort: Effort;
+  /** Already on the README roadmap or in the "bald" list. */
+  planned?: boolean;
+  /** Already in the app. */
+  done?: boolean;
+  /** Partly in the app: what is there already, so the rest is clear. */
+  partial?: string;
+}
+
+export type IdeaStatus = "done" | "partial" | "open";
+
+export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.partial ? "partial" : "open");
+
+export interface IdeaArea {
+  prefix: string;
+  emoji: string;
+  title: string;
+  /** Short note that holds for every idea of the area. */
+  intro?: string;
+  ideas: Idea[];
+}
+
+export const EFFORT_LABELS: Record<Effort, string> = {
+  S: "klein",
+  M: "mittel",
+  L: "groß",
+};

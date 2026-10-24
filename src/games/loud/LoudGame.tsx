@@ -40,22 +40,19 @@ export function LoudGame() {
       settings={
         <SettingsGroup title="Mikrofon">
           <p className="setting-note">
-            Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus.
-            Nacheinander geht es nach zehn Tönen weiter zum Pusten.
+            Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Nacheinander geht es nach
+            zehn Tönen weiter zum Pusten.
           </p>
           <p className="setting-note">
-            Pusten: Ins Mikrofon pusten bläst die Kerzen auf dem Geburtstagskuchen aus, lässt die Schirmchen der Pusteblume fliegen,
-            dreht ein Windrad, bis der Regenbogen fertig ist, und treibt das Segelboot mit der Maus zum Löwen. Lautes Rufen pustet
-            auch; so laut wie für den Löwen ist ganz fest gepustet.
+            Pusten: Ins Mikrofon pusten bläst die Kerzen auf dem Geburtstagskuchen aus, lässt die Schirmchen der Pusteblume fliegen, dreht ein Windrad, bis der
+            Regenbogen fertig ist, und treibt das Segelboot mit der Maus zum Löwen. Lautes Rufen pustet auch; so laut wie für den Löwen ist ganz fest gepustet.
           </p>
           <p className="setting-note">
-            Das Spiel misst nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch:
-            Ein Tipp ist ein kurzer Puster, Finger draufhalten pustet weiter.
+            Das Spiel misst nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch: Ein Tipp ist ein kurzer
+            Puster, Finger draufhalten pustet weiter.
           </p>
           <MicCheck sensitivity={settings.sensitivity} />
-          <p className="setting-note">
-            Mit „Vorlesen“ auf der Startseite sprechen die Tiere („Roaaar! Ich bin der Löwe!“) und laden zum Rufen und Pusten ein.
-          </p>
+          <p className="setting-note">Mit „Vorlesen“ auf der Startseite sprechen die Tiere („Roaaar! Ich bin der Löwe!“) und laden zum Rufen und Pusten ein.</p>
         </SettingsGroup>
       }
     >
@@ -104,24 +101,15 @@ function MicCheck({ sensitivity }: { sensitivity: Sensitivity }) {
             🎤 {permission === "granted" ? "Mikrofon ausprobieren" : "Mikrofon erlauben und ausprobieren"}
           </button>
           {permission === "granted" && <p className="setting-note">✓ Das Mikrofon ist für diese Seite erlaubt.</p>}
-          {permission === "denied" && (
-            <p className="setting-note">Das Mikrofon ist für diese Seite blockiert. Bitte in den Browser-Einstellungen erlauben.</p>
-          )}
+          {permission === "denied" && <p className="setting-note">Das Mikrofon ist für diese Seite blockiert. Bitte in den Browser-Einstellungen erlauben.</p>}
         </>
       )}
       {testing && mic === "asking" && <p className="setting-note">Bitte im Browser „Erlauben“ wählen.</p>}
-      {testing && mic === "denied" && (
-        <p className="setting-note">Das Mikrofon ist blockiert. Bitte in den Browser-Einstellungen für diese Seite erlauben.</p>
-      )}
+      {testing && mic === "denied" && <p className="setting-note">Das Mikrofon ist blockiert. Bitte in den Browser-Einstellungen für diese Seite erlauben.</p>}
       {testing && mic === "missing" && <p className="setting-note">Kein Mikrofon gefunden.</p>}
       {testing && mic === "on" && (
         <>
-          <div
-            ref={barRef}
-            className="mic-check-meter"
-            style={{ "--threshold": meterAt(ear.loudDb(sensitivity)) } as CSSProperties}
-            aria-hidden
-          >
+          <div ref={barRef} className="mic-check-meter" style={{ "--threshold": meterAt(ear.loudDb(sensitivity)) } as CSSProperties} aria-hidden>
             <span className="mic-check-level" />
             <span className="mic-check-mark">🦁</span>
           </div>

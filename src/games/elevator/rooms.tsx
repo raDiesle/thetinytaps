@@ -46,7 +46,8 @@ export interface RoomProps {
 /** How often a task has been tapped. */
 const count = (taps: Record<string, number>, name: string) => taps[name] ?? 0;
 
-const BLOCK_COLOURS = ["#ff6b6b", "#4dabf7", "#ffd43b", "#51cf66"];
+/** The two blocks on the living room floor, one per tap. */
+const BLOCK_COLOURS = ["#ff6b6b", "#4dabf7"];
 
 export type Weather = "day" | "evening" | "rain";
 
@@ -154,10 +155,7 @@ function Window({ x, y = -178, w = 130, h = 104, curtains }: { x: number; y?: nu
       {curtains && (
         <>
           <path d={`M${x - 20} ${y - 14} H${x + 22} Q${x + 10} ${y + h * 0.5} ${x + 24} ${y + h + 6} H${x - 20} Z`} fill={curtains} />
-          <path
-            d={`M${x + w + 20} ${y - 14} H${x + w - 22} Q${x + w - 10} ${y + h * 0.5} ${x + w - 24} ${y + h + 6} H${x + w + 20} Z`}
-            fill={curtains}
-          />
+          <path d={`M${x + w + 20} ${y - 14} H${x + w - 22} Q${x + w - 10} ${y + h * 0.5} ${x + w - 24} ${y + h + 6} H${x + w + 20} Z`} fill={curtains} />
           <rect x={x - 28} y={y - 18} width={w + 56} height="6" rx="3" fill="#868e96" />
         </>
       )}
@@ -190,15 +188,7 @@ function Plant({ x, pot = "#e8590c", size = 1 }: { x: number; pot?: string; size
   return (
     <g transform={`translate(${x} 0) scale(${size})`}>
       {[-30, -10, 10, 30].map((a, i) => (
-        <ellipse
-          key={a}
-          cx={a * 0.6}
-          cy={-60 - (i % 2) * 14}
-          rx="11"
-          ry="26"
-          fill={i % 2 ? "#2f9e44" : "#40c057"}
-          transform={`rotate(${a} ${a * 0.6} -40)`}
-        />
+        <ellipse key={a} cx={a * 0.6} cy={-60 - (i % 2) * 14} rx="11" ry="26" fill={i % 2 ? "#2f9e44" : "#40c057"} transform={`rotate(${a} ${a * 0.6} -40)`} />
       ))}
       <path d="M-22 -40 H22 L17 0 H-17 Z" fill={pot} />
       <rect x="-25" y="-44" width="50" height="9" rx="3" fill={pot} />
@@ -269,12 +259,6 @@ export function Keller({ playing, used, taps }: RoomProps) {
           <path d={`M${Number(x) - 40} -42 h72 M${Number(x) - 40} -28 h72`} stroke="#8d5a2b" strokeWidth="3" />
         </g>
       ))}
-      {/* The sack of flour */}
-      {!count(taps, "sack") && (
-        <g transform="translate(520 0) scale(1.15)">
-          <FlourBag />
-        </g>
-      )}
       <g className={`el-fridge${open ? " open" : ""}`} transform="translate(300 -10)">
         <Fridge eggs={!count(taps, "eggs") && !used.includes("eggs")} juice={!count(taps, "juice")} />
       </g>
@@ -282,7 +266,14 @@ export function Keller({ playing, used, taps }: RoomProps) {
   );
 }
 
-/** The kitchen: the bowl for the batter, the cooker with pan and pot, the mug, and the jam in the cupboard. */
+/** Where the glass bowl stands on the worktop, and the pan on the cooker. */
+const BOWL_X = 505;
+const PAN_X = 627;
+/** The plate for the pancakes, and the mug, on the right worktop. */
+const PLATE_X = 870;
+const MUG_X = 800;
+
+/** The kitchen: the glass bowl with flour and mixer beside it, the cooker with pan and pot, the mug, the plate and the jam. */
 export function Kueche({ playing, used, task, taps }: RoomProps) {
   const t = (name: string) => count(taps, name);
   const flipped = t("flip");
@@ -291,30 +282,27 @@ export function Kueche({ playing, used, task, taps }: RoomProps) {
   const flying = task === "flip" && !baking && flipped > 0;
   const cooking = baking ? "pan" : playing === "milk" && !t("milkpour") ? "pot" : null;
   const mugHeld = t("blow") >= 2 && !used.includes("milk");
+  /** The mixer dips into the bowl with the tap, so the eggs, milk and flour stay in sight until then. */
+  const mixing = task === "mix" && t("mix") > 0;
+  const pouring = (name: string) => task === name && t(name) > 0;
   return (
     <>
       <Wall colour="#fff3bf">
-        <g fill="#fff" opacity="0.9">
+        {/* Green tiles, so the white milk and flour stand out in front of them */}
+        <g fill="#b2f2bb">
           {Array.from({ length: 10 }, (_, i) =>
             [0, 1].map((row) => <rect key={`${i}${row}`} x={300 + i * 60 + row * 30} y={-140 + row * 26} width="26" height="22" rx="3" />),
           )}
         </g>
       </Wall>
       <Window x={100} curtains="#ff8787" />
-      {/* Wall cupboards: inside the left one is the jam */}
-      <rect x="300" y="-196" width="250" height="56" rx="6" fill="#1971c2" />
-      <rect x="304" y="-172" width="117" height="4" fill="#4dabf7" />
-      {!t("jar") && (
-        <g transform="translate(362 -142) scale(0.62)">
-          <JamJar />
+      {/* Wall cupboards */}
+      {[300, 425].map((x) => (
+        <g key={x}>
+          <rect x={x} y="-196" width="125" height="56" rx="6" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
+          <circle cx={x === 300 ? 412 : 438} cy="-150" r="4" fill="#fff" />
         </g>
-      )}
-      <g className={`el-cupboard-door${t("door") && !used.includes("jam") ? " open" : ""}`} style={{ transformOrigin: "300px 0px" }}>
-        <rect x="300" y="-196" width="125" height="56" rx="6" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
-        <circle cx="412" cy="-150" r="4" fill="#fff" />
-      </g>
-      <rect x="425" y="-196" width="125" height="56" rx="6" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
-      <circle cx="438" cy="-150" r="4" fill="#fff" />
+      ))}
       <path d="M620 -200 H700 L720 -168 H600 Z" fill="#ced4da" />
       <rect x="632" y="-204" width="56" height="8" fill="#adb5bd" />
       {/* Clock */}
@@ -330,65 +318,90 @@ export function Kueche({ playing, used, task, taps }: RoomProps) {
       <rect x="738" y="-86" width="200" height="86" fill="#74c0fc" />
       <rect x="734" y="-94" width="210" height="12" rx="3" fill="#e9b872" />
       <rect x="826" y="-60" width="28" height="6" rx="3" fill="#fff" />
-      {/* Fruit bowl */}
-      <circle cx="880" cy="-108" r="10" fill="#fa5252" />
-      <circle cx="898" cy="-110" r="10" fill="#fab005" />
-      <circle cx="916" cy="-106" r="10" fill="#82c91e" />
-      <path d="M864 -104 H932 Q928 -94 898 -94 Q868 -94 864 -104 Z" fill="#fff" stroke="#ced4da" strokeWidth="2" />
-      {/* The bowl, and what goes into it */}
-      {playing === "bowl" && (
-        <g transform="translate(385 -94) scale(0.8)">
-          <EggBasket eggs={2 - t("crack")} milk={!t("milk")} />
-        </g>
-      )}
-      {playing === "batter" && t("flour") < 2 && (
-        <g transform="translate(385 -94) scale(0.7)">
+      {/* What goes into the bowl stands beside it: the flour, and the eggs and milk brought from the cellar */}
+      {!pouring("flour") && (
+        <g transform="translate(375 -94) scale(0.72)">
           <FlourBag />
         </g>
       )}
-      <g transform="translate(455 -94)">
-        <Bowl eggs={t("crack")} milk={t("milk") > 0} flour={t("flour")} mixed={t("mix")} poured={t("pour")} />
+      {playing === "bowl" && (
+        <g transform="translate(430 -94) scale(0.75)">
+          <EggBasket eggs={2 - t("crack")} milk={!t("milk")} />
+        </g>
+      )}
+      <g transform={`translate(${BOWL_X} -94)`}>
+        <Bowl eggs={t("crack")} milk={t("milk") > 0} flour={t("flour")} mixed={t("mix")} poured={t("pour")}>
+          {mixing && (
+            <g transform="translate(0 -8)">
+              <Mixer spinning />
+            </g>
+          )}
+        </Bowl>
       </g>
+      {!mixing && (
+        <g transform="translate(320 -94)">
+          <Mixer />
+        </g>
+      )}
+      {/* Cracking an egg: the shell breaks open over the bowl and the yolk drops in */}
       {task === "crack" && t("crack") > 0 && (
-        <g key={t("crack")} transform="translate(455 -152)">
-          <path className="el-shell-l" d="M0 -14 Q-12 -14 -12 0 Q-12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#e8c59a" strokeWidth="2" />
-          <path className="el-shell-r" d="M0 -14 Q12 -14 12 0 Q12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#e8c59a" strokeWidth="2" />
+        <g key={t("crack")} transform={`translate(${BOWL_X + (t("crack") === 1 ? -16 : 14)} -172)`}>
+          <path className="el-shell-l" d="M0 -14 Q-12 -14 -12 0 Q-12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#c9a26b" strokeWidth="2" />
+          <path className="el-shell-r" d="M0 -14 Q12 -14 12 0 Q12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#c9a26b" strokeWidth="2" />
           <ellipse className="el-yolk-drop" cx="0" cy="6" rx="6" ry="5" fill="#fab005" />
         </g>
       )}
-      {task === "flour" && t("flour") > 0 && (
-        <g key={t("flour")} className="el-dust" fill="#fff">
-          {[-24, -6, 14, 28].map((dx, i) => (
-            <circle key={dx} cx={455 + dx} cy={-140 - (i % 2) * 10} r={10 + (i % 2) * 4} />
-          ))}
+      {/* Pouring the milk: the bottle tips over the bowl */}
+      {pouring("milk") && (
+        <g className="el-pop-in">
+          <path d={`M${BOWL_X - 12} -176 Q${BOWL_X - 2} -170 ${BOWL_X - 4} -130`} stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" />
+          <g transform={`translate(${BOWL_X - 30} -190) rotate(115)`}>
+            <rect x="-10" y="-38" width="20" height="38" rx="6" fill="#fff" stroke="#495057" strokeWidth="2.5" />
+            <rect x="-10" y="-26" width="20" height="10" fill="#4dabf7" />
+          </g>
         </g>
       )}
-      <g transform={task === "mix" ? "translate(455 -126)" : "translate(330 -94)"}>
-        <Mixer spinning={task === "mix"} />
-      </g>
+      {/* Pouring the flour: the bag tips over the bowl, and a cloud of flour puffs up */}
+      {pouring("flour") && (
+        <>
+          <g className="el-pop-in">
+            <g transform={`translate(${BOWL_X - 44} -176) rotate(120) scale(0.72)`}>
+              <FlourBag />
+            </g>
+          </g>
+          <g className="el-dust" fill="#fff" stroke="#dee2e6" strokeWidth="2">
+            {[-30, -10, 12, 30].map((dx, i) => (
+              <circle key={dx} cx={BOWL_X + dx} cy={-156 - (i % 2) * 12} r={11 + (i % 2) * 4} />
+            ))}
+          </g>
+        </>
+      )}
       {!mugHeld && (
-        <g transform="translate(556 -94) scale(0.9)">
+        <g transform={`translate(${MUG_X} -94) scale(0.9)`}>
           <Mug steam={t("milkpour") > 0 && t("blow") < 2} empty={!t("milkpour") || used.includes("milk")} spoon={task === "stir"} />
         </g>
       )}
-      {/* The plate for the pancakes */}
-      {t("pour") > 0 && !used.includes("batter") && (
-        <g transform="translate(810 -94) scale(0.9)">
-          <Pancakes plain count={flying ? flipped - 1 : flipped} />
-        </g>
+      {/* The plate for the pancakes, and the jam that goes with them */}
+      {!used.includes("bowl") && (
+        <>
+          {t("pour") > 0 && (
+            <g transform={`translate(${PLATE_X} -94) scale(0.9)`}>
+              <Pancakes plain count={flying ? flipped - 1 : flipped} />
+            </g>
+          )}
+          <g transform="translate(926 -94) scale(0.66)">
+            <JamJar />
+          </g>
+        </>
       )}
       <Floorboards colour="#e9ecef" line="#ced4da" />
       <g className={cooking ? `el-stove cooking-${cooking}` : "el-stove"} transform="translate(664 0)">
         <Stove cooking={cooking} pancake={baking} />
       </g>
       {flying && (
-        <g
-          key={flipped}
-          className="el-fly"
-          style={{ "--dx": "183px", "--dy": `${11 - (flipped - 1) * 8}px` } as CSSProperties}
-        >
-          <ellipse cx="627" cy="-118" rx="22" ry="6" fill="#d9902f" />
-          <ellipse cx="627" cy="-121" rx="22" ry="5" fill="#f4b860" />
+        <g key={flipped} className="el-fly" style={{ "--dx": `${PLATE_X - PAN_X}px`, "--dy": `${11 - (flipped - 1) * 8}px` } as CSSProperties}>
+          <ellipse cx={PAN_X} cy="-118" rx="22" ry="6" fill="#d9902f" />
+          <ellipse cx={PAN_X} cy="-121" rx="22" ry="5" fill="#f4b860" />
         </g>
       )}
     </>
@@ -426,10 +439,10 @@ export function Kinderzimmer({ playing, taps }: RoomProps) {
       <rect x="684" y="-70" width="108" height="14" rx="5" fill="#845ef7" />
       <path d="M704 -40 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
       {/* A sheet of paper on the toy box, for the boat */}
-      {count(taps, "fold") < 3 && (
+      {count(taps, "fold") < 2 && (
         <g transform="translate(738 -70)">
           <g key={count(taps, "fold")} className="el-pop-in">
-            <PaperFold stage={count(taps, "fold")} />
+            <PaperFold stage={count(taps, "fold") * 2} />
           </g>
         </g>
       )}
@@ -461,9 +474,7 @@ export function Terrasse({ playing, used, taps }: RoomProps) {
       <Outside x={ROOM_L} y={-ROOM_H} w={W} h={ROOM_H} />
       {/* Roofs of the town far away */}
       <g fill="#b2bec3">
-        <path
-          d={`M${ROOM_L} -60 H140 V-110 L170 -130 L200 -110 V-80 H300 V-120 H360 V-70 H460 V-100 L500 -126 L540 -100 V-60 H${ROOM_R} V0 H${ROOM_L} Z`}
-        />
+        <path d={`M${ROOM_L} -60 H140 V-110 L170 -130 L200 -110 V-80 H300 V-120 H360 V-70 H460 V-100 L500 -126 L540 -100 V-60 H${ROOM_R} V0 H${ROOM_L} Z`} />
         <path d="M720 -60 V-116 H790 V-60 Z M860 -60 V-96 L900 -124 L940 -96 V-60 Z" />
       </g>
       {/* Railing */}
@@ -474,9 +485,7 @@ export function Terrasse({ playing, used, taps }: RoomProps) {
       {Array.from({ length: 12 }, (_, i) => {
         const x = 90 + i * 80;
         const y = -178 + Math.sin(((x - 60) / 480) * Math.PI) * 26;
-        return (
-          <path key={i} d={`M${x - 12} ${y} H${x + 12} L${x} ${y + 22} Z`} fill={["#ff6b6b", "#ffd43b", "#51cf66", "#4dabf7"][i % 4]} />
-        );
+        return <path key={i} d={`M${x - 12} ${y} H${x + 12} L${x} ${y + 22} Z`} fill={["#ff6b6b", "#ffd43b", "#51cf66", "#4dabf7"][i % 4]} />;
       })}
       {/* Sunshade */}
       <path d="M260 0 V-150" stroke="#868e96" strokeWidth="6" />
@@ -520,15 +529,7 @@ export function Wohnzimmer({ used, taps }: RoomProps) {
         <g key={y}>
           <rect x="658" y={y} width="114" height="44" fill="#8d5a2b" />
           {["#e03131", "#1c7ed6", "#fab005", "#2f9e44", "#7048e8"].map((colour, i) => (
-            <rect
-              key={colour}
-              x={662 + i * 20 + (y === -110 ? 10 : 0)}
-              y={y + 6 + (i % 2) * 6}
-              width="16"
-              height={38 - (i % 2) * 6}
-              rx="2"
-              fill={colour}
-            />
+            <rect key={colour} x={662 + i * 20 + (y === -110 ? 10 : 0)} y={y + 6 + (i % 2) * 6} width="16" height={38 - (i % 2) * 6} rx="2" fill={colour} />
           ))}
         </g>
       ))}
@@ -552,7 +553,7 @@ export function Wohnzimmer({ used, taps }: RoomProps) {
       {BLOCK_COLOURS.map(
         (colour, i) =>
           tidied <= i && (
-            <g key={colour} transform={`translate(${250 + i * 90} -4)`}>
+            <g key={colour} transform={`translate(${450 + i * 90} -4)`}>
               <Block colour={colour} />
             </g>
           ),
@@ -803,16 +804,14 @@ export function Dachboden({ taps }: RoomProps) {
       <path d="M596 -50 H664" stroke="#adb5bd" strokeWidth="5" />
       {/* Rocking horse */}
       <g transform="translate(830 0)">
-        <g key={count(taps, "horse")} className={count(taps, "horse") ? "el-rock" : undefined}>
-          <path d="M-70 -4 Q0 22 70 -4" stroke="#c92a2a" strokeWidth="8" fill="none" />
-          <path d="M-46 -6 L-34 -60 M46 -6 L34 -60" stroke="#fff4e6" strokeWidth="9" strokeLinecap="round" />
-          <ellipse cx="0" cy="-70" rx="52" ry="22" fill="#fff4e6" />
-          <path d="M34 -84 L54 -132 Q76 -136 82 -116 L64 -100 Z" fill="#fff4e6" />
-          <path d="M44 -100 L50 -136 Q36 -124 38 -100 Z" fill="#fab005" />
-          <circle cx="66" cy="-120" r="4" fill={INK} />
-          <path d="M-52 -74 Q-76 -70 -70 -40" stroke="#fab005" strokeWidth="9" strokeLinecap="round" fill="none" />
-          <rect x="-16" y="-96" width="36" height="12" rx="4" fill="#e03131" />
-        </g>
+        <path d="M-70 -4 Q0 22 70 -4" stroke="#c92a2a" strokeWidth="8" fill="none" />
+        <path d="M-46 -6 L-34 -60 M46 -6 L34 -60" stroke="#fff4e6" strokeWidth="9" strokeLinecap="round" />
+        <ellipse cx="0" cy="-70" rx="52" ry="22" fill="#fff4e6" />
+        <path d="M34 -84 L54 -132 Q76 -136 82 -116 L64 -100 Z" fill="#fff4e6" />
+        <path d="M44 -100 L50 -136 Q36 -124 38 -100 Z" fill="#fab005" />
+        <circle cx="66" cy="-120" r="4" fill={INK} />
+        <path d="M-52 -74 Q-76 -70 -70 -40" stroke="#fab005" strokeWidth="9" strokeLinecap="round" fill="none" />
+        <rect x="-16" y="-96" width="36" height="12" rx="4" fill="#e03131" />
       </g>
       <Floorboards colour="#c88b3a" line="#a0662f" />
     </>
@@ -841,12 +840,7 @@ export function Garten({ playing, used, task, taps }: RoomProps) {
         ))}
       </g>
       <rect x={ROOM_L} y="-70" width={W} height="60" fill="#2f9e44" />
-      <path
-        d={Array.from({ length: 34 }, (_, i) => `M${ROOM_L + 10 + i * 30} -20 V-60`).join(" ")}
-        stroke="#fff"
-        strokeWidth="9"
-        strokeLinecap="round"
-      />
+      <path d={Array.from({ length: 34 }, (_, i) => `M${ROOM_L + 10 + i * 30} -20 V-60`).join(" ")} stroke="#fff" strokeWidth="9" strokeLinecap="round" />
       <path d={`M${ROOM_L} -50 H${ROOM_R}`} stroke="#fff" strokeWidth="6" />
       {/* Tree */}
       <rect x="912" y="-120" width="26" height="110" rx="6" fill="#8d5a2b" />
@@ -882,7 +876,7 @@ export function Garten({ playing, used, task, taps }: RoomProps) {
         <Puddle width={120} />
       </g>
       <g className={splashing ? "el-puddle splashing" : "el-puddle"} transform="translate(600 0)">
-        <Puddle width={240} boat={sailing || used.includes("splash")} drift={sailing ? count(taps, "puff") : 3} />
+        <Puddle width={240} boat={sailing || used.includes("splash")} drift={sailing ? count(taps, "puff") * 1.5 : 3} />
       </g>
       <g transform="translate(820 0)">
         <Puddle width={110} />

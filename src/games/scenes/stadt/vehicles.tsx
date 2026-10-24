@@ -57,8 +57,30 @@ export function Bus() {
           <Face cx={-126} cy={-133} size={0.5} />
         </g>
       </Inside>
-      <rect className="st-bus-door" x="-150" y="-186" width="24" height="152" rx="3" fill={GLASS} stroke="#3aa6c9" strokeWidth="4" style={{ transformOrigin: "-150px -110px" }} />
-      <rect className="st-bus-door" x="-126" y="-186" width="24" height="152" rx="3" fill={GLASS} stroke="#3aa6c9" strokeWidth="4" style={{ transformOrigin: "-102px -110px" }} />
+      <rect
+        className="st-bus-door"
+        x="-150"
+        y="-186"
+        width="24"
+        height="152"
+        rx="3"
+        fill={GLASS}
+        stroke="#3aa6c9"
+        strokeWidth="4"
+        style={{ transformOrigin: "-150px -110px" }}
+      />
+      <rect
+        className="st-bus-door"
+        x="-126"
+        y="-186"
+        width="24"
+        height="152"
+        rx="3"
+        fill={GLASS}
+        stroke="#3aa6c9"
+        strokeWidth="4"
+        style={{ transformOrigin: "-102px -110px" }}
+      />
       {PASSENGERS.map(({ x, shirt, hair }, i) => (
         <Pane key={x} x={x} y={-186} w={60} h={70} rx={8}>
           <g className="st-bus-passenger" style={nth(i)}>
@@ -87,7 +109,14 @@ export function Polizei() {
       <ellipse className="st-polizei-glow" cx="0" cy="-131" rx="44" ry="20" fill="#4cc9f0" />
       <rect x="-22" y="-138" width="44" height="14" rx="6" fill="#3a86ff" />
       <rect className="st-polizei-light" x="-22" y="-138" width="44" height="14" rx="6" fill="#9bf6ff" />
-      <path className="st-polizei-antenna" d="M70 -118 L80 -170" stroke={INK} strokeWidth="3" strokeLinecap="round" style={{ transformOrigin: "70px -118px" }} />
+      <path
+        className="st-polizei-antenna"
+        d="M70 -118 L80 -170"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinecap="round"
+        style={{ transformOrigin: "70px -118px" }}
+      />
       <path d="M-86 -72 Q-74 -124 -36 -126 H46 Q82 -124 98 -72 Z" fill="#f8f9fa" />
       <path d={POLICE_FRONT} fill={GLASS} />
       <Inside d={POLICE_FRONT}>
@@ -264,7 +293,14 @@ export function Fahrrad() {
     <g className="st-rad-body">
       <Spokes cx={44} />
       <Spokes cx={-50} />
-      <path d="M44 -30 L0 -30 L30 -86 Z M0 -30 L-30 -90 M30 -84 L-28 -88 M-30 -90 L-50 -30" stroke="#ff5d73" strokeWidth="6" strokeLinejoin="round" strokeLinecap="round" fill="none" />
+      <path
+        d="M44 -30 L0 -30 L30 -86 Z M0 -30 L-30 -90 M30 -84 L-28 -88 M-30 -90 L-50 -30"
+        stroke="#ff5d73"
+        strokeWidth="6"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+        fill="none"
+      />
       <path d="M-30 -90 L-36 -106 H-50" stroke={INK} strokeWidth="5" strokeLinecap="round" fill="none" />
       <circle className="st-rad-bell" cx="-44" cy="-110" r="4" fill="#ffd60a" />
       <Toot x={-56} y={-118} dir={-1} className="st-rad-ring" />

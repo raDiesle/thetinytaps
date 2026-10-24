@@ -10,7 +10,8 @@ export const TURN: Movement[] = [
     difficulty: "medium",
     bodyZone: "full_body",
     bodyParts: ["feet", "legs", "arms", "torso"],
-    bodyMovement: "Mit seitlich ausgebreiteten Armen dreht sich der ganze Körper in kleinen Trippelschritten langsam einmal ganz herum, bis man wieder zum Bildschirm schaut.",
+    bodyMovement:
+      "Mit seitlich ausgebreiteten Armen dreht sich der ganze Körper in kleinen Trippelschritten langsam einmal ganz herum, bis man wieder zum Bildschirm schaut.",
     startingPose: "Aufrecht stehen, Arme seitlich ausgebreitet.",
     movementSteps: [
       "Arme ausbreiten wie ein Karussell.",
@@ -100,10 +101,7 @@ export const TURN: Movement[] = [
       seated: "Im Sitzen über die Schulter nach hinten schauen und wieder nach vorn.",
     },
     needs: { jump: false, space: "medium", balance: false },
-    safetyNotes: [
-      "Hinter dem Kind frei räumen – es schaut beim Drehen weg vom Bildschirm.",
-      "Langsam mit kleinen Schritten drehen, nicht auf einem Fuß.",
-    ],
+    safetyNotes: ["Hinter dem Kind frei räumen – es schaut beim Drehen weg vom Bildschirm.", "Langsam mit kleinen Schritten drehen, nicht auf einem Fuß."],
     tags: ["turning", "peekaboo", "surprise", "jungle", "slow"],
   },
   {

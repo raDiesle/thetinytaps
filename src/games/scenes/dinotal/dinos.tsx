@@ -17,7 +17,12 @@ export function Brachiosaurus() {
     <>
       <rect x="-84" y="-128" width="42" height="128" rx="18" fill={BRACHIO_DARK} />
       <rect x="74" y="-128" width="42" height="128" rx="18" fill={BRACHIO_DARK} />
-      <path className="dt-brachio-tail" d="M-120 -196 Q-232 -172 -302 -72 Q-294 -58 -272 -68 Q-200 -132 -108 -138 Z" fill={BRACHIO} style={{ transformOrigin: "-110px -166px" }} />
+      <path
+        className="dt-brachio-tail"
+        d="M-120 -196 Q-232 -172 -302 -72 Q-294 -58 -272 -68 Q-200 -132 -108 -138 Z"
+        fill={BRACHIO}
+        style={{ transformOrigin: "-110px -166px" }}
+      />
       <ellipse cx="0" cy="-172" rx="142" ry="80" fill={BRACHIO} />
       <path d="M-112 -128 Q0 -78 112 -128 Q84 -98 0 -96 Q-84 -98 -112 -128 Z" fill="#cfe8fb" />
       <g fill="#a9d0f2">
@@ -76,7 +81,12 @@ export function Parasaurolophus() {
       <ellipse cx="30" cy="-82" rx="30" ry="36" fill={PARA} />
       <rect x="16" y="-64" width="28" height="64" rx="12" fill={PARA} />
       <ellipse cx="26" cy="-2" rx="22" ry="8" fill={PARA} />
-      <path className="dt-para-arm" d="M-46 -108 Q-70 -96 -72 -78 Q-64 -74 -60 -82 Q-54 -94 -38 -96 Z" fill={PARA_DARK} style={{ transformOrigin: "-44px -104px" }} />
+      <path
+        className="dt-para-arm"
+        d="M-46 -108 Q-70 -96 -72 -78 Q-64 -74 -60 -82 Q-54 -94 -38 -96 Z"
+        fill={PARA_DARK}
+        style={{ transformOrigin: "-44px -104px" }}
+      />
       <path d="M-30 -144 Q-58 -170 -68 -192 L-36 -206 Q-28 -180 4 -152 Z" fill={PARA} />
       <g className="dt-para-head" style={{ transformOrigin: "-40px -170px" }}>
         <path className="dt-para-crest" d="M-72 -214 Q-20 -252 34 -270 Q52 -270 46 -254 Q0 -230 -48 -198 Z" fill={PARA_DARK} />
@@ -223,7 +233,12 @@ const MAMA_DARK = "#e98ab0";
 export function DinoMama() {
   return (
     <>
-      <path className="dt-mama-tail" d="M-70 -114 Q-140 -102 -172 -60 Q-162 -50 -146 -58 Q-110 -82 -60 -82 Z" fill={MAMA} style={{ transformOrigin: "-70px -98px" }} />
+      <path
+        className="dt-mama-tail"
+        d="M-70 -114 Q-140 -102 -172 -60 Q-162 -50 -146 -58 Q-110 -82 -60 -82 Z"
+        fill={MAMA}
+        style={{ transformOrigin: "-70px -98px" }}
+      />
       <rect x="-20" y="-82" width="26" height="82" rx="11" fill={MAMA_DARK} />
       <ellipse cx="-10" cy="-2" rx="20" ry="7" fill={MAMA_DARK} />
       <ellipse cx="-10" cy="-112" rx="76" ry="54" fill={MAMA} />
@@ -332,7 +347,12 @@ export function TRex() {
       <ellipse cx="44" cy="-104" rx="34" ry="44" fill={TREX_DARK} />
       <rect x="28" y="-80" width="30" height="74" rx="12" fill={TREX_DARK} />
       <ellipse cx="32" cy="-8" rx="32" ry="10" fill={TREX_DARK} />
-      <path className="dt-trex-arm dt-trex-arm-far" d="M-40 -176 Q-66 -170 -76 -150 Q-72 -142 -64 -146 Q-58 -158 -38 -160 Z" fill={TREX_DARK} style={{ transformOrigin: "-40px -170px" }} />
+      <path
+        className="dt-trex-arm dt-trex-arm-far"
+        d="M-40 -176 Q-66 -170 -76 -150 Q-72 -142 -64 -146 Q-58 -158 -38 -160 Z"
+        fill={TREX_DARK}
+        style={{ transformOrigin: "-40px -170px" }}
+      />
       <path d="M-62 -212 Q-44 -252 20 -248 Q92 -238 98 -162 Q98 -96 30 -86 Q-52 -86 -72 -140 Q-78 -180 -62 -212 Z" fill={TREX} />
       <ellipse cx="-30" cy="-148" rx="30" ry="56" fill="#d8f3c0" transform="rotate(-14 -30 -148)" />
       <path d="M10 -236 q10 10 6 24 M46 -226 q10 10 6 24 M74 -200 q10 8 8 22" stroke={TREX_DARK} strokeWidth="8" strokeLinecap="round" fill="none" />
@@ -343,10 +363,20 @@ export function TRex() {
       {[-36, -20, -4].map((x) => (
         <ellipse key={x} cx={x} cy={-4} rx="6" ry="5" fill={CREAM} />
       ))}
-      <path className="dt-trex-arm" d="M-36 -164 Q-62 -158 -74 -138 Q-70 -130 -62 -134 Q-54 -146 -34 -148 Z" fill={TREX} style={{ transformOrigin: "-38px -158px" }} />
+      <path
+        className="dt-trex-arm"
+        d="M-36 -164 Q-62 -158 -74 -138 Q-70 -130 -62 -134 Q-54 -146 -34 -148 Z"
+        fill={TREX}
+        style={{ transformOrigin: "-38px -158px" }}
+      />
       <g className="dt-trex-head" style={{ transformOrigin: "-40px -226px" }}>
         <path className="dt-trex-mouth" d="M-44 -232 H-158 Q-120 -206 -50 -214 Z" fill="#e56b6f" />
-        <path className="dt-trex-jaw" d="M-40 -232 H-164 Q-174 -222 -162 -210 Q-100 -192 -48 -204 Z" fill="#c9eab4" style={{ transformOrigin: "-48px -226px" }} />
+        <path
+          className="dt-trex-jaw"
+          d="M-40 -232 H-164 Q-174 -222 -162 -210 Q-100 -192 -48 -204 Z"
+          fill="#c9eab4"
+          style={{ transformOrigin: "-48px -226px" }}
+        />
         <path d="M-20 -290 Q-40 -334 -110 -328 Q-178 -322 -188 -272 Q-192 -240 -170 -232 L-40 -228 Q-14 -250 -20 -290 Z" fill={TREX} />
         <path d="M-146 -233 q5 9 10 0 Z M-120 -232 q5 9 10 0 Z" fill="#fff" stroke="#4d8f48" strokeWidth="1.5" strokeLinejoin="round" />
         <path d="M-172 -238 Q-124 -226 -70 -238 q10 -2 14 -10" stroke="#2b2d42" strokeWidth="4" strokeLinecap="round" fill="none" />

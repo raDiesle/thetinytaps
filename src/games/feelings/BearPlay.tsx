@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { COMFORTS, COMFORTS_NEEDED, FEELINGS, type ComfortId, type Feeling } from "./bear";
 import { bearImages, preloadImages } from "./images";
 import type { FeelingsSettings } from "./settings";
@@ -34,10 +34,11 @@ function shuffle<T>(items: T[]): T[] {
 const freshRound = (feeling: Feeling, key: number): Round => ({ key, feeling, used: [], busy: false, happy: false });
 
 export function BearPlay({ settings }: { settings: FeelingsSettings }) {
+  const feelings = useMemo(() => (settings.feeling === "all" ? FEELINGS : FEELINGS.filter((f) => f.id === settings.feeling)), [settings.feeling]);
   const deck = useRef<Feeling[]>([]);
   const nextKey = useRef(0);
   const happyAt = useRef(0);
-  const [round, setRound] = useState<Round>(() => freshRound(FEELINGS[0], nextKey.current++));
+  const [round, setRound] = useState<Round>(() => freshRound(feelings[0], nextKey.current++));
   const { later, clearAll } = useTimers();
   const { say, sound } = useVoice(settings);
   const { floaters, float } = useFloaters();
@@ -58,12 +59,12 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
 
   const nextFeeling = useCallback(() => {
     if (deck.current.length === 0) {
-      deck.current = shuffle(FEELINGS);
+      deck.current = shuffle(feelings);
       const last = deck.current.length - 1;
       if (deck.current[last] === round.feeling) [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
     }
     startFeeling(deck.current.pop()!);
-  }, [round.feeling, startFeeling]);
+  }, [feelings, round.feeling, startFeeling]);
 
   useEffect(() => nextFeeling(), []);
 

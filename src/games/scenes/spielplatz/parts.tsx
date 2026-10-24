@@ -25,7 +25,21 @@ export type Hair = "short" | "pigtails" | "bun" | "curly" | "bald";
  * A child's (or grown-up's) head with radius r around (cx, cy): hair, a smiling face and
  * eyelids that blink. `cap` draws a cap in that colour instead of the top of the hair.
  */
-export function Head({ cx, cy, r = 20, hair = "#6b4423", style = "short", cap }: { cx: number; cy: number; r?: number; hair?: string; style?: Hair; cap?: string }) {
+export function Head({
+  cx,
+  cy,
+  r = 20,
+  hair = "#6b4423",
+  style = "short",
+  cap,
+}: {
+  cx: number;
+  cy: number;
+  r?: number;
+  hair?: string;
+  style?: Hair;
+  cap?: string;
+}) {
   const s = r / 20;
   const eye = 7 * (r / 28.6);
   return (
@@ -52,14 +66,32 @@ export function Head({ cx, cy, r = 20, hair = "#6b4423", style = "short", cap }:
       )}
       {style === "bald" && (
         <>
-          <path d={`M${cx - r * 0.98} ${cy + r * 0.1} Q${cx - r} ${cy - r * 0.5} ${cx - r * 0.6} ${cy - r * 0.6}`} stroke={hair} strokeWidth={r * 0.3} strokeLinecap="round" fill="none" />
-          <path d={`M${cx + r * 0.98} ${cy + r * 0.1} Q${cx + r} ${cy - r * 0.5} ${cx + r * 0.6} ${cy - r * 0.6}`} stroke={hair} strokeWidth={r * 0.3} strokeLinecap="round" fill="none" />
+          <path
+            d={`M${cx - r * 0.98} ${cy + r * 0.1} Q${cx - r} ${cy - r * 0.5} ${cx - r * 0.6} ${cy - r * 0.6}`}
+            stroke={hair}
+            strokeWidth={r * 0.3}
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path
+            d={`M${cx + r * 0.98} ${cy + r * 0.1} Q${cx + r} ${cy - r * 0.5} ${cx + r * 0.6} ${cy - r * 0.6}`}
+            stroke={hair}
+            strokeWidth={r * 0.3}
+            strokeLinecap="round"
+            fill="none"
+          />
         </>
       )}
       {cap && (
         <>
-          <path d={`M${cx - r * 0.98} ${cy - r * 0.18} Q${cx - r} ${cy - r * 1.12} ${cx} ${cy - r * 1.1} Q${cx + r} ${cy - r * 1.12} ${cx + r * 0.98} ${cy - r * 0.18} Z`} fill={cap} />
-          <path d={`M${cx + r * 0.2} ${cy - r * 0.3} Q${cx + r * 1.2} ${cy - r * 0.42} ${cx + r * 1.5} ${cy - r * 0.1} L${cx + r * 0.6} ${cy - r * 0.06} Z`} fill={cap} />
+          <path
+            d={`M${cx - r * 0.98} ${cy - r * 0.18} Q${cx - r} ${cy - r * 1.12} ${cx} ${cy - r * 1.1} Q${cx + r} ${cy - r * 1.12} ${cx + r * 0.98} ${cy - r * 0.18} Z`}
+            fill={cap}
+          />
+          <path
+            d={`M${cx + r * 0.2} ${cy - r * 0.3} Q${cx + r * 1.2} ${cy - r * 0.42} ${cx + r * 1.5} ${cy - r * 0.1} L${cx + r * 0.6} ${cy - r * 0.06} Z`}
+            fill={cap}
+          />
           <circle cx={cx} cy={cy - r * 1.08} r={r * 0.12} fill="#fff" opacity="0.7" />
         </>
       )}
@@ -73,7 +105,16 @@ export function Head({ cx, cy, r = 20, hair = "#6b4423", style = "short", cap }:
 /** Little floating words or notes, e.g. "Hui!", shown one after the other while the item plays. */
 export function Notes({ x, y, texts, colour = "#fff", size = 26 }: { x: number; y: number; texts: string[]; colour?: string; size?: number }) {
   return (
-    <g className="sp-notes" fill={colour} fontSize={size} fontWeight="800" fontFamily="system-ui, sans-serif" stroke="#2b2d42" strokeWidth={size / 8} paintOrder="stroke">
+    <g
+      className="sp-notes"
+      fill={colour}
+      fontSize={size}
+      fontWeight="800"
+      fontFamily="system-ui, sans-serif"
+      stroke="#2b2d42"
+      strokeWidth={size / 8}
+      paintOrder="stroke"
+    >
       {texts.map((text, i) => (
         <text key={i} x={x + i * size * 0.9} y={y - i * size * 0.6} style={nth(i)}>
           {text}
@@ -117,7 +158,23 @@ export function Hearts({ className, spots, r = 10, fill = "#ff6b9a" }: { classNa
 }
 
 /** A leg in trousers from the hip (x1, y1) to the foot (x2, y2), with a shoe. */
-export function Leg({ x1, y1, x2, y2, trousers, shoe = "#e63946", w = 11 }: { x1: number; y1: number; x2: number; y2: number; trousers: string; shoe?: string; w?: number }) {
+export function Leg({
+  x1,
+  y1,
+  x2,
+  y2,
+  trousers,
+  shoe = "#e63946",
+  w = 11,
+}: {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  trousers: string;
+  shoe?: string;
+  w?: number;
+}) {
   return (
     <>
       <path d={`M${x1} ${y1} L${x2} ${y2}`} stroke={trousers} strokeWidth={w} strokeLinecap="round" />

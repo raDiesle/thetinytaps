@@ -33,7 +33,12 @@ export function Opa() {
       <g className="sp-opa-paper">
         <path d="M-62 -112 L-56 -180 L22 -176 L18 -108 Z" fill="#f8f9fa" />
         <path d="M-17 -178 L-20 -110" stroke="#dee2e6" strokeWidth="2" />
-        <path d="M-50 -166 H-26 M-50 -156 H-28 M-52 -146 H-26 M-10 -164 H10 M-10 -154 H8 M-11 -144 H10 M-11 -134 H8" stroke="#adb5bd" strokeWidth="3" strokeLinecap="round" />
+        <path
+          d="M-50 -166 H-26 M-50 -156 H-28 M-52 -146 H-26 M-10 -164 H10 M-10 -154 H8 M-11 -144 H10 M-11 -134 H8"
+          stroke="#adb5bd"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
         <rect x="-52" y="-136" width="24" height="18" fill="#74c0fc" />
         <circle cx="-60" cy="-140" r="7" fill={SKIN} />
         <circle cx="22" cy="-136" r="7" fill={SKIN} />
@@ -54,7 +59,12 @@ export function Eiswagen() {
         {[-150, -75, 0, 75].map((x, i) => (
           <path key={x} d={`M0 -352 L${x} -296 Q${x + 18} ${-300 + (i % 2) * 2} ${x + 37} -298 Z`} fill="#ff6b6b" />
         ))}
-        <path d="M-150 -296 Q-131 -282 -112 -296 Q-93 -282 -75 -296 Q-56 -282 -37 -296 Q-18 -282 0 -296 Q18 -282 37 -296 Q56 -282 75 -296 Q94 -282 112 -296 Q131 -282 150 -296" stroke="#ff6b6b" strokeWidth="6" fill="none" />
+        <path
+          d="M-150 -296 Q-131 -282 -112 -296 Q-93 -282 -75 -296 Q-56 -282 -37 -296 Q-18 -282 0 -296 Q18 -282 37 -296 Q56 -282 75 -296 Q94 -282 112 -296 Q131 -282 150 -296"
+          stroke="#ff6b6b"
+          strokeWidth="6"
+          fill="none"
+        />
         <circle cx="0" cy="-354" r="7" fill="#ffd60a" />
       </g>
       {/* The ice cream man behind the cart */}
@@ -271,8 +281,20 @@ export function Seifenblasen() {
         {BUBBLES.map(([cx, cy, r], i) => (
           <g key={i} style={nth(i)}>
             <circle cx={cx} cy={cy} r={r} fill="#e7f5ff" fillOpacity="0.35" stroke="#a5d8ff" strokeWidth="3" />
-            <path d={`M${cx - r * 0.55} ${cy - r * 0.2} Q${cx - r * 0.45} ${cy - r * 0.6} ${cx - r * 0.1} ${cy - r * 0.62}`} stroke="#fff" strokeWidth="3" strokeLinecap="round" fill="none" />
-            <path d={`M${cx + r * 0.3} ${cy + r * 0.5} Q${cx + r * 0.55} ${cy + r * 0.3} ${cx + r * 0.6} ${cy}`} stroke="#e599f7" strokeWidth="2" strokeLinecap="round" fill="none" />
+            <path
+              d={`M${cx - r * 0.55} ${cy - r * 0.2} Q${cx - r * 0.45} ${cy - r * 0.6} ${cx - r * 0.1} ${cy - r * 0.62}`}
+              stroke="#fff"
+              strokeWidth="3"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d={`M${cx + r * 0.3} ${cy + r * 0.5} Q${cx + r * 0.55} ${cy + r * 0.3} ${cx + r * 0.6} ${cy}`}
+              stroke="#e599f7"
+              strokeWidth="2"
+              strokeLinecap="round"
+              fill="none"
+            />
           </g>
         ))}
       </g>
@@ -292,7 +314,16 @@ export function Seifenblasen() {
       <g className="sp-blasen-head" style={{ transformOrigin: "0px -134px" }}>
         <Head cx={0} cy={-154} r={21} hair="#e9c46a" style="pigtails" />
       </g>
-      <Puffs className="sp-blasen-pop" spots={[[92, -206], [118, -252], [84, -284]]} r={8} fill="#d0ebff" />
+      <Puffs
+        className="sp-blasen-pop"
+        spots={[
+          [92, -206],
+          [118, -252],
+          [84, -284],
+        ]}
+        r={8}
+        fill="#d0ebff"
+      />
     </>
   );
 }
@@ -301,7 +332,17 @@ export function Seifenblasen() {
 export function Kind() {
   return (
     <>
-      <Puffs className="sp-kind-sand" spots={[[64, -150], [84, -168], [50, -176], [76, -196]]} r={9} fill="#f1c87a" />
+      <Puffs
+        className="sp-kind-sand"
+        spots={[
+          [64, -150],
+          [84, -168],
+          [50, -176],
+          [76, -196],
+        ]}
+        r={9}
+        fill="#f1c87a"
+      />
       <Leg x1={-14} y1={-34} x2={-46} y2={-10} trousers="#ffd43b" shoe="#4dabf7" w={13} />
       <Leg x1={14} y1={-34} x2={44} y2={-10} trousers="#ffd43b" shoe="#4dabf7" w={13} />
       <path d="M-26 -30 Q-30 -76 -16 -96 H16 Q30 -76 26 -30 Z" fill="#ff8787" />

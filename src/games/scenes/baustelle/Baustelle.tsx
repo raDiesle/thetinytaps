@@ -22,21 +22,7 @@ import { float, ground } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import { DIGGER, FLOWERS, HAMMER, SITE, TREE } from "./layout";
 import { Ampel, Bagger, Ballon, Betonmischer, Gabelstapler, Hubschrauber, Kipplaster, Kran, Walze } from "./machines";
-import {
-  Bauwagen,
-  Container,
-  Haus,
-  Huetchen,
-  Kabeltrommel,
-  Klo,
-  Laterne,
-  Radio,
-  Saege,
-  Sandhaufen,
-  Schild,
-  Schubkarre,
-  Werkzeugkasten,
-} from "./site";
+import { Bauwagen, Container, Haus, Huetchen, Kabeltrommel, Klo, Laterne, Radio, Saege, Sandhaufen, Schild, Schubkarre, Werkzeugkasten } from "./site";
 import "./baustelle.css";
 
 // Items are listed from back to front, which is also the drawing order.

@@ -1,4 +1,4 @@
-import type { ReactElement } from "react";
+import type { ReactElement, ReactNode } from "react";
 import { HORIZON, depthScale, onFloor } from "../layout";
 import { STEEL } from "../shared";
 
@@ -50,7 +50,7 @@ function Chair({ x, y, colour, dark }: { x: number; y: number; colour: string; d
 }
 
 /** A child's drawing pinned to the wall. */
-function Drawing({ x, y, tilt, children }: { x: number; y: number; tilt: number; children: ReactElement }) {
+function Drawing({ x, y, tilt, children }: { x: number; y: number; tilt: number; children: ReactNode }) {
   return (
     <g transform={`rotate(${tilt} ${x + 30} ${y + 24})`}>
       <rect x={x} y={y} width="60" height="48" rx="3" fill="#fff" stroke="#e9ecef" strokeWidth="2" />
@@ -120,16 +120,12 @@ export function Background() {
       <circle cx="504" cy="222" r="14" fill="#fff" />
       <circle cx="490" cy="226" r="11" fill="#fff" />
       <Drawing x={1050} y={178} tilt={-5}>
-        <>
-          <circle cx="1080" cy="196" r="9" fill="#ffd43b" />
-          <path d="M1058 220 H1102" stroke="#51cf66" strokeWidth="5" />
-        </>
+        <circle cx="1080" cy="196" r="9" fill="#ffd43b" />
+        <path d="M1058 220 H1102" stroke="#51cf66" strokeWidth="5" />
       </Drawing>
       <Drawing x={690} y={52} tilt={6}>
-        <>
-          <path d="M704 92 V72 L720 60 L736 72 V92 Z" fill="#ff8787" />
-          <rect x="716" y="80" width="8" height="12" fill="#845ef7" />
-        </>
+        <path d="M704 92 V72 L720 60 L736 72 V92 Z" fill="#ff8787" />
+        <rect x="716" y="80" width="8" height="12" fill="#845ef7" />
       </Drawing>
 
       {/* Floor */}

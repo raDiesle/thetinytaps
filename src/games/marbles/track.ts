@@ -19,11 +19,7 @@ export type Piece = "bell" | "trampoline" | "funnel" | "wheel";
 export const PIECES: Piece[] = ["bell", "trampoline", "funnel", "wheel"];
 
 /** Something along the way that sounds or moves when a marble gets there. */
-export type TrackEvent =
-  | { kind: "note"; bar: number }
-  | { kind: Piece; slot: number }
-  | { kind: "seesaw" }
-  | { kind: "basket" };
+export type TrackEvent = { kind: "note"; bar: number } | { kind: Piece; slot: number } | { kind: "seesaw" } | { kind: "basket" };
 
 /* ---------- Layout ---------- */
 

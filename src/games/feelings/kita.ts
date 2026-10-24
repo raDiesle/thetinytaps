@@ -33,24 +33,17 @@ export const SITUATIONS: Situation[] = [
     id: "push",
     emoji: "💥",
     title: "Geschubst",
-    intro: [
-      { narration: "Der kleine Bär spielt draußen." },
-      { narration: "Der Fuchs schubst den kleinen Bären. Aua!", sound: "boing" },
-    ],
+    intro: [{ narration: "Der kleine Bär spielt draußen." }, { narration: "Der Fuchs schubst den kleinen Bären. Aua!", sound: "boing" }],
     steps: [
       {
         emoji: "✋",
         label: "Stopp! Nein!",
-        beats: [
-          { narration: "Der kleine Bär sagt laut:", line: "Stopp! Nein! Ich will das nicht!" },
-        ],
+        beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Nein! Ich will das nicht!" }],
       },
       {
         emoji: "👣",
         label: "Weggehen",
-        beats: [
-          { narration: "Dann geht er weg. So hat er Abstand." },
-        ],
+        beats: [{ narration: "Dann geht er weg. So hat er Abstand." }],
       },
       {
         emoji: "🙋",
@@ -67,32 +60,23 @@ export const SITUATIONS: Situation[] = [
       label: "Zurückschubsen",
       answer: "Hmm, dann tut es noch mehr weh. Sag lieber laut: Stopp!",
     },
-    outro: [
-      { narration: "Super! Stopp sagen, weggehen, Hilfe holen.", sound: "chime" },
-    ],
+    outro: [{ narration: "Super! Stopp sagen, weggehen, Hilfe holen.", sound: "chime" }],
   },
   {
     id: "kick",
     emoji: "🦶",
     title: "Getreten",
-    intro: [
-      { narration: "Der kleine Bär und der Fuchs sind draußen." },
-      { narration: "Der Fuchs tritt den kleinen Bären ans Bein. Aua!", sound: "boing" },
-    ],
+    intro: [{ narration: "Der kleine Bär und der Fuchs sind draußen." }, { narration: "Der Fuchs tritt den kleinen Bären ans Bein. Aua!", sound: "boing" }],
     steps: [
       {
         emoji: "✋",
         label: "Stopp!",
-        beats: [
-          { narration: "Der kleine Bär sagt laut:", line: "Stopp! Nicht treten!" },
-        ],
+        beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Nicht treten!" }],
       },
       {
         emoji: "👣",
         label: "Weggehen",
-        beats: [
-          { narration: "Er geht ein paar Schritte weg." },
-        ],
+        beats: [{ narration: "Er geht ein paar Schritte weg." }],
       },
       {
         emoji: "🙋",
@@ -109,43 +93,28 @@ export const SITUATIONS: Situation[] = [
       label: "Zurücktreten",
       answer: "Hmm, dann tut es beiden weh. Sag lieber laut: Stopp!",
     },
-    outro: [
-      { narration: "Prima! Stopp sagen, Abstand halten, Hilfe holen.", sound: "chime" },
-    ],
+    outro: [{ narration: "Prima! Stopp sagen, Abstand halten, Hilfe holen.", sound: "chime" }],
   },
   {
     id: "grab",
     emoji: "🚜",
     title: "Weggenommen",
-    intro: [
-      { narration: "Der kleine Bär spielt mit seinem Traktor." },
-      { narration: "Da nimmt ihm der Fuchs einfach den Traktor weg!" },
-      { sound: "pop" },
-    ],
+    intro: [{ narration: "Der kleine Bär spielt mit seinem Traktor." }, { narration: "Da nimmt ihm der Fuchs einfach den Traktor weg!" }, { sound: "pop" }],
     steps: [
       {
         emoji: "✋",
         label: "Das ist meins!",
-        beats: [
-          { narration: "Der kleine Bär sagt laut:", line: "Stopp! Das ist mein Traktor!" },
-        ],
+        beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Das ist mein Traktor!" }],
       },
       {
         emoji: "🤲",
         label: "Zurück, bitte",
-        beats: [
-          { line: "Gib ihn mir bitte zurück." },
-          { line: "Hier. Entschuldigung." },
-          { sound: "pop" },
-        ],
+        beats: [{ line: "Gib ihn mir bitte zurück." }, { line: "Hier. Entschuldigung." }, { sound: "pop" }],
       },
       {
         emoji: "🤝",
         label: "Mitspielen?",
-        beats: [
-          { line: "Willst du mitspielen? Du kannst den Eimer haben." },
-          { line: "Au ja!" },
-        ],
+        beats: [{ line: "Willst du mitspielen? Du kannst den Eimer haben." }, { line: "Au ja!" }],
       },
     ],
     instead: {
@@ -153,41 +122,28 @@ export const SITUATIONS: Situation[] = [
       label: "Wegreißen",
       answer: "Hmm, dann zerren beide und es gibt Streit. Sag lieber: Stopp, das ist meins!",
     },
-    outro: [
-      { narration: "Toll! Und gibt er es nicht zurück, holst du die Erzieherin.", sound: "chime" },
-    ],
+    outro: [{ narration: "Toll! Und gibt er es nicht zurück, holst du die Erzieherin.", sound: "chime" }],
   },
   {
     id: "slide",
     emoji: "🎢",
     title: "Rutsche voll",
-    intro: [
-      { narration: "Alle wollen rutschen." },
-      { narration: "Der kleine Bär will sofort rutschen. Aber die Rutsche ist voll!" },
-    ],
+    intro: [{ narration: "Alle wollen rutschen." }, { narration: "Der kleine Bär will sofort rutschen. Aber die Rutsche ist voll!" }],
     steps: [
       {
         emoji: "🚶",
         label: "Anstellen",
-        beats: [
-          { narration: "Er stellt sich hinten an.", line: "Ich bin nach dem Fuchs dran." },
-        ],
+        beats: [{ narration: "Er stellt sich hinten an.", line: "Ich bin nach dem Fuchs dran." }],
       },
       {
         emoji: "⏳",
         label: "Warten",
-        beats: [
-          { narration: "Er wartet. Erst rutscht der Hase …" },
-          { narration: "… dann der Fuchs." },
-        ],
+        beats: [{ narration: "Er wartet. Erst rutscht der Hase …" }, { narration: "… dann der Fuchs." }],
       },
       {
         emoji: "🥳",
         label: "Jetzt ich!",
-        beats: [
-          { narration: "Jetzt ist der kleine Bär dran!" },
-          { line: "Juhuu!", sound: "boing" },
-        ],
+        beats: [{ narration: "Jetzt ist der kleine Bär dran!" }, { line: "Juhuu!", sound: "boing" }],
       },
     ],
     instead: {
@@ -195,41 +151,28 @@ export const SITUATIONS: Situation[] = [
       label: "Vordrängeln",
       answer: "Hmm, auf der Rutsche kann jemand runterfallen. Lieber hinten anstellen.",
     },
-    outro: [
-      { narration: "Super gewartet! Jeder kommt mal dran.", sound: "chime" },
-    ],
+    outro: [{ narration: "Super gewartet! Jeder kommt mal dran.", sound: "chime" }],
   },
   {
     id: "want",
     emoji: "🚗",
     title: "Haben wollen",
-    intro: [
-      { narration: "Der Hase spielt mit einem tollen Auto." },
-      { narration: "Der kleine Bär will das Auto auch haben!" },
-    ],
+    intro: [{ narration: "Der Hase spielt mit einem tollen Auto." }, { narration: "Der kleine Bär will das Auto auch haben!" }],
     steps: [
       {
         emoji: "🗣️",
         label: "Fragen",
-        beats: [
-          { narration: "Er fragt:", line: "Darf ich auch mal?" },
-          { line: "Gleich. Ich spiele noch." },
-        ],
+        beats: [{ narration: "Er fragt:", line: "Darf ich auch mal?" }, { line: "Gleich. Ich spiele noch." }],
       },
       {
         emoji: "⏳",
         label: "Warten",
-        beats: [
-          { narration: "Der kleine Bär wartet. Solange spielt er mit dem Ball.", sound: "boing" },
-        ],
+        beats: [{ narration: "Der kleine Bär wartet. Solange spielt er mit dem Ball.", sound: "boing" }],
       },
       {
         emoji: "🔄",
         label: "Tauschen",
-        beats: [
-          { line: "Jetzt darfst du. Tauschen wir?" },
-          { line: "Ja! Danke!", sound: "pop" },
-        ],
+        beats: [{ line: "Jetzt darfst du. Tauschen wir?" }, { line: "Ja! Danke!", sound: "pop" }],
       },
     ],
     instead: {
@@ -237,9 +180,7 @@ export const SITUATIONS: Situation[] = [
       label: "Wegnehmen",
       answer: "Hmm, dann ist der Hase traurig. Frag lieber: Darf ich auch mal?",
     },
-    outro: [
-      { narration: "Prima! Fragen, warten, tauschen.", sound: "chime" },
-    ],
+    outro: [{ narration: "Prima! Fragen, warten, tauschen.", sound: "chime" }],
   },
   {
     id: "angry",
@@ -253,16 +194,12 @@ export const SITUATIONS: Situation[] = [
       {
         emoji: "🦶",
         label: "Stampfen",
-        beats: [
-          { narration: "Aber er stampft lieber. Stampf, stampf!", sound: "rumble" },
-        ],
+        beats: [{ narration: "Aber er stampft lieber. Stampf, stampf!", sound: "rumble" }],
       },
       {
         emoji: "💨",
         label: "Tief pusten",
-        beats: [
-          { narration: "Er atmet tief ein und pustet: Puuuh." },
-        ],
+        beats: [{ narration: "Er atmet tief ein und pustet: Puuuh." }],
       },
       {
         emoji: "🗣️",
@@ -279,8 +216,6 @@ export const SITUATIONS: Situation[] = [
       label: "Schubsen",
       answer: "Hmm, Schubsen tut weh. Lass die Wut lieber raus: Stampf ganz fest!",
     },
-    outro: [
-      { narration: "Toll! Wütend sein ist okay. Stampfen, pusten, sagen – nicht hauen.", sound: "chime" },
-    ],
+    outro: [{ narration: "Toll! Wütend sein ist okay. Stampfen, pusten, sagen – nicht hauen.", sound: "chime" }],
   },
 ];

@@ -28,7 +28,12 @@ export function Bett() {
       <g className="gn-bett-head" style={{ transformOrigin: "-240px 0px" }}>
         <path d="M-272 0 V-300 Q-272 -340 -240 -340 Q-208 -340 -208 -300 V0 Z" fill={WOOD} />
         <path d="M-262 -10 V-296 Q-262 -326 -240 -328" stroke="#fff" strokeWidth="6" strokeLinecap="round" opacity="0.3" fill="none" />
-        <path d="M-240 -258 C-258 -272 -256 -292 -240 -284 C-224 -292 -222 -272 -240 -258 Z" fill="#ff8fa3" className="gn-bett-heart" style={{ transformOrigin: "-240px -274px" }} />
+        <path
+          d="M-240 -258 C-258 -272 -256 -292 -240 -284 C-224 -292 -222 -272 -240 -258 Z"
+          fill="#ff8fa3"
+          className="gn-bett-heart"
+          style={{ transformOrigin: "-240px -274px" }}
+        />
         <rect x="-272" y="-20" width="64" height="20" rx="4" fill={WOOD_DARK} />
       </g>
       {/* Footboard */}
@@ -46,30 +51,28 @@ export function Bett() {
 /** The blue blanket with yellow stars; it rises and falls as the child breathes. */
 export function Decke() {
   return (
-    <>
-      <g className="gn-decke" style={{ transformOrigin: "40px -100px" }}>
-        <path
-          d="M-148 -150 Q-120 -200 -40 -204 Q40 -208 90 -188 Q160 -176 214 -168 V-104 q-18 12 -36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 Q-150 -100 -148 -150 Z"
-          fill="#748ffc"
-        />
-        <path d="M-140 -150 Q-110 -196 -40 -198" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.4" fill="none" />
-        <path d="M-150 -112 Q30 -128 214 -118" stroke="#5c7cfa" strokeWidth="4" fill="none" />
-        {[
-          [-90, -170, 10],
-          [-20, -180, 12],
-          [60, -172, 10],
-          [140, -150, 11],
-          [-60, -130, 9],
-          [30, -138, 10],
-          [110, -124, 9],
-          [180, -132, 8],
-        ].map(([x, y, r], i) => (
-          <path key={i} className="gn-decke-star" style={{ ...nth(i % 4), transformOrigin: `${x}px ${y}px` }} d={star(x, y, r)} fill="#ffe066" />
-        ))}
-        {/* Sheet folded over the top */}
-        <path d="M-148 -150 Q-132 -186 -96 -196 L-84 -170 Q-120 -164 -132 -134 Z" fill="#fff" />
-      </g>
-    </>
+    <g className="gn-decke" style={{ transformOrigin: "40px -100px" }}>
+      <path
+        d="M-148 -150 Q-120 -200 -40 -204 Q40 -208 90 -188 Q160 -176 214 -168 V-104 q-18 12 -36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 t-36 0 Q-150 -100 -148 -150 Z"
+        fill="#748ffc"
+      />
+      <path d="M-140 -150 Q-110 -196 -40 -198" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.4" fill="none" />
+      <path d="M-150 -112 Q30 -128 214 -118" stroke="#5c7cfa" strokeWidth="4" fill="none" />
+      {[
+        [-90, -170, 10],
+        [-20, -180, 12],
+        [60, -172, 10],
+        [140, -150, 11],
+        [-60, -130, 9],
+        [30, -138, 10],
+        [110, -124, 9],
+        [180, -132, 8],
+      ].map(([x, y, r], i) => (
+        <path key={i} className="gn-decke-star" style={{ ...nth(i % 4), transformOrigin: `${x}px ${y}px` }} d={star(x, y, r)} fill="#ffe066" />
+      ))}
+      {/* Sheet folded over the top */}
+      <path d="M-148 -150 Q-132 -186 -96 -196 L-84 -170 Q-120 -164 -132 -134 Z" fill="#fff" />
+    </g>
   );
 }
 

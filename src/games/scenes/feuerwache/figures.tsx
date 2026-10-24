@@ -19,15 +19,7 @@ function Legs({ colour = NAVY, gap = 6 }: { colour?: string; gap?: number }) {
 export function Feuerwehrfrau() {
   return (
     <>
-      <path
-        className="fw-frau-jet"
-        d="M100 -138 Q130 -330 168 -196"
-        pathLength={1}
-        stroke="#74c0fc"
-        strokeWidth="12"
-        strokeLinecap="round"
-        fill="none"
-      />
+      <path className="fw-frau-jet" d="M100 -138 Q130 -330 168 -196" pathLength={1} stroke="#74c0fc" strokeWidth="12" strokeLinecap="round" fill="none" />
       <path className="fw-frau-jet-core" d="M100 -138 Q130 -330 168 -196" pathLength={1} stroke="#d0ebff" strokeWidth="4" strokeLinecap="round" fill="none" />
       <g className="fw-frau-splash" fill="#74c0fc">
         {[
@@ -43,12 +35,7 @@ export function Feuerwehrfrau() {
       <path d="M-150 -4 Q-60 -8 -34 -30 Q-10 -60 40 -112" stroke={FIRE_RED} strokeWidth="11" strokeLinecap="round" fill="none" />
       <g className="fw-frau-body" style={{ transformOrigin: "0px 0px" }}>
         <Legs />
-        <path
-          className="fw-frau-ponytail"
-          d="M-20 -186 Q-46 -176 -42 -144 Q-30 -160 -16 -170 Z"
-          fill="#6b4423"
-          style={{ transformOrigin: "-20px -184px" }}
-        />
+        <path className="fw-frau-ponytail" d="M-20 -186 Q-46 -176 -42 -144 Q-30 -160 -16 -170 Z" fill="#6b4423" style={{ transformOrigin: "-20px -184px" }} />
         <Jacket x={-30} y={-156} w={60} h={84} />
         <HelmetHead cx={0} cy={-178} r={24} helmet={STRIPE} />
         <g className="fw-frau-nozzle" style={{ transformOrigin: "30px -126px" }}>
@@ -77,7 +64,13 @@ export function Feuerwehrmann() {
           <circle cx="-12" cy="-172" r="7" />
           <circle cx="12" cy="-172" r="7" />
         </g>
-        <path className="fw-mann-visor" d="M-26 -212 Q0 -222 26 -212 V-200 Q0 -208 -26 -200 Z" fill="#ffd166" opacity="0.85" style={{ transformOrigin: "0px -212px" }} />
+        <path
+          className="fw-mann-visor"
+          d="M-26 -212 Q0 -222 26 -212 V-200 Q0 -208 -26 -200 Z"
+          fill="#ffd166"
+          opacity="0.85"
+          style={{ transformOrigin: "0px -212px" }}
+        />
         <g className="fw-mann-whistle">
           <rect x="-4" y="-168" width="22" height="10" rx="4" fill={STRIPE} />
           <circle cx="18" cy="-163" r="6" fill={STRIPE} />
@@ -157,7 +150,12 @@ export function Opa() {
         <circle cx="0" cy="-166" r="24" fill={SKIN} />
         <path d="M-24 -172 Q-26 -150 -18 -146 M24 -172 Q26 -150 18 -146" stroke="#dee2e6" strokeWidth="7" strokeLinecap="round" fill="none" />
         <Face cx={-2} cy={-168} size={0.8} />
-        <path className="fw-opa-moustache" d="M-14 -158 Q-8 -152 -2 -158 Q4 -152 10 -158 Q4 -148 -2 -154 Q-8 -148 -14 -158 Z" fill="#dee2e6" style={{ transformOrigin: "-2px -156px" }} />
+        <path
+          className="fw-opa-moustache"
+          d="M-14 -158 Q-8 -152 -2 -158 Q4 -152 10 -158 Q4 -148 -2 -154 Q-8 -148 -14 -158 Z"
+          fill="#dee2e6"
+          style={{ transformOrigin: "-2px -156px" }}
+        />
         <g className="fw-opa-hat" style={{ transformOrigin: "0px -188px" }}>
           <rect x="-22" y="-200" width="44" height="14" rx="4" fill="#fff" />
           <circle cx="-14" cy="-210" r="13" fill="#fff" />

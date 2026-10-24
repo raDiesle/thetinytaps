@@ -280,8 +280,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   // When the mouth has to open or close, the picture does it slowly and arrows on the lips show the way.
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
   const mouthMoves = step !== null && step.mouth !== mouthBefore;
-  const action: MouthAction | null =
-    step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
+  const action: MouthAction | null = step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
   const target = step?.view ?? GRIN_VIEW;
   const view = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
@@ -345,9 +344,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             view={view}
             zone={step && { surface: step.surface, teeth: step.teeth }}
             monsters={spots}
-            brush={
-              step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }
-            }
+            brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
             happy={done}
             action={action}
             paused={paused}
@@ -357,12 +354,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       </div>
 
       {done ? (
-        <button className="teeth-again" onClick={again}>
+        <button type="button" className="teeth-again" onClick={again}>
           🔁 Nochmal
         </button>
       ) : (
         <div className="teeth-controls">
-          <button className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>
+          <button type="button" className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>
             {paused ? "▶️" : "⏸️"}
           </button>
           <div
@@ -380,7 +377,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
               if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e);
             }}
           >
-              {STEPS.map((s, i) => (
+            {STEPS.map((s, i) => (
               <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
                 <span style={{ width: `${Math.max(0, Math.min(1, (brushed - i * stepMs) / stepMs)) * 100}%` }} />
               </span>
@@ -390,7 +387,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       )}
 
       {paused && (
-        <button className="teeth-paused" onClick={togglePause}>
+        <button type="button" className="teeth-paused" onClick={togglePause}>
           <span className="teeth-paused-icon" aria-hidden>
             ⏸️
           </span>

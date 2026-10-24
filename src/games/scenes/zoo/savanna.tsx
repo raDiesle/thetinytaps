@@ -11,7 +11,8 @@ const GIRAFFE_DARK = "#7f5539";
 
 const GIRAFFE_SPOTS =
   "M-60 -250 q16 -10 30 0 q6 16 -10 24 q-18 2 -20 -24 Z M-14 -258 q20 -6 30 6 q-2 18 -22 18 q-14 -6 -8 -24 Z M34 -246 q18 -4 26 10 q-6 16 -24 12 q-10 -10 -2 -22 Z M-40 -214 q16 -6 26 6 q-4 16 -20 14 q-12 -6 -6 -20 Z M10 -214 q18 -4 24 10 q-8 14 -22 10 q-8 -10 -2 -20 Z M62 -214 q14 -2 20 10 q-6 12 -18 8 Z";
-const NECK_SPOTS = "M-62 -280 q12 -6 20 4 q-2 12 -16 12 Z M-82 -326 q12 -6 18 4 q-4 12 -16 10 Z M-102 -368 q10 -4 16 4 q-4 10 -14 8 Z M-52 -248 q10 -2 14 6 q-6 8 -14 4 Z";
+const NECK_SPOTS =
+  "M-62 -280 q12 -6 20 4 q-2 12 -16 12 Z M-82 -326 q12 -6 18 4 q-4 12 -16 10 Z M-102 -368 q10 -4 16 4 q-4 10 -14 8 Z M-52 -248 q10 -2 14 6 q-6 8 -14 4 Z";
 
 /** Giraffe in the savanna, facing left; she stretches her neck into the acacia and munches leaves. */
 export function Giraffe() {
@@ -47,7 +48,12 @@ export function Giraffe() {
           <path d="M-98 -442 Q-142 -450 -178 -422 Q-188 -400 -168 -392 Q-130 -390 -98 -404 Z" fill={GIRAFFE} />
           <ellipse cx="-166" cy="-406" rx="18" ry="14" fill="#fbe3a1" />
           <ellipse cx="-176" cy="-412" rx="3" ry="2" fill={GIRAFFE_DARK} />
-          <path className="zo-giraffe-tongue" d="M-180 -398 Q-202 -394 -206 -408 Q-198 -414 -182 -404 Z" fill="#6d597a" style={{ transformOrigin: "-180px -400px" }} />
+          <path
+            className="zo-giraffe-tongue"
+            d="M-180 -398 Q-202 -394 -206 -408 Q-198 -414 -182 -404 Z"
+            fill="#6d597a"
+            style={{ transformOrigin: "-180px -400px" }}
+          />
           <path d="M-180 -398 Q-170 -393 -158 -398" stroke={GIRAFFE_DARK} strokeWidth="2.2" fill="none" strokeLinecap="round" />
           <circle cx="-140" cy="-404" r="5" fill={CHEEK} opacity="0.5" />
           <Eye cx={-128} cy={-424} r={4.6} />
@@ -245,7 +251,15 @@ export function Nashorn() {
         <path d="M8 -158 L0 -155 L8 -152 Z" fill="#e63946" />
         <Eye cx={14} cy={-158} r={2} />
       </g>
-      <path className="zo-nashorn-tail" d="M118 -136 Q138 -116 132 -90" stroke={shade} strokeWidth="5" fill="none" strokeLinecap="round" style={{ transformOrigin: "118px -136px" }} />
+      <path
+        className="zo-nashorn-tail"
+        d="M118 -136 Q138 -116 132 -90"
+        stroke={shade}
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "118px -136px" }}
+      />
       {[-70, -40, 56, 86].map((x) => (
         <g key={x} className={x === -40 ? "zo-nashorn-stamp" : undefined} style={x === -40 ? { transformOrigin: `${x}px -90px` } : undefined}>
           <rect x={x - 17} y="-96" width="34" height="96" rx="12" fill={x === -40 || x === 86 ? skin : shade} />
@@ -257,7 +271,12 @@ export function Nashorn() {
       <path d="M-40 -140 Q-36 -110 -44 -84 M40 -150 Q46 -120 40 -80" stroke={shade} strokeWidth="4" fill="none" strokeLinecap="round" />
       <ellipse cx="0" cy="-166" rx="60" ry="10" fill="#fff" opacity="0.25" />
       <g className="zo-nashorn-head" style={{ transformOrigin: "-80px -130px" }}>
-        <path className="zo-nashorn-ears" d="M-90 -160 L-96 -188 L-78 -166 Z M-70 -162 L-70 -190 L-56 -164 Z" fill={shade} style={{ transformOrigin: "-76px -162px" }} />
+        <path
+          className="zo-nashorn-ears"
+          d="M-90 -160 L-96 -188 L-78 -166 Z M-70 -162 L-70 -190 L-56 -164 Z"
+          fill={shade}
+          style={{ transformOrigin: "-76px -162px" }}
+        />
         <path d="M-60 -168 Q-110 -176 -150 -140 Q-176 -118 -170 -96 Q-150 -82 -110 -90 Q-70 -96 -56 -110 Z" fill={skin} />
         <path d="M-154 -130 Q-172 -170 -164 -196 Q-150 -168 -136 -138 Z" fill="#f1e9df" />
         <path d="M-126 -146 Q-130 -162 -124 -172 Q-114 -160 -114 -148 Z" fill="#f1e9df" />
@@ -335,7 +354,15 @@ export function Loewe() {
 export function Loewenbaby() {
   return (
     <g className="zo-cub-body" style={{ transformOrigin: "0px 0px" }}>
-      <path className="zo-cub-tail" d="M40 -40 Q70 -50 66 -80" stroke={LION} strokeWidth="6" fill="none" strokeLinecap="round" style={{ transformOrigin: "40px -40px" }} />
+      <path
+        className="zo-cub-tail"
+        d="M40 -40 Q70 -50 66 -80"
+        stroke={LION}
+        strokeWidth="6"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "40px -40px" }}
+      />
       <circle cx="66" cy="-82" r="6" fill={MANE} />
       {[-30, -14, 22, 36].map((x) => (
         <rect key={x} x={x - 7} y="-40" width="14" height="40" rx="6" fill={x === -14 || x === 36 ? LION : "#e9a24c"} />

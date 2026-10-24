@@ -114,8 +114,16 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Auf dem Gehweg sind Pflastersteine in zwei Farben.", reaction: "Hopp, hopp, nur auf die roten – der Weg ist geschafft.", everyday: true },
     { situation: "Mama hält die Hand hoch über den Kopf.", reaction: "Hochgesprungen und mit dem Kopf drangestupst, Mama lacht.", everyday: true },
     { situation: "Im Garten liegen Trittplatten über dem Beet.", reaction: "Von Platte zu Platte, die Füße bleiben sauber.", everyday: true },
-    { situation: "Über dem Bach schweben Kisten mit goldenem Stern.", reaction: "Bumm mit dem Kopf, ein Stern springt heraus.", worlds: ["pirate_island", "jungle"] },
-    { situation: "Seerosenblätter liegen im Teich, ein Frosch wartet.", reaction: "Von Blatt zu Blatt, der Frosch hüpft hinterher.", worlds: ["garden", "jungle"] },
+    {
+      situation: "Über dem Bach schweben Kisten mit goldenem Stern.",
+      reaction: "Bumm mit dem Kopf, ein Stern springt heraus.",
+      worlds: ["pirate_island", "jungle"],
+    },
+    {
+      situation: "Seerosenblätter liegen im Teich, ein Frosch wartet.",
+      reaction: "Von Blatt zu Blatt, der Frosch hüpft hinterher.",
+      worlds: ["garden", "jungle"],
+    },
     { situation: "Eine Glocke hängt an einem Bogen über dem Weg.", reaction: "Mit dem Kopf angestupst, sie bimmelt.", worlds: ["toy_town", "circus"] },
   ],
 
@@ -281,7 +289,11 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Im Keller hängt eine Spinnwebe vor dem Regal.", reaction: "Weggewedelt, das Fahrrad ist zu sehen.", everyday: true },
     { situation: "Seifenblasen schweben vor dem Gesicht.", reaction: "Plopp, plopp, sie platzen zur Seite.", everyday: true },
     { situation: "Der Vorhang aus Perlenschnüren hängt in der Tür.", reaction: "Er klimpert zur Seite, das Zimmer ist frei.", everyday: true },
-    { situation: "Hinter der Steintür hängen dicke Spinnweben im Gang.", reaction: "Sie reißen und wehen davon, der Gang wird hell.", worlds: ["pirate_island", "crystal_cave"] },
+    {
+      situation: "Hinter der Steintür hängen dicke Spinnweben im Gang.",
+      reaction: "Sie reißen und wehen davon, der Gang wird hell.",
+      worlds: ["pirate_island", "crystal_cave"],
+    },
     { situation: "Dichte Lianen hängen über dem Dschungelpfad.", reaction: "Sie schwingen zur Seite, ein Tukan schaut heraus.", worlds: ["jungle"] },
     { situation: "Nebel liegt über dem Schlossgraben.", reaction: "Er weht weg, die Zugbrücke ist zu sehen.", worlds: ["magic_castle", "winter_forest"] },
   ],
@@ -379,11 +391,23 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
   ],
   shapes: [
     { situation: "Im Flur hängt ein großer Spiegel.", reaction: "Darin steht erst ein Riese, dann ein Stern, dann eine kleine Maus.", everyday: true },
-    { situation: "Abends leuchtet die Taschenlampe an die Wand im Kinderzimmer.", reaction: "Ein großer, ein breiter und ein kleiner Schatten tanzen.", everyday: true },
+    {
+      situation: "Abends leuchtet die Taschenlampe an die Wand im Kinderzimmer.",
+      reaction: "Ein großer, ein breiter und ein kleiner Schatten tanzen.",
+      everyday: true,
+    },
     { situation: "Papa hält drei Karten hoch: Turm, Stern und Maus.", reaction: "Er rät jedes Bild und lacht.", everyday: true },
-    { situation: "Eine Zaubertür hat kein Schloss, nur drei Bilder.", reaction: "Ein Bild nach dem anderen leuchtet, die Tür summt.", worlds: ["magic_castle"] },
+    {
+      situation: "Eine Zaubertür hat kein Schloss, nur drei Bilder.",
+      reaction: "Ein Bild nach dem anderen leuchtet, die Tür summt.",
+      worlds: ["magic_castle"],
+    },
     { situation: "Die Wolken haben noch keine Form.", reaction: "Eine wird ein Turm, eine ein Stern, eine ein kleines Schaf.", worlds: ["cloud_world"] },
-    { situation: "Der Clown hält einen hohen, einen breiten und einen kleinen Reifen hoch.", reaction: "In jeden passt eine Figur, das Publikum klatscht.", worlds: ["circus"] },
+    {
+      situation: "Der Clown hält einen hohen, einen breiten und einen kleinen Reifen hoch.",
+      reaction: "In jeden passt eine Figur, das Publikum klatscht.",
+      worlds: ["circus"],
+    },
   ],
 
   // Marschieren und Stampfen
@@ -594,7 +618,11 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "An der Fußgängerampel ist ein Knopf.", reaction: "Das Signal kommt, die Ampel wird grün.", everyday: true },
     { situation: "Bei Oma ist die Türklingel.", reaction: "Ding-dong, Oma öffnet.", everyday: true },
     { situation: "Die Lok hat einen Knopf für die Pfeife.", reaction: "Tuut tuut.", worlds: ["railway"] },
-    { situation: "In der Feuerwache ist ein großer roter Knopf.", reaction: "Die Lichter blinken, alle rutschen die Stange herunter.", worlds: ["fire_station"] },
+    {
+      situation: "In der Feuerwache ist ein großer roter Knopf.",
+      reaction: "Die Lichter blinken, alle rutschen die Stange herunter.",
+      worlds: ["fire_station"],
+    },
     { situation: "Am Karussell ist der Startknopf.", reaction: "Die Musik beginnt, das Karussell dreht sich.", worlds: ["toy_town"] },
   ],
   crank: [
