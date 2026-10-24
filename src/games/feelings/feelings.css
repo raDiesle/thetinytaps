@@ -826,6 +826,11 @@
   animation: waiting 1.8s ease-in-out infinite;
 }
 
+/* Playing the story again is the quieter choice, "Weiter" stays yellow. */
+.story-button.replay {
+  background: #fff;
+}
+
 .story-button-emoji {
   font-family: var(--font-emoji);
   font-size: clamp(2.6rem, 9vh, 4.6rem);

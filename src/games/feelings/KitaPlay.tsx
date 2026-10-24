@@ -307,19 +307,34 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
       <footer className="story-buttons">
         {cards}
         {run.phase === "done" && (
-          <button
-            type="button"
-            className="story-button next again"
-            onPointerDown={(e: PointerEvent) => {
-              e.stopPropagation();
-              nextSituation();
-            }}
-          >
-            <span className="story-button-emoji" aria-hidden>
-              ▶
-            </span>
-            Weiter
-          </button>
+          <>
+            <button
+              type="button"
+              className="story-button replay"
+              onPointerDown={(e: PointerEvent) => {
+                e.stopPropagation();
+                startSituation(situation);
+              }}
+            >
+              <span className="story-button-emoji" aria-hidden>
+                🔁
+              </span>
+              Nochmal
+            </button>
+            <button
+              type="button"
+              className="story-button next again"
+              onPointerDown={(e: PointerEvent) => {
+                e.stopPropagation();
+                nextSituation();
+              }}
+            >
+              <span className="story-button-emoji" aria-hidden>
+                ▶
+              </span>
+              Weiter
+            </button>
+          </>
         )}
       </footer>
     </div>
