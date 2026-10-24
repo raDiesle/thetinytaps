@@ -29,7 +29,15 @@ export function Mama() {
       <g className="sd-mama-arm" style={{ transformOrigin: "22px -100px" }}>
         <Arm x1={22} y1={-100} x2={52} y2={-60} sleeve={SKIN} w={12} />
       </g>
-      <Hearts className="sd-mama-hearts" spots={[[40, -170], [64, -150], [20, -190]]} r={9} />
+      <Hearts
+        className="sd-mama-hearts"
+        spots={[
+          [40, -170],
+          [64, -150],
+          [20, -190],
+        ]}
+        r={9}
+      />
     </>
   );
 }
@@ -57,7 +65,16 @@ export function Pommes() {
       <path d="M-30 -18 H30 M-28 -8 H28" stroke="#e63946" strokeWidth="5" />
       <path d="M36 -10 Q36 -24 50 -22 Q62 -18 56 -6 Q48 2 36 -10 Z" fill="#e63946" />
       <circle cx="46" cy="-17" r="3" fill="#fff" opacity="0.7" />
-      <Sparkles className="sd-pommes-sparkle" spots={[[-30, -70], [24, -76], [52, -36]]} r={8} fill="#fff9db" />
+      <Sparkles
+        className="sd-pommes-sparkle"
+        spots={[
+          [-30, -70],
+          [24, -76],
+          [52, -36],
+        ]}
+        r={8}
+        fill="#fff9db"
+      />
       <Notes x={-30} y={-80} texts={["Mmh!"]} colour="#ffd43b" size={22} />
     </g>
   );

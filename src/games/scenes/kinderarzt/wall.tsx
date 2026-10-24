@@ -43,7 +43,15 @@ export function Fenster() {
       ].map(({ d, origin }, i) => (
         <g key={i} className="ka-fenster-curtain" style={{ ...nth(i), transformOrigin: origin }}>
           <path d={d} fill="#ffc9de" />
-          <path d={i ? "M318 48 Q316 130 304 208" : "M122 48 Q124 130 136 208"} stroke="#fff" strokeWidth="4" strokeDasharray="3 10" strokeLinecap="round" fill="none" opacity="0.8" />
+          <path
+            d={i ? "M318 48 Q316 130 304 208" : "M122 48 Q124 130 136 208"}
+            stroke="#fff"
+            strokeWidth="4"
+            strokeDasharray="3 10"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.8"
+          />
         </g>
       ))}
       <rect x="100" y="34" width="240" height="9" rx="4" fill={STEEL} />
@@ -260,7 +268,10 @@ export function Sehtafel() {
             )}
             {kind === "car" && (
               <>
-                <path d={`M${x - r * 1.2} ${y + r * 0.5} V${y} L${x - r * 0.6} ${y - r * 0.7} H${x + r * 0.5} L${x + r * 1.2} ${y} V${y + r * 0.5} Z`} fill="#4dabf7" />
+                <path
+                  d={`M${x - r * 1.2} ${y + r * 0.5} V${y} L${x - r * 0.6} ${y - r * 0.7} H${x + r * 0.5} L${x + r * 1.2} ${y} V${y + r * 0.5} Z`}
+                  fill="#4dabf7"
+                />
                 <circle cx={x - r * 0.6} cy={y + r * 0.6} r={r * 0.32} fill={INK} />
                 <circle cx={x + r * 0.6} cy={y + r * 0.6} r={r * 0.32} fill={INK} />
               </>
@@ -312,7 +323,15 @@ export function Messlatte() {
         {spots.map(([x, y, r], i) => (
           <circle key={i} cx={x} cy={y} r={r} fill="#f08c00" opacity="0.8" />
         ))}
-        <path className="ka-giraffe-tail" d="M1186 284 Q1176 296 1180 310" stroke="#fcc419" strokeWidth="4" strokeLinecap="round" fill="none" style={{ transformOrigin: "1186px 284px" }} />
+        <path
+          className="ka-giraffe-tail"
+          d="M1186 284 Q1176 296 1180 310"
+          stroke="#fcc419"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+          style={{ transformOrigin: "1186px 284px" }}
+        />
       </g>
       <g className="ka-giraffe-head" style={{ transformOrigin: "1230px 96px" }}>
         <path d="M1222 46 V30 M1238 46 V30" stroke="#f08c00" strokeWidth="4" strokeLinecap="round" />

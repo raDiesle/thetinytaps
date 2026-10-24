@@ -32,13 +32,7 @@ export function Lion() {
       <g className="ll-lion-head" style={{ transformOrigin: "0px -200px" }}>
         <g className="ll-lion-mane" style={{ transformOrigin: "0px -250px" }}>
           {Array.from({ length: 14 }, (_, i) => (
-            <circle
-              key={i}
-              cx={96 * Math.cos((i * Math.PI) / 7)}
-              cy={-250 + 96 * Math.sin((i * Math.PI) / 7)}
-              r="36"
-              fill={i % 2 ? MANE : "#b5561a"}
-            />
+            <circle key={i} cx={96 * Math.cos((i * Math.PI) / 7)} cy={-250 + 96 * Math.sin((i * Math.PI) / 7)} r="36" fill={i % 2 ? MANE : "#b5561a"} />
           ))}
           <circle cx="0" cy="-250" r="100" fill={MANE} />
         </g>
@@ -57,7 +51,14 @@ export function Lion() {
           <Eye cx={27} cy={-264} r={9} />
         </g>
         <path className="ll-lion-brows" d="M-40 -284 q13 -8 26 0 M14 -284 q13 -8 26 0" stroke={BROWN} strokeWidth="5" fill="none" strokeLinecap="round" />
-        <path className="ll-lion-smile" d="M0 -222 V-212 M0 -212 Q-12 -202 -22 -210 M0 -212 Q12 -202 22 -210" stroke={BROWN} strokeWidth="4" fill="none" strokeLinecap="round" />
+        <path
+          className="ll-lion-smile"
+          d="M0 -222 V-212 M0 -212 Q-12 -202 -22 -210 M0 -212 Q12 -202 22 -210"
+          stroke={BROWN}
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+        />
         <g className="ll-lion-roar" style={{ transformOrigin: "0px -214px" }}>
           <ellipse cx="0" cy="-196" rx="30" ry="30" fill="#9d0208" />
           <path d="M-22 -218 l6 12 l6 -12 M10 -218 l6 12 l6 -12" fill="#fff" />
@@ -73,7 +74,15 @@ export function Lion() {
 export function Mouse() {
   return (
     <g className="ll-mouse-body" style={{ transformOrigin: "0px 0px" }}>
-      <path className="ll-mouse-tail" d="M28 -14 Q86 -4 84 -46 Q82 -74 104 -78" stroke={PINK} strokeWidth="6" fill="none" strokeLinecap="round" style={{ transformOrigin: "28px -14px" }} />
+      <path
+        className="ll-mouse-tail"
+        d="M28 -14 Q86 -4 84 -46 Q82 -74 104 -78"
+        stroke={PINK}
+        strokeWidth="6"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "28px -14px" }}
+      />
       <ellipse cx="0" cy="-44" rx="40" ry="46" fill={MOUSE} />
       <ellipse cx="0" cy="-38" rx="25" ry="32" fill="#ece8f2" />
       {[-1, 1].map((s) => (

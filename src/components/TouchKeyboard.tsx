@@ -71,15 +71,7 @@ export function TouchKeyboard({
 }
 
 /** The parents' option for the on-screen keys; not shown on computers without a touch screen. */
-export function TouchKeysSetting({
-  value,
-  onChange,
-  anyTouch = false,
-}: {
-  value: TouchKeysMode;
-  onChange: (mode: TouchKeysMode) => void;
-  anyTouch?: boolean;
-}) {
+export function TouchKeysSetting({ value, onChange, anyTouch = false }: { value: TouchKeysMode; onChange: (mode: TouchKeysMode) => void; anyTouch?: boolean }) {
   const device = useDevice();
   if (!device.hasTouch) return null;
   return (

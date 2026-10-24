@@ -6,19 +6,16 @@ export interface LevelProps {
   sound: (play: () => void) => void;
   /** Says a line, if speech is on. */
   say: (text: string) => void;
-  /** The level is finished: basket full, or everything has fallen over. */
+  /** The level is finished: the machine has run, or everything has fallen over. */
   onDone: () => void;
-  /** Kugelbahn: tapping one of the three spots swaps its part. */
-  rebuild: boolean;
 }
 
-/** The picture's size; both levels draw in these coordinates. */
+/** The picture's size; every level draws in these coordinates. */
 export const VIEW_W = 1600;
 export const VIEW_H = 900;
 
 /** A wobble that starts at `amp` and dies away, `age` seconds after a hit. */
-export const wobble = (age: number, amp: number, freq: number, damp: number) =>
-  age < 0 || age > 4 ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq);
+export const wobble = (age: number, amp: number, freq: number, damp: number) => (age < 0 || age > 4 ? 0 : amp * Math.exp(-age * damp) * Math.sin(age * freq));
 
 /**
  * Calls `step(dt, now)` on every animation frame and renders again after it.

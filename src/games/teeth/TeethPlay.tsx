@@ -1,34 +1,39 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { useDevice } from "@/lib/device";
-import { playChime, playCountNote, playPoof, playSqueak, playTuneNote } from "@/lib/sfx";
+import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
+import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
+import { useBrushingMusic } from "./music";
 import { Prep } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS } from "./steps";
+import { Week } from "./week";
 import "./teeth.css";
 
 const MONSTER_COLORS = ["#8bd346", "#b388ff", "#ff9f43", "#ff7bd0", "#4cc9f0"];
 const MONSTER_VARIANTS = 3;
 const TICK_MS = 200;
-const BEAT_MS = 280;
 const TICKLE_MS = 700;
 const TURN_MS = 1100;
 /** Opening or closing the mouth glides slower, so the child can do it along with the picture. */
 const MOUTH_MS = 1800;
 /** How long the arrows on the lips show after the mouth has to open or close. */
 const ACTION_MS = 3500;
+/** Dragging on the progress bar stops this far before the end. */
+const SEEK_END_MS = 1000;
 
 /** Before the clock starts: get the brush, toothpaste on, and meet the monsters. */
 type Prelude = "brush" | "paste" | "monsters";
 
-const PRELUDE: Record<Prelude, { ms: number; title: string; cue: string }> = {
+/** The monsters' cue depends on the time of day, see DAYTIME. */
+const PRELUDE: Record<Prelude, { ms: number; title: string; cue?: string }> = {
   brush: { ms: 7000, title: "🪥 Zahnbürste holen", cue: "Zuerst holen wir die Zahnbürste!" },
   paste: { ms: 8000, title: "🫧 Zahnpasta drauf", cue: "Jetzt ein kleiner Klecks Zahnpasta drauf." },
-  monsters: { ms: 4500, title: "😱 Zuckermonster!", cue: "Oh je, Zuckermonster! Komm, wir putzen sie alle weg!" },
+  monsters: { ms: 4500, title: "😱 Zuckermonster!" },
 };
 
 interface Monster {
@@ -117,20 +122,24 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
  * A brushing timer that needs no tapping: first it shows fetching the brush
  * and putting toothpaste on, then the mirror shows where to brush next
  * (chewing surfaces, outside, inside), and the sugar monsters there vanish
- * one by one. Arrow keys skip ahead or back, Space pauses.
+ * one by one. Arrow keys skip ahead or back, Space or the pause button pauses,
+ * and tapping the progress bar jumps there.
  */
 export function TeethPlay({ speechLang, settings }: { speechLang: string; settings: TeethSettings }) {
   const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now() }));
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
   const [tickled, setTickled] = useState<number | null>(null);
+  const [week, setWeek] = useState<WeekLog>(loadWeek);
   const { touchOnly } = useDevice();
   const { bursts, spawn } = useBursts();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
 
-  // A fresh set of monsters for every round.
+  // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
+  const daytime = useMemo(() => daytimeOf(settings.daytime), [settings.daytime, round]);
+  const preludeCue = (p: Prelude) => PRELUDE[p].cue ?? DAYTIME[daytime].monsters;
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
   const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
   const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
@@ -149,7 +158,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const isGone = (m: Monster) => brushed >= (m.step + (m.order + 1) / perStep[m.step] - 0.04) * stepMs;
   const goneCount = monsters.filter(isGone).length;
   const step = phase >= 0 && !done ? STEPS[phase] : null;
-  const cue = before ? PRELUDE[before].cue : step?.cue;
+  const cue = before ? preludeCue(before) : step?.cue;
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -166,25 +175,23 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
-  const brushing = step !== null && !paused;
-  useEffect(() => {
-    if (!brushing || !settings.music) return;
-    let beat = 0;
-    const timer = setInterval(() => playTuneNote(beat++), BEAT_MS);
-    return () => clearInterval(timer);
-  }, [brushing, settings.music, round]);
+  useBrushingMusic({ enabled: settings.music, playing: step !== null && !paused, finished: done, sync: clock, at: brushed });
 
   // What to say and play when a new part begins.
   useEffect(() => {
     if (before) {
       if (settings.sounds && part > 0) playChime();
-      say(PRELUDE[before].cue);
+      say(part === 0 ? `${DAYTIME[daytime].hello} ${preludeCue(before)}` : preludeCue(before));
     } else if (phase < STEPS.length) {
       if (settings.sounds) playChime();
       say(STEPS[phase].cue);
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
-      say("Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!");
+      say(`Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank! ${DAYTIME[daytime].after}`);
+      // A star on the week chart, whether or not it is shown, so it is complete when turned on.
+      const next = addBrushing(loadWeek(), new Date(), daytime);
+      saveWeek(next);
+      setWeek(next);
       for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 150);
     }
     // Only when the part changes, not when a setting does.
@@ -230,19 +237,33 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     // Only when pausing or going on.
   }, [paused]);
 
+  /** Move the clock to `at` ms after the start; a paused clock stays paused. */
+  const seek = useCallback((at: number) => {
+    const t = performance.now();
+    setNow(t);
+    setClock((c) => ({ banked: at, since: c.since === null ? null : t }));
+  }, []);
+
   /** Jump to the start of a part: the prelude ones first, then the steps, then the end. */
   const jumpTo = useCallback(
-    (target: number) => {
-      const t = performance.now();
-      const at =
+    (target: number) =>
+      seek(
         target < prelude.length
           ? prelude.slice(0, target).reduce((sum, p) => sum + PRELUDE[p].ms, 0)
-          : introMs + Math.min(target - prelude.length, STEPS.length) * stepMs;
-      setNow(t);
-      setClock((c) => ({ banked: at, since: c.since === null ? null : t }));
-    },
-    [prelude, introMs, stepMs],
+          : introMs + Math.min(target - prelude.length, STEPS.length) * stepMs,
+      ),
+    [seek, prelude, introMs, stepMs],
   );
+
+  /** Tapping or dragging on the progress bar jumps to that point of the brushing. */
+  const seekFromPointer = (e: PointerEvent<HTMLDivElement>) => {
+    const segments = [...e.currentTarget.children];
+    const i = segments.findIndex((s, k) => k === segments.length - 1 || e.clientX < s.getBoundingClientRect().right);
+    const rect = segments[i].getBoundingClientRect();
+    const k = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    // Stop just short of the end, so dragging to the right edge doesn't finish at once.
+    seek(introMs + Math.min((i + k) * stepMs, totalMs - SEEK_END_MS));
+  };
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -263,8 +284,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   // When the mouth has to open or close, the picture does it slowly and arrows on the lips show the way.
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
   const mouthMoves = step !== null && step.mouth !== mouthBefore;
-  const action: MouthAction | null =
-    step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
+  const action: MouthAction | null = step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
   const target = step?.view ?? GRIN_VIEW;
   const view = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
@@ -292,12 +312,15 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     }));
 
   return (
-    <div className={`teeth-play${done ? " done" : ""}${paused ? " paused" : ""}`}>
+    <div className={`teeth-play ${daytime}${done ? " done" : ""}${paused ? " paused" : ""}`}>
+      <span className="teeth-sky" aria-hidden>
+        {daytime === "morning" ? "☀️" : "🌙"}
+      </span>
       <p className="teeth-clock" aria-label="Restzeit">
         {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
       </p>
       <div className="teeth-heading" key={`${round}-${part}`}>
-        <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : "✨ Blitzeblank!"}</h2>
+        <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : DAYTIME[daytime].doneTitle}</h2>
         {before === "paste" && (
           <p className="teeth-mouth prep">
             👌 Erbsengroß
@@ -321,17 +344,16 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
       <div className="teeth-stage">
         {before === "brush" || before === "paste" ? (
-          <Prep key={round} part={before} />
+          <Prep key={round} part={before} daytime={daytime} />
         ) : (
           <Mouth
             key={round}
             view={view}
             zone={step && { surface: step.surface, teeth: step.teeth }}
             monsters={spots}
-            brush={
-              step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }
-            }
+            brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
             happy={done}
+            daytime={daytime}
             action={action}
             paused={paused}
             onTickle={tickle}
@@ -340,21 +362,47 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       </div>
 
       {done ? (
-        <button className="teeth-again" onClick={again}>
-          🔁 Nochmal
-        </button>
-      ) : (
-        <div className="teeth-progress" aria-hidden>
-          {STEPS.map((s, i) => (
-            <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
-              <span style={{ width: `${Math.max(0, Math.min(1, (brushed - i * stepMs) / stepMs)) * 100}%` }} />
-            </span>
-          ))}
+        <div className="teeth-end">
+          {settings.week && <Week log={week} today={new Date()} now={daytime} />}
+          <button type="button" className="teeth-again" onClick={again}>
+            🔁 Nochmal
+          </button>
         </div>
+      ) : (
+        <>
+          {/* The week shows before brushing too, which star is to come; while brushing, the mouth gets its room. */}
+          {before && settings.week && <Week log={week} today={new Date()} now={daytime} />}
+          <div className="teeth-controls">
+            <button type="button" className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>
+              {paused ? "▶️" : "⏸️"}
+            </button>
+            <div
+              className="teeth-progress"
+              role="slider"
+              aria-label="Fortschritt"
+              aria-valuemin={0}
+              aria-valuemax={Math.round(totalMs / 1000)}
+              aria-valuenow={Math.round(Math.max(0, Math.min(brushed, totalMs)) / 1000)}
+              onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture(e.pointerId);
+                seekFromPointer(e);
+              }}
+              onPointerMove={(e) => {
+                if (e.currentTarget.hasPointerCapture(e.pointerId)) seekFromPointer(e);
+              }}
+            >
+              {STEPS.map((s, i) => (
+                <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
+                  <span style={{ width: `${Math.max(0, Math.min(1, (brushed - i * stepMs) / stepMs)) * 100}%` }} />
+                </span>
+              ))}
+            </div>
+          </div>
+        </>
       )}
 
       {paused && (
-        <button className="teeth-paused" onClick={togglePause}>
+        <button type="button" className="teeth-paused" onClick={togglePause}>
           <span className="teeth-paused-icon" aria-hidden>
             ⏸️
           </span>

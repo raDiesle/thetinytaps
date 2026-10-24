@@ -44,8 +44,8 @@ export function Carrot() {
 export function Plank() {
   return (
     <g>
-      <rect x="-110" y="-26" width="220" height="26" rx="6" fill="#d9a066" stroke="#8d5a3b" strokeWidth="4" />
-      <path d="M-90 -15 Q-40 -20 0 -14 T80 -15" stroke="#b07b47" strokeWidth="3" fill="none" />
+      <rect x="-110" y="-26" width="220" height="26" rx="6" fill="#ffe3a3" stroke={INK} strokeWidth="5" />
+      <path d="M-90 -15 Q-40 -20 0 -14 T80 -15" stroke="#d9a066" strokeWidth="3" fill="none" />
       <circle cx="-96" cy="-13" r="3.5" fill={INK} />
       <circle cx="96" cy="-13" r="3.5" fill={INK} />
     </g>

@@ -125,7 +125,7 @@
 }
 
 /* Phones upright: two per row, so they stay big enough for a finger. */
-@media (max-aspect-ratio: 4/5) {
+@media (max-aspect-ratio: 4 / 5) {
   .sh-options {
     --cols: min(var(--n), 2);
   }
@@ -150,7 +150,7 @@
 }
 
 /* Phones upright: two rows of shadows have to fit into the meadow. */
-@media (max-aspect-ratio: 4/5) {
+@media (max-aspect-ratio: 4 / 5) {
   .sh-option {
     --size: min(18vh, calc((100vw - 32px - (var(--cols) - 1) * var(--gap)) / var(--cols)), 220px);
   }

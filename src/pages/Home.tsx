@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
-import { KID_HOME } from "@/components/GameShell";
 import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
@@ -49,12 +48,6 @@ export function Home() {
           </li>
         ))}
       </ul>
-      <Link to={KID_HOME} className="kid-home-link">
-        <span aria-hidden>🧸</span>
-        <span>
-          <strong>Kinder-Startseite</strong> – nur große Bilder im Vollbild, das Kind wählt selbst
-        </span>
-      </Link>
       <InstallHint />
     </main>
   );

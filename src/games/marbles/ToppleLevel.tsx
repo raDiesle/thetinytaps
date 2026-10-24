@@ -3,7 +3,7 @@ import { playDrum, playKnock } from "@/lib/sfx";
 import { useAnyKey, useFrames, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { cameraOn } from "./machineKit";
 import { pickThings, type Thing } from "./things";
-import type { Pt } from "./track";
+import type { Pt } from "./path";
 
 const INK = "#2a1e5c";
 const FLOOR = 790;
@@ -126,13 +126,14 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
 
   // Tock, tock, tock: each one on the first screen lands after dropping in; then the row is ready.
   useEffect(() => {
-    const timers = things
-      .slice(0, onFirstScreen)
-      .map((t, i) => setTimeout(() => sound(() => playKnock(1100 - t.h)), i * DROP_STAGGER_MS + DROP_MS * 0.7));
+    const timers = things.slice(0, onFirstScreen).map((t, i) => setTimeout(() => sound(() => playKnock(1100 - t.h)), i * DROP_STAGGER_MS + DROP_MS * 0.7));
     timers.push(
-      setTimeout(() => {
-        phase.current = "ready";
-      }, onFirstScreen * DROP_STAGGER_MS + DROP_MS),
+      setTimeout(
+        () => {
+          phase.current = "ready";
+        },
+        onFirstScreen * DROP_STAGGER_MS + DROP_MS,
+      ),
     );
     return () => timers.forEach(clearTimeout);
   }, [things, onFirstScreen, sound]);

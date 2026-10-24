@@ -12,7 +12,6 @@ import { MachineLevel } from "./MachineLevel";
 import type { MarbleLevel, MarbleSettings } from "./settings";
 import { SpaceLevel } from "./SpaceLevel";
 import { ToppleLevel } from "./ToppleLevel";
-import { TrackLevel } from "./TrackLevel";
 import "./marbles.css";
 
 const LEVELS: { id: MarbleLevel; emoji: string; name: string; intro: string; Level: ComponentType<LevelProps> }[] = [
@@ -22,7 +21,6 @@ const LEVELS: { id: MarbleLevel; emoji: string; name: string; intro: string; Lev
   { id: "topple", emoji: "📚", name: "Alles fällt um", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
   { id: "building", emoji: "🚧", name: "Baustelle", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
   { id: "circus", emoji: "🎪", name: "Zirkus", intro: "Tipp! Manege frei!", Level: CircusLevel },
-  { id: "track", emoji: "🎢", name: "Kugelbahn", intro: "Tipp! Dann rollen die Kugeln.", Level: TrackLevel },
   { id: "space", emoji: "🚀", name: "Raketenstart", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
 ];
 
@@ -38,8 +36,8 @@ const PARTY_MS = 3200;
 
 /**
  * "Kettenreaktion": one tap, and one thing sets off the next – the Rube
- * Goldberg machines, the long row of things that fall over and the marble
- * run, one level after the other (or only one of them, as the grown-up chose).
+ * Goldberg machines and the long row of things that fall over, one level
+ * after the other (or only one of them, as the grown-up chose).
  * After each level the child plays it again or goes on.
  */
 export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings; speechLang: string }) {
@@ -106,7 +104,7 @@ export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings;
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
-      <level.Level key={round} sound={sound} say={say} onDone={onDone} rebuild={settings.rebuild} />
+      <level.Level key={round} sound={sound} say={say} onDone={onDone} />
       {ended && <GameEnd onAgain={again} next={next ? { emoji: next.emoji, name: next.name, onNext: goOn } : undefined} />}
       <BurstLayer bursts={bursts} />
     </div>

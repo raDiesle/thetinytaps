@@ -20,7 +20,10 @@ function Head({ x, y, hat, trim, r = 17 }: { x: number; y: number; hat: string; 
         r={2.6 * s}
         fill={SKIN}
       />
-      <path d={`M${x - r - 1} ${y - 4 * s} Q${x - r - 2} ${y - 24 * s} ${x} ${y - 24 * s} Q${x + r + 2} ${y - 24 * s} ${x + r + 1} ${y - 4 * s} Z`} fill={hat} />
+      <path
+        d={`M${x - r - 1} ${y - 4 * s} Q${x - r - 2} ${y - 24 * s} ${x} ${y - 24 * s} Q${x + r + 2} ${y - 24 * s} ${x + r + 1} ${y - 4 * s} Z`}
+        fill={hat}
+      />
       <rect x={x - r - 2} y={y - 8 * s} width={2 * r + 4} height={7 * s} rx={3.5 * s} fill={trim} />
       <circle className="wi-bobble" cx={x} cy={y - 28 * s} r={6 * s} fill="#fff" />
     </>
@@ -123,7 +126,11 @@ export function Schneeengel() {
           [92, -110],
           [0, -136],
         ].map(([x, y], i) => (
-          <path key={x} d={`M${x} ${y - 10} L${x + 3} ${y} L${x} ${y + 10} L${x - 3} ${y} Z M${x - 10} ${y} L${x} ${y + 3} L${x + 10} ${y} L${x} ${y - 3} Z`} style={nth(i)} />
+          <path
+            key={x}
+            d={`M${x} ${y - 10} L${x + 3} ${y} L${x} ${y + 10} L${x - 3} ${y} Z M${x - 10} ${y} L${x} ${y + 3} L${x + 10} ${y} L${x} ${y - 3} Z`}
+            style={nth(i)}
+          />
         ))}
       </g>
     </>

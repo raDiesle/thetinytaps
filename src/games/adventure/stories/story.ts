@@ -16,8 +16,8 @@ export interface StepLines {
   instruction: string;
   /** When the child joins in, after the guide showed it once. */
   turn?: string;
-  /** Halfway through, to keep going. */
-  again: string;
+  /** Halfway through, to keep going; left out where `more` says it all. */
+  again?: string;
   /** More lines during the movement, `at` seconds after the child joined in. */
   more?: { at: number; text: string }[];
   /** At the end. */

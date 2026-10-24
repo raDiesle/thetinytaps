@@ -83,10 +83,7 @@ export function Maedchen() {
         <g className="he-maedchen-umbrella" style={{ transformOrigin: "26px -92px" }}>
           <path d="M24 -88 V-196" stroke={INK} strokeWidth="3.5" strokeLinecap="round" />
           <path d="M24 -88 q0 8 -8 8 q-6 0 -6 -6" stroke={INK} strokeWidth="3.5" strokeLinecap="round" fill="none" />
-          <path
-            d="M-41 -186 Q24 -256 89 -186 q-11 -8 -22 0 q-11 -8 -21 0 q-11 -8 -22 0 q-11 -8 -22 0 q-11 -8 -21 0 q-11 -8 -21 0 Z"
-            fill="#4dabf7"
-          />
+          <path d="M-41 -186 Q24 -256 89 -186 q-11 -8 -22 0 q-11 -8 -21 0 q-11 -8 -22 0 q-11 -8 -22 0 q-11 -8 -21 0 q-11 -8 -21 0 Z" fill="#4dabf7" />
           <path d="M24 -232 Q4 -214 2 -186 M24 -232 Q44 -214 46 -186" stroke="#339af0" strokeWidth="3" fill="none" />
           <path d="M-20 -200 Q0 -230 20 -232" stroke="#fff" strokeOpacity="0.55" strokeWidth="5" strokeLinecap="round" fill="none" />
           <circle cx="24" cy="-234" r="4" fill={INK} />
@@ -142,7 +139,14 @@ export function Laternenkind() {
         <rect x="66" y="-142" width="28" height="7" rx="3" fill="#e63946" />
         <rect x="66" y="-85" width="28" height="7" rx="3" fill="#e63946" />
       </g>
-      <Notes className="he-laterne-note" spots={[[-40, -150], [-24, -172], [-4, -186]]} />
+      <Notes
+        className="he-laterne-note"
+        spots={[
+          [-40, -150],
+          [-24, -172],
+          [-4, -186],
+        ]}
+      />
     </>
   );
 }
@@ -231,15 +235,36 @@ export function Oma() {
         <path d="M-50 -94 h22 M-50 -84 h22 M-50 -74 h22" stroke="#fff" strokeWidth="3" />
       </g>
       <path d="M-72 -120 L-46 -104 M-18 -120 L-34 -104" stroke="#b5838d" strokeWidth="12" strokeLinecap="round" />
-      <path className="he-oma-needle" d="M-56 -122 L-26 -98" stroke="#adb5bd" strokeWidth="3.5" strokeLinecap="round" style={{ transformOrigin: "-42px -106px" }} />
-      <path className="he-oma-needle" d="M-26 -122 L-54 -98" stroke="#adb5bd" strokeWidth="3.5" strokeLinecap="round" style={{ transformOrigin: "-40px -108px", ...nth(1) }} />
+      <path
+        className="he-oma-needle"
+        d="M-56 -122 L-26 -98"
+        stroke="#adb5bd"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        style={{ transformOrigin: "-42px -106px" }}
+      />
+      <path
+        className="he-oma-needle"
+        d="M-26 -122 L-54 -98"
+        stroke="#adb5bd"
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        style={{ transformOrigin: "-40px -108px", ...nth(1) }}
+      />
       <circle cx="-46" cy="-104" r="7" fill={SKIN} />
       <circle cx="-34" cy="-104" r="7" fill={SKIN} />
       {/* A basket of wool next to the bench */}
       <path d="M-128 0 h40 l4 -26 h-48 Z" fill="#c68b59" />
       <circle cx="-116" cy="-30" r="9" fill="#4dabf7" />
       <circle cx="-98" cy="-30" r="9" fill="#ffd60a" />
-      <Notes className="he-oma-note" spots={[[-86, -196], [-70, -214], [-48, -222]]} />
+      <Notes
+        className="he-oma-note"
+        spots={[
+          [-86, -196],
+          [-70, -214],
+          [-48, -222],
+        ]}
+      />
     </>
   );
 }

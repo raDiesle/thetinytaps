@@ -116,7 +116,12 @@ export function Vogelnest() {
           <circle cx={x - 4} cy={-325} r="2" fill={EYE} />
           <circle cx={x + 4} cy={-325} r="2" fill={EYE} />
           <path d={`M${x - 5} ${-320} L${x} ${-326} L${x + 5} ${-320} Z`} fill="#ffb703" />
-          <path className="wd-nest-beak" d={`M${x - 5} ${-320} L${x} ${-312} L${x + 5} ${-320} Z`} fill="#f77f00" style={{ transformOrigin: `${x}px ${-320}px` }} />
+          <path
+            className="wd-nest-beak"
+            d={`M${x - 5} ${-320} L${x} ${-312} L${x + 5} ${-320} Z`}
+            fill="#f77f00"
+            style={{ transformOrigin: `${x}px ${-320}px` }}
+          />
         </g>
       ))}
       <path d="M-40 -318 Q0 -278 40 -318 Q0 -308 -40 -318 Z" fill="#9c6644" />

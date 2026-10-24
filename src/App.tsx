@@ -16,10 +16,10 @@ const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage");
 const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage");
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage");
 const IdeasPage = page(() => import("@/pages/IdeasPage"), "IdeasPage");
-const KidHome = page(() => import("@/pages/KidHome"), "KidHome");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage");
 const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
+const MarbleRunPage = page(() => import("@/pages/MarbleRunPage"), "MarbleRunPage");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
@@ -42,13 +42,12 @@ export function App() {
         <Route path="schatten" element={<ShadowsPage />} />
         <Route path="laut-leise" element={<LoudPage />} />
         <Route path="kettenreaktion" element={<MarblePage />} />
-        {/* Its old name and address, for bookmarks and the home screen. */}
-        <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
+        {/* Kettenreaktion's old address; the marble run is a game of its own there now. */}
+        <Route path="kugelbahn" element={<MarbleRunPage />} />
         <Route path="kleine-abenteuer" element={<ElevatorPage />} />
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="aufzug" element={<Navigate to="/kleine-abenteuer/" replace />} />
         <Route path="abenteuer" element={<AdventurePage />} />
-        <Route path="kinder" element={<KidHome />} />
         <Route path="ideen" element={<IdeasPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

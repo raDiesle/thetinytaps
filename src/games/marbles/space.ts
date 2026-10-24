@@ -25,25 +25,8 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import { wobble } from "./level";
-import {
-  along,
-  cameraOn,
-  distAt,
-  easeIn,
-  easeInOut,
-  easeOut,
-  GRAVITY,
-  lerp,
-  pathOf,
-  rad,
-  roll,
-  rounded,
-  seg,
-  STEP,
-  timeline,
-  timeWhen,
-} from "./machineKit";
-import { arc, BALL_R, line, quad, type Pt } from "./track";
+import { along, cameraOn, distAt, easeIn, easeInOut, easeOut, GRAVITY, lerp, pathOf, rad, roll, rounded, seg, STEP, timeline, timeWhen } from "./machineKit";
+import { arc, BALL_R, line, quad, type Pt } from "./path";
 
 export const WORLD_W = 6000;
 export const FLOOR = 800;
@@ -325,7 +308,8 @@ export function buildSpace() {
   /** How far the rocket has risen. */
   const rocketRise = (t: number) => 1400 * easeIn(seg(t, tLift, tLift + 2.6));
   /** How big the flame is: a small flicker once the engine lights, full size once it lifts off. */
-  const flameAt = (t: number) => (t < tIgnite ? 0 : t < tLift ? 0.35 * easeOut(seg(t, tIgnite, tIgnite + 0.4)) : lerp(0.35, 1, easeOut(seg(t, tLift, tLift + 0.4))));
+  const flameAt = (t: number) =>
+    t < tIgnite ? 0 : t < tLift ? 0.35 * easeOut(seg(t, tIgnite, tIgnite + 0.4)) : lerp(0.35, 1, easeOut(seg(t, tLift, tLift + 0.4)));
 
   /** Where the camera looks: the thing that moves right now. */
   const focusX = (t: number) => {

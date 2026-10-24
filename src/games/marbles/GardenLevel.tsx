@@ -39,8 +39,8 @@ import {
 import { beside, deg, seg, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
-import { BALL_R, type Pt } from "./track";
-import { BAR_COLORS, Ball } from "./TrackLevel";
+import { BALL_R, type Pt } from "./path";
+import { BAR_COLORS, Ball } from "./parts";
 
 const LAWN = "#7fd34e";
 const LEAF = "#4caf50";
@@ -183,7 +183,16 @@ function Fence() {
       ))}
       {Array.from({ length: n }, (_, i) => {
         const x = -400 + i * 46;
-        return <path key={i} d={`M${x} ${FLOOR} L${x} ${FENCE_TOP + 14} L${x + 17} ${FENCE_TOP} L${x + 34} ${FENCE_TOP + 14} L${x + 34} ${FLOOR} Z`} fill="#fffaf0" stroke={INK} strokeWidth="3" strokeLinejoin="round" />;
+        return (
+          <path
+            key={i}
+            d={`M${x} ${FLOOR} L${x} ${FENCE_TOP + 14} L${x + 17} ${FENCE_TOP} L${x + 34} ${FENCE_TOP + 14} L${x + 34} ${FLOOR} Z`}
+            fill="#fffaf0"
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+        );
       })}
     </g>
   );
@@ -235,7 +244,17 @@ function OldTree() {
       <path d={svgLine(branch)} fill="none" stroke={INK} strokeWidth="18" strokeLinecap="round" strokeLinejoin="round" />
       <path d={svgLine(branch)} fill="none" stroke={BARK} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
       {[300, 520, 700, 860].map((x, i) => (
-        <ellipse key={x} cx={x} cy={branchY(x) - 12} rx="30" ry="14" transform={`rotate(${i % 2 ? 20 : -20} ${x} ${branchY(x) - 12})`} fill={LEAF_LIGHT} stroke={INK} strokeWidth="3" />
+        <ellipse
+          key={x}
+          cx={x}
+          cy={branchY(x) - 12}
+          rx="30"
+          ry="14"
+          transform={`rotate(${i % 2 ? 20 : -20} ${x} ${branchY(x) - 12})`}
+          fill={LEAF_LIGHT}
+          stroke={INK}
+          strokeWidth="3"
+        />
       ))}
       {[
         [40, -20, 160],
@@ -259,7 +278,16 @@ function Chimes({ garden, t }: { garden: Garden; t: number }) {
         return (
           <g key={c.x} transform={`rotate(${swing} ${c.x} ${top})`}>
             <line x1={c.x} y1={top} x2={c.x} y2={c.top} stroke={INK} strokeWidth="3" />
-            <rect x={c.x - 10} y={c.top} width="20" height={c.bottom - c.top} rx="6" fill={BAR_COLORS[(i * 2 + 1) % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
+            <rect
+              x={c.x - 10}
+              y={c.top}
+              width="20"
+              height={c.bottom - c.top}
+              rx="6"
+              fill={BAR_COLORS[(i * 2 + 1) % BAR_COLORS.length]}
+              stroke={INK}
+              strokeWidth="3"
+            />
             <line x1={c.x - 3} y1={c.top + 8} x2={c.x - 3} y2={c.bottom - 10} stroke="#fff9" strokeWidth="4" strokeLinecap="round" />
           </g>
         );
@@ -315,7 +343,15 @@ function GutterFront() {
   return (
     <g>
       <path d={gutterBand(GUTTER_X0, GUTTER.to.x, 8, BALL_R + 12)} fill={ZINC} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <line x1={GUTTER_X0 + 20} y1={gutterY(GUTTER_X0 + 20) + 15} x2={GUTTER.to.x - 30} y2={gutterY(GUTTER.to.x - 30) + 15} stroke="#fffb" strokeWidth="4" strokeLinecap="round" />
+      <line
+        x1={GUTTER_X0 + 20}
+        y1={gutterY(GUTTER_X0 + 20) + 15}
+        x2={GUTTER.to.x - 30}
+        y2={gutterY(GUTTER.to.x - 30) + 15}
+        stroke="#fffb"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
       <rect x={GUTTER_X0 - 6} y={gutterY(GUTTER_X0) - 12} width="12" height={BALL_R + 26} rx="4" fill={ZINC} stroke={INK} strokeWidth="3" />
     </g>
   );
@@ -330,7 +366,13 @@ function Downpipe() {
       <path d={d} fill="none" stroke={INK} strokeWidth="62" />
       <path d={d} fill="none" stroke={ZINC} strokeWidth="54" />
       <rect x={CUP.x - 33} y={to.y + 34} width="66" height="12" rx="4" fill="#a9b6ca" stroke={INK} strokeWidth="3" />
-      <path d={`M${to.x - 6} ${to.y - 18} Q${CUP.x - 14} ${to.y - 12} ${CUP.x - 16} ${to.y + 24}`} fill="none" stroke="#fffb" strokeWidth="5" strokeLinecap="round" />
+      <path
+        d={`M${to.x - 6} ${to.y - 18} Q${CUP.x - 14} ${to.y - 12} ${CUP.x - 16} ${to.y + 24}`}
+        fill="none"
+        stroke="#fffb"
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
     </g>
   );
 }
@@ -343,8 +385,22 @@ function CanStick() {
   return (
     <g>
       <rect x={x - 9} y={y} width="18" height={TERRACE.y - y} rx="5" fill={MID_WOOD} stroke={INK} strokeWidth="3" />
-      <path d={`M${x - 22} ${y - 14} L${x} ${y + 40} L${x + 22} ${y - 14}`} fill="none" stroke={INK} strokeWidth="11" strokeLinecap="round" strokeLinejoin="round" />
-      <path d={`M${x - 22} ${y - 14} L${x} ${y + 40} L${x + 22} ${y - 14}`} fill="none" stroke={MID_WOOD} strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d={`M${x - 22} ${y - 14} L${x} ${y + 40} L${x + 22} ${y - 14}`}
+        fill="none"
+        stroke={INK}
+        strokeWidth="11"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${x - 22} ${y - 14} L${x} ${y + 40} L${x + 22} ${y - 14}`}
+        fill="none"
+        stroke={MID_WOOD}
+        strokeWidth="5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </g>
   );
 }
@@ -370,7 +426,13 @@ function WateringCan({ tilt }: { tilt: number }) {
         <path d="M-50 -36 L-50 -4" stroke="#fff9" strokeWidth="8" strokeLinecap="round" />
         <ellipse cx="-24" cy="-55" rx="28" ry="7" fill="#b8344a" stroke={INK} strokeWidth="3" />
         {/* The tin cup the marble drops into */}
-        <path d={`M${CAN_CUP.x - 32} ${CAN_CUP.y} L${CAN_CUP.x + 32} ${CAN_CUP.y} L${CAN_CUP.x + 24} -55 L${CAN_CUP.x - 24} -55 Z`} fill="#ffd23f" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path
+          d={`M${CAN_CUP.x - 32} ${CAN_CUP.y} L${CAN_CUP.x + 32} ${CAN_CUP.y} L${CAN_CUP.x + 24} -55 L${CAN_CUP.x - 24} -55 Z`}
+          fill="#ffd23f"
+          stroke={INK}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
         <line x1={CAN_CUP.x - 20} y1={CAN_CUP.y + 6} x2={CAN_CUP.x - 16} y2="-60" stroke="#fffa" strokeWidth="4" strokeLinecap="round" />
       </g>
       <circle cx={CAN.pivot.x} cy={CAN.pivot.y} r="8" fill={INK} />
@@ -392,7 +454,9 @@ function Pour({ garden, t }: { garden: Garden; t: number }) {
       {garden.splashing(t) &&
         [-1, 1].map((side) => {
           const k = (t * 3) % 1;
-          return <circle key={side} cx={x + side * 26 * k} cy={y - 18 * Math.sin(k * Math.PI)} r={6 * (1 - k) + 2} fill={WATER} stroke="#1e6fb8" strokeWidth="2" />;
+          return (
+            <circle key={side} cx={x + side * 26 * k} cy={y - 18 * Math.sin(k * Math.PI)} r={6 * (1 - k) + 2} fill={WATER} stroke="#1e6fb8" strokeWidth="2" />
+          );
         })}
     </g>
   );
@@ -495,7 +559,13 @@ function AppleTree({ sway }: { sway: number }) {
         strokeWidth="4"
         strokeLinejoin="round"
       />
-      <path d={`M${x - 6} ${FLOOR - 60} q8 -30 0 -60 M${x + 8} ${crownY + 60} q-8 -30 0 -50`} fill="none" stroke="#7a4a26" strokeWidth="4" strokeLinecap="round" />
+      <path
+        d={`M${x - 6} ${FLOOR - 60} q8 -30 0 -60 M${x + 8} ${crownY + 60} q-8 -30 0 -50`}
+        fill="none"
+        stroke="#7a4a26"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
       {/* The low branch */}
       <path
         d={`M${x} ${LOW_BRANCH.y + 6} L${LOW_BRANCH.x0 + 30} ${LOW_BRANCH.y} Q${LOW_BRANCH.x0} ${LOW_BRANCH.y} ${LOW_BRANCH.x0 - 16} ${LOW_BRANCH.y - 24}`}
@@ -550,7 +620,17 @@ function FallingLeaves({ age }: { age: number }) {
         const fall = Math.min(FLOOR - 8 - y0, 70 * age);
         const sway = 26 * Math.sin(age * 4 + i * 2);
         return (
-          <ellipse key={i} cx={x0 + sway} cy={y0 + fall} rx="14" ry="7" transform={`rotate(${sway} ${x0 + sway} ${y0 + fall})`} fill={LEAF_LIGHT} stroke={INK} strokeWidth="2.5" />
+          <ellipse
+            key={i}
+            cx={x0 + sway}
+            cy={y0 + fall}
+            rx="14"
+            ry="7"
+            transform={`rotate(${sway} ${x0 + sway} ${y0 + fall})`}
+            fill={LEAF_LIGHT}
+            stroke={INK}
+            strokeWidth="2.5"
+          />
         );
       })}
     </g>
@@ -564,7 +644,12 @@ function Apple({ at, spin, hanging, sway }: { at: Pt; spin: number; hanging: boo
     <g transform={`translate(${at.x} ${at.y})`}>
       <g transform={`rotate(${hanging ? sway : deg(spin)})`}>
         {hanging && <line x1="0" y1={-r} x2="0" y2={-r - 12} stroke={INK} strokeWidth="4" strokeLinecap="round" />}
-        <path d={`M0 ${-r + 6} C${r} ${-r - 8} ${r + 6} ${r} 0 ${r} C${-r - 6} ${r} ${-r} ${-r - 8} 0 ${-r + 6} Z`} fill="#ff3b3b" stroke={INK} strokeWidth="3" />
+        <path
+          d={`M0 ${-r + 6} C${r} ${-r - 8} ${r + 6} ${r} 0 ${r} C${-r - 6} ${r} ${-r} ${-r - 8} 0 ${-r + 6} Z`}
+          fill="#ff3b3b"
+          stroke={INK}
+          strokeWidth="3"
+        />
         <path d={`M0 ${-r + 6} q-2 -10 4 -14`} fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" />
         <ellipse cx="8" cy={-r - 4} rx="8" ry="4" fill={LEAF_LIGHT} stroke={INK} strokeWidth="2" transform={`rotate(-20 8 ${-r - 4})`} />
       </g>
@@ -583,7 +668,8 @@ function Slide() {
   return (
     <g>
       {[SLIDE.bottom.x - 60, end.x - 16].map((x) => {
-        const y = x < SLIDE.bottom.x ? SLIDE.top.y + ((x - SLIDE.top.x) * (SLIDE.bottom.y - SLIDE.top.y)) / (SLIDE.bottom.x - SLIDE.top.x) + APPLE.r + 10 : end.y + 4;
+        const y =
+          x < SLIDE.bottom.x ? SLIDE.top.y + ((x - SLIDE.top.x) * (SLIDE.bottom.y - SLIDE.top.y)) / (SLIDE.bottom.x - SLIDE.top.x) + APPLE.r + 10 : end.y + 4;
         return <rect key={x} x={x - 6} y={y} width="12" height={FLOOR - y} rx="3" fill="#ff5d73" stroke={INK} strokeWidth="2.5" />;
       })}
       {[SLIDE.top.x - 62, SLIDE.top.x - 18].map((x) => (
@@ -593,7 +679,13 @@ function Slide() {
         <rect key={i} x={SLIDE.top.x - 62} y={topY + 18 + i * 24} width="44" height="8" rx="3" fill="#ff8c42" stroke={INK} strokeWidth="2" />
       ))}
       <rect x={SLIDE.top.x - 72} y={topY - 6} width="82" height="14" rx="5" fill="#ff8c42" stroke={INK} strokeWidth="3" />
-      <path d={`M${SLIDE.top.x - 62} ${topY - 50} Q${SLIDE.top.x - 40} ${topY - 74} ${SLIDE.top.x - 18} ${topY - 50}`} fill="none" stroke="#ff5d73" strokeWidth="8" strokeLinecap="round" />
+      <path
+        d={`M${SLIDE.top.x - 62} ${topY - 50} Q${SLIDE.top.x - 40} ${topY - 74} ${SLIDE.top.x - 18} ${topY - 50}`}
+        fill="none"
+        stroke="#ff5d73"
+        strokeWidth="8"
+        strokeLinecap="round"
+      />
       <path d={svgLine(chute)} fill="none" stroke={INK} strokeWidth="20" strokeLinecap="round" strokeLinejoin="round" />
       <path d={svgLine(chute)} fill="none" stroke="#ffb703" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round" />
       <path d={svgLine(beside(SLIDE_LINE.slice(2, -12), APPLE.r + 4))} fill="none" stroke="#fff8" strokeWidth="3" strokeLinecap="round" />
@@ -649,7 +741,13 @@ function Shed() {
       {Array.from({ length: Math.floor((x1 - x0) / 34) }, (_, i) => (
         <line key={i} x1={x0 + 34 * (i + 1)} y1={wallTop} x2={x0 + 34 * (i + 1)} y2={FLOOR} stroke="#a85f35" strokeWidth="3" />
       ))}
-      <path d={`M${x0 - 34} ${wallTop + 12} L${x0 + 50} ${roofTop} L${x1 - 50} ${roofTop} L${x1 + 34} ${wallTop + 12} Z`} fill="#8e3b46" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x0 - 34} ${wallTop + 12} L${x0 + 50} ${roofTop} L${x1 - 50} ${roofTop} L${x1 + 34} ${wallTop + 12} Z`}
+        fill="#8e3b46"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <rect x="3745" y="600" width="104" height={FLOOR - 600} rx="6" fill="#a5643a" stroke={INK} strokeWidth="4" />
       <path d="M3797 640 c-12 -14 -28 0 0 22 c28 -22 12 -36 0 -22 Z" fill="#ff7bd0" stroke={INK} strokeWidth="2.5" />
       <circle cx="3832" cy="710" r="6" fill="#ffd23f" stroke={INK} strokeWidth="2" />
@@ -739,11 +837,23 @@ function FlowerBed() {
   const { x0, x1 } = BED;
   return (
     <g>
-      <path d={`M${x0} ${FLOOR + 2} Q${x0 + 10} ${FLOOR - 20} ${x0 + 50} ${FLOOR - 20} L${x1 - 50} ${FLOOR - 20} Q${x1 - 10} ${FLOOR - 20} ${x1} ${FLOOR + 2} Z`} fill="#8a5a2b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d={`M${x0} ${FLOOR + 2} Q${x0 + 10} ${FLOOR - 20} ${x0 + 50} ${FLOOR - 20} L${x1 - 50} ${FLOOR - 20} Q${x1 - 10} ${FLOOR - 20} ${x1} ${FLOOR + 2} Z`}
+        fill="#8a5a2b"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       {[4320, 4580, 4660, 4730].map((x, i) => (
         <g key={x}>
           <line x1={x} y1={FLOOR - 18} x2={x} y2={FLOOR - 70 - (i % 2) * 14} stroke="#3e9a2e" strokeWidth="5" />
-          <path d={`M${x - 12} ${FLOOR - 76 - (i % 2) * 14} l4 -22 l8 10 l8 -10 l4 22 Q${x} ${FLOOR - 60 - (i % 2) * 14} ${x - 12} ${FLOOR - 76 - (i % 2) * 14} Z`} fill={["#ff5d73", "#ff7bd0", "#8e7dff", "#ff8c42"][i]} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+          <path
+            d={`M${x - 12} ${FLOOR - 76 - (i % 2) * 14} l4 -22 l8 10 l8 -10 l4 22 Q${x} ${FLOOR - 60 - (i % 2) * 14} ${x - 12} ${FLOOR - 76 - (i % 2) * 14} Z`}
+            fill={["#ff5d73", "#ff7bd0", "#8e7dff", "#ff8c42"][i]}
+            stroke={INK}
+            strokeWidth="2.5"
+            strokeLinejoin="round"
+          />
         </g>
       ))}
     </g>
@@ -762,8 +872,20 @@ function Sunflower({ garden, t }: { garden: Garden; t: number }) {
   const sway = bloom > 0 ? 3 * Math.sin((t - garden.tBloom) * 1.8) : 0;
   return (
     <g>
-      <path d={`M${SUN.x} ${soil} Q${SUN.x + 22 * (h / full)} ${soil - h / 2} ${top.x} ${top.y}`} fill="none" stroke={INK} strokeWidth="15" strokeLinecap="round" />
-      <path d={`M${SUN.x} ${soil} Q${SUN.x + 22 * (h / full)} ${soil - h / 2} ${top.x} ${top.y}`} fill="none" stroke="#3ec300" strokeWidth="9" strokeLinecap="round" />
+      <path
+        d={`M${SUN.x} ${soil} Q${SUN.x + 22 * (h / full)} ${soil - h / 2} ${top.x} ${top.y}`}
+        fill="none"
+        stroke={INK}
+        strokeWidth="15"
+        strokeLinecap="round"
+      />
+      <path
+        d={`M${SUN.x} ${soil} Q${SUN.x + 22 * (h / full)} ${soil - h / 2} ${top.x} ${top.y}`}
+        fill="none"
+        stroke="#3ec300"
+        strokeWidth="9"
+        strokeLinecap="round"
+      />
       {[0.22, 0.45, 0.68].map((f, i) => {
         const s = Math.min(1, Math.max(0, (h - f * full) / 50));
         if (s <= 0) return null;
@@ -771,11 +893,33 @@ function Sunflower({ garden, t }: { garden: Garden; t: number }) {
         const x = stemX(f);
         const y = soil - f * full;
         return (
-          <ellipse key={f} cx={x + side * 34 * s} cy={y - 8 * s} rx={38 * s} ry={15 * s} transform={`rotate(${-side * 24} ${x} ${y})`} fill="#3ec300" stroke={INK} strokeWidth="3" />
+          <ellipse
+            key={f}
+            cx={x + side * 34 * s}
+            cy={y - 8 * s}
+            rx={38 * s}
+            ry={15 * s}
+            transform={`rotate(${-side * 24} ${x} ${y})`}
+            fill="#3ec300"
+            stroke={INK}
+            strokeWidth="3"
+          />
         );
       })}
       {grow === 0 &&
-        [-1, 1].map((side) => <ellipse key={side} cx={SUN.x + side * 14} cy={soil - 26} rx="14" ry="7" transform={`rotate(${side * -30} ${SUN.x + side * 14} ${soil - 26})`} fill="#3ec300" stroke={INK} strokeWidth="2.5" />)}
+        [-1, 1].map((side) => (
+          <ellipse
+            key={side}
+            cx={SUN.x + side * 14}
+            cy={soil - 26}
+            rx="14"
+            ry="7"
+            transform={`rotate(${side * -30} ${SUN.x + side * 14} ${soil - 26})`}
+            fill="#3ec300"
+            stroke={INK}
+            strokeWidth="2.5"
+          />
+        ))}
       {bloom <= 0 ? (
         <g transform={`translate(${top.x} ${top.y})`}>
           <circle r={8 + 16 * grow} fill="#3ec300" stroke={INK} strokeWidth="3" />
@@ -824,7 +968,13 @@ function Birds({ garden, t }: { garden: Garden; t: number }) {
               <ellipse rx="24" ry="18" fill={color} stroke={INK} strokeWidth="3" />
               <circle cx="-16" cy="-16" r="14" fill={color} stroke={INK} strokeWidth="3" />
               <circle cx="-20" cy="-19" r="3" fill={INK} />
-              <path d={flying ? "M-29 -16 L-42 -13 L-29 -10 Z" : "M-29 -18 L-43 -16 L-29 -10 L-41 -9 Z"} fill="#ffb703" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+              <path
+                d={flying ? "M-29 -16 L-42 -13 L-29 -10 Z" : "M-29 -18 L-43 -16 L-29 -10 L-41 -9 Z"}
+                fill="#ffb703"
+                stroke={INK}
+                strokeWidth="2"
+                strokeLinejoin="round"
+              />
               <ellipse cx="4" cy="-2" rx="16" ry="9" transform={`rotate(${-flap} 14 -4)`} fill="#fff8" stroke={INK} strokeWidth="2.5" />
               {!flying && (
                 <>

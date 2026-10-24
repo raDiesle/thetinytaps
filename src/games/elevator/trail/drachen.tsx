@@ -212,7 +212,13 @@ function Horse({ done, here, nope }: SceneryProps) {
             <g className="tl-horse-head" style={{ transformOrigin: "-70px -180px" }}>
               <path d="M-60 -190 L-104 -268 L-60 -282 L-30 -176 Z" fill="#a0673a" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
               <path d="M-62 -280 Q-40 -240 -32 -186" stroke="#5c3b1e" strokeWidth="14" strokeLinecap="round" fill="none" />
-              <path d="M-108 -276 Q-150 -256 -176 -210 Q-180 -190 -160 -186 Q-120 -204 -86 -240 Z" fill="#a0673a" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+              <path
+                d="M-108 -276 Q-150 -256 -176 -210 Q-180 -190 -160 -186 Q-120 -204 -86 -240 Z"
+                fill="#a0673a"
+                stroke={INK}
+                strokeWidth="4"
+                strokeLinejoin="round"
+              />
               <ellipse cx="-164" cy="-202" rx="20" ry="16" fill="#d9a066" stroke={INK} strokeWidth="3" />
               <circle cx="-170" cy="-208" r="3.5" fill={INK} />
               <circle cx="-118" cy="-250" r="6" fill={INK} />
@@ -271,9 +277,9 @@ function Stream({ done }: { done: string[] }) {
       <path className="tl-water" d="M3060 770 q20 -8 40 0 t40 0 t40 0 t40 0 t20 0" stroke="#d0ebff" strokeWidth="5" fill="none" />
       <g transform="translate(3110 800)">
         <g className={`tl-fish${bridged ? " jump" : ""}`}>
-        <ellipse cx="0" cy="0" rx="22" ry="12" fill="#ff922b" stroke={INK} strokeWidth="3" />
-        <path d="M18 0 L36 -12 V12 Z" fill="#ff922b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-        <circle cx="-10" cy="-3" r="3" fill={INK} />
+          <ellipse cx="0" cy="0" rx="22" ry="12" fill="#ff922b" stroke={INK} strokeWidth="3" />
+          <path d="M18 0 L36 -12 V12 Z" fill="#ff922b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+          <circle cx="-10" cy="-3" r="3" fill={INK} />
         </g>
       </g>
       {bridged && (

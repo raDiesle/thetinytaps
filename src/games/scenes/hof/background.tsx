@@ -136,7 +136,14 @@ function Pond() {
     <g>
       <ellipse cx={cx} cy={cy + 4} rx={rx + 12} ry={ry + 10} fill="#6a994e" opacity="0.5" />
       <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#hf-pond)" />
-      <path d={`M${cx - rx + 30} ${cy - 18} q30 -10 60 0 M${cx + 40} ${cy + 26} q30 -8 56 0`} stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.5" fill="none" />
+      <path
+        d={`M${cx - rx + 30} ${cy - 18} q30 -10 60 0 M${cx + 40} ${cy + 26} q30 -8 56 0`}
+        stroke="#fff"
+        strokeWidth="4"
+        strokeLinecap="round"
+        opacity="0.5"
+        fill="none"
+      />
       {[
         [cx - 120, cy + 22],
         [cx + 30, cy - 34],
@@ -223,8 +230,19 @@ export function Background() {
         fill="url(#hf-track)"
       />
       <path d={`M0 ${TRACK_TOP + 34} Q400 ${TRACK_TOP + 22} 800 ${TRACK_TOP + 32} T1600 ${TRACK_TOP + 30}`} stroke="#c49a63" strokeWidth="5" fill="none" />
-      <path d={`M0 ${TRACK_BOTTOM - 26} Q400 ${TRACK_BOTTOM - 36} 800 ${TRACK_BOTTOM - 28} T1600 ${TRACK_BOTTOM - 30}`} stroke="#c49a63" strokeWidth="7" fill="none" />
-      <path d={`M0 ${TRACK_TOP + 62} Q400 ${TRACK_TOP + 50} 800 ${TRACK_TOP + 60} T1600 ${TRACK_TOP + 58}`} stroke="#9bd17a" strokeWidth="8" strokeDasharray="14 10" fill="none" />
+      <path
+        d={`M0 ${TRACK_BOTTOM - 26} Q400 ${TRACK_BOTTOM - 36} 800 ${TRACK_BOTTOM - 28} T1600 ${TRACK_BOTTOM - 30}`}
+        stroke="#c49a63"
+        strokeWidth="7"
+        fill="none"
+      />
+      <path
+        d={`M0 ${TRACK_TOP + 62} Q400 ${TRACK_TOP + 50} 800 ${TRACK_TOP + 60} T1600 ${TRACK_TOP + 58}`}
+        stroke="#9bd17a"
+        strokeWidth="8"
+        strokeDasharray="14 10"
+        fill="none"
+      />
       <g fill="#bf9a6a">
         {PEBBLES.map(([x, y]) => (
           <ellipse key={x} cx={x} cy={y} rx={7 * depthScale(y)} ry={4 * depthScale(y)} />
@@ -237,11 +255,7 @@ export function Background() {
       {/* Grass tufts and little flowers */}
       <g stroke="#52b788" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path
-            key={`${x}-${y}`}
-            d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26"
-            transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
-          />
+          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
         ))}
       </g>
       {DOTS.map(([x, y, color]) => (

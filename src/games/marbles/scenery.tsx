@@ -1,6 +1,6 @@
 // Drawings the machines share: ink and wood colours, and things on the wall.
 
-import { BAR_COLORS } from "./TrackLevel";
+import { BAR_COLORS } from "./parts";
 
 export const INK = "#2a1e5c";
 export const WOOD = "#d08c4b";
@@ -51,7 +51,16 @@ export function Bunting({ x0, x1, y }: { x0: number; x1: number; y: number }) {
     <g>
       {Array.from({ length: n }, (_, i) => {
         const x = x0 + 20 + i * 64;
-        return <path key={i} d={`M${x} ${y + 4} L${x + 64} ${y + 4} L${x + 32} ${y + 60} Z`} fill={BAR_COLORS[i % BAR_COLORS.length]} stroke={INK} strokeWidth="3" strokeLinejoin="round" />;
+        return (
+          <path
+            key={i}
+            d={`M${x} ${y + 4} L${x + 64} ${y + 4} L${x + 32} ${y + 60} Z`}
+            fill={BAR_COLORS[i % BAR_COLORS.length]}
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+        );
       })}
       <path d={`M${x0} ${y} Q${(x0 + x1) / 2} ${y + 24} ${x1} ${y}`} stroke={INK} strokeWidth="4" fill="none" />
     </g>
@@ -62,7 +71,13 @@ export function Bunting({ x0, x1, y }: { x0: number; x1: number; y: number }) {
 export function Hopper({ x, y, color = "#8e7dff" }: { x: number; y: number; color?: string }) {
   return (
     <g>
-      <path d={`M${x - 58} ${y - 70} L${x + 58} ${y - 70} L${x + 28} ${y + 2} L${x - 28} ${y + 2} Z`} fill={color} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x - 58} ${y - 70} L${x + 58} ${y - 70} L${x + 28} ${y + 2} L${x - 28} ${y + 2} Z`}
+        fill={color}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <path d={`M${x - 36} ${y - 52} L${x + 36} ${y - 52}`} stroke="#fff8" strokeWidth="6" strokeLinecap="round" />
     </g>
   );

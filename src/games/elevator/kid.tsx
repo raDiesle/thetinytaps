@@ -9,9 +9,7 @@ import {
   ChefHat,
   EggBasket,
   EmptyPlate,
-  FlourBag,
   Fridge,
-  JamJar,
   Juice,
   Mug,
   OpenUmbrella,
@@ -66,13 +64,11 @@ export type Pose =
   | "hop";
 
 export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat";
-export type Holding = "eggs" | "flour" | "pancakes" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
+export type Holding = "eggs" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
 
 /** Held in front with both hands. */
 const IN_FRONT: Partial<Record<Holding, { draw: () => ReactNode; scale: number }>> = {
   eggs: { draw: () => <EggBasket />, scale: 0.78 },
-  flour: { draw: () => <FlourBag />, scale: 0.72 },
-  pancakes: { draw: () => <Pancakes plain />, scale: 0.9 },
   breakfast: { draw: () => <Breakfast />, scale: 0.85 },
   juice: { draw: () => <Juice />, scale: 0.62 },
   teddy: { draw: () => <Teddy />, scale: 0.6 },
@@ -158,19 +154,7 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
 }
 
 /** A child. `face` -1 mirrors it, so it turns to where it walks or reaches. */
-export function Kid({
-  look,
-  pose,
-  holding,
-  wear,
-  face,
-}: {
-  look: Look;
-  pose: Pose;
-  holding: Holding | null;
-  wear: Outfit[];
-  face: 1 | -1;
-}) {
+export function Kid({ look, pose, holding, wear, face }: { look: Look; pose: Pose; holding: Holding | null; wear: Outfit[]; face: 1 | -1 }) {
   const pyjama = wear.includes("pyjama");
   const coat = wear.includes("coat");
   const boots = wear.includes("boots");
@@ -265,15 +249,7 @@ export function Kid({
             {pyjama ? (
               <path d="M-24 -92 H24 M-26 -76 H26 M-25 -60 H25" stroke="#74c0fc" strokeWidth="5" />
             ) : (
-              <path
-                d="M-10 -82 l4 -9 l4 9 l4 -9 l4 9"
-                stroke="#fff"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-                opacity="0.8"
-              />
+              <path d="M-10 -82 l4 -9 l4 9 l4 -9 l4 9" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.8" />
             )}
             <path
               className="el-rumble"
@@ -350,8 +326,6 @@ export type PicId =
   | "boat"
   | "chefhat"
   | "bowl"
-  | "flour"
-  | "jam"
   | "pyjama"
   | "hat";
 
@@ -392,20 +366,19 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
   umbrella: { w: 40, h: 150, draw: () => <Umbrella /> },
   boat: { w: 84, h: 64, draw: () => <Boat /> },
   chefhat: { w: 90, h: 84, draw: () => <ChefHat /> },
-  bowl: { w: 100, h: 52, draw: () => <Bowl eggs={2} flour={2} /> },
-  flour: { w: 64, h: 80, draw: () => <FlourBag /> },
-  jam: { w: 50, h: 52, draw: () => <JamJar /> },
+  bowl: { w: 116, h: 64, draw: () => <Bowl eggs={2} flour={1} /> },
   pyjama: { w: 80, h: 50, draw: () => <Pyjama /> },
   hat: { w: 112, h: 56, draw: () => <RainHat /> },
 };
 
-/** A thought bubble with a picture, above the head of a child of height `height`; it pops up anew for every `n`. */
-export function Bubble({ pic, height }: { pic: PicId; height: number }) {
-  return <ThoughtBubble picture={PICTURES[pic]} height={height} />;
+/** A thought bubble with a picture, above the head of a child of height `height`. It pops up once; every new `nudge`
+ * runs a yellow light once along its outline, to remind the child of the wish. */
+export function Bubble({ pic, height, nudge = 0 }: { pic: PicId; height: number; nudge?: number }) {
+  return <ThoughtBubble picture={PICTURES[pic]} height={height} nudge={nudge} />;
 }
 
-/** The thought bubble with any drawing of size `w` × `h` standing on (0, 0). */
-export function ThoughtBubble({ picture, height }: { picture: { w: number; h: number; draw: () => ReactNode }; height: number }) {
+/** The thought bubble with any drawing of size `w` × `h` standing on (0, 0); `nudge` as for `Bubble`. */
+export function ThoughtBubble({ picture, height, nudge = 0 }: { picture: { w: number; h: number; draw: () => ReactNode }; height: number; nudge?: number }) {
   const { w, h, draw } = picture;
   const s = Math.min(150 / w, 104 / h);
   const puffs: [number, number, number][] = [
@@ -424,6 +397,14 @@ export function ThoughtBubble({ picture, height }: { picture: { w: number; h: nu
         {puffs.map(([x, y, r]) => (
           <circle key={`o${x}${y}`} cx={x} cy={y} r={r + 4} fill={INK} />
         ))}
+        {/* Dashes on every puff's rim; the white puffs on top leave only the part on the outline visible. */}
+        {nudge > 0 && (
+          <g key={nudge} className="el-bubble-trace" fill="none" stroke="#ffd43b" strokeWidth="12" strokeDasharray="14 11" strokeLinecap="round">
+            {puffs.map(([x, y, r]) => (
+              <circle key={`t${x}${y}`} cx={x} cy={y} r={r + 3} pathLength={100} />
+            ))}
+          </g>
+        )}
         {puffs.map(([x, y, r]) => (
           <circle key={`i${x}${y}`} cx={x} cy={y} r={r} fill="#fff" />
         ))}

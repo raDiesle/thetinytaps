@@ -22,14 +22,28 @@ export function Blumen() {
             return (
               <g key={dx}>
                 <path d={`M${x + dx * 0.3} -46 Q${x + dx} ${(hy - 46) / 2} ${hx} ${hy}`} stroke="#40c057" strokeWidth="4" fill="none" />
-                <path d={`M${x + dx * 0.5} -70 q${dx >= 0 ? 12 : -12} -4 ${dx >= 0 ? 16 : -16} -14 q${dx >= 0 ? -10 : 10} 0 ${dx >= 0 ? -16 : 16} 10 Z`} fill="#51cf66" />
+                <path
+                  d={`M${x + dx * 0.5} -70 q${dx >= 0 ? 12 : -12} -4 ${dx >= 0 ? 16 : -16} -14 q${dx >= 0 ? -10 : 10} 0 ${dx >= 0 ? -16 : 16} 10 Z`}
+                  fill="#51cf66"
+                />
                 <g className="sm-blume-head" style={{ ...nth(k), transformOrigin: `${hx}px ${hy}px` }}>
                   {kind === "tulip" ? (
-                    <path d={`M${hx - 10} ${hy - 4} L${hx - 10} ${hy - 20} L${hx - 4} ${hy - 12} L${hx} ${hy - 22} L${hx + 4} ${hy - 12} L${hx + 10} ${hy - 20} L${hx + 10} ${hy - 4} Q${hx} ${hy + 6} ${hx - 10} ${hy - 4} Z`} fill={head} />
+                    <path
+                      d={`M${hx - 10} ${hy - 4} L${hx - 10} ${hy - 20} L${hx - 4} ${hy - 12} L${hx} ${hy - 22} L${hx + 4} ${hy - 12} L${hx + 10} ${hy - 20} L${hx + 10} ${hy - 4} Q${hx} ${hy + 6} ${hx - 10} ${hy - 4} Z`}
+                      fill={head}
+                    />
                   ) : (
                     <>
                       {[0, 60, 120, 180, 240, 300].map((a) => (
-                        <ellipse key={a} cx={hx} cy={hy - (kind === "sun" ? 12 : 9)} rx={kind === "sun" ? 6 : 5} ry={kind === "sun" ? 9 : 7} fill={kind === "sun" ? head : "#fff"} transform={`rotate(${a} ${hx} ${hy})`} />
+                        <ellipse
+                          key={a}
+                          cx={hx}
+                          cy={hy - (kind === "sun" ? 12 : 9)}
+                          rx={kind === "sun" ? 6 : 5}
+                          ry={kind === "sun" ? 9 : 7}
+                          fill={kind === "sun" ? head : "#fff"}
+                          transform={`rotate(${a} ${hx} ${hy})`}
+                        />
                       ))}
                       <circle cx={hx} cy={hy} r={kind === "sun" ? 8 : 6} fill={kind === "sun" ? "#8d5a2b" : head} />
                     </>
@@ -323,7 +337,15 @@ export function Eistruhe() {
       <path d="M-150 -96 L-138 -130 H138 L150 -96 Z" fill="#f8f9fa" />
       <path d="M-136 -100 L-128 -124 H128 L136 -100 Z" fill="#d0ebff" />
       {Array.from({ length: 10 }, (_, i) => (
-        <rect key={i} x={-122 + i * 25} y={-120 + (i % 2) * 6} width="20" height="14" rx="3" fill={["#ffc9c9", "#fff3bf", "#d3f9d8", "#e5dbff", "#ffd8a8"][i % 5]} />
+        <rect
+          key={i}
+          x={-122 + i * 25}
+          y={-120 + (i % 2) * 6}
+          width="20"
+          height="14"
+          rx="3"
+          fill={["#ffc9c9", "#fff3bf", "#d3f9d8", "#e5dbff", "#ffd8a8"][i % 5]}
+        />
       ))}
       <path d="M-128 -124 L-136 -100 H0 V-124 Z" fill="#e7f5ff" fillOpacity="0.5" stroke="#adb5bd" strokeWidth="3" />
       <g className="sm-eis-lid">
@@ -388,7 +410,13 @@ export function Einkaufstuete() {
     <>
       <g className="sm-tuete-lauch" style={{ transformOrigin: "26px -100px" }}>
         <rect x="20" y="-150" width="12" height="52" fill="#fff" />
-        <path d="M26 -146 Q16 -170 8 -176 M26 -146 Q28 -172 24 -182 M26 -146 Q38 -168 46 -170" stroke="#40c057" strokeWidth="7" strokeLinecap="round" fill="none" />
+        <path
+          d="M26 -146 Q16 -170 8 -176 M26 -146 Q28 -172 24 -182 M26 -146 Q38 -168 46 -170"
+          stroke="#40c057"
+          strokeWidth="7"
+          strokeLinecap="round"
+          fill="none"
+        />
       </g>
       <g className="sm-tuete-baguette" style={{ transformOrigin: "-22px -100px" }}>
         <path d="M-40 -100 L-18 -168 Q-12 -176 -6 -166 L-22 -100 Z" fill="#e0a060" />
@@ -425,7 +453,14 @@ export function Warnschild() {
         <path d="M-28 -124 L0 -76 H-56 Z" transform="translate(28 0)" fill="#fff" stroke="#e03131" strokeWidth="5" strokeLinejoin="round" />
         <g className="sm-warn-man" style={{ transformOrigin: "0px -84px" }}>
           <circle cx="4" cy="-108" r="4.5" fill={INK} />
-          <path d="M2 -102 L-4 -92 L6 -86 M-4 -92 L-12 -86 M2 -100 L12 -104" stroke={INK} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <path
+            d="M2 -102 L-4 -92 L6 -86 M-4 -92 L-12 -86 M2 -100 L12 -104"
+            stroke={INK}
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
         </g>
         <path d="M-12 -82 q6 -4 12 0 t12 0" stroke="#4dabf7" strokeWidth="3" fill="none" strokeLinecap="round" />
         <path d="M-30 -50 H30 M-26 -34 H26" stroke="#f59f00" strokeWidth="5" strokeLinecap="round" />

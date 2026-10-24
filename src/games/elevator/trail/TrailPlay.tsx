@@ -4,7 +4,7 @@ import { INK } from "@/games/scenes/shared";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { cardForKey, StoryCards } from "../cards";
-import { Confetti, TapMark } from "../house";
+import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, ThoughtBubble, type Pose } from "../kid";
 import type { ElevatorSettings } from "../settings";
 import { groundY, route } from "./ground";
@@ -35,6 +35,8 @@ const SLOTS: Point[] = [
   [602, 822],
 ];
 const SLOT_R = 74;
+/** The action button, in the other bottom corner. */
+const ACTION: Point = [1494, 800];
 
 interface KidState {
   x: number;
@@ -64,9 +66,9 @@ interface View {
   /** Bumped to bounce the slots. */
   shake: number;
   /** Where the hand points, in the world; `n` makes it pop up anew. */
-  target: { x: number; y: number; n: number } | null;
-  /** The thought bubble with the goal pops up anew for every `n`. */
-  bubble: number | null;
+  action: { nudge: number } | null;
+  /** The thought bubble with the goal; `nudge` counts the reminders. */
+  bubble: { nudge: number } | null;
   party: boolean;
 }
 
@@ -81,7 +83,7 @@ const startView = (level: TrailLevel): View => ({
   choosing: false,
   hint: null,
   shake: 0,
-  target: null,
+  action: null,
   bubble: null,
   party: false,
 });
@@ -92,17 +94,7 @@ const handOf = (kid: KidState): Point => [kid.x + 62, kid.y - 112];
 const heldOf = (kid: KidState): Point => [kid.x + 140, kid.y - 250];
 
 /** "Weg-Abenteuer": the goal goes away, the child follows it through a scrolling world and uses what it finds. */
-export function TrailPlay({
-  lang,
-  settings,
-  level,
-  onPick,
-}: {
-  lang: string;
-  settings: ElevatorSettings;
-  level: TrailLevel;
-  onPick: (id: string) => void;
-}) {
+export function TrailPlay({ lang, settings, level, onPick }: { lang: string; settings: ElevatorSettings; level: TrailLevel; onPick: (id: string) => void }) {
   const [view, setView] = useState<View>(() => startView(level));
   const viewRef = useRef<View>(view);
   const { bursts, spawn } = useBursts();
@@ -232,22 +224,23 @@ export function TrailPlay({
     }
   };
 
-  /** The hand points at `at` until the child taps (anywhere); it pops up again after a while. */
-  const tapAt = async ([x, y]: Point) => {
-    put((v) => ({ target: { x, y, n: (v.target?.n ?? 0) + 1 } }));
+  /** The action button lights up until the child taps (it, anywhere, or any key); after a while it jumps again and
+   * the bubble reminds the child of the goal. Nothing in the picture is pointed at. */
+  const go = async () => {
+    put({ action: { nudge: 0 } });
     let stop = () => {};
     const nudge = () => {
-      put((v) => ({ target: v.target && { ...v.target, n: v.target.n + 1 }, bubble: (v.bubble ?? 0) + 1 }));
+      put((v) => ({ action: v.action && { nudge: v.action.nudge + 1 }, bubble: v.bubble ? { nudge: v.bubble.nudge + 1 } : { nudge: 0 } }));
       stop = later(NUDGE_MS, nudge);
     };
     stop = later(NUDGE_MS, nudge);
     await nextTap();
     stop();
-    put({ target: null, bubble: null });
+    put({ action: null, bubble: null });
   };
 
   const pickup = async (station: Pickup) => {
-    await tapAt(station.at);
+    await go();
     await walkTo(station.x);
     say(station.ask);
     kid({ pose: "reach" });
@@ -265,7 +258,7 @@ export function TrailPlay({
   const nextChoice = () => new Promise<number>((resolve) => (chooser.current = resolve));
 
   const obstacle = async (station: Obstacle) => {
-    await tapAt([station.at[0], Math.max(station.at[1], viewRef.current.kid.y - 120)]);
+    await go();
     await walkTo(station.x);
     put({ here: station.id, choosing: true, shake: viewRef.current.shake + 1 });
     cue(station.meet);
@@ -308,12 +301,14 @@ export function TrailPlay({
     put({ here: null });
   };
 
+  /** Two taps: the first walks to the stairs and climbs half of them, the second the rest; a note per step. */
   const climb = async (station: Climb) => {
-    await tapAt([station.steps[0][0], station.steps[0][1] - 40]);
+    await go();
     await walkTo(station.x);
     say(station.ask);
+    const half = Math.ceil(station.steps.length / 2);
     for (const [i, [x, y]] of station.steps.entries()) {
-      if (i > 0) await tapAt([x, y - 40]);
+      if (i === half) await go();
       kid({ x, y, walk: STEP_MS, pose: "walk" });
       sound(() => playCountNote(i));
       await wait(STEP_MS);
@@ -339,7 +334,7 @@ export function TrailPlay({
     kid({ pose: "shake" });
     await moveGoal(level.away.to, level.away.ms, null, 120);
     kid({ pose: "stand" });
-    put({ bubble: 1 });
+    put({ bubble: { nudge: 0 } });
     say(level.away.say);
     await wait(1800);
     put({ bubble: null });
@@ -455,11 +450,11 @@ export function TrailPlay({
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} />
             </g>
-            {view.bubble !== null && <ThoughtBubble key={view.bubble} picture={GOALS[level.goal]} height={KID_H} />}
+            {view.bubble && <ThoughtBubble picture={GOALS[level.goal]} height={KID_H} nudge={view.bubble.nudge} />}
           </g>
-          {view.target && <TapMark key={view.target.n} x={view.target.x} y={view.target.y} />}
         </g>
 
+        <ActionButton waiting={!!view.action} nudge={view.action?.nudge ?? 0} x={ACTION[0]} y={ACTION[1]} r={70} />
         {/* The bag with its three slots, always in the bottom corner */}
         <g className={`tl-bag${view.choosing ? " open" : ""}`}>
           <g transform="translate(96 836)">

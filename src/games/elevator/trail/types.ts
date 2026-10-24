@@ -5,7 +5,8 @@ import type { GoalId, ItemId } from "./items";
 // A trail level ("Weg-Abenteuer"): a long world seen from the side that scrolls along with the child.
 // Something the child loves goes away at the start (the kite flies off), and the child follows it.
 // On the way it finds things that go into its bag (three at most), and at every obstacle the bag
-// opens: the child taps the thing to use, and the child uses it by itself. A wrong thing is tried,
+// opens: the child taps the thing to use, and the child uses it by itself. Walking on is one tap on the
+// action button (or anywhere, or any key); nothing in the picture is pointed at. A wrong thing is tried,
 // something funny happens, it comes back into the bag and the right one glows.
 
 /** A point in the world: x to the right, y down; the ground at the start is at y = 740. */
@@ -39,7 +40,7 @@ interface StationBase {
 export interface Pickup extends StationBase {
   kind: "pickup";
   item: ItemId;
-  /** Where the thing is; the hand points there and it flies from there into the bag. */
+  /** Where the thing is; it flies from there into the bag. */
   at: Point;
   sound: () => void;
 }
@@ -62,7 +63,7 @@ export interface Obstacle extends StationBase {
   frees?: boolean;
 }
 
-/** Stairs or a ladder: every tap takes one step. */
+/** Stairs or a ladder: the first tap climbs half of the steps, the second the rest (never more taps in a row). */
 export interface Climb extends StationBase {
   kind: "climb";
   /** The steps, each a point of the ground, from the bottom up. */

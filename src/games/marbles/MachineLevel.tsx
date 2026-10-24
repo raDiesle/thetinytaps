@@ -32,8 +32,8 @@ import {
 import { beside, deg, seg } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { DARK_WOOD, Hopper, INK, MARBLE_COLOR, Picture, WallClock, Window, WOOD } from "./scenery";
-import { BALL_R, type Pt } from "./track";
-import { BAR_COLORS, Ball, Rail } from "./TrackLevel";
+import { BALL_R, type Pt } from "./path";
+import { BAR_COLORS, Ball, Rail } from "./parts";
 
 /**
  * Level 3: the big machine. One tap lets the marble go, and then one thing
@@ -121,7 +121,16 @@ function Room({ stripes }: { stripes: string }) {
       <Window x={5850} />
       {Array.from({ length: 13 }, (_, i) => {
         const x = 6060 + i * 64;
-        return <path key={i} d={`M${x} 40 L${x + 64} 40 L${x + 32} 96 Z`} fill={BAR_COLORS[i % BAR_COLORS.length]} stroke={INK} strokeWidth="3" strokeLinejoin="round" />;
+        return (
+          <path
+            key={i}
+            d={`M${x} 40 L${x + 64} 40 L${x + 32} 96 Z`}
+            fill={BAR_COLORS[i % BAR_COLORS.length]}
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+        );
       })}
       <path d={`M6040 36 Q6480 60 6920 36`} stroke={INK} strokeWidth="4" fill="none" />
       <rect x="-400" y={FLOOR - 26} width={WORLD_W + 800} height="26" fill="#fff" stroke={INK} strokeWidth="3" />
@@ -176,7 +185,13 @@ function XylophoneRamp({ machine, t }: { machine: Machine; t: number }) {
 function Bell({ age }: { age: number }) {
   return (
     <g transform={`translate(${BELL.pivot.x} ${BELL.pivot.y}) rotate(${wobble(age, 24, 13, 2.2)}) scale(0.85)`}>
-      <path d="M-4 0 L4 0 L5 12 C22 16 28 34 30 58 L34 64 L-34 64 L-30 58 C-28 34 -22 16 -5 12 Z" fill="#ffc93c" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d="M-4 0 L4 0 L5 12 C22 16 28 34 30 58 L34 64 L-34 64 L-30 58 C-28 34 -22 16 -5 12 Z"
+        fill="#ffc93c"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       <path d="M-18 28 C-16 22 -12 19 -8 18" stroke="#fff9" strokeWidth="4" fill="none" strokeLinecap="round" />
       <circle cx="0" cy="70" r="7" fill="#c98a00" stroke={INK} strokeWidth="3" />
     </g>
@@ -263,7 +278,12 @@ function CarTrack({ machine }: { machine: Machine }) {
       <circle cx={LOOP.cx} cy={LOOP.cy} r={LOOP.r + 7} fill="none" stroke={INK} strokeWidth="20" />
       <circle cx={LOOP.cx} cy={LOOP.cy} r={LOOP.r + 7} fill="none" stroke="#ff8c42" strokeWidth="13" />
       <path d={`M${JUMP.x0} ${FLOOR} L${JUMP.x1} ${JUMP.top} L${JUMP.x1} ${FLOOR} Z`} fill="#ffb703" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path d={`M${JUMP.x1 - 50} ${FLOOR - 6} L${JUMP.x1 - 50} ${FLOOR - 32} M${JUMP.x1 - 22} ${FLOOR - 6} L${JUMP.x1 - 22} ${FLOOR - 42}`} stroke="#ff5d73" strokeWidth="8" strokeLinecap="round" />
+      <path
+        d={`M${JUMP.x1 - 50} ${FLOOR - 6} L${JUMP.x1 - 50} ${FLOOR - 32} M${JUMP.x1 - 22} ${FLOOR - 6} L${JUMP.x1 - 22} ${FLOOR - 42}`}
+        stroke="#ff5d73"
+        strokeWidth="8"
+        strokeLinecap="round"
+      />
     </g>
   );
 }
@@ -522,8 +542,8 @@ function Crossing({ machine, t }: { machine: Machine; t: number }) {
           cx={CROSSING_X + side * 23}
           cy="645"
           r="13"
-          fill={near && (side < 0) === (blink === 0) ? "#ff3b3b" : "#7a2a3a"}
-          stroke={near && (side < 0) === (blink === 0) ? "#ffd0d0" : "none"}
+          fill={near && side < 0 === (blink === 0) ? "#ff3b3b" : "#7a2a3a"}
+          stroke={near && side < 0 === (blink === 0) ? "#ffd0d0" : "none"}
           strokeWidth="3"
         />
       ))}
@@ -572,7 +592,16 @@ function Jack({ age }: { age: number }) {
       <path d={`M${spring}`} fill="none" stroke="#7d7d96" strokeWidth="7" strokeLinejoin="round" />
       <g transform={`translate(${cx} ${head}) rotate(${sway}) scale(1.2)`}>
         {Array.from({ length: 8 }, (_, i) => (
-          <ellipse key={i} cx={34 * Math.cos((i * Math.PI) / 4)} cy={40 + 10 * Math.sin((i * Math.PI) / 4)} rx="20" ry="11" fill={BAR_COLORS[i]} stroke={INK} strokeWidth="2" />
+          <ellipse
+            key={i}
+            cx={34 * Math.cos((i * Math.PI) / 4)}
+            cy={40 + 10 * Math.sin((i * Math.PI) / 4)}
+            rx="20"
+            ry="11"
+            fill={BAR_COLORS[i]}
+            stroke={INK}
+            strokeWidth="2"
+          />
         ))}
         <circle r="48" fill="#ffe0bd" stroke={INK} strokeWidth="3.5" />
         <circle cx="-30" cy="12" r="10" fill="#ff9bb5" />
