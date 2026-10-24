@@ -52,7 +52,17 @@ export function Leuchtturm() {
       <path d="M-24 -298 Q0 -334 24 -298 Z" fill="#e63946" />
       <circle cx="0" cy="-326" r="5" fill="#495057" />
       <path d="M-10 -306 Q-4 -318 6 -322" stroke="#fff" strokeOpacity="0.5" strokeWidth="4" strokeLinecap="round" fill="none" />
-      <Puffs className="sd-leucht-splash" spots={[[-100, -8], [-80, -20], [86, -16], [104, -6]]} r={10} fill={FOAM} />
+      <Puffs
+        className="sd-leucht-splash"
+        spots={[
+          [-100, -8],
+          [-80, -20],
+          [86, -16],
+          [104, -6],
+        ]}
+        r={10}
+        fill={FOAM}
+      />
     </>
   );
 }
@@ -89,7 +99,15 @@ export function Segelboot() {
       <Inside d="M-104 -30 H112 Q100 4 64 10 H-70 Q-96 2 -104 -30 Z">
         <rect x="-110" y="0" width="230" height="20" fill={SEA} opacity="0.5" />
       </Inside>
-      <Drops className="sd-segel-splash" spots={[[-110, -24], [-96, -36], [116, -26]]} r={6} />
+      <Drops
+        className="sd-segel-splash"
+        spots={[
+          [-110, -24],
+          [-96, -36],
+          [116, -26],
+        ]}
+        r={6}
+      />
     </g>
   );
 }
@@ -112,7 +130,16 @@ const FERRY_HULL = "M-196 -42 H186 L176 -4 Q166 18 126 22 H-148 Q-180 10 -196 -4
 export function Schiff() {
   return (
     <g className="sd-schiff-body" style={{ transformOrigin: "0px 10px" }}>
-      <Puffs className="sd-schiff-puff" spots={[[66, -200], [80, -224], [96, -250]]} r={14} fill="#f1f3f5" />
+      <Puffs
+        className="sd-schiff-puff"
+        spots={[
+          [66, -200],
+          [80, -224],
+          [96, -250],
+        ]}
+        r={14}
+        fill="#f1f3f5"
+      />
       {/* Funnel */}
       <path d="M48 -132 L54 -190 H94 L98 -132 Z" fill="#e63946" />
       <path d="M53 -178 H95 L94 -190 H54 Z" fill={INK} />
@@ -151,7 +178,15 @@ export function Schiff() {
       <Inside d={FERRY_HULL}>
         <rect x="-200" y="2" width="400" height="24" fill={SEA} opacity="0.5" />
       </Inside>
-      <Drops className="sd-schiff-wave" spots={[[-204, -30], [-188, -46], [-174, -32]]} r={7} />
+      <Drops
+        className="sd-schiff-wave"
+        spots={[
+          [-204, -30],
+          [-188, -46],
+          [-174, -32],
+        ]}
+        r={7}
+      />
       <Notes x={-200} y={-150} texts={["Tuut!", "Tuut!"]} colour="#fff" size={30} />
     </g>
   );
@@ -178,7 +213,16 @@ export function Delfin() {
           </g>
         </g>
       </Inside>
-      <Drops className="sd-delfin-splash" spots={[[-50, -10], [-30, -24], [30, -20], [52, -8]]} r={7} />
+      <Drops
+        className="sd-delfin-splash"
+        spots={[
+          [-50, -10],
+          [-30, -24],
+          [30, -20],
+          [52, -8],
+        ]}
+        r={7}
+      />
       <Notes x={70} y={-120} texts={["Ki-ki!"]} colour="#a5d8ff" size={26} />
     </>
   );
@@ -217,7 +261,16 @@ export function Boot() {
       <Inside d={ROWING_HULL}>
         <rect x="-120" y="0" width="240" height="20" fill={SEA} opacity="0.5" />
       </Inside>
-      <Drops className="sd-boot-splash" spots={[[-120, 0], [-104, -12], [-134, -10], [150, -12]]} r={6} />
+      <Drops
+        className="sd-boot-splash"
+        spots={[
+          [-120, 0],
+          [-104, -12],
+          [-134, -10],
+          [150, -12],
+        ]}
+        r={6}
+      />
     </g>
   );
 }

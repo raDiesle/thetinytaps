@@ -8,7 +8,10 @@ function Peeker({ cx, cy, size = 1 }: { cx: number; cy: number; size?: number })
     <>
       <circle cx={cx} cy={cy} r={r} fill={SKIN} />
       <Face cx={cx} cy={cy - r * 0.1} size={size * 0.62} />
-      <path d={`M${cx - r * 1.05} ${cy - r * 0.35} Q${cx - r} ${cy - r * 1.3} ${cx} ${cy - r * 1.3} Q${cx + r} ${cy - r * 1.3} ${cx + r * 1.05} ${cy - r * 0.35} Z`} fill="#ffd60a" />
+      <path
+        d={`M${cx - r * 1.05} ${cy - r * 0.35} Q${cx - r} ${cy - r * 1.3} ${cx} ${cy - r * 1.3} Q${cx + r} ${cy - r * 1.3} ${cx + r * 1.05} ${cy - r * 0.35} Z`}
+        fill="#ffd60a"
+      />
     </>
   );
 }
@@ -259,7 +262,14 @@ export function Werkzeugkasten() {
         </g>
         <g className="werkzeug-tool" style={{ ...nth(2), transformOrigin: "976px 952px" }}>
           <path d="M976 952 L968 916" stroke="#ff5d73" strokeWidth="6" strokeLinecap="round" />
-          <path className="werkzeug-pliers" d="M976 952 L986 916" stroke="#ff5d73" strokeWidth="6" strokeLinecap="round" style={{ transformOrigin: "976px 952px" }} />
+          <path
+            className="werkzeug-pliers"
+            d="M976 952 L986 916"
+            stroke="#ff5d73"
+            strokeWidth="6"
+            strokeLinecap="round"
+            style={{ transformOrigin: "976px 952px" }}
+          />
         </g>
       </g>
       <rect x="880" y="952" width="120" height="40" rx="6" fill="#ff5d73" />

@@ -15,7 +15,16 @@ const STONES = [
 export function Krater() {
   return (
     <>
-      <Dust className="wa-krater-dust" spots={[[-84, -36], [-30, -48], [30, -48], [84, -36]]} r={18} />
+      <Dust
+        className="wa-krater-dust"
+        spots={[
+          [-84, -36],
+          [-30, -48],
+          [30, -48],
+          [84, -36],
+        ]}
+        r={18}
+      />
       <ellipse cx="0" cy="-22" rx="136" ry="32" fill="#c3c5d3" />
       <ellipse cx="0" cy="-20" rx="112" ry="22" fill="#8f92a8" />
       {/* Something climbs out of the hole */}
@@ -29,7 +38,15 @@ export function Krater() {
           <ellipse cx={x - r * 0.3} cy={y - r * 0.25} rx={r * 0.4} ry={r * 0.25} fill="#a5a8bc" />
         </g>
       ))}
-      <Sparkles className="wa-krater-sparkle" spots={[[-70, -70], [0, -84], [70, -70]]} r={10} />
+      <Sparkles
+        className="wa-krater-sparkle"
+        spots={[
+          [-70, -70],
+          [0, -84],
+          [70, -70],
+        ]}
+        r={10}
+      />
     </>
   );
 }
@@ -53,7 +70,16 @@ export function Kristall() {
           <path d={shine} stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.6" />
         </g>
       ))}
-      <Sparkles className="wa-kristall-sparkle" spots={[[-46, -100], [20, -128], [56, -92], [-6, -64]]} r={9} />
+      <Sparkles
+        className="wa-kristall-sparkle"
+        spots={[
+          [-46, -100],
+          [20, -128],
+          [56, -92],
+          [-6, -64],
+        ]}
+        r={9}
+      />
     </>
   );
 }
@@ -62,7 +88,15 @@ export function Kristall() {
 export function Astronautin() {
   return (
     <>
-      <Dust className="wa-astra-dust" spots={[[-36, -6], [0, 2], [36, -6]]} r={14} />
+      <Dust
+        className="wa-astra-dust"
+        spots={[
+          [-36, -6],
+          [0, 2],
+          [36, -6],
+        ]}
+        r={14}
+      />
       <g className="wa-astra-body">
         <rect x="-46" y="-158" width="22" height="72" rx="8" fill="#adb5bd" />
         <g className="wa-astra-leg" style={{ transformOrigin: "-14px -74px" }}>
@@ -99,17 +133,25 @@ export function Mondball() {
   const ball = ellipsePath(0, -40, 40);
   return (
     <>
-      <Dust className="wa-ball-dust" spots={[[-40, -6], [0, 0], [40, -6]]} r={12} />
+      <Dust
+        className="wa-ball-dust"
+        spots={[
+          [-40, -6],
+          [0, 0],
+          [40, -6],
+        ]}
+        r={12}
+      />
       <g className="wa-ball-body" style={{ transformOrigin: "0px 0px" }}>
-      <g className="wa-ball-spin" style={{ transformOrigin: "0px -40px" }}>
-        <circle cx="0" cy="-40" r="40" fill="#ff6b6b" />
-        <Inside d={ball}>
-          <path d="M-44 -62 Q0 -40 44 -62 V-44 Q0 -22 -44 -44 Z" fill="#ffd60a" />
-          <path d="M-44 -30 Q0 -8 44 -30 V-12 Q0 10 -44 -12 Z" fill="#4dabf7" />
-        </Inside>
-      </g>
-      <circle cx="0" cy="-40" r="40" fill="none" stroke="#c9184a" strokeWidth="3" opacity="0.4" />
-      <ellipse cx="-14" cy="-58" rx="10" ry="7" fill="#fff" opacity="0.6" />
+        <g className="wa-ball-spin" style={{ transformOrigin: "0px -40px" }}>
+          <circle cx="0" cy="-40" r="40" fill="#ff6b6b" />
+          <Inside d={ball}>
+            <path d="M-44 -62 Q0 -40 44 -62 V-44 Q0 -22 -44 -44 Z" fill="#ffd60a" />
+            <path d="M-44 -30 Q0 -8 44 -30 V-12 Q0 10 -44 -12 Z" fill="#4dabf7" />
+          </Inside>
+        </g>
+        <circle cx="0" cy="-40" r="40" fill="none" stroke="#c9184a" strokeWidth="3" opacity="0.4" />
+        <ellipse cx="-14" cy="-58" rx="10" ry="7" fill="#fff" opacity="0.6" />
       </g>
     </>
   );
@@ -119,7 +161,16 @@ export function Mondball() {
 export function Kiste() {
   return (
     <>
-      <Sparkles className="wa-kiste-sparkle" spots={[[-50, -124], [0, -156], [50, -124]]} r={10} fill="#ffe066" />
+      <Sparkles
+        className="wa-kiste-sparkle"
+        spots={[
+          [-50, -124],
+          [0, -156],
+          [50, -124],
+        ]}
+        r={10}
+        fill="#ffe066"
+      />
       <g className="wa-kiste-surprise">
         <path d="M0 -10 l-10 -6 l20 -8 l-20 -8 l20 -8 l-10 -6" stroke="#adb5bd" strokeWidth="4" fill="none" strokeLinejoin="round" />
         <path d={starPath(0, -50, 24)} fill="#ffd60a" />
@@ -151,7 +202,15 @@ export function Kiste() {
 export function Fernrohr() {
   return (
     <>
-      <Sparkles className="wa-tele-star" spots={[[122, -206], [150, -170]]} r={16} fill="#ffd60a" />
+      <Sparkles
+        className="wa-tele-star"
+        spots={[
+          [122, -206],
+          [150, -170],
+        ]}
+        r={16}
+        fill="#ffd60a"
+      />
       <path d="M0 -92 L-52 0 M0 -92 L52 0 M0 -92 L6 0" stroke="#495057" strokeWidth="7" strokeLinecap="round" />
       <g className="wa-tele-tube" style={{ transformOrigin: "0px -96px" }}>
         <g transform="rotate(-28 0 -96)">
@@ -192,7 +251,14 @@ export function Helm() {
         <circle cx="12" cy="-38" r="1.4" fill="#fff" />
         <circle cx="4" cy="-52" r="1.2" fill="#fff" />
         <path d="M-18 -52 Q-8 -60 6 -60" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
-        <Sparkles className="wa-helm-glint" spots={[[-16, -56], [18, -30]]} r={8} />
+        <Sparkles
+          className="wa-helm-glint"
+          spots={[
+            [-16, -56],
+            [18, -30],
+          ]}
+          r={8}
+        />
       </g>
     </>
   );

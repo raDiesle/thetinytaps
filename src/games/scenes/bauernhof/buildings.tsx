@@ -32,7 +32,12 @@ export function Scheune() {
       <path d="M-160 -200 L-124 -286 L0 -338" stroke="#fff" strokeOpacity="0.25" strokeWidth="5" fill="none" />
       {/* Weathervane */}
       <path d="M0 -356 V-392" stroke={INK} strokeWidth="4" />
-      <path className="bh-scheune-vane" d="M-14 -398 q4 -14 14 -12 q6 -10 10 -2 l-6 4 q6 6 -2 12 h-14 q-10 -2 -2 -2 Z" fill={INK} style={{ transformOrigin: "0px -398px" }} />
+      <path
+        className="bh-scheune-vane"
+        d="M-14 -398 q4 -14 14 -12 q6 -10 10 -2 l-6 4 q6 6 -2 12 h-14 q-10 -2 -2 -2 Z"
+        fill={INK}
+        style={{ transformOrigin: "0px -398px" }}
+      />
       {/* Hayloft: the owl sits in here */}
       <rect x="-42" y="-280" width="84" height="70" rx="6" fill="#4a2c2a" stroke="#fff" strokeWidth="6" />
       <path d="M-38 -214 q10 -16 20 -6 q10 -14 22 -4 q10 -14 22 -2 q6 -6 12 -2 V-214 Z" fill="#f4c95d" />
@@ -121,7 +126,16 @@ export function Bauernhaus() {
           <rect className="bh-haus-light" x={x} y={-148} width="52" height="56" rx="4" fill="#ffd166" style={nth(i + 4)} />
           <path d={`M${x + 26} -148 V-92 M${x} -120 H${x + 52}`} stroke="#fff" strokeWidth="4" />
           <rect className="bh-haus-shutter" x={x - 24} y={-150} width="22" height="60" rx="3" fill="#52b788" style={{ transformOrigin: `${x - 2}px -120px` }} />
-          <rect className="bh-haus-shutter" x={x + 54} y={-150} width="22" height="60" rx="3" fill="#52b788" style={{ transformOrigin: `${x + 54}px -120px` }} />
+          <rect
+            className="bh-haus-shutter"
+            x={x + 54}
+            y={-150}
+            width="22"
+            height="60"
+            rx="3"
+            fill="#52b788"
+            style={{ transformOrigin: `${x + 54}px -120px` }}
+          />
           <rect x={x - 4} y={-92} width="60" height="14" rx="3" fill="#bc6c25" />
           {[8, 22, 36, 50].map((dx, j) => (
             <circle key={dx} className="bh-haus-flower" cx={x + dx} cy={-96} r="6" fill={j % 2 ? "#ff8fa3" : "#e63946"} style={nth(i * 4 + j)} />

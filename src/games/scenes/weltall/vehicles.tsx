@@ -32,7 +32,15 @@ function MoonWheel({ cx, cy, r, className }: { cx: number; cy: number; r: number
 export function Mondbagger() {
   return (
     <>
-      <Dust className="wa-bagger-dust" spots={[[150, -18], [122, -6], [180, -8]]} r={16} />
+      <Dust
+        className="wa-bagger-dust"
+        spots={[
+          [150, -18],
+          [122, -6],
+          [180, -8],
+        ]}
+        r={16}
+      />
       <g className="wa-bagger-body" style={{ transformOrigin: "0px 0px" }}>
         <rect x="-120" y="-78" width="214" height="36" rx="10" fill="#ffb703" />
         <rect x="-120" y="-54" width="214" height="12" rx="6" fill="#f4a100" />
@@ -84,7 +92,15 @@ function WireWheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 export function Buggy() {
   return (
     <>
-      <Dust className="wa-buggy-dust" spots={[[-140, -12], [-112, -4], [-164, -22]]} r={14} />
+      <Dust
+        className="wa-buggy-dust"
+        spots={[
+          [-140, -12],
+          [-112, -4],
+          [-164, -22],
+        ]}
+        r={14}
+      />
       <g className="wa-buggy-body">
         <path d="M-104 -76 V-170" stroke="#868e96" strokeWidth="4" />
         <g className="wa-buggy-flag" style={{ transformOrigin: "-104px -160px" }}>

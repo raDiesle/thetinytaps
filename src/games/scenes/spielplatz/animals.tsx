@@ -174,7 +174,13 @@ export function Schnecke() {
       </g>
       <g className="sp-schnecke-shell" style={{ transformOrigin: "0px -16px" }}>
         <circle cx="0" cy="-46" r="34" fill="#e8590c" />
-        <path d="M0 -46 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 0 1 12 -12 a18 18 0 0 1 18 18 a24 24 0 0 1 -24 24 a30 30 0 0 1 -30 -30" stroke="#ffa94d" strokeWidth="6" fill="none" strokeLinecap="round" />
+        <path
+          d="M0 -46 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 0 1 12 -12 a18 18 0 0 1 18 18 a24 24 0 0 1 -24 24 a30 30 0 0 1 -30 -30"
+          stroke="#ffa94d"
+          strokeWidth="6"
+          fill="none"
+          strokeLinecap="round"
+        />
         <circle cx="-12" cy="-64" r="6" fill="#fff" opacity="0.4" />
       </g>
     </>

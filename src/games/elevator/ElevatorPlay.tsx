@@ -1,21 +1,11 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import {
-  loadRecordings,
-  playDing,
-  playGiggle,
-  playKnock,
-  playLift,
-  playLullaby,
-  playMelody,
-  playRandomNote,
-  playSlide,
-} from "@/lib/sfx";
+import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
-import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs, TapMark } from "./house";
+import { ActionButton, Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, HERO, KID_H, Kid, PICTURES, type Holding, type Outfit, type PicId, type Pose } from "./kid";
-import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_W, floorLine } from "./layout";
+import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
 import { WeatherContext } from "./rooms";
 import type { ElevatorSettings } from "./settings";
 
@@ -25,7 +15,7 @@ const FLOOR_MS = 1200;
 const DOOR_MS = 700;
 /** Walking time per SVG unit. */
 const WALK_MS = 2.6;
-/** While waiting for the right button: the bubble pops up again, and the first time the room starts to glow. */
+/** While waiting for the right button or a tap: the bubble (or the action button) reminds the child, and the room glows. */
 const NUDGE_MS = 7000;
 /** How long one tap's movement lasts if the task doesn't say. */
 const BEAT_MS = 700;
@@ -61,14 +51,15 @@ interface View {
   ride: number;
   doors: boolean;
   actors: Record<Who, Actor | null>;
-  bubble: { who: Who; pic: PicId; n: number } | null;
+  /** The wish over a child's head; `nudge` counts the reminders. */
+  bubble: { who: Who; pic: PicId; nudge: number } | null;
   playing: string | null;
   used: string[];
   /** The task being tapped now, and how often each task has been tapped in this story. */
   task: string | null;
   taps: Record<string, number>;
-  /** Where the hand points, on which floor; `n` makes it pop up anew. */
-  target: { floor: number; x: number; y: number; n: number } | null;
+  /** The action button waits for a tap; `nudge` counts the reminders. */
+  action: { nudge: number } | null;
   hint: number | null;
   lit: number | null;
   night: boolean;
@@ -89,7 +80,7 @@ const START: View = {
   used: [],
   task: null,
   taps: {},
-  target: null,
+  action: null,
   hint: null,
   lit: null,
   night: false,
@@ -177,7 +168,11 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   const cue = (sounds: [number, () => void][]) => sounds.forEach(([ms, play]) => later(ms, () => sound(play)));
 
-  const showBubble = (who: Who, pic: PicId) => put((v) => ({ bubble: { who, pic, n: (v.bubble?.n ?? 0) + 1 } }));
+  /** Shows a wish; the same wish again doesn't pop the bubble up anew but runs a light along its outline. */
+  const showBubble = (who: Who, pic: PicId) =>
+    put((v) => ({
+      bubble: v.bubble?.who === who && v.bubble.pic === pic ? { ...v.bubble, nudge: v.bubble.nudge + 1 } : { who, pic, nudge: 0 },
+    }));
 
   /** Walks a child to `x` on its floor. */
   const walk = async (who: Who, x: number) => {
@@ -251,7 +246,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   const nextTap = () => new Promise<void>((resolve) => (tapper.current = resolve));
 
-  /** A tap, a click or a key while a task waits for one. */
+  /** A tap, a click or a key while the action button waits for one. */
   const tap = () => {
     const resolve = tapper.current;
     if (resolve) {
@@ -260,30 +255,31 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     }
   };
 
-  /** The hand points at the thing; every tap does the task once more, until it is done. */
-  const doTask = async (who: Who, task: Task, floor: number) => {
+  /** The action button lights up and every tap does the task once more, until it is done; an `auto` task does itself. */
+  const doTask = async (who: Who, task: Task) => {
     const other: Who = who === "hero" ? "buddy" : "hero";
+    put((v) => ({ task: task.name, taps: { ...v.taps, [task.name]: v.taps[task.name] ?? 0 } }));
     if (task.spot !== undefined) await walk(who, task.spot);
     if (task.face) actor(who, { face: task.face });
-    put((v) => ({ task: task.name, taps: { ...v.taps, [task.name]: v.taps[task.name] ?? 0 } }));
-    say(task.ask);
+    if (!task.auto) say(task.ask);
     for (let i = 0; i < task.taps; i++) {
-      const [x, y] = typeof task.at[0] === "number" ? (task.at as [number, number]) : (task.at as [number, number][])[i];
-      put((v) => ({ target: { floor, x, y, n: (v.target?.n ?? 0) + 1 } }));
-      const stopNudging = (() => {
-        let stop = () => {};
-        const nudge = () => {
-          put((v) => ({ target: v.target && { ...v.target, n: v.target.n + 1 } }));
-          say(task.ask);
+      if (!task.auto) {
+        put({ action: { nudge: 0 } });
+        const stopNudging = (() => {
+          let stop = () => {};
+          const nudge = () => {
+            put((v) => ({ action: v.action && { nudge: v.action.nudge + 1 } }));
+            say(task.ask);
+            stop = later(NUDGE_MS, nudge);
+          };
           stop = later(NUDGE_MS, nudge);
-        };
-        stop = later(NUDGE_MS, nudge);
-        return () => stop();
-      })();
-      await nextTap();
-      stopNudging();
+          return () => stop();
+        })();
+        await nextTap();
+        stopNudging();
+      }
       const lastTap = i === task.taps - 1;
-      put((v) => ({ target: null, taps: { ...v.taps, [task.name]: (v.taps[task.name] ?? 0) + 1 } }));
+      put((v) => ({ action: null, taps: { ...v.taps, [task.name]: (v.taps[task.name] ?? 0) + 1 } }));
       const a = viewRef.current.actors[who]!;
       actor(who, {
         pose: task.pose,
@@ -328,7 +324,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     cue(step.sounds);
     say(step.done);
     await wait(step.ms);
-    for (const task of step.tasks ?? []) await doTask(who, task, step.floor);
+    for (const task of step.tasks ?? []) await doTask(who, task);
     put({ task: null });
     if (last) return;
 
@@ -392,7 +388,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   /** A floor button or a room was tapped. */
   const press = (floor: number) => {
-    if (viewRef.current.task) return tap();
+    if (viewRef.current.action) return tap();
+    if (viewRef.current.task) return sound(() => playKnock(1500));
     if (floor < 0 || floor >= FLOORS || !viewRef.current.story || viewRef.current.picking) return;
     const resolve = waiter.current;
     if (resolve) {
@@ -403,7 +400,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   const tapKid = (who: Who) => (e: PointerEvent) => {
     e.stopPropagation();
-    if (viewRef.current.task) return tap();
+    if (viewRef.current.action) return tap();
     const a = viewRef.current.actors[who];
     if (!a || a.walk) return;
     actor(who, { hop: a.hop + 1 });
@@ -423,7 +420,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     void play(STORIES.find((s) => s.id === settings.story) ?? STORIES[0]);
   }, []);
 
-  // 1–4 fetch the lift (or pick a story on the cards), arrows ride one floor up or down, any other key makes a burst.
+  // Any key presses the waiting action button; else 1–4 fetch the lift (or pick a story on the cards), arrows ride one
+  // floor up or down, and any other key makes a burst.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
@@ -435,7 +433,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
         else funBurst();
         return;
       }
-      if (v.task) tap();
+      if (v.action) tap();
+      else if (v.task) funBurst();
       else if (Number.isInteger(digit) && digit >= 1 && digit <= FLOORS) press(digit - 1);
       else if (e.key === "ArrowUp") press(Math.min(FLOORS - 1, v.cabin + 1));
       else if (e.key === "ArrowDown") press(Math.max(0, v.cabin - 1));
@@ -459,12 +458,12 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     <div
       className={`elevator-play weather-${weather}`}
       onPointerDown={(e) => {
-        if (!viewRef.current.task) return funBurst(e.clientX, e.clientY);
+        if (!viewRef.current.action) return funBurst(e.clientX, e.clientY);
         spawn(e.clientX, e.clientY);
         tap();
       }}
     >
-      <svg className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
+      <svg className="el-svg" viewBox={`${VIEW_L} 0 ${VIEW_W - VIEW_L} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
         <WeatherContext.Provider value={weather}>
           <Backdrop weather={weather} />
           {story && (
@@ -502,26 +501,20 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
                 );
               })}
               <CabinFront floor={view.cabin} ride={view.ride} open={view.doors} />
-              {view.target && (
-                <g transform={`translate(0 ${floorLine(view.target.floor)})`}>
-                  <TapMark key={view.target.n} x={view.target.x} y={view.target.y} />
-                </g>
-              )}
+              <ActionButton waiting={!!view.action} nudge={view.action?.nudge ?? 0} />
               {bubble && actors[bubble.who] && !actors[bubble.who]!.hidden && (
                 <g className="el-ride" style={place(actors[bubble.who]!).outer}>
                   <g className="el-walker" style={place(actors[bubble.who]!).inner}>
-                    <Bubble key={bubble.n} pic={bubble.pic} height={KID_H * (bubble.who === "buddy" ? BUDDY_SCALE : 1)} />
+                    <Bubble
+                      key={`${bubble.who}${bubble.pic}`}
+                      pic={bubble.pic}
+                      nudge={bubble.nudge}
+                      height={KID_H * (bubble.who === "buddy" ? BUDDY_SCALE : 1)}
+                    />
                   </g>
                 </g>
               )}
-              <rect
-                className={`el-night${view.night ? " on" : ""}`}
-                x="-4000"
-                y="-4000"
-                width={VIEW_W + 8000}
-                height={VIEW_H + 8000}
-                fill="#0b1340"
-              />
+              <rect className={`el-night${view.night ? " on" : ""}`} x="-4000" y="-4000" width={VIEW_W + 8000} height={VIEW_H + 8000} fill="#0b1340" />
               {view.party && <Confetti />}
             </>
           )}

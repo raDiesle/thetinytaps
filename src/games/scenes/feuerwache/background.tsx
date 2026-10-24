@@ -100,7 +100,10 @@ export function Background() {
       {VILLAGE.map(([x, y, w, colour]) => (
         <g key={x}>
           <rect x={x} y={Number(y) - Number(w) * 0.7} width={w} height={Number(w) * 0.7} fill={String(colour)} />
-          <path d={`M${Number(x) - 4} ${Number(y) - Number(w) * 0.7} L${Number(x) + Number(w) / 2} ${Number(y) - Number(w) * 1.15} L${Number(x) + Number(w) + 4} ${Number(y) - Number(w) * 0.7} Z`} fill="#e5989b" />
+          <path
+            d={`M${Number(x) - 4} ${Number(y) - Number(w) * 0.7} L${Number(x) + Number(w) / 2} ${Number(y) - Number(w) * 1.15} L${Number(x) + Number(w) + 4} ${Number(y) - Number(w) * 0.7} Z`}
+            fill="#e5989b"
+          />
         </g>
       ))}
       <rect x="1290" y="252" width="12" height="44" fill="#e9ecef" />

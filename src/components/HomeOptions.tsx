@@ -1,22 +1,17 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { FullscreenButton } from "@/components/FullscreenButton";
 import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { sampleLetter } from "@/content/languages";
 import { useCommonSettings } from "@/lib/common";
-import {
-  DEFAULT_PLAYTIME_SETTINGS,
-  playedToday,
-  PLAYTIME_OPTIONS,
-  PLAYTIME_SETTINGS_KEY,
-  resetPlaytime,
-} from "@/lib/playtime";
+import { DEFAULT_PLAYTIME_SETTINGS, playedToday, PLAYTIME_OPTIONS, PLAYTIME_SETTINGS_KEY, resetPlaytime } from "@/lib/playtime";
 import { useStoredSettings } from "@/lib/storage";
 
 /**
- * On the home page, for the grown-ups: two small buttons at the top – the play
- * time for all games on the left, the options most games share on the right –
- * each opening its menu only when tapped, so the games fill the screen.
+ * On the home page, for the grown-ups: small buttons at the top – the play
+ * time for all games on the left, fullscreen and the options most games share
+ * on the right – each opening its menu only when tapped, so the games fill the screen.
  */
 export function HomeOptions() {
   return (
@@ -24,9 +19,12 @@ export function HomeOptions() {
       <MenuButton icon="⏳" label="Spielzeit" side="left">
         <PlaytimeOptions />
       </MenuButton>
-      <MenuButton icon="⚙️" label="Einstellungen für alle Spiele" iconOnly side="right">
-        <CommonOptions />
-      </MenuButton>
+      <div className="home-bar-right">
+        <FullscreenButton />
+        <MenuButton icon="⚙️" label="Einstellungen für alle Spiele" iconOnly side="right">
+          <CommonOptions />
+        </MenuButton>
+      </div>
     </nav>
   );
 }
@@ -62,6 +60,7 @@ function MenuButton({
 
   return (
     <div className={`home-menu ${side}`}>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
       {open && <div className="home-menu-backdrop" onClick={() => setOpen(false)} />}
       <button
         type="button"

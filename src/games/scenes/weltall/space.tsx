@@ -51,7 +51,17 @@ export function Erde() {
         <Lid cx={-12.6} cy={12} r={5.8} fill="#4dabf7" />
         <Lid cx={12.6} cy={12} r={5.8} fill="#4dabf7" />
       </g>
-      <Sparkles className="wa-erde-sparkle" spots={[[-92, -60], [92, -66], [96, 58], [-94, 62]]} r={12} fill="#fff3bf" />
+      <Sparkles
+        className="wa-erde-sparkle"
+        spots={[
+          [-92, -60],
+          [92, -66],
+          [96, 58],
+          [-94, 62],
+        ]}
+        r={12}
+        fill="#fff3bf"
+      />
     </>
   );
 }
@@ -129,7 +139,17 @@ export function Sternschnuppe() {
         <path d={starPath(-50, 18, 22, 10)} fill="#ffd60a" />
         <path d={starPath(-53, 14, 9, 4)} fill="#fff" opacity="0.55" />
       </g>
-      <Sparkles className="wa-schnuppe-dust" spots={[[-8, -8], [28, -20], [62, -32], [-30, 44]]} r={8} fill="#fff3bf" />
+      <Sparkles
+        className="wa-schnuppe-dust"
+        spots={[
+          [-8, -8],
+          [28, -20],
+          [62, -32],
+          [-30, 44],
+        ]}
+        r={8}
+        fill="#fff3bf"
+      />
     </>
   );
 }
@@ -165,7 +185,17 @@ export function Asteroid() {
 export function Komet() {
   return (
     <>
-      <Sparkles className="wa-komet-sparkle" spots={[[0, -26], [40, 20], [78, -16], [110, 10]]} r={8} fill="#d0ebff" />
+      <Sparkles
+        className="wa-komet-sparkle"
+        spots={[
+          [0, -26],
+          [40, 20],
+          [78, -16],
+          [110, 10],
+        ]}
+        r={8}
+        fill="#d0ebff"
+      />
       <g className="wa-komet-body">
         <g className="wa-komet-tail" style={{ transformOrigin: "-62px 0px" }}>
           <path d="M-62 -20 Q20 -34 112 -30 Q30 -8 -62 20 Z" fill="#a5d8ff" opacity="0.55" />
@@ -389,7 +419,15 @@ const CLUSTER = [
 export function Sterne() {
   return (
     <>
-      <path className="wa-sterne-lines" d="M-62 -14 L-28 16 L6 -24 L40 10 L68 -16" stroke="#fff3bf" strokeWidth="2.5" strokeDasharray="4 6" fill="none" opacity="0.35" />
+      <path
+        className="wa-sterne-lines"
+        d="M-62 -14 L-28 16 L6 -24 L40 10 L68 -16"
+        stroke="#fff3bf"
+        strokeWidth="2.5"
+        strokeDasharray="4 6"
+        fill="none"
+        opacity="0.35"
+      />
       {CLUSTER.map(([x, y, r], i) => (
         <g key={i} className="wa-sterne-star" style={{ transformOrigin: `${x}px ${y}px`, ...nth(i) }}>
           <path d={starPath(x, y, r, r * 0.45)} fill={i === 2 ? "#ffd60a" : "#fff3bf"} />

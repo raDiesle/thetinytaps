@@ -22,7 +22,15 @@ export function Waage() {
       <circle cx="0" cy="-380" r="46" fill="#fff" />
       {Array.from({ length: 9 }, (_, i) => {
         const a = (-120 + i * 30) * (Math.PI / 180);
-        return <path key={i} d={`M${38 * Math.sin(a)} ${-380 - 38 * Math.cos(a)} L${44 * Math.sin(a)} ${-380 - 44 * Math.cos(a)}`} stroke={INK} strokeWidth={i % 2 ? 2 : 3.5} strokeLinecap="round" />;
+        return (
+          <path
+            key={i}
+            d={`M${38 * Math.sin(a)} ${-380 - 38 * Math.cos(a)} L${44 * Math.sin(a)} ${-380 - 44 * Math.cos(a)}`}
+            stroke={INK}
+            strokeWidth={i % 2 ? 2 : 3.5}
+            strokeLinecap="round"
+          />
+        );
       })}
       <g className="ka-waage-needle" style={{ transformOrigin: "0px -380px" }}>
         <path d="M0 -380 L-4 -376 L0 -418 L4 -376 Z" fill="#e03131" stroke="#e03131" strokeWidth="2" strokeLinejoin="round" />
@@ -248,9 +256,13 @@ export function Rollwagen() {
             <g key={y} className="ka-roll-drawer" style={{ ...nth(i), transformOrigin: `0px ${y + 58}px` }}>
               <g className="ka-roll-inside">
                 <rect x="-96" y={y - 20} width="192" height="22" rx="3" fill="#e7f5ff" />
-                {inside === "cotton" && [-60, -30, 0, 30, 60].map((x) => <circle key={x} cx={x} cy={y - 10} r="10" fill="#fff" stroke="#dee2e6" strokeWidth="2" />)}
-                {inside === "plasters" && [-54, 0, 54].map((x, k) => <Plaster key={x} x={x} y={y - 10} w={42} angle={(k - 1) * 12} colour={["#ffa8a8", "#ffe066", "#8ce99a"][k]} />)}
-                {inside === "sticks" && <path d={`M-70 ${y - 10} h50 M-10 ${y - 12} h50 M50 ${y - 8} h30`} stroke="#e9b872" strokeWidth="8" strokeLinecap="round" />}
+                {inside === "cotton" &&
+                  [-60, -30, 0, 30, 60].map((x) => <circle key={x} cx={x} cy={y - 10} r="10" fill="#fff" stroke="#dee2e6" strokeWidth="2" />)}
+                {inside === "plasters" &&
+                  [-54, 0, 54].map((x, k) => <Plaster key={x} x={x} y={y - 10} w={42} angle={(k - 1) * 12} colour={["#ffa8a8", "#ffe066", "#8ce99a"][k]} />)}
+                {inside === "sticks" && (
+                  <path d={`M-70 ${y - 10} h50 M-10 ${y - 12} h50 M50 ${y - 8} h30`} stroke="#e9b872" strokeWidth="8" strokeLinecap="round" />
+                )}
               </g>
               <rect x="-104" y={y} width="208" height="58" rx="7" fill="#e7f5ff" stroke="#a5d8ff" strokeWidth="3" />
               <rect x="-24" y={y + 22} width="48" height="12" rx="6" fill="#4dabf7" />

@@ -56,7 +56,10 @@ function Village() {
           <rect x={x} y={base - h} width={w} height={h} fill="#efe6da" />
           <rect x={x + w - 10} y={base - h} width="10" height={h} fill="#ddd2c4" />
           <path d={`M${x - 6} ${base - h + 2} L${x + w / 2} ${base - h - 26} L${x + w + 6} ${base - h + 2} Z`} fill={roof} />
-          <path d={`M${x - 6} ${base - h + 2} L${x + w / 2} ${base - h - 26} L${x + w + 6} ${base - h + 2} Q${x + w / 2} ${base - h - 12} ${x - 6} ${base - h + 2} Z`} fill={SNOW} />
+          <path
+            d={`M${x - 6} ${base - h + 2} L${x + w / 2} ${base - h - 26} L${x + w + 6} ${base - h + 2} Q${x + w / 2} ${base - h - 12} ${x - 6} ${base - h + 2} Z`}
+            fill={SNOW}
+          />
           <rect x={x + 10} y={base - h + 8} width="10" height="10" rx="2" fill={lit ? "#ffe08a" : "#a9bfd6"} />
           <rect x={x + w - 24} y={base - h + 8} width="10" height="10" rx="2" fill="#a9bfd6" />
         </g>
@@ -168,8 +171,14 @@ function Pond() {
         strokeLinecap="round"
       />
       {/* Snow blown onto the edge of the ice */}
-      <path d={`M${cx - rx} ${cy + 2} Q${cx - rx + 30} ${cy - 18} ${cx - rx + 90} ${cy - 30} Q${cx - rx + 40} ${cy - 8} ${cx - rx + 30} ${cy + 20} Z`} fill={SNOW} />
-      <path d={`M${cx + rx} ${cy + 2} Q${cx + rx - 40} ${cy + 30} ${cx + rx - 120} ${cy + 48} Q${cx + rx - 60} ${cy + 24} ${cx + rx - 10} ${cy - 20} Z`} fill={SNOW} />
+      <path
+        d={`M${cx - rx} ${cy + 2} Q${cx - rx + 30} ${cy - 18} ${cx - rx + 90} ${cy - 30} Q${cx - rx + 40} ${cy - 8} ${cx - rx + 30} ${cy + 20} Z`}
+        fill={SNOW}
+      />
+      <path
+        d={`M${cx + rx} ${cy + 2} Q${cx + rx - 40} ${cy + 30} ${cx + rx - 120} ${cy + 48} Q${cx + rx - 60} ${cy + 24} ${cx + rx - 10} ${cy - 20} Z`}
+        fill={SNOW}
+      />
       <OnGround x={cx - rx + 6} y={cy - 8} size={1.2}>
         <Reeds />
       </OnGround>
@@ -310,7 +319,12 @@ export function Background() {
       <g fill="#fff">
         {SPARKLES.map(([x, y]) => {
           const s = depthScale(y) * 6;
-          return <path key={`${x}-${y}`} d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`} />;
+          return (
+            <path
+              key={`${x}-${y}`}
+              d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`}
+            />
+          );
         })}
       </g>
     </>

@@ -69,7 +69,11 @@ function Runway() {
       <rect y={RUNWAY_TOP} width="1600" height={RUNWAY_BOTTOM - RUNWAY_TOP} fill="#9aa3ad" />
       <path d={`M0 ${RUNWAY_TOP + 2} H1600 M0 ${RUNWAY_BOTTOM - 2} H1600`} stroke="#f1f3f5" strokeWidth="2.5" />
       <path d={`M120 ${mid} H1600`} stroke="#fff" strokeWidth="3" strokeDasharray="34 26" />
-      <path d={Array.from({ length: 6 }, (_, i) => `M${20 + i * 14} ${RUNWAY_TOP + 6} v${RUNWAY_BOTTOM - RUNWAY_TOP - 12}`).join(" ")} stroke="#fff" strokeWidth="6" />
+      <path
+        d={Array.from({ length: 6 }, (_, i) => `M${20 + i * 14} ${RUNWAY_TOP + 6} v${RUNWAY_BOTTOM - RUNWAY_TOP - 12}`).join(" ")}
+        stroke="#fff"
+        strokeWidth="6"
+      />
       {/* A taxiway joins the runway from the hangar */}
       <path d={`M1380 ${RUNWAY_BOTTOM} L1350 444 H1460 L1440 ${RUNWAY_BOTTOM} Z`} fill="#a9b1ba" />
       <path d={`M1410 ${RUNWAY_BOTTOM} L1404 444`} stroke="#ffd60a" strokeWidth="2.5" />

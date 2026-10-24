@@ -30,8 +30,7 @@ const subscribe = (listener: () => void) => {
 
 /** Opened from the home screen (or as an installed desktop app), not in a browser tab. */
 export const isStandalone = () =>
-  matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches ||
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
+  matchMedia("(display-mode: standalone), (display-mode: fullscreen)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
 
 /** iPhone / iPad Safari, where installing only works through the share menu. */
 export const isIos = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));

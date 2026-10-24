@@ -5,7 +5,23 @@ import { Face, GLASS, INK, Pane, SKIN, nth } from "../shared";
 // Houses and street furniture. Each drawing has its foot point at (0, 0).
 
 /** A house window with a white frame and a sill; `light` is the class of the light that goes on when tapped. */
-function Window({ x, y, w = 56, h = 66, i = 0, light, children }: { x: number; y: number; w?: number; h?: number; i?: number; light?: string; children?: ReactNode }) {
+function Window({
+  x,
+  y,
+  w = 56,
+  h = 66,
+  i = 0,
+  light,
+  children,
+}: {
+  x: number;
+  y: number;
+  w?: number;
+  h?: number;
+  i?: number;
+  light?: string;
+  children?: ReactNode;
+}) {
   return (
     <>
       <rect x={x - 5} y={y - 5} width={w + 10} height={h + 10} rx="6" fill="#fff" />
@@ -303,7 +319,13 @@ export function Feuerwache() {
       <rect x="-64" y="-36" width="204" height="36" fill="#495057" />
       <rect x="-50" y="-136" width="76" height="6" rx="2" fill="#6c757d" />
       {[-30, 6].map((x, i) => (
-        <path key={x} className="st-wache-helmet" d={`M${x - 16} -136 Q${x - 16} -160 ${x} -160 Q${x + 16} -160 ${x + 16} -136 Z`} fill="#ffd60a" style={nth(i)} />
+        <path
+          key={x}
+          className="st-wache-helmet"
+          d={`M${x - 16} -136 Q${x - 16} -160 ${x} -160 Q${x + 16} -160 ${x + 16} -136 Z`}
+          fill="#ffd60a"
+          style={nth(i)}
+        />
       ))}
       <g className="st-wache-hose" style={{ transformOrigin: "96px -120px" }}>
         <circle cx="96" cy="-120" r="26" fill="none" stroke="#e63946" strokeWidth="9" />
@@ -364,7 +386,18 @@ export function Briefkasten() {
       </g>
       {/* Little door at the bottom, where the postman takes the letters out */}
       <rect x="-24" y="-92" width="48" height="12" rx="3" fill="#2b2d42" />
-      <rect className="st-post-door" x="-24" y="-92" width="48" height="12" rx="3" fill="#ffc300" stroke="#e0a800" strokeWidth="2" style={{ transformOrigin: "0px -80px" }} />
+      <rect
+        className="st-post-door"
+        x="-24"
+        y="-92"
+        width="48"
+        height="12"
+        rx="3"
+        fill="#ffc300"
+        stroke="#e0a800"
+        strokeWidth="2"
+        style={{ transformOrigin: "0px -80px" }}
+      />
     </>
   );
 }
@@ -445,8 +478,8 @@ export function Ampel() {
       </g>
       <g className="st-ampel-green" fill="#3ec300" stroke="#3ec300" strokeWidth="4" strokeLinecap="round">
         <g className="st-ampel-walk">
-        <circle cx="2" cy="-186" r="5" stroke="none" />
-        <path d="M1 -178 L-1 -168 M-1 -168 L-7 -160 M-1 -168 L5 -160 M0 -176 L-7 -170 M1 -176 L7 -172" fill="none" />
+          <circle cx="2" cy="-186" r="5" stroke="none" />
+          <path d="M1 -178 L-1 -168 M-1 -168 L-7 -160 M-1 -168 L5 -160 M0 -176 L-7 -170 M1 -176 L7 -172" fill="none" />
         </g>
       </g>
       <rect x="-22" y="-244" width="8" height="90" rx="4" fill="#fff" opacity="0.12" />

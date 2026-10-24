@@ -24,7 +24,12 @@ export function Ameisenhaufen() {
     <>
       <g className="wd-ameisen-hill" style={{ transformOrigin: "0px 0px" }}>
         <path d="M-92 0 Q-70 -60 -20 -86 Q0 -94 20 -86 Q70 -60 92 0 Z" fill="#b08968" />
-        <path d="M-60 -20 l10 -8 M-30 -50 l8 -10 M10 -70 l8 -8 M40 -40 l10 -6 M-10 -30 l6 -10 M60 -16 l10 -6 M-40 -10 l8 -6 M20 -20 l8 -8" stroke="#7f5539" strokeWidth="3" strokeLinecap="round" />
+        <path
+          d="M-60 -20 l10 -8 M-30 -50 l8 -10 M10 -70 l8 -8 M40 -40 l10 -6 M-10 -30 l6 -10 M60 -16 l10 -6 M-40 -10 l8 -6 M20 -20 l8 -8"
+          stroke="#7f5539"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
         <path d="M-60 -40 Q-30 -80 10 -84" stroke="#e6ccb2" strokeWidth="5" strokeLinecap="round" opacity="0.5" fill="none" />
         <ellipse cx="0" cy="-60" rx="10" ry="6" fill="#5c4033" />
       </g>

@@ -33,7 +33,7 @@ const FAR_TREES = [
 ];
 
 // Pebbles on the gravel path: [x, offset from the middle in half heights].
-const GRAVEL = Array.from({ length: 70 }, (_, i) => [(i * 131) % 1660 - 30, (((i * 53) % 17) / 8.5 - 1) * 0.8]);
+const GRAVEL = Array.from({ length: 70 }, (_, i) => [((i * 131) % 1660) - 30, (((i * 53) % 17) / 8.5 - 1) * 0.8]);
 
 const TUFTS = [
   [60, 360],
@@ -119,7 +119,10 @@ function Hedge() {
 function Path() {
   const xs = Array.from({ length: 34 }, (_, i) => i * 50 - 20);
   const top = xs.map((x) => `${x} ${pathY(x) - pathHalf(x)}`).join(" L");
-  const bottom = [...xs].reverse().map((x) => `${x} ${pathY(x) + pathHalf(x)}`).join(" L");
+  const bottom = [...xs]
+    .reverse()
+    .map((x) => `${x} ${pathY(x) + pathHalf(x)}`)
+    .join(" L");
   const edge = (dir: 1 | -1) => `M${xs.map((x) => `${x} ${pathY(x) + dir * pathHalf(x)}`).join(" L")}`;
   return (
     <g>
@@ -154,7 +157,9 @@ function Chalk() {
         <ellipse cx={sunX} cy={sunY} rx={20 * s} ry={9 * s} fill="none" />
         {Array.from({ length: 8 }, (_, i) => {
           const a = (i * Math.PI) / 4;
-          return <path key={i} d={`M${sunX + 26 * s * Math.cos(a)} ${sunY + 12 * s * Math.sin(a)} L${sunX + 36 * s * Math.cos(a)} ${sunY + 17 * s * Math.sin(a)}`} />;
+          return (
+            <path key={i} d={`M${sunX + 26 * s * Math.cos(a)} ${sunY + 12 * s * Math.sin(a)} L${sunX + 36 * s * Math.cos(a)} ${sunY + 17 * s * Math.sin(a)}`} />
+          );
         })}
       </g>
       <path d={`M${860} ${pathY(860) - 4} q10 -10 20 0 q10 10 20 0`} stroke="#a5d8ff" fill="none" />
@@ -169,7 +174,13 @@ function Sandpit() {
   return (
     <g>
       <path d={`M${SAND_LEFT} ${SAND_TOP} H${SAND_RIGHT} L${rightBottom} 1010 H${leftBottom} Z`} fill="#f4d58d" />
-      <path d={`M${SAND_LEFT + 30} ${SAND_TOP + 30} Q600 ${SAND_TOP + 10} ${SAND_RIGHT - 40} ${SAND_TOP + 40}`} stroke="#ead08a" strokeWidth="18" fill="none" opacity="0.7" />
+      <path
+        d={`M${SAND_LEFT + 30} ${SAND_TOP + 30} Q600 ${SAND_TOP + 10} ${SAND_RIGHT - 40} ${SAND_TOP + 40}`}
+        stroke="#ead08a"
+        strokeWidth="18"
+        fill="none"
+        opacity="0.7"
+      />
       <g fill="#e2b866" opacity="0.7">
         {[
           [400, 880],

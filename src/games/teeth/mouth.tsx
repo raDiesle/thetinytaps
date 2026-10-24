@@ -16,6 +16,7 @@ import {
   type View,
 } from "./jaw";
 import { Brush, lerp3, type BrushAnchor } from "./brush";
+import type { Daytime } from "./daytime";
 import type { Motion } from "./steps";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
@@ -104,6 +105,8 @@ interface MouthProps {
   paused: boolean;
   /** All clean: sparkles and smiling eyes. */
   happy: boolean;
+  /** In the morning breakfast crumbs stick round the mouth until all is clean. */
+  daytime: Daytime;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
   onTickle: (id: number) => void;
@@ -154,7 +157,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, daytime, action, paused, onTickle }: MouthProps) {
   const model = useMemo(() => buildMouth(view.open), [view.open]);
   const all = projectors(view);
   const project = all.face;
@@ -257,7 +260,7 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
 
       <rect {...frame} fill="#dff6ff" />
       <g clipPath="url(#mirror)">
-        <Face project={project} head={head} happy={happy} open={view.open} />
+        <KidFace project={project} head={head} happy={happy} open={view.open} crumbs={daytime === "morning" && !happy} />
 
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill="#5c1430" />
@@ -268,17 +271,7 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
             const face = toothFace(id, zone.surface);
             const at = all[id.jaw];
             if (at.facing(face.normal) <= MIN_FACING) return null;
-            return (
-              <path
-                key={toothKey(id)}
-                className="zone-glow"
-                d={facePath(face, at)}
-                fill="none"
-                stroke="#ffd23f"
-                strokeWidth={5}
-                strokeLinejoin="round"
-              />
-            );
+            return <path key={toothKey(id)} className="zone-glow" d={facePath(face, at)} fill="none" stroke="#ffd23f" strokeWidth={5} strokeLinejoin="round" />;
           })}
         </g>
 
@@ -330,26 +323,19 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
             );
           })}
 
-        {brush && brush.stops.length > 0 && (() => {
-          // Glide between the two stops either side of `at`.
-          const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
-          const next = Math.min(brush.stops.length - 1, i + 1);
-          const k = Math.min(1, Math.max(0, brush.at - i));
-          const a = anchorAt(brush.stops[i], brush.surface);
-          const b = anchorAt(brush.stops[next], brush.surface);
-          const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
-          const tooth = brush.stops[k < 0.5 ? i : next].tooth;
-          return (
-            <Brush
-              anchor={anchor}
-              surface={brush.surface}
-              tooth={tooth}
-              motion={brush.motion}
-              project={all[tooth.jaw]}
-              paused={paused}
-            />
-          );
-        })()}
+        {brush &&
+          brush.stops.length > 0 &&
+          (() => {
+            // Glide between the two stops either side of `at`.
+            const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
+            const next = Math.min(brush.stops.length - 1, i + 1);
+            const k = Math.min(1, Math.max(0, brush.at - i));
+            const a = anchorAt(brush.stops[i], brush.surface);
+            const b = anchorAt(brush.stops[next], brush.surface);
+            const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
+            const tooth = brush.stops[k < 0.5 ? i : next].tooth;
+            return <Brush anchor={anchor} surface={brush.surface} tooth={tooth} motion={brush.motion} project={all[tooth.jaw]} paused={paused} />;
+          })()}
 
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
 
@@ -406,7 +392,17 @@ function LipArrows({ action, lips, zoom }: { action: MouthAction; lips: Point2[]
   );
 }
 
-function Face({ project, head, happy, open }: { project: Project; head: Point2; happy: boolean; open: number }) {
+/** Breakfast crumbs on the chin and by the corners of the mouth: across, below the lips, size. */
+const CRUMBS: [number, number, number][] = [
+  [-180, -54, 7],
+  [-64, 36, 8],
+  [-22, 52, 6],
+  [40, 40, 9],
+  [92, 30, 6],
+  [174, -50, 8],
+];
+
+function KidFace({ project, head, happy, open, crumbs }: { project: Project; head: Point2; happy: boolean; open: number; crumbs: boolean }) {
   const p = project.point;
   const feature = (x: number, y: number, z: number) => ({ at: p([x, y, z]), facing: project.facing([x / 200, 0.1, 0.95]) });
   const ears = [-1, 1].map((s) => ({ s, at: p([s * HEAD * 0.97, 70, -60]) }));
@@ -427,7 +423,16 @@ function Face({ project, head, happy, open }: { project: Project; head: Point2; 
         <circle cx={head.x} cy={head.y} r={HEAD * project.zoom} />
       </clipPath>
       {/* Hair: a fringe that moves with the head. */}
-      <ellipse clipPath="url(#head-shape)" cx={head.x} cy={head.y - 250 * project.zoom} rx={270 * project.zoom} ry={110 * project.zoom} fill="#8a5a3c" stroke={INK} strokeWidth={6} />
+      <ellipse
+        clipPath="url(#head-shape)"
+        cx={head.x}
+        cy={head.y - 250 * project.zoom}
+        rx={270 * project.zoom}
+        ry={110 * project.zoom}
+        fill="#8a5a3c"
+        stroke={INK}
+        strokeWidth={6}
+      />
       {cheeks.map(({ at, facing }, i) =>
         facing > 0 ? <ellipse key={i} cx={at.x} cy={at.y} rx={30 * squash(facing)} ry={20} fill="#ff8fa3" opacity={0.55} /> : null,
       )}
@@ -461,6 +466,27 @@ function Face({ project, head, happy, open }: { project: Project; head: Point2; 
         ) : null,
       )}
       {nose.facing > 0 && <ellipse cx={nose.at.x} cy={nose.at.y} rx={16 * squash(nose.facing)} ry={11} fill="#e8a982" />}
+      {crumbs &&
+        CRUMBS.map(([x, below, size], i) => {
+          // They sit just below the lower lip, which drops as the mouth opens.
+          const { at, facing } = feature(x, -(54 + 62 * open) - below, 110 - Math.abs(x) / 4);
+          if (facing <= 0) return null;
+          const r = size * project.zoom * squash(facing);
+          return (
+            <rect
+              key={i}
+              x={at.x - r}
+              y={at.y - r}
+              width={2 * r}
+              height={1.6 * r}
+              rx={r / 2}
+              fill="#e0a85a"
+              stroke="#a8682a"
+              strokeWidth={2}
+              transform={`rotate(${i * 37} ${at.x} ${at.y})`}
+            />
+          );
+        })}
     </g>
   );
 }

@@ -152,7 +152,10 @@ function Drift({ w }: { w: number }) {
   return (
     <>
       <path d={`M${-w / 2} 0 Q${-w / 4} ${-w * 0.22} 0 ${-w * 0.16} Q${w / 4} ${-w * 0.24} ${w / 2} 0 Z`} fill={SNOW} />
-      <path d={`M${w * 0.05} ${-w * 0.14} Q${w * 0.3} ${-w * 0.18} ${w / 2} 0 H${w * 0.18} Q${w * 0.26} ${-w * 0.08} ${w * 0.05} ${-w * 0.14} Z`} fill={SNOW_SHADE} />
+      <path
+        d={`M${w * 0.05} ${-w * 0.14} Q${w * 0.3} ${-w * 0.18} ${w / 2} 0 H${w * 0.18} Q${w * 0.26} ${-w * 0.08} ${w * 0.05} ${-w * 0.14} Z`}
+        fill={SNOW_SHADE}
+      />
     </>
   );
 }
@@ -265,9 +268,7 @@ export function Background() {
         <rect x="676" y="644" width="88" height="10" rx="2" fill="#8d5a2b" />
         <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
           {[0, 1, 2].map((row) =>
-            [0, 1, 2].map((col) => (
-              <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />
-            )),
+            [0, 1, 2].map((col) => <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />),
           )}
         </g>
         <Cap x={686} y={590} w={82} h={10} />
@@ -281,7 +282,12 @@ export function Background() {
         ))}
       </g>
       {/* Wet tyre tracks and slush */}
-      <path d={`M0 ${ROAD_TOP + 30} H1600 M0 ${ROAD_TOP + 50} H1600 M0 ${ROAD_TOP + 84} H1600 M0 ${ROAD_TOP + 106} H1600`} stroke="#535b63" strokeWidth="7" opacity="0.6" />
+      <path
+        d={`M0 ${ROAD_TOP + 30} H1600 M0 ${ROAD_TOP + 50} H1600 M0 ${ROAD_TOP + 84} H1600 M0 ${ROAD_TOP + 106} H1600`}
+        stroke="#535b63"
+        strokeWidth="7"
+        opacity="0.6"
+      />
       <path d="M0 712 H1600" stroke="#fff" strokeWidth="5" strokeDasharray="44 36" opacity="0.8" />
       <g fill="#c9d6e3" opacity="0.8">
         <ellipse cx="380" cy="690" rx="40" ry="5" />
@@ -293,7 +299,9 @@ export function Background() {
       <rect y={ROAD_BOTTOM + 8} width="1600" height={PAVEMENT - ROAD_BOTTOM - 4} fill="#eef3f9" />
       <path d={`M0 ${PAVEMENT - 8} H1600`} stroke="#dbe5ef" strokeWidth="8" />
       <path
-        d={Array.from({ length: 28 }, (_, i) => `M${i * 60} ${PAVEMENT - 12} L${towardsHorizon(i * 60, PAVEMENT - 12, PAVEMENT - 4)} ${PAVEMENT - 4}`).join(" ")}
+        d={Array.from({ length: 28 }, (_, i) => `M${i * 60} ${PAVEMENT - 12} L${towardsHorizon(i * 60, PAVEMENT - 12, PAVEMENT - 4)} ${PAVEMENT - 4}`).join(
+          " ",
+        )}
         stroke="#cbd7e3"
         strokeWidth="2"
       />
@@ -303,7 +311,12 @@ export function Background() {
       <g fill="#fff">
         {SPARKLES.map(([x, y]) => {
           const s = depthScale(y) * 6;
-          return <path key={`${x}-${y}`} d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`} />;
+          return (
+            <path
+              key={`${x}-${y}`}
+              d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`}
+            />
+          );
         })}
       </g>
       <g fill="#b8cde3" opacity="0.7">

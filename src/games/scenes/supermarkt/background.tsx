@@ -90,7 +90,13 @@ function Gondola({ side }: { side: -1 | 1 }) {
       {/* Shadow on the floor */}
       <path d={poly([at(outer, front), at(inner, front), at(inner, back), at(outer, back)])} fill="#adb5bd" opacity="0.35" transform="translate(0 6)" />
       {/* Top */}
-      <path d={poly([at(outer, front, 1), at(inner, front, 1), at(inner, back, 1), at(outer, back, 1)])} fill="#ced4da" stroke="#adb5bd" strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d={poly([at(outer, front, 1), at(inner, front, 1), at(inner, back, 1), at(outer, back, 1)])}
+        fill="#ced4da"
+        stroke="#adb5bd"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       {/* Boxes waiting on top */}
       {[0.56, 0.5].map((s, i) => {
         const [x, y] = at((inner + outer) / 2 + (i ? 30 : -20), s, 1);
@@ -270,7 +276,9 @@ export function Background() {
       <rect x="596" y="118" width="204" height="124" fill="#fff3bf" />
       <rect x="800" y="118" width="204" height="124" fill="#d0ebff" />
       <path
-        d={[...Array.from({ length: 5 }, (_, i) => `M596 ${118 + i * 31} H1004`), ...Array.from({ length: 14 }, (_, i) => `M${596 + i * 31.4} 118 V242`)].join(" ")}
+        d={[...Array.from({ length: 5 }, (_, i) => `M596 ${118 + i * 31} H1004`), ...Array.from({ length: 14 }, (_, i) => `M${596 + i * 31.4} 118 V242`)].join(
+          " ",
+        )}
         stroke="#fff"
         strokeWidth="2"
         opacity="0.8"

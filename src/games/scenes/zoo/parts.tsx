@@ -13,7 +13,21 @@ export function Lid({ cx, cy, r, fill }: { cx: number; cy: number; r: number; fi
 }
 
 /** A few drops or bubbles around (x, y) that only show while the item plays; `className` picks the animation. */
-export function Drops({ x, y, className, fill = "#a5d8ff", count = 3, spread = 16 }: { x: number; y: number; className: string; fill?: string; count?: number; spread?: number }) {
+export function Drops({
+  x,
+  y,
+  className,
+  fill = "#a5d8ff",
+  count = 3,
+  spread = 16,
+}: {
+  x: number;
+  y: number;
+  className: string;
+  fill?: string;
+  count?: number;
+  spread?: number;
+}) {
   return (
     <g className={className} fill={fill}>
       {Array.from({ length: count }, (_, i) => (

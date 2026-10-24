@@ -3,7 +3,24 @@ import type { Scene } from "../types";
 import { Background } from "./background";
 import { COUCH, DESK, TROLLEY } from "./layout";
 import { Aerztin, Arzttasche, Kind, Liege, Muelleimer, Ohrenlampe, Pflasterbox, Rollwagen, Stethoskop, Teddy, Waage, Waschbecken } from "./practice";
-import { Aquarium, Arzthelferin, Aufkleber, Ball, Bauklotz, Bilderbuch, Empfang, Feuerwehr, Kinderwagen, Kugelbahn, Papa, Pflanze, Schaukelpferd, Spielkiste, Telefon, Wasserspender } from "./waiting";
+import {
+  Aquarium,
+  Arzthelferin,
+  Aufkleber,
+  Ball,
+  Bauklotz,
+  Bilderbuch,
+  Empfang,
+  Feuerwehr,
+  Kinderwagen,
+  Kugelbahn,
+  Papa,
+  Pflanze,
+  Schaukelpferd,
+  Spielkiste,
+  Telefon,
+  Wasserspender,
+} from "./waiting";
 import { Fenster, Hampelmann, Lampe, Messlatte, Mobile, Schrank, Sehtafel, Seifenspender, Tuer, Uhr } from "./wall";
 import "./kinderarzt.css";
 

@@ -22,13 +22,7 @@ export function useLanguages() {
   return { settings, update, language: main, second };
 }
 
-export function LanguageSetting({
-  settings,
-  update,
-}: {
-  settings: LanguageSettings;
-  update: (patch: Partial<LanguageSettings>) => void;
-}) {
+export function LanguageSetting({ settings, update }: { settings: LanguageSettings; update: (patch: Partial<LanguageSettings>) => void }) {
   const main = languageFor(settings.language).id;
   return (
     <SettingsGroup title="Sprache">
@@ -42,15 +36,10 @@ export function LanguageSetting({
         label="Zweite Sprache"
         value={settings.second === main ? "none" : settings.second}
         onChange={(second) => update({ second })}
-        options={[
-          { value: "none", label: "Aus" },
-          ...LANGUAGES.filter((l) => l.id !== main).map((l) => ({ value: l.id, label: l.label })),
-        ]}
+        options={[{ value: "none", label: "Aus" }, ...LANGUAGES.filter((l) => l.id !== main).map((l) => ({ value: l.id, label: l.label }))]}
       />
       {settings.second !== "none" && settings.second !== main && (
-        <p className="setting-note">
-          Unter jedem Wort steht es auch in der zweiten Sprache und wird danach vorgelesen: „Bär – bear“.
-        </p>
+        <p className="setting-note">Unter jedem Wort steht es auch in der zweiten Sprache und wird danach vorgelesen: „Bär – bear“.</p>
       )}
     </SettingsGroup>
   );

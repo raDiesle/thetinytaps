@@ -13,8 +13,20 @@ export function Treppenwagen() {
   return (
     <>
       <g className="fh-treppe-stairs" style={{ transformOrigin: "-60px -64px" }}>
-        <path d={`M-60 -64 ${STEPS.map((i) => `L${-60 + i * 22} ${-82 - i * 17} H${-38 + i * 22}`).join(" ")} L118 -200 H146 V-188 H122 L-20 -64 Z`} fill="#f8f9fa" stroke="#ced4da" strokeWidth="3" strokeLinejoin="round" />
-        <path d="M-56 -120 L106 -246 M106 -246 V-200 M146 -246 V-188 M106 -246 H146 M-4 -160 V-118 M50 -202 V-160" stroke={STEEL} strokeWidth="6" strokeLinecap="round" fill="none" />
+        <path
+          d={`M-60 -64 ${STEPS.map((i) => `L${-60 + i * 22} ${-82 - i * 17} H${-38 + i * 22}`).join(" ")} L118 -200 H146 V-188 H122 L-20 -64 Z`}
+          fill="#f8f9fa"
+          stroke="#ced4da"
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M-56 -120 L106 -246 M106 -246 V-200 M146 -246 V-188 M106 -246 H146 M-4 -160 V-118 M50 -202 V-160"
+          stroke={STEEL}
+          strokeWidth="6"
+          strokeLinecap="round"
+          fill="none"
+        />
         <circle className="fh-treppe-guest" cx="128" cy="-222" r="12" fill={SKIN} />
       </g>
       <rect x="-130" y="-70" width="270" height="34" rx="8" fill="#3a86ff" />
@@ -84,7 +96,6 @@ export function Tankwagen() {
     </g>
   );
 }
-
 
 const FOLLOW_GLASS = "M-14 -78 V-108 H24 Q50 -106 60 -78 Z";
 
@@ -159,8 +170,30 @@ export function Bus() {
           <Face cx={-130} cy={-133} size={0.5} />
         </g>
       </Inside>
-      <rect className="fh-bus-door" x="-150" y="-186" width="24" height="152" rx="3" fill={GLASS} stroke="#40916c" strokeWidth="4" style={{ transformOrigin: "-150px -110px" }} />
-      <rect className="fh-bus-door" x="-126" y="-186" width="24" height="152" rx="3" fill={GLASS} stroke="#40916c" strokeWidth="4" style={{ transformOrigin: "-102px -110px" }} />
+      <rect
+        className="fh-bus-door"
+        x="-150"
+        y="-186"
+        width="24"
+        height="152"
+        rx="3"
+        fill={GLASS}
+        stroke="#40916c"
+        strokeWidth="4"
+        style={{ transformOrigin: "-150px -110px" }}
+      />
+      <rect
+        className="fh-bus-door"
+        x="-126"
+        y="-186"
+        width="24"
+        height="152"
+        rx="3"
+        fill={GLASS}
+        stroke="#40916c"
+        strokeWidth="4"
+        style={{ transformOrigin: "-102px -110px" }}
+      />
       {BUS_GUESTS.map(({ x, shirt, hair }, i) => (
         <Pane key={x} x={x} y={-186} w={60} h={70} rx={8}>
           <g className="fh-bus-passenger" style={nth(i)}>
