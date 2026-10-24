@@ -277,16 +277,6 @@ export class Guide {
     belly.scale.set(0.95, 1.6, 0.5);
     belly.position.set(0, 0.2, 0.075);
     this.spine.add(belly);
-    // A thin satchel strap across the chest, for the explorer look.
-    const strap = mesh(new THREE.TorusGeometry(0.17, 0.012, 8, 40), new THREE.MeshStandardMaterial({ color: "#7a4b2a", roughness: 0.8 }), false);
-    strap.rotation.set(0, Math.PI / 2, 0.75);
-    strap.scale.set(1, 1.25, 0.8);
-    strap.position.y = 0.22;
-    this.spine.add(strap);
-    const bag = mesh(new THREE.BoxGeometry(0.09, 0.08, 0.045), new THREE.MeshStandardMaterial({ color: "#8d5a33", roughness: 0.8 }));
-    bag.position.set(-0.14, 0.02, 0.08);
-    bag.rotation.z = 0.2;
-    this.spine.add(bag);
 
     // Head: round, with muzzle, nose, eyes, ears and bandana; kept small, so it hides little of the arms.
     this.head.position.y = 0.5;
@@ -713,9 +703,11 @@ export class Guide {
       l.hip.rotation.set(-pose.lift, 0, pose.spread * side);
       l.knee.rotation.x = pose.knee;
       // Keep the sole level, also with the legs apart, tipped up onto the toes when asked; the toes stay
-      // on the ground then. A paw in the air hangs a little, toes down, and lands flat again.
+      // on the ground then. A paw in the air hangs a little, toes down, and lands flat again. A leg
+      // stretched out forwards, sitting, rests on its heel with the toes up instead of digging the sole in.
       const hang = THREE.MathUtils.smoothstep(lifted(pose), 0.01, 0.1);
-      l.foot.rotation.x = pose.lift - pose.knee + p.toes * 0.6 + hang * 0.3;
+      const stretched = THREE.MathUtils.smoothstep(pose.lift - pose.knee, 0.9, 1.35);
+      l.foot.rotation.x = (pose.lift - pose.knee) * (1 - stretched) + stretched * 0.3 + p.toes * 0.6 + hang * 0.3;
       l.foot.rotation.z = -pose.spread * side;
       l.toes.rotation.x = -p.toes * 0.6 + hang * 0.2;
     };

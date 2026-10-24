@@ -31,10 +31,13 @@ export interface PlayerEvents {
 
 const ACT_BLEND = 0.7;
 
-/** Sitting on the floor with the legs stretched out forwards, a little bent, blended in by `k`; the rest of the pose stays. */
+/**
+ * Sitting on the floor with the legs stretched out forwards, nearly level, blended in by `k`; the rest
+ * of the pose stays. Level legs keep the heels as high as the bottom, so neither sinks into the seat.
+ */
 function sitDown(p: Pose, k: number): Pose {
   if (k <= 0) return p;
-  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.45, spread: 0.1, knee: 0.2 }, legR: { lift: 1.45, spread: 0.1, knee: 0.2 } };
+  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.55, spread: 0.1, knee: 0.08 }, legR: { lift: 1.55, spread: 0.1, knee: 0.08 } };
   return lerpPose(p, sit, k);
 }
 const PRAISE_BLEND = 0.9;
@@ -232,7 +235,7 @@ export class StoryPlayer {
     const instructionAt = travel > 0 ? travel : lines.situation ? 2.6 : 0.05;
     if (at(instructionAt)) this.events.onLine(lines.instruction, "instruction", f.step);
     if (f.demo > 0 && at(f.lead)) this.events.onLine(lines.turn ?? "Jetzt du!", "turn", f.step);
-    if (at(f.lead + f.actLength * 0.55)) this.events.onLine(lines.again, "again", f.step);
+    if (lines.again && at(f.lead + f.actLength * 0.55)) this.events.onLine(lines.again, "again", f.step);
     for (const line of lines.more ?? []) if (at(f.lead + line.at)) this.events.onLine(line.text, "again", f.step);
     if (at(f.lead + f.actLength + 0.1)) this.events.onLine(lines.praise, "praise", f.step);
   }

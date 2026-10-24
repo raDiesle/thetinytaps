@@ -148,56 +148,6 @@ export function makePalm(height: number, seed: number) {
   return group;
 }
 
-/** A big flower with a stem; `open(k)` unfolds the petals, 0 is a closed bud. */
-export function makeFlower(height: number, color: string, seed: number) {
-  const rnd = seeded(seed);
-  const group = new THREE.Group();
-  const stem = solid(new THREE.CylinderGeometry(0.05, 0.08, height, 10), mat("#4c9a3a"));
-  stem.position.y = height / 2;
-  group.add(stem);
-  for (const side of [1, -1]) {
-    const leafGeo = new THREE.SphereGeometry(0.3, 16, 10);
-    leafGeo.scale(1, 0.12, 0.45);
-    const leaf = solid(leafGeo, mat("#5bb04a"));
-    leaf.position.set(0.25 * side, height * (0.3 + rnd() * 0.2), 0);
-    leaf.rotation.z = -0.5 * side;
-    group.add(leaf);
-  }
-  const head = new THREE.Group();
-  head.position.y = height;
-  group.add(head);
-  const heart = solid(new THREE.SphereGeometry(0.17, 20, 14), mat("#ffd23f", 0.5, { emissive: "#ffb000", emissiveIntensity: 0 }));
-  heart.scale.y = 0.7;
-  head.add(heart);
-  const petals: THREE.Group[] = [];
-  const petalMat = new THREE.MeshPhysicalMaterial({ color, roughness: 0.5, sheen: 1, sheenColor: new THREE.Color("#ffffff"), side: THREE.DoubleSide });
-  const count = 6;
-  for (let i = 0; i < count; i++) {
-    const pivot = new THREE.Group();
-    pivot.rotation.y = (i / count) * Math.PI * 2;
-    const petalGeo = new THREE.SphereGeometry(0.32, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2);
-    petalGeo.scale(0.55, 1, 0.2);
-    petalGeo.translate(0, 0, 0);
-    const petal = solid(petalGeo, petalMat);
-    petal.position.z = 0.12;
-    petal.rotation.x = 0.1;
-    pivot.add(petal);
-    head.add(pivot);
-    petals.push(pivot);
-  }
-  const heartMat = heart.material as THREE.MeshStandardMaterial;
-  return {
-    group,
-    open(k: number) {
-      for (const p of petals) p.rotation.x = 1.45 * k + 0.05;
-      // Closed petals fold up over the heart.
-      for (const p of petals) p.children[0].rotation.x = 0.1 - (1 - k) * 0.1;
-      head.scale.setScalar(0.75 + k * 0.25);
-      heartMat.emissiveIntensity = k * 0.6;
-    },
-  };
-}
-
 /** A butterfly; call `flap(time)` every frame. */
 export function makeButterfly(color: string) {
   const group = new THREE.Group();
@@ -573,8 +523,10 @@ export function makeMonkey() {
 export function makeKey() {
   const group = new THREE.Group();
   const gold = mat("#ffcc33", 0.25, { metalness: 0.9, emissive: "#7a5600", emissiveIntensity: 0.35 });
+  // The ring stands upright along the shaft, like a real key's bow, so a turn of the key shows.
   const bow = solid(new THREE.TorusGeometry(0.07, 0.022, 10, 24), gold);
-  bow.position.z = -0.12;
+  bow.rotation.y = Math.PI / 2;
+  bow.position.z = -0.12 - 0.07;
   group.add(bow);
   const shaft = solid(new THREE.CylinderGeometry(0.02, 0.02, 0.32, 10), gold);
   shaft.rotation.x = Math.PI / 2;

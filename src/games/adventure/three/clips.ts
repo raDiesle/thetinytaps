@@ -141,6 +141,15 @@ export const KEY_TURN = 1.6;
 /** How far the key is turned, 0..1 (a quarter turn), at `t` seconds into the key clip. */
 export const keyTurn = (t: number) => (t < KEY_PICKUP ? 0 : hold(phase(t - KEY_PICKUP, KEY_TURN), 0.08, 0.38, 0.66, 0.92));
 
+/** Seconds of one cast of the fishing rod: swinging back over the shoulder, then out. */
+export const CAST_PERIOD = 3.2;
+/** Seconds of one go of the drum clip: the left paw beats, then the right. */
+export const DRUM_PERIOD = 1.6;
+/** Seconds into each half when the beating paw comes down on the drum. */
+export const DRUM_HIT = 0.4;
+/** Seconds of one push of both arms up into the sky. */
+export const PUSH_PERIOD = 2.6;
+
 /** How Tapsi stands still in the stop dance. */
 type Statue = "wobbly" | "one_leg" | "funny";
 
@@ -245,7 +254,7 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   push_up: (t, p) => {
-    const k = hold(phase(t, 2.6), 0.05, 0.4, 0.65, 0.95);
+    const k = hold(phase(t, PUSH_PERIOD), 0.05, 0.4, 0.65, 0.95);
     for (const a of [p.armL, p.armR]) {
       a.raise = 1.2 + k * 1.3;
       a.spread = 0.15;
@@ -688,7 +697,7 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   cast: (t, p) => {
-    const k = phase(t, 3.2);
+    const k = phase(t, CAST_PERIOD);
     const back = hold(k, 0.05, 0.35, 0.42, 0.5);
     const out = hold(k, 0.42, 0.55, 0.85, 1);
     for (const a of [p.armL, p.armR]) {
@@ -985,13 +994,25 @@ const CLIPS: Record<MotionClipId, Clip> = {
   },
 
   drum: (t, p) => {
-    const s = Math.sin(phase(t, 0.7) * TAU);
-    p.armL.raise = 0.95 + Math.max(0, s) * 0.5;
-    p.armR.raise = 0.95 + Math.max(0, -s) * 0.5;
-    p.armL.elbow = p.armR.elbow = 1.3;
-    p.armL.spread = p.armR.spread = 0.2;
-    p.bend = 0.1;
-    p.lift = Math.abs(s) * 0.01;
+    // Left, then right: the paw goes up high, waits a moment and comes down hard on a drum in front
+    // beside the body, bounces up off it and goes up again.
+    const k = phase(t, DRUM_PERIOD);
+    const beat = (a: Pose["armL"], hit: number) => {
+      // 0 right at the beat, up after it; down fast just before the next one.
+      const u = (k - hit + 1) % 1;
+      const up = u < 0.45 ? smooth(u / 0.45) : u < 0.8 ? 1 : 1 - ((u - 0.8) / 0.2) ** 2;
+      a.raise = 0.85 + up * 1.15;
+      // Out to the side, so the paw on the drum shows beside the body from behind.
+      a.spread = 0.62 - up * 0.1;
+      a.elbow = 0.7 + up * 0.75;
+      return up;
+    };
+    const left = beat(p.armL, DRUM_HIT / DRUM_PERIOD);
+    const right = beat(p.armR, DRUM_HIT / DRUM_PERIOD + 0.5);
+    // Leaning into the beat a little.
+    p.lean = (right - left) * 0.06;
+    p.bend = 0.12;
+    p.headPitch = 0.15;
   },
 
   wand: (t, p) => {

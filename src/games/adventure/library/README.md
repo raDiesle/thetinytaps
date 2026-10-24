@@ -16,7 +16,7 @@ und wie die Welt antwortet.
 | `categories.ts` | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was *nicht* dazugehört |
 | `movements/*.ts` | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor |
-| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–17 Bewegungen und Sekunden, 153–240 s lang |
+| `sequences.ts` | **Ergebnis D**: 5 Abläufe mit 9–18 Bewegungen und Sekunden, 153–321 s lang |
 | `situations.ts` | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
 | diese Datei | **Ergebnis E**: Qualitätskontrolle |
 
@@ -102,20 +102,22 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 | Ablauf | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
 | --- | --- | --- | --- |
-| `treasure_island` (spielbar) | 17 | 240 s | r m l l l r m m l r r m m r l l r |
+| `treasure_island` (spielbar) | 18 | 321 s | m r m l l l l m m l r r m m r l l r |
 | `space_trip` | 9 | 160 s | r m l m m m l r l |
 | `underwater_dive` | 9 | 158 s | r m m m m l r m l |
 | `winter_forest_walk` | 9 | 156 s | r m m m l r r l m |
 | `farm_morning` | 9 | 153 s | r r m l m l m r m |
 
-Die 3D-Geschichte der Schatzinsel dauert länger als die 240 s der Tabelle, etwa 5 Minuten. Vorher
+Die 3D-Geschichte der Schatzinsel dauert länger als die 321 s der Tabelle, gut 6 Minuten. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
-Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (2–4 s je Bewegung, beim Stopptanz eine ganze Runde). Die
-Wege zwischen den Stationen sind kurz (2–5 s), damit es ohne lange Pausen weitergeht. Eltern
+Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (eine bis drei Runden der Bewegung, 2–5 s). Jede
+Bewegung läuft eine ganze Zahl von Runden, und zu jeder Runde gibt es ein Ziel (`CYCLES` in
+`../stories/treasureIsland.ts`, geprüft im Test daneben). Die Wege zwischen den Stationen sind kurz
+(2–6 s), damit es ohne lange Pausen weitergeht. Eltern
 können oben links pausieren und vor- oder zurückspringen, unten auf ein Bild tippen springt zu
 dieser Bewegung.
 
-Alle beginnen ruhig, und nach jeder lebhaften Bewegung kommt bald eine ruhige. `space_trip`
+Alle beginnen ruhig (die Schatzinsel mit dem Angeln, mittel), und nach jeder lebhaften Bewegung kommt bald eine ruhige. `space_trip`
 und `underwater_dive` enden lebhaft. Wenn die Geschichte vor dem Schlafen läuft, sollte dort
 noch ein ruhiger Abschied dazukommen.
 
@@ -139,33 +141,33 @@ noch ein ruhiger Abschied dazukommen.
   deshalb schräg von der Seite, sonst wären die Arme hinter dem Körper versteckt.
 - **Kamera von hinten.** Tapsi schaut immer zur Insel, und die Kamera steht hinter Tapsi: Das
   Kind sieht, was Tapsi sieht, und links ist links. Wo die Arme vor dem Körper arbeiten (Tür,
-  Seil, Blumen), steht sie höher und seitlich, damit die Arme sichtbar bleiben. Tapsis Gesicht
+  Seil, Schlüssel), steht sie höher und seitlich, damit die Arme sichtbar bleiben. Tapsis Gesicht
   sieht das Kind dabei kaum; erst nach dem Aufschließen der Truhe dreht Tapsi sich um und jubelt,
-  tanzt und winkt uns von vorne zu, mit fröhlichem Gesicht. Ob Kinder so besser mitmachen als mit
+  schießt Raketen in den Himmel und winkt uns von vorne zu, mit fröhlichem Gesicht. Ob Kinder so besser mitmachen als mit
   einem Fuchs, der sie anschaut, ist noch offen.
 - **Ole trägt Tapsi.** Das Kind macht jede Bewegung nach, auch die zwischen den Stationen, und
   kann sich im Zimmer nicht frei bewegen. Darum geht Tapsi nie selbst: Ole, eine große
   Meeresschildkröte, schwimmt und krabbelt mit Tapsi auf dem Panzer durch das ganze Level, und
   Tapsi macht alles auf der Stelle (siehe `../LEVEL-REGELN.md`).
-- **Jede Bewegung hat ein Gegenüber.** Tapsi winkt Kiki zu (Kiki fliegt am Anfang heran und am
+- **Jede Bewegung hat ein Gegenüber.** Tapsi steht auf Ole und wirft die Angel aus (bei jedem Wurf springt ein
+  Fisch über den Schwimmer), setzt sich, winkt Kiki zu (Kiki fliegt am Anfang heran und am
   Ende davon), paddelt auf Ole sitzend, stampft Skorpione platt, hüpft auf Ole über die Brücke und stößt
   mit dem Kopf an schwebende Sternkisten (von der Seite gefilmt wie ein Jump-and-Run), duckt sich unter dem
-  schaukelnden Baumstamm, öffnet mit den Armen die Blumen, kurbelt das Holztor hoch, macht den
+  schaukelnden Baumstamm, schlägt abwechselnd auf zwei hängende Trommeln (aus jeder flattert ein Schmetterling),
+  kurbelt das Holztor hoch (beide Pfoten am Griff), macht den
   rollenden Kokosnüssen Platz, weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
-  pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür (groß, breit, klein), wedelt die
-  Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), zieht die Truhe am Seil heran, schließt sie mit dem
-  Schlüssel auf, jubelt und macht mit Kiki und den Krebsen Stopptanz, und zum Schluss gibt es ein Feuerwerk.
-- **Stopptanz** (`freeze` in `../three/clips.ts`, `STOP_DANCE`): Musik an, alle tanzen; hört sie
-  auf, frieren Tapsi, Kiki und die Krebse ein, mal wackelig, mal als Statue auf einem Bein, mal
-  lustig mit einem Arm hoch. Die Pausen sind verschieden lang (1,5–3 s), damit niemand mitzählen
-  kann. Das Zeichen ist nur die Stille: Tapsi sagt kein „Stopp!“. Ist die Musik ausgeschaltet,
-  bleibt nur das Bild, dann frieren alle trotzdem ein.
+  pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür zweimal (groß, breit, klein), wedelt die
+  Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), wird von Ole durch die Schlucht in die Bucht getragen, zieht die Truhe am Seil heran,
+  schließt sie mit dem Schlüssel auf (die Pfote hält den Ring, die Kamera schaut über die Schulter), jubelt,
+  und stößt zum Schluss mit beiden Armen Raketen in den Himmel: ein kurzes Feuerwerk statt eines langen Tanzes.
+- **Stopptanz** (`freeze` in `../three/clips.ts`, `STOP_DANCE`): gibt es als Clip, aber nicht mehr in der
+  Schatzinsel; Tanzen am Ende war zu lang und keine Bewegung, die etwas bewirkt.
 - **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Tapsi hüpft
   zwar über die Brücke, das Kind aber auf der Stelle (`stone_jump`, leichter: auf die Zehenspitzen
   und den Kopf hochstrecken). Sonst gibt es nur kleine Schritte zur Seite und zurück.
 - **Clips nur teilweise angeschaut.** Im Browser geprüft sind die Clips der Schatzinsel
-  (`wave`, `paddle`, `stomp`, `jump`, `duck`, `bloom`, `crank`, `step_side`, `lean_side`,
-  `reach_up`, `shapes`, `brush_away`, `pull_rope`, `turn_key`, `cheer`, `shake`). Die übrigen sind
+  (`cast`, `wave`, `paddle`, `stomp`, `jump`, `duck`, `drum`, `crank`, `step_side`, `lean_side`,
+  `reach_up`, `shapes`, `brush_away`, `pull_rope`, `turn_key`, `cheer`, `push_up`). Die übrigen sind
   programmiert und typgeprüft, aber noch nicht angesehen.
 - **Zeiten sind geschätzt.** Die Sekunden der Abläufe sind nicht mit Kindern gemessen. Wird
   eine Bewegung zu lang, merkt man das daran, dass das Kind aufhört; dann diese Bewegung kürzen.
