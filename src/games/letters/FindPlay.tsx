@@ -7,7 +7,7 @@ import { keyMatches, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import { translate } from "@/content/translate";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
-import { playChime, playRandomNote, setSfxVolume } from "@/lib/sfx";
+import { playChime, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import type { LettersSettings } from "./settings";
 
@@ -73,9 +73,9 @@ export function FindPlay({
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm, pack.speechLang],
+    [settings.speech, pack.speechLang],
   );
 
   const funBurst = useCallback(
@@ -148,16 +148,16 @@ export function FindPlay({
         if (settings.sounds) playChime();
         say(`${pack.letterSentence(current.letter, current.word)} ${pick(pack.praise)}`);
         if (settings.speech && second && translation) {
-          speak(`${translation}!`, second.speechLang, { queue: true, rate: settings.calm ? 0.75 : 0.85 });
+          speak(`${translation}!`, second.speechLang, { queue: true, rate: 0.85 });
         }
-        for (let i = 0; i < (settings.calm ? 3 : 8); i++) spawn();
+        for (let i = 0; i < 8; i++) spawn();
         return;
       }
       funBurst();
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, second, translation, say, spawn, funBurst, tryNextLetter, settings.sounds, settings.speech, settings.calm],
+    [current, found, wrong, pack, second, translation, say, spawn, funBurst, tryNextLetter, settings.sounds, settings.speech],
   );
 
   useEffect(() => {
@@ -171,10 +171,6 @@ export function FindPlay({
 
   const touchKeys = useTouchKeys(settings.touchKeys);
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
-
-  useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
 
   // Tapping the card asks again; once the key is found, any tap moves on.
   const onPlayAreaPointer = (e: PointerEvent) => {
@@ -196,7 +192,7 @@ export function FindPlay({
 
   return (
     <div
-      className={`letters-play${settings.calm ? " calm" : ""}`}
+      className={`letters-play`}
       style={{ background }}
       onPointerDown={onPlayAreaPointer}
     >

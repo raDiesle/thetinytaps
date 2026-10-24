@@ -546,5 +546,4 @@ export const feuerwache: Scene = {
       ],
     },
   ],
-  seasons: { weather: true, tree: [1335, 600, 0.8], snowman: [1185, 858, 0.75], pumpkin: [870, 975], egg: [1295, 965] },
 };

@@ -8,10 +8,13 @@ export type TouchKeysMode = "auto" | "on" | "off";
 
 const KEYS_PER_ROW = 10;
 
-/** On a computer without a touch screen the option is hidden and the keys stay off: real keys are easier than clicking. */
-export function useTouchKeys(mode: TouchKeysMode) {
+/**
+ * On a computer without a touch screen the option is hidden and the keys stay off: real keys are easier than clicking.
+ * `anyTouch`: "auto" shows the keys on every touch screen, also on a touch laptop or an iPad with keyboard.
+ */
+export function useTouchKeys(mode: TouchKeysMode, anyTouch = false) {
   const device = useDevice();
-  return device.hasTouch && (mode === "on" || (mode === "auto" && device.touchOnly));
+  return device.hasTouch && (mode === "on" || (mode === "auto" && (anyTouch || device.touchOnly)));
 }
 
 /** Splits keys into rows of ten, like a keyboard. */
@@ -68,7 +71,15 @@ export function TouchKeyboard({
 }
 
 /** The parents' option for the on-screen keys; not shown on computers without a touch screen. */
-export function TouchKeysSetting({ value, onChange }: { value: TouchKeysMode; onChange: (mode: TouchKeysMode) => void }) {
+export function TouchKeysSetting({
+  value,
+  onChange,
+  anyTouch = false,
+}: {
+  value: TouchKeysMode;
+  onChange: (mode: TouchKeysMode) => void;
+  anyTouch?: boolean;
+}) {
   const device = useDevice();
   if (!device.hasTouch) return null;
   return (
@@ -78,7 +89,7 @@ export function TouchKeysSetting({ value, onChange }: { value: TouchKeysMode; on
         value={value}
         onChange={onChange}
         options={[
-          { value: "auto", label: "📱 Nur auf Tablets" },
+          { value: "auto", label: anyTouch ? "📱 Auf Touch-Bildschirmen" : "📱 Nur auf Tablets" },
           { value: "on", label: "Immer" },
           { value: "off", label: "Nie (mit angeschlossener Tastatur)" },
         ]}

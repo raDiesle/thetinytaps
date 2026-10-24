@@ -102,12 +102,9 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   little "wenn – dann" stories between items that are near each other or belong
   together (Hund bellt → Katze erschrickt → Vogel fliegt weg). The steps use the
   items' normal tap animations.
-- Seasons: add `seasons` to the scene (`{ weather, pumpkin, tree, snowman, egg }`,
-  see `seasonal.tsx`). Each spot is `[footX, footY, size?]` on the ground, on a free
-  patch where the extra covers no item's hit area (tree ≈ 216 × 342 and snowman ≈
-  184 × 264 units before depth scaling, pumpkin ≈ 220 × 116, egg ≈ 108 × 80). Leave
-  out what doesn't fit the place (no snow indoors, no pumpkin if the scene has one);
-  `weather: true` only outdoors. Check every season with the "Jahreszeit" setting.
+- Seasons and holidays are pictures of their own (`winter/`, `herbst/`, `ostern/`), not
+  extras in other scenes. Falling leaves and snow for outdoor pictures: `../weather`
+  (`FallenLeaves`/`Snow` in the background, `FallingLeaves`/`FallingSnow` as `Overlay`).
 - Hidden surprises (idea B-01, `hideout.tsx`): give 2–4 items with a door, window,
   lid, box, hole or sand pile a `<Hideout x y w h size? />` in their drawing, drawn
   **behind** the door (dark interior → Hideout → door), and set `hideout` on the item:

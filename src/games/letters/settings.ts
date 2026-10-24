@@ -38,8 +38,6 @@ export interface LettersSettings {
   theme: "all" | ThemeId;
   /** Chimes and notes. */
   sounds: boolean;
-  /** Quieter sounds, no wiggling, softer shapes. */
-  calm: boolean;
   /** How a number comes in, see NumberReveal. */
   numbers: NumberReveal;
   /** "count" only: ignore new letters/numbers until counting has finished. */
@@ -59,7 +57,6 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   announce: "letterAndWord",
   theme: "all",
   sounds: true,
-  calm: false,
   numbers: "all",
   finishCounting: true,
   touchKeys: "auto",

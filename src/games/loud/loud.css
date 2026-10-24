@@ -62,13 +62,6 @@
   animation: ll-swish 2s ease-in-out infinite;
 }
 
-.loud-play.calm .ll-lion-body,
-.loud-play.calm .ll-lion-tail,
-.loud-play.calm .ll-mouse-whiskers,
-.loud-play.calm .ll-mouse-tail {
-  animation: none;
-}
-
 /* ---------- The lion roars and jumps ---------- */
 
 .roaring .ll-lion-jump {
@@ -124,16 +117,6 @@
   animation: ll-tilt 1.2s ease-in-out;
 }
 
-.loud-play.calm .ll-lion-jump,
-.loud-play.calm .ll-mouse-jump {
-  animation-name: ll-bob;
-}
-
-.loud-play.calm .ll-lion-mane,
-.loud-play.calm .ll-mouse-body {
-  animation: none;
-}
-
 /* ---------- Speech bubbles and labels ---------- */
 
 .ll-bubble {
@@ -157,6 +140,86 @@
 
 .nudge-lion .ll-lion-jump,
 .nudge-mouse .ll-mouse-jump {
+  animation: ll-bob 0.8s ease-in-out 2;
+}
+
+/* ---------- Pusten ---------- */
+
+.loud-root {
+  position: absolute;
+  inset: 0;
+}
+
+.blow-play {
+  --wind: 0;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  touch-action: none;
+}
+
+/* The flames lean away and shrink the harder the child blows. */
+.bl-flame {
+  transform: rotate(calc(var(--wind) * 50deg)) scale(calc(1 - var(--wind) * 0.3), calc(1 - var(--wind) * 0.45));
+}
+
+.bl-flame-flicker {
+  animation: bl-flicker 0.32s ease-in-out infinite alternate;
+}
+
+.bl-smoke {
+  animation: bl-smoke 1.6s ease-out forwards;
+}
+
+.bl-sway {
+  transform: rotate(calc(var(--wind) * 7deg));
+}
+
+.bl-seed-fly {
+  animation: bl-seed-fly 3s cubic-bezier(0.25, 0.6, 0.4, 1) forwards;
+}
+
+.bl-band {
+  stroke-dasharray: 1;
+  animation: bl-draw 0.9s ease-out backwards;
+}
+
+.bl-sail {
+  transform-origin: 6px -24px;
+  transform: scaleX(calc(0.85 + var(--wind) * 0.35));
+}
+
+.bl-flag {
+  transform-origin: 0 -168px;
+  animation: bl-flutter 0.5s ease-in-out infinite alternate;
+}
+
+.bl-foam {
+  opacity: var(--wind);
+}
+
+.bl-boat-bob {
+  animation: bl-bob 2.4s ease-in-out infinite;
+}
+
+.bl-wave {
+  animation: bl-waves 3s linear infinite;
+}
+
+.bl-wave-front {
+  animation-duration: 2.2s;
+  animation-direction: reverse;
+}
+
+.party .bl-cheer,
+.bl-arrived .bl-cheer {
+  animation: ll-mouse-hop 0.5s ease-in-out 4;
+}
+
+.bl-nudging .bl-target {
   animation: ll-bob 0.8s ease-in-out 2;
 }
 
@@ -329,7 +392,68 @@
   }
 }
 
+@keyframes bl-flicker {
+  to {
+    transform: scale(0.9, 1.08);
+  }
+}
+
+@keyframes bl-smoke {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+    transform: translate(10px, -40px) scale(1.2);
+  }
+}
+
+@keyframes bl-seed-fly {
+  0% {
+    transform: none;
+  }
+  45% {
+    transform: translate(calc(var(--dx) * 0.4), calc(var(--dy) * 0.55)) rotate(8deg);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(-6deg);
+  }
+}
+
+@keyframes bl-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes bl-flutter {
+  to {
+    transform: scaleY(0.7) skewY(-8deg);
+  }
+}
+
+@keyframes bl-bob {
+  0%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateY(5px) rotate(2deg);
+  }
+}
+
+@keyframes bl-waves {
+  to {
+    transform: translateX(80px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .blow-play *,
   .loud-play * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;

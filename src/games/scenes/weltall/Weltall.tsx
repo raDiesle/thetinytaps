@@ -487,5 +487,4 @@ export const weltall: Scene = {
     },
   ],
   // No weather on the moon, but the astronauts have a tree in Advent.
-  seasons: { tree: [1170, 800, 0.65], egg: [1265, 960] },
 };

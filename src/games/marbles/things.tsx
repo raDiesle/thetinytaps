@@ -236,10 +236,13 @@ const shuffle = <T,>(list: T[]) =>
     .map(({ item }) => item);
 
 /**
- * A new row of things, small to tall, so each one can reach the next: two
- * small ones, two books, and two or three of the bigger things.
+ * A new row of things, in `groups` runs from small to tall, so each one can
+ * reach the next: two small ones, two books, and two or three of the bigger
+ * things. The tall end of one run falls onto the small start of the next.
  */
-export function pickThings(): Thing[] {
-  const makers = [...shuffle(SMALL).slice(0, 2), book, book, ...shuffle(MIDDLE).slice(0, pick([2, 3]))];
-  return makers.map((make) => make()).sort((a, b) => a.h - b.h);
+export function pickThings(groups = 1): Thing[] {
+  return Array.from({ length: groups }, () => {
+    const makers = [...shuffle(SMALL).slice(0, 2), book, book, ...shuffle(MIDDLE).slice(0, pick([2, 3]))];
+    return makers.map((make) => make()).sort((a, b) => a.h - b.h);
+  }).flat();
 }

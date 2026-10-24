@@ -102,16 +102,26 @@ export function lerpPose(a: Pose, b: Pose, k: number): Pose {
   };
 }
 
+/** The fox is built in the units below and shown this much bigger; the story scales what it measured on the fox with it. */
+export const GUIDE_SIZE = 1.15;
+/** How solid the body and head stay where they hide an arm or a leg. */
+const SEE_THROUGH = 0.4;
+
 const THIGH = 0.24;
 const SHIN = 0.24;
 const FOOT = 0.07;
 const UPPER_ARM = 0.21;
 const FOREARM = 0.19;
+/** Where a paw holds a bar (hand space): in front of the palm, resting on the curled fingers. */
+const GRIP = new THREE.Vector3(0, -0.045, 0.04);
+/** How far the fingers curl round a bar they hold (rad). */
+const GRIP_CURL = 1.75;
 
 const FUR = "#f08a3c";
 const CREAM = "#fff4e2";
 const DARK = "#4a2c22";
 const BANDANA = "#e8423f";
+const PAW = "#ffe6c7";
 
 function fur(color: string) {
   return new THREE.MeshPhysicalMaterial({
@@ -141,6 +151,9 @@ interface Arm {
   shoulder: THREE.Group;
   upper: THREE.Group;
   elbow: THREE.Group;
+  /** The four fingers, each turning at its knuckle. */
+  fingers: THREE.Group[];
+  hand: THREE.Group;
 }
 
 interface Leg {
@@ -169,6 +182,8 @@ export class Guide {
   /** The hands, e.g. to hold a paddle or a rope. */
   readonly handL = new THREE.Group();
   readonly handR = new THREE.Group();
+  /** On top of the thighs while sitting, e.g. for a paddle lying across them; x to the fox's left. */
+  readonly lap = new THREE.Group();
   private talking = false;
   private readonly contour: Contour;
   /** How much moving body parts glow (0..1); the story turns it up during a movement. */
@@ -192,49 +207,56 @@ export class Guide {
     this.root.add(this.hips);
     this.hips.add(this.spine);
 
-    // Body: a soft pear with a cream belly.
-    const body = mesh(new THREE.SphereGeometry(0.23, 32, 24), furMat);
-    body.scale.set(1, 1.25, 0.92);
-    body.position.y = 0.2;
-    this.spine.add(body);
-    const belly = mesh(new THREE.SphereGeometry(0.17, 28, 20), creamMat, false);
-    belly.scale.set(1, 1.3, 0.6);
-    belly.position.set(0, 0.17, 0.12);
+    // Body: slim, a chest and a smaller belly, so the arms and legs stand clear of it.
+    const chest = mesh(new THREE.SphereGeometry(0.16, 32, 24), furMat);
+    chest.scale.set(1.1, 1.15, 0.78);
+    chest.position.y = 0.31;
+    this.spine.add(chest);
+    const pelvis = mesh(new THREE.SphereGeometry(0.15, 28, 20), furMat);
+    pelvis.scale.set(0.95, 1.1, 0.8);
+    pelvis.position.y = 0.08;
+    this.spine.add(pelvis);
+    const belly = mesh(new THREE.SphereGeometry(0.11, 24, 18), creamMat, false);
+    belly.scale.set(0.95, 1.6, 0.5);
+    belly.position.set(0, 0.2, 0.075);
     this.spine.add(belly);
-    // A little satchel strap across the chest, for the explorer look.
-    const strap = mesh(new THREE.TorusGeometry(0.24, 0.018, 8, 40), new THREE.MeshStandardMaterial({ color: "#7a4b2a", roughness: 0.8 }));
+    // A thin satchel strap across the chest, for the explorer look.
+    const strap = mesh(new THREE.TorusGeometry(0.17, 0.012, 8, 40), new THREE.MeshStandardMaterial({ color: "#7a4b2a", roughness: 0.8 }), false);
     strap.rotation.set(0, Math.PI / 2, 0.75);
-    strap.scale.set(1, 1.2, 0.85);
+    strap.scale.set(1, 1.25, 0.8);
     strap.position.y = 0.22;
     this.spine.add(strap);
-    const bag = mesh(new THREE.BoxGeometry(0.14, 0.11, 0.06), new THREE.MeshStandardMaterial({ color: "#8d5a33", roughness: 0.8 }));
-    bag.position.set(-0.2, 0.06, 0.1);
+    const bag = mesh(new THREE.BoxGeometry(0.09, 0.08, 0.045), new THREE.MeshStandardMaterial({ color: "#8d5a33", roughness: 0.8 }));
+    bag.position.set(-0.14, 0.02, 0.08);
     bag.rotation.z = 0.2;
     this.spine.add(bag);
 
-    // Head: big and round, with muzzle, nose, eyes, ears and bandana.
+    // Head: round, with muzzle, nose, eyes, ears and bandana; kept small, so it hides little of the arms.
     this.head.position.y = 0.5;
     this.spine.add(this.head);
+    const face = new THREE.Group();
+    face.scale.setScalar(0.8);
+    this.head.add(face);
     const skull = mesh(new THREE.SphereGeometry(0.27, 40, 30), furMat);
     skull.scale.set(1.08, 0.95, 0.95);
     skull.position.y = 0.16;
-    this.head.add(skull);
+    face.add(skull);
     const cheeks = mesh(new THREE.SphereGeometry(0.2, 32, 24), creamMat);
     cheeks.scale.set(1.15, 0.6, 0.75);
     cheeks.position.set(0, 0.06, 0.12);
-    this.head.add(cheeks);
+    face.add(cheeks);
     const muzzle = mesh(new THREE.SphereGeometry(0.11, 28, 20), creamMat);
     muzzle.scale.set(1, 0.75, 1.15);
     muzzle.position.set(0, 0.09, 0.25);
-    this.head.add(muzzle);
+    face.add(muzzle);
     const nose = mesh(new THREE.SphereGeometry(0.042, 20, 16), new THREE.MeshPhysicalMaterial({ color: "#2b1b17", roughness: 0.2, clearcoat: 1 }));
     nose.scale.set(1.2, 0.85, 1);
     nose.position.set(0, 0.13, 0.37);
-    this.head.add(nose);
+    face.add(nose);
     this.mouth = mesh(new THREE.TorusGeometry(0.035, 0.01, 8, 20, Math.PI), darkMat, false);
     this.mouth.rotation.z = Math.PI;
     this.mouth.position.set(0, 0.04, 0.33);
-    this.head.add(this.mouth);
+    face.add(this.mouth);
     // The laugh: a wide open half-moon with a pink tongue.
     this.laugh = new THREE.Group();
     this.laugh.position.set(0, 0.045, 0.325);
@@ -247,7 +269,7 @@ export class Guide {
     tongue.position.set(0, -0.042, 0.002);
     this.laugh.add(tongue);
     this.laugh.visible = false;
-    this.head.add(this.laugh);
+    face.add(this.laugh);
 
     const eyeMat = new THREE.MeshPhysicalMaterial({ color: "#1d1411", roughness: 0.1, clearcoat: 1 });
     const shine = new THREE.MeshBasicMaterial({ color: "#ffffff" });
@@ -260,14 +282,14 @@ export class Guide {
       const glint = new THREE.Mesh(new THREE.SphereGeometry(0.014, 10, 8), shine);
       glint.position.set(0.012 * side, 0.02, 0.03);
       eye.add(glint);
-      this.head.add(eye);
+      face.add(eye);
       this.eyes.push(eye);
       // A happy eye: a little arch, like ^.
       const arc = mesh(new THREE.TorusGeometry(0.04, 0.012, 8, 20, Math.PI), darkMat, false);
       arc.position.set(0.1 * side, 0.2, 0.262);
       arc.rotation.x = -0.25;
       arc.visible = false;
-      this.head.add(arc);
+      face.add(arc);
       this.happyEyes.push(arc);
       const cheek = new THREE.Mesh(
         new THREE.CircleGeometry(0.045, 20),
@@ -275,7 +297,7 @@ export class Guide {
       );
       cheek.position.set(0.16 * side, 0.1, 0.235);
       cheek.rotation.y = 0.55 * side;
-      this.head.add(cheek);
+      face.add(cheek);
       this.blush.push(cheek);
 
       const ear = new THREE.Group();
@@ -293,7 +315,7 @@ export class Guide {
       tip.scale.z = 0.55;
       tip.position.y = 0.19;
       ear.add(tip);
-      this.head.add(ear);
+      face.add(ear);
       this.ears.push(ear);
     }
 
@@ -302,31 +324,31 @@ export class Guide {
     cap.scale.set(1.1, 0.95, 0.98);
     cap.position.y = 0.17;
     cap.rotation.x = -0.25;
-    this.head.add(cap);
+    face.add(cap);
     const dotMat = new THREE.MeshStandardMaterial({ color: "#fff3e8", roughness: 0.6 });
     for (let i = 0; i < 7; i++) {
       const a = (i / 7) * Math.PI * 2;
       const dot = mesh(new THREE.SphereGeometry(0.018, 8, 6), dotMat, false);
       dot.position.set(Math.cos(a) * 0.19, 0.39, Math.sin(a) * 0.17 - 0.06);
-      this.head.add(dot);
+      face.add(dot);
     }
     for (const side of [1, -1]) {
       const knot = mesh(new THREE.ConeGeometry(0.05, 0.16, 12), bandanaMat);
       knot.position.set(0.05 * side, 0.22, -0.3);
       knot.rotation.set(-1.1, 0, 0.5 * side);
-      this.head.add(knot);
+      face.add(knot);
     }
 
-    // Tail: a bushy curve with a cream tip, wagging from the hips; small, so seen from behind it
-    // does not hide the legs.
-    this.tail.position.set(0, 0.1, -0.17);
-    this.tail.scale.setScalar(0.42);
+    // Tail: a short, slim brush with a cream tip, sticking out backwards from the hips and wagging;
+    // small, so it does not draw the eye away from the arms and legs, nor hide them from behind.
+    this.tail.position.set(0, 0.07, -0.11);
+    this.tail.scale.setScalar(0.3);
     this.hips.add(this.tail);
     const tailCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(0, 0, 0),
-      new THREE.Vector3(0, -0.05, -0.18),
-      new THREE.Vector3(0, 0.08, -0.36),
-      new THREE.Vector3(0, 0.3, -0.42),
+      new THREE.Vector3(0, 0.01, -0.15),
+      new THREE.Vector3(0, 0.07, -0.3),
+      new THREE.Vector3(0, 0.17, -0.4),
     ]);
     const tailGeo = new THREE.TubeGeometry(tailCurve, 24, 1, 14);
     // Thick in the middle, thin at the root.
@@ -336,79 +358,102 @@ export class Guide {
       const u = Math.floor(i / 15) / 24;
       const p = tailCurve.getPointAt(u);
       v.fromBufferAttribute(pos, i).sub(p);
-      const r = 0.04 + Math.sin(Math.min(1, u * 1.15) * Math.PI) * 0.1;
+      const r = 0.035 + Math.sin(Math.min(1, u * 1.15) * Math.PI) * 0.075;
       v.normalize().multiplyScalar(r).add(p);
       pos.setXYZ(i, v.x, v.y, v.z);
     }
     tailGeo.computeVertexNormals();
     this.tail.add(mesh(tailGeo, furMat));
-    const tailTip = mesh(new THREE.SphereGeometry(0.075, 20, 16), creamMat);
-    tailTip.scale.set(1, 1.5, 1);
-    tailTip.position.set(0, 0.32, -0.42);
+    const tailTip = mesh(new THREE.SphereGeometry(0.06, 20, 16), creamMat);
+    tailTip.scale.set(1, 1, 1.5);
+    tailTip.position.set(0, 0.19, -0.42);
+    tailTip.rotation.x = 0.75;
     this.tail.add(tailTip);
 
-    // Arms: orange fur above the elbow and dark "gloves" below, like a real fox's legs, so they
-    // stand out against the body; paws with a pink pad, four short fingers and a thumb.
+    // Arms: slim, orange fur above the elbow and dark below, like a real fox's legs, with round
+    // joints so a bend reads clearly. The paws are light with a dark outline, so the four fingers
+    // and the thumb show one by one; the fingers spread wider the higher the arm goes.
+    const pawMat = fur(PAW);
     const padMat = fur("#e7a3a0");
     const makeArm = (side: 1 | -1, hand: THREE.Group): Arm => {
       const shoulder = new THREE.Group();
       shoulder.position.set(0.2 * side, 0.36, 0);
       const upper = new THREE.Group();
       shoulder.add(upper);
-      const joint = mesh(new THREE.SphereGeometry(0.08, 20, 16), furMat);
+      const joint = mesh(new THREE.SphereGeometry(0.054, 20, 16), furMat);
       upper.add(joint);
-      upper.add(limb(UPPER_ARM, 0.072, furMat));
+      upper.add(limb(UPPER_ARM, 0.046, furMat));
       const elbow = new THREE.Group();
       elbow.position.y = -UPPER_ARM;
       upper.add(elbow);
-      elbow.add(limb(FOREARM, 0.064, darkMat));
+      elbow.add(mesh(new THREE.SphereGeometry(0.045, 16, 12), furMat));
+      elbow.add(limb(FOREARM, 0.04, darkMat));
       hand.position.y = -FOREARM;
       elbow.add(hand);
-      const palm = mesh(new THREE.SphereGeometry(0.07, 20, 16), darkMat);
-      palm.scale.set(1.05, 1.05, 0.72);
+      const palm = mesh(new THREE.SphereGeometry(0.048, 20, 16), pawMat);
+      palm.scale.set(1.1, 1.05, 0.6);
       palm.position.y = -0.035;
       hand.add(palm);
-      // The palm faces the body while the arm hangs.
-      const pad = mesh(new THREE.SphereGeometry(0.04, 14, 10), padMat, false);
-      pad.scale.set(0.35, 1, 0.9);
-      pad.position.set(-0.05 * side, -0.04, 0);
+      // The pad on the inside of the paw: towards us when the paw waves.
+      const pad = mesh(new THREE.SphereGeometry(0.026, 14, 10), padMat, false);
+      pad.scale.set(1, 1, 0.4);
+      pad.position.set(0, -0.04, 0.026);
       hand.add(pad);
+      const fingers: THREE.Group[] = [];
       for (let i = 0; i < 4; i++) {
-        const finger = mesh(new THREE.CapsuleGeometry(0.019, 0.045, 4, 8), darkMat, false);
-        finger.position.set((i - 1.5) * 0.028, -0.105, 0.012);
-        finger.rotation.set(0.35, 0, (i - 1.5) * 0.12);
-        hand.add(finger);
+        const knuckle = new THREE.Group();
+        knuckle.position.set((i - 1.5) * 0.022, -0.068, 0);
+        const long = i === 1 || i === 2 ? 0.012 : 0;
+        const finger = mesh(new THREE.CapsuleGeometry(0.0125, 0.032 + long, 4, 8), pawMat);
+        finger.position.y = -0.026 - long / 2;
+        knuckle.add(finger);
+        hand.add(knuckle);
+        fingers.push(knuckle);
       }
-      const thumb = mesh(new THREE.CapsuleGeometry(0.02, 0.04, 4, 8), darkMat, false);
-      thumb.position.set(-0.055 * side, -0.06, 0.035);
-      thumb.rotation.set(0.5, 0, 0.6 * side);
+      const thumb = new THREE.Group();
+      thumb.position.set(-0.04 * side, -0.035, 0.008);
+      thumb.rotation.z = -0.95 * side;
+      const thumbTip = mesh(new THREE.CapsuleGeometry(0.0135, 0.028, 4, 8), pawMat);
+      thumbTip.position.y = -0.024;
+      thumb.add(thumbTip);
       hand.add(thumb);
       this.spine.add(shoulder);
-      return { shoulder, upper, elbow };
+      return { shoulder, upper, elbow, fingers, hand };
     };
     this.armL = makeArm(1, this.handL);
     this.armR = makeArm(-1, this.handR);
 
+    // Legs: slim, with a round knee, dark socks and light paws with four toes in front.
     const makeLeg = (side: 1 | -1): Leg => {
       const hip = new THREE.Group();
       hip.position.set(0.11 * side, 0.02, 0);
-      hip.add(limb(THIGH, 0.08, furMat));
+      hip.add(limb(THIGH, 0.056, furMat));
       const knee = new THREE.Group();
       knee.position.y = -THIGH;
       hip.add(knee);
-      knee.add(limb(SHIN, 0.065, darkMat));
+      knee.add(mesh(new THREE.SphereGeometry(0.052, 16, 12), furMat));
+      knee.add(limb(SHIN, 0.043, darkMat));
       const foot = new THREE.Group();
       foot.position.y = -SHIN;
       knee.add(foot);
-      const sole = mesh(new THREE.SphereGeometry(0.08, 20, 14), darkMat);
-      sole.scale.set(0.85, 0.55, 1.4);
-      sole.position.set(0, -0.02, 0.05);
+      const sole = mesh(new THREE.SphereGeometry(0.06, 20, 14), pawMat);
+      sole.scale.set(1, 0.58, 1.4);
+      sole.position.set(0, -0.035, 0.035);
       foot.add(sole);
+      for (let i = 0; i < 4; i++) {
+        const toe = mesh(new THREE.SphereGeometry(0.023, 12, 10), pawMat);
+        toe.scale.set(1, 0.85, 1.1);
+        toe.position.set((i - 1.5) * 0.034, -0.05, 0.112 - Math.abs(i - 1.5) * 0.012);
+        foot.add(toe);
+      }
       this.hips.add(hip);
       return { hip, knee, foot };
     };
     this.legL = makeLeg(1);
     this.legR = makeLeg(-1);
+    // Over the thighs halfway to the knees, as they lie when sitting (thighs forward).
+    this.lap.position.set(0, 0.075, 0.19);
+    this.hips.add(this.lap);
 
     const parts: [THREE.Object3D, ContourPart][] = [
       [this.armL.shoulder, "armL"],
@@ -424,6 +469,78 @@ export class Guide {
       }
       return "body";
     });
+    // The root of the arm and leg sits inside the body anyway; only what reaches out of it shows through.
+    this.seeThrough(
+      [this.armL.shoulder, this.armR.shoulder, this.legL.hip, this.legR.hip],
+      [this.armL.upper.children[0], this.armR.upper.children[0], this.legL.hip.children[0], this.legR.hip.children[0]],
+    );
+    this.root.scale.setScalar(GUIDE_SIZE);
+  }
+
+  /**
+   * Where the body or head hides an arm or a leg from the camera, it turns half see-through there,
+   * so the movement still shows from every side. The limbs are drawn first and mark where they show
+   * in the stencil buffer; body and head are drawn after them, solid only where there is no mark,
+   * and see-through on the marks that lie behind them.
+   */
+  private seeThrough(limbs: THREE.Object3D[], inside: THREE.Object3D[]) {
+    const marking = new Map<THREE.Material, THREE.Material>();
+    const solid = new Map<THREE.Material, THREE.Material>();
+    const ghosts = new Map<THREE.Material, THREE.Material>();
+    const once = (cache: Map<THREE.Material, THREE.Material>, m: THREE.Material, make: (c: THREE.Material) => void) => {
+      let c = cache.get(m);
+      if (!c) {
+        c = m.clone();
+        // The outline changes its uniforms later on the material it made, so the copy keeps them.
+        if (m instanceof THREE.ShaderMaterial) (c as THREE.ShaderMaterial).uniforms = m.uniforms;
+        make(c);
+        cache.set(m, c);
+      }
+      return c;
+    };
+    const under = (o: THREE.Object3D, groups: THREE.Object3D[]) => {
+      for (let p: THREE.Object3D | null = o; p; p = p.parent) if (groups.includes(p)) return true;
+      return false;
+    };
+    const meshes: THREE.Mesh[] = [];
+    this.root.traverse((o) => {
+      if (o instanceof THREE.Mesh) meshes.push(o);
+    });
+    for (const m of meshes) {
+      const material = m.material as THREE.Material;
+      if (under(m, limbs)) {
+        if (under(m, inside)) continue;
+        m.material = once(marking, material, (c) => {
+          c.stencilWrite = true;
+          c.stencilRef = 1;
+          c.stencilFunc = THREE.AlwaysStencilFunc;
+          c.stencilZPass = THREE.ReplaceStencilOp;
+        });
+        m.renderOrder = 10;
+      } else if (!material.transparent) {
+        m.material = once(solid, material, (c) => {
+          c.stencilWrite = true;
+          c.stencilRef = 1;
+          c.stencilFunc = THREE.NotEqualStencilFunc;
+        });
+        m.renderOrder = 11;
+        // The outline stays solid.
+        if (material instanceof THREE.ShaderMaterial) continue;
+        const ghost = new THREE.Mesh(
+          m.geometry,
+          once(ghosts, material, (c) => {
+            c.transparent = true;
+            c.opacity = SEE_THROUGH;
+            c.depthWrite = false;
+            c.stencilWrite = true;
+            c.stencilRef = 1;
+            c.stencilFunc = THREE.EqualStencilFunc;
+          }),
+        );
+        ghost.renderOrder = 11;
+        m.add(ghost);
+      }
+    }
   }
 
   /** Talking moves the mouth while the voice speaks. */
@@ -447,6 +564,9 @@ export class Guide {
       a.shoulder.rotation.set(-pose.raise, 0, pose.spread * side);
       a.upper.rotation.y = pose.twist * side;
       a.elbow.rotation.x = -pose.elbow;
+      // Fingers close together while the arm hangs, and spread wide once it reaches out or up.
+      const open = THREE.MathUtils.smoothstep(pose.raise + pose.spread, 0.5, 1.8);
+      a.fingers.forEach((finger, i) => finger.rotation.set(0, 0, (i - 1.5) * (0.1 + open * 0.2)));
     };
     arm(this.armL, p.armL, 1);
     arm(this.armR, p.armR, -1);
@@ -461,7 +581,7 @@ export class Guide {
     leg(this.legL, p.legL, 1);
     leg(this.legR, p.legR, -1);
 
-    this.tail.rotation.set(0.15 + Math.sin(time * 1.7) * 0.05, Math.sin(time * 2.6) * 0.35, 0);
+    this.tail.rotation.set(Math.sin(time * 1.7) * 0.05, Math.sin(time * 2.6) * 0.35, 0);
 
     // Blink every few seconds.
     const blink = time % 3.7 < 0.12 ? 0.1 : 1;
@@ -487,6 +607,52 @@ export class Guide {
     this.laugh.scale.set(1, laughOpen, 1);
 
     this.glowMoving(p, time);
+  }
+
+  /** Where a paw would hold a bar right now, in world space. */
+  gripPoint(hand: "L" | "R", out: THREE.Vector3) {
+    return (hand === "L" ? this.handL : this.handR).localToWorld(out.copy(GRIP));
+  }
+
+  /**
+   * Puts a paw on a bar: `target` (world space) comes to lie in the paw, the bar runs along `along`
+   * and the fingers close round it. The arm bends in the plane across the bar, the elbow down and
+   * back. `weight` blends from the pose (0) to holding on (1). Called after apply(), every frame.
+   */
+  hold(hand: "L" | "R", target: THREE.Vector3, along: THREE.Vector3, weight: number) {
+    if (weight <= 0) return;
+    const a = hand === "L" ? this.armL : this.armR;
+    const side = hand === "L" ? 1 : -1;
+    // In the space of the body the shoulder hangs from, in the fox's own units.
+    this.spine.updateWorldMatrix(true, false);
+    const toBody = new THREE.Matrix4().copy(this.spine.matrixWorld).invert();
+    const reach = new THREE.Vector3().copy(target).applyMatrix4(toBody).sub(a.shoulder.position);
+    const bar = new THREE.Vector3().copy(along).transformDirection(toBody);
+    // The paw holds the bar a little in front of the forearm's line.
+    const forearm = Math.hypot(FOREARM - GRIP.y, GRIP.z);
+    const offset = Math.atan2(GRIP.z, FOREARM - GRIP.y);
+    const dist = THREE.MathUtils.clamp(reach.length(), Math.abs(UPPER_ARM - forearm) + 0.001, UPPER_ARM + forearm - 0.001);
+    const dir = reach.normalize();
+    const across = bar.addScaledVector(dir, -bar.dot(dir));
+    if (across.lengthSq() < 1e-6) across.set(1, 0, 0);
+    across.normalize();
+    const toElbow = new THREE.Vector3().crossVectors(across, dir);
+    if (toElbow.dot(new THREE.Vector3(side * 0.3, -1, -0.6)) < 0) toElbow.negate();
+    const cosShoulder = (UPPER_ARM ** 2 + dist ** 2 - forearm ** 2) / (2 * UPPER_ARM * dist);
+    const cosElbow = (UPPER_ARM ** 2 + forearm ** 2 - dist ** 2) / (2 * UPPER_ARM * forearm);
+    const shoulderAngle = Math.acos(THREE.MathUtils.clamp(cosShoulder, -1, 1));
+    const bend = Math.max(0, Math.PI - Math.acos(THREE.MathUtils.clamp(cosElbow, -1, 1)) - offset);
+    const upperDir = dir.clone().multiplyScalar(Math.cos(shoulderAngle)).addScaledVector(toElbow, Math.sin(shoulderAngle));
+    // The upper arm hangs along -y and the elbow bends it towards +z: towards where the paw goes.
+    const y = upperDir.clone().negate();
+    const z = dir.addScaledVector(upperDir, -dir.dot(upperDir)).normalize();
+    const x = new THREE.Vector3().crossVectors(y, z);
+    const held = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+    a.shoulder.quaternion.multiply(a.upper.quaternion).slerp(held, weight);
+    a.upper.quaternion.identity();
+    a.elbow.rotation.x += (-bend - a.elbow.rotation.x) * weight;
+    for (const finger of a.fingers) finger.rotation.x = -GRIP_CURL * weight;
+    a.shoulder.updateMatrixWorld(true);
   }
 
   /** Lets the parts that move right now glow, so the movement stands out. */

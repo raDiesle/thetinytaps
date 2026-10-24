@@ -40,13 +40,30 @@ export const meterAt = (db: number) => Math.min(1, Math.max(0, (db - METER_MIN_D
 
 export type Heard = "loud" | "quiet";
 
+/** The room's own noise, learned while listening; see the FLOOR_ constants. */
+function createFloor() {
+  let floor = FLOOR_START_DB;
+  return {
+    get db() {
+      return floor;
+    },
+    update(db: number, dt: number, deaf: boolean) {
+      if (db < floor && db > SILENT_DB) floor = Math.max(db, floor - (FLOOR_FALL_DB_PER_S * dt) / 1000);
+      else if (db > floor && !deaf) floor = Math.min(db, floor + (FLOOR_RISE_DB_PER_S * dt) / 1000);
+    },
+  };
+}
+
+/** dBFS where the lion roars, but at least that much above the room. */
+const loudDbAbove = (floor: number, sensitivity: Sensitivity) => Math.max(LOUD_DB[sensitivity], floor + LOUD_ABOVE_FLOOR_DB);
+
 /**
  * Turns the loudness of each frame into "loud" (the lion) or "quiet" (the
  * mouse) once a sound has lasted long enough. While `deaf` (the game itself
  * makes noise) it hears nothing, so the lion doesn't answer his own roar.
  */
 export function createEar() {
-  let floor = FLOOR_START_DB;
+  const floor = createFloor();
   let loudMs = 0;
   let quietMs = 0;
   let gapMs = 0;
@@ -58,13 +75,12 @@ export function createEar() {
       return meter;
     },
     loudDb(sensitivity: Sensitivity) {
-      return Math.max(LOUD_DB[sensitivity], floor + LOUD_ABOVE_FLOOR_DB);
+      return loudDbAbove(floor.db, sensitivity);
     },
     hear(db: number, ms: number, deaf: boolean, sensitivity: Sensitivity): Heard | null {
       const dt = Math.min(ms, 100);
       meter = Math.max(meterAt(db), meter - (METER_FALL_PER_S * dt) / 1000);
-      if (db < floor && db > SILENT_DB) floor = Math.max(db, floor - (FLOOR_FALL_DB_PER_S * dt) / 1000);
-      else if (db > floor && !deaf) floor = Math.min(db, floor + (FLOOR_RISE_DB_PER_S * dt) / 1000);
+      floor.update(db, dt, deaf);
       if (deaf) {
         loudMs = quietMs = gapMs = 0;
         return null;
@@ -81,7 +97,7 @@ export function createEar() {
         return null;
       }
       loudMs = 0;
-      if (db >= Math.max(QUIET_MIN_DB, floor + QUIET_ABOVE_FLOOR_DB)) {
+      if (db >= Math.max(QUIET_MIN_DB, floor.db + QUIET_ABOVE_FLOOR_DB)) {
         quietMs += dt;
         gapMs = 0;
         if (quietMs >= QUIET_HOLD_MS) {
@@ -92,6 +108,37 @@ export function createEar() {
         quietMs = 0;
       }
       return null;
+    },
+  };
+}
+
+/** Blowing starts to count this much above the room's noise; as loud as the lion's roar is full strength. */
+const WIND_ABOVE_FLOOR_DB = 10;
+const WIND_MIN_DB = -52;
+/** The wind picks up fast and calms down a little slower, like a real gust; per second, on the 0–1 scale. */
+const WIND_RISE_PER_S = 8;
+const WIND_FALL_PER_S = 2.5;
+/** While deaf (the game makes a sound) the wind keeps blowing a little, so a sound doesn't stop the boat. */
+const WIND_DEAF_FALL_PER_S = 0.5;
+
+/**
+ * For the blowing level: how strong the child blows into the microphone, 0–1.
+ * A loud voice blows too – for a toddler that's just as good.
+ */
+export function createWind() {
+  const floor = createFloor();
+  let wind = 0;
+
+  return {
+    blow(db: number, ms: number, deaf: boolean, sensitivity: Sensitivity): number {
+      const dt = Math.min(ms, 100);
+      floor.update(db, dt, deaf);
+      if (deaf) return (wind = Math.max(0, wind - (WIND_DEAF_FALL_PER_S * dt) / 1000));
+      const from = Math.max(WIND_MIN_DB, floor.db + WIND_ABOVE_FLOOR_DB);
+      const full = Math.max(loudDbAbove(floor.db, sensitivity), from + 6);
+      const target = Math.min(1, Math.max(0, (db - from) / (full - from)));
+      wind = target > wind ? Math.min(target, wind + (WIND_RISE_PER_S * dt) / 1000) : Math.max(target, wind - (WIND_FALL_PER_S * dt) / 1000);
+      return wind;
     },
   };
 }

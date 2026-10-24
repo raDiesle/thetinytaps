@@ -160,7 +160,7 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
   const feelingImage = imageFor(bearImages.feeling(feeling.id));
 
   return (
-    <div className={`story-play bear-play${settings.calm ? " calm" : ""}`} onPointerDown={() => happy && tryNextFeeling()}>
+    <div className={`story-play bear-play`} onPointerDown={() => happy && tryNextFeeling()}>
       <header className="story-narration">
         {feelingImage && <img key={feeling.id} className="story-picture" src={feelingImage} alt="" draggable={false} />}
         <span key={`${round.key}-${happy}`} className="story-tag feeling-tag">
@@ -218,19 +218,34 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
           );
         })}
         {happy && (
-          <button
-            type="button"
-            className="story-button next again"
-            onPointerDown={(e: PointerEvent) => {
-              e.stopPropagation();
-              nextFeeling();
-            }}
-          >
-            <span className="story-button-emoji" aria-hidden>
-              ▶
-            </span>
-            Weiter
-          </button>
+          <>
+            <button
+              type="button"
+              className="story-button replay"
+              onPointerDown={(e: PointerEvent) => {
+                e.stopPropagation();
+                startFeeling(feeling);
+              }}
+            >
+              <span className="story-button-emoji" aria-hidden>
+                🔁
+              </span>
+              Nochmal
+            </button>
+            <button
+              type="button"
+              className="story-button next again"
+              onPointerDown={(e: PointerEvent) => {
+                e.stopPropagation();
+                nextFeeling();
+              }}
+            >
+              <span className="story-button-emoji" aria-hidden>
+                ▶
+              </span>
+              Weiter
+            </button>
+          </>
         )}
       </footer>
     </div>

@@ -515,5 +515,4 @@ export const strand: Scene = {
       ],
     },
   ],
-  seasons: { weather: true, snowman: [1450, 730, 0.75], tree: [1572, 880, 0.75], pumpkin: [1470, 800, 0.8], egg: [1050, 820] },
 };
