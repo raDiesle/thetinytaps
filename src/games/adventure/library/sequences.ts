@@ -28,13 +28,13 @@ export const SEQUENCES: Sequence[] = [
         seconds: 13.5,
         energy: "lively",
         situation: "Am Strand krabbeln kleine Skorpione heran – schnell und feste stampfen, plopp, weg sind sie.",
-        transition: "Ein Bach mit Steinen versperrt den Weg, darüber schweben Kisten.",
+        transition: "Über den Bach führt eine kleine Holzbrücke, darüber schweben Kisten.",
       },
       {
         movement: "stone_jump",
         seconds: 15.6,
         energy: "lively",
-        situation: "Von der Seite wie in einem Hüpfspiel: von Stein zu Stein springen, beim dritten Sprung mit dem Kopf an eine Kiste stoßen, ein Stern springt heraus.",
+        situation: "Von der Seite wie in einem Hüpfspiel: über die kleine Brücke hüpfen, beim dritten Sprung mit dem Kopf an eine Kiste stoßen, ein Stern springt heraus.",
         transition: "Am anderen Ufer geht es in den Dschungel.",
       },
       {

@@ -156,8 +156,8 @@ noch ein ruhiger Abschied dazukommen.
   lustig mit einem Arm hoch. Die Pausen sind verschieden lang (1,5–3 s), damit niemand mitzählen
   kann. Das Zeichen ist nur die Stille: Tapsi sagt kein „Stopp!“. Ist die Musik ausgeschaltet,
   bleibt nur das Bild, dann frieren alle trotzdem ein.
-- **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Tapsi springt
-  zwar von Stein zu Stein, das Kind aber auf der Stelle (`stone_jump`, leichter: auf die Zehenspitzen
+- **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Tapsi hüpft
+  zwar über die Brücke, das Kind aber auf der Stelle (`stone_jump`, leichter: auf die Zehenspitzen
   und den Kopf hochstrecken). Sonst gibt es nur kleine Schritte zur Seite und zurück.
 - **Clips nur teilweise angeschaut.** Im Browser geprüft sind die Clips der Schatzinsel
   (`wave`, `paddle`, `stomp`, `jump`, `duck`, `bloom`, `crank`, `step_side`, `lean_side`,
