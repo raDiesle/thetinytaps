@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { SEQUENCES } from "../../library/sequences";
 import {
   BRUSH_HIT,
   BRUSH_PERIOD,
@@ -16,33 +15,8 @@ import {
   stopDance,
 } from "../../three/clips";
 import { GUIDE_SIZE, type Guide } from "../../three/guide";
-import {
-  makeBasket,
-  makeBush,
-  makeButterfly,
-  makeChest,
-  makeCloud,
-  makeConfetti,
-  makeCrab,
-  makeFlower,
-  makeKey,
-  makeMonkey,
-  makePaddle,
-  PADDLE_REACH,
-  makePalm,
-  makeParrot,
-  makeRock,
-  makeScorpion,
-  makeTurtle,
-  mat,
-  mergeStatic,
-  seeded,
-  solid,
-  TURTLE_BACK,
-  TURTLE_HALF_WIDTH,
-  turtleTop,
-} from "../../three/props";
-import { DAY, makeWater, SUNSET, type Stage } from "../../three/stage";
+import { PADDLE_REACH, TURTLE_BACK, TURTLE_HALF_WIDTH, turtleTop } from "../../three/props";
+import { DAY, SUNSET, type Stage } from "../../three/stage";
 import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from "../story";
 import {
   APPLE_Z,
@@ -50,10 +24,7 @@ import {
   BEACH_Z,
   BOAT_END,
   BOAT_START,
-  BOX_ABOVE,
   BROOK_FROM,
-  CHEST_Y,
-  CHEST_Z,
   CRANK_REACH,
   CRANK_Y,
   DOOR_Z,
@@ -79,7 +50,6 @@ import {
   STOMP_Z,
   SWING_HELD,
   SWING_PARKED,
-  SWING_PIVOT_Z,
   SWING_Z,
   TAU,
   TURTLE_FLOAT,
@@ -91,30 +61,38 @@ import {
   WINCH_Z,
   bridgeTop,
   clamp01,
-  freeSpot,
   groundHeight,
   smooth,
   ss,
   v3,
 } from "./layout";
 import {
-  cobwebTexture,
-  makeAppleTree,
-  makeBridge,
-  makeCoconut,
-  makeDoor,
-  makeFarIsland,
-  makeGate,
-  makeGroundCover,
-  makeLock,
-  makeRaft,
-  makeRiddle,
-  makeSpider,
-  makeStarBox,
-  makeSwing,
-  makeTerrain,
-  makeTrail,
-} from "./scenery";
+  ACROSS,
+  DEMO,
+  ISLAND,
+  LEAD,
+  LEAN_PERIOD,
+  ON_SAND,
+  OPENING,
+  OPENING_CUT,
+  PADDLE_DROP,
+  PADDLE_GRIP,
+  PADDLE_PERIOD,
+  PADDLE_TILT,
+  PRAISE,
+  REACH_PERIOD,
+  S,
+  SIDE_STEP_PERIOD,
+  TRAIL_FROM,
+  TRAIL_TO,
+  TRAVEL,
+  actLength,
+  bumpTime,
+  clipLength,
+  jumpZ,
+  sequence,
+} from "./script";
+import { makeWorld } from "./world";
 
 // "Die Schatzinsel": Tapsi greets us from the back of Ole, a big sea turtle,
 // and paddles to an island,
@@ -141,403 +119,55 @@ import {
 // from the side, like a jump-and-run game. At the treasure Tapsi turns round
 // and celebrates facing us.
 //
-// Positions along the path are in layout.ts, the props in scenery.ts.
-
-const sequence = SEQUENCES.find((s) => s.id === "treasure_island")!;
-
-/** The step indices of the sequence, by name. */
-const S = {
-  hello: 0,
-  paddle: 1,
-  stomp: 2,
-  jump: 3,
-  duck: 4,
-  flowers: 5,
-  gate: 6,
-  roll: 7,
-  monkeys: 8,
-  apples: 9,
-  riddle: 10,
-  webs: 11,
-  rope: 12,
-  key: 13,
-  hooray: 14,
-  party: 15,
-  bye: 16,
-} as const;
-
-/** Seconds of travel before each step: walking or paddling there, or the camera coming in. */
-const TRAVEL = [2.5, 3, 3, 3.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 3.5, 2.5, 2.5, 2, 1];
-/** Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step. */
-const DEMO = [
-  2.5,
-  2.8,
-  1.6,
-  3 * JUMP_PERIOD,
-  3,
-  4,
-  CRANK_PERIOD,
-  3,
-  3.4,
-  2.6,
-  2,
-  BRUSH_PERIOD,
-  3.6,
-  KEY_PICKUP + KEY_TURN,
-  2,
-  STOP_DANCE[0].dance + STOP_DANCE[0].hold,
-  2,
-];
-const LEAD = TRAVEL.map((t, i) => t + DEMO[i]);
-const PRAISE = 2.5;
-/** Seconds the child moves along in a step, after Tapsi has shown it. */
-const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL[step] - PRAISE;
-/** Seconds of a step's clip that the world follows: from when Tapsi shows it until the praise. */
-const clipLength = (step: number) => DEMO[step] + actLength(step);
-/** Seconds into the jump clip when the head bumps star box `n`: at the top of every third jump. */
-const bumpTime = (n: number) => (n * 3 + 2) * JUMP_PERIOD + JUMP_PEAK;
-/** Where Ole is on the bridge (z) `clip` seconds into the jump clip: walking steadily across while Tapsi hops on its back. */
-function jumpZ(clip: number) {
-  const k = clamp01(clip / clipLength(S.jump));
-  return JUMP_FROM + (JUMP_TO - JUMP_FROM) * (k * 0.8 + smooth(k) * 0.2);
-}
-const OPENING = 8;
-/** In the opening: when the trail starts and reaches the chest, and the flash back to Ole at sea. */
-const TRAIL_FROM = 0.6;
-const TRAIL_TO = 5.2;
-const OPENING_CUT = 6.6;
-
-/** Tapsi faces the island (-z); 0 would face the sea. */
-const ISLAND = Math.PI;
-
-/** Seconds of one paddle stroke cycle, as in the paddle clip. */
-const PADDLE_PERIOD = 2.8;
-/** How much more the paddle tips than the line between the hands. */
-const PADDLE_TILT = 1.3;
-/** How far from its middle each paw holds the paddle while it lies on the lap (m). */
-const PADDLE_GRIP = 0.22;
-/** The paddle lying across Tapsi's lap: its shaft (y) along x, the blades flat (z up); and on the sand, along z. */
-const ACROSS = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(v3(0, 0, 1), v3(1, 0, 0), v3(0, 1, 0)));
-const ON_SAND = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(v3(-1, 0, 0), v3(0, 0, 1), v3(0, 1, 0)));
-/** Where Tapsi lets the paddle fall onto the beach, beside Ole on the right. */
-const PADDLE_DROP = v3(1.35, 0, BEACH_Z + 0.3);
-/** The stomp clip: a foot comes down every half period, the left one first. */
-const STOMP_PERIOD = 1.6;
-const SIDE_STEP_PERIOD = 3;
-const LEAN_PERIOD = 3.4;
-const REACH_PERIOD = 2.6;
-
-const ROLLERS = 4;
-const THROWS = 8;
-const APPLES = 8;
+// Positions along the path are in layout.ts, the props in scenery.ts, putting them
+// together in world.ts, the steps and their timing in script.ts; here they move.
 
 function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const scene = stage.scene;
-  const rnd = seeded(1234);
   stage.setSky(DAY, SUNSET, 0);
   stage.updateReflections();
 
-  // --- Land, sea and sky ---------------------------------------------------
-  scene.add(makeTerrain());
-  const sea = makeWater(800, 240, new THREE.Vector2(0, -4), 40, "#45d6cf", "#1b6db6");
-  scene.add(sea.mesh);
-  const lagoonWater = new THREE.Mesh(
-    new THREE.CircleGeometry(7.8, 64),
-    new THREE.MeshPhysicalMaterial({ color: "#3fd3c8", roughness: 0.08, transparent: true, opacity: 0.82, clearcoat: 1 }),
-  );
-  lagoonWater.rotation.x = -Math.PI / 2;
-  lagoonWater.position.set(LAGOON.x, LAGOON_LEVEL, LAGOON.y);
-  lagoonWater.receiveShadow = true;
-  scene.add(lagoonWater);
-  const brook = new THREE.Mesh(
-    new THREE.PlaneGeometry(36, 3.6),
-    new THREE.MeshPhysicalMaterial({ color: "#5cc8e6", roughness: 0.1, transparent: true, opacity: 0.85, clearcoat: 1 }),
-  );
-  brook.rotation.x = -Math.PI / 2;
-  brook.position.set(0, 0.42, 25.4);
-  brook.receiveShadow = true;
-  scene.add(brook);
-
-  const far1 = makeFarIsland(1.4, 300);
-  far1.position.set(-150, -0.5, -40);
-  const far2 = makeFarIsland(1.0, 310);
-  far2.position.set(170, -0.5, -170);
-  const far3 = makeFarIsland(0.8, 320);
-  far3.position.set(-60, -0.5, 160);
-  scene.add(mergeStatic(new THREE.Group().add(far1, far2, far3)));
-
-  const clouds: THREE.Group[] = [];
-  for (let i = 0; i < 12; i++) {
-    const cloud = makeCloud(400 + i);
-    const a = (i / 12) * TAU + rnd() * 0.4;
-    const d = 170 + rnd() * 120;
-    cloud.position.set(Math.cos(a) * d, 45 + rnd() * 35, Math.sin(a) * d);
-    cloud.lookAt(0, cloud.position.y, 0);
-    cloud.scale.setScalar(1 + rnd() * 0.8);
-    clouds.push(cloud);
-    scene.add(cloud);
-  }
-
-  // --- Plants and rocks ----------------------------------------------------
-  // They never move, so they are baked together at the end.
-  const scenery = new THREE.Group();
-  for (let i = 0, placed = 0; i < 2000 && placed < 46; i++) {
-    const x = (rnd() - 0.5) * 56;
-    const z = -4 + (rnd() - 0.5) * 82;
-    if (!freeSpot(x, z) || groundHeight(x, z) > 2.5) continue;
-    const palm = makePalm(5 + rnd() * 3.5, 100 + i);
-    palm.position.set(x, groundHeight(x, z) - 0.1, z);
-    palm.rotation.y = rnd() * TAU;
-    scenery.add(palm);
-    placed++;
-  }
-  for (let i = 0, placed = 0; i < 3000 && placed < 70; i++) {
-    const x = (rnd() - 0.5) * 56;
-    const z = -4 + (rnd() - 0.5) * 82;
-    if (!freeSpot(x, z)) continue;
-    const bush = makeBush(0.7 + rnd() * 0.9, 500 + i);
-    bush.position.set(x, groundHeight(x, z) - 0.1, z);
-    scenery.add(bush);
-    placed++;
-  }
-  for (let i = 0, placed = 0; i < 2000 && placed < 34; i++) {
-    const x = (rnd() - 0.5) * 60;
-    const z = -4 + (rnd() - 0.5) * 88;
-    const h = groundHeight(x, z);
-    if (h < -0.4 || (Math.abs(x) < 3 && z > -12) || Math.hypot(x - LAGOON.x, z - LAGOON.y) < 8) continue;
-    const rock = makeRock(0.4 + rnd() * 0.9, 900 + i);
-    rock.position.set(x, h, z);
-    scenery.add(rock);
-    placed++;
-  }
-  scene.add(makeGroundCover(rnd));
-  // Bushes framing the path, so walking feels like going into the jungle; not where the stations stand.
-  const busy = [SWING_PIVOT_Z, GATE_Z, MONKEY_Z - 2.4, APPLE_Z - 1];
-  for (let i = 0; i < 26; i++) {
-    const z = 30 - i * 1.6;
-    const side = i % 2 ? 1 : -1;
-    const x = side * (2.6 + rnd() * 1.2);
-    if (Math.abs(z - 25.4) < 2.2 || busy.some((b) => Math.abs(z - b) < 1.6) || (side < 0 && z > GATE_Z && z < GATE_Z + 6)) continue;
-    // Not between the path and the cameras beside the brook and the rolling coconuts.
-    if (side > 0 && (Math.abs(z - 25.4) < 4.5 || Math.abs(z - ROLL_Z - 1.5) < 2.5)) continue;
-    const bush = makeBush(0.6 + rnd() * 0.5, 700 + i);
-    bush.position.set(x, groundHeight(x, z) - 0.05, z);
-    scenery.add(bush);
-  }
-  scene.add(mergeStatic(scenery));
-
-  // --- Things of the story -------------------------------------------------
-  const turtle = makeTurtle();
-  scene.add(turtle.group);
-  const paddle = makePaddle();
-  scene.add(paddle);
-
-  const parrot = makeParrot();
-  scene.add(parrot.group);
-
-  // A scorpion for every stomp of the clip, also the last ones; they crawl up onto Ole's shell.
-  const stompLandings: number[] = [];
-  for (let at = STOMP_PERIOD / 2; at <= clipLength(S.stomp) + 0.05; at += STOMP_PERIOD / 2) stompLandings.push(at);
-  const scorpions = stompLandings.map((land, i) => {
-    const sc = makeScorpion(i % 3 === 0 ? "#d9543a" : "#e98a3c");
-    sc.group.visible = false;
-    turtle.group.add(sc.group);
-    return { ...sc, land };
-  });
-
-  const bridge = makeBridge();
-  scene.add(bridge);
-  // A star box over every jump that goes up: Ole walks on over the bridge, so each hangs where Tapsi is then.
-  const bumps: number[] = [];
-  for (let n = 0; bumpTime(n) < clipLength(S.jump) - 0.2; n++) bumps.push(bumpTime(n));
-  const boxes = bumps.map((at) => {
-    const box = makeStarBox();
-    const z = jumpZ(at);
-    box.group.position.set(0, bridgeTop(0, z) + TURTLE_BACK + BOX_ABOVE + 0.25, z);
-    scene.add(box.group);
-    return box;
-  });
-
-  const swing = makeSwing();
-  swing.group.position.set(0, groundHeight(0, SWING_PIVOT_Z), SWING_PIVOT_Z);
-  scene.add(swing.group);
-
-  const flowerSpots: [number, number, number, string][] = [
-    // Two right beside Tapsi's paws, which open them, as high as Tapsi on Ole's back; the others a little further on.
-    [-1.2, FLOWERS_Z - 0.5, 1.2 + TURTLE_BACK, "#ff6fa8"],
-    [1.2, FLOWERS_Z - 0.5, 1.15 + TURTLE_BACK, "#b388ff"],
-    [-2.3, FLOWERS_Z - 1.7, 1.8, "#ff9f43"],
-    [2.4, FLOWERS_Z - 1.9, 2.0, "#ff5d73"],
-    [3.6, FLOWERS_Z - 3.4, 2.6, "#64c8ff"],
-  ];
-  const flowers = flowerSpots.map(([x, z, h, color], i) => {
-    const f = makeFlower(h, color, 80 + i);
-    f.group.position.set(x, groundHeight(x, z) - 0.05, z);
-    scene.add(f.group);
-    return f;
-  });
-  const butterflyColors = ["#ffd23f", "#ff7eb6", "#7bd3ff", "#b388ff", "#ffffff", "#ff9f43"];
-  const butterflies = butterflyColors.map((c) => {
-    const b = makeButterfly(c);
-    b.group.visible = false;
-    scene.add(b.group);
-    return b;
-  });
-
-  const gate = makeGate();
-  gate.group.position.set(0, groundHeight(0, GATE_Z), GATE_Z);
-  scene.add(gate.group);
-
-  const rollers = Array.from({ length: ROLLERS }, (_, i) => {
-    const nut = makeCoconut(i + 3);
-    nut.scale.setScalar(ROLL_RADIUS / 0.5);
-    nut.visible = false;
-    scene.add(nut);
-    return nut;
-  });
-
-  // Two monkeys up in palms on either side of the path, a little ahead.
-  const monkeys = [-1, 1].map((side) => {
-    const palm = makePalm(4.6, side > 0 ? 610 : 620);
-    const x = side * 2.5;
-    const z = MONKEY_Z - 2.4;
-    palm.position.set(x, groundHeight(x, z) - 0.1, z);
-    // The palm leans along its own x: towards the path.
-    palm.rotation.y = side > 0 ? Math.PI : 0;
-    scene.add(palm);
-    palm.updateMatrixWorld(true);
-    const top = new THREE.Vector3(x, -1, z);
-    palm.traverse((o) => {
-      if (o instanceof THREE.Mesh && o.geometry.type === "CylinderGeometry") {
-        const at = o.getWorldPosition(new THREE.Vector3());
-        if (at.y > top.y) top.copy(at);
-      }
-    });
-    const monkey = makeMonkey();
-    const holder = new THREE.Group();
-    holder.position.set(top.x, top.y - 0.55, top.z + 0.25);
-    holder.rotation.y = Math.atan2(-top.x, MONKEY_Z - top.z);
-    holder.add(monkey.group);
-    scene.add(holder);
-    return monkey;
-  });
-  const ringMat = new THREE.MeshBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide });
-  const RING_TIMES = [-0.5, -0.32, -0.18, -0.07, 0.05, 0.17];
-  const throws = Array.from({ length: THROWS }, (_, i) => {
-    const nut = makeCoconut(i + 30);
-    nut.scale.setScalar(0.34);
-    nut.visible = false;
-    scene.add(nut);
-    const rings = RING_TIMES.map(() => {
-      const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.06, 6, 28), ringMat.clone());
-      ring.visible = false;
-      scene.add(ring);
-      return ring;
-    });
-    return { nut, rings, curve: null as THREE.QuadraticBezierCurve3 | null };
-  });
-
-  const appleTree = makeAppleTree();
-  appleTree.position.set(0, groundHeight(0, APPLE_Z), APPLE_Z);
-  scene.add(appleTree);
-  const basket = makeBasket();
-  // Beside Ole on the left, so Ole walks on past it.
-  const basketAt = v3(-1.3, groundHeight(-1.3, APPLE_Z - 0.5), APPLE_Z - 0.5);
-  basket.position.copy(basketAt);
-  scene.add(basket);
-  const appleMat = mat("#e3262f", 0.35);
-  const stemMat = mat("#5a3a1f", 0.9);
-  const apples = Array.from({ length: APPLES }, (_, i) => {
-    const group = new THREE.Group();
-    const apple = solid(new THREE.SphereGeometry(0.085, 14, 10), appleMat);
-    apple.scale.set(1, 0.9, 1);
-    group.add(apple);
-    const stem = solid(new THREE.CylinderGeometry(0.008, 0.008, 0.3, 4), stemMat, false);
-    stem.position.y = 0.2;
-    group.add(stem);
-    const leaf = solid(new THREE.SphereGeometry(0.04, 8, 6), mat("#4ea640", 0.8), false);
-    leaf.scale.set(1, 0.3, 0.5);
-    leaf.position.set(0.04, 0.12, 0);
-    group.add(leaf);
-    scene.add(group);
-    // A little bunch at each paw's highest point; the paw reaches into it.
-    const r = seeded(70 + i);
-    return { group, stem, jitter: v3((r() - 0.5) * 0.24, r() * 0.12, (r() - 0.5) * 0.2) };
-  });
-  /** Where the paws are at the top of a reach (measured on the clip), from Tapsi: x to Tapsi's left. */
-  const REACH_TOP = v3(0.28, 1.55, 0.05).multiplyScalar(GUIDE_SIZE);
-
-  const door = makeDoor();
-  door.group.position.set(0, groundHeight(0, DOOR_Z), DOOR_Z);
-  scene.add(door.group);
-  const riddle = makeRiddle();
-  riddle.group.position.set(0, 4.05, 0.7);
-  door.group.add(riddle.group);
-  // Cobwebs in the passage behind the door, a left and a right half in every layer, the front ones first.
-  const webGround = groundHeight(0, DOOR_Z);
-  const webs = Array.from({ length: WEB_LAYERS * 2 }, (_, n) => {
-    const layer = Math.floor(n / 2);
-    // Even ones on Tapsi's left (-x, facing the island).
-    const side = n % 2 === 0 ? -1 : 1;
-    const web = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.6, 2.1),
-      new THREE.MeshBasicMaterial({ map: cobwebTexture(90 + n), transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide }),
-    );
-    const home = v3(side * (0.78 + layer * 0.03), webGround + TURTLE_BACK + 1.3 + layer * 0.05, WEB_Z - layer * WEB_GAP);
-    web.position.copy(home);
-    // After the light of the open doorway, which would otherwise paint over the webs about as far away.
-    web.renderOrder = 1;
-    scene.add(web);
-    return { web, home, side };
-  });
-  const spider = makeSpider();
-  scene.add(spider.group);
-
-  const raft = makeRaft();
-  scene.add(raft);
-  // A crate on the raft lifts the chest up to Tapsi on Ole's back.
-  const crate = solid(new THREE.BoxGeometry(1.0, CHEST_Y - 0.12, 0.62), mat("#a7733f", 0.85));
-  crate.position.set(0, 0.12 + (CHEST_Y - 0.12) / 2, CHEST_Z - 0.3);
-  raft.add(crate);
-  const chest = makeChest();
-  chest.group.position.set(0, CHEST_Y, CHEST_Z);
-  raft.add(chest.group);
-  const lock = makeLock();
-  lock.group.position.copy(LOCK);
-  chest.group.add(lock.group);
-  const key = makeKey();
-  key.visible = false;
-  scene.add(key);
-  const ropeMat = mat("#d9b77a", 0.9);
+  const {
+    sea,
+    clouds,
+    turtle,
+    paddle,
+    parrot,
+    scorpions,
+    bridge,
+    boxes,
+    swing,
+    flowerSpots,
+    flowers,
+    butterflies,
+    gate,
+    rollers,
+    monkeys,
+    RING_TIMES,
+    throws,
+    basketAt,
+    apples,
+    REACH_TOP,
+    door,
+    riddle,
+    webGround,
+    webs,
+    spider,
+    raft,
+    chest,
+    lock,
+    key,
+    ropeMat,
+    crabs,
+    confetti,
+    spray,
+    gold,
+    sand,
+    sparks,
+    rockets,
+    trail,
+  } = makeWorld(scene);
   let rope: THREE.Mesh | null = null;
-
-  const crabs = Array.from({ length: 5 }, (_, i) => {
-    const crab = makeCrab();
-    // Around Ole and a little behind, all facing us, so they dance along with Tapsi.
-    const x = PARTY.x + [-2.0, 2.1, -2.9, 3.0, -0.5][i];
-    const z = PARTY.z + [-0.5, -0.3, 0.4, 0.3, -1.1][i];
-    const holder = new THREE.Group();
-    holder.position.set(x, groundHeight(x, z) - 0.6, z);
-    holder.add(crab.group);
-    scene.add(holder);
-    return { ...crab, holder, ground: groundHeight(x, z) };
-  });
-
-  const confetti = makeConfetti(400);
-  const spray = makeConfetti(240, ["#ffffff", "#d8f6ff", "#9fe4ff"], 0.9);
-  const gold = makeConfetti(160, ["#ffd23f", "#ffcc33", "#fff1a8"], 1.4);
-  const sand = makeConfetti(160, ["#f2d49b", "#e3c48e", "#fff1d0"], 0.8);
-  const sparks = makeConfetti(600, ["#ff5d73", "#ffd23f", "#7bd3ff", "#b388ff", "#7bd389", "#ffffff"], 2);
-  (sparks.mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = 1.2;
-  scene.add(confetti.mesh, spray.mesh, gold.mesh, sand.mesh, sparks.mesh);
-  const rockets = Array.from({ length: 6 }, () => {
-    const r = new THREE.Mesh(new THREE.SphereGeometry(0.12, 8, 6), new THREE.MeshBasicMaterial({ color: "#fff3c4" }));
-    r.visible = false;
-    scene.add(r);
-    return r;
-  });
-  const trail = makeTrail();
-  scene.add(trail.mesh);
 
   // --- Helpers -------------------------------------------------------------
   const focus = v3(0, 0, BOAT_START);
