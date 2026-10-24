@@ -325,7 +325,6 @@ export const newGamesIdeas: IdeaArea = {
       text: "Eine Straße mit Ampel. Antippen schaltet auf Grün: Tiere gehen über den Zebrastreifen, die Autos warten. Rot: Tiere bleiben stehen, Autos fahren. Die Ente vergisst manchmal zu gucken und wird freundlich zurückgerufen.",
       why: "Erste Verkehrsregeln, die Kinder vom Spaziergang kennen.",
       effort: "S",
-      done: true,
     },
     {
       id: "N-41",

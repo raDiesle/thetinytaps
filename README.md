@@ -52,7 +52,6 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/feelings/` | Game „Gefühle“: comfort the bear, kindergarten stories with picture choices. Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |
 | `src/games/marbles/` | Game „Kettenreaktion“: marble run, „Alles fällt um“ and six Rube Goldberg machines. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
 | `src/games/elevator/` | Game „Spaß im Aufzug“: picture stories in a house with a lift. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md) |
-| `src/games/traffic/` | Game „Ampel und Zebrastreifen“: tap the light, the animals cross and the cars wait. Details in its [`CLAUDE.md`](src/games/traffic/CLAUDE.md) |
 | `src/games/adventure/` | Game „Bewegungsabenteuer“: 3D movement story with the fox Tapsi (three.js, lazy-loaded). Details in its [`CLAUDE.md`](src/games/adventure/CLAUDE.md) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
 | `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Spaß im Aufzug" use them (`playRecorded` / `recorded` in `src/lib/sfx/core.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
@@ -137,4 +136,3 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 9. ~~Laut und leise (Mikrofon): Löwe und Maus, Pusten~~
 10. ~~Kugelbahn: Kugelbahn und „Alles fällt um“~~
 11. ~~Aufzug~~
-12. ~~Ampel und Zebrastreifen~~
