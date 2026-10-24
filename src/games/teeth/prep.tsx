@@ -1,15 +1,19 @@
 import { STAR_PATH } from "@/components/Bursts";
+import type { Daytime } from "./daytime";
 import { PICTURE } from "./jaw";
 import { INK, SKIN } from "./mouth";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a
 // hand takes it out, then the tube comes over and puts a blob of toothpaste
 // on the bristles and lies down again. All of it is CSS animation (teeth.css).
+// Through the window the sun comes up in the morning; in the evening the moon
+// is out and the sleeve is a pyjama one.
 
 export type PrepPart = "brush" | "paste";
 
 const { width: W, height: H } = PICTURE;
 const SINK = 300;
+const WINDOW = { x: 176, y: 34, width: 112, height: 112 };
 
 /** Drawn lying down with the bristles up and the handle to the right; the head sits at the origin. */
 function Toothbrush() {
@@ -24,11 +28,11 @@ function Toothbrush() {
 }
 
 /** A child's hand round the handle, its arm going off the picture. In the toothbrush's own coordinates. */
-function Hand() {
+function Hand({ daytime }: { daytime: Daytime }) {
   return (
     <g className="prep-hand" stroke={INK} strokeWidth={4} strokeLinejoin="round">
       <rect x={100} y={20} width={36} height={420} rx={14} fill={SKIN} />
-      <rect x={94} y={78} width={48} height={380} rx={12} fill="#8e7dff" />
+      <rect x={94} y={78} width={48} height={380} rx={12} fill={daytime === "evening" ? "url(#prep-pyjama)" : "#8e7dff"} />
       <rect x={90} y={-6} width={56} height={36} rx={15} fill={SKIN} />
       <path d="M104 12 V28 M118 12 V28 M132 12 V28" fill="none" strokeWidth={3} strokeLinecap="round" />
       <rect x={94} y={-10} width={36} height={13} rx={6.5} fill={SKIN} />
@@ -48,7 +52,44 @@ function Tube() {
   );
 }
 
-export function Prep({ part }: { part: PrepPart }) {
+/** The window above the sink: the sun rising, or the moon and stars. */
+function Window({ daytime }: { daytime: Daytime }) {
+  const { x, y, width, height } = WINDOW;
+  const evening = daytime === "evening";
+  return (
+    <g>
+      <clipPath id="prep-window">
+        <rect x={x} y={y} width={width} height={height} rx={10} />
+      </clipPath>
+      <g clipPath="url(#prep-window)">
+        <rect x={x} y={y} width={width} height={height} fill={evening ? "#2d2a6e" : "#ffd9a8"} />
+        {evening ? (
+          <>
+            <path d={`M${x + 72} ${y + 22} a26 26 0 1 0 22 40 a22 22 0 1 1 -22 -40 Z`} fill="#ffe680" stroke={INK} strokeWidth={3} />
+            {[
+              [x + 24, y + 30],
+              [x + 44, y + 78],
+              [x + 90, y + 92],
+            ].map(([sx, sy]) => (
+              <g key={sx} transform={`translate(${sx - 8} ${sy - 8}) scale(0.16)`}>
+                <path d={STAR_PATH} fill="#fff6c2" />
+              </g>
+            ))}
+          </>
+        ) : (
+          <circle className="prep-sun" cx={x + width / 2} cy={y + 60} r={24} fill="#ffd23f" stroke={INK} strokeWidth={3} />
+        )}
+        {/* Far hills, so the sun has something to rise behind. */}
+        <path d={`M${x} ${y + 92} Q${x + 30} ${y + 74} ${x + 60} ${y + 90} T${x + width} ${y + 84} V${y + height} H${x} Z`} fill={evening ? "#1d4a5c" : "#8bd346"} />
+      </g>
+      <rect x={x} y={y} width={width} height={height} rx={10} fill="none" stroke="#fff" strokeWidth={10} />
+      <path d={`M${x + width / 2} ${y} V${y + height} M${x} ${y + height / 2} H${x + width}`} stroke="#fff" strokeWidth={6} />
+      <rect x={x - 5} y={y - 5} width={width + 10} height={height + 10} rx={14} fill="none" stroke={INK} strokeWidth={4} />
+    </g>
+  );
+}
+
+export function Prep({ part, daytime }: { part: PrepPart; daytime: Daytime }) {
   return (
     <svg
       className={`prep at-${part}`}
@@ -64,10 +105,16 @@ export function Prep({ part }: { part: PrepPart }) {
           <rect width={55} height={55} fill="#e6f7ff" />
           <path d="M0 0.5 H55 M0.5 0 V55" stroke="#b8e2f5" strokeWidth={3} />
         </pattern>
+        <pattern id="prep-pyjama" width={36} height={36} patternUnits="userSpaceOnUse">
+          <rect width={36} height={36} fill="#3a4a9e" />
+          <circle cx={9} cy={9} r={4} fill="#ffe680" />
+          <circle cx={27} cy={27} r={3} fill="#fff" />
+        </pattern>
       </defs>
 
       <g clipPath="url(#prep-frame)">
         <rect width={W} height={H} fill="url(#prep-tiles)" />
+        <Window daytime={daytime} />
         {/* The edge of the sink. */}
         <rect x={-20} y={SINK} width={W + 40} height={140} rx={26} fill="#fff" stroke={INK} strokeWidth={6} />
         <ellipse cx={W / 2} cy={SINK + 70} rx={150} ry={30} fill="#d6eefa" stroke={INK} strokeWidth={4} />
@@ -94,7 +141,7 @@ export function Prep({ part }: { part: PrepPart }) {
                 <path d="M-16 -22 C-10 -28 0 -26 8 -24" fill="none" stroke="#4cc9f0" strokeWidth={4} strokeLinecap="round" />
               </g>
             )}
-            <Hand />
+            <Hand daytime={daytime} />
           </g>
         </g>
 

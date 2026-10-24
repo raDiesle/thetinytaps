@@ -1,5 +1,5 @@
 import { GameShell } from "@/components/GameShell";
-import { SettingsGroup, Toggle } from "@/components/SettingControls";
+import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
@@ -27,6 +27,16 @@ export function TeethGame() {
       settings={
         <>
           <SettingsGroup title="Putzen">
+            <Choice
+              label="Tageszeit"
+              value={settings.daytime}
+              options={[
+                { value: "auto", label: "🕑 Nach der Uhr" },
+                { value: "morning", label: "☀️ Morgens" },
+                { value: "evening", label: "🌙 Abends" },
+              ]}
+              onChange={(daytime) => update({ daytime })}
+            />
             <Toggle
               label="Vorher zeigen: Zahnbürste holen, Zahnpasta drauf"
               checked={settings.prep}
@@ -37,12 +47,21 @@ export function TeethGame() {
               checked={settings.speech}
               onChange={(speech) => update({ speech })}
             />
+            <Toggle
+              label="Wochenbild am Ende: ein Stern für jedes Putzen morgens und abends"
+              checked={settings.week}
+              onChange={(week) => update({ week })}
+            />
             <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
             <p className="setting-note">
               Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes
               Mal, ob der Mund weit auf ist oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und
               welche Zähne gerade dran sind. Auf allen noch nicht geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und
               nach verschwinden. Der Bildschirm bleibt dabei an.
+            </p>
+            <p className="setting-note">
+              Morgens geht die Sonne auf und am Kinn kleben Frühstückskrümel; abends scheint der Mond, der Ärmel ist ein Schlafanzug
+              und zum Schluss heißt es „Gute Nacht“. Nach der Uhr ist bis 14 Uhr morgens.
             </p>
             <p className="setting-note">
               Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren

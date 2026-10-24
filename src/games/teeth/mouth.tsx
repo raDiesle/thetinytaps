@@ -16,6 +16,7 @@ import {
   type View,
 } from "./jaw";
 import { Brush, lerp3, type BrushAnchor } from "./brush";
+import type { Daytime } from "./daytime";
 import type { Motion } from "./steps";
 
 // A child's face in a mirror, close up. The mouth is a small 3D model (see
@@ -64,6 +65,8 @@ interface MouthProps {
   paused: boolean;
   /** All clean: sparkles and smiling eyes. */
   happy: boolean;
+  /** In the morning breakfast crumbs stick round the mouth until all is clean. */
+  daytime: Daytime;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
   onTickle: (id: number) => void;
@@ -114,7 +117,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, daytime, action, paused, onTickle }: MouthProps) {
   const model = useMemo(() => buildMouth(view.open), [view.open]);
   const all = projectors(view);
   const project = all.face;
@@ -201,7 +204,7 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
 
       <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} fill="#dff6ff" />
       <g clipPath="url(#mirror)">
-        <Face project={project} head={head} happy={happy} open={view.open} />
+        <Face project={project} head={head} happy={happy} open={view.open} crumbs={daytime === "morning" && !happy} />
 
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill="#5c1430" />
@@ -359,7 +362,29 @@ function LipArrows({ action, lips, zoom }: { action: MouthAction; lips: Point2[]
   );
 }
 
-function Face({ project, head, happy, open }: { project: Project; head: Point2; happy: boolean; open: number }) {
+/** Breakfast crumbs on the chin and by the corners of the mouth: across, below the lips, size. */
+const CRUMBS: [number, number, number][] = [
+  [-180, -54, 7],
+  [-64, 36, 8],
+  [-22, 52, 6],
+  [40, 40, 9],
+  [92, 30, 6],
+  [174, -50, 8],
+];
+
+function Face({
+  project,
+  head,
+  happy,
+  open,
+  crumbs,
+}: {
+  project: Project;
+  head: Point2;
+  happy: boolean;
+  open: number;
+  crumbs: boolean;
+}) {
   const p = project.point;
   const feature = (x: number, y: number, z: number) => ({ at: p([x, y, z]), facing: project.facing([x / 200, 0.1, 0.95]) });
   const ears = [-1, 1].map((s) => ({ s, at: p([s * HEAD * 0.97, 70, -60]) }));
@@ -414,6 +439,14 @@ function Face({ project, head, happy, open }: { project: Project; head: Point2; 
         ) : null,
       )}
       {nose.facing > 0 && <ellipse cx={nose.at.x} cy={nose.at.y} rx={16 * squash(nose.facing)} ry={11} fill="#e8a982" />}
+      {crumbs &&
+        CRUMBS.map(([x, below, size], i) => {
+          // They sit just below the lower lip, which drops as the mouth opens.
+          const { at, facing } = feature(x, -(54 + 62 * open) - below, 110 - Math.abs(x) / 4);
+          if (facing <= 0) return null;
+          const r = size * project.zoom * squash(facing);
+          return <rect key={i} x={at.x - r} y={at.y - r} width={2 * r} height={1.6 * r} rx={r / 2} fill="#e0a85a" stroke="#a8682a" strokeWidth={2} transform={`rotate(${i * 37} ${at.x} ${at.y})`} />;
+        })}
     </g>
   );
 }
