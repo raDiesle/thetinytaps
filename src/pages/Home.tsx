@@ -5,21 +5,8 @@ import { KID_HOME } from "@/components/GameShell";
 import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
+import { CATEGORIES, categoryHref } from "@/content/games";
 import { useTitle } from "@/lib/title";
-
-const GAMES = [
-  { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen", text: "Taste drücken – Bild, Buchstabe und Zahl erscheinen." },
-  { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder", text: "Wimmelbilder zum Antippen – alles bewegt sich und spricht." },
-  { href: "/woerter/", emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
-  { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen", text: "Zwei Minuten putzen, bis alle Zuckermonster weg sind." },
-  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?", text: "Tiere füttern und ihr Zuhause finden." },
-  { href: "/schatten/", emoji: "👤", title: "Schatten finden", text: "Welcher Schatten gehört zum Bild? Antippen oder hinziehen." },
-  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise", text: "Laut rufen – der Löwe brüllt. Leise flüstern – die Maus piepst." },
-  { href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn", text: "Tippen – die Kugel rollt, klingelt und plumpst in den Korb. Oder alles fällt um, oder eine ganze Maschine läuft los." },
-  { href: "/aufzug/", emoji: "🛗", title: "Aufzug", text: "Großen Knopf drücken – der Aufzug fährt, pling, und ein Tier steigt ein oder aus." },
-  { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer", text: "Mit dem Fuchs Tapsi zur Schatzinsel – paddeln, ducken, ziehen und mitmachen." },
-  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle", text: "Den Bären trösten – und üben, was man im Kindergarten tun kann." },
-];
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
 const IDEAS_HOLD_MS = 2000;
@@ -51,10 +38,15 @@ export function Home() {
         }}
       />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
-      <ul className="game-list">
-        {GAMES.map((g) => (
-          <li key={g.title}>
-            <GameCard {...g} />
+      <ul className="game-list category-list">
+        {CATEGORIES.map((c) => (
+          <li key={c.id}>
+            <GameCard
+              href={categoryHref(c)}
+              emoji={c.emoji}
+              title={c.title}
+              text={c.games.map((g) => g.title).join(" · ")}
+            />
           </li>
         ))}
       </ul>

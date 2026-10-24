@@ -241,6 +241,13 @@ html:has(.play-area) body {
   gap: 32px 28px;
 }
 
+/* The four categories on the home page: two by two. */
+.category-list {
+  max-width: 760px;
+  margin: 0 auto;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}
+
 .game-list li {
   --card: var(--tomato);
   --tilt: -1.5deg;

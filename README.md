@@ -26,6 +26,7 @@ Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
 | `public/icons/` | App icon: `icon.svg` (rounded) and `icon-maskable.svg` (full bleed, for home screens); the PNGs are made from them, see [App icon](#app-icon) |
 | `src/App.tsx` | Routes (React Router) |
 | `src/pages/` | One component per page |
+| `src/content/games.ts` | The home menu: four categories (Buchstaben & Zahlen, Zuordnen, Lebendige Stories, Weitere), each with its games on `/spiele/<id>/` (`src/pages/CategoryPage.tsx`); a game's back link leads to its category. New games go here (and into `TILES` in `src/pages/KidHome.tsx`) |
 | `src/components/GameShell.tsx` | Shared shell: parent start screen, fullscreen + keyboard lock, hold-to-exit |
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
