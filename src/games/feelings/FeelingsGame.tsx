@@ -1,6 +1,7 @@
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
+import { FEELINGS } from "./bear";
 import { BearPlay } from "./BearPlay";
 import { SITUATIONS } from "./kita";
 import { KitaPlay } from "./KitaPlay";
@@ -29,18 +30,31 @@ export function FeelingsGame() {
       ]}
       mode={kita ? `kita-${settings.answers}` : "bear"}
       onMode={(id) => update(MODE_PATCH[id])}
+      level={
+        <>
+          <Choice<FeelingsSettings["feeling"]>
+            label="🐻 Bär trösten: Gefühl"
+            value={settings.feeling}
+            onChange={(feeling) => update({ feeling })}
+            options={[
+              { value: "all", label: "🌈 Alle" },
+              ...FEELINGS.map((f) => ({ value: f.id, label: `${f.emoji} ${f.title}` })),
+            ]}
+          />
+          <Choice<FeelingsSettings["situation"]>
+            label="🏫 Kindergarten: Geschichte"
+            value={settings.situation}
+            onChange={(situation) => update({ situation })}
+            options={[
+              { value: "all", label: "🌈 Alle" },
+              ...SITUATIONS.map((s) => ({ value: s.id, label: `${s.emoji} ${s.title}` })),
+            ]}
+          />
+        </>
+      }
       settings={
         <>
           <SettingsGroup title="🏫 Im Kindergarten">
-            <Choice<FeelingsSettings["situation"]>
-              label="Geschichte"
-              value={settings.situation}
-              onChange={(situation) => update({ situation })}
-              options={[
-                { value: "all", label: "🌈 Alle" },
-                ...SITUATIONS.map((s) => ({ value: s.id, label: `${s.emoji} ${s.title}` })),
-              ]}
-            />
             <p className="setting-note">
               Kleine Geschichten: Jemand schubst, tritt oder nimmt etwas weg, die Rutsche ist voll, ein anderes Kind hat das tolle
               Spielzeug – oder der kleine Bär ist selbst wütend. Das Kind tippt, was der Bär tun kann: laut „Stopp! Nein!“ sagen,
