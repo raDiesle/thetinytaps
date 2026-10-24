@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties, type PointerEvent } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import {
   buildMouth,
@@ -31,6 +31,46 @@ const MIN_FACING = 0.03;
 const WAITING_FACING = 0.25;
 const HEAD = 270;
 const MONSTER_SIZE = 0.75;
+
+/** A part of the picture: x, y, width and height. */
+interface Box {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * The part of the picture that always shows: every tooth with its monsters
+ * in every step, cutting off only the corners of the lips. The rest of the
+ * screen is filled with more of the face around it, so the mouth is as big
+ * as the screen allows on a tall phone as well as a wide computer.
+ */
+const FOCUS: Box = { x: 50, y: 45, width: 340, height: 300 };
+/** How far in from the edge the mirror's frame sits; its stroke reaches twice as far, so the focus box keeps clear of it. */
+const FRAME_INSET = 7;
+
+/** The focus box grown to the shape of the element, around the same middle. */
+function useFocusBox(ref: RefObject<SVGSVGElement | null>): Box {
+  const [box, setBox] = useState<Box>({ x: 0, y: 0, width: PICTURE.width, height: PICTURE.height });
+  useLayoutEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+    const fit = () => {
+      const { width, height } = element.getBoundingClientRect();
+      if (!width || !height) return;
+      const scale = Math.min(width / (FOCUS.width + 4 * FRAME_INSET), height / (FOCUS.height + 4 * FRAME_INSET));
+      const w = width / scale;
+      const h = height / scale;
+      setBox({ x: FOCUS.x + (FOCUS.width - w) / 2, y: FOCUS.y + (FOCUS.height - h) / 2, width: w, height: h });
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [ref]);
+  return box;
+}
 
 export interface MonsterSpot {
   id: number;
@@ -134,6 +174,16 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
     return { at: alongFace(face, stop.spot), normal: face.normal, along };
   };
 
+  const svg = useRef<SVGSVGElement>(null);
+  const box = useFocusBox(svg);
+  const frame = {
+    x: box.x + FRAME_INSET,
+    y: box.y + FRAME_INSET,
+    width: box.width - 2 * FRAME_INSET,
+    height: box.height - 2 * FRAME_INSET,
+    rx: 70,
+  };
+
   const head = project.point([0, 20, -60]);
   const lipPoints = model.lips.map(project.point);
   const lipsPath = smoothPath(lipPoints);
@@ -184,10 +234,16 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
   const palateDown = all.upper.facing([0, -1, 0.2]) > 0.05;
 
   return (
-    <svg className="mouth" viewBox={`0 0 ${PICTURE.width} ${PICTURE.height}`} role="img" aria-label="Ein Kindergesicht im Spiegel beim Zähneputzen">
+    <svg
+      ref={svg}
+      className="mouth"
+      viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`}
+      role="img"
+      aria-label="Ein Kindergesicht im Spiegel beim Zähneputzen"
+    >
       <defs>
         <clipPath id="mirror">
-          <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} />
+          <rect {...frame} />
         </clipPath>
         <clipPath id="mouth-inside">
           <path d={lipsPath} />
@@ -199,7 +255,7 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
         </radialGradient>
       </defs>
 
-      <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} fill="#dff6ff" />
+      <rect {...frame} fill="#dff6ff" />
       <g clipPath="url(#mirror)">
         <Face project={project} head={head} happy={happy} open={view.open} />
 
@@ -298,22 +354,13 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTi
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
 
         {/* The mirror glass catches the light. */}
-        <g fill="#fff" opacity={0.35} pointerEvents="none">
+        <g fill="#fff" opacity={0.35} pointerEvents="none" transform={`translate(${box.x.toFixed(1)} ${box.y.toFixed(1)})`}>
           <path d="M80 10 L135 10 L10 135 L10 80 Z" />
           <path d="M160 10 L178 10 L10 178 L10 160 Z" />
         </g>
       </g>
-      <rect
-        x={10}
-        y={10}
-        width={PICTURE.width - 20}
-        height={PICTURE.height - 20}
-        rx={70}
-        fill="none"
-        stroke={INK}
-        strokeWidth={14}
-      />
-      <rect x={10} y={10} width={PICTURE.width - 20} height={PICTURE.height - 20} rx={70} fill="none" stroke="#b9a8ff" strokeWidth={7} />
+      <rect {...frame} fill="none" stroke={INK} strokeWidth={14} />
+      <rect {...frame} fill="none" stroke="#b9a8ff" strokeWidth={7} />
     </svg>
   );
 }

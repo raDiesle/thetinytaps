@@ -339,18 +339,21 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
         )}
       </div>
 
-      {done ? (
-        <button className="teeth-again" onClick={again}>
-          🔁 Nochmal
-        </button>
-      ) : (
+      {/* The seven steps show what's ahead and what's done; while brushing, the mouth gets their room. */}
+      {!step && (
         <div className="teeth-progress" aria-hidden>
           {STEPS.map((s, i) => (
-            <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
+            <span key={i} className={`teeth-segment ${s.surface}`}>
               <span style={{ width: `${Math.max(0, Math.min(1, (brushed - i * stepMs) / stepMs)) * 100}%` }} />
             </span>
           ))}
         </div>
+      )}
+
+      {done && (
+        <button className="teeth-again" onClick={again}>
+          🔁 Nochmal
+        </button>
       )}
 
       {paused && (

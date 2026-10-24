@@ -6,8 +6,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2vmin;
-  padding: max(16px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+  gap: 1.5vmin;
+  padding: max(10px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom))
+    max(6px, env(safe-area-inset-left));
   background: linear-gradient(#c4f1ff, #fff4d6);
 }
 
@@ -27,6 +28,14 @@
   align-items: center;
   gap: 0.6vmin;
   text-align: center;
+}
+
+/* A phone on its side: title and hint side by side, so the mouth keeps the height. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .teeth-heading {
+    flex-direction: row;
+    gap: 2vmin;
+  }
 }
 
 .teeth-cue {
@@ -74,13 +83,10 @@
   justify-content: center;
 }
 
+/* The mirror takes the whole stage; the picture inside grows to fit (see useFocusBox). */
 .mouth {
   width: 100%;
   height: 100%;
-}
-
-.mouth {
-  max-width: min(100%, 880px);
 }
 
 /* The surfaces to brush now shine. */
@@ -221,10 +227,6 @@
 
 .teeth-segment.inner > span {
   background: #ff8fab;
-}
-
-.teeth-segment.now {
-  outline: 4px solid var(--sunshine);
 }
 
 /* Pause: brush, monsters and glow stand still under a big button that goes on. */
