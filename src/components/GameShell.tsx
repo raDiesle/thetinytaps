@@ -42,6 +42,8 @@ export interface GameMode {
   emoji: string;
   title: string;
   text?: string;
+  /** Drawn bigger and across the whole row, e.g. for "all of them in turn". */
+  featured?: boolean;
 }
 
 interface GameShellProps {
@@ -197,7 +199,7 @@ export function GameShell({
           {level && <div className="mode-level">{level}</div>}
           <ul className="game-list mode-list">
             {modes.map((m) => (
-              <li key={m.id}>
+              <li key={m.id} className={m.featured ? "mode-featured" : undefined}>
                 <button type="button" className="game-card mode-card" onClick={() => pick(m.id)}>
                   <span className="game-emoji" aria-hidden>
                     {m.emoji}

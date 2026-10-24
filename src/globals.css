@@ -1074,6 +1074,30 @@ kbd {
   font-size: 0.98rem;
 }
 
+/* The one card above the rest ("all of them in turn"): a whole row, in rainbow stripes. */
+.mode-list .mode-featured {
+  grid-column: 1 / -1;
+  --tilt: 0deg;
+}
+
+.mode-featured .mode-card {
+  flex-direction: row;
+  justify-content: center;
+  gap: 24px;
+  padding: 22px 28px 26px;
+  background: linear-gradient(100deg, #ff8fa0, #ffc46b, #fff07a, #8ee08a, #7fd3ff, #b7a8ff);
+}
+
+.mode-featured .mode-card .game-emoji {
+  width: 100px;
+  height: 100px;
+  font-size: 3.3rem;
+}
+
+.mode-featured .mode-card .game-title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
 /* Play time, language, read aloud … are set on the home page for all games. */
 .shared-settings-note {
   max-width: 680px;
