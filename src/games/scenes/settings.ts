@@ -42,6 +42,8 @@ export interface ScenesSettings {
   showKeys: boolean;
   /** Explore mode: some vehicles drive into other pictures, and a sign at the edge follows them (see roads.ts). */
   roads: boolean;
+  /** A calm song in the background from the first tap (not at bedtime); off by default. */
+  music: boolean;
 }
 
 export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
@@ -55,6 +57,7 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   ambient: false,
   showKeys: true,
   roads: true,
+  music: false,
 };
 
 // v2: speech is off and the picture stands still by default now, so old saved settings start fresh.
