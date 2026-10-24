@@ -193,10 +193,36 @@
     twinkle 1.6s ease-in-out calc(var(--delay) + 0.4s) infinite;
 }
 
+/* Pause button and progress bar sit above the pause screen, so a grown-up can jump around while paused. */
+.teeth-controls {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: min(90vw, 780px);
+}
+
+.teeth-pause {
+  flex: none;
+  width: clamp(44px, 8vmin, 60px);
+  height: clamp(44px, 8vmin, 60px);
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  font-size: clamp(1.2rem, 4vmin, 1.8rem);
+  line-height: 1;
+  cursor: pointer;
+}
+
 .teeth-progress {
+  flex: 1;
   display: flex;
   gap: 10px;
-  width: min(90vw, 720px);
+  /* Room above and below the thin bar, so a finger hits it easily. */
+  padding: 12px 0;
+  cursor: pointer;
+  touch-action: none;
 }
 
 .teeth-segment {

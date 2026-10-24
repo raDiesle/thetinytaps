@@ -48,11 +48,15 @@ export function TeethGame() {
               Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren
               erbsengroß. Danach ausspucken, nicht nachspülen. Bis ins Grundschulalter putzen Eltern nach.
             </p>
-            {!touchOnly && (
-              <p className="setting-note">
-                Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
-              </p>
-            )}
+            <p className="setting-note">
+              Unten neben dem Fortschrittsbalken pausiert ⏸️ das Putzen. Tippen oder Ziehen auf dem Balken springt an diese Stelle.
+              {!touchOnly && (
+                <>
+                  {" "}
+                  Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
+                </>
+              )}
+            </p>
           </SettingsGroup>
         </>
       }
