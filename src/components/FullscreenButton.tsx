@@ -23,3 +23,18 @@ export function FullscreenButton() {
     </button>
   );
 }
+
+/**
+ * The same button in the top right corner of the other menus, shown only in
+ * fullscreen: the grown-up can leave it right there, without going back to
+ * the home page first.
+ */
+export function FullscreenExit() {
+  const on = useFullscreen();
+  if (!on) return null;
+  return (
+    <div className="fullscreen-exit">
+      <FullscreenButton />
+    </div>
+  );
+}

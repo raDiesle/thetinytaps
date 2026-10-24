@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { FullscreenExit } from "@/components/FullscreenButton";
 import { Choice, Toggle } from "@/components/SettingControls";
 import { EFFORT_LABELS, IDEA_AREAS, TODDLER_RULES, TOP_PICKS, ideaStatus, type Idea, type IdeaStatus } from "@/content/ideas";
 import { useStoredSettings } from "@/lib/storage";
@@ -38,6 +39,7 @@ export function IdeasPage() {
 
   return (
     <main className="home ideas">
+      <FullscreenExit />
       <Link to="/" className="back-link">
         ← Alle Spiele
       </Link>

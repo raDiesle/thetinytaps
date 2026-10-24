@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { FullscreenExit } from "@/components/FullscreenButton";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
 import { categoryHref, categoryOf } from "@/content/games";
@@ -135,6 +136,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
   return (
     <main className="start-screen">
       <Sky />
+      <FullscreenExit />
       <Link to={back} className="back-link">
         ← {backText}
       </Link>

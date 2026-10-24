@@ -83,7 +83,7 @@ mode falls back to tapping; on computers without a touch screen the on-screen
 keys option is hidden and the keys stay off. On a phone held upright the
 pictures show a "Quer halten" note, since the wide picture gets tiny. On iPad the games go fullscreen, and the
 app stays in fullscreen after a game, menus included (the ⛶ button on the home page
-switches it on or off); on iPhone (no fullscreen in Safari) add the page to the home screen to hide the
+switches it on or off, and the other menus show it in the top right corner while in fullscreen); on iPhone (no fullscreen in Safari) add the page to the home screen to hide the
 browser bars.
 
 ## Offline and as an app
