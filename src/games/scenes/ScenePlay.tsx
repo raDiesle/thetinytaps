@@ -78,7 +78,6 @@ import {
   playSneeze,
   loadRecordings,
   playRecorded,
-  setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { findScene } from ".";
@@ -320,18 +319,14 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   }, []);
 
   useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
-  useEffect(() => {
     loadRecordings(new Set(items.map((item) => item.sound)));
   }, [items]);
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, speechLang, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm, speechLang],
+    [settings.speech, speechLang],
   );
 
   // Repeated taps cycle through the item's sentences, so there is always something new to hear.
@@ -430,7 +425,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   // Ambient life (only if switched on): when nobody taps for a while, items move by themselves, silently.
   // While something is looked for, the answers stay still, so they aren't given away.
   useEffect(() => {
-    if (!settings.ambient || settings.calm) return;
+    if (!settings.ambient) return;
     let timer: ReturnType<typeof setTimeout>;
     const schedule = () => {
       timer = setTimeout(() => {
@@ -442,7 +437,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     };
     schedule();
     return () => clearTimeout(timer);
-  }, [items, animate, settings.ambient, settings.calm]);
+  }, [items, animate, settings.ambient]);
 
   const interacted = () => {
     lastInteraction.current = performance.now();
@@ -763,8 +758,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const greyFilter = `url(#${greyId})`;
   const sceneClass = [
     "scene",
-    settings.calm && "calm",
-    settings.ambient && !settings.calm && "lively",
+    settings.ambient && "lively",
     colouring && "colouring",
     partying && "party",
     night && "night",

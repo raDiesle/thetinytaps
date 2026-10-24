@@ -11,8 +11,6 @@ export interface TeethSettings {
   music: boolean;
   /** A poof for every monster, a chime when it is time to move on. */
   sounds: boolean;
-  /** Quieter sounds, a slower brush, no wiggling. */
-  calm: boolean;
 }
 
 export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
@@ -21,7 +19,6 @@ export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   speech: true,
   music: false,
   sounds: true,
-  calm: false,
 };
 
 export const TEETH_SETTINGS_KEY = "tinytaps.teeth.v1";

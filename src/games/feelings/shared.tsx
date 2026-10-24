@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { setSfxVolume } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { Critter, MOODS, type Face, type Species } from "./Critter";
 import type { Place } from "./kita";
@@ -37,15 +36,11 @@ export function useTimers() {
 
 /** Speech and sounds as the parent set them up. */
 export function useVoice(settings: FeelingsSettings) {
-  useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, SPEECH_LANG, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, SPEECH_LANG, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm],
+    [settings.speech],
   );
 
   const sound = useCallback(

@@ -229,7 +229,7 @@ export function GameShell({
             <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min. ·{" "}
           </>
         ) : null}
-        Spielzeit, Sprache, Vorlesen, Töne und ruhiger Modus gelten für alle Spiele – <Link to="/">auf der Startseite</Link>{" "}
+        Spielzeit, Sprache, Vorlesen und Töne gelten für alle Spiele – <Link to="/">auf der Startseite</Link>{" "}
         einstellen.
       </p>
       {settings && (

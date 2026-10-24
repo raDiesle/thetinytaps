@@ -62,13 +62,6 @@
   animation: ll-swish 2s ease-in-out infinite;
 }
 
-.loud-play.calm .ll-lion-body,
-.loud-play.calm .ll-lion-tail,
-.loud-play.calm .ll-mouse-whiskers,
-.loud-play.calm .ll-mouse-tail {
-  animation: none;
-}
-
 /* ---------- The lion roars and jumps ---------- */
 
 .roaring .ll-lion-jump {
@@ -122,16 +115,6 @@
 /* The lion tips his head and listens. */
 .squeaking .ll-lion-head {
   animation: ll-tilt 1.2s ease-in-out;
-}
-
-.loud-play.calm .ll-lion-jump,
-.loud-play.calm .ll-mouse-jump {
-  animation-name: ll-bob;
-}
-
-.loud-play.calm .ll-lion-mane,
-.loud-play.calm .ll-mouse-body {
-  animation: none;
 }
 
 /* ---------- Speech bubbles and labels ---------- */

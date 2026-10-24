@@ -10,7 +10,6 @@ import {
   playMelody,
   playRandomNote,
   playSlide,
-  setSfxVolume,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Who } from "./content";
@@ -30,8 +29,6 @@ const WALK_MS = 2.6;
 const NUDGE_MS = 7000;
 /** From the end of a story until the picture cards come back. */
 const END_MS = 5000;
-/** Calm mode: everything a bit slower. */
-const CALM_PACE = 1.35;
 const BUDDY_SCALE = 0.8;
 
 interface Actor {
@@ -106,7 +103,6 @@ const actorAt = (floor: number, x: number, face: 1 | -1, pose: Pose): Actor => (
 
 /** "Aufzug": picture stories – the bubble shows what the child needs, and the lift takes it to the floor where it is. */
 export function ElevatorPlay({ lang, settings }: { lang: string; settings: ElevatorSettings }) {
-  const pace = settings.calm ? CALM_PACE : 1;
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(START);
   const { bursts, spawn } = useBursts();
@@ -155,22 +151,18 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
   useEffect(() => cancel, []);
 
   useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
-  useEffect(() => {
     if (settings.sounds) loadRecordings(RECORDINGS);
   }, [settings.sounds]);
 
   const say = (text: string) => {
-    if (settings.speech) speak(text, lang, { rate: settings.calm ? 0.75 : 0.85 });
+    if (settings.speech) speak(text, lang, { rate: 0.85 });
   };
 
   const sound = (play: () => void) => {
     if (settings.sounds) play();
   };
 
-  const cue = (sounds: [number, () => void][]) => sounds.forEach(([ms, play]) => later(ms * pace, () => sound(play)));
+  const cue = (sounds: [number, () => void][]) => sounds.forEach(([ms, play]) => later(ms, () => sound(play)));
 
   const showBubble = (who: Who, pic: PicId) => put((v) => ({ bubble: { who, pic, n: (v.bubble?.n ?? 0) + 1 } }));
 
@@ -178,7 +170,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
   const walk = async (who: Who, x: number) => {
     const a = viewRef.current.actors[who];
     if (!a) return;
-    const ms = Math.abs(x - a.x) * WALK_MS * pace;
+    const ms = Math.abs(x - a.x) * WALK_MS;
     if (ms < 1) return;
     actor(who, { x, walk: ms, pose: "walk", face: x > a.x ? 1 : -1, inCabin: false });
     await wait(ms);
@@ -189,9 +181,9 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
   const ride = async (target: number) => {
     put({ doors: false, lit: target });
     sound(playSlide);
-    await wait(DOOR_MS * pace);
+    await wait(DOOR_MS);
     const from = viewRef.current.cabin;
-    const ms = Math.abs(target - from) * FLOOR_MS * pace;
+    const ms = Math.abs(target - from) * FLOOR_MS;
     put((v) => ({
       cabin: target,
       ride: ms,
@@ -205,7 +197,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     put({ lit: null, doors: true });
     sound(playDing);
     later(150, () => sound(playSlide));
-    await wait(DOOR_MS * pace);
+    await wait(DOOR_MS);
   };
 
   const nextPress = () => new Promise<number>((resolve) => (waiter.current = resolve));
@@ -221,9 +213,9 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
         const nudge = () => {
           showBubble(who, step.wish);
           put({ hint: step.floor });
-          stop = later(NUDGE_MS * pace, nudge);
+          stop = later(NUDGE_MS, nudge);
         };
-        stop = later(NUDGE_MS * pace, nudge);
+        stop = later(NUDGE_MS, nudge);
         return () => stop();
       })();
       const floor = await nextPress();
@@ -268,7 +260,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     put({ playing: step.prop });
     cue(step.sounds);
     say(step.done);
-    await wait(step.ms * pace);
+    await wait(step.ms);
     if (last) return;
 
     put((v) => ({ playing: null, used: [...v.used, step.prop] }));
@@ -287,7 +279,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
         ...(step.otherCarry !== undefined && { holding: step.otherCarry }),
       });
     }
-    await wait(500 * pace);
+    await wait(500);
     const withOther = other === "hero" || viewRef.current.actors[other]?.joined;
     await Promise.all([walk(who, IN_CABIN[who]), withOther ? walk(other, IN_CABIN[other]) : undefined]);
   };
@@ -303,12 +295,12 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
       sound(playMelody);
       say(texts.party);
       for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
-      later(1200 * pace, () => {
+      later(1200, () => {
         put((v) => ({ playing: null, used: [...v.used, last.prop] }));
         (["hero", "buddy"] as Who[]).forEach((who) => actor(who, { pose: "cheer", hidden: false }));
       });
     }
-    await wait(END_MS * pace);
+    await wait(END_MS);
     put({ picking: true });
   };
 
@@ -322,7 +314,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     showBubble("hero", story.need.pic);
     cue(story.need.sounds);
     say(story.need.say);
-    await wait(2800 * pace);
+    await wait(2800);
     actor("hero", { pose: "stand" });
     await walk("hero", IN_CABIN.hero);
     for (const [i, step] of story.steps.entries()) await doStep(step, i === story.steps.length - 1);
@@ -393,7 +385,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   return (
     <div
-      className={`elevator-play weather-${weather}${settings.calm ? " calm" : ""}`}
+      className={`elevator-play weather-${weather}`}
       onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
     >
       <svg className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">

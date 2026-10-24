@@ -30,14 +30,12 @@ export interface ScenesSettings {
   announce: SceneAnnounce;
   /** Engine noises, beeps and chimes. */
   sounds: boolean;
-  /** Quieter sounds, no idle movement, softer shapes. */
-  calm: boolean;
   /** Explore and colour mode: count the discovered items and throw a party when all were tapped. */
   goal: boolean;
   /** Sounds and questions mode: mark an item that is looked for after a while or a few wrong taps. */
   hints: boolean;
   /**
-   * The picture lives on its own (not in calm mode): clouds drift, rotors turn,
+   * The picture lives on its own: clouds drift, rotors turn,
    * and when nobody taps for a while, items move by themselves. Off: nothing
    * moves unless the child does something.
    */
@@ -56,7 +54,6 @@ export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
   speech: false,
   announce: "sentence",
   sounds: true,
-  calm: false,
   goal: true,
   hints: true,
   ambient: false,

@@ -1,5 +1,5 @@
 // Options most games share, chosen once on the home page for all of them:
-// read aloud, sounds and the calm mode. Each game keeps its own fields of the
+// read aloud and sounds. Each game keeps its own fields of the
 // same name and gets them filled in from here (see withCommon).
 
 import { useStoredSettings } from "@/lib/storage";
@@ -9,11 +9,9 @@ export interface CommonSettings {
   speech: boolean;
   /** Chimes, notes and noises. */
   sounds: boolean;
-  /** Quieter sounds, less movement, slower. */
-  calm: boolean;
 }
 
-export const DEFAULT_COMMON_SETTINGS: CommonSettings = { speech: false, sounds: true, calm: false };
+export const DEFAULT_COMMON_SETTINGS: CommonSettings = { speech: false, sounds: true };
 
 export const COMMON_SETTINGS_KEY = "tinytaps.common.v1";
 

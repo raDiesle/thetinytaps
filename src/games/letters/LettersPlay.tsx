@@ -5,7 +5,7 @@ import { toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import { translate, translateCountable } from "@/content/translate";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
-import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, recorded, setSfxVolume } from "@/lib/sfx";
+import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, recorded } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { LetterCard, NumberCard } from "./Cards";
 import type { LettersSettings } from "./settings";
@@ -97,9 +97,9 @@ export function LettersPlay({
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm, pack.speechLang],
+    [settings.speech, pack.speechLang],
   );
 
   /** Counting by tapping applies to numbers with things to tap, not to the empty nest. */
@@ -141,10 +141,10 @@ export function LettersPlay({
       say(sentenceFor(s), queue);
       const also = secondSentenceFor(s);
       if (settings.speech && second && also) {
-        speak(also, second.speechLang, { queue: true, rate: settings.calm ? 0.75 : 0.85 });
+        speak(also, second.speechLang, { queue: true, rate: 0.85 });
       }
     },
-    [say, sentenceFor, secondSentenceFor, second, settings.speech, settings.calm],
+    [say, sentenceFor, secondSentenceFor, second, settings.speech],
   );
 
   /** Speak and play the sound for reaching `stage`. */
@@ -315,13 +315,10 @@ export function LettersPlay({
     [shown, present, pickWord, funBurst],
   );
 
-  /** Make the card move once, unless calm mode is on. */
-  const animateCard = useCallback(
-    (keyframes: Keyframe[], duration: number) => {
-      if (!settings.calm) cardBox.current?.animate(keyframes, { duration, easing: "ease-out" });
-    },
-    [settings.calm],
-  );
+  /** Make the card move once. */
+  const animateCard = useCallback((keyframes: Keyframe[], duration: number) => {
+    cardBox.current?.animate(keyframes, { duration, easing: "ease-out" });
+  }, []);
 
   /**
    * Keys that are not letters or numbers each do their own thing: Space jumps with confetti,
@@ -402,10 +399,6 @@ export function LettersPlay({
   useEffect(() => () => countTimers.current.forEach(clearTimeout), []);
 
   useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
-  useEffect(() => {
     loadRecordings(["honk", "whistle"]);
   }, []);
 
@@ -430,7 +423,7 @@ export function LettersPlay({
 
   return (
     <div
-      className={`letters-play${settings.calm ? " calm" : ""}`}
+      className={`letters-play`}
       style={{ background }}
       onPointerDown={onPlayAreaPointer}
     >
