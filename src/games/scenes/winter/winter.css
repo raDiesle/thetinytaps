@@ -1,0 +1,1060 @@
+/* Animations of the winter picture. Durations match durationMs in Winter.tsx. Items drawn by the
+   Winter-Baustelle, the Baustelle and the Wald keep their ids and move with those scenes' CSS;
+   the snowman and the Christmas tree are animated in schneemann.css. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .wi-cloud {
+  animation: wi-drift 28s ease-in-out infinite alternate;
+}
+
+.scene.lively .wi-cloud-slow {
+  animation-duration: 40s;
+}
+
+.scene.lively .wi-haus-smoke circle {
+  animation: wi-smoke 4.8s ease-out calc(var(--i) * 1.2s) infinite;
+}
+
+.scene.lively .wi-pferd-tail {
+  animation: wi-swish 2.4s ease-in-out infinite;
+}
+
+@keyframes wi-drift {
+  to {
+    transform: translateX(80px);
+  }
+}
+
+/* ---------- Hidden until their animation shows them ---------- */
+
+.wi-haus-smoke circle,
+.wi-haus-light,
+.wi-haus-roofsnow circle,
+.wi-kirche-window,
+.wi-kirche-ring path,
+.wi-krippe-hay path,
+.wi-bank-puff circle,
+.wi-bank-glint path,
+.wi-kakao-steam circle,
+.wi-kakao-heart,
+.wi-mitten-glint path,
+.wi-flocke-glint path,
+.wi-kugel-crumbs circle,
+.wi-engel-sparkle path,
+.wi-ski-spray circle,
+.wi-rutscher-spray circle,
+.wi-opa-snow circle,
+.wi-opa-breath circle,
+.wi-mama-breath circle,
+.wi-eis-glint path,
+.wi-ente-lines path,
+.wi-skates-glint path,
+.wi-ps-snow circle {
+  opacity: 0;
+}
+
+/* Puffs, sparkles and lumps turn and grow around their own middle. */
+.wi-haus-smoke circle,
+.wi-haus-roofsnow circle,
+.wi-kirche-ring path,
+.wi-krippe-hay path,
+.wi-krippe-lump ellipse,
+.wi-bank-lump,
+.wi-bank-puff circle,
+.wi-bank-glint path,
+.wi-kakao-steam circle,
+.wi-kakao-heart,
+.wi-mitten-glint path,
+.wi-flocke-glint path,
+.wi-kugel-crumbs circle,
+.wi-engel-print,
+.wi-engel-sparkle path,
+.wi-ski-spray circle,
+.wi-rutscher-spray circle,
+.wi-opa-snow circle,
+.wi-opa-breath circle,
+.wi-mama-breath circle,
+.wi-eis-glint path,
+.wi-skates-glint path,
+.wi-ps-snow circle,
+.wi-bobble {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ---------- Shared moves ---------- */
+
+.scene-item.playing .wi-bobble {
+  animation: wi-bobble 0.3s ease-in-out 5;
+}
+
+@keyframes wi-bobble {
+  50% {
+    transform: translateY(-5px) scale(1.15);
+  }
+}
+
+@keyframes wi-twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.3) rotate(0deg);
+  }
+  40%,
+  60% {
+    opacity: 1;
+    transform: scale(1.2) rotate(45deg);
+  }
+}
+
+@keyframes wi-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-26px) scale(1.6);
+  }
+}
+
+@keyframes wi-smoke {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(34px, -120px) scale(2.2);
+  }
+}
+
+@keyframes wi-swish {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes wi-wiggle {
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+/* ---------- Holzhaus: smoke puffs, shutters clap, lights on, the door opens ---------- */
+
+.item-holzhaus.playing .wi-haus-door {
+  animation: wi-haus-door 2.6s ease-in-out;
+}
+
+.item-holzhaus.playing .wi-haus-shutter {
+  animation: wi-haus-shutter 0.6s ease-in-out 0.1s 3;
+}
+
+.item-holzhaus.playing .wi-haus-light {
+  animation: wi-haus-light 2.6s ease-in-out;
+}
+
+.item-holzhaus.playing .wi-haus-kid {
+  animation: wi-haus-kid 2.6s ease-in-out;
+}
+
+.item-holzhaus.playing .wi-haus-curtain {
+  animation: wi-haus-curtain 0.65s ease-in-out 0.3s 3;
+}
+
+.item-holzhaus.playing .wi-haus-curtain-r {
+  animation-name: wi-haus-curtain-r;
+}
+
+.item-holzhaus.playing .wi-haus-smoke circle {
+  animation: wi-smoke 1.4s ease-out calc(var(--i) * 0.3s);
+}
+
+.item-holzhaus.playing .wi-haus-roofsnow circle {
+  animation: wi-fall-snow 1.2s ease-in calc(0.2s + var(--i) * 0.25s);
+}
+
+@keyframes wi-haus-door {
+  0%,
+  100% {
+    transform: none;
+  }
+  18%,
+  78% {
+    transform: scaleX(0.12);
+  }
+}
+
+@keyframes wi-haus-shutter {
+  50% {
+    transform: scaleX(0.4);
+  }
+}
+
+@keyframes wi-haus-light {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  82% {
+    opacity: 0.85;
+  }
+}
+
+@keyframes wi-haus-kid {
+  0%,
+  100% {
+    transform: none;
+  }
+  25%,
+  72% {
+    transform: translateY(-34px);
+  }
+}
+
+@keyframes wi-haus-curtain {
+  50% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes wi-haus-curtain-r {
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes wi-fall-snow {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(120px) scale(1.4);
+  }
+}
+
+/* ---------- Kirchturm: the bell swings, sound rings, the clock turns, the rooster spins ---------- */
+
+.item-kirchturm.playing .wi-kirche-bell {
+  animation: wi-kirche-bell 0.6s ease-in-out 4;
+}
+
+.item-kirchturm.playing .wi-kirche-ring path {
+  animation: wi-kirche-ring 0.6s ease-out calc(var(--i) * 0.15s) 4;
+}
+
+.item-kirchturm.playing .wi-kirche-hour {
+  animation: wi-turn 2.4s ease-in-out;
+}
+
+.item-kirchturm.playing .wi-kirche-minute {
+  animation: wi-turn 1.2s ease-in-out 2;
+}
+
+.item-kirchturm.playing .wi-kirche-window {
+  animation: wi-haus-light 2.4s ease-in-out;
+}
+
+.item-kirchturm.playing .wi-kirche-hahn {
+  animation: wi-flip 1.2s ease-in-out 2;
+}
+
+@keyframes wi-kirche-bell {
+  25% {
+    transform: rotate(-24deg);
+  }
+  75% {
+    transform: rotate(24deg);
+  }
+}
+
+@keyframes wi-kirche-ring {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes wi-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wi-flip {
+  25% {
+    transform: scaleX(0);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+  75% {
+    transform: scaleX(0);
+  }
+}
+
+/* ---------- Futterkrippe: the rack shakes, hay drops, snow slides off the roof ---------- */
+
+.item-futterkrippe.playing .wi-krippe-rack {
+  animation: wi-wiggle 0.4s ease-in-out 3;
+}
+
+.item-futterkrippe.playing .wi-krippe-hay path {
+  animation: wi-krippe-hay 1.2s ease-in calc(0.2s + var(--i) * 0.15s);
+}
+
+.item-futterkrippe.playing .wi-krippe-lump ellipse {
+  animation: wi-krippe-lump 1.6s ease-in calc(0.3s + var(--i) * 0.2s);
+}
+
+@keyframes wi-krippe-hay {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-6px, 46px) rotate(120deg);
+  }
+}
+
+@keyframes wi-krippe-lump {
+  0% {
+    transform: none;
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(70px) scale(0.9);
+  }
+  55% {
+    opacity: 0;
+    transform: translateY(124px) scale(1.4, 0.5);
+  }
+  80% {
+    opacity: 0;
+    transform: none;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Parkbank: the snow on the backrest plops down ---------- */
+
+.item-parkbank.playing .wi-bank-lump {
+  animation: wi-bank-lump 2s ease-in;
+}
+
+.item-parkbank.playing .wi-bank-puff circle {
+  animation: wi-puff 0.8s ease-out calc(0.8s + var(--i) * 0.08s);
+}
+
+.item-parkbank.playing .wi-bank-body {
+  animation: wi-bank-shake 0.2s ease-in-out 0.8s 3;
+}
+
+.item-parkbank.playing .wi-bank-glint path {
+  animation: wi-twinkle 0.8s ease-in-out calc(1s + var(--i) * 0.3s);
+}
+
+@keyframes wi-bank-lump {
+  0% {
+    transform: none;
+  }
+  15% {
+    transform: translateY(-8px);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(96px) scale(1.2, 0.8);
+  }
+  50% {
+    opacity: 0;
+    transform: translateY(100px) scale(1.4, 0.5);
+  }
+  75% {
+    opacity: 0;
+    transform: none;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes wi-bank-shake {
+  50% {
+    transform: translateY(2px);
+  }
+}
+
+/* ---------- Kakao: the cap pops, steam rises, a heart ---------- */
+
+.item-kakao.playing .wi-kakao-cap {
+  animation: wi-kakao-cap 1.2s ease-in-out;
+}
+
+.item-kakao.playing .wi-kakao-steam circle {
+  animation: wi-puff 1.2s ease-out calc(0.3s + var(--i) * 0.25s);
+}
+
+.item-kakao.playing .wi-kakao-mug {
+  animation: wi-wiggle 0.35s ease-in-out 0.4s 3;
+}
+
+.item-kakao.playing .wi-kakao-heart {
+  animation: wi-heart 1.2s ease-out 0.8s;
+}
+
+@keyframes wi-kakao-cap {
+  30%,
+  60% {
+    transform: translateY(-16px) rotate(-24deg);
+  }
+}
+
+@keyframes wi-heart {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-24px) scale(1);
+  }
+}
+
+/* ---------- Handschuh: wiggles, the thumb waves, someone peeks out ---------- */
+
+.item-handschuh.playing .wi-mitten {
+  animation: wi-wiggle 0.4s ease-in-out 2;
+}
+
+.item-handschuh.playing .wi-mitten-thumb {
+  animation: wi-mitten-thumb 0.5s ease-in-out 0.6s 3;
+}
+
+.item-handschuh.playing .wi-mitten-glint path {
+  animation: wi-twinkle 0.8s ease-in-out calc(0.4s + var(--i) * 0.6s);
+}
+
+@keyframes wi-mitten-thumb {
+  50% {
+    transform: rotate(22deg);
+  }
+}
+
+/* ---------- Schneeflocke: spins round and glitters ---------- */
+
+.item-schneeflocke.playing .wi-flocke-arms {
+  animation: wi-turn 2s ease-in-out;
+}
+
+.item-schneeflocke.playing .wi-flocke-face {
+  animation: wi-pulse 0.5s ease-in-out 0.2s 3;
+}
+
+.item-schneeflocke.playing .wi-flocke-glint path {
+  animation: wi-twinkle 0.8s ease-in-out calc(var(--i) * 0.3s);
+}
+
+@keyframes wi-pulse {
+  50% {
+    transform: scale(1.18);
+  }
+}
+
+/* ---------- Schneekugel: the child pushes, the ball rolls and grows ---------- */
+
+.item-schneekugel.playing .wi-kugel-push {
+  animation: wi-kugel-push 2.2s ease-in-out;
+}
+
+.item-schneekugel.playing .wi-kugel-roll {
+  animation: wi-kugel-roll 2.2s ease-in-out;
+}
+
+.item-schneekugel.playing .wi-kugel-ball {
+  animation: wi-kugel-grow 2.2s ease-in-out;
+}
+
+.item-schneekugel.playing .wi-kugel-crumbs circle {
+  animation: wi-puff 0.8s ease-out calc(0.5s + var(--i) * 0.12s);
+}
+
+@keyframes wi-kugel-push {
+  45%,
+  55% {
+    transform: translateX(-28px);
+  }
+}
+
+@keyframes wi-kugel-roll {
+  45%,
+  55% {
+    transform: rotate(-70deg);
+  }
+}
+
+@keyframes wi-kugel-grow {
+  45%,
+  70% {
+    transform: scale(1.12);
+  }
+}
+
+/* ---------- Schneeengel: arms and legs sweep, the angel shines ---------- */
+
+.item-schneeengel.playing .wi-engel-arm-l {
+  animation: wi-engel-arm-l 0.7s ease-in-out 3;
+}
+
+.item-schneeengel.playing .wi-engel-arm-r {
+  animation: wi-engel-arm-r 0.7s ease-in-out 3;
+}
+
+.item-schneeengel.playing .wi-engel-leg-l {
+  animation: wi-engel-leg-l 0.7s ease-in-out 3;
+}
+
+.item-schneeengel.playing .wi-engel-leg-r {
+  animation: wi-engel-leg-r 0.7s ease-in-out 3;
+}
+
+.item-schneeengel.playing .wi-engel-print {
+  animation: wi-pulse 0.7s ease-in-out 3;
+}
+
+.item-schneeengel.playing .wi-engel-sparkle path {
+  animation: wi-twinkle 0.8s ease-in-out calc(0.6s + var(--i) * 0.3s);
+}
+
+@keyframes wi-engel-arm-l {
+  50% {
+    transform: rotate(-38deg);
+  }
+}
+
+@keyframes wi-engel-arm-r {
+  50% {
+    transform: rotate(38deg);
+  }
+}
+
+@keyframes wi-engel-leg-l {
+  50% {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes wi-engel-leg-r {
+  50% {
+    transform: rotate(-22deg);
+  }
+}
+
+/* ---------- Skifahrer: glides down, pushes with the poles, snow sprays ---------- */
+
+.item-skifahrer.playing .wi-ski-body {
+  animation: wi-ski-glide 2s ease-in-out;
+}
+
+.item-skifahrer.playing .wi-ski-pole {
+  animation: wi-ski-pole 0.5s ease-in-out 2;
+}
+
+.item-skifahrer.playing .wi-ski-scarf {
+  animation: wi-flutter 0.25s ease-in-out 8;
+}
+
+.item-skifahrer.playing .wi-ski-spray circle {
+  animation: wi-puff 0.8s ease-out calc(0.4s + var(--i) * 0.12s);
+}
+
+@keyframes wi-ski-glide {
+  0%,
+  100% {
+    transform: none;
+  }
+  45%,
+  60% {
+    transform: translateX(-46px);
+  }
+}
+
+@keyframes wi-ski-pole {
+  50% {
+    transform: rotate(-22deg);
+  }
+}
+
+@keyframes wi-flutter {
+  50% {
+    transform: rotate(-14deg);
+  }
+}
+
+/* ---------- Po-Rutscher: spins round, arms up, snow sprays ---------- */
+
+.item-rutscher.playing .wi-rutscher-spin {
+  animation: wi-rutscher-spin 2s ease-in-out;
+}
+
+.item-rutscher.playing .wi-rutscher-arm {
+  animation: wi-rutscher-arm 0.3s ease-in-out 6;
+}
+
+.item-rutscher.playing .wi-rutscher-arm-r {
+  animation-name: wi-rutscher-arm-r;
+}
+
+.item-rutscher.playing .wi-rutscher-spray circle {
+  animation: wi-puff 0.8s ease-out calc(0.3s + var(--i) * 0.3s);
+}
+
+@keyframes wi-rutscher-spin {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translate(-10px, -4px) scaleX(-1);
+  }
+  40% {
+    transform: translate(-16px, -6px) scaleX(1);
+  }
+  60% {
+    transform: translate(-10px, -4px) scaleX(-1);
+  }
+  80% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes wi-rutscher-arm {
+  50% {
+    transform: rotate(-20deg);
+  }
+}
+
+@keyframes wi-rutscher-arm-r {
+  50% {
+    transform: rotate(20deg);
+  }
+}
+
+/* ---------- Opa: pushes the snow, it piles up and flies, he puffs ---------- */
+
+.item-schneeopa.playing .wi-opa-push {
+  animation: wi-opa-push 2.2s ease-in-out;
+}
+
+.item-schneeopa.playing .wi-opa-heap {
+  animation: wi-opa-heap 2.2s ease-in-out;
+}
+
+.item-schneeopa.playing .wi-opa-snow circle {
+  animation: wi-opa-snow 0.9s ease-out calc(0.5s + var(--i) * 0.1s);
+}
+
+.item-schneeopa.playing .wi-opa-breath circle {
+  animation: wi-puff 0.8s ease-out calc(1.3s + var(--i) * 0.12s);
+}
+
+.item-schneeopa.playing .wi-opa-hat {
+  animation: wi-opa-hat 2.2s ease-in-out;
+}
+
+@keyframes wi-opa-push {
+  0%,
+  100% {
+    transform: none;
+  }
+  30%,
+  50% {
+    transform: translateX(-18px);
+  }
+}
+
+@keyframes wi-opa-heap {
+  30%,
+  60% {
+    transform: scale(1.25, 1.35);
+  }
+}
+
+@keyframes wi-opa-snow {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-24px, -46px) scale(1.3);
+  }
+}
+
+@keyframes wi-opa-hat {
+  60%,
+  80% {
+    transform: translateY(-14px) rotate(-8deg);
+  }
+}
+
+/* ---------- Mama: walks, pulls the sledge, the little one waves ---------- */
+
+.item-schlittenmama.playing .wi-mama-walk {
+  animation: wi-step 0.44s ease-in-out 5;
+}
+
+.item-schlittenmama.playing .wi-mama-arm {
+  animation: wi-mama-arm 0.44s ease-in-out 5;
+}
+
+.item-schlittenmama.playing .wi-mama-sled {
+  animation: wi-mama-sled 2.2s ease-in-out;
+}
+
+.item-schlittenmama.playing .wi-mama-baby-arm {
+  animation: wi-mama-wave 0.35s ease-in-out 0.2s 5;
+}
+
+.item-schlittenmama.playing .wi-mama-breath circle {
+  animation: wi-puff 0.8s ease-out calc(1.1s + var(--i) * 0.12s);
+}
+
+@keyframes wi-step {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes wi-mama-arm {
+  50% {
+    transform: rotate(18deg);
+  }
+}
+
+@keyframes wi-mama-sled {
+  35%,
+  60% {
+    transform: translateX(-12px);
+  }
+}
+
+@keyframes wi-mama-wave {
+  50% {
+    transform: rotate(-28deg);
+  }
+}
+
+/* ---------- Eisläuferin: spins round twice, arms up, the ice glitters ---------- */
+
+.item-eislaeuferin.playing .wi-eis-spin {
+  animation: wi-eis-spin 2.4s ease-in-out;
+}
+
+.item-eislaeuferin.playing .wi-eis-arm {
+  animation: wi-eis-arm 2.4s ease-in-out;
+}
+
+.item-eislaeuferin.playing .wi-eis-arm-r {
+  animation-name: wi-eis-arm-r;
+}
+
+.item-eislaeuferin.playing .wi-eis-leg {
+  animation: wi-eis-leg 2.4s ease-in-out;
+}
+
+.item-eislaeuferin.playing .wi-eis-scarf {
+  animation: wi-flutter 0.3s ease-in-out 8;
+}
+
+.item-eislaeuferin.playing .wi-eis-glint path {
+  animation: wi-twinkle 0.8s ease-in-out calc(0.3s + var(--i) * 0.35s);
+}
+
+@keyframes wi-eis-spin {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: scaleX(-1);
+  }
+  40% {
+    transform: scaleX(1);
+  }
+  60% {
+    transform: scaleX(-1);
+  }
+  80% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes wi-eis-arm {
+  20%,
+  80% {
+    transform: rotate(28deg);
+  }
+}
+
+@keyframes wi-eis-arm-r {
+  20%,
+  80% {
+    transform: rotate(-28deg);
+  }
+}
+
+@keyframes wi-eis-leg {
+  20%,
+  80% {
+    transform: rotate(-14deg);
+  }
+}
+
+/* ---------- Ente: slithers over the ice, flaps and quacks ---------- */
+
+.item-eisente.playing .wi-ente-slide {
+  animation: wi-ente-slide 2s ease-in-out;
+}
+
+.item-eisente.playing .wi-ente-wing {
+  animation: wi-ente-wing 0.25s ease-in-out 8;
+}
+
+.item-eisente.playing .wi-ente-wing-back {
+  animation-name: wi-ente-wing-back;
+}
+
+.item-eisente.playing .wi-ente-foot {
+  animation: wi-ente-foot 0.2s ease-in-out 8;
+}
+
+.item-eisente.playing .wi-ente-head {
+  animation: wi-ente-head 0.3s ease-in-out 1.2s 2;
+}
+
+.item-eisente.playing .wi-ente-lines path {
+  animation: wi-ente-lines 0.8s ease-out calc(0.1s + var(--i) * 0.1s);
+}
+
+@keyframes wi-ente-slide {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateX(-24px) rotate(-8deg);
+  }
+  40% {
+    transform: translateX(-40px) rotate(7deg);
+  }
+  60% {
+    transform: translateX(-30px) rotate(-5deg);
+  }
+}
+
+@keyframes wi-ente-wing {
+  50% {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes wi-ente-wing-back {
+  50% {
+    transform: rotate(-22deg);
+  }
+}
+
+@keyframes wi-ente-foot {
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes wi-ente-head {
+  50% {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes wi-ente-lines {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+}
+
+/* ---------- Schlittschuhe: hop twice, laces swing, blades flash ---------- */
+
+.item-schlittschuhe.playing .wi-skates-hop {
+  animation: wi-skates-hop 1.6s ease-in-out;
+}
+
+.item-schlittschuhe.playing .wi-skate-a {
+  animation: wi-skate-a 0.8s ease-in-out 2;
+}
+
+.item-schlittschuhe.playing .wi-skate-b {
+  animation: wi-skate-b 0.8s ease-in-out 2;
+}
+
+.item-schlittschuhe.playing .wi-skates-lace {
+  animation: wi-wiggle 0.4s ease-in-out 4;
+}
+
+.item-schlittschuhe.playing .wi-skates-glint path {
+  animation: wi-twinkle 0.7s ease-in-out calc(0.2s + var(--i) * 0.3s);
+}
+
+@keyframes wi-skates-hop {
+  0%,
+  50%,
+  90%,
+  100% {
+    transform: none;
+  }
+  25% {
+    transform: translateY(-26px);
+  }
+  70% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes wi-skate-a {
+  50% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes wi-skate-b {
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+/* ---------- Pferdeschlitten: the horse trots, nods and swishes, the bells jingle ---------- */
+
+.item-pferdeschlitten.playing .wi-ps-ride {
+  animation: wi-ps-ride 0.325s ease-in-out 8;
+}
+
+.item-pferdeschlitten.playing .wi-pferd-leg-a {
+  animation: wi-pferd-leg-a 0.65s ease-in-out 4;
+}
+
+.item-pferdeschlitten.playing .wi-pferd-leg-b {
+  animation: wi-pferd-leg-b 0.65s ease-in-out 4;
+}
+
+.item-pferdeschlitten.playing .wi-pferd-head {
+  animation: wi-pferd-head 0.65s ease-in-out 4;
+}
+
+.item-pferdeschlitten.playing .wi-pferd-tail {
+  animation: wi-swish 0.4s ease-in-out 6;
+}
+
+.item-pferdeschlitten.playing .wi-pferd-bell {
+  animation: wi-pferd-bell 0.16s ease-in-out calc(var(--i) * 0.05s) 14;
+}
+
+.item-pferdeschlitten.playing .wi-ps-wave {
+  animation: wi-ps-wave 0.35s ease-in-out 0.3s 6;
+}
+
+.item-pferdeschlitten.playing .wi-ps-driver {
+  animation: wi-step 0.65s ease-in-out 4;
+}
+
+.item-pferdeschlitten.playing .wi-ps-snow circle {
+  animation: wi-puff 0.7s ease-out calc(var(--i) * 0.3s) 2;
+}
+
+@keyframes wi-ps-ride {
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes wi-pferd-leg-a {
+  25% {
+    transform: rotate(16deg);
+  }
+  75% {
+    transform: rotate(-12deg);
+  }
+}
+
+@keyframes wi-pferd-leg-b {
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes wi-pferd-head {
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes wi-pferd-bell {
+  25% {
+    transform: rotate(-24deg);
+  }
+  75% {
+    transform: rotate(24deg);
+  }
+}
+
+@keyframes wi-ps-wave {
+  50% {
+    transform: rotate(-26deg);
+  }
+}

@@ -1,6 +1,6 @@
 import { useId, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
-import { playBoing, playCountNote, playDing, playKnock, playPlop, playPop, playSwirl, playTick } from "@/lib/sfx";
+import { playBells, playBoing, playCountNote, playDing, playKnock, playPlop, playPop, playSwirl, playTick } from "@/lib/sfx";
 import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import {
   BALL_R,
@@ -43,10 +43,12 @@ const GRAVITY = 1600;
 const FRICTION = 0.3;
 const MIN_SPEED = 280;
 const MAX_SPEED = 950;
-/** Taps closer together than this release only one marble, so they don't start on top of each other. */
-const SPAWN_GAP_MS = 450;
-const MAX_ROLLING = 8;
+/** After the tap the hopper lets out one marble after the other, this far apart. */
+const RELEASE_GAP_MS = 1400;
 const LAND_MS = 380;
+/** The flag springs up out of the full basket; then the level is done. */
+const FLAG_MS = 500;
+const DONE_AFTER_FULL_MS = 2200;
 /** Sections of the run: a fixed one before every spot, the spot, and the fixed one to the basket. */
 const LAST_SECTION = SLOTS.length * 2;
 
@@ -93,13 +95,13 @@ interface SpotState {
 }
 
 /**
- * Level 1: a wooden marble run on the wall. Each tap lets a marble out of the
- * hopper; it rolls over a xylophone, through three spots that hold a bell, a
- * funnel and a paddle wheel, rides the seesaw, disappears in the tunnel and
- * drops into the basket. Several marbles may be on their way at once; a full
- * basket ends the level. If the grown-ups allow it, tapping a spot swaps its
- * part (bell, trampoline, funnel, paddle wheel), and the next marble takes the
- * new way.
+ * A wooden marble run on the wall. One tap opens the hopper, and the marbles
+ * come out one after the other by themselves: each rolls over a xylophone,
+ * through three spots that hold a bell, a funnel and a paddle wheel, rides the
+ * seesaw, disappears in the tunnel and drops into the basket. When the basket
+ * is full a flag springs up out of it. If the grown-ups allow it, tapping a
+ * spot swaps its part (bell, trampoline, funnel, paddle wheel), and the next
+ * marble takes the new way.
  */
 export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
   const routes = useMemo(buildRoutes, []);
@@ -108,7 +110,9 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
   const marbles = useRef<Marble[]>([]);
   const landed = useRef<Landed[]>([]);
   const nextId = useRef(0);
-  const lastSpawn = useRef(-Infinity);
+  /** When the tap opened the hopper. */
+  const openedAt = useRef<number | null>(null);
+  const fullAt = useRef(-Infinity);
   const bars = useRef(BARS.map(() => -Infinity));
   const tilt = useRef(SEESAW.rest);
   const done = useRef(false);
@@ -152,8 +156,10 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
     sound(playPlop);
     if (!done.current && landed.current.length >= BASKET_FULL) {
       done.current = true;
+      fullAt.current = t;
+      sound(playBells);
       say("Der Korb ist voll!");
-      onDone();
+      setTimeout(onDone, DONE_AFTER_FULL_MS);
     }
   };
 
@@ -178,6 +184,7 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
 
   useFrames((dt, t) => {
     now.current = t;
+    if (openedAt.current !== null && nextId.current < BASKET_FULL && t - openedAt.current >= nextId.current * RELEASE_GAP_MS) release();
     const onWheel = SLOTS.map(() => false);
     let onSeesaw = false;
     for (const m of marbles.current) {
@@ -225,9 +232,6 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
   });
 
   const release = () => {
-    const t = performance.now();
-    if (done.current || t - lastSpawn.current < SPAWN_GAP_MS || marbles.current.length >= MAX_ROLLING) return;
-    lastSpawn.current = t;
     const id = nextId.current++;
     marbles.current.push({
       id,
@@ -244,16 +248,21 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
     sound(playPop);
   };
 
-  useAnyKey(release);
+  const open = () => {
+    if (openedAt.current === null) openedAt.current = performance.now();
+  };
+
+  useAnyKey(open);
 
   const t = now.current;
-  const started = nextId.current > 0;
+  const started = openedAt.current !== null;
+  const flagAge = t - fullAt.current;
   const spot = (i: number, layer: "back" | "front") => (
     <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />
   );
 
   return (
-    <div className="marble-level" onPointerDown={release}>
+    <div className="marble-level" onPointerDown={open}>
       <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label="Kugelbahn">
         <defs>
           <pattern id={pegs} width="50" height="50" patternUnits="userSpaceOnUse">
@@ -289,6 +298,7 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
         {/* Row 3 and the back of the basket */}
         <Rail a={{ x: ROW3.from.x - 16, y: ROW3.from.y - 1 }} b={ROW3.to} />
         <ellipse cx={(BASKET.x0 + BASKET.x1) / 2} cy={BASKET.rimY} rx={(BASKET.x1 - BASKET.x0) / 2} ry="14" fill="#6b4220" />
+        {done.current && <Flag rise={Math.min(1, flagAge / FLAG_MS)} sway={wobble(flagAge / 1000, 10, 9, 1.5)} />}
 
         {landed.current.map((l) => {
           const k = Math.min(1, (t - l.at) / LAND_MS);
@@ -471,6 +481,21 @@ function PaddleWheel({ slot, angle }: { slot: Slot; angle: number }) {
         ))}
       </g>
       <circle r="18" fill="#ffb703" stroke={INK} strokeWidth="4" />
+    </g>
+  );
+}
+
+/** The flag that springs up out of the full basket: `rise` from 0 to 1, swaying by `sway` degrees. */
+function Flag({ rise, sway }: { rise: number; sway: number }) {
+  const x = (BASKET.x0 + BASKET.x1) / 2;
+  // A little past the top, then back.
+  const up = 250 * (1 - (1 - rise) ** 3) + 18 * Math.sin(Math.PI * rise);
+  return (
+    <g transform={`translate(${x} ${BASKET.rimY - up + 30}) rotate(${sway})`}>
+      <rect x="-5" y="0" width="10" height="240" rx="5" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
+      <path d="M5 4 L120 34 L5 66 Z" fill="#ff5d73" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M5 24 L60 34 L5 46 Z" fill="#ffd23f" />
+      <circle cx="0" cy="-4" r="11" fill="#ffd23f" stroke={INK} strokeWidth="3" />
     </g>
   );
 }

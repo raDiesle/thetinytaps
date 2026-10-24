@@ -366,23 +366,6 @@
   }
 }
 
-/* Calm mode: no breathing or bouncing, slower moves. */
-.animals-play.calm .ap-animal:not(.munch, .yuck) .ap-emoji,
-.animals-play.calm .ap-option,
-.animals-play.calm .nudge-0,
-.animals-play.calm .nudge-1 {
-  animation: none;
-}
-
-.animals-play.calm .ap-animal,
-.animals-play.calm .ap-prompt {
-  animation: fade-in 0.7s ease-out;
-}
-
-.animals-play.calm .ap-home.happy .ap-home-box {
-  animation: none;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .ap-animal:not(.dragging, .landed, .munch, .yuck) .ap-emoji {
     animation: none;

@@ -576,5 +576,4 @@ export const baustelle: Scene = {
       ],
     },
   ],
-  seasons: { weather: true, tree: [580, 420], snowman: [1200, 545, 0.85], pumpkin: [1220, 860], egg: [760, 840] },
 };

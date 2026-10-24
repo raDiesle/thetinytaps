@@ -31,10 +31,10 @@ export interface PlayerEvents {
 
 const ACT_BLEND = 0.7;
 
-/** The legs folded to sit (thighs forward, shins down), blended in by `k`; the rest of the pose stays. */
+/** The legs folded to sit (thighs forward, shins down, the paws close together), blended in by `k`; the rest of the pose stays. */
 function sitDown(p: Pose, k: number): Pose {
   if (k <= 0) return p;
-  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.45, spread: 0.18, knee: 1.5 }, legR: { lift: 1.45, spread: 0.18, knee: 1.5 } };
+  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.45, spread: 0.06, knee: 1.5 }, legR: { lift: 1.45, spread: 0.06, knee: 1.5 } };
   return lerpPose(p, sit, k);
 }
 const PRAISE_BLEND = 0.9;
@@ -56,8 +56,6 @@ export class StoryPlayer {
   /** Seconds of the opening before the first step. */
   private readonly opening: number;
   private ended = false;
-  /** How much slower than written the story runs, e.g. 1.3 for calm mode. */
-  private readonly pace: number;
   paused = false;
   /** The parts of the guide that move glow during a movement. */
   highlight = true;
@@ -66,9 +64,7 @@ export class StoryPlayer {
     canvas: HTMLCanvasElement,
     private readonly story: Story,
     private readonly events: PlayerEvents,
-    pace = 1,
   ) {
-    this.pace = pace;
     this.stage = new Stage(canvas);
     this.stage.scene.add(this.guide.root);
     this.world = story.build(this.stage, this.guide, (c) => events.onCue(c));
@@ -88,7 +84,7 @@ export class StoryPlayer {
       this.frame = requestAnimationFrame(loop);
       const dt = Math.min(0.1, (now - this.lastNow) / 1000);
       this.lastNow = now;
-      if (!this.paused) this.elapsed += dt / this.pace;
+      if (!this.paused) this.elapsed += dt;
       this.tick(dt);
     };
     this.frame = requestAnimationFrame(loop);
@@ -192,11 +188,13 @@ export class StoryPlayer {
       this.events.onQuiet?.(quiet);
     }
     const pose = sitDown(this.pose(frame, result.walking, dt), result.sitting ?? 0);
+    pose.bend += result.bend ?? 0;
     // From just before the guide shows the movement until the praise.
     const smooth = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
     this.guide.highlight = this.highlight ? smooth((frame.act + frame.demo + 0.5) / 0.6) * (1 - smooth(frame.praise / 0.8)) : 0;
     this.guide.focus = clipFocus(movement(this.story.sequence.steps[step].movement).motion);
     this.guide.apply(pose, this.elapsed);
+    this.world.afterPose?.(frame);
     const root = this.guide.root;
     const cam = this.stage.camera.position;
     this.events.onPose?.(pose, frame, Math.atan2(cam.x - root.position.x, cam.z - root.position.z) - root.rotation.y);

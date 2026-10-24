@@ -485,5 +485,4 @@ export const kinderarzt: Scene = {
     },
   ],
   // Indoors: no leaves or snow, but a pumpkin, a little tree in Advent and an Easter egg.
-  seasons: { tree: [825, 600, 0.55], pumpkin: [1390, 700], egg: [1350, 975] },
 };

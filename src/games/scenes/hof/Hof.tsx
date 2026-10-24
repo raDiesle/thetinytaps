@@ -498,5 +498,4 @@ export const hof: Scene = {
     },
   ],
   // No pumpkin in autumn: the Hof has its own pumpkin patch.
-  seasons: { weather: true, tree: [1270, 745, 0.8], snowman: [110, 745, 0.85], egg: [680, 950] },
 };

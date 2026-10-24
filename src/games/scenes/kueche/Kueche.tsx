@@ -535,5 +535,4 @@ export const kueche: Scene = {
       ],
     },
   ],
-  seasons: { tree: [1270, 780], pumpkin: [1270, 600], egg: [470, 950] },
 };

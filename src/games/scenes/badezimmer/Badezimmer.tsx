@@ -491,5 +491,4 @@ export const badezimmer: Scene = {
     },
   ],
   // Indoors: no leaves or snow, but a little tree in Advent.
-  seasons: { tree: [1330, 560, 0.6], egg: [990, 650] },
 };

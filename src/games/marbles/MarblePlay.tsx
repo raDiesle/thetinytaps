@@ -15,34 +15,30 @@ import { TrackLevel } from "./TrackLevel";
 import "./marbles.css";
 
 const LEVELS: { id: MarbleLevel; intro: string; Level: ComponentType<LevelProps> }[] = [
-  { id: "track", intro: "Tipp! Dann rollt die Kugel.", Level: TrackLevel },
-  { id: "topple", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
   { id: "machine", intro: "Tipp! Dann läuft die große Maschine.", Level: MachineLevel },
   { id: "kitchen", intro: "Tipp! Dann wird in der Küche gezaubert.", Level: KitchenLevel },
   { id: "garden", intro: "Tipp! Dann wacht der Garten auf.", Level: GardenLevel },
+  { id: "topple", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
   { id: "building", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
   { id: "circus", intro: "Tipp! Manege frei!", Level: CircusLevel },
+  { id: "track", intro: "Tipp! Dann rollen die Kugeln.", Level: TrackLevel },
   { id: "space", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
 ];
-
-/** The Rube Goldberg machines: one tap, and one thing sets off the next. */
-const MACHINES: MarbleLevel[] = ["machine", "kitchen", "garden", "building", "circus", "space"];
 
 /** Which levels to play, in turn; in development `?level=garden` in the address picks one. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
   const fromUrl = import.meta.env.DEV ? new URLSearchParams(window.location.search).get("level") : null;
   const one = LEVELS.find((l) => l.id === (fromUrl ?? choice));
-  if (one) return [one.id];
-  return choice === "machines" ? MACHINES : LEVELS.map((l) => l.id);
+  return one ? [one.id] : LEVELS.map((l) => l.id);
 }
 
 /** Party time after a level, before the next one starts. */
 const PARTY_MS = 3200;
 
 /**
- * "Kugelbahn": the marble run, the row of things that fall over and the Rube
- * Goldberg machines, one level after the other (or only some of them, as the
- * grown-up chose).
+ * "Kettenreaktion": one tap, and one thing sets off the next – the Rube
+ * Goldberg machines, the long row of things that fall over and the marble
+ * run, one level after the other (or only one of them, as the grown-up chose).
  */
 export function MarblePlay({ settings, speechLang }: { settings: MarbleSettings; speechLang: string }) {
   const levels = chosenLevels(settings.levels);

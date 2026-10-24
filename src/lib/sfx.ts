@@ -1,5 +1,7 @@
 // Small synthesized sound effects, so no audio files are needed.
 
+import { silent } from "./silent";
+
 // C-major pentatonic: any sequence of these notes sounds pleasant.
 const PENTATONIC = [523.25, 587.33, 659.25, 783.99, 880.0, 1046.5, 1174.66, 1318.51];
 
@@ -8,7 +10,9 @@ let masterVolume = 1;
 
 function audio(): AudioContext | null {
   if (typeof window === "undefined" || !("AudioContext" in window)) return null;
-  ctx ??= new AudioContext();
+  // Silent: the context runs (timing, microphone) but has no speaker to play to.
+  // (`sinkId` is not in TypeScript's types yet.)
+  ctx ??= silent ? new AudioContext({ sinkId: { type: "none" } } as AudioContextOptions) : new AudioContext();
   return ctx;
 }
 
@@ -17,7 +21,7 @@ export function audioContext(): AudioContext | null {
   return audio();
 }
 
-/** Scales all effects, e.g. 0.4 for calm mode. */
+/** Scales all effects, e.g. while play time fades out. */
 export function setSfxVolume(volume: number) {
   masterVolume = volume;
 }
@@ -638,6 +642,31 @@ export function playKettle() {
 export function playSizzle() {
   hiss({ from: 5000, to: 4200, duration: 1.3, volume: 0.12, q: 0.7 });
   for (let i = 0; i < 9; i++) note({ from: 2600 + (i % 3) * 400, to: 1800, duration: 0.03, type: "triangle", volume: 0.07, delay: 0.1 + i * 0.13 + (i % 2) * 0.04 });
+}
+
+/** "Knack!" – an egg cracked on the rim of a bowl: a dry snap, then the egg plops in. */
+export function playCrack() {
+  note({ from: 2400, to: 1200, duration: 0.04, type: "square", volume: 0.12, lowpass: 5000 });
+  hiss({ from: 3000, duration: 0.05, volume: 0.2, q: 2 });
+  note({ from: 300, to: 110, duration: 0.18, type: "sine", volume: 0.25, delay: 0.22 });
+}
+
+/** "Wrrrrr!" – a hand mixer whirring, rising as it speeds up and falling as it stops. */
+export function playWhirr() {
+  note({ from: 160, to: 260, duration: 0.6, type: "sawtooth", volume: 0.08, lowpass: 900 });
+  note({ from: 320, to: 520, duration: 0.6, type: "square", volume: 0.03, lowpass: 1400 });
+  hiss({ from: 1800, to: 2600, duration: 0.6, volume: 0.06, q: 1 });
+}
+
+/** "Gluck, gluck" – milk poured from a bottle. */
+export function playGlug() {
+  [0, 0.2, 0.38].forEach((delay, i) => note({ from: 260 + i * 40, to: 520 + i * 60, duration: 0.12, type: "sine", volume: 0.22, delay }));
+  hiss({ from: 900, to: 700, duration: 0.6, volume: 0.06, q: 0.8 });
+}
+
+/** "Ffffff" – a child blowing: a soft breath of air that fades. */
+export function playPuff() {
+  hiss({ from: 1300, to: 800, duration: 0.6, volume: 0.2, q: 0.6 });
 }
 
 /** "Knirsch, knirsch" – footsteps or a shovel in fresh snow: short, dry, muffled crunches. */

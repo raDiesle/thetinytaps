@@ -287,19 +287,6 @@
   box-shadow: 0 2px 0 var(--ink);
 }
 
-/* Calm mode: a slow brush (brush.tsx), no swaying or twinkling. */
-.teeth-play.calm .monster-body,
-.teeth-play.calm .monster-glow,
-.teeth-play.calm .brush-foam circle,
-.teeth-play.calm .zone-glow,
-.teeth-play.calm .tooth-sparkle {
-  animation: none;
-}
-
-.teeth-play.calm .sugar-monster.gone .monster-body {
-  animation: fade-out 0.9s ease-out forwards;
-}
-
 @keyframes fade-out {
   to {
     opacity: 0;
@@ -583,18 +570,6 @@
 .teeth-play.paused .lip-arrow,
 .teeth-play.paused .teeth-mouth-icon {
   animation-play-state: paused;
-}
-
-.teeth-play.calm .monster-eyes,
-.teeth-play.calm .face-eye,
-.teeth-play.calm .sugar-monster.scared .monster-body,
-.teeth-play.calm .teeth-mouth-icon,
-.teeth-play.calm .prep-brush-bob {
-  animation: none;
-}
-
-.teeth-play.calm .lip-arrow {
-  animation: pop-in 0.4s ease-out backwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

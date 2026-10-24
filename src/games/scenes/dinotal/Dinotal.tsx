@@ -526,5 +526,4 @@ export const dinotal: Scene = {
       ],
     },
   ],
-  seasons: { weather: true, tree: [985, 442, 0.55], snowman: [70, 640, 0.75], pumpkin: [1480, 780, 0.8], egg: [700, 990] },
 };

@@ -57,6 +57,8 @@ export interface FrameResult {
   pointing?: number;
   /** How much the guide sits (0 stands, 1 sits, e.g. in the canoe); arms and body keep moving. */
   sitting?: number;
+  /** Bending forwards on top of the movement (rad), e.g. to put something down. */
+  bend?: number;
   /** The music stops for a moment, e.g. for everyone to freeze in the stop dance. */
   quiet?: boolean;
 }
@@ -64,6 +66,8 @@ export interface FrameResult {
 export interface StoryWorld {
   /** Places the guide and the camera and moves the world for this frame. */
   update(frame: StoryFrame): FrameResult;
+  /** After the guide took its pose: what it holds follows its paws, and the paws hold on to it. */
+  afterPose?(frame: StoryFrame): void;
   /** Where the camera's attention is, so shadows stay sharp there. */
   focus: THREE.Vector3;
 }

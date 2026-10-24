@@ -2,23 +2,25 @@ import { useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router";
 import { GameCard } from "@/components/GameCard";
 import { KID_HOME } from "@/components/GameShell";
+import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
+import { useFitGrid } from "@/lib/fitGrid";
 import { useTitle } from "@/lib/title";
 
 const GAMES = [
-  { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen", text: "Taste drücken – Bild, Buchstabe und Zahl erscheinen." },
-  { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder", text: "Wimmelbilder zum Antippen – alles bewegt sich und spricht." },
-  { href: "/woerter/", emoji: "✍️", title: "Wörter tippen", text: "Kurze Wörter Buchstabe für Buchstabe tippen." },
-  { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen", text: "Zwei Minuten putzen, bis alle Zuckermonster weg sind." },
-  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?", text: "Tiere füttern und ihr Zuhause finden." },
-  { href: "/schatten/", emoji: "👤", title: "Schatten finden", text: "Welcher Schatten gehört zum Bild? Antippen oder hinziehen." },
-  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise", text: "Laut rufen – der Löwe brüllt. Leise flüstern – die Maus piepst." },
-  { href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn", text: "Tippen – die Kugel rollt, klingelt und plumpst in den Korb. Oder alles fällt um, oder eine ganze Maschine läuft los." },
-  { href: "/aufzug/", emoji: "🛗", title: "Aufzug", text: "Großen Knopf drücken – der Aufzug fährt, pling, und ein Tier steigt ein oder aus." },
-  { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer", text: "Mit dem Fuchs Tapsi zur Schatzinsel – paddeln, ducken, ziehen und mitmachen." },
-  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle", text: "Den Bären trösten – und üben, was man im Kindergarten tun kann." },
+  { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
+  { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
+  { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
+  { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen" },
+  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
+  { href: "/schatten/", emoji: "👤", title: "Schatten finden" },
+  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise" },
+  { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
+  { href: "/aufzug/", emoji: "🛗", title: "Aufzug" },
+  { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
+  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
 ];
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
@@ -27,6 +29,7 @@ const IDEAS_HOLD_MS = 2000;
 export function Home() {
   useTitle();
   const navigate = useNavigate();
+  const grid = useFitGrid(GAMES.length);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const beginHold = () => {
@@ -41,6 +44,7 @@ export function Home() {
   return (
     <main className="home">
       <Sky />
+      <HomeOptions />
       <Logo
         secretProps={{
           onPointerDown: beginHold,
@@ -51,7 +55,7 @@ export function Home() {
         }}
       />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
-      <ul className="game-list">
+      <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {GAMES.map((g) => (
           <li key={g.title}>
             <GameCard {...g} />
