@@ -4,12 +4,14 @@ import { useDevice } from "@/lib/device";
 import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
+import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { useBrushingMusic } from "./music";
 import { Prep } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS } from "./steps";
+import { Week } from "./week";
 import "./teeth.css";
 
 const MONSTER_COLORS = ["#8bd346", "#b388ff", "#ff9f43", "#ff7bd0", "#4cc9f0"];
@@ -27,10 +29,11 @@ const SEEK_END_MS = 1000;
 /** Before the clock starts: get the brush, toothpaste on, and meet the monsters. */
 type Prelude = "brush" | "paste" | "monsters";
 
-const PRELUDE: Record<Prelude, { ms: number; title: string; cue: string }> = {
+/** The monsters' cue depends on the time of day, see DAYTIME. */
+const PRELUDE: Record<Prelude, { ms: number; title: string; cue?: string }> = {
   brush: { ms: 7000, title: "🪥 Zahnbürste holen", cue: "Zuerst holen wir die Zahnbürste!" },
   paste: { ms: 8000, title: "🫧 Zahnpasta drauf", cue: "Jetzt ein kleiner Klecks Zahnpasta drauf." },
-  monsters: { ms: 4500, title: "😱 Zuckermonster!", cue: "Oh je, Zuckermonster! Komm, wir putzen sie alle weg!" },
+  monsters: { ms: 4500, title: "😱 Zuckermonster!" },
 };
 
 interface Monster {
@@ -127,13 +130,16 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
   const [tickled, setTickled] = useState<number | null>(null);
+  const [week, setWeek] = useState<WeekLog>(loadWeek);
   const { touchOnly } = useDevice();
   const { bursts, spawn } = useBursts();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
 
-  // A fresh set of monsters for every round.
+  // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
+  const daytime = useMemo(() => daytimeOf(settings.daytime), [settings.daytime, round]);
+  const preludeCue = (p: Prelude) => PRELUDE[p].cue ?? DAYTIME[daytime].monsters;
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
   const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
   const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
@@ -152,7 +158,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const isGone = (m: Monster) => brushed >= (m.step + (m.order + 1) / perStep[m.step] - 0.04) * stepMs;
   const goneCount = monsters.filter(isGone).length;
   const step = phase >= 0 && !done ? STEPS[phase] : null;
-  const cue = before ? PRELUDE[before].cue : step?.cue;
+  const cue = before ? preludeCue(before) : step?.cue;
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -175,13 +181,17 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   useEffect(() => {
     if (before) {
       if (settings.sounds && part > 0) playChime();
-      say(PRELUDE[before].cue);
+      say(part === 0 ? `${DAYTIME[daytime].hello} ${preludeCue(before)}` : preludeCue(before));
     } else if (phase < STEPS.length) {
       if (settings.sounds) playChime();
       say(STEPS[phase].cue);
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
-      say("Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!");
+      say(`Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank! ${DAYTIME[daytime].after}`);
+      // A star on the week chart, whether or not it is shown, so it is complete when turned on.
+      const next = addBrushing(loadWeek(), new Date(), daytime);
+      saveWeek(next);
+      setWeek(next);
       for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 150);
     }
     // Only when the part changes, not when a setting does.
@@ -302,12 +312,15 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     }));
 
   return (
-    <div className={`teeth-play${done ? " done" : ""}${paused ? " paused" : ""}`}>
+    <div className={`teeth-play ${daytime}${done ? " done" : ""}${paused ? " paused" : ""}`}>
+      <span className="teeth-sky" aria-hidden>
+        {daytime === "morning" ? "☀️" : "🌙"}
+      </span>
       <p className="teeth-clock" aria-label="Restzeit">
         {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
       </p>
       <div className="teeth-heading" key={`${round}-${part}`}>
-        <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : "✨ Blitzeblank!"}</h2>
+        <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : DAYTIME[daytime].doneTitle}</h2>
         {before === "paste" && (
           <p className="teeth-mouth prep">
             👌 Erbsengroß
@@ -331,7 +344,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
       <div className="teeth-stage">
         {before === "brush" || before === "paste" ? (
-          <Prep key={round} part={before} />
+          <Prep key={round} part={before} daytime={daytime} />
         ) : (
           <Mouth
             key={round}
@@ -340,6 +353,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             monsters={spots}
             brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
             happy={done}
+            daytime={daytime}
             action={action}
             paused={paused}
             onTickle={tickle}
@@ -348,9 +362,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       </div>
 
       {done ? (
-        <button type="button" className="teeth-again" onClick={again}>
-          🔁 Nochmal
-        </button>
+        <div className="teeth-end">
+          {settings.week && <Week log={week} today={new Date()} now={daytime} />}
+          <button type="button" className="teeth-again" onClick={again}>
+            🔁 Nochmal
+          </button>
+        </div>
       ) : (
         <div className="teeth-controls">
           <button type="button" className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>

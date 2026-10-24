@@ -22,6 +22,7 @@ export const otherGamesIdeas: IdeaArea = {
       text: "Zähne putzen sieht morgens anders aus (Sonne geht auf, Frühstückskrümel) als abends (Mond, Schlafanzug, danach Gute Nacht). Dazu ein Wochenbild mit zwei Sternen pro Tag.",
       why: "Zweimal täglich wird sichtbar; abends direkter Übergang ins Bett.",
       effort: "S",
+      done: true,
     },
     {
       id: "X-03",
