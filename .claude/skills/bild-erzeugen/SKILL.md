@@ -14,10 +14,16 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
 
 - `GEMINI_API_KEY` must be exported in the user's shell (key from Google AI Studio).
   If the script says it is missing, tell the user to set it themselves.
-- Image models usually need billing enabled in AI Studio; each picture costs a few cents.
-  Don't generate dozens of variants without asking.
-- Default model `gemini-2.5-flash-image`; `--model` or `GEMINI_IMAGE_MODEL` switches
-  (e.g. the Pro image model for harder scenes).
+- Image models need billing enabled in AI Studio (the free tier allows 0 pictures;
+  a `429 … free_tier … limit: 0` means billing is off). Don't generate dozens of
+  variants without asking.
+- Default model `gemini-nano-banana-2.1` (about $0.034 per 1K picture, Oct 2026);
+  `--model` or `GEMINI_IMAGE_MODEL` switches, e.g. `gemini-3-pro-image` (Nano Banana
+  Pro, about $0.13) for hard scenes with many characters. `gemini-2.5-flash-image` is
+  switched off. List the models the key can use:
+  `curl -s -H "x-goog-api-key: $GEMINI_API_KEY" https://generativelanguage.googleapis.com/v1beta/models`
+- The key must be **exported** (`export GEMINI_API_KEY=…` in `~/.zshrc`); if the shell
+  of this session started before, run `zsh -ic 'export GEMINI_API_KEY; yarn image …'`.
 
 ## Commands
 
