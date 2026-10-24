@@ -1231,6 +1231,21 @@ kbd {
   margin: -24px 0 8px;
 }
 
+.home-bar-right {
+  display: flex;
+  gap: 12px;
+}
+
+.fullscreen-icon {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .home-menu {
   position: relative;
   z-index: 10;

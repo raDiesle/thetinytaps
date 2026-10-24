@@ -70,7 +70,7 @@ interface GameShellProps {
 
 /**
  * Wraps a game with a parent start screen (pick the way to play, options),
- * fullscreen + keyboard lock while playing, and the exit: a click on the corner
+ * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
 export function GameShell({
@@ -109,14 +109,15 @@ export function GameShell({
 
   const stop = () => {
     stopSpeaking();
-    // A game picked by the child goes back to the picture menu, still in fullscreen;
+    // A game picked by the child goes back to the picture menu, still in kid mode;
     // once play time is over the grown-up's exit ends kid mode right away.
+    // Fullscreen stays on either way: the menus are part of the app too.
     if (kidMode && !kidHome && !isPlaytimeOver()) {
       navigate(KID_HOME, { state: KID_STATE });
       return;
     }
     setPlaying(false);
-    void exitKidMode();
+    exitKidMode();
     // Drop the kid state, so a reload shows the grown-ups' start screen.
     if (kidMode) navigate(kidHome ? location.pathname : KID_HOME, { replace: kidHome });
   };

@@ -80,8 +80,9 @@ tablets and phones (every pointer is a finger) the keys mode of "Lebendige
 Bilder" and the keyboard hints (Esc, arrow keys) are hidden, and a saved keys
 mode falls back to tapping; on computers without a touch screen the on-screen
 keys option is hidden and the keys stay off. On a phone held upright the
-pictures show a "Quer halten" note, since the wide picture gets tiny. On iPad the games go fullscreen; on
-iPhone (no fullscreen in Safari) add the page to the home screen to hide the
+pictures show a "Quer halten" note, since the wide picture gets tiny. On iPad the games go fullscreen, and the
+app stays in fullscreen after a game, menus included (the ⛶ button on the home page
+switches it on or off); on iPhone (no fullscreen in Safari) add the page to the home screen to hide the
 browser bars.
 
 ## Offline and as an app
@@ -119,7 +120,8 @@ To add a picture that has no emoji, put an SVG in `public/images/` and set
 
 Hold **Esc** or the ✕ button (top right) for 1 second; the start screen of
 every game explains this before it starts. In Chrome/Edge the
-keyboard is locked in fullscreen, so shortcuts like Cmd+W are captured;
+keyboard is locked while a game runs, so shortcuts like Cmd+W are captured
+(in the menus a single Esc leaves fullscreen);
 Cmd+Q / Cmd+Tab can't be blocked by any website.
 
 ## Roadmap

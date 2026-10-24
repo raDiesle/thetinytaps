@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { FullscreenButton } from "@/components/FullscreenButton";
 import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
@@ -14,9 +15,9 @@ import {
 import { useStoredSettings } from "@/lib/storage";
 
 /**
- * On the home page, for the grown-ups: two small buttons at the top – the play
- * time for all games on the left, the options most games share on the right –
- * each opening its menu only when tapped, so the games fill the screen.
+ * On the home page, for the grown-ups: small buttons at the top – the play
+ * time for all games on the left, fullscreen and the options most games share
+ * on the right – each opening its menu only when tapped, so the games fill the screen.
  */
 export function HomeOptions() {
   return (
@@ -24,9 +25,12 @@ export function HomeOptions() {
       <MenuButton icon="⏳" label="Spielzeit" side="left">
         <PlaytimeOptions />
       </MenuButton>
-      <MenuButton icon="⚙️" label="Einstellungen für alle Spiele" iconOnly side="right">
-        <CommonOptions />
-      </MenuButton>
+      <div className="home-bar-right">
+        <FullscreenButton />
+        <MenuButton icon="⚙️" label="Einstellungen für alle Spiele" iconOnly side="right">
+          <CommonOptions />
+        </MenuButton>
+      </div>
     </nav>
   );
 }
