@@ -197,6 +197,8 @@ export class Guide {
   private readonly activity: Record<ContourPart, number> = { armL: 0, armR: 0, legL: 0, legR: 0, body: 0, head: 0 };
   private previous: Pose | null = null;
   private previousTime = 0;
+  /** The limbs' materials that mark where they show through the body, by part. */
+  private readonly markers: [ContourPart, THREE.Material][] = [];
 
   constructor() {
     const furMat = fur(FUR);
@@ -471,7 +473,7 @@ export class Guide {
     });
     // The root of the arm and leg sits inside the body anyway; only what reaches out of it shows through.
     this.seeThrough(
-      [this.armL.shoulder, this.armR.shoulder, this.legL.hip, this.legR.hip],
+      parts.slice(0, 4) as [THREE.Object3D, ContourPart][],
       [this.armL.upper.children[0], this.armR.upper.children[0], this.legL.hip.children[0], this.legR.hip.children[0]],
     );
     this.root.scale.setScalar(GUIDE_SIZE);
@@ -481,10 +483,19 @@ export class Guide {
    * Where the body or head hides an arm or a leg from the camera, it turns half see-through there,
    * so the movement still shows from every side. The limbs are drawn first and mark where they show
    * in the stencil buffer; body and head are drawn after them, solid only where there is no mark,
-   * and see-through on the marks that lie behind them.
+   * and see-through on the marks that lie behind them. Only the limbs in `focus` mark: a leg that is
+   * not part of the movement (paddling) stays hidden behind the body.
    */
-  private seeThrough(limbs: THREE.Object3D[], inside: THREE.Object3D[]) {
-    const marking = new Map<THREE.Material, THREE.Material>();
+  private seeThrough(limbParts: [THREE.Object3D, ContourPart][], inside: THREE.Object3D[]) {
+    const limbs = limbParts.map(([group]) => group);
+    const partOf = (o: THREE.Object3D) => {
+      for (let p: THREE.Object3D | null = o; p; p = p.parent) {
+        const found = limbParts.find(([group]) => group === p);
+        if (found) return found[1];
+      }
+      return "body";
+    };
+    const markingByPart = new Map<ContourPart, Map<THREE.Material, THREE.Material>>();
     const solid = new Map<THREE.Material, THREE.Material>();
     const ghosts = new Map<THREE.Material, THREE.Material>();
     const once = (cache: Map<THREE.Material, THREE.Material>, m: THREE.Material, make: (c: THREE.Material) => void) => {
@@ -510,11 +521,14 @@ export class Guide {
       const material = m.material as THREE.Material;
       if (under(m, limbs)) {
         if (under(m, inside)) continue;
-        m.material = once(marking, material, (c) => {
+        const part = partOf(m);
+        if (!markingByPart.has(part)) markingByPart.set(part, new Map());
+        m.material = once(markingByPart.get(part)!, material, (c) => {
           c.stencilWrite = true;
           c.stencilRef = 1;
           c.stencilFunc = THREE.AlwaysStencilFunc;
           c.stencilZPass = THREE.ReplaceStencilOp;
+          this.markers.push([part, c]);
         });
         m.renderOrder = 10;
       } else if (!material.transparent) {
@@ -605,6 +619,9 @@ export class Guide {
     this.laugh.visible = happy;
     const laughOpen = 0.85 + (this.talking ? Math.abs(Math.sin(time * 14)) * 0.35 : Math.sin(time * 6) * 0.08);
     this.laugh.scale.set(1, laughOpen, 1);
+
+    // Only the limbs the movement is about show through the body.
+    for (const [part, m] of this.markers) m.stencilWrite = this.focus.includes(part);
 
     this.glowMoving(p, time);
   }
