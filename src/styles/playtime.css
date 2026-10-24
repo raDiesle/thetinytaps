@@ -1,0 +1,130 @@
+/* ---------- Play time (idea A-03) ---------- */
+
+/* The last minute: a night-blue veil that thickens; taps still go through. */
+.playtime-dusk {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  background: radial-gradient(circle at 50% 40%, #1b1f4a99, #0b0d2a);
+  pointer-events: none;
+  transition: opacity 1s linear;
+}
+
+.good-night {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2vmin;
+  overflow: hidden;
+  background: linear-gradient(#0b0d2a, #232a6b);
+  color: #fff4d6;
+  text-align: center;
+  animation: night-fall 3s ease-out both;
+}
+
+@keyframes night-fall {
+  from {
+    opacity: 0;
+  }
+}
+
+.good-night-star {
+  position: absolute;
+  color: #fff4d6;
+  font-size: 3vmin;
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  50% {
+    opacity: 0.25;
+    scale: 0.7;
+  }
+}
+
+.good-night-moon {
+  font-family: var(--font-emoji);
+  font-size: 22vmin;
+  line-height: 1;
+  filter: drop-shadow(0 0 4vmin #fff4d680);
+  animation: moon-rise 4s ease-out both;
+}
+
+@keyframes moon-rise {
+  from {
+    translate: 0 20vmin;
+    opacity: 0;
+  }
+}
+
+.good-night-sleeper {
+  position: relative;
+  font-family: var(--font-emoji);
+  font-size: 16vmin;
+  line-height: 1;
+  animation: sleep-breathe 4s ease-in-out infinite;
+}
+
+.good-night-zzz {
+  position: absolute;
+  top: -0.3em;
+  right: -0.5em;
+  font-size: 0.45em;
+  animation: zzz-float 3s ease-in-out infinite;
+}
+
+@keyframes sleep-breathe {
+  50% {
+    scale: 1.04 0.97;
+  }
+}
+
+@keyframes zzz-float {
+  from {
+    translate: 0 0.4em;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    translate: 0.3em -0.6em;
+    opacity: 0;
+  }
+}
+
+.good-night-text {
+  margin: 0;
+  font-size: 7vmin;
+  font-weight: 700;
+}
+
+/* The exit ring stays findable for the grown-up on the dark sky. */
+.play-area:has(.good-night) .hold-exit {
+  background: conic-gradient(#fff4d6 var(--progress, 0%), #ffffff26 0);
+  color: #fff4d699;
+}
+
+.play-area:has(.good-night) .hold-exit.holding {
+  color: var(--ink);
+}
+
+.good-night-hint {
+  position: absolute;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  margin: 0;
+  padding: 0 16px;
+  font-size: 1rem;
+  opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .good-night-star,
+  .good-night-sleeper,
+  .good-night-zzz {
+    animation: none;
+  }
+}

@@ -24,8 +24,8 @@ In a fresh worktree run `yarn install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `yarn verify`, commit on the branch, merge into **local** `main`, never push.
-  Shared files many branches touch (`ScenePlay.tsx`, `sfx.ts`, `globals.css`,
-  `ideas.ts`): keep edits there small and local, so merges stay easy.
+  Shared files many branches touch (`ScenePlay.tsx`, `sfx.ts`, `src/styles/`,
+  `src/content/ideas/`): keep edits there small and local, so merges stay easy.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
@@ -34,7 +34,7 @@ In a fresh worktree run `yarn install` first.
 - Before touching a Bewegungsabenteuer level read [`src/games/adventure/LEVEL-REGELN.md`](src/games/adventure/LEVEL-REGELN.md)
   and check the work against it; write every piece of feedback on a level into it as a general rule
   (German, in the same commit as the fix).
-- Ideas live in `src/content/ideas.ts` with fixed IDs ("mach N-04"). When an idea is
+- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
   built, set `done: true` (or `partial`) there.
 
 ## Language and style

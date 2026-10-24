@@ -31,7 +31,7 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
    Lazy-load it like the other pages.
 2. `CATEGORIES` in `src/content/games.ts`: the game in the fitting category.
 3. `TILES` in `src/pages/KidHome.tsx`: a tile with a stable `id` (hidden tiles are saved by id).
-4. The idea in `src/content/ideas.ts`: `done: true` (or `partial: "…"`).
+4. The idea in `src/content/ideas/<area>.ts`: `done: true` (or `partial: "…"`).
 5. One line in the README structure table and the roadmap.
 
 ## Settings and shared parts

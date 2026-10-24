@@ -39,7 +39,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/components/HomeOptions.tsx`, `src/lib/common.ts`, `src/lib/playtime.ts` | On the home page, for all games: the play time per day (every minute in any game counts, kept in localStorage per day; the last minute winds down, then „Gute Nacht“), and folded away language, read aloud, sounds and calm mode. Games read their own settings through `useGameSettings`, which fills in the shared ones |
 | `src/components/Bursts.tsx` | Colourful shapes for "any other key" and taps |
 | `src/components/TouchKeyboard.tsx` | Big on-screen letter keys for tablets (letters and words games) |
-| `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/globals.css` |
+| `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/styles/` (all loaded in order by `src/globals.css`) |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on the home page (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
 | `src/games/letters/` | Game „Buchstaben & Zahlen“: free typing, „Wo ist das B?“ and the Buchstaben-Zug. Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
@@ -56,7 +56,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
 | `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Spaß im Aufzug" use them (`playRecorded` / `recorded` in `src/lib/sfx.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
 | `scripts/gemini-image.mjs` | `yarn image <out.webp> "<prompt>"`: makes a picture with Gemini (needs `GEMINI_API_KEY` in your shell), optionally cut out (`--transparent`), sized and saved as WebP; the raw result stays in `.image-raw/`. Guide: the Claude Code skill [`.claude/skills/bild-erzeugen/SKILL.md`](.claude/skills/bild-erzeugen/SKILL.md) (`/bild-erzeugen`) |
-| `src/content/ideas.ts` | Idea collection with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
+| `src/content/ideas/` | Idea collection, one file per area (`n-new-games.ts` …) with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
 
 To add a scene to "Lebendige Bilder", create a folder like `src/games/scenes/baustelle/`
 with the drawing (SVG in React, one component per tappable item), its texts and a
