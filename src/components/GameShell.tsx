@@ -223,15 +223,11 @@ export function GameShell({
           Los geht&apos;s!
         </button>
       )}
-      <p className="shared-settings-note">
-        {minutes > 0 ? (
-          <>
-            <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min. ·{" "}
-          </>
-        ) : null}
-        Spielzeit, Sprache, Vorlesen, Töne und ruhiger Modus gelten für alle Spiele – <Link to="/">auf der Startseite</Link>{" "}
-        einstellen.
-      </p>
+      {minutes > 0 && (
+        <p className="shared-settings-note">
+          <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min.
+        </p>
+      )}
       {settings && (
         // Folded away by default, so the start screen stays short.
         <details className="settings-panel">
