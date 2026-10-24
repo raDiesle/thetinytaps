@@ -59,11 +59,11 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
 
   const say = useCallback(
     (text: string) => {
-      const rate = settings.calm ? 0.75 : 0.85;
+      const rate = 0.85;
       deafUntil.current = Math.max(deafUntil.current, performance.now() + (text.length * SPEECH_MS_PER_CHAR) / rate + 600);
       speak(text, speechLang, { rate });
     },
-    [settings.calm, speechLang],
+    [speechLang],
   );
 
   const later = useCallback((ms: number, run: () => void) => {
@@ -87,7 +87,7 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
       if (who === "lion") {
         playRoar();
         const box = lionRef.current?.getBoundingClientRect();
-        if (box && !settings.calm) {
+        if (box) {
           // On both sides of the lion, so his open mouth stays in sight.
           for (let i = 0; i < 6; i++) {
             const x = i % 2 ? box.right + Math.random() * box.width * 0.2 : box.left - Math.random() * box.width * 0.2;
@@ -107,7 +107,7 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
         later(SPEECH_DELAY_MS, () => say(pick(SAYS[who])));
       }
     },
-    [celebrate, later, onDone, say, spawn, settings.calm, settings.speech],
+    [celebrate, later, onDone, say, spawn, settings.speech],
   );
 
   listen.current = (db, ms) => {
@@ -136,7 +136,6 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
       ref={rootRef}
       className={[
         "loud-play",
-        settings.calm && "calm",
         active === "lion" && "roaring",
         active === "mouse" && "squeaking",
         nudge && `nudge-${nudge}`,

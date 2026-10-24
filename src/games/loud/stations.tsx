@@ -16,7 +16,6 @@ export interface StationProps {
   done: (pause?: number) => void;
   /** Plays a sound; the microphone stays deaf for `ms`, so the game doesn't blow on its own. */
   sound: (play: () => void, ms?: number) => void;
-  calm: boolean;
 }
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
@@ -63,7 +62,7 @@ export function Candles({ step, done, sound }: StationProps) {
     next[pick(lit)] = true;
     outRef.current = next;
     setOut(next);
-    sound(playPuff, 400);
+    sound(playPuff, 700);
     if (lit.length === 1) done();
   };
 
@@ -140,7 +139,7 @@ interface Flight {
 }
 
 /** A dandelion clock; blowing sends its little parachutes flying. */
-export function Dandelion({ step, done, calm }: StationProps) {
+export function Dandelion({ step, done }: StationProps) {
   const seeds = useMemo(
     () => Array.from({ length: SEEDS }, (_, i) => ({ angle: (i * 360) / SEEDS + Math.random() * 8 - 4, length: 72 + Math.random() * 14 })),
     [],
@@ -161,7 +160,7 @@ export function Dandelion({ step, done, calm }: StationProps) {
       next[i] = {
         dx: Math.sin(a) * 320 + Math.random() * 300 - 150,
         dy: -Math.cos(a) * 180 - 220 - Math.random() * 220,
-        seconds: (calm ? 3.4 : 2.4) + Math.random() * 1.4,
+        seconds: 2.4 + Math.random() * 1.4,
       };
     }
     due.current = Math.min(due.current, 1);

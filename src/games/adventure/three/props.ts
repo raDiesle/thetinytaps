@@ -228,13 +228,17 @@ export function makeButterfly(color: string) {
   };
 }
 
-/** A wooden canoe pointing along -z. */
 /** Height of the canoe's rim above its bottom (local y); the paddle has to stay above it. */
 export const CANOE_RIM = 0.3;
 /** Half the width of the canoe in the middle, and half its length. */
 export const CANOE_HALF_WIDTH = 0.62;
 export const CANOE_HALF_LENGTH = 2.3;
+/** Where the feet of someone sitting in the canoe stand: on the floor boards, in front of the seat (local). */
+export const CANOE_FEET = new THREE.Vector3(0, -0.03, 0.4);
+/** The top of the seat (local y): just under the bottom of a sitting Tapsi. */
+const CANOE_SEAT = 0.26;
 
+/** A wooden canoe pointing along -z. */
 export function makeCanoe() {
   const group = new THREE.Group();
   const wood = mat("#b5753f", 0.6);
@@ -251,23 +255,24 @@ export function makeCanoe() {
   const rim = solid(rimGeo, woodDark);
   rim.position.y = CANOE_RIM;
   group.add(rim);
-  // The seat Tapsi sits on, low in the hull.
-  const seat = solid(new THREE.BoxGeometry(0.8, 0.06, 0.32), wood);
-  seat.position.set(0, 0.16, 0.5);
+  // The seat Tapsi sits on: a plank from side to side, just under the rim.
+  const seat = solid(new THREE.BoxGeometry(1.12, 0.06, 0.32), wood);
+  seat.position.set(0, CANOE_SEAT - 0.03, CANOE_FEET.z + 0.1);
   group.add(seat);
   const floor = solid(new THREE.BoxGeometry(0.36, 0.02, 1.4), woodDark);
   floor.position.y = -0.045;
   group.add(floor);
   // The sea is a flat plane and would show inside the open hull, as if the
   // canoe was full of water. An invisible lid over the hull fills in depth
-  // after everything solid is drawn, so the water behind it is hidden while
-  // Tapsi and the floor inside stay.
+  // after everything solid is drawn – Tapsi too, who is drawn late for the
+  // see-through body – so the water behind it is hidden while Tapsi's legs
+  // and the floor inside stay.
   const lidGeo = new THREE.CircleGeometry(1, 48);
   lidGeo.rotateX(-Math.PI / 2);
   lidGeo.scale(CANOE_HALF_WIDTH, 1, CANOE_HALF_LENGTH);
   const waterMask = new THREE.Mesh(lidGeo, new THREE.MeshBasicMaterial({ colorWrite: false, side: THREE.DoubleSide }));
   waterMask.position.y = CANOE_RIM;
-  waterMask.renderOrder = 1;
+  waterMask.renderOrder = 20;
   group.add(waterMask);
   return group;
 }

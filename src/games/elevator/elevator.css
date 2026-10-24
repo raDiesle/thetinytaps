@@ -1,362 +1,1077 @@
 /* ---------- Aufzug ---------- */
 
 .elevator-play {
-  --grass: 3vh;
-  --btn: min(calc((100vh - 140px) / (var(--floors) + 1.4)), 17vw, 150px);
   --ease-ride: cubic-bezier(0.45, 0, 0.55, 1);
   position: absolute;
   inset: 0;
-  display: flex;
-  gap: 3vw;
-  padding: max(64px, env(safe-area-inset-top)) 3vw 0;
-  background:
-    linear-gradient(to top, #80b918 0 var(--grass), transparent var(--grass)),
-    linear-gradient(#a2d2ff, #e3f2ff);
-}
-
-/* The house in cross-section: rooms on the left, the lift shaft on the right. */
-.el-house {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-  max-width: 130vh;
-  margin-left: auto;
-}
-
-.el-roof {
-  flex: 0 0 11%;
-  margin: 0 -3%;
-  background: #d1495b;
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-}
-
-.el-floors {
-  position: relative;
-  flex: 1;
   overflow: hidden;
-  container-type: size;
-  border: 6px solid #8d5a3c;
-  border-bottom: 0;
-  background: #fff;
+  background: #a5d8ff;
 }
 
-.el-ground {
-  flex: 0 0 var(--grass);
+.elevator-play.weather-evening {
+  background: #1c2a6b;
 }
 
-.el-floor {
+.elevator-play.weather-rain {
+  background: #8d99a6;
+}
+
+/* The picture fills the screen below the exit button; the sky runs on past its edges. */
+.el-svg {
   position: absolute;
-  right: 0;
-  bottom: calc(var(--f) * 100% / var(--floors));
-  left: 0;
-  height: calc(100% / var(--floors));
-}
-
-/* The ceiling of the floor below. */
-.el-floor::after {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 7%;
-  background: #a47148;
-  content: "";
-}
-
-.el-window {
-  position: absolute;
-  top: 16%;
-  left: 5%;
-  width: 13%;
-  height: 42%;
-  border: 0.8cqh solid #fff;
-  border-radius: 6px;
-  background:
-    linear-gradient(#fff 0 0) center / 8% 100% no-repeat,
-    linear-gradient(#fff 0 0) center / 100% 8% no-repeat,
-    linear-gradient(#8ecae6, #d6f0ff);
-  box-shadow: 0 0 0 2px #0000001a;
-}
-
-.el-thing,
-.el-animal {
-  position: absolute;
-  font-family: var(--font-emoji);
-  line-height: 1;
-  translate: -50% 0;
-}
-
-.el-thing {
-  bottom: 7%;
-  font-size: min(calc(100cqh / var(--floors) * 0.42), 9cqw);
-  pointer-events: none;
-}
-
-.el-thing-0 {
-  left: 25%;
-}
-
-.el-thing-1 {
-  left: 49%;
-}
-
-/* The floor's number next to the lift door; it lights up while the lift stands there. */
-.el-plate {
-  position: absolute;
-  top: 9%;
-  left: 67%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(calc(100cqh / var(--floors) * 0.24), 5cqw);
-  aspect-ratio: 1;
-  translate: -50% 0;
-  border: 3px solid #455a64;
-  border-radius: 50%;
-  background: #fff;
-  font-size: min(calc(100cqh / var(--floors) * 0.15), 3cqw);
-  font-weight: 800;
-  transition:
-    background 0.3s,
-    scale 0.3s;
-}
-
-.el-plate.here {
-  background: var(--sunshine);
-  scale: 1.15;
-}
-
-/* The shaft is open to the front, so the cabin can be watched going up and down. */
-.el-shaft {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 72%;
-  width: 20%;
-  overflow: hidden;
-  background:
-    linear-gradient(90deg, transparent 12%, #37474f 12% 14%, transparent 14% 86%, #37474f 86% 88%, transparent 88%),
-    #607d8b;
-}
-
-.el-cabin,
-.el-doors {
-  position: absolute;
-  bottom: calc((var(--f) + 0.07) * 100% / var(--floors));
-  left: 5%;
-  width: 90%;
-  height: calc(0.84 * 100% / var(--floors));
-  transition: bottom var(--ride) var(--ease-ride);
-}
-
-.el-cabin {
-  z-index: 1;
-  border-radius: 8px 8px 0 0;
-  background:
-    linear-gradient(#c9a227 0 0) 0 62% / 100% 5% no-repeat,
-    linear-gradient(#ffe8a3, #f6d186);
-}
-
-/* The rope it hangs on. */
-.el-cabin::before {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  width: 4px;
-  height: 100cqh;
-  translate: -50% 0;
-  background: #263238;
-  content: "";
-}
-
-/* In front of the riders, so they disappear behind the closing doors. */
-.el-doors {
-  z-index: 3;
-  display: flex;
-  pointer-events: none;
-}
-
-.el-doors span {
-  flex: 1;
-  border: 2px solid #78909c;
-  background: linear-gradient(90deg, #cfd8dc, #eceff1 50%, #cfd8dc);
-  transition: scale 0.65s ease-in-out;
-}
-
-.el-doors span:first-child {
-  transform-origin: left;
-}
-
-.el-doors span:last-child {
-  transform-origin: right;
-}
-
-.el-doors.open span {
-  scale: 0.06 1;
-}
-
-.el-animal {
-  z-index: 2;
-  bottom: calc((var(--f) + 0.07) * 100% / var(--floors));
-  font-size: min(calc(100cqh / var(--floors) * 0.48), 10cqw);
-  cursor: pointer;
+  top: max(56px, env(safe-area-inset-top));
+  right: 1vw;
+  bottom: 1vh;
+  left: 1vw;
+  width: calc(100% - 2vw);
+  height: calc(100% - max(56px, env(safe-area-inset-top)) - 1vh);
+  overflow: visible;
+  font-family: inherit;
   touch-action: manipulation;
-  transition:
-    left var(--walk) linear,
-    bottom var(--ride) var(--ease-ride),
-    opacity 0.6s;
+  user-select: none;
 }
 
-.el-animal.gone {
+/* Riding moves the cabin and everyone in it together; walking moves a child along its floor. */
+.el-ride {
+  transition-property: transform;
+  transition-timing-function: var(--ease-ride);
+}
+
+.el-walker {
+  transition-property: transform;
+  transition-timing-function: linear;
+}
+
+.el-bubble,
+.el-tap,
+.el-cabin-front,
+.el-hint,
+.el-night,
+.el-confetti {
+  pointer-events: none;
+}
+
+.el-hopper {
+  cursor: pointer;
+}
+
+.el-hopper.hop-0 {
+  animation: el-hop 0.5s ease-out;
+}
+
+.el-hopper.hop-1 {
+  animation: el-hop-again 0.5s ease-out;
+}
+
+/* ---------- The children ---------- */
+
+.el-rumble,
+.el-lids,
+.el-mouth-open {
   opacity: 0;
 }
 
-.el-face,
-.el-body {
-  display: block;
+.pose-walk .el-leg-l {
+  animation: el-step 0.42s ease-in-out infinite alternate;
 }
 
-.el-animal.right .el-face {
-  scale: -1 1;
+.pose-walk .el-leg-r {
+  animation: el-step 0.42s ease-in-out infinite alternate-reverse;
 }
 
-.el-animal.walking .el-body {
-  animation: el-waddle 0.3s ease-in-out infinite alternate;
+.pose-walk .el-kid-body {
+  animation: el-bob 0.21s ease-in-out infinite alternate;
 }
 
-.el-body.hop-0 {
-  animation: el-hop 0.45s ease-in-out;
+.pose-walk .el-arm-l {
+  animation: el-swing 0.42s ease-in-out infinite alternate-reverse;
 }
 
-.el-body.hop-1 {
-  animation: el-hop-again 0.45s ease-in-out;
+.pose-walk .el-arm-r {
+  animation: el-swing 0.42s ease-in-out infinite alternate;
 }
 
-/* The button panel, like the one inside a real lift. */
-.el-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: calc(var(--btn) * 0.18);
-  align-self: center;
-  margin-right: auto;
-  padding: calc(var(--btn) * 0.22);
-  border: 4px solid #90a4ae;
-  border-radius: 24px;
-  background: linear-gradient(#eceff1, #cfd8dc);
-  box-shadow: var(--lift);
+/* Hungry: hands on the tummy, which rumbles. */
+.pose-tummy .el-rumble {
+  animation: el-flicker 0.65s steps(2) infinite;
 }
 
-.el-display {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15em;
-  min-width: calc(var(--btn) * 1.2);
-  padding: 0.05em 0.3em;
-  border-radius: 10px;
-  background: #1b1b1b;
-  color: #ff9f1c;
-  font-size: calc(var(--btn) * 0.5);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
+.pose-tummy .el-kid-body {
+  animation: el-wobble 0.32s ease-in-out infinite alternate;
 }
 
-.el-arrow {
-  width: 0.7em;
-  font-size: 0.6em;
+/* Tired: a big yawn with closed eyes and the arms stretched up. */
+.pose-yawn .el-lids,
+.pose-yawn .el-mouth-open {
+  opacity: 1;
+}
+
+.pose-yawn .el-smile,
+.pose-blow .el-smile,
+.pose-eat .el-smile,
+.pose-cheer .el-smile,
+.pose-jump .el-smile,
+.pose-hop .el-smile {
+  opacity: 0;
+}
+
+.pose-yawn .el-mouth-open {
+  animation: el-yawn 2.6s ease-in-out;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pose-cheer .el-mouth-open,
+.pose-jump .el-mouth-open,
+.pose-hop .el-mouth-open {
+  opacity: 1;
+}
+
+/* Blowing: a small round mouth, puffing. */
+.pose-blow .el-mouth-open {
+  opacity: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-blow 0.35s ease-in-out infinite alternate;
+}
+
+.pose-eat .el-mouth-open {
+  animation: el-chew 0.5s steps(2) infinite;
+}
+
+.pose-shake .el-head {
+  animation: el-shake 0.5s ease-in-out 2;
+}
+
+.pose-reach .el-arm-r {
+  animation: el-reach 0.9s ease-in-out infinite alternate;
+}
+
+.pose-stir .el-arm-r {
+  animation: el-stir 0.18s linear infinite alternate;
+}
+
+.pose-build .el-arm-r {
+  animation: el-build 1.2s ease-in-out infinite;
+}
+
+/* Eating: sitting with dangling legs; the fork comes to the mouth in time with the munching, and the eyes close: mmh. */
+.pose-eat .el-arm-r {
+  animation: el-feed 1.5s ease-in-out -0.3s infinite;
+}
+
+.pose-eat .el-lids {
+  animation: el-savour 1.5s linear -0.3s infinite;
+}
+
+.pose-eat .el-leg-l,
+.pose-sit .el-leg-l,
+.pose-serve .el-leg-l {
+  animation: el-dangle 0.8s ease-in-out infinite alternate;
+}
+
+.pose-eat .el-leg-r,
+.pose-sit .el-leg-r,
+.pose-serve .el-leg-r {
+  animation: el-dangle 0.8s ease-in-out infinite alternate-reverse;
+}
+
+.pose-drink .el-arm-r {
+  animation: el-sip 1.4s ease-in-out infinite alternate;
+}
+
+.pose-brush .el-arm-r {
+  animation: el-brush 0.22s linear infinite alternate;
+}
+
+.pose-hop .el-kid-body,
+.pose-cheer .el-kid-body {
+  animation: el-bounce 0.55s ease-in-out infinite;
+}
+
+.pose-cheer .el-arm-r {
+  animation: el-wave 0.4s ease-in-out infinite alternate;
+}
+
+.pose-cheer .el-arm-l {
+  animation: el-wave 0.4s ease-in-out infinite alternate-reverse;
+}
+
+.pose-jump .el-kid-body {
+  animation: el-jump 1s ease-in-out infinite;
+}
+
+.pose-jump .el-leg-l,
+.pose-jump .el-leg-r {
+  animation: el-tuck 1s ease-in-out infinite;
+}
+
+/* The thought bubble pops up out of the child's head. */
+.el-bubble {
+  animation: el-pop 0.55s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+/* ---------- Things in the rooms ---------- */
+
+.el-fridge-door {
+  transition: transform 0.45s ease-in-out;
+}
+
+.el-fridge.open .el-fridge-door {
+  transform: scaleX(-0.32);
+}
+
+.el-fridge-light {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.el-fridge.open .el-fridge-light {
+  opacity: 0.25;
+}
+
+.el-oven-glow {
+  opacity: 0.25;
+  transition: opacity 0.6s;
+}
+
+.el-oven-glow.on {
+  opacity: 0.9;
+}
+
+.el-flames {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.el-flames.on {
+  opacity: 1;
+  animation: el-flicker 0.3s steps(2) infinite;
+}
+
+.el-batter-bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-blink 0.9s ease-in-out infinite;
+}
+
+/* The pancake on each plate: each bite takes a piece, then only crumbs are left; little hearts rise meanwhile. */
+.el-bite,
+.el-crumbs {
+  animation: el-appear 0.15s ease-out both;
+}
+
+.el-yum {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-zzz 1.6s ease-out infinite;
+}
+
+.cooking-pot .el-pot-lid {
+  animation: el-rattle 0.5s ease-in-out infinite;
+}
+
+.el-steam {
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+
+.el-steam.on {
+  opacity: 1;
+}
+
+.el-steam.on .el-puff {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-rise 1.4s ease-out infinite;
+}
+
+.el-tub.bathing .el-duck {
+  animation: el-bob-big 0.8s ease-in-out infinite alternate;
+}
+
+.el-tub.bathing .el-foam circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-foam 0.7s ease-in-out infinite alternate;
+}
+
+.el-tub.bathing .el-foam circle:nth-child(2n) {
+  animation-delay: -0.35s;
+}
+
+.el-bather {
+  animation: el-bather 1.6s ease-in-out infinite;
+}
+
+.el-foam-bits {
+  opacity: 0;
+}
+
+.el-foam-bits.on {
+  opacity: 1;
+}
+
+.el-foam-bits.on circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-rise 1s ease-out infinite;
+}
+
+.el-wobble .el-tower {
+  animation: el-tower 0.5s ease-in-out 4 alternate;
+}
+
+.el-jump-once {
+  animation: el-jump-once 0.6s ease-out;
+}
+
+.el-pop-in {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-pop 0.4s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+.el-drop-in {
+  animation: el-drop-in 0.45s ease-in both;
+}
+
+/* Cooking: eggshells fall apart, flour puffs up, the mixer whirls, the pancake flies onto the plate. */
+.el-shell-l {
+  animation: el-shell-l 0.7s ease-out forwards;
+}
+
+.el-shell-r {
+  animation: el-shell-r 0.7s ease-out forwards;
+}
+
+.el-yolk-drop {
+  animation: el-yolk-drop 0.5s ease-in forwards;
+}
+
+.el-dust circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-dust 0.9s ease-out forwards;
+}
+
+.el-beaters.on,
+.el-whirl {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-beat 0.12s linear infinite alternate;
+}
+
+.el-spoon {
+  animation: el-spoon 0.3s ease-in-out infinite alternate;
+}
+
+.el-fly {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-fly 0.9s ease-in-out forwards;
+}
+
+.el-cupboard-door {
+  transition: transform 0.45s ease-in-out;
+}
+
+.el-cupboard-door.open {
+  transform: scaleX(-0.3);
+}
+
+.el-rock {
+  animation: el-rock 0.9s ease-in-out;
+}
+
+.el-sparkle path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-sparkle 0.9s ease-out forwards;
+}
+
+.el-drift {
+  transition: transform 0.9s ease-out;
+}
+
+.el-zzz path {
+  opacity: 0;
+  animation: el-zzz 2.1s ease-out infinite;
+}
+
+.el-night-glow {
+  animation: el-glow 3s ease-in-out infinite alternate;
+}
+
+.el-splash {
+  opacity: 0;
+}
+
+.el-puddle.splashing .el-splash {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: el-splash 1s ease-out infinite;
+}
+
+.el-boat-float {
+  animation: el-float 1.8s ease-in-out infinite alternate;
+}
+
+.el-frog.jumping > * {
+  animation: el-frog 1s ease-in-out infinite;
+  animation-delay: 0.5s;
+}
+
+.el-rainbow {
+  animation: el-fade-in 2s ease-out both;
+}
+
+.el-rain-lines {
+  animation: el-rain 0.5s linear infinite;
+}
+
+.el-twinkle {
+  animation: el-twinkle 2s ease-in-out infinite alternate;
+}
+
+/* ---------- The hand that shows where to tap ---------- */
+
+.el-tap-pop {
+  animation: el-pop 0.45s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+.el-tap-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-ring 0.9s ease-in-out infinite alternate;
+}
+
+.el-tap-hand {
+  animation: el-press 0.9s ease-in-out infinite;
+}
+
+/* ---------- Lift, buttons, hint, night, party ---------- */
+
+.el-door {
+  transition: transform 0.6s ease-in-out;
+}
+
+.el-door.open {
+  transform: translateX(calc(var(--s) * 84px));
+}
+
+.el-hint {
+  animation: el-hint 1.1s ease-in-out infinite alternate;
 }
 
 .el-button {
-  width: var(--btn);
-  height: var(--btn);
-  border: 5px solid #90a4ae;
-  border-radius: 50%;
-  background: radial-gradient(circle at 40% 35%, #fff, #e0e0e0);
-  box-shadow: 0 6px 0 #78909c;
-  color: #37474f;
-  font: inherit;
-  font-size: calc(var(--btn) * 0.5);
-  font-weight: 800;
-  line-height: 1;
   cursor: pointer;
-  touch-action: manipulation;
-  transition:
-    translate 0.1s,
-    box-shadow 0.1s,
-    background 0.3s;
+  transition: transform 0.1s;
 }
 
 .el-button:active {
+  transform: translateY(4px);
+}
+
+.el-button-face {
+  fill: #fafafa;
+  transition: fill 0.3s;
+}
+
+.el-button text {
+  fill: #37474f;
+}
+
+.el-button.lit .el-button-face {
+  fill: #ffe066;
+  filter: drop-shadow(0 0 14px #ffd60a);
+}
+
+.el-button.lit text {
+  fill: #e85d04;
+}
+
+.el-button.hint {
+  animation: el-pulse 1.1s ease-in-out infinite alternate;
+}
+
+.el-night {
+  opacity: 0;
+  transition: opacity 2.5s ease-in-out;
+}
+
+.el-night.on {
+  opacity: 0.5;
+}
+
+.el-confetti rect {
+  animation-name: el-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ---------- Picture cards to pick a story ---------- */
+
+.el-picker {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  gap: 4vmin;
+  padding: max(64px, env(safe-area-inset-top)) 4vw 4vh;
+}
+
+.el-picker.again {
+  background: #ffffff59;
+  animation: el-fade-in 0.6s ease-out both;
+}
+
+.el-card {
+  width: min(28vmin, 30vw);
+  aspect-ratio: 1;
+  padding: 3vmin;
+  border: 6px solid var(--ink);
+  border-radius: 28px;
+  background: #fff9db;
+  box-shadow: var(--lift);
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: el-card-in 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+  transition: translate 0.1s;
+}
+
+.el-card:active {
   translate: 0 4px;
-  box-shadow: 0 2px 0 #78909c;
 }
 
-/* Pressed: it glows until the lift is there. */
-.el-button.lit {
-  border-color: #ffb703;
-  background: radial-gradient(circle at 40% 35%, #fffbe0, #ffe066);
-  box-shadow:
-    0 6px 0 #78909c,
-    0 0 calc(var(--btn) * 0.3) #ffd60a;
-  color: #e85d04;
+.el-card svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-/* Phones upright: the buttons go in a row under the house, 1 on the left. The
-   display makes room for them; the lit number plate in the house shows the floor. */
-@media (max-aspect-ratio: 4/5) {
-  .elevator-play {
-    --btn: min(calc((94vw - 20px) / (var(--floors) * 1.18 + 0.44)), 14vh, 130px);
-    flex-direction: column;
-    gap: 2vh;
-    padding-bottom: 2vh;
-  }
-
-  .el-house {
-    width: 100%;
-    margin: 0;
-  }
-
-  .el-panel {
-    flex-direction: row-reverse;
-    margin: 0;
-  }
-
-  .el-display {
-    display: none;
-  }
+.el-card-1 {
+  background: #d0bfff;
+  animation-delay: 0.1s;
 }
 
-@keyframes el-waddle {
-  from {
-    transform: rotate(-7deg) translateY(0);
-  }
-  to {
-    transform: rotate(7deg) translateY(-6%);
-  }
+.el-card-2 {
+  background: #a5d8ff;
+  animation-delay: 0.2s;
 }
+
+/* ---------- Keyframes ---------- */
 
 @keyframes el-hop {
   40% {
-    transform: translateY(-25%);
+    transform: translateY(-34px);
   }
 }
 
 @keyframes el-hop-again {
   40% {
-    transform: translateY(-25%);
+    transform: translateY(-34px);
   }
 }
 
-/* Calm mode: a gentler walk. */
-.elevator-play.calm .el-animal.walking .el-body {
-  animation-duration: 0.5s;
+@keyframes el-step {
+  from {
+    transform: rotate(-16deg);
+  }
+  to {
+    transform: rotate(16deg);
+  }
+}
+
+@keyframes el-bob {
+  to {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes el-swing {
+  from {
+    transform: rotate(-12deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes el-flicker {
+  50% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes el-wobble {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes el-yawn {
+  0%,
+  100% {
+    transform: scale(0.6);
+  }
+  40%,
+  70% {
+    transform: scale(1.5, 1.8);
+  }
+}
+
+@keyframes el-chew {
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes el-shake {
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes el-reach {
+  to {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes el-build {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(110deg);
+  }
+}
+
+@keyframes el-feed {
+  0%,
+  100% {
+    transform: rotate(40deg);
+  }
+  40%,
+  70% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes el-savour {
+  0%,
+  42% {
+    opacity: 0;
+  }
+  46%,
+  70% {
+    opacity: 1;
+  }
+  74%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes el-dangle {
+  from {
+    transform: rotate(-10deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes el-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes el-sip {
+  from {
+    transform: rotate(6deg);
+  }
+  to {
+    transform: rotate(-6deg);
+  }
+}
+
+@keyframes el-brush {
+  from {
+    transform: translateX(-4px);
+  }
+  to {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes el-bounce {
+  50% {
+    transform: translateY(-14px);
+  }
+}
+
+@keyframes el-wave {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes el-jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  45% {
+    transform: translateY(-30px);
+  }
+  80% {
+    transform: translateY(2px) scaleY(0.94);
+  }
+}
+
+@keyframes el-tuck {
+  45% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes el-pop {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes el-blow {
+  from {
+    transform: scale(0.45);
+  }
+  to {
+    transform: scale(0.65);
+  }
+}
+
+@keyframes el-stir {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes el-blink {
+  50% {
+    transform: scale(0.2);
+    opacity: 0.3;
+  }
+}
+
+@keyframes el-jump-once {
+  40% {
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes el-drop-in {
+  from {
+    transform: translateY(-70px);
+    opacity: 0;
+  }
+}
+
+@keyframes el-shell-l {
+  to {
+    transform: translate(-18px, 12px) rotate(-40deg);
+    opacity: 0;
+  }
+}
+
+@keyframes el-shell-r {
+  to {
+    transform: translate(18px, 12px) rotate(40deg);
+    opacity: 0;
+  }
+}
+
+@keyframes el-yolk-drop {
+  to {
+    transform: translateY(26px);
+    opacity: 0;
+  }
+}
+
+@keyframes el-dust {
+  from {
+    transform: scale(0.3);
+    opacity: 0.95;
+  }
+  to {
+    transform: translateY(-16px) scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes el-beat {
+  to {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes el-spoon {
+  from {
+    transform: rotate(-20deg);
+  }
+  to {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes el-fly {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(calc(var(--dx) * 0.5), -110px) rotate(180deg);
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(360deg) scale(1.3);
+  }
+}
+
+@keyframes el-rock {
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes el-sparkle {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes el-ring {
+  from {
+    transform: scale(0.85);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes el-press {
+  0%,
+  100% {
+    transform: translate(12px, -16px);
+  }
+  50% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes el-rattle {
+  50% {
+    transform: translateY(-5px) rotate(-4deg);
+  }
+}
+
+@keyframes el-rise {
+  from {
+    transform: translateY(0) scale(0.6);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(-40px) scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes el-bob-big {
+  from {
+    transform: translateY(0) rotate(-6deg);
+  }
+  to {
+    transform: translateY(-6px) rotate(6deg);
+  }
+}
+
+@keyframes el-foam {
+  to {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes el-bather {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes el-tower {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes el-zzz {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-36px);
+  }
+}
+
+@keyframes el-glow {
+  to {
+    opacity: 0.4;
+  }
+}
+
+@keyframes el-splash {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  20% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.3) translateY(-10px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.4) translateY(-4px);
+  }
+}
+
+@keyframes el-float {
+  from {
+    transform: rotate(-6deg) translateX(-10px);
+  }
+  to {
+    transform: rotate(6deg) translateX(14px);
+  }
+}
+
+@keyframes el-frog {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-40px);
+  }
+}
+
+@keyframes el-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes el-rain {
+  to {
+    transform: translate(-8px, 24px);
+  }
+}
+
+@keyframes el-twinkle {
+  to {
+    opacity: 0.3;
+  }
+}
+
+@keyframes el-hint {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes el-pulse {
+  to {
+    transform: scale(1.14);
+  }
+}
+
+@keyframes el-fall {
+  from {
+    transform: translateY(-40px) rotate(0deg);
+  }
+  to {
+    transform: translateY(1200px) rotate(540deg);
+  }
+}
+
+@keyframes el-card-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .el-animal.walking .el-body {
+  .pose-walk .el-leg-l,
+  .pose-walk .el-leg-r,
+  .pose-walk .el-kid-body,
+  .pose-walk .el-arm-l,
+  .pose-walk .el-arm-r,
+  .el-rain-lines,
+  .el-confetti rect {
     animation: none;
   }
 }

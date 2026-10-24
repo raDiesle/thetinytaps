@@ -62,7 +62,6 @@ interface MouthProps {
   /** The brush goes from stop to stop; `at` is how far, 1.5 is half way from the second to the third. */
   brush: { stops: { tooth: ToothId; spot: number }[]; at: number; surface: Surface; motion: Motion } | null;
   paused: boolean;
-  calm: boolean;
   /** All clean: sparkles and smiling eyes. */
   happy: boolean;
   /** Shown while the child should open or close their mouth. */
@@ -115,7 +114,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, action, paused, calm, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, action, paused, onTickle }: MouthProps) {
   const model = useMemo(() => buildMouth(view.open), [view.open]);
   const all = projectors(view);
   const project = all.face;
@@ -292,7 +291,6 @@ export function Mouth({ view, zone, monsters, brush, happy, action, paused, calm
               motion={brush.motion}
               project={all[tooth.jaw]}
               paused={paused}
-              calm={calm}
             />
           );
         })()}

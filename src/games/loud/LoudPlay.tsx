@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type RefObject } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playMelody, setSfxVolume } from "@/lib/sfx";
+import { playMelody } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { BlowPlay } from "./BlowPlay";
 import { useMicrophone, type MicState } from "./mic";
@@ -55,10 +55,6 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
   useWakeLock(true);
 
   useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
-  useEffect(() => {
     const pending = timers.current;
     return () => pending.forEach(clearTimeout);
   }, []);
@@ -76,14 +72,14 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
       partying.current = true;
       setParty(true);
       playMelody();
-      for (let i = 0; i < (settings.calm ? 4 : 14); i++) later(i * 120, () => spawn());
+      for (let i = 0; i < 14; i++) later(i * 120, () => spawn());
       later(PARTY_MS, () => {
         partying.current = false;
         setParty(false);
         then();
       });
     },
-    [later, settings.calm, spawn],
+    [later, spawn],
   );
 
   // Nobody listens during the party: the melody would blow out the next candle or wake the lion.

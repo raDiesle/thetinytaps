@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playChime, playMunch, playPop, playRandomNote, playYuck, setSfxVolume } from "@/lib/sfx";
+import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { ANIMALS, FOODS, texts, type Animal, type Food } from "./content";
 import { HOMES, HomeDrawing, type Home } from "./homes";
@@ -90,15 +90,11 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, lang, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, lang, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm, lang],
+    [settings.speech, lang],
   );
 
   const prompt = (r: Round) => (r.kind === "feed" ? texts.hungry(r.animal) : texts.whereLives(r.animal));
@@ -218,7 +214,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
     if (settings.sounds) later(200, playChime);
     setStars((n) => n + 1);
     later(700, () => {
-      for (let i = 0; i < (settings.calm ? 3 : 8); i++) spawn();
+      for (let i = 0; i < 8; i++) spawn();
     });
     later(CELEBRATE_MS, nextRound);
   };
@@ -451,7 +447,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
 
   return (
     <div
-      className={`animals-play kind-${round.kind}${settings.calm ? " calm" : ""}`}
+      className={`animals-play kind-${round.kind}`}
       onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
     >
       <p key={round.id} className="ap-prompt">

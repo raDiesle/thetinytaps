@@ -99,11 +99,11 @@ export function BlowPlay({ speechLang, settings, mic, listen, celebrate, onDone 
   const say = useCallback(
     (text: string) => {
       if (!settings.speech) return;
-      const rate = settings.calm ? 0.75 : 0.85;
+      const rate = 0.85;
       deafFor((text.length * SPEECH_MS_PER_CHAR) / rate + 600);
       speak(text, speechLang, { rate });
     },
-    [deafFor, settings.calm, settings.speech, speechLang],
+    [deafFor, settings.speech, speechLang],
   );
 
   listen.current = (db, ms) => {
@@ -182,7 +182,7 @@ export function BlowPlay({ speechLang, settings, mic, listen, celebrate, onDone 
   return (
     <div
       ref={rootRef}
-      className={["blow-play", `bl-${station.id}`, settings.calm && "calm", nudge && "bl-nudging"].filter(Boolean).join(" ")}
+      className={["blow-play", `bl-${station.id}`, nudge && "bl-nudging"].filter(Boolean).join(" ")}
       onPointerDown={() => {
         gust.current = 1;
         held.current = true;
@@ -190,7 +190,7 @@ export function BlowPlay({ speechLang, settings, mic, listen, celebrate, onDone 
       }}
     >
       <svg className="loud-scene" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax meet" role="img" aria-label={station.label}>
-        <Station key={round} step={step} done={done} sound={sound} calm={settings.calm} />
+        <Station key={round} step={step} done={done} sound={sound} />
       </svg>
     </div>
   );

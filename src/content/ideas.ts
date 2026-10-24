@@ -426,7 +426,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "B-18",
         emoji: "🍂",
         title: "Jahreszeiten im Bild",
-        text: "Die Szenen folgen dem Kalender: Im Herbst fallen Blätter und ein Kürbis liegt da, im Winter liegt Schnee, im Dezember steht ein Tannenbaum mit Lichtern, an Ostern ist ein Ei versteckt. Kleine Zusätze, die Szene bleibt dieselbe.",
+        text: "Eigene Bilder für die Jahreszeiten statt einer Einstellung: ein Winterbild mit Schnee und Schneemann, ein Herbstbild mit Blättern und Kürbis, ein Osterbild mit Hasen und versteckten Eiern.",
         why: "Das bekannte Bild wird neu entdeckt; Jahreszeiten und Feste werden Gesprächsthema.",
         effort: "M",
         done: true,
@@ -1121,6 +1121,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Bei Schatten finden: Nur ein Stück schaut hinter einem Busch hervor (Ohren, Schwanz, Rüssel). Wer ist das? Antippen – das ganze Tier kommt heraus.",
         why: "Aus einem Teil das Ganze erkennen; nächste Stufe nach den Schatten.",
         effort: "M",
+        done: true,
       },
       {
         id: "X-05",

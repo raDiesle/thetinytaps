@@ -24,7 +24,8 @@ const TILES: KidTile[] = [
   { id: "tiere", href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
   { id: "schatten", href: "/schatten/", emoji: "👤", title: "Schatten finden" },
   { id: "laut-leise", href: "/laut-leise/", emoji: "🦁", title: "Laut und leise" },
-  { id: "kugelbahn", href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn" },
+  // Keeps its old id, so a tile hidden before the rename stays hidden.
+  { id: "kugelbahn", href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
   { id: "aufzug", href: "/aufzug/", emoji: "🛗", title: "Aufzug" },
   { id: "abenteuer", href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
   { id: "gefuehle", href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
