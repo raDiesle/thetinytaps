@@ -48,13 +48,16 @@ export function FeelingsGame() {
             </p>
             <p className="setting-note">
               Jede Antwort ist ein Bild, auf dem der Bär es vormacht – so kann das Kind ohne Lesen wählen. Beim Selbst-Wählen steht neben
-              dem ersten Schritt eine nicht so gute Idee (z.&nbsp;B. zurückschubsen). Tippt das Kind darauf, bekommt sie ein rotes Kreuz, der
-              Bär schüttelt den Kopf, denkt sie sich durchgestrichen und es wird erklärt, warum. Die gute Idee bekommt einen grünen Haken.
+              dem ersten Schritt eine nicht so gute Idee (z.&nbsp;B. zurückschubsen). Tippt das Kind darauf, erscheint sie groß in der Mitte
+              mit rotem Kreuz und es wird erklärt, warum. Die gute Idee bekommt einen grünen Haken.
             </p>
           </SettingsGroup>
 
           {!settings.speech && (
-            <p className="setting-note">Ohne Vorlesen stehen die Sätze groß oben im Bild – zum Vorlesen durch Erwachsene.</p>
+            <p className="setting-note">
+              Im Spiel steht kein Text, nur Bilder. Mit Vorlesen (auf der Startseite) wird die Geschichte erzählt, sonst erzählen
+              Erwachsene sie anhand der Bilder.
+            </p>
           )}
         </>
       }
