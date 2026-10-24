@@ -395,8 +395,8 @@ export function LettersPlay({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pressKey]);
 
-  // Tablets: digits, then the alphabet.
-  const touchKeys = useTouchKeys(settings.touchKeys);
+  // Touch screens: digits, then the alphabet.
+  const touchKeys = useTouchKeys(settings.touchKeys, true);
   const rows = useMemo(() => keyRows([..."1234567890", ...pack.letters.map((l) => l.upper)]), [pack]);
 
   useEffect(() => () => countTimers.current.forEach(clearTimeout), []);

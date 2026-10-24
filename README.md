@@ -60,8 +60,10 @@ presses a key. Parents can turn on speech, idle movement and the keys mode
 ## Tablets
 
 All games work by touch. The letters and words games show big letter keys on
-the screen on touch-only devices (tablets, phones); parents can switch them to
-"Immer" or "Nie" on the start screen.
+the screen on touch-only devices (tablets, phones); "Frei tippen" in
+Buchstaben & Zahlen shows them on every touch screen, also on a touch laptop or
+an iPad with keyboard. Parents can switch them to "Immer" or "Nie" on the start
+screen.
 
 The start screens only offer what fits the device (`src/lib/device.ts`): on
 tablets and phones (every pointer is a finger) the keys mode of "Lebendige

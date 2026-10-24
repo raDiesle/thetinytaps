@@ -24,7 +24,9 @@ export function LettersGame() {
   const second = languages.second?.pack ?? null;
   // Examples in the settings, in the chosen language: „Be, wie Bär“.
   const b = sampleLetter(pack);
-  const touchKeys = useTouchKeys(settings.touchKeys);
+  // Free typing: the ABC keys on every touch screen, the other modes only on tablets.
+  const anyTouch = settings.mode === "free";
+  const touchKeys = useTouchKeys(settings.touchKeys, anyTouch);
 
   return (
     <GameShell
@@ -154,7 +156,11 @@ export function LettersGame() {
             )}
           </SettingsGroup>
 
-          <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} />
+          <TouchKeysSetting
+            value={settings.touchKeys}
+            onChange={(touchKeys) => update({ touchKeys })}
+            anyTouch={anyTouch}
+          />
         </>
       }
     >
