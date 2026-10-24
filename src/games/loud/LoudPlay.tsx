@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type RefObject } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { GameEnd } from "@/components/GameEnd";
 import { playMelody } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { BlowPlay } from "./BlowPlay";
@@ -23,9 +24,9 @@ export interface LevelProps {
   onDone?: () => void;
 }
 
-const LEVELS: { id: LoudLevel; tapHint: string; Level: ComponentType<LevelProps> }[] = [
-  { id: "voice", tapHint: "Löwe und Maus antippen", Level: VoicePlay },
-  { id: "blow", tapHint: "antippen, das pustet auch", Level: BlowPlay },
+const LEVELS: { id: LoudLevel; emoji: string; name: string; tapHint: string; Level: ComponentType<LevelProps> }[] = [
+  { id: "voice", emoji: "🦁", name: "Löwe und Maus", tapHint: "Löwe und Maus antippen", Level: VoicePlay },
+  { id: "blow", emoji: "🎂", name: "Pusten", tapHint: "antippen, das pustet auch", Level: BlowPlay },
 ];
 
 /** Which levels to play, in turn; in development `?level=blow` in the address picks one. */
@@ -35,19 +36,24 @@ function chosenLevels(choice: LoudSettings["levels"]): LoudLevel[] {
   return one ? [one.id] : LEVELS.map((l) => l.id);
 }
 
-/** Party time after a level or a blowing picture, before the next one starts. */
+/** Party time after a level or a blowing picture, before the next picture (or "Nochmal" and "Weiter") comes. */
 const PARTY_MS = 3200;
 
 /**
  * "Laut und leise": everything with the microphone, one level after the
- * other (or only one, as the grown-up chose). The microphone only measures
- * how loud it is.
+ * other (or only one, as the grown-up chose); after each level the child
+ * plays it again or goes on. The microphone only measures how loud it is.
  */
 export function LoudPlay({ speechLang, settings }: { speechLang: string; settings: LoudSettings }) {
   const levels = chosenLevels(settings.levels);
+  /** Which of the chosen levels is on, and how often a level was started (a new one or the same again). */
+  const [index, setIndex] = useState(0);
   const [round, setRound] = useState(0);
   const [party, setParty] = useState(false);
-  const level = LEVELS.find((l) => l.id === levels[round % levels.length]) ?? LEVELS[0];
+  const [ended, setEnded] = useState(false);
+  const levelAt = (i: number) => LEVELS.find((l) => l.id === levels[i % levels.length]) ?? LEVELS[0];
+  const level = levelAt(index);
+  const next = levelAt(index + 1);
   const listen = useRef<FrameHandler | null>(null);
   const partying = useRef(false);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
@@ -87,6 +93,12 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
     if (!partying.current) listen.current?.(db, ms);
   });
 
+  const startLevel = (nextIndex: number) => {
+    setEnded(false);
+    setIndex(nextIndex);
+    setRound((r) => r + 1);
+  };
+
   const Level = level.Level;
   return (
     <div className={["loud-root", party && "party"].filter(Boolean).join(" ")}>
@@ -97,8 +109,14 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
         mic={mic}
         listen={listen}
         celebrate={celebrate}
-        onDone={levels.length > 1 ? () => setRound((r) => r + 1) : undefined}
+        onDone={levels.length > 1 ? () => setEnded(true) : undefined}
       />
+      {ended && (
+        <GameEnd
+          onAgain={() => startLevel(index)}
+          next={{ emoji: next.emoji, name: next.name, onNext: () => startLevel(index + 1) }}
+        />
+      )}
       <MicNote state={mic} tapHint={level.tapHint} />
       <BurstLayer bursts={bursts} />
     </div>
