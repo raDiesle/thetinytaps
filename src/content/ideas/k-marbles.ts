@@ -31,6 +31,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Eine rollende Kugel antippen: Sie macht einen kleinen Hüpfer mit „Hui!“, wird kurz schneller oder dreht sich wie ein Kreisel und rollt dann weiter. Fällt nie von der Bahn.",
       why: "Das Kind kann jederzeit eingreifen statt nur zu warten.",
       effort: "S",
+      done: true,
     },
     {
       id: "K-04",
@@ -39,6 +40,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Glocke, Xylophon-Stäbe, Wasserrad und Wippe reagieren auch direkt aufs Antippen, ohne Kugel: Stab klingt, Rad dreht sich, Wippe kippt, Trichter macht „Wusch“. Tippen auf die leere Wand lässt dort ein Glitzern aufsteigen.",
       why: "Jedes Tippen macht etwas, auch zwischen den Kugeln – die Bahn wird zum Instrument.",
       effort: "S",
+      done: true,
     },
     {
       id: "K-05",
@@ -55,6 +57,8 @@ export const marblesIdeas: IdeaArea = {
       text: "Was in den Tunnel rollt, kommt verändert heraus: in einer anderen Farbe, mit Streifen, als zwei kleine Kugeln, als Sternkugel oder mit einem Tier, das kurz aus dem Tunnel guckt. Jedes Mal etwas anderes.",
       why: "Guck-guck mit Überraschung: „Was kommt diesmal raus?“ trägt durch viele Durchgänge.",
       effort: "S",
+      partial:
+        "Jede Kugel kommt anders aus dem Tunnel: andere Farbe, Streifen, Punkte, goldene Sternkugel, oder ein Tier guckt heraus. Zwei kleine Kugeln aus einer fehlen noch.",
     },
     {
       id: "K-07",

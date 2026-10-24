@@ -17,18 +17,28 @@ export function Rail({ a, b }: { a: Pt; b: Pt }) {
   );
 }
 
-/** A marble with a shine and a stripe that turns by `spin` radians as it rolls. */
-export function Ball({ color, x, y, spin }: { color: string; x: number; y: number; spin: number }) {
+/** The pattern on a marble; the Kugelbahn's magic tunnel gives it one (K-06). */
+export type BallLook = "plain" | "stripes" | "dots" | "star";
+
+/** A five-pointed star around 0, 0, about as wide as a marble's middle. */
+export const STAR_POINTS = Array.from({ length: 10 }, (_, i) => {
+  const a = (i * Math.PI) / 5 - Math.PI / 2;
+  const r = i % 2 ? 6 : 14;
+  return `${(r * Math.cos(a)).toFixed(1)},${(r * Math.sin(a)).toFixed(1)}`;
+}).join(" ");
+
+/** A marble with a shine and a pattern (a stripe unless `look` says otherwise) that turns by `spin` radians as it rolls. */
+export function Ball({ color, x, y, spin, look = "plain" }: { color: string; x: number; y: number; spin: number; look?: BallLook }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <circle r={BALL_R} fill={color} stroke={INK} strokeWidth="3" />
-      <path
-        d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`}
-        transform={`rotate(${(spin * 180) / Math.PI})`}
-        fill="none"
-        stroke="#fff6"
-        strokeWidth="5"
-      />
+      <g transform={`rotate(${(spin * 180) / Math.PI})`}>
+        {look === "plain" && <path d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`} fill="none" stroke="#fff6" strokeWidth="5" />}
+        {look === "stripes" && <path d="M-17 -8 L17 -8 M-17 8 L17 8" stroke="#fff" strokeWidth="6" strokeLinecap="round" />}
+        {look === "dots" &&
+          [0, 120, 240].map((a) => <circle key={a} cx={11 * Math.cos((a * Math.PI) / 180)} cy={11 * Math.sin((a * Math.PI) / 180)} r="4.5" fill="#fff" />)}
+        {look === "star" && <polygon points={STAR_POINTS} fill="#fff" stroke="#e09a00" strokeWidth="2" strokeLinejoin="round" />}
+      </g>
       <circle cx="-7" cy="-8" r="5.5" fill="#fff" opacity="0.75" />
     </g>
   );
