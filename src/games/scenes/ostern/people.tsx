@@ -100,7 +100,16 @@ export function Osterhase() {
         <circle cx="-32" cy="-176" r="7" fill={CHEEK} opacity="0.5" />
         <circle cx="32" cy="-176" r="7" fill={CHEEK} opacity="0.5" />
       </g>
-      <Sparkles className="os-hase-spark" spots={[[-110, -200], [120, -150], [-100, -60], [130, -230]]} r={12} />
+      <Sparkles
+        className="os-hase-spark"
+        spots={[
+          [-110, -200],
+          [120, -150],
+          [-100, -60],
+          [130, -230],
+        ]}
+        r={12}
+      />
       <Notes x={60} y={-260} texts={["Hopp!", "Hopp!"]} colour="#fff" size={30} />
     </g>
   );
@@ -146,7 +155,15 @@ export function Korbkind() {
         <circle cx="20" cy="-206" r="7" fill="#ffd43b" />
         <circle cx="20" cy="-206" r="3" fill="#ff922b" />
       </g>
-      <Sparkles className="os-kind-spark" spots={[[70, -230], [30, -250], [96, -190]]} r={11} />
+      <Sparkles
+        className="os-kind-spark"
+        spots={[
+          [70, -230],
+          [30, -250],
+          [96, -190],
+        ]}
+        r={11}
+      />
       <Notes x={-90} y={-230} texts={["Ein Ei!"]} colour="#fff" size={28} />
     </g>
   );

@@ -115,14 +115,7 @@ export function Steam({ x, y, className = "el-steam on" }: { x: number; y: numbe
   return (
     <g className={className} fill="#fff">
       {[-12, 0, 12].map((dx, i) => (
-        <circle
-          key={dx}
-          className="el-puff"
-          cx={x + dx}
-          cy={y - (i % 2) * 8}
-          r={8 - (i % 2) * 2}
-          style={{ animationDelay: `${i * 0.35}s` }}
-        />
+        <circle key={dx} className="el-puff" cx={x + dx} cy={y - (i % 2) * 8} r={8 - (i % 2) * 2} style={{ animationDelay: `${i * 0.35}s` }} />
       ))}
     </g>
   );
@@ -218,12 +211,7 @@ export function EggBasket({ eggs = 2, milk = true }: { eggs?: number; milk?: boo
 export function Juice() {
   return (
     <>
-      <path
-        d="M-16 -50 Q-16 -60 -8 -64 V-74 H8 V-64 Q16 -60 16 -50 V-4 Q16 0 12 0 H-12 Q-16 0 -16 -4 Z"
-        fill="#ff922b"
-        stroke="#e8590c"
-        strokeWidth="2.5"
-      />
+      <path d="M-16 -50 Q-16 -60 -8 -64 V-74 H8 V-64 Q16 -60 16 -50 V-4 Q16 0 12 0 H-12 Q-16 0 -16 -4 Z" fill="#ff922b" stroke="#e8590c" strokeWidth="2.5" />
       <rect x="-10" y="-84" width="20" height="12" rx="3" fill="#2f9e44" />
       <rect x="-16" y="-40" width="32" height="24" fill="#fff" />
       <circle cx="0" cy="-28" r="9" fill="#ffa94d" stroke="#fd7e14" strokeWidth="2" />
@@ -257,21 +245,8 @@ export function EmptyPlate() {
     <>
       <ellipse cx="0" cy="-14" rx="48" ry="14" fill="#fff" stroke="#ced4da" strokeWidth="3" />
       <ellipse cx="0" cy="-15" rx="30" ry="8" fill="#f1f3f5" />
-      <path
-        d="M-64 -40 V-6 M-70 -40 V-28 Q-70 -22 -64 -22 Q-58 -22 -58 -28 V-40"
-        stroke="#868e96"
-        strokeWidth="4"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M64 -6 V-42 Q72 -34 70 -20 H64"
-        stroke="#868e96"
-        strokeWidth="4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fill="#adb5bd"
-      />
+      <path d="M-64 -40 V-6 M-70 -40 V-28 Q-70 -22 -64 -22 Q-58 -22 -58 -28 V-40" stroke="#868e96" strokeWidth="4" strokeLinecap="round" fill="none" />
+      <path d="M64 -6 V-42 Q72 -34 70 -20 H64" stroke="#868e96" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" fill="#adb5bd" />
     </>
   );
 }
@@ -314,27 +289,14 @@ function PlatePancake({ x, jam, bites, eating }: { x: number; jam: boolean; bite
           </g>
         </g>
       )}
-      {eating &&
-        [0, 1].map((i) => (
-          <path key={i} className="el-yum" d={heart(-6 + i * 14, -22)} fill="#ff6b6b" style={{ animationDelay: `${i * 0.8}s` }} />
-        ))}
+      {eating && [0, 1].map((i) => <path key={i} className="el-yum" d={heart(-6 + i * 14, -22)} fill="#ff6b6b" style={{ animationDelay: `${i * 0.8}s` }} />)}
     </g>
   );
 }
 
 /** The round table on the roof terrace with two stools. At the feast the pancakes, the jam and the juice stand on it,
  * and each child has a plate: `jam` is how many plates got jam, `bites` how often the children have bitten. */
-export function Table({
-  feast = false,
-  jam = 0,
-  bites = 0,
-  open = false,
-}: {
-  feast?: boolean;
-  jam?: number;
-  bites?: number;
-  open?: boolean;
-}) {
+export function Table({ feast = false, jam = 0, bites = 0, open = false }: { feast?: boolean; jam?: number; bites?: number; open?: boolean }) {
   const scallops = Array.from({ length: 14 }, (_, i) => {
     const x = 112 - i * 16;
     return `Q${x - 8} -50 ${x - 16} -58`;
@@ -343,12 +305,7 @@ export function Table({
     <>
       {STOOLS.map(([s, h]) => (
         <g key={s} transform={`translate(${s * STOOL_X} 0)`}>
-          <path
-            d={`M-22 ${-h + 10} L-28 0 M22 ${-h + 10} L28 0 M-25 ${-h / 2} H25`}
-            stroke={WOOD_DARK}
-            strokeWidth="7"
-            strokeLinecap="round"
-          />
+          <path d={`M-22 ${-h + 10} L-28 0 M22 ${-h + 10} L28 0 M-25 ${-h / 2} H25`} stroke={WOOD_DARK} strokeWidth="7" strokeLinecap="round" />
           <rect x="-38" y={-h} width="76" height="14" rx="7" fill="#ff6b6b" />
           <rect x="-32" y={-h + 2} width="64" height="4" rx="2" fill="#ffa8a8" />
         </g>
@@ -373,13 +330,7 @@ export function Table({
             <JamJar open={open} />
           </g>
           {[-1, 1].map((s) => (
-            <path
-              key={s}
-              d={`M${s * 50 - 8} -106 L${s * 50 - 6} -86 H${s * 50 + 6} L${s * 50 + 8} -106 Z`}
-              fill="#ffc078"
-              stroke="#adb5bd"
-              strokeWidth="2"
-            />
+            <path key={s} d={`M${s * 50 - 8} -106 L${s * 50 - 6} -86 H${s * 50 + 6} L${s * 50 + 8} -106 Z`} fill="#ffc078" stroke="#adb5bd" strokeWidth="2" />
           ))}
           <PlatePancake x={-78} jam={jam >= 1} bites={bites} eating={bites > 0 && bites < 3} />
           <PlatePancake x={78} jam={jam >= 2} bites={bites} eating={bites > 0 && bites < 3} />
@@ -436,12 +387,7 @@ export function Tub({ bather, soap = 0, quack = 0 }: { bather?: ReactNode; soap?
           <circle key={`s${x}`} className="el-pop-in" cx={x} cy={-100 - (i % 3) * 12} r={13 + (i % 2) * 5} />
         ))}
       </g>
-      <path
-        d="M-112 -88 H112 Q110 -40 92 -24 Q80 -14 60 -14 H-60 Q-80 -14 -92 -24 Q-110 -40 -112 -88 Z"
-        fill="#f8f9fa"
-        stroke="#a5d8ff"
-        strokeWidth="4"
-      />
+      <path d="M-112 -88 H112 Q110 -40 92 -24 Q80 -14 60 -14 H-60 Q-80 -14 -92 -24 Q-110 -40 -112 -88 Z" fill="#f8f9fa" stroke="#a5d8ff" strokeWidth="4" />
       <rect x="-118" y="-94" width="236" height="12" rx="6" fill="#fff" stroke="#a5d8ff" strokeWidth="3" />
       <path d="M-92 -70 Q-86 -40 -64 -30" stroke="#d0ebff" strokeWidth="6" strokeLinecap="round" fill="none" />
       <path d="M106 -94 V-128 Q106 -138 96 -138 H84" stroke="#adb5bd" strokeWidth="7" strokeLinecap="round" fill="none" />
@@ -675,17 +621,7 @@ export function RainPuddle() {
     <>
       <ellipse cx="0" cy="-8" rx="66" ry="12" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
       {[-1, 1].map((s) => (
-        <ellipse
-          key={s}
-          cx={s * 28}
-          cy="-30"
-          rx="7"
-          ry="11"
-          fill="#a5d8ff"
-          stroke="#4dabf7"
-          strokeWidth="2"
-          transform={`rotate(${s * 30} ${s * 28} -30)`}
-        />
+        <ellipse key={s} cx={s * 28} cy="-30" rx="7" ry="11" fill="#a5d8ff" stroke="#4dabf7" strokeWidth="2" transform={`rotate(${s * 30} ${s * 28} -30)`} />
       ))}
       <g transform="translate(-6 0) scale(0.4)">
         <Boots />
@@ -728,13 +664,7 @@ export function Blocks() {
 export function ChefHat() {
   return (
     <>
-      <path
-        d="M-24 -20 Q-44 -34 -28 -52 Q-24 -72 -4 -66 Q12 -80 26 -60 Q46 -50 26 -20 Z"
-        fill="#fff"
-        stroke="#ced4da"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
+      <path d="M-24 -20 Q-44 -34 -28 -52 Q-24 -72 -4 -66 Q12 -80 26 -60 Q46 -50 26 -20 Z" fill="#fff" stroke="#ced4da" strokeWidth="3" strokeLinejoin="round" />
       <path d="M-10 -24 Q-12 -40 -6 -50 M10 -24 Q12 -40 6 -52" stroke="#e9ecef" strokeWidth="3" strokeLinecap="round" fill="none" />
       <rect x="-26" y="-24" width="52" height="24" rx="5" fill="#fff" stroke="#ced4da" strokeWidth="3" />
     </>
@@ -747,13 +677,7 @@ export function RainHat() {
     <>
       <path d="M-30 -12 Q-30 -48 0 -48 Q30 -48 30 -12 Z" fill="#ffd43b" stroke="#f59f00" strokeWidth="3" />
       <path d="M-14 -40 Q-20 -30 -18 -18" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
-      <path
-        d="M-52 -4 Q0 -24 52 -4 Q58 4 44 6 Q0 -6 -44 6 Q-58 4 -52 -4 Z"
-        fill="#fab005"
-        stroke="#f59f00"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
+      <path d="M-52 -4 Q0 -24 52 -4 Q58 4 44 6 Q0 -6 -44 6 Q-58 4 -52 -4 Z" fill="#fab005" stroke="#f59f00" strokeWidth="3" strokeLinejoin="round" />
     </>
   );
 }
@@ -807,14 +731,7 @@ export function Mixer({ spinning = false }: { spinning?: boolean }) {
     <>
       <g className={spinning ? "el-beaters on" : "el-beaters"}>
         {[-9, 9].map((x) => (
-          <path
-            key={x}
-            d={`M${x} -34 V-16 Q${x - 7} -8 ${x} 0 Q${x + 7} -8 ${x} -16`}
-            stroke="#adb5bd"
-            strokeWidth="3"
-            strokeLinejoin="round"
-            fill="none"
-          />
+          <path key={x} d={`M${x} -34 V-16 Q${x - 7} -8 ${x} 0 Q${x + 7} -8 ${x} -16`} stroke="#adb5bd" strokeWidth="3" strokeLinejoin="round" fill="none" />
         ))}
       </g>
       <path d="M-24 -34 H24 Q34 -34 34 -46 V-52 Q34 -62 22 -62 H-22 Q-30 -62 -30 -52 V-44 Q-30 -34 -24 -34 Z" fill="#ff6b6b" />
@@ -829,13 +746,7 @@ export function Mixer({ spinning = false }: { spinning?: boolean }) {
 export function FlourBag() {
   return (
     <>
-      <path
-        d="M-26 0 Q-32 -30 -24 -58 L-16 -66 H16 L24 -58 Q32 -30 26 0 Z"
-        fill="#f8f9fa"
-        stroke="#ced4da"
-        strokeWidth="3"
-        strokeLinejoin="round"
-      />
+      <path d="M-26 0 Q-32 -30 -24 -58 L-16 -66 H16 L24 -58 Q32 -30 26 0 Z" fill="#f8f9fa" stroke="#ced4da" strokeWidth="3" strokeLinejoin="round" />
       <path d="M-16 -66 L-10 -76 H10 L16 -66" fill="#e9ecef" stroke="#ced4da" strokeWidth="3" strokeLinejoin="round" />
       <path d="M0 -10 V-48" stroke="#e8a317" strokeWidth="3" strokeLinecap="round" />
       {[-44, -36, -28, -20].map((y) => (
@@ -888,8 +799,7 @@ export function Toilet({ flushing = false }: { flushing?: boolean }) {
 /** A sheet of paper folded into a boat, tap by tap: flat, folded in half, a hat, then the boat. */
 export function PaperFold({ stage }: { stage: number }) {
   if (stage >= 3) return <Boat />;
-  if (stage === 2)
-    return <path d="M-30 0 L0 -44 L30 0 Z" fill="#fff" stroke="#74c0fc" strokeWidth="3" strokeLinejoin="round" />;
+  if (stage === 2) return <path d="M-30 0 L0 -44 L30 0 Z" fill="#fff" stroke="#74c0fc" strokeWidth="3" strokeLinejoin="round" />;
   if (stage === 1) return <rect x="-30" y="-24" width="60" height="24" rx="2" fill="#fff" stroke="#74c0fc" strokeWidth="3" />;
   return (
     <>

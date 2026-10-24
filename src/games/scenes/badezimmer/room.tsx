@@ -39,10 +39,7 @@ export function Fenster() {
         </g>
       ))}
       <g className="bz-fenster-curtain" style={{ transformOrigin: "220px 40px" }}>
-        <path
-          d="M114 36 H326 V60 q-13 12 -26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 Z"
-          fill="#ffafcc"
-        />
+        <path d="M114 36 H326 V60 q-13 12 -26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 t-26.5 0 Z" fill="#ffafcc" />
         <path d="M114 44 H326" stroke="#fff" strokeWidth="3" strokeDasharray="2 8" strokeLinecap="round" />
       </g>
       <rect x="104" y="220" width="232" height="14" rx="5" fill="#fff" />
@@ -224,7 +221,13 @@ export function Toilette() {
       <ellipse cx="0" cy="-142" rx="48" ry="11" fill="#a5d8ff" />
       <g transform="translate(0 -142) scale(1 0.24)">
         <g className="bz-klo-swirl">
-          <path d="M0 0 m-6 0 a6 6 0 1 1 12 0 a14 14 0 1 1 -28 0 a24 24 0 1 1 48 0 a34 34 0 1 1 -68 0" stroke="#fff" strokeWidth="9" fill="none" strokeLinecap="round" />
+          <path
+            d="M0 0 m-6 0 a6 6 0 1 1 12 0 a14 14 0 1 1 -28 0 a24 24 0 1 1 48 0 a34 34 0 1 1 -68 0"
+            stroke="#fff"
+            strokeWidth="9"
+            fill="none"
+            strokeLinecap="round"
+          />
         </g>
       </g>
       <g className="bz-klo-lid" style={{ transformOrigin: "0px -146px" }}>

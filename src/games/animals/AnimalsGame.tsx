@@ -53,11 +53,7 @@ export function AnimalsGame() {
         </>
       }
     >
-      {settings.mode === "peek" ? (
-        <PeekPlay lang={de.speechLang} settings={settings} />
-      ) : (
-        <AnimalsPlay lang={de.speechLang} settings={settings} />
-      )}
+      {settings.mode === "peek" ? <PeekPlay lang={de.speechLang} settings={settings} /> : <AnimalsPlay lang={de.speechLang} settings={settings} />}
     </GameShell>
   );
 }

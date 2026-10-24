@@ -34,10 +34,7 @@ function shuffle<T>(items: T[]): T[] {
 const freshRound = (feeling: Feeling, key: number): Round => ({ key, feeling, used: [], busy: false, happy: false });
 
 export function BearPlay({ settings }: { settings: FeelingsSettings }) {
-  const feelings = useMemo(
-    () => (settings.feeling === "all" ? FEELINGS : FEELINGS.filter((f) => f.id === settings.feeling)),
-    [settings.feeling],
-  );
+  const feelings = useMemo(() => (settings.feeling === "all" ? FEELINGS : FEELINGS.filter((f) => f.id === settings.feeling)), [settings.feeling]);
   const deck = useRef<Feeling[]>([]);
   const nextKey = useRef(0);
   const happyAt = useRef(0);

@@ -23,6 +23,7 @@ const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
+const TrafficPage = page(() => import("@/pages/TrafficPage"), "TrafficPage");
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage");
 const WordsPage = page(() => import("@/pages/WordsPage"), "WordsPage");
 
@@ -45,6 +46,7 @@ export function App() {
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
         <Route path="aufzug" element={<ElevatorPage />} />
+        <Route path="ampel" element={<TrafficPage />} />
         <Route path="abenteuer" element={<AdventurePage />} />
         <Route path="kinder" element={<KidHome />} />
         <Route path="ideen" element={<IdeasPage />} />

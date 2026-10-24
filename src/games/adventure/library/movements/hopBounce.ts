@@ -12,17 +12,13 @@ export const HOP_BOUNCE: Movement[] = [
     bodyParts: ["knees", "legs", "feet"],
     bodyMovement: "Die Füße bleiben auf dem Boden, das Kind beugt und streckt die Knie weich und gleichmäßig, als würde es auf und ab federn.",
     startingPose: "Gerade stehen, Füße etwas auseinander, Knie locker.",
-    movementSteps: [
-      "Knie weich machen.",
-      "Runter federn.",
-      "Hoch federn.",
-      "Im Takt weiter.",
-    ],
+    movementSteps: ["Knie weich machen.", "Runter federn.", "Hoch federn.", "Im Takt weiter."],
     durationSeconds: 14,
     repetitions: 1,
     instruction: "Feder wie ein Ball!",
     motion: "bounce",
-    demonstration: "Die Figur hält einen Ball, lässt ihn langsam aufprellen und federt dabei sichtbar in den Knien, dem Kind zugewandt: „Bo-ing, bo-ing“. Dann federt sie im Takt der Musik mit dem Kind.",
+    demonstration:
+      "Die Figur hält einen Ball, lässt ihn langsam aufprellen und federt dabei sichtbar in den Knien, dem Kind zugewandt: „Bo-ing, bo-ing“. Dann federt sie im Takt der Musik mit dem Kind.",
     scenario: {
       world: "toy_town",
       setup: "In der Spielzeugstadt hüpft ein roter Gummiball die Straße entlang.",
@@ -36,20 +32,14 @@ export const HOP_BOUNCE: Movement[] = [
       musicSync: true,
     },
     visualDirection: { camera: "stationary", movementDirection: "up_down", intensity: "medium" },
-    variants: [
-      "Ein großer, schwerer Ball: langsam und tief federn.",
-      "Ein kleiner Flummi: schnell und klein federn.",
-      "Beim Federn dazu klatschen.",
-    ],
+    variants: ["Ein großer, schwerer Ball: langsam und tief federn.", "Ein kleiner Flummi: schnell und klein federn.", "Beim Federn dazu klatschen."],
     adaptations: {
       easier: "Mit beiden Händen an einem Erwachsenen oder Stuhl festhalten und federn.",
       seated: "Im Sitzen mit den Händen auf den Knien im Takt wippen.",
       higherEnergy: "Die Arme beim Hochfedern mit nach oben nehmen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Die Füße bleiben am Boden, nicht durchdrücken – weiche Knie.",
-    ],
+    safetyNotes: ["Die Füße bleiben am Boden, nicht durchdrücken – weiche Knie."],
     tags: ["bounce", "knees", "rhythm", "ball", "warm_up"],
   },
   {
@@ -62,16 +52,13 @@ export const HOP_BOUNCE: Movement[] = [
     bodyParts: ["knees", "legs", "feet"],
     bodyMovement: "Anders als beim Ball federt das Kind tiefer und kräftiger in den Knien und darf dabei, wenn es mag, mit beiden Füßen ganz kurz abheben.",
     startingPose: "Breit stehen, Knie gebeugt, Arme locker.",
-    movementSteps: [
-      "Tief in die Knie.",
-      "Hochfedern – vielleicht ein Mini-Hüpfer.",
-      "Weich wieder landen.",
-    ],
+    movementSteps: ["Tief in die Knie.", "Hochfedern – vielleicht ein Mini-Hüpfer.", "Weich wieder landen."],
     durationSeconds: 15,
     repetitions: 3,
     instruction: "Hüpf auf dem Pilz!",
     motion: "bounce",
-    demonstration: "Die Figur steht auf einem großen Pilz, federt erst ganz langsam ohne Abheben und zeigt dem Kind die weichen Knie. Dann ein kleiner Hüpfer mit „Hui!“, danach federt sie gemeinsam mit dem Kind.",
+    demonstration:
+      "Die Figur steht auf einem großen Pilz, federt erst ganz langsam ohne Abheben und zeigt dem Kind die weichen Knie. Dann ein kleiner Hüpfer mit „Hui!“, danach federt sie gemeinsam mit dem Kind.",
     scenario: {
       world: "garden",
       setup: "Im Zaubergarten steht ein riesiger, weicher Pilz mit Punkten, so federnd wie ein Trampolin.",
@@ -113,16 +100,13 @@ export const HOP_BOUNCE: Movement[] = [
     bodyParts: ["legs", "knees", "feet"],
     bodyMovement: "Das Kind beugt die Knie und macht einen einzigen kleinen Sprung mit beiden Füßen auf der Stelle – oder stampft stattdessen kräftig auf.",
     startingPose: "Gerade stehen, Knie leicht gebeugt.",
-    movementSteps: [
-      "In die Knie gehen.",
-      "Hopp – mit beiden Füßen hüpfen.",
-      "Weich landen.",
-    ],
+    movementSteps: ["In die Knie gehen.", "Hopp – mit beiden Füßen hüpfen.", "Weich landen."],
     durationSeconds: 12,
     repetitions: 3,
     instruction: "Hüpf in die Pfütze!",
     motion: "hop",
-    demonstration: "Die Figur zeigt auf die Pfütze, zählt langsam „Eins, zwei …“, geht in die Knie und macht bei „drei“ einen kleinen Hüpfer mit lautem „Platsch!“. Danach zählen und hüpfen beide gemeinsam.",
+    demonstration:
+      "Die Figur zeigt auf die Pfütze, zählt langsam „Eins, zwei …“, geht in die Knie und macht bei „drei“ einen kleinen Hüpfer mit lautem „Platsch!“. Danach zählen und hüpfen beide gemeinsam.",
     scenario: {
       world: "farm",
       setup: "Nach dem Regen ist auf dem Bauernhof eine große braune Pfütze vor der Figur.",
@@ -162,18 +146,16 @@ export const HOP_BOUNCE: Movement[] = [
     difficulty: "medium",
     bodyZone: "full_body",
     bodyParts: ["knees", "legs", "arms", "torso"],
-    bodyMovement: "Anders als bei der Pfütze beginnt das Kind ganz klein zusammengekauert und schnellt dann plötzlich groß nach oben, die Arme hoch – mit oder ohne kleinen Sprung.",
+    bodyMovement:
+      "Anders als bei der Pfütze beginnt das Kind ganz klein zusammengekauert und schnellt dann plötzlich groß nach oben, die Arme hoch – mit oder ohne kleinen Sprung.",
     startingPose: "Klein in der Hocke, Arme um die Knie, wie ein Maiskorn.",
-    movementSteps: [
-      "Ganz klein machen.",
-      "Warten … es wird warm.",
-      "Plopp – groß werden, Arme hoch!",
-    ],
+    movementSteps: ["Ganz klein machen.", "Warten … es wird warm.", "Plopp – groß werden, Arme hoch!"],
     durationSeconds: 15,
     repetitions: 3,
     instruction: "Plopp, wie Popcorn!",
     motion: "hop",
-    demonstration: "Die Figur kauert sich vor dem Kind klein zusammen, wackelt ein bisschen, flüstert „Gleich …“ und springt mit „Plopp!“ ganz langsam groß nach oben. Beim nächsten Mal ploppen beide zusammen.",
+    demonstration:
+      "Die Figur kauert sich vor dem Kind klein zusammen, wackelt ein bisschen, flüstert „Gleich …“ und springt mit „Plopp!“ ganz langsam groß nach oben. Beim nächsten Mal ploppen beide zusammen.",
     scenario: {
       world: "circus",
       setup: "Im Zirkus steht eine riesige Popcornmaschine, die Figur ist ein kleines Maiskorn darin.",
@@ -198,10 +180,7 @@ export const HOP_BOUNCE: Movement[] = [
       higherEnergy: "Mit kleinem Hüpfer hochploppen und dabei „Plopp!“ rufen.",
     },
     needs: { jump: true, space: "small", balance: false },
-    safetyNotes: [
-      "Über dem Kopf muss Platz frei sein, keine Tischkante darüber.",
-      "Weich landen, die Knie beugen.",
-    ],
+    safetyNotes: ["Über dem Kopf muss Platz frei sein, keine Tischkante darüber.", "Weich landen, die Knie beugen."],
     tags: ["pop", "jump", "crouch", "surprise", "circus"],
   },
   {
@@ -231,7 +210,8 @@ export const HOP_BOUNCE: Movement[] = [
       world: "pirate_island",
       setup: "Eine kleine Holzbrücke führt über den Bach; über der Brücke schweben Holzkisten mit einem goldenen Stern.",
       trigger: "Die nächste Kiste über der Brücke wackelt.",
-      reaction: "Bei jedem Sprung landet der Guide ein Stück weiter auf der Brücke, die Bretter federn; stößt er an eine Kiste, hüpft sie hoch und ein goldener Stern springt heraus.",
+      reaction:
+        "Bei jedem Sprung landet der Guide ein Stück weiter auf der Brücke, die Bretter federn; stößt er an eine Kiste, hüpft sie hoch und ein goldener Stern springt heraus.",
       payoff: "Am anderen Ufer funkeln alle Sterne zusammen über dem Bach.",
     },
     audio: {

@@ -167,7 +167,17 @@ export function Laemmchen() {
   return (
     <g className="os-lamm-body" style={{ transformOrigin: "0px 0px" }}>
       {[-34, -18, 22, 38].map((x, i) => (
-        <rect key={x} className={i % 2 ? "os-lamm-leg-b" : "os-lamm-leg-a"} x={x - 5} y="-40" width="10" height="40" rx="4" fill="#ffe8d6" style={{ transformOrigin: `${x}px -40px` }} />
+        <rect
+          key={x}
+          className={i % 2 ? "os-lamm-leg-b" : "os-lamm-leg-a"}
+          x={x - 5}
+          y="-40"
+          width="10"
+          height="40"
+          rx="4"
+          fill="#ffe8d6"
+          style={{ transformOrigin: `${x}px -40px` }}
+        />
       ))}
       <g fill="#fff">
         <circle cx="-20" cy="-60" r="26" />
@@ -210,7 +220,15 @@ export function Laemmchen() {
 export function Hummel() {
   return (
     <g className="os-hummel-fly" style={{ transformOrigin: "0px -170px" }}>
-      <path className="os-hummel-trail" d="M-90 -150 q20 -30 40 -10 q20 20 40 -6" stroke="#adb5bd" strokeWidth="3" strokeDasharray="4 7" strokeLinecap="round" fill="none" />
+      <path
+        className="os-hummel-trail"
+        d="M-90 -150 q20 -30 40 -10 q20 20 40 -6"
+        stroke="#adb5bd"
+        strokeWidth="3"
+        strokeDasharray="4 7"
+        strokeLinecap="round"
+        fill="none"
+      />
       <g className="os-hummel-wing" style={{ transformOrigin: "0px -184px" }}>
         <ellipse cx="-8" cy="-198" rx="10" ry="16" fill="#e7f5ff" opacity="0.9" transform="rotate(-20 -8 -198)" />
         <ellipse cx="10" cy="-196" rx="10" ry="16" fill="#e7f5ff" opacity="0.9" transform="rotate(20 10 -196)" />
@@ -310,7 +328,16 @@ export function Haeschen() {
         <path d="M-30 -48 l10 -12 M-30 -46 l14 -4 M-30 -44 l12 6" stroke="#40916c" strokeWidth="4" strokeLinecap="round" />
       </g>
       <ellipse cx="-24" cy="-36" rx="8" ry="6" fill="#e6ccb2" />
-      <Puffs className="os-haeschen-crumbs" spots={[[-70, -50], [-78, -38], [-62, -60]]} r={4} fill="#ff922b" />
+      <Puffs
+        className="os-haeschen-crumbs"
+        spots={[
+          [-70, -50],
+          [-78, -38],
+          [-62, -60],
+        ]}
+        r={4}
+        fill="#ff922b"
+      />
       <Notes x={-90} y={-120} texts={["Mampf!"]} colour="#fff" size={24} />
     </g>
   );

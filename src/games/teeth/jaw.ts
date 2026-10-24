@@ -217,9 +217,7 @@ export interface MouthModel {
 const JAWS: Jaw[] = ["upper", "lower"];
 const SIDES: Side[] = ["left", "right"];
 
-export const ALL_TEETH: ToothId[] = JAWS.flatMap((jaw) =>
-  SIDES.flatMap((side) => TEETH.map((_, n) => ({ jaw, side, n }))),
-);
+export const ALL_TEETH: ToothId[] = JAWS.flatMap((jaw) => SIDES.flatMap((side) => TEETH.map((_, n) => ({ jaw, side, n }))));
 
 const ring = (count: number, at: (s: number) => Vec3) => Array.from({ length: count }, (_, i) => at((i / count) * Math.PI * 2));
 

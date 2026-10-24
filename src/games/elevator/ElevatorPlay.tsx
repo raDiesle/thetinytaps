@@ -1,16 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import {
-  loadRecordings,
-  playDing,
-  playGiggle,
-  playKnock,
-  playLift,
-  playLullaby,
-  playMelody,
-  playRandomNote,
-  playSlide,
-} from "@/lib/sfx";
+import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs, TapMark } from "./house";
@@ -514,14 +504,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
                   </g>
                 </g>
               )}
-              <rect
-                className={`el-night${view.night ? " on" : ""}`}
-                x="-4000"
-                y="-4000"
-                width={VIEW_W + 8000}
-                height={VIEW_H + 8000}
-                fill="#0b1340"
-              />
+              <rect className={`el-night${view.night ? " on" : ""}`} x="-4000" y="-4000" width={VIEW_W + 8000} height={VIEW_H + 8000} fill="#0b1340" />
               {view.party && <Confetti />}
             </>
           )}

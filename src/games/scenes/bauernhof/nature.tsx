@@ -60,28 +60,34 @@ export function Baum() {
 export function Heuballen() {
   return (
     <>
-    <g className="bh-heu-mouse">
-      <ellipse cx="0" cy="-14" rx="16" ry="12" fill="#adb5bd" />
-      <circle cx="-14" cy="-30" r="7" fill="#ced4da" />
-      <circle cx="10" cy="-30" r="7" fill="#ced4da" />
-      <circle cx="-2" cy="-24" r="11" fill="#adb5bd" />
-      <circle cx="-6" cy="-26" r="2" fill="#2b2d42" />
-      <circle cx="3" cy="-26" r="2" fill="#2b2d42" />
-      <circle cx="-2" cy="-20" r="2.4" fill="#ff8fa3" />
-      <path d="M14 -10 q16 0 14 -14" stroke="#adb5bd" strokeWidth="3" fill="none" strokeLinecap="round" />
-    </g>
-    <g className="bh-heu-bits" stroke="#e9b949" strokeWidth="4" strokeLinecap="round">
-      {[-40, 0, 40].map((x, i) => (
-        <path key={x} d={`M${x} -6 l8 -4`} style={nth(i)} />
-      ))}
-    </g>
-    <g className="bh-heu-roll" style={{ transformOrigin: "0px -58px" }}>
-      <circle cx="0" cy="-58" r="58" fill="#e9b949" />
-      <circle cx="0" cy="-58" r="58" fill="none" stroke="#c89b2c" strokeWidth="4" />
-      <path d="M0 -58 m-6 0 a6 6 0 1 1 12 0 a16 16 0 1 1 -28 -6 a28 28 0 1 1 48 18 a40 40 0 1 1 -66 -28" stroke="#c89b2c" strokeWidth="4" fill="none" strokeLinecap="round" />
-      <path d="M-30 -104 a54 54 0 0 1 40 -10" stroke="#fff" strokeOpacity="0.5" strokeWidth="6" fill="none" strokeLinecap="round" />
-      <path d="M-56 -40 l-10 4 M-50 -90 l-10 -6 M50 -94 l10 -6 M56 -36 l10 4" stroke="#e9b949" strokeWidth="3" strokeLinecap="round" />
-    </g>
+      <g className="bh-heu-mouse">
+        <ellipse cx="0" cy="-14" rx="16" ry="12" fill="#adb5bd" />
+        <circle cx="-14" cy="-30" r="7" fill="#ced4da" />
+        <circle cx="10" cy="-30" r="7" fill="#ced4da" />
+        <circle cx="-2" cy="-24" r="11" fill="#adb5bd" />
+        <circle cx="-6" cy="-26" r="2" fill="#2b2d42" />
+        <circle cx="3" cy="-26" r="2" fill="#2b2d42" />
+        <circle cx="-2" cy="-20" r="2.4" fill="#ff8fa3" />
+        <path d="M14 -10 q16 0 14 -14" stroke="#adb5bd" strokeWidth="3" fill="none" strokeLinecap="round" />
+      </g>
+      <g className="bh-heu-bits" stroke="#e9b949" strokeWidth="4" strokeLinecap="round">
+        {[-40, 0, 40].map((x, i) => (
+          <path key={x} d={`M${x} -6 l8 -4`} style={nth(i)} />
+        ))}
+      </g>
+      <g className="bh-heu-roll" style={{ transformOrigin: "0px -58px" }}>
+        <circle cx="0" cy="-58" r="58" fill="#e9b949" />
+        <circle cx="0" cy="-58" r="58" fill="none" stroke="#c89b2c" strokeWidth="4" />
+        <path
+          d="M0 -58 m-6 0 a6 6 0 1 1 12 0 a16 16 0 1 1 -28 -6 a28 28 0 1 1 48 18 a40 40 0 1 1 -66 -28"
+          stroke="#c89b2c"
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <path d="M-30 -104 a54 54 0 0 1 40 -10" stroke="#fff" strokeOpacity="0.5" strokeWidth="6" fill="none" strokeLinecap="round" />
+        <path d="M-56 -40 l-10 4 M-50 -90 l-10 -6 M50 -94 l10 -6 M56 -36 l10 4" stroke="#e9b949" strokeWidth="3" strokeLinecap="round" />
+      </g>
     </>
   );
 }

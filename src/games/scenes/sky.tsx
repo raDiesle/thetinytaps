@@ -48,7 +48,11 @@ export function Sonne() {
           [1378, 196],
           [1548, 190],
         ].map(([x, y], i) => (
-          <path key={i} d={`M${x} ${y - 14} Q${x} ${y} ${x + 14} ${y} Q${x} ${y} ${x} ${y + 14} Q${x} ${y} ${x - 14} ${y} Q${x} ${y} ${x} ${y - 14} Z`} style={nth(i)} />
+          <path
+            key={i}
+            d={`M${x} ${y - 14} Q${x} ${y} ${x + 14} ${y} Q${x} ${y} ${x} ${y + 14} Q${x} ${y} ${x - 14} ${y} Q${x} ${y} ${x} ${y - 14} Z`}
+            style={nth(i)}
+          />
         ))}
       </g>
     </g>

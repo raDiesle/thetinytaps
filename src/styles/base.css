@@ -1,0 +1,49 @@
+:root {
+  --font-rounded: "Fredoka Variable", ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  --ink: #2a1e5c;
+  --accent: #ff5d73;
+  --cream: #fff4d6;
+  --sky-top: #6ccaff;
+  --sky-bottom: #c4f1ff;
+  /* Toy-block colours for cards and buttons. */
+  --tomato: #ff6b6b;
+  --sunshine: #ffd23f;
+  --mint: #3ddc97;
+  --berry: #b388ff;
+  --ocean: #4cc9f0;
+  --outline: 4px solid var(--ink);
+  --lift: 0 8px 0 var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: var(--font-rounded);
+  color: var(--ink);
+  /* No double-tap zoom on tablets; taps react right away. */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Only on html, so the sky backdrop (z-index -1) isn't painted over by the body. */
+html {
+  background: var(--sky-bottom);
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* While a game runs, the page itself must not scroll, bounce or pull to refresh. */
+html:has(.play-area),
+html:has(.play-area) body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}

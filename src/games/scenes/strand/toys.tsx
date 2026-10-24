@@ -26,7 +26,12 @@ export function Sandburg() {
           {TOWER_TOP(-18, -196, 36)}
         </g>
         <path d="M0 -208 V-246" stroke="#868e96" strokeWidth="4" strokeLinecap="round" />
-        <path className="sd-burg-flag-top" d="M0 -246 Q14 -252 30 -242 Q20 -236 30 -228 Q14 -234 0 -230 Z" fill="#4dabf7" style={{ transformOrigin: "0px -238px" }} />
+        <path
+          className="sd-burg-flag-top"
+          d="M0 -246 Q14 -252 30 -242 Q20 -236 30 -228 Q14 -234 0 -230 Z"
+          fill="#4dabf7"
+          style={{ transformOrigin: "0px -238px" }}
+        />
       </g>
       {[-1, 1].map((s) => (
         <g key={s} className="sd-burg-tower" style={{ ...nth(s < 0 ? 0 : 1), transformOrigin: `${s * 88}px -30px` }}>
@@ -40,7 +45,12 @@ export function Sandburg() {
         </g>
       ))}
       <path d="M88 -146 V-176" stroke="#868e96" strokeWidth="4" strokeLinecap="round" />
-      <path className="sd-burg-flag" d="M88 -176 Q102 -182 118 -172 Q108 -166 118 -158 Q102 -164 88 -160 Z" fill="#e63946" style={{ transformOrigin: "88px -168px" }} />
+      <path
+        className="sd-burg-flag"
+        d="M88 -176 Q102 -182 118 -172 Q108 -166 118 -158 Q102 -164 88 -160 Z"
+        fill="#e63946"
+        style={{ transformOrigin: "88px -168px" }}
+      />
       <g className="sd-burg-keep" style={{ transformOrigin: "0px -30px" }}>
         <g fill={CASTLE}>
           <rect x="-66" y="-94" width="132" height="64" />
@@ -62,8 +72,28 @@ export function Sandburg() {
         <circle cx="-40" cy="-58" r="6" fill="#fff" />
         <path d="M34 -52 l6 -10 l6 10 Z" fill="#ffa8a8" />
       </g>
-      <Puffs className="sd-burg-sand" spots={[[-110, -150], [-70, -146], [70, -150], [108, -144], [0, -160]]} r={7} fill={SAND_DARK} />
-      <Sparkles className="sd-burg-sparkle" spots={[[-60, -200], [60, -220], [0, -270]]} r={11} fill="#fff9db" />
+      <Puffs
+        className="sd-burg-sand"
+        spots={[
+          [-110, -150],
+          [-70, -146],
+          [70, -150],
+          [108, -144],
+          [0, -160],
+        ]}
+        r={7}
+        fill={SAND_DARK}
+      />
+      <Sparkles
+        className="sd-burg-sparkle"
+        spots={[
+          [-60, -200],
+          [60, -220],
+          [0, -270],
+        ]}
+        r={11}
+        fill="#fff9db"
+      />
     </>
   );
 }
@@ -88,7 +118,16 @@ export function Eimer() {
         <path d="M-32 -40 Q-32 -64 -26 -80" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.4" />
         <path d="M6 -40 l6 -8 l6 8 l-6 8 Z" fill="#ffd43b" />
       </g>
-      <Drops className="sd-eimer-splash" spots={[[-30, -112], [-10, -126], [24, -120], [40, -106]]} r={6} />
+      <Drops
+        className="sd-eimer-splash"
+        spots={[
+          [-30, -112],
+          [-10, -126],
+          [24, -120],
+          [40, -106],
+        ]}
+        r={6}
+      />
       <Notes x={40} y={-140} texts={["Plitsch!"]} colour="#a5d8ff" size={22} />
     </>
   );
@@ -105,7 +144,17 @@ export function Schaufel() {
         <path d="M-22 -24 Q-22 -40 0 -40 Q22 -40 22 -24 L12 2 H-12 Z" fill="#69db7c" transform="rotate(16 0 -20)" />
         <ellipse cx="2" cy="-30" rx="12" ry="5" fill={SAND} transform="rotate(16 0 -20)" className="sd-schaufel-load" />
       </g>
-      <Puffs className="sd-schaufel-sand" spots={[[40, -40], [60, -70], [76, -52], [50, -96]]} r={10} fill={SAND} />
+      <Puffs
+        className="sd-schaufel-sand"
+        spots={[
+          [40, -40],
+          [60, -70],
+          [76, -52],
+          [50, -96],
+        ]}
+        r={10}
+        fill={SAND}
+      />
     </>
   );
 }
@@ -132,7 +181,17 @@ export function Sandhaufen() {
       <g className="sd-haufen-cap" style={{ transformOrigin: "24px -60px" }}>
         <path d="M-30 -58 Q-24 -76 0 -78 Q24 -76 30 -58 Q0 -50 -30 -58 Z" fill={CASTLE_LIGHT} />
       </g>
-      <Puffs className="sd-haufen-sand" spots={[[-40, -70], [-20, -90], [30, -88], [46, -66]]} r={7} fill={SAND_DARK} />
+      <Puffs
+        className="sd-haufen-sand"
+        spots={[
+          [-40, -70],
+          [-20, -90],
+          [30, -88],
+          [46, -66],
+        ]}
+        r={7}
+        fill={SAND_DARK}
+      />
       <Notes x={30} y={-120} texts={["Kuckuck!"]} colour="#ffc9e0" size={20} />
     </>
   );
@@ -167,7 +226,18 @@ export function Schatztruhe() {
       {/* Sand piled up in front of the chest */}
       <path d="M-100 4 Q-90 -30 -50 -26 Q-20 -40 10 -24 Q60 -36 100 4 Z" fill={SAND} />
       <path d="M-70 -14 Q-40 -26 -10 -18" stroke="#fff" strokeOpacity="0.4" strokeWidth="5" strokeLinecap="round" fill="none" />
-      <Sparkles className="sd-truhe-sparkle" spots={[[-60, -140], [0, -170], [62, -140], [-30, -190], [36, -196]]} r={12} fill="#fff9db" />
+      <Sparkles
+        className="sd-truhe-sparkle"
+        spots={[
+          [-60, -140],
+          [0, -170],
+          [62, -140],
+          [-30, -190],
+          [36, -196],
+        ]}
+        r={12}
+        fill="#fff9db"
+      />
     </>
   );
 }
@@ -176,7 +246,17 @@ export function Schatztruhe() {
 export function Kuehlbox() {
   return (
     <>
-      <Puffs className="sd-kuehl-cold" spots={[[-40, -112], [-10, -128], [24, -118], [50, -106]]} r={12} fill="#e7f5ff" />
+      <Puffs
+        className="sd-kuehl-cold"
+        spots={[
+          [-40, -112],
+          [-10, -128],
+          [24, -118],
+          [50, -106],
+        ]}
+        r={12}
+        fill="#e7f5ff"
+      />
       {/* The ice lolly sits inside and pops up while it plays */}
       <g className="sd-kuehl-eis">
         <rect x="-4" y="-120" width="8" height="40" rx="3" fill="#e9c46a" />
@@ -227,7 +307,12 @@ export function Sonnencreme() {
       <g className="sd-creme-bottle" style={{ transformOrigin: "0px 0px" }}>
         <path d="M-26 -8 Q-30 -60 -20 -86 H20 Q30 -60 26 -8 Q24 2 0 2 Q-24 2 -26 -8 Z" fill="#ffd43b" />
         <circle cx="0" cy="-46" r="15" fill="#ff922b" />
-        <path d="M0 -66 V-62 M0 -30 V-26 M-20 -46 H-16 M16 -46 H20 M-14 -60 l3 3 M14 -32 l-3 -3 M14 -60 l-3 3 M-14 -32 l3 -3" stroke="#ff922b" strokeWidth="3" strokeLinecap="round" />
+        <path
+          d="M0 -66 V-62 M0 -30 V-26 M-20 -46 H-16 M16 -46 H20 M-14 -60 l3 3 M14 -32 l-3 -3 M14 -60 l-3 3 M-14 -32 l3 -3"
+          stroke="#ff922b"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
         <circle cx="-5" cy="-48" r="1.8" fill={INK} />
         <circle cx="5" cy="-48" r="1.8" fill={INK} />
         <path d="M-5 -42 Q0 -38 5 -42" stroke={INK} strokeWidth="1.8" fill="none" strokeLinecap="round" />

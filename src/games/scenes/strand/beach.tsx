@@ -102,7 +102,15 @@ export function Strandzelt() {
         <circle cx="8" cy="-40" r="5" fill="#e8590c" />
       </g>
       <path d="M-118 0 H112" stroke="#e8590c" strokeWidth="6" strokeLinecap="round" />
-      <Hearts className="sd-zelt-hearts" spots={[[-30, -120], [10, -140], [50, -122]]} r={10} />
+      <Hearts
+        className="sd-zelt-hearts"
+        spots={[
+          [-30, -120],
+          [10, -140],
+          [50, -122],
+        ]}
+        r={10}
+      />
     </>
   );
 }
@@ -196,7 +204,16 @@ export function Pommesbude() {
       <Inside d={HATCH}>
         <rect x="-80" y="-176" width="160" height="70" fill="#868e96" />
         <rect x="30" y="-150" width="40" height="44" rx="4" fill="#adb5bd" />
-        <Puffs className="sd-bude-steam" spots={[[44, -156], [56, -168], [40, -176]]} r={9} fill="#fff" />
+        <Puffs
+          className="sd-bude-steam"
+          spots={[
+            [44, -156],
+            [56, -168],
+            [40, -176],
+          ]}
+          r={9}
+          fill="#fff"
+        />
         <g className="sd-bude-cook">
           <rect x="-46" y="-130" width="56" height="40" rx="16" fill="#fff" />
           <Head cx={-18} cy={-146} r={20} hair="#6b4423" />
@@ -254,7 +271,12 @@ export function Strandhaus() {
       <path d="M-100 -188 Q0 -168 100 -188" stroke="#868e96" strokeWidth="2" fill="none" />
       <g className="sd-haus-pennants">
         {[-80, -48, -16, 16, 48, 80].map((x, i) => (
-          <path key={x} d={`M${x - 10} ${-186 + Math.abs(x) * -0.06 + 6} h20 l-10 18 Z`} fill={["#e63946", "#ffd43b", "#40c057"][i % 3]} style={{ ...nth(i), transformOrigin: `${x}px ${-180 + Math.abs(x) * -0.06}px` }} />
+          <path
+            key={x}
+            d={`M${x - 10} ${-186 + Math.abs(x) * -0.06 + 6} h20 l-10 18 Z`}
+            fill={["#e63946", "#ffd43b", "#40c057"][i % 3]}
+            style={{ ...nth(i), transformOrigin: `${x}px ${-180 + Math.abs(x) * -0.06}px` }}
+          />
         ))}
       </g>
       {/* Little window in the gable with two shutters */}

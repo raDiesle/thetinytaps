@@ -45,9 +45,7 @@ export function LetterCard({
   /** Tapping the picture, e.g. for the next word with the same letter. */
   onPicturePointerDown?: PointerEventHandler;
 }) {
-  const glyphs = { upper: [letter.upper], both: [letter.upper, letter.lower], lower: [letter.lower] }[
-    settings.letterCase
-  ];
+  const glyphs = { upper: [letter.upper], both: [letter.upper, letter.lower], lower: [letter.lower] }[settings.letterCase];
 
   return (
     <div className="card" onPointerDown={onPointerDown}>
@@ -175,10 +173,7 @@ export function NumberCard({
                   const order = tapped.indexOf(index);
                   return (
                     <Reveal key={j} visible hint={hint}>
-                      <span
-                        className={`count-tap${order >= 0 ? " counted" : ""}`}
-                        onPointerDown={(e) => onItemPointer?.(index, e)}
-                      >
+                      <span className={`count-tap${order >= 0 ? " counted" : ""}`} onPointerDown={(e) => onItemPointer?.(index, e)}>
                         <span className="count-item">{thing.emoji}</span>
                         {order >= 0 && <span className="count-badge">{order + 1}</span>}
                       </span>
