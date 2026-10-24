@@ -27,6 +27,7 @@ export type TrackEvent =
   | { kind: "loop" }
   | { kind: "drum"; drum: number }
   | { kind: "chime"; chime: number }
+  | { kind: "tunnel" }
   | { kind: "basket" };
 
 /* ---------- Layout ---------- */
@@ -57,6 +58,9 @@ export const SEESAW = { cx: 330, cy: 742, half: 140, rest: -12, tipped: 12 };
 export const ROW3: Row = { from: { x: 530, y: 773 }, to: { x: 1255, y: 800 } };
 
 export const TUNNEL = { x0: 800, x1: 1010 };
+
+/** The middle of the tunnel, out of sight: here a marble changes (K-06). */
+export const TUNNEL_MID = (TUNNEL.x0 + TUNNEL.x1) / 2;
 
 /** Below the tunnel the marble zigzags down the right edge, hitting a wall at every turn, and goes on left on row 4. */
 export const ZIGS: Row[] = [
@@ -294,7 +298,7 @@ function fixedParts(): Part[][] {
     { pts: [...line(ROW2B.from, ROW2B.to), ...line(ROW2B.to, land).slice(1)] },
     { pts: line(land, off, 4), event: { kind: "seesaw" }, speed: 140, seesaw: true },
     { pts: quad(off, { x: off.x + 20, y: ROW3.from.y - 8 }, ROW3.from) },
-    ...rowParts(ROW3),
+    ...rowParts(ROW3, [{ x: TUNNEL_MID, event: { kind: "tunnel" } }]),
     { pts: quad(ROW3.to, { x: 1290, y: ROW3.to.y }, ZIGS[0].from) },
     ...rowParts(ZIGS[0]),
     turnPart(1),

@@ -15,6 +15,13 @@ the hopper and something else pops up in its place, a key or a tap on the wall t
 the same route: the tennis ball hops along the rows, the iron ball is slow with deep notes and thumps, the apple bumps, the
 soap bubble floats at an even speed and bursts above the basket instead of landing (so it doesn't fill it).
 
+Joining in on the way: a tapped thing hops with a twirl and rolls on faster (K-03; without the shelf, after the hopper is
+open, a key hops all rolling marbles, or plays the next bar when none rolls). The bars, seesaw, drums, chimes, looping and
+basket react to a tap without a marble, as do bell, trampoline, funnel and wheel when the spots can't be swapped; a tap on
+the tunnel lets an animal look out, and the bare wall sparkles where it is tapped (K-04). Taps on parts stop there, so the
+wall doesn't also take the next thing or sparkle. In the middle of the tunnel (the `tunnel` event) every marble changes, in
+turn from a random start: another colour, stripes, dots, a golden star, or an animal looks out (K-06; `Ball` in `parts.tsx`
+takes a `look`); other things keep their look and an animal looks out for them.
 - `track.ts`: all the numbers. The route comes in sections – a fixed stretch before every spot, one section per part and
   spot, and the stretch to the basket – so a marble takes whatever part is in a spot when it gets there. `TURNS` are the walls
   the marble bounces off to change direction. `track.test.ts` checks that sections join up, nothing leaves the wall and spot
