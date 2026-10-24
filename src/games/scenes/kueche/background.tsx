@@ -136,7 +136,10 @@ export function Background() {
       <CupboardDoor x={1244} y={WORKTOP_FRONT + 16} w={150} h={128} knob="left" />
       {/* Plinth with a mouse hole */}
       <rect y={COUNTER_FOOT - 14} width={COUNTER_END} height="14" fill="#6f9b7d" />
-      <path d={`M1222 ${COUNTER_FOOT} V${COUNTER_FOOT - 8} Q1222 ${COUNTER_FOOT - 20} 1236 ${COUNTER_FOOT - 20} Q1250 ${COUNTER_FOOT - 20} 1250 ${COUNTER_FOOT - 8} V${COUNTER_FOOT} Z`} fill="#3d405b" />
+      <path
+        d={`M1222 ${COUNTER_FOOT} V${COUNTER_FOOT - 8} Q1222 ${COUNTER_FOOT - 20} 1236 ${COUNTER_FOOT - 20} Q1250 ${COUNTER_FOOT - 20} 1250 ${COUNTER_FOOT - 8} V${COUNTER_FOOT} Z`}
+        fill="#3d405b"
+      />
 
       {/* The lamp's ceiling rose */}
       <rect x="742" y="0" width="36" height="8" rx="3" fill={STEEL} />

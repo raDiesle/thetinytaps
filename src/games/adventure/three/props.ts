@@ -30,8 +30,8 @@ export function mergeStatic(root: THREE.Object3D) {
     const part = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
     for (const name of Object.keys(part.attributes)) if (name !== "position" && name !== "normal") part.deleteAttribute(name);
     part.applyMatrix4(o.matrixWorld);
-    let look = looks.get(key);
-    if (!look) looks.set(key, (look = { mesh: o, parts: [] }));
+    const look = looks.get(key) ?? { mesh: o, parts: [] as THREE.BufferGeometry[] };
+    looks.set(key, look);
     look.parts.push(part);
   });
   const merged = new THREE.Group();
@@ -395,7 +395,11 @@ export function makeTurtle() {
         // In the water the front flippers beat like wings, the back ones steer.
         const beat = Math.sin(time * 2.4 + (front ? 0 : 1.2)) * swimming * (front ? 0.55 : 0.2);
         const rest = front ? -0.45 : 0.65;
-        pivot.rotation.set(0, side * (rest - step) + side * Math.cos(time * 2.4) * 0.25 * swimming * (front ? 1 : 0), side * (lift + beat - 0.1 * (1 - swimming)));
+        pivot.rotation.set(
+          0,
+          side * (rest - step) + side * Math.cos(time * 2.4) * 0.25 * swimming * (front ? 1 : 0),
+          side * (lift + beat - 0.1 * (1 - swimming)),
+        );
       }
       head.rotation.set(-0.08 + Math.sin(time * 1.3) * 0.04 - walking * 0.1, Math.sin(time * 0.45) * 0.25 * (1 - walking), 0);
       head.position.z = TURTLE_HALF_LENGTH - 0.02 + walking * Math.sin(stride * 2) * 0.02;
@@ -592,7 +596,10 @@ export function makeKey() {
 export function makeBasket() {
   const group = new THREE.Group();
   const weave = mat("#c48a4a", 0.95);
-  const wall = solid(new THREE.CylinderGeometry(0.32, 0.24, 0.28, 20, 1, true), new THREE.MeshStandardMaterial({ color: "#c48a4a", roughness: 0.95, side: THREE.DoubleSide }));
+  const wall = solid(
+    new THREE.CylinderGeometry(0.32, 0.24, 0.28, 20, 1, true),
+    new THREE.MeshStandardMaterial({ color: "#c48a4a", roughness: 0.95, side: THREE.DoubleSide }),
+  );
   wall.position.y = 0.14;
   group.add(wall);
   const bottom = solid(new THREE.CircleGeometry(0.24, 20), weave);

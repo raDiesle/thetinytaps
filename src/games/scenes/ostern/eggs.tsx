@@ -33,7 +33,15 @@ export function Osterei() {
         <circle cx="12" cy="-14" r="3.5" fill="#ffd60a" />
       </g>
       <Blades xs={[-28, -8, 6, 24, 42, 56]} shade="#52b788" />
-      <Sparkles className="os-ei-spark" spots={[[-44, -86], [40, -96], [-56, -40], [60, -70]]} />
+      <Sparkles
+        className="os-ei-spark"
+        spots={[
+          [-44, -86],
+          [40, -96],
+          [-56, -40],
+          [60, -70],
+        ]}
+      />
     </>
   );
 }
@@ -48,7 +56,15 @@ export function BlauesEi() {
         </g>
       </g>
       <Blades xs={[-100, -86, -54]} shade="#52b788" height={22} />
-      <Sparkles className="os-blau-spark" spots={[[-112, -80], [-40, -96], [-120, -30]]} r={9} />
+      <Sparkles
+        className="os-blau-spark"
+        spots={[
+          [-112, -80],
+          [-40, -96],
+          [-120, -30],
+        ]}
+        r={9}
+      />
     </>
   );
 }
@@ -62,7 +78,17 @@ export function GelbesEi() {
         <circle cx="-10" cy="-46" r="3" fill="#fff" />
         <circle cx="10" cy="-46" r="3" fill="#fff" />
       </g>
-      <Sparkles className="os-gelb-spark" spots={[[-50, -96], [50, -90], [-62, -40], [60, -30]]} r={9} fill="#fff3bf" />
+      <Sparkles
+        className="os-gelb-spark"
+        spots={[
+          [-50, -96],
+          [50, -90],
+          [-62, -40],
+          [60, -30],
+        ]}
+        r={9}
+        fill="#fff3bf"
+      />
     </>
   );
 }
@@ -90,7 +116,15 @@ export function GruenesEi() {
         ))}
       </g>
       <Blades xs={[-70, -54, -18, -2]} shade="#40916c" height={24} />
-      <Sparkles className="os-gruen-spark" spots={[[-86, -60], [6, -50], [-96, -6]]} r={9} />
+      <Sparkles
+        className="os-gruen-spark"
+        spots={[
+          [-86, -60],
+          [6, -50],
+          [-96, -6],
+        ]}
+        r={9}
+      />
     </>
   );
 }
@@ -129,7 +163,16 @@ export function Osternest() {
       <path d="M-92 -26 Q0 -2 92 -26 M-80 -10 Q0 10 80 -10" stroke="#a0673d" strokeWidth="4" fill="none" />
       <path d="M-60 -30 V0 M-30 -22 V2 M0 -20 V2 M30 -22 V2 M60 -30 V0" stroke="#a0673d" strokeWidth="3" />
       <path d="M-96 -40 Q0 -14 96 -40" stroke="#d9a066" strokeWidth="8" strokeLinecap="round" fill="none" />
-      <Sparkles className="os-nest-spark" spots={[[-80, -90], [0, -110], [84, -84], [-40, -120]]} r={10} />
+      <Sparkles
+        className="os-nest-spark"
+        spots={[
+          [-80, -90],
+          [0, -110],
+          [84, -84],
+          [-40, -120],
+        ]}
+        r={10}
+      />
     </>
   );
 }

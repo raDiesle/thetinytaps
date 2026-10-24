@@ -120,11 +120,7 @@ export function Background() {
       <rect width="1600" height={SURFACE + 10} fill="url(#uw-sky)" />
       <Cloud x={900} y={44} scale={0.26} className="uw-cloud" />
       <rect y={SURFACE} width="1600" height={1000 - SURFACE} fill="url(#uw-water)" />
-      <path
-        d={`M0 ${SURFACE} ${Array.from({ length: 40 }, () => "q20 -8 40 0").join(" ")} V${SURFACE + 10} H0 Z`}
-        fill="#7ee0f5"
-        className="uw-waves"
-      />
+      <path d={`M0 ${SURFACE} ${Array.from({ length: 40 }, () => "q20 -8 40 0").join(" ")} V${SURFACE + 10} H0 Z`} fill="#7ee0f5" className="uw-waves" />
       <path d={`M0 ${SURFACE} ${Array.from({ length: 40 }, () => "q20 -8 40 0").join(" ")}`} stroke="#fff" strokeWidth="3" fill="none" opacity="0.8" />
       <path
         d={`M0 ${SURFACE + 8} ${Array.from({ length: 32 }, (_, i) => `q25 ${i % 2 ? 8 : 4} 50 0`).join(" ")}`}
@@ -154,7 +150,10 @@ export function Background() {
       </g>
 
       {/* The sea floor */}
-      <path d={`M0 ${HORIZON + 4} Q200 ${HORIZON - 8} 400 ${HORIZON + 2} T800 ${HORIZON} T1200 ${HORIZON + 4} T1600 ${HORIZON - 2} V1000 H0 Z`} fill="url(#uw-floor)" />
+      <path
+        d={`M0 ${HORIZON + 4} Q200 ${HORIZON - 8} 400 ${HORIZON + 2} T800 ${HORIZON} T1200 ${HORIZON + 4} T1600 ${HORIZON - 2} V1000 H0 Z`}
+        fill="url(#uw-floor)"
+      />
       <rect y={HORIZON - 30} width="1600" height="200" fill="url(#uw-haze)" />
 
       {/* Rocks at the back left, behind the submarine */}

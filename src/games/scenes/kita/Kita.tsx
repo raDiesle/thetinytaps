@@ -4,7 +4,21 @@ import { Background } from "./background";
 import { TABLE, onTable } from "./layout";
 import { Aufwachkind, Baukind, Erzieherin, Junge, KindBecher, KindNudeln, Maedchen, Schlafkind, Winkekinder } from "./people";
 import { Kanne, Pudding, Tisch, Topf } from "./table";
-import { Ball, Bilderbuch, Gummistiefel, Hausschuhe, Kipplaster, Kisten, Kuscheltier, Puppenwagen, Spielzeugkiste, Spieluhr, Trommel, Turm, Xylophon } from "./toys";
+import {
+  Ball,
+  Bilderbuch,
+  Gummistiefel,
+  Hausschuhe,
+  Kipplaster,
+  Kisten,
+  Kuscheltier,
+  Puppenwagen,
+  Spielzeugkiste,
+  Spieluhr,
+  Trommel,
+  Turm,
+  Xylophon,
+} from "./toys";
 import { Bilder, Fenster, Garderobe, Geburtstagszug, Hamster, Rollo, Rucksack, Schrank, Tuer, Uhr, Vogel, Wimpelkette } from "./wall";
 import "./kita.css";
 

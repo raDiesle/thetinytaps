@@ -42,9 +42,7 @@ self.addEventListener("fetch", (event) => {
   // answer from the cache straight away. A new build is picked up by the
   // browser's update check and used from the next start on.
   if (request.mode === "navigate") {
-    event.respondWith(
-      (async () => (await (await caches.open(CACHE)).match(SHELL)) ?? fetch(request))(),
-    );
+    event.respondWith((async () => (await (await caches.open(CACHE)).match(SHELL)) ?? fetch(request))());
     return;
   }
 

@@ -1,0 +1,509 @@
+/* ---------- Start screen (parents) ---------- */
+
+.start-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(140px, env(safe-area-inset-bottom))
+    max(20px, env(safe-area-inset-left));
+  text-align: center;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  min-height: 48px;
+  padding: 8px 22px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 5px 0 var(--ink);
+}
+
+.back-link:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.settings {
+  width: 100%;
+  max-width: 680px;
+  border: var(--outline);
+  border-radius: 28px;
+  box-shadow: 0 8px 0 #2a1e5c40;
+  text-align: left;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 24px 28px;
+  background: #fff;
+  font-size: 1.15rem;
+}
+
+/* The options are folded into one bar until a grown-up opens them. */
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 680px;
+}
+
+.settings-panel > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 8px 22px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 5px 0 var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+.settings-panel > summary::-webkit-details-marker {
+  display: none;
+}
+
+.settings-panel > summary::after {
+  content: "▾";
+  transition: rotate 0.2s;
+}
+
+.settings-panel[open] > summary::after {
+  rotate: 180deg;
+}
+
+.settings-panel > summary:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.settings-panel > summary:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+.settings-summary-note {
+  padding: 0 10px;
+  border-radius: 999px;
+  background: var(--sunshine);
+  font-size: 0.95rem;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.settings-group + .settings-group {
+  padding-top: 22px;
+  border-top: 3px dotted #2a1e5c30;
+}
+
+.settings-group h2 {
+  margin: 0;
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.toggle input {
+  position: absolute;
+  opacity: 0;
+}
+
+.toggle-track {
+  position: relative;
+  flex-shrink: 0;
+  width: 60px;
+  height: 36px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #e6e2f3;
+  transition: background 0.2s;
+}
+
+.toggle-track::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.toggle input:checked + .toggle-track {
+  background: var(--mint);
+}
+
+.toggle input:checked + .toggle-track::after {
+  transform: translateX(24px);
+}
+
+.toggle input:focus-visible + .toggle-track {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+.choice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice legend {
+  float: left;
+  margin-right: 8px;
+}
+
+.choice button,
+.voice-setting select,
+.voice-setting button {
+  min-width: 56px;
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+
+.choice button:active,
+.voice-setting button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.choice button.selected {
+  background: var(--sunshine);
+  font-weight: 700;
+}
+
+.voice-setting {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.setting-note {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.start-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 44px 16px 18px;
+  border: var(--outline);
+  border-radius: 999px;
+  background: var(--tomato);
+  color: #fff;
+  font: inherit;
+  font-size: clamp(1.8rem, 5vw, 2.4rem);
+  font-weight: 700;
+  -webkit-text-stroke: 0.07em var(--ink);
+  paint-order: stroke fill;
+  box-shadow: 0 10px 0 var(--ink);
+  cursor: pointer;
+  animation: breathe 2.4s ease-in-out infinite;
+}
+
+.start-icon {
+  display: grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  padding-left: 0.12em;
+  border: var(--outline);
+  border-radius: 50%;
+  background: var(--sunshine);
+  color: var(--ink);
+  font-size: 0.75em;
+  -webkit-text-stroke: 0;
+}
+
+.start-button:active {
+  transform: translateY(8px);
+  box-shadow: 0 2px 0 var(--ink);
+  animation: none;
+}
+
+@keyframes breathe {
+  50% {
+    scale: 1.05;
+  }
+}
+
+kbd {
+  padding: 1px 8px;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 0 var(--ink);
+  font-family: inherit;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-sun-rays,
+  .sky-cloud,
+  .logo-letter,
+  .start-button {
+    animation: none;
+  }
+}
+
+/* Ways to play: big cards under the title; a tap picks one and starts. */
+.mode-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  max-width: 1040px;
+}
+
+.mode-heading {
+  margin: 0;
+  padding: 4px 20px;
+  border-radius: 999px;
+  background: #ffffffb0;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+}
+
+.mode-level {
+  padding: 10px 20px;
+  border: 3px solid var(--ink);
+  border-radius: 28px;
+  background: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.mode-level .choice,
+.mode-level .toggle {
+  justify-content: center;
+}
+
+.mode-level .toggle {
+  margin-top: 8px;
+}
+
+.mode-list {
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 26px 24px;
+  text-align: center;
+}
+
+.mode-card {
+  width: 100%;
+  padding: 20px 18px 26px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.mode-card .game-emoji {
+  width: 84px;
+  height: 84px;
+  font-size: 2.7rem;
+}
+
+.mode-card .game-title {
+  font-size: 1.35rem;
+}
+
+/* The one card above the rest ("all of them in turn"): a whole row, in rainbow stripes. */
+.mode-list .mode-featured {
+  grid-column: 1 / -1;
+  --tilt: 0deg;
+}
+
+.mode-featured .mode-card {
+  flex-direction: row;
+  justify-content: center;
+  gap: 24px;
+  padding: 22px 28px 26px;
+  background: linear-gradient(100deg, #ff8fa0, #ffc46b, #fff07a, #8ee08a, #7fd3ff, #b7a8ff);
+}
+
+.mode-featured .mode-card .game-emoji {
+  width: 100px;
+  height: 100px;
+  font-size: 3.3rem;
+}
+
+.mode-featured .mode-card .game-title {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+/*
+ * On a tablet or computer, all cards and the buttons under them fit on one
+ * screen: useFitGrid picks the columns and row height, the cards scale with it.
+ */
+.home:has(> .game-list.fit),
+.start-screen:has(.game-list.fit) {
+  padding-bottom: 32px;
+}
+
+.game-list.fit {
+  grid-template-columns: repeat(var(--fit-columns), minmax(0, 1fr));
+  grid-auto-rows: var(--fit-row);
+  gap: 24px;
+}
+
+.game-list.fit li {
+  container-type: size;
+}
+
+.game-list.fit .game-card {
+  justify-content: center;
+  gap: 4cqh;
+  /* Keeps the title clear of the ▶ button in the corner. */
+  padding: 5cqh 14px max(7cqh, 30px);
+}
+
+.game-list.fit .game-emoji {
+  --size: min(112px, 46cqh);
+  width: var(--size);
+  height: var(--size);
+  font-size: calc(var(--size) * 0.5);
+}
+
+.game-list.fit .game-title {
+  font-size: clamp(0.95rem, min(13cqh, 9cqw), 1.6rem);
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
+.game-list.fit .game-go {
+  width: 44px;
+  height: 44px;
+  right: -8px;
+  bottom: -12px;
+  font-size: 1.1rem;
+}
+
+.game-list.fit .mode-featured .game-title {
+  font-size: clamp(1.2rem, 20cqh, 2.2rem);
+}
+
+/* More room for the cards on big screens: the back link moves up into the corner. */
+@media (min-width: 900px) and (min-height: 600px) {
+  .home > .back-link,
+  .start-screen > .back-link {
+    position: absolute;
+    top: max(24px, env(safe-area-inset-top));
+    left: max(20px, env(safe-area-inset-left));
+    margin: 0;
+  }
+
+  .start-screen {
+    gap: 20px;
+  }
+
+  .home-subtitle {
+    margin-bottom: 28px;
+  }
+}
+
+/* Play time, language, read aloud … are set on the home page for all games. */
+.shared-settings-note {
+  max-width: 680px;
+  margin: 0;
+  padding: 6px 18px;
+  border-radius: 20px;
+  background: #ffffffb0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.shared-settings-note a {
+  color: inherit;
+  font-weight: 700;
+}
+
+.playtime-over-note {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+  margin: 0;
+  padding: 10px 20px;
+  border: 3px solid var(--ink);
+  border-radius: 28px;
+  background: #232a6b;
+  color: #fff4d6;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.playtime-over-note button,
+.playtime-status button {
+  min-height: 44px;
+  padding: 6px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+
+.playtime-over-note button:active,
+.playtime-status button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}

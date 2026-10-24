@@ -65,7 +65,13 @@ export function Hoehle() {
       <g className="dt-hoehle-rock">
         <path d="M-170 0 Q-188 -150 -122 -236 Q-62 -300 20 -294 Q124 -292 162 -200 Q192 -104 172 0 Z" fill={ROCK} />
         <path d="M60 -286 Q150 -260 168 -180 Q190 -90 172 0 H110 Q140 -120 60 -286 Z" fill="#8f7f74" opacity="0.5" />
-        <path d="M-150 -150 Q-60 -170 40 -150 M-160 -70 Q-120 -80 -96 -76 M90 -100 Q130 -110 160 -100" stroke="#8f7f74" strokeWidth="6" strokeLinecap="round" fill="none" />
+        <path
+          d="M-150 -150 Q-60 -170 40 -150 M-160 -70 Q-120 -80 -96 -76 M90 -100 Q130 -110 160 -100"
+          stroke="#8f7f74"
+          strokeWidth="6"
+          strokeLinecap="round"
+          fill="none"
+        />
         <path d="M-120 -226 Q-90 -270 -30 -282" stroke="#fff" strokeOpacity="0.3" strokeWidth="12" strokeLinecap="round" fill="none" />
         {/* Moss on top */}
         <path d="M-120 -240 Q-60 -306 30 -296 Q100 -296 140 -246 Q90 -262 40 -258 Q-30 -266 -120 -240 Z" fill="#8cbf78" />

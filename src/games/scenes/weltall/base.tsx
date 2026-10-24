@@ -10,7 +10,17 @@ export function Rakete() {
   const window = ellipsePath(0, -300, 20);
   return (
     <>
-      <Dust className="wa-rakete-smoke" spots={[[-96, -14], [-56, -4], [0, 4], [56, -4], [96, -14]]} r={30} />
+      <Dust
+        className="wa-rakete-smoke"
+        spots={[
+          [-96, -14],
+          [-56, -4],
+          [0, 4],
+          [56, -4],
+          [96, -14],
+        ]}
+        r={30}
+      />
       <g className="wa-rakete-body">
         <g className="wa-rakete-flame" style={{ transformOrigin: "0px -40px" }}>
           <path d="M-28 -42 Q-20 30 0 70 Q20 30 28 -42 Z" fill="#ff8c42" />
@@ -57,7 +67,14 @@ export function Flagge() {
           <path d="M2 -128 Q50 -122 98 -128 V-118 Q50 -112 2 -120 Z" fill="#c1121f" />
           <path d={starPath(50, -150, 18)} fill="#ffd60a" />
         </g>
-        <Sparkles className="wa-flagge-sparkle" spots={[[50, -150], [86, -176]]} r={14} />
+        <Sparkles
+          className="wa-flagge-sparkle"
+          spots={[
+            [50, -150],
+            [86, -176],
+          ]}
+          r={14}
+        />
       </g>
     </>
   );
@@ -68,7 +85,16 @@ export function Landefaehre() {
   const hatch = "M6 -204 h40 v42 h-40 Z";
   return (
     <>
-      <Dust className="wa-lander-dust" spots={[[-124, -8], [-64, 0], [64, 0], [124, -8]]} r={18} />
+      <Dust
+        className="wa-lander-dust"
+        spots={[
+          [-124, -8],
+          [-64, 0],
+          [64, 0],
+          [124, -8],
+        ]}
+        r={18}
+      />
       <path d="M-60 -110 L-96 -10 M60 -110 L96 -10" stroke="#ced4da" strokeWidth="7" strokeLinecap="round" />
       <ellipse cx="-96" cy="-8" rx="14" ry="4" fill="#ced4da" />
       <ellipse cx="96" cy="-8" rx="14" ry="4" fill="#ced4da" />
@@ -89,7 +115,14 @@ export function Landefaehre() {
         />
         <rect x="-82" y="-220" width="10" height="16" rx="3" fill="#868e96" />
         <rect x="72" y="-220" width="10" height="16" rx="3" fill="#868e96" />
-        <Dust className="wa-lander-puff" spots={[[-94, -212], [94, -212]]} r={10} />
+        <Dust
+          className="wa-lander-puff"
+          spots={[
+            [-94, -212],
+            [94, -212],
+          ]}
+          r={10}
+        />
         <path d="M-62 -160 L-72 -206 L-46 -246 H46 L72 -206 L62 -160 Z" fill="#e9ecef" />
         <path d="M30 -246 H46 L72 -206 L62 -160 H44 Z" fill="#dee2e6" />
         <Pane x={-48} y={-232} w={36} h={30} rx={6}>
@@ -132,7 +165,15 @@ export function Solarzellen() {
           <path className="wa-solar-shine" d="M-164 -62 L-140 -130 L-116 -130 L-140 -62 Z" fill="#fff" opacity="0.65" />
         </Inside>
       </g>
-      <Sparkles className="wa-solar-sparkle" spots={[[-70, -142], [70, -142]]} r={11} fill="#fff3bf" />
+      <Sparkles
+        className="wa-solar-sparkle"
+        spots={[
+          [-70, -142],
+          [70, -142],
+        ]}
+        r={11}
+        fill="#fff3bf"
+      />
     </>
   );
 }
@@ -179,7 +220,14 @@ export function Mondbasis() {
             </Inside>
           )}
           <circle className="wa-basis-light" cx={x} cy={y} r={r} fill="#ffe066" style={nth(i)} />
-          <path d={`M${x - r * 0.5} ${y - r * 0.4} Q${x - r * 0.1} ${y - r * 0.75} ${x + r * 0.35} ${y - r * 0.6}`} stroke="#fff" strokeWidth="3" fill="none" strokeLinecap="round" opacity="0.8" />
+          <path
+            d={`M${x - r * 0.5} ${y - r * 0.4} Q${x - r * 0.1} ${y - r * 0.75} ${x + r * 0.35} ${y - r * 0.6}`}
+            stroke="#fff"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.8"
+          />
         </g>
       ))}
       <path d={door} fill="#343a40" />

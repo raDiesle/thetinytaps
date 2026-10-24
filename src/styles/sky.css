@@ -1,0 +1,106 @@
+/* ---------- Sky backdrop ---------- */
+
+.sky {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(var(--sky-top), var(--sky-bottom) 70%);
+  pointer-events: none;
+}
+
+.sky-sun {
+  position: absolute;
+  top: -40px;
+  right: -30px;
+  width: clamp(150px, 22vw, 240px);
+}
+
+.sky-sun circle {
+  fill: var(--sunshine);
+  stroke: var(--ink);
+  stroke-width: 5;
+}
+
+.sky-sun .sky-sun-cheek {
+  fill: #ff9f9f;
+  stroke: none;
+}
+
+.sky-sun .sky-sun-eye {
+  fill: var(--ink);
+  stroke: none;
+}
+
+.sky-sun-mouth {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+}
+
+.sky-sun-rays {
+  fill: #ffb703;
+  transform-origin: 100px 100px;
+  animation: spin 40s linear infinite;
+}
+
+.sky-cloud {
+  position: absolute;
+  left: 0;
+  fill: #fff;
+  opacity: 0.95;
+  animation: drift var(--drift, 60s) linear infinite;
+}
+
+.sky-cloud.c1 {
+  top: 8%;
+  width: 150px;
+  --drift: 70s;
+  animation-delay: -20s;
+}
+
+.sky-cloud.c2 {
+  top: 26%;
+  width: 110px;
+  --drift: 90s;
+  animation-delay: -65s;
+}
+
+.sky-cloud.c3 {
+  top: 48%;
+  width: 180px;
+  --drift: 110s;
+  animation-delay: -40s;
+}
+
+.sky-hills {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: clamp(90px, 18vh, 200px);
+}
+
+.hill-back {
+  fill: #7ad86b;
+}
+
+.hill-front {
+  fill: #4cbf56;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(-220px);
+  }
+  to {
+    transform: translateX(calc(100vw + 20px));
+  }
+}

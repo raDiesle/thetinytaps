@@ -12,17 +12,13 @@ export const PUSH_PULL: Movement[] = [
     bodyParts: ["hands", "arms", "shoulders"],
     bodyMovement: "Das Kind legt beide Hände flach vor die Brust und schiebt die Arme langsam und kräftig nach vorn, bis sie gestreckt sind.",
     startingPose: "Gerade stehen, Hände flach vor der Brust.",
-    movementSteps: [
-      "Hände flach vor die Brust.",
-      "Langsam und fest nach vorn drücken.",
-      "Arme ganz lang machen.",
-      "Hände zurückholen und noch einmal.",
-    ],
+    movementSteps: ["Hände flach vor die Brust.", "Langsam und fest nach vorn drücken.", "Arme ganz lang machen.", "Hände zurückholen und noch einmal."],
     durationSeconds: 14,
     repetitions: 3,
     instruction: "Drück die Tür auf!",
     motion: "push_forward",
-    demonstration: "Die Figur steht vor der Tür, dreht sich zum Kind, zeigt die flachen Hände und drückt einmal ganz langsam mit angestrengtem Gesicht und „Hmmmpf!“. Dann drückt sie gemeinsam mit dem Kind im ruhigen Takt.",
+    demonstration:
+      "Die Figur steht vor der Tür, dreht sich zum Kind, zeigt die flachen Hände und drückt einmal ganz langsam mit angestrengtem Gesicht und „Hmmmpf!“. Dann drückt sie gemeinsam mit dem Kind im ruhigen Takt.",
     scenario: {
       world: "magic_castle",
       setup: "Am Ende eines Burggangs steht eine schwere Steintür mit einem leuchtenden Stern darauf.",
@@ -63,17 +59,13 @@ export const PUSH_PULL: Movement[] = [
     bodyParts: ["hands", "arms", "shoulders"],
     bodyMovement: "Das Kind greift vor sich ein gedachtes Seil und zieht es Hand über Hand zu sich heran, die Hände wandern dabei von vorn zur Brust.",
     startingPose: "Gerade stehen, beide Arme nach vorn gestreckt, Hände zu Fäusten.",
-    movementSteps: [
-      "Vorn das Seil festhalten.",
-      "Eine Hand zieht zur Brust.",
-      "Die andere Hand greift vorn neu.",
-      "Immer abwechselnd weiterziehen.",
-    ],
+    movementSteps: ["Vorn das Seil festhalten.", "Eine Hand zieht zur Brust.", "Die andere Hand greift vorn neu.", "Immer abwechselnd weiterziehen."],
     durationSeconds: 16,
     repetitions: 2,
     instruction: "Zieh am Seil!",
     motion: "pull_rope",
-    demonstration: "Die Figur hält das Seil, schaut zum Kind und zieht erst ganz langsam eine Hand, dann die andere heran, mit „Hau ruck!“. Danach zieht sie im Takt mit dem Kind.",
+    demonstration:
+      "Die Figur hält das Seil, schaut zum Kind und zieht erst ganz langsam eine Hand, dann die andere heran, mit „Hau ruck!“. Danach zieht sie im Takt mit dem Kind.",
     scenario: {
       world: "pirate_island",
       setup: "Eine Schatztruhe liegt weiter hinten im Sand, ein dickes Seil führt von ihr bis nach vorn zum Kind.",
@@ -114,16 +106,13 @@ export const PUSH_PULL: Movement[] = [
     bodyParts: ["hands", "arms", "shoulders"],
     bodyMovement: "Das Kind schiebt beide Hände schräg nach oben und vorn, als würde es eine weiche Wolke über sich wegschieben.",
     startingPose: "Gerade stehen, Hände flach auf Schulterhöhe, Handflächen nach oben-vorn.",
-    movementSteps: [
-      "Hände auf Schulterhöhe.",
-      "Schräg nach oben wegschieben.",
-      "Arme wieder herunterholen.",
-    ],
+    movementSteps: ["Hände auf Schulterhöhe.", "Schräg nach oben wegschieben.", "Arme wieder herunterholen."],
     durationSeconds: 12,
     repetitions: 3,
     instruction: "Schieb die Wolke weg!",
     motion: "push_up",
-    demonstration: "Die Figur blickt zur grauen Wolke, dann zum Kind, und schiebt sie ganz langsam mit beiden Händen nach oben weg, mit einem leisen „Huiii“. Danach schiebt sie mit dem Kind zusammen.",
+    demonstration:
+      "Die Figur blickt zur grauen Wolke, dann zum Kind, und schiebt sie ganz langsam mit beiden Händen nach oben weg, mit einem leisen „Huiii“. Danach schiebt sie mit dem Kind zusammen.",
     scenario: {
       world: "cloud_world",
       setup: "Über der Wolkenwiese hängt eine dicke graue Wolke vor der Sonne, alles ist etwas dunkel.",
@@ -147,9 +136,7 @@ export const PUSH_PULL: Movement[] = [
       higherEnergy: "Auf die Zehenspitzen gehen und ganz hoch schieben.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Über dem Kind auf Lampen oder Regalbretter achten.",
-    ],
+    safetyNotes: ["Über dem Kind auf Lampen oder Regalbretter achten."],
     tags: ["push", "upwards", "cloud", "calm", "weather"],
   },
   {
@@ -160,18 +147,16 @@ export const PUSH_PULL: Movement[] = [
     difficulty: "medium",
     bodyZone: "full_body",
     bodyParts: ["hands", "arms", "torso", "legs", "feet"],
-    bodyMovement: "Anders als bei der Zaubertür arbeitet hier der ganze Körper: leicht nach vorn gebeugt drückt das Kind mit beiden Händen tief vor sich und trippelt dabei auf der Stelle.",
+    bodyMovement:
+      "Anders als bei der Zaubertür arbeitet hier der ganze Körper: leicht nach vorn gebeugt drückt das Kind mit beiden Händen tief vor sich und trippelt dabei auf der Stelle.",
     startingPose: "Knie leicht gebeugt, Oberkörper etwas nach vorn, Hände vorn auf Bauchhöhe.",
-    movementSteps: [
-      "Etwas nach vorn beugen.",
-      "Hände gegen den Schneeball.",
-      "Drücken und auf der Stelle trippeln.",
-    ],
+    movementSteps: ["Etwas nach vorn beugen.", "Hände gegen den Schneeball.", "Drücken und auf der Stelle trippeln."],
     durationSeconds: 16,
     repetitions: 2,
     instruction: "Roll den Schneeball!",
     motion: "push_forward",
-    demonstration: "Die Figur beugt sich zum Schneeball, zeigt dem Kind die Hände und trippelt ganz langsam auf der Stelle, während sie drückt. Dann wird das Trippeln etwas munterer, gemeinsam mit dem Kind.",
+    demonstration:
+      "Die Figur beugt sich zum Schneeball, zeigt dem Kind die Hände und trippelt ganz langsam auf der Stelle, während sie drückt. Dann wird das Trippeln etwas munterer, gemeinsam mit dem Kind.",
     scenario: {
       world: "winter_forest",
       setup: "Auf einer verschneiten Lichtung liegt ein kleiner Schneeball, daneben wartet ein Schneemann ohne Bauch.",
@@ -196,10 +181,7 @@ export const PUSH_PULL: Movement[] = [
       higherEnergy: "Schneller trippeln, der Ball rollt schneller.",
     },
     needs: { jump: false, space: "medium", balance: false },
-    safetyNotes: [
-      "Auf der Stelle bleiben, nicht nach vorn auf den Bildschirm zulaufen.",
-      "Rutschfeste Socken oder barfuß, kein glatter Boden.",
-    ],
+    safetyNotes: ["Auf der Stelle bleiben, nicht nach vorn auf den Bildschirm zulaufen.", "Rutschfeste Socken oder barfuß, kein glatter Boden."],
     tags: ["push", "snow", "whole_body", "steps", "winter"],
   },
   {
@@ -212,16 +194,13 @@ export const PUSH_PULL: Movement[] = [
     bodyParts: ["hands", "arms", "knees", "torso"],
     bodyMovement: "Das Kind beugt die Knie, greift mit beiden Händen tief vor sich und richtet sich langsam auf, wobei es sich leicht zurücklehnt.",
     startingPose: "Knie gebeugt, beide Hände unten vor den Füßen.",
-    movementSteps: [
-      "In die Knie gehen.",
-      "Unten mit beiden Händen festhalten.",
-      "Langsam hochziehen und aufrichten.",
-    ],
+    movementSteps: ["In die Knie gehen.", "Unten mit beiden Händen festhalten.", "Langsam hochziehen und aufrichten."],
     durationSeconds: 14,
     repetitions: 2,
     instruction: "Zieh die Karotte raus!",
     motion: "heave",
-    demonstration: "Die Figur geht vor dem Kind in die Knie, packt das grüne Karottenkraut, schaut zum Kind und zieht ganz langsam mit „Hmmm … hopp!“. Beim zweiten Mal ziehen beide gemeinsam.",
+    demonstration:
+      "Die Figur geht vor dem Kind in die Knie, packt das grüne Karottenkraut, schaut zum Kind und zieht ganz langsam mit „Hmmm … hopp!“. Beim zweiten Mal ziehen beide gemeinsam.",
     scenario: {
       world: "farm",
       setup: "Im Gemüsebeet wackelt ein riesiges grünes Karottenkraut, ein Hase sitzt hungrig daneben.",
@@ -244,10 +223,7 @@ export const PUSH_PULL: Movement[] = [
       seated: "Im Sitzen nach vorn zum Boden greifen und aufrichten.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Langsam aufrichten, nicht ruckartig nach hinten werfen.",
-      "Hinter dem Kind muss Platz frei sein.",
-    ],
+    safetyNotes: ["Langsam aufrichten, nicht ruckartig nach hinten werfen.", "Hinter dem Kind muss Platz frei sein."],
     tags: ["pull", "squat", "garden", "lift", "vegetables"],
   },
   {
@@ -258,18 +234,16 @@ export const PUSH_PULL: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["hands", "arms"],
-    bodyMovement: "Anders als bei der Zaubertür drückt das Kind sehr langsam und gleichmäßig mit beiden Handflächen gegen eine weiche, nachgebende Wand, die Arme strecken sich ganz allmählich.",
+    bodyMovement:
+      "Anders als bei der Zaubertür drückt das Kind sehr langsam und gleichmäßig mit beiden Handflächen gegen eine weiche, nachgebende Wand, die Arme strecken sich ganz allmählich.",
     startingPose: "Gerade stehen, Handflächen dicht vor dem Gesicht nach vorn.",
-    movementSteps: [
-      "Hände an die Gummiwand.",
-      "Ganz langsam drücken.",
-      "Die Wand wackelt – weiter drücken.",
-    ],
+    movementSteps: ["Hände an die Gummiwand.", "Ganz langsam drücken.", "Die Wand wackelt – weiter drücken."],
     durationSeconds: 15,
     repetitions: 2,
     instruction: "Drück ganz langsam!",
     motion: "push_forward",
-    demonstration: "Die Figur legt staunend die Hände an die durchsichtige Wand, schaut zum Kind und drückt in Zeitlupe; die Wand beult sich weich aus. Dann drücken beide gemeinsam langsam weiter.",
+    demonstration:
+      "Die Figur legt staunend die Hände an die durchsichtige Wand, schaut zum Kind und drückt in Zeitlupe; die Wand beult sich weich aus. Dann drücken beide gemeinsam langsam weiter.",
     scenario: {
       world: "crystal_cave",
       setup: "Im Höhlengang steht eine durchsichtige, schimmernde Wand aus Glibber, dahinter funkeln Kristalle.",
@@ -293,9 +267,7 @@ export const PUSH_PULL: Movement[] = [
       seated: "Im Sitzen genauso langsam drücken.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Langsam bleiben – das ist eine ruhige Kraftübung.",
-    ],
+    safetyNotes: ["Langsam bleiben – das ist eine ruhige Kraftübung."],
     tags: ["push", "slow_motion", "calm", "pretend", "arms"],
   },
   {
@@ -308,16 +280,13 @@ export const PUSH_PULL: Movement[] = [
     bodyParts: ["hands", "arms", "shoulders"],
     bodyMovement: "Das Kind greift mit beiden Händen über dem Kopf einen gedachten Hebel und zieht ihn in einem Zug kräftig bis zur Brust herunter.",
     startingPose: "Gerade stehen, beide Arme hoch, Hände greifen den Hebel.",
-    movementSteps: [
-      "Arme hoch, Hebel greifen.",
-      "Kräftig bis zur Brust ziehen.",
-      "Kurz halten, dann loslassen.",
-    ],
+    movementSteps: ["Arme hoch, Hebel greifen.", "Kräftig bis zur Brust ziehen.", "Kurz halten, dann loslassen."],
     durationSeconds: 12,
     repetitions: 2,
     instruction: "Zieh den Hebel runter!",
     motion: "pull_down",
-    demonstration: "Die Figur streckt sich zum großen roten Hebel, schaut zum Kind und zieht ihn langsam mit „Uuund … klack!“ herunter. Beim zweiten Mal ziehen beide zusammen.",
+    demonstration:
+      "Die Figur streckt sich zum großen roten Hebel, schaut zum Kind und zieht ihn langsam mit „Uuund … klack!“ herunter. Beim zweiten Mal ziehen beide zusammen.",
     scenario: {
       world: "construction",
       setup: "Auf der Baustelle steht ein großer Kran, daneben ein roter Hebel an einem Schaltkasten.",
@@ -331,18 +300,13 @@ export const PUSH_PULL: Movement[] = [
       musicSync: false,
     },
     visualDirection: { camera: "stationary", movementDirection: "down", intensity: "medium" },
-    variants: [
-      "Bei der Eisenbahn die Weiche umstellen, der Zug fährt auf ein neues Gleis.",
-      "Im Raumschiff den Starthebel ziehen, die Motoren leuchten.",
-    ],
+    variants: ["Bei der Eisenbahn die Weiche umstellen, der Zug fährt auf ein neues Gleis.", "Im Raumschiff den Starthebel ziehen, die Motoren leuchten."],
     adaptations: {
       easier: "Nur einen Arm hoch und mit einer Hand ziehen.",
       seated: "Im Sitzen von oben zur Brust ziehen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Über dem Kopf muss Platz frei sein.",
-    ],
+    safetyNotes: ["Über dem Kopf muss Platz frei sein."],
     tags: ["pull", "lever", "machine", "arms", "construction"],
   },
   {
@@ -353,18 +317,16 @@ export const PUSH_PULL: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["hands", "arms", "knees"],
-    bodyMovement: "Anders als beim Hebel geht es hier im Wechsel: hoch greifen, herunterziehen und in den Knien mitgehen, dann die Arme wieder mit dem Seil nach oben schwingen lassen.",
+    bodyMovement:
+      "Anders als beim Hebel geht es hier im Wechsel: hoch greifen, herunterziehen und in den Knien mitgehen, dann die Arme wieder mit dem Seil nach oben schwingen lassen.",
     startingPose: "Gerade stehen, beide Arme hoch, Hände am Seil.",
-    movementSteps: [
-      "Hoch greifen.",
-      "Herunterziehen und in die Knie gehen.",
-      "Mit dem Seil wieder hochstrecken.",
-    ],
+    movementSteps: ["Hoch greifen.", "Herunterziehen und in die Knie gehen.", "Mit dem Seil wieder hochstrecken."],
     durationSeconds: 15,
     repetitions: 3,
     instruction: "Zieh die Glocke!",
     motion: "pull_down",
-    demonstration: "Die Figur greift das dicke Glockenseil, zieht es langsam herunter und lässt sich wieder nach oben ziehen; oben läutet die Glocke. Dann zieht sie im ruhigen Takt mit dem Kind, „Ding … dong …“.",
+    demonstration:
+      "Die Figur greift das dicke Glockenseil, zieht es langsam herunter und lässt sich wieder nach oben ziehen; oben läutet die Glocke. Dann zieht sie im ruhigen Takt mit dem Kind, „Ding … dong …“.",
     scenario: {
       world: "magic_castle",
       setup: "Im Burgturm hängt eine große goldene Glocke, ein dickes Seil baumelt herunter.",
@@ -389,10 +351,7 @@ export const PUSH_PULL: Movement[] = [
       higherEnergy: "Beim Hochstrecken auf die Zehenspitzen gehen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Über dem Kopf muss Platz frei sein.",
-      "Weich in die Knie gehen, nicht fallen lassen.",
-    ],
+    safetyNotes: ["Über dem Kopf muss Platz frei sein.", "Weich in die Knie gehen, nicht fallen lassen."],
     tags: ["pull", "bell", "rhythm", "up_down", "castle"],
   },
 ];

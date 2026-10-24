@@ -38,7 +38,7 @@ export function pathY(x: number) {
   const [x1, y1] = PATH[i];
   const [x2, y2] = PATH[i + 1];
   const t = Math.max(0, Math.min(1, (x - x1) / (x2 - x1)));
-  return y1 + (y2 - y1) * (1 - Math.cos(t * Math.PI)) / 2;
+  return y1 + ((y2 - y1) * (1 - Math.cos(t * Math.PI))) / 2;
 }
 
 /** Half the height of the path at x. */

@@ -10,18 +10,16 @@ export const SIDE_STEPS: Movement[] = [
     difficulty: "easy",
     bodyZone: "legs",
     bodyParts: ["legs", "feet"],
-    bodyMovement: "Das Kind macht einen kleinen Schritt genau dorthin, wo eine Fußspur aufleuchtet – mal nach vorn, mal zur Seite – und stellt den anderen Fuß dazu.",
+    bodyMovement:
+      "Das Kind macht einen kleinen Schritt genau dorthin, wo eine Fußspur aufleuchtet – mal nach vorn, mal zur Seite – und stellt den anderen Fuß dazu.",
     startingPose: "Gerade stehen, Füße nebeneinander.",
-    movementSteps: [
-      "Schauen, wo es leuchtet.",
-      "Einen Schritt dorthin.",
-      "Den anderen Fuß dazustellen.",
-    ],
+    movementSteps: ["Schauen, wo es leuchtet.", "Einen Schritt dorthin.", "Den anderen Fuß dazustellen."],
     durationSeconds: 16,
     repetitions: 4,
     instruction: "Tritt auf die Spur!",
     motion: "step_side",
-    demonstration: "Die Figur zeigt auf eine leuchtende Fußspur, schaut zum Kind und setzt ganz langsam einen Fuß darauf, dann den zweiten daneben: „Tapp … tapp!“. Bei den nächsten Spuren macht sie es zusammen mit dem Kind.",
+    demonstration:
+      "Die Figur zeigt auf eine leuchtende Fußspur, schaut zum Kind und setzt ganz langsam einen Fuß darauf, dann den zweiten daneben: „Tapp … tapp!“. Bei den nächsten Spuren macht sie es zusammen mit dem Kind.",
     scenario: {
       world: "crystal_cave",
       setup: "Auf dem Höhlenboden sind Fußspuren aus Licht, sie zeigen den Weg zu einem Schatz.",
@@ -46,10 +44,7 @@ export const SIDE_STEPS: Movement[] = [
       higherEnergy: "Größere Schritte und nach jeder Spur einmal klatschen.",
     },
     needs: { jump: false, space: "medium", balance: false },
-    safetyNotes: [
-      "Rund um das Kind etwa einen Schritt Platz freiräumen.",
-      "Keine Teppichkanten oder Spielsachen auf dem Boden.",
-    ],
+    safetyNotes: ["Rund um das Kind etwa einen Schritt Platz freiräumen.", "Keine Teppichkanten oder Spielsachen auf dem Boden."],
     tags: ["steps", "footprints", "path", "legs", "coordination"],
   },
   {
@@ -62,16 +57,13 @@ export const SIDE_STEPS: Movement[] = [
     bodyParts: ["legs", "feet", "hips"],
     bodyMovement: "Im Takt der Musik macht das Kind einen Schritt zur Seite, tippt den anderen Fuß daneben und geht genauso zur anderen Seite zurück.",
     startingPose: "Gerade stehen, Füße nebeneinander, Hände locker.",
-    movementSteps: [
-      "Schritt zur Seite.",
-      "Anderen Fuß dazu tippen.",
-      "Schritt zur anderen Seite, tippen.",
-    ],
+    movementSteps: ["Schritt zur Seite.", "Anderen Fuß dazu tippen.", "Schritt zur anderen Seite, tippen."],
     durationSeconds: 18,
     repetitions: 4,
     instruction: "Schritt und tipp!",
     motion: "step_side",
-    demonstration: "Die Figur zählt langsam „Schritt … tipp“ und zeigt es erst ohne Musik, dann mit Musik, immer dem Kind zugewandt. Danach tanzt sie im Takt mit dem Kind.",
+    demonstration:
+      "Die Figur zählt langsam „Schritt … tipp“ und zeigt es erst ohne Musik, dann mit Musik, immer dem Kind zugewandt. Danach tanzt sie im Takt mit dem Kind.",
     scenario: {
       world: "music_room",
       setup: "Im Musikzimmer liegt ein großer Tanzboden aus bunten Fliesen.",
@@ -85,21 +77,14 @@ export const SIDE_STEPS: Movement[] = [
       musicSync: true,
     },
     visualDirection: { camera: "stationary", movementDirection: "side_to_side", intensity: "lively" },
-    variants: [
-      "Mit Klatschen beim Tippen.",
-      "Langsamer Walzer: ganz weich, mit wiegenden Armen.",
-      "Im Zirkus zur Musik der Kapelle, Clowns machen mit.",
-    ],
+    variants: ["Mit Klatschen beim Tippen.", "Langsamer Walzer: ganz weich, mit wiegenden Armen.", "Im Zirkus zur Musik der Kapelle, Clowns machen mit."],
     adaptations: {
       easier: "Nur auf der Stelle mit einem Fuß zur Seite tippen, ohne Schritt.",
       seated: "Im Sitzen die Füße abwechselnd zur Seite tippen.",
       higherEnergy: "Die Arme beim Schritt weit zur Seite schwingen.",
     },
     needs: { jump: false, space: "medium", balance: false },
-    safetyNotes: [
-      "Zu beiden Seiten einen Schritt Platz lassen.",
-      "Nicht in Socken auf glattem Boden tanzen.",
-    ],
+    safetyNotes: ["Zu beiden Seiten einen Schritt Platz lassen.", "Nicht in Socken auf glattem Boden tanzen."],
     tags: ["dance", "step_touch", "rhythm", "music", "lights"],
   },
   {
@@ -112,16 +97,13 @@ export const SIDE_STEPS: Movement[] = [
     bodyParts: ["legs", "feet"],
     bodyMovement: "Das Kind macht einen einzigen großen Schritt zur Seite, wartet dort und tritt danach wieder zurück in die Mitte.",
     startingPose: "Gerade stehen in der Mitte.",
-    movementSteps: [
-      "Ein großer Schritt zur Seite.",
-      "Warten, der Elefant geht vorbei.",
-      "Zurück in die Mitte.",
-    ],
+    movementSteps: ["Ein großer Schritt zur Seite.", "Warten, der Elefant geht vorbei.", "Zurück in die Mitte."],
     durationSeconds: 14,
     repetitions: 2,
     instruction: "Mach Platz!",
     motion: "step_side",
-    demonstration: "Die Figur hört schwere Schritte, schaut zum Kind und macht übertrieben langsam einen großen Schritt zur Seite, winkt den Elefanten vorbei und geht zurück. Beim nächsten Elefanten machen beide gemeinsam Platz.",
+    demonstration:
+      "Die Figur hört schwere Schritte, schaut zum Kind und macht übertrieben langsam einen großen Schritt zur Seite, winkt den Elefanten vorbei und geht zurück. Beim nächsten Elefanten machen beide gemeinsam Platz.",
     scenario: {
       world: "jungle",
       setup: "Auf einem schmalen Dschungelweg kommt eine Elefantenfamilie entlang.",
@@ -135,19 +117,13 @@ export const SIDE_STEPS: Movement[] = [
       musicSync: false,
     },
     visualDirection: { camera: "stationary", movementDirection: "side_to_side", intensity: "medium" },
-    variants: [
-      "Ein Bauernhof-Traktor tuckert vorbei.",
-      "Ein Babyelefant kommt hinterher: einmal zur einen, einmal zur anderen Seite ausweichen.",
-    ],
+    variants: ["Ein Bauernhof-Traktor tuckert vorbei.", "Ein Babyelefant kommt hinterher: einmal zur einen, einmal zur anderen Seite ausweichen."],
     adaptations: {
       easier: "Ein kleiner Schritt genügt, auch mit Festhalten an einer Hand.",
       seated: "Im Sitzen beide Knie zur Seite kippen und zurück.",
     },
     needs: { jump: false, space: "medium", balance: false },
-    safetyNotes: [
-      "Zur Seite hin einen großen Schritt Platz freiräumen.",
-      "Ruhig gehen, kein Sprung zur Seite.",
-    ],
+    safetyNotes: ["Zur Seite hin einen großen Schritt Platz freiräumen.", "Ruhig gehen, kein Sprung zur Seite."],
     tags: ["side_step", "elephant", "waiting", "jungle", "legs"],
   },
   {
@@ -158,19 +134,16 @@ export const SIDE_STEPS: Movement[] = [
     difficulty: "medium",
     bodyZone: "full_body",
     bodyParts: ["legs", "feet", "hands", "arms"],
-    bodyMovement: "Anders als beim Platzmachen trippelt das Kind mehrere kleine Schritte hintereinander zur Seite und öffnet und schließt dabei die Hände wie Krebsscheren.",
+    bodyMovement:
+      "Anders als beim Platzmachen trippelt das Kind mehrere kleine Schritte hintereinander zur Seite und öffnet und schließt dabei die Hände wie Krebsscheren.",
     startingPose: "Knie leicht gebeugt, Hände vor der Brust als Scheren.",
-    movementSteps: [
-      "Hände werden Scheren.",
-      "Kleine Schritte zur Seite.",
-      "Scheren auf und zu.",
-      "Zurück zur anderen Seite.",
-    ],
+    movementSteps: ["Hände werden Scheren.", "Kleine Schritte zur Seite.", "Scheren auf und zu.", "Zurück zur anderen Seite."],
     durationSeconds: 16,
     repetitions: 2,
     instruction: "Lauf wie ein Krebs!",
     motion: "step_side",
-    demonstration: "Die Figur macht mit den Händen „Schnipp, schnapp“, zeigt sie dem Kind und trippelt ganz langsam ein paar kleine Schritte zur Seite. Dann krabbeln beide zusammen hin und wieder zurück.",
+    demonstration:
+      "Die Figur macht mit den Händen „Schnipp, schnapp“, zeigt sie dem Kind und trippelt ganz langsam ein paar kleine Schritte zur Seite. Dann krabbeln beide zusammen hin und wieder zurück.",
     scenario: {
       world: "beach",
       setup: "Am Strand liegt eine Muschel am Rand des Wassers, ein kleiner Krebs will dorthin.",
@@ -195,10 +168,7 @@ export const SIDE_STEPS: Movement[] = [
       higherEnergy: "Tiefer in die Knie gehen und mehr Schritte machen.",
     },
     needs: { jump: false, space: "medium", balance: false },
-    safetyNotes: [
-      "Zu beiden Seiten zwei bis drei Schritte Platz lassen.",
-      "Kleine, langsame Schritte, nicht über die eigenen Füße stolpern.",
-    ],
+    safetyNotes: ["Zu beiden Seiten zwei bis drei Schritte Platz lassen.", "Kleine, langsame Schritte, nicht über die eigenen Füße stolpern."],
     tags: ["side_step", "crab", "beach", "hands", "animals"],
   },
 ];

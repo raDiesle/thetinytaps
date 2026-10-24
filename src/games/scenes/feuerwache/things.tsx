@@ -157,8 +157,22 @@ export function Feuerloescher() {
         <path d="M-16 -110 Q-20 -60 -14 -10" stroke="#fff" strokeOpacity="0.45" strokeWidth="6" strokeLinecap="round" fill="none" />
         <rect x="-8" y="-134" width="16" height="18" rx="3" fill="#495057" />
         <circle cx="-16" cy="-128" r="10" fill="#fff" stroke={INK} strokeWidth="3" />
-        <path className="fw-loescher-needle" d="M-16 -128 l6 -5" stroke={FIRE_RED} strokeWidth="2.5" strokeLinecap="round" style={{ transformOrigin: "-16px -128px" }} />
-        <path className="fw-loescher-lever" d="M4 -136 L34 -146" stroke="#343a40" strokeWidth="7" strokeLinecap="round" style={{ transformOrigin: "4px -136px" }} />
+        <path
+          className="fw-loescher-needle"
+          d="M-16 -128 l6 -5"
+          stroke={FIRE_RED}
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          style={{ transformOrigin: "-16px -128px" }}
+        />
+        <path
+          className="fw-loescher-lever"
+          d="M4 -136 L34 -146"
+          stroke="#343a40"
+          strokeWidth="7"
+          strokeLinecap="round"
+          style={{ transformOrigin: "4px -136px" }}
+        />
         <path d="M8 -128 Q50 -128 54 -102" stroke="#2b2d42" strokeWidth="7" fill="none" strokeLinecap="round" />
         <rect x="48" y="-106" width="14" height="12" rx="3" fill="#2b2d42" transform="rotate(-30 55 -100)" />
       </g>

@@ -54,7 +54,8 @@ export const STRETCH_CURL: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["arms", "torso", "shoulders"],
-    bodyMovement: "Das Kind streckt beide Arme lang nach vorn, macht den Rücken lang und neigt sich dabei etwas nach vorn, dann richtet es sich langsam wieder auf.",
+    bodyMovement:
+      "Das Kind streckt beide Arme lang nach vorn, macht den Rücken lang und neigt sich dabei etwas nach vorn, dann richtet es sich langsam wieder auf.",
     startingPose: "Stehen, Füße etwas auseinander.",
     movementSteps: ["Arme nach vorn strecken", "Rücken lang machen, leicht vorbeugen", "Langsam wieder aufrichten"],
     durationSeconds: 12,
@@ -141,7 +142,8 @@ export const STRETCH_CURL: Movement[] = [
     difficulty: "medium",
     bodyZone: "full_body",
     bodyParts: ["knees", "legs", "arms", "hands"],
-    bodyMovement: "Das Kind hockt sich klein hin, zählt mit herunter und schießt bei „Los“ schnell nach oben, Arme als Raketenspitze über dem Kopf – ein kurzer, kräftiger Moment, kein langsames Wachsen.",
+    bodyMovement:
+      "Das Kind hockt sich klein hin, zählt mit herunter und schießt bei „Los“ schnell nach oben, Arme als Raketenspitze über dem Kopf – ein kurzer, kräftiger Moment, kein langsames Wachsen.",
     startingPose: "In der Hocke, Hände über dem Kopf zur Spitze zusammen.",
     movementSteps: ["Klein in die Hocke", "Mitzählen: 3, 2, 1", "Bei „Los“ schnell groß machen", "Optional kleiner Hüpfer"],
     durationSeconds: 12,
@@ -189,7 +191,8 @@ export const STRETCH_CURL: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["knees", "legs", "torso", "arms"],
-    bodyMovement: "Das Kind macht sich am Boden ganz klein wie ein Samen und wächst dann sehr langsam, ohne Zählen und ohne Sprung, Stück für Stück zu einem großen Baum mit ausgebreiteten Armen.",
+    bodyMovement:
+      "Das Kind macht sich am Boden ganz klein wie ein Samen und wächst dann sehr langsam, ohne Zählen und ohne Sprung, Stück für Stück zu einem großen Baum mit ausgebreiteten Armen.",
     startingPose: "Ganz klein in der Hocke, Arme um die Knie.",
     movementSteps: ["Klein wie ein Samen", "Langsam aufrichten", "Arme als Äste ausbreiten", "Ruhig stehen bleiben"],
     durationSeconds: 20,
@@ -232,7 +235,8 @@ export const STRETCH_CURL: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["arms", "legs", "hands", "feet"],
-    bodyMovement: "Das Kind stellt die Beine breit und streckt die Arme schräg nach oben aus, sodass der Körper ein großer Stern ist, hält kurz und lässt dann locker.",
+    bodyMovement:
+      "Das Kind stellt die Beine breit und streckt die Arme schräg nach oben aus, sodass der Körper ein großer Stern ist, hält kurz und lässt dann locker.",
     startingPose: "Stehen, Füße zusammen.",
     movementSteps: ["Beine breit stellen", "Arme weit ausstrecken", "Kurz still halten", "Locker zusammenkommen"],
     durationSeconds: 10,
@@ -319,7 +323,8 @@ export const STRETCH_CURL: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["arms", "hands", "shoulders", "torso"],
-    bodyMovement: "Das Kind führt einen gestreckten Arm in einem großen Bogen von der einen Seite über den Kopf zur anderen Seite, als male es einen Regenbogen.",
+    bodyMovement:
+      "Das Kind führt einen gestreckten Arm in einem großen Bogen von der einen Seite über den Kopf zur anderen Seite, als male es einen Regenbogen.",
     startingPose: "Stehen, ein Arm unten zur Seite.",
     movementSteps: ["Arm unten zur Seite", "Großer Bogen über den Kopf", "Zur anderen Seite hinunter", "Mit dem anderen Arm zurück"],
     durationSeconds: 14,
@@ -362,7 +367,8 @@ export const STRETCH_CURL: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["arms", "legs", "torso"],
-    bodyMovement: "Das Kind macht drei Figuren nach, eine nach der anderen: ganz groß (Arme hoch), ganz breit (Arme und Beine weit) und ganz klein (in die Hocke).",
+    bodyMovement:
+      "Das Kind macht drei Figuren nach, eine nach der anderen: ganz groß (Arme hoch), ganz breit (Arme und Beine weit) und ganz klein (in die Hocke).",
     startingPose: "Locker stehen.",
     movementSteps: ["Ganz groß: Arme hoch", "Ganz breit: wie ein Stern", "Ganz klein: in die Hocke", "Wieder aufstehen"],
     durationSeconds: 12,

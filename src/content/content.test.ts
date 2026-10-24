@@ -46,7 +46,11 @@ describe.each(LANGUAGES.map((language) => [language.id, language] as const))("la
 
   test("every letter can be typed on the keyboard", () => {
     const keys = [...pack.keyboardRows.join("")];
-    for (const letter of pack.letters) expect(keys.some((key) => keyMatches(key, letter.upper, pack)), letter.upper).toBe(true);
+    for (const letter of pack.letters)
+      expect(
+        keys.some((key) => keyMatches(key, letter.upper, pack)),
+        letter.upper,
+      ).toBe(true);
   });
 
   test("numbers 0–9 have words", () => {

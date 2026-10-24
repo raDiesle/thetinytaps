@@ -98,7 +98,8 @@ export const TOOL_MIMICRY: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["hands", "arms", "knees", "torso"],
-    bodyMovement: "Das Kind beugt die Knie, schaufelt mit beiden Händen an einer gedachten Schaufel unten Sand, richtet sich auf und wirft ihn sanft zur Seite.",
+    bodyMovement:
+      "Das Kind beugt die Knie, schaufelt mit beiden Händen an einer gedachten Schaufel unten Sand, richtet sich auf und wirft ihn sanft zur Seite.",
     startingPose: "Stehen, Füße etwas auseinander, beide Hände an einer gedachten Schaufel.",
     movementSteps: ["In die Knie, Schaufel runter", "Sand aufnehmen", "Aufrichten", "Sanft zur Seite werfen"],
     durationSeconds: 15,
@@ -229,7 +230,8 @@ export const TOOL_MIMICRY: Movement[] = [
     difficulty: "easy",
     bodyZone: "arms",
     bodyParts: ["hands", "arms", "shoulders"],
-    bodyMovement: "Das Kind schlägt mit beiden flachen Händen abwechselnd oder gleichzeitig auf eine große gedachte Trommel vor sich, mal kräftig und laut, mal ganz sanft und leise.",
+    bodyMovement:
+      "Das Kind schlägt mit beiden flachen Händen abwechselnd oder gleichzeitig auf eine große gedachte Trommel vor sich, mal kräftig und laut, mal ganz sanft und leise.",
     startingPose: "Stehen, Hände in Bauchhöhe über der Trommel.",
     movementSteps: ["Hände über die Trommel", "Laut trommeln", "Leise trommeln", "Mit einem großen Schlag enden"],
     durationSeconds: 15,
@@ -273,7 +275,8 @@ export const TOOL_MIMICRY: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["hands", "arms", "shoulders"],
-    bodyMovement: "Das Kind hält mit beiden Händen eine gedachte Drachenschnur hoch über dem Kopf und zieht sanft in kleinen Rucken nach unten, dann lässt es wieder nach.",
+    bodyMovement:
+      "Das Kind hält mit beiden Händen eine gedachte Drachenschnur hoch über dem Kopf und zieht sanft in kleinen Rucken nach unten, dann lässt es wieder nach.",
     startingPose: "Stehen, beide Hände halten die Schnur über dem Kopf.",
     movementSteps: ["Schnur mit beiden Händen hoch halten", "Sanft ein bisschen ziehen", "Wieder nachlassen", "Hochschauen"],
     durationSeconds: 15,
@@ -316,7 +319,8 @@ export const TOOL_MIMICRY: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["hands", "arms", "knees"],
-    bodyMovement: "Das Kind hält mit beiden Händen den Griff einer gedachten Luftpumpe und drückt ihn nach unten, wobei es leicht in die Knie geht, und zieht ihn wieder hoch.",
+    bodyMovement:
+      "Das Kind hält mit beiden Händen den Griff einer gedachten Luftpumpe und drückt ihn nach unten, wobei es leicht in die Knie geht, und zieht ihn wieder hoch.",
     startingPose: "Stehen, beide Fäuste vor der Brust am Pumpengriff.",
     movementSteps: ["Griff mit beiden Händen fassen", "Runter drücken: „Pfff“", "Wieder hochziehen", "Weiterpumpen"],
     durationSeconds: 15,

@@ -75,6 +75,9 @@ export type FeelingId = "sad" | "angry" | "tired" | "scared";
 
 export interface Feeling {
   id: FeelingId;
+  /** For the grown-ups' choice on the start screen. */
+  emoji: string;
+  title: string;
   /** Read aloud with the question. */
   intro: string;
   comforts: ComfortId[];
@@ -85,24 +88,32 @@ export interface Feeling {
 export const FEELINGS: Feeling[] = [
   {
     id: "sad",
+    emoji: "😢",
+    title: "Traurig",
     intro: "Der Bär ist traurig. Er weint.",
     comforts: ["hug", "teddy", "stroke"],
     end: { narration: "Jetzt ist der Bär wieder fröhlich!", line: "Danke!" },
   },
   {
     id: "angry",
+    emoji: "😠",
+    title: "Wütend",
     intro: "Der Bär ist wütend! Sein Turm ist umgefallen.",
     comforts: ["stomp", "blow", "hug"],
     end: { narration: "Die Wut ist weg. Der Bär ist wieder ruhig.", line: "Danke!" },
   },
   {
     id: "tired",
+    emoji: "😴",
+    title: "Müde",
     intro: "Der Bär ist müde. Er gähnt.",
     comforts: ["blanket", "teddy", "lullaby"],
     end: { narration: "Der Bär schläft glücklich ein. Gute Nacht!", line: "Gute Nacht …" },
   },
   {
     id: "scared",
+    emoji: "😨",
+    title: "Angst",
     intro: "Der Bär hat Angst. Es donnert!",
     comforts: ["hand", "light", "hug"],
     end: { narration: "Das Gewitter ist vorbei. Der Bär lacht wieder!", line: "Danke!" },

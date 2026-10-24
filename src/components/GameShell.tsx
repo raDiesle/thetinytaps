@@ -5,14 +5,7 @@ import { de } from "@/content/de";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
-import {
-  DEFAULT_PLAYTIME_SETTINGS,
-  isPlaytimeOver,
-  playedToday,
-  PLAYTIME_SETTINGS_KEY,
-  resetPlaytime,
-  usePlaytime,
-} from "@/lib/playtime";
+import { DEFAULT_PLAYTIME_SETTINGS, isPlaytimeOver, playedToday, PLAYTIME_SETTINGS_KEY, resetPlaytime, usePlaytime } from "@/lib/playtime";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useStoredSettings } from "@/lib/storage";
@@ -59,18 +52,7 @@ interface GameShellProps {
  * fullscreen + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({
-  title,
-  emoji,
-  modes,
-  mode,
-  onMode,
-  level,
-  settings,
-  children,
-  backHref,
-  backLabel,
-}: GameShellProps) {
+export function GameShell({ title, emoji, modes, mode, onMode, level, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const category = categoryOf(location.pathname);
   const back = backHref ?? (category ? categoryHref(category) : "/");
@@ -195,7 +177,7 @@ export function GameShell({
           </ul>
         </section>
       ) : (
-        <button className="start-button" onClick={start}>
+        <button type="button" className="start-button" onClick={start}>
           <span className="start-icon" aria-hidden>
             ▶
           </span>

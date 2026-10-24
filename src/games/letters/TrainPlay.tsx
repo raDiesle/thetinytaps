@@ -190,16 +190,10 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const empty = wagons.length === 0 && phase === "waiting";
 
   return (
-    <div
-      className={`letters-play train-play`}
-      style={{ background: BACKGROUND }}
-      onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
-    >
+    <div className={`letters-play train-play`} style={{ background: BACKGROUND }} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
       <div className="stage">
         <div className="train-scene">
-          <p className={`letters-welcome train-hint${empty ? "" : " gone"}`}>
-            {touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}
-          </p>
+          <p className={`letters-welcome train-hint${empty ? "" : " gone"}`}>{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>
           <div key={trainId} className={`train ${phase}`}>
             <Engine moving={phase !== "waiting"} onPointerDown={tapEngine} />
             {Array.from({ length: TRAIN_LENGTH }, (_, i) => {
@@ -224,13 +218,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
           <div className="rails" aria-hidden />
         </div>
       </div>
-      {touchKeys && (
-        <TouchKeyboard
-          rows={rows}
-          onKey={pressKey}
-          label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)}
-        />
-      )}
+      {touchKeys && <TouchKeyboard rows={rows} onKey={pressKey} label={(key) => (settings.letterCase === "lower" ? toLower(key, pack) : key)} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

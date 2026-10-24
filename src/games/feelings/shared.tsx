@@ -90,11 +90,7 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
   return (
     <div className="fg-floaters" aria-hidden>
       {floaters.map((f, i) => (
-        <span
-          key={f.id}
-          className="fg-floater"
-          style={{ left: `${f.x}%`, bottom: `${f.y}%`, "--i": i % 4, "--float-ms": `${FLOAT_MS}ms` } as CSSProperties}
-        >
+        <span key={f.id} className="fg-floater" style={{ left: `${f.x}%`, bottom: `${f.y}%`, "--i": i % 4, "--float-ms": `${FLOAT_MS}ms` } as CSSProperties}>
           {f.emoji}
         </span>
       ))}

@@ -20,7 +20,13 @@ export function DinoEye({ cx, cy, r, skin, look = 0 }: { cx: number; cy: number;
       <circle cx={px - r * 0.2} cy={cy + r * 0.28} r={r * 0.1} fill="#fff" />
       <g className="dt-lid">
         <circle cx={cx} cy={cy} r={r * 1.12} fill={skin} />
-        <path d={`M${cx - r * 0.8} ${cy} Q${cx} ${cy + r * 0.7} ${cx + r * 0.8} ${cy}`} stroke={PUPIL} strokeWidth={Math.max(1.4, r * 0.28)} strokeLinecap="round" fill="none" />
+        <path
+          d={`M${cx - r * 0.8} ${cy} Q${cx} ${cy + r * 0.7} ${cx + r * 0.8} ${cy}`}
+          stroke={PUPIL}
+          strokeWidth={Math.max(1.4, r * 0.28)}
+          strokeLinecap="round"
+          fill="none"
+        />
       </g>
     </>
   );

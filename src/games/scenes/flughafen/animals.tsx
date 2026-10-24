@@ -96,7 +96,15 @@ export function Hund() {
     <g className="fh-hund-body" style={{ transformOrigin: "-140px 0px" }}>
       <path d="M-92 -62 Q-30 -30 32 -104" stroke={RAIL_RED} strokeWidth="4" fill="none" strokeLinecap="round" />
       <g transform="translate(-140 0)">
-        <path className="fh-hund-tail" d="M-56 -62 Q-80 -78 -74 -100" stroke="#fff" strokeWidth="10" strokeLinecap="round" fill="none" style={{ transformOrigin: "-56px -62px" }} />
+        <path
+          className="fh-hund-tail"
+          d="M-56 -62 Q-80 -78 -74 -100"
+          stroke="#fff"
+          strokeWidth="10"
+          strokeLinecap="round"
+          fill="none"
+          style={{ transformOrigin: "-56px -62px" }}
+        />
         {[-48, -26, 24, 44].map((x) => (
           <g key={x}>
             <rect x={x - 7} y="-44" width="14" height="40" rx="6" fill={x < 0 ? "#e9ecef" : "#f8f9fa"} />

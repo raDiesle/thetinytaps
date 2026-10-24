@@ -1,0 +1,91 @@
+/* Loaded for the whole app: src/globals.css imports it in order, so the cascade stays the same. */
+
+/* ---------- Wo ist das B? ---------- */
+
+/* The letter to look for, drawn like a key on the keyboard. */
+.find-key {
+  display: flex;
+  gap: 0.25em;
+  padding: 0.08em 0.3em;
+  border: 0.05em solid var(--ink);
+  border-radius: 0.2em;
+  background: #fff;
+  box-shadow: 0 0.09em 0 var(--ink);
+  font-size: min(20cqh, 26cqw);
+  font-weight: 800;
+  line-height: 1;
+  animation: waiting 1.8s ease-in-out infinite;
+}
+
+.find-key span:nth-child(2) {
+  color: var(--accent);
+}
+
+.find-key.nudge {
+  animation:
+    shake 0.4s ease-in-out,
+    waiting 1.8s ease-in-out 0.4s infinite;
+}
+
+/* Found: the key is pressed down and lights up. */
+.find-card.done .find-key {
+  background: var(--accent);
+  color: #fff;
+  transform: translateY(0.07em);
+  box-shadow: 0 0.02em 0 var(--ink);
+  animation: none;
+}
+
+.find-card.done .find-key span:nth-child(2) {
+  color: #fff;
+}
+
+.find-card.done .picture {
+  animation: hop 0.5s ease-in-out 3;
+}
+
+/* A small picture of the real keyboard; keeps its space so the card doesn't jump when it appears. */
+.keyboard-map {
+  --key: min(calc((100vw - 40px) / (var(--keys) + 1.5)), 46px);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--key) * 0.12);
+  width: fit-content;
+  margin: 0 auto;
+  padding: 12px 16px max(14px, env(safe-area-inset-bottom));
+  visibility: hidden;
+}
+
+.keyboard-map.shown {
+  visibility: visible;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.keyboard-map-row {
+  display: flex;
+  gap: calc(var(--key) * 0.12);
+  padding-left: calc(var(--offset) * var(--key));
+}
+
+.keyboard-map-key {
+  display: grid;
+  place-items: center;
+  width: var(--key);
+  height: var(--key);
+  border: 2px solid #2b2d4240;
+  border-radius: calc(var(--key) * 0.2);
+  background: #ffffffb0;
+  color: #2b2d4280;
+  font-size: calc(var(--key) * 0.45);
+  font-weight: 700;
+}
+
+.keyboard-map-key.lit {
+  border: 3px solid var(--ink);
+  background: var(--accent);
+  color: #fff;
+  box-shadow:
+    0 0 0 4px #fff,
+    0 0 18px 8px var(--accent);
+  animation: waiting 1.2s ease-in-out infinite;
+}
