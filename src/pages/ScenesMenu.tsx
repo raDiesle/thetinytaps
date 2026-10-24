@@ -1,9 +1,12 @@
 import { Link } from "react-router";
 import { GameCard } from "@/components/GameCard";
 import { Sky } from "@/components/Sky";
+import { categoryHref, categoryOf } from "@/content/games";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useTitle } from "@/lib/title";
+
+const CATEGORY = categoryOf("/bilder/");
 
 export function ScenesMenu() {
   useTitle("Lebendige Bilder");
@@ -11,8 +14,8 @@ export function ScenesMenu() {
   return (
     <main className="home">
       <Sky />
-      <Link to="/" className="back-link">
-        ← Alle Spiele
+      <Link to={CATEGORY ? categoryHref(CATEGORY) : "/"} className="back-link">
+        ← {CATEGORY?.title ?? "Alle Spiele"}
       </Link>
       <h1 className="menu-title">
         <span aria-hidden>🖼️</span> Lebendige Bilder

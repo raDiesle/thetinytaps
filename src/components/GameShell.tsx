@@ -2,6 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
+import { categoryHref, categoryOf } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import {
@@ -60,7 +61,7 @@ interface GameShellProps {
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
   children: ReactNode;
-  /** Where the start screen's back link leads. */
+  /** Where the start screen's back link leads; by default the game's category on the home menu. */
   backHref?: string;
   backLabel?: string;
   /** This is the child-friendly home page itself: its exit leaves kid mode for good. */
@@ -81,11 +82,14 @@ export function GameShell({
   level,
   settings,
   children,
-  backHref = "/",
-  backLabel = "Alle Spiele",
+  backHref,
+  backLabel,
   kidHome = false,
 }: GameShellProps) {
   const location = useLocation();
+  const category = categoryOf(location.pathname);
+  const back = backHref ?? (category ? categoryHref(category) : "/");
+  const backText = backLabel ?? category?.title ?? "Alle Spiele";
   const navigate = useNavigate();
   const kidMode = isKidState(location.state);
   const [playing, setPlaying] = useState(kidMode);
@@ -173,8 +177,8 @@ export function GameShell({
   return (
     <main className="start-screen">
       <Sky />
-      <Link to={backHref} className="back-link">
-        ← {backLabel}
+      <Link to={back} className="back-link">
+        ← {backText}
       </Link>
       <h1 className="menu-title">
         <span aria-hidden>{emoji}</span> {title}

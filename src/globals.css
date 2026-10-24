@@ -232,6 +232,12 @@ html:has(.play-area) body {
   font-weight: 600;
 }
 
+/* Under a short menu title the subtitle still starts its own line. */
+.menu-title + .home-subtitle {
+  display: table;
+  margin-inline: auto;
+}
+
 .game-list {
   list-style: none;
   margin: 0;

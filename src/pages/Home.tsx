@@ -6,22 +6,9 @@ import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
+import { CATEGORIES, categoryHref } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useTitle } from "@/lib/title";
-
-const GAMES = [
-  { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
-  { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
-  { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
-  { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen" },
-  { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
-  { href: "/schatten/", emoji: "👤", title: "Schatten finden" },
-  { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise" },
-  { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
-  { href: "/aufzug/", emoji: "🛗", title: "Aufzug" },
-  { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
-  { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
-];
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
 const IDEAS_HOLD_MS = 2000;
@@ -29,7 +16,7 @@ const IDEAS_HOLD_MS = 2000;
 export function Home() {
   useTitle();
   const navigate = useNavigate();
-  const grid = useFitGrid(GAMES.length);
+  const grid = useFitGrid(CATEGORIES.length);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const beginHold = () => {
@@ -56,9 +43,9 @@ export function Home() {
       />
       <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
-        {GAMES.map((g) => (
-          <li key={g.title}>
-            <GameCard {...g} />
+        {CATEGORIES.map((c) => (
+          <li key={c.id}>
+            <GameCard href={categoryHref(c)} emoji={c.emoji} title={c.title} />
           </li>
         ))}
       </ul>

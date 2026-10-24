@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { AnimalsPage } from "@/pages/AnimalsPage";
+import { CategoryPage } from "@/pages/CategoryPage";
 import { ElevatorPage } from "@/pages/ElevatorPage";
 import { FeelingsPage } from "@/pages/FeelingsPage";
 import { Home } from "@/pages/Home";
@@ -22,6 +23,7 @@ export function App() {
   return (
     <Routes>
       <Route index element={<Home />} />
+      <Route path="spiele/:category" element={<CategoryPage />} />
       <Route path="buchstaben" element={<LettersPage />} />
       <Route path="woerter" element={<WordsPage />} />
       <Route path="tiere" element={<AnimalsPage />} />
