@@ -11,13 +11,19 @@ Auswahl-Karten. Fehlt ein Bild, bleibt die Stelle leer.
   die Frames im Wechsel ineinander über, wie ein kleines GIF. Die Karten zeigen nur
   den ersten Frame.
 
-Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`, Modell Nano Banana 2 Lite – das günstigste, 1K reicht):
+Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`, Modell Nano Banana 2 Lite – das günstigste, 1K reicht; läuft als Batch zum halben Preis, das Skript wartet, bis die Bilder da sind):
 
 ```
 yarn image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --quality 65 --ref src/games/feelings/bilder/push-2.webp
 ```
 
-Zweiter Frame: das erste Bild als Referenz mitgeben und nur die Bewegung beschreiben:
+Neues bewegtes Bild: beide Frames in einem Auftrag (zum halben Preis pro Frame, und sie passen besser zusammen):
+
+```
+yarn image src/games/feelings/bilder/push-1.webp,src/games/feelings/bilder/push-1-b.webp "<Stilblock> <Figuren> The two panels are two frames of a tiny animation: same scene, framing, sizes and colours; only the small movement differs." --grid 1x2 --aspect 4:3 --size 1200x900 --quality 65 --panel "<Bild>" --panel "Exactly the same as panel 1, but <Bewegung>"
+```
+
+Zweiter Frame zu einem Bild, das es schon gibt: das erste Bild als Referenz mitgeben und nur die Bewegung beschreiben:
 
 ```
 yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters, clothes, colours, background, camera framing, composition, line style and sizes. Change only this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
