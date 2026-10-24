@@ -1118,7 +1118,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         id: "X-04",
         emoji: "🙈",
         title: "Wer schaut da raus?",
-        text: "Bei Schatten finden: Nur ein Stück schaut hinter einem Busch hervor (Ohren, Schwanz, Rüssel). Wer ist das? Antippen – das ganze Tier kommt heraus.",
+        text: "Bei Was gehört zum Tier?: Nur ein Stück schaut hinter einem Busch hervor (Ohren, Schwanz, Rüssel). Wer ist das? Antippen – das ganze Tier kommt heraus.",
         why: "Aus einem Teil das Ganze erkennen; nächste Stufe nach den Schatten.",
         effort: "M",
         done: true,
