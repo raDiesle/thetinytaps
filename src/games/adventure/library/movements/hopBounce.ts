@@ -206,7 +206,7 @@ export const HOP_BOUNCE: Movement[] = [
   },
   {
     id: "stone_jump",
-    name: "Von Stein zu Stein springen",
+    name: "Über die Brücke hüpfen",
     category: "hop_bounce",
     ageRange: { min: 2, max: 4 },
     difficulty: "medium",
@@ -226,17 +226,17 @@ export const HOP_BOUNCE: Movement[] = [
     instruction: "Hopp, hopp – und Kopf hoch!",
     motion: "jump",
     demonstration:
-      "Der Guide wird von der Seite gezeigt wie in einem Hüpfspiel: Er springt von Stein zu Stein über den Bach, und über jedem zweiten Stein schwebt eine Kiste, an die er beim dritten Sprung von unten mit dem Kopf stößt. Erst springt er allein, dann im gemeinsamen Takt.",
+      "Der Guide wird von der Seite gezeigt wie in einem Hüpfspiel: Er hüpft über eine kleine Holzbrücke über den Bach, und über jedem zweiten Sprung schwebt eine Kiste, an die er beim dritten Sprung von unten mit dem Kopf stößt. Erst springt er allein, dann im gemeinsamen Takt.",
     scenario: {
       world: "pirate_island",
-      setup: "Ein Bach mit flachen Steinen versperrt den Weg; über den Steinen schweben Holzkisten mit einem goldenen Stern.",
-      trigger: "Der nächste Stein glitzert, die Kiste darüber wackelt.",
-      reaction: "Bei jedem Sprung landet der Guide auf dem nächsten Stein, es spritzt; stößt er an eine Kiste, hüpft sie hoch und ein goldener Stern springt heraus.",
+      setup: "Eine kleine Holzbrücke führt über den Bach; über der Brücke schweben Holzkisten mit einem goldenen Stern.",
+      trigger: "Die nächste Kiste über der Brücke wackelt.",
+      reaction: "Bei jedem Sprung landet der Guide ein Stück weiter auf der Brücke, die Bretter federn; stößt er an eine Kiste, hüpft sie hoch und ein goldener Stern springt heraus.",
       payoff: "Am anderen Ufer funkeln alle Sterne zusammen über dem Bach.",
     },
     audio: {
       voiceCue: "Hopp, hopp – bumm!",
-      soundEffects: ["Platschen", "Bumm an der Kiste", "Glitzern"],
+      soundEffects: ["Bumm an der Kiste", "Glitzern"],
       musicSync: true,
     },
     visualDirection: { camera: "follow", movementDirection: "up", intensity: "lively" },

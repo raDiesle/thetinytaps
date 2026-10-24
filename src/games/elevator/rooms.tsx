@@ -487,7 +487,7 @@ export function Terrasse({ playing, used, taps }: RoomProps) {
       <Plant x={430} size={0.7} pot="#f08c00" />
       <Floorboards colour="#c88b3a" line="#a0662f" />
       <g transform="translate(640 0)">
-        <Table feast={feast} pancakes={3 - count(taps, "bite")} jam={count(taps, "spread")} open={count(taps, "lid") > 0} />
+        <Table feast={feast} jam={count(taps, "spread")} bites={count(taps, "bite")} open={count(taps, "lid") > 0} />
       </g>
     </>
   );

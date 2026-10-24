@@ -155,8 +155,25 @@
   animation: el-build 1.2s ease-in-out infinite;
 }
 
+/* Eating: sitting with dangling legs; the fork comes to the mouth in time with the munching, and the eyes close: mmh. */
 .pose-eat .el-arm-r {
-  animation: el-feed 0.75s ease-in-out infinite alternate;
+  animation: el-feed 1.5s ease-in-out -0.3s infinite;
+}
+
+.pose-eat .el-lids {
+  animation: el-savour 1.5s linear -0.3s infinite;
+}
+
+.pose-eat .el-leg-l,
+.pose-sit .el-leg-l,
+.pose-serve .el-leg-l {
+  animation: el-dangle 0.8s ease-in-out infinite alternate;
+}
+
+.pose-eat .el-leg-r,
+.pose-sit .el-leg-r,
+.pose-serve .el-leg-r {
+  animation: el-dangle 0.8s ease-in-out infinite alternate-reverse;
 }
 
 .pose-drink .el-arm-r {
@@ -236,6 +253,19 @@
   transform-box: fill-box;
   transform-origin: center;
   animation: el-blink 0.9s ease-in-out infinite;
+}
+
+/* The pancake on each plate: each bite takes a piece, then only crumbs are left; little hearts rise meanwhile. */
+.el-bite,
+.el-crumbs {
+  animation: el-appear 0.15s ease-out both;
+}
+
+.el-yum {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-zzz 1.6s ease-out infinite;
 }
 
 .cooking-pot .el-pot-lid {
@@ -639,11 +669,46 @@
 }
 
 @keyframes el-feed {
-  from {
+  0%,
+  100% {
+    transform: rotate(40deg);
+  }
+  40%,
+  70% {
     transform: rotate(0deg);
   }
+}
+
+@keyframes el-savour {
+  0%,
+  42% {
+    opacity: 0;
+  }
+  46%,
+  70% {
+    opacity: 1;
+  }
+  74%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes el-dangle {
+  from {
+    transform: rotate(-10deg);
+  }
   to {
-    transform: rotate(18deg);
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes el-appear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 

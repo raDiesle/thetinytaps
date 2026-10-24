@@ -112,6 +112,10 @@ const SHIN = 0.24;
 const FOOT = 0.07;
 const UPPER_ARM = 0.21;
 const FOREARM = 0.19;
+/** Where a paw holds a bar (hand space): in front of the palm, resting on the curled fingers. */
+const GRIP = new THREE.Vector3(0, -0.045, 0.04);
+/** How far the fingers curl round a bar they hold (rad). */
+const GRIP_CURL = 1.75;
 
 const FUR = "#f08a3c";
 const CREAM = "#fff4e2";
@@ -149,6 +153,7 @@ interface Arm {
   elbow: THREE.Group;
   /** The four fingers, each turning at its knuckle. */
   fingers: THREE.Group[];
+  hand: THREE.Group;
 }
 
 interface Leg {
@@ -177,6 +182,8 @@ export class Guide {
   /** The hands, e.g. to hold a paddle or a rope. */
   readonly handL = new THREE.Group();
   readonly handR = new THREE.Group();
+  /** On top of the thighs while sitting, e.g. for a paddle lying across them; x to the fox's left. */
+  readonly lap = new THREE.Group();
   private talking = false;
   private readonly contour: Contour;
   /** How much moving body parts glow (0..1); the story turns it up during a movement. */
@@ -411,7 +418,7 @@ export class Guide {
       thumb.add(thumbTip);
       hand.add(thumb);
       this.spine.add(shoulder);
-      return { shoulder, upper, elbow, fingers };
+      return { shoulder, upper, elbow, fingers, hand };
     };
     this.armL = makeArm(1, this.handL);
     this.armR = makeArm(-1, this.handR);
@@ -444,6 +451,9 @@ export class Guide {
     };
     this.legL = makeLeg(1);
     this.legR = makeLeg(-1);
+    // Over the thighs halfway to the knees, as they lie when sitting (thighs forward).
+    this.lap.position.set(0, 0.075, 0.19);
+    this.hips.add(this.lap);
 
     const parts: [THREE.Object3D, ContourPart][] = [
       [this.armL.shoulder, "armL"],
@@ -556,7 +566,7 @@ export class Guide {
       a.elbow.rotation.x = -pose.elbow;
       // Fingers close together while the arm hangs, and spread wide once it reaches out or up.
       const open = THREE.MathUtils.smoothstep(pose.raise + pose.spread, 0.5, 1.8);
-      a.fingers.forEach((finger, i) => (finger.rotation.z = (i - 1.5) * (0.1 + open * 0.2)));
+      a.fingers.forEach((finger, i) => finger.rotation.set(0, 0, (i - 1.5) * (0.1 + open * 0.2)));
     };
     arm(this.armL, p.armL, 1);
     arm(this.armR, p.armR, -1);
@@ -597,6 +607,52 @@ export class Guide {
     this.laugh.scale.set(1, laughOpen, 1);
 
     this.glowMoving(p, time);
+  }
+
+  /** Where a paw would hold a bar right now, in world space. */
+  gripPoint(hand: "L" | "R", out: THREE.Vector3) {
+    return (hand === "L" ? this.handL : this.handR).localToWorld(out.copy(GRIP));
+  }
+
+  /**
+   * Puts a paw on a bar: `target` (world space) comes to lie in the paw, the bar runs along `along`
+   * and the fingers close round it. The arm bends in the plane across the bar, the elbow down and
+   * back. `weight` blends from the pose (0) to holding on (1). Called after apply(), every frame.
+   */
+  hold(hand: "L" | "R", target: THREE.Vector3, along: THREE.Vector3, weight: number) {
+    if (weight <= 0) return;
+    const a = hand === "L" ? this.armL : this.armR;
+    const side = hand === "L" ? 1 : -1;
+    // In the space of the body the shoulder hangs from, in the fox's own units.
+    this.spine.updateWorldMatrix(true, false);
+    const toBody = new THREE.Matrix4().copy(this.spine.matrixWorld).invert();
+    const reach = new THREE.Vector3().copy(target).applyMatrix4(toBody).sub(a.shoulder.position);
+    const bar = new THREE.Vector3().copy(along).transformDirection(toBody);
+    // The paw holds the bar a little in front of the forearm's line.
+    const forearm = Math.hypot(FOREARM - GRIP.y, GRIP.z);
+    const offset = Math.atan2(GRIP.z, FOREARM - GRIP.y);
+    const dist = THREE.MathUtils.clamp(reach.length(), Math.abs(UPPER_ARM - forearm) + 0.001, UPPER_ARM + forearm - 0.001);
+    const dir = reach.normalize();
+    const across = bar.addScaledVector(dir, -bar.dot(dir));
+    if (across.lengthSq() < 1e-6) across.set(1, 0, 0);
+    across.normalize();
+    const toElbow = new THREE.Vector3().crossVectors(across, dir);
+    if (toElbow.dot(new THREE.Vector3(side * 0.3, -1, -0.6)) < 0) toElbow.negate();
+    const cosShoulder = (UPPER_ARM ** 2 + dist ** 2 - forearm ** 2) / (2 * UPPER_ARM * dist);
+    const cosElbow = (UPPER_ARM ** 2 + forearm ** 2 - dist ** 2) / (2 * UPPER_ARM * forearm);
+    const shoulderAngle = Math.acos(THREE.MathUtils.clamp(cosShoulder, -1, 1));
+    const bend = Math.max(0, Math.PI - Math.acos(THREE.MathUtils.clamp(cosElbow, -1, 1)) - offset);
+    const upperDir = dir.clone().multiplyScalar(Math.cos(shoulderAngle)).addScaledVector(toElbow, Math.sin(shoulderAngle));
+    // The upper arm hangs along -y and the elbow bends it towards +z: towards where the paw goes.
+    const y = upperDir.clone().negate();
+    const z = dir.addScaledVector(upperDir, -dir.dot(upperDir)).normalize();
+    const x = new THREE.Vector3().crossVectors(y, z);
+    const held = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(x, y, z));
+    a.shoulder.quaternion.multiply(a.upper.quaternion).slerp(held, weight);
+    a.upper.quaternion.identity();
+    a.elbow.rotation.x += (-bend - a.elbow.rotation.x) * weight;
+    for (const finger of a.fingers) finger.rotation.x = -GRIP_CURL * weight;
+    a.shoulder.updateMatrixWorld(true);
   }
 
   /** Lets the parts that move right now glow, so the movement stands out. */

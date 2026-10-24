@@ -1,0 +1,1854 @@
+/* Animations of the scene Herbst. Durations match durationMs in Herbst.tsx. Sun and cloud: ../sky.css, the pumpkin: kuerbis.css. */
+
+/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
+
+.scene.lively .he-cloud {
+  animation: he-drift 30s ease-in-out infinite alternate;
+}
+
+.scene.lively .he-cloud-slow {
+  animation-duration: 44s;
+}
+
+.scene.lively .he-drachen-fly {
+  animation: he-idle-sway 5s ease-in-out infinite alternate;
+}
+
+.scene.lively .he-windrad-blades {
+  animation: he-idle-spin 6s linear infinite;
+}
+
+.scene.lively .he-hund-tail {
+  animation: he-wag 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes he-drift {
+  to {
+    transform: translateX(90px);
+  }
+}
+
+@keyframes he-idle-sway {
+  from {
+    transform: rotate(-2deg);
+  }
+  to {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes he-idle-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* ---------- Resting state ---------- */
+
+/* Puffs, leaves, notes, drops and sparkles only show while their item plays, and can't be tapped meanwhile. */
+.he-wind-leaf,
+.he-kb-nut,
+.he-kb-leaf,
+.he-ahorn-fall,
+.he-ahorn-leaf,
+.he-kastanie-sparkle circle,
+.he-hoernchen-crumbs circle,
+.he-kraehe-call,
+.he-amsel-note,
+.he-amsel-berry,
+.he-schnecke-drops path,
+.he-maedchen-drops circle,
+.he-laterne-note,
+.he-laterne-mouth,
+.he-opa-leaf,
+.he-oma-note,
+.he-pile-leaf,
+.he-pfuetze-rings ellipse,
+.he-pfuetze-drops circle,
+.he-stiefel-drops path,
+.he-pilz-sparkle path,
+.he-trak-puff,
+.he-windrad-gust,
+.he-katze-blink,
+.he-schuppen-light {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The kite string is only drawn, taps go through it. */
+.he-drachen-string {
+  pointer-events: none;
+}
+
+/* The worm hides in its apple; only the top of its head peeks out. */
+.he-wurm {
+  transform: translateY(34px);
+}
+
+/* Parts that turn or grow around their own middle. */
+.he-wind-leaf,
+.he-kb-leaf,
+.he-kb-nut,
+.he-ahorn-leaf,
+.he-opa-leaf,
+.he-pile-leaf,
+.he-schuppen-roofleaf,
+.he-pfuetze-rings ellipse,
+.he-pfuetze-drops circle,
+.he-maedchen-drops circle,
+.he-amsel-note,
+.he-laterne-note,
+.he-oma-note,
+.he-pilz-sparkle path,
+.he-trak-puff,
+.he-netz-dew,
+.he-kastanie-sparkle circle,
+.he-hoernchen-crumbs circle,
+.he-drachen-bow,
+.he-kraehe-call,
+.he-laterne-light,
+.he-laterne-mouth,
+.he-wurm-hat,
+.he-maedchen-tails ellipse {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.he-korb-handle {
+  transform-origin: 0px -50px;
+}
+
+/* ---------- Shared keyframes ---------- */
+
+@keyframes he-spin-back {
+  to {
+    transform: rotate(-1turn);
+  }
+}
+
+@keyframes he-puff {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-10px, -40px) scale(1.6);
+  }
+}
+
+@keyframes he-leaf-fall {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(30px, 110px) rotate(140deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-20px, 220px) rotate(300deg);
+  }
+}
+
+@keyframes he-note {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-10px, -34px);
+  }
+}
+
+@keyframes he-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.3) rotate(45deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.6) rotate(90deg);
+  }
+}
+
+@keyframes he-drip {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+@keyframes he-nod {
+  50% {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes he-tilt {
+  25% {
+    transform: rotate(-7deg);
+  }
+  75% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes he-wag {
+  to {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes he-flap {
+  to {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes he-show {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Wind: puffs its cheeks, gusts shoot out and blow leaves away ---------- */
+
+.item-herbstwind.playing .he-wind-body {
+  animation: he-wind-puff 2.4s ease-in-out;
+}
+
+.item-herbstwind.playing .he-wind-cheeks {
+  animation: he-wind-cheeks 1.2s ease-in-out 2;
+}
+
+.item-herbstwind.playing .he-wind-mouth {
+  animation: he-wind-mouth 0.6s ease-in-out 4;
+}
+
+.item-herbstwind.playing .he-wind-gust {
+  animation: he-wind-gust 1.1s ease-out calc(var(--i) * 0.12s) 2;
+}
+
+.item-herbstwind.playing .he-wind-leaf {
+  animation: he-wind-leaf 1.5s ease-out calc(0.4s + var(--i) * 0.15s);
+}
+
+@keyframes he-wind-puff {
+  25% {
+    transform: scale(1.08);
+  }
+  45% {
+    transform: translateX(8px) scale(0.94, 1.04);
+  }
+  65% {
+    transform: scale(1.06);
+  }
+  82% {
+    transform: translateX(4px) scale(0.96, 1.03);
+  }
+}
+
+@keyframes he-wind-cheeks {
+  50% {
+    transform: scale(1.5);
+  }
+}
+
+@keyframes he-wind-mouth {
+  50% {
+    transform: scale(1.4, 0.8);
+  }
+}
+
+@keyframes he-wind-gust {
+  0%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  50% {
+    opacity: 0;
+    transform: translateX(70px);
+  }
+  51% {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+@keyframes he-wind-leaf {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(280px, calc(var(--i) * 16px - 20px)) rotate(540deg);
+  }
+}
+
+/* ---------- Wildgänse: flap and glide in a wave ---------- */
+
+.item-wildgaense.playing .he-gaense-fly {
+  animation: he-gaense-fly 2.4s ease-in-out;
+}
+
+.item-wildgaense.playing .he-gans-wing {
+  animation: he-gans-flap 0.3s ease-in-out calc(var(--i) * -0.1s) 8 alternate;
+}
+
+.item-wildgaense.playing .he-gans-head {
+  animation: he-nod 0.4s ease-in-out calc(0.3s + var(--i) * 0.1s) 3;
+}
+
+@keyframes he-gaense-fly {
+  25% {
+    transform: translate(-30px, -16px);
+  }
+  50% {
+    transform: translate(-50px, 0);
+  }
+  75% {
+    transform: translate(-26px, 12px);
+  }
+}
+
+@keyframes he-gans-flap {
+  to {
+    transform: scaleY(-0.7);
+  }
+}
+
+/* ---------- Drachen: sways on its string, wiggles, the tail and bows wave ---------- */
+
+.item-herbstdrachen.playing .he-drachen-fly {
+  animation: he-drachen-sway 2.6s ease-in-out;
+}
+
+.item-herbstdrachen.playing .he-drachen-kite {
+  animation: he-drachen-wiggle 0.65s ease-in-out 4;
+}
+
+.item-herbstdrachen.playing .he-drachen-tail {
+  animation: he-drachen-tail 0.65s ease-in-out 4;
+}
+
+.item-herbstdrachen.playing .he-drachen-bow {
+  animation: he-drachen-bow 0.4s ease-in-out calc(var(--i) * 0.1s) 6 alternate;
+}
+
+@keyframes he-drachen-sway {
+  25% {
+    transform: rotate(-6deg);
+  }
+  55% {
+    transform: rotate(5deg);
+  }
+  80% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes he-drachen-wiggle {
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes he-drachen-tail {
+  25% {
+    transform: skewX(14deg);
+  }
+  75% {
+    transform: skewX(-14deg);
+  }
+}
+
+@keyframes he-drachen-bow {
+  to {
+    transform: scale(1.3) rotate(15deg);
+  }
+}
+
+/* ---------- Traktor: bumps forward and back, wheels turn, exhaust puffs ---------- */
+
+.item-pflugtraktor.playing .he-trak-body {
+  animation: he-trak-drive 2.2s ease-in-out;
+}
+
+.item-pflugtraktor.playing .he-trak-wheel {
+  animation: he-spin-back 1.1s linear 2;
+}
+
+.item-pflugtraktor.playing .he-trak-puff {
+  animation: he-puff 0.8s ease-out calc(var(--i) * 0.25s) 2;
+}
+
+@keyframes he-trak-drive {
+  15% {
+    transform: translateY(-4px);
+  }
+  35% {
+    transform: translateX(-24px);
+  }
+  45% {
+    transform: translate(-30px, -3px);
+  }
+  70% {
+    transform: translateX(-12px);
+  }
+}
+
+/* ---------- Krähe: hops up flapping, calls "Krah!" ---------- */
+
+.item-kraehe.playing .he-kraehe-bird {
+  animation: he-kraehe-hop 2s ease-in-out;
+}
+
+.item-kraehe.playing .he-kraehe-wing {
+  animation: he-kraehe-flap 0.25s ease-in-out 8 alternate;
+}
+
+.item-kraehe.playing .he-kraehe-head {
+  animation: he-kraehe-caw 0.5s ease-in-out 0.9s 2;
+}
+
+.item-kraehe.playing .he-kraehe-call {
+  animation: he-call 1s ease-out 0.9s;
+}
+
+@keyframes he-kraehe-hop {
+  20% {
+    transform: translateY(-30px);
+  }
+  35% {
+    transform: translateY(-46px) rotate(-6deg);
+  }
+  55% {
+    transform: translateY(-20px);
+  }
+  70% {
+    transform: none;
+  }
+  80% {
+    transform: translateY(-8px);
+  }
+  90% {
+    transform: none;
+  }
+}
+
+@keyframes he-kraehe-flap {
+  to {
+    transform: rotate(-50deg);
+  }
+}
+
+@keyframes he-kraehe-caw {
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes he-call {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.6);
+  }
+  20%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* ---------- Schuppen: the door opens (someone peeks out), the light goes on, leaves blow off the roof ---------- */
+
+.item-schuppen.playing .he-schuppen-door {
+  animation: he-door 2.4s ease-in-out;
+}
+
+.item-schuppen.playing .he-schuppen-light {
+  animation: he-show 2.4s ease-in-out;
+}
+
+.item-schuppen.playing .he-schuppen-roofleaf {
+  animation: he-roofleaf 1.4s ease-out calc(0.3s + var(--i) * 0.15s);
+}
+
+@keyframes he-door {
+  0%,
+  100% {
+    transform: none;
+  }
+  18%,
+  80% {
+    transform: scaleX(0.12);
+  }
+}
+
+@keyframes he-roofleaf {
+  0%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  60% {
+    opacity: 0;
+    transform: translate(70px, -40px) rotate(220deg);
+  }
+  61% {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+/* ---------- Spinnennetz: trembles, dew sparkles, the spider abseils ---------- */
+
+.item-spinnennetz.playing .he-netz-web {
+  animation: he-web 0.5s ease-in-out 4;
+}
+
+.item-spinnennetz.playing .he-netz-dew {
+  animation: he-dew 0.6s ease-in-out calc(var(--i) * 0.2s) 2;
+}
+
+.item-spinnennetz.playing .he-netz-spider {
+  animation: he-spider 2.2s ease-in-out;
+}
+
+.item-spinnennetz.playing .he-netz-thread {
+  animation: he-thread 2.2s ease-in-out;
+}
+
+@keyframes he-web {
+  25% {
+    transform: scale(1.05, 0.96);
+  }
+  75% {
+    transform: scale(0.96, 1.04);
+  }
+}
+
+@keyframes he-dew {
+  50% {
+    transform: scale(1.8);
+    fill: #fff;
+  }
+}
+
+@keyframes he-spider {
+  35%,
+  60% {
+    transform: translateY(34px);
+  }
+  45% {
+    transform: translateY(30px) rotate(10deg);
+  }
+}
+
+@keyframes he-thread {
+  35%,
+  60% {
+    transform: scaleY(3.1);
+  }
+  45% {
+    transform: scaleY(2.85);
+  }
+}
+
+/* ---------- Bäuerin: lifts the pumpkin, nods and bobs ---------- */
+
+.item-baeuerin.playing .he-baeuerin-arm {
+  animation: he-baeuerin-lift 2s ease-in-out;
+}
+
+.item-baeuerin.playing .he-baeuerin-head {
+  animation: he-nod 0.5s ease-in-out 0.2s 3;
+}
+
+.item-baeuerin.playing .he-baeuerin {
+  animation: he-bob 1s ease-in-out 2;
+}
+
+@keyframes he-baeuerin-lift {
+  25% {
+    transform: rotate(-20deg);
+  }
+  40% {
+    transform: rotate(-32deg);
+  }
+  55% {
+    transform: rotate(-16deg);
+  }
+  70% {
+    transform: rotate(-30deg);
+  }
+}
+
+@keyframes he-bob {
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ---------- Kürbisstand: awning flaps, pumpkins hop, the sign swings, the crate opens ---------- */
+
+.item-kuerbisstand.playing .he-stand-awning {
+  animation: he-awning 0.6s ease-in-out 4;
+}
+
+.item-kuerbisstand.playing .he-stand-pumpkin {
+  animation: he-hop 0.6s ease-in-out calc(var(--i) * 0.15s) 2;
+}
+
+.item-kuerbisstand.playing .he-stand-sign {
+  animation: he-swing 2.4s ease-in-out;
+}
+
+.item-kuerbisstand.playing .he-stand-lid {
+  animation: he-lid 2.4s ease-in-out;
+}
+
+@keyframes he-awning {
+  50% {
+    transform: scaleY(0.86);
+  }
+}
+
+@keyframes he-hop {
+  0%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(-18px) scale(0.95, 1.05);
+  }
+  70% {
+    transform: scale(1.08, 0.92);
+  }
+}
+
+@keyframes he-swing {
+  15% {
+    transform: rotate(12deg);
+  }
+  35% {
+    transform: rotate(-9deg);
+  }
+  55% {
+    transform: rotate(6deg);
+  }
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes he-lid {
+  0%,
+  100% {
+    transform: none;
+  }
+  18%,
+  80% {
+    transform: rotate(-110deg);
+  }
+}
+
+/* ---------- Apfelkorb: the apples hop out one after the other ---------- */
+
+.item-apfelkorb.playing .he-korb-apple {
+  animation: he-korb-apple 0.8s ease-out calc(var(--i) * 0.2s);
+}
+
+.item-apfelkorb.playing .he-korb-handle {
+  animation: he-korb-handle 0.5s ease-in-out 3;
+}
+
+@keyframes he-korb-apple {
+  0%,
+  100% {
+    transform: none;
+  }
+  45% {
+    transform: translateY(-46px) rotate(calc(var(--i) * 70deg - 140deg));
+  }
+}
+
+@keyframes he-korb-handle {
+  50% {
+    transform: rotate(-8deg);
+  }
+}
+
+/* ---------- Ahorn: sways, leaves drop and the seeds spin down ---------- */
+
+.item-ahorn.playing .he-ahorn-crown {
+  animation: he-sway 2.6s ease-in-out;
+}
+
+.item-ahorn.playing .he-ahorn-fall {
+  animation: he-seed-fall 2.2s ease-in calc(var(--i) * 0.12s);
+}
+
+.item-ahorn.playing .he-ahorn-seed {
+  animation: he-seed-spin 0.35s linear 6;
+}
+
+.item-ahorn.playing .he-ahorn-leaf {
+  animation: he-leaf-fall 2s ease-in calc(0.2s + var(--i) * 0.08s);
+}
+
+@keyframes he-sway {
+  15% {
+    transform: rotate(3deg);
+  }
+  35% {
+    transform: rotate(-3deg);
+  }
+  55% {
+    transform: rotate(2deg);
+  }
+  75% {
+    transform: rotate(-1deg);
+  }
+}
+
+@keyframes he-seed-fall {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  8% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(var(--fall));
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--fall));
+  }
+}
+
+@keyframes he-seed-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* ---------- Junge: bounces, waves, hat and scarf flutter (his string hand stays put) ---------- */
+
+.item-drachenjunge.playing .he-junge-body {
+  animation: he-junge-bounce 0.5s ease-in-out 4;
+}
+
+.item-drachenjunge.playing .he-junge-wave {
+  animation: he-junge-wave 2s ease-in-out;
+}
+
+.item-drachenjunge.playing .he-junge-head {
+  animation: he-tilt 1s ease-in-out 2;
+}
+
+.item-drachenjunge.playing .he-junge-pom {
+  animation: he-pom 0.25s ease-in-out 8 alternate;
+}
+
+.item-drachenjunge.playing .he-junge-scarf {
+  animation: he-scarf 0.25s ease-in-out 8 alternate;
+}
+
+@keyframes he-junge-bounce {
+  50% {
+    transform: scaleY(0.96);
+  }
+}
+
+@keyframes he-junge-wave {
+  0%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: rotate(150deg);
+  }
+  35% {
+    transform: rotate(125deg);
+  }
+  50% {
+    transform: rotate(160deg);
+  }
+  65% {
+    transform: rotate(125deg);
+  }
+  80% {
+    transform: rotate(150deg);
+  }
+}
+
+@keyframes he-pom {
+  to {
+    transform: translateY(-5px) scale(1.15);
+  }
+}
+
+@keyframes he-scarf {
+  to {
+    transform: rotate(-16deg) scaleX(1.12);
+  }
+}
+
+/* ---------- Opa: rakes, leaves fly, lifts his cap ---------- */
+
+.item-laubopa.playing .he-opa-rake {
+  animation: he-rake 0.55s ease-in-out 4;
+}
+
+.item-laubopa.playing .he-opa-leaf {
+  animation: he-rake-leaf 0.85s ease-out calc(var(--i) * 0.15s) 2;
+}
+
+.item-laubopa.playing .he-opa-cap {
+  animation: he-cap 2.2s ease-in-out;
+}
+
+.item-laubopa.playing .he-opa-head {
+  animation: he-nod 0.55s ease-in-out 4;
+}
+
+@keyframes he-rake {
+  50% {
+    transform: translate(16px, -3px) rotate(-3deg);
+  }
+}
+
+@keyframes he-rake-leaf {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(46px, -54px) rotate(220deg);
+  }
+}
+
+@keyframes he-cap {
+  0%,
+  55%,
+  92%,
+  100% {
+    transform: none;
+  }
+  65%,
+  82% {
+    transform: translateY(-14px) rotate(-14deg);
+  }
+}
+
+/* ---------- Laubhaufen: leaves whirl up, the heap squashes, someone peeks out ---------- */
+
+.item-laubhaufen.playing .he-pile-heap {
+  animation: he-pile-squash 2.2s ease-in-out;
+}
+
+.item-laubhaufen.playing .he-pile-leaf {
+  animation: he-pile-burst 1.6s ease-out calc(var(--i) * 0.05s);
+}
+
+@keyframes he-pile-squash {
+  0%,
+  40%,
+  85%,
+  100% {
+    transform: none;
+  }
+  10% {
+    transform: scale(1.08, 0.85);
+  }
+  25% {
+    transform: scale(0.96, 1.06);
+  }
+  92% {
+    transform: scale(1.04, 0.95);
+  }
+}
+
+@keyframes he-pile-burst {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  10% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 1;
+    transform: translate(calc(var(--s) * 60px), -110px) rotate(200deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--s) * 96px), 30px) rotate(400deg);
+  }
+}
+
+/* ---------- Oma: the needles click, the scarf grows, she nods and hums ---------- */
+
+.item-strickoma.playing .he-oma-needle {
+  animation: he-knit 0.28s ease-in-out calc(var(--i) * 0.14s) 8 alternate;
+}
+
+.item-strickoma.playing .he-oma-scarf {
+  animation: he-oma-scarf 2.4s ease-in-out;
+}
+
+.item-strickoma.playing .he-oma-head {
+  animation: he-nod 0.6s ease-in-out 4;
+}
+
+.item-strickoma.playing .he-oma-note {
+  animation: he-note 1.2s ease-out calc(0.3s + var(--i) * 0.3s);
+}
+
+@keyframes he-knit {
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes he-oma-scarf {
+  70%,
+  85% {
+    transform: scaleY(1.45);
+  }
+}
+
+/* ---------- Katze: bats the ball of wool, swishes her tail, blinks ---------- */
+
+.item-bankkatze.playing .he-katze-paw {
+  animation: he-katze-paw 0.45s ease-in-out 0.1s 2;
+}
+
+.item-bankkatze.playing .he-katze-ball {
+  animation: he-katze-ball 1.8s ease-in-out;
+}
+
+.item-bankkatze.playing .he-katze-tail {
+  animation: he-katze-tail 0.45s ease-in-out 4;
+}
+
+.item-bankkatze.playing .he-katze-ear {
+  animation: he-katze-ear 0.3s ease-in-out 0.9s 2;
+}
+
+.item-bankkatze.playing .he-katze-blink {
+  animation: he-blink 1.8s linear;
+}
+
+.item-bankkatze.playing .he-katze-head {
+  animation: he-tilt 0.9s ease-in-out 2;
+}
+
+@keyframes he-katze-paw {
+  50% {
+    transform: rotate(-35deg);
+  }
+}
+
+@keyframes he-katze-ball {
+  0%,
+  20%,
+  100% {
+    transform: none;
+  }
+  50% {
+    transform: translateX(14px) rotate(160deg);
+  }
+  75% {
+    transform: translateX(4px) rotate(40deg);
+  }
+}
+
+@keyframes he-katze-tail {
+  50% {
+    transform: rotate(14deg);
+  }
+}
+
+@keyframes he-katze-ear {
+  50% {
+    transform: rotate(-18deg);
+  }
+}
+
+@keyframes he-blink {
+  0%,
+  40%,
+  57%,
+  100% {
+    opacity: 0;
+  }
+  45%,
+  52% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Kastanienbaum: the crown shakes, chestnuts drop, leaves flutter down ---------- */
+
+.item-kastanienbaum.playing .he-kb-crown {
+  animation: he-shake 0.4s ease-in-out 5;
+}
+
+.item-kastanienbaum.playing .he-kb-nut {
+  animation: he-nut-fall 1.4s ease-in calc(0.2s + var(--i) * 0.25s);
+}
+
+.item-kastanienbaum.playing .he-kb-leaf {
+  animation: he-leaf-fall 1.9s ease-in calc(0.1s + var(--i) * 0.08s);
+}
+
+@keyframes he-shake {
+  25% {
+    transform: rotate(2deg);
+  }
+  75% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes he-nut-fall {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  5% {
+    opacity: 1;
+  }
+  70% {
+    transform: translateY(var(--fall));
+  }
+  80% {
+    transform: translateY(calc(var(--fall) - 14px));
+  }
+  90% {
+    opacity: 1;
+    transform: translateY(var(--fall));
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--fall));
+  }
+}
+
+/* ---------- Eichhörnchen: hops twice, flicks its tail and nibbles ---------- */
+
+.item-herbsthoernchen.playing .he-hoernchen-body {
+  animation: he-squirrel-hop 1.8s ease-in-out;
+}
+
+.item-herbsthoernchen.playing .he-hoernchen-tail {
+  animation: he-tail-flick 0.45s ease-in-out 4;
+}
+
+.item-herbsthoernchen.playing .he-hoernchen-head {
+  animation: he-nibble 0.15s ease-in-out 0.9s 6 alternate;
+}
+
+.item-herbsthoernchen.playing .he-hoernchen-paws {
+  animation: he-paws 0.15s ease-in-out 0.9s 6 alternate;
+}
+
+.item-herbsthoernchen.playing .he-hoernchen-crumbs circle {
+  animation: he-crumb 0.6s ease-out calc(1s + var(--i) * 0.1s);
+}
+
+@keyframes he-squirrel-hop {
+  0%,
+  28%,
+  56%,
+  100% {
+    transform: none;
+  }
+  15% {
+    transform: translateY(-22px);
+  }
+  43% {
+    transform: translateY(-16px);
+  }
+}
+
+@keyframes he-tail-flick {
+  50% {
+    transform: rotate(-16deg);
+  }
+}
+
+@keyframes he-nibble {
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+@keyframes he-paws {
+  to {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes he-crumb {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+/* ---------- Igel: hops, bristles, sniffs; the apple on its back bounces ---------- */
+
+.item-laubigel.playing .he-igel-body {
+  animation: he-igel-hop 1.8s ease-in-out;
+}
+
+.item-laubigel.playing .he-igel-spines {
+  animation: he-bristle 0.6s ease-in-out 0.1s 2;
+}
+
+.item-laubigel.playing .he-igel-nose {
+  animation: he-sniff 0.2s ease-in-out 8 alternate;
+}
+
+.item-laubigel.playing .he-igel-apple {
+  animation: he-apple-bounce 0.6s ease-in-out 0.2s 2;
+}
+
+.item-laubigel.playing .he-igel-leaf {
+  animation: he-leaf-flip 0.6s ease-in-out 2;
+}
+
+@keyframes he-igel-hop {
+  0%,
+  32%,
+  64%,
+  100% {
+    transform: none;
+  }
+  20% {
+    transform: translateY(-14px);
+  }
+  52% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes he-bristle {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes he-sniff {
+  to {
+    transform: scale(1.4);
+  }
+}
+
+@keyframes he-apple-bounce {
+  40% {
+    transform: translateY(-14px) rotate(-12deg);
+  }
+}
+
+@keyframes he-leaf-flip {
+  50% {
+    transform: rotate(30deg);
+  }
+}
+
+/* ---------- Bollerwagen: rolls forward and back, wheels turn, pumpkins bounce ---------- */
+
+.item-kuerbiswagen.playing .he-wagen-body {
+  animation: he-roll 2s ease-in-out;
+}
+
+.item-kuerbiswagen.playing .he-wagen-wheel {
+  animation: he-wheel-roll 2s ease-in-out;
+}
+
+.item-kuerbiswagen.playing .he-wagen-load {
+  animation: he-load 0.5s ease-in-out calc(var(--i) * 0.12s) 3;
+}
+
+.item-kuerbiswagen.playing .he-wagen-handle {
+  animation: he-handle 0.5s ease-in-out 4;
+}
+
+@keyframes he-roll {
+  35% {
+    transform: translateX(-34px);
+  }
+  50% {
+    transform: translateX(-36px);
+  }
+  85% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes he-wheel-roll {
+  35% {
+    transform: rotate(-81deg);
+  }
+  50% {
+    transform: rotate(-86deg);
+  }
+  85% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes he-load {
+  40% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes he-handle {
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+/* ---------- Hund: jumps after the leaf, wags, flaps his ears ---------- */
+
+.item-laubhund.playing .he-hund-body {
+  animation: he-dog-jump 1.8s ease-in-out;
+}
+
+.item-laubhund.playing .he-hund-leaf {
+  animation: he-leaf-dance 1.8s ease-in-out;
+}
+
+.item-laubhund.playing .he-hund-tail {
+  animation: he-wag 0.2s ease-in-out 8 alternate;
+}
+
+.item-laubhund.playing .he-hund-ear {
+  animation: he-ear-flop 0.3s ease-in-out 0.4s 4 alternate;
+}
+
+.item-laubhund.playing .he-hund-head {
+  animation: he-tilt 0.9s ease-in-out 2;
+}
+
+@keyframes he-dog-jump {
+  0%,
+  65%,
+  100% {
+    transform: none;
+  }
+  12% {
+    transform: scale(1.04, 0.92);
+  }
+  35% {
+    transform: translateY(-50px) rotate(-10deg);
+  }
+  55% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes he-leaf-dance {
+  35% {
+    transform: translate(-6px, -20px) rotate(60deg);
+  }
+  70% {
+    transform: translate(10px, 6px) rotate(-30deg);
+  }
+}
+
+@keyframes he-ear-flop {
+  to {
+    transform: rotate(-30deg);
+  }
+}
+
+/* ---------- Kastanie: the shell pops open, the chestnut hops out and back ---------- */
+
+.item-kastanie.playing .he-kastanie-half {
+  animation: he-shell-open 2s ease-in-out;
+}
+
+.item-kastanie.playing .he-kastanie-nut {
+  animation: he-nut-hop 2s ease-in-out;
+}
+
+.item-kastanie.playing .he-kastanie-sparkle circle {
+  animation: he-sparkle 0.6s ease-out calc(0.6s + var(--i) * 0.15s);
+}
+
+@keyframes he-shell-open {
+  0%,
+  100% {
+    transform: none;
+  }
+  20%,
+  75% {
+    transform: rotate(calc(var(--s) * 50deg));
+  }
+}
+
+@keyframes he-nut-hop {
+  0%,
+  20%,
+  72%,
+  100% {
+    transform: none;
+  }
+  40% {
+    transform: translateY(-40px) rotate(-30deg);
+  }
+  55% {
+    transform: translateY(-46px) rotate(20deg);
+  }
+}
+
+/* ---------- Steinpilze: pop up one after the other ---------- */
+
+.item-steinpilze.playing .he-pilz {
+  animation: he-pop-up 0.8s ease-out calc(var(--i) * 0.3s);
+}
+
+.item-steinpilze.playing .he-pilz-sparkle path {
+  animation: he-sparkle 0.6s ease-out calc(0.6s + var(--i) * 0.3s);
+}
+
+@keyframes he-pop-up {
+  25% {
+    transform: scale(1.15, 0.7);
+  }
+  55% {
+    transform: scale(0.92, 1.18);
+  }
+  80% {
+    transform: scale(1.04, 0.96);
+  }
+}
+
+/* ---------- Kastanienmännchen: dances, waves, its cap pops up ---------- */
+
+.item-kastanienmann.playing .he-kmann-body {
+  animation: he-dance 0.6s ease-in-out 3;
+}
+
+.item-kastanienmann.playing .he-kmann-arm {
+  animation: he-arm-wave 0.3s ease-in-out 6 alternate;
+}
+
+.item-kastanienmann.playing .he-kmann-hat {
+  animation: he-hat-pop 1.8s ease-in-out;
+}
+
+@keyframes he-dance {
+  25% {
+    transform: translateY(-16px) rotate(-8deg);
+  }
+  50% {
+    transform: none;
+  }
+  75% {
+    transform: translateY(-16px) rotate(8deg);
+  }
+}
+
+@keyframes he-arm-wave {
+  to {
+    transform: rotate(calc(var(--s) * -40deg));
+  }
+}
+
+@keyframes he-hat-pop {
+  0%,
+  30%,
+  75%,
+  100% {
+    transform: none;
+  }
+  45% {
+    transform: translateY(-24px) rotate(-20deg);
+  }
+  60% {
+    transform: translateY(-26px) rotate(20deg);
+  }
+}
+
+/* ---------- Windrad: spins ---------- */
+
+.item-herbstwindrad.playing .he-windrad-blades {
+  animation: he-windrad 2s cubic-bezier(0.3, 0, 0.3, 1);
+}
+
+@keyframes he-windrad {
+  to {
+    transform: rotate(3turn);
+  }
+}
+
+.item-herbstwindrad.playing .he-windrad-sway {
+  animation: he-windrad-sway 2s ease-in-out;
+}
+
+.item-herbstwindrad.playing .he-windrad-ribbon {
+  animation: he-windrad-ribbon 0.4s ease-in-out 5 alternate;
+}
+
+.item-herbstwindrad.playing .he-windrad-gust {
+  animation: he-windrad-gust 1.2s ease-out calc(var(--i) * 0.2s) both;
+}
+
+@keyframes he-windrad-sway {
+  25% {
+    transform: rotate(7deg);
+  }
+  55% {
+    transform: rotate(-4deg);
+  }
+  80% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes he-windrad-ribbon {
+  to {
+    transform: rotate(40deg) scaleY(0.85);
+  }
+}
+
+@keyframes he-windrad-gust {
+  0% {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(70px);
+  }
+}
+
+/* ---------- Amsel: the bush shakes, she pecks a berry, hops and sings ---------- */
+
+.item-amsel.playing .he-busch {
+  animation: he-bush 0.3s ease-in-out 4;
+}
+
+.item-amsel.playing .he-amsel {
+  animation: he-bird-hop 2.2s ease-in-out;
+}
+
+.item-amsel.playing .he-amsel-head {
+  animation: he-peck 2.2s ease-in-out;
+}
+
+.item-amsel.playing .he-amsel-berry {
+  animation: he-berry 2.2s linear;
+}
+
+.item-amsel.playing .he-amsel-wing {
+  animation: he-flap 0.2s ease-in-out 1.2s 6 alternate;
+}
+
+.item-amsel.playing .he-amsel-note {
+  animation: he-note 1s ease-out calc(0.9s + var(--i) * 0.15s);
+}
+
+@keyframes he-bush {
+  25% {
+    transform: skewX(3deg);
+  }
+  75% {
+    transform: skewX(-3deg);
+  }
+}
+
+@keyframes he-bird-hop {
+  0%,
+  50%,
+  70%,
+  86%,
+  100% {
+    transform: none;
+  }
+  60% {
+    transform: translateY(-16px);
+  }
+  78% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes he-peck {
+  0%,
+  18%,
+  34%,
+  100% {
+    transform: none;
+  }
+  10%,
+  26% {
+    transform: rotate(-30deg);
+  }
+}
+
+@keyframes he-berry {
+  0%,
+  24%,
+  48%,
+  100% {
+    opacity: 0;
+  }
+  28%,
+  44% {
+    opacity: 1;
+  }
+}
+
+/* ---------- Laterne: glows and swings, the child sways and sings ---------- */
+
+.item-martinslaterne.playing .he-laterne-lamp {
+  animation: he-lamp-swing 2.6s ease-in-out;
+}
+
+.item-martinslaterne.playing .he-laterne-glow {
+  animation: he-glow 2.6s ease-in-out;
+}
+
+.item-martinslaterne.playing .he-laterne-light {
+  animation: he-flicker 0.4s ease-in-out 6 alternate;
+}
+
+.item-martinslaterne.playing .he-laterne-body {
+  animation: he-tilt 1.3s ease-in-out 2;
+}
+
+.item-martinslaterne.playing .he-laterne-head {
+  animation: he-tilt 1.3s ease-in-out 2 reverse;
+}
+
+.item-martinslaterne.playing .he-laterne-mouth {
+  animation: he-sing 0.4s ease-in-out 6 alternate;
+}
+
+.item-martinslaterne.playing .he-laterne-note {
+  animation: he-note 1.2s ease-out calc(0.4s + var(--i) * 0.35s);
+}
+
+@keyframes he-lamp-swing {
+  15% {
+    transform: rotate(14deg);
+  }
+  35% {
+    transform: rotate(-12deg);
+  }
+  55% {
+    transform: rotate(9deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
+}
+
+@keyframes he-glow {
+  20%,
+  80% {
+    opacity: 0.85;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes he-flicker {
+  to {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes he-sing {
+  to {
+    opacity: 1;
+  }
+}
+
+/* ---------- Pfütze: rings spread, drops splash, the leaf boat bobs ---------- */
+
+.item-matschpfuetze.playing .he-pfuetze-rings ellipse {
+  animation: he-ring 1.2s ease-out calc(var(--i) * 0.25s);
+}
+
+.item-matschpfuetze.playing .he-pfuetze-drops circle {
+  animation: he-splash-drop 1s ease-out calc(var(--i) * 0.08s);
+}
+
+.item-matschpfuetze.playing .he-pfuetze-boat {
+  animation: he-boat 0.6s ease-in-out 3;
+}
+
+@keyframes he-ring {
+  0% {
+    opacity: 1;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
+}
+
+@keyframes he-splash-drop {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--s) * 16px), -50px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--s) * 26px), 0);
+  }
+}
+
+@keyframes he-boat {
+  50% {
+    transform: translateY(-5px) rotate(10deg);
+  }
+}
+
+/* ---------- Mädchen: jumps into the puddle twice, splashes, waves ---------- */
+
+.item-pfuetzenkind.playing .he-maedchen-body {
+  animation: he-jump 0.8s ease-in-out 2;
+}
+
+.item-pfuetzenkind.playing .he-maedchen-drops circle {
+  animation: he-girl-splash 0.8s ease-out 0.5s;
+}
+
+.item-pfuetzenkind.playing .he-maedchen-umbrella {
+  animation: he-umbrella 0.8s ease-in-out 2;
+}
+
+.item-pfuetzenkind.playing .he-maedchen-tails ellipse {
+  animation: he-tails 0.8s ease-in-out 2;
+}
+
+.item-pfuetzenkind.playing .he-maedchen-wave {
+  animation: he-girl-wave 0.8s ease-in-out 2;
+}
+
+@keyframes he-jump {
+  0%,
+  75%,
+  100% {
+    transform: none;
+  }
+  15% {
+    transform: scale(1.05, 0.92);
+  }
+  45% {
+    transform: translateY(-46px);
+  }
+  85% {
+    transform: scale(1.05, 0.94);
+  }
+}
+
+@keyframes he-girl-splash {
+  0% {
+    opacity: 0;
+    transform: none;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc((var(--i) - 1.5) * 18px), -44px);
+  }
+}
+
+@keyframes he-umbrella {
+  45% {
+    transform: rotate(-10deg);
+  }
+}
+
+@keyframes he-tails {
+  45% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes he-girl-wave {
+  45% {
+    transform: rotate(110deg);
+  }
+}
+
+/* ---------- Wurm: comes out of the apple, looks around, lifts his hat, slips back ---------- */
+
+.item-apfelwurm.playing .he-wurm {
+  animation: he-worm 2.2s ease-in-out;
+}
+
+.item-apfelwurm.playing .he-wurm-hat {
+  animation: he-hat-lift 0.6s ease-in-out 1s;
+}
+
+.item-apfelwurm.playing .he-apfel {
+  animation: he-tilt 0.5s ease-in-out 2;
+}
+
+.item-apfelwurm.playing .he-apfel-leaf {
+  animation: he-flap 0.3s ease-in-out 4 alternate;
+}
+
+@keyframes he-worm {
+  0%,
+  100% {
+    transform: translateY(34px);
+  }
+  20%,
+  75% {
+    transform: none;
+  }
+  30% {
+    transform: rotate(-12deg);
+  }
+  45% {
+    transform: rotate(12deg);
+  }
+  60% {
+    transform: rotate(-8deg);
+  }
+}
+
+@keyframes he-hat-lift {
+  50% {
+    transform: translateY(-8px) rotate(-15deg);
+  }
+}
+
+/* ---------- Gummistiefel: hop one after the other, drip; someone peeks out of the right one ---------- */
+
+.item-herbststiefel.playing .he-stiefel {
+  animation: he-boot-hop 0.7s ease-in-out calc(var(--i) * 0.35s) 2;
+}
+
+.item-herbststiefel.playing .he-stiefel-drops path {
+  animation: he-drip 1s ease-out calc(var(--i) * 0.3s);
+}
+
+@keyframes he-boot-hop {
+  0%,
+  60%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-22px) rotate(-8deg);
+  }
+  75% {
+    transform: scale(1.05, 0.95);
+  }
+}
+
+/* ---------- Schnecke: stretches out, waves her feelers, the shell wobbles ---------- */
+
+.item-regenschnecke.playing .he-schnecke-foot {
+  animation: he-stretch 2.2s ease-in-out;
+}
+
+.item-regenschnecke.playing .he-schnecke-feelers {
+  animation: he-tilt 0.55s ease-in-out 4;
+}
+
+.item-regenschnecke.playing .he-schnecke-shell {
+  animation: he-shell-wobble 0.55s ease-in-out 4;
+}
+
+.item-regenschnecke.playing .he-schnecke-drops path {
+  animation: he-drip 0.8s ease-out calc(var(--i) * 0.25s) 2;
+}
+
+@keyframes he-stretch {
+  40%,
+  60% {
+    transform: scaleX(1.12);
+  }
+}
+
+@keyframes he-shell-wobble {
+  50% {
+    transform: translateX(4px) rotate(-8deg);
+  }
+}

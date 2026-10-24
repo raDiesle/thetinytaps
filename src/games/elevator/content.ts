@@ -70,6 +70,8 @@ export interface Task {
   face?: 1 | -1;
   /** The move and the sound of one tap; it lasts `beat` ms (700 if not given). */
   pose: Pose;
+  /** The pose between taps (standing if not given). */
+  rest?: Pose;
   sound: () => void;
   beat?: number;
   /** The other child does it too. */
@@ -339,30 +341,42 @@ export const STORIES: Story[] = [
       {
         wish: "table",
         floor: 3,
-        spot: 520,
+        spot: 500,
         face: 1,
-        pose: "stand",
+        pose: "sit",
         prop: "feast",
         ms: 1400,
         hold: null,
-        otherSpot: 760,
+        otherSpot: 780,
         otherFace: -1,
-        otherPose: "stand",
+        otherPose: "sit",
         otherHold: null,
         sounds: [[200, playClonk]],
         ask: "Jetzt essen wir zusammen!",
         done: "Alles auf den Tisch!",
         tasks: [
-          { name: "lid", taps: 1, at: [654, -124], pose: "reach", sound: playPop, ask: "Glas aufdrehen!" },
-          { name: "spread", taps: 3, at: [606, -126], pose: "reach", sound: playPlop, ask: "Marmelade drauf!" },
+          { name: "lid", taps: 1, at: [646, -122], pose: "serve", rest: "sit", sound: playPop, ask: "Glas aufdrehen!" },
+          {
+            name: "spread",
+            taps: 2,
+            at: [
+              [562, -100],
+              [718, -100],
+            ],
+            pose: "serve",
+            rest: "sit",
+            sound: playPlop,
+            ask: "Marmelade drauf!",
+          },
           {
             name: "bite",
             taps: 3,
-            at: [606, -126],
+            at: [562, -100],
             pose: "eat",
+            rest: "sit",
             together: true,
             sound: munch,
-            beat: 1000,
+            beat: 1500,
             ask: "Guten Appetit!",
             done: "Mmmh, lecker!",
           },

@@ -293,8 +293,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
       if (task.together) actor(other, { pose: task.pose });
       sound(task.sound);
       await wait(task.beat ?? BEAT_MS);
-      actor(who, { pose: "stand" });
-      if (task.together) actor(other, { pose: "stand" });
+      actor(who, { pose: task.rest ?? "stand" });
+      if (task.together) actor(other, { pose: task.rest ?? "stand" });
     }
     if (task.done) say(task.done);
     if (task.wait) {

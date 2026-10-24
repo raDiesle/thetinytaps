@@ -526,5 +526,4 @@ export const stadt: Scene = {
       ],
     },
   ],
-  seasons: { weather: true, tree: [1450, 965, 0.7], snowman: [1180, 600, 0.7], pumpkin: [985, 975], egg: [1255, 890] },
 };
