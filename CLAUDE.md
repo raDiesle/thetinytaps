@@ -93,7 +93,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 1. `yarn verify`. The tests (`*.test.ts` next to the code) check data that is easy to
    get wrong by hand: scene items (ids, tap sizes, chains, keys, plural grammar), roads,
    the home menu against the routes and kid tiles, ideas, language packs, the movement
-   library, unique `@keyframes` names.
+   library, the Gefühle pictures, unique `@keyframes` names.
    When you add data with rules like these, add a check.
 2. Look at it in the browser preview: the change itself, the console, and the rules above.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
