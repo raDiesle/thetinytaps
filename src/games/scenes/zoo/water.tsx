@@ -101,7 +101,13 @@ export function Seehund() {
           <ellipse cx="-22" cy="-138" rx="24" ry="20" fill="#868e96" />
           <ellipse cx="-42" cy="-134" rx="12" ry="9" fill="#adb5bd" />
           <ellipse cx="-50" cy="-138" rx="3.5" ry="2.6" fill={INK} />
-          <path className="zo-seehund-whiskers" d="M-46 -128 h-12 M-46 -130 l-12 -5 M-40 -127 l-10 6" stroke="#495057" strokeWidth="1.3" style={{ transformOrigin: "-44px -129px" }} />
+          <path
+            className="zo-seehund-whiskers"
+            d="M-46 -128 h-12 M-46 -130 l-12 -5 M-40 -127 l-10 6"
+            stroke="#495057"
+            strokeWidth="1.3"
+            style={{ transformOrigin: "-44px -129px" }}
+          />
           <Eye cx={-28} cy={-146} r={3.8} />
           <Lid cx={-28} cy={-146} r={3.8} fill="#868e96" />
           <circle cx="-30" cy="-132" r="4" fill={CHEEK} opacity="0.45" />
@@ -130,7 +136,13 @@ export function Krokodil() {
         <path d="M100 -38 l8 -10 l8 10 M130 -32 l7 -9 l7 9 M158 -24 l6 -8 l6 8" fill={CROC_DARK} />
       </g>
       {[-40, 40].map((x, i) => (
-        <path key={x} className="zo-krokodil-leg" d={`M${x - 12} -14 L${x - 18} 0 H${x + 10} L${x + 6} -14 Z`} fill={CROC_DARK} style={{ ...nth(i), transformOrigin: `${x - 3}px -14px` }} />
+        <path
+          key={x}
+          className="zo-krokodil-leg"
+          d={`M${x - 12} -14 L${x - 18} 0 H${x + 10} L${x + 6} -14 Z`}
+          fill={CROC_DARK}
+          style={{ ...nth(i), transformOrigin: `${x - 3}px -14px` }}
+        />
       ))}
       <ellipse cx="10" cy="-28" rx="86" ry="24" fill={CROC} />
       <path d="M-50 -48 l8 -10 l8 10 M-20 -50 l8 -10 l8 10 M10 -50 l8 -10 l8 10 M40 -48 l8 -10 l8 10" fill={CROC_DARK} />
@@ -170,7 +182,13 @@ export function Schildkroete() {
         <circle cx="62" cy="-31" r="3.5" fill={CHEEK} opacity="0.5" />
       </g>
       <path d="M-56 -18 Q-54 -70 0 -72 Q54 -70 56 -18 Z" fill="#40916c" />
-      <path d="M-30 -24 L-20 -52 L0 -60 L20 -52 L30 -24 M-20 -52 L-44 -30 M20 -52 L44 -30 M0 -60 V-24" stroke="#2d6a4f" strokeWidth="4" fill="none" strokeLinejoin="round" />
+      <path
+        d="M-30 -24 L-20 -52 L0 -60 L20 -52 L30 -24 M-20 -52 L-44 -30 M20 -52 L44 -30 M0 -60 V-24"
+        stroke="#2d6a4f"
+        strokeWidth="4"
+        fill="none"
+        strokeLinejoin="round"
+      />
       <path d="M-58 -18 H58" stroke="#2d6a4f" strokeWidth="8" strokeLinecap="round" />
       <ellipse cx="-14" cy="-60" rx="18" ry="5" fill="#fff" opacity="0.3" />
       <path className="zo-schildi-heart" d="M66 -64 c-5 -8 -16 0 0 11 c16 -11 5 -19 0 -11 Z" fill="#ff8fa3" />
@@ -273,7 +291,15 @@ export function Erdmaennchen() {
         <g className="zo-erdmann-body" style={{ transformOrigin: "0px -6px" }}>
           <ellipse cx="0" cy="-48" rx="16" ry="38" fill={MEERKAT} />
           <ellipse cx="2" cy="-44" rx="9" ry="26" fill="#f1dcc0" />
-          <path className="zo-erdmann-paws" d="M-10 -64 Q-2 -58 4 -62 M10 -64 Q2 -58 -4 -62" stroke={MEERKAT} strokeWidth="6" strokeLinecap="round" fill="none" style={{ transformOrigin: "0px -64px" }} />
+          <path
+            className="zo-erdmann-paws"
+            d="M-10 -64 Q-2 -58 4 -62 M10 -64 Q2 -58 -4 -62"
+            stroke={MEERKAT}
+            strokeWidth="6"
+            strokeLinecap="round"
+            fill="none"
+            style={{ transformOrigin: "0px -64px" }}
+          />
           <g className="zo-erdmann-head" style={{ transformOrigin: "0px -92px" }}>
             <circle className="zo-erdmann-ear" cx="-12" cy="-98" r="4" fill="#9c6644" />
             <circle className="zo-erdmann-ear" cx="12" cy="-98" r="4" fill="#9c6644" />

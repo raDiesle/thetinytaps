@@ -221,7 +221,11 @@ export function Enten() {
 export function Oma() {
   return (
     <>
-      <path className="st-oma-heart" d="M-24 -184 C-24 -196 -40 -196 -40 -184 C-40 -174 -24 -168 -24 -164 C-24 -168 -8 -174 -8 -184 C-8 -196 -24 -196 -24 -184 Z" fill="#ff5d73" />
+      <path
+        className="st-oma-heart"
+        d="M-24 -184 C-24 -196 -40 -196 -40 -184 C-40 -174 -24 -168 -24 -164 C-24 -168 -8 -174 -8 -184 C-8 -196 -24 -196 -24 -184 Z"
+        fill="#ff5d73"
+      />
       <rect x="-82" y="-50" width="8" height="50" fill="#495057" />
       <rect x="74" y="-50" width="8" height="50" fill="#495057" />
       <rect x="-92" y="-114" width="184" height="12" rx="3" fill="#bc6c25" />
@@ -361,7 +365,15 @@ export function Marienkaefer() {
         <ellipse cx="-12" cy="-22" rx="12" ry="7" />
         <ellipse cx="12" cy="-22" rx="12" ry="7" />
       </g>
-      <path className="st-kaefer-antenna" d="M20 -16 q4 -8 10 -8 M22 -12 q6 -4 12 -2" stroke="#2b2d42" strokeWidth="1.8" fill="none" strokeLinecap="round" style={{ transformOrigin: "20px -14px" }} />
+      <path
+        className="st-kaefer-antenna"
+        d="M20 -16 q4 -8 10 -8 M22 -12 q6 -4 12 -2"
+        stroke="#2b2d42"
+        strokeWidth="1.8"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "20px -14px" }}
+      />
       <circle cx="16" cy="-10" r="8" fill="#2b2d42" />
       <circle cx="19" cy="-12" r="1.6" fill="#fff" />
       <g className="st-kaefer-left" style={{ transformOrigin: "0px -24px" }}>

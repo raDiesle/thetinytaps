@@ -14,7 +14,17 @@ function ShipWheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
   return (
     <g className="sp-turm-wheel" style={{ transformOrigin: `${cx}px ${cy}px` }}>
       {Array.from({ length: 8 }, (_, i) => (
-        <line key={i} x1={cx} y1={cy} x2={cx} y2={cy - r * 1.3} stroke={WOOD_DARK} strokeWidth="5" strokeLinecap="round" transform={`rotate(${i * 45} ${cx} ${cy})`} />
+        <line
+          key={i}
+          x1={cx}
+          y1={cy}
+          x2={cx}
+          y2={cy - r * 1.3}
+          stroke={WOOD_DARK}
+          strokeWidth="5"
+          strokeLinecap="round"
+          transform={`rotate(${i * 45} ${cx} ${cy})`}
+        />
       ))}
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e63946" strokeWidth="7" />
       <circle cx={cx} cy={cy} r={6} fill="#ffd60a" />
@@ -101,7 +111,17 @@ export function Rutsche() {
           <Head cx={116} cy={-250} r={18} hair="#e9c46a" style="pigtails" />
         </g>
       </g>
-      <Puffs className="sp-rutsche-sand" spots={[[350, -12], [372, -24], [330, -28], [386, -8]]} r={11} fill="#f3d8a2" />
+      <Puffs
+        className="sp-rutsche-sand"
+        spots={[
+          [350, -12],
+          [372, -24],
+          [330, -28],
+          [386, -8],
+        ]}
+        r={11}
+        fill="#f3d8a2"
+      />
       <Notes x={250} y={-180} texts={["Hui!"]} colour="#ffd43b" />
     </>
   );
@@ -125,7 +145,14 @@ export function Schaukel() {
       <g className="sp-schaukel-frame" style={{ transformOrigin: "0px 0px" }}>
         {/* Legs: an A on each side, the back legs lighter */}
         <path d="M-196 0 L-222 -320 M222 0 L196 -320" stroke="#4dabf7" strokeWidth="13" strokeLinecap="round" opacity="0.6" />
-        <path d="M-260 0 L-222 -320 L-184 0 M260 0 L222 -320 L184 0" stroke="#228be6" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <path
+          d="M-260 0 L-222 -320 L-184 0 M260 0 L222 -320 L184 0"
+          stroke="#228be6"
+          strokeWidth="16"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
         <path d="M-248 -60 H-196 M196 -60 H248" stroke="#1c7ed6" strokeWidth="8" strokeLinecap="round" />
         <rect x="-240" y="-334" width="480" height="24" rx="12" fill="#1971c2" />
         <rect x="-232" y="-330" width="464" height="7" rx="3.5" fill="#74c0fc" opacity="0.7" />
@@ -184,7 +211,15 @@ export function Wippe() {
         </g>
       </g>
       <circle cx="0" cy="-60" r="10" fill="#ffd60a" />
-      <Hearts className="sp-wippe-hearts" spots={[[-176, -186], [176, -186], [0, -110]]} r={11} />
+      <Hearts
+        className="sp-wippe-hearts"
+        spots={[
+          [-176, -186],
+          [176, -186],
+          [0, -110],
+        ]}
+        r={11}
+      />
       <Notes x={-40} y={-170} texts={["Hoch!", "Runter!"]} colour="#e599f7" />
     </>
   );

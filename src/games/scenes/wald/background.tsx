@@ -167,7 +167,14 @@ function Dam() {
       <path d={sticks.join(" ")} stroke="#9c6644" strokeWidth={8 * s} strokeLinecap="round" />
       <path d={`M${x1 + 10 * s} ${y - 6 * s} L${x2 - 4 * s} ${y - 18 * s}`} stroke="#b08968" strokeWidth={6 * s} strokeLinecap="round" />
       {/* A little waterfall over the dam */}
-      <path d={`M${x1 + 30 * s} ${y + 8 * s} q4 ${10 * s} 0 ${18 * s} M${x2 - 34 * s} ${y + 8 * s} q4 ${10 * s} 0 ${18 * s}`} stroke="#fff" strokeWidth={4 * s} strokeLinecap="round" opacity="0.7" fill="none" />
+      <path
+        d={`M${x1 + 30 * s} ${y + 8 * s} q4 ${10 * s} 0 ${18 * s} M${x2 - 34 * s} ${y + 8 * s} q4 ${10 * s} 0 ${18 * s}`}
+        stroke="#fff"
+        strokeWidth={4 * s}
+        strokeLinecap="round"
+        opacity="0.7"
+        fill="none"
+      />
     </g>
   );
 }
@@ -177,7 +184,13 @@ function Reeds({ x, y, flip = 1 }: { x: number; y: number; flip?: 1 | -1 }) {
   const s = depthScale(y);
   return (
     <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`}>
-      <path d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44" stroke="#40916c" strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path
+        d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44"
+        stroke="#40916c"
+        strokeWidth="5"
+        strokeLinecap="round"
+        fill="none"
+      />
       <ellipse cx="-12" cy="-90" rx="5" ry="13" fill="#7f5539" />
       <ellipse cx="16" cy="-108" rx="5" ry="13" fill="#7f5539" />
     </g>

@@ -77,7 +77,10 @@ export function Rider({ cx, cy, shirt, hair = "#6b4423", cap }: { cx: number; cy
           <rect x={cx - 16} y={cy - 7} width="32" height="5" rx="2" fill={cap} />
         </>
       ) : (
-        <path d={`M${cx - 13} ${cy - 1} Q${cx - 15} ${cy - 16} ${cx} ${cy - 15} Q${cx + 15} ${cy - 16} ${cx + 13} ${cy - 1} Q${cx + 2} ${cy - 10} ${cx - 13} ${cy - 1} Z`} fill={hair} />
+        <path
+          d={`M${cx - 13} ${cy - 1} Q${cx - 15} ${cy - 16} ${cx} ${cy - 15} Q${cx + 15} ${cy - 16} ${cx + 13} ${cy - 1} Q${cx + 2} ${cy - 10} ${cx - 13} ${cy - 1} Z`}
+          fill={hair}
+        />
       )}
       <circle cx={cx - 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />
       <circle cx={cx + 4.5} cy={cy + 1} r="1.8" fill="#2b2d42" />

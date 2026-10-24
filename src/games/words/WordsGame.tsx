@@ -3,15 +3,7 @@ import { useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { useGameSettings } from "@/lib/common";
-import {
-  DEFAULT_WORDS_SETTINGS,
-  WORDS_SETTINGS_KEY,
-  type PictureReveal,
-  type WordCase,
-  type WordLength,
-  type WordsMode,
-  type WordsSettings,
-} from "./settings";
+import { DEFAULT_WORDS_SETTINGS, WORDS_SETTINGS_KEY, type PictureReveal, type WordCase, type WordLength, type WordsMode, type WordsSettings } from "./settings";
 import { WordsPlay } from "./WordsPlay";
 
 export function WordsGame() {
@@ -51,10 +43,7 @@ export function WordsGame() {
               label="Bilder"
               value={settings.theme}
               onChange={(theme) => update({ theme })}
-              options={[
-                { value: "all", label: "🌈 Alle" },
-                ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` })),
-              ]}
+              options={[{ value: "all", label: "🌈 Alle" }, ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` }))]}
             />
             <p className="setting-note">Wortlänge und Bilder gelten für „Ganzes Wort“ und „Erster Buchstabe“.</p>
           </SettingsGroup>

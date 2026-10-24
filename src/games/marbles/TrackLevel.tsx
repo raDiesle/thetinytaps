@@ -257,9 +257,7 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
   const t = now.current;
   const started = openedAt.current !== null;
   const flagAge = t - fullAt.current;
-  const spot = (i: number, layer: "back" | "front") => (
-    <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />
-  );
+  const spot = (i: number, layer: "back" | "front") => <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />;
 
   return (
     <div className="marble-level" onPointerDown={open}>
@@ -288,7 +286,13 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
         {SLOTS.map((_, i) => spot(i, "back"))}
 
         {/* Seesaw */}
-        <path d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`} fill="#8a5a2b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path
+          d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`}
+          fill="#8a5a2b"
+          stroke={INK}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
         <g transform={`translate(${SEESAW.cx} ${SEESAW.cy}) rotate(${tilt.current})`}>
           <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
           <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
@@ -303,7 +307,9 @@ export function TrackLevel({ sound, say, onDone, rebuild }: LevelProps) {
         {landed.current.map((l) => {
           const k = Math.min(1, (t - l.at) / LAND_MS);
           const bounce = k < 1 ? 0 : wobble((t - l.at - LAND_MS) / 1000, 6, 20, 8);
-          return <Ball key={l.id} color={l.color} x={l.from.x + (l.to.x - l.from.x) * k} y={l.from.y + (l.to.y - l.from.y) * k * k - Math.abs(bounce)} spin={0} />;
+          return (
+            <Ball key={l.id} color={l.color} x={l.from.x + (l.to.x - l.from.x) * k} y={l.from.y + (l.to.y - l.from.y) * k * k - Math.abs(bounce)} spin={0} />
+          );
         })}
         {marbles.current.map((m) => (
           <Ball key={m.id} color={m.color} x={m.x} y={m.y} spin={m.spin} />
@@ -451,7 +457,13 @@ export function Ball({ color, x, y, spin }: { color: string; x: number; y: numbe
   return (
     <g transform={`translate(${x} ${y})`}>
       <circle r={BALL_R} fill={color} stroke={INK} strokeWidth="3" />
-      <path d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`} transform={`rotate(${(spin * 180) / Math.PI})`} fill="none" stroke="#fff6" strokeWidth="5" />
+      <path
+        d={`M${-BALL_R + 4} 0 A${BALL_R - 4} ${BALL_R - 4} 0 0 0 ${BALL_R - 4} 0`}
+        transform={`rotate(${(spin * 180) / Math.PI})`}
+        fill="none"
+        stroke="#fff6"
+        strokeWidth="5"
+      />
       <circle cx="-7" cy="-8" r="5.5" fill="#fff" opacity="0.75" />
     </g>
   );
@@ -460,7 +472,13 @@ export function Ball({ color, x, y, spin }: { color: string; x: number; y: numbe
 function Hopper() {
   return (
     <g>
-      <path d={`M${HOPPER.x - 58} -10 L${HOPPER.x + 58} -10 L${HOPPER.x + 28} 62 L${HOPPER.x - 28} 62 Z`} fill="#8e7dff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${HOPPER.x - 58} -10 L${HOPPER.x + 58} -10 L${HOPPER.x + 28} 62 L${HOPPER.x - 28} 62 Z`}
+        fill="#8e7dff"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <path d={`M${HOPPER.x - 36} 8 L${HOPPER.x + 36} 8`} stroke="#fff8" strokeWidth="6" strokeLinecap="round" />
     </g>
   );
@@ -504,7 +522,13 @@ function Flag({ rise, sway }: { rise: number; sway: number }) {
 function Bell({ x, y, angle }: { x: number; y: number; angle: number }) {
   return (
     <g transform={`translate(${x} ${y}) rotate(${angle})`}>
-      <path d="M-4 0 L4 0 L5 12 C22 16 28 34 30 58 L34 64 L-34 64 L-30 58 C-28 34 -22 16 -5 12 Z" fill="#ffc93c" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d="M-4 0 L4 0 L5 12 C22 16 28 34 30 58 L34 64 L-34 64 L-30 58 C-28 34 -22 16 -5 12 Z"
+        fill="#ffc93c"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       <path d="M-18 28 C-16 22 -12 19 -8 18" stroke="#fff9" strokeWidth="4" fill="none" strokeLinecap="round" />
       <circle cx="0" cy="70" r="7" fill="#c98a00" stroke={INK} strokeWidth="3" />
     </g>
@@ -578,7 +602,13 @@ function Basket() {
   const { x0, x1, rimY, bottomY } = BASKET;
   return (
     <g>
-      <path d={`M${x0} ${rimY} L${x1} ${rimY} L${x1 - 14} ${bottomY} L${x0 + 14} ${bottomY} Z`} fill="#c98a4b" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x0} ${rimY} L${x1} ${rimY} L${x1 - 14} ${bottomY} L${x0 + 14} ${bottomY} Z`}
+        fill="#c98a4b"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       {[0, 1, 2].map((i) => {
         const yy = rimY + 14 + i * 15;
         return <line key={i} x1={x0 + 6} y1={yy} x2={x1 - 6} y2={yy} stroke="#9b6330" strokeWidth="4" />;

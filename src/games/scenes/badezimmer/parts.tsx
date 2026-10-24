@@ -19,7 +19,15 @@ export function Bubbles({ x, y, count = 3, spread = 18, r = 9 }: { x: number; y:
     <g className="bz-bubbles">
       {Array.from({ length: count }, (_, i) => (
         <g key={i} style={nth(i)}>
-          <circle cx={x + (i - (count - 1) / 2) * spread} cy={y - (i % 2) * spread * 0.6} r={r - (i % 3) * 2} fill="#e7f5ff" fillOpacity="0.55" stroke="#a5d8ff" strokeWidth="2.5" />
+          <circle
+            cx={x + (i - (count - 1) / 2) * spread}
+            cy={y - (i % 2) * spread * 0.6}
+            r={r - (i % 3) * 2}
+            fill="#e7f5ff"
+            fillOpacity="0.55"
+            stroke="#a5d8ff"
+            strokeWidth="2.5"
+          />
           <circle cx={x + (i - (count - 1) / 2) * spread - r * 0.35} cy={y - (i % 2) * spread * 0.6 - r * 0.35} r={r * 0.25} fill="#fff" />
         </g>
       ))}
@@ -28,15 +36,23 @@ export function Bubbles({ x, y, count = 3, spread = 18, r = 9 }: { x: number; y:
 }
 
 /** Water drops around (x, y) that fly off while the item plays. */
-export function Splash({ x, y, count = 4, spread = 16, className = "bz-splash" }: { x: number; y: number; count?: number; spread?: number; className?: string }) {
+export function Splash({
+  x,
+  y,
+  count = 4,
+  spread = 16,
+  className = "bz-splash",
+}: {
+  x: number;
+  y: number;
+  count?: number;
+  spread?: number;
+  className?: string;
+}) {
   return (
     <g className={className} fill="#74c0fc">
       {Array.from({ length: count }, (_, i) => (
-        <path
-          key={i}
-          d={`M${x + (i - (count - 1) / 2) * spread} ${y - 9} q6 8 0 12 q-6 -4 0 -12 Z`}
-          style={nth(i)}
-        />
+        <path key={i} d={`M${x + (i - (count - 1) / 2) * spread} ${y - 9} q6 8 0 12 q-6 -4 0 -12 Z`} style={nth(i)} />
       ))}
     </g>
   );

@@ -202,7 +202,12 @@ export function Saft() {
       {JUICES.map(({ x, fill, cap }, i) => (
         <g key={x} className="sm-saft-bottle" style={{ ...nth(i), transformOrigin: `${x + 13}px 449px` }}>
           <path d={`M${x} 449 V414 Q${x} 406 ${x + 8} 404 V398 H${x + 18} V404 Q${x + 26} 406 ${x + 26} 414 V449 Z`} fill="#f1f3f5" fillOpacity="0.9" />
-          <path className="sm-saft-juice" d={`M${x + 2} 447 V420 Q${x + 13} 416 ${x + 24} 420 V447 Z`} fill={fill} style={{ transformOrigin: `${x + 13}px 447px` }} />
+          <path
+            className="sm-saft-juice"
+            d={`M${x + 2} 447 V420 Q${x + 13} 416 ${x + 24} 420 V447 Z`}
+            fill={fill}
+            style={{ transformOrigin: `${x + 13}px 447px` }}
+          />
           <rect x={x + 7} y="394" width="12" height="6" rx="2" fill={cap} />
           <rect x={x + 3} y="426" width="20" height="12" rx="2" fill="#fff" />
           <circle cx={x + 13} cy="432" r="4" fill={fill} />
@@ -226,7 +231,13 @@ export function Bonbons() {
     <>
       {[1088, 1152].map((x, j) => (
         <g key={x}>
-          <path d={`M${x} 521 V478 Q${x} 470 ${x + 8} 470 H${x + 48} Q${x + 56} 470 ${x + 56} 478 V521 Z`} fill="#e7f5ff" fillOpacity="0.7" stroke="#a5d8ff" strokeWidth="2.5" />
+          <path
+            d={`M${x} 521 V478 Q${x} 470 ${x + 8} 470 H${x + 48} Q${x + 56} 470 ${x + 56} 478 V521 Z`}
+            fill="#e7f5ff"
+            fillOpacity="0.7"
+            stroke="#a5d8ff"
+            strokeWidth="2.5"
+          />
           {Array.from({ length: 10 }, (_, i) => (
             <circle key={i} cx={x + 9 + (i % 5) * 9.5} cy={512 - Math.floor(i / 5) * 12 - (i % 2) * 3} r="5.5" fill={SWEETS[(i + j * 3) % SWEETS.length]} />
           ))}

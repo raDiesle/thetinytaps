@@ -5,14 +5,7 @@ import { useGameSettings } from "@/lib/common";
 import { useDevice, type Device } from "@/lib/device";
 import { findScene } from ".";
 import { ScenePlay } from "./ScenePlay";
-import {
-  carryOverScenesSettings,
-  DEFAULT_SCENES_SETTINGS,
-  SCENES_SETTINGS_KEY,
-  type SceneAnnounce,
-  type SceneMode,
-  type SceneTrigger,
-} from "./settings";
+import { carryOverScenesSettings, DEFAULT_SCENES_SETTINGS, SCENES_SETTINGS_KEY, type SceneAnnounce, type SceneMode, type SceneTrigger } from "./settings";
 
 const pack = de;
 
@@ -33,30 +26,18 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       backHref="/bilder/"
       backLabel="Alle Bilder"
       modes={[
-        { id: "explore", emoji: "👆", title: "Entdecken" },
-        { id: "find", emoji: "🔍", title: "Suchen" },
-        { id: "sounds", emoji: "🔊", title: "Geräusch-Rätsel" },
-        { id: "questions", emoji: "❓", title: "Fragen" },
         { id: "colour", emoji: "🖍️", title: "Ausmalen" },
+        { id: "find", emoji: "🔍", title: "Suchen" },
+        { id: "questions", emoji: "❓", title: "Fragen" },
+        { id: "explore", emoji: "👆", title: "Freies Entdecken" },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as SceneMode })}
       settings={
         <>
           <SettingsGroup title="Spiel">
-            <Choice<SceneTrigger>
-              label="Auslösen"
-              value={settings.trigger}
-              onChange={(trigger) => update({ trigger })}
-              options={triggerOptions(device)}
-            />
-            {settings.trigger === "keys" && (
-              <Toggle
-                label="Tasten im Bild zeigen"
-                checked={settings.showKeys}
-                onChange={(showKeys) => update({ showKeys })}
-              />
-            )}
+            <Choice<SceneTrigger> label="Auslösen" value={settings.trigger} onChange={(trigger) => update({ trigger })} options={triggerOptions(device)} />
+            {settings.trigger === "keys" && <Toggle label="Tasten im Bild zeigen" checked={settings.showKeys} onChange={(showKeys) => update({ showKeys })} />}
             <Toggle
               label="Entdecken und Ausmalen: Mitzählen – wenn alles entdeckt ist, gibt es eine Party"
               checked={settings.goal}
@@ -67,11 +48,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               checked={settings.roads}
               onChange={(roads) => update({ roads })}
             />
-            <Toggle
-              label="Geräusch-Rätsel und Fragen: Tipp zeigen, wenn es länger dauert"
-              checked={settings.hints}
-              onChange={(hints) => update({ hints })}
-            />
+            <Toggle label="Fragen: Tipp zeigen, wenn es länger dauert" checked={settings.hints} onChange={(hints) => update({ hints })} />
             {settings.speech && (
               <Choice<SceneAnnounce>
                 label="Ansage beim Entdecken"

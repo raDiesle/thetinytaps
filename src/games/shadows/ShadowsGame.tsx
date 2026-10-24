@@ -43,14 +43,8 @@ export function ShadowsGame() {
           </SettingsGroup>
 
           <SettingsGroup title="Verhalten">
-            <Toggle
-              label="Schatten antippen reicht (sonst muss man das Bild ziehen)"
-              checked={settings.tap}
-              onChange={(tap) => update({ tap })}
-            />
-            {!device.touchOnly && (
-              <p className="setting-note">Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.</p>
-            )}
+            <Toggle label="Schatten antippen reicht (sonst muss man das Bild ziehen)" checked={settings.tap} onChange={(tap) => update({ tap })} />
+            {!device.touchOnly && <p className="setting-note">Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.</p>}
           </SettingsGroup>
         </>
       }

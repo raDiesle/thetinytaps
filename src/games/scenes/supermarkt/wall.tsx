@@ -229,7 +229,12 @@ export function Brottheke() {
       {breads.map(({ x, d, fill }, i) => (
         <g key={x} className="sm-brot-loaf" style={{ ...nth(i), transformOrigin: `${x}px 296px` }}>
           <path d={d} fill={fill} />
-          <path d={`M${x - 8} ${286 - (i % 2) * 2} l4 -6 M${x} ${285 - (i % 2) * 2} l4 -6 M${x + 8} ${286 - (i % 2) * 2} l4 -6`} stroke="#f3d9b1" strokeWidth="2.5" strokeLinecap="round" />
+          <path
+            d={`M${x - 8} ${286 - (i % 2) * 2} l4 -6 M${x} ${285 - (i % 2) * 2} l4 -6 M${x + 8} ${286 - (i % 2) * 2} l4 -6`}
+            stroke="#f3d9b1"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          />
         </g>
       ))}
       <path className="sm-brot-shine" d="M250 300 L266 256 H280 L264 300 Z" fill="#fff" opacity="0.45" />

@@ -10,8 +10,20 @@ function Pumpkin({ x, y, r = 16, colour = "#f77f00" }: { x: number; y: number; r
     <>
       <ellipse cx={x} cy={y - r * 0.8} rx={r * 1.15} ry={r * 0.85} fill={colour} />
       <ellipse cx={x} cy={y - r * 0.8} rx={r * 0.45} ry={r * 0.85} fill="#fff" opacity="0.18" />
-      <path d={`M${x - r * 0.5} ${y - r * 1.5} Q${x - r * 0.7} ${y - r * 0.8} ${x - r * 0.5} ${y - 1} M${x + r * 0.5} ${y - r * 1.5} Q${x + r * 0.7} ${y - r * 0.8} ${x + r * 0.5} ${y - 1}`} stroke="#000" strokeOpacity="0.15" strokeWidth={r * 0.12} fill="none" />
-      <path d={`M${x} ${y - r * 1.6} q${r * 0.1} ${-r * 0.4} ${r * 0.4} ${-r * 0.5}`} stroke="#6b4423" strokeWidth={r * 0.22} strokeLinecap="round" fill="none" />
+      <path
+        d={`M${x - r * 0.5} ${y - r * 1.5} Q${x - r * 0.7} ${y - r * 0.8} ${x - r * 0.5} ${y - 1} M${x + r * 0.5} ${y - r * 1.5} Q${x + r * 0.7} ${y - r * 0.8} ${x + r * 0.5} ${y - 1}`}
+        stroke="#000"
+        strokeOpacity="0.15"
+        strokeWidth={r * 0.12}
+        fill="none"
+      />
+      <path
+        d={`M${x} ${y - r * 1.6} q${r * 0.1} ${-r * 0.4} ${r * 0.4} ${-r * 0.5}`}
+        stroke="#6b4423"
+        strokeWidth={r * 0.22}
+        strokeLinecap="round"
+        fill="none"
+      />
     </>
   );
 }
@@ -103,10 +115,7 @@ export function Kuerbisstand() {
         {[-110, -66, -22, 22, 66, 110].map((x) => (
           <path key={x} d={`M${x - 11} -236 H${x + 11} L${x + 13} -196 H${x - 13} Z`} fill="#f77f00" />
         ))}
-        <path
-          d={`M-140 -196 ${Array.from({ length: 10 }, () => "q14 14 28 0").join(" ")} Z`}
-          fill="#f77f00"
-        />
+        <path d={`M-140 -196 ${Array.from({ length: 10 }, () => "q14 14 28 0").join(" ")} Z`} fill="#f77f00" />
       </g>
       {/* Sign with a pumpkin on it, hanging on the front of the counter */}
       <g className="he-stand-sign" style={{ transformOrigin: "70px -76px" }}>
@@ -284,9 +293,7 @@ export function Gummistiefel() {
 
 /** A colourful pinwheel stuck in the grass: it spins. */
 export function Windrad() {
-  const blade = (rot: number, colour: string) => (
-    <path key={rot} d="M0 0 L0 -40 Q30 -36 30 -6 Z" fill={colour} transform={`rotate(${rot})`} />
-  );
+  const blade = (rot: number, colour: string) => <path key={rot} d="M0 0 L0 -40 Q30 -36 30 -6 Z" fill={colour} transform={`rotate(${rot})`} />;
   return (
     <>
       {/* Wind lines that only show while it spins */}
@@ -297,7 +304,15 @@ export function Windrad() {
       </g>
       <g className="he-windrad-sway" style={{ transformOrigin: "0px 0px" }}>
         <path className="he-windrad-stick" d="M0 0 V-128" stroke="#9c6644" strokeWidth="6" strokeLinecap="round" />
-        <path className="he-windrad-ribbon" d="M0 -116 q10 6 4 18 q-6 10 4 20" stroke="#e63946" strokeWidth="4" strokeLinecap="round" fill="none" style={{ transformOrigin: "0px -116px" }} />
+        <path
+          className="he-windrad-ribbon"
+          d="M0 -116 q10 6 4 18 q-6 10 4 20"
+          stroke="#e63946"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+          style={{ transformOrigin: "0px -116px" }}
+        />
         <g transform="translate(0 -130)">
           <g className="he-windrad-blades">
             {blade(0, "#e63946")}

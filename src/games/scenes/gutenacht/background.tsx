@@ -18,13 +18,7 @@ function Wallpaper() {
     const y = 34 + row * 46;
     for (let col = 0; col < 24; col++) {
       const x = col * 70 + (row % 2) * 35 + 18;
-      shapes.push(
-        (col + row) % 3 ? (
-          <circle key={`${row}-${col}`} cx={x} cy={y} r="3.5" />
-        ) : (
-          <path key={`${row}-${col}`} d={star(x, y, 9)} />
-        ),
-      );
+      shapes.push((col + row) % 3 ? <circle key={`${row}-${col}`} cx={x} cy={y} r="3.5" /> : <path key={`${row}-${col}`} d={star(x, y, 9)} />);
     }
   }
   return <g fill="#e6defa">{shapes}</g>;
@@ -71,7 +65,10 @@ function WindowView() {
       ].map(([sx, sy, r]) => (
         <path key={`${sx}-${sy}`} d={sparkle(sx, sy, r * 2)} fill="#fff" opacity="0.7" />
       ))}
-      <path d={`M${x} ${bottom - 44} Q${x + 60} ${bottom - 70} ${x + 130} ${bottom - 48} Q${x + 190} ${bottom - 30} ${x + w} ${bottom - 56} V${bottom} H${x} Z`} fill="#5b5f9e" />
+      <path
+        d={`M${x} ${bottom - 44} Q${x + 60} ${bottom - 70} ${x + 130} ${bottom - 48} Q${x + 190} ${bottom - 30} ${x + w} ${bottom - 56} V${bottom} H${x} Z`}
+        fill="#5b5f9e"
+      />
       {/* Little houses with lit windows */}
       {[
         [654, bottom - 52, 22, 20],

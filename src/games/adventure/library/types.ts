@@ -70,22 +70,12 @@ export type Difficulty = "easy" | "medium";
 export type Energy = "calm" | "medium" | "lively";
 
 /** Where the motion goes, as the child sees it on screen. */
-export type MotionDirection =
-  | "back_to_front"
-  | "front_to_back"
-  | "up"
-  | "down"
-  | "up_down"
-  | "side_to_side"
-  | "outwards"
-  | "inwards"
-  | "around"
-  | "in_place";
+export type MotionDirection = "back_to_front" | "front_to_back" | "up" | "down" | "up_down" | "side_to_side" | "outwards" | "inwards" | "around" | "in_place";
 
 export type CameraStyle = "stationary" | "slow_push_in" | "follow" | "orbit" | "first_person";
 
 /**
- * Body animations of the 3D guide (../three/clips.ts). Many movements share
+ * Body animations of the 3D guide (../three/clips/). Many movements share
  * one clip: pushing a door and pushing a cloud look the same on the body, only
  * the world around differs.
  */

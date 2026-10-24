@@ -101,7 +101,21 @@ export function star(x: number, y: number, r: number) {
 }
 
 /** Little sparkles around (x, y) that twinkle while the item plays. */
-export function Sparkles({ x, y, spread = 30, count = 3, colour = "#ffe066", size = 1 }: { x: number; y: number; spread?: number; count?: number; colour?: string; size?: number }) {
+export function Sparkles({
+  x,
+  y,
+  spread = 30,
+  count = 3,
+  colour = "#ffe066",
+  size = 1,
+}: {
+  x: number;
+  y: number;
+  spread?: number;
+  count?: number;
+  colour?: string;
+  size?: number;
+}) {
   return (
     <g className="gn-sparkles" fill={colour}>
       {Array.from({ length: count }, (_, i) => {

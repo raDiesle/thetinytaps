@@ -33,7 +33,15 @@ export function Bubbles({ x, y, count = 3, spread = 18, r = 9 }: { x: number; y:
     <g className="kc-bubbles">
       {Array.from({ length: count }, (_, i) => (
         <g key={i} style={nth(i)}>
-          <circle cx={x + (i - (count - 1) / 2) * spread} cy={y - (i % 2) * spread * 0.6} r={r - (i % 3) * 2} fill="#e7f5ff" fillOpacity="0.6" stroke="#a5d8ff" strokeWidth="2.5" />
+          <circle
+            cx={x + (i - (count - 1) / 2) * spread}
+            cy={y - (i % 2) * spread * 0.6}
+            r={r - (i % 3) * 2}
+            fill="#e7f5ff"
+            fillOpacity="0.6"
+            stroke="#a5d8ff"
+            strokeWidth="2.5"
+          />
           <circle cx={x + (i - (count - 1) / 2) * spread - r * 0.35} cy={y - (i % 2) * spread * 0.6 - r * 0.35} r={r * 0.25} fill="#fff" />
         </g>
       ))}
