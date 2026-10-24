@@ -13,7 +13,7 @@ import {
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
-import { CALM_PACE, type AdventureSettings } from "./settings";
+import type { AdventureSettings } from "./settings";
 import type { Cue, Story, StoryFrame } from "./stories/story";
 import { Music } from "./three/music";
 import { StoryPlayer } from "./three/player";
@@ -106,7 +106,6 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
             if (shown > 0) silhouette.update(pose, view);
           },
         },
-        settings.pace === "calm" ? CALM_PACE : 1,
       );
     } catch {
       // No WebGL (very old device or switched off).

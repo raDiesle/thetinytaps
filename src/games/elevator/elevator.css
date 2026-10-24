@@ -876,34 +876,6 @@
   }
 }
 
-/* Calm mode: gentler steps. */
-.elevator-play.calm .pose-walk .el-leg-l,
-.elevator-play.calm .pose-walk .el-leg-r,
-.elevator-play.calm .pose-walk .el-arm-l,
-.elevator-play.calm .pose-walk .el-arm-r {
-  animation-duration: 0.6s;
-}
-
-/* The munching sounds come slower in calm mode; the fork and the bites follow them. */
-.elevator-play.calm .pose-eat .el-arm-r,
-.elevator-play.calm .pose-eat .el-lids {
-  animation-duration: 2s;
-  animation-delay: -0.4s;
-}
-
-.elevator-play.calm .el-bite-1 {
-  animation-delay: 0.7s;
-}
-
-.elevator-play.calm .el-bite-2 {
-  animation-delay: 2.7s;
-}
-
-.elevator-play.calm .el-plate-pancake,
-.elevator-play.calm .el-crumbs {
-  animation-delay: 4.7s;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .pose-walk .el-leg-l,
   .pose-walk .el-leg-r,

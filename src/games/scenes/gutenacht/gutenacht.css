@@ -926,7 +926,7 @@
 
 .item-puppenhaus .scene-surprise,
 .item-spielzeugkiste .scene-surprise {
-  animation-name: surprise-peek-calm;
+  animation-name: surprise-peek-gentle;
 }
 
 /* ---------- Puppenhaus: door opens, the doll bobs; asleep, lights go out one by one ---------- */

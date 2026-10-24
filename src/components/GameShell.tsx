@@ -16,7 +16,7 @@ import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useStoredSettings } from "@/lib/storage";
 
-/** A click on ✕ leaves the game after this long; the ring fills meanwhile. */
+/** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
 const EXIT_DELAY_MS = 500;
 
 /** Esc has to be held, since children press it while typing. */
@@ -223,15 +223,11 @@ export function GameShell({
           Los geht&apos;s!
         </button>
       )}
-      <p className="shared-settings-note">
-        {minutes > 0 ? (
-          <>
-            <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min. ·{" "}
-          </>
-        ) : null}
-        Spielzeit, Sprache, Vorlesen, Töne und ruhiger Modus gelten für alle Spiele – <Link to="/">auf der Startseite</Link>{" "}
-        einstellen.
-      </p>
+      {minutes > 0 && (
+        <p className="shared-settings-note">
+          <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min.
+        </p>
+      )}
       {settings && (
         // Folded away by default, so the start screen stays short.
         <details className="settings-panel">
@@ -288,7 +284,7 @@ function GoodNight() {
         🧸<span className="good-night-zzz">💤</span>
       </span>
       <p className="good-night-text">Gute Nacht!</p>
-      <p className="good-night-hint">Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts antippen.</p>
+      <p className="good-night-hint">Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts gedrückt halten.</p>
     </div>
   );
 }
@@ -308,11 +304,12 @@ const STARS: [number, number, number][] = [
 ];
 
 /**
- * The ✕ in the corner: a click leaves the game after half a second, while the
- * ring fills. A short note next to it says what it does when the game starts.
+ * The ✕ in the corner: it has to be held for half a second while the ring
+ * fills; letting go earlier keeps playing. A short note next to it says what
+ * it does when the game starts.
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
-  const [leaving, setLeaving] = useState(false);
+  const [holding, setHolding] = useState(false);
   const [hint, setHint] = useState(true);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -324,25 +321,47 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
     };
   }, []);
 
-  const leave = () => {
+  const press = () => {
     if (timer.current) return;
-    setLeaving(true);
+    setHolding(true);
     timer.current = setTimeout(onExit, EXIT_DELAY_MS);
   };
 
+  const release = () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    setHolding(false);
+  };
+
+  const isPressKey = (key: string) => key === "Enter" || key === " ";
+
   return (
-    <div className={`exit-corner${hint || leaving ? " hinted" : ""}`}>
+    <div className={`exit-corner${hint || holding ? " hinted" : ""}`}>
       <span className="exit-hint" aria-hidden>
-        {label}
+        {label} · halten
       </span>
       <button
         type="button"
-        className={`hold-exit${leaving ? " holding" : ""}`}
+        className={`hold-exit${holding ? " holding" : ""}`}
         style={{ "--hold-ms": `${EXIT_DELAY_MS}ms` } as CSSProperties}
-        aria-label={label}
-        // Keep the game from reacting to the tap on the button.
-        onPointerDown={(e: PointerEvent) => e.stopPropagation()}
-        onClick={leave}
+        aria-label={`${label} (gedrückt halten)`}
+        onPointerDown={(e: PointerEvent<HTMLButtonElement>) => {
+          // Keep the game from reacting to the tap on the button.
+          e.stopPropagation();
+          // A finger that slides a little still counts as holding.
+          e.currentTarget.setPointerCapture(e.pointerId);
+          press();
+        }}
+        onPointerUp={release}
+        onPointerCancel={release}
+        onContextMenu={(e) => e.preventDefault()}
+        onKeyDown={(e) => {
+          if (!isPressKey(e.key)) return;
+          e.preventDefault();
+          if (!e.repeat) press();
+        }}
+        onKeyUp={(e) => isPressKey(e.key) && release()}
+        onBlur={release}
       >
         ✕
       </button>

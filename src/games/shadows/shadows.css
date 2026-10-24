@@ -236,17 +236,6 @@
   }
 }
 
-/* Calm mode: no breathing or bouncing, slower moves. */
-.shadows-play.calm .sh-picture:not(.wrong),
-.shadows-play.calm .sh-option,
-.shadows-play.calm .sh-picture-box {
-  animation: none;
-}
-
-.shadows-play.calm .sh-prompt {
-  animation: fade-in 0.7s ease-out;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .sh-picture:not(.dragging, .landed, .wrong, .nudge-0, .nudge-1) {
     animation: none;

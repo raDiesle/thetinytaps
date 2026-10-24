@@ -1357,6 +1357,10 @@ kbd {
 
 .hold-exit {
   flex-shrink: 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   width: 44px;
   height: 44px;
   border: 0;
@@ -2473,16 +2477,6 @@ kbd {
   animation: waiting 1.2s ease-in-out infinite;
 }
 
-.calm .find-key,
-.calm .find-card.done .picture,
-.calm .keyboard-map-key.lit {
-  animation: none;
-}
-
-.calm .keyboard-map.shown {
-  animation: fade-in 0.7s ease-out;
-}
-
 /* ---------- Lebendige Bilder ---------- */
 
 /* Above and below the picture the sky and ground continue, whatever the screen shape. */
@@ -2586,10 +2580,6 @@ kbd {
   }
 }
 
-.calm .scene-keys .lit .scene-key-glow {
-  animation: none;
-}
-
 .scene-hint {
   fill: #ffffff30;
   stroke: #fff;
@@ -2649,10 +2639,6 @@ kbd {
   transform-box: fill-box;
   transform-origin: center;
   animation: exit-pop 0.4s ease-out both, exit-pulse 1.6s 0.4s ease-in-out infinite;
-}
-
-.calm .scene-exit-pulse {
-  animation: exit-pop 0.4s ease-out both;
 }
 
 .scene-exit-bubble {
@@ -2855,10 +2841,6 @@ kbd {
   }
 }
 
-.calm.party .scene-item {
-  animation: none;
-}
-
 /* A note for the grown-up, below the picture; the picture stays playable. */
 .scene-rotate {
   display: none;
@@ -3046,10 +3028,6 @@ kbd {
 /* Doing words: once typed, the figure does it until the next word. Calm mode does it slower. */
 .figure.actor {
   --act-slow: 1;
-}
-
-.calm .figure.actor {
-  --act-slow: 2;
 }
 
 .act-hop {
@@ -3433,67 +3411,6 @@ kbd {
   background: repeating-linear-gradient(90deg, #a1887f 0 calc(var(--unit) * 0.12), transparent 0 calc(var(--unit) * 0.4));
 }
 
-/* Calm mode: no wiggling or bouncing, softer shapes, slower colour changes. */
-.letters-play.calm,
-.words-play.calm {
-  transition-duration: 1.2s;
-}
-
-.calm .picture,
-.calm .glyphs.family .mama,
-.calm .glyphs.family .baby:not(.grown) {
-  animation: none;
-}
-
-/* Calm: the letter still turns into its animal, but it keeps still. */
-.calm .living,
-.calm .living-animal g {
-  animation: none;
-}
-
-.calm .card,
-.calm .reveal.shown {
-  animation: fade-in 0.7s ease-out;
-}
-
-.calm .count-tap.counted .count-item {
-  animation: none;
-}
-
-.calm .count-badge,
-.calm .trace-star {
-  animation: fade-in 0.7s ease-out;
-}
-
-.calm .reveal.waiting,
-.calm .touch-key.wanted,
-.calm .slot.next,
-.calm .card.done .slot {
-  animation: none;
-}
-
-.calm .train.leaving .wagon:not(.slot) {
-  animation: none;
-}
-
-.calm .slot.typed {
-  animation: fade-in 0.7s ease-out;
-}
-
-.calm .burst-layer {
-  opacity: 0.45;
-}
-
-.calm .burst {
-  animation-duration: calc(var(--lifetime) * 1.6);
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .picture,
   .glyphs.family .mama,
@@ -3523,6 +3440,3 @@ kbd {
   color: #fffc;
 }
 
-.calm .translation {
-  animation: none;
-}

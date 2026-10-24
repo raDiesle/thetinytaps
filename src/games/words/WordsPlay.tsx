@@ -6,7 +6,7 @@ import { keyMatches, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import { translate } from "@/content/translate";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
-import { playChime, playCountNote, playRandomNote, setSfxVolume } from "@/lib/sfx";
+import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { MAX_LETTERS, type WordsMode, type WordsSettings } from "./settings";
 
@@ -97,13 +97,13 @@ export function WordsPlay({
   const color = current && isColor(current.word) ? current.word : null;
   const action = current && isAction(current.word) ? current.word : null;
   const translation = current && second ? translate(current.word, second) : undefined;
-  const parade = useMemo(() => (color ? paradeSpots(settings.calm ? 4 : color.things.length) : []), [color, settings.calm]);
+  const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, pack.speechLang, { queue, rate: settings.calm ? 0.75 : 0.85 });
+      if (settings.speech) speak(text, pack.speechLang, { queue, rate: 0.85 });
     },
-    [settings.speech, settings.calm, pack.speechLang],
+    [settings.speech, pack.speechLang],
   );
 
   const sayLetter = useCallback(
@@ -159,11 +159,11 @@ export function WordsPlay({
     const word = current.word;
     say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
     if (settings.speech && second && translation) {
-      speak(`${translation}!`, second.speechLang, { queue: true, rate: settings.calm ? 0.75 : 0.85 });
+      speak(`${translation}!`, second.speechLang, { queue: true, rate: 0.85 });
     }
     if (isColor(word)) setBackground(word.color);
-    for (let i = 0; i < (settings.calm ? 3 : 8); i++) spawn();
-  }, [current, done, letters, typed, firstOnly, pack, second, translation, say, sayLetter, spawn, settings.sounds, settings.speech, settings.calm]);
+    for (let i = 0; i < 8; i++) spawn();
+  }, [current, done, letters, typed, firstOnly, pack, second, translation, say, sayLetter, spawn, settings.sounds, settings.speech]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -215,10 +215,6 @@ export function WordsPlay({
   const touchKeys = useTouchKeys(settings.touchKeys);
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
 
-  useEffect(() => {
-    setSfxVolume(settings.calm ? 0.4 : 1);
-  }, [settings.calm]);
-
   // Tapping the waiting letter types it, tapping the picture says the word,
   // and once the word is done any tap moves on. Everywhere else makes shapes.
   const onPlayAreaPointer = (e: PointerEvent) => {
@@ -266,7 +262,7 @@ export function WordsPlay({
 
   return (
     <div
-      className={`words-play${settings.calm ? " calm" : ""}${color && done ? " colored" : ""}`}
+      className={`words-play${color && done ? " colored" : ""}`}
       style={{ background }}
       onPointerDown={onPlayAreaPointer}
     >

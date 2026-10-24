@@ -137,13 +137,6 @@ function CommonOptions() {
         <Toggle label="Töne und Geräusche" checked={common.sounds} onChange={(sounds) => update({ sounds })} />
       </SettingsGroup>
 
-      <SettingsGroup title="Verhalten">
-        <Toggle
-          label="Ruhiger Modus (leiser, weniger Bewegung, langsamer)"
-          checked={common.calm}
-          onChange={(calm) => update({ calm })}
-        />
-      </SettingsGroup>
       <p className="setting-note">Alles Weitere, was nur zu einem Spiel gehört, steht auf dessen Startseite unter „Einstellungen“.</p>
     </section>
   );

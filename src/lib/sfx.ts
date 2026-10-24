@@ -21,7 +21,7 @@ export function audioContext(): AudioContext | null {
   return audio();
 }
 
-/** Scales all effects, e.g. 0.4 for calm mode. */
+/** Scales all effects, e.g. while play time fades out. */
 export function setSfxVolume(volume: number) {
   masterVolume = volume;
 }

@@ -99,13 +99,11 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
               onChange={(season) => update({ season })}
               options={seasonOptions()}
             />
-            {!settings.calm && (
-              <Toggle
-                label="Bild bewegt sich auch von allein, ohne Ton (Wolken, Rotor, Blinklichter …)"
-                checked={settings.ambient}
-                onChange={(ambient) => update({ ambient })}
-              />
-            )}
+            <Toggle
+              label="Bild bewegt sich auch von allein, ohne Ton (Wolken, Rotor, Blinklichter …)"
+              checked={settings.ambient}
+              onChange={(ambient) => update({ ambient })}
+            />
           </SettingsGroup>
         </>
       }
