@@ -1,6 +1,9 @@
 import type { CSSProperties, PointerEvent } from "react";
-import { Cloud, INK } from "@/games/scenes/shared";
+import { Cloud } from "@/games/scenes/shared";
 import {
+  ACTION_R,
+  ACTION_X,
+  ACTION_Y,
   BUTTON_R,
   BUTTON_X,
   CABIN_H,
@@ -23,7 +26,7 @@ import {
 import type { Weather } from "./rooms";
 import { star } from "./things";
 
-// The house around the rooms: sky, roof, walls, the lift shaft with its cabin and the call buttons.
+// The house around the rooms: sky, roof, walls, the lift shaft with its cabin, the call buttons and the action button.
 
 const FLOOR_LIST = Array.from({ length: FLOORS }, (_, f) => f);
 const CABIN_W = CABIN_R - CABIN_L;
@@ -58,7 +61,7 @@ export function Backdrop({ weather }: { weather: Weather }) {
             [-20, 260],
             [1360, 220],
             [1320, 420],
-            [-50, 520],
+            [-150, 940],
           ].map(([x, y], i) => (
             <path key={x * y} className="el-twinkle" style={{ animationDelay: `${i * 0.4}s` }} d={star(x, y, 9)} fill="#fff3bf" />
           ))}
@@ -220,21 +223,28 @@ export function Hint({ floor }: { floor: number }) {
   );
 }
 
-/** A glowing ring with a hand tapping on it: tap here (or anywhere, or any key) to help. */
-export function TapMark({ x, y }: { x: number; y: number }) {
+/** The big action button left of the house, always in the same place: grey while there is nothing to do,
+ * red and glowing while a tap is awaited. Any tap or key does the same; the button only shows when and where.
+ * A new `nudge` makes it jump again. */
+export function ActionButton({ waiting, nudge }: { waiting: boolean; nudge: number }) {
   return (
-    <g className="el-tap" transform={`translate(${x} ${y})`}>
-      <g className="el-tap-pop">
-        <circle className="el-tap-ring" r="42" fill="#fff3bf" fillOpacity="0.25" stroke="#ffd43b" strokeWidth="9" />
-        <g className="el-tap-hand" fill="#fff" stroke={INK} strokeWidth="5" strokeLinejoin="round">
-          {/* Fingertip on the middle of the ring, the hand above it */}
-          <g transform="translate(8 8) rotate(-24)">
-            <rect x="-14" y="-86" width="54" height="52" rx="18" />
-            <circle cx="22" cy="-36" r="9" />
-            <circle cx="35" cy="-40" r="8" />
-            <ellipse cx="-16" cy="-54" rx="8" ry="15" transform="rotate(-30 -16 -54)" />
-            <path d="M-9 -44 V-6 Q-9 4 0 4 Q9 4 9 -6 V-44" />
-          </g>
+    <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label="Los">
+      <rect
+        x={ACTION_X - ACTION_R - 14}
+        y={ACTION_Y - ACTION_R - 14}
+        width={2 * ACTION_R + 28}
+        height={2 * ACTION_R + 36}
+        rx={ACTION_R + 14}
+        fill="#cfd8dc"
+        stroke="#90a4ae"
+        strokeWidth="6"
+      />
+      <g key={nudge} className="el-action-jump" style={{ transformOrigin: `${ACTION_X}px ${ACTION_Y}px` }}>
+        <circle className="el-action-glow" cx={ACTION_X} cy={ACTION_Y} r={ACTION_R + 10} fill="none" stroke="#ffd43b" strokeWidth="16" />
+        <g className="el-action-press">
+          <circle className="el-action-base" cx={ACTION_X} cy={ACTION_Y + 9} r={ACTION_R} />
+          <circle className="el-action-face" cx={ACTION_X} cy={ACTION_Y} r={ACTION_R} strokeWidth="7" />
+          <path className="el-action-star" d={star(ACTION_X, ACTION_Y + 4, 46)} strokeWidth="6" strokeLinejoin="round" />
         </g>
       </g>
     </g>

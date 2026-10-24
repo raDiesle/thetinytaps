@@ -432,7 +432,7 @@ export function Tub({ bather, soap = 0, quack = 0 }: { bather?: ReactNode; soap?
         {[-80, -56, -30, 30, 56, 82].map((x, i) => (
           <circle key={x} cx={x} cy={-88 - (i % 2) * 8} r={14 + (i % 3) * 3} />
         ))}
-        {[-66, 70, -8, -42, 44, 14].slice(0, soap * 2).map((x, i) => (
+        {[-66, 70, -8, -42, 44, 14].slice(0, soap * 3).map((x, i) => (
           <circle key={`s${x}`} className="el-pop-in" cx={x} cy={-100 - (i % 3) * 12} r={13 + (i % 2) * 5} />
         ))}
       </g>
@@ -758,45 +758,76 @@ export function RainHat() {
   );
 }
 
-/** The mixing bowl. What is in it comes in tap by tap: `eggs`, `milk`, `flour`; `mixed` stirs it into batter, `poured` empties it. */
+/** The outline of the glass bowl, from the rim down to its foot. */
+const BOWL = "M-56 -56 Q-54 -8 -24 -3 H24 Q54 -8 56 -56 Z";
+
+/** The glass mixing bowl, so the child sees what goes in, tap by tap: `eggs` (yolks), `milk`, `flour` (a white heap);
+ * `mixed` stirs it all into yellow batter, and every pancake `poured` lowers it. `children` (the mixer) dip into it. */
 export function Bowl({
   eggs = 0,
   milk = false,
   flour = 0,
   mixed = 0,
   poured = 0,
+  children,
 }: {
   eggs?: number;
   milk?: boolean;
   flour?: number;
   mixed?: number;
   poured?: number;
+  children?: ReactNode;
 }) {
-  /** How smooth the batter is, 0 to 1. */
-  const smooth = Math.min(1, mixed / 5);
-  const batter = milk || eggs > 0;
-  const pile = flour * 9 * (1 - smooth);
+  const clip = useId();
+  /** The top of the milk, then of the batter, which sinks with every pancake. */
+  const milkTop = -28;
+  const batterTop = -38 + poured * 9;
+  const yolkY = milk ? milkTop : -9;
   return (
     <>
-      <ellipse cx="0" cy="-42" rx="44" ry="8" fill="#868e96" />
-      {poured < 3 && batter && (
-        <ellipse cx="0" cy={-41 + poured * 2} rx={40 - poured * 6} ry="6" fill={smooth > 0 ? "#ffe8a3" : milk ? "#fff9db" : "#ffec99"} />
-      )}
-      {smooth === 0 &&
-        [-14, 6, 20].slice(0, eggs).map((x) => (
-          <g key={x}>
-            <ellipse cx={x} cy="-42" rx="9" ry="4" fill="#fff" opacity="0.9" />
-            <ellipse cx={x} cy="-43" rx="4.5" ry="3" fill="#fab005" />
-          </g>
-        ))}
-      {pile > 0 && <path d={`M${-22 - flour * 4} -40 Q0 ${-44 - pile * 2} ${22 + flour * 4} -40 Z`} fill="#fff" stroke="#e9ecef" strokeWidth="2" />}
-      {smooth > 0 && poured < 3 && (
-        <path className="el-swirl" d="M-20 -41 Q-8 -46 4 -41 Q14 -37 22 -42" stroke="#f4b860" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-      )}
-      <path d="M-46 -42 H46 Q44 -8 20 -3 H-20 Q-44 -8 -46 -42 Z" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" strokeLinejoin="round" />
-      <path d="M-34 -32 Q-30 -16 -16 -10" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
-      <rect x="-18" y="-4" width="36" height="5" rx="2" fill="#4dabf7" />
-      <ellipse cx="0" cy="-42" rx="46" ry="8" fill="none" stroke="#4dabf7" strokeWidth="3" />
+      <clipPath id={clip}>
+        <path d={BOWL} />
+      </clipPath>
+      <ellipse cx="0" cy="-56" rx="56" ry="11" fill="#e7f5ff" fillOpacity="0.5" stroke="#495057" strokeWidth="4" />
+      <g clipPath={`url(#${clip})`}>
+        {mixed > 0 ? (
+          poured < 3 && (
+            <g className="el-blend">
+              <rect x="-60" y={batterTop} width="120" height="60" fill="#fcc419" />
+              <ellipse cx="0" cy={batterTop} rx="60" ry="7" fill="#ffd43b" />
+            </g>
+          )
+        ) : (
+          <>
+            {milk && (
+              <>
+                <rect x="-60" y={milkTop} width="120" height="40" fill="#fff" />
+                <ellipse cx="0" cy={milkTop} rx="60" ry="6" fill="#f1f3f5" />
+              </>
+            )}
+            {[-16, 14].slice(0, eggs).map((x) => (
+              <g key={x}>
+                <ellipse cx={x} cy={yolkY} rx="13" ry="5" fill="#fff" stroke="#e9ecef" strokeWidth="2" />
+                <circle cx={x} cy={yolkY - 1} r="7" fill="#fab005" />
+              </g>
+            ))}
+            {flour > 0 && (
+              <path
+                d={`M-34 ${milk ? milkTop + 2 : -6} Q-6 ${(milk ? milkTop : -6) - 30} 34 ${milk ? milkTop + 2 : -6} Z`}
+                fill="#fff"
+                stroke="#adb5bd"
+                strokeWidth="2.5"
+              />
+            )}
+          </>
+        )}
+      </g>
+      {children}
+      {/* The glass in front: a light tint, a dark outline and a shine, so the bowl stands out from any wall */}
+      <path d={BOWL} fill="#d0ebff" fillOpacity="0.18" stroke="#495057" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M-44 -46 Q-42 -20 -26 -12" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.8" />
+      <rect x="-22" y="-4" width="44" height="6" rx="3" fill="#495057" />
+      <path d="M-56 -56 A56 11 0 0 0 56 -56" fill="none" stroke="#495057" strokeWidth="4" />
     </>
   );
 }
@@ -825,21 +856,22 @@ export function Mixer({ spinning = false }: { spinning?: boolean }) {
   );
 }
 
-/** A paper bag of flour with an ear of wheat on it. */
+/** A paper bag of flour with a red band and an ear of wheat on it; the dark outline keeps it apart from white tiles. */
 export function FlourBag() {
   return (
     <>
       <path
         d="M-26 0 Q-32 -30 -24 -58 L-16 -66 H16 L24 -58 Q32 -30 26 0 Z"
-        fill="#f8f9fa"
-        stroke="#ced4da"
+        fill="#fff"
+        stroke="#495057"
         strokeWidth="3"
         strokeLinejoin="round"
       />
-      <path d="M-16 -66 L-10 -76 H10 L16 -66" fill="#e9ecef" stroke="#ced4da" strokeWidth="3" strokeLinejoin="round" />
-      <path d="M0 -10 V-48" stroke="#e8a317" strokeWidth="3" strokeLinecap="round" />
-      {[-44, -36, -28, -20].map((y) => (
-        <g key={y} fill="#fab005">
+      <path d="M-28 -44 H28 Q30 -30 28 -14 H-28 Q-30 -30 -28 -44 Z" fill="#e03131" />
+      <path d="M-16 -66 L-10 -76 H10 L16 -66" fill="#f1f3f5" stroke="#495057" strokeWidth="3" strokeLinejoin="round" />
+      <path d="M0 -18 V-50" stroke="#ffd43b" strokeWidth="3" strokeLinecap="round" />
+      {[-46, -38, -30, -22].map((y) => (
+        <g key={y} fill="#ffd43b">
           <ellipse cx="-5" cy={y} rx="3.5" ry="6" transform={`rotate(-30 -5 ${y})`} />
           <ellipse cx="5" cy={y} rx="3.5" ry="6" transform={`rotate(30 5 ${y})`} />
         </g>
