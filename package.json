@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "preview": "rsbuild preview",
     "image": "node scripts/gemini-image.mjs",
+    "song": "node scripts/song-timing.mjs",
     "archive-check": "node scripts/archive-check.mjs"
   },
   "dependencies": {
