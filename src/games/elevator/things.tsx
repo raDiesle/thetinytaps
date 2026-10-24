@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { INK } from "@/games/scenes/shared";
 
 // The things of the stories. Each drawing has its foot point at (0, 0) and is centred on x = 0.
@@ -217,50 +217,98 @@ export function EmptyPlate() {
   );
 }
 
-/** The round table on the roof terrace with two stools; at the feast the food stands on it. */
-export function Table({ feast = false }: { feast?: boolean }) {
+/** How far the stools stand left and right of the table. */
+const STOOL_X = 140;
+/** Side and seat height of the stools: the hero's, and the lower one for the little brother. */
+const STOOLS: [number, number][] = [
+  [-1, 50],
+  [1, 40],
+];
+
+/** A heart around (x, y). */
+const heart = (x: number, y: number) => `M${x} ${y - 4} c-4 -6 -12 -1 -6 5 l6 5 l6 -5 c6 -6 -2 -11 -6 -5 Z`;
+
+/** A child's plate with one pancake; while eating, bites go out of it until only crumbs are left. */
+function PlatePancake({ x, meal }: { x: number; meal: "eating" | "eaten" }) {
+  const id = useId();
+  return (
+    <g transform={`translate(${x} -86)`}>
+      <ellipse cx="0" cy="0" rx="26" ry="7" fill="#fff" stroke="#ced4da" strokeWidth="2.5" />
+      <ellipse cx="0" cy="-1" rx="16" ry="4" fill="#f1f3f5" />
+      <g className={meal === "eating" ? "el-crumbs" : undefined} fill="#d9902f">
+        <circle cx="-8" cy="-2" r="2" />
+        <circle cx="5" cy="0" r="1.6" />
+        <circle cx="10" cy="-3" r="2.2" />
+      </g>
+      {meal === "eating" && (
+        <g className="el-plate-pancake">
+          <mask id={id}>
+            <rect x="-30" y="-20" width="60" height="30" fill="#fff" />
+            <circle className="el-bite el-bite-1" cx="-17" cy="-5" r="7" fill="#000" />
+            <circle className="el-bite el-bite-2" cx="15" cy="-6" r="8" fill="#000" />
+          </mask>
+          <g mask={`url(#${id})`}>
+            <ellipse cx="0" cy="-3" rx="19" ry="6" fill="#d9902f" />
+            <ellipse cx="0" cy="-6" rx="19" ry="5.5" fill="#f4b860" />
+            <path d="M-8 -7 Q0 -11 9 -7 Q4 -3 -2 -4 Q-6 -2 -8 -7 Z" fill="#a0522d" opacity="0.85" />
+          </g>
+        </g>
+      )}
+      {meal === "eating" &&
+        [0, 1].map((i) => (
+          <path key={i} className="el-yum" d={heart(-6 + i * 14, -22)} fill="#ff6b6b" style={{ animationDelay: `${i * 0.8}s` }} />
+        ))}
+    </g>
+  );
+}
+
+/** The round table on the roof terrace with two stools; at the feast the food stands on it and the children eat their pancakes. */
+export function Table({ meal = null }: { meal?: "eating" | "eaten" | null }) {
+  const scallops = Array.from({ length: 14 }, (_, i) => {
+    const x = 112 - i * 16;
+    return `Q${x - 8} -50 ${x - 16} -58`;
+  }).join(" ");
   return (
     <>
-      {[-1, 1].map((s) => (
-        <g key={s}>
-          <rect x={s * 120 - 26} y="-56" width="52" height="12" rx="6" fill="#ff6b6b" />
+      {STOOLS.map(([s, h]) => (
+        <g key={s} transform={`translate(${s * STOOL_X} 0)`}>
           <path
-            d={`M${s * 120 - 18} -44 L${s * 120 - 22} 0 M${s * 120 + 18} -44 L${s * 120 + 22} 0`}
+            d={`M-22 ${-h + 10} L-28 0 M22 ${-h + 10} L28 0 M-25 ${-h / 2} H25`}
             stroke={WOOD_DARK}
             strokeWidth="7"
             strokeLinecap="round"
           />
+          <rect x="-38" y={-h} width="76" height="14" rx="7" fill="#ff6b6b" />
+          <rect x="-32" y={-h + 2} width="64" height="4" rx="2" fill="#ffa8a8" />
         </g>
       ))}
       <path d="M-8 -82 H8 L14 0 H-14 Z" fill={WOOD_DARK} />
-      <ellipse cx="0" cy="-2" rx="34" ry="6" fill={WOOD_DARK} />
-      <path
-        d="M-90 -88 H90 L96 -58 Q80 -50 64 -58 Q48 -50 32 -58 Q16 -50 0 -58 Q-16 -50 -32 -58 Q-48 -50 -64 -58 Q-80 -50 -96 -58 Z"
-        fill="#fff"
-        stroke="#ff8787"
-        strokeWidth="3"
-      />
-      {[-64, -32, 0, 32, 64].map((x) => (
+      <ellipse cx="0" cy="-2" rx="38" ry="6" fill={WOOD_DARK} />
+      <path d={`M-106 -88 H106 L112 -58 ${scallops} Z`} fill="#fff" stroke="#ff8787" strokeWidth="3" />
+      {[-78, -52, -26, 0, 26, 52, 78].map((x) => (
         <circle key={x} cx={x} cy="-74" r="6" fill="#ff8787" />
       ))}
-      <ellipse cx="0" cy="-88" rx="90" ry="10" fill="#fff" stroke="#ff8787" strokeWidth="3" />
-      {feast ? (
+      <ellipse cx="0" cy="-88" rx="106" ry="11" fill="#fff" stroke="#ff8787" strokeWidth="3" />
+      {meal ? (
         <g>
-          <g transform="translate(-34 -88) scale(0.8)">
-            <Pancakes />
-          </g>
-          <g transform="translate(40 -88) scale(0.7)">
+          <g transform="translate(20 -94) scale(0.55)">
             <Juice />
           </g>
+          <g transform="translate(-12 -86) scale(0.72)">
+            <Pancakes />
+          </g>
+          <Steam x={-12} y={-128} className={meal === "eating" ? "el-steam on" : "el-steam"} />
           {[-1, 1].map((s) => (
             <path
               key={s}
-              d={`M${s * 72 - 8} -110 L${s * 72 - 6} -90 H${s * 72 + 6} L${s * 72 + 8} -110 Z`}
+              d={`M${s * 44 - 8} -106 L${s * 44 - 6} -86 H${s * 44 + 6} L${s * 44 + 8} -106 Z`}
               fill="#ffc078"
               stroke="#adb5bd"
               strokeWidth="2"
             />
           ))}
+          <PlatePancake x={-78} meal={meal} />
+          <PlatePancake x={78} meal={meal} />
         </g>
       ) : (
         <path d="M-12 -92 Q0 -120 12 -92 Z" fill="#ffd43b" stroke="#fab005" strokeWidth="2" />

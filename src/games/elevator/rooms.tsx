@@ -344,7 +344,7 @@ export function Kinderzimmer({ playing, used }: RoomProps) {
 
 /** The roof terrace: open to the sky, a sunshade, plants and the table for the feast. */
 export function Terrasse({ playing, used }: RoomProps) {
-  const feast = playing === "feast" || used.includes("feast");
+  const meal = playing === "feast" ? "eating" : used.includes("feast") ? "eaten" : null;
   return (
     <>
       <Outside x={ROOM_L} y={-ROOM_H} w={W} h={ROOM_H} />
@@ -376,7 +376,7 @@ export function Terrasse({ playing, used }: RoomProps) {
       <Plant x={430} size={0.7} pot="#f08c00" />
       <Floorboards colour="#c88b3a" line="#a0662f" />
       <g transform="translate(640 0)">
-        <Table feast={feast} />
+        <Table meal={meal} />
       </g>
     </>
   );

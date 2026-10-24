@@ -52,7 +52,7 @@ const IN_FRONT: Partial<Record<Holding, { draw: () => ReactNode; scale: number }
   teddy: { draw: () => <Teddy />, scale: 0.6 },
 };
 
-type Arm = "down" | "up" | "out" | "front" | "belly" | "mouth" | "side";
+type Arm = "down" | "up" | "out" | "front" | "belly" | "mouth" | "fork" | "side";
 
 /** The right arm in each position, and where its hand is; the left one is mirrored. */
 const ARMS: Record<Arm, { d: string; hand: [number, number] }> = {
@@ -62,13 +62,15 @@ const ARMS: Record<Arm, { d: string; hand: [number, number] }> = {
   front: { d: "M22 -100 Q34 -80 18 -70", hand: [17, -70] },
   belly: { d: "M22 -100 Q36 -82 12 -74", hand: [10, -74] },
   mouth: { d: "M22 -100 Q44 -98 14 -118", hand: [12, -120] },
+  fork: { d: "M22 -100 Q48 -100 30 -116", hand: [28, -118] },
   side: { d: "M22 -100 Q42 -106 40 -96", hand: [40, -94] },
 };
 
 function rightArm(pose: Pose, front: boolean): Arm {
   if (pose === "reach") return "out";
   if (pose === "cheer" || pose === "yawn" || pose === "build") return "up";
-  if (pose === "drink" || pose === "brush" || pose === "eat") return "mouth";
+  if (pose === "eat") return "fork";
+  if (pose === "drink" || pose === "brush") return "mouth";
   if (pose === "tummy") return "belly";
   return front ? "front" : "down";
 }
@@ -155,6 +157,39 @@ export function Kid({
   const sleeve = coat ? "#ffd43b" : shirt;
   const [rx, ry] = right.hand;
   const [lx, ly] = left.hand;
+  // Eating, the child sits on a stool with its legs dangling and brings the fork up in front of its face.
+  const sitting = pose === "eat";
+  const legH = sitting ? 30 : 50;
+  const rightArmEl = (
+    <g className="el-arm el-arm-r" style={{ transformOrigin: "22px -100px" }}>
+      {holding === "mug" && (
+        <g transform={`translate(${rx + 4} ${ry + 14}) scale(0.6)`}>
+          <Mug />
+        </g>
+      )}
+      {holding === "toothbrush" && (
+        <g transform={`translate(${rx + 2} ${ry + 2}) rotate(-80) scale(0.55)`}>
+          <Toothbrush />
+        </g>
+      )}
+      {holding === "boat" && (
+        <g transform={`translate(${rx + 2} ${ry + 30}) scale(0.6)`}>
+          <Boat />
+        </g>
+      )}
+      <path d={right.d} stroke={sleeve} strokeWidth="14" strokeLinecap="round" fill="none" />
+      {sitting && !holding && (
+        <g transform={`translate(${rx} ${ry})`}>
+          <path d="M2 2 L-18 -4" stroke="#868e96" strokeWidth="4" strokeLinecap="round" />
+          <path d="M-17 -8 L-26 -10 M-18 -4 L-28 -6 M-19 0 L-27 -1" stroke="#868e96" strokeWidth="2.5" strokeLinecap="round" />
+          <ellipse cx="-27" cy="-3" rx="9" ry="6" fill="#d9902f" />
+          <ellipse cx="-27" cy="-6" rx="9" ry="5" fill="#f4b860" />
+          <path d="M-31 -8 Q-27 -10 -23 -8" stroke="#a0522d" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+        </g>
+      )}
+      <circle cx={rx} cy={ry} r="8" fill={SKIN} />
+    </g>
+  );
 
   return (
     <g className={`el-kid pose-${pose}`} style={{ transform: `scaleX(${face})` }}>
@@ -163,7 +198,7 @@ export function Kid({
         {/* Legs */}
         {[-1, 1].map((s) => (
           <g key={s} className={`el-leg el-leg-${s < 0 ? "l" : "r"}`} style={{ transformOrigin: `${s * 10}px -52px` }}>
-            <rect x={s * 11 - 7} y="-54" width="14" height="50" rx="6" fill={pants} />
+            <rect x={s * 11 - 7} y="-54" width="14" height={legH} rx="6" fill={pants} />
             {pyjama && <path d={`M${s * 11 - 7} -36 H${s * 11 + 7} M${s * 11 - 7} -20 H${s * 11 + 7}`} stroke="#74c0fc" strokeWidth="4" />}
             {boots ? (
               <>
@@ -177,7 +212,7 @@ export function Kid({
                 <rect x={s * 11 - 10} y="-33" width="20" height="6" rx="3" fill="#fab005" />
               </>
             ) : (
-              <ellipse cx={s * 13} cy="-4" rx="13" ry="7" fill={pyjama ? "#f783ac" : "#495057"} />
+              <ellipse cx={s * 13} cy={legH - 54} rx="13" ry="7" fill={pyjama ? "#f783ac" : "#495057"} />
             )}
           </g>
         ))}
@@ -241,26 +276,7 @@ export function Kid({
               ))}
           </g>
         </g>
-        <g className="el-arm el-arm-r" style={{ transformOrigin: "22px -100px" }}>
-          {holding === "mug" && (
-            <g transform={`translate(${rx + 4} ${ry + 14}) scale(0.6)`}>
-              <Mug />
-            </g>
-          )}
-          {holding === "toothbrush" && (
-            <g transform={`translate(${rx + 2} ${ry + 2}) rotate(-80) scale(0.55)`}>
-              <Toothbrush />
-            </g>
-          )}
-          {holding === "boat" && (
-            <g transform={`translate(${rx + 2} ${ry + 30}) scale(0.6)`}>
-              <Boat />
-            </g>
-          )}
-          {pose === "eat" && !holding && <ellipse cx={rx - 4} cy={ry - 2} rx="9" ry="6" fill="#f4b860" stroke="#d9902f" strokeWidth="2" />}
-          <path d={right.d} stroke={sleeve} strokeWidth="14" strokeLinecap="round" fill="none" />
-          <circle cx={rx} cy={ry} r="8" fill={SKIN} />
-        </g>
+        {!sitting && rightArmEl}
         {/* Head */}
         <rect x="-7" y="-116" width="14" height="12" fill={SKIN} />
         <g className="el-head" style={{ transformOrigin: "0px -108px" }}>
@@ -269,6 +285,7 @@ export function Kid({
           {pyjama && <path d="M-20 -176 Q0 -200 30 -186 L36 -160 Q10 -172 -20 -176 Z" fill="#74c0fc" />}
           {pyjama && <circle cx="38" cy="-160" r="6" fill="#fff" />}
         </g>
+        {sitting && rightArmEl}
       </g>
     </g>
   );
@@ -310,7 +327,7 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
     ),
   },
   juice: { w: 40, h: 86, draw: () => <Juice /> },
-  table: { w: 300, h: 124, draw: () => <Table /> },
+  table: { w: 360, h: 124, draw: () => <Table /> },
   moon: {
     w: 140,
     h: 120,
