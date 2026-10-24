@@ -4,13 +4,7 @@ import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { sampleLetter } from "@/content/languages";
 import { useCommonSettings } from "@/lib/common";
-import {
-  DEFAULT_PLAYTIME_SETTINGS,
-  playedToday,
-  PLAYTIME_OPTIONS,
-  PLAYTIME_SETTINGS_KEY,
-  resetPlaytime,
-} from "@/lib/playtime";
+import { DEFAULT_PLAYTIME_SETTINGS, playedToday, PLAYTIME_OPTIONS, PLAYTIME_SETTINGS_KEY, resetPlaytime } from "@/lib/playtime";
 import { useStoredSettings } from "@/lib/storage";
 
 /**
@@ -62,6 +56,7 @@ function MenuButton({
 
   return (
     <div className={`home-menu ${side}`}>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
       {open && <div className="home-menu-backdrop" onClick={() => setOpen(false)} />}
       <button
         type="button"

@@ -1,0 +1,122 @@
+/* ---------- Ampel und Zebrastreifen ---------- */
+
+.traffic-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(#a5d8ff 50%, #8ac926 50%);
+}
+
+/* The picture fills the screen below the exit button; the street runs on past its edges. */
+.amp-svg {
+  position: absolute;
+  top: max(56px, env(safe-area-inset-top));
+  right: 1vw;
+  bottom: 1vh;
+  left: 1vw;
+  width: calc(100% - 2vw);
+  height: calc(100% - max(56px, env(safe-area-inset-top)) - 1vh);
+  overflow: visible;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.amp-walklight,
+.amp-animal,
+.amp-car {
+  cursor: pointer;
+}
+
+.amp-bubble {
+  pointer-events: none;
+  transform-origin: 0px -120px;
+  animation: amp-pop 0.35s ease-out;
+}
+
+/* Walking: a little waddle from side to side. */
+.amp-walking {
+  animation: amp-waddle 0.36s ease-in-out infinite alternate;
+}
+
+.amp-hop {
+  animation: amp-hop 0.5s ease-out;
+}
+
+.amp-rolling {
+  animation: amp-roll 0.5s linear infinite;
+}
+
+.amp-press {
+  animation: amp-press 0.25s ease-out;
+}
+
+.amp-arm {
+  transition: transform 0.3s ease-out;
+}
+
+.amp-arm.amp-waving {
+  animation: amp-wave 0.5s ease-in-out 0.3s 3 alternate;
+  transform: rotate(-150deg);
+}
+
+/* The duck looks left and right before it walks again. */
+.amp-looking {
+  animation: amp-look 1.4s ease-in-out;
+}
+
+@keyframes amp-waddle {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(5deg);
+  }
+}
+
+@keyframes amp-hop {
+  40% {
+    transform: translateY(-36px);
+  }
+  70% {
+    transform: translateY(0) scale(1.08, 0.92);
+  }
+}
+
+@keyframes amp-roll {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes amp-press {
+  50% {
+    transform: scale(0.88);
+  }
+}
+
+@keyframes amp-wave {
+  from {
+    transform: rotate(-150deg);
+  }
+  to {
+    transform: rotate(-115deg);
+  }
+}
+
+@keyframes amp-look {
+  20%,
+  40% {
+    transform: translateX(-8px) rotate(-10deg);
+  }
+  60%,
+  80% {
+    transform: translateX(8px) rotate(10deg);
+  }
+}
+
+@keyframes amp-pop {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}

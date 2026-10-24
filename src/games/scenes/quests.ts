@@ -22,7 +22,7 @@ export interface Quest {
 /** "ist" or "sind", matching the item's name. */
 export const verb = (item: SceneItem) => (item.plural ? "sind" : "ist");
 
-const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
+export const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
 /** Questions mode: one question per trait, asked when the scene has at least two answers. `pluralAnswer` is for plural names ("die Tauben"). */
 export const TRAITS: Record<SceneTrait, { question: string; answer: string; pluralAnswer: string; emoji: string }> = {
@@ -40,8 +40,7 @@ export const TRAITS: Record<SceneTrait, { question: string; answer: string; plur
 /** A question with many answers is done after this many, so it doesn't drag on. */
 const MAX_NEEDED = 3;
 
-
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
+const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 function findQuest(item: SceneItem): Quest {
   return {

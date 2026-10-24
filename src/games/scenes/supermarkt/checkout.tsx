@@ -128,12 +128,7 @@ export function Laufband() {
       <path d="M-300 -190 L-292 -218 H292 L300 -190 Z" fill="#dee2e6" />
       <Inside d={BELT}>
         <rect x="-292" y="-212" width="312" height="20" fill="#343a40" />
-        <path
-          className="sm-band-stripes"
-          d={Array.from({ length: 18 }, (_, i) => `M${-300 + i * 20} -212 l6 20`).join(" ")}
-          stroke="#495057"
-          strokeWidth="5"
-        />
+        <path className="sm-band-stripes" d={Array.from({ length: 18 }, (_, i) => `M${-300 + i * 20} -212 l6 20`).join(" ")} stroke="#495057" strokeWidth="5" />
       </Inside>
       {[-292, 20].map((x) => (
         <g key={x} className="sm-band-roller" style={{ transformOrigin: `${x}px -202px` }}>
@@ -186,7 +181,16 @@ export function Kasse() {
       <path d="M140 -214 L146 -250 H184 L190 -214 Z" fill="#495057" />
       <rect x="152" y="-250" width="24" height="5" rx="2" fill="#212529" />
       {Array.from({ length: 6 }, (_, i) => (
-        <rect key={i} className={i === 4 ? "sm-kasse-key" : undefined} x={152 + (i % 3) * 10} y={-238 + Math.floor(i / 3) * 10} width="7" height="6" rx="1.5" fill={["#ced4da", "#69db7c", "#ff8787"][i % 3]} />
+        <rect
+          key={i}
+          className={i === 4 ? "sm-kasse-key" : undefined}
+          x={152 + (i % 3) * 10}
+          y={-238 + Math.floor(i / 3) * 10}
+          width="7"
+          height="6"
+          rx="1.5"
+          fill={["#ced4da", "#69db7c", "#ff8787"][i % 3]}
+        />
       ))}
       {/* Display for the customer */}
       <rect x="96" y="-264" width="6" height="50" fill={STEEL} />

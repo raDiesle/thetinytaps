@@ -59,7 +59,11 @@ function Puddle({ x, y, w }: { x: number; y: number; w: number }) {
   const s = depthScale(y);
   return (
     <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path d={`M${-w} 0 Q${-w} -14 ${-w * 0.4} -16 Q0 -24 ${w * 0.5} -16 Q${w} -12 ${w} 0 Q${w * 0.6} 12 0 10 Q${-w * 0.7} 14 ${-w} 0 Z`} fill="#a5d8ff" opacity="0.7" />
+      <path
+        d={`M${-w} 0 Q${-w} -14 ${-w * 0.4} -16 Q0 -24 ${w * 0.5} -16 Q${w} -12 ${w} 0 Q${w * 0.6} 12 0 10 Q${-w * 0.7} 14 ${-w} 0 Z`}
+        fill="#a5d8ff"
+        opacity="0.7"
+      />
       <path d={`M${-w * 0.5} -8 Q0 -14 ${w * 0.3} -10`} stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.8" />
     </g>
   );

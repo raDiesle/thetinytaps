@@ -1,0 +1,281 @@
+/* ---------- Ideas (hidden, for grown-ups) ---------- */
+
+.ideas {
+  text-align: left;
+}
+
+.ideas h1,
+.ideas .home-subtitle {
+  text-align: center;
+}
+
+.ideas-panel {
+  margin-bottom: 24px;
+  padding: 20px 24px;
+  border-radius: 24px;
+  background: #fff;
+}
+
+.ideas-panel h2 {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+}
+
+.ideas-picks {
+  margin: 0;
+  padding-left: 1.4em;
+  line-height: 1.7;
+}
+
+.ideas-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 6px 24px;
+  line-height: 1.5;
+}
+
+.ideas-intro {
+  max-width: 70ch;
+  margin: 0 0 12px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: #fff;
+  font-size: 0.95rem;
+}
+
+.ideas-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ideas-nav button {
+  padding: 6px 14px;
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ideas-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ideas-legend {
+  font-size: 0.9rem;
+}
+
+.ideas-area {
+  scroll-margin-top: 16px;
+}
+
+.ideas-area h2 {
+  margin: 32px 0 12px;
+  font-size: 1.5rem;
+}
+
+.ideas-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.idea-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 4px 0 #00000014;
+  scroll-margin-top: 16px;
+}
+
+.idea-card:target,
+.idea-card:focus-within {
+  outline: 3px solid var(--accent);
+}
+
+.idea-card p {
+  margin: 0;
+}
+
+.idea-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.idea-head h3 {
+  flex: 1;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.idea-id {
+  padding: 2px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ink);
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+button.idea-id {
+  cursor: pointer;
+}
+
+.idea-emoji {
+  font-family: var(--font-emoji);
+  font-size: 1.5rem;
+}
+
+.idea-star {
+  border: 0;
+  background: none;
+  color: #c9a227;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.idea-why {
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+.idea-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.effort,
+.idea-planned,
+.idea-done {
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.effort-S {
+  background: #d8f5d0;
+}
+
+.effort-M {
+  background: #fff0c2;
+}
+
+.effort-L {
+  background: #ffd9de;
+}
+
+.idea-planned {
+  background: #e3f0ff;
+}
+
+.idea-done {
+  background: #3ec300;
+  color: #fff;
+}
+
+.idea-partial-tag {
+  padding: 2px 10px;
+  border-radius: 99px;
+  background: #fff0c2;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.idea-partial {
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #fff8e0;
+  font-size: 0.9rem;
+}
+
+/* Done ideas step back: green edge, faded, a check in the corner. */
+.idea-card.done {
+  background: #f1fbec;
+  box-shadow: inset 0 0 0 3px #3ec30066;
+}
+
+.idea-card.done > :not(.idea-tags, .idea-done-stamp) {
+  opacity: 0.55;
+}
+
+.idea-card.done h3 {
+  text-decoration: line-through;
+  text-decoration-color: #3ec300;
+  text-decoration-thickness: 2px;
+}
+
+.idea-card.partial {
+  box-shadow: inset 0 0 0 3px #ffb70366;
+}
+
+.idea-done-stamp {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  font-family: var(--font-emoji);
+  font-size: 1.6rem;
+  rotate: 12deg;
+}
+
+.ideas-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.ideas-area .ideas-progress {
+  justify-content: flex-start;
+  margin-top: -6px;
+}
+
+.ideas-progress-bar {
+  width: 160px;
+  height: 10px;
+  border-radius: 99px;
+  background: #00000014;
+  overflow: hidden;
+}
+
+.ideas-progress-bar span {
+  display: block;
+  height: 100%;
+  background: #3ec300;
+}
+
+.ideas-nav-count {
+  padding: 0 6px;
+  border-radius: 99px;
+  background: #d8f5d0;
+  font-size: 0.8rem;
+}

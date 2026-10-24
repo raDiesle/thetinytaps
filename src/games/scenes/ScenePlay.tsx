@@ -2,171 +2,18 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSPrope
 import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
-import {
-  playBark,
-  playBeeps,
-  playBoing,
-  playChime,
-  playDrops,
-  playEngine,
-  playKnocks,
-  playQuack,
-  playRandomNote,
-  playRattle,
-  playRotor,
-  playSqueak,
-  playMelody,
-  playSniff,
-  playPop,
-  playBuzz,
-  playRumble,
-  playHum,
-  playSaw,
-  playHonk,
-  playSiren,
-  playBells,
-  playRing,
-  playCoo,
-  playMeow,
-  playMoo,
-  playOink,
-  playBaa,
-  playCluck,
-  playCrow,
-  playNeigh,
-  playHoot,
-  playCroak,
-  playRoar,
-  playTrumpet,
-  playChatter,
-  playSquawk,
-  playMunch,
-  playSnap,
-  playTweet,
-  playBlub,
-  playWhale,
-  playPing,
-  playDolphin,
-  playLaunch,
-  playTwinkle,
-  playBeam,
-  playRobot,
-  playAlien,
-  playAlarm,
-  playTrill,
-  playWhoosh,
-  playFlush,
-  playBlow,
-  playScrub,
-  playSplash,
-  playTick,
-  playPeck,
-  playCuckoo,
-  playKettle,
-  playSizzle,
-  playCrunch,
-  playSleigh,
-  playCrackle,
-  playYawn,
-  playMusicbox,
-  playLullaby,
-  playTrain,
-  playJet,
-  playHeartbeat,
-  playGiggle,
-  playCreak,
-  playLeaves,
-  playSneeze,
-  loadRecordings,
-  playRecorded,
-} from "@/lib/sfx";
+import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { findScene, SCENES } from ".";
+import { SCENES } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys } from "./keys";
-import { nextQuest, questsFor, verb, type Quest } from "./quests";
+import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
+import { capitalize, nextQuest, questsFor, verb, type Quest } from "./quests";
 import { driveDistance, guestFor, PLACES, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
-import { placeBox, type Box, type Scene, type SceneItem, type SceneSound } from "./types";
-
-const SOUNDS: Record<SceneSound, () => void> = {
-  engine: playEngine,
-  beeps: playBeeps,
-  tweet: playTweet,
-  boing: playBoing,
-  knocks: playKnocks,
-  chime: playChime,
-  drops: playDrops,
-  rattle: playRattle,
-  rotor: playRotor,
-  quack: playQuack,
-  bark: playBark,
-  squeak: playSqueak,
-  melody: playMelody,
-  sniff: playSniff,
-  pop: playPop,
-  buzz: playBuzz,
-  rumble: playRumble,
-  hum: playHum,
-  saw: playSaw,
-  honk: playHonk,
-  siren: playSiren,
-  bells: playBells,
-  ring: playRing,
-  coo: playCoo,
-  meow: playMeow,
-  moo: playMoo,
-  oink: playOink,
-  baa: playBaa,
-  cluck: playCluck,
-  crow: playCrow,
-  neigh: playNeigh,
-  hoot: playHoot,
-  croak: playCroak,
-  roar: playRoar,
-  trumpet: playTrumpet,
-  chatter: playChatter,
-  squawk: playSquawk,
-  munch: playMunch,
-  snap: playSnap,
-  blub: playBlub,
-  whale: playWhale,
-  ping: playPing,
-  dolphin: playDolphin,
-  launch: playLaunch,
-  twinkle: playTwinkle,
-  beam: playBeam,
-  robot: playRobot,
-  alien: playAlien,
-  alarm: playAlarm,
-  trill: playTrill,
-  whoosh: playWhoosh,
-  flush: playFlush,
-  blow: playBlow,
-  scrub: playScrub,
-  splash: playSplash,
-  tick: playTick,
-  peck: playPeck,
-  cuckoo: playCuckoo,
-  kettle: playKettle,
-  sizzle: playSizzle,
-  crunch: playCrunch,
-  sleigh: playSleigh,
-  crackle: playCrackle,
-  yawn: playYawn,
-  musicbox: playMusicbox,
-  train: playTrain,
-  jet: playJet,
-  heartbeat: playHeartbeat,
-  giggle: playGiggle,
-  creak: playCreak,
-  rustle: playLeaves,
-  sneeze: playSneeze,
-};
-
-/** A scene sound: the real recording where there is one (src/lib/sounds/), else synthesized. */
-const playSound = (sound: SceneSound) => playRecorded(sound, SOUNDS[sound]);
+import { playSound } from "./sounds";
+import { placeBox, type Scene, type SceneItem } from "./types";
 
 /** Key presses closer together than this only spawn shapes. */
 const MIN_KEY_MS = 600;
@@ -208,19 +55,14 @@ const COLOUR_PROMPTS = {
 const PRAISE = ["Super!", "Toll!", "Prima!", "Ja, genau!", "Richtig!"];
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
-const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
 /**
  * Per item: how often it was started (remounts restart the animation), whether it is running
  * and, for an item with a hideout, which surprise peeks out this time (index into SURPRISES).
  */
 type Plays = Record<string, { count: number; playing: boolean; surprise?: number }>;
-/** Keys mode: the badge that lights up; the count restarts its animation on every press. */
-type Lit = { id: string; count: number };
 /** A vehicle driving out of the picture, gone from it, or driving in; dx is how far off the picture it is then. */
 type Drive = { phase: "out" | "gone" | "in"; dx: number; ms: number };
-/** The sign at the edge where a vehicle drove off; tapping it follows the vehicle into the other picture. */
-type Exit = { item: SceneItem; to: string; trip: Trip };
 
 const driveMs = (dx: number) => Math.min(DRIVE_MAX_MS, Math.max(DRIVE_MIN_MS, (Math.abs(dx) / DRIVE_SPEED) * 1000));
 
@@ -430,12 +272,15 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     if (!settings.ambient) return;
     let timer: ReturnType<typeof setTimeout>;
     const schedule = () => {
-      timer = setTimeout(() => {
-        if (performance.now() - lastInteraction.current > AMBIENT_IDLE_MS) {
-          animate(pick(items.filter((item) => !questRef.current?.answers.includes(item))), true);
-        }
-        schedule();
-      }, AMBIENT_MIN_MS + Math.random() * (AMBIENT_MAX_MS - AMBIENT_MIN_MS));
+      timer = setTimeout(
+        () => {
+          if (performance.now() - lastInteraction.current > AMBIENT_IDLE_MS) {
+            animate(pick(items.filter((item) => !questRef.current?.answers.includes(item))), true);
+          }
+          schedule();
+        },
+        AMBIENT_MIN_MS + Math.random() * (AMBIENT_MAX_MS - AMBIENT_MIN_MS),
+      );
     };
     schedule();
     return () => clearTimeout(timer);
@@ -513,10 +358,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const runChain = (item: SceneItem) => {
     const chain = scene.chains?.find((c) => c.start === item.id);
     chain?.steps.forEach((step, i) => {
-      later(() => {
-        const next = itemsById.get(step.item);
-        if (next && animate(next)) say(settings.announce === "name" ? describe(next) : step.sentence, true);
-      }, (i + 1) * CHAIN_STEP_MS);
+      later(
+        () => {
+          const next = itemsById.get(step.item);
+          if (next && animate(next)) say(settings.announce === "name" ? describe(next) : step.sentence, true);
+        },
+        (i + 1) * CHAIN_STEP_MS,
+      );
     });
   };
 
@@ -614,8 +462,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       if (started) {
         say(describe(item));
         if (item.hideout) say(`Guck-guck! ${SURPRISES[lastSurprise.current.get(item.id)!].found}`, true);
-      }
-      else if (how !== "hover") funBurst(x, y);
+      } else if (how !== "hover") funBurst(x, y);
       paint(x, y);
       discover(item, x, y);
       if (started) {
@@ -773,15 +620,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const greyFilter = `url(#${greyId})`;
   // The grey copy of the background, with holes where it was painted.
   const greyCopy = { filter: greyFilter, mask: `url(#${svgId}-paint)` };
-  const sceneClass = [
-    "scene",
-    settings.ambient && "lively",
-    colouring && "colouring",
-    partying && "party",
-    night && "night",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const sceneClass = ["scene", settings.ambient && "lively", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
 
   return (
     <div
@@ -846,13 +685,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
               >
                 <g transform={place && `translate(${place.x} ${place.y}) scale(${place.scale})`}>
                   {item.shadow && (
-                    <ellipse
-                      className="scene-shadow"
-                      cx={item.shadow[0]}
-                      cy={item.shadow[1]}
-                      rx={item.shadow[2]}
-                      ry={Math.max(6, item.shadow[2] * 0.12)}
-                    />
+                    <ellipse className="scene-shadow" cx={item.shadow[0]} cy={item.shadow[1]} rx={item.shadow[2]} ry={Math.max(6, item.shadow[2] * 0.12)} />
                   )}
                   <HideoutContext.Provider value={peek}>
                     <item.Art />
@@ -893,6 +726,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
 
       {quest && (
         <button
+          type="button"
           key={quest.id}
           className="find-question"
           onPointerDown={(e) => {
@@ -926,11 +760,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       )}
       {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
       {!questMode && allDiscovered && (
-        <GameEnd
-          delayMs={END_BUTTONS_MS}
-          onAgain={startOver}
-          next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }}
-        />
+        <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }} />
       )}
       {!questMode && !touched && <p className="scene-prompt">{(colouring ? COLOUR_PROMPTS : PROMPTS)[settings.trigger]}</p>}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
@@ -942,145 +772,5 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       </p>
       <BurstLayer bursts={bursts} />
     </div>
-  );
-}
-
-/**
- * Where a vehicle drove off: a bubble at the edge with the vehicle in it, an
- * arrow out of the picture and the emoji of the picture it went to.
- */
-function ExitSign({
-  exit,
-  right,
-  width,
-  onFollow,
-}: {
-  exit: Exit;
-  right: boolean;
-  width: number;
-  onFollow: (e: PointerEvent) => void;
-}) {
-  const [, y, , h] = placeBox(exit.item.box, exit.item.place);
-  const cy = Math.min(860, Math.max(140, y + h / 2));
-  const [bx, by, bw, bh] = exit.item.box;
-  const dir = right ? 1 : -1;
-  return (
-    <g
-      className="scene-exit"
-      transform={`translate(${right ? width - 140 : 140} ${cy})`}
-      data-item={exit.item.id}
-      role="button"
-      aria-label={`${capitalize(exit.item.name)} hinterher`}
-      onPointerDown={onFollow}
-    >
-      <g className="scene-exit-pulse">
-        <path className="scene-exit-arrow" d={`M ${70 * dir} -50 L ${126 * dir} 0 L ${70 * dir} 50 Z`} />
-        <rect className="scene-exit-bubble" x={-86} y={-70} width={172} height={140} rx={36} />
-        <svg x={-70} y={-58} width={140} height={84} viewBox={`${bx} ${by} ${bw} ${bh}`}>
-          <exit.item.Art />
-        </svg>
-        <text className="scene-exit-emoji" x={0} y={46}>
-          {findScene(exit.to)?.emoji}
-        </text>
-      </g>
-    </g>
-  );
-}
-
-function HintRing({ box: [x, y, w, h] }: { box: Box }) {
-  const pad = 14;
-  return <rect className="scene-hint" x={x - pad} y={y - pad} width={w + 2 * pad} height={h + 2 * pad} rx={28} />;
-}
-
-/** Keys mode: the glowing frame the arrow keys move around. */
-function FocusRing({ box: [x, y, w, h] }: { box: Box }) {
-  const pad = 10;
-  const rect = { x: x - pad, y: y - pad, width: w + 2 * pad, height: h + 2 * pad, rx: 24 };
-  return (
-    <g className="scene-focus" aria-hidden>
-      <rect className="scene-focus-glow" {...rect} />
-      <rect className="scene-focus-line" {...rect} />
-    </g>
-  );
-}
-
-const BADGE_R = 13;
-
-/**
- * Keys mode: each item's key in a little bubble next to it. The bubble of the
- * item that was just started lights up, so the child sees where to look.
- */
-function KeyBadges({ scene, keyOf, lit }: { scene: Scene; keyOf: Map<string, string>; lit: Lit | null }) {
-  const spots = useMemo(() => badgeSpots(scene, BADGE_R), [scene]);
-  return (
-    <g className="scene-keys" aria-hidden>
-      {scene.items.map((item, i) => {
-        const [cx, cy] = spots[i];
-        const isLit = lit?.id === item.id;
-        return (
-          <g key={isLit ? `${item.id}-${lit.count}` : item.id} className={isLit ? "lit" : undefined}>
-            <circle className="scene-key-glow" cx={cx} cy={cy} r={BADGE_R} />
-            <g className="scene-key-cap">
-              <circle cx={cx} cy={cy} r={BADGE_R} />
-              <text x={cx} y={cy}>
-                {keyOf.get(item.id)}
-              </text>
-            </g>
-          </g>
-        );
-      })}
-    </g>
-  );
-}
-
-/**
- * Where the key badges go: just outside each item, at the spot that covers the
- * least of it, of the other items and of the badges placed before. Above the
- * item is preferred, then the sides, then below.
- */
-function badgeSpots(scene: Scene, r: number): [number, number][] {
-  const areas = scene.items.flatMap((item) => (item.hitAreas ?? [item.box]).map((box) => placeBox(box, item.place)));
-  const covered = (cx: number, cy: number) =>
-    areas.reduce((sum, [x, y, w, h]) => {
-      const dx = Math.min(cx + r, x + w) - Math.max(cx - r, x);
-      const dy = Math.min(cy + r, y + h) - Math.max(cy - r, y);
-      return dx > 0 && dy > 0 ? sum + dx * dy : sum;
-    }, 0);
-  const gap = r + 4;
-  const taken: [number, number][] = [];
-  return scene.items.map((item) => {
-    const [x, y, w, h] = placeBox(item.box, item.place);
-    const candidates: [number, number][] = [
-      ...[0.5, 0.25, 0.75, 0, 1].map((t): [number, number] => [x + w * t, y - gap]),
-      ...[r, h / 2].flatMap((dy): [number, number][] => [
-        [x - gap, y + dy],
-        [x + w + gap, y + dy],
-      ]),
-      ...[0.5, 0, 1].map((t): [number, number] => [x + w * t, y + h + gap]),
-    ];
-    let best = candidates[0];
-    let bestScore = Infinity;
-    candidates.forEach(([cx, cy], order) => {
-      const outside = cx < r || cy < r || cx > scene.width - r || cy > scene.height - r;
-      const crowded = taken.some(([tx, ty]) => Math.hypot(tx - cx, ty - cy) < 2 * r + 4);
-      // Order only breaks ties: a free spot further round always beats a covering one.
-      const score = covered(cx, cy) + (outside ? 1e6 : 0) + (crowded ? 1e5 : 0) + order;
-      if (score < bestScore) {
-        best = [cx, cy];
-        bestScore = score;
-      }
-    });
-    taken.push(best);
-    return best;
-  });
-}
-
-/** The item drawn on its own, for the find question. */
-function Thumbnail({ item }: { item: SceneItem }) {
-  const [x, y, w, h] = item.box;
-  return (
-    <svg className="find-thumb" viewBox={`${x} ${y} ${w} ${h}`} aria-hidden>
-      <item.Art />
-    </svg>
   );
 }

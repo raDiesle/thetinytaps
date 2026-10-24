@@ -10,5 +10,5 @@ Scene engine (modes in menu order: colouring in – a tapped item gets its colou
   guide to depth, keys, drawing style, animations and the browser checks.
 - `scenes.test.ts` checks every picture's data (unique ids, articles, tap sizes, chains, keys,
   plural grammar in questions, roads). `yarn test` after every change to items.
-- `ScenePlay.tsx` is the engine and is shared by every picture: keep scene-specific things in the
+- `ScenePlay.tsx` is the engine and is shared by every picture (sounds in `sounds.ts`, the marks drawn over a picture in `marks.tsx`): keep scene-specific things in the
   scene's folder and its CSS, and prefix CSS classes and SVG ids by the scene (CSS is global).

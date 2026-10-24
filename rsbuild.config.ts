@@ -30,7 +30,12 @@ const pluginOffline: RsbuildPlugin = {
       const dist = api.context.distPath;
       const files = (await readdir(dist, { recursive: true, withFileTypes: true }))
         .filter((entry) => entry.isFile())
-        .map((entry) => join(entry.parentPath, entry.name).slice(dist.length + 1).split("\\").join("/"))
+        .map((entry) =>
+          join(entry.parentPath, entry.name)
+            .slice(dist.length + 1)
+            .split("\\")
+            .join("/"),
+        )
         .filter((file) => file !== "404.html" && file !== "sw.js" && !/\.(map|LICENSE\.txt)$/.test(file))
         .sort();
       const template = await readFile("src/sw.js", "utf8");

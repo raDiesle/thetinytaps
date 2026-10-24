@@ -1,0 +1,424 @@
+/* Loaded for the whole app: src/globals.css imports it in order, so the cascade stays the same. */
+
+/* ---------- Lebendige Bilder ---------- */
+
+/* Above and below the picture the sky and ground continue, whatever the screen shape. */
+.scene {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(var(--sky) 50%, var(--ground) 50%);
+}
+
+.scene-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scene-item {
+  cursor: pointer;
+}
+
+/* Invisible but tappable: generous tap areas for small fingers. */
+.scene-hit {
+  fill: transparent;
+}
+
+.scene-overlay {
+  pointer-events: none;
+}
+
+/* Colour mode: a dab of paint spreads out where the background was tapped. */
+.scene-dab {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: scene-dab-grow 0.35s ease-out;
+}
+
+@keyframes scene-dab-grow {
+  from {
+    transform: scale(0.2);
+  }
+}
+
+.scene-shadow {
+  fill: #3d405b;
+  opacity: 0.14;
+  pointer-events: none;
+}
+
+/* Keys mode: the key of each item, like a little keyboard key. */
+.scene-keys {
+  pointer-events: none;
+}
+
+.scene-keys circle {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2;
+  opacity: 0.9;
+}
+
+.scene-keys text {
+  fill: var(--ink);
+  font-family: var(--font-rounded);
+  font-size: 16px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* The key just pressed: its bubble lights up and a glow ring spreads out once. */
+.scene-keys .scene-key-glow {
+  fill: #ffd60a;
+  stroke: none;
+  opacity: 0;
+}
+
+.scene-key-cap,
+.scene-key-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.scene-keys .lit .scene-key-cap {
+  animation: key-pop 0.9s ease-out;
+}
+
+.scene-keys .lit .scene-key-cap circle {
+  animation: key-light 0.9s ease-out;
+}
+
+.scene-keys .lit .scene-key-glow {
+  animation: key-glow 0.9s ease-out;
+}
+
+@keyframes key-pop {
+  25% {
+    transform: scale(1.6);
+  }
+}
+
+@keyframes key-light {
+  15%,
+  50% {
+    fill: #ffd60a;
+    stroke: #fff;
+    stroke-width: 4;
+    opacity: 1;
+  }
+}
+
+@keyframes key-glow {
+  0% {
+    opacity: 0.8;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
+.scene-hint {
+  fill: #ffffff30;
+  stroke: #fff;
+  stroke-width: 8;
+  stroke-dasharray: 22 14;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hint-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  50% {
+    stroke: var(--accent);
+    transform: scale(1.04);
+  }
+}
+
+/* Idea B-19: a vehicle drives out of the picture (into another one) and comes back in from behind itself. */
+.scene-drive.out {
+  animation: scene-drive-out var(--drive-ms) ease-in forwards;
+}
+
+.scene-drive.gone {
+  transform: translateX(var(--drive-dx));
+  visibility: hidden;
+}
+
+.scene-drive.in {
+  animation: scene-drive-in var(--drive-ms) ease-out both;
+}
+
+/* Nobody taps it on the way. */
+.scene-drive.out,
+.scene-drive.in {
+  pointer-events: none;
+}
+
+@keyframes scene-drive-out {
+  to {
+    transform: translateX(var(--drive-dx));
+  }
+}
+
+@keyframes scene-drive-in {
+  from {
+    transform: translateX(var(--drive-dx));
+  }
+}
+
+/* Where it drove off: a bubble with the vehicle and an arrow out of the picture; tapping it follows. */
+.scene-exit {
+  cursor: pointer;
+}
+
+.scene-exit-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    exit-pop 0.4s ease-out both,
+    exit-pulse 1.6s 0.4s ease-in-out infinite;
+}
+
+.scene-exit-bubble {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 5;
+}
+
+.scene-exit-arrow {
+  fill: var(--accent);
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
+
+.scene-exit-emoji {
+  font-family: var(--font-emoji);
+  font-size: 34px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+@keyframes exit-pop {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes exit-pulse {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.scene-prompt,
+.find-question {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  width: fit-content;
+  /* Leave room for the stars (left) and the exit button (right). */
+  max-width: calc(100% - 160px);
+  margin: 0 auto;
+  border-radius: 99px;
+  background: #fff;
+  box-shadow: 0 6px 0 #00000014;
+  font-weight: 700;
+}
+
+.scene-prompt {
+  padding: 12px 28px;
+  font-size: clamp(1.4rem, 4vw, 2.4rem);
+  pointer-events: none;
+  animation: bob 1.6s ease-in-out infinite;
+}
+
+.find-question {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 28px 8px 8px;
+  border: 0;
+  border-radius: 36px;
+  color: inherit;
+  font-family: inherit;
+  font-size: clamp(1.3rem, 3.5vw, 2.2rem);
+  cursor: pointer;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Find mode: the thing to look for, big and framed, so it can be recognised without reading. */
+.find-thumb {
+  width: min(34vh, 260px);
+  height: min(25vh, 190px);
+  padding: 10px;
+  border: 5px solid var(--accent);
+  border-radius: 28px;
+  background: #e3f6ff;
+}
+
+.find-stars {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  max-width: 30vw;
+  font-family: var(--font-emoji);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  pointer-events: none;
+}
+
+.find-count {
+  margin-left: 6px;
+  font-family: var(--font-rounded);
+  font-weight: 800;
+}
+
+/* Questions: a big symbol instead of the item's picture. */
+.find-emoji {
+  display: grid;
+  place-items: center;
+  width: min(12vh, 90px);
+  height: min(12vh, 90px);
+  border-radius: 50%;
+  background: #e3f6ff;
+  font-family: var(--font-emoji);
+  font-size: min(7vh, 54px);
+}
+
+/* Questions with several answers: one dot per answer still to find. */
+.find-progress {
+  display: flex;
+  gap: 6px;
+}
+
+.find-progress span {
+  width: 0.55em;
+  height: 0.55em;
+  border: 3px solid #2b2d4240;
+  border-radius: 50%;
+}
+
+.find-progress span.done {
+  border-color: var(--accent);
+  background: var(--accent);
+  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* "Alles entdeckt": how many items were tapped, small at the edge. */
+.scene-goal {
+  position: absolute;
+  top: max(14px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 14px 4px 8px;
+  border-radius: 99px;
+  background: #ffffffb0;
+  font-size: clamp(1rem, 2.2vw, 1.3rem);
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.scene-goal-star {
+  font-family: var(--font-emoji);
+  font-size: 1.3em;
+}
+
+.scene-goal.done {
+  background: #fff;
+  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Keys mode: the frame the arrow keys move. */
+.scene-focus {
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop-in 0.25s ease-out;
+}
+
+.scene-focus rect {
+  fill: none;
+}
+
+.scene-focus-glow {
+  stroke: #ffd60a;
+  stroke-width: 22;
+  stroke-opacity: 0.35;
+}
+
+.scene-focus-line {
+  stroke: #ffd60a;
+  stroke-width: 7;
+}
+
+/* Everything discovered: all items dance together for a moment. */
+.scene.party .scene-item {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: scene-dance 0.7s ease-in-out calc(var(--party-i) * 40ms) 4;
+}
+
+@keyframes scene-dance {
+  25% {
+    transform: translateY(-14px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-14px) rotate(5deg);
+  }
+}
+
+/* A note for the grown-up, below the picture; the picture stays playable. */
+.scene-rotate {
+  display: none;
+}
+
+@media (orientation: portrait) and (max-width: 600px) and (pointer: coarse) {
+  .scene-rotate {
+    position: absolute;
+    bottom: max(24px, env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: fit-content;
+    max-width: calc(100% - 32px);
+    margin: 0 auto;
+    padding: 10px 22px 10px 14px;
+    border-radius: 99px;
+    background: #fff;
+    box-shadow: 0 6px 0 #00000014;
+    font-weight: 700;
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  .scene-rotate-phone {
+    font-size: 2rem;
+    animation: turn-phone 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes turn-phone {
+  0%,
+  30% {
+    transform: rotate(0);
+  }
+  60%,
+  100% {
+    transform: rotate(-90deg);
+  }
+}
+
+/* Unless the picture may move by itself, nothing moves without the child doing something. */
+.scene:not(.lively) .scene-prompt,
+.scene:not(.lively) .scene-hint {
+  animation: none;
+}

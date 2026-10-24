@@ -12,17 +12,13 @@ export const DODGE_LEAN: Movement[] = [
     bodyParts: ["torso", "hips", "head"],
     bodyMovement: "Die Füße bleiben stehen, der Oberkörper neigt sich sanft zur einen Seite, kommt zurück zur Mitte und neigt sich dann zur anderen Seite.",
     startingPose: "Gerade stehen, Füße etwas auseinander, Hände an den Hüften.",
-    movementSteps: [
-      "Füße fest auf den Boden.",
-      "Zur Seite lehnen.",
-      "Zurück in die Mitte.",
-      "Zur anderen Seite lehnen.",
-    ],
+    movementSteps: ["Füße fest auf den Boden.", "Zur Seite lehnen.", "Zurück in die Mitte.", "Zur anderen Seite lehnen."],
     durationSeconds: 15,
     repetitions: 4,
     instruction: "Lehn dich zur Seite!",
     motion: "lean_side",
-    demonstration: "Die Figur steht dem Kind gegenüber, zeigt auf ihre Füße („Die bleiben hier!“) und lehnt sich langsam zur Seite, während ein Ball ganz gemächlich vorbeikullert. Danach lehnen beide im Wechsel mit.",
+    demonstration:
+      "Die Figur steht dem Kind gegenüber, zeigt auf ihre Füße („Die bleiben hier!“) und lehnt sich langsam zur Seite, während ein Ball ganz gemächlich vorbeikullert. Danach lehnen beide im Wechsel mit.",
     scenario: {
       world: "toy_town",
       setup: "In der Spielzeugstadt rollen große, weiche Wasserbälle eine Straße entlang, direkt auf die Figur zu.",
@@ -47,10 +43,7 @@ export const DODGE_LEAN: Movement[] = [
       higherEnergy: "Die Arme zur Gegenseite ausstrecken und dabei weiter lehnen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Nur so weit lehnen, wie es bequem ist – die Füße bleiben stehen.",
-      "Zu beiden Seiten etwas Platz lassen.",
-    ],
+    safetyNotes: ["Nur so weit lehnen, wie es bequem ist – die Füße bleiben stehen.", "Zu beiden Seiten etwas Platz lassen."],
     tags: ["lean", "dodge", "upper_body", "side_to_side", "ball"],
   },
   {
@@ -63,16 +56,13 @@ export const DODGE_LEAN: Movement[] = [
     bodyParts: ["knees", "head", "torso"],
     bodyMovement: "Das Kind beugt die Knie, zieht den Kopf ein und kommt danach wieder ganz nach oben.",
     startingPose: "Gerade stehen, Arme locker.",
-    movementSteps: [
-      "Der Ast kommt.",
-      "In die Knie, Kopf runter.",
-      "Wieder groß werden.",
-    ],
+    movementSteps: ["Der Ast kommt.", "In die Knie, Kopf runter.", "Wieder groß werden."],
     durationSeconds: 12,
     repetitions: 3,
     instruction: "Duck dich!",
     motion: "duck",
-    demonstration: "Die Figur sieht den Ast kommen, schaut zum Kind und duckt sich übertrieben langsam mit „Huch!“, dann kommt sie wieder hoch und lacht. Beim nächsten Ast ducken sich beide zusammen.",
+    demonstration:
+      "Die Figur sieht den Ast kommen, schaut zum Kind und duckt sich übertrieben langsam mit „Huch!“, dann kommt sie wieder hoch und lacht. Beim nächsten Ast ducken sich beide zusammen.",
     scenario: {
       world: "jungle",
       setup: "Die Figur geht auf einem Dschungelpfad, über den immer wieder tief hängende Äste ragen.",
@@ -97,9 +87,7 @@ export const DODGE_LEAN: Movement[] = [
       higherEnergy: "Ganz tief in die Hocke gehen und schwungvoll wieder hochkommen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Langsam aufrichten und vorher nach oben schauen, ob dort Tischkanten sind.",
-    ],
+    safetyNotes: ["Langsam aufrichten und vorher nach oben schauen, ob dort Tischkanten sind."],
     tags: ["duck", "squat", "jungle", "dodge", "knees"],
   },
   {
@@ -112,16 +100,13 @@ export const DODGE_LEAN: Movement[] = [
     bodyParts: ["torso", "hands", "arms"],
     bodyMovement: "Die Füße bleiben stehen, das Kind lehnt den Oberkörper nach vorn in einen starken Wind und hält die Hände schützend vor sich.",
     startingPose: "Breit stehen, ein Fuß etwas vor dem anderen, Hände vor der Brust.",
-    movementSteps: [
-      "Fest hinstellen.",
-      "Nach vorn in den Wind lehnen.",
-      "Wind hört auf – aufrichten.",
-    ],
+    movementSteps: ["Fest hinstellen.", "Nach vorn in den Wind lehnen.", "Wind hört auf – aufrichten."],
     durationSeconds: 14,
     repetitions: 2,
     instruction: "Lehn dich in den Wind!",
     motion: "lean_forward",
-    demonstration: "Die Figur stellt sich breit hin, schaut zum Kind und lehnt sich langsam nach vorn, die Haare und der Schal flattern nach hinten. Mit „Huiii!“ stemmen sich beide gemeinsam gegen den Wind.",
+    demonstration:
+      "Die Figur stellt sich breit hin, schaut zum Kind und lehnt sich langsam nach vorn, die Haare und der Schal flattern nach hinten. Mit „Huiii!“ stemmen sich beide gemeinsam gegen den Wind.",
     scenario: {
       world: "winter_forest",
       setup: "Auf einem Hügel im Winterwald weht plötzlich ein kräftiger, aber freundlicher Wind.",
@@ -144,10 +129,7 @@ export const DODGE_LEAN: Movement[] = [
       seated: "Im Sitzen den Oberkörper nach vorn lehnen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Nur ein bisschen nach vorn lehnen, die Füße stehen breit und fest.",
-      "Vor dem Kind keine Tischkante in Kopfhöhe.",
-    ],
+    safetyNotes: ["Nur ein bisschen nach vorn lehnen, die Füße stehen breit und fest.", "Vor dem Kind keine Tischkante in Kopfhöhe."],
     tags: ["lean", "wind", "weather", "forward", "strength"],
   },
   {
@@ -158,18 +140,16 @@ export const DODGE_LEAN: Movement[] = [
     difficulty: "easy",
     bodyZone: "full_body",
     bodyParts: ["arms", "torso", "hips"],
-    bodyMovement: "Anders als beim Kullerball weicht das Kind nichts aus: mit hochgestreckten Armen als Äste wiegt es sich langsam und gleichmäßig von einer Seite zur anderen, die Füße bleiben wie Wurzeln stehen.",
+    bodyMovement:
+      "Anders als beim Kullerball weicht das Kind nichts aus: mit hochgestreckten Armen als Äste wiegt es sich langsam und gleichmäßig von einer Seite zur anderen, die Füße bleiben wie Wurzeln stehen.",
     startingPose: "Gerade stehen, Füße wie Wurzeln fest, Arme hoch als Äste.",
-    movementSteps: [
-      "Arme hoch wie Äste.",
-      "Langsam zur Seite wiegen.",
-      "Langsam zur anderen Seite wiegen.",
-    ],
+    movementSteps: ["Arme hoch wie Äste.", "Langsam zur Seite wiegen.", "Langsam zur anderen Seite wiegen."],
     durationSeconds: 18,
     repetitions: 4,
     instruction: "Wieg dich wie ein Baum!",
     motion: "sway",
-    demonstration: "Die Figur stellt sich ruhig hin, hebt die Arme wie Äste und wiegt sich sehr langsam zur leisen Musik, mit einem sanften „Schhhh“. Das Kind schaukelt im selben ruhigen Takt mit.",
+    demonstration:
+      "Die Figur stellt sich ruhig hin, hebt die Arme wie Äste und wiegt sich sehr langsam zur leisen Musik, mit einem sanften „Schhhh“. Das Kind schaukelt im selben ruhigen Takt mit.",
     scenario: {
       world: "garden",
       setup: "Im Garten wird es Abend, ein sanfter Wind streicht durch die Bäume.",
@@ -193,10 +173,7 @@ export const DODGE_LEAN: Movement[] = [
       seated: "Im Sitzen mit erhobenen Armen hin und her wiegen.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Ganz langsam wiegen, ohne Schwung.",
-      "Über und neben den Armen etwas Platz lassen.",
-    ],
+    safetyNotes: ["Ganz langsam wiegen, ohne Schwung.", "Über und neben den Armen etwas Platz lassen."],
     tags: ["sway", "calm", "tree", "nature", "cool_down"],
   },
   {
@@ -207,18 +184,16 @@ export const DODGE_LEAN: Movement[] = [
     difficulty: "easy",
     bodyZone: "upper_body",
     bodyParts: ["torso", "head", "hips"],
-    bodyMovement: "Anders als beim Kullerball weicht das Kind nicht aus, sondern lehnt sich neugierig zur Seite, schaut kurz um eine Ecke und richtet sich wieder auf.",
+    bodyMovement:
+      "Anders als beim Kullerball weicht das Kind nicht aus, sondern lehnt sich neugierig zur Seite, schaut kurz um eine Ecke und richtet sich wieder auf.",
     startingPose: "Gerade stehen, Hände vor den Augen oder an den Hüften.",
-    movementSteps: [
-      "Gerade hinstellen.",
-      "Zur Seite lehnen und gucken.",
-      "Zurück in die Mitte.",
-    ],
+    movementSteps: ["Gerade hinstellen.", "Zur Seite lehnen und gucken.", "Zurück in die Mitte."],
     durationSeconds: 14,
     repetitions: 3,
     instruction: "Guck mal, wer da ist!",
     motion: "lean_side",
-    demonstration: "Die Figur steht hinter einem dicken Baumstamm, flüstert dem Kind „Wer ist da?“ zu und lehnt sich langsam zur Seite, um zu gucken. Dann gucken beide zusammen, mal zur einen, mal zur anderen Seite.",
+    demonstration:
+      "Die Figur steht hinter einem dicken Baumstamm, flüstert dem Kind „Wer ist da?“ zu und lehnt sich langsam zur Seite, um zu gucken. Dann gucken beide zusammen, mal zur einen, mal zur anderen Seite.",
     scenario: {
       world: "jungle",
       setup: "Hinter einem breiten Baumstamm kichert jemand, aber man kann ihn nicht sehen.",
@@ -242,9 +217,7 @@ export const DODGE_LEAN: Movement[] = [
       seated: "Im Sitzen zur Seite lehnen und gucken.",
     },
     needs: { jump: false, space: "small", balance: false },
-    safetyNotes: [
-      "Die Füße bleiben stehen, nur so weit lehnen, wie es bequem ist.",
-    ],
+    safetyNotes: ["Die Füße bleiben stehen, nur so weit lehnen, wie es bequem ist."],
     tags: ["lean", "peekaboo", "curiosity", "calm", "animals"],
   },
 ];

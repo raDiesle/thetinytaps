@@ -11,29 +11,27 @@ const B = TABLE_TOP_BACK;
 /** The low lunch table with two plates; it wobbles, the plates jump and the cutlery clinks. */
 export function Tisch() {
   return (
-    <>
-      <g className="ki-tisch" style={{ transformOrigin: "0px 0px" }}>
-        {/* Back legs, then the top seen from above, its edge and the front legs */}
-        <path d="M-210 -228 V-52 M210 -228 V-52" stroke="#ffa94d" strokeWidth="18" strokeLinecap="round" />
-        <path d={`M-252 ${F} L-222 ${B} H222 L252 ${F} Z`} fill="#fff4e6" />
-        <path d={`M-236 ${F - 8} L-214 ${B + 6} H214 L236 ${F - 8} Z`} fill="none" stroke="#ffe8cc" strokeWidth="6" />
-        {[-140, 140].map((x, i) => (
-          <g key={x} className="ki-tisch-plate" style={nth(i)}>
-            <ellipse cx={x} cy={B + 22} rx="44" ry="11" fill="#fff" stroke={i ? "#ffc9c9" : "#a5d8ff"} strokeWidth="4" />
-            {i === 0 && <path d={`M${x - 20} ${B + 22} q8 -8 14 0 t14 0 t14 0`} stroke="#ffe066" strokeWidth="5" strokeLinecap="round" fill="none" />}
-            {i === 1 && <circle cx={x + 6} cy={B + 20} r="8" fill="#ff8787" />}
-          </g>
-        ))}
-        <g className="ki-tisch-spoon" style={{ transformOrigin: "-60px -214px" }}>
-          <path d={`M-84 ${B + 30} L-44 ${B + 20}`} stroke="#adb5bd" strokeWidth="5" strokeLinecap="round" />
-          <ellipse cx="-90" cy={B + 31} rx="8" ry="5" fill="#adb5bd" />
+    <g className="ki-tisch" style={{ transformOrigin: "0px 0px" }}>
+      {/* Back legs, then the top seen from above, its edge and the front legs */}
+      <path d="M-210 -228 V-52 M210 -228 V-52" stroke="#ffa94d" strokeWidth="18" strokeLinecap="round" />
+      <path d={`M-252 ${F} L-222 ${B} H222 L252 ${F} Z`} fill="#fff4e6" />
+      <path d={`M-236 ${F - 8} L-214 ${B + 6} H214 L236 ${F - 8} Z`} fill="none" stroke="#ffe8cc" strokeWidth="6" />
+      {[-140, 140].map((x, i) => (
+        <g key={x} className="ki-tisch-plate" style={nth(i)}>
+          <ellipse cx={x} cy={B + 22} rx="44" ry="11" fill="#fff" stroke={i ? "#ffc9c9" : "#a5d8ff"} strokeWidth="4" />
+          {i === 0 && <path d={`M${x - 20} ${B + 22} q8 -8 14 0 t14 0 t14 0`} stroke="#ffe066" strokeWidth="5" strokeLinecap="round" fill="none" />}
+          {i === 1 && <circle cx={x + 6} cy={B + 20} r="8" fill="#ff8787" />}
         </g>
-        <rect x="-256" y={F - 2} width="512" height="18" rx="6" fill="#51cf66" />
-        <rect x="-256" y={F + 12} width="512" height="5" rx="2" fill="#2f9e44" />
-        <path d={`M-236 ${F + 14} V-8 M236 ${F + 14} V-8`} stroke="#ff922b" strokeWidth="22" strokeLinecap="round" />
-        <path d={`M-242 ${F + 30} V-40 M230 ${F + 30} V-40`} stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
+      ))}
+      <g className="ki-tisch-spoon" style={{ transformOrigin: "-60px -214px" }}>
+        <path d={`M-84 ${B + 30} L-44 ${B + 20}`} stroke="#adb5bd" strokeWidth="5" strokeLinecap="round" />
+        <ellipse cx="-90" cy={B + 31} rx="8" ry="5" fill="#adb5bd" />
       </g>
-    </>
+      <rect x="-256" y={F - 2} width="512" height="18" rx="6" fill="#51cf66" />
+      <rect x="-256" y={F + 12} width="512" height="5" rx="2" fill="#2f9e44" />
+      <path d={`M-236 ${F + 14} V-8 M236 ${F + 14} V-8`} stroke="#ff922b" strokeWidth="22" strokeLinecap="round" />
+      <path d={`M-242 ${F + 30} V-40 M230 ${F + 30} V-40`} stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
+    </g>
   );
 }
 

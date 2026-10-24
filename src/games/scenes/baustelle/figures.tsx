@@ -33,7 +33,14 @@ export function Bauarbeiter() {
       <circle cx="1314" cy="492" r="5" fill={SKIN} />
       <path d="M1268 484 q2 -8 10 -6 M1312 484 q-2 -8 -10 -6" stroke="#8d5a2b" strokeWidth="5" strokeLinecap="round" fill="none" />
       <Face cx={1290} cy={488} size={1.05} />
-      <Lids eyes={[[1282.65, 488], [1297.35, 488]]} r={4.4} fill={SKIN} />
+      <Lids
+        eyes={[
+          [1282.65, 488],
+          [1297.35, 488],
+        ]}
+        r={4.4}
+        fill={SKIN}
+      />
       {/* He lifts his helmet to say hello. */}
       <g className="arbeiter-helmet" style={{ transformOrigin: "1290px 482px" }}>
         <path d="M1264 482 Q1264 456 1290 456 Q1316 456 1316 482 Z" fill="#ffd60a" />
@@ -120,7 +127,14 @@ export function Katze() {
         <circle cx="1168" cy="337" r="2.5" fill="#2b2d42" />
         <circle cx="1156.8" cy="336" r="0.9" fill="#fff" />
         <circle cx="1168.8" cy="336" r="0.9" fill="#fff" />
-        <Lids eyes={[[1156, 337], [1168, 337]]} r={3.4} fill="#ff8c42" />
+        <Lids
+          eyes={[
+            [1156, 337],
+            [1168, 337],
+          ]}
+          r={3.4}
+          fill="#ff8c42"
+        />
         <path d="M1159 344 H1165 L1162 347 Z" fill="#ff5d73" />
         <path d="M1144 344 H1154 M1170 344 H1180" stroke="#2b2d42" strokeWidth="1.5" />
       </g>
@@ -141,15 +155,7 @@ export function Vogel() {
         <circle cx="917" cy="89" r="2.5" fill="#2b2d42" />
         <circle cx="917.8" cy="88.2" r="0.8" fill="#fff" />
       </g>
-      <ellipse
-        className="vogel-wing"
-        cx="891"
-        cy="101"
-        rx="12"
-        ry="7"
-        fill="#0077b6"
-        style={{ transformOrigin: "898px 99px" }}
-      />
+      <ellipse className="vogel-wing" cx="891" cy="101" rx="12" ry="7" fill="#0077b6" style={{ transformOrigin: "898px 99px" }} />
       <path d="M892 112 V117 M900 112 V117" stroke="#ff8c42" strokeWidth="2.5" />
     </g>
   );
@@ -212,14 +218,7 @@ export function Maus() {
       <circle cx="510" cy="950" r="31" fill="none" stroke="#ced4da" strokeWidth="3" />
       <circle cx="510" cy="950" r="24" fill="#343a40" />
       <g className="maus-body">
-        <path
-          className="maus-tail"
-          d="M494 966 Q478 978 488 990"
-          stroke="#f4acb7"
-          strokeWidth="3"
-          fill="none"
-          style={{ transformOrigin: "494px 966px" }}
-        />
+        <path className="maus-tail" d="M494 966 Q478 978 488 990" stroke="#f4acb7" strokeWidth="3" fill="none" style={{ transformOrigin: "494px 966px" }} />
         <ellipse cx="506" cy="962" rx="16" ry="10" fill="#ced4da" />
         {[500, 520].map((cx, i) => (
           <g key={cx} className="maus-ear" style={nth(i)}>
@@ -230,7 +229,14 @@ export function Maus() {
         <circle cx="510" cy="955" r="12" fill="#ced4da" />
         <circle cx="506" cy="952" r="2.2" fill="#2b2d42" />
         <circle cx="514" cy="952" r="2.2" fill="#2b2d42" />
-        <Lids eyes={[[506, 952], [514, 952]]} r={3} fill="#ced4da" />
+        <Lids
+          eyes={[
+            [506, 952],
+            [514, 952],
+          ]}
+          r={3}
+          fill="#ced4da"
+        />
         <circle className="maus-nose" cx="510" cy="960" r="2.6" fill="#ff5d73" />
         <path className="maus-whiskers" d="M502 960 H490 M502 963 L491 967 M518 960 H530 M518 963 L529 967" stroke={INK} strokeWidth="1.2" />
       </g>
@@ -368,7 +374,14 @@ export function Frosch() {
       <circle cx="1078" cy="957" r="4" fill="#fff" />
       <circle cx="1055" cy="957" r="2.2" fill="#2b2d42" />
       <circle cx="1079" cy="957" r="2.2" fill="#2b2d42" />
-      <Lids eyes={[[1054, 957], [1078, 957]]} r={5} fill="#3ec300" />
+      <Lids
+        eyes={[
+          [1054, 957],
+          [1078, 957],
+        ]}
+        r={5}
+        fill="#3ec300"
+      />
       <path className="frosch-tongue" d="M1066 975 L1098 962" stroke="#ff5d73" strokeWidth="3.5" strokeLinecap="round" />
       <path d="M1056 972 Q1066 978 1076 972" stroke="#1b5e20" strokeWidth="2.5" strokeLinecap="round" fill="none" />
       <circle cx="1050" cy="970" r="3" fill={CHEEK} opacity="0.6" />
@@ -511,7 +524,14 @@ export function Hase() {
         <circle cx="80" cy="46" r="18" fill="#c9b8a8" />
         <ellipse cx="80" cy="52" rx="9" ry="6" fill="#f1e7dc" />
         <Face cx={80} cy={44} size={0.8} />
-        <Lids eyes={[[74.4, 44], [85.6, 44]]} r={3.4} fill="#c9b8a8" />
+        <Lids
+          eyes={[
+            [74.4, 44],
+            [85.6, 44],
+          ]}
+          r={3.4}
+          fill="#c9b8a8"
+        />
         <circle className="hase-nose" cx="80" cy="50" r="2.5" fill="#ff8fa3" />
       </g>
       <g className="hase-bush" style={{ transformOrigin: "80px 106px" }}>

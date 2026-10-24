@@ -6,16 +6,17 @@ built with Rsbuild, deployed to GitHub Pages, works offline (PWA). No backend.
 ## Commands (always yarn, never npm)
 
 ```bash
-yarn verify        # typecheck + unit tests – run before every commit
+yarn verify        # lint + format check + typecheck + unit tests – run before every commit
+yarn format        # format everything and apply safe lint fixes (Biome)
 yarn test          # unit tests only (Rstest, ~1 s); yarn test:watch while working
 yarn build         # production build into out/
 yarn image ...     # picture with Gemini, see /bild-erzeugen
 ```
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
-Use `dev` – it moves to the next free port when another session has 3000
-(the fixed-port `dev-test`/`dev-3010` fail if taken). `preview-pages` serves the
-built site with the service worker. Sound and speech are muted when the browser
+Use `dev` – it moves to the next free port when another session has 3000, so
+never add configs with fixed ports. `preview-pages` serves the built site with
+the service worker. Sound and speech are muted when the browser
 is Claude's preview (`src/lib/silent.ts`).
 In a fresh worktree run `yarn install` first.
 
@@ -23,16 +24,17 @@ In a fresh worktree run `yarn install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `yarn verify`, commit on the branch, merge into **local** `main`, never push.
-  Shared files many branches touch (`ScenePlay.tsx`, `sfx.ts`, `globals.css`,
-  `ideas.ts`): keep edits there small and local, so merges stay easy.
+  Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
+  `src/content/ideas/`): keep edits there small and local, so merges stay easy.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
   there). Update that file with the code, not the README – the README only has one
   line per game, so parallel branches don't all conflict on it.
-- Before touching a Bewegungsabenteuer level read `src/games/adventure/LEVEL-REGELN.md`
-  (once merged); write every piece of feedback on a level into it as a general rule.
-- Ideas live in `src/content/ideas.ts` with fixed IDs ("mach N-04"). When an idea is
+- Before touching a Bewegungsabenteuer level read [`src/games/adventure/LEVEL-REGELN.md`](src/games/adventure/LEVEL-REGELN.md)
+  and check the work against it; write every piece of feedback on a level into it as a general rule
+  (German, in the same commit as the fix).
+- Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
   built, set `done: true` (or `partial`) there.
 
 ## Language and style
@@ -51,6 +53,9 @@ In a fresh worktree run `yarn install` first.
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
+- Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
+  `yarn format`. Lint rules that don't fit SVG drawings (index keys, `role` on `<g>`)
+  are off; fix what the rest reports instead of ignoring it.
 
 ## Rules for every game (toddlers play alone)
 
@@ -82,10 +87,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
   defaults (so new fields need no migration); `speech`/`sounds` come from the shared
   options on the home page. Bump the key's `.vN` only when old values would break.
-- Sounds: `src/lib/sfx.ts` synthesizes everything (Web Audio); `playRecorded(name, fallback)`
+- Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`) and `TILES` (`src/pages/KidHome.tsx`) – use `/neues-spiel`.
+  (`src/content/games.ts`) – use `/neues-spiel`.
 - A new Lebendige-Bilder picture: `/neue-szene`. A generated picture: `/bild-erzeugen`.
 
 ## Checking your work

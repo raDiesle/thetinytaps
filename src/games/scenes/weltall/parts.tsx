@@ -47,7 +47,13 @@ export function Lid({ cx, cy, r, fill }: { cx: number; cy: number; r: number; fi
   return (
     <g className="wa-lid">
       <circle cx={cx} cy={cy} r={r * 1.3} fill={fill} />
-      <path d={`M${cx - r} ${cy} Q${cx} ${cy + r * 0.9} ${cx + r} ${cy}`} stroke="#2b2d42" strokeWidth={Math.max(1.4, r * 0.4)} fill="none" strokeLinecap="round" />
+      <path
+        d={`M${cx - r} ${cy} Q${cx} ${cy + r * 0.9} ${cx + r} ${cy}`}
+        stroke="#2b2d42"
+        strokeWidth={Math.max(1.4, r * 0.4)}
+        fill="none"
+        strokeLinecap="round"
+      />
     </g>
   );
 }

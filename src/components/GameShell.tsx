@@ -1,18 +1,11 @@
-import { Link, useLocation, useNavigate } from "react-router";
+import { Link, useLocation } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
-import {
-  DEFAULT_PLAYTIME_SETTINGS,
-  isPlaytimeOver,
-  playedToday,
-  PLAYTIME_SETTINGS_KEY,
-  resetPlaytime,
-  usePlaytime,
-} from "@/lib/playtime";
+import { DEFAULT_PLAYTIME_SETTINGS, isPlaytimeOver, playedToday, PLAYTIME_SETTINGS_KEY, resetPlaytime, usePlaytime } from "@/lib/playtime";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useStoredSettings } from "@/lib/storage";
@@ -25,18 +18,6 @@ const ESC_HOLD_MS = 1000;
 
 /** How long the "Zurück zum Menü" note shows next to ✕ when a game starts. */
 const EXIT_HINT_MS = 4000;
-
-/** The child-friendly home page (idea A-04). */
-export const KID_HOME = "/kinder/";
-
-/**
- * Navigation state of a game opened from the child-friendly home page: it
- * skips the start screen (fullscreen is already on), and its exit leads back
- * there instead of to the grown-ups' options.
- */
-export const KID_STATE = { kid: true };
-
-const isKidState = (state: unknown) => (state as { kid?: boolean } | null)?.kid === true;
 
 /** One way to play a game, picked on its start screen with a big card. */
 export interface GameMode {
@@ -64,8 +45,6 @@ interface GameShellProps {
   /** Where the start screen's back link leads; by default the game's category on the home menu. */
   backHref?: string;
   backLabel?: string;
-  /** This is the child-friendly home page itself: its exit leaves kid mode for good. */
-  kidHome?: boolean;
 }
 
 /**
@@ -73,26 +52,12 @@ interface GameShellProps {
  * fullscreen + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({
-  title,
-  emoji,
-  modes,
-  mode,
-  onMode,
-  level,
-  settings,
-  children,
-  backHref,
-  backLabel,
-  kidHome = false,
-}: GameShellProps) {
+export function GameShell({ title, emoji, modes, mode, onMode, level, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const category = categoryOf(location.pathname);
   const back = backHref ?? (category ? categoryHref(category) : "/");
   const backText = backLabel ?? category?.title ?? "Alle Spiele";
-  const navigate = useNavigate();
-  const kidMode = isKidState(location.state);
-  const [playing, setPlaying] = useState(kidMode);
+  const [playing, setPlaying] = useState(false);
   const [playtimeSettings] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
   const playtime = usePlaytime(playing);
   // Bumped when the grown-up starts the play time afresh, to show it at once.
@@ -109,16 +74,8 @@ export function GameShell({
 
   const stop = () => {
     stopSpeaking();
-    // A game picked by the child goes back to the picture menu, still in fullscreen;
-    // once play time is over the grown-up's exit ends kid mode right away.
-    if (kidMode && !kidHome && !isPlaytimeOver()) {
-      navigate(KID_HOME, { state: KID_STATE });
-      return;
-    }
     setPlaying(false);
     void exitKidMode();
-    // Drop the kid state, so a reload shows the grown-ups' start screen.
-    if (kidMode) navigate(kidHome ? location.pathname : KID_HOME, { replace: kidHome });
   };
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -160,7 +117,7 @@ export function GameShell({
       <div className="play-area" onPointerDownCapture={unlockAudio}>
         {playtime.over ? <GoodNight /> : children}
         {!playtime.over && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
-        <ExitButton onExit={stop} label={kidHome ? "Beenden" : "Zurück zum Menü"} />
+        <ExitButton onExit={stop} label="Zurück zum Menü" />
       </div>
     );
   }
@@ -220,7 +177,7 @@ export function GameShell({
           </ul>
         </section>
       ) : (
-        <button className="start-button" onClick={start}>
+        <button type="button" className="start-button" onClick={start}>
           <span className="start-icon" aria-hidden>
             ▶
           </span>

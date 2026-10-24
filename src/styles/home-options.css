@@ -1,0 +1,91 @@
+/* ---------- Home: play time and options for all games ---------- */
+
+.home-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: -24px 0 8px;
+}
+
+.home-menu {
+  position: relative;
+  z-index: 10;
+}
+
+.home-menu-backdrop {
+  position: fixed;
+  inset: 0;
+}
+
+.home-menu-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 4px 16px 4px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+
+.home-menu-button.icon-only {
+  justify-content: center;
+  width: 44px;
+  padding: 0;
+}
+
+.home-menu-button span {
+  font-family: var(--font-emoji);
+  font-size: 1.3rem;
+}
+
+.home-menu-button[aria-expanded="true"] {
+  background: var(--sunshine);
+}
+
+.home-menu-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--ink);
+}
+
+.home-menu-button:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+.home-menu-panel {
+  position: absolute;
+  top: calc(100% + 12px);
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 120px);
+  overflow: auto;
+  border: var(--outline);
+  border-radius: 28px;
+  box-shadow: var(--lift);
+  text-align: left;
+}
+
+.home-menu.left .home-menu-panel {
+  left: 0;
+}
+
+.home-menu.right .home-menu-panel {
+  right: 0;
+}
+
+.playtime-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}

@@ -178,7 +178,12 @@ function Site({ ids }: { ids: string }) {
 function SandPile({ x, w, h }: { x: number; w: number; h: number }) {
   return (
     <g>
-      <path d={`M${x - w / 2} ${FLOOR} Q${x - w / 4} ${FLOOR - h * 1.1} ${x} ${FLOOR - h} Q${x + w / 4} ${FLOOR - h * 1.1} ${x + w / 2} ${FLOOR} Z`} fill="#f2c46d" stroke={INK} strokeWidth="3" />
+      <path
+        d={`M${x - w / 2} ${FLOOR} Q${x - w / 4} ${FLOOR - h * 1.1} ${x} ${FLOOR - h} Q${x + w / 4} ${FLOOR - h * 1.1} ${x + w / 2} ${FLOOR} Z`}
+        fill="#f2c46d"
+        stroke={INK}
+        strokeWidth="3"
+      />
       <path d={`M${x - w / 5} ${FLOOR - h * 0.6} q20 -14 40 -10`} stroke="#fff6" strokeWidth="6" fill="none" strokeLinecap="round" />
     </g>
   );
@@ -235,10 +240,27 @@ function Scaffold() {
         return <rect key={x} x={x - 6} y={top} width="12" height={FLOOR - top} fill={STEEL} stroke={INK} strokeWidth="2.5" />;
       })}
       {ledgers.map((y) => (
-        <rect key={y} x={SCAFFOLD_POLES[0] - 14} y={y} width={SCAFFOLD_POLES[3] - SCAFFOLD_POLES[0] + 28} height="10" fill={STEEL} stroke={INK} strokeWidth="2.5" />
+        <rect
+          key={y}
+          x={SCAFFOLD_POLES[0] - 14}
+          y={y}
+          width={SCAFFOLD_POLES[3] - SCAFFOLD_POLES[0] + 28}
+          height="10"
+          fill={STEEL}
+          stroke={INK}
+          strokeWidth="2.5"
+        />
       ))}
       {/* The ledger under the spirit level, and braces across each bay */}
-      <rect x={SCAFFOLD_POLES[1] - 10} y={SPIRIT.to.y + BALL_R + 32} width={SCAFFOLD_POLES[2] - SCAFFOLD_POLES[1] + 210} height="10" fill={STEEL} stroke={INK} strokeWidth="2.5" />
+      <rect
+        x={SCAFFOLD_POLES[1] - 10}
+        y={SPIRIT.to.y + BALL_R + 32}
+        width={SCAFFOLD_POLES[2] - SCAFFOLD_POLES[1] + 210}
+        height="10"
+        fill={STEEL}
+        stroke={INK}
+        strokeWidth="2.5"
+      />
       {SCAFFOLD_POLES.slice(0, 3).map((x, i) => (
         <line key={x} x1={x} y1={ledgers[1]} x2={SCAFFOLD_POLES[i + 1]} y2={ledgers[0] + 10} stroke={STEEL} strokeWidth="6" opacity="0.8" />
       ))}
@@ -254,7 +276,16 @@ function Scaffold() {
       {/* The arm the rubble chute hangs from */}
       <rect x={CHUTE.x - 24} y={CHUTE.top - 22} width={SCAFFOLD_POLES[3] - CHUTE.x + 30} height="10" fill={STEEL} stroke={INK} strokeWidth="2.5" />
       {[-20, 20].map((dx) => (
-        <line key={dx} x1={CHUTE.x + dx} y1={CHUTE.top - 12} x2={CHUTE.x + dx * 1.6} y2={CHUTE.top + 2} stroke="#6b6b80" strokeWidth="3" strokeDasharray="5 3" />
+        <line
+          key={dx}
+          x1={CHUTE.x + dx}
+          y1={CHUTE.top - 12}
+          x2={CHUTE.x + dx * 1.6}
+          y2={CHUTE.top + 2}
+          stroke="#6b6b80"
+          strokeWidth="3"
+          strokeDasharray="5 3"
+        />
       ))}
     </g>
   );
@@ -428,7 +459,16 @@ function Deck1() {
   return (
     <g>
       {[x0 + 20, POLE_X].map((x) => (
-        <rect key={x} x={x - 6} y={x === POLE_X ? BEAM_Y : y} width="12" height={FLOOR - (x === POLE_X ? BEAM_Y : y)} fill={STEEL} stroke={INK} strokeWidth="2.5" />
+        <rect
+          key={x}
+          x={x - 6}
+          y={x === POLE_X ? BEAM_Y : y}
+          width="12"
+          height={FLOOR - (x === POLE_X ? BEAM_Y : y)}
+          fill={STEEL}
+          stroke={INK}
+          strokeWidth="2.5"
+        />
       ))}
       <rect x={x0} y={y + 120} width={x1 - x0} height="10" fill={STEEL} stroke={INK} strokeWidth="2.5" />
       <line x1={x0 + 20} y1={y + 130} x2={POLE_X} y2={FLOOR - 20} stroke={STEEL} strokeWidth="6" />
@@ -440,7 +480,12 @@ function Deck1() {
       {Array.from({ length: 6 }, (_, i) => (
         <circle key={i} cx={POLE_X + 10 + i * ((PIVOT.x - POLE_X) / 5)} cy={BEAM_Y + 10} r="3.5" fill={INK} />
       ))}
-      <path d={`M${PIVOT.x - 10} ${BEAM_Y + 20} L${PIVOT.x - 10} ${PIVOT.y} L${PIVOT.x + 10} ${PIVOT.y} L${PIVOT.x + 10} ${BEAM_Y + 20}`} fill="#7d7d96" stroke={INK} strokeWidth="2.5" />
+      <path
+        d={`M${PIVOT.x - 10} ${BEAM_Y + 20} L${PIVOT.x - 10} ${PIVOT.y} L${PIVOT.x + 10} ${PIVOT.y} L${PIVOT.x + 10} ${BEAM_Y + 20}`}
+        fill="#7d7d96"
+        stroke={INK}
+        strokeWidth="2.5"
+      />
     </g>
   );
 }
@@ -649,14 +694,25 @@ function Crane({ drop }: { drop: number }) {
       <path d={`M${x + 55} ${jibY + 33} Q${x + 67} ${jibY + 16} ${x + 79} ${jibY + 33} Z`} fill="#ffd23f" stroke={INK} strokeWidth="2" />
       <circle cx={x + 70} cy={jibY + 39} r="1.8" fill={INK} />
       {/* The rope up the mast, along the jib and down to the hook */}
-      <path d={`M${TOP_PULLEY.x} ${TOP_PULLEY.y - TOP_PULLEY.r} L${TROLLEY_X} ${TOP_PULLEY.y - TOP_PULLEY.r + 32} L${TROLLEY_X} ${hookY - 22}`} stroke="#8a6a4a" strokeWidth="4" fill="none" />
+      <path
+        d={`M${TOP_PULLEY.x} ${TOP_PULLEY.y - TOP_PULLEY.r} L${TROLLEY_X} ${TOP_PULLEY.y - TOP_PULLEY.r + 32} L${TROLLEY_X} ${hookY - 22}`}
+        stroke="#8a6a4a"
+        strokeWidth="4"
+        fill="none"
+      />
       {pulley(TOP_PULLEY)}
       {pulley(FOOT_PULLEY)}
       <rect x={TROLLEY_X - 26} y={jibY} width="52" height="22" rx="4" fill="#ff5d73" stroke={INK} strokeWidth="3" />
       {/* The hook block */}
       <rect x={TROLLEY_X - 18} y={hookY - 30} width="36" height="22" rx="4" fill={YELLOW} stroke={INK} strokeWidth="3" />
       <path d={`M${TROLLEY_X - 12} ${hookY - 26} l8 0 l-8 14 z M${TROLLEY_X + 4} ${hookY - 26} l8 0 l-8 14 z`} fill={INK} />
-      <path d={`M${TROLLEY_X} ${hookY - 8} L${TROLLEY_X} ${hookY + 2} Q${TROLLEY_X} ${hookY + 12} ${TROLLEY_X + 9} ${hookY + 8}`} fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+      <path
+        d={`M${TROLLEY_X} ${hookY - 8} L${TROLLEY_X} ${hookY + 2} Q${TROLLEY_X} ${hookY + 12} ${TROLLEY_X + 9} ${hookY + 8}`}
+        fill="none"
+        stroke={INK}
+        strokeWidth="5"
+        strokeLinecap="round"
+      />
     </g>
   );
 }
@@ -673,7 +729,18 @@ function House() {
           const bx = x0 + i * 50 - (row % 2) * 25;
           const left = Math.max(x0, bx);
           const right = Math.min(x1, bx + 50);
-          return <rect key={`${row}-${i}`} x={left} y={top + row * 22} width={right - left} height="22" fill={row ? "#e88a6a" : BRICK} stroke={INK} strokeWidth="2" />;
+          return (
+            <rect
+              key={`${row}-${i}`}
+              x={left}
+              y={top + row * 22}
+              width={right - left}
+              height="22"
+              fill={row ? "#e88a6a" : BRICK}
+              stroke={INK}
+              strokeWidth="2"
+            />
+          );
         }),
       )}
       {[x0 + 60, x1 - 160].map((x) => (
@@ -734,12 +801,28 @@ function TopOutTree({ drop, age }: { drop: number; age: number }) {
     <g transform={`translate(${cx} ${foot}) rotate(${sway}) scale(${grow})`}>
       <line x1="0" y1="0" x2="0" y2="-70" stroke={DARK_WOOD} strokeWidth="7" strokeLinecap="round" />
       {[0, 1, 2].map((k) => (
-        <path key={k} d={`M${-34 + k * 7} ${-60 - k * 26} L0 ${-104 - k * 26} L${34 - k * 7} ${-60 - k * 26} Z`} fill="#3ec300" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path
+          key={k}
+          d={`M${-34 + k * 7} ${-60 - k * 26} L0 ${-104 - k * 26} L${34 - k * 7} ${-60 - k * 26} Z`}
+          fill="#3ec300"
+          stroke={INK}
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
       ))}
       {Array.from({ length: 5 }, (_, i) => {
         const x = -26 + i * 13;
         const flap = 6 * Math.sin(age * 9 + i);
-        return <path key={i} d={`M${x} -70 q${flap} 20 ${-flap / 2} 44`} stroke={BAR_COLORS[(i * 2) % BAR_COLORS.length]} strokeWidth="5" fill="none" strokeLinecap="round" />;
+        return (
+          <path
+            key={i}
+            d={`M${x} -70 q${flap} 20 ${-flap / 2} 44`}
+            stroke={BAR_COLORS[(i * 2) % BAR_COLORS.length]}
+            strokeWidth="5"
+            fill="none"
+            strokeLinecap="round"
+          />
+        );
       })}
     </g>
   );
@@ -772,11 +855,34 @@ function Truck({ gone }: { gone: number }) {
   );
   return (
     <g>
-      <path d={`M${x + 10} ${FLOOR - 140} Q${x + 70} ${FLOOR - 196} ${x + 130} ${FLOOR - 166} Q${x + 190} ${FLOOR - 190} ${x + 226} ${FLOOR - 140} Z`} fill="#f2c46d" stroke={INK} strokeWidth="3" />
-      <path d={`M${x} ${FLOOR - 150} L${x + 236} ${FLOOR - 150} L${x + 226} ${FLOOR - 70} L${x + 14} ${FLOOR - 70} Z`} fill={ORANGE} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x + 10} ${FLOOR - 140} Q${x + 70} ${FLOOR - 196} ${x + 130} ${FLOOR - 166} Q${x + 190} ${FLOOR - 190} ${x + 226} ${FLOOR - 140} Z`}
+        fill="#f2c46d"
+        stroke={INK}
+        strokeWidth="3"
+      />
+      <path
+        d={`M${x} ${FLOOR - 150} L${x + 236} ${FLOOR - 150} L${x + 226} ${FLOOR - 70} L${x + 14} ${FLOOR - 70} Z`}
+        fill={ORANGE}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
       <rect x={x + 6} y={FLOOR - 76} width="320" height="16" rx="4" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
-      <path d={`M${x + 244} ${FLOOR - 72} L${x + 244} ${FLOOR - 176} Q${x + 244} ${FLOOR - 184} ${x + 252} ${FLOOR - 184} L${x + 300} ${FLOOR - 184} L${x + 330} ${FLOOR - 130} L${x + 330} ${FLOOR - 72} Z`} fill={YELLOW} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path d={`M${x + 258} ${FLOOR - 170} L${x + 296} ${FLOOR - 170} L${x + 316} ${FLOOR - 132} L${x + 258} ${FLOOR - 132} Z`} fill="#bde9ff" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <path
+        d={`M${x + 244} ${FLOOR - 72} L${x + 244} ${FLOOR - 176} Q${x + 244} ${FLOOR - 184} ${x + 252} ${FLOOR - 184} L${x + 300} ${FLOOR - 184} L${x + 330} ${FLOOR - 130} L${x + 330} ${FLOOR - 72} Z`}
+        fill={YELLOW}
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${x + 258} ${FLOOR - 170} L${x + 296} ${FLOOR - 170} L${x + 316} ${FLOOR - 132} L${x + 258} ${FLOOR - 132} Z`}
+        fill="#bde9ff"
+        stroke={INK}
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
       <circle cx={x + 282} cy={FLOOR - 146} r="10" fill="#c98a4b" stroke={INK} strokeWidth="2" />
       <path d={`M${x + 270} ${FLOOR - 152} Q${x + 282} ${FLOOR - 170} ${x + 294} ${FLOOR - 152} Z`} fill={ORANGE} stroke={INK} strokeWidth="2" />
       <circle cx={x + 322} cy={FLOOR - 110} r="7" fill="#ffd23f" stroke={INK} strokeWidth="2" />
@@ -787,4 +893,3 @@ function Truck({ gone }: { gone: number }) {
     </g>
   );
 }
-

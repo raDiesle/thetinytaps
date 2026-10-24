@@ -192,8 +192,24 @@ const LOBSTER = "#d62828";
 export function Hummer() {
   return (
     <g className="uw-hummer-body">
-      <path className="uw-hummer-antenna" d="M-54 -38 Q-96 -76 -70 -118" stroke={LOBSTER} strokeWidth="3" fill="none" strokeLinecap="round" style={{ transformOrigin: "-54px -38px" }} />
-      <path className="uw-hummer-antenna uw-hummer-antenna-2" d="M-48 -40 Q-74 -90 -40 -116" stroke={LOBSTER} strokeWidth="3" fill="none" strokeLinecap="round" style={{ transformOrigin: "-48px -40px" }} />
+      <path
+        className="uw-hummer-antenna"
+        d="M-54 -38 Q-96 -76 -70 -118"
+        stroke={LOBSTER}
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "-54px -38px" }}
+      />
+      <path
+        className="uw-hummer-antenna uw-hummer-antenna-2"
+        d="M-48 -40 Q-74 -90 -40 -116"
+        stroke={LOBSTER}
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        style={{ transformOrigin: "-48px -40px" }}
+      />
       <path className="uw-hummer-legs" d="M-20 -14 L-30 0 M0 -12 L-4 0 M20 -12 L22 0 M38 -14 L44 0" stroke="#9d0208" strokeWidth="5" strokeLinecap="round" />
       <g className="uw-hummer-tail" style={{ transformOrigin: "40px -24px" }}>
         <ellipse cx="50" cy="-24" rx="18" ry="15" fill={LOBSTER} />

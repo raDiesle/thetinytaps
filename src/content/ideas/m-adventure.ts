@@ -1,0 +1,85 @@
+import type { IdeaArea } from "./types";
+
+/** M: Bewegungsabenteuer. */
+export const adventureIdeas: IdeaArea = {
+  prefix: "M",
+  emoji: "🏝️",
+  title: "Bewegungsabenteuer",
+  intro:
+    "Der Fuchs Tapsi macht vor, das Kind macht vor dem Bildschirm mit. Die Bewegungsbibliothek hat schon 18 Welten und 100 Bewegungen, gespielt wird bisher nur die Schatzinsel.",
+  ideas: [
+    {
+      id: "M-01",
+      emoji: "🗺️",
+      title: "Mehr Abenteuer",
+      text: "Weitere Welten der Bibliothek als 3D-Geschichte: Wolkenland, Winterwald, Feuerwehr hilft dem Kätzchen, Dinotal. Auf dem Startbild eine Karte, auf der das Kind das Ziel antippt.",
+      why: "Die Bewegungen und Abläufe gibt es schon; es fehlen nur Welt und Sätze.",
+      effort: "L",
+    },
+    {
+      id: "M-02",
+      emoji: "⏱️",
+      title: "Kurz-Abenteuer",
+      text: "Eine Mini-Geschichte mit nur 3–4 Bewegungen, etwa eine Minute lang: für zwischendurch, vor dem Anziehen oder wenn die Zeit knapp ist.",
+      why: "Passt in jeden Tag; dasselbe Spiel, nur weniger Stationen.",
+      effort: "S",
+    },
+    {
+      id: "M-03",
+      emoji: "🪑",
+      title: "Im Sitzen",
+      text: "Ein Schalter für die Sitz-Varianten, die jede Bewegung schon hat: paddeln, ducken, ziehen am Tisch, im Hochstuhl oder krank auf dem Sofa.",
+      why: "Bewegung auch ohne Platz; jede Bewegung hat ihre Sitz-Variante schon.",
+      effort: "S",
+    },
+    {
+      id: "M-04",
+      emoji: "🕯️",
+      title: "Ruhiges Abenteuer zum Schluss",
+      text: "Eine Geschichte, die langsamer wird: erst noch hüpfen, dann strecken, dann Kerze auspusten, Bauch wie ein Ballon atmen, ins Nest kuscheln. Am Ende schläft Tapsi ein, statt Party zu feiern.",
+      why: "Bewegung, die müde macht statt aufdreht – gut vor dem Abendessen oder Schlafen.",
+      effort: "M",
+    },
+    {
+      id: "M-05",
+      emoji: "👨‍👧",
+      title: "Zu zweit",
+      text: "Bewegungen für Kind und Erwachsenen zusammen: Ruderboot (gegenüber sitzen, Hände halten, vor und zurück), Brücke bauen, hohe Fünf, Huckepack-Pferd. Tapsi bekommt dafür eine zweite Figur, etwa Mama Fuchs.",
+      why: "Holt Eltern vom Sofa; gemeinsames Bewegen verbindet.",
+      effort: "M",
+    },
+    {
+      id: "M-06",
+      emoji: "🧸",
+      title: "Hol dein Kuscheltier!",
+      text: "Tapsi bittet: „Hol dein Kuscheltier!“ und wartet geduldig. Danach kommt es in den Bewegungen vor: hochwerfen und fangen, im Arm schaukeln, auf dem Kopf balancieren.",
+      why: "Ein echtes Ding verbindet Bildschirm und Zimmer; Kinder lieben Aufträge.",
+      effort: "M",
+    },
+    {
+      id: "M-07",
+      emoji: "🤪",
+      title: "Tapsi macht Quatsch",
+      text: "Ab und zu macht Tapsi es absichtlich falsch: paddelt mit einer Banane, duckt sich zu spät (der Ast streift nur das Ohr), hüpft rückwärts. Er lacht über sich selbst: „Hoppla! Wie geht das richtig?“",
+      why: "Kinder ab 3 lieben es, den Großen zu verbessern; bringt Lachen ins Abenteuer.",
+      effort: "S",
+    },
+    {
+      id: "M-08",
+      emoji: "🔁",
+      title: "Lieblings-Station nochmal",
+      text: "Am Ende zeigt die Route alle Stationen als große Bilder. Antippen spielt genau diese Bewegung noch einmal: „Nochmal paddeln!“",
+      why: "Wiederholen ist das, was Kleine wollen; kein Neustart der ganzen Geschichte nötig.",
+      effort: "S",
+    },
+    {
+      id: "M-09",
+      emoji: "🎵",
+      title: "Stopptanz",
+      text: "Musik läuft, Tapsi tanzt. Hört die Musik auf, friert Tapsi ein – und alle Tiere im Bild auch. Mal wackelig, mal als Statue auf einem Bein. Die Pausen sind unterschiedlich lang.",
+      why: "Klassiker vom Kindergeburtstag; Zuhören und Körperkontrolle.",
+      effort: "S",
+      done: true,
+    },
+  ],
+};

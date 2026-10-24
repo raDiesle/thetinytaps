@@ -52,7 +52,12 @@ export function Vogelscheuche() {
       <path d="M0 0 V-200" stroke="#8d5a2b" strokeWidth="10" strokeLinecap="round" />
       <g className="bh-scheuche-arms" style={{ transformOrigin: "0px -148px" }}>
         <path d="M-84 -148 H84" stroke="#8d5a2b" strokeWidth="8" strokeLinecap="round" />
-        <path d="M-84 -148 l-14 -8 M-84 -148 l-16 2 M-84 -148 l-12 10 M84 -148 l14 -8 M84 -148 l16 2 M84 -148 l12 10" stroke="#e9c46a" strokeWidth="4" strokeLinecap="round" />
+        <path
+          d="M-84 -148 l-14 -8 M-84 -148 l-16 2 M-84 -148 l-12 10 M84 -148 l14 -8 M84 -148 l16 2 M84 -148 l12 10"
+          stroke="#e9c46a"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
         <path d="M-74 -160 H74 L64 -134 H-64 Z" fill="#4895ef" />
       </g>
       <path d="M-34 -164 H34 L40 -80 Q0 -70 -40 -80 Z" fill="#4895ef" />

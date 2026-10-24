@@ -146,7 +146,15 @@ const BOAR = "#5c4033";
 export function Wildschwein() {
   return (
     <>
-      <path className="wd-schwein-tail" d="M-74 -78 q-14 -2 -16 12 q-4 6 2 10" stroke={BOAR} strokeWidth="4" strokeLinecap="round" fill="none" style={{ transformOrigin: "-74px -78px" }} />
+      <path
+        className="wd-schwein-tail"
+        d="M-74 -78 q-14 -2 -16 12 q-4 6 2 10"
+        stroke={BOAR}
+        strokeWidth="4"
+        strokeLinecap="round"
+        fill="none"
+        style={{ transformOrigin: "-74px -78px" }}
+      />
       <Leg x={-44} top={-40} w={14} fill="#3d2b1f" hoof="#212529" />
       <Leg x={30} top={-40} w={14} fill="#3d2b1f" hoof="#212529" />
       <path d="M-80 -60 Q-82 -112 -20 -114 Q48 -116 70 -80 Q76 -40 40 -28 H-50 Q-80 -32 -80 -60 Z" fill={BOAR} />
@@ -383,7 +391,14 @@ export function Maus() {
   return (
     <StumpHole>
       <g className="wd-maus-body">
-        <path className="wd-maus-tail" d={`M${cx + 14} ${cy + 8} Q${cx + 40} ${cy + 12} ${cx + 46} ${cy - 6}`} stroke="#c8b6a6" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <path
+          className="wd-maus-tail"
+          d={`M${cx + 14} ${cy + 8} Q${cx + 40} ${cy + 12} ${cx + 46} ${cy - 6}`}
+          stroke="#c8b6a6"
+          strokeWidth="3"
+          strokeLinecap="round"
+          fill="none"
+        />
         <ellipse cx={cx + 6} cy={cy + 4} rx="17" ry="12" fill="#a47148" />
         <g className="wd-maus-ear" style={{ transformOrigin: `${cx - 6}px ${cy - 12}px` }}>
           <circle cx={cx - 4} cy={cy - 16} r="7" fill="#a47148" />

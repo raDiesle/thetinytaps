@@ -12,11 +12,7 @@ const TIERS = [
   "M-80 -140 L-16 -238 L16 -238 L80 -140 Q40 -128 0 -134 Q-40 -128 -80 -140 Z",
   "M-56 -214 L0 -300 L56 -214 Q28 -204 0 -210 Q-28 -204 -56 -214 Z",
 ];
-const SHADES = [
-  "M0 -176 L22 -176 L100 -62 Q50 -48 0 -56 Z",
-  "M0 -238 L16 -238 L80 -140 Q40 -128 0 -134 Z",
-  "M0 -300 L56 -214 Q28 -204 0 -210 Z",
-];
+const SHADES = ["M0 -176 L22 -176 L100 -62 Q50 -48 0 -56 Z", "M0 -238 L16 -238 L80 -140 Q40 -128 0 -134 Z", "M0 -300 L56 -214 Q28 -204 0 -210 Z"];
 
 const BALLS: [number, number, string][] = [
   [-56, -78, "#e63946"],
@@ -57,7 +53,13 @@ export function Tannenbaum() {
             <path d={SHADES[i]} fill="#1b4332" opacity="0.25" />
           </g>
         ))}
-        <path d="M-86 -82 Q0 -100 84 -96 M-66 -158 Q0 -176 64 -170 M-42 -232 Q0 -246 40 -240" stroke="#ffd166" strokeWidth="4" strokeLinecap="round" fill="none" />
+        <path
+          d="M-86 -82 Q0 -100 84 -96 M-66 -158 Q0 -176 64 -170 M-42 -232 Q0 -246 40 -240"
+          stroke="#ffd166"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+        />
         {BALLS.map(([cx, cy, fill], i) => (
           <g key={i}>
             <circle cx={cx} cy={cy} r="9" fill={fill} />
@@ -119,7 +121,15 @@ export function Schneemann() {
       <ellipse cx="0" cy="-6" rx="70" ry="14" fill="#fff" />
       <g className="wi-schneemann-body" style={{ transformOrigin: "0px 0px" }}>
         <path d="M-36 -134 L-84 -168 M-66 -156 L-76 -178 M-66 -156 L-90 -156" stroke="#7f5539" strokeWidth="5" strokeLinecap="round" fill="none" />
-        <path className="wi-schneemann-arm" d="M34 -134 L84 -172 M68 -160 L74 -182 M68 -160 L92 -162" stroke="#7f5539" strokeWidth="5" strokeLinecap="round" fill="none" style={{ transformOrigin: "34px -134px" }} />
+        <path
+          className="wi-schneemann-arm"
+          d="M34 -134 L84 -172 M68 -160 L74 -182 M68 -160 L92 -162"
+          stroke="#7f5539"
+          strokeWidth="5"
+          strokeLinecap="round"
+          fill="none"
+          style={{ transformOrigin: "34px -134px" }}
+        />
         <circle cx="0" cy="-52" r="52" fill="#fff" />
         <path d="M-50 -38 A52 52 0 0 0 50 -38 A60 50 0 0 1 -50 -38 Z" fill="#dbe9fb" />
         <circle cx="0" cy="-130" r="38" fill="#fff" />
