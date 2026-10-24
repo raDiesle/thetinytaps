@@ -60,8 +60,8 @@ export function Fridge({ eggs = true, juice = true }: { eggs?: boolean; juice?: 
   );
 }
 
-/** The cooker: an oven with a window, knobs, a pan on the left and a pot on the right. */
-export function Stove({ cooking = null, pancake = true }: { cooking?: "pan" | "pot" | null; pancake?: boolean }) {
+/** The cooker: an oven with a window, knobs, a pan on the left and a pot on the right; `pancake` is one baking in the pan. */
+export function Stove({ cooking = null, pancake = false }: { cooking?: "pan" | "pot" | null; pancake?: boolean }) {
   return (
     <>
       <rect x="-74" y="-104" width="148" height="104" rx="8" fill="#f8f9fa" stroke="#adb5bd" strokeWidth="4" />
@@ -89,8 +89,11 @@ export function Stove({ cooking = null, pancake = true }: { cooking?: "pan" | "p
       <path d="M-64 -118 H-10 Q-12 -110 -20 -110 H-54 Q-62 -110 -64 -118 Z" fill="#495057" />
       <rect x="-104" y="-121" width="44" height="7" rx="3.5" fill={WOOD_DARK} />
       {pancake && (
-        <g className="el-pancake" style={{ transformOrigin: "-37px -120px" }}>
-          <ellipse cx="-37" cy="-121" rx="22" ry="5" fill="#f4b860" stroke="#d9902f" strokeWidth="2" />
+        <g className="el-pancake">
+          <ellipse cx="-37" cy="-121" rx="22" ry="5" fill="#ffe8a3" stroke="#f4b860" strokeWidth="2" />
+          {[-46, -34, -26].map((x, i) => (
+            <circle key={x} className="el-batter-bubble" cx={x} cy={-122 + (i % 2)} r="2" fill="#f4b860" style={{ animationDelay: `${i * 0.3}s` }} />
+          ))}
         </g>
       )}
       {/* Pot with lid */}
@@ -125,32 +128,83 @@ export function Steam({ x, y, className = "el-steam on" }: { x: number; y: numbe
   );
 }
 
-/** A plate of three pancakes with syrup. */
-export function Pancakes() {
+/** A plate of `count` pancakes: with syrup and butter as on the picture card, or `plain` with `jam` blobs on top. */
+export function Pancakes({ count = 3, plain = false, jam = 0 }: { count?: number; plain?: boolean; jam?: number }) {
+  const top = -17 - (count - 1) * 9;
   return (
     <>
       <ellipse cx="0" cy="-6" rx="44" ry="9" fill="#fff" stroke="#ced4da" strokeWidth="3" />
-      {[0, 1, 2].map((i) => (
+      {Array.from({ length: count }, (_, i) => (
         <g key={i}>
           <ellipse cx="0" cy={-14 - i * 9} rx="32" ry="8" fill="#d9902f" />
           <ellipse cx="0" cy={-17 - i * 9} rx="32" ry="7" fill="#f4b860" />
         </g>
       ))}
-      <path d="M-20 -36 Q-22 -26 -16 -24 Q-12 -30 -8 -36 Z" fill="#a0522d" opacity="0.85" />
-      <ellipse cx="0" cy="-37" rx="20" ry="4.5" fill="#a0522d" opacity="0.85" />
-      <rect x="-6" y="-46" width="14" height="8" rx="2" fill="#fff3bf" stroke="#fcc419" strokeWidth="2" />
+      {!plain && count === 3 && (
+        <>
+          <path d="M-20 -36 Q-22 -26 -16 -24 Q-12 -30 -8 -36 Z" fill="#a0522d" opacity="0.85" />
+          <ellipse cx="0" cy="-37" rx="20" ry="4.5" fill="#a0522d" opacity="0.85" />
+          <rect x="-6" y="-46" width="14" height="8" rx="2" fill="#fff3bf" stroke="#fcc419" strokeWidth="2" />
+        </>
+      )}
+      {count > 0 &&
+        [-14, 2, 16].slice(0, jam).map((x) => (
+          <g key={x}>
+            <ellipse cx={x} cy={top - 1} rx="10" ry="4" fill="#e03131" />
+            <circle cx={x - 3} cy={top - 2} r="1.8" fill="#fff" opacity="0.6" />
+          </g>
+        ))}
+    </>
+  );
+}
+
+/** The plate of pancakes and the jam jar, carried together to the table. */
+export function Breakfast() {
+  return (
+    <>
+      <Pancakes plain />
+      <g transform="translate(34 -8) scale(0.7)">
+        <JamJar />
+      </g>
+    </>
+  );
+}
+
+/** A jar of strawberry jam; `open`, its lid lies beside it. */
+export function JamJar({ open = false }: { open?: boolean }) {
+  return (
+    <>
+      <rect x="-17" y="-40" width="34" height="40" rx="8" fill="#e03131" stroke="#c92a2a" strokeWidth="2.5" />
+      <rect x="-11" y="-30" width="22" height="16" rx="3" fill="#fff" />
+      <path d="M-5 -24 Q-6 -18 0 -16 Q6 -18 5 -24 Z" fill="#fa5252" />
+      <path d="M-4 -25 L0 -28 L4 -25" stroke="#40c057" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <path d="M-11 -36 V-30" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.5" />
+      {open ? (
+        <ellipse cx="30" cy="-3" rx="13" ry="4" fill="#fff" stroke="#ff8787" strokeWidth="2.5" />
+      ) : (
+        <g>
+          <rect x="-19" y="-49" width="38" height="11" rx="3" fill="#fff" stroke="#ff8787" strokeWidth="2.5" />
+          {[-11, 0, 11].map((x) => (
+            <circle key={x} cx={x} cy="-43.5" r="2.5" fill="#ff8787" />
+          ))}
+        </g>
+      )}
     </>
   );
 }
 
 /** A basket with eggs and a small bottle of milk. */
-export function EggBasket() {
+export function EggBasket({ eggs = 2, milk = true }: { eggs?: number; milk?: boolean }) {
   return (
     <>
       <path d="M-28 -32 Q-28 -66 0 -66 Q28 -66 28 -32" stroke={WOOD_DARK} strokeWidth="5" fill="none" />
-      <rect x="10" y="-58" width="16" height="30" rx="5" fill="#fff" stroke="#adb5bd" strokeWidth="2" />
-      <rect x="10" y="-48" width="16" height="8" fill="#4dabf7" />
-      {[-18, -4].map((x) => (
+      {milk && (
+        <>
+          <rect x="10" y="-58" width="16" height="30" rx="5" fill="#fff" stroke="#adb5bd" strokeWidth="2" />
+          <rect x="10" y="-48" width="16" height="8" fill="#4dabf7" />
+        </>
+      )}
+      {[-18, -4].slice(0, eggs).map((x) => (
         <ellipse key={x} cx={x} cy="-36" rx="9" ry="11" fill="#fff4e6" stroke="#e8c59a" strokeWidth="2" />
       ))}
       <path d="M-34 -32 H34 L28 -2 Q27 0 24 0 H-24 Q-27 0 -28 -2 Z" fill={WOOD} />
@@ -179,13 +233,18 @@ export function Juice() {
   );
 }
 
-/** A blue mug with a heart. */
-export function Mug({ steam = false }: { steam?: boolean }) {
+/** A blue mug with a heart; full of milk unless `empty`, with a spoon while it is stirred. */
+export function Mug({ steam = false, empty = false, spoon = false }: { steam?: boolean; empty?: boolean; spoon?: boolean }) {
   return (
     <>
       <path d="M16 -30 Q32 -30 32 -18 Q32 -6 16 -8" stroke="#4c6ef5" strokeWidth="6" fill="none" />
+      {spoon && (
+        <g className="el-spoon" style={{ transformOrigin: "-1px -36px" }}>
+          <path d="M-1 -36 L10 -64" stroke="#adb5bd" strokeWidth="4" strokeLinecap="round" />
+        </g>
+      )}
       <path d="M-20 -38 H18 V-8 Q18 0 10 0 H-12 Q-20 0 -20 -8 Z" fill="#4c6ef5" />
-      <ellipse cx="-1" cy="-38" rx="19" ry="4" fill="#fff4e6" />
+      <ellipse cx="-1" cy="-38" rx="19" ry="4" fill={empty ? "#364fc7" : "#fff4e6"} />
       <path d="M-1 -14 c-4 -6 -12 -1 -6 5 l6 5 l6 -5 c6 -6 -2 -11 -6 -5 Z" fill="#fff" />
       {steam && <Steam x={-1} y={-48} />}
     </>
@@ -218,7 +277,7 @@ export function EmptyPlate() {
 }
 
 /** The round table on the roof terrace with two stools; at the feast the food stands on it. */
-export function Table({ feast = false }: { feast?: boolean }) {
+export function Table({ feast = false, pancakes = 3, jam = 0, open = false }: { feast?: boolean; pancakes?: number; jam?: number; open?: boolean }) {
   return (
     <>
       {[-1, 1].map((s) => (
@@ -247,9 +306,12 @@ export function Table({ feast = false }: { feast?: boolean }) {
       {feast ? (
         <g>
           <g transform="translate(-34 -88) scale(0.8)">
-            <Pancakes />
+            <Pancakes count={pancakes} plain jam={jam} />
           </g>
-          <g transform="translate(40 -88) scale(0.7)">
+          <g transform="translate(14 -88) scale(0.55)">
+            <JamJar open={open} />
+          </g>
+          <g transform="translate(46 -88) scale(0.7)">
             <Juice />
           </g>
           {[-1, 1].map((s) => (
@@ -298,8 +360,8 @@ export function star(x: number, y: number, r: number) {
   return `M${points.join(" L")} Z`;
 }
 
-/** The bathtub with foam and a rubber duck; while bathing, the child's head peeks out of the foam. */
-export function Tub({ bather }: { bather?: ReactNode }) {
+/** The bathtub with foam and a rubber duck; while bathing, the child's head peeks out of the foam. `soap` adds foam, `quack` makes the duck jump. */
+export function Tub({ bather, soap = 0, quack = 0 }: { bather?: ReactNode; soap?: number; quack?: number }) {
   return (
     <>
       {[-80, 80].map((x) => (
@@ -309,6 +371,9 @@ export function Tub({ bather }: { bather?: ReactNode }) {
       <g className="el-foam" fill="#fff" stroke="#d0ebff" strokeWidth="2">
         {[-80, -56, -30, 30, 56, 82].map((x, i) => (
           <circle key={x} cx={x} cy={-88 - (i % 2) * 8} r={14 + (i % 3) * 3} />
+        ))}
+        {[-66, 70, -8, -42, 44, 14].slice(0, soap * 2).map((x, i) => (
+          <circle key={`s${x}`} className="el-pop-in" cx={x} cy={-100 - (i % 3) * 12} r={13 + (i % 2) * 5} />
         ))}
       </g>
       <path
@@ -320,11 +385,13 @@ export function Tub({ bather }: { bather?: ReactNode }) {
       <rect x="-118" y="-94" width="236" height="12" rx="6" fill="#fff" stroke="#a5d8ff" strokeWidth="3" />
       <path d="M-92 -70 Q-86 -40 -64 -30" stroke="#d0ebff" strokeWidth="6" strokeLinecap="round" fill="none" />
       <path d="M106 -94 V-128 Q106 -138 96 -138 H84" stroke="#adb5bd" strokeWidth="7" strokeLinecap="round" fill="none" />
-      <g className="el-duck" style={{ transformOrigin: "60px -96px" }}>
-        <ellipse cx="60" cy="-104" rx="16" ry="10" fill="#ffd43b" />
-        <circle cx="70" cy="-118" r="9" fill="#ffd43b" />
-        <path d="M78 -118 L88 -115 L78 -112 Z" fill="#ff922b" />
-        <circle cx="72" cy="-120" r="2" fill={INK} />
+      <g key={quack} className={quack ? "el-jump-once" : undefined}>
+        <g className="el-duck" style={{ transformOrigin: "60px -96px" }}>
+          <ellipse cx="60" cy="-104" rx="16" ry="10" fill="#ffd43b" />
+          <circle cx="70" cy="-118" r="9" fill="#ffd43b" />
+          <path d="M78 -118 L88 -115 L78 -112 Z" fill="#ff922b" />
+          <circle cx="72" cy="-120" r="2" fill={INK} />
+        </g>
       </g>
     </>
   );
@@ -413,11 +480,11 @@ export function Bed({ sleeper }: { sleeper?: ReactNode }) {
   );
 }
 
-/** A pair of yellow rubber boots. */
-export function Boots() {
+/** A pair of yellow rubber boots; `left`/`right` false leaves that one out. */
+export function Boots({ left = true, right = true }: { left?: boolean; right?: boolean }) {
   return (
     <>
-      {[-20, 22].map((x) => (
+      {[...(left ? [-20] : []), ...(right ? [22] : [])].map((x) => (
         <g key={x}>
           <path
             d={`M${x - 14} -58 H${x + 10} V-16 H${x + 22} Q${x + 30} -14 ${x + 30} -6 V0 H${x - 14} Z`}
@@ -509,16 +576,18 @@ export function Boat() {
 }
 
 /** A puddle on the ground; it splashes while someone jumps in it. */
-export function Puddle({ width = 150, boat = false }: { width?: number; boat?: boolean }) {
+export function Puddle({ width = 150, boat = false, drift = 3 }: { width?: number; boat?: boolean; drift?: number }) {
   const w = width / 2;
   return (
     <>
       <ellipse cx="0" cy="-6" rx={w} ry="15" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
       <path d={`M${-w * 0.6} -8 H${-w * 0.2} M${w * 0.1} -3 H${w * 0.5}`} stroke="#e7f5ff" strokeWidth="4" strokeLinecap="round" />
       {boat && (
-        <g className="el-boat-float" style={{ transformOrigin: "0px -8px" }}>
-          <g transform={`translate(${w * 0.55} -6) scale(0.7)`}>
-            <Boat />
+        <g className="el-drift" style={{ transform: `translateX(${w * (drift * 0.3 - 0.35)}px)` }}>
+          <g className="el-boat-float" style={{ transformOrigin: "0px -8px" }}>
+            <g transform="translate(0 -6) scale(0.7)">
+              <Boat />
+            </g>
           </g>
         </g>
       )}
@@ -592,5 +661,190 @@ export function Blocks() {
       ))}
       <path d="M-12 -96 L4 -122 L20 -96 Z" fill="#cc5de8" stroke="#00000026" strokeWidth="3" strokeLinejoin="round" />
     </g>
+  );
+}
+
+/** The white chef's hat. */
+export function ChefHat() {
+  return (
+    <>
+      <path
+        d="M-24 -20 Q-44 -34 -28 -52 Q-24 -72 -4 -66 Q12 -80 26 -60 Q46 -50 26 -20 Z"
+        fill="#fff"
+        stroke="#ced4da"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M-10 -24 Q-12 -40 -6 -50 M10 -24 Q12 -40 6 -52" stroke="#e9ecef" strokeWidth="3" strokeLinecap="round" fill="none" />
+      <rect x="-26" y="-24" width="52" height="24" rx="5" fill="#fff" stroke="#ced4da" strokeWidth="3" />
+    </>
+  );
+}
+
+/** The yellow rain hat with its wide brim. */
+export function RainHat() {
+  return (
+    <>
+      <path d="M-30 -12 Q-30 -48 0 -48 Q30 -48 30 -12 Z" fill="#ffd43b" stroke="#f59f00" strokeWidth="3" />
+      <path d="M-14 -40 Q-20 -30 -18 -18" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
+      <path
+        d="M-52 -4 Q0 -24 52 -4 Q58 4 44 6 Q0 -6 -44 6 Q-58 4 -52 -4 Z"
+        fill="#fab005"
+        stroke="#f59f00"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+    </>
+  );
+}
+
+/** The mixing bowl. What is in it comes in tap by tap: `eggs`, `milk`, `flour`; `mixed` stirs it into batter, `poured` empties it. */
+export function Bowl({
+  eggs = 0,
+  milk = false,
+  flour = 0,
+  mixed = 0,
+  poured = 0,
+}: {
+  eggs?: number;
+  milk?: boolean;
+  flour?: number;
+  mixed?: number;
+  poured?: number;
+}) {
+  /** How smooth the batter is, 0 to 1. */
+  const smooth = Math.min(1, mixed / 5);
+  const batter = milk || eggs > 0;
+  const pile = flour * 9 * (1 - smooth);
+  return (
+    <>
+      <ellipse cx="0" cy="-42" rx="44" ry="8" fill="#868e96" />
+      {poured < 3 && batter && (
+        <ellipse cx="0" cy={-41 + poured * 2} rx={40 - poured * 6} ry="6" fill={smooth > 0 ? "#ffe8a3" : milk ? "#fff9db" : "#ffec99"} />
+      )}
+      {smooth === 0 &&
+        [-14, 6, 20].slice(0, eggs).map((x) => (
+          <g key={x}>
+            <ellipse cx={x} cy="-42" rx="9" ry="4" fill="#fff" opacity="0.9" />
+            <ellipse cx={x} cy="-43" rx="4.5" ry="3" fill="#fab005" />
+          </g>
+        ))}
+      {pile > 0 && <path d={`M${-22 - flour * 4} -40 Q0 ${-44 - pile * 2} ${22 + flour * 4} -40 Z`} fill="#fff" stroke="#e9ecef" strokeWidth="2" />}
+      {smooth > 0 && poured < 3 && (
+        <path className="el-swirl" d="M-20 -41 Q-8 -46 4 -41 Q14 -37 22 -42" stroke="#f4b860" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      )}
+      <path d="M-46 -42 H46 Q44 -8 20 -3 H-20 Q-44 -8 -46 -42 Z" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-34 -32 Q-30 -16 -16 -10" stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.6" />
+      <rect x="-18" y="-4" width="36" height="5" rx="2" fill="#4dabf7" />
+      <ellipse cx="0" cy="-42" rx="46" ry="8" fill="none" stroke="#4dabf7" strokeWidth="3" />
+    </>
+  );
+}
+
+/** A red hand mixer standing on its heel; its beaters whirl while `spinning`. */
+export function Mixer({ spinning = false }: { spinning?: boolean }) {
+  return (
+    <>
+      <g className={spinning ? "el-beaters on" : "el-beaters"}>
+        {[-9, 9].map((x) => (
+          <path
+            key={x}
+            d={`M${x} -34 V-16 Q${x - 7} -8 ${x} 0 Q${x + 7} -8 ${x} -16`}
+            stroke="#adb5bd"
+            strokeWidth="3"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        ))}
+      </g>
+      <path d="M-24 -34 H24 Q34 -34 34 -46 V-52 Q34 -62 22 -62 H-22 Q-30 -62 -30 -52 V-44 Q-30 -34 -24 -34 Z" fill="#ff6b6b" />
+      <path d="M-18 -62 Q-16 -86 4 -86 H20 Q30 -86 28 -62" stroke="#fa5252" strokeWidth="9" strokeLinecap="round" fill="none" />
+      <circle cx="-14" cy="-48" r="5" fill="#fff" />
+      <rect x="0" y="-52" width="22" height="7" rx="3.5" fill="#ffc9c9" />
+    </>
+  );
+}
+
+/** A paper bag of flour with an ear of wheat on it. */
+export function FlourBag() {
+  return (
+    <>
+      <path
+        d="M-26 0 Q-32 -30 -24 -58 L-16 -66 H16 L24 -58 Q32 -30 26 0 Z"
+        fill="#f8f9fa"
+        stroke="#ced4da"
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M-16 -66 L-10 -76 H10 L16 -66" fill="#e9ecef" stroke="#ced4da" strokeWidth="3" strokeLinejoin="round" />
+      <path d="M0 -10 V-48" stroke="#e8a317" strokeWidth="3" strokeLinecap="round" />
+      {[-44, -36, -28, -20].map((y) => (
+        <g key={y} fill="#fab005">
+          <ellipse cx="-5" cy={y} rx="3.5" ry="6" transform={`rotate(-30 -5 ${y})`} />
+          <ellipse cx="5" cy={y} rx="3.5" ry="6" transform={`rotate(30 5 ${y})`} />
+        </g>
+      ))}
+    </>
+  );
+}
+
+/** Pyjamas folded up: the trousers and the top with a star. */
+export function Pyjama() {
+  return (
+    <>
+      <rect x="-36" y="-16" width="72" height="16" rx="5" fill="#a5d8ff" />
+      <path d="M-36 -8 H36" stroke="#74c0fc" strokeWidth="4" />
+      <path
+        d="M-32 -16 Q-36 -40 -20 -44 L-8 -38 Q0 -33 8 -38 L20 -44 Q36 -40 32 -16 Z"
+        fill="#a5d8ff"
+        stroke="#74c0fc"
+        strokeWidth="2.5"
+        strokeLinejoin="round"
+      />
+      <path d="M-30 -24 H30 M-31 -32 H31" stroke="#74c0fc" strokeWidth="4" />
+      <path d={star(0, -28, 8)} fill="#ffe066" stroke="#fab005" strokeWidth="1.5" />
+    </>
+  );
+}
+
+/** The toilet, seen from the front; while `flushing` the water swirls. */
+export function Toilet({ flushing = false }: { flushing?: boolean }) {
+  return (
+    <>
+      <rect x="-24" y="-118" width="48" height="52" rx="7" fill="#fff" stroke="#ced4da" strokeWidth="3" />
+      <rect className={flushing ? "el-flush on" : "el-flush"} x="-9" y="-126" width="18" height="9" rx="3" fill="#74c0fc" />
+      <path d="M-36 -58 H36 Q34 -28 14 -20 L12 0 H-12 L-14 -20 Q-34 -28 -36 -58 Z" fill="#fff" stroke="#ced4da" strokeWidth="3" strokeLinejoin="round" />
+      <ellipse cx="0" cy="-60" rx="40" ry="8" fill="#ffd8a8" stroke="#e9b872" strokeWidth="3" />
+      {flushing && (
+        <g className="el-whirl" style={{ transformOrigin: "0px -60px" }}>
+          <ellipse cx="0" cy="-60" rx="24" ry="4" fill="#a5d8ff" />
+          <path d="M-14 -61 Q0 -66 14 -60" stroke="#fff" strokeWidth="2.5" fill="none" />
+        </g>
+      )}
+    </>
+  );
+}
+
+/** A sheet of paper folded into a boat, tap by tap: flat, folded in half, a hat, then the boat. */
+export function PaperFold({ stage }: { stage: number }) {
+  if (stage >= 3) return <Boat />;
+  if (stage === 2)
+    return <path d="M-30 0 L0 -44 L30 0 Z" fill="#fff" stroke="#74c0fc" strokeWidth="3" strokeLinejoin="round" />;
+  if (stage === 1) return <rect x="-30" y="-24" width="60" height="24" rx="2" fill="#fff" stroke="#74c0fc" strokeWidth="3" />;
+  return (
+    <>
+      <rect x="-30" y="-44" width="60" height="44" rx="2" fill="#fff" stroke="#74c0fc" strokeWidth="3" />
+      <path d="M-20 -32 H20 M-20 -22 H20 M-20 -12 H12" stroke="#d0ebff" strokeWidth="3" strokeLinecap="round" />
+    </>
+  );
+}
+
+/** A wooden toy block with a dot, standing on its foot point. */
+export function Block({ colour }: { colour: string }) {
+  return (
+    <>
+      <rect x="-16" y="-32" width="32" height="32" rx="4" fill={colour} stroke="#00000026" strokeWidth="3" />
+      <circle cx="0" cy="-16" r="7" fill="#fff" opacity="0.5" />
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import type { CSSProperties, PointerEvent } from "react";
-import { Cloud } from "@/games/scenes/shared";
+import { Cloud, INK } from "@/games/scenes/shared";
 import {
   BUTTON_R,
   BUTTON_X,
@@ -218,6 +218,27 @@ export function Hint({ floor }: { floor: number }) {
       stroke="#ffd43b"
       strokeWidth="12"
     />
+  );
+}
+
+/** A glowing ring with a hand tapping on it: tap here (or anywhere, or any key) to help. */
+export function TapMark({ x, y }: { x: number; y: number }) {
+  return (
+    <g className="el-tap" transform={`translate(${x} ${y})`}>
+      <g className="el-tap-pop">
+        <circle className="el-tap-ring" r="42" fill="#fff3bf" fillOpacity="0.25" stroke="#ffd43b" strokeWidth="9" />
+        <g className="el-tap-hand" fill="#fff" stroke={INK} strokeWidth="5" strokeLinejoin="round">
+          {/* Fingertip on the middle of the ring, the hand above it */}
+          <g transform="translate(8 8) rotate(-24)">
+            <rect x="-14" y="-86" width="54" height="52" rx="18" />
+            <circle cx="22" cy="-36" r="9" />
+            <circle cx="35" cy="-40" r="8" />
+            <ellipse cx="-16" cy="-54" rx="8" ry="15" transform="rotate(-30 -16 -54)" />
+            <path d="M-9 -44 V-6 Q-9 4 0 4 Q9 4 9 -6 V-44" />
+          </g>
+        </g>
+      </g>
+    </g>
   );
 }
 

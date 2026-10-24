@@ -4,13 +4,20 @@ import {
   Bed,
   Boat,
   Boots,
+  Bowl,
+  Breakfast,
+  ChefHat,
   EggBasket,
   EmptyPlate,
+  FlourBag,
   Fridge,
+  JamJar,
   Juice,
   Mug,
   OpenUmbrella,
   Pancakes,
+  Pyjama,
+  RainHat,
   RainPuddle,
   Raincoat,
   SleepyMoon,
@@ -39,15 +46,32 @@ export const BROTHER: Look = { shirt: "#40c057", pants: "#e8590c", hair: "#f2c14
 /** Height of a child at scale 1, from the feet to the top of the hair. */
 export const KID_H = 178;
 
-export type Pose = "stand" | "walk" | "reach" | "tummy" | "yawn" | "shake" | "jump" | "eat" | "drink" | "brush" | "cheer" | "build" | "hop";
+export type Pose =
+  | "stand"
+  | "walk"
+  | "reach"
+  | "stir"
+  | "blow"
+  | "tummy"
+  | "yawn"
+  | "shake"
+  | "jump"
+  | "eat"
+  | "drink"
+  | "brush"
+  | "cheer"
+  | "build"
+  | "hop";
 
-export type Outfit = "pyjama" | "boots" | "coat" | "umbrella";
-export type Holding = "eggs" | "pancakes" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
+export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat";
+export type Holding = "eggs" | "flour" | "pancakes" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
 
 /** Held in front with both hands. */
 const IN_FRONT: Partial<Record<Holding, { draw: () => ReactNode; scale: number }>> = {
   eggs: { draw: () => <EggBasket />, scale: 0.78 },
-  pancakes: { draw: () => <Pancakes />, scale: 0.9 },
+  flour: { draw: () => <FlourBag />, scale: 0.72 },
+  pancakes: { draw: () => <Pancakes plain />, scale: 0.9 },
+  breakfast: { draw: () => <Breakfast />, scale: 0.85 },
   juice: { draw: () => <Juice />, scale: 0.62 },
   teddy: { draw: () => <Teddy />, scale: 0.6 },
 };
@@ -66,7 +90,7 @@ const ARMS: Record<Arm, { d: string; hand: [number, number] }> = {
 };
 
 function rightArm(pose: Pose, front: boolean): Arm {
-  if (pose === "reach") return "out";
+  if (pose === "reach" || pose === "stir") return "out";
   if (pose === "cheer" || pose === "yawn" || pose === "build") return "up";
   if (pose === "drink" || pose === "brush" || pose === "eat") return "mouth";
   if (pose === "tummy") return "belly";
@@ -147,6 +171,8 @@ export function Kid({
   const coat = wear.includes("coat");
   const boots = wear.includes("boots");
   const umbrella = wear.includes("umbrella");
+  const chef = wear.includes("chef");
+  const hat = wear.includes("hat");
   const front = holding ? IN_FRONT[holding] : undefined;
   const shirt = pyjama ? "#a5d8ff" : look.shirt;
   const pants = pyjama ? "#a5d8ff" : look.pants;
@@ -268,6 +294,16 @@ export function Kid({
           <KidHead look={look} />
           {pyjama && <path d="M-20 -176 Q0 -200 30 -186 L36 -160 Q10 -172 -20 -176 Z" fill="#74c0fc" />}
           {pyjama && <circle cx="38" cy="-160" r="6" fill="#fff" />}
+          {chef && (
+            <g transform="translate(0 -160) scale(0.95)">
+              <ChefHat />
+            </g>
+          )}
+          {hat && (
+            <g transform="translate(0 -156)">
+              <RainHat />
+            </g>
+          )}
         </g>
       </g>
     </g>
@@ -292,7 +328,13 @@ export type PicId =
   | "boots"
   | "coat"
   | "umbrella"
-  | "boat";
+  | "boat"
+  | "chefhat"
+  | "bowl"
+  | "flour"
+  | "jam"
+  | "pyjama"
+  | "hat";
 
 /** What can show in a thought bubble: the drawing and its size. */
 export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNode }> = {
@@ -330,6 +372,12 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
   coat: { w: 100, h: 146, draw: () => <Raincoat /> },
   umbrella: { w: 40, h: 150, draw: () => <Umbrella /> },
   boat: { w: 84, h: 64, draw: () => <Boat /> },
+  chefhat: { w: 90, h: 84, draw: () => <ChefHat /> },
+  bowl: { w: 100, h: 52, draw: () => <Bowl eggs={2} flour={2} /> },
+  flour: { w: 64, h: 80, draw: () => <FlourBag /> },
+  jam: { w: 50, h: 52, draw: () => <JamJar /> },
+  pyjama: { w: 80, h: 50, draw: () => <Pyjama /> },
+  hat: { w: 112, h: 56, draw: () => <RainHat /> },
 };
 
 /** A thought bubble with a picture, above the head of a child of height `height`; it pops up anew for every `n`. */

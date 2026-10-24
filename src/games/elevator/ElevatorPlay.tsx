@@ -12,8 +12,8 @@ import {
   playSlide,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { STORIES, RECORDINGS, texts, type Step, type Story, type Who } from "./content";
-import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
+import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
+import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs, TapMark } from "./house";
 import { BROTHER, Bubble, HERO, KID_H, Kid, PICTURES, type Holding, type Outfit, type PicId, type Pose } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_W, floorLine } from "./layout";
 import { WeatherContext } from "./rooms";
@@ -27,6 +27,8 @@ const DOOR_MS = 700;
 const WALK_MS = 2.6;
 /** While waiting for the right button: the bubble pops up again, and the first time the room starts to glow. */
 const NUDGE_MS = 7000;
+/** How long one tap's movement lasts if the task doesn't say. */
+const BEAT_MS = 700;
 /** From the end of a story until the picture cards come back. */
 const END_MS = 5000;
 const BUDDY_SCALE = 0.8;
@@ -62,6 +64,11 @@ interface View {
   bubble: { who: Who; pic: PicId; n: number } | null;
   playing: string | null;
   used: string[];
+  /** The task being tapped now, and how often each task has been tapped in this story. */
+  task: string | null;
+  taps: Record<string, number>;
+  /** Where the hand points, on which floor; `n` makes it pop up anew. */
+  target: { floor: number; x: number; y: number; n: number } | null;
   hint: number | null;
   lit: number | null;
   night: boolean;
@@ -80,6 +87,9 @@ const START: View = {
   bubble: null,
   playing: null,
   used: [],
+  task: null,
+  taps: {},
+  target: null,
   hint: null,
   lit: null,
   night: false,
@@ -112,6 +122,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
   const timers = useRef(new Set<number>());
   /** Set while the script waits for a button: it gets the floor. */
   const waiter = useRef<((floor: number) => void) | null>(null);
+  /** Set while a task waits for a tap. */
+  const tapper = useRef<(() => void) | null>(null);
 
   const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
     const patch = typeof change === "function" ? change(viewRef.current) : change;
@@ -146,6 +158,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     timers.current.forEach(clearTimeout);
     timers.current.clear();
     waiter.current = null;
+    tapper.current = null;
   };
 
   useEffect(() => cancel, []);
@@ -236,6 +249,60 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     }
   };
 
+  const nextTap = () => new Promise<void>((resolve) => (tapper.current = resolve));
+
+  /** A tap, a click or a key while a task waits for one. */
+  const tap = () => {
+    const resolve = tapper.current;
+    if (resolve) {
+      tapper.current = null;
+      resolve();
+    }
+  };
+
+  /** The hand points at the thing; every tap does the task once more, until it is done. */
+  const doTask = async (who: Who, task: Task, floor: number) => {
+    const other: Who = who === "hero" ? "buddy" : "hero";
+    if (task.spot !== undefined) await walk(who, task.spot);
+    if (task.face) actor(who, { face: task.face });
+    put((v) => ({ task: task.name, taps: { ...v.taps, [task.name]: v.taps[task.name] ?? 0 } }));
+    say(task.ask);
+    for (let i = 0; i < task.taps; i++) {
+      const [x, y] = typeof task.at[0] === "number" ? (task.at as [number, number]) : (task.at as [number, number][])[i];
+      put((v) => ({ target: { floor, x, y, n: (v.target?.n ?? 0) + 1 } }));
+      const stopNudging = (() => {
+        let stop = () => {};
+        const nudge = () => {
+          put((v) => ({ target: v.target && { ...v.target, n: v.target.n + 1 } }));
+          say(task.ask);
+          stop = later(NUDGE_MS, nudge);
+        };
+        stop = later(NUDGE_MS, nudge);
+        return () => stop();
+      })();
+      await nextTap();
+      stopNudging();
+      const lastTap = i === task.taps - 1;
+      put((v) => ({ target: null, taps: { ...v.taps, [task.name]: (v.taps[task.name] ?? 0) + 1 } }));
+      const a = viewRef.current.actors[who]!;
+      actor(who, {
+        pose: task.pose,
+        ...(lastTap && task.hold !== undefined && { holding: task.hold }),
+        ...(lastTap && task.wear && { wear: [...a.wear, task.wear] }),
+      });
+      if (task.together) actor(other, { pose: task.pose });
+      sound(task.sound);
+      await wait(task.beat ?? BEAT_MS);
+      actor(who, { pose: "stand" });
+      if (task.together) actor(other, { pose: "stand" });
+    }
+    if (task.done) say(task.done);
+    if (task.wait) {
+      cue(task.sounds ?? []);
+      await wait(task.wait);
+    }
+  };
+
   const doStep = async (step: Step, last: boolean) => {
     const who = step.who ?? "hero";
     const other: Who = who === "hero" ? "buddy" : "hero";
@@ -261,6 +328,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
     cue(step.sounds);
     say(step.done);
     await wait(step.ms);
+    for (const task of step.tasks ?? []) await doTask(who, task, step.floor);
+    put({ task: null });
     if (last) return;
 
     put((v) => ({ playing: null, used: [...v.used, step.prop] }));
@@ -323,6 +392,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   /** A floor button or a room was tapped. */
   const press = (floor: number) => {
+    if (viewRef.current.task) return tap();
     if (floor < 0 || floor >= FLOORS || !viewRef.current.story || viewRef.current.picking) return;
     const resolve = waiter.current;
     if (resolve) {
@@ -333,6 +403,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
 
   const tapKid = (who: Who) => (e: PointerEvent) => {
     e.stopPropagation();
+    if (viewRef.current.task) return tap();
     const a = viewRef.current.actors[who];
     if (!a || a.walk) return;
     actor(who, { hop: a.hop + 1 });
@@ -364,7 +435,8 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
         else funBurst();
         return;
       }
-      if (Number.isInteger(digit) && digit >= 1 && digit <= FLOORS) press(digit - 1);
+      if (v.task) tap();
+      else if (Number.isInteger(digit) && digit >= 1 && digit <= FLOORS) press(digit - 1);
       else if (e.key === "ArrowUp") press(Math.min(FLOORS - 1, v.cabin + 1));
       else if (e.key === "ArrowDown") press(Math.max(0, v.cabin - 1));
       else funBurst();
@@ -386,7 +458,11 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
   return (
     <div
       className={`elevator-play weather-${weather}`}
-      onPointerDown={(e) => funBurst(e.clientX, e.clientY)}
+      onPointerDown={(e) => {
+        if (!viewRef.current.task) return funBurst(e.clientX, e.clientY);
+        spawn(e.clientX, e.clientY);
+        tap();
+      }}
     >
       <svg className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
         <WeatherContext.Provider value={weather}>
@@ -400,7 +476,7 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
                     <rect x={ROOM_L} y={-ROOM_H} width={ROOM_R - ROOM_L} height={ROOM_H} />
                   </clipPath>
                   <g clipPath={`url(#el-room-${f})`}>
-                    <Room playing={view.playing} used={view.used} />
+                    <Room playing={view.playing} used={view.used} task={view.task} taps={view.taps} />
                   </g>
                 </g>
               ))}
@@ -426,6 +502,11 @@ export function ElevatorPlay({ lang, settings }: { lang: string; settings: Eleva
                 );
               })}
               <CabinFront floor={view.cabin} ride={view.ride} open={view.doors} />
+              {view.target && (
+                <g transform={`translate(0 ${floorLine(view.target.floor)})`}>
+                  <TapMark key={view.target.n} x={view.target.x} y={view.target.y} />
+                </g>
+              )}
               {bubble && actors[bubble.who] && !actors[bubble.who]!.hidden && (
                 <g className="el-ride" style={place(actors[bubble.who]!).outer}>
                   <g className="el-walker" style={place(actors[bubble.who]!).inner}>

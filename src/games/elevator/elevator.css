@@ -43,6 +43,7 @@
 }
 
 .el-bubble,
+.el-tap,
 .el-cabin-front,
 .el-hint,
 .el-night,
@@ -106,6 +107,7 @@
 }
 
 .pose-yawn .el-smile,
+.pose-blow .el-smile,
 .pose-eat .el-smile,
 .pose-cheer .el-smile,
 .pose-jump .el-smile,
@@ -125,6 +127,14 @@
   opacity: 1;
 }
 
+/* Blowing: a small round mouth, puffing. */
+.pose-blow .el-mouth-open {
+  opacity: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-blow 0.35s ease-in-out infinite alternate;
+}
+
 .pose-eat .el-mouth-open {
   animation: el-chew 0.5s steps(2) infinite;
 }
@@ -135,6 +145,10 @@
 
 .pose-reach .el-arm-r {
   animation: el-reach 0.9s ease-in-out infinite alternate;
+}
+
+.pose-stir .el-arm-r {
+  animation: el-stir 0.18s linear infinite alternate;
 }
 
 .pose-build .el-arm-r {
@@ -218,8 +232,10 @@
   animation: el-flicker 0.3s steps(2) infinite;
 }
 
-.cooking-pan .el-pancake {
-  animation: el-flip 2s ease-in-out infinite;
+.el-batter-bubble {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-blink 0.9s ease-in-out infinite;
 }
 
 .cooking-pot .el-pot-lid {
@@ -277,8 +293,76 @@
   animation: el-tower 0.5s ease-in-out 4 alternate;
 }
 
-.el-hop-once {
-  animation: el-teddy 0.6s ease-out 2;
+.el-jump-once {
+  animation: el-jump-once 0.6s ease-out;
+}
+
+.el-pop-in {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-pop 0.4s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+.el-drop-in {
+  animation: el-drop-in 0.45s ease-in both;
+}
+
+/* Cooking: eggshells fall apart, flour puffs up, the mixer whirls, the pancake flies onto the plate. */
+.el-shell-l {
+  animation: el-shell-l 0.7s ease-out forwards;
+}
+
+.el-shell-r {
+  animation: el-shell-r 0.7s ease-out forwards;
+}
+
+.el-yolk-drop {
+  animation: el-yolk-drop 0.5s ease-in forwards;
+}
+
+.el-dust circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-dust 0.9s ease-out forwards;
+}
+
+.el-beaters.on,
+.el-whirl {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-beat 0.12s linear infinite alternate;
+}
+
+.el-spoon {
+  animation: el-spoon 0.3s ease-in-out infinite alternate;
+}
+
+.el-fly {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-fly 0.9s ease-in-out forwards;
+}
+
+.el-cupboard-door {
+  transition: transform 0.45s ease-in-out;
+}
+
+.el-cupboard-door.open {
+  transform: scaleX(-0.3);
+}
+
+.el-rock {
+  animation: el-rock 0.9s ease-in-out;
+}
+
+.el-sparkle path {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-sparkle 0.9s ease-out forwards;
+}
+
+.el-drift {
+  transition: transform 0.9s ease-out;
 }
 
 .el-zzz path {
@@ -319,6 +403,22 @@
 
 .el-twinkle {
   animation: el-twinkle 2s ease-in-out infinite alternate;
+}
+
+/* ---------- The hand that shows where to tap ---------- */
+
+.el-tap-pop {
+  animation: el-pop 0.45s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+.el-tap-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: el-ring 0.9s ease-in-out infinite alternate;
+}
+
+.el-tap-hand {
+  animation: el-press 0.9s ease-in-out infinite;
 }
 
 /* ---------- Lift, buttons, hint, night, party ---------- */
@@ -610,17 +710,139 @@
   }
 }
 
-@keyframes el-flip {
-  0%,
-  30%,
-  100% {
-    transform: translateY(0) rotate(0deg);
+@keyframes el-blow {
+  from {
+    transform: scale(0.45);
+  }
+  to {
+    transform: scale(0.65);
+  }
+}
+
+@keyframes el-stir {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes el-blink {
+  50% {
+    transform: scale(0.2);
+    opacity: 0.3;
+  }
+}
+
+@keyframes el-jump-once {
+  40% {
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes el-drop-in {
+  from {
+    transform: translateY(-70px);
+    opacity: 0;
+  }
+}
+
+@keyframes el-shell-l {
+  to {
+    transform: translate(-18px, 12px) rotate(-40deg);
+    opacity: 0;
+  }
+}
+
+@keyframes el-shell-r {
+  to {
+    transform: translate(18px, 12px) rotate(40deg);
+    opacity: 0;
+  }
+}
+
+@keyframes el-yolk-drop {
+  to {
+    transform: translateY(26px);
+    opacity: 0;
+  }
+}
+
+@keyframes el-dust {
+  from {
+    transform: scale(0.3);
+    opacity: 0.95;
+  }
+  to {
+    transform: translateY(-16px) scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes el-beat {
+  to {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes el-spoon {
+  from {
+    transform: rotate(-20deg);
+  }
+  to {
+    transform: rotate(20deg);
+  }
+}
+
+@keyframes el-fly {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
   }
   50% {
-    transform: translateY(-60px) rotate(180deg);
+    transform: translate(calc(var(--dx) * 0.5), -110px) rotate(180deg);
   }
-  70% {
-    transform: translateY(0) rotate(360deg);
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(360deg) scale(1.3);
+  }
+}
+
+@keyframes el-rock {
+  25% {
+    transform: rotate(-8deg);
+  }
+  75% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes el-sparkle {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes el-ring {
+  from {
+    transform: scale(0.85);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes el-press {
+  0%,
+  100% {
+    transform: translate(12px, -16px);
+  }
+  50% {
+    transform: translate(0, 0);
   }
 }
 
@@ -668,12 +890,6 @@
   }
   to {
     transform: rotate(5deg);
-  }
-}
-
-@keyframes el-teddy {
-  40% {
-    transform: translateY(-30px);
   }
 }
 

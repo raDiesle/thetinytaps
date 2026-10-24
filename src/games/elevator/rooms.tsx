@@ -1,17 +1,52 @@
-import { createContext, useContext, useId, type ReactNode } from "react";
+import { createContext, useContext, useId, type CSSProperties, type ReactNode } from "react";
 import { INK } from "@/games/scenes/shared";
 import { HERO, KidHead } from "./kid";
 import { ROOM_H, ROOM_L, ROOM_R } from "./layout";
-import { Bed, Blocks, Boat, Boots, Fridge, Mug, Puddle, Raincoat, Stove, Table, Teddy, ToothCup, Tub, Umbrella, star } from "./things";
+import {
+  Bed,
+  Block,
+  Blocks,
+  Boots,
+  Bowl,
+  ChefHat,
+  EggBasket,
+  FlourBag,
+  Fridge,
+  JamJar,
+  Mixer,
+  Mug,
+  Pancakes,
+  PaperFold,
+  Puddle,
+  Pyjama,
+  RainHat,
+  Raincoat,
+  Stove,
+  Table,
+  Teddy,
+  Toilet,
+  ToothCup,
+  Tub,
+  Umbrella,
+  star,
+} from "./things";
 
 // The rooms. Each one is drawn from ROOM_L to ROOM_R and from -ROOM_H (the ceiling) to 0 (the floor)
 // and is placed on its floor by the house. `playing` is the thing being used right now, `used` the ones
-// already done, so a room can show the fridge open or the boots gone from the shelf.
+// already done, so a room can show the fridge open or the boots gone from the shelf. `taps` counts what
+// was done by tapping (two eggs cracked, one boot on …) and `task` is the one being tapped now.
 
 export interface RoomProps {
   playing: string | null;
   used: string[];
+  task: string | null;
+  taps: Record<string, number>;
 }
+
+/** How often a task has been tapped. */
+const count = (taps: Record<string, number>, name: string) => taps[name] ?? 0;
+
+const BLOCK_COLOURS = ["#ff6b6b", "#4dabf7", "#ffd43b", "#51cf66"];
 
 export type Weather = "day" | "evening" | "rain";
 
@@ -184,7 +219,7 @@ function Shelf({ x1, x2, y }: { x1: number; x2: number; y: number }) {
 // ---------- Story 1: hungry ----------
 
 /** The cellar with the big fridge, shelves of jars and crates of apples. */
-export function Keller({ playing, used }: RoomProps) {
+export function Keller({ playing, used, taps }: RoomProps) {
   const open = playing === "eggs" || playing === "juice";
   return (
     <>
@@ -234,16 +269,28 @@ export function Keller({ playing, used }: RoomProps) {
           <path d={`M${Number(x) - 40} -42 h72 M${Number(x) - 40} -28 h72`} stroke="#8d5a2b" strokeWidth="3" />
         </g>
       ))}
+      {/* The sack of flour */}
+      {!count(taps, "sack") && (
+        <g transform="translate(520 0) scale(1.15)">
+          <FlourBag />
+        </g>
+      )}
       <g className={`el-fridge${open ? " open" : ""}`} transform="translate(300 -10)">
-        <Fridge eggs={!used.includes("eggs")} juice={!used.includes("juice")} />
+        <Fridge eggs={!count(taps, "eggs") && !used.includes("eggs")} juice={!count(taps, "juice")} />
       </g>
     </>
   );
 }
 
-/** The kitchen with the cooker; pancakes in the pan, milk in the pot, the mug on the worktop. */
-export function Kueche({ playing, used }: RoomProps) {
-  const cooking = playing === "pancakes" ? "pan" : playing === "milk" ? "pot" : null;
+/** The kitchen: the bowl for the batter, the cooker with pan and pot, the mug, and the jam in the cupboard. */
+export function Kueche({ playing, used, task, taps }: RoomProps) {
+  const t = (name: string) => count(taps, name);
+  const flipped = t("flip");
+  /** A pancake is in the pan until it is flipped onto the plate. */
+  const baking = t("pour") > flipped;
+  const flying = task === "flip" && !baking && flipped > 0;
+  const cooking = baking ? "pan" : playing === "milk" && !t("milkpour") ? "pot" : null;
+  const mugHeld = t("blow") >= 2 && !used.includes("milk");
   return (
     <>
       <Wall colour="#fff3bf">
@@ -254,10 +301,19 @@ export function Kueche({ playing, used }: RoomProps) {
         </g>
       </Wall>
       <Window x={100} curtains="#ff8787" />
-      {/* Wall cupboards and the hood */}
-      <rect x="300" y="-196" width="250" height="56" rx="6" fill="#74c0fc" />
-      <path d="M425 -196 V-140" stroke="#4dabf7" strokeWidth="4" />
-      <circle cx="412" cy="-150" r="4" fill="#fff" />
+      {/* Wall cupboards: inside the left one is the jam */}
+      <rect x="300" y="-196" width="250" height="56" rx="6" fill="#1971c2" />
+      <rect x="304" y="-172" width="117" height="4" fill="#4dabf7" />
+      {!t("jar") && (
+        <g transform="translate(362 -142) scale(0.62)">
+          <JamJar />
+        </g>
+      )}
+      <g className={`el-cupboard-door${t("door") && !used.includes("jam") ? " open" : ""}`} style={{ transformOrigin: "300px 0px" }}>
+        <rect x="300" y="-196" width="125" height="56" rx="6" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
+        <circle cx="412" cy="-150" r="4" fill="#fff" />
+      </g>
+      <rect x="425" y="-196" width="125" height="56" rx="6" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
       <circle cx="438" cy="-150" r="4" fill="#fff" />
       <path d="M620 -200 H700 L720 -168 H600 Z" fill="#ced4da" />
       <rect x="632" y="-204" width="56" height="8" fill="#adb5bd" />
@@ -274,30 +330,73 @@ export function Kueche({ playing, used }: RoomProps) {
       <rect x="738" y="-86" width="200" height="86" fill="#74c0fc" />
       <rect x="734" y="-94" width="210" height="12" rx="3" fill="#e9b872" />
       <rect x="826" y="-60" width="28" height="6" rx="3" fill="#fff" />
-      {/* Bread on a board */}
-      <rect x="330" y="-102" width="90" height="8" rx="3" fill="#a0662f" />
-      <path d="M342 -102 Q344 -128 372 -128 Q402 -128 404 -102 Z" fill="#d9902f" />
-      <path d="M358 -116 l8 -6 M374 -118 l8 -6 M390 -114 l6 -5" stroke="#a0662f" strokeWidth="3" strokeLinecap="round" />
       {/* Fruit bowl */}
       <circle cx="880" cy="-108" r="10" fill="#fa5252" />
       <circle cx="898" cy="-110" r="10" fill="#fab005" />
       <circle cx="916" cy="-106" r="10" fill="#82c91e" />
       <path d="M864 -104 H932 Q928 -94 898 -94 Q868 -94 864 -104 Z" fill="#fff" stroke="#ced4da" strokeWidth="2" />
-      {playing !== "milk" && (
-        <g transform="translate(540 -94) scale(0.9)">
-          <Mug steam={used.includes("milk")} />
+      {/* The bowl, and what goes into it */}
+      {playing === "bowl" && (
+        <g transform="translate(385 -94) scale(0.8)">
+          <EggBasket eggs={2 - t("crack")} milk={!t("milk")} />
+        </g>
+      )}
+      {playing === "batter" && t("flour") < 2 && (
+        <g transform="translate(385 -94) scale(0.7)">
+          <FlourBag />
+        </g>
+      )}
+      <g transform="translate(455 -94)">
+        <Bowl eggs={t("crack")} milk={t("milk") > 0} flour={t("flour")} mixed={t("mix")} poured={t("pour")} />
+      </g>
+      {task === "crack" && t("crack") > 0 && (
+        <g key={t("crack")} transform="translate(455 -152)">
+          <path className="el-shell-l" d="M0 -14 Q-12 -14 -12 0 Q-12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#e8c59a" strokeWidth="2" />
+          <path className="el-shell-r" d="M0 -14 Q12 -14 12 0 Q12 10 0 10 L-3 4 L2 -2 L-2 -8 Z" fill="#fff4e6" stroke="#e8c59a" strokeWidth="2" />
+          <ellipse className="el-yolk-drop" cx="0" cy="6" rx="6" ry="5" fill="#fab005" />
+        </g>
+      )}
+      {task === "flour" && t("flour") > 0 && (
+        <g key={t("flour")} className="el-dust" fill="#fff">
+          {[-24, -6, 14, 28].map((dx, i) => (
+            <circle key={dx} cx={455 + dx} cy={-140 - (i % 2) * 10} r={10 + (i % 2) * 4} />
+          ))}
+        </g>
+      )}
+      <g transform={task === "mix" ? "translate(455 -126)" : "translate(330 -94)"}>
+        <Mixer spinning={task === "mix"} />
+      </g>
+      {!mugHeld && (
+        <g transform="translate(556 -94) scale(0.9)">
+          <Mug steam={t("milkpour") > 0 && t("blow") < 2} empty={!t("milkpour") || used.includes("milk")} spoon={task === "stir"} />
+        </g>
+      )}
+      {/* The plate for the pancakes */}
+      {t("pour") > 0 && !used.includes("batter") && (
+        <g transform="translate(810 -94) scale(0.9)">
+          <Pancakes plain count={flying ? flipped - 1 : flipped} />
         </g>
       )}
       <Floorboards colour="#e9ecef" line="#ced4da" />
       <g className={cooking ? `el-stove cooking-${cooking}` : "el-stove"} transform="translate(664 0)">
-        <Stove cooking={cooking} pancake={!used.includes("pancakes")} />
+        <Stove cooking={cooking} pancake={baking} />
       </g>
+      {flying && (
+        <g
+          key={flipped}
+          className="el-fly"
+          style={{ "--dx": "183px", "--dy": `${11 - (flipped - 1) * 8}px` } as CSSProperties}
+        >
+          <ellipse cx="627" cy="-118" rx="22" ry="6" fill="#d9902f" />
+          <ellipse cx="627" cy="-121" rx="22" ry="5" fill="#f4b860" />
+        </g>
+      )}
     </>
   );
 }
 
 /** The children's room: toys on the shelf, the tower of blocks and the raincoat on its hook. */
-export function Kinderzimmer({ playing, used }: RoomProps) {
+export function Kinderzimmer({ playing, used, taps }: RoomProps) {
   return (
     <>
       <Wall colour="#d0ebff">
@@ -314,11 +413,8 @@ export function Kinderzimmer({ playing, used }: RoomProps) {
       <path d="M452 -144 Q470 -132 488 -144" stroke="#fff" strokeWidth="4" fill="none" />
       <rect x="512" y="-150" width="36" height="32" rx="6" fill="#4dabf7" />
       <ellipse cx="530" cy="-150" rx="18" ry="5" fill="#e7f5ff" />
-      {!used.includes("boat") && playing !== "boat" && (
-        <g transform="translate(600 -118) scale(0.8)">
-          <Boat />
-        </g>
-      )}
+      <path d="M584 -118 L594 -146 H626 L636 -118 Z" fill="#ffd43b" />
+      <circle cx="610" cy="-150" r="8" fill="#fab005" />
       {/* Rug and the tower of blocks */}
       <ellipse cx="560" cy="-8" rx="200" ry="14" fill="#ffc9c9" />
       <ellipse cx="560" cy="-8" rx="150" ry="9" fill="#ffa8a8" />
@@ -329,12 +425,27 @@ export function Kinderzimmer({ playing, used }: RoomProps) {
       <rect x="690" y="-62" width="96" height="58" rx="6" fill="#9775fa" />
       <rect x="684" y="-70" width="108" height="14" rx="5" fill="#845ef7" />
       <path d="M704 -40 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
+      {/* A sheet of paper on the toy box, for the boat */}
+      {count(taps, "fold") < 3 && (
+        <g transform="translate(738 -70)">
+          <g key={count(taps, "fold")} className="el-pop-in">
+            <PaperFold stage={count(taps, "fold")} />
+          </g>
+        </g>
+      )}
       {/* Hook with the raincoat */}
       <rect x="868" y="-176" width="44" height="10" rx="4" fill="#a0662f" />
       <circle cx="890" cy="-166" r="5" fill="#868e96" />
-      {!used.includes("coat") && playing !== "coat" && (
+      {!count(taps, "coat") && (
         <g transform="translate(890 -20) scale(0.95)">
           <Raincoat />
+        </g>
+      )}
+      {/* Peg with the chef's hat */}
+      <rect x="966" y="-128" width="38" height="8" rx="4" fill="#a0662f" />
+      {!count(taps, "chefhat") && (
+        <g transform="translate(985 -122) scale(0.9)">
+          <ChefHat />
         </g>
       )}
       <Floorboards colour="#e9b872" line="#c88b3a" />
@@ -343,7 +454,7 @@ export function Kinderzimmer({ playing, used }: RoomProps) {
 }
 
 /** The roof terrace: open to the sky, a sunshade, plants and the table for the feast. */
-export function Terrasse({ playing, used }: RoomProps) {
+export function Terrasse({ playing, used, taps }: RoomProps) {
   const feast = playing === "feast" || used.includes("feast");
   return (
     <>
@@ -376,7 +487,7 @@ export function Terrasse({ playing, used }: RoomProps) {
       <Plant x={430} size={0.7} pot="#f08c00" />
       <Floorboards colour="#c88b3a" line="#a0662f" />
       <g transform="translate(640 0)">
-        <Table feast={feast} />
+        <Table feast={feast} pancakes={3 - count(taps, "bite")} jam={count(taps, "spread")} open={count(taps, "lid") > 0} />
       </g>
     </>
   );
@@ -385,8 +496,9 @@ export function Terrasse({ playing, used }: RoomProps) {
 // ---------- Story 2: bedtime ----------
 
 /** The living room in the evening: sofa with the teddy, a reading lamp and books. */
-export function Wohnzimmer({ playing, used }: RoomProps) {
-  const teddy = !used.includes("teddy");
+export function Wohnzimmer({ used, taps }: RoomProps) {
+  const teddy = !count(taps, "teddy") && !used.includes("teddy");
+  const tidied = count(taps, "tidy");
   return (
     <>
       <Wall colour="#d3f9d8">
@@ -425,9 +537,7 @@ export function Wohnzimmer({ playing, used }: RoomProps) {
       <rect x="300" y="-122" width="320" height="70" rx="26" fill="#f06595" />
       {teddy && (
         <g transform="translate(520 -58) scale(0.85)">
-          <g className={playing === "teddy" ? "el-hop-once" : undefined}>
-            <Teddy />
-          </g>
+          <Teddy />
         </g>
       )}
       <rect x="320" y="-72" width="280" height="42" rx="14" fill="#f783ac" />
@@ -438,12 +548,31 @@ export function Wohnzimmer({ playing, used }: RoomProps) {
       <rect x="606" y="-18" width="14" height="18" fill="#862e9c" />
       <Plant x={960} />
       <Floorboards colour="#c88b3a" line="#a0662f" />
+      {/* Blocks on the floor, and the toy box they go into */}
+      {BLOCK_COLOURS.map(
+        (colour, i) =>
+          tidied <= i && (
+            <g key={colour} transform={`translate(${250 + i * 90} -4)`}>
+              <Block colour={colour} />
+            </g>
+          ),
+      )}
+      {BLOCK_COLOURS.slice(0, tidied).map((colour, i) => (
+        <g key={colour} transform={`translate(${850 + i * 20} -44) scale(0.8)`}>
+          <g className="el-drop-in">
+            <Block colour={colour} />
+          </g>
+        </g>
+      ))}
+      <rect x="834" y="-56" width="96" height="56" rx="6" fill="#9775fa" />
+      <rect x="828" y="-62" width="108" height="12" rx="5" fill="#845ef7" />
+      <path d="M848 -34 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
     </>
   );
 }
 
 /** The bathroom: bathtub with a duck, the washbasin with the tooth cup, a towel. */
-export function Bad({ playing }: RoomProps) {
+export function Bad({ playing, task, taps }: RoomProps) {
   const bathing = playing === "bath";
   return (
     <>
@@ -470,9 +599,9 @@ export function Bad({ playing }: RoomProps) {
       <path d="M730 -94 V-108 H744" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" fill="none" />
       <rect x="772" y="-108" width="70" height="8" rx="3" fill="#adb5bd" />
       <g transform="translate(796 -108) scale(0.8)">
-        <ToothCup brush={playing !== "teeth"} />
+        <ToothCup brush={playing !== "teeth" || count(taps, "rinse") > 0} />
       </g>
-      <g className={playing === "teeth" ? "el-foam-bits on" : "el-foam-bits"} fill="#fff" stroke="#a5d8ff" strokeWidth="2">
+      <g className={task === "scrub" ? "el-foam-bits on" : "el-foam-bits"} fill="#fff" stroke="#a5d8ff" strokeWidth="2">
         {[0, 1, 2].map((i) => (
           <circle key={i} cx={710 + i * 20} cy={-120 - (i % 2) * 14} r="7" style={{ animationDelay: `${i * 0.3}s` }} />
         ))}
@@ -483,8 +612,13 @@ export function Bad({ playing }: RoomProps) {
       <path d="M906 -104 H954 M906 -116 H954" stroke="#fff" strokeWidth="4" />
       <rect x={ROOM_L} y="-16" width={W} height="16" fill="#99e9f2" />
       <ellipse cx="560" cy="-8" rx="60" ry="8" fill="#ff8787" opacity="0.7" />
+      <g transform="translate(985 0)">
+        <Toilet flushing={task === "toilet" && count(taps, "toilet") > 0} />
+      </g>
       <g className={bathing ? "el-tub bathing" : "el-tub"} transform="translate(330 -4)">
         <Tub
+          soap={count(taps, "soap")}
+          quack={count(taps, "duck")}
           bather={
             bathing ? (
               <g transform="translate(-24 34)">
@@ -501,8 +635,10 @@ export function Bad({ playing }: RoomProps) {
 }
 
 /** The bedroom: the bed with the star blanket, a night light and the moon outside. */
-export function Schlafzimmer({ playing, used }: RoomProps) {
+export function Schlafzimmer({ playing, used, taps }: RoomProps) {
   const sleeping = playing === "bed" || used.includes("bed");
+  const dark = count(taps, "light") > 0;
+  const slippers = count(taps, "slippers");
   return (
     <>
       <Wall colour="#e5dbff">
@@ -514,15 +650,15 @@ export function Schlafzimmer({ playing, used }: RoomProps) {
       </Wall>
       <Window x={120} curtains="#9775fa" />
       {/* Night light on the bedside table */}
-      <ellipse className="el-night-glow" cx="790" cy="-110" rx="60" ry="50" fill="#fff3bf" opacity="0.7" />
+      {!dark && <ellipse className="el-night-glow" cx="790" cy="-110" rx="60" ry="50" fill="#fff3bf" opacity="0.7" />}
       <rect x="750" y="-70" width="80" height="70" rx="6" fill="#c88b3a" />
       <rect x="760" y="-50" width="60" height="6" rx="3" fill="#8d5a2b" />
       <path d="M790 -70 V-90" stroke="#868e96" strokeWidth="5" />
-      <path d="M766 -90 Q790 -134 814 -90 Z" fill="#ffd43b" />
+      <path d="M766 -90 Q790 -134 814 -90 Z" fill={dark ? "#868e96" : "#ffd43b"} />
       {/* Slippers and rug */}
       <ellipse cx="560" cy="-8" rx="180" ry="12" fill="#b197fc" opacity="0.5" />
-      <ellipse cx="390" cy="-8" rx="16" ry="7" fill="#f783ac" />
-      <ellipse cx="416" cy="-6" rx="16" ry="7" fill="#f783ac" />
+      {slippers < 1 && <ellipse cx="390" cy="-8" rx="16" ry="7" fill="#f783ac" />}
+      {slippers < 2 && <ellipse cx="416" cy="-6" rx="16" ry="7" fill="#f783ac" />}
       <g transform="translate(560 0)">
         <Bed
           sleeper={
@@ -550,6 +686,11 @@ export function Schlafzimmer({ playing, used }: RoomProps) {
           </g>
         )}
       </g>
+      {!count(taps, "pyjama") && (
+        <g transform="translate(650 -84) scale(0.8)">
+          <Pyjama />
+        </g>
+      )}
     </>
   );
 }
@@ -557,7 +698,8 @@ export function Schlafzimmer({ playing, used }: RoomProps) {
 // ---------- Story 3: puddles ----------
 
 /** The hall: front door, mirror and the shoe rack with the yellow boots. */
-export function Flur({ playing, used }: RoomProps) {
+export function Flur({ task, taps }: RoomProps) {
+  const boots = count(taps, "boots");
   return (
     <>
       <Wall colour="#ffe8cc">
@@ -569,19 +711,36 @@ export function Flur({ playing, used }: RoomProps) {
       <path d="M185 -176 V-112" stroke="#fff" strokeWidth="5" />
       <rect x="146" y="-96" width="78" height="80" rx="4" fill="#2f9e44" />
       <circle cx="226" cy="-96" r="7" fill="#fab005" />
-      {/* Mirror */}
+      {/* Peg with the rain hat */}
+      <rect x="276" y="-182" width="28" height="8" rx="3" fill="#a0662f" />
+      {!count(taps, "hat") && (
+        <g transform="translate(290 -142)">
+          <RainHat />
+        </g>
+      )}
+      {/* Mirror; it sparkles when the child looks in */}
       <ellipse cx="400" cy="-130" rx="42" ry="56" fill="#e7f5ff" stroke="#c88b3a" strokeWidth="8" />
       <path d="M380 -150 L396 -170 M384 -132 L410 -164" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+      {task === "mirror" && count(taps, "mirror") > 0 && (
+        <g key={count(taps, "mirror")} className="el-sparkle" fill="#ffd43b">
+          {[
+            [366, -176, 10],
+            [440, -160, 8],
+            [430, -86, 9],
+            [360, -96, 7],
+          ].map(([x, y, r]) => (
+            <path key={x} d={star(x, y, r)} />
+          ))}
+        </g>
+      )}
       {/* Shoe rack: the boots on top, more shoes below */}
       <rect x="540" y="-84" width="190" height="10" rx="3" fill="#a0662f" />
       <rect x="540" y="-40" width="190" height="8" rx="3" fill="#a0662f" />
       <rect x="544" y="-84" width="10" height="84" fill="#8d5a2b" />
       <rect x="716" y="-84" width="10" height="84" fill="#8d5a2b" />
-      {!used.includes("boots") && playing !== "boots" && (
-        <g transform="translate(630 -84)">
-          <Boots />
-        </g>
-      )}
+      <g transform="translate(630 -84)">
+        <Boots left={boots < 1} right={boots < 2} />
+      </g>
       <path d="M570 -40 Q570 -60 590 -60 H604 Q620 -52 630 -48 V-40 Z" fill="#4dabf7" />
       <path d="M640 -40 Q640 -60 660 -60 H674 Q690 -52 700 -48 V-40 Z" fill="#4dabf7" />
       <ellipse cx="600" cy="-6" rx="24" ry="8" fill="#f783ac" />
@@ -597,7 +756,7 @@ export function Flur({ playing, used }: RoomProps) {
 }
 
 /** The attic under the roof: a chest, the umbrella stand, a rocking horse and a cobweb. */
-export function Dachboden({ playing, used }: RoomProps) {
+export function Dachboden({ taps }: RoomProps) {
   return (
     <>
       <Wall colour="#e9c79a">
@@ -634,7 +793,7 @@ export function Dachboden({ playing, used }: RoomProps) {
       <path d="M290 -96 V0 M370 -96 V0" stroke="#fab005" strokeWidth="6" />
       <rect x="320" y="-60" width="20" height="18" rx="3" fill="#fab005" />
       {/* Umbrella stand */}
-      {!used.includes("umbrella") && playing !== "umbrella" && (
+      {!count(taps, "umbrella") && (
         <g transform="translate(620 -40)">
           <Umbrella />
         </g>
@@ -644,14 +803,16 @@ export function Dachboden({ playing, used }: RoomProps) {
       <path d="M596 -50 H664" stroke="#adb5bd" strokeWidth="5" />
       {/* Rocking horse */}
       <g transform="translate(830 0)">
-        <path d="M-70 -4 Q0 22 70 -4" stroke="#c92a2a" strokeWidth="8" fill="none" />
-        <path d="M-46 -6 L-34 -60 M46 -6 L34 -60" stroke="#fff4e6" strokeWidth="9" strokeLinecap="round" />
-        <ellipse cx="0" cy="-70" rx="52" ry="22" fill="#fff4e6" />
-        <path d="M34 -84 L54 -132 Q76 -136 82 -116 L64 -100 Z" fill="#fff4e6" />
-        <path d="M44 -100 L50 -136 Q36 -124 38 -100 Z" fill="#fab005" />
-        <circle cx="66" cy="-120" r="4" fill={INK} />
-        <path d="M-52 -74 Q-76 -70 -70 -40" stroke="#fab005" strokeWidth="9" strokeLinecap="round" fill="none" />
-        <rect x="-16" y="-96" width="36" height="12" rx="4" fill="#e03131" />
+        <g key={count(taps, "horse")} className={count(taps, "horse") ? "el-rock" : undefined}>
+          <path d="M-70 -4 Q0 22 70 -4" stroke="#c92a2a" strokeWidth="8" fill="none" />
+          <path d="M-46 -6 L-34 -60 M46 -6 L34 -60" stroke="#fff4e6" strokeWidth="9" strokeLinecap="round" />
+          <ellipse cx="0" cy="-70" rx="52" ry="22" fill="#fff4e6" />
+          <path d="M34 -84 L54 -132 Q76 -136 82 -116 L64 -100 Z" fill="#fff4e6" />
+          <path d="M44 -100 L50 -136 Q36 -124 38 -100 Z" fill="#fab005" />
+          <circle cx="66" cy="-120" r="4" fill={INK} />
+          <path d="M-52 -74 Q-76 -70 -70 -40" stroke="#fab005" strokeWidth="9" strokeLinecap="round" fill="none" />
+          <rect x="-16" y="-96" width="36" height="12" rx="4" fill="#e03131" />
+        </g>
       </g>
       <Floorboards colour="#c88b3a" line="#a0662f" />
     </>
@@ -659,10 +820,10 @@ export function Dachboden({ playing, used }: RoomProps) {
 }
 
 /** The garden on the ground: hedge, tree, flowers, the frog and the puddles. */
-export function Garten({ playing, used }: RoomProps) {
+export function Garten({ playing, used, task, taps }: RoomProps) {
   const weather = useContext(WeatherContext);
-  const splashing = playing === "splash";
-  const boat = splashing || used.includes("splash");
+  const splashing = playing === "splash" && (task === null || task === "jump");
+  const sailing = count(taps, "sail") > 0;
   return (
     <>
       <Outside x={ROOM_L} y={-ROOM_H} w={W} h={ROOM_H} />
@@ -721,23 +882,25 @@ export function Garten({ playing, used }: RoomProps) {
         <Puddle width={120} />
       </g>
       <g className={splashing ? "el-puddle splashing" : "el-puddle"} transform="translate(600 0)">
-        <Puddle width={240} boat={boat} />
+        <Puddle width={240} boat={sailing || used.includes("splash")} drift={sailing ? count(taps, "puff") : 3} />
       </g>
       <g transform="translate(820 0)">
         <Puddle width={110} />
       </g>
       {/* Frog */}
-      <g className={splashing ? "el-frog jumping" : "el-frog"} transform="translate(760 -4)">
-        <ellipse cx="0" cy="-16" rx="22" ry="16" fill="#51cf66" />
-        <circle cx="-10" cy="-32" r="9" fill="#51cf66" />
-        <circle cx="10" cy="-32" r="9" fill="#51cf66" />
-        <circle cx="-10" cy="-33" r="4.5" fill="#fff" />
-        <circle cx="10" cy="-33" r="4.5" fill="#fff" />
-        <circle cx="-10" cy="-33" r="2.5" fill={INK} />
-        <circle cx="10" cy="-33" r="2.5" fill={INK} />
-        <path d="M-10 -18 Q0 -10 10 -18" stroke="#2b8a3e" strokeWidth="3" strokeLinecap="round" fill="none" />
-        <ellipse cx="-18" cy="-2" rx="10" ry="4" fill="#40c057" />
-        <ellipse cx="18" cy="-2" rx="10" ry="4" fill="#40c057" />
+      <g className={playing === "splash" && !task ? "el-frog jumping" : "el-frog"} transform="translate(760 -4)">
+        <g key={count(taps, "frog")} className={count(taps, "frog") ? "el-jump-once" : undefined}>
+          <ellipse cx="0" cy="-16" rx="22" ry="16" fill="#51cf66" />
+          <circle cx="-10" cy="-32" r="9" fill="#51cf66" />
+          <circle cx="10" cy="-32" r="9" fill="#51cf66" />
+          <circle cx="-10" cy="-33" r="4.5" fill="#fff" />
+          <circle cx="10" cy="-33" r="4.5" fill="#fff" />
+          <circle cx="-10" cy="-33" r="2.5" fill={INK} />
+          <circle cx="10" cy="-33" r="2.5" fill={INK} />
+          <path d="M-10 -18 Q0 -10 10 -18" stroke="#2b8a3e" strokeWidth="3" strokeLinecap="round" fill="none" />
+          <ellipse cx="-18" cy="-2" rx="10" ry="4" fill="#40c057" />
+          <ellipse cx="18" cy="-2" rx="10" ry="4" fill="#40c057" />
+        </g>
       </g>
     </>
   );
