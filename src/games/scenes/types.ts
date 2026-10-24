@@ -143,19 +143,6 @@ export interface SceneChain {
   steps: { item: string; sentence: string }[];
 }
 
-/** Where a seasonal extra stands: its foot point on the ground and how big it is (see `ground` in layout.ts). */
-export type SeasonSpot = [x: number, y: number, size?: number];
-
-/** The scene's seasonal extras (seasonal.tsx); an extra without a spot is left out. */
-export interface SceneSeasons {
-  /** Fallen leaves in autumn, snow in winter; not indoors, under water or in space. */
-  weather?: boolean;
-  pumpkin?: SeasonSpot;
-  tree?: SeasonSpot;
-  snowman?: SeasonSpot;
-  egg?: SeasonSpot;
-}
-
 /** A "living picture": a drawn scene whose items move and talk when tapped. */
 export interface Scene {
   id: string;
@@ -181,6 +168,4 @@ export interface Scene {
   bedtime?: boolean;
   /** Drawn above the items and not tappable, e.g. falling snow. */
   Overlay?: ComponentType;
-  /** Where the seasonal extras go in this scene. */
-  seasons?: SceneSeasons;
 }
