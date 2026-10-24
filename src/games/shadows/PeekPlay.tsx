@@ -71,8 +71,14 @@ const HIDE_DIRECTION: Record<Side, { x: number; y: number }> = {
   right: { x: -1, y: 0 },
 };
 
-/** "Wer schaut da raus?" (X-04): a part of an animal peeks out of a bush or the pond; tap the whole animal below. */
-export function PeekPlay({ lang, settings }: { lang: string; settings: ShadowsSettings }) {
+/** The settings "Wer schaut da raus?" reads; it is played from "Was gehört zum Tier?". */
+export type PeekSettings = Pick<ShadowsSettings, "choices" | "names" | "speech" | "sounds">;
+
+/**
+ * "Wer schaut da raus?" (X-04): a part of an animal peeks out of a bush or the pond; tap the whole animal below.
+ * A mode of "Was gehört zum Tier?", but it lives here since it shares the stage, pictures and glyphs with the shadows.
+ */
+export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSettings }) {
   const [round, setRound] = useState<Round | null>(null);
   const [phase, setPhase] = useState<Phase>("hidden");
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);

@@ -70,7 +70,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
   const nextId = useRef(0);
   const decks = useRef({ feed: [] as Animal[], home: [] as Animal[] });
   const lastAnimal = useRef<Animal | null>(null);
-  const lastKind = useRef<Round["kind"]>("home");
+  const lastKind = useRef<Round["kind"]>(settings.mode === "home" ? "feed" : "home");
   const animalRef = useRef<HTMLDivElement>(null);
   const emojiRef = useRef<HTMLSpanElement>(null);
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -114,7 +114,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
   }, []);
 
   const nextRound = useCallback(() => {
-    const kind = settings.mode === "mix" ? (lastKind.current === "feed" ? "home" : "feed") : settings.mode;
+    const kind = settings.mix ? (lastKind.current === "feed" ? "home" : "feed") : settings.mode === "home" ? "home" : "feed";
     lastKind.current = kind;
     const animal = drawAnimal(kind);
     const count = Number(settings.choices);
@@ -139,7 +139,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
     busy.current = false;
     say(prompt(next));
     if (settings.sounds) later(400, () => animal.sound?.());
-  }, [settings.mode, settings.choices, settings.sounds, drawAnimal, say, later]);
+  }, [settings.mode, settings.mix, settings.choices, settings.sounds, drawAnimal, say, later]);
 
   // Start with an animal right away; settings can't change while playing.
   useEffect(() => nextRound(), []);

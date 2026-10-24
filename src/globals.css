@@ -1043,8 +1043,13 @@ kbd {
   font-weight: 600;
 }
 
-.mode-level .choice {
+.mode-level .choice,
+.mode-level .toggle {
   justify-content: center;
+}
+
+.mode-level .toggle {
+  margin-top: 8px;
 }
 
 .mode-list {

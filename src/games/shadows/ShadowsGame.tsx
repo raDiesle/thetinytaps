@@ -3,13 +3,9 @@ import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
-import { PeekPlay } from "./PeekPlay";
 import { ShadowsPlay } from "./ShadowsPlay";
 import { DEFAULT_SHADOWS_SETTINGS, SHADOWS_SETTINGS_KEY, type ChoiceCount, type ShadowTheme } from "./settings";
 import "./shadows.css";
-
-/** The mode card for "Wer schaut da raus?" (X-04); the other cards are the shadow themes. */
-const PEEK = "peek";
 
 export function ShadowsGame() {
   const [settings, update] = useGameSettings(SHADOWS_SETTINGS_KEY, DEFAULT_SHADOWS_SETTINGS);
@@ -25,10 +21,9 @@ export function ShadowsGame() {
         { id: "vehicles", emoji: "🚗", title: "Fahrzeuge" },
         { id: "food", emoji: "🍌", title: "Essen" },
         { id: "things", emoji: "☂️", title: "Dinge" },
-        { id: PEEK, emoji: "🙈", title: "Wer schaut da raus?" },
       ]}
-      mode={settings.peek ? PEEK : settings.theme}
-      onMode={(id) => update(id === PEEK ? { peek: true } : { peek: false, theme: id as ShadowTheme })}
+      mode={settings.theme}
+      onMode={(theme) => update({ theme: theme as ShadowTheme })}
       level={
         <Choice<ChoiceCount>
           label="Zur Auswahl"
@@ -49,7 +44,7 @@ export function ShadowsGame() {
 
           <SettingsGroup title="Verhalten">
             <Toggle
-              label="Schatten antippen reicht (sonst muss man das Bild ziehen; bei „Wer schaut da raus?“ wird immer getippt)"
+              label="Schatten antippen reicht (sonst muss man das Bild ziehen)"
               checked={settings.tap}
               onChange={(tap) => update({ tap })}
             />
@@ -60,11 +55,7 @@ export function ShadowsGame() {
         </>
       }
     >
-      {settings.peek ? (
-        <PeekPlay lang={de.speechLang} settings={settings} />
-      ) : (
-        <ShadowsPlay lang={de.speechLang} settings={settings} />
-      )}
+      <ShadowsPlay lang={de.speechLang} settings={settings} />
     </GameShell>
   );
 }
