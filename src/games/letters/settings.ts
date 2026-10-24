@@ -9,6 +9,14 @@ export type LetterCase = "upper" | "both" | "lower";
  */
 export type LettersMode = "free" | "find" | "train";
 
+/**
+ * How a number comes in. "all": the things and the digit at once. "count": the things pop in
+ * one by one while being counted aloud, then the digit. "step": each click shows the next thing,
+ * and each click on a letter brings its next word. "tap": the child taps every thing to count it;
+ * the digit appears after the last one.
+ */
+export type NumberReveal = "all" | "count" | "step" | "tap";
+
 /** What is spoken for a letter: "Be, wie Bär!", "Bär!" or "Be!". */
 export type Announce = "letterAndWord" | "word" | "letter";
 
@@ -19,8 +27,6 @@ export interface LettersSettings {
   letterCase: LetterCase;
   /** With "A a": the big letter holds the small one by the hand, both with eyes. */
   letterFamily: boolean;
-  /** The capital turns into its animal for a moment: S slithers as a snake, M gets mouse ears. */
-  livingLetters: boolean;
   /** The letter as big dots to trace with a finger or the mouse; stars appear along the way. */
   trace: boolean;
   /** Show the word under the picture, with its first letter highlighted. */
@@ -34,11 +40,9 @@ export interface LettersSettings {
   sounds: boolean;
   /** Quieter sounds, no wiggling, softer shapes. */
   calm: boolean;
-  /** Reveal number items one click at a time; each click on a letter brings its next word. */
-  stepByStep: boolean;
-  /** Numbers: the child taps every thing to count it; the digit appears after the last one. */
-  countByTap: boolean;
-  /** Automatic mode only: ignore new letters/numbers until counting has finished. */
+  /** How a number comes in, see NumberReveal. */
+  numbers: NumberReveal;
+  /** "count" only: ignore new letters/numbers until counting has finished. */
   finishCounting: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
   touchKeys: TouchKeysMode;
@@ -49,7 +53,6 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   hints: true,
   letterCase: "upper",
   letterFamily: true,
-  livingLetters: true,
   trace: false,
   showWord: true,
   speech: false,
@@ -57,8 +60,7 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   theme: "all",
   sounds: true,
   calm: false,
-  stepByStep: true,
-  countByTap: false,
+  numbers: "all",
   finishCounting: true,
   touchKeys: "auto",
 };

@@ -82,6 +82,7 @@ export function LettersPlay({
   const [background, setBackground] = useState(BACKGROUNDS[0]);
   const [push, setPush] = useState<[number, number]>([0, 0]);
   const { bursts, spawn } = useBursts();
+  const stepByStep = settings.numbers === "step";
 
   const lastChange = useRef(0);
   const countingUntil = useRef(0);
@@ -104,8 +105,8 @@ export function LettersPlay({
 
   /** Counting by tapping applies to numbers with things to tap, not to the empty nest. */
   const byTap = useCallback(
-    (s: Shown | null) => settings.countByTap && s?.kind === "number" && s.n > 0,
-    [settings.countByTap],
+    (s: Shown | null) => settings.numbers === "tap" && s?.kind === "number" && s.n > 0,
+    [settings.numbers],
   );
 
   /** The full sentence for a fully revealed letter or number. */
@@ -212,13 +213,13 @@ export function LettersPlay({
         setStage(0);
         return;
       }
-      if (settings.stepByStep) {
+      if (stepByStep) {
         setStage(from);
         announce(next, from);
         return;
       }
       const last = lastStage(next);
-      if (next.kind === "letter") {
+      if (next.kind === "letter" || settings.numbers === "all") {
         setStage(last);
         announce(next, last);
         return;
@@ -236,7 +237,7 @@ export function LettersPlay({
       }
       countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + COUNT_SUMMARY_MS;
     },
-    [announce, replace, byTap, settings.stepByStep],
+    [announce, replace, byTap, stepByStep, settings.numbers],
   );
 
   const show = useCallback(
@@ -369,7 +370,7 @@ export function LettersPlay({
       // Step by step, Space and Enter reveal the next part until everything is shown; then they are special keys again.
       const revealing = shown !== null && stage < lastStage(shown);
       const isNextKey = ((key === " " || key === "Enter") && revealing) || (shown !== null && isSame(target, shown));
-      if ((settings.stepByStep || byTap(shown)) && shown && isNextKey) {
+      if ((stepByStep || byTap(shown)) && shown && isNextKey) {
         if (!tryAdvance()) funBurst();
         return;
       }
@@ -383,7 +384,7 @@ export function LettersPlay({
       lastChange.current = now;
       show(target);
     },
-    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, settings.stepByStep, settings.finishCounting],
+    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, stepByStep, settings.finishCounting],
   );
 
   useEffect(() => {
@@ -414,7 +415,7 @@ export function LettersPlay({
   // tapping: only the things count; once all are counted, any click brings new ones.
   const onPlayAreaPointer = (e: PointerEvent) => {
     const waitingForTaps = shown?.kind === "number" && byTap(shown) && stage <= shown.n;
-    if ((settings.stepByStep || byTap(shown)) && shown && !waitingForTaps && tryAdvance()) return;
+    if ((stepByStep || byTap(shown)) && shown && !waitingForTaps && tryAdvance()) return;
     funBurst(e.clientX, e.clientY);
   };
   const onItemPointer = (index: number, e: PointerEvent) => {
@@ -426,7 +427,7 @@ export function LettersPlay({
     if (shown && !counting) sayAll(shown);
     funBurst(e.clientX, e.clientY);
   };
-  const onCardPointer = settings.stepByStep || byTap(shown) ? undefined : repeat;
+  const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
 
   return (
     <div
@@ -457,7 +458,7 @@ export function LettersPlay({
               thing={shown.thing}
               zeroEmoji={pack.zero.emoji}
               stage={stage}
-              hint={settings.stepByStep || byTap(shown)}
+              hint={stepByStep || byTap(shown)}
               tapped={byTap(shown) ? tapped : undefined}
               trace={settings.trace ? { sounds: settings.sounds } : undefined}
               onItemPointer={onItemPointer}

@@ -12,6 +12,7 @@ import {
   type LetterCase,
   type LettersMode,
   type LettersSettings,
+  type NumberReveal,
 } from "./settings";
 import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
@@ -83,16 +84,6 @@ export function LettersGame() {
                 onChange={(letterFamily) => update({ letterFamily })}
               />
             )}
-            {settings.letterCase !== "lower" &&
-              settings.mode === "free" &&
-              !settings.trace &&
-              !(settings.letterCase === "both" && settings.letterFamily) && (
-                <Toggle
-                  label="Lebende Buchstaben (der Buchstabe wird kurz zum Tier: S zur Schlange, M zur Maus)"
-                  checked={settings.livingLetters}
-                  onChange={(livingLetters) => update({ livingLetters })}
-                />
-              )}
             <Choice<LettersSettings["theme"]>
               label="Bilder"
               value={settings.theme}
@@ -127,17 +118,16 @@ export function LettersGame() {
 
           <SettingsGroup title="Verhalten">
             {settings.mode === "free" && (
-              <Toggle
-                label="Schritt für Schritt (jeder Klick zeigt das Nächste)"
-                checked={settings.stepByStep}
-                onChange={(stepByStep) => update({ stepByStep })}
-              />
-            )}
-            {settings.mode === "free" && (
-              <Toggle
-                label="Selbst zählen (jedes Ding antippen)"
-                checked={settings.countByTap}
-                onChange={(countByTap) => update({ countByTap })}
+              <Choice<NumberReveal>
+                label="Zahlen"
+                value={settings.numbers}
+                onChange={(numbers) => update({ numbers })}
+                options={[
+                  { value: "all", label: "🖼️ Alles sofort" },
+                  { value: "count", label: "🗣️ Vorzählen" },
+                  { value: "step", label: "👆 Schritt für Schritt" },
+                  { value: "tap", label: "✋ Selbst zählen" },
+                ]}
               />
             )}
             <Toggle
@@ -145,7 +135,7 @@ export function LettersGame() {
               checked={settings.calm}
               onChange={(calm) => update({ calm })}
             />
-            {settings.mode === "free" && !settings.stepByStep && !settings.countByTap && (
+            {settings.mode === "free" && settings.numbers === "count" && (
               <Toggle
                 label="Zählen nicht unterbrechen"
                 checked={settings.finishCounting}
