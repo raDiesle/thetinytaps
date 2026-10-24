@@ -1155,6 +1155,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "An drei Stellen der Bahn ist ein Platz frei; Antippen wechselt das Teil (Glocke, Trampolin, Trichter, Wasserrad). Die nächste Kugel nimmt den neuen Weg.",
         why: "Erstes Bauen und Ausprobieren: Was passiert, wenn ich das ändere?",
         effort: "M",
+        done: true,
       },
       {
         id: "X-09",
@@ -1292,6 +1293,7 @@ export const IDEA_AREAS: IdeaArea[] = [
         text: "Drei bis vier leere Lücken in der Bahn. Antippen einer Lücke wechselt reihum das Teil: Glocke, Trampolin, Trichter, Looping, Trommel. Jede Mischung funktioniert, die Kugel kommt immer durch. Eltern-Version für Ältere: Teile aus einer Leiste in die Lücken ziehen.",
         why: "Eigene Bahn = eigenes Werk; dasselbe Spiel klingt jedes Mal anders.",
         effort: "L",
+        partial: "Drei Plätze auf der Kugelbahn wechseln beim Antippen reihum Glocke, Trampolin, Trichter und Wasserrad (X-08); Looping, Trommel und das Ziehen aus einer Leiste fehlen.",
       },
       {
         id: "K-13",
