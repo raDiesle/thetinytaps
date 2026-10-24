@@ -9,7 +9,7 @@ import { TeethPlay } from "./TeethPlay";
 
 export function TeethGame() {
   const [shared, update, stored] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
-  // The spoken hints are the point here, so they have their own switch.
+  // The spoken hints have their own switch here, independent of "Vorlesen" on the home page.
   const settings = { ...shared, speech: stored.speech };
   const { touchOnly } = useDevice();
 

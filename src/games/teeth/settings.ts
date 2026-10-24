@@ -11,7 +11,7 @@ export interface TeethSettings {
   week: boolean;
   /** First fetch the brush and put toothpaste on it, shown and said. */
   prep: boolean;
-  /** Say where to brush next and how; the point of the game, so on by default. */
+  /** Say where to brush next and how; off by default, the pictures and music carry the brushing. */
   speech: boolean;
   /** A little tune in the background while brushing; on by default, it makes the two minutes go by. */
   music: boolean;
@@ -24,10 +24,11 @@ export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   daytime: "auto",
   week: true,
   prep: true,
-  speech: true,
+  speech: false,
   music: true,
   sounds: true,
 };
 
-// v2: music became on by default; saved v1 settings would have kept it off.
-export const TEETH_SETTINGS_KEY = "tinytaps.teeth.v2";
+// v2: music became on by default; v3: speech became off by default. Saved older
+// settings would have kept the old choice.
+export const TEETH_SETTINGS_KEY = "tinytaps.teeth.v3";
