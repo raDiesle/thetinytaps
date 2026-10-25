@@ -16,17 +16,22 @@ Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`, Modell Nano Banana 2
 yarn image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --quality 65 --ref src/games/feelings/bilder/push-2.webp
 ```
 
-Neues bewegtes Bild: beide Frames in einem Auftrag (zum halben Preis pro Frame, und sie passen besser zusammen):
+Neues bewegtes Bild: erst den ersten Frame allein, dann den zweiten mit dem ersten als Referenz,
+in dem nur die Bewegung beschrieben ist. Nicht beide als `--grid 1x2` in einem Auftrag: dort zeichnet
+Gemini die Szene zweimal, Kamera, Kinder, Luftballons oder ein Tisch springen, und beim Überblenden wird
+es unruhig, man kann der Geschichte kaum folgen.
 
 ```
-yarn image src/games/feelings/bilder/push-1.webp,src/games/feelings/bilder/push-1-b.webp "<Stilblock> <Figuren> The two panels are two frames of a tiny animation: same scene, framing, sizes and colours; only the small movement differs." --grid 1x2 --aspect 4:3 --size 1200x900 --quality 65 --panel "<Bild>" --panel "Exactly the same as panel 1, but <Bewegung>"
+yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters at exactly the same places and sizes, same clothes, colours, background, every object where it is, same camera framing (no zoom, no shift), same composition and line style. Nothing appears, disappears or moves except this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
 ```
 
-Zweiter Frame zu einem Bild, das es schon gibt: das erste Bild als Referenz mitgeben und nur die Bewegung beschreiben:
+Danach `yarn frames` (oder `yarn frames <datei-b.webp>`): listet Paare, bei denen mehr als die Bewegung
+anders ist, vor allem am Rand, wo fast immer Hintergrund ist. `baer-scared` darf auffallen – dort blitzt es.
 
-```
-yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters, clothes, colours, background, camera framing, composition, line style and sizes. Change only this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
-```
+**Dieselbe Szene bleibt dieselbe:** Spielt eine Geschichte an einem Ort, bleiben Raum und Dinge von Bild zu
+Bild gleich (Luftballons, Tisch mit Kuchen, Baum). Darum das erste Bild der Szene als einzige Referenz
+mitgeben und nur ändern, was der Bär tut („Redraw this exact picture … Change only what happens: …“).
+Eine Referenz für den Raum und eine zweite für die Pose verwechselt das Lite-Modell und erfindet den Raum neu.
 
 ## So bleiben die Figuren gleich
 
@@ -85,6 +90,10 @@ Schritte in dieser Reihenfolge), `…-nein` (die nicht so gute Idee neben Schrit
 (alle fröhlich, das Bild am Schluss) – jeweils mit zweitem Frame `…-b`. Neben Schritt 2 und 3
 stehen `…-nein-2` und `…-nein-3` (nur ein Frame; erzeugt mit dem guten Schritt als `--ref`).
 
+Erwachsene (Erzieherin, großer Bär) sind erst im Bild, wenn ein Schritt sie holt oder ruft: kommt „Hilfe
+holen“ erst noch, zeigen `…-passiert` und die Bilder davor nur die Kinder – sonst fragt man sich, warum
+der Bär Hilfe holen soll, wenn sie schon danebensteht. Eine nicht so gute Idee zeigt dieselben Kinder wie die Szene davor.
+
 ### Nicht so gute Ideen bei Schritt 2 und 3
 
 Vor jeden Prompt: Stilblock, Figuren und „This is the not-so-good idea: the action must be clearly
@@ -92,9 +101,9 @@ visible, but gentle – no injuries, no blood. Use the reference only for the ch
 
 | Datei          | Prompt                                                                                                                                                                                                                         |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `push-nein-2`  | Playground, grass, a tree. The little bear throws a handful of sand at the fox; the fox covers his eyes and cries.                                                                                                             |
-| `push-nein-3`  | Playground. The little bear angrily stomps on the fox's toy bucket and flattens it. The fox stands next to it and cries.                                                                                                       |
-| `kick-nein-2`  | Playground. The little bear pulls the fox's ear hard, angry face. The fox cries.                                                                                                                                               |
+| `push-nein-2`  | Playground, grass, a tree. Only the little bear and the fox. The little bear throws a handful of sand at the fox; the fox covers his eyes and cries.                                                                           |
+| `push-nein-3`  | Playground. No grown-ups. The little bear angrily stomps on the fox's toy bucket and flattens it. The fox stands next to it and cries.                                                                                         |
+| `kick-nein-2`  | Playground. No grown-ups. The little bear pulls the fox's ear hard, angry face. The fox cries.                                                                                                                                 |
 | `kick-nein-3`  | Playground. Only the little bear and the fox. The little bear has snatched the fox's green cap off his head and throws it away with a big arm swing; the cap flies towards a muddy puddle. The fox reaches after it and cries. |
 | `grab-nein-2`  | Sandbox, a red toy tractor. The little bear hits the fox on the arm to get the tractor back, angry face. The fox cries and still holds the tractor.                                                                            |
 | `grab-nein-3`  | Sandbox. The little bear holds the red toy tractor tight and points away with his other paw, sending the fox away. The fox walks off alone, sad, head down.                                                                    |
@@ -168,8 +177,8 @@ visible, but gentle – no injuries, no blood. Use the reference only for the ch
 In den vier Geschichten unten haben diese Bilder nur einen Frame, weil im zweiten die Szene
 sprang statt sich nur ein wenig zu bewegen: `bye-passiert`, `bye-3`, `bye-nein`,
 `new-passiert`, `new-nein`, `new-ende`, `fall-3`, `fall-ende`, `stop-1`, `stop-nein`.
-Ein Paar aus `--grid 1x2` darum vor dem Einbauen nebeneinander ansehen; Streifen
-der Trennfarbe am Rand beider Frames gleich wegschneiden, damit sie deckungsgleich bleiben.
+Die übrigen zweiten Frames dieser Geschichten waren als `--grid 1x2` entstanden und sprangen auch; sie sind
+neu mit dem ersten Frame als Referenz gezeichnet (siehe oben, `yarn frames`).
 
 ### Abschied an der Tür (`bye`) – Eingang mit Garderobe, Tür und Fenster
 
@@ -199,16 +208,16 @@ der Trennfarbe am Rand beider Frames gleich wegschneiden, damit sie deckungsglei
 
 ### Hingefallen (`fall`) – Spielplatz, Wiese, ein Baum
 
-| Datei           | Prompt                                                                                                                                                               |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fall-passiert` | The little bear has fallen down while running: he sits on the grass and holds his knee, crying. A small red scrape on the knee, no blood.                            |
-| `fall-1`        | „Hilfe rufen“ – The little bear sits on the grass, holds his knee and calls out loud with one paw raised. The teacher comes running towards him.                     |
-| `fall-2`        | „Pflaster drauf“ – The teacher kneels and puts a colourful plaster on the little bear's knee. The bear watches, calmer, sniffing.                                    |
-| `fall-3`        | „Langsam weiterspielen“ – The fox helps the little bear up with his paw; the bear has a plaster on his knee. They roll a ball to each other, slowly and carefully.   |
-| `fall-nein`     | „Strampeln und schreien“ – The little bear lies on the grass in a big tantrum, kicking his legs and screaming, while the teacher stands next to him and cannot help. |
-| `fall-nein-2`   | The little bear pulls the plaster off his knee and makes an ouch face. The teacher looks worried.                                                                    |
-| `fall-nein-3`   | The little bear with a plaster on his knee runs wildly and fast again and is about to trip over a root. The fox looks worried.                                       |
-| `fall-ende`     | The little bear proudly shows his colourful plaster on the knee and laughs; the fox and the teacher smile.                                                           |
+| Datei           | Prompt                                                                                                                                                                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fall-passiert` | No grown-ups. The little bear has fallen down while running: he sits on the grass and holds his knee, crying. A small red scrape on the knee, no blood. The fox, the bunny and the little hedgehog stand around him, worried.             |
+| `fall-1`        | „Hilfe rufen“ – The little bear sits on the grass, holds his knee and calls out loud with one paw raised. The teacher comes running towards him.                                                                                          |
+| `fall-2`        | „Pflaster drauf“ – The teacher kneels and puts a colourful plaster on the little bear's knee. The bear watches, calmer, sniffing.                                                                                                         |
+| `fall-3`        | „Langsam weiterspielen“ – The fox helps the little bear up with his paw; the bear has a plaster on his knee. They roll a ball to each other, slowly and carefully.                                                                        |
+| `fall-nein`     | „Strampeln und schreien“ – Same scene and children as `fall-passiert` (`--ref`), no grown-ups. The little bear lies on the grass in a big tantrum, kicking his legs and screaming; the fox, the bunny and the hedgehog look on, helpless. |
+| `fall-nein-2`   | The little bear pulls the plaster off his knee and makes an ouch face. The teacher looks worried.                                                                                                                                         |
+| `fall-nein-3`   | The little bear with a plaster on his knee runs wildly and fast again and is about to trip over a root. The fox looks worried.                                                                                                            |
+| `fall-ende`     | The little bear proudly shows his colourful plaster on the knee and laughs; the fox and the teacher smile.                                                                                                                                |
 
 ### Hört nicht auf (`stop`) – Spielplatz, Wiese, ein Baum
 

@@ -78,14 +78,16 @@ the panels separated by magenta gaps and cuts it apart; one request, so each pic
 costs a half or a quarter. `--aspect` is the aspect of each panel; the files are
 comma-separated, one `--panel "<what differs>"` each, the prompt holds what is shared.
 
-```bash
-# both frames of a moving picture in one request
-yarn image bilder/x.webp,bilder/x-b.webp "<style> <characters> The two panels are two frames of a tiny animation: same scene, framing, sizes and colours; only the small movement differs." --grid 1x2 --aspect 4:3 --size 1200x900 --panel "<frame 1>" --panel "Exactly the same as panel 1, but <movement>"
-```
-
-- **Use `1x2` for frame pairs** of new pictures: each panel comes back about 850 px
-  wide instead of 1184, which looked just as sharp at 1200×900 in a 1:1 comparison,
-  and the two frames match better than a second frame drawn from a `--ref`.
+- **Not for the two frames of a moving picture.** Drawn as one grid, Gemini draws the
+  scene twice: the camera zooms, characters stand elsewhere, balloons or a table vanish,
+  and the cross-fade looks restless. Make the first frame alone, then the second with
+  the first as the only `--ref` and a prompt that names just the small movement
+  ("Redraw this exact picture … Nothing appears, disappears or moves except …").
+  Then run `yarn frames` (a folder or files): it lists pairs where more than the
+  movement changed, above all at the edge, which is background.
+- **The same place stays the same** from picture to picture of a story: pass its first
+  picture as the only `--ref` and change only what the character does. Two references
+  (one for the room, one for the pose) make the Lite model invent the room anew.
 - **`2x2` only for pictures that are never shown big** (icons, stickers, small
   cards): each panel is only about 590 px wide.
 - Check both pieces: nothing cut off at the inner edges, no pink seam left.

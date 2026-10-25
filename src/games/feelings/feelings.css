@@ -175,6 +175,7 @@
   gap: clamp(20px, 5vw, 56px);
   min-height: calc(var(--card-w) * 0.75 + 100px);
   padding: 22px 16px max(16px, env(safe-area-inset-bottom));
+  transition: min-height 0.4s ease-in-out;
 }
 
 /* At home three kind things and a not-so-good idea: four smaller cards in a row. */
@@ -184,6 +185,16 @@
 
 .bear-play .story-choices {
   gap: clamp(12px, 3vw, 40px);
+}
+
+/* While the child chooses, the cards are big and the picture above makes room
+   (the middle row takes what is left); when the bear acts, the picture grows again. */
+.story-play.choosing {
+  --card-w: min(44vw, 52vh, 600px);
+}
+
+.bear-play.choosing {
+  --card-w: min(21vw, 34vh, 340px);
 }
 
 /* Tall, narrow screens (phones upright): the four cards two by two, so they stay big. */
@@ -197,6 +208,21 @@
     grid-template-columns: repeat(2, auto);
     justify-content: center;
     gap: 16px clamp(16px, 5vw, 40px);
+  }
+
+  .bear-play.choosing {
+    --card-w: min(44vw, 24vh, 340px);
+  }
+
+  /* Side by side the two kindergarten cards would stay small: while choosing they stand one above the other. */
+  .kita-play.choosing {
+    --card-w: min(80vw, 34vh, 420px);
+  }
+
+  .kita-play.choosing .story-choices {
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 10px;
   }
 }
 
@@ -225,6 +251,7 @@
   align-items: center;
   gap: 24px;
   width: var(--card-w);
+  transition: width 0.4s ease-in-out;
 }
 
 .fg-choice.small {
@@ -243,6 +270,7 @@
   cursor: pointer;
   touch-action: manipulation;
   transition:
+    width 0.4s ease-in-out,
     opacity 0.3s,
     translate 0.15s,
     box-shadow 0.15s;
@@ -438,9 +466,22 @@
     --card-w: min(16vw, 22vh, 130px);
   }
 
+  /* While choosing, the two kindergarten cards stand side by side and the picture makes room. */
+  .story-play.choosing {
+    --card-w: min(33vw, 70vh, 320px);
+  }
+
+  .kita-play.choosing .story-choices {
+    flex-direction: row;
+  }
+
   /* Four cards at home: two by two. */
   .story-play.bear-play {
     --card-w: min(17vw, 24vh, 180px);
+  }
+
+  .story-play.bear-play.choosing {
+    --card-w: min(22vw, 38vh, 240px);
   }
 
   .bear-play .story-choices {
