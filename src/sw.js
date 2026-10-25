@@ -4,8 +4,10 @@
 // (rsbuild.config.ts, pluginOffline).
 
 const VERSION = "__VERSION__";
-/** All files of the build, relative to this script. */
+/** All files of the build, relative to this script, without the songs. */
 const FILES = __FILES__;
+/** Songs (musik-*.mp3) are left out of FILES: music can be off, and then they are never downloaded. */
+const SONG = /\/musik-[^/]*\.mp3$/;
 
 const PREFIX = "tinytaps-";
 const CACHE = PREFIX + VERSION;
@@ -43,6 +45,21 @@ self.addEventListener("fetch", (event) => {
   // browser's update check and used from the next start on.
   if (request.mode === "navigate") {
     event.respondWith((async () => (await (await caches.open(CACHE)).match(SHELL)) ?? fetch(request))());
+    return;
+  }
+
+  // A song is kept once a page has fetched it (it does at start while music is
+  // on), so it plays offline from then on.
+  if (SONG.test(new URL(request.url).pathname)) {
+    event.respondWith(
+      (async () => {
+        const kept = await caches.match(request);
+        if (kept) return kept;
+        const response = await fetch(request);
+        if (response.ok) await (await caches.open(CACHE)).put(request, response.clone());
+        return response;
+      })(),
+    );
     return;
   }
 

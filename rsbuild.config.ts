@@ -23,6 +23,9 @@ const pluginSpaFallback: RsbuildPlugin = {
 // built files, so the service worker can keep them in the browser. The version
 // is a hash over the worker and all files, so every change installs a new one.
 // 404.html is left out: the worker answers deep links with index.html itself.
+// So are songs (files named musik-*.mp3): music can be switched off for all
+// games, and then they must not be downloaded; the worker keeps a song once a
+// page has fetched it.
 const pluginOffline: RsbuildPlugin = {
   name: "offline",
   setup(api) {
@@ -36,7 +39,7 @@ const pluginOffline: RsbuildPlugin = {
             .split("\\")
             .join("/"),
         )
-        .filter((file) => file !== "404.html" && file !== "sw.js" && !/\.(map|LICENSE\.txt)$/.test(file))
+        .filter((file) => file !== "404.html" && file !== "sw.js" && !/\.(map|LICENSE\.txt)$/.test(file) && !/(^|\/)musik-[^/]*\.mp3$/.test(file))
         .sort();
       const template = await readFile("src/sw.js", "utf8");
       const hash = createHash("sha256").update(template);

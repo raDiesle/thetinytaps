@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type PointerEvent } from "rea
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useAnyKey } from "@/games/marbles/level";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playMelody } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import type { MarbleRunSettings } from "./settings";
@@ -18,6 +19,8 @@ const PARTY_MS = 3200;
 export function MarbleRunPlay({ settings, speechLang }: { settings: MarbleRunSettings; speechLang: string }) {
   /** How often the run was started; a new round puts the marbles back into the hopper. */
   const [round, setRound] = useState(0);
+  // The run plays its own notes and scales; a song on top would clash with them.
+  useNoBackgroundMusic();
   const [party, setParty] = useState(false);
   const [ended, setEnded] = useState(false);
   const { bursts, spawn } = useBursts();

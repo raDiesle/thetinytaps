@@ -1,6 +1,6 @@
 // Options most games share, chosen once on the home page for all of them:
-// read aloud and sounds. Each game keeps its own fields of the
-// same name and gets them filled in from here (see withCommon).
+// read aloud, sounds and music. Each game keeps its own fields for read aloud
+// and sounds and gets them filled in from here (see withCommon).
 
 import { useStoredSettings } from "@/lib/storage";
 
@@ -9,9 +9,20 @@ export interface CommonSettings {
   speech: boolean;
   /** Chimes, notes and noises. */
   sounds: boolean;
+  /**
+   * The background song in every game (`backgroundMusic.ts`); off also silences a game's
+   * own music and keeps the song files from being downloaded at all.
+   */
+  music: boolean;
 }
 
-export const DEFAULT_COMMON_SETTINGS: CommonSettings = { speech: false, sounds: true };
+export const DEFAULT_COMMON_SETTINGS: CommonSettings = { speech: false, sounds: true, music: true };
+
+/**
+ * The options filled into a game's fields of the same name. Not music: a game with
+ * its own music keeps its own switch for it, which only counts while music is on here.
+ */
+const FILLED_IN = ["speech", "sounds"] as const;
 
 export const COMMON_SETTINGS_KEY = "tinytaps.common.v1";
 
@@ -22,7 +33,7 @@ export function useCommonSettings() {
 /** A game's own settings with the shared options put in, for the fields the game has. */
 export function withCommon<T extends object>(settings: T, common: CommonSettings): T {
   const merged = { ...settings } as Record<string, unknown>;
-  for (const key of Object.keys(common) as (keyof CommonSettings)[]) {
+  for (const key of FILLED_IN) {
     if (key in settings) merged[key] = common[key];
   }
   return merged as T;

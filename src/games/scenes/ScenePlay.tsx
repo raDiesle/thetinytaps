@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSPrope
 import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -10,7 +11,6 @@ import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys } from "./keys";
 import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
-import { useSceneMusic } from "./music";
 import { capitalize, nextQuest, questsFor, verb, type Quest } from "./quests";
 import { driveDistance, guestFor, PLACES, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
@@ -161,8 +161,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const allDiscovered = discovered.size === scene.items.length;
   /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the party. */
   const bedtime = !!scene.bedtime && !colouring && !questMode;
-  // A trip in from another picture counts as the child's action, so the song goes on.
-  useSceneMusic({ enabled: settings.music && soundsOn && !scene.bedtime, started: touched || !!arrival });
+  // The good-night picture is about getting calm: no song in the background there.
+  useNoBackgroundMusic(!!scene.bedtime);
 
   const later = useCallback((fn: () => void, ms: number) => {
     const timer = setTimeout(() => {
