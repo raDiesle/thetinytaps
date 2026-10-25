@@ -2,7 +2,6 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSPrope
 import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
-import { useDevice } from "@/lib/device";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { SCENES } from ".";
@@ -108,7 +107,6 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const [lit, setLit] = useState<Lit | null>(null);
   /** Colour mode: the space bar is held, so its cap on the screen goes down too. */
   const [spaceDown, setSpaceDown] = useState(false);
-  const { touchOnly } = useDevice();
   const { bursts, spawn } = useBursts();
   const location = useLocation();
   const navigate = useNavigate();
@@ -811,8 +809,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       {!questMode && allDiscovered && (
         <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }} />
       )}
-      {/* Colour mode on a computer: the space bar, wide at the bottom, paints where nothing happens. */}
-      {colouring && !touchOnly && !allDiscovered && (
+      {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
+      {colouring && settings.trigger === "keys" && settings.showKeys && !allDiscovered && (
         <button
           type="button"
           className={`scene-space${spaceDown ? " down" : ""}`}
@@ -823,9 +821,6 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           }}
         >
           <span className="scene-space-top">
-            <span className="scene-space-brush" aria-hidden>
-              🖌️
-            </span>
             <svg className="scene-space-bar" viewBox="-40 -14 80 28" aria-hidden>
               <path d="M-34 -8 V8 H34 V-8" />
             </svg>
