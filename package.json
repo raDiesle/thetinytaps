@@ -14,6 +14,7 @@
     "preview": "rsbuild preview",
     "image": "node scripts/gemini-image.mjs",
     "song": "node scripts/song-timing.mjs",
+    "song:stretch": "node scripts/song-stretch.mjs",
     "archive-check": "node scripts/archive-check.mjs",
     "frames": "node scripts/frame-check.mjs"
   },
