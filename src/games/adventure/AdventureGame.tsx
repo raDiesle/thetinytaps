@@ -1,16 +1,15 @@
 import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
-import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { TARGET_LANGUAGES, targetLanguageFor } from "@/content/targetLanguages";
-import { useCommonSettings, useGameSettings } from "@/lib/common";
+import { useLanguages } from "@/components/LanguageSetting";
+import { targetLanguageFor } from "@/content/targetLanguages";
+import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
+import { useStoredSettings } from "@/lib/storage";
 import { AdventurePlay } from "./AdventurePlay";
-import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
+import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
 import { CLOUD_TRIP } from "./stories/cloudTrip";
 import { type Story, storyIn } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
-
-carryOverAdventureSettings();
 
 /** The stories on the start screen, each a card. */
 const STORIES: { id: AdventureStoryId; emoji: string; story: Story }[] = [
@@ -18,12 +17,15 @@ const STORIES: { id: AdventureStoryId; emoji: string; story: Story }[] = [
   { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP },
 ];
 
+/** The start screen: no options of its own, read aloud, sounds, music and Tapsi's language come from the home page. */
 export function AdventureGame() {
-  const [settings, update] = useGameSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
+  const [settings, update] = useStoredSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
+  const languages = useLanguages();
   const { touchOnly } = useDevice();
   const chosen = (STORIES.find((s) => s.id === settings.story) ?? STORIES[0]).story;
-  const wanted = targetLanguageFor(settings.language);
+  // The play language of the home page; Turkish and Polish have no recordings yet, they get German.
+  const wanted = targetLanguageFor(languages.settings.language);
   // A story not translated yet is said in German, not German words with an English voice.
   const language = wanted.id === "de" || chosen.translations?.[wanted.id] ? wanted : targetLanguageFor("de");
   // Built once per story and language: the game starts anew when the story changes.
@@ -36,59 +38,41 @@ export function AdventureGame() {
       modes={STORIES.map((s) => ({ id: s.id, emoji: s.emoji, title: s.story.sequence.title }))}
       mode={settings.story}
       onMode={(id) => update({ story: id as AdventureStoryId })}
-      settings={
-        <SettingsGroup title="Bewegungsabenteuer">
-          <p className="setting-note">
+      info={
+        <>
+          <p>
             Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit. Die Welt reagiert von selbst im Takt der Bewegung –
             es gibt keine Kamera und kein „falsch“.
           </p>
-          <p className="setting-note">
+          <p>
             🏝️ Die Schatzinsel: angeln, paddeln, über eine kleine Brücke hüpfen und mit dem Kopf an Sternkisten stoßen, sich unter einem schaukelnden Baumstamm
             ducken, trommeln, Kokosnüssen ausweichen, Spinnweben wegwedeln, die Truhe am Seil heranziehen und zum Schluss das Gold hochwerfen.
           </p>
-          <p className="setting-note">
+          <p>
             ☁️ Die Wolkenreise: Tapsi fliegt auf der kleinen Wolke Wolle in den Himmel – flattern wie ein Vogel, sich unter Spielzeugflugzeugen ducken,
             Luftballons antippen, im Sitzen in die Kurven lehnen und Sterne holen, die Regenwolke hochdrücken, bis die Sonne lacht, und mit den Armen einen
             Regenbogen malen.
           </p>
-          <p className="setting-note">
-            Am besten auf einem großen Bildschirm, mit etwas Platz um das Kind herum (Arme ausbreiten, ein Schritt zur Seite). Niemand muss tippen.
+          <p>
+            Am Fuchs leuchtet, worauf es bei der Bewegung ankommt (z.&nbsp;B. nur die Arme an der Kurbel), und eine dunkle Figur mit leuchtendem Rand macht jede
+            Bewegung groß mit.
           </p>
-          <Toggle
-            label="Am Fuchs leuchtet, worauf es bei der Bewegung ankommt (z. B. nur die Arme an der Kurbel)"
-            checked={settings.glow}
-            onChange={(glow) => update({ glow })}
-          />
-          <Toggle
-            label="Umriss-Hilfe: eine dunkle Figur mit leuchtendem Rand macht jede Bewegung groß mit"
-            checked={settings.outline}
-            onChange={(outline) => update({ outline })}
-          />
-          <Choice
-            label="Tapsi spricht"
-            value={language.id}
-            options={TARGET_LANGUAGES.map((l) => ({ value: l.id, label: l.label }))}
-            onChange={(id) => update({ language: id })}
-          />
-          {!settings.speech && <p className="setting-note">Tapsi spricht nur, wenn „Vorlesen“ auf der Startseite an ist.</p>}
-          {language !== wanted && (
-            <p className="setting-note">
-              „{chosen.sequence.title}“ gibt es noch nicht auf {wanted.label.split(" ")[1]}, Tapsi spricht dort Deutsch.
-            </p>
-          )}
-          <Toggle label="Musik" checked={settings.music} onChange={(music) => update({ music })} />
-          {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
+          <p>Am besten auf einem großen Bildschirm, mit etwas Platz um das Kind herum (Arme ausbreiten, ein Schritt zur Seite). Niemand muss tippen.</p>
+          <p>
+            Ob Tapsi spricht und in welcher Sprache, Töne und Musik stellt ⚙️ auf der Startseite für alle Spiele ein.
+            {language !== wanted && ` „${chosen.sequence.title}“ gibt es noch nicht auf ${wanted.label.split(" ")[1]}, Tapsi spricht dort Deutsch.`}
+          </p>
           {!touchOnly && (
-            <p className="setting-note">
+            <p>
               Oben links: pausieren und zur vorigen oder nächsten Bewegung springen; ein Bild unten springt zu dieser Bewegung. Mit Tastatur: <kbd>←</kbd>{" "}
               <kbd>→</kbd> und die <kbd>Leertaste</kbd>.
             </p>
           )}
-        </SettingsGroup>
+        </>
       }
     >
-      {/* Its own music, which plays only while music is on for all games too. */}
-      <AdventurePlay story={story} language={language} settings={{ ...settings, music: settings.music && common.music }} />
+      {/* Its own music, which plays while music is on for all games. */}
+      <AdventurePlay story={story} language={language} settings={common} />
     </GameShell>
   );
 }
