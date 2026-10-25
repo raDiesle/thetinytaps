@@ -95,6 +95,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()`; song files are named `musik-*.mp3`, see `/musik-erzeugen`.
+- Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
+  "Bitte quer halten" while the device stands upright, and asks once per visit for fullscreen, which on Android
+  also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`) – use `/neues-spiel`.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`.

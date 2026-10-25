@@ -12,6 +12,7 @@
 @import "./styles/playing.css";
 @import "./styles/game-end.css";
 @import "./styles/playtime.css";
+@import "./styles/screen-hint.css";
 @import "./games/letters/letters.css";
 @import "./games/letters/find.css";
 @import "./games/scenes/scenes.css";
