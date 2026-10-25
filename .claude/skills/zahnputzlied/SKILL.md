@@ -5,8 +5,8 @@ description: The sung Zähneputzen-Lied of „Zähne putzen“ in a new language
 
 # Zähneputzen-Lied in a new language
 
-The sung brushing song (`src/games/teeth/`, see its `CLAUDE.md`): in two-minute
-brushing the song sings one verse per step about what the picture shows, then a finale
+The sung brushing song (`src/games/teeth/`, see its `CLAUDE.md`): the brushing lasts
+as long as the song (no choice of minutes), the song sings one verse per step about what the picture shows, then a finale
 on the end screen. The voice stays silent meanwhile, the song is the hint. Suno doesn't
 sing its verses equally long, so **the steps follow the verses**: each step begins a
 moment before its verse.
@@ -105,8 +105,8 @@ Then:
 ## 4. Check
 
 Sound is muted in Claude's preview. Log what plays instead (see `/musik-erzeugen` 5.),
-choose the language under „Gesungen“, start 2 Minuten, skip the prelude with →, and
+choose the language under „Gesungen“, press „Los geht's!“, skip the prelude with →, and
 step through: the sung file must start at the `.json`'s times, one per step, and play
-the last one once at the end. Ask the user to listen on a real device that
+the last one once at the end; the timer shows the song's length (finale − first verse). Ask the user to listen on a real device that
 each verse comes with its picture. Commit (`Zähne putzen: the brushing song in <Language>`)
 and merge into local main.

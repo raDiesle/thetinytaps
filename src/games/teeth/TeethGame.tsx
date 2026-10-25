@@ -4,7 +4,7 @@ import { de } from "@/content/de";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { SUNG_LANGUAGES } from "./music";
-import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes } from "./settings";
+import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY } from "./settings";
 import { KAI } from "./steps";
 import { SUNG_LABELS } from "./sung";
 import { TeethPlay } from "./TeethPlay";
@@ -20,13 +20,6 @@ export function TeethGame() {
     <GameShell
       title="Zähne putzen"
       emoji="🦷"
-      modes={[
-        { id: "1", emoji: "🪥", title: "1 Minute" },
-        { id: "2", emoji: "🦷", title: "2 Minuten" },
-        { id: "3", emoji: "✨", title: "3 Minuten" },
-      ]}
-      mode={settings.minutes}
-      onMode={(minutes) => update({ minutes: minutes as BrushMinutes })}
       settings={
         <SettingsGroup title="Putzen">
           <Choice
@@ -56,7 +49,10 @@ export function TeethGame() {
                 options={[{ value: "off", label: "🎶 Nur Musik" }, ...SUNG_LANGUAGES.map((lang) => ({ value: lang, label: SUNG_LABELS[lang] ?? lang }))]}
                 onChange={(singing) => update({ singing })}
               />
-              <p className="setting-note">Bei 2 Minuten singt das Lied zu jedem Schritt, was gerade dran ist. Bei 1 und 3 Minuten spielt nur Musik.</p>
+              <p className="setting-note">
+                Das Lied singt zu jedem Schritt, was gerade dran ist, und das Putzen dauert so lange wie das Lied, gut 2 Minuten. Mit „Nur Musik“ sind es genau
+                2 Minuten.
+              </p>
             </>
           )}
           <p className="setting-note">

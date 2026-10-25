@@ -132,7 +132,7 @@ export function useBrushingMusic({
     const now = songAt(song, atRef.current);
     let loop: Loop | null;
     if (finished) {
-      // After two minutes the song is just at the finale and goes on without a break; otherwise it jumps there.
+      // At the end of the brushing the song is just at the finale and goes on without a break; after a jump it goes there.
       const goesOn = now >= song.finale && now < song.finale + 1;
       loop = playLoop(buffer, { offset: goesOn ? now : song.finale, volume, once: true, fadeIn: goesOn ? 0.05 : 0.4 });
     } else {
