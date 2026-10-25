@@ -54,7 +54,10 @@ In a fresh worktree run `yarn install` first.
 ## Language and style
 
 - Everything the child or parent sees or hears is **German** (short, simple, present
-  tense). Code, comments, docs and commit messages are English, except
+  tense). Other languages come game by game: the app aims at German, the five most spoken
+  languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
+  When a game gains one, mark it in `src/content/ideas/languageStatus.ts` (shown on `/ideen/`).
+  Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
@@ -111,7 +114,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   "Bitte quer halten" while the device stands upright, and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`) – use `/neues-spiel`.
+  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts` – use `/neues-spiel`.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work

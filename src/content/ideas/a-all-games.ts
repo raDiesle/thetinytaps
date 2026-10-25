@@ -139,5 +139,14 @@ export const allGamesIdeas: IdeaArea = {
       why: "Aus einzelnen Spielen wird ein Ritual, das immer gleich abläuft.",
       effort: "M",
     },
+    {
+      id: "A-18",
+      emoji: "🗺️",
+      title: "Deutsch, die fünf größten Weltsprachen, Russisch und Italienisch",
+      text: "Jedes Spiel spricht nach und nach Englisch, Chinesisch, Hindi, Spanisch, Arabisch, Russisch und Italienisch. Wo die Stimme des Browsers schlecht oder gar nicht da ist, sprechen aufgenommene Stimmen (ElevenLabs). Eltern wählen die Sprache einmal auf der Startseite. Welches Spiel schon welche Sprache kann, steht oben unter „Sprachen“.",
+      why: "Mehrsprachige Familien und Kinder überall auf der Welt; die Spiele kommen fast ohne Text aus, nur die Stimme muss sich ändern.",
+      effort: "L",
+      partial: "Alles auf Deutsch; „Buchstaben & Zahlen“ und „Wörter tippen“ auch auf Englisch.",
+    },
   ],
 };

@@ -21,6 +21,7 @@ import { allGamesIdeas } from "./a-all-games";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
+export * from "./languageStatus";
 
 /** Areas sorted by what kind of work they are: grow a game, make a new one, or for parents. */
 export const IDEA_GROUPS: IdeaGroup[] = [

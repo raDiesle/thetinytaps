@@ -1,8 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, test } from "@rstest/core";
 import { CATEGORIES } from "./games";
-import { IDEA_AREAS, TOP_PICKS } from "./ideas";
+import { IDEA_AREAS, LANGUAGE_STATUS, TOP_PICKS } from "./ideas";
 import { keyMatches, LANGUAGES, toUpper } from "./languages";
+import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
   const app = readFileSync("src/App.tsx", "utf8");
@@ -42,6 +43,27 @@ describe("ideas", () => {
 
   test("a rejected idea is not marked as done", () => {
     expect(ideas.filter(({ idea }) => idea.rejected && idea.done).map(({ idea }) => idea.id)).toEqual([]);
+  });
+});
+
+describe("language status on the ideas page", () => {
+  test("names every game of the home menu once, in menu order, then the home page", () => {
+    const hrefs = [...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)), "/"];
+    expect(LANGUAGE_STATUS.map((row) => row.href)).toEqual(hrefs);
+  });
+
+  test("letters and words speak exactly the wanted languages that have a language pack", () => {
+    const packs = LANGUAGES.map((language) => language.id as string).filter((id) => TARGET_LANGUAGES.some((target) => target.id === id));
+    for (const href of ["/buchstaben/", "/woerter/"]) {
+      const row = LANGUAGE_STATUS.find((r) => r.href === href);
+      expect(Object.keys(row?.languages ?? {}).sort(), href).toEqual(packs.sort());
+    }
+  });
+
+  test("German is wanted first and no language twice", () => {
+    const ids = TARGET_LANGUAGES.map((language) => language.id);
+    expect(ids[0]).toBe("de");
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
 

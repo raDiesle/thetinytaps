@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { FullscreenExit } from "@/components/FullscreenButton";
+import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
   IDEA_AREAS,
   IDEA_GROUPS,
+  LANGUAGE_STATUS,
   TODDLER_RULES,
   TOP_PICKS,
   ideaStatus,
@@ -12,7 +14,9 @@ import {
   type Idea,
   type IdeaArea,
   type IdeaStatus,
+  type LanguageState,
 } from "@/content/ideas";
+import { TARGET_LANGUAGES } from "@/content/targetLanguages";
 import { useStoredSettings } from "@/lib/storage";
 import { useTitle } from "@/lib/title";
 
@@ -151,6 +155,8 @@ export function IdeasPage() {
         <p className="ideas-hint">Zahlen = offene Ideen. Antippen zeigt genau diese Ideen unten.</p>
         <Overview marks={marks} onPick={pick} />
       </section>
+
+      <Languages />
 
       {picks.length > 0 && (
         <section className="ideas-panel">
@@ -424,6 +430,74 @@ function Overview({ marks, onPick }: { marks: Record<string, Mark>; onPick: (are
         ))}
       </table>
     </div>
+  );
+}
+
+const GAME_BY_HREF = new Map(CATEGORIES.flatMap((c) => c.games.map((g) => [g.href, g])));
+const LANGUAGE_MARKS: Record<LanguageState, { mark: string; label: string }> = {
+  done: { mark: "✅", label: "fertig" },
+  partial: { mark: "🟡", label: "teilweise" },
+};
+
+/** Which game already speaks which of the wanted languages (content/targetLanguages.ts), games × languages. */
+function Languages() {
+  return (
+    <section className="ideas-panel">
+      <h2>🌍 Sprachen: Deutsch, die fünf größten Weltsprachen, Russisch, Italienisch</h2>
+      <p className="ideas-hint">
+        Nicht alles sofort: Ein Spiel bekommt eine Sprache, wenn es fertig umgebaut ist. ✅ fertig, 🟡 teilweise, · noch offen. Idee dazu: A-18.
+      </p>
+      <div className="ideas-overview-scroll">
+        <table className="ideas-overview ideas-languages">
+          <thead>
+            <tr>
+              <th>Spiel</th>
+              {TARGET_LANGUAGES.map((l) => (
+                <th key={l.id} title={l.reason}>
+                  {l.label.split(" ")[0]}
+                  <small>{l.label.split(" ").slice(1).join(" ")}</small>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {LANGUAGE_STATUS.map((row) => {
+              const game = GAME_BY_HREF.get(row.href);
+              return (
+                <tr key={row.href}>
+                  <th>
+                    {game ? `${game.emoji} ${game.title}` : "🏠 Startseite & Eltern"}
+                    {row.note && <small>{row.note}</small>}
+                  </th>
+                  {TARGET_LANGUAGES.map((l) => {
+                    const state = row.languages[l.id];
+                    return state ? (
+                      <td key={l.id} title={`${l.label}: ${LANGUAGE_MARKS[state].label}`}>
+                        {LANGUAGE_MARKS[state].mark}
+                      </td>
+                    ) : (
+                      <td key={l.id} className="ideas-zero" title={`${l.label}: offen`}>
+                        ·
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th>Fertig</th>
+              {TARGET_LANGUAGES.map((l) => (
+                <td key={l.id} className="ideas-overview-done">
+                  {LANGUAGE_STATUS.filter((row) => row.languages[l.id] === "done").length}/{LANGUAGE_STATUS.length}
+                </td>
+              ))}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
   );
 }
 
