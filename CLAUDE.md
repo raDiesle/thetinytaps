@@ -25,7 +25,8 @@ In a fresh worktree run `yarn install` first.
 ## Working here
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
-  is done: `yarn verify`, commit on the branch, merge into **local** `main`, never push.
+  is done: `yarn verify`, commit on the branch, merge into **local** `main` without asking,
+  never push (and don't offer to – pushing is the user's move).
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
@@ -33,11 +34,19 @@ In a fresh worktree run `yarn install` first.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
   there). Update that file with the code, not the README – the README only has one
   line per game, so parallel branches don't all conflict on it.
-- Before touching a Bewegungsabenteuer level read [`src/games/adventure/LEVEL-REGELN.md`](src/games/adventure/LEVEL-REGELN.md)
-  and check the work against it; write every piece of feedback on a level into it as a general rule
-  (German, in the same commit as the fix).
+- **Feedback becomes a written rule**, so the next session doesn't make the same mistake. Write it
+  generally (what to always/never do, not a note about one bug), in the same commit as the fix, into the
+  file that is loaded where it matters: one game → that game's `CLAUDE.md` (its rules section);
+  a Bewegungsabenteuer level → [`src/games/adventure/LEVEL-REGELN.md`](src/games/adventure/LEVEL-REGELN.md)
+  (German; read it before touching a level and check the work against it); work done with a skill →
+  its `.claude/skills/<name>/SKILL.md`; every game or how to work here → this file. When a rule
+  already covers it, sharpen that rule instead of adding a second one; when new feedback
+  contradicts a rule, replace the old one. Claude's private memory is only for things that don't
+  belong in the repo.
 - Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
+  An idea round only collects – the user decides later what to implement, so don't offer to implement
+  after one (say „umsetzen“, not the ambiguous „bauen“).
 
 ## Language and style
 
