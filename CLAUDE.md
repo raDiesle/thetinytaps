@@ -56,7 +56,12 @@ In a fresh worktree run `yarn install` first.
 - Everything the child or parent sees or hears is **German** (short, simple, present
   tense). Other languages come game by game: the app aims at German, the five most spoken
   languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
-  When a game gains one, mark it in `src/content/ideas/languageStatus.ts` (shown on `/ideen/`).
+  Translations and recordings (ElevenLabs voice, Suno songs) are made **only when the user asks** for
+  them, since they cost tokens and credits: new features, stories, modes and changed lines come in German
+  only, never translated or recorded on your own, also in a game that already speaks other languages.
+  Instead keep `src/content/ideas/languageStatus.ts` (shown on `/ideen/`) true in the same commit: what is
+  there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
+  `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell.
   Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
@@ -91,7 +96,7 @@ In a fresh worktree run `yarn install` first.
 src/App.tsx              routes; every game page is lazy-loaded (its own JS and CSS chunk)
 src/pages/<X>Page.tsx    thin wrapper: useTitle + <XGame/>
 src/games/<game>/        one folder per game, see its CLAUDE.md
-  <X>Game.tsx            start screen: <GameShell> with modes, level, settings
+  <X>Game.tsx            start screen: <GameShell> with modes, level, info, settings
   <X>Play.tsx            the game itself, mounted only while playing
   settings.ts            settings type, defaults, storage key "tinytaps.<game>.v1"
   content.ts             German texts and pictures
@@ -101,6 +106,10 @@ src/content/             home menu (games.ts), language packs (de/en/tr/pl), ide
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
+- Start screen: what the game is and how it is played (also keys and tips for grown-ups) goes into `info`
+  („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
+  that explain them. A game adds no own switch for what the home page already sets for all games
+  (Vorlesen, Töne, Musik, Sprache); „Zähne putzen“ (brushing hints, music while brushing) is the only exception so far.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
   defaults (so new fields need no migration); `speech`/`sounds` come from the shared
   options on the home page. Bump the key's `.vN` only when old values would break.

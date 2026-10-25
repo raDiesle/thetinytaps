@@ -53,7 +53,7 @@
   font-size: 1.15rem;
 }
 
-/* The options are folded into one bar until a grown-up opens them. */
+/* "Über das Spiel" and the options are folded into two buttons until a grown-up opens one. */
 .settings-panel {
   display: flex;
   flex-direction: column;
@@ -63,7 +63,7 @@
   max-width: 680px;
 }
 
-.settings-panel > summary {
+.panel-button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -75,31 +75,44 @@
   font-size: 1.1rem;
   font-weight: 600;
   box-shadow: 0 5px 0 var(--ink);
+  color: inherit;
+  font-family: inherit;
   cursor: pointer;
-  list-style: none;
 }
 
-.settings-panel > summary::-webkit-details-marker {
-  display: none;
-}
-
-.settings-panel > summary::after {
+.panel-button::after {
   content: "▾";
   transition: rotate 0.2s;
 }
 
-.settings-panel[open] > summary::after {
+.panel-button[aria-expanded="true"]::after {
   rotate: 180deg;
 }
 
-.settings-panel > summary:active {
+.panel-button:active {
   transform: translateY(4px);
   box-shadow: 0 1px 0 var(--ink);
 }
 
-.settings-panel > summary:focus-visible {
+.panel-button:focus-visible {
   outline: 3px solid var(--ocean);
   outline-offset: 3px;
+}
+
+.panel-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.game-info {
+  gap: 14px;
+  line-height: 1.45;
+}
+
+.game-info p {
+  margin: 0;
 }
 
 .settings-summary-note {

@@ -22,8 +22,9 @@ camera often looks from the right from then on. The timing helpers (`passTime`, 
 What Tapsi says is in `stories/<story>/lines.ts` (no three.js there, so Node can read it), and in the other
 languages of the app (`src/content/targetLanguages.ts`) in `lines.<language>.ts` next to it: the same steps and
 lines in the same order (`StoryTranslation`, listed in the story's `translations.ts`; `storyIn()` swaps them in).
-Grown-ups choose the language on the start screen („Tapsi spricht“, the setting `language`); a story without
-a translation into it is said in German (and the start screen says so). Translations say
+Tapsi speaks the play language of the home page („Spielsprache“, `LanguageSetting.tsx`, which lists these
+languages too); Turkish and Polish, and a story without a translation into the chosen language, are said in
+German (and „Über das Spiel“ says so). Translations say
 nothing that changes for a boy or a girl (no "you did", no "brave boy"): commands, "we" and "your turn".
 Each line can have a recording in `stories/<story>/stimme/<hash>.mp3` (German) or
 `stimme/<language>/<language>-<hash>.mp3`, made with ElevenLabs as a warm children's coach voice, the same voice
@@ -33,10 +34,15 @@ recording until `yarn voice make` records it again; `voice.ts` plays recordings 
 voice for lines without one. `voice.test.ts` checks the translations against the German steps and that a
 language with recordings has one for every line and no extra ones. Recordings in other languages than German
 are not kept offline by every phone, only once the story has started in that language (`rsbuild.config.ts`, `src/sw.js`).
+- A new story or changed lines come in German only: translate (`lines.<language>.ts`) and record (`yarn voice make`)
+  only when the user asks for it, and keep the story's row in `src/content/ideas/languageStatus.ts` true
+  (`content.test.ts` checks it against the files).
 - ElevenLabs always with the turbo model (`eleven_v4_turbo`, in `stimme.json`): it costs half the credits, and
   the 10,000 credits a month have to reach for every language. `yarn voice make --dry [--lang en]` shows what
   would be recorded and how many credits it costs; the German lines were recorded with `eleven_v4` and audio
   tags before, the other languages with turbo and `--no-tags`.
+
+The game has no settings of its own: read aloud, sounds, its own music and the language follow the shared options on the home page (`useCommonSettings`, `useLanguages`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen only has „Über das Spiel“.
 
 ## Working on levels
 
