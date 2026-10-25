@@ -4,11 +4,10 @@ import { de } from "@/content/de";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { SUNG_LANGUAGES } from "./music";
-import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes, type SungLanguage } from "./settings";
+import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes } from "./settings";
 import { KAI } from "./steps";
+import { SUNG_LABELS } from "./sung";
 import { TeethPlay } from "./TeethPlay";
-
-const SUNG_LABELS: Record<SungLanguage, string> = { de: "🇩🇪 Lied auf Deutsch", en: "🇬🇧 Lied auf Englisch" };
 
 export function TeethGame() {
   const [shared, update, stored] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
@@ -54,7 +53,7 @@ export function TeethGame() {
               <Choice
                 label="Gesungen"
                 value={settings.singing}
-                options={[{ value: "off", label: "🎶 Nur Musik" }, ...SUNG_LANGUAGES.map((lang) => ({ value: lang, label: SUNG_LABELS[lang] }))]}
+                options={[{ value: "off", label: "🎶 Nur Musik" }, ...SUNG_LANGUAGES.map((lang) => ({ value: lang, label: SUNG_LABELS[lang] ?? lang }))]}
                 onChange={(singing) => update({ singing })}
               />
               <p className="setting-note">Bei 2 Minuten singt das Lied zu jedem Schritt, was gerade dran ist. Bei 1 und 3 Minuten spielt nur Musik.</p>

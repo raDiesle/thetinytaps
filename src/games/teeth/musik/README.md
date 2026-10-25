@@ -6,8 +6,9 @@ Without it the synthesized tune plays.
 `musik-zaehneputzen-lied-<lang>.mp3` are sung versions for the two-minute brushing:
 one verse per step singing what is shown, then the finale. `suno-lied.md` has what
 was typed into Suno. Suno's tempo drifted while singing, so each part was stretched
-back to 8 bars at 112 BPM (`yarn song:stretch`) before converting; `SUNG` in
-`music.ts` holds their times.
+back to 8 bars at 112 BPM and the first put at 0.2 s (`yarn song:stretch … --lead 0.2`),
+which also converts them; they all share the timing in `../sung.ts`. A new language:
+the `/zahnputzlied` skill.
 
 The song is instrumental, 112 BPM, with a new part every 8 bars (17.14 s) – exactly
 one step of the two-minute brushing. `SONG` in `music.ts` holds where the first

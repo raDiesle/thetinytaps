@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { type Loop, loadSound, playLoop, playTuneNote } from "@/lib/sfx";
-import type { SungLanguage } from "./settings";
+import { SUNG_LEAD, SUNG_PART, sungLanguageOf } from "./sung";
 
 // The brushing songs in musik/ (see the README there). Without one, or while it is
 // still loading, the synthesized tune plays instead.
@@ -32,16 +32,20 @@ interface Song {
 const PLAIN: Song = { file: "./musik-zaehneputzen.mp3", start: 0.27, finale: 120.27, loopEnd: 137.41 };
 
 /**
- * The sung songs: one verse per step singing what is shown, a finale for the end.
- * Suno sped up while singing, so each part was stretched to 8 bars at 112 BPM
- * (see the README); they fit only the two-minute brushing.
+ * The sung songs by language, found by their file names: one verse per step singing
+ * what is shown, a finale for the end. Every part was stretched to 8 bars at 112 BPM
+ * and the first one put at SUNG_LEAD, so they share one timing and fit only the
+ * two-minute brushing.
  */
-const SUNG: Partial<Record<SungLanguage, Song>> = {
-  de: { file: "./musik-zaehneputzen-lied-de.mp3", start: 0.2, finale: 120.2, loopEnd: 137.34 },
-};
+const SUNG: Record<string, Song> = Object.fromEntries(
+  files.keys().flatMap((file) => {
+    const lang = sungLanguageOf(file);
+    return lang ? [[lang, { file, start: SUNG_LEAD, finale: SUNG_LEAD + 7 * SUNG_PART, loopEnd: SUNG_LEAD + 8 * SUNG_PART }]] : [];
+  }),
+);
 
 /** The languages with a sung song, for the settings. */
-export const SUNG_LANGUAGES = (Object.keys(SUNG) as SungLanguage[]).filter((lang) => urlOf(SUNG[lang]?.file ?? ""));
+export const SUNG_LANGUAGES = Object.keys(SUNG).sort();
 
 /** Loudness of the song; mastered music is much louder than the synthesized notes. */
 const VOLUME = 0.35;
@@ -82,7 +86,7 @@ export function useBrushingMusic({
   at,
 }: {
   enabled: boolean;
-  sung: SungLanguage | null;
+  sung: string | null;
   playing: boolean;
   finished: boolean;
   sync: unknown;

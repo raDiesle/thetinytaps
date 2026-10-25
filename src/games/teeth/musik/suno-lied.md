@@ -3,7 +3,7 @@
 The sung songs (`musik-zaehneputzen-lied-<lang>.mp3`): one 8-bar verse per brushing
 step, singing what the picture shows, and a finale for the end screen. Create →
 Custom, Instrumental off. Keep the verses in step order (`../steps.ts`); a changed
-step needs a new song.
+step needs a new song. A new language: the `/zahnputzlied` skill.
 
 ## Deutsch (`de`, 25 Oct 2026)
 
@@ -89,7 +89,7 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
 ```
 
 Suno sped up to 115 BPM by the end; every part was stretched back to 8 bars at
-112 BPM with `yarn song:stretch … --bpm 112 --start 0.3`.
+112 BPM with `yarn song:stretch … --bpm 112 --start 0.3 --lead 0.2`.
 
 ## English (`en`, not made yet)
 
