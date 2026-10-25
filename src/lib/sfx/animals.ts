@@ -170,3 +170,21 @@ export function playSneeze() {
   note({ from: 820, to: 300, duration: 0.18, type: "triangle", volume: 0.18, lowpass: 2000, delay: 1.75 });
   hiss({ from: 4200, to: 2200, duration: 0.45, volume: 0.32, delay: 1.78, q: 0.9 });
 }
+
+/** "Ha…" – one breath in before a sneeze; `size` from 0 (a mouse) to 1 (an elephant) makes it lower, longer and louder. */
+export function playHa(size = 0.5) {
+  const base = 1000 - 680 * size;
+  note({ from: base, to: base * 1.4, duration: 0.22 + 0.14 * size, type: "triangle", volume: 0.07 + 0.08 * size, lowpass: 2600 - 1200 * size });
+  hiss({ from: 1500 - 600 * size, to: 2200 - 800 * size, duration: 0.26 + 0.14 * size, volume: 0.03 + 0.05 * size, q: 0.8 });
+}
+
+/** "Hatschi!" – the sneeze itself: a tiny one from a mouse (`size` 0) up to an elephant's huge one (1). */
+export function playHatschi(size = 0.5) {
+  const base = 1300 - 920 * size;
+  // "Hat…": a short note that drops.
+  note({ from: base, to: base * 0.45, duration: 0.12 + 0.14 * size, type: "triangle", volume: 0.12 + 0.12 * size, lowpass: 2400 });
+  // "…schi!": a rush of air, lower and longer for a big animal.
+  hiss({ from: 5200 - 2600 * size, to: 2800 - 1500 * size, duration: 0.3 + 0.55 * size, volume: 0.15 + 0.2 * size, delay: 0.05, q: 0.9 });
+  // Big animals rumble a little underneath.
+  if (size > 0.5) note({ from: 220, to: 70, duration: 0.3 + 0.4 * size, type: "sawtooth", volume: 0.1 * size, lowpass: 420, delay: 0.04 });
+}

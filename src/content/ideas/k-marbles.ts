@@ -118,6 +118,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Neues Level: ein großes Brett mit Nägeln. Die Kugel fällt genau dort los, wo das Kind oben antippt, springt klimpernd von Nagel zu Nagel und landet unten in einem von vier Fächern. In jedem Fach wartet ein anderes Tier, das sich freut (Frosch hüpft, Kuh muht, Hund wedelt).",
       why: "Wo ich tippe, startet die Kugel – das versteht schon ein 2-Jähriger. Jedes Fach ist ein Gewinn.",
       effort: "M",
+      done: true,
     },
     {
       id: "K-14",

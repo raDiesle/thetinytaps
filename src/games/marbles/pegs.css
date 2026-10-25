@@ -1,0 +1,15 @@
+/* ---------- Kettenreaktion: Nagelbrett ---------- */
+
+.marble-play:has([aria-label="Nagelbrett"]) {
+  background: #bfe3f5;
+}
+
+/* Taps go straight to the board: no scrolling or zooming while the child taps quickly. */
+.pegs-level {
+  touch-action: none;
+}
+
+/* The hint stands still (nothing moves before the first tap) and lets taps through. */
+.pegs-hint {
+  pointer-events: none;
+}

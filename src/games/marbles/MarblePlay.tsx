@@ -11,10 +11,13 @@ import { KitchenLevel } from "./KitchenLevel";
 import { useAnyKey, type LevelProps } from "./level";
 import { LightLevel } from "./LightLevel";
 import { MachineLevel } from "./MachineLevel";
+import { PegsLevel } from "./PegsLevel";
 import type { MarbleLevel, MarbleSettings } from "./settings";
+import { SneezeLevel } from "./SneezeLevel";
 import { SpaceLevel } from "./SpaceLevel";
 import { ToppleLevel } from "./ToppleLevel";
 import { TrackLevel } from "./TrackLevel";
+import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
 
@@ -22,10 +25,13 @@ import "./track.css";
 const LEVELS: { id: MarbleLevel; emoji: string; name: string; intro: string; Level: ComponentType<LevelProps> | null }[] = [
   { id: "track", emoji: "🎢", name: "Klingende Kugelbahn", intro: "Tipp! Dann rollen die Kugeln.", Level: null },
   { id: "machine", emoji: "⚙️", name: "Große Maschine", intro: "Tipp! Dann läuft die große Maschine.", Level: MachineLevel },
+  { id: "sneeze", emoji: "🤧", name: "Hatschi-Kette", intro: "Tipp! Dann kitzelt die Feder die Maus.", Level: SneezeLevel },
   { id: "kitchen", emoji: "🍳", name: "Verrückte Küche", intro: "Tipp! Dann wird in der Küche gezaubert.", Level: KitchenLevel },
   { id: "garden", emoji: "🌻", name: "Im Garten", intro: "Tipp! Dann wacht der Garten auf.", Level: GardenLevel },
+  { id: "pegs", emoji: "📍", name: "Nagelbrett", intro: "Tipp oben hin! Dort fällt die Kugel los.", Level: PegsLevel },
   { id: "topple", emoji: "📚", name: "Alles fällt um", intro: "Tipp an, dann fällt alles um!", Level: ToppleLevel },
   { id: "building", emoji: "🚧", name: "Baustelle", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
+  { id: "water", emoji: "🦆", name: "Wasserbahn", intro: "Tipp auf das Tor! Dann schwimmt die Ente weiter.", Level: WaterLevel },
   { id: "circus", emoji: "🎪", name: "Zirkus", intro: "Tipp! Manege frei!", Level: CircusLevel },
   { id: "space", emoji: "🚀", name: "Raketenstart", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
   { id: "light", emoji: "🔦", name: "Licht-Kette", intro: "Tipp! Dann geht das Licht an.", Level: LightLevel },
