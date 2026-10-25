@@ -36,7 +36,7 @@ In a fresh worktree run `yarn install` first.
   and check the work against it; write every piece of feedback on a level into it as a general rule
   (German, in the same commit as the fix).
 - Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
-  built, set `done: true` (or `partial`) there.
+  built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
 
 ## Language and style
 
