@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "@rstest/core";
 import { STEPS } from "./steps";
-import { SUNG_LABELS, SUNG_LEAD, SUNG_PART, sungLanguageOf } from "./sung";
+import { SUNG_LABELS, type SungTimes, sungLanguageOf } from "./sung";
 
 // A sung song shows up in the settings just by its file name, so check what that relies on.
 
@@ -24,7 +24,17 @@ test("every sung song has a name for the settings and its lyrics in suno-lied.md
   }
 });
 
-test("one part per step, then the finale, makes two minutes of brushing", () => {
-  expect(STEPS.length * SUNG_PART).toBeCloseTo(120, 6);
-  expect(SUNG_LEAD).toBeGreaterThan(0);
+test("every sung song says where its verses begin: one per step, then the finale, each long enough to brush", () => {
+  for (const lang of languages) {
+    const { verses } = JSON.parse(readFileSync(`${DIR}/musik-zaehneputzen-lied-${lang}.json`, "utf8")) as SungTimes;
+    expect(verses, lang).toHaveLength(STEPS.length + 1);
+    for (let k = 1; k < verses.length; k++) {
+      const step = verses[k] - verses[k - 1];
+      expect(step, `${lang} step ${k}`).toBeGreaterThan(8);
+      expect(step, `${lang} step ${k}`).toBeLessThan(30);
+    }
+    const brushing = verses[STEPS.length] - verses[0];
+    expect(brushing, lang).toBeGreaterThan(90);
+    expect(brushing, lang).toBeLessThan(160);
+  }
 });
