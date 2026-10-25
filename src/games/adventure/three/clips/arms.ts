@@ -1,7 +1,7 @@
 import type { Pose } from "../guide";
 import {
   BRUSH_PERIOD,
-  CAST_PERIOD,
+  castSwing,
   clamp01,
   clips,
   CRANK_PERIOD,
@@ -296,16 +296,21 @@ export const ARM_CLIPS = clips({
   },
 
   cast: (t, p) => {
-    const k = phase(t, CAST_PERIOD);
-    const back = hold(k, 0.05, 0.35, 0.42, 0.5);
-    const out = hold(k, 0.42, 0.55, 0.85, 1);
-    for (const a of [p.armL, p.armR]) {
-      a.raise = 1.0 + back * 1.7 - out * 0.2 - back * out * 1.7;
-      a.spread = -0.1;
-      a.elbow = 0.6 + back * 0.8 - out * 0.5;
-    }
-    p.bend = -back * 0.12 + out * 0.15;
-    p.twist = -back * 0.2;
+    // Both paws on the rod: swung back sideways over the right shoulder, the right paw up beside the
+    // head and the left one in front of the chest, then out ahead. The paws stay outside the body and
+    // head all the way.
+    const { back, out } = castSwing(t);
+    const rest = Math.max(0, 1 - back - out);
+    p.armR.raise = 1.0 * rest + 2.1 * back + 1.35 * out;
+    p.armR.spread = 0.15 * rest + 0.85 * back + 0.2 * out;
+    p.armR.elbow = 0.7 * rest + 1.75 * back + 0.35 * out;
+    p.armL.raise = 1.0 * rest + 1.45 * back + 1.25 * out;
+    p.armL.spread = -0.1 * rest - 0.45 * back - 0.05 * out;
+    p.armL.elbow = 0.7 * rest + 1.0 * back + 0.4 * out;
+    p.twist = -back * 0.35 + out * 0.1;
+    p.lean = -back * 0.06;
+    p.bend = -back * 0.1 + out * 0.15;
+    p.headYaw = back * 0.25;
   },
 
   scatter: (t, p) => {

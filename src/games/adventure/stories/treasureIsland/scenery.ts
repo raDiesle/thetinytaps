@@ -514,6 +514,60 @@ export function makeFish(color: string) {
 }
 
 /**
+ * A small round bird that sits on the path, looking ahead along its own z; `pose(time, flying)` pecks
+ * at the ground while it sits and beats its wings while it flies.
+ */
+export function makeBird(color: string, wingColor: string) {
+  const group = new THREE.Group();
+  const feathers = mat(color, 0.55);
+  const body = solid(new THREE.SphereGeometry(0.1, 16, 12), feathers);
+  body.scale.set(0.85, 0.8, 1.15);
+  body.position.y = 0.1;
+  group.add(body);
+  const head = new THREE.Group();
+  head.position.set(0, 0.19, 0.08);
+  group.add(head);
+  head.add(solid(new THREE.SphereGeometry(0.065, 14, 10), feathers));
+  const beakGeo = new THREE.ConeGeometry(0.022, 0.06, 8);
+  beakGeo.rotateX(Math.PI / 2);
+  const beak = solid(beakGeo, mat("#ffb02e", 0.4), false);
+  beak.position.set(0, -0.005, 0.08);
+  head.add(beak);
+  for (const side of [1, -1]) {
+    const eye = solid(new THREE.SphereGeometry(0.013, 8, 6), mat("#111111", 0.2), false);
+    eye.position.set(side * 0.042, 0.018, 0.045);
+    head.add(eye);
+  }
+  const tail = solid(new THREE.BoxGeometry(0.08, 0.015, 0.1), mat(wingColor, 0.6));
+  tail.position.set(0, 0.13, -0.13);
+  tail.rotation.x = -0.4;
+  group.add(tail);
+  const wings: THREE.Group[] = [];
+  for (const side of [1, -1]) {
+    const pivot = new THREE.Group();
+    pivot.position.set(side * 0.075, 0.14, 0);
+    const wingGeo = new THREE.SphereGeometry(0.08, 12, 8);
+    wingGeo.scale(1, 0.18, 0.75);
+    wingGeo.translate(side * 0.07, 0, -0.01);
+    pivot.add(solid(wingGeo, mat(wingColor, 0.55)));
+    group.add(pivot);
+    wings.push(pivot);
+  }
+  return {
+    group,
+    pose(time: number, flying: boolean) {
+      // Folded along the body while sitting, wide beats while flying.
+      const beat = flying ? Math.sin(time * 26) * 0.9 : -1.2;
+      wings[0].rotation.z = beat;
+      wings[1].rotation.z = -beat;
+      const peck = flying ? 0 : Math.max(0, Math.sin(time * 2.3)) ** 6;
+      head.rotation.x = peck * 0.9;
+      head.position.y = 0.19 - peck * 0.04;
+    },
+  };
+}
+
+/**
  * Two drums hanging on vines from a bamboo pole between two palms, one beside each of
  * Tapsi's paws where they come down on a beat; `set(n, since)` lets drum n bounce and
  * swing `since` seconds after a beat.

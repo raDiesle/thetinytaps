@@ -81,18 +81,15 @@ export function feetAt(p: Pose, footL: number, footR: number, upL: number, upR: 
   leg(p.legR, spreadR, upR);
 }
 
-/** Seconds of one jump of the jump clip; every third one goes straight up, to bump the head. */
+/** Seconds of one jump of the jump clip: straight up, to bump the head on something above. */
 export const JUMP_PERIOD = 1.6;
 /** When the feet leave the ground and land again, as parts of one jump. */
 const TAKE_OFF = 0.4;
 const LANDING = 0.75;
-/** How high the jumps go (m): forwards along the bridge, and straight up to bump the head. */
-export const JUMP_HEIGHT = 0.3;
-export const BUMP_HEIGHT = 0.42;
+/** How high the jumps go (m). */
+export const JUMP_HEIGHT = 0.42;
 /** Seconds into a jump when it is highest. */
 export const JUMP_PEAK = ((TAKE_OFF + LANDING) / 2) * JUMP_PERIOD;
-/** True if jump number `n` (from 0) of the jump clip is the one up to bump the head. */
-export const isBump = (n: number) => n % 3 === 2;
 /** How far through the current jump of the jump clip `t` is: 0 until take-off, 1 from the landing on. */
 export function jumpProgress(t: number) {
   return clamp01((phase(t, JUMP_PERIOD) - TAKE_OFF) / (LANDING - TAKE_OFF));
@@ -151,6 +148,16 @@ export const keyTurn = (t: number) => (t < KEY_PICKUP ? 0 : hold(phase(t - KEY_P
 
 /** Seconds of one cast of the fishing rod: swinging back over the shoulder, then out. */
 export const CAST_PERIOD = 3.2;
+/** How far a cast is swung back over the right shoulder and out ahead (0..1 each), `t` seconds into the cast clip. */
+export function castSwing(t: number) {
+  const k = phase(t, CAST_PERIOD);
+  return { back: hold(k, 0.05, 0.35, 0.42, 0.5), out: hold(k, 0.42, 0.55, 0.85, 1) };
+}
+/** Sitting down or getting up takes this long, from this many seconds into the sit clip; stories sit the guide down with it. */
+export const SIT_FROM = 0.2;
+export const SIT_TIME = 2.2;
+/** How far the guide has sat down (or got up), 0..1, `t` seconds into the sit clip. */
+export const sitProgress = (t: number) => smooth(clamp01((t - SIT_FROM) / SIT_TIME));
 /** Seconds of one go of the drum clip: the left paw beats, then the right. */
 export const DRUM_PERIOD = 1.6;
 /** Seconds into each half when the beating paw comes down on the drum. */
