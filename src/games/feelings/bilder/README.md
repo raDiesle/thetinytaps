@@ -165,7 +165,7 @@ visible, but gentle – no injuries, no blood. Use the reference only for the ch
 | `angry-3`        | „Sagen“ – The little bear tells the fox how he feels, one paw on his chest. The fox looks sorry and starts to rebuild the tower with him.                                     |
 | `angry-nein`     | „Schubsen“ – The angry little bear pushes the fox. The fox falls on the floor and cries.                                                                                      |
 
-Bei den vier Geschichten unten haben nur einen Frame, weil im zweiten die Szene
+In den vier Geschichten unten haben diese Bilder nur einen Frame, weil im zweiten die Szene
 sprang statt sich nur ein wenig zu bewegen: `bye-passiert`, `bye-3`, `bye-nein`,
 `new-passiert`, `new-nein`, `new-ende`, `fall-3`, `fall-ende`, `stop-1`, `stop-nein`.
 Ein Paar aus `--grid 1x2` darum vor dem Einbauen nebeneinander ansehen; Streifen
