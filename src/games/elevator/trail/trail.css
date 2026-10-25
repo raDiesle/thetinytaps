@@ -27,7 +27,46 @@
   transition-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
 }
 
+/* Measures the screen without a notch, so bag and button keep clear of it. */
+.tl-safe {
+  position: absolute;
+  top: 0;
+  left: env(safe-area-inset-left, 0px);
+  right: env(safe-area-inset-right, 0px);
+  height: 0;
+  pointer-events: none;
+}
+
+/* ---------- What the next tap does: footprints to the child's pale ghost ---------- */
+
+.tl-next {
+  pointer-events: none;
+}
+
+/* Yellow like the waiting button: the button and the way belong together. */
+.tl-print {
+  fill: #ffd43b;
+  stroke: #3d405b;
+  stroke-width: 3;
+  animation: tl-print-in 0.3s ease-out both;
+}
+
+.tl-ghost {
+  opacity: 0.45;
+  animation: tl-ghost-in 0.5s ease-out both;
+}
+
 /* ---------- The bag ---------- */
+
+/* Its frame is the colour of the bag: what is inside the circles is in the bag. */
+.tl-bag-shadow {
+  fill: #3d405b;
+}
+
+.tl-bag-box {
+  fill: #f1d6b0;
+  stroke: #3d405b;
+}
 
 .tl-slot {
   cursor: pointer;
@@ -82,7 +121,7 @@
 }
 
 .tl-key.down .tl-key-top {
-  transform: translateY(6px);
+  transform: translateY(4px);
 }
 
 /* ---------- The world's answers ---------- */
@@ -187,7 +226,7 @@
   animation: tl-ball-blink 0.4s ease-in-out 6 alternate;
 }
 
-/* With the pretzel, the dog goes back to its door and wags. */
+/* With the bone, the dog goes back to its door and wags. */
 .tl-ball-dog {
   transition: transform 1.4s ease-in-out;
 }
@@ -284,6 +323,19 @@
   }
   to {
     transform: translateY(-50px) scale(1.4, 0.1);
+    opacity: 0;
+  }
+}
+
+@keyframes tl-print-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes tl-ghost-in {
+  from {
     opacity: 0;
   }
 }

@@ -462,9 +462,40 @@
 
 /* ---------- The action button (trail adventures) ---------- */
 
-/* Grey and still while there is nothing to do; red with a glowing ring while it waits for a tap. */
+/* Grey and still while there is nothing to do; while it waits for a tap its frame turns yellow, the button red
+   with a glowing ring, it breathes and sends rings out, so a child sees at once: press me now. */
 .el-action {
   cursor: pointer;
+}
+
+.el-action-shadow {
+  fill: #3d405b;
+}
+
+.el-action-box {
+  fill: #fff;
+  stroke: #3d405b;
+  transition: fill 0.3s;
+}
+
+.el-action.on .el-action-box {
+  fill: #ffe066;
+}
+
+.el-action-ripple {
+  stroke: #fff;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.el-action.on .el-action-ripple {
+  animation: el-action-ripple 1.4s ease-out infinite;
+}
+
+/* The white plate on the button with the picture of what the tap will do. */
+.el-action-plate {
+  fill: #fff;
 }
 
 .el-action-base {
@@ -509,7 +540,9 @@
 }
 
 .el-action.on .el-action-jump {
-  animation: el-action-jump 0.6s cubic-bezier(0.3, 1.6, 0.6, 1);
+  animation:
+    el-action-jump 0.6s cubic-bezier(0.3, 1.6, 0.6, 1),
+    el-action-breathe 1.4s ease-in-out 0.6s infinite;
 }
 
 .el-action-press {
@@ -1107,6 +1140,23 @@
   to {
     opacity: 1;
     transform: scale(1.06);
+  }
+}
+
+@keyframes el-action-ripple {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.7);
+  }
+}
+
+@keyframes el-action-breathe {
+  50% {
+    transform: scale(1.08);
   }
 }
 

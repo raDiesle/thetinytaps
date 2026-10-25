@@ -190,13 +190,13 @@ const ball: TrailLevel = {
       ask: "Die Ampel ist rot. Wir drücken den Knopf.",
       done: "Grün! Jetzt gehen wir rüber.",
     },
-    { kind: "pickup", id: "pretzel", x: 1600, item: "pretzel", at: [1690, 650], sound: playPop, ask: "Eine Brezel!", done: "Ab in den Beutel!" },
+    { kind: "pickup", id: "bone", x: 1600, item: "bone", at: [1690, 676], sound: playPop, ask: "Ein Knochen!", done: "Ab in den Beutel!" },
     { kind: "pickup", id: "shovel", x: 1900, item: "shovel", at: [2010, 680], sound: playClonk, ask: "Eine Schaufel.", done: "Die nehmen wir mit." },
     {
       kind: "obstacle",
       id: "dog",
       x: 2300,
-      need: "pretzel",
+      need: "bone",
       at: [2420, 636],
       meet: [[100, playBark]],
       sounds: [
@@ -207,7 +207,7 @@ const ball: TrailLevel = {
       ms: 2200,
       nope: playSneeze,
       ask: "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?",
-      done: "Die Brezel! Mmh, lecker.",
+      done: "Der Knochen! Mmh, lecker.",
     },
     {
       kind: "obstacle",

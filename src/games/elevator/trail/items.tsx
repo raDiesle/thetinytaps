@@ -6,7 +6,7 @@ import { INK } from "@/games/scenes/shared";
 // in the world, in a bag slot and in the thought bubble.
 
 /** A thing that fits into the bag. */
-export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "pretzel" | "can" | "shovel" | "bread" | "fish" | "sunflower" | "umbrella";
+export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "bone" | "can" | "shovel" | "bread" | "fish" | "sunflower" | "umbrella";
 
 /** A drawing and its size, to fit it into a slot, a bubble or a card. */
 export interface Picture {
@@ -83,25 +83,21 @@ export function Apple() {
   );
 }
 
-/** A pretzel, salted: a brown rope with its arms crossed in the middle. */
-export function Pretzel() {
-  const rope = "M-34 -14 C-20 -30 20 -48 12 -64 C4 -80 -46 -78 -46 -48 C-46 -22 -12 -8 0 -8 C12 -8 46 -22 46 -48 C46 -78 -4 -80 -12 -64 C-20 -48 20 -30 34 -14";
+/** A dog's bone: a pale bar with two round knobs at each end, outlined as one shape. */
+export function Bone() {
+  const shape = (
+    <>
+      <rect x="-44" y="-33" width="88" height="16" rx="4" />
+      {[-44, 44].flatMap((x) => [-38, -14].map((y) => <circle key={`${x}${y}`} cx={x} cy={y} r="12" />))}
+    </>
+  );
   return (
     <g>
-      <path d={rope} stroke={INK} strokeWidth="22" fill="none" strokeLinecap="round" />
-      <path d={rope} stroke="#c8742c" strokeWidth="14" fill="none" strokeLinecap="round" />
-      <path d="M-40 -56 Q-36 -70 -20 -72" stroke="#e8a35c" strokeWidth="4" fill="none" strokeLinecap="round" />
-      {[
-        [-38, -40],
-        [-24, -16],
-        [30, -20],
-        [40, -50],
-        [22, -70],
-        [-28, -70],
-        [0, -36],
-      ].map(([x, y]) => (
-        <rect key={`${x}${y}`} x={x - 2.5} y={y - 2.5} width="5" height="5" rx="1" fill="#fff" />
-      ))}
+      <g fill={INK} stroke={INK} strokeWidth="9">
+        {shape}
+      </g>
+      <g fill="#fff3dc">{shape}</g>
+      <path d="M-30 -29 H24" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
     </g>
   );
 }
@@ -263,7 +259,7 @@ export const ITEMS: Record<ItemId, Picture> = {
   plank: { w: 224, h: 30, draw: () => <Plank /> },
   lantern: { w: 60, h: 118, draw: () => <Lantern /> },
   apple: { w: 64, h: 72, draw: () => <Apple /> },
-  pretzel: { w: 104, h: 84, draw: () => <Pretzel /> },
+  bone: { w: 130, h: 60, draw: () => <Bone /> },
   can: { w: 140, h: 94, draw: () => <WateringCan /> },
   shovel: { w: 56, h: 124, draw: () => <Shovel /> },
   bread: { w: 120, h: 64, draw: () => <Bread /> },

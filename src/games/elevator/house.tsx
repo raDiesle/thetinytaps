@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Cloud } from "@/games/scenes/shared";
 import {
   BUTTON_R,
@@ -248,15 +248,17 @@ export function Contour({ wish, floor, glow }: { wish: string; floor: number; gl
   );
 }
 
-/** The big action button of the trail adventures, always in the same place: grey while there is nothing to do,
- * red and glowing while a tap is awaited. Any tap or key does the same; the button only shows when and where.
- * A new `nudge` makes it jump again. */
+/** The big action button of the trail adventures, in its own framed box: grey while there is nothing to do, red,
+ * glowing and sending out rings while a tap is awaited. Any tap or key does the same; the button only shows when,
+ * and its `picture` (drawn around its middle, the star if none) what the tap will do. A new `nudge` makes it jump again. */
 export function ActionButton({
   waiting,
   nudge,
   x,
   y,
   r,
+  box,
+  picture,
 }: {
   waiting: boolean;
   nudge: number;
@@ -264,16 +266,31 @@ export function ActionButton({
   x: number;
   y: number;
   r: number;
+  /** The frame around it: left, top, width, height. */
+  box: [number, number, number, number];
+  picture?: ReactNode;
 }) {
+  const [bx, by, bw, bh] = box;
   return (
     <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label="Los">
-      <rect x={x - r - 14} y={y - r - 14} width={2 * r + 28} height={2 * r + 36} rx={r + 14} fill="#cfd8dc" stroke="#90a4ae" strokeWidth="6" />
+      <rect x={bx + 8} y={by + 8} width={bw} height={bh} rx="36" className="el-action-shadow" />
+      <rect x={bx} y={by} width={bw} height={bh} rx="36" className="el-action-box" strokeWidth="6" />
+      {[0, 1].map((i) => (
+        <circle key={i} className="el-action-ripple" cx={x} cy={y} r={r} fill="none" strokeWidth="8" style={{ animationDelay: `${i * 0.7}s` }} />
+      ))}
       <g key={nudge} className="el-action-jump" style={{ transformOrigin: `${x}px ${y}px` }}>
         <circle className="el-action-glow" cx={x} cy={y} r={r + 10} fill="none" stroke="#ffd43b" strokeWidth="16" />
         <g className="el-action-press">
           <circle className="el-action-base" cx={x} cy={y + 9} r={r} />
           <circle className="el-action-face" cx={x} cy={y} r={r} strokeWidth="7" />
-          <path className="el-action-star" d={star(x, y + 4, 46)} strokeWidth="6" strokeLinejoin="round" />
+          {picture ? (
+            <>
+              <circle className="el-action-plate" cx={x} cy={y} r={r - 16} />
+              <g transform={`translate(${x} ${y})`}>{picture}</g>
+            </>
+          ) : (
+            <path className="el-action-star" d={star(x, y + 4, 46)} strokeWidth="6" strokeLinejoin="round" />
+          )}
         </g>
       </g>
     </g>
