@@ -431,7 +431,7 @@
   animation: el-twinkle 2s ease-in-out infinite alternate;
 }
 
-/* ---------- The action button ---------- */
+/* ---------- The action button (trail adventures) ---------- */
 
 /* Grey and still while there is nothing to do; red with a glowing ring while it waits for a tap. */
 .el-action {

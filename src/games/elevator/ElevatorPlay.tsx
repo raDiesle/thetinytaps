@@ -4,7 +4,7 @@ import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby,
 import { speak } from "@/lib/speech";
 import { cardForKey, StoryCards } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
-import { ActionButton, Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
+import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, HERO, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
 import { WeatherContext } from "./rooms";
@@ -16,9 +16,9 @@ const FLOOR_MS = 1200;
 const DOOR_MS = 700;
 /** Walking time per SVG unit. */
 const WALK_MS = 2.6;
-/** While waiting for the right button or a tap: the bubble (or the action button) reminds the child, and the room glows. */
+/** While waiting for the right button: the bubble reminds the child, and the button (and, for a ride, the room) glows. */
 const NUDGE_MS = 7000;
-/** How long one tap's movement lasts if the task doesn't say. */
+/** How long one move of a task lasts if the task doesn't say. */
 const BEAT_MS = 700;
 /** From the end of a story until the picture cards come back. */
 const END_MS = 5000;
@@ -56,13 +56,15 @@ interface View {
   bubble: { who: Who; pic: PicId; nudge: number } | null;
   playing: string | null;
   used: string[];
-  /** The task being tapped now, and how often each task has been tapped in this story. */
+  /** The task being done now, and how often each task has been done in this story. */
   task: string | null;
   taps: Record<string, number>;
-  /** The action button waits for a tap; `nudge` counts the reminders. */
-  action: { nudge: number } | null;
+  /** The button that pulses as a reminder (and its room glows, unless the child is in it already). */
   hint: number | null;
+  /** The button of the floor the lift rides to. */
   lit: number | null;
+  /** The button of the child's own floor, lit while a move in the room waits for it. */
+  call: number | null;
   night: boolean;
   /** The rain has stopped. */
   cleared: boolean;
@@ -81,9 +83,9 @@ const START: View = {
   used: [],
   task: null,
   taps: {},
-  action: null,
   hint: null,
   lit: null,
+  call: null,
   night: false,
   cleared: false,
   party: false,
@@ -126,8 +128,6 @@ export function ElevatorPlay({
   const timers = useRef(new Set<number>());
   /** Set while the script waits for a button: it gets the floor. */
   const waiter = useRef<((floor: number) => void) | null>(null);
-  /** Set while a task waits for a tap. */
-  const tapper = useRef<(() => void) | null>(null);
 
   const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
     const patch = typeof change === "function" ? change(viewRef.current) : change;
@@ -162,7 +162,6 @@ export function ElevatorPlay({
     timers.current.forEach(clearTimeout);
     timers.current.clear();
     waiter.current = null;
-    tapper.current = null;
   };
 
   useEffect(() => cancel, []);
@@ -223,76 +222,56 @@ export function ElevatorPlay({
 
   const nextPress = () => new Promise<number>((resolve) => (waiter.current = resolve));
 
-  /** Shows the wish and waits until the child has brought the lift to the floor where it is. */
-  const reach = async (step: Step) => {
-    const who = step.who ?? "hero";
-    showBubble(who, step.wish);
-    say(step.ask);
+  /** Waits until the child has pressed `floor`: the lift rides there. With `here` the child is in that room already –
+   * its own number lights up, and another number doesn't call the lift. The bubble must already show `wish`. */
+  const reach = async (who: Who, wish: PicId, floor: number, here = false) => {
     for (;;) {
+      if (here) put({ call: floor });
       const stopNudging = (() => {
         let stop = () => {};
         const nudge = () => {
-          showBubble(who, step.wish);
-          put({ hint: step.floor });
+          showBubble(who, wish);
+          put({ hint: floor });
           stop = later(NUDGE_MS, nudge);
         };
         stop = later(NUDGE_MS, nudge);
         return () => stop();
       })();
-      const floor = await nextPress();
+      const pressed = await nextPress();
       stopNudging();
-      if (floor === step.floor && floor === viewRef.current.cabin) return;
-      if (floor !== viewRef.current.cabin) {
+      if (pressed === floor && (here || pressed === viewRef.current.cabin)) break;
+      if (!here && pressed !== viewRef.current.cabin) {
         sound(() => playKnock(1500));
-        await ride(floor);
-        if (floor === step.floor) return;
+        await ride(pressed);
+        if (pressed === floor) break;
       }
-      // Wrong floor: the child looks out, shakes its head and thinks of the wish again.
+      // Wrong floor: the child shakes its head and thinks of the wish again.
+      const pose = viewRef.current.actors[who]!.pose;
       actor(who, { pose: "shake" });
-      say(texts.wrong);
+      say(here ? texts.notYet : texts.wrong);
       await wait(1100);
-      actor(who, { pose: "stand" });
-      showBubble(who, step.wish);
-      put({ hint: step.floor });
+      actor(who, { pose });
+      showBubble(who, wish);
+      put({ hint: floor });
     }
+    put({ hint: null, call: null });
   };
 
-  const nextTap = () => new Promise<void>((resolve) => (tapper.current = resolve));
-
-  /** A tap, a click or a key while the action button waits for one. */
-  const tap = () => {
-    const resolve = tapper.current;
-    if (resolve) {
-      tapper.current = null;
-      resolve();
-    }
-  };
-
-  /** The action button lights up and every tap does the task once more, until it is done; an `auto` task does itself. */
+  /** Does a task `taps` times. A task with a wish asks for every move like a floor: the bubble shows it and the
+   * child's own floor number lights up; one without does itself. */
   const doTask = async (who: Who, task: Task) => {
     const other: Who = who === "hero" ? "buddy" : "hero";
     put((v) => ({ task: task.name, taps: { ...v.taps, [task.name]: v.taps[task.name] ?? 0 } }));
     if (task.spot !== undefined) await walk(who, task.spot);
     if (task.face) actor(who, { face: task.face });
-    if (!task.auto) say(task.ask);
+    if (task.wish) {
+      showBubble(who, task.wish.pic);
+      say(task.wish.ask);
+    }
     for (let i = 0; i < task.taps; i++) {
-      if (!task.auto) {
-        put({ action: { nudge: 0 } });
-        const stopNudging = (() => {
-          let stop = () => {};
-          const nudge = () => {
-            put((v) => ({ action: v.action && { nudge: v.action.nudge + 1 } }));
-            say(task.ask);
-            stop = later(NUDGE_MS, nudge);
-          };
-          stop = later(NUDGE_MS, nudge);
-          return () => stop();
-        })();
-        await nextTap();
-        stopNudging();
-      }
+      if (task.wish) await reach(who, task.wish.pic, viewRef.current.actors[who]!.floor, true);
       const lastTap = i === task.taps - 1;
-      put((v) => ({ action: null, taps: { ...v.taps, [task.name]: (v.taps[task.name] ?? 0) + 1 } }));
+      put((v) => ({ taps: { ...v.taps, [task.name]: (v.taps[task.name] ?? 0) + 1 } }));
       const a = viewRef.current.actors[who]!;
       actor(who, {
         pose: task.pose,
@@ -305,6 +284,7 @@ export function ElevatorPlay({
       actor(who, { pose: task.rest ?? "stand" });
       if (task.together) actor(other, { pose: task.rest ?? "stand" });
     }
+    if (task.wish) put({ bubble: null });
     if (task.done) say(task.done);
     if (task.wait) {
       cue(task.sounds ?? []);
@@ -315,8 +295,10 @@ export function ElevatorPlay({
   const doStep = async (step: Step, last: boolean) => {
     const who = step.who ?? "hero";
     const other: Who = who === "hero" ? "buddy" : "hero";
-    await reach(step);
-    put({ bubble: null, hint: null });
+    showBubble(who, step.wish);
+    say(step.ask);
+    await reach(who, step.wish, step.floor);
+    put({ bubble: null });
     const otherComes = viewRef.current.actors[other]?.inCabin;
     await Promise.all([walk(who, step.spot), otherComes ? walk(other, step.otherSpot ?? step.spot + step.face * -110) : undefined]);
 
@@ -401,8 +383,6 @@ export function ElevatorPlay({
 
   /** A floor button or a room was tapped. */
   const press = (floor: number) => {
-    if (viewRef.current.action) return tap();
-    if (viewRef.current.task) return sound(() => playKnock(1500));
     if (floor < 0 || floor >= FLOORS || !viewRef.current.story || viewRef.current.picking) return;
     const resolve = waiter.current;
     if (resolve) {
@@ -413,7 +393,8 @@ export function ElevatorPlay({
 
   const tapKid = (who: Who) => (e: PointerEvent) => {
     e.stopPropagation();
-    if (viewRef.current.action) return tap();
+    // The child stands in its room: while a move there waits, tapping the child is tapping the room.
+    if (viewRef.current.call !== null) return press(viewRef.current.call);
     const a = viewRef.current.actors[who];
     if (!a || a.walk) return;
     actor(who, { hop: a.hop + 1 });
@@ -433,8 +414,8 @@ export function ElevatorPlay({
     void play(STORIES.find((s) => s.id === storyId) ?? STORIES[0]);
   }, []);
 
-  // Any key presses the waiting action button; else 1–4 fetch the lift (or pick a story on the cards), arrows ride one
-  // floor up or down, and any other key makes a burst.
+  // 1–4 fetch the lift or do the move in the room (or pick a story on the cards), arrows ride one floor up or down,
+  // and any other key – or any key while a move does itself – makes a burst.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
@@ -446,8 +427,7 @@ export function ElevatorPlay({
         else funBurst();
         return;
       }
-      if (v.action) tap();
-      else if (v.task) funBurst();
+      if (v.task && v.call === null) funBurst();
       else if (Number.isInteger(digit) && digit >= 1 && digit <= FLOORS) press(digit - 1);
       else if (e.key === "ArrowUp") press(Math.min(FLOORS - 1, v.cabin + 1));
       else if (e.key === "ArrowDown") press(Math.max(0, v.cabin - 1));
@@ -468,14 +448,7 @@ export function ElevatorPlay({
   });
 
   return (
-    <div
-      className={`elevator-play weather-${weather}`}
-      onPointerDown={(e) => {
-        if (!viewRef.current.action) return funBurst(e.clientX, e.clientY);
-        spawn(e.clientX, e.clientY);
-        tap();
-      }}
-    >
+    <div className={`elevator-play weather-${weather}`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
       <svg className="el-svg" viewBox={`${VIEW_L} 0 ${VIEW_W - VIEW_L} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
         <WeatherContext.Provider value={weather}>
           <Backdrop weather={weather} />
@@ -495,8 +468,8 @@ export function ElevatorPlay({
               <Slabs />
               <Shaft />
               <CabinBack floor={view.cabin} ride={view.ride} />
-              <Buttons lit={view.lit} hint={view.hint} onPress={press} />
-              {view.hint !== null && <Hint floor={view.hint} />}
+              <Buttons lit={view.lit ?? view.call} hint={view.hint} onPress={press} />
+              {view.hint !== null && view.call === null && <Hint floor={view.hint} />}
               {kids.map((who) => {
                 const a = actors[who];
                 if (!a || a.hidden) return null;
@@ -514,7 +487,6 @@ export function ElevatorPlay({
                 );
               })}
               <CabinFront floor={view.cabin} ride={view.ride} open={view.doors} />
-              <ActionButton waiting={!!view.action} nudge={view.action?.nudge ?? 0} />
               {bubble && actors[bubble.who] && !actors[bubble.who]!.hidden && (
                 <g className="el-ride" style={place(actors[bubble.who]!).outer}>
                   <g className="el-walker" style={place(actors[bubble.who]!).inner}>
