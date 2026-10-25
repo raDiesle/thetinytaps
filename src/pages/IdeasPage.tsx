@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { FullscreenExit } from "@/components/FullscreenButton";
+import { FullscreenCorner } from "@/components/FullscreenButton";
 import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
@@ -136,7 +136,7 @@ export function IdeasPage() {
 
   return (
     <main className="home ideas">
-      <FullscreenExit />
+      <FullscreenCorner />
       <Link to="/" className="back-link">
         ← Alle Spiele
       </Link>

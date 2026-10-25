@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { MenuIcon } from "@/components/GameEnd";
 import { useLeaveGame } from "@/components/GameShell";
 import { useBackgroundMusicNow, useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
@@ -406,7 +407,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
           {settings.week && <Week log={week} today={new Date()} now={daytime} />}
           <div className="teeth-end-buttons">
             <button type="button" className="teeth-again teeth-menu" onClick={leave}>
-              🏠 Menü
+              <MenuIcon /> Menü
             </button>
             <button type="button" className="teeth-again" onClick={again}>
               🔁 Nochmal

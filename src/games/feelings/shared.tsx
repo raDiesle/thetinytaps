@@ -303,9 +303,11 @@ export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: (
       {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
       <button type="button" className="fg-round menu" aria-label="Menü" onPointerDown={(e) => e.stopPropagation()} onClick={leave}>
         <svg viewBox="0 0 24 24" aria-hidden>
-          <path d="M3 11.5 12 4l9 7.5" />
-          <path d="M5.5 9.5V20h13V9.5" />
-          <path d="M10 20v-5.5h4V20" />
+          {/* Four cards, like the start screen – not a house, which would look like the home page. */}
+          <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+          <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+          <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+          <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
         </svg>
       </button>
       <button type="button" className="fg-round again" aria-label="Nochmal" onPointerDown={press(onAgain)}>

@@ -37,7 +37,7 @@ export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
       {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
       <button type="button" className="game-end-button menu" onClick={leave}>
         <span className="game-end-emoji" aria-hidden>
-          🏠
+          <MenuIcon />
         </span>
         Menü
       </button>
@@ -54,5 +54,20 @@ export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
         Weiter ▶
       </button>
     </div>
+  );
+}
+
+/**
+ * The picture on „Menü“: four cards, like the game's own start screen where its modes are picked –
+ * not a house, which would look like the home page.
+ */
+export function MenuIcon() {
+  return (
+    <svg className="menu-icon" viewBox="0 0 24 24" aria-hidden>
+      <rect x="2" y="2" width="9" height="9" rx="2" style={{ fill: "var(--ocean)" }} />
+      <rect x="13" y="2" width="9" height="9" rx="2" style={{ fill: "var(--mint)" }} />
+      <rect x="2" y="13" width="9" height="9" rx="2" style={{ fill: "var(--sunshine)" }} />
+      <rect x="13" y="13" width="9" height="9" rx="2" style={{ fill: "var(--berry)" }} />
+    </svg>
   );
 }

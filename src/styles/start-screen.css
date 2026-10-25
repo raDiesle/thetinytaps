@@ -450,14 +450,23 @@ kbd {
   font-size: clamp(1.2rem, 20cqh, 2.2rem);
 }
 
-/* More room for the cards on big screens: the back link moves up into the corner. */
+/*
+ * More room for the cards on big screens: the back link moves up into the corner, bigger and yellow so
+ * a grown-up finds it at once, and stays there while the page scrolls.
+ */
 @media (min-width: 900px) and (min-height: 600px) {
   .home > .back-link,
   .start-screen > .back-link {
-    position: absolute;
-    top: max(24px, env(safe-area-inset-top));
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top));
     left: max(20px, env(safe-area-inset-left));
+    z-index: 10;
+    min-height: 60px;
     margin: 0;
+    padding: 10px 30px 10px 24px;
+    background: var(--sunshine);
+    font-size: 1.4rem;
+    font-weight: 700;
   }
 
   .start-screen {

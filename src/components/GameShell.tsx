@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { FullscreenExit } from "@/components/FullscreenButton";
+import { FullscreenButton, FullscreenCorner } from "@/components/FullscreenButton";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
 import { categoryHref, categoryOf } from "@/content/games";
@@ -168,7 +168,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, info, sett
   return (
     <main className="start-screen">
       <Sky />
-      <FullscreenExit />
+      <FullscreenCorner />
       <Link to={back} className="back-link">
         ← {backText}
       </Link>
@@ -346,6 +346,8 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
       <span className="exit-hint" aria-hidden>
         {label} · halten
       </span>
+      {/* On computers only (CSS): a finger on a tablet would end fullscreen by accident. */}
+      <FullscreenButton className="play-fullscreen" />
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}

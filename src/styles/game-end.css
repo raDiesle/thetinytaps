@@ -40,6 +40,15 @@
   animation: none;
 }
 
+/* „Menü“: four cards drawn in the size of an emoji. */
+.menu-icon {
+  width: 0.9em;
+  height: 0.9em;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  vertical-align: -0.12em;
+}
+
 .game-end-emoji {
   font-family: var(--font-emoji);
   font-size: clamp(3.2rem, 13vh, 6.4rem);

@@ -97,12 +97,16 @@ In a fresh worktree run `yarn install` first.
   overlap, the right answer wins (`data-tap="goal"`), then one not tapped yet (not `"done"`), then the
   nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
+- Grown-ups on a computer (≥ 900 px wide with a mouse) always see the fullscreen button: top right in every menu
+  (`FullscreenCorner`) and next to ✕ while playing; there the back link of a menu is big, yellow and fixed in the
+  top left corner, so it never scrolls away. Phones and tablets keep both out of a child's reach.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
   of a level. Never add another.
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
-  game's start screen, `useLeaveGame()`), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
+  current game's own start screen before play, `useLeaveGame()` – never the home page; its picture is four cards,
+  `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
   the first, so there is always one). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
   it has a use for, just as big.
 

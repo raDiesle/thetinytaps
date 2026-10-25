@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { FullscreenExit } from "@/components/FullscreenButton";
+import { FullscreenCorner } from "@/components/FullscreenButton";
 import { GameCard } from "@/components/GameCard";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
@@ -17,7 +17,7 @@ export function ScenesMenu() {
   return (
     <main className="home">
       <Sky />
-      <FullscreenExit />
+      <FullscreenCorner />
       <Link to={CATEGORY ? categoryHref(CATEGORY) : "/"} className="back-link">
         ← {CATEGORY?.title ?? "Alle Spiele"}
       </Link>
