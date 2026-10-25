@@ -18,7 +18,6 @@ import {
   Pancakes,
   Pyjama,
   RainHat,
-  RainPuddle,
   Raincoat,
   SleepyMoon,
   Stove,
@@ -386,7 +385,7 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
   toothcup: { w: 70, h: 96, draw: () => <ToothCup /> },
   teddy: { w: 80, h: 100, draw: () => <Teddy /> },
   bed: { w: 260, h: 150, draw: () => <Bed /> },
-  rain: { w: 150, h: 122, draw: () => <RainPuddle /> },
+  rain: { w: 210, h: 200, draw: () => <PuddleJump /> },
   boots: { w: 90, h: 64, draw: () => <Boots /> },
   coat: { w: 100, h: 146, draw: () => <Raincoat /> },
   umbrella: { w: 40, h: 150, draw: () => <Umbrella /> },
@@ -409,6 +408,47 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
       )),
   },
 };
+
+/** The wish to jump into puddles: the child in rain boots and raincoat in mid-air, cheering, over a puddle that
+ * splashes up high, with rain around. Still, like every picture in a bubble. */
+function PuddleJump() {
+  const drops: [number, number][] = [
+    [-96, -176],
+    [-70, -128],
+    [-100, -84],
+    [80, -180],
+    [100, -132],
+    [74, -96],
+  ];
+  const splash: [number, number, number, number, number][] = [
+    [40, -36, 9, 16, 20],
+    [68, -54, 8, 14, 40],
+    [26, -62, 7, 12, 10],
+  ];
+  return (
+    <>
+      {drops.map(([x, y]) => (
+        <path key={`${x}${y}`} d={`M${x} ${y} q-6 11 0 14 q6 -3 0 -14 Z`} fill="#4dabf7" />
+      ))}
+      <ellipse cx="0" cy="-12" rx="98" ry="16" fill="#74c0fc" stroke="#1c7ed6" strokeWidth="4" />
+      <ellipse cx="0" cy="-12" rx="54" ry="7" fill="none" stroke="#e7f5ff" strokeWidth="4" />
+      {/* The splash: drops flying up and out on both sides */}
+      <g fill="#a5d8ff" stroke="#1c7ed6" strokeWidth="3">
+        {[-1, 1].map((s) =>
+          splash.map(([x, y, rx, ry, turn]) => <ellipse key={`${s}${x}`} cx={s * x} cy={y} rx={rx} ry={ry} transform={`rotate(${s * turn} ${s * x} ${y})`} />),
+        )}
+        {[-1, 1].map((s) => (
+          <circle key={s} cx={s * 88} cy="-76" r="6" />
+        ))}
+      </g>
+      {/* Lines beside the legs: the child comes down fast */}
+      <path d="M-46 -112 V-80 M-58 -98 V-74 M46 -112 V-80 M58 -98 V-74" stroke="#1c7ed6" strokeWidth="4" strokeLinecap="round" />
+      <g className="el-pic-kid" transform="translate(0 -44) scale(0.8)">
+        <Kid look={HERO} pose="cheer" holding={null} wear={["boots", "coat"]} face={1} />
+      </g>
+    </>
+  );
+}
 
 /** A thought bubble with a picture, above the head of a child of height `height`. It pops up once; every new `nudge`
  * runs a yellow light once along its outline, to remind the child of the wish. */

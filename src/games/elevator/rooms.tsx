@@ -259,7 +259,7 @@ export function Keller({ playing, used, taps }: RoomProps) {
           <path d={`M${Number(x) - 40} -42 h72 M${Number(x) - 40} -28 h72`} stroke="#8d5a2b" strokeWidth="3" />
         </g>
       ))}
-      <g className={`el-fridge${open ? " open" : ""}`} transform="translate(300 -10)">
+      <g className={`el-fridge${open ? " open" : ""}`} data-wish="fridge juice" transform="translate(300 -10)">
         <Fridge eggs={!count(taps, "eggs") && !used.includes("eggs")} juice={!count(taps, "juice")} />
       </g>
     </>
@@ -329,7 +329,7 @@ export function Kueche({ playing, used, task, taps }: RoomProps) {
           <EggBasket eggs={2 - t("crack")} milk={!t("milk")} />
         </g>
       )}
-      <g transform={`translate(${BOWL_X} -94)`}>
+      <g data-wish="bowl" transform={`translate(${BOWL_X} -94)`}>
         <Bowl eggs={t("crack")} milk={t("milk") > 0} flour={t("flour")} mixed={t("mix")} poured={t("pour")}>
           {mixing && (
             <g transform="translate(0 -8)">
@@ -377,7 +377,7 @@ export function Kueche({ playing, used, task, taps }: RoomProps) {
         </>
       )}
       {!mugHeld && (
-        <g transform={`translate(${MUG_X} -94) scale(0.9)`}>
+        <g data-wish="mug" transform={`translate(${MUG_X} -94) scale(0.9)`}>
           <Mug steam={t("milkpour") > 0 && t("blow") < 2} empty={!t("milkpour") || used.includes("milk")} spoon={task === "stir"} />
         </g>
       )}
@@ -440,7 +440,7 @@ export function Kinderzimmer({ playing, taps }: RoomProps) {
       <path d="M704 -40 l10 -10 l10 10 l10 -10 l10 10 l10 -10 l10 10" stroke="#fff" strokeWidth="3" fill="none" opacity="0.6" />
       {/* A sheet of paper on the toy box, for the boat */}
       {count(taps, "fold") < 2 && (
-        <g transform="translate(738 -70)">
+        <g data-wish="boat" transform="translate(738 -70)">
           <g key={count(taps, "fold")} className="el-pop-in">
             <PaperFold stage={count(taps, "fold") * 2} />
           </g>
@@ -450,14 +450,14 @@ export function Kinderzimmer({ playing, taps }: RoomProps) {
       <rect x="868" y="-176" width="44" height="10" rx="4" fill="#a0662f" />
       <circle cx="890" cy="-166" r="5" fill="#868e96" />
       {!count(taps, "coat") && (
-        <g transform="translate(890 -20) scale(0.95)">
+        <g data-wish="coat" transform="translate(890 -20) scale(0.95)">
           <Raincoat />
         </g>
       )}
       {/* Peg with the chef's hat */}
       <rect x="966" y="-128" width="38" height="8" rx="4" fill="#a0662f" />
       {!count(taps, "chefhat") && (
-        <g transform="translate(985 -122) scale(0.9)">
+        <g data-wish="chefhat" transform="translate(985 -122) scale(0.9)">
           <ChefHat />
         </g>
       )}
@@ -495,7 +495,7 @@ export function Terrasse({ playing, used, taps }: RoomProps) {
       <Plant x={970} pot="#1c7ed6" />
       <Plant x={430} size={0.7} pot="#f08c00" />
       <Floorboards colour="#c88b3a" line="#a0662f" />
-      <g transform="translate(640 0)">
+      <g data-wish="table" transform="translate(640 0)">
         <Table feast={feast} jam={count(taps, "spread")} bites={count(taps, "bite")} open={count(taps, "lid") > 0} />
       </g>
     </>
@@ -537,7 +537,7 @@ export function Wohnzimmer({ used, taps }: RoomProps) {
       {/* Sofa */}
       <rect x="300" y="-122" width="320" height="70" rx="26" fill="#f06595" />
       {teddy && (
-        <g transform="translate(520 -58) scale(0.85)">
+        <g data-wish="teddy" transform="translate(520 -58) scale(0.85)">
           <Teddy />
         </g>
       )}
@@ -599,7 +599,7 @@ export function Bad({ playing, task, taps }: RoomProps) {
       <rect x="720" y="-64" width="20" height="64" fill="#fff" stroke="#ced4da" strokeWidth="3" />
       <path d="M730 -94 V-108 H744" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" fill="none" />
       <rect x="772" y="-108" width="70" height="8" rx="3" fill="#adb5bd" />
-      <g transform="translate(796 -108) scale(0.8)">
+      <g data-wish="toothcup" transform="translate(796 -108) scale(0.8)">
         <ToothCup brush={playing !== "teeth" || count(taps, "rinse") > 0} />
       </g>
       <g className={task === "scrub" ? "el-foam-bits on" : "el-foam-bits"} fill="#fff" stroke="#a5d8ff" strokeWidth="2">
@@ -616,7 +616,7 @@ export function Bad({ playing, task, taps }: RoomProps) {
       <g transform="translate(985 0)">
         <Toilet flushing={task === "toilet" && count(taps, "toilet") > 0} />
       </g>
-      <g className={bathing ? "el-tub bathing" : "el-tub"} transform="translate(330 -4)">
+      <g className={bathing ? "el-tub bathing" : "el-tub"} data-wish="tub" transform="translate(330 -4)">
         <Tub
           soap={count(taps, "soap")}
           quack={count(taps, "duck")}
@@ -660,7 +660,7 @@ export function Schlafzimmer({ playing, used, taps }: RoomProps) {
       <ellipse cx="560" cy="-8" rx="180" ry="12" fill="#b197fc" opacity="0.5" />
       {slippers < 1 && <ellipse cx="390" cy="-8" rx="16" ry="7" fill="#f783ac" />}
       {slippers < 2 && <ellipse cx="416" cy="-6" rx="16" ry="7" fill="#f783ac" />}
-      <g transform="translate(560 0)">
+      <g data-wish="bed" transform="translate(560 0)">
         <Bed
           sleeper={
             sleeping ? (
@@ -688,7 +688,7 @@ export function Schlafzimmer({ playing, used, taps }: RoomProps) {
         )}
       </g>
       {!count(taps, "pyjama") && (
-        <g transform="translate(650 -84) scale(0.8)">
+        <g data-wish="pyjama" transform="translate(650 -84) scale(0.8)">
           <Pyjama />
         </g>
       )}
@@ -715,7 +715,7 @@ export function Flur({ task, taps }: RoomProps) {
       {/* Peg with the rain hat */}
       <rect x="276" y="-182" width="28" height="8" rx="3" fill="#a0662f" />
       {!count(taps, "hat") && (
-        <g transform="translate(290 -142)">
+        <g data-wish="hat" transform="translate(290 -142)">
           <RainHat />
         </g>
       )}
@@ -739,7 +739,7 @@ export function Flur({ task, taps }: RoomProps) {
       <rect x="540" y="-40" width="190" height="8" rx="3" fill="#a0662f" />
       <rect x="544" y="-84" width="10" height="84" fill="#8d5a2b" />
       <rect x="716" y="-84" width="10" height="84" fill="#8d5a2b" />
-      <g transform="translate(630 -84)">
+      <g data-wish="boots" transform="translate(630 -84)">
         <Boots left={boots < 1} right={boots < 2} />
       </g>
       <path d="M570 -40 Q570 -60 590 -60 H604 Q620 -52 630 -48 V-40 Z" fill="#4dabf7" />
@@ -795,7 +795,7 @@ export function Dachboden({ taps }: RoomProps) {
       <rect x="320" y="-60" width="20" height="18" rx="3" fill="#fab005" />
       {/* Umbrella stand */}
       {!count(taps, "umbrella") && (
-        <g transform="translate(620 -40)">
+        <g data-wish="umbrella" transform="translate(620 -40)">
           <Umbrella />
         </g>
       )}
@@ -875,7 +875,7 @@ export function Garten({ playing, used, task, taps }: RoomProps) {
       <g transform="translate(330 0)">
         <Puddle width={120} />
       </g>
-      <g className={splashing ? "el-puddle splashing" : "el-puddle"} transform="translate(600 0)">
+      <g className={splashing ? "el-puddle splashing" : "el-puddle"} data-wish="rain" transform="translate(600 0)">
         <Puddle width={240} boat={sailing || used.includes("splash")} drift={sailing ? count(taps, "puff") * 1.5 : 3} />
       </g>
       <g transform="translate(820 0)">

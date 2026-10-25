@@ -615,30 +615,6 @@ export function Puddle({ width = 150, boat = false, drift = 3 }: { width?: numbe
   );
 }
 
-/** For the bubble: a rain cloud over a puddle with a splash. */
-export function RainPuddle() {
-  return (
-    <>
-      <ellipse cx="0" cy="-8" rx="66" ry="12" fill="#74c0fc" stroke="#4dabf7" strokeWidth="3" />
-      {[-1, 1].map((s) => (
-        <ellipse key={s} cx={s * 28} cy="-30" rx="7" ry="11" fill="#a5d8ff" stroke="#4dabf7" strokeWidth="2" transform={`rotate(${s * 30} ${s * 28} -30)`} />
-      ))}
-      <g transform="translate(-6 0) scale(0.4)">
-        <Boots />
-      </g>
-      {[-40, -16, 12, 38].map((x, i) => (
-        <path key={x} d={`M${x} ${-58 + (i % 2) * 8} q-5 9 0 12 q5 -3 0 -12 Z`} fill="#4dabf7" />
-      ))}
-      <g fill="#adb5bd">
-        <circle cx="-34" cy="-84" r="18" />
-        <circle cx="-6" cy="-96" r="24" />
-        <circle cx="26" cy="-86" r="18" />
-        <rect x="-48" y="-84" width="86" height="18" rx="9" />
-      </g>
-    </>
-  );
-}
-
 /** A tower of wooden blocks; it wobbles while the brother cheers. */
 export function Blocks() {
   const blocks: [number, number, string][] = [
