@@ -85,6 +85,10 @@ Schritte in dieser Reihenfolge), `…-nein` (die nicht so gute Idee neben Schrit
 (alle fröhlich, das Bild am Schluss) – jeweils mit zweitem Frame `…-b`. Neben Schritt 2 und 3
 stehen `…-nein-2` und `…-nein-3` (nur ein Frame; erzeugt mit dem guten Schritt als `--ref`).
 
+Erwachsene (Erzieherin, großer Bär) sind erst im Bild, wenn ein Schritt sie holt oder ruft: kommt „Hilfe
+holen“ erst noch, zeigen `…-passiert` und die Bilder davor nur die Kinder – sonst fragt man sich, warum
+der Bär Hilfe holen soll, wenn sie schon danebensteht. Eine nicht so gute Idee zeigt dieselben Kinder wie die Szene davor.
+
 ### Nicht so gute Ideen bei Schritt 2 und 3
 
 Vor jeden Prompt: Stilblock, Figuren und „This is the not-so-good idea: the action must be clearly
@@ -92,9 +96,9 @@ visible, but gentle – no injuries, no blood. Use the reference only for the ch
 
 | Datei          | Prompt                                                                                                                                                                                                                         |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `push-nein-2`  | Playground, grass, a tree. The little bear throws a handful of sand at the fox; the fox covers his eyes and cries.                                                                                                             |
-| `push-nein-3`  | Playground. The little bear angrily stomps on the fox's toy bucket and flattens it. The fox stands next to it and cries.                                                                                                       |
-| `kick-nein-2`  | Playground. The little bear pulls the fox's ear hard, angry face. The fox cries.                                                                                                                                               |
+| `push-nein-2`  | Playground, grass, a tree. Only the little bear and the fox. The little bear throws a handful of sand at the fox; the fox covers his eyes and cries.                                                                           |
+| `push-nein-3`  | Playground. No grown-ups. The little bear angrily stomps on the fox's toy bucket and flattens it. The fox stands next to it and cries.                                                                                         |
+| `kick-nein-2`  | Playground. No grown-ups. The little bear pulls the fox's ear hard, angry face. The fox cries.                                                                                                                                 |
 | `kick-nein-3`  | Playground. Only the little bear and the fox. The little bear has snatched the fox's green cap off his head and throws it away with a big arm swing; the cap flies towards a muddy puddle. The fox reaches after it and cries. |
 | `grab-nein-2`  | Sandbox, a red toy tractor. The little bear hits the fox on the arm to get the tractor back, angry face. The fox cries and still holds the tractor.                                                                            |
 | `grab-nein-3`  | Sandbox. The little bear holds the red toy tractor tight and points away with his other paw, sending the fox away. The fox walks off alone, sad, head down.                                                                    |
@@ -199,16 +203,16 @@ der Trennfarbe am Rand beider Frames gleich wegschneiden, damit sie deckungsglei
 
 ### Hingefallen (`fall`) – Spielplatz, Wiese, ein Baum
 
-| Datei           | Prompt                                                                                                                                                               |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `fall-passiert` | The little bear has fallen down while running: he sits on the grass and holds his knee, crying. A small red scrape on the knee, no blood.                            |
-| `fall-1`        | „Hilfe rufen“ – The little bear sits on the grass, holds his knee and calls out loud with one paw raised. The teacher comes running towards him.                     |
-| `fall-2`        | „Pflaster drauf“ – The teacher kneels and puts a colourful plaster on the little bear's knee. The bear watches, calmer, sniffing.                                    |
-| `fall-3`        | „Langsam weiterspielen“ – The fox helps the little bear up with his paw; the bear has a plaster on his knee. They roll a ball to each other, slowly and carefully.   |
-| `fall-nein`     | „Strampeln und schreien“ – The little bear lies on the grass in a big tantrum, kicking his legs and screaming, while the teacher stands next to him and cannot help. |
-| `fall-nein-2`   | The little bear pulls the plaster off his knee and makes an ouch face. The teacher looks worried.                                                                    |
-| `fall-nein-3`   | The little bear with a plaster on his knee runs wildly and fast again and is about to trip over a root. The fox looks worried.                                       |
-| `fall-ende`     | The little bear proudly shows his colourful plaster on the knee and laughs; the fox and the teacher smile.                                                           |
+| Datei           | Prompt                                                                                                                                                                                                                                    |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fall-passiert` | No grown-ups. The little bear has fallen down while running: he sits on the grass and holds his knee, crying. A small red scrape on the knee, no blood. The fox, the bunny and the little hedgehog stand around him, worried.             |
+| `fall-1`        | „Hilfe rufen“ – The little bear sits on the grass, holds his knee and calls out loud with one paw raised. The teacher comes running towards him.                                                                                          |
+| `fall-2`        | „Pflaster drauf“ – The teacher kneels and puts a colourful plaster on the little bear's knee. The bear watches, calmer, sniffing.                                                                                                         |
+| `fall-3`        | „Langsam weiterspielen“ – The fox helps the little bear up with his paw; the bear has a plaster on his knee. They roll a ball to each other, slowly and carefully.                                                                        |
+| `fall-nein`     | „Strampeln und schreien“ – Same scene and children as `fall-passiert` (`--ref`), no grown-ups. The little bear lies on the grass in a big tantrum, kicking his legs and screaming; the fox, the bunny and the hedgehog look on, helpless. |
+| `fall-nein-2`   | The little bear pulls the plaster off his knee and makes an ouch face. The teacher looks worried.                                                                                                                                         |
+| `fall-nein-3`   | The little bear with a plaster on his knee runs wildly and fast again and is about to trip over a root. The fox looks worried.                                                                                                            |
+| `fall-ende`     | The little bear proudly shows his colourful plaster on the knee and laughs; the fox and the teacher smile.                                                                                                                                |
 
 ### Hört nicht auf (`stop`) – Spielplatz, Wiese, ein Baum
 
