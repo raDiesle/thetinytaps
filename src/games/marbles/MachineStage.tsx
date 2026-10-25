@@ -77,7 +77,7 @@ export function MachineStage({
   );
 }
 
-/** The bouncing finger that says „tap here“, until the machine starts. */
+/** The still finger that says „tap here“, until the machine starts. */
 export function TapHint({ t, x, y }: { t: number; x: number; y: number }) {
   if (t >= 0) return null;
   return (
