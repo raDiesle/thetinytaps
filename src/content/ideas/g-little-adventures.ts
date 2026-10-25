@@ -24,6 +24,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Der Ball rollt die Straße hinunter: an der Ampel den Knopf drücken und auf Grün warten, über den Zebrastreifen, am Bäcker vorbei (Brezel für den Hund), durch den Park, die Rutsche hinunter – unten liegt er im Sandkasten. Beutel: Brezel, Schaufel, Gießkanne.",
       why: "Die eigene Straße als Abenteuer; Ampel und Zebrastreifen nebenbei.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-03",
@@ -32,6 +33,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Ein roter Luftballon fliegt davon, über Dächer und Bäume. Das Kind folgt ihm über den Markt (Obststand), am Teich mit Enten (Brot) vorbei, über eine Hängebrücke und eine lange Treppe bis zum Kirchturm, wo eine Taube ihn festhält.",
       why: "Ein Ziel, das man immer am Himmel sieht – leicht zu verstehen.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-04",

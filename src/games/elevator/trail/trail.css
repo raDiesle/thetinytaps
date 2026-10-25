@@ -180,7 +180,113 @@
   transform-origin: 0 0;
 }
 
+/* ---------- "Der Ball rollt weg" ---------- */
+
+/* The child presses the button: its lamp blinks while the light is red. */
+.tl-ball-signal {
+  animation: tl-ball-blink 0.4s ease-in-out 6 alternate;
+}
+
+/* With the pretzel, the dog goes back to its door and wags. */
+.tl-ball-dog {
+  transition: transform 1.4s ease-in-out;
+}
+
+.tl-ball-dog.done {
+  transform: translate(70px, -40px) scale(0.85);
+}
+
+.tl-ball-dog.done .tl-ball-dog-tail {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: tl-wag 0.25s ease-in-out 12 alternate;
+}
+
+.tl-ball-dog.done .tl-ball-dog-head {
+  animation: tl-munch 0.5s ease-in-out 6 alternate;
+}
+
+/* The sunflowers hang their heads over the path; watered, they stand up one after the other. */
+.tl-ball-flower {
+  transform: rotate(-64deg);
+  transform-origin: 0 0;
+  transition: transform 1.6s cubic-bezier(0.3, 1.4, 0.6, 1);
+}
+
+.tl-ball-flower.up {
+  transform: rotate(0deg);
+}
+
+.tl-ball-pour {
+  animation: tl-ball-away 2.4s ease-in both;
+}
+
+.tl-ball-drops {
+  opacity: 0;
+  animation: tl-ball-drop 0.5s ease-in 4;
+}
+
+/* The shovel digs, the sand heap flies away. */
+.tl-ball-dig {
+  transform-origin: 0 0;
+  animation:
+    tl-ball-shovel 0.4s ease-in-out 4 alternate,
+    tl-ball-away 2s ease-in both;
+}
+
+.tl-ball-heap {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: tl-ball-scatter 1.4s ease-in both;
+}
+
 /* ---------- Keyframes ---------- */
+
+@keyframes tl-ball-blink {
+  to {
+    fill: #ffd43b;
+  }
+}
+
+@keyframes tl-ball-away {
+  80% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes tl-ball-drop {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(70px);
+  }
+}
+
+@keyframes tl-ball-shovel {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(40deg) translateY(-20px);
+  }
+}
+
+@keyframes tl-ball-scatter {
+  50% {
+    transform: translateY(-30px) scale(1.1, 0.6);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-50px) scale(1.4, 0.1);
+    opacity: 0;
+  }
+}
 
 @keyframes tl-slot-hop {
   from {
@@ -294,5 +400,51 @@
   }
   to {
     transform: rotate(10deg);
+  }
+}
+
+/* ---------- „Der Luftballon“ ---------- */
+
+.tl-ballon-ducks,
+.tl-ballon-cat {
+  transition: transform 1.4s ease-in-out;
+}
+
+/* With the bread, the ducks waddle into the pond and dip for the crumbs. */
+.tl-ballon-ducks.done {
+  transform: translate(150px, -30px) scale(0.7);
+}
+
+.tl-ballon-ducks.done .tl-ballon-duck-head,
+.tl-ballon-dove.done .tl-ballon-dove-head {
+  animation: tl-munch 0.4s ease-in-out 1.4s 8 alternate;
+}
+
+.tl-nope .tl-ballon-duck-head,
+.tl-nope .tl-ballon-dove-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The sprinkler's water runs while the child stands there. */
+.tl-ballon-spray.on path {
+  animation: tl-ballon-spray 0.5s linear 12;
+}
+
+/* With the fish, the cat jumps onto the wall, eats and swishes its tail. */
+.tl-ballon-cat.done {
+  transform: translate(10px, -80px) scale(0.9);
+}
+
+.tl-ballon-cat.done .tl-ballon-cat-tail {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: tl-wag 0.3s ease-in-out 1.4s 10 alternate;
+}
+
+@keyframes tl-ballon-spray {
+  to {
+    stroke-dashoffset: -28;
   }
 }

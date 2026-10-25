@@ -62,12 +62,13 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
     expect(freeing).toEqual([level.stations[level.stations.length - 1]]);
   });
 
-  test("the steps of stairs lie on the ground, going up", () => {
+  test("the steps of stairs and slides lie on the ground", () => {
     for (const station of level.stations) {
       if (station.kind !== "climb") continue;
       expect(station.steps.length).toBeGreaterThan(0);
       for (const [x, y] of station.steps) expect(groundY(level.ground, x)).toBe(y);
       expect(station.steps[0][0]).toBeGreaterThan(station.x);
+      for (const [x, y] of station.slide ?? []) expect(groundY(level.ground, x)).toBe(y);
     }
   });
 });
