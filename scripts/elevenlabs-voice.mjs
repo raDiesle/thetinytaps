@@ -79,20 +79,23 @@ function apiKey() {
   return key;
 }
 
-async function call(path, { body, query } = {}) {
+async function call(path, { body, query, soft = false } = {}) {
   const url = `${API}${path}${query ? `?${new URLSearchParams(query)}` : ""}`;
   const response = await fetch(url, {
     method: body ? "POST" : "GET",
     headers: { "xi-api-key": apiKey(), ...(body ? { "content-type": "application/json" } : {}) },
     body: body ? JSON.stringify(body) : undefined,
   });
+  if (soft && !response.ok) return null;
   if (!response.ok) fail(`${path}: ${response.status} ${await response.text()}`);
   return response;
 }
 
-/** Characters used and allowed this month. */
+/** Characters used and allowed this month; null if the key may not read them (it needs "User: Read"). */
 async function credits() {
-  const { character_count: used, character_limit: limit } = await (await call("/user/subscription")).json();
+  const response = await call("/user/subscription", { soft: true });
+  if (!response) return null;
+  const { character_count: used, character_limit: limit } = await response.json();
   return { used, limit, left: limit - used };
 }
 
@@ -199,20 +202,22 @@ async function make() {
   }
   if (!todo.length) return;
   const before = await credits();
-  if (before.left < characters) fail(`Only ${before.left} credits left this month, ${characters} needed`);
+  if (!before) console.log('The key may not read the credits ("User: Read" on elevenlabs.io), so they are not checked.');
+  else if (before.left < characters) fail(`Only ${before.left} credits left this month, ${characters} needed`);
   for (const [i, line] of todo.entries()) {
     mkdirSync(line.story.folder, { recursive: true });
     writeFileSync(line.file, await record(config, spoken(line), Number.parseInt(voiceId(line.text), 16)));
     console.log(`${i + 1}/${todo.length}  ${line.text}`);
   }
   const after = await credits();
-  console.log(`Used ${after.used - before.used} credits, ${after.left} left this month.`);
+  if (before && after) console.log(`Used ${after.used - before.used} credits, ${after.left} left this month.`);
 }
 
 const COMMANDS = {
   credits: async () => {
-    const { used, limit, left } = await credits();
-    console.log(`${left} of ${limit} credits left (${used} used)`);
+    const left = await credits();
+    if (!left) fail('The key may not read the credits: give it "User: Read" on elevenlabs.io → Developers → API Keys');
+    console.log(`${left.left} of ${left.limit} credits left (${left.used} used)`);
   },
   design,
   save,
