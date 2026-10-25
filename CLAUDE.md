@@ -12,7 +12,7 @@ yarn test          # unit tests only (Rstest, ~1 s); yarn test:watch while worki
 yarn build         # production build into out/
 yarn image ...     # picture with Gemini, see /bild-erzeugen
 yarn song ...      # measure a song from Suno, see /musik-erzeugen
-yarn frames        # do the two frames of each moving picture stay the same scene?
+yarn frames        # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.

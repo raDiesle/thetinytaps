@@ -63,5 +63,8 @@ Bärs Pfote“ is wrong), no full stop.
 New or changed pictures: `/bild-erzeugen` (`yarn image`); file names and prompts
 are listed in `bilder/README.md`. Grown-ups are only in a picture once a step fetched
 them; a second frame only moves a little and is drawn from the first (`--ref`),
-never as a grid pair – `yarn frames` lists pairs that jump. `feelings.test.ts` fails when a story or the
+never as a grid pair – `yarn frames` lists pairs that jump. Within a story only what
+the characters do changes: every picture is drawn from the story's first one
+(`…-passiert`, `baer-…`) as the only `--ref`, with the same cast and background –
+`yarn frames --scenes` lists pictures whose background drifted. `feelings.test.ts` fails when a story or the
 bear asks for a picture that is not in `bilder/`.
