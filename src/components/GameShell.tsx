@@ -4,6 +4,8 @@ import { FullscreenExit } from "@/components/FullscreenButton";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
 import { categoryHref, categoryOf } from "@/content/games";
+import { useBackgroundMusic } from "@/lib/backgroundMusic";
+import { useCommonSettings } from "@/lib/common";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { DEFAULT_PLAYTIME_SETTINGS, isPlaytimeOver, playedToday, PLAYTIME_SETTINGS_KEY, resetPlaytime, usePlaytime } from "@/lib/playtime";
@@ -64,6 +66,10 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
   // Bumped when the grown-up starts the play time afresh, to show it at once.
   const [, setResets] = useState(0);
   const grid = useFitGrid(modes?.length ?? 0, modes?.filter((m) => m.featured).length);
+  const [common] = useCommonSettings();
+  // The child's first tap or key in the game: the background song starts only then, not on "Los".
+  const [acted, setActed] = useState(false);
+  useBackgroundMusic({ enabled: playing && common.music && !playtime.over, started: acted });
 
   const start = async () => {
     // These need the click as a user gesture, so run them before any await.
@@ -76,6 +82,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
   const stop = () => {
     stopSpeaking();
     setPlaying(false);
+    setActed(false);
     // Only the keyboard lock ends: fullscreen stays on, the menus are part of the app too.
     exitKidMode();
   };
@@ -89,7 +96,10 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
     // Capture phase so this runs before the game's own handlers.
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
-      if (e.key !== "Escape") return;
+      if (e.key !== "Escape") {
+        setActed(true);
+        return;
+      }
       if (!e.repeat) escDownAt = performance.now();
       else if (escDownAt !== null && performance.now() - escDownAt >= ESC_HOLD_MS) stopRef.current();
     };
@@ -116,7 +126,14 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
   if (playing) {
     return (
       // Resuming audio on any tap helps after a reload, when no "Los" click unlocked it.
-      <div className="play-area" onPointerDownCapture={unlockAudio}>
+      <div
+        className="play-area"
+        onPointerDownCapture={(e) => {
+          unlockAudio();
+          // Holding ✕ to leave is no reason to start the music.
+          if (!(e.target as Element).closest(".exit-corner")) setActed(true);
+        }}
+      >
         {playtime.over ? <GoodNight /> : children}
         {!playtime.over && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
         <ExitButton onExit={stop} label="Zurück zum Menü" />

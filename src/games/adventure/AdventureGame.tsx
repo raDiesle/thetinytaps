@@ -1,7 +1,7 @@
 import { GameShell } from "@/components/GameShell";
 import { SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
-import { useGameSettings } from "@/lib/common";
+import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { AdventurePlay } from "./AdventurePlay";
 import { ADVENTURE_SETTINGS_KEY, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
@@ -11,6 +11,7 @@ carryOverAdventureSettings();
 
 export function AdventureGame() {
   const [settings, update] = useGameSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
+  const [common] = useCommonSettings();
   const { touchOnly } = useDevice();
   const story = TREASURE_ISLAND;
 
@@ -41,6 +42,7 @@ export function AdventureGame() {
             onChange={(outline) => update({ outline })}
           />
           <Toggle label="Musik" checked={settings.music} onChange={(music) => update({ music })} />
+          {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
           {!touchOnly && (
             <p className="setting-note">
               Oben links: pausieren und zur vorigen oder nächsten Bewegung springen; ein Bild unten springt zu dieser Bewegung. Mit Tastatur: <kbd>←</kbd>{" "}
@@ -50,7 +52,8 @@ export function AdventureGame() {
         </SettingsGroup>
       }
     >
-      <AdventurePlay story={story} speechLang={de.speechLang} settings={settings} />
+      {/* Its own music, which plays only while music is on for all games too. */}
+      <AdventurePlay story={story} speechLang={de.speechLang} settings={{ ...settings, music: settings.music && common.music }} />
     </GameShell>
   );
 }

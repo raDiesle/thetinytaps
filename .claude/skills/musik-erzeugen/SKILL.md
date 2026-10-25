@@ -102,11 +102,13 @@ end, and where a finale starts.
 ## 3. Convert and put it in
 
 ```bash
-ffmpeg -i Song.wav -af "loudnorm=I=-16:TP=-1.5:LRA=11" -ar 44100 -c:a libmp3lame -b:a 128k -map_metadata -1 src/games/<game>/musik/<name>.mp3
+ffmpeg -i Song.wav -af "loudnorm=I=-16:TP=-1.5:LRA=11" -ar 44100 -c:a libmp3lame -b:a 128k -map_metadata -1 src/games/<game>/musik/musik-<name>.mp3
 ```
 
-- 128 kbit/s stereo ≈ 1 MB per minute. The service worker keeps every built file
-  offline on every device, so keep songs at about 2–2.5 minutes.
+- Name it `musik-<name>.mp3`: the service worker leaves songs out of its offline copy
+  and keeps one only once a page has fetched it, so nothing is downloaded while
+  music is off on the home page. 128 kbit/s stereo ≈ 1 MB per minute; keep songs at
+  about 2–2.5 minutes.
 - `musik/README.md` in the game folder: file, source (Suno, date), terms. Commit the
   MP3, never the WAV.
 
@@ -124,9 +126,11 @@ and returns `{ fade, stop }`. Build a small hook like `useBrushingMusic` in
   game's clock changes (pause, jumps), stop when paused;
 - duck while the voice speaks: poll `speechSynthesis.speaking` every ~150 ms and
   `fade` to a low volume; `VOLUME` ≈ 0.35, ducked ≈ 0.08 for a song at −16 LUFS;
-- a "Musik" toggle in the game's settings. Music is off by default in the games
-  unless the user asks otherwise (Zähne putzen: on, by request). Nothing plays before
-  the child or parent starts the game.
+- `useNoBackgroundMusic()` in the game's Play component, so the shared background
+  song (`src/lib/backgroundMusic.ts`) stops while the game's own one plays;
+- a "Musik" toggle in the game's settings, and play only while `music` in the common
+  settings is on too (switch "🎵 Musik" on the home page – off means no song is even
+  downloaded; see `TeethGame.tsx`). Nothing plays before the child or parent starts the game.
 
 ## 5. Check
 
