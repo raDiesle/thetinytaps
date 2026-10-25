@@ -82,6 +82,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "An einer Kreuzung zeigen zwei Bilder zwei Wege: Treppe hoch oder Tunnel durch. Das Kind tippt einen, beide führen ans Ziel, nur mit anderen Dingen unterwegs. Beim nächsten Mal kann es den anderen Weg nehmen.",
       why: "Eigene Entscheidung ohne Falsch; jedes Mal ein etwas anderes Abenteuer.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-10",

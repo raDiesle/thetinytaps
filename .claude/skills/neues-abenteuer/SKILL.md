@@ -83,6 +83,12 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
 - **`moment`** – something that happens by itself when the child gets there, no bag:
   `pose` (what the child does), `sounds` + `ms`; then it is `done`. Ball: the child
   presses the button at the traffic light and it turns green.
+- **`fork`** – two `ways` that both lead on (G-09, „Die kleine Lok“): each way has an
+  `id`, a `Sign` picture (stairs, a tunnel) shown on a round sign at `sign`, a spoken
+  `say`, its own `stations`, and optionally its own `ground` (with its stairs) that must
+  be the level's ground before the fork and after the way. The child taps a sign or 1 / 2;
+  the level draws only the signpost. Put the first station of each way within ~800
+  points of the fork, so both ghosts are on the screen. Ways contain no further forks.
 
 The world drawing (`drachen.tsx`) exports the ground constants, `<Level>Scenery` and
 `<Level>Backdrop`. `Scenery` gets `{ done, here, nope }` and draws every station from

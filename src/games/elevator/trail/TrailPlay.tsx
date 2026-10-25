@@ -8,9 +8,9 @@ import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, ThoughtBubble, type Pose } from "../kid";
 import type { ElevatorSettings } from "../settings";
-import { groundY, route } from "./ground";
+import { allStations, groundY, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId } from "./items";
-import type { Climb, Cue, Flight, Moment, Obstacle, Pickup, Point, TrailLevel } from "./types";
+import type { Climb, Cue, Flight, Fork, Moment, Obstacle, Pickup, Point, Station, TrailLevel, Way } from "./types";
 import "./trail.css";
 
 const VIEW_W = 1600;
@@ -49,6 +49,8 @@ const EDGE = 18;
 const KID_LEFT = KID_AT[0] - 80;
 /** The footprints to where the child goes next are this far apart. */
 const PRINT_GAP = 62;
+/** The round picture sign of each way at a fork. */
+const WAY_R = 66;
 
 /** Where the bag and the action button are on the screen, in the picture's units. */
 interface Hud {
@@ -158,6 +160,8 @@ interface View {
   action: { nudge: number; next: Next } | null;
   /** The thought bubble with the goal; `nudge` counts the reminders. */
   bubble: { nudge: number } | null;
+  /** At a fork: the child picks a way by its sign; each shows where it goes first. `nudge` makes the signs hop. */
+  fork: { id: string; ways: Next[]; nudge: number } | null;
   party: boolean;
 }
 
@@ -174,6 +178,7 @@ const startView = (level: TrailLevel): View => ({
   shake: 0,
   action: null,
   bubble: null,
+  fork: null,
   party: false,
 });
 
@@ -224,6 +229,10 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const tapper = useRef<(() => void) | null>(null);
   /** Set while the bag is open: it gets the slot. */
   const chooser = useRef<((slot: number) => void) | null>(null);
+  /** Set at a fork while the child picks a way: it gets the way's number. */
+  const picker = useRef<((way: number) => void) | null>(null);
+  /** The ground the child walks on: the level's, and from a fork on the picked way's. */
+  const ground = useRef(level.ground);
 
   // The goal (the kite, the ball, the balloon) moves along curves, so it is moved frame by frame, not by React.
   const goalEl = useRef<SVGGElement>(null);
@@ -322,7 +331,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   /** Walks the child along the ground to `x`; the world scrolls along. */
   const walkTo = async (x: number) => {
-    for (const [px, py] of route(level.ground, viewRef.current.kid.x, x)) {
+    for (const [px, py] of route(ground.current, viewRef.current.kid.x, x)) {
       const k = viewRef.current.kid;
       const ms = Math.hypot(px - k.x, py - k.y) * WALK_MS;
       if (ms < 1) continue;
@@ -351,15 +360,29 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     }
   };
 
-  /** Footprints along the ground from the child to `x`, then one on each of `steps`. */
-  const printsTo = (x: number, steps: Point[] = []): Point[] => {
+  /** Footprints along `on` (the ground) from the child to `x`, then one on each of `steps`. */
+  const printsTo = (x: number, steps: Point[] = [], on = ground.current): Point[] => {
     const prints: Point[] = [];
-    for (let px = viewRef.current.kid.x + PRINT_GAP; px < x - PRINT_GAP / 2; px += PRINT_GAP) prints.push([px, groundY(level.ground, px)]);
+    for (let px = viewRef.current.kid.x + PRINT_GAP; px < x - PRINT_GAP / 2; px += PRINT_GAP) prints.push([px, groundY(on, px)]);
     return [...prints, ...steps];
   };
 
   /** Walking on to `x` and doing `pose` there, shown before the tap. */
-  const nextAt = (x: number, pose: Pose, icon: Next["icon"]): Next => ({ prints: printsTo(x), ghost: [x, groundY(level.ground, x)], pose, icon });
+  const nextAt = (x: number, pose: Pose, icon: Next["icon"], on = ground.current): Next => ({
+    prints: printsTo(x, [], on),
+    ghost: [x, groundY(on, x)],
+    pose,
+    icon,
+  });
+
+  /** What the first tap at `station` does: for stairs, walking there and up the first half of the steps. */
+  const nextOf = (station: Station, on = ground.current): Next => {
+    if (station.kind === "pickup") return nextAt(station.x, "reach", station.item, on);
+    if (station.kind === "moment") return nextAt(station.x, station.pose, "walk", on);
+    if (station.kind === "obstacle") return nextAt(station.x, "stand", "walk", on);
+    const half = station.steps.slice(0, Math.ceil(station.steps.length / 2));
+    return { prints: printsTo(station.x, half, on), ghost: half[half.length - 1], pose: "stand", icon: "climb" };
+  };
 
   /** The action button lights up until the child taps (it, anywhere, or any key), and footprints and the child's
    * ghost show where the tap takes it; after a while it jumps again and the bubble reminds the child of the goal. */
@@ -376,8 +399,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     put({ action: null, bubble: null });
   };
 
-  const pickup = async (station: Pickup) => {
-    await go(nextAt(station.x, "reach", station.item));
+  // Each station starts with a tap that walks there, unless the child already tapped its way at a fork (`picked`).
+  const pickup = async (station: Pickup, picked: boolean) => {
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     say(station.ask);
     kid({ pose: "reach" });
@@ -394,8 +418,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   const nextChoice = () => new Promise<number>((resolve) => (chooser.current = resolve));
 
-  const obstacle = async (station: Obstacle) => {
-    await go(nextAt(station.x, "stand", "walk"));
+  const obstacle = async (station: Obstacle, picked: boolean) => {
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     put({ here: station.id, choosing: true, shake: viewRef.current.shake + 1 });
     cue(station.meet);
@@ -439,10 +463,10 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   };
 
   /** Two taps: the first walks to the stairs and climbs half of them, the second the rest; a note per step. */
-  const climb = async (station: Climb) => {
+  const climb = async (station: Climb, picked: boolean) => {
     const half = Math.ceil(station.steps.length / 2);
     const { steps } = station;
-    await go({ prints: printsTo(station.x, steps.slice(0, half)), ghost: steps[half - 1], pose: "stand", icon: "climb" });
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     say(station.ask);
     for (const [i, [x, y]] of steps.entries()) {
@@ -471,8 +495,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   };
 
   /** The child gets there and something happens by itself (the light turns green); the walk was the tap. */
-  const moment = async (station: Moment) => {
-    await go(nextAt(station.x, station.pose, "walk"));
+  const moment = async (station: Moment, picked: boolean) => {
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     put({ here: station.id });
     kid({ pose: station.pose });
@@ -486,6 +510,36 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     say(station.done);
     await wait(900);
     kid({ pose: "stand" });
+  };
+
+  const station = (s: Station, picked = false) => {
+    if (s.kind === "pickup") return pickup(s, picked);
+    if (s.kind === "obstacle") return obstacle(s, picked);
+    if (s.kind === "moment") return moment(s, picked);
+    return climb(s, picked);
+  };
+
+  /** Two ways: the child walks to the fork, then both ways show where they go first (footprints to a ghost each)
+   * and the child taps a sign (or 1 / 2). The picked way's stations follow, starting right away. */
+  const fork = async (at: Fork) => {
+    await go(nextAt(at.x, "stand", "walk"));
+    await walkTo(at.x);
+    put({ here: at.id, fork: { id: at.id, ways: at.ways.map((way) => nextOf(way.stations[0], way.ground ?? ground.current)), nudge: 0 } });
+    say(at.ask);
+    let stop = () => {};
+    const nudge = () => {
+      put((v) => ({ fork: v.fork && { ...v.fork, nudge: v.fork.nudge + 1 } }));
+      say(at.ask);
+      stop = later(NUDGE_MS, nudge);
+    };
+    stop = later(NUDGE_MS, nudge);
+    const way: Way = at.ways[await new Promise<number>((resolve) => (picker.current = resolve))];
+    stop();
+    put((v) => ({ fork: null, here: null, done: [...v.done, at.id, way.id] }));
+    if (way.ground) ground.current = way.ground;
+    sound(playPop);
+    say(way.say);
+    for (const [i, s] of way.stations.entries()) await station(s, i === 0);
   };
 
   const funBurst = useCallback(
@@ -509,12 +563,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     say(level.away.say);
     await wait(1800);
     put({ bubble: null });
-    for (const station of level.stations) {
-      if (station.kind === "pickup") await pickup(station);
-      else if (station.kind === "obstacle") await obstacle(station);
-      else if (station.kind === "moment") await moment(station);
-      else await climb(station);
-    }
+    for (const s of level.stations) await (s.kind === "fork" ? fork(s) : station(s));
     // The goal is back in the child's hands: up it goes.
     put({ party: true });
     sound(playMelody);
@@ -544,10 +593,25 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     } else funBurst(e.clientX, e.clientY);
   };
 
-  /** While the bag is open, a tap elsewhere or another key shows which thing helps. */
+  /** While the bag is open, a tap elsewhere or another key shows which thing helps; at a fork the signs hop. */
   const showHint = () => {
-    const station = level.stations.find((s) => s.id === viewRef.current.here);
-    if (station?.kind === "obstacle") put((v) => ({ hint: station.need, shake: v.shake + 1 }));
+    if (viewRef.current.fork) return put((v) => ({ fork: v.fork && { ...v.fork, nudge: v.fork.nudge + 1 } }));
+    const here = allStations(level).find((s) => s.id === viewRef.current.here);
+    if (here?.kind === "obstacle") put((v) => ({ hint: here.need, shake: v.shake + 1 }));
+  };
+
+  /** A way was picked at a fork: by its sign, its ghost, or the key 1 / 2. */
+  const pickWay = (way: number) => {
+    const pick = picker.current;
+    picker.current = null;
+    pick?.(way);
+  };
+
+  const pressWay = (way: number) => (e: PointerEvent) => {
+    if (!picker.current) return;
+    e.stopPropagation();
+    spawn(e.clientX, e.clientY);
+    pickWay(way);
   };
 
   const tapKid = (e: PointerEvent) => {
@@ -571,13 +635,15 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         return;
       }
       if (tapper.current) return tap();
+      const way = Number(e.key) - 1;
+      if (picker.current && (way === 0 || way === 1)) return pickWay(way);
       const pick = chooser.current;
       const slot = Number(e.key) - 1;
       if (pick && slot >= 0 && slot < SLOT_COUNT && v.bag[slot]) {
         chooser.current = null;
         pick(slot);
       } else {
-        if (pick) showHint();
+        if (pick || picker.current) showHint();
         funBurst();
       }
     };
@@ -592,6 +658,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   const { kid: k, flight } = view;
   const next = view.action?.next;
+  /** Where the next tap may take the child: one way, or both at a fork. */
+  const shown = next ? [next] : (view.fork?.ways ?? []);
+  const forks = level.stations.filter((s): s is Fork => s.kind === "fork");
   const { bagBox, bag, slots, action, actionBox } = hud.current;
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
@@ -611,7 +680,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
           spawn(e.clientX, e.clientY);
           return tap();
         }
-        if (chooser.current) showHint();
+        if (chooser.current || picker.current) showHint();
         funBurst(e.clientX, e.clientY);
       }}
     >
@@ -629,17 +698,47 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             </g>
           </g>
           {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
-          {next && (
-            <g key={`${next.ghost}`} className="tl-next">
-              {next.prints.map(([x, y], i) => (
+          {shown.map((n, w) => (
+            <g key={`${n.ghost}`} className="tl-next">
+              {n.prints.map(([x, y], i) => (
                 <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
               ))}
-              <g transform={`translate(${next.ghost[0]} ${next.ghost[1]})`}>
-                <g className="tl-ghost" style={{ animationDelay: `${next.prints.length * 90}ms` }}>
-                  <Kid look={HERO} pose={next.pose} holding={null} wear={[]} face={1} />
+              <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} onPointerDown={pressWay(w)}>
+                <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
+                  <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} />
                 </g>
               </g>
             </g>
+          ))}
+          {/* The picture signs of the ways at a fork: always there; while the child picks a way they hop and glow */}
+          {forks.flatMap((f) =>
+            f.ways.map(({ id, Sign, sign: [x, y] }, w) => {
+              const on = view.fork?.id === f.id;
+              return (
+                <g
+                  key={`${id}-${on ? view.fork?.nudge : "off"}`}
+                  className={`tl-way${on ? " on" : ""}`}
+                  onPointerDown={pressWay(w)}
+                  role="button"
+                  aria-label={id}
+                >
+                  <g className="tl-way-board" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${w * 120}ms` }}>
+                    <circle cx={x} cy={y} r={WAY_R + 12} className="tl-way-glow" fill="none" strokeWidth="14" />
+                    <circle cx={x} cy={y} r={WAY_R} className="tl-way-face" stroke={INK} strokeWidth="6" />
+                    <g transform={`translate(${x} ${y})`}>
+                      <Sign />
+                    </g>
+                  </g>
+                  {on && !touchOnly && (
+                    <KeyCap x={x} y={y + WAY_R + 40} w={40} on down={held === `${w + 1}`}>
+                      <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
+                        {w + 1}
+                      </text>
+                    </KeyCap>
+                  )}
+                </g>
+              );
+            }),
           )}
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
