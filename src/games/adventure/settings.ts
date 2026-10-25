@@ -1,4 +1,9 @@
+/** The 3D stories to choose from on the start screen. */
+export type AdventureStoryId = "schatzinsel" | "wolkenreise";
+
 export interface AdventureSettings {
+  /** The story played last, marked on the start screen. */
+  story: AdventureStoryId;
   /** The guide speaks every situation and movement; off by default, the fox shows everything. */
   speech: boolean;
   /** Background music; off by default. */
@@ -12,6 +17,7 @@ export interface AdventureSettings {
 }
 
 export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
+  story: "schatzinsel",
   speech: false,
   music: false,
   sounds: true,

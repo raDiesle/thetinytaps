@@ -120,6 +120,11 @@ export class Stage {
     this.skyUniforms.uSunDir.value.set(0.45 - k * 0.15, 0.62 - k * 0.54, 0.55 + k * 0.4).normalize();
   }
 
+  /** Puts the sun in the sky (and the light coming from it) towards `dir`; call after setSky, which moves it for the sunset. */
+  setSunDirection(dir: THREE.Vector3) {
+    this.skyUniforms.uSunDir.value.copy(dir).normalize();
+  }
+
   /** Call after setSky when the mood changed a lot, so reflections follow (costs a few ms). */
   updateReflections() {
     this.refreshEnvironment();

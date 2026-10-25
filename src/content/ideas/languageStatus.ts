@@ -24,7 +24,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/abenteuer/",
     languages: { de: "done" },
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen; weitere Sprachen werden gerade aufgenommen.",
+    note: "Tapsis Stimme ist in beiden Geschichten (Schatzinsel, Wolkenreise) von ElevenLabs aufgenommen; weitere Sprachen werden gerade aufgenommen.",
   },
   { href: "/gefuehle/", languages: { de: "done" } },
   { href: "/kettenreaktion/", languages: { de: "done" } },

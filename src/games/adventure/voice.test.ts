@@ -1,11 +1,15 @@
 import { existsSync, readdirSync } from "node:fs";
 import { expect, test } from "@rstest/core";
+import { CLOUD_TRIP } from "./stories/cloudTrip";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 import { DEFAULT_TURN } from "./stories/story";
 import { spokenLines, voiceId } from "./voiceId";
 
 // Recordings are named by the hash of their line (voice.ts, `yarn voice make`).
-const STORIES = [{ folder: "src/games/adventure/stories/treasureIsland/stimme", story: TREASURE_ISLAND }];
+const STORIES = [
+  { folder: "src/games/adventure/stories/treasureIsland/stimme", story: TREASURE_ISLAND },
+  { folder: "src/games/adventure/stories/cloudTrip/stimme", story: CLOUD_TRIP },
+];
 
 test("no two lines of a story share a recording", () => {
   for (const { story } of STORIES) {

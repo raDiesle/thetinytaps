@@ -1,11 +1,11 @@
-import { clips, hold, linger, phase, TAU } from "./motion";
+import { clips, hold, LEAN_PERIOD, linger, phase, TAU } from "./motion";
 
 // Clips about the body and head: leaning, swaying, twisting, looking round.
 // Where a clip is decides which part of Tapsi glows (`clipFocus` in index.ts).
 
 export const BODY_CLIPS = clips({
   lean_side: (t, p) => {
-    const s = linger(Math.sin(phase(t, 3.4) * TAU));
+    const s = linger(Math.sin(phase(t, LEAN_PERIOD) * TAU));
     p.lean = s * 0.6;
     // The arm on the side leaned to reaches out far; the other one stays down, out of the way.
     p.armL.spread = 0.4 + Math.max(0, s) * 1.0;
