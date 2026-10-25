@@ -4,7 +4,7 @@ import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby,
 import { speak } from "@/lib/speech";
 import { cardForKey, StoryCards } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
-import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
+import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Contour, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, HERO, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
 import { WeatherContext } from "./rooms";
@@ -65,6 +65,8 @@ interface View {
   lit: number | null;
   /** The button of the child's own floor, lit while a move in the room waits for it. */
   call: number | null;
+  /** The thing the child rides to: it has an outline in its room. */
+  seek: { wish: PicId; floor: number } | null;
   night: boolean;
   /** The rain has stopped. */
   cleared: boolean;
@@ -86,6 +88,7 @@ const START: View = {
   hint: null,
   lit: null,
   call: null,
+  seek: null,
   night: false,
   cleared: false,
   party: false,
@@ -297,8 +300,9 @@ export function ElevatorPlay({
     const other: Who = who === "hero" ? "buddy" : "hero";
     showBubble(who, step.wish);
     say(step.ask);
+    put({ seek: { wish: step.wish, floor: step.floor } });
     await reach(who, step.wish, step.floor);
-    put({ bubble: null });
+    put({ bubble: null, seek: null });
     const otherComes = viewRef.current.actors[other]?.inCabin;
     await Promise.all([walk(who, step.spot), otherComes ? walk(other, step.otherSpot ?? step.spot + step.face * -110) : undefined]);
 
@@ -470,12 +474,13 @@ export function ElevatorPlay({
               <CabinBack floor={view.cabin} ride={view.ride} />
               <Buttons lit={view.lit ?? view.call} hint={view.hint} onPress={press} />
               {view.hint !== null && view.call === null && <Hint floor={view.hint} />}
+              {view.seek && <Contour key={view.seek.wish} wish={view.seek.wish} floor={view.seek.floor} glow={view.hint === view.seek.floor} />}
               {kids.map((who) => {
                 const a = actors[who];
                 if (!a || a.hidden) return null;
                 const { outer, inner } = place(a);
                 return (
-                  <g key={who} className="el-ride" style={outer}>
+                  <g key={who} className="el-ride" style={outer} data-wish={who === "buddy" ? "brother" : undefined}>
                     <g className="el-walker" style={inner}>
                       <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} onPointerDown={tapKid(who)}>
                         <g transform={who === "buddy" ? `scale(${BUDDY_SCALE})` : undefined}>
