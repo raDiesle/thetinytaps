@@ -1,7 +1,7 @@
 // What both parts of the feelings game are made of: short beats that are told
 // (or read aloud) while a big picture shows what happens.
 
-import { playBoing, playChime, playMelody, playPop, playRumble, playHum, playYuck } from "@/lib/sfx";
+import { playBoing, playChime, playCrash, playCry, playHum, playLaugh, playMelody, playPop, playRecorded, playRumble } from "@/lib/sfx";
 
 export const SOUNDS = {
   pop: playPop,
@@ -10,7 +10,10 @@ export const SOUNDS = {
   rumble: playRumble,
   melody: playMelody,
   hum: playHum,
-  yuck: playYuck,
+  // What a not-so-good idea leads to, and the laugh for a good one: a real recording once there is one in src/lib/sounds/.
+  cry: () => playRecorded("cry", playCry),
+  crash: () => playRecorded("crash", playCrash),
+  laugh: () => playRecorded("laugh", playLaugh),
 };
 
 export type SoundName = keyof typeof SOUNDS;

@@ -101,8 +101,8 @@ export interface Feeling {
   question?: string;
   /** The kind things on the cards, the best one first. */
   comforts: ComfortId[];
-  /** The not-so-good idea, the first card: what its picture shows, and why it doesn't help (read aloud). */
-  instead: { caption: string; answer: string };
+  /** The not-so-good idea, the first card: what its picture shows, why it doesn't help (read aloud), and whether something breaks (a crash instead of crying). */
+  instead: { caption: string; answer: string; breaks?: boolean };
   /** Read aloud when he is happy again: what is told, then what he says. */
   end: { narration: string; line: string };
   /** What the picture of him happy again shows. */
@@ -126,7 +126,7 @@ export const FEELINGS: Feeling[] = [
     title: "Wut, Turm umgefallen",
     intro: "Der Bär ist wütend! Sein Turm ist umgefallen.",
     comforts: ["stomp", "blow", "hug"],
-    instead: { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!" },
+    instead: { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", breaks: true },
     end: { narration: "Die Wut ist weg. Der Bär ist wieder ruhig.", line: "Danke!" },
     endCaption: "Wieder ruhig",
   },

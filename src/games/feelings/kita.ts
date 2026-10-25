@@ -16,6 +16,8 @@ export interface KitaInstead {
   caption: string;
   /** Read aloud when the child picks it: why it is not so good, and what is better. */
   answer: string;
+  /** Something breaks or falls over: it crashes; otherwise someone cries. */
+  breaks?: boolean;
 }
 
 /** One good thing the little bear does, with the not-so-good idea offered before it. */
@@ -69,7 +71,7 @@ export const SITUATIONS: Situation[] = [
           { line: "Stopp, Fuchs. Schubsen tut weh." },
           { line: "Entschuldigung, Bär." },
         ],
-        instead: { caption: "Eimer kaputt machen", answer: "Hmm, jetzt ist der Eimer kaputt und der Fuchs weint. Hol lieber Hilfe." },
+        instead: { caption: "Eimer kaputt machen", answer: "Hmm, jetzt ist der Eimer kaputt und der Fuchs weint. Hol lieber Hilfe.", breaks: true },
       },
     ],
     outro: [{ narration: "Super! Stopp sagen, weggehen, Hilfe holen.", sound: "chime" }],
@@ -201,7 +203,7 @@ export const SITUATIONS: Situation[] = [
       {
         caption: "Tief pusten",
         beats: [{ narration: "Er atmet tief ein und pustet: Puuuh." }],
-        instead: { caption: "Turm umtreten", answer: "Hmm, jetzt weint der Fuchs auch. Puste lieber ganz tief: Puuuh." },
+        instead: { caption: "Turm umtreten", answer: "Hmm, jetzt weint der Fuchs auch. Puste lieber ganz tief: Puuuh.", breaks: true },
       },
       {
         caption: "„Ich bin wütend!“ sagen",

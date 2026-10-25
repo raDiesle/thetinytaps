@@ -15,7 +15,8 @@
   --label: 38px;
   /* The row of dots at the top; the bear and the weather have none. */
   --top: 42px;
-  --caption-h: 1.7rem;
+  /* The caption under the big picture, below the ring a chosen picture gets. */
+  --caption-h: 2.1rem;
   /* Upright: the picture as wide as the screen, but not more than about half its height; the cards get the rest. */
   --pic-h: min((100cqw - 2 * var(--pad)) * 0.75, 56cqh);
   --rest: calc(100cqh - var(--top) - var(--caption-h) - var(--pic-h) - 3 * var(--pad));
@@ -92,17 +93,12 @@
   padding-top: max(var(--pad), env(safe-area-inset-top));
 }
 
-/* Leaves room for the caption under it. */
-.fg-picture {
+/* The big picture with its corner mark; leaves room for the caption under it. */
+.fg-frame {
   position: relative;
   width: min(100cqw, (100cqh - var(--caption-h)) * 4 / 3);
   aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border: var(--outline);
   border-radius: 28px;
-  background: #fff;
-  box-shadow: var(--lift);
-  container-type: size;
   animation: fg-picture-in 0.25s ease-out;
 }
 
@@ -113,15 +109,33 @@
   }
 }
 
+/* What happens is a framed photo – a white mat, a soft shadow – not a button like the cards. */
+.fg-picture {
+  --mat: clamp(5px, 1.2vmin, 12px);
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: var(--outline);
+  border-radius: inherit;
+  background: #fff;
+  box-shadow: 0 6px 18px #2d1b4e33;
+  container-type: size;
+  transition: box-shadow 0.3s;
+}
+
 /* The frames lie on top of each other; the first always shows, the others fade in over it in turn. */
 .fg-picture img {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: var(--mat);
+  width: calc(100% - 2 * var(--mat));
+  height: calc(100% - 2 * var(--mat));
+  border-radius: 16px;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.3s ease-in-out;
+  transition:
+    opacity 0.3s ease-in-out,
+    filter 0.3s;
   user-select: none;
 }
 
@@ -130,13 +144,103 @@
   opacity: 1;
 }
 
-/* The not-so-good idea, crossed out big in the corner, so the faces stay to be seen. */
+/* While the child chooses, the story so far grows pale – after a moment, so it is seen bright first. */
+.fg-look-quiet .fg-picture img {
+  filter: saturate(0.45) brightness(1.06) opacity(0.8);
+  transition:
+    opacity 0.3s ease-in-out,
+    filter 0.8s 1.2s;
+}
+
+/* A card looked at big, or a choice and its answer: the whole picture, without the mat, like a card. */
+.fg-look-option .fg-picture,
+.fg-look-good .fg-picture,
+.fg-look-bad .fg-picture {
+  --mat: 0px;
+}
+
+.fg-look-option .fg-picture img,
+.fg-look-good .fg-picture img,
+.fg-look-bad .fg-picture img {
+  border-radius: 0;
+}
+
+/* Tapped once: the yellow ring of a card glows, waiting for the second tap. */
+.fg-look-option .fg-picture {
+  box-shadow:
+    0 0 0 7px var(--sunshine),
+    0 0 0 10px var(--ink);
+  animation: fg-glow 1.6s ease-in-out infinite;
+  cursor: pointer;
+}
+
+@keyframes fg-glow {
+  50% {
+    box-shadow:
+      0 0 0 7px var(--sunshine),
+      0 0 0 10px var(--ink),
+      0 0 34px 18px #ffd23fa0;
+  }
+}
+
+/* A good idea: a green frame, and the picture hops for joy. */
+.fg-look-good .fg-picture {
+  box-shadow:
+    0 0 0 7px var(--mint),
+    0 0 0 10px var(--ink),
+    0 0 40px 16px #3ddc97a0;
+}
+
+.fg-look-good {
+  animation: fg-hop 0.7s ease-out;
+}
+
+@keyframes fg-hop {
+  30% {
+    translate: 0 -16px;
+  }
+  55% {
+    translate: 0 0;
+  }
+  75% {
+    translate: 0 -6px;
+  }
+}
+
+/* A not-so-good idea: a red frame that shakes – the picture itself stays clear, so the child sees what went wrong. */
+.fg-look-bad .fg-picture {
+  box-shadow:
+    0 0 0 7px #ff4d4d,
+    0 0 0 10px var(--ink),
+    0 0 40px 16px #ff4d4d90;
+}
+
+.fg-look-bad {
+  animation: fg-shake 0.6s ease-in-out 2;
+}
+
+@keyframes fg-shake {
+  20% {
+    translate: -14px 0;
+  }
+  40% {
+    translate: 12px 0;
+  }
+  60% {
+    translate: -8px 0;
+  }
+  80% {
+    translate: 5px 0;
+  }
+}
+
+/* Tick or cross on the corner of the frame, half outside it, so it covers next to nothing. */
 .fg-picture-mark {
   position: absolute;
-  top: 4%;
-  right: 3%;
+  top: -14px;
+  right: -14px;
   z-index: 3;
-  width: 28%;
+  width: clamp(52px, 15%, 120px);
   animation: fg-stamp 0.45s var(--pop);
 }
 
@@ -156,7 +260,7 @@
 
 .fg-picture-caption {
   height: var(--caption-h);
-  padding-top: 0.35rem;
+  padding-top: 0.8rem;
   font-size: clamp(0.85rem, 2.1vh, 1.1rem);
 }
 
@@ -322,6 +426,15 @@
   animation: fg-call 1.8s ease-in-out infinite;
 }
 
+/* Tapped once and shown big above: lifted, a thicker ring, still – the next tap chooses it. */
+.fg-card-picked {
+  translate: 0 -4px;
+  box-shadow:
+    0 0 0 9px var(--sunshine),
+    0 0 0 12px var(--ink),
+    0 16px 0 4px var(--ink);
+}
+
 /* Cards to choose from take turns calling. */
 .fg-choice:nth-child(even) .fg-card-choose {
   animation-delay: -0.9s;
@@ -343,8 +456,9 @@
   opacity: 0.5;
 }
 
+/* Pale, but still to be recognised. */
 .fg-card-wrong .fg-card-image {
-  filter: grayscale(0.8) opacity(0.6);
+  filter: grayscale(0.6) opacity(0.75);
 }
 
 /* ---------- Tick and cross ---------- */
@@ -370,20 +484,14 @@
   stroke-linejoin: round;
 }
 
+/* On the corner, half outside the card, so the picture stays to be seen. */
 .fg-card-mark {
   position: absolute;
   top: -12px;
   right: -12px;
   z-index: 3;
-  width: 34%;
+  width: 30%;
   animation: fg-stamp 0.45s var(--pop);
-}
-
-/* The cross for the not-so-good idea is bigger than the tick, but leaves the picture to be seen. */
-.fg-card-wrong .fg-card-mark {
-  top: -18px;
-  right: -18px;
-  width: 44%;
 }
 
 .fg-card.small .fg-card-mark {
@@ -508,7 +616,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .story-play .fg-card,
-  .story-play .fg-round {
+  .story-play .fg-round,
+  .story-play .fg-frame,
+  .story-play .fg-picture {
     animation: none;
   }
 }
