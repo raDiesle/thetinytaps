@@ -169,8 +169,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
   const caption = pictureCaption(situation, run);
 
   return (
-    // While the child chooses, the cards are big and the picture of what happened makes room for them.
-    <div className={`story-play kita-play${ready ? " choosing" : ""}`} onPointerDown={() => run.phase === "done" && onNext()}>
+    <div className="story-play kita-play" onPointerDown={() => run.phase === "done" && onNext()}>
       <header className="story-top">
         <StepDots total={situation.steps.length} done={Math.min(run.stepsDone, situation.steps.length)} current={run.phase === "steps"} />
       </header>

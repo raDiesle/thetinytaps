@@ -46,12 +46,15 @@ with a green tick or red cross, so children can choose without reading; „Nochm
 and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
 `story.ts`.
 
-While the child has to choose, `.story-play` has the class `choosing`: the cards
-are big and the picture above makes room (it takes what is left of the height);
-when the bear acts, the cards shrink back and the picture grows again (widths
-transition). In the kindergarten the two cards are bigger than the picture then –
-one above the other on upright phones, side by side next to the picture on phones
-lying on their side. At home the four cards stay in one row.
+The big picture and the cards keep one size for the whole story – nothing grows or
+shrinks when the child has to choose, and a new picture only fades in where the last
+one was (things changing size confuse small children). `feelings.css` works the room
+for the cards out from the screen alone (cq units of `.story-play`), the picture takes
+all that is left. Upright: the picture as wide as the screen on top, the cards below –
+in the kindergarten side by side, on tall phones one above the other; at home two by
+two. Wide screens: the picture left, the cards right – in the kindergarten one above
+the other, on low phones side by side; at home two by two. The small cards of the happy
+end and the round buttons fit into the same room.
 
 Under every picture, big or card, a short caption says what it shows – for
 grown-ups, to tell the story and give feedback on the pictures; the child chooses
