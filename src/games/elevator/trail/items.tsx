@@ -6,7 +6,7 @@ import { INK } from "@/games/scenes/shared";
 // in the world, in a bag slot and in the thought bubble.
 
 /** A thing that fits into the bag. */
-export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "bone" | "can" | "shovel" | "bread" | "fish" | "sunflower" | "umbrella";
+export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "bone" | "can" | "shovel" | "bread" | "fish" | "sunflower" | "umbrella" | "corn";
 
 /** A drawing and its size, to fit it into a slot, a bubble or a card. */
 export interface Picture {
@@ -216,6 +216,51 @@ export function Umbrella() {
   );
 }
 
+/** A cob of corn, standing on its stalk end, with its green husk opened at the bottom. */
+export function Corn() {
+  return (
+    <g>
+      <path
+        d="M-20 -122 Q-30 -70 -14 -30 Q0 -20 14 -30 Q30 -70 20 -122 Q0 -136 -20 -122 Z"
+        fill="#fcc419"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      {[-110, -94, -78, -62, -46].map((y) => (
+        <path key={y} d={`M${-21 + (y + 122) * 0.06} ${y} Q0 ${y + 6} ${21 - (y + 122) * 0.06} ${y}`} stroke="#e8a500" strokeWidth="3" fill="none" />
+      ))}
+      <path d="M-8 -126 V-36 M8 -126 V-36" stroke="#e8a500" strokeWidth="3" />
+      <g fill="#69db7c" stroke="#2b8a3e" strokeWidth="3.5" strokeLinejoin="round">
+        <path d="M-4 0 Q-40 -30 -32 -86 Q-18 -50 2 -24 Z" />
+        <path d="M4 0 Q40 -30 32 -86 Q18 -50 -2 -24 Z" />
+      </g>
+    </g>
+  );
+}
+
+/** The wooden toy locomotive: red boiler, blue cab, yellow chimney, black wheels on (0, 0); it faces right. */
+export function Loco() {
+  return (
+    <g>
+      <rect x="-60" y="-104" width="50" height="70" rx="6" fill="#4263eb" stroke={INK} strokeWidth="5" />
+      <rect x="-50" y="-94" width="30" height="26" rx="4" fill="#d0ebff" stroke={INK} strokeWidth="3.5" />
+      <rect x="-68" y="-114" width="66" height="14" rx="5" fill="#fcc419" stroke={INK} strokeWidth="4" />
+      <rect x="-10" y="-72" width="62" height="40" rx="10" fill="#fa5252" stroke={INK} strokeWidth="5" />
+      <path d="M22 -72 V-98 H40 V-72" fill="#fcc419" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <rect x="16" y="-108" width="30" height="12" rx="5" fill="#fcc419" stroke={INK} strokeWidth="4" />
+      <circle cx="52" cy="-52" r="7" fill="#fff3bf" stroke={INK} strokeWidth="3" />
+      <rect x="-66" y="-38" width="124" height="12" rx="4" fill="#c08552" stroke={INK} strokeWidth="4" />
+      {[-40, 0, 36].map((x, i) => (
+        <g key={x}>
+          <circle cx={x} cy={i === 0 ? -18 : -14} r={i === 0 ? 18 : 14} fill="#343a40" stroke={INK} strokeWidth="3" />
+          <circle cx={x} cy={i === 0 ? -18 : -14} r="5" fill="#fcc419" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
 /** The balloon: the string is tied to (0, 0), the knot; with `tail`, a bit of string hangs from it (for its picture). */
 export function Balloon({ tail = false, colour = "#fa5252" }: { tail?: boolean; colour?: string }) {
   return (
@@ -266,6 +311,7 @@ export const ITEMS: Record<ItemId, Picture> = {
   fish: { w: 120, h: 60, draw: () => <Fish /> },
   sunflower: { w: 96, h: 172, draw: () => <Sunflower /> },
   umbrella: { w: 144, h: 184, draw: () => <Umbrella /> },
+  corn: { w: 80, h: 136, draw: () => <Corn /> },
 };
 
 /** What a level is about: its picture, and how the child carries it in the world. */
@@ -278,7 +324,7 @@ export interface Goal extends Picture {
   roll?: number;
 }
 
-export type GoalId = "kite" | "football" | "balloon";
+export type GoalId = "kite" | "football" | "balloon" | "loco";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
@@ -295,6 +341,7 @@ export const GOALS: Record<GoalId, Goal> = {
     world: () => <Balloon />,
     carry: "string",
   },
+  loco: { w: 130, h: 116, draw: () => <Loco />, carry: "hands" },
 };
 
 /** `picture` scaled to fit a `width` × `height` box around (0, 0). */

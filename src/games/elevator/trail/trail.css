@@ -56,6 +56,36 @@
   animation: tl-ghost-in 0.5s ease-out both;
 }
 
+/* ---------- A fork: two picture signs, one per way ---------- */
+
+.tl-way-face {
+  fill: #fff9db;
+}
+
+.tl-way-glow {
+  stroke: transparent;
+}
+
+/* While the child picks a way: the signs hop once, one after the other, and glow yellow like the waiting button. */
+.tl-way.on {
+  cursor: pointer;
+}
+
+.tl-way.on .tl-way-board {
+  animation: tl-slot-hop 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+.tl-way.on .tl-way-glow {
+  stroke: #ffd43b;
+  animation: tl-way-glow 0.9s ease-in-out infinite alternate;
+}
+
+/* The ghost of each way can be tapped too. */
+.tl-way-ghost {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 /* ---------- The bag ---------- */
 
 /* Its frame is the colour of the bag: what is inside the circles is in the bag. */
@@ -358,6 +388,12 @@
   }
 }
 
+@keyframes tl-way-glow {
+  to {
+    stroke: #fff3bf;
+  }
+}
+
 @keyframes tl-nope {
   15% {
     transform: translateX(-8px) rotate(-6deg);
@@ -499,4 +535,50 @@
   to {
     stroke-dashoffset: -28;
   }
+}
+
+/* ---------- „Die kleine Lok“ ---------- */
+
+.tl-lok-rabbit,
+.tl-lok-pony,
+.tl-lok-hen {
+  transition: transform 1.4s ease-in-out;
+}
+
+/* With the carrot, the rabbit hops into the meadow and nibbles. */
+.tl-lok-rabbit.done {
+  transform: translate(60px, -70px) scale(0.7);
+}
+
+/* With the apple, the pony steps aside and chews. */
+.tl-lok-pony.done {
+  transform: translate(90px, -30px) scale(0.8);
+}
+
+/* With the corn, the hen hops down from the train and pecks. */
+.tl-lok-hen.done {
+  transform: translate(-50px, 66px);
+}
+
+.tl-lok-rabbit.done .tl-lok-rabbit-head,
+.tl-lok-pony.done .tl-lok-pony-head,
+.tl-lok-hen.done .tl-lok-hen-head {
+  animation: tl-munch 0.4s ease-in-out 1.4s 8 alternate;
+}
+
+.tl-nope .tl-lok-rabbit-head,
+.tl-nope .tl-lok-pony-head,
+.tl-nope .tl-lok-hen-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The gate swings open. */
+.tl-lok-gate {
+  transition: transform 1s ease-in-out;
+}
+
+.tl-lok-gate.open {
+  transform: scaleX(0.18);
 }
