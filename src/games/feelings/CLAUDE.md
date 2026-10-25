@@ -1,17 +1,26 @@
 # Gefühle
 
-Route `/gefuehle/`: one start screen (`FeelingsGame`) with „Alle“ first, then one
-card per story (`stories.ts`, `settings.story`): the bear's feelings at home, then
-the kindergarten stories. There are no sub-menus per place; the old addresses
+Route `/gefuehle/`: one start screen (`FeelingsGame`) with „Alle“ first, then
+„Wie geht's dir?“, then one card per story (`stories.ts`, `settings.story`): the
+bear's feelings at home, then the kindergarten stories. There are no sub-menus per place; the old addresses
 `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
 `FeelingsPlay` plays one story after another: a picked one comes first, then
 „Weiter“ goes on with the next ones in list order, so it never repeats the same;
 „Alle“ plays every story in random order.
 
+„Wie geht's dir?“ (`mood.ts`, `MoodPlay.tsx`, `settings.story` = `"mood"`, not in
+„Alle“): four weather cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show
+the bear under that weather, feeling the same. The child picks the one that fits;
+it shows big while the bear says „Das kenne ich auch!“, then the bear's story with
+that feeling plays (sun → birthday, cloud → tired, rain → sad, storm → angry) and
+„Weiter“ goes on in list order. Keys 1–4 pick a weather, any other key one at random.
+
 Zu Hause (`bear.ts`, `BearPlay.tsx`): the bear is sad, angry, tired or scared, and
-three comforts (hug, teddy, blowing …) make it happy again. And kindergarten
-stories – pushed, kicked, toy taken, slide full, wanting a toy, angry yourself
-(`kita.ts`, `KitaPlay.tsx`): what happened, then the child picks the good next
+three comforts (hug, teddy, blowing …) make it happy again; on his birthday he is
+happy already and the three kind things celebrate with him (dance, streamers,
+hug), asked with its own `Feeling.question`. And kindergarten stories – pushed,
+kicked, toy taken, slide full, wanting a toy, angry yourself, goodbye at the door,
+a newcomer, fallen down, someone who doesn't stop (`kita.ts`, `KitaPlay.tsx`): what happened, then the child picks the good next
 step, one after another.
 
 The bear stands for the child, and at home whoever comforts it is anyone there –

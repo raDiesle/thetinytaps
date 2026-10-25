@@ -61,8 +61,9 @@
   container-type: size;
 }
 
-/* At home there is nothing above the picture. */
-.bear-play .story-middle {
+/* At home and for the weather there is nothing above the picture. */
+.bear-play .story-middle,
+.mood-play .story-middle {
   padding-top: max(14px, env(safe-area-inset-top));
 }
 
@@ -196,6 +197,24 @@
     grid-template-columns: repeat(2, auto);
     justify-content: center;
     gap: 16px clamp(16px, 5vw, 40px);
+  }
+}
+
+/* Wie geht's dir? The four weather cards fill the middle, two by two, as big as the height allows (two rows with their captions). */
+.mood-cards {
+  --card-w: min(36cqw, (100cqh - 200px) * 2 / 3, 380px);
+
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 28px clamp(24px, 6vw, 64px);
+}
+
+/* Wide and low screens: all four in one row. */
+@media (max-height: 560px) and (min-aspect-ratio: 3 / 2) {
+  .mood-cards {
+    --card-w: min(21cqw, (100cqh - 80px) * 4 / 3);
+
+    grid-template-columns: repeat(4, auto);
   }
 }
 

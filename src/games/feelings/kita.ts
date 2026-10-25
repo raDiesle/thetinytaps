@@ -1,12 +1,14 @@
 // Little stories from the kindergarten: someone pushes, kicks, grabs, the
-// slide is full, someone has the toy you want, or you are angry yourself.
+// slide is full, someone has the toy you want, or you are angry yourself; and
+// the everyday moments around them: saying goodbye at the door, a new child,
+// falling down, someone who doesn't stop.
 // Each one shows what the little bear can do instead of hitting back:
 // say "Stopp!", step away, get a grown-up, ask, wait, swap. Every step has a
 // not-so-good idea before it, so the child always chooses between two.
 
 import type { Beat } from "./story";
 
-export type SituationId = "push" | "kick" | "grab" | "slide" | "want" | "angry";
+export type SituationId = "push" | "kick" | "grab" | "slide" | "want" | "angry" | "bye" | "new" | "fall" | "stop";
 
 /** The not-so-good idea next to a good step. */
 export interface KitaInstead {
@@ -213,5 +215,121 @@ export const SITUATIONS: Situation[] = [
     ],
     outro: [{ narration: "Toll! Wütend sein ist okay. Stampfen, pusten, sagen – nicht hauen.", sound: "chime" }],
     endCaption: "Turm steht wieder, beide lachen",
+  },
+  {
+    id: "bye",
+    emoji: "👋",
+    title: "Abschied an der Tür",
+    caption: "Bär hält den großen Bären fest",
+    intro: [
+      { narration: "Der kleine Bär kommt in den Kindergarten." },
+      { narration: "Der große Bär muss jetzt gehen. Der kleine Bär weint. Er will nicht, dass er geht!" },
+    ],
+    steps: [
+      {
+        caption: "Fest drücken",
+        beats: [{ narration: "Der kleine Bär drückt den großen Bären ganz fest.", line: "Tschüss! Hab dich lieb!" }, { line: "Ich hole dich nachher ab." }],
+        instead: { caption: "Hinterherrennen", answer: "Hmm, draußen fahren Autos, das ist gefährlich. Drück ihn lieber ganz fest zum Tschüss." },
+      },
+      {
+        caption: "Am Fenster winken",
+        beats: [{ narration: "Dann winkt er am Fenster.", line: "Tschüss!" }, { narration: "Der große Bär winkt zurück." }],
+        instead: { caption: "Verstecken", answer: "Hmm, allein im Versteck ist es traurig. Wink lieber am Fenster." },
+      },
+      {
+        caption: "Mitspielen",
+        beats: [{ line: "Komm, wir bauen mit dem Fuchs einen Turm." }, { narration: "Der kleine Bär hört auf zu weinen. Er spielt mit.", sound: "pop" }],
+        instead: { caption: "Allein in der Ecke", answer: "Hmm, allein in der Ecke ist es langweilig. Spiel lieber mit." },
+      },
+    ],
+    outro: [{ narration: "Super! Drücken, winken, mitspielen. Und nachher kommt der große Bär wieder.", sound: "chime" }],
+    endCaption: "Abholen, beide froh",
+  },
+  {
+    id: "new",
+    emoji: "🦔",
+    title: "Neu im Kindergarten",
+    caption: "Igel ist neu und allein",
+    intro: [{ narration: "Heute ist jemand neu da: der kleine Igel." }, { narration: "Er steht ganz allein an der Tür. Er ist schüchtern." }],
+    steps: [
+      {
+        caption: "Hallo sagen",
+        beats: [{ narration: "Der kleine Bär geht hin und winkt.", line: "Hallo! Ich bin der Bär." }, { line: "Hallo. Ich bin der Igel." }],
+        instead: { caption: "Auslachen", answer: "Hmm, jetzt ist der Igel traurig. Sag lieber: Hallo!" },
+      },
+      {
+        caption: "Bauklötze zeigen",
+        beats: [{ line: "Guck mal, hier sind die Bauklötze." }, { narration: "Der Igel guckt. Er lächelt ein bisschen." }],
+        instead: { caption: "Bauklötze verstecken", answer: "Hmm, so kann der Igel nicht mitspielen. Zeig ihm lieber die Bauklötze." },
+      },
+      {
+        caption: "Mitspielen lassen",
+        beats: [{ line: "Willst du mitspielen?" }, { line: "Ja!", sound: "pop" }],
+        instead: { caption: "Nur mit Fuchs spielen", answer: "Hmm, jetzt ist der Igel ganz allein. Frag ihn lieber: Willst du mitspielen?" },
+      },
+    ],
+    outro: [{ narration: "Toll! Hallo sagen, zeigen, mitspielen lassen. Jetzt hat der Igel Freunde.", sound: "chime" }],
+    endCaption: "Bär, Fuchs und Igel jubeln",
+  },
+  {
+    id: "fall",
+    emoji: "🩹",
+    title: "Hingefallen",
+    caption: "Bär ist hingefallen, Knie tut weh",
+    intro: [{ narration: "Der kleine Bär rennt ganz schnell." }, { narration: "Plumps! Er fällt hin. Aua, das Knie tut weh!", sound: "boing" }],
+    steps: [
+      {
+        caption: "Hilfe rufen",
+        beats: [{ narration: "Der kleine Bär ruft:", line: "Aua! Hilfe!" }, { line: "Ich komme! Zeig mal her." }],
+        instead: { caption: "Strampeln und schreien", answer: "Hmm, so kann ihm keiner helfen. Ruf lieber die Erzieherin." },
+      },
+      {
+        caption: "Pflaster drauf",
+        beats: [{ narration: "Die Erzieherin klebt ein Pflaster drauf und pustet." }, { line: "So. Gleich ist es besser." }],
+        instead: { caption: "Pflaster abreißen", answer: "Hmm, dann tut es wieder weh. Lass das Pflaster lieber dran." },
+      },
+      {
+        caption: "Langsam weiterspielen",
+        beats: [
+          { narration: "Der Fuchs hilft ihm hoch.", line: "Komm, wir spielen langsam." },
+          { narration: "Sie rollen sich den Ball zu.", sound: "boing" },
+        ],
+        instead: { caption: "Gleich wild rennen", answer: "Hmm, dann fällt er gleich wieder hin. Spiel lieber erst langsam." },
+      },
+    ],
+    outro: [{ narration: "Super! Hilfe rufen, Pflaster drauf, langsam weiter. Das Aua geht vorbei.", sound: "chime" }],
+    endCaption: "Bär zeigt stolz sein Pflaster",
+  },
+  {
+    id: "stop",
+    emoji: "✋",
+    title: "Hört nicht auf",
+    caption: "Fuchs kitzelt, Bär will nicht mehr",
+    intro: [
+      { narration: "Der Fuchs kitzelt den kleinen Bären. Erst ist es lustig." },
+      { narration: "Aber jetzt will der Bär nicht mehr. Und der Fuchs hört nicht auf!" },
+    ],
+    steps: [
+      {
+        caption: "„Stopp!“ sagen",
+        beats: [
+          { narration: "Der kleine Bär sagt laut:", line: "Stopp! Ich will das nicht mehr!" },
+          { narration: "Der Fuchs hört auf.", line: "Oh. Okay." },
+        ],
+        instead: { caption: "Beißen", answer: "Hmm, Beißen tut weh. Sag lieber laut: Stopp! Ich will das nicht!" },
+      },
+      {
+        caption: "Fangen vorschlagen",
+        beats: [{ line: "Spielen wir lieber Fangen?" }, { line: "Au ja!" }],
+        instead: { caption: "Zurückkitzeln", answer: "Hmm, jetzt will der Fuchs das nicht. Stopp heißt Stopp, für alle. Frag lieber: Spielen wir Fangen?" },
+      },
+      {
+        caption: "Fangen spielen",
+        beats: [{ narration: "Sie rennen und lachen.", line: "Fang mich doch!", sound: "boing" }],
+        instead: { caption: "Beleidigt weggehen", answer: "Hmm, jetzt sind beide allein. Spielt lieber zusammen Fangen." },
+      },
+    ],
+    outro: [{ narration: "Prima! Stopp heißt Stopp. Und dann spielt ihr etwas, das beide mögen.", sound: "chime" }],
+    endCaption: "Bär und Fuchs klatschen ab",
   },
 ];

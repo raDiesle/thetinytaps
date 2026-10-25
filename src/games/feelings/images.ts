@@ -52,3 +52,8 @@ export const bearImages = {
   /** Happy (or asleep) again at the end. */
   happy: (id: string) => `baer-${id}-gut`,
 };
+
+/** Names of the weather cards of „Wie geht's dir?“. */
+export const moodImages = {
+  weather: (id: string) => `wetter-${id}`,
+};

@@ -65,6 +65,10 @@ Characters (small animal children, toddler proportions, big round heads):
 - The bunny: white fur, long ears pink inside, yellow t-shirt, light-blue trousers.
 - The teacher: a grown-up grey mouse, taller than the children, big round ears
   pink inside, round glasses, purple shirt with a white apron, kind face.
+- The big bear: the little bear's grown-up, much taller, same warm brown fur and
+  beige muzzle, green knitted sweater, kind face.
+- The little hedgehog: a small hedgehog child, light-brown face, round dark-brown
+  spikes, red t-shirt, yellow trousers.
 ```
 
 ### Figurenbogen (als Erstes)
@@ -161,6 +165,64 @@ visible, but gentle – no injuries, no blood. Use the reference only for the ch
 | `angry-3`        | „Sagen“ – The little bear tells the fox how he feels, one paw on his chest. The fox looks sorry and starts to rebuild the tower with him.                                     |
 | `angry-nein`     | „Schubsen“ – The angry little bear pushes the fox. The fox falls on the floor and cries.                                                                                      |
 
+In den vier Geschichten unten haben diese Bilder nur einen Frame, weil im zweiten die Szene
+sprang statt sich nur ein wenig zu bewegen: `bye-passiert`, `bye-3`, `bye-nein`,
+`new-passiert`, `new-nein`, `new-ende`, `fall-3`, `fall-ende`, `stop-1`, `stop-nein`.
+Ein Paar aus `--grid 1x2` darum vor dem Einbauen nebeneinander ansehen; Streifen
+der Trennfarbe am Rand beider Frames gleich wegschneiden, damit sie deckungsgleich bleiben.
+
+### Abschied an der Tür (`bye`) – Eingang mit Garderobe, Tür und Fenster
+
+| Datei          | Prompt                                                                                                                                                                     |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bye-passiert` | The big bear has to go to work and says goodbye at the door. The little bear clings to the big bear's leg and cries, big tears.                                            |
+| `bye-1`        | „Fest drücken“ – The big bear kneels down and the little bear hugs him tight goodbye, both with eyes closed, small hearts.                                                 |
+| `bye-2`        | „Am Fenster winken“ – The little bear stands at the window inside and waves goodbye with a smile; outside, the big bear, small in the distance, walks away and waves back. |
+| `bye-3`        | „Mitspielen“ – Playroom: the teacher sits on the floor with the little bear and the fox; they build a tower of blocks together. The little bear smiles again.              |
+| `bye-nein`     | „Hinterherrennen“ – The little bear runs after the big bear out of the open door towards the street with cars; the teacher reaches after him, worried. Clearly dangerous.  |
+| `bye-nein-2`   | The little bear hides alone under the coats on the hooks, only his sad face peeking out.                                                                                   |
+| `bye-nein-3`   | Playroom. The little bear sits alone in a corner, sad and bored, while the teacher and the fox play blocks far away.                                                       |
+| `bye-ende`     | Afternoon light. The big bear comes back to pick him up: the little bear runs into his open arms, both laugh happily.                                                      |
+
+### Neu im Kindergarten (`new`) – Spielzimmer, bunte Bauklötze
+
+| Datei          | Prompt                                                                                                                                                                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `new-passiert` | A new child, the little hedgehog, stands alone and shy at the door, looking down, paws together. The little bear and the fox play with blocks in the background and look at him. |
+| `new-1`        | „Hallo sagen“ – The little bear walks up to the little hedgehog and waves hello with a big friendly smile. The hedgehog looks up, surprised and a bit shy.                       |
+| `new-2`        | „Bauklötze zeigen“ – The little bear shows the little hedgehog the colourful blocks and holds one out to him. The hedgehog looks curious and smiles a little.                    |
+| `new-3`        | „Mitspielen lassen“ – The little bear, the fox and the little hedgehog sit together on the floor and build a tower of blocks. All laugh.                                         |
+| `new-nein`     | „Auslachen“ – The little bear points at the little hedgehog's spikes and laughs at him. The hedgehog is sad, head down, a tear.                                                  |
+| `new-nein-2`   | The little bear hides all the blocks behind his back and turns away from the little hedgehog. The hedgehog stands with empty paws, sad.                                          |
+| `new-nein-3`   | The little bear and the fox play together with their backs to the little hedgehog. The hedgehog sits alone, sad.                                                                 |
+| `new-ende`     | The little bear, the fox and the little hedgehog stand next to their tall tower of blocks and cheer together, friends.                                                           |
+
+### Hingefallen (`fall`) – Spielplatz, Wiese, ein Baum
+
+| Datei           | Prompt                                                                                                                                                               |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `fall-passiert` | The little bear has fallen down while running: he sits on the grass and holds his knee, crying. A small red scrape on the knee, no blood.                            |
+| `fall-1`        | „Hilfe rufen“ – The little bear sits on the grass, holds his knee and calls out loud with one paw raised. The teacher comes running towards him.                     |
+| `fall-2`        | „Pflaster drauf“ – The teacher kneels and puts a colourful plaster on the little bear's knee. The bear watches, calmer, sniffing.                                    |
+| `fall-3`        | „Langsam weiterspielen“ – The fox helps the little bear up with his paw; the bear has a plaster on his knee. They roll a ball to each other, slowly and carefully.   |
+| `fall-nein`     | „Strampeln und schreien“ – The little bear lies on the grass in a big tantrum, kicking his legs and screaming, while the teacher stands next to him and cannot help. |
+| `fall-nein-2`   | The little bear pulls the plaster off his knee and makes an ouch face. The teacher looks worried.                                                                    |
+| `fall-nein-3`   | The little bear with a plaster on his knee runs wildly and fast again and is about to trip over a root. The fox looks worried.                                       |
+| `fall-ende`     | The little bear proudly shows his colourful plaster on the knee and laughs; the fox and the teacher smile.                                                           |
+
+### Hört nicht auf (`stop`) – Spielplatz, Wiese, ein Baum
+
+| Datei           | Prompt                                                                                                                                                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `stop-passiert` | The fox tickles the little bear and won't stop. The bear squirms away, not laughing anymore, unhappy face, pushing the fox's paws away. The fox laughs.                              |
+| `stop-1`        | „Stopp!“ – The little bear stands firm and holds one paw up high towards the fox, palm out, a clear stop gesture, brave face, shouting. The fox stops, paws still raised, surprised. |
+| `stop-2`        | „Fangen vorschlagen“ – The little bear points across the grass with a friendly face, asking the fox to play tag. The fox nods happily.                                               |
+| `stop-3`        | „Fangen spielen“ – The little bear and the fox play tag on the grass: the fox runs away laughing, the bear runs after him, laughing.                                                 |
+| `stop-nein`     | „Beißen“ – The little bear bites the fox's arm. The fox cries and pulls his arm away. Gentle, no injury.                                                                             |
+| `stop-nein-2`   | The little bear tickles the fox wildly; the fox squirms away, unhappy, holding up one paw to stop him.                                                                               |
+| `stop-nein-3`   | The little bear stomps away alone with crossed arms, sulking. The fox stands alone behind him, sad.                                                                                  |
+| `stop-ende`     | The little bear and the fox, out of breath from playing, give each other a high five and laugh.                                                                                      |
+
 ### Das gute Ende (`…-ende`)
 
 | Datei        | Prompt                                                                                                                            |
@@ -183,29 +245,47 @@ Karten (und danach das Bild in der Mitte), `baer-…-nein` ist die nicht so gute
 zwischen den Karten, `baer-…-gut` zeigt ihn am Ende wieder froh.
 Alle mit zweitem Frame `…-b`, außer `trost-hug` und `baer-…-nein` (mit `baer-…` als `--ref` erzeugt).
 
-| Datei              | Prompt                                                                                                                                       |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baer-sad`         | The little bear sits on the floor and cries, big tears, shoulders down.                                                                      |
-| `baer-angry`       | The little bear is angry: his block tower has fallen over next to him, red face, fists clenched.                                             |
-| `baer-tired`       | Night, a moon in the window. The little bear yawns widely and rubs his eyes.                                                                 |
-| `baer-scared`      | Night, a thunderstorm with lightning outside the window. The little bear hides behind a pillow, big scared eyes.                             |
-| `trost-stroke`     | A child's hand gently strokes the little bear's head. The bear smiles with closed eyes; small hearts.                                        |
-| `trost-hug`        | Side view: rainbow-sleeved arms from the left edge hug the bear; he hugs back, eyes closed, small hearts.                                    |
-| `trost-teddy`      | A child's hands give the little bear a small teddy. He hugs it and smiles.                                                                   |
-| `trost-stomp`      | The little bear stomps with both feet to let the anger out, determined face, motion lines at his feet. He is alone.                          |
-| `trost-blow`       | The little bear breathes in deeply and blows out a big puff of air, cheeks round.                                                            |
-| `trost-blanket`    | The little bear lies in bed; a child's hands tuck him in with a pink striped blanket. Sleepy smile.                                          |
-| `trost-lullaby`    | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile.                                           |
-| `trost-hand`       | A child's hand holds the little bear's paw. The bear looks calm and smiles a little.                                                         |
-| `trost-light`      | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles.                                               |
-| `baer-sad-nein`    | A child's hands take the small teddy away from the sad little bear. The bear cries even harder, reaching after the teddy.                    |
-| `baer-angry-nein`  | The angry little bear throws his toys across the room: a block and a toy car fly through the air, red face, shouting.                        |
-| `baer-tired-nein`  | Night. A child's hands bang loudly on a toy drum next to the bear's bed. The bear sits up wide awake, covers his ears, grumpy.               |
-| `baer-scared-nein` | Night, thunderstorm. A child's finger switches the bedside lamp off. The bear sits in bed, clearly visible, clutching a pillow, very scared. |
-| `baer-sad-gut`     | The little bear in his cosy room is happy again: he laughs, jumps up with both arms raised, small hearts float around him.                   |
-| `baer-angry-gut`   | The little bear is calm again: he sits relaxed next to a rebuilt tall tower of colourful blocks and smiles contentedly.                      |
-| `baer-tired-gut`   | Night, a moon in the window. The little bear sleeps peacefully in his bed under a pink striped blanket, holding a small teddy.               |
-| `baer-scared-gut`  | The storm is over: a rainbow outside the window, the lamp is on. Only the little bear: he sits on his bed, laughs and waves.                 |
+| Datei              | Prompt                                                                                                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baer-sad`         | The little bear sits on the floor and cries, big tears, shoulders down.                                                                                           |
+| `baer-angry`       | The little bear is angry: his block tower has fallen over next to him, red face, fists clenched.                                                                  |
+| `baer-tired`       | Night, a moon in the window. The little bear yawns widely and rubs his eyes.                                                                                      |
+| `baer-scared`      | Night, a thunderstorm with lightning outside the window. The little bear hides behind a pillow, big scared eyes.                                                  |
+| `trost-stroke`     | A child's hand gently strokes the little bear's head. The bear smiles with closed eyes; small hearts.                                                             |
+| `trost-hug`        | Side view: rainbow-sleeved arms from the left edge hug the bear; he hugs back, eyes closed, small hearts.                                                         |
+| `trost-teddy`      | A child's hands give the little bear a small teddy. He hugs it and smiles.                                                                                        |
+| `trost-stomp`      | The little bear stomps with both feet to let the anger out, determined face, motion lines at his feet. He is alone.                                               |
+| `trost-blow`       | The little bear breathes in deeply and blows out a big puff of air, cheeks round.                                                                                 |
+| `trost-blanket`    | The little bear lies in bed; a child's hands tuck him in with a pink striped blanket. Sleepy smile.                                                               |
+| `trost-lullaby`    | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile.                                                                |
+| `trost-hand`       | A child's hand holds the little bear's paw. The bear looks calm and smiles a little.                                                                              |
+| `trost-light`      | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles.                                                                    |
+| `baer-sad-nein`    | A child's hands take the small teddy away from the sad little bear. The bear cries even harder, reaching after the teddy.                                         |
+| `baer-angry-nein`  | The angry little bear throws his toys across the room: a block and a toy car fly through the air, red face, shouting.                                             |
+| `baer-tired-nein`  | Night. A child's hands bang loudly on a toy drum next to the bear's bed. The bear sits up wide awake, covers his ears, grumpy.                                    |
+| `baer-scared-nein` | Night, thunderstorm. A child's finger switches the bedside lamp off. The bear sits in bed, clearly visible, clutching a pillow, very scared.                      |
+| `baer-sad-gut`     | The little bear in his cosy room is happy again: he laughs, jumps up with both arms raised, small hearts float around him.                                        |
+| `baer-angry-gut`   | The little bear is calm again: he sits relaxed next to a rebuilt tall tower of colourful blocks and smiles contentedly.                                           |
+| `baer-tired-gut`   | Night, a moon in the window. The little bear sleeps peacefully in his bed under a pink striped blanket, holding a small teddy.                                    |
+| `baer-scared-gut`  | The storm is over: a rainbow outside the window, the lamp is on. Only the little bear: he sits on his bed, laughs and waves.                                      |
+| `baer-happy`       | Birthday in his cosy room: balloons, a birthday cake with candles on a little table. The little bear wears a party hat and beams with joy, clapping his paws.     |
+| `trost-dance`      | Birthday party, balloons. A child's hands hold the little bear's paws from the front; they dance together, the bear in a party hat jumps and laughs, music notes. |
+| `trost-streamers`  | Birthday party, balloons. Colourful paper streamers fly through the air from a child's hands at the front; the little bear in a party hat laughs with arms up.    |
+| `baer-happy-nein`  | Birthday. A child's hands take the birthday cake away from the little bear. His smile is gone: he is sad and reaches after the cake.                              |
+| `baer-happy-gut`   | A happy birthday party: the little bear in a party hat laughs and raises both arms; cake with candles, balloons, streamers and confetti everywhere.               |
 
 `trost-hug` hat nur einen Frame: von vorn war die Umarmung nie zu erkennen. Darum von der Seite – das Kind steht links
 knapp außerhalb, man sieht nur Ärmel und ein Stück Pulli, kein Gesicht; beide umarmen sich ganz fest.
+
+## Wie geht's dir? (Wetterkarten)
+
+Nur der kleine Bär draußen auf einer Wiese, über ihm ein Wetter, das zu seinem
+Gefühl passt; Sonne und Wolken ohne Gesicht. Je zwei in einem Auftrag (`--grid 1x2`),
+nur ein Frame, mit `baer-sad-gut` als `--ref` für den Bären.
+
+| Datei             | Prompt                                                                                                             |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `wetter-sonne`    | A big bright sun shines. The little bear is happy and dances, arms up, beaming.                                    |
+| `wetter-wolke`    | A big grey cloud hangs above him. The little bear is tired and droopy, yawning, eyes half closed.                  |
+| `wetter-regen`    | A small rain cloud right above him, rain falls on him. The little bear is sad, shoulders down, a tear.             |
+| `wetter-gewitter` | A dark thunder cloud with lightning right above him. The little bear is angry: red face, fists clenched, stomping. |
