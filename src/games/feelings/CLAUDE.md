@@ -40,11 +40,14 @@ that one instead. Keys do the same: the first press shows, the second chooses.
 Only then comes the answer, seen and heard (`cheer`/`oops` in `shared.tsx`): the
 good idea gets a green frame that hops, stars and a laugh („Juhu!“ when speech is
 on), then the bear does it; the not-so-good one a red frame that shakes and what it
-leads to – crying, or a crash when something breaks (`breaks: true`) – not an error
-sound, while the answer says why; its card stays crossed out. Ticks and crosses sit
-on the corner, half outside, so the picture stays to be seen. The sounds are
-synthesized (`playCry`, `playCrash`, `playLaugh`) and become real recordings once
-`cry.mp3`, `crash.mp3`, `laugh.mp3` are in `src/lib/sounds/`. In the kindergarten
+leads to, heard (`instead.sound`): „Aua!“ when someone gets hurt (`"aua"`: pushing,
+hitting, biting …), a crash when something breaks (`"crash"`), otherwise crying –
+never an error sound – with 💢, 💥 or 💧 floating up, while the answer says why; its
+card stays crossed out. Ticks and crosses sit on the corner, half outside, so the
+picture stays to be seen. Crying, the crash and the laugh are CC0 recordings
+(`cry.mp3`, `crash.mp3`, `laugh.mp3` in `src/lib/sounds/`, loaded when a story starts,
+`RECORDED_SOUNDS` in `story.ts`); „Aua!“ is synthesized (`playAua`) until an
+`aua.mp3` is found. In the kindergarten
 the left arrow picks the not-so-good idea; every other key the good thing.
 
 The big picture of the story is a framed photo – white mat, soft shadow – and turns

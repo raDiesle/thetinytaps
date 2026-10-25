@@ -3,7 +3,7 @@
 // bear strokes him, which always helps too. On his birthday he is happy already,
 // and the three kind things are celebrating with him.
 
-import type { SoundName } from "./story";
+import type { OopsSound, SoundName } from "./story";
 
 export type ComfortId = "stroke" | "hug" | "teddy" | "stomp" | "blow" | "blanket" | "lullaby" | "hand" | "light" | "dance" | "streamers";
 
@@ -101,8 +101,8 @@ export interface Feeling {
   question?: string;
   /** The kind things on the cards, the best one first. */
   comforts: ComfortId[];
-  /** The not-so-good idea, the first card: what its picture shows, why it doesn't help (read aloud), and whether something breaks (a crash instead of crying). */
-  instead: { caption: string; answer: string; breaks?: boolean };
+  /** The not-so-good idea, the first card: what its picture shows, why it doesn't help (read aloud), and what is heard (see `KitaInstead.sound`). */
+  instead: { caption: string; answer: string; sound?: OopsSound };
   /** Read aloud when he is happy again: what is told, then what he says. */
   end: { narration: string; line: string };
   /** What the picture of him happy again shows. */
@@ -126,7 +126,7 @@ export const FEELINGS: Feeling[] = [
     title: "Wut, Turm umgefallen",
     intro: "Der Bär ist wütend! Sein Turm ist umgefallen.",
     comforts: ["stomp", "blow", "hug"],
-    instead: { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", breaks: true },
+    instead: { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", sound: "crash" },
     end: { narration: "Die Wut ist weg. Der Bär ist wieder ruhig.", line: "Danke!" },
     endCaption: "Wieder ruhig",
   },

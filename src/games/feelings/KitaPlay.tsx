@@ -141,10 +141,10 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
 
   // The not-so-good idea stays big in a red frame that shakes, with crying or a crash, while the answer says why.
   const tryInstead = useCallback(() => {
-    const { answer, breaks } = situation.steps[run.stepsDone].instead;
+    const { answer, sound: heard } = situation.steps[run.stepsDone].instead;
     setRun((r) => ({ ...r, tried: true, trying: true, picked: null, busy: true }));
     say(answer);
-    oops(breaks, sound, float);
+    oops(heard, sound, float);
     later(() => setRun((r) => ({ ...r, busy: false, trying: false })), Math.max(OOPS_MS, beatMs({ narration: answer }, settings.speech)));
   }, [situation, run.stepsDone, say, sound, float, later, settings.speech]);
 
