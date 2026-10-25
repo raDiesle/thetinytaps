@@ -2,7 +2,6 @@ import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Po
 import { STAR_PATH } from "@/components/Bursts";
 import {
   buildMouth,
-  PICTURE,
   projectors,
   toothKey,
   type Face,
@@ -34,44 +33,112 @@ const HEAD = 270;
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
 const MONSTER_SIZE = 0.58;
 
-/** A part of the picture: x, y, width and height. */
-interface Box {
+/** A part of the picture or the screen: x, y, width and height. */
+export interface Box {
   x: number;
   y: number;
   width: number;
   height: number;
 }
 
-/**
- * The part of the picture that always shows: every tooth with its monsters
- * in every step, cutting off only the corners of the lips. The rest of the
- * screen is filled with more of the face around it, so the mouth is as big
- * as the screen allows on a tall phone as well as a wide computer.
- */
-const FOCUS: Box = { x: 50, y: 45, width: 340, height: 300 };
-/** How far in from the edge the mirror's frame sits; its stroke reaches twice as far, so the focus box keeps clear of it. */
-const FRAME_INSET = 7;
+/** The picture's size on screen in px, and the free part of it between the heading and the controls. */
+export interface Room {
+  width: number;
+  height: number;
+  /** Relative to the picture's top left corner. */
+  free: Box;
+}
 
-/** The focus box grown to the shape of the element, around the same middle. */
-function useFocusBox(ref: RefObject<SVGSVGElement | null>): Box {
-  const [box, setBox] = useState<Box>({ x: 0, y: 0, width: PICTURE.width, height: PICTURE.height });
+/**
+ * Measures a picture that fills the whole screen behind the heading and the
+ * controls, and the free part of the screen between them (`free`), where what
+ * matters has to fit.
+ */
+export function useRoom(svg: RefObject<SVGSVGElement | null>, free: RefObject<HTMLElement | null>): Room | null {
+  const [room, setRoom] = useState<Room | null>(null);
   useLayoutEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    const fit = () => {
-      const { width, height } = element.getBoundingClientRect();
-      if (!width || !height) return;
-      const scale = Math.min(width / (FOCUS.width + 4 * FRAME_INSET), height / (FOCUS.height + 4 * FRAME_INSET));
-      const w = width / scale;
-      const h = height / scale;
-      setBox({ x: FOCUS.x + (FOCUS.width - w) / 2, y: FOCUS.y + (FOCUS.height - h) / 2, width: w, height: h });
+    const element = svg.current;
+    const area = free.current;
+    if (!element || !area) return;
+    const measure = () => {
+      const s = element.getBoundingClientRect();
+      const f = area.getBoundingClientRect();
+      if (!s.width || !s.height) return;
+      const whole = { x: 0, y: 0, width: s.width, height: s.height };
+      setRoom({
+        width: s.width,
+        height: s.height,
+        free: f.width && f.height ? { x: f.left - s.left, y: f.top - s.top, width: f.width, height: f.height } : whole,
+      });
     };
-    fit();
-    const observer = new ResizeObserver(fit);
+    measure();
+    const observer = new ResizeObserver(measure);
     observer.observe(element);
+    observer.observe(area);
     return () => observer.disconnect();
-  }, [ref]);
-  return box;
+  }, [svg, free]);
+  return room;
+}
+
+/**
+ * The part of the picture the whole screen shows, so `focus` is as big as it
+ * fits into the free room and sits in its middle; the rest of the screen shows
+ * more of the picture around it. `unit` is one screen pixel in picture units,
+ * for a frame that stays the same thickness however far it zooms.
+ */
+export function fitBox(room: Room | null, focus: Box): { box: Box; unit: number } {
+  if (!room) return { box: focus, unit: 1 };
+  const scale = Math.min(room.free.width / focus.width, room.free.height / focus.height);
+  const box = {
+    x: focus.x + focus.width / 2 - (room.free.x + room.free.width / 2) / scale,
+    y: focus.y + focus.height / 2 - (room.free.y + room.free.height / 2) / scale,
+    width: room.width / scale,
+    height: room.height / scale,
+  };
+  return { box, unit: 1 / scale };
+}
+
+/** The mirror's frame along the screen's edge, in px; it keeps its thickness however far the picture zooms. */
+const FRAME_PX = { inset: 6, radius: 36, ink: 12, color: 6 };
+
+/** A frame at the edge of `box`, see FRAME_PX. */
+export function screenFrame(box: Box, unit: number) {
+  const inset = FRAME_PX.inset * unit;
+  return { x: box.x + inset, y: box.y + inset, width: box.width - 2 * inset, height: box.height - 2 * inset, rx: FRAME_PX.radius * unit };
+}
+
+/** The mirror frame's two strokes, see screenFrame. */
+export function FrameStroke({ frame, unit }: { frame: ReturnType<typeof screenFrame>; unit: number }) {
+  return (
+    <>
+      <rect {...frame} fill="none" stroke={INK} strokeWidth={FRAME_PX.ink * unit} />
+      <rect {...frame} fill="none" stroke="#b9a8ff" strokeWidth={FRAME_PX.color * unit} />
+    </>
+  );
+}
+
+/**
+ * Room round the lips that always shows: the lips' thick outline and the arrows above and below them.
+ * The arrows that close the mouth stand further out (`closed`) than the ones on an open mouth (`open`).
+ */
+const LIP_ROOM = { x: 22, closed: 62, open: 46 };
+/** The mouth never zooms in so far that it shows less of the picture than this, in picture units. */
+const MIN_FOCUS = { width: 240, height: 120 };
+
+/**
+ * The part of the picture that has to show: the lips with everything inside
+ * them (teeth, monsters, brush) and the arrows on them. It follows the view,
+ * so the mouth fills the free room whether it is open or closed, seen from
+ * the front or the side.
+ */
+function mouthFocus(lips: Point2[], zoom: number, open: number): Box {
+  const xs = lips.map((p) => p.x);
+  const ys = lips.map((p) => p.y);
+  const [left, right, top, bottom] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const width = Math.max(MIN_FOCUS.width, right - left + 2 * LIP_ROOM.x * zoom);
+  const above = LIP_ROOM.closed + (LIP_ROOM.open - LIP_ROOM.closed) * open;
+  const height = Math.max(MIN_FOCUS.height, bottom - top + 2 * above * Math.min(1, zoom));
+  return { x: (left + right - width) / 2, y: (top + bottom - height) / 2, width, height };
 }
 
 export interface MonsterSpot {
@@ -110,6 +177,8 @@ interface MouthProps {
   daytime: Daytime;
   /** Shown while the child should open or close their mouth. */
   action: MouthAction | null;
+  /** The free part of the screen between heading and controls, where the mouth has to fit. */
+  free: RefObject<HTMLElement | null>;
   onTickle: (id: number) => void;
 }
 
@@ -158,7 +227,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, daytime, action, paused, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, daytime, action, paused, free, onTickle }: MouthProps) {
   const model = useMemo(() => buildMouth(view.open), [view.open]);
   const all = projectors(view);
   const project = all.face;
@@ -178,19 +247,13 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
     return { at: alongFace(face, stop.spot), normal: face.normal, along };
   };
 
-  const svg = useRef<SVGSVGElement>(null);
-  const box = useFocusBox(svg);
-  const frame = {
-    x: box.x + FRAME_INSET,
-    y: box.y + FRAME_INSET,
-    width: box.width - 2 * FRAME_INSET,
-    height: box.height - 2 * FRAME_INSET,
-    rx: 70,
-  };
-
   const head = project.point([0, 20, -60]);
   const lipPoints = model.lips.map(project.point);
   const lipsPath = smoothPath(lipPoints);
+
+  const svg = useRef<SVGSVGElement>(null);
+  const { box, unit } = fitBox(useRoom(svg, free), mouthFocus(lipPoints, project.zoom, view.open));
+  const frame = screenFrame(box, unit);
 
   const jawParts = jawOrder(view).map((jaw) => {
     const project = all[jaw];
@@ -341,13 +404,12 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
         {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
 
         {/* The mirror glass catches the light. */}
-        <g fill="#fff" opacity={0.35} pointerEvents="none" transform={`translate(${box.x.toFixed(1)} ${box.y.toFixed(1)})`}>
+        <g fill="#fff" opacity={0.35} pointerEvents="none" transform={`translate(${box.x.toFixed(1)} ${box.y.toFixed(1)}) scale(${(1.6 * unit).toFixed(3)})`}>
           <path d="M80 10 L135 10 L10 135 L10 80 Z" />
           <path d="M160 10 L178 10 L10 178 L10 160 Z" />
         </g>
       </g>
-      <rect {...frame} fill="none" stroke={INK} strokeWidth={14} />
-      <rect {...frame} fill="none" stroke="#b9a8ff" strokeWidth={7} />
+      <FrameStroke frame={frame} unit={unit} />
     </svg>
   );
 }
@@ -532,7 +594,7 @@ export function Monster({
     >
       {/* The ones to brush now glow. */}
       {active && <circle className="monster-glow" cy={-3} r={27} fill="url(#monster-glow)" />}
-      <g className="monster-body" onPointerDown={stop}>
+      <g className="monster-body" data-tap={gone ? "done" : ""} onPointerDown={stop}>
         <path d={MONSTER_TOPS[variant % MONSTER_TOPS.length]} fill={color} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
         {variant % MONSTER_TOPS.length === 1 && (
           <g fill={color} stroke={INK} strokeWidth={2}>

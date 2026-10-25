@@ -545,3 +545,9 @@ button.idea-id {
 .ideas-languages tfoot td {
   border-top: 2px solid var(--ink);
 }
+
+/* Parts of a game (stories, the sung song) sit indented under it. */
+.ideas-languages .ideas-languages-part th {
+  padding-left: 26px;
+  font-size: 0.85rem;
+}

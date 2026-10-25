@@ -1,8 +1,8 @@
-import type { CSSProperties } from "react";
+import { useRef, type CSSProperties, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import type { Daytime } from "./daytime";
 import { PICTURE } from "./jaw";
-import { INK, Monster, SKIN } from "./mouth";
+import { fitBox, FrameStroke, INK, Monster, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 
 // Before anything else, a short story of where the sugar monsters come from:
 // sweets fly into a big grin one after another and leave sugar crumbs on the
@@ -14,6 +14,8 @@ import { INK, Monster, SKIN } from "./mouth";
 export type OriginPart = "sweets" | "grow";
 
 const { width: W, height: H } = PICTURE;
+/** What has to fit between heading and controls: the eyes, the grin and the sun or moon above; the screen shows more sky and face around it. */
+const FOCUS: Box = { x: 20, y: 40, width: 400, height: 340 };
 const MOUTH = { x: 66, y: 236, width: 308, height: 124 };
 const MOUTH_R = 56;
 const TOOTH_W = 42;
@@ -95,28 +97,36 @@ function SkyBody({ daytime }: { daytime: Daytime }) {
 /** A tooth's place in the picture, where a crumb lies and its monster grows. */
 const crumbAt = (c: (typeof CRUMBS)[number]) => ({ x: toothX(c.tooth) + TOOTH_W / 2, y: c.upper ? UPPER_Y : LOWER_Y });
 
+/** The story filling the screen; `free` is the part between heading and controls, where the face has to fit. */
 export function Origin({
   part,
   daytime,
   tickled,
   onTickle,
+  free,
 }: {
   part: OriginPart;
   daytime: Daytime;
   /** The monster that was just tapped and giggles. */
   tickled: number | null;
   onTickle: (id: number) => void;
+  free: RefObject<HTMLElement | null>;
 }) {
+  const svg = useRef<SVGSVGElement>(null);
+  const { box, unit } = fitBox(useRoom(svg, free), FOCUS);
+  const frame = screenFrame(box, unit);
+  const bottom = box.y + box.height;
   return (
     <svg
+      ref={svg}
       className={`origin at-${part} ${daytime}`}
-      viewBox={`0 0 ${W} ${H}`}
+      viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`}
       role="img"
       aria-label={part === "sweets" ? "Süßigkeiten fliegen in einen lachenden Mund" : "Aus dem Zucker auf den Zähnen wachsen kleine Monster"}
     >
       <defs>
         <clipPath id="origin-frame">
-          <rect x={10} y={10} width={W - 20} height={H - 20} rx={70} />
+          <rect {...frame} />
         </clipPath>
         <clipPath id="origin-mouth">
           <rect {...MOUTH} rx={MOUTH_R} />
@@ -124,13 +134,18 @@ export function Origin({
       </defs>
 
       <g clipPath="url(#origin-frame)">
-        <rect className="origin-sky" width={W} height={H} />
+        <rect className="origin-sky" {...box} />
         {/* In the morning the night ends with the sun coming up behind the head. */}
         {daytime === "morning" && part === "grow" && <circle className="origin-sunrise" cx={120} cy={110} r={28} fill="#ffd23f" stroke={INK} strokeWidth={4} />}
         <SkyBody daytime={daytime} />
 
-        {/* The child's face, with a big grin. */}
-        <ellipse cx={W / 2} cy={H + 60} rx={250} ry={290} fill={SKIN} stroke={INK} strokeWidth={6} />
+        {/* The child's face, with a big grin; its sides go straight down to the screen's bottom. */}
+        <path
+          d={`M${W / 2 - 250} ${H + 60} A250 290 0 0 1 ${W / 2 + 250} ${H + 60} V${Math.max(H + 60, bottom + 20)} H${W / 2 - 250} Z`}
+          fill={SKIN}
+          stroke={INK}
+          strokeWidth={6}
+        />
         <g fill={INK}>
           <ellipse cx={150} cy={196} rx={11} ry={14} />
           <ellipse cx={290} cy={196} rx={11} ry={14} />
@@ -196,8 +211,7 @@ export function Origin({
           ))}
       </g>
 
-      <rect x={10} y={10} width={W - 20} height={H - 20} rx={70} fill="none" stroke={INK} strokeWidth={14} />
-      <rect x={10} y={10} width={W - 20} height={H - 20} rx={70} fill="none" stroke="#b9a8ff" strokeWidth={7} />
+      <FrameStroke frame={frame} unit={unit} />
     </svg>
   );
 }

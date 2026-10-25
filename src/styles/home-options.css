@@ -22,11 +22,23 @@
   stroke-linejoin: round;
 }
 
-.fullscreen-exit {
+/* On a computer always, so a grown-up finds it; on phones and tablets only to leave fullscreen. */
+.fullscreen-corner {
   position: absolute;
   top: max(24px, env(safe-area-inset-top));
   right: max(20px, env(safe-area-inset-right));
   z-index: 10;
+  display: none;
+}
+
+.fullscreen-corner.on {
+  display: block;
+}
+
+@media (min-width: 900px) and (any-pointer: fine) {
+  .fullscreen-corner {
+    display: block;
+  }
 }
 
 .home-menu {

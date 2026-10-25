@@ -26,6 +26,7 @@ export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   prep: true,
   speech: false,
   music: true,
+  // TeethGame starts on the browser's language instead, when a song is sung in it.
   singing: "de",
   sounds: true,
 };

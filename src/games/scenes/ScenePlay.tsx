@@ -5,6 +5,7 @@ import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { tapState, tapTargetAt } from "@/lib/tapTargets";
 import { SCENES } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
@@ -580,7 +581,9 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
 
   const onPointerMove = (e: PointerEvent) => {
     if (settings.trigger !== "hover") return;
-    const id = document.elementFromPoint(e.clientX, e.clientY)?.closest("[data-item]")?.getAttribute("data-item") ?? null;
+    // The same grown tap areas as for taps (see tapTargets.ts).
+    const under = tapTargetAt(e.clientX, e.clientY, document.elementFromPoint(e.clientX, e.clientY));
+    const id = under?.closest("[data-item]")?.getAttribute("data-item") ?? null;
     if (id === hovered.current) return;
     endHover();
     hovered.current = id;
@@ -726,6 +729,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
                 style={{ "--party-i": i } as CSSProperties}
                 filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
                 data-item={item.id}
+                data-tap={quest ? tapState({ goal: quest.answers.includes(item), done: answered.has(item.id) }) : tapState({ done: discovered.has(item.id) })}
                 role="button"
                 aria-label={capitalize(item.name)}
                 onPointerDown={(e) => tapItem(item, e)}
@@ -738,7 +742,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
                     <item.Art />
                   </HideoutContext.Provider>
                   {(item.hitAreas ?? [item.box]).map(([x, y, w, h], i) => (
-                    <rect key={i} className="scene-hit" x={x} y={y} width={w} height={h} />
+                    <rect key={i} className="scene-hit" data-tap-area x={x} y={y} width={w} height={h} />
                   ))}
                 </g>
               </g>

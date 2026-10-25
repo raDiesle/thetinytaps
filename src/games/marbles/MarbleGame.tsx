@@ -33,12 +33,14 @@ export function MarbleGame() {
       modes={MODES}
       mode={mode}
       onMode={(levels) => update({ levels: levels as MarbleLevels })}
+      info={
+        <p>
+          Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft bis zum Ende, und das Bild fährt mit. Auf der Klingenden Kugelbahn rollen die Kugeln
+          über Xylophon, Wippe, Looping, Trommeln und Klangröhren bis in den Korb.
+        </p>
+      }
       settings={
         <>
-          <p className="setting-note">
-            Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft bis zum Ende, und das Bild fährt mit. Auf der Klingenden Kugelbahn rollen die Kugeln
-            über Xylophon, Wippe, Looping, Trommeln und Klangröhren bis in den Korb.
-          </p>
           <SettingsGroup title="Kugelbahn: Was rollt denn da?">
             <Toggle label="Oben liegen drei Dinge zur Wahl, ein Tipp lässt genau dieses los" checked={settings.pick} onChange={(pick) => update({ pick })} />
             <p className="setting-note">

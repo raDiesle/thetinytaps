@@ -1,21 +1,23 @@
 import { Link } from "react-router";
-import { FullscreenExit } from "@/components/FullscreenButton";
+import { FullscreenCorner } from "@/components/FullscreenButton";
 import { GameCard } from "@/components/GameCard";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
 import { useFitGrid } from "@/lib/fitGrid";
+import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
 const CATEGORY = categoryOf("/bilder/");
 
 export function ScenesMenu() {
   useTitle("Lebendige Bilder");
+  useUpdateBetweenGames();
   const grid = useFitGrid(SCENES.length + UPCOMING_SCENES.length);
   return (
     <main className="home">
       <Sky />
-      <FullscreenExit />
+      <FullscreenCorner />
       <Link to={CATEGORY ? categoryHref(CATEGORY) : "/"} className="back-link">
         ← {CATEGORY?.title ?? "Alle Spiele"}
       </Link>

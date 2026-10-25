@@ -3,6 +3,7 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { playBoing, playCountNote, playKnock, playMelody, playPlop, playRandomNote, playWash } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { dealPairs, MAX_PAIRS, shuffle, texts, type SockLook } from "./content";
 import { Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
@@ -275,7 +276,9 @@ export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSet
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const next = pairs < MAX_PAIRS ? { emoji: "🧦", name: `${pairs + 1} Paare`, onNext: () => startRound(pairs + 1) } : undefined;
+  // One pair more each time; after the most pairs, the number the grown-up started with again.
+  const nextPairs = pairs < MAX_PAIRS ? pairs + 1 : Number(settings.pairs);
+  const next = { emoji: "🧦", name: `${nextPairs} Paare`, onNext: () => startRound(nextPairs) };
 
   return (
     <div className={`socks-play ${phase}`} onPointerDown={onBackgroundDown}>
@@ -337,6 +340,8 @@ export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSet
                       }${gone ? " gone" : ""}`}
                       style={{ translate, rotate: flight ? "0deg" : `${sock.rotate}deg`, scale: flight ? `${flight.scale}` : undefined }}
                       aria-label={`Socke ${i + 1}`}
+                      // With one sock in hand, its partner is the right one.
+                      data-tap={tapState({ goal: selected !== null && selected !== i && round.socks[selected].pair === sock.pair, done: gone })}
                       onPointerDown={onSockDown(i)}
                     >
                       <SockDrawing look={round.looks[sock.pair]} />

@@ -2,8 +2,8 @@
 export type MarbleLevel = "track" | "pegs" | "sneeze" | "water" | "topple" | "machine" | "kitchen" | "garden" | "building" | "circus" | "space" | "light";
 
 /**
- * Which levels to play: all in turn, or only one of them. (Older saves may
- * still say "both" or "machines"; they play all of them.)
+ * Which level to begin with: the first, or the one picked; „Weiter“ goes on with
+ * the ones after it. (Older saves may still say "both" or "machines"; they begin with the first.)
  */
 export type MarbleLevels = "all" | MarbleLevel;
 
