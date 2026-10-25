@@ -126,8 +126,7 @@ function CommonOptions() {
     <section className="settings">
       <LanguageSetting settings={languages.settings} update={languages.update} />
       <p className="setting-note">
-        Die Sprache gilt für „Buchstaben &amp; Zahlen“ und „Wörter tippen“; das Bewegungsabenteuer hat seine eigene Sprachwahl, die anderen Spiele sind auf
-        Deutsch.
+        Die Sprache gilt für „Buchstaben &amp; Zahlen“, „Wörter tippen“ und für das, was Tapsi im Bewegungsabenteuer sagt; die anderen Spiele sind auf Deutsch.
       </p>
 
       <SettingsGroup title="Ton">

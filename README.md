@@ -95,8 +95,13 @@ without WLAN – and straight away. The home page shows „Funktioniert auch ohn
 Internet“ once that is done, and an „Als App installieren“ button in Chrome /
 Edge / Android (on iPhone and iPad: Safari → Teilen → „Zum Home-Bildschirm“).
 
-A new version is downloaded in the background and used from the next start;
-a game that is open keeps running on the old one. Speech offline uses only the
+A new version is downloaded in the background: the browser looks for it when
+the site is opened, and an open page or installed app (which often only comes
+back from the background, for days) asks every hour and each time it comes back.
+The new version takes over between games – when a menu page is opened or the app
+goes to the background while showing one – never in a running game, and not in
+fullscreen (it would end); otherwise at the next start. The home page shows
+small in the bottom left corner when the running version was built („Stand …“). Speech offline uses only the
 voices on the device (the online „Google“ voices need network). The service
 worker only runs in the built site; to try it locally use the `preview-pages`
 launch config (`PUBLIC_BASE_PATH=/thetinytaps`, port 3200) – `yarn dev` removes

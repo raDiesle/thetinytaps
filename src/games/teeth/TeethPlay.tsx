@@ -138,6 +138,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const { bursts, spawn } = useBursts();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
+  /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
+  const room = useRef<HTMLDivElement>(null);
 
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
@@ -183,11 +185,11 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   // The brushing has its own song (or none, when it is switched off).
   useNoBackgroundMusic();
-  // The sung song sings the steps, so the voice leaves them to it.
+  // Music from the start, while fetching the brush too; the sung song sings the steps, so the voice leaves them to it.
   const sung = useBrushingMusic({
     enabled: settings.music,
     sung: sungIn,
-    playing: step !== null && !paused,
+    playing: !done && !paused,
     finished: done,
     sync: clock,
     at: brushed,
@@ -359,9 +361,11 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
         )}
       </div>
 
+      {/* Before the picture, so it is there when the picture measures it. */}
+      <div className="teeth-room" ref={room} />
       <div className="teeth-stage">
         {before === "brush" || before === "paste" ? (
-          <Prep key={round} part={before} daytime={daytime} />
+          <Prep key={round} part={before} daytime={daytime} free={room} />
         ) : (
           <Mouth
             key={round}
@@ -373,6 +377,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             daytime={daytime}
             action={action}
             paused={paused}
+            free={room}
             onTickle={tickle}
           />
         )}
@@ -387,8 +392,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
         </div>
       ) : (
         <>
-          {/* The week shows before brushing too, which star is to come; while brushing, the mouth gets its room. */}
-          {before && settings.week && <Week log={week} today={new Date()} now={daytime} />}
+          {/* The week shows before brushing too, which star is to come (not on a phone, where the sink needs the room); while brushing, the mouth gets its room. */}
+          {before && settings.week && (
+            <div className="teeth-week-before">
+              <Week log={week} today={new Date()} now={daytime} />
+            </div>
+          )}
           <div className="teeth-controls">
             <button type="button" className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>
               {paused ? "▶️" : "⏸️"}

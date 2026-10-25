@@ -51,6 +51,16 @@ export function LettersGame() {
           ]}
         />
       }
+      info={
+        <>
+          <p>
+            Frei tippen: Jede Taste zeigt ihren Buchstaben groß mit einem Bild dazu, „{b.upper} wie {b.words[0].word}“. Eine Zahl zeigt so viele Dinge – auf
+            einmal, vorgezählt, Schritt für Schritt oder zum selbst Antippen.
+          </p>
+          <p>Wo ist das {b.upper}? Ein Buchstabe und sein Bild erscheinen, und das Kind sucht die Taste dafür.</p>
+          <p>Buchstaben-Zug: Jede Taste hängt einen Wagen mit ihrem Buchstaben an. Ist der Zug voll, pfeift er und fährt los.</p>
+        </>
+      }
       settings={
         <>
           <SettingsGroup title="Anzeige">

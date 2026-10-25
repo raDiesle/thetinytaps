@@ -74,16 +74,47 @@
   opacity: 0.75;
 }
 
+/* The mirror (or the sink) fills the whole screen behind the heading and the controls; what matters
+   fits into .teeth-room, the free part between them (see fitBox in mouth.tsx). */
 .teeth-stage {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+  position: absolute;
+  inset: 0;
 }
 
-/* The mirror takes the whole stage; the picture inside grows to fit (see useFocusBox). */
-.mouth {
+.teeth-room {
+  flex: 1;
+  min-height: 0;
+  align-self: stretch;
+}
+
+/* Heading, week and controls lie on the picture; the heading lets taps through to the monsters. */
+.teeth-heading,
+.teeth-end,
+.teeth-week-before,
+.teeth-controls {
+  position: relative;
+  z-index: 1;
+}
+
+.teeth-clock,
+.teeth-sky {
+  z-index: 1;
+}
+
+.teeth-heading {
+  pointer-events: none;
+}
+
+/* On a phone on its side the sink would shrink to a stamp next to the week, so before brushing it waits for the end. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .teeth-week-before {
+    display: none;
+  }
+}
+
+.mouth,
+.prep {
+  display: block;
   width: 100%;
   height: 100%;
 }
@@ -269,6 +300,8 @@
 .teeth-paused {
   position: absolute;
   inset: 0;
+  /* Over the heading, under the controls. */
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -425,12 +458,6 @@
 
 /* ---------- Before brushing: get the brush, toothpaste on ---------- */
 
-.prep {
-  width: 100%;
-  height: 100%;
-  max-width: min(100%, 880px);
-}
-
 .prep-brush {
   transform: translate(356px, 95px) rotate(90deg) scale(0.9);
 }
@@ -473,10 +500,11 @@
   animation: reach 4.5s ease-out forwards;
 }
 
+/* It starts far enough out to be off the screen however much of the sink shows on a wide one. */
 @keyframes reach {
   0%,
   25% {
-    transform: translateY(420px);
+    transform: translateY(1000px);
   }
   42%,
   100% {
