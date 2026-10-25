@@ -1,5 +1,5 @@
 import { expect, test } from "@rstest/core";
-import { BALL_R, type Pt } from "@/games/marbles/path";
+import { BALL_R, type Pt } from "./path";
 import {
   BASKET_FULL,
   BASKET_SLOTS,

@@ -6,7 +6,7 @@ export interface LevelProps {
   sound: (play: () => void) => void;
   /** Says a line, if speech is on. */
   say: (text: string) => void;
-  /** The level is finished: the machine has run, or everything has fallen over. */
+  /** The level is finished: the machine has run, everything has fallen over, or the marble run's basket is full. */
   onDone: () => void;
 }
 
