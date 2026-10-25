@@ -4,6 +4,7 @@ import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { sampleLetter } from "@/content/languages";
+import { downloadMusic } from "@/lib/musicFile";
 import { useCommonSettings } from "@/lib/common";
 import { DEFAULT_PLAYTIME_SETTINGS, playedToday, PLAYTIME_OPTIONS, PLAYTIME_SETTINGS_KEY, resetPlaytime } from "@/lib/playtime";
 import { useStoredSettings } from "@/lib/storage";
@@ -134,6 +135,20 @@ function CommonOptions() {
           <p className="setting-note">„Zähne putzen“ sagt seine Ansagen trotzdem – dort lassen sie sich abschalten.</p>
         )}
         <Toggle label="Töne und Geräusche" checked={common.sounds} onChange={(sounds) => update({ sounds })} />
+        <Toggle
+          label="🎵 Musik"
+          checked={common.music}
+          onChange={(music) => {
+            // Switched back on: fetch the song now, so it is there when the game starts.
+            if (music) void downloadMusic();
+            update({ music });
+          }}
+        />
+        <p className="setting-note">
+          {common.music
+            ? "Leise Musik im Hintergrund, ab dem ersten Tippen im Spiel. Spiele mit eigener Musik spielen ihre eigene."
+            : "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen."}
+        </p>
       </SettingsGroup>
 
       <p className="setting-note">Alles Weitere, was nur zu einem Spiel gehört, steht auf dessen Startseite unter „Einstellungen“.</p>

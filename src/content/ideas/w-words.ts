@@ -58,6 +58,7 @@ export const wordsIdeas: IdeaArea = {
       text: "Eltern legen eigene Wörter mit Emoji an (Name, Haustier „Bello“, Kita, Lieblingskuscheltier). Gespeichert im Browser.",
       why: "Persönliche Wörter motivieren am meisten.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "W-07",
@@ -66,6 +67,7 @@ export const wordsIdeas: IdeaArea = {
       text: "Wort in Silben geteilt (Ba-na-ne); zu jeder Silbe ein Klatsch-Ton und ein hüpfender Bogen. Option: ganze Silbe mit einer Taste.",
       why: "Silbengefühl ist eine wichtige Vorläuferfähigkeit fürs Lesen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "W-08",
@@ -74,6 +76,7 @@ export const wordsIdeas: IdeaArea = {
       text: "Jedes fertige Wort landet als Sticker in einem Album, das man am Ende (oder auf der Startseite) durchblättern kann.",
       why: "Sammeln macht Spaß und zeigt Eltern, was geübt wurde.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "W-09",
@@ -82,6 +85,7 @@ export const wordsIdeas: IdeaArea = {
       text: "Ein Buchstabe wird getauscht: MAUS → HAUS → LAUS. Die Bilder wechseln mit.",
       why: "Für ältere Geschwister; Lautbewusstsein und Reime.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "W-10",

@@ -2,6 +2,6 @@ import { MarbleRunGame } from "@/games/marblerun/MarbleRunGame";
 import { useTitle } from "@/lib/title";
 
 export function MarbleRunPage() {
-  useTitle("Kugelbahn");
+  useTitle("Klingende Kugelbahn");
   return <MarbleRunGame />;
 }

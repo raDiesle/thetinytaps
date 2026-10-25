@@ -166,7 +166,9 @@ export const SCENARIOS: Scenario[] = [
     title: "Der Piratenschatz",
     premise: "Wir rudern zur Pirateninsel. Der Papagei kennt das Versteck des Schatzes.",
     moments: [
+      { movement: "sit_down", situation: "Das Ruderboot schaukelt am Schiff.", reaction: "Im Sitzen liegt es ruhig, die Ruder sind bereit." },
       { movement: "rowing_boat", situation: "Das Ruderboot liegt am Schiff.", reaction: "Das Boot gleitet über die Wellen zur Insel." },
+      { movement: "stand_up", situation: "Das Boot liegt fest im Sand.", reaction: "Alle stehen auf, der Papagei fliegt voraus." },
       { movement: "fishing_cast", situation: "Am Steg ziehen Fische vorbei.", reaction: "Die Angel holt eine Flaschenpost mit Schatzkarte." },
       { movement: "line_walk", situation: "Ein schmales Brett führt vom Schiff an den Strand.", reaction: "Wir kommen sicher an, der Papagei klatscht." },
       { movement: "flamingo_stand", situation: "Eine Welle schwappt über die Steine.", reaction: "Ein Fuß bleibt trocken, die Welle kitzelt den anderen." },

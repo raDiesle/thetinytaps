@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
@@ -52,6 +53,8 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
   const musicRef = useRef<Music | null>(null);
 
   useWakeLock(!ended && !paused);
+  // The story has its own music, which the stop dance needs to control.
+  useNoBackgroundMusic();
 
   useEffect(() => {
     const canvas = canvasRef.current!;

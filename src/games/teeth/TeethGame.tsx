@@ -1,7 +1,7 @@
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
-import { useGameSettings } from "@/lib/common";
+import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes } from "./settings";
 import { KAI } from "./steps";
@@ -11,6 +11,7 @@ export function TeethGame() {
   const [shared, update, stored] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
   // The spoken hints have their own switch here, independent of "Vorlesen" on the home page.
   const settings = { ...shared, speech: stored.speech };
+  const [common] = useCommonSettings();
   const { touchOnly } = useDevice();
 
   return (
@@ -44,6 +45,7 @@ export function TeethGame() {
           />
           <Toggle label="Wochenbild am Ende: ein Stern für jedes Putzen morgens und abends" checked={settings.week} onChange={(week) => update({ week })} />
           <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
+          {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
           <p className="setting-note">
             Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist
             oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht
@@ -69,7 +71,8 @@ export function TeethGame() {
         </SettingsGroup>
       }
     >
-      <TeethPlay speechLang={de.speechLang} settings={settings} />
+      {/* Its own song, which plays only while music is on for all games too. */}
+      <TeethPlay speechLang={de.speechLang} settings={{ ...settings, music: settings.music && common.music }} />
     </GameShell>
   );
 }

@@ -6,7 +6,7 @@ export const adventureIdeas: IdeaArea = {
   emoji: "🏝️",
   title: "Bewegungsabenteuer",
   intro:
-    "Der Fuchs Tapsi macht vor, das Kind macht vor dem Bildschirm mit. Die Bewegungsbibliothek hat schon 18 Welten und 100 Bewegungen, gespielt wird bisher nur die Schatzinsel.",
+    "Der Fuchs Tapsi macht vor, das Kind macht vor dem Bildschirm mit. Die Bewegungsbibliothek hat schon 18 Welten und 102 Bewegungen, gespielt wird bisher nur die Schatzinsel.",
   ideas: [
     {
       id: "M-01",

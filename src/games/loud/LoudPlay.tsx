@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type ComponentType, type RefObject } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playMelody } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { BlowPlay } from "./BlowPlay";
@@ -46,6 +47,8 @@ const PARTY_MS = 3200;
  */
 export function LoudPlay({ speechLang, settings }: { speechLang: string; settings: LoudSettings }) {
   const levels = chosenLevels(settings.levels);
+  // The microphone would hear the background song and take it for the child.
+  useNoBackgroundMusic();
   /** Which of the chosen levels is on, and how often a level was started (a new one or the same again). */
   const [index, setIndex] = useState(0);
   const [round, setRound] = useState(0);

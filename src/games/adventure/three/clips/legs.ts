@@ -1,21 +1,4 @@
-import {
-  BUMP_HEIGHT,
-  clamp01,
-  clips,
-  crouch,
-  duckDepth,
-  feetAt,
-  hold,
-  isBump,
-  jump,
-  JUMP_HEIGHT,
-  JUMP_PERIOD,
-  phase,
-  smooth,
-  steps,
-  swing,
-  TAU,
-} from "./motion";
+import { clamp01, clips, crouch, duckDepth, feetAt, hold, jump, JUMP_HEIGHT, JUMP_PERIOD, phase, sitProgress, smooth, steps, swing, TAU } from "./motion";
 
 // Clips about the legs: stomping, hopping, marching, balancing.
 // Where a clip is decides which part of Tapsi glows (`clipFocus` in index.ts).
@@ -178,21 +161,28 @@ export const LEG_CLIPS = clips({
   },
 
   jump: (t, p) => {
-    // Forwards along the bridge, leaning into it; every third jump goes straight up, the head first, to
-    // bump something above with it.
-    const n = Math.floor(t / JUMP_PERIOD);
-    const bump = isBump(n);
-    const flight = jump(p, phase(t, JUMP_PERIOD), bump ? BUMP_HEIGHT : JUMP_HEIGHT);
+    // Every jump goes straight up, the head first, to bump something above with it: arms down by the
+    // sides, chin up.
+    const flight = jump(p, phase(t, JUMP_PERIOD), JUMP_HEIGHT);
     const air = flight >= 0 ? Math.sin(flight * Math.PI) : 0;
-    if (bump) {
-      // Arms down by the sides, chin up: the head bumps it.
-      for (const a of [p.armL, p.armR]) {
-        a.raise = Math.min(a.raise, 0.4);
-        a.spread = 0.35 + air * 0.3;
-      }
-      p.headPitch -= air * 0.35;
-    } else {
-      p.bend += air * 0.15;
+    for (const a of [p.armL, p.armR]) {
+      a.raise = Math.min(a.raise, 0.4);
+      a.spread = 0.35 + air * 0.3;
     }
+    p.headPitch -= air * 0.35;
+  },
+
+  sit: (t, p) => {
+    // Sitting down on the floor or getting up from it: the arms go forwards for balance while the body
+    // goes down or up (the story sits the guide down with sitProgress), then hang loosely again.
+    const k = sitProgress(t);
+    const moving = Math.sin(k * Math.PI);
+    for (const a of [p.armL, p.armR]) {
+      a.raise = 0.25 + moving * 1.0;
+      a.spread = 0.2;
+      a.elbow = 0.3 + moving * 0.2;
+    }
+    p.bend = moving * 0.3;
+    p.headPitch = moving * 0.15;
   },
 });

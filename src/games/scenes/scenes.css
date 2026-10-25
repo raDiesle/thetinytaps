@@ -335,6 +335,48 @@
   animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
+/*
+ * Colour mode with the key badges on: the space bar, small at the bottom in the
+ * middle. Plain like the letter badges, only wide; it goes down while it is held.
+ */
+.scene-space {
+  position: absolute;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  width: clamp(110px, 14vw, 170px);
+  padding: 0 0 3px;
+  border: 0;
+  border-radius: 10px;
+  background: #2a1e5c40;
+  cursor: pointer;
+}
+
+.scene-space-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: clamp(26px, 4vh, 34px);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: #ffffffe6;
+  transition: transform 0.08s;
+}
+
+.scene-space.down .scene-space-top,
+.scene-space:active .scene-space-top {
+  transform: translateY(3px);
+}
+
+.scene-space-bar {
+  width: 50%;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* Keys mode: the frame the arrow keys move. */
 .scene-focus {
   pointer-events: none;

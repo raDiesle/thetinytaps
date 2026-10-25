@@ -1,5 +1,5 @@
-/* The feelings game: comforting the bear, and the kindergarten stories.
-   No words on screen: a big picture in the middle, picture cards below. */
+/* The feelings game: comforting the bear at home, and the kindergarten stories.
+   A big picture in the middle, picture cards below; the only words are small captions for grown-ups. */
 
 .story-play {
   --card-w: min(34vw, 28vh, 300px);
@@ -12,7 +12,7 @@
   background: linear-gradient(var(--sky-bottom), var(--cream));
 }
 
-/* ---------- How far along: dots for the steps, hearts for the bear ---------- */
+/* ---------- How far along a story is: one dot per step ---------- */
 
 .story-top {
   grid-area: top;
@@ -21,8 +21,7 @@
   padding: max(14px, env(safe-area-inset-top)) 70px 10px;
 }
 
-.fg-dots,
-.fg-hearts {
+.fg-dots {
   display: flex;
   gap: 8px;
 }
@@ -48,33 +47,29 @@
   background: var(--sunshine);
 }
 
-.fg-heart {
-  font-family: var(--font-emoji);
-  font-size: clamp(1.6rem, 4.5vh, 2.4rem);
-  line-height: 1;
-}
-
-.fg-heart:not(.full) {
-  filter: grayscale(1) opacity(0.35);
-}
-
-.fg-heart.full {
-  animation: pop-in 0.45s var(--pop);
-}
-
 /* ---------- The big picture in the middle ---------- */
 
 .story-middle {
+  --caption-h: 1.9rem;
+
   grid-area: middle;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 0 16px 14px;
   container-type: size;
 }
 
+/* At home there is nothing above the picture. */
+.bear-play .story-middle {
+  padding-top: max(14px, env(safe-area-inset-top));
+}
+
+/* Leaves room for the caption under it. */
 .fg-picture {
   position: relative;
-  width: min(100cqw, 100cqh * 4 / 3);
+  width: min(100cqw, (100cqh - var(--caption-h)) * 4 / 3);
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border: var(--outline);
@@ -110,6 +105,29 @@
   z-index: 3;
   width: 28%;
   animation: fg-stamp 0.45s var(--pop);
+}
+
+/* ---------- Captions: what a picture shows, small, for grown-ups ---------- */
+
+.fg-caption {
+  max-width: 100%;
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(0.75rem, 1.8vh, 0.95rem);
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  opacity: 0.7;
+  user-select: none;
+}
+
+.fg-picture-caption {
+  height: var(--caption-h);
+  padding-top: 0.45rem;
+  overflow: hidden;
+  font-size: clamp(0.85rem, 2.1vh, 1.1rem);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* ---------- Floating hearts, notes and puffs ---------- */
@@ -154,8 +172,44 @@
   align-items: center;
   justify-content: center;
   gap: clamp(20px, 5vw, 56px);
-  min-height: calc(var(--card-w) * 0.75 + 56px);
-  padding: 22px 16px max(26px, env(safe-area-inset-bottom));
+  min-height: calc(var(--card-w) * 0.75 + 100px);
+  padding: 22px 16px max(16px, env(safe-area-inset-bottom));
+}
+
+/* At home three kind things and a not-so-good idea: four smaller cards in a row. */
+.bear-play {
+  --card-w: min(20vw, 24vh, 240px);
+}
+
+.bear-play .story-choices {
+  gap: clamp(12px, 3vw, 40px);
+}
+
+/* Tall, narrow screens (phones upright): the four cards two by two, so they stay big. */
+@media (max-aspect-ratio: 3 / 4) {
+  .bear-play {
+    --card-w: min(40vw, 19vh, 240px);
+  }
+
+  .bear-play .story-choices {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    justify-content: center;
+    gap: 16px clamp(16px, 5vw, 40px);
+  }
+}
+
+/* A card with its caption underneath, below the ring and shadow of the card. */
+.fg-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: var(--card-w);
+}
+
+.fg-choice.small {
+  --card-w: min(22vw, 16vh, 160px);
 }
 
 .fg-card {
@@ -185,7 +239,6 @@
 }
 
 .fg-card.small {
-  --card-w: min(22vw, 16vh, 160px);
   border-radius: 16px;
 }
 
@@ -202,8 +255,8 @@
   animation: fg-call 1.8s ease-in-out infinite;
 }
 
-/* Two cards to choose from take turns calling. */
-.fg-card-choose ~ .fg-card-choose {
+/* Cards to choose from take turns calling. */
+.fg-choice:nth-child(even) .fg-card-choose {
   animation-delay: -0.9s;
 }
 
@@ -362,8 +415,20 @@
     padding: 0 max(20px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) 20px;
   }
 
-  .fg-card.small {
+  .fg-choice.small {
     --card-w: min(16vw, 22vh, 130px);
+  }
+
+  /* Four cards at home: two by two. */
+  .story-play.bear-play {
+    --card-w: min(17vw, 24vh, 180px);
+  }
+
+  .bear-play .story-choices {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    align-content: center;
+    gap: 16px 20px;
   }
 
   .fg-end {

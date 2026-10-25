@@ -31,6 +31,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Eltern tragen den Namen des Kindes und von Familienmitgliedern ein (bleibt nur im Browser). Die Buchstaben des Namens bekommen eine eigene Feier: „Em, wie Mia!“, dazu Mama, Papa, Oma, Haustier.",
       why: "Der eigene Anfangsbuchstabe ist meist der erste, den Kinder erkennen.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "L-04",
@@ -48,6 +49,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Zur Zahl zusätzlich (oder wahlweise) das Würfelbild oder zwei Hände mit gestreckten Fingern zeigen. Einstellung: Dinge / Würfel / Finger.",
       why: "Kleine Mengen auf einen Blick erkennen (Simultanerfassung) – ohne Abzählen.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "L-06",
@@ -119,6 +121,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Neue Ansage-Art „Geräusch“: „Die Kuh macht Muh!“, „Das Auto macht Brumm!“. Dazu passender synthetischer Ton aus sfx.",
       why: "Tierlaute sprechen Kinder vor Wörtern nach – perfekt für die Jüngsten.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "L-14",
@@ -127,6 +130,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Druckseite für Eltern: kleine Bildchen (🐻 auf B) zum Aufkleben auf die Tasten oder als Vorlage neben der Tastatur.",
       why: "Kind findet Lieblingsbilder wieder; Verbindung Bildschirm ↔ Tastatur.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "L-15",

@@ -63,3 +63,72 @@
     animation: none;
   }
 }
+
+/* On a computer: the number keys under the shelf, which go down while held. */
+.run-key {
+  cursor: pointer;
+}
+
+.run-key-base {
+  fill: #adb5bd;
+}
+
+.run-key-face {
+  fill: #fff8e8;
+}
+
+.run-key-top {
+  transition: transform 0.08s;
+}
+
+.run-key.down .run-key-top {
+  transform: translateY(5px);
+}
+
+/*
+ * On a computer: the space bar, at the bottom in the middle, rebuilds the run.
+ * It looks like the app's other buttons – sunny yellow, ink outline and a solid
+ * shadow under it – so it reads as a button on the busy wall, and goes down
+ * while it is held.
+ */
+.run-space {
+  position: absolute;
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 8px));
+  left: 50%;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: clamp(150px, 20vw, 230px);
+  height: clamp(44px, 6.5vh, 56px);
+  padding: 0;
+  border: var(--outline);
+  border-radius: 16px;
+  background: var(--sunshine);
+  box-shadow: var(--lift);
+  cursor: pointer;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+
+.run-space.down,
+.run-space:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.run-space-wrench {
+  font-family: var(--font-emoji);
+  font-size: clamp(1.4rem, 3.6vh, 1.9rem);
+}
+
+.run-space-bar {
+  width: clamp(60px, 8vw, 96px);
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

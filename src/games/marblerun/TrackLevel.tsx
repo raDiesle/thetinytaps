@@ -1,8 +1,9 @@
-import { useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
 import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble } from "@/games/marbles/level";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "@/games/marbles/parts";
 import { BALL_R, type Pt } from "@/games/marbles/path";
+import { useDevice } from "@/lib/device";
 import {
   playBells,
   playBlub,
@@ -298,6 +299,9 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
   const turn = useRef(0);
   const pops = useRef<{ id: number; x: number; y: number; at: number }[]>([]);
   const pegs = useId();
+  /** The key held down just now, so its cap on the screen goes down too (the picture is drawn on every frame anyway). */
+  const held = useRef<string | null>(null);
+  const { touchOnly } = useDevice();
 
   const routeOf = (m: Marble): Route => (m.section % 2 ? routes.pieces[(m.section - 1) / 2][m.piece] : routes.fixed[m.section / 2]);
   const zoneAt = (route: Route, s: number) => route.zones.find((z) => s >= z.s0 && s < z.s1);
@@ -408,14 +412,31 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
     sound(() => playKnock(520));
   };
 
-  /** A tap on a spot: the next part in turn goes in, or waits until the marble inside has rolled out. */
+  /** The next part in turn goes into spot i, or waits until the marble inside has rolled out. True when it is back at the first part. */
+  const advance = (i: number) => {
+    const spot = spots.current[i];
+    const next = (PIECES.indexOf(spot.pending ?? build.current[i]) + 1) % PIECES.length;
+    if (busy(i)) spot.pending = PIECES[next];
+    else put(i, PIECES[next], performance.now());
+    return next === 0;
+  };
+
+  /** A tap on a spot swaps its part. */
   const swap = (i: number, e: PointerEvent) => {
     if (done.current) return;
     e.stopPropagation();
-    const spot = spots.current[i];
-    const next = PIECES[(PIECES.indexOf(spot.pending ?? build.current[i]) + 1) % PIECES.length];
-    if (busy(i)) spot.pending = next;
-    else put(i, next, performance.now());
+    advance(i);
+  };
+
+  /**
+   * The space bar (on a computer) rebuilds the run to the next of all its
+   * builds, counting like a car's mileage: the first spot takes its next part,
+   * and each time it comes back to the first part the next spot moves on too.
+   */
+  const rebuildNext = () => {
+    if (done.current) return;
+    let i = 0;
+    while (i < SLOTS.length && advance(i)) i++;
   };
 
   /** Something on the run was tapped: it reacts, and the wall behind doesn't sparkle. Without the shelf the first tap still opens the hopper. */
@@ -598,19 +619,34 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
   };
 
   /**
-   * A key: with the shelf the next thing goes in. Without it the first key
-   * opens the hopper, later ones hop every rolling marble, or play the next
-   * bar when none is rolling.
+   * A key: with the shelf 1, 2 and 3 let out the thing in that place, any
+   * other key the next thing in turn; the space bar rebuilds the run, if it
+   * may be rebuilt. Without the shelf the first key opens the hopper, later
+   * ones hop every rolling marble, or play the next bar when none is rolling.
    */
-  useAnyKey(() => {
+  useAnyKey((e) => {
+    held.current = e.key;
     const t = performance.now();
-    if (pick || openedAt.current === null) open();
+    const place = SHELF.things.findIndex((_, i) => e.key === `${i + 1}`);
+    if (rebuild && e.key === " ") {
+      e.preventDefault();
+      rebuildNext();
+    } else if (pick && place >= 0) take(place);
+    else if (pick || openedAt.current === null) open();
     else if (marbles.current.length) marbles.current.forEach((m) => nudge(m, t));
     else {
       playBar(keyBar.current, t);
       keyBar.current = (keyBar.current + 1) % BARS.length;
     }
   });
+
+  useEffect(() => {
+    const onKeyUp = () => {
+      held.current = null;
+    };
+    window.addEventListener("keyup", onKeyUp);
+    return () => window.removeEventListener("keyup", onKeyUp);
+  }, []);
 
   /** A tap on the bare wall does what a key does first (opens the hopper, or takes the next thing), and sparkles rise there. */
   const tapWall = (e: PointerEvent) => {
@@ -636,7 +672,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
 
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
-      <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label="Kugelbahn">
+      <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label="Klingende Kugelbahn">
         <defs>
           <pattern id={pegs} width="50" height="50" patternUnits="userSpaceOnUse">
             <circle cx="25" cy="25" r="4.5" fill="#d7ac72" />
@@ -753,6 +789,8 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
             return <RollerBody key={l.id} kind={l.kind} color={l.color} look={l.look} x={x} y={y} spin={0} />;
           })}
         </g>
+        {/* On a computer the keys 1, 2 and 3 under the shelf; behind the marbles rolling past */}
+        {pick && !touchOnly && <ShelfKeys held={held.current} onTake={take} />}
         {marbles.current.map((m) => {
           const k = (t - m.nudged) / NUDGE_MS;
           return (
@@ -823,6 +861,25 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
           </text>
         )}
       </svg>
+      {/* On a computer the space bar at the bottom rebuilds the run */}
+      {rebuild && !touchOnly && !done.current && (
+        <button
+          type="button"
+          className={`run-space${held.current === " " ? " down" : ""}`}
+          aria-label="Leertaste"
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            rebuildNext();
+          }}
+        >
+          <span className="run-space-wrench" aria-hidden>
+            🔧
+          </span>
+          <svg className="run-space-bar" viewBox="-40 -14 80 28" aria-hidden>
+            <path d="M-34 -8 V8 H34 V-8" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 }
@@ -1011,6 +1068,32 @@ function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled:
           </g>
         );
       })}
+    </g>
+  );
+}
+
+/** Under each place on the shelf its number key, which lets out the thing there; it goes down while `held`. */
+function ShelfKeys({ held, onTake }: { held: string | null; onTake: (i: number) => void }) {
+  return (
+    <g>
+      {SHELF.things.map((x, i) => (
+        <g
+          key={i}
+          className={`run-key${held === `${i + 1}` ? " down" : ""}`}
+          onPointerDown={(e: PointerEvent) => {
+            e.stopPropagation();
+            onTake(i);
+          }}
+        >
+          <rect x={x - 22} y={SHELF.y + 20} width="44" height="40" rx="10" className="run-key-base" />
+          <g className="run-key-top">
+            <rect x={x - 22} y={SHELF.y + 16} width="44" height="38" rx="10" className="run-key-face" stroke={INK} strokeWidth="3.5" />
+            <text x={x} y={SHELF.y + 45} fontSize="28" fontWeight="800" textAnchor="middle" fill={INK}>
+              {i + 1}
+            </text>
+          </g>
+        </g>
+      ))}
     </g>
   );
 }

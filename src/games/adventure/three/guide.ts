@@ -751,6 +751,12 @@ export class Guide {
     this.glowMoving(p, time);
   }
 
+  /** A point given in the body's own space (fox units, x to the fox's left, z ahead), in world space. */
+  bodyPoint(local: THREE.Vector3, out: THREE.Vector3) {
+    this.spine.updateWorldMatrix(true, false);
+    return this.spine.localToWorld(out.copy(local));
+  }
+
   /** Where a paw would hold a bar right now, in world space. */
   gripPoint(hand: "L" | "R", out: THREE.Vector3) {
     return (hand === "L" ? this.handL : this.handR).localToWorld(out.copy(GRIP));

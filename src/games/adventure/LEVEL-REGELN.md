@@ -21,11 +21,14 @@ Fehler in späteren Leveln nicht wieder passiert.
   an ihren Enden, damit man sie gut erkennt.
 - **Jede Bewegung oft genug.** Zeigen und Mitmachen zusammen dauern etwa 12–25 s, also viele
   Runden, bevor es weitergeht. Lieber eine Station länger als eine mehr.
-- **Das Level beginnt im Stehen und gleich mit einer Bewegung** (Schatzinsel: die Angel auswerfen),
-  nicht mit Sitzen und Zuschauen. Hinsetzen ist dann selbst ein Schritt, den man sieht.
+- **Das Level beginnt im Stehen und gleich mit einer Bewegung** (Schatzinsel: erst Kiki winken, dann
+  die Angel auswerfen), nicht mit Sitzen und Zuschauen.
+- **Hinsetzen und Aufstehen sind eigene Schritte** mit eigener Zeit, Vormachen und „Jetzt du!“,
+  damit sich das Kind wirklich hinsetzt und wieder aufsteht. Nicht nebenbei im Lob oder im Weg davor.
 - **Lieber ein klarer Treffer mit Ton als eine vage Bewegung.** Blumen mit den Armen „aufwecken“
-  war zu unbestimmt; auf eine Trommel schlagen (bumm, ein Schmetterling fliegt heraus) kennt jedes
-  Kind.
+  war zu unbestimmt; auf eine Trommel schlagen kennt jedes Kind.
+- **Die Bewegung hat einen Sinn auf dem Weg.** Trommeln nur für einen Schmetterling war beliebig;
+  jetzt sitzen Vögel auf dem Weg, und jeder Schlag scheucht einen weg, bis der Weg frei ist.
 - **Das Ende ist kurz und bleibt Bewegung mit Wirkung**, kein langes Tanzen: Tanzen bewirkt nichts
   und trainiert nichts Bestimmtes. Schatzinsel: Arme hochstoßen, und aus jeder Pfote zischt eine
   Rakete.
@@ -40,6 +43,9 @@ Fehler in späteren Leveln nicht wieder passiert.
   gegen die Anzahl der Dinge. Auch am Ende: Der Clip läuft eine ganze Zahl von Runden, sonst weicht
   der Fuchs zum Schluss noch aus, obwohl keine Nuss mehr kommt. Die Anzahl der Dinge aus der Länge
   rechnen, nicht von Hand (`CYCLES` in der Geschichte, ein Test prüft die ganzen Runden).
+- **Bei jeder Runde passiert etwas**, nicht nur bei manchen: Hüpft der Fuchs zehnmal, stößt er zehnmal
+  mit dem Kopf an eine Kiste. Ole läuft dafür so schnell, dass bei jedem Sprung eine neue Kiste
+  über Tapsi hängt.
 - **Was getroffen wird, hängt dort, wo die Pfote im Clip wirklich ankommt**: am Clip messen, nicht
   schätzen, und seitlich vom Körper, damit man den Treffer von hinten sieht.
 - **Die Pfoten sind an dem, was sie drehen oder halten** (Kurbel, Paddel, Angel, Schlüssel): Hand
@@ -57,6 +63,14 @@ Fehler in späteren Leveln nicht wieder passiert.
   Körperteilen (im Bild berechnet, nicht pro Teil), mit einem kleinen Abstand zum Körper. Was vor
   dem Fuchs steht, verdeckt auch das Leuchten.
 - Kamera von hinten, damit links links ist; wo die Arme vor dem Körper arbeiten, höher und seitlich.
+- **Am Anfang sieht man den Fuchs von vorn**: Beim Vorstellen schwenkt die Kamera erst vor ihn, so
+  dass man sein Gesicht sieht, und geht erst danach hinter ihn.
+- **Ausholen geht seitlich über die Schulter** (Angel): Die Pfoten gehen neben dem Kopf hoch, nicht
+  vor dem Gesicht vorbei oder in den Kopf. Wo ein Arm hinter dem Körper ist, scheint er durch; er
+  geht aber nie in den Körper hinein. Das Ding in der Hand legt fest, wo die Pfoten sind, nicht
+  umgekehrt.
+- **Wer weggescheucht wird, ist im Bild**: Kamera so hoch, dass man über den Fuchs hinweg sieht,
+  was auf dem Weg sitzt, und groß genug, um es zu erkennen.
 - **Was die Hände tun, ist im Bild.** Verdeckt der Körper die Hände, geht die Kamera über die
   Schulter (Schlüssel im Schloss). Was gedreht wird, muss so gebaut sein, dass man die Drehung
   sieht: Ein Schlüsselring steht längs zum Schaft; ein flacher Ring, der sich um sich selbst dreht,

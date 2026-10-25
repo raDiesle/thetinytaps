@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { CHEEK, INK, SKIN } from "@/games/scenes/shared";
 import {
   Bed,
+  Block,
   Boat,
   Boots,
   Bowl,
@@ -11,17 +12,18 @@ import {
   EmptyPlate,
   Fridge,
   Juice,
+  Mixer,
   Mug,
   OpenUmbrella,
   Pancakes,
   Pyjama,
   RainHat,
-  RainPuddle,
   Raincoat,
   SleepyMoon,
   Stove,
   Table,
   Teddy,
+  Toilet,
   ToothCup,
   Toothbrush,
   Tub,
@@ -118,37 +120,51 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
         <path d="M-33 -146 Q-38 -180 0 -180 Q38 -180 33 -146 Z" fill={look.hair} />
       )}
       <circle cx="0" cy="-140" r="32" fill={SKIN} />
-      {look.curly ? (
-        <path d="M-30 -150 Q-24 -172 0 -170 Q24 -172 30 -150 Q18 -160 8 -154 Q0 -162 -8 -154 Q-18 -160 -30 -150 Z" fill={look.hair} />
-      ) : (
-        <>
-          <path d="M-33 -142 Q-36 -178 0 -178 Q36 -178 33 -142 Q26 -160 8 -158 Q-6 -166 -20 -156 Q-28 -150 -33 -142 Z" fill={look.hair} />
-          <path d="M-2 -176 q4 -18 20 -14 q-12 2 -12 14 Z" fill={look.hair} />
-        </>
-      )}
+      {/* The fringe, the cheeks and the face slide sideways when the head turns (pose "shake"), the face furthest, so it looks round. */}
+      <g className="el-fringe">
+        {look.curly ? (
+          <path d="M-30 -150 Q-24 -172 0 -170 Q24 -172 30 -150 Q18 -160 8 -154 Q0 -162 -8 -154 Q-18 -160 -30 -150 Z" fill={look.hair} />
+        ) : (
+          <>
+            <path d="M-33 -142 Q-36 -178 0 -178 Q36 -178 33 -142 Q26 -160 8 -158 Q-6 -166 -20 -156 Q-28 -150 -33 -142 Z" fill={look.hair} />
+            <path d="M-2 -176 q4 -18 20 -14 q-12 2 -12 14 Z" fill={look.hair} />
+          </>
+        )}
+      </g>
       <circle cx="-31" cy="-138" r="6" fill={SKIN} />
       <circle cx="31" cy="-138" r="6" fill={SKIN} />
-      <circle cx="-19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
-      <circle cx="19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
-      {asleep ? (
-        <path d="M-16 -140 q5 4 10 0 M6 -140 q5 4 10 0" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
-      ) : (
-        <g className="el-eyes">
-          <circle cx="-11" cy="-141" r="4.4" fill={INK} />
-          <circle cx="11" cy="-141" r="4.4" fill={INK} />
-          <circle cx="-9.6" cy="-142.6" r="1.5" fill="#fff" />
-          <circle cx="12.4" cy="-142.6" r="1.5" fill="#fff" />
-        </g>
-      )}
-      {!asleep && (
-        <g className="el-lids">
-          <circle cx="-11" cy="-141" r="6" fill={SKIN} />
-          <circle cx="11" cy="-141" r="6" fill={SKIN} />
+      <g className="el-cheeks">
+        <circle cx="-19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
+        <circle cx="19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
+      </g>
+      <g className="el-face">
+        {asleep ? (
           <path d="M-16 -140 q5 4 10 0 M6 -140 q5 4 10 0" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
-        </g>
-      )}
-      <path className="el-smile" d="M-8 -127 Q0 -119 8 -127" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
-      <ellipse className="el-mouth-open" cx="0" cy="-123" rx="7" ry="8" fill="#a61e4d" />
+        ) : (
+          <g className="el-eyes">
+            <circle cx="-11" cy="-141" r="4.4" fill={INK} />
+            <circle cx="11" cy="-141" r="4.4" fill={INK} />
+            <circle cx="-9.6" cy="-142.6" r="1.5" fill="#fff" />
+            <circle cx="12.4" cy="-142.6" r="1.5" fill="#fff" />
+          </g>
+        )}
+        {!asleep && (
+          <g className="el-lids">
+            <circle cx="-11" cy="-141" r="6" fill={SKIN} />
+            <circle cx="11" cy="-141" r="6" fill={SKIN} />
+            <path d="M-16 -140 q5 4 10 0 M6 -140 q5 4 10 0" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
+          </g>
+        )}
+        <path className="el-smile" d="M-8 -127 Q0 -119 8 -127" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
+        <ellipse className="el-mouth-open" cx="0" cy="-123" rx="7" ry="8" fill="#a61e4d" />
+        {/* Only while shaking the head: frowning brows and pressed lips, "mm-mm". */}
+        {!asleep && (
+          <g className="el-nope-face" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none">
+            <path d="M-18 -153 L-6 -150 M18 -153 L6 -150" />
+            <path d="M-8 -124 q4 -3 8 0 q4 3 8 0" />
+          </g>
+        )}
+      </g>
     </>
   );
 }
@@ -300,6 +316,11 @@ export function Kid({ look, pose, holding, wear, face }: { look: Look; pose: Pos
           )}
         </g>
         {sitting && rightArmEl}
+        {/* Swish lines beside the head while it shakes, one per side as it swings there. */}
+        <g stroke={INK} strokeWidth="4" strokeLinecap="round" fill="none">
+          <path className="el-swish el-swish-l" d="M-46 -160 Q-58 -140 -46 -120 M-58 -154 Q-66 -140 -58 -126" />
+          <path className="el-swish el-swish-r" d="M46 -160 Q58 -140 46 -120 M58 -154 Q66 -140 58 -126" />
+        </g>
       </g>
     </g>
   );
@@ -327,7 +348,11 @@ export type PicId =
   | "chefhat"
   | "bowl"
   | "pyjama"
-  | "hat";
+  | "hat"
+  | "eggs"
+  | "mixer"
+  | "toilet"
+  | "blocks";
 
 /** What can show in a thought bubble: the drawing and its size. */
 export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNode }> = {
@@ -360,7 +385,7 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
   toothcup: { w: 70, h: 96, draw: () => <ToothCup /> },
   teddy: { w: 80, h: 100, draw: () => <Teddy /> },
   bed: { w: 260, h: 150, draw: () => <Bed /> },
-  rain: { w: 150, h: 122, draw: () => <RainPuddle /> },
+  rain: { w: 210, h: 200, draw: () => <PuddleJump /> },
   boots: { w: 90, h: 64, draw: () => <Boots /> },
   coat: { w: 100, h: 146, draw: () => <Raincoat /> },
   umbrella: { w: 40, h: 150, draw: () => <Umbrella /> },
@@ -369,7 +394,61 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
   bowl: { w: 116, h: 64, draw: () => <Bowl eggs={2} flour={1} /> },
   pyjama: { w: 80, h: 50, draw: () => <Pyjama /> },
   hat: { w: 112, h: 56, draw: () => <RainHat /> },
+  eggs: { w: 68, h: 66, draw: () => <EggBasket milk={false} /> },
+  mixer: { w: 70, h: 86, draw: () => <Mixer /> },
+  toilet: { w: 80, h: 126, draw: () => <Toilet /> },
+  blocks: {
+    w: 76,
+    h: 34,
+    draw: () =>
+      ["#ff6b6b", "#4dabf7"].map((colour, i) => (
+        <g key={colour} transform={`translate(${i * 40 - 20} 0)`}>
+          <Block colour={colour} />
+        </g>
+      )),
+  },
 };
+
+/** The wish to jump into puddles: the child in rain boots and raincoat in mid-air, cheering, over a puddle that
+ * splashes up high, with rain around. Still, like every picture in a bubble. */
+function PuddleJump() {
+  const drops: [number, number][] = [
+    [-96, -176],
+    [-70, -128],
+    [-100, -84],
+    [80, -180],
+    [100, -132],
+    [74, -96],
+  ];
+  const splash: [number, number, number, number, number][] = [
+    [40, -36, 9, 16, 20],
+    [68, -54, 8, 14, 40],
+    [26, -62, 7, 12, 10],
+  ];
+  return (
+    <>
+      {drops.map(([x, y]) => (
+        <path key={`${x}${y}`} d={`M${x} ${y} q-6 11 0 14 q6 -3 0 -14 Z`} fill="#4dabf7" />
+      ))}
+      <ellipse cx="0" cy="-12" rx="98" ry="16" fill="#74c0fc" stroke="#1c7ed6" strokeWidth="4" />
+      <ellipse cx="0" cy="-12" rx="54" ry="7" fill="none" stroke="#e7f5ff" strokeWidth="4" />
+      {/* The splash: drops flying up and out on both sides */}
+      <g fill="#a5d8ff" stroke="#1c7ed6" strokeWidth="3">
+        {[-1, 1].map((s) =>
+          splash.map(([x, y, rx, ry, turn]) => <ellipse key={`${s}${x}`} cx={s * x} cy={y} rx={rx} ry={ry} transform={`rotate(${s * turn} ${s * x} ${y})`} />),
+        )}
+        {[-1, 1].map((s) => (
+          <circle key={s} cx={s * 88} cy="-76" r="6" />
+        ))}
+      </g>
+      {/* Lines beside the legs: the child comes down fast */}
+      <path d="M-46 -112 V-80 M-58 -98 V-74 M46 -112 V-80 M58 -98 V-74" stroke="#1c7ed6" strokeWidth="4" strokeLinecap="round" />
+      <g className="el-pic-kid" transform="translate(0 -44) scale(0.8)">
+        <Kid look={HERO} pose="cheer" holding={null} wear={["boots", "coat"]} face={1} />
+      </g>
+    </>
+  );
+}
 
 /** A thought bubble with a picture, above the head of a child of height `height`. It pops up once; every new `nudge`
  * runs a yellow light once along its outline, to remind the child of the wish. */

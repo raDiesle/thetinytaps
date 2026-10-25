@@ -1,12 +1,10 @@
-import { useEffect, useState } from "react";
-import { type Loop, loadSound, playLoop } from "@/lib/sfx";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { downloadMusic } from "@/lib/musicFile";
+import { decodeSound, type Loop, playLoop } from "@/lib/sfx";
 
-// The song musik/lebendige-bilder.mp3 (see the README there). Without it there is
-// no music; the pictures have their own sounds anyway.
-const files = import.meta.webpackContext("./musik", { regExp: /\.mp3$/ });
-const SONG_FILE = "./lebendige-bilder.mp3";
-const songModule = files.keys().includes(SONG_FILE) ? (files(SONG_FILE) as string | { default: string }) : null;
-const SONG_URL = typeof songModule === "string" ? songModule : (songModule?.default ?? null);
+// The song every game plays in the background (downloaded in musicFile.ts), unless
+// the game has its own music or must stay quiet. It is on by default and switched
+// off for all games in the options on the home page. Without the file there is no music.
 
 /**
  * Where things are in the song, in seconds. It runs at 97 BPM with a new part
@@ -20,7 +18,7 @@ const SONG = {
   loopEnd: 158.81,
 };
 
-/** Loudness of the song: below the tap sounds, which are what the picture is about. */
+/** Loudness of the song: below the tap sounds, which are what the games are about. */
 const VOLUME = 0.25;
 /** Loudness while the voice speaks, so it can be understood. */
 const DUCKED = 0.06;
@@ -29,14 +27,14 @@ const DUCK_CHECK_MS = 150;
 
 let song: Promise<AudioBuffer | null> | null = null;
 
-/** Loads the song once per visit; null when there is none. */
+/** The decoded song, once per visit; null when there is none. */
 const loadSong = () => {
-  song ??= SONG_URL ? loadSound(SONG_URL) : Promise.resolve(null);
+  song ??= downloadMusic().then((data) => (data ? decodeSound(data) : null));
   return song;
 };
 
-// Where the song was when it last stopped, so after a trip into another picture
-// (a new ScenePlay) it goes on there instead of starting over.
+// Where the song was when it last stopped, so in the next game (or after a trip
+// into another picture) it goes on there instead of starting over.
 let stoppedAt = SONG.start;
 
 /** Where in the song it is `seconds` after starting from `from`, going round the parts. */
@@ -46,16 +44,47 @@ const speaking = () => typeof window !== "undefined" && "speechSynthesis" in win
 
 const hidden = () => typeof document !== "undefined" && document.hidden;
 
+// How many mounted parts of the game want the song off (see useNoBackgroundMusic).
+let hushes = 0;
+const listeners = new Set<() => void>();
+const notify = () => {
+  for (const listener of listeners) listener();
+};
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
 /**
- * Background music in a picture once `started` (the child tapped, or followed a
- * vehicle in). It stops while the page is hidden and gets quiet while the voice speaks.
+ * Keeps the background song off while the calling component is mounted (and
+ * `when` holds): for games with music of their own, a microphone that would hear
+ * it, or a picture that is about falling asleep.
  */
-export function useSceneMusic({ enabled, started }: { enabled: boolean; started: boolean }) {
+export function useNoBackgroundMusic(when = true) {
+  useEffect(() => {
+    if (!when) return;
+    hushes++;
+    notify();
+    return () => {
+      hushes--;
+      notify();
+    };
+  }, [when]);
+}
+
+/**
+ * The background song while a game is played (`enabled`), from the child's first
+ * tap or key (`started`). It stops while the page is hidden or a game part wants
+ * quiet, and gets quiet while the voice speaks.
+ */
+export function useBackgroundMusic({ enabled, started }: { enabled: boolean; started: boolean }) {
+  const hushed = useSyncExternalStore(subscribe, () => hushes > 0);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [visible, setVisible] = useState(() => !hidden());
+  const on = enabled && !hushed;
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!on) return;
     let alive = true;
     void loadSong().then((loaded) => {
       if (alive) setBuffer(loaded);
@@ -63,7 +92,7 @@ export function useSceneMusic({ enabled, started }: { enabled: boolean; started:
     return () => {
       alive = false;
     };
-  }, [enabled]);
+  }, [on]);
 
   useEffect(() => {
     const onChange = () => setVisible(!hidden());
@@ -72,7 +101,7 @@ export function useSceneMusic({ enabled, started }: { enabled: boolean; started:
   }, []);
 
   useEffect(() => {
-    if (!enabled || !started || !visible || !buffer) return;
+    if (!on || !started || !visible || !buffer) return;
     const from = stoppedAt;
     const startedAt = performance.now();
     const loop: Loop | null = playLoop(buffer, {
@@ -93,5 +122,5 @@ export function useSceneMusic({ enabled, started }: { enabled: boolean; started:
       loop?.stop();
       stoppedAt = songAt(from, (performance.now() - startedAt) / 1000);
     };
-  }, [enabled, started, visible, buffer]);
+  }, [on, started, visible, buffer]);
 }

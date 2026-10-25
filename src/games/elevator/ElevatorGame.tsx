@@ -30,8 +30,9 @@ export function ElevatorGame() {
       settings={
         device.touchOnly ? undefined : (
           <p className="setting-note">
-            Jede Geschichte dauert etwa 5 Minuten. Leuchtet der große Knopf, drückt ihn jede Taste. Im Haus holen 1–4 den Aufzug, Pfeil hoch und runter fahren
-            einen Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Beutel. Am Ende wählen die Zahlentasten die nächste Geschichte.
+            Jede Geschichte dauert etwa 5 Minuten. Leuchtet der große Knopf, drückt ihn die Leertaste (oder jede andere Taste). Im Haus holen 1–4 den Aufzug,
+            Pfeil hoch und runter fahren einen Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Beutel. Am Ende geht jede Taste zur nächsten
+            Geschichte.
           </p>
         )
       }
@@ -41,7 +42,7 @@ export function ElevatorGame() {
   );
 }
 
-/** Plays the story picked on the start screen, and the one picked on the cards after it. */
+/** Plays the story picked on the start screen, and after it the one „Nochmal“ or „Weiter“ starts. */
 function Stories({ settings }: { settings: ElevatorSettings }) {
   const [run, setRun] = useState({ story: settings.story, n: 0 });
   const pick = (story: string) => setRun((r) => ({ story, n: r.n + 1 }));

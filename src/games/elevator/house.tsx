@@ -1,9 +1,6 @@
-import type { CSSProperties, PointerEvent } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { Cloud } from "@/games/scenes/shared";
 import {
-  ACTION_R,
-  ACTION_X,
-  ACTION_Y,
   BUTTON_R,
   BUTTON_X,
   CABIN_H,
@@ -26,7 +23,8 @@ import {
 import type { Weather } from "./rooms";
 import { star } from "./things";
 
-// The house around the rooms: sky, roof, walls, the lift shaft with its cabin, the call buttons and the action button.
+// The house around the rooms: sky, roof, walls, the lift shaft with its cabin and the call buttons – and the action
+// button of the trail adventures.
 
 const FLOOR_LIST = Array.from({ length: FLOORS }, (_, f) => f);
 const CABIN_W = CABIN_R - CABIN_L;
@@ -204,22 +202,68 @@ export function Hint({ floor }: { floor: number }) {
   );
 }
 
-/** The big action button left of the house, always in the same place: grey while there is nothing to do,
+/** Room around the wanted thing inside its outline. */
+const CONTOUR_PAD = 12;
+
+/** A thin dashed yellow outline around the thing in the bubble, in the room of `floor`, so the child sees where to
+ * ride. It finds the thing by its `data-wish` in the picture and measures it; `glow` makes it pulse with the room's
+ * glow. It doesn't move by itself. */
+export function Contour({ wish, floor, glow }: { wish: string; floor: number; glow: boolean }) {
+  const ref = useRef<SVGGElement>(null);
+  const [box, setBox] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  useLayoutEffect(() => {
+    const svg = ref.current?.ownerSVGElement;
+    const thing = svg?.querySelector(`[data-wish~="${wish}"]`);
+    const toSvg = svg?.getScreenCTM()?.inverse();
+    if (!thing || !toSvg) return;
+    const r = thing.getBoundingClientRect();
+    const a = new DOMPoint(r.left, r.top).matrixTransform(toSvg);
+    const b = new DOMPoint(r.right, r.bottom).matrixTransform(toSvg);
+    // Kept inside the room, so it never covers the walls or the lift.
+    const top = floorLine(floor) - ROOM_H + 8;
+    const x = Math.max(ROOM_L + 8, a.x - CONTOUR_PAD);
+    const y = Math.max(top, a.y - CONTOUR_PAD);
+    setBox({ x, y, w: Math.min(ROOM_R - 8, b.x + CONTOUR_PAD) - x, h: Math.min(floorLine(floor) - 4, b.y + CONTOUR_PAD) - y });
+  }, [wish, floor]);
+  return (
+    <g ref={ref} className={glow ? "el-contour glow" : "el-contour"}>
+      {box && (
+        <>
+          <rect x={box.x} y={box.y} width={box.w} height={box.h} rx="18" fill="none" stroke="#fff" strokeWidth="10" opacity="0.6" />
+          <rect
+            x={box.x}
+            y={box.y}
+            width={box.w}
+            height={box.h}
+            rx="18"
+            fill="none"
+            stroke="#fab005"
+            strokeWidth="5"
+            strokeDasharray="14 9"
+            strokeLinecap="round"
+          />
+        </>
+      )}
+    </g>
+  );
+}
+
+/** The big action button of the trail adventures, always in the same place: grey while there is nothing to do,
  * red and glowing while a tap is awaited. Any tap or key does the same; the button only shows when and where.
  * A new `nudge` makes it jump again. */
 export function ActionButton({
   waiting,
   nudge,
-  x = ACTION_X,
-  y = ACTION_Y,
-  r = ACTION_R,
+  x,
+  y,
+  r,
 }: {
   waiting: boolean;
   nudge: number;
-  /** Where it sits, if not left of the house (the trail adventures put it in the bottom corner). */
-  x?: number;
-  y?: number;
-  r?: number;
+  /** Its middle and radius. */
+  x: number;
+  y: number;
+  r: number;
 }) {
   return (
     <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label="Los">

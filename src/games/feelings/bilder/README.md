@@ -77,8 +77,29 @@ side by side, front view, neutral friendly faces, plain white background.
 ## Im Kindergarten
 
 Pro Geschichte: `…-passiert` (was passiert ist), `…-1` bis `…-3` (die guten
-Schritte in dieser Reihenfolge), `…-nein` (die nicht so gute Idee) und `…-ende`
-(alle fröhlich, das Bild am Schluss) – jeweils mit zweitem Frame `…-b`.
+Schritte in dieser Reihenfolge), `…-nein` (die nicht so gute Idee neben Schritt 1) und `…-ende`
+(alle fröhlich, das Bild am Schluss) – jeweils mit zweitem Frame `…-b`. Neben Schritt 2 und 3
+stehen `…-nein-2` und `…-nein-3` (nur ein Frame; erzeugt mit dem guten Schritt als `--ref`).
+
+### Nicht so gute Ideen bei Schritt 2 und 3
+
+Vor jeden Prompt: Stilblock, Figuren und „This is the not-so-good idea: the action must be clearly
+visible, but gentle – no injuries, no blood. Use the reference only for the characters, setting and style.“
+
+| Datei          | Prompt                                                                                                                                                                                                                         |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `push-nein-2`  | Playground, grass, a tree. The little bear throws a handful of sand at the fox; the fox covers his eyes and cries.                                                                                                             |
+| `push-nein-3`  | Playground. The little bear angrily stomps on the fox's toy bucket and flattens it. The fox stands next to it and cries.                                                                                                       |
+| `kick-nein-2`  | Playground. The little bear pulls the fox's ear hard, angry face. The fox cries.                                                                                                                                               |
+| `kick-nein-3`  | Playground. Only the little bear and the fox. The little bear has snatched the fox's green cap off his head and throws it away with a big arm swing; the cap flies towards a muddy puddle. The fox reaches after it and cries. |
+| `grab-nein-2`  | Sandbox, a red toy tractor. The little bear hits the fox on the arm to get the tractor back, angry face. The fox cries and still holds the tractor.                                                                            |
+| `grab-nein-3`  | Sandbox. The little bear holds the red toy tractor tight and points away with his other paw, sending the fox away. The fox walks off alone, sad, head down.                                                                    |
+| `slide-nein-2` | Playground with a slide and ladder. The little bear lies on the ground at the ladder and screams in a big tantrum, kicking his legs. The bunny and the fox look at him, unhappy, covering their ears.                          |
+| `slide-nein-3` | Playground with a slide. The little bear sits at the top of the slide and holds on tight, blocking it. The bunny and the fox wait below, sad and impatient.                                                                    |
+| `want-nein-2`  | Outside. The little bear stands next to the bunny and screams loudly at him, angry, mouth wide open. The bunny holds the shiny red toy car and covers one ear, sad.                                                            |
+| `want-nein-3`  | Outside. The little bear hugs both the shiny red toy car and the ball tightly to his chest and turns away. The bunny stands with empty paws and cries.                                                                         |
+| `angry-nein-2` | Playroom, colourful blocks. The angry little bear kicks over the fox's own block tower; blocks fly. The fox cries.                                                                                                             |
+| `angry-nein-3` | Playroom, colourful blocks. The angry little bear hits the fox with his paw. The fox holds his arm and cries.                                                                                                                  |
 
 ### Geschubst (`push`) – draußen auf dem Spielplatz, Wiese, ein Baum
 
@@ -151,35 +172,40 @@ Schritte in dieser Reihenfolge), `…-nein` (die nicht so gute Idee) und `…-en
 | `want-ende`  | The little bear drives the red toy car, the bunny holds the ball up high; both laugh and play together.                           |
 | `angry-ende` | Playroom. The tower of blocks stands again; the little bear and the fox stand next to it, laughing proudly.                       |
 
-## Bär trösten
+## Zu Hause (den Bären trösten)
 
 Nur der kleine Bär, in einem gemütlichen Kinderzimmer. Wer tröstet, ist das Kind
 vor dem Bildschirm: zeige nur **Kinderhände oder -arme**, die von vorn ins Bild
 kommen, nie ein ganzes Kind.
 
 `baer-…` zeigt in der Mitte, wie es dem Bären am Anfang geht, `trost-…` sind die
-Karten (und danach das Bild in der Mitte), `baer-…-gut` zeigt ihn am Ende wieder froh.
-Alle mit zweitem Frame `…-b`, außer `trost-hug`.
+Karten (und danach das Bild in der Mitte), `baer-…-nein` ist die nicht so gute Idee
+zwischen den Karten, `baer-…-gut` zeigt ihn am Ende wieder froh.
+Alle mit zweitem Frame `…-b`, außer `trost-hug` und `baer-…-nein` (mit `baer-…` als `--ref` erzeugt).
 
-| Datei             | Prompt                                                                                                                         |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `baer-sad`        | The little bear sits on the floor and cries, big tears, shoulders down.                                                        |
-| `baer-angry`      | The little bear is angry: his block tower has fallen over next to him, red face, fists clenched.                               |
-| `baer-tired`      | Night, a moon in the window. The little bear yawns widely and rubs his eyes.                                                   |
-| `baer-scared`     | Night, a thunderstorm with lightning outside the window. The little bear hides behind a pillow, big scared eyes.               |
-| `trost-stroke`    | A child's hand gently strokes the little bear's head. The bear smiles with closed eyes; small hearts.                          |
-| `trost-hug`       | Side view: rainbow-sleeved arms from the left edge hug the bear; he hugs back, eyes closed, small hearts.                      |
-| `trost-teddy`     | A child's hands give the little bear a small teddy. He hugs it and smiles.                                                     |
-| `trost-stomp`     | The little bear stomps with both feet to let the anger out, determined face, motion lines at his feet. He is alone.            |
-| `trost-blow`      | The little bear breathes in deeply and blows out a big puff of air, cheeks round.                                              |
-| `trost-blanket`   | The little bear lies in bed; a child's hands tuck him in with a pink striped blanket. Sleepy smile.                            |
-| `trost-lullaby`   | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile.                             |
-| `trost-hand`      | A child's hand holds the little bear's paw. The bear looks calm and smiles a little.                                           |
-| `trost-light`     | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles.                                 |
-| `baer-sad-gut`    | The little bear in his cosy room is happy again: he laughs, jumps up with both arms raised, small hearts float around him.     |
-| `baer-angry-gut`  | The little bear is calm again: he sits relaxed next to a rebuilt tall tower of colourful blocks and smiles contentedly.        |
-| `baer-tired-gut`  | Night, a moon in the window. The little bear sleeps peacefully in his bed under a pink striped blanket, holding a small teddy. |
-| `baer-scared-gut` | The storm is over: a rainbow outside the window, the lamp is on. Only the little bear: he sits on his bed, laughs and waves.   |
+| Datei              | Prompt                                                                                                                                       |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baer-sad`         | The little bear sits on the floor and cries, big tears, shoulders down.                                                                      |
+| `baer-angry`       | The little bear is angry: his block tower has fallen over next to him, red face, fists clenched.                                             |
+| `baer-tired`       | Night, a moon in the window. The little bear yawns widely and rubs his eyes.                                                                 |
+| `baer-scared`      | Night, a thunderstorm with lightning outside the window. The little bear hides behind a pillow, big scared eyes.                             |
+| `trost-stroke`     | A child's hand gently strokes the little bear's head. The bear smiles with closed eyes; small hearts.                                        |
+| `trost-hug`        | Side view: rainbow-sleeved arms from the left edge hug the bear; he hugs back, eyes closed, small hearts.                                    |
+| `trost-teddy`      | A child's hands give the little bear a small teddy. He hugs it and smiles.                                                                   |
+| `trost-stomp`      | The little bear stomps with both feet to let the anger out, determined face, motion lines at his feet. He is alone.                          |
+| `trost-blow`       | The little bear breathes in deeply and blows out a big puff of air, cheeks round.                                                            |
+| `trost-blanket`    | The little bear lies in bed; a child's hands tuck him in with a pink striped blanket. Sleepy smile.                                          |
+| `trost-lullaby`    | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile.                                           |
+| `trost-hand`       | A child's hand holds the little bear's paw. The bear looks calm and smiles a little.                                                         |
+| `trost-light`      | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles.                                               |
+| `baer-sad-nein`    | A child's hands take the small teddy away from the sad little bear. The bear cries even harder, reaching after the teddy.                    |
+| `baer-angry-nein`  | The angry little bear throws his toys across the room: a block and a toy car fly through the air, red face, shouting.                        |
+| `baer-tired-nein`  | Night. A child's hands bang loudly on a toy drum next to the bear's bed. The bear sits up wide awake, covers his ears, grumpy.               |
+| `baer-scared-nein` | Night, thunderstorm. A child's finger switches the bedside lamp off. The bear sits in bed, clearly visible, clutching a pillow, very scared. |
+| `baer-sad-gut`     | The little bear in his cosy room is happy again: he laughs, jumps up with both arms raised, small hearts float around him.                   |
+| `baer-angry-gut`   | The little bear is calm again: he sits relaxed next to a rebuilt tall tower of colourful blocks and smiles contentedly.                      |
+| `baer-tired-gut`   | Night, a moon in the window. The little bear sleeps peacefully in his bed under a pink striped blanket, holding a small teddy.               |
+| `baer-scared-gut`  | The storm is over: a rainbow outside the window, the lamp is on. Only the little bear: he sits on his bed, laughs and waves.                 |
 
 `trost-hug` hat nur einen Frame: von vorn war die Umarmung nie zu erkennen. Darum von der Seite – das Kind steht links
 knapp außerhalb, man sieht nur Ärmel und ein Stück Pulli, kein Gesicht; beide umarmen sich ganz fest.

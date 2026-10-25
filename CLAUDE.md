@@ -36,7 +36,7 @@ In a fresh worktree run `yarn install` first.
   and check the work against it; write every piece of feedback on a level into it as a general rule
   (German, in the same commit as the fix).
 - Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
-  built, set `done: true` (or `partial`) there.
+  built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
 
 ## Language and style
 
@@ -90,6 +90,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   options on the home page. Bump the key's `.vN` only when old values would break.
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
+- Music: `GameShell` plays one background song in every game from the child's first tap
+  (`src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
+  for all games and then no song is downloaded. A game with its own music (or a microphone)
+  calls `useNoBackgroundMusic()`; song files are named `musik-*.mp3`, see `/musik-erzeugen`.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`) – use `/neues-spiel`.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`.

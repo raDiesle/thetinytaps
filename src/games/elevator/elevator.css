@@ -66,7 +66,9 @@
 
 .el-rumble,
 .el-lids,
-.el-mouth-open {
+.el-mouth-open,
+.el-nope-face,
+.el-swish {
   opacity: 0;
 }
 
@@ -138,8 +140,35 @@
   animation: el-chew 0.5s steps(2) infinite;
 }
 
+/* "No": the head turns from side to side like a ball – the face slides further than the fringe and the head gets
+   narrower at the turn – with swish lines beside it, frowning brows and pressed lips. Three swings, about a second. */
 .pose-shake .el-head {
-  animation: el-shake 0.5s ease-in-out 2;
+  animation: el-no-head 0.36s ease-in-out 3;
+}
+
+.pose-shake .el-face {
+  animation: el-no-face 0.36s ease-in-out 3;
+}
+
+.pose-shake .el-fringe,
+.pose-shake .el-cheeks {
+  animation: el-no-side 0.36s ease-in-out 3;
+}
+
+.pose-shake .el-smile {
+  opacity: 0;
+}
+
+.pose-shake .el-nope-face {
+  opacity: 1;
+}
+
+.pose-shake .el-swish-l {
+  animation: el-swish-l 0.36s linear 3;
+}
+
+.pose-shake .el-swish-r {
+  animation: el-swish-r 0.36s linear 3;
 }
 
 .pose-reach .el-arm-r {
@@ -431,7 +460,7 @@
   animation: el-twinkle 2s ease-in-out infinite alternate;
 }
 
-/* ---------- The action button ---------- */
+/* ---------- The action button (trail adventures) ---------- */
 
 /* Grey and still while there is nothing to do; red with a glowing ring while it waits for a tap. */
 .el-action {
@@ -505,6 +534,23 @@
   animation: el-hint 1.1s ease-in-out infinite alternate;
 }
 
+.el-contour {
+  pointer-events: none;
+}
+
+.el-contour.glow {
+  animation: el-hint 1.1s ease-in-out infinite alternate;
+}
+
+/* A child drawn inside a picture (the puddle jump in the bubble) keeps still and floats without its shadow. */
+.el-pic-kid .el-kid * {
+  animation: none;
+}
+
+.el-pic-kid .el-kid > ellipse {
+  display: none;
+}
+
 .el-button {
   cursor: pointer;
   transition: transform 0.1s;
@@ -553,63 +599,17 @@
   transform-origin: center;
 }
 
-/* ---------- Picture cards to pick a story ---------- */
+/* ---------- The next story's picture on „Weiter“ (cards.tsx) ---------- */
 
-.el-picker {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  align-content: center;
-  gap: 4vmin;
-  padding: max(64px, env(safe-area-inset-top)) 4vw 4vh;
-}
-
-.el-picker.again {
-  background: #ffffff59;
-  animation: el-fade-in 0.6s ease-out both;
-}
-
-.el-card {
-  width: min(28vmin, 30vw);
-  aspect-ratio: 1;
-  padding: 3vmin;
-  border: 6px solid var(--ink);
-  border-radius: 28px;
-  background: #fff9db;
-  box-shadow: var(--lift);
-  cursor: pointer;
-  touch-action: manipulation;
-  animation: el-card-in 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
-  transition: translate 0.1s;
-}
-
-.el-card:active {
-  translate: 0 4px;
-}
-
-.el-card svg {
+/* A white tile, so a yellow moon or kite still shows on the yellow button. */
+.el-end-picture {
   display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.el-card-1 {
-  background: #d0bfff;
-  animation-delay: 0.1s;
-}
-
-.el-card-2 {
-  background: #a5d8ff;
-  animation-delay: 0.2s;
-}
-
-.el-card-3 {
-  background: #b2f2bb;
-  animation-delay: 0.3s;
+  width: 1.4em;
+  height: 1.1em;
+  margin: 0.06em 0;
+  border: 4px solid var(--ink);
+  border-radius: 0.22em;
+  background: #fff;
 }
 
 /* ---------- Keyframes ---------- */
@@ -688,12 +688,52 @@
   }
 }
 
-@keyframes el-shake {
+@keyframes el-no-head {
   25% {
-    transform: rotate(-12deg);
+    transform: translateX(-5px) rotate(-6deg) scaleX(0.9);
   }
   75% {
-    transform: rotate(12deg);
+    transform: translateX(5px) rotate(6deg) scaleX(0.9);
+  }
+}
+
+@keyframes el-no-face {
+  25% {
+    transform: translateX(-11px);
+  }
+  75% {
+    transform: translateX(11px);
+  }
+}
+
+@keyframes el-no-side {
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes el-swish-l {
+  10%,
+  35% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes el-swish-r {
+  0%,
+  50% {
+    opacity: 0;
+  }
+  60%,
+  85% {
+    opacity: 1;
   }
 }
 
@@ -1106,13 +1146,6 @@
   }
   to {
     transform: translateY(1200px) rotate(540deg);
-  }
-}
-
-@keyframes el-card-in {
-  from {
-    transform: scale(0.4);
-    opacity: 0;
   }
 }
 
