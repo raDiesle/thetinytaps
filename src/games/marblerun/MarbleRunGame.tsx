@@ -10,7 +10,7 @@ export function MarbleRunGame() {
 
   return (
     <GameShell
-      title="Kugelbahn"
+      title="Klingende Kugelbahn"
       emoji="🎢"
       settings={
         <>

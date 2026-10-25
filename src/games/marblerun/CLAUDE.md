@@ -1,6 +1,6 @@
-# Kugelbahn
+# Klingende Kugelbahn
 
-Route `/kugelbahn/`, its own category „Kugelbahn“ on the home menu. Ideas N-34, X-08, K-19 (more in the K area of the ideas page).
+Route `/kugelbahn/`, in the category „Lebendige Stories“ on the home menu (after Kettenreaktion); it was called „Kugelbahn“ and had a category of its own before. Ideas N-34, X-08, K-19 (more in the K area of the ideas page).
 
 A wooden marble run down a wall 1600 × 2250 (`TRACK_W`/`TRACK_H`, two and a half screens). One tap or key opens the hopper,
 and six marbles come out one after the other. Each rolls over a xylophone, through six spots (bell, funnel, paddle wheel,

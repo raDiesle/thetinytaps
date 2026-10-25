@@ -636,7 +636,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
 
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
-      <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label="Kugelbahn">
+      <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label="Klingende Kugelbahn">
         <defs>
           <pattern id={pegs} width="50" height="50" patternUnits="userSpaceOnUse">
             <circle cx="25" cy="25" r="4.5" fill="#d7ac72" />

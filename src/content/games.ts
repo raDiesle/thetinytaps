@@ -16,13 +16,17 @@ export interface Category {
 /** The home menu: first a category, then its games (on `/spiele/<id>/`). */
 export const CATEGORIES: Category[] = [
   {
-    id: "buchstaben-zahlen",
-    emoji: "🔤",
-    title: "Buchstaben & Zahlen",
-    subtitle: "Tasten drücken, Buchstaben finden, Wörter tippen.",
+    id: "lebendige-stories",
+    emoji: "🖼️",
+    title: "Lebendige Stories",
+    subtitle: "Bilder und Geschichten, die auf jedes Antippen antworten.",
     games: [
-      { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
-      { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
+      { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
+      { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
+      { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
+      { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
+      { href: "/kugelbahn/", emoji: "🎢", title: "Klingende Kugelbahn" },
+      { href: "/kleine-abenteuer/", emoji: "🧭", title: "Kleine Abenteuer" },
     ],
   },
   {
@@ -36,24 +40,14 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "lebendige-stories",
-    emoji: "🖼️",
-    title: "Lebendige Stories",
-    subtitle: "Bilder und Geschichten, die auf jedes Antippen antworten.",
+    id: "buchstaben-zahlen",
+    emoji: "🔤",
+    title: "Buchstaben & Zahlen",
+    subtitle: "Tasten drücken, Buchstaben finden, Wörter tippen.",
     games: [
-      { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
-      { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
-      { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
-      { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
-      { href: "/kleine-abenteuer/", emoji: "🧭", title: "Kleine Abenteuer" },
+      { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
+      { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
     ],
-  },
-  {
-    id: "kugelbahn",
-    emoji: "🎢",
-    title: "Kugelbahn",
-    subtitle: "Ein Tipp, und die Kugeln rollen eine lange Bahn hinunter.",
-    games: [{ href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn" }],
   },
   {
     id: "weitere",
