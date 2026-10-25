@@ -3,7 +3,8 @@
 Route `/gefuehle/`: a first menu picks the place (`places.ts`, `src/pages/FeelingsMenu.tsx`),
 then `/gefuehle/zuhause/` or `/gefuehle/kindergarten/` is the start screen of that place
 (`FeelingsGame`), with „Alle“ first and then one card per feeling or story
-(`settings.feeling`, `settings.situation`).
+(`settings.feeling`, `settings.situation`). A picked one comes first, then
+„Weiter“ goes on with the next ones in list order, so it never repeats the same.
 
 Zu Hause (`bear.ts`, `BearPlay.tsx`): the bear is sad, angry, tired or scared, and
 three comforts (hug, teddy, blowing …) make it happy again. And kindergarten

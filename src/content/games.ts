@@ -16,9 +16,9 @@ export interface Category {
 /** The home menu: first a category, then its games (on `/spiele/<id>/`). */
 export const CATEGORIES: Category[] = [
   {
-    id: "lebendige-stories",
+    id: "lebendige-welten",
     emoji: "🖼️",
-    title: "Lebendige Stories",
+    title: "Lebendige Welten",
     subtitle: "Bilder und Geschichten, die auf jedes Antippen antworten.",
     games: [
       { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },

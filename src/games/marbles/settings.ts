@@ -1,5 +1,5 @@
 /** One level of the game. */
-export type MarbleLevel = "topple" | "machine" | "kitchen" | "garden" | "building" | "circus" | "space";
+export type MarbleLevel = "topple" | "machine" | "kitchen" | "garden" | "building" | "circus" | "space" | "light";
 
 /**
  * Which levels to play: all in turn, or only one of them. (Older saves may

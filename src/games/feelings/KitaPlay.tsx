@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { imageFor, preloadImages, storyImages } from "./images";
 import { QUESTION, SITUATIONS, type Situation } from "./kita";
 import type { FeelingsSettings } from "./settings";
@@ -65,10 +65,11 @@ function pictureCaption({ situation, phase, stepsDone, trying }: Run): string {
 }
 
 export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
-  const situations = useMemo(() => (settings.situation === "all" ? SITUATIONS : SITUATIONS.filter((s) => s.id === settings.situation)), [settings.situation]);
+  // The story the grown-up picked comes first; without one all come in random order.
+  const chosen = SITUATIONS.find((s) => s.id === settings.situation);
   const deck = useRef<Situation[]>([]);
   const nextKey = useRef(0);
-  const [run, setRun] = useState<Run>(() => freshRun(situations[0], nextKey.current++));
+  const [run, setRun] = useState<Run>(() => freshRun(chosen ?? SITUATIONS[0], nextKey.current++));
   const { later, clearAll } = useTimers();
   const { say, sound } = useVoice(settings);
 
@@ -115,23 +116,26 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
     [clearAll, playBeats, ask],
   );
 
-  // Go through all stories in random order before any comes again.
+  // After a picked story the others follow in order, so „Weiter“ never plays the same one again.
+  // Without one, go through all stories in random order before any comes again.
   const nextSituation = useCallback(() => {
+    if (chosen) return startSituation(SITUATIONS[(SITUATIONS.indexOf(run.situation) + 1) % SITUATIONS.length]);
     if (deck.current.length === 0) {
-      deck.current = shuffle(situations);
+      deck.current = shuffle(SITUATIONS);
       const last = deck.current.length - 1;
       if (last > 0 && deck.current[last] === run.situation) {
         [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
       }
     }
     startSituation(deck.current.pop()!);
-  }, [situations, run.situation, startSituation]);
+  }, [chosen, run.situation, startSituation]);
 
   useEffect(() => {
     deck.current = [];
-    nextSituation();
-    // Only when the chosen stories change; nextSituation changes with every story.
-  }, [situations]);
+    if (chosen) startSituation(chosen);
+    else nextSituation();
+    // Only when the picked story changes; nextSituation changes with every story.
+  }, [chosen]);
 
   const doStep = useCallback(
     (i: number) => {

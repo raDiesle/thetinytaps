@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
 import { COMFORTS, COMFORTS_NEEDED, FEELINGS, type ComfortId, type Feeling } from "./bear";
 import { bearImages, preloadImages } from "./images";
 import type { FeelingsSettings } from "./settings";
@@ -53,11 +53,12 @@ const freshRound = (feeling: Feeling, key: number): Round => ({
 });
 
 export function BearPlay({ settings }: { settings: FeelingsSettings }) {
-  const feelings = useMemo(() => (settings.feeling === "all" ? FEELINGS : FEELINGS.filter((f) => f.id === settings.feeling)), [settings.feeling]);
+  // The feeling the grown-up picked comes first; without one all come in random order.
+  const chosen = FEELINGS.find((f) => f.id === settings.feeling);
   const deck = useRef<Feeling[]>([]);
   const nextKey = useRef(0);
   const happyAt = useRef(0);
-  const [round, setRound] = useState<Round>(() => freshRound(feelings[0], nextKey.current++));
+  const [round, setRound] = useState<Round>(() => freshRound(chosen ?? FEELINGS[0], nextKey.current++));
   const { later, clearAll } = useTimers();
   const { say, sound } = useVoice(settings);
   const { floaters, float } = useFloaters();
@@ -76,15 +77,17 @@ export function BearPlay({ settings }: { settings: FeelingsSettings }) {
   );
 
   const nextFeeling = useCallback(() => {
+    // After a picked feeling the others follow in order, so „Weiter“ never plays the same one again.
+    if (chosen) return startFeeling(FEELINGS[(FEELINGS.indexOf(round.feeling) + 1) % FEELINGS.length]);
     if (deck.current.length === 0) {
-      deck.current = shuffle(feelings);
+      deck.current = shuffle(FEELINGS);
       const last = deck.current.length - 1;
       if (deck.current[last] === round.feeling) [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
     }
     startFeeling(deck.current.pop()!);
-  }, [feelings, round.feeling, startFeeling]);
+  }, [chosen, round.feeling, startFeeling]);
 
-  useEffect(() => nextFeeling(), []);
+  useEffect(() => (chosen ? startFeeling(chosen) : nextFeeling()), []);
 
   const tryNextFeeling = () => {
     if (performance.now() - happyAt.current >= CELEBRATE_MS) nextFeeling();

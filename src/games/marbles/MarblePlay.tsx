@@ -8,6 +8,7 @@ import { CircusLevel } from "./CircusLevel";
 import { GardenLevel } from "./GardenLevel";
 import { KitchenLevel } from "./KitchenLevel";
 import { useAnyKey, type LevelProps } from "./level";
+import { LightLevel } from "./LightLevel";
 import { MachineLevel } from "./MachineLevel";
 import type { MarbleLevel, MarbleSettings } from "./settings";
 import { SpaceLevel } from "./SpaceLevel";
@@ -22,6 +23,7 @@ const LEVELS: { id: MarbleLevel; emoji: string; name: string; intro: string; Lev
   { id: "building", emoji: "🚧", name: "Baustelle", intro: "Tipp! Dann geht es los auf der Baustelle.", Level: BuildingLevel },
   { id: "circus", emoji: "🎪", name: "Zirkus", intro: "Tipp! Manege frei!", Level: CircusLevel },
   { id: "space", emoji: "🚀", name: "Raketenstart", intro: "Tipp! Dann startet die Rakete.", Level: SpaceLevel },
+  { id: "light", emoji: "🔦", name: "Licht-Kette", intro: "Tipp! Dann geht das Licht an.", Level: LightLevel },
 ];
 
 /** Which levels to play, in turn; in development `?level=garden` in the address picks one. */

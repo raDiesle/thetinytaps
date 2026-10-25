@@ -57,6 +57,34 @@
   animation: tl-glow-slot 0.8s ease-in-out infinite alternate;
 }
 
+/* ---------- Key caps (computers only) ---------- */
+
+/* Pale while the key does nothing; yellow while it does something now; pressed down while it is held. */
+.tl-key-base {
+  fill: #adb5bd;
+}
+
+.tl-key-face {
+  fill: #f1f3f5;
+  opacity: 0.85;
+  transition:
+    fill 0.3s,
+    opacity 0.3s;
+}
+
+.tl-key.on .tl-key-face {
+  fill: #ffe066;
+  opacity: 1;
+}
+
+.tl-key-top {
+  transition: transform 0.08s;
+}
+
+.tl-key.down .tl-key-top {
+  transform: translateY(6px);
+}
+
 /* ---------- The world's answers ---------- */
 
 /* A wrong thing: the animal wobbles and shakes its head hard, three times. */
