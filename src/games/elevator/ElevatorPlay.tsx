@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Poin
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { cardForKey, StoryCards } from "./cards";
+import { StoryEnd, nextCard } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, HERO, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose } from "./kid";
@@ -20,7 +20,7 @@ const WALK_MS = 2.6;
 const NUDGE_MS = 7000;
 /** How long one move of a task lasts if the task doesn't say. */
 const BEAT_MS = 700;
-/** From the end of a story until the picture cards come back. */
+/** From the end of a story until „Nochmal“ and „Weiter“ come. */
 const END_MS = 5000;
 const BUDDY_SCALE = 0.8;
 
@@ -45,7 +45,7 @@ interface Actor {
 
 interface View {
   story: Story | null;
-  /** The picture cards to choose a story are shown. */
+  /** The story is over: „Nochmal“ and „Weiter“ are shown. */
   picking: boolean;
   cabin: number;
   /** Length of the current ride, for the cabin's and the riders' transition. */
@@ -116,7 +116,7 @@ export function ElevatorPlay({
   settings: ElevatorSettings;
   /** The story to play. */
   story: string;
-  /** A card was picked at the end: the game starts that story or level. */
+  /** „Nochmal“ or „Weiter“ at the end: the game starts that story or level. */
   onPick: (id: string) => void;
 }) {
   const [view, setView] = useState<View>(START);
@@ -409,12 +409,12 @@ export function ElevatorPlay({
     [spawn, settings.sounds],
   );
 
-  // The story picked on the start screen begins at once; the picture cards come back after it.
+  // The story picked on the start screen begins at once; „Nochmal“ and „Weiter“ come after it.
   useEffect(() => {
     void play(STORIES.find((s) => s.id === storyId) ?? STORIES[0]);
   }, []);
 
-  // 1–4 fetch the lift or do the move in the room (or pick a story on the cards), arrows ride one floor up or down,
+  // 1–4 fetch the lift or do the move in the room, arrows ride one floor up or down, any key at the end goes on to the next story,
   // and any other key – or any key while a move does itself – makes a burst.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -422,9 +422,7 @@ export function ElevatorPlay({
       const digit = Number(e.key);
       const v = viewRef.current;
       if (v.picking) {
-        const card = cardForKey(e.key);
-        if (card) onPick(card.id);
-        else funBurst();
+        if (v.story) onPick(nextCard(v.story.id).id);
         return;
       }
       if (v.task && v.call === null) funBurst();
@@ -506,7 +504,7 @@ export function ElevatorPlay({
         </WeatherContext.Provider>
       </svg>
 
-      {view.picking && <StoryCards again={!!story} onPick={onPick} />}
+      {view.picking && story && <StoryEnd id={story.id} onPick={onPick} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

@@ -1,10 +1,10 @@
-import { useEffect, useState, type PointerEvent } from "react";
+import { useEffect, useState, type PointerEvent, type ReactNode } from "react";
 
 interface GameEndProps {
   /** Plays the same level (picture, story …) once more. */
   onAgain: () => void;
-  /** The next level, if there is one: its picture and name. */
-  next?: { emoji: string; name: string; onNext: () => void };
+  /** The next level, if there is one: its picture (an emoji or a small drawing) and name. */
+  next?: { emoji: ReactNode; name: string; onNext: () => void };
   /** Waits this long before showing up, so the party can be watched first. */
   delayMs?: number;
 }

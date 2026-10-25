@@ -4,7 +4,7 @@ import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { cardForKey, StoryCards } from "../cards";
+import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, ThoughtBubble, type Pose } from "../kid";
 import type { ElevatorSettings } from "../settings";
@@ -27,7 +27,7 @@ const STEP_MS = 380;
 const FLY_MS = 650;
 /** Without a tap for so long, the hand pops up again (and while choosing, the right thing glows). */
 const NUDGE_MS = 7000;
-/** From the end of the level until the picture cards come. */
+/** From the end of the level until „Nochmal“ and „Weiter“ come. */
 const END_MS = 6000;
 /** The bag's slots on the screen; the bag holds three things at most. */
 const SLOTS: Point[] = [
@@ -407,16 +407,14 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   };
 
   // Any key goes on when the action button lights up (the space bar is the one shown on it); 1–3 take a thing out
-  // of the open bag; 1–4 pick a card at the end.
+  // of the open bag; any key at the end goes on to the next story.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       setHeld(e.key);
       const v = viewRef.current;
       if (v.picking) {
-        const card = cardForKey(e.key);
-        if (card) onPick(card.id);
-        else funBurst();
+        onPick(nextCard(level.id).id);
         return;
       }
       if (tapper.current) return tap();
@@ -534,7 +532,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         )}
       </svg>
 
-      {view.picking && <StoryCards again onPick={onPick} />}
+      {view.picking && <StoryEnd id={level.id} onPick={onPick} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

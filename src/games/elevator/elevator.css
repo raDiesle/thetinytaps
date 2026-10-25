@@ -582,63 +582,17 @@
   transform-origin: center;
 }
 
-/* ---------- Picture cards to pick a story ---------- */
+/* ---------- The next story's picture on „Weiter“ (cards.tsx) ---------- */
 
-.el-picker {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  align-content: center;
-  gap: 4vmin;
-  padding: max(64px, env(safe-area-inset-top)) 4vw 4vh;
-}
-
-.el-picker.again {
-  background: #ffffff59;
-  animation: el-fade-in 0.6s ease-out both;
-}
-
-.el-card {
-  width: min(28vmin, 30vw);
-  aspect-ratio: 1;
-  padding: 3vmin;
-  border: 6px solid var(--ink);
-  border-radius: 28px;
-  background: #fff9db;
-  box-shadow: var(--lift);
-  cursor: pointer;
-  touch-action: manipulation;
-  animation: el-card-in 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
-  transition: translate 0.1s;
-}
-
-.el-card:active {
-  translate: 0 4px;
-}
-
-.el-card svg {
+/* A white tile, so a yellow moon or kite still shows on the yellow button. */
+.el-end-picture {
   display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.el-card-1 {
-  background: #d0bfff;
-  animation-delay: 0.1s;
-}
-
-.el-card-2 {
-  background: #a5d8ff;
-  animation-delay: 0.2s;
-}
-
-.el-card-3 {
-  background: #b2f2bb;
-  animation-delay: 0.3s;
+  width: 1.4em;
+  height: 1.1em;
+  margin: 0.06em 0;
+  border: 4px solid var(--ink);
+  border-radius: 0.22em;
+  background: #fff;
 }
 
 /* ---------- Keyframes ---------- */
@@ -1175,13 +1129,6 @@
   }
   to {
     transform: translateY(1200px) rotate(540deg);
-  }
-}
-
-@keyframes el-card-in {
-  from {
-    transform: scale(0.4);
-    opacity: 0;
   }
 }
 
