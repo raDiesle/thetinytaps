@@ -35,7 +35,7 @@ const ACT_BLEND = 0.7;
  * Sitting on the floor with the legs stretched out forwards, nearly level, blended in by `k`; the rest
  * of the pose stays. Level legs keep the heels as high as the bottom, so neither sinks into the seat.
  */
-function sitDown(p: Pose, k: number): Pose {
+export function sitDown(p: Pose, k: number): Pose {
   if (k <= 0) return p;
   const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.55, spread: 0.1, knee: 0.08 }, legR: { lift: 1.55, spread: 0.1, knee: 0.08 } };
   return lerpPose(p, sit, k);

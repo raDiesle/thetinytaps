@@ -133,8 +133,31 @@ export const BRUSH_PERIOD = 2.4;
 /** Seconds into each half when the sweeping paw is fastest, right through the cobweb. */
 export const BRUSH_HIT = 0.6;
 
+/** Seconds of one duck: down, hold while something passes over, up again. */
+export const DUCK_PERIOD = 3;
 /** How far down the duck clip is, 0..1; stories time swinging branches by it. */
-export const duckDepth = (t: number) => hold(phase(t, 3), 0.05, 0.28, 0.72, 0.92);
+export const duckDepth = (t: number) => hold(phase(t, DUCK_PERIOD), 0.05, 0.28, 0.72, 0.92);
+
+/** Seconds of one beat of the wings in the flap clip: up in the first half, down in the second. */
+export const FLAP_PERIOD = 1.1;
+/** Seconds of one tap of tap_forward: the left paw taps in the first one, the right in the next. */
+export const TAP_PERIOD = 1.5;
+/** Seconds into each tap when the paw is furthest forward. */
+export const TAP_HIT = 0.43;
+/** Seconds of one go of lean_side: over to the left, back, over to the right, back. */
+export const LEAN_PERIOD = 3.4;
+/** Seconds of one jump for joy in the cheer clip. */
+export const CHEER_PERIOD = 0.8;
+/** Seconds of one go of the arc clip: the left arm draws a half circle up over the head, then the right one. */
+export const ARC_PERIOD = 4;
+/** Which arm draws in the arc clip `t` s in (true: the left one) and how far up it has come, 0..1. */
+export function arcDraw(t: number) {
+  const k = phase(t, ARC_PERIOD);
+  const left = k < 0.5;
+  const half = left ? k * 2 : k * 2 - 1;
+  // Up for most of the half, a moment at the top, and back down quickly.
+  return { left, up: smooth(clamp01((half - 0.04) / 0.56)), down: smooth(clamp01((half - 0.72) / 0.24)) };
+}
 
 /** Seconds of one turn of the crank clip; stories turn their crank with it. */
 export const CRANK_PERIOD = 2.4;

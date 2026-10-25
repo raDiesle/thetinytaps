@@ -1,14 +1,18 @@
 import type { Pose } from "../guide";
 import {
+  arcDraw,
   BRUSH_PERIOD,
   castSwing,
+  CHEER_PERIOD,
   clamp01,
   clips,
   CRANK_PERIOD,
   crouch,
   DRUM_HIT,
   DRUM_PERIOD,
+  FLAP_PERIOD,
   hold,
+  TAP_PERIOD,
   jump,
   KEY_PICKUP,
   keyTurn,
@@ -147,7 +151,7 @@ export const ARM_CLIPS = clips({
 
   cheer: (t, p) => {
     // Jumping for joy with both arms up: into the knees, off the toes, land softly.
-    jump(p, phase(t, 0.8), 0.14, 0.35, 0.72);
+    jump(p, phase(t, CHEER_PERIOD), 0.14, 0.35, 0.72);
     for (const a of [p.armL, p.armR]) {
       a.raise = 0.4;
       a.spread = 2.6 + Math.sin(t * 7) * 0.2;
@@ -169,7 +173,7 @@ export const ARM_CLIPS = clips({
   },
 
   flap: (t, p) => {
-    const k = swing(t, 1.1);
+    const k = swing(t, FLAP_PERIOD);
     for (const a of [p.armL, p.armR]) {
       a.raise = 0.1;
       a.spread = 0.6 + k * 1.6;
@@ -256,9 +260,9 @@ export const ARM_CLIPS = clips({
   },
 
   tap_forward: (t, p) => {
-    const k = phase(t, 1.5);
+    const k = phase(t, TAP_PERIOD);
     const tap = hold(k, 0.1, 0.25, 0.32, 0.5);
-    const hand = Math.floor(t / 1.5) % 2 === 0 ? p.armL : p.armR;
+    const hand = Math.floor(t / TAP_PERIOD) % 2 === 0 ? p.armL : p.armR;
     hand.raise = 0.9 + tap * 0.65;
     hand.spread = 0.1;
     hand.elbow = 1.5 - tap * 1.45;
@@ -381,16 +385,18 @@ export const ARM_CLIPS = clips({
   },
 
   arc: (t, p) => {
-    const k = phase(t, 5);
-    const first = k < 0.5;
-    const draw = smooth(clamp01(((first ? k : k - 0.5) - 0.05) / 0.4));
-    const arm = first ? p.armL : p.armR;
-    arm.spread = 0.3 + Math.sin(draw * Math.PI) * 2.6;
-    arm.raise = draw * 0.6;
+    // A big half circle: the arm goes out to the side and up over the head, stays a moment and drops
+    // back; the left arm first, then the right one. The body and head go along with the paw.
+    const { left, up, down } = arcDraw(t);
+    const draw = up * (1 - down);
+    const arm = left ? p.armL : p.armR;
+    arm.spread = 0.3 + draw * 2.6;
+    arm.raise = draw * 0.35;
     arm.elbow = 0.1;
-    p.lean = (first ? -1 : 1) * Math.sin(draw * Math.PI) * 0.12;
-    p.headYaw = (first ? 1 : -1) * (draw - 0.5) * 0.6;
-    p.headPitch = -Math.sin(draw * Math.PI) * 0.3;
+    const side = left ? 1 : -1;
+    p.lean = -side * Math.sin(draw * Math.PI) * 0.12;
+    p.headTilt = -side * draw * 0.15;
+    p.headPitch = -draw * 0.35;
   },
 
   kite: (t, p) => {
