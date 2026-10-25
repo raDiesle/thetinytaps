@@ -99,9 +99,17 @@
   }
 }
 
-/* Monsters pop up one after another, sway, and vanish in a puff. */
+/* The monsters sit on the teeth from the start (the story before, origin.tsx, shows them growing):
+   they don't pop up, they only fade in softly as their side of a tooth turns into view. They sway,
+   and vanish in a puff. */
 .sugar-monster {
-  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay) backwards;
+  animation: teeth-monster-show 0.3s ease-out backwards;
+}
+
+@keyframes teeth-monster-show {
+  from {
+    opacity: 0;
+  }
 }
 
 .monster-body {
@@ -421,6 +429,168 @@
 
 .teeth-mouth.prep {
   background: #fff;
+}
+
+/* ---------- The story at the start: sweets, then the monsters grow (origin.tsx) ---------- */
+
+.origin {
+  width: 100%;
+  height: 100%;
+  max-width: min(100%, 880px);
+}
+
+/* Each sweet flies in from the top corner and is in the mouth at its --arrive (85% of the flight). */
+.origin-sweet {
+  animation: teeth-origin-fly 1.2s ease-in calc(var(--arrive) - 1020ms) both;
+}
+
+@keyframes teeth-origin-fly {
+  from {
+    transform: translate(480px, -50px) rotate(-30deg) scale(1.1);
+  }
+  45% {
+    transform: translate(340px, 120px) rotate(12deg) scale(1);
+  }
+  85% {
+    transform: translate(220px, 295px) rotate(0deg) scale(0.5);
+    opacity: 1;
+  }
+  to {
+    transform: translate(220px, 300px) scale(0);
+    opacity: 0;
+  }
+}
+
+/* A bite for every sweet. */
+.origin-mouth {
+  transform-box: view-box;
+  transform-origin: 220px 298px;
+}
+
+.origin.at-sweets .origin-mouth {
+  animation:
+    teeth-origin-chomp 0.35s ease-in-out 1.3s,
+    teeth-origin-chomp 0.35s ease-in-out 2.5s,
+    teeth-origin-chomp 0.35s ease-in-out 3.7s;
+}
+
+@keyframes teeth-origin-chomp {
+  50% {
+    transform: scale(1.04, 0.6);
+  }
+}
+
+.origin-crumb {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.origin.at-sweets .origin-crumb {
+  animation: teeth-origin-crumb 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--arrive) backwards;
+}
+
+@keyframes teeth-origin-crumb {
+  from {
+    transform: scale(0);
+  }
+}
+
+/* Each crumb shrinks away as its monster grows out of it. */
+.origin.at-grow .origin-crumb {
+  animation: teeth-origin-crumb-gone 0.5s ease-in var(--grow) forwards;
+}
+
+@keyframes teeth-origin-crumb-gone {
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.origin-monster {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: teeth-origin-grow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) var(--grow) backwards;
+}
+
+@keyframes teeth-origin-grow {
+  from {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+}
+
+/* Time goes by: the sun (or the moon) crosses the sky behind the head while the monsters grow. */
+.origin-sky-body {
+  transform-box: view-box;
+  transform-origin: 220px 420px;
+  transform: rotate(-28deg);
+}
+
+.origin.at-grow .origin-sky-body {
+  animation: teeth-origin-arc 4.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-arc {
+  to {
+    transform: rotate(75deg);
+  }
+}
+
+/* Before the evening brushing a whole day goes by and ends at dusk; before the morning one a night, and the sun comes up. */
+.origin.evening .origin-sky {
+  fill: #c4f1ff;
+}
+
+.origin.morning .origin-sky {
+  fill: #a49be6;
+}
+
+.origin.evening.at-grow .origin-sky {
+  animation: teeth-origin-day 4.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-day {
+  60% {
+    fill: #ffd9a8;
+  }
+  to {
+    fill: #a49be6;
+  }
+}
+
+.origin.morning.at-grow .origin-sky {
+  animation: teeth-origin-night 4.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-night {
+  30%,
+  55% {
+    fill: #2d2a6e;
+  }
+  85%,
+  to {
+    fill: #ffe0b0;
+  }
+}
+
+.origin-sunrise {
+  animation: teeth-origin-sunrise 4.6s ease-out forwards;
+}
+
+@keyframes teeth-origin-sunrise {
+  0%,
+  55% {
+    transform: translateY(240px);
+  }
+  90%,
+  to {
+    transform: translateY(0);
+  }
+}
+
+.teeth-play.paused .origin * {
+  animation-play-state: paused;
 }
 
 /* ---------- Before brushing: get the brush, toothpaste on ---------- */

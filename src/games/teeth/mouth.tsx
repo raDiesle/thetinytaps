@@ -31,7 +31,8 @@ const MIN_FACING = 0.03;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 const HEAD = 270;
-const MONSTER_SIZE = 0.75;
+/** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
+const MONSTER_SIZE = 0.58;
 
 /** A part of the picture: x, y, width and height. */
 interface Box {
@@ -82,8 +83,8 @@ export interface MonsterSpot {
   color: string;
   /** Horns, feelers or spiky hair. */
   variant: number;
-  /** When it pops up, so they don't all appear at once. */
-  delayMs: number;
+  /** Where in its blink it starts, so they don't all blink at once. */
+  blinkMs: number;
   /** On a tooth that comes later: only shown where it clearly shows. The others glow. */
   waiting: boolean;
   /** The brush is coming for this one. */
@@ -296,7 +297,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
                 gone={m.gone}
                 scared={m.scared}
                 tickled={m.tickled}
-                delayMs={m.delayMs}
+                blinkMs={m.blinkMs}
                 onTickle={() => onTickle(m.id)}
               />
             </g>
@@ -500,14 +501,15 @@ const MONSTER_TOPS = [
   "M-11 -10 L-8 -21 L-3 -14 Z M-3 -14 L0 -24 L3 -14 Z M3 -14 L8 -21 L11 -10 Z",
 ];
 
-function Monster({
+/** A sugar monster drawn round its middle, about 30 wide; the story at the start (origin.tsx) shows the same ones. */
+export function Monster({
   color,
   variant,
   active,
   gone,
   scared,
   tickled,
-  delayMs,
+  blinkMs,
   onTickle,
 }: {
   color: string;
@@ -516,7 +518,7 @@ function Monster({
   gone: boolean;
   scared: boolean;
   tickled: boolean;
-  delayMs: number;
+  blinkMs: number;
   onTickle: () => void;
 }) {
   const stop = (e: PointerEvent) => {
@@ -526,7 +528,7 @@ function Monster({
   return (
     <g
       className={`sugar-monster${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
-      style={{ "--delay": `${delayMs}ms`, "--blink": `${-(delayMs % 3700)}ms` } as CSSProperties}
+      style={{ "--blink": `${-(blinkMs % 3700)}ms` } as CSSProperties}
     >
       {/* The ones to brush now glow. */}
       {active && <circle className="monster-glow" cy={-3} r={27} fill="url(#monster-glow)" />}

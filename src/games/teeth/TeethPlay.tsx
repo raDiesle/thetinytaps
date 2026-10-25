@@ -9,6 +9,7 @@ import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } fro
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { sungSteps, useBrushingMusic } from "./music";
+import { Origin } from "./origin";
 import { Prep } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS } from "./steps";
@@ -29,14 +30,16 @@ const BRUSH_MS = 120_000;
 /** Dragging on the progress bar stops this far before the end. */
 const SEEK_END_MS = 1000;
 
-/** Before the clock starts: get the brush, toothpaste on, and meet the monsters. */
-type Prelude = "brush" | "paste" | "monsters";
+/** Before the clock starts: where the monsters come from, get the brush, toothpaste on, and see them in the mirror. */
+type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters";
 
-/** The monsters' cue depends on the time of day, see DAYTIME. */
+/** How the monsters grow depends on the time of day (over the day or the night), see DAYTIME. */
 const PRELUDE: Record<Prelude, { ms: number; title: string; cue?: string }> = {
+  sweets: { ms: 4800, title: "🍭 Süßes essen", cue: "Mmh, Süßes! Ein bisschen Zucker bleibt an den Zähnen." },
+  grow: { ms: 5000, title: "👾 Zuckermonster wachsen" },
   brush: { ms: 7000, title: "🪥 Zahnbürste holen", cue: "Zuerst holen wir die Zahnbürste!" },
   paste: { ms: 8000, title: "🫧 Zahnpasta drauf", cue: "Jetzt ein kleiner Klecks Zahnpasta drauf." },
-  monsters: { ms: 4500, title: "😱 Zuckermonster!" },
+  monsters: { ms: 4500, title: "😱 Zuckermonster!", cue: "Oh je, da sind sie! Komm, wir putzen sie alle weg!" },
 };
 
 interface Monster {
@@ -122,8 +125,8 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
 }
 
 /**
- * A brushing timer that needs no tapping: first it shows fetching the brush
- * and putting toothpaste on, then the mirror shows where to brush next
+ * A brushing timer that needs no tapping: first a short story of how sweets
+ * become sugar monsters, fetching the brush and putting toothpaste on, then the mirror shows where to brush next
  * (chewing surfaces, outside, inside), and the sugar monsters there vanish
  * one by one. Arrow keys skip ahead or back, Space or the pause button pauses,
  * and tapping the progress bar jumps there.
@@ -142,9 +145,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
   const daytime = useMemo(() => daytimeOf(settings.daytime), [settings.daytime, round]);
-  const preludeCue = (p: Prelude) => PRELUDE[p].cue ?? DAYTIME[daytime].monsters;
+  const preludeCue = (p: Prelude) => PRELUDE[p].cue ?? DAYTIME[daytime].grow;
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
-  const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
+  const prelude = useMemo<Prelude[]>(
+    () => [...(settings.origin ? (["sweets", "grow"] as const) : []), ...(settings.prep ? (["brush", "paste"] as const) : []), "monsters"],
+    [settings.origin, settings.prep],
+  );
   const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
   // With a sung song the brushing lasts as long as the song and each step as long as its verse; otherwise two minutes in equal steps.
   const sungIn = settings.music && settings.singing !== "off" ? settings.singing : null;
@@ -310,7 +316,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const brushAt = inStep.find((m) => !isGone(m));
   const stepDone = step ? (brushed - stepStarts[phase]) / stepLength(phase) : 0;
   const brushStop = Math.max(0, Math.min(inStep.length - 1, stepDone * inStep.length - 0.6));
-  // Every monster on a tooth not brushed yet; the picture shows those whose side of the tooth faces out.
+  // Every monster on a tooth not brushed yet, there from the start; the picture shows those whose side of the tooth faces out.
   const spots: MonsterSpot[] = monsters
     .filter((m) => m.step >= phase)
     .map((m) => ({
@@ -320,8 +326,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       spot: m.spot,
       color: m.color,
       variant: m.variant,
-      // While they arrive they pop up all over; later ones come quickly as their side turns into view.
-      delayMs: phase === -1 ? 400 + ((m.id * 7) % 20) * 150 : m.step === phase ? 150 + m.order * 60 : 0,
+      blinkMs: m.id * 530,
       waiting: m.step !== phase,
       scared: m === brushAt && !isGone(m),
       gone: m.step === phase && isGone(m),
@@ -360,7 +365,9 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       </div>
 
       <div className="teeth-stage">
-        {before === "brush" || before === "paste" ? (
+        {before === "sweets" || before === "grow" ? (
+          <Origin key={round} part={before} daytime={daytime} tickled={tickled} onTickle={tickle} />
+        ) : before === "brush" || before === "paste" ? (
           <Prep key={round} part={before} daytime={daytime} />
         ) : (
           <Mouth
