@@ -14,12 +14,14 @@ import {
   keyTurn,
   linger,
   phase,
+  pullReach,
   PUSH_PERIOD,
   smooth,
   steps,
   swing,
   TAU,
   TOGETHER,
+  TOSS_PERIOD,
 } from "./motion";
 
 // Clips about the arms: only the arms glow while they move (the crank, the paddle, waving).
@@ -63,19 +65,38 @@ export const ARM_CLIPS = clips({
   },
 
   pull_rope: (t, p) => {
-    const s = linger(Math.sin(phase(t, 1.8) * TAU));
+    // Hand over hand: one paw reaches out along the rope while the other pulls it in to the body.
+    const r = pullReach(t);
+    const s = r * 2 - 1;
     const reach = (a: Pose["armL"], k: number) => {
       a.raise = 0.6 + k * 1.1;
       a.spread = -0.15;
       a.elbow = 1.75 - k * 1.6;
     };
-    reach(p.armL, 0.5 + s / 2);
-    reach(p.armR, 0.5 - s / 2);
+    reach(p.armL, r);
+    reach(p.armR, 1 - r);
     p.bend = -0.08 + Math.abs(s) * 0.05;
     p.twist = s * 0.18;
     p.legL.lift = 0.35;
     p.legL.knee = 0.25;
     p.legR.lift = -0.2;
+  },
+
+  scoop_toss: (t, p) => {
+    // From standing, bent over deep with both paws down into the chest in front; then straight up, high
+    // on the toes, the arms flung up over the head, so the coins fly – and slowly down again.
+    const k = phase(t, TOSS_PERIOD);
+    const down = hold(k, 0.02, 0.3, 0.42, 0.55);
+    const up = hold(k, 0.45, 0.6, 0.7, 0.95);
+    p.bend = down * 0.6;
+    crouch(p, down * 0.15);
+    p.toes = up * 0.6;
+    for (const a of [p.armL, p.armR]) {
+      a.raise = 0.25 + down * 0.6 + up * 2.6;
+      a.spread = 0.15 + up * 0.45;
+      a.elbow = 0.3 + down * 0.3 - up * 0.2;
+    }
+    p.headPitch = down * 0.4 - up * 0.35;
   },
 
   pull_down: (t, p) => {
@@ -214,16 +235,17 @@ export const ARM_CLIPS = clips({
     const l = Math.max(0, s);
     const r = Math.max(0, -s);
     const reach = (a: Pose["armL"], up: number, other: number) => {
-      a.raise = 0.3 + up * 2.85 - other * 0.5;
+      a.raise = 0.3 + up * 2.75 - other * 0.5;
       a.spread = 0.25 + up * 0.1 + other * 0.45;
       a.elbow = 0.5 - up * 0.48;
     };
     reach(p.armL, l, r);
     reach(p.armR, r, l);
-    p.toes = Math.abs(s);
+    // High up on the toes, the side long: the apples hang just within reach.
+    p.toes = Math.abs(s) * 1.5;
     p.lift = Math.abs(s) * 0.02;
     p.shift = s * 0.04;
-    p.lean = -s * 0.14;
+    p.lean = -s * 0.22;
     p.bend = -0.12 * Math.abs(s);
     p.legL.spread = 0.04 + r * 0.32;
     p.legR.spread = 0.04 + l * 0.32;

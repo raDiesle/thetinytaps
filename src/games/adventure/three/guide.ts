@@ -757,6 +757,12 @@ export class Guide {
     return this.spine.localToWorld(out.copy(local));
   }
 
+  /** A point given in the space of the hips (fox units, like bodyPoint but not bent or twisted with the body), in world space. */
+  hipsPoint(local: THREE.Vector3, out: THREE.Vector3) {
+    this.hips.updateWorldMatrix(true, false);
+    return this.hips.localToWorld(out.copy(local));
+  }
+
   /** Where a paw would hold a bar right now, in world space. */
   gripPoint(hand: "L" | "R", out: THREE.Vector3) {
     return (hand === "L" ? this.handL : this.handR).localToWorld(out.copy(GRIP));

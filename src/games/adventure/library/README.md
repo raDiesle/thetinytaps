@@ -14,15 +14,15 @@ und wie die Welt antwortet.
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `types.ts`                  | Datenmodell (Bewegung, Welt, Szenario, Ablauf)                                                                                                  |
 | `categories.ts`             | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was _nicht_ dazugehört                                                                          |
-| `movements/*.ts`            | **Ergebnis B**: 102 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
+| `movements/*.ts`            | **Ergebnis B**: 105 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor                                              |
-| `sequences.ts`              | **Ergebnis D**: 5 Abläufe mit 9–20 Bewegungen und Sekunden, 153–335 s lang                                                                      |
-| `situations.ts`             | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 73 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
+| `sequences.ts`              | **Ergebnis D**: 5 Abläufe mit 9–22 Bewegungen und Sekunden, 153–359 s lang                                                                      |
+| `situations.ts`             | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 76 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
 | diese Datei                 | **Ergebnis E**: Qualitätskontrolle                                                                                                              |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
 bleibt bis zum Aufräumen. Jede Bewegung nennt einen `motion`-Clip; die Clips für den Fuchs
-stehen in `../three/clips/` (74 Clips, keiner fehlt): eine Datei je Körperteil (`arms.ts`, `legs.ts`,
+stehen in `../three/clips/` (77 Clips, keiner fehlt): eine Datei je Körperteil (`arms.ts`, `legs.ts`,
 `body.ts`, `whole.ts`), Bausteine und Takte in `motion.ts`.
 
 ## Neue Bewegung
@@ -50,16 +50,16 @@ Bewegungen mit diesem Clip (`push_forward` passt zu Zaubertür, Schneeball und G
 - **Welten** (`worlds`): Wo die Idee hinpasst. Bauen sich daraus neue Szenarien oder
   Abläufe, steht der Moment danach in `scenarios.ts` bzw. `sequences.ts`.
 
-Stand: 73 Clips (alle außer `idle`), 438 Situationen, davon 191 aus dem Alltag, jeder Clip mit
+Stand: 76 Clips (alle außer `idle`), 456 Situationen, davon 200 aus dem Alltag, jeder Clip mit
 mindestens zwei. Am wenigsten Ideen haben Baustelle (5) und Eisenbahn (6). Keine Idee
 verlangt mehr, als die Bewegung schon erlaubt: Es gibt kein schnelles Drehen und kein Drücken
 gegen echte Möbel, und auf Schienen balanciert niemand.
 
 ## Ergebnis E: Qualitätskontrolle
 
-Stand: 102 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
+Stand: 105 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
 verweist nur auf vorhandene Bewegungen, und jede Bewegung hat eine Sitz-Variante
-(`adaptations.seated`). 81 Bewegungen sind „leicht“, 21 „mittel“, keine ist „schwer“.
+(`adaptations.seated`). 84 Bewegungen sind „leicht“, 21 „mittel“, keine ist „schwer“.
 
 ### Bewegungen, die sich sehr ähnlich sind
 
@@ -101,13 +101,13 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 | Ablauf                       | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
 | ---------------------------- | ---------- | ----- | -------------------------------------------- |
-| `treasure_island` (spielbar) | 20         | 335 s | r m r m r l l m l m m m r r m m r l r r      |
+| `treasure_island` (spielbar) | 22         | 359 s | r m r m r l l l l m m m m l r r m m r l l r  |
 | `space_trip`                 | 9          | 160 s | r m l m m m l r l                            |
 | `underwater_dive`            | 9          | 158 s | r m m m m l r m l                            |
 | `winter_forest_walk`         | 9          | 156 s | r m m m l r r l m                            |
 | `farm_morning`               | 9          | 153 s | r r m l m l m r m                            |
 
-Die 3D-Geschichte der Schatzinsel dauert länger als die 335 s der Tabelle, gut 6 Minuten. Vorher
+Die 3D-Geschichte der Schatzinsel dauert länger als die 359 s der Tabelle, gut 6 Minuten. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
 Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (eine bis drei Runden der Bewegung, 2–5 s). Jede
 Bewegung läuft eine ganze Zahl von Runden, und zu jeder Runde gibt es ein Ziel (`CYCLES` in
@@ -142,7 +142,7 @@ noch ein ruhiger Abschied dazukommen.
   Kind sieht, was Tapsi sieht, und links ist links. Wo die Arme vor dem Körper arbeiten (Tür,
   Seil, Schlüssel), steht sie höher und seitlich, damit die Arme sichtbar bleiben. Tapsis Gesicht
   sieht das Kind dabei kaum; erst nach dem Aufschließen der Truhe dreht Tapsi sich um und jubelt,
-  schießt Raketen in den Himmel und winkt uns von vorne zu, mit fröhlichem Gesicht. Ob Kinder so besser mitmachen als mit
+  wirft Goldmünzen aus der Truhe hoch und winkt uns von vorne zu, mit fröhlichem Gesicht. Ob Kinder so besser mitmachen als mit
   einem Fuchs, der sie anschaut, ist noch offen.
 - **Ole trägt Tapsi.** Das Kind macht jede Bewegung nach, auch die zwischen den Stationen, und
   kann sich im Zimmer nicht frei bewegen. Darum geht Tapsi nie selbst: Ole, eine große
@@ -152,13 +152,13 @@ noch ein ruhiger Abschied dazukommen.
   Fisch über den Schwimmer), setzt sich, winkt Kiki zu (Kiki fliegt am Anfang heran und am
   Ende davon), paddelt auf Ole sitzend, stampft Skorpione platt, hüpft auf Ole über die Brücke und stößt
   mit dem Kopf an schwebende Sternkisten (von der Seite gefilmt wie ein Jump-and-Run), duckt sich unter dem
-  schaukelnden Baumstamm, schlägt abwechselnd auf zwei hängende Trommeln (aus jeder flattert ein Schmetterling),
+  schaukelnden Baumstamm, schlägt abwechselnd auf zwei hängende Trommeln (jeder Schlag scheucht einen Vogel vom Weg),
   kurbelt das Holztor hoch (beide Pfoten am Griff), macht den
-  rollenden Kokosnüssen Platz, weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
+  rollenden Kokosnüssen der Affen Platz (erst mit einem großen Schritt zur Seite, dann mit dem linken Bein hoch, dann mit breiten Beinen), weicht den Nüssen der Affen in Zeitlupe mit dem Oberkörper aus,
   pflückt Äpfel in den Korb, löst das Bilderrätsel an der Tür zweimal (groß, breit, klein), wedelt die
-  Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), wird von Ole durch die Schlucht in die Bucht getragen, zieht die Truhe am Seil heran,
+  Spinnweben dahinter weg (statt eine Tür aufzudrücken, gegen die das Kind im Zimmer nichts zum Drücken hätte), wird von Ole durch die Schlucht in die Bucht getragen, zieht die Truhe Hand über Hand am Seil heran,
   schließt sie mit dem Schlüssel auf (die Pfote hält den Ring, die Kamera schaut über die Schulter), jubelt,
-  und stößt zum Schluss mit beiden Armen Raketen in den Himmel: ein kurzes Feuerwerk statt eines langen Tanzes.
+  während die Krebse die Truhe an den Strand tragen, hüpft hinunter, greift tief hinein und wirft die Münzen mit beiden Armen hoch: ein Goldregen statt eines langen Tanzes.
 - **Stopptanz** (`freeze` in `../three/clips/whole.ts`, `STOP_DANCE` in `motion.ts`): gibt es als Clip, aber nicht mehr in der
   Schatzinsel; Tanzen am Ende war zu lang und keine Bewegung, die etwas bewirkt.
 - **Kein Hüpfen nach vorne.** Das Kind soll sich nicht durch den Raum bewegen. Tapsi hüpft

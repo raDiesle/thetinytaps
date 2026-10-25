@@ -1,4 +1,21 @@
-import { clamp01, clips, crouch, duckDepth, feetAt, hold, jump, JUMP_HEIGHT, JUMP_PERIOD, phase, sitProgress, smooth, steps, swing, TAU } from "./motion";
+import {
+  clamp01,
+  clips,
+  crouch,
+  DODGE_PERIOD,
+  duckDepth,
+  feetAt,
+  hold,
+  jump,
+  JUMP_HEIGHT,
+  JUMP_PERIOD,
+  phase,
+  sitProgress,
+  smooth,
+  steps,
+  swing,
+  TAU,
+} from "./motion";
 
 // Clips about the legs: stomping, hopping, marching, balancing.
 // Where a clip is decides which part of Tapsi glows (`clipFocus` in index.ts).
@@ -16,25 +33,55 @@ export const LEG_CLIPS = clips({
   },
 
   step_side: (t, p) => {
-    // A real step to the side and back, one foot after the other: the left foot steps out, the
+    // A big step to the side and back, one foot after the other: the left foot steps out, the
     // weight shifts over, the right foot follows; back the other way round.
-    const k = phase(t, 3);
+    const k = phase(t, DODGE_PERIOD);
     const part = (from: number, to: number) => clamp01((k - from) / (to - from));
     const lift = (u: number) => Math.sin(u * Math.PI);
     const outL = smooth(part(0.05, 0.2));
     const outR = smooth(part(0.25, 0.4));
     const backR = smooth(part(0.55, 0.7));
     const backL = smooth(part(0.75, 0.9));
-    p.shift = (smooth(part(0.14, 0.32)) - smooth(part(0.64, 0.82))) * 0.36;
+    p.shift = (smooth(part(0.14, 0.32)) - smooth(part(0.64, 0.82))) * 0.5;
     const upL = lift(part(0.05, 0.2)) + lift(part(0.75, 0.9));
     const upR = lift(part(0.25, 0.4)) + lift(part(0.55, 0.7));
-    feetAt(p, 0.13 + (outL - backL) * 0.38, -0.13 + (outR - backR) * 0.36, upL * 1.4, upR * 1.4);
+    feetAt(p, 0.13 + (outL - backL) * 0.52, -0.13 + (outR - backR) * 0.5, upL * 1.4, upR * 1.4);
     // Over the standing leg, arms out for balance.
     p.lean = (upR - upL) * 0.1;
     p.armL.spread = 0.4 + upR * 0.55;
     p.armR.spread = 0.4 + upL * 0.55;
     p.armL.elbow = p.armR.elbow = 0.5;
     p.headPitch = 0.1;
+  },
+
+  lift_leg: (t, p) => {
+    // The left knee comes up high and stays there a moment, so something can roll under the foot; the
+    // arms go out and the body leans a little over the standing leg.
+    const up = hold(phase(t, DODGE_PERIOD), 0.1, 0.3, 0.6, 0.8);
+    p.legL.lift = up * 1.25;
+    p.legL.knee = up * 2.0;
+    p.lean = -up * 0.07;
+    p.armL.spread = p.armR.spread = 0.4 + up * 0.8;
+    p.armL.elbow = p.armR.elbow = 0.3;
+    p.headPitch = up * 0.3;
+  },
+
+  straddle: (t, p) => {
+    // The feet go wide one after the other and come back together, with the legs straight, so
+    // something can roll through between them; arms out wide, looking down.
+    const k = phase(t, DODGE_PERIOD);
+    const part = (from: number, to: number) => clamp01((k - from) / (to - from));
+    const lift = (u: number) => Math.sin(u * Math.PI);
+    const outL = smooth(part(0.05, 0.17)) - smooth(part(0.68, 0.8));
+    const outR = smooth(part(0.17, 0.29)) - smooth(part(0.6, 0.72));
+    const upL = lift(part(0.05, 0.17)) + lift(part(0.68, 0.8));
+    const upR = lift(part(0.17, 0.29)) + lift(part(0.6, 0.72));
+    feetAt(p, 0.13 + outL * 0.24, -0.13 - outR * 0.24, upL * 0.8, upR * 0.8);
+    const wide = Math.min(outL, outR);
+    p.lean = (upR - upL) * 0.06;
+    p.armL.spread = p.armR.spread = 0.4 + wide * 1.0;
+    p.armL.elbow = p.armR.elbow = 0.2;
+    p.headPitch = wide * 0.35;
   },
 
   march: (t, p) => {

@@ -162,8 +162,32 @@ export const sitProgress = (t: number) => smooth(clamp01((t - SIT_FROM) / SIT_TI
 export const DRUM_PERIOD = 1.6;
 /** Seconds into each half when the beating paw comes down on the drum. */
 export const DRUM_HIT = 0.4;
+/**
+ * Seconds of one go of the side step, the leg lift and the straddle: out, hold while something rolls
+ * past, back; and seconds into a go when the step is furthest out, the leg highest and the feet widest.
+ */
+export const DODGE_PERIOD = 3;
+export const DODGE_PASS = 1.4;
+/** Seconds of one pull of each paw on the rope, hand over hand: the left paw pulls in the first half, the right in the second. */
+export const PULL_PERIOD = 1.8;
+/** How far out the left paw is on the rope `t` s into pull_rope: 0 at the body, 1 reached out; the right paw is at 1 minus this. */
+export const pullReach = (t: number) => 0.5 + linger(Math.sin(phase(t, PULL_PERIOD) * TAU)) / 2;
+/**
+ * How much rope the paws have pulled in `t` s into pull_rope, in reaches: a paw only pulls while it comes
+ * back to the body, so the rope comes in tug by tug, two in each period, and stops a moment between them.
+ */
+export function pulledIn(t: number) {
+  const k = phase(t, PULL_PERIOD);
+  const r = pullReach(t);
+  const sofar = k < 0.25 ? r - 0.5 : k < 0.75 ? 1.5 - r : 1.5 + r;
+  return Math.floor(t / PULL_PERIOD) * 2 + sofar;
+}
 /** Seconds of one push of both arms up into the sky. */
 export const PUSH_PERIOD = 2.6;
+/** Seconds of one go of scoop_toss: down into the chest, up, and the coins thrown. */
+export const TOSS_PERIOD = 3;
+/** Seconds into each go of scoop_toss when the coins leave the paws, the arms flying up. */
+export const TOSS_AT = 1.65;
 
 /** How Tapsi stands still in the stop dance. */
 type Statue = "wobbly" | "one_leg" | "funny";

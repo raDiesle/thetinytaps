@@ -47,6 +47,7 @@ import {
   v3,
   WEB_GAP,
   WEB_Z,
+  COINS_PER_TOSS,
 } from "./layout";
 import {
   cobwebTexture,
@@ -64,7 +65,6 @@ import {
   makeLock,
   makeRaft,
   makeRiddle,
-  makeRocket,
   makeRod,
   makeSpider,
   makeStarBox,
@@ -266,13 +266,16 @@ export function makeWorld(scene: THREE.Scene) {
   gate.group.position.set(0, groundHeight(0, GATE_Z), GATE_Z);
   scene.add(gate.group);
 
-  const rollers = Array.from({ length: goes(S.roll) }, (_, i) => {
-    const nut = makeCoconut(i + 3);
-    nut.scale.setScalar(ROLL_RADIUS / 0.5);
-    nut.visible = false;
-    scene.add(nut);
-    return nut;
-  });
+  // The coconuts the monkeys drop down the path: one for every go of each of the three dodging steps.
+  const rollers = [S.roll, S.rollLeft, S.rollMiddle].flatMap((step) =>
+    Array.from({ length: goes(step) }, (_, n) => {
+      const nut = makeCoconut(step * 10 + n);
+      nut.scale.setScalar(ROLL_RADIUS / 0.5);
+      nut.visible = false;
+      scene.add(nut);
+      return { nut, step, n };
+    }),
+  );
 
   // Two monkeys up in palms on either side of the path, a little ahead.
   const monkeys = [-1, 1].map((side) => {
@@ -291,6 +294,15 @@ export function makeWorld(scene: THREE.Scene) {
         if (at.y > top.y) top.copy(at);
       }
     });
+    // A bunch of coconuts under the leaves beside the monkey, on the side of the path, where it takes the
+    // ones it drops.
+    for (let i = 0; i < 5; i++) {
+      const nut = makeCoconut(80 + i + (side > 0 ? 10 : 0));
+      nut.scale.setScalar((ROLL_RADIUS * 1.4) / 0.5);
+      const a = (i / 5) * TAU;
+      nut.position.set(top.x - side * 0.4 + Math.cos(a) * 0.13, top.y - 0.2 - (i % 2) * 0.13, top.z + 0.3 + Math.sin(a) * 0.13);
+      scene.add(nut);
+    }
     const monkey = makeMonkey();
     const holder = new THREE.Group();
     holder.position.set(top.x, top.y - 0.55, top.z + 0.25);
@@ -343,7 +355,7 @@ export function makeWorld(scene: THREE.Scene) {
     return { group, stem, jitter: v3((r() - 0.5) * 0.24, r() * 0.12, (r() - 0.5) * 0.2) };
   });
   /** Where the paws are at the top of a reach (measured on the clip), from Tapsi: x to Tapsi's left. */
-  const REACH_TOP = v3(0.28, 1.55, 0.05).multiplyScalar(GUIDE_SIZE);
+  const REACH_TOP = v3(0.25, 1.6, 0.05).multiplyScalar(GUIDE_SIZE);
 
   const door = makeDoor();
   door.group.position.set(0, groundHeight(0, DOOR_Z), DOOR_Z);
@@ -393,8 +405,8 @@ export function makeWorld(scene: THREE.Scene) {
   const crabs = Array.from({ length: 5 }, (_, i) => {
     const crab = makeCrab();
     // Around Ole and a little behind, all facing us, so they dance along with Tapsi.
-    const x = PARTY.x + [-2.0, 2.1, -2.9, 3.0, -0.5][i];
-    const z = PARTY.z + [-0.5, -0.3, 0.4, 0.3, -1.1][i];
+    const x = PARTY.x + [-2.0, 2.9, -2.9, 3.0, -0.5][i];
+    const z = PARTY.z + [-0.5, -0.6, 0.4, 0.3, -1.1][i];
     const holder = new THREE.Group();
     holder.position.set(x, groundHeight(x, z) - 0.6, z);
     holder.add(crab.group);
@@ -406,17 +418,23 @@ export function makeWorld(scene: THREE.Scene) {
   const spray = makeConfetti(240, ["#ffffff", "#d8f6ff", "#9fe4ff"], 0.9);
   const gold = makeConfetti(160, ["#ffd23f", "#ffcc33", "#fff1a8"], 1.4);
   const sand = makeConfetti(160, ["#f2d49b", "#e3c48e", "#fff1d0"], 0.8);
-  // The fireworks start before sunset: glowing only a little, so their colours show against the day sky.
-  const sparks = makeConfetti(600, ["#ff3d5a", "#ffc61a", "#3fb4ff", "#9b6bff", "#4fd36a", "#ff8a1f"], 2);
-  (sparks.mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.3;
-  scene.add(confetti.mesh, spray.mesh, gold.mesh, sand.mesh, sparks.mesh);
-  // A rocket for every push of the arms at the end.
-  const rocketColors = ["#e8423f", "#3ec1d3", "#b388ff", "#7bd389", "#ff9f43"];
-  const rockets = Array.from({ length: goes(S.fireworks) }, (_, i) => {
-    const r = makeRocket(rocketColors[i % rocketColors.length]);
-    r.group.visible = false;
-    scene.add(r.group);
-    return r;
+  scene.add(confetti.mesh, spray.mesh, gold.mesh, sand.mesh);
+  // Two more crabs carry the open chest from the raft up the beach.
+  const porters = [0, 1].map(() => {
+    const crab = makeCrab();
+    crab.group.visible = false;
+    scene.add(crab.group);
+    return crab;
+  });
+  // The gold coins Tapsi throws up out of the chest at the end, a handful at every throw.
+  const coinMat = mat("#ffcc33", 0.3, { metalness: 0.9, emissive: "#6b4a00", emissiveIntensity: 0.4 });
+  const coinGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.012, 14);
+  const coins = Array.from({ length: goes(S.coins) * COINS_PER_TOSS }, () => {
+    const coin = new THREE.Mesh(coinGeo, coinMat);
+    coin.castShadow = true;
+    coin.visible = false;
+    scene.add(coin);
+    return coin;
   });
   const trail = makeTrail();
   scene.add(trail.mesh);
@@ -465,8 +483,8 @@ export function makeWorld(scene: THREE.Scene) {
     spray,
     gold,
     sand,
-    sparks,
-    rockets,
+    porters,
+    coins,
     trail,
   };
 }
