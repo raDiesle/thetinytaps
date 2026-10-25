@@ -39,6 +39,10 @@ describe("ideas", () => {
     const ids = new Set(ideas.map(({ idea }) => idea.id));
     for (const pick of TOP_PICKS) expect(ids).toContain(pick.id);
   });
+
+  test("a rejected idea is not marked as done", () => {
+    expect(ideas.filter(({ idea }) => idea.rejected && idea.done).map(({ idea }) => idea.id)).toEqual([]);
+  });
 });
 
 describe.each(LANGUAGES.map((language) => [language.id, language] as const))("language %s", (_, { pack }) => {

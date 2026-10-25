@@ -6,7 +6,7 @@
 // between the spots, and one section for every part in every spot. The
 // drawing in TrackLevel.tsx is laid out along the same numbers.
 
-import { arc, BALL_R, indexAt, line, quad, type Pt } from "@/games/marbles/path";
+import { arc, BALL_R, indexAt, line, quad, type Pt } from "./path";
 
 /** The whole wall; the picture shows 1600 × 900 of it (more on a tall screen). */
 export const TRACK_W = 1600;

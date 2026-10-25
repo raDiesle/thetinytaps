@@ -36,8 +36,8 @@ export const storyImages = {
   problem: (id: string) => `${id}-passiert`,
   /** The n-th good step, counted from 0. */
   step: (id: string, i: number) => `${id}-${i + 1}`,
-  /** The not-so-good idea. */
-  instead: (id: string) => `${id}-nein`,
+  /** The not-so-good idea next to the n-th good step, counted from 0: "push-nein", "push-nein-2". */
+  instead: (id: string, i: number) => (i === 0 ? `${id}-nein` : `${id}-nein-${i + 1}`),
   /** Everybody happy at the end. */
   end: (id: string) => `${id}-ende`,
 };
@@ -47,6 +47,8 @@ export const bearImages = {
   /** How the bear feels at the start. */
   feeling: (id: string) => `baer-${id}`,
   comfort: (id: string) => `trost-${id}`,
+  /** The not-so-good idea among the comforts. */
+  instead: (id: string) => `baer-${id}-nein`,
   /** Happy (or asleep) again at the end. */
   happy: (id: string) => `baer-${id}-gut`,
 };

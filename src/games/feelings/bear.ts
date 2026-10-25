@@ -1,13 +1,15 @@
-// The bear and his feelings: what he feels, and what helps. Three kind things
-// make him happy again; tapping the bear strokes him, which always helps too.
+// Zu Hause: the bear and his feelings, what he feels and what helps. Three kind
+// things make him happy again, one not-so-good idea lies among them; tapping the
+// bear strokes him, which always helps too.
 
 import type { SoundName } from "./story";
 
 export type ComfortId = "stroke" | "hug" | "teddy" | "stomp" | "blow" | "blanket" | "lullaby" | "hand" | "light";
 
+/** One kind thing for the bear. */
 export interface Comfort {
-  /** Not shown: the card is only a picture. Said by screen readers. */
-  label: string;
+  /** What to do, in a word or two („Hand halten“): for grown-ups under the card, said by screen readers. */
+  caption: string;
   narration: string;
   /** Little things that float up from him. */
   float: string;
@@ -16,55 +18,55 @@ export interface Comfort {
 
 export const COMFORTS: Record<ComfortId, Comfort> = {
   stroke: {
-    label: "Streicheln",
+    caption: "Streicheln",
     narration: "Du streichelst den Bären. Ganz sanft.",
     float: "💛",
     sound: "hum",
   },
   hug: {
-    label: "Umarmen",
+    caption: "Umarmen",
     narration: "Du nimmst den Bären fest in den Arm.",
     float: "💛",
     sound: "hum",
   },
   teddy: {
-    label: "Teddy geben",
+    caption: "Teddy geben",
     narration: "Du gibst dem Bären einen Teddy zum Kuscheln.",
     float: "💛",
     sound: "pop",
   },
   stomp: {
-    label: "Stampfen",
+    caption: "Stampfen",
     narration: "Stampf, stampf! Die Wut darf raus.",
     float: "💥",
     sound: "rumble",
   },
   blow: {
-    label: "Tief pusten",
+    caption: "Tief pusten",
     narration: "Tief einatmen … und auspusten: Puuuh.",
     float: "💨",
     sound: "hum",
   },
   blanket: {
-    label: "Zudecken",
+    caption: "Zudecken",
     narration: "Du deckst den Bären zu. Schön warm.",
     float: "✨",
     sound: "hum",
   },
   lullaby: {
-    label: "Schlaflied",
+    caption: "Schlaflied singen",
     narration: "Du singst ein leises Schlaflied.",
     float: "🎵",
     sound: "melody",
   },
   hand: {
-    label: "Hand halten",
+    caption: "Hand halten",
     narration: "Du hältst seine Pfote. Du bist da.",
     float: "💛",
     sound: "hum",
   },
   light: {
-    label: "Licht an",
+    caption: "Licht anmachen",
     narration: "Du machst Licht an. Jetzt ist es hell.",
     float: "✨",
     sound: "chime",
@@ -73,50 +75,65 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
 
 export type FeelingId = "sad" | "angry" | "tired" | "scared";
 
+/** How the bear feels at the start, and what makes him happy again. */
 export interface Feeling {
   id: FeelingId;
   /** For the grown-ups' choice on the start screen. */
   emoji: string;
+  /** The scene in a few words („Angst bei Gewitter“): on the start screen and under the first picture. */
   title: string;
   /** Read aloud with the question. */
   intro: string;
+  /** The kind things on the cards, the best one first. */
   comforts: ComfortId[];
+  /** The not-so-good idea, the first card: what its picture shows, and why it doesn't help (read aloud). */
+  instead: { caption: string; answer: string };
   /** Read aloud when he is happy again: what is told, then what he says. */
   end: { narration: string; line: string };
+  /** What the picture of him happy again shows. */
+  endCaption: string;
 }
 
 export const FEELINGS: Feeling[] = [
   {
     id: "sad",
     emoji: "😢",
-    title: "Traurig",
+    title: "Traurig, weint",
     intro: "Der Bär ist traurig. Er weint.",
-    comforts: ["hug", "teddy", "stroke"],
+    comforts: ["hug", "stroke", "teddy"],
+    instead: { caption: "Teddy wegnehmen", answer: "Hmm, jetzt weint der Bär noch mehr. Tröste ihn lieber." },
     end: { narration: "Jetzt ist der Bär wieder fröhlich!", line: "Danke!" },
+    endCaption: "Wieder fröhlich",
   },
   {
     id: "angry",
     emoji: "😠",
-    title: "Wütend",
+    title: "Wut, Turm umgefallen",
     intro: "Der Bär ist wütend! Sein Turm ist umgefallen.",
     comforts: ["stomp", "blow", "hug"],
+    instead: { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!" },
     end: { narration: "Die Wut ist weg. Der Bär ist wieder ruhig.", line: "Danke!" },
+    endCaption: "Wieder ruhig",
   },
   {
     id: "tired",
     emoji: "😴",
-    title: "Müde",
+    title: "Müde am Abend",
     intro: "Der Bär ist müde. Er gähnt.",
-    comforts: ["blanket", "teddy", "lullaby"],
+    comforts: ["blanket", "lullaby", "teddy"],
+    instead: { caption: "Laut trommeln", answer: "Hmm, so laut kann der Bär nicht schlafen. Sei lieber ganz leise." },
     end: { narration: "Der Bär schläft glücklich ein. Gute Nacht!", line: "Gute Nacht …" },
+    endCaption: "Schläft ein",
   },
   {
     id: "scared",
     emoji: "😨",
-    title: "Angst",
+    title: "Angst bei Gewitter",
     intro: "Der Bär hat Angst. Es donnert!",
-    comforts: ["hand", "light", "hug"],
+    comforts: ["hug", "hand", "light"],
+    instead: { caption: "Licht ausmachen", answer: "Hmm, im Dunkeln hat der Bär noch mehr Angst. Mach lieber Licht an." },
     end: { narration: "Das Gewitter ist vorbei. Der Bär lacht wieder!", line: "Danke!" },
+    endCaption: "Wieder fröhlich",
   },
 ];
 

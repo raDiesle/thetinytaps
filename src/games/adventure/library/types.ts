@@ -152,7 +152,8 @@ export type MotionClipId =
   | "shapes"
   | "turn_key"
   | "jump"
-  | "brush_away";
+  | "brush_away"
+  | "sit";
 
 /** What a movement asks of the room and the body, so parents and sequences can filter. */
 export interface MovementNeeds {

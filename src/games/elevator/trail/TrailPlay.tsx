@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
-import { playCountNote, playGiggle, playMelody, playPop, playRandomNote } from "@/lib/sfx";
+import { useDevice } from "@/lib/device";
+import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { cardForKey, StoryCards } from "../cards";
+import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, ThoughtBubble, type Pose } from "../kid";
 import type { ElevatorSettings } from "../settings";
 import { groundY, route } from "./ground";
-import { Fitted, GOALS, ITEMS, Kite, type ItemId } from "./items";
-import type { Climb, Cue, Obstacle, Pickup, Point, TrailLevel } from "./types";
+import { Fitted, GOALS, ITEMS, type Goal, type ItemId } from "./items";
+import type { Climb, Cue, Flight, Moment, Obstacle, Pickup, Point, TrailLevel } from "./types";
 import "./trail.css";
 
 const VIEW_W = 1600;
@@ -22,11 +23,13 @@ const FAR = 0.3;
 const WALK_MS = 2.6;
 /** One step up the stairs. */
 const STEP_MS = 380;
+/** Sliding time per world point: much faster than walking. */
+const SLIDE_MS = 0.9;
 /** A thing flying between the bag and the world. */
 const FLY_MS = 650;
 /** Without a tap for so long, the hand pops up again (and while choosing, the right thing glows). */
 const NUDGE_MS = 7000;
-/** From the end of the level until the picture cards come. */
+/** From the end of the level until „Nochmal“ and „Weiter“ come. */
 const END_MS = 6000;
 /** The bag's slots on the screen; the bag holds three things at most. */
 const SLOTS: Point[] = [
@@ -37,6 +40,22 @@ const SLOTS: Point[] = [
 const SLOT_R = 74;
 /** The action button, in the other bottom corner. */
 const ACTION: Point = [1494, 800];
+/** On a computer a key cap above each slot and above the action button shows which key does it. */
+const SLOT_KEY_Y = 712;
+const ACTION_KEY_Y = 676;
+
+/** A key on the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
+function KeyCap({ x, y, w, on, down, children }: { x: number; y: number; w: number; on: boolean; down: boolean; children: ReactNode }) {
+  return (
+    <g className={`tl-key${on ? " on" : ""}${down ? " down" : ""}`}>
+      <rect x={x - w / 2} y={y - 22} width={w} height={52} rx="12" className="tl-key-base" />
+      <g className="tl-key-top">
+        <rect x={x - w / 2} y={y - 28} width={w} height={50} rx="12" className="tl-key-face" stroke={INK} strokeWidth="4" />
+        <g transform={`translate(${x} ${y - 3})`}>{children}</g>
+      </g>
+    </g>
+  );
+}
 
 interface KidState {
   x: number;
@@ -90,14 +109,19 @@ const startView = (level: TrailLevel): View => ({
 
 /** The hand of the child reaching out (pose "reach", facing right), where the string is held. */
 const handOf = (kid: KidState): Point => [kid.x + 62, kid.y - 112];
-/** Where the goal is while the child holds it by its string. */
-const heldOf = (kid: KidState): Point => [kid.x + 140, kid.y - 250];
+/** Where the goal is while the child holds it: high up on its string, or in the reaching hand. */
+const heldOf = (kid: KidState, goal: Goal): Point => (goal.carry === "string" ? [kid.x + 140, kid.y - 250] : [kid.x + 66, kid.y - 78]);
 
 /** "Weg-Abenteuer": the goal goes away, the child follows it through a scrolling world and uses what it finds. */
 export function TrailPlay({ lang, settings, level, onPick }: { lang: string; settings: ElevatorSettings; level: TrailLevel; onPick: (id: string) => void }) {
+  const theGoal = GOALS[level.goal];
+  const onString = theGoal.carry === "string";
   const [view, setView] = useState<View>(() => startView(level));
   const viewRef = useRef<View>(view);
   const { bursts, spawn } = useBursts();
+  const { touchOnly } = useDevice();
+  /** The key held down right now, so its cap on the screen goes down too. */
+  const [held, setHeld] = useState<string | null>(null);
 
   // The level is a script of waits; leaving bumps the generation and drops its timers.
   const generation = useRef(0);
@@ -107,8 +131,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   /** Set while the bag is open: it gets the slot. */
   const chooser = useRef<((slot: number) => void) | null>(null);
 
-  // The goal (the kite) moves along curves, so it is moved frame by frame, not by React.
+  // The goal (the kite, the ball, the balloon) moves along curves, so it is moved frame by frame, not by React.
   const goalEl = useRef<SVGGElement>(null);
+  const spinEl = useRef<SVGGElement>(null);
   const stringEl = useRef<SVGLineElement>(null);
   const goal = useRef<{ at: Point; hand: Point | null }>({ at: [0, 0], hand: null });
 
@@ -154,10 +179,12 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   const cue = (sounds: Cue[]) => sounds.forEach(([ms, play]) => later(ms, () => sound(play)));
 
-  /** Draws the goal at `at`, with its string to `hand` if it is held. */
+  /** Draws the goal at `at`, with its string to `hand` if it is held; a ball turns as far as it has rolled. */
   const drawGoal = (at: Point, hand: Point | null) => {
     goal.current = { at, hand };
     goalEl.current?.setAttribute("transform", `translate(${at[0]} ${at[1]})`);
+    const r = theGoal.roll;
+    if (r) spinEl.current?.setAttribute("transform", `rotate(${((at[0] / r) * 180) / Math.PI} 0 ${-r})`);
     const line = stringEl.current;
     if (!line) return;
     line.style.display = hand ? "" : "none";
@@ -184,6 +211,12 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     };
     requestAnimationFrame(frame);
     return wait(ms);
+  };
+
+  /** Moves the goal along a flight: through its `via` points, then to `to`. */
+  const flyGoal = async (flight: Flight, hand: Point | null) => {
+    for (const [at, ms] of flight.via ?? []) await moveGoal(at, ms, hand, flight.sway);
+    await moveGoal(flight.to, flight.ms, hand, flight.sway);
   };
 
   /** The camera: the world moves so that the child stays at `KID_AT`. */
@@ -295,8 +328,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     await wait(Math.max(0, station.ms - 500));
     if (station.frees) {
       kid({ pose: "reach" });
-      await moveGoal(heldOf(viewRef.current.kid), 1200, null, 30);
-      drawGoal(goal.current.at, handOf(viewRef.current.kid));
+      await moveGoal(heldOf(viewRef.current.kid, theGoal), 1200, null, onString ? 30 : 0);
+      if (onString) drawGoal(goal.current.at, handOf(viewRef.current.kid));
     } else kid({ pose: "stand" });
     put({ here: null });
   };
@@ -314,7 +347,40 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
       await wait(STEP_MS);
       kid({ walk: 0, pose: "stand" });
     }
+    if (station.slide) {
+      // Down the slide by itself: "Huiii!"
+      sound(playSlide);
+      kid({ pose: "cheer" });
+      for (const [x, y] of station.slide) {
+        const k = viewRef.current.kid;
+        const ms = Math.hypot(x - k.x, y - k.y) * SLIDE_MS;
+        kid({ x, y, walk: ms });
+        await wait(ms);
+      }
+      kid({ walk: 0, pose: "cheer" });
+      sound(playGiggle);
+      await wait(700);
+      kid({ pose: "stand" });
+    }
     say(station.done);
+  };
+
+  /** The child gets there and something happens by itself (the light turns green); the walk was the tap. */
+  const moment = async (station: Moment) => {
+    await go();
+    await walkTo(station.x);
+    put({ here: station.id });
+    kid({ pose: station.pose });
+    cue(station.sounds);
+    say(station.ask);
+    await wait(700);
+    kid({ pose: "stand" });
+    await wait(Math.max(0, station.ms - 700));
+    put((v) => ({ done: [...v.done, station.id], here: null }));
+    kid({ pose: "cheer" });
+    say(station.done);
+    await wait(900);
+    kid({ pose: "stand" });
   };
 
   const funBurst = useCallback(
@@ -327,12 +393,12 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   const play = async () => {
     const k = viewRef.current.kid;
-    drawGoal(heldOf(k), handOf(k));
+    drawGoal(heldOf(k, theGoal), onString ? handOf(k) : null);
     kid({ pose: level.away.pose });
     await wait(900);
     cue(level.away.sounds);
     kid({ pose: "shake" });
-    await moveGoal(level.away.to, level.away.ms, null, 120);
+    await flyGoal(level.away, null);
     kid({ pose: "stand" });
     put({ bubble: { nudge: 0 } });
     say(level.away.say);
@@ -341,6 +407,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     for (const station of level.stations) {
       if (station.kind === "pickup") await pickup(station);
       else if (station.kind === "obstacle") await obstacle(station);
+      else if (station.kind === "moment") await moment(station);
       else await climb(station);
     }
     // The goal is back in the child's hands: up it goes.
@@ -348,8 +415,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     sound(playMelody);
     say(level.finale.say);
     for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
-    await moveGoal(level.finale.to, level.finale.ms, handOf(viewRef.current.kid), 60);
-    await wait(END_MS - level.finale.ms);
+    const finaleMs = level.finale.ms + (level.finale.via ?? []).reduce((sum, [, ms]) => sum + ms, 0);
+    await flyGoal(level.finale, onString ? handOf(viewRef.current.kid) : null);
+    await wait(Math.max(0, END_MS - finaleMs));
     put({ picking: true });
   };
 
@@ -386,15 +454,15 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     sound(playGiggle);
   };
 
-  // Any key goes on when the hand shows; 1–3 take a thing out of the open bag; 1–4 pick a card at the end.
+  // Any key goes on when the action button lights up (the space bar is the one shown on it); 1–3 take a thing out
+  // of the open bag; any key at the end goes on to the next story.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
+      setHeld(e.key);
       const v = viewRef.current;
       if (v.picking) {
-        const card = cardForKey(e.key);
-        if (card) onPick(card.id);
-        else funBurst();
+        onPick(nextCard(level.id).id);
         return;
       }
       if (tapper.current) return tap();
@@ -408,19 +476,24 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         funBurst();
       }
     };
+    const onKeyUp = () => setHeld(null);
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
   });
 
   const { kid: k, flight } = view;
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
-  const { Scenery, Backdrop } = level;
+  const { Scenery, Front, Backdrop } = level;
   // Where the goal is drawn before the script moves it: in the hands at the start. React sets these
   // once; after that the script moves goal and string by itself.
-  const [startHand, startHeld] = [handOf(startView(level).kid), heldOf(startView(level).kid)];
+  const [startHand, startHeld] = [handOf(startView(level).kid), heldOf(startView(level).kid, theGoal)];
   const firstGoal = `translate(${startHeld[0]} ${startHeld[1]})`;
-  const firstString = { x1: startHand[0], y1: startHand[1], x2: startHeld[0], y2: startHeld[1] };
+  const firstString = { x1: startHand[0], y1: startHand[1], x2: startHeld[0], y2: startHeld[1], display: onString ? undefined : "none" };
 
   return (
     <div
@@ -442,10 +515,11 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
           <Scenery done={view.done} here={view.here} nope={view.nope} />
           <line ref={stringEl} className="tl-string" stroke={INK} strokeWidth="3" {...firstString} />
           <g ref={goalEl} className="tl-goal" transform={firstGoal}>
-            <g className={view.party ? "tl-sway" : undefined}>
-              <Kite />
+            <g className={view.party && onString ? "tl-sway" : undefined}>
+              <g ref={spinEl}>{(theGoal.world ?? theGoal.draw)()}</g>
             </g>
           </g>
+          {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} />
@@ -455,6 +529,11 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         </g>
 
         <ActionButton waiting={!!view.action} nudge={view.action?.nudge ?? 0} x={ACTION[0]} y={ACTION[1]} r={70} />
+        {!touchOnly && (
+          <KeyCap x={ACTION[0]} y={ACTION_KEY_Y} w={200} on={!!view.action} down={held === " "}>
+            <path d="M-34 -8 V8 H34 V-8" fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+          </KeyCap>
+        )}
         {/* The bag with its three slots, always in the bottom corner */}
         <g className={`tl-bag${view.choosing ? " open" : ""}`}>
           <g transform="translate(96 836)">
@@ -474,6 +553,13 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
                 aria-label={item ?? "leer"}
               >
                 <circle cx={x} cy={y} r={SLOT_R} className="tl-slot-face" stroke={INK} strokeWidth="6" />
+                {!touchOnly && (
+                  <KeyCap x={x} y={SLOT_KEY_Y} w={58} on={view.choosing && !!item} down={held === `${i + 1}`}>
+                    <text y="15" textAnchor="middle" fontSize="40" fontWeight="800" fontFamily="inherit" fill={INK}>
+                      {i + 1}
+                    </text>
+                  </KeyCap>
+                )}
                 {item && (
                   <g transform={`translate(${x} ${y})`}>
                     <Fitted picture={ITEMS[item]} width={104} />
@@ -495,7 +581,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         )}
       </svg>
 
-      {view.picking && <StoryCards again onPick={onPick} />}
+      {view.picking && <StoryEnd id={level.id} onPick={onPick} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

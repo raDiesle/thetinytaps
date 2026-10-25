@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { type Loop, loadSound, playLoop, playTuneNote } from "@/lib/sfx";
 
-// The brushing song musik/zaehneputzen.mp3 (see the README there). Without it,
+// The brushing song musik/musik-zaehneputzen.mp3 (see the README there). Without it,
 // or while it is still loading, the synthesized tune plays instead.
 const files = import.meta.webpackContext("./musik", { regExp: /\.mp3$/ });
-const SONG_FILE = "./zaehneputzen.mp3";
+const SONG_FILE = "./musik-zaehneputzen.mp3";
 const songModule = files.keys().includes(SONG_FILE) ? (files(SONG_FILE) as string | { default: string }) : null;
 const SONG_URL = typeof songModule === "string" ? songModule : (songModule?.default ?? null);
 

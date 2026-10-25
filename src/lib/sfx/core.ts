@@ -59,11 +59,21 @@ export function loadRecordings(names: Iterable<string>) {
 
 /** Fetches and decodes the sound file at `url`; null without audio or if it fails. */
 export async function loadSound(url: string): Promise<AudioBuffer | null> {
+  if (!audio()) return null;
+  try {
+    const response = await fetch(url);
+    return await decodeSound(await response.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
+/** Decodes a sound file fetched before (the bytes are used up); null without audio or if it fails. */
+export async function decodeSound(data: ArrayBuffer): Promise<AudioBuffer | null> {
   const ac = audio();
   if (!ac) return null;
   try {
-    const response = await fetch(url);
-    return await ac.decodeAudioData(await response.arrayBuffer());
+    return await ac.decodeAudioData(data);
   } catch {
     return null;
   }

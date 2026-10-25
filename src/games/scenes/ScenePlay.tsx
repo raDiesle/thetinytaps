@@ -2,6 +2,7 @@ import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSPrope
 import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { SCENES } from ".";
@@ -9,7 +10,6 @@ import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys } from "./keys";
 import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
-import { useSceneMusic } from "./music";
 import { capitalize, nextQuest, questsFor, verb, type Quest } from "./quests";
 import { driveDistance, guestFor, PLACES, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
@@ -73,6 +73,9 @@ const GREY_SLOPE = 0.55;
 /** Colour mode: a dab of paint on the background is this share of the picture's width across. */
 const PAINT_RADIUS = 0.14;
 
+/** Colour mode, space bar: of this many random spots off the items, the one furthest from the paint so far gets painted. */
+const SPACE_TRIES = 40;
+
 /** Colour mode: a round patch of the background (and overlay) that got its colour back, in picture units. */
 type Dab = { x: number; y: number };
 
@@ -102,6 +105,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   /** Keys mode: the item in the glowing frame, moved with the arrow keys; hidden once an item starts. */
   const [focus, setFocus] = useState<SceneItem | null>(null);
   const [lit, setLit] = useState<Lit | null>(null);
+  /** Colour mode: the space bar is held, so its cap on the screen goes down too. */
+  const [spaceDown, setSpaceDown] = useState(false);
   const { bursts, spawn } = useBursts();
   const location = useLocation();
   const navigate = useNavigate();
@@ -154,8 +159,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const allDiscovered = discovered.size === scene.items.length;
   /** Bedtime picture while exploring: tapped items fall asleep, and the end is a quiet night instead of the party. */
   const bedtime = !!scene.bedtime && !colouring && !questMode;
-  // A trip in from another picture counts as the child's action, so the song goes on.
-  useSceneMusic({ enabled: settings.music && soundsOn && !scene.bedtime, started: touched || !!arrival });
+  // The good-night picture is about getting calm: no song in the background there.
+  useNoBackgroundMusic(!!scene.bedtime);
 
   const later = useCallback((fn: () => void, ms: number) => {
     const timer = setTimeout(() => {
@@ -353,8 +358,33 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     const matrix = svgRef.current?.getScreenCTM();
     if (!colouring || !matrix) return;
     const { x, y } = new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+    dab(x, y);
+  };
+
+  /** Colour mode: a dab at this point of the picture, in picture units. */
+  const dab = (x: number, y: number) => {
     const near = (scene.width * PAINT_RADIUS) / 4;
     setDabs((prev) => (prev.some((d) => Math.hypot(d.x - x, d.y - y) < near) ? prev : [...prev, { x, y }]));
+  };
+
+  /**
+   * Colour mode, space bar (on a computer): a spot of the grey background where
+   * nothing happens gets its colour back. Of a few random spots off the items it
+   * takes the one furthest from the paint so far, so each press paints somewhere new.
+   */
+  const paintSomewhere = () => {
+    interacted();
+    const boxes = here(items).map((item) => placeBox(item.box, item.place));
+    const spots = Array.from({ length: SPACE_TRIES }, () => ({ x: Math.random() * scene.width, y: Math.random() * scene.height }));
+    const free = spots.filter(({ x, y }) => !boxes.some(([bx, by, w, h]) => x >= bx && x <= bx + w && y >= by && y <= by + h));
+    const room = ({ x, y }: Dab) => Math.min(Infinity, ...dabs.map((d) => Math.hypot(d.x - x, d.y - y)));
+    const spot = (free.length ? free : spots).reduce((best, s) => (room(s) > room(best) ? s : best));
+    dab(spot.x, spot.y);
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!matrix) return;
+    const { x, y } = new DOMPoint(spot.x, spot.y).matrixTransform(matrix);
+    funBurst(x, y);
+    for (let i = 0; i < 2; i++) spawn(x + (Math.random() - 0.5) * 120, y + (Math.random() - 0.5) * 120);
   };
 
   /** Chain reaction: the items after this one react one by one, each telling its part of the story. */
@@ -511,6 +541,8 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   // The key handler is set up once; this way it always calls the current activate.
   const activateRef = useRef(activate);
   activateRef.current = activate;
+  const paintSomewhereRef = useRef(paintSomewhere);
+  paintSomewhereRef.current = paintSomewhere;
 
   /** Where an item is on screen, for the shapes that fly out of it. */
   const screenPoint = useCallback((item: SceneItem): [number, number] => {
@@ -565,6 +597,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       e.preventDefault();
       if (e.repeat) return;
 
+      // Colour mode: the space bar paints the background where nothing happens (Enter still starts the item in the frame).
+      if (colouring && e.key === " ") {
+        setSpaceDown(true);
+        paintSomewhereRef.current();
+        return;
+      }
+
       // Keys mode: the key's own item; items sharing a key take turns.
       // Only the item's own animation limits how fast keys can be pressed.
       if (settings.trigger === "keys") {
@@ -614,9 +653,14 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       const [x, y] = screenPoint(item);
       activateRef.current(item, x, y, "key");
     };
+    const onKeyUp = (e: KeyboardEvent) => e.key === " " && setSpaceDown(false);
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [scene, items, here, keys, screenPoint, settings.trigger, settings.sounds, ask, funBurst, moveFocus]);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
+  }, [scene, items, here, keys, screenPoint, colouring, settings.trigger, settings.sounds, ask, funBurst, moveFocus]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
@@ -764,6 +808,24 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       {/* Counted to the end (party, the room gone dark or the picture coloured in). */}
       {!questMode && allDiscovered && (
         <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }} />
+      )}
+      {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
+      {colouring && settings.trigger === "keys" && settings.showKeys && !allDiscovered && (
+        <button
+          type="button"
+          className={`scene-space${spaceDown ? " down" : ""}`}
+          aria-label="Leertaste"
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            paintSomewhere();
+          }}
+        >
+          <span className="scene-space-top">
+            <svg className="scene-space-bar" viewBox="-40 -14 80 28" aria-hidden>
+              <path d="M-34 -8 V8 H34 V-8" />
+            </svg>
+          </span>
+        </button>
       )}
       {!questMode && !touched && <p className="scene-prompt">{(colouring ? COLOUR_PROMPTS : PROMPTS)[settings.trigger]}</p>}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}

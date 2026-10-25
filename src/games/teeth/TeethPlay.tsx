@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
 import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
@@ -175,6 +176,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
+  // The brushing has its own song (or none, when it is switched off).
+  useNoBackgroundMusic();
   useBrushingMusic({ enabled: settings.music, playing: step !== null && !paused, finished: done, sync: clock, at: brushed });
 
   // What to say and play when a new part begins.

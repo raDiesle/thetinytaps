@@ -6,7 +6,7 @@ export const chainReactionIdeas: IdeaArea = {
   emoji: "⛓️",
   title: "Kettenreaktion – neue Maschinen und Ideen",
   intro:
-    "Heute: ein Tipp, dann laufen sechs Maschinen und „Alles fällt um“ von allein bis zum Ende (N-34). Hier sammeln sich neue Welten und Wege, wie das Kind mehr bewirkt. Jeder Moment einer Maschine lässt sich schon heute berechnen – Rückwärts, Zeitlupe und Anhalten sind deshalb klein.",
+    "Heute: ein Tipp, dann laufen sieben Maschinen und „Alles fällt um“ von allein bis zum Ende (N-34). Hier sammeln sich neue Welten und Wege, wie das Kind mehr bewirkt. Jeder Moment einer Maschine lässt sich schon heute berechnen – Rückwärts, Zeitlupe und Anhalten sind deshalb klein.",
   ideas: [
     {
       id: "R-01",
@@ -87,6 +87,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Ein dunkles Zimmer: Die Taschenlampe leuchtet auf einen Spiegel, der auf die Discokugel, Glühwürmchen wachen auf, die Lichterkette geht an … bis der ganze Raum funkelt.",
       why: "Hell und dunkel statt Krach; schön am Abend.",
       effort: "M",
+      done: true,
     },
     {
       id: "R-11",

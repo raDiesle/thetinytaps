@@ -13,6 +13,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Jede Taste (oder große bunte Leiste) spielt einen Ton der Pentatonik – klingt immer schön. Dazu fliegt eine Note hoch. Option: Tier-Stimmen statt Töne.",
       why: "Sofortiges Erfolgserlebnis; sfx-Grundlage ist schon da.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-02",
@@ -21,6 +22,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Blasen steigen langsam auf, Antippen oder eine Taste lässt sie platzen. Manche haben ein Tier oder einen Buchstaben drin, der dann herausfällt.",
       why: "Auge-Hand-Koordination, für ganz Kleine (ab 1½).",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-03",
@@ -54,6 +56,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "2, 3 oder 4 große Teile, die an ihren Platz gezogen werden (schnappen weit vorher ein). Motive aus den Szenen und Emojis.",
       why: "Teil-Ganzes-Verständnis, Feinmotorik beim Ziehen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-07",
@@ -88,6 +91,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Taste oder Finger gedrückt halten → Ballon wird größer. Loslassen → er fliegt weg. Zu lange → Plopp mit Konfetti.",
       why: "Lernt „gedrückt halten“ und Dauer; einfache Ursache-Wirkung.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-11",
@@ -96,6 +100,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Mit dem Finger malen (Regenbogen-Spur, die langsam verblasst) oder Tier-Stempel setzen, die sich danach leicht bewegen. Tastatur: jede Taste ein Stempel.",
       why: "Freies, kreatives Spiel ohne richtig oder falsch.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-12",
@@ -103,6 +108,7 @@ export const newGamesIdeas: IdeaArea = {
       title: "Guck-guck",
       text: "Hinter Büschen, Kissen oder Türen verstecken sich Tiere. Antippen → das Tier springt raus und macht sein Geräusch. Für die Allerkleinsten.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-13",
@@ -119,6 +125,7 @@ export const newGamesIdeas: IdeaArea = {
       title: "Formen-Steckbox",
       text: "Kreis, Dreieck, Quadrat, Stern in die passenden Löcher ziehen. Passt es, plumpst es mit Geräusch rein.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-15",
@@ -135,6 +142,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Draußen regnet/schneit/scheint die Sonne – die Figur wird passend angezogen (Gummistiefel, Mütze, Sonnenhut). Danach geht sie raus spielen.",
       why: "Alltagswissen und Wortschatz Kleidung.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-17",
@@ -150,6 +158,7 @@ export const newGamesIdeas: IdeaArea = {
       title: "Pizza belegen / Kuchen backen",
       text: "Zutaten auf die Pizza ziehen, in den Ofen schieben, warten, fertig. Dann an Tiere verteilen, die sich freuen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-19",
@@ -157,6 +166,7 @@ export const newGamesIdeas: IdeaArea = {
       title: "Feuerwehr löscht",
       text: "Kleine (freundliche) Flammen im Haus; Antippen oder eine Taste spritzt Wasser, bis alles gelöscht ist. Danach winken die Bewohner.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-20",
@@ -179,6 +189,7 @@ export const newGamesIdeas: IdeaArea = {
       title: "Zug beladen",
       text: "Tiere, Pakete oder Obst auf Waggons verteilen, dann pfeift die Lok und fährt durch eine Landschaft; unterwegs steigen Tiere aus.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-23",
@@ -202,6 +213,7 @@ export const newGamesIdeas: IdeaArea = {
       title: "Muster fortsetzen (ab 3)",
       text: "🔴🔵🔴🔵❓ – welche Farbe kommt als Nächstes? Zwei große Knöpfe zur Wahl.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-26",
@@ -210,6 +222,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Der Bildschirm ist wie eine beschlagene Scheibe. Wo der Finger wischt, wird sie klar und dahinter sitzt ein Tier, das winkt. Nach einer Weile beschlägt sie wieder – neues Tier. Tastatur: jede Taste wischt ein Stück frei.",
       why: "Nur wischen, nichts falsch machen, sofort eine Belohnung – ideal ab 2.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-27",
@@ -226,6 +239,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Spielsachen liegen herum. Antippen – das Ding fliegt von allein in die Kiste und sagt „Tschüss!“. Ist alles drin, geht der Deckel zu und die Kiste lächelt. Kein Ziehen nötig.",
       why: "Übt eine Alltags-Routine und endet von selbst ruhig.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-29",
@@ -251,6 +265,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Wie ein Soundbuch aus Pappe: eine Seite mit vier großen Tieren oder Fahrzeugen, Antippen macht das Geräusch, Wischen (oder Leertaste) blättert um. Nichts sonst.",
       why: "Kennen fast alle 2-Jährigen aus echten Büchern – sofort verstanden.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-32",
@@ -259,6 +274,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Unten tapsen Tierkinder (Küken, Kälbchen, Ferkel). Antippen – das Kleine läuft von allein zu seiner Mama, beide kuscheln und machen ihr Geräusch, groß und klein.",
       why: "Groß und klein, Tiernamen und Geräusche – ohne Ziehen und ohne Fehler.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-33",
@@ -267,6 +283,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Ein dunkles Zimmer mit einem riesigen Lichtschalter. Klick – Licht an, Tiere blinzeln überrascht; klick – Licht aus, nur ihre Augen leuchten. Jedes Mal sitzen andere Tiere da.",
       why: "Lichtschalter sind für Kleinkinder magisch; reine Ursache und Wirkung.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-34",
@@ -292,6 +309,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Ein großes Ei wackelt. Jedes Tippen macht einen Riss mehr; beim fünften Mal springt die Schale auf und ein Küken, ein Dino, eine Schildkröte oder ein Krokodil schaut heraus und piepst. Dann kommt das nächste Ei.",
       why: "Einfachste Ursache-Wirkung mit Spannung; jedes Mal eine Überraschung.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-37",
@@ -309,6 +327,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Es klingelt, der Postbote bringt ein Paket. Antippen: Schleife aufziehen, Deckel auf, Papier rascheln – drin ist etwas, das sofort lebendig wird (ein Hüpfball, ein Hundewelpe, ein Spielzeugzug, der losfährt).",
       why: "Auspacken ist für Kleine pure Freude; jedes Mal etwas anderes.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "N-39",
@@ -317,6 +336,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Nur vier große Karten (zwei Paare), später sechs. Umgedrehte Karten bleiben einen Moment offen; findet das Kind ein Paar, tanzen beide Bilder zusammen. Kein Zählen, keine Züge.",
       why: "Gedächtnis üben in der kleinsten Form; Motive aus den vorhandenen Spielen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-41",
@@ -357,6 +377,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Eine Waschmaschine dreht, dann fallen bunte Socken heraus. Das Kind tippt zwei gleiche nacheinander an, sie hüpfen zusammen auf die Leine. Erst zwei Paare, dann mehr.",
       why: "Gleiches finden mit Alltagsbezug; ruhiges Spiel.",
       effort: "S",
+      done: true,
     },
     {
       id: "N-46",
@@ -365,6 +386,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Ein ruhiges Zugfenster, draußen zieht die Landschaft vorbei: Kühe, Brücke, Tunnel (alles dunkel, „Huuu!“), Bahnhof. Antippen lässt draußen jemanden winken. Nach ein paar Minuten kommt der Zug an.",
       why: "Ruhiges Schauen statt Action, gut vor dem Schlafen oder zum Runterkommen.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "N-47",
@@ -389,6 +411,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Tablet kippen (oder auf einen Becher tippen): Wasser fließt von einem Becher in den anderen, plätschert, eine Gießkanne gießt eine Blume, die wächst. Nichts kann überlaufen, was ärgert.",
       why: "Kippen ist eine ganz neue Bedienung; Mengen und voll/leer.",
       effort: "M",
+      rejected: true,
     },
   ],
 };

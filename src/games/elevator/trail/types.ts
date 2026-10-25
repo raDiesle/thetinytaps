@@ -68,9 +68,30 @@ export interface Climb extends StationBase {
   kind: "climb";
   /** The steps, each a point of the ground, from the bottom up. */
   steps: Point[];
+  /** A slide from the top: the child slides down these ground points by itself, fast. */
+  slide?: Point[];
 }
 
-export type Station = Pickup | Obstacle | Climb;
+/** Something that happens by itself when the child gets there (the traffic light turns green): no bag, no extra tap. */
+export interface Moment extends StationBase {
+  kind: "moment";
+  /** What the child does meanwhile (presses the button). */
+  pose: Pose;
+  /** Sounds while it happens, and how long it takes; then it is done. */
+  sounds: Cue[];
+  ms: number;
+}
+
+export type Station = Pickup | Obstacle | Climb | Moment;
+
+/** A way through the air or along the ground: points with the time to get to each, then `to` in `ms`. */
+export interface Flight {
+  via?: [Point, number][];
+  to: Point;
+  ms: number;
+  /** How far it swings up and down on the way (the kite in the wind); 0 for a ball. */
+  sway: number;
+}
 
 /** One trail level, with its world drawing and its stations in walking order. */
 export interface TrailLevel {
@@ -81,6 +102,8 @@ export interface TrailLevel {
   goal: GoalId;
   /** The world near the path, drawn in world points. */
   Scenery: ComponentType<SceneryProps>;
+  /** Drawn in front of the goal (the sand that half hides the ball), behind the child. */
+  Front?: ComponentType<SceneryProps>;
   /** Far hills and clouds; they move slower than the world, which makes it deep. */
   Backdrop: ComponentType;
   /** The ground line the child walks on, from left to right; stairs are one point per step. */
@@ -88,8 +111,8 @@ export interface TrailLevel {
   /** Where the child starts, on the ground. */
   start: number;
   /** At the start: the goal leaves the child's hands for `to` (where the last obstacle keeps it). */
-  away: { to: Point; ms: number; pose: Pose; sounds: Cue[]; say: string };
+  away: Flight & { pose: Pose; sounds: Cue[]; say: string };
   stations: Station[];
   /** At the end, with the goal back in hand: it goes to `to`, and everybody is happy. */
-  finale: { to: Point; ms: number; say: string };
+  finale: Flight & { say: string };
 }

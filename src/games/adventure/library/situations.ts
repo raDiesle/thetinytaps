@@ -409,6 +409,18 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
       worlds: ["circus"],
     },
   ],
+  sit: [
+    { situation: "Im Morgenkreis liegt das Bilderbuch schon auf dem Teppich.", reaction: "Alle sitzen, das Buch geht auf.", everyday: true },
+    { situation: "Die Schuhe sollen an, und im Stehen wackelt es.", reaction: "Im Sitzen rutscht der Schuh an den Fuß.", everyday: true },
+    { situation: "Auf der Picknickdecke ist noch ein Platz frei.", reaction: "Es gibt Apfelschnitze für alle.", everyday: true },
+    {
+      situation: "Das kleine Boot schaukelt, im Stehen wackelt es zu sehr.",
+      reaction: "Im Sitzen liegt es ruhig, es kann losgehen.",
+      worlds: ["pirate_island", "beach"],
+    },
+    { situation: "Der Zug ist da, alle gehen auf ihre Plätze.", reaction: "Die Lok pfeift, der Zug fährt los.", worlds: ["railway"] },
+    { situation: "Gleich beginnt die Vorstellung.", reaction: "Das Licht geht aus, der Clown kommt herein.", worlds: ["circus"] },
+  ],
 
   // Marschieren und Stampfen
   high_knees: [

@@ -33,7 +33,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `public/icons/` | App icon: `icon.svg` (rounded) and `icon-maskable.svg` (full bleed, for home screens); the PNGs are made from them, see [App icon](#app-icon) |
 | `src/App.tsx` | Routes (React Router) |
 | `src/pages/` | One component per page |
-| `src/content/games.ts` | The home menu: four categories (Buchstaben & Zahlen, Zuordnen, Lebendige Stories, Weitere), each with its games on `/spiele/<id>/` (`src/pages/CategoryPage.tsx`); a game's back link leads to its category. New games go here |
+| `src/content/games.ts` | The home menu: four categories (Lebendige Welten, Zuordnen, Buchstaben & Zahlen, Weitere), each with its games on `/spiele/<id>/` (`src/pages/CategoryPage.tsx`); a game's back link leads to its category. New games go here |
 | `src/components/GameShell.tsx` | Shared shell: parent start screen with a big card per way to play (mode or level; a tap picks it and starts) and the game's own options folded away, fullscreen + keyboard lock, the ✕ in the corner (a click leaves after half a second, „Zurück zum Menü“ shows next to it for a moment; Esc has to be held) |
 | `src/components/GameEnd.tsx` | End of a level: „Nochmal“ and „Weiter“ with the next level's picture, so a child plays on without the menu („Lebendige Bilder“ goes on to the next picture, „Kettenreaktion“ and „Laut und leise“ to the next level; „Gefühle“ has the same two buttons under its stories) |
 | `src/components/HomeOptions.tsx`, `src/lib/common.ts`, `src/lib/playtime.ts` | On the home page, for all games: the play time per day (every minute in any game counts, kept in localStorage per day; the last minute winds down, then „Gute Nacht“), and folded away language, read aloud, sounds and calm mode. Games read their own settings through `useGameSettings`, which fills in the shared ones |
@@ -46,12 +46,12 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/scenes/` | Game „Lebendige Bilder“: the Wimmelbild engine and all its pictures. Details in its [`CLAUDE.md`](src/games/scenes/CLAUDE.md) |
 | `src/games/animals/` | Game „Was gehört zum Tier?“: feed the animal, bring it home, „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/animals/CLAUDE.md) |
 | `src/games/shadows/` | Game „Schatten finden“: find the shadow of a picture; also hosts „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/shadows/CLAUDE.md) |
+| `src/games/socks/` | Game „Socken-Paare“: socks tumble out of the washing machine, two same ones hop onto the line. Details in its [`CLAUDE.md`](src/games/socks/CLAUDE.md) |
 | `src/games/words/` | Game „Wörter tippen“: whole words, first letters, colour and doing words. Details in its [`CLAUDE.md`](src/games/words/CLAUDE.md) |
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
 | `src/games/loud/` | Game „Laut und leise“: the microphone's loudness moves lion and mouse; „Pusten“. Details in its [`CLAUDE.md`](src/games/loud/CLAUDE.md) |
 | `src/games/feelings/` | Game „Gefühle“: comfort the bear, kindergarten stories with picture choices. Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |
-| `src/games/marbles/` | Game „Kettenreaktion“: „Alles fällt um“ and six Rube Goldberg machines. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
-| `src/games/marblerun/` | Game „Kugelbahn“: a long marble run down a tall wall, with parts to swap. Details in its [`CLAUDE.md`](src/games/marblerun/CLAUDE.md) |
+| `src/games/marbles/` | Game „Kettenreaktion“: the Klingende Kugelbahn (a long marble run with parts to swap), „Alles fällt um“ and seven Rube Goldberg machines. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
 | `src/games/elevator/` | Game „Kleine Abenteuer“ (was „Spaß im Aufzug“): picture stories in a house with a lift, and trail adventures through a scrolling world with a bag of things. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md) |
 | `src/games/adventure/` | Game „Bewegungsabenteuer“: 3D movement story with the fox Tapsi (three.js, lazy-loaded). Details in its [`CLAUDE.md`](src/games/adventure/CLAUDE.md) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
@@ -139,3 +139,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 9. ~~Laut und leise (Mikrofon): Löwe und Maus, Pusten~~
 10. ~~Kugelbahn: Kugelbahn und „Alles fällt um“~~; ~~Kugelbahn als eigenes Spiel mit langer Bahn~~
 11. ~~Aufzug~~
+12. ~~Socken-Paare~~

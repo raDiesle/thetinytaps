@@ -1,76 +1,55 @@
-import { GameShell } from "@/components/GameShell";
-import { Choice, SettingsGroup } from "@/components/SettingControls";
+import { GameShell, type GameMode } from "@/components/GameShell";
+import { SettingsGroup } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
-import { FEELINGS } from "./bear";
-import { BearPlay } from "./BearPlay";
-import { SITUATIONS } from "./kita";
-import { KitaPlay } from "./KitaPlay";
-import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY, type FeelingsSettings } from "./settings";
+import { FeelingsPlay } from "./FeelingsPlay";
+import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY } from "./settings";
+import { STORIES } from "./stories";
 import "./feelings.css";
 
-/** Card ids: the bear, or the kindergarten with shown or chosen answers. */
-const MODE_PATCH: Record<string, Partial<FeelingsSettings>> = {
-  bear: { mode: "bear" },
-  "kita-show": { mode: "kita", answers: "show" },
-  "kita-choose": { mode: "kita", answers: "choose" },
-};
+/** "All in turn" comes first and across the whole row. */
+const ALL: GameMode = { id: "all", emoji: "🌈", title: "Alle", featured: true };
 
+const MODES = [ALL, ...STORIES.map(({ id, emoji, title }) => ({ id, emoji, title }))];
+
+/** The start screen: all stories in turn, or just one – the bear's feelings at home and the kindergarten stories side by side. */
 export function FeelingsGame() {
   const [settings, update] = useGameSettings(FEELINGS_SETTINGS_KEY, DEFAULT_FEELINGS_SETTINGS);
-  const kita = settings.mode === "kita";
 
   return (
     <GameShell
       title="Gefühle"
       emoji="🐻"
-      modes={[
-        { id: "bear", emoji: "🐻", title: "Bär trösten" },
-        { id: "kita-show", emoji: "🏫", title: "Im Kindergarten" },
-        { id: "kita-choose", emoji: "🤔", title: "Kindergarten: selbst wählen" },
-      ]}
-      mode={kita ? `kita-${settings.answers}` : "bear"}
-      onMode={(id) => update(MODE_PATCH[id])}
-      level={
-        <>
-          <Choice<FeelingsSettings["feeling"]>
-            label="🐻 Bär trösten: Gefühl"
-            value={settings.feeling}
-            onChange={(feeling) => update({ feeling })}
-            options={[{ value: "all", label: "🌈 Alle" }, ...FEELINGS.map((f) => ({ value: f.id, label: `${f.emoji} ${f.title}` }))]}
-          />
-          <Choice<FeelingsSettings["situation"]>
-            label="🏫 Kindergarten: Geschichte"
-            value={settings.situation}
-            onChange={(situation) => update({ situation })}
-            options={[{ value: "all", label: "🌈 Alle" }, ...SITUATIONS.map((s) => ({ value: s.id, label: `${s.emoji} ${s.title}` }))]}
-          />
-        </>
-      }
+      modes={MODES}
+      mode={settings.story}
+      onMode={(story) => update({ story })}
       settings={
         <>
-          <SettingsGroup title="🏫 Im Kindergarten">
+          <SettingsGroup title="🐻 Gefühle">
             <p className="setting-note">
-              Kleine Geschichten: Jemand schubst, tritt oder nimmt etwas weg, die Rutsche ist voll, ein anderes Kind hat das tolle Spielzeug – oder der kleine
-              Bär ist selbst wütend. Das Kind tippt, was der Bär tun kann: laut „Stopp! Nein!“ sagen, weggehen und Abstand halten, Hilfe holen, fragen, warten,
+              Zu Hause ist der kleine Bär traurig, wütend, müde oder hat Angst. Drei Karten zeigen, was ihm hilft – umarmen, Hand halten, stampfen, Licht an …
+              Sind alle drei getan, ist er wieder froh.
+            </p>
+            <p className="setting-note">
+              Im Kindergarten: Jemand schubst, tritt oder nimmt etwas weg, die Rutsche ist voll, ein anderes Kind hat das tolle Spielzeug – oder der kleine Bär
+              ist selbst wütend. Bei jedem Schritt tippt das Kind, was der Bär tun kann: laut „Stopp! Nein!“ sagen, weggehen, Hilfe holen, fragen, warten,
               tauschen.
             </p>
             <p className="setting-note">
-              Jede Antwort ist ein Bild, auf dem der Bär es vormacht – so kann das Kind ohne Lesen wählen. Beim Selbst-Wählen steht neben dem ersten Schritt
-              eine nicht so gute Idee (z.&nbsp;B. zurückschubsen). Tippt das Kind darauf, erscheint sie groß in der Mitte mit rotem Kreuz und es wird erklärt,
-              warum. Die gute Idee bekommt einen grünen Haken.
+              Links liegt immer eine nicht so gute Idee (z.&nbsp;B. zurückschubsen, Licht aus), daneben die guten, die beste zuerst. Tippt das Kind auf die
+              nicht so gute, erscheint sie groß mit rotem Kreuz und es wird erklärt, warum. Die guten Ideen bekommen einen grünen Haken.
+            </p>
+            <p className="setting-note">
+              Unter jedem Bild steht klein, was es zeigt – zum Mitlesen und Erzählen für Erwachsene. Kinder wählen nur nach dem Bild.
             </p>
           </SettingsGroup>
 
           {!settings.speech && (
-            <p className="setting-note">
-              Im Spiel steht kein Text, nur Bilder. Mit Vorlesen (auf der Startseite) wird die Geschichte erzählt, sonst erzählen Erwachsene sie anhand der
-              Bilder.
-            </p>
+            <p className="setting-note">Mit Vorlesen (auf der Startseite) wird die Geschichte erzählt, sonst erzählen Erwachsene sie anhand der Bilder.</p>
           )}
         </>
       }
     >
-      {kita ? <KitaPlay settings={settings} /> : <BearPlay settings={settings} />}
+      <FeelingsPlay settings={settings} />
     </GameShell>
   );
 }

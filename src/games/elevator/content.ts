@@ -32,24 +32,26 @@ import type { Holding, Outfit, PicId, Pose } from "./kid";
 import { Bad, Dachboden, Flur, Garten, Keller, Kinderzimmer, Kueche, Schlafzimmer, Terrasse, Wohnzimmer, type RoomProps, type Weather } from "./rooms";
 
 // The stories of "Aufzug". A thought bubble shows what the child needs next; the floor where that
-// thing is drawn is the one to ride to. There the first move happens by itself, then the action button
-// lights up: every tap (or click, or key) cracks an egg, pours a pancake, puts on a boot … At most two
-// taps in a row, see the rules in CLAUDE.md. Nothing needs to be read – the sentences are only spoken
-// when "Vorlesen" is on.
+// thing is drawn is the one to ride to. There the moves happen by themselves – only a move that matters
+// for the story and can clearly be seen (crack the eggs, pour a pancake, flush the toilet) is wished for
+// in the bubble like a floor, and the number of the floor the child is on lights up to be pressed again.
+// At most two presses in a row, see the rules in CLAUDE.md. Nothing needs to be read – the sentences are
+// only spoken when "Vorlesen" is on.
 
 export type Who = "hero" | "buddy";
 
 /** A sound at `ms` after the start of a step's action. */
 type Cue = [number, () => void];
 
-/** Something done in the room: each tap on the action button does it once more, and the room draws how far it is.
- * An `auto` task does itself, as the first move in a room or between two runs of taps. */
+/** Something done in the room, `taps` times; the room draws how far it is. Without a `wish` it does itself –
+ * small moves like chewing, blowing or putting on are only shown, not asked for. */
 export interface Task {
   /** The taps are counted under this name; the rooms draw from the counts. */
   name: string;
   taps: number;
-  /** Happens by itself, without waiting for a tap. */
-  auto?: boolean;
+  /** Only for a move that matters and can clearly be seen: the bubble shows `pic` (and the voice asks), and every
+   * press of the floor's own number – lit up – or a tap on the room does the move once. */
+  wish?: { pic: PicId; ask: string };
   /** Walks there first, and looks that way. */
   spot?: number;
   face?: 1 | -1;
@@ -64,7 +66,6 @@ export interface Task {
   /** In the hands, and put on, with the last tap. */
   hold?: Holding | null;
   wear?: Outfit;
-  ask: string;
   done?: string;
   /** After the last tap: waiting so long with these sounds, e.g. while the pancake bakes. */
   wait?: number;
@@ -137,7 +138,7 @@ const tock = () => playKnock(900);
 /** Recordings to load before the first story. */
 export const RECORDINGS = ["quack", "croak", "munch", "scrub", "splash", "flush"];
 
-/** One pancake: a tap pours the batter into the pan, it bakes, and flips itself onto the plate. */
+/** One pancake: a press pours the batter into the pan, it bakes, and flips itself onto the plate. */
 const pancake = (n: number): Task[] => [
   {
     name: "pour",
@@ -145,7 +146,7 @@ const pancake = (n: number): Task[] => [
     ...(n === 0 && { spot: 720, face: -1 as const }),
     pose: "reach",
     sound: playGlug,
-    ask: n === 0 ? "Teig in die Pfanne!" : "Noch einer!",
+    wish: { pic: "stove", ask: n === 0 ? "Teig in die Pfanne!" : "Noch einer!" },
     done: "Brutzel, brutzel.",
     wait: 2400,
     sounds: [
@@ -156,10 +157,8 @@ const pancake = (n: number): Task[] => [
   {
     name: "flip",
     taps: 1,
-    auto: true,
     pose: "reach",
     sound: playWhoosh,
-    ask: "Umdrehen, auf den Teller!",
     done: n === 2 ? "Drei Pfannkuchen!" : "Hopp!",
     wait: 700,
   },
@@ -196,7 +195,7 @@ export const STORIES: Story[] = [
         sounds: [],
         ask: "Ich backe Pfannkuchen! Wo ist meine Kochmütze?",
         done: "Da ist sie!",
-        tasks: [{ name: "chefhat", taps: 1, auto: true, pose: "reach", sound: playPop, wear: "chef", ask: "Mütze auf!", done: "Ich bin der Koch!" }],
+        tasks: [{ name: "chefhat", taps: 1, pose: "reach", sound: playPop, wear: "chef", done: "Ich bin der Koch!" }],
       },
       {
         wish: "fridge",
@@ -209,7 +208,7 @@ export const STORIES: Story[] = [
         sounds: [[0, playCreak]],
         ask: "Was ist im Kühlschrank?",
         done: "Kühlschrank auf!",
-        tasks: [{ name: "eggs", taps: 1, pose: "reach", sound: playPlop, hold: "eggs", ask: "Eier und Milch, bitte!", done: "Eier und Milch!" }],
+        tasks: [{ name: "eggs", taps: 1, pose: "reach", sound: playPlop, hold: "eggs", done: "Eier und Milch!" }],
       },
       {
         wish: "bowl",
@@ -225,16 +224,16 @@ export const STORIES: Story[] = [
         ask: "Ab in die Küche, zur Schüssel!",
         done: "Jetzt wird gebacken!",
         tasks: [
-          { name: "crack", taps: 2, pose: "reach", sound: playCrack, ask: "Eier aufschlagen!", done: "Knack, knack!" },
-          { name: "milk", taps: 1, auto: true, pose: "reach", sound: playGlug, beat: 1100, ask: "Milch dazu!" },
-          { name: "flour", taps: 1, auto: true, pose: "reach", sound: playPoof, beat: 1100, ask: "Und Mehl!" },
+          { name: "crack", taps: 2, pose: "reach", sound: playCrack, wish: { pic: "eggs", ask: "Eier aufschlagen!" }, done: "Knack, knack!" },
+          { name: "milk", taps: 1, pose: "reach", sound: playGlug, beat: 1100 },
+          { name: "flour", taps: 1, pose: "reach", sound: playPoof, beat: 1100 },
           {
             name: "mix",
             taps: 1,
             pose: "stir",
             sound: playWhirr,
             beat: 1800,
-            ask: "Rühren mit dem Mixer!",
+            wish: { pic: "mixer", ask: "Rühren mit dem Mixer!" },
             done: "Der Teig ist fertig!",
           },
           ...pancake(0),
@@ -274,7 +273,7 @@ export const STORIES: Story[] = [
         sounds: [[0, playCreak]],
         ask: "Ich habe Durst! Saft, bitte!",
         done: "Kühlschrank auf!",
-        tasks: [{ name: "juice", taps: 1, pose: "reach", sound: playPlop, hold: "juice", ask: "Den Saft!", done: "Orangensaft!" }],
+        tasks: [{ name: "juice", taps: 1, pose: "reach", sound: playPlop, hold: "juice", done: "Orangensaft!" }],
       },
       {
         wish: "table",
@@ -293,20 +292,9 @@ export const STORIES: Story[] = [
         ask: "Jetzt essen wir zusammen!",
         done: "Alles auf den Tisch!",
         tasks: [
-          { name: "lid", taps: 1, auto: true, pose: "serve", rest: "sit", sound: playPop, ask: "Glas aufdrehen!" },
-          { name: "spread", taps: 2, pose: "serve", rest: "sit", sound: playPlop, ask: "Marmelade drauf!" },
-          { name: "bite", taps: 1, auto: true, pose: "eat", rest: "sit", together: true, sound: munch, beat: 1500, ask: "Guten Appetit!" },
-          {
-            name: "bite",
-            taps: 2,
-            pose: "eat",
-            rest: "sit",
-            together: true,
-            sound: munch,
-            beat: 1500,
-            ask: "Noch ein Bissen!",
-            done: "Mmmh, lecker!",
-          },
+          { name: "lid", taps: 1, pose: "serve", rest: "sit", sound: playPop },
+          { name: "spread", taps: 2, pose: "serve", rest: "sit", sound: playPlop, done: "Guten Appetit!" },
+          { name: "bite", taps: 3, pose: "eat", rest: "sit", together: true, sound: munch, beat: 1500, done: "Mmmh, lecker!" },
         ],
       },
     ],
@@ -343,8 +331,8 @@ export const STORIES: Story[] = [
         ask: "Erst in die Badewanne.",
         done: "Plitsch, platsch!",
         tasks: [
-          { name: "soap", taps: 2, pose: "stand", sound: scrub, ask: "Einseifen!", done: "Lauter Schaum!" },
-          { name: "duck", taps: 1, auto: true, pose: "stand", sound: quack, ask: "Die Quietsch-Ente!" },
+          { name: "soap", taps: 2, pose: "stand", sound: scrub, done: "Lauter Schaum!" },
+          { name: "duck", taps: 1, pose: "stand", sound: quack },
         ],
       },
       {
@@ -359,8 +347,8 @@ export const STORIES: Story[] = [
         ask: "Jetzt den Schlafanzug.",
         done: "Da liegt er!",
         tasks: [
-          { name: "pyjama", taps: 1, auto: true, pose: "reach", sound: playRustle, wear: "pyjama", ask: "Anziehen!", done: "Schlafanzug an!" },
-          { name: "slippers", taps: 2, spot: 470, face: -1, pose: "reach", sound: playPlop, ask: "Und die Hausschuhe!", done: "Kuschelig!" },
+          { name: "pyjama", taps: 1, pose: "reach", sound: playRustle, wear: "pyjama", done: "Schlafanzug an!" },
+          { name: "slippers", taps: 2, spot: 470, face: -1, pose: "reach", sound: playPlop, done: "Kuschelig!" },
         ],
       },
       {
@@ -379,10 +367,10 @@ export const STORIES: Story[] = [
         ask: "Eine warme Milch, bitte.",
         done: "Die Milch wird warm.",
         tasks: [
-          { name: "milkpour", taps: 1, auto: true, spot: 880, face: -1, pose: "reach", sound: playGlug, ask: "In die Tasse!" },
-          { name: "stir", taps: 1, auto: true, pose: "stir", sound: clink, beat: 1000, ask: "Umrühren!" },
-          { name: "blow", taps: 2, pose: "blow", sound: playPuff, hold: "mug", ask: "Pusten, die Milch ist heiß!" },
-          { name: "sip", taps: 1, auto: true, pose: "drink", sound: playGlug, beat: 1400, ask: "Trinken!", done: "Mmmh, warm." },
+          { name: "milkpour", taps: 1, spot: 880, face: -1, pose: "reach", sound: playGlug },
+          { name: "stir", taps: 1, pose: "stir", sound: clink, beat: 1000 },
+          { name: "blow", taps: 2, pose: "blow", sound: playPuff, hold: "mug", done: "Pusten, die Milch ist heiß!" },
+          { name: "sip", taps: 1, pose: "drink", sound: playGlug, beat: 1400, done: "Mmmh, warm." },
         ],
       },
       {
@@ -398,9 +386,19 @@ export const STORIES: Story[] = [
         ask: "Zähne putzen!",
         done: "Zahnpasta drauf!",
         tasks: [
-          { name: "scrub", taps: 2, pose: "brush", sound: scrub, beat: 900, ask: "Schrubb, schrubb!" },
-          { name: "rinse", taps: 1, auto: true, pose: "reach", sound: splash, hold: null, ask: "Ausspülen!", done: "Blitzeblank!" },
-          { name: "toilet", taps: 1, spot: 900, face: 1, pose: "reach", sound: flush, ask: "Und noch aufs Klo.", done: "Wusch!", wait: 1200 },
+          { name: "scrub", taps: 2, pose: "brush", sound: scrub, beat: 900, done: "Schrubb, schrubb!" },
+          { name: "rinse", taps: 1, pose: "reach", sound: splash, hold: null, done: "Blitzeblank!" },
+          {
+            name: "toilet",
+            taps: 1,
+            spot: 900,
+            face: 1,
+            pose: "reach",
+            sound: flush,
+            wish: { pic: "toilet", ask: "Und noch aufs Klo." },
+            done: "Wusch!",
+            wait: 1200,
+          },
         ],
       },
       {
@@ -415,8 +413,8 @@ export const STORIES: Story[] = [
         ask: "Wo ist mein Teddy?",
         done: "Oh, erst aufräumen!",
         tasks: [
-          { name: "tidy", taps: 2, pose: "reach", sound: tock, ask: "Aufräumen! Ab in die Kiste.", done: "Fertig aufgeräumt!" },
-          { name: "teddy", taps: 1, auto: true, pose: "reach", sound: playGiggle, hold: "teddy", ask: "Da ist mein Teddy!", done: "Da bist du ja!" },
+          { name: "tidy", taps: 2, pose: "reach", sound: tock, wish: { pic: "blocks", ask: "Aufräumen! Ab in die Kiste." }, done: "Fertig aufgeräumt!" },
+          { name: "teddy", taps: 1, pose: "reach", sound: playGiggle, hold: "teddy", done: "Da bist du ja!" },
         ],
       },
       {
@@ -432,7 +430,7 @@ export const STORIES: Story[] = [
         sounds: [[0, playYawn]],
         ask: "Ab ins Bett.",
         done: "Kuschelig.",
-        tasks: [{ name: "light", taps: 1, pose: "stand", sound: () => playKnock(1600), ask: "Licht aus!", done: "Gute Nacht!" }],
+        tasks: [{ name: "light", taps: 1, pose: "stand", sound: () => playKnock(1600), done: "Gute Nacht!" }],
       },
     ],
     ending: "sleep",
@@ -466,7 +464,7 @@ export const STORIES: Story[] = [
         sounds: [],
         ask: "Erst die Gummistiefel.",
         done: "Da sind sie!",
-        tasks: [{ name: "boots", taps: 2, pose: "reach", sound: playThump, wear: "boots", ask: "Rein in die Stiefel!", done: "Stiefel an!" }],
+        tasks: [{ name: "boots", taps: 2, pose: "reach", sound: playThump, wear: "boots", done: "Stiefel an!" }],
       },
       {
         wish: "coat",
@@ -479,7 +477,7 @@ export const STORIES: Story[] = [
         sounds: [],
         ask: "Jetzt die Regenjacke.",
         done: "Da hängt sie!",
-        tasks: [{ name: "coat", taps: 1, auto: true, pose: "reach", sound: playRustle, wear: "coat", ask: "Jacke an!", done: "Jacke an!" }],
+        tasks: [{ name: "coat", taps: 1, pose: "reach", sound: playRustle, wear: "coat", done: "Jacke an!" }],
       },
       {
         wish: "umbrella",
@@ -493,8 +491,8 @@ export const STORIES: Story[] = [
         ask: "Und der Regenschirm!",
         done: "Da ist er!",
         tasks: [
-          { name: "umbrella", taps: 1, auto: true, pose: "reach", sound: playPop, wear: "umbrella", ask: "Schirm nehmen!" },
-          { name: "open", taps: 1, pose: "cheer", sound: playWhoosh, beat: 1200, ask: "Schirm auf!", done: "Mein Schirm!" },
+          { name: "umbrella", taps: 1, pose: "reach", sound: playPop, wear: "umbrella" },
+          { name: "open", taps: 1, pose: "cheer", sound: playWhoosh, beat: 1200, done: "Mein Schirm!" },
         ],
       },
       {
@@ -509,8 +507,8 @@ export const STORIES: Story[] = [
         ask: "Mein Regenhut!",
         done: "Am Haken!",
         tasks: [
-          { name: "hat", taps: 1, auto: true, pose: "reach", sound: playPop, wear: "hat", ask: "Hut auf!" },
-          { name: "mirror", taps: 1, spot: 480, face: -1, pose: "cheer", sound: playGiggle, ask: "Schau in den Spiegel!", done: "Fertig für den Regen!" },
+          { name: "hat", taps: 1, pose: "reach", sound: playPop, wear: "hat" },
+          { name: "mirror", taps: 1, spot: 480, face: -1, pose: "cheer", sound: playGiggle, done: "Fertig für den Regen!" },
         ],
       },
       {
@@ -524,7 +522,7 @@ export const STORIES: Story[] = [
         sounds: [[0, playRustle]],
         ask: "Mein Schiffchen!",
         done: "Erst falten.",
-        tasks: [{ name: "fold", taps: 2, pose: "reach", sound: playRustle, hold: "boat", ask: "Falten!", done: "Ein Schiffchen!" }],
+        tasks: [{ name: "fold", taps: 2, pose: "reach", sound: playRustle, hold: "boat", done: "Ein Schiffchen!" }],
       },
       {
         wish: "rain",
@@ -541,10 +539,19 @@ export const STORIES: Story[] = [
         ask: "Ab in den Garten!",
         done: "Platsch! Platsch!",
         tasks: [
-          { name: "jump", taps: 2, pose: "jump", sound: splash, beat: 1000, ask: "Hüpf in die Pfütze!" },
-          { name: "sail", taps: 1, auto: true, spot: 470, face: 1, pose: "reach", sound: playPlop, hold: null, ask: "Das Schiffchen ins Wasser!" },
-          { name: "puff", taps: 2, pose: "blow", sound: playPuff, ask: "Puste das Schiffchen!" },
-          { name: "frog", taps: 1, auto: true, pose: "cheer", sound: croak, beat: 1000, ask: "Da ist ein Frosch!", done: "Quak!" },
+          { name: "jump", taps: 2, pose: "jump", sound: splash, beat: 1000 },
+          {
+            name: "sail",
+            taps: 1,
+            spot: 470,
+            face: 1,
+            pose: "reach",
+            sound: playPlop,
+            hold: null,
+            wish: { pic: "boat", ask: "Das Schiffchen ins Wasser!" },
+          },
+          { name: "puff", taps: 2, pose: "blow", sound: playPuff },
+          { name: "frog", taps: 1, pose: "cheer", sound: croak, beat: 1000, done: "Quak!" },
         ],
       },
     ],
@@ -554,6 +561,8 @@ export const STORIES: Story[] = [
 
 export const texts = {
   wrong: "Hier nicht.",
+  /** Another floor pressed while something is to be done in the room. */
+  notYet: "Erst hier!",
   sleep: "Schlaf gut!",
   party: "Hurra!",
 };

@@ -11,6 +11,7 @@ import {
   KEY_TURN,
   PUSH_PERIOD,
   SHAPE_SECONDS,
+  SIT_TIME,
 } from "../../three/clips";
 import { BEACH_Z, JUMP_FROM, JUMP_TO, clamp01, smooth, v3 } from "./layout";
 
@@ -21,24 +22,26 @@ export const sequence = SEQUENCES.find((s) => s.id === "treasure_island")!;
 
 /** The step indices of the sequence, by name. */
 export const S = {
-  fish: 0,
-  hello: 1,
-  paddle: 2,
-  stomp: 3,
-  jump: 4,
-  duck: 5,
-  drums: 6,
-  gate: 7,
-  roll: 8,
-  monkeys: 9,
-  apples: 10,
-  riddle: 11,
-  webs: 12,
-  rope: 13,
-  key: 14,
-  hooray: 15,
-  fireworks: 16,
-  bye: 17,
+  hello: 0,
+  fish: 1,
+  sit: 2,
+  paddle: 3,
+  stand: 4,
+  stomp: 5,
+  jump: 6,
+  duck: 7,
+  drums: 8,
+  gate: 9,
+  roll: 10,
+  monkeys: 11,
+  apples: 12,
+  riddle: 13,
+  webs: 14,
+  rope: 15,
+  key: 16,
+  hooray: 17,
+  fireworks: 18,
+  bye: 19,
 } as const;
 
 /** Seconds of one paddle stroke cycle, as in the paddle clip. */
@@ -52,15 +55,22 @@ export const PULL_PERIOD = 1.8;
 /** The log swings over Tapsi and back to the front in this many seconds: two ducks. */
 export const SWING_PERIOD = 6;
 
-/** Seconds of travel before each step: walking or paddling there, or the camera coming in. */
-export const TRAVEL = [2.5, 2.5, 3, 3, 3.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 6, 2.5, 2.5, 2, 1];
+/**
+ * Seconds of travel before each step: walking or paddling there, or the camera coming in. Kiki flies in
+ * for the hello while the camera comes round to Tapsi's front; before the paddling Tapsi takes the paddle.
+ */
+export const TRAVEL = [4, 3, 1.5, 3, 1, 2, 2.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 6, 2.5, 2.5, 2, 1];
+/** Tapsi sits down (or gets up) alone first, and a moment more, before the child does it too. */
+const SIT_SHOW = SIT_TIME + 0.6;
 /** Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step. */
 export const DEMO = [
-  CAST_PERIOD,
   2.5,
+  CAST_PERIOD,
+  SIT_SHOW,
   PADDLE_PERIOD,
+  SIT_SHOW,
   STOMP_PERIOD,
-  3 * JUMP_PERIOD,
+  2 * JUMP_PERIOD,
   3,
   2 * DRUM_PERIOD,
   CRANK_PERIOD,
@@ -81,12 +91,14 @@ export const DEMO = [
  * movement still meets its target and none is left over when the praise begins.
  */
 export const CYCLES: ({ seconds: number; from: number } | null)[] = [
+  null,
   { seconds: CAST_PERIOD, from: 0 },
   null,
   { seconds: PADDLE_PERIOD, from: 0 },
+  null,
   { seconds: STOMP_PERIOD, from: 0 },
-  // A star box over every third jump.
-  { seconds: 3 * JUMP_PERIOD, from: 0 },
+  // A star box over every jump.
+  { seconds: JUMP_PERIOD, from: 0 },
   { seconds: SWING_PERIOD, from: 0 },
   { seconds: DRUM_PERIOD, from: 0 },
   { seconds: CRANK_PERIOD, from: 0 },
@@ -109,9 +121,9 @@ export const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL
 export const clipLength = (step: number) => DEMO[step] + actLength(step);
 /** How many times a step's clip meets its target: casts, stomps, beats, nuts … */
 export const goes = (step: number) => Math.round((clipLength(step) - CYCLES[step]!.from) / CYCLES[step]!.seconds);
-/** Seconds into the jump clip when the head bumps star box `n`: at the top of every third jump. */
-export const bumpTime = (n: number) => (n * 3 + 2) * JUMP_PERIOD + JUMP_PEAK;
-/** Where Ole is on the bridge (z) `clip` seconds into the jump clip: walking steadily across while Tapsi hops on its back. */
+/** Seconds into the jump clip when the head bumps star box `n`: at the top of every jump. */
+export const bumpTime = (n: number) => n * JUMP_PERIOD + JUMP_PEAK;
+/** Where Ole is (z) `clip` seconds into the jump clip: walking steadily over the bridge while Tapsi hops on its back. */
 export function jumpZ(clip: number) {
   const k = clamp01(clip / clipLength(S.jump));
   return JUMP_FROM + (JUMP_TO - JUMP_FROM) * (k * 0.8 + smooth(k) * 0.2);
@@ -133,8 +145,6 @@ export const REEL_TIME = 0.18;
 /** In each cast: when a fish leaps out beside the float and when it dives in again on the other side. */
 export const LEAP_FROM = 0.7;
 export const LEAP_TO = 0.92;
-/** In the praise after the fishing: when Tapsi sits down, after laying the rod on Ole's back. */
-export const SIT_FROM = 1.1;
 /** In each push of the fireworks (0..1 of it): when the rocket leaves the paws at the top; and how long it flies. */
 export const ROCKET_OFF = 0.4;
 export const ROCKET_FLIGHT = 0.9;

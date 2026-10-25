@@ -19,7 +19,7 @@ import { useTitle } from "@/lib/title";
 /** The grown-up's own decision on an idea, saved per browser. */
 type Mark = "next" | "maybe" | "no";
 
-type StatusFilter = "all" | "todo" | "done";
+type StatusFilter = "all" | "todo" | "done" | "rejected";
 type MarkFilter = "any" | Mark | "undecided";
 type GroupBy = "area" | "effort";
 
@@ -35,10 +35,13 @@ const ALL_IDEAS = IDEA_AREAS.flatMap((a) => a.ideas);
 const AREA_OF = new Map(IDEA_AREAS.flatMap((a) => a.ideas.map((i) => [i.id, a] as const)));
 const IDEA_BY_ID = new Map(ALL_IDEAS.map((i) => [i.id, i]));
 
-const STATUS_ORDER: Record<IdeaStatus, number> = { open: 0, partial: 1, done: 2 };
+const STATUS_ORDER: Record<IdeaStatus, number> = { open: 0, partial: 1, done: 2, rejected: 3 };
 
-const isOpen = (idea: Idea) => !idea.done;
+/** Still to build: neither done nor turned down. */
+const isOpen = (idea: Idea) => !idea.done && !idea.rejected;
 const countDone = (ideas: Idea[]) => ideas.filter((i) => i.done).length;
+/** Rejected ideas don't count towards the progress; they only show under their own filter. */
+const countActive = (ideas: Idea[]) => ideas.filter((i) => !i.rejected).length;
 
 const DEFAULTS = {
   marks: {} as Record<string, Mark>,
@@ -64,6 +67,8 @@ export function IdeasPage() {
   const [query, setQuery] = useState("");
   const marks: Record<string, Mark> = { ...Object.fromEntries(saved.starred.map((id) => [id, "next"])), ...saved.marks };
   const done = countDone(ALL_IDEAS);
+  const active = countActive(ALL_IDEAS);
+  const rejected = ALL_IDEAS.length - active;
 
   const setMark = (id: string, mark: Mark) => {
     const next = { ...marks };
@@ -95,8 +100,9 @@ export function IdeasPage() {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   const visible = (idea: Idea) => {
     const mark = marks[idea.id];
+    if ((saved.status === "rejected") !== !!idea.rejected) return false;
     if (saved.status === "todo" && !isOpen(idea)) return false;
-    if (saved.status === "done" && isOpen(idea)) return false;
+    if (saved.status === "done" && !idea.done) return false;
     if (saved.efforts.length > 0 && !saved.efforts.includes(idea.effort)) return false;
     if (saved.area && AREA_OF.get(idea.id)?.prefix !== saved.area) return false;
     if (saved.mark === "undecided" ? mark : saved.mark !== "any" && mark !== saved.mark) return false;
@@ -112,10 +118,13 @@ export function IdeasPage() {
       ? IDEA_AREAS.map((a) => ({ key: a.prefix, title: `${a.emoji} ${a.prefix} – ${a.title}`, intro: a.intro, ideas: a.ideas.filter(visible).sort(order) }))
       : EFFORTS.map((e) => ({ key: e, title: `Aufwand ${e} – ${EFFORT_LABELS[e]}`, ideas: shown.filter((i) => i.effort === e).sort(order) }));
 
-  const nextIdeas = Object.keys(marks)
-    .filter((id) => marks[id] === "next")
-    .map((id) => IDEA_BY_ID.get(id))
-    .filter((i): i is Idea => !!i && isOpen(i));
+  const marked = (mark: Mark) =>
+    Object.keys(marks)
+      .filter((id) => marks[id] === mark)
+      .map((id) => IDEA_BY_ID.get(id))
+      .filter((i): i is Idea => !!i && isOpen(i));
+  const nextIdeas = marked("next");
+  const noIdeas = marked("no");
   const picks = TOP_PICKS.filter(({ id }) => isOpen(IDEA_BY_ID.get(id) as Idea));
   const filtered = saved.status !== DEFAULTS.status || saved.efforts.length > 0 || saved.mark !== "any" || saved.area !== "" || words.length > 0;
   const markProps = { marks, onMark: setMark };
@@ -130,11 +139,12 @@ export function IdeasPage() {
         <span aria-hidden>💡</span> Ideen
       </h1>
       <p className="home-subtitle">
-        {ALL_IDEAS.length - done} offene Ideen, {done} schon umgesetzt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
+        {active - done} offene Ideen, {done} schon umgesetzt, {rejected} abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen
+        kann.
       </p>
-      <Progress done={done} total={ALL_IDEAS.length} />
+      <Progress done={done} total={active} />
 
-      <NextPanel ideas={nextIdeas} onShow={showIdea} onMark={setMark} />
+      <NextPanel ideas={nextIdeas} noIdeas={noIdeas} onShow={showIdea} onMark={setMark} />
 
       <section className="ideas-panel">
         <h2>Überblick: Wo ist was offen?</h2>
@@ -189,9 +199,10 @@ export function IdeasPage() {
         <Chips
           label="Zeigen"
           options={[
-            { value: "todo", label: `Offen (${ALL_IDEAS.length - done})` },
+            { value: "todo", label: `Offen (${active - done})` },
             { value: "done", label: `✅ Umgesetzt (${done})` },
             { value: "all", label: "Alle" },
+            { value: "rejected", label: `🚫 Abgelehnt (${rejected})` },
           ]}
           selected={[saved.status]}
           onToggle={(status) => update({ status })}
@@ -265,16 +276,23 @@ export function IdeasPage() {
   );
 }
 
-/** The ideas marked ⭐, with a button that copies "mach N-01, B-02" for Claude. */
-function NextPanel({ ideas, onShow, onMark }: { ideas: Idea[]; onShow: (id: string) => void; onMark: (id: string, mark: Mark) => void }) {
-  const [copied, setCopied] = useState(false);
+/**
+ * The ideas marked ⭐, with a button that copies "mach N-01, B-02" for Claude.
+ * The 👎 ones get a line of their own, so they can be rejected for good (`rejected: true`).
+ */
+function NextPanel({
+  ideas,
+  noIdeas,
+  onShow,
+  onMark,
+}: {
+  ideas: Idea[];
+  noIdeas: Idea[];
+  onShow: (id: string) => void;
+  onMark: (id: string, mark: Mark) => void;
+}) {
   const command = `mach ${ideas.map((i) => i.id).join(", ")}`;
-  const copy = () => {
-    navigator.clipboard.writeText(command).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    });
-  };
+  const rejectCommand = `lehne ab: ${noIdeas.map((i) => i.id).join(", ")}`;
   const efforts = EFFORTS.map((e) => [e, ideas.filter((i) => i.effort === e).length] as const).filter(([, n]) => n > 0);
 
   return (
@@ -302,14 +320,38 @@ function NextPanel({ ideas, onShow, onMark }: { ideas: Idea[]; onShow: (id: stri
           </ul>
           <div className="ideas-next-foot">
             <span>Zusammen: {efforts.map(([e, n]) => `${n}× ${EFFORT_LABELS[e]}`).join(", ")}</span>
-            <code>{command}</code>
-            <button type="button" className="ideas-copy" onClick={copy}>
-              {copied ? "Kopiert ✓" : "📋 Kopieren"}
-            </button>
+            <CopyCommand command={command} />
           </div>
         </>
       )}
+      {noIdeas.length > 0 && (
+        <div className="ideas-next-foot">
+          <span>
+            👎 {noIdeas.length} {noIdeas.length === 1 ? "Idee" : "Ideen"} „eher nicht“ – endgültig ablehnen:
+          </span>
+          <CopyCommand command={rejectCommand} />
+        </div>
+      )}
     </section>
+  );
+}
+
+/** A command for Claude and a button that copies it. */
+function CopyCommand({ command }: { command: string }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard.writeText(command).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <>
+      <code>{command}</code>
+      <button type="button" className="ideas-copy" onClick={copy}>
+        {copied ? "Kopiert ✓" : "📋 Kopieren"}
+      </button>
+    </>
   );
 }
 
@@ -342,12 +384,13 @@ function Overview({ marks, onPick }: { marks: Record<string, Mark>; onPick: (are
             <th>Offen</th>
             <th>⭐</th>
             <th>Fertig</th>
+            <th>🚫</th>
           </tr>
         </thead>
         {IDEA_GROUPS.map((group) => (
           <tbody key={group.title}>
             <tr className="ideas-overview-group">
-              <th colSpan={7}>
+              <th colSpan={8}>
                 {group.emoji} {group.title}
               </th>
             </tr>
@@ -371,8 +414,9 @@ function Overview({ marks, onPick }: { marks: Record<string, Mark>; onPick: (are
                   {cell("open", area, open)}
                   <td>{open.filter((i) => marks[i.id] === "next").length || <span className="ideas-zero">·</span>}</td>
                   <td className="ideas-overview-done">
-                    {countDone(area.ideas)}/{area.ideas.length}
+                    {countDone(area.ideas)}/{countActive(area.ideas)}
                   </td>
+                  <td className="ideas-overview-done">{area.ideas.length - countActive(area.ideas) || <span className="ideas-zero">·</span>}</td>
                 </tr>
               );
             })}
@@ -481,9 +525,11 @@ function IdeaRow({
             {area.emoji} {area.title}
           </span>
         )}
-        {idea.planned && !idea.done && <span className="idea-planned">schon geplant</span>}
+        {idea.planned && isOpen(idea) && <span className="idea-planned">schon geplant</span>}
         {idea.partial && <span className="idea-partial-tag">teilweise</span>}
-        {idea.done ? <span className="idea-done">✓ umgesetzt</span> : <MarkButtons id={idea.id} marks={marks} onMark={onMark} />}
+        {idea.done && <span className="idea-done">✓ umgesetzt</span>}
+        {idea.rejected && <span className="idea-rejected">✗ abgelehnt</span>}
+        {isOpen(idea) && <MarkButtons id={idea.id} marks={marks} onMark={onMark} />}
       </div>
       <p>{idea.text}</p>
       {idea.why && <p className="idea-why">💬 {idea.why}</p>}

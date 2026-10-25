@@ -16,29 +16,9 @@ export interface Category {
 /** The home menu: first a category, then its games (on `/spiele/<id>/`). */
 export const CATEGORIES: Category[] = [
   {
-    id: "buchstaben-zahlen",
-    emoji: "🔤",
-    title: "Buchstaben & Zahlen",
-    subtitle: "Tasten drücken, Buchstaben finden, Wörter tippen.",
-    games: [
-      { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
-      { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
-    ],
-  },
-  {
-    id: "zuordnen",
-    emoji: "🧩",
-    title: "Zuordnen",
-    subtitle: "Was gehört zusammen? Antippen oder hinziehen.",
-    games: [
-      { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
-      { href: "/schatten/", emoji: "👤", title: "Schatten finden" },
-    ],
-  },
-  {
-    id: "lebendige-stories",
+    id: "lebendige-welten",
     emoji: "🖼️",
-    title: "Lebendige Stories",
+    title: "Lebendige Welten",
     subtitle: "Bilder und Geschichten, die auf jedes Antippen antworten.",
     games: [
       { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
@@ -49,11 +29,25 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "kugelbahn",
-    emoji: "🎢",
-    title: "Kugelbahn",
-    subtitle: "Ein Tipp, und die Kugeln rollen eine lange Bahn hinunter.",
-    games: [{ href: "/kugelbahn/", emoji: "🎢", title: "Kugelbahn" }],
+    id: "zuordnen",
+    emoji: "🧩",
+    title: "Zuordnen",
+    subtitle: "Was gehört zusammen? Antippen oder hinziehen.",
+    games: [
+      { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
+      { href: "/schatten/", emoji: "👤", title: "Schatten finden" },
+      { href: "/socken/", emoji: "🧦", title: "Socken-Paare" },
+    ],
+  },
+  {
+    id: "buchstaben-zahlen",
+    emoji: "🔤",
+    title: "Buchstaben & Zahlen",
+    subtitle: "Tasten drücken, Buchstaben finden, Wörter tippen.",
+    games: [
+      { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
+      { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
+    ],
   },
   {
     id: "weitere",
