@@ -23,6 +23,7 @@ export function ElevatorGame() {
         { id: "gutenacht", emoji: "🌙", title: "Gute Nacht" },
         { id: "pfuetzen", emoji: "🌧️", title: "Pfützen" },
         { id: "drachen", emoji: "🪁", title: "Der Drachen" },
+        { id: "ballon", emoji: "🎈", title: "Der Luftballon" },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}

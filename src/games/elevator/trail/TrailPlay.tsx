@@ -9,7 +9,7 @@ import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, ThoughtBubble, type Pose } from "../kid";
 import type { ElevatorSettings } from "../settings";
 import { groundY, route } from "./ground";
-import { Fitted, GOALS, ITEMS, Kite, type ItemId } from "./items";
+import { Fitted, GOALS, ITEMS, type ItemId } from "./items";
 import type { Climb, Cue, Obstacle, Pickup, Point, TrailLevel } from "./types";
 import "./trail.css";
 
@@ -127,7 +127,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   /** Set while the bag is open: it gets the slot. */
   const chooser = useRef<((slot: number) => void) | null>(null);
 
-  // The goal (the kite) moves along curves, so it is moved frame by frame, not by React.
+  // The goal (the kite, the balloon) moves along curves, so it is moved frame by frame, not by React.
   const goalEl = useRef<SVGGElement>(null);
   const stringEl = useRef<SVGLineElement>(null);
   const goal = useRef<{ at: Point; hand: Point | null }>({ at: [0, 0], hand: null });
@@ -467,9 +467,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
           <Scenery done={view.done} here={view.here} nope={view.nope} />
           <line ref={stringEl} className="tl-string" stroke={INK} strokeWidth="3" {...firstString} />
           <g ref={goalEl} className="tl-goal" transform={firstGoal}>
-            <g className={view.party ? "tl-sway" : undefined}>
-              <Kite />
-            </g>
+            <g className={view.party ? "tl-sway" : undefined}>{(GOALS[level.goal].world ?? GOALS[level.goal].draw)()}</g>
           </g>
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>

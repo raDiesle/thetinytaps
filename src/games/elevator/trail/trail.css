@@ -296,3 +296,49 @@
     transform: rotate(10deg);
   }
 }
+
+/* ---------- „Der Luftballon“ ---------- */
+
+.tl-ballon-ducks,
+.tl-ballon-cat {
+  transition: transform 1.4s ease-in-out;
+}
+
+/* With the bread, the ducks waddle into the pond and dip for the crumbs. */
+.tl-ballon-ducks.done {
+  transform: translate(150px, -30px) scale(0.7);
+}
+
+.tl-ballon-ducks.done .tl-ballon-duck-head,
+.tl-ballon-dove.done .tl-ballon-dove-head {
+  animation: tl-munch 0.4s ease-in-out 1.4s 8 alternate;
+}
+
+.tl-nope .tl-ballon-duck-head,
+.tl-nope .tl-ballon-dove-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The sprinkler's water runs while the child stands there. */
+.tl-ballon-spray.on path {
+  animation: tl-ballon-spray 0.5s linear 12;
+}
+
+/* With the fish, the cat jumps onto the wall, eats and swishes its tail. */
+.tl-ballon-cat.done {
+  transform: translate(10px, -80px) scale(0.9);
+}
+
+.tl-ballon-cat.done .tl-ballon-cat-tail {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: tl-wag 0.3s ease-in-out 1.4s 10 alternate;
+}
+
+@keyframes tl-ballon-spray {
+  to {
+    stroke-dashoffset: -28;
+  }
+}

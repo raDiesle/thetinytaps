@@ -17,7 +17,8 @@ A long world seen from the side that scrolls along with the child (far hills slo
 - `items.tsx` – the bag's things and the goals, drawn standing on (0, 0); `TrailPlay.tsx` – the script; `trail.css` – classes `tl-`.
 - The child (`Kid` from `kid.tsx`), the thought bubble and the action button (`house.tsx`) and their classes come from `elevator.css`, which the game always loads.
 
-Levels so far: „Der Drachen“ (garden: ball, carrot, plank → dog wants the ball → lantern at the hut → horse wants the carrot → apple from the tree → plank over the stream → lantern in the dark tunnel → stairs up the hill → the squirrel trades the kite for the apple).
+Levels so far: „Der Drachen“ (garden: ball, carrot, plank → dog wants the ball → lantern at the hut → horse wants the carrot → apple from the tree → plank over the stream → lantern in the dark tunnel → stairs up the hill → the squirrel trades the kite for the apple), „Der Luftballon“ (`ballon.tsx`, town: bread from the bakery, fish from the market stall, sunflower from the flower stall → the ducks at the pond want the bread → umbrella on the park bench → the sprinkler sprays over the path, the umbrella goes over it → plank on the logs → the plank fills the hole in the hanging bridge → the cat wants the fish → long stairs up to the church → the dove on the tower trades the balloon for the sunflower).
+- A goal in `GOALS` hangs on a string tied at its (0, 0); `world` is its drawing in the world when that differs from the card picture (the kite with its tail).
 
 ## Rules for every story (from feedback; follow them in new stories and trail levels too)
 
