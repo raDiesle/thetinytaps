@@ -3,9 +3,6 @@ import type { DaytimeChoice } from "./daytime";
 /** How long the brushing takes; dentists recommend two minutes. */
 export type BrushMinutes = "1" | "2" | "3";
 
-/** Languages the brushing song can be sung in. */
-export type SungLanguage = "de" | "en";
-
 export interface TeethSettings {
   minutes: BrushMinutes;
   /** Morning (sun, breakfast crumbs) or evening (moon, pyjamas, "Gute Nacht"); by the clock unless chosen. */
@@ -18,8 +15,8 @@ export interface TeethSettings {
   speech: boolean;
   /** A little tune in the background while brushing; on by default, it makes the two minutes go by. */
   music: boolean;
-  /** In two-minute brushing, a song that sings each step instead of the plain tune; "off" keeps the plain tune. */
-  singing: SungLanguage | "off";
+  /** In two-minute brushing, the song sung in this language (see sung.ts) instead of the plain tune; "off" keeps the plain tune. */
+  singing: string;
   /** A poof for every monster, a chime when it is time to move on. */
   sounds: boolean;
 }
