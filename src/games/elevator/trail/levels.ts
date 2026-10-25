@@ -3,19 +3,26 @@ import {
   playBoing,
   playChatter,
   playClonk,
+  playCrunch,
+  playDing,
   playDrops,
   playGiggle,
+  playGlug,
   playLeaves,
   playMunch,
   playNeigh,
+  playPing,
   playPlop,
   playPop,
+  playRustle,
   playSneeze,
   playSplash,
   playThump,
+  playTick,
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
+import { BALL_AT, BallBackdrop, BallFront, BallScenery, LADDER, SLIDE, GROUND_Y as STREET_Y } from "./ball";
 import { DrachenBackdrop, DrachenScenery, GROUND_Y, STAIRS, TOP_Y } from "./drachen";
 import type { TrailLevel } from "./types";
 
@@ -33,6 +40,7 @@ const drachen: TrailLevel = {
   away: {
     to: [5420, 150],
     ms: 3600,
+    sway: 120,
     pose: "reach",
     sounds: [
       [0, playWhoosh],
@@ -128,8 +136,110 @@ const drachen: TrailLevel = {
       done: "Den Apfel! Danke, Eichhörnchen.",
     },
   ],
-  finale: { to: [5820, -200], ms: 2600, say: "Der Drachen fliegt! Hurra!" },
+  finale: { to: [5820, -200], ms: 2600, sway: 60, say: "Der Drachen fliegt! Hurra!" },
+};
+
+const ball: TrailLevel = {
+  id: "ball",
+  title: "Der Ball rollt weg",
+  goal: "football",
+  Scenery: BallScenery,
+  Front: BallFront,
+  Backdrop: BallBackdrop,
+  ground: [[-3000, STREET_Y], [3400, STREET_Y], ...LADDER, ...SLIDE, [9000, STREET_Y]],
+  start: 300,
+  away: {
+    via: [
+      [[450, 744], 450],
+      [[560, 680], 300],
+      [[660, 744], 300],
+    ],
+    to: BALL_AT,
+    ms: 3400,
+    sway: 0,
+    pose: "reach",
+    sounds: [
+      [400, playBoing],
+      [1000, playBoing],
+      [1400, playWhoosh],
+    ],
+    say: "Oh nein! Der Ball rollt weg. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "can", x: 540, item: "can", at: [640, 700], sound: playClonk, ask: "Eine Gießkanne.", done: "Die nehmen wir mit." },
+    {
+      kind: "moment",
+      id: "light",
+      x: 960,
+      pose: "reach",
+      sounds: [
+        [100, playPing],
+        [600, playTick],
+        [1900, playTick],
+        [3000, playDing],
+      ],
+      ms: 3200,
+      ask: "Die Ampel ist rot. Wir drücken den Knopf.",
+      done: "Grün! Jetzt gehen wir rüber.",
+    },
+    { kind: "pickup", id: "pretzel", x: 1600, item: "pretzel", at: [1690, 650], sound: playPop, ask: "Eine Brezel!", done: "Ab in den Beutel!" },
+    { kind: "pickup", id: "shovel", x: 1900, item: "shovel", at: [2010, 680], sound: playClonk, ask: "Eine Schaufel.", done: "Die nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "dog",
+      x: 2300,
+      need: "pretzel",
+      at: [2420, 636],
+      meet: [[100, playBark]],
+      sounds: [
+        [100, playMunch],
+        [800, playMunch],
+        [1500, playBark],
+      ],
+      ms: 2200,
+      nope: playSneeze,
+      ask: "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?",
+      done: "Die Brezel! Mmh, lecker.",
+    },
+    {
+      kind: "obstacle",
+      id: "flowers",
+      x: 2760,
+      need: "can",
+      at: [2880, 560],
+      meet: [[100, playRustle]],
+      sounds: [
+        [0, playGlug],
+        [300, playDrops],
+        [1400, playTwinkle],
+      ],
+      ms: 2600,
+      nope: playBoing,
+      ask: "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?",
+      done: "Wasser! Die Blumen stehen auf.",
+    },
+    { kind: "climb", id: "slide", x: 3360, steps: LADDER, slide: SLIDE, ask: "Die Rutsche! Hoch geht's.", done: "Hui!" },
+    {
+      kind: "obstacle",
+      id: "sandbox",
+      x: 4260,
+      need: "shovel",
+      at: [4400, 700],
+      meet: [[100, playBoing]],
+      sounds: [
+        [0, playCrunch],
+        [1300, playPop],
+      ],
+      ms: 1800,
+      nope: playPlop,
+      frees: true,
+      ask: "Da ist der Ball! Er steckt im Sand. Was hilft?",
+      done: "Die Schaufel! Wir graben ihn aus.",
+    },
+  ],
+  // Up into the air and back into the hands (they reach out at x 4326, y 662).
+  finale: { via: [[[4380, 300], 1000]], to: [4326, 662], ms: 1000, sway: 0, say: "Der Ball ist wieder da! Hurra!" },
 };
 
 /** All trail levels, in the order of their cards. */
-export const TRAIL_LEVELS: TrailLevel[] = [drachen];
+export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball];
