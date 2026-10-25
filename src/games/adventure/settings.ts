@@ -1,8 +1,12 @@
+import type { TargetLanguageId } from "@/content/targetLanguages";
+
 export interface AdventureSettings {
   /** The guide speaks every situation and movement; off by default, the fox shows everything. */
   speech: boolean;
   /** Background music; off by default. */
   music: boolean;
+  /** The language Tapsi speaks in (when speech is on). */
+  language: TargetLanguageId;
   /** Splashes, whooshes and sparkles. */
   sounds: boolean;
   /** A glowing outline of a child shows the movement next to the fox. */
@@ -14,6 +18,7 @@ export interface AdventureSettings {
 export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
   speech: false,
   music: false,
+  language: "de",
   sounds: true,
   outline: true,
   glow: true,

@@ -14,6 +14,13 @@ export function voiceId(text: string): string {
   return (hash >>> 0).toString(16).padStart(8, "0");
 }
 
+/**
+ * The file name (without .mp3) of the recording of `text` in `language`: the hash for German
+ * (stimme/<hash>.mp3), the language in front for the others (stimme/en/en-<hash>.mp3), so the
+ * build can leave those out of what every phone keeps offline (rsbuild.config.ts).
+ */
+export const recordingName = (text: string, language: string) => (language === "de" ? voiceId(text) : `${language}-${voiceId(text)}`);
+
 /** What kind of line it is; the recording script gives each kind its own way of saying it. */
 export type SpokenKind = "opening" | "situation" | "instruction" | "turn" | "again" | "more" | "praise";
 

@@ -130,6 +130,7 @@ import {
   TRAVEL,
 } from "./script";
 import { LINES, OPENING_LINES } from "./lines";
+import { TRANSLATIONS } from "./translations";
 import { makeWorld } from "./world";
 
 // "Die Schatzinsel": Tapsi stands on the back of Ole, a big sea turtle, greets
@@ -1787,5 +1788,6 @@ export const TREASURE_ISLAND: Story = {
   demo: DEMO,
   praise: PRAISE,
   lines: LINES,
+  translations: TRANSLATIONS,
   build,
 };

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { TargetLanguage } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
@@ -38,7 +39,7 @@ const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (
  * can pause and jump between steps with the buttons in the corner, by tapping
  * a picture on the route, or with the keys (arrows jump, Space pauses).
  */
-export function AdventurePlay({ story, speechLang, settings }: { story: Story; speechLang: string; settings: AdventureSettings }) {
+export function AdventurePlay({ story, language, settings }: { story: Story; language: TargetLanguage; settings: AdventureSettings }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<StoryPlayer | null>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -68,7 +69,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
         onLine(text, kind, at) {
           if (!settingsRef.current.speech) return;
           // A new step starts fresh; within a step, lines wait for each other.
-          say(text, speechLang, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
+          say(text, language, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
         },
         onPointing: setPointing,
         onStep(at) {
@@ -102,7 +103,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       return;
     }
     player.highlight = settings.glow;
-    if (settings.speech) loadVoice(story, speechLang);
+    if (settings.speech) loadVoice(story, language);
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
     if (!import.meta.env.PROD) Object.assign(window, { __adventure: player });

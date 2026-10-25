@@ -1,10 +1,12 @@
+import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
-import { SettingsGroup, Toggle } from "@/components/SettingControls";
-import { de } from "@/content/de";
+import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
+import { TARGET_LANGUAGES, targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { AdventurePlay } from "./AdventurePlay";
 import { ADVENTURE_SETTINGS_KEY, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
+import { storyIn } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 
 carryOverAdventureSettings();
@@ -13,7 +15,9 @@ export function AdventureGame() {
   const [settings, update] = useGameSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
   const { touchOnly } = useDevice();
-  const story = TREASURE_ISLAND;
+  const language = targetLanguageFor(settings.language);
+  // Built once per language: the game starts anew when the story changes.
+  const story = useMemo(() => storyIn(TREASURE_ISLAND, language.id), [language.id]);
 
   return (
     <GameShell
@@ -41,6 +45,13 @@ export function AdventureGame() {
             checked={settings.outline}
             onChange={(outline) => update({ outline })}
           />
+          <Choice
+            label="Tapsi spricht"
+            value={language.id}
+            options={TARGET_LANGUAGES.map((l) => ({ value: l.id, label: l.label }))}
+            onChange={(id) => update({ language: id })}
+          />
+          {!settings.speech && <p className="setting-note">Tapsi spricht nur, wenn „Vorlesen“ auf der Startseite an ist.</p>}
           <Toggle label="Musik" checked={settings.music} onChange={(music) => update({ music })} />
           {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
           {!touchOnly && (
@@ -53,7 +64,7 @@ export function AdventureGame() {
       }
     >
       {/* Its own music, which plays only while music is on for all games too. */}
-      <AdventurePlay story={story} speechLang={de.speechLang} settings={{ ...settings, music: settings.music && common.music }} />
+      <AdventurePlay story={story} language={language} settings={{ ...settings, music: settings.music && common.music }} />
     </GameShell>
   );
 }

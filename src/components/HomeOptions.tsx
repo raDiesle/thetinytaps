@@ -125,7 +125,10 @@ function CommonOptions() {
   return (
     <section className="settings">
       <LanguageSetting settings={languages.settings} update={languages.update} />
-      <p className="setting-note">Die Sprache gilt für „Buchstaben &amp; Zahlen“ und „Wörter tippen“; die anderen Spiele sind auf Deutsch.</p>
+      <p className="setting-note">
+        Die Sprache gilt für „Buchstaben &amp; Zahlen“ und „Wörter tippen“; das Bewegungsabenteuer hat seine eigene Sprachwahl, die anderen Spiele sind auf
+        Deutsch.
+      </p>
 
       <SettingsGroup title="Ton">
         <Toggle label="Vorlesen (Namen, Sätze, Fragen)" checked={common.speech} onChange={(speech) => update({ speech })} />

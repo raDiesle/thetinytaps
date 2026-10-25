@@ -1,4 +1,5 @@
 import type * as THREE from "three";
+import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Sequence } from "../library/types";
 import type { Guide } from "../three/guide";
 import type { Stage } from "../three/stage";
@@ -22,6 +23,26 @@ export interface StepLines {
   more?: { at: number; text: string }[];
   /** At the end. */
   praise: string;
+}
+
+/** One step's lines in another language: the same lines as its German StepLines, `more` without the times. */
+export interface StepTranslation {
+  situation?: string;
+  instruction: string;
+  turn?: string;
+  again?: string;
+  more?: string[];
+  praise: string;
+}
+
+/** What the guide says in a story in another language (stories/<story>/lines.<language>.ts), in the order of the German lines. */
+export interface StoryTranslation {
+  /** Like DEFAULT_TURN, where a step has no `turn`. */
+  defaultTurn: string;
+  /** The opening lines, said at the times of the German ones. */
+  opening: string[];
+  /** One entry per step, with the same lines as the German step. */
+  steps: StepTranslation[];
 }
 
 /** Story time within one step, in seconds. */
@@ -78,6 +99,8 @@ export type Cue = "splash" | "whoosh" | "rumble" | "chime" | "sparkle" | "pop" |
 export interface Story {
   sequence: Sequence;
   lines: StepLines[];
+  /** The lines in other languages; a language left out is said in German. */
+  translations?: Partial<Record<TargetLanguageId, StoryTranslation>>;
   /** Before the first step: what the story is about, e.g. the way on a map. */
   opening?: { seconds: number; lines: { at: number; text: string }[] };
   /** Seconds before each step's movement: travel, then showing it (`demo`). */
@@ -94,3 +117,30 @@ export const crossed = (f: StoryFrame, at: number) => f.prevLocal < at && f.loca
 
 /** What the guide says when the child joins in, where a step has no `turn` of its own. */
 export const DEFAULT_TURN = "Jetzt du!";
+
+/** The German lines put into another language: same steps, icons and times; a step without `turn` gets the language's `defaultTurn`. */
+export function translateLines(opening: { at: number; text: string }[], lines: StepLines[], t: StoryTranslation) {
+  return {
+    opening: opening.map((line, i) => ({ at: line.at, text: t.opening[i] })),
+    lines: lines.map((step, i): StepLines => {
+      const own = t.steps[i];
+      return {
+        icon: step.icon,
+        situation: own.situation,
+        instruction: own.instruction,
+        turn: own.turn ?? t.defaultTurn,
+        again: own.again,
+        more: step.more?.map((line, k) => ({ at: line.at, text: own.more?.[k] ?? line.text })),
+        praise: own.praise,
+      };
+    }),
+  };
+}
+
+/** The story as it is said in `language`: the German one where it has no translation. */
+export function storyIn(story: Story, language: TargetLanguageId): Story {
+  const t = story.translations?.[language];
+  if (!t) return story;
+  const { opening, lines } = translateLines(story.opening?.lines ?? [], story.lines, t);
+  return { ...story, opening: story.opening && { ...story.opening, lines: opening }, lines };
+}

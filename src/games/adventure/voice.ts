@@ -1,19 +1,21 @@
 import { audioContext, loadSound } from "@/lib/sfx";
+import type { TargetLanguage } from "@/content/targetLanguages";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { DEFAULT_TURN, type Story } from "./stories/story";
-import { spokenLines, voiceId } from "./voiceId";
+import { recordingName, spokenLines } from "./voiceId";
 
 // Tapsi's recorded voice: a warm coach voice made with ElevenLabs
 // (scripts/elevenlabs-voice.mjs, `yarn voice`), one file per line in the
-// story's stimme/ folder. A German line with a recording plays from its file;
-// any other line falls back to the browser's voice, so a line changed but not
-// recorded again is still said.
+// story's stimme/ folder (German) or stimme/<language>/ (the others). A line with
+// a recording plays from its file; any other line falls back to the browser's
+// voice, so a line changed but not recorded again is still said.
 
-const files = import.meta.webpackContext("./stories", { recursive: true, regExp: /\/stimme\/[0-9a-f]{8}\.mp3$/ });
+const files = import.meta.webpackContext("./stories", { recursive: true, regExp: /\/stimme\/(?:[a-z]{2}\/[a-z]{2}-)?[0-9a-f]{8}\.mp3$/ });
+/** Each recording by its file name (recordingName). */
 const URLS = new Map<string, string>();
 for (const key of files.keys()) {
   const module = files(key) as string | { default: string };
-  URLS.set(key.slice(-12, -4), typeof module === "string" ? module : module.default);
+  URLS.set(key.slice(key.lastIndexOf("/") + 1, -4), typeof module === "string" ? module : module.default);
 }
 
 const buffers = new Map<string, Promise<AudioBuffer | null>>();
@@ -26,12 +28,12 @@ const load = (url: string) => {
   return buffer;
 };
 
-const recordingOf = (text: string, lang: string) => (lang.startsWith("de") ? URLS.get(voiceId(text)) : undefined);
+const recordingOf = (text: string, language: TargetLanguage) => URLS.get(recordingName(text, language.id));
 
-/** Starts loading the recordings of a story's lines, so each plays right when it is due. */
-export function loadVoice(story: Story, lang: string) {
+/** Starts loading the recordings of a story's lines (already in `language`), so each plays right when it is due. */
+export function loadVoice(story: Story, language: TargetLanguage) {
   for (const { text } of spokenLines(story.opening?.lines ?? [], story.lines, DEFAULT_TURN)) {
-    const url = recordingOf(text, lang);
+    const url = recordingOf(text, language);
     if (url) void load(url);
   }
 }
@@ -63,12 +65,12 @@ function play(buffer: AudioBuffer) {
  * Says `text`: its recording if there is one, else with the browser's voice.
  * Like speak(), cuts off what is being said unless `queue`, which waits for it.
  */
-export function say(text: string, lang: string, { queue = false } = {}) {
-  const url = recordingOf(text, lang);
+export function say(text: string, language: TargetLanguage, { queue = false } = {}) {
+  const url = recordingOf(text, language);
   if (!queue) hush();
   // Without a recording it does not wait for one still playing; that only happens while lines are being recorded anew.
   if (!url || !audioContext()) {
-    speak(text, lang, { queue: true });
+    speak(text, language.speechLang, { queue: true });
     return;
   }
   const at = generation;

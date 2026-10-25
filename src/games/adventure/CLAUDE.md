@@ -6,13 +6,23 @@ A 3D movement story (three.js, loaded only on this page). The fox Tapsi shows ea
 
 ## Tapsi's voice
 
-What Tapsi says is in `stories/<story>/lines.ts` (no three.js there, so Node can read it). Each line can have
-a recording in `stories/<story>/stimme/<hash>.mp3`, made with ElevenLabs as a warm children's coach voice
-(`yarn voice`, see `scripts/elevenlabs-voice.mjs`; the voice and model are in `stimme.json`, the key in
-`ELEVENLABS_API_KEY`). The file name is a hash of the text (`voiceId.ts`), so a changed line has no recording
-until `yarn voice make` records it again; `voice.ts` plays recordings and falls back to the browser's voice for
-lines without one. `voice.test.ts` checks that a story with recordings has one for every line and no extra ones.
-`yarn voice make --dry` shows what would be recorded and how many characters (≈ credits) it costs.
+What Tapsi says is in `stories/<story>/lines.ts` (no three.js there, so Node can read it), and in the other
+languages of the app (`src/content/targetLanguages.ts`) in `lines.<language>.ts` next to it: the same steps and
+lines in the same order (`StoryTranslation`, listed in the story's `translations.ts`; `storyIn()` swaps them in).
+Grown-ups choose the language on the start screen („Tapsi spricht“, the setting `language`). Translations say
+nothing that changes for a boy or a girl (no "you did", no "brave boy"): commands, "we" and "your turn".
+Each line can have a recording in `stories/<story>/stimme/<hash>.mp3` (German) or
+`stimme/<language>/<language>-<hash>.mp3`, made with ElevenLabs as a warm children's coach voice, the same voice
+in every language (`yarn voice`, see `scripts/elevenlabs-voice.mjs`; the voice and model are in `stimme.json`,
+the key in `ELEVENLABS_API_KEY`). The file name is a hash of the text (`voiceId.ts`), so a changed line has no
+recording until `yarn voice make` records it again; `voice.ts` plays recordings and falls back to the browser's
+voice for lines without one. `voice.test.ts` checks the translations against the German steps and that a
+language with recordings has one for every line and no extra ones. Recordings in other languages than German
+are not kept offline by every phone, only once the story has started in that language (`rsbuild.config.ts`, `src/sw.js`).
+- ElevenLabs always with the turbo model (`eleven_v4_turbo`, in `stimme.json`): it costs half the credits, and
+  the 10,000 credits a month have to reach for every language. `yarn voice make --dry [--lang en]` shows what
+  would be recorded and how many credits it costs; the German lines were recorded with `eleven_v4` and audio
+  tags before, the other languages with turbo and `--no-tags`.
 
 ## Working on levels
 

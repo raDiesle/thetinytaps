@@ -4,10 +4,14 @@
 // (rsbuild.config.ts, pluginOffline).
 
 const VERSION = "__VERSION__";
-/** All files of the build, relative to this script, without the songs. */
+/** All files of the build, relative to this script, without the songs and other languages' voices. */
 const FILES = __FILES__;
-/** Songs (musik-*.mp3) are left out of FILES: music can be off, and then they are never downloaded. */
-const SONG = /\/musik-[^/]*\.mp3$/;
+/**
+ * Left out of FILES and kept once fetched: songs (musik-*.mp3), because music can be off and then
+ * they are never downloaded, and Tapsi's voice in other languages than German (en-<hash>.mp3), of
+ * which only the chosen one is needed.
+ */
+const ON_DEMAND = /\/(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/;
 
 const PREFIX = "tinytaps-";
 const CACHE = PREFIX + VERSION;
@@ -48,9 +52,9 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // A song is kept once a page has fetched it (it does at start while music is
-  // on), so it plays offline from then on.
-  if (SONG.test(new URL(request.url).pathname)) {
+  // A song or voice is kept once a page has fetched it (it does at start while
+  // music is on, or when the story starts in that language), so it plays offline from then on.
+  if (ON_DEMAND.test(new URL(request.url).pathname)) {
     event.respondWith(
       (async () => {
         const kept = await caches.match(request);
