@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
 import { Cloud, INK } from "@/games/scenes/shared";
-import { Pretzel, Shovel, WateringCan } from "./items";
+import { Bone, Shovel, WateringCan } from "./items";
 import type { Point, SceneryProps } from "./types";
 
 // "Der Ball rollt weg": down the own street – the front garden, the traffic light with its button
-// and the zebra crossing, the bakery, the dog at its door – into the park, past the sunflowers,
+// and the zebra crossing, the pet shop, the dog at its door – into the park, past the sunflowers,
 // up the ladder and down the slide to the sandbox, where the ball is stuck in the sand.
 // World points: the pavement is at y = 740 the whole way; only the ladder and the slide go up.
 
@@ -189,7 +189,8 @@ function FrontGarden({ can }: { can: boolean }) {
   );
 }
 
-function Bakery({ pretzel }: { pretzel: boolean }) {
+/** The pet shop: a fish bowl and a bird in the window, a paw on its sign; a bone lies on the table outside. */
+function PetShop({ bone }: { bone: boolean }) {
   return (
     <g>
       <rect x="1460" y="420" width="520" height="320" fill="#fff4e6" stroke={INK} strokeWidth="5" />
@@ -205,47 +206,49 @@ function Bakery({ pretzel }: { pretzel: boolean }) {
         stroke={INK}
         strokeWidth="3"
       />
-      {/* The shop window with loaves and rolls */}
+      {/* The shop window with a fish bowl and a bird in its cage */}
       <rect x="1490" y="590" width="230" height="110" rx="8" fill="#d0ebff" stroke={INK} strokeWidth="5" />
-      <path d="M1496 650 H1714" stroke={WOOD} strokeWidth="6" />
-      {[1530, 1600, 1670].map((x) => (
-        <ellipse key={x} cx={x} cy="634" rx="28" ry="14" fill="#e8a35c" stroke={INK} strokeWidth="3" />
+      <path d="M1496 680 H1714" stroke={WOOD} strokeWidth="6" />
+      <circle cx="1546" cy="648" r="28" fill="#a5d8ff" stroke={INK} strokeWidth="3" />
+      <path d="M1524 640 H1568" stroke="#74c0fc" strokeWidth="4" />
+      <path d="M1536 654 q10 -10 20 0 q-10 10 -20 0 Z M1536 654 l-8 -6 v12 Z" fill="#fd7e14" stroke={INK} strokeWidth="2" />
+      <path d="M1626 676 V626 Q1650 598 1674 626 V676 Z" fill="none" stroke="#868e96" strokeWidth="3" />
+      {[1638, 1650, 1662].map((x) => (
+        <path key={x} d={`M${x} 676 V${x === 1650 ? 608 : 614}`} stroke="#868e96" strokeWidth="2" />
       ))}
-      {[1520, 1570, 1620, 1670].map((x) => (
-        <circle key={x} cx={x} cy="680" r="14" fill="#f4c27a" stroke={INK} strokeWidth="3" />
-      ))}
+      <path d="M1630 652 H1670" stroke={WOOD} strokeWidth="3" />
+      <ellipse cx="1650" cy="640" rx="11" ry="10" fill="#ffd43b" stroke={INK} strokeWidth="2.5" />
+      <path d="M1660 640 l7 2 l-7 3 Z" fill="#fd7e14" />
       <rect x="1840" y="610" width="90" height="130" rx="8" fill="#a0673a" stroke={INK} strokeWidth="5" />
       <circle cx="1856" cy="676" r="6" fill="#ffd43b" stroke={INK} strokeWidth="2" />
-      {/* The baker's sign: a golden pretzel over the shop window */}
+      {/* The sign over the window: a paw */}
       <path d="M1720 424 V446" stroke={INK} strokeWidth="6" />
-      <g transform="translate(1720 512) scale(0.9)">
-        <path
-          d="M-34 -14 C-20 -30 20 -48 12 -64 C4 -80 -46 -78 -46 -48 C-46 -22 -12 -8 0 -8 C12 -8 46 -22 46 -48 C46 -78 -4 -80 -12 -64 C-20 -48 20 -30 34 -14"
-          stroke={INK}
-          strokeWidth="20"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <path
-          d="M-34 -14 C-20 -30 20 -48 12 -64 C4 -80 -46 -78 -46 -48 C-46 -22 -12 -8 0 -8 C12 -8 46 -22 46 -48 C46 -78 -4 -80 -12 -64 C-20 -48 20 -30 34 -14"
-          stroke="#fcc419"
-          strokeWidth="12"
-          fill="none"
-          strokeLinecap="round"
-        />
+      <circle cx="1720" cy="478" r="34" fill="#fff" stroke={INK} strokeWidth="5" />
+      <g fill="#8d5a3b">
+        <ellipse cx="1720" cy="488" rx="14" ry="11" />
+        {[
+          [1702, 470],
+          [1714, 462],
+          [1726, 462],
+          [1738, 470],
+        ].map(([x, y]) => (
+          <circle key={x} cx={x} cy={y} r="5.5" />
+        ))}
       </g>
-      {/* A little table outside with a basket; one pretzel lies on top */}
+      {/* A little table outside with a basket of bones; one bone lies on top */}
       <rect x="1640" y="682" width="140" height="14" rx="4" fill="#fff" stroke={INK} strokeWidth="4" />
       {[1656, 1764].map((x) => (
         <rect key={x} x={x - 5} y="696" width="10" height="44" fill="#868e96" stroke={INK} strokeWidth="3" />
       ))}
-      <path d="M1736 682 L1730 656 H1776 L1770 682 Z" fill={WOOD} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-      {[1742, 1762].map((x) => (
-        <circle key={x} cx={x} cy="652" r="10" fill="#f4c27a" stroke={INK} strokeWidth="3" />
+      {[-24, 18].map((turn) => (
+        <g key={turn} transform={`translate(${1752 + turn / 3} 668) rotate(${turn}) scale(0.4)`}>
+          <Bone />
+        </g>
       ))}
-      {pretzel && (
+      <path d="M1736 682 L1730 656 H1776 L1770 682 Z" fill={WOOD} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      {bone && (
         <g transform="translate(1690 682) scale(0.8)">
-          <Pretzel />
+          <Bone />
         </g>
       )}
     </g>
@@ -274,7 +277,7 @@ function StreetTree({ shovel }: { shovel: boolean }) {
   );
 }
 
-/** The dog sits on the pavement and looks hungry; with the pretzel it goes back to its door and wags. */
+/** The dog sits on the pavement and looks hungry; with the bone it goes back to its door and wags. */
 function Dog({ done, here, nope }: SceneryProps) {
   const solved = done.includes("dog");
   return (
@@ -308,7 +311,7 @@ function Dog({ done, here, nope }: SceneryProps) {
               {solved ? (
                 <g transform="translate(-50 -86) scale(0.5)">
                   <g className="tl-chew">
-                    <Pretzel />
+                    <Bone />
                   </g>
                 </g>
               ) : (
@@ -506,7 +509,7 @@ export function BallScenery(props: SceneryProps) {
       <Front x={820} w={190} h={260} wall="#d0ebff" roof="#495057" door={880} />
       <Crossing />
       <TrafficLight {...props} />
-      <Bakery pretzel={!done.includes("pretzel")} />
+      <PetShop bone={!done.includes("bone")} />
       <StreetTree shovel={!done.includes("shovel")} />
       <Front x={2210} w={380} h={300} wall="#e5dbff" roof="#5f3dc4" door={2490} />
       <Dog {...props} />

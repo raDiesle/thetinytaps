@@ -37,6 +37,8 @@ export function groundHeight(x: number, z: number) {
   h += hill * ss(1.5, 2.7, Math.abs(x)) * (1 + 0.08 * Math.sin(x * 0.9) * Math.sin(z * 0.7));
   // The hidden bay behind the hill.
   h -= 2.4 * ss(8.5, 5.5, Math.hypot(x - LAGOON.x, z - LAGOON.y));
+  // A bank across the path in front of Ole's head at the rolling coconuts, nearly as high as Ole's back.
+  h += ROLL_BANK * ss(ROLL_BANK_END - 1.7, ROLL_BANK_END - 1.1, z) * ss(ROLL_BANK_END, ROLL_BANK_END - 0.4, z) * ss(2.4, 1.8, Math.abs(x));
   return h;
 }
 
@@ -123,6 +125,13 @@ export const CRANK_Y = TURTLE_BACK + CRANK_HEIGHT;
 /** How far behind the crank the winch's post stands: beyond Ole's head. */
 export const WINCH_POST = 1.15;
 export const ROLL_Z = 6.6;
+/**
+ * The bank in front of Ole where the coconuts land and roll down at Tapsi: this high, so the camera low
+ * behind Tapsi sees them over Ole's shell all the way; it ends just before Ole's head (z), and the
+ * coconuts hop from its edge over the head onto the shell. It starts behind where Ole stands at the monkeys.
+ */
+export const ROLL_BANK = 0.38;
+export const ROLL_BANK_END = ROLL_Z - 1.6;
 /** How big the rolling coconuts are: small enough to roll under Tapsi's lifted foot and between its feet. */
 export const ROLL_RADIUS = 0.11;
 /** Seconds from when a monkey holds a coconut up until it rolls past Tapsi. */

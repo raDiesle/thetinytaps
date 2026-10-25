@@ -3,6 +3,7 @@ import {
   playBlub,
   playBoing,
   playChatter,
+  playCluck,
   playClonk,
   playCoo,
   playCreak,
@@ -23,15 +24,20 @@ import {
   playQuack,
   playRustle,
   playSneeze,
+  playSniff,
   playSplash,
+  playSquawk,
   playThump,
   playTick,
+  playTrain,
   playTwinkle,
+  playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
 import { BALL_AT, BallBackdrop, BallFront, BallScenery, LADDER, SLIDE, GROUND_Y as STREET_Y } from "./ball";
 import { BALLON_GROUND, BallonBackdrop, BallonScenery, BRIDGE_DIP, DOVE_HOLDS, STAIRS as BALLON_STAIRS } from "./ballon";
 import { DrachenBackdrop, DrachenScenery, GROUND_Y, STAIRS, TOP_Y } from "./drachen";
+import { LOK_AT, LokBackdrop, LokFront, LokScenery, OVER_GROUND, SIGN_OVER, SIGN_THROUGH, StairsSign, TunnelSign, STAIRS as LOK_STAIRS } from "./lok";
 import type { TrailLevel } from "./types";
 
 // The trail levels. Every sentence is only spoken, and only with "Vorlesen": the child can't read,
@@ -190,13 +196,13 @@ const ball: TrailLevel = {
       ask: "Die Ampel ist rot. Wir drücken den Knopf.",
       done: "Grün! Jetzt gehen wir rüber.",
     },
-    { kind: "pickup", id: "pretzel", x: 1600, item: "pretzel", at: [1690, 650], sound: playPop, ask: "Eine Brezel!", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "bone", x: 1600, item: "bone", at: [1690, 676], sound: playPop, ask: "Ein Knochen!", done: "Ab in den Rucksack!" },
     { kind: "pickup", id: "shovel", x: 1900, item: "shovel", at: [2010, 680], sound: playClonk, ask: "Eine Schaufel.", done: "Die nehmen wir mit." },
     {
       kind: "obstacle",
       id: "dog",
       x: 2300,
-      need: "pretzel",
+      need: "bone",
       at: [2420, 636],
       meet: [[100, playBark]],
       sounds: [
@@ -207,7 +213,7 @@ const ball: TrailLevel = {
       ms: 2200,
       nope: playSneeze,
       ask: "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?",
-      done: "Die Brezel! Mmh, lecker.",
+      done: "Der Knochen! Mmh, lecker.",
     },
     {
       kind: "obstacle",
@@ -364,5 +370,146 @@ const ballon: TrailLevel = {
   finale: { to: [4540, -170], ms: 2600, sway: 60, say: "Der Luftballon ist wieder da! Hurra!" },
 };
 
+// G-09: at the hill the way forks – up the stairs and over the top (apple, pony) or through the dark
+// tunnel (lantern); both meet again at the gate of the hen yard.
+const lok: TrailLevel = {
+  id: "lok",
+  title: "Die kleine Lok",
+  goal: "loco",
+  Scenery: LokScenery,
+  Front: LokFront,
+  Backdrop: LokBackdrop,
+  ground: [
+    [-3000, GROUND_Y],
+    [9000, GROUND_Y],
+  ],
+  start: 300,
+  away: {
+    via: [[[450, 740], 350]],
+    to: LOK_AT,
+    ms: 3600,
+    sway: 0,
+    pose: "reach",
+    sounds: [
+      [200, playTrain],
+      [1600, playWhistle],
+    ],
+    say: "Huch! Die Lok fährt allein los. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "carrot", x: 540, item: "carrot", at: [640, 690], sound: playPop, ask: "Eine Karotte!", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "corn", x: 880, item: "corn", at: [970, 690], sound: playRustle, ask: "Ein Maiskolben.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "rabbit",
+      x: 1240,
+      need: "carrot",
+      at: [1340, 690],
+      meet: [[100, playSniff]],
+      sounds: [
+        [300, playMunch],
+        [1000, playMunch],
+        [1700, playMunch],
+      ],
+      ms: 2200,
+      nope: playSneeze,
+      ask: "Der Hase sitzt im Weg. Er hat Hunger. Was geben wir ihm?",
+      done: "Die Karotte! Mmh, lecker.",
+    },
+    {
+      kind: "fork",
+      id: "fork",
+      x: 1560,
+      ask: "Zwei Wege! Die Treppe hoch oder durch den Tunnel?",
+      ways: [
+        {
+          id: "over",
+          Sign: StairsSign,
+          sign: SIGN_OVER,
+          ground: OVER_GROUND,
+          say: "Die Treppe hoch!",
+          stations: [
+            { kind: "climb", id: "stairs", x: 1780, steps: LOK_STAIRS, ask: "Hoch geht's.", done: "Oben! Wie weit man sieht." },
+            { kind: "pickup", id: "apple", x: 2540, item: "apple", at: [2598, 300], sound: playLeaves, ask: "Ein Apfel!", done: "Plopp, in den Rucksack." },
+            {
+              kind: "obstacle",
+              id: "pony",
+              x: 2820,
+              need: "apple",
+              at: [2950, 300],
+              meet: [[100, playNeigh]],
+              sounds: [
+                [300, playMunch],
+                [1000, playMunch],
+                [1700, playNeigh],
+              ],
+              ms: 2400,
+              nope: playBoing,
+              ask: "Das Pony steht im Weg. Es hat Hunger. Was geben wir ihm?",
+              done: "Den Apfel! Danke, Pony.",
+            },
+          ],
+        },
+        {
+          id: "through",
+          Sign: TunnelSign,
+          sign: SIGN_THROUGH,
+          say: "Durch den Tunnel!",
+          stations: [
+            { kind: "pickup", id: "lantern", x: 2260, item: "lantern", at: [2336, 664], sound: playClonk, ask: "Eine Laterne.", done: "Die nehmen wir mit." },
+            {
+              kind: "obstacle",
+              id: "dark",
+              x: 2460,
+              need: "lantern",
+              at: [2580, 660],
+              meet: [[100, playDrops]],
+              sounds: [[0, playTwinkle]],
+              ms: 1500,
+              nope: playBoing,
+              ask: "Im Tunnel ist es ganz dunkel. Was hilft?",
+              done: "Die Laterne! Jetzt ist es hell.",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      kind: "moment",
+      id: "gate",
+      x: 3760,
+      pose: "reach",
+      sounds: [
+        [100, playCreak],
+        [1000, playClonk],
+      ],
+      ms: 1600,
+      ask: "Ein Tor. Wir machen es auf.",
+      done: "Offen!",
+    },
+    {
+      kind: "obstacle",
+      id: "hen",
+      x: 4160,
+      need: "corn",
+      at: [4236, 700],
+      meet: [[100, playCluck]],
+      sounds: [
+        [200, playCluck],
+        [1100, playPeck],
+        [1600, playPeck],
+        [2600, playWhistle],
+      ],
+      ms: 2400,
+      nope: playSquawk,
+      frees: true,
+      ask: "Ein Huhn sitzt auf der Lok! Was geben wir ihm?",
+      done: "Den Mais! Das Huhn pickt.",
+    },
+  ],
+  // Up into the air and back into the hands (they hold it at x 4226, y 662).
+  finale: { via: [[[4260, 330], 1000]], to: [4226, 662], ms: 1000, sway: 0, say: "Die Lok ist wieder da! Tuut, tuut!" },
+};
+
 /** All trail levels, in the order of their cards. */
-export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon];
+export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok];

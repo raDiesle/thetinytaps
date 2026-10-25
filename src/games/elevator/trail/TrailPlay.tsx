@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
@@ -8,9 +8,9 @@ import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, PACK, ThoughtBubble, type Pose } from "../kid";
 import type { ElevatorSettings } from "../settings";
-import { groundY, route } from "./ground";
+import { allStations, groundY, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
-import type { Climb, Cue, Flight, Moment, Obstacle, Pickup, Point, TrailLevel } from "./types";
+import type { Climb, Cue, Flight, Fork, Moment, Obstacle, Pickup, Point, Station, TrailLevel, Way } from "./types";
 import "./trail.css";
 
 const VIEW_W = 1600;
@@ -35,19 +35,66 @@ const HAND_OUT: Point = [72, -128];
 const HAND_UP: Point = [44, -196];
 const PACK_TOP: Point = [-54, -180];
 const PACK_IN: Point = [-51, -96];
+/** The backpack on the child's back while nothing goes in or out (the ghost wears it too). */
+const PACK_SHUT = { open: false, bump: 0 };
 /** Without a tap for so long, the hand pops up again (and while choosing, the right thing glows). */
 const NUDGE_MS = 7000;
 /** From the end of the level until „Nochmal“ and „Weiter“ come. */
 const END_MS = 6000;
-/** The big backpack on the screen holds three things at most, standing side by side in it at these x. */
-const POCKETS = [214, 370, 526];
+/** The backpack on the screen holds three things at most, standing side by side in it. */
+const SLOT_COUNT = 3;
+/** From one thing's middle to the next, and from the frame's left edge to the first. */
+const SLOT_STEP = 150;
+const SLOT_IN = 100;
 /** The upper edge of the backpack's front: the things stand behind it, their bottoms hidden. */
-const RIM = 778;
-/** The action button, in the other bottom corner. */
-const ACTION: Point = [1494, 800];
-/** On a computer a key cap on each front pocket of the backpack and above the action button shows which key does it. */
-const SLOT_KEY_Y = 856;
-const ACTION_KEY_Y = 676;
+const RIM = 808;
+const ACTION_R = 62;
+/** The bag's frame and the button's frame at the bottom of the screen, as high as each other. */
+const HUD_TOP = 704;
+const HUD_H = 188;
+/** On a computer a small key cap under each thing (on its front pocket) and under the action button shows which
+ * key does it. */
+const KEY_Y = 864;
+/** Room kept free between the screen's edge and the frames. */
+const EDGE = 18;
+/** The child's left side on the screen: the action button only goes left of it when it fits there. */
+const KID_LEFT = KID_AT[0] - 80;
+/** The footprints to where the child goes next are this far apart. */
+const PRINT_GAP = 62;
+/** The round picture sign of each way at a fork. */
+const WAY_R = 66;
+
+/** Where the bag and the action button are on the screen, in the picture's units. */
+interface Hud {
+  /** The bag's frame: left, top, width, height. */
+  bagBox: [number, number, number, number];
+  /** Where each thing stands in the backpack: its middle, on the front's upper edge. */
+  slots: Point[];
+  action: Point;
+  actionBox: [number, number, number, number];
+}
+
+/**
+ * Bag and button stay at the screen's edges, not the picture's: on a wide phone the picture leaves room left and
+ * right, so the bag sits at the very left and the button right next to it, where one thumb reaches both and the way
+ * ahead stays free. Where the button would cover the child (a computer, a tablet) it goes to the right corner.
+ * `left` and `right` are the screen's free edges in the picture's units.
+ */
+function layoutHud(left: number, right: number, keys: boolean): Hud {
+  const x0 = left + EDGE;
+  const y = keys ? 784 : HUD_TOP + HUD_H / 2;
+  const slots = Array.from({ length: SLOT_COUNT }, (_, i): Point => [x0 + SLOT_IN + i * SLOT_STEP, RIM]);
+  const bagW = 2 * SLOT_IN + (SLOT_COUNT - 1) * SLOT_STEP;
+  const boxW = 2 * ACTION_R + 44;
+  const beside = x0 + bagW + 26;
+  const boxX = beside + boxW <= KID_LEFT ? beside : right - EDGE - boxW;
+  return {
+    bagBox: [x0, HUD_TOP, bagW, HUD_H],
+    slots,
+    action: [boxX + boxW / 2, y],
+    actionBox: [boxX, HUD_TOP, boxW, HUD_H],
+  };
+}
 
 const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
 
@@ -56,22 +103,52 @@ const natural = (picture: Picture) => 1 / Math.min(CARRY / picture.w, CARRY / pi
 
 /** A thing standing in the open backpack on (0, 0), its bottom behind the front; a long thing (the plank) sticks out slanted. */
 function InPack({ picture }: { picture: Picture }) {
-  if (picture.w > picture.h * 2.5) return <g transform={`rotate(-58) scale(${170 / picture.w})`}>{picture.draw()}</g>;
-  const s = Math.min(138 / picture.w, 128 / picture.h);
-  return <g transform={`translate(0 ${Math.min(28, picture.h * s * 0.28)}) scale(${s})`}>{picture.draw()}</g>;
+  if (picture.w > picture.h * 2.5) return <g transform={`rotate(-58) scale(${150 / picture.w})`}>{picture.draw()}</g>;
+  const s = Math.min(118 / picture.w, 104 / picture.h);
+  return <g transform={`translate(0 ${Math.min(24, picture.h * s * 0.25)}) scale(${s})`}>{picture.draw()}</g>;
 }
 
-/** A key on the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
+/** A small key of the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
 function KeyCap({ x, y, w, on, down, children }: { x: number; y: number; w: number; on: boolean; down: boolean; children: ReactNode }) {
   return (
     <g className={`tl-key${on ? " on" : ""}${down ? " down" : ""}`}>
-      <rect x={x - w / 2} y={y - 22} width={w} height={52} rx="12" className="tl-key-base" />
+      <rect x={x - w / 2} y={y - 14} width={w} height={34} rx="8" className="tl-key-base" />
       <g className="tl-key-top">
-        <rect x={x - w / 2} y={y - 28} width={w} height={50} rx="12" className="tl-key-face" stroke={INK} strokeWidth="4" />
-        <g transform={`translate(${x} ${y - 3})`}>{children}</g>
+        <rect x={x - w / 2} y={y - 18} width={w} height={32} rx="8" className="tl-key-face" stroke={INK} strokeWidth="3" />
+        <g transform={`translate(${x} ${y - 2})`}>{children}</g>
       </g>
     </g>
   );
+}
+
+/** What the next tap does: the child walks along the footprints to its pale ghost and does what the ghost does
+ * there; the button shows the thing it gets there, or feet or stairs. */
+interface Next {
+  prints: Point[];
+  ghost: Point;
+  pose: Pose;
+  icon: ItemId | "walk" | "climb";
+}
+
+/** The picture on the action button for what the next tap does. */
+function NextIcon({ icon }: { icon: Next["icon"] }) {
+  if (icon === "climb")
+    return <path d="M-30 26 H-12 V8 H6 V-10 H24 V-28" fill="none" stroke={INK} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />;
+  if (icon === "walk")
+    return (
+      <g fill="#fff" stroke={INK} strokeWidth="4">
+        {[
+          [-13, 8, -12],
+          [13, -8, 12],
+        ].map(([x, y, turn]) => (
+          <g key={x} transform={`translate(${x} ${y}) rotate(${turn})`}>
+            <ellipse cy="-6" rx="10" ry="15" fill="#4263eb" />
+            <ellipse cy="16" rx="8" ry="7" fill="#4263eb" />
+          </g>
+        ))}
+      </g>
+    );
+  return <Fitted picture={ITEMS[icon]} width={70} />;
 }
 
 interface KidState {
@@ -108,10 +185,12 @@ interface View {
   hint: ItemId | null;
   /** Bumped to bounce the slots. */
   shake: number;
-  /** Where the hand points, in the world; `n` makes it pop up anew. */
-  action: { nudge: number } | null;
+  /** The action button waits for a tap; `nudge` makes it jump anew, `next` shows what the tap will do. */
+  action: { nudge: number; next: Next } | null;
   /** The thought bubble with the goal; `nudge` counts the reminders. */
   bubble: { nudge: number } | null;
+  /** At a fork: the child picks a way by its sign; each shows where it goes first. `nudge` makes the signs hop. */
+  fork: { id: string; ways: Next[]; nudge: number } | null;
   party: boolean;
 }
 
@@ -123,7 +202,7 @@ const startView = (level: TrailLevel): View => ({
   leaving: null,
   bagBump: 0,
   carry: null,
-  pack: { open: false, bump: 0 },
+  pack: PACK_SHUT,
   done: [],
   here: null,
   nope: null,
@@ -132,6 +211,7 @@ const startView = (level: TrailLevel): View => ({
   shake: 0,
   action: null,
   bubble: null,
+  fork: null,
   party: false,
 });
 
@@ -151,6 +231,30 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   /** The key held down right now, so its cap on the screen goes down too. */
   const [held, setHeld] = useState<string | null>(null);
 
+  // The screen's free edges (without a notch) in the picture's units, measured whenever the screen turns or resizes.
+  const playEl = useRef<HTMLDivElement>(null);
+  const svgEl = useRef<SVGSVGElement>(null);
+  const safeEl = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState<[number, number]>([0, VIEW_W]);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const box = svgEl.current?.getBoundingClientRect();
+      const free = safeEl.current?.getBoundingClientRect();
+      if (!box || !free) return;
+      const scale = Math.min(box.width / VIEW_W, box.height / VIEW_H);
+      if (!scale) return;
+      const toView = (px: number) => VIEW_W / 2 + (px - box.left - box.width / 2) / scale;
+      setEdges([Math.round(toView(free.left)), Math.round(toView(free.right))]);
+    };
+    measure();
+    const watch = new ResizeObserver(measure);
+    if (playEl.current) watch.observe(playEl.current);
+    return () => watch.disconnect();
+  }, []);
+  /** Where bag and button are now; the script reads it when a thing flies to or from the bag. */
+  const hud = useRef<Hud>(layoutHud(0, VIEW_W, !touchOnly));
+  hud.current = layoutHud(edges[0], edges[1], !touchOnly);
+
   // The level is a script of waits; leaving bumps the generation and drops its timers.
   const generation = useRef(0);
   const timers = useRef(new Set<number>());
@@ -158,6 +262,10 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const tapper = useRef<(() => void) | null>(null);
   /** Set while the bag is open: it gets the slot. */
   const chooser = useRef<((slot: number) => void) | null>(null);
+  /** Set at a fork while the child picks a way: it gets the way's number. */
+  const picker = useRef<((way: number) => void) | null>(null);
+  /** The ground the child walks on: the level's, and from a fork on the picked way's. */
+  const ground = useRef(level.ground);
 
   // The goal (the kite, the ball, the balloon) moves along curves, so it is moved frame by frame, not by React.
   const goalEl = useRef<SVGGElement>(null);
@@ -258,7 +366,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   /** Walks the child along the ground to `x`; the world scrolls along. */
   const walkTo = async (x: number) => {
-    for (const [px, py] of route(level.ground, viewRef.current.kid.x, x)) {
+    for (const [px, py] of route(ground.current, viewRef.current.kid.x, x)) {
       const k = viewRef.current.kid;
       const ms = Math.hypot(px - k.x, py - k.y) * WALK_MS;
       if (ms < 1) continue;
@@ -359,13 +467,37 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     }
   };
 
-  /** The action button lights up until the child taps (it, anywhere, or any key); after a while it jumps again and
-   * the bubble reminds the child of the goal. Nothing in the picture is pointed at. */
-  const go = async () => {
-    put({ action: { nudge: 0 } });
+  /** Footprints along `on` (the ground) from the child to `x`, then one on each of `steps`. */
+  const printsTo = (x: number, steps: Point[] = [], on = ground.current): Point[] => {
+    const prints: Point[] = [];
+    for (let px = viewRef.current.kid.x + PRINT_GAP; px < x - PRINT_GAP / 2; px += PRINT_GAP) prints.push([px, groundY(on, px)]);
+    return [...prints, ...steps];
+  };
+
+  /** Walking on to `x` and doing `pose` there, shown before the tap. */
+  const nextAt = (x: number, pose: Pose, icon: Next["icon"], on = ground.current): Next => ({
+    prints: printsTo(x, [], on),
+    ghost: [x, groundY(on, x)],
+    pose,
+    icon,
+  });
+
+  /** What the first tap at `station` does: for stairs, walking there and up the first half of the steps. */
+  const nextOf = (station: Station, on = ground.current): Next => {
+    if (station.kind === "pickup") return nextAt(station.x, "take", station.item, on);
+    if (station.kind === "moment") return nextAt(station.x, station.pose, "walk", on);
+    if (station.kind === "obstacle") return nextAt(station.x, "stand", "walk", on);
+    const half = station.steps.slice(0, Math.ceil(station.steps.length / 2));
+    return { prints: printsTo(station.x, half, on), ghost: half[half.length - 1], pose: "stand", icon: "climb" };
+  };
+
+  /** The action button lights up until the child taps (it, anywhere, or any key), and footprints and the child's
+   * ghost show where the tap takes it; after a while it jumps again and the bubble reminds the child of the goal. */
+  const go = async (next: Next) => {
+    put({ action: { nudge: 0, next } });
     let stop = () => {};
     const nudge = () => {
-      put((v) => ({ action: v.action && { nudge: v.action.nudge + 1 }, bubble: v.bubble ? { nudge: v.bubble.nudge + 1 } : { nudge: 0 } }));
+      put((v) => ({ action: v.action && { ...v.action, nudge: v.action.nudge + 1 }, bubble: v.bubble ? { nudge: v.bubble.nudge + 1 } : { nudge: 0 } }));
       stop = later(NUDGE_MS, nudge);
     };
     stop = later(NUDGE_MS, nudge);
@@ -374,8 +506,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     put({ action: null, bubble: null });
   };
 
-  const pickup = async (station: Pickup) => {
-    await go();
+  // Each station starts with a tap that walks there, unless the child already tapped its way at a fork (`picked`).
+  const pickup = async (station: Pickup, picked: boolean) => {
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     say(station.ask);
     // The child takes the thing, holds it up high and puts it into the backpack.
@@ -391,8 +524,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   const nextChoice = () => new Promise<number>((resolve) => (chooser.current = resolve));
 
-  const obstacle = async (station: Obstacle) => {
-    await go();
+  const obstacle = async (station: Obstacle, picked: boolean) => {
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     put({ here: station.id, choosing: true, shake: viewRef.current.shake + 1 });
     cue(station.meet);
@@ -439,13 +572,14 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   };
 
   /** Two taps: the first walks to the stairs and climbs half of them, the second the rest; a note per step. */
-  const climb = async (station: Climb) => {
-    await go();
+  const climb = async (station: Climb, picked: boolean) => {
+    const half = Math.ceil(station.steps.length / 2);
+    const { steps } = station;
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     say(station.ask);
-    const half = Math.ceil(station.steps.length / 2);
-    for (const [i, [x, y]] of station.steps.entries()) {
-      if (i === half) await go();
+    for (const [i, [x, y]] of steps.entries()) {
+      if (i === half) await go({ prints: steps.slice(half), ghost: steps[steps.length - 1], pose: "stand", icon: "climb" });
       kid({ x, y, walk: STEP_MS, pose: "walk" });
       sound(() => playCountNote(i));
       await wait(STEP_MS);
@@ -470,8 +604,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   };
 
   /** The child gets there and something happens by itself (the light turns green); the walk was the tap. */
-  const moment = async (station: Moment) => {
-    await go();
+  const moment = async (station: Moment, picked: boolean) => {
+    if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     put({ here: station.id });
     kid({ pose: station.pose });
@@ -485,6 +619,36 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     say(station.done);
     await wait(900);
     kid({ pose: "stand" });
+  };
+
+  const station = (s: Station, picked = false) => {
+    if (s.kind === "pickup") return pickup(s, picked);
+    if (s.kind === "obstacle") return obstacle(s, picked);
+    if (s.kind === "moment") return moment(s, picked);
+    return climb(s, picked);
+  };
+
+  /** Two ways: the child walks to the fork, then both ways show where they go first (footprints to a ghost each)
+   * and the child taps a sign (or 1 / 2). The picked way's stations follow, starting right away. */
+  const fork = async (at: Fork) => {
+    await go(nextAt(at.x, "stand", "walk"));
+    await walkTo(at.x);
+    put({ here: at.id, fork: { id: at.id, ways: at.ways.map((way) => nextOf(way.stations[0], way.ground ?? ground.current)), nudge: 0 } });
+    say(at.ask);
+    let stop = () => {};
+    const nudge = () => {
+      put((v) => ({ fork: v.fork && { ...v.fork, nudge: v.fork.nudge + 1 } }));
+      say(at.ask);
+      stop = later(NUDGE_MS, nudge);
+    };
+    stop = later(NUDGE_MS, nudge);
+    const way: Way = at.ways[await new Promise<number>((resolve) => (picker.current = resolve))];
+    stop();
+    put((v) => ({ fork: null, here: null, done: [...v.done, at.id, way.id] }));
+    if (way.ground) ground.current = way.ground;
+    sound(playPop);
+    say(way.say);
+    for (const [i, s] of way.stations.entries()) await station(s, i === 0);
   };
 
   const funBurst = useCallback(
@@ -508,12 +672,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     say(level.away.say);
     await wait(1800);
     put({ bubble: null });
-    for (const station of level.stations) {
-      if (station.kind === "pickup") await pickup(station);
-      else if (station.kind === "obstacle") await obstacle(station);
-      else if (station.kind === "moment") await moment(station);
-      else await climb(station);
-    }
+    for (const s of level.stations) await (s.kind === "fork" ? fork(s) : station(s));
     // The goal is back in the child's hands: up it goes.
     put({ party: true });
     sound(playMelody);
@@ -543,10 +702,25 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     } else funBurst(e.clientX, e.clientY);
   };
 
-  /** While the bag is open, a tap elsewhere or another key shows which thing helps. */
+  /** While the bag is open, a tap elsewhere or another key shows which thing helps; at a fork the signs hop. */
   const showHint = () => {
-    const station = level.stations.find((s) => s.id === viewRef.current.here);
-    if (station?.kind === "obstacle") put((v) => ({ hint: station.need, shake: v.shake + 1 }));
+    if (viewRef.current.fork) return put((v) => ({ fork: v.fork && { ...v.fork, nudge: v.fork.nudge + 1 } }));
+    const here = allStations(level).find((s) => s.id === viewRef.current.here);
+    if (here?.kind === "obstacle") put((v) => ({ hint: here.need, shake: v.shake + 1 }));
+  };
+
+  /** A way was picked at a fork: by its sign, its ghost, or the key 1 / 2. */
+  const pickWay = (way: number) => {
+    const pick = picker.current;
+    picker.current = null;
+    pick?.(way);
+  };
+
+  const pressWay = (way: number) => (e: PointerEvent) => {
+    if (!picker.current) return;
+    e.stopPropagation();
+    spawn(e.clientX, e.clientY);
+    pickWay(way);
   };
 
   const tapKid = (e: PointerEvent) => {
@@ -571,13 +745,15 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         return;
       }
       if (tapper.current) return tap();
+      const way = Number(e.key) - 1;
+      if (picker.current && (way === 0 || way === 1)) return pickWay(way);
       const pick = chooser.current;
       const slot = Number(e.key) - 1;
-      if (pick && slot >= 0 && slot < POCKETS.length && v.bag[slot]) {
+      if (pick && slot >= 0 && slot < SLOT_COUNT && v.bag[slot]) {
         chooser.current = null;
         pick(slot);
       } else {
-        if (pick) showHint();
+        if (pick || picker.current) showHint();
         funBurst();
       }
     };
@@ -592,6 +768,12 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   const { kid: k } = view;
   const carry = view.carry && <Fitted picture={ITEMS[view.carry]} width={CARRY} />;
+  const next = view.action?.next;
+  /** Where the next tap may take the child: one way, or both at a fork. */
+  const shown = next ? [next] : (view.fork?.ways ?? []);
+  const forks = level.stations.filter((s): s is Fork => s.kind === "fork");
+  const { bagBox, slots, action, actionBox } = hud.current;
+  const [bx, , bw] = bagBox;
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
   const { Scenery, Front, Backdrop } = level;
@@ -603,17 +785,19 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   return (
     <div
+      ref={playEl}
       className="tl-play"
       onPointerDown={(e) => {
         if (tapper.current) {
           spawn(e.clientX, e.clientY);
           return tap();
         }
-        if (chooser.current) showHint();
+        if (chooser.current || picker.current) showHint();
         funBurst(e.clientX, e.clientY);
       }}
     >
-      <svg className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
+      <div ref={safeEl} className="tl-safe" />
+      <svg ref={svgEl} className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
         <g className="tl-pan" style={pan(FAR)}>
           <Backdrop />
         </g>
@@ -626,6 +810,48 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             </g>
           </g>
           {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
+          {shown.map((n, w) => (
+            <g key={`${n.ghost}`} className="tl-next">
+              {n.prints.map(([x, y], i) => (
+                <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
+              ))}
+              <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} onPointerDown={pressWay(w)}>
+                <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
+                  <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} backpack={PACK_SHUT} />
+                </g>
+              </g>
+            </g>
+          ))}
+          {/* The picture signs of the ways at a fork: always there; while the child picks a way they hop and glow */}
+          {forks.flatMap((f) =>
+            f.ways.map(({ id, Sign, sign: [x, y] }, w) => {
+              const on = view.fork?.id === f.id;
+              return (
+                <g
+                  key={`${id}-${on ? view.fork?.nudge : "off"}`}
+                  className={`tl-way${on ? " on" : ""}`}
+                  onPointerDown={pressWay(w)}
+                  role="button"
+                  aria-label={id}
+                >
+                  <g className="tl-way-board" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${w * 120}ms` }}>
+                    <circle cx={x} cy={y} r={WAY_R + 12} className="tl-way-glow" fill="none" strokeWidth="14" />
+                    <circle cx={x} cy={y} r={WAY_R} className="tl-way-face" stroke={INK} strokeWidth="6" />
+                    <g transform={`translate(${x} ${y})`}>
+                      <Sign />
+                    </g>
+                  </g>
+                  {on && !touchOnly && (
+                    <KeyCap x={x} y={y + WAY_R + 40} w={40} on down={held === `${w + 1}`}>
+                      <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
+                        {w + 1}
+                      </text>
+                    </KeyCap>
+                  )}
+                </g>
+              );
+            }),
+          )}
           <g ref={carryBack} className="tl-carry">
             {carry}
           </g>
@@ -640,27 +866,49 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
           </g>
         </g>
 
-        <ActionButton waiting={!!view.action} nudge={view.action?.nudge ?? 0} x={ACTION[0]} y={ACTION[1]} r={70} />
+        <ActionButton
+          waiting={!!view.action}
+          nudge={view.action?.nudge ?? 0}
+          x={action[0]}
+          y={action[1]}
+          r={ACTION_R}
+          box={actionBox}
+          picture={next && <NextIcon icon={next.icon} />}
+        />
         {!touchOnly && (
-          <KeyCap x={ACTION[0]} y={ACTION_KEY_Y} w={200} on={!!view.action} down={held === " "}>
-            <path d="M-34 -8 V8 H34 V-8" fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+          <KeyCap x={action[0]} y={KEY_Y} w={110} on={!!view.action} down={held === " "}>
+            <path d="M-24 -5 V5 H24 V-5" fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
           </KeyCap>
         )}
-        {/* The backpack again, big and open in the bottom corner: the things in it stand side by side. */}
+        {/* The child's backpack again, big and open in its frame at the bottom left: the things in it stand side by side */}
         <g className={`tl-bag${view.choosing ? " open" : ""}`}>
-          <g key={view.bagBump} className={view.bagBump ? "tl-bag-bump" : undefined} style={{ transformOrigin: "370px 900px" }}>
+          <rect x={bx + 8} y={bagBox[1] + 8} width={bw} height={bagBox[3]} rx="36" className="tl-bag-shadow" />
+          <rect x={bx} y={bagBox[1]} width={bw} height={bagBox[3]} rx="36" className="tl-bag-box" strokeWidth="6" />
+          <g key={view.bagBump} className={view.bagBump ? "tl-bag-bump" : undefined} style={{ transformOrigin: `${bx + bw / 2}px 888px` }}>
             {/* The lid folded back, the straps at the sides and the inside, all behind the things */}
-            <path d="M150 746 Q146 690 210 686 H530 Q594 690 590 746 Z" fill={PACK.lining} stroke={INK} strokeWidth="6" strokeLinejoin="round" />
-            <path d="M190 700 H550" stroke={PACK.dark} strokeWidth="4" strokeDasharray="10 8" opacity="0.6" />
             <path
-              d="M124 796 Q66 800 70 852 Q74 892 118 886 M616 796 Q674 800 670 852 Q666 892 622 886"
+              d={`M${bx + 62} 784 Q${bx + 58} 734 ${bx + 116} 730 H${bx + bw - 116} Q${bx + bw - 58} 734 ${bx + bw - 62} 784 Z`}
+              fill={PACK.lining}
+              stroke={INK}
+              strokeWidth="6"
+              strokeLinejoin="round"
+            />
+            <path d={`M${bx + 96} 744 H${bx + bw - 96}`} stroke={PACK.dark} strokeWidth="4" strokeDasharray="10 8" opacity="0.6" />
+            <path
+              d={`M${bx + 40} 822 Q${bx + 12} 830 ${bx + 16} 856 Q${bx + 20} 880 ${bx + 40} 876 M${bx + bw - 40} 822 Q${bx + bw - 12} 830 ${bx + bw - 16} 856 Q${bx + bw - 20} 880 ${bx + bw - 40} 876`}
               stroke={PACK.dark}
-              strokeWidth="18"
+              strokeWidth="14"
               strokeLinecap="round"
               fill="none"
             />
-            <path d="M104 782 Q104 744 144 742 H596 Q636 744 636 782 Z" fill={PACK.inside} stroke={INK} strokeWidth="6" strokeLinejoin="round" />
-            {POCKETS.map((x, i) => {
+            <path
+              d={`M${bx + 42} ${RIM + 4} Q${bx + 42} 778 ${bx + 76} 776 H${bx + bw - 76} Q${bx + bw - 42} 778 ${bx + bw - 42} ${RIM + 4} Z`}
+              fill={PACK.inside}
+              stroke={INK}
+              strokeWidth="6"
+              strokeLinejoin="round"
+            />
+            {slots.map(([x, y], i) => {
               const item = view.bag[i];
               if (!item) return null;
               const moving = view.entering === i ? " in" : view.leaving === i ? " out" : "";
@@ -668,11 +916,11 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
                 <g
                   key={`${i}-${view.shake}`}
                   className={`tl-slot${item === view.hint ? " hint" : ""}`}
-                  style={{ transformOrigin: `${x}px ${RIM}px`, animationDelay: `${i * 80}ms` }}
+                  style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${i * 80}ms` }}
                 >
-                  <g transform={`translate(${x} ${RIM})`}>
+                  <g transform={`translate(${x} ${y})`}>
                     <g key={item} className={`tl-thing${moving}`}>
-                      <ellipse className="tl-glow" cx="0" cy="-56" rx="78" ry="74" />
+                      <ellipse className="tl-glow" cx="0" cy="-48" rx="70" ry="64" />
                       <InPack picture={ITEMS[item]} />
                     </g>
                   </g>
@@ -681,22 +929,24 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             })}
             {/* The front with a pocket under each thing: its number key on a computer, a buckle on a tablet */}
             <path
-              d="M92 778 H648 Q660 778 658 798 L650 878 Q646 902 616 902 H124 Q94 902 90 878 L82 798 Q80 778 92 778 Z"
+              d={`M${bx + 34} ${RIM} H${bx + bw - 34} Q${bx + bw - 24} ${RIM} ${bx + bw - 26} ${RIM + 18} L${bx + bw - 32} 872 Q${bx + bw - 36} 888 ${bx + bw - 60} 888 H${bx + 60} Q${bx + 36} 888 ${bx + 32} 872 L${bx + 26} ${RIM + 18} Q${bx + 24} ${RIM} ${bx + 34} ${RIM} Z`}
               fill={PACK.body}
               stroke={INK}
               strokeWidth="6"
               strokeLinejoin="round"
             />
-            <path d="M98 792 H642" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
-            {POCKETS.map((x, i) => (
+            <path d={`M${bx + 40} ${RIM + 12} H${bx + bw - 40}`} stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
+            {slots.map(([x], i) => (
               <g key={x}>
-                <rect x={x - 50} y="814" width="100" height="74" rx="16" fill={PACK.pocket} stroke={INK} strokeWidth="4" />
-                <path d={`M${x - 50} 840 Q${x} 852 ${x + 50} 840`} stroke={INK} strokeWidth="3" fill="none" opacity="0.5" />
+                <rect x={x - 44} y="828" width="88" height="54" rx="14" fill={PACK.pocket} stroke={INK} strokeWidth="4" />
                 {touchOnly ? (
-                  <rect x={x - 11} y="836" width="22" height="20" rx="4" fill={PACK.buckle} stroke={INK} strokeWidth="3" />
+                  <>
+                    <path d={`M${x - 44} 846 Q${x} 856 ${x + 44} 846`} stroke={INK} strokeWidth="3" fill="none" opacity="0.5" />
+                    <rect x={x - 11} y="842" width="22" height="18" rx="4" fill={PACK.buckle} stroke={INK} strokeWidth="3" />
+                  </>
                 ) : (
-                  <KeyCap x={x} y={SLOT_KEY_Y} w={58} on={view.choosing && !!view.bag[i]} down={held === `${i + 1}`}>
-                    <text y="15" textAnchor="middle" fontSize="40" fontWeight="800" fontFamily="inherit" fill={INK}>
+                  <KeyCap x={x} y={KEY_Y} w={40} on={view.choosing && !!view.bag[i]} down={held === `${i + 1}`}>
+                    <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
                       {i + 1}
                     </text>
                   </KeyCap>
@@ -705,13 +955,13 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             ))}
           </g>
           {/* What a tap hits: a thing with its pocket below it */}
-          {POCKETS.map((x, i) => (
+          {slots.map(([x], i) => (
             <rect
               key={x}
-              x={x - 78}
-              y="620"
-              width="156"
-              height="280"
+              x={x - SLOT_STEP / 2}
+              y={bagBox[1] - 60}
+              width={SLOT_STEP}
+              height={bagBox[3] + 60}
               fill="transparent"
               onPointerDown={pressSlot(i)}
               role="button"

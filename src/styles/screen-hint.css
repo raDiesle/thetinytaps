@@ -1,0 +1,102 @@
+/* ---------- Phones and tablets: "Bitte quer halten" and the fullscreen question ---------- */
+
+.screen-hint {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom));
+  background: linear-gradient(var(--sky-top), var(--sky-bottom));
+  text-align: center;
+}
+
+.screen-hint-phone {
+  width: min(55vw, 220px);
+  height: auto;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.screen-hint-phone rect {
+  fill: #fff;
+}
+
+.screen-hint-phone circle {
+  fill: var(--ink);
+  stroke: none;
+}
+
+.screen-hint-arrow {
+  stroke: var(--accent);
+}
+
+/* The phone turns on its side, the way the arrow points, three times and then stays there: no endless motion. */
+.screen-hint-turn {
+  transform-box: view-box;
+  transform-origin: 60px 68px;
+  animation: screen-hint-turn 2.4s ease-in-out 3 forwards;
+}
+
+@keyframes screen-hint-turn {
+  0%,
+  25% {
+    rotate: 0deg;
+  }
+  65%,
+  100% {
+    rotate: 90deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-hint-turn {
+    animation: none;
+    rotate: 90deg;
+  }
+}
+
+.screen-hint-title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.screen-hint-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.screen-hint-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 8px 28px;
+  border: var(--outline);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: inherit;
+  font: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  box-shadow: 0 5px 0 var(--ink);
+  cursor: pointer;
+}
+
+.screen-hint-button.secondary {
+  background: #fff;
+}
+
+.screen-hint-button:active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 var(--ink);
+}

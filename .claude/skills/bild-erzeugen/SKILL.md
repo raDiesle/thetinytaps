@@ -22,7 +22,8 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
   these simple pictures, also for second frames with `--ref`). `--model` or
   `GEMINI_IMAGE_MODEL` switches, e.g. `gemini-3.1-flash-image` (Nano Banana 2, $0.067)
   or `gemini-3-pro-image` (Nano Banana Pro, $0.134) only for hard scenes with many
-  characters – ask the user first. `gemini-2.5-flash-image` is switched off. List the models the key can use:
+  characters – ask the user first. Keep costs low, but only where the saving doesn't show
+  in the picture. `gemini-2.5-flash-image` is switched off. List the models the key can use:
   `curl -s -H "x-goog-api-key: $GEMINI_API_KEY" https://generativelanguage.googleapis.com/v1beta/models`
 - The key must be **exported** (`export GEMINI_API_KEY=…` in `~/.zshrc`); if the shell
   of this session started before, run `zsh -ic 'export GEMINI_API_KEY; yarn image …'`.

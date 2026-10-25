@@ -182,3 +182,34 @@ export function playWash() {
   note({ from: 70, to: 160, duration: 2.2, type: "sawtooth", volume: 0.07, lowpass: 400 });
   hiss({ from: 900, to: 2400, duration: 0.8, volume: 0.14, delay: 1.5, q: 1.2 });
 }
+
+/** "Wäää, wäää!" – a small child crying: three sobbing wails that fall, a quick breath in between. */
+export function playCry() {
+  [0, 0.62, 1.24].forEach((delay, i) => {
+    const top = 640 - i * 30;
+    note({ from: top, to: top * 0.72, duration: 0.5, type: "sawtooth", volume: 0.1, lowpass: 1500, delay });
+    note({ from: top * 2, to: top * 1.44, duration: 0.5, type: "triangle", volume: 0.05, delay });
+    hiss({ from: 1600, to: 2400, duration: 0.1, volume: 0.06, delay: delay + 0.5, q: 1.5 });
+  });
+}
+
+/** "Hahaha!" – a child laughing: bright little bursts that hop down, a little different every time. */
+export function playLaugh() {
+  const base = 560 + Math.random() * 80;
+  [0, 0.15, 0.3, 0.45, 0.62].forEach((delay, i) => {
+    const pitch = base * (1 - i * 0.05);
+    note({ from: pitch * 1.15, to: pitch, duration: 0.11, type: "sawtooth", volume: 0.09, lowpass: 2200, delay });
+    note({ from: pitch * 2.3, to: pitch * 2, duration: 0.11, type: "triangle", volume: 0.05, delay });
+    hiss({ from: 2000, duration: 0.07, volume: 0.04, delay: delay + 0.02, q: 1 });
+  });
+}
+
+/** "Krach!" – something breaks: a hard bang, then pieces clattering down. */
+export function playCrash() {
+  note({ from: 160, to: 45, duration: 0.35, type: "sine", volume: 0.45 });
+  hiss({ from: 2600, to: 600, duration: 0.45, volume: 0.35, q: 0.5 });
+  [0.12, 0.2, 0.31, 0.38, 0.5, 0.63].forEach((delay, i) => {
+    const pitch = 900 + ((i * 377) % 700);
+    note({ from: pitch, to: pitch * 0.6, duration: 0.07, type: "triangle", volume: 0.18, delay });
+  });
+}

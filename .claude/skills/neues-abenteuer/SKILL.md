@@ -84,6 +84,12 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
 - **`moment`** – something that happens by itself when the child gets there, no bag:
   `pose` (what the child does), `sounds` + `ms`; then it is `done`. Ball: the child
   presses the button at the traffic light and it turns green.
+- **`fork`** – two `ways` that both lead on (G-09, „Die kleine Lok“): each way has an
+  `id`, a `Sign` picture (stairs, a tunnel) shown on a round sign at `sign`, a spoken
+  `say`, its own `stations`, and optionally its own `ground` (with its stairs) that must
+  be the level's ground before the fork and after the way. The child taps a sign or 1 / 2;
+  the level draws only the signpost. Put the first station of each way within ~800
+  points of the fork, so both ghosts are on the screen. Ways contain no further forks.
 
 The world drawing (`drachen.tsx`) exports the ground constants, `<Level>Scenery` and
 `<Level>Backdrop`. `Scenery` gets `{ done, here, nope }` and draws every station from
@@ -148,10 +154,17 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
   buttons. `title` is for the parents' start screen only.
 - **German speech only**, and only with „Vorlesen“ on: `ask`, `done`, `away.say`,
   `finale.say`. Short words, present tense.
-- **Nothing is pointed at.** No arrows, frames or hands on things in the world; the
-  bag's right thing glows, and the thought bubble shows the goal.
-- **One fixed action button**, bottom right, the same in every level (drawn by
-  `TrailPlay`). Don't add buttons, and no other way to leave than `GameShell`'s.
+- **Nothing is pointed at** beyond what `TrailPlay` shows by itself: before each tap
+  yellow footprints lead to the child's pale ghost, standing where the tap takes it and
+  doing what it will do there, and the button shows the thing it gets (or feet, or
+  stairs). No extra arrows, frames or hands; the bag's right thing glows, the thought
+  bubble shows the goal.
+- **One action button**, the same in every level (drawn by `TrailPlay`, framed, next to
+  the bag on wide phones, bottom right otherwise). Don't add buttons, and no other way
+  to leave than `GameShell`'s.
+- **Things fit together.** What an animal wants is what it really eats or plays with
+  (a dog a bone or a ball, a horse a carrot, ducks bread), and a thing comes from a
+  place where it belongs (the bone from the pet shop, not a pretzel from the bakery).
 - **Things stand out from their background**: a colour that differs from the grass,
   wall or wood behind it, and a dark `INK` outline – no green thing on the meadow, no
   brown plank on the brown shed.

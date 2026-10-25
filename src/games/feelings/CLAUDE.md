@@ -33,9 +33,23 @@ chooses: at home one card before the three comforts (`Feeling.instead`), in the
 kindergarten one before each step (`KitaStep.instead`). The order is fixed: the
 not-so-good idea always first (left), then the good ones, the most fitting first
 (`Feeling.comforts` is in that order; a key press does them in that order too).
-Tapped, the not-so-good idea shows big with a red cross while the answer says why,
-and stays crossed out. In the kindergarten the left arrow picks it; every other
-key does the good thing.
+Choosing takes two taps: the first grows the card into the big picture's place
+(yellow ring, the card lifted), so the child sees once more what it picked; the
+second – on that card or the big picture – chooses it. Tapping the other card shows
+that one instead. Keys do the same: the first press shows, the second chooses.
+Only then comes the answer, seen and heard (`cheer`/`oops` in `shared.tsx`): the
+good idea gets a green frame that hops, stars and a laugh („Juhu!“ when speech is
+on), then the bear does it; the not-so-good one a red frame that shakes and what it
+leads to – crying, or a crash when something breaks (`breaks: true`) – not an error
+sound, while the answer says why; its card stays crossed out. Ticks and crosses sit
+on the corner, half outside, so the picture stays to be seen. The sounds are
+synthesized (`playCry`, `playCrash`, `playLaugh`) and become real recordings once
+`cry.mp3`, `crash.mp3`, `laugh.mp3` are in `src/lib/sounds/`. In the kindergarten
+the left arrow picks the not-so-good idea; every other key the good thing.
+
+The big picture of the story is a framed photo – white mat, soft shadow – and turns
+pale a moment after the child has to choose, so it never looks like one of the
+cards (which have the yellow ring and stand out like buttons).
 
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
@@ -46,12 +60,15 @@ with a green tick or red cross, so children can choose without reading; „Nochm
 and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
 `story.ts`.
 
-While the child has to choose, `.story-play` has the class `choosing`: the cards
-are big and the picture above makes room (it takes what is left of the height);
-when the bear acts, the cards shrink back and the picture grows again (widths
-transition). In the kindergarten the two cards are bigger than the picture then –
-one above the other on upright phones, side by side next to the picture on phones
-lying on their side. At home the four cards stay in one row.
+The big picture and the cards keep one size for the whole story – nothing grows or
+shrinks when the child has to choose, and a new picture only fades in where the last
+one was (things changing size confuse small children). `feelings.css` works the room
+for the cards out from the screen alone (cq units of `.story-play`), the picture takes
+all that is left. Upright: the picture as wide as the screen on top, the cards below –
+in the kindergarten side by side, on tall phones one above the other; at home two by
+two. Wide screens: the picture left, the cards right – in the kindergarten one above
+the other, on low phones side by side; at home two by two. The small cards of the happy
+end and the round buttons fit into the same room.
 
 Under every picture, big or card, a short caption says what it shows – for
 grown-ups, to tell the story and give feedback on the pictures; the child chooses
