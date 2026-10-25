@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
+import { useDevice } from "@/lib/device";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { cardForKey, StoryCards } from "../cards";
@@ -37,6 +38,22 @@ const SLOTS: Point[] = [
 const SLOT_R = 74;
 /** The action button, in the other bottom corner. */
 const ACTION: Point = [1494, 800];
+/** On a computer a key cap above each slot and above the action button shows which key does it. */
+const SLOT_KEY_Y = 712;
+const ACTION_KEY_Y = 676;
+
+/** A key on the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
+function KeyCap({ x, y, w, on, down, children }: { x: number; y: number; w: number; on: boolean; down: boolean; children: ReactNode }) {
+  return (
+    <g className={`tl-key${on ? " on" : ""}${down ? " down" : ""}`}>
+      <rect x={x - w / 2} y={y - 22} width={w} height={52} rx="12" className="tl-key-base" />
+      <g className="tl-key-top">
+        <rect x={x - w / 2} y={y - 28} width={w} height={50} rx="12" className="tl-key-face" stroke={INK} strokeWidth="4" />
+        <g transform={`translate(${x} ${y - 3})`}>{children}</g>
+      </g>
+    </g>
+  );
+}
 
 interface KidState {
   x: number;
@@ -98,6 +115,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const [view, setView] = useState<View>(() => startView(level));
   const viewRef = useRef<View>(view);
   const { bursts, spawn } = useBursts();
+  const { touchOnly } = useDevice();
+  /** The key held down right now, so its cap on the screen goes down too. */
+  const [held, setHeld] = useState<string | null>(null);
 
   // The level is a script of waits; leaving bumps the generation and drops its timers.
   const generation = useRef(0);
@@ -386,10 +406,12 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     sound(playGiggle);
   };
 
-  // Any key goes on when the hand shows; 1–3 take a thing out of the open bag; 1–4 pick a card at the end.
+  // Any key goes on when the action button lights up (the space bar is the one shown on it); 1–3 take a thing out
+  // of the open bag; 1–4 pick a card at the end.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
+      setHeld(e.key);
       const v = viewRef.current;
       if (v.picking) {
         const card = cardForKey(e.key);
@@ -408,8 +430,13 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         funBurst();
       }
     };
+    const onKeyUp = () => setHeld(null);
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+    };
   });
 
   const { kid: k, flight } = view;
@@ -455,6 +482,11 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         </g>
 
         <ActionButton waiting={!!view.action} nudge={view.action?.nudge ?? 0} x={ACTION[0]} y={ACTION[1]} r={70} />
+        {!touchOnly && (
+          <KeyCap x={ACTION[0]} y={ACTION_KEY_Y} w={200} on={!!view.action} down={held === " "}>
+            <path d="M-34 -8 V8 H34 V-8" fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+          </KeyCap>
+        )}
         {/* The bag with its three slots, always in the bottom corner */}
         <g className={`tl-bag${view.choosing ? " open" : ""}`}>
           <g transform="translate(96 836)">
@@ -474,6 +506,13 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
                 aria-label={item ?? "leer"}
               >
                 <circle cx={x} cy={y} r={SLOT_R} className="tl-slot-face" stroke={INK} strokeWidth="6" />
+                {!touchOnly && (
+                  <KeyCap x={x} y={SLOT_KEY_Y} w={58} on={view.choosing && !!item} down={held === `${i + 1}`}>
+                    <text y="15" textAnchor="middle" fontSize="40" fontWeight="800" fontFamily="inherit" fill={INK}>
+                      {i + 1}
+                    </text>
+                  </KeyCap>
+                )}
                 {item && (
                   <g transform={`translate(${x} ${y})`}>
                     <Fitted picture={ITEMS[item]} width={104} />
