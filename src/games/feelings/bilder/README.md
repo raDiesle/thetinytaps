@@ -16,17 +16,22 @@ Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`, Modell Nano Banana 2
 yarn image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --quality 65 --ref src/games/feelings/bilder/push-2.webp
 ```
 
-Neues bewegtes Bild: beide Frames in einem Auftrag (zum halben Preis pro Frame, und sie passen besser zusammen):
+Neues bewegtes Bild: erst den ersten Frame allein, dann den zweiten mit dem ersten als Referenz,
+in dem nur die Bewegung beschrieben ist. Nicht beide als `--grid 1x2` in einem Auftrag: dort zeichnet
+Gemini die Szene zweimal, Kamera, Kinder, Luftballons oder ein Tisch springen, und beim Überblenden wird
+es unruhig, man kann der Geschichte kaum folgen.
 
 ```
-yarn image src/games/feelings/bilder/push-1.webp,src/games/feelings/bilder/push-1-b.webp "<Stilblock> <Figuren> The two panels are two frames of a tiny animation: same scene, framing, sizes and colours; only the small movement differs." --grid 1x2 --aspect 4:3 --size 1200x900 --quality 65 --panel "<Bild>" --panel "Exactly the same as panel 1, but <Bewegung>"
+yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters at exactly the same places and sizes, same clothes, colours, background, every object where it is, same camera framing (no zoom, no shift), same composition and line style. Nothing appears, disappears or moves except this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
 ```
 
-Zweiter Frame zu einem Bild, das es schon gibt: das erste Bild als Referenz mitgeben und nur die Bewegung beschreiben:
+Danach `yarn frames` (oder `yarn frames <datei-b.webp>`): listet Paare, bei denen mehr als die Bewegung
+anders ist, vor allem am Rand, wo fast immer Hintergrund ist. `baer-scared` darf auffallen – dort blitzt es.
 
-```
-yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters, clothes, colours, background, camera framing, composition, line style and sizes. Change only this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
-```
+**Dieselbe Szene bleibt dieselbe:** Spielt eine Geschichte an einem Ort, bleiben Raum und Dinge von Bild zu
+Bild gleich (Luftballons, Tisch mit Kuchen, Baum). Darum das erste Bild der Szene als einzige Referenz
+mitgeben und nur ändern, was der Bär tut („Redraw this exact picture … Change only what happens: …“).
+Eine Referenz für den Raum und eine zweite für die Pose verwechselt das Lite-Modell und erfindet den Raum neu.
 
 ## So bleiben die Figuren gleich
 
@@ -172,8 +177,8 @@ visible, but gentle – no injuries, no blood. Use the reference only for the ch
 In den vier Geschichten unten haben diese Bilder nur einen Frame, weil im zweiten die Szene
 sprang statt sich nur ein wenig zu bewegen: `bye-passiert`, `bye-3`, `bye-nein`,
 `new-passiert`, `new-nein`, `new-ende`, `fall-3`, `fall-ende`, `stop-1`, `stop-nein`.
-Ein Paar aus `--grid 1x2` darum vor dem Einbauen nebeneinander ansehen; Streifen
-der Trennfarbe am Rand beider Frames gleich wegschneiden, damit sie deckungsgleich bleiben.
+Die übrigen zweiten Frames dieser Geschichten waren als `--grid 1x2` entstanden und sprangen auch; sie sind
+neu mit dem ersten Frame als Referenz gezeichnet (siehe oben, `yarn frames`).
 
 ### Abschied an der Tür (`bye`) – Eingang mit Garderobe, Tür und Fenster
 
