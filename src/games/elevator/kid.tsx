@@ -118,37 +118,51 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
         <path d="M-33 -146 Q-38 -180 0 -180 Q38 -180 33 -146 Z" fill={look.hair} />
       )}
       <circle cx="0" cy="-140" r="32" fill={SKIN} />
-      {look.curly ? (
-        <path d="M-30 -150 Q-24 -172 0 -170 Q24 -172 30 -150 Q18 -160 8 -154 Q0 -162 -8 -154 Q-18 -160 -30 -150 Z" fill={look.hair} />
-      ) : (
-        <>
-          <path d="M-33 -142 Q-36 -178 0 -178 Q36 -178 33 -142 Q26 -160 8 -158 Q-6 -166 -20 -156 Q-28 -150 -33 -142 Z" fill={look.hair} />
-          <path d="M-2 -176 q4 -18 20 -14 q-12 2 -12 14 Z" fill={look.hair} />
-        </>
-      )}
+      {/* The fringe, the cheeks and the face slide sideways when the head turns (pose "shake"), the face furthest, so it looks round. */}
+      <g className="el-fringe">
+        {look.curly ? (
+          <path d="M-30 -150 Q-24 -172 0 -170 Q24 -172 30 -150 Q18 -160 8 -154 Q0 -162 -8 -154 Q-18 -160 -30 -150 Z" fill={look.hair} />
+        ) : (
+          <>
+            <path d="M-33 -142 Q-36 -178 0 -178 Q36 -178 33 -142 Q26 -160 8 -158 Q-6 -166 -20 -156 Q-28 -150 -33 -142 Z" fill={look.hair} />
+            <path d="M-2 -176 q4 -18 20 -14 q-12 2 -12 14 Z" fill={look.hair} />
+          </>
+        )}
+      </g>
       <circle cx="-31" cy="-138" r="6" fill={SKIN} />
       <circle cx="31" cy="-138" r="6" fill={SKIN} />
-      <circle cx="-19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
-      <circle cx="19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
-      {asleep ? (
-        <path d="M-16 -140 q5 4 10 0 M6 -140 q5 4 10 0" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
-      ) : (
-        <g className="el-eyes">
-          <circle cx="-11" cy="-141" r="4.4" fill={INK} />
-          <circle cx="11" cy="-141" r="4.4" fill={INK} />
-          <circle cx="-9.6" cy="-142.6" r="1.5" fill="#fff" />
-          <circle cx="12.4" cy="-142.6" r="1.5" fill="#fff" />
-        </g>
-      )}
-      {!asleep && (
-        <g className="el-lids">
-          <circle cx="-11" cy="-141" r="6" fill={SKIN} />
-          <circle cx="11" cy="-141" r="6" fill={SKIN} />
+      <g className="el-cheeks">
+        <circle cx="-19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
+        <circle cx="19" cy="-127" r="6" fill={CHEEK} opacity="0.55" />
+      </g>
+      <g className="el-face">
+        {asleep ? (
           <path d="M-16 -140 q5 4 10 0 M6 -140 q5 4 10 0" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
-        </g>
-      )}
-      <path className="el-smile" d="M-8 -127 Q0 -119 8 -127" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
-      <ellipse className="el-mouth-open" cx="0" cy="-123" rx="7" ry="8" fill="#a61e4d" />
+        ) : (
+          <g className="el-eyes">
+            <circle cx="-11" cy="-141" r="4.4" fill={INK} />
+            <circle cx="11" cy="-141" r="4.4" fill={INK} />
+            <circle cx="-9.6" cy="-142.6" r="1.5" fill="#fff" />
+            <circle cx="12.4" cy="-142.6" r="1.5" fill="#fff" />
+          </g>
+        )}
+        {!asleep && (
+          <g className="el-lids">
+            <circle cx="-11" cy="-141" r="6" fill={SKIN} />
+            <circle cx="11" cy="-141" r="6" fill={SKIN} />
+            <path d="M-16 -140 q5 4 10 0 M6 -140 q5 4 10 0" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
+          </g>
+        )}
+        <path className="el-smile" d="M-8 -127 Q0 -119 8 -127" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none" />
+        <ellipse className="el-mouth-open" cx="0" cy="-123" rx="7" ry="8" fill="#a61e4d" />
+        {/* Only while shaking the head: frowning brows and pressed lips, "mm-mm". */}
+        {!asleep && (
+          <g className="el-nope-face" stroke={INK} strokeWidth="3" strokeLinecap="round" fill="none">
+            <path d="M-18 -153 L-6 -150 M18 -153 L6 -150" />
+            <path d="M-8 -124 q4 -3 8 0 q4 3 8 0" />
+          </g>
+        )}
+      </g>
     </>
   );
 }
@@ -300,6 +314,11 @@ export function Kid({ look, pose, holding, wear, face }: { look: Look; pose: Pos
           )}
         </g>
         {sitting && rightArmEl}
+        {/* Swish lines beside the head while it shakes, one per side as it swings there. */}
+        <g stroke={INK} strokeWidth="4" strokeLinecap="round" fill="none">
+          <path className="el-swish el-swish-l" d="M-46 -160 Q-58 -140 -46 -120 M-58 -154 Q-66 -140 -58 -126" />
+          <path className="el-swish el-swish-r" d="M46 -160 Q58 -140 46 -120 M58 -154 Q66 -140 58 -126" />
+        </g>
       </g>
     </g>
   );

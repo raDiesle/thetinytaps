@@ -59,11 +59,16 @@
 
 /* ---------- The world's answers ---------- */
 
-/* A wrong thing: a shake of the head. */
+/* A wrong thing: the animal wobbles and shakes its head hard, three times. */
 .tl-nope {
-  animation: tl-nope 0.8s ease-in-out;
+  animation: tl-nope 1s ease-in-out;
   transform-box: fill-box;
   transform-origin: bottom center;
+}
+
+.tl-nope .tl-dog-head,
+.tl-nope .tl-horse-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
 }
 
 /* The child arrives: the obstacle looks up once. */
@@ -168,17 +173,26 @@
 }
 
 @keyframes tl-nope {
-  20% {
-    transform: rotate(-4deg);
+  15% {
+    transform: translateX(-8px) rotate(-6deg);
   }
-  40% {
-    transform: rotate(4deg);
+  35% {
+    transform: translateX(8px) rotate(6deg);
   }
-  60% {
-    transform: rotate(-3deg);
+  55% {
+    transform: translateX(-7px) rotate(-5deg);
   }
-  80% {
-    transform: rotate(2deg);
+  75% {
+    transform: translateX(5px) rotate(3deg);
+  }
+}
+
+@keyframes tl-head-no {
+  25% {
+    transform: rotate(-14deg) scaleX(0.92);
+  }
+  75% {
+    transform: rotate(10deg) scaleX(0.92);
   }
 }
 

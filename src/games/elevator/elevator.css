@@ -66,7 +66,9 @@
 
 .el-rumble,
 .el-lids,
-.el-mouth-open {
+.el-mouth-open,
+.el-nope-face,
+.el-swish {
   opacity: 0;
 }
 
@@ -138,8 +140,35 @@
   animation: el-chew 0.5s steps(2) infinite;
 }
 
+/* "No": the head turns from side to side like a ball – the face slides further than the fringe and the head gets
+   narrower at the turn – with swish lines beside it, frowning brows and pressed lips. Three swings, about a second. */
 .pose-shake .el-head {
-  animation: el-shake 0.5s ease-in-out 2;
+  animation: el-no-head 0.36s ease-in-out 3;
+}
+
+.pose-shake .el-face {
+  animation: el-no-face 0.36s ease-in-out 3;
+}
+
+.pose-shake .el-fringe,
+.pose-shake .el-cheeks {
+  animation: el-no-side 0.36s ease-in-out 3;
+}
+
+.pose-shake .el-smile {
+  opacity: 0;
+}
+
+.pose-shake .el-nope-face {
+  opacity: 1;
+}
+
+.pose-shake .el-swish-l {
+  animation: el-swish-l 0.36s linear 3;
+}
+
+.pose-shake .el-swish-r {
+  animation: el-swish-r 0.36s linear 3;
 }
 
 .pose-reach .el-arm-r {
@@ -688,12 +717,52 @@
   }
 }
 
-@keyframes el-shake {
+@keyframes el-no-head {
   25% {
-    transform: rotate(-12deg);
+    transform: translateX(-5px) rotate(-6deg) scaleX(0.9);
   }
   75% {
-    transform: rotate(12deg);
+    transform: translateX(5px) rotate(6deg) scaleX(0.9);
+  }
+}
+
+@keyframes el-no-face {
+  25% {
+    transform: translateX(-11px);
+  }
+  75% {
+    transform: translateX(11px);
+  }
+}
+
+@keyframes el-no-side {
+  25% {
+    transform: translateX(-6px);
+  }
+  75% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes el-swish-l {
+  10%,
+  35% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes el-swish-r {
+  0%,
+  50% {
+    opacity: 0;
+  }
+  60%,
+  85% {
+    opacity: 1;
   }
 }
 
