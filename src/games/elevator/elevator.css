@@ -112,7 +112,8 @@
 .pose-eat .el-smile,
 .pose-cheer .el-smile,
 .pose-jump .el-smile,
-.pose-hop .el-smile {
+.pose-hop .el-smile,
+.pose-lift .el-smile {
   opacity: 0;
 }
 
@@ -124,7 +125,8 @@
 
 .pose-cheer .el-mouth-open,
 .pose-jump .el-mouth-open,
-.pose-hop .el-mouth-open {
+.pose-hop .el-mouth-open,
+.pose-lift .el-mouth-open {
   opacity: 1;
 }
 
@@ -232,6 +234,19 @@
 .pose-jump .el-leg-l,
 .pose-jump .el-leg-r {
   animation: el-tuck 1s ease-in-out infinite;
+}
+
+/* The backpack (trail adventures): the lid swings up over the back while a thing goes in or comes out. */
+.el-pack-lid {
+  transition: transform 0.22s ease-out;
+}
+
+.el-pack.open .el-pack-lid {
+  transform: rotate(-115deg);
+}
+
+.el-pack-bump {
+  animation: el-pack-bump 0.45s ease-out;
 }
 
 /* The thought bubble pops up out of the child's head once per wish; a reminder runs a light along its outline. */
@@ -613,6 +628,15 @@
 }
 
 /* ---------- Keyframes ---------- */
+
+@keyframes el-pack-bump {
+  30% {
+    transform: scale(1.16, 0.86);
+  }
+  65% {
+    transform: scale(0.94, 1.08);
+  }
+}
 
 @keyframes el-hop {
   40% {

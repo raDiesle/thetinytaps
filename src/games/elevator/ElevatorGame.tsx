@@ -32,7 +32,7 @@ export function ElevatorGame() {
         device.touchOnly ? undefined : (
           <p className="setting-note">
             Jede Geschichte dauert etwa 5 Minuten. Leuchtet der große Knopf, drückt ihn die Leertaste (oder jede andere Taste). Im Haus holen 1–4 den Aufzug,
-            Pfeil hoch und runter fahren einen Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Beutel. Am Ende geht jede Taste zur nächsten
+            Pfeil hoch und runter fahren einen Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Rucksack. Am Ende geht jede Taste zur nächsten
             Geschichte.
           </p>
         )
