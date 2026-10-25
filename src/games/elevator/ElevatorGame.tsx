@@ -24,6 +24,7 @@ export function ElevatorGame() {
         { id: "pfuetzen", emoji: "🌧️", title: "Pfützen" },
         { id: "drachen", emoji: "🪁", title: "Der Drachen" },
         { id: "ball", emoji: "⚽", title: "Der Ball rollt weg" },
+        { id: "ballon", emoji: "🎈", title: "Der Luftballon" },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}

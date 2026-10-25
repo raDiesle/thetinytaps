@@ -20,6 +20,7 @@ A long world seen from the side that scrolls along with the child (far hills slo
 Levels so far:
 - „Der Drachen“ (garden: ball, carrot, plank → dog wants the ball → lantern at the hut → horse wants the carrot → apple from the tree → plank over the stream → lantern in the dark tunnel → stairs up the hill → the squirrel trades the kite for the apple).
 - „Der Ball rollt weg“ (G-02, the own street: the football bounces out of the hands and rolls away → watering can in the front garden → the child presses the button at the traffic light, it turns green, over the zebra crossing → pretzel at the bakery → sand shovel at the street tree → the dog on the pavement wants the pretzel → in the park the sunflowers hang their heads over the path and want water → up the ladder and down the slide by itself → the ball is half in the sand; the shovel digs it out, the child throws it up and catches it).
+- „Der Luftballon“ (G-03, `ballon.tsx`, the town: bread from the bakery, fish from the market stall, sunflower from the flower stall → the ducks at the pond want the bread → umbrella on the park bench → the sprinkler sprays over the path, the umbrella goes over it → plank on the logs → the plank fills the hole in the hanging bridge → the cat wants the fish → long stairs up to the church → the dove on the tower trades the balloon for the sunflower).
 
 ## Rules for every story (from feedback; follow them in new stories and trail levels too)
 

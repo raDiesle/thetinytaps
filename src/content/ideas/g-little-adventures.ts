@@ -33,6 +33,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Ein roter Luftballon fliegt davon, über Dächer und Bäume. Das Kind folgt ihm über den Markt (Obststand), am Teich mit Enten (Brot) vorbei, über eine Hängebrücke und eine lange Treppe bis zum Kirchturm, wo eine Taube ihn festhält.",
       why: "Ein Ziel, das man immer am Himmel sieht – leicht zu verstehen.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-04",

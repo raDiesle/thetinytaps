@@ -131,7 +131,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   /** Set while the bag is open: it gets the slot. */
   const chooser = useRef<((slot: number) => void) | null>(null);
 
-  // The goal (the kite, the ball) moves along curves, so it is moved frame by frame, not by React.
+  // The goal (the kite, the ball, the balloon) moves along curves, so it is moved frame by frame, not by React.
   const goalEl = useRef<SVGGElement>(null);
   const spinEl = useRef<SVGGElement>(null);
   const stringEl = useRef<SVGLineElement>(null);

@@ -6,7 +6,7 @@ import { INK } from "@/games/scenes/shared";
 // in the world, in a bag slot and in the thought bubble.
 
 /** A thing that fits into the bag. */
-export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "pretzel" | "can" | "shovel";
+export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "pretzel" | "can" | "shovel" | "bread" | "fish" | "sunflower" | "umbrella";
 
 /** A drawing and its size, to fit it into a slot, a bubble or a card. */
 export interface Picture {
@@ -148,6 +148,90 @@ export function Football() {
   );
 }
 
+/** A loaf of bread with its cuts on top. */
+export function Bread() {
+  return (
+    <g>
+      <path d="M-56 -4 Q-62 -48 -20 -56 Q0 -60 20 -56 Q62 -48 56 -4 Q0 6 -56 -4 Z" fill="#e8a35c" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <path d="M-30 -46 Q-24 -30 -30 -16 M-4 -52 Q2 -34 -4 -18 M22 -48 Q28 -32 22 -16" stroke="#fff3bf" strokeWidth="6" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A fish lying on its side, its head to the left; orange unless `colour` says otherwise. */
+export function Fish({ colour = "#ff922b" }: { colour?: string }) {
+  return (
+    <g>
+      <path d="M30 -24 L58 -46 Q52 -24 58 -2 Z" fill={colour} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <ellipse cx="-6" cy="-24" rx="44" ry="22" fill={colour} stroke={INK} strokeWidth="4" />
+      <path d="M-6 -44 Q6 -56 18 -42" fill="#ffc078" stroke={INK} strokeWidth="3" />
+      <path d="M-22 -40 Q-14 -24 -22 -8" stroke="#d9480f" strokeWidth="3.5" fill="none" />
+      <circle cx="-34" cy="-28" r="4.5" fill={INK} />
+      <path d="M8 -30 q6 4 0 8 M20 -30 q6 4 0 8" stroke="#d9480f" strokeWidth="3" fill="none" />
+    </g>
+  );
+}
+
+/** A sunflower on its stem: yellow petals round a big brown middle full of seeds. */
+export function Sunflower() {
+  return (
+    <g>
+      <path d="M0 0 Q-6 -50 0 -96" stroke="#2f9e44" strokeWidth="7" fill="none" strokeLinecap="round" />
+      <path d="M-2 -40 Q-30 -56 -40 -36 Q-20 -30 -2 -40 Z" fill="#51cf66" stroke="#2b8a3e" strokeWidth="3" />
+      {Array.from({ length: 12 }, (_, i) => (
+        <ellipse key={i} cx="0" cy="-150" rx="10" ry="22" transform={`rotate(${i * 30} 0 -118)`} fill="#ffd43b" stroke="#f08c00" strokeWidth="3" />
+      ))}
+      <circle cx="0" cy="-118" r="22" fill="#8d5a3b" stroke={INK} strokeWidth="4" />
+      {[
+        [-8, -126],
+        [6, -128],
+        [-10, -112],
+        [4, -114],
+        [12, -118],
+        [-2, -104],
+      ].map(([x, y]) => (
+        <circle key={`${x}${y}`} cx={x} cy={y} r="3" fill="#5c3b1e" />
+      ))}
+    </g>
+  );
+}
+
+/** An open umbrella, red and white, on its hook handle. */
+export function Umbrella() {
+  return (
+    <g>
+      <path d="M0 -112 V-14 Q0 0 -12 0 Q-22 0 -22 -12" stroke={INK} strokeWidth="6" fill="none" strokeLinecap="round" />
+      <path
+        d="M-70 -110 Q-66 -164 0 -170 Q66 -164 70 -110 Q58 -120 46 -110 Q34 -120 23 -110 Q12 -120 0 -110 Q-12 -120 -23 -110 Q-34 -120 -46 -110 Q-58 -120 -70 -110 Z"
+        fill="#fa5252"
+        stroke={INK}
+        strokeWidth="4.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M-23 -110 Q-24 -150 0 -170 Q24 -150 23 -110 Q12 -120 0 -110 Q-12 -120 -23 -110 Z"
+        fill="#fff"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M0 -170 V-180" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** The balloon: the string is tied to (0, 0), the knot; with `tail`, a bit of string hangs from it (for its picture). */
+export function Balloon({ tail = false, colour = "#fa5252" }: { tail?: boolean; colour?: string }) {
+  return (
+    <g>
+      {tail && <path d="M0 0 Q-12 20 0 40 Q12 60 0 80" stroke={INK} strokeWidth="3" fill="none" />}
+      <path d="M-6 2 L0 -12 L6 2 Z" fill={colour} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M0 -12 Q-58 -40 -58 -96 Q-58 -160 0 -160 Q58 -160 58 -96 Q58 -40 0 -12 Z" fill={colour} stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      <ellipse cx="-24" cy="-118" rx="10" ry="20" fill="#fff" opacity="0.6" transform="rotate(20 -24 -118)" />
+    </g>
+  );
+}
+
 /** The kite: the string is tied to (0, 0), the bottom tip; the tail hangs from there. */
 export function Kite({ tail = true }: { tail?: boolean }) {
   return (
@@ -182,6 +266,10 @@ export const ITEMS: Record<ItemId, Picture> = {
   pretzel: { w: 104, h: 84, draw: () => <Pretzel /> },
   can: { w: 140, h: 94, draw: () => <WateringCan /> },
   shovel: { w: 56, h: 124, draw: () => <Shovel /> },
+  bread: { w: 120, h: 64, draw: () => <Bread /> },
+  fish: { w: 120, h: 60, draw: () => <Fish /> },
+  sunflower: { w: 96, h: 172, draw: () => <Sunflower /> },
+  umbrella: { w: 144, h: 184, draw: () => <Umbrella /> },
 };
 
 /** What a level is about: its picture, and how the child carries it in the world. */
@@ -194,12 +282,23 @@ export interface Goal extends Picture {
   roll?: number;
 }
 
-export type GoalId = "kite" | "football";
+export type GoalId = "kite" | "football" | "balloon";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
   kite: { w: 120, h: 164, draw: () => <Kite tail={false} />, world: () => <Kite />, carry: "string" },
   football: { w: 72, h: 72, draw: () => <Football />, carry: "hands", roll: 34 },
+  balloon: {
+    w: 120,
+    h: 244,
+    draw: () => (
+      <g transform="translate(0 -80)">
+        <Balloon tail />
+      </g>
+    ),
+    world: () => <Balloon />,
+    carry: "string",
+  },
 };
 
 /** `picture` scaled to fit a `width` × `height` box around (0, 0). */
