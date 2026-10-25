@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { useLeaveGame } from "@/components/GameShell";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
 import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
@@ -129,6 +130,7 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
  * and tapping the progress bar jumps there.
  */
 export function TeethPlay({ speechLang, settings }: { speechLang: string; settings: TeethSettings }) {
+  const leave = useLeaveGame();
   const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now() }));
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
@@ -381,9 +383,14 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       {done ? (
         <div className="teeth-end">
           {settings.week && <Week log={week} today={new Date()} now={daytime} />}
-          <button type="button" className="teeth-again" onClick={again}>
-            🔁 Nochmal
-          </button>
+          <div className="teeth-end-buttons">
+            <button type="button" className="teeth-again teeth-menu" onClick={leave}>
+              🏠 Menü
+            </button>
+            <button type="button" className="teeth-again" onClick={again}>
+              🔁 Nochmal
+            </button>
+          </div>
         </div>
       ) : (
         <>

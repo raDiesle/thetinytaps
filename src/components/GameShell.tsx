@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { FullscreenExit } from "@/components/FullscreenButton";
 import { Sky } from "@/components/Sky";
 import { de } from "@/content/de";
@@ -21,6 +21,12 @@ const ESC_HOLD_MS = 1000;
 
 /** How long the "Zurück zum Menü" note shows next to ✕ when a game starts. */
 const EXIT_HINT_MS = 4000;
+
+/** Leaves the game for its start screen, like holding ✕; the end of a level offers it as „Menü“. */
+const LeaveGame = createContext<() => void>(() => {});
+
+/** The way back to the game's start screen, for the „Menü“ button at the end of a level. */
+export const useLeaveGame = () => useContext(LeaveGame);
 
 /** One way to play a game, picked on its start screen with a big card. */
 export interface GameMode {
@@ -134,7 +140,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
           if (!(e.target as Element).closest(".exit-corner")) setActed(true);
         }}
       >
-        {playtime.over ? <GoodNight /> : children}
+        {playtime.over ? <GoodNight /> : <LeaveGame value={stop}>{children}</LeaveGame>}
         {!playtime.over && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
         <ExitButton onExit={stop} label="Zurück zum Menü" />
       </div>

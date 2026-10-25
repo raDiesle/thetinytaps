@@ -275,7 +275,9 @@ export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSet
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const next = pairs < MAX_PAIRS ? { emoji: "🧦", name: `${pairs + 1} Paare`, onNext: () => startRound(pairs + 1) } : undefined;
+  // One pair more each time; after the most pairs, the number the grown-up started with again.
+  const nextPairs = pairs < MAX_PAIRS ? pairs + 1 : Number(settings.pairs);
+  const next = { emoji: "🧦", name: `${nextPairs} Paare`, onNext: () => startRound(nextPairs) };
 
   return (
     <div className={`socks-play ${phase}`} onPointerDown={onBackgroundDown}>

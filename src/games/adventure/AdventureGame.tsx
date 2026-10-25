@@ -22,7 +22,13 @@ export function AdventureGame() {
   const [settings, update] = useGameSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
   const { touchOnly } = useDevice();
-  const chosen = (STORIES.find((s) => s.id === settings.story) ?? STORIES[0]).story;
+  const at = Math.max(
+    0,
+    STORIES.findIndex((s) => s.id === settings.story),
+  );
+  const chosen = STORIES[at].story;
+  // „Weiter“ at the end: the next story on the start screen, after the last the first.
+  const next = STORIES[(at + 1) % STORIES.length];
   const wanted = targetLanguageFor(settings.language);
   // A story not translated yet is said in German, not German words with an English voice.
   const language = wanted.id === "de" || chosen.translations?.[wanted.id] ? wanted : targetLanguageFor("de");
@@ -88,7 +94,13 @@ export function AdventureGame() {
       }
     >
       {/* Its own music, which plays only while music is on for all games too. */}
-      <AdventurePlay story={story} language={language} settings={{ ...settings, music: settings.music && common.music }} />
+      <AdventurePlay
+        key={story.sequence.title}
+        story={story}
+        language={language}
+        settings={{ ...settings, music: settings.music && common.music }}
+        next={{ emoji: next.emoji, name: next.story.sequence.title, onNext: () => update({ story: next.id }) }}
+      />
     </GameShell>
   );
 }

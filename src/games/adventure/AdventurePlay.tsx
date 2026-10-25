@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { GameEnd } from "@/components/GameEnd";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
@@ -39,7 +40,18 @@ const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (
  * can pause and jump between steps with the buttons in the corner, by tapping
  * a picture on the route, or with the keys (arrows jump, Space pauses).
  */
-export function AdventurePlay({ story, language, settings }: { story: Story; language: TargetLanguage; settings: AdventureSettings }) {
+export function AdventurePlay({
+  story,
+  language,
+  settings,
+  next,
+}: {
+  story: Story;
+  language: TargetLanguage;
+  settings: AdventureSettings;
+  /** The story „Weiter“ starts at the end. */
+  next: { emoji: string; name: string; onNext: () => void };
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<StoryPlayer | null>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -206,11 +218,7 @@ export function AdventurePlay({ story, language, settings }: { story: Story; lan
           ▶
         </button>
       )}
-      {ended && (
-        <button type="button" className="adventure-again" onClick={again} aria-label="Nochmal">
-          🔁
-        </button>
-      )}
+      {ended && <GameEnd onAgain={again} next={next} />}
       <p className="adventure-sr-only">{current.situation}</p>
     </div>
   );

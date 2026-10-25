@@ -83,7 +83,12 @@ In a fresh worktree run `yarn install` first.
 - Speech is off by default (`src/lib/common.ts`); sounds are on.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
-- Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). Never add another way out.
+- Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
+  of a level. Never add another.
+- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
+  game's start screen, `useLeaveGame()`), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
+  the first, so there is always one). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
+  it has a use for, just as big.
 
 ## Architecture
 

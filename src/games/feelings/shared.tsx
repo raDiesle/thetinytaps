@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useLeaveGame } from "@/components/GameShell";
 import { loadRecordings } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { framesFor, imageFor } from "./images";
@@ -286,8 +287,9 @@ export function StepDots({ total, done, current }: { total: number; done: number
   );
 }
 
-/** At the end of a story: play it again (small, white) or go on to the next one (big, yellow). Only pictures, no words. */
+/** At the end of a story: back to the start screen or play it again (small, white), or go on to the next one (big, yellow). Only pictures, no words. */
 export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: () => void }) {
+  const leave = useLeaveGame();
   // Pointer down, not click: it reacts right away, and the picture underneath doesn't get the tap.
   const press = (action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
@@ -296,6 +298,14 @@ export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: (
 
   return (
     <div className="fg-end">
+      {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
+      <button type="button" className="fg-round menu" aria-label="Menü" onPointerDown={(e) => e.stopPropagation()} onClick={leave}>
+        <svg viewBox="0 0 24 24" aria-hidden>
+          <path d="M3 11.5 12 4l9 7.5" />
+          <path d="M5.5 9.5V20h13V9.5" />
+          <path d="M10 20v-5.5h4V20" />
+        </svg>
+      </button>
       <button type="button" className="fg-round again" aria-label="Nochmal" onPointerDown={press(onAgain)}>
         <svg viewBox="0 0 24 24" aria-hidden>
           <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />

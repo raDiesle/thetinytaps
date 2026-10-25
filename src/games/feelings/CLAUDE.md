@@ -65,8 +65,8 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades in and out
 for a little movement. Choices are picture cards (`ChoiceCard` in `shared.tsx`)
-with a green tick or red cross, so children can choose without reading; „Nochmal“
-and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
+with a green tick or red cross, so children can choose without reading; „Menü“ (a house),
+„Nochmal“ and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
 `story.ts`.
 
 The big picture and the cards keep one size for the whole story – nothing grows or
