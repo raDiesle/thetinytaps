@@ -13,6 +13,7 @@ const MODES = [
   { id: "building", emoji: "🚧", title: "Baustelle" },
   { id: "circus", emoji: "🎪", title: "Zirkus" },
   { id: "space", emoji: "🚀", title: "Raketenstart" },
+  { id: "light", emoji: "🔦", title: "Licht-Kette" },
 ];
 
 export function MarbleGame() {

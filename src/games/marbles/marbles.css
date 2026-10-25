@@ -38,6 +38,10 @@
   background: #0d1446;
 }
 
+.marble-play:has([aria-label="Licht-Kette"]) {
+  background: #384067;
+}
+
 .marble-svg {
   display: block;
   width: 100%;
