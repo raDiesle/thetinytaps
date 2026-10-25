@@ -56,7 +56,12 @@ In a fresh worktree run `yarn install` first.
 - Everything the child or parent sees or hears is **German** (short, simple, present
   tense). Other languages come game by game: the app aims at German, the five most spoken
   languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
-  When a game gains one, mark it in `src/content/ideas/languageStatus.ts` (shown on `/ideen/`).
+  Translations and recordings (ElevenLabs voice, Suno songs) are made **only when the user asks** for
+  them, since they cost tokens and credits: new features, stories, modes and changed lines come in German
+  only, never translated or recorded on your own, also in a game that already speaks other languages.
+  Instead keep `src/content/ideas/languageStatus.ts` (shown on `/ideen/`) true in the same commit: what is
+  there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
+  `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell.
   Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported

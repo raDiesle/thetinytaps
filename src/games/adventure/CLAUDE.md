@@ -33,6 +33,9 @@ recording until `yarn voice make` records it again; `voice.ts` plays recordings 
 voice for lines without one. `voice.test.ts` checks the translations against the German steps and that a
 language with recordings has one for every line and no extra ones. Recordings in other languages than German
 are not kept offline by every phone, only once the story has started in that language (`rsbuild.config.ts`, `src/sw.js`).
+- A new story or changed lines come in German only: translate (`lines.<language>.ts`) and record (`yarn voice make`)
+  only when the user asks for it, and keep the story's row in `src/content/ideas/languageStatus.ts` true
+  (`content.test.ts` checks it against the files).
 - ElevenLabs always with the turbo model (`eleven_v4_turbo`, in `stimme.json`): it costs half the credits, and
   the 10,000 credits a month have to reach for every language. `yarn voice make --dry [--lang en]` shows what
   would be recorded and how many credits it costs; the German lines were recorded with `eleven_v4` and audio
