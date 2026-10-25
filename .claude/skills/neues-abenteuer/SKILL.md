@@ -147,10 +147,17 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
   buttons. `title` is for the parents' start screen only.
 - **German speech only**, and only with „Vorlesen“ on: `ask`, `done`, `away.say`,
   `finale.say`. Short words, present tense.
-- **Nothing is pointed at.** No arrows, frames or hands on things in the world; the
-  bag's right thing glows, and the thought bubble shows the goal.
-- **One fixed action button**, bottom right, the same in every level (drawn by
-  `TrailPlay`). Don't add buttons, and no other way to leave than `GameShell`'s.
+- **Nothing is pointed at** beyond what `TrailPlay` shows by itself: before each tap
+  yellow footprints lead to the child's pale ghost, standing where the tap takes it and
+  doing what it will do there, and the button shows the thing it gets (or feet, or
+  stairs). No extra arrows, frames or hands; the bag's right thing glows, the thought
+  bubble shows the goal.
+- **One action button**, the same in every level (drawn by `TrailPlay`, framed, next to
+  the bag on wide phones, bottom right otherwise). Don't add buttons, and no other way
+  to leave than `GameShell`'s.
+- **Things fit together.** What an animal wants is what it really eats or plays with
+  (a dog a bone or a ball, a horse a carrot, ducks bread), and a thing comes from a
+  place where it belongs (the bone from the pet shop, not a pretzel from the bakery).
 - **Things stand out from their background**: a colour that differs from the grass,
   wall or wood behind it, and a dark `INK` outline – no green thing on the meadow, no
   brown plank on the brown shed.

@@ -135,8 +135,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
   else if (last) [picture, caption] = [bearImages.comfort(last), COMFORTS[last].caption];
 
   return (
-    // While the child chooses, the cards are big and the bear's picture makes room for them.
-    <div className={`story-play bear-play${happy || round.busy ? "" : " choosing"}`} onPointerDown={() => happy && tryNextFeeling()}>
+    <div className="story-play bear-play" onPointerDown={() => happy && tryNextFeeling()}>
       <main className="story-middle">
         <StoryPicture key={`${round.key}-${picture}`} name={picture} caption={caption} onPointerDown={onBearPointer}>
           <FloaterLayer floaters={floaters} />

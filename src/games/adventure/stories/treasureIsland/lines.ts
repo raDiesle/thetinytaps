@@ -30,10 +30,8 @@ export const LINES: StepLines[] = [
   },
   {
     icon: "🪑",
-    situation: "Gleich schwimmt Ole los.",
-    instruction: "Wir setzen uns hin – ganz langsam, so.",
-    turn: "Jetzt du – setz dich hin!",
-    praise: "Gut sitzen wir. Los geht's!",
+    instruction: "Setz dich mit mir hin – so!",
+    praise: "Los geht's!",
   },
   {
     icon: "🛶",
@@ -45,10 +43,8 @@ export const LINES: StepLines[] = [
   },
   {
     icon: "🧍",
-    situation: "Wir sind auf der Insel!",
-    instruction: "Wir stehen auf – ganz langsam, so.",
-    turn: "Jetzt du – steh auf!",
-    praise: "Jetzt geht es zu Fuß weiter.",
+    instruction: "Wir sind auf der Insel! Steh mit mir auf – so!",
+    praise: "Weiter geht's!",
   },
   {
     icon: "🦂",
@@ -169,20 +165,20 @@ export const LINES: StepLines[] = [
     praise: "Das Schloss ist auf!",
   },
   {
-    icon: "🙌",
-    situation: "Oh! Was ist da drin?",
-    instruction: "Gold! Arme hoch – Hurra!",
-    turn: "Du auch – Hurra!",
-    again: "Hurra, ein Schatz!",
-    praise: "So viel Gold!",
-  },
-  {
     icon: "💰",
-    situation: "Die Krebse bringen uns die Truhe. Ich hüpfe runter!",
+    situation: "Oh! Gold! Die Krebse bringen uns die Truhe. Ich hüpfe runter!",
     instruction: "Tief rein greifen – und die Münzen hoch werfen! So!",
     turn: "Jetzt du – rein greifen und hoch werfen!",
     again: "Rein greifen – hoch werfen!",
-    praise: "Ein Goldregen! Wir sind reich!",
+    praise: "Ein Goldregen!",
+  },
+  {
+    icon: "🙌",
+    situation: "Wir haben den Schatz gefunden!",
+    instruction: "Arme hoch – Hurra!",
+    turn: "Du auch – Hurra!",
+    again: "Hurra, ein Schatz!",
+    praise: "So viel Gold! Wir sind reich!",
   },
   {
     icon: "🌅",

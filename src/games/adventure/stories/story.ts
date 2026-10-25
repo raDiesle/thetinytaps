@@ -85,7 +85,7 @@ export interface Story {
   /** Seconds the guide shows each movement alone before the child joins in. */
   demo: number[];
   /** Seconds of praise at the end of each step. */
-  praise: number;
+  praise: number[];
   build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld;
 }
 

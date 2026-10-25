@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
@@ -31,30 +31,100 @@ const FLY_MS = 650;
 const NUDGE_MS = 7000;
 /** From the end of the level until „Nochmal“ and „Weiter“ come. */
 const END_MS = 6000;
-/** The bag's slots on the screen; the bag holds three things at most. */
-const SLOTS: Point[] = [
-  [262, 822],
-  [432, 822],
-  [602, 822],
-];
-const SLOT_R = 74;
-/** The action button, in the other bottom corner. */
-const ACTION: Point = [1494, 800];
-/** On a computer a key cap above each slot and above the action button shows which key does it. */
-const SLOT_KEY_Y = 712;
-const ACTION_KEY_Y = 676;
+/** The bag's slots; the bag holds three things at most. */
+const SLOT_COUNT = 3;
+const SLOT_R = 62;
+/** From one slot's middle to the next. */
+const SLOT_STEP = 150;
+const ACTION_R = 62;
+/** The bag's frame and the button's frame at the bottom of the screen, as high as each other. */
+const HUD_TOP = 704;
+const HUD_H = 188;
+/** On a computer a small key cap under each slot and under the action button shows which key does it; then the
+ * slots sit a little higher to make room. */
+const KEY_Y = 864;
+/** Room kept free between the screen's edge and the frames. */
+const EDGE = 18;
+/** The child's left side on the screen: the action button only goes left of it when it fits there. */
+const KID_LEFT = KID_AT[0] - 80;
+/** The footprints to where the child goes next are this far apart. */
+const PRINT_GAP = 62;
 
-/** A key on the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
+/** Where the bag and the action button are on the screen, in the picture's units. */
+interface Hud {
+  /** The bag's frame: left, top, width, height. */
+  bagBox: [number, number, number, number];
+  /** The bag's picture at the left of its frame. */
+  bag: Point;
+  slots: Point[];
+  action: Point;
+  actionBox: [number, number, number, number];
+}
+
+/**
+ * Bag and button stay at the screen's edges, not the picture's: on a wide phone the picture leaves room left and
+ * right, so the bag sits at the very left and the button right next to it, where one thumb reaches both and the way
+ * ahead stays free. Where the button would cover the child (a computer, a tablet) it goes to the right corner.
+ * `left` and `right` are the screen's free edges in the picture's units.
+ */
+function layoutHud(left: number, right: number, keys: boolean): Hud {
+  const x0 = left + EDGE;
+  const y = keys ? 784 : HUD_TOP + HUD_H / 2;
+  const slots = Array.from({ length: SLOT_COUNT }, (_, i): Point => [x0 + 218 + i * SLOT_STEP, y]);
+  const bagW = slots[SLOT_COUNT - 1][0] + SLOT_R + 18 - x0;
+  const boxW = 2 * ACTION_R + 44;
+  const beside = x0 + bagW + 26;
+  const boxX = beside + boxW <= KID_LEFT ? beside : right - EDGE - boxW;
+  return {
+    bagBox: [x0, HUD_TOP, bagW, HUD_H],
+    bag: [x0 + 80, y + 8],
+    slots,
+    action: [boxX + boxW / 2, y],
+    actionBox: [boxX, HUD_TOP, boxW, HUD_H],
+  };
+}
+
+/** A small key of the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
 function KeyCap({ x, y, w, on, down, children }: { x: number; y: number; w: number; on: boolean; down: boolean; children: ReactNode }) {
   return (
     <g className={`tl-key${on ? " on" : ""}${down ? " down" : ""}`}>
-      <rect x={x - w / 2} y={y - 22} width={w} height={52} rx="12" className="tl-key-base" />
+      <rect x={x - w / 2} y={y - 14} width={w} height={34} rx="8" className="tl-key-base" />
       <g className="tl-key-top">
-        <rect x={x - w / 2} y={y - 28} width={w} height={50} rx="12" className="tl-key-face" stroke={INK} strokeWidth="4" />
-        <g transform={`translate(${x} ${y - 3})`}>{children}</g>
+        <rect x={x - w / 2} y={y - 18} width={w} height={32} rx="8" className="tl-key-face" stroke={INK} strokeWidth="3" />
+        <g transform={`translate(${x} ${y - 2})`}>{children}</g>
       </g>
     </g>
   );
+}
+
+/** What the next tap does: the child walks along the footprints to its pale ghost and does what the ghost does
+ * there; the button shows the thing it gets there, or feet or stairs. */
+interface Next {
+  prints: Point[];
+  ghost: Point;
+  pose: Pose;
+  icon: ItemId | "walk" | "climb";
+}
+
+/** The picture on the action button for what the next tap does. */
+function NextIcon({ icon }: { icon: Next["icon"] }) {
+  if (icon === "climb")
+    return <path d="M-30 26 H-12 V8 H6 V-10 H24 V-28" fill="none" stroke={INK} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />;
+  if (icon === "walk")
+    return (
+      <g fill="#fff" stroke={INK} strokeWidth="4">
+        {[
+          [-13, 8, -12],
+          [13, -8, 12],
+        ].map(([x, y, turn]) => (
+          <g key={x} transform={`translate(${x} ${y}) rotate(${turn})`}>
+            <ellipse cy="-6" rx="10" ry="15" fill="#4263eb" />
+            <ellipse cy="16" rx="8" ry="7" fill="#4263eb" />
+          </g>
+        ))}
+      </g>
+    );
+  return <Fitted picture={ITEMS[icon]} width={70} />;
 }
 
 interface KidState {
@@ -84,8 +154,8 @@ interface View {
   hint: ItemId | null;
   /** Bumped to bounce the slots. */
   shake: number;
-  /** Where the hand points, in the world; `n` makes it pop up anew. */
-  action: { nudge: number } | null;
+  /** The action button waits for a tap; `nudge` makes it jump anew, `next` shows what the tap will do. */
+  action: { nudge: number; next: Next } | null;
   /** The thought bubble with the goal; `nudge` counts the reminders. */
   bubble: { nudge: number } | null;
   party: boolean;
@@ -122,6 +192,30 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const { touchOnly } = useDevice();
   /** The key held down right now, so its cap on the screen goes down too. */
   const [held, setHeld] = useState<string | null>(null);
+
+  // The screen's free edges (without a notch) in the picture's units, measured whenever the screen turns or resizes.
+  const playEl = useRef<HTMLDivElement>(null);
+  const svgEl = useRef<SVGSVGElement>(null);
+  const safeEl = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState<[number, number]>([0, VIEW_W]);
+  useLayoutEffect(() => {
+    const measure = () => {
+      const box = svgEl.current?.getBoundingClientRect();
+      const free = safeEl.current?.getBoundingClientRect();
+      if (!box || !free) return;
+      const scale = Math.min(box.width / VIEW_W, box.height / VIEW_H);
+      if (!scale) return;
+      const toView = (px: number) => VIEW_W / 2 + (px - box.left - box.width / 2) / scale;
+      setEdges([Math.round(toView(free.left)), Math.round(toView(free.right))]);
+    };
+    measure();
+    const watch = new ResizeObserver(measure);
+    if (playEl.current) watch.observe(playEl.current);
+    return () => watch.disconnect();
+  }, []);
+  /** Where bag and button are now; the script reads it when a thing flies to or from the bag. */
+  const hud = useRef<Hud>(layoutHud(0, VIEW_W, !touchOnly));
+  hud.current = layoutHud(edges[0], edges[1], !touchOnly);
 
   // The level is a script of waits; leaving bumps the generation and drops its timers.
   const generation = useRef(0);
@@ -257,13 +351,23 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     }
   };
 
-  /** The action button lights up until the child taps (it, anywhere, or any key); after a while it jumps again and
-   * the bubble reminds the child of the goal. Nothing in the picture is pointed at. */
-  const go = async () => {
-    put({ action: { nudge: 0 } });
+  /** Footprints along the ground from the child to `x`, then one on each of `steps`. */
+  const printsTo = (x: number, steps: Point[] = []): Point[] => {
+    const prints: Point[] = [];
+    for (let px = viewRef.current.kid.x + PRINT_GAP; px < x - PRINT_GAP / 2; px += PRINT_GAP) prints.push([px, groundY(level.ground, px)]);
+    return [...prints, ...steps];
+  };
+
+  /** Walking on to `x` and doing `pose` there, shown before the tap. */
+  const nextAt = (x: number, pose: Pose, icon: Next["icon"]): Next => ({ prints: printsTo(x), ghost: [x, groundY(level.ground, x)], pose, icon });
+
+  /** The action button lights up until the child taps (it, anywhere, or any key), and footprints and the child's
+   * ghost show where the tap takes it; after a while it jumps again and the bubble reminds the child of the goal. */
+  const go = async (next: Next) => {
+    put({ action: { nudge: 0, next } });
     let stop = () => {};
     const nudge = () => {
-      put((v) => ({ action: v.action && { nudge: v.action.nudge + 1 }, bubble: v.bubble ? { nudge: v.bubble.nudge + 1 } : { nudge: 0 } }));
+      put((v) => ({ action: v.action && { ...v.action, nudge: v.action.nudge + 1 }, bubble: v.bubble ? { nudge: v.bubble.nudge + 1 } : { nudge: 0 } }));
       stop = later(NUDGE_MS, nudge);
     };
     stop = later(NUDGE_MS, nudge);
@@ -273,14 +377,14 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   };
 
   const pickup = async (station: Pickup) => {
-    await go();
+    await go(nextAt(station.x, "reach", station.item));
     await walkTo(station.x);
     say(station.ask);
     kid({ pose: "reach" });
     sound(station.sound);
     const slot = viewRef.current.bag.indexOf(null);
     put((v) => ({ done: [...v.done, station.id] }));
-    await fly(station.item, onScreen(station.at), SLOTS[slot]);
+    await fly(station.item, onScreen(station.at), hud.current.slots[slot]);
     put((v) => ({ flight: null, bag: v.bag.map((thing, i) => (i === slot ? station.item : thing)) }));
     sound(playPop);
     say(station.done);
@@ -291,7 +395,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const nextChoice = () => new Promise<number>((resolve) => (chooser.current = resolve));
 
   const obstacle = async (station: Obstacle) => {
-    await go();
+    await go(nextAt(station.x, "stand", "walk"));
     await walkTo(station.x);
     put({ here: station.id, choosing: true, shake: viewRef.current.shake + 1 });
     cue(station.meet);
@@ -309,14 +413,14 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
       const item = viewRef.current.bag[slot]!;
       put((v) => ({ choosing: false, hint: null, bag: v.bag.map((thing, i) => (i === slot ? null : thing)) }));
       kid({ pose: "reach" });
-      await fly(item, SLOTS[slot], onScreen(station.at));
+      await fly(item, hud.current.slots[slot], onScreen(station.at));
       if (item === station.need) break;
       // Not this one: something funny happens, the thing comes back and the right one glows.
       put((v) => ({ nope: { id: station.id, n: (v.nope?.n ?? 0) + 1 } }));
       sound(station.nope);
       kid({ pose: "shake" });
       await wait(1000);
-      await fly(item, onScreen(station.at), SLOTS[slot]);
+      await fly(item, onScreen(station.at), hud.current.slots[slot]);
       put((v) => ({ flight: null, nope: null, bag: v.bag.map((thing, i) => (i === slot ? item : thing)), hint: station.need, choosing: true }));
       kid({ pose: "stand" });
     }
@@ -336,12 +440,13 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   /** Two taps: the first walks to the stairs and climbs half of them, the second the rest; a note per step. */
   const climb = async (station: Climb) => {
-    await go();
+    const half = Math.ceil(station.steps.length / 2);
+    const { steps } = station;
+    await go({ prints: printsTo(station.x, steps.slice(0, half)), ghost: steps[half - 1], pose: "stand", icon: "climb" });
     await walkTo(station.x);
     say(station.ask);
-    const half = Math.ceil(station.steps.length / 2);
-    for (const [i, [x, y]] of station.steps.entries()) {
-      if (i === half) await go();
+    for (const [i, [x, y]] of steps.entries()) {
+      if (i === half) await go({ prints: steps.slice(half), ghost: steps[steps.length - 1], pose: "stand", icon: "climb" });
       kid({ x, y, walk: STEP_MS, pose: "walk" });
       sound(() => playCountNote(i));
       await wait(STEP_MS);
@@ -367,7 +472,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   /** The child gets there and something happens by itself (the light turns green); the walk was the tap. */
   const moment = async (station: Moment) => {
-    await go();
+    await go(nextAt(station.x, station.pose, "walk"));
     await walkTo(station.x);
     put({ here: station.id });
     kid({ pose: station.pose });
@@ -468,7 +573,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
       if (tapper.current) return tap();
       const pick = chooser.current;
       const slot = Number(e.key) - 1;
-      if (pick && slot >= 0 && slot < SLOTS.length && v.bag[slot]) {
+      if (pick && slot >= 0 && slot < SLOT_COUNT && v.bag[slot]) {
         chooser.current = null;
         pick(slot);
       } else {
@@ -486,6 +591,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   });
 
   const { kid: k, flight } = view;
+  const next = view.action?.next;
+  const { bagBox, bag, slots, action, actionBox } = hud.current;
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
   const { Scenery, Front, Backdrop } = level;
@@ -497,6 +604,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   return (
     <div
+      ref={playEl}
       className="tl-play"
       onPointerDown={(e) => {
         if (tapper.current) {
@@ -507,7 +615,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
         funBurst(e.clientX, e.clientY);
       }}
     >
-      <svg className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
+      <div ref={safeEl} className="tl-safe" />
+      <svg ref={svgEl} className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
         <g className="tl-pan" style={pan(FAR)}>
           <Backdrop />
         </g>
@@ -520,6 +629,18 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             </g>
           </g>
           {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
+          {next && (
+            <g key={`${next.ghost}`} className="tl-next">
+              {next.prints.map(([x, y], i) => (
+                <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
+              ))}
+              <g transform={`translate(${next.ghost[0]} ${next.ghost[1]})`}>
+                <g className="tl-ghost" style={{ animationDelay: `${next.prints.length * 90}ms` }}>
+                  <Kid look={HERO} pose={next.pose} holding={null} wear={[]} face={1} />
+                </g>
+              </g>
+            </g>
+          )}
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} />
@@ -528,20 +649,30 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
           </g>
         </g>
 
-        <ActionButton waiting={!!view.action} nudge={view.action?.nudge ?? 0} x={ACTION[0]} y={ACTION[1]} r={70} />
+        <ActionButton
+          waiting={!!view.action}
+          nudge={view.action?.nudge ?? 0}
+          x={action[0]}
+          y={action[1]}
+          r={ACTION_R}
+          box={actionBox}
+          picture={next && <NextIcon icon={next.icon} />}
+        />
         {!touchOnly && (
-          <KeyCap x={ACTION[0]} y={ACTION_KEY_Y} w={200} on={!!view.action} down={held === " "}>
-            <path d="M-34 -8 V8 H34 V-8" fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+          <KeyCap x={action[0]} y={KEY_Y} w={110} on={!!view.action} down={held === " "}>
+            <path d="M-24 -5 V5 H24 V-5" fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
           </KeyCap>
         )}
-        {/* The bag with its three slots, always in the bottom corner */}
+        {/* The bag in its frame with its three slots, always at the bottom left */}
         <g className={`tl-bag${view.choosing ? " open" : ""}`}>
-          <g transform="translate(96 836)">
+          <rect x={bagBox[0] + 8} y={bagBox[1] + 8} width={bagBox[2]} height={bagBox[3]} rx="36" className="tl-bag-shadow" />
+          <rect x={bagBox[0]} y={bagBox[1]} width={bagBox[2]} height={bagBox[3]} rx="36" className="tl-bag-box" strokeWidth="6" />
+          <g transform={`translate(${bag[0]} ${bag[1]}) scale(1.15)`}>
             <path d="M-56 -40 Q-60 40 0 44 Q60 40 56 -40 Q30 -56 0 -56 Q-30 -56 -56 -40 Z" fill="#c08552" stroke={INK} strokeWidth="5" />
             <path d="M-50 -42 Q0 -20 50 -42" stroke={INK} strokeWidth="5" fill="none" />
             <path d="M-20 -54 Q0 -84 20 -54" stroke="#8d5a3b" strokeWidth="8" fill="none" />
           </g>
-          {SLOTS.map(([x, y], i) => {
+          {slots.map(([x, y], i) => {
             const item = view.bag[i];
             return (
               <g
@@ -554,15 +685,15 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               >
                 <circle cx={x} cy={y} r={SLOT_R} className="tl-slot-face" stroke={INK} strokeWidth="6" />
                 {!touchOnly && (
-                  <KeyCap x={x} y={SLOT_KEY_Y} w={58} on={view.choosing && !!item} down={held === `${i + 1}`}>
-                    <text y="15" textAnchor="middle" fontSize="40" fontWeight="800" fontFamily="inherit" fill={INK}>
+                  <KeyCap x={x} y={KEY_Y} w={40} on={view.choosing && !!item} down={held === `${i + 1}`}>
+                    <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
                       {i + 1}
                     </text>
                   </KeyCap>
                 )}
                 {item && (
                   <g transform={`translate(${x} ${y})`}>
-                    <Fitted picture={ITEMS[item]} width={104} />
+                    <Fitted picture={ITEMS[item]} width={88} />
                   </g>
                 )}
               </g>

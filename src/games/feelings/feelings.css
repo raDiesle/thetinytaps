@@ -1,8 +1,29 @@
 /* The feelings game: comforting the bear at home, and the kindergarten stories.
-   A big picture in the middle, picture cards below; the only words are small captions for grown-ups. */
+   A big picture in the middle, picture cards below; the only words are small captions for grown-ups.
+
+   The picture and the cards keep one size for the whole story, whatever happens: things that grow
+   and shrink confuse small children. So the room for the cards is worked out from the screen alone
+   (cq units of .story-play), never from what is in it, and the picture takes all that is left.
+   Upright screens: picture on top as wide as the screen, cards below. Wide screens: picture left,
+   cards right. */
 
 .story-play {
-  --card-w: min(34vw, 28vh, 300px);
+  /* Edges and the space between cards. */
+  --pad: 12px;
+  --gap: clamp(12px, 2.4cqmin, 28px);
+  /* Under a card: its ring and shadow, a gap and one line of caption. */
+  --label: 38px;
+  /* The row of dots at the top; the bear and the weather have none. */
+  --top: 42px;
+  --caption-h: 1.7rem;
+  /* Upright: the picture as wide as the screen, but not more than about half its height; the cards get the rest. */
+  --pic-h: min((100cqw - 2 * var(--pad)) * 0.75, 56cqh);
+  --rest: calc(100cqh - var(--top) - var(--caption-h) - var(--pic-h) - 3 * var(--pad));
+  /* The kindergarten: two cards side by side under the picture. */
+  --card-w: min((100cqw - 2 * var(--pad) - var(--gap)) / 2, (var(--rest) - var(--label)) / 0.75);
+  --choices-h: calc(var(--card-w) * 0.75 + var(--label) + var(--pad));
+  /* At the happy end the three good steps once more, in a row. */
+  --small-w: min((100cqw - 2 * var(--pad) - 2 * var(--gap)) / 3, var(--card-w));
   --pop: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   position: absolute;
@@ -10,6 +31,12 @@
   display: grid;
   grid-template: "top" auto "middle" minmax(0, 1fr) "choices" auto / minmax(0, 1fr);
   background: linear-gradient(var(--sky-bottom), var(--cream));
+  container-type: size;
+}
+
+.bear-play,
+.mood-play {
+  --top: var(--pad);
 }
 
 /* ---------- How far along a story is: one dot per step ---------- */
@@ -18,7 +45,7 @@
   grid-area: top;
   display: flex;
   justify-content: center;
-  padding: max(14px, env(safe-area-inset-top)) 70px 10px;
+  padding: max(8px, env(safe-area-inset-top)) 70px 6px;
 }
 
 .fg-dots {
@@ -50,21 +77,19 @@
 /* ---------- The big picture in the middle ---------- */
 
 .story-middle {
-  --caption-h: 1.9rem;
-
   grid-area: middle;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0 16px 14px;
+  padding: 0 var(--pad) var(--pad);
   container-type: size;
 }
 
 /* At home and for the weather there is nothing above the picture. */
 .bear-play .story-middle,
 .mood-play .story-middle {
-  padding-top: max(14px, env(safe-area-inset-top));
+  padding-top: max(var(--pad), env(safe-area-inset-top));
 }
 
 /* Leaves room for the caption under it. */
@@ -78,7 +103,14 @@
   background: #fff;
   box-shadow: var(--lift);
   container-type: size;
-  animation: pop-in 0.35s var(--pop);
+  animation: fg-picture-in 0.25s ease-out;
+}
+
+/* A new picture fades in where the last one was, at the same size. */
+@keyframes fg-picture-in {
+  from {
+    opacity: 0.4;
+  }
 }
 
 /* The frames lie on top of each other; the first always shows, the others fade in over it in turn. */
@@ -124,9 +156,14 @@
 
 .fg-picture-caption {
   height: var(--caption-h);
-  padding-top: 0.45rem;
-  overflow: hidden;
+  padding-top: 0.35rem;
   font-size: clamp(0.85rem, 2.1vh, 1.1rem);
+}
+
+/* One line, so a long caption never pushes anything. */
+.fg-picture-caption,
+.fg-choice .fg-caption {
+  overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -166,79 +203,64 @@
 
 /* ---------- Picture cards: what the bear can do ---------- */
 
-/* Room for one row of big cards, so the picture doesn't jump when they change. */
+/* Always the same room, whatever is in it: two cards, the small cards at the end, or the round buttons. */
 .story-choices {
   grid-area: choices;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(20px, 5vw, 56px);
-  min-height: calc(var(--card-w) * 0.75 + 100px);
-  padding: 22px 16px max(16px, env(safe-area-inset-bottom));
-  transition: min-height 0.4s ease-in-out;
+  gap: var(--gap);
+  height: var(--choices-h);
+  padding: 0 var(--pad) max(var(--pad), env(safe-area-inset-bottom));
 }
 
-/* At home three kind things and a not-so-good idea: four smaller cards in a row. */
+/* At home a not-so-good idea and three kind things: two by two under the picture. */
 .bear-play {
-  --card-w: min(20vw, 24vh, 240px);
+  --card-w: min((100cqw - 2 * var(--pad) - var(--gap)) / 2, (var(--rest) - 2 * var(--label) - var(--gap)) / 1.5);
+  --choices-h: calc(var(--card-w) * 1.5 + 2 * var(--label) + var(--gap) + var(--pad));
 }
 
 .bear-play .story-choices {
-  gap: clamp(12px, 3vw, 40px);
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  align-content: center;
+  justify-content: center;
 }
 
-/* While the child chooses, the cards are big and the picture above makes room
-   (the middle row takes what is left); when the bear acts, the picture grows again. */
-.story-play.choosing {
-  --card-w: min(44vw, 52vh, 600px);
+.bear-play .fg-end {
+  grid-column: 1 / -1;
+  justify-self: center;
 }
 
-.bear-play.choosing {
-  --card-w: min(21vw, 34vh, 340px);
-}
-
-/* Tall, narrow screens (phones upright): the four cards two by two, so they stay big. */
-@media (max-aspect-ratio: 3 / 4) {
-  .bear-play {
-    --card-w: min(40vw, 19vh, 240px);
+/* Tall, narrow phones: side by side the two kindergarten cards would stay small and leave room empty, so they stand one above the other. */
+@media (max-aspect-ratio: 11 / 20) {
+  .kita-play {
+    --card-w: min(100cqw - 2 * var(--pad), (var(--rest) - 2 * var(--label) - var(--gap)) / 1.5);
+    --choices-h: calc(var(--card-w) * 1.5 + 2 * var(--label) + var(--gap) + var(--pad));
   }
 
-  .bear-play .story-choices {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    justify-content: center;
-    gap: 16px clamp(16px, 5vw, 40px);
-  }
-
-  .bear-play.choosing {
-    --card-w: min(44vw, 24vh, 340px);
-  }
-
-  /* Side by side the two kindergarten cards would stay small: while choosing they stand one above the other. */
-  .kita-play.choosing {
-    --card-w: min(80vw, 34vh, 420px);
-  }
-
-  .kita-play.choosing .story-choices {
+  .kita-play .story-choices {
     flex-direction: column;
-    gap: 16px;
-    padding-top: 10px;
+  }
+
+  .kita-play .story-choices:has(.small) {
+    flex-direction: row;
   }
 }
 
 /* Wie geht's dir? The four weather cards fill the middle, two by two, as big as the height allows (two rows with their captions). */
 .mood-cards {
-  --card-w: min(36cqw, (100cqh - 200px) * 2 / 3, 380px);
+  --card-w: min((100cqw - var(--gap)) / 2, (100cqh - 2 * var(--label) - var(--gap) - var(--pad)) / 1.5);
 
   display: grid;
   grid-template-columns: repeat(2, auto);
-  gap: 28px clamp(24px, 6vw, 64px);
+  gap: var(--gap);
 }
 
 /* Wide and low screens: all four in one row. */
 @media (max-height: 560px) and (min-aspect-ratio: 3 / 2) {
   .mood-cards {
-    --card-w: min(21cqw, (100cqh - 80px) * 4 / 3);
+    --card-w: min((100cqw - 3 * var(--gap)) / 4, (100cqh - var(--label)) / 0.75);
 
     grid-template-columns: repeat(4, auto);
   }
@@ -249,13 +271,12 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
   width: var(--card-w);
-  transition: width 0.4s ease-in-out;
 }
 
 .fg-choice.small {
-  --card-w: min(22vw, 16vh, 160px);
+  --card-w: var(--small-w);
 }
 
 .fg-card {
@@ -270,7 +291,6 @@
   cursor: pointer;
   touch-action: manipulation;
   transition:
-    width 0.4s ease-in-out,
     opacity 0.3s,
     translate 0.15s,
     box-shadow 0.15s;
@@ -296,9 +316,9 @@
 /* What can be tapped now has a thick yellow ring and calls gently. */
 .fg-card-choose {
   box-shadow:
-    0 0 0 7px var(--sunshine),
-    0 0 0 10px var(--ink),
-    0 14px 0 4px var(--ink);
+    0 0 0 6px var(--sunshine),
+    0 0 0 9px var(--ink),
+    0 12px 0 3px var(--ink);
   animation: fg-call 1.8s ease-in-out infinite;
 }
 
@@ -352,8 +372,8 @@
 
 .fg-card-mark {
   position: absolute;
-  top: -16px;
-  right: -16px;
+  top: -12px;
+  right: -12px;
   z-index: 3;
   width: 34%;
   animation: fg-stamp 0.45s var(--pop);
@@ -383,6 +403,8 @@
 /* ---------- Again and next, as round picture buttons ---------- */
 
 .fg-end {
+  --end-size: min(var(--card-w) * 0.75, 168px);
+
   display: flex;
   align-items: center;
   gap: clamp(28px, 7vw, 72px);
@@ -418,13 +440,13 @@
 
 /* Playing it again is the quieter choice. */
 .fg-round.again {
-  --size: clamp(76px, 14vh, 112px);
+  --size: calc(var(--end-size) * 0.68);
   background: #fff;
 }
 
 /* Going on is big, yellow and calls. */
 .fg-round.next {
-  --size: clamp(104px, 21vh, 168px);
+  --size: var(--end-size);
   background: var(--sunshine);
   animation: fg-call 1.8s ease-in-out infinite;
 }
@@ -436,64 +458,51 @@
   stroke-width: 2;
 }
 
-/* ---------- Wide and low screens (phones on their side): picture left, choices right ---------- */
+/* ---------- Wide screens: picture left, cards right ---------- */
 
-@media (max-height: 560px) and (min-aspect-ratio: 3 / 2) {
+@media (min-aspect-ratio: 6 / 5) {
   .story-play {
-    --card-w: min(26vw, 30vh, 220px);
+    /* Above the cards: room for the ✕ in the corner (it sits 12px from the top and is 44px high). */
+    --x-clear: calc(68px - var(--top));
+    /* What is left of the width when the picture is as high as it can be. */
+    --free: calc(100cqw - (100cqh - var(--top) - var(--caption-h) - 2 * var(--pad)) * 4 / 3 - 3 * var(--pad));
+    /* The kindergarten: two cards one above the other, at least a quarter of the width, so the picture makes some room. */
+    --card-w: min((100cqh - var(--top) - var(--x-clear) - var(--pad) - 2 * var(--label) - var(--gap)) / 1.5, max(26cqw, var(--free)));
+    --choices-w: calc(var(--card-w) + 2 * var(--pad));
+    --small-w: calc((var(--card-w) * 1.5 - var(--label) - var(--gap)) / 2.25);
 
     grid-template: "top top" auto "middle choices" minmax(0, 1fr) / minmax(0, 1fr) auto;
   }
 
-  .story-top {
-    padding-top: max(8px, env(safe-area-inset-top));
-    padding-bottom: 6px;
-  }
-
   .story-middle {
-    padding: 0 0 max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+    padding: 0 0 max(var(--pad), env(safe-area-inset-bottom)) max(var(--pad), env(safe-area-inset-left));
   }
 
   .story-choices {
     flex-direction: column;
-    gap: 22px;
-    min-height: 0;
-    min-width: calc(var(--card-w) + 40px);
-    padding: 0 max(20px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) 20px;
+    width: var(--choices-w);
+    height: auto;
+    padding: var(--x-clear) max(var(--pad), env(safe-area-inset-right)) max(var(--pad), env(safe-area-inset-bottom)) var(--pad);
   }
 
-  .fg-choice.small {
-    --card-w: min(16vw, 22vh, 130px);
+  /* Four cards at home: two by two. Nothing is above them, so they clear the ✕ themselves. */
+  .bear-play {
+    --x-clear: 68px;
+    --card-w: min((100cqh - var(--x-clear) - var(--pad) - 2 * var(--label) - var(--gap)) / 1.5, max(18cqw, (var(--free) - var(--gap)) / 2));
+    --choices-w: calc(var(--card-w) * 2 + var(--gap) + 2 * var(--pad));
+  }
+}
+
+/* Wide and low (phones on their side): one above the other the kindergarten cards would be tiny, so side by side. */
+@media (min-aspect-ratio: 6 / 5) and (max-height: 560px) {
+  .kita-play {
+    --card-w: min((100cqh - var(--top) - var(--x-clear) - var(--pad) - var(--label)) / 0.75, max(18cqw, (var(--free) - var(--gap)) / 2));
+    --choices-w: calc(var(--card-w) * 2 + var(--gap) + 2 * var(--pad));
+    --small-w: calc((var(--card-w) * 2 - var(--gap)) / 3);
   }
 
-  /* While choosing, the two kindergarten cards stand side by side and the picture makes room. */
-  .story-play.choosing {
-    --card-w: min(33vw, 70vh, 320px);
-  }
-
-  .kita-play.choosing .story-choices {
+  .kita-play .story-choices {
     flex-direction: row;
-  }
-
-  /* Four cards at home: two by two. */
-  .story-play.bear-play {
-    --card-w: min(17vw, 24vh, 180px);
-  }
-
-  .story-play.bear-play.choosing {
-    --card-w: min(22vw, 38vh, 240px);
-  }
-
-  .bear-play .story-choices {
-    display: grid;
-    grid-template-columns: repeat(2, auto);
-    align-content: center;
-    gap: 16px 20px;
-  }
-
-  .fg-end {
-    flex-direction: column;
-    gap: 20px;
   }
 }
 
