@@ -1,18 +1,20 @@
 ---
 name: zahnputzlied
-description: The sung Zähneputzen-Lied of „Zähne putzen“ in a new language (or a new take of one) – write the lyrics, one verse per brushing step, give the user the copy-paste texts for suno.com, then even out, convert and drop in the WAV they download; no code needed. Use when the user wants the brushing song in another language (English, Türkisch, Polnisch, …), says "Zahnputzlied", "Lied auf <Sprache>" for Zähne putzen, or hands over a WAV of it.
+description: The sung Zähneputzen-Lied of „Zähne putzen“ in a new language (or a new take of one) – write the lyrics, one verse per brushing step, give the user the copy-paste texts for suno.com, then convert the WAV they download and find where each verse begins (Whisper), so the steps follow the song; no code needed. Use when the user wants the brushing song in another language (English, Türkisch, Polnisch, …), says "Zahnputzlied", "Lied auf <Sprache>" for Zähne putzen, or hands over a WAV of it.
 ---
 
 # Zähneputzen-Lied in a new language
 
-The sung brushing song (`src/games/teeth/`, see its `CLAUDE.md`): in two-minute
-brushing each of the 7 steps lasts 17.14 s = 8 bars at 112 BPM, and the song sings one
-verse per step about what the picture shows, then a finale on the end screen. The
-voice stays silent meanwhile, the song is the hint.
+The sung brushing song (`src/games/teeth/`, see its `CLAUDE.md`): the brushing lasts
+as long as the song (no choice of minutes), the song sings one verse per step about what the picture shows, then a finale
+on the end screen. The voice stays silent meanwhile, the song is the hint. Suno doesn't
+sing its verses equally long, so **the steps follow the verses**: each step begins a
+moment before its verse.
 
-A language is **just a file**: `musik/musik-zaehneputzen-lied-<lang>.mp3` (two-letter
-code) appears in the setting „Gesungen“ by its name (`sung.ts`, `music.ts`). No code,
-unless the language has no name in `SUNG_LABELS` (`sung.ts`) yet – then one line.
+A language is **just two files**: `musik/musik-zaehneputzen-lied-<lang>.mp3` (two-letter
+code) and the `.json` of the same name with where its verses begin. They appear in the
+setting „Gesungen“ by their name (`sung.ts`, `music.ts`). No code, unless the language
+has no name in `SUNG_LABELS` (`sung.ts`) yet – then one line.
 
 The user makes the song on suno.com (never ask for their login); general Suno
 lessons are in `/musik-erzeugen`.
@@ -65,42 +67,46 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
    about 2:20 with a final chord. Wrong word → generate again or "Replace Section".
    Download the better one as **WAV** and send the path.
 
-## 3. Even it out and put it in
-
-Suno speeds up while singing (the German take went from 112 to 115 BPM), so every
-part is stretched back to 17.14 s and the first one put at 0.2 s – then all sung songs
-share one timing (`SUNG_LEAD`, `SUNG_PART` in `sung.ts`).
+## 3. Put it in
 
 ```bash
-yarn song "/Users/…/Downloads/Song.wav" --bpm 112 --bars 8
+yarn song:verses "/Users/…/Downloads/Song.wav" src/games/teeth/musik/musik-zaehneputzen-lied-<lang>.mp3 --lang <lang>
 ```
 
-Look at the spectrogram with Read and find where the first verse's first beat is
-(the printed "first beat" can be a beat off; the first part starts right at the
-beginning when Suno left out the intro). Then:
+It converts the song for the game, listens to it with Whisper (needs
+`brew install whisper-cpp` and the model in `~/.cache/whisper/ggml-base.bin` – the
+script prints how; downloading them needs the user's OK), finds the first line of every
+part of the new lyrics section in order, and writes the `.json`. It prints each part's
+start and length:
+
+- **A line not found:** it prints what Whisper heard there. Usually Suno left out or
+  changed the line – a new take is better than forcing it.
+- **"odd length"** (a step under 13 s or over 26 s): Suno crammed or stretched a verse.
+  Usable (the German take has a 9 s step), but tell the user and offer a new take.
+- **Whisper's times can be seconds off**, mostly for the first word after a break.
+  For any start that looks doubtful, draw that stretch and look at it with Read: the
+  voice shows as stacks of many harmonics, a whistle or flute as a single line.
 
 ```bash
-yarn song:stretch "/Users/…/Downloads/Song.wav" src/games/teeth/musik/musik-zaehneputzen-lied-<lang>.mp3 --bpm 112 --start <first beat> --lead 0.2
-yarn song src/games/teeth/musik/musik-zaehneputzen-lied-<lang>.mp3 --bpm 112 --bars 8
+ffmpeg -ss <from> -t 12 -i src/games/teeth/musik/musik-zaehneputzen-lied-<lang>.mp3 -lavfi "pan=mono|c0=0.5*c0+0.5*c1,showspectrumpic=s=1400x500:fscale=log:start=150:stop=3000:legend=1" check.png
 ```
 
-The second must say 112 BPM with parts at about 0.2 + n × 17.14 s (±0.1 s). The
-part list of `song:stretch` should show 8 parts of about 16.6–17.2 s plus the short
-ending; much shorter or longer means a wrong `--start` or a song that doesn't keep
-8-bar verses – then a new take is better than forcing it.
+  If a start is wrong, correct it in the `.json` by hand (a moment, ~0.3 s, before the
+  first word).
 
 Then:
 
 - `SUNG_LABELS` in `sung.ts`: add the language if it isn't there („🇫🇷 Französisch“).
-- `musik/README.md`: a row in the table (source Suno, date, "stretched to 112 BPM").
-- `yarn verify` – `sung.test.ts` checks that every song file has a name and its
-  lyrics section in `suno-lied.md`.
+- `musik/README.md`: a row in the table (source Suno, date); `suno-lied.md`: a note on
+  anything odd in the take.
+- `yarn verify` – `sung.test.ts` checks that every song has its `.json` (one start per
+  step plus the finale, steps 8–30 s), a name and its lyrics in `suno-lied.md`.
 
 ## 4. Check
 
 Sound is muted in Claude's preview. Log what plays instead (see `/musik-erzeugen` 5.),
-choose the language under „Gesungen“, start 2 Minuten, skip the prelude with →, and
-step through: the sung file (≈143 s long) must start at 0.20, 17.34, 34.49 … s for the
-steps and play 120.20 once at the end. Ask the user to listen on a real device that
+choose the language under „Gesungen“, press „Los geht's!“, skip the prelude with →, and
+step through: the sung file must start at the `.json`'s times, one per step, and play
+the last one once at the end; the timer shows the song's length (finale − first verse). Ask the user to listen on a real device that
 each verse comes with its picture. Commit (`Zähne putzen: the brushing song in <Language>`)
 and merge into local main.

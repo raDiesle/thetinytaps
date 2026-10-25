@@ -23,8 +23,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   { href: "/bilder/", languages: { de: "done" }, note: "Viele Namen und Sätze je Bild (content.ts jeder Szene)." },
   {
     href: "/abenteuer/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "partial", it: "partial" },
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen. Russisch und Italienisch sind übersetzt, aber noch nicht aufgenommen (Credits); bis dahin liest die Browserstimme.",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial", it: "partial" },
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen. Die Schatzinsel spricht auch Englisch, Chinesisch, Hindi, Spanisch und Arabisch (aufgenommen), Russisch und Italienisch (übersetzt, noch die Browserstimme); die Wolkenreise ist noch nur auf Deutsch.",
   },
   { href: "/gefuehle/", languages: { de: "done" } },
   { href: "/kettenreaktion/", languages: { de: "done" } },

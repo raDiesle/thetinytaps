@@ -1,12 +1,16 @@
 import { existsSync, readdirSync } from "node:fs";
 import { expect, test } from "@rstest/core";
 import { TARGET_LANGUAGES } from "@/content/targetLanguages";
+import { CLOUD_TRIP } from "./stories/cloudTrip";
 import { DEFAULT_TURN, type Story, storyIn } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 import { recordingName, spokenLines } from "./voiceId";
 
 // Recordings are named by the hash of their line (voice.ts, `yarn voice make`).
-const STORIES = [{ dir: "src/games/adventure/stories/treasureIsland", story: TREASURE_ISLAND }];
+const STORIES = [
+  { dir: "src/games/adventure/stories/treasureIsland", story: TREASURE_ISLAND },
+  { dir: "src/games/adventure/stories/cloudTrip", story: CLOUD_TRIP },
+];
 
 /** The story in every language it has, with the folder of its recordings. */
 const voices = () =>

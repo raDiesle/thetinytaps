@@ -88,10 +88,10 @@ Exclude Styles:
 choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, long intro
 ```
 
-Suno sped up to 115 BPM by the end; every part was stretched back to 8 bars at
-112 BPM with `yarn song:stretch … --bpm 112 --start 0.3 --lead 0.2`.
+Suno sped up to 115 BPM and sang the verses 9 to 20 s long: „Innen oben“ is only about
+9 s before „Fertig!“ comes. A new take could even that out.
 
-## English (`en`, not made yet)
+## English (`en`, 25 Oct 2026)
 
 Lyrics:
 
@@ -173,3 +173,6 @@ Exclude Styles:
 ```text
 choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, speeding up, long intro
 ```
+
+Suno made a short plucked intro, whistled fills between some verses and verses of 17 to
+23 s.

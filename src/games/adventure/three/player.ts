@@ -46,7 +46,7 @@ const SEATED: LegPose = { lift: 1.55, spread: 0.1, knee: 0.08 };
  * knees in, lean forwards over the feet, push up. The upper body leans forwards in the squat; the rest of the
  * pose (the arms) stays.
  */
-function sitDown(p: Pose, k: number): Pose {
+export function sitDown(p: Pose, k: number): Pose {
   if (k <= 0) return p;
   const leg = (standing: LegPose) =>
     k < 0.45

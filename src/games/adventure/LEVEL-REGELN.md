@@ -116,6 +116,13 @@ Fehler in späteren Leveln nicht wieder passiert.
   deutlich mit, nicht nur der Körper.
 - **Hinter durchsichtigen Dingen sieht man durch** (Spinnweben): keine weiße oder helle Fläche
   dahinter, die wie eine Wand wirkt.
+- **Begleiter fliegen nie durchs Bild** (Kiki): Sie bleiben weit genug vor der Kamera und wechseln
+  höchstens einmal die Seite, vor dem Fuchs und in einem Schritt, in dem die Kamera von hinten schaut.
+  Jeden Übergang zwischen zwei Stationen anschauen, nicht nur die Stationen selbst: Ein Papagei, der
+  beim Umdrehen oder Seitenwechsel vor der Linse vorbeifliegt, verdeckt den Fuchs ganz.
+- **Die Kamera steht frei, auch am Anfang**: Nicht in oder knapp vor Wolken oder Bergen starten. Das,
+  was gezeigt werden soll (die Regenwolke), sieht man aus Abstand ganz. Ein grauer Himmel hat keinen
+  hellen Sonnenschein.
 - **Keine Felswand füllt das Bild.** In engen Buchten erst von oben nachsehen, wo die Wände sind,
   und Figur, Truhe und Kamera so stellen, dass die Kamera frei steht und die Wand höchstens am Rand
   zu sehen ist.

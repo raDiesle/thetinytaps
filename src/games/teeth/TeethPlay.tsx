@@ -8,7 +8,7 @@ import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
-import { useBrushingMusic } from "./music";
+import { sungSteps, useBrushingMusic } from "./music";
 import { Prep } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS } from "./steps";
@@ -24,6 +24,8 @@ const TURN_MS = 1100;
 const MOUTH_MS = 1800;
 /** How long the arrows on the lips show after the mouth has to open or close. */
 const ACTION_MS = 3500;
+/** Brushing without a sung song: the two minutes dentists recommend, as long as the plain song's seven parts. */
+const BRUSH_MS = 120_000;
 /** Dragging on the progress bar stops this far before the end. */
 const SEEK_END_MS = 1000;
 
@@ -144,19 +146,22 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
   const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
   const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
-  const stepMs = (Number(settings.minutes) * 60_000) / STEPS.length;
-  const totalMs = stepMs * STEPS.length;
+  // With a sung song the brushing lasts as long as the song and each step as long as its verse; otherwise two minutes in equal steps.
+  const sungIn = settings.music && settings.singing !== "off" ? settings.singing : null;
+  const stepStarts = useMemo(() => sungSteps(sungIn) ?? Array.from({ length: STEPS.length + 1 }, (_, k) => (k * BRUSH_MS) / STEPS.length), [sungIn]);
+  const stepLength = (k: number) => stepStarts[k + 1] - stepStarts[k];
+  const totalMs = stepStarts[STEPS.length];
   const paused = clock.since === null;
   const elapsed = readClock(clock, now);
   const brushed = elapsed - introMs;
   const done = brushed >= totalMs;
   /** -1 during the prelude, STEPS.length when done. */
-  const phase = brushed < 0 ? -1 : done ? STEPS.length : Math.floor(brushed / stepMs);
+  const phase = brushed < 0 ? -1 : done ? STEPS.length : stepStarts.filter((at, k) => k < STEPS.length && brushed >= at).length - 1;
   const before = brushed < 0 ? preludeAt(prelude, elapsed) : null;
   /** Prelude parts first, then the steps, then the end: what the arrow keys step through. */
   const part = before ? prelude.indexOf(before) : prelude.length + phase;
   // The last one goes a moment before the step's time is up, so it's gone when the brush moves on.
-  const isGone = (m: Monster) => brushed >= (m.step + (m.order + 1) / perStep[m.step] - 0.04) * stepMs;
+  const isGone = (m: Monster) => brushed >= stepStarts[m.step] + ((m.order + 1) / perStep[m.step] - 0.04) * stepLength(m.step);
   const goneCount = monsters.filter(isGone).length;
   const step = phase >= 0 && !done ? STEPS[phase] : null;
   const cue = before ? preludeCue(before) : step?.cue;
@@ -178,10 +183,10 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   // The brushing has its own song (or none, when it is switched off).
   useNoBackgroundMusic();
-  // The sung song fits only the two-minute brushing, one verse per step; it sings the steps, so the voice leaves them to it.
+  // The sung song sings the steps, so the voice leaves them to it.
   const sung = useBrushingMusic({
     enabled: settings.music,
-    sung: settings.minutes === "2" && settings.singing !== "off" ? settings.singing : null,
+    sung: sungIn,
     playing: step !== null && !paused,
     finished: done,
     sync: clock,
@@ -262,9 +267,9 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       seek(
         target < prelude.length
           ? prelude.slice(0, target).reduce((sum, p) => sum + PRELUDE[p].ms, 0)
-          : introMs + Math.min(target - prelude.length, STEPS.length) * stepMs,
+          : introMs + stepStarts[Math.min(target - prelude.length, STEPS.length)],
       ),
-    [seek, prelude, introMs, stepMs],
+    [seek, prelude, introMs, stepStarts],
   );
 
   /** Tapping or dragging on the progress bar jumps to that point of the brushing. */
@@ -274,7 +279,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     const rect = segments[i].getBoundingClientRect();
     const k = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
     // Stop just short of the end, so dragging to the right edge doesn't finish at once.
-    seek(introMs + Math.min((i + k) * stepMs, totalMs - SEEK_END_MS));
+    seek(introMs + Math.min(stepStarts[i] + k * stepLength(i), totalMs - SEEK_END_MS));
   };
 
   useEffect(() => {
@@ -296,14 +301,14 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   // When the mouth has to open or close, the picture does it slowly and arrows on the lips show the way.
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
   const mouthMoves = step !== null && step.mouth !== mouthBefore;
-  const action: MouthAction | null = step && mouthMoves && brushed - phase * stepMs < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
+  const action: MouthAction | null = step && mouthMoves && brushed - stepStarts[phase] < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
   const target = step?.view ?? GRIN_VIEW;
   const view = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
   // The brush glides along the step's teeth and reaches each monster just as it goes.
   const inStep = monsters.filter((m) => m.step === phase);
   const brushAt = inStep.find((m) => !isGone(m));
-  const stepDone = phase >= 0 ? (brushed - phase * stepMs) / stepMs : 0;
+  const stepDone = step ? (brushed - stepStarts[phase]) / stepLength(phase) : 0;
   const brushStop = Math.max(0, Math.min(inStep.length - 1, stepDone * inStep.length - 0.6));
   // Every monster on a tooth not brushed yet; the picture shows those whose side of the tooth faces out.
   const spots: MonsterSpot[] = monsters
@@ -405,7 +410,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             >
               {STEPS.map((s, i) => (
                 <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
-                  <span style={{ width: `${Math.max(0, Math.min(1, (brushed - i * stepMs) / stepMs)) * 100}%` }} />
+                  <span style={{ width: `${Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i))) * 100}%` }} />
                 </span>
               ))}
             </div>
