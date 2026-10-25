@@ -57,6 +57,9 @@ In a fresh worktree run `yarn install` first.
   tense). Other languages come game by game: the app aims at German, the five most spoken
   languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
   When a game gains one, mark it in `src/content/ideas/languageStatus.ts` (shown on `/ideen/`).
+  Every language choice (the Spielsprache on the home page, a game's own) starts on `playLanguage(…)`
+  (`src/lib/locale.ts`): German while developing, for players the browser's language if offered, else
+  English – never a hard-coded `"de"`. A fallback when something isn't translated is English too, then German.
   Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported

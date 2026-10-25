@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { TARGET_LANGUAGES, targetLanguageFor } from "@/content/targetLanguages";
+import { TARGET_LANGUAGES, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { AdventurePlay } from "./AdventurePlay";
@@ -24,8 +24,9 @@ export function AdventureGame() {
   const { touchOnly } = useDevice();
   const chosen = (STORIES.find((s) => s.id === settings.story) ?? STORIES[0]).story;
   const wanted = targetLanguageFor(settings.language);
-  // A story not translated yet is said in German, not German words with an English voice.
-  const language = wanted.id === "de" || chosen.translations?.[wanted.id] ? wanted : targetLanguageFor("de");
+  // A story not translated yet is said in English, or else German – never German words with a Spanish voice.
+  const told = (id: TargetLanguageId) => id === "de" || Boolean(chosen.translations?.[id]);
+  const language = told(wanted.id) ? wanted : targetLanguageFor(told("en") ? "en" : "de");
   // Built once per story and language: the game starts anew when the story changes.
   const story = useMemo(() => storyIn(chosen, language.id), [chosen, language.id]);
 
@@ -73,7 +74,7 @@ export function AdventureGame() {
           {!settings.speech && <p className="setting-note">Tapsi spricht nur, wenn „Vorlesen“ auf der Startseite an ist.</p>}
           {language !== wanted && (
             <p className="setting-note">
-              „{chosen.sequence.title}“ gibt es noch nicht auf {wanted.label.split(" ")[1]}, Tapsi spricht dort Deutsch.
+              „{chosen.sequence.title}“ gibt es noch nicht auf {wanted.label.split(" ")[1]}, Tapsi spricht dort {language.label.split(" ")[1]}.
             </p>
           )}
           <Toggle label="Musik" checked={settings.music} onChange={(music) => update({ music })} />

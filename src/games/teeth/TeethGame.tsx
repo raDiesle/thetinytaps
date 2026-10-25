@@ -3,14 +3,18 @@ import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
+import { playLanguage } from "@/lib/locale";
 import { SUNG_LANGUAGES } from "./music";
 import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY } from "./settings";
 import { KAI } from "./steps";
 import { SUNG_LABELS } from "./sung";
 import { TeethPlay } from "./TeethPlay";
 
+// Until the parents choose, the song is sung in the browser's language (English when there is no song in it).
+const DEFAULTS = { ...DEFAULT_TEETH_SETTINGS, singing: SUNG_LANGUAGES.length ? playLanguage(SUNG_LANGUAGES) : DEFAULT_TEETH_SETTINGS.singing };
+
 export function TeethGame() {
-  const [shared, update, stored] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
+  const [shared, update, stored] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULTS);
   // The spoken hints have their own switch here, independent of "Vorlesen" on the home page.
   const settings = { ...shared, speech: stored.speech };
   const [common] = useCommonSettings();

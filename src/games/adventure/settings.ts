@@ -1,4 +1,5 @@
-import type { TargetLanguageId } from "@/content/targetLanguages";
+import { TARGET_LANGUAGES, type TargetLanguageId } from "@/content/targetLanguages";
+import { playLanguage } from "@/lib/locale";
 
 /** The 3D stories to choose from on the start screen. */
 export type AdventureStoryId = "schatzinsel" | "wolkenreise";
@@ -10,7 +11,7 @@ export interface AdventureSettings {
   speech: boolean;
   /** Background music; off by default. */
   music: boolean;
-  /** The language Tapsi speaks in (when speech is on). */
+  /** The language Tapsi speaks in (when speech is on); the browser's language at first. */
   language: TargetLanguageId;
   /** Splashes, whooshes and sparkles. */
   sounds: boolean;
@@ -24,7 +25,7 @@ export const DEFAULT_ADVENTURE_SETTINGS: AdventureSettings = {
   story: "schatzinsel",
   speech: false,
   music: false,
-  language: "de",
+  language: playLanguage(TARGET_LANGUAGES.map((l) => l.id)),
   sounds: true,
   outline: true,
   glow: true,

@@ -1,5 +1,6 @@
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { LANGUAGES, languageFor, type LanguageId } from "@/content/languages";
+import { playLanguage } from "@/lib/locale";
 import { useStoredSettings } from "@/lib/storage";
 
 export interface LanguageSettings {
@@ -9,7 +10,8 @@ export interface LanguageSettings {
   second: LanguageId | "none";
 }
 
-const DEFAULT_LANGUAGE_SETTINGS: LanguageSettings = { language: "de", second: "none" };
+// Until the parents choose, the child plays in the browser's language (English when there is none of it).
+const DEFAULT_LANGUAGE_SETTINGS: LanguageSettings = { language: playLanguage(LANGUAGES.map((l) => l.id)), second: "none" };
 
 // Shared by the letters and words games, so parents choose the language once.
 const LANGUAGE_SETTINGS_KEY = "tinytaps.language.v1";
