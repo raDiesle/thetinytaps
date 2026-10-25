@@ -1,6 +1,6 @@
 // Sounds of home, people and nature: water, kitchen, bathroom, toys, weather.
 
-import { PENTATONIC, hiss, note } from "./core";
+import { PENTATONIC, hiss, note, voice } from "./core";
 
 /** Raindrops: soft high plinks. */
 export function playDrops() {
@@ -202,6 +202,16 @@ export function playLaugh() {
     note({ from: pitch * 2.3, to: pitch * 2, duration: 0.11, type: "triangle", volume: 0.05, delay });
     hiss({ from: 2000, duration: 0.07, volume: 0.04, delay: delay + 0.02, q: 1 });
   });
+}
+
+/** „Aua!“ – a small child that got hurt: a high "a" gliding into "u", then a falling "a". */
+export function playAua() {
+  const [a, u]: [number, number][] = [
+    [1000, 1650],
+    [460, 1000],
+  ];
+  voice({ pitch: [430, 560, 520, 470], vowels: [a, a, u, u], duration: 0.38, volume: 0.9 });
+  voice({ pitch: [500, 420, 330], vowels: [a, a, a], duration: 0.42, volume: 0.9, delay: 0.36 });
 }
 
 /** "Krach!" – something breaks: a hard bang, then pieces clattering down. */

@@ -6,7 +6,7 @@
 // say "Stopp!", step away, get a grown-up, ask, wait, swap. Every step has a
 // not-so-good idea before it, so the child always chooses between two.
 
-import type { Beat } from "./story";
+import type { Beat, OopsSound } from "./story";
 
 export type SituationId = "push" | "kick" | "grab" | "slide" | "want" | "angry" | "bye" | "new" | "fall" | "stop";
 
@@ -16,8 +16,8 @@ export interface KitaInstead {
   caption: string;
   /** Read aloud when the child picks it: why it is not so good, and what is better. */
   answer: string;
-  /** Something breaks or falls over: it crashes; otherwise someone cries. */
-  breaks?: boolean;
+  /** What it leads to, heard: „Aua!“ when someone gets hurt, a crash when something breaks; otherwise someone cries. */
+  sound?: OopsSound;
 }
 
 /** One good thing the little bear does, with the not-so-good idea offered before it. */
@@ -57,12 +57,12 @@ export const SITUATIONS: Situation[] = [
       {
         caption: "„Stopp!“ sagen",
         beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Nein! Ich will das nicht!" }],
-        instead: { caption: "Zurückschubsen", answer: "Hmm, dann tut es noch mehr weh. Sag lieber laut: Stopp!" },
+        instead: { caption: "Zurückschubsen", answer: "Hmm, dann tut es noch mehr weh. Sag lieber laut: Stopp!", sound: "aua" },
       },
       {
         caption: "Weggehen",
         beats: [{ narration: "Dann geht er weg. So hat er Abstand." }],
-        instead: { caption: "Sand werfen", answer: "Hmm, Sand in den Augen tut weh. Geh lieber weg." },
+        instead: { caption: "Sand werfen", answer: "Hmm, Sand in den Augen tut weh. Geh lieber weg.", sound: "aua" },
       },
       {
         caption: "Erzieherin holen",
@@ -71,7 +71,7 @@ export const SITUATIONS: Situation[] = [
           { line: "Stopp, Fuchs. Schubsen tut weh." },
           { line: "Entschuldigung, Bär." },
         ],
-        instead: { caption: "Eimer kaputt machen", answer: "Hmm, jetzt ist der Eimer kaputt und der Fuchs weint. Hol lieber Hilfe.", breaks: true },
+        instead: { caption: "Eimer kaputt machen", answer: "Hmm, jetzt ist der Eimer kaputt und der Fuchs weint. Hol lieber Hilfe.", sound: "crash" },
       },
     ],
     outro: [{ narration: "Super! Stopp sagen, weggehen, Hilfe holen.", sound: "chime" }],
@@ -87,12 +87,12 @@ export const SITUATIONS: Situation[] = [
       {
         caption: "„Stopp!“ sagen",
         beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Nicht treten!" }],
-        instead: { caption: "Zurücktreten", answer: "Hmm, dann tut es beiden weh. Sag lieber laut: Stopp!" },
+        instead: { caption: "Zurücktreten", answer: "Hmm, dann tut es beiden weh. Sag lieber laut: Stopp!", sound: "aua" },
       },
       {
         caption: "Weggehen",
         beats: [{ narration: "Er geht ein paar Schritte weg." }],
-        instead: { caption: "Am Ohr ziehen", answer: "Hmm, Ziehen tut auch weh. Geh lieber weg." },
+        instead: { caption: "Am Ohr ziehen", answer: "Hmm, Ziehen tut auch weh. Geh lieber weg.", sound: "aua" },
       },
       {
         caption: "Erzieherin rufen",
@@ -122,7 +122,7 @@ export const SITUATIONS: Situation[] = [
       {
         caption: "Um Traktor bitten",
         beats: [{ line: "Gib ihn mir bitte zurück." }, { line: "Hier. Entschuldigung." }, { sound: "pop" }],
-        instead: { caption: "Hauen", answer: "Hmm, Hauen tut weh. Sag lieber: Gib ihn mir bitte zurück." },
+        instead: { caption: "Hauen", answer: "Hmm, Hauen tut weh. Sag lieber: Gib ihn mir bitte zurück.", sound: "aua" },
       },
       {
         caption: "Zusammen spielen",
@@ -143,7 +143,7 @@ export const SITUATIONS: Situation[] = [
       {
         caption: "Anstellen",
         beats: [{ narration: "Er stellt sich hinten an.", line: "Ich bin nach dem Fuchs dran." }],
-        instead: { caption: "Vordrängeln", answer: "Hmm, auf der Rutsche kann jemand runterfallen. Lieber hinten anstellen." },
+        instead: { caption: "Vordrängeln", answer: "Hmm, auf der Rutsche kann jemand runterfallen. Lieber hinten anstellen.", sound: "aua" },
       },
       {
         caption: "Warten",
@@ -198,12 +198,12 @@ export const SITUATIONS: Situation[] = [
       {
         caption: "Stampfen",
         beats: [{ narration: "Aber er stampft lieber. Stampf, stampf!", sound: "rumble" }],
-        instead: { caption: "Schubsen", answer: "Hmm, Schubsen tut weh. Lass die Wut lieber raus: Stampf ganz fest!" },
+        instead: { caption: "Schubsen", answer: "Hmm, Schubsen tut weh. Lass die Wut lieber raus: Stampf ganz fest!", sound: "aua" },
       },
       {
         caption: "Tief pusten",
         beats: [{ narration: "Er atmet tief ein und pustet: Puuuh." }],
-        instead: { caption: "Turm umtreten", answer: "Hmm, jetzt weint der Fuchs auch. Puste lieber ganz tief: Puuuh.", breaks: true },
+        instead: { caption: "Turm umtreten", answer: "Hmm, jetzt weint der Fuchs auch. Puste lieber ganz tief: Puuuh.", sound: "crash" },
       },
       {
         caption: "„Ich bin wütend!“ sagen",
@@ -212,7 +212,7 @@ export const SITUATIONS: Situation[] = [
           { line: "Oh, Entschuldigung! Ich helfe dir." },
           { sound: "pop" },
         ],
-        instead: { caption: "Hauen", answer: "Hmm, Hauen tut weh. Sag lieber: Ich bin wütend!" },
+        instead: { caption: "Hauen", answer: "Hmm, Hauen tut weh. Sag lieber: Ich bin wütend!", sound: "aua" },
       },
     ],
     outro: [{ narration: "Toll! Wütend sein ist okay. Stampfen, pusten, sagen – nicht hauen.", sound: "chime" }],
@@ -288,7 +288,7 @@ export const SITUATIONS: Situation[] = [
       {
         caption: "Pflaster drauf",
         beats: [{ narration: "Die Erzieherin klebt ein Pflaster drauf und pustet." }, { line: "So. Gleich ist es besser." }],
-        instead: { caption: "Pflaster abreißen", answer: "Hmm, dann tut es wieder weh. Lass das Pflaster lieber dran." },
+        instead: { caption: "Pflaster abreißen", answer: "Hmm, dann tut es wieder weh. Lass das Pflaster lieber dran.", sound: "aua" },
       },
       {
         caption: "Langsam weiterspielen",
@@ -296,7 +296,7 @@ export const SITUATIONS: Situation[] = [
           { narration: "Der Fuchs hilft ihm hoch.", line: "Komm, wir spielen langsam." },
           { narration: "Sie rollen sich den Ball zu.", sound: "boing" },
         ],
-        instead: { caption: "Gleich wild rennen", answer: "Hmm, dann fällt er gleich wieder hin. Spiel lieber erst langsam." },
+        instead: { caption: "Gleich wild rennen", answer: "Hmm, dann fällt er gleich wieder hin. Spiel lieber erst langsam.", sound: "aua" },
       },
     ],
     outro: [{ narration: "Super! Hilfe rufen, Pflaster drauf, langsam weiter. Das Aua geht vorbei.", sound: "chime" }],
@@ -318,7 +318,7 @@ export const SITUATIONS: Situation[] = [
           { narration: "Der kleine Bär sagt laut:", line: "Stopp! Ich will das nicht mehr!" },
           { narration: "Der Fuchs hört auf.", line: "Oh. Okay." },
         ],
-        instead: { caption: "Beißen", answer: "Hmm, Beißen tut weh. Sag lieber laut: Stopp! Ich will das nicht!" },
+        instead: { caption: "Beißen", answer: "Hmm, Beißen tut weh. Sag lieber laut: Stopp! Ich will das nicht!", sound: "aua" },
       },
       {
         caption: "Fangen vorschlagen",

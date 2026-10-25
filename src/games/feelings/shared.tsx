@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { loadRecordings } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { framesFor, imageFor } from "./images";
-import { SOUNDS, type SoundName } from "./story";
+import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
 
 const SPEECH_LANG = "de-DE";
@@ -26,10 +27,13 @@ export function cheer(say: (text: string) => void, sound: (name: SoundName) => v
   float("✨", 70, 35, 4);
 }
 
-/** A not-so-good idea was chosen: what it leads to, heard and seen – crying, or a crash when something breaks. */
-export function oops(breaks: boolean | undefined, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
-  sound(breaks ? "crash" : "cry");
-  float(breaks ? "💥" : "💧", 50, 45, 3);
+/** What floats up after a not-so-good idea, by what is heard. */
+const OOPS_FLOAT: Record<OopsSound | "cry", string> = { aua: "💢", crash: "💥", cry: "💧" };
+
+/** A not-so-good idea was chosen: what it leads to, heard and seen – „Aua!“, a crash, or crying. */
+export function oops(heard: OopsSound | undefined, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
+  sound(heard ?? "cry");
+  float(OOPS_FLOAT[heard ?? "cry"], 50, 45, 3);
 }
 
 /** Timeouts that are all cleared when the game ends or a new story starts. */
@@ -59,6 +63,10 @@ export function useTimers() {
 
 /** Speech and sounds as the parent set them up. */
 export function useVoice(settings: FeelingsSettings) {
+  useEffect(() => {
+    if (settings.sounds) loadRecordings(RECORDED_SOUNDS);
+  }, [settings.sounds]);
+
   const say = useCallback(
     (text: string, queue = false) => {
       if (settings.speech) speak(text, SPEECH_LANG, { queue, rate: 0.85 });

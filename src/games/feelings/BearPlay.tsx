@@ -122,10 +122,10 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
   /** The not-so-good idea: shown big in a red frame that shakes, with crying or a crash, while it is told why it doesn't help; then the cards come back. */
   const tryInstead = useCallback(() => {
     if (round.busy || happy) return;
-    const { answer, breaks } = feeling.instead;
+    const { answer, sound: heard } = feeling.instead;
     setRound((r) => ({ ...r, tried: true, trying: true, picked: null, busy: true }));
     say(answer);
-    oops(breaks, sound, float);
+    oops(heard, sound, float);
     later(() => setRound((r) => ({ ...r, busy: false, trying: false })), Math.max(OOPS_MS, beatMs({ narration: answer }, settings.speech)));
   }, [round.busy, happy, feeling, say, sound, float, later, settings.speech]);
 
