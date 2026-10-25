@@ -63,3 +63,72 @@
     animation: none;
   }
 }
+
+/* On a computer: the number keys under the shelf, which go down while held. */
+.run-key {
+  cursor: pointer;
+}
+
+.run-key-base {
+  fill: #adb5bd;
+}
+
+.run-key-face {
+  fill: #fff8e8;
+}
+
+.run-key-top {
+  transition: transform 0.08s;
+}
+
+.run-key.down .run-key-top {
+  transform: translateY(5px);
+}
+
+/*
+ * On a computer: the space bar, wide at the bottom in the middle, rebuilds the
+ * run. Its dashed wooden edge and wrench match the boards of the spots.
+ */
+.run-space {
+  position: absolute;
+  bottom: max(14px, env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  width: clamp(200px, 30vw, 380px);
+  padding: 0 0 8px;
+  border: 0;
+  border-radius: 20px;
+  background: #8a5a2b;
+  cursor: pointer;
+}
+
+.run-space-top {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: clamp(50px, 7.5vh, 66px);
+  border: 5px dashed #c48a4d;
+  border-radius: 20px;
+  background: #fff8e8;
+  transition: transform 0.08s;
+}
+
+.run-space.down .run-space-top,
+.run-space:active .run-space-top {
+  transform: translateY(8px);
+}
+
+.run-space-wrench {
+  font-family: var(--font-emoji);
+  font-size: clamp(1.8rem, 4.5vh, 2.6rem);
+}
+
+.run-space-bar {
+  width: clamp(80px, 12vw, 150px);
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

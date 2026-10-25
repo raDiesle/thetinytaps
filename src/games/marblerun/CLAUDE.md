@@ -8,10 +8,14 @@ trampoline, bell, funnel by default), rides the seesaw, goes through the tunnel,
 hops over three drums, knocks five chimes and plays a whole scale on the second xylophone before it drops into the basket.
 A full basket raises the flag and ends the round („Nochmal“; any key starts again). A first marble takes about 21 s, the
 whole round about 35 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel); a setting turns this off.
+On a computer a wide space bar sits at the bottom in the middle (like in Ausmalen), and Space rebuilds the run to the next
+of all its builds, counting like a car's mileage: the first spot takes its next part, and each time it is back at the first
+part the next spot moves on too (`rebuildNext`).
 
 „Was rollt denn da?“ (K-07, a setting, on by default): instead of six marbles in a row, a shelf over the first row holds
 three of five things (marble, tennis ball, iron ball, apple, soap bubble; `ROLLER` in `track.ts`); tapping one flies it into
-the hopper and something else pops up in its place, a key or a tap on the wall takes them in turn. Each rolls its own way on
+the hopper and something else pops up in its place, a key or a tap on the wall takes them in turn. On a computer the keys
+1, 2 and 3 hang under the shelf and let out the thing in that place (`ShelfKeys`). Each rolls its own way on
 the same route: the tennis ball hops along the rows, the iron ball is slow with deep notes and thumps, the apple bumps, the
 soap bubble floats at an even speed and bursts above the basket instead of landing (so it doesn't fill it).
 
