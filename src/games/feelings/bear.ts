@@ -1,10 +1,11 @@
 // Zu Hause: the bear and his feelings, what he feels and what helps. Three kind
 // things make him happy again, one not-so-good idea lies among them; tapping the
-// bear strokes him, which always helps too.
+// bear strokes him, which always helps too. On his birthday he is happy already,
+// and the three kind things are celebrating with him.
 
 import type { SoundName } from "./story";
 
-export type ComfortId = "stroke" | "hug" | "teddy" | "stomp" | "blow" | "blanket" | "lullaby" | "hand" | "light";
+export type ComfortId = "stroke" | "hug" | "teddy" | "stomp" | "blow" | "blanket" | "lullaby" | "hand" | "light" | "dance" | "streamers";
 
 /** One kind thing for the bear. */
 export interface Comfort {
@@ -71,9 +72,21 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
     float: "✨",
     sound: "chime",
   },
+  dance: {
+    caption: "Mittanzen",
+    narration: "Ihr tanzt zusammen. Hüpf, hüpf!",
+    float: "🎵",
+    sound: "boing",
+  },
+  streamers: {
+    caption: "Luftschlangen werfen",
+    narration: "Du wirfst bunte Luftschlangen. Hurra!",
+    float: "🎉",
+    sound: "pop",
+  },
 };
 
-export type FeelingId = "sad" | "angry" | "tired" | "scared";
+export type FeelingId = "sad" | "angry" | "tired" | "scared" | "happy";
 
 /** How the bear feels at the start, and what makes him happy again. */
 export interface Feeling {
@@ -84,6 +97,8 @@ export interface Feeling {
   title: string;
   /** Read aloud with the question. */
   intro: string;
+  /** Asked after the intro, if not „Wie kannst du ihm helfen?“. */
+  question?: string;
   /** The kind things on the cards, the best one first. */
   comforts: ComfortId[];
   /** The not-so-good idea, the first card: what its picture shows, and why it doesn't help (read aloud). */
@@ -134,6 +149,17 @@ export const FEELINGS: Feeling[] = [
     instead: { caption: "Licht ausmachen", answer: "Hmm, im Dunkeln hat der Bär noch mehr Angst. Mach lieber Licht an." },
     end: { narration: "Das Gewitter ist vorbei. Der Bär lacht wieder!", line: "Danke!" },
     endCaption: "Wieder fröhlich",
+  },
+  {
+    id: "happy",
+    emoji: "🥳",
+    title: "Freude, Geburtstag",
+    intro: "Der Bär hat Geburtstag! Er freut sich so.",
+    question: "Wie feierst du mit ihm?",
+    comforts: ["dance", "streamers", "hug"],
+    instead: { caption: "Kuchen wegnehmen", answer: "Hmm, das ist sein Geburtstagskuchen. Jetzt ist er traurig. Feier lieber mit ihm." },
+    end: { narration: "Was für ein schöner Geburtstag!", line: "Danke! Das war toll!" },
+    endCaption: "Geburtstagsfeier",
   },
 ];
 

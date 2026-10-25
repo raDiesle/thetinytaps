@@ -90,6 +90,7 @@ export const otherGamesIdeas: IdeaArea = {
       text: "Neue Geschichten beim Bären in der Kita: Abschied an der Tür, ein neues Kind, hingefallen und Aua, warten müssen, „Stopp!“ sagen, wenn jemand nicht aufhört.",
       why: "Die häufigsten Kita-Momente üben, bevor sie passieren.",
       effort: "M",
+      done: true,
     },
     {
       id: "X-11",
@@ -98,6 +99,7 @@ export const otherGamesIdeas: IdeaArea = {
       text: "Zu Beginn wählt das Kind ein Wetterbild (Sonne, Wolke, Regen, Gewitter). Der Bär sagt: „Das kenne ich auch“ und bietet etwas Passendes an: tanzen, kuscheln, kräftig stampfen oder tief atmen.",
       why: "Gefühle benennen ohne Worte; Eltern erfahren nebenbei, wie es dem Kind geht.",
       effort: "S",
+      done: true,
     },
     {
       id: "X-12",
@@ -106,6 +108,7 @@ export const otherGamesIdeas: IdeaArea = {
       text: "Nicht nur trösten: Der Bär freut sich über etwas (Geburtstag, Schnee, ein neues Spielzeug), und das Kind darf mitfeiern – Luftschlangen, Hüpfen, Umarmen.",
       why: "Auch schöne Gefühle zeigen und teilen; das Spiel wird nicht nur traurig.",
       effort: "S",
+      done: true,
     },
   ],
 };

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
-import { COMFORTS, COMFORTS_NEEDED, type ComfortId, type Feeling } from "./bear";
+import { COMFORTS, COMFORTS_NEEDED, type ComfortId, type Feeling, type FeelingId } from "./bear";
 import { bearImages, preloadImages } from "./images";
 import type { FeelingsSettings } from "./settings";
 import { ChoiceCard, EndButtons, FloaterLayer, Mark, StoryPicture, useFloaters, useTimers, useVoice } from "./shared";
@@ -13,6 +13,9 @@ const CELEBRATE_MS = 1500;
 const BEAR_CHEST = { x: 50, y: 42 };
 
 const QUESTION = "Wie kannst du ihm helfen?";
+
+/** What floats up when he is happy again, if not hearts. */
+const END_FLOAT: Partial<Record<FeelingId, string>> = { tired: "💤", happy: "🎉" };
 
 interface Round {
   /** Changes when the feeling is played again, so its pictures start fresh. */
@@ -51,7 +54,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
     clearAll();
     preloadImages([bearImages.feeling(feeling.id), bearImages.happy(feeling.id), bearImages.instead(feeling.id), ...feeling.comforts.map(bearImages.comfort)]);
     setRound(freshRound(nextKey.current++));
-    say(`${feeling.intro} ${QUESTION}`);
+    say(`${feeling.intro} ${feeling.question ?? QUESTION}`);
     if (feeling.id === "scared") sound("rumble");
   }, [feeling, clearAll, say, sound]);
 
@@ -82,7 +85,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
         setRound((r) => ({ ...r, busy: false, happy: true }));
         say(`${end.narration} ${end.line}`, true);
         sound("chime");
-        float(feeling.id === "tired" ? "💤" : "💛", BEAR_CHEST.x, BEAR_CHEST.y + 20, 5);
+        float(END_FLOAT[feeling.id] ?? "💛", BEAR_CHEST.x, BEAR_CHEST.y + 20, 5);
       }, COMFORT_MS);
     },
     [round.busy, happy, used, feeling, say, sound, float, later],
