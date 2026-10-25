@@ -58,8 +58,10 @@ const HUD_H = 188;
 const KEY_Y = 864;
 /** Room kept free between the screen's edge and the frames. */
 const EDGE = 18;
-/** The child's left side on the screen: the action button only goes left of it when it fits there. */
-const KID_LEFT = KID_AT[0] - 80;
+/** From the child's feet to its left side (the backpack): the action button stays left of that. */
+const KID_BACK = 80;
+/** The child moves at most this far right of `KID_AT` to make room for the action button beside the bag. */
+const KID_SHIFT = 80;
 /** The footprints to where the child goes next are this far apart. */
 const PRINT_GAP = 62;
 /** The round picture sign of each way at a fork. */
@@ -73,27 +75,33 @@ interface Hud {
   slots: Point[];
   action: Point;
   actionBox: [number, number, number, number];
+  /** Where the child's feet are on the screen across: `KID_AT`, or a little further right to make room for the button. */
+  kidX: number;
 }
 
 /**
- * Bag and button stay at the screen's edges, not the picture's: on a wide phone the picture leaves room left and
- * right, so the bag sits at the very left and the button right next to it, where one thumb reaches both and the way
- * ahead stays free. Where the button would cover the child (a computer, a tablet) it goes to the right corner.
+ * Bag and button stay at the screen's edges, not the picture's: the bag sits at the very left and the button right
+ * next to it, where one thumb reaches both and the way ahead stays free. On a wide phone the picture leaves room at
+ * the sides for that; on a computer or tablet the child stands a little further right so the button fits left of
+ * it. Only where even that is too little does the button go to the right corner.
  * `left` and `right` are the screen's free edges in the picture's units.
  */
-function layoutHud(left: number, right: number, keys: boolean): Hud {
+export function layoutHud(left: number, right: number, keys: boolean): Hud {
   const x0 = left + EDGE;
   const y = keys ? 784 : HUD_TOP + HUD_H / 2;
   const slots = Array.from({ length: SLOT_COUNT }, (_, i): Point => [x0 + SLOT_IN + i * SLOT_STEP, RIM]);
   const bagW = 2 * SLOT_IN + (SLOT_COUNT - 1) * SLOT_STEP;
   const boxW = 2 * ACTION_R + 44;
   const beside = x0 + bagW + 26;
-  const boxX = beside + boxW <= KID_LEFT ? beside : right - EDGE - boxW;
+  const kidX = Math.max(KID_AT[0], beside + boxW + KID_BACK);
+  const fits = kidX <= KID_AT[0] + KID_SHIFT;
+  const boxX = fits ? beside : right - EDGE - boxW;
   return {
     bagBox: [x0, HUD_TOP, bagW, HUD_H],
     slots,
     action: [boxX + boxW / 2, y],
     actionBox: [boxX, HUD_TOP, boxW, HUD_H],
+    kidX: fits ? kidX : KID_AT[0],
   };
 }
 
@@ -362,8 +370,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     await moveGoal(flight.to, flight.ms, hand, flight.sway);
   };
 
-  /** The camera: the world moves so that the child stays at `KID_AT`. */
-  const camOf = (k: KidState): Point => [k.x - KID_AT[0], k.y - KID_AT[1]];
+  /** The camera: the world moves so that the child stays at `KID_AT` (moved right by the HUD's `kidX`). */
+  const camOf = (k: KidState): Point => [k.x - hud.current.kidX, k.y - KID_AT[1]];
 
   /** Walks the child along the ground to `x`; the world scrolls along. */
   const walkTo = async (x: number) => {
