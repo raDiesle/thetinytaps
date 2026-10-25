@@ -82,6 +82,7 @@ export const otherGamesIdeas: IdeaArea = {
       text: "Neues Level der Kugelbahn: Statt einer Kugel schwimmt eine Quietscheente durch Rinnen, Schleusen und einen kleinen Wasserfall und landet im Planschbecken.",
       why: "Wiederverwendet die Bahn-Logik mit neuem Thema.",
       effort: "M",
+      done: true,
     },
     {
       id: "X-10",

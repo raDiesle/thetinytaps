@@ -117,3 +117,10 @@ export function playMusicbox() {
     note({ from: PENTATONIC[step] * 4, duration: 0.25, type: "sine", volume: 0.025, delay: i * 0.3 });
   });
 }
+
+/** "Plink" – a marble on a nail: a short, bright note of the pentatonic scale, low (0) to high. */
+export function playPlink(i: number) {
+  const freq = PENTATONIC[i % PENTATONIC.length];
+  note({ from: freq, duration: 0.3, type: "triangle", volume: 0.12 });
+  note({ from: freq * 3, duration: 0.07, type: "sine", volume: 0.04 });
+}

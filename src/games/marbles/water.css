@@ -1,0 +1,11 @@
+/* ---------- Kettenreaktion: Wasserbahn ---------- */
+
+/* Sky above and beside the hillside, when the screen is taller or wider than the picture. */
+.marble-play:has([aria-label="Wasserbahn"]) {
+  background: #7fd0ff;
+}
+
+/* The finger over the gate stays still: nothing moves before the child taps. */
+.water-hint {
+  pointer-events: none;
+}
