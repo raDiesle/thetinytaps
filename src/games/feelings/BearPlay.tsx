@@ -112,7 +112,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
         happyAt.current = performance.now();
         setRound((r) => ({ ...r, busy: false, happy: true }));
         say(`${end.narration} ${end.line}`, true);
-        sound("chime");
+        sound("cheer");
         float(END_FLOAT[feeling.id] ?? "💛", BEAR_CHEST.x, BEAR_CHEST.y + 20, 5);
       }, CHEER_MS + COMFORT_MS);
     },
