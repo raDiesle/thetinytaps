@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Cloud } from "@/games/scenes/shared";
+import { tapState } from "@/lib/tapTargets";
 import {
   BUTTON_R,
   BUTTON_X,
@@ -306,7 +307,16 @@ export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: numb
   return (
     <>
       {FLOOR_LIST.map((f) => (
-        <rect key={`room${f}`} x={HOUSE_L} y={floorLine(f) - ROOM_H} width={SHAFT_R - HOUSE_L} height={ROOM_H} fill="transparent" onPointerDown={down(f)} />
+        <rect
+          key={`room${f}`}
+          x={HOUSE_L}
+          y={floorLine(f) - ROOM_H}
+          width={SHAFT_R - HOUSE_L}
+          height={ROOM_H}
+          fill="transparent"
+          data-tap={tapState({ goal: hint === f })}
+          onPointerDown={down(f)}
+        />
       ))}
       <rect x={BUTTON_X - 70} y={TOP + 20} width="140" height={GROUND - TOP - 40} rx="30" fill="#cfd8dc" stroke="#90a4ae" strokeWidth="6" />
       {FLOOR_LIST.map((f) => {
@@ -316,6 +326,7 @@ export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: numb
             key={f}
             className={`el-button${lit === f ? " lit" : ""}${hint === f ? " hint" : ""}`}
             style={{ transformOrigin: `${BUTTON_X}px ${cy}px` }}
+            data-tap={tapState({ goal: hint === f })}
             onPointerDown={down(f)}
             role="button"
             aria-label={`Stock ${f + 1}`}

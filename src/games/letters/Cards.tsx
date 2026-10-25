@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent, type PointerEventHandler, type ReactNode } from "react";
 import { Picture } from "@/components/Picture";
 import type { Countable, LetterEntry, WordEntry } from "@/content/types";
+import { tapState } from "@/lib/tapTargets";
 import type { LettersSettings } from "./settings";
 import { TraceGlyphs } from "./TraceGlyphs";
 
@@ -105,7 +106,7 @@ function LetterFamily({ letter }: { letter: LetterEntry }) {
         <path d="M0 4 Q10 20 20 16 Q30 20 40 8" />
         <circle cx="20" cy="16" r="6" />
       </svg>
-      <span className={`baby${grown ? " grown" : ""}`} onPointerDown={grow}>
+      <span className={`baby${grown ? " grown" : ""}`} data-tap onPointerDown={grow}>
         {grown ? letter.upper : letter.lower}
         <Eyes />
       </span>
@@ -173,7 +174,11 @@ export function NumberCard({
                   const order = tapped.indexOf(index);
                   return (
                     <Reveal key={j} visible hint={hint}>
-                      <span className={`count-tap${order >= 0 ? " counted" : ""}`} onPointerDown={(e) => onItemPointer?.(index, e)}>
+                      <span
+                        className={`count-tap${order >= 0 ? " counted" : ""}`}
+                        data-tap={tapState({ done: order >= 0 })}
+                        onPointerDown={(e) => onItemPointer?.(index, e)}
+                      >
                         <span className="count-item">{thing.emoji}</span>
                         {order >= 0 && <span className="count-badge">{order + 1}</span>}
                       </span>

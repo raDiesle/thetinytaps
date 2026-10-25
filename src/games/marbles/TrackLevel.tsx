@@ -693,6 +693,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
           <Rail key={i} a={inset(row.from, row, 10)} b={row.to} />
         ))}
         <g
+          data-tap
           onPointerDown={(e) => {
             tapped(e);
             looped.current = performance.now();
@@ -704,6 +705,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         {DRUMS.map((_, i) => (
           <g
             key={i}
+            data-tap
             onPointerDown={(e) => {
               tapped(e);
               playDrum(i, performance.now());
@@ -738,6 +740,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
                 height={b.h}
                 rx="28"
                 fill="transparent"
+                data-tap
                 onPointerDown={(e) => playSpot(i, e)}
               />
             );
@@ -745,6 +748,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
 
         {/* Seesaw; a tap tips it */}
         <g
+          data-tap
           onPointerDown={(e) => {
             tapped(e);
             seesawTapped.current = performance.now();
@@ -774,7 +778,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         {/* An animal looks out of the tunnel, from behind its roof */}
         <Peek animal={peek.current.animal} age={(t - peek.current.at) / PEEK_MS} />
 
-        <g onPointerDown={tapBasket}>
+        <g data-tap onPointerDown={tapBasket}>
           {landed.current.map((l, i) => {
             const k = Math.min(1, (t - l.at) / LAND_MS);
             const bounce = (k < 1 ? 0 : wobble((t - l.at - LAND_MS) / 1000, 6, 20, 8)) + wobble(basketAge - i * 0.06, 22, 16, 6);
@@ -790,6 +794,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
           return (
             <g
               key={m.id}
+              data-tap
               onPointerDown={(e) => {
                 tapped(e);
                 nudge(m, performance.now());
@@ -816,6 +821,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         <Hopper />
         {SLOTS.map((_, i) => spot(i, "front"))}
         <g
+          data-tap
           onPointerDown={(e) => {
             tapped(e);
             peekOut(performance.now());
@@ -823,7 +829,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         >
           <Tunnel />
         </g>
-        <g onPointerDown={tapBasket}>
+        <g data-tap onPointerDown={tapBasket}>
           <Basket />
         </g>
         {glitters.current.map((g) => (
@@ -837,7 +843,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
             const pending = spots.current[i].pending;
             const wx = slot.dir > 0 ? b.x + b.w - 30 : b.x + 30;
             return (
-              <g key={i} className="run-spot-tap" onPointerDown={(e) => swap(i, e)}>
+              <g key={i} className="run-spot-tap" data-tap onPointerDown={(e) => swap(i, e)}>
                 <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="transparent" />
                 <circle cx={wx} cy={b.y + 30} r="24" fill="#fff8e8" stroke="#c48a4d" strokeWidth="3" />
                 <text x={wx} y={b.y + 41} fontSize="28" textAnchor="middle" className={pending ? "run-wrench busy" : "run-wrench"}>
@@ -1050,6 +1056,7 @@ function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled:
           <g
             key={i}
             className="run-shelf-thing"
+            data-tap
             onPointerDown={(e: PointerEvent) => {
               e.stopPropagation();
               onTake(i);
@@ -1074,6 +1081,7 @@ function ShelfKeys({ held, onTake }: { held: string | null; onTake: (i: number) 
         <g
           key={i}
           className={`run-key${held === `${i + 1}` ? " down" : ""}`}
+          data-tap
           onPointerDown={(e: PointerEvent) => {
             e.stopPropagation();
             onTake(i);
@@ -1122,7 +1130,7 @@ function Xylophone({ row, hits, t, onTap }: { row: Row; hits: number[]; t: numbe
         const cx = bar.x + bar.w / 2;
         const dip = age >= 0 && age < 1 ? 5 * Math.exp(-age * 10) : 0;
         return (
-          <g key={bar.i} transform={`translate(${cx} ${rowY(row, cx) + BALL_R + 9 + dip}) rotate(${slope})`} onPointerDown={(e) => onTap(bar.i, e)}>
+          <g key={bar.i} transform={`translate(${cx} ${rowY(row, cx) + BALL_R + 9 + dip}) rotate(${slope})`} data-tap onPointerDown={(e) => onTap(bar.i, e)}>
             {/* Taller than the bar, so a small finger finds it */}
             <rect x={-bar.w / 2 + 2} y={-62} width={bar.w - 4} height={100} fill="transparent" />
             <rect x={-bar.w / 2} y={-9} width={bar.w} height={18} rx={6} fill={BAR_COLORS[bar.i % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
@@ -1274,7 +1282,7 @@ function Chimes({ hits, t, onTap }: { hits: number[]; t: number; onTap: (chime: 
         const tubeTop = bottom - chime.length;
         const age = (t - hits[i]) / 1000;
         return (
-          <g key={i} transform={`rotate(${wobble(age, 16, 8, 1.6)} ${chime.x} ${y + 6})`} onPointerDown={(e) => onTap(i, e)}>
+          <g key={i} transform={`rotate(${wobble(age, 16, 8, 1.6)} ${chime.x} ${y + 6})`} data-tap onPointerDown={(e) => onTap(i, e)}>
             <rect x={chime.x - 28} y={tubeTop} width="56" height={chime.length} fill="transparent" />
             <line x1={chime.x} y1={y + 6} x2={chime.x} y2={tubeTop} stroke={INK} strokeWidth="2.5" />
             <rect x={chime.x - 8} y={tubeTop} width="16" height={chime.length} rx="5" fill="#cfd8e3" stroke={INK} strokeWidth="3" />

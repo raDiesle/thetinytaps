@@ -54,6 +54,8 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 - Every tap and every key does something at once – also "wrong" ones, which do
   something nice instead of an error. Keys: letters, digits, arrows, Space, Enter.
 - Nothing to read; big targets (≥ 60 px on a phone); works upright and landscape.
+- Every tappable thing carries `data-tap` (`tapState({ goal, done })` for the right answer / one tapped already),
+  so taps next to it count too (`src/lib/tapTargets.ts`); react on `onPointerDown`, not `onClick`.
 - Still and silent until the child acts.
 - Drawings in SVG components with CSS animations; generated pictures via `/bild-erzeugen`.
 

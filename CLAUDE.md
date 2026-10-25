@@ -92,6 +92,11 @@ In a fresh worktree run `yarn install` first.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
   the room left between them, instead of a fixed box with empty space round it. Look at both sizes in the preview.
+- Tap areas are bigger than they look: everything a child can tap carries `data-tap`, and a tap up to
+  30 px next to it still counts (`src/lib/tapTargets.ts`, installed by `GameShell`). Where grown areas
+  overlap, the right answer wins (`data-tap="goal"`), then one not tapped yet (not `"done"`), then the
+  nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
+  overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). Never add another way out.

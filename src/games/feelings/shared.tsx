@@ -245,6 +245,8 @@ export function ChoiceCard({
         type="button"
         className={`fg-card fg-card-${state}${small ? " small" : ""}`}
         data-card={image}
+        // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
+        data-tap
         disabled={!active}
         aria-label={caption}
         onPointerDown={(e: PointerEvent) => {
@@ -295,7 +297,7 @@ export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: (
   };
 
   return (
-    <div className="fg-end">
+    <div className="fg-end" data-tap-root>
       <button type="button" className="fg-round again" aria-label="Nochmal" onPointerDown={press(onAgain)}>
         <svg viewBox="0 0 24 24" aria-hidden>
           <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />

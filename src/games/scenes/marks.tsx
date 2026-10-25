@@ -25,6 +25,7 @@ export function ExitSign({ exit, right, width, onFollow }: { exit: Exit; right: 
       className="scene-exit"
       transform={`translate(${right ? width - 140 : 140} ${cy})`}
       data-item={exit.item.id}
+      data-tap
       role="button"
       aria-label={`${capitalize(exit.item.name)} hinterher`}
       onPointerDown={onFollow}
