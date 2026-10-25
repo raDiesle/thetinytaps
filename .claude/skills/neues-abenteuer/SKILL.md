@@ -77,7 +77,12 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
   tunnel → lantern, squirrel with the kite → apple.
 - **`climb`** – stairs or a ladder: `steps` are ground points from the bottom up; the
   first tap climbs half, the second the rest. They must also be in `ground`
-  (Drachen exports `STAIRS` from `drachen.tsx` and uses it in both).
+  (Drachen exports `STAIRS` from `drachen.tsx` and uses it in both). With `slide`
+  (more ground points) the child slides down from the top by itself, arms up („Der
+  Ball rollt weg“: ladder and slide in the park).
+- **`moment`** – something that happens by itself when the child gets there, no bag:
+  `pose` (what the child does), `sounds` + `ms`; then it is `done`. Ball: the child
+  presses the button at the traffic light and it turns green.
 
 The world drawing (`drachen.tsx`) exports the ground constants, `<Level>Scenery` and
 `<Level>Backdrop`. `Scenery` gets `{ done, here, nope }` and draws every station from
@@ -88,11 +93,15 @@ them:
   once), is wrapped in `<Nope id nope>` (it shakes its head at a wrong thing), and
   changes when solved (`.tl-dog.done` trots off and wags, the plank lies over the
   stream, `tl-dark` gets `lit`);
-- the goal itself is drawn by `TrailPlay`, not by the scenery.
+- the goal itself is drawn by `TrailPlay`, not by the scenery; what must be in front
+  of it (the sand that half hides the ball) goes into an optional `<Level>Front`.
 
 Things live in `items.tsx`: a component drawn standing on (0, 0), centred, in `ITEMS`
 with its size (`{ w, h, draw }`), and its id in `ItemId`. The same drawing is used in
-the world, the bag slot and the flight. Goals are in `GOALS` the same way.
+the world, the bag slot and the flight. Goals are in `GOALS` the same way, plus how
+the child carries them (`carry: "string"` for the kite above, `"hands"` for the ball)
+and `roll` for a ball that turns as it moves. `away` and `finale` are flights: `via`
+points with their times, then `to`; `sway` swings them (120 for the kite, 0 for a ball).
 
 ## Steps
 
@@ -118,9 +127,9 @@ the world, the bag slot and the flight. Goals are in `GOALS` the same way.
    `ITEMS`), a new goal into `GOALS`. Animations and states go into `trail.css`,
    every class and `@keyframes` prefixed `tl-` and unique (`tl-<level>-…` when it is
    level-specific). Nothing moves before the child acts.
-   - `TrailPlay.tsx` still draws the goal as `<Kite />` on a string. A level with
-     another goal makes it generic first (draw `GOALS[level.goal]`, and let the level
-     say whether it hangs on a string), and checks that „Der Drachen“ still plays.
+   - A level that needs something new from `TrailPlay.tsx` (a new kind of station, a
+     new way to carry the goal) adds it there generically and checks that the other
+     levels still play.
 4. **Add the data** to `levels.ts`: the `TrailLevel` with stations, sounds from
    `@/lib/sfx` (add a new sound to the fitting topic file there, built on `note()`),
    short German sentences in the present tense. Append it to `TRAIL_LEVELS`.

@@ -23,6 +23,7 @@ export function ElevatorGame() {
         { id: "gutenacht", emoji: "🌙", title: "Gute Nacht" },
         { id: "pfuetzen", emoji: "🌧️", title: "Pfützen" },
         { id: "drachen", emoji: "🪁", title: "Der Drachen" },
+        { id: "ball", emoji: "⚽", title: "Der Ball rollt weg" },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}
@@ -30,7 +31,7 @@ export function ElevatorGame() {
         device.touchOnly ? undefined : (
           <p className="setting-note">
             Jede Geschichte dauert etwa 5 Minuten. Leuchtet der große Knopf, drückt ihn jede Taste. Im Haus holen 1–4 den Aufzug, Pfeil hoch und runter fahren
-            einen Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Beutel. Am Ende wählen 1–4 die nächste Geschichte.
+            einen Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Beutel. Am Ende wählen die Zahlentasten die nächste Geschichte.
           </p>
         )
       }

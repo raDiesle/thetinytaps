@@ -11,13 +11,15 @@ Picture stories of about two minutes in a house in cross-section with four floor
 ## Trail adventures („Weg-Abenteuer“, `trail/`)
 
 A long world seen from the side that scrolls along with the child (far hills slower, for depth). Something the child loves goes away at the start (the kite flies off), and the child follows it. The action button in the bottom-right corner lights up when the child can walk on; a tap on it, anywhere, or any key walks to the next station (after a while it jumps and a light runs along the thought bubble with the goal). Things lying on the way go into the bag in the bottom-left corner (three slots); at an obstacle the bag opens and the child taps the thing that helps (or 1–3) – it flies there and is used by itself. A wrong thing is tried: the obstacle shakes its head with a funny sound, the thing flies back and the right one glows (it also glows after a while without a tap). Stairs take two taps, half of the steps each. At the end the goal is back in the hands, confetti, cards.
-- `types.ts` – the level format: `TrailLevel` with its ground line, stations (`pickup`, `obstacle`, `climb`) and finale.
+- `types.ts` – the level format: `TrailLevel` with its ground line, stations (`pickup`, `obstacle`, `climb` with an optional `slide` down, `moment` – something that happens by itself) and the goal's flights away and back.
 - `levels.ts` – the levels' data (`TRAIL_LEVELS`); `levels.test.ts` checks it (bag never over three, every need is in the bag, stations left to right, steps on the ground, the last station frees the goal).
-- `<level>.tsx` – one world drawing per level (`drachen.tsx`): a `Scenery` that draws the stations from `done`/`here`/`nope`, and a `Backdrop`.
-- `items.tsx` – the bag's things and the goals, drawn standing on (0, 0); `TrailPlay.tsx` – the script; `trail.css` – classes `tl-`.
+- `<level>.tsx` – one world drawing per level (`drachen.tsx`, `ball.tsx`): a `Scenery` that draws the stations from `done`/`here`/`nope`, a `Backdrop`, and optionally a `Front` drawn over the goal.
+- `items.tsx` – the bag's things and the goals, drawn standing on (0, 0); a goal says how it is carried (on a string above the child, or in the hands) and whether it rolls. `TrailPlay.tsx` – the script; `trail.css` – classes `tl-` (`tl-ball-` for the ball level).
 - The child (`Kid` from `kid.tsx`), the thought bubble and the action button (`house.tsx`) and their classes come from `elevator.css`, which the game always loads.
 
-Levels so far: „Der Drachen“ (garden: ball, carrot, plank → dog wants the ball → lantern at the hut → horse wants the carrot → apple from the tree → plank over the stream → lantern in the dark tunnel → stairs up the hill → the squirrel trades the kite for the apple).
+Levels so far:
+- „Der Drachen“ (garden: ball, carrot, plank → dog wants the ball → lantern at the hut → horse wants the carrot → apple from the tree → plank over the stream → lantern in the dark tunnel → stairs up the hill → the squirrel trades the kite for the apple).
+- „Der Ball rollt weg“ (G-02, the own street: the football bounces out of the hands and rolls away → watering can in the front garden → the child presses the button at the traffic light, it turns green, over the zebra crossing → pretzel at the bakery → sand shovel at the street tree → the dog on the pavement wants the pretzel → in the park the sunflowers hang their heads over the path and want water → up the ladder and down the slide by itself → the ball is half in the sand; the shovel digs it out, the child throws it up and catches it).
 
 ## Rules for every story (from feedback; follow them in new stories and trail levels too)
 
