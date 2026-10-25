@@ -14,7 +14,6 @@ function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, n
 const AdventurePage = page(() => import("@/pages/AdventurePage"), "AdventurePage");
 const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage");
 const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage");
-const FeelingsMenu = page(() => import("@/pages/FeelingsMenu"), "FeelingsMenu");
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage");
 const IdeasPage = page(() => import("@/pages/IdeasPage"), "IdeasPage");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage");
@@ -39,8 +38,9 @@ export function App() {
         <Route path="bilder" element={<ScenesMenu />} />
         <Route path="bilder/:scene" element={<ScenePage />} />
         <Route path="zaehne" element={<TeethPage />} />
-        <Route path="gefuehle" element={<FeelingsMenu />} />
-        <Route path="gefuehle/:place" element={<FeelingsPage />} />
+        <Route path="gefuehle" element={<FeelingsPage />} />
+        {/* Zu Hause and Kindergarten had pages of their own; all stories are on one start screen now. */}
+        <Route path="gefuehle/:place" element={<Navigate to="/gefuehle/" replace />} />
         <Route path="schatten" element={<ShadowsPage />} />
         <Route path="laut-leise" element={<LoudPage />} />
         <Route path="kettenreaktion" element={<MarblePage />} />
