@@ -23,6 +23,7 @@ const MarbleRunPage = page(() => import("@/pages/MarbleRunPage"), "MarbleRunPage
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
+const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage");
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage");
 const WordsPage = page(() => import("@/pages/WordsPage"), "WordsPage");
 
@@ -42,6 +43,7 @@ export function App() {
         {/* Zu Hause and Kindergarten had pages of their own; all stories are on one start screen now. */}
         <Route path="gefuehle/:place" element={<Navigate to="/gefuehle/" replace />} />
         <Route path="schatten" element={<ShadowsPage />} />
+        <Route path="socken" element={<SocksPage />} />
         <Route path="laut-leise" element={<LoudPage />} />
         <Route path="kettenreaktion" element={<MarblePage />} />
         {/* Kettenreaktion's old address; the marble run is a game of its own there now. */}

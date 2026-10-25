@@ -37,6 +37,7 @@ export const CATEGORIES: Category[] = [
     games: [
       { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
       { href: "/schatten/", emoji: "👤", title: "Schatten finden" },
+      { href: "/socken/", emoji: "🧦", title: "Socken-Paare" },
     ],
   },
   {
