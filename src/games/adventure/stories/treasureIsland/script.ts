@@ -12,7 +12,6 @@ import {
   KEY_TURN,
   PULL_PERIOD,
   SHAPE_SECONDS,
-  SIT_TIME,
   TOSS_AT,
   TOSS_PERIOD,
 } from "../../three/clips";
@@ -44,8 +43,8 @@ export const S = {
   webs: 16,
   rope: 17,
   key: 18,
-  hooray: 19,
-  coins: 20,
+  coins: 19,
+  hooray: 20,
   bye: 21,
 } as const;
 
@@ -61,18 +60,21 @@ export const SWING_PERIOD = 6;
 /**
  * Seconds of travel before each step: walking or paddling there, or the camera coming in. Kiki flies in
  * for the hello while the camera comes round to Tapsi's front; before the paddling Tapsi takes the paddle;
- * before the coins Tapsi hops down from Ole into the sand.
+ * before the coins the lid opens, Ole turns round, the crabs carry the chest up the beach and Tapsi hops
+ * down into the sand behind it (`CARRY`, `HOP_FROM`); before the hooray Tapsi turns round to us.
  */
-export const TRAVEL = [4, 3, 1.5, 3, 1, 2, 2.5, 3, 3, 3, 4, 2, 2, 3, 3, 3.5, 2, 6, 2.5, 2.5, 3, 1.5];
-/** Tapsi sits down (or gets up) alone first, and a moment more, before the child does it too. */
-const SIT_SHOW = SIT_TIME + 0.6;
-/** Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step. */
+export const TRAVEL = [4, 3, 1.2, 3, 1, 2, 2.5, 3, 3, 3, 4, 2, 2, 3, 3, 3.5, 2, 6, 2.5, 7.5, 1.5, 1.5];
+/**
+ * Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step.
+ * Sitting down and getting up are not shown first: Tapsi and the child do them together, once, and the
+ * story goes on as soon as they sit or stand.
+ */
 export const DEMO = [
   2.5,
   CAST_PERIOD,
-  SIT_SHOW,
+  0,
   PADDLE_PERIOD,
-  SIT_SHOW,
+  0,
   STOMP_PERIOD,
   2 * JUMP_PERIOD,
   3,
@@ -87,8 +89,8 @@ export const DEMO = [
   BRUSH_PERIOD,
   2 * PULL_PERIOD,
   KEY_PICKUP + KEY_TURN,
-  2,
   TOSS_PERIOD,
+  2,
   2,
 ];
 /**
@@ -118,14 +120,15 @@ export const CYCLES: ({ seconds: number; from: number } | null)[] = [
   { seconds: BRUSH_PERIOD, from: 0 },
   { seconds: PULL_PERIOD, from: 0 },
   { seconds: KEY_TURN, from: KEY_PICKUP },
-  null,
   { seconds: TOSS_PERIOD, from: 0 },
+  null,
   null,
 ];
 export const LEAD = TRAVEL.map((t, i) => t + DEMO[i]);
-export const PRAISE = 2.5;
+/** Seconds of praise at the end of each step; short after sitting down and getting up, so nobody waits sitting or standing. */
+export const PRAISE = sequence.steps.map((_, i) => (i === S.sit || i === S.stand ? 0.8 : 2.5));
 /** Seconds the child moves along in a step, after Tapsi has shown it. */
-export const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL[step] - PRAISE;
+export const actLength = (step: number) => sequence.steps[step].seconds - TRAVEL[step] - PRAISE[step];
 /** Seconds of a step's clip that the world follows: from when Tapsi shows it until the praise. */
 export const clipLength = (step: number) => DEMO[step] + actLength(step);
 /** How many times a step's clip meets its target: casts, stomps, beats, nuts … */
@@ -156,11 +159,11 @@ export const LEAP_FROM = 0.7;
 export const LEAP_TO = 0.92;
 /** Seconds into the coins clip when the coins of throw n leave Tapsi's paws. */
 export const tossAt = (n: number) => n * TOSS_PERIOD + TOSS_AT;
-/** In the hooray (seconds into the step): the crabs come up out of the water at the raft, lift the open chest off it, carry it up the beach, set it down and go. */
-export const CARRY = { up: 2, lift: 2.6, off: 3.2, down: 7.2, set: 7.6, gone: 8.6 };
-/** In the coins step (seconds into it): Tapsi hops down from Ole into the sand, and lands. */
-export const HOP_FROM = 0.6;
-export const HOP_LAND = 1.4;
+/** In the coins step (seconds into it): the lid opens, the crabs come up out of the water at the raft, lift the open chest off it, carry it up the beach, set it down and go. */
+export const CARRY = { up: 1.6, lift: 2.1, off: 2.6, down: 5.4, set: 5.8, gone: 6.8 };
+/** In the coins step (seconds into it): Tapsi hops down from Ole into the sand behind the chest, and lands. */
+export const HOP_FROM = 5.9;
+export const HOP_LAND = 6.7;
 
 /** How much more the paddle tips than the line between the hands. */
 export const PADDLE_TILT = 1.3;

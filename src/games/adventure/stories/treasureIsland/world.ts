@@ -327,7 +327,11 @@ export function makeWorld(scene: THREE.Scene) {
     return { nut, rings, curve: null as THREE.QuadraticBezierCurve3 | null };
   });
 
-  const appleTree = makeAppleTree();
+  /** Where the paws are at the top of a reach (measured on the clip), from Tapsi: x to Tapsi's left. */
+  const REACH_TOP = v3(0.25, 1.6, 0.05).multiplyScalar(GUIDE_SIZE);
+  /** The apples hang from a bough this high over Tapsi's feet, a little above the highest the paws reach. */
+  const APPLE_BOUGH = REACH_TOP.y + 0.45;
+  const appleTree = makeAppleTree(APPLE_BOUGH);
   appleTree.position.set(0, groundHeight(0, APPLE_Z), APPLE_Z);
   scene.add(appleTree);
   const basket = makeBasket();
@@ -335,27 +339,30 @@ export function makeWorld(scene: THREE.Scene) {
   const basketAt = v3(-1.3, groundHeight(-1.3, APPLE_Z - 0.5), APPLE_Z - 0.5);
   basket.position.copy(basketAt);
   scene.add(basket);
-  const appleMat = mat("#e3262f", 0.35);
+  const appleMat = mat("#e3262f", 0.3);
   const stemMat = mat("#5a3a1f", 0.9);
+  const leafMat = mat("#4ea640", 0.8);
   const apples = Array.from({ length: goes(S.apples) * 2 }, (_, i) => {
     const group = new THREE.Group();
-    const apple = solid(new THREE.SphereGeometry(0.085, 14, 10), appleMat);
+    // Big and bright red, so each one shows hanging on its stalk.
+    const apple = solid(new THREE.SphereGeometry(0.12, 16, 12), appleMat);
     apple.scale.set(1, 0.9, 1);
     group.add(apple);
-    const stem = solid(new THREE.CylinderGeometry(0.008, 0.008, 0.3, 4), stemMat, false);
-    stem.position.y = 0.2;
-    group.add(stem);
-    const leaf = solid(new THREE.SphereGeometry(0.04, 8, 6), mat("#4ea640", 0.8), false);
-    leaf.scale.set(1, 0.3, 0.5);
-    leaf.position.set(0.04, 0.12, 0);
-    group.add(leaf);
-    scene.add(group);
     // A little bunch at each paw's highest point; the paw reaches into it.
     const r = seeded(70 + i);
-    return { group, stem, jitter: v3((r() - 0.5) * 0.24, r() * 0.12, (r() - 0.5) * 0.2) };
+    const jitter = v3((r() - 0.5) * 0.24, r() * 0.12, (r() - 0.5) * 0.2);
+    // The stalk goes up from the apple to the bough.
+    const length = APPLE_BOUGH - (REACH_TOP.y + 0.07 + jitter.y) - 0.1;
+    const stem = solid(new THREE.CylinderGeometry(0.012, 0.012, length, 5), stemMat, false);
+    stem.position.y = 0.1 + length / 2;
+    group.add(stem);
+    const leaf = solid(new THREE.SphereGeometry(0.06, 8, 6), leafMat, false);
+    leaf.scale.set(1, 0.3, 0.5);
+    leaf.position.set(0.06, 0.16, 0);
+    group.add(leaf);
+    scene.add(group);
+    return { group, stem, leaf, jitter };
   });
-  /** Where the paws are at the top of a reach (measured on the clip), from Tapsi: x to Tapsi's left. */
-  const REACH_TOP = v3(0.25, 1.6, 0.05).multiplyScalar(GUIDE_SIZE);
 
   const door = makeDoor();
   door.group.position.set(0, groundHeight(0, DOOR_Z), DOOR_Z);
