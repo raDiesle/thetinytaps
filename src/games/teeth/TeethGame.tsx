@@ -25,6 +25,32 @@ export function TeethGame() {
       ]}
       mode={settings.minutes}
       onMode={(minutes) => update({ minutes: minutes as BrushMinutes })}
+      info={
+        <>
+          <p>
+            Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist
+            oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht
+            geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und nach verschwinden. Der Bildschirm bleibt dabei an.
+          </p>
+          <p>
+            Morgens geht die Sonne auf und am Kinn kleben Frühstückskrümel; abends scheint der Mond, der Ärmel ist ein Schlafanzug und zum Schluss heißt es
+            „Gute Nacht“. Nach der Uhr ist bis 14 Uhr morgens.
+          </p>
+          <p>
+            Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren erbsengroß. Danach ausspucken, nicht
+            nachspülen. Bis ins Grundschulalter putzen Eltern nach.
+          </p>
+          <p>
+            Unten neben dem Fortschrittsbalken pausiert ⏸️ das Putzen. Tippen oder Ziehen auf dem Balken springt an diese Stelle.
+            {!touchOnly && (
+              <>
+                {" "}
+                Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
+              </>
+            )}
+          </p>
+        </>
+      }
       settings={
         <SettingsGroup title="Putzen">
           <Choice
@@ -46,28 +72,6 @@ export function TeethGame() {
           <Toggle label="Wochenbild am Ende: ein Stern für jedes Putzen morgens und abends" checked={settings.week} onChange={(week) => update({ week })} />
           <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
           {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
-          <p className="setting-note">
-            Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist
-            oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht
-            geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und nach verschwinden. Der Bildschirm bleibt dabei an.
-          </p>
-          <p className="setting-note">
-            Morgens geht die Sonne auf und am Kinn kleben Frühstückskrümel; abends scheint der Mond, der Ärmel ist ein Schlafanzug und zum Schluss heißt es
-            „Gute Nacht“. Nach der Uhr ist bis 14 Uhr morgens.
-          </p>
-          <p className="setting-note">
-            Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren erbsengroß. Danach ausspucken, nicht
-            nachspülen. Bis ins Grundschulalter putzen Eltern nach.
-          </p>
-          <p className="setting-note">
-            Unten neben dem Fortschrittsbalken pausiert ⏸️ das Putzen. Tippen oder Ziehen auf dem Balken springt an diese Stelle.
-            {!touchOnly && (
-              <>
-                {" "}
-                Mit Tastatur: <kbd>←</kbd> <kbd>→</kbd> springen zum vorigen oder nächsten Schritt, die <kbd>Leertaste</kbd> pausiert.
-              </>
-            )}
-          </p>
         </SettingsGroup>
       }
     >

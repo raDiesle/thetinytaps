@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import type { CommonSettings } from "@/lib/common";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
-import type { AdventureSettings } from "./settings";
 import type { Cue, Story, StoryFrame } from "./stories/story";
 import { Music } from "./three/music";
 import { StoryPlayer } from "./three/player";
@@ -38,7 +38,7 @@ const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (
  * can pause and jump between steps with the buttons in the corner, by tapping
  * a picture on the route, or with the keys (arrows jump, Space pauses).
  */
-export function AdventurePlay({ story, speechLang, settings }: { story: Story; speechLang: string; settings: AdventureSettings }) {
+export function AdventurePlay({ story, speechLang, settings }: { story: Story; speechLang: string; settings: CommonSettings }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<StoryPlayer | null>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -91,7 +91,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
         onPose(pose, frame, view) {
           const box = outlineRef.current;
           if (!box) return;
-          const shown = settingsRef.current.outline ? outlineShown(frame) : 0;
+          const shown = outlineShown(frame);
           box.style.opacity = String(shown);
           if (shown > 0) silhouette.update(pose, view);
         },
@@ -101,7 +101,6 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       setFailed(true);
       return;
     }
-    player.highlight = settings.glow;
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
     if (!import.meta.env.PROD) Object.assign(window, { __adventure: player });

@@ -76,7 +76,7 @@ In a fresh worktree run `yarn install` first.
 src/App.tsx              routes; every game page is lazy-loaded (its own JS and CSS chunk)
 src/pages/<X>Page.tsx    thin wrapper: useTitle + <XGame/>
 src/games/<game>/        one folder per game, see its CLAUDE.md
-  <X>Game.tsx            start screen: <GameShell> with modes, level, settings
+  <X>Game.tsx            start screen: <GameShell> with modes, level, info, settings
   <X>Play.tsx            the game itself, mounted only while playing
   settings.ts            settings type, defaults, storage key "tinytaps.<game>.v1"
   content.ts             German texts and pictures
@@ -86,6 +86,10 @@ src/content/             home menu (games.ts), language packs (de/en/tr/pl), ide
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
+- Start screen: what the game is and how it is played (also keys and tips for grown-ups) goes into `info`
+  („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
+  that explain them. A game adds no own switch for what the home page already sets for all games
+  (Vorlesen, Töne, Musik); „Zähne putzen“ (brushing hints, music while brushing) is the only exception so far.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
   defaults (so new fields need no migration); `speech`/`sounds` come from the shared
   options on the home page. Bump the key's `.vN` only when old values would break.

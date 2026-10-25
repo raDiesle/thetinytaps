@@ -1,16 +1,12 @@
 import { GameShell } from "@/components/GameShell";
-import { SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
-import { useCommonSettings, useGameSettings } from "@/lib/common";
+import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { AdventurePlay } from "./AdventurePlay";
-import { ADVENTURE_SETTINGS_KEY, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 
-carryOverAdventureSettings();
-
+/** The start screen: no options of its own, read aloud, sounds and music come from the home page. */
 export function AdventureGame() {
-  const [settings, update] = useGameSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
   const { touchOnly } = useDevice();
   const story = TREASURE_ISLAND;
@@ -20,40 +16,30 @@ export function AdventureGame() {
       title="Bewegungsabenteuer"
       emoji="🏝️"
       modes={[{ id: "normal", emoji: "🏝️", title: "Die Schatzinsel" }]}
-      settings={
-        <SettingsGroup title="Die Schatzinsel">
-          <p className="setting-note">
-            Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit: Paddeln, über eine kleine Brücke hüpfen und mit dem
-            Kopf an Sternkisten stoßen, sich unter einem schaukelnden Ast ducken, Blumen mit den Armen öffnen, Kokosnüssen ausweichen, Spinnweben wegwedeln, die
-            Schatztruhe am Seil heranziehen und zum Schluss Stopptanz am Strand: Hört die Musik auf, frieren Tapsi, der Papagei und die Krebse ein. Die Welt
-            reagiert von selbst im Takt der Bewegung – es gibt keine Kamera und kein „falsch“.
+      info={
+        <>
+          <p>
+            Der kleine Fuchs Tapsi fährt auf der großen Meeresschildkröte Ole zur Schatzinsel. Er zeigt jede Bewegung vor, und das Kind macht sie vor dem
+            Bildschirm mit: winken, angeln, paddeln, springen und mit dem Kopf an Sternkisten stoßen, trommeln, kurbeln, Kokosnüssen ausweichen, Spinnweben
+            wegwedeln, die Schatztruhe am Seil heranziehen und am Ende Gold in die Luft werfen. Die Welt reagiert von selbst – es gibt keine Kamera und kein
+            „falsch“.
           </p>
-          <p className="setting-note">
-            Am besten auf einem großen Bildschirm, mit etwas Platz um das Kind herum (Arme ausbreiten, ein Schritt zur Seite). Niemand muss tippen.
+          <p>
+            Am Fuchs leuchtet, worauf es bei der Bewegung ankommt (z.&nbsp;B. nur die Arme an der Kurbel), und eine dunkle Figur mit leuchtendem Rand macht jede
+            Bewegung groß mit.
           </p>
-          <Toggle
-            label="Am Fuchs leuchtet, worauf es bei der Bewegung ankommt (z. B. nur die Arme an der Kurbel)"
-            checked={settings.glow}
-            onChange={(glow) => update({ glow })}
-          />
-          <Toggle
-            label="Umriss-Hilfe: eine dunkle Figur mit leuchtendem Rand macht jede Bewegung groß mit"
-            checked={settings.outline}
-            onChange={(outline) => update({ outline })}
-          />
-          <Toggle label="Musik" checked={settings.music} onChange={(music) => update({ music })} />
-          {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
+          <p>Am besten auf einem großen Bildschirm, mit etwas Platz um das Kind herum (Arme ausbreiten, ein Schritt zur Seite). Niemand muss tippen.</p>
+          <p>Vorlesen, Töne und Musik stellt ⚙️ auf der Startseite für alle Spiele ein.</p>
           {!touchOnly && (
-            <p className="setting-note">
+            <p>
               Oben links: pausieren und zur vorigen oder nächsten Bewegung springen; ein Bild unten springt zu dieser Bewegung. Mit Tastatur: <kbd>←</kbd>{" "}
               <kbd>→</kbd> und die <kbd>Leertaste</kbd>.
             </p>
           )}
-        </SettingsGroup>
+        </>
       }
     >
-      {/* Its own music, which plays only while music is on for all games too. */}
-      <AdventurePlay story={story} speechLang={de.speechLang} settings={{ ...settings, music: settings.music && common.music }} />
+      <AdventurePlay story={story} speechLang={de.speechLang} settings={common} />
     </GameShell>
   );
 }
