@@ -35,6 +35,13 @@ export interface IdeaArea {
   ideas: Idea[];
 }
 
+/** A few areas of the same kind, shown under one heading. */
+export interface IdeaGroup {
+  emoji: string;
+  title: string;
+  areas: IdeaArea[];
+}
+
 export const EFFORT_LABELS: Record<Effort, string> = {
   S: "klein",
   M: "mittel",
