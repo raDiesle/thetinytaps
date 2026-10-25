@@ -46,6 +46,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/scenes/` | Game „Lebendige Bilder“: the Wimmelbild engine and all its pictures. Details in its [`CLAUDE.md`](src/games/scenes/CLAUDE.md) |
 | `src/games/animals/` | Game „Was gehört zum Tier?“: feed the animal, bring it home, „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/animals/CLAUDE.md) |
 | `src/games/shadows/` | Game „Schatten finden“: find the shadow of a picture; also hosts „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/shadows/CLAUDE.md) |
+| `src/games/socks/` | Game „Socken-Paare“: socks tumble out of the washing machine, two same ones hop onto the line. Details in its [`CLAUDE.md`](src/games/socks/CLAUDE.md) |
 | `src/games/words/` | Game „Wörter tippen“: whole words, first letters, colour and doing words. Details in its [`CLAUDE.md`](src/games/words/CLAUDE.md) |
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
 | `src/games/loud/` | Game „Laut und leise“: the microphone's loudness moves lion and mouse; „Pusten“. Details in its [`CLAUDE.md`](src/games/loud/CLAUDE.md) |
@@ -139,3 +140,4 @@ Cmd+Q / Cmd+Tab can't be blocked by any website.
 9. ~~Laut und leise (Mikrofon): Löwe und Maus, Pusten~~
 10. ~~Kugelbahn: Kugelbahn und „Alles fällt um“~~; ~~Kugelbahn als eigenes Spiel mit langer Bahn~~
 11. ~~Aufzug~~
+12. ~~Socken-Paare~~

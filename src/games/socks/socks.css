@@ -1,0 +1,333 @@
+/* ---------- Socken-Paare ---------- */
+
+.socks-play {
+  /* The machine once the socks are out: small in the corner, so the floor has room. */
+  --machine-small: min(22vh, 26vw);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(#dff1fb, #f3fafe 60%);
+}
+
+/* ---------- The line at the top ---------- */
+
+.sock-line {
+  /* Below the ✕ in the corner, so the socks can use the whole width. */
+  --rope-y: max(66px, calc(env(safe-area-inset-top) + 52px));
+  --hang-h: min(18vh, calc((100vw - 48px) / var(--pairs) / 2.4 / 0.667));
+  position: relative;
+  flex: 0 0 calc(var(--rope-y) + var(--hang-h) + 3vh);
+}
+
+.sock-rope {
+  position: absolute;
+  top: var(--rope-y);
+  left: 14px;
+  right: 14px;
+  height: 4px;
+  border-radius: 2px;
+  background: #b08968;
+}
+
+.sock-post {
+  position: absolute;
+  top: calc(var(--rope-y) - 14px);
+  width: 10px;
+  height: 100%;
+  border-radius: 5px 5px 0 0;
+  background: #8d6e63;
+}
+
+.sock-post.left {
+  left: 8px;
+}
+
+.sock-post.right {
+  right: 8px;
+}
+
+.sock-slots {
+  position: absolute;
+  top: calc(var(--rope-y) - var(--hang-h) * 0.06);
+  left: 24px;
+  right: 24px;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.sock-hang {
+  display: flex;
+  gap: calc(var(--hang-h) * 0.08);
+}
+
+.sock-hang-sock {
+  position: relative;
+  display: block;
+  width: calc(var(--hang-h) * 0.667);
+  height: var(--hang-h);
+}
+
+.sock-hang.shown .sock-svg {
+  transform-origin: 50% 5%;
+  animation: sock-swing 1.2s ease-out;
+}
+
+.sock-hang.shown .sock-hang-sock:nth-child(2) .sock-svg {
+  animation-delay: 0.08s;
+}
+
+.sock-peg {
+  position: absolute;
+  top: calc(var(--hang-h) * -0.12);
+  left: 50%;
+  width: calc(var(--hang-h) * 0.13);
+  translate: -50% 0;
+  animation: sock-peg-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* All socks on the line: they jump for joy, one pair after the other. */
+.socks-play.done .sock-hang .sock-svg {
+  animation: sock-cheer 0.6s ease-in-out 2 calc(var(--slot) * 0.12s);
+}
+
+/* ---------- The floor with the machine and the socks ---------- */
+
+.sock-floor {
+  position: relative;
+  flex: 1;
+  background: linear-gradient(#e9d8c4, #dcc3a6);
+  border-top: 6px solid #c9ab89;
+}
+
+.sock-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sock-machine {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  height: min(78%, 70vw);
+  aspect-ratio: 200 / 236;
+  translate: -50% -50%;
+  transition:
+    left 0.8s ease-in-out,
+    top 0.8s ease-in-out,
+    height 0.8s ease-in-out,
+    translate 0.8s ease-in-out;
+}
+
+.sock-machine.open {
+  left: 2vw;
+  top: calc(100% - var(--machine-small) - 2vh);
+  height: var(--machine-small);
+  translate: 0 0;
+}
+
+.sock-machine-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sock-drum,
+.sock-door,
+.sock-knob {
+  transform-box: view-box;
+}
+
+.sock-drum {
+  transform-origin: 100px 136px;
+}
+
+.sock-knob {
+  transform-origin: 170px 28px;
+  transition: rotate 0.3s;
+}
+
+.sock-door {
+  transform-origin: 38px 136px;
+  transition: scale 0.4s ease-in;
+}
+
+.washing .sock-machine-svg {
+  animation: sock-shake 0.2s linear 12;
+}
+
+.washing .sock-drum {
+  animation: sock-drum-spin 0.8s linear 3;
+}
+
+.washing .sock-knob {
+  rotate: 90deg;
+}
+
+.sock-machine.open .sock-door {
+  scale: 0.18 1;
+}
+
+.sock-machine.open .sock-drum ellipse {
+  opacity: 0;
+}
+
+.sock-pile {
+  position: absolute;
+  inset: 0;
+  padding: 2vh 3vw;
+}
+
+/* Room for the machine in the corner: beside the socks when wide, below them when tall. */
+@media (orientation: landscape) {
+  .sock-pile {
+    padding-left: calc(var(--machine-small) * 0.85 + 5vw);
+  }
+}
+
+@media (orientation: portrait) {
+  .sock-pile {
+    padding-bottom: calc(var(--machine-small) + 4vh);
+  }
+}
+
+.sock-grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-auto-rows: 1fr;
+  width: 100%;
+  height: 100%;
+}
+
+.sock-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sock-tumble 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.sock {
+  position: relative;
+  width: calc(var(--sock-h) * 0.667);
+  height: var(--sock-h);
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  touch-action: none;
+  filter: drop-shadow(0 4px 2px #00000026);
+  transition:
+    translate 0.8s cubic-bezier(0.45, 0, 0.3, 1),
+    rotate 0.8s,
+    scale 0.8s cubic-bezier(0.45, 0, 0.3, 1),
+    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The first sock of a pair: lifted up, waiting for its partner. */
+.sock.selected {
+  z-index: 3;
+  transform: translateY(-14%) scale(1.15);
+  filter: drop-shadow(0 14px 6px #00000033);
+}
+
+.sock.selected.nudge-0 .sock-svg {
+  animation: sock-wiggle-a 0.45s ease-in-out;
+}
+
+.sock.selected.nudge-1 .sock-svg {
+  animation: sock-wiggle-b 0.45s ease-in-out;
+}
+
+.sock.focused::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  border: 5px solid #118ab2;
+  border-radius: 18px;
+}
+
+.sock.flying {
+  z-index: 4;
+  pointer-events: none;
+  animation: sock-hop 0.8s ease-in-out;
+}
+
+.sock.gone {
+  visibility: hidden;
+}
+
+@keyframes sock-drum-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes sock-shake {
+  25% {
+    translate: -1.5% 0;
+  }
+  75% {
+    translate: 1.5% 0;
+  }
+}
+
+@keyframes sock-tumble {
+  from {
+    opacity: 0;
+    transform: translate(-30vw, 10vh) rotate(-160deg) scale(0.3);
+  }
+}
+
+/* An arc on top of the straight flight: up first, then down onto the line. */
+@keyframes sock-hop {
+  50% {
+    transform: translateY(-18vh);
+  }
+}
+
+@keyframes sock-wiggle-a {
+  25% {
+    rotate: -12deg;
+  }
+  75% {
+    rotate: 12deg;
+  }
+}
+
+@keyframes sock-wiggle-b {
+  25% {
+    rotate: 12deg;
+  }
+  75% {
+    rotate: -12deg;
+  }
+}
+
+@keyframes sock-swing {
+  0% {
+    rotate: 18deg;
+  }
+  35% {
+    rotate: -10deg;
+  }
+  65% {
+    rotate: 5deg;
+  }
+}
+
+@keyframes sock-peg-in {
+  from {
+    opacity: 0;
+    translate: -50% -60%;
+  }
+}
+
+@keyframes sock-cheer {
+  50% {
+    translate: 0 -18%;
+    rotate: -6deg;
+  }
+}

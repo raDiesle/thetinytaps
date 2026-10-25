@@ -175,3 +175,10 @@ export function playHeartbeat() {
     note({ from: 62, to: 40, duration: 0.16, type: "sine", volume: 0.4, delay: delay + 0.22 });
   });
 }
+
+/** "Wusch, wusch, schleuder!" – a washing machine: water sloshing round in the drum, the motor rising into a short spin. */
+export function playWash() {
+  [0, 0.55, 1.1].forEach((delay) => hiss({ from: 600, to: 1500, duration: 0.5, volume: 0.22, delay, q: 0.9 }));
+  note({ from: 70, to: 160, duration: 2.2, type: "sawtooth", volume: 0.07, lowpass: 400 });
+  hiss({ from: 900, to: 2400, duration: 0.8, volume: 0.14, delay: 1.5, q: 1.2 });
+}

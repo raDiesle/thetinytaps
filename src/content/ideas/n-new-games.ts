@@ -357,6 +357,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Eine Waschmaschine dreht, dann fallen bunte Socken heraus. Das Kind tippt zwei gleiche nacheinander an, sie hüpfen zusammen auf die Leine. Erst zwei Paare, dann mehr.",
       why: "Gleiches finden mit Alltagsbezug; ruhiges Spiel.",
       effort: "S",
+      done: true,
     },
     {
       id: "N-46",
