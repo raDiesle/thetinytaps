@@ -1,13 +1,8 @@
-/* ---------- Kugelbahn ---------- */
+/* ---------- Kettenreaktion: Klingende Kugelbahn ---------- */
 
-.run-play,
 .run-level {
   position: absolute;
   inset: 0;
-}
-
-.run-play {
-  background: #f3d5a4;
 }
 
 .run-svg {

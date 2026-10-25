@@ -1,8 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble } from "@/games/marbles/level";
-import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "@/games/marbles/parts";
-import { BALL_R, type Pt } from "@/games/marbles/path";
+import { type LevelProps, useAnyKey, useFrames, VIEW_H, VIEW_W, wobble } from "./level";
+import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
+import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
 import {
   playBells,
@@ -225,13 +225,7 @@ interface Glitter {
 }
 
 /** What the level gets from the game around it. */
-export interface TrackLevelProps {
-  /** Plays a sound effect, unless sounds are off. */
-  sound: (play: () => void) => void;
-  /** Says a line, if speech is on. */
-  say: (text: string) => void;
-  /** The basket is full. */
-  onDone: () => void;
+export interface TrackLevelProps extends LevelProps {
   /** Tapping one of the spots swaps its part. */
   rebuild: boolean;
   /** Three things to pick from at the hopper instead of six marbles in a row (K-07). */

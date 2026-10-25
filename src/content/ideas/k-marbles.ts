@@ -163,7 +163,7 @@ export const marblesIdeas: IdeaArea = {
       id: "K-19",
       emoji: "📏",
       title: "Lange Bahn",
-      text: "Die Kugelbahn ist ein eigenes Spiel und geht über zweieinhalb Bildschirme die Wand hinunter; das Bild fährt mit den Kugeln mit. Nach dem Tunnel: Zickzack mit Prallkissen, Looping, drei Trommeln zum Hüpfen, Klangröhren, ein zweites Xylophon mit der ganzen Tonleiter und sechs Plätze zum Umbauen.",
+      text: "Die Kugelbahn (ein Level der Kettenreaktion) geht über zweieinhalb Bildschirme die Wand hinunter; das Bild fährt mit den Kugeln mit. Nach dem Tunnel: Zickzack mit Prallkissen, Looping, drei Trommeln zum Hüpfen, Klangröhren, ein zweites Xylophon mit der ganzen Tonleiter und sechs Plätze zum Umbauen.",
       why: "Ein Durchgang dauert etwa doppelt so lang, und unterwegs passiert immer wieder etwas Neues.",
       effort: "M",
       done: true,

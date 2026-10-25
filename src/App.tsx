@@ -19,7 +19,6 @@ const IdeasPage = page(() => import("@/pages/IdeasPage"), "IdeasPage");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage");
 const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
-const MarbleRunPage = page(() => import("@/pages/MarbleRunPage"), "MarbleRunPage");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
@@ -46,8 +45,8 @@ export function App() {
         <Route path="socken" element={<SocksPage />} />
         <Route path="laut-leise" element={<LoudPage />} />
         <Route path="kettenreaktion" element={<MarblePage />} />
-        {/* Kettenreaktion's old address; the marble run is a game of its own there now. */}
-        <Route path="kugelbahn" element={<MarbleRunPage />} />
+        {/* Kettenreaktion's old address, then the Klingende Kugelbahn's; the marble run is a level of Kettenreaktion now. */}
+        <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />
         <Route path="kleine-abenteuer" element={<ElevatorPage />} />
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="aufzug" element={<Navigate to="/kleine-abenteuer/" replace />} />
