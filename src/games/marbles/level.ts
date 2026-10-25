@@ -40,14 +40,14 @@ export function useFrames(step: (dt: number, now: number) => void) {
   }, []);
 }
 
-/** Any key but Esc (which leaves the game) counts as a tap. */
-export function useAnyKey(onKey: () => void) {
+/** Any key but Esc (which leaves the game) counts as a tap; `onKey` gets the key's event for games that give some keys their own job. */
+export function useAnyKey(onKey: (e: KeyboardEvent) => void) {
   const ref = useRef(onKey);
   ref.current = onKey;
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" || e.repeat) return;
-      ref.current();
+      ref.current(e);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
