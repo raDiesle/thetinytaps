@@ -530,7 +530,7 @@ function Monster({
     >
       {/* The ones to brush now glow. */}
       {active && <circle className="monster-glow" cy={-3} r={27} fill="url(#monster-glow)" />}
-      <g className="monster-body" onPointerDown={stop}>
+      <g className="monster-body" data-tap={gone ? "done" : ""} onPointerDown={stop}>
         <path d={MONSTER_TOPS[variant % MONSTER_TOPS.length]} fill={color} stroke={INK} strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
         {variant % MONSTER_TOPS.length === 1 && (
           <g fill={color} stroke={INK} strokeWidth={2}>

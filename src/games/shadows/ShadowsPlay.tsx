@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Poin
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { ITEMS, texts, type ShadowItem } from "./content";
 import { shuffle, useDeck } from "./deck";
 import type { ShadowsSettings } from "./settings";
@@ -283,6 +284,7 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
             style={offset ? { translate: `${offset.x}px ${offset.y}px`, scale: landed?.scale?.toString() } : undefined}
             role="img"
             aria-label={round.item.name}
+            data-tap
             onPointerDown={onPictureDown}
             onPointerMove={onPictureMove}
             onPointerUp={onPictureUp}
@@ -308,6 +310,7 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
                 }${peek ? " peek" : ""}`}
                 role="button"
                 aria-label={peek ? s.name : `Schatten ${i + 1}`}
+                data-tap={tapState({ goal: i === round.correct })}
                 onPointerDown={onShadowDown(i)}
               >
                 <span

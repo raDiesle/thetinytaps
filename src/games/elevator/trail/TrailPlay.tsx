@@ -4,6 +4,7 @@ import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, PACK, ThoughtBubble, type Pose } from "../kid";
@@ -777,6 +778,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
   const { Scenery, Front, Backdrop } = level;
+  // While the child picks from the bag at an obstacle, the thing that helps is the right one to tap.
+  const stop = view.choosing ? allStations(level).find((s) => s.id === view.here) : undefined;
+  const need = stop?.kind === "obstacle" ? stop.need : null;
   // Where the goal is drawn before the script moves it: in the hands at the start. React sets these
   // once; after that the script moves goal and string by itself.
   const [startHand, startHeld] = [handOf(startView(level).kid), heldOf(startView(level).kid, theGoal)];
@@ -815,7 +819,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               {n.prints.map(([x, y], i) => (
                 <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
               ))}
-              <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} onPointerDown={pressWay(w)}>
+              <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
                 <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
                   <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} backpack={PACK_SHUT} />
                 </g>
@@ -830,6 +834,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
                 <g
                   key={`${id}-${on ? view.fork?.nudge : "off"}`}
                   className={`tl-way${on ? " on" : ""}`}
+                  data-tap
                   onPointerDown={pressWay(w)}
                   role="button"
                   aria-label={id}
@@ -856,7 +861,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             {carry}
           </g>
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
-            <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
+            <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} backpack={view.pack} />
             </g>
             {view.bubble && <ThoughtBubble picture={GOALS[level.goal]} height={KID_H} nudge={view.bubble.nudge} />}
@@ -963,6 +968,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               width={SLOT_STEP}
               height={bagBox[3] + 60}
               fill="transparent"
+              data-tap={tapState({ goal: need !== null && view.bag[i] === need })}
               onPointerDown={pressSlot(i)}
               role="button"
               aria-label={view.bag[i] ?? "leer"}

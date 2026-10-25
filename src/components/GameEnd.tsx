@@ -31,7 +31,7 @@ export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
   };
 
   return (
-    <div className="game-end" onPointerDown={(e) => e.stopPropagation()}>
+    <div className="game-end" data-tap-root onPointerDown={(e) => e.stopPropagation()}>
       <button type="button" className="game-end-button again" onPointerDown={press(onAgain)}>
         <span className="game-end-emoji" aria-hidden>
           🔁

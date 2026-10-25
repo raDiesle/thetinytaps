@@ -12,6 +12,7 @@ import { DEFAULT_PLAYTIME_SETTINGS, isPlaytimeOver, playedToday, PLAYTIME_SETTIN
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useStoredSettings } from "@/lib/storage";
+import { forwardNearTaps } from "@/lib/tapTargets";
 
 /** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
 const EXIT_DELAY_MS = 500;
@@ -70,6 +71,9 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
   // The child's first tap or key in the game: the background song starts only then, not on "Los".
   const [acted, setActed] = useState(false);
   useBackgroundMusic({ enabled: playing && common.music && !playtime.over, started: acted });
+  // Taps a little next to something the child can tap still count for it (see tapTargets.ts).
+  const playArea = useRef<HTMLDivElement>(null);
+  useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
   const start = async () => {
     // These need the click as a user gesture, so run them before any await.
@@ -127,6 +131,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
     return (
       // Resuming audio on any tap helps after a reload, when no "Los" click unlocked it.
       <div
+        ref={playArea}
         className="play-area"
         onPointerDownCapture={(e) => {
           unlockAudio();
@@ -317,7 +322,7 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   const isPressKey = (key: string) => key === "Enter" || key === " ";
 
   return (
-    <div className={`exit-corner${hint || holding ? " hinted" : ""}`}>
+    <div className={`exit-corner${hint || holding ? " hinted" : ""}`} data-tap-keep>
       <span className="exit-hint" aria-hidden>
         {label} · halten
       </span>

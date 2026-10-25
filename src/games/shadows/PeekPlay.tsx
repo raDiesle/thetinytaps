@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Poin
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { PEEK_ITEMS, hideoutOf, texts, type Hideout, type ShadowItem } from "./content";
 import { shuffle, useDeck } from "./deck";
 import { emojiGlyph, type Glyph } from "./glyph";
@@ -260,7 +261,7 @@ export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSetti
         {won ? texts.there(round.item) : texts.peek}
       </p>
       <div className="sh-top">
-        <div key={`stage-${round.id}`} className="pk-stage" onPointerDown={onHideoutDown}>
+        <div key={`stage-${round.id}`} className="pk-stage" data-tap onPointerDown={onHideoutDown}>
           {glyph.url ? (
             <img src={glyph.url} alt="" draggable={false} className={`pk-animal pk-${phase}${phase === "hidden" ? wiggle : ""}`} style={animalStyle} />
           ) : (
@@ -292,6 +293,7 @@ export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSetti
               }`}
               role="button"
               aria-label={c.name}
+              data-tap={tapState({ goal: i === round.correct })}
               onPointerDown={onChoiceDown(i)}
             >
               <span className="pk-choice sh-emoji" aria-hidden>

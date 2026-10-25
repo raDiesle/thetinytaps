@@ -192,7 +192,7 @@ export function FindPlay({
     <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
         {current && (
-          <div key={current.id} className={`card find-card${found ? " done" : ""}`} onPointerDown={onCardPointer}>
+          <div key={current.id} className={`card find-card${found ? " done" : ""}`} data-tap onPointerDown={onCardPointer}>
             <Picture word={current.word} />
             {settings.showWord && (
               <div className="word">
