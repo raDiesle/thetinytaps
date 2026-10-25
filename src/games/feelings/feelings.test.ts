@@ -1,9 +1,11 @@
+import { existsSync } from "node:fs";
 import { expect, test } from "@rstest/core";
 import { COMFORTS, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, storyImages } from "./images";
 import { SITUATIONS } from "./kita";
 import { MOOD_ID, WEATHERS } from "./mood";
 import { STORIES } from "./stories";
+import { RECORDED_SOUNDS } from "./story";
 
 // Every picture the game asks for is in bilder/; a missing one shows an empty card.
 
@@ -35,4 +37,9 @@ test("every weather has its card and leads to a feeling of the bear", () => {
     expect(imageFor(moodImages.weather(id)), moodImages.weather(id)).toBeDefined();
     expect(FEELINGS.map((f) => f.id)).toContain(feeling);
   }
+});
+
+// „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.
+test("every recorded sound of the stories has its file", () => {
+  for (const name of RECORDED_SOUNDS.filter((n) => n !== "aua")) expect(existsSync(`src/lib/sounds/${name}.mp3`), name).toBe(true);
 });

@@ -40,13 +40,13 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
     caption: "Stampfen",
     narration: "Stampf, stampf! Die Wut darf raus.",
     float: "💥",
-    sound: "rumble",
+    sound: "stomp",
   },
   blow: {
     caption: "Tief pusten",
     narration: "Tief einatmen … und auspusten: Puuuh.",
     float: "💨",
-    sound: "hum",
+    sound: "breath",
   },
   blanket: {
     caption: "Zudecken",
@@ -58,7 +58,7 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
     caption: "Schlaflied singen",
     narration: "Du singst ein leises Schlaflied.",
     float: "🎵",
-    sound: "melody",
+    sound: "musicbox",
   },
   hand: {
     caption: "Hand halten",
@@ -70,7 +70,7 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
     caption: "Licht anmachen",
     narration: "Du machst Licht an. Jetzt ist es hell.",
     float: "✨",
-    sound: "chime",
+    sound: "light",
   },
   dance: {
     caption: "Mittanzen",
@@ -82,7 +82,7 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
     caption: "Luftschlangen werfen",
     narration: "Du wirfst bunte Luftschlangen. Hurra!",
     float: "🎉",
-    sound: "pop",
+    sound: "partyhorn",
   },
 };
 

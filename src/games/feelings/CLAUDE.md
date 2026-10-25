@@ -47,7 +47,13 @@ card stays crossed out. Ticks and crosses sit on the corner, half outside, so th
 picture stays to be seen. Crying, the crash and the laugh are CC0 recordings
 (`cry.mp3`, `crash.mp3`, `laugh.mp3` in `src/lib/sounds/`, loaded when a story starts,
 `RECORDED_SOUNDS` in `story.ts`); „Aua!“ is synthesized (`playAua`) until an
-`aua.mp3` is found. In the kindergarten
+`aua.mp3` is found. Good moments sound like the real thing too (`SOUNDS` in
+`story.ts`, CC0 recordings, each falling back to a synthesized sound): children
+cheer when a story ends well (`cheer`), a slide whistle glides down the slide,
+a ball bounces, stomping stomps, the lullaby is a music box, streamers get a party
+horn, blowing is a real breath out, the light clicks on before it chimes. Every
+`recorded(…)` sound is loaded when a story starts (`RECORDED_SOUNDS`), and
+`feelings.test.ts` fails when its file is missing. In the kindergarten
 the left arrow picks the not-so-good idea; every other key the good thing.
 
 The big picture of the story is a framed photo – white mat, soft shadow – and turns
