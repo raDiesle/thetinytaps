@@ -23,8 +23,8 @@ export const DAYTIME: Record<
   {
     /** Said before the first cue. */
     hello: string;
-    /** Where the sugar monsters come from. */
-    monsters: string;
+    /** Said while the sugar crumbs grow into monsters: over the day before the evening brushing, over the night before the morning one. */
+    grow: string;
     /** The heading at the end. */
     doneTitle: string;
     /** Said after spitting out at the end. */
@@ -33,13 +33,13 @@ export const DAYTIME: Record<
 > = {
   morning: {
     hello: "Guten Morgen!",
-    monsters: "Oh je, Zuckermonster vom Frühstück! Komm, wir putzen sie alle weg!",
+    grow: "In der Nacht wachsen daraus Zuckermonster.",
     doneTitle: "☀️ Blitzeblank!",
     after: "Jetzt kann der Tag losgehen!",
   },
   evening: {
     hello: "Bald ist Schlafenszeit.",
-    monsters: "Oh je, Zuckermonster vom Abendessen! Komm, wir putzen sie alle weg!",
+    grow: "Den ganzen Tag über wachsen daraus Zuckermonster.",
     doneTitle: "🌙 Gute Nacht!",
     after: "Jetzt ab ins Bett. Gute Nacht!",
   },

@@ -4,6 +4,7 @@ import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, PACK, ThoughtBubble, type Pose } from "../kid";
@@ -58,8 +59,10 @@ const HUD_H = 188;
 const KEY_Y = 864;
 /** Room kept free between the screen's edge and the frames. */
 const EDGE = 18;
-/** The child's left side on the screen: the action button only goes left of it when it fits there. */
-const KID_LEFT = KID_AT[0] - 80;
+/** From the child's feet to its left side (the backpack): the action button stays left of that. */
+const KID_BACK = 80;
+/** The child moves at most this far right of `KID_AT` to make room for the action button beside the bag. */
+const KID_SHIFT = 80;
 /** The footprints to where the child goes next are this far apart. */
 const PRINT_GAP = 62;
 /** The round picture sign of each way at a fork. */
@@ -73,27 +76,33 @@ interface Hud {
   slots: Point[];
   action: Point;
   actionBox: [number, number, number, number];
+  /** Where the child's feet are on the screen across: `KID_AT`, or a little further right to make room for the button. */
+  kidX: number;
 }
 
 /**
- * Bag and button stay at the screen's edges, not the picture's: on a wide phone the picture leaves room left and
- * right, so the bag sits at the very left and the button right next to it, where one thumb reaches both and the way
- * ahead stays free. Where the button would cover the child (a computer, a tablet) it goes to the right corner.
+ * Bag and button stay at the screen's edges, not the picture's: the bag sits at the very left and the button right
+ * next to it, where one thumb reaches both and the way ahead stays free. On a wide phone the picture leaves room at
+ * the sides for that; on a computer or tablet the child stands a little further right so the button fits left of
+ * it. Only where even that is too little does the button go to the right corner.
  * `left` and `right` are the screen's free edges in the picture's units.
  */
-function layoutHud(left: number, right: number, keys: boolean): Hud {
+export function layoutHud(left: number, right: number, keys: boolean): Hud {
   const x0 = left + EDGE;
   const y = keys ? 784 : HUD_TOP + HUD_H / 2;
   const slots = Array.from({ length: SLOT_COUNT }, (_, i): Point => [x0 + SLOT_IN + i * SLOT_STEP, RIM]);
   const bagW = 2 * SLOT_IN + (SLOT_COUNT - 1) * SLOT_STEP;
   const boxW = 2 * ACTION_R + 44;
   const beside = x0 + bagW + 26;
-  const boxX = beside + boxW <= KID_LEFT ? beside : right - EDGE - boxW;
+  const kidX = Math.max(KID_AT[0], beside + boxW + KID_BACK);
+  const fits = kidX <= KID_AT[0] + KID_SHIFT;
+  const boxX = fits ? beside : right - EDGE - boxW;
   return {
     bagBox: [x0, HUD_TOP, bagW, HUD_H],
     slots,
     action: [boxX + boxW / 2, y],
     actionBox: [boxX, HUD_TOP, boxW, HUD_H],
+    kidX: fits ? kidX : KID_AT[0],
   };
 }
 
@@ -379,8 +388,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     await moveGoal(flight.to, flight.ms, hand, flight.sway);
   };
 
-  /** The camera: the world moves so that the child stays at `KID_AT`. */
-  const camOf = (k: KidState): Point => [k.x - KID_AT[0], k.y - KID_AT[1]];
+  /** The camera: the world moves so that the child stays at `KID_AT` (moved right by the HUD's `kidX`). */
+  const camOf = (k: KidState): Point => [k.x - hud.current.kidX, k.y - KID_AT[1]];
 
   /** Walks the child along the ground to `x`; the world scrolls along. */
   const walkTo = async (x: number) => {
@@ -803,6 +812,9 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
   const { Scenery, Front, Backdrop } = level;
+  // While the child picks from the bag at an obstacle, the thing that helps is the right one to tap.
+  const stop = view.choosing ? allStations(level).find((s) => s.id === view.here) : undefined;
+  const need = stop?.kind === "obstacle" ? stop.need : null;
   // Where the goal is drawn before the script moves it: in the hands at the start. React sets these
   // once; after that the script moves goal and string by itself.
   const [startHand, startHeld] = [handOf(startView(level).kid), heldOf(startView(level).kid, theGoal)];
@@ -842,7 +854,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               {n.prints.map(([x, y], i) => (
                 <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
               ))}
-              <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} onPointerDown={pressWay(w)}>
+              <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
                 <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
                   <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} backpack={PACK_SHUT} />
                 </g>
@@ -857,6 +869,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
                 <g
                   key={`${id}-${on ? view.fork?.nudge : "off"}`}
                   className={`tl-way${on ? " on" : ""}`}
+                  data-tap
                   onPointerDown={pressWay(w)}
                   role="button"
                   aria-label={id}
@@ -883,7 +896,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             {carry}
           </g>
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
-            <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
+            <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} backpack={view.pack} />
             </g>
             {view.bubble && !view.bubble.at && <ThoughtBubble picture={view.bubble.picture} height={KID_H} nudge={view.bubble.nudge} />}
@@ -1004,6 +1017,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               width={SLOT_STEP}
               height={bagBox[3] + 60}
               fill="transparent"
+              data-tap={tapState({ goal: need !== null && view.bag[i] === need })}
               onPointerDown={pressSlot(i)}
               role="button"
               aria-label={view.bag[i] ?? "leer"}

@@ -37,6 +37,15 @@ export function AnimalsGame() {
           <Toggle label="Abwechselnd füttern und Zuhause finden" checked={settings.mix} onChange={(mix) => update({ mix })} />
         </>
       }
+      info={
+        <>
+          <p>Tiere füttern: Ein Tier hat Hunger, und das Kind zieht das passende Futter zu ihm – die Möhre zum Hasen, den Knochen zum Hund.</p>
+          <p>Wer wohnt wo? Das Kind bringt das Tier in sein Zuhause: den Vogel ins Nest, die Kuh in den Stall.</p>
+          <p>
+            Wer schaut da raus? Nur ein Stück von einem Tier schaut aus dem Busch oder dem Teich. Das Kind tippt unten auf das ganze Tier, und es kommt heraus.
+          </p>
+        </>
+      }
       settings={
         <>
           <SettingsGroup title="Anzeige">

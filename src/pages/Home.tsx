@@ -7,6 +7,7 @@ import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
+import { buildDate, useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
@@ -14,6 +15,7 @@ const IDEAS_HOLD_MS = 2000;
 
 export function Home() {
   useTitle();
+  useUpdateBetweenGames();
   const navigate = useNavigate();
   const grid = useFitGrid(CATEGORIES.length);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -49,6 +51,7 @@ export function Home() {
         ))}
       </ul>
       <InstallHint />
+      <p className="home-version">Stand {buildDate()}</p>
     </main>
   );
 }

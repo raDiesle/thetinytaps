@@ -26,7 +26,9 @@ In a fresh worktree run `yarn install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `yarn verify`, commit on the branch, merge into **local** `main` without asking,
-  never push (and don't offer to – pushing is the user's move).
+  never push (and don't offer to – pushing is the user's move). Each session may run a dev server on its own
+  port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
+  the user once checked another session's server by mistake.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
@@ -56,7 +58,15 @@ In a fresh worktree run `yarn install` first.
 - Everything the child or parent sees or hears is **German** (short, simple, present
   tense). Other languages come game by game: the app aims at German, the five most spoken
   languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
-  When a game gains one, mark it in `src/content/ideas/languageStatus.ts` (shown on `/ideen/`).
+  Translations and recordings (ElevenLabs voice, Suno songs) are made **only when the user asks** for
+  them, since they cost tokens and credits: new features, stories, modes and changed lines come in German
+  only, never translated or recorded on your own, also in a game that already speaks other languages.
+  Instead keep `src/content/ideas/languageStatus.ts` (shown on `/ideen/`) true in the same commit: what is
+  there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
+  `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell.
+  Every language choice (the Spielsprache on the home page, a game's own) starts on `playLanguage(…)`
+  (`src/lib/locale.ts`): German while developing, for players the browser's language if offered, else
+  English – never a hard-coded `"de"`. Where a game lacks the chosen language, it plays in English, then German.
   Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
@@ -81,9 +91,26 @@ In a fresh worktree run `yarn install` first.
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load).
 - Speech is off by default (`src/lib/common.ts`); sounds are on.
+- The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
+  as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
+  the room left between them, instead of a fixed box with empty space round it. Look at both sizes in the preview.
+- Tap areas are bigger than they look: everything a child can tap carries `data-tap`, and a tap up to
+  30 px next to it still counts (`src/lib/tapTargets.ts`, installed by `GameShell`). Where grown areas
+  overlap, the right answer wins (`data-tap="goal"`), then one not tapped yet (not `"done"`), then the
+  nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
+  overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
+- Grown-ups on a computer (≥ 900 px wide with a mouse) always see the fullscreen button: top right in every menu
+  (`FullscreenCorner`) and next to ✕ while playing; there the back link of a menu is big, yellow and fixed in the
+  top left corner, so it never scrolls away. Phones and tablets keep both out of a child's reach.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
-- Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). Never add another way out.
+- Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
+  of a level. Never add another.
+- Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
+  current game's own start screen before play, `useLeaveGame()` – never the home page; its picture is four cards,
+  `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
+  the first, so there is always one). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
+  it has a use for, just as big.
 
 ## Architecture
 
@@ -91,7 +118,7 @@ In a fresh worktree run `yarn install` first.
 src/App.tsx              routes; every game page is lazy-loaded (its own JS and CSS chunk)
 src/pages/<X>Page.tsx    thin wrapper: useTitle + <XGame/>
 src/games/<game>/        one folder per game, see its CLAUDE.md
-  <X>Game.tsx            start screen: <GameShell> with modes, level, settings
+  <X>Game.tsx            start screen: <GameShell> with modes, level, info, settings
   <X>Play.tsx            the game itself, mounted only while playing
   settings.ts            settings type, defaults, storage key "tinytaps.<game>.v1"
   content.ts             German texts and pictures
@@ -101,18 +128,27 @@ src/content/             home menu (games.ts), language packs (de/en/tr/pl), ide
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
+- Start screen: what the game is and how it is played (also keys and tips for grown-ups) goes into `info`
+  („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
+  that explain them. A game adds no own switch for what the home page already sets for all games
+  (Vorlesen, Töne, Musik, Sprache); „Zähne putzen“ (brushing hints, music while brushing) is the only exception so far.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
   defaults (so new fields need no migration); `speech`/`sounds` come from the shared
   options on the home page. Bump the key's `.vN` only when old values would break.
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
-- Music: `GameShell` plays one background song in every game from the child's first tap
-  (`src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
+- Music: one background song plays behind the menus and every game from the first tap or key of the visit
+  (`src/components/BackgroundMusic.tsx`, mounted once in `index.tsx`, so it runs on without a break from the
+  menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
-  calls `useNoBackgroundMusic()`; song files are named `musik-*.mp3`, see `/musik-erzeugen`.
+  calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
+  song files are named `musik-*.mp3`, see `/musik-erzeugen`. The shared options (`useCommonSettings`) are one
+  store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
   "Bitte quer halten" while the device stands upright, and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
+- Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
+  only between games: menu pages call `useUpdateBetweenGames()` (`src/lib/pwa.ts`) – a new menu page does too, a game never.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts` – use `/neues-spiel`.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
@@ -125,5 +161,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    library, the Gefühle pictures, unique `@keyframes` names.
    When you add data with rules like these, add a check.
 2. Look at it in the browser preview: the change itself, the console, and the rules above.
+   Sound is muted there, so "I hear no music" can't be checked by ear: wrap
+   `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
+   (the length tells which song started, and when). Say that you checked it this way, not by ear.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
    (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`.

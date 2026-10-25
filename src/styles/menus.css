@@ -246,6 +246,18 @@ button.game-card:focus-visible {
   font-family: var(--font-emoji);
 }
 
+/* Bottom left on the home page, small, for parents: when the running version was built. */
+.home-version {
+  position: fixed;
+  left: max(12px, env(safe-area-inset-left));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 .install-button {
   display: inline-flex;
   align-items: center;

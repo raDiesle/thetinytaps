@@ -5,6 +5,8 @@ export interface TeethSettings {
   daytime: DaytimeChoice;
   /** At the end, a week with a star for every morning and evening brushed. */
   week: boolean;
+  /** First a short story: sweets leave sugar on the teeth, and over the day (or night) it grows into the monsters. */
+  origin: boolean;
   /** First fetch the brush and put toothpaste on it, shown and said. */
   prep: boolean;
   /** Say where to brush next and how; off by default, the pictures and music carry the brushing. */
@@ -20,9 +22,11 @@ export interface TeethSettings {
 export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   daytime: "auto",
   week: true,
+  origin: true,
   prep: true,
   speech: false,
   music: true,
+  // TeethGame starts on the browser's language instead, when a song is sung in it.
   singing: "de",
   sounds: true,
 };

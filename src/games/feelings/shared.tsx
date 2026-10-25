@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useLeaveGame } from "@/components/GameShell";
 import { loadRecordings } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { framesFor, imageFor } from "./images";
@@ -245,6 +246,8 @@ export function ChoiceCard({
         type="button"
         className={`fg-card fg-card-${state}${small ? " small" : ""}`}
         data-card={image}
+        // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
+        data-tap
         disabled={!active}
         aria-label={caption}
         onPointerDown={(e: PointerEvent) => {
@@ -286,8 +289,9 @@ export function StepDots({ total, done, current }: { total: number; done: number
   );
 }
 
-/** At the end of a story: play it again (small, white) or go on to the next one (big, yellow). Only pictures, no words. */
+/** At the end of a story: back to the start screen or play it again (small, white), or go on to the next one (big, yellow). Only pictures, no words. */
 export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: () => void }) {
+  const leave = useLeaveGame();
   // Pointer down, not click: it reacts right away, and the picture underneath doesn't get the tap.
   const press = (action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
@@ -295,7 +299,17 @@ export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: (
   };
 
   return (
-    <div className="fg-end">
+    <div className="fg-end" data-tap-root>
+      {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
+      <button type="button" className="fg-round menu" aria-label="Menü" onPointerDown={(e) => e.stopPropagation()} onClick={leave}>
+        <svg viewBox="0 0 24 24" aria-hidden>
+          {/* Four cards, like the start screen – not a house, which would look like the home page. */}
+          <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+          <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+          <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+          <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+        </svg>
+      </button>
       <button type="button" className="fg-round again" aria-label="Nochmal" onPointerDown={press(onAgain)}>
         <svg viewBox="0 0 24 24" aria-hidden>
           <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />

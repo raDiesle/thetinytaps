@@ -204,6 +204,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
                   key={wagon.id}
                   className="wagon"
                   style={{ "--wagon": BRIGHT_COLORS[wagon.id % BRIGHT_COLORS.length], "--i": i } as CSSProperties}
+                  data-tap
                   onPointerDown={(e) => tapWagon(wagon, e)}
                 >
                   <div className="wagon-cargo">
@@ -236,7 +237,7 @@ function Wheels() {
 /** The steam engine, facing left (the way it drives), with smoke while it moves. */
 function Engine({ moving, onPointerDown }: { moving: boolean; onPointerDown: (e: PointerEvent) => void }) {
   return (
-    <div className="engine" role="button" aria-label="Lok: losfahren" onPointerDown={onPointerDown}>
+    <div className="engine" role="button" aria-label="Lok: losfahren" data-tap onPointerDown={onPointerDown}>
       {moving && (
         <div className="smoke" aria-hidden>
           <span />
