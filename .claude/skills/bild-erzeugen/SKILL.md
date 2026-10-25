@@ -85,9 +85,17 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   ("Redraw this exact picture … Nothing appears, disappears or moves except …").
   Then run `yarn frames` (a folder or files): it lists pairs where more than the
   movement changed, above all at the edge, which is background.
-- **The same place stays the same** from picture to picture of a story: pass its first
-  picture as the only `--ref` and change only what the character does. Two references
+- **The same place stays the same** from picture to picture of a story: only the core
+  of the picture (what the characters do) may change, never the background, objects or
+  camera around it. Get the story's first picture right (cast, every object once), then
+  draw every later picture with it as the only `--ref`. Write the prompt in two parts:
+  what stays ("Redraw this exact picture … Keep the place exactly as it is: …, same
+  camera framing (no zoom, no shift)"), naming every character that must be there
+  ("each exactly once … Nobody else"), then "Now this happens: …". Two references
   (one for the room, one for the pose) make the Lite model invent the room anew.
+  `yarn frames --scenes` lists pictures whose border (the background) differs from
+  the story's first picture; a look at the story side by side shows a missing or
+  extra character.
 - **`2x2` only for pictures that are never shown big** (icons, stickers, small
   cards): each panel is only about 590 px wide.
 - Check both pieces: nothing cut off at the inner edges, no pink seam left.

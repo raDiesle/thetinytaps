@@ -28,10 +28,40 @@ yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as
 Danach `yarn frames` (oder `yarn frames <datei-b.webp>`): listet Paare, bei denen mehr als die Bewegung
 anders ist, vor allem am Rand, wo fast immer Hintergrund ist. `baer-scared` darf auffallen – dort blitzt es.
 
-**Dieselbe Szene bleibt dieselbe:** Spielt eine Geschichte an einem Ort, bleiben Raum und Dinge von Bild zu
-Bild gleich (Luftballons, Tisch mit Kuchen, Baum). Darum das erste Bild der Szene als einzige Referenz
-mitgeben und nur ändern, was der Bär tut („Redraw this exact picture … Change only what happens: …“).
-Eine Referenz für den Raum und eine zweite für die Pose verwechselt das Lite-Modell und erfindet den Raum neu.
+## So bleibt die Szene gleich
+
+Was sich bewegen soll, ist der Kern des Bildes: was der Bär und die anderen gerade tun. Alles drumherum
+bleibt von Bild zu Bild einer Geschichte gleich – Himmel, Wiese, Baum, Rutsche, Teppich, Regal, Bett,
+Fenster, Kamera. Springt der Hintergrund, schaut ein Kleinkind auf das Neue statt auf die Handlung.
+- **Das erste Bild einer Geschichte legt alles fest:** `…-passiert` im Kindergarten, `baer-…` zu Hause.
+  Jedes weitere Bild der Geschichte wird mit genau diesem Bild als **einziger** `--ref` gezeichnet
+  (auch `…-nein-2`, `…-nein-3` und `…-ende`). Eine Referenz für den Raum und eine zweite für die Pose
+  verwechselt das Lite-Modell und erfindet den Raum neu. Darum muss das erste Bild stimmen, bevor die
+  anderen kommen: richtige Figuren, jedes Ding nur einmal (ein Traktor, nicht zwei).
+- **Die Figuren stehen fest:** wer im ersten Bild ist, bleibt da (auch wer nur zuschaut); Erwachsene kommen
+  erst, wenn ein Schritt sie holt, und bleiben dann. Niemand kommt ohne Grund dazu, niemand doppelt.
+  Im Prompt darum immer alle Figuren aufzählen, „each exactly once … Nobody else“.
+- **Dinge bleiben dieselben:** ein Spielzeugauto bleibt ein kleines Spielzeugauto, die Decke im Bett bleibt
+  dieselbe Decke. Neue Dinge nur, wenn die Handlung sie braucht (der Ball beim Warten).
+- **Ein neuer Ort nur, wenn die Geschichte hingeht:** beim Abschied von der Tür ans Fenster ins Spielzimmer.
+
+Prompt für jedes weitere Bild einer Geschichte (ohne Stilblock – den Stil bringt die Referenz mit):
+
+```
+yarn image src/games/feelings/bilder/push-2.webp "Redraw this exact picture as a later moment of the same story. Keep the place exactly as it is: the same background, sky, ground, trees, playground things, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. <Was sonst gleich bleibt, z. B. Exactly one small red toy car.> Only the characters' poses, faces and places change. In the picture, each exactly once: <Figuren mit Kurzbeschreibung>. Nobody else: no other children, no other grown-ups. Now this happens: <Handlung>. Gentle, no injuries, no blood. No text, no letters." --ref src/games/feelings/bilder/push-passiert.webp --aspect 4:3 --size 1200x900 --quality 65
+```
+
+Zu Hause: „Redraw this exact picture. Keep the room exactly as it is: the same walls, window, curtains, bed,
+furniture, shelves, toys and rug at the same places, the same light and time of day, the same camera framing
+(no zoom, no shift), the same colours and line style. The little bear is the only character; a child's hands
+or arms may come in from the bottom edge, never a whole child, no child's face. Change only what happens: …“
+mit `baer-…` als `--ref`. Karten, die bei mehreren Gefühlen vorkommen (`trost-hug`, `trost-teddy`), passen
+nicht in jeden Raum; sie zeigen den Bären nah, mit wenig Raum drumherum.
+
+Danach `yarn frames --scenes`: vergleicht den Rand jedes Bildes (fast immer Hintergrund) mit dem ersten Bild
+der Geschichte und listet, was nach neuem Ort, Zoom oder neuer Kamera aussieht. So neu gezeichnete Bilder
+liegen bei 0–10 %. Ob alle Figuren da sind, sieht das Skript nicht – das zeigt nur ein Blick auf die Bilder
+einer Geschichte nebeneinander. `bye` darf auffallen, dort wechselt der Ort.
 
 ## So bleiben die Figuren gleich
 
@@ -88,7 +118,7 @@ side by side, front view, neutral friendly faces, plain white background.
 Pro Geschichte: `…-passiert` (was passiert ist), `…-1` bis `…-3` (die guten
 Schritte in dieser Reihenfolge), `…-nein` (die nicht so gute Idee neben Schritt 1) und `…-ende`
 (alle fröhlich, das Bild am Schluss) – jeweils mit zweitem Frame `…-b`. Neben Schritt 2 und 3
-stehen `…-nein-2` und `…-nein-3` (nur ein Frame; erzeugt mit dem guten Schritt als `--ref`).
+stehen `…-nein-2` und `…-nein-3` (nur ein Frame; wie alle Bilder der Geschichte mit `…-passiert` als `--ref`, siehe „So bleibt die Szene gleich“).
 
 Erwachsene (Erzieherin, großer Bär) sind erst im Bild, wenn ein Schritt sie holt oder ruft: kommt „Hilfe
 holen“ erst noch, zeigen `…-passiert` und die Bilder davor nur die Kinder – sonst fragt man sich, warum
@@ -97,7 +127,7 @@ der Bär Hilfe holen soll, wenn sie schon danebensteht. Eine nicht so gute Idee 
 ### Nicht so gute Ideen bei Schritt 2 und 3
 
 Vor jeden Prompt: Stilblock, Figuren und „This is the not-so-good idea: the action must be clearly
-visible, but gentle – no injuries, no blood. Use the reference only for the characters, setting and style.“
+visible, but gentle – no injuries, no blood.“ und dazu den Rahmen aus „So bleibt die Szene gleich“.
 
 | Datei          | Prompt                                                                                                                                                                                                                         |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
