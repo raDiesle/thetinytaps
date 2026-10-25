@@ -2,6 +2,7 @@
 // runs, so key mashing can't close or leave the page.
 
 import { useEffect, useState } from "react";
+import { touchOnly } from "@/lib/device";
 
 interface KeyboardLock {
   lock?: (keys?: string[]) => Promise<void>;
@@ -38,6 +39,22 @@ export function isFullscreen(): boolean {
   return Boolean(doc.fullscreenElement || doc.webkitFullscreenElement);
 }
 
+// Not in every TypeScript DOM library: Chrome on Android has it, Safari not.
+type LockableOrientation = ScreenOrientation & { lock?: (orientation: "landscape") => Promise<void> };
+
+/**
+ * Phones and tablets stay in landscape while in fullscreen (Chrome on Android),
+ * so the child can't turn the picture into a narrow portrait one.
+ */
+async function lockLandscape() {
+  if (!touchOnly()) return;
+  try {
+    await (screen.orientation as LockableOrientation | undefined)?.lock?.("landscape");
+  } catch {
+    // Not supported here (Safari, some tablets): the "Bitte quer halten" note remains.
+  }
+}
+
 /**
  * Put the whole page into fullscreen; it stays there while moving between
  * menus and games. Needs a tap or key as user gesture. Returns whether the
@@ -47,10 +64,11 @@ export async function enterFullscreen(): Promise<boolean> {
   if (isFullscreen()) return true;
   try {
     await requestFullscreen(document.documentElement);
-    return true;
   } catch {
     return false;
   }
+  await lockLandscape();
+  return true;
 }
 
 /** Leave fullscreen, e.g. when the grown-up taps the button on the home page. */

@@ -14,7 +14,7 @@
   transition-timing-function: linear;
 }
 
-.tl-flight,
+.tl-carry,
 .tl-string,
 .tl-goal,
 .tl-play .el-tap,
@@ -22,38 +22,120 @@
   pointer-events: none;
 }
 
-.tl-flight {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
+/* Measures the screen without a notch, so bag and button keep clear of it. */
+.tl-safe {
+  position: absolute;
+  top: 0;
+  left: env(safe-area-inset-left, 0px);
+  right: env(safe-area-inset-right, 0px);
+  height: 0;
+  pointer-events: none;
 }
 
-/* ---------- The bag ---------- */
+/* ---------- What the next tap does: footprints to the child's pale ghost ---------- */
 
-.tl-slot {
+.tl-next {
+  pointer-events: none;
+}
+
+/* Yellow like the waiting button: the button and the way belong together. */
+.tl-print {
+  fill: #ffd43b;
+  stroke: #3d405b;
+  stroke-width: 3;
+  animation: tl-print-in 0.3s ease-out both;
+}
+
+.tl-ghost {
+  opacity: 0.45;
+  animation: tl-ghost-in 0.5s ease-out both;
+}
+
+/* ---------- A fork: two picture signs, one per way ---------- */
+
+.tl-way-face {
+  fill: #fff9db;
+}
+
+.tl-way-glow {
+  stroke: transparent;
+}
+
+/* While the child picks a way: the signs hop once, one after the other, and glow yellow like the waiting button. */
+.tl-way.on {
   cursor: pointer;
 }
 
-.tl-slot-face {
-  fill: #fff9db;
-  transition: fill 0.3s;
+.tl-way.on .tl-way-board {
+  animation: tl-slot-hop 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
 }
 
-.tl-bag.open .tl-slot-face {
-  fill: #fff3bf;
+.tl-way.on .tl-way-glow {
+  stroke: #ffd43b;
+  animation: tl-way-glow 0.9s ease-in-out infinite alternate;
 }
 
-/* The bag opens: the slots hop once, one after the other. */
+/* The ghost of each way can be tapped too. */
+.tl-way-ghost {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* ---------- The backpack on the screen ---------- */
+
+/* Its frame sets it off from the picture: the backpack in it is the child's own, open. */
+.tl-bag-shadow {
+  fill: #3d405b;
+}
+
+.tl-bag-box {
+  fill: #f1d6b0;
+  stroke: #3d405b;
+}
+
+.tl-slot-tap {
+  cursor: pointer;
+}
+
+.tl-bag .tl-slot,
+.tl-bag-bump {
+  pointer-events: none;
+}
+
+/* A thing goes in or out: the backpack bounces. */
+.tl-bag-bump {
+  animation: tl-bag-bump 0.45s ease-out;
+}
+
+/* A thing drops in from above and settles; taken out, it rises up and goes. */
+.tl-thing {
+  transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.6, 1);
+}
+
+.tl-thing.in {
+  animation: tl-thing-in 0.5s cubic-bezier(0.3, 1.3, 0.6, 1);
+}
+
+.tl-thing.out {
+  animation: tl-thing-out 0.32s ease-in both;
+}
+
+/* The bag opens: the things come up out of it, hopping one after the other. */
+.tl-bag.open .tl-thing {
+  transform: translateY(-30px);
+}
+
 .tl-bag.open .tl-slot {
   animation: tl-slot-hop 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
 }
 
-.tl-bag.open .tl-slot.full .tl-slot-face {
-  stroke: #f59f00;
+/* The thing that helps glows. */
+.tl-glow {
+  fill: #ffe066;
+  opacity: 0;
 }
 
-/* The thing that helps glows. */
-.tl-bag.open .tl-slot.hint .tl-slot-face {
-  fill: #ffe066;
+.tl-bag.open .tl-slot.hint .tl-glow {
   animation: tl-glow-slot 0.8s ease-in-out infinite alternate;
 }
 
@@ -82,7 +164,7 @@
 }
 
 .tl-key.down .tl-key-top {
-  transform: translateY(6px);
+  transform: translateY(4px);
 }
 
 /* ---------- The world's answers ---------- */
@@ -187,7 +269,7 @@
   animation: tl-ball-blink 0.4s ease-in-out 6 alternate;
 }
 
-/* With the pretzel, the dog goes back to its door and wags. */
+/* With the bone, the dog goes back to its door and wags. */
 .tl-ball-dog {
   transition: transform 1.4s ease-in-out;
 }
@@ -288,6 +370,19 @@
   }
 }
 
+@keyframes tl-print-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes tl-ghost-in {
+  from {
+    opacity: 0;
+  }
+}
+
 @keyframes tl-slot-hop {
   from {
     transform: scale(0.8);
@@ -301,8 +396,43 @@
 }
 
 @keyframes tl-glow-slot {
+  from {
+    opacity: 0.35;
+  }
   to {
-    fill: #fff;
+    opacity: 0.9;
+  }
+}
+
+@keyframes tl-bag-bump {
+  30% {
+    transform: scale(1.04, 0.95);
+  }
+  65% {
+    transform: scale(0.99, 1.02);
+  }
+}
+
+@keyframes tl-thing-in {
+  from {
+    transform: translateY(-150px) scale(0.5);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@keyframes tl-thing-out {
+  to {
+    transform: translateY(-150px) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes tl-way-glow {
+  to {
+    stroke: #fff3bf;
   }
 }
 
@@ -447,4 +577,50 @@
   to {
     stroke-dashoffset: -28;
   }
+}
+
+/* ---------- „Die kleine Lok“ ---------- */
+
+.tl-lok-rabbit,
+.tl-lok-pony,
+.tl-lok-hen {
+  transition: transform 1.4s ease-in-out;
+}
+
+/* With the carrot, the rabbit hops into the meadow and nibbles. */
+.tl-lok-rabbit.done {
+  transform: translate(60px, -70px) scale(0.7);
+}
+
+/* With the apple, the pony steps aside and chews. */
+.tl-lok-pony.done {
+  transform: translate(90px, -30px) scale(0.8);
+}
+
+/* With the corn, the hen hops down from the train and pecks. */
+.tl-lok-hen.done {
+  transform: translate(-50px, 66px);
+}
+
+.tl-lok-rabbit.done .tl-lok-rabbit-head,
+.tl-lok-pony.done .tl-lok-pony-head,
+.tl-lok-hen.done .tl-lok-hen-head {
+  animation: tl-munch 0.4s ease-in-out 1.4s 8 alternate;
+}
+
+.tl-nope .tl-lok-rabbit-head,
+.tl-nope .tl-lok-pony-head,
+.tl-nope .tl-lok-hen-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The gate swings open. */
+.tl-lok-gate {
+  transition: transform 1s ease-in-out;
+}
+
+.tl-lok-gate.open {
+  transform: scaleX(0.18);
 }

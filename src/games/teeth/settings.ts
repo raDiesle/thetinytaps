@@ -15,6 +15,8 @@ export interface TeethSettings {
   speech: boolean;
   /** A little tune in the background while brushing; on by default, it makes the two minutes go by. */
   music: boolean;
+  /** In two-minute brushing, the song sung in this language (see sung.ts) instead of the plain tune; "off" keeps the plain tune. */
+  singing: string;
   /** A poof for every monster, a chime when it is time to move on. */
   sounds: boolean;
 }
@@ -26,6 +28,7 @@ export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   prep: true,
   speech: false,
   music: true,
+  singing: "de",
   sounds: true,
 };
 

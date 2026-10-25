@@ -178,7 +178,15 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   // The brushing has its own song (or none, when it is switched off).
   useNoBackgroundMusic();
-  useBrushingMusic({ enabled: settings.music, playing: step !== null && !paused, finished: done, sync: clock, at: brushed });
+  // The sung song fits only the two-minute brushing, one verse per step; it sings the steps, so the voice leaves them to it.
+  const sung = useBrushingMusic({
+    enabled: settings.music,
+    sung: settings.minutes === "2" && settings.singing !== "off" ? settings.singing : null,
+    playing: step !== null && !paused,
+    finished: done,
+    sync: clock,
+    at: brushed,
+  });
 
   // What to say and play when a new part begins.
   useEffect(() => {
@@ -187,10 +195,11 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       say(part === 0 ? `${DAYTIME[daytime].hello} ${preludeCue(before)}` : preludeCue(before));
     } else if (phase < STEPS.length) {
       if (settings.sounds) playChime();
-      say(STEPS[phase].cue);
+      if (!sung) say(STEPS[phase].cue);
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
-      say(`Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank! ${DAYTIME[daytime].after}`);
+      // The sung finale sings "Fertig, blitzeblank" itself; the voice would talk over it.
+      if (!sung) say(`Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank! ${DAYTIME[daytime].after}`);
       // A star on the week chart, whether or not it is shown, so it is complete when turned on.
       const next = addBrushing(loadWeek(), new Date(), daytime);
       saveWeek(next);
@@ -236,7 +245,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   // Pausing stops the voice mid-sentence; going on repeats what to do.
   useEffect(() => {
     if (paused) stopSpeaking();
-    else if (cue) say(cue);
+    else if (cue && !(sung && step)) say(cue);
     // Only when pausing or going on.
   }, [paused]);
 

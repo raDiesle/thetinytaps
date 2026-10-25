@@ -25,7 +25,8 @@ In a fresh worktree run `yarn install` first.
 ## Working here
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
-  is done: `yarn verify`, commit on the branch, merge into **local** `main`, never push.
+  is done: `yarn verify`, commit on the branch, merge into **local** `main` without asking,
+  never push (and don't offer to – pushing is the user's move).
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
@@ -33,16 +34,30 @@ In a fresh worktree run `yarn install` first.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
   there). Update that file with the code, not the README – the README only has one
   line per game, so parallel branches don't all conflict on it.
-- Before touching a Bewegungsabenteuer level read [`src/games/adventure/LEVEL-REGELN.md`](src/games/adventure/LEVEL-REGELN.md)
-  and check the work against it; write every piece of feedback on a level into it as a general rule
-  (German, in the same commit as the fix).
+- **Feedback becomes a written rule**, so the next session doesn't make the same mistake. Write it
+  generally (what to always/never do, not a note about one bug), in the same commit as the fix, into the
+  file that is loaded where it matters: one game → that game's `CLAUDE.md` (its rules section);
+  a Bewegungsabenteuer level → [`src/games/adventure/LEVEL-REGELN.md`](src/games/adventure/LEVEL-REGELN.md)
+  (German; read it before touching a level and check the work against it); work done with a skill →
+  its `.claude/skills/<name>/SKILL.md`; every game or how to work here → this file. When a rule
+  already covers it, sharpen that rule instead of adding a second one; when new feedback
+  contradicts a rule, replace the old one. The same goes for mistakes you find yourself (a failed
+  check, a bug seen in the preview, a wrong assumption) that the next session could make again.
+  A check beats a sentence: when a test can catch it, add the test. Claude's private memory is only
+  for things that don't belong in the repo. A `UserPromptSubmit` hook (`.claude/hooks/feedback-reminder.md`)
+  repeats this reminder with every message.
 - Ideas live in `src/content/ideas/` (one file per area) with fixed IDs ("mach N-04"). When an idea is
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
+  An idea round only collects – the user decides later what to implement, so don't offer to implement
+  after one (say „umsetzen“, not the ambiguous „bauen“).
 
 ## Language and style
 
 - Everything the child or parent sees or hears is **German** (short, simple, present
-  tense). Code, comments, docs and commit messages are English, except
+  tense). Other languages come game by game: the app aims at German, the five most spoken
+  languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
+  When a game gains one, mark it in `src/content/ideas/languageStatus.ts` (shown on `/ideen/`).
+  Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
@@ -95,9 +110,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()`; song files are named `musik-*.mp3`, see `/musik-erzeugen`.
+- Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
+  "Bitte quer halten" while the device stands upright, and asks once per visit for fullscreen, which on Android
+  also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`) – use `/neues-spiel`.
-- A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`.
+  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts` – use `/neues-spiel`.
+- A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work
 

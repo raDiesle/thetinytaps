@@ -25,9 +25,9 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "sit_down",
-        seconds: 8,
+        seconds: 4.5,
         energy: "calm",
-        situation: "Tapsi setzt sich langsam auf Oles Panzer und wartet, bis das Kind auch sitzt.",
+        situation: "Tapsi setzt sich auf Oles Panzer, das Kind gleich mit; sobald beide sitzen, geht es weiter.",
         transition: "Tapsi nimmt das Paddel: „Ole schwimmt los!“",
       },
       {
@@ -39,9 +39,9 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "stand_up",
-        seconds: 7.5,
+        seconds: 4.3,
         energy: "calm",
-        situation: "Tapsi steht langsam auf Oles Panzer auf und wartet, bis das Kind auch steht.",
+        situation: "Tapsi zieht die Knie an, beugt sich vor und steht auf, das Kind gleich mit; sobald beide stehen, geht es weiter.",
         transition: "Am Strand krabbelt etwas.",
       },
       {
@@ -145,19 +145,18 @@ export const SEQUENCES: Sequence[] = [
         transition: "Das Schloss springt auf.",
       },
       {
-        movement: "hooray_arms",
-        seconds: 12,
+        movement: "treasure_toss",
+        seconds: 19,
         energy: "lively",
         situation:
-          "Die Truhe springt auf: Goldmünzen, Glitzer und Konfetti; Tapsi dreht sich zu uns um und jubelt, zwei Krebse tragen die Truhe an den Strand.",
-        transition: "Die Krebse kommen zum Feiern aus dem Sand.",
+          "Die Truhe springt auf: Goldmünzen und Glitzer. Ole dreht sich um, zwei Krebse tragen die Truhe an den Strand, Tapsi hüpft von Ole in den Sand hinter die Truhe, greift aus dem Stand tief hinein und wirft die Münzen hoch: ein Goldregen um Tapsi herum. Die Sonne geht unter.",
+        transition: "Tapsi dreht sich zu uns um.",
       },
       {
-        movement: "treasure_toss",
-        seconds: 14.5,
+        movement: "hooray_arms",
+        seconds: 9,
         energy: "lively",
-        situation:
-          "Tapsi hüpft von Ole in den Sand hinter die Truhe, greift aus dem Stand tief hinein und wirft die Münzen hoch: ein Goldregen um Tapsi herum. Die Sonne geht unter.",
+        situation: "Tapsi dreht sich zu uns um und jubelt mit beiden Armen, aus der Truhe glitzert das Gold, Konfetti fliegt, die Krebse hüpfen.",
         transition: "Es wird Abend, alle werden ruhig.",
       },
       {

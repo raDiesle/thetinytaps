@@ -82,6 +82,29 @@ export interface Moment extends StationBase {
   ms: number;
 }
 
+/** One of the two ways at a fork, with its own stations; both lead on to the same place. */
+export interface Way {
+  /** Unique in the level; it goes into `done` when the child takes this way. */
+  id: string;
+  /** The picture on its sign (stairs, a tunnel), drawn to fit about 120 × 120 around (0, 0). */
+  Sign: ComponentType;
+  /** Where its sign is in the world; a tap on it takes this way. */
+  sign: Point;
+  /** The ground line while on this way (with its stairs); it must be the level's ground before the fork and after the
+   * way's last station. */
+  ground?: Point[];
+  /** Spoken when the child picks it. */
+  say: string;
+  /** Its stations, in walking order; the first one starts as soon as the way is picked. */
+  stations: Station[];
+}
+
+/** Two ways, both to the goal: the child picks one by tapping its sign (or 1 / 2), and next time can take the other. */
+export interface Fork extends Omit<StationBase, "done"> {
+  kind: "fork";
+  ways: [Way, Way];
+}
+
 export type Station = Pickup | Obstacle | Climb | Moment;
 
 /** A way through the air or along the ground: points with the time to get to each, then `to` in `ms`. */
@@ -112,7 +135,7 @@ export interface TrailLevel {
   start: number;
   /** At the start: the goal leaves the child's hands for `to` (where the last obstacle keeps it). */
   away: Flight & { pose: Pose; sounds: Cue[]; say: string };
-  stations: Station[];
+  stations: (Station | Fork)[];
   /** At the end, with the goal back in hand: it goes to `to`, and everybody is happy. */
   finale: Flight & { say: string };
 }

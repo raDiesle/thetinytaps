@@ -63,7 +63,11 @@ export type Pose =
   | "brush"
   | "cheer"
   | "build"
-  | "hop";
+  | "hop"
+  // Trail adventures: taking a thing (arm out, still), holding it up high, reaching back into the backpack.
+  | "take"
+  | "lift"
+  | "pack";
 
 export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat";
 export type Holding = "eggs" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
@@ -76,7 +80,7 @@ const IN_FRONT: Partial<Record<Holding, { draw: () => ReactNode; scale: number }
   teddy: { draw: () => <Teddy />, scale: 0.6 },
 };
 
-type Arm = "down" | "up" | "out" | "front" | "belly" | "mouth" | "fork" | "side";
+type Arm = "down" | "up" | "out" | "front" | "belly" | "mouth" | "fork" | "side" | "back";
 
 /** The right arm in each position, and where its hand is; the left one is mirrored. */
 const ARMS: Record<Arm, { d: string; hand: [number, number] }> = {
@@ -88,11 +92,12 @@ const ARMS: Record<Arm, { d: string; hand: [number, number] }> = {
   mouth: { d: "M22 -100 Q44 -98 14 -118", hand: [12, -120] },
   fork: { d: "M22 -100 Q48 -100 30 -116", hand: [28, -118] },
   side: { d: "M22 -100 Q42 -106 40 -96", hand: [40, -94] },
+  back: { d: "M22 -100 Q54 -104 52 -132", hand: [52, -134] },
 };
 
 function rightArm(pose: Pose, front: boolean): Arm {
-  if (pose === "reach" || pose === "stir" || pose === "serve") return "out";
-  if (pose === "cheer" || pose === "yawn" || pose === "build") return "up";
+  if (pose === "reach" || pose === "stir" || pose === "serve" || pose === "take") return "out";
+  if (pose === "cheer" || pose === "yawn" || pose === "build" || pose === "lift" || pose === "pack") return "up";
   if (pose === "eat") return "fork";
   if (pose === "drink" || pose === "brush") return "mouth";
   if (pose === "tummy") return "belly";
@@ -103,7 +108,30 @@ function leftArm(pose: Pose, front: boolean, umbrella: boolean): Arm {
   if (umbrella) return pose === "jump" || pose === "cheer" ? "side" : "down";
   if (pose === "cheer" || pose === "yawn") return "up";
   if (pose === "tummy") return "belly";
+  if (pose === "pack") return "back";
   return front ? "front" : "down";
+}
+
+/** The backpack's colours, shared with the big backpack on the screen that shows what is in it. */
+export const PACK = { body: "#f03e3e", dark: "#c92a2a", inside: "#5c1616", lining: "#ffe3e3", pocket: "#ff8787", buckle: "#ffd43b" };
+
+/** The backpack of the trail adventures, on the child's back: it sticks out behind the child, its lid swings
+ * open while a thing goes in or comes out, and a thing landing in it makes it bounce (`bump` counts them). */
+function Backpack({ open, bump }: { open: boolean; bump: number }) {
+  return (
+    <g className={`el-pack${open ? " open" : ""}`}>
+      <g key={bump} className={bump ? "el-pack-bump" : undefined} style={{ transformOrigin: "-50px -48px" }}>
+        <rect x="-78" y="-126" width="54" height="78" rx="16" fill={PACK.body} stroke={INK} strokeWidth="3" />
+        <ellipse cx="-51" cy="-123" rx="24" ry="7" fill={PACK.inside} />
+        <rect x="-74" y="-86" width="32" height="28" rx="8" fill={PACK.pocket} stroke={INK} strokeWidth="2.5" />
+        <path d="M-70 -78 H-46" stroke={INK} strokeWidth="2" opacity="0.5" />
+        <g className="el-pack-lid" style={{ transformOrigin: "-78px -120px" }}>
+          <path d="M-80 -120 Q-80 -138 -51 -138 Q-22 -138 -22 -120 L-24 -102 Q-51 -97 -78 -102 Z" fill={PACK.dark} stroke={INK} strokeWidth="3" />
+          <rect x="-56" y="-108" width="11" height="11" rx="2.5" fill={PACK.buckle} stroke={INK} strokeWidth="2" />
+        </g>
+      </g>
+    </g>
+  );
 }
 
 /** Hair and face; also used alone in the bathtub, the bed and the bubble. */
@@ -169,8 +197,22 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
   );
 }
 
-/** A child. `face` -1 mirrors it, so it turns to where it walks or reaches. */
-export function Kid({ look, pose, holding, wear, face }: { look: Look; pose: Pose; holding: Holding | null; wear: Outfit[]; face: 1 | -1 }) {
+/** A child. `face` -1 mirrors it, so it turns to where it walks or reaches; `backpack` puts one on its back. */
+export function Kid({
+  look,
+  pose,
+  holding,
+  wear,
+  face,
+  backpack,
+}: {
+  look: Look;
+  pose: Pose;
+  holding: Holding | null;
+  wear: Outfit[];
+  face: 1 | -1;
+  backpack?: { open: boolean; bump: number };
+}) {
   const pyjama = wear.includes("pyjama");
   const coat = wear.includes("coat");
   const boots = wear.includes("boots");
@@ -223,6 +265,7 @@ export function Kid({ look, pose, holding, wear, face }: { look: Look; pose: Pos
     <g className={`el-kid pose-${pose}`} style={{ transform: `scaleX(${face})` }}>
       <ellipse cx="0" cy="0" rx="34" ry="7" fill="#000" opacity="0.12" />
       <g className="el-kid-body">
+        {backpack && <Backpack {...backpack} />}
         {/* Legs */}
         {[-1, 1].map((s) => (
           <g key={s} className={`el-leg el-leg-${s < 0 ? "l" : "r"}`} style={{ transformOrigin: `${s * 10}px -52px` }}>
@@ -277,6 +320,7 @@ export function Kid({ look, pose, holding, wear, face }: { look: Look; pose: Pos
             />
           </>
         )}
+        {backpack && <path d="M-20 -106 Q-25 -80 -21 -52 M19 -106 Q24 -80 20 -52" stroke={PACK.dark} strokeWidth="7" strokeLinecap="round" fill="none" />}
         {front && <g transform={`translate(0 -54) scale(${front.scale})`}>{front.draw()}</g>}
         {/* Arms */}
         <g className="el-arm el-arm-l" style={{ transformOrigin: "-22px -100px" }}>
