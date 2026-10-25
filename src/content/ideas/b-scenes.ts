@@ -22,6 +22,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Neuer Such-Modus: Nur das Geräusch wird gespielt (Hund bellt, Bagger brummt) – wer war das? Nutzt die vorhandenen sfx-Klänge.",
       why: "Genaues Hinhören; funktioniert auch ohne Sprachausgabe.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "B-03",
@@ -47,6 +48,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Sonne antippen → es wird Abend: Himmel dunkel, Laternen und Fenster leuchten, Tiere schlafen, Eule wacht auf. Mond antippen → Morgen.",
       why: "Großer Wow-Effekt und ein natürliches, ruhiges Spielende.",
       effort: "L",
+      rejected: true,
     },
     {
       id: "B-06",
@@ -55,6 +57,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Wolke antippen löst Regen (Pfützen, Regenschirme), Schnee (alles wird weiß) oder Wind (Blätter fliegen) aus – die ganze Szene reagiert.",
       why: "Ursache und Wirkung im großen Maßstab.",
       effort: "L",
+      rejected: true,
       partial: "Die Wolke regnet schon („Plitsch, platsch“); Schnee, Wind und eine reagierende Szene fehlen.",
     },
     {
@@ -73,6 +76,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Geführter Modus mit 5–6 Schritten: „Der Kipplaster bringt Sand. Wer baggert ihn auf?“ – das Kind tippt, die Geschichte geht weiter.",
       why: "Sprachverständnis und Reihenfolgen; schöne Vorlese-Situation mit Eltern.",
       effort: "M",
+      rejected: true,
     },
     {
       id: "B-09",
@@ -99,6 +103,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Das Bild ist breiter als der Bildschirm; man wischt seitlich weiter oder zoomt hinein – wie in einem echten Wimmelbuch.",
       why: "Viel mehr Platz für Details ohne Gedränge.",
       effort: "L",
+      rejected: true,
     },
     {
       id: "B-12",
@@ -116,6 +121,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Leere Szene, unten eine Leiste mit Dingen zum Hineinziehen. Platzierte Dinge sind sofort lebendig.",
       why: "Kreativ statt nur entdecken; für ältere Kinder.",
       effort: "L",
+      rejected: true,
     },
     {
       id: "B-14",
@@ -140,6 +146,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Manche Dinge laden zum Nachmachen ein: Der Frosch hüpft – „Hüpf mit!“, der Kran streckt sich – „Mach dich ganz groß!“, die Ente watschelt. Das Bild wartet kurz, damit das Kind mitmachen kann.",
       why: "Bewegung weg vom Bildschirm; 2-Jährige lieben Nachmachen.",
       effort: "S",
+      rejected: true,
     },
     {
       id: "B-17",

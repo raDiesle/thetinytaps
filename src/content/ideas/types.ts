@@ -17,11 +17,14 @@ export interface Idea {
   done?: boolean;
   /** Partly in the app: what is there already, so the rest is clear. */
   partial?: string;
+  /** Decided against it: stays in the list (and keeps its number) so it isn't suggested again. */
+  rejected?: boolean;
 }
 
-export type IdeaStatus = "done" | "partial" | "open";
+export type IdeaStatus = "done" | "partial" | "open" | "rejected";
 
-export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.partial ? "partial" : "open");
+/** A rejected idea counts as rejected even if a part of it is in the app, so nobody builds the rest. */
+export const ideaStatus = (idea: Idea): IdeaStatus => (idea.done ? "done" : idea.rejected ? "rejected" : idea.partial ? "partial" : "open");
 
 export interface IdeaArea {
   prefix: string;

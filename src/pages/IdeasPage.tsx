@@ -7,13 +7,20 @@ import { useTitle } from "@/lib/title";
 
 const ALL_IDEAS = IDEA_AREAS.flatMap((a) => a.ideas);
 
-type StatusFilter = "all" | "todo" | "done";
+type StatusFilter = "all" | "todo" | "done" | "rejected";
 
-const STATUS_ORDER: Record<IdeaStatus, number> = { open: 0, partial: 1, done: 2 };
+const STATUS_ORDER: Record<IdeaStatus, number> = { open: 0, partial: 1, done: 2, rejected: 3 };
 
 const countDone = (ideas: Idea[]) => ideas.filter((i) => i.done).length;
 
-const matches = (idea: Idea, filter: StatusFilter) => filter === "all" || (filter === "done") === (ideaStatus(idea) === "done");
+/** Rejected ideas don't count towards the progress; they only show under their own filter. */
+const countActive = (ideas: Idea[]) => ideas.filter((i) => !i.rejected).length;
+
+const matches = (idea: Idea, filter: StatusFilter) => {
+  const status = ideaStatus(idea);
+  if (filter === "rejected" || status === "rejected") return filter === status;
+  return filter === "all" || (filter === "done") === (status === "done");
+};
 
 /** Open ideas first, then partly done, then done ones; otherwise in number order. */
 const byStatus = (a: Idea, b: Idea) => STATUS_ORDER[ideaStatus(a)] - STATUS_ORDER[ideaStatus(b)];
@@ -33,7 +40,12 @@ export function IdeasPage() {
   });
   const starred = new Set(saved.starred);
   const done = countDone(ALL_IDEAS);
-  const picks = TOP_PICKS.filter(({ id }) => !ALL_IDEAS.find((i) => i.id === id)?.done);
+  const active = countActive(ALL_IDEAS);
+  const rejected = ALL_IDEAS.length - active;
+  const picks = TOP_PICKS.filter(({ id }) => {
+    const idea = ALL_IDEAS.find((i) => i.id === id);
+    return !idea?.done && !idea?.rejected;
+  });
 
   const toggleStar = (id: string) => update({ starred: starred.has(id) ? saved.starred.filter((s) => s !== id) : [...saved.starred, id] });
 
@@ -47,9 +59,9 @@ export function IdeasPage() {
         <span aria-hidden>💡</span> Ideen
       </h1>
       <p className="home-subtitle">
-        {ALL_IDEAS.length} Ideen für neue und bestehende Spiele. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
+        {active} Ideen für neue und bestehende Spiele, dazu {rejected} abgelehnte. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
-      <Progress done={done} total={ALL_IDEAS.length} />
+      <Progress done={done} total={active} />
 
       <section className="ideas-panel">
         <h2>So einfach muss es sein – Faustregeln für 2-Jährige</h2>
@@ -81,7 +93,7 @@ export function IdeasPage() {
           <button key={a.prefix} type="button" onClick={() => scrollTo(`area-${a.prefix}`)}>
             <span aria-hidden>{a.emoji}</span> {a.prefix}: {a.title}{" "}
             <span className="ideas-nav-count">
-              {countDone(a.ideas)}/{a.ideas.length}
+              {countDone(a.ideas)}/{countActive(a.ideas)}
             </span>
           </button>
         ))}
@@ -94,8 +106,9 @@ export function IdeasPage() {
           onChange={(status) => update({ status })}
           options={[
             { value: "all", label: "Alle" },
-            { value: "todo", label: `Noch offen (${ALL_IDEAS.length - done})` },
+            { value: "todo", label: `Noch offen (${active - done})` },
             { value: "done", label: `✅ Umgesetzt (${done})` },
+            { value: "rejected", label: `🚫 Abgelehnt (${rejected})` },
           ]}
         />
         <Toggle label={`Nur gemerkte ⭐ (${saved.starred.length})`} checked={saved.onlyStarred} onChange={(onlyStarred) => update({ onlyStarred })} />
@@ -114,7 +127,7 @@ export function IdeasPage() {
               <span aria-hidden>{area.emoji}</span> {area.prefix} – {area.title}
             </h2>
             {area.intro && <p className="ideas-intro">{area.intro}</p>}
-            <Progress done={countDone(area.ideas)} total={area.ideas.length} />
+            {saved.status !== "rejected" && <Progress done={countDone(area.ideas)} total={countActive(area.ideas)} />}
             <ul className="ideas-list">
               {ideas.map((idea) => (
                 <IdeaCard key={idea.id} idea={idea} starred={starred.has(idea.id)} onStar={() => toggleStar(idea.id)} />
@@ -141,9 +154,9 @@ function Progress({ done, total }: { done: number; total: number }) {
 function IdeaCard({ idea, starred, onStar }: { idea: Idea; starred: boolean; onStar: () => void }) {
   return (
     <li id={idea.id} className={`idea-card ${ideaStatus(idea)}`}>
-      {idea.done && (
+      {(idea.done || idea.rejected) && (
         <span className="idea-done-stamp" aria-hidden>
-          ✅
+          {idea.done ? "✅" : "🚫"}
         </span>
       )}
       <div className="idea-head">
@@ -169,9 +182,10 @@ function IdeaCard({ idea, starred, onStar }: { idea: Idea; starred: boolean; onS
         <span className={`effort effort-${idea.effort}`}>
           Aufwand {idea.effort} {EFFORT_LABELS[idea.effort]}
         </span>
-        {idea.planned && !idea.done && <span className="idea-planned">schon geplant</span>}
+        {idea.planned && !idea.done && !idea.rejected && <span className="idea-planned">schon geplant</span>}
         {idea.partial && <span className="idea-partial-tag">teilweise umgesetzt</span>}
         {idea.done && <span className="idea-done">✓ umgesetzt</span>}
+        {idea.rejected && <span className="idea-rejected">✗ abgelehnt</span>}
       </div>
     </li>
   );
