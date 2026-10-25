@@ -24,6 +24,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Der Ball rollt die Straße hinunter: an der Ampel den Knopf drücken und auf Grün warten, über den Zebrastreifen, am Bäcker vorbei (Brezel für den Hund), durch den Park, die Rutsche hinunter – unten liegt er im Sandkasten. Beutel: Brezel, Schaufel, Gießkanne.",
       why: "Die eigene Straße als Abenteuer; Ampel und Zebrastreifen nebenbei.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-03",
