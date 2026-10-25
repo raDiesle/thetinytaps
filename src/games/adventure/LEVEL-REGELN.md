@@ -23,8 +23,9 @@ Fehler in späteren Leveln nicht wieder passiert.
   Runden, bevor es weitergeht. Lieber eine Station länger als eine mehr.
 - **Das Level beginnt im Stehen und gleich mit einer Bewegung** (Schatzinsel: erst Kiki winken, dann
   die Angel auswerfen), nicht mit Sitzen und Zuschauen.
-- **Hinsetzen und Aufstehen sind eigene Schritte** mit eigener Zeit, Vormachen und „Jetzt du!“,
-  damit sich das Kind wirklich hinsetzt und wieder aufsteht. Nicht nebenbei im Lob oder im Weg davor.
+- **Hinsetzen und Aufstehen sind eigene Schritte, aber nur die Bewegung selbst**: Der Fuchs setzt
+  sich (oder steht auf) zusammen mit dem Kind, ohne Vormachen vorher und ohne Sitzen oder Stehen
+  danach, und es geht gleich weiter (kurzes Lob). Nicht nebenbei im Lob oder im Weg davor.
 - **Lieber ein klarer Treffer mit Ton als eine vage Bewegung.** Blumen mit den Armen „aufwecken“
   war zu unbestimmt; auf eine Trommel schlagen kennt jedes Kind.
 - **Die Bewegung hat einen Sinn auf dem Weg.** Trommeln nur für einen Schmetterling war beliebig;
@@ -34,6 +35,9 @@ Fehler in späteren Leveln nicht wieder passiert.
   Raketen aus den Pfoten waren beliebig. Schatzinsel: Die Krebse tragen die Truhe an den Strand,
   Tapsi hüpft hinunter, greift aus dem Stand tief in die Truhe und wirft die Münzen mit beiden
   Armen hoch über sich – ein Goldregen.
+- **Das Ende hat eine feste Reihenfolge**: erst mit dem Schlüssel die Truhe öffnen, dann das Gold
+  werfen, dann freuen (zu uns umdrehen und jubeln), zum Schluss winken. Wird eine Station umgestellt,
+  wandert alles mit, was zu ihr gehört (Krebse, Deckel, Papagei, Abenddämmerung, Sätze).
 
 ## Die Welt antwortet im Takt
 
@@ -88,11 +92,26 @@ Fehler in späteren Leveln nicht wieder passiert.
   sieht aus, als stünde er still.
 - **Kommt etwas auf den Fuchs zu** (rollende Kokosnüsse), steht die Kamera genau mittig hinter ihm
   und etwas tiefer, damit man sieht, wie es heranrollt.
+- **Schwingt oder fliegt etwas auf den Fuchs zu** (Baumstamm), ist die Kamera direkt hinter seinem
+  Kopf, knapp darüber, und schaut genau in seine Blickrichtung: Der Kopf sitzt unten im Bild, und die
+  Gefahr kommt auf uns selbst zu. Nicht auf Kopfhöhe, sonst verdeckt der Kopf, was kommt.
+- **Was über dem Fuchs hängt** (Äpfel), sieht man von hinten wie beim Baumstamm, aber tiefer und
+  schräg nach oben: Jeder Apfel hängt sichtbar an einem Stiel unter einem Ast, mit Blatt.
+- **Was rollt, bleibt im Bild.** Steht etwas Hohes vor dem Fuchs (Schildkrötenkopf), wird der Boden
+  davor angehoben, damit eine rollende Nuss nicht dahinter verschwindet, und sie hüpft darüber.
 - **Keine Grafik geht in eine andere.** Füße, Beine und Körper bleiben über dem Panzer (im Sitzen:
   Beine gerade nach vorn, auf den Fersen), Stangen, Seile und Taschen gehen nicht durch den Körper.
   Im Zweifel weglassen (ein Taschenriemen lief als brauner Ring durch den Fuchs). Von der Seite
-  anschauen und nachmessen.
+  anschauen und nachmessen. Was auf dem Panzer abgelegt ist (die Angel beim Paddeln), liegt oben
+  auf und folgt seiner Wölbung, statt hineinzustecken.
 - Der Schwanz ist klein und verdeckt keine Beine.
+- **Der Fuchs ist groß im Bild**, in jeder Station: Die Kamera geht so nah heran, wie es die
+  Bewegung erlaubt; das Kind muss jede Pfote erkennen, auch auf dem Handy.
+- **Aufstehen und Hinsetzen wie ein Kind**: über die Hocke mit den Füßen unter der Hüfte, Knie
+  angezogen, Oberkörper vorgebeugt über die Füße, dann hochdrücken. Nicht steif aus dem Sitzen
+  hochklappen.
+- **Auf dem Handy gehört das Bild dem Fuchs**: Die Wegleiste unten ist klein und auf schmalen oder
+  niedrigen Bildschirmen ganz weg; Springen geht weiter über ⏮ ⏭ oben.
 - **Neigen geht mit dem Kopf**: Beim Ausweichen zur Seite (Nüsse von oben) neigt sich der Kopf
   deutlich mit, nicht nur der Körper.
 - **Hinter durchsichtigen Dingen sieht man durch** (Spinnweben): keine weiße oder helle Fläche

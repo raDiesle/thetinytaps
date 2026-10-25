@@ -872,8 +872,12 @@ export function makeGate() {
   };
 }
 
-/** An apple tree leaning over the path, with its crown above Tapsi on Ole's back. */
-export function makeAppleTree() {
+/**
+ * An apple tree leaning over the path: a bough reaches out right over Tapsi on Ole's back, `boughY` over
+ * Tapsi's feet, for the apples to hang from in the open, and the crown is above and behind it, so the
+ * apples show red against the leaves.
+ */
+export function makeAppleTree(boughY: number) {
   const group = new THREE.Group();
   const bark = mat("#7b5233", 0.95);
   const up = TURTLE_BACK;
@@ -881,18 +885,21 @@ export function makeAppleTree() {
   trunk.position.set(-1.6, 1.25 + up / 2, -1.0);
   trunk.rotation.z = -0.18;
   group.add(trunk);
-  const bough = solid(new THREE.CylinderGeometry(0.1, 0.16, 2.4, 8), bark);
-  bough.position.set(-0.5, 2.25 + up, -0.75);
-  bough.rotation.z = 1.25;
+  // From the trunk out over the path, just over the apples.
+  const from = v3(-1.5, boughY + up + 0.25, -0.3);
+  const to = v3(0.85, boughY + up, -0.02);
+  const bough = solid(new THREE.CylinderGeometry(0.06, 0.13, from.distanceTo(to), 8), bark);
+  bough.position.lerpVectors(from, to, 0.5);
+  bough.quaternion.setFromUnitVectors(v3(0, 1, 0), to.clone().sub(from).normalize());
   group.add(bough);
   const leaves = ["#3d8f36", "#4ea640", "#5cb84a"];
   for (const [x, y, z, size, seed] of [
-    [-1.3, 2.0, -1.0, 1.4, 61],
-    [-0.4, 2.0, -0.6, 1.25, 62],
-    [0.6, 2.05, -0.55, 1.15, 63],
+    [-1.3, 0.25, -1.3, 1.3, 61],
+    [-0.3, 0.3, -1.15, 1.2, 62],
+    [0.7, 0.25, -1.1, 1.1, 63],
   ]) {
     const crown = makeBush(size, seed, leaves);
-    crown.position.set(x, y + up, z);
+    crown.position.set(x, boughY + up + y, z);
     group.add(crown);
   }
   return group;
