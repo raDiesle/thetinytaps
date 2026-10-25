@@ -1,50 +1,42 @@
 import { GameShell, type GameMode } from "@/components/GameShell";
 import { SettingsGroup } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
-import { FEELINGS } from "./bear";
-import { BearPlay } from "./BearPlay";
-import { SITUATIONS } from "./kita";
-import { KitaPlay } from "./KitaPlay";
-import type { Place } from "./places";
-import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY, type FeelingsSettings } from "./settings";
+import { FeelingsPlay } from "./FeelingsPlay";
+import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY } from "./settings";
+import { STORIES } from "./stories";
 import "./feelings.css";
 
 /** "All in turn" comes first and across the whole row. */
 const ALL: GameMode = { id: "all", emoji: "🌈", title: "Alle", featured: true };
 
-/** The start screen of one place: all its feelings or stories in turn, or just one. */
-export function FeelingsGame({ place }: { place: Place }) {
+const MODES = [ALL, ...STORIES.map(({ id, emoji, title }) => ({ id, emoji, title }))];
+
+/** The start screen: all stories in turn, or just one – the bear's feelings at home and the kindergarten stories side by side. */
+export function FeelingsGame() {
   const [settings, update] = useGameSettings(FEELINGS_SETTINGS_KEY, DEFAULT_FEELINGS_SETTINGS);
-  const home = place.id === "zuhause";
-  const modes = [ALL, ...(home ? FEELINGS : SITUATIONS).map(({ id, emoji, title }) => ({ id, emoji, title }))];
 
   return (
     <GameShell
-      title={place.title}
-      emoji={place.emoji}
-      modes={modes}
-      mode={home ? settings.feeling : settings.situation}
-      onMode={(id) => update(home ? { feeling: id as FeelingsSettings["feeling"] } : { situation: id as FeelingsSettings["situation"] })}
-      backHref="/gefuehle/"
-      backLabel="Gefühle"
+      title="Gefühle"
+      emoji="🐻"
+      modes={MODES}
+      mode={settings.story}
+      onMode={(story) => update({ story })}
       settings={
         <>
-          <SettingsGroup title={`${place.emoji} ${place.title}`}>
-            {home ? (
-              <p className="setting-note">
-                Der kleine Bär ist traurig, wütend, müde oder hat Angst. Drei Karten zeigen, was ihm hilft – umarmen, Teddy geben, stampfen, Licht an … Sind
-                alle drei getan, ist er wieder froh.
-              </p>
-            ) : (
-              <p className="setting-note">
-                Kleine Geschichten: Jemand schubst, tritt oder nimmt etwas weg, die Rutsche ist voll, ein anderes Kind hat das tolle Spielzeug – oder der kleine
-                Bär ist selbst wütend. Bei jedem Schritt tippt das Kind, was der Bär tun kann: laut „Stopp! Nein!“ sagen, weggehen, Hilfe holen, fragen, warten,
-                tauschen.
-              </p>
-            )}
+          <SettingsGroup title="🐻 Gefühle">
             <p className="setting-note">
-              Zwischen den guten Ideen liegt immer eine nicht so gute (z.&nbsp;B. zurückschubsen, Licht aus). Tippt das Kind darauf, erscheint sie groß mit
-              rotem Kreuz und es wird erklärt, warum. Die guten Ideen bekommen einen grünen Haken.
+              Zu Hause ist der kleine Bär traurig, wütend, müde oder hat Angst. Drei Karten zeigen, was ihm hilft – umarmen, Hand halten, stampfen, Licht an …
+              Sind alle drei getan, ist er wieder froh.
+            </p>
+            <p className="setting-note">
+              Im Kindergarten: Jemand schubst, tritt oder nimmt etwas weg, die Rutsche ist voll, ein anderes Kind hat das tolle Spielzeug – oder der kleine Bär
+              ist selbst wütend. Bei jedem Schritt tippt das Kind, was der Bär tun kann: laut „Stopp! Nein!“ sagen, weggehen, Hilfe holen, fragen, warten,
+              tauschen.
+            </p>
+            <p className="setting-note">
+              Links liegt immer eine nicht so gute Idee (z.&nbsp;B. zurückschubsen, Licht aus), daneben die guten, die beste zuerst. Tippt das Kind auf die
+              nicht so gute, erscheint sie groß mit rotem Kreuz und es wird erklärt, warum. Die guten Ideen bekommen einen grünen Haken.
             </p>
             <p className="setting-note">
               Unter jedem Bild steht klein, was es zeigt – zum Mitlesen und Erzählen für Erwachsene. Kinder wählen nur nach dem Bild.
@@ -57,7 +49,7 @@ export function FeelingsGame({ place }: { place: Place }) {
         </>
       }
     >
-      {home ? <BearPlay settings={settings} /> : <KitaPlay settings={settings} />}
+      <FeelingsPlay settings={settings} />
     </GameShell>
   );
 }
