@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { CHEEK, INK, SKIN } from "@/games/scenes/shared";
 import {
   Bed,
+  Block,
   Boat,
   Boots,
   Bowl,
@@ -11,6 +12,7 @@ import {
   EmptyPlate,
   Fridge,
   Juice,
+  Mixer,
   Mug,
   OpenUmbrella,
   Pancakes,
@@ -22,6 +24,7 @@ import {
   Stove,
   Table,
   Teddy,
+  Toilet,
   ToothCup,
   Toothbrush,
   Tub,
@@ -346,7 +349,11 @@ export type PicId =
   | "chefhat"
   | "bowl"
   | "pyjama"
-  | "hat";
+  | "hat"
+  | "eggs"
+  | "mixer"
+  | "toilet"
+  | "blocks";
 
 /** What can show in a thought bubble: the drawing and its size. */
 export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNode }> = {
@@ -388,6 +395,19 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
   bowl: { w: 116, h: 64, draw: () => <Bowl eggs={2} flour={1} /> },
   pyjama: { w: 80, h: 50, draw: () => <Pyjama /> },
   hat: { w: 112, h: 56, draw: () => <RainHat /> },
+  eggs: { w: 68, h: 66, draw: () => <EggBasket milk={false} /> },
+  mixer: { w: 70, h: 86, draw: () => <Mixer /> },
+  toilet: { w: 80, h: 126, draw: () => <Toilet /> },
+  blocks: {
+    w: 76,
+    h: 34,
+    draw: () =>
+      ["#ff6b6b", "#4dabf7"].map((colour, i) => (
+        <g key={colour} transform={`translate(${i * 40 - 20} 0)`}>
+          <Block colour={colour} />
+        </g>
+      )),
+  },
 };
 
 /** A thought bubble with a picture, above the head of a child of height `height`. It pops up once; every new `nudge`

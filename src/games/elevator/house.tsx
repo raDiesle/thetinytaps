@@ -1,9 +1,6 @@
 import type { CSSProperties, PointerEvent } from "react";
 import { Cloud } from "@/games/scenes/shared";
 import {
-  ACTION_R,
-  ACTION_X,
-  ACTION_Y,
   BUTTON_R,
   BUTTON_X,
   CABIN_H,
@@ -26,7 +23,8 @@ import {
 import type { Weather } from "./rooms";
 import { star } from "./things";
 
-// The house around the rooms: sky, roof, walls, the lift shaft with its cabin, the call buttons and the action button.
+// The house around the rooms: sky, roof, walls, the lift shaft with its cabin and the call buttons – and the action
+// button of the trail adventures.
 
 const FLOOR_LIST = Array.from({ length: FLOORS }, (_, f) => f);
 const CABIN_W = CABIN_R - CABIN_L;
@@ -204,22 +202,22 @@ export function Hint({ floor }: { floor: number }) {
   );
 }
 
-/** The big action button left of the house, always in the same place: grey while there is nothing to do,
+/** The big action button of the trail adventures, always in the same place: grey while there is nothing to do,
  * red and glowing while a tap is awaited. Any tap or key does the same; the button only shows when and where.
  * A new `nudge` makes it jump again. */
 export function ActionButton({
   waiting,
   nudge,
-  x = ACTION_X,
-  y = ACTION_Y,
-  r = ACTION_R,
+  x,
+  y,
+  r,
 }: {
   waiting: boolean;
   nudge: number;
-  /** Where it sits, if not left of the house (the trail adventures put it in the bottom corner). */
-  x?: number;
-  y?: number;
-  r?: number;
+  /** Its middle and radius. */
+  x: number;
+  y: number;
+  r: number;
 }) {
   return (
     <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label="Los">
