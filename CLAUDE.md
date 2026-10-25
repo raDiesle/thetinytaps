@@ -81,6 +81,9 @@ In a fresh worktree run `yarn install` first.
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load).
 - Speech is off by default (`src/lib/common.ts`); sounds are on.
+- The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
+  as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
+  the room left between them, instead of a fixed box with empty space round it. Look at both sizes in the preview.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). Never add another way out.
