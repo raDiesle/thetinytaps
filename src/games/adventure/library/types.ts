@@ -271,6 +271,8 @@ export interface SituationIdea {
 /** One action of a sequence, in the order played. */
 export interface SequenceStep {
   movement: string;
+  /** What the movement is called in this story, where the library's name fits another world (shown to grown-ups on the route). */
+  name?: string;
   /** Time for this action, including showing it and the world's reaction. */
   seconds: number;
   energy: Energy;

@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import type { TargetLanguage } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import type { CommonSettings } from "@/lib/common";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
-import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
 import type { Cue, Story, StoryFrame } from "./stories/story";
 import { Music } from "./three/music";
 import { StoryPlayer } from "./three/player";
 import { Silhouette } from "./three/silhouette";
+import { hush, loadVoice, say } from "./voice";
 import "./adventure.css";
 
 const CUES: Record<Cue, () => void> = {
@@ -38,7 +39,7 @@ const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (
  * can pause and jump between steps with the buttons in the corner, by tapping
  * a picture on the route, or with the keys (arrows jump, Space pauses).
  */
-export function AdventurePlay({ story, speechLang, settings }: { story: Story; speechLang: string; settings: CommonSettings }) {
+export function AdventurePlay({ story, language, settings }: { story: Story; language: TargetLanguage; settings: CommonSettings }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const playerRef = useRef<StoryPlayer | null>(null);
   const flashRef = useRef<HTMLDivElement>(null);
@@ -68,7 +69,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
         onLine(text, kind, at) {
           if (!settingsRef.current.speech) return;
           // A new step starts fresh; within a step, lines wait for each other.
-          speak(text, speechLang, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
+          say(text, language, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
         },
         onPointing: setPointing,
         onStep(at) {
@@ -101,6 +102,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       setFailed(true);
       return;
     }
+    if (settings.speech) loadVoice(story, language);
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
     if (!import.meta.env.PROD) Object.assign(window, { __adventure: player });
@@ -113,7 +115,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
     return () => {
       observer.disconnect();
       music.stop();
-      stopSpeaking();
+      hush();
       player.dispose();
       silhouette.svg.remove();
       playerRef.current = null;
@@ -128,7 +130,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
     player.paused = !player.paused;
     setPaused(player.paused);
     if (player.paused) {
-      stopSpeaking();
+      hush();
       musicRef.current?.stop();
     } else if (settingsRef.current.music) {
       musicRef.current?.start();
@@ -139,7 +141,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
   const jump = (to: (player: StoryPlayer) => void) => {
     const player = playerRef.current;
     if (!player) return;
-    stopSpeaking();
+    hush();
     to(player);
   };
 
@@ -181,7 +183,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       <ol className="adventure-route" aria-label={story.sequence.title}>
         {story.sequence.steps.map((s, i) => (
           <li key={i} className={pointing !== null ? (i === pointing ? "now" : "") : i < step ? "done" : i === step ? "now" : ""}>
-            <button type="button" title={movement(s.movement).name} onClick={() => jump((p) => p.jump(i))}>
+            <button type="button" title={s.name ?? movement(s.movement).name} onClick={() => jump((p) => p.jump(i))}>
               {story.lines[i].icon}
             </button>
           </li>

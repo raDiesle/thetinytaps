@@ -25,7 +25,8 @@ const pluginSpaFallback: RsbuildPlugin = {
 // 404.html is left out: the worker answers deep links with index.html itself.
 // So are songs (files named musik-*.mp3): music can be switched off for all
 // games, and then they must not be downloaded; the worker keeps a song once a
-// page has fetched it.
+// page has fetched it. The same for Tapsi's voice in languages besides German
+// (en-<hash>.mp3 and so on, src/games/adventure/voiceId.ts): only the chosen one is needed.
 const pluginOffline: RsbuildPlugin = {
   name: "offline",
   setup(api) {
@@ -39,7 +40,10 @@ const pluginOffline: RsbuildPlugin = {
             .split("\\")
             .join("/"),
         )
-        .filter((file) => file !== "404.html" && file !== "sw.js" && !/\.(map|LICENSE\.txt)$/.test(file) && !/(^|\/)musik-[^/]*\.mp3$/.test(file))
+        .filter(
+          (file) =>
+            file !== "404.html" && file !== "sw.js" && !/\.(map|LICENSE\.txt)$/.test(file) && !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file),
+        )
         .sort();
       const template = await readFile("src/sw.js", "utf8");
       const hash = createHash("sha256").update(template);

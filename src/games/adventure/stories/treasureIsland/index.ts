@@ -9,7 +9,6 @@ import {
   DODGE_PERIOD,
   DRUM_HIT,
   DRUM_PERIOD,
-  duckDepth,
   JUMP_LANDING,
   JUMP_PEAK,
   JUMP_PERIOD,
@@ -66,8 +65,10 @@ import {
   RIDDLE_Z,
   ROD_GRIP_L,
   ROD_GRIP_R,
+  ROD_LENGTH,
   ROD_REST,
   ROLL_LEAD,
+  ROLL_BANK_END,
   ROLL_RADIUS,
   ROLL_Z,
   SHORE,
@@ -128,6 +129,8 @@ import {
   TRAIL_TO,
   TRAVEL,
 } from "./script";
+import { LINES, OPENING_LINES } from "./lines";
+import { TRANSLATIONS } from "./translations";
 import { makeWorld } from "./world";
 
 // "Die Schatzinsel": Tapsi stands on the back of Ole, a big sea turtle, greets
@@ -139,10 +142,10 @@ import { makeWorld } from "./world";
 // wooden gate open, steps aside for rolling coconuts,
 // dodges the monkeys' nuts in slow motion, picks apples, solves the riddle of
 // the stone door, brushes the cobwebs out of the passage behind it, pulls the
-// treasure chest ashore and unlocks it with the key Kiki brings – then Tapsi
-// turns round to us and cheers while two crabs carry the open chest up the beach;
-// Tapsi hops down behind it, reaches deep into it and throws the coins up, so
-// they rain down all round. Every world reaction is timed to the
+// treasure chest ashore and unlocks it with the key Kiki brings – then two crabs
+// carry the open chest up the beach, Tapsi hops down behind it, reaches deep into
+// it and throws the coins up, so they rain down all round, turns round to us and
+// jumps for joy, and waves goodbye. Every world reaction is timed to the
 // guide's clip, so it happens together with the child's movement. Every
 // movement stays on the spot: the child in front of the screen never has to
 // go forwards. So Tapsi never walks either: Ole carries Tapsi the whole way,
@@ -156,8 +159,9 @@ import { makeWorld } from "./world";
 // station's target as the clip hits it. Tapsi faces the island and the camera looks from behind, a
 // little raised and to the side where the arms would hide behind the body:
 // the child sees what Tapsi sees, and left is left. Over the brook it looks
-// from the side, like a jump-and-run game. At the treasure Tapsi turns round
-// and celebrates facing us.
+// from the side, like a jump-and-run game. Where things come at Tapsi (the log,
+// the apples above) it looks from right behind the head, the way Tapsi looks.
+// After the gold rain Tapsi turns round and celebrates facing us.
 //
 // Positions along the path are in layout.ts, the props in scenery.ts, putting them
 // together in world.ts, the steps and their timing in script.ts; here they move.
@@ -233,6 +237,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const tmpA = new THREE.Vector3();
   const tmpB = new THREE.Vector3();
   const tmpC = new THREE.Vector3();
+  const tmpD = new THREE.Vector3();
+  const carryPos = new THREE.Vector3();
+  const carryLook = new THREE.Vector3();
   const lapQ = new THREE.Quaternion();
   const restQ = new THREE.Quaternion();
   const heldQ = new THREE.Quaternion();
@@ -268,13 +275,23 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     return RAFT_FROM + ((RAFT_TO - RAFT_FROM) * pulledIn(clip)) / (2 * pulls);
   };
 
-  /** How far the camera stands from Tapsi, so the whole body with the arms up fills most of the picture. */
+  /** How far the camera stands from Tapsi, so Tapsi is big: the whole body with the arms up just fills the picture. */
   const frameDistance = () => {
     const cam = stage.camera;
     const v = THREE.MathUtils.degToRad(cam.fov / 2);
     const h = Math.atan(Math.tan(v) * cam.aspect);
-    return Math.max(1.15 / Math.tan(v), 0.95 / Math.tan(h));
+    return Math.max(0.95 / Math.tan(v), 0.72 / Math.tan(h));
   };
+
+  /**
+   * Right behind Tapsi's head, looking straight ahead the way Tapsi looks, `up` metres up at 4 m ahead:
+   * what comes at Tapsi comes at us too. `height` is the camera over Tapsi's feet, `back` how far behind.
+   */
+  function overHead(at: THREE.Vector3, pos: THREE.Vector3, look: THREE.Vector3, height: number, back: number, up: number) {
+    const a = ISLAND + Math.PI;
+    pos.set(at.x + Math.sin(a) * back, at.y + height, at.z + Math.cos(a) * back);
+    look.set(at.x - Math.sin(a) * 4, at.y + height + up, at.z - Math.cos(a) * 4);
+  }
 
   /**
    * Tapsi standing at `at`, seen from the sea's side (from behind while
@@ -430,13 +447,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         look.set(0, at.y + 1.3, z - 0.2);
         return;
       }
-      case S.duck: {
-        // Low behind Tapsi and to the side, looking up: the log swings over us and looks dangerous.
-        const dip = clip > 0 && f.act < actLength(step) ? duckDepth(clip) : 0;
-        rear(at, pos, look, 0.55, 0.45 - dip * 0.1, 0.9);
-        look.set(at.x, at.y + 1.25 - dip * 0.2, at.z - 1.2);
+      case S.duck:
+        // Right behind Tapsi's head and a little over it, looking ahead the way Tapsi looks: the head stays low in
+        // the picture and the log swings straight at us, then over Tapsi's ducked head and ours.
+        overHead(at, pos, look, 1.5, 1.4, 1.5);
         return;
-      }
       case S.drums:
         // Straight behind Tapsi and high up: both paws and both drums beside the body show, and the birds on
         // the path beyond, over Tapsi's head.
@@ -464,9 +479,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         look.set(at.x, at.y + 1.1, at.z - 1.2);
         return;
       case S.apples:
-        // A little low, looking up into the tree.
-        rear(at, pos, look, 0.35, 1.0, 1.0);
-        look.y = at.y + 1.2;
+        // Behind Tapsi like at the log but lower, looking up into the tree, where the apples hang over Tapsi's head.
+        overHead(at, pos, look, 0.65, 1.7, 2.6);
         return;
       case S.riddle:
         // Further back, so the three pictures over the door show above Tapsi.
@@ -499,22 +513,24 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         pos.lerp(lock.add(KEY_VIEW), k);
         return;
       }
-      case S.hooray: {
-        // First over Tapsi's shoulder at the opening chest; Tapsi turns round, and we see the face.
-        cheerShot(at, tmpA, tmpB);
-        // Then back and over to the right, so the crabs bringing the chest up the beach show too.
-        const follow = smooth((f.local - CARRY.off) / 3);
-        const mid = tmpC.copy(at).lerp(v3(CHEST_SAND.x, at.y, CHEST_SAND.z), follow * 0.5);
-        rear(mid, pos, look, 0.25 - follow * 0.6, 1.3 + follow * 0.4, 1.15 + follow * 0.3);
-        const k = smooth((f.local - 1.2) / 1.6);
-        pos.lerpVectors(tmpA, pos, k);
-        look.lerpVectors(tmpB, look, k);
+      case S.coins: {
+        // Behind Tapsi on the left and above: down into the chest and up with the coins over it. From further
+        // left than straight behind, so the cliff right beside Tapsi stays out of the picture.
+        pos.set(COIN_STAND.x - 2.6 + Math.sin(f.local * 0.3) * 0.1, at.y + 1.95, COIN_STAND.z + 1.2);
+        look.set(COIN_STAND.x - 0.1, at.y + 0.85, COIN_STAND.z - 0.8);
+        // Before that, while the chest opens and the crabs carry it up the beach to where Tapsi hops down.
+        const toss = smooth((f.local - HOP_FROM + 0.4) / 1.8);
+        if (toss < 1) {
+          carryShot(f.local, carryPos, carryLook);
+          pos.lerpVectors(carryPos, pos, toss);
+          look.lerpVectors(carryLook, look, toss);
+        }
         return;
       }
-      case S.coins:
-        // Behind Tapsi and above, as all the way: down into the chest and up with the coins over it.
-        rear(at, pos, look, -0.45 + Math.sin(f.local * 0.3) * 0.05, 2.1, 1.0);
-        look.set(COIN_STAND.x, at.y + 0.9, COIN_STAND.z - 0.6);
+      case S.hooray:
+        // In front: Tapsi has turned round to us and jumps for joy, the gold glittering out of the chest behind.
+        rear(at, pos, look, 0.1, 1.5, 1.25);
+        look.y += 0.45;
         return;
       case S.bye: {
         // In front; at the end the camera rises and flies back to show the whole island at sunset.
@@ -530,10 +546,21 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
   }
 
-  /** Behind Tapsi and above, the chest in front: for when the lid opens. */
-  function cheerShot(at: THREE.Vector3, pos: THREE.Vector3, look: THREE.Vector3) {
-    pos.set(at.x - 0.6, at.y + 2.2, at.z + 3.6);
-    look.set(RAFT_X - 0.4, at.y + 0.7, RAFT_TO + 0.4);
+  /**
+   * While the chest opens and is carried up the beach, `local` seconds into the coins step: first behind
+   * Tapsi and above, the opening chest in front; Ole turns round, and we see Tapsi's face; then back and
+   * over to the right, so the crabs bringing the chest up the beach show too.
+   */
+  function carryShot(local: number, pos: THREE.Vector3, look: THREE.Vector3) {
+    const at = tmpC.set(PARTY.x, Math.max(groundHeight(PARTY.x, PARTY.z), -TURTLE_FLOAT) + TURTLE_BACK, PARTY.z);
+    tmpA.set(at.x - 0.6, at.y + 2.2, at.z + 3.6);
+    tmpB.set(RAFT_X - 0.4, at.y + 0.7, RAFT_TO + 0.4);
+    const follow = smooth((local - CARRY.off) / 3);
+    at.lerp(tmpD.set(CHEST_SAND.x, at.y, CHEST_SAND.z), follow * 0.5);
+    rear(at, pos, look, 0.25 - follow * 0.6, 1.3 + follow * 0.4, 1.15 + follow * 0.3);
+    const k = smooth((local - 1.2) / 1.6);
+    pos.lerpVectors(tmpA, pos, k);
+    look.lerpVectors(tmpB, look, k);
   }
 
   /**
@@ -663,7 +690,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       // Side on, its head to the right, so the raft comes right up to Tapsi in front.
       [ride.x, ride.z] = standAt(step);
       ride.yaw = ISLAND - Math.PI / 2;
-    } else if (step === S.hooray) {
+    } else if (step === S.coins) {
       // Once the lid is open, Ole turns round under Tapsi to face us and crawls up the beach.
       const k = clamp01((f.local - 1.3) / 1.8);
       const e = smooth(k);
@@ -672,7 +699,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       ride.yaw = ISLAND - Math.PI / 2 - Math.PI * e;
       ride.walking = walkingAt(k);
       ride.stride = e * 5 * TAU;
-    } else if (step > S.hooray) {
+    } else if (step > S.coins) {
       [ride.x, ride.z] = standAt(step);
       ride.yaw = ISLAND - Math.PI * 1.5;
     } else if (f.act < -f.demo) {
@@ -876,8 +903,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   function holdRod(f: StoryFrame) {
     const { step, praise } = f;
     const clip = f.act + f.demo;
-    const resting = turtle.group.localToWorld(tmpA.set(ROD_REST.x, turtleTop(ROD_REST.x, ROD_REST.z) + 0.03, ROD_REST.z));
-    const behind = turtle.group.localToWorld(tmpB.set(ROD_REST.x, turtleTop(ROD_REST.x, ROD_REST.z - 0.6) + 0.03, ROD_REST.z - 0.6));
+    // Lying on the round shell, it touches it once, halfway along, and is clear of it everywhere else:
+    // along the shell's slope there, never through it.
+    const shell = (z: number) => turtleTop(ROD_REST.x, z);
+    const touch = ROD_REST.z - ROD_LENGTH * 0.4;
+    const slope = (shell(touch + 0.01) - shell(touch - 0.01)) / 0.02;
+    const onShell = (z: number) => shell(touch) + 0.05 + slope * (z - touch);
+    const resting = turtle.group.localToWorld(tmpA.set(ROD_REST.x, onShell(ROD_REST.z), ROD_REST.z));
+    const behind = turtle.group.localToWorld(tmpB.set(ROD_REST.x, onShell(ROD_REST.z - 0.6), ROD_REST.z - 0.6));
     restQ.setFromUnitVectors(UP, behind.sub(resting).normalize());
     const fishing = step === S.fish && f.opening === null;
     // Picked up in the travel before the fishing, laid down again in the praise after it.
@@ -1056,14 +1089,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     turtle.group.localToWorld(guide.root.position.set(0, TURTLE_BACK - SIT_DROP * sitting, 0));
     guide.root.rotation.y = ride.yaw + (Math.PI / 2) * ride.side;
     // At the end Tapsi hops down off Ole's back into the sand before the chest, turning round to it in
-    // the air, and stays there; for the goodbye it turns back to us.
+    // the air, and stays there; for the hooray it turns back to us.
     const off = step === S.coins ? clamp01((f.local - HOP_FROM) / (HOP_LAND - HOP_FROM)) : step > S.coins ? 1 : 0;
     if (off > 0) {
       guide.root.position.lerp(tmpA.set(COIN_STAND.x, groundHeight(COIN_STAND.x, COIN_STAND.z), COIN_STAND.z), smooth(off));
       guide.root.position.y += Math.sin(off * Math.PI) * 0.35;
-      guide.root.rotation.y += Math.PI * (step === S.coins ? smooth(off) : 1 - smooth(f.local / 1.2));
+      guide.root.rotation.y += Math.PI * (step === S.coins ? smooth(off) : step === S.hooray ? 1 - smooth(f.local / 1.2) : 0);
     }
-    guide.joy = step === S.hooray ? smooth((f.local - 0.8) / 0.6) : step > S.hooray ? 1 : 0;
+    guide.joy = step === S.coins ? smooth((f.local - 0.8) / 0.6) : step > S.coins ? 1 : 0;
     return { sitting };
   }
 
@@ -1071,13 +1104,13 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   const chestAt = new THREE.Vector3();
 
   /**
-   * In the hooray two crabs come up out of the water at the raft, lift the open chest off it onto their
+   * Before the coins two crabs come up out of the water at the raft, lift the open chest off it onto their
    * backs, carry it up the beach past Ole and set it down in the sand where Tapsi will stand before it;
    * then they dig themselves in. Before that it sits on the raft.
    */
   function placeChest(f: StoryFrame) {
     const { step, time } = f;
-    const h = step === S.hooray ? f.local : step > S.hooray ? 99 : -1;
+    const h = step === S.coins ? f.local : step > S.coins ? 99 : -1;
     const show = h >= CARRY.up && h < CARRY.gone + 0.6;
     porters.forEach((crab) => {
       crab.group.visible = show;
@@ -1261,7 +1294,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       const x = at === S.roll ? 0.05 : at === S.rollLeft ? -0.15 * GUIDE_SIZE : 0;
       const drop = -ROLL_LEAD + 0.6;
       const land = drop + 0.55;
-      const landAt = tmpB.set(hand.x * 0.6, 0, hand.z + 0.8);
+      // Onto the bank in front of Ole.
+      const landAt = tmpB.set(hand.x * 0.6, 0, ROLL_BANK_END - 1.0);
       landAt.y = groundHeight(landAt.x, landAt.z) + ROLL_RADIUS;
       if (dt < drop) {
         // Held up by the monkey, its arm going back to throw.
@@ -1278,7 +1312,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         const speed = (ROLL_Z - landAt.z) / -land;
         const z = u < 1 ? landAt.z + (ROLL_Z - landAt.z) * u : ROLL_Z + speed * dt;
         const nx = x + (landAt.x - x) * (1 - smooth(clamp01(u * 1.3)));
-        const over = Math.max(groundHeight(nx, z), onOle(nx, z, tmpC).y);
+        // Off the bank's edge in a hop over Ole's head and onto the shell.
+        const off = (z - ROLL_BANK_END + 0.4) / 1.25;
+        const hop = off > 0 && off < 1 ? groundHeight(nx, ROLL_BANK_END - 0.4) + 0.25 * Math.sin(Math.PI * off) : -Infinity;
+        const over = Math.max(groundHeight(nx, z), onOle(nx, z, tmpC).y, hop);
         const since = dt - land;
         const bounce = 0.3 * Math.exp(-5 * since) * Math.abs(Math.sin(since * 10));
         nut.position.set(nx, over + ROLL_RADIUS + bounce, z);
@@ -1483,25 +1520,32 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       cue("splash");
     }
 
-    let lid = step > S.hooray ? 1.2 : 0;
-    if (step === S.hooray) {
-      // It opens first, then Tapsi turns round to us and cheers; set down in the sand it opens all the way.
+    let lid = step > S.coins ? 1.2 : 0;
+    if (step === S.coins) {
+      // It opens first, gold glittering out of it, then the crabs carry it; set down in the sand it opens all the way.
       lid = smooth((f.local - 0.6) / 1.2) + 0.2 * smooth((f.local - CARRY.set) / 0.6);
       if (crossed(f, 0.8)) cue("chime");
+      for (let n = 0; n < 2; n++) {
+        if (crossed(f, 1.0 + n * 1.1)) {
+          gold.burst(chest.group.getWorldPosition(tmpA).add(v3(0, 0.9, 0)), 18, 4.5);
+          cue("sparkle");
+        }
+      }
     }
     chest.open(lid);
     placeChest(f);
+    if (step === S.coins && crossed(f, CARRY.set)) {
+      sand.burst(tmpA.set(CHEST_SAND.x, groundHeight(CHEST_SAND.x, CHEST_SAND.z), CHEST_SAND.z), 20, 2);
+      cue("knock");
+    }
+    // At every second jump for joy, at its top, gold glitters out of the chest behind Tapsi and confetti flies.
     if (step === S.hooray) {
-      for (let n = 0; n < 8; n++) {
-        if (crossed(f, 1.0 + n * 1.1)) {
+      for (let n = 0; TRAVEL[S.hooray] + n * 1.6 < LEAD[S.hooray] + len; n++) {
+        if (crossed(f, TRAVEL[S.hooray] + 0.4 + n * 1.6)) {
           gold.burst(chest.group.getWorldPosition(tmpA).add(v3(0, 0.9, 0)), 18, 4.5);
-          confetti.burst(tmpA.add(v3(-1, 0.6, 0.5)), 30, 5);
+          confetti.burst(tmpA.copy(guide.root.position).add(v3(0, 1.8, 0)), 30, 5);
           cue(n % 2 ? "pop" : "sparkle");
         }
-      }
-      if (crossed(f, CARRY.set)) {
-        sand.burst(tmpA.set(CHEST_SAND.x, groundHeight(CHEST_SAND.x, CHEST_SAND.z), CHEST_SAND.z), 20, 2);
-        cue("knock");
       }
     }
     if (step === S.coins && crossed(f, HOP_LAND)) {
@@ -1537,12 +1581,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       }
     });
 
-    // Crabs come out of the sand at the treasure and wave their claws; they hop whenever the coins come down.
-    const out = step === S.hooray ? smooth((f.local - 3) / 1.5) : step > S.hooray ? 1 : 0;
-    const hop = step === S.coins && landed < 0.6 ? Math.sin((landed / 0.6) * Math.PI) * 0.15 : 0;
+    // Crabs come out of the sand at the treasure and wave their claws; they hop whenever the coins come down,
+    // and with Tapsi's hoorays.
+    const out = step === S.coins ? smooth((f.local - 3) / 1.5) : step > S.coins ? 1 : 0;
+    const cheer = step === S.hooray && act > -f.demo && act < len ? Math.abs(Math.sin(((act + f.demo) / 0.8) * Math.PI)) * 0.12 : 0;
+    const hop = step === S.coins && landed < 0.6 ? Math.sin((landed / 0.6) * Math.PI) * 0.15 : cheer;
     crabs.forEach((crab, i) => {
       crab.holder.position.y = crab.ground - 0.6 + out * 0.6 + hop * (0.7 + (i % 3) * 0.15);
-      crab.holder.visible = step >= S.hooray;
+      crab.holder.visible = step >= S.coins;
       crab.dance(time + i * 0.4, 0.3);
     });
 
@@ -1585,7 +1631,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     } else if (step === S.webs) {
       // Waiting to the left beyond the webs, out of the way of the camera close behind Tapsi.
       p.copy(around).lerp(beyond, smooth(f.local / 1.5));
-    } else if (step < S.hooray) {
+    } else if (step < S.coins) {
       circling = true;
       const from = step === S.stand ? leading : step === S.duck ? ahead : step === S.rope ? beyond : around;
       p.copy(from).lerp(around, smooth(f.local / 2));
@@ -1595,11 +1641,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       p.copy(perch).lerp(away, k);
       flying = k > 0.02;
     } else {
-      const settle = step === S.hooray ? smooth((f.local - 1) / 1.5) : 1;
+      const settle = step === S.coins ? smooth((f.local - 1) / 1.5) : 1;
       p.copy(around).lerp(perch, settle);
       flying = settle < 0.95;
       // Hopping on the chest with joy.
-      if (step >= S.hooray) p.y += Math.abs(Math.sin(time * 6)) * 0.12;
+      p.y += Math.abs(Math.sin(time * 6)) * 0.12;
     }
     // Looking at Tapsi, except while circling; sitting on the chest it looks at us.
     const face = circling
@@ -1608,15 +1654,22 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         ? Math.atan2(g.x - p.x, g.z - p.z)
         : Math.atan2(camPos.x - p.x, camPos.z - p.z);
     parrot.group.rotation.set(0, face, 0);
-    parrot.flap(time, flying || step >= S.hooray);
+    parrot.flap(time, flying || step >= S.coins);
     if (step === S.hello) {
       for (const at of [1.2, TRAVEL[S.hello] + 0.6, LEAD[S.hello] + 1, LEAD[S.hello] + 4]) if (crossed(f, at)) cue("tweet");
     } else if (step === S.bye) {
       if (crossed(f, LEAD[S.bye] + 0.5) || crossed(f, LEAD[S.bye] + 3)) cue("tweet");
-    } else if (step > S.hello && step < S.hooray && crossed(f, 2)) cue("tweet");
+    } else if (step > S.hello && step < S.coins && crossed(f, 2)) cue("tweet");
 
-    // Sunset during the coins and the goodbye.
-    const dusk = step === S.coins ? smooth(f.local / sequence.steps[S.coins].seconds) * 0.7 : step > S.coins ? 0.7 + smooth(f.local / 6) * 0.3 : 0;
+    // Sunset during the coins, the hooray and the goodbye.
+    const dusk =
+      step === S.coins
+        ? smooth(f.local / sequence.steps[S.coins].seconds) * 0.45
+        : step === S.hooray
+          ? 0.45 + clamp01(f.local / (sequence.steps[S.hooray].seconds + DEMO[S.hooray])) * 0.25
+          : step > S.hooray
+            ? 0.7 + smooth(f.local / 6) * 0.3
+            : 0;
     stage.setSky(DAY, SUNSET, dusk);
     const band = Math.floor(dusk * 4);
     if (band !== sunsetDone) {
@@ -1664,13 +1717,19 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       } else {
         actShot(f.step, f, camPos, camLook);
         const prev = f.step - 1;
-        const prevEnd = { local: sequence.steps[prev].seconds + DEMO[prev], act: actLength(prev) + PRAISE, demo: DEMO[prev], praise: PRAISE, time: f.time };
+        const prevEnd = {
+          local: sequence.steps[prev].seconds + DEMO[prev],
+          act: actLength(prev) + PRAISE[prev],
+          demo: DEMO[prev],
+          praise: PRAISE[prev],
+          time: f.time,
+        };
         actShot(prev, prevEnd, fromPos, fromLook);
         midPos.copy(fromPos);
         midLook.copy(fromLook);
         // Not at sea or on the beach before the walk: there the camera swings round Tapsi, e.g. from the
         // greeting in front to behind for the fishing.
-        const chase = travel >= 3 && f.step > S.stand && f.step !== S.hooray;
+        const chase = travel >= 3 && f.step > S.stand && f.step !== S.coins;
         if (chase && f.step === S.rope) {
           // In the narrow gorge close behind Tapsi, the way it looks, so the camera never goes into the rock.
           tmpC.set(Math.sin(guide.root.rotation.y), 0, Math.cos(guide.root.rotation.y));
@@ -1684,7 +1743,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
           tmpB.set(g.x, g.y + 1.0, g.z - 3);
           orbitBlend(g, fromPos, fromLook, tmpA, tmpB, smooth(f.local / 1.2), midPos, midLook);
         }
-        const settle = chase ? smooth((f.local - (travel - 1.5)) / 1.6) : smooth(f.local / Math.max(1.2, travel));
+        // Into the chest's opening as quickly as before, though the coins' travel is long.
+        const settle = chase ? smooth((f.local - (travel - 1.5)) / 1.6) : smooth(f.local / Math.max(1.2, Math.min(travel, 2.5)));
         orbitBlend(g, midPos, midLook, camPos, camLook, settle, camPos, camLook);
       }
       // A gentle breathing of the camera, like it is held by hand.
@@ -1723,198 +1783,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
 
 export const TREASURE_ISLAND: Story = {
   sequence,
-  opening: {
-    seconds: OPENING,
-    lines: [
-      { at: 0.3, text: "Schau – da hinten ist die Schatzinsel!" },
-      { at: 3, text: "Und da liegt ein Schatz!" },
-      { at: 6.7, text: "Kommst du mit?" },
-    ],
-  },
+  opening: { seconds: OPENING, lines: OPENING_LINES },
   lead: LEAD,
   demo: DEMO,
   praise: PRAISE,
-  lines: [
-    {
-      icon: "👋",
-      situation: "Ahoi! Ich bin Tapsi. Und da kommt Kiki, mein Papagei!",
-      instruction: "Ich winke Kiki Hallo – so!",
-      turn: "Winkst du Kiki auch?",
-      again: "Hallo, Kiki!",
-      praise: "Kiki freut sich, dass du da bist!",
-    },
-    {
-      icon: "🎣",
-      situation: "Jetzt angeln wir!",
-      instruction: "Über die Schulter ausholen – und weit werfen, so!",
-      turn: "Jetzt du – wirf die Angel aus!",
-      again: "Ausholen – und plitsch!",
-      praise: "Lauter Fische!",
-    },
-    {
-      icon: "🪑",
-      situation: "Gleich schwimmt Ole los.",
-      instruction: "Wir setzen uns hin – ganz langsam, so.",
-      turn: "Jetzt du – setz dich hin!",
-      praise: "Gut sitzen wir. Los geht's!",
-    },
-    {
-      icon: "🛶",
-      situation: "Ole schwimmt los – zur Schatzinsel!",
-      instruction: "Schau: das Paddel rechts ins Wasser – und links.",
-      turn: "Paddel mit!",
-      again: "Paddeln, paddeln – die Insel kommt näher!",
-      praise: "Geschafft! Ole ist am Strand.",
-    },
-    {
-      icon: "🧍",
-      situation: "Wir sind auf der Insel!",
-      instruction: "Wir stehen auf – ganz langsam, so.",
-      turn: "Jetzt du – steh auf!",
-      praise: "Jetzt geht es zu Fuß weiter.",
-    },
-    {
-      icon: "🦂",
-      situation: "Huch! Skorpione krabbeln auf Ole!",
-      instruction: "Fuß hoch – und schnell feste stampfen, so!",
-      turn: "Jetzt du – stampf mit!",
-      again: "Stampf, stampf – plopp!",
-      praise: "Alle Skorpione sind weg!",
-    },
-    {
-      icon: "🌉",
-      situation: "Eine kleine Brücke! Und da oben schweben lauter Kisten.",
-      instruction: "Hopp – und mit dem Kopf an die Kiste, bumm!",
-      turn: "Jetzt du – hüpf mit!",
-      again: "Hopp, bumm! Hopp, bumm!",
-      praise: "Drüben! Lauter goldene Sterne!",
-    },
-    {
-      icon: "🪵",
-      situation: "Achtung! Da oben schaukelt ein Baumstamm.",
-      instruction: "Wenn er kommt, ducken wir uns – so!",
-      turn: "Er kommt! Duck dich!",
-      again: "Und nochmal ducken!",
-      praise: "Puh, der Stamm ist vorbei!",
-    },
-    {
-      icon: "🥁",
-      situation: "Oh, lauter Vögel sitzen auf dem Weg! Und da hängen zwei Trommeln.",
-      instruction: "Links – bumm! Und rechts – bumm! So!",
-      turn: "Jetzt du – trommel mit!",
-      again: "Bumm, bumm – die Vögel fliegen weg!",
-      praise: "Der Weg ist frei!",
-    },
-    {
-      icon: "⚙️",
-      situation: "Ein Tor! Und da ist eine Kurbel.",
-      instruction: "Wir drehen die Kurbel – rundherum, so!",
-      turn: "Jetzt du – dreh mit!",
-      again: "Rundherum – das Tor geht hoch!",
-      praise: "Das Tor ist offen!",
-    },
-    {
-      icon: "🥥",
-      situation: "Oh, der Affe lässt Kokosnüsse fallen! Die kullern genau zu uns.",
-      instruction: "Ein großer Schritt zur Seite – und zurück. So!",
-      turn: "Kokosnuss! Großer Schritt zur Seite!",
-      again: "Und nochmal Platz machen!",
-      praise: "Alle Kokosnüsse sind vorbeigekullert.",
-    },
-    {
-      icon: "🦵",
-      situation: "Jetzt kullern sie links!",
-      instruction: "Das Bein hoch – die Kokosnuss rollt unten durch. So!",
-      turn: "Jetzt du – Bein hoch!",
-      again: "Bein hoch!",
-      praise: "Unten durch! Super.",
-    },
-    {
-      icon: "🦶",
-      situation: "Und jetzt kommen sie in der Mitte!",
-      instruction: "Die Beine ganz breit – die Kokosnuss rollt durch. So!",
-      turn: "Jetzt du – Beine breit!",
-      again: "Beine breit!",
-      praise: "Durch die Beine! Die Affen lachen.",
-    },
-    {
-      icon: "🐒",
-      situation: "Oh, Affen! Die werfen mit Kokosnüssen!",
-      instruction: "Wir weichen ganz langsam aus – zur Seite, so!",
-      turn: "Jetzt du – weich aus!",
-      again: "Und zur anderen Seite!",
-      praise: "Daneben! Die Affen klatschen.",
-    },
-    {
-      icon: "🍎",
-      situation: "Ein Apfelbaum! Und da steht ein Korb.",
-      instruction: "Ganz hoch strecken und pflücken – so!",
-      turn: "Jetzt du – pflück einen Apfel!",
-      again: "Hoch – und plumps in den Korb!",
-      praise: "Der Korb ist voll!",
-    },
-    {
-      icon: "🧩",
-      situation: "Eine Tür mit drei Bildern. Ein Rätsel!",
-      instruction: "Wir machen die Bilder nach. Erst ganz groß – so!",
-      turn: "Jetzt du – ganz groß!",
-      more: [
-        { at: 1.7, text: "Und jetzt ganz breit, wie ein Stern!" },
-        { at: 5.7, text: "Und jetzt ganz klein!" },
-        { at: 9.7, text: "Nochmal von vorn: ganz groß!" },
-        { at: 13.7, text: "Ganz breit!" },
-        { at: 17.7, text: "Und ganz klein!" },
-      ],
-      praise: "Rätsel gelöst! Die Tür geht auf.",
-    },
-    {
-      icon: "🕸️",
-      situation: "Oh, lauter Spinnweben! Da kommen wir nicht durch.",
-      instruction: "Mit der Pfote hoch – und weit zur Seite wedeln, so!",
-      turn: "Jetzt du – wedel mit!",
-      again: "Links – und rechts – weg damit!",
-      praise: "Der Weg ist frei! Die Spinne winkt.",
-    },
-    {
-      icon: "🪢",
-      situation: "Da schwimmt die Schatztruhe!",
-      instruction: "Hand über Hand am Seil ziehen – so!",
-      turn: "Zieh mit!",
-      again: "Ziehen, ziehen – sie kommt!",
-      praise: "Die Truhe ist da!",
-    },
-    {
-      icon: "🔑",
-      situation: "Oh, ein Schloss! Kiki bringt den Schlüssel.",
-      instruction: "Aufheben, reinstecken und umdrehen – so!",
-      turn: "Jetzt du – dreh den Schlüssel!",
-      again: "Klick – und nochmal!",
-      praise: "Das Schloss ist auf!",
-    },
-    {
-      icon: "🙌",
-      situation: "Oh! Was ist da drin?",
-      instruction: "Gold! Arme hoch – Hurra!",
-      turn: "Du auch – Hurra!",
-      again: "Hurra, ein Schatz!",
-      praise: "So viel Gold!",
-    },
-    {
-      icon: "💰",
-      situation: "Die Krebse bringen uns die Truhe. Ich hüpfe runter!",
-      instruction: "Tief rein greifen – und die Münzen hoch werfen! So!",
-      turn: "Jetzt du – rein greifen und hoch werfen!",
-      again: "Rein greifen – hoch werfen!",
-      praise: "Ein Goldregen! Wir sind reich!",
-    },
-    {
-      icon: "🌅",
-      situation: "Die Sonne geht unter.",
-      instruction: "Ich winke Kiki Tschüss – so!",
-      turn: "Winkst du mit?",
-      again: "Tschüss, Kiki! Tschüss, Insel!",
-      praise: "Danke fürs Mitmachen! Bis bald!",
-    },
-  ],
+  lines: LINES,
+  translations: TRANSLATIONS,
   build,
 };

@@ -21,7 +21,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       id: "G-02",
       emoji: "⚽",
       title: "Der Ball rollt weg",
-      text: "Der Ball rollt die Straße hinunter: an der Ampel den Knopf drücken und auf Grün warten, über den Zebrastreifen, am Bäcker vorbei (Brezel für den Hund), durch den Park, die Rutsche hinunter – unten liegt er im Sandkasten. Beutel: Brezel, Schaufel, Gießkanne.",
+      text: "Der Ball rollt die Straße hinunter: an der Ampel den Knopf drücken und auf Grün warten, über den Zebrastreifen, an der Tierhandlung vorbei (Knochen für den Hund), durch den Park, die Rutsche hinunter – unten liegt er im Sandkasten. Beutel: Knochen, Schaufel, Gießkanne.",
       why: "Die eigene Straße als Abenteuer; Ampel und Zebrastreifen nebenbei.",
       effort: "M",
       done: true,
@@ -82,6 +82,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "An einer Kreuzung zeigen zwei Bilder zwei Wege: Treppe hoch oder Tunnel durch. Das Kind tippt einen, beide führen ans Ziel, nur mit anderen Dingen unterwegs. Beim nächsten Mal kann es den anderen Weg nehmen.",
       why: "Eigene Entscheidung ohne Falsch; jedes Mal ein etwas anderes Abenteuer.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-10",

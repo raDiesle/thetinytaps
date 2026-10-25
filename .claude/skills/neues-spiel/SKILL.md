@@ -42,7 +42,7 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
   `<p>`s for grown-ups, one per mode, keyboard hints only when `!useDevice().touchOnly`.
 - Parent options go into `settings` with `SettingsGroup`, `Toggle`, `Choice`
   (`src/components/SettingControls.tsx`) – only options, no description; no own switch for
-  Vorlesen, Töne or Musik, the home page sets those for all games.
+  Vorlesen, Töne, Musik or Sprache, the home page sets those for all games.
 - Sounds: build on `note()` and friends in `src/lib/sfx/core.ts` (the new sound goes into the topic file it fits), or `playRecorded(name, fallback)`
   for a recording in `src/lib/sounds/`. Speech: `speak()` from `src/lib/speech.ts`, only if
   `settings.speech`.

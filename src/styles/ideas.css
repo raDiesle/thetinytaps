@@ -525,3 +525,23 @@ button.idea-id {
   height: 100%;
   background: #3ec300;
 }
+
+/* Languages: games × wanted languages; flag above the name, the note under the game. */
+.ideas-languages thead small,
+.ideas-languages th small {
+  display: block;
+}
+
+.ideas-languages tbody th small {
+  max-width: 360px;
+  font-size: 0.8rem;
+}
+
+.ideas-languages tbody th {
+  padding-block: 5px;
+}
+
+.ideas-languages tfoot th,
+.ideas-languages tfoot td {
+  border-top: 2px solid var(--ink);
+}

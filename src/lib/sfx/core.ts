@@ -192,6 +192,50 @@ export function note({ from, to = from, duration, type, volume, delay = 0, lowpa
   osc.stop(start + duration);
 }
 
+/**
+ * A voice saying vowels one after another: a buzzing tone through two band-pass filters at the
+ * vowel's first two formants (Hz), e.g. "a" [1000, 1600] → "u" [450, 1000] → "a" for „Aua!“.
+ * `pitch` and `vowels` are points spread evenly over `duration`, glided between.
+ */
+export function voice({
+  pitch,
+  vowels,
+  duration,
+  volume,
+  delay = 0,
+}: {
+  pitch: number[];
+  vowels: [number, number][];
+  duration: number;
+  volume: number;
+  delay?: number;
+}) {
+  const ac = audio();
+  if (!ac) return;
+  const start = ac.currentTime + delay;
+  const at = (i: number, count: number) => start + (count > 1 ? (duration * i) / (count - 1) : 0);
+  const osc = ac.createOscillator();
+  osc.type = "sawtooth";
+  pitch.forEach((hz, i) => (i ? osc.frequency.linearRampToValueAtTime(hz, at(i, pitch.length)) : osc.frequency.setValueAtTime(hz, start)));
+  const gain = ac.createGain();
+  gain.gain.setValueAtTime(0, start);
+  gain.gain.linearRampToValueAtTime(volume * masterVolume, start + 0.04);
+  gain.gain.setValueAtTime(volume * masterVolume, start + duration * 0.8);
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+  gain.connect(ac.destination);
+  for (const formant of [0, 1]) {
+    const filter = ac.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.Q.value = formant ? 9 : 6;
+    vowels.forEach((v, i) =>
+      i ? filter.frequency.linearRampToValueAtTime(v[formant], at(i, vowels.length)) : filter.frequency.setValueAtTime(v[formant], start),
+    );
+    osc.connect(filter).connect(gain);
+  }
+  osc.start(start);
+  osc.stop(start + duration);
+}
+
 export function tone(freq: number, duration: number, type: OscillatorType, volume: number) {
   note({ from: freq, duration, type, volume });
 }

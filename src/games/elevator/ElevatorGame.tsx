@@ -25,21 +25,23 @@ export function ElevatorGame() {
         { id: "drachen", emoji: "🪁", title: "Der Drachen" },
         { id: "ball", emoji: "⚽", title: "Der Ball rollt weg" },
         { id: "ballon", emoji: "🎈", title: "Der Luftballon" },
+        { id: "lok", emoji: "🚂", title: "Die kleine Lok" },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}
       info={
         <>
           <p>
-            Kleine Bildergeschichten von ein paar Minuten. Im Haus zeigt eine Denkblase, was das Kind als Nächstes braucht, und es fährt mit dem Aufzug in
-            diesen Stock. Draußen läuft es einem Ding hinterher, das weggeflogen oder weggerollt ist, sammelt unterwegs Sachen in den Beutel und nimmt an jedem
+            Kleine Bildergeschichten von etwa 5 Minuten. Im Haus zeigt eine Denkblase, was das Kind als Nächstes braucht, und es fährt mit dem Aufzug in diesen
+            Stock. Draußen läuft es einem Ding hinterher, das weggeflogen oder weggerollt ist, sammelt unterwegs Sachen in den Rucksack und nimmt an jedem
             Hindernis das, was hilft.
           </p>
           <p>Am Ende spielt „Nochmal“ dieselbe Geschichte noch einmal, „Weiter“ die nächste.</p>
           {!device.touchOnly && (
             <p>
               Leuchtet der große Knopf, drückt ihn die Leertaste (oder jede andere Taste). Im Haus holen 1–4 den Aufzug, Pfeil hoch und runter fahren einen
-              Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Beutel. Am Ende geht jede Taste zur nächsten Geschichte.
+              Stock weiter; draußen nehmen 1–3 ein Ding aus dem offenen Rucksack, und an einer Weggabelung wählen 1 und 2 den Weg. Am Ende geht jede Taste zur
+              nächsten Geschichte.
             </p>
           )}
         </>

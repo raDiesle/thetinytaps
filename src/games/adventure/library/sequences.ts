@@ -1,5 +1,5 @@
-// Result D: five playable sequences of about three minutes each. The first,
-// treasure_island, is the one with a 3D story (../stories/treasureIsland/).
+// Result D: playable sequences of about three minutes each. Two have a 3D story:
+// treasure_island (../stories/treasureIsland/) and cloud_trip (../stories/cloudTrip/).
 import type { Sequence } from "./types";
 
 export const SEQUENCES: Sequence[] = [
@@ -25,9 +25,9 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "sit_down",
-        seconds: 8,
+        seconds: 4.5,
         energy: "calm",
-        situation: "Tapsi setzt sich langsam auf Oles Panzer und wartet, bis das Kind auch sitzt.",
+        situation: "Tapsi setzt sich auf Oles Panzer, das Kind gleich mit; sobald beide sitzen, geht es weiter.",
         transition: "Tapsi nimmt das Paddel: „Ole schwimmt los!“",
       },
       {
@@ -39,9 +39,9 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "stand_up",
-        seconds: 7.5,
+        seconds: 4.3,
         energy: "calm",
-        situation: "Tapsi steht langsam auf Oles Panzer auf und wartet, bis das Kind auch steht.",
+        situation: "Tapsi zieht die Knie an, beugt sich vor und steht auf, das Kind gleich mit; sobald beide stehen, geht es weiter.",
         transition: "Am Strand krabbelt etwas.",
       },
       {
@@ -145,19 +145,18 @@ export const SEQUENCES: Sequence[] = [
         transition: "Das Schloss springt auf.",
       },
       {
-        movement: "hooray_arms",
-        seconds: 12,
+        movement: "treasure_toss",
+        seconds: 19,
         energy: "lively",
         situation:
-          "Die Truhe springt auf: Goldmünzen, Glitzer und Konfetti; Tapsi dreht sich zu uns um und jubelt, zwei Krebse tragen die Truhe an den Strand.",
-        transition: "Die Krebse kommen zum Feiern aus dem Sand.",
+          "Die Truhe springt auf: Goldmünzen und Glitzer. Ole dreht sich um, zwei Krebse tragen die Truhe an den Strand, Tapsi hüpft von Ole in den Sand hinter die Truhe, greift aus dem Stand tief hinein und wirft die Münzen hoch: ein Goldregen um Tapsi herum. Die Sonne geht unter.",
+        transition: "Tapsi dreht sich zu uns um.",
       },
       {
-        movement: "treasure_toss",
-        seconds: 14.5,
+        movement: "hooray_arms",
+        seconds: 9,
         energy: "lively",
-        situation:
-          "Tapsi hüpft von Ole in den Sand hinter die Truhe, greift aus dem Stand tief hinein und wirft die Münzen hoch: ein Goldregen um Tapsi herum. Die Sonne geht unter.",
+        situation: "Tapsi dreht sich zu uns um und jubelt mit beiden Armen, aus der Truhe glitzert das Gold, Konfetti fliegt, die Krebse hüpfen.",
         transition: "Es wird Abend, alle werden ruhig.",
       },
       {
@@ -169,6 +168,98 @@ export const SEQUENCES: Sequence[] = [
       },
     ],
     finale: "Die Insel im Sonnenuntergang, die offene Truhe glitzert, Kiki fliegt eine Runde.",
+  },
+  {
+    id: "cloud_trip",
+    title: "Die Wolkenreise",
+    world: "cloud_world",
+    opening: "Die Sonne steckt hinter einer dicken Regenwolke, alles ist grau. Tapsi steht auf Wolle, der kleinen Wolke, auf der Wiese.",
+    steps: [
+      {
+        movement: "wave_hello",
+        seconds: 14,
+        energy: "calm",
+        situation: "Tapsi steht auf Wolle, von vorn zu sehen, und winkt Kiki, die herangeflogen kommt.",
+        transition: "Die Kamera geht hinter Tapsi: „Wolle will fliegen!“",
+      },
+      {
+        movement: "bird_flap",
+        name: "Wie ein Vogel flattern",
+        seconds: 17.1,
+        energy: "lively",
+        situation: "Mit jedem Flügelschlag nach unten steigt Wolle ein Stück höher, bis die Wiese tief unten liegt.",
+        transition: "Wolle fliegt los, über die Wolken.",
+      },
+      {
+        movement: "branch_duck",
+        name: "Unter den Flugzeugen ducken",
+        seconds: 17.5,
+        energy: "lively",
+        situation: "Kleine Flugzeuge kommen genau auf Kopfhöhe angeflogen; ducken, und eins nach dem anderen saust über Tapsi hinweg.",
+        transition: "Bunte Luftballons schweben heran.",
+      },
+      {
+        movement: "bubble_tap",
+        name: "Luftballons antippen",
+        seconds: 17.5,
+        energy: "medium",
+        situation: "Die Ballons schweben genau an die Pfote; abwechselnd links und rechts antippen, plopp, Konfetti.",
+        transition: "Wolle will schnell fliegen.",
+      },
+      {
+        movement: "sit_down",
+        seconds: 4.5,
+        energy: "calm",
+        situation: "Tapsi setzt sich auf Wolle, das Kind gleich mit; sobald beide sitzen, geht es weiter.",
+        transition: "Wolle saust los, zwischen hohen Wolkentürmen hindurch.",
+      },
+      {
+        movement: "rolling_ball_lean",
+        name: "In die Kurve lehnen und Sterne holen",
+        seconds: 18.1,
+        energy: "lively",
+        situation: "Im Sitzen: Wolle fliegt Kurven um die Wolkentürme, Tapsi lehnt sich mit in die Kurve und holt mit der ausgestreckten Pfote einen Stern.",
+        transition: "Wolle wird langsamer, vorn hängt die Regenwolke.",
+      },
+      {
+        movement: "stand_up",
+        seconds: 4.3,
+        energy: "calm",
+        situation: "Tapsi zieht die Knie an, beugt sich vor und steht auf Wolle auf, das Kind gleich mit; sobald beide stehen, geht es weiter.",
+        transition: "Wolle fliegt unter die Regenwolke, es regnet.",
+      },
+      {
+        movement: "cloud_push",
+        name: "Die Regenwolke hochdrücken",
+        seconds: 19,
+        energy: "medium",
+        situation:
+          "Mit beiden Armen hoch drücken: Bei jedem Drücken fliegt ein grauer Wolkenbausch weg und wird weiß, der Regen wird weniger, die Sonne kommt hervor.",
+        transition: "Die Sonne ist da, der Himmel wird blau.",
+      },
+      {
+        movement: "rainbow_arc",
+        seconds: 24.5,
+        energy: "calm",
+        situation: "Mit einem Arm nach dem anderen einen großen Bogen über den Kopf malen; jeder Bogen malt eine Farbe in den Himmel.",
+        transition: "Der Regenbogen ist fertig.",
+      },
+      {
+        movement: "hooray_arms",
+        seconds: 10.6,
+        energy: "lively",
+        situation: "Wolle dreht sich mit Tapsi zu uns um. Arme hoch und hüpfen: Wolle federt bei jedem Sprung, die Sonne lacht und strahlt.",
+        transition: "Zeit, nach Hause zu fliegen.",
+      },
+      {
+        movement: "wave_hello",
+        seconds: 11,
+        energy: "calm",
+        situation: "Von vorn: Tapsi winkt zum Abschied, hinter ihm die Sonne und der Regenbogen.",
+        transition: "Die Kamera fliegt hoch, über allem steht der Regenbogen.",
+      },
+    ],
+    finale: "Die Sonne lacht über dem Regenbogen, Wolle trägt Tapsi und Kiki nach Hause.",
   },
   {
     id: "space_trip",

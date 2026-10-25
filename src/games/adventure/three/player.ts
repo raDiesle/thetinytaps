@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import { movement } from "../library/movements";
-import type { Cue, Story, StoryFrame, StoryWorld } from "../stories/story";
+import { type Cue, DEFAULT_TURN, type Story, type StoryFrame, type StoryWorld } from "../stories/story";
 import { clipFocus, clipPose } from "./clips";
-import { Guide, lerpPose, restPose, type Pose } from "./guide";
+import { Guide, type LegPose, lerpLeg, lerpPose, restPose, type Pose } from "./guide";
 import { Stage } from "./stage";
+import { talking } from "../voice";
 
 // Plays a story: keeps the clock (pause, skip), works out which step and
 // phase it is, poses the guide (blending between clips), lets the world
@@ -31,15 +32,41 @@ export interface PlayerEvents {
 
 const ACT_BLEND = 0.7;
 
+/** The legs on the way down to sitting (and, backwards, up again): squatting with the feet under the hips … */
+const SQUAT: LegPose = { lift: 1.2, spread: 0.14, knee: 2.4 };
+/** … sitting with the knees pulled up, the feet close in front of the bottom … */
+const TUCKED: LegPose = { lift: 2.45, spread: 0.16, knee: 2.35 };
+/** … and sitting with the legs stretched out forwards, nearly level, so the heels are as high as the bottom. */
+const SEATED: LegPose = { lift: 1.55, spread: 0.1, knee: 0.08 };
+
 /**
- * Sitting on the floor with the legs stretched out forwards, nearly level, blended in by `k`; the rest
- * of the pose stays. Level legs keep the heels as high as the bottom, so neither sinks into the seat.
+ * Sitting on the floor, `k` of the way there (0 stands, 1 sits), the way a child does it: down into a
+ * squat with the feet under the hips (the knee bends twice as far as the thigh lifts, so the feet stay put),
+ * onto the bottom with the knees pulled up, then the legs stretched out. Getting up goes the same way back:
+ * knees in, lean forwards over the feet, push up. The upper body leans forwards in the squat; the rest of the
+ * pose (the arms) stays.
  */
-function sitDown(p: Pose, k: number): Pose {
+export function sitDown(p: Pose, k: number): Pose {
   if (k <= 0) return p;
-  const sit = { ...p, toes: 0, lift: 0, legL: { lift: 1.55, spread: 0.1, knee: 0.08 }, legR: { lift: 1.55, spread: 0.1, knee: 0.08 } };
-  return lerpPose(p, sit, k);
+  const leg = (standing: LegPose) =>
+    k < 0.45
+      ? lerpLeg(standing, SQUAT, smoothstep(k / 0.45))
+      : k < 0.7
+        ? lerpLeg(SQUAT, TUCKED, smoothstep((k - 0.45) / 0.25))
+        : lerpLeg(TUCKED, SEATED, smoothstep((k - 0.7) / 0.3));
+  const lean = Math.sin(Math.PI * Math.min(1, k / 0.85)) * 0.45;
+  const down = Math.min(1, k / 0.3);
+  return {
+    ...p,
+    toes: p.toes * (1 - down),
+    lift: p.lift * (1 - down),
+    bend: p.bend + lean,
+    headPitch: p.headPitch - lean * 0.5,
+    legL: leg(p.legL),
+    legR: leg(p.legR),
+  };
 }
+const smoothstep = (k: number) => THREE.MathUtils.smoothstep(k, 0, 1);
 const PRAISE_BLEND = 0.9;
 
 export class StoryPlayer {
@@ -156,7 +183,7 @@ export class StoryPlayer {
     if (opening !== null) this.speakOpening(t);
     this.prevElapsed = t;
     const lead = this.story.lead[step];
-    const actLength = this.stepSeconds(step) - lead - this.story.praise;
+    const actLength = this.stepSeconds(step) - lead - this.story.praise[step];
     const frame: StoryFrame = {
       step,
       local,
@@ -199,7 +226,7 @@ export class StoryPlayer {
     const root = this.guide.root;
     const cam = this.stage.camera.position;
     this.events.onPose?.(pose, frame, Math.atan2(cam.x - root.position.x, cam.z - root.position.z) - root.rotation.y);
-    this.guide.setTalking(typeof speechSynthesis !== "undefined" && speechSynthesis.speaking);
+    this.guide.setTalking(talking());
     this.events.onFlash(result.flash);
     this.stage.focusShadow(this.world.focus);
     this.stage.render();
@@ -232,7 +259,7 @@ export class StoryPlayer {
     const travel = f.lead - f.demo;
     const instructionAt = travel > 0 ? travel : lines.situation ? 2.6 : 0.05;
     if (at(instructionAt)) this.events.onLine(lines.instruction, "instruction", f.step);
-    if (f.demo > 0 && at(f.lead)) this.events.onLine(lines.turn ?? "Jetzt du!", "turn", f.step);
+    if (f.demo > 0 && at(f.lead)) this.events.onLine(lines.turn ?? DEFAULT_TURN, "turn", f.step);
     if (lines.again && at(f.lead + f.actLength * 0.55)) this.events.onLine(lines.again, "again", f.step);
     for (const line of lines.more ?? []) if (at(f.lead + line.at)) this.events.onLine(line.text, "again", f.step);
     if (at(f.lead + f.actLength + 0.1)) this.events.onLine(lines.praise, "praise", f.step);

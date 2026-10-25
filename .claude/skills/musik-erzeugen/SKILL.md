@@ -14,9 +14,17 @@ parts change exactly with the brushing steps, a finale on the end screen.
 
 ## What we learned (keep to it)
 
-- **Instrumental only.** The spoken hints are what the games are about, and singing
-  under them (even quiet) makes both hard to follow for a toddler. Suno's German
-  vocals were also not good enough, and a sung song per language isn't worth it.
+- **Instrumental under spoken hints.** Singing under the voice (even quiet) makes both
+  hard to follow for a toddler. A **sung song that is itself the hint** works instead:
+  one verse per step singing exactly what is shown, the voice then stays silent during
+  the steps (Zähne putzen; a new language of it: `/zahnputzlied`). Keep the plain song
+  as the choice "Nur Musik" and for timings the verses don't fit.
+- **Sung songs don't keep to bars.** Asked for "8 bars per part", Suno sang verses of
+  5 to 11 bars, put whistled fills between them and sped up from 112 to 115 BPM. Never
+  take the beat grid as where the words are: hear where each verse begins
+  (`yarn song:verses`, Whisper) and let the game follow the verses. Stretching the
+  parts to 8 bars (`yarn song:stretch`) evens out tempo drift of an instrumental song
+  only.
 - **Give the user exact copy-paste blocks, one per Suno field**, numbered steps in
   the user's language. A general description ("make it loopable, ~90 s") left the
   user not knowing what to do.
@@ -98,6 +106,18 @@ vertical edges and gaps; check that they sit on the printed part starts (the gri
 phase is only known within one beat – a song with an intro starts its first part
 some beats later). Decide which time is the loop start, where the repeating parts
 end, and where a finale starts.
+
+If the tempo is off the asked one, or the parts drift off the printed grid, even it out:
+
+```bash
+yarn song:stretch "/Users/…/Downloads/Song.wav" song-112.wav --bpm 112 --bars 8 --start 0.3
+```
+
+`--start` is where the first part's first beat is (from the measuring and the picture;
+the script can't tell it reliably). It finds each part's real start, stretches every
+part to exactly 8 bars (pitch stays) and prints where the parts now begin. `--lead 0.2`
+also puts the first beat at exactly 0.2 s, and an `.mp3` out is converted for the game
+right away (as in 3.). Measure the result with `yarn song` again.
 
 ## 3. Convert and put it in
 

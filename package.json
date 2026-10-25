@@ -14,8 +14,11 @@
     "preview": "rsbuild preview",
     "image": "node scripts/gemini-image.mjs",
     "song": "node scripts/song-timing.mjs",
+    "song:stretch": "node scripts/song-stretch.mjs",
+    "song:verses": "node scripts/song-verses.mjs",
     "archive-check": "node scripts/archive-check.mjs",
-    "frames": "node scripts/frame-check.mjs"
+    "frames": "node scripts/frame-check.mjs",
+    "voice": "node --experimental-strip-types --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/elevenlabs-voice.mjs"
   },
   "dependencies": {
     "@fontsource-variable/fredoka": "^5.3.0",

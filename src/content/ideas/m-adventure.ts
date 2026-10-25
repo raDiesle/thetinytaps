@@ -15,6 +15,8 @@ export const adventureIdeas: IdeaArea = {
       text: "Weitere Welten der Bibliothek als 3D-Geschichte: Wolkenland, Winterwald, Feuerwehr hilft dem Kätzchen, Dinotal. Auf dem Startbild eine Karte, auf der das Kind das Ziel antippt.",
       why: "Die Bewegungen und Abläufe gibt es schon; es fehlen nur Welt und Sätze.",
       effort: "L",
+      partial:
+        "Das Wolkenland ist gebaut: „Die Wolkenreise“, auf dem Startbild neben der Schatzinsel wählbar. Winterwald, Feuerwehr, Dinotal und die Karte fehlen.",
     },
     {
       id: "M-02",

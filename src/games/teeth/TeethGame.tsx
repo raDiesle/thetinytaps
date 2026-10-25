@@ -3,8 +3,10 @@ import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
-import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes } from "./settings";
+import { SUNG_LANGUAGES } from "./music";
+import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY } from "./settings";
 import { KAI } from "./steps";
+import { SUNG_LABELS } from "./sung";
 import { TeethPlay } from "./TeethPlay";
 
 export function TeethGame() {
@@ -18,13 +20,6 @@ export function TeethGame() {
     <GameShell
       title="Zähne putzen"
       emoji="🦷"
-      modes={[
-        { id: "1", emoji: "🪥", title: "1 Minute" },
-        { id: "2", emoji: "🦷", title: "2 Minuten" },
-        { id: "3", emoji: "✨", title: "3 Minuten" },
-      ]}
-      mode={settings.minutes}
-      onMode={(minutes) => update({ minutes: minutes as BrushMinutes })}
       info={
         <>
           <p>
@@ -72,6 +67,20 @@ export function TeethGame() {
           <Toggle label="Wochenbild am Ende: ein Stern für jedes Putzen morgens und abends" checked={settings.week} onChange={(week) => update({ week })} />
           <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
           {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
+          {settings.music && SUNG_LANGUAGES.length > 0 && (
+            <>
+              <Choice
+                label="Gesungen"
+                value={settings.singing}
+                options={[{ value: "off", label: "🎶 Nur Musik" }, ...SUNG_LANGUAGES.map((lang) => ({ value: lang, label: SUNG_LABELS[lang] ?? lang }))]}
+                onChange={(singing) => update({ singing })}
+              />
+              <p className="setting-note">
+                Das Lied singt zu jedem Schritt, was gerade dran ist, und das Putzen dauert so lange wie das Lied, gut 2 Minuten. Mit „Nur Musik“ sind es genau
+                2 Minuten.
+              </p>
+            </>
+          )}
         </SettingsGroup>
       }
     >

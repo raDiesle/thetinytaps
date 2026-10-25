@@ -77,7 +77,8 @@ const lerpArm = (a: ArmPose, b: ArmPose, k: number): ArmPose => ({
   elbow: lerp(a.elbow, b.elbow, k),
   twist: lerp(a.twist, b.twist, k),
 });
-const lerpLeg = (a: LegPose, b: LegPose, k: number): LegPose => ({
+/** Blends two leg poses. */
+export const lerpLeg = (a: LegPose, b: LegPose, k: number): LegPose => ({
   lift: lerp(a.lift, b.lift, k),
   spread: lerp(a.spread, b.spread, k),
   knee: lerp(a.knee, b.knee, k),
