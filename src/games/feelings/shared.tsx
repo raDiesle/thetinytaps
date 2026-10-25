@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { speak } from "@/lib/speech";
 import { framesFor, imageFor } from "./images";
 import { SOUNDS, type SoundName } from "./story";
@@ -8,6 +8,29 @@ const SPEECH_LANG = "de-DE";
 
 /** How long each frame of a picture stays before the next one fades in. */
 const FRAME_MS = 900;
+
+/** Said with the laugh when a good idea is chosen (only when speech is on), one at random. */
+const PRAISE = ["Juhu!", "Ja!", "Super!"];
+
+/** How long the green frame and the laugh stay before the bear does the good thing. */
+export const CHEER_MS = 1100;
+
+/** The red frame stays at least this long, even without speech: long enough to see what went wrong. */
+export const OOPS_MS = 2600;
+
+/** A good idea was chosen: a laugh, stars, and „Juhu!“ when speech is on. */
+export function cheer(say: (text: string) => void, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
+  sound("laugh");
+  say(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+  float("⭐", 30, 25, 4);
+  float("✨", 70, 35, 4);
+}
+
+/** A not-so-good idea was chosen: what it leads to, heard and seen – crying, or a crash when something breaks. */
+export function oops(breaks: boolean | undefined, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
+  sound(breaks ? "crash" : "cry");
+  float(breaks ? "💥" : "💧", 50, 45, 3);
+}
 
 /** Timeouts that are all cleared when the game ends or a new story starts. */
 export function useTimers() {
@@ -99,6 +122,17 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
 }
 
 /**
+ * How the big picture looks. "story": what happens, as a framed photo. "quiet": the same while
+ * the child chooses, paler, so the cards stand out and it doesn't look like one of them.
+ * "option": a card the child tapped, looked at big, with the yellow ring of a card. "good" and
+ * "bad": the answer to a choice, a green frame that hops or a red one that shakes.
+ */
+export type PictureLook = "story" | "quiet" | "option" | "good" | "bad";
+
+/** How long the picture of a tapped card takes to grow from the card to its place. */
+const ZOOM_MS = 320;
+
+/**
  * The big picture in the middle: what happens right now. Its frames fade into
  * each other in a loop, like a tiny GIF, so the animals seem to move a little.
  * Under it a short caption for grown-ups says what it shows.
@@ -107,19 +141,25 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
 export function StoryPicture({
   name,
   caption,
+  look = "story",
+  zoom = false,
   children,
   onPointerDown,
 }: {
   name: string;
   /** What the picture shows, in a few words: for grown-ups, children don't read it. */
   caption: string;
-  /** Things on top of the picture: a cross, floating hearts. */
+  look?: PictureLook;
+  /** Grows out of the card with the same picture when it appears, so the child sees which card it is. */
+  zoom?: boolean;
+  /** Things on top of the picture: floating hearts. */
   children?: ReactNode;
   onPointerDown?: (e: PointerEvent) => void;
 }) {
   const frames = framesFor(name);
   const [frame, setFrame] = useState(0);
   const moving = frames.length > 1;
+  const frameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!moving || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -127,15 +167,41 @@ export function StoryPicture({
     return () => clearInterval(timer);
   }, [moving]);
 
+  // Before the first paint: start where the card is and grow to the picture's place.
+  useLayoutEffect(() => {
+    const el = frameRef.current;
+    const card = document.querySelector(`.fg-card[data-card="${CSS.escape(name)}"]`);
+    if (!zoom || !el || !card || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const from = card.getBoundingClientRect();
+    const to = el.getBoundingClientRect();
+    const start = `translate(${from.left - to.left}px, ${from.top - to.top}px) scale(${from.width / to.width})`;
+    const grow = el.animate(
+      [
+        { transform: start, transformOrigin: "0 0" },
+        { transform: "none", transformOrigin: "0 0" },
+      ],
+      {
+        duration: ZOOM_MS,
+        easing: "cubic-bezier(0.2, 0.8, 0.3, 1)",
+      },
+    );
+    return () => grow.cancel();
+  }, []);
+
   const shown = frame % Math.max(frames.length, 1);
 
   return (
     <>
-      <div className="fg-picture" onPointerDown={onPointerDown}>
-        {frames.map((src, i) => (
-          <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
-        ))}
-        {children}
+      <div ref={frameRef} className={`fg-frame fg-look-${look}`} onPointerDown={onPointerDown}>
+        <div className="fg-picture">
+          {frames.map((src, i) => (
+            <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
+          ))}
+          {children}
+        </div>
+        {/* On the corner, not over the picture, so what happened stays to be seen. */}
+        {look === "good" && <Mark good className="fg-picture-mark" />}
+        {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
       </div>
       <p className="fg-caption fg-picture-caption">{caption}</p>
     </>
@@ -143,10 +209,10 @@ export function StoryPicture({
 }
 
 /**
- * "choose": the child can tap it. "playing": chosen, the bear does it now.
- * "done": done, with a tick. "wrong": the not-so-good idea, crossed out. "rest": waits.
+ * "choose": the child can tap it. "picked": tapped once, shown big above; tapped again it is chosen.
+ * "playing": chosen, the bear does it now. "done": done, with a tick. "wrong": the not-so-good idea, crossed out. "rest": waits.
  */
-export type CardState = "choose" | "playing" | "done" | "wrong" | "rest";
+export type CardState = "choose" | "picked" | "playing" | "done" | "wrong" | "rest";
 
 /** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
 export function ChoiceCard({
@@ -156,7 +222,7 @@ export function ChoiceCard({
   small = false,
   onChoose,
 }: {
-  /** Name of the picture, see images.ts. */
+  /** Name of the picture, see images.ts. The big picture grows out of the card with the same name. */
   image: string;
   /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
   caption: string;
@@ -164,16 +230,18 @@ export function ChoiceCard({
   small?: boolean;
   onChoose?: () => void;
 }) {
+  const active = state === "choose" || state === "picked";
   return (
     <div className={`fg-choice${small ? " small" : ""}`}>
       <button
         type="button"
         className={`fg-card fg-card-${state}${small ? " small" : ""}`}
-        disabled={state !== "choose"}
+        data-card={image}
+        disabled={!active}
         aria-label={caption}
         onPointerDown={(e: PointerEvent) => {
           e.stopPropagation();
-          if (state === "choose") onChoose?.();
+          if (active) onChoose?.();
         }}
       >
         <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} />
