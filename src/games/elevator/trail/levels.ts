@@ -63,7 +63,7 @@ const drachen: TrailLevel = {
     say: "Huch! Der Wind nimmt den Drachen mit. Hinterher!",
   },
   stations: [
-    { kind: "pickup", id: "ball", x: 540, item: "ball", at: [620, 712], sound: playBoing, ask: "Da liegt ein Ball.", done: "Ab in den Beutel!" },
+    { kind: "pickup", id: "ball", x: 540, item: "ball", at: [620, 712], sound: playBoing, ask: "Da liegt ein Ball.", done: "Ab in den Rucksack!" },
     { kind: "pickup", id: "carrot", x: 740, item: "carrot", at: [830, 690], sound: playPop, ask: "Eine Karotte!", done: "Rausgezogen!" },
     { kind: "pickup", id: "plank", x: 840, item: "plank", at: [930, 640], sound: playClonk, ask: "Ein Brett.", done: "Das nehmen wir mit." },
     {
@@ -100,7 +100,7 @@ const drachen: TrailLevel = {
       ask: "Das Pferd steht im Weg. Es hat Hunger. Was geben wir ihm?",
       done: "Die Karotte! Mmh, lecker.",
     },
-    { kind: "pickup", id: "apple", x: 2800, item: "apple", at: [2930, 590], sound: playLeaves, ask: "Ein Apfel!", done: "Plopp, in den Beutel." },
+    { kind: "pickup", id: "apple", x: 2800, item: "apple", at: [2930, 590], sound: playLeaves, ask: "Ein Apfel!", done: "Plopp, in den Rucksack." },
     {
       kind: "obstacle",
       id: "stream",
@@ -196,7 +196,7 @@ const ball: TrailLevel = {
       ask: "Die Ampel ist rot. Wir drücken den Knopf.",
       done: "Grün! Jetzt gehen wir rüber.",
     },
-    { kind: "pickup", id: "bone", x: 1600, item: "bone", at: [1690, 676], sound: playPop, ask: "Ein Knochen!", done: "Ab in den Beutel!" },
+    { kind: "pickup", id: "bone", x: 1600, item: "bone", at: [1690, 676], sound: playPop, ask: "Ein Knochen!", done: "Ab in den Rucksack!" },
     { kind: "pickup", id: "shovel", x: 1900, item: "shovel", at: [2010, 680], sound: playClonk, ask: "Eine Schaufel.", done: "Die nehmen wir mit." },
     {
       kind: "obstacle",
@@ -275,7 +275,7 @@ const ballon: TrailLevel = {
     say: "Huch! Der Wind nimmt den Luftballon mit. Hinterher!",
   },
   stations: [
-    { kind: "pickup", id: "bread", x: 560, item: "bread", at: [640, 660], sound: playCrunch, ask: "Ein Brot!", done: "Ab in den Beutel!" },
+    { kind: "pickup", id: "bread", x: 560, item: "bread", at: [640, 660], sound: playCrunch, ask: "Ein Brot!", done: "Ab in den Rucksack!" },
     { kind: "pickup", id: "fish", x: 860, item: "fish", at: [940, 630], sound: playBlub, ask: "Ein Fisch.", done: "Den nehmen wir mit." },
     { kind: "pickup", id: "sunflower", x: 1120, item: "sunflower", at: [1210, 600], sound: playLeaves, ask: "Eine Sonnenblume!", done: "Die nehmen wir mit." },
     {
@@ -397,7 +397,7 @@ const lok: TrailLevel = {
     say: "Huch! Die Lok fährt allein los. Hinterher!",
   },
   stations: [
-    { kind: "pickup", id: "carrot", x: 540, item: "carrot", at: [640, 690], sound: playPop, ask: "Eine Karotte!", done: "Ab in den Beutel!" },
+    { kind: "pickup", id: "carrot", x: 540, item: "carrot", at: [640, 690], sound: playPop, ask: "Eine Karotte!", done: "Ab in den Rucksack!" },
     { kind: "pickup", id: "corn", x: 880, item: "corn", at: [970, 690], sound: playRustle, ask: "Ein Maiskolben.", done: "Den nehmen wir mit." },
     {
       kind: "obstacle",
@@ -430,7 +430,7 @@ const lok: TrailLevel = {
           say: "Die Treppe hoch!",
           stations: [
             { kind: "climb", id: "stairs", x: 1780, steps: LOK_STAIRS, ask: "Hoch geht's.", done: "Oben! Wie weit man sieht." },
-            { kind: "pickup", id: "apple", x: 2540, item: "apple", at: [2598, 300], sound: playLeaves, ask: "Ein Apfel!", done: "Plopp, in den Beutel." },
+            { kind: "pickup", id: "apple", x: 2540, item: "apple", at: [2598, 300], sound: playLeaves, ask: "Ein Apfel!", done: "Plopp, in den Rucksack." },
             {
               kind: "obstacle",
               id: "pony",

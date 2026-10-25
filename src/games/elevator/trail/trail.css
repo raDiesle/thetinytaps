@@ -14,17 +14,12 @@
   transition-timing-function: linear;
 }
 
-.tl-flight,
+.tl-carry,
 .tl-string,
 .tl-goal,
 .tl-play .el-tap,
 .tl-play .el-confetti {
   pointer-events: none;
-}
-
-.tl-flight {
-  transition-property: transform;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.3, 1);
 }
 
 /* Measures the screen without a notch, so bag and button keep clear of it. */
@@ -86,9 +81,9 @@
   cursor: pointer;
 }
 
-/* ---------- The bag ---------- */
+/* ---------- The backpack on the screen ---------- */
 
-/* Its frame is the colour of the bag: what is inside the circles is in the bag. */
+/* Its frame sets it off from the picture: the backpack in it is the child's own, open. */
 .tl-bag-shadow {
   fill: #3d405b;
 }
@@ -98,31 +93,49 @@
   stroke: #3d405b;
 }
 
-.tl-slot {
+.tl-slot-tap {
   cursor: pointer;
 }
 
-.tl-slot-face {
-  fill: #fff9db;
-  transition: fill 0.3s;
+.tl-bag .tl-slot,
+.tl-bag-bump {
+  pointer-events: none;
 }
 
-.tl-bag.open .tl-slot-face {
-  fill: #fff3bf;
+/* A thing goes in or out: the backpack bounces. */
+.tl-bag-bump {
+  animation: tl-bag-bump 0.45s ease-out;
 }
 
-/* The bag opens: the slots hop once, one after the other. */
+/* A thing drops in from above and settles; taken out, it rises up and goes. */
+.tl-thing {
+  transition: transform 0.3s cubic-bezier(0.3, 1.6, 0.6, 1);
+}
+
+.tl-thing.in {
+  animation: tl-thing-in 0.5s cubic-bezier(0.3, 1.3, 0.6, 1);
+}
+
+.tl-thing.out {
+  animation: tl-thing-out 0.32s ease-in both;
+}
+
+/* The bag opens: the things come up out of it, hopping one after the other. */
+.tl-bag.open .tl-thing {
+  transform: translateY(-30px);
+}
+
 .tl-bag.open .tl-slot {
   animation: tl-slot-hop 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
 }
 
-.tl-bag.open .tl-slot.full .tl-slot-face {
-  stroke: #f59f00;
+/* The thing that helps glows. */
+.tl-glow {
+  fill: #ffe066;
+  opacity: 0;
 }
 
-/* The thing that helps glows. */
-.tl-bag.open .tl-slot.hint .tl-slot-face {
-  fill: #ffe066;
+.tl-bag.open .tl-slot.hint .tl-glow {
   animation: tl-glow-slot 0.8s ease-in-out infinite alternate;
 }
 
@@ -383,8 +396,37 @@
 }
 
 @keyframes tl-glow-slot {
+  from {
+    opacity: 0.35;
+  }
   to {
-    fill: #fff;
+    opacity: 0.9;
+  }
+}
+
+@keyframes tl-bag-bump {
+  30% {
+    transform: scale(1.04, 0.95);
+  }
+  65% {
+    transform: scale(0.99, 1.02);
+  }
+}
+
+@keyframes tl-thing-in {
+  from {
+    transform: translateY(-150px) scale(0.5);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@keyframes tl-thing-out {
+  to {
+    transform: translateY(-150px) scale(0.5);
+    opacity: 0;
   }
 }
 

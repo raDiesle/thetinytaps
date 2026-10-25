@@ -6,10 +6,10 @@ import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSli
 import { speak } from "@/lib/speech";
 import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
-import { HERO, KID_H, Kid, ThoughtBubble, type Pose } from "../kid";
+import { HERO, KID_H, Kid, PACK, ThoughtBubble, type Pose } from "../kid";
 import type { ElevatorSettings } from "../settings";
 import { allStations, groundY, route } from "./ground";
-import { Fitted, GOALS, ITEMS, type Goal, type ItemId } from "./items";
+import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
 import type { Climb, Cue, Flight, Fork, Moment, Obstacle, Pickup, Point, Station, TrailLevel, Way } from "./types";
 import "./trail.css";
 
@@ -25,23 +25,35 @@ const WALK_MS = 2.6;
 const STEP_MS = 380;
 /** Sliding time per world point: much faster than walking. */
 const SLIDE_MS = 0.9;
-/** A thing flying between the bag and the world. */
+/** A thing flying from the child's hand to an obstacle. */
 const FLY_MS = 650;
+/** How big a thing is while the child carries it, in world points. */
+const CARRY = 84;
+// Where a carried thing is, from the child's feet (facing right): in the hand reaching out, high up in the
+// raised hand, just above the backpack's opening on the back, and deep in it.
+const HAND_OUT: Point = [72, -128];
+const HAND_UP: Point = [44, -196];
+const PACK_TOP: Point = [-54, -180];
+const PACK_IN: Point = [-51, -96];
+/** The backpack on the child's back while nothing goes in or out (the ghost wears it too). */
+const PACK_SHUT = { open: false, bump: 0 };
 /** Without a tap for so long, the hand pops up again (and while choosing, the right thing glows). */
 const NUDGE_MS = 7000;
 /** From the end of the level until „Nochmal“ and „Weiter“ come. */
 const END_MS = 6000;
-/** The bag's slots; the bag holds three things at most. */
+/** The backpack on the screen holds three things at most, standing side by side in it. */
 const SLOT_COUNT = 3;
-const SLOT_R = 62;
-/** From one slot's middle to the next. */
+/** From one thing's middle to the next, and from the frame's left edge to the first. */
 const SLOT_STEP = 150;
+const SLOT_IN = 100;
+/** The upper edge of the backpack's front: the things stand behind it, their bottoms hidden. */
+const RIM = 808;
 const ACTION_R = 62;
 /** The bag's frame and the button's frame at the bottom of the screen, as high as each other. */
 const HUD_TOP = 704;
 const HUD_H = 188;
-/** On a computer a small key cap under each slot and under the action button shows which key does it; then the
- * slots sit a little higher to make room. */
+/** On a computer a small key cap under each thing (on its front pocket) and under the action button shows which
+ * key does it. */
 const KEY_Y = 864;
 /** Room kept free between the screen's edge and the frames. */
 const EDGE = 18;
@@ -56,8 +68,7 @@ const WAY_R = 66;
 interface Hud {
   /** The bag's frame: left, top, width, height. */
   bagBox: [number, number, number, number];
-  /** The bag's picture at the left of its frame. */
-  bag: Point;
+  /** Where each thing stands in the backpack: its middle, on the front's upper edge. */
   slots: Point[];
   action: Point;
   actionBox: [number, number, number, number];
@@ -72,18 +83,29 @@ interface Hud {
 function layoutHud(left: number, right: number, keys: boolean): Hud {
   const x0 = left + EDGE;
   const y = keys ? 784 : HUD_TOP + HUD_H / 2;
-  const slots = Array.from({ length: SLOT_COUNT }, (_, i): Point => [x0 + 218 + i * SLOT_STEP, y]);
-  const bagW = slots[SLOT_COUNT - 1][0] + SLOT_R + 18 - x0;
+  const slots = Array.from({ length: SLOT_COUNT }, (_, i): Point => [x0 + SLOT_IN + i * SLOT_STEP, RIM]);
+  const bagW = 2 * SLOT_IN + (SLOT_COUNT - 1) * SLOT_STEP;
   const boxW = 2 * ACTION_R + 44;
   const beside = x0 + bagW + 26;
   const boxX = beside + boxW <= KID_LEFT ? beside : right - EDGE - boxW;
   return {
     bagBox: [x0, HUD_TOP, bagW, HUD_H],
-    bag: [x0 + 80, y + 8],
     slots,
     action: [boxX + boxW / 2, y],
     actionBox: [boxX, HUD_TOP, boxW, HUD_H],
   };
+}
+
+const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+
+/** How much bigger a thing is where it lies in the world than while it is carried. */
+const natural = (picture: Picture) => 1 / Math.min(CARRY / picture.w, CARRY / picture.h);
+
+/** A thing standing in the open backpack on (0, 0), its bottom behind the front; a long thing (the plank) sticks out slanted. */
+function InPack({ picture }: { picture: Picture }) {
+  if (picture.w > picture.h * 2.5) return <g transform={`rotate(-58) scale(${150 / picture.w})`}>{picture.draw()}</g>;
+  const s = Math.min(118 / picture.w, 104 / picture.h);
+  return <g transform={`translate(0 ${Math.min(24, picture.h * s * 0.25)}) scale(${s})`}>{picture.draw()}</g>;
 }
 
 /** A small key of the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
@@ -145,8 +167,15 @@ interface View {
   kid: KidState;
   /** The things in the bag, one per slot. */
   bag: (ItemId | null)[];
-  /** A thing flying on the screen, to or from the bag. */
-  flight: { item: ItemId; x: number; y: number; ms: number } | null;
+  /** The slot a thing is just dropping into, or rising out of, on the screen. */
+  entering: number | null;
+  leaving: number | null;
+  /** Bumped to bounce the backpack on the screen when a thing goes in or out. */
+  bagBump: number;
+  /** The thing the child carries in the world, between where it lies, the hands and the backpack. */
+  carry: ItemId | null;
+  /** The backpack on the child's back: its lid is open while a thing goes in or out; `bump` bounces it. */
+  pack: { open: boolean; bump: number };
   done: string[];
   here: string | null;
   nope: { id: string; n: number } | null;
@@ -169,7 +198,11 @@ const startView = (level: TrailLevel): View => ({
   picking: false,
   kid: { x: level.start, y: groundY(level.ground, level.start), walk: 0, pose: "stand", face: 1, hop: 0 },
   bag: [null, null, null],
-  flight: null,
+  entering: null,
+  leaving: null,
+  bagBump: 0,
+  carry: null,
+  pack: PACK_SHUT,
   done: [],
   here: null,
   nope: null,
@@ -239,6 +272,12 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const spinEl = useRef<SVGGElement>(null);
   const stringEl = useRef<SVGLineElement>(null);
   const goal = useRef<{ at: Point; hand: Point | null }>({ at: [0, 0], hand: null });
+  // The carried thing moves frame by frame too. It is drawn in front of the child, or behind it (and its
+  // backpack) while it sinks into the backpack or comes up out of it; `mover` stops an older move.
+  const carryFront = useRef<SVGGElement>(null);
+  const carryBack = useRef<SVGGElement>(null);
+  const carried = useRef<{ at: Point; s: number; behind: boolean }>({ at: [0, 0], s: 1, behind: false });
+  const mover = useRef(0);
 
   const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
     const patch = typeof change === "function" ? change(viewRef.current) : change;
@@ -307,7 +346,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     const frame = (now: number) => {
       if (g !== generation.current) return;
       const t = Math.min(1, (now - begin) / ms);
-      const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+      const e = ease(t);
       const side = Math.sin(t * Math.PI * 3) * sway * (1 - t);
       drawGoal([x0 + (to[0] - x0) * e, y0 + (to[1] - y0) * e + side], hand);
       if (t < 1) requestAnimationFrame(frame);
@@ -324,10 +363,6 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   /** The camera: the world moves so that the child stays at `KID_AT`. */
   const camOf = (k: KidState): Point => [k.x - KID_AT[0], k.y - KID_AT[1]];
-  const onScreen = ([x, y]: Point): Point => {
-    const [cx, cy] = camOf(viewRef.current.kid);
-    return [x - cx, y - cy];
-  };
 
   /** Walks the child along the ground to `x`; the world scrolls along. */
   const walkTo = async (x: number) => {
@@ -341,12 +376,84 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     kid({ walk: 0, pose: "stand", face: 1 });
   };
 
-  /** A thing flies on the screen from `from` to `to`. */
-  const fly = async (item: ItemId, from: Point, to: Point) => {
-    put({ flight: { item, x: from[0], y: from[1], ms: 0 } });
-    await wait(40);
-    put({ flight: { item, x: to[0], y: to[1], ms: FLY_MS } });
-    await wait(FLY_MS);
+  /** Draws the carried thing at `at`, `s` times its carrying size, in front of the child or `behind` it. */
+  const drawCarry = (at: Point, s: number, behind = carried.current.behind) => {
+    carried.current = { at, s, behind };
+    const [shown, hidden] = behind ? [carryBack.current, carryFront.current] : [carryFront.current, carryBack.current];
+    if (hidden) hidden.style.display = "none";
+    if (!shown) return;
+    shown.style.display = "";
+    shown.setAttribute("transform", `translate(${at[0]} ${at[1]}) scale(${s})`);
+  };
+
+  /** Moves the carried thing to `to` in `ms` along a bow `arc` points high, growing or shrinking to `s`. */
+  const moveCarry = (to: Point, ms: number, s = carried.current.s, arc = 0) => {
+    const {
+      at: [x0, y0],
+      s: s0,
+    } = carried.current;
+    const g = generation.current;
+    const move = ++mover.current;
+    const begin = performance.now();
+    const frame = (now: number) => {
+      if (g !== generation.current || move !== mover.current) return;
+      const t = Math.min(1, (now - begin) / ms);
+      const e = ease(t);
+      drawCarry([x0 + (to[0] - x0) * e, y0 + (to[1] - y0) * e - arc * 4 * t * (1 - t)], s0 + (s - s0) * e);
+      if (t < 1) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+    // Frames can lag behind the clock: the thing is where it should be when the next step starts.
+    return wait(ms).then(() => {
+      if (move === mover.current) drawCarry(to, s);
+    });
+  };
+
+  /** A point next to the child, from its feet: `HAND_UP`, `PACK_TOP` … */
+  const byKid = ([dx, dy]: Point): Point => {
+    const k = viewRef.current.kid;
+    return [k.x + dx * k.face, k.y + dy];
+  };
+
+  /** The child holds the thing in its hand up high, then throws it over its shoulder into the open backpack;
+   * the backpack bounces, and on the screen the thing drops into the big backpack at `slot`. */
+  const packAway = async (item: ItemId, slot: number) => {
+    kid({ pose: "lift" });
+    await moveCarry(byKid(HAND_UP), 320, 1);
+    await wait(420);
+    put((v) => ({ pack: { ...v.pack, open: true } }));
+    kid({ pose: "pack" });
+    await moveCarry(byKid(PACK_TOP), 440, 0.9, 60);
+    drawCarry(carried.current.at, carried.current.s, true);
+    await moveCarry(byKid(PACK_IN), 280, 0.6);
+    put((v) => ({
+      carry: null,
+      pack: { open: false, bump: v.pack.bump + 1 },
+      bag: v.bag.map((thing, i) => (i === slot ? item : thing)),
+      entering: slot,
+      bagBump: v.bagBump + 1,
+    }));
+    sound(playPop);
+    kid({ pose: "stand" });
+    await wait(500);
+    put({ entering: null });
+  };
+
+  /** The thing rises out of the big backpack on the screen, and the child reaches back into its backpack and
+   * holds the thing up high. */
+  const takeOut = async (item: ItemId, slot: number) => {
+    put((v) => ({ leaving: slot, bagBump: v.bagBump + 1 }));
+    sound(playPop);
+    await wait(320);
+    put((v) => ({ leaving: null, carry: item, bag: v.bag.map((thing, i) => (i === slot ? null : thing)), pack: { ...v.pack, open: true } }));
+    kid({ pose: "pack" });
+    drawCarry(byKid(PACK_IN), 0.6, true);
+    await moveCarry(byKid(PACK_TOP), 300, 0.9);
+    drawCarry(carried.current.at, carried.current.s, false);
+    put((v) => ({ pack: { ...v.pack, open: false } }));
+    kid({ pose: "lift" });
+    await moveCarry(byKid(HAND_UP), 380, 1, 50);
+    await wait(260);
   };
 
   const nextTap = () => new Promise<void>((resolve) => (tapper.current = resolve));
@@ -377,7 +484,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   /** What the first tap at `station` does: for stairs, walking there and up the first half of the steps. */
   const nextOf = (station: Station, on = ground.current): Next => {
-    if (station.kind === "pickup") return nextAt(station.x, "reach", station.item, on);
+    if (station.kind === "pickup") return nextAt(station.x, "take", station.item, on);
     if (station.kind === "moment") return nextAt(station.x, station.pose, "walk", on);
     if (station.kind === "obstacle") return nextAt(station.x, "stand", "walk", on);
     const half = station.steps.slice(0, Math.ceil(station.steps.length / 2));
@@ -404,16 +511,15 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     say(station.ask);
-    kid({ pose: "reach" });
+    // The child takes the thing, holds it up high and puts it into the backpack.
+    kid({ pose: "take" });
     sound(station.sound);
-    const slot = viewRef.current.bag.indexOf(null);
-    put((v) => ({ done: [...v.done, station.id] }));
-    await fly(station.item, onScreen(station.at), hud.current.slots[slot]);
-    put((v) => ({ flight: null, bag: v.bag.map((thing, i) => (i === slot ? station.item : thing)) }));
-    sound(playPop);
+    put((v) => ({ done: [...v.done, station.id], carry: station.item }));
+    drawCarry(station.at, natural(ITEMS[station.item]), false);
+    await moveCarry(byKid(HAND_OUT), 450, 1);
+    await packAway(station.item, viewRef.current.bag.indexOf(null));
     say(station.done);
-    kid({ pose: "stand" });
-    await wait(300);
+    await wait(200);
   };
 
   const nextChoice = () => new Promise<number>((resolve) => (chooser.current = resolve));
@@ -435,20 +541,23 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
       const slot = await nextChoice();
       stop();
       const item = viewRef.current.bag[slot]!;
-      put((v) => ({ choosing: false, hint: null, bag: v.bag.map((thing, i) => (i === slot ? null : thing)) }));
-      kid({ pose: "reach" });
-      await fly(item, hud.current.slots[slot], onScreen(station.at));
+      put({ choosing: false, hint: null });
+      // Out of the backpack, up high, and over to the obstacle.
+      await takeOut(item, slot);
+      kid({ pose: "take" });
+      await moveCarry(station.at, FLY_MS, natural(ITEMS[item]), 50);
       if (item === station.need) break;
-      // Not this one: something funny happens, the thing comes back and the right one glows.
+      // Not this one: something funny happens, the thing comes back into the backpack and the right one glows.
       put((v) => ({ nope: { id: station.id, n: (v.nope?.n ?? 0) + 1 } }));
       sound(station.nope);
       kid({ pose: "shake" });
       await wait(1000);
-      await fly(item, onScreen(station.at), hud.current.slots[slot]);
-      put((v) => ({ flight: null, nope: null, bag: v.bag.map((thing, i) => (i === slot ? item : thing)), hint: station.need, choosing: true }));
-      kid({ pose: "stand" });
+      kid({ pose: "take" });
+      await moveCarry(byKid(HAND_OUT), 500, 1, 50);
+      await packAway(item, slot);
+      put({ nope: null, hint: station.need, choosing: true });
     }
-    put((v) => ({ flight: null, done: [...v.done, station.id] }));
+    put((v) => ({ carry: null, done: [...v.done, station.id] }));
     cue(station.sounds);
     say(station.done);
     await wait(500);
@@ -618,7 +727,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     e.stopPropagation();
     if (tapper.current) return tap();
     const k = viewRef.current.kid;
-    if (k.walk) return;
+    // Not while walking, nor while the child carries a thing: the thing would stay behind in the air.
+    if (k.walk || viewRef.current.carry) return;
     kid({ hop: k.hop + 1 });
     sound(playGiggle);
   };
@@ -656,12 +766,14 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     };
   });
 
-  const { kid: k, flight } = view;
+  const { kid: k } = view;
+  const carry = view.carry && <Fitted picture={ITEMS[view.carry]} width={CARRY} />;
   const next = view.action?.next;
   /** Where the next tap may take the child: one way, or both at a fork. */
   const shown = next ? [next] : (view.fork?.ways ?? []);
   const forks = level.stations.filter((s): s is Fork => s.kind === "fork");
-  const { bagBox, bag, slots, action, actionBox } = hud.current;
+  const { bagBox, slots, action, actionBox } = hud.current;
+  const [bx, , bw] = bagBox;
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
   const { Scenery, Front, Backdrop } = level;
@@ -705,7 +817,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               ))}
               <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} onPointerDown={pressWay(w)}>
                 <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
-                  <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} />
+                  <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} backpack={PACK_SHUT} />
                 </g>
               </g>
             </g>
@@ -740,11 +852,17 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               );
             }),
           )}
+          <g ref={carryBack} className="tl-carry">
+            {carry}
+          </g>
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
-              <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} />
+              <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} backpack={view.pack} />
             </g>
             {view.bubble && <ThoughtBubble picture={GOALS[level.goal]} height={KID_H} nudge={view.bubble.nudge} />}
+          </g>
+          <g ref={carryFront} className="tl-carry">
+            {carry}
           </g>
         </g>
 
@@ -762,48 +880,96 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             <path d="M-24 -5 V5 H24 V-5" fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
           </KeyCap>
         )}
-        {/* The bag in its frame with its three slots, always at the bottom left */}
+        {/* The child's backpack again, big and open in its frame at the bottom left: the things in it stand side by side */}
         <g className={`tl-bag${view.choosing ? " open" : ""}`}>
-          <rect x={bagBox[0] + 8} y={bagBox[1] + 8} width={bagBox[2]} height={bagBox[3]} rx="36" className="tl-bag-shadow" />
-          <rect x={bagBox[0]} y={bagBox[1]} width={bagBox[2]} height={bagBox[3]} rx="36" className="tl-bag-box" strokeWidth="6" />
-          <g transform={`translate(${bag[0]} ${bag[1]}) scale(1.15)`}>
-            <path d="M-56 -40 Q-60 40 0 44 Q60 40 56 -40 Q30 -56 0 -56 Q-30 -56 -56 -40 Z" fill="#c08552" stroke={INK} strokeWidth="5" />
-            <path d="M-50 -42 Q0 -20 50 -42" stroke={INK} strokeWidth="5" fill="none" />
-            <path d="M-20 -54 Q0 -84 20 -54" stroke="#8d5a3b" strokeWidth="8" fill="none" />
-          </g>
-          {slots.map(([x, y], i) => {
-            const item = view.bag[i];
-            return (
-              <g
-                key={`${i}-${view.shake}`}
-                className={`tl-slot${item ? " full" : ""}${item && item === view.hint ? " hint" : ""}`}
-                style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${i * 80}ms` }}
-                onPointerDown={pressSlot(i)}
-                role="button"
-                aria-label={item ?? "leer"}
-              >
-                <circle cx={x} cy={y} r={SLOT_R} className="tl-slot-face" stroke={INK} strokeWidth="6" />
-                {!touchOnly && (
-                  <KeyCap x={x} y={KEY_Y} w={40} on={view.choosing && !!item} down={held === `${i + 1}`}>
+          <rect x={bx + 8} y={bagBox[1] + 8} width={bw} height={bagBox[3]} rx="36" className="tl-bag-shadow" />
+          <rect x={bx} y={bagBox[1]} width={bw} height={bagBox[3]} rx="36" className="tl-bag-box" strokeWidth="6" />
+          <g key={view.bagBump} className={view.bagBump ? "tl-bag-bump" : undefined} style={{ transformOrigin: `${bx + bw / 2}px 888px` }}>
+            {/* The lid folded back, the straps at the sides and the inside, all behind the things */}
+            <path
+              d={`M${bx + 62} 784 Q${bx + 58} 734 ${bx + 116} 730 H${bx + bw - 116} Q${bx + bw - 58} 734 ${bx + bw - 62} 784 Z`}
+              fill={PACK.lining}
+              stroke={INK}
+              strokeWidth="6"
+              strokeLinejoin="round"
+            />
+            <path d={`M${bx + 96} 744 H${bx + bw - 96}`} stroke={PACK.dark} strokeWidth="4" strokeDasharray="10 8" opacity="0.6" />
+            <path
+              d={`M${bx + 40} 822 Q${bx + 12} 830 ${bx + 16} 856 Q${bx + 20} 880 ${bx + 40} 876 M${bx + bw - 40} 822 Q${bx + bw - 12} 830 ${bx + bw - 16} 856 Q${bx + bw - 20} 880 ${bx + bw - 40} 876`}
+              stroke={PACK.dark}
+              strokeWidth="14"
+              strokeLinecap="round"
+              fill="none"
+            />
+            <path
+              d={`M${bx + 42} ${RIM + 4} Q${bx + 42} 778 ${bx + 76} 776 H${bx + bw - 76} Q${bx + bw - 42} 778 ${bx + bw - 42} ${RIM + 4} Z`}
+              fill={PACK.inside}
+              stroke={INK}
+              strokeWidth="6"
+              strokeLinejoin="round"
+            />
+            {slots.map(([x, y], i) => {
+              const item = view.bag[i];
+              if (!item) return null;
+              const moving = view.entering === i ? " in" : view.leaving === i ? " out" : "";
+              return (
+                <g
+                  key={`${i}-${view.shake}`}
+                  className={`tl-slot${item === view.hint ? " hint" : ""}`}
+                  style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${i * 80}ms` }}
+                >
+                  <g transform={`translate(${x} ${y})`}>
+                    <g key={item} className={`tl-thing${moving}`}>
+                      <ellipse className="tl-glow" cx="0" cy="-48" rx="70" ry="64" />
+                      <InPack picture={ITEMS[item]} />
+                    </g>
+                  </g>
+                </g>
+              );
+            })}
+            {/* The front with a pocket under each thing: its number key on a computer, a buckle on a tablet */}
+            <path
+              d={`M${bx + 34} ${RIM} H${bx + bw - 34} Q${bx + bw - 24} ${RIM} ${bx + bw - 26} ${RIM + 18} L${bx + bw - 32} 872 Q${bx + bw - 36} 888 ${bx + bw - 60} 888 H${bx + 60} Q${bx + 36} 888 ${bx + 32} 872 L${bx + 26} ${RIM + 18} Q${bx + 24} ${RIM} ${bx + 34} ${RIM} Z`}
+              fill={PACK.body}
+              stroke={INK}
+              strokeWidth="6"
+              strokeLinejoin="round"
+            />
+            <path d={`M${bx + 40} ${RIM + 12} H${bx + bw - 40}`} stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.35" />
+            {slots.map(([x], i) => (
+              <g key={x}>
+                <rect x={x - 44} y="828" width="88" height="54" rx="14" fill={PACK.pocket} stroke={INK} strokeWidth="4" />
+                {touchOnly ? (
+                  <>
+                    <path d={`M${x - 44} 846 Q${x} 856 ${x + 44} 846`} stroke={INK} strokeWidth="3" fill="none" opacity="0.5" />
+                    <rect x={x - 11} y="842" width="22" height="18" rx="4" fill={PACK.buckle} stroke={INK} strokeWidth="3" />
+                  </>
+                ) : (
+                  <KeyCap x={x} y={KEY_Y} w={40} on={view.choosing && !!view.bag[i]} down={held === `${i + 1}`}>
                     <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
                       {i + 1}
                     </text>
                   </KeyCap>
                 )}
-                {item && (
-                  <g transform={`translate(${x} ${y})`}>
-                    <Fitted picture={ITEMS[item]} width={88} />
-                  </g>
-                )}
               </g>
-            );
-          })}
-        </g>
-        {flight && (
-          <g className="tl-flight" style={{ transform: `translate(${flight.x}px, ${flight.y}px)`, transitionDuration: `${flight.ms}ms` }}>
-            <Fitted picture={ITEMS[flight.item]} width={110} />
+            ))}
           </g>
-        )}
+          {/* What a tap hits: a thing with its pocket below it */}
+          {slots.map(([x], i) => (
+            <rect
+              key={x}
+              x={x - SLOT_STEP / 2}
+              y={bagBox[1] - 60}
+              width={SLOT_STEP}
+              height={bagBox[3] + 60}
+              fill="transparent"
+              onPointerDown={pressSlot(i)}
+              role="button"
+              aria-label={view.bag[i] ?? "leer"}
+              className="tl-slot-tap"
+            />
+          ))}
+        </g>
         {view.party && (
           <g transform={`scale(${VIEW_W / 1400} 1)`}>
             <Confetti />

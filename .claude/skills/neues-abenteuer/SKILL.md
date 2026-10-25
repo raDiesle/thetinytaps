@@ -67,8 +67,9 @@ obstacle, which keeps it until it is solved.
 Stations (`types.ts`), each with a unique `id`, the child's stop `x` on the ground, and
 two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
 
-- **`pickup`** – a thing lying on the way: `item` (an `ItemId`), `at` (where it lies, it
-  flies from there into the bag), `sound`. Drachen: ball in the grass, carrot from the
+- **`pickup`** – a thing lying on the way: `item` (an `ItemId`), `at` (the middle of the
+  thing where it lies: the child takes it from there, holds it up and puts it into its
+  backpack), `sound`. Drachen: ball in the grass, carrot from the
   vegetable patch, plank at the shed, lantern at the hut, apple from the tree.
 - **`obstacle`** – something in the way: `need` (the thing that helps), `at` (where the
   thing flies to), `meet` (sounds on arrival), `sounds` + `ms` (while it is solved),
@@ -104,7 +105,7 @@ them:
 
 Things live in `items.tsx`: a component drawn standing on (0, 0), centred, in `ITEMS`
 with its size (`{ w, h, draw }`), and its id in `ItemId`. The same drawing is used in
-the world, the bag slot and the flight. Goals are in `GOALS` the same way, plus how
+the world, in the child's hands and in the backpack on the screen. Goals are in `GOALS` the same way, plus how
 the child carries them (`carry: "string"` for the kite above, `"hands"` for the ball)
 and `roll` for a ball that turns as it moves. `away` and `finale` are flights: `via`
 points with their times, then `to`; `sway` swings them (120 for the kite, 0 for a ball).
