@@ -75,27 +75,18 @@ const loadSong = ({ file }: Song) => {
   return loading.get(file) as Promise<AudioBuffer | null>;
 };
 
-/**
- * Where in `song` the brushing is after `ms`, going round the repeating parts. Before
- * the brushing (`ms` < 0) it counts back from the end of the repeating parts, so the
- * song runs on into its first part just as the brushing begins.
- */
-const songAt = (song: Song, ms: number) => {
-  const length = song.loopEnd - song.start;
-  return song.start + ((((ms / 1000) % length) + length) % length);
-};
+/** Where in `song` the brushing is after `ms`, going round the repeating parts. */
+const songAt = (song: Song, ms: number) => song.start + ((Math.max(0, ms) / 1000) % (song.loopEnd - song.start));
 
 const speaking = () => typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking;
 
 /**
  * Background music while brushing. The song runs at the brushing time `at` (ms),
  * so after a pause or a jump it goes on where the brushing is; `sync` is any value
- * that changes exactly then (the timer's clock). Before the brushing (`at` < 0,
- * fetching the brush) the instrumental song plays already, without words. When
- * `finished`, the finale plays once to the final chord. While the voice speaks, the
- * song gets quiet. With `sung`, the song in that language takes over from the first
- * step if there is one. Returns whether the sung song is playing, so the voice can
- * leave the singing to it.
+ * that changes exactly then (the timer's clock). When `finished`, the finale plays
+ * once to the final chord. While the voice speaks, the song gets quiet.
+ * With `sung`, the song in that language plays if there is one. Returns whether
+ * the sung song is playing, so the voice can leave the singing to it.
  */
 export function useBrushingMusic({
   enabled,
@@ -112,26 +103,22 @@ export function useBrushingMusic({
   sync: unknown;
   at: number;
 }) {
-  const brushingSong = (sung && SUNG[sung]) || PLAIN;
-  // The sung song has words from its first beat, so before the brushing the instrumental one plays.
-  const song = at < 0 ? PLAIN : brushingSong;
-  const [loaded, setLoaded] = useState<ReadonlyMap<Song, AudioBuffer | null>>(new Map());
-  const buffer = loaded.get(song) ?? null;
+  const song = (sung && SUNG[sung]) || PLAIN;
+  const [loaded, setLoaded] = useState<{ song: Song; buffer: AudioBuffer | null } | null>(null);
+  const buffer = loaded?.song === song ? loaded.buffer : null;
   const atRef = useRef(at);
   atRef.current = at;
 
   useEffect(() => {
     if (!enabled) return;
     let alive = true;
-    for (const s of new Set([PLAIN, brushingSong])) {
-      void loadSong(s).then((buffer) => {
-        if (alive) setLoaded((m) => new Map(m).set(s, buffer));
-      });
-    }
+    void loadSong(song).then((buffer) => {
+      if (alive) setLoaded({ song, buffer });
+    });
     return () => {
       alive = false;
     };
-  }, [enabled, brushingSong]);
+  }, [enabled, song]);
 
   useEffect(() => {
     if (!enabled || !(playing || finished)) return;
@@ -163,5 +150,5 @@ export function useBrushingMusic({
     };
   }, [enabled, playing, finished, sync, song, buffer]);
 
-  return enabled && (loaded.get(brushingSong) ?? null) !== null && brushingSong !== PLAIN;
+  return enabled && buffer !== null && song !== PLAIN;
 }

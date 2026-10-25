@@ -96,6 +96,23 @@ export function playDrum() {
   hiss({ from: 900, to: 200, duration: 0.25, volume: 0.18, q: 0.6 });
 }
 
+/** One second of a snare drum roll, louder with each `i` (0, 1, 2 …): "trrrrr" building up to something. */
+export function playDrumRoll(i: number) {
+  const hits = 18;
+  for (let k = 0; k < hits; k++) {
+    const volume = (0.06 + 0.05 * i + (0.04 * k) / hits) * (0.85 + 0.3 * Math.random());
+    hiss({ from: 2600, to: 1700, duration: 0.07, volume, delay: k / hits, q: 0.8 });
+    note({ from: 210, to: 170, duration: 0.05, type: "triangle", volume: volume * 0.6, delay: k / hits });
+  }
+}
+
+/** "Tusch!" – the end of a drum roll: a big drum, a cymbal and a bright chord. */
+export function playTusch() {
+  note({ from: 140, to: 45, duration: 0.7, type: "sine", volume: 0.55 });
+  hiss({ from: 7000, to: 3500, duration: 1.4, volume: 0.22, q: 0.4 });
+  [0, 2, 3, 5].forEach((step) => note({ from: PENTATONIC[step], duration: 1.1, type: "triangle", volume: 0.1 }));
+}
+
 /** "Bumm, bamm, bimm" – toy drums from big and low (0) to small and high. */
 export function playDrumNote(i: number) {
   const pitch = 130 * 1.4 ** i;

@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { useBackgroundMusicNow, useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
-import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
+import { playChime, playCountNote, playDrumRoll, playPoof, playSqueak, playTusch } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } from "./daytime";
@@ -28,6 +28,10 @@ const ACTION_MS = 3500;
 const BRUSH_MS = 120_000;
 /** Dragging on the progress bar stops this far before the end. */
 const SEEK_END_MS = 1000;
+/** The last seconds before the brushing are counted down big, with a drum roll. */
+const COUNTDOWN = 3;
+/** How long „Los!“ shows when the brushing begins. */
+const GO_MS = 1300;
 
 /** Before the clock starts: get the brush, toothpaste on, and meet the monsters. */
 type Prelude = "brush" | "paste" | "monsters";
@@ -167,6 +171,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const goneCount = monsters.filter(isGone).length;
   const step = phase >= 0 && !done ? STEPS[phase] : null;
   const cue = before ? preludeCue(before) : step?.cue;
+  /** In the last seconds before the brushing: 3, 2, 1. */
+  const count = brushed < 0 && -brushed <= COUNTDOWN * 1000 ? Math.ceil(-brushed / 1000) : null;
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -183,13 +189,15 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
-  // The brushing has its own song (or none, when it is switched off).
-  useNoBackgroundMusic();
-  // Music from the start, while fetching the brush too; the sung song sings the steps, so the voice leaves them to it.
+  // On the way to the sink the shared background song plays at once; the brushing has its own song (or none, when it is switched off).
+  const preludeSong = settings.music && before !== null && !paused;
+  useBackgroundMusicNow(preludeSong);
+  useNoBackgroundMusic(!preludeSong);
+  // The sung song sings the steps, so the voice leaves them to it.
   const sung = useBrushingMusic({
     enabled: settings.music,
     sung: sungIn,
-    playing: !done && !paused,
+    playing: step !== null && !paused,
     finished: done,
     sync: clock,
     at: brushed,
@@ -201,7 +209,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       if (settings.sounds && part > 0) playChime();
       say(part === 0 ? `${DAYTIME[daytime].hello} ${preludeCue(before)}` : preludeCue(before));
     } else if (phase < STEPS.length) {
-      if (settings.sounds) playChime();
+      // The drum roll before the brushing ends with a „Tusch“.
+      if (settings.sounds) (phase === 0 ? playTusch : playChime)();
       if (!sung) say(STEPS[phase].cue);
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
@@ -215,6 +224,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     }
     // Only when the part changes, not when a setting does.
   }, [part, round]);
+
+  // A drum roll under the countdown, louder each second.
+  useEffect(() => {
+    if (count !== null && !paused && settings.sounds) playDrumRoll(COUNTDOWN - count);
+    // Only when the number changes.
+  }, [count, round]);
 
   useEffect(() => {
     if (goneCount > lastGone.current && settings.sounds) playPoof();
@@ -335,8 +350,9 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       <span className="teeth-sky" aria-hidden>
         {daytime === "morning" ? "☀️" : "🌙"}
       </span>
-      <p className="teeth-clock" aria-label="Restzeit">
-        {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
+      {/* Before the brushing it counts down to its start, then the brushing time left. */}
+      <p className={`teeth-clock${before ? " before" : ""}`} aria-label={before ? "Zeit bis zum Start" : "Restzeit"}>
+        {before ? `🪥 ${formatTime(-brushed)}` : formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
       </p>
       <div className="teeth-heading" key={`${round}-${part}`}>
         <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : DAYTIME[daytime].doneTitle}</h2>
@@ -425,6 +441,18 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             </div>
           </div>
         </>
+      )}
+
+      {/* Under the pause screen. */}
+      {count !== null && (
+        <p className="teeth-count" key={count} aria-live="polite">
+          {count}
+        </p>
+      )}
+      {step && phase === 0 && brushed < GO_MS && (
+        <p className="teeth-count go" aria-live="polite">
+          Los!
+        </p>
       )}
 
       {paused && (
