@@ -3,9 +3,12 @@ import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
-import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes } from "./settings";
+import { SUNG_LANGUAGES } from "./music";
+import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY, type BrushMinutes, type SungLanguage } from "./settings";
 import { KAI } from "./steps";
 import { TeethPlay } from "./TeethPlay";
+
+const SUNG_LABELS: Record<SungLanguage, string> = { de: "🇩🇪 Lied auf Deutsch", en: "🇬🇧 Lied auf Englisch" };
 
 export function TeethGame() {
   const [shared, update, stored] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
@@ -46,6 +49,17 @@ export function TeethGame() {
           <Toggle label="Wochenbild am Ende: ein Stern für jedes Putzen morgens und abends" checked={settings.week} onChange={(week) => update({ week })} />
           <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
           {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
+          {settings.music && SUNG_LANGUAGES.length > 0 && (
+            <>
+              <Choice
+                label="Gesungen"
+                value={settings.singing}
+                options={[{ value: "off", label: "🎶 Nur Musik" }, ...SUNG_LANGUAGES.map((lang) => ({ value: lang, label: SUNG_LABELS[lang] }))]}
+                onChange={(singing) => update({ singing })}
+              />
+              <p className="setting-note">Bei 2 Minuten singt das Lied zu jedem Schritt, was gerade dran ist. Bei 1 und 3 Minuten spielt nur Musik.</p>
+            </>
+          )}
           <p className="setting-note">
             Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist
             oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht
