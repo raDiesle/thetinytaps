@@ -58,7 +58,8 @@ const pluginOffline: RsbuildPlugin = {
 
 export default defineConfig({
   plugins: [pluginReact(), pluginSpaFallback, pluginOffline],
-  source: { entry: { index: "./src/index.tsx" } },
+  // BUILD_TIME: the home page shows parents which version runs (src/lib/pwa.ts, buildDate).
+  source: { entry: { index: "./src/index.tsx" }, define: { BUILD_TIME: JSON.stringify(new Date().toISOString()) } },
   html: {
     template: "./index.html",
     // Prefixed with the base path, so they also work under /<repo-name>/.

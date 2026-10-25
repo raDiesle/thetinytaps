@@ -36,6 +36,15 @@ export function ShadowsGame() {
           ]}
         />
       }
+      info={
+        <>
+          <p>
+            Ein Bild sucht seinen Schatten unter zwei bis vier schwarzen. Das Kind tippt auf den passenden Schatten oder zieht das Bild darauf. Ein anderer
+            Schatten zeigt kurz seine Farben: „Das ist die Giraffe.“
+          </p>
+          {!device.touchOnly && <p>Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.</p>}
+        </>
+      }
       settings={
         <>
           <SettingsGroup title="Anzeige">
@@ -44,7 +53,6 @@ export function ShadowsGame() {
 
           <SettingsGroup title="Verhalten">
             <Toggle label="Schatten antippen reicht (sonst muss man das Bild ziehen)" checked={settings.tap} onChange={(tap) => update({ tap })} />
-            {!device.touchOnly && <p className="setting-note">Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.</p>}
           </SettingsGroup>
         </>
       }

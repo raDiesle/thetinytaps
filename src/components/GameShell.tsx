@@ -12,6 +12,7 @@ import { DEFAULT_PLAYTIME_SETTINGS, isPlaytimeOver, playedToday, PLAYTIME_SETTIN
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useStoredSettings } from "@/lib/storage";
+import { forwardNearTaps } from "@/lib/tapTargets";
 
 /** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
 const EXIT_DELAY_MS = 500;
@@ -47,6 +48,8 @@ interface GameShellProps {
   onMode?: (id: string) => void;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
+  /** What the game is, how it is played and what helps; behind its own button on the start screen, apart from the settings. */
+  info: ReactNode;
   /** Parent-facing options shown on the start screen. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
@@ -61,12 +64,14 @@ interface GameShellProps {
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({ title, emoji, modes, mode, onMode, level, settings, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({ title, emoji, modes, mode, onMode, level, info, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const category = categoryOf(location.pathname);
   const back = backHref ?? (category ? categoryHref(category) : "/");
   const backText = backLabel ?? category?.title ?? "Alle Spiele";
   const [playing, setPlaying] = useState(false);
+  // The panel opened below the two buttons, if any: folded away by default, so the start screen stays short.
+  const [panel, setPanel] = useState<"info" | "settings" | null>(null);
   const [playtimeSettings] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
   const playtime = usePlaytime(playing);
   // Bumped when the grown-up starts the play time afresh, to show it at once.
@@ -76,6 +81,9 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
   // The child's first tap or key in the game: the background song starts only then, not on "Los".
   const [acted, setActed] = useState(false);
   useBackgroundMusic({ enabled: playing && common.music && !playtime.over, started: acted });
+  // Taps a little next to something the child can tap still count for it (see tapTargets.ts).
+  const playArea = useRef<HTMLDivElement>(null);
+  useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
   const start = async () => {
     // These need the click as a user gesture, so run them before any await.
@@ -133,6 +141,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
     return (
       // Resuming audio on any tap helps after a reload, when no "Los" click unlocked it.
       <div
+        ref={playArea}
         className="play-area"
         onPointerDownCapture={(e) => {
           unlockAudio();
@@ -215,16 +224,26 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
           <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min.
         </p>
       )}
-      {settings && (
-        // Folded away by default, so the start screen stays short.
-        <details className="settings-panel">
-          <summary>
-            <span aria-hidden>⚙️</span> Einstellungen für dieses Spiel
-          </summary>
-          <section className="settings">{settings}</section>
-        </details>
-      )}
+      <div className="settings-panel">
+        <div className="panel-buttons">
+          <PanelButton open={panel === "info"} onClick={() => setPanel(panel === "info" ? null : "info")} emoji="ℹ️" label="Über das Spiel" />
+          {settings && (
+            <PanelButton open={panel === "settings"} onClick={() => setPanel(panel === "settings" ? null : "settings")} emoji="⚙️" label="Einstellungen" />
+          )}
+        </div>
+        {panel === "info" && <section className="settings game-info">{info}</section>}
+        {panel === "settings" && settings && <section className="settings">{settings}</section>}
+      </div>
     </main>
+  );
+}
+
+/** One of the buttons under the mode cards that opens its panel below them, or folds it away again. */
+function PanelButton({ open, onClick, emoji, label }: { open: boolean; onClick: () => void; emoji: string; label: string }) {
+  return (
+    <button type="button" className="panel-button" aria-expanded={open} onClick={onClick}>
+      <span aria-hidden>{emoji}</span> {label}
+    </button>
   );
 }
 
@@ -323,7 +342,7 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   const isPressKey = (key: string) => key === "Enter" || key === " ";
 
   return (
-    <div className={`exit-corner${hint || holding ? " hinted" : ""}`}>
+    <div className={`exit-corner${hint || holding ? " hinted" : ""}`} data-tap-keep>
       <span className="exit-hint" aria-hidden>
         {label} · halten
       </span>

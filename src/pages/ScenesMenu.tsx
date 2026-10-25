@@ -5,12 +5,14 @@ import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
 import { useFitGrid } from "@/lib/fitGrid";
+import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
 const CATEGORY = categoryOf("/bilder/");
 
 export function ScenesMenu() {
   useTitle("Lebendige Bilder");
+  useUpdateBetweenGames();
   const grid = useFitGrid(SCENES.length + UPCOMING_SCENES.length);
   return (
     <main className="home">

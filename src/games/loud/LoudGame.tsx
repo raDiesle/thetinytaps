@@ -37,22 +37,26 @@ export function LoudGame() {
           ]}
         />
       }
-      settings={
-        <SettingsGroup title="Mikrofon">
-          <p className="setting-note">
+      info={
+        <>
+          <p>
             Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Nacheinander geht es nach
             zehn Tönen weiter zum Pusten.
           </p>
-          <p className="setting-note">
+          <p>
             Pusten: Ins Mikrofon pusten bläst die Kerzen auf dem Geburtstagskuchen aus, lässt die Schirmchen der Pusteblume fliegen, dreht ein Windrad, bis der
             Regenbogen fertig ist, und treibt das Segelboot mit der Maus zum Löwen. Lautes Rufen pustet auch; so laut wie für den Löwen ist ganz fest gepustet.
           </p>
-          <p className="setting-note">
+          <p>
             Das Spiel misst nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch: Ein Tipp ist ein kurzer
             Puster, Finger draufhalten pustet weiter.
           </p>
+          <p>Mit „Vorlesen“ auf der Startseite sprechen die Tiere („Roaaar! Ich bin der Löwe!“) und laden zum Rufen und Pusten ein.</p>
+        </>
+      }
+      settings={
+        <SettingsGroup title="Mikrofon">
           <MicCheck sensitivity={settings.sensitivity} />
-          <p className="setting-note">Mit „Vorlesen“ auf der Startseite sprechen die Tiere („Roaaar! Ich bin der Löwe!“) und laden zum Rufen und Pusten ein.</p>
         </SettingsGroup>
       }
     >

@@ -150,14 +150,14 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
 
         <Meter threshold={threshold} />
 
-        <g className="ll-mouse" transform="translate(215 508) scale(1.5)" onPointerDown={() => react("mouse")}>
+        <g className="ll-mouse" transform="translate(215 508) scale(1.5)" data-tap onPointerDown={() => react("mouse")}>
           <ellipse cx="0" cy="2" rx="58" ry="9" fill="#00000018" />
           <g key={count.mouse} className="ll-mouse-jump">
             <Mouse />
           </g>
         </g>
 
-        <g className="ll-lion" ref={lionRef} transform="translate(720 512)" onPointerDown={() => react("lion")}>
+        <g className="ll-lion" ref={lionRef} transform="translate(720 512)" data-tap onPointerDown={() => react("lion")}>
           <ellipse cx="0" cy="4" rx="150" ry="16" fill="#00000018" />
           <g key={count.lion} className="ll-lion-jump">
             <Lion />

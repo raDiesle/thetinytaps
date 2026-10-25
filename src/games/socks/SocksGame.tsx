@@ -1,5 +1,5 @@
 import { GameShell } from "@/components/GameShell";
-import { Choice, SettingsGroup } from "@/components/SettingControls";
+import { Choice } from "@/components/SettingControls";
 import { de } from "@/content/de";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
@@ -33,14 +33,17 @@ export function SocksGame() {
           ]}
         />
       }
-      settings={
-        !device.touchOnly && (
-          <SettingsGroup title="Verhalten">
-            <p className="setting-note">
-              Mit der Tastatur: jede Taste startet die Waschmaschine. Dann wählen Pfeiltasten eine Socke, Leertaste oder Enter nimmt sie, 1–9 direkt.
-            </p>
-          </SettingsGroup>
-        )
+      info={
+        <>
+          <p>
+            Die Waschmaschine ist voll. Ein Tipp startet sie, dann purzeln die Socken auf den Boden. Eine Socke antippen hebt sie hoch und lässt ihren Ton
+            klingen; ihre Partnerin dazu, und beide hüpfen an die Wäscheleine. Eine andere Socke ist nie falsch: Die erste geht einfach zurück.
+          </p>
+          <p>„Farben“: jedes Paar hat seine Farbe. „Muster“: jedes Paar hat sein Muster in nur drei Farben. „Weiter“ bringt ein Paar mehr.</p>
+          {!device.touchOnly && (
+            <p>Mit der Tastatur: jede Taste startet die Waschmaschine. Dann wählen Pfeiltasten eine Socke, Leertaste oder Enter nimmt sie, 1–9 direkt.</p>
+          )}
+        </>
       }
     >
       <SocksPlay lang={de.speechLang} settings={settings} />

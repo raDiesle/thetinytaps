@@ -33,7 +33,7 @@ export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
   };
 
   return (
-    <div className="game-end" onPointerDown={(e) => e.stopPropagation()}>
+    <div className="game-end" data-tap-root onPointerDown={(e) => e.stopPropagation()}>
       {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
       <button type="button" className="game-end-button menu" onClick={leave}>
         <span className="game-end-emoji" aria-hidden>

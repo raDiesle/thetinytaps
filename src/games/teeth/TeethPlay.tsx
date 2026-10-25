@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { useLeaveGame } from "@/components/GameShell";
-import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { useBackgroundMusicNow, useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
-import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
+import { playChime, playCountNote, playDrumRoll, playPoof, playSqueak, playTusch } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } from "./daytime";
@@ -29,6 +29,10 @@ const ACTION_MS = 3500;
 const BRUSH_MS = 120_000;
 /** Dragging on the progress bar stops this far before the end. */
 const SEEK_END_MS = 1000;
+/** The last seconds before the brushing are counted down big, with a drum roll. */
+const COUNTDOWN = 3;
+/** How long „Los!“ shows when the brushing begins. */
+const GO_MS = 1300;
 
 /** Before the clock starts: get the brush, toothpaste on, and meet the monsters. */
 type Prelude = "brush" | "paste" | "monsters";
@@ -140,6 +144,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const { bursts, spawn } = useBursts();
   const tickleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastGone = useRef(0);
+  /** The free part of the screen between heading and controls; the picture fills the whole screen and fits what matters in here. */
+  const room = useRef<HTMLDivElement>(null);
 
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
@@ -167,6 +173,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const goneCount = monsters.filter(isGone).length;
   const step = phase >= 0 && !done ? STEPS[phase] : null;
   const cue = before ? preludeCue(before) : step?.cue;
+  /** In the last seconds before the brushing: 3, 2, 1. */
+  const count = brushed < 0 && -brushed <= COUNTDOWN * 1000 ? Math.ceil(-brushed / 1000) : null;
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -183,8 +191,10 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
-  // The brushing has its own song (or none, when it is switched off).
-  useNoBackgroundMusic();
+  // On the way to the sink the shared background song plays at once; the brushing has its own song (or none, when it is switched off).
+  const preludeSong = settings.music && before !== null && !paused;
+  useBackgroundMusicNow(preludeSong);
+  useNoBackgroundMusic(!preludeSong);
   // The sung song sings the steps, so the voice leaves them to it.
   const sung = useBrushingMusic({
     enabled: settings.music,
@@ -201,7 +211,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       if (settings.sounds && part > 0) playChime();
       say(part === 0 ? `${DAYTIME[daytime].hello} ${preludeCue(before)}` : preludeCue(before));
     } else if (phase < STEPS.length) {
-      if (settings.sounds) playChime();
+      // The drum roll before the brushing ends with a „Tusch“.
+      if (settings.sounds) (phase === 0 ? playTusch : playChime)();
       if (!sung) say(STEPS[phase].cue);
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
@@ -215,6 +226,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     }
     // Only when the part changes, not when a setting does.
   }, [part, round]);
+
+  // A drum roll under the countdown, louder each second.
+  useEffect(() => {
+    if (count !== null && !paused && settings.sounds) playDrumRoll(COUNTDOWN - count);
+    // Only when the number changes.
+  }, [count, round]);
 
   useEffect(() => {
     if (goneCount > lastGone.current && settings.sounds) playPoof();
@@ -335,8 +352,9 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       <span className="teeth-sky" aria-hidden>
         {daytime === "morning" ? "☀️" : "🌙"}
       </span>
-      <p className="teeth-clock" aria-label="Restzeit">
-        {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
+      {/* Before the brushing it counts down to its start, then the brushing time left. */}
+      <p className={`teeth-clock${before ? " before" : ""}`} aria-label={before ? "Zeit bis zum Start" : "Restzeit"}>
+        {before ? `🪥 ${formatTime(-brushed)}` : formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
       </p>
       <div className="teeth-heading" key={`${round}-${part}`}>
         <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : DAYTIME[daytime].doneTitle}</h2>
@@ -361,9 +379,11 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
         )}
       </div>
 
+      {/* Before the picture, so it is there when the picture measures it. */}
+      <div className="teeth-room" ref={room} />
       <div className="teeth-stage">
         {before === "brush" || before === "paste" ? (
-          <Prep key={round} part={before} daytime={daytime} />
+          <Prep key={round} part={before} daytime={daytime} free={room} />
         ) : (
           <Mouth
             key={round}
@@ -375,6 +395,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             daytime={daytime}
             action={action}
             paused={paused}
+            free={room}
             onTickle={tickle}
           />
         )}
@@ -394,8 +415,12 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
         </div>
       ) : (
         <>
-          {/* The week shows before brushing too, which star is to come; while brushing, the mouth gets its room. */}
-          {before && settings.week && <Week log={week} today={new Date()} now={daytime} />}
+          {/* The week shows before brushing too, which star is to come (not on a phone, where the sink needs the room); while brushing, the mouth gets its room. */}
+          {before && settings.week && (
+            <div className="teeth-week-before">
+              <Week log={week} today={new Date()} now={daytime} />
+            </div>
+          )}
           <div className="teeth-controls">
             <button type="button" className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>
               {paused ? "▶️" : "⏸️"}
@@ -423,6 +448,18 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
             </div>
           </div>
         </>
+      )}
+
+      {/* Under the pause screen. */}
+      {count !== null && (
+        <p className="teeth-count" key={count} aria-live="polite">
+          {count}
+        </p>
+      )}
+      {step && phase === 0 && brushed < GO_MS && (
+        <p className="teeth-count go" aria-live="polite">
+          Los!
+        </p>
       )}
 
       {paused && (

@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { GameEnd } from "@/components/GameEnd";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import type { CommonSettings } from "@/lib/common";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
-import type { AdventureSettings } from "./settings";
 import type { Cue, Story, StoryFrame } from "./stories/story";
 import { Music } from "./three/music";
 import { StoryPlayer } from "./three/player";
@@ -48,7 +48,7 @@ export function AdventurePlay({
 }: {
   story: Story;
   language: TargetLanguage;
-  settings: AdventureSettings;
+  settings: CommonSettings;
   /** The story „Weiter“ starts at the end. */
   next: { emoji: string; name: string; onNext: () => void };
 }) {
@@ -104,7 +104,7 @@ export function AdventurePlay({
         onPose(pose, frame, view) {
           const box = outlineRef.current;
           if (!box) return;
-          const shown = settingsRef.current.outline ? outlineShown(frame) : 0;
+          const shown = outlineShown(frame);
           box.style.opacity = String(shown);
           if (shown > 0) silhouette.update(pose, view);
         },
@@ -114,7 +114,6 @@ export function AdventurePlay({
       setFailed(true);
       return;
     }
-    player.highlight = settings.glow;
     if (settings.speech) loadVoice(story, language);
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
