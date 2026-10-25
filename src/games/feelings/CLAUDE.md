@@ -46,6 +46,13 @@ with a green tick or red cross, so children can choose without reading; „Nochm
 and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
 `story.ts`.
 
+While the child has to choose, `.story-play` has the class `choosing`: the cards
+are big and the picture above makes room (it takes what is left of the height);
+when the bear acts, the cards shrink back and the picture grows again (widths
+transition). In the kindergarten the two cards are bigger than the picture then –
+one above the other on upright phones, side by side next to the picture on phones
+lying on their side. At home the four cards stay in one row.
+
 Under every picture, big or card, a short caption says what it shows – for
 grown-ups, to tell the story and give feedback on the pictures; the child chooses
 by the picture. Every picture has one (`caption`, `endCaption`, `instead.caption`,
@@ -54,5 +61,7 @@ by the picture. Every picture has one (`caption`, `endCaption`, `instead.caption
 Bärs Pfote“ is wrong), no full stop.
 
 New or changed pictures: `/bild-erzeugen` (`yarn image`); file names and prompts
-are listed in `bilder/README.md`. `feelings.test.ts` fails when a story or the
+are listed in `bilder/README.md`. Grown-ups are only in a picture once a step fetched
+them; a second frame only moves a little and is drawn from the first (`--ref`),
+never as a grid pair – `yarn frames` lists pairs that jump. `feelings.test.ts` fails when a story or the
 bear asks for a picture that is not in `bilder/`.
