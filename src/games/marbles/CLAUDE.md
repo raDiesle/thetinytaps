@@ -1,6 +1,6 @@
 # Kettenreaktion
 
-Route `/kettenreaktion/`. The marble run that used to be a level here is the game „Kugelbahn“ now
+Route `/kettenreaktion/`. The marble run that used to be a level here is the game „Klingende Kugelbahn“ now
 (`src/games/marblerun/`, at `/kugelbahn/`, the old address of this game).
 
 Seven levels in turn (or one of them); after each one „Nochmal“ or „Weiter“ (any key goes on). Shared with the Kugelbahn: the
