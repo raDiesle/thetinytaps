@@ -861,7 +861,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
           </text>
         )}
       </svg>
-      {/* On a computer the space bar, wide at the bottom, rebuilds the run */}
+      {/* On a computer the space bar at the bottom rebuilds the run */}
       {rebuild && !touchOnly && !done.current && (
         <button
           type="button"
@@ -872,14 +872,12 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
             rebuildNext();
           }}
         >
-          <span className="run-space-top">
-            <span className="run-space-wrench" aria-hidden>
-              🔧
-            </span>
-            <svg className="run-space-bar" viewBox="-40 -14 80 28" aria-hidden>
-              <path d="M-34 -8 V8 H34 V-8" />
-            </svg>
+          <span className="run-space-wrench" aria-hidden>
+            🔧
           </span>
+          <svg className="run-space-bar" viewBox="-40 -14 80 28" aria-hidden>
+            <path d="M-34 -8 V8 H34 V-8" />
+          </svg>
         </button>
       )}
     </div>

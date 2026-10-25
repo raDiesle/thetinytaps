@@ -8,7 +8,7 @@ trampoline, bell, funnel by default), rides the seesaw, goes through the tunnel,
 hops over three drums, knocks five chimes and plays a whole scale on the second xylophone before it drops into the basket.
 A full basket raises the flag and ends the round („Nochmal“; any key starts again). A first marble takes about 21 s, the
 whole round about 35 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel); a setting turns this off.
-On a computer a wide space bar sits at the bottom in the middle (like in Ausmalen), and Space rebuilds the run to the next
+On a computer a yellow space-bar button sits at the bottom in the middle, and Space rebuilds the run to the next
 of all its builds, counting like a car's mileage: the first spot takes its next part, and each time it is back at the first
 part the next spot moves on too (`rebuildNext`).
 
