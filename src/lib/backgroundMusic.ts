@@ -46,6 +46,8 @@ const hidden = () => typeof document !== "undefined" && document.hidden;
 
 // How many mounted parts of the game want the song off (see useNoBackgroundMusic).
 let hushes = 0;
+// How many want it now, without waiting for the child's first tap (see useBackgroundMusicNow).
+let eager = 0;
 const listeners = new Set<() => void>();
 const notify = () => {
   for (const listener of listeners) listener();
@@ -73,12 +75,31 @@ export function useNoBackgroundMusic(when = true) {
 }
 
 /**
+ * Starts the background song while the calling component is mounted (and `when`
+ * holds), without waiting for the child's first tap: for a game that runs on its
+ * own from "Los", like the way to the sink before brushing teeth.
+ */
+export function useBackgroundMusicNow(when = true) {
+  useEffect(() => {
+    if (!when) return;
+    eager++;
+    notify();
+    return () => {
+      eager--;
+      notify();
+    };
+  }, [when]);
+}
+
+/**
  * The background song while a game is played (`enabled`), from the child's first
- * tap or key (`started`). It stops while the page is hidden or a game part wants
+ * tap or key (`started`, or earlier when the game asks, see useBackgroundMusicNow). It stops while the page is hidden or a game part wants
  * quiet, and gets quiet while the voice speaks.
  */
 export function useBackgroundMusic({ enabled, started }: { enabled: boolean; started: boolean }) {
   const hushed = useSyncExternalStore(subscribe, () => hushes > 0);
+  const now = useSyncExternalStore(subscribe, () => eager > 0);
+  const going = started || now;
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [visible, setVisible] = useState(() => !hidden());
   const on = enabled && !hushed;
@@ -101,7 +122,7 @@ export function useBackgroundMusic({ enabled, started }: { enabled: boolean; sta
   }, []);
 
   useEffect(() => {
-    if (!on || !started || !visible || !buffer) return;
+    if (!on || !going || !visible || !buffer) return;
     const from = stoppedAt;
     const startedAt = performance.now();
     const loop: Loop | null = playLoop(buffer, {
@@ -122,5 +143,5 @@ export function useBackgroundMusic({ enabled, started }: { enabled: boolean; sta
       loop?.stop();
       stoppedAt = songAt(from, (performance.now() - startedAt) / 1000);
     };
-  }, [on, started, visible, buffer]);
+  }, [on, going, visible, buffer]);
 }

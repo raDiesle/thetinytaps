@@ -21,6 +21,62 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Before the brushing the clock counts down to its start, big enough for a grown-up to see across the bathroom. */
+.teeth-clock.before {
+  padding: 0.1em 0.6em;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: clamp(1.2rem, 4.5vmin, 2rem);
+  font-weight: 700;
+}
+
+/* 3, 2, 1, Los! – big in the middle, over the picture. */
+.teeth-count {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  pointer-events: none;
+  color: #fff;
+  font-size: clamp(6rem, 40vmin, 18rem);
+  font-weight: 700;
+  -webkit-text-stroke: 0.05em var(--ink);
+  paint-order: stroke fill;
+  animation: teeth-count 1s ease-out forwards;
+}
+
+.teeth-count.go {
+  color: var(--sunshine);
+  font-size: clamp(4rem, 25vmin, 12rem);
+  animation-duration: 1.3s;
+}
+
+@keyframes teeth-count {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  35% {
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
 .teeth-heading {
   display: flex;
   flex-direction: column;
@@ -602,6 +658,7 @@
   }
 }
 
+.teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
 .teeth-play.paused .lip-arrow,
 .teeth-play.paused .teeth-mouth-icon {

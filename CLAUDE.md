@@ -128,5 +128,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    library, the Gefühle pictures, unique `@keyframes` names.
    When you add data with rules like these, add a check.
 2. Look at it in the browser preview: the change itself, the console, and the rules above.
+   Sound is muted there, so "I hear no music" can't be checked by ear: wrap
+   `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
+   (the length tells which song started, and when). Say that you checked it this way, not by ear.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
    (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`.
