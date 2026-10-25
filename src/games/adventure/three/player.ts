@@ -1,9 +1,10 @@
 import * as THREE from "three";
 import { movement } from "../library/movements";
-import type { Cue, Story, StoryFrame, StoryWorld } from "../stories/story";
+import { type Cue, DEFAULT_TURN, type Story, type StoryFrame, type StoryWorld } from "../stories/story";
 import { clipFocus, clipPose } from "./clips";
 import { Guide, lerpPose, restPose, type Pose } from "./guide";
 import { Stage } from "./stage";
+import { talking } from "../voice";
 
 // Plays a story: keeps the clock (pause, skip), works out which step and
 // phase it is, poses the guide (blending between clips), lets the world
@@ -201,7 +202,7 @@ export class StoryPlayer {
     const root = this.guide.root;
     const cam = this.stage.camera.position;
     this.events.onPose?.(pose, frame, Math.atan2(cam.x - root.position.x, cam.z - root.position.z) - root.rotation.y);
-    this.guide.setTalking(typeof speechSynthesis !== "undefined" && speechSynthesis.speaking);
+    this.guide.setTalking(talking());
     this.events.onFlash(result.flash);
     this.stage.focusShadow(this.world.focus);
     this.stage.render();
@@ -234,7 +235,7 @@ export class StoryPlayer {
     const travel = f.lead - f.demo;
     const instructionAt = travel > 0 ? travel : lines.situation ? 2.6 : 0.05;
     if (at(instructionAt)) this.events.onLine(lines.instruction, "instruction", f.step);
-    if (f.demo > 0 && at(f.lead)) this.events.onLine(lines.turn ?? "Jetzt du!", "turn", f.step);
+    if (f.demo > 0 && at(f.lead)) this.events.onLine(lines.turn ?? DEFAULT_TURN, "turn", f.step);
     if (lines.again && at(f.lead + f.actLength * 0.55)) this.events.onLine(lines.again, "again", f.step);
     for (const line of lines.more ?? []) if (at(f.lead + line.at)) this.events.onLine(line.text, "again", f.step);
     if (at(f.lead + f.actLength + 0.1)) this.events.onLine(lines.praise, "praise", f.step);

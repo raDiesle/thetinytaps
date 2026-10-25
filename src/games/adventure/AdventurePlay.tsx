@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
-import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
 import type { AdventureSettings } from "./settings";
@@ -9,6 +8,7 @@ import type { Cue, Story, StoryFrame } from "./stories/story";
 import { Music } from "./three/music";
 import { StoryPlayer } from "./three/player";
 import { Silhouette } from "./three/silhouette";
+import { hush, loadVoice, say } from "./voice";
 import "./adventure.css";
 
 const CUES: Record<Cue, () => void> = {
@@ -68,7 +68,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
         onLine(text, kind, at) {
           if (!settingsRef.current.speech) return;
           // A new step starts fresh; within a step, lines wait for each other.
-          speak(text, speechLang, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
+          say(text, speechLang, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
         },
         onPointing: setPointing,
         onStep(at) {
@@ -102,6 +102,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       return;
     }
     player.highlight = settings.glow;
+    if (settings.speech) loadVoice(story, speechLang);
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
     if (!import.meta.env.PROD) Object.assign(window, { __adventure: player });
@@ -114,7 +115,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
     return () => {
       observer.disconnect();
       music.stop();
-      stopSpeaking();
+      hush();
       player.dispose();
       silhouette.svg.remove();
       playerRef.current = null;
@@ -129,7 +130,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
     player.paused = !player.paused;
     setPaused(player.paused);
     if (player.paused) {
-      stopSpeaking();
+      hush();
       musicRef.current?.stop();
     } else if (settingsRef.current.music) {
       musicRef.current?.start();
@@ -140,7 +141,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
   const jump = (to: (player: StoryPlayer) => void) => {
     const player = playerRef.current;
     if (!player) return;
-    stopSpeaking();
+    hush();
     to(player);
   };
 

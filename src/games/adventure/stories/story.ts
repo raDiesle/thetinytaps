@@ -14,7 +14,7 @@ export interface StepLines {
   situation?: string;
   /** When the guide starts to show the movement. */
   instruction: string;
-  /** When the child joins in, after the guide showed it once. */
+  /** When the child joins in, after the guide showed it once; DEFAULT_TURN if left out. */
   turn?: string;
   /** Halfway through, to keep going; left out where `more` says it all. */
   again?: string;
@@ -91,3 +91,6 @@ export interface Story {
 
 /** True if `at` was passed between the last frame and this one. */
 export const crossed = (f: StoryFrame, at: number) => f.prevLocal < at && f.local >= at;
+
+/** What the guide says when the child joins in, where a step has no `turn` of its own. */
+export const DEFAULT_TURN = "Jetzt du!";
