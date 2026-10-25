@@ -21,10 +21,168 @@
   font-size: 1.2rem;
 }
 
-.ideas-picks {
+.ideas-panel summary {
+  cursor: pointer;
+}
+
+.ideas-panel summary h2 {
+  display: inline;
+}
+
+details.ideas-panel[open] summary {
+  margin-bottom: 8px;
+}
+
+.ideas-hint {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+/* Recommendation and "next" lists: number, effort, text, buttons in one line. */
+.ideas-picks,
+.ideas-next-list {
+  display: grid;
+  gap: 6px;
   margin: 0;
-  padding-left: 1.4em;
-  line-height: 1.7;
+  padding: 0;
+  list-style: none;
+}
+
+.ideas-picks li,
+.ideas-next-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+
+.ideas-picks li > span:not(.effort, .idea-marks),
+.ideas-next-list li > span:not(.effort) {
+  flex: 1;
+}
+
+.ideas-next {
+  box-shadow: inset 0 0 0 3px #ffd23f;
+}
+
+.ideas-next-area {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.ideas-unmark {
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+.ideas-next-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+.ideas-next-foot span {
+  flex: 1;
+}
+
+.ideas-next-foot code {
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #f3f0ff;
+}
+
+.ideas-copy,
+.ideas-reset {
+  padding: 4px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Overview: areas × effort, the numbers are filter buttons. */
+.ideas-overview-scroll {
+  overflow-x: auto;
+}
+
+.ideas-overview {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.ideas-overview th,
+.ideas-overview td {
+  padding: 3px 6px;
+  text-align: center;
+}
+
+.ideas-overview thead th {
+  border-bottom: 2px solid var(--ink);
+  white-space: nowrap;
+}
+
+.ideas-overview small {
+  font-weight: 400;
+  opacity: 0.6;
+}
+
+.ideas-overview th:first-child {
+  text-align: left;
+  font-weight: 400;
+}
+
+.ideas-overview-group th:first-child {
+  padding-top: 14px;
+  font-weight: 700;
+}
+
+.ideas-overview tbody tr:not(.ideas-overview-group):hover {
+  background: #f6f4ff;
+}
+
+/* :where keeps the effort colours of the S/M/L cells. */
+.ideas-overview :where(button) {
+  min-width: 40px;
+  padding: 2px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: #f0eef8;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ideas-overview th button {
+  min-width: 0;
+  background: none;
+  font-weight: 400;
+  text-align: left;
+}
+
+.ideas-overview-finished {
+  opacity: 0.45;
+}
+
+.ideas-zero {
+  opacity: 0.3;
+}
+
+.ideas-overview-done {
+  font-size: 0.85rem;
+  opacity: 0.7;
 }
 
 .ideas-rules {
@@ -46,70 +204,138 @@
   font-size: 0.95rem;
 }
 
-.ideas-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
+/* Filters stay at the top while scrolling through the list (not on small screens, where they would fill it). */
+.ideas-toolbar {
+  display: grid;
+  gap: 6px;
+  margin: 0 -12px 8px;
+  padding: 10px 12px;
+  border-radius: 0 0 20px 20px;
+  background: #fffdf5f2;
+  box-shadow: 0 4px 12px #00000014;
 }
 
-.ideas-nav button {
-  padding: 6px 14px;
+@media (min-width: 700px) and (min-height: 700px) {
+  .ideas-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+}
+
+.ideas-search {
+  width: 100%;
+  padding: 6px 12px;
   border: 2px solid var(--ink);
   border-radius: 12px;
-  background: #fff;
-  color: inherit;
   font: inherit;
-  font-weight: 700;
-  cursor: pointer;
 }
 
-.ideas-filter {
+.ideas-chips {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 0.85rem;
+}
+
+.ideas-chips legend {
+  float: left;
+  width: 90px;
+  font-weight: 700;
+}
+
+.ideas-chips button {
+  padding: 2px 10px;
+  border: 2px solid #2a1e5c33;
+  border-radius: 99px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ideas-chips button.selected {
+  border-color: var(--ink);
+  font-weight: 700;
+}
+
+.ideas-chips button.selected:not([class*="effort-"]) {
+  background: var(--sunshine);
+}
+
+.ideas-chips button[class*="effort-"]:not(.selected) {
+  background: #fff;
+}
+
+.ideas-count {
+  display: flex;
+  align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
-}
-
-.ideas-legend {
   font-size: 0.9rem;
+  font-weight: 700;
 }
 
-.ideas-area {
-  scroll-margin-top: 16px;
+.ideas-reset {
+  padding: 0 10px;
+  font-size: 0.85rem;
+}
+
+.ideas-empty {
+  margin: 40px 0;
+  text-align: center;
 }
 
 .ideas-area h2 {
-  margin: 32px 0 12px;
-  font-size: 1.5rem;
+  margin: 28px 0 10px;
+  font-size: 1.3rem;
 }
 
+.ideas-area-count {
+  padding: 0 8px;
+  border-radius: 99px;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+/* One idea per row, so titles and efforts can be compared top to bottom. */
 .ideas-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  gap: 8px;
 }
 
 .idea-card {
-  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 16px 18px;
-  border-radius: 20px;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: 16px;
   background: #fff;
-  box-shadow: 0 4px 0 #00000014;
-  scroll-margin-top: 16px;
+  box-shadow: 0 3px 0 #00000014;
+  scroll-margin-top: 260px;
 }
 
-.idea-card:target,
+.idea-card p {
+  font-size: 0.95rem;
+}
+
+.idea-card:focus,
 .idea-card:focus-within {
   outline: 3px solid var(--accent);
+}
+
+.idea-card.mark-next {
+  box-shadow: inset 0 0 0 3px #ffd23f;
+}
+
+.idea-card.mark-no {
+  opacity: 0.5;
 }
 
 .idea-card p {
@@ -118,14 +344,52 @@
 
 .idea-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 6px 8px;
 }
 
 .idea-head h3 {
   flex: 1;
+  min-width: 160px;
   margin: 0;
+  font-size: 1.05rem;
+}
+
+.idea-area-tag {
+  padding: 2px 10px;
+  border-radius: 99px;
+  background: #f0eef8;
+  font-size: 0.8rem;
+}
+
+.idea-marks {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.idea-marks button {
+  padding: 2px 4px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: none;
+  font-family: var(--font-emoji);
   font-size: 1.1rem;
+  line-height: 1;
+  filter: grayscale(1);
+  opacity: 0.4;
+  cursor: pointer;
+}
+
+.idea-marks button:hover {
+  opacity: 0.8;
+}
+
+.idea-marks button.selected {
+  border-color: var(--ink);
+  background: #fff8e0;
+  filter: none;
+  opacity: 1;
 }
 
 .idea-id {
@@ -149,30 +413,15 @@ button.idea-id {
   font-size: 1.5rem;
 }
 
-.idea-star {
-  border: 0;
-  background: none;
-  color: #c9a227;
-  font-size: 1.6rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
 .idea-why {
   font-size: 0.95rem;
   opacity: 0.8;
 }
 
-.idea-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: auto;
-}
-
 .effort,
 .idea-planned,
 .idea-done {
+  white-space: nowrap;
   padding: 2px 10px;
   border-radius: 99px;
   font-size: 0.8rem;
@@ -215,13 +464,14 @@ button.idea-id {
   font-size: 0.9rem;
 }
 
-/* Done ideas step back: green edge, faded, a check in the corner. */
+/* Done ideas step back: green edge, faded. */
 .idea-card.done {
   background: #f1fbec;
   box-shadow: inset 0 0 0 3px #3ec30066;
 }
 
-.idea-card.done > :not(.idea-tags, .idea-done-stamp) {
+.idea-card.done > p,
+.idea-card.done .idea-head > :not(.idea-done) {
   opacity: 0.55;
 }
 
@@ -235,15 +485,6 @@ button.idea-id {
   box-shadow: inset 0 0 0 3px #ffb70366;
 }
 
-.idea-done-stamp {
-  position: absolute;
-  top: -10px;
-  right: -8px;
-  font-family: var(--font-emoji);
-  font-size: 1.6rem;
-  rotate: 12deg;
-}
-
 .ideas-progress {
   display: flex;
   align-items: center;
@@ -252,11 +493,6 @@ button.idea-id {
   margin: 0 0 16px;
   font-size: 0.9rem;
   font-weight: 700;
-}
-
-.ideas-area .ideas-progress {
-  justify-content: flex-start;
-  margin-top: -6px;
 }
 
 .ideas-progress-bar {
@@ -271,11 +507,4 @@ button.idea-id {
   display: block;
   height: 100%;
   background: #3ec300;
-}
-
-.ideas-nav-count {
-  padding: 0 6px;
-  border-radius: 99px;
-  background: #d8f5d0;
-  font-size: 0.8rem;
 }

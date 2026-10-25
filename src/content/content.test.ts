@@ -30,6 +30,11 @@ describe("ideas", () => {
     for (const { area, idea } of ideas) expect(idea.id).toMatch(new RegExp(`^${area.prefix}-\\d{2,}$`));
   });
 
+  test("each area has its own prefix and sits in one group", () => {
+    const prefixes = IDEA_AREAS.map((area) => area.prefix);
+    expect(prefixes.filter((p, i) => prefixes.indexOf(p) !== i)).toEqual([]);
+  });
+
   test("top picks name existing ideas", () => {
     const ids = new Set(ideas.map(({ idea }) => idea.id));
     for (const pick of TOP_PICKS) expect(ids).toContain(pick.id);

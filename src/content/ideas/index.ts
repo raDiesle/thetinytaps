@@ -3,7 +3,8 @@
 // referenced ("mach N-04"); new ideas get the next free number of their area,
 // never a reused one.
 //
-// One file per area (`<prefix>-<name>.ts`); the menu order is the order of IDEA_AREAS.
+// One file per area (`<prefix>-<name>.ts`); areas are sorted into IDEA_GROUPS,
+// whose order is the order on the page.
 
 import { lettersIdeas } from "./l-letters";
 import { wordsIdeas } from "./w-words";
@@ -17,24 +18,23 @@ import { marblesIdeas } from "./k-marbles";
 import { chainReactionIdeas } from "./r-chain-reactions";
 import { parentPhoneIdeas } from "./e-parent-phone";
 import { allGamesIdeas } from "./a-all-games";
-import type { IdeaArea } from "./types";
+import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
 
-export const IDEA_AREAS: IdeaArea[] = [
-  lettersIdeas,
-  wordsIdeas,
-  scenesIdeas,
-  newScenesIdeas,
-  newGamesIdeas,
-  adventureIdeas,
-  littleAdventuresIdeas,
-  otherGamesIdeas,
-  marblesIdeas,
-  chainReactionIdeas,
-  parentPhoneIdeas,
-  allGamesIdeas,
+/** Areas sorted by what kind of work they are: grow a game, make a new one, or for parents. */
+export const IDEA_GROUPS: IdeaGroup[] = [
+  {
+    emoji: "🧱",
+    title: "Bestehende Spiele ausbauen",
+    areas: [scenesIdeas, newScenesIdeas, lettersIdeas, wordsIdeas, marblesIdeas, chainReactionIdeas, adventureIdeas, littleAdventuresIdeas, otherGamesIdeas],
+  },
+  { emoji: "✨", title: "Ganz neue Spiele", areas: [newGamesIdeas] },
+  { emoji: "👪", title: "Für Eltern & Technik", areas: [parentPhoneIdeas, allGamesIdeas] },
 ];
+
+/** Every area in page order. */
+export const IDEA_AREAS: IdeaArea[] = IDEA_GROUPS.flatMap((g) => g.areas);
 
 /** My suggestion of what to do first, with a short reason each. */
 export const TOP_PICKS: { id: string; reason: string }[] = [
