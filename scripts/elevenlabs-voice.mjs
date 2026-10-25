@@ -8,8 +8,9 @@
 //   yarn voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
 //   yarn voice save <1|2|3> ["<name>"]       keeps a draft as the voice (src/games/adventure/stimme.json)
 //   yarn voice try "<text>" [--kind turn]    one line with the voice, into .voice-raw/probe.mp3
-//   yarn voice make [--dry] [--redo "<part of a line>"] [--all] [--no-tags]
+//   yarn voice make [--dry] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
 //                                            records every line that has no recording yet
+//                                            (and again: lines with that text part, of that kind, or all)
 //
 // `make` only records what is missing (a line changed → new hash → new file) and
 // deletes recordings no line uses any more, so running it again costs nothing.
@@ -46,7 +47,8 @@ const TAGS = {
   situation: "[excited]",
   instruction: "[warmly]",
   turn: "[encouraging]",
-  again: "[cheering]",
+  // Not [cheering]: that adds a "Juhu!", "Jo!" or even a cheering crowd before the line.
+  again: "[enthusiastically]",
   more: "[encouraging]",
   praise: "[proud]",
 };
@@ -186,7 +188,7 @@ async function make() {
     const orphans = existsSync(story.folder) ? readdirSync(story.folder).filter((f) => f.endsWith(".mp3") && !wanted.has(f)) : [];
     for (const line of story.lines) {
       const file = join(story.folder, `${voiceId(line.text)}.mp3`);
-      const redo = flags.has("all") || (values.redo !== undefined && line.text.includes(values.redo));
+      const redo = flags.has("all") || (values.redo !== undefined && line.text.includes(values.redo)) || values.kind === line.kind;
       if (redo || !existsSync(file)) todo.push({ ...line, file, story });
     }
     if (orphans.length) {
