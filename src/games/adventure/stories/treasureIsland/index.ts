@@ -5,6 +5,8 @@ import {
   CAST_PERIOD,
   castSwing,
   CRANK_PERIOD,
+  DODGE_PASS,
+  DODGE_PERIOD,
   DRUM_HIT,
   DRUM_PERIOD,
   duckDepth,
@@ -14,7 +16,9 @@ import {
   KEY_PICKUP,
   KEY_TURN,
   keyTurn,
-  PUSH_PERIOD,
+  PULL_PERIOD,
+  pulledIn,
+  pullReach,
   SHAPE_SECONDS,
   sitProgress,
 } from "../../three/clips";
@@ -30,7 +34,14 @@ import {
   BOAT_START,
   bridgeTop,
   BROOK_FROM,
+  CARRY_PATH,
   CAST_REACH,
+  CHEST_SAND,
+  CHEST_Y,
+  CHEST_Z,
+  COIN_FALL,
+  COIN_STAND,
+  COINS_PER_TOSS,
   clamp01,
   CRANK_BAR,
   CRANK_REACH,
@@ -56,12 +67,15 @@ import {
   ROD_GRIP_L,
   ROD_GRIP_R,
   ROD_REST,
+  ROLL_LEAD,
   ROLL_RADIUS,
-  ROLL_X,
   ROLL_Z,
   SHORE,
   SIT_DROP,
   smooth,
+  ROPE_REACH,
+  ROPE_TAIL,
+  ROPE_TIE,
   ss,
   STOMP_Z,
   SWING_HELD,
@@ -80,17 +94,20 @@ import {
   ACROSS,
   actLength,
   bumpTime,
-  burstAt,
+  CARRY,
   CAST_LANDS,
   CAST_OUT,
   clipLength,
   DEMO,
+  goes,
   ISLAND,
   jumpZ,
   LEAD,
   LEAN_PERIOD,
   LEAP_FROM,
   LEAP_TO,
+  HOP_FROM,
+  HOP_LAND,
   ON_SAND,
   OPENING,
   OPENING_CUT,
@@ -102,14 +119,12 @@ import {
   REACH_PERIOD,
   REEL,
   REEL_TIME,
-  ROCKET_FLIGHT,
-  ROCKET_OFF,
   S,
   sequence,
-  SIDE_STEP_PERIOD,
   STANDING,
   SWING_PERIOD,
   TRAIL_FROM,
+  tossAt,
   TRAIL_TO,
   TRAVEL,
 } from "./script";
@@ -125,8 +140,9 @@ import { makeWorld } from "./world";
 // dodges the monkeys' nuts in slow motion, picks apples, solves the riddle of
 // the stone door, brushes the cobwebs out of the passage behind it, pulls the
 // treasure chest ashore and unlocks it with the key Kiki brings – then Tapsi
-// turns round to us, cheers, and pushes rockets up into the sunset sky, one
-// with every push of the arms. Every world reaction is timed to the
+// turns round to us and cheers while two crabs carry the open chest up the beach;
+// Tapsi hops down behind it, reaches deep into it and throws the coins up, so
+// they rain down all round. Every world reaction is timed to the
 // guide's clip, so it happens together with the child's movement. Every
 // movement stays on the spot: the child in front of the screen never has to
 // go forwards. So Tapsi never walks either: Ole carries Tapsi the whole way,
@@ -199,11 +215,11 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     spray,
     gold,
     sand,
-    sparks,
-    rockets,
+    porters,
+    coins,
     trail,
   } = makeWorld(scene);
-  let rope: THREE.Mesh | null = null;
+  const ropeParts: THREE.Mesh[] = [];
 
   // --- Helpers -------------------------------------------------------------
   const focus = v3(0, 0, BOAT_START);
@@ -240,12 +256,16 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     return BOAT_START + (BOAT_END - BOAT_START) * (smooth(k) * 0.4 + k * 0.6 + surge);
   };
 
-  /** Raft position (z) at a moment of the story: pulled in with the rope. */
+  /**
+   * Raft position (z) at a moment of the story: pulled in with the rope from when Tapsi starts to pull,
+   * tug by tug as each paw comes back to the body, so it is there when the praise begins.
+   */
   const raftAt = (step: number, act: number) => {
-    if (step < S.rope || (step === S.rope && act <= 0)) return RAFT_FROM;
+    if (step < S.rope) return RAFT_FROM;
     if (step > S.rope) return RAFT_TO;
-    const k = clamp01(act / (actLength(S.rope) - 0.5));
-    return RAFT_FROM + (RAFT_TO - RAFT_FROM) * (k + Math.sin((act * TAU) / 0.9) * 0.01 * (1 - k));
+    const pulls = goes(S.rope);
+    const clip = Math.max(0, Math.min(pulls * PULL_PERIOD, act + DEMO[S.rope]));
+    return RAFT_FROM + ((RAFT_TO - RAFT_FROM) * pulledIn(clip)) / (2 * pulls);
   };
 
   /** How far the camera stands from Tapsi, so the whole body with the arms up fills most of the picture. */
@@ -285,6 +305,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       case S.gate:
         return [WINCH_X, WINCH_Z + CRANK_REACH];
       case S.roll:
+      case S.rollLeft:
+      case S.rollMiddle:
         return [0, ROLL_Z];
       case S.monkeys:
         return [0, MONKEY_Z];
@@ -298,7 +320,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       case S.key:
         return [BAY.x, BAY.z];
       case S.hooray:
-      case S.fireworks:
+      case S.coins:
       case S.bye:
         return [PARTY.x, PARTY.z];
       default:
@@ -346,6 +368,12 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   /** Where Tapsi's feet are while showing and doing a step's movement, for the cameras: on Ole's back. */
   function actSpot(step: number, act: number, out: THREE.Vector3) {
     if (step <= S.paddle) return out.set(0, TURTLE_BACK - TURTLE_FLOAT - (step >= S.sit ? SIT_DROP : 0), boatZ(step, act));
+    // At the end Tapsi stands in the sand beside Ole: the camera looks at both, from the middle of the
+    // gorge Ole came down, whose rock walls come close on either side.
+    if (step >= S.coins) {
+      const x = (PARTY.x + COIN_STAND.x) / 2;
+      return out.set(x, groundHeight(x, COIN_STAND.z), COIN_STAND.z);
+    }
     const [x, z] = step === S.jump ? [0, jumpZ(act + DEMO[S.jump])] : standAt(step);
     return out.set(x, Math.max(groundHeight(x, z), bridgeTop(x, z), (step >= S.rope && step <= S.key ? LAGOON_LEVEL : 0) - TURTLE_FLOAT) + TURTLE_BACK, z);
   }
@@ -424,6 +452,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         return;
       }
       case S.roll:
+      case S.rollLeft:
+      case S.rollMiddle:
         // Right behind Tapsi in the middle and a little from below, looking up the path where the coconuts come from.
         rear(at, pos, look, 0, 0.55, 1.3);
         look.set(at.x + 0.15, at.y + 1.05, at.z - 2.5);
@@ -453,8 +483,10 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         return;
       }
       case S.rope:
-        // To the side, so the pulling paws show, and high enough to see the chest come.
-        rear(at, pos, look, 0.55, 2.0, 1.1);
+        // From the right, so the paws on the rope show beside the body, and looking a little ahead to
+        // where the chest comes from.
+        rear(at, pos, look, 0.85, 1.9, 1.25);
+        look.z -= 0.9;
         return;
       case S.key: {
         // From behind on the right while Kiki brings the key and Tapsi picks it up; for the turning
@@ -470,20 +502,23 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       case S.hooray: {
         // First over Tapsi's shoulder at the opening chest; Tapsi turns round, and we see the face.
         cheerShot(at, tmpA, tmpB);
-        rear(at, pos, look, 0.25, 1.3, 1.15);
+        // Then back and over to the right, so the crabs bringing the chest up the beach show too.
+        const follow = smooth((f.local - CARRY.off) / 3);
+        const mid = tmpC.copy(at).lerp(v3(CHEST_SAND.x, at.y, CHEST_SAND.z), follow * 0.5);
+        rear(mid, pos, look, 0.25 - follow * 0.6, 1.3 + follow * 0.4, 1.15 + follow * 0.3);
         const k = smooth((f.local - 1.2) / 1.6);
         pos.lerpVectors(tmpA, pos, k);
         look.lerpVectors(tmpB, look, k);
         return;
       }
-      case S.fireworks:
-        // In front of Tapsi, low and looking up into the sky over the bay where the rockets burst.
-        rear(at, pos, look, 0.25 + Math.sin(f.local * 0.3) * 0.15, 0.9, 1.55);
-        look.y = at.y + 1.9;
+      case S.coins:
+        // Behind Tapsi and above, as all the way: down into the chest and up with the coins over it.
+        rear(at, pos, look, -0.45 + Math.sin(f.local * 0.3) * 0.05, 2.1, 1.0);
+        look.set(COIN_STAND.x, at.y + 0.9, COIN_STAND.z - 0.6);
         return;
       case S.bye: {
         // In front; at the end the camera rises and flies back to show the whole island at sunset.
-        rear(at, pos, look, 0.3, 1.6, 1.25);
+        rear(at, pos, look, 0, 1.6, 1.3);
         look.y += 0.6;
         const k = smooth((f.act - actLength(step) + 1.5) / 7);
         pos.lerp(tmpA.set(-12, 21, SHORE.z - 26), k);
@@ -615,8 +650,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         ride.walking = walkingAt(f.praise / 2);
         ride.stride = ((BOAT_END - ride.z) / STRIDE) * TAU;
       }
-    } else if (step === S.stand) {
-      // Lying still on the beach while Tapsi gets up.
+    } else if (step === S.stand || step === S.rollLeft || step === S.rollMiddle) {
+      // Lying still on the beach while Tapsi gets up, and where the coconuts roll.
       [ride.x, ride.z] = standAt(step);
     } else if (step === S.rope && f.act < -f.demo) {
       // Through the gorge into the light of the bay, and round side on at the water's edge at the end.
@@ -945,46 +980,56 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     guide.hold("R", bar.clone().addScaledVector(across, CRANK_BAR * 0.3), across, weight);
   }
 
-  /** Where rocket n bursts, above the bay behind Tapsi. */
-  function burstPoint(n: number, out: THREE.Vector3) {
-    const g = guide.root.position;
-    return out.set(g.x + [-1.6, 1.4, -0.4, 2, -2.2, 0.8][n % 6], g.y + 4.2 + (n % 3) * 0.5, g.z - 3 - (n % 2) * 1.5);
-  }
-
-  /** Where each rocket left the paws, so its flight starts there even when the arms come down. */
-  const launched: (THREE.Vector3 | null)[] = rockets.map(() => null);
-
-  /** The fireworks: a rocket pops up between Tapsi's paws, rises with every push and shoots off at the top. */
-  function holdRockets(f: StoryFrame) {
-    const clip = f.act + f.demo;
-    rockets.forEach((r, n) => {
-      const t = f.step === S.fireworks && f.opening === null ? clip / PUSH_PERIOD - n : -1;
-      r.group.visible = t > -0.1 && clip < burstAt(n);
-      const local = (c: number) => TRAVEL[S.fireworks] + c;
-      if (f.step === S.fireworks && crossed(f, local((n + ROCKET_OFF) * PUSH_PERIOD))) cue("whoosh");
-      if (f.step === S.fireworks && crossed(f, local(burstAt(n)))) {
-        sparks.burst(burstPoint(n, tmpA), 90, 4, true);
-        cue(n % 2 ? "pop" : "sparkle");
-      }
-      if (!r.group.visible) return;
-      const paws = guide.handL.getWorldPosition(tmpA).add(guide.handR.getWorldPosition(tmpB)).multiplyScalar(0.5);
-      paws.y += 0.05;
-      const fly = clamp01((t - ROCKET_OFF) * (PUSH_PERIOD / ROCKET_FLIGHT));
-      r.group.scale.setScalar(smooth((t + 0.1) / 0.15));
-      r.flame.visible = fly > 0;
-      r.flame.scale.y = 1 + Math.sin(f.time * 40 + n) * 0.3;
-      if (fly === 0) {
-        launched[n] = (launched[n] ?? new THREE.Vector3()).copy(paws);
-        r.group.position.copy(paws);
-        r.group.quaternion.identity();
-        return;
-      }
-      // Fast off the paws, slowing towards the top where it bursts.
-      const from = launched[n] ?? paws;
-      const to = burstPoint(n, tmpC);
-      r.group.position.lerpVectors(from, to, 1 - (1 - fly) * (1 - fly));
-      r.group.quaternion.setFromUnitVectors(UP, tmpB.subVectors(to, from).normalize());
+  /**
+   * Hand over hand on the rope: the pulling paw holds it and comes back to the body while the other goes
+   * out open, a little above and beside it, to take hold further on. The rope runs from the chest
+   * through the holding paws, past Tapsi's right side and down onto Ole's back, never through the body.
+   */
+  function holdRope(f: StoryFrame) {
+    for (const part of ropeParts) {
+      scene.remove(part);
+      part.geometry.dispose();
+    }
+    ropeParts.length = 0;
+    const len = actLength(S.rope);
+    if (f.step !== S.rope || f.act < -f.demo || f.act >= len + 0.5) return;
+    const clip = Math.min(f.act + f.demo, goes(S.rope) * PULL_PERIOD);
+    const weight = smooth(clip / 0.3) * (1 - smooth((f.act - len) / 0.4));
+    const tie = chest.group.getWorldPosition(new THREE.Vector3()).add(ROPE_TIE);
+    // Where the rope passes in front of the belly, and from there straight to the chest.
+    const near = guide.hipsPoint(v3(-0.03, 0.27, 0.21), new THREE.Vector3());
+    const along = tie.clone().sub(near).normalize();
+    // Once the chest is close, the paws stay short of where the rope is tied.
+    const span = Math.min(ROPE_REACH * GUIDE_SIZE, Math.max(0, near.distanceTo(tie) - 0.15));
+    const zero = guide.hipsPoint(v3(0, 0, 0), new THREE.Vector3());
+    const reach = pullReach(clip);
+    const held: THREE.Vector3[] = [];
+    (["L", "R"] as const).forEach((hand, i) => {
+      // Holding on while it comes back to the body (the middle of its period), open while it goes out.
+      const k = (clip / PULL_PERIOD + i * 0.5) % 1;
+      const grip = ss(0.2, 0.27, k) * ss(0.8, 0.73, k);
+      const onRope = near.clone().addScaledVector(along, span * (i ? 1 - reach : reach));
+      const open = guide.hipsPoint(v3((i ? -1 : 1) * 0.07, 0.06, 0), new THREE.Vector3()).sub(zero);
+      guide.hold(hand, onRope.clone().addScaledVector(open, 1 - grip), along, weight);
+      if (grip > 0.5) held.push(onRope.lerp(guide.gripPoint(hand, new THREE.Vector3()), weight));
     });
+    held.sort((a, b) => a.distanceTo(tie) - b.distanceTo(tie));
+    if (held.length === 0) held.push(near.clone().addScaledVector(along, span * 0.5));
+    const tube = (points: THREE.Vector3[], segments: number) => {
+      const part = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points, false, "centripetal"), segments, 0.03, 6), ropeMat);
+      part.castShadow = true;
+      scene.add(part);
+      ropeParts.push(part);
+    };
+    // Out to the chest: taut while a paw pulls, sagging a little in between (less when it is short).
+    const far = held[0];
+    const tug = clamp01((pulledIn(clip + 0.05) - pulledIn(clip)) / 0.1);
+    const mid = far.clone().lerp(tie, 0.5);
+    mid.y -= (0.05 + 0.2 * (1 - tug)) * clamp01(far.distanceTo(tie) / 3);
+    tube([tie, mid, far], 24);
+    // Through the paws and off to the right side, down onto Ole's back and lying along it.
+    const tail = ROPE_TAIL.map((p, n) => (n < 2 ? guide.hipsPoint(p, new THREE.Vector3()) : guide.root.localToWorld(p.clone())));
+    tube([far.clone().addScaledVector(along, 0.1), ...held, ...tail], 32);
   }
 
   /** How far Tapsi leans forward: picking up and laying down the rod, lifting the paddle out of the water, swinging it out over Ole's side. */
@@ -1010,8 +1055,74 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // In the bay Ole lies side on, Tapsi across its back facing the water; turning round, Ole turns Tapsi with it.
     turtle.group.localToWorld(guide.root.position.set(0, TURTLE_BACK - SIT_DROP * sitting, 0));
     guide.root.rotation.y = ride.yaw + (Math.PI / 2) * ride.side;
+    // At the end Tapsi hops down off Ole's back into the sand before the chest, turning round to it in
+    // the air, and stays there; for the goodbye it turns back to us.
+    const off = step === S.coins ? clamp01((f.local - HOP_FROM) / (HOP_LAND - HOP_FROM)) : step > S.coins ? 1 : 0;
+    if (off > 0) {
+      guide.root.position.lerp(tmpA.set(COIN_STAND.x, groundHeight(COIN_STAND.x, COIN_STAND.z), COIN_STAND.z), smooth(off));
+      guide.root.position.y += Math.sin(off * Math.PI) * 0.35;
+      guide.root.rotation.y += Math.PI * (step === S.coins ? smooth(off) : 1 - smooth(f.local / 1.2));
+    }
     guide.joy = step === S.hooray ? smooth((f.local - 0.8) / 0.6) : step > S.hooray ? 1 : 0;
     return { sitting };
+  }
+
+  /** Where the chest is (world), for the crabs carrying it. */
+  const chestAt = new THREE.Vector3();
+
+  /**
+   * In the hooray two crabs come up out of the water at the raft, lift the open chest off it onto their
+   * backs, carry it up the beach past Ole and set it down in the sand where Tapsi will stand before it;
+   * then they dig themselves in. Before that it sits on the raft.
+   */
+  function placeChest(f: StoryFrame) {
+    const { step, time } = f;
+    const h = step === S.hooray ? f.local : step > S.hooray ? 99 : -1;
+    const show = h >= CARRY.up && h < CARRY.gone + 0.6;
+    porters.forEach((crab) => {
+      crab.group.visible = show;
+    });
+    if (h < CARRY.lift) {
+      chest.group.position.set(0, CHEST_Y, CHEST_Z);
+      chest.group.quaternion.identity();
+    }
+    // The crabs' backs: a little under the water out in the bay, on the sand up the beach.
+    const base = (x: number, z: number) => Math.max(groundHeight(x, z), LAGOON_LEVEL - 0.2);
+    const onCrate = raft.localToWorld(tmpB.set(0, CHEST_Y, CHEST_Z));
+    const [sx, sz] = CARRY_PATH[0];
+    const start = tmpC.set(sx, base(sx, sz) + 0.32, sz);
+    let k = 0;
+    if (h < CARRY.lift) {
+      chestAt.copy(start);
+    } else if (h < CARRY.off) {
+      // Off the crate in a little arc onto the crabs.
+      const e = smooth((h - CARRY.lift) / (CARRY.off - CARRY.lift));
+      chestAt.lerpVectors(onCrate, start, e);
+      chestAt.y += Math.sin(e * Math.PI) * 0.2;
+    } else {
+      k = clamp01((h - CARRY.off) / (CARRY.down - CARRY.off));
+      const [x, z] = along(CARRY_PATH, smooth(k) * 0.3 + k * 0.7);
+      const down = smooth((h - CARRY.down) / (CARRY.set - CARRY.down));
+      chestAt.set(x, base(x, z) + 0.32 * (1 - down) + (k < 1 ? Math.abs(Math.sin(time * 9)) * 0.03 : 0), z);
+    }
+    if (h >= CARRY.lift) {
+      // Level, whichever way the raft rocks.
+      raft.updateMatrixWorld(true);
+      chest.group.position.copy(raft.worldToLocal(tmpB.copy(chestAt)));
+      chest.group.quaternion.copy(raft.quaternion).invert();
+    }
+    if (!show) return;
+    // Under the chest's two ends while carrying; then out to the sides and down into the sand.
+    const rise = smooth((h - CARRY.up) / (CARRY.lift - CARRY.up));
+    const leave = smooth((h - CARRY.set) / 0.6);
+    const dig = smooth((h - CARRY.gone) / 0.6);
+    porters.forEach((crab, i) => {
+      const side = i ? 1 : -1;
+      const p = tmpB.set(side * (0.35 + leave * 0.7), 0, 0).add(chestAt);
+      p.y = base(p.x, p.z) - 0.6 * (1 - rise) - 0.6 * dig;
+      crab.group.position.copy(p);
+      crab.dance(time * 1.5 + i, 0.3);
+    });
   }
 
   function updateWorld(f: StoryFrame) {
@@ -1134,24 +1245,50 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
     gate.set(lift, crankAngle);
 
-    // Coconuts roll down the path, on Tapsi's right, past Ole's head and over its shell; Tapsi steps aside
-    // to the left on Ole's back as each one comes.
-    rollers.forEach((nut, n) => {
-      const pass = 1.3 + n * SIDE_STEP_PERIOD;
+    // The monkeys up in the palms drop small coconuts that roll down the path at Tapsi: first right through
+    // where it stood (a big step aside), then on its left under the lifted foot, then in the middle between
+    // its feet. Each is held up, dropped, bounces and rolls, and passes Tapsi when the step is furthest out.
+    const throwing = [0, 0];
+    rollers.forEach(({ nut, step: at, n }) => {
+      const pass = DODGE_PASS + n * DODGE_PERIOD;
       const dt = clip - pass;
-      const on = step === S.roll && f.opening === null && dt > -2 && dt < 1.2 && pass < clipLength(step);
+      const on = step === at && f.opening === null && dt > -ROLL_LEAD && dt < 1.2 && pass < clipLength(step);
       nut.visible = on;
       if (!on) return;
-      const z = ROLL_Z + dt * 4.2;
-      const x = ROLL_X;
-      const over = Math.max(groundHeight(x, z), onOle(x, z, tmpA).y);
-      nut.position.set(x, over + ROLL_RADIUS + Math.abs(Math.sin(dt * 5)) * 0.05, z);
-      nut.rotation.set(z / ROLL_RADIUS, 0, 0);
+      // From the monkey on Tapsi's right (+x) first, from the left one for the left foot, in turns for the middle.
+      const side = at === S.roll ? 1 : at === S.rollLeft ? -1 : n % 2 === 0 ? 1 : -1;
+      const hand = monkeys[side > 0 ? 1 : 0].hand.getWorldPosition(tmpA);
+      const x = at === S.roll ? 0.05 : at === S.rollLeft ? -0.15 * GUIDE_SIZE : 0;
+      const drop = -ROLL_LEAD + 0.6;
+      const land = drop + 0.55;
+      const landAt = tmpB.set(hand.x * 0.6, 0, hand.z + 0.8);
+      landAt.y = groundHeight(landAt.x, landAt.z) + ROLL_RADIUS;
+      if (dt < drop) {
+        // Held up by the monkey, its arm going back to throw.
+        throwing[side > 0 ? 1 : 0] = clamp01((dt + ROLL_LEAD) / 0.5);
+        nut.position.copy(hand);
+      } else if (dt < land) {
+        // Falling, faster and faster.
+        const v = (dt - drop) / (land - drop);
+        nut.position.lerpVectors(hand, landAt, v);
+        nut.position.y = hand.y + (landAt.y - hand.y) * v * v;
+      } else {
+        // Rolling, steadily, into its lane before it reaches Tapsi and straight on past.
+        const u = (dt - land) / -land;
+        const speed = (ROLL_Z - landAt.z) / -land;
+        const z = u < 1 ? landAt.z + (ROLL_Z - landAt.z) * u : ROLL_Z + speed * dt;
+        const nx = x + (landAt.x - x) * (1 - smooth(clamp01(u * 1.3)));
+        const over = Math.max(groundHeight(nx, z), onOle(nx, z, tmpC).y);
+        const since = dt - land;
+        const bounce = 0.3 * Math.exp(-5 * since) * Math.abs(Math.sin(since * 10));
+        nut.position.set(nx, over + ROLL_RADIUS + bounce, z);
+        nut.rotation.set(z / ROLL_RADIUS, 0, 0);
+      }
+      if (atClip(pass + land)) cue("knock");
       if (atClip(pass - 0.5)) cue("whoosh");
     });
 
     // The monkeys throw small coconuts; each flies, in slow motion as it passes, right where Tapsi's head was.
-    const throwing = [0, 0];
     throws.forEach((th, n) => {
       const pass = LEAN_PERIOD / 4 + n * (LEAN_PERIOD / 2);
       const dt = clip - pass;
@@ -1166,8 +1303,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
         monkey.hand.updateMatrixWorld(true);
         const start = monkey.hand.getWorldPosition(new THREE.Vector3());
         const g = groundHeight(0, MONKEY_Z) + TURTLE_BACK;
-        // Well clear of the head leaning away, and on out to the same side.
-        const passAt = v3(side * 0.5, g + 1.35, MONKEY_Z);
+        // Through where the head was, close to the head leaning away, and on out to the same side.
+        const passAt = v3(side * 0.12, g + 1.25, MONKEY_Z);
         const end = v3(side * 1.2, g + 0.3, MONKEY_Z + 3.5);
         const control = passAt.clone().multiplyScalar(2).sub(start.clone().add(end).multiplyScalar(0.5));
         th.curve = new THREE.QuadraticBezierCurve3(start, control, end);
@@ -1247,8 +1384,9 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // With the riddle solved the spiral glows bright and the door sinks into the ground.
     const open = step > S.riddle ? 1 : step === S.riddle ? smooth((f.praise - 0.3) / 2) : 0;
     if (step === S.riddle && crossed(f, LEAD[S.riddle] + len + 0.3)) cue("rumble");
-    // The light in the doorway fades as the cobwebs go, so the way through the gorge shows and nothing walks into it.
-    const shine = step <= S.riddle ? open : step === S.webs ? 1 - smooth((f.praise - 0.3) / 1.5) : 0;
+    // Light flashes in the doorway while the door sinks and is gone once it is down: through the cobwebs one
+    // sees the gorge behind them, not a white wall.
+    const shine = step === S.riddle ? Math.sin(open * Math.PI) * 0.8 : 0;
     door.set(open, step === S.riddle ? Math.max((solved / shapes) * 0.3, smooth(f.praise / 0.5)) : open, shine);
 
     // Cobwebs in the passage: each sweep of a paw tears the front one on its side; it blows away
@@ -1285,13 +1423,20 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     spider.thread.position.y = 0.1 + thread / 2;
     if (step === S.webs && atClip(lastWeb + 0.4)) cue("sparkle");
 
-    // The chest on its raft comes closer with the pulling.
+    // The chest on its raft comes closer with every pull: a tug, its front lifting a little and water
+    // splashing up at the front; in between it stops.
     const raftZ = raftAt(step, act);
-    if (step === S.rope && act > 0) {
-      for (let n = 0; n * 1.8 < len; n++) if (crossed(f, LEAD[S.rope] + 0.9 + n * 1.8)) cue("splash");
+    const tug = step === S.rope ? clamp01((raftAt(step, act + 0.1) - raftZ) / 0.25) : 0;
+    if (step === S.rope) {
+      for (let n = 1; n * (PULL_PERIOD / 2) <= goes(step) * PULL_PERIOD; n++) {
+        if (atClip(n * (PULL_PERIOD / 2) - 0.45)) {
+          cue("splash");
+          spray.burst(tmpA.set(RAFT_X, LAGOON_LEVEL + 0.05, raftZ + 0.9), 10, 1.5);
+        }
+      }
     }
     raft.position.set(RAFT_X, LAGOON_LEVEL + Math.sin(time * 1.4) * 0.03, raftZ);
-    raft.rotation.z = Math.sin(time * 1.1) * 0.03;
+    raft.rotation.set(-tug * 0.06, 0, Math.sin(time * 1.1) * 0.03);
     // In the opening the chest waits far out in the bay, at the end of the trail.
     raft.visible = step >= S.webs || f.opening !== null;
     raft.updateMatrixWorld(true);
@@ -1338,13 +1483,14 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       cue("splash");
     }
 
-    let lid = step > S.hooray ? 1 : 0;
+    let lid = step > S.hooray ? 1.2 : 0;
     if (step === S.hooray) {
-      // It opens first, then Tapsi turns round to us and cheers.
-      lid = smooth((f.local - 0.6) / 1.2);
+      // It opens first, then Tapsi turns round to us and cheers; set down in the sand it opens all the way.
+      lid = smooth((f.local - 0.6) / 1.2) + 0.2 * smooth((f.local - CARRY.set) / 0.6);
       if (crossed(f, 0.8)) cue("chime");
     }
     chest.open(lid);
+    placeChest(f);
     if (step === S.hooray) {
       for (let n = 0; n < 8; n++) {
         if (crossed(f, 1.0 + n * 1.1)) {
@@ -1353,33 +1499,47 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
           cue(n % 2 ? "pop" : "sparkle");
         }
       }
+      if (crossed(f, CARRY.set)) {
+        sand.burst(tmpA.set(CHEST_SAND.x, groundHeight(CHEST_SAND.x, CHEST_SAND.z), CHEST_SAND.z), 20, 2);
+        cue("knock");
+      }
+    }
+    if (step === S.coins && crossed(f, HOP_LAND)) {
+      sand.burst(tmpA.set(COIN_STAND.x, groundHeight(COIN_STAND.x, COIN_STAND.z), COIN_STAND.z), 16, 2);
+      cue("pop");
     }
 
-    // The rope from the chest to the fox's paws.
-    if (rope) {
-      scene.remove(rope);
-      rope.geometry.dispose();
-      rope = null;
-    }
-    if (step === S.rope && f.act >= -f.demo && act < len + 0.5) {
-      guide.handL.getWorldPosition(tmpA);
-      guide.handR.getWorldPosition(tmpB);
-      const hands = tmpA.add(tmpB).multiplyScalar(0.5);
-      const end = chest.group.getWorldPosition(new THREE.Vector3()).add(v3(0, 0.4, 0.45));
-      const mid = hands.clone().lerp(end, 0.5);
-      mid.y -= 0.25 + 0.15 * Math.sin(time * 3);
-      const behind = hands.clone().add(v3(0.3, -0.6, 0.6));
-      const curve = new THREE.CatmullRomCurve3([behind, hands, mid, end]);
-      rope = new THREE.Mesh(new THREE.TubeGeometry(curve, 30, 0.03, 6), ropeMat);
-      rope.castShadow = true;
-      scene.add(rope);
-    }
+    // The coins of every throw fly up out of Tapsi's paws, spread all round but away from Ole on the
+    // left, spin, and stay lying in the sand close by where they land (or fall back into the chest).
+    const sandY = groundHeight(COIN_STAND.x, COIN_STAND.z) + 0.006;
+    let landed = Infinity;
+    coins.forEach((coin, i) => {
+      const n = Math.floor(i / COINS_PER_TOSS);
+      const t = step === S.coins ? clip - tossAt(n) : step > S.coins ? 99 : -1;
+      coin.visible = t > 0;
+      if (!coin.visible) return;
+      const j = i % COINS_PER_TOSS;
+      const a = -1.4 + (2.6 * (j + 0.5)) / COINS_PER_TOSS + Math.sin(i * 12.9898) * 0.15;
+      const speed = 0.3 + ((i * 7) % 5) * 0.07;
+      const rise = 3 + ((i * 3) % 4) * 0.2;
+      const from = tmpA.set(COIN_STAND.x, sandY + 1.45, COIN_STAND.z - 0.1);
+      const flight = (rise + Math.sqrt(rise * rise + 2 * COIN_FALL * (from.y - sandY))) / COIN_FALL;
+      const u = Math.min(t, flight);
+      coin.position.set(from.x + Math.cos(a) * speed * u, from.y + rise * u - 0.5 * COIN_FALL * u * u, from.z + Math.sin(a) * speed * u);
+      coin.rotation.set(t < flight ? u * 11 : 0, i, t < flight ? u * 7 : 0);
+      if (j === 0) {
+        if (step === S.coins && atClip(tossAt(n))) {
+          gold.burst(from, 24, 3.5);
+          cue("whoosh");
+        }
+        if (step === S.coins && atClip(tossAt(n) + flight)) cue("sparkle");
+        if (t >= flight) landed = Math.min(landed, t - flight);
+      }
+    });
 
-    // Crabs come out of the sand at the treasure and wave their claws; they hop whenever a rocket bursts.
+    // Crabs come out of the sand at the treasure and wave their claws; they hop whenever the coins come down.
     const out = step === S.hooray ? smooth((f.local - 3) / 1.5) : step > S.hooray ? 1 : 0;
-    let since = Infinity;
-    if (step === S.fireworks) for (let n = 0; n < rockets.length; n++) if (clip >= burstAt(n)) since = clip - burstAt(n);
-    const hop = since < 0.6 ? Math.sin((since / 0.6) * Math.PI) * 0.15 : 0;
+    const hop = step === S.coins && landed < 0.6 ? Math.sin((landed / 0.6) * Math.PI) * 0.15 : 0;
     crabs.forEach((crab, i) => {
       crab.holder.position.y = crab.ground - 0.6 + out * 0.6 + hop * (0.7 + (i % 3) * 0.15);
       crab.holder.visible = step >= S.hooray;
@@ -1455,8 +1615,8 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       if (crossed(f, LEAD[S.bye] + 0.5) || crossed(f, LEAD[S.bye] + 3)) cue("tweet");
     } else if (step > S.hello && step < S.hooray && crossed(f, 2)) cue("tweet");
 
-    // Sunset during the fireworks and the goodbye.
-    const dusk = step === S.fireworks ? smooth(f.local / sequence.steps[S.fireworks].seconds) * 0.7 : step > S.fireworks ? 0.7 + smooth(f.local / 6) * 0.3 : 0;
+    // Sunset during the coins and the goodbye.
+    const dusk = step === S.coins ? smooth(f.local / sequence.steps[S.coins].seconds) * 0.7 : step > S.coins ? 0.7 + smooth(f.local / 6) * 0.3 : 0;
     stage.setSky(DAY, SUNSET, dusk);
     const band = Math.floor(dusk * 4);
     if (band !== sunsetDone) {
@@ -1481,7 +1641,6 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     spray.update(dt);
     gold.update(dt);
     sand.update(dt);
-    sparks.update(dt);
     return inAct;
   }
 
@@ -1557,7 +1716,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       holdRod(f);
       holdCrank(f);
       holdKey(f);
-      holdRockets(f);
+      holdRope(f);
     },
   };
 }
@@ -1656,11 +1815,27 @@ export const TREASURE_ISLAND: Story = {
     },
     {
       icon: "🥥",
-      situation: "Da kullern Kokosnüsse den Weg herunter!",
-      instruction: "Ein Schritt zur Seite – und zurück. So!",
-      turn: "Kokosnuss! Schritt zur Seite!",
+      situation: "Oh, der Affe lässt Kokosnüsse fallen! Die kullern genau zu uns.",
+      instruction: "Ein großer Schritt zur Seite – und zurück. So!",
+      turn: "Kokosnuss! Großer Schritt zur Seite!",
       again: "Und nochmal Platz machen!",
       praise: "Alle Kokosnüsse sind vorbeigekullert.",
+    },
+    {
+      icon: "🦵",
+      situation: "Jetzt kullern sie links!",
+      instruction: "Das Bein hoch – die Kokosnuss rollt unten durch. So!",
+      turn: "Jetzt du – Bein hoch!",
+      again: "Bein hoch!",
+      praise: "Unten durch! Super.",
+    },
+    {
+      icon: "🦶",
+      situation: "Und jetzt kommen sie in der Mitte!",
+      instruction: "Die Beine ganz breit – die Kokosnuss rollt durch. So!",
+      turn: "Jetzt du – Beine breit!",
+      again: "Beine breit!",
+      praise: "Durch die Beine! Die Affen lachen.",
     },
     {
       icon: "🐒",
@@ -1725,12 +1900,12 @@ export const TREASURE_ISLAND: Story = {
       praise: "So viel Gold!",
     },
     {
-      icon: "🎆",
-      situation: "Jetzt feiern wir mit einem Feuerwerk!",
-      instruction: "Arme ganz hoch stoßen – und zisch, eine Rakete!",
-      turn: "Jetzt du – stoß die Rakete hoch!",
-      again: "Hoch – und bumm!",
-      praise: "Was für ein Feuerwerk!",
+      icon: "💰",
+      situation: "Die Krebse bringen uns die Truhe. Ich hüpfe runter!",
+      instruction: "Tief rein greifen – und die Münzen hoch werfen! So!",
+      turn: "Jetzt du – rein greifen und hoch werfen!",
+      again: "Rein greifen – hoch werfen!",
+      praise: "Ein Goldregen! Wir sind reich!",
     },
     {
       icon: "🌅",

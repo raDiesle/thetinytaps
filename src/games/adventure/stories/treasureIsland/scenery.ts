@@ -636,22 +636,6 @@ export function makeDrums() {
   };
 }
 
-/** A little firework rocket standing on its own y, with a flame at the bottom. */
-export function makeRocket(color: string) {
-  const group = new THREE.Group();
-  const body = solid(new THREE.CylinderGeometry(0.06, 0.06, 0.3, 12), mat(color, 0.5), false);
-  body.position.y = 0.15;
-  group.add(body);
-  const tip = solid(new THREE.ConeGeometry(0.06, 0.14, 12), mat("#ffd23f", 0.4), false);
-  tip.position.y = 0.37;
-  group.add(tip);
-  const flame = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.22, 10), new THREE.MeshBasicMaterial({ color: "#ffd27a" }));
-  flame.rotation.x = Math.PI;
-  flame.position.y = -0.1;
-  group.add(flame);
-  return { group, flame };
-}
-
 /** A raft for the chest. */
 export function makeRaft() {
   const group = new THREE.Group();

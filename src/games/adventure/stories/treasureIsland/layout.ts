@@ -123,9 +123,10 @@ export const CRANK_Y = TURTLE_BACK + CRANK_HEIGHT;
 /** How far behind the crank the winch's post stands: beyond Ole's head. */
 export const WINCH_POST = 1.15;
 export const ROLL_Z = 6.6;
-/** The coconuts roll down this far to Tapsi's right, just past Ole's head and over its shell, and are this big. */
-export const ROLL_X = 0.55;
-export const ROLL_RADIUS = 0.4;
+/** How big the rolling coconuts are: small enough to roll under Tapsi's lifted foot and between its feet. */
+export const ROLL_RADIUS = 0.11;
+/** Seconds from when a monkey holds a coconut up until it rolls past Tapsi. */
+export const ROLL_LEAD = 3;
 export const MONKEY_Z = 2.4;
 export const APPLE_Z = -1.4;
 export const DOOR_Z = -9.9;
@@ -151,6 +152,15 @@ export const KEY_VIEW = v3(1.35, 1.0, 2.4);
 /** Where the key's ring is when it is in the lock, from the lock. */
 export const KEY_RING = v3(0, 0.05, 0.4);
 export const RAFT_FROM = -35;
+/** Where the rope is tied to the chest, from the chest. */
+export const ROPE_TIE = v3(0, 0.4, 0.45);
+/** How far along the rope the paws reach out from the belly (fox units). */
+export const ROPE_REACH = 0.26;
+/**
+ * Where the pulled-in rope goes after the paws: past Tapsi's right side, clear of the body (the first two
+ * from the hips), then down onto Ole's back and along it (from Tapsi's feet), all in fox units.
+ */
+export const ROPE_TAIL = [v3(-0.22, 0.22, 0.17), v3(-0.3, -0.05, 0.08), v3(-0.36, 0.03, 0.02), v3(-0.42, 0.03, -0.4)];
 /** Pulled in to Ole's side, the chest right in front of Tapsi: x so the lock is at the turning paw, z just clear of the shell. */
 export const RAFT_TO = BAY.z - TURTLE_HALF_WIDTH - 1.12;
 export const RAFT_X = BAY.x - KEY_HAND.x - LOCK.x;
@@ -162,6 +172,19 @@ export const CHEST_Y = TURTLE_BACK - TURTLE_FLOAT + KEY_HAND.y - LOCK.y;
 export const CHEST_Z = BAY.z - KEY_HAND.z - LOCK.z - RAFT_TO;
 /** Where Tapsi celebrates, facing us: Ole has turned round and crawled up the beach. */
 export const PARTY = v3(BAY.x, 0, BAY.z + 1.9);
+/** At the end Tapsi stands in the sand here, beside Ole on the right as we see it, facing the bay … */
+export const COIN_STAND = v3(PARTY.x + 1.4, 0, PARTY.z);
+/** … before the open chest the crabs have set down, its front to Tapsi and the lid open away, so the paws reach down into it. */
+export const CHEST_SAND = v3(COIN_STAND.x, 0, COIN_STAND.z - 0.62);
+/** The way the crabs carry the chest from the raft (x, z): out past Ole on the right and up the beach. */
+export const CARRY_PATH: [number, number][] = [
+  [RAFT_X + 1.3, CHEST_Z + RAFT_TO + 0.3],
+  [CHEST_SAND.x + 0.2, CHEST_SAND.z - 0.8],
+  [CHEST_SAND.x, CHEST_SAND.z],
+];
+/** Coins at every throw at the end; they fall this fast (m/s²), slower than real, so they can be seen. */
+export const COINS_PER_TOSS = 8;
+export const COIN_FALL = 6;
 
 /** The top of the bridge's deck at (x, z), or -Infinity off the bridge. */
 export function bridgeTop(x: number, z: number) {

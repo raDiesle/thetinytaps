@@ -83,10 +83,24 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "make_room_step",
-        seconds: 18.5,
+        seconds: 15.5,
         energy: "medium",
-        situation: "Kokosnüsse kullern über den Weg – ein Schritt zur Seite, sie rollen vorbei.",
-        transition: "Oben in den Palmen sitzen Affen.",
+        situation: "Ein Affe oben in der Palme lässt Kokosnüsse fallen; sie kullern genau da, wo Tapsi steht – ein großer Schritt zur Seite.",
+        transition: "Jetzt kommen sie von links.",
+      },
+      {
+        movement: "coconut_leg_lift",
+        seconds: 13.5,
+        energy: "medium",
+        situation: "Die Kokosnüsse kullern links – das linke Bein hoch, sie rollen unten durch.",
+        transition: "Jetzt kommen sie in der Mitte.",
+      },
+      {
+        movement: "coconut_straddle",
+        seconds: 13.5,
+        energy: "medium",
+        situation: "Die Kokosnüsse kullern in der Mitte – Beine breit, sie rollen zwischen den Füßen durch.",
+        transition: "Die Affen werfen jetzt von oben.",
       },
       {
         movement: "rolling_ball_lean",
@@ -134,14 +148,16 @@ export const SEQUENCES: Sequence[] = [
         movement: "hooray_arms",
         seconds: 12,
         energy: "lively",
-        situation: "Die Truhe springt auf: Goldmünzen, Glitzer und Konfetti; Tapsi dreht sich zu uns um und jubelt.",
+        situation:
+          "Die Truhe springt auf: Goldmünzen, Glitzer und Konfetti; Tapsi dreht sich zu uns um und jubelt, zwei Krebse tragen die Truhe an den Strand.",
         transition: "Die Krebse kommen zum Feiern aus dem Sand.",
       },
       {
-        movement: "cloud_push",
-        seconds: 14.9,
+        movement: "treasure_toss",
+        seconds: 14.5,
         energy: "lively",
-        situation: "Feuerwerk: mit beiden Armen hoch stoßen, und eine Rakete zischt aus den Pfoten in den Himmel und knallt bunt. Die Sonne geht unter.",
+        situation:
+          "Tapsi hüpft von Ole in den Sand hinter die Truhe, greift aus dem Stand tief hinein und wirft die Münzen hoch: ein Goldregen um Tapsi herum. Die Sonne geht unter.",
         transition: "Es wird Abend, alle werden ruhig.",
       },
       {

@@ -4,14 +4,17 @@ import {
   BRUSH_PERIOD,
   CAST_PERIOD,
   CRANK_PERIOD,
+  DODGE_PERIOD,
   DRUM_PERIOD,
   JUMP_PEAK,
   JUMP_PERIOD,
   KEY_PICKUP,
   KEY_TURN,
-  PUSH_PERIOD,
+  PULL_PERIOD,
   SHAPE_SECONDS,
   SIT_TIME,
+  TOSS_AT,
+  TOSS_PERIOD,
 } from "../../three/clips";
 import { BEACH_Z, JUMP_FROM, JUMP_TO, clamp01, smooth, v3 } from "./layout";
 
@@ -33,33 +36,34 @@ export const S = {
   drums: 8,
   gate: 9,
   roll: 10,
-  monkeys: 11,
-  apples: 12,
-  riddle: 13,
-  webs: 14,
-  rope: 15,
-  key: 16,
-  hooray: 17,
-  fireworks: 18,
-  bye: 19,
+  rollLeft: 11,
+  rollMiddle: 12,
+  monkeys: 13,
+  apples: 14,
+  riddle: 15,
+  webs: 16,
+  rope: 17,
+  key: 18,
+  hooray: 19,
+  coins: 20,
+  bye: 21,
 } as const;
 
 /** Seconds of one paddle stroke cycle, as in the paddle clip. */
 export const PADDLE_PERIOD = 2.8;
 /** The stomp clip: a foot comes down every half period, the left one first. */
 export const STOMP_PERIOD = 1.6;
-export const SIDE_STEP_PERIOD = 3;
 export const LEAN_PERIOD = 3.4;
 export const REACH_PERIOD = 2.6;
-export const PULL_PERIOD = 1.8;
 /** The log swings over Tapsi and back to the front in this many seconds: two ducks. */
 export const SWING_PERIOD = 6;
 
 /**
  * Seconds of travel before each step: walking or paddling there, or the camera coming in. Kiki flies in
- * for the hello while the camera comes round to Tapsi's front; before the paddling Tapsi takes the paddle.
+ * for the hello while the camera comes round to Tapsi's front; before the paddling Tapsi takes the paddle;
+ * before the coins Tapsi hops down from Ole into the sand.
  */
-export const TRAVEL = [4, 3, 1.5, 3, 1, 2, 2.5, 3, 3, 3, 4, 3, 3, 3.5, 2, 6, 2.5, 2.5, 2, 1];
+export const TRAVEL = [4, 3, 1.5, 3, 1, 2, 2.5, 3, 3, 3, 4, 2, 2, 3, 3, 3.5, 2, 6, 2.5, 2.5, 3, 1.5];
 /** Tapsi sits down (or gets up) alone first, and a moment more, before the child does it too. */
 const SIT_SHOW = SIT_TIME + 0.6;
 /** Seconds Tapsi shows each movement alone first: whole loops of its clip, so the world stays in step. */
@@ -74,7 +78,9 @@ export const DEMO = [
   3,
   2 * DRUM_PERIOD,
   CRANK_PERIOD,
-  SIDE_STEP_PERIOD,
+  DODGE_PERIOD,
+  DODGE_PERIOD,
+  DODGE_PERIOD,
   LEAN_PERIOD,
   REACH_PERIOD,
   2,
@@ -82,7 +88,7 @@ export const DEMO = [
   2 * PULL_PERIOD,
   KEY_PICKUP + KEY_TURN,
   2,
-  PUSH_PERIOD,
+  TOSS_PERIOD,
   2,
 ];
 /**
@@ -102,7 +108,10 @@ export const CYCLES: ({ seconds: number; from: number } | null)[] = [
   { seconds: SWING_PERIOD, from: 0 },
   { seconds: DRUM_PERIOD, from: 0 },
   { seconds: CRANK_PERIOD, from: 0 },
-  { seconds: SIDE_STEP_PERIOD, from: 0 },
+  // A coconut for every step aside, every lifted leg and every straddle.
+  { seconds: DODGE_PERIOD, from: 0 },
+  { seconds: DODGE_PERIOD, from: 0 },
+  { seconds: DODGE_PERIOD, from: 0 },
   { seconds: LEAN_PERIOD, from: 0 },
   { seconds: REACH_PERIOD, from: 0 },
   { seconds: 3 * SHAPE_SECONDS, from: 0 },
@@ -110,7 +119,7 @@ export const CYCLES: ({ seconds: number; from: number } | null)[] = [
   { seconds: PULL_PERIOD, from: 0 },
   { seconds: KEY_TURN, from: KEY_PICKUP },
   null,
-  { seconds: PUSH_PERIOD, from: 0 },
+  { seconds: TOSS_PERIOD, from: 0 },
   null,
 ];
 export const LEAD = TRAVEL.map((t, i) => t + DEMO[i]);
@@ -145,11 +154,13 @@ export const REEL_TIME = 0.18;
 /** In each cast: when a fish leaps out beside the float and when it dives in again on the other side. */
 export const LEAP_FROM = 0.7;
 export const LEAP_TO = 0.92;
-/** In each push of the fireworks (0..1 of it): when the rocket leaves the paws at the top; and how long it flies. */
-export const ROCKET_OFF = 0.4;
-export const ROCKET_FLIGHT = 0.9;
-/** Seconds into the fireworks clip when rocket n bursts. */
-export const burstAt = (n: number) => (n + ROCKET_OFF) * PUSH_PERIOD + ROCKET_FLIGHT;
+/** Seconds into the coins clip when the coins of throw n leave Tapsi's paws. */
+export const tossAt = (n: number) => n * TOSS_PERIOD + TOSS_AT;
+/** In the hooray (seconds into the step): the crabs come up out of the water at the raft, lift the open chest off it, carry it up the beach, set it down and go. */
+export const CARRY = { up: 2, lift: 2.6, off: 3.2, down: 7.2, set: 7.6, gone: 8.6 };
+/** In the coins step (seconds into it): Tapsi hops down from Ole into the sand, and lands. */
+export const HOP_FROM = 0.6;
+export const HOP_LAND = 1.4;
 
 /** How much more the paddle tips than the line between the hands. */
 export const PADDLE_TILT = 1.3;

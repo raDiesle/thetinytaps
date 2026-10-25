@@ -323,6 +323,14 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Die Fische im Riff haben Hunger.", reaction: "Sie schwimmen in einer bunten Wolke heran.", worlds: ["underwater"] },
     { situation: "Bei der Parade fehlen noch Blüten auf der Straße.", reaction: "Die Straße wird bunt.", worlds: ["toy_town", "circus"] },
   ],
+  scoop_toss: [
+    { situation: "Im Garten liegt ein großer Haufen Herbstlaub.", reaction: "Die Blätter wirbeln hoch und segeln herunter.", everyday: true },
+    { situation: "In der Kiste sind ganz viele weiche Bälle.", reaction: "Sie hüpfen überall herum.", everyday: true },
+    { situation: "Im Sandkasten liegt trockener Sand.", reaction: "Er rieselt wie Regen zurück.", everyday: true },
+    { situation: "Die Schatztruhe ist voller Goldmünzen.", reaction: "Ein Goldregen glitzert um uns herum.", worlds: ["pirate_island"] },
+    { situation: "Unter dem Baum liegt frischer Schnee.", reaction: "Es schneit noch einmal, ganz glitzernd.", worlds: ["winter_forest"] },
+    { situation: "Im Korb liegen bunte Blütenblätter.", reaction: "Sie regnen bunt auf die Wiese.", worlds: ["garden"] },
+  ],
   catch: [
     { situation: "Papa wirft den weichen Ball.", reaction: "Er landet sicher in den Armen.", everyday: true },
     { situation: "Schneeflocken fallen vom Himmel.", reaction: "Eine landet und glitzert.", everyday: true },
@@ -464,6 +472,22 @@ export const SITUATIONS: Record<Exclude<MotionClipId, "idle">, SituationIdea[]> 
     { situation: "Ein Storch steht auf der Wiese.", reaction: "Er klappert mit dem Schnabel.", worlds: ["farm"] },
     { situation: "Die Ballerina auf der Spieluhr steht still.", reaction: "Die Melodie spielt.", worlds: ["music_room"] },
     { situation: "Im Bach ist nur auf einem Stein Platz für einen Fuß.", reaction: "Der Frosch nickt und quakt.", worlds: ["jungle"] },
+  ],
+  lift_leg: [
+    { situation: "Ein Spielzeugauto saust über den Teppich auf die Füße zu.", reaction: "Es fährt unter dem Bein durch.", everyday: true },
+    { situation: "Beim Aufräumen liegt ein Bauklotz vor dem Fuß.", reaction: "Ein großer Schritt darüber, nichts wackelt.", everyday: true },
+    { situation: "Die Katze will unter dem Bein durch.", reaction: "Sie schlüpft durch und schnurrt.", everyday: true },
+    { situation: "Eine kleine Kokosnuss kullert links den Weg herunter.", reaction: "Sie rollt unter dem Fuß durch.", worlds: ["pirate_island"] },
+    { situation: "Ein Igel tappelt durchs Beet.", reaction: "Er läuft unten durch und schnuppert.", worlds: ["garden"] },
+    { situation: "Ein Ferkel rennt quiekend über den Hof.", reaction: "Es saust unter dem Bein durch.", worlds: ["farm"] },
+  ],
+  straddle: [
+    { situation: "Der Ball rollt genau auf die Füße zu.", reaction: "Er rollt durch die Beine hindurch.", everyday: true },
+    { situation: "Das Kuscheltier will durch einen Tunnel.", reaction: "Es kriecht durch die Beine, alle lachen.", everyday: true },
+    { situation: "Der kleine Bruder krabbelt heran.", reaction: "Er krabbelt durch das Beintor.", everyday: true },
+    { situation: "Eine Kokosnuss rollt mitten den Weg herunter.", reaction: "Sie kullert zwischen den Füßen durch.", worlds: ["pirate_island"] },
+    { situation: "Die Spielzeugeisenbahn braucht einen Tunnel.", reaction: "Sie tuckert unter den Beinen durch.", worlds: ["toy_town"] },
+    { situation: "Ein Pinguin rutscht auf dem Bauch heran.", reaction: "Er rutscht zwischen den Füßen durch.", worlds: ["winter_forest"] },
   ],
   carry: [
     { situation: "Der volle Becher soll zum Tisch.", reaction: "Kein Tropfen schwappt über.", everyday: true },

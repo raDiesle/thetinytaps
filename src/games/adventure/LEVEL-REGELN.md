@@ -30,8 +30,10 @@ Fehler in späteren Leveln nicht wieder passiert.
 - **Die Bewegung hat einen Sinn auf dem Weg.** Trommeln nur für einen Schmetterling war beliebig;
   jetzt sitzen Vögel auf dem Weg, und jeder Schlag scheucht einen weg, bis der Weg frei ist.
 - **Das Ende ist kurz und bleibt Bewegung mit Wirkung**, kein langes Tanzen: Tanzen bewirkt nichts
-  und trainiert nichts Bestimmtes. Schatzinsel: Arme hochstoßen, und aus jeder Pfote zischt eine
-  Rakete.
+  und trainiert nichts Bestimmtes. **Und was am Ende passiert, ergibt in der Geschichte Sinn**:
+  Raketen aus den Pfoten waren beliebig. Schatzinsel: Die Krebse tragen die Truhe an den Strand,
+  Tapsi hüpft hinunter, greift aus dem Stand tief in die Truhe und wirft die Münzen mit beiden
+  Armen hoch über sich – ein Goldregen.
 
 ## Die Welt antwortet im Takt
 
@@ -43,11 +45,20 @@ Fehler in späteren Leveln nicht wieder passiert.
   gegen die Anzahl der Dinge. Auch am Ende: Der Clip läuft eine ganze Zahl von Runden, sonst weicht
   der Fuchs zum Schluss noch aus, obwohl keine Nuss mehr kommt. Die Anzahl der Dinge aus der Länge
   rechnen, nicht von Hand (`CYCLES` in der Geschichte, ein Test prüft die ganzen Runden).
+- **Was auf den Fuchs zukommt, kommt nah und klein**: Kokosnüsse rollen genau durch die Stelle, an der
+  der Fuchs eben noch stand, und sind deutlich kleiner als er; der Schritt zur Seite ist groß. Man
+  sieht, woher sie kommen (Affen werfen sie vom Baum).
+- **Eine Station hat Abwandlungen statt immer gleich**: erst von rechts (Schritt zur Seite), dann von
+  links (linkes Bein hoch, die Nuss rollt darunter durch), dann durch die Mitte (Beine breit).
+- **Was ankommt, kommt nur, solange der Fuchs zieht**: Am Seil zieht er Hand über Hand, ruckweise,
+  und das Floß rückt bei jedem Zug ein Stück näher und steht dazwischen still (`pulledIn`). Das
+  Seil läuft von den Pfoten aus seitlich am Körper vorbei auf den Boden, nie in den Körper.
 - **Bei jeder Runde passiert etwas**, nicht nur bei manchen: Hüpft der Fuchs zehnmal, stößt er zehnmal
   mit dem Kopf an eine Kiste. Ole läuft dafür so schnell, dass bei jedem Sprung eine neue Kiste
   über Tapsi hängt.
 - **Was getroffen wird, hängt dort, wo die Pfote im Clip wirklich ankommt**: am Clip messen, nicht
-  schätzen, und seitlich vom Körper, damit man den Treffer von hinten sieht.
+  schätzen, und seitlich vom Körper, damit man den Treffer von hinten sieht. Lieber an der
+  höchsten Stelle, die die Pfote erreicht (Äpfel), damit sich das Kind richtig streckt.
 - **Die Pfoten sind an dem, was sie drehen oder halten** (Kurbel, Paddel, Angel, Schlüssel): Hand
   und Ding bewegen sich zusammen, sonst dreht sich etwas wie von Geisterhand.
 - Kein Satz behauptet, das Kind gesehen zu haben (es gibt keine Kamera).
@@ -82,6 +93,13 @@ Fehler in späteren Leveln nicht wieder passiert.
   Im Zweifel weglassen (ein Taschenriemen lief als brauner Ring durch den Fuchs). Von der Seite
   anschauen und nachmessen.
 - Der Schwanz ist klein und verdeckt keine Beine.
+- **Neigen geht mit dem Kopf**: Beim Ausweichen zur Seite (Nüsse von oben) neigt sich der Kopf
+  deutlich mit, nicht nur der Körper.
+- **Hinter durchsichtigen Dingen sieht man durch** (Spinnweben): keine weiße oder helle Fläche
+  dahinter, die wie eine Wand wirkt.
+- **Keine Felswand füllt das Bild.** In engen Buchten erst von oben nachsehen, wo die Wände sind,
+  und Figur, Truhe und Kamera so stellen, dass die Kamera frei steht und die Wand höchstens am Rand
+  zu sehen ist.
 
 ## Technik
 
