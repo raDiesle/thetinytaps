@@ -4,7 +4,6 @@ import { GUIDE_SIZE } from "../../three/guide";
 import {
   makeBasket,
   makeBush,
-  makeButterfly,
   makeChest,
   makeCloud,
   makeConfetti,
@@ -52,6 +51,7 @@ import {
 import {
   cobwebTexture,
   makeAppleTree,
+  makeBird,
   makeBobber,
   makeBridge,
   makeCoconut,
@@ -211,13 +211,14 @@ export function makeWorld(scene: THREE.Scene) {
 
   const bridge = makeBridge();
   scene.add(bridge);
-  // A star box over every jump that goes up: Ole walks on over the bridge, so each hangs where Tapsi is then.
+  // A star box over every jump: Ole walks on over the bridge, so each hangs where Tapsi is then, over
+  // the sand before the bridge or over the bridge.
   const bumps: number[] = [];
   for (let n = 0; bumpTime(n) < clipLength(S.jump) - 0.2; n++) bumps.push(bumpTime(n));
   const boxes = bumps.map((at) => {
     const box = makeStarBox();
     const z = jumpZ(at);
-    box.group.position.set(0, bridgeTop(0, z) + TURTLE_BACK + BOX_ABOVE + 0.25, z);
+    box.group.position.set(0, Math.max(groundHeight(0, z), bridgeTop(0, z)) + TURTLE_BACK + BOX_ABOVE + 0.25, z);
     scene.add(box.group);
     return box;
   });
@@ -226,21 +227,39 @@ export function makeWorld(scene: THREE.Scene) {
   swing.group.position.set(0, groundHeight(0, SWING_PIVOT_Z), SWING_PIVOT_Z);
   scene.add(swing.group);
 
-  // Two drums hanging beside Tapsi's paws; a butterfly flies up from the bushes at every beat.
+  // Two drums hanging beside Tapsi's paws; birds sit on the path ahead, and every beat scares one off.
   const drums = makeDrums();
   drums.group.position.set(0, groundHeight(0, DRUMS_Z), DRUMS_Z);
   scene.add(drums.group);
-  const butterflyColors = ["#ffd23f", "#ff7eb6", "#7bd3ff", "#b388ff", "#ffffff", "#ff9f43"];
   const beats = goes(S.drums) * 2;
   const riddleRounds = goes(S.riddle);
   const keyTurns = goes(S.key);
   /** Seconds into the key clip when the last turn opens the lock. */
   const lastTurn = KEY_PICKUP + (keyTurns - 1) * KEY_TURN + KEY_TURN * 0.45;
-  const butterflies = Array.from({ length: beats }, (_, i) => {
-    const b = makeButterfly(butterflyColors[i % butterflyColors.length]);
-    b.group.visible = false;
-    scene.add(b.group);
-    return b;
+  // A bird for every beat, on the side of its drum (even ones on Tapsi's left, -x), the nearest first.
+  const birdColors: [string, string][] = [
+    ["#ffd23f", "#ff8a1f"],
+    ["#4fb8ff", "#2f6fe8"],
+    ["#ff6f8e", "#d9435f"],
+    ["#7bd389", "#3f9e52"],
+    ["#ffffff", "#9fb0c0"],
+    ["#b388ff", "#7a52d9"],
+  ];
+  const birds = Array.from({ length: beats }, (_, n) => {
+    const bird = makeBird(...birdColors[(n * 5) % birdColors.length]);
+    const r = seeded(40 + n);
+    const side = n % 2 === 0 ? -1 : 1;
+    const z = DRUMS_Z - 1.2 - Math.floor(n / 2) * 0.22 - r() * 0.1;
+    const x = side * (0.35 + r() * 0.7);
+    const home = v3(x, groundHeight(x, z), z);
+    bird.group.position.copy(home);
+    // Big enough to see over Tapsi's shoulders.
+    bird.group.scale.setScalar(1.6);
+    // Mostly looking towards us, each a little differently.
+    const look = (r() - 0.5) * 1.6;
+    bird.group.rotation.y = look;
+    scene.add(bird.group);
+    return { ...bird, home, look, side };
   });
 
   const gate = makeGate();
@@ -422,7 +441,7 @@ export function makeWorld(scene: THREE.Scene) {
     riddleRounds,
     keyTurns,
     lastTurn,
-    butterflies,
+    birds,
     gate,
     rollers,
     monkeys,

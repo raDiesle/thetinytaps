@@ -65,10 +65,10 @@ export function surface(x: number, z: number) {
 
 /** Where things happen; z along the path. */
 export const BOAT_START = 62;
-/** How long the fishing rod is, where along it the right and the left paw hold it, and how far ahead the float lands. */
+/** How long the fishing rod is, where along it the right paw (above) and the left paw (at the end) hold it, and how far ahead the float lands. */
 export const ROD_LENGTH = 1.25;
-export const ROD_GRIP_R = 0.1;
-export const ROD_GRIP_L = 0.26;
+export const ROD_GRIP_R = 0.27;
+export const ROD_GRIP_L = 0.08;
 export const CAST_REACH = 3.6;
 /** Where the rod lies on Ole's back after the fishing (Ole's own space, x to Ole's left): along its left side, behind Tapsi. */
 export const ROD_REST = v3(0.5, 0, -0.05);
@@ -80,12 +80,15 @@ export const BEACH_Z = 32.2;
 /** On the beach, where the scorpions come. */
 export const STOMP_Z = 31.5;
 export const BROOK_FROM = 27.3;
-/** Over the brook Ole walks along the little bridge from one bank to the other, while Tapsi hops on its back. */
-export const JUMP_FROM = BROOK_FROM + 0.4;
-export const JUMP_TO = JUMP_FROM - 4.2;
 /** The little wooden bridge: where it starts and ends (z), half its width (Ole walks over it), the top of its deck at the ends and how much higher it arches in the middle. */
-export const BRIDGE_FROM = JUMP_FROM + 0.35;
-export const BRIDGE_TO = JUMP_TO - 0.35;
+export const BRIDGE_FROM = BROOK_FROM + 0.75;
+export const BRIDGE_TO = BRIDGE_FROM - 4.9;
+/**
+ * Ole walks from the sand before the bridge over it to the other bank while Tapsi hops on its back:
+ * far enough that a box hangs over every jump with room between them.
+ */
+export const JUMP_FROM = BRIDGE_FROM + 2.35;
+export const JUMP_TO = BRIDGE_TO - 0.15;
 export const BRIDGE_HALF = 0.98;
 const BRIDGE_END = 0.87;
 export const BRIDGE_ARCH = 0.12;

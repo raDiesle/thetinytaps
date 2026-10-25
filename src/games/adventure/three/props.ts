@@ -148,36 +148,6 @@ export function makePalm(height: number, seed: number) {
   return group;
 }
 
-/** A butterfly; call `flap(time)` every frame. */
-export function makeButterfly(color: string) {
-  const group = new THREE.Group();
-  const wingMat = new THREE.MeshStandardMaterial({ color, roughness: 0.4, side: THREE.DoubleSide, emissive: color, emissiveIntensity: 0.25 });
-  const body = solid(new THREE.CapsuleGeometry(0.02, 0.12, 4, 8), mat("#3b2a2a"), false);
-  body.rotation.x = Math.PI / 2;
-  group.add(body);
-  const wings: THREE.Mesh[] = [];
-  for (const side of [1, -1]) {
-    const shape = new THREE.Shape();
-    shape.moveTo(0, 0);
-    shape.bezierCurveTo(0.12 * side, 0.18, 0.28 * side, 0.12, 0.22 * side, -0.02);
-    shape.bezierCurveTo(0.26 * side, -0.14, 0.1 * side, -0.18, 0, -0.04);
-    const wing = new THREE.Mesh(new THREE.ShapeGeometry(shape, 12), wingMat);
-    wing.rotation.x = -Math.PI / 2;
-    const pivot = new THREE.Group();
-    pivot.add(wing);
-    group.add(pivot);
-    wings.push(wing);
-  }
-  return {
-    group,
-    flap(time: number) {
-      const a = Math.sin(time * 18) * 0.9;
-      wings[0].parent!.rotation.z = a;
-      wings[1].parent!.rotation.z = -a;
-    },
-  };
-}
-
 /** The turtle that carries Tapsi: how high its back is above its belly (local y), where Tapsi stands. */
 export const TURTLE_BACK = 0.45;
 /** Half the width and half the length of the shell. */

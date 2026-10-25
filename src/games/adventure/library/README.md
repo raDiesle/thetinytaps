@@ -14,15 +14,15 @@ und wie die Welt antwortet.
 | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `types.ts`                  | Datenmodell (Bewegung, Welt, Szenario, Ablauf)                                                                                                  |
 | `categories.ts`             | **Ergebnis A**: 15 Kategorien, jeweils mit dem, was _nicht_ dazugehört                                                                          |
-| `movements/*.ts`            | **Ergebnis B**: 100 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
+| `movements/*.ts`            | **Ergebnis B**: 102 Bewegungen, eine Datei pro Kategorie; `movement(id)` findet eine                                                            |
 | `worlds.ts`, `scenarios.ts` | **Ergebnis C**: 18 Welten, jede mit 7–9 Momenten; jede Bewegung kommt in mindestens einer Welt vor                                              |
-| `sequences.ts`              | **Ergebnis D**: 5 Abläufe mit 9–18 Bewegungen und Sekunden, 153–321 s lang                                                                      |
-| `situations.ts`             | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 72 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
+| `sequences.ts`              | **Ergebnis D**: 5 Abläufe mit 9–20 Bewegungen und Sekunden, 153–335 s lang                                                                      |
+| `situations.ts`             | **Ergebnis F**: Situationskatalog, je 6 typische Situationen für jede der 73 Körperbewegungen; `situationsFor(id)` findet sie für eine Bewegung |
 | diese Datei                 | **Ergebnis E**: Qualitätskontrolle                                                                                                              |
 
 Die IDs (`wave_hello`, `canoe_paddle` …) bleiben fest. Umbenennen heißt: neue ID, die alte
 bleibt bis zum Aufräumen. Jede Bewegung nennt einen `motion`-Clip; die Clips für den Fuchs
-stehen in `../three/clips/` (73 Clips, keiner fehlt): eine Datei je Körperteil (`arms.ts`, `legs.ts`,
+stehen in `../three/clips/` (74 Clips, keiner fehlt): eine Datei je Körperteil (`arms.ts`, `legs.ts`,
 `body.ts`, `whole.ts`), Bausteine und Takte in `motion.ts`.
 
 ## Neue Bewegung
@@ -50,16 +50,16 @@ Bewegungen mit diesem Clip (`push_forward` passt zu Zaubertür, Schneeball und G
 - **Welten** (`worlds`): Wo die Idee hinpasst. Bauen sich daraus neue Szenarien oder
   Abläufe, steht der Moment danach in `scenarios.ts` bzw. `sequences.ts`.
 
-Stand: 72 Clips (alle außer `idle`), 432 Situationen, davon 188 aus dem Alltag, jeder Clip mit
+Stand: 73 Clips (alle außer `idle`), 438 Situationen, davon 191 aus dem Alltag, jeder Clip mit
 mindestens zwei. Am wenigsten Ideen haben Baustelle (5) und Eisenbahn (6). Keine Idee
 verlangt mehr, als die Bewegung schon erlaubt: Es gibt kein schnelles Drehen und kein Drücken
 gegen echte Möbel, und auf Schienen balanciert niemand.
 
 ## Ergebnis E: Qualitätskontrolle
 
-Stand: 100 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
+Stand: 102 Bewegungen, keine doppelte ID, kein doppelter Name. Jedes Szenario und jeder Ablauf
 verweist nur auf vorhandene Bewegungen, und jede Bewegung hat eine Sitz-Variante
-(`adaptations.seated`). 79 Bewegungen sind „leicht“, 21 „mittel“, keine ist „schwer“.
+(`adaptations.seated`). 81 Bewegungen sind „leicht“, 21 „mittel“, keine ist „schwer“.
 
 ### Bewegungen, die sich sehr ähnlich sind
 
@@ -101,13 +101,13 @@ erzählt. Im selben Ablauf sollten sie aber nicht beide vorkommen:
 
 | Ablauf                       | Bewegungen | Dauer | Energie (r = ruhig, m = mittel, l = lebhaft) |
 | ---------------------------- | ---------- | ----- | -------------------------------------------- |
-| `treasure_island` (spielbar) | 18         | 321 s | m r m l l l l m m l r r m m r l l r          |
+| `treasure_island` (spielbar) | 20         | 335 s | r m r m r l l m l m m m r r m m r l r r      |
 | `space_trip`                 | 9          | 160 s | r m l m m m l r l                            |
 | `underwater_dive`            | 9          | 158 s | r m m m m l r m l                            |
 | `winter_forest_walk`         | 9          | 156 s | r m m m l r r l m                            |
 | `farm_morning`               | 9          | 153 s | r r m l m l m r m                            |
 
-Die 3D-Geschichte der Schatzinsel dauert länger als die 321 s der Tabelle, gut 6 Minuten. Vorher
+Die 3D-Geschichte der Schatzinsel dauert länger als die 335 s der Tabelle, gut 6 Minuten. Vorher
 zeigt eine rote Punktspur wie auf einer Schatzkarte den Weg bis zur Truhe (8 s). Danach macht
 Tapsi jede Bewegung erst einmal allein vor, bevor das Kind mitmacht (eine bis drei Runden der Bewegung, 2–5 s). Jede
 Bewegung läuft eine ganze Zahl von Runden, und zu jeder Runde gibt es ein Ziel (`CYCLES` in
@@ -116,7 +116,7 @@ Bewegung läuft eine ganze Zahl von Runden, und zu jeder Runde gibt es ein Ziel 
 können oben links pausieren und vor- oder zurückspringen, unten auf ein Bild tippen springt zu
 dieser Bewegung.
 
-Alle beginnen ruhig (die Schatzinsel mit dem Angeln, mittel), und nach jeder lebhaften Bewegung kommt bald eine ruhige. `space_trip`
+Alle beginnen ruhig (die Schatzinsel mit dem Winken), und nach jeder lebhaften Bewegung kommt bald eine ruhige. `space_trip`
 und `underwater_dive` enden lebhaft. Wenn die Geschichte vor dem Schlafen läuft, sollte dort
 noch ein ruhiger Abschied dazukommen.
 
