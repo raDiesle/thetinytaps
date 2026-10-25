@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { type Loop, loadSound, playLoop, playTuneNote } from "@/lib/sfx";
-import { SUNG_LEAD, SUNG_PART, sungLanguageOf } from "./sung";
+import { type SungTimes, sungLanguageOf } from "./sung";
 
 // The brushing songs in musik/ (see the README there). Without one, or while it is
 // still loading, the synthesized tune plays instead.
 const files = import.meta.webpackContext("./musik", { regExp: /\.mp3$/ });
+const timings = import.meta.webpackContext("./musik", { regExp: /\.json$/ });
 
 /** The bundled URL of a song file, or null when it isn't there. */
 const urlOf = (file: string) => {
@@ -33,19 +34,29 @@ const PLAIN: Song = { file: "./musik-zaehneputzen.mp3", start: 0.27, finale: 120
 
 /**
  * The sung songs by language, found by their file names: one verse per step singing
- * what is shown, a finale for the end. Every part was stretched to 8 bars at 112 BPM
- * and the first one put at SUNG_LEAD, so they share one timing and fit only the
- * two-minute brushing.
+ * what is shown, a finale for the end. Suno doesn't keep its verses equally long, so
+ * the steps follow the verses (`sungSteps`) instead of the other way round.
  */
-const SUNG: Record<string, Song> = Object.fromEntries(
+const SUNG: Record<string, Song & SungTimes> = Object.fromEntries(
   files.keys().flatMap((file) => {
     const lang = sungLanguageOf(file);
-    return lang ? [[lang, { file, start: SUNG_LEAD, finale: SUNG_LEAD + 7 * SUNG_PART, loopEnd: SUNG_LEAD + 8 * SUNG_PART }]] : [];
+    const times = file.replace(/\.mp3$/, ".json");
+    if (!lang || !timings.keys().includes(times)) return [];
+    const module = timings(times) as SungTimes | { default: SungTimes };
+    const { verses } = "default" in module ? module.default : module;
+    const finale = verses[verses.length - 1];
+    return [[lang, { file, verses, start: verses[0], finale, loopEnd: finale }]];
   }),
 );
 
 /** The languages with a sung song, for the settings. */
 export const SUNG_LANGUAGES = Object.keys(SUNG).sort();
+
+/** With the song sung in `lang`: when each step begins, in ms of brushing, and last when the brushing ends. Null without one. */
+export function sungSteps(lang: string | null): number[] | null {
+  const song = lang ? SUNG[lang] : undefined;
+  return song ? song.verses.map((t) => Math.round((t - song.start) * 1000)) : null;
+}
 
 /** Loudness of the song; mastered music is much louder than the synthesized notes. */
 const VOLUME = 0.35;

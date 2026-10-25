@@ -19,9 +19,12 @@ parts change exactly with the brushing steps, a finale on the end screen.
   one verse per step singing exactly what is shown, the voice then stays silent during
   the steps (Zähne putzen; a new language of it: `/zahnputzlied`). Keep the plain song
   as the choice "Nur Musik" and for timings the verses don't fit.
-- **Sung songs drift.** The German song asked for 112 BPM sped up to 115 by the end
-  (the instrumental one kept 112). `yarn song` then shows one average tempo; stretch
-  each part back to 8 bars with `yarn song:stretch` (see 2.) before converting.
+- **Sung songs don't keep to bars.** Asked for "8 bars per part", Suno sang verses of
+  5 to 11 bars, put whistled fills between them and sped up from 112 to 115 BPM. Never
+  take the beat grid as where the words are: hear where each verse begins
+  (`yarn song:verses`, Whisper) and let the game follow the verses. Stretching the
+  parts to 8 bars (`yarn song:stretch`) evens out tempo drift of an instrumental song
+  only.
 - **Give the user exact copy-paste blocks, one per Suno field**, numbered steps in
   the user's language. A general description ("make it loopable, ~90 s") left the
   user not knowing what to do.
