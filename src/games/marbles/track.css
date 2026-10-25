@@ -35,25 +35,12 @@
   }
 }
 
+/* Still, like the machines' finger: nothing moves before the first tap. */
 .run-hint {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: run-hint 1.1s ease-in-out infinite;
   pointer-events: none;
 }
 
-@keyframes run-hint {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-14px) scale(1.08);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .run-hint,
   .run-wrench.busy {
     animation: none;
   }

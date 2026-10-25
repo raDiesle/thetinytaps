@@ -48,41 +48,10 @@
   height: 100%;
 }
 
+/* The finger that says „tap here“ stands still: nothing moves before the child's first tap. */
 .marble-hint,
 .topple-hint {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: marble-hint 1.1s ease-in-out infinite;
   pointer-events: none;
-}
-
-.topple-hint {
-  animation-name: topple-hint;
-  animation-delay: 1.4s;
-  opacity: 0;
-  animation-fill-mode: both;
-}
-
-@keyframes marble-hint {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-14px) scale(1.08);
-  }
-}
-
-@keyframes topple-hint {
-  0%,
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(16px);
-  }
 }
 
 .thing-drop {

@@ -8,8 +8,8 @@ machines: the points-along-a-way helpers in `path.ts`, the marble and rail drawi
 
 ## Levels to join in
 
-Three levels aren't one-tap machines but let the child set off each step. None of them uses `marble-hint` (it bounces from
-the start); their first-tap hints are still.
+Three levels aren't one-tap machines but let the child set off each step. Like every level here, their first-tap hints
+stand still, so nothing moves before the child acts.
 
 „Nagelbrett“ (`PegsLevel.tsx`, numbers and physics in `pegs.ts`, K-13): an upright wooden board with seven staggered rows of nails over five bins, each with an animal waiting in it (five of frog, cow, dog, duck, cat and pig, shuffled each round). Wherever the child taps, only the x counts: a marble pops in at the top above it and falls, bouncing from nail to nail (circle against nail with a bounce and a small random push, so none balances on a nail; side walls and dividers). Each nail it hits glows and plinks a pentatonic note, higher rows higher (`playPlink`). A tap on a bin drops a marble above that bin; a key drops at its place along its keyboard row (`keySpot`, by `KeyboardEvent.code`), other keys at a random place. At most 12 marbles fall at once. In the bin the animal hops and calls, and the marble rolls to its place in a small pile (5 + 4; one more pops in sparkles). After ten marbles the level ends. Everything moves in the frame loop with no CSS animations, so the board is still before the first tap (a still marble and 👆 at the top) and again once all marbles lie. `pegs.test.ts` drops hundreds of marbles to check none gets stuck and all bins can be reached: run it after moving nails or bins.
 

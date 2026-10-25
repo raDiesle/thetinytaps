@@ -229,7 +229,8 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
             <g transform={`translate(${drumLeft + DRUM.w / 2} 0) scale(${1 + drumSquash} ${1 - drumSquash}) translate(${-DRUM.w / 2} 0)`}>
               <Drum />
             </g>
-            {phase.current !== "falling" && phase.current !== "done" && (
+            {/* Only once everything has dropped in, so the finger doesn't stand in the air before the first thing. */}
+            {phase.current === "ready" && (
               <text className="topple-hint" x={-24} y={-first.h * 0.62} fontSize={86 / SCALE} textAnchor="end" dominantBaseline="middle">
                 👉
               </text>
