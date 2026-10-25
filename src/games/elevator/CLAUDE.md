@@ -1,6 +1,6 @@
 # Kleine Abenteuer
 
-Route `/kleine-abenteuer/` (the old `/aufzug/` redirects there) · ideas N-37 and area G („Kleine Abenteuer“), in „Lebendige Stories“. Was called „Spaß im Aufzug“; the folder, the code names (`Elevator…`) and the settings key `tinytaps.elevator.v2` keep the old name so saved settings and other branches still fit.
+Route `/kleine-abenteuer/` (the old `/aufzug/` redirects there) · ideas N-37 and area G („Kleine Abenteuer“), in „Lebendige Welten“. Was called „Spaß im Aufzug“; the folder, the code names (`Elevator…`) and the settings key `tinytaps.elevator.v2` keep the old name so saved settings and other branches still fit.
 
 Picture adventures of a few minutes for 2–3-year-olds. Two kinds of levels, all picked on the start screen and again on picture cards at the end (`cards.tsx`):
 
