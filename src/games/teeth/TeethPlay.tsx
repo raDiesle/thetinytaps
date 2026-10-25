@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } 
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { MenuIcon } from "@/components/GameEnd";
 import { useLeaveGame } from "@/components/GameShell";
-import { useBackgroundMusicNow, useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
 import { playChime, playCountNote, playDrumRoll, playPoof, playSqueak, playTusch } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
@@ -198,9 +198,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
-  // On the way to the sink the shared background song plays at once; the brushing has its own song (or none, when it is switched off).
+  // On the way to the sink the shared background song runs on from the menu; the brushing has its own song (or none, when it is switched off).
   const preludeSong = settings.music && before !== null && !paused;
-  useBackgroundMusicNow(preludeSong);
   useNoBackgroundMusic(!preludeSong);
   // The sung song sings the steps, so the voice leaves them to it.
   const sung = useBrushingMusic({

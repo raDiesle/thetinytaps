@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router";
 import { App } from "./App";
+import { BackgroundMusic } from "./components/BackgroundMusic";
 import { ScreenHint } from "./components/ScreenHint";
 import { downloadMusicIfOn } from "./lib/musicFile";
 import { setUpPwa } from "./lib/pwa";
@@ -16,6 +17,7 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <App />
       <ScreenHint />
+      <BackgroundMusic />
     </BrowserRouter>
   </StrictMode>,
 );

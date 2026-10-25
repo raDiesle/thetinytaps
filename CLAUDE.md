@@ -26,7 +26,9 @@ In a fresh worktree run `yarn install` first.
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
   is done: `yarn verify`, commit on the branch, merge into **local** `main` without asking,
-  never push (and don't offer to – pushing is the user's move).
+  never push (and don't offer to – pushing is the user's move). Each session may run a dev server on its own
+  port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
+  the user once checked another session's server by mistake.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
@@ -135,10 +137,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   options on the home page. Bump the key's `.vN` only when old values would break.
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
-- Music: `GameShell` plays one background song in every game from the child's first tap
-  (`src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
+- Music: one background song plays behind the menus and every game from the first tap or key of the visit
+  (`src/components/BackgroundMusic.tsx`, mounted once in `index.tsx`, so it runs on without a break from the
+  menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
-  calls `useNoBackgroundMusic()`; song files are named `musik-*.mp3`, see `/musik-erzeugen`.
+  calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
+  song files are named `musik-*.mp3`, see `/musik-erzeugen`. The shared options (`useCommonSettings`) are one
+  store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
   "Bitte quer halten" while the device stands upright, and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.

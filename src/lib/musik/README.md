@@ -1,6 +1,6 @@
 # Musik im Hintergrund
 
-`musik-hintergrund.mp3` is the background song of all games (`../backgroundMusic.ts`,
+`musik-hintergrund.mp3` is the background song of the menus and all games (`../backgroundMusic.ts`,
 downloaded in `../musicFile.ts`), except games with music of their own or a reason to
 stay quiet. It was made for Lebendige Bilder. Without it there is no music.
 
