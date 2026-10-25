@@ -8,7 +8,8 @@ kindergarten stories – pushed, kicked, toy taken, slide full, wanting a toy,
 angry yourself (`kita.ts`, `KitaPlay.tsx`): what happened, then the child picks
 the good next steps and sees the not-so-good idea too. Above the mode cards the
 grown-up picks one feeling of the bear or all in turn (`settings.feeling`), and one
-kindergarten story or all (`settings.situation`).
+kindergarten story or all (`settings.situation`). A picked one comes first, then
+„Weiter“ goes on with the next ones in list order, so it never repeats the same.
 
 Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
