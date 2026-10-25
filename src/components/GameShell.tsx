@@ -29,6 +29,8 @@ export interface GameMode {
   title: string;
   /** Drawn bigger and across the whole row, e.g. for "all of them in turn". */
   featured?: boolean;
+  /** A small tag for the parent, what sort of level it is when a game has several (e.g. „🛗 Aufzug“). */
+  kind?: string;
 }
 
 interface GameShellProps {
@@ -187,6 +189,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
                     {m.emoji}
                   </span>
                   <span className="game-title">{m.title}</span>
+                  {m.kind && <span className="mode-kind">{m.kind}</span>}
                   <span className="game-go" aria-hidden>
                     ▶
                   </span>

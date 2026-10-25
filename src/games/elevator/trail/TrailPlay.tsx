@@ -11,6 +11,7 @@ import type { ElevatorSettings } from "../settings";
 import { allStations, groundY, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
 import type { Climb, Cue, Flight, Fork, Moment, Obstacle, Pickup, Point, Station, TrailLevel, Way } from "./types";
+import { WORRIES } from "./worries";
 import "./trail.css";
 
 const VIEW_W = 1600;
@@ -108,6 +109,19 @@ function InPack({ picture }: { picture: Picture }) {
   return <g transform={`translate(0 ${Math.min(24, picture.h * s * 0.25)}) scale(${s})`}>{picture.draw()}</g>;
 }
 
+/** How big the ring round a thing lying in the world is: about as big as the thing. */
+const ringOf = (picture: Picture) => Math.min(110, Math.max(56, Math.max(picture.w, picture.h) / 2 + 14));
+
+/** A dashed yellow ring round the thing the next tap picks up, in the world and in the backpack on the screen. */
+function WantRing({ at: [x, y], r }: { at: Point; r: number }) {
+  return (
+    <g className="tl-want">
+      <circle cx={x} cy={y} r={r} stroke={INK} strokeWidth="13" />
+      <circle cx={x} cy={y} r={r} stroke="#ffd43b" strokeWidth="7" />
+    </g>
+  );
+}
+
 /** A small key of the keyboard, drawn around its middle; `on` while it does something now, `down` while it is held. */
 function KeyCap({ x, y, w, on, down, children }: { x: number; y: number; w: number; on: boolean; down: boolean; children: ReactNode }) {
   return (
@@ -128,6 +142,9 @@ interface Next {
   ghost: Point;
   pose: Pose;
   icon: ItemId | "walk" | "climb";
+  /** Where the thing lies that the tap picks up: a yellow ring goes round it, and its pale picture waits in the
+   * backpack where it will go. */
+  at?: Point;
 }
 
 /** The picture on the action button for what the next tap does. */
@@ -187,8 +204,9 @@ interface View {
   shake: number;
   /** The action button waits for a tap; `nudge` makes it jump anew, `next` shows what the tap will do. */
   action: { nudge: number; next: Next } | null;
-  /** The thought bubble with the goal; `nudge` counts the reminders. */
-  bubble: { nudge: number } | null;
+  /** A thought bubble: the child's (`at` null) with the goal when it goes away, or at an obstacle why a thing helps –
+   * the child's worry, or the creature's wish above its head at `at`. `nudge` counts the reminders. */
+  bubble: { picture: Picture; at: Point | null; nudge: number } | null;
   /** At a fork: the child picks a way by its sign; each shows where it goes first. `nudge` makes the signs hop. */
   fork: { id: string; ways: Next[]; nudge: number } | null;
   party: boolean;
@@ -484,7 +502,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
 
   /** What the first tap at `station` does: for stairs, walking there and up the first half of the steps. */
   const nextOf = (station: Station, on = ground.current): Next => {
-    if (station.kind === "pickup") return nextAt(station.x, "take", station.item, on);
+    if (station.kind === "pickup") return { ...nextAt(station.x, "take", station.item, on), at: station.at };
     if (station.kind === "moment") return nextAt(station.x, station.pose, "walk", on);
     if (station.kind === "obstacle") return nextAt(station.x, "stand", "walk", on);
     const half = station.steps.slice(0, Math.ceil(station.steps.length / 2));
@@ -492,18 +510,19 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   };
 
   /** The action button lights up until the child taps (it, anywhere, or any key), and footprints and the child's
-   * ghost show where the tap takes it; after a while it jumps again and the bubble reminds the child of the goal. */
+   * ghost show where the tap takes it; after a while the button jumps and the footprints and the ghost come again.
+   * The reminder shows only the next step, never the goal at the end: that is far away and doesn't help now. */
   const go = async (next: Next) => {
     put({ action: { nudge: 0, next } });
     let stop = () => {};
     const nudge = () => {
-      put((v) => ({ action: v.action && { ...v.action, nudge: v.action.nudge + 1 }, bubble: v.bubble ? { nudge: v.bubble.nudge + 1 } : { nudge: 0 } }));
+      put((v) => ({ action: v.action && { ...v.action, nudge: v.action.nudge + 1 } }));
       stop = later(NUDGE_MS, nudge);
     };
     stop = later(NUDGE_MS, nudge);
     await nextTap();
     stop();
-    put({ action: null, bubble: null });
+    put({ action: null });
   };
 
   // Each station starts with a tap that walks there, unless the child already tapped its way at a fork (`picked`).
@@ -527,13 +546,16 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const obstacle = async (station: Obstacle, picked: boolean) => {
     if (!picked) await go(nextOf(station));
     await walkTo(station.x);
-    put({ here: station.id, choosing: true, shake: viewRef.current.shake + 1 });
+    // Why a thing helps: the creature thinks of what it wants, or the child of what would happen.
+    const { why } = station;
+    const bubble = "wants" in why ? { picture: ITEMS[station.need], at: why.wants, nudge: 0 } : { picture: WORRIES[why.worry], at: null, nudge: 0 };
+    put({ here: station.id, choosing: true, shake: viewRef.current.shake + 1, bubble });
     cue(station.meet);
     say(station.ask);
     for (;;) {
       let stop = () => {};
       const nudge = () => {
-        put((v) => ({ hint: station.need, shake: v.shake + 1 }));
+        put((v) => ({ hint: station.need, shake: v.shake + 1, bubble: v.bubble && { ...v.bubble, nudge: v.bubble.nudge + 1 } }));
         say(station.ask);
         stop = later(NUDGE_MS, nudge);
       };
@@ -557,7 +579,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
       await packAway(item, slot);
       put({ nope: null, hint: station.need, choosing: true });
     }
-    put((v) => ({ carry: null, done: [...v.done, station.id] }));
+    put((v) => ({ carry: null, done: [...v.done, station.id], bubble: null }));
     cue(station.sounds);
     say(station.done);
     await wait(500);
@@ -668,7 +690,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     kid({ pose: "shake" });
     await flyGoal(level.away, null);
     kid({ pose: "stand" });
-    put({ bubble: { nudge: 0 } });
+    put({ bubble: { picture: theGoal, at: null, nudge: 0 } });
     say(level.away.say);
     await wait(1800);
     put({ bubble: null });
@@ -706,7 +728,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const showHint = () => {
     if (viewRef.current.fork) return put((v) => ({ fork: v.fork && { ...v.fork, nudge: v.fork.nudge + 1 } }));
     const here = allStations(level).find((s) => s.id === viewRef.current.here);
-    if (here?.kind === "obstacle") put((v) => ({ hint: here.need, shake: v.shake + 1 }));
+    if (here?.kind === "obstacle") put((v) => ({ hint: here.need, shake: v.shake + 1, bubble: v.bubble && { ...v.bubble, nudge: v.bubble.nudge + 1 } }));
   };
 
   /** A way was picked at a fork: by its sign, its ghost, or the key 1 / 2. */
@@ -771,6 +793,10 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
   const next = view.action?.next;
   /** Where the next tap may take the child: one way, or both at a fork. */
   const shown = next ? [next] : (view.fork?.ways ?? []);
+  /** Bumped by the reminders: the footprints, the ghost and the ring come again. */
+  const again = view.action?.nudge ?? 0;
+  /** The free place in the backpack where the next thing goes, when the next tap picks one up. */
+  const packing = next?.at && next.icon !== "walk" && next.icon !== "climb" ? { item: next.icon, slot: view.bag.indexOf(null) } : null;
   const forks = level.stations.filter((s): s is Fork => s.kind === "fork");
   const { bagBox, slots, action, actionBox } = hud.current;
   const [bx, , bw] = bagBox;
@@ -811,7 +837,8 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
           </g>
           {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
           {shown.map((n, w) => (
-            <g key={`${n.ghost}`} className="tl-next">
+            <g key={`${n.ghost}-${again}`} className="tl-next">
+              {n.at && n.icon !== "walk" && n.icon !== "climb" && <WantRing at={n.at} r={ringOf(ITEMS[n.icon])} />}
               {n.prints.map(([x, y], i) => (
                 <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
               ))}
@@ -859,11 +886,16 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} backpack={view.pack} />
             </g>
-            {view.bubble && <ThoughtBubble picture={GOALS[level.goal]} height={KID_H} nudge={view.bubble.nudge} />}
+            {view.bubble && !view.bubble.at && <ThoughtBubble picture={view.bubble.picture} height={KID_H} nudge={view.bubble.nudge} />}
           </g>
           <g ref={carryFront} className="tl-carry">
             {carry}
           </g>
+          {view.bubble?.at && (
+            <g transform={`translate(${view.bubble.at[0]} ${view.bubble.at[1]})`}>
+              <ThoughtBubble picture={view.bubble.picture} height={0} nudge={view.bubble.nudge} right />
+            </g>
+          )}
         </g>
 
         <ActionButton
@@ -927,6 +959,15 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
                 </g>
               );
             })}
+            {/* The thing the next tap picks up, pale and ringed like in the world, already over where it will go */}
+            {packing && slots[packing.slot] && (
+              <g key={again} transform={`translate(${slots[packing.slot][0]} ${slots[packing.slot][1] - 30})`}>
+                <WantRing at={[0, -50]} r={62} />
+                <g className="tl-pack-ghost">
+                  <InPack picture={ITEMS[packing.item]} />
+                </g>
+              </g>
+            )}
             {/* The front with a pocket under each thing: its number key on a computer, a buckle on a tablet */}
             <path
               d={`M${bx + 34} ${RIM} H${bx + bw - 34} Q${bx + bw - 24} ${RIM} ${bx + bw - 26} ${RIM + 18} L${bx + bw - 32} 872 Q${bx + bw - 36} 888 ${bx + bw - 60} 888 H${bx + 60} Q${bx + 36} 888 ${bx + 32} 872 L${bx + 26} ${RIM + 18} Q${bx + 24} ${RIM} ${bx + 34} ${RIM} Z`}

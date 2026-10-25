@@ -362,6 +362,20 @@ kbd {
   font-size: 1.35rem;
 }
 
+/* What sort of level a card is, small in its top-left corner (the "zuletzt" badge is in the right one). */
+.mode-kind {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  padding: 2px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* The one card above the rest ("all of them in turn"): a whole row, in rainbow stripes. */
 .mode-list .mode-featured {
   grid-column: 1 / -1;

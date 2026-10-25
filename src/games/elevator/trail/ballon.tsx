@@ -259,12 +259,6 @@ function Ducks({ done, here, nope }: SceneryProps) {
       {[1606, 1620, 1848].map((x, i) => (
         <path key={x} d={`M${x} 718 Q${x - 4} ${680 - i * 8} ${x + 4} ${666 - i * 6}`} stroke="#2f9e44" strokeWidth="5" fill="none" strokeLinecap="round" />
       ))}
-      {solved &&
-        [
-          [1690, 712],
-          [1770, 716],
-          [1740, 706],
-        ].map(([x, y]) => <ellipse key={x} cx={x} cy={y} rx="8" ry="5" fill="#e8a35c" stroke={INK} strokeWidth="2" />)}
       <g transform="translate(1560 740)">
         <g className={`tl-ballon-ducks${solved ? " done" : ""}`}>
           <Nope id="ducks" nope={nope}>
@@ -274,6 +268,30 @@ function Ducks({ done, here, nope }: SceneryProps) {
               <Duck x={156} s={0.75} body="#ffd43b" beak="#ff922b" />
             </g>
           </Nope>
+          {/* The bread lies at the big duck's beak, a crumb at each small one's; they peck it up bite by bite */}
+          {solved && (
+            <>
+              <g transform="translate(-84 0) scale(0.6)">
+                <g className="tl-bites">
+                  <Bread />
+                </g>
+              </g>
+              {[56, 116].map((x, i) => (
+                <ellipse
+                  key={x}
+                  cx={x}
+                  cy="-5"
+                  rx="11"
+                  ry="6"
+                  fill="#e8a35c"
+                  stroke={INK}
+                  strokeWidth="2.5"
+                  className="tl-bites"
+                  style={{ animationDelay: `${0.7 + i * 0.4}s` }}
+                />
+              ))}
+            </>
+          )}
         </g>
       </g>
     </g>
@@ -466,7 +484,9 @@ function Church({ done, here, nope }: SceneryProps) {
       <rect x="4570" y="190" width="200" height="16" rx="4" fill={STONE} stroke={INK} strokeWidth="4" />
       {solved && (
         <g transform="translate(4634 196) rotate(-80) scale(0.55)">
-          <Sunflower />
+          <g className="tl-bites late">
+            <Sunflower />
+          </g>
         </g>
       )}
       {/* The dove, looking left; its string goes to the balloon until it lets go */}

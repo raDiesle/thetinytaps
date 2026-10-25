@@ -9,6 +9,10 @@ import { TRAIL_LEVELS } from "./trail/levels";
 import { TrailPlay } from "./trail/TrailPlay";
 import "./elevator.css";
 
+/** The small tags on the cards: which levels ride the lift in the house, which walk through the world. */
+const LIFT = "🛗 Aufzug";
+const TRAIL = "🚶 Laufen";
+
 /** "Kleine Abenteuer": the lift stories in the house and the trail levels through the world. */
 export function ElevatorGame() {
   const [settings, update] = useGameSettings(ELEVATOR_SETTINGS_KEY, DEFAULT_ELEVATOR_SETTINGS);
@@ -19,13 +23,13 @@ export function ElevatorGame() {
       title="Kleine Abenteuer"
       emoji="🧭"
       modes={[
-        { id: "hunger", emoji: "🥞", title: "Pfannkuchen" },
-        { id: "gutenacht", emoji: "🌙", title: "Gute Nacht" },
-        { id: "pfuetzen", emoji: "🌧️", title: "Pfützen" },
-        { id: "drachen", emoji: "🪁", title: "Der Drachen" },
-        { id: "ball", emoji: "⚽", title: "Der Ball rollt weg" },
-        { id: "ballon", emoji: "🎈", title: "Der Luftballon" },
-        { id: "lok", emoji: "🚂", title: "Die kleine Lok" },
+        { id: "hunger", emoji: "🥞", title: "Pfannkuchen", kind: LIFT },
+        { id: "gutenacht", emoji: "🌙", title: "Gute Nacht", kind: LIFT },
+        { id: "pfuetzen", emoji: "🌧️", title: "Pfützen", kind: LIFT },
+        { id: "drachen", emoji: "🪁", title: "Der Drachen", kind: TRAIL },
+        { id: "ball", emoji: "⚽", title: "Der Ball rollt weg", kind: TRAIL },
+        { id: "ballon", emoji: "🎈", title: "Der Luftballon", kind: TRAIL },
+        { id: "lok", emoji: "🚂", title: "Die kleine Lok", kind: TRAIL },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}

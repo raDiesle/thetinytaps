@@ -51,6 +51,34 @@
   animation: tl-ghost-in 0.5s ease-out both;
 }
 
+/* The thing the next tap picks up: a dashed yellow ring round it in the world, and its pale picture already in the
+   backpack where it will go. */
+.tl-want {
+  animation: tl-want 0.9s ease-in-out infinite alternate;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.tl-want circle {
+  fill: none;
+  stroke-dasharray: 22 12;
+  stroke-linecap: round;
+}
+
+/* The child's head in a worry picture frowns, like when it shakes its head, but keeps still. */
+.tl-worry .el-nope-face {
+  opacity: 1;
+}
+
+.tl-worry .el-smile {
+  opacity: 0;
+}
+
+.tl-pack-ghost {
+  pointer-events: none;
+  animation: tl-pack-ghost 0.9s ease-in-out infinite alternate;
+}
+
 /* ---------- A fork: two picture signs, one per way ---------- */
 
 .tl-way-face {
@@ -214,6 +242,17 @@
   animation: tl-munch 0.5s ease-in-out 6 alternate;
 }
 
+.tl-bites {
+  animation: tl-bites 1.8s steps(1, end) 0.4s both;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+
+/* The hen and the dove first hop down to their food. */
+.tl-bites.late {
+  animation-delay: 1.5s;
+}
+
 .tl-chew {
   animation: tl-shrink 3s ease-in both;
   transform-box: fill-box;
@@ -370,6 +409,26 @@
   }
 }
 
+@keyframes tl-want {
+  from {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes tl-pack-ghost {
+  from {
+    opacity: 0.3;
+  }
+  to {
+    opacity: 0.75;
+  }
+}
+
 @keyframes tl-print-in {
   from {
     opacity: 0;
@@ -481,6 +540,23 @@
   }
 }
 
+/* Food an animal pecks at gets smaller bite by bite until it is gone. */
+@keyframes tl-bites {
+  0% {
+    transform: scale(1);
+  }
+  33% {
+    transform: scale(0.7);
+  }
+  66% {
+    transform: scale(0.42);
+  }
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
 @keyframes tl-shrink {
   to {
     transform: scale(0.1);
@@ -540,12 +616,17 @@
   transition: transform 1.4s ease-in-out;
 }
 
-/* With the bread, the ducks waddle into the pond and dip for the crumbs. */
+/* With the bread, the ducks peck it up piece by piece where it fell, then waddle into the pond. */
 .tl-ballon-ducks.done {
   transform: translate(150px, -30px) scale(0.7);
+  transition-delay: 2.3s;
 }
 
-.tl-ballon-ducks.done .tl-ballon-duck-head,
+.tl-ballon-ducks.done .tl-ballon-duck-head {
+  transform-origin: -14px -50px;
+  animation: tl-ballon-peck 0.3s ease-in-out 0.1s 8 alternate;
+}
+
 .tl-ballon-dove.done .tl-ballon-dove-head {
   animation: tl-munch 0.4s ease-in-out 1.4s 8 alternate;
 }
@@ -571,6 +652,13 @@
   transform-box: fill-box;
   transform-origin: bottom left;
   animation: tl-wag 0.3s ease-in-out 1.4s 10 alternate;
+}
+
+/* A duck's head dips down to the bread at its feet, turning at the neck. */
+@keyframes tl-ballon-peck {
+  to {
+    transform: rotate(-55deg);
+  }
 }
 
 @keyframes tl-ballon-spray {
