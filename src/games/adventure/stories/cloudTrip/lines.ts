@@ -45,10 +45,8 @@ export const LINES: StepLines[] = [
   },
   {
     icon: "🪑",
-    situation: "Jetzt fliegt Wolle ganz schnell.",
-    instruction: "Wir setzen uns hin – ganz langsam, so.",
-    turn: "Jetzt du – setz dich hin!",
-    praise: "Gut festhalten. Los geht's!",
+    instruction: "Jetzt wird's schnell! Setz dich mit mir hin – so!",
+    praise: "Gut festhalten!",
   },
   {
     icon: "⭐",
@@ -60,10 +58,8 @@ export const LINES: StepLines[] = [
   },
   {
     icon: "🧍",
-    situation: "Da vorne ist die Regenwolke.",
-    instruction: "Wir stehen auf – ganz langsam, so.",
-    turn: "Jetzt du – steh auf!",
-    praise: "Jetzt holen wir die Sonne raus!",
+    instruction: "Da ist die Regenwolke! Steh mit mir auf – so!",
+    praise: "Jetzt holen wir die Sonne!",
   },
   {
     icon: "🌧️",

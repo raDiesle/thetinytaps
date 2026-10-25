@@ -4,29 +4,46 @@ import { de } from "@/content/de";
 import { useCommonSettings, useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { AdventurePlay } from "./AdventurePlay";
-import { ADVENTURE_SETTINGS_KEY, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
+import { ADVENTURE_SETTINGS_KEY, type AdventureStoryId, carryOverAdventureSettings, DEFAULT_ADVENTURE_SETTINGS } from "./settings";
+import { CLOUD_TRIP } from "./stories/cloudTrip";
+import type { Story } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 
 carryOverAdventureSettings();
+
+/** The stories on the start screen, each a card. */
+const STORIES: { id: AdventureStoryId; emoji: string; story: Story }[] = [
+  { id: "schatzinsel", emoji: "🏝️", story: TREASURE_ISLAND },
+  { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP },
+];
 
 export function AdventureGame() {
   const [settings, update] = useGameSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
   const { touchOnly } = useDevice();
-  const story = TREASURE_ISLAND;
+  const story = (STORIES.find((s) => s.id === settings.story) ?? STORIES[0]).story;
 
   return (
     <GameShell
       title="Bewegungsabenteuer"
       emoji="🏝️"
-      modes={[{ id: "normal", emoji: "🏝️", title: "Die Schatzinsel" }]}
+      modes={STORIES.map((s) => ({ id: s.id, emoji: s.emoji, title: s.story.sequence.title }))}
+      mode={settings.story}
+      onMode={(id) => update({ story: id as AdventureStoryId })}
       settings={
-        <SettingsGroup title="Die Schatzinsel">
+        <SettingsGroup title="Bewegungsabenteuer">
           <p className="setting-note">
-            Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit: Paddeln, über eine kleine Brücke hüpfen und mit dem
-            Kopf an Sternkisten stoßen, sich unter einem schaukelnden Ast ducken, Blumen mit den Armen öffnen, Kokosnüssen ausweichen, Spinnweben wegwedeln, die
-            Schatztruhe am Seil heranziehen und zum Schluss Stopptanz am Strand: Hört die Musik auf, frieren Tapsi, der Papagei und die Krebse ein. Die Welt
-            reagiert von selbst im Takt der Bewegung – es gibt keine Kamera und kein „falsch“.
+            Der kleine Fuchs Tapsi zeigt jede Bewegung vor, und das Kind macht sie vor dem Bildschirm mit. Die Welt reagiert von selbst im Takt der Bewegung –
+            es gibt keine Kamera und kein „falsch“.
+          </p>
+          <p className="setting-note">
+            🏝️ Die Schatzinsel: angeln, paddeln, über eine kleine Brücke hüpfen und mit dem Kopf an Sternkisten stoßen, sich unter einem schaukelnden Baumstamm
+            ducken, trommeln, Kokosnüssen ausweichen, Spinnweben wegwedeln, die Truhe am Seil heranziehen und zum Schluss das Gold hochwerfen.
+          </p>
+          <p className="setting-note">
+            ☁️ Die Wolkenreise: Tapsi fliegt auf der kleinen Wolke Wolle in den Himmel – flattern wie ein Vogel, sich unter Spielzeugflugzeugen ducken,
+            Luftballons antippen, im Sitzen in die Kurven lehnen und Sterne holen, die Regenwolke hochdrücken, bis die Sonne lacht, und mit den Armen einen
+            Regenbogen malen.
           </p>
           <p className="setting-note">
             Am besten auf einem großen Bildschirm, mit etwas Platz um das Kind herum (Arme ausbreiten, ein Schritt zur Seite). Niemand muss tippen.

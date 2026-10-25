@@ -2,8 +2,8 @@ import * as THREE from "three";
 
 // The way of "Die Wolkenreise", from the meadow at +z into the sky towards -z:
 // meadow 40 · up into the sky until 33 · little planes 26 · balloons 19 ·
-// sitting down 14 · the curves round the cloud towers until -14 · getting up
-// -16 · the rain cloud with the sun behind it -24, where the rainbow is painted.
+// sitting down 15 · the curves round the cloud towers until -21 · slowing down
+// and getting up · the rain cloud with the sun behind it -30, where the rainbow is painted.
 // Wolle flies straight along x = 0; only in the curves does it swing out.
 //
 // Shared by the scenery and the story: heights, positions along the way, small maths helpers.
@@ -45,20 +45,18 @@ export const DUCK_Z = 26;
 /** Where the balloons float up. */
 export const BALLOON_Z = 19;
 /** Where Tapsi sits down, and where the curves begin. */
-export const SIT_Z = 14;
+export const SIT_Z = 15;
 /** Where the curves end. */
-export const CURVES_TO = -14;
+export const CURVES_TO = -21;
 /** How far Wolle swings out to either side in the curves. */
-export const CURVE_SWING = 1.6;
-/** Where Tapsi gets up again. */
-export const STAND_Z = -16;
+export const CURVE_SWING = 0.9;
 /** Under the rain cloud: pushing it up, painting the rainbow, cheering and waving goodbye. */
-export const SUN_Z = -24;
+export const SUN_Z = -30;
 
-/** The sun, hidden in the rain cloud ahead and above. */
-export const SUN = v3(0, ALT + 10, SUN_Z - 22);
+/** The sun, hidden in the rain cloud ahead, above and a little to the right, clear of the rainbow's top. */
+export const SUN = v3(6, ALT + 13, SUN_Z - 20);
 export const SUN_RADIUS = 3.2;
-/** How far apart the grey puffs of the rain cloud sit, one after the other up towards the sun. */
+/** How far apart the grey puffs hanging down from the rain cloud sit, one above the other. */
 export const PUFF_GAP = 1.15;
 /** The size of the grey puffs Tapsi pushes away. */
 export const PUFF_RADIUS = 0.85;

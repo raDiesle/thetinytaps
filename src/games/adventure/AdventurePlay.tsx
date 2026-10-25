@@ -183,7 +183,7 @@ export function AdventurePlay({ story, speechLang, settings }: { story: Story; s
       <ol className="adventure-route" aria-label={story.sequence.title}>
         {story.sequence.steps.map((s, i) => (
           <li key={i} className={pointing !== null ? (i === pointing ? "now" : "") : i < step ? "done" : i === step ? "now" : ""}>
-            <button type="button" title={movement(s.movement).name} onClick={() => jump((p) => p.jump(i))}>
+            <button type="button" title={s.name ?? movement(s.movement).name} onClick={() => jump((p) => p.jump(i))}>
               {story.lines[i].icon}
             </button>
           </li>

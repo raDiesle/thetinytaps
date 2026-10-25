@@ -1,5 +1,5 @@
-// Result D: five playable sequences of about three minutes each. The first,
-// treasure_island, is the one with a 3D story (../stories/treasureIsland/).
+// Result D: playable sequences of about three minutes each. Two have a 3D story:
+// treasure_island (../stories/treasureIsland/) and cloud_trip (../stories/cloudTrip/).
 import type { Sequence } from "./types";
 
 export const SEQUENCES: Sequence[] = [
@@ -208,9 +208,9 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "sit_down",
-        seconds: 8,
+        seconds: 4.5,
         energy: "calm",
-        situation: "Tapsi setzt sich langsam auf Wolle und wartet, bis das Kind auch sitzt.",
+        situation: "Tapsi setzt sich auf Wolle, das Kind gleich mit; sobald beide sitzen, geht es weiter.",
         transition: "Wolle saust los, zwischen hohen Wolkentürmen hindurch.",
       },
       {
@@ -223,9 +223,9 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "stand_up",
-        seconds: 7.5,
+        seconds: 4.3,
         energy: "calm",
-        situation: "Tapsi steht langsam auf Wolle auf und wartet, bis das Kind auch steht.",
+        situation: "Tapsi zieht die Knie an, beugt sich vor und steht auf Wolle auf, das Kind gleich mit; sobald beide stehen, geht es weiter.",
         transition: "Wolle fliegt unter die Regenwolke, es regnet.",
       },
       {
@@ -246,10 +246,10 @@ export const SEQUENCES: Sequence[] = [
       },
       {
         movement: "hooray_arms",
-        seconds: 10,
+        seconds: 10.6,
         energy: "lively",
-        situation: "Arme hoch und hüpfen: Wolle federt bei jedem Sprung, die Sonne lacht und strahlt.",
-        transition: "Wolle dreht sich um, nach Hause.",
+        situation: "Wolle dreht sich mit Tapsi zu uns um. Arme hoch und hüpfen: Wolle federt bei jedem Sprung, die Sonne lacht und strahlt.",
+        transition: "Zeit, nach Hause zu fliegen.",
       },
       {
         movement: "wave_hello",
