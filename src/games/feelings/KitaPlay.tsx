@@ -15,11 +15,11 @@ interface Run {
   situation: Situation;
   phase: Phase;
   stepsDone: number;
-  /** The not-so-good idea was tried already. */
+  /** The not-so-good idea next to this step was tried already. */
   tried: boolean;
   /** The not-so-good idea is shown crossed out right now. */
   trying: boolean;
-  /** Whether the not-so-good idea sits left of the good one. */
+  /** Whether the not-so-good idea sits left of the good one; mixed anew for every step. */
   insteadFirst: boolean;
   /** Beats are playing; buttons wait. */
   busy: boolean;
@@ -50,11 +50,18 @@ function freshRun(situation: Situation, key: number): Run {
 /** The big picture for this moment: what happened, the step the bear just did, the not-so-good idea, or the happy end. */
 function pictureName({ situation, phase, stepsDone, trying }: Run): string {
   const { id, steps } = situation;
-  if (trying) return storyImages.instead(id);
+  if (trying) return storyImages.instead(id, stepsDone);
   if (phase === "outro" || phase === "done") {
     return imageFor(storyImages.end(id)) ? storyImages.end(id) : storyImages.step(id, steps.length - 1);
   }
   return stepsDone > 0 ? storyImages.step(id, stepsDone - 1) : storyImages.problem(id);
+}
+
+/** What the big picture shows, in a few words for grown-ups. */
+function pictureCaption({ situation, phase, stepsDone, trying }: Run): string {
+  if (trying) return situation.steps[stepsDone].instead.caption;
+  if (phase === "outro" || phase === "done") return situation.endCaption;
+  return stepsDone > 0 ? situation.steps[stepsDone - 1].caption : situation.caption;
 }
 
 export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
@@ -64,7 +71,6 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   const [run, setRun] = useState<Run>(() => freshRun(situations[0], nextKey.current++));
   const { later, clearAll } = useTimers();
   const { say, sound } = useVoice(settings);
-  const choose = settings.answers === "choose";
 
   /** Plays the beats one after another, then calls `then`. */
   const playBeats = useCallback(
@@ -97,9 +103,8 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
       clearAll();
       preloadImages([
         storyImages.problem(situation.id),
-        storyImages.instead(situation.id),
         storyImages.end(situation.id),
-        ...situation.steps.map((_, i) => storyImages.step(situation.id, i)),
+        ...situation.steps.flatMap((_, i) => [storyImages.step(situation.id, i), storyImages.instead(situation.id, i)]),
       ]);
       setRun(freshRun(situation, nextKey.current++));
       playBeats(situation.intro, () => {
@@ -133,10 +138,11 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
       const { situation } = run;
       const step = situation.steps[i];
       setRun((r) => ({ ...r, stepsDone: i + 1 }));
-      // Choosing between a good and a not-so-good idea: the good one gets a happy chime.
-      if (choose && i === 0) sound("chime");
+      // The good idea gets a happy chime.
+      sound("chime");
       playBeats(step.beats, () => {
         if (i + 1 < situation.steps.length) {
+          setRun((r) => ({ ...r, tried: false, insteadFirst: Math.random() < 0.5 }));
           ask(NEXT_QUESTION);
           return;
         }
@@ -144,11 +150,11 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
         playBeats(situation.outro, () => setRun((r) => ({ ...r, phase: "done", busy: false })));
       });
     },
-    [run, choose, sound, playBeats, ask],
+    [run, sound, playBeats, ask],
   );
 
   const tryInstead = useCallback(() => {
-    const { answer } = run.situation.instead;
+    const { answer } = run.situation.steps[run.stepsDone].instead;
     setRun((r) => ({ ...r, tried: true, trying: true, busy: true }));
     say(answer);
     sound("yuck");
@@ -156,24 +162,21 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   }, [run, say, sound, later, settings.speech]);
 
   const ready = run.phase === "steps" && !run.busy;
-  const offerInstead = choose && run.phase === "steps" && run.stepsDone === 0;
 
-  // The two buttons a child can choose from first, left to right.
-  const firstChoices = run.insteadFirst ? [tryInstead, () => doStep(0)] : [() => doStep(0), tryInstead];
+  // The two buttons a child can choose from, left to right.
+  const goodStep = () => doStep(run.stepsDone);
+  const choices = run.insteadFirst ? [tryInstead, goodStep] : [goodStep, tryInstead];
 
+  // The arrow keys pick the left or right card; every other key picks the good idea, so mashing keys still tells the story.
   const pressKey = useCallback(
     (key: string) => {
       if (run.phase === "done") return nextSituation();
       if (!ready) return;
-      if (offerInstead && !run.tried) {
-        if (key === "ArrowLeft") firstChoices[0]();
-        else if (key === "ArrowRight") firstChoices[1]();
-        else say(QUESTION);
-        return;
-      }
-      doStep(run.stepsDone);
+      if (!run.tried && key === "ArrowLeft") return choices[0]();
+      if (!run.tried && key === "ArrowRight") return choices[1]();
+      goodStep();
     },
-    [run, ready, offerInstead, firstChoices, nextSituation, say, doStep],
+    [run, ready, choices, nextSituation, goodStep],
   );
 
   useEffect(() => {
@@ -188,31 +191,30 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
   const { situation } = run;
 
   // Only what the child can choose from now is shown, big; while the happy end plays all good steps once more, small.
-  let choices: ReactNode = null;
+  let cards: ReactNode = null;
   if (run.phase === "done") {
-    choices = <EndButtons onAgain={() => startSituation(situation)} onNext={nextSituation} />;
+    cards = <EndButtons onAgain={() => startSituation(situation)} onNext={nextSituation} />;
   } else if (run.phase === "outro") {
-    choices = situation.steps.map((step, i) => <ChoiceCard key={step.label} image={storyImages.step(situation.id, i)} label={step.label} state="done" small />);
+    cards = situation.steps.map((step, i) => (
+      <ChoiceCard key={step.caption} image={storyImages.step(situation.id, i)} caption={step.caption} state="done" small />
+    ));
   } else if (run.phase === "steps") {
     const playing = run.busy && !run.trying;
     const index = playing ? Math.max(0, run.stepsDone - 1) : run.stepsDone;
     const step = situation.steps[index];
     const stepState: CardState = playing ? "playing" : run.trying ? "rest" : "choose";
-    const list = [
-      <ChoiceCard key={step.label} image={storyImages.step(situation.id, index)} label={step.label} state={stepState} onChoose={() => doStep(index)} />,
-    ];
-    if (choose && index === 0) {
-      const insteadState: CardState = run.tried ? "wrong" : playing ? "rest" : "choose";
-      list.splice(
-        run.insteadFirst ? 0 : 1,
-        0,
-        <ChoiceCard key="instead" image={storyImages.instead(situation.id)} label={situation.instead.label} state={insteadState} onChoose={tryInstead} />,
-      );
-    }
-    choices = list;
+    const insteadState: CardState = run.tried ? "wrong" : playing ? "rest" : "choose";
+    const good = (
+      <ChoiceCard key="good" image={storyImages.step(situation.id, index)} caption={step.caption} state={stepState} onChoose={() => doStep(index)} />
+    );
+    const instead = (
+      <ChoiceCard key="instead" image={storyImages.instead(situation.id, index)} caption={step.instead.caption} state={insteadState} onChoose={tryInstead} />
+    );
+    cards = run.insteadFirst ? [instead, good] : [good, instead];
   }
 
   const picture = pictureName(run);
+  const caption = pictureCaption(run);
 
   return (
     <div className="story-play kita-play" onPointerDown={() => run.phase === "done" && nextSituation()}>
@@ -220,11 +222,11 @@ export function KitaPlay({ settings }: { settings: FeelingsSettings }) {
         <StepDots total={situation.steps.length} done={Math.min(run.stepsDone, situation.steps.length)} current={run.phase === "steps"} />
       </header>
       <main className="story-middle">
-        <StoryPicture key={`${run.key}-${picture}`} name={picture}>
+        <StoryPicture key={`${run.key}-${picture}`} name={picture} caption={caption}>
           {run.trying && <Mark good={false} className="fg-picture-mark" />}
         </StoryPicture>
       </main>
-      <footer className="story-choices">{choices}</footer>
+      <footer className="story-choices">{cards}</footer>
     </div>
   );
 }

@@ -1,19 +1,11 @@
 import type { FeelingId } from "./bear";
 import type { SituationId } from "./kita";
 
-/** "bear": comfort the bear until he is happy again. "kita": what to do when someone pushes, kicks or grabs. */
-export type FeelingsMode = "bear" | "kita";
-
-/** "show": the good steps come one after another. "choose": the first step has a not-so-good idea next to it. */
-export type KitaAnswers = "show" | "choose";
-
 export interface FeelingsSettings {
-  mode: FeelingsMode;
-  /** One feeling of the bear only, or all in turn. */
+  /** Zu Hause: one feeling of the bear only, or all in turn. */
   feeling: "all" | FeelingId;
-  /** One situation only, for a problem the child has right now, or all in turn. */
+  /** Im Kindergarten: one situation only, for a problem the child has right now, or all in turn. */
   situation: "all" | SituationId;
-  answers: KitaAnswers;
   /** Read the story, the bubbles and the praise aloud. */
   speech: boolean;
   /** Little sounds for hugs, stomping, lullabies. */
@@ -21,10 +13,8 @@ export interface FeelingsSettings {
 }
 
 export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
-  mode: "bear",
   feeling: "all",
   situation: "all",
-  answers: "show",
   speech: false,
   sounds: true,
 };

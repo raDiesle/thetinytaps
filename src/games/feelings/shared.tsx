@@ -101,14 +101,18 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
 /**
  * The big picture in the middle: what happens right now. Its frames fade into
  * each other in a loop, like a tiny GIF, so the animals seem to move a little.
+ * Under it a short caption for grown-ups says what it shows.
  * Give it a new `key` with every new picture, so it starts at the first frame.
  */
 export function StoryPicture({
   name,
+  caption,
   children,
   onPointerDown,
 }: {
   name: string;
+  /** What the picture shows, in a few words: for grown-ups, children don't read it. */
+  caption: string;
   /** Things on top of the picture: a cross, floating hearts. */
   children?: ReactNode;
   onPointerDown?: (e: PointerEvent) => void;
@@ -126,12 +130,15 @@ export function StoryPicture({
   const shown = frame % Math.max(frames.length, 1);
 
   return (
-    <div className="fg-picture" onPointerDown={onPointerDown}>
-      {frames.map((src, i) => (
-        <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
-      ))}
-      {children}
-    </div>
+    <>
+      <div className="fg-picture" onPointerDown={onPointerDown}>
+        {frames.map((src, i) => (
+          <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
+        ))}
+        {children}
+      </div>
+      <p className="fg-caption fg-picture-caption">{caption}</p>
+    </>
   );
 }
 
@@ -141,37 +148,42 @@ export function StoryPicture({
  */
 export type CardState = "choose" | "playing" | "done" | "wrong" | "rest";
 
-/** A big picture button: what the bear can do, to be understood without reading. */
+/** A big picture button: what the bear can do, to be understood without reading. A short caption for grown-ups sits under it. */
 export function ChoiceCard({
   image,
-  label,
+  caption,
   state,
   small = false,
   onChoose,
 }: {
   /** Name of the picture, see images.ts. */
   image: string;
-  /** Not shown, for screen readers. */
-  label: string;
+  /** What the picture shows, in a few words: shown small under the card for grown-ups, said by screen readers. */
+  caption: string;
   state: CardState;
   small?: boolean;
   onChoose?: () => void;
 }) {
   return (
-    <button
-      type="button"
-      className={`fg-card fg-card-${state}${small ? " small" : ""}`}
-      disabled={state !== "choose"}
-      aria-label={label}
-      onPointerDown={(e: PointerEvent) => {
-        e.stopPropagation();
-        if (state === "choose") onChoose?.();
-      }}
-    >
-      <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} />
-      {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
-      {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
-    </button>
+    <div className={`fg-choice${small ? " small" : ""}`}>
+      <button
+        type="button"
+        className={`fg-card fg-card-${state}${small ? " small" : ""}`}
+        disabled={state !== "choose"}
+        aria-label={caption}
+        onPointerDown={(e: PointerEvent) => {
+          e.stopPropagation();
+          if (state === "choose") onChoose?.();
+        }}
+      >
+        <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} />
+        {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
+        {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
+      </button>
+      <span className="fg-caption" aria-hidden>
+        {caption}
+      </span>
+    </div>
   );
 }
 
