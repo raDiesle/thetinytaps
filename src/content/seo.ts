@@ -139,6 +139,13 @@ export const SEO_PAGES: PageSeo[] = [
     text: "Ein Zahnputz-Begleiter: Zahnputzlied, sieben Schritte nach KAI (Kauflächen, außen, innen), Zuckermonster auf den Zähnen und eine Wochentafel mit Sonne und Mond.",
   },
   {
+    path: "/toepfchen/",
+    title: "Töpfchentraining spielerisch – Töpfchen-Spiel ab 2",
+    description:
+      "Tapsi muss mal: hinlaufen, Hose runter, warten, abziehen, Hände waschen – ein Tippen pro Schritt. Dazu Applaus und ein Stern, wenn es wirklich geklappt hat.",
+    text: "Ein Töpfchen-Spiel für Kleinkinder: Fuchs, Bär oder Hase gehen Schritt für Schritt aufs Töpfchen, mit Warte-Liedchen beim Sitzen. „Hat geklappt!“ feiert echte Erfolge mit einem Stern auf der Wochentafel.",
+  },
+  {
     path: "/laut-leise/",
     title: "Laut und leise – Stimmspiel für Kleinkinder",
     description:

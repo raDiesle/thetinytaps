@@ -100,10 +100,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
     ],
   },
+  { href: "/toepfchen/", languages: { de: "done" }, note: "Neu im Oktober 2026, nur auf Deutsch." },
   { href: "/laut-leise/", languages: { de: "done", ru: "done" } },
   {
     href: "/",
-    languages: { de: "done", ru: "done" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
+    languages: { de: "done", ru: "partial" },
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. Der Untertitel von „Weitere“ (mit Töpfchen) ist seit Oktober 2026 nur auf Deutsch.",
   },
 ];

@@ -1,0 +1,718 @@
+/* ---------- Aufs Töpfchen ---------- */
+
+/*
+ * Every step's motion is here, switched on by the class PottyPlay puts on the root
+ * (`pt-at-<step>`, `busy` while it runs). The durations match STEPS[].ms and the
+ * sound times in PottyPlay.tsx: walk 2.2 s, paper 2.2 s, flush 4.4 s (the potty is
+ * emptied at 1.8–2.2 s, the flush at 2.8 s), wash 4.6 s (water from 1.8 s).
+ * Nothing moves before the first tap.
+ */
+
+.potty-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fdf1dc;
+}
+
+.pt-scene {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.pt-camera {
+  transition: transform 1.4s ease-in-out;
+}
+
+.pt-animal-pos {
+  transition: transform var(--move-ms) ease-in-out;
+}
+
+/* Parts that turn or shrink do so around their own box. */
+.pt-bob,
+.pt-leg,
+.pt-pantleg,
+.pt-arm,
+.pt-head,
+.pt-potty-move,
+.pt-swirl,
+.pt-strip,
+.pt-bubble,
+.pt-flush-button {
+  transform-box: fill-box;
+}
+
+/* ---------- The animal ---------- */
+
+.pt-bob {
+  transform-origin: 50% 100%;
+}
+
+.pt-upper {
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Sitting: the body sinks onto the potty, the shins splay out with the knees apart. */
+.pt-sitting .pt-upper {
+  transform: translateY(26px);
+}
+
+.pt-leg {
+  transform-origin: 50% 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+.pt-sitting .pt-leg.left {
+  transform: rotate(-14deg) scaleY(0.8);
+}
+
+.pt-sitting .pt-leg.right {
+  transform: rotate(14deg) scaleY(0.8);
+}
+
+/* Trousers down: the legs bunch at the ankles, the top slides away. */
+.pt-pantleg {
+  transform-origin: 50% 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+.pt-pants-down .pt-pantleg {
+  transform: translateY(6px) scaleY(0.3);
+}
+
+.pt-pants-hip {
+  transition:
+    opacity 0.4s,
+    transform 0.5s ease-in-out;
+}
+
+.pt-pants-down .pt-pants-hip {
+  opacity: 0;
+  transform: translateY(36px);
+}
+
+/* Standing up first, then the trousers come up. */
+.pt-at-up .pt-pantleg,
+.pt-at-up .pt-pants-hip {
+  transition-delay: 0.4s;
+}
+
+.pt-arm {
+  transform-origin: 50% 0;
+  transition: transform 0.4s ease-in-out;
+}
+
+.pt-head {
+  transform-origin: 50% 100%;
+}
+
+.pt-eyes-happy {
+  display: none;
+}
+
+.pt-happy .pt-eyes-happy {
+  display: inline;
+}
+
+.pt-happy .pt-eyes-open {
+  display: none;
+}
+
+.pt-thought {
+  display: none;
+}
+
+.pt-at-start .pt-thought {
+  display: inline;
+}
+
+@keyframes pt-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+.pt-at-walk.busy .pt-bob {
+  animation: pt-bob 0.44s ease-in-out 5;
+}
+
+.pt-at-flush.busy .pt-bob {
+  animation: pt-bob 0.35s ease-in-out 4;
+}
+
+.pt-at-wash.busy .pt-bob {
+  animation: pt-bob 0.375s ease-in-out 4;
+}
+
+@keyframes pt-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-30px);
+  }
+}
+
+.pt-at-up.busy .pt-bob {
+  animation: pt-hop 0.5s ease-out;
+}
+
+/* Waiting on the potty: the head sways, one way per bar of the waiting tune. */
+@keyframes pt-sway {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.pt-waiting .pt-head {
+  animation: pt-sway 4s ease-in-out infinite;
+}
+
+/* ---------- The potty and the trickle ---------- */
+
+.pt-potty-front {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.pt-sitting .pt-potty-front {
+  opacity: 1;
+  transition-delay: 0.4s;
+}
+
+.pt-pee {
+  opacity: 0;
+}
+
+.pt-peed .pt-pee {
+  opacity: 1;
+  transition: opacity 0.6s;
+}
+
+.pt-drop {
+  opacity: 0;
+}
+
+@keyframes pt-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+}
+
+.pt-peeing .pt-drop {
+  animation: pt-drop 0.7s ease-out 2 both;
+}
+
+/* ---------- Paper: unroll, tear, wipe ---------- */
+
+.pt-strip {
+  transform-origin: 50% 0;
+  transform: scaleY(0.15);
+}
+
+@keyframes pt-unroll {
+  0% {
+    transform: scaleY(0.15);
+  }
+  25%,
+  29% {
+    transform: scaleY(1);
+  }
+  30%,
+  100% {
+    transform: scaleY(0.15);
+  }
+}
+
+.pt-at-paper .pt-strip {
+  animation: pt-unroll 2.2s ease-out both;
+}
+
+.pt-piece {
+  opacity: 0;
+}
+
+@keyframes pt-piece {
+  0%,
+  28% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  50%,
+  60% {
+    opacity: 1;
+    transform: translate(-80px, -10px);
+  }
+  72%,
+  100% {
+    opacity: 0;
+    transform: translate(-100px, 40px);
+  }
+}
+
+.pt-at-paper .pt-piece {
+  animation: pt-piece 2.2s ease-in-out both;
+}
+
+@keyframes pt-paper-arm {
+  0% {
+    transform: rotate(0);
+  }
+  20%,
+  30% {
+    transform: rotate(-80deg);
+  }
+  50% {
+    transform: rotate(0);
+  }
+  60%,
+  85% {
+    transform: rotate(25deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.pt-at-paper .pt-arm.right {
+  animation: pt-paper-arm 2.2s ease-in-out both;
+}
+
+@keyframes pt-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}
+
+.pt-at-paper.busy .pt-bob {
+  animation: pt-wiggle 0.3s ease-in-out 1.3s 2;
+}
+
+/* ---------- Empty the potty into the toilet and flush ---------- */
+
+.pt-potty-move {
+  transform-origin: 50% 50%;
+}
+
+.pt-potty-away .pt-potty-move {
+  transform: translate(120px, 0);
+}
+
+@keyframes pt-carry {
+  0% {
+    transform: translate(0, 0) rotate(0);
+  }
+  10% {
+    transform: translate(0, -40px) rotate(0);
+  }
+  50% {
+    transform: translate(300px, -150px) rotate(0);
+  }
+  62%,
+  78% {
+    transform: translate(330px, -170px) rotate(110deg);
+  }
+  100% {
+    transform: translate(120px, 0) rotate(0);
+  }
+}
+
+.pt-at-flush .pt-potty-move {
+  animation: pt-carry 2.6s ease-in-out 0.2s both;
+}
+
+@keyframes pt-empty {
+  0%,
+  64% {
+    opacity: 1;
+  }
+  75%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pt-at-flush .pt-pee {
+  animation: pt-empty 2.8s both;
+}
+
+.pt-pour {
+  opacity: 0;
+}
+
+@keyframes pt-pour {
+  0%,
+  64% {
+    opacity: 0;
+  }
+  68%,
+  80% {
+    opacity: 1;
+  }
+  86%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pt-at-flush .pt-pour {
+  animation: pt-pour 2.8s both;
+}
+
+@keyframes pt-carry-arm {
+  0% {
+    transform: rotate(0);
+  }
+  10%,
+  52% {
+    transform: rotate(-70deg);
+  }
+  62%,
+  70% {
+    transform: rotate(-150deg);
+  }
+  80%,
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.pt-at-flush .pt-arm.right {
+  animation: pt-carry-arm 4.4s ease-in-out both;
+}
+
+@keyframes pt-press {
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.pt-at-flush .pt-flush-button {
+  animation: pt-press 0.4s ease-in-out 2.7s;
+}
+
+.pt-swirl {
+  transform-origin: 50% 50%;
+  opacity: 0;
+}
+
+@keyframes pt-swirl {
+  0% {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(900deg) scale(0.3);
+  }
+}
+
+.pt-at-flush .pt-swirl {
+  /* forwards, not both: during the delay the swirl must stay hidden. */
+  animation: pt-swirl 1.5s ease-in 2.8s forwards;
+}
+
+/* ---------- Wash hands ---------- */
+
+.pt-water {
+  opacity: 0;
+}
+
+@keyframes pt-water {
+  0%,
+  37% {
+    opacity: 0;
+  }
+  40%,
+  88% {
+    opacity: 1;
+  }
+  92%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.pt-at-wash .pt-water {
+  animation: pt-water 4.6s both;
+}
+
+@keyframes pt-wash-right {
+  0%,
+  33% {
+    transform: rotate(0);
+  }
+  40%,
+  88% {
+    transform: rotate(-100deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+@keyframes pt-wash-left {
+  0%,
+  33% {
+    transform: rotate(0);
+  }
+  40%,
+  88% {
+    transform: rotate(-70deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.pt-at-wash .pt-arm.right {
+  animation: pt-wash-right 4.6s ease-in-out both;
+}
+
+.pt-at-wash .pt-arm.left {
+  animation: pt-wash-left 4.6s ease-in-out both;
+}
+
+.pt-bubble {
+  transform-origin: 50% 50%;
+  transform: scale(0);
+}
+
+@keyframes pt-bubble {
+  0%,
+  50% {
+    transform: scale(0);
+  }
+  56% {
+    transform: scale(1.15);
+  }
+  60%,
+  78% {
+    transform: scale(1);
+  }
+  84%,
+  100% {
+    transform: scale(0);
+  }
+}
+
+.pt-at-wash .pt-bubble {
+  animation: pt-bubble 4.6s ease-out both;
+}
+
+/* ---------- Party ---------- */
+
+@keyframes pt-jump {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-60px);
+  }
+}
+
+.pt-at-party .pt-bob,
+.pt-cheering .pt-bob {
+  animation: pt-jump 0.6s ease-out 0.2s 3;
+}
+
+.pt-at-party .pt-arm.left,
+.pt-cheering .pt-arm.left {
+  transform: rotate(150deg);
+}
+
+.pt-at-party .pt-arm.right,
+.pt-cheering .pt-arm.right {
+  transform: rotate(-150deg);
+}
+
+/* ---------- The row of steps ---------- */
+
+.pt-steps {
+  position: absolute;
+  left: 50%;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  gap: clamp(4px, 1vw, 10px);
+  margin: 0;
+  padding: 6px 12px;
+  list-style: none;
+  border-radius: 999px;
+  background: #ffffffcc;
+  box-shadow: 0 2px 10px #0002;
+}
+
+.pt-steps li {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: clamp(30px, 6vw, 48px);
+  height: clamp(30px, 6vw, 48px);
+  border-radius: 50%;
+  font-size: clamp(17px, 3.4vw, 28px);
+  opacity: 0.45;
+  filter: grayscale(0.7);
+  transition: transform 0.3s;
+}
+
+.pt-steps li.done {
+  opacity: 1;
+  filter: none;
+  background: #d8f5d0;
+}
+
+.pt-steps li.now {
+  opacity: 1;
+  filter: none;
+  background: #ffe08a;
+  transform: scale(1.2);
+}
+
+.pt-arrow {
+  position: absolute;
+  right: -3px;
+  bottom: -5px;
+  font-size: 0.6em;
+  font-weight: 900;
+  color: #3f88c5;
+}
+
+/* ---------- „Hat geklappt!“ ---------- */
+
+.potty-party {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3vw;
+  padding: max(56px, env(safe-area-inset-top)) 16px 16px;
+  background: radial-gradient(circle at 30% 50%, #fff7d6, #ffe3ec);
+}
+
+.pt-party-animal {
+  flex: 0 1 auto;
+  height: min(84vh, 46vw);
+  overflow: visible;
+}
+
+.pt-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(4px, 1vw, 10px);
+  width: min(54vw, 620px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pt-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: min(40vh, 280px);
+  padding: 8px 2px;
+  border-radius: 16px;
+  background: #ffffffd9;
+}
+
+.pt-day.today {
+  background: #fff3b0;
+  outline: 4px solid #ffb703;
+  transform: scale(1.06);
+}
+
+.pt-today-tag {
+  position: absolute;
+  top: -14px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #ffb703;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pt-day-name {
+  font-size: clamp(14px, 2.4vw, 22px);
+  font-weight: 800;
+}
+
+.pt-day-stars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: clamp(18px, 3.6vw, 34px);
+  line-height: 1.1;
+}
+
+.pt-star.empty {
+  color: #e0a800;
+}
+
+@keyframes pt-star-pop {
+  0% {
+    transform: scale(0) rotate(-120deg);
+  }
+  70% {
+    transform: scale(1.5) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.pt-star.fresh {
+  display: inline-block;
+  animation: pt-star-pop 0.8s ease-out 0.9s both;
+}
+
+@media (orientation: portrait) {
+  .potty-party {
+    flex-direction: column;
+  }
+
+  .pt-party-animal {
+    height: 42vh;
+  }
+
+  .pt-week {
+    width: min(94vw, 620px);
+  }
+
+  .pt-day {
+    min-height: 26vh;
+  }
+}
