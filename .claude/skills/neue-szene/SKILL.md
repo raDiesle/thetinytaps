@@ -175,6 +175,12 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   ("Brumm, brumm!", "Quak!"). Speech is off by default, but the texts are also
   used in find mode ("Wo ist der Traktor?").
 - `name` with the correct article; the find question is built from it.
+- **Russian too, in the same change:** `src/games/scenes/<id>/ru.ts` (`export const RU: SceneTranslation`,
+  see an existing scene) with the title, description, every item (`name` in the nominative without
+  article, starting with a Cyrillic letter – it is the item's key; `gender` m/f/n or `plural: true` as
+  Russian has it; as many sentences as the German) and the chain sentences in order; import it in
+  `src/games/scenes/translations.ts`. Present tense, "ты", nothing that changes for boy or girl.
+  `scenes.test.ts` fails on a missing or extra item.
 
 ## Checks before you finish
 

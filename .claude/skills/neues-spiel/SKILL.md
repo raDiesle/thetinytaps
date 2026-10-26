@@ -32,6 +32,10 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 2. `CATEGORIES` in `src/content/games.ts`: the game in the fitting category.
 3. The idea in `src/content/ideas/<area>.ts`: `done: true` (or `partial: "…"`).
 4. One line in the README structure table and the roadmap.
+5. Russian from the start: the title in `games.ts` as `{ de, ru }`, every start-screen text as
+   `t({ de: "…", ru: "…" })`, the child's texts in a `content.ru.ts` keyed like the German, speech with
+   `useAppLanguage().speechLang` (see "The whole app also speaks Russian" in the root `CLAUDE.md`), and
+   `ru` in the game's row of `src/content/ideas/languageStatus.ts`.
 
 ## Settings and shared parts
 

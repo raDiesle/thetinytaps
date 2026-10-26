@@ -140,6 +140,8 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
 4. **Add the data** to `levels.ts`: the `TrailLevel` with stations, sounds from
    `@/lib/sfx` (add a new sound to the fitting topic file there, built on `note()`),
    short German sentences in the present tense. Append it to `TRAIL_LEVELS`.
+   Give every sentence and the level title its Russian line in `src/games/elevator/ru.ts` in the same
+   change (`ru.test.ts` fails on a German text without one).
 5. **Add a mode** in `ElevatorGame.tsx`: `{ id: "<level id>", emoji, title }` after the
    other trail levels. If the start-screen note mentions the levels or keys, keep it true.
 6. **The cards pick it up**: `cards.tsx` builds the end cards from `TRAIL_LEVELS` and

@@ -14,7 +14,7 @@ moment before its verse.
 A language is **just two files**: `musik/musik-zaehneputzen-lied-<lang>.mp3` (two-letter
 code) and the `.json` of the same name with where its verses begin. They appear in the
 setting „Gesungen“ by their name (`sung.ts`, `music.ts`). No code, unless the language
-has no name in `SUNG_LABELS` (`sung.ts`) yet – then one line.
+has no name in `SUNG_LABELS` (`sung.ts`) yet – then one line with its German and Russian name (the app's languages).
 
 The user makes the song on suno.com (never ask for their login); general Suno
 lessons are in `/musik-erzeugen`.
@@ -96,7 +96,7 @@ ffmpeg -ss <from> -t 12 -i src/games/teeth/musik/musik-zaehneputzen-lied-<lang>.
 
 Then:
 
-- `SUNG_LABELS` in `sung.ts`: add the language if it isn't there („🇫🇷 Französisch“).
+- `SUNG_LABELS` in `sung.ts`: add the language if it isn't there (`fr: { de: "🇫🇷 Französisch", ru: "🇫🇷 Французский" }`).
 - `musik/README.md`: a row in the table (source Suno, date); `suno-lied.md`: a note on
   anything odd in the take.
 - `yarn verify` – `sung.test.ts` checks that every song has its `.json` (one start per
