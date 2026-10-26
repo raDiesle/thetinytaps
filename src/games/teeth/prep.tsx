@@ -1,7 +1,7 @@
 import { useRef, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import { useT } from "@/lib/language";
-import { playPuff, playRecorded, playTwinkle } from "@/lib/sfx";
+import { playPuff, playRecorded, playSplash, playTwinkle } from "@/lib/sfx";
 import type { Cue } from "./cues";
 import type { Daytime } from "./daytime";
 import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
@@ -10,10 +10,12 @@ import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "
 // hand takes it out, then the tube comes over and squeezes a striped wave of
 // toothpaste along the bristles and lies down again. All of it is CSS
 // animation (teeth.css); the sounds (PREP_CUES) go by the brushing clock.
-// Through the window the sun comes up in the morning; in the evening the moon
-// is out and the sleeve is a pyjama one.
+// After brushing the same sink again: the brush is rinsed under the tap and
+// goes back into its cup. Through the window the sun comes up in the morning;
+// in the evening the moon is out and the sleeve is a pyjama one.
 
-export type PrepPart = "brush" | "paste";
+/** Before brushing: get the brush, toothpaste on; after it: rinse the brush and put it away. */
+export type PrepPart = "brush" | "paste" | "tidy";
 
 const SINK = 300;
 /** The part of the sink that always shows: window, cup, tube and the bowl; the rest of the screen shows more wall and sink. */
@@ -21,7 +23,7 @@ const FOCUS: Box = { x: 30, y: 24, width: 390, height: 356 };
 const WINDOW = { x: 176, y: 34, width: 112, height: 112 };
 
 /** How long each part lasts, as long as its animation in teeth.css. */
-export const PREP_MS: Record<PrepPart, number> = { brush: 7000, paste: 8000 };
+export const PREP_MS: Record<PrepPart, number> = { brush: 7000, paste: 8000, tidy: 8570 };
 
 /** The sounds of each part, in ms from its start, matching the animations in teeth.css. */
 export const PREP_CUES: Record<PrepPart, Cue[]> = {
@@ -36,10 +38,21 @@ export const PREP_CUES: Record<PrepPart, Cue[]> = {
     { at: 1650, play: playPuff },
     { at: 3650, play: playTwinkle },
   ],
+  // The tap runs, the brush rattles back into its cup, and a twinkle: all tidy.
+  tidy: [
+    { at: 600, play: () => playRecorded("splash", playSplash) },
+    { at: 2150, play: () => playRecorded("splash", playSplash) },
+    { at: 6450, play: () => playRecorded("clink", playTwinkle) },
+    { at: 6980, play: () => playRecorded("clink", playTwinkle) },
+    { at: 7500, play: playTwinkle },
+  ],
 };
 
 /** The recordings the sink plays, to load before it starts. */
 export const PREP_RECORDINGS = ["clink"];
+
+/** The recordings of rinsing and putting the brush away at the end. */
+export const TIDY_RECORDINGS = ["splash", "clink"];
 
 /** Where the tufts of bristles stand on the head, left to right; the one at the tip is longer. */
 const TUFTS = [-36, -26, -16, -6, 4, 14];
@@ -147,6 +160,44 @@ function Paste() {
   );
 }
 
+/** The foam left on the bristles after brushing, in the toothbrush's coordinates; the water washes it off. */
+function Foam() {
+  return (
+    <g className="prep-foam" fill="#fff" stroke="#9fd8ef" strokeWidth={2}>
+      <path d="M-40 -14 C-44 -24 -36 -32 -27 -28 C-22 -38 -8 -38 -3 -30 C2 -38 16 -38 20 -29 C28 -30 32 -20 27 -13 Z" />
+      {[
+        [-30, -34, 5],
+        [-12, -38, 6],
+        [8, -36, 4.5],
+        [24, -26, 3.5],
+      ].map(([x, y, r]) => (
+        <circle key={x} cx={x} cy={y} r={r} />
+      ))}
+    </g>
+  );
+}
+
+/** The water running from the tap into the basin while the brush is rinsed. */
+function Water() {
+  return (
+    <g className="prep-water">
+      <path
+        d={`M214 ${SINK - 49} C212 ${SINK - 10} 216 ${SINK + 30} 214 ${SINK + 72} L228 ${SINK + 72} C226 ${SINK + 30} 230 ${SINK - 10} 228 ${SINK - 49} Z`}
+        fill="#8fdcf7"
+        opacity={0.85}
+      />
+      <path d={`M219 ${SINK - 44} V${SINK + 60}`} stroke="#fff" strokeWidth={3} strokeLinecap="round" opacity={0.8} />
+      {[
+        [196, SINK + 62],
+        [246, SINK + 58],
+        [204, SINK + 50],
+      ].map(([x, y]) => (
+        <circle key={x} className="prep-drop" cx={x} cy={y} r={4} fill="#8fdcf7" stroke={INK} strokeWidth={1.5} />
+      ))}
+    </g>
+  );
+}
+
 /** A window with the sun rising, or the moon and stars. */
 function Window({ daytime }: { daytime: Daytime }) {
   const { x, y, width, height } = WINDOW;
@@ -218,7 +269,9 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
       aria-label={
         part === "brush"
           ? t({ de: "Die Zahnbürste steht im Becher am Waschbecken", ru: "Зубная щётка стоит в стаканчике у раковины" })
-          : t({ de: "Zahnpasta kommt auf die Zahnbürste", ru: "Зубная паста ложится на щётку" })
+          : part === "paste"
+            ? t({ de: "Zahnpasta kommt auf die Zahnbürste", ru: "Зубная паста ложится на щётку" })
+            : t({ de: "Die Zahnbürste wird ausgespült und kommt zurück in den Becher" })
       }
     >
       <defs>
@@ -245,6 +298,7 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
         <path d={`M90 ${SINK + 62} Q220 ${SINK + 44} 350 ${SINK + 62}`} fill="none" stroke="#fff" strokeWidth={4} opacity={0.8} />
         <ellipse cx={220} cy={SINK + 78} rx={12} ry={4} fill="#9fb4c4" stroke={INK} strokeWidth={2.5} />
         <Tap />
+        {part === "tidy" && <Water />}
 
         {/* The cup's back, then the brush in it, then the glass in front. */}
         <path d="M318 212 L394 212 L386 298 L326 298 Z" fill="#cfe9ff" />
@@ -257,6 +311,7 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
           <g className="prep-brush-bob">
             <Toothbrush />
             {part === "paste" && <Paste />}
+            {part === "tidy" && <Foam />}
             <g className="prep-hand">
               <g transform="translate(118 12)">
                 <Fist daytime={daytime} />
@@ -292,6 +347,17 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
             <path className="prep-twinkle late" d={STAR_PATH} fill="#ffd23f" stroke={INK} strokeWidth={8} />
           </g>
         )}
+        {/* Back in its cup: all tidy. */}
+        {part === "tidy" &&
+          [
+            [300, 150, 0],
+            [410, 168, 270],
+            [352, 52, 540],
+          ].map(([x, y, delay]) => (
+            <g key={x} transform={`translate(${x} ${y}) scale(0.3)`}>
+              <path className="prep-twinkle tidy" d={STAR_PATH} fill="#ffd23f" stroke={INK} strokeWidth={8} style={{ animationDelay: `${7500 + delay}ms` }} />
+            </g>
+          ))}
       </g>
 
       <FrameStroke frame={frame} unit={unit} />

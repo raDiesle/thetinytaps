@@ -90,7 +90,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🪥 Hinweise und Bilder",
         languages: { de: "done", ru: "partial" },
-        note: "Die Einstellungen (Vorher zeigen, Wochenbild, Zahnputzlied) und der Hinweis zu morgens und abends sind seit Oktober 2026 nur auf Deutsch.",
+        note: "Die Einstellungen (Vorher zeigen, Wochenbild, Zahnputzlied), der Hinweis zu morgens und abends und das Ende („Geschafft!“, Medaille, Zahnbürste aufräumen) sind seit Oktober 2026 nur auf Deutsch.",
       },
       {
         label: "🎵 Zahnputzlied (gesungen)",

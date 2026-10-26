@@ -1,13 +1,14 @@
 import { existsSync } from "node:fs";
 import { expect, test } from "@rstest/core";
-import { PREP_CUES, PREP_MS, PREP_RECORDINGS } from "./prep";
+import { PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import { ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 
-// The prelude's sounds fire when the brushing clock passes them, so they must lie inside their part.
+// The sounds of the prelude and of tidying up at the end fire when the brushing clock passes them, so they must lie inside their part.
 const PARTS = [
   { name: "sweets", cues: ORIGIN_CUES, ms: ORIGIN_MS.sweets },
   { name: "brush", cues: PREP_CUES.brush, ms: PREP_MS.brush },
   { name: "paste", cues: PREP_CUES.paste, ms: PREP_MS.paste },
+  { name: "tidy", cues: PREP_CUES.tidy, ms: PREP_MS.tidy },
 ];
 
 test("prelude sounds are in order and inside their part", () => {
@@ -19,5 +20,6 @@ test("prelude sounds are in order and inside their part", () => {
 });
 
 test("every preloaded prelude recording has its file", () => {
-  for (const name of [...ORIGIN_RECORDINGS, ...PREP_RECORDINGS]) expect({ name, file: existsSync(`src/lib/sounds/${name}.mp3`) }).toEqual({ name, file: true });
+  for (const name of [...ORIGIN_RECORDINGS, ...PREP_RECORDINGS, ...TIDY_RECORDINGS])
+    expect({ name, file: existsSync(`src/lib/sounds/${name}.mp3`) }).toEqual({ name, file: true });
 });

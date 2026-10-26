@@ -115,6 +115,58 @@
   background: #e3f9d6;
 }
 
+.teeth-mouth.goodbye {
+  background: #fff6c2;
+}
+
+/* „Geschafft!“ in gold, bigger than every other heading, with the medal swinging down beside it. */
+.teeth-cue.teeth-done {
+  display: flex;
+  align-items: center;
+  gap: 0.25em;
+  font-size: clamp(2.4rem, 11vmin, 6rem);
+  color: #ffd23f;
+}
+
+.teeth-medal {
+  width: 1.1em;
+  height: 1.43em;
+  overflow: visible;
+  transform-origin: 50% 0;
+  animation: teeth-medal-swing 2.14s ease-out 0.27s backwards;
+}
+
+/* Drops in on its ribbon and swings out in two beats either way. */
+@keyframes teeth-medal-swing {
+  0% {
+    transform: translateY(-120%) rotate(-25deg);
+  }
+  25% {
+    transform: translateY(0) rotate(18deg);
+  }
+  50% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+  100% {
+    transform: rotate(0);
+  }
+}
+
+.teeth-medal-shine {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: teeth-medal-twinkle 1.07s ease-in-out 2.4s 3;
+}
+
+@keyframes teeth-medal-twinkle {
+  50% {
+    transform: scale(1.5) rotate(36deg);
+  }
+}
+
 .teeth-hint {
   font-weight: 500;
   opacity: 0.75;
@@ -947,6 +999,125 @@
   }
 }
 
+/* ---------- After brushing: rinse the brush and put it back into its cup (16 beats, PREP_MS.tidy) ---------- */
+
+/* From where it got its toothpaste: two beats over to the tap, six beats scrubbed to and fro under the water,
+   up and down into the cup, a rattle (the clinks in PREP_CUES.tidy), and the hand lets go. */
+.prep.at-tidy .prep-brush {
+  transform: translate(356px, 95px) rotate(90deg) scale(0.9);
+  animation: tidy-brush 8.57s ease-in-out forwards;
+}
+
+@keyframes tidy-brush {
+  0% {
+    transform: translate(120px, 195px) rotate(0deg) scale(1.2);
+  }
+  12.5% {
+    transform: translate(225px, 296px) rotate(-12deg) scale(1.1);
+  }
+  18.75%,
+  31.25%,
+  43.75% {
+    transform: translate(237px, 294px) rotate(-12deg) scale(1.1);
+  }
+  25%,
+  37.5% {
+    transform: translate(213px, 298px) rotate(-12deg) scale(1.1);
+  }
+  50% {
+    transform: translate(225px, 296px) rotate(-12deg) scale(1.1);
+  }
+  62.5% {
+    transform: translate(340px, 20px) rotate(90deg) scale(0.9);
+  }
+  75% {
+    transform: translate(356px, 95px) rotate(90deg) scale(0.9);
+  }
+  78% {
+    transform: translate(356px, 95px) rotate(84deg) scale(0.9);
+  }
+  81.25%,
+  100% {
+    transform: translate(356px, 95px) rotate(90deg) scale(0.9);
+  }
+}
+
+.prep.at-tidy .prep-hand {
+  animation: let-go 8.57s ease-in forwards;
+}
+
+/* The way it came at the start, back off the screen. */
+@keyframes let-go {
+  0%,
+  81.25% {
+    transform: translateY(0);
+  }
+  93.75%,
+  100% {
+    transform: translateY(1000px);
+  }
+}
+
+/* The water washes the foam off while the brush is scrubbed under it. */
+.prep-foam {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: foam-off 8.57s ease-in forwards;
+}
+
+@keyframes foam-off {
+  0%,
+  18.75% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  43.75%,
+  100% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* The tap runs from the first beat until the brush is lifted out. */
+.prep-water {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  transform: scaleY(0);
+  animation: water-run 8.57s ease-in-out forwards;
+}
+
+@keyframes water-run {
+  0%,
+  6.25% {
+    transform: scaleY(0);
+    opacity: 1;
+  }
+  12.5%,
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  56.25%,
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+.prep-drop {
+  animation: drop-hop 1.07s ease-out 1.07s 3;
+}
+
+@keyframes drop-hop {
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.prep-twinkle.tidy {
+  animation-iteration-count: 3;
+}
+
 .teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
 .teeth-play.paused .lip-arrow {
@@ -1124,6 +1295,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .teeth-sky,
+  .teeth-medal,
+  .teeth-medal-shine,
   .prep-sun,
   .teeth-day,
   .teeth-slot.fresh {
