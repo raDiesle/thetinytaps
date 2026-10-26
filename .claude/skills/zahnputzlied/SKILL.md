@@ -84,8 +84,11 @@ start and length:
   changed the line – a new take is better than forcing it.
 - **"odd length"** (a step under 13 s or over 26 s): Suno crammed or stretched a verse.
   Usable (the German take has a 9 s step), but tell the user and offer a new take.
+- **"unsure start"**: Whisper spread the line's first three words over more than 3 s,
+  smearing them over an intro or a break (Spanish: „Abre grande“ over 7 s of whistling,
+  the start came out 5 s early). Always draw that part and correct the start.
 - **Whisper's times can be seconds off**, mostly for the first word after a break.
-  For any start that looks doubtful, draw that stretch and look at it with Read: the
+  Always draw part 1: Suno often puts a short intro before it. For any start that looks doubtful, draw that stretch and look at it with Read: the
   voice shows as stacks of many harmonics, a whistle or flute as a single line.
 
 ```bash
