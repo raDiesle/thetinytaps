@@ -40,7 +40,9 @@ are not kept offline by every phone, only once the story has started in that lan
 - ElevenLabs always with the turbo model (`eleven_v4_turbo`, in `stimme.json`): it costs half the credits, and
   the 10,000 credits a month have to reach for every language. `yarn voice make --dry [--lang en]` shows what
   would be recorded and how many credits it costs; the German lines were recorded with `eleven_v4` and audio
-  tags before, the other languages with turbo and `--no-tags`.
+  tags before, the other languages with turbo and `--no-tags`. The estimate is far too high: in October 2026
+  10,399 characters (all seven missing story languages) cost 995 credits, about 0.1 per character, so check
+  `yarn voice credits` after a run instead of holding back translations for the estimate.
 
 The game has no settings of its own: read aloud, sounds, its own music and the language follow the shared options on the home page (`useCommonSettings`, `useLanguages`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen only has „Über das Spiel“.
 
