@@ -40,10 +40,17 @@ export function WordsGame() {
       }
       info={
         <>
-          <p>Ganzes Wort: Ein Bild erscheint mit seinem Wort, und das Kind tippt es Buchstabe für Buchstabe. Erster Buchstabe: nur den Anfang zum Bild.</p>
           <p>
-            Farben: Ein Farbwort wie „Rot“ tippen, und Dinge in dieser Farbe hüpfen herein. Tu-Wörter: „Hüpf“ oder „Tanz“ tippen, die Figur macht es vor, und
-            das Kind macht mit.
+            {t({
+              de: "Ganzes Wort: Ein Bild erscheint mit seinem Wort, und das Kind tippt es Buchstabe für Buchstabe. Erster Buchstabe: nur den Anfang zum Bild.",
+              ru: "Целое слово: появляется картинка со своим словом, и ребёнок печатает его буква за буквой. Первая буква: только начало слова к картинке.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Farben: Ein Farbwort wie „Rot“ tippen, und Dinge in dieser Farbe hüpfen herein. Tu-Wörter: „Hüpf“ oder „Tanz“ tippen, die Figur macht es vor, und das Kind macht mit.",
+              ru: "Цвета: напечатать слово цвета, например «Красный», и вещи этого цвета запрыгивают на экран. Слова-действия: напечатать «Прыгай» или «Танцуй», фигурка показывает, а ребёнок повторяет.",
+            })}
           </p>
         </>
       }

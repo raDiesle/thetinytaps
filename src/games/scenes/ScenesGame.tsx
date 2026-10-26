@@ -37,13 +37,30 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       onMode={(mode) => update({ mode: mode as SceneMode })}
       info={
         <>
-          <p>Ein Wimmelbild, in dem alles auf Antippen antwortet: Der Bagger baggert, die Kuh muht.</p>
-          <p>Ausmalen: Das Bild ist grau, und jedes angetippte Ding bekommt seine Farbe zurück; jeder Tipp malt auch einen Farbklecks in den Hintergrund.</p>
           <p>
-            Suchen: Ein Ding erscheint groß in der Blase, und das Kind sucht es im Bild. Fragen: „Was ist rot?“, „Wer kann fliegen?“ – das Kind tippt, was
-            passt.
+            {t({
+              de: "Ein Wimmelbild, in dem alles auf Antippen antwortet: Der Bagger baggert, die Kuh muht.",
+              ru: "Большая картинка, где всё отвечает на касание: экскаватор копает, корова мычит.",
+            })}
           </p>
-          <p>Freies Entdecken: Alles darf angetippt werden, manches stößt etwas anderes an, und Fahrzeuge fahren am Rand in andere Bilder weiter.</p>
+          <p>
+            {t({
+              de: "Ausmalen: Das Bild ist grau, und jedes angetippte Ding bekommt seine Farbe zurück; jeder Tipp malt auch einen Farbklecks in den Hintergrund.",
+              ru: "Раскраска: картинка серая, и каждая вещь, которой коснулся ребёнок, снова становится цветной; каждое касание ещё оставляет цветную кляксу на фоне.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Suchen: Ein Ding erscheint groß in der Blase, und das Kind sucht es im Bild. Fragen: „Was ist rot?“, „Wer kann fliegen?“ – das Kind tippt, was passt.",
+              ru: "Поиск: в пузыре появляется большая вещь, и ребёнок ищет её на картинке. Вопросы: «Что красное?», «Кто умеет летать?» – ребёнок нажимает на то, что подходит.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Freies Entdecken: Alles darf angetippt werden, manches stößt etwas anderes an, und Fahrzeuge fahren am Rand in andere Bilder weiter.",
+              ru: "Свободная игра: можно нажимать на всё, одно иногда приводит в движение другое, а машины уезжают за край в другие картинки.",
+            })}
+          </p>
         </>
       }
       settings={
