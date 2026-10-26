@@ -148,5 +148,13 @@ export const allGamesIdeas: IdeaArea = {
       effort: "L",
       partial: "Alles auf Deutsch; „Buchstaben & Zahlen“ und „Wörter tippen“ auch auf Englisch.",
     },
+    {
+      id: "A-19",
+      emoji: "🔍",
+      title: "Bei Google gefunden werden",
+      text: "Heute kennt Google nur die Startseite: Jede Spielseite kommt über 404.html (Fehlercode 404, wird nicht aufgenommen), und alle haben denselben Titel und dieselbe Beschreibung. Beim Bauen bekommt jede Seite ihre eigene index.html mit Titel, Beschreibung und ein paar Sätzen auf Deutsch, dazu sitemap.xml und robots.txt. Titel nach dem, was Eltern suchen: „Zähneputzen für Kinder – Zahnputzlied mit Timer“, „Bewegungsspiele für Kleinkinder drinnen“, „Tiergeräusche für Kinder“, „Gefühle Kindern erklären“, überall „ab 2 Jahren, kostenlos, ohne Werbung, offline“.",
+      why: "Eltern suchen genau das, was es hier schon gibt (z. B. „zähne putzen kinder app“, „zahnputzlied kinder“, „bewegungsspiele kleinkinder drinnen“, „lernspiele für 2 jährige“), finden es aber nicht.",
+      effort: "M",
+    },
   ],
 };
