@@ -130,28 +130,67 @@ interface Box {
   b: [number, number];
   /** Fills for the faces across the bristles, the sides and the ends. */
   fills: [string, string, string];
+  /** Outline width; the small bristle tufts get a thinner one so they don't drown in ink. */
+  line?: number;
 }
 
 const BLUE: Box["fills"] = ["#4cc9f0", "#33b0d9", "#2797bf"];
+const WHITE: Box["fills"] = ["#ffffff", "#e3f3ff", "#d2e9f8"];
+const SKY: Box["fills"] = ["#bfe9fb", "#9fd8f2", "#8acbe9"];
+const GRIP: Box["fills"] = ["#80ed99", "#57cc99", "#3fa97f"];
 /** A child's brush head covers about two milk molars. */
 const SIZE = 1.25;
 
-// The bristles stick out a little round the head, so it reads as a brush even from the back.
-const BOXES: Box[] = [
-  { u: [-23, 21], w: [-12, 12], b: [-11, 0], fills: ["#ffffff", "#e3f3ff", "#d2e9f8"] },
-  { u: [-21, 22], w: [-9.5, 9.5], b: [-17, -11], fills: BLUE },
-  { u: [22, 60], w: [-3.5, 3.5], b: [-16, -11], fills: BLUE },
-  { u: [60, 140], w: [-6.5, 6.5], b: [-18, -10], fills: BLUE },
+/** Rows of bristle tufts from the tip of the head towards the neck, alternating white and light blue like a real child's brush. */
+const TUFT_ROWS: [number, number][] = [
+  [-23, -17],
+  [-15.5, -9.5],
+  [-8, -2],
+  [-0.5, 5.5],
+  [7, 13],
+  [14.5, 20.5],
 ];
 
-/** Foam round the bristle tips, in (u, w, b). */
+// The bristles stick out a little round the head, so it reads as a brush even from the back.
+// Two tufts per row with a gap between them; the tip row is the longest, as on a real brush.
+const TUFTS: Box[] = TUFT_ROWS.flatMap((u, row) =>
+  [
+    [-11.5, -0.8],
+    [0.8, 11.5],
+  ].map((w): Box => ({ u, w: w as [number, number], b: [-11, row === 0 ? 0 : -1.5 - (row % 2)], fills: row % 2 ? SKY : WHITE, line: 1.5 })),
+);
+
+const BOXES: Box[] = [
+  ...TUFTS,
+  // Head, with a rounded-off tip.
+  { u: [-21, 22], w: [-9.5, 9.5], b: [-17, -11], fills: BLUE },
+  { u: [-25, -21], w: [-6.5, 6.5], b: [-16.5, -11.5], fills: BLUE },
+  // A thin neck, then the handle: blue, a soft green grip for the thumb, a blue end.
+  { u: [22, 60], w: [-3.5, 3.5], b: [-16, -11], fills: BLUE },
+  { u: [60, 84], w: [-6, 6], b: [-17.5, -10.5], fills: BLUE },
+  { u: [84, 118], w: [-7.5, 7.5], b: [-19, -9], fills: GRIP },
+  { u: [118, 142], w: [-6, 6], b: [-17.5, -10.5], fills: BLUE },
+];
+
+/** Foam round the bristle tips, in (u, w, b); more of it shows the longer the child brushes. */
 const FOAM: Vec3[] = [
   [-15, 8, -3],
   [-3, -9, -2],
   [9, 9, -4],
   [16, -7, -2],
   [2, 2, 1],
+  [-20, -6, -1],
+  [-9, 11, 0],
+  [13, 1, 0],
+  [-12, -1, 1],
+  [20, 10, -3],
+  [4, -12, -1],
+  [-24, 3, -4],
 ];
+/** Seconds of brushing until all the foam is there. */
+const FOAM_FULL_S = 30;
+/** How far the brush rocks on its handle while it scrubs or circles (0.15 is about 9°). */
+const ROCK = 0.15;
 
 const fmt = (p: { x: number; y: number }) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
 
@@ -173,7 +212,7 @@ function drawBox(box: Box, pose: Pose, w: Vec3, project: Projector, key: number)
       {faces
         .filter((f) => project.facing(f.normal) > 0.02)
         .map((f, i) => (
-          <path key={i} d={`M${f.points.map(fmt).join(" L")} Z`} fill={f.fill} stroke={INK} strokeWidth={2.2} strokeLinejoin="round" />
+          <path key={i} d={`M${f.points.map(fmt).join(" L")} Z`} fill={f.fill} stroke={INK} strokeWidth={box.line ?? 2.2} strokeLinejoin="round" />
         ))}
     </g>
   );
@@ -234,15 +273,25 @@ export function Brush({
   current.current = { pose, at: now };
 
   const jawUp: Vec3 = tooth.jaw === "lower" ? [0, 1, 0] : [0, -1, 0];
-  const moved = { ...pose, at: add(pose.at, motionOffset(pose, motion, jawUp, t)) };
+  // A real hand rocks the brush a little on its handle as it scrubs or circles; wiping keeps it steady.
+  const tilt = motion === "wipe" ? 0 : ROCK * Math.sin((2 * Math.PI * t) / (motion === "scrub" ? SCRUB_S : CIRCLE_S));
+  const side = cross(pose.u, pose.b);
+  const rocked = add(scale(pose.b, Math.cos(tilt)), scale(side, Math.sin(tilt)));
+  const moved = { u: pose.u, b: rocked, at: add(pose.at, motionOffset(pose, motion, jawUp, t)) };
   const w = cross(moved.u, moved.b);
   const center = (box: Box) =>
-    project.point(add(moved.at, scale(add(scale(moved.u, (box.u[0] + box.u[1]) / 2), scale(moved.b, (box.b[0] + box.b[1]) / 2)), SIZE))).depth;
+    project.point(
+      add(
+        moved.at,
+        scale(add(scale(moved.u, (box.u[0] + box.u[1]) / 2), add(scale(w, (box.w[0] + box.w[1]) / 2), scale(moved.b, (box.b[0] + box.b[1]) / 2))), SIZE),
+      ),
+    ).depth;
   const boxes = BOXES.map((box, i) => ({ box, i, depth: center(box) })).sort((a, b) => a.depth - b.depth);
   const backShows = project.facing(scale(moved.b, -1)) > 0;
+  const foamCount = Math.min(FOAM.length, 4 + Math.floor(((FOAM.length - 4) * t) / FOAM_FULL_S));
   const foam = (
     <g className="brush-foam" fill="#fff" stroke="#bde0fe" strokeWidth={2}>
-      {FOAM.map(([su, sw, sb], i) => {
+      {FOAM.slice(0, foamCount).map(([su, sw, sb], i) => {
         const p = project.point(add(moved.at, scale(add(scale(moved.u, su), add(scale(w, sw), scale(moved.b, sb))), SIZE)));
         return <circle key={i} cx={p.x} cy={p.y} r={(3.5 + (i % 3)) * project.zoom} />;
       })}

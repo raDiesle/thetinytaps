@@ -63,9 +63,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏝️ Die Schatzinsel",
         recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "text" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
       },
-      { label: "☁️ Die Wolkenreise", recorded: true, languages: { de: "done", ru: "done" } },
+      {
+        label: "☁️ Die Wolkenreise",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
+      },
     ],
   },
   { href: "/gefuehle/", languages: { de: "done", ru: "done" } },
@@ -94,7 +98,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
-        languages: { de: "done", en: "done", ru: "done" },
+        languages: { de: "done", en: "done", es: "done", ru: "done" },
         note: "Text und Lied von Suno, eine neue Sprache: /zahnputzlied.",
       },
     ],

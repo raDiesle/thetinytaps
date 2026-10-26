@@ -1,6 +1,8 @@
 import { useRef, type CSSProperties, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import { useT } from "@/lib/language";
+import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
+import type { Cue } from "./cues";
 import type { Daytime } from "./daytime";
 import { PICTURE } from "./jaw";
 import { fitBox, FrameStroke, INK, Monster, screenFrame, SKIN, useRoom, type Box } from "./mouth";
@@ -11,10 +13,16 @@ import { fitBox, FrameStroke, INK, Monster, screenFrame, SKIN, useRoom, type Box
 // teeth. Then time goes by in the sky (the sun crosses the day before the
 // evening brushing, the moon crosses the night before the morning one) and the
 // crumbs grow into the same monsters the mirror shows later, while the child
-// looks worried. All of it is CSS animation (teeth.css), calm enough to go
-// with the music; ARRIVE_MS here sets when each sweet reaches the mouth.
+// looks worried. The child is happy about each sweet: its eyes follow it and
+// its brows go up, hearts rise, and while it chews its eyes close happily and
+// its cheeks glow. All of it is CSS animation (teeth.css), calm enough to go
+// with the music; ARRIVE_MS here sets when each sweet reaches the mouth, and
+// ORIGIN_CUES the sounds that go with it (cheering, unwrapping, biting, chewing, „Mmmh“).
 
 export type OriginPart = "sweets" | "grow";
+
+/** How long each part lasts: the sweets one until the last is chewed, the grow one until the monsters are there. */
+export const ORIGIN_MS: Record<OriginPart, number> = { sweets: 9600, grow: 6000 };
 
 const { width: W } = PICTURE;
 /** What has to fit between heading and controls: the head, with the corners the sweets appear in; the screen shows more sky round it. */
@@ -39,14 +47,42 @@ const FIRST_ID = 1000;
 const ARRIVE_MS = [2300, 5000, 7700];
 /** How long the mouth chews each sweet; the crumbs show when it opens again. */
 const CHEW_MS = 1200;
+/** How long a sweet shows before it reaches the mouth: growing, floating and gliding in (`.origin-sweet` in teeth.css). */
+const SHOW_MS = 2288;
+/** When each sweet appears in its corner. */
+const APPEAR_MS = ARRIVE_MS.map((at) => at - SHOW_MS);
 
-/** One chew per sweet; set property by property, so the pause rule in teeth.css still holds. */
-const CHEWING: CSSProperties = {
-  animationName: ARRIVE_MS.map(() => "teeth-origin-chew").join(", "),
-  animationDuration: `${CHEW_MS}ms`,
+/** One animation per sweet, starting at `times`; set property by property, so the pause rule in teeth.css still holds. */
+const perSweet = (names: string[], ms: number, times: number[]): CSSProperties => ({
+  animationName: names.join(", "),
+  animationDuration: `${ms}ms`,
   animationTimingFunction: "ease-in-out",
-  animationDelay: ARRIVE_MS.map((at) => `${at}ms`).join(", "),
-};
+  animationDelay: times.map((at) => `${at}ms`).join(", "),
+});
+
+/** One chew per sweet. */
+const CHEWING = perSweet(
+  ARRIVE_MS.map(() => "teeth-origin-chew"),
+  CHEW_MS,
+  ARRIVE_MS,
+);
+/** While chewing the eyes close happily and the cheeks glow. */
+const HAPPY_EYES = perSweet(
+  ARRIVE_MS.map(() => "teeth-origin-happy"),
+  CHEW_MS,
+  ARRIVE_MS,
+);
+const GLOW = perSweet(
+  ARRIVE_MS.map(() => "teeth-origin-glow"),
+  CHEW_MS,
+  ARRIVE_MS,
+);
+/** The brows go up in delight while a sweet shows. */
+const DELIGHT = perSweet(
+  APPEAR_MS.map(() => "teeth-origin-delight"),
+  SHOW_MS,
+  APPEAR_MS,
+);
 
 /** Where each sweet first appears: in the top corners, beside the head. */
 const SWEET_FROM = [
@@ -109,6 +145,37 @@ function Cupcake() {
 
 const SWEETS = [Lollipop, Bonbon, Cupcake];
 
+/** The eyes follow each sweet: up to its corner while it floats, down to the mouth as it glides in. */
+const LOOK = perSweet(
+  SWEET_FROM.map((from) => (from.x > W / 2 ? "teeth-origin-look-right" : "teeth-origin-look-left")),
+  SHOW_MS,
+  APPEAR_MS,
+);
+
+/** Two hearts rise beside the head when a sweet appears, on its side. */
+const HEARTS = SWEET_FROM.flatMap((from, i) => {
+  const side = from.x > W / 2 ? 1 : -1;
+  return [
+    { x: W / 2 + side * 112, y: 70, at: APPEAR_MS[i] + 500 },
+    { x: W / 2 + side * 168, y: 128, at: APPEAR_MS[i] + 770 },
+  ];
+});
+const HEART_PATH = "M0 10 C-22 -6 -16 -26 0 -14 C16 -26 22 -6 0 10 Z";
+
+/** What the child hears: a cheer when the sweets come, unwrapping the bonbon, a bite and chewing for each, „Mmmh“ at the end. */
+export const ORIGIN_CUES: Cue[] = [
+  { at: APPEAR_MS[0] + 500, play: () => playRecorded("yay", playGiggle) },
+  { at: APPEAR_MS[1] + 700, play: () => playRecorded("wrapper", playRustle) },
+  ...ARRIVE_MS.flatMap((at, i) => [
+    { at: at + 300, play: i === 2 ? () => playRecorded("munch", playMunch) : () => playRecorded("lolly", playCrunch) },
+    { at: at + 600, play: () => playRecorded("chew", playMunch) },
+  ]),
+  { at: ARRIVE_MS[2] + CHEW_MS + 150, play: () => playRecorded("yum", playYum) },
+].sort((a, b) => a.at - b.at);
+
+/** The recordings the story plays, to load before it starts. */
+export const ORIGIN_RECORDINGS = ["yay", "wrapper", "lolly", "munch", "chew", "yum"];
+
 /** The sun, or the moon with a star, that crosses the sky while the monsters grow. */
 function SkyBody({ daytime }: { daytime: Daytime }) {
   return (
@@ -127,12 +194,12 @@ function SkyBody({ daytime }: { daytime: Daytime }) {
   );
 }
 
-/** A big round eye with two shines; the pupil looks down at the teeth while the monsters grow. */
-function Eye({ x, y }: { x: number; y: number }) {
+/** A big round eye with two shines; the pupil follows the sweets, and looks down at the teeth while the monsters grow. */
+function Eye({ x, y, look }: { x: number; y: number; look?: CSSProperties }) {
   return (
     <g>
       <ellipse cx={x} cy={y} rx={22} ry={26} fill="#fff" stroke={INK} strokeWidth={4} />
-      <g className="origin-pupil">
+      <g className="origin-pupil" style={look}>
         <circle cx={x + 2} cy={y + 4} r={15} fill={INK} />
         <circle cx={x + 7} cy={y - 3} r={6} fill="#fff" />
         <circle cx={x - 3} cy={y + 11} r={3} fill="#fff" />
@@ -161,6 +228,7 @@ export function Origin({
   const { box, unit } = fitBox(useRoom(svg, free), FOCUS);
   const frame = screenFrame(box, unit);
   const bottom = box.y + box.height;
+  const sweets = part === "sweets";
   return (
     <svg
       ref={svg}
@@ -216,16 +284,29 @@ export function Origin({
         />
         <path d="M222 44 C206 18 238 4 244 24 C248 38 230 42 228 32" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
 
-        <path className="origin-brow left" d="M140 150 Q160 140 180 148" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-        <path className="origin-brow right" d="M260 148 Q280 140 300 150" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-        <Eye x={160} y={186} />
-        <Eye x={280} y={186} />
+        <g style={sweets ? DELIGHT : undefined}>
+          <path className="origin-brow left" d="M140 150 Q160 140 180 148" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+          <path className="origin-brow right" d="M260 148 Q280 140 300 150" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+        </g>
+        <Eye x={160} y={186} look={sweets ? LOOK : undefined} />
+        <Eye x={280} y={186} look={sweets ? LOOK : undefined} />
+        {/* Happy closed eyes while chewing: skin over the eye and a smiling arc. */}
+        {sweets && (
+          <g className="origin-happy-eyes" style={HAPPY_EYES}>
+            {[160, 280].map((x) => (
+              <g key={x}>
+                <ellipse cx={x} cy={188} rx={27} ry={31} fill={SKIN} />
+                <path d={`M${x - 18} 194 Q${x} 172 ${x + 18} 194`} fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+              </g>
+            ))}
+          </g>
+        )}
         <path d="M212 226 Q220 234 228 226" fill="none" stroke={INK} strokeWidth={4} strokeLinecap="round" />
-        <ellipse cx={104} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
-        <ellipse cx={336} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
+        <ellipse className="origin-cheek" style={sweets ? GLOW : undefined} cx={104} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
+        <ellipse className="origin-cheek" style={sweets ? GLOW : undefined} cx={336} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
 
         {/* The mouth closes and chews when a sweet arrives. */}
-        <g className="origin-mouth" style={part === "sweets" ? CHEWING : undefined}>
+        <g className="origin-mouth" style={sweets ? CHEWING : undefined}>
           <path d={MOUTH_PATH} fill="#7a1f3d" />
           <g clipPath="url(#origin-mouth)">
             {/* The tongue lies behind the lower teeth. */}
@@ -278,8 +359,16 @@ export function Origin({
             })}
         </g>
 
+        {/* Hearts for each sweet: the child is delighted. */}
+        {sweets &&
+          HEARTS.map(({ x, y, at }, i) => (
+            <g key={i} transform={`translate(${x} ${y})`}>
+              <path className="origin-heart" style={{ "--at": `${at}ms` } as CSSProperties} d={HEART_PATH} fill="#ff6b9a" stroke={INK} strokeWidth={3} />
+            </g>
+          ))}
+
         {/* Each sweet appears big in a top corner, floats a moment, then glides into the mouth. */}
-        {part === "sweets" &&
+        {sweets &&
           SWEETS.map((Sweet, i) => (
             <g
               key={i}

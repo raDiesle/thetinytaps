@@ -31,6 +31,9 @@ In a fresh worktree run `yarn install` first.
   the user once checked another session's server by mistake.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
+  Before building something bigger in a game, merge local `main` into your branch and read the game's latest
+  commits and `CLAUDE.md`: another session may already be building the same thing (two sweets stories once
+  had to be folded into one), and its new rules apply to your work too.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
@@ -152,7 +155,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   defaults (so new fields need no migration); `speech`/`sounds` come from the shared
   options on the home page. Bump the key's `.vN` only when old values would break.
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
-  plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
+  plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README). A new file replaces the sound at every
+  `playRecorded(name, …)` in every game, so grep the name first and pick a new one unless all of them should change.
 - Music: one background song plays behind the menus and every game from the first tap or key of the visit
   (`src/components/BackgroundMusic.tsx`, mounted once in `index.tsx`, so it runs on without a break from the
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
@@ -161,7 +165,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   song files are named `musik-*.mp3`, see `/musik-erzeugen`. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
-  "Bitte quer halten" while the device stands upright, and asks once per visit for fullscreen, which on Android
+  "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“ lets a grown-up play upright for
+  the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
   only between games: menu pages call `useUpdateBetweenGames()` (`src/lib/pwa.ts`) – a new menu page does too, a game never.

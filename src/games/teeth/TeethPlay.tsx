@@ -6,15 +6,17 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
-import { playChime, playCountNote, playDrumRoll, playPoof, playSqueak, playTusch } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playDrumRoll, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, daytimeOf, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
+import { Medal } from "./medal";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { SUNG_LANGUAGES, sungSteps, useBrushingMusic } from "./music";
-import { Origin } from "./origin";
-import { Prep } from "./prep";
+import type { Cue } from "./cues";
+import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
+import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
@@ -24,6 +26,10 @@ import "./teeth.css";
 const MONSTER_COLORS = ["#8bd346", "#b388ff", "#ff9f43", "#ff7bd0", "#4cc9f0"];
 const MONSTER_VARIANTS = 3;
 const TICK_MS = 200;
+/** Before brushing the clock ticks faster, so the sounds of the story and the sink fall on their pictures. */
+const PRELUDE_TICK_MS = 80;
+/** A jump of the clock longer than this plays none of the sounds it skipped. */
+const CUE_GAP_MS = 600;
 const TICKLE_MS = 700;
 const TURN_MS = 1600;
 /** Opening or closing the mouth glides slower, so the child can do it along with the picture. */
@@ -36,25 +42,34 @@ const SEEK_END_MS = 1000;
 const COUNTDOWN = 3;
 /** How long „Los!“ shows when the brushing begins. */
 const GO_MS = 1300;
+/** After the brushing: two bars of cheering at the clean grin, then the brush is rinsed and put away, then the buttons. */
+const CHEER_MS = 4290;
+const ENDING_MS = CHEER_MS + PREP_MS.tidy;
+
+/** The parts of the end: cheering at the clean teeth, tidying the brush away, and resting with the week chart and the buttons. */
+type Ending = "cheer" | "tidy" | "rest";
 
 /** Before the clock starts: where the monsters come from, get the brush, toothpaste on, and see them in the mirror. */
 type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters";
 
-/** How the monsters grow depends on the time of day (over the day or the night), see DAYTIME. */
-const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized }> = {
+/** How the monsters grow depends on the time of day (over the day or the night), see DAYTIME. `sounds` play at their moment of the part. */
+const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized; sounds?: Cue[] }> = {
   sweets: {
-    ms: 9600,
+    ms: ORIGIN_MS.sweets,
+    sounds: ORIGIN_CUES,
     title: { de: "🍭 Süßes essen", ru: "🍭 Едим сладкое" },
     cue: { de: "Mmh, Süßes! Ein bisschen Zucker bleibt an den Zähnen.", ru: "Ммм, сладкое! Немного сахара остаётся на зубках." },
   },
-  grow: { ms: 6000, title: { de: "👾 Zuckermonster wachsen", ru: "👾 Растут сахарные монстры" } },
+  grow: { ms: ORIGIN_MS.grow, title: { de: "👾 Zuckermonster wachsen", ru: "👾 Растут сахарные монстры" } },
   brush: {
-    ms: 7000,
+    ms: PREP_MS.brush,
+    sounds: PREP_CUES.brush,
     title: { de: "🪥 Zahnbürste holen", ru: "🪥 Берём щётку" },
     cue: { de: "Zuerst holen wir die Zahnbürste!", ru: "Сначала берём зубную щётку!" },
   },
   paste: {
-    ms: 8000,
+    ms: PREP_MS.paste,
+    sounds: PREP_CUES.paste,
     title: { de: "🫧 Zahnpasta drauf", ru: "🫧 Немного пасты" },
     cue: { de: "Jetzt ein kleiner Klecks Zahnpasta drauf.", ru: "Теперь капельку зубной пасты." },
   },
@@ -69,6 +84,12 @@ const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized }
 const DONE_SAY: Localized = {
   de: "Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!",
   ru: "Готово! Сахарных монстров больше нет. Теперь сплюнь пенку. Чисто-чисто!",
+};
+
+/** Said while the brush is rinsed and put away (unless the song sings). */
+const TIDY_SAY: Localized = {
+  de: "Zahnbürste ausspülen und zurück in den Becher. Geschafft!",
+  ru: "Споласкиваем щётку и ставим в стаканчик. Готово!",
 };
 
 interface Monster {
@@ -143,6 +164,9 @@ interface Clock {
 
 const readClock = (clock: Clock, now: number) => clock.banked + (clock.since === null ? 0 : now - clock.since);
 
+/** When a prelude part begins, in ms after the start. */
+const preludeStart = (prelude: Prelude[], p: Prelude) => prelude.slice(0, prelude.indexOf(p)).reduce((sum, q) => sum + PRELUDE[q].ms, 0);
+
 /** The prelude part running `elapsed` ms after the start. */
 function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
   let end = 0;
@@ -199,6 +223,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const elapsed = readClock(clock, now);
   const brushed = elapsed - introMs;
   const done = brushed >= totalMs;
+  const ending: Ending | null = !done ? null : brushed - totalMs < CHEER_MS ? "cheer" : brushed - totalMs < ENDING_MS ? "tidy" : "rest";
   /** -1 during the prelude, STEPS.length when done. */
   const phase = brushed < 0 ? -1 : done ? STEPS.length : stepStarts.filter((at, k) => k < STEPS.length && brushed >= at).length - 1;
   const before = brushed < 0 ? preludeAt(prelude, elapsed) : null;
@@ -219,13 +244,35 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     [settings.speech],
   );
 
-  useWakeLock(!done);
+  useWakeLock(ending !== "rest");
+
+  // The clock runs on through the end until the brush is put away; the story, the sink and tidying up tick faster for their sounds.
+  const ticking = ending !== "rest";
+  const fastTick = before !== null || done;
+  useEffect(() => {
+    if (!ticking || paused) return;
+    const timer = setInterval(() => setNow(performance.now()), fastTick ? PRELUDE_TICK_MS : TICK_MS);
+    return () => clearInterval(timer);
+  }, [ticking, paused, round, fastTick]);
 
   useEffect(() => {
-    if (done || paused) return;
-    const timer = setInterval(() => setNow(performance.now()), TICK_MS);
-    return () => clearInterval(timer);
-  }, [done, paused, round]);
+    if (settings.sounds)
+      loadRecordings([...(settings.origin ? ORIGIN_RECORDINGS : []), ...(settings.prep ? PREP_RECORDINGS : []), ...TIDY_RECORDINGS, "cheer"]);
+  }, [settings.sounds, settings.origin, settings.prep]);
+
+  // The sounds of the story, the sink and tidying up, each when the clock passes its moment; none of those a jump skips over.
+  const lastElapsed = useRef(elapsed);
+  useEffect(() => {
+    const from = lastElapsed.current;
+    lastElapsed.current = elapsed;
+    const sounds = before
+      ? { start: preludeStart(prelude, before), cues: PRELUDE[before].sounds ?? [] }
+      : ending === "tidy"
+        ? { start: introMs + totalMs + CHEER_MS, cues: PREP_CUES.tidy }
+        : null;
+    if (!settings.sounds || !sounds || elapsed <= from || elapsed - from > CUE_GAP_MS) return;
+    for (const cue of sounds.cues) if (sounds.start + cue.at > from && sounds.start + cue.at <= elapsed) cue.play();
+  }, [elapsed]);
 
   // On the way to the sink the shared background song runs on from the menu (while music is on); the brushing has its own song, always.
   const [common] = useCommonSettings();
@@ -251,20 +298,29 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       if (settings.sounds) (phase === 0 ? playTusch : playChime)();
       if (!sung) say(stepText(STEPS[phase], "cue", language));
     } else {
-      if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
-      // The sung finale sings "Fertig, blitzeblank" itself; the voice would talk over it.
-      if (!sung) {
-        say(spokenIn(DONE_SAY, language));
-        say(daytimeText(daytime, "after", language), true);
+      // Done: a fanfare of notes and children cheering, and confetti for two bars.
+      if (settings.sounds) {
+        [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
+        setTimeout(() => playRecorded("cheer", playTusch), 700);
       }
+      // The sung finale sings "Fertig, blitzeblank" itself; the voice would talk over it.
+      if (!sung) say(spokenIn(DONE_SAY, language));
       // A star on the week chart, whether or not it is shown, so it is complete when turned on.
       const next = addBrushing(loadWeek(), new Date(), daytime);
       saveWeek(next);
       setWeek(next);
-      for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 150);
+      for (let i = 0; i < 24; i++) setTimeout(() => spawn(), i * 160);
     }
     // Only when the part changes, not when a setting does.
   }, [part, round]);
+
+  // Rinsing the brush, and the daytime's goodbye when all is tidy; the sung finale needs no voice.
+  useEffect(() => {
+    if (sung) return;
+    if (ending === "tidy") say(spokenIn(TIDY_SAY, language), true);
+    if (ending === "rest") say(daytimeText(daytime, "after", language), true);
+    // Only when the end moves on.
+  }, [ending]);
 
   // A drum roll under the countdown, louder each second.
   useEffect(() => {
@@ -322,11 +378,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   /** Jump to the start of a part: the prelude ones first, then the steps, then the end. */
   const jumpTo = useCallback(
     (target: number) =>
-      seek(
-        target < prelude.length
-          ? prelude.slice(0, target).reduce((sum, p) => sum + PRELUDE[p].ms, 0)
-          : introMs + stepStarts[Math.min(target - prelude.length, STEPS.length)],
-      ),
+      seek(target < prelude.length ? preludeStart(prelude, prelude[target]) : introMs + stepStarts[Math.min(target - prelude.length, STEPS.length)]),
     [seek, prelude, introMs, stepStarts],
   );
 
@@ -348,13 +400,14 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         else togglePause();
       } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
         if (!done) jumpTo(part + 1);
+        else if (ending !== "rest") seek(introMs + totalMs + ENDING_MS);
       } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         jumpTo(Math.max(0, part - 1));
       }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [done, part, again, togglePause, jumpTo]);
+  }, [done, ending, part, again, togglePause, jumpTo, seek, introMs, totalMs]);
 
   // When the mouth has to open or close, the picture does it slowly and arrows on the lips show the way.
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
@@ -399,18 +452,32 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {/* While brushing no text at all: the picture, the song and the voice say what to do, and the mouth gets the room. */}
       {!step && (
         <div className="teeth-heading" key={`${round}-${part}`}>
-          <h2 className="teeth-cue">{before ? t(PRELUDE[before].title) : daytimeText(daytime, "doneTitle", language).text}</h2>
+          {before ? (
+            <h2 className="teeth-cue">{t(PRELUDE[before].title)}</h2>
+          ) : (
+            <h2 className="teeth-cue teeth-done">
+              <Medal label={t({ de: "Goldmedaille", ru: "Золотая медаль" })} />
+              {t({ de: "Geschafft!", ru: "Ура, получилось!" })}
+            </h2>
+          )}
           {before === "paste" && (
             <p className="teeth-mouth prep">
               👌 {t({ de: "Erbsengroß", ru: "С горошину" })}
               <span className="teeth-hint"> · {t({ de: "unter 2 Jahren nur reiskorngroß", ru: "до 2 лет — с рисовое зёрнышко" })}</span>
             </p>
           )}
-          {done && (
-            <p className="teeth-mouth spit">
-              💦 {t({ de: "Ausspucken", ru: "Сплюнуть" })}
-              <span className="teeth-hint"> · {t({ de: "nicht mit Wasser nachspülen", ru: "водой не полоскать" })}</span>
+          {/* First spit out; when the brush is put away, the daytime's goodbye. */}
+          {ending === "rest" ? (
+            <p className="teeth-mouth goodbye" key="goodbye">
+              {daytimeText(daytime, "doneTitle", language).text}
             </p>
+          ) : (
+            done && (
+              <p className="teeth-mouth spit">
+                💦 {t({ de: "Ausspucken", ru: "Сплюнуть" })}
+                <span className="teeth-hint"> · {t({ de: "nicht mit Wasser nachspülen", ru: "водой не полоскать" })}</span>
+              </p>
+            )
           )}
         </div>
       )}
@@ -422,6 +489,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
           <Origin key={round} part={before} daytime={daytime} tickled={tickled} onTickle={tickle} free={room} />
         ) : before === "brush" || before === "paste" ? (
           <Prep key={round} part={before} daytime={daytime} free={room} />
+        ) : ending === "tidy" ? (
+          <Prep key={round} part="tidy" daytime={daytime} free={room} />
         ) : (
           <Mouth
             key={round}
@@ -439,18 +508,21 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         )}
       </div>
 
+      {/* The buttons and the week's new star wait until the brush is put away. */}
       {done ? (
-        <div className="teeth-end">
-          {settings.week && <Week log={week} today={new Date()} now={daytime} />}
-          <div className="teeth-end-buttons">
-            <button type="button" className="teeth-again teeth-menu" onClick={leave}>
-              <MenuIcon /> {t({ de: "Menü", ru: "Меню" })}
-            </button>
-            <button type="button" className="teeth-again" onClick={again}>
-              🔁 {t({ de: "Nochmal", ru: "Ещё раз" })}
-            </button>
+        ending === "rest" && (
+          <div className="teeth-end">
+            {settings.week && <Week log={week} today={new Date()} now={daytime} />}
+            <div className="teeth-end-buttons">
+              <button type="button" className="teeth-again teeth-menu" onClick={leave}>
+                <MenuIcon /> {t({ de: "Menü", ru: "Меню" })}
+              </button>
+              <button type="button" className="teeth-again" onClick={again}>
+                🔁 {t({ de: "Nochmal", ru: "Ещё раз" })}
+              </button>
+            </div>
           </div>
-        </div>
+        )
       ) : (
         <>
           {/* The week shows before brushing too, which star is to come (not during the story, nor on a phone, where the pictures need the room); while brushing, the mouth gets its room. */}
