@@ -1,4 +1,5 @@
 import { useEffect, useState, type PointerEvent, type ReactNode } from "react";
+import { useT } from "@/lib/language";
 
 interface GameEndProps {
   /** Plays the same level (picture, story …) once more. */
@@ -14,6 +15,7 @@ interface GameEndProps {
  * next, right in the game, without the way back to the menu.
  */
 export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
+  const t = useT();
   const [shown, setShown] = useState(delayMs <= 0);
 
   useEffect(() => {
@@ -36,14 +38,19 @@ export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
         <span className="game-end-emoji" aria-hidden>
           🔁
         </span>
-        Nochmal
+        {t({ de: "Nochmal", ru: "Ещё раз" })}
       </button>
       {next && (
-        <button type="button" className="game-end-button next" aria-label={`Weiter: ${next.name}`} onPointerDown={press(next.onNext)}>
+        <button
+          type="button"
+          className="game-end-button next"
+          aria-label={`${t({ de: "Weiter", ru: "Дальше" })}: ${next.name}`}
+          onPointerDown={press(next.onNext)}
+        >
           <span className="game-end-emoji" aria-hidden>
             {next.emoji}
           </span>
-          Weiter ▶
+          {t({ de: "Weiter", ru: "Дальше" })} ▶
         </button>
       )}
     </div>

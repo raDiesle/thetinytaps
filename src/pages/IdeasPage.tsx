@@ -466,7 +466,7 @@ function Languages() {
               return (
                 <tr key={row.href}>
                   <th>
-                    {game ? `${game.emoji} ${game.title}` : "🏠 Startseite & Eltern"}
+                    {game ? `${game.emoji} ${game.title.de}` : "🏠 Startseite & Eltern"}
                     {row.note && <small>{row.note}</small>}
                   </th>
                   {TARGET_LANGUAGES.map((l) => {

@@ -57,6 +57,13 @@ In a fresh worktree run `yarn install` first.
   tense). Other languages come game by game: the app aims at German, the five most spoken
   languages (English, Chinese, Hindi, Spanish, Arabic), Russian and Italian (`src/content/targetLanguages.ts`).
   When a game gains one, mark it in `src/content/ideas/languageStatus.ts` (shown on `/ideen/`).
+- **The whole app also speaks Russian** (🌐 on the home page, `src/lib/language.ts`): grown-ups' screens and what
+  the child hears and sees. Every new text gets its Russian right away, next to the German: short texts inline
+  as `t({ de: "…", ru: "…" })` (`useT()`), larger content in a `*.ru.ts` / `ru.ts` file next to the German data,
+  keyed by id. Speak a text with the speech language of the language it is in (`useAppLanguage().speechLang`),
+  never a fixed `de-DE`. Russian for the child: present tense, "ты", nothing that changes for boy or girl.
+  Keys that stand for letters take the Cyrillic letter at their ЙЦУКЕН place (`src/lib/cyrillicKeys.ts`).
+  `src/lib/language.test.ts` fails on a `t({ de })` without `ru`. Only the ideas page (`/ideen/`) stays German.
   Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported

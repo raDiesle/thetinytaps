@@ -2,9 +2,13 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useLocation } from "react-router";
 import { useDevice } from "@/lib/device";
 import { canFullscreen, enterFullscreen, useFullscreen } from "@/lib/fullscreen";
+import { useT } from "@/lib/language";
 import { isStandalone } from "@/lib/pwa";
 
 const PORTRAIT = "(orientation: portrait)";
+
+const TURN = { de: "Bitte quer halten", ru: "Поверните экран горизонтально" };
+const ASK = { de: "Im Vollbild spielen?", ru: "Играть в полноэкранном режиме?" };
 
 function subscribePortrait(onChange: () => void) {
   const query = matchMedia(PORTRAIT);
@@ -25,6 +29,7 @@ function usePortrait(): boolean {
  */
 export function ScreenHint() {
   const device = useDevice();
+  const t = useT();
   const portrait = usePortrait();
   const fullscreen = useFullscreen();
   const { pathname } = useLocation();
@@ -46,7 +51,7 @@ export function ScreenHint() {
 
   if (portrait) {
     return (
-      <div className="screen-hint" role="dialog" aria-modal aria-label="Bitte quer halten">
+      <div className="screen-hint" role="dialog" aria-modal aria-label={t(TURN)}>
         <svg className="screen-hint-phone" viewBox="0 0 120 120" aria-hidden>
           <path className="screen-hint-arrow" d="M28 30 A44 44 0 0 1 92 28 M84 18 L93 28 L80 34" />
           <g className="screen-hint-turn">
@@ -54,10 +59,10 @@ export function ScreenHint() {
             <circle cx="60" cy="98" r="3" />
           </g>
         </svg>
-        <p className="screen-hint-title">Bitte quer halten</p>
+        <p className="screen-hint-title">{t(TURN)}</p>
         {fullscreenPossible && (
           <button type="button" className="screen-hint-button" onClick={goFullscreen}>
-            <FullscreenIcon /> Vollbild
+            <FullscreenIcon /> {t({ de: "Vollbild", ru: "Полный экран" })}
           </button>
         )}
       </div>
@@ -66,14 +71,14 @@ export function ScreenHint() {
 
   if (fullscreenPossible && !asked) {
     return (
-      <div className="screen-hint" role="dialog" aria-modal aria-label="Im Vollbild spielen?">
-        <p className="screen-hint-title">Im Vollbild spielen?</p>
+      <div className="screen-hint" role="dialog" aria-modal aria-label={t(ASK)}>
+        <p className="screen-hint-title">{t(ASK)}</p>
         <div className="screen-hint-buttons">
           <button type="button" className="screen-hint-button" onClick={goFullscreen}>
-            <FullscreenIcon /> Vollbild
+            <FullscreenIcon /> {t({ de: "Vollbild", ru: "Полный экран" })}
           </button>
           <button type="button" className="screen-hint-button secondary" onClick={() => setAsked(true)}>
-            Nein
+            {t({ de: "Nein", ru: "Нет" })}
           </button>
         </div>
       </div>

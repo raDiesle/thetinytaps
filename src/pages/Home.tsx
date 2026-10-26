@@ -7,6 +7,7 @@ import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
+import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
 /** Holding the "p" in the title this long opens the hidden idea collection. */
@@ -14,6 +15,7 @@ const IDEAS_HOLD_MS = 2000;
 
 export function Home() {
   useTitle();
+  const t = useT();
   const navigate = useNavigate();
   const grid = useFitGrid(CATEGORIES.length);
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -40,11 +42,11 @@ export function Home() {
           onContextMenu: (e) => e.preventDefault(),
         }}
       />
-      <p className="home-subtitle">Spiele für die Kleinsten (2–3 Jahre)</p>
+      <p className="home-subtitle">{t({ de: "Spiele für die Kleinsten (2–3 Jahre)", ru: "Игры для самых маленьких (2–3 года)" })}</p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {CATEGORIES.map((c) => (
           <li key={c.id}>
-            <GameCard href={categoryHref(c)} emoji={c.emoji} title={c.title} />
+            <GameCard href={categoryHref(c)} emoji={c.emoji} title={t(c.title)} />
           </li>
         ))}
       </ul>

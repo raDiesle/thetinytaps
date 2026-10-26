@@ -1,3 +1,4 @@
+import { useT } from "@/lib/language";
 import { canFullscreen, enterFullscreen, exitFullscreen, useFullscreen } from "@/lib/fullscreen";
 
 /**
@@ -6,8 +7,9 @@ import { canFullscreen, enterFullscreen, exitFullscreen, useFullscreen } from "@
  */
 export function FullscreenButton() {
   const on = useFullscreen();
+  const t = useT();
   if (!canFullscreen()) return null;
-  const label = on ? "Vollbild beenden" : "Vollbild";
+  const label = on ? t({ de: "Vollbild beenden", ru: "Выйти из полноэкранного режима" }) : t({ de: "Vollbild", ru: "Полный экран" });
   return (
     <button
       type="button"

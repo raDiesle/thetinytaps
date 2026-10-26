@@ -1,15 +1,18 @@
+import type { Localized } from "@/lib/language";
+
 export interface Game {
   href: string;
   emoji: string;
-  title: string;
+  /** The game's name in every language of the app (see lib/language.ts). */
+  title: Localized;
 }
 
 export interface Category {
   id: string;
   emoji: string;
-  title: string;
+  title: Localized;
   /** Under the title on the category's own page. */
-  subtitle: string;
+  subtitle: Localized;
   games: Game[];
 }
 
@@ -18,45 +21,45 @@ export const CATEGORIES: Category[] = [
   {
     id: "lebendige-welten",
     emoji: "🖼️",
-    title: "Lebendige Welten",
-    subtitle: "Bilder und Geschichten, die auf jedes Antippen antworten.",
+    title: { de: "Lebendige Welten", ru: "Живые миры" },
+    subtitle: { de: "Bilder und Geschichten, die auf jedes Antippen antworten.", ru: "Картинки и истории, которые отвечают на каждое касание." },
     games: [
-      { href: "/bilder/", emoji: "🖼️", title: "Lebendige Bilder" },
-      { href: "/abenteuer/", emoji: "🏝️", title: "Bewegungsabenteuer" },
-      { href: "/gefuehle/", emoji: "🐻", title: "Gefühle" },
-      { href: "/kettenreaktion/", emoji: "🎳", title: "Kettenreaktion" },
-      { href: "/kleine-abenteuer/", emoji: "🧭", title: "Kleine Abenteuer" },
+      { href: "/bilder/", emoji: "🖼️", title: { de: "Lebendige Bilder", ru: "Живые картинки" } },
+      { href: "/abenteuer/", emoji: "🏝️", title: { de: "Bewegungsabenteuer", ru: "Приключения в движении" } },
+      { href: "/gefuehle/", emoji: "🐻", title: { de: "Gefühle", ru: "Чувства" } },
+      { href: "/kettenreaktion/", emoji: "🎳", title: { de: "Kettenreaktion", ru: "Цепная реакция" } },
+      { href: "/kleine-abenteuer/", emoji: "🧭", title: { de: "Kleine Abenteuer", ru: "Маленькие приключения" } },
     ],
   },
   {
     id: "zuordnen",
     emoji: "🧩",
-    title: "Zuordnen",
-    subtitle: "Was gehört zusammen? Antippen oder hinziehen.",
+    title: { de: "Zuordnen", ru: "Найди пару" },
+    subtitle: { de: "Was gehört zusammen? Antippen oder hinziehen.", ru: "Что к чему подходит? Коснуться или перетащить." },
     games: [
-      { href: "/tiere/", emoji: "🐰", title: "Was gehört zum Tier?" },
-      { href: "/schatten/", emoji: "👤", title: "Schatten finden" },
-      { href: "/socken/", emoji: "🧦", title: "Socken-Paare" },
+      { href: "/tiere/", emoji: "🐰", title: { de: "Was gehört zum Tier?", ru: "Что у кого?" } },
+      { href: "/schatten/", emoji: "👤", title: { de: "Schatten finden", ru: "Найди тень" } },
+      { href: "/socken/", emoji: "🧦", title: { de: "Socken-Paare", ru: "Пары носков" } },
     ],
   },
   {
     id: "buchstaben-zahlen",
     emoji: "🔤",
-    title: "Buchstaben & Zahlen",
-    subtitle: "Tasten drücken, Buchstaben finden, Wörter tippen.",
+    title: { de: "Buchstaben & Zahlen", ru: "Буквы и цифры" },
+    subtitle: { de: "Tasten drücken, Buchstaben finden, Wörter tippen.", ru: "Нажимать клавиши, искать буквы, печатать слова." },
     games: [
-      { href: "/buchstaben/", emoji: "🔤", title: "Buchstaben & Zahlen" },
-      { href: "/woerter/", emoji: "✍️", title: "Wörter tippen" },
+      { href: "/buchstaben/", emoji: "🔤", title: { de: "Buchstaben & Zahlen", ru: "Буквы и цифры" } },
+      { href: "/woerter/", emoji: "✍️", title: { de: "Wörter tippen", ru: "Печатаем слова" } },
     ],
   },
   {
     id: "weitere",
     emoji: "🎈",
-    title: "Weitere",
-    subtitle: "Zähne putzen und laut oder leise rufen.",
+    title: { de: "Weitere", ru: "Ещё" },
+    subtitle: { de: "Zähne putzen und laut oder leise rufen.", ru: "Чистить зубы и звать громко или тихо." },
     games: [
-      { href: "/zaehne/", emoji: "🦷", title: "Zähne putzen" },
-      { href: "/laut-leise/", emoji: "🦁", title: "Laut und leise" },
+      { href: "/zaehne/", emoji: "🦷", title: { de: "Zähne putzen", ru: "Чистим зубы" } },
+      { href: "/laut-leise/", emoji: "🦁", title: { de: "Laut und leise", ru: "Громко и тихо" } },
     ],
   },
 ];

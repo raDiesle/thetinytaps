@@ -4,13 +4,15 @@ import { GameCard } from "@/components/GameCard";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
+import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
 /** One category of the home menu with its games. */
 export function CategoryPage() {
   const { category: id } = useParams();
   const category = CATEGORIES.find((c) => c.id === id);
-  useTitle(category?.title);
+  const t = useT();
+  useTitle(category && t(category.title));
   const grid = useFitGrid(category?.games.length ?? 0);
   if (!category) return <Navigate to="/" replace />;
   return (
@@ -18,16 +20,16 @@ export function CategoryPage() {
       <Sky />
       <FullscreenExit />
       <Link to="/" className="back-link">
-        ← Alle Spiele
+        ← {t({ de: "Alle Spiele", ru: "Все игры" })}
       </Link>
       <h1 className="menu-title">
-        <span aria-hidden>{category.emoji}</span> {category.title}
+        <span aria-hidden>{category.emoji}</span> {t(category.title)}
       </h1>
-      <p className="home-subtitle">{category.subtitle}</p>
+      <p className="home-subtitle">{t(category.subtitle)}</p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {category.games.map((g) => (
           <li key={g.href}>
-            <GameCard {...g} />
+            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} />
           </li>
         ))}
       </ul>

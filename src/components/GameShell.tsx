@@ -2,12 +2,12 @@ import { Link, useLocation } from "react-router";
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { FullscreenExit } from "@/components/FullscreenButton";
 import { Sky } from "@/components/Sky";
-import { de } from "@/content/de";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useBackgroundMusic } from "@/lib/backgroundMusic";
 import { useCommonSettings } from "@/lib/common";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
+import { useAppLanguage, useT } from "@/lib/language";
 import { DEFAULT_PLAYTIME_SETTINGS, isPlaytimeOver, playedToday, PLAYTIME_SETTINGS_KEY, resetPlaytime, usePlaytime } from "@/lib/playtime";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
@@ -57,9 +57,10 @@ interface GameShellProps {
  */
 export function GameShell({ title, emoji, modes, mode, onMode, level, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
+  const t = useT();
   const category = categoryOf(location.pathname);
   const back = backHref ?? (category ? categoryHref(category) : "/");
-  const backText = backLabel ?? category?.title ?? "Alle Spiele";
+  const backText = backLabel ?? (category ? t(category.title) : t({ de: "Alle Spiele", ru: "Все игры" }));
   const [playing, setPlaying] = useState(false);
   const [playtimeSettings] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
   const playtime = usePlaytime(playing);
@@ -136,7 +137,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
       >
         {playtime.over ? <GoodNight /> : children}
         {!playtime.over && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
-        <ExitButton onExit={stop} label="Zurück zum Menü" />
+        <ExitButton onExit={stop} label={t({ de: "Zurück zum Menü", ru: "Назад в меню" })} />
       </div>
     );
   }
@@ -162,7 +163,8 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
       </h1>
       {over && (
         <p className="playtime-over-note" role="status">
-          <span aria-hidden>🌙</span> Die Spielzeit für heute ({minutes} Min.) ist vorbei.
+          <span aria-hidden>🌙</span>{" "}
+          {t({ de: `Die Spielzeit für heute (${minutes} Min.) ist vorbei.`, ru: `Время игры на сегодня (${minutes} мин.) закончилось.` })}
           <button
             type="button"
             onClick={() => {
@@ -170,14 +172,14 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
               setResets((n) => n + 1);
             }}
           >
-            Noch einmal {minutes} Min.
+            {t({ de: `Noch einmal ${minutes} Min.`, ru: `Ещё ${minutes} мин.` })}
           </button>
         </p>
       )}
       {/* Right under the title, so it stays in sight however long the options get. */}
       {modes ? (
-        <section className="mode-picker" aria-label="Spielart wählen">
-          <h2 className="mode-heading">Was spielen wir?</h2>
+        <section className="mode-picker" aria-label={t({ de: "Spielart wählen", ru: "Выбрать игру" })}>
+          <h2 className="mode-heading">{t({ de: "Was spielen wir?", ru: "Во что играем?" })}</h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {modes.map((m) => (
@@ -190,7 +192,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
                   <span className="game-go" aria-hidden>
                     ▶
                   </span>
-                  {m.id === mode && modes.length > 1 && <span className="badge">zuletzt</span>}
+                  {m.id === mode && modes.length > 1 && <span className="badge">{t({ de: "zuletzt", ru: "в прошлый раз" })}</span>}
                 </button>
               </li>
             ))}
@@ -201,19 +203,23 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, settings, 
           <span className="start-icon" aria-hidden>
             ▶
           </span>
-          Los geht&apos;s!
+          {t({ de: "Los geht’s!", ru: "Поехали!" })}
         </button>
       )}
       {minutes > 0 && (
         <p className="shared-settings-note">
-          <span aria-hidden>⏳</span> Spielzeit heute: {Math.min(playedMinutes, minutes)} von {minutes} Min.
+          <span aria-hidden>⏳</span>{" "}
+          {t({
+            de: `Spielzeit heute: ${Math.min(playedMinutes, minutes)} von ${minutes} Min.`,
+            ru: `Время игры сегодня: ${Math.min(playedMinutes, minutes)} из ${minutes} мин.`,
+          })}
         </p>
       )}
       {settings && (
         // Folded away by default, so the start screen stays short.
         <details className="settings-panel">
           <summary>
-            <span aria-hidden>⚙️</span> Einstellungen für dieses Spiel
+            <span aria-hidden>⚙️</span> {t({ de: "Einstellungen für dieses Spiel", ru: "Настройки этой игры" })}
           </summary>
           <section className="settings">{settings}</section>
         </details>
@@ -245,11 +251,14 @@ function Dusk({ level }: { level: number }) {
 
 /** Play time is over: a quiet night sky that ignores taps and keys until a grown-up exits. */
 function GoodNight() {
+  const t = useT();
+  const language = useAppLanguage();
+  const sentence = t({ de: "Gute Nacht! Die Spielzeit ist vorbei.", ru: "Спокойной ночи! Время игры закончилось." });
   useEffect(() => {
     playLullaby();
-    const timer = setTimeout(() => speak("Gute Nacht! Die Spielzeit ist vorbei.", de.speechLang, { rate: 0.7 }), 1200);
+    const timer = setTimeout(() => speak(sentence, language.speechLang, { rate: 0.7 }), 1200);
     return () => clearTimeout(timer);
-  }, []);
+  }, [sentence, language.speechLang]);
 
   return (
     <div className="good-night" role="status">
@@ -264,8 +273,13 @@ function GoodNight() {
       <span className="good-night-sleeper" aria-hidden>
         🧸<span className="good-night-zzz">💤</span>
       </span>
-      <p className="good-night-text">Gute Nacht!</p>
-      <p className="good-night-hint">Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts gedrückt halten.</p>
+      <p className="good-night-text">{t({ de: "Gute Nacht!", ru: "Спокойной ночи!" })}</p>
+      <p className="good-night-hint">
+        {t({
+          de: "Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts gedrückt halten.",
+          ru: "Время игры закончилось. Чтобы выйти, удерживайте ✕ справа вверху.",
+        })}
+      </p>
     </div>
   );
 }
@@ -290,6 +304,7 @@ const STARS: [number, number, number][] = [
  * it does when the game starts.
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
+  const t = useT();
   const [holding, setHolding] = useState(false);
   const [hint, setHint] = useState(true);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -319,13 +334,13 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   return (
     <div className={`exit-corner${hint || holding ? " hinted" : ""}`}>
       <span className="exit-hint" aria-hidden>
-        {label} · halten
+        {label} · {t({ de: "halten", ru: "удерживать" })}
       </span>
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}
         style={{ "--hold-ms": `${EXIT_DELAY_MS}ms` } as CSSProperties}
-        aria-label={`${label} (gedrückt halten)`}
+        aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать" })})`}
         onPointerDown={(e: PointerEvent<HTMLButtonElement>) => {
           // Keep the game from reacting to the tap on the button.
           e.stopPropagation();
