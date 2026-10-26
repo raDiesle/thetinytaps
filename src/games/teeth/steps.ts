@@ -1,15 +1,27 @@
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import { type Localized, pick } from "@/lib/language";
 import { ALL_TEETH, type Jaw, type Side, type Surface, type ToothId, type View } from "./jaw";
+import { STEP_TEXTS_RU } from "./steps.ru";
 
 /** How the brush moves: back and forth on the chewing surfaces, small circles outside, wiping from gum to tooth inside. */
 export type Motion = "scrub" | "circle" | "wipe";
 
-export interface Step {
+/** Names the step, so its translations (steps.ru.ts) can find it. */
+export type StepId = "lower-top" | "upper-top" | "outer-left" | "outer-front" | "outer-right" | "inner-lower" | "inner-upper";
+
+/** What is shown and said in a step, in one language. */
+export interface StepTexts {
   /** Big, for the child. */
   title: string;
   /** Small, for the grown-up. */
   hint: string;
   /** Spoken when the step begins. */
   cue: string;
+}
+
+/** One brushing step; its texts here are the German ones. */
+export interface Step extends StepTexts {
+  id: StepId;
   mouth: "open" | "closed";
   surface: Surface;
   /** The teeth brushed in this step, in the order the brush visits them. */
@@ -27,10 +39,11 @@ const FLAT = { upper: 0, lower: 0 };
 const CLOSED_FRONT: View = { open: 0, pitch: 6, yaw: 0, look: [0, 8, 100], zoom: 1.3, tilt: FLAT };
 
 /** The routine German kindergartens teach, for the grown-ups. */
-export const KAI = "Kauflächen, Außenflächen, Innenflächen";
+export const KAI: Localized = { de: "Kauflächen, Außenflächen, Innenflächen", ru: "жевательные, наружные, внутренние поверхности" };
 
 export const STEPS: Step[] = [
   {
+    id: "lower-top",
     title: "⬇️ Unten drauf",
     hint: "Kauflächen unten: hin und her",
     cue: "Mund weit auf! Unten auf die Backenzähne. Hin und her schrubben!",
@@ -41,6 +54,7 @@ export const STEPS: Step[] = [
     view: { open: 1, pitch: 0, yaw: 0, look: [0, -10, 100], zoom: 1.2, tilt: { upper: 0, lower: 60 } },
   },
   {
+    id: "upper-top",
     title: "⬆️ Oben drauf",
     hint: "Kauflächen oben: hin und her",
     cue: "Und jetzt oben auf die Backenzähne. Hin und her!",
@@ -51,6 +65,7 @@ export const STEPS: Step[] = [
     view: { open: 1, pitch: 0, yaw: 0, look: [0, 10, 100], zoom: 1.2, tilt: { upper: -60, lower: 0 } },
   },
   {
+    id: "outer-left",
     title: "⬅️ Außen an der Seite",
     hint: "Außenflächen: kleine Kreise",
     cue: "Zähne zusammenbeißen! Außen an der Seite. Kleine Kreise!",
@@ -61,6 +76,7 @@ export const STEPS: Step[] = [
     view: { open: 0, pitch: 4, yaw: 42, look: [-70, 18, 70], zoom: 1.4, tilt: FLAT },
   },
   {
+    id: "outer-front",
     title: "😁 Außen vorne",
     hint: "Außenflächen: kleine Kreise",
     cue: "Jetzt vorne. Kreise, Kreise, Kreise!",
@@ -71,6 +87,7 @@ export const STEPS: Step[] = [
     view: CLOSED_FRONT,
   },
   {
+    id: "outer-right",
     title: "➡️ Außen an der Seite",
     hint: "Außenflächen: kleine Kreise",
     cue: "Und die andere Seite. Schön kreisen!",
@@ -81,6 +98,7 @@ export const STEPS: Step[] = [
     view: { open: 0, pitch: 4, yaw: -42, look: [70, 18, 70], zoom: 1.4, tilt: FLAT },
   },
   {
+    id: "inner-lower",
     title: "👅 Innen unten",
     hint: "Innenflächen: von Rot nach Weiß",
     cue: "Mund weit auf! Jetzt innen unten, da wo die Zunge ist.",
@@ -91,6 +109,7 @@ export const STEPS: Step[] = [
     view: { open: 1, pitch: 0, yaw: 0, look: [0, -10, 100], zoom: 1.2, tilt: { upper: 0, lower: 72 } },
   },
   {
+    id: "inner-upper",
     title: "👅 Innen oben",
     hint: "Innenflächen: von Rot nach Weiß",
     cue: "Und innen oben. Fast geschafft!",
@@ -101,6 +120,9 @@ export const STEPS: Step[] = [
     view: { open: 1, pitch: 0, yaw: 0, look: [0, 10, 100], zoom: 1.2, tilt: { upper: -72, lower: 0 } },
   },
 ];
+
+/** What `step` shows and says in `language`; German where there is no translation. */
+export const stepTexts = (step: Step, language: TargetLanguageId): StepTexts => pick<StepTexts>({ de: step, ru: STEP_TEXTS_RU[step.id] }, language);
 
 /** While the monsters arrive and when everything is clean: a big grin. */
 export const GRIN_VIEW = CLOSED_FRONT;

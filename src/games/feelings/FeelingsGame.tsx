@@ -72,7 +72,7 @@ export function FeelingsGame() {
             <p className="setting-note">
               {t({
                 de: "Mit Vorlesen (auf der Startseite) wird die Geschichte erzählt, sonst erzählen Erwachsene sie anhand der Bilder.",
-                ru: "С озвучкой (на главной странице) историю рассказывает голос, без неё её рассказывают взрослые по картинкам.",
+                ru: "Если на главной странице включено «Читать вслух», историю рассказывает голос, иначе её рассказывают взрослые по картинкам.",
               })}
             </p>
           )}

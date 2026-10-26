@@ -2,16 +2,19 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } 
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
+import { type Localized, pick, useAppLanguage, useT } from "@/lib/language";
 import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } from "./daytime";
+import { DAYTIME_RU } from "./daytime.ru";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
-import { sungSteps, useBrushingMusic } from "./music";
+import { SUNG_LANGUAGES, sungSteps, useBrushingMusic } from "./music";
 import { Prep } from "./prep";
 import type { TeethSettings } from "./settings";
-import { GRIN_VIEW, STEPS } from "./steps";
+import { GRIN_VIEW, STEPS, stepTexts } from "./steps";
+import { sungLanguageFor } from "./sung";
 import { Week } from "./week";
 import "./teeth.css";
 
@@ -33,10 +36,24 @@ const SEEK_END_MS = 1000;
 type Prelude = "brush" | "paste" | "monsters";
 
 /** The monsters' cue depends on the time of day, see DAYTIME. */
-const PRELUDE: Record<Prelude, { ms: number; title: string; cue?: string }> = {
-  brush: { ms: 7000, title: "🪥 Zahnbürste holen", cue: "Zuerst holen wir die Zahnbürste!" },
-  paste: { ms: 8000, title: "🫧 Zahnpasta drauf", cue: "Jetzt ein kleiner Klecks Zahnpasta drauf." },
-  monsters: { ms: 4500, title: "😱 Zuckermonster!" },
+const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized }> = {
+  brush: {
+    ms: 7000,
+    title: { de: "🪥 Zahnbürste holen", ru: "🪥 Берём щётку" },
+    cue: { de: "Zuerst holen wir die Zahnbürste!", ru: "Сначала берём зубную щётку!" },
+  },
+  paste: {
+    ms: 8000,
+    title: { de: "🫧 Zahnpasta drauf", ru: "🫧 Немного пасты" },
+    cue: { de: "Jetzt ein kleiner Klecks Zahnpasta drauf.", ru: "Теперь капельку зубной пасты." },
+  },
+  monsters: { ms: 4500, title: { de: "😱 Zuckermonster!", ru: "😱 Сахарные монстры!" } },
+};
+
+/** Said at the end, before the daytime's goodbye (unless the sung finale sings it). */
+const DONE_SAY: Localized = {
+  de: "Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!",
+  ru: "Готово! Сахарных монстров больше нет. Теперь сплюнь пенку. Чисто-чисто!",
 };
 
 interface Monster {
@@ -51,7 +68,7 @@ interface Monster {
   order: number;
 }
 
-const pick = (count: number) => Math.floor(Math.random() * count);
+const randomIndex = (count: number) => Math.floor(Math.random() * count);
 
 /** A monster on every tooth of every step, two on a molar's chewing surface, in the order the brush visits them. */
 function placeMonsters(): Monster[] {
@@ -62,8 +79,8 @@ function placeMonsters(): Monster[] {
         id: s * 100 + order,
         tooth,
         spot,
-        color: MONSTER_COLORS[pick(MONSTER_COLORS.length)],
-        variant: pick(MONSTER_VARIANTS),
+        color: MONSTER_COLORS[randomIndex(MONSTER_COLORS.length)],
+        variant: randomIndex(MONSTER_VARIANTS),
         step: s,
         order,
       })),
@@ -128,7 +145,10 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
  * one by one. Arrow keys skip ahead or back, Space or the pause button pauses,
  * and tapping the progress bar jumps there.
  */
-export function TeethPlay({ speechLang, settings }: { speechLang: string; settings: TeethSettings }) {
+export function TeethPlay({ settings }: { settings: TeethSettings }) {
+  // Everything shown and said follows the app language; the voice speaks in it too.
+  const language = useAppLanguage();
+  const t = useT();
   const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now() }));
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
@@ -142,12 +162,16 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
   const daytime = useMemo(() => daytimeOf(settings.daytime), [settings.daytime, round]);
-  const preludeCue = (p: Prelude) => PRELUDE[p].cue ?? DAYTIME[daytime].monsters;
+  const daytimeTexts = pick({ de: DAYTIME[daytime], ru: DAYTIME_RU[daytime] }, language.id);
+  const preludeCue = (p: Prelude) => {
+    const cue = PRELUDE[p].cue;
+    return cue ? t(cue) : daytimeTexts.monsters;
+  };
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
   const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
   const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
   // With a sung song the brushing lasts as long as the song and each step as long as its verse; otherwise two minutes in equal steps.
-  const sungIn = settings.music && settings.singing !== "off" ? settings.singing : null;
+  const sungIn = settings.music ? sungLanguageFor(settings.singing, language.id, SUNG_LANGUAGES) : null;
   const stepStarts = useMemo(() => sungSteps(sungIn) ?? Array.from({ length: STEPS.length + 1 }, (_, k) => (k * BRUSH_MS) / STEPS.length), [sungIn]);
   const stepLength = (k: number) => stepStarts[k + 1] - stepStarts[k];
   const totalMs = stepStarts[STEPS.length];
@@ -164,13 +188,14 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const isGone = (m: Monster) => brushed >= stepStarts[m.step] + ((m.order + 1) / perStep[m.step] - 0.04) * stepLength(m.step);
   const goneCount = monsters.filter(isGone).length;
   const step = phase >= 0 && !done ? STEPS[phase] : null;
-  const cue = before ? preludeCue(before) : step?.cue;
+  const texts = step && stepTexts(step, language.id);
+  const cue = before ? preludeCue(before) : texts?.cue;
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, speechLang, { queue, rate: 0.85 });
+      if (settings.speech) speak(text, language.speechLang, { queue, rate: 0.85 });
     },
-    [settings.speech, speechLang],
+    [settings.speech, language.speechLang],
   );
 
   useWakeLock(!done);
@@ -197,14 +222,14 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   useEffect(() => {
     if (before) {
       if (settings.sounds && part > 0) playChime();
-      say(part === 0 ? `${DAYTIME[daytime].hello} ${preludeCue(before)}` : preludeCue(before));
+      say(part === 0 ? `${daytimeTexts.hello} ${preludeCue(before)}` : preludeCue(before));
     } else if (phase < STEPS.length) {
       if (settings.sounds) playChime();
-      if (!sung) say(STEPS[phase].cue);
+      if (!sung) say(stepTexts(STEPS[phase], language.id).cue);
     } else {
       if (settings.sounds) [0, 1, 2, 3, 4, 5].forEach((i) => setTimeout(() => playCountNote(i), i * 120));
       // The sung finale sings "Fertig, blitzeblank" itself; the voice would talk over it.
-      if (!sung) say(`Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank! ${DAYTIME[daytime].after}`);
+      if (!sung) say(`${t(DONE_SAY)} ${daytimeTexts.after}`);
       // A star on the week chart, whether or not it is shown, so it is complete when turned on.
       const next = addBrushing(loadWeek(), new Date(), daytime);
       saveWeek(next);
@@ -333,28 +358,28 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       <span className="teeth-sky" aria-hidden>
         {daytime === "morning" ? "☀️" : "🌙"}
       </span>
-      <p className="teeth-clock" aria-label="Restzeit">
+      <p className="teeth-clock" aria-label={t({ de: "Restzeit", ru: "Осталось времени" })}>
         {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
       </p>
       <div className="teeth-heading" key={`${round}-${part}`}>
-        <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : DAYTIME[daytime].doneTitle}</h2>
+        <h2 className="teeth-cue">{before ? t(PRELUDE[before].title) : texts ? texts.title : daytimeTexts.doneTitle}</h2>
         {before === "paste" && (
           <p className="teeth-mouth prep">
-            👌 Erbsengroß
-            <span className="teeth-hint"> · unter 2 Jahren nur reiskorngroß</span>
+            👌 {t({ de: "Erbsengroß", ru: "С горошину" })}
+            <span className="teeth-hint"> · {t({ de: "unter 2 Jahren nur reiskorngroß", ru: "до 2 лет — с рисовое зёрнышко" })}</span>
           </p>
         )}
-        {step && (
+        {step && texts && (
           <p className={`teeth-mouth ${step.mouth}`}>
-            <span className="teeth-mouth-icon">{step.mouth === "open" ? "😮" : "😬"}</span>
-            {step.mouth === "open" ? " Mund weit auf" : " Zähne zusammen"}
-            <span className="teeth-hint"> · {step.hint}</span>
+            <span className="teeth-mouth-icon">{step.mouth === "open" ? "😮" : "😬"}</span>{" "}
+            {step.mouth === "open" ? t({ de: "Mund weit auf", ru: "Ротик широко" }) : t({ de: "Zähne zusammen", ru: "Зубки вместе" })}
+            <span className="teeth-hint"> · {texts.hint}</span>
           </p>
         )}
         {done && (
           <p className="teeth-mouth spit">
-            💦 Ausspucken
-            <span className="teeth-hint"> · nicht mit Wasser nachspülen</span>
+            💦 {t({ de: "Ausspucken", ru: "Сплюнуть" })}
+            <span className="teeth-hint"> · {t({ de: "nicht mit Wasser nachspülen", ru: "водой не полоскать" })}</span>
           </p>
         )}
       </div>
@@ -382,7 +407,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
         <div className="teeth-end">
           {settings.week && <Week log={week} today={new Date()} now={daytime} />}
           <button type="button" className="teeth-again" onClick={again}>
-            🔁 Nochmal
+            🔁 {t({ de: "Nochmal", ru: "Ещё раз" })}
           </button>
         </div>
       ) : (
@@ -390,13 +415,18 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
           {/* The week shows before brushing too, which star is to come; while brushing, the mouth gets its room. */}
           {before && settings.week && <Week log={week} today={new Date()} now={daytime} />}
           <div className="teeth-controls">
-            <button type="button" className="teeth-pause" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"}>
+            <button
+              type="button"
+              className="teeth-pause"
+              onClick={togglePause}
+              aria-label={paused ? t({ de: "Weiter", ru: "Дальше" }) : t({ de: "Pause", ru: "Пауза" })}
+            >
               {paused ? "▶️" : "⏸️"}
             </button>
             <div
               className="teeth-progress"
               role="slider"
-              aria-label="Fortschritt"
+              aria-label={t({ de: "Fortschritt", ru: "Сколько уже почищено" })}
               aria-valuemin={0}
               aria-valuemax={Math.round(totalMs / 1000)}
               aria-valuenow={Math.round(Math.max(0, Math.min(brushed, totalMs)) / 1000)}
@@ -423,8 +453,10 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
           <span className="teeth-paused-icon" aria-hidden>
             ⏸️
           </span>
-          Pause
-          <small>{touchOnly ? "Tippen: weiter" : "Leertaste oder Tippen: weiter"}</small>
+          {t({ de: "Pause", ru: "Пауза" })}
+          <small>
+            {touchOnly ? t({ de: "Tippen: weiter", ru: "Нажми — и дальше" }) : t({ de: "Leertaste oder Tippen: weiter", ru: "Пробел или нажатие — и дальше" })}
+          </small>
         </button>
       )}
 

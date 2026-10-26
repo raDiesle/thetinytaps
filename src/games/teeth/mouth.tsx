@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
+import { useT } from "@/lib/language";
 import {
   buildMouth,
   PICTURE,
@@ -158,6 +159,7 @@ const jawOrder = (view: View): Jaw[] => {
 };
 
 export function Mouth({ view, zone, monsters, brush, happy, daytime, action, paused, onTickle }: MouthProps) {
+  const pictureLabel = useT()({ de: "Ein Kindergesicht im Spiegel beim Zähneputzen", ru: "Лицо ребёнка в зеркале во время чистки зубов" });
   const model = useMemo(() => buildMouth(view.open), [view.open]);
   const all = projectors(view);
   const project = all.face;
@@ -242,7 +244,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
       className="mouth"
       viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`}
       role="img"
-      aria-label="Ein Kindergesicht im Spiegel beim Zähneputzen"
+      aria-label={pictureLabel}
     >
       <defs>
         <clipPath id="mirror">

@@ -1,40 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
+import { pick, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import type { LevelProps } from "./LoudPlay";
 import { createWind } from "./mic";
 import { Boat, Candles, Dandelion, Pinwheel, type Step, type StationProps } from "./stations";
+import { STATION_TEXTS, type StationId } from "./texts";
 
-type StationId = "candles" | "dandelion" | "pinwheel" | "boat";
-
-const STATIONS: { id: StationId; label: string; intro: { mic: string; tap: string }; cheer: string; Station: ComponentType<StationProps> }[] = [
-  {
-    id: "candles",
-    label: "Kuchen mit Kerzen",
-    intro: { mic: "Puste die Kerzen aus! Ganz fest pusten!", tap: "Tipp, dann pustest du die Kerzen aus!" },
-    cheer: "Alle Kerzen sind aus! Hurra!",
-    Station: Candles,
-  },
-  {
-    id: "dandelion",
-    label: "Pusteblume",
-    intro: { mic: "Puste die Pusteblume an!", tap: "Tipp, dann fliegen die Schirmchen!" },
-    cheer: "Alle Schirmchen fliegen weg!",
-    Station: Dandelion,
-  },
-  {
-    id: "pinwheel",
-    label: "Windrad",
-    intro: { mic: "Puste, dann dreht sich das Windrad!", tap: "Tipp, dann dreht sich das Windrad!" },
-    cheer: "Ein Regenbogen!",
-    Station: Pinwheel,
-  },
-  {
-    id: "boat",
-    label: "Segelboot",
-    intro: { mic: "Puste ins Segel! Die Maus will zum Löwen.", tap: "Tipp, dann segelt die Maus zum Löwen!" },
-    cheer: "Angekommen! Hallo, Löwe!",
-    Station: Boat,
-  },
+/** The pictures in play order; their texts are in texts.ts. */
+const STATIONS: { id: StationId; Station: ComponentType<StationProps> }[] = [
+  { id: "candles", Station: Candles },
+  { id: "dandelion", Station: Dandelion },
+  { id: "pinwheel", Station: Pinwheel },
+  { id: "boat", Station: Boat },
 ];
 
 /** All pictures in turn; in development `?station=boat` in the address picks one. */
@@ -59,11 +36,14 @@ const SPEECH_MS_PER_CHAR = 80;
  * sends a dandelion's seeds flying, turns a pinwheel and sails a boat across
  * the sea. Tapping blows a gust, so it works without a microphone too.
  */
-export function BlowPlay({ speechLang, settings, mic, listen, celebrate, onDone }: LevelProps) {
+export function BlowPlay({ settings, mic, listen, celebrate, onDone }: LevelProps) {
+  // The pictures speak the app language, in its voice.
+  const language = useAppLanguage();
   const stations = useMemo(chosenStations, []);
   const [round, setRound] = useState(0);
   const [nudge, setNudge] = useState(false);
   const station = stations[round % stations.length];
+  const texts = STATION_TEXTS[station.id];
   const rootRef = useRef<HTMLDivElement>(null);
   const step = useRef<Step | null>(null);
   const micWind = useRef(0);
@@ -101,16 +81,16 @@ export function BlowPlay({ speechLang, settings, mic, listen, celebrate, onDone 
       if (!settings.speech) return;
       const rate = 0.85;
       deafFor((text.length * SPEECH_MS_PER_CHAR) / rate + 600);
-      speak(text, speechLang, { rate });
+      speak(text, language.speechLang, { rate });
     },
-    [deafFor, settings.speech, speechLang],
+    [deafFor, settings.speech, language.speechLang],
   );
 
   listen.current = (db, ms) => {
     micWind.current = ear.blow(db, ms, performance.now() < deafUntil.current, settings.sensitivity);
   };
 
-  const introFor = useCallback(() => station.intro[micRef.current === "on" ? "mic" : "tap"], [station]);
+  const introFor = useCallback(() => pick(texts.intro[micRef.current === "on" ? "mic" : "tap"], language.id), [texts, language.id]);
 
   useEffect(() => {
     finished.current = false;
@@ -171,11 +151,11 @@ export function BlowPlay({ speechLang, settings, mic, listen, celebrate, onDone 
       finished.current = true;
       const last = round % stations.length === stations.length - 1;
       later(pause, () => {
-        say(station.cheer);
+        say(pick(texts.cheer, language.id));
         celebrate(() => (last && onDone ? onDone() : setRound((r) => r + 1)));
       });
     },
-    [celebrate, later, onDone, round, say, station, stations.length],
+    [celebrate, later, onDone, round, say, texts, language.id, stations.length],
   );
 
   const Station = station.Station;
@@ -189,7 +169,7 @@ export function BlowPlay({ speechLang, settings, mic, listen, celebrate, onDone 
         lastBlow.current = performance.now();
       }}
     >
-      <svg className="loud-scene" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax meet" role="img" aria-label={station.label}>
+      <svg className="loud-scene" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax meet" role="img" aria-label={pick(texts.label, language.id)}>
         <Station key={round} step={step} done={done} sound={sound} />
       </svg>
     </div>

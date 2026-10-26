@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
+import { pick, useAppLanguage } from "@/lib/language";
 import { playRoar, playSqueak } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { Acacia, Lion, Mouse, Tuft } from "./animals";
 import type { LevelProps } from "./LoudPlay";
 import { createEar, meterAt } from "./mic";
-
-type Who = "lion" | "mouse";
+import { NUDGES, SAYS, VOICE_WORDS, type Who } from "./texts";
 
 /** How long each animal reacts; the microphone is deaf meanwhile, so the lion doesn't hear his own roar. */
 const REACT_MS: Record<Who, number> = { lion: 2000, mouse: 1200 };
@@ -19,24 +19,17 @@ const BARS = 10;
 /** When another level follows: this many sounds, then a party and on to it. */
 const ROUND_SOUNDS = 10;
 
-const SAYS: Record<Who, string[]> = {
-  lion: ["Roaaar! Ich bin der Löwe!", "So laut! Roaaar!", "Roaaar! Noch mal!"],
-  mouse: ["Piep! Ich bin die kleine Maus.", "Pssst. Piep, piep.", "Piep! Ganz leise."],
-};
-
-const NUDGES: Record<Who, { mic: string; tap: string }> = {
-  lion: { mic: "Ruf mal ganz laut: Hallo, Löwe!", tap: "Tipp mal den Löwen an!" },
-  mouse: { mic: "Und jetzt ganz leise flüstern: Hallo, Maus.", tap: "Tipp mal die kleine Maus an!" },
-};
-
-const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
+const pickOne = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /**
  * Level "Löwe und Maus" (idea N-29): the microphone measures how loud the
  * child is. Shouting makes the lion roar and jump, a quiet voice makes the
  * little mouse squeak. Tapping an animal works too, e.g. without a microphone.
  */
-export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone }: LevelProps) {
+export function VoicePlay({ settings, mic, listen, celebrate, onDone }: LevelProps) {
+  // The animals speak the app language, in its voice.
+  const language = useAppLanguage();
+  const words = (key: keyof typeof VOICE_WORDS) => pick(VOICE_WORDS[key], language.id);
   const [active, setActive] = useState<Who | null>(null);
   const [count, setCount] = useState<Record<Who, number>>({ lion: 0, mouse: 0 });
   const [nudge, setNudge] = useState<Who | null>(null);
@@ -61,9 +54,9 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
     (text: string) => {
       const rate = 0.85;
       deafUntil.current = Math.max(deafUntil.current, performance.now() + (text.length * SPEECH_MS_PER_CHAR) / rate + 600);
-      speak(text, speechLang, { rate });
+      speak(text, language.speechLang, { rate });
     },
-    [speechLang],
+    [language.speechLang],
   );
 
   const later = useCallback((ms: number, run: () => void) => {
@@ -104,10 +97,10 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
         busyUntil.current = deafUntil.current = Infinity;
         later(REACT_MS[who], () => celebrate(onDone));
       } else if (settings.speech) {
-        later(SPEECH_DELAY_MS, () => say(pick(SAYS[who])));
+        later(SPEECH_DELAY_MS, () => say(pickOne(pick(SAYS[who], language.id))));
       }
     },
-    [celebrate, later, onDone, say, spawn, settings.speech],
+    [celebrate, later, onDone, say, spawn, settings.speech, language.id],
   );
 
   listen.current = (db, ms) => {
@@ -123,11 +116,11 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
       if (performance.now() - lastAct.current < NUDGE_MS) return;
       lastAct.current = performance.now();
       setNudge(next);
-      if (settings.speech) say(NUDGES[next][mic === "on" ? "mic" : "tap"]);
+      if (settings.speech) say(pick(NUDGES[next][mic === "on" ? "mic" : "tap"], language.id));
       next = next === "lion" ? "mouse" : "lion";
     }, 1000);
     return () => clearInterval(tick);
-  }, [mic, say, settings.speech]);
+  }, [mic, say, settings.speech, language.id]);
 
   const threshold = meterAt(ear.loudDb(settings.sensitivity));
 
@@ -136,7 +129,7 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
       ref={rootRef}
       className={["loud-play", active === "lion" && "roaring", active === "mouse" && "squeaking", nudge && `nudge-${nudge}`].filter(Boolean).join(" ")}
     >
-      <svg className="loud-scene" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax meet" role="img" aria-label="Löwe und Maus">
+      <svg className="loud-scene" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax meet" role="img" aria-label={words("scene")}>
         <circle cx="120" cy="110" r="56" fill="#ffd166" />
         {/* The ground reaches far past the sides, for screens wider than the picture. */}
         <path d="M-1000 500 H0 Q250 470 500 500 T1000 490 H2000 V600 H-1000 Z" fill="#a7c957" />
@@ -169,7 +162,7 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
             <g className="ll-bubble ll-bubble-lion">
               <rect x="-150" y="-46" width="300" height="84" rx="42" fill="#fff" stroke="var(--ink)" strokeWidth="5" />
               <text y="14" textAnchor="middle" fontSize="54" fontWeight="700" fill="#d62828">
-                ROAAAR!
+                {words("roar")}
               </text>
             </g>
           </g>
@@ -179,17 +172,17 @@ export function VoicePlay({ speechLang, settings, mic, listen, celebrate, onDone
             <g className="ll-bubble">
               <rect x="-62" y="-26" width="124" height="48" rx="24" fill="#fff" stroke="var(--ink)" strokeWidth="4" />
               <text y="9" textAnchor="middle" fontSize="28" fontWeight="600" fill="#5a4fcf">
-                piep!
+                {words("squeak")}
               </text>
             </g>
           </g>
         )}
 
         <text className="ll-label ll-label-mouse" x="215" y="580" textAnchor="middle" fontSize="34">
-          🤫 leise
+          {words("quiet")}
         </text>
         <text className="ll-label ll-label-lion" x="720" y="580" textAnchor="middle" fontSize="34">
-          📣 laut
+          {words("loud")}
         </text>
       </svg>
 

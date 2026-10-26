@@ -168,7 +168,7 @@ function CommonOptions() {
 
       <SettingsGroup title={t({ de: "Ton", ru: "Звук" })}>
         <Toggle
-          label={t({ de: "Vorlesen (Namen, Sätze, Fragen)", ru: "Озвучивание (названия, фразы, вопросы)" })}
+          label={t({ de: "Vorlesen (Namen, Sätze, Fragen)", ru: "Читать вслух (названия, фразы, вопросы)" })}
           checked={common.speech}
           onChange={(speech) => update({ speech })}
         />

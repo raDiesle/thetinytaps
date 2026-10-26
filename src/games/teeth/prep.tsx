@@ -1,4 +1,5 @@
 import { STAR_PATH } from "@/components/Bursts";
+import { useT } from "@/lib/language";
 import type { Daytime } from "./daytime";
 import { PICTURE } from "./jaw";
 import { INK, SKIN } from "./mouth";
@@ -93,12 +94,17 @@ function Window({ daytime }: { daytime: Daytime }) {
 }
 
 export function Prep({ part, daytime }: { part: PrepPart; daytime: Daytime }) {
+  const t = useT();
   return (
     <svg
       className={`prep at-${part}`}
       viewBox={`0 0 ${W} ${H}`}
       role="img"
-      aria-label={part === "brush" ? "Die Zahnbürste steht im Becher am Waschbecken" : "Zahnpasta kommt auf die Zahnbürste"}
+      aria-label={
+        part === "brush"
+          ? t({ de: "Die Zahnbürste steht im Becher am Waschbecken", ru: "Зубная щётка стоит в стаканчике у раковины" })
+          : t({ de: "Zahnpasta kommt auf die Zahnbürste", ru: "Зубная паста ложится на щётку" })
+      }
     >
       <defs>
         <clipPath id="prep-frame">

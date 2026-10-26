@@ -92,7 +92,7 @@ export function AdventureGame() {
             <p className="setting-note">
               {t({
                 de: "Tapsi spricht nur, wenn „Vorlesen“ auf der Startseite an ist.",
-                ru: "Тапси говорит, только если на главной странице включено «Озвучивание».",
+                ru: "Тапси говорит, только если на главной странице включено «Читать вслух».",
               })}
             </p>
           )}

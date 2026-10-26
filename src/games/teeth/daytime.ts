@@ -17,20 +17,20 @@ export function daytimeOf(choice: DaytimeChoice, now = new Date()): Daytime {
   return now.getHours() < EVENING_FROM_HOUR ? "morning" : "evening";
 }
 
-/** What is said and shown differently in the morning and the evening. */
-export const DAYTIME: Record<
-  Daytime,
-  {
-    /** Said before the first cue. */
-    hello: string;
-    /** Where the sugar monsters come from. */
-    monsters: string;
-    /** The heading at the end. */
-    doneTitle: string;
-    /** Said after spitting out at the end. */
-    after: string;
-  }
-> = {
+/** What is said and shown differently in the morning and the evening, in one language. */
+export interface DaytimeTexts {
+  /** Said before the first cue. */
+  hello: string;
+  /** Where the sugar monsters come from. */
+  monsters: string;
+  /** The heading at the end. */
+  doneTitle: string;
+  /** Said after spitting out at the end. */
+  after: string;
+}
+
+/** The German texts; the Russian ones are in daytime.ru.ts. */
+export const DAYTIME: Record<Daytime, DaytimeTexts> = {
   morning: {
     hello: "Guten Morgen!",
     monsters: "Oh je, Zuckermonster vom Frühstück! Komm, wir putzen sie alle weg!",

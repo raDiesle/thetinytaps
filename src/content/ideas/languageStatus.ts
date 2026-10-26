@@ -42,8 +42,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "done", ru: "done" },
     note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch, dieselben Sprachpakete wie „Buchstaben & Zahlen“.",
   },
-  { href: "/zaehne/", languages: { de: "done" }, note: "Das gesungene Zahnputzlied gibt es nur auf Deutsch (/zahnputzlied)." },
-  { href: "/laut-leise/", languages: { de: "done" } },
+  {
+    href: "/zaehne/",
+    languages: { de: "done", ru: "partial" },
+    note: "Russisch ganz bis auf das gesungene Zahnputzlied: der Text für Suno steht in musik/suno-lied.md, die Aufnahme fehlt noch (/zahnputzlied).",
+  },
+  { href: "/laut-leise/", languages: { de: "done", ru: "done" } },
   {
     href: "/",
     languages: { de: "done", ru: "done" },
