@@ -179,11 +179,11 @@ Suno made a short plucked intro, whistled fills between some verses and verses o
 
 ## Русский (`ru`, 26 Oct 2026)
 
-Written for Suno, not made yet (no `musik-zaehneputzen-lied-ru.mp3`): until then the
-Russian app sings in the browser's language or English by default („Только музыка“ plays
-the plain music) and, with the hints on, speaks the steps in Russian. Sound words to join
-in: _шурх-шурх_ (scrubbing), _жу-жу-жу_ (circling, like a beetle), _вжик_ (wiping).
-Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Let a native speaker read it before making it.
+Made in Suno on 26 Oct 2026 with the texts below. Whisper found every part's first line;
+the take has no intro, verses of 15 to 19 s (the brushing lasts 1:58) and runs 2:33 with
+the finale. Sound words to join in: _шурх-шурх_ (scrubbing), _жу-жу-жу_ (circling, like a
+beetle), _вжик_ (wiping). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a
+native speaker.
 
 Lyrics:
 

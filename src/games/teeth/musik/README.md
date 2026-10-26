@@ -22,3 +22,4 @@ Made from the WAV with `ffmpeg -i song.wav -af "loudnorm=I=-16:TP=-1.5:LRA=11" -
 | `musik-zaehneputzen.mp3`         | Generated with [Suno](https://suno.com), 24 Oct 2026 | Suno terms of the account that made it (a paid plan allows publishing) |
 | `musik-zaehneputzen-lied-de.mp3` | Generated with [Suno](https://suno.com), 25 Oct 2026 | Suno terms of the account that made it (a paid plan allows publishing) |
 | `musik-zaehneputzen-lied-en.mp3` | Generated with [Suno](https://suno.com), 25 Oct 2026 | Suno terms of the account that made it (a paid plan allows publishing) |
+| `musik-zaehneputzen-lied-ru.mp3` | Generated with [Suno](https://suno.com), 26 Oct 2026 | Suno terms of the account that made it (a paid plan allows publishing) |
