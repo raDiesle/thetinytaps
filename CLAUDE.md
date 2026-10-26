@@ -166,7 +166,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
-  song files are named `musik-*.mp3`, see `/musik-erzeugen`. The shared options (`useCommonSettings`) are one
+  song files are named `musik-*.mp3`, see `/musik-erzeugen`. A game that runs along its own song (its steps follow it)
+  starts loading it on its start screen and waits for it before the part that follows the song, showing how far it is
+  when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
   "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“ lets a grown-up play upright for

@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { type Loop, loadSound, playLoop, playTuneNote } from "@/lib/sfx";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+import { audioContext, decodeSound, type Loop, playLoop, playTuneNote } from "@/lib/sfx";
 import { type SungTimes, sungLanguageOf } from "./sung";
 
 // The sung brushing songs in musik/ (see the README there). While one is still
@@ -59,14 +59,73 @@ const DUCKED = 0.08;
 const DUCK_CHECK_MS = 150;
 const BEAT_MS = 280;
 
-const loading = new Map<string, Promise<AudioBuffer | null>>();
+/** How far a song has come: downloaded share, then the decoded sound. */
+interface SongLoad {
+  /** Share of the file downloaded, 0–1; stays 0 when the size isn't known. */
+  progress: number;
+  /** The decoded song once it is there; null when it can't be loaded. */
+  buffer?: AudioBuffer | null;
+}
 
-/** Loads a song once per visit; null when there is none. */
-const loadSong = ({ file }: Song) => {
-  const url = urlOf(file);
-  if (!loading.has(file)) loading.set(file, url ? loadSound(url) : Promise.resolve(null));
-  return loading.get(file) as Promise<AudioBuffer | null>;
+const loads = new Map<string, SongLoad>();
+const listeners = new Set<() => void>();
+const LOADING: SongLoad = { progress: 0 };
+
+const report = (file: string, load: SongLoad) => {
+  loads.set(file, load);
+  for (const listener of listeners) listener();
 };
+
+/** Downloads the file in pieces, so a loading bar can show how far it is. */
+async function download(file: string, url: string): Promise<ArrayBuffer> {
+  const response = await fetch(url);
+  const total = Number(response.headers.get("content-length")) || 0;
+  if (!response.body || !total) return response.arrayBuffer();
+  const reader = response.body.getReader();
+  const pieces: BlobPart[] = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) return new Blob(pieces).arrayBuffer();
+    pieces.push(value);
+    received += value.length;
+    // A compressed answer states its compressed size; then the bar just waits at the end.
+    report(file, { progress: Math.min(1, received / total) });
+  }
+}
+
+/** Loads a song once per visit; its buffer is null when there is none or it fails. */
+function loadSong({ file }: Song) {
+  if (loads.has(file)) return;
+  const url = urlOf(file);
+  if (!url || !audioContext()) return report(file, { progress: 1, buffer: null });
+  report(file, LOADING);
+  void download(file, url)
+    .then(decodeSound, () => null)
+    .then((buffer) => report(file, { progress: 1, buffer }));
+}
+
+/**
+ * Starts loading the song sung in `sung` as soon as the game is chosen in the menu, so it
+ * is there by the time the brushing begins: a 2-minute song is a few MB, and switching from
+ * the stand-in tune to it, or decoding it, in the middle of brushing makes the picture stutter.
+ */
+export function preloadSong(sung: string) {
+  if (SUNG[sung]) loadSong(SUNG[sung]);
+}
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+/** How far the song sung in `sung` has loaded; `ready` also when it can't be loaded (then the stand-in tune plays). */
+export function useSongLoad(sung: string): { ready: boolean; progress: number; buffer: AudioBuffer | null } {
+  const song = SUNG[sung];
+  useEffect(() => loadSong(song), [song]);
+  const load = useSyncExternalStore(subscribe, () => loads.get(song.file) ?? LOADING);
+  return { ready: load.buffer !== undefined, progress: load.progress, buffer: load.buffer ?? null };
+}
 
 /** Where in `song` the brushing is after `ms`, going round the repeating parts. */
 const songAt = (song: Song, ms: number) => song.start + ((Math.max(0, ms) / 1000) % (song.loopEnd - song.start));
@@ -84,20 +143,9 @@ const speaking = () => typeof window !== "undefined" && "speechSynthesis" in win
  */
 export function useBrushingMusic({ sung, playing, finished, sync, at }: { sung: string; playing: boolean; finished: boolean; sync: unknown; at: number }) {
   const song = SUNG[sung];
-  const [loaded, setLoaded] = useState<{ song: Song; buffer: AudioBuffer | null } | null>(null);
-  const buffer = loaded?.song === song ? loaded.buffer : null;
+  const { buffer } = useSongLoad(sung);
   const atRef = useRef(at);
   atRef.current = at;
-
-  useEffect(() => {
-    let alive = true;
-    void loadSong(song).then((buffer) => {
-      if (alive) setLoaded({ song, buffer });
-    });
-    return () => {
-      alive = false;
-    };
-  }, [song]);
 
   useEffect(() => {
     if (!(playing || finished)) return;

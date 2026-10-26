@@ -93,7 +93,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "🪥 Hinweise und Bilder",
-        languages: { de: "done", ru: "done" },
+        languages: { de: "done", ru: "partial" },
+        note: "Russisch fehlt nur „Musik lädt …“ (wenn das Lied nach dem Vorspann noch nicht da ist).",
       },
       {
         label: "🎵 Zahnputzlied (gesungen)",
