@@ -16,15 +16,14 @@ import {
   playScrub,
   playSplash,
   playTrickle,
-  playWaitNote,
   playWhoosh,
   recorded,
-  WAIT_BEATS,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { animalById, BEAT_MS, nextAnimal, PEE_MS, POTTY_TEXTS, SIT_MS, STEPS, type AnimalId, type StepId } from "./content";
+import { animalById, nextAnimal, PEE_MS, POTTY_TEXTS, SIT_GUARD_MS, SIT_MS, STEPS, type AnimalId, type StepId } from "./content";
 import { AnimalDrawing, Bathroom, Drops, FLOOR_Y, PaperRoll, Potty, PottyFront, Sink, ThoughtBubble, Toilet } from "./drawings";
 import type { PottySettings } from "./settings";
+import { useWaitingMusic } from "./waitMusic";
 
 const flush = recorded("flush", playFlush);
 const splash = recorded("splash", playSplash);
@@ -70,7 +69,7 @@ interface Box {
 /** Room kept free around the picture's focus, in px, besides the row of steps below; the ✕ sits in a corner, beside the animal's head. */
 const MARGIN = { top: 16, side: 16, bottom: 8 };
 
-/** While sitting: sitting down, the waiting tune, the trickle, then done. */
+/** While sitting: sitting down, waiting (as long as it takes, until a tap), the trickle, then done. */
 type SitPhase = "none" | "sitting" | "waiting" | "peeing" | "done";
 
 /** The camera's transform that fits `focus` into the free part of a `width` × `height` screen. */
@@ -102,6 +101,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   // A ref as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
   const stepRef = useRef(-1);
+  const sitRef = useRef<SitPhase>("none");
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
 
   const later = useCallback((ms: number, run: () => void) => {
@@ -117,8 +117,16 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  // The waiting tune is music of its own; the background song waits meanwhile.
-  useNoBackgroundMusic(sit === "waiting" && settings.sounds);
+  /** The sitting phase in state and ref, so a tap can tell whether the waiting is on. */
+  const toSit = useCallback((phase: SitPhase) => {
+    sitRef.current = phase;
+    setSit(phase);
+  }, []);
+
+  // The waiting song is part of sitting (like the brushing song), so it plays even with Töne or Musik off;
+  // the background song waits meanwhile.
+  useNoBackgroundMusic(sit === "waiting");
+  useWaitingMusic(sit === "waiting", language.id);
 
   useLayoutEffect(() => {
     const root = rootRef.current;
@@ -161,27 +169,19 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       case "down":
         sound(0, playWhoosh);
         break;
-      case "sit": {
-        setSit("sitting");
+      case "sit":
+        // Nobody knows how long sitting takes: the waiting lasts until a tap (see act), only a short start can't be skipped.
+        toSit("sitting");
         sound(500, playPlop);
-        const tuneMs = WAIT_BEATS * BEAT_MS;
-        later(SIT_MS, () => setSit("waiting"));
-        for (let beat = 0; beat < WAIT_BEATS; beat++) sound(SIT_MS + beat * BEAT_MS, () => playWaitNote(beat));
-        later(SIT_MS + tuneMs, () => {
-          setSit("peeing");
-          if (settings.sounds) playTrickle();
-          say(texts.pee);
-        });
-        later(SIT_MS + tuneMs + PEE_MS, () => setSit("done"));
-        ready(SIT_MS + tuneMs + PEE_MS);
+        later(SIT_MS, () => toSit("waiting"));
+        ready(SIT_GUARD_MS);
         return;
-      }
       case "paper":
         sound(650, playRip);
         sound(1300, playGiggle);
         break;
       case "up":
-        setSit("none");
+        toSit("none");
         sound(0, playBoing);
         sound(500, playWhoosh);
         break;
@@ -206,6 +206,17 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     ready(ms);
   };
 
+  /** The tap that ends the waiting: it trickles, and the tap after that goes on. */
+  const finishWaiting = () => {
+    busyRef.current = true;
+    setBusy(true);
+    toSit("peeing");
+    if (settings.sounds) playTrickle();
+    say(texts.pee);
+    later(PEE_MS, () => toSit("done"));
+    ready(PEE_MS);
+  };
+
   /** A tap or key: the next step when the last one has finished, a sparkle while it still runs. */
   const act = (x?: number, y?: number) => {
     const next = stepRef.current + 1;
@@ -214,7 +225,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       if (settings.sounds) playRandomNote();
       return;
     }
-    begin(next);
+    if (sitRef.current === "waiting") finishWaiting();
+    else begin(next);
   };
 
   const restart = (id: AnimalId) => {
@@ -225,7 +237,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     stepRef.current = -1;
     busyRef.current = false;
     setStep(-1);
-    setSit("none");
+    toSit("none");
     setBusy(false);
   };
 

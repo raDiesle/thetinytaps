@@ -54,15 +54,12 @@ export function playTuneNote(i: number) {
 const WAIT_TUNE = [4, 4, 2, null, 4, 4, 2, null, 5, 4, 3, 2, 1, null, 0, null];
 const WAIT_BASS = [130.81, 174.61, 196.0, 130.81];
 
-/** The i-th beat of the waiting tune (0 to 15); a soft bass note starts every bar. */
+/** The i-th beat of the waiting tune, which repeats every four bars; a soft bass note starts every bar. */
 export function playWaitNote(i: number) {
   const step = WAIT_TUNE[i % WAIT_TUNE.length];
   if (step !== null) note({ from: PENTATONIC[step], duration: 0.4, type: "triangle", volume: 0.13 });
   if (i % 4 === 0) note({ from: WAIT_BASS[Math.floor(i / 4) % WAIT_BASS.length], duration: 1.4, type: "sine", volume: 0.14 });
 }
-
-/** Beats in the waiting tune. */
-export const WAIT_BEATS = WAIT_TUNE.length;
 
 /** "Puff!" – a little monster vanishes in a cloud, with a sparkle after. */
 export function playPoof() {
