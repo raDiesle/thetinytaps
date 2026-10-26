@@ -2,11 +2,13 @@ import { useCallback, useEffect, useRef, useState, type ComponentType, type RefO
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { type Localized, useT } from "@/lib/language";
 import { playMelody } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { BlowPlay } from "./BlowPlay";
 import { useMicrophone, type MicState } from "./mic";
 import type { LoudLevel, LoudSettings } from "./settings";
+import { LEVEL_TEXTS } from "./texts";
 import { VoicePlay } from "./VoicePlay";
 import "./loud.css";
 
@@ -14,7 +16,6 @@ import "./loud.css";
 export type FrameHandler = (db: number, ms: number) => void;
 
 export interface LevelProps {
-  speechLang: string;
   settings: LoudSettings;
   mic: MicState;
   /** The level puts its handler here to hear the microphone; it stays on between levels, so the browser asks only once. */
@@ -25,9 +26,9 @@ export interface LevelProps {
   onDone?: () => void;
 }
 
-const LEVELS: { id: LoudLevel; emoji: string; name: string; tapHint: string; Level: ComponentType<LevelProps> }[] = [
-  { id: "voice", emoji: "🦁", name: "Löwe und Maus", tapHint: "Löwe und Maus antippen", Level: VoicePlay },
-  { id: "blow", emoji: "🎂", name: "Pusten", tapHint: "antippen, das pustet auch", Level: BlowPlay },
+const LEVELS: { id: LoudLevel; emoji: string; name: Localized; tapHint: Localized; Level: ComponentType<LevelProps> }[] = [
+  { id: "voice", emoji: "🦁", ...LEVEL_TEXTS.voice, Level: VoicePlay },
+  { id: "blow", emoji: "🎂", ...LEVEL_TEXTS.blow, Level: BlowPlay },
 ];
 
 /** Which levels to play, in turn; in development `?level=blow` in the address picks one. */
@@ -45,7 +46,8 @@ const PARTY_MS = 3200;
  * other (or only one, as the grown-up chose); after each level the child
  * plays it again or goes on. The microphone only measures how loud it is.
  */
-export function LoudPlay({ speechLang, settings }: { speechLang: string; settings: LoudSettings }) {
+export function LoudPlay({ settings }: { settings: LoudSettings }) {
+  const t = useT();
   const levels = chosenLevels(settings.levels);
   // The microphone would hear the background song and take it for the child.
   useNoBackgroundMusic();
@@ -105,17 +107,9 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
   const Level = level.Level;
   return (
     <div className={["loud-root", party && "party"].filter(Boolean).join(" ")}>
-      <Level
-        key={round}
-        speechLang={speechLang}
-        settings={settings}
-        mic={mic}
-        listen={listen}
-        celebrate={celebrate}
-        onDone={levels.length > 1 ? () => setEnded(true) : undefined}
-      />
-      {ended && <GameEnd onAgain={() => startLevel(index)} next={{ emoji: next.emoji, name: next.name, onNext: () => startLevel(index + 1) }} />}
-      <MicNote state={mic} tapHint={level.tapHint} />
+      <Level key={round} settings={settings} mic={mic} listen={listen} celebrate={celebrate} onDone={levels.length > 1 ? () => setEnded(true) : undefined} />
+      {ended && <GameEnd onAgain={() => startLevel(index)} next={{ emoji: next.emoji, name: t(next.name), onNext: () => startLevel(index + 1) }} />}
+      <MicNote state={mic} tapHint={t(level.tapHint)} />
       <BurstLayer bursts={bursts} />
     </div>
   );
@@ -123,13 +117,28 @@ export function LoudPlay({ speechLang, settings }: { speechLang: string; setting
 
 /** For the grown-up: what's up with the microphone. Tapping works meanwhile. */
 function MicNote({ state, tapHint }: { state: MicState; tapHint: string }) {
+  const t = useT();
   if (state === "on") return null;
   return (
     <div className={`loud-mic-note ${state}`} role="status">
       <span aria-hidden>🎤</span>
-      {state === "asking" && <p>Darf das Spiel das Mikrofon benutzen? Bitte „Erlauben“ tippen. Es wird nichts aufgenommen.</p>}
-      {state === "denied" && <p>Das Mikrofon ist blockiert. In den Browser-Einstellungen für diese Seite erlauben – bis dahin {tapHint}.</p>}
-      {state === "missing" && <p>Kein Mikrofon gefunden – einfach {tapHint}.</p>}
+      {state === "asking" && (
+        <p>
+          {t({
+            de: "Darf das Spiel das Mikrofon benutzen? Bitte „Erlauben“ tippen. Es wird nichts aufgenommen.",
+            ru: "Можно игре пользоваться микрофоном? Нажмите «Разрешить». Ничего не записывается.",
+          })}
+        </p>
+      )}
+      {state === "denied" && (
+        <p>
+          {t({
+            de: `Das Mikrofon ist blockiert. In den Browser-Einstellungen für diese Seite erlauben – bis dahin ${tapHint}.`,
+            ru: `Микрофон заблокирован. Разрешите его в настройках браузера для этого сайта, а пока ${tapHint}.`,
+          })}
+        </p>
+      )}
+      {state === "missing" && <p>{t({ de: `Kein Mikrofon gefunden – einfach ${tapHint}.`, ru: `Микрофон не найден — просто ${tapHint}.` })}</p>}
     </div>
   );
 }

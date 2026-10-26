@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent } from "react";
 import { playPlop, playQuack } from "@/lib/sfx";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { deg, svgLine } from "./machineKit";
 import type { Pt } from "./path";
 import { INK, Sparkles } from "./scenery";
@@ -73,6 +73,7 @@ interface Ripple {
  * water splashes a ripple and any other tap or key makes the duck quack and hop.
  */
 export function WaterLevel({ sound, say, onDone }: LevelProps) {
+  const label = useLevelName("water");
   const water = useMemo(buildWater, []);
   const { stretches } = water;
   const ids = useId();
@@ -191,7 +192,7 @@ export function WaterLevel({ sound, say, onDone }: LevelProps) {
 
   return (
     <div className="marble-level" onPointerDown={onPointerDown}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label="Wasserbahn">
+      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
         <g ref={world} transform={`translate(${-cam.x} ${-cam.y})`}>
           <Sky gradient={`${ids}-sky`} />
           <Hill />

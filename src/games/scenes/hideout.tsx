@@ -1,4 +1,5 @@
 import { createContext, useContext, useId, type ComponentType, type CSSProperties } from "react";
+import type { Localized } from "@/lib/language";
 import { CHEEK, Eye, Face, INK, sparklePath } from "./shared";
 import type { SceneItem, SceneSound } from "./types";
 import "./hideout.css";
@@ -10,8 +11,8 @@ import "./hideout.css";
 
 export interface Surprise {
   id: string;
-  /** Said after the item's own sentence: "Guck-guck! Da ist ja eine Katze!" */
-  found: string;
+  /** Said after the item's own sentence, after "Guck-guck!": "Da ist ja eine Katze!" */
+  found: Localized;
   sound: SceneSound;
   Art: ComponentType;
 }
@@ -162,14 +163,14 @@ function Hund() {
 
 /** Everything that can be hiding; kept to friendly, well-known things a two-year-old can name. */
 export const SURPRISES: Surprise[] = [
-  { id: "katze", found: "Da ist ja eine Katze!", sound: "meow", Art: Katze },
-  { id: "maus", found: "Da ist ja eine Maus!", sound: "squeak", Art: Maus },
-  { id: "hase", found: "Da ist ja ein Hase!", sound: "boing", Art: Hase },
-  { id: "kueken", found: "Da ist ja ein Küken!", sound: "tweet", Art: Kueken },
-  { id: "geschenk", found: "Da ist ja ein Geschenk!", sound: "twinkle", Art: Geschenk },
-  { id: "teddy", found: "Da ist ja ein Teddy!", sound: "giggle", Art: Teddy },
-  { id: "frosch", found: "Da ist ja ein Frosch!", sound: "croak", Art: Frosch },
-  { id: "hund", found: "Da ist ja ein Hund!", sound: "bark", Art: Hund },
+  { id: "katze", found: { de: "Da ist ja eine Katze!", ru: "Ой, тут котик!" }, sound: "meow", Art: Katze },
+  { id: "maus", found: { de: "Da ist ja eine Maus!", ru: "Ой, тут мышка!" }, sound: "squeak", Art: Maus },
+  { id: "hase", found: { de: "Da ist ja ein Hase!", ru: "Ой, тут зайчик!" }, sound: "boing", Art: Hase },
+  { id: "kueken", found: { de: "Da ist ja ein Küken!", ru: "Ой, тут цыплёнок!" }, sound: "tweet", Art: Kueken },
+  { id: "geschenk", found: { de: "Da ist ja ein Geschenk!", ru: "Ой, тут подарок!" }, sound: "twinkle", Art: Geschenk },
+  { id: "teddy", found: { de: "Da ist ja ein Teddy!", ru: "Ой, тут мишка!" }, sound: "giggle", Art: Teddy },
+  { id: "frosch", found: { de: "Da ist ja ein Frosch!", ru: "Ой, тут лягушка!" }, sound: "croak", Art: Frosch },
+  { id: "hund", found: { de: "Da ist ja ein Hund!", ru: "Ой, тут собачка!" }, sound: "bark", Art: Hund },
 ];
 
 /** While the item plays: what is hiding this time, and when it is out (in ms after the tap). */

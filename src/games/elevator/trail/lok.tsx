@@ -461,7 +461,9 @@ export function LokFront({ done, here, nope }: SceneryProps) {
     <g>
       {solved && (
         <g transform="translate(4236 740) rotate(-90) scale(0.55)">
-          <Corn />
+          <g className="tl-bites late">
+            <Corn />
+          </g>
         </g>
       )}
       <g transform={`translate(${LOK_AT[0] + 4} ${LOK_AT[1] - 66})`}>

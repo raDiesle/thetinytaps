@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/sfx";
+import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
-import { ANIMALS, FOODS, texts, type Animal, type Food } from "./content";
+import { tapState } from "@/lib/tapTargets";
+import { ANIMAL_TEXTS, ANIMALS, FOODS, type Animal, type Food } from "./content";
 import { HOMES, HomeDrawing, type Home } from "./homes";
 import type { AnimalsSettings } from "./settings";
 
@@ -49,7 +51,9 @@ const moveStyle = (o: Offset | null): CSSProperties | undefined =>
   o ? { translate: `${o.x}px ${o.y}px`, scale: o.scale === undefined ? undefined : `${o.scale}` } : undefined;
 
 /** "Was gehört zum Tier?": food to the hungry animal (N-08), or the animal to its home (N-09). */
-export function AnimalsPlay({ lang, settings }: { lang: string; settings: AnimalsSettings }) {
+export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
+  const language = useAppLanguage();
+  const texts = pick(ANIMAL_TEXTS, language.id);
   const [round, setRound] = useState<Round | null>(null);
   const [drag, setDrag] = useState<{ who: Mover; x: number; y: number } | null>(null);
   /** The target the dragged thing is over, so it can lean towards it. */
@@ -92,9 +96,11 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, lang, { queue, rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
     },
-    [settings.speech, lang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   const prompt = (r: Round) => (r.kind === "feed" ? texts.hungry(r.animal) : texts.whereLives(r.animal));
@@ -209,7 +215,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
         later(650, playPop);
         later(900, () => round.animal.sound?.());
       }
-      say(texts.movedIn(round.animal, home.inPhrase));
+      say(texts.movedIn(round.animal, home));
     }
     if (settings.sounds) later(200, playChime);
     setStars((n) => n + 1);
@@ -351,19 +357,20 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
         won && round.kind === "feed" ? " munch" : ""
       }${yuck ? " yuck" : ""}`}
       style={round.kind === "home" ? moveStyle(offsetOf("animal")) : undefined}
+      data-tap
       onPointerDown={round.kind === "home" ? onMoverDown("animal") : onAnimalTap}
       onPointerMove={onMoverMove}
       onPointerUp={onMoverUp}
       onPointerCancel={onMoverCancel}
     >
-      <span ref={emojiRef} className="ap-emoji" role="img" aria-label={round.animal.name}>
+      <span ref={emojiRef} className="ap-emoji" role="img" aria-label={texts.animal(round.animal)}>
         {round.animal.emoji}
       </span>
-      {settings.names && <span className="ap-name">{round.animal.name}</span>}
-      {yuck && <span className="ap-bubble">Bäh!</span>}
+      {settings.names && <span className="ap-name">{texts.animal(round.animal)}</span>}
+      {yuck && <span className="ap-bubble">{texts.yuckBubble}</span>}
       {won && round.kind === "feed" && (
         <>
-          <span className="ap-bubble thanks">Danke!</span>
+          <span className="ap-bubble thanks">{texts.thanksBubble}</span>
           <span className="ap-hearts" aria-hidden>
             <span>💖</span>
             <span>💛</span>
@@ -384,6 +391,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
               optionRefs.current[i] = el;
             }}
             className={`ap-option ap-plate${focus === i ? " focused" : ""}`}
+            data-tap={tapState({ goal: i === round.correct })}
             onPointerDown={onMoverDown(i)}
             onPointerMove={onMoverMove}
             onPointerUp={onMoverUp}
@@ -393,11 +401,11 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
               className={`ap-food ap-emoji${moverClass(i)}${outcome?.pick === i && !outcome.ok ? " refused" : ""}`}
               style={moveStyle(offsetOf(i))}
               role="img"
-              aria-label={food.name}
+              aria-label={texts.food(food)}
             >
               {food.emoji}
             </span>
-            {settings.names && <span className="ap-name">{food.name}</span>}
+            {settings.names && <span className="ap-name">{texts.food(food)}</span>}
           </div>
         ))}
       </div>
@@ -415,10 +423,11 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
               className={`ap-option ap-home${focus === i ? " focused" : ""}${hover === i ? " near" : ""}${
                 won && outcome.pick === i ? " happy" : ""
               }${peek ? " peek" : ""}`}
+              data-tap={tapState({ goal: i === round.correct })}
               onPointerDown={onHomeDown(i)}
             >
               <div className="ap-home-box">
-                <HomeDrawing home={home} />
+                <HomeDrawing home={home} label={texts.home(home)} />
                 {resident && (
                   <span
                     className="ap-resident ap-emoji"
@@ -435,7 +444,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
                   </span>
                 )}
               </div>
-              {settings.names && <span className="ap-name">{home.name}</span>}
+              {settings.names && <span className="ap-name">{texts.home(home)}</span>}
             </div>
           );
         })}
@@ -451,7 +460,7 @@ export function AnimalsPlay({ lang, settings }: { lang: string; settings: Animal
       <div className="ap-top">{round.kind === "home" ? options : animal}</div>
       <div className="ap-ground">{round.kind === "home" ? animal : options}</div>
       {stars > 0 && (
-        <div className="find-stars" aria-label={`${stars} geschafft`}>
+        <div className="find-stars" aria-label={texts.stars(stars)}>
           {"⭐".repeat(Math.min(stars, 10))}
           {stars > 10 && <span className="find-count">{stars}</span>}
         </div>

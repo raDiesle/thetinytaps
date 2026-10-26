@@ -45,9 +45,6 @@ const SUNG: Record<string, Song & SungTimes> = Object.fromEntries(
 /** The languages with a sung song. */
 export const SUNG_LANGUAGES = Object.keys(SUNG).sort();
 
-/** The song for the app's language (Spielsprache on the home page); German when there is none in it. */
-export const sungLanguage = (appLanguage: string) => (appLanguage in SUNG ? appLanguage : "de");
-
 /** With the song sung in `lang`: when each step begins, in ms of brushing, and last when the brushing ends. */
 export function sungSteps(lang: string): number[] {
   const song = SUNG[lang];

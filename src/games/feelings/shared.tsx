@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useLeaveGame } from "@/components/GameShell";
+import { appLanguage, pick, useAppLanguage, useT, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { framesFor, imageFor } from "./images";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
 
-const SPEECH_LANG = "de-DE";
-
 /** How long each frame of a picture stays before the next one fades in. */
 const FRAME_MS = 900;
 
 /** Said with the laugh when a good idea is chosen (only when speech is on), one at random. */
-const PRAISE = ["Juhu!", "Ja!", "Super!"];
+const PRAISE: Localized<string[]> = { de: ["Juhu!", "Ja!", "Super!"], ru: ["Ура!", "Да!", "Молодец!"] };
 
 /** How long the green frame and the laugh stay before the bear does the good thing. */
 export const CHEER_MS = 1100;
@@ -21,8 +21,9 @@ export const OOPS_MS = 2600;
 
 /** A good idea was chosen: a laugh, stars, and „Juhu!“ when speech is on. */
 export function cheer(say: (text: string) => void, sound: (name: SoundName) => void, float: (emoji: string, x: number, y: number, count?: number) => void) {
+  const praise = pick(PRAISE, appLanguage());
   sound("laugh");
-  say(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+  say(praise[Math.floor(Math.random() * praise.length)]);
   float("⭐", 30, 25, 4);
   float("✨", 70, 35, 4);
 }
@@ -61,17 +62,18 @@ export function useTimers() {
   return { later, clearAll };
 }
 
-/** Speech and sounds as the parent set them up. */
+/** Speech and sounds as the parent set them up; speech in the app language, as every text of the stories is. */
 export function useVoice(settings: FeelingsSettings) {
+  const { speechLang } = useAppLanguage();
   useEffect(() => {
     if (settings.sounds) loadRecordings(RECORDED_SOUNDS);
   }, [settings.sounds]);
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, SPEECH_LANG, { queue, rate: 0.85 });
+      if (settings.speech) speak(text, speechLang, { queue, rate: 0.85 });
     },
-    [settings.speech],
+    [settings.speech, speechLang],
   );
 
   const sound = useCallback(
@@ -245,6 +247,8 @@ export function ChoiceCard({
         type="button"
         className={`fg-card fg-card-${state}${small ? " small" : ""}`}
         data-card={image}
+        // No "goal" here: picking the good or the not-so-good idea is the child's own choice.
+        data-tap
         disabled={!active}
         aria-label={caption}
         onPointerDown={(e: PointerEvent) => {
@@ -286,8 +290,10 @@ export function StepDots({ total, done, current }: { total: number; done: number
   );
 }
 
-/** At the end of a story: play it again (small, white) or go on to the next one (big, yellow). Only pictures, no words. */
+/** At the end of a story: back to the start screen or play it again (small, white), or go on to the next one (big, yellow). Only pictures, no words. */
 export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: () => void }) {
+  const t = useT();
+  const leave = useLeaveGame();
   // Pointer down, not click: it reacts right away, and the picture underneath doesn't get the tap.
   const press = (action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
@@ -295,14 +301,24 @@ export function EndButtons({ onAgain, onNext }: { onAgain: () => void; onNext: (
   };
 
   return (
-    <div className="fg-end">
-      <button type="button" className="fg-round again" aria-label="Nochmal" onPointerDown={press(onAgain)}>
+    <div className="fg-end" data-tap-root>
+      {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
+      <button type="button" className="fg-round menu" aria-label={t({ de: "Menü", ru: "Меню" })} onPointerDown={(e) => e.stopPropagation()} onClick={leave}>
+        <svg viewBox="0 0 24 24" aria-hidden>
+          {/* Four cards, like the start screen – not a house, which would look like the home page. */}
+          <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+          <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+          <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+          <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+        </svg>
+      </button>
+      <button type="button" className="fg-round again" aria-label={t({ de: "Nochmal", ru: "Ещё раз" })} onPointerDown={press(onAgain)}>
         <svg viewBox="0 0 24 24" aria-hidden>
           <path d="M3.5 12a8.5 8.5 0 1 0 2.5-6" />
           <path d="M2.5 3.5v5h5" />
         </svg>
       </button>
-      <button type="button" className="fg-round next" aria-label="Weiter" onPointerDown={press(onNext)}>
+      <button type="button" className="fg-round next" aria-label={t({ de: "Weiter", ru: "Дальше" })} onPointerDown={press(onNext)}>
         <svg viewBox="0 0 24 24" aria-hidden>
           <path d="M8 4.5v15l12-7.5z" />
         </svg>

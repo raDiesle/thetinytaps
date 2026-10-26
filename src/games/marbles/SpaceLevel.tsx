@@ -1,4 +1,5 @@
 import { useId, useMemo, type ReactNode } from "react";
+import { useT } from "@/lib/language";
 import { VIEW_H, wobble, type LevelProps } from "./level";
 import { beside, deg, hop, lerp, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
@@ -63,7 +64,7 @@ export function SpaceLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={space} label="Raketenstart" {...props}>
+    <MachineStage machine={space} level="space" {...props}>
       {(t) => (
         <>
           <Sky sky={`${ids}-sky`} t={t} space={space} />
@@ -803,6 +804,8 @@ function SlotHole() {
 
 /** The board wakes up when the iron ball drops into its slot, then counts down: three lamps one after the other, then all green for the start. */
 function CountdownBoard({ space, t }: { space: Space; t: number }) {
+  // The word on the screen at lift-off, as the voice says it (`t` is the time here).
+  const liftWord = useT()({ de: "START!", ru: "ПУСК!" });
   const { x, y, w, h } = BOARD;
   const step = space.countAt(t);
   const awake = t >= space.tWake;
@@ -856,7 +859,7 @@ function CountdownBoard({ space, t }: { space: Space; t: number }) {
           fontFamily="system-ui, sans-serif"
           fill={step === 4 ? GLOW : LAMP_COLORS[step - 1]}
         >
-          {step === 4 ? "START!" : 4 - step}
+          {step === 4 ? liftWord : 4 - step}
         </text>
       )}
     </g>

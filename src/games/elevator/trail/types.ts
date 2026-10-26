@@ -1,13 +1,14 @@
 import type { ComponentType } from "react";
 import type { Pose } from "../kid";
 import type { GoalId, ItemId } from "./items";
+import type { Worry } from "./worries";
 
 // A trail level ("Weg-Abenteuer"): a long world seen from the side that scrolls along with the child.
 // Something the child loves goes away at the start (the kite flies off), and the child follows it.
 // On the way it finds things that go into its bag (three at most), and at every obstacle the bag
-// opens: the child taps the thing to use, and the child uses it by itself. Walking on is one tap on the
-// action button (or anywhere, or any key); nothing in the picture is pointed at. A wrong thing is tried,
-// something funny happens, it comes back into the bag and the right one glows.
+// opens: the child taps the thing to use, and the child uses it by itself; a thought bubble says why it helps.
+// Walking on is one tap on the action button (or anywhere, or any key); only a thing to pick up is ringed.
+// A wrong thing is tried, something funny happens, it comes back into the bag and the right one glows.
 
 /** A point in the world: x to the right, y down; the ground at the start is at y = 740. */
 export type Point = [number, number];
@@ -59,6 +60,9 @@ export interface Obstacle extends StationBase {
   ms: number;
   /** The funny sound when a wrong thing is tried. */
   nope: () => void;
+  /** Why the thing helps, in a thought bubble while the child chooses: a creature (or the flowers) thinks of the thing
+   * it wants (`wants`: the bubble's tip, just above its head), or the child thinks of what would happen (`worry`). */
+  why: { wants: Point } | { worry: Worry };
   /** Solving it gives the goal back: it comes into the child's hands. */
   frees?: boolean;
 }

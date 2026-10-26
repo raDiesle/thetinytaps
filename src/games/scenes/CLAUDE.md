@@ -12,6 +12,30 @@ Scene engine (modes in menu order: colouring in – a tapped item gets its colou
   plural grammar in questions, roads). `yarn test` after every change to items.
 - `ScenePlay.tsx` is the engine and is shared by every picture (sounds in `sounds.ts`, the marks drawn over a picture in `marks.tsx`): keep scene-specific things in the
   scene's folder and its CSS, and prefix CSS classes and SVG ids by the scene (CSS is global).
-- Music is the background song of all games (`src/lib/backgroundMusic.ts`, played by `GameShell`, switched on the
-  home page). The shell stays mounted when the child follows a vehicle into another picture, so the song goes on.
+- Music is the background song of all games (`src/lib/backgroundMusic.ts`, played once for the whole app by
+  `BackgroundMusic`, switched on the home page), so it goes on when the child follows a vehicle into another picture.
   Not in Gute Nacht (`bedtime`, `useNoBackgroundMusic`), which could get a lullaby of its own.
+
+## Languages (German and Russian)
+
+The pictures speak the app language (chosen on the home page, `src/lib/language.ts`). Rules:
+- An item's words live in two places: German in the scene's item (`name`, `sentences`, chains), every other
+  language in the scene folder's `ru.ts` (`SceneTranslation`: title, description, items by id with name,
+  sentences, `gender` or `plural`, chain sentences in order), wired up in `translations.ts`. New items and
+  sentences come in German only until the user asks for a language; when a German line's meaning changes,
+  delete its Russian. A picture plays in Russian only when its translation covers every item and chain step,
+  otherwise entirely in German, voice and keys included (`sceneLanguage` in `localize.ts`), never mixed;
+  mark such a gap in `src/content/ideas/languageStatus.ts`. `scenes.test.ts` fails on an unknown item, a
+  chain of the wrong length or a name without gender/plural.
+- Grammar follows the translation, never the German: an item can be plural in Russian and not in German
+  (санки, часы) and the other way round. `localize.ts` (`localizeScene`, `localizeItem`) gives ScenePlay,
+  the menu and guests from other pictures the scene in the app language, German where the translation is missing or incomplete.
+- Every sentence the engine builds itself (prompts, praise, party, find and trait questions, wrong taps,
+  vehicles driving between pictures, labels) is in `phrases.ts`, one block per language; never put a
+  German sentence into `ScenePlay.tsx` or `quests.ts`. Russian adjectives agree with the item's gender/plural
+  (`agree`). Start-screen texts are inline with `t({ de, ru })` in `ScenesGame.tsx`; the surprises in a
+  hideout have `found: { de, ru }`.
+- Speech uses the scene language's `speechLang`. Keys mode in Russian: the keys are the Cyrillic letters
+  (`RUSSIAN_SCENE_KEYS`), found by key place (`pressedKey` → `cyrillicLetterOf`), so a German keyboard types
+  Russian; an item wants the first letter of its whole Russian name (put the noun first in a translation
+  where you can), and the Latin `key` wishes only count in German.

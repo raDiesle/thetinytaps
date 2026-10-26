@@ -69,3 +69,12 @@ test("a story with recordings has one for every line and none left over (yarn vo
     ).toEqual([]);
   }
 });
+
+// Translations come only on request, so a story may lack a title or step names in a language (they show in German).
+test("Russian titles and step names, where a story has them, are written in Cyrillic", () => {
+  for (const { dir, story } of STORIES) {
+    const ru = story.translations?.ru;
+    const names = [ru?.title, ...(ru?.steps.map((s) => s.name) ?? [])].flatMap((n) => (n ? [n] : []));
+    for (const name of names) expect(name, `${dir}: ${name}`).toMatch(/^[^A-Za-z]*$/);
+  }
+});

@@ -1,3 +1,6 @@
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import { pick as pickLanguage } from "@/lib/language";
+import { SCENE_PHRASES } from "./phrases";
 import type { SceneMode } from "./settings";
 import type { Scene, SceneItem, SceneTrait } from "./types";
 
@@ -19,58 +22,30 @@ export interface Quest {
   praise: (item: SceneItem) => string;
 }
 
-/** "ist" or "sind", matching the item's name. */
-export const verb = (item: SceneItem) => (item.plural ? "sind" : "ist");
-
-export const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
-
-/** Questions mode: one question per trait, asked when the scene has at least two answers. `pluralAnswer` is for plural names ("die Tauben"). */
-export const TRAITS: Record<SceneTrait, { question: string; answer: string; pluralAnswer: string; emoji: string }> = {
-  red: { question: "Was ist rot?", answer: "ist rot", pluralAnswer: "sind rot", emoji: "🔴" },
-  yellow: { question: "Was ist gelb?", answer: "ist gelb", pluralAnswer: "sind gelb", emoji: "🟡" },
-  blue: { question: "Was ist blau?", answer: "ist blau", pluralAnswer: "sind blau", emoji: "🔵" },
-  green: { question: "Was ist grün?", answer: "ist grün", pluralAnswer: "sind grün", emoji: "🟢" },
-  flies: { question: "Wer kann fliegen?", answer: "kann fliegen", pluralAnswer: "können fliegen", emoji: "🪽" },
-  big: { question: "Was ist ganz groß?", answer: "ist ganz groß", pluralAnswer: "sind ganz groß", emoji: "🐘" },
-  small: { question: "Was ist ganz klein?", answer: "ist ganz klein", pluralAnswer: "sind ganz klein", emoji: "🐜" },
-  animal: { question: "Wo ist ein Tier?", answer: "ist ein Tier", pluralAnswer: "sind Tiere", emoji: "🐾" },
-  wheels: { question: "Was hat Räder?", answer: "hat Räder", pluralAnswer: "haben Räder", emoji: "🛞" },
-};
+/** The traits asked about in questions mode; their words are in phrases.ts. */
+const TRAITS = Object.keys(SCENE_PHRASES.de.traits) as SceneTrait[];
 
 /** A question with many answers is done after this many, so it doesn't drag on. */
 const MAX_NEEDED = 3;
 
 const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
-function findQuest(item: SceneItem): Quest {
-  return {
-    id: item.id,
-    question: `Wo ${verb(item)} ${item.name}?`,
-    answers: [item],
-    needed: 1,
-    item,
-    praise: (found) => `Das ${verb(found)} ${found.name}!`,
-  };
-}
-
-function traitQuest(scene: Scene, trait: SceneTrait): Quest {
-  const { question, answer, pluralAnswer, emoji } = TRAITS[trait];
-  const answers = scene.items.filter((item) => item.traits?.includes(trait));
-  return {
-    id: trait,
-    question,
-    answers,
-    needed: Math.min(MAX_NEEDED, answers.length),
-    emoji,
-    praise: (found) => `${capitalize(found.name)} ${found.plural ? pluralAnswer : answer}!`,
-  };
-}
-
-/** Everything that can be asked in this mode and scene. */
-export function questsFor(mode: SceneMode, scene: Scene): Quest[] {
-  if (mode === "find") return scene.items.map(findQuest);
+/**
+ * Everything that can be asked in this mode and scene, in `languageId` (the scene's
+ * items already localized, see localize.ts). Questions mode asks a trait when the
+ * scene has at least two answers.
+ */
+export function questsFor(mode: SceneMode, scene: Scene, languageId: TargetLanguageId = "de"): Quest[] {
+  const words = pickLanguage(SCENE_PHRASES, languageId);
+  if (mode === "find") {
+    return scene.items.map((item) => ({ id: item.id, question: words.whereIs(item), answers: [item], needed: 1, item, praise: words.hereIs }));
+  }
   if (mode === "questions") {
-    return (Object.keys(TRAITS) as SceneTrait[]).map((trait) => traitQuest(scene, trait)).filter((quest) => quest.answers.length >= 2);
+    return TRAITS.map((trait): Quest => {
+      const { question, praise, emoji } = words.traits[trait];
+      const answers = scene.items.filter((item) => item.traits?.includes(trait));
+      return { id: trait, question, answers, needed: Math.min(MAX_NEEDED, answers.length), emoji, praise };
+    }).filter((quest) => quest.answers.length >= 2);
   }
   return [];
 }

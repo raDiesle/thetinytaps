@@ -57,7 +57,9 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
 | `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Kleine Abenteuer" use them (`playRecorded` / `recorded` in `src/lib/sfx/core.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
 | `scripts/gemini-image.mjs` | `yarn image <out.webp> "<prompt>"`: makes a picture with Gemini (needs `GEMINI_API_KEY` in your shell), optionally cut out (`--transparent`), sized and saved as WebP; the raw result stays in `.image-raw/`. Guide: the Claude Code skill [`.claude/skills/bild-erzeugen/SKILL.md`](.claude/skills/bild-erzeugen/SKILL.md) (`/bild-erzeugen`) |
-| `src/content/ideas/` | Idea collection, one file per area (`n-new-games.ts` …) with fixed IDs (e.g. `N-03`), shown on the hidden page `/ideen/` – hold the „p“ in the home page title for 2 seconds |
+| `src/content/ideas/` | Idea collection, one file per area (`n-new-games.ts` …) with fixed IDs (e.g. `N-03`), shown on the hidden page `/management/` – hold the „p“ in the home page title for 2 seconds |
+| `src/content/seo.ts` | Title, description and text for search engines per game, category and scene; the build writes a page of its own for each, plus `sitemap.xml` and `robots.txt` |
+| `src/content/research.ts` | Research for grown-ups (e.g. what parents search on Google), with date, method, findings and the ideas it led to, also shown on `/management/` |
 
 To add a scene to "Lebendige Bilder", create a folder like `src/games/scenes/baustelle/`
 with the drawing (SVG in React, one component per tappable item), its texts and a
@@ -95,8 +97,13 @@ without WLAN – and straight away. The home page shows „Funktioniert auch ohn
 Internet“ once that is done, and an „Als App installieren“ button in Chrome /
 Edge / Android (on iPhone and iPad: Safari → Teilen → „Zum Home-Bildschirm“).
 
-A new version is downloaded in the background and used from the next start;
-a game that is open keeps running on the old one. Speech offline uses only the
+A new version is downloaded in the background: the browser looks for it when
+the site is opened, and an open page or installed app (which often only comes
+back from the background, for days) asks every hour and each time it comes back.
+The new version takes over between games – when a menu page is opened or the app
+goes to the background while showing one – never in a running game, and not in
+fullscreen (it would end); otherwise at the next start. The home page shows
+small in the bottom left corner when the running version was built („Stand …“). Speech offline uses only the
 voices on the device (the online „Google“ voices need network). The service
 worker only runs in the built site; to try it locally use the `preview-pages`
 launch config (`PUBLIC_BASE_PATH=/thetinytaps`, port 3200) – `yarn dev` removes

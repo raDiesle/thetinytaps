@@ -1,6 +1,8 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
-import { COMFORTS, COMFORTS_NEEDED, type ComfortId, type Feeling, type FeelingId } from "./bear";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { COMFORTS_NEEDED, type ComfortId, type Feeling, type FeelingId } from "./bear";
 import { bearImages, preloadImages } from "./images";
+import { comfortsIn } from "./localized";
 import type { FeelingsSettings } from "./settings";
 import {
   CHEER_MS,
@@ -25,7 +27,8 @@ const CELEBRATE_MS = 1500;
 /** Where hearts and notes float up from: the middle of the picture. */
 const BEAR_CHEST = { x: 50, y: 42 };
 
-const QUESTION = "Wie kannst du ihm helfen?";
+/** Asked after the intro, unless the feeling has its own question. */
+const QUESTION: Localized = { de: "Wie kannst du ihm helfen?", ru: "Как ты можешь ему помочь?" };
 
 /** What floats up when he is happy again, if not hearts. */
 const END_FLOAT: Partial<Record<FeelingId, string>> = { tired: "💤", happy: "🎉" };
@@ -61,7 +64,7 @@ const freshRound = (key: number): Round => ({
   happy: false,
 });
 
-/** Zu Hause: one feeling of the bear, until he is happy again. `onNext` goes on to the next story. */
+/** Zu Hause: one feeling of the bear (its words already in the app language), until he is happy again. `onNext` goes on to the next story. */
 export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; settings: FeelingsSettings; onNext: () => void }) {
   const nextKey = useRef(0);
   const happyAt = useRef(0);
@@ -69,6 +72,9 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
   const { later, clearAll } = useTimers();
   const { say, sound } = useVoice(settings);
   const { floaters, float } = useFloaters();
+  const t = useT();
+  const { id: language } = useAppLanguage();
+  const comforts = useMemo(() => comfortsIn(language), [language]);
 
   const { used, happy } = round;
 
@@ -76,9 +82,9 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
     clearAll();
     preloadImages([bearImages.feeling(feeling.id), bearImages.happy(feeling.id), bearImages.instead(feeling.id), ...feeling.comforts.map(bearImages.comfort)]);
     setRound(freshRound(nextKey.current++));
-    say(`${feeling.intro} ${feeling.question ?? QUESTION}`);
+    say(`${feeling.intro} ${feeling.question ?? t(QUESTION)}`);
     if (feeling.id === "scared") sound("rumble");
-  }, [feeling, clearAll, say, sound]);
+  }, [feeling, clearAll, say, sound, t]);
 
   useEffect(() => startFeeling(), []);
 
@@ -90,7 +96,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
   const comfort = useCallback(
     (id: ComfortId) => {
       if (round.busy || happy) return;
-      const c = COMFORTS[id];
+      const c = comforts[id];
       const nowUsed = used.includes(id) ? used : [...used, id];
       const nowHappy = nowUsed.length >= COMFORTS_NEEDED;
       setRound((r) => ({ ...r, used: nowUsed, picked: null, cheering: true, busy: true }));
@@ -116,7 +122,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
         float(END_FLOAT[feeling.id] ?? "💛", BEAR_CHEST.x, BEAR_CHEST.y + 20, 5);
       }, CHEER_MS + COMFORT_MS);
     },
-    [round.busy, happy, used, feeling, say, sound, float, later],
+    [round.busy, happy, used, feeling, comforts, say, sound, float, later],
   );
 
   /** The not-so-good idea: shown big in a red frame that shakes, with crying or a crash, while it is told why it doesn't help; then the cards come back. */
@@ -172,9 +178,9 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
   let look: PictureLook = round.busy ? "story" : "quiet";
   if (happy) [picture, caption, look] = [bearImages.happy(feeling.id), feeling.endCaption, "story"];
   else if (round.picked === "instead") [picture, caption, look] = [bearImages.instead(feeling.id), feeling.instead.caption, "option"];
-  else if (round.picked) [picture, caption, look] = [bearImages.comfort(round.picked), COMFORTS[round.picked].caption, "option"];
+  else if (round.picked) [picture, caption, look] = [bearImages.comfort(round.picked), comforts[round.picked].caption, "option"];
   else if (round.trying) [picture, caption, look] = [bearImages.instead(feeling.id), feeling.instead.caption, "bad"];
-  else if (last) [picture, caption] = [bearImages.comfort(last), COMFORTS[last].caption];
+  else if (last) [picture, caption] = [bearImages.comfort(last), comforts[last].caption];
   if (round.cheering) look = "good";
 
   return (
@@ -200,7 +206,7 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
               <ChoiceCard
                 key={id}
                 image={bearImages.comfort(id)}
-                caption={COMFORTS[id].caption}
+                caption={comforts[id].caption}
                 state={used.includes(id) ? "done" : round.busy ? "rest" : round.picked === id ? "picked" : "choose"}
                 onChoose={() => pick(id)}
               />

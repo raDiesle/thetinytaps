@@ -18,7 +18,7 @@ parts change exactly with the brushing steps, a finale on the end screen.
   hard to follow for a toddler. A **sung song that is itself the hint** works instead:
   one verse per step singing exactly what is shown, the voice then stays silent during
   the steps (Zähne putzen; a new language of it: `/zahnputzlied`). Such a song is part of
-  the game: it always plays, sung in the home page's Spielsprache, with no "plain music"
+  the game: it always plays, sung in the app language (🌐), with no "plain music"
   choice and regardless of "🎵 Musik".
 - **Sung songs don't keep to bars.** Asked for "8 bars per part", Suno sang verses of
   5 to 11 bars, put whistled fills between them and sped up from 112 to 115 BPM. Never

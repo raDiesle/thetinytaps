@@ -15,9 +15,9 @@ const AdventurePage = page(() => import("@/pages/AdventurePage"), "AdventurePage
 const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage");
 const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage");
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage");
-const IdeasPage = page(() => import("@/pages/IdeasPage"), "IdeasPage");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage");
 const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage");
+const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
@@ -51,7 +51,9 @@ export function App() {
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="aufzug" element={<Navigate to="/kleine-abenteuer/" replace />} />
         <Route path="abenteuer" element={<AdventurePage />} />
-        <Route path="ideen" element={<IdeasPage />} />
+        <Route path="management" element={<ManagementPage />} />
+        {/* Its old name and address, for bookmarks. */}
+        <Route path="ideen" element={<Navigate to="/management/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

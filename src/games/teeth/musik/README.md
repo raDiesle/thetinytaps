@@ -12,3 +12,4 @@ A new language: the `/zahnputzlied` skill.
 | -------------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------- |
 | `musik-zaehneputzen-lied-de.mp3` | Generated with [Suno](https://suno.com), 25 Oct 2026 | Suno terms of the account that made it (a paid plan allows publishing) |
 | `musik-zaehneputzen-lied-en.mp3` | Generated with [Suno](https://suno.com), 25 Oct 2026 | Suno terms of the account that made it (a paid plan allows publishing) |
+| `musik-zaehneputzen-lied-ru.mp3` | Generated with [Suno](https://suno.com), 26 Oct 2026 | Suno terms of the account that made it (a paid plan allows publishing) |

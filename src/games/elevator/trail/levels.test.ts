@@ -82,6 +82,19 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
       }
     });
 
+    test("a creature's why-bubble is above the ground next to the child, where the screen shows it", () => {
+      for (const station of path.stations) {
+        if (station.kind !== "obstacle" || !("wants" in station.why)) continue;
+        const [x, y] = station.why.wants;
+        // The child stands at 760 of 1600 on the screen, its feet at 740 of 900; the bubble grows 160 to the right
+        // and 200 up from its tip.
+        expect(x - station.x).toBeGreaterThan(40);
+        expect(x - station.x).toBeLessThan(640);
+        expect(groundY(path.ground, station.x) - y).toBeGreaterThan(0);
+        expect(groundY(path.ground, station.x) - y).toBeLessThan(520);
+      }
+    });
+
     test("the last station gives the goal back, and only that one", () => {
       const freeing = path.stations.filter((s) => s.kind === "obstacle" && s.frees);
       expect(freeing).toEqual([path.stations[path.stations.length - 1]]);

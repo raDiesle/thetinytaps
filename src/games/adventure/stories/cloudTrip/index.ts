@@ -48,6 +48,7 @@ import {
   tapTime,
   TRAVEL,
 } from "./script";
+import { TRANSLATIONS } from "./translations";
 import { makeWorld } from "./world";
 
 // „Die Wolkenreise“: the sun is stuck behind a rain cloud and everything is grey. Tapsi rides on
@@ -620,5 +621,6 @@ export const CLOUD_TRIP: Story = {
   demo: DEMO,
   praise: PRAISE,
   lines: LINES,
+  translations: TRANSLATIONS,
   build,
 };

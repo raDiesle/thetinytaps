@@ -1,9 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { expect, test } from "@rstest/core";
 import { STEPS } from "./steps";
-import { SUNG_LABELS, type SungTimes, sungLanguageOf } from "./sung";
+import { type SungTimes, sungLanguageOf } from "./sung";
 
-// A sung song shows up in the settings just by its file name, so check what that relies on.
+// A sung song is found just by its file name, so check what that relies on.
 
 const DIR = "src/games/teeth/musik";
 const languages = readdirSync(DIR)
@@ -16,10 +16,9 @@ test("only sung songs count as languages", () => {
   expect(languages).toContain("de");
 });
 
-test("every sung song has a name for the settings and its lyrics in suno-lied.md", () => {
+test("every sung song has its lyrics in suno-lied.md", () => {
   const lyrics = readFileSync(`${DIR}/suno-lied.md`, "utf8");
   for (const lang of languages) {
-    expect(SUNG_LABELS[lang], lang).toBeTruthy();
     expect(lyrics, lang).toContain(`(\`${lang}\``);
   }
 });

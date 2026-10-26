@@ -58,7 +58,7 @@ export function CircusLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={circus} label="Zirkus" {...props}>
+    <MachineStage machine={circus} level="circus" {...props}>
       {(t) => {
         const uni = circus.unicycleAt(t);
         const clown = circus.clownAt(t);

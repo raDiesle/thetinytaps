@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
 import { playDrum, playKnock } from "@/lib/sfx";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { cameraOn } from "./machineKit";
 import { pickThings, type Thing } from "./things";
 import type { Pt } from "./path";
@@ -108,6 +108,7 @@ type Phase = "dropping" | "ready" | "falling" | "done";
  * the last one hits the drum. Every round brings other things.
  */
 export function ToppleLevel({ sound, say, onDone }: LevelProps) {
+  const label = useLevelName("topple");
   const layout = useMemo(() => layOut(pickThings(GROUPS)), []);
   const { things, lefts, drumLeft, onFirstScreen, worldW } = layout;
   const tipping = useRef<Tipping[]>(things.map(() => ({ angle: 0, spin: 0, started: false, touched: false })));
@@ -180,7 +181,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
           } else {
             drumAt.current = t;
             sound(playDrum);
-            say("Bumm! Alles umgefallen!");
+            say({ de: "Bumm! Alles umgefallen!", ru: "Бум! Всё упало!" });
             finish();
           }
         }
@@ -211,7 +212,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
 
   return (
     <div className="marble-level" onPointerDown={push}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label="Alles fällt um">
+      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
         <g transform={`translate(${-camera.current} 0)`}>
           <Room width={worldW} />
           <g transform={`translate(${MARGIN} ${FLOOR}) scale(${SCALE})`}>

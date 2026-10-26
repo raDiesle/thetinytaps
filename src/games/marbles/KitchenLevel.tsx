@@ -57,7 +57,7 @@ export function KitchenLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={kitchen} label="Verrückte Küche" {...props}>
+    <MachineStage machine={kitchen} level="kitchen" {...props}>
       {(t) => (
         <>
           <Room tiles={`${ids}-tiles`} />

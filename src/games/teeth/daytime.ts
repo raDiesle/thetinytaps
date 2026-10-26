@@ -1,3 +1,7 @@
+import { type Spoken, spokenIn } from "@/lib/language";
+import type { TargetLanguage } from "@/content/targetLanguages";
+import { DAYTIME_RU } from "./daytime.ru";
+
 // Brushing in the morning looks different from brushing at night: the sun
 // rises or the moon is out, crumbs from breakfast or pyjamas before bed. The
 // week chart keeps a star for every morning and every evening brushed.
@@ -13,33 +17,37 @@ export function daytimeOf(now = new Date()): Daytime {
   return now.getHours() < EVENING_FROM_HOUR ? "morning" : "evening";
 }
 
-/** What is said and shown differently in the morning and the evening. */
-export const DAYTIME: Record<
-  Daytime,
-  {
-    /** Said before the first cue. */
-    hello: string;
-    /** Where the sugar monsters come from. */
-    monsters: string;
-    /** The heading at the end. */
-    doneTitle: string;
-    /** Said after spitting out at the end. */
-    after: string;
-  }
-> = {
+/** What is said and shown differently in the morning and the evening, in one language. */
+export interface DaytimeTexts {
+  /** Said before the first cue. */
+  hello: string;
+  /** Said while the sugar crumbs grow into monsters: over the day before the evening brushing, over the night before the morning one. */
+  grow: string;
+  /** The heading at the end. */
+  doneTitle: string;
+  /** Said after spitting out at the end. */
+  after: string;
+}
+
+/** The German texts; the Russian ones are in daytime.ru.ts. */
+export const DAYTIME: Record<Daytime, DaytimeTexts> = {
   morning: {
     hello: "Guten Morgen!",
-    monsters: "Oh je, Zuckermonster vom Frühstück! Komm, wir putzen sie alle weg!",
+    grow: "In der Nacht wachsen daraus Zuckermonster.",
     doneTitle: "☀️ Blitzeblank!",
     after: "Jetzt kann der Tag losgehen!",
   },
   evening: {
     hello: "Bald ist Schlafenszeit.",
-    monsters: "Oh je, Zuckermonster vom Abendessen! Komm, wir putzen sie alle weg!",
+    grow: "Den ganzen Tag über wachsen daraus Zuckermonster.",
     doneTitle: "🌙 Gute Nacht!",
     after: "Jetzt ab ins Bett. Gute Nacht!",
   },
 };
+
+/** One of the daytime's texts in `language` and the voice for it; the German one with the German voice where there is no translation. */
+export const daytimeText = (daytime: Daytime, key: keyof DaytimeTexts, language: TargetLanguage): Spoken =>
+  spokenIn({ de: DAYTIME[daytime][key], ru: DAYTIME_RU[daytime][key] }, language);
 
 /** Which brushings were finished on which day, keyed by the local date ("2026-10-24"). */
 export type WeekLog = Record<string, Daytime[]>;

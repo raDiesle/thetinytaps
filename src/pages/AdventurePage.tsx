@@ -1,7 +1,9 @@
 import { AdventureGame } from "@/games/adventure/AdventureGame";
+import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
 export function AdventurePage() {
-  useTitle("Bewegungsabenteuer");
+  const t = useT();
+  useTitle(t({ de: "Bewegungsabenteuer", ru: "Приключения в движении" }));
   return <AdventureGame />;
 }

@@ -1,6 +1,8 @@
 export interface TeethSettings {
   /** At the end, a week with a star for every morning and evening brushed. */
   week: boolean;
+  /** First a short story: sweets leave sugar on the teeth, and over the day (or night) it grows into the monsters. */
+  origin: boolean;
   /** First fetch the brush and put toothpaste on it, shown and said. */
   prep: boolean;
   /** "Vorlesen" from the home page: says the prelude; the song sings the steps itself. */
@@ -9,10 +11,11 @@ export interface TeethSettings {
   sounds: boolean;
 }
 
-// No choices for the song or the daytime: the song always plays, sung in the app's
+// No choices for the song or the daytime: the song always plays, sung in the app
 // language (it is the brushing), and the clock says whether it is morning or evening.
 export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
   week: true,
+  origin: true,
   prep: true,
   speech: false,
   sounds: true,

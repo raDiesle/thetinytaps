@@ -2,8 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProp
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { playBoing, playCountNote, playKnock, playMelody, playPlop, playRandomNote, playWash } from "@/lib/sfx";
+import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
-import { dealPairs, MAX_PAIRS, shuffle, texts, type SockLook } from "./content";
+import { tapState } from "@/lib/tapTargets";
+import { dealPairs, MAX_PAIRS, oneOf, SOCK_TEXTS, shuffle, type SockLook } from "./content";
 import { Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
 
@@ -68,7 +70,9 @@ function fitPile(count: number, width: number, height: number) {
 const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
 
 /** "Socken-Paare" (N-45): the washing machine spins, socks tumble out, two same ones hop onto the line together. */
-export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSettings }) {
+export function SocksPlay({ settings }: { settings: SocksSettings }) {
+  const language = useAppLanguage();
+  const texts = useT()(SOCK_TEXTS);
   const [pairs, setPairs] = useState(Number(settings.pairs));
   const [round, setRound] = useState(() => newRound(0, settings, pairs));
   const [phase, setPhase] = useState<Phase>("ready");
@@ -110,9 +114,11 @@ export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSet
 
   const say = useCallback(
     (text: string) => {
-      if (settings.speech) speak(text, lang, { rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { rate: 0.85 });
     },
-    [settings.speech, lang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   // The socks get as big as the floor allows, also when the screen turns.
@@ -182,7 +188,7 @@ export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSet
       playCountNote(pair);
       later(150, playBoing);
     }
-    say(texts.pair());
+    say(oneOf(texts.pair));
 
     later(FLY_MS, () => {
       setLanded((l) => [...l, pair]);
@@ -275,7 +281,9 @@ export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSet
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const next = pairs < MAX_PAIRS ? { emoji: "🧦", name: `${pairs + 1} Paare`, onNext: () => startRound(pairs + 1) } : undefined;
+  // One pair more each time; after the most pairs, the number the grown-up started with again.
+  const nextPairs = pairs < MAX_PAIRS ? pairs + 1 : Number(settings.pairs);
+  const next = { emoji: "🧦", name: texts.pairs(nextPairs), onNext: () => startRound(nextPairs) };
 
   return (
     <div className={`socks-play ${phase}`} onPointerDown={onBackgroundDown}>
@@ -336,7 +344,9 @@ export function SocksPlay({ lang, settings }: { lang: string; settings: SocksSet
                         flight ? " flying" : ""
                       }${gone ? " gone" : ""}`}
                       style={{ translate, rotate: flight ? "0deg" : `${sock.rotate}deg`, scale: flight ? `${flight.scale}` : undefined }}
-                      aria-label={`Socke ${i + 1}`}
+                      aria-label={texts.sock(i + 1)}
+                      // With one sock in hand, its partner is the right one.
+                      data-tap={tapState({ goal: selected !== null && selected !== i && round.socks[selected].pair === sock.pair, done: gone })}
                       onPointerDown={onSockDown(i)}
                     >
                       <SockDrawing look={round.looks[sock.pair]} />

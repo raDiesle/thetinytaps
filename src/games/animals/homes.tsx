@@ -20,6 +20,7 @@ export type HomeId =
 
 export interface Home {
   id: HomeId;
+  /** The German name; the Russian name and phrase are in content.ru.ts (RUSSIAN_HOMES). */
   name: string;
   /** "in der Hütte", for "Der Hund wohnt in der Hütte." */
   inPhrase: string;
@@ -254,9 +255,10 @@ export const HOMES: Record<HomeId, Home> = {
   eis: { id: "eis", name: "Eis", inPhrase: "auf dem Eis", spot: [60, 68], fit: 0.3, drawing: eis },
 };
 
-export function HomeDrawing({ home }: { home: Home }) {
+/** The drawing of `home`; `label` is its name in the app language, for screen readers. */
+export function HomeDrawing({ home, label }: { home: Home; label: string }) {
   return (
-    <svg className="home-drawing" viewBox="0 0 120 120" role="img" aria-label={home.name}>
+    <svg className="home-drawing" viewBox="0 0 120 120" role="img" aria-label={label}>
       {home.drawing}
     </svg>
   );

@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
+import type { TargetLanguage } from "@/content/targetLanguages";
 import { speak } from "@/lib/speech";
 import { StoryEnd, nextCard } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Contour, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, HERO, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
+import { spokenIn } from "./phrases";
 import { WeatherContext } from "./rooms";
 import type { ElevatorSettings } from "./settings";
 
@@ -110,12 +112,13 @@ const actorAt = (floor: number, x: number, face: 1 | -1, pose: Pose): Actor => (
 
 /** "Aufzug": picture stories – the bubble shows what the child needs, and the lift takes it to the floor where it is. */
 export function ElevatorPlay({
-  lang,
+  language,
   settings,
   story: storyId,
   onPick,
 }: {
-  lang: string;
+  /** The app language: what the child hears is spoken in it. */
+  language: TargetLanguage;
   settings: ElevatorSettings;
   /** The story to play. */
   story: string;
@@ -173,8 +176,11 @@ export function ElevatorPlay({
     if (settings.sounds) loadRecordings(RECORDINGS);
   }, [settings.sounds]);
 
-  const say = (text: string) => {
-    if (settings.speech) speak(text, lang, { rate: 0.85 });
+  /** Speaks a German sentence of the story in the app language (only with "Vorlesen"). */
+  const say = (german: string) => {
+    if (!settings.speech) return;
+    const { text, speechLang } = spokenIn(german, language);
+    speak(text, speechLang, { rate: 0.85 });
   };
 
   const sound = (play: () => void) => {
@@ -480,7 +486,7 @@ export function ElevatorPlay({
                 return (
                   <g key={who} className="el-ride" style={outer} data-wish={who === "buddy" ? "brother" : undefined}>
                     <g className="el-walker" style={inner}>
-                      <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} onPointerDown={tapKid(who)}>
+                      <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid(who)}>
                         <g transform={who === "buddy" ? `scale(${BUDDY_SCALE})` : undefined}>
                           <Kid look={who === "hero" ? HERO : BROTHER} pose={a.pose} holding={a.holding} wear={a.wear} face={a.face} />
                         </g>

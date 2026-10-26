@@ -21,8 +21,10 @@
   gap: 8px;
 }
 
-/* "Zurück zum Menü": shown for a moment when a game starts, and while leaving. */
+/* "Zurück zum Menü": shown for a moment when a game starts, and while leaving; left of the buttons, taking no room. */
 .exit-hint {
+  position: absolute;
+  right: calc(100% + 8px);
   padding: 3px 10px;
   border-radius: 999px;
   background: #ffffffd0;
@@ -47,6 +49,35 @@
   .exit-corner:hover .exit-hint {
     opacity: 1;
     translate: 0 0;
+  }
+}
+
+/* Fullscreen on and off while playing, as quiet as the ✕ next to it; only on computers. */
+.play-fullscreen {
+  display: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #00000014;
+  cursor: pointer;
+}
+
+.play-fullscreen .fullscreen-icon {
+  width: 20px;
+  height: 20px;
+  stroke: #00000055;
+}
+
+.play-fullscreen:hover .fullscreen-icon {
+  stroke: var(--ink);
+}
+
+@media (min-width: 900px) and (any-pointer: fine) {
+  .play-fullscreen {
+    display: grid;
   }
 }
 
