@@ -49,19 +49,22 @@ export interface Step {
   ms: number;
 }
 
-/** The waiting tune's beat while sitting. */
+/** The synthesized waiting tune's beat while sitting (when there is no recorded song). */
 export const BEAT_MS = 500;
 
-/** Sitting down, before the waiting tune starts. */
+/** Sitting down, before the waiting starts. */
 export const SIT_MS = 1000;
 
-/** The trickle at the end of the waiting, before the next tap goes on. */
+/** Taps only sparkle this long after sitting down, so the tap that sat down doesn't end the waiting at once. */
+export const SIT_GUARD_MS = 2000;
+
+/** The trickle after the tap that ends the waiting, before the next tap goes on. */
 export const PEE_MS = 1800;
 
 export const STEPS: Step[] = [
   { id: "walk", icon: "👣", ms: 2400 },
   { id: "down", icon: "👖", arrow: "↓", ms: 1000 },
-  // Sitting is the long one: sit down, the waiting tune, then the trickle (see SIT_MS, PEE_MS and the tune's beats).
+  // Sitting has no fixed length: sit down, wait with the song until a tap, then the trickle (see SIT_MS, SIT_GUARD_MS, PEE_MS).
   { id: "sit", icon: "💧", ms: 0 },
   { id: "paper", icon: "🧻", ms: 2200 },
   { id: "up", icon: "👖", arrow: "↑", ms: 1200 },

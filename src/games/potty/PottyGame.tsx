@@ -45,7 +45,7 @@ export function PottyGame() {
           </p>
           <p>
             {t({
-              de: "Beim Sitzen spielt ein kurzes Warte-Liedchen, erst danach plätschert es. So sieht das Kind: Auf dem Töpfchen darf man sich Zeit lassen. Tippen während eines Schritts lässt nur Farben aufsteigen.",
+              de: "Beim Sitzen spielt ein Warte-Lied, so lange es dauert – es wiederholt sich, bis jemand tippt. Dann plätschert es, und das nächste Tippen geht weiter. So kann das Kind mit dem Tier zusammen sitzen, und das Kind sieht: Auf dem Töpfchen darf man sich Zeit lassen. Tippen während eines Schritts lässt nur Farben aufsteigen.",
             })}
           </p>
           <p>

@@ -100,7 +100,18 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
     ],
   },
-  { href: "/toepfchen/", languages: { de: "done" }, note: "Neu im Oktober 2026, nur auf Deutsch." },
+  {
+    href: "/toepfchen/",
+    parts: [
+      { label: "🚽 Bilder und Texte", languages: { de: "done" }, note: "Neu im Oktober 2026, nur auf Deutsch." },
+      {
+        label: "🎵 Warte-Lied (gesungen)",
+        recorded: true,
+        languages: {},
+        note: "Noch keins: bis dahin wiederholt sich eine kleine Melodie. Ein Lied von Suno pro Sprache, endlos wiederholbar: src/games/potty/musik/musik-toepfchen-warten-<Sprache>.mp3 (/musik-erzeugen).",
+      },
+    ],
+  },
   { href: "/laut-leise/", languages: { de: "done", ru: "done" } },
   {
     href: "/",
