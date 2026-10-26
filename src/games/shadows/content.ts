@@ -25,11 +25,14 @@ import {
   playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
+import type { Localized } from "@/lib/language";
+import { russianTexts } from "./content.ru";
 import type { ShadowTheme } from "./settings";
 
-// German texts for "Schatten finden" (N-07). The pictures are emojis; their
-// shadow is the same emoji in black, so each one needs a shape of its own –
-// whole bodies rather than faces, nothing that is just a round blob.
+// Pictures and German texts for "Schatten finden" (N-07); the Russian ones are in
+// content.ru.ts, by the same ids. The pictures are emojis; their shadow is the
+// same emoji in black, so each one needs a shape of its own – whole bodies
+// rather than faces, nothing that is just a round blob.
 
 export interface ShadowItem {
   id: string;
@@ -141,12 +144,33 @@ const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 /** "seinen" or "ihren" Schatten. */
 const its = (item: ShadowItem) => (item.the.startsWith("die ") ? "ihren" : "seinen");
 
-export const texts = {
-  search: (item: ShadowItem) => `${capital(item.the)} sucht ${its(item)} Schatten.`,
-  found: (item: ShadowItem) => `Juhu! ${capital(item.the)} hat ${its(item)} Schatten gefunden.`,
+/** Everything the shadows and "Wer schaut da raus?" say or show, in one language. */
+export interface ShadowTexts {
+  /** The picture's name, under it and for screen readers: "Elefant". */
+  name: (item: ShadowItem) => string;
+  search: (item: ShadowItem) => string;
+  found: (item: ShadowItem) => string;
   /** A wrong shadow shows who it belongs to. */
-  thatIs: (item: ShadowItem) => `Das ist ${item.the}.`,
-  peek: "Wer schaut da raus?",
+  thatIs: (item: ShadowItem) => string;
+  peek: string;
   /** The animal has come out. */
-  there: (item: ShadowItem) => `Da ist ja ${item.the}!`,
+  there: (item: ShadowItem) => string;
+  /** For screen readers: the shadow at place `n` (from 1) while it is still black. */
+  shadow: (n: number) => string;
+  /** For screen readers: the stars for `n` found ones. */
+  stars: (n: number) => string;
+}
+
+const GERMAN_TEXTS: ShadowTexts = {
+  name: (item) => item.name,
+  search: (item) => `${capital(item.the)} sucht ${its(item)} Schatten.`,
+  found: (item) => `Juhu! ${capital(item.the)} hat ${its(item)} Schatten gefunden.`,
+  thatIs: (item) => `Das ist ${item.the}.`,
+  peek: "Wer schaut da raus?",
+  there: (item) => `Da ist ja ${item.the}!`,
+  shadow: (n) => `Schatten ${n}`,
+  stars: (n) => `${n} geschafft`,
 };
+
+/** The texts by app language: `pick(SHADOW_TEXTS, language.id)`. */
+export const SHADOW_TEXTS: Localized<ShadowTexts> = { de: GERMAN_TEXTS, ru: russianTexts(GERMAN_TEXTS) };

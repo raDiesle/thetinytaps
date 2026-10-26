@@ -65,8 +65,8 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades in and out
 for a little movement. Choices are picture cards (`ChoiceCard` in `shared.tsx`)
-with a green tick or red cross, so children can choose without reading; „Nochmal“
-and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
+with a green tick or red cross, so children can choose without reading; „Menü“ (four cards like the start screen),
+„Nochmal“ and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
 `story.ts`.
 
 The big picture and the cards keep one size for the whole story – nothing grows or
@@ -94,3 +94,26 @@ the characters do changes: every picture is drawn from the story's first one
 (`…-passiert`, `baer-…`) as the only `--ref`, with the same cast and background –
 `yarn frames --scenes` lists pictures whose background drifted. `feelings.test.ts` fails when a story or the
 bear asks for a picture that is not in `bilder/`.
+
+## Russian
+
+The game speaks the app language (German or Russian, chosen on the home page,
+`src/lib/language.ts`): start screen, captions and everything read aloud. The German
+data (`bear.ts`, `kita.ts`) holds pictures, sounds and order; `bear.ru.ts` and
+`kita.ru.ts` hold only the Russian words, by id, step for step and beat for beat,
+and `localized.ts` lays them over the German (`feelingIn`, `situationIn`,
+`comfortsIn`, `storyIn`). Small texts (the questions, praise, weather captions,
+start screen notes) are `Localized` inline: `t({ de, ru })`. Speech always uses the
+app language's voice (`useVoice`). Rules:
+- New stories, feelings and kind things come in German only; their Russian is written
+  only when the user asks (a missing entry in `bear.ru.ts`/`kita.ru.ts` is told in German).
+  But a story that has a translation must match the German step for step and beat for
+  beat (a sound-only beat is `{}`): when you add or remove a step or beat in a translated
+  story, change `kita.ru.ts` too, or delete that story's entry. `feelings.test.ts` fails
+  when they don't match.
+- Russian names: the bear is „Мишка“ (at home and in the kindergarten), the fox
+  „Лисёнок“, the hare „Зайчик“, the hedgehog „Ёжик“, the kindergarten teacher
+  „воспитательница“, the one who brings Мишка „большой медведь“.
+- Nothing said to or about the child depends on boy or girl: feelings as
+  „Мишке грустно“, captions as adverbs („Дождь, грустно“), praise „Молодец!“.
+  The not-so-good answers start with „Хм,“ like the German „Hmm,“.

@@ -17,8 +17,9 @@ parts change exactly with the brushing steps, a finale on the end screen.
 - **Instrumental under spoken hints.** Singing under the voice (even quiet) makes both
   hard to follow for a toddler. A **sung song that is itself the hint** works instead:
   one verse per step singing exactly what is shown, the voice then stays silent during
-  the steps (Zähne putzen; a new language of it: `/zahnputzlied`). Keep the plain song
-  as the choice "Nur Musik" and for timings the verses don't fit.
+  the steps (Zähne putzen; a new language of it: `/zahnputzlied`). Such a song is part of
+  the game: it always plays, sung in the app language (🌐), with no "plain music"
+  choice and regardless of "🎵 Musik".
 - **Sung songs don't keep to bars.** Asked for "8 bars per part", Suno sang verses of
   5 to 11 bars, put whistled fills between them and sped up from 112 to 115 BPM. Never
   take the beat grid as where the words are: hear where each verse begins
@@ -148,9 +149,10 @@ and returns `{ fade, stop }`. Build a small hook like `useBrushingMusic` in
   `fade` to a low volume; `VOLUME` ≈ 0.35, ducked ≈ 0.08 for a song at −16 LUFS;
 - `useNoBackgroundMusic()` in the game's Play component, so the shared background
   song (`src/lib/backgroundMusic.ts`) stops while the game's own one plays;
-- a "Musik" toggle in the game's settings, and play only while `music` in the common
-  settings is on too (switch "🎵 Musik" on the home page – off means no song is even
-  downloaded; see `TeethGame.tsx`). Nothing plays before the child or parent starts the game.
+- background music plays only while `music` in the common settings is on (switch
+  "🎵 Musik" on the home page – off means no song is even downloaded); no extra toggle in
+  the game. A sung song that carries the game (Zähne putzen) plays regardless. Nothing
+  plays before the child or parent starts the game.
 
 ## 5. Check
 

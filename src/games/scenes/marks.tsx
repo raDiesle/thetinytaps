@@ -1,6 +1,7 @@
 import { useMemo, type PointerEvent } from "react";
+import { pick, useAppLanguage } from "@/lib/language";
 import { findScene } from ".";
-import { capitalize } from "./quests";
+import { SCENE_PHRASES } from "./phrases";
 import type { Trip } from "./roads";
 import { placeBox, type Box, type Scene, type SceneItem } from "./types";
 
@@ -20,13 +21,15 @@ export function ExitSign({ exit, right, width, onFollow }: { exit: Exit; right: 
   const cy = Math.min(860, Math.max(140, y + h / 2));
   const [bx, by, bw, bh] = exit.item.box;
   const dir = right ? 1 : -1;
+  const words = pick(SCENE_PHRASES, useAppLanguage().id);
   return (
     <g
       className="scene-exit"
       transform={`translate(${right ? width - 140 : 140} ${cy})`}
       data-item={exit.item.id}
+      data-tap
       role="button"
-      aria-label={`${capitalize(exit.item.name)} hinterher`}
+      aria-label={words.follow(exit.item)}
       onPointerDown={onFollow}
     >
       <g className="scene-exit-pulse">

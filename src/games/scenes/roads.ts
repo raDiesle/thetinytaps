@@ -1,5 +1,7 @@
+import type { TargetLanguageId } from "@/content/targetLanguages";
 import { SCENES } from ".";
 import { depthScale, float } from "./layout";
+import { localizeItem } from "./localize";
 import { placeBox, type Placement, type SceneItem } from "./types";
 
 // Idea B-19: some vehicles drive out of their picture into another one. Every
@@ -27,15 +29,7 @@ export const ROADS: Road[] = [
   { from: "baustelle", item: "kipper", to: "stadt", park: [560, 620], faces: "left" },
 ];
 
-/** How the pictures are named in sentences: "fährt in die Stadt", "kommt aus der Stadt", "ist wieder in der Stadt". */
-export const PLACES: Record<string, { to: string; from: string; at: string }> = {
-  stadt: { to: "in die Stadt", from: "aus der Stadt", at: "in der Stadt" },
-  feuerwache: { to: "zur Feuerwache", from: "von der Feuerwache", at: "an der Feuerwache" },
-  bauernhof: { to: "auf den Bauernhof", from: "vom Bauernhof", at: "auf dem Bauernhof" },
-  wald: { to: "in den Wald", from: "aus dem Wald", at: "im Wald" },
-  zoo: { to: "in den Zoo", from: "aus dem Zoo", at: "im Zoo" },
-  baustelle: { to: "zur Baustelle", from: "von der Baustelle", at: "auf der Baustelle" },
-};
+// How the pictures are named in sentences ("fährt in die Stadt") is in phrases.ts, `places`, in every language.
 
 export const roadId = (road: Road) => `${road.from}.${road.item}`;
 
@@ -60,9 +54,11 @@ export interface Guest {
 /** The id of a guest in the picture it visits; can't clash with the picture's own items. */
 const GUEST_ID = "gast";
 
-export function guestFor(road: Road): Guest | undefined {
-  const item = SCENES.find((s) => s.id === road.from)?.items.find((i) => i.id === road.item);
-  if (!item) return undefined;
+/** The vehicle of `road` as a guest in the picture it visits, named in `languageId`. */
+export function guestFor(road: Road, languageId: TargetLanguageId = "de"): Guest | undefined {
+  const home = SCENES.find((s) => s.id === road.from)?.items.find((i) => i.id === road.item);
+  if (!home) return undefined;
+  const item = localizeItem(road.from, home, languageId);
   return { item: { ...item, id: GUEST_ID, place: parkAt(item, road.park) }, look: item.id, road };
 }
 

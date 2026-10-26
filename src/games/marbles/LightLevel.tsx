@@ -56,7 +56,7 @@ export function LightLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={light} label="Licht-Kette" {...props}>
+    <MachineStage machine={light} level="light" {...props}>
       {(t) => (
         <>
           <Room paper={`${ids}-paper`} />

@@ -1,7 +1,9 @@
-import { ShadowsGame } from "@/games/shadows/ShadowsGame";
+import { SHADOWS_TITLE, ShadowsGame } from "@/games/shadows/ShadowsGame";
+import { useT } from "@/lib/language";
 import { useTitle } from "@/lib/title";
 
 export function ShadowsPage() {
-  useTitle("Schatten finden");
+  const t = useT();
+  useTitle(t(SHADOWS_TITLE));
   return <ShadowsGame />;
 }

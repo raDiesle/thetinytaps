@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
+import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
-import { PEEK_ITEMS, hideoutOf, texts, type Hideout, type ShadowItem } from "./content";
+import { tapState } from "@/lib/tapTargets";
+import { PEEK_ITEMS, hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } from "./content";
 import { shuffle, useDeck } from "./deck";
 import { emojiGlyph, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
@@ -78,7 +80,9 @@ export type PeekSettings = Pick<ShadowsSettings, "choices" | "names" | "speech" 
  * "Wer schaut da raus?" (X-04): a part of an animal peeks out of a bush or the pond; tap the whole animal below.
  * A mode of "Was gehört zum Tier?", but it lives here since it shares the stage, pictures and glyphs with the shadows.
  */
-export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSettings }) {
+export function PeekPlay({ settings }: { settings: PeekSettings }) {
+  const language = useAppLanguage();
+  const texts = pick(SHADOW_TEXTS, language.id);
   const [round, setRound] = useState<Round | null>(null);
   const [phase, setPhase] = useState<Phase>("hidden");
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
@@ -112,9 +116,11 @@ export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSetti
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, lang, { queue, rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
     },
-    [settings.speech, lang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   const nextRound = useCallback(() => {
@@ -260,7 +266,7 @@ export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSetti
         {won ? texts.there(round.item) : texts.peek}
       </p>
       <div className="sh-top">
-        <div key={`stage-${round.id}`} className="pk-stage" onPointerDown={onHideoutDown}>
+        <div key={`stage-${round.id}`} className="pk-stage" data-tap onPointerDown={onHideoutDown}>
           {glyph.url ? (
             <img src={glyph.url} alt="" draggable={false} className={`pk-animal pk-${phase}${phase === "hidden" ? wiggle : ""}`} style={animalStyle} />
           ) : (
@@ -291,19 +297,20 @@ export function PeekPlay({ lang, settings }: { lang: string; settings: PeekSetti
                 outcome?.ok === false && outcome.pick === i ? " nope" : ""
               }`}
               role="button"
-              aria-label={c.name}
+              aria-label={texts.name(c)}
+              data-tap={tapState({ goal: i === round.correct })}
               onPointerDown={onChoiceDown(i)}
             >
               <span className="pk-choice sh-emoji" aria-hidden>
                 {c.emoji}
               </span>
-              {settings.names && <span className="pk-name">{c.name}</span>}
+              {settings.names && <span className="pk-name">{texts.name(c)}</span>}
             </div>
           ))}
         </div>
       </div>
       {stars > 0 && (
-        <div className="find-stars" aria-label={`${stars} geschafft`}>
+        <div className="find-stars" aria-label={texts.stars(stars)}>
           {"⭐".repeat(Math.min(stars, 10))}
           {stars > 10 && <span className="find-count">{stars}</span>}
         </div>

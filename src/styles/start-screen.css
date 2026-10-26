@@ -53,7 +53,7 @@
   font-size: 1.15rem;
 }
 
-/* The options are folded into one bar until a grown-up opens them. */
+/* "Über das Spiel" and the options are folded into two buttons until a grown-up opens one. */
 .settings-panel {
   display: flex;
   flex-direction: column;
@@ -63,7 +63,7 @@
   max-width: 680px;
 }
 
-.settings-panel > summary {
+.panel-button {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -75,31 +75,44 @@
   font-size: 1.1rem;
   font-weight: 600;
   box-shadow: 0 5px 0 var(--ink);
+  color: inherit;
+  font-family: inherit;
   cursor: pointer;
-  list-style: none;
 }
 
-.settings-panel > summary::-webkit-details-marker {
-  display: none;
-}
-
-.settings-panel > summary::after {
+.panel-button::after {
   content: "▾";
   transition: rotate 0.2s;
 }
 
-.settings-panel[open] > summary::after {
+.panel-button[aria-expanded="true"]::after {
   rotate: 180deg;
 }
 
-.settings-panel > summary:active {
+.panel-button:active {
   transform: translateY(4px);
   box-shadow: 0 1px 0 var(--ink);
 }
 
-.settings-panel > summary:focus-visible {
+.panel-button:focus-visible {
   outline: 3px solid var(--ocean);
   outline-offset: 3px;
+}
+
+.panel-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+}
+
+.game-info {
+  gap: 14px;
+  line-height: 1.45;
+}
+
+.game-info p {
+  margin: 0;
 }
 
 .settings-summary-note {
@@ -362,6 +375,20 @@ kbd {
   font-size: 1.35rem;
 }
 
+/* What sort of level a card is, small in its top-left corner (the "zuletzt" badge is in the right one). */
+.mode-kind {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  padding: 2px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* The one card above the rest ("all of them in turn"): a whole row, in rainbow stripes. */
 .mode-list .mode-featured {
   grid-column: 1 / -1;
@@ -437,14 +464,23 @@ kbd {
   font-size: clamp(1.2rem, 20cqh, 2.2rem);
 }
 
-/* More room for the cards on big screens: the back link moves up into the corner. */
+/*
+ * More room for the cards on big screens: the back link moves up into the corner, bigger and yellow so
+ * a grown-up finds it at once, and stays there while the page scrolls.
+ */
 @media (min-width: 900px) and (min-height: 600px) {
   .home > .back-link,
   .start-screen > .back-link {
-    position: absolute;
-    top: max(24px, env(safe-area-inset-top));
+    position: fixed;
+    top: max(20px, env(safe-area-inset-top));
     left: max(20px, env(safe-area-inset-left));
+    z-index: 10;
+    min-height: 60px;
     margin: 0;
+    padding: 10px 30px 10px 24px;
+    background: var(--sunshine);
+    font-size: 1.4rem;
+    font-weight: 700;
   }
 
   .start-screen {

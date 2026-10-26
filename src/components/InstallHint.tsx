@@ -1,3 +1,4 @@
+import { useT } from "@/lib/language";
 import { install, isIos, isStandalone, usePwa } from "@/lib/pwa";
 
 /**
@@ -5,11 +6,12 @@ import { install, isIos, isStandalone, usePwa } from "@/lib/pwa";
  * whether the games already work without internet.
  */
 export function InstallHint() {
+  const t = useT();
   const { offlineReady, installPrompt, installed } = usePwa();
   const app = installed || isStandalone();
   const offline = offlineReady && (
     <span>
-      <span aria-hidden>📴</span> Funktioniert auch ohne Internet.
+      <span aria-hidden>📴</span> {t({ de: "Funktioniert auch ohne Internet.", ru: "Работает и без интернета." })}
     </span>
   );
 
@@ -18,7 +20,7 @@ export function InstallHint() {
     return (
       <p className="install-hint">
         <button type="button" className="install-button" onClick={() => void install()}>
-          <span aria-hidden>📲</span> Als App installieren
+          <span aria-hidden>📲</span> {t({ de: "Als App installieren", ru: "Установить как приложение" })}
         </button>
         {offline}
       </p>
@@ -28,7 +30,19 @@ export function InstallHint() {
     return (
       <p className="install-hint">
         <span>
-          <span aria-hidden>📲</span> Als App: in Safari auf <b>Teilen</b> tippen, dann <b>„Zum Home-Bildschirm“</b>.
+          <span aria-hidden>📲</span>{" "}
+          {t({
+            de: (
+              <>
+                Als App: in Safari auf <b>Teilen</b> tippen, dann <b>„Zum Home-Bildschirm“</b>.
+              </>
+            ),
+            ru: (
+              <>
+                Как приложение: в Safari нажмите <b>«Поделиться»</b>, затем <b>«На экран „Домой“»</b>.
+              </>
+            ),
+          })}
         </span>
         {offline}
       </p>

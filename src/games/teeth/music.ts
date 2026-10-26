@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { type Loop, loadSound, playLoop, playTuneNote } from "@/lib/sfx";
 import { type SungTimes, sungLanguageOf } from "./sung";
 
-// The brushing songs in musik/ (see the README there). Without one, or while it is
-// still loading, the synthesized tune plays instead.
+// The sung brushing songs in musik/ (see the README there). While one is still
+// loading, or when it can't be loaded, the synthesized tune plays instead.
 const files = import.meta.webpackContext("./musik", { regExp: /\.mp3$/ });
 const timings = import.meta.webpackContext("./musik", { regExp: /\.json$/ });
 
@@ -26,13 +26,6 @@ interface Song {
 }
 
 /**
- * The instrumental song. It runs at 112 BPM with a new part every 8 bars (17.14 s) –
- * exactly one step of the two-minute brushing, so there the music changes just as
- * the next step begins.
- */
-const PLAIN: Song = { file: "./musik-zaehneputzen.mp3", start: 0.27, finale: 120.27, loopEnd: 137.41 };
-
-/**
  * The sung songs by language, found by their file names: one verse per step singing
  * what is shown, a finale for the end. Suno doesn't keep its verses equally long, so
  * the steps follow the verses (`sungSteps`) instead of the other way round.
@@ -49,13 +42,13 @@ const SUNG: Record<string, Song & SungTimes> = Object.fromEntries(
   }),
 );
 
-/** The languages with a sung song, for the settings. */
+/** The languages with a sung song. */
 export const SUNG_LANGUAGES = Object.keys(SUNG).sort();
 
-/** With the song sung in `lang`: when each step begins, in ms of brushing, and last when the brushing ends. Null without one. */
-export function sungSteps(lang: string | null): number[] | null {
-  const song = lang ? SUNG[lang] : undefined;
-  return song ? song.verses.map((t) => Math.round((t - song.start) * 1000)) : null;
+/** With the song sung in `lang`: when each step begins, in ms of brushing, and last when the brushing ends. */
+export function sungSteps(lang: string): number[] {
+  const song = SUNG[lang];
+  return song.verses.map((t) => Math.round((t - song.start) * 1000));
 }
 
 /** Loudness of the song; mastered music is much louder than the synthesized notes. */
@@ -81,36 +74,22 @@ const songAt = (song: Song, ms: number) => song.start + ((Math.max(0, ms) / 1000
 const speaking = () => typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking;
 
 /**
- * Background music while brushing. The song runs at the brushing time `at` (ms),
- * so after a pause or a jump it goes on where the brushing is; `sync` is any value
- * that changes exactly then (the timer's clock). When `finished`, the finale plays
- * once to the final chord. While the voice speaks, the song gets quiet.
- * With `sung`, the song in that language plays if there is one. Returns whether
- * the sung song is playing, so the voice can leave the singing to it.
+ * The song sung in `sung` while brushing, always – even when music is off for all
+ * games, because the song is the brushing: it sings each step and sets how long it
+ * lasts. It runs at the brushing time `at` (ms), so after a pause or a jump it goes
+ * on where the brushing is; `sync` is any value that changes exactly then (the
+ * timer's clock). When `finished`, the finale plays once to the final chord. While
+ * the voice speaks, the song gets quiet. Returns whether the song is playing, so
+ * the voice can leave the steps to it.
  */
-export function useBrushingMusic({
-  enabled,
-  sung,
-  playing,
-  finished,
-  sync,
-  at,
-}: {
-  enabled: boolean;
-  sung: string | null;
-  playing: boolean;
-  finished: boolean;
-  sync: unknown;
-  at: number;
-}) {
-  const song = (sung && SUNG[sung]) || PLAIN;
+export function useBrushingMusic({ sung, playing, finished, sync, at }: { sung: string; playing: boolean; finished: boolean; sync: unknown; at: number }) {
+  const song = SUNG[sung];
   const [loaded, setLoaded] = useState<{ song: Song; buffer: AudioBuffer | null } | null>(null);
   const buffer = loaded?.song === song ? loaded.buffer : null;
   const atRef = useRef(at);
   atRef.current = at;
 
   useEffect(() => {
-    if (!enabled) return;
     let alive = true;
     void loadSong(song).then((buffer) => {
       if (alive) setLoaded({ song, buffer });
@@ -118,10 +97,10 @@ export function useBrushingMusic({
     return () => {
       alive = false;
     };
-  }, [enabled, song]);
+  }, [song]);
 
   useEffect(() => {
-    if (!enabled || !(playing || finished)) return;
+    if (!(playing || finished)) return;
     if (!buffer) {
       if (finished) return;
       let beat = 0;
@@ -148,7 +127,7 @@ export function useBrushingMusic({
       clearInterval(timer);
       loop?.stop();
     };
-  }, [enabled, playing, finished, sync, song, buffer]);
+  }, [playing, finished, sync, song, buffer]);
 
-  return enabled && buffer !== null && song !== PLAIN;
+  return buffer !== null;
 }

@@ -176,3 +176,94 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
 
 Suno made a short plucked intro, whistled fills between some verses and verses of 17 to
 23 s.
+
+## Русский (`ru`, 26 Oct 2026)
+
+Made in Suno on 26 Oct 2026 with the texts below. Whisper found every part's first line;
+the take has no intro, verses of 15 to 19 s (the brushing lasts 1:58) and runs 2:33 with
+the finale. Sound words to join in: _шурх-шурх_ (scrubbing), _жу-жу-жу_ (circling, like a
+beetle), _вжик_ (wiping). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a
+native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 112 BPM, steady, the same tempo all the way through]
+
+[Part 1 – 8 bars – bouncy ukulele, scrubbing rhythm]
+Ротик шире открывай,
+снизу зубки начищай!
+Взад-вперёд и взад-вперёд,
+шурх-шурх, щёточка поёт!
+
+[Glockenspiel sparkle]
+
+[Part 2 – 8 bars – glockenspiel, a little higher]
+Сверху тоже — вверх, наверх!
+Щётка чистит лучше всех.
+Взад-вперёд и взад-вперёд,
+шурх-шурх, щёточка поёт!
+
+[Glockenspiel sparkle]
+
+[Part 3 – 8 bars – rolling marimba, round circling melody]
+Зубки вместе — вот так, вот!
+Сбоку щётка в круг идёт.
+Кружим, кружим — круг, круг, круг!
+Жу-жу-жу — жужжит, как жук!
+
+[Glockenspiel sparkle]
+
+[Part 4 – 8 bars – marimba and toy piano]
+Улыбнись-ка широко,
+спереди кружи легко.
+Кружим, кружим — круг, круг, круг!
+Жу-жу-жу — жужжит, как жук!
+
+[Glockenspiel sparkle]
+
+[Part 5 – 8 bars – marimba, whistling flute]
+И другой теперь бочок,
+щёточка туда — прыг-скок!
+Кружим, кружим — круг, круг, круг!
+Жу-жу-жу — жужжит, как жук!
+
+[Glockenspiel sparkle]
+
+[Part 6 – 8 bars – soft ukulele, gentle wiping rhythm]
+Открывай пошире рот,
+снизу, где язык живёт.
+Красный, белый — вжик, вжик, вжик!
+Каждый зубик чистый вмиг!
+
+[Glockenspiel sparkle]
+
+[Part 7 – 8 bars – all instruments, joyful build]
+А теперь внутри, вверху,
+скоро всё! Ага, угу!
+Красный, белый — вжик, вжик, вжик!
+Каждый зубик чистый вмиг!
+
+[Part 8 – 8 bars – big happy finale, hand claps]
+Вот и всё! Блестят, блестят,
+зубки весело глядят.
+Монстры убегают — ура!
+Ура, ура, ура!
+
+[Final happy chord]
+[End]
+```
+
+Style of Music:
+
+```text
+cheerful Russian children's song for toddlers, exactly 112 BPM, steady tempo that never speeds up, C major, steady bouncy beat, one warm friendly female voice, slow clear pronunciation, simple sing-along melody, eight clearly different 8-bar sections, ukulele, glockenspiel, marimba, whistling flute, toy piano, light hand claps, bright and happy, no intro, no fade out, about 2 minutes 20 seconds
+```
+
+Exclude Styles:
+
+```text
+choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, speeding up, long intro
+```
+
+Title: `Чистим зубки`

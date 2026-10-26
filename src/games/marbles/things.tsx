@@ -3,6 +3,7 @@
 // it falls over to the right, turning around its bottom right corner.
 
 import type { ReactNode } from "react";
+import type { Localized } from "@/lib/language";
 import { playClonk, playKnock, playRustle, playThump } from "@/lib/sfx";
 
 const INK = "#2a1e5c";
@@ -10,8 +11,8 @@ const LINE = { stroke: INK, strokeWidth: 3, strokeLinejoin: "round" as const };
 
 export interface Thing {
   kind: string;
-  /** Said when speech is on. */
-  name: string;
+  /** Its name in each language the game speaks, for saying it when speech is on. */
+  name: Localized;
   w: number;
   h: number;
   /** Knock when it hits the next one. */
@@ -27,7 +28,7 @@ function crayon(): Thing {
   const h = 130;
   return {
     kind: "crayon",
-    name: "Buntstift",
+    name: { de: "Buntstift", ru: "Карандаш" },
     w,
     h,
     sound: () => playKnock(1500),
@@ -51,7 +52,7 @@ function block(): Thing {
   const h = 104;
   return {
     kind: "block",
-    name: "Bauklotz",
+    name: { de: "Bauklotz", ru: "Кубик" },
     w,
     h,
     sound: () => playKnock(900),
@@ -72,7 +73,7 @@ function toiletRoll(): Thing {
   const h = 96;
   return {
     kind: "roll",
-    name: "Klopapierrolle",
+    name: { de: "Klopapierrolle", ru: "Рулон бумаги" },
     w,
     h,
     sound: playThump,
@@ -96,7 +97,7 @@ function can(): Thing {
   const h = 108;
   return {
     kind: "can",
-    name: "Dose",
+    name: { de: "Dose", ru: "Банка" },
     w,
     h,
     sound: playClonk,
@@ -119,7 +120,7 @@ function book(): Thing {
   const h = pick([150, 172, 196, 218]);
   return {
     kind: "book",
-    name: "Buch",
+    name: { de: "Buch", ru: "Книжка" },
     w,
     h,
     sound: () => playKnock(520),
@@ -139,7 +140,7 @@ function juice(): Thing {
   const h = 150;
   return {
     kind: "juice",
-    name: "Saftpackung",
+    name: { de: "Saftpackung", ru: "Пакетик сока" },
     w,
     h,
     sound: playThump,
@@ -161,7 +162,7 @@ function bottle(): Thing {
   const neck = 16;
   return {
     kind: "bottle",
-    name: "Flasche",
+    name: { de: "Flasche", ru: "Бутылка" },
     w,
     h,
     sound: playClonk,
@@ -186,7 +187,7 @@ function cereal(): Thing {
   const h = 236;
   return {
     kind: "cereal",
-    name: "Müslipackung",
+    name: { de: "Müslipackung", ru: "Коробка хлопьев" },
     w,
     h,
     sound: playRustle,
@@ -210,7 +211,7 @@ function umbrella(): Thing {
   const h = 300;
   return {
     kind: "umbrella",
-    name: "Regenschirm",
+    name: { de: "Regenschirm", ru: "Зонтик" },
     w,
     h,
     sound: () => playKnock(600),

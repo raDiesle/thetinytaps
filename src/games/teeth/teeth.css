@@ -1,5 +1,8 @@
 /* ---------- Zähne putzen ---------- */
 
+/* Everything that moves goes with the song (112 BPM): calm, in whole beats – a beat is 0.536 s,
+   two beats 1.07 s, a bar 2.14 s. Nothing faster than a beat repeats, except a tapped monster's giggle. */
+
 .teeth-play {
   position: absolute;
   inset: 0;
@@ -11,14 +14,65 @@
   background: linear-gradient(#c4f1ff, #fff4d6);
 }
 
+/* Before the brushing the clock counts down to its start, big enough for a grown-up to see across the bathroom. */
 .teeth-clock {
   position: absolute;
   top: max(12px, env(safe-area-inset-top));
   left: max(16px, env(safe-area-inset-left));
   margin: 0;
-  color: #2a1e5c88;
-  font-size: clamp(1rem, 3vmin, 1.4rem);
   font-variant-numeric: tabular-nums;
+  padding: 0.1em 0.6em;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font-size: clamp(1.2rem, 4.5vmin, 2rem);
+  font-weight: 700;
+}
+
+/* 3, 2, 1, Los! – big in the middle, over the picture. */
+.teeth-count {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  pointer-events: none;
+  color: #fff;
+  font-size: clamp(6rem, 40vmin, 18rem);
+  font-weight: 700;
+  -webkit-text-stroke: 0.05em var(--ink);
+  paint-order: stroke fill;
+  animation: teeth-count 1s ease-out forwards;
+}
+
+.teeth-count.go {
+  color: var(--sunshine);
+  font-size: clamp(4rem, 25vmin, 12rem);
+  animation-duration: 1.3s;
+}
+
+@keyframes teeth-count {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  20% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  35% {
+    transform: scale(1);
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
 }
 
 .teeth-heading {
@@ -57,14 +111,6 @@
   animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s backwards;
 }
 
-.teeth-mouth.open {
-  background: #ffd6e0;
-}
-
-.teeth-mouth.closed {
-  background: #d6f5ff;
-}
-
 .teeth-mouth.spit {
   background: #e3f9d6;
 }
@@ -74,23 +120,54 @@
   opacity: 0.75;
 }
 
+/* The mirror (or the sink) fills the whole screen behind the heading and the controls; what matters
+   fits into .teeth-room, the free part between them (see fitBox in mouth.tsx). */
 .teeth-stage {
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-  display: flex;
-  justify-content: center;
+  position: absolute;
+  inset: 0;
 }
 
-/* The mirror takes the whole stage; the picture inside grows to fit (see useFocusBox). */
-.mouth {
+.teeth-room {
+  flex: 1;
+  min-height: 0;
+  align-self: stretch;
+}
+
+/* Heading, week and controls lie on the picture; the heading lets taps through to the monsters. */
+.teeth-heading,
+.teeth-end,
+.teeth-week-before,
+.teeth-controls {
+  position: relative;
+  z-index: 1;
+}
+
+.teeth-clock,
+.teeth-sky {
+  z-index: 1;
+}
+
+.teeth-heading {
+  pointer-events: none;
+}
+
+/* On a phone on its side the sink would shrink to a stamp next to the week, so before brushing it waits for the end. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .teeth-week-before {
+    display: none;
+  }
+}
+
+.mouth,
+.prep {
+  display: block;
   width: 100%;
   height: 100%;
 }
 
 /* The surfaces to brush now shine. */
 .zone-glow {
-  animation: glow-pulse 1.2s ease-in-out infinite;
+  animation: glow-pulse 2.14s ease-in-out infinite;
 }
 
 @keyframes glow-pulse {
@@ -99,33 +176,41 @@
   }
 }
 
-/* Monsters pop up one after another, sway, and vanish in a puff. */
+/* The monsters sit on the teeth from the start (the story before, origin.tsx, shows them growing):
+   they don't pop up, they only fade in softly as their side of a tooth turns into view. They sway,
+   and vanish in a puff. */
 .sugar-monster {
-  animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) var(--delay) backwards;
+  animation: teeth-monster-show 0.3s ease-out backwards;
+}
+
+@keyframes teeth-monster-show {
+  from {
+    opacity: 0;
+  }
 }
 
 .monster-body {
   transform-box: fill-box;
   transform-origin: 50% 100%;
-  animation: monster-sway 1.2s ease-in-out infinite;
+  animation: monster-sway 2.14s ease-in-out infinite;
   cursor: pointer;
 }
 
 .sugar-monster:nth-child(odd) .monster-body {
-  animation-delay: -0.6s;
+  animation-delay: -1.07s;
 }
 
 .sugar-monster.tickled .monster-body {
-  animation: wiggle 0.25s ease-in-out infinite;
+  animation: wiggle 0.4s ease-in-out infinite;
 }
 
 @keyframes monster-sway {
   0%,
   100% {
-    transform: rotate(-7deg);
+    transform: rotate(-5deg);
   }
   50% {
-    transform: rotate(7deg) translateY(-1px);
+    transform: rotate(5deg) translateY(-1px);
   }
 }
 
@@ -136,13 +221,13 @@
 
 .sugar-monster.gone .monster-body {
   pointer-events: none;
-  animation: monster-poof 0.6s ease-in forwards;
+  animation: monster-poof 1.07s ease-in-out forwards;
 }
 
 .sugar-monster.gone .monster-puff {
   transform-box: fill-box;
   transform-origin: center;
-  animation: puff-out 0.9s ease-out forwards;
+  animation: puff-out 1.4s ease-out forwards;
 }
 
 @keyframes monster-poof {
@@ -174,11 +259,11 @@
 .brush-foam circle {
   transform-box: fill-box;
   transform-origin: center;
-  animation: foam 0.9s ease-in-out infinite alternate;
+  animation: foam 1.07s ease-in-out infinite alternate;
 }
 
 .brush-foam circle:nth-child(even) {
-  animation-delay: -0.45s;
+  animation-delay: -0.536s;
 }
 
 @keyframes foam {
@@ -218,6 +303,22 @@
   font-size: clamp(1.2rem, 4vmin, 1.8rem);
   line-height: 1;
   cursor: pointer;
+}
+
+/* The brushing time left, right of the bar; on a narrow screen the bar keeps the room. */
+.teeth-time {
+  flex: none;
+  min-width: 3.2em;
+  color: var(--ink);
+  font-size: clamp(1.1rem, 4vmin, 1.8rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px) {
+  .teeth-time {
+    display: none;
+  }
 }
 
 .teeth-progress {
@@ -269,6 +370,8 @@
 .teeth-paused {
   position: absolute;
   inset: 0;
+  /* Over the heading, under the controls. */
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -293,18 +396,28 @@
   font-weight: 500;
 }
 
+.teeth-end-buttons {
+  display: flex;
+  gap: 3vmin;
+}
+
 .teeth-again {
-  padding: 12px 36px;
+  padding: clamp(10px, 2vmin, 18px) clamp(28px, 5vmin, 48px);
   border: var(--outline);
   border-radius: 999px;
   background: var(--mint);
   color: var(--ink);
   font: inherit;
-  font-size: clamp(1.6rem, 5vmin, 2.4rem);
+  font-size: clamp(1.6rem, 6.5vmin, 3.2rem);
   font-weight: 700;
   box-shadow: var(--lift);
   cursor: pointer;
   animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 1s backwards;
+}
+
+/* Back to the menu is the quieter choice. */
+.teeth-menu {
+  background: #fff;
 }
 
 .teeth-again:active {
@@ -337,7 +450,7 @@
   pointer-events: none;
   transform-box: fill-box;
   transform-origin: center;
-  animation: glow-breathe 1.1s ease-in-out infinite alternate;
+  animation: glow-breathe 1.07s ease-in-out infinite alternate;
 }
 
 .sugar-monster.gone .monster-glow {
@@ -369,23 +482,23 @@
 
 /* The next one to go knows the brush is coming. */
 .sugar-monster.scared .monster-body {
-  animation: tremble 0.18s linear infinite;
+  animation: tremble 0.536s ease-in-out infinite;
 }
 
 @keyframes tremble {
   0%,
   100% {
-    transform: translateX(-1px) rotate(-4deg);
+    transform: translateX(-1px) rotate(-3deg);
   }
   50% {
-    transform: translateX(1px) rotate(4deg);
+    transform: translateX(1px) rotate(3deg);
   }
 }
 
 .lip-arrow {
   animation:
     pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards,
-    nudge 0.7s ease-in-out 0.4s infinite;
+    nudge 1.07s ease-in-out 0.4s infinite;
 }
 
 @keyframes nudge {
@@ -394,42 +507,293 @@
   }
 }
 
-/* The emoji in the label shows the move too: stretch wide open, or bite together. */
-.teeth-mouth-icon {
-  display: inline-block;
-}
-
-.teeth-mouth.open .teeth-mouth-icon {
-  animation: stretch-open 1.1s ease-in-out infinite;
-}
-
-.teeth-mouth.closed .teeth-mouth-icon {
-  animation: chomp 0.9s ease-in-out infinite;
-}
-
-@keyframes stretch-open {
-  50% {
-    transform: scale(0.95, 1.3);
-  }
-}
-
-@keyframes chomp {
-  50% {
-    transform: scale(1.12, 0.85);
-  }
-}
-
 .teeth-mouth.prep {
   background: #fff;
 }
 
-/* ---------- Before brushing: get the brush, toothpaste on ---------- */
+/* ---------- The story at the start: sweets, then the monsters grow (origin.tsx) ---------- */
 
-.prep {
+.origin {
+  display: block;
   width: 100%;
   height: 100%;
-  max-width: min(100%, 880px);
 }
+
+/* Each sweet takes its time, so a toddler sees what it is: it grows in its corner (0.5 s), floats there
+   (1.1 s), glides into the mouth (1 s, arriving at --arrive) and is gone while the mouth closes. */
+.origin-sweet {
+  animation: teeth-origin-sweet 2.6s ease-in-out calc(var(--arrive) - 2288ms) both;
+}
+
+@keyframes teeth-origin-sweet {
+  from {
+    transform: translate(var(--sx), var(--sy)) scale(0) rotate(-20deg);
+  }
+  19% {
+    transform: translate(var(--sx), var(--sy)) scale(1.5) rotate(6deg);
+  }
+  32% {
+    transform: translate(var(--sx), calc(var(--sy) - 8px)) scale(1.5) rotate(-5deg);
+  }
+  44% {
+    transform: translate(var(--sx), var(--sy)) scale(1.5) rotate(3deg);
+  }
+  88% {
+    transform: translate(220px, 300px) scale(0.55) rotate(0deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(220px, 304px) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* The mouth closes, chews twice and opens again (its animations are set in origin.tsx, one per sweet). */
+.origin-mouth {
+  transform-box: view-box;
+  transform-origin: 220px 268px;
+}
+
+@keyframes teeth-origin-chew {
+  25%,
+  42% {
+    transform: scaleY(0.08);
+  }
+  55% {
+    transform: scaleY(0.3);
+  }
+  70% {
+    transform: scaleY(0.08);
+  }
+}
+
+.origin-crumb {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.origin.at-sweets .origin-crumb {
+  animation: teeth-origin-crumb 0.6s ease-out var(--crumb) backwards;
+}
+
+@keyframes teeth-origin-crumb {
+  from {
+    transform: scale(0);
+  }
+}
+
+/* Each crumb shrinks away as its monster grows out of it. */
+.origin.at-grow .origin-crumb {
+  animation: teeth-origin-crumb-gone 0.8s ease-in-out var(--grow) forwards;
+}
+
+@keyframes teeth-origin-crumb-gone {
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.origin-monster {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: teeth-origin-grow 1.2s ease-out var(--grow) backwards;
+}
+
+@keyframes teeth-origin-grow {
+  from {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+}
+
+/* The child gets worried as the monsters grow: brows up in the middle, eyes on the teeth. */
+.origin-brow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.origin.at-grow .origin-brow.left {
+  animation: teeth-origin-worry-left 1s ease-in-out 1.2s forwards;
+}
+
+.origin.at-grow .origin-brow.right {
+  animation: teeth-origin-worry-right 1s ease-in-out 1.2s forwards;
+}
+
+@keyframes teeth-origin-worry-left {
+  to {
+    transform: translateY(-6px) rotate(-14deg);
+  }
+}
+
+@keyframes teeth-origin-worry-right {
+  to {
+    transform: translateY(-6px) rotate(14deg);
+  }
+}
+
+.origin.at-grow .origin-pupil {
+  animation: teeth-origin-look-down 1s ease-in-out 0.6s forwards;
+}
+
+@keyframes teeth-origin-look-down {
+  to {
+    transform: translateY(6px);
+  }
+}
+
+/* Time goes by: the sun (or the moon) crosses the sky over the head while the monsters grow. */
+.origin-sky-body {
+  transform-box: view-box;
+  transform-origin: 220px 560px;
+  transform: rotate(-35deg);
+}
+
+.origin.at-grow .origin-sky-body {
+  animation: teeth-origin-arc 5.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-arc {
+  to {
+    transform: rotate(35deg);
+  }
+}
+
+/* Before the evening brushing a whole day goes by and ends at dusk; before the morning one a night, and the sun comes up. */
+.origin.evening .origin-sky {
+  fill: #c4f1ff;
+}
+
+.origin.morning .origin-sky {
+  fill: #a49be6;
+}
+
+.origin.evening.at-grow .origin-sky {
+  animation: teeth-origin-day 5.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-day {
+  60% {
+    fill: #ffd9a8;
+  }
+  to {
+    fill: #a49be6;
+  }
+}
+
+.origin.morning.at-grow .origin-sky {
+  animation: teeth-origin-night 5.6s ease-in-out forwards;
+}
+
+@keyframes teeth-origin-night {
+  30%,
+  55% {
+    fill: #2d2a6e;
+  }
+  85%,
+  to {
+    fill: #ffe0b0;
+  }
+}
+
+.origin-sunrise {
+  animation: teeth-origin-sunrise 5.6s ease-out forwards;
+}
+
+@keyframes teeth-origin-sunrise {
+  0%,
+  55% {
+    transform: translateY(240px);
+  }
+  90%,
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* The child is happy about each sweet (the timings are set in origin.tsx, one per sweet): the eyes follow it
+   up to its corner and down into the mouth, the brows go up, and hearts rise for three beats. */
+@keyframes teeth-origin-look-right {
+  22%,
+  70% {
+    transform: translate(7px, -8px);
+  }
+  to {
+    transform: translate(0, 7px);
+  }
+}
+
+@keyframes teeth-origin-look-left {
+  22%,
+  70% {
+    transform: translate(-7px, -8px);
+  }
+  to {
+    transform: translate(0, 7px);
+  }
+}
+
+@keyframes teeth-origin-delight {
+  15%,
+  70% {
+    transform: translateY(-9px);
+  }
+}
+
+.origin-heart {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: teeth-origin-heart 1.608s ease-out var(--at) backwards;
+}
+
+@keyframes teeth-origin-heart {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-48px) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* While chewing the eyes close happily („Mmmh!“) and the cheeks glow. */
+.origin-happy-eyes {
+  opacity: 0;
+}
+
+@keyframes teeth-origin-happy {
+  15%,
+  85% {
+    opacity: 1;
+  }
+}
+
+.origin-cheek {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes teeth-origin-glow {
+  20%,
+  80% {
+    transform: scale(1.25);
+    opacity: 0.95;
+  }
+}
+
+.teeth-play.paused .origin,
+.teeth-play.paused .origin * {
+  animation-play-state: paused;
+}
+
+/* ---------- Before brushing: get the brush, toothpaste on ---------- */
 
 .prep-brush {
   transform: translate(356px, 95px) rotate(90deg) scale(0.9);
@@ -473,10 +837,11 @@
   animation: reach 4.5s ease-out forwards;
 }
 
+/* It starts far enough out to be off the screen however much of the sink shows on a wide one. */
 @keyframes reach {
   0%,
   25% {
-    transform: translateY(420px);
+    transform: translateY(1000px);
   }
   42%,
   100% {
@@ -582,164 +947,16 @@
   }
 }
 
-.teeth-play.paused .treat *,
+.teeth-play.paused .teeth-count,
 .teeth-play.paused .prep *,
-.teeth-play.paused .lip-arrow,
-.teeth-play.paused .teeth-mouth-icon {
+.teeth-play.paused .lip-arrow {
   animation-play-state: paused;
-}
-
-/* ---------- Before brushing: sweets at the table ---------- */
-
-/* Up to the mouth with a little bounce, and gone into it after the second bite. */
-.treat-sweet {
-  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
-}
-
-.treat-sweet.eaten {
-  transition: transform 0.22s ease-in;
-}
-
-.treat-hand {
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.treat-hand.holding {
-  opacity: 1;
-}
-
-.treat-wrapper.off {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: treat-unwrap 0.7s ease-out forwards;
-}
-
-@keyframes treat-unwrap {
-  to {
-    transform: translate(40px, -70px) rotate(220deg) scale(0.6);
-    opacity: 0;
-  }
-}
-
-.treat-crumb {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: treat-crumb 0.7s ease-out forwards;
-}
-
-@keyframes treat-crumb {
-  to {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--spin));
-    opacity: 0;
-  }
-}
-
-/* Each new face pops in. */
-.treat-mouth {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: treat-mouth-pop 0.2s ease-out;
-}
-
-@keyframes treat-mouth-pop {
-  from {
-    transform: scale(0.6);
-  }
-}
-
-/* „Juhu!“ – a little jump for joy. */
-.treat-kid.joy {
-  animation: treat-hop 0.4s ease-in-out 3;
-}
-
-@keyframes treat-hop {
-  50% {
-    transform: translateY(-12px);
-  }
-}
-
-/* Chewing: the jaw goes up and down and the full cheeks squash. */
-.treat-kid.chew .treat-jaw {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: treat-chew 0.3s ease-in-out infinite alternate;
-}
-
-.treat-full-cheek {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: treat-cheek-in 0.2s ease-out;
-}
-
-.treat-kid.chew .treat-full-cheek {
-  animation: treat-cheek 0.3s ease-in-out infinite alternate;
-}
-
-@keyframes treat-chew {
-  to {
-    transform: translateY(5px) scaleX(0.8);
-  }
-}
-
-@keyframes treat-cheek-in {
-  from {
-    transform: scale(0.5);
-  }
-}
-
-@keyframes treat-cheek {
-  to {
-    transform: scale(0.9, 1.05);
-  }
-}
-
-.treat-lick {
-  animation: treat-lick 0.45s ease-in-out 3 alternate;
-}
-
-@keyframes treat-lick {
-  to {
-    transform: translate(-12px, 1px);
-  }
-}
-
-/* Hearts and stars rise and fade. */
-.treat-float {
-  animation: treat-float 1.4s ease-out backwards;
-  opacity: 0;
-}
-
-@keyframes treat-float {
-  from {
-    transform: scale(0);
-    opacity: 1;
-  }
-  30% {
-    transform: scale(1.1);
-    opacity: 1;
-  }
-  to {
-    transform: translateY(-46px) scale(1);
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .treat-kid.joy,
-  .treat-kid.chew .treat-jaw,
-  .treat-kid.chew .treat-full-cheek,
-  .treat-lick,
-  .treat-crumb {
-    animation: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .monster-eyes,
   .face-eye,
   .sugar-monster.scared .monster-body,
-  .teeth-mouth-icon,
   .prep-brush-bob,
   .lip-arrow {
     animation: none;
@@ -795,6 +1012,7 @@
 
 .teeth-week {
   display: flex;
+  align-items: flex-end;
   gap: clamp(4px, 1.2vmin, 10px);
   margin: 0;
   padding: 0;
@@ -834,8 +1052,46 @@
   animation-delay: 0.3s;
 }
 
+/* Today stands out: bigger, tagged „Heute“, warm yellow in the morning and night blue in the evening. */
 .teeth-day.today {
+  position: relative;
+  padding: 6px clamp(6px, 1.4vmin, 12px);
+  border-width: 4px;
+  font-size: clamp(1.4rem, 4.8vmin, 2.4rem);
   outline: 5px solid var(--sunshine);
+}
+
+.teeth-day.today.morning {
+  background: #fff1b8;
+}
+
+.teeth-day.today.evening {
+  background: #c9c2ff;
+}
+
+.teeth-today-tag {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  translate: -50% 0;
+  padding: 1px 8px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: var(--ink);
+  font-size: clamp(0.75rem, 2.4vmin, 1rem);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* The slot of this brushing: a ring round its sun or moon, fully coloured even before the star. */
+.teeth-slot.now {
+  padding: 0 3px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  opacity: 1;
+  filter: none;
 }
 
 .teeth-day-name {

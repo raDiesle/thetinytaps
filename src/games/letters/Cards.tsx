@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent, type PointerEventHandler, type ReactNode } from "react";
 import { Picture } from "@/components/Picture";
 import type { Countable, LetterEntry, WordEntry } from "@/content/types";
+import { tapState } from "@/lib/tapTargets";
 import type { LettersSettings } from "./settings";
 import { TraceGlyphs } from "./TraceGlyphs";
 
@@ -65,13 +66,27 @@ export function LetterCard({
       </div>
       {settings.showWord && (
         <>
-          <div className="word">
-            <span className="first-letter">{word.word.slice(0, 1)}</span>
-            {word.word.slice(1)}
-          </div>
+          <LetterWord letter={letter} word={word} />
           {translation && <div className="translation">{translation}</div>}
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * The word with its letter highlighted: the first one, or for a letter no word
+ * starts with (Russian Ы in "Сыр") the letter where it is inside.
+ */
+export function LetterWord({ letter, word }: { letter: LetterEntry; word: WordEntry }) {
+  const found = letter.inWord ? Array.from(word.word).findIndex((char) => char === letter.lower || char === letter.upper) : 0;
+  const at = Math.max(found, 0);
+  const chars = Array.from(word.word);
+  return (
+    <div className="word">
+      {chars.slice(0, at).join("")}
+      <span className="first-letter">{chars[at]}</span>
+      {chars.slice(at + 1).join("")}
     </div>
   );
 }
@@ -105,7 +120,7 @@ function LetterFamily({ letter }: { letter: LetterEntry }) {
         <path d="M0 4 Q10 20 20 16 Q30 20 40 8" />
         <circle cx="20" cy="16" r="6" />
       </svg>
-      <span className={`baby${grown ? " grown" : ""}`} onPointerDown={grow}>
+      <span className={`baby${grown ? " grown" : ""}`} data-tap onPointerDown={grow}>
         {grown ? letter.upper : letter.lower}
         <Eyes />
       </span>
@@ -173,7 +188,11 @@ export function NumberCard({
                   const order = tapped.indexOf(index);
                   return (
                     <Reveal key={j} visible hint={hint}>
-                      <span className={`count-tap${order >= 0 ? " counted" : ""}`} onPointerDown={(e) => onItemPointer?.(index, e)}>
+                      <span
+                        className={`count-tap${order >= 0 ? " counted" : ""}`}
+                        data-tap={tapState({ done: order >= 0 })}
+                        onPointerDown={(e) => onItemPointer?.(index, e)}
+                      >
                         <span className="count-item">{thing.emoji}</span>
                         {order >= 0 && <span className="count-badge">{order + 1}</span>}
                       </span>

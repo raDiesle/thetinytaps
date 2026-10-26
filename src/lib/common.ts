@@ -2,7 +2,8 @@
 // read aloud, sounds and music. Each game keeps its own fields for read aloud
 // and sounds and gets them filled in from here (see withCommon).
 
-import { useStoredSettings } from "@/lib/storage";
+import { useCallback, useSyncExternalStore } from "react";
+import { loadStored, useStoredSettings } from "@/lib/storage";
 
 export interface CommonSettings {
   /** Speak names, sentences and questions. */
@@ -11,7 +12,8 @@ export interface CommonSettings {
   sounds: boolean;
   /**
    * The background song in every game (`backgroundMusic.ts`); off also silences a game's
-   * own music and keeps the song files from being downloaded at all.
+   * own music and keeps the song files from being downloaded at all. Not the song of
+   * Zähne putzen: it sings the steps and sets how long the brushing lasts.
    */
   music: boolean;
 }
@@ -26,8 +28,29 @@ const FILLED_IN = ["speech", "sounds"] as const;
 
 export const COMMON_SETTINGS_KEY = "tinytaps.common.v1";
 
+// One copy for the whole app, so a switch on the home page reaches the background song
+// playing at the same time (src/components/BackgroundMusic.tsx) at once.
+let common: CommonSettings | null = null;
+const listeners = new Set<() => void>();
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+const current = () => (common ??= loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS));
+
+/** The shared options and their setter; every component using them sees a change at once. */
 export function useCommonSettings() {
-  return useStoredSettings(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS);
+  const value = useSyncExternalStore(subscribe, current);
+  const update = useCallback((patch: Partial<CommonSettings>) => {
+    common = { ...current(), ...patch };
+    try {
+      localStorage.setItem(COMMON_SETTINGS_KEY, JSON.stringify(common));
+    } catch {
+      // Storage full or disabled: the setting still applies for this visit.
+    }
+    for (const listener of listeners) listener();
+  }, []);
+  return [value, update] as const;
 }
 
 /** A game's own settings with the shared options put in, for the fields the game has. */

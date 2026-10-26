@@ -67,7 +67,7 @@ export function BuildingLevel(props: LevelProps) {
   const inMixer = (t: number) => machine.marbleAt(t).pt.x < SPIRIT.from.x;
 
   return (
-    <MachineStage machine={machine} label="Baustelle" {...props}>
+    <MachineStage machine={machine} level="building" {...props}>
       {(t) => (
         <>
           <Site ids={ids} />

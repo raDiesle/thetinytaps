@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { downloadMusic } from "@/lib/musicFile";
-import { decodeSound, type Loop, playLoop } from "@/lib/sfx";
+import { decodeSound, type Loop, playLoop, unlockAudio } from "@/lib/sfx";
 
 // The song every game plays in the background (downloaded in musicFile.ts), unless
 // the game has its own music or must stay quiet. It is on by default and switched
@@ -46,6 +46,8 @@ const hidden = () => typeof document !== "undefined" && document.hidden;
 
 // How many mounted parts of the game want the song off (see useNoBackgroundMusic).
 let hushes = 0;
+// Whether anyone has tapped or pressed a key in this visit: the browser lets the song play only after that.
+let tapped = false;
 const listeners = new Set<() => void>();
 const notify = () => {
   for (const listener of listeners) listener();
@@ -72,13 +74,28 @@ export function useNoBackgroundMusic(when = true) {
   }, [when]);
 }
 
+if (typeof window !== "undefined") {
+  const onFirst = () => {
+    // The tap also lets the audio play, wherever it lands (a menu, a game).
+    unlockAudio();
+    if (tapped) return;
+    tapped = true;
+    notify();
+  };
+  window.addEventListener("pointerdown", onFirst, { capture: true });
+  window.addEventListener("keydown", onFirst, { capture: true });
+}
+
 /**
- * The background song while a game is played (`enabled`), from the child's first
- * tap or key (`started`). It stops while the page is hidden or a game part wants
- * quiet, and gets quiet while the voice speaks.
+ * The background song for the whole app (`enabled` while music is on), mounted
+ * once, so it runs on without a break from the menus into a game and back. It
+ * starts with the first tap or key of the visit, stops while the page is hidden
+ * or a game part wants quiet (useNoBackgroundMusic), and gets quiet while the
+ * voice speaks.
  */
-export function useBackgroundMusic({ enabled, started }: { enabled: boolean; started: boolean }) {
+export function useBackgroundMusic({ enabled }: { enabled: boolean }) {
   const hushed = useSyncExternalStore(subscribe, () => hushes > 0);
+  const going = useSyncExternalStore(subscribe, () => tapped);
   const [buffer, setBuffer] = useState<AudioBuffer | null>(null);
   const [visible, setVisible] = useState(() => !hidden());
   const on = enabled && !hushed;
@@ -101,7 +118,7 @@ export function useBackgroundMusic({ enabled, started }: { enabled: boolean; sta
   }, []);
 
   useEffect(() => {
-    if (!on || !started || !visible || !buffer) return;
+    if (!on || !going || !visible || !buffer) return;
     const from = stoppedAt;
     const startedAt = performance.now();
     const loop: Loop | null = playLoop(buffer, {
@@ -122,5 +139,5 @@ export function useBackgroundMusic({ enabled, started }: { enabled: boolean; sta
       loop?.stop();
       stoppedAt = songAt(from, (performance.now() - startedAt) / 1000);
     };
-  }, [on, started, visible, buffer]);
+  }, [on, going, visible, buffer]);
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
 import { playBark, playCroak, playMeow, playMoo, playOink, playPlink, playPop, playQuack } from "@/lib/sfx";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
+import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import { BAR_COLORS, Ball } from "./parts";
 import { BALL_R } from "./path";
 import {
@@ -83,6 +83,7 @@ interface Animal {
  * level ends.
  */
 export function PegsLevel({ sound, onDone }: LevelProps) {
+  const label = useLevelName("pegs");
   const animals = useMemo(() => pickAnimals(BINS), []);
   const svg = useRef<SVGSVGElement>(null);
   const now = useRef(performance.now());
@@ -187,7 +188,7 @@ export function PegsLevel({ sound, onDone }: LevelProps) {
   const t = now.current;
   return (
     <div className="marble-level pegs-level" onPointerDown={onPointerDown}>
-      <svg ref={svg} className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label="Nagelbrett">
+      <svg ref={svg} className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
         <Board />
         {PEGS.map((p, i) => (
           <Nail key={i} x={p.x} y={p.y} color={BAR_COLORS[p.row % BAR_COLORS.length]} age={(t - pegHit.current[i]) / 1000} />

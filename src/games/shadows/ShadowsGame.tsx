@@ -1,55 +1,84 @@
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { de } from "@/content/de";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
+import { type Localized, useT } from "@/lib/language";
 import { ShadowsPlay } from "./ShadowsPlay";
 import { DEFAULT_SHADOWS_SETTINGS, SHADOWS_SETTINGS_KEY, type ChoiceCount, type ShadowTheme } from "./settings";
 import "./shadows.css";
 
+/** The game's name, on its start screen and in the browser tab. */
+export const SHADOWS_TITLE: Localized = { de: "Schatten finden", ru: "Найди тень" };
+
 export function ShadowsGame() {
+  const t = useT();
   const [settings, update] = useGameSettings(SHADOWS_SETTINGS_KEY, DEFAULT_SHADOWS_SETTINGS);
   const device = useDevice();
 
   return (
     <GameShell
-      title="Schatten finden"
+      title={t(SHADOWS_TITLE)}
       emoji="👤"
       modes={[
-        { id: "all", emoji: "🔀", title: "Gemischt" },
-        { id: "animals", emoji: "🐘", title: "Tiere" },
-        { id: "vehicles", emoji: "🚗", title: "Fahrzeuge" },
-        { id: "food", emoji: "🍌", title: "Essen" },
-        { id: "things", emoji: "☂️", title: "Dinge" },
+        { id: "all", emoji: "🔀", title: t({ de: "Gemischt", ru: "Вперемешку" }) },
+        { id: "animals", emoji: "🐘", title: t({ de: "Tiere", ru: "Животные" }) },
+        { id: "vehicles", emoji: "🚗", title: t({ de: "Fahrzeuge", ru: "Транспорт" }) },
+        { id: "food", emoji: "🍌", title: t({ de: "Essen", ru: "Еда" }) },
+        { id: "things", emoji: "☂️", title: t({ de: "Dinge", ru: "Вещи" }) },
       ]}
       mode={settings.theme}
       onMode={(theme) => update({ theme: theme as ShadowTheme })}
       level={
         <Choice<ChoiceCount>
-          label="Zur Auswahl"
+          label={t({ de: "Zur Auswahl", ru: "На выбор" })}
           value={settings.choices}
           onChange={(choices) => update({ choices })}
           options={[
-            { value: "2", label: "2 Bilder" },
-            { value: "3", label: "3 Bilder" },
-            { value: "4", label: "4 Bilder" },
+            { value: "2", label: t({ de: "2 Bilder", ru: "2 картинки" }) },
+            { value: "3", label: t({ de: "3 Bilder", ru: "3 картинки" }) },
+            { value: "4", label: t({ de: "4 Bilder", ru: "4 картинки" }) },
           ]}
         />
       }
+      info={
+        <>
+          <p>
+            {t({
+              de: "Ein Bild sucht seinen Schatten unter zwei bis vier schwarzen. Das Kind tippt auf den passenden Schatten oder zieht das Bild darauf. Ein anderer Schatten zeigt kurz seine Farben: „Das ist die Giraffe.“",
+              ru: "Картинка ищет свою тень среди двух–четырёх чёрных. Ребёнок нажимает на подходящую тень или перетаскивает на неё картинку. Другая тень ненадолго показывает свои цвета: «Это жираф».",
+            })}
+          </p>
+          {!device.touchOnly && (
+            <p>
+              {t({
+                de: "Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.",
+                ru: "С клавиатуры: стрелки выбирают картинку, пробел или Enter берёт её, 1–4 – сразу.",
+              })}
+            </p>
+          )}
+        </>
+      }
       settings={
         <>
-          <SettingsGroup title="Anzeige">
-            <Toggle label="Namen zeigen (Elefant, Auto …)" checked={settings.names} onChange={(names) => update({ names })} />
+          <SettingsGroup title={t({ de: "Anzeige", ru: "Отображение" })}>
+            <Toggle
+              label={t({ de: "Namen zeigen (Elefant, Auto …)", ru: "Показывать названия (слон, машина …)" })}
+              checked={settings.names}
+              onChange={(names) => update({ names })}
+            />
           </SettingsGroup>
 
-          <SettingsGroup title="Verhalten">
-            <Toggle label="Schatten antippen reicht (sonst muss man das Bild ziehen)" checked={settings.tap} onChange={(tap) => update({ tap })} />
-            {!device.touchOnly && <p className="setting-note">Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.</p>}
+          <SettingsGroup title={t({ de: "Verhalten", ru: "Поведение" })}>
+            <Toggle
+              label={t({ de: "Schatten antippen reicht (sonst muss man das Bild ziehen)", ru: "Достаточно нажать на тень (иначе нужно перетащить картинку)" })}
+              checked={settings.tap}
+              onChange={(tap) => update({ tap })}
+            />
           </SettingsGroup>
         </>
       }
     >
-      <ShadowsPlay lang={de.speechLang} settings={settings} />
+      <ShadowsPlay settings={settings} />
     </GameShell>
   );
 }

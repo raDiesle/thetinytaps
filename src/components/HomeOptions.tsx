@@ -4,8 +4,10 @@ import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { sampleLetter } from "@/content/languages";
-import { downloadMusic } from "@/lib/musicFile";
+import { targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings } from "@/lib/common";
+import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
+import { downloadMusic } from "@/lib/musicFile";
 import { DEFAULT_PLAYTIME_SETTINGS, playedToday, PLAYTIME_OPTIONS, PLAYTIME_SETTINGS_KEY, resetPlaytime } from "@/lib/playtime";
 import { useStoredSettings } from "@/lib/storage";
 
@@ -15,14 +17,20 @@ import { useStoredSettings } from "@/lib/storage";
  * on the right – each opening its menu only when tapped, so the games fill the screen.
  */
 export function HomeOptions() {
+  const t = useT();
+  const language = useAppLanguage();
   return (
-    <nav className="home-bar" aria-label="Für Erwachsene">
-      <MenuButton icon="⏳" label="Spielzeit" side="left">
+    <nav className="home-bar" aria-label={t({ de: "Für Erwachsene", ru: "Для взрослых" })}>
+      <MenuButton icon="⏳" label={t({ de: "Spielzeit", ru: "Время игры" })} side="left">
         <PlaytimeOptions />
       </MenuButton>
       <div className="home-bar-right">
+        {/* The language by its own name, so a grown-up who can't read the other one still finds theirs. */}
+        <MenuButton icon="🌐" label={OWN_NAMES[language.id].split(" ")[1]} side="right">
+          <AppLanguageOptions />
+        </MenuButton>
         <FullscreenButton />
-        <MenuButton icon="⚙️" label="Einstellungen für alle Spiele" iconOnly side="right">
+        <MenuButton icon="⚙️" label={t({ de: "Einstellungen für alle Spiele", ru: "Настройки для всех игр" })} iconOnly side="right">
           <CommonOptions />
         </MenuButton>
       </div>
@@ -79,7 +87,26 @@ function MenuButton({
   );
 }
 
+/** The language of the whole app: the grown-ups' screens and what the games say, where a game speaks it. */
+function AppLanguageOptions() {
+  const t = useT();
+  const language = useAppLanguage();
+  return (
+    <section className="settings">
+      <SettingsGroup title={t({ de: "Sprache", ru: "Язык" })}>
+        <Choice
+          label={t({ de: "Sprache der App und der Spiele", ru: "Язык приложения и игр" })}
+          value={language.id}
+          onChange={(id) => setAppLanguage(targetLanguageFor(id).id)}
+          options={APP_LANGUAGES.map((id) => ({ value: id, label: OWN_NAMES[id] }))}
+        />
+      </SettingsGroup>
+    </section>
+  );
+}
+
 function PlaytimeOptions() {
+  const t = useT();
   const [settings, update] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
   const [played, setPlayed] = useState(() => Math.floor(playedToday() / 60_000));
   const minutes = settings.minutes;
@@ -87,17 +114,23 @@ function PlaytimeOptions() {
 
   return (
     <section className="settings">
-      <SettingsGroup title="Spielzeit für alle Spiele">
+      <SettingsGroup title={t({ de: "Spielzeit für alle Spiele", ru: "Время игры для всех игр" })}>
         <Choice
-          label="Pro Tag"
+          label={t({ de: "Pro Tag", ru: "В день" })}
           value={String(minutes)}
           onChange={(value) => update({ minutes: Number(value) })}
-          options={PLAYTIME_OPTIONS.map((m) => ({ value: String(m), label: m ? `${m} Min.` : "∞ Ohne" }))}
+          options={PLAYTIME_OPTIONS.map((m) => ({
+            value: String(m),
+            label: m ? t({ de: `${m} Min.`, ru: `${m} мин.` }) : t({ de: "∞ Ohne", ru: "∞ Без ограничения" }),
+          }))}
         />
         <p className="playtime-status">
           <span>
-            Heute gespielt: {played} Min.
-            {minutes > 0 && (left > 0 ? ` – noch ${left} Min.` : " – die Spielzeit ist vorbei")}
+            {t({ de: `Heute gespielt: ${played} Min.`, ru: `Сегодня сыграно: ${played} мин.` })}
+            {minutes > 0 &&
+              (left > 0
+                ? t({ de: ` – noch ${left} Min.`, ru: ` – осталось ${left} мин.` })
+                : t({ de: " – die Spielzeit ist vorbei", ru: " – время игры закончилось" }))}
           </span>
           {played > 0 && (
             <button
@@ -107,7 +140,7 @@ function PlaytimeOptions() {
                 setPlayed(0);
               }}
             >
-              ↺ Von vorn
+              ↺ {t({ de: "Von vorn", ru: "Сначала" })}
             </button>
           )}
         </p>
@@ -117,6 +150,7 @@ function PlaytimeOptions() {
 }
 
 function CommonOptions() {
+  const t = useT();
   const [common, update] = useCommonSettings();
   const languages = useLanguages();
   const pack = languages.language.pack;
@@ -126,20 +160,22 @@ function CommonOptions() {
     <section className="settings">
       <LanguageSetting settings={languages.settings} update={languages.update} />
       <p className="setting-note">
-        Die Sprache gilt für „Buchstaben &amp; Zahlen“ und „Wörter tippen“; das Bewegungsabenteuer hat seine eigene Sprachwahl, die anderen Spiele sind auf
-        Deutsch.
+        {t({
+          de: "Die Sprache gilt für „Buchstaben & Zahlen“, „Wörter tippen“ und für das, was Tapsi im Bewegungsabenteuer sagt; die anderen Spiele sprechen die Sprache der App (🌐 oben).",
+          ru: "Этот язык действует для «Букв и цифр», «Печатаем слова» и для того, что говорит Тапси в «Приключениях в движении»; остальные игры говорят на языке приложения (🌐 вверху).",
+        })}
       </p>
 
-      <SettingsGroup title="Ton">
-        <Toggle label="Vorlesen (Namen, Sätze, Fragen)" checked={common.speech} onChange={(speech) => update({ speech })} />
-        {common.speech ? (
-          <VoiceSetting lang={pack.speechLang} sample={pack.letterSentence(b, b.words[0])} />
-        ) : (
-          <p className="setting-note">„Zähne putzen“ sagt seine Ansagen trotzdem – dort lassen sie sich abschalten.</p>
-        )}
-        <Toggle label="Töne und Geräusche" checked={common.sounds} onChange={(sounds) => update({ sounds })} />
+      <SettingsGroup title={t({ de: "Ton", ru: "Звук" })}>
         <Toggle
-          label="🎵 Musik"
+          label={t({ de: "Vorlesen (Namen, Sätze, Fragen)", ru: "Читать вслух (названия, фразы, вопросы)" })}
+          checked={common.speech}
+          onChange={(speech) => update({ speech })}
+        />
+        {common.speech && <VoiceSetting lang={pack.speechLang} sample={pack.letterSentence(b, b.words[0])} />}
+        <Toggle label={t({ de: "Töne und Geräusche", ru: "Звуки и шумы" })} checked={common.sounds} onChange={(sounds) => update({ sounds })} />
+        <Toggle
+          label={t({ de: "🎵 Musik", ru: "🎵 Музыка" })}
           checked={common.music}
           onChange={(music) => {
             // Switched back on: fetch the song now, so it is there when the game starts.
@@ -149,12 +185,23 @@ function CommonOptions() {
         />
         <p className="setting-note">
           {common.music
-            ? "Leise Musik im Hintergrund, ab dem ersten Tippen im Spiel. Spiele mit eigener Musik spielen ihre eigene."
-            : "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen."}
+            ? t({
+                de: "Leise Musik im Hintergrund, ab dem ersten Tippen im Spiel. Spiele mit eigener Musik spielen ihre eigene.",
+                ru: "Тихая музыка на фоне – с первого касания в игре. Игры со своей музыкой играют свою.",
+              })
+            : t({
+                de: "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen.",
+                ru: "Без музыки во всех играх – тогда она и не скачивается.",
+              })}
         </p>
       </SettingsGroup>
 
-      <p className="setting-note">Alles Weitere, was nur zu einem Spiel gehört, steht auf dessen Startseite unter „Einstellungen“.</p>
+      <p className="setting-note">
+        {t({
+          de: "Alles Weitere, was nur zu einem Spiel gehört, steht auf dessen Startseite unter „Einstellungen“.",
+          ru: "Всё остальное, что относится только к одной игре, – на её стартовой странице в разделе «Настройки».",
+        })}
+      </p>
     </section>
   );
 }

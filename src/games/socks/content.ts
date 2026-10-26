@@ -1,3 +1,5 @@
+import type { Localized } from "@/lib/language";
+import { RUSSIAN_TEXTS } from "./content.ru";
 import type { SockMode } from "./settings";
 
 /** A sock colour: the knitted body and the lighter cuff, heel and toe. */
@@ -57,11 +59,28 @@ export function dealPairs(mode: SockMode, count: number): SockLook[] {
     .map((pattern, i) => ({ color: colors[i % colors.length], pattern }));
 }
 
-const pick = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
+/** One of `list`, at random. */
+export const oneOf = <T>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
-/** What is said, only with "Vorlesen" on. */
-export const texts = {
+/** What is said (only with "Vorlesen" on) and shown, in one language. */
+export interface SockTexts {
+  start: string;
+  /** Praise for a pair found; one of them, at random. */
+  pair: string[];
+  done: string;
+  /** "3 Paare", on the start screen and the „Weiter“ button. */
+  pairs: (n: number) => string;
+  /** For screen readers: the sock at place `n` (from 1) on the floor. */
+  sock: (n: number) => string;
+}
+
+const GERMAN_TEXTS: SockTexts = {
   start: "Such zwei gleiche Socken!",
-  pair: () => pick(["Ein Paar!", "Die passen zusammen!", "Gleich und gleich!", "Zwei gleiche!"]),
+  pair: ["Ein Paar!", "Die passen zusammen!", "Gleich und gleich!", "Zwei gleiche!"],
   done: "Alle Socken hängen auf der Leine!",
+  pairs: (n) => `${n} ${n === 1 ? "Paar" : "Paare"}`,
+  sock: (n) => `Socke ${n}`,
 };
+
+/** The texts by app language: `pick(SOCK_TEXTS, language.id)`; the Russian ones are in content.ru.ts. */
+export const SOCK_TEXTS: Localized<SockTexts> = { de: GERMAN_TEXTS, ru: { ...GERMAN_TEXTS, ...RUSSIAN_TEXTS } };

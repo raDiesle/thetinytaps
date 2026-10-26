@@ -16,7 +16,7 @@ If the idea fits an existing game as a mode or level, add it there instead
 
 ```
 src/games/<game>/          folder name: short English word (marbles, elevator)
-  <X>Game.tsx              start screen: <GameShell title emoji modes mode onMode level settings>
+  <X>Game.tsx              start screen: <GameShell title emoji modes mode onMode level info settings>
   <X>Play.tsx              the game, mounted only while playing; props: settings (+ mode)
   settings.ts              <X>Settings, DEFAULT_<X>_SETTINGS, <X>_SETTINGS_KEY = "tinytaps.<game>.v1"
   content.ts               German texts, pictures, sentences
@@ -31,15 +31,23 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
    Lazy-load it like the other pages.
 2. `CATEGORIES` in `src/content/games.ts`: the game in the fitting category.
 3. The idea in `src/content/ideas/<area>.ts`: `done: true` (or `partial: "…"`).
+   And its entry in `src/content/seo.ts`: a title with what parents search for (see the research
+   on `/management/`), a description of 80–160 characters and a short text; true to what the game does.
 4. One line in the README structure table and the roadmap.
+5. German only, unless the user asks for other languages (see the root `CLAUDE.md`): the title in `games.ts`
+   as `{ de: "…" }`, start-screen texts as `t({ de: "…" })`, so a translation can be added later without
+   rewriting; the game's row in `src/content/ideas/languageStatus.ts` with only `de`.
 
 ## Settings and shared parts
 
 - `useGameSettings(KEY, DEFAULTS)` in `<X>Game`; include `speech` and `sounds` fields
   if the game talks or makes noise – they are filled in from the home page options.
   Defaults: `speech: false`, `sounds: true`.
+- What the game is and how it is played goes into `info` (required, „ℹ️ Über das Spiel“): short German
+  `<p>`s for grown-ups, one per mode, keyboard hints only when `!useDevice().touchOnly`.
 - Parent options go into `settings` with `SettingsGroup`, `Toggle`, `Choice`
-  (`src/components/SettingControls.tsx`); keyboard hints only when `!useDevice().touchOnly`.
+  (`src/components/SettingControls.tsx`) – only options, no description; no own switch for
+  Vorlesen, Töne, Musik or Sprache, the home page sets those for all games.
 - Sounds: build on `note()` and friends in `src/lib/sfx/core.ts` (the new sound goes into the topic file it fits), or `playRecorded(name, fallback)`
   for a recording in `src/lib/sounds/`. Speech: `speak()` from `src/lib/speech.ts`, only if
   `settings.speech`.
@@ -51,6 +59,8 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 - Every tap and every key does something at once – also "wrong" ones, which do
   something nice instead of an error. Keys: letters, digits, arrows, Space, Enter.
 - Nothing to read; big targets (≥ 60 px on a phone); works upright and landscape.
+- Every tappable thing carries `data-tap` (`tapState({ goal, done })` for the right answer / one tapped already),
+  so taps next to it count too (`src/lib/tapTargets.ts`); react on `onPointerDown`, not `onClick`.
 - Still and silent until the child acts.
 - Drawings in SVG components with CSS animations; generated pictures via `/bild-erzeugen`.
 

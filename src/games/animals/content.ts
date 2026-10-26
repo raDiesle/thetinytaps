@@ -1,7 +1,10 @@
 import { playBark, playBuzz, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
-import type { HomeId } from "./homes";
+import type { Localized } from "@/lib/language";
+import { russianTexts } from "./content.ru";
+import type { Home, HomeId } from "./homes";
 
-// German texts for "Was gehört zum Tier?": who eats what (N-08) and who lives where (N-09).
+// Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
+// and who lives where (N-09). The Russian texts are in content.ru.ts, by the same ids.
 
 export interface Food {
   /** Same id = same food, so two animals can share one (cat and penguin both like fish). */
@@ -62,11 +65,41 @@ export const FOODS: Food[] = [...new Map(ANIMALS.flatMap((a) => (a.food ? [[a.fo
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
-export const texts = {
-  hungry: (a: Animal) => `${capitalize(a.the)} hat Hunger!`,
-  yummy: (a: Animal, f: Food) => `Mmh, lecker! ${capitalize(a.the)} mag ${f.plural}. Danke!`,
-  yuck: (a: Animal) => `Bäh! Das mag ${a.the} nicht.`,
-  whereLives: (a: Animal) => `Wo wohnt ${a.the}?`,
-  movedIn: (a: Animal, inPhrase: string) => `Juhu! ${capitalize(a.the)} wohnt ${inPhrase}.`,
-  livesHere: (resident: Animal) => `Nein, hier wohnt ${resident.the}!`,
+/** Everything "Tiere füttern" and "Wer wohnt wo?" say or show, in one language. */
+export interface AnimalTexts {
+  /** The animal's name, under it and for screen readers: "Hase". */
+  animal: (a: Animal) => string;
+  food: (f: Food) => string;
+  home: (h: Home) => string;
+  hungry: (a: Animal) => string;
+  yummy: (a: Animal, f: Food) => string;
+  yuck: (a: Animal) => string;
+  whereLives: (a: Animal) => string;
+  movedIn: (a: Animal, h: Home) => string;
+  /** A wrong home: the one who lives there peeks out. */
+  livesHere: (resident: Animal) => string;
+  /** In the speech bubble of an animal given the wrong food. */
+  yuckBubble: string;
+  /** In the speech bubble of a fed animal. */
+  thanksBubble: string;
+  /** For screen readers: the stars for `n` done ones. */
+  stars: (n: number) => string;
+}
+
+const GERMAN_TEXTS: AnimalTexts = {
+  animal: (a) => a.name,
+  food: (f) => f.name,
+  home: (h) => h.name,
+  hungry: (a) => `${capitalize(a.the)} hat Hunger!`,
+  yummy: (a, f) => `Mmh, lecker! ${capitalize(a.the)} mag ${f.plural}. Danke!`,
+  yuck: (a) => `Bäh! Das mag ${a.the} nicht.`,
+  whereLives: (a) => `Wo wohnt ${a.the}?`,
+  movedIn: (a, h) => `Juhu! ${capitalize(a.the)} wohnt ${h.inPhrase}.`,
+  livesHere: (resident) => `Nein, hier wohnt ${resident.the}!`,
+  yuckBubble: "Bäh!",
+  thanksBubble: "Danke!",
+  stars: (n) => `${n} geschafft`,
 };
+
+/** The texts by app language: `pick(ANIMAL_TEXTS, language.id)`. */
+export const ANIMAL_TEXTS: Localized<AnimalTexts> = { de: GERMAN_TEXTS, ru: russianTexts(GERMAN_TEXTS) };

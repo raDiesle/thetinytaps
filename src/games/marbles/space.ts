@@ -286,7 +286,11 @@ export function buildSpace() {
   const tArm = tCount[1] + 0.35;
   const tIgnite = tCount[2] + 0.4;
   const tDone = tLift + 2.8;
-  ["Drei!", "Zwei!", "Eins!"].forEach((word, i) => {
+  [
+    { de: "Drei!", ru: "Три!" },
+    { de: "Zwei!", ru: "Два!" },
+    { de: "Eins!", ru: "Один!" },
+  ].forEach((word, i) => {
     at(tCount[i], { sound: playPing });
     at(tCount[i] + 0.05, { say: word });
   });
@@ -294,7 +298,7 @@ export function buildSpace() {
   at(tArm, { sound: playCreak });
   at(tIgnite, { sound: playRumble });
   at(tLift, { sound: playLaunch });
-  at(tLift + 0.05, { say: "Start! Die Rakete fliegt zum Mond!" });
+  at(tLift + 0.05, { say: { de: "Start! Die Rakete fliegt zum Mond!", ru: "Пуск! Ракета летит на Луну!" } });
   at(tLift + 1.2, { sound: playTwinkle });
   at(tLift + 1.8, { sound: playTwinkle });
   at(tDone, { done: true });

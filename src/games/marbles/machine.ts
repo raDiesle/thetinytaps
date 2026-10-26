@@ -319,7 +319,7 @@ export function buildMachine() {
   at(tPop + 0.15, { sound: playBoing });
   at(tPop + 0.5, { sound: playCuckoo });
   at(tPop + 1.2, { sound: playTwinkle });
-  at(tPop + 0.6, { say: "Kuckuck! Die Maschine hat es geschafft!" });
+  at(tPop + 0.6, { say: { de: "Kuckuck! Die Maschine hat es geschafft!", ru: "Ку-ку! Машина справилась!" } });
   at(tDone, { done: true });
   events.sort((a, b) => a.at - b.at);
 

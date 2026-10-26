@@ -27,6 +27,8 @@ export interface StepLines {
 
 /** One step's lines in another language: the same lines as its German StepLines, `more` without the times. */
 export interface StepTranslation {
+  /** What the step is called on the route (shown to grown-ups); the German name where left out. */
+  name?: string;
   situation?: string;
   instruction: string;
   turn?: string;
@@ -37,6 +39,8 @@ export interface StepTranslation {
 
 /** What the guide says in a story in another language (stories/<story>/lines.<language>.ts), in the order of the German lines. */
 export interface StoryTranslation {
+  /** The story's title (start screen, route); the German one where left out. */
+  title?: string;
   /** Like DEFAULT_TURN, where a step has no `turn`. */
   defaultTurn: string;
   /** The opening lines, said at the times of the German ones. */
@@ -136,6 +140,9 @@ export function translateLines(opening: { at: number; text: string }[], lines: S
     }),
   };
 }
+
+/** The story's title in `language` (for grown-ups' screens), the German one where it has none. */
+export const storyTitle = (story: Story, language: TargetLanguageId) => story.translations?.[language]?.title ?? story.sequence.title;
 
 /** The story as it is said in `language`: the German one where it has no translation. */
 export function storyIn(story: Story, language: TargetLanguageId): Story {

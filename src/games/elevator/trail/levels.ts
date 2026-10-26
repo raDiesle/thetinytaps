@@ -71,6 +71,7 @@ const drachen: TrailLevel = {
       id: "dog",
       x: 1400,
       need: "ball",
+      why: { wants: [1540, 600] },
       at: [1486, 680],
       meet: [[100, playBark]],
       sounds: [
@@ -88,6 +89,7 @@ const drachen: TrailLevel = {
       id: "horse",
       x: 2200,
       need: "carrot",
+      why: { wants: [2400, 440] },
       at: [2310, 545],
       meet: [[100, playNeigh]],
       sounds: [
@@ -106,6 +108,7 @@ const drachen: TrailLevel = {
       id: "stream",
       x: 2990,
       need: "plank",
+      why: { worry: "splash" },
       at: [3150, 735],
       meet: [[100, playSplash]],
       sounds: [
@@ -122,6 +125,7 @@ const drachen: TrailLevel = {
       id: "cave",
       x: 3350,
       need: "lantern",
+      why: { worry: "dark" },
       at: [3520, 620],
       meet: [[100, playDrops]],
       sounds: [[0, playTwinkle]],
@@ -136,6 +140,7 @@ const drachen: TrailLevel = {
       id: "squirrel",
       x: 5300,
       need: "apple",
+      why: { wants: [5490, 110] },
       at: [5490, 150],
       meet: [[100, playChatter]],
       sounds: [
@@ -203,6 +208,7 @@ const ball: TrailLevel = {
       id: "dog",
       x: 2300,
       need: "bone",
+      why: { wants: [2462, 560] },
       at: [2420, 636],
       meet: [[100, playBark]],
       sounds: [
@@ -220,6 +226,7 @@ const ball: TrailLevel = {
       id: "flowers",
       x: 2760,
       need: "can",
+      why: { wants: [2930, 600] },
       at: [2880, 560],
       meet: [[100, playRustle]],
       sounds: [
@@ -238,6 +245,7 @@ const ball: TrailLevel = {
       id: "sandbox",
       x: 4260,
       need: "shovel",
+      why: { worry: "dig" },
       at: [4400, 700],
       meet: [[100, playBoing]],
       sounds: [
@@ -281,16 +289,20 @@ const ballon: TrailLevel = {
     {
       kind: "obstacle",
       id: "ducks",
-      x: 1440,
+      x: 1400,
       need: "bread",
-      at: [1550, 680],
+      why: { wants: [1520, 596] },
+      at: [1476, 721],
       meet: [[100, playQuack]],
       sounds: [
         [200, playQuack],
-        [1400, playSplash],
-        [2000, playQuack],
+        [500, playPeck],
+        [1100, playPeck],
+        [1700, playPeck],
+        [2700, playSplash],
+        [3200, playQuack],
       ],
-      ms: 2600,
+      ms: 3600,
       nope: playSneeze,
       ask: "Die Enten stehen im Weg. Sie haben Hunger. Was geben wir ihnen?",
       done: "Das Brot! Quak, quak, lecker.",
@@ -301,6 +313,7 @@ const ballon: TrailLevel = {
       id: "sprinkler",
       x: 2060,
       need: "umbrella",
+      why: { worry: "wet" },
       at: [2300, 640],
       meet: [[100, playDrops]],
       sounds: [
@@ -319,6 +332,7 @@ const ballon: TrailLevel = {
       id: "bridge",
       x: 2600,
       need: "plank",
+      why: { worry: "splash" },
       at: [BRIDGE_DIP[0], BRIDGE_DIP[1] + 10],
       meet: [[100, playCreak]],
       sounds: [
@@ -335,6 +349,7 @@ const ballon: TrailLevel = {
       id: "cat",
       x: 3260,
       need: "fish",
+      why: { wants: [3350, 640] },
       at: [3330, 710],
       meet: [[100, playMeow]],
       sounds: [
@@ -353,6 +368,7 @@ const ballon: TrailLevel = {
       id: "dove",
       x: 4380,
       need: "sunflower",
+      why: { wants: [4595, 124] },
       at: [4630, 180],
       meet: [[100, playCoo]],
       sounds: [
@@ -404,6 +420,7 @@ const lok: TrailLevel = {
       id: "rabbit",
       x: 1240,
       need: "carrot",
+      why: { wants: [1350, 600] },
       at: [1340, 690],
       meet: [[100, playSniff]],
       sounds: [
@@ -436,6 +453,7 @@ const lok: TrailLevel = {
               id: "pony",
               x: 2820,
               need: "apple",
+              why: { wants: [3000, 250] },
               at: [2950, 300],
               meet: [[100, playNeigh]],
               sounds: [
@@ -462,6 +480,7 @@ const lok: TrailLevel = {
               id: "dark",
               x: 2460,
               need: "lantern",
+              why: { worry: "dark" },
               at: [2580, 660],
               meet: [[100, playDrops]],
               sounds: [[0, playTwinkle]],
@@ -492,6 +511,7 @@ const lok: TrailLevel = {
       id: "hen",
       x: 4160,
       need: "corn",
+      why: { wants: [4276, 578] },
       at: [4236, 700],
       meet: [[100, playCluck]],
       sounds: [

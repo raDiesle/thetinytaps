@@ -104,9 +104,11 @@ function poseFor(anchor: BrushAnchor, surface: Surface, tooth: ToothId): Pose {
   return { at: anchor.at, u: across(forward, into), b: into };
 }
 
-const SCRUB_S = 0.8;
-const CIRCLE_S = 0.75;
-const WIPE_S = 0.7;
+/** One stroke, circle or wipe takes two beats of the song (112 BPM), calm enough to follow along. */
+const STROKE_S = 120 / 112;
+const SCRUB_S = STROKE_S;
+const CIRCLE_S = STROKE_S;
+const WIPE_S = STROKE_S;
 
 /** Where the brush is pushed to by its motion, `t` seconds in. */
 function motionOffset(pose: Pose, motion: Motion, jawUp: Vec3, t: number): Vec3 {
@@ -234,7 +236,8 @@ function useBrushTime(paused: boolean, speed: number) {
   return t;
 }
 
-const FOLLOW_S = 0.18;
+/** How quickly the brush follows to its next place: unhurried, like a hand. */
+const FOLLOW_S = 0.3;
 
 export function Brush({
   anchor,

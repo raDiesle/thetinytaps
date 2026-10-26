@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { type Localized, useT } from "@/lib/language";
 import { imageFor, preloadImages, storyImages } from "./images";
 import { QUESTION, type Situation } from "./kita";
 import type { FeelingsSettings } from "./settings";
@@ -20,7 +21,8 @@ import {
 } from "./shared";
 import { beatMs, type Beat } from "./story";
 
-const NEXT_QUESTION = "Und jetzt?";
+/** Asked before every step after the first. */
+const NEXT_QUESTION: Localized = { de: "Und jetzt?", ru: "А теперь?" };
 
 type Phase = "intro" | "steps" | "outro" | "done";
 
@@ -67,13 +69,14 @@ function pictureCaption(situation: Situation, { phase, stepsDone, trying, picked
   return stepsDone > 0 ? situation.steps[stepsDone - 1].caption : situation.caption;
 }
 
-/** Im Kindergarten: one story, step by step. `onNext` goes on to the next story. */
+/** Im Kindergarten: one story (its words already in the app language), step by step. `onNext` goes on to the next story. */
 export function KitaPlay({ situation, settings, onNext }: { situation: Situation; settings: FeelingsSettings; onNext: () => void }) {
   const nextKey = useRef(0);
   const [run, setRun] = useState<Run>(() => freshRun(nextKey.current++));
   const { later, clearAll } = useTimers();
   const { say, sound } = useVoice(settings);
   const { floaters, float } = useFloaters();
+  const t = useT();
 
   /** Plays the beats one after another, then calls `then`. */
   const playBeats = useCallback(
@@ -111,9 +114,9 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
     setRun(freshRun(nextKey.current++));
     playBeats(situation.intro, () => {
       setRun((r) => ({ ...r, phase: "steps" }));
-      ask(QUESTION);
+      ask(t(QUESTION));
     });
-  }, [situation, clearAll, playBeats, ask]);
+  }, [situation, clearAll, playBeats, ask, t]);
 
   useEffect(() => startSituation(), []);
 
@@ -128,7 +131,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
         playBeats(step.beats, () => {
           if (i + 1 < situation.steps.length) {
             setRun((r) => ({ ...r, tried: false }));
-            ask(NEXT_QUESTION);
+            ask(t(NEXT_QUESTION));
             return;
           }
           setRun((r) => ({ ...r, phase: "outro" }));
@@ -136,7 +139,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
         });
       }, CHEER_MS);
     },
-    [situation, say, sound, float, later, playBeats, ask],
+    [situation, say, sound, float, later, playBeats, ask, t],
   );
 
   // The not-so-good idea stays big in a red frame that shakes, with crying or a crash, while the answer says why.

@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
+import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
-import { ITEMS, texts, type ShadowItem } from "./content";
+import { tapState } from "@/lib/tapTargets";
+import { ITEMS, SHADOW_TEXTS, type ShadowItem } from "./content";
 import { shuffle, useDeck } from "./deck";
 import type { ShadowsSettings } from "./settings";
 
@@ -37,7 +39,9 @@ function near(r: DOMRect, x: number, y: number) {
 }
 
 /** "Schatten finden" (N-07): drag the picture onto its shadow, or tap the right shadow. */
-export function ShadowsPlay({ lang, settings }: { lang: string; settings: ShadowsSettings }) {
+export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
+  const language = useAppLanguage();
+  const texts = pick(SHADOW_TEXTS, language.id);
   const [round, setRound] = useState<Round | null>(null);
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   /** The shadow the picture is dragged over, so it can grow a little. */
@@ -77,9 +81,11 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, lang, { queue, rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
     },
-    [settings.speech, lang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   const pool = settings.theme === "all" ? ITEMS : ITEMS.filter((i) => i.theme === settings.theme);
@@ -282,7 +288,8 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
             }${!drag && !outcome && nudge ? ` nudge-${nudge % 2}` : ""}`}
             style={offset ? { translate: `${offset.x}px ${offset.y}px`, scale: landed?.scale?.toString() } : undefined}
             role="img"
-            aria-label={round.item.name}
+            aria-label={texts.name(round.item)}
+            data-tap
             onPointerDown={onPictureDown}
             onPointerMove={onPictureMove}
             onPointerUp={onPictureUp}
@@ -290,7 +297,7 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
           >
             {round.item.emoji}
           </span>
-          {settings.names && <span className={`sh-name${landed ? " gone" : ""}`}>{round.item.name}</span>}
+          {settings.names && <span className={`sh-name${landed ? " gone" : ""}`}>{texts.name(round.item)}</span>}
         </div>
       </div>
       <div className="sh-ground">
@@ -307,7 +314,8 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
                   won && outcome.pick === i ? " matched" : ""
                 }${peek ? " peek" : ""}`}
                 role="button"
-                aria-label={peek ? s.name : `Schatten ${i + 1}`}
+                aria-label={peek ? texts.name(s) : texts.shadow(i + 1)}
+                data-tap={tapState({ goal: i === round.correct })}
                 onPointerDown={onShadowDown(i)}
               >
                 <span
@@ -319,14 +327,14 @@ export function ShadowsPlay({ lang, settings }: { lang: string; settings: Shadow
                 >
                   {s.emoji}
                 </span>
-                {peek && settings.names && <span className="sh-bubble">{s.name}</span>}
+                {peek && settings.names && <span className="sh-bubble">{texts.name(s)}</span>}
               </div>
             );
           })}
         </div>
       </div>
       {stars > 0 && (
-        <div className="find-stars" aria-label={`${stars} geschafft`}>
+        <div className="find-stars" aria-label={texts.stars(stars)}>
           {"⭐".repeat(Math.min(stars, 10))}
           {stars > 10 && <span className="find-count">{stars}</span>}
         </div>

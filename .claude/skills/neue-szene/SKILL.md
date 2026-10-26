@@ -27,6 +27,8 @@ src/games/scenes/
 
 Register the scene in `src/games/scenes/index.ts` (`SCENES`) and remove it from
 `UPCOMING_SCENES`. The route `/bilder/<id>` (`src/pages/ScenePage.tsx`) finds it with `findScene`.
+Add its search engine entry to `src/content/seo.ts` (`scene("<id>", "<Titel>", "<three things to tap>")`,
+things that really are in the picture); `content.test.ts` fails without it.
 
 Reuse instead of copying: import the shared helpers from `../layout`, `../shared`
 and `../sky`. When a helper of one scene is needed by another, move it up to
@@ -175,6 +177,14 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   ("Brumm, brumm!", "Quak!"). Speech is off by default, but the texts are also
   used in find mode ("Wo ist der Traktor?").
 - `name` with the correct article; the find question is built from it.
+- German only, unless the user asks for languages: a scene without (or with an incomplete) `ru.ts` plays
+  entirely in German, also on a Russian app (`sceneLanguage` in `localize.ts`). Mark the gap in the
+  `/bilder/` row of `src/content/ideas/languageStatus.ts`. When asked for Russian: `src/games/scenes/<id>/ru.ts`
+  (`export const RU: SceneTranslation`, see an existing scene) with the title, description, every item (`name` in
+  the nominative without article, starting with a Cyrillic letter – it is the item's key; `gender` m/f/n or
+  `plural: true` as Russian has it) and the chain sentences in order, imported in `src/games/scenes/translations.ts`;
+  present tense, "ты", nothing that changes for boy or girl. Changing a German item of a translated scene: delete
+  its Russian when the meaning changes.
 
 ## Checks before you finish
 

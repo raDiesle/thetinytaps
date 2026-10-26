@@ -1,5 +1,6 @@
 import type { CSSProperties, PointerEvent } from "react";
 import { useDevice } from "@/lib/device";
+import { useT } from "@/lib/language";
 import { BRIGHT_COLORS } from "./Bursts";
 import { Choice, SettingsGroup } from "./SettingControls";
 
@@ -45,9 +46,10 @@ export function TouchKeyboard({
     onKey(key);
   };
 
+  const t = useT();
   let index = 0;
   return (
-    <div className="touch-keyboard" role="group" aria-label="Tasten">
+    <div className="touch-keyboard" role="group" aria-label={t({ de: "Tasten", ru: "Клавиши" })}>
       {rows.map((row, r) => (
         <div key={r} className="touch-row">
           {row.map((key) => {
@@ -73,17 +75,23 @@ export function TouchKeyboard({
 /** The parents' option for the on-screen keys; not shown on computers without a touch screen. */
 export function TouchKeysSetting({ value, onChange, anyTouch = false }: { value: TouchKeysMode; onChange: (mode: TouchKeysMode) => void; anyTouch?: boolean }) {
   const device = useDevice();
+  const t = useT();
   if (!device.hasTouch) return null;
   return (
-    <SettingsGroup title="Tablet">
+    <SettingsGroup title={t({ de: "Tablet", ru: "Планшет" })}>
       <Choice<TouchKeysMode>
-        label="Tasten auf dem Bildschirm"
+        label={t({ de: "Tasten auf dem Bildschirm", ru: "Клавиши на экране" })}
         value={value}
         onChange={onChange}
         options={[
-          { value: "auto", label: anyTouch ? "📱 Auf Touch-Bildschirmen" : "📱 Nur auf Tablets" },
-          { value: "on", label: "Immer" },
-          { value: "off", label: "Nie (mit angeschlossener Tastatur)" },
+          {
+            value: "auto",
+            label: anyTouch
+              ? t({ de: "📱 Auf Touch-Bildschirmen", ru: "📱 На сенсорных экранах" })
+              : t({ de: "📱 Nur auf Tablets", ru: "📱 Только на планшетах" }),
+          },
+          { value: "on", label: t({ de: "Immer", ru: "Всегда" }) },
+          { value: "off", label: t({ de: "Nie (mit angeschlossener Tastatur)", ru: "Никогда (с подключённой клавиатурой)" }) },
         ]}
       />
     </SettingsGroup>

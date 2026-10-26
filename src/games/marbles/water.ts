@@ -416,7 +416,7 @@ export function buildWater() {
     at(pool.spray, { sound: playDrops });
     at(pool.spray + 1.2, { sound: playDrops });
     pool.quacks.forEach((t) => at(t, { sound: playQuack }));
-    at(pool.sparkle, { sound: playTwinkle, say: "Quak! Da sind die Entenbabys!" });
+    at(pool.sparkle, { sound: playTwinkle, say: { de: "Quak! Da sind die Entenbabys!", ru: "Кря! А вот и утята!" } });
     at(pool.done, { done: true });
   });
   /** How high a duckling hops (0 to 1) when it quacks, `t` seconds into the last stretch. */
