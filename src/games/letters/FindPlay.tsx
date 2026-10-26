@@ -3,12 +3,14 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { KeyboardMap } from "@/components/KeyboardMap";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
-import { keyMatches, toLower } from "@/content/languages";
+import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import { translate } from "@/content/translate";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
+import { useT } from "@/lib/language";
 import { playChime, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
+import { LetterWord } from "./Cards";
 import type { LettersSettings } from "./settings";
 
 /** Keys closer together than this only spawn shapes, so mashing the whole keyboard doesn't count as finding. */
@@ -22,10 +24,11 @@ const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#ff
 
 /**
  * Letters to look for. Umlauts are left out: their keys are missing on many
- * keyboards, and they are rarely among the first letters children know.
+ * keyboards, and they are rarely among the first letters children know. The same
+ * goes for Russian Ё (outside А–Я), whose key sits left of the 1.
  */
 function findableLetters(pack: LanguagePack, theme: "all" | ThemeId): LetterEntry[] {
-  const plain = pack.letters.filter((l) => /^[A-Z]$/.test(l.upper));
+  const plain = pack.letters.filter((l) => /^[A-ZА-Я]$/.test(l.upper));
   if (theme === "all") return plain;
   const matching = plain.filter((l) => l.words.some((w) => w.theme === theme));
   return matching.length > 0 ? matching : plain;
@@ -60,6 +63,7 @@ export function FindPlay({
   const [foundCount, setFoundCount] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
   const { bursts, spawn } = useBursts();
+  const t = useT();
 
   const lastPress = useRef(0);
   const foundAt = useRef(0);
@@ -163,11 +167,11 @@ export function FindPlay({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
-      if (!e.repeat) pressKey(e.key);
+      if (!e.repeat) pressKey(keyOf(e, pack));
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pressKey]);
+  }, [pressKey, pack]);
 
   const touchKeys = useTouchKeys(settings.touchKeys);
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
@@ -194,12 +198,7 @@ export function FindPlay({
         {current && (
           <div key={current.id} className={`card find-card${found ? " done" : ""}`} onPointerDown={onCardPointer}>
             <Picture word={current.word} />
-            {settings.showWord && (
-              <div className="word">
-                <span className="first-letter">{current.word.word.slice(0, 1)}</span>
-                {current.word.word.slice(1)}
-              </div>
-            )}
+            {settings.showWord && <LetterWord letter={current.letter} word={current.word} />}
             {settings.showWord && translation && <div className="translation">{translation}</div>}
             <div key={wrong} className={`find-key${wrong > 0 ? " nudge" : ""}`} aria-label={pack.findPrompt(current.letter)}>
               {glyphs.map((g) => (
@@ -210,7 +209,7 @@ export function FindPlay({
         )}
       </div>
       {foundCount > 0 && (
-        <div className="find-stars" aria-label={`${foundCount} gefunden`}>
+        <div className="find-stars" aria-label={t({ de: `${foundCount} gefunden`, ru: `Найдено: ${foundCount}` })}>
           {"⭐".repeat(Math.min(foundCount, 10))}
           {foundCount > 10 && <span className="find-count">{foundCount}</span>}
         </div>

@@ -20,29 +20,33 @@ export interface LanguageStatusRow {
 
 /** Every game of the home menu once, in menu order, then the home page. */
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
-  { href: "/bilder/", languages: { de: "done" }, note: "Viele Namen und Sätze je Bild (content.ts jeder Szene)." },
+  { href: "/bilder/", languages: { de: "done", ru: "done" }, note: "Viele Namen und Sätze je Bild; Russisch in ru.ts jeder Szene." },
   {
     href: "/abenteuer/",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial", it: "partial" },
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen. Die Schatzinsel spricht auch Englisch, Chinesisch, Hindi, Spanisch und Arabisch (aufgenommen), Russisch und Italienisch (übersetzt, noch die Browserstimme); die Wolkenreise ist noch nur auf Deutsch.",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "done", it: "partial" },
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen. Beide Geschichten sprechen Russisch (aufgenommen); die Schatzinsel auch Englisch, Chinesisch, Hindi, Spanisch und Arabisch (aufgenommen) und Italienisch (übersetzt, noch die Browserstimme); die Wolkenreise sonst nur Deutsch.",
   },
-  { href: "/gefuehle/", languages: { de: "done" } },
-  { href: "/kettenreaktion/", languages: { de: "done" } },
-  { href: "/kleine-abenteuer/", languages: { de: "done" } },
-  { href: "/tiere/", languages: { de: "done" } },
-  { href: "/schatten/", languages: { de: "done" } },
-  { href: "/socken/", languages: { de: "done" } },
+  { href: "/gefuehle/", languages: { de: "done", ru: "done" } },
+  { href: "/kettenreaktion/", languages: { de: "done", ru: "done" } },
+  { href: "/kleine-abenteuer/", languages: { de: "done", ru: "done" } },
+  { href: "/tiere/", languages: { de: "done", ru: "done" } },
+  { href: "/schatten/", languages: { de: "done", ru: "done" } },
+  { href: "/socken/", languages: { de: "done", ru: "done" } },
   {
     href: "/buchstaben/",
-    languages: { de: "done", en: "done" },
-    note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Chinesisch, Hindi, Arabisch und Russisch haben eine andere Schrift und Tastatur.",
+    languages: { de: "done", en: "done", ru: "done" },
+    note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Russisch tippt jede Taste als den kyrillischen Buchstaben an ihrer Stelle (ЙЦУКЕН); Chinesisch, Hindi und Arabisch haben eine andere Schrift und Tastatur.",
   },
   {
     href: "/woerter/",
-    languages: { de: "done", en: "done" },
+    languages: { de: "done", en: "done", ru: "done" },
     note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch, dieselben Sprachpakete wie „Buchstaben & Zahlen“.",
   },
   { href: "/zaehne/", languages: { de: "done" }, note: "Das gesungene Zahnputzlied gibt es nur auf Deutsch (/zahnputzlied)." },
   { href: "/laut-leise/", languages: { de: "done" } },
-  { href: "/", languages: { de: "done" }, note: "Startseite, Einstellungen und alles für Eltern." },
+  {
+    href: "/",
+    languages: { de: "done", ru: "done" },
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Ideenseite bleibt Deutsch.",
+  },
 ];

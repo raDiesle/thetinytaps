@@ -3,6 +3,7 @@ import { useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { useGameSettings } from "@/lib/common";
+import { useT } from "@/lib/language";
 import { DEFAULT_WORDS_SETTINGS, WORDS_SETTINGS_KEY, type PictureReveal, type WordCase, type WordLength, type WordsMode, type WordsSettings } from "./settings";
 import { WordsPlay } from "./WordsPlay";
 
@@ -10,71 +11,88 @@ export function WordsGame() {
   const [settings, update] = useGameSettings(WORDS_SETTINGS_KEY, DEFAULT_WORDS_SETTINGS);
   const languages = useLanguages();
   const pack = languages.language.pack;
+  const t = useT();
 
   return (
     <GameShell
-      title="Wörter tippen"
+      title={t({ de: "Wörter tippen", ru: "Печатаем слова" })}
       emoji="✍️"
       modes={[
-        { id: "spell", emoji: "✍️", title: "Ganzes Wort" },
-        { id: "first", emoji: "🐻", title: "Erster Buchstabe" },
-        { id: "colors", emoji: "🎨", title: "Farben" },
-        { id: "actions", emoji: "🦘", title: "Tu-Wörter" },
+        { id: "spell", emoji: "✍️", title: t({ de: "Ganzes Wort", ru: "Целое слово" }) },
+        { id: "first", emoji: "🐻", title: t({ de: "Erster Buchstabe", ru: "Первая буква" }) },
+        { id: "colors", emoji: "🎨", title: t({ de: "Farben", ru: "Цвета" }) },
+        { id: "actions", emoji: "🦘", title: t({ de: "Tu-Wörter", ru: "Слова-действия" }) },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as WordsMode })}
       level={
         // Colours and doing words are short fixed lists, so the length only applies to the picture words.
         <Choice<WordLength>
-          label="Wortlänge"
+          label={t({ de: "Wortlänge", ru: "Длина слова" })}
           value={settings.length}
           onChange={(length) => update({ length })}
           options={[
-            { value: "short", label: "Bär" },
-            { value: "medium", label: "Hund" },
-            { value: "long", label: "Giraffe" },
+            { value: "short", label: t({ de: "Bär", ru: "Кот" }) },
+            { value: "medium", label: t({ de: "Hund", ru: "Лиса" }) },
+            { value: "long", label: t({ de: "Giraffe", ru: "Корова" }) },
           ]}
         />
       }
       settings={
         <>
-          <SettingsGroup title="Wörter">
+          <SettingsGroup title={t({ de: "Wörter", ru: "Слова" })}>
             <Choice<WordsSettings["theme"]>
-              label="Bilder"
+              label={t({ de: "Bilder", ru: "Картинки" })}
               value={settings.theme}
               onChange={(theme) => update({ theme })}
-              options={[{ value: "all", label: "🌈 Alle" }, ...pack.themes.map((t) => ({ value: t.id, label: `${t.emoji} ${t.label}` }))]}
+              options={[
+                { value: "all", label: t({ de: "🌈 Alle", ru: "🌈 Все" }) },
+                ...pack.themes.map((th) => ({ value: th.id, label: `${th.emoji} ${th.label}` })),
+              ]}
             />
-            <p className="setting-note">Wortlänge und Bilder gelten für „Ganzes Wort“ und „Erster Buchstabe“.</p>
+            <p className="setting-note">
+              {t({
+                de: "Wortlänge und Bilder gelten für „Ganzes Wort“ und „Erster Buchstabe“.",
+                ru: "Длина слова и картинки – для «Целого слова» и «Первой буквы».",
+              })}
+            </p>
           </SettingsGroup>
 
-          <SettingsGroup title="Anzeige">
+          <SettingsGroup title={t({ de: "Anzeige", ru: "Что видно" })}>
             <Choice<WordCase>
-              label="Schrift"
+              label={t({ de: "Schrift", ru: "Буквы" })}
               value={settings.letterCase}
               onChange={(letterCase) => update({ letterCase })}
               options={[
-                { value: "upper", label: "BÄR" },
-                { value: "word", label: "Bär" },
-                { value: "lower", label: "bär" },
+                { value: "upper", label: t({ de: "BÄR", ru: "КОТ" }) },
+                { value: "word", label: t({ de: "Bär", ru: "Кот" }) },
+                { value: "lower", label: t({ de: "bär", ru: "кот" }) },
               ]}
             />
             <Choice<PictureReveal>
-              label="Bild"
+              label={t({ de: "Bild", ru: "Картинка" })}
               value={settings.picture}
               onChange={(picture) => update({ picture })}
               options={[
-                { value: "now", label: "Gleich zeigen" },
-                { value: "puzzle", label: "🧩 Baut sich auf" },
-                { value: "end", label: "Erst am Ende" },
+                { value: "now", label: t({ de: "Gleich zeigen", ru: "Сразу" }) },
+                { value: "puzzle", label: t({ de: "🧩 Baut sich auf", ru: "🧩 Собирается по кусочкам" }) },
+                { value: "end", label: t({ de: "Erst am Ende", ru: "Только в конце" }) },
               ]}
             />
-            <p className="setting-note">Beim ersten Buchstaben ist das Bild immer gleich da – es ist der einzige Hinweis.</p>
+            <p className="setting-note">
+              {t({
+                de: "Beim ersten Buchstaben ist das Bild immer gleich da – es ist der einzige Hinweis.",
+                ru: "В «Первой букве» картинка видна сразу – это единственная подсказка.",
+              })}
+            </p>
           </SettingsGroup>
 
-          <SettingsGroup title="Verhalten">
+          <SettingsGroup title={t({ de: "Verhalten", ru: "Игра" })}>
             <Toggle
-              label="Jede Taste schreibt den nächsten Buchstaben (für die Kleinsten)"
+              label={t({
+                de: "Jede Taste schreibt den nächsten Buchstaben (für die Kleinsten)",
+                ru: "Любая клавиша пишет следующую букву (для самых маленьких)",
+              })}
               checked={settings.anyKey}
               onChange={(anyKey) => update({ anyKey })}
             />

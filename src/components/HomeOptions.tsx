@@ -161,8 +161,8 @@ function CommonOptions() {
       <LanguageSetting settings={languages.settings} update={languages.update} />
       <p className="setting-note">
         {t({
-          de: "Diese Sprache gilt für „Buchstaben & Zahlen“ und „Wörter tippen“; das Bewegungsabenteuer hat seine eigene Sprachwahl. Alle anderen Spiele sprechen die Sprache der App (🌐 oben).",
-          ru: "Этот язык действует в «Буквах и цифрах» и «Печатаем слова»; у «Приключений в движении» свой выбор языка. Все остальные игры говорят на языке приложения (🌐 вверху).",
+          de: "Für „Buchstaben & Zahlen“ und „Wörter tippen“; ohne eigene Wahl gilt die Sprache der App (🌐 oben), wie in allen anderen Spielen.",
+          ru: "Для «Букв и цифр» и «Печатаем слова»; без своего выбора действует язык приложения (🌐 вверху), как во всех остальных играх.",
         })}
       </p>
 

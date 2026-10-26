@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
-import { toLower, toUpper } from "@/content/languages";
+import { keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { loadRecordings, playChime, playCountNote, playRandomNote, playWhistle, recorded } from "@/lib/sfx";
+import { useT } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import type { LettersSettings } from "./settings";
 
@@ -48,6 +49,7 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const [phase, setPhase] = useState<Phase>("waiting");
   const [trainId, setTrainId] = useState(0);
   const { bursts, spawn } = useBursts();
+  const t = useT();
 
   const lastWagon = useRef(0);
   const nextId = useRef(0);
@@ -154,11 +156,11 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
-      if (!e.repeat) pressKey(e.key);
+      if (!e.repeat) pressKey(keyOf(e, pack));
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pressKey]);
+  }, [pressKey, pack]);
 
   // A full train leaves on its own after a moment.
   useEffect(() => {
@@ -193,7 +195,9 @@ export function TrainPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     <div className={`letters-play train-play`} style={{ background: BACKGROUND }} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
       <div className="stage">
         <div className="train-scene">
-          <p className={`letters-welcome train-hint${empty ? "" : " gone"}`}>{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>
+          <p className={`letters-welcome train-hint${empty ? "" : " gone"}`}>
+            {touchKeys ? t({ de: "Tipp auf einen Buchstaben! 👇", ru: "Нажми на букву! 👇" }) : t({ de: "Drück eine Taste! ⌨️", ru: "Нажми на клавишу! ⌨️" })}
+          </p>
           <div key={trainId} className={`train ${phase}`}>
             <Engine moving={phase !== "waiting"} onPointerDown={tapEngine} />
             {Array.from({ length: TRAIN_LENGTH }, (_, i) => {
@@ -235,8 +239,9 @@ function Wheels() {
 
 /** The steam engine, facing left (the way it drives), with smoke while it moves. */
 function Engine({ moving, onPointerDown }: { moving: boolean; onPointerDown: (e: PointerEvent) => void }) {
+  const t = useT();
   return (
-    <div className="engine" role="button" aria-label="Lok: losfahren" onPointerDown={onPointerDown}>
+    <div className="engine" role="button" aria-label={t({ de: "Lok: losfahren", ru: "Паровоз: поехали" })} onPointerDown={onPointerDown}>
       {moving && (
         <div className="smoke" aria-hidden>
           <span />

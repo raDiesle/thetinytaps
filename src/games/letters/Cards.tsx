@@ -65,13 +65,27 @@ export function LetterCard({
       </div>
       {settings.showWord && (
         <>
-          <div className="word">
-            <span className="first-letter">{word.word.slice(0, 1)}</span>
-            {word.word.slice(1)}
-          </div>
+          <LetterWord letter={letter} word={word} />
           {translation && <div className="translation">{translation}</div>}
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * The word with its letter highlighted: the first one, or for a letter no word
+ * starts with (Russian Ы in "Сыр") the letter where it is inside.
+ */
+export function LetterWord({ letter, word }: { letter: LetterEntry; word: WordEntry }) {
+  const found = letter.inWord ? Array.from(word.word).findIndex((char) => char === letter.lower || char === letter.upper) : 0;
+  const at = Math.max(found, 0);
+  const chars = Array.from(word.word);
+  return (
+    <div className="word">
+      {chars.slice(0, at).join("")}
+      <span className="first-letter">{chars[at]}</span>
+      {chars.slice(at + 1).join("")}
     </div>
   );
 }

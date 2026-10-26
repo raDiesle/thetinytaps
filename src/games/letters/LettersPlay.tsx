@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
-import { toLower, toUpper } from "@/content/languages";
+import { keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import { translate, translateCountable } from "@/content/translate";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, recorded } from "@/lib/sfx";
+import { useT } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { LetterCard, NumberCard } from "./Cards";
 import type { LettersSettings } from "./settings";
@@ -80,6 +81,7 @@ export function LettersPlay({
   const [background, setBackground] = useState(BACKGROUNDS[0]);
   const [push, setPush] = useState<[number, number]>([0, 0]);
   const { bursts, spawn } = useBursts();
+  const t = useT();
   const stepByStep = settings.numbers === "step";
 
   const lastChange = useRef(0);
@@ -385,11 +387,11 @@ export function LettersPlay({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
-      if (!e.repeat) pressKey(e.key);
+      if (!e.repeat) pressKey(keyOf(e, pack));
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pressKey]);
+  }, [pressKey, pack]);
 
   // Touch screens: digits, then the alphabet.
   const touchKeys = useTouchKeys(settings.touchKeys, true);
@@ -424,7 +426,11 @@ export function LettersPlay({
     <div className={`letters-play`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
-          {shown === null && <p className="letters-welcome">{touchKeys ? "Tipp auf einen Buchstaben! 👇" : "Drück eine Taste! ⌨️"}</p>}
+          {shown === null && (
+            <p className="letters-welcome">
+              {touchKeys ? t({ de: "Tipp auf einen Buchstaben! 👇", ru: "Нажми на букву! 👇" }) : t({ de: "Drück eine Taste! ⌨️", ru: "Нажми на клавишу! ⌨️" })}
+            </p>
+          )}
           {shown?.kind === "letter" && (
             <LetterCard
               key={shown.id}

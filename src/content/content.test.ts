@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, test } from "@rstest/core";
 import { CATEGORIES } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, TOP_PICKS } from "./ideas";
-import { keyMatches, LANGUAGES, toUpper } from "./languages";
+import { keyMatches, keyOf, LANGUAGES, languageFor, toLower, toUpper } from "./languages";
 import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
@@ -68,11 +68,29 @@ describe("language status on the ideas page", () => {
 });
 
 describe.each(LANGUAGES.map((language) => [language.id, language] as const))("language %s", (_, { pack }) => {
-  test("every letter has words that start with it", () => {
+  test("every letter has words that start with it (or, for a letter no word starts with, have it inside)", () => {
     for (const letter of pack.letters) {
       expect(letter.words.length, letter.upper).toBeGreaterThan(0);
-      for (const { word } of letter.words) expect(toUpper(word.charAt(0), pack), word).toBe(letter.upper);
+      for (const { word } of letter.words) {
+        if (letter.inWord) expect(toUpper(word, pack).slice(1), word).toContain(letter.upper);
+        else expect(toUpper(word.charAt(0), pack), word).toBe(letter.upper);
+      }
     }
+  });
+
+  test("every letter has a spoken name, a matching lower case and comes once", () => {
+    for (const letter of pack.letters) {
+      expect(letter.spoken.trim(), letter.upper).not.toBe("");
+      expect(letter.lower, letter.upper).toBe(toLower(letter.upper, pack));
+    }
+    const uppers = pack.letters.map((l) => l.upper);
+    expect(new Set(uppers).size).toBe(uppers.length);
+  });
+
+  test("countables have every form for 0–9, and a word stands under one letter only", () => {
+    for (const thing of pack.countables) for (let n = 0; n <= 9; n++) expect(pack.countSentence(n, thing), `${thing.singular} ${n}`).not.toMatch(/undefined/);
+    const words = pack.letters.flatMap((l) => l.words.map((w) => w.word));
+    expect(words.filter((w, i) => words.indexOf(w) !== i)).toEqual([]);
   });
 
   test("every letter can be typed on the keyboard", () => {
@@ -86,5 +104,58 @@ describe.each(LANGUAGES.map((language) => [language.id, language] as const))("la
 
   test("numbers 0–9 have words", () => {
     expect(pack.numberWords).toHaveLength(10);
+  });
+});
+
+describe("Russian", () => {
+  const { pack } = languageFor("ru");
+
+  test("has the 33 letters of the alphabet in order", () => {
+    expect(pack.letters.map((l) => l.upper).join("")).toBe("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ");
+  });
+
+  test("only Ъ, Ы and Ь have their words with the letter inside", () => {
+    expect(pack.letters.filter((l) => l.inWord).map((l) => l.upper)).toEqual(["Ъ", "Ы", "Ь"]);
+  });
+
+  test("counts with the right plural forms", () => {
+    const duck = pack.countables.find((c) => c.emoji === "🦆")!;
+    expect([0, 1, 2, 3, 4, 5, 9].map((n) => pack.countSentence(n, duck))).toEqual([
+      "ноль уток!",
+      "одна утка!",
+      "две утки!",
+      "три утки!",
+      "четыре утки!",
+      "пять уток!",
+      "девять уток!",
+    ]);
+    const bus = pack.countables.find((c) => c.emoji === "🚌")!;
+    expect([1, 2, 5].map((n) => pack.countSentence(n, bus))).toEqual(["один автобус!", "два автобуса!", "пять автобусов!"]);
+    const apple = pack.countables.find((c) => c.emoji === "🍎")!;
+    expect([1, 2].map((n) => pack.countSentence(n, apple))).toEqual(["одно яблоко!", "два яблока!"]);
+  });
+
+  test("a German keyboard types Russian letters by their place", () => {
+    expect(keyOf({ key: "q", code: "KeyQ" }, pack)).toBe("Й");
+    expect(keyOf({ key: "z", code: "KeyY" }, pack)).toBe("Н");
+    expect(keyOf({ key: "ö", code: "Semicolon" }, pack)).toBe("Ж");
+    expect(keyOf({ key: "ф", code: "KeyA" }, pack)).toBe("Ф");
+    expect(keyOf({ key: "3", code: "Digit3" }, pack)).toBe("3");
+    expect(keyOf({ key: "Enter", code: "Enter" }, pack)).toBe("Enter");
+    // Other languages keep the key itself.
+    expect(keyOf({ key: "z", code: "KeyY" }, languageFor("de").pack)).toBe("z");
+  });
+
+  test("Й is its own key, Е also finds Ё", () => {
+    expect(keyMatches("И", "Й", pack)).toBe(false);
+    expect(keyMatches("Е", "Ё", pack)).toBe(true);
+  });
+
+  test("speaks in Russian and asks about letters", () => {
+    const b = pack.letters[1];
+    expect(pack.letterSentence(b, b.words[0])).toBe("бэ – как банан!");
+    const y = pack.letters.find((l) => l.upper === "Ы")!;
+    expect(pack.letterSentence(y, y.words[0])).toBe("ы – в слове сыр!");
+    expect(pack.findPrompt(b)).toBe("Где буква бэ?");
   });
 });

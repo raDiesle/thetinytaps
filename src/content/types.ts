@@ -26,6 +26,11 @@ export interface LetterEntry {
   spoken: string;
   /** Words starting with this letter; cycled through on repeated presses. */
   words: WordEntry[];
+  /**
+   * No word starts with this letter (Russian Ъ, Ы, Ь): its words have it inside ("сыр"),
+   * the card marks it there instead of the first letter, and the sentence says so.
+   */
+  inWord?: boolean;
 }
 
 /** A colour to type; when it is done the screen turns that colour and things of that colour hop in. */
@@ -68,6 +73,11 @@ export interface LanguagePack {
   findPrompt: (letter: LetterEntry) => string;
   /** The keyboard as printed on the keys, one string per row from the top. */
   keyboardRows: string[];
+  /**
+   * For a script most keyboards don't print (Russian): the letter at the pressed key's
+   * place, so any keyboard types it (Q = Й). Without it the key's own letter counts.
+   */
+  letterOfKey?: (e: Pick<KeyboardEvent, "key" | "code">) => string | undefined;
   /** "drei Äpfel" / "ein Apfel" */
   countSentence: (n: number, thing: Countable) => string;
   /** Short cheers, one is picked when a word has been typed. */

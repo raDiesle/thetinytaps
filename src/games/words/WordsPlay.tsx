@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
-import { keyMatches, toLower, toUpper } from "@/content/languages";
+import { keyMatches, keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import { translate } from "@/content/translate";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
@@ -204,11 +204,11 @@ export function WordsPlay({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
-      if (!e.repeat) pressKey(e.key);
+      if (!e.repeat) pressKey(keyOf(e, pack));
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [pressKey]);
+  }, [pressKey, pack]);
 
   const touchKeys = useTouchKeys(settings.touchKeys);
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
