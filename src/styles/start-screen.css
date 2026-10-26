@@ -237,6 +237,37 @@
   font-weight: 700;
 }
 
+/* A slider with a big thumb a grown-up's finger finds, and its value next to it. */
+.slider {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.slider-label {
+  flex-basis: 100%;
+}
+
+.slider input {
+  flex: 1;
+  min-width: 160px;
+  height: 44px;
+  margin: 0;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+
+.slider-value {
+  min-width: 5.5em;
+  padding: 6px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  font-weight: 700;
+  text-align: center;
+}
+
 .voice-setting {
   display: flex;
   flex-wrap: wrap;
@@ -508,23 +539,6 @@ kbd {
   font-weight: 700;
 }
 
-.playtime-over-note {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 10px 14px;
-  margin: 0;
-  padding: 10px 20px;
-  border: 3px solid var(--ink);
-  border-radius: 28px;
-  background: #232a6b;
-  color: #fff4d6;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.playtime-over-note button,
 .playtime-status button {
   min-height: 44px;
   padding: 6px 16px;
@@ -538,7 +552,6 @@ kbd {
   cursor: pointer;
 }
 
-.playtime-over-note button:active,
 .playtime-status button:active {
   transform: translateY(3px);
   box-shadow: 0 1px 0 var(--ink);

@@ -1,6 +1,7 @@
 import { useEffect, useState, type PointerEvent, type ReactNode } from "react";
 import { useLeaveGame } from "@/components/GameShell";
 import { useT } from "@/lib/language";
+import { countGame, gameEnded } from "@/lib/playtime";
 
 interface GameEndProps {
   /** Plays the same level (picture, story …) once more. */
@@ -26,11 +27,18 @@ export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
     return () => clearTimeout(timer);
   }, [shown, delayMs]);
 
+  // With the last game of a game limit, the game says good night instead (GameShell).
+  useEffect(() => {
+    if (shown) gameEnded();
+  }, [shown]);
+
   if (!shown) return null;
 
   // Pointer down, not click: it reacts right away, and the game underneath doesn't get the tap.
+  // „Nochmal“ and „Weiter“ each start one more game, for a game limit.
   const press = (action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
+    countGame();
     action();
   };
 

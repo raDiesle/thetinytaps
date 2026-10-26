@@ -7,10 +7,9 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { useAppLanguage, useT } from "@/lib/language";
-import { DEFAULT_PLAYTIME_SETTINGS, isPlaytimeOver, playedToday, PLAYTIME_SETTINGS_KEY, resetPlaytime, usePlaytime } from "@/lib/playtime";
+import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
-import { useStoredSettings } from "@/lib/storage";
 import { forwardNearTaps } from "@/lib/tapTargets";
 
 /** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
@@ -74,18 +73,18 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, info, sett
   const [playing, setPlaying] = useState(false);
   // The panel opened below the two buttons, if any: folded away by default, so the start screen stays short.
   const [panel, setPanel] = useState<"info" | "settings" | null>(null);
-  const [playtimeSettings] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
   const playtime = usePlaytime(playing);
-  // Bumped when the grown-up starts the play time afresh, to show it at once.
-  const [, setResets] = useState(0);
   const grid = useFitGrid(modes?.length ?? 0, modes?.filter((m) => m.featured).length);
   // The background song runs on from the menus into the game (BackgroundMusic), until the play time is over.
-  useNoBackgroundMusic(playing && playtime.over);
+  useNoBackgroundMusic(playing && playtime.goodNight);
   // Taps a little next to something the child can tap still count for it (see tapTargets.ts).
   const playArea = useRef<HTMLDivElement>(null);
   useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
   const start = async () => {
+    // The menus are locked then (PlaytimeLock); this also stops a key that slips past it.
+    if (isPlaytimeOver()) return;
+    countGame();
     // These need the click as a user gesture, so run them before any await.
     unlockAudio();
     unlockSpeech();
@@ -137,16 +136,12 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, info, sett
     return (
       // Resuming audio on any tap helps after a reload, when no "Los" click unlocked it.
       <div ref={playArea} className="play-area" onPointerDownCapture={unlockAudio}>
-        {playtime.over ? <GoodNight /> : <LeaveGame value={stop}>{children}</LeaveGame>}
-        {!playtime.over && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
+        {playtime.goodNight ? <GoodNight /> : <LeaveGame value={stop}>{children}</LeaveGame>}
+        {!playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
         <ExitButton onExit={stop} label={t({ de: "Zurück zum Menü", ru: "Назад в меню" })} />
       </div>
     );
   }
-
-  const minutes = playtimeSettings.minutes;
-  const playedMinutes = Math.floor(playedToday() / 60_000);
-  const over = isPlaytimeOver();
 
   const pick = (id: string) => {
     onMode?.(id);
@@ -163,21 +158,6 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, info, sett
       <h1 className="menu-title">
         <span aria-hidden>{emoji}</span> {title}
       </h1>
-      {over && (
-        <p className="playtime-over-note" role="status">
-          <span aria-hidden>🌙</span>{" "}
-          {t({ de: `Die Spielzeit für heute (${minutes} Min.) ist vorbei.`, ru: `Время игры на сегодня (${minutes} мин.) закончилось.` })}
-          <button
-            type="button"
-            onClick={() => {
-              resetPlaytime();
-              setResets((n) => n + 1);
-            }}
-          >
-            {t({ de: `Noch einmal ${minutes} Min.`, ru: `Ещё ${minutes} мин.` })}
-          </button>
-        </p>
-      )}
       {/* Right under the title, so it stays in sight however long the options get. */}
       {modes ? (
         <section className="mode-picker" aria-label={t({ de: "Spielart wählen", ru: "Выбрать игру" })}>
@@ -209,15 +189,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, info, sett
           {t({ de: "Los geht’s!", ru: "Поехали!" })}
         </button>
       )}
-      {minutes > 0 && (
-        <p className="shared-settings-note">
-          <span aria-hidden>⏳</span>{" "}
-          {t({
-            de: `Spielzeit heute: ${Math.min(playedMinutes, minutes)} von ${minutes} Min.`,
-            ru: `Время игры сегодня: ${Math.min(playedMinutes, minutes)} из ${minutes} мин.`,
-          })}
-        </p>
-      )}
+      <PlaytimeNote />
       <div className="settings-panel">
         <div className="panel-buttons">
           <PanelButton
@@ -239,6 +211,25 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, info, sett
         {panel === "settings" && settings && <section className="settings">{settings}</section>}
       </div>
     </main>
+  );
+}
+
+/** On the start screen, for the grown-up: how much of today's play time is used. */
+function PlaytimeNote() {
+  const t = useT();
+  const { settings, played } = usePlaytimeState();
+  if (settings.by === "none") return null;
+  const playedMinutes = Math.min(Math.floor(played.ms / 60_000), settings.minutes);
+  return (
+    <p className="shared-settings-note">
+      <span aria-hidden>⏳</span>{" "}
+      {settings.by === "time"
+        ? t({
+            de: `Spielzeit heute: ${playedMinutes} von ${settings.minutes} Min.`,
+            ru: `Время игры сегодня: ${playedMinutes} из ${settings.minutes} мин.`,
+          })
+        : t({ de: `Spiele heute: ${Math.min(played.games, settings.games)} von ${settings.games}` })}
+    </p>
   );
 }
 

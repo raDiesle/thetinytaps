@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
+import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
 import { sampleLetter } from "@/content/languages";
@@ -8,8 +9,6 @@ import { targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings } from "@/lib/common";
 import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
 import { downloadMusic } from "@/lib/musicFile";
-import { DEFAULT_PLAYTIME_SETTINGS, playedToday, PLAYTIME_OPTIONS, PLAYTIME_SETTINGS_KEY, resetPlaytime } from "@/lib/playtime";
-import { useStoredSettings } from "@/lib/storage";
 
 /**
  * On the home page, for the grown-ups: small buttons at the top – the play
@@ -100,50 +99,6 @@ function AppLanguageOptions() {
           onChange={(id) => setAppLanguage(targetLanguageFor(id).id)}
           options={APP_LANGUAGES.map((id) => ({ value: id, label: OWN_NAMES[id] }))}
         />
-      </SettingsGroup>
-    </section>
-  );
-}
-
-function PlaytimeOptions() {
-  const t = useT();
-  const [settings, update] = useStoredSettings(PLAYTIME_SETTINGS_KEY, DEFAULT_PLAYTIME_SETTINGS);
-  const [played, setPlayed] = useState(() => Math.floor(playedToday() / 60_000));
-  const minutes = settings.minutes;
-  const left = Math.max(0, minutes - played);
-
-  return (
-    <section className="settings">
-      <SettingsGroup title={t({ de: "Spielzeit für alle Spiele", ru: "Время игры для всех игр" })}>
-        <Choice
-          label={t({ de: "Pro Tag", ru: "В день" })}
-          value={String(minutes)}
-          onChange={(value) => update({ minutes: Number(value) })}
-          options={PLAYTIME_OPTIONS.map((m) => ({
-            value: String(m),
-            label: m ? t({ de: `${m} Min.`, ru: `${m} мин.` }) : t({ de: "∞ Ohne", ru: "∞ Без ограничения" }),
-          }))}
-        />
-        <p className="playtime-status">
-          <span>
-            {t({ de: `Heute gespielt: ${played} Min.`, ru: `Сегодня сыграно: ${played} мин.` })}
-            {minutes > 0 &&
-              (left > 0
-                ? t({ de: ` – noch ${left} Min.`, ru: ` – осталось ${left} мин.` })
-                : t({ de: " – die Spielzeit ist vorbei", ru: " – время игры закончилось" }))}
-          </span>
-          {played > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                resetPlaytime();
-                setPlayed(0);
-              }}
-            >
-              ↺ {t({ de: "Von vorn", ru: "Сначала" })}
-            </button>
-          )}
-        </p>
       </SettingsGroup>
     </section>
   );

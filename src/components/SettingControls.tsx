@@ -39,6 +39,34 @@ export function Choice<T extends string>({
   );
 }
 
+/** A slider for a number, with the chosen value written next to it. */
+export function Slider({
+  label,
+  value,
+  min,
+  max,
+  step = 1,
+  format,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step?: number;
+  /** The value as the grown-up reads it, e.g. "20 Min.". */
+  format: (value: number) => string;
+  onChange: (value: number) => void;
+}) {
+  return (
+    <label className="slider">
+      <span className="slider-label">{label}</span>
+      <input type="range" min={min} max={max} step={step} value={value} aria-valuetext={format(value)} onChange={(e) => onChange(Number(e.target.value))} />
+      <output className="slider-value">{format(value)}</output>
+    </label>
+  );
+}
+
 export function SettingsGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className="settings-group">
