@@ -1,23 +1,19 @@
-import type { AnimalId } from "./content";
-
-/** "story": an animal goes to the potty step by step; "party": the child went for real and gets a star. */
-export type PottyMode = "story" | "party";
+/** "pipi" and "kaka": Tapsi goes to the potty step by step; "party": the child went for real and gets a star. */
+export type PottyMode = "pipi" | "kaka" | "party";
 
 export interface PottySettings {
   mode: PottyMode;
-  /** Who goes to the potty first; „Weiter“ brings the next one. */
-  animal: AnimalId;
   /** Says what happens at every step. */
   speech: boolean;
-  /** Steps, trickle, flush, the waiting tune and the applause. */
+  /** Eating, drinking, the waiting scenes, trickle, flush and the applause. */
   sounds: boolean;
 }
 
 export const DEFAULT_POTTY_SETTINGS: PottySettings = {
-  mode: "story",
-  animal: "fox",
+  mode: "pipi",
   speech: false,
   sounds: true,
 };
 
-export const POTTY_SETTINGS_KEY = "tinytaps.potty.v1";
+// v2: the story became two, „Pipi“ and „Kaka“ – an old "story" would match no mode.
+export const POTTY_SETTINGS_KEY = "tinytaps.potty.v2";

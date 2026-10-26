@@ -1,108 +1,77 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import {
   playBoing,
+  playChime,
+  playDrops,
+  playDrumRoll,
   playFlush,
   playGiggle,
+  playGlug,
   playKnock,
   playMelody,
+  playMunch,
   playPlop,
   playPop,
   playRandomNote,
   playRip,
+  playRumble,
   playScrub,
   playSplash,
+  playSqueak,
+  playTrain,
   playTrickle,
+  playTusch,
+  playBlow,
   playWhoosh,
   recorded,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { animalById, nextAnimal, PEE_MS, POTTY_TEXTS, SIT_GUARD_MS, SIT_MS, STEPS, type AnimalId, type StepId } from "./content";
-import { AnimalDrawing, Bathroom, Drops, FLOOR_Y, PaperRoll, Potty, PottyFront, Sink, ThoughtBubble, Toilet } from "./drawings";
+import { forNeed, POTTY_TEXTS, SCENE_MS, scenePicture, scenesFor, STEPS, TAPSI, type Need, type SceneSound } from "./content";
+import { preloadImages } from "./images";
 import type { PottySettings } from "./settings";
+import { StoryPicture } from "./StoryPicture";
 import { useWaitingMusic } from "./waitMusic";
 
 const flush = recorded("flush", playFlush);
 const splash = recorded("splash", playSplash);
 const scrub = recorded("scrub", playScrub);
+const munch = recorded("munch", playMunch);
+const blow = recorded("blow", playBlow);
 const cheer = recorded("cheer", playMelody);
 const partyHorn = recorded("partyhorn", playPop);
 
-/** Where things stand in the bathroom (world units, see drawings.tsx). */
-const POTTY_X = 520;
-const TOILET_X = 880;
-const SINK_X = 1230;
-const PAPER = { x: 650, y: 420 };
-
-/** Before the first tap the animal waits by the door. */
-type Place = StepId | "start";
-
-/** Where the animal stands (or sits) during each step. */
-const ANIMAL_X: Record<Place, number> = { start: 230, walk: 430, down: 430, sit: POTTY_X, paper: POTTY_X, up: 430, flush: 760, wash: 1090, party: 1090 };
-
-/** How long the animal takes to get there; the walking bob in potty.css lasts as long. */
-const MOVE_MS: Partial<Record<Place, number>> = { walk: 2200, sit: 700, up: 800, flush: 1400, wash: 1500 };
-
-/** What the camera shows in each step (world units); it zooms this into the room left between ✕ and the row of steps. */
-const FOCUS: Record<Place, Box> = {
-  start: { x: 20, y: 130, width: 680, height: 480 },
-  walk: { x: 280, y: 250, width: 420, height: 365 },
-  down: { x: 280, y: 250, width: 420, height: 365 },
-  sit: { x: 340, y: 265, width: 380, height: 345 },
-  paper: { x: 340, y: 265, width: 380, height: 345 },
-  up: { x: 280, y: 250, width: 420, height: 365 },
-  flush: { x: 610, y: 250, width: 420, height: 365 },
-  wash: { x: 950, y: 250, width: 400, height: 365 },
-  party: { x: 600, y: 220, width: 760, height: 395 },
-};
-
-interface Box {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+/** Where the story is: before the first tap, at a step, or sitting with Mama and Papa playing a waiting scene. */
+interface At {
+  /** Index in STEPS; -1 before the first tap. */
+  step: number;
+  /** While sitting: the waiting scene shown (an index into scenesFor), -1 for the sitting picture itself. */
+  scene: number;
 }
 
-/** Room kept free around the picture's focus, in px, besides the row of steps below; the ✕ sits in a corner, beside the animal's head. */
-const MARGIN = { top: 16, side: 16, bottom: 8 };
+const START: At = { step: -1, scene: -1 };
 
-/** While sitting: sitting down, waiting (as long as it takes, until a tap), the trickle, then done. */
-type SitPhase = "none" | "sitting" | "waiting" | "peeing" | "done";
-
-/** The camera's transform that fits `focus` into the free part of a `width` × `height` screen. */
-function camera(focus: Box, width: number, height: number, bar: number) {
-  const free = { x: MARGIN.side, y: MARGIN.top, width: width - 2 * MARGIN.side, height: height - MARGIN.top - bar - MARGIN.bottom };
-  const scale = Math.max(0.05, Math.min(free.width / focus.width, free.height / focus.height));
-  const x = free.x + free.width / 2 - (focus.x + focus.width / 2) * scale;
-  const y = free.y + free.height / 2 - (focus.y + focus.height / 2) * scale;
-  return `translate(${x}px, ${y}px) scale(${scale})`;
-}
-
-/** „Aufs Töpfchen“ (H-06): an animal goes to the potty, one tap for every step, and it ends with a party. */
+/** „Aufs Töpfchen“ (H-06): Tapsi eats, drinks, has to go, calls Mama and Papa and goes to the potty, one tap for every step. */
 export function PottyPlay({ settings }: { settings: PottySettings }) {
   const language = useAppLanguage();
   const texts = useT()(POTTY_TEXTS);
-  const [animalId, setAnimalId] = useState<AnimalId>(settings.animal);
-  const animal = animalById(animalId);
-  /** Index in STEPS of the step going on now; -1 before the first tap. */
-  const [step, setStep] = useState(-1);
-  const [sit, setSit] = useState<SitPhase>("none");
+  const [need, setNeed] = useState<Need>(settings.mode === "kaka" ? "kaka" : "pipi");
+  const scenes = useMemo(() => scenesFor(need), [need]);
+  const [at, setAt] = useState<At>(START);
   const [busy, setBusy] = useState(false);
-  /** Bumped for „Nochmal“ and „Weiter“: the scene starts again without gliding back. */
-  const [round, setRound] = useState(0);
-  const [size, setSize] = useState({ width: 0, height: 0, bar: 0 });
+  /** Bumped for every step and scene, so the overlays and the picture start again. */
+  const [beat, setBeat] = useState(0);
   const { bursts, spawn } = useBursts();
 
-  const rootRef = useRef<HTMLDivElement>(null);
-  const barRef = useRef<HTMLOListElement>(null);
-  // A ref as well as state: a quick second tap can come before React has rendered the first.
+  // Refs as well as state: a quick second tap can come before React has rendered the first.
   const busyRef = useRef(false);
-  const stepRef = useRef(-1);
-  const sitRef = useRef<SitPhase>("none");
+  const atRef = useRef<At>(START);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  /** The ✓ was explained once in this round. */
+  const toldFinish = useRef(false);
 
   const later = useCallback((ms: number, run: () => void) => {
     const timer = setTimeout(() => {
@@ -117,26 +86,21 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  /** The sitting phase in state and ref, so a tap can tell whether the waiting is on. */
-  const toSit = useCallback((phase: SitPhase) => {
-    sitRef.current = phase;
-    setSit(phase);
-  }, []);
+  const step = at.step >= 0 ? STEPS[at.step] : undefined;
+  const sitting = step?.id === "sit";
 
   // The waiting song is part of sitting (like the brushing song), so it plays even with Töne or Musik off;
   // the background song waits meanwhile.
-  useNoBackgroundMusic(sit === "waiting");
-  useWaitingMusic(sit === "waiting", language.id);
+  useNoBackgroundMusic(sitting);
+  useWaitingMusic(sitting, language.id);
 
-  useLayoutEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const measure = () => setSize({ width: root.clientWidth, height: root.clientHeight, bar: barRef.current?.offsetHeight ?? 0 });
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(root);
-    return () => observer.disconnect();
-  }, []);
+  // The next step's pictures load while this one plays, the waiting scenes once the animal sits.
+  useEffect(() => {
+    const next = STEPS[at.step + 1];
+    const names = next ? [`${TAPSI.pictures}-${forNeed(next.picture, need)}`] : [];
+    if (STEPS[at.step]?.id === "down") names.push(...scenes.map((s) => `${TAPSI.pictures}-${scenePicture(s)}`));
+    preloadImages(names);
+  }, [at.step, need, scenes]);
 
   const say = (text: string) => {
     if (settings.speech) speak(text, voiceFor(text, language));
@@ -148,54 +112,72 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     for (let t = 0; t < ms; t += 320) sound(t, () => playKnock(t % 640 ? 380 : 440));
   };
 
-  const ready = (ms: number) =>
+  const goTo = (next: At, ms: number) => {
+    atRef.current = next;
+    busyRef.current = true;
+    setAt(next);
+    setBusy(true);
+    setBeat((b) => b + 1);
     later(ms, () => {
       busyRef.current = false;
       setBusy(false);
     });
+  };
 
-  /** Plays step `index`: its motion is in potty.css (by the class on the root), its sounds and words here. */
+  /** Plays step `index`: its picture shows, its sounds and words come here. */
   const begin = (index: number) => {
     const { id, ms } = STEPS[index];
-    stepRef.current = index;
-    busyRef.current = true;
-    setStep(index);
-    setBusy(true);
-    say(texts.steps[id](animal.name));
+    goTo({ step: index, scene: -1 }, ms);
+    say(texts.steps[id](TAPSI.name, need));
     switch (id) {
-      case "walk":
-        footsteps(MOVE_MS.walk ?? 0);
+      case "eat":
+        sound(0, munch);
+        break;
+      case "drink":
+        sound(0, playGlug);
+        sound(700, playGlug);
+        break;
+      case "need":
+        if (need === "pipi") {
+          sound(0, playBoing);
+          sound(500, playDrops);
+        } else {
+          sound(0, playRumble);
+          sound(700, playRumble);
+        }
+        break;
+      case "call":
+        sound(0, playChime);
+        break;
+      case "go":
+        footsteps(1500);
         break;
       case "down":
         sound(0, playWhoosh);
         break;
       case "sit":
-        // Nobody knows how long sitting takes: the waiting lasts until a tap (see act), only a short start can't be skipped.
-        toSit("sitting");
-        sound(500, playPlop);
-        later(SIT_MS, () => toSit("waiting"));
-        ready(SIT_GUARD_MS);
-        return;
-      case "paper":
-        sound(650, playRip);
-        sound(1300, playGiggle);
+        sound(300, playPlop);
+        break;
+      case "done":
+        if (need === "pipi") sound(0, playTrickle);
+        else sound(0, playPlop);
+        sound(900, cheer);
+        for (let i = 0; i < 8; i++) later(600 + i * 120, () => spawn());
+        break;
+      case "wipe":
+        sound(300, playRip);
+        sound(1000, playGiggle);
         break;
       case "up":
-        toSit("none");
         sound(0, playBoing);
         sound(500, playWhoosh);
         break;
       case "flush":
-        footsteps(MOVE_MS.flush ?? 0);
-        sound(1700, playPlop);
-        sound(1900, splash);
-        sound(2800, flush);
+        sound(200, flush);
         break;
       case "wash":
-        footsteps(MOVE_MS.wash ?? 0);
-        sound(1800, splash);
-        sound(2500, scrub);
-        sound(3700, splash);
+        sound(0, splash);
+        sound(900, scrub);
         break;
       case "party":
         sound(0, cheer);
@@ -203,121 +185,138 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         for (let i = 0; i < 12; i++) later(i * 150, () => spawn());
         break;
     }
-    ready(ms);
   };
 
-  /** The tap that ends the waiting: it trickles, and the tap after that goes on. */
-  const finishWaiting = () => {
-    busyRef.current = true;
-    setBusy(true);
-    toSit("peeing");
-    if (settings.sounds) playTrickle();
-    say(texts.pee);
-    later(PEE_MS, () => toSit("done"));
-    ready(PEE_MS);
+  const SCENE_SOUNDS: Record<SceneSound, () => void> = {
+    trickle: () => playTrickle(),
+    splash: () => splash(),
+    glug: () => {
+      playGlug();
+      later(600, playGlug);
+    },
+    whoosh: () => playWhoosh(),
+    squeeze: () => playSqueak(),
+    blow: () => blow(),
+    push: () => playRumble(),
+    drops: () => playDrops(),
+    train: () => playTrain(),
+    dance: () => {
+      playDrumRoll(0);
+      later(1000, playTusch);
+    },
+    juggle: () => [0, 300, 600].forEach((ms) => later(ms, playBoing)),
+    peekaboo: () => playGiggle(),
+    bubbles: () => [0, 250, 500, 750].forEach((ms) => later(ms, playPop)),
   };
 
-  /** A tap or key: the next step when the last one has finished, a sparkle while it still runs. */
+  /** A tap while sitting: Mama and Papa do the next thing, endlessly – the animal sits as long as it takes. */
+  const nextScene = () => {
+    const index = (atRef.current.scene + 1) % scenes.length;
+    const scene = scenes[index];
+    goTo({ step: atRef.current.step, scene: index }, SCENE_MS);
+    if (settings.sounds) SCENE_SOUNDS[scene.sound]();
+    // Once per round the voice says what the ✓ is for; after that only the scenes speak.
+    if (!toldFinish.current) {
+      toldFinish.current = true;
+      say(`${texts.scenes[scene.id]} ${texts.finish[need]}`);
+    } else say(texts.scenes[scene.id]);
+  };
+
+  /** A tap or key: the next step (or waiting scene) when the last one has finished, a sparkle while it still runs. */
   const act = (x?: number, y?: number) => {
-    const next = stepRef.current + 1;
+    const next = atRef.current.step + 1;
     if (busyRef.current || next >= STEPS.length) {
       spawn(x, y);
       if (settings.sounds) playRandomNote();
       return;
     }
-    if (sitRef.current === "waiting") finishWaiting();
+    if (STEPS[atRef.current.step]?.id === "sit") nextScene();
     else begin(next);
   };
 
-  const restart = (id: AnimalId) => {
+  /** The ✓ while sitting: the pipi or kaka is in the potty, the story goes on. */
+  const finish = (e: PointerEvent) => {
+    e.stopPropagation();
+    begin(atRef.current.step + 1);
+  };
+
+  const restart = (nextNeed: Need) => {
     timers.current.forEach(clearTimeout);
     timers.current.clear();
-    setAnimalId(id);
-    setRound((r) => r + 1);
-    stepRef.current = -1;
+    setNeed(nextNeed);
+    atRef.current = START;
     busyRef.current = false;
-    setStep(-1);
-    toSit("none");
+    toldFinish.current = false;
+    setAt(START);
     setBusy(false);
   };
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
-      act();
+      // While sitting Enter is the ✓, every other key the next scene.
+      if (e.key === "Enter" && STEPS[atRef.current.step]?.id === "sit" && !busyRef.current) begin(atRef.current.step + 1);
+      else act();
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const place: Place = step < 0 ? "start" : STEPS[step].id;
-  const at = (from: StepId) => step >= STEPS.findIndex((s) => s.id === from);
-  const pantsDown = place === "down" || place === "sit" || place === "paper";
-  const sitting = place === "sit" || place === "paper";
-  const peed = (place === "sit" && (sit === "peeing" || sit === "done")) || place === "paper" || place === "up";
-  const happy = sit === "peeing" || place === "party";
-  const flags = [
-    `pt-at-${place}`,
-    busy && "busy",
-    pantsDown && "pt-pants-down",
-    sitting && "pt-sitting",
-    peed && "pt-peed",
-    happy && "pt-happy",
-    sit === "waiting" && "pt-waiting",
-    sit === "peeing" && "pt-peeing",
-    at("flush") && "pt-potty-away",
-  ].filter(Boolean);
-  const done = step === STEPS.length - 1;
-  const next = nextAnimal(animalId);
+  const picture = sitting && at.scene >= 0 ? scenePicture(scenes[at.scene]) : forNeed(step?.picture ?? "essen", need);
+  const done = at.step === STEPS.length - 1;
+  // „Weiter“: Tapsi has to do the other thing.
+  const nextNeed: Need = need === "pipi" ? "kaka" : "pipi";
 
   return (
-    <div ref={rootRef} className={`potty-play ${flags.join(" ")}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
-      <svg className="pt-scene" width="100%" height="100%" aria-hidden>
-        {size.width > 0 && (
-          <g key={round} className="pt-camera" style={{ transform: camera(FOCUS[place], size.width, size.height, size.bar) }}>
-            <Bathroom />
-            <g transform={`translate(${PAPER.x} ${PAPER.y})`}>
-              <PaperRoll />
-            </g>
-            <g transform={`translate(${TOILET_X} ${FLOOR_Y})`}>
-              <Toilet />
-            </g>
-            <g transform={`translate(${SINK_X} ${FLOOR_Y})`}>
-              <Sink />
-            </g>
-            <g transform={`translate(${POTTY_X} ${FLOOR_Y})`}>
-              <g className="pt-potty-move">
-                <Potty />
-              </g>
-            </g>
-            <g
-              className="pt-animal-pos"
-              style={{ transform: `translate(${ANIMAL_X[place]}px, ${FLOOR_Y}px)`, "--move-ms": `${MOVE_MS[place] ?? 0}ms` } as CSSProperties}
-            >
-              <g className="pt-bob">
-                <AnimalDrawing animal={animal} />
-              </g>
-              <ThoughtBubble />
-            </g>
-            <g transform={`translate(${POTTY_X} ${FLOOR_Y})`}>
-              <PottyFront />
-              <Drops />
-            </g>
-          </g>
-        )}
-      </svg>
+    <div className={`potty-play pt-${need} pt-at-${step?.id ?? "start"}${busy ? " busy" : ""}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
+      <StoryPicture key={picture} name={`${TAPSI.pictures}-${picture}`} moving={at.step >= 0} />
 
-      <ol ref={barRef} className="pt-steps" aria-hidden>
+      {/* Drawn on top of the picture: what the animal feels and says, without words. */}
+      {step?.id === "need" && (
+        <div key={beat} className="pt-feel" aria-hidden>
+          {need === "pipi" ? "💦" : "🌀"}
+        </div>
+      )}
+      {step?.id === "call" && (
+        <div key={beat} className="pt-call" aria-hidden>
+          <span>📣</span>
+          <span>{need === "pipi" ? "💧" : "💩"}</span>
+        </div>
+      )}
+
+      {sitting && (
+        <button
+          type="button"
+          className="pt-finish"
+          data-tap="goal"
+          aria-label={texts.finish[need]}
+          onPointerDown={(e) => {
+            if (!busyRef.current) finish(e);
+          }}
+        >
+          <span className="pt-finish-check">✓</span>
+          <span className="pt-finish-need">{need === "pipi" ? "💧" : "💩"}</span>
+          <span className="pt-finish-hand" aria-hidden>
+            👆
+          </span>
+        </button>
+      )}
+
+      <ol className="pt-steps" aria-hidden>
         {STEPS.map((s, i) => (
-          <li key={s.id} className={i < step ? "done" : i === step ? "now" : undefined}>
-            {s.icon}
+          <li key={s.id} className={i < at.step ? "done" : i === at.step ? "now" : undefined}>
+            {forNeed(s.icon, need)}
             {s.arrow && <span className="pt-arrow">{s.arrow}</span>}
           </li>
         ))}
       </ol>
 
       {done && (
-        <GameEnd delayMs={STEPS[step].ms} onAgain={() => restart(animalId)} next={{ emoji: next.emoji, name: next.name, onNext: () => restart(next.id) }} />
+        <GameEnd
+          delayMs={STEPS[at.step].ms}
+          onAgain={() => restart(need)}
+          next={{ emoji: nextNeed === "pipi" ? "💧" : "💩", name: TAPSI.name, onNext: () => restart(nextNeed) }}
+        />
       )}
       <BurstLayer bursts={bursts} />
     </div>

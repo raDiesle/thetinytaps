@@ -142,8 +142,8 @@ export const SEO_PAGES: PageSeo[] = [
     path: "/toepfchen/",
     title: "Töpfchentraining spielerisch – Töpfchen-Spiel ab 2",
     description:
-      "Tapsi muss mal: hinlaufen, Hose runter, warten, abziehen, Hände waschen – ein Tippen pro Schritt. Dazu Applaus und ein Stern, wenn es wirklich geklappt hat.",
-    text: "Ein Töpfchen-Spiel für Kleinkinder: Fuchs, Bär oder Hase gehen Schritt für Schritt aufs Töpfchen, mit Warte-Liedchen beim Sitzen. „Hat geklappt!“ feiert echte Erfolge mit einem Stern auf der Wochentafel.",
+      "Tapsi muss Pipi oder Kaka: Mama und Papa rufen, Hose runter, sitzen, abziehen, Hände waschen – ein Tippen pro Schritt. Ein Stern, wenn es wirklich klappt.",
+    text: "Ein Töpfchen-Spiel für Kleinkinder in bewegten Bildern: Tapsi der Fuchs isst und trinkt, merkt, dass er muss, ruft Mama und Papa und geht Schritt für Schritt aufs Töpfchen. Beim Sitzen machen Mama und Papa Quatsch, gießen Blumen oder drücken Zahnpasta – bis der grüne Haken „fertig“ sagt. „Hat geklappt!“ feiert echte Erfolge mit einem Stern auf der Wochentafel.",
   },
   {
     path: "/laut-leise/",

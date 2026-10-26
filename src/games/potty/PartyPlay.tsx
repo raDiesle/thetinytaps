@@ -5,10 +5,10 @@ import { dayKey, weekOf } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { playMelody, playPop, playRandomNote, playTwinkle, recorded } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { animalById, POTTY_TEXTS } from "./content";
-import { AnimalDrawing } from "./drawings";
+import { POTTY_TEXTS, TAPSI } from "./content";
 import type { PottySettings } from "./settings";
 import { addStar, loadStars, saveStars, type StarLog } from "./stars";
+import { StoryPicture } from "./StoryPicture";
 
 const cheer = recorded("cheer", playMelody);
 const partyHorn = recorded("partyhorn", playPop);
@@ -30,7 +30,6 @@ export function PartyPlay({ settings, onStory }: { settings: PottySettings; onSt
   const language = useAppLanguage();
   const t = useT();
   const texts = t(POTTY_TEXTS);
-  const animal = animalById(settings.animal);
   const [log, setLog] = useState<StarLog>(loadStars);
   /** The star of this opening is on the chart. */
   const [starred, setStarred] = useState(false);
@@ -96,13 +95,7 @@ export function PartyPlay({ settings, onStory }: { settings: PottySettings; onSt
 
   return (
     <div className={`potty-party${party > 0 ? " pt-happy" : ""}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
-      <svg className="pt-party-animal" viewBox="-210 -440 420 450" aria-hidden>
-        <g key={party} className={party > 0 ? "pt-cheering" : undefined}>
-          <g className="pt-bob">
-            <AnimalDrawing animal={animal} />
-          </g>
-        </g>
-      </svg>
+      <StoryPicture key={party} name={`${TAPSI.pictures}-party`} moving={party > 0} className="pt-party-picture" />
       <ol className="pt-week" aria-label={t({ de: "Sterne dieser Woche" })}>
         {weekOf(today).map((day, i) => {
           const key = dayKey(day);
@@ -128,7 +121,7 @@ export function PartyPlay({ settings, onStory }: { settings: PottySettings; onSt
           );
         })}
       </ol>
-      {ended && <GameEnd onAgain={celebrate} next={{ emoji: animal.emoji, name: t({ de: "Muss mal!" }), onNext: onStory }} />}
+      {ended && <GameEnd onAgain={celebrate} next={{ emoji: "💧", name: t({ de: "Muss Pipi!" }), onNext: onStory }} />}
       <BurstLayer bursts={bursts} />
     </div>
   );
