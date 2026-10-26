@@ -88,7 +88,11 @@ start and length:
   smearing them over an intro or a break (Spanish: „Abre grande“ over 7 s of whistling,
   the start came out 5 s early). Always draw that part and correct the start.
 - **Whisper's times can be seconds off**, mostly for the first word after a break.
-  Always draw part 1: Suno often puts a short intro before it. For any start that looks doubtful, draw that stretch and look at it with Read: the
+  Always draw part 1: Suno puts a whistled intro before it in spite of "no intro"
+  (Spanish 7 s, Italian 9.5 s). Over a whole song Whisper's text also drifts: it can squeeze
+  lines together or borrow a line from an earlier verse. Before calling a start or a sung
+  line wrong, let Whisper listen to a 12–16 s cut around it alone
+  (`ffmpeg -ss <from> -t 16 -i song.wav cut.wav`, then `whisper-cli -l <lang> -f cut.wav`). For any start that looks doubtful, draw that stretch and look at it with Read: the
   voice shows as stacks of many harmonics, a whistle or flute as a single line.
 
 ```bash

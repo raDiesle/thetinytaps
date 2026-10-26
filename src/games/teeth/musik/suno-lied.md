@@ -363,7 +363,10 @@ Title: `¡A cepillar los dientes!`
 
 ## Italiano (`it`, 26 Oct 2026)
 
-Not made in Suno yet. Sound words to join in: _sfrega, sfrega_ (scrubbing), _zum, zum, zum_
+Made in Suno on 26 Oct 2026 with the texts below. A whistled intro until 9.6 s (the first
+start set by hand from the spectrogram). Suno sang the first two lines of parts 2 and 6 in
+the time of one, so those steps are only 11 and 12 s; the others 17 to 19 s. The brushing
+lasts 1:52, the song runs 2:27. Sound words to join in: _sfrega, sfrega_ (scrubbing), _zum, zum, zum_
 (circling; „tondo tondo … gira il mondo“ echoes the nursery rhyme „Giro giro tondo“),
 _sciù, sciù, sciù_ (wiping). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Present tense,
 nothing gendered about the child. Not yet read by a native speaker.
@@ -450,3 +453,93 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
 ```
 
 Title: `Laviamo i denti!`
+
+## 中文 (`zh`, 26 Oct 2026)
+
+Not made in Suno yet. Mandarin, simplified characters, seven syllables a line, every pair
+rhyming. Sound words to join in: _刷刷刷_ (shuā, scrubbing), _嗡嗡嗡_ (wēng, circling like a
+bee), _嗖嗖嗖_ (sōu, wiping). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a
+native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 112 BPM, steady, the same tempo all the way through]
+
+[Part 1 – 8 bars – bouncy ukulele, scrubbing rhythm]
+张大嘴巴，啊啊啊，
+下面牙齿刷一刷。
+前前后后来回刷，
+刷刷刷刷笑哈哈！
+
+[Glockenspiel sparkle]
+
+[Part 2 – 8 bars – glockenspiel, a little higher]
+上面牙齿也要刷，
+牙刷往上爬呀爬。
+前前后后来回刷，
+刷刷刷刷笑哈哈！
+
+[Glockenspiel sparkle]
+
+[Part 3 – 8 bars – rolling marimba, round circling melody]
+轻轻咬住合起来，
+旁边牙齿刷起来。
+小小圆圈转呀转，
+嗡嗡嗡嗡转圈圈！
+
+[Glockenspiel sparkle]
+
+[Part 4 – 8 bars – marimba and toy piano]
+前面牙齿露出来，
+大大笑脸真可爱！
+小小圆圈转呀转，
+嗡嗡嗡嗡转圈圈！
+
+[Glockenspiel sparkle]
+
+[Part 5 – 8 bars – marimba, whistling flute]
+换到那边去看看，
+牙刷跑去转一转。
+小小圆圈转呀转，
+嗡嗡嗡嗡转圈圈！
+
+[Glockenspiel sparkle]
+
+[Part 6 – 8 bars – soft ukulele, gentle wiping rhythm]
+再张大嘴，啊啊啊，
+舌头旁边刷一刷。
+从红到白嗖嗖嗖，
+白白牙齿滑溜溜！
+
+[Glockenspiel sparkle]
+
+[Part 7 – 8 bars – all instruments, joyful build]
+上面里面轻轻擦，
+马上就好顶呱呱！
+从红到白嗖嗖嗖，
+白白牙齿滑溜溜！
+
+[Part 8 – 8 bars – big happy finale, hand claps]
+刷好啦！牙齿亮晶晶，
+干干净净真开心！
+小怪兽们不见啦，好耶！
+好耶，好耶，好耶！
+
+[Final happy chord]
+[End]
+```
+
+Style of Music:
+
+```text
+cheerful Mandarin Chinese children's song for toddlers, exactly 112 BPM, steady tempo that never speeds up, C major, steady bouncy beat, one warm friendly female voice, slow clear pronunciation, simple sing-along melody, eight clearly different 8-bar sections, ukulele, glockenspiel, marimba, whistling flute, toy piano, light hand claps, bright and happy, no intro, no fade out, about 2 minutes 20 seconds
+```
+
+Exclude Styles:
+
+```text
+choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, speeding up, long intro
+```
+
+Title: `刷牙歌`
