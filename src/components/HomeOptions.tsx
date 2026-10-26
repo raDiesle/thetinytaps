@@ -126,17 +126,13 @@ function CommonOptions() {
     <section className="settings">
       <LanguageSetting settings={languages.settings} update={languages.update} />
       <p className="setting-note">
-        Die Sprache gilt für „Buchstaben &amp; Zahlen“ und „Wörter tippen“; das Bewegungsabenteuer hat seine eigene Sprachwahl, die anderen Spiele sind auf
-        Deutsch.
+        Die Sprache gilt für „Buchstaben &amp; Zahlen“, „Wörter tippen“ und das Zahnputzlied; das Bewegungsabenteuer hat seine eigene Sprachwahl, die anderen
+        Spiele sind auf Deutsch.
       </p>
 
       <SettingsGroup title="Ton">
         <Toggle label="Vorlesen (Namen, Sätze, Fragen)" checked={common.speech} onChange={(speech) => update({ speech })} />
-        {common.speech ? (
-          <VoiceSetting lang={pack.speechLang} sample={pack.letterSentence(b, b.words[0])} />
-        ) : (
-          <p className="setting-note">„Zähne putzen“ sagt seine Ansagen trotzdem – dort lassen sie sich abschalten.</p>
-        )}
+        {common.speech && <VoiceSetting lang={pack.speechLang} sample={pack.letterSentence(b, b.words[0])} />}
         <Toggle label="Töne und Geräusche" checked={common.sounds} onChange={(sounds) => update({ sounds })} />
         <Toggle
           label="🎵 Musik"
@@ -150,7 +146,7 @@ function CommonOptions() {
         <p className="setting-note">
           {common.music
             ? "Leise Musik im Hintergrund, ab dem ersten Tippen im Spiel. Spiele mit eigener Musik spielen ihre eigene."
-            : "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen."}
+            : "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen. Nur das Zahnputzlied spielt, es gehört zum Putzen."}
         </p>
       </SettingsGroup>
 

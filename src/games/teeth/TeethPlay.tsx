@@ -24,8 +24,6 @@ const TURN_MS = 1100;
 const MOUTH_MS = 1800;
 /** How long the arrows on the lips show after the mouth has to open or close. */
 const ACTION_MS = 3500;
-/** Brushing without a sung song: the two minutes dentists recommend, as long as the plain song's seven parts. */
-const BRUSH_MS = 120_000;
 /** Dragging on the progress bar stops this far before the end. */
 const SEEK_END_MS = 1000;
 
@@ -128,7 +126,7 @@ function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
  * one by one. Arrow keys skip ahead or back, Space or the pause button pauses,
  * and tapping the progress bar jumps there.
  */
-export function TeethPlay({ speechLang, settings }: { speechLang: string; settings: TeethSettings }) {
+export function TeethPlay({ speechLang, sungIn, settings }: { speechLang: string; sungIn: string; settings: TeethSettings }) {
   const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now() }));
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
@@ -141,14 +139,13 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   // A fresh set of monsters for every round, and a fresh look at the clock.
   const monsters = useMemo(placeMonsters, [round]);
-  const daytime = useMemo(() => daytimeOf(settings.daytime), [settings.daytime, round]);
+  const daytime = useMemo(() => daytimeOf(), [round]);
   const preludeCue = (p: Prelude) => PRELUDE[p].cue ?? DAYTIME[daytime].monsters;
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
   const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
   const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
-  // With a sung song the brushing lasts as long as the song and each step as long as its verse; otherwise two minutes in equal steps.
-  const sungIn = settings.music && settings.singing !== "off" ? settings.singing : null;
-  const stepStarts = useMemo(() => sungSteps(sungIn) ?? Array.from({ length: STEPS.length + 1 }, (_, k) => (k * BRUSH_MS) / STEPS.length), [sungIn]);
+  // The brushing lasts as long as the song and each step as long as its verse.
+  const stepStarts = useMemo(() => sungSteps(sungIn), [sungIn]);
   const stepLength = (k: number) => stepStarts[k + 1] - stepStarts[k];
   const totalMs = stepStarts[STEPS.length];
   const paused = clock.since === null;
@@ -181,11 +178,10 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
     return () => clearInterval(timer);
   }, [done, paused, round]);
 
-  // The brushing has its own song (or none, when it is switched off).
+  // The brushing has its own song.
   useNoBackgroundMusic();
-  // The sung song sings the steps, so the voice leaves them to it.
+  // The song sings the steps, so the voice leaves them to it.
   const sung = useBrushingMusic({
-    enabled: settings.music,
     sung: sungIn,
     playing: step !== null && !paused,
     finished: done,

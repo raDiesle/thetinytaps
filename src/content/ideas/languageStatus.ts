@@ -42,7 +42,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "done" },
     note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch, dieselben Sprachpakete wie „Buchstaben & Zahlen“.",
   },
-  { href: "/zaehne/", languages: { de: "done" }, note: "Das gesungene Zahnputzlied gibt es nur auf Deutsch (/zahnputzlied)." },
+  {
+    href: "/zaehne/",
+    languages: { de: "done", en: "partial" },
+    note: "Das Zahnputzlied singt in der Spielsprache der Startseite, auf Deutsch und Englisch (/zahnputzlied); die Ansage vorher ist Deutsch.",
+  },
   { href: "/laut-leise/", languages: { de: "done" } },
   { href: "/", languages: { de: "done" }, note: "Startseite, Einstellungen und alles für Eltern." },
 ];

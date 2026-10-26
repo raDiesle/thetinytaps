@@ -1,29 +1,20 @@
-import type { DaytimeChoice } from "./daytime";
-
 export interface TeethSettings {
-  /** Morning (sun, breakfast crumbs) or evening (moon, pyjamas, "Gute Nacht"); by the clock unless chosen. */
-  daytime: DaytimeChoice;
   /** At the end, a week with a star for every morning and evening brushed. */
   week: boolean;
   /** First fetch the brush and put toothpaste on it, shown and said. */
   prep: boolean;
-  /** Say where to brush next and how; off by default, the pictures and music carry the brushing. */
+  /** "Vorlesen" from the home page: says the prelude; the song sings the steps itself. */
   speech: boolean;
-  /** A little tune in the background while brushing; on by default, it makes the two minutes go by. */
-  music: boolean;
-  /** The song sung in this language (see sung.ts) instead of the plain tune, and the brushing lasts as long as it; "off" keeps the plain tune and two minutes. */
-  singing: string;
   /** A poof for every monster, a chime when it is time to move on. */
   sounds: boolean;
 }
 
+// No choices for the song or the daytime: the song always plays, sung in the app's
+// language (it is the brushing), and the clock says whether it is morning or evening.
 export const DEFAULT_TEETH_SETTINGS: TeethSettings = {
-  daytime: "auto",
   week: true,
   prep: true,
   speech: false,
-  music: true,
-  singing: "de",
   sounds: true,
 };
 

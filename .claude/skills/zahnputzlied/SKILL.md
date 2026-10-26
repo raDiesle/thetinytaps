@@ -12,9 +12,11 @@ sing its verses equally long, so **the steps follow the verses**: each step begi
 moment before its verse.
 
 A language is **just two files**: `musik/musik-zaehneputzen-lied-<lang>.mp3` (two-letter
-code) and the `.json` of the same name with where its verses begin. They appear in the
-setting „Gesungen“ by their name (`sung.ts`, `music.ts`). No code, unless the language
-has no name in `SUNG_LABELS` (`sung.ts`) yet – then one line.
+code) and the `.json` of the same name with where its verses begin. They are found by
+their name (`sung.ts`, `music.ts`) and play when the Spielsprache on the home page is that
+language (German otherwise), so a language the home page can't choose yet (`LANGUAGES` in
+`src/content/languages.ts`) is never heard. No code, unless the language has no name in
+`SUNG_LABELS` (`sung.ts`) yet – then one line; mark it in `src/content/ideas/languageStatus.ts`.
 
 The user makes the song on suno.com (never ask for their login); general Suno
 lessons are in `/musik-erzeugen`.
@@ -105,7 +107,7 @@ Then:
 ## 4. Check
 
 Sound is muted in Claude's preview. Log what plays instead (see `/musik-erzeugen` 5.),
-choose the language under „Gesungen“, press „Los geht's!“, skip the prelude with →, and
+choose the language as Spielsprache on the home page, open Zähne putzen, press „Los geht's!“, skip the prelude with →, and
 step through: the sung file must start at the `.json`'s times, one per step, and play
 the last one once at the end; the timer shows the song's length (finale − first verse). Ask the user to listen on a real device that
 each verse comes with its picture. Commit (`Zähne putzen: the brushing song in <Language>`)

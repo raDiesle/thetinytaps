@@ -4,9 +4,10 @@ import { addBrushing, dayKey, daytimeOf, weekOf } from "./daytime";
 // Dates are easy to get wrong by one: the week starts on Monday, local dates, no double stars.
 
 test("the clock picks morning before two and evening after", () => {
-  expect(daytimeOf("auto", new Date(2026, 9, 24, 7, 30))).toBe("morning");
-  expect(daytimeOf("auto", new Date(2026, 9, 24, 19, 0))).toBe("evening");
-  expect(daytimeOf("evening", new Date(2026, 9, 24, 7, 30))).toBe("evening");
+  expect(daytimeOf(new Date(2026, 9, 24, 7, 30))).toBe("morning");
+  expect(daytimeOf(new Date(2026, 9, 24, 13, 59))).toBe("morning");
+  expect(daytimeOf(new Date(2026, 9, 24, 14, 0))).toBe("evening");
+  expect(daytimeOf(new Date(2026, 9, 24, 19, 0))).toBe("evening");
 });
 
 test("the week runs from Monday to Sunday", () => {

@@ -65,7 +65,7 @@ CSS file for the tap animations, then add it to `SCENES` in `src/games/scenes/in
 The full guide (depth, keys, drawing style, checks) is the Claude Code skill
 [`.claude/skills/neue-szene/SKILL.md`](.claude/skills/neue-szene/SKILL.md) – run it with `/neue-szene`.
 
-Defaults: speech is off (except in "Zähne putzen", where the spoken hints are the point and have their own switch) and the picture only moves when someone taps, hovers or
+Defaults: speech is off ("Zähne putzen" has its song sing the steps instead, always) and the picture only moves when someone taps, hovers or
 presses a key. Parents turn on speech for all games on the home page, and idle movement and the keys mode
 ("Jedes Ding hat eine Taste") on the start screen of "Lebendige Bilder".
 

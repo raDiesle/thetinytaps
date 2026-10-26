@@ -5,15 +5,11 @@
 /** Which brushing of the day this is. */
 export type Daytime = "morning" | "evening";
 
-/** The parent's choice: by the clock, or always one of the two. */
-export type DaytimeChoice = "auto" | Daytime;
-
 /** Before two in the afternoon counts as the morning brush. */
 const EVENING_FROM_HOUR = 14;
 
-/** The daytime the parent chose, or the one the clock says. */
-export function daytimeOf(choice: DaytimeChoice, now = new Date()): Daytime {
-  if (choice !== "auto") return choice;
+/** The daytime the clock says. */
+export function daytimeOf(now = new Date()): Daytime {
   return now.getHours() < EVENING_FROM_HOUR ? "morning" : "evening";
 }
 

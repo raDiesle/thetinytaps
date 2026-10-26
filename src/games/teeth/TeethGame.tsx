@@ -1,19 +1,22 @@
 import { GameShell } from "@/components/GameShell";
-import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
+import { useLanguages } from "@/components/LanguageSetting";
+import { SettingsGroup, Toggle } from "@/components/SettingControls";
 import { de } from "@/content/de";
-import { useCommonSettings, useGameSettings } from "@/lib/common";
+import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
-import { SUNG_LANGUAGES } from "./music";
+import { SUNG_LANGUAGES, sungLanguage } from "./music";
 import { DEFAULT_TEETH_SETTINGS, TEETH_SETTINGS_KEY } from "./settings";
 import { KAI } from "./steps";
 import { SUNG_LABELS } from "./sung";
 import { TeethPlay } from "./TeethPlay";
 
+/** "🇩🇪 Deutsch oder 🇬🇧 Englisch": the languages the song is sung in. */
+const sungNames = new Intl.ListFormat("de", { type: "disjunction" }).format(SUNG_LANGUAGES.map((lang) => SUNG_LABELS[lang] ?? lang));
+
 export function TeethGame() {
-  const [shared, update, stored] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
-  // The spoken hints have their own switch here, independent of "Vorlesen" on the home page.
-  const settings = { ...shared, speech: stored.speech };
-  const [common] = useCommonSettings();
+  const [settings, update] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
+  // The song sings in the language the app's texts are in, so there is nothing to choose here.
+  const sungIn = sungLanguage(useLanguages().language.id);
   const { touchOnly } = useDevice();
 
   return (
@@ -22,47 +25,21 @@ export function TeethGame() {
       emoji="🦷"
       settings={
         <SettingsGroup title="Putzen">
-          <Choice
-            label="Tageszeit"
-            value={settings.daytime}
-            options={[
-              { value: "auto", label: "🕑 Nach der Uhr" },
-              { value: "morning", label: "☀️ Morgens" },
-              { value: "evening", label: "🌙 Abends" },
-            ]}
-            onChange={(daytime) => update({ daytime })}
-          />
-          <Toggle label="Vorher zeigen: Zahnbürste holen, Zahnpasta drauf" checked={settings.prep} onChange={(prep) => update({ prep })} />
-          <Toggle
-            label="Ansagen vorlesen („Mund weit auf!“) – auch wenn „Vorlesen“ auf der Startseite aus ist"
-            checked={settings.speech}
-            onChange={(speech) => update({ speech })}
-          />
-          <Toggle label="Wochenbild am Ende: ein Stern für jedes Putzen morgens und abends" checked={settings.week} onChange={(week) => update({ week })} />
-          <Toggle label="Musik beim Putzen" checked={settings.music} onChange={(music) => update({ music })} />
-          {!common.music && <p className="setting-note">Die Musik ist für alle Spiele aus (⚙️ auf der Startseite).</p>}
-          {settings.music && SUNG_LANGUAGES.length > 0 && (
-            <>
-              <Choice
-                label="Gesungen"
-                value={settings.singing}
-                options={[{ value: "off", label: "🎶 Nur Musik" }, ...SUNG_LANGUAGES.map((lang) => ({ value: lang, label: SUNG_LABELS[lang] ?? lang }))]}
-                onChange={(singing) => update({ singing })}
-              />
-              <p className="setting-note">
-                Das Lied singt zu jedem Schritt, was gerade dran ist, und das Putzen dauert so lange wie das Lied, gut 2 Minuten. Mit „Nur Musik“ sind es genau
-                2 Minuten.
-              </p>
-            </>
-          )}
+          <Toggle label="🪥 Vorher: Bürste holen, Zahnpasta drauf" checked={settings.prep} onChange={(prep) => update({ prep })} />
+          <Toggle label="⭐ Wochenbild: ein Stern für jedes Putzen" checked={settings.week} onChange={(week) => update({ week })} />
+          <p className="setting-note">
+            🎵 Das Zahnputzlied singt zu jedem Schritt, was gerade dran ist, und das Putzen dauert so lange wie das Lied, gut 2 Minuten. Es spielt immer, auch
+            wenn die Musik für alle Spiele aus ist, und singt in der Sprache von der Startseite: {sungNames}, sonst Deutsch. Mit „Vorlesen“ (Startseite) wird
+            vorher angesagt, was kommt.
+          </p>
           <p className="setting-note">
             Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI ({KAI}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist
             oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht
             geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und nach verschwinden. Der Bildschirm bleibt dabei an.
           </p>
           <p className="setting-note">
-            Morgens geht die Sonne auf und am Kinn kleben Frühstückskrümel; abends scheint der Mond, der Ärmel ist ein Schlafanzug und zum Schluss heißt es
-            „Gute Nacht“. Nach der Uhr ist bis 14 Uhr morgens.
+            Bis 14 Uhr ist morgens: Die Sonne geht auf und am Kinn kleben Frühstückskrümel. Danach ist abends: Der Mond scheint, der Ärmel ist ein Schlafanzug
+            und zum Schluss heißt es „Gute Nacht“.
           </p>
           <p className="setting-note">
             Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren erbsengroß. Danach ausspucken, nicht
@@ -80,8 +57,7 @@ export function TeethGame() {
         </SettingsGroup>
       }
     >
-      {/* Its own song, which plays only while music is on for all games too. */}
-      <TeethPlay speechLang={de.speechLang} settings={{ ...settings, music: settings.music && common.music }} />
+      <TeethPlay speechLang={de.speechLang} sungIn={sungIn} settings={settings} />
     </GameShell>
   );
 }

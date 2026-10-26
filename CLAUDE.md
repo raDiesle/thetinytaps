@@ -84,6 +84,8 @@ In a fresh worktree run `yarn install` first.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). Never add another way out.
+- Few settings, each with a short label: never a game option for what the home page already chooses
+  (Vorlesen, Musik, Spielsprache) or what the game can tell by itself (morning or evening by the clock).
 
 ## Architecture
 

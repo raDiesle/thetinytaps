@@ -11,7 +11,8 @@ export interface CommonSettings {
   sounds: boolean;
   /**
    * The background song in every game (`backgroundMusic.ts`); off also silences a game's
-   * own music and keeps the song files from being downloaded at all.
+   * own music and keeps the song files from being downloaded at all. Not the song of
+   * Zähne putzen: it sings the steps and sets how long the brushing lasts.
    */
   music: boolean;
 }
