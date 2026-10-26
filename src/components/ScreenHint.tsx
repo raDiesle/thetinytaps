@@ -25,6 +25,7 @@ function usePortrait(): boolean {
  * For the grown-up on phones and tablets, over menus and games: a note to hold
  * the device sideways while it stands upright, and once per visit the question
  * whether to play in fullscreen (a browser only allows fullscreen after a tap).
+ * „Trotzdem hochkant“ dismisses both for the visit, for grown-ups who keep the device upright.
  * Computers get neither: a game goes into fullscreen when it starts anyway.
  */
 export function ScreenHint() {
@@ -34,6 +35,8 @@ export function ScreenHint() {
   const fullscreen = useFullscreen();
   const { pathname } = useLocation();
   const [asked, setAsked] = useState(false);
+  // The grown-up may choose to play upright anyway; then neither note comes back during this visit.
+  const [upright, setUpright] = useState(false);
   const fullscreenPossible = canFullscreen() && !fullscreen && !isStandalone();
 
   // Once the page has been in fullscreen (a game started), leaving it isn't a reason to ask.
@@ -49,7 +52,12 @@ export function ScreenHint() {
     void enterFullscreen();
   };
 
-  if (portrait) {
+  const playUpright = () => {
+    setUpright(true);
+    setAsked(true);
+  };
+
+  if (portrait && !upright) {
     return (
       <div className="screen-hint" role="dialog" aria-modal aria-label={t(TURN)}>
         <svg className="screen-hint-phone" viewBox="0 0 120 120" aria-hidden>
@@ -60,11 +68,16 @@ export function ScreenHint() {
           </g>
         </svg>
         <p className="screen-hint-title">{t(TURN)}</p>
-        {fullscreenPossible && (
-          <button type="button" className="screen-hint-button" onClick={goFullscreen}>
-            <FullscreenIcon /> {t({ de: "Vollbild", ru: "Полный экран" })}
+        <div className="screen-hint-buttons">
+          {fullscreenPossible && (
+            <button type="button" className="screen-hint-button" onClick={goFullscreen}>
+              <FullscreenIcon /> {t({ de: "Vollbild", ru: "Полный экран" })}
+            </button>
+          )}
+          <button type="button" className="screen-hint-button secondary" onClick={playUpright}>
+            {t({ de: "Trotzdem hochkant" })}
           </button>
-        )}
+        </div>
       </div>
     );
   }
