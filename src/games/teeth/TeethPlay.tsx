@@ -22,9 +22,9 @@ const MONSTER_COLORS = ["#8bd346", "#b388ff", "#ff9f43", "#ff7bd0", "#4cc9f0"];
 const MONSTER_VARIANTS = 3;
 const TICK_MS = 200;
 const TICKLE_MS = 700;
-const TURN_MS = 1100;
+const TURN_MS = 1600;
 /** Opening or closing the mouth glides slower, so the child can do it along with the picture. */
-const MOUTH_MS = 1800;
+const MOUTH_MS = 2100;
 /** How long the arrows on the lips show after the mouth has to open or close. */
 const ACTION_MS = 3500;
 /** Brushing without a sung song: the two minutes dentists recommend, as long as the plain song's seven parts. */
@@ -41,8 +41,8 @@ type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters";
 
 /** How the monsters grow depends on the time of day (over the day or the night), see DAYTIME. */
 const PRELUDE: Record<Prelude, { ms: number; title: string; cue?: string }> = {
-  sweets: { ms: 4800, title: "🍭 Süßes essen", cue: "Mmh, Süßes! Ein bisschen Zucker bleibt an den Zähnen." },
-  grow: { ms: 5000, title: "👾 Zuckermonster wachsen" },
+  sweets: { ms: 9600, title: "🍭 Süßes essen", cue: "Mmh, Süßes! Ein bisschen Zucker bleibt an den Zähnen." },
+  grow: { ms: 6000, title: "👾 Zuckermonster wachsen" },
   brush: { ms: 7000, title: "🪥 Zahnbürste holen", cue: "Zuerst holen wir die Zahnbürste!" },
   paste: { ms: 8000, title: "🫧 Zahnpasta drauf", cue: "Jetzt ein kleiner Klecks Zahnpasta drauf." },
   monsters: { ms: 4500, title: "😱 Zuckermonster!", cue: "Oh je, da sind sie! Komm, wir putzen sie alle weg!" },
@@ -358,32 +358,30 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       <span className="teeth-sky" aria-hidden>
         {daytime === "morning" ? "☀️" : "🌙"}
       </span>
-      {/* Before the brushing it counts down to its start, then the brushing time left. */}
-      <p className={`teeth-clock${before ? " before" : ""}`} aria-label={before ? "Zeit bis zum Start" : "Restzeit"}>
-        {before ? `🪥 ${formatTime(-brushed)}` : formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
-      </p>
-      <div className="teeth-heading" key={`${round}-${part}`}>
-        <h2 className="teeth-cue">{before ? PRELUDE[before].title : step ? step.title : DAYTIME[daytime].doneTitle}</h2>
-        {before === "paste" && (
-          <p className="teeth-mouth prep">
-            👌 Erbsengroß
-            <span className="teeth-hint"> · unter 2 Jahren nur reiskorngroß</span>
-          </p>
-        )}
-        {step && (
-          <p className={`teeth-mouth ${step.mouth}`}>
-            <span className="teeth-mouth-icon">{step.mouth === "open" ? "😮" : "😬"}</span>
-            {step.mouth === "open" ? " Mund weit auf" : " Zähne zusammen"}
-            <span className="teeth-hint"> · {step.hint}</span>
-          </p>
-        )}
-        {done && (
-          <p className="teeth-mouth spit">
-            💦 Ausspucken
-            <span className="teeth-hint"> · nicht mit Wasser nachspülen</span>
-          </p>
-        )}
-      </div>
+      {/* Before the brushing it counts down to its start; the brushing time left sits next to the progress bar. */}
+      {before && (
+        <p className="teeth-clock" aria-label="Zeit bis zum Start">
+          🪥 {formatTime(-brushed)}
+        </p>
+      )}
+      {/* While brushing no text at all: the picture, the song and the voice say what to do, and the mouth gets the room. */}
+      {!step && (
+        <div className="teeth-heading" key={`${round}-${part}`}>
+          <h2 className="teeth-cue">{before ? PRELUDE[before].title : DAYTIME[daytime].doneTitle}</h2>
+          {before === "paste" && (
+            <p className="teeth-mouth prep">
+              👌 Erbsengroß
+              <span className="teeth-hint"> · unter 2 Jahren nur reiskorngroß</span>
+            </p>
+          )}
+          {done && (
+            <p className="teeth-mouth spit">
+              💦 Ausspucken
+              <span className="teeth-hint"> · nicht mit Wasser nachspülen</span>
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Before the picture, so it is there when the picture measures it. */}
       <div className="teeth-room" ref={room} />
@@ -423,8 +421,8 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
         </div>
       ) : (
         <>
-          {/* The week shows before brushing too, which star is to come (not on a phone, where the sink needs the room); while brushing, the mouth gets its room. */}
-          {before && settings.week && (
+          {/* The week shows before brushing too, which star is to come (not during the story, nor on a phone, where the pictures need the room); while brushing, the mouth gets its room. */}
+          {before && before !== "sweets" && before !== "grow" && settings.week && (
             <div className="teeth-week-before">
               <Week log={week} today={new Date()} now={daytime} />
             </div>
@@ -449,11 +447,17 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
               }}
             >
               {STEPS.map((s, i) => (
-                <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}>
+                <span key={i} className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`} title={`${s.title} · ${s.hint}`}>
                   <span style={{ width: `${Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i))) * 100}%` }} />
                 </span>
               ))}
             </div>
+            {/* The brushing time left, for the grown-up; only where the screen is wide enough (teeth.css). */}
+            {!before && (
+              <span className="teeth-time" aria-label="Restzeit">
+                {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
+              </span>
+            )}
           </div>
         </>
       )}

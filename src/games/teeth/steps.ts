@@ -4,9 +4,9 @@ import { ALL_TEETH, type Jaw, type Side, type Surface, type ToothId, type View }
 export type Motion = "scrub" | "circle" | "wipe";
 
 export interface Step {
-  /** Big, for the child. */
+  /** What the step is; no text shows while brushing, so this is the progress bar segment's tooltip, with the hint. */
   title: string;
-  /** Small, for the grown-up. */
+  /** How to brush there, for the grown-up. */
   hint: string;
   /** Spoken when the step begins. */
   cue: string;
