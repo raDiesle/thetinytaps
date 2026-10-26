@@ -19,3 +19,46 @@ test("keyframe names are unique across all CSS files", () => {
   const twice = [...files].filter(([, where]) => where.length > 1).map(([name, where]) => `${name}: ${where.join(", ")}`);
   expect(twice).toEqual([]);
 });
+
+// Words in an `animation` shorthand that are not keyframe names.
+const animationKeywords = new Set(
+  "none infinite linear ease ease-in ease-out ease-in-out step-start step-end forwards backwards both normal reverse alternate alternate-reverse running paused inherit initial unset".split(
+    " ",
+  ),
+);
+
+/** The keyframe names an `animation` or `animation-name` in this CSS uses. */
+function usedKeyframes(css: string): string[] {
+  const names: string[] = [];
+  for (const [, value] of css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/animation(?:-name)?\s*:\s*([^;}]+)/g)) {
+    let words = value;
+    // Drop cubic-bezier(…), var(…), calc(var(…) * …): inner calls first.
+    while (/[\w-]+\([^()]*\)/.test(words)) words = words.replace(/[\w-]+\([^()]*\)/g, " ");
+    for (const word of words.split(/[\s,]+/)) {
+      if (/^[a-z][\w-]*$/i.test(word) && !animationKeywords.has(word)) names.push(word);
+    }
+  }
+  return names;
+}
+
+// A game's CSS arrives only when the game is opened, so keyframes from another game's
+// CSS may be missing. Keyframes a game borrows live in a stylesheet every page loads
+// (src/styles/animations.css); a game may use its own and those.
+test("keyframes come from the same game or from a stylesheet every page loads", () => {
+  const everyPage = [...readFileSync("src/globals.css", "utf8").matchAll(/@import\s+"\.\/(styles\/[\w-]+\.css)"/g)].map(([, file]) => join("src", file));
+  /** The folder whose CSS loads together: a game's folder, or the file itself outside games. */
+  const owner = (file: string) => file.match(/^src\/games\/[^/]+\//)?.[0] ?? file;
+  const definedIn = new Map<string, string>();
+  for (const file of cssFiles) {
+    for (const [, name] of readFileSync(file, "utf8").matchAll(/@keyframes\s+([\w-]+)/g)) definedIn.set(name, file);
+  }
+  const wrong: string[] = [];
+  for (const file of cssFiles) {
+    for (const name of new Set(usedKeyframes(readFileSync(file, "utf8")))) {
+      const where = definedIn.get(name);
+      if (!where) wrong.push(`${file}: ${name} is not defined anywhere`);
+      else if (!everyPage.includes(where) && owner(file) !== owner(where)) wrong.push(`${file}: ${name} comes from ${where}`);
+    }
+  }
+  expect(wrong).toEqual([]);
+});

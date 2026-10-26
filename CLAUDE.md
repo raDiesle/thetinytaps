@@ -93,7 +93,9 @@ In a fresh worktree run `yarn install` first.
   are German where they are user-facing (`/bilder/`, `/aufzug/`).
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
   classes and `@keyframes` by game or scene (`el-`, `bs-`); never style another
-  game's classes. A game using another game's parts imports that CSS itself.
+  game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
+  (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
+  keyframes from another game's CSS (`css.test.ts` checks it).
 - Drawings are SVG in React components, animated with CSS classes; no image files
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
