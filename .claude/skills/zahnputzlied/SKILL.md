@@ -82,6 +82,14 @@ start and length:
 
 - **A line not found:** it prints what Whisper heard there. Usually Suno left out or
   changed the line – a new take is better than forcing it.
+- **Nothing found at all** (Chinese, likely other scripts too): the `.mp3` is already
+  written; the matching failed, not the song. Whisper writes Chinese in traditional
+  characters and hears homophones (牙齿 → 雅之), so letters can't match. Write the `.json`
+  by hand instead: `whisper-cli -m ~/.cache/whisper/ggml-base.bin -l zh -f song.wav --prompt "以下是简体中文的儿歌歌词。"`
+  prints each sung line with its time (the prompt gets simplified characters), and the
+  same with `-ml 1 -dtw base` gives word times; take each part's first line where both
+  agree, minus 0.3 s, and draw part 1. Suno sings a line every 2 bars (about 4.3 s), so
+  a start that breaks that grid is suspect.
 - **"odd length"** (a step under 13 s or over 26 s): Suno crammed or stretched a verse.
   Usable (the German take has a 9 s step), but tell the user and offer a new take.
 - **"unsure start"**: Whisper spread the line's first three words over more than 3 s,
