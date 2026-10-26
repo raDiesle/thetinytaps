@@ -551,7 +551,12 @@ Title: `刷牙歌`
 
 ## हिन्दी (`hi`, 26 Oct 2026)
 
-Not made in Suno yet. Only imperatives (_खोलो_, _करो_) and sentences about the teeth and
+Made in Suno on 26 Oct 2026 with the texts below. A whistled intro until about 8.7 s. Suno
+sings „घिस-घिस-घिस, ब्रश चलाओ!“ twice in parts 1 and 2, so those steps are 22 s; the others
+16 to 19 s. The brushing lasts 2:11, the song runs 2:34. `yarn song:verses` couldn't match
+the lines (Whisper wrote Latin or Urdu letters and looped from 1:44 on), so the starts were
+written by hand from Whisper's word times, cuts around parts 6–8 and the spectrogram.
+Only imperatives (_खोलो_, _करो_) and sentences about the teeth and
 the brush, so nothing changes for boy or girl. Sound words to join in: _घिस-घिस_ (scrubbing),
 _भन-भन_ (buzzing circles), _सर-सर_ (wiping). The sugar monsters are _कीड़े_ (the tooth bugs
 Indian families know). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a
@@ -639,3 +644,94 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
 ```
 
 Title: `चलो ब्रश करें`
+
+## العربية (`ar`, 26 Oct 2026)
+
+Not made in Suno yet. Modern Standard Arabic. Arabic imperatives change for boy or girl
+(افتحْ / افتحي), so the verses say "let's" (هيّا نـ…, first person plural) or speak of "my
+teeth". Sound words to join in: _فَرْك_ (scrubbing), _زُن_ (buzzing circles), _فِش_ (wiping),
+_هيييه_ (hooray). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a native
+speaker; the least sure of all the languages.
+
+Lyrics:
+
+```text
+[Tempo: 112 BPM, steady, the same tempo all the way through]
+
+[Part 1 – 8 bars – bouncy ukulele, scrubbing rhythm]
+هيّا نفتحُ فمَنا، آآآ!
+ننظّفُ تحتُ هنا!
+ذهابًا وإيابًا،
+فَرْك، فَرْك، هيّا بِنا!
+
+[Glockenspiel sparkle]
+
+[Part 2 – 8 bars – glockenspiel, a little higher]
+والآنَ فوقُ، فوقُ، فوق!
+الفرشاةُ تطيرُ بشوق!
+ذهابًا وإيابًا،
+فَرْك، فَرْك، هيّا بِنا!
+
+[Glockenspiel sparkle]
+
+[Part 3 – 8 bars – rolling marimba, round circling melody]
+نُطبِقُ أسنانَنا معًا،
+ونلُفُّ في الجنبِ معًا!
+دوائرُ صغيرة، لفّة لفّة،
+زُن، زُن، زُن، خفيفة خفيفة!
+
+[Glockenspiel sparkle]
+
+[Part 4 – 8 bars – marimba and toy piano]
+نبتسمُ ابتسامةً كبيرة،
+من الأمام، يا أسناني المنيرة!
+دوائرُ صغيرة، لفّة لفّة،
+زُن، زُن، زُن، خفيفة خفيفة!
+
+[Glockenspiel sparkle]
+
+[Part 5 – 8 bars – marimba, whistling flute]
+والآنَ الجنبُ الثاني،
+الفرشاةُ تأتي وتغنّي!
+دوائرُ صغيرة، لفّة لفّة،
+زُن، زُن، زُن، خفيفة خفيفة!
+
+[Glockenspiel sparkle]
+
+[Part 6 – 8 bars – soft ukulele, gentle wiping rhythm]
+هيّا نفتحُ فمَنا، آآآ!
+من الداخل، عند اللسان، هنا!
+من الأحمر للأبيض، فِش، فِش، فِش،
+أسناني بيضاءُ كالريش!
+
+[Glockenspiel sparkle]
+
+[Part 7 – 8 bars – all instruments, joyful build]
+ومن الداخلِ فوقُ كذلك،
+نكادُ ننتهي، ما أحلى ذلك!
+من الأحمر للأبيض، فِش، فِش، فِش،
+أسناني بيضاءُ كالريش!
+
+[Part 8 – 8 bars – big happy finale, hand claps]
+أسناني تلمعُ وتلمع،
+بيضاءُ نظيفةٌ، ما أروع!
+لا وحوشَ بعدَ الآن، هيييه!
+هيييه، هيييه، هيييه!
+
+[Final happy chord]
+[End]
+```
+
+Style of Music:
+
+```text
+cheerful Arabic children's song for toddlers, Modern Standard Arabic, exactly 112 BPM, steady tempo that never speeds up, C major, steady bouncy beat, one warm friendly female voice, slow clear pronunciation, simple sing-along melody, eight clearly different 8-bar sections, ukulele, glockenspiel, marimba, whistling flute, toy piano, light hand claps, bright and happy, no intro, no fade out, about 2 minutes 20 seconds
+```
+
+Exclude Styles:
+
+```text
+choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, speeding up, long intro
+```
+
+Title: `أغنية تنظيف الأسنان`
