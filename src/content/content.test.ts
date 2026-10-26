@@ -4,6 +4,8 @@ import { CATEGORIES } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, LANGUAGES, toUpper } from "./languages";
 import { RESEARCH } from "./research";
+import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
+import { SCENES } from "../games/scenes";
 import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
@@ -44,6 +46,38 @@ describe("ideas", () => {
 
   test("a rejected idea is not marked as done", () => {
     expect(ideas.filter(({ idea }) => idea.rejected && idea.done).map(({ idea }) => idea.id)).toEqual([]);
+  });
+});
+
+describe("search engine texts (seo.ts)", () => {
+  const paths = SEO_PAGES.map((page) => page.path);
+
+  test("every page of the menu and every scene has one, and nothing else", () => {
+    const wanted = [
+      "/",
+      ...CATEGORIES.map((category) => `/spiele/${category.id}/`),
+      ...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)),
+      ...SCENES.map((scene) => `/bilder/${scene.id}/`),
+    ];
+    expect([...paths].sort()).toEqual([...new Set(wanted)].sort());
+  });
+
+  test.each(SEO_PAGES.map((page) => [page.path, page] as const))("%s: title and description fit in a search result", (_, page) => {
+    expect(fullTitle(page).length, fullTitle(page)).toBeLessThanOrEqual(70);
+    expect(page.description.length, page.description).toBeGreaterThanOrEqual(80);
+    expect(page.description.length, page.description).toBeLessThanOrEqual(160);
+    expect(page.text.length).toBeGreaterThan(60);
+  });
+
+  test("titles and descriptions are not shared between pages", () => {
+    for (const key of ["title", "description"] as const) {
+      const values = SEO_PAGES.map((page) => page[key]);
+      expect(values.filter((v, i) => values.indexOf(v) !== i)).toEqual([]);
+    }
+  });
+
+  test("grown-up pages are never in the search pages", () => {
+    for (const path of NO_INDEX_PATHS) expect(paths).not.toContain(path);
   });
 });
 

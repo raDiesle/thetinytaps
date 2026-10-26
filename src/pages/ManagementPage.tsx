@@ -21,6 +21,7 @@ import { RESEARCH, type Research } from "@/content/research";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/content/targetLanguages";
 import { useStoredSettings } from "@/lib/storage";
 import { useTitle } from "@/lib/title";
+import "@/styles/ideas.css";
 
 /** The grown-up's own decision on an idea, saved per browser. */
 type Mark = "next" | "maybe" | "no";

@@ -47,3 +47,17 @@ html:has(.play-area) body {
   overflow: hidden;
   overscroll-behavior: none;
 }
+
+/* The page's text from the build (src/content/seo.ts), shown until the app replaces it
+   and read by search engines; plain and calm, it is only there for a moment. */
+.seo-page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 48px 24px;
+  line-height: 1.5;
+}
+
+.seo-page ul {
+  padding-left: 20px;
+  font-size: 0.9rem;
+}
