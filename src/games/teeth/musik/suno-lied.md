@@ -456,7 +456,12 @@ Title: `Laviamo i denti!`
 
 ## 中文 (`zh`, 26 Oct 2026)
 
-Not made in Suno yet. Mandarin, simplified characters, seven syllables a line, every pair
+Made in Suno on 26 Oct 2026 with the texts below. A short intro until 2.5 s, then every line
+about 4.3 s after the last without breaks between the parts (about 115 BPM), so every step is
+16 to 17 s; the brushing lasts 1:57, the song runs 2:26. `yarn song:verses` couldn't match the
+lines (Whisper writes traditional characters and hears homophones: 牙齿 → 雅之), so the starts
+were written by hand from Whisper's line times and the spectrogram (see `/zahnputzlied`).
+Mandarin, simplified characters, seven syllables a line, every pair
 rhyming. Sound words to join in: _刷刷刷_ (shuā, scrubbing), _嗡嗡嗡_ (wēng, circling like a
 bee), _嗖嗖嗖_ (sōu, wiping). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a
 native speaker.
@@ -543,3 +548,94 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
 ```
 
 Title: `刷牙歌`
+
+## हिन्दी (`hi`, 26 Oct 2026)
+
+Not made in Suno yet. Only imperatives (_खोलो_, _करो_) and sentences about the teeth and
+the brush, so nothing changes for boy or girl. Sound words to join in: _घिस-घिस_ (scrubbing),
+_भन-भन_ (buzzing circles), _सर-सर_ (wiping). The sugar monsters are _कीड़े_ (the tooth bugs
+Indian families know). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a
+native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 112 BPM, steady, the same tempo all the way through]
+
+[Part 1 – 8 bars – bouncy ukulele, scrubbing rhythm]
+मुँह को खोलो, आ बोलो!
+नीचे दाँत, ब्रश से धो लो।
+आगे जाओ, पीछे आओ,
+घिस-घिस-घिस, ब्रश चलाओ!
+
+[Glockenspiel sparkle]
+
+[Part 2 – 8 bars – glockenspiel, a little higher]
+अब ऊपर की बारी है,
+ब्रश की ऊँची सवारी है!
+आगे जाओ, पीछे आओ,
+घिस-घिस-घिस, ब्रश चलाओ!
+
+[Glockenspiel sparkle]
+
+[Part 3 – 8 bars – rolling marimba, round circling melody]
+दाँत मिलाओ, बंद करो,
+एक तरफ़ से शुरू करो।
+छोटे-छोटे गोल-गोल,
+भन-भन-भन, गोल-मटोल!
+
+[Glockenspiel sparkle]
+
+[Part 4 – 8 bars – marimba and toy piano]
+आगे के दाँत दिखाओ,
+बड़ी सी मुस्कान लाओ!
+छोटे-छोटे गोल-गोल,
+भन-भन-भन, गोल-मटोल!
+
+[Glockenspiel sparkle]
+
+[Part 5 – 8 bars – marimba, whistling flute]
+अब दूसरी तरफ़ चलो,
+ब्रश से धीरे-धीरे मलो।
+छोटे-छोटे गोल-गोल,
+भन-भन-भन, गोल-मटोल!
+
+[Glockenspiel sparkle]
+
+[Part 6 – 8 bars – soft ukulele, gentle wiping rhythm]
+फिर से मुँह को खोलो, आ!
+अंदर, जीभ के पास, हाँ!
+लाल से सफ़ेद, सर-सर-सर,
+दाँत चमकते सुंदर-सुंदर!
+
+[Glockenspiel sparkle]
+
+[Part 7 – 8 bars – all instruments, joyful build]
+अंदर ऊपर, धीरे-धीरे,
+बस थोड़ा सा, मेरे हीरे!
+लाल से सफ़ेद, सर-सर-सर,
+दाँत चमकते सुंदर-सुंदर!
+
+[Part 8 – 8 bars – big happy finale, hand claps]
+हो गया! चम-चम चमके,
+सारे दाँत दम-दम दमके!
+कीड़े सारे गायब, हुर्रे!
+हुर्रे, हुर्रे, हुर्रे!
+
+[Final happy chord]
+[End]
+```
+
+Style of Music:
+
+```text
+cheerful Hindi children's song for toddlers, exactly 112 BPM, steady tempo that never speeds up, C major, steady bouncy beat, one warm friendly female voice, slow clear pronunciation, simple sing-along melody, eight clearly different 8-bar sections, ukulele, glockenspiel, marimba, whistling flute, toy piano, light hand claps, bright and happy, no intro, no fade out, about 2 minutes 20 seconds
+```
+
+Exclude Styles:
+
+```text
+choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, speeding up, long intro
+```
+
+Title: `चलो ब्रश करें`
