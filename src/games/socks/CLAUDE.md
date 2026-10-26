@@ -7,3 +7,7 @@ A full washing machine waits, still and silent; the first tap or key starts it (
 `SocksPlay.tsx` holds the phases (ready → washing → sorting → done) and the flight: the floor sock gets a `translate`/`scale` to its empty place on the line (measured from its grid cell, since the lifted sock's own box is shifted) while `.sock.flying` adds the hop as a `transform` animation; after `FLY_MS` the floor sock hides and the line one shows. The floor grid is sized by `fitPile` to the room left beside (landscape) or above (portrait) the small machine. Drawings (sock with SVG pattern tiles, peg, washing machine) in `drawings.tsx`; colours, patterns, `dealPairs` and spoken texts in `content.ts`, checked by `socks.test.ts`.
 
 Keys: any key starts the machine; arrows (and any other key) move a frame over the socks still on the floor and play their note, Space/Enter takes the framed one, 1–9 take a sock directly.
+
+## Languages
+
+The game speaks the app language (German or Russian, `useAppLanguage()`): start screen texts inline with `t({ de, ru })`, spoken texts and the pair counts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, Russian in `content.ru.ts`), speech in `language.speechLang`. A new text goes into `SockTexts`, so every language has to fill it; numbers with a word ("3 Paare", „5 пар“) go through `texts.pairs(n)`, which picks the Russian form with `Intl.PluralRules`; `socks.test.ts` checks both languages.

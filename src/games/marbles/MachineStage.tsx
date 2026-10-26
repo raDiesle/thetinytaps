@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
+import type { MarbleLevel } from "./settings";
 import type { MachineEvent } from "./machineKit";
 
 /** How fast the camera catches up with the action, per second. */
@@ -21,12 +22,13 @@ export interface MachineBase {
  */
 export function MachineStage({
   machine,
-  label,
+  level,
   sound,
   say,
   onDone,
   children,
-}: LevelProps & { machine: MachineBase; label: string; children: (t: number) => ReactNode }) {
+}: LevelProps & { machine: MachineBase; level: MarbleLevel; children: (t: number) => ReactNode }) {
+  const label = useLevelName(level);
   /** Seconds since the tap; below 0 until then. */
   const clock = useRef(-1);
   const fired = useRef(0);

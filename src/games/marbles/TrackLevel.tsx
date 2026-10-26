@@ -1,9 +1,10 @@
 import { useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
-import { type LevelProps, useAnyKey, useFrames, VIEW_H, VIEW_W, wobble } from "./level";
+import { type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble } from "./level";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
+import { useT } from "@/lib/language";
 import {
   playBells,
   playBlub,
@@ -258,6 +259,9 @@ const never = (n: number) => Array.from({ length: n }, () => -Infinity);
  * marble comes out of the tunnel changed (K-06).
  */
 export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProps) {
+  const label = useLevelName("track");
+  // `t` is the time everywhere here, so the translation helper gets another name.
+  const tr = useT();
   const routes = useMemo(buildRoutes, []);
   const build = useRef<Piece[]>(rebuild ? [...keptBuild] : [...DEFAULT_BUILD]);
   const spots = useRef<SpotState[]>(SLOTS.map(() => ({ hit: -Infinity, swapped: -Infinity, angle: 0, spin: 0, pending: null })));
@@ -392,7 +396,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
       done.current = true;
       fullAt.current = t;
       sound(playBells);
-      say("Der Korb ist voll!");
+      say({ de: "Der Korb ist voll!", ru: "Корзина полна!" });
       setTimeout(onDone, DONE_AFTER_FULL_MS);
     }
   };
@@ -666,7 +670,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
 
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
-      <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label="Klingende Kugelbahn">
+      <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
         <defs>
           <pattern id={pegs} width="50" height="50" patternUnits="userSpaceOnUse">
             <circle cx="25" cy="25" r="4.5" fill="#d7ac72" />
@@ -860,7 +864,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         <button
           type="button"
           className={`run-space${held.current === " " ? " down" : ""}`}
-          aria-label="Leertaste"
+          aria-label={tr({ de: "Leertaste", ru: "Пробел" })}
           onPointerDown={(e) => {
             e.stopPropagation();
             rebuildNext();

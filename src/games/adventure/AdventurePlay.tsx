@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import type { TargetLanguage } from "@/content/targetLanguages";
+import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { useAppLanguage, useT } from "@/lib/language";
 import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
 import type { AdventureSettings } from "./settings";
-import type { Cue, Story, StoryFrame } from "./stories/story";
+import { type Cue, type Story, type StoryFrame, storyTitle } from "./stories/story";
 import { Music } from "./three/music";
 import { StoryPlayer } from "./three/player";
 import { Silhouette } from "./three/silhouette";
@@ -32,6 +33,12 @@ const smooth = (k: number) => {
 /** How much the outline shows: it comes in when Tapsi starts to show the movement and goes with the praise. */
 const outlineShown = (f: StoryFrame) => smooth((f.act + f.demo + 0.8) / 0.8) * (1 - smooth(f.praise / 0.8));
 
+/** What step `i` is called on the route, for grown-ups in the app language: the story's translation, else the German name. */
+function stepName(story: Story, i: number, language: TargetLanguageId) {
+  const step = story.sequence.steps[i];
+  return story.translations?.[language]?.steps[i]?.name ?? step.name ?? movement(step.movement).name;
+}
+
 /**
  * A 3D movement story: the fox Tapsi shows each movement and the child does
  * it along in front of the screen; the world answers on its own time. Nobody
@@ -52,6 +59,8 @@ export function AdventurePlay({ story, language, settings }: { story: Story; lan
   const settingsRef = useRef(settings);
   settingsRef.current = settings;
   const musicRef = useRef<Music | null>(null);
+  const t = useT();
+  const app = useAppLanguage();
 
   useWakeLock(!ended && !paused);
   // The story has its own music, which the stop dance needs to control.
@@ -169,49 +178,56 @@ export function AdventurePlay({ story, language, settings }: { story: Story; lan
   if (failed) {
     return (
       <div className="adventure adventure-failed">
-        <p>Dieses Gerät kann die 3D-Bilder leider nicht zeigen.</p>
+        <p>{t({ de: "Dieses Gerät kann die 3D-Bilder leider nicht zeigen.", ru: "К сожалению, это устройство не может показать 3D-картинки." })}</p>
       </div>
     );
   }
 
-  const current = story.sequence.steps[step];
+  // For screen readers: what happens in this step (the library's description), in other app languages Tapsi's first line there.
+  const own = app.id === "de" ? undefined : story.translations?.[app.id]?.steps[step];
+  const scene = own ? (own.situation ?? own.instruction) : story.sequence.steps[step].situation;
+  const back = t({ de: "Zurück", ru: "Назад" });
+  const forward = t({ de: "Vor", ru: "Вперёд" });
+  const resume = t({ de: "Weiter", ru: "Дальше" });
+  const pause = t({ de: "Pause", ru: "Пауза" });
+  const space = t({ de: "Leertaste", ru: "Пробел" });
 
   return (
     <div className="adventure">
       <canvas ref={canvasRef} className="adventure-canvas" />
       <div ref={flashRef} className="adventure-flash" aria-hidden />
       <div ref={outlineRef} className="adventure-outline" aria-hidden />
-      <ol className="adventure-route" aria-label={story.sequence.title}>
-        {story.sequence.steps.map((s, i) => (
+      <ol className="adventure-route" aria-label={storyTitle(story, app.id)}>
+        {story.sequence.steps.map((_, i) => (
           <li key={i} className={pointing !== null ? (i === pointing ? "now" : "") : i < step ? "done" : i === step ? "now" : ""}>
-            <button type="button" title={s.name ?? movement(s.movement).name} onClick={() => jump((p) => p.jump(i))}>
+            <button type="button" title={stepName(story, i, app.id)} onClick={() => jump((p) => p.jump(i))}>
               {story.lines[i].icon}
             </button>
           </li>
         ))}
       </ol>
       <div className="adventure-controls">
-        <button type="button" onClick={() => jump((p) => p.skip(-1))} aria-label="Zurück" title="Zurück (←)">
+        <button type="button" onClick={() => jump((p) => p.skip(-1))} aria-label={back} title={`${back} (←)`}>
           ⏮
         </button>
-        <button type="button" onClick={togglePause} aria-label={paused ? "Weiter" : "Pause"} title={paused ? "Weiter (Leertaste)" : "Pause (Leertaste)"}>
+        <button type="button" onClick={togglePause} aria-label={paused ? resume : pause} title={`${paused ? resume : pause} (${space})`}>
           {paused ? "▶" : "⏸"}
         </button>
-        <button type="button" onClick={() => jump((p) => p.skip(1))} aria-label="Vor" title="Vor (→)">
+        <button type="button" onClick={() => jump((p) => p.skip(1))} aria-label={forward} title={`${forward} (→)`}>
           ⏭
         </button>
       </div>
       {paused && (
-        <button type="button" className="adventure-paused" onClick={togglePause} aria-label="Weiter">
+        <button type="button" className="adventure-paused" onClick={togglePause} aria-label={resume}>
           ▶
         </button>
       )}
       {ended && (
-        <button type="button" className="adventure-again" onClick={again} aria-label="Nochmal">
+        <button type="button" className="adventure-again" onClick={again} aria-label={t({ de: "Nochmal", ru: "Ещё раз" })}>
           🔁
         </button>
       )}
-      <p className="adventure-sr-only">{current.situation}</p>
+      <p className="adventure-sr-only">{scene}</p>
     </div>
   );
 }

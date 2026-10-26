@@ -1,12 +1,15 @@
 import { GameEnd } from "@/components/GameEnd";
+import { useAppLanguage } from "@/lib/language";
 import { STORIES } from "./content";
 import { PICTURES } from "./kid";
+import { titleIn } from "./phrases";
 import { Fitted, GOALS, type Picture } from "./trail/items";
 import { TRAIL_LEVELS } from "./trail/levels";
 
 /** A story or level, with the picture on its „Weiter“ button. */
 export interface StoryCard {
   id: string;
+  /** German; shown through `titleIn` in the app language. */
   title: string;
   picture: Picture;
 }
@@ -25,11 +28,12 @@ export function nextCard(id: string) {
 
 /** The end of a story: „Nochmal“ plays it again, „Weiter“ with the next story's picture starts that one. */
 export function StoryEnd({ id, onPick }: { id: string; onPick: (id: string) => void }) {
+  const language = useAppLanguage();
   const next = nextCard(id);
   const picture = (
     <svg className="el-end-picture" viewBox="-130 -100 260 200" aria-hidden>
       <Fitted picture={next.picture} width={200} height={150} />
     </svg>
   );
-  return <GameEnd onAgain={() => onPick(id)} next={{ emoji: picture, name: next.title, onNext: () => onPick(next.id) }} />;
+  return <GameEnd onAgain={() => onPick(id)} next={{ emoji: picture, name: titleIn(next.title, language.id), onNext: () => onPick(next.id) }} />;
 }

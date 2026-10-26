@@ -6,6 +6,7 @@
 // say "Stopp!", step away, get a grown-up, ask, wait, swap. Every step has a
 // not-so-good idea before it, so the child always chooses between two.
 
+import type { Localized } from "@/lib/language";
 import type { Beat, OopsSound } from "./story";
 
 export type SituationId = "push" | "kick" | "grab" | "slide" | "want" | "angry" | "bye" | "new" | "fall" | "stop";
@@ -44,7 +45,7 @@ export interface Situation {
 }
 
 /** Asked before the first step of a story. */
-export const QUESTION = "Was kann der kleine Bär tun?";
+export const QUESTION: Localized = { de: "Was kann der kleine Bär tun?", ru: "Что может сделать Мишка?" };
 
 export const SITUATIONS: Situation[] = [
   {

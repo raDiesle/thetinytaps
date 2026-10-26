@@ -4,14 +4,17 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
+import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { SCENES } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
-import { assignKeys } from "./keys";
+import { assignKeys, pressedKey } from "./keys";
+import { localizeScene } from "./localize";
 import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
-import { capitalize, nextQuest, questsFor, verb, type Quest } from "./quests";
-import { driveDistance, guestFor, PLACES, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
+import { capitalize, SCENE_PHRASES } from "./phrases";
+import { nextQuest, questsFor, type Quest } from "./quests";
+import { driveDistance, guestFor, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
 import { playSound } from "./sounds";
 import { placeBox, type Scene, type SceneItem } from "./types";
@@ -46,15 +49,6 @@ const DRIVE_MAX_MS = 3000;
 /** …and how long the sign at the edge waits to be followed before the vehicle comes back. */
 const GONE_MS = 15000;
 
-const PROMPTS = { tap: "Tipp etwas an! 👆", hover: "Zeig auf etwas! 👆", keys: "Drück eine Taste! ⌨️" };
-const COLOUR_PROMPTS = {
-  tap: "Tipp etwas an – es wird bunt! 🖍️",
-  hover: "Zeig auf etwas – es wird bunt! 🖍️",
-  keys: "Drück eine Taste – es wird bunt! 🖍️",
-};
-
-const PRAISE = ["Super!", "Toll!", "Prima!", "Ja, genau!", "Richtig!"];
-
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /**
@@ -87,7 +81,11 @@ function paleGrey(hex: string) {
   return `rgb(${v} ${v} ${v})`;
 }
 
-export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; settings: ScenesSettings; speechLang: string }) {
+/** Plays `scene` (already in the app language, see localize.ts); the engine's own sentences come from phrases.ts. */
+export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesSettings }) {
+  const language = useAppLanguage();
+  const words = pickLanguage(SCENE_PHRASES, language.id);
+  const speechLang = language.speechLang;
   const [plays, setPlays] = useState<Plays>({});
   const [quest, setQuest] = useState<Quest | null>(null);
   /** Answers already found for the current question. */
@@ -113,7 +111,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const roadsOn = settings.roads && settings.mode === "explore";
   // Opened by following a vehicle: it drives in, as a guest or back at home. Read once, the play is keyed by scene.
   const [arrival] = useState(() => (roadsOn ? tripTo(scene.id, location.state) : null));
-  const [guest] = useState(() => (arrival && !arrival.home ? (guestFor(arrival.road) ?? null) : null));
+  const [guest] = useState(() => (arrival && !arrival.home ? (guestFor(arrival.road, language.id) ?? null) : null));
   const items = useMemo(() => (guest ? withGuest(scene.items, guest) : scene.items), [scene, guest]);
   const [drives, setDrives] = useState<Record<string, Drive>>(() => {
     const item = guest?.item ?? scene.items.find((i) => i.id === arrival?.road.item);
@@ -153,7 +151,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const questMode = isQuestMode(settings.mode);
   const colouring = settings.mode === "colour";
   const soundsOn = settings.sounds;
-  const quests = useMemo(() => questsFor(settings.mode, scene), [settings.mode, scene]);
+  const quests = useMemo(() => questsFor(settings.mode, scene, language.id), [settings.mode, scene, language.id]);
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
   const roads = useMemo(() => roadsFrom(scene.id), [scene]);
   const allDiscovered = discovered.size === scene.items.length;
@@ -308,7 +306,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const party = () => {
     setPartying(true);
     if (soundsOn) playMelody();
-    say(colouring ? "Hurra! Das ganze Bild ist bunt!" : "Hurra! Du hast alles entdeckt!");
+    say(colouring ? words.allColoured : words.allFound);
     items.forEach((item, i) => later(() => animate(item, true), i * 40));
     for (let i = 0; i < 14; i++) later(() => spawn(), i * 140);
     later(() => setPartying(false), PARTY_MS);
@@ -318,7 +316,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   const goodNight = () => {
     setNight(true);
     if (soundsOn) playLullaby();
-    say("Gute Nacht! Alle schlafen jetzt.");
+    say(words.goodNight);
   };
 
   const startOver = () => {
@@ -329,7 +327,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
   };
 
   /** The next picture in menu order (after the last one the first). The game stays open, like following a vehicle. */
-  const nextScene = SCENES[(SCENES.findIndex((s) => s.id === scene.id) + 1) % SCENES.length];
+  const nextScene = localizeScene(SCENES[(SCENES.findIndex((s) => s.id === scene.id) + 1) % SCENES.length], language.id);
   const goToNextScene = () => {
     const { trip: _, ...state } = (location.state ?? {}) as { trip?: Trip };
     navigate(`/bilder/${nextScene.id}/`, { replace: true, state });
@@ -421,8 +419,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     if (!item) return;
     driveIn(item, road);
     if (soundsOn) playSound(item.sound);
-    const name = capitalize(item.name);
-    say(home ? `${name} ist wieder ${PLACES[scene.id].at}!` : `${name} kommt ${PLACES[road.from].from}!`);
+    say(home ? words.backHome(item, words.places[scene.id]) : words.comesFrom(item, words.places[road.from]));
     // So a reload doesn't bring it once more.
     const { trip: _, ...state } = location.state as { trip?: Trip };
     navigate(location.pathname, { replace: true, state });
@@ -440,7 +437,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     busyUntil.current.set(item.id, Infinity);
     setDrives((prev) => ({ ...prev, [item.id]: { phase: "out", dx, ms } }));
     if (soundsOn) playSound(item.sound);
-    say(`Tschüss! ${capitalize(item.name)} fährt ${PLACES[to].to}.`, true);
+    say(words.drivesTo(item, words.places[to]), true);
     later(() => {
       setDrives((prev) => ({ ...prev, [item.id]: { phase: "gone", dx, ms } }));
       const exit: Exit = { item, to, trip: { road: roadId(road), home: goingHome } };
@@ -494,7 +491,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       const started = animate(item);
       if (started) {
         say(describe(item));
-        if (item.hideout) say(`Guck-guck! ${SURPRISES[lastSurprise.current.get(item.id)!].found}`, true);
+        if (item.hideout) say(words.peekaboo(pickLanguage(SURPRISES[lastSurprise.current.get(item.id)!].found, language.id)), true);
       } else if (how !== "hover") funBurst(x, y);
       paint(x, y);
       discover(item, x, y);
@@ -518,7 +515,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       setHint(false);
       setFound((n) => n + 1);
       misses.current = 0;
-      say(`${pick(PRAISE)} ${quest.praise(item)}`);
+      say(`${pick(words.praise)} ${quest.praise(item)}`);
       if (answeredRef.current.size >= quest.needed) {
         celebrating.current = true;
         later(() => newQuestion(true), NEXT_QUESTION_MS);
@@ -535,7 +532,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     misses.current++;
     if (hintsOn && misses.current >= HINT_AFTER_MISSES) setHint(true);
     lastQuestion.current = performance.now();
-    say(`Das ${verb(item)} ${item.name}. ${quest.question}`);
+    say(words.thatIs(item, quest.question));
   };
 
   // The key handler is set up once; this way it always calls the current activate.
@@ -553,7 +550,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
     return [point.x, point.y];
   }, []);
 
-  const keys = useMemo(() => assignKeys(scene.items), [scene]);
+  const keys = useMemo(() => assignKeys(scene.items, language.id), [scene, language.id]);
   const keyTurns = useRef(new Map<string, number>());
 
   const tapItem = (item: SceneItem, e: PointerEvent) => {
@@ -616,7 +613,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           if (settings.sounds) playRandomNote();
           return;
         }
-        const key = e.key.toLocaleUpperCase("de-DE");
+        const key = pressedKey(e, language.id);
         const list = keys.byKey.get(key);
         const open = (i: SceneItem) => questRef.current?.answers.includes(i) && !answeredRef.current.has(i.id);
         let item: SceneItem;
@@ -660,7 +657,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [scene, items, here, keys, screenPoint, colouring, settings.trigger, settings.sounds, ask, funBurst, moveFocus]);
+  }, [scene, items, here, keys, screenPoint, colouring, settings.trigger, settings.sounds, ask, funBurst, moveFocus, language.id]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
@@ -785,7 +782,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           {quest.emoji && <span className="find-emoji">{quest.emoji}</span>}
           <span>{quest.question}</span>
           {quest.needed > 1 && (
-            <span className="find-progress" aria-label={`${answered.size} von ${quest.needed}`}>
+            <span className="find-progress" aria-label={words.of(answered.size, quest.needed)}>
               {Array.from({ length: quest.needed }, (_, i) => (
                 <span key={i} className={i < answered.size ? "done" : undefined} />
               ))}
@@ -794,13 +791,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         </button>
       )}
       {found > 0 && (
-        <div className="find-stars" aria-label={`${found} gefunden`}>
+        <div className="find-stars" aria-label={words.foundCount(found)}>
           {"⭐".repeat(Math.min(found, 10))}
           {found > 10 && <span className="find-count">{found}</span>}
         </div>
       )}
       {!questMode && settings.goal && (
-        <div className={`scene-goal${allDiscovered ? " done" : ""}`} aria-label={`${discovered.size} von ${scene.items.length} entdeckt`}>
+        <div className={`scene-goal${allDiscovered ? " done" : ""}`} aria-label={words.discoveredCount(discovered.size, scene.items.length)}>
           <span className="scene-goal-star">{allDiscovered ? (bedtime ? "🌙" : "🎉") : "⭐"}</span>
           {discovered.size}/{scene.items.length}
         </div>
@@ -814,7 +811,7 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
         <button
           type="button"
           className={`scene-space${spaceDown ? " down" : ""}`}
-          aria-label="Leertaste"
+          aria-label={words.spaceBar}
           onPointerDown={(e) => {
             e.stopPropagation();
             paintSomewhere();
@@ -827,13 +824,13 @@ export function ScenePlay({ scene, settings, speechLang }: { scene: Scene; setti
           </span>
         </button>
       )}
-      {!questMode && !touched && <p className="scene-prompt">{(colouring ? COLOUR_PROMPTS : PROMPTS)[settings.trigger]}</p>}
+      {!questMode && !touched && <p className="scene-prompt">{(colouring ? words.colourPrompts : words.prompts)[settings.trigger]}</p>}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
       <p className="scene-rotate">
         <span className="scene-rotate-phone" aria-hidden>
           📱
         </span>
-        Quer halten – dann wird das Bild groß
+        {words.rotate}
       </p>
       <BurstLayer bursts={bursts} />
     </div>

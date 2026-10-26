@@ -101,7 +101,7 @@ export type SceneTrait = "red" | "yellow" | "blue" | "green" | "flies" | "big" |
 
 export interface SceneItem {
   id: string;
-  /** With article, as used inside a sentence: "der Bagger". */
+  /** With article, as used inside a sentence: "der Bagger" (in another language: its translation, see localize.ts). */
   name: string;
   /** Spoken when the item is tapped while exploring, one after the other: "Der Bagger baggert!" */
   sentences: string[];
@@ -120,6 +120,8 @@ export interface SceneItem {
   traits?: SceneTrait[];
   /** The name is a plural ("die Küken"), so questions say "Wo sind …?". */
   plural?: boolean;
+  /** Grammatical gender of a translated name ("красный/красная/красное"); set by localizeScene, German names have none. */
+  gender?: "m" | "f" | "n";
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */
   durationMs: number;
   /**

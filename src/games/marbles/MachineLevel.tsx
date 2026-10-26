@@ -48,7 +48,7 @@ export function MachineLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={machine} label="Große Maschine" {...props}>
+    <MachineStage machine={machine} level="machine" {...props}>
       {(t) => (
         <>
           <Room stripes={`${ids}-stripes`} />

@@ -23,6 +23,12 @@ Levels so far:
 - „Der Luftballon“ (G-03, `ballon.tsx`, the town: bread from the bakery, fish from the market stall, sunflower from the flower stall → the ducks at the pond want the bread → umbrella on the park bench → the sprinkler sprays over the path, the umbrella goes over it → plank on the logs → the plank fills the hole in the hanging bridge → the cat wants the fish → long stairs up to the church → the dove on the tower trades the balloon for the sunflower).
 - „Die kleine Lok“ (G-09, `lok.tsx`, the farm and the hill: the wooden toy train drives off by itself → carrot from the vegetable patch → corn cob at the corn field → the rabbit on the path wants the carrot → at the hill the way forks: **over** – up the stairs, apple from the tree on top, the pony wants the apple, down the path – or **through** – lantern from the post at the tunnel mouth, the dark tunnel wants the lantern → both meet at the gate of the hen yard, the child opens it → a hen sits on the train and hops down for the corn).
 
+## Languages (German, Russian)
+
+The game follows the app language chosen on the home page (`useAppLanguage`). The stories and levels stay written in German (`content.ts`, `trail/levels.ts`); `ru.ts` is the Russian phrasebook – every spoken sentence and every story/level title, keyed by its German text – and `phrases.ts` looks a sentence up (`spokenIn` for speech, `titleIn` for titles). Speech always uses the voice of the language the words are in: a sentence missing from the phrasebook is said in German by the German voice. Small texts of the start screen and labels (`Stock 1`, `Los`, the key note) are inline `t({ de, ru })`.
+- **Every German sentence or title you add or change gets its Russian line in `ru.ts` in the same change** (`ru.test.ts` fails on a missing one and on a left-over one). One German sentence has one Russian one, so where the same German line is used for things of different gender, keep the Russian gender-free („Берём с собой.“).
+- Russian for the child: short, present tense, „ты“/„мы“, no past-tense or adjective forms that depend on the child being a boy or a girl („Я хочу спать“, not „Я устал“); Russian sound words („Кря-кря“, „Ква“, „Ту-ту“).
+
 ## Rules for every story (from feedback; follow them in new stories and trail levels too)
 
 - **The first thing in a room happens by itself.** Getting out of the lift, the child does the first move on its own (puts the hat on, opens the fridge, sits down) – the ride was the child's tap. A step whose whole point is one move needs no tap at all.

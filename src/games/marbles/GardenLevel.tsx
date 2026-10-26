@@ -63,7 +63,7 @@ export function GardenLevel(props: LevelProps) {
   const ids = useId();
 
   return (
-    <MachineStage machine={garden} label="Im Garten" {...props}>
+    <MachineStage machine={garden} level="garden" {...props}>
       {(t) => (
         <>
           <Sky gradient={`${ids}-sky`} />

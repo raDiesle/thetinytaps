@@ -399,7 +399,7 @@ export function buildBuilding() {
   at(tRoofLand + 0.08, { sound: playClonk });
   at(tTree, { sound: playPop });
   at(tTree + 0.15, { sound: playTwinkle });
-  at(tTree + 0.25, { say: "Hurra! Das Dach ist drauf!" });
+  at(tTree + 0.25, { say: { de: "Hurra! Das Dach ist drauf!", ru: "Ура! Крыша на месте!" } });
   at(tGreen, { sound: playDing });
   at(tGreen + 0.5, { sound: playBells });
   at(tGo - 0.3, { sound: playHonk });

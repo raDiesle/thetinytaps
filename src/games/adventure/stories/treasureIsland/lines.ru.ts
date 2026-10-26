@@ -5,11 +5,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Schatzinsel“ in Russian. */
 export const TRANSLATION: StoryTranslation = {
+  title: "Остров сокровищ",
   defaultTurn: "Теперь ты!",
   opening: ["Смотри – вон там Остров сокровищ!", "А там лежит сокровище!", "Пойдёшь со мной?"],
   steps: [
     // 👋
     {
+      name: "Помахать Кики",
       situation: "Ахой! Я Тапси. А вот и Кики, мой попугай!",
       instruction: "Я машу Кики – вот так!",
       turn: "Помашешь Кики тоже?",
@@ -18,6 +20,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎣
     {
+      name: "Закинуть удочку",
       situation: "А теперь ловим рыбу!",
       instruction: "Замах через плечо – и далеко забрасываем, вот так!",
       turn: "Теперь ты – закинь удочку!",
@@ -25,9 +28,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "Сколько рыбок!",
     },
     // 🪑
-    { instruction: "Садись со мной – вот так!", praise: "Поехали!" },
+    { name: "Сесть", instruction: "Садись со мной – вот так!", praise: "Поехали!" },
     // 🛶
     {
+      name: "Грести веслом",
       situation: "Оле плывёт – к Острову сокровищ!",
       instruction: "Смотри: весло справа в воду – и слева.",
       turn: "Греби со мной!",
@@ -35,9 +39,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "Приплыли! Оле на пляже.",
     },
     // 🧍
-    { instruction: "Мы на острове! Вставай со мной – вот так!", praise: "Идём дальше!" },
+    { name: "Встать", instruction: "Мы на острове! Вставай со мной – вот так!", praise: "Идём дальше!" },
     // 🦂
     {
+      name: "Топать по скорпионам",
       situation: "Ой! По Оле ползут скорпионы!",
       instruction: "Ногу вверх – и быстро, крепко топаем, вот так!",
       turn: "Теперь ты – топай со мной!",
@@ -46,6 +51,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌉
     {
+      name: "Прыгать по мостику",
       situation: "Маленький мостик! А наверху парят ящики.",
       instruction: "Прыг – и головой по ящику, бум!",
       turn: "Теперь ты – прыгай со мной!",
@@ -54,6 +60,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪵
     {
+      name: "Пригнуться под бревном",
       situation: "Внимание! Там наверху качается бревно.",
       instruction: "Когда оно летит, мы пригибаемся – вот так!",
       turn: "Летит! Пригнись!",
@@ -62,6 +69,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥁
     {
+      name: "Барабанить",
       situation: "Ой, на дорожке сидит много птичек! А там висят два барабана.",
       instruction: "Слева – бум! И справа – бум! Вот так!",
       turn: "Теперь ты – барабань со мной!",
@@ -70,6 +78,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ⚙️
     {
+      name: "Крутить ручку",
       situation: "Ворота! А вот ручка.",
       instruction: "Крутим ручку – кругом, кругом, вот так!",
       turn: "Теперь ты – крути со мной!",
@@ -78,6 +87,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥥
     {
+      name: "Шаг в сторону",
       situation: "Ой, обезьянка роняет кокосы! Они катятся прямо к нам.",
       instruction: "Большой шаг в сторону – и назад. Вот так!",
       turn: "Кокос! Большой шаг в сторону!",
@@ -86,6 +96,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦵
     {
+      name: "Нога вверх, кокос под ней",
       situation: "Теперь они катятся слева!",
       instruction: "Ногу вверх – кокос катится под ней. Вот так!",
       turn: "Теперь ты – ногу вверх!",
@@ -94,6 +105,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦶
     {
+      name: "Ноги широко, кокос между ними",
       situation: "А теперь они катятся посередине!",
       instruction: "Ноги широко – кокос катится между ними. Вот так!",
       turn: "Теперь ты – ноги широко!",
@@ -102,6 +114,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐒
     {
+      name: "Уклониться от кокосов",
       situation: "Ой, обезьянки! Они бросают кокосы!",
       instruction: "Медленно отходим в сторону – вот так!",
       turn: "Теперь ты – отойди в сторону!",
@@ -110,6 +123,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🍎
     {
+      name: "Сорвать яблоко",
       situation: "Яблоня! А вот корзинка.",
       instruction: "Тянемся высоко и срываем – вот так!",
       turn: "Теперь ты – сорви яблоко!",
@@ -118,6 +132,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🧩
     {
+      name: "Загадка с картинками",
       situation: "Дверь с тремя картинками. Загадка!",
       instruction: "Повторяем картинки. Сначала тянемся высоко-высоко – вот так!",
       turn: "Теперь ты – высоко-высоко!",
@@ -126,6 +141,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🕸️
     {
+      name: "Смахнуть паутину",
       situation: "Ой, сколько паутины! Тут не пройти.",
       instruction: "Лапу вверх – и машем далеко в сторону, вот так!",
       turn: "Теперь ты – маши со мной!",
@@ -134,6 +150,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪢
     {
+      name: "Тянуть сундук за верёвку",
       situation: "Вон плывёт сундук с сокровищами!",
       instruction: "Тянем верёвку, рука за рукой – вот так!",
       turn: "Тяни со мной!",
@@ -142,6 +159,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🔑
     {
+      name: "Повернуть ключ",
       situation: "Ой, замок! Кики несёт ключ.",
       instruction: "Поднять, вставить и повернуть – вот так!",
       turn: "Теперь ты – поверни ключ!",
@@ -150,6 +168,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 💰
     {
+      name: "Подбросить золото",
       situation: "Ой! Золото! Крабы несут нам сундук. Я спрыгиваю!",
       instruction: "Глубоко запускаем лапы – и подбрасываем монетки! Вот так!",
       turn: "Теперь ты – возьми и подбрось!",
@@ -158,6 +177,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "Ура!",
       situation: "Мы нашли сокровище!",
       instruction: "Руки вверх – ура!",
       turn: "И ты тоже – ура!",
@@ -166,6 +186,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌅
     {
+      name: "Помахать на прощание",
       situation: "Солнце садится.",
       instruction: "Я машу Кики на прощание – вот так!",
       turn: "Помашешь со мной?",

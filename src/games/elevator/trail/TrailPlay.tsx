@@ -3,10 +3,13 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
+import type { TargetLanguage } from "@/content/targetLanguages";
+import { pick } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, PACK, ThoughtBubble, type Pose } from "../kid";
+import { spokenIn } from "../phrases";
 import type { ElevatorSettings } from "../settings";
 import { allStations, groundY, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
@@ -221,7 +224,18 @@ const handOf = (kid: KidState): Point => [kid.x + 62, kid.y - 112];
 const heldOf = (kid: KidState, goal: Goal): Point => (goal.carry === "string" ? [kid.x + 140, kid.y - 250] : [kid.x + 66, kid.y - 78]);
 
 /** "Weg-Abenteuer": the goal goes away, the child follows it through a scrolling world and uses what it finds. */
-export function TrailPlay({ lang, settings, level, onPick }: { lang: string; settings: ElevatorSettings; level: TrailLevel; onPick: (id: string) => void }) {
+export function TrailPlay({
+  language,
+  settings,
+  level,
+  onPick,
+}: {
+  /** The app language: what the child hears is spoken in it. */
+  language: TargetLanguage;
+  settings: ElevatorSettings;
+  level: TrailLevel;
+  onPick: (id: string) => void;
+}) {
   const theGoal = GOALS[level.goal];
   const onString = theGoal.carry === "string";
   const [view, setView] = useState<View>(() => startView(level));
@@ -311,8 +325,11 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
     [],
   );
 
-  const say = (text: string) => {
-    if (settings.speech) speak(text, lang, { rate: 0.85 });
+  /** Speaks a German sentence of the level in the app language (only with "Vorlesen"). */
+  const say = (german: string) => {
+    if (!settings.speech) return;
+    const { text, speechLang } = spokenIn(german, language);
+    speak(text, speechLang, { rate: 0.85 });
   };
 
   const sound = (play: () => void) => {
@@ -824,7 +841,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
           ))}
           {/* The picture signs of the ways at a fork: always there; while the child picks a way they hop and glow */}
           {forks.flatMap((f) =>
-            f.ways.map(({ id, Sign, sign: [x, y] }, w) => {
+            f.ways.map(({ id, Sign, sign: [x, y], say: wayName }, w) => {
               const on = view.fork?.id === f.id;
               return (
                 <g
@@ -832,7 +849,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
                   className={`tl-way${on ? " on" : ""}`}
                   onPointerDown={pressWay(w)}
                   role="button"
-                  aria-label={id}
+                  aria-label={spokenIn(wayName, language).text}
                 >
                   <g className="tl-way-board" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${w * 120}ms` }}>
                     <circle cx={x} cy={y} r={WAY_R + 12} className="tl-way-glow" fill="none" strokeWidth="14" />
@@ -965,7 +982,7 @@ export function TrailPlay({ lang, settings, level, onPick }: { lang: string; set
               fill="transparent"
               onPointerDown={pressSlot(i)}
               role="button"
-              aria-label={view.bag[i] ?? "leer"}
+              aria-label={view.bag[i] ?? pick({ de: "leer", ru: "пусто" }, language.id)}
               className="tl-slot-tap"
             />
           ))}

@@ -3,6 +3,7 @@ import { expect, test } from "@rstest/core";
 import { COMFORTS, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, storyImages } from "./images";
 import { SITUATIONS } from "./kita";
+import { FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { MOOD_ID, WEATHERS } from "./mood";
 import { STORIES } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
@@ -42,4 +43,40 @@ test("every weather has its card and leads to a feeling of the bear", () => {
 // „Aua!“ has no recording yet; every other sound the stories load is a file, or the first tap would only hear the synthesized stand-in.
 test("every recorded sound of the stories has its file", () => {
   for (const name of RECORDED_SOUNDS.filter((n) => n !== "aua")) expect(existsSync(`src/lib/sounds/${name}.mp3`), name).toBe(true);
+});
+
+// Every translation tells the same story as the German: the same steps, the same beats (a narration or a line
+// where the German has one, so the timing and sounds fit), a question only where the German feeling has its own.
+test("every translation of a kindergarten story matches the German beat for beat", () => {
+  const beatParts = (beats: { narration?: string; line?: string }[]) => beats.map((b) => [!!b.narration, !!b.line]);
+  for (const [language, texts] of Object.entries(SITUATION_TEXTS)) {
+    for (const situation of SITUATIONS) {
+      const text = texts[situation.id];
+      const where = `${language} ${situation.id}`;
+      expect(beatParts(text.intro), `${where} intro`).toEqual(beatParts(situation.intro));
+      expect(beatParts(text.outro), `${where} outro`).toEqual(beatParts(situation.outro));
+      expect(text.steps.length, `${where} steps`).toBe(situation.steps.length);
+      situation.steps.forEach((step, i) => expect(beatParts(text.steps[i].beats), `${where} step ${i + 1}`).toEqual(beatParts(step.beats)));
+      // The happy end shows the steps as cards keyed by caption.
+      expect(new Set(text.steps.map((s) => s.caption)).size, `${where} captions`).toBe(text.steps.length);
+    }
+  }
+});
+
+test("every translation of the bear's feelings asks its own question where the German does", () => {
+  for (const [language, texts] of Object.entries(FEELING_TEXTS)) {
+    for (const feeling of FEELINGS) expect(!!texts[feeling.id].question, `${language} ${feeling.id}`).toBe(!!feeling.question);
+  }
+});
+
+test("a translated story has no German words left and keeps its sounds", () => {
+  for (const story of STORIES) {
+    const ru = storyIn(story, "ru");
+    expect(ru.title).not.toBe(story.title);
+    if (story.kind === "kita" && ru.kind === "kita") {
+      expect(ru.situation.steps.map((s) => s.instead.sound)).toEqual(story.situation.steps.map((s) => s.instead.sound));
+      expect(ru.situation.intro.map((b) => b.sound)).toEqual(story.situation.intro.map((b) => b.sound));
+    }
+  }
+  expect(storyIn(STORIES[0], "de")).toEqual(STORIES[0]);
 });

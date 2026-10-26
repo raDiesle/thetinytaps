@@ -37,9 +37,9 @@ export const CATEGORIES: Category[] = [
     title: { de: "Zuordnen", ru: "Найди пару" },
     subtitle: { de: "Was gehört zusammen? Antippen oder hinziehen.", ru: "Что к чему подходит? Коснуться или перетащить." },
     games: [
-      { href: "/tiere/", emoji: "🐰", title: { de: "Was gehört zum Tier?", ru: "Что у кого?" } },
+      { href: "/tiere/", emoji: "🐰", title: { de: "Was gehört zum Tier?", ru: "Что нужно зверюшке?" } },
       { href: "/schatten/", emoji: "👤", title: { de: "Schatten finden", ru: "Найди тень" } },
-      { href: "/socken/", emoji: "🧦", title: { de: "Socken-Paare", ru: "Пары носков" } },
+      { href: "/socken/", emoji: "🧦", title: { de: "Socken-Paare", ru: "Пары носочков" } },
     ],
   },
   {

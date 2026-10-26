@@ -364,7 +364,7 @@ export function buildKitchen() {
   at(tToast, { sound: playPlop });
   at(tToast + 0.15, { sound: playTwinkle });
   at(tToast + 0.35, { sound: playWhistle });
-  at(tToast + 0.5, { say: "Ping! Der Toast ist fertig!" });
+  at(tToast + 0.5, { say: { de: "Ping! Der Toast ist fertig!", ru: "Дзинь! Тост готов!" } });
   at(tDone, { done: true });
 
   const toastAt = (t: number): { pt: Pt; angle: number; flat: number } => {

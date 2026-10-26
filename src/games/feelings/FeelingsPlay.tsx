@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
+import { useAppLanguage } from "@/lib/language";
 import { BearPlay } from "./BearPlay";
 import { KitaPlay } from "./KitaPlay";
+import { feelingIn, situationIn } from "./localized";
 import { MOOD_ID } from "./mood";
 import { MoodPlay } from "./MoodPlay";
 import type { FeelingsSettings } from "./settings";
@@ -23,6 +25,7 @@ export function FeelingsPlay({ settings }: { settings: FeelingsSettings }) {
   const mood = settings.story === MOOD_ID;
   const chosen = STORIES.find((s) => s.id === settings.story);
   const deck = useRef<Story[]>([]);
+  const { id: language } = useAppLanguage();
 
   // A picked story (or the one the weather led to) comes first and the others follow in list order, so „Weiter“ never plays the same one again.
   // Without one, all stories come in random order before any comes again.
@@ -42,8 +45,8 @@ export function FeelingsPlay({ settings }: { settings: FeelingsSettings }) {
   const { story } = now;
   if (!story) return <MoodPlay settings={settings} onPick={(feeling) => setNow({ story: homeStory(feeling), key: now.key + 1 })} />;
   return story.kind === "home" ? (
-    <BearPlay key={now.key} feeling={story.feeling} settings={settings} onNext={next} />
+    <BearPlay key={now.key} feeling={feelingIn(story.feeling, language)} settings={settings} onNext={next} />
   ) : (
-    <KitaPlay key={now.key} situation={story.situation} settings={settings} onNext={next} />
+    <KitaPlay key={now.key} situation={situationIn(story.situation, language)} settings={settings} onNext={next} />
   );
 }

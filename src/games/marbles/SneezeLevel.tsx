@@ -17,7 +17,7 @@ import {
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
-import { useAnyKey, useFrames, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
+import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import { deg, easeIn, easeInOut, easeOut, lerp } from "./machineKit";
 import type { Pt } from "./path";
 import { INK } from "./scenery";
@@ -141,6 +141,7 @@ interface Pose {
  * hello; any other tap or key hurries the chain on by one step.
  */
 export function SneezeLevel({ sound, say, onDone }: LevelProps) {
+  const label = useLevelName("sneeze");
   const row = useMemo(() => layOutRow(pickAnimals()), []);
   const feather = useMemo(() => FEATHERS[Math.floor(Math.random() * FEATHERS.length)], []);
   const leaves = useMemo(() => leavesOf(row.tree), [row]);
@@ -174,7 +175,7 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
     b.sneezeT = clock.current;
     b.haT = Math.min(b.haT, clock.current);
     sound(() => playHatschi(sizeAt(i)));
-    if (i === last) say("Hatschi!");
+    if (i === last) say({ de: "Hatschi!", ru: "Апчхи!" });
   };
   const arrive = (i: number) => {
     beasts.current[i].arriveT = clock.current;
@@ -286,7 +287,7 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
 
   return (
     <div className="marble-level" onPointerDown={onPointerDown}>
-      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label="Hatschi-Kette">
+      <svg className="marble-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
         {/* Zooming out keeps the meadow's ground line in the same place on the screen. */}
         <g transform={`translate(0 ${VIEW_H * (1 - camZ)}) scale(${camZ}) translate(${-camX} 0)`}>
           {meadow}

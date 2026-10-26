@@ -94,3 +94,24 @@ the characters do changes: every picture is drawn from the story's first one
 (`…-passiert`, `baer-…`) as the only `--ref`, with the same cast and background –
 `yarn frames --scenes` lists pictures whose background drifted. `feelings.test.ts` fails when a story or the
 bear asks for a picture that is not in `bilder/`.
+
+## Russian
+
+The game speaks the app language (German or Russian, chosen on the home page,
+`src/lib/language.ts`): start screen, captions and everything read aloud. The German
+data (`bear.ts`, `kita.ts`) holds pictures, sounds and order; `bear.ru.ts` and
+`kita.ru.ts` hold only the Russian words, by id, step for step and beat for beat,
+and `localized.ts` lays them over the German (`feelingIn`, `situationIn`,
+`comfortsIn`, `storyIn`). Small texts (the questions, praise, weather captions,
+start screen notes) are `Localized` inline: `t({ de, ru })`. Speech always uses the
+app language's voice (`useVoice`). Rules:
+- Every German text gets its Russian in the same change: a new story, step or beat
+  in `kita.ts` needs the same in `kita.ru.ts` (a sound-only beat is `{}`), a new
+  feeling or kind thing an entry in `bear.ru.ts` (the types make a missing id fail).
+  `feelings.test.ts` fails when a translation's steps or beats don't match the German.
+- Russian names: the bear is „Мишка“ (at home and in the kindergarten), the fox
+  „Лисёнок“, the hare „Зайчик“, the hedgehog „Ёжик“, the kindergarten teacher
+  „воспитательница“, the one who brings Мишка „большой медведь“.
+- Nothing said to or about the child depends on boy or girl: feelings as
+  „Мишке грустно“, captions as adverbs („Дождь, грустно“), praise „Молодец!“.
+  The not-so-good answers start with „Хм,“ like the German „Hmm,“.

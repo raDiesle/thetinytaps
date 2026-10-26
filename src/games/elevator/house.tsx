@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Cloud } from "@/games/scenes/shared";
+import { useT } from "@/lib/language";
 import {
   BUTTON_R,
   BUTTON_X,
@@ -270,9 +271,10 @@ export function ActionButton({
   box: [number, number, number, number];
   picture?: ReactNode;
 }) {
+  const t = useT();
   const [bx, by, bw, bh] = box;
   return (
-    <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label="Los">
+    <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label={t({ de: "Los", ru: "Вперёд" })}>
       <rect x={bx + 8} y={by + 8} width={bw} height={bh} rx="36" className="el-action-shadow" />
       <rect x={bx} y={by} width={bw} height={bh} rx="36" className="el-action-box" strokeWidth="6" />
       {[0, 1].map((i) => (
@@ -299,6 +301,7 @@ export function ActionButton({
 
 /** One big round button per floor, right of the house; tapping the room itself works too. */
 export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: number | null; onPress: (floor: number) => void }) {
+  const t = useT();
   const down = (f: number) => (e: PointerEvent) => {
     e.stopPropagation();
     onPress(f);
@@ -318,7 +321,7 @@ export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: numb
             style={{ transformOrigin: `${BUTTON_X}px ${cy}px` }}
             onPointerDown={down(f)}
             role="button"
-            aria-label={`Stock ${f + 1}`}
+            aria-label={t({ de: `Stock ${f + 1}`, ru: `Этаж ${f + 1}` })}
           >
             <circle cx={BUTTON_X} cy={cy + 6} r={BUTTON_R} fill="#78909c" />
             <circle className="el-button-face" cx={BUTTON_X} cy={cy} r={BUTTON_R} stroke="#90a4ae" strokeWidth="6" />

@@ -211,7 +211,7 @@ export function buildLight() {
   const dark = (t: number) => 0.68 - 0.5 * easeInOut(seg(t, tLamp + 0.4, tLamp + 2.6));
   at(tLamp, { sound: playMusicbox });
   at(tLamp + 0.7, { sound: playTwinkle });
-  at(tLamp + 1.2, { say: "Licht an! Alles funkelt!" });
+  at(tLamp + 1.2, { say: { de: "Licht an! Alles funkelt!", ru: "Свет горит! Всё сверкает!" } });
   at(tOwl, { sound: playHoot });
   at(tOwl + 0.6, { sound: playTwinkle });
   at(tDone, { done: true });

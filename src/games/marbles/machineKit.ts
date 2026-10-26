@@ -3,6 +3,7 @@
 // A machine works everything out ahead as a function of the seconds since the
 // tap, so its level only asks where each thing is at a moment.
 
+import type { Localized } from "@/lib/language";
 import { VIEW_W } from "./level";
 import { indexAt, line, quad, type Pt } from "./path";
 
@@ -156,7 +157,8 @@ export function chain(t0: number, runs: Run[]) {
 export interface MachineEvent {
   at: number;
   sound?: () => void;
-  say?: string;
+  /** Said in the app language when speech is on. */
+  say?: Localized;
   done?: boolean;
 }
 

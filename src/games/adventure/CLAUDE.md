@@ -22,7 +22,10 @@ camera often looks from the right from then on. The timing helpers (`passTime`, 
 What Tapsi says is in `stories/<story>/lines.ts` (no three.js there, so Node can read it), and in the other
 languages of the app (`src/content/targetLanguages.ts`) in `lines.<language>.ts` next to it: the same steps and
 lines in the same order (`StoryTranslation`, listed in the story's `translations.ts`; `storyIn()` swaps them in).
-Grown-ups choose the language on the start screen („Tapsi spricht“, the setting `language`); a story without
+Grown-ups choose the language on the start screen („Tapsi spricht“, the setting `voiceLanguage`); its default
+`"app"` follows the app language chosen on the home page (`src/lib/language.ts`), and picking the app's own
+language saves `"app"` again. The old setting `language` is carried over once (`carryOverAdventureSettings`):
+a saved `"de"` was the old default and now follows the app, any other language stays. A story without
 a translation into it is said in German (and the start screen says so). Translations say
 nothing that changes for a boy or a girl (no "you did", no "brave boy"): commands, "we" and "your turn".
 Each line can have a recording in `stories/<story>/stimme/<hash>.mp3` (German) or
@@ -37,6 +40,16 @@ are not kept offline by every phone, only once the story has started in that lan
   the 10,000 credits a month have to reach for every language. `yarn voice make --dry [--lang en]` shows what
   would be recorded and how many credits it costs; the German lines were recorded with `eleven_v4` and audio
   tags before, the other languages with turbo and `--no-tags`.
+
+## Russian (the app language)
+
+- The grown-ups' texts (start screen, buttons, tooltips, notes) follow the app language: every new text is
+  written as `t({ de: "…", ru: "…" })` (`useT()`), never German alone; language names via `languageLabel`.
+- A story's title and its step names on the route are in its translations (`title`, `name` per step in
+  `lines.<language>.ts`), shown in the app language (`storyTitle`, `stepName` in `AdventurePlay.tsx`); the
+  movement library itself stays German (it is notes for building stories, not shown except as a fallback name).
+- Every story has a Russian `lines.ru.ts` with `title` and a `name` for every step; a new story gets one too.
+  Wolle is „Пушинка“ in Russian, Tapsi „Тапси“, Ole „Оле“, Kiki „Кики“.
 
 ## Working on levels
 

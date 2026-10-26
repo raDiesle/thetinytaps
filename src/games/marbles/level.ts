@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { type Localized, useT } from "@/lib/language";
+import { LEVEL_TEXTS } from "./content";
+import type { MarbleLevel } from "./settings";
 
 /** What every level gets from the game around it. */
 export interface LevelProps {
   /** Plays a sound effect, unless sounds are off. */
   sound: (play: () => void) => void;
-  /** Says a line, if speech is on. */
-  say: (text: string) => void;
+  /** Says a line in the app language, if speech is on; every line comes in German and Russian. */
+  say: (text: Localized) => void;
   /** The level is finished: the machine has run, everything has fallen over, or the marble run's basket is full. */
   onDone: () => void;
 }
@@ -52,4 +55,10 @@ export function useAnyKey(onKey: (e: KeyboardEvent) => void) {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
+}
+
+/** The level's name in the app language, for its picture's label. */
+export function useLevelName(level: MarbleLevel) {
+  const t = useT();
+  return t(LEVEL_TEXTS[level].name);
 }
