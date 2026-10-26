@@ -31,6 +31,9 @@ In a fresh worktree run `yarn install` first.
   the user once checked another session's server by mistake.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
+  Before building something bigger in a game, merge local `main` into your branch and read the game's latest
+  commits and `CLAUDE.md`: another session may already be building the same thing (two sweets stories once
+  had to be folded into one), and its new rules apply to your work too.
 - Commit messages: `<Game or area>: <what changed, in plain words>`, e.g.
   `Lebendige Bilder: the belt loader at the airport has wheels too`.
 - Each game documents itself in a `CLAUDE.md` in its folder (loaded when you work
