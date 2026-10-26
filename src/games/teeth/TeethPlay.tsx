@@ -13,7 +13,7 @@ import { addBrushing, daytimeOf, daytimeText, loadWeek, saveWeek, type WeekLog }
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Medal } from "./medal";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
-import { SUNG_LANGUAGES, sungSteps, useBrushingMusic } from "./music";
+import { SUNG_LANGUAGES, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
@@ -160,9 +160,24 @@ interface Clock {
   banked: number;
   /** When it was last started; null while paused. */
   since: number | null;
+  /** While the song is still loading, the clock stands still here (just before the countdown) until it is there. */
+  until?: number;
 }
 
-const readClock = (clock: Clock, now: number) => clock.banked + (clock.since === null ? 0 : now - clock.since);
+const readClock = (clock: Clock, now: number) => Math.min(clock.banked + (clock.since === null ? 0 : now - clock.since), clock.until ?? Infinity);
+
+/** The prelude parts the settings ask for. */
+const preludeOf = ({ origin, prep }: TeethSettings): Prelude[] => [
+  ...(origin ? (["sweets", "grow"] as const) : []),
+  ...(prep ? (["brush", "paste"] as const) : []),
+  "monsters",
+];
+
+/** How long the prelude lasts, in ms. */
+const introOf = (prelude: Prelude[]) => prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
+
+/** Where the clock waits while the song is still loading: just before the countdown, so the brushing never starts without its song. */
+const waitAt = (prelude: Prelude[]) => introOf(prelude) - COUNTDOWN * 1000 - 1;
 
 /** When a prelude part begins, in ms after the start. */
 const preludeStart = (prelude: Prelude[], p: Prelude) => prelude.slice(0, prelude.indexOf(p)).reduce((sum, q) => sum + PRELUDE[q].ms, 0);
@@ -189,7 +204,9 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   // Everything shown and said follows the app language; a line without a translation is said in German with the German voice (spoken.ts).
   const language = useAppLanguage();
   const t = useT();
-  const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now() }));
+  // The song began loading in the menu; the story plays meanwhile, and the brushing waits for it (`until`).
+  const song = useSongLoad(sungLanguageFor(language.id, SUNG_LANGUAGES));
+  const [clock, setClock] = useState<Clock>(() => ({ banked: 0, since: performance.now(), until: song.ready ? undefined : waitAt(preludeOf(settings)) }));
   const [now, setNow] = useState(() => performance.now());
   const [round, setRound] = useState(0);
   const [tickled, setTickled] = useState<number | null>(null);
@@ -209,11 +226,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     return cue ? spokenIn(cue, language) : daytimeText(daytime, "grow", language);
   };
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
-  const prelude = useMemo<Prelude[]>(
-    () => [...(settings.origin ? (["sweets", "grow"] as const) : []), ...(settings.prep ? (["brush", "paste"] as const) : []), "monsters"],
-    [settings.origin, settings.prep],
-  );
-  const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
+  const prelude = useMemo(() => preludeOf(settings), [settings.origin, settings.prep]);
+  const introMs = introOf(prelude);
   // The song is sung in the app language; the brushing lasts as long as the song and each step as long as its verse.
   const sungIn = sungLanguageFor(language.id, SUNG_LANGUAGES);
   const stepStarts = useMemo(() => sungSteps(sungIn), [sungIn]);
@@ -221,6 +235,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const totalMs = stepStarts[STEPS.length];
   const paused = clock.since === null;
   const elapsed = readClock(clock, now);
+  /** The clock stands at `until` until the song is there. */
+  const waiting = !paused && clock.until !== undefined && elapsed >= clock.until;
   const brushed = elapsed - introMs;
   const done = brushed >= totalMs;
   const ending: Ending | null = !done ? null : brushed - totalMs < CHEER_MS ? "cheer" : brushed - totalMs < ENDING_MS ? "tidy" : "rest";
@@ -247,13 +263,21 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   useWakeLock(ending !== "rest");
 
   // The clock runs on through the end until the brush is put away; the story, the sink and tidying up tick faster for their sounds.
-  const ticking = ending !== "rest";
+  const ticking = ending !== "rest" && !waiting;
   const fastTick = before !== null || done;
   useEffect(() => {
     if (!ticking || paused) return;
     const timer = setInterval(() => setNow(performance.now()), fastTick ? PRELUDE_TICK_MS : TICK_MS);
     return () => clearInterval(timer);
   }, [ticking, paused, round, fastTick]);
+
+  // When the song is there, the clock goes on from where it waited.
+  useEffect(() => {
+    if (!song.ready) return;
+    const t = performance.now();
+    setNow(t);
+    setClock((c) => (c.until === undefined ? c : { banked: readClock(c, t), since: c.since === null ? null : t }));
+  }, [song.ready]);
 
   useEffect(() => {
     if (settings.sounds)
@@ -350,15 +374,15 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   const again = useCallback(() => {
     const t = performance.now();
-    setClock({ banked: 0, since: t });
+    setClock({ banked: 0, since: t, until: song.ready ? undefined : waitAt(prelude) });
     setNow(t);
     setRound((r) => r + 1);
-  }, []);
+  }, [song.ready, prelude]);
 
   const togglePause = useCallback(() => {
     const t = performance.now();
     setNow(t);
-    setClock((c) => (c.since === null ? { banked: c.banked, since: t } : { banked: readClock(c, t), since: null }));
+    setClock((c) => (c.since === null ? { ...c, since: t } : { ...c, banked: readClock(c, t), since: null }));
   }, []);
 
   // Pausing stops the voice mid-sentence; going on repeats what to do.
@@ -368,12 +392,15 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     // Only when pausing or going on.
   }, [paused]);
 
-  /** Move the clock to `at` ms after the start; a paused clock stays paused. */
-  const seek = useCallback((at: number) => {
-    const t = performance.now();
-    setNow(t);
-    setClock((c) => ({ banked: at, since: c.since === null ? null : t }));
-  }, []);
+  /** Move the clock to `at` ms after the start; a paused clock stays paused. A jump into the brushing while the song loads waits there for it. */
+  const seek = useCallback(
+    (at: number) => {
+      const t = performance.now();
+      setNow(t);
+      setClock((c) => ({ banked: at, since: c.since === null ? null : t, until: c.until === undefined ? undefined : Math.max(waitAt(prelude), at) }));
+    },
+    [prelude],
+  );
 
   /** Jump to the start of a part: the prelude ones first, then the steps, then the end. */
   const jumpTo = useCallback(
@@ -585,6 +612,16 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
         <p className="teeth-count go" aria-live="polite">
           {t({ de: "Los!", ru: "Поехали!" })}
         </p>
+      )}
+
+      {/* Only when the song is still not there after the story: the brushing waits for it. */}
+      {waiting && (
+        <div className="teeth-loading" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(song.progress * 100)}>
+          🎵 {t({ de: "Musik lädt …" })}
+          <span className="teeth-loading-bar">
+            <span style={{ width: `${song.progress * 100}%` }} />
+          </span>
+        </div>
       )}
 
       {paused && (
