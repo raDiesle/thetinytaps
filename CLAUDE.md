@@ -154,7 +154,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
   only between games: menu pages call `useUpdateBetweenGames()` (`src/lib/pwa.ts`) – a new menu page does too, a game never.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+- Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
+  (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
+  with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
+  (`useTitle`, `SeoHead`). Texts say only what the page really does. Heavy downloads (service worker copy,
+  songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work

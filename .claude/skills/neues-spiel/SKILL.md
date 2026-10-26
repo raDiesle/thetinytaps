@@ -31,6 +31,8 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
    Lazy-load it like the other pages.
 2. `CATEGORIES` in `src/content/games.ts`: the game in the fitting category.
 3. The idea in `src/content/ideas/<area>.ts`: `done: true` (or `partial: "…"`).
+   And its entry in `src/content/seo.ts`: a title with what parents search for (see the research
+   on `/management/`), a description of 80–160 characters and a short text; true to what the game does.
 4. One line in the README structure table and the roadmap.
 
 ## Settings and shared parts

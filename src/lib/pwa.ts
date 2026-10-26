@@ -43,6 +43,13 @@ export const isStandalone = () =>
 /** iPhone / iPad Safari, where installing only works through the share menu. */
 export const isIos = () => /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform));
 
+/** Runs `task` after the page has loaded, when the browser has nothing else to do (at the latest after 3 s). */
+export function afterLoad(task: () => void) {
+  const idle = () => (typeof requestIdleCallback === "function" ? requestIdleCallback(task, { timeout: 3000 }) : setTimeout(task, 200));
+  if (document.readyState === "complete") idle();
+  else addEventListener("load", idle, { once: true });
+}
+
 /** Called once at start-up. */
 export function setUpPwa() {
   if (!("serviceWorker" in navigator)) return;
@@ -65,21 +72,25 @@ export function setUpPwa() {
   });
 
   const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
-  // "none": sw.js is always asked from the server, never from the HTTP cache (GitHub Pages caches 10 minutes).
-  navigator.serviceWorker
-    .register(`${base}sw.js`, { scope: base, updateViaCache: "none" })
-    .then((registration) => {
-      // The browser only looks for a new sw.js when a page is opened, so an app that
-      // stays open or comes back from the background asks itself. Offline that fails quietly.
-      const check = () => void registration.update().catch(() => {});
-      setInterval(check, UPDATE_CHECK_MS);
-      document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") check();
-      });
-    })
-    .catch(() => {
-      // E.g. private mode in Firefox: the site still works online.
-    });
+  // Only once the page has loaded and is idle: the new worker downloads every file of
+  // the site for offline use, and on a first visit that must not slow down the page
+  // itself (what the visitor and Google measure). Returning visitors already have it.
+  afterLoad(() =>
+    navigator.serviceWorker
+      .register(`${base}sw.js`, { scope: base, updateViaCache: "none" })
+      .then((registration) => {
+        // The browser only looks for a new sw.js when a page is opened, so an app that
+        // stays open or comes back from the background asks itself. Offline that fails quietly.
+        const check = () => void registration.update().catch(() => {});
+        setInterval(check, UPDATE_CHECK_MS);
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") check();
+        });
+      })
+      .catch(() => {
+        // E.g. private mode in Firefox: the site still works online.
+      }),
+  );
   void navigator.serviceWorker.ready.then(() => update({ offlineReady: true }));
 }
 
