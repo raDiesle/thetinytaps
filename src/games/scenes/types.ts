@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import type { TargetLanguageId } from "@/content/targetLanguages";
 
 /** x, y, width, height in scene units. */
 export type Box = [number, number, number, number];
@@ -169,3 +170,27 @@ export interface Scene {
   /** Drawn above the items and not tappable, e.g. falling snow. */
   Overlay?: ComponentType;
 }
+
+/** An item's words in another language (by its id in `SceneTranslation.items`). */
+export interface SceneItemTranslation {
+  /** The name as used inside a sentence, without article where the language has none: "экскаватор". */
+  name: string;
+  /** Spoken one after the other when the item is tapped, like the German `sentences` (same meaning, not word for word). */
+  sentences: string[];
+  /** Grammatical gender of the name, for sentences that need it (Russian "мой/моя/моё"); left out for plurals. */
+  gender?: "m" | "f" | "n";
+  /** The name is a plural ("цыплята"). */
+  plural?: boolean;
+}
+
+/** A scene's words in another language: its title and description, every item by id and the chain sentences. */
+export interface SceneTranslation {
+  title: string;
+  description: string;
+  items: Record<string, SceneItemTranslation>;
+  /** For each chain of the scene, in order: the sentence of each step, in order. */
+  chains?: string[][];
+}
+
+/** A scene's translations by language; German is the scene itself. */
+export type SceneTranslations = Partial<Record<TargetLanguageId, SceneTranslation>>;
