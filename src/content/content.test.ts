@@ -3,6 +3,7 @@ import { describe, expect, test } from "@rstest/core";
 import { CATEGORIES } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, LANGUAGES, toUpper } from "./languages";
+import { RESEARCH } from "./research";
 import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
@@ -46,7 +47,25 @@ describe("ideas", () => {
   });
 });
 
-describe("language status on the ideas page", () => {
+describe("research on the management page", () => {
+  const ideaIds = new Set(IDEA_AREAS.flatMap((area) => area.ideas.map((idea) => idea.id)));
+  const hrefs = new Set(CATEGORIES.flatMap((category) => category.games.map((game) => game.href)));
+
+  test.each(RESEARCH.map((r) => [r.id, r] as const))("%s names existing ideas and games", (_, research) => {
+    for (const id of [...research.ideas, ...research.topics.flatMap((topic) => topic.ideas)]) expect(ideaIds, id).toContain(id);
+    for (const game of research.games) expect(hrefs, game.href).toContain(game.href);
+    expect(research.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  test("ids are unique and the newest comes first", () => {
+    const ids = RESEARCH.map((r) => r.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const dates = RESEARCH.map((r) => r.date);
+    expect(dates).toEqual([...dates].sort().reverse());
+  });
+});
+
+describe("language status on the management page", () => {
   test("names every game of the home menu once, in menu order, then the home page", () => {
     const hrefs = [...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)), "/"];
     expect(LANGUAGE_STATUS.map((row) => row.href)).toEqual(hrefs);

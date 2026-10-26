@@ -21,7 +21,7 @@ export function Home() {
   const holdTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const beginHold = () => {
-    holdTimer.current = setTimeout(() => navigate("/ideen/"), IDEAS_HOLD_MS);
+    holdTimer.current = setTimeout(() => navigate("/management/"), IDEAS_HOLD_MS);
   };
   const cancelHold = () => {
     if (holdTimer.current) clearTimeout(holdTimer.current);

@@ -52,6 +52,10 @@ In a fresh worktree run `yarn install` first.
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
+- The hidden page `/management/` (hold the „p“ in the home title; `/ideen/` is its old address) is where
+  everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
+  market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
+  findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
 
 ## Language and style
 
@@ -61,7 +65,7 @@ In a fresh worktree run `yarn install` first.
   Translations and recordings (ElevenLabs voice, Suno songs) are made **only when the user asks** for
   them, since they cost tokens and credits: new features, stories, modes and changed lines come in German
   only, never translated or recorded on your own, also in a game that already speaks other languages.
-  Instead keep `src/content/ideas/languageStatus.ts` (shown on `/ideen/`) true in the same commit: what is
+  Instead keep `src/content/ideas/languageStatus.ts` (shown on `/management/`) true in the same commit: what is
   there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
   `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell.
   Every language choice (the Spielsprache on the home page, a game's own) starts on `playLanguage(…)`

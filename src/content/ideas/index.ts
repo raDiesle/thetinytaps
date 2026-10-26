@@ -1,4 +1,4 @@
-// Idea collection for grown-ups, shown on the hidden page /ideen/ (hold the
+// Idea collection for grown-ups, shown on the hidden page /management/ (hold the
 // "p" in the home page title for 2 seconds). IDs are fixed so they can be
 // referenced ("mach N-04"); new ideas get the next free number of their area,
 // never a reused one.

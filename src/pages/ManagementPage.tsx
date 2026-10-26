@@ -17,6 +17,7 @@ import {
   type LanguageState,
   languageStateOf,
 } from "@/content/ideas";
+import { RESEARCH, type Research } from "@/content/research";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/content/targetLanguages";
 import { useStoredSettings } from "@/lib/storage";
 import { useTitle } from "@/lib/title";
@@ -59,15 +60,24 @@ const DEFAULTS = {
   groupBy: "area" as GroupBy,
 };
 
+/** The page's parts, linked from the contents line at the top. */
+const CONTENTS: { id: string; label: string }[] = [
+  { id: "uebersicht", label: "📊 Überblick" },
+  { id: "sprachen", label: "🌍 Sprachen" },
+  { id: "recherchen", label: "🔍 Recherchen" },
+  { id: "ideas-list", label: "💡 Alle Ideen" },
+];
+
 /**
- * Hidden page for grown-ups: the idea collection from content/ideas, built for
- * choosing what to make next. An overview table shows where the open work is
+ * Hidden page for grown-ups that collects everything that helps decide what to
+ * do next: the idea collection from content/ideas, the language table and the
+ * research from content/research. An overview table shows where the open work is
  * (area × effort), filters narrow the list, and each idea can be marked
  * ⭐ / 🤔 / 👎. The ⭐ ones collect at the top, ready to copy as "mach N-01, …".
  * Reached by holding the "p" in the home page title.
  */
-export function IdeasPage() {
-  useTitle("Ideen");
+export function ManagementPage() {
+  useTitle("Management");
   const [saved, update] = useStoredSettings("tinytaps.ideas.v1", DEFAULTS);
   const [query, setQuery] = useState("");
   const marks: Record<string, Mark> = { ...Object.fromEntries(saved.starred.map((id) => [id, "next"])), ...saved.marks };
@@ -141,23 +151,45 @@ export function IdeasPage() {
         ← Alle Spiele
       </Link>
       <h1>
-        <span aria-hidden>💡</span> Ideen
+        <span aria-hidden>🧭</span> Management
       </h1>
       <p className="home-subtitle">
-        {active - done} offene Ideen, {done} schon umgesetzt, {rejected} abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen
-        kann.
+        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen. {active - done} offene Ideen, {done} schon umgesetzt, {rejected} abgelehnt. Die Nummern
+        (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
       <Progress done={done} total={active} />
+      <nav className="ideas-contents" aria-label="Inhalt">
+        {CONTENTS.map(({ id, label }) => (
+          <a
+            key={id}
+            href={`#${id}`}
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          >
+            {label}
+          </a>
+        ))}
+      </nav>
 
       <NextPanel ideas={nextIdeas} noIdeas={noIdeas} onShow={showIdea} onMark={setMark} />
 
-      <section className="ideas-panel">
+      <section id="uebersicht" className="ideas-panel">
         <h2>Überblick: Wo ist was offen?</h2>
         <p className="ideas-hint">Zahlen = offene Ideen. Antippen zeigt genau diese Ideen unten.</p>
         <Overview marks={marks} onPick={pick} />
       </section>
 
       <Languages />
+
+      <section id="recherchen" className="ideas-research">
+        <h2>🔍 Recherchen</h2>
+        <p className="ideas-hint">Was nachgeschaut wurde, wie, und welche Ideen daraus kamen. Die neueste zuerst; eine Nummer zeigt die Idee unten.</p>
+        {RESEARCH.map((research, i) => (
+          <ResearchPanel key={research.id} research={research} open={i === 0} onShow={showIdea} />
+        ))}
+      </section>
 
       {picks.length > 0 && (
         <section className="ideas-panel">
@@ -459,7 +491,7 @@ function LanguageCell({ language, state }: { language: TargetLanguage; state: La
  */
 function Languages() {
   return (
-    <section className="ideas-panel">
+    <section id="sprachen" className="ideas-panel">
       <h2>🌍 Sprachen: Deutsch, die fünf größten Weltsprachen, Russisch, Italienisch</h2>
       <p className="ideas-hint">
         Übersetzt und aufgenommen wird nur auf Wunsch, weil es Tokens und Credits kostet: Neues kommt erst auf Deutsch und steht hier als fehlend. Sag dann z.
@@ -521,6 +553,137 @@ function Languages() {
         </table>
       </div>
     </section>
+  );
+}
+
+/** An idea number that shows the idea in the list below. */
+function IdeaLink({ id, onShow }: { id: string; onShow: (id: string) => void }) {
+  return (
+    <button type="button" className="idea-id" title={IDEA_BY_ID.get(id)?.title} onClick={() => onShow(id)}>
+      {id}
+    </button>
+  );
+}
+
+/** One piece of research from content/research: question, method, findings, topics with their ideas, games, what was left out, sources. */
+function ResearchPanel({ research, open, onShow }: { research: Research; open: boolean; onShow: (id: string) => void }) {
+  const date = new Date(`${research.date}T12:00:00`).toLocaleDateString("de-DE");
+  return (
+    <details className="ideas-panel" open={open}>
+      <summary>
+        <h2>
+          {research.emoji} {research.title}
+        </h2>{" "}
+        <small className="ideas-research-date">{date}</small>
+      </summary>
+      <p>
+        <b>Frage:</b> {research.question}
+      </p>
+      <p className="ideas-hint">
+        <b>Wie:</b> {research.method}
+      </p>
+      <h3>Ergebnisse</h3>
+      <ul className="ideas-research-findings">
+        {research.findings.map((finding) => (
+          <li key={finding}>{finding}</li>
+        ))}
+      </ul>
+      {research.ideas.length > 0 && (
+        <p>
+          Ideen daraus außerdem:{" "}
+          {research.ideas.map((id) => (
+            <IdeaLink key={id} id={id} onShow={onShow} />
+          ))}
+        </p>
+      )}
+      {research.topics.length > 0 && (
+        <>
+          <h3>Themen und Ideen</h3>
+          <div className="ideas-overview-scroll">
+            <table className="ideas-research-table">
+              <thead>
+                <tr>
+                  <th>Thema</th>
+                  <th>Was Eltern suchen</th>
+                  <th>Ideen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {research.topics.map((topic) => (
+                  <tr key={topic.title}>
+                    <th>
+                      {topic.emoji} {topic.title}
+                    </th>
+                    <td>{topic.searches.map((q) => `„${q}“`).join(", ")}</td>
+                    <td>
+                      {topic.ideas.map((id) => (
+                        <IdeaLink key={id} id={id} onShow={onShow} />
+                      ))}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+      {research.games.length > 0 && (
+        <>
+          <h3>Gibt es schon – Titel-Vorschlag für Google</h3>
+          <div className="ideas-overview-scroll">
+            <table className="ideas-research-table">
+              <thead>
+                <tr>
+                  <th>Spiel</th>
+                  <th>Was Eltern suchen</th>
+                  <th>Titel</th>
+                </tr>
+              </thead>
+              <tbody>
+                {research.games.map((match) => {
+                  const game = GAME_BY_HREF.get(match.href);
+                  return (
+                    <tr key={match.href}>
+                      <th>
+                        <Link to={match.href}>{game ? `${game.emoji} ${game.title}` : match.href}</Link>
+                      </th>
+                      <td>{match.searches.map((q) => `„${q}“`).join(", ")}</td>
+                      <td>{match.title}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+      {research.excluded.length > 0 && (
+        <>
+          <h3>Bewusst weggelassen</h3>
+          <ul className="ideas-research-findings">
+            {research.excluded.map(({ title, why }) => (
+              <li key={title}>
+                <b>{title}:</b> {why}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {research.sources.length > 0 && (
+        <>
+          <h3>Quellen</h3>
+          <ul className="ideas-research-findings">
+            {research.sources.map(({ label, url }) => (
+              <li key={url}>
+                <a href={url} target="_blank" rel="noreferrer">
+                  {label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </details>
   );
 }
 
