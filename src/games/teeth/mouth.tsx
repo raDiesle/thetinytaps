@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type Po
 import { STAR_PATH } from "@/components/Bursts";
 import {
   buildMouth,
+  insideBy,
   projectors,
   toothKey,
   type Face,
@@ -32,6 +33,8 @@ const WAITING_FACING = 0.25;
 const HEAD = 270;
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
 const MONSTER_SIZE = 0.58;
+/** How far inside the lips' outline a monster's middle has to be: past the thick lip (half its stroke) onto the teeth. */
+const LIP_EDGE = 15;
 
 /** A part of the picture or the screen: x, y, width and height. */
 export interface Box {
@@ -351,6 +354,8 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
           // with the teeth together, only the outside of the teeth shows.
           if (m.waiting ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
           const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
+          // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
+          if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
           return (
             <g key={m.id} transform={`translate(${at.x.toFixed(1)} ${at.y.toFixed(1)}) scale(${(MONSTER_SIZE * project.zoom).toFixed(2)})`}>
               <Monster
