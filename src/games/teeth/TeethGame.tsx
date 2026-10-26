@@ -39,6 +39,7 @@ export function TeethGame() {
           <p>
             {t({
               de: "Bis 14 Uhr ist morgens: Die Sonne geht auf und am Kinn kleben Frühstückskrümel. Danach ist abends: Der Mond scheint, der Ärmel ist ein Schlafanzug und zum Schluss heißt es „Gute Nacht“.",
+              ru: "До 14:00 — утро: встаёт солнышко, а на подбородке крошки от завтрака. Потом — вечер: светит луна, рукав — это пижама, а в конце звучит «Спокойной ночи».",
             })}
           </p>
           <p>
@@ -69,22 +70,28 @@ export function TeethGame() {
             label={t({ de: "Vorher zeigen", ru: "Сначала показать" })}
             value={beforeOf(settings)}
             options={[
-              { value: "both", label: t({ de: "🍬 + 🪥 Beides" }) },
-              { value: "origin", label: t({ de: "🍬 Zuckermonster" }) },
-              { value: "prep", label: t({ de: "🪥 Zahnpasta" }) },
-              { value: "none", label: t({ de: "⏩ Gleich putzen" }) },
+              { value: "both", label: t({ de: "🍬 + 🪥 Beides", ru: "🍬 + 🪥 Всё вместе" }) },
+              { value: "origin", label: t({ de: "🍬 Zuckermonster", ru: "🍬 Сахарные монстры" }) },
+              { value: "prep", label: t({ de: "🪥 Zahnpasta", ru: "🪥 Зубная паста" }) },
+              { value: "none", label: t({ de: "⏩ Gleich putzen", ru: "⏩ Сразу чистить" }) },
             ]}
             onChange={(before) => update(BEFORE[before])}
           />
           <p className="setting-note">
             {t({
               de: "🍬 Wie Süßes zu Zuckermonstern wird. 🪥 Zahnbürste holen, Zahnpasta drauf.",
+              ru: "🍬 Как сладкое превращается в сахарных монстров. 🪥 Достаём щётку, выдавливаем пасту.",
             })}
           </p>
-          <Toggle label={t({ de: "⭐ Wochenbild: ein Stern für jedes Putzen" })} checked={settings.week} onChange={(week) => update({ week })} />
+          <Toggle
+            label={t({ de: "⭐ Wochenbild: ein Stern für jedes Putzen", ru: "⭐ Неделя: звёздочка за каждую чистку" })}
+            checked={settings.week}
+            onChange={(week) => update({ week })}
+          />
           <p className="setting-note">
             {t({
               de: "🎵 Das Zahnputzlied singt zu jedem Schritt, was dran ist, in der Sprache der App (🌐 auf der Startseite). Das Putzen dauert so lange wie das Lied, gut 2 Minuten. Es spielt immer, auch wenn die Musik aus ist.",
+              ru: "🎵 Песенка на каждом шаге поёт, что сейчас чистим, на языке приложения (🌐 на главной странице). Чистка длится столько же, сколько песенка, — чуть больше 2 минут. Она звучит всегда, даже когда музыка выключена.",
             })}
           </p>
         </SettingsGroup>
