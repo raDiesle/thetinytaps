@@ -165,7 +165,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   song files are named `musik-*.mp3`, see `/musik-erzeugen`. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
-  "Bitte quer halten" while the device stands upright, and asks once per visit for fullscreen, which on Android
+  "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“ lets a grown-up play upright for
+  the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
   only between games: menu pages call `useUpdateBetweenGames()` (`src/lib/pwa.ts`) – a new menu page does too, a game never.
