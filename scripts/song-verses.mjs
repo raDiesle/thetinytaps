@@ -43,6 +43,12 @@ const FIRST_WORD = 0.8;
 /** Shorter or longer steps are odd for brushing: a sign of a missed line or a take that doesn't follow the lyrics. */
 const SHORTEST = 13;
 const LONGEST = 26;
+/**
+ * A line's first three words are sung within about two seconds. When Whisper spreads them wider,
+ * it has smeared them over an intro or a break (the Spanish take: „Abre grande“ over 7 s of
+ * whistling), and the start needs a look at the spectrogram.
+ */
+const SMEARED = 3;
 
 // The first line of every part, from the language's section of the lyrics file.
 const lyrics = readFileSync(lyricsFile, "utf8");
@@ -117,6 +123,7 @@ function find(words, line, after) {
 // the second word. Checked against a spectrogram: the voice came in where this says.
 const words = hear();
 const verses = [];
+const smeared = [];
 for (const line of firstLines) {
   const after = (verses.at(-1) ?? -1) + 1;
   const i = find(words, line, after);
@@ -132,6 +139,7 @@ for (const line of firstLines) {
     process.exit(1);
   }
   const sung = Math.max(words[i].t, (words[i + 1]?.t ?? words[i].t) - FIRST_WORD);
+  smeared.push((words[i + 2]?.t ?? words[i].t) - words[i].t > SMEARED);
   verses.push(Math.max(0, Math.round((sung - LEAD) * 100) / 100));
 }
 
@@ -140,10 +148,13 @@ let odd = false;
 verses.forEach((t, i) => {
   const length = i < verses.length - 1 ? verses[i + 1] - t : null;
   const warn = length !== null && (length < SHORTEST || length > LONGEST);
-  odd ||= warn;
+  odd ||= warn || smeared[i];
   console.log(
-    `part ${i + 1}  ${t.toFixed(2).padStart(6)} s  ${length === null ? "finale" : `${length.toFixed(1)} s`}${warn ? "  <- odd length" : ""}  ${firstLines[i]}`,
+    `part ${i + 1}  ${t.toFixed(2).padStart(6)} s  ${length === null ? "finale" : `${length.toFixed(1)} s`}${warn ? "  <- odd length" : ""}${smeared[i] ? "  <- unsure start" : ""}  ${firstLines[i]}`,
   );
 });
 console.log(`written       ${out} and ${out.replace(/\.mp3$/, ".json")}; brushing lasts ${(verses.at(-1) - verses[0]).toFixed(1)} s`);
-if (odd) console.log("Some parts are much shorter or longer than a brushing step: listen there, a new take may be better.");
+if (odd)
+  console.log(
+    "Odd length: listen there, a new take may be better. Unsure start: Whisper smeared the line's first words, draw a spectrogram there (see /zahnputzlied) and correct the .json.",
+  );

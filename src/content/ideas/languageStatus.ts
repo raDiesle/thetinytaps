@@ -95,7 +95,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
-        languages: { de: "done", en: "done", ru: "done" },
+        languages: { de: "done", en: "done", es: "done", ru: "done" },
         note: "Text und Lied von Suno, eine neue Sprache: /zahnputzlied.",
       },
     ],

@@ -267,3 +267,186 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
 ```
 
 Title: `Чистим зубки`
+
+## Español (`es`, 26 Oct 2026)
+
+Made in Suno on 26 Oct 2026 with the texts below. Whisper found every part's first line, but
+smeared „Abre grande“ over the whistled intro (3 bars, until 6.9 s): the first start was set
+by hand from the spectrogram. Verses of 12 to 18 s: „Por dentro, arriba“ is sung fast, about
+3 s a line, so its step is only 12 s. The brushing lasts 1:49, the song runs 2:21. Sound words to join in: _ras, ras, ras_ (scrubbing), _zum, zum, zum_
+(circling, like a bee), _zas, zas, zas_ (wiping). Lines 3–4 repeat in parts 1–2, 3–5 and
+6–7. Neutral Spanish (no _dientitos_/_dientecitos_), present tense, nothing gendered about
+the child. Not yet read by a native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 112 BPM, steady, the same tempo all the way through]
+
+[Part 1 – 8 bars – bouncy ukulele, scrubbing rhythm]
+Abre grande, ¡ahhh, así!
+Los de abajo, por aquí.
+Adelante y hacia atrás,
+frota, frota, ras, ras, ras.
+
+[Glockenspiel sparkle]
+
+[Part 2 – 8 bars – glockenspiel, a little higher]
+Ahora arriba, ¡arriba va!
+El cepillo sube ya.
+Adelante y hacia atrás,
+frota, frota, ras, ras, ras.
+
+[Glockenspiel sparkle]
+
+[Part 3 – 8 bars – rolling marimba, round circling melody]
+Dientes juntos, ¡así, bien!
+Por el lado, ven, ven, ven.
+Circulitos, redonditos,
+zum, zum, zum, chiquititos.
+
+[Glockenspiel sparkle]
+
+[Part 4 – 8 bars – marimba and toy piano]
+Por delante, ¡gran sonrisa!
+Muestra los dientes sin prisa.
+Circulitos, redonditos,
+zum, zum, zum, chiquititos.
+
+[Glockenspiel sparkle]
+
+[Part 5 – 8 bars – marimba, whistling flute]
+Y ahora al otro lado,
+el cepillo va volando.
+Circulitos, redonditos,
+zum, zum, zum, chiquititos.
+
+[Glockenspiel sparkle]
+
+[Part 6 – 8 bars – soft ukulele, gentle wiping rhythm]
+Abre grande otra vez,
+junto a la lengua, ¿lo ves?
+De rojo a blanco, zas, zas, zas,
+los dientes brillan más.
+
+[Glockenspiel sparkle]
+
+[Part 7 – 8 bars – all instruments, joyful build]
+Por dentro, arriba también,
+ya casi acabamos, ¡bien!
+De rojo a blanco, zas, zas, zas,
+los dientes brillan más.
+
+[Part 8 – 8 bars – big happy finale, hand claps]
+¡Ya está! ¡Brillan, brillan, sí!
+Dientes limpios, ¡mira aquí!
+Los monstruos ya no están, ¡hurra!
+¡Hurra, hurra, hurra!
+
+[Final happy chord]
+[End]
+```
+
+Style of Music:
+
+```text
+cheerful Spanish children's song for toddlers, exactly 112 BPM, steady tempo that never speeds up, C major, steady bouncy beat, one warm friendly female voice, slow clear pronunciation, simple sing-along melody, eight clearly different 8-bar sections, ukulele, glockenspiel, marimba, whistling flute, toy piano, light hand claps, bright and happy, no intro, no fade out, about 2 minutes 20 seconds
+```
+
+Exclude Styles:
+
+```text
+choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, speeding up, long intro
+```
+
+Title: `¡A cepillar los dientes!`
+
+## Italiano (`it`, 26 Oct 2026)
+
+Not made in Suno yet. Sound words to join in: _sfrega, sfrega_ (scrubbing), _zum, zum, zum_
+(circling; „tondo tondo … gira il mondo“ echoes the nursery rhyme „Giro giro tondo“),
+_sciù, sciù, sciù_ (wiping). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Present tense,
+nothing gendered about the child. Not yet read by a native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 112 BPM, steady, the same tempo all the way through]
+
+[Part 1 – 8 bars – bouncy ukulele, scrubbing rhythm]
+Apri grande, ahhh, così!
+Sotto i denti, proprio qui.
+Avanti, indietro, avanti e via,
+sfrega, sfrega, che allegria!
+
+[Glockenspiel sparkle]
+
+[Part 2 – 8 bars – glockenspiel, a little higher]
+Ora sopra, su, su, su,
+lo spazzolino va lassù.
+Avanti, indietro, avanti e via,
+sfrega, sfrega, che allegria!
+
+[Glockenspiel sparkle]
+
+[Part 3 – 8 bars – rolling marimba, round circling melody]
+Chiudi i denti, tutti insieme,
+sul lato strofina bene.
+Piccoli cerchi, tondo tondo,
+zum, zum, zum, gira il mondo!
+
+[Glockenspiel sparkle]
+
+[Part 4 – 8 bars – marimba and toy piano]
+Ora davanti, un gran sorriso,
+largo largo sul tuo viso!
+Piccoli cerchi, tondo tondo,
+zum, zum, zum, gira il mondo!
+
+[Glockenspiel sparkle]
+
+[Part 5 – 8 bars – marimba, whistling flute]
+E dall'altro lato adesso,
+lo spazzolino fa lo stesso.
+Piccoli cerchi, tondo tondo,
+zum, zum, zum, gira il mondo!
+
+[Glockenspiel sparkle]
+
+[Part 6 – 8 bars – soft ukulele, gentle wiping rhythm]
+Bocca aperta, sì, perfetta,
+sotto, accanto alla linguetta.
+Dal rosso al bianco, sciù, sciù, sciù,
+i denti brillano di più!
+
+[Glockenspiel sparkle]
+
+[Part 7 – 8 bars – all instruments, joyful build]
+Dentro e in alto, dai, dai, dai,
+manca poco, ce la fai!
+Dal rosso al bianco, sciù, sciù, sciù,
+i denti brillano di più!
+
+[Part 8 – 8 bars – big happy finale, hand claps]
+Fatto! Denti bianchi e belli,
+brillano come gioielli.
+Niente più mostri, evviva!
+Evviva, evviva, evviva!
+
+[Final happy chord]
+[End]
+```
+
+Style of Music:
+
+```text
+cheerful Italian children's song for toddlers, exactly 112 BPM, steady tempo that never speeds up, C major, steady bouncy beat, one warm friendly female voice, slow clear pronunciation, simple sing-along melody, eight clearly different 8-bar sections, ukulele, glockenspiel, marimba, whistling flute, toy piano, light hand claps, bright and happy, no intro, no fade out, about 2 minutes 20 seconds
+```
+
+Exclude Styles:
+
+```text
+choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, tempo changes, speeding up, long intro
+```
+
+Title: `Laviamo i denti!`
