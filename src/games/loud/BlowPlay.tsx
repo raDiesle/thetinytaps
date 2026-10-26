@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from "react";
-import { pick, useAppLanguage } from "@/lib/language";
+import { type Localized, pick, useAppLanguage, spokenIn } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import type { LevelProps } from "./LoudPlay";
 import { createWind } from "./mic";
@@ -77,20 +77,21 @@ export function BlowPlay({ settings, mic, listen, celebrate, onDone }: LevelProp
   }, []);
 
   const say = useCallback(
-    (text: string) => {
+    (texts: Localized) => {
       if (!settings.speech) return;
+      const { text, lang } = spokenIn(texts, language);
       const rate = 0.85;
       deafFor((text.length * SPEECH_MS_PER_CHAR) / rate + 600);
-      speak(text, language.speechLang, { rate });
+      speak(text, lang, { rate });
     },
-    [deafFor, settings.speech, language.speechLang],
+    [deafFor, settings.speech, language],
   );
 
   listen.current = (db, ms) => {
     micWind.current = ear.blow(db, ms, performance.now() < deafUntil.current, settings.sensitivity);
   };
 
-  const introFor = useCallback(() => pick(texts.intro[micRef.current === "on" ? "mic" : "tap"], language.id), [texts, language.id]);
+  const introFor = useCallback(() => texts.intro[micRef.current === "on" ? "mic" : "tap"], [texts]);
 
   useEffect(() => {
     finished.current = false;
@@ -151,11 +152,11 @@ export function BlowPlay({ settings, mic, listen, celebrate, onDone }: LevelProp
       finished.current = true;
       const last = round % stations.length === stations.length - 1;
       later(pause, () => {
-        say(pick(texts.cheer, language.id));
+        say(texts.cheer);
         celebrate(() => (last && onDone ? onDone() : setRound((r) => r + 1)));
       });
     },
-    [celebrate, later, onDone, round, say, texts, language.id, stations.length],
+    [celebrate, later, onDone, round, say, texts, stations.length],
   );
 
   const Station = station.Station;

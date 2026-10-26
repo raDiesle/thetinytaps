@@ -1,5 +1,5 @@
 import { GameShell } from "@/components/GameShell";
-import { Choice, SettingsGroup } from "@/components/SettingControls";
+import { Choice } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useT } from "@/lib/language";
@@ -39,17 +39,29 @@ export function SocksGame() {
           ]}
         />
       }
-      settings={
-        !device.touchOnly && (
-          <SettingsGroup title={t({ de: "Verhalten", ru: "Поведение" })}>
-            <p className="setting-note">
+      info={
+        <>
+          <p>
+            {t({
+              de: "Die Waschmaschine ist voll. Ein Tipp startet sie, dann purzeln die Socken auf den Boden. Eine Socke antippen hebt sie hoch und lässt ihren Ton klingen; ihre Partnerin dazu, und beide hüpfen an die Wäscheleine. Eine andere Socke ist nie falsch: Die erste geht einfach zurück.",
+              ru: "Стиральная машина полна. Одно касание запускает её, и носочки высыпаются на пол. Касание носочка поднимает его, и звучит его нота; к нему его пару – и оба прыгают на верёвку. Другой носочек никогда не ошибка: первый просто возвращается обратно.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "„Farben“: jedes Paar hat seine Farbe. „Muster“: jedes Paar hat sein Muster in nur drei Farben. „Weiter“ bringt ein Paar mehr.",
+              ru: "«Цвета»: у каждой пары свой цвет. «Узоры»: у каждой пары свой узор всего в трёх цветах. «Дальше» добавляет ещё одну пару.",
+            })}
+          </p>
+          {!device.touchOnly && (
+            <p>
               {t({
                 de: "Mit der Tastatur: jede Taste startet die Waschmaschine. Dann wählen Pfeiltasten eine Socke, Leertaste oder Enter nimmt sie, 1–9 direkt.",
                 ru: "С клавиатуры: любая клавиша запускает стиральную машину. Потом стрелки выбирают носочек, пробел или Enter берёт его, 1–9 сразу.",
               })}
             </p>
-          </SettingsGroup>
-        )
+          )}
+        </>
       }
     >
       <SocksPlay settings={settings} />

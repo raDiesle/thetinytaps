@@ -486,7 +486,7 @@ export function ElevatorPlay({
                 return (
                   <g key={who} className="el-ride" style={outer} data-wish={who === "buddy" ? "brother" : undefined}>
                     <g className="el-walker" style={inner}>
-                      <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} onPointerDown={tapKid(who)}>
+                      <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid(who)}>
                         <g transform={who === "buddy" ? `scale(${BUDDY_SCALE})` : undefined}>
                           <Kid look={who === "hero" ? HERO : BROTHER} pose={a.pose} holding={a.holding} wear={a.wear} face={a.face} />
                         </g>

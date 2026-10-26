@@ -4,8 +4,8 @@ import type { StepId, StepTexts } from "./steps";
 // kindergarten would say it to a two-year-old ("зубки", "язычок", "кружочки").
 // "От красного к белому" is how Russian dentists teach the inside too.
 
-/** Title, hint and spoken cue of every step in Russian, by step id. */
-export const STEP_TEXTS_RU: Record<StepId, StepTexts> = {
+/** Title, hint and spoken cue of the steps in Russian, by step id; a text missing here is said in German (see stepText). */
+export const STEP_TEXTS_RU: Partial<Record<StepId, Partial<StepTexts>>> = {
   "lower-top": {
     title: "⬇️ Нижние зубки",
     hint: "Жевательные снизу: туда-сюда",

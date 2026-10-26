@@ -1,6 +1,6 @@
 import { playBark, playBuzz, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
 import type { Localized } from "@/lib/language";
-import { RUSSIAN_TEXTS } from "./content.ru";
+import { russianTexts } from "./content.ru";
 import type { Home, HomeId } from "./homes";
 
 // Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
@@ -102,4 +102,4 @@ const GERMAN_TEXTS: AnimalTexts = {
 };
 
 /** The texts by app language: `pick(ANIMAL_TEXTS, language.id)`. */
-export const ANIMAL_TEXTS: Localized<AnimalTexts> = { de: GERMAN_TEXTS, ru: RUSSIAN_TEXTS };
+export const ANIMAL_TEXTS: Localized<AnimalTexts> = { de: GERMAN_TEXTS, ru: russianTexts(GERMAN_TEXTS) };

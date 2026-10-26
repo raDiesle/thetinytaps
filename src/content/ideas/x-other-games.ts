@@ -111,5 +111,13 @@ export const otherGamesIdeas: IdeaArea = {
       effort: "S",
       done: true,
     },
+    {
+      id: "X-13",
+      emoji: "🚒",
+      title: "Zahnputzlieder mit Thema",
+      text: "Zähne putzen bekommt mehr gesungene Lieder zum Aussuchen, jedes mit eigenem Bild: Feuerwehr spritzt die Zuckermonster weg, ein Krokodil hält das Maul auf, ein Bagger baggert. Gemacht wie das Zahnputzlied (/zahnputzlied), ein Vers pro Schritt.",
+      why: "Eltern suchen „zahnputzlied feuerwehr“, „zahnputzlied krokodil“ und „zahnputzlied lustig“. Ein neues Lied macht das tägliche Putzen wieder spannend.",
+      effort: "S",
+    },
   ],
 };

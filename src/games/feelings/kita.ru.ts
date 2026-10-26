@@ -7,7 +7,7 @@ import type { SituationId } from "./kita";
 import type { SituationText } from "./localized";
 
 /** The kindergarten stories in Russian. */
-export const SITUATIONS_RU: Record<SituationId, SituationText> = {
+export const SITUATIONS_RU: Partial<Record<SituationId, SituationText>> = {
   push: {
     title: "Толкнули",
     caption: "Лисёнок толкает Мишку",

@@ -179,6 +179,8 @@ export function TraceGlyphs({ glyphs, sounds }: { glyphs: string[]; sounds: bool
       className="glyphs trace"
       role="img"
       aria-label={glyphs.join(" ")}
+      // Tracing stays on the letter, even next to something else to tap.
+      data-tap-keep
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={lift}

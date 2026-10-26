@@ -45,13 +45,14 @@ test("every recorded sound of the stories has its file", () => {
   for (const name of RECORDED_SOUNDS.filter((n) => n !== "aua")) expect(existsSync(`src/lib/sounds/${name}.mp3`), name).toBe(true);
 });
 
-// Every translation tells the same story as the German: the same steps, the same beats (a narration or a line
+// Every translated story tells the same story as the German: the same steps, the same beats (a narration or a line
 // where the German has one, so the timing and sounds fit), a question only where the German feeling has its own.
 test("every translation of a kindergarten story matches the German beat for beat", () => {
   const beatParts = (beats: { narration?: string; line?: string }[]) => beats.map((b) => [!!b.narration, !!b.line]);
   for (const [language, texts] of Object.entries(SITUATION_TEXTS)) {
     for (const situation of SITUATIONS) {
       const text = texts[situation.id];
+      if (!text) continue;
       const where = `${language} ${situation.id}`;
       expect(beatParts(text.intro), `${where} intro`).toEqual(beatParts(situation.intro));
       expect(beatParts(text.outro), `${where} outro`).toEqual(beatParts(situation.outro));
@@ -65,13 +66,18 @@ test("every translation of a kindergarten story matches the German beat for beat
 
 test("every translation of the bear's feelings asks its own question where the German does", () => {
   for (const [language, texts] of Object.entries(FEELING_TEXTS)) {
-    for (const feeling of FEELINGS) expect(!!texts[feeling.id].question, `${language} ${feeling.id}`).toBe(!!feeling.question);
+    for (const feeling of FEELINGS) {
+      const text = texts[feeling.id];
+      if (text) expect(!!text.question, `${language} ${feeling.id}`).toBe(!!feeling.question);
+    }
   }
 });
 
-test("a translated story has no German words left and keeps its sounds", () => {
+// Translations come only on request, so a story may have none yet (it is told in German); one that has keeps the sounds.
+test("a translated story has no German title left and keeps its sounds", () => {
   for (const story of STORIES) {
     const ru = storyIn(story, "ru");
+    if (story.kind === "home" ? !FEELING_TEXTS.ru?.[story.feeling.id] : !SITUATION_TEXTS.ru?.[story.situation.id]) continue;
     expect(ru.title).not.toBe(story.title);
     if (story.kind === "kita" && ru.kind === "kita") {
       expect(ru.situation.steps.map((s) => s.instead.sound)).toEqual(story.situation.steps.map((s) => s.instead.sound));

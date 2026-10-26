@@ -65,8 +65,8 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades in and out
 for a little movement. Choices are picture cards (`ChoiceCard` in `shared.tsx`)
-with a green tick or red cross, so children can choose without reading; „Nochmal“
-and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
+with a green tick or red cross, so children can choose without reading; „Menü“ (four cards like the start screen),
+„Nochmal“ and „Weiter“ are round picture buttons. Timing of a story's beats and its sounds in
 `story.ts`.
 
 The big picture and the cards keep one size for the whole story – nothing grows or
@@ -105,10 +105,12 @@ and `localized.ts` lays them over the German (`feelingIn`, `situationIn`,
 `comfortsIn`, `storyIn`). Small texts (the questions, praise, weather captions,
 start screen notes) are `Localized` inline: `t({ de, ru })`. Speech always uses the
 app language's voice (`useVoice`). Rules:
-- Every German text gets its Russian in the same change: a new story, step or beat
-  in `kita.ts` needs the same in `kita.ru.ts` (a sound-only beat is `{}`), a new
-  feeling or kind thing an entry in `bear.ru.ts` (the types make a missing id fail).
-  `feelings.test.ts` fails when a translation's steps or beats don't match the German.
+- New stories, feelings and kind things come in German only; their Russian is written
+  only when the user asks (a missing entry in `bear.ru.ts`/`kita.ru.ts` is told in German).
+  But a story that has a translation must match the German step for step and beat for
+  beat (a sound-only beat is `{}`): when you add or remove a step or beat in a translated
+  story, change `kita.ru.ts` too, or delete that story's entry. `feelings.test.ts` fails
+  when they don't match.
 - Russian names: the bear is „Мишка“ (at home and in the kindergarten), the fox
   „Лисёнок“, the hare „Зайчик“, the hedgehog „Ёжик“, the kindergarten teacher
   „воспитательница“, the one who brings Мишка „большой медведь“.

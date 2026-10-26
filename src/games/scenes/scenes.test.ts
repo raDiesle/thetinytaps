@@ -3,7 +3,7 @@ import { isCyrillic, RUSSIAN_KEYBOARD_ROWS } from "@/lib/cyrillicKeys";
 import { APP_LANGUAGES, pick } from "@/lib/language";
 import { SCENES } from ".";
 import { assignKeys, pressedKey, RUSSIAN_SCENE_KEYS, SCENE_KEYS, sceneKeysFor } from "./keys";
-import { localizeScene } from "./localize";
+import { localizeScene, sceneLanguage } from "./localize";
 import { SCENE_PHRASES } from "./phrases";
 import { questsFor } from "./quests";
 import { ROADS } from "./roads";
@@ -121,22 +121,20 @@ function translationProblems(scene: Scene, translation: SceneTranslation): strin
   const ids = new Set(scene.items.map((item) => item.id));
   if (!translation.title.trim()) problems.push("no title");
   if (!translation.description.trim()) problems.push("no description");
-  for (const id of ids) {
-    const words = translation.items[id];
-    if (!words) problems.push(`${id}: missing`);
-    else if (words.sentences.length === 0 || words.sentences.some((s) => !s.trim())) problems.push(`${id}: no sentence`);
-  }
+  // Items and chains may be missing (translations come only on request; the picture then plays in German), what is there must be whole.
   for (const [id, words] of Object.entries(translation.items)) {
     if (!ids.has(id)) problems.push(`${id}: not an item of the scene`);
     if (!words.name.trim()) problems.push(`${id}: no name`);
+    if (words.sentences.length === 0 || words.sentences.some((s) => !s.trim())) problems.push(`${id}: no sentence`);
     if (words.plural && words.gender) problems.push(`${id}: plural with a gender`);
     if (!words.plural && !words.gender) problems.push(`${id}: no gender`);
   }
   const chains = scene.chains ?? [];
-  if ((translation.chains?.length ?? 0) !== chains.length) problems.push(`chains: ${translation.chains?.length ?? 0} instead of ${chains.length}`);
+  if ((translation.chains?.length ?? 0) > chains.length) problems.push(`chains: ${translation.chains?.length} instead of ${chains.length}`);
   chains.forEach((chain, c) => {
     const steps = translation.chains?.[c];
-    if (steps && steps.length !== chain.steps.length) problems.push(`chain ${c + 1} (${chain.start}): ${steps.length} steps instead of ${chain.steps.length}`);
+    if (steps?.length && steps.length !== chain.steps.length)
+      problems.push(`chain ${c + 1} (${chain.start}): ${steps.length} steps instead of ${chain.steps.length}`);
     if (steps?.some((s) => !s.trim())) problems.push(`chain ${c + 1} (${chain.start}): empty step`);
   });
   return problems;
@@ -151,7 +149,7 @@ describe("scene translations", () => {
     Object.entries(byLanguage).map(([language, translation]) => ({ sceneId, language, translation: translation as SceneTranslation })),
   );
 
-  test("belong to scenes and cover every item, chain and the grammar", () => {
+  test("belong to scenes, and what they translate is whole and has its grammar", () => {
     for (const { sceneId, language, translation } of translations) {
       const scene = SCENES.find((s) => s.id === sceneId);
       expect(scene, sceneId).toBeDefined();
@@ -193,36 +191,46 @@ describe("a scene in Russian (fixture)", () => {
     title: "Стройка",
     description: "Машины работают.",
     items: {
+      ...Object.fromEntries(baustelle.items.map((item, i) => [item.id, { name: `предмет ${i}`, sentences: ["Привет!"], gender: "m" as const }])),
       [first.id]: { name: "экскаватор", sentences: ["Экскаватор копает!"], gender: "m" },
       [second.id]: { name: "санки", sentences: ["Санки едут!"], plural: true },
     },
     chains: baustelle.chains?.map((chain) => chain.steps.map((_, i) => `Шаг ${i + 1}`)),
   };
+  /** The fixture with its last item left out: the picture is not translated completely. */
+  const partial: SceneTranslation = { ...fixture, items: Object.fromEntries(Object.entries(fixture.items).slice(0, -1)) };
 
   // The fixture goes in for these tests only and comes out again, so the real translations stay as they are.
   const before = SCENE_TRANSLATIONS.baustelle;
-  const withFixture = () => {
-    SCENE_TRANSLATIONS.baustelle = { ...before, ru: fixture };
+  const withFixture = (translation = fixture) => {
+    SCENE_TRANSLATIONS.baustelle = { ...before, ru: translation };
     try {
-      return localizeScene({ ...baustelle }, "ru");
+      return { scene: localizeScene({ ...baustelle }, "ru"), language: sceneLanguage("baustelle", "ru") };
     } finally {
       if (before) SCENE_TRANSLATIONS.baustelle = before;
       else delete SCENE_TRANSLATIONS.baustelle;
     }
   };
 
-  test("translated items, title and chains are Russian, the rest stays German", () => {
-    const scene = withFixture();
+  test("a completely translated picture has Russian items, title and chains", () => {
+    const { scene, language } = withFixture();
+    expect(language).toBe("ru");
     expect(scene.title).toBe("Стройка");
     expect(scene.items[0].name).toBe("экскаватор");
     expect(scene.items[1].plural).toBe(true);
-    expect(scene.items[2]?.name).toBe(baustelle.items[2]?.name);
     if (baustelle.chains?.length) expect(scene.chains?.[0].steps[0].sentence).toBe("Шаг 1");
     expect(localizeScene(baustelle, "de")).toBe(baustelle);
   });
 
+  test("a picture missing one item plays entirely in German", () => {
+    const { scene, language } = withFixture(partial);
+    expect(language).toBe("de");
+    expect(scene.title).toBe(baustelle.title);
+    expect(scene.items[0].name).toBe(first.name);
+  });
+
   test("questions and praise follow the Russian grammar of the name", () => {
-    const scene = withFixture();
+    const { scene } = withFixture();
     const [find] = questsFor("find", scene, "ru");
     expect(find.question).toBe("Где экскаватор?");
     expect(find.praise(scene.items[0])).toBe("Вот экскаватор!");
@@ -234,7 +242,7 @@ describe("a scene in Russian (fixture)", () => {
   });
 
   test("keys mode gives the first Cyrillic letter and counts a German keyboard's keys as Russian", () => {
-    const { keyOf } = assignKeys(withFixture().items, "ru");
+    const { keyOf } = assignKeys(withFixture().scene.items, "ru");
     expect(keyOf.get(first.id)).toBe("Э");
     expect(keyOf.get(second.id)).toBe("С");
     for (const key of keyOf.values()) expect(RUSSIAN_SCENE_KEYS).toContain(key);

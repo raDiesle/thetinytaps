@@ -37,14 +37,16 @@ export function MarbleGame() {
       modes={modes}
       mode={mode}
       onMode={(levels) => update({ levels: levels as MarbleLevels })}
+      info={
+        <p>
+          {t({
+            de: "Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft bis zum Ende, und das Bild fährt mit. Auf der Klingenden Kugelbahn rollen die Kugeln über Xylophon, Wippe, Looping, Trommeln und Klangröhren bis in den Korb.",
+            ru: "Одно касание — и одно толкает другое: каждый уровень идёт до конца, а картинка едет следом. В «Звонких шариках» шарики катятся по ксилофону, качелям, мёртвой петле, барабанам и колокольчикам прямо в корзину.",
+          })}
+        </p>
+      }
       settings={
         <>
-          <p className="setting-note">
-            {t({
-              de: "Ein Tipp, und dann stößt eins das nächste an: Jedes Level läuft bis zum Ende, und das Bild fährt mit. Auf der Klingenden Kugelbahn rollen die Kugeln über Xylophon, Wippe, Looping, Trommeln und Klangröhren bis in den Korb.",
-              ru: "Одно касание — и одно толкает другое: каждый уровень идёт до конца, а картинка едет следом. В «Звонких шариках» шарики катятся по ксилофону, качелям, мёртвой петле, барабанам и колокольчикам прямо в корзину.",
-            })}
-          </p>
           <SettingsGroup title={t({ de: "Kugelbahn: Was rollt denn da?", ru: "Звонкие шарики: что там катится?" })}>
             <Toggle
               label={t({

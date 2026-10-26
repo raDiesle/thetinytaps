@@ -5,7 +5,7 @@ import type { ComfortId, FeelingId } from "./bear";
 import type { ComfortText, FeelingText } from "./localized";
 
 /** The kind things in Russian. */
-export const COMFORTS_RU: Record<ComfortId, ComfortText> = {
+export const COMFORTS_RU: Partial<Record<ComfortId, ComfortText>> = {
   stroke: { caption: "Погладить", narration: "Ты гладишь Мишку. Нежно-нежно." },
   hug: { caption: "Обнять", narration: "Ты крепко обнимаешь Мишку." },
   teddy: { caption: "Дать игрушку", narration: "Ты даёшь Мишке мягкую игрушку." },
@@ -20,7 +20,7 @@ export const COMFORTS_RU: Record<ComfortId, ComfortText> = {
 };
 
 /** The bear's feelings in Russian. */
-export const FEELINGS_RU: Record<FeelingId, FeelingText> = {
+export const FEELINGS_RU: Partial<Record<FeelingId, FeelingText>> = {
   sad: {
     title: "Грустно, плачет",
     intro: "Мишке грустно. Он плачет.",

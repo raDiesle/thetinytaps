@@ -83,4 +83,4 @@ const GERMAN_TEXTS: SockTexts = {
 };
 
 /** The texts by app language: `pick(SOCK_TEXTS, language.id)`; the Russian ones are in content.ru.ts. */
-export const SOCK_TEXTS: Localized<SockTexts> = { de: GERMAN_TEXTS, ru: RUSSIAN_TEXTS };
+export const SOCK_TEXTS: Localized<SockTexts> = { de: GERMAN_TEXTS, ru: { ...GERMAN_TEXTS, ...RUSSIAN_TEXTS } };

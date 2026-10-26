@@ -1,5 +1,5 @@
-import type { TargetLanguageId } from "@/content/targetLanguages";
-import { type Localized, pick } from "@/lib/language";
+import type { TargetLanguage } from "@/content/targetLanguages";
+import { type Localized, type Spoken, spokenIn } from "@/lib/language";
 import { ALL_TEETH, type Jaw, type Side, type Surface, type ToothId, type View } from "./jaw";
 import { STEP_TEXTS_RU } from "./steps.ru";
 
@@ -11,9 +11,9 @@ export type StepId = "lower-top" | "upper-top" | "outer-left" | "outer-front" | 
 
 /** What is shown and said in a step, in one language. */
 export interface StepTexts {
-  /** Big, for the child. */
+  /** What the step is; no text shows while brushing, so this is the progress bar segment's tooltip, with the hint. */
   title: string;
-  /** Small, for the grown-up. */
+  /** How to brush there, for the grown-up. */
   hint: string;
   /** Spoken when the step begins. */
   cue: string;
@@ -121,8 +121,9 @@ export const STEPS: Step[] = [
   },
 ];
 
-/** What `step` shows and says in `language`; German where there is no translation. */
-export const stepTexts = (step: Step, language: TargetLanguageId): StepTexts => pick<StepTexts>({ de: step, ru: STEP_TEXTS_RU[step.id] }, language);
+/** Title, hint or cue of `step` in `language` and the voice for it; the German one with the German voice where there is no translation. */
+export const stepText = (step: Step, key: keyof StepTexts, language: TargetLanguage): Spoken =>
+  spokenIn({ de: step[key], ru: STEP_TEXTS_RU[step.id]?.[key] }, language);
 
 /** While the monsters arrive and when everything is clean: a big grin. */
 export const GRIN_VIEW = CLOSED_FRONT;

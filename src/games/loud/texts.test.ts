@@ -1,9 +1,10 @@
 import { expect, test } from "@rstest/core";
-import type { Localized } from "@/lib/language";
+import { targetLanguageFor } from "@/content/targetLanguages";
+import { type Localized, spokenIn } from "@/lib/language";
 import { LEVEL_TEXTS, NUDGES, SAYS, STATION_TEXTS, VOICE_WORDS } from "./texts";
 
-// Every text the lion, the mouse and the pictures say or show needs its Russian too,
-// else a Russian child would hear German.
+// Translations are made only when the user asks, so a text may lack its Russian (it is
+// then said in German with the German voice); the Russian that is there must be Russian.
 
 const CYRILLIC = /[а-яё]/i;
 
@@ -16,15 +17,18 @@ function localizedIn(value: unknown, path: string): [string, Localized<string | 
 
 const ALL = localizedIn({ SAYS, NUDGES, STATION_TEXTS, VOICE_WORDS, LEVEL_TEXTS }, "texts");
 
-test("every text has a Russian one in Cyrillic", () => {
+test("the Russian texts that are there are written in Cyrillic", () => {
   expect(ALL.length).toBeGreaterThan(30);
   for (const [path, text] of ALL) {
-    const ru = text.ru;
-    expect(ru, path).toBeTruthy();
-    for (const line of [ru ?? []].flat()) expect(line, path).toMatch(CYRILLIC);
+    if (text.ru === undefined) continue;
+    const lines = [text.ru].flat();
+    expect(lines.length, path).toBeGreaterThan(0);
+    for (const line of lines) expect(line, path).toMatch(CYRILLIC);
   }
 });
 
-test("the animals have as many Russian sayings as German ones", () => {
-  for (const [who, says] of Object.entries(SAYS)) expect(says.ru?.length, who).toBe(says.de.length);
+test("a text without Russian is spoken in German with the German voice", () => {
+  const russian = targetLanguageFor("ru");
+  expect(spokenIn({ de: "Hallo" }, russian)).toEqual({ text: "Hallo", lang: "de-DE" });
+  expect(spokenIn({ de: "Hallo", ru: "Привет" }, russian)).toEqual({ text: "Привет", lang: russian.speechLang });
 });

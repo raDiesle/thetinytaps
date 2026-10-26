@@ -1,8 +1,8 @@
+import { useRef, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import { useT } from "@/lib/language";
 import type { Daytime } from "./daytime";
-import { PICTURE } from "./jaw";
-import { INK, SKIN } from "./mouth";
+import { fitBox, FrameStroke, INK, screenFrame, SKIN, useRoom, type Box } from "./mouth";
 
 // Before brushing, at the sink: the toothbrush wiggles in its cup until a
 // hand takes it out, then the tube comes over and puts a blob of toothpaste
@@ -12,8 +12,9 @@ import { INK, SKIN } from "./mouth";
 
 export type PrepPart = "brush" | "paste";
 
-const { width: W, height: H } = PICTURE;
 const SINK = 300;
+/** The part of the sink that always shows: window, cup, tube and the bowl; the rest of the screen shows more wall and sink. */
+const FOCUS: Box = { x: 30, y: 24, width: 390, height: 356 };
 const WINDOW = { x: 176, y: 34, width: 112, height: 112 };
 
 /** Drawn lying down with the bristles up and the handle to the right; the head sits at the origin. */
@@ -32,8 +33,9 @@ function Toothbrush() {
 function Hand({ daytime }: { daytime: Daytime }) {
   return (
     <g className="prep-hand" stroke={INK} strokeWidth={4} strokeLinejoin="round">
-      <rect x={100} y={20} width={36} height={420} rx={14} fill={SKIN} />
-      <rect x={94} y={78} width={48} height={380} rx={12} fill={daytime === "evening" ? "url(#prep-pyjama)" : "#8e7dff"} />
+      {/* Long enough to reach past the screen's edge however much of the sink shows. */}
+      <rect x={100} y={20} width={36} height={900} rx={14} fill={SKIN} />
+      <rect x={94} y={78} width={48} height={860} rx={12} fill={daytime === "evening" ? "url(#prep-pyjama)" : "#8e7dff"} />
       <rect x={90} y={-6} width={56} height={36} rx={15} fill={SKIN} />
       <path d="M104 12 V28 M118 12 V28 M132 12 V28" fill="none" strokeWidth={3} strokeLinecap="round" />
       <rect x={94} y={-10} width={36} height={13} rx={6.5} fill={SKIN} />
@@ -93,12 +95,18 @@ function Window({ daytime }: { daytime: Daytime }) {
   );
 }
 
-export function Prep({ part, daytime }: { part: PrepPart; daytime: Daytime }) {
+/** The sink filling the screen; `free` is the part between heading and controls, where the sink has to fit. */
+export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime; free: RefObject<HTMLElement | null> }) {
   const t = useT();
+  const svg = useRef<SVGSVGElement>(null);
+  const { box, unit } = fitBox(useRoom(svg, free), FOCUS);
+  const frame = screenFrame(box, unit);
+  const bottom = box.y + box.height;
   return (
     <svg
+      ref={svg}
       className={`prep at-${part}`}
-      viewBox={`0 0 ${W} ${H}`}
+      viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`}
       role="img"
       aria-label={
         part === "brush"
@@ -108,7 +116,7 @@ export function Prep({ part, daytime }: { part: PrepPart; daytime: Daytime }) {
     >
       <defs>
         <clipPath id="prep-frame">
-          <rect x={10} y={10} width={W - 20} height={H - 20} rx={70} />
+          <rect {...frame} />
         </clipPath>
         <pattern id="prep-tiles" width={55} height={55} patternUnits="userSpaceOnUse">
           <rect width={55} height={55} fill="#e6f7ff" />
@@ -122,11 +130,11 @@ export function Prep({ part, daytime }: { part: PrepPart; daytime: Daytime }) {
       </defs>
 
       <g clipPath="url(#prep-frame)">
-        <rect width={W} height={H} fill="url(#prep-tiles)" />
+        <rect {...box} fill="url(#prep-tiles)" />
         <Window daytime={daytime} />
-        {/* The edge of the sink. */}
-        <rect x={-20} y={SINK} width={W + 40} height={140} rx={26} fill="#fff" stroke={INK} strokeWidth={6} />
-        <ellipse cx={W / 2} cy={SINK + 70} rx={150} ry={30} fill="#d6eefa" stroke={INK} strokeWidth={4} />
+        {/* The edge of the sink, across the whole screen and down to its bottom. */}
+        <rect x={box.x - 20} y={SINK} width={box.width + 40} height={Math.max(140, bottom - SINK + 20)} rx={26} fill="#fff" stroke={INK} strokeWidth={6} />
+        <ellipse cx={220} cy={SINK + 70} rx={150} ry={30} fill="#d6eefa" stroke={INK} strokeWidth={4} />
 
         {/* The cup's back, then the brush in it, then the glass in front. */}
         <path d="M318 212 L394 212 L386 298 L326 298 Z" fill="#cfe9ff" />
@@ -183,8 +191,7 @@ export function Prep({ part, daytime }: { part: PrepPart; daytime: Daytime }) {
         )}
       </g>
 
-      <rect x={10} y={10} width={W - 20} height={H - 20} rx={70} fill="none" stroke={INK} strokeWidth={14} />
-      <rect x={10} y={10} width={W - 20} height={H - 20} rx={70} fill="none" stroke="#b9a8ff" strokeWidth={7} />
+      <FrameStroke frame={frame} unit={unit} />
     </svg>
   );
 }

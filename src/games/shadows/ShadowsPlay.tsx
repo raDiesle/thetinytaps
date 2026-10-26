@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { pick, useAppLanguage } from "@/lib/language";
+import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { ITEMS, SHADOW_TEXTS, type ShadowItem } from "./content";
 import { shuffle, useDeck } from "./deck";
 import type { ShadowsSettings } from "./settings";
@@ -80,9 +81,11 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, language.speechLang, { queue, rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
     },
-    [settings.speech, language.speechLang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   const pool = settings.theme === "all" ? ITEMS : ITEMS.filter((i) => i.theme === settings.theme);
@@ -286,6 +289,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
             style={offset ? { translate: `${offset.x}px ${offset.y}px`, scale: landed?.scale?.toString() } : undefined}
             role="img"
             aria-label={texts.name(round.item)}
+            data-tap
             onPointerDown={onPictureDown}
             onPointerMove={onPictureMove}
             onPointerUp={onPictureUp}
@@ -311,6 +315,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
                 }${peek ? " peek" : ""}`}
                 role="button"
                 aria-label={peek ? texts.name(s) : texts.shadow(i + 1)}
+                data-tap={tapState({ goal: i === round.correct })}
                 onPointerDown={onShadowDown(i)}
               >
                 <span

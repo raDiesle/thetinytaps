@@ -4,12 +4,11 @@ import { RUSSIAN_NAMES } from "./content.ru";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
-test("every picture has a Russian name and the form for „тень …“, in Cyrillic lower case", () => {
-  for (const item of ITEMS) {
-    const ru = RUSSIAN_NAMES[item.id];
-    expect(ru, item.id).toBeDefined();
-    expect(ru.name, item.id).toMatch(CYRILLIC);
-    expect(ru.of, item.id).toMatch(CYRILLIC);
+// Translations come only when asked for, so a picture may lack its Russian name; one that has it must be well formed.
+test("every Russian name and its form for „тень …“ are Cyrillic lower case", () => {
+  for (const [id, ru] of Object.entries(RUSSIAN_NAMES)) {
+    expect(ru.name, id).toMatch(CYRILLIC);
+    expect(ru.of, id).toMatch(CYRILLIC);
   }
 });
 
@@ -20,9 +19,15 @@ test("no Russian name is left over from a picture that is gone", () => {
 
 test("the Russian sentences have no German left in them", () => {
   const ru = SHADOW_TEXTS.ru!;
-  for (const item of ITEMS) {
+  for (const item of ITEMS.filter((i) => RUSSIAN_NAMES[i.id])) {
     for (const sentence of [ru.name(item), ru.search(item), ru.found(item), ru.thatIs(item), ru.there(item)]) {
       expect(sentence, item.id).not.toMatch(/[a-zäöüß]/i);
     }
   }
+});
+
+test("a picture without its Russian name gets the whole German sentence", () => {
+  const item = { ...ITEMS[0], id: "not-translated" };
+  const [ru, de] = [SHADOW_TEXTS.ru!, SHADOW_TEXTS.de];
+  for (const key of ["name", "search", "found", "thatIs", "there"] as const) expect(ru[key](item), key).toBe(de[key](item));
 });

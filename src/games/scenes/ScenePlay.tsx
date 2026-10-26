@@ -4,13 +4,15 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } from "@/lib/sfx";
+import { targetLanguageFor } from "@/content/targetLanguages";
 import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
+import { tapState, tapTargetAt } from "@/lib/tapTargets";
 import { SCENES } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
-import { localizeScene } from "./localize";
+import { localizeScene, sceneLanguage } from "./localize";
 import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
 import { capitalize, SCENE_PHRASES } from "./phrases";
 import { nextQuest, questsFor, type Quest } from "./quests";
@@ -83,7 +85,9 @@ function paleGrey(hex: string) {
 
 /** Plays `scene` (already in the app language, see localize.ts); the engine's own sentences come from phrases.ts. */
 export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesSettings }) {
-  const language = useAppLanguage();
+  // A picture that is not translated completely plays in German, voice and keys included (localize.ts).
+  const appLanguage = useAppLanguage();
+  const language = targetLanguageFor(sceneLanguage(scene.id, appLanguage.id));
   const words = pickLanguage(SCENE_PHRASES, language.id);
   const speechLang = language.speechLang;
   const [plays, setPlays] = useState<Plays>({});
@@ -327,7 +331,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
   };
 
   /** The next picture in menu order (after the last one the first). The game stays open, like following a vehicle. */
-  const nextScene = localizeScene(SCENES[(SCENES.findIndex((s) => s.id === scene.id) + 1) % SCENES.length], language.id);
+  const nextScene = localizeScene(SCENES[(SCENES.findIndex((s) => s.id === scene.id) + 1) % SCENES.length], appLanguage.id);
   const goToNextScene = () => {
     const { trip: _, ...state } = (location.state ?? {}) as { trip?: Trip };
     navigate(`/bilder/${nextScene.id}/`, { replace: true, state });
@@ -577,7 +581,9 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
 
   const onPointerMove = (e: PointerEvent) => {
     if (settings.trigger !== "hover") return;
-    const id = document.elementFromPoint(e.clientX, e.clientY)?.closest("[data-item]")?.getAttribute("data-item") ?? null;
+    // The same grown tap areas as for taps (see tapTargets.ts).
+    const under = tapTargetAt(e.clientX, e.clientY, document.elementFromPoint(e.clientX, e.clientY));
+    const id = under?.closest("[data-item]")?.getAttribute("data-item") ?? null;
     if (id === hovered.current) return;
     endHover();
     hovered.current = id;
@@ -723,6 +729,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
                 style={{ "--party-i": i } as CSSProperties}
                 filter={colouring && !discovered.has(item.id) ? greyFilter : undefined}
                 data-item={item.id}
+                data-tap={quest ? tapState({ goal: quest.answers.includes(item), done: answered.has(item.id) }) : tapState({ done: discovered.has(item.id) })}
                 role="button"
                 aria-label={capitalize(item.name)}
                 onPointerDown={(e) => tapItem(item, e)}
@@ -735,7 +742,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
                     <item.Art />
                   </HideoutContext.Provider>
                   {(item.hitAreas ?? [item.box]).map(([x, y, w, h], i) => (
-                    <rect key={i} className="scene-hit" x={x} y={y} width={w} height={h} />
+                    <rect key={i} className="scene-hit" data-tap-area x={x} y={y} width={w} height={h} />
                   ))}
                 </g>
               </g>

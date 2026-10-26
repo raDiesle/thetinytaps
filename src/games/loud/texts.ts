@@ -1,8 +1,8 @@
 import type { Localized } from "@/lib/language";
 
 // What the lion, the mouse and the blowing pictures say and show, German and
-// Russian side by side (the app language picks one). Every text needs both;
-// texts.test.ts checks that.
+// Russian side by side (the app language picks one). Russian comes only on request,
+// so a text may lack it: it is then said in German with the German voice (spokenIn).
 
 /** Who reacts: the lion to a loud voice, the mouse to a quiet one. */
 export type Who = "lion" | "mouse";

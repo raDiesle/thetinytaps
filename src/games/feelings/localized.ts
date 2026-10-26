@@ -1,7 +1,8 @@
 // The stories in the app language. The German data (bear.ts, kita.ts) holds
 // everything – pictures, sounds, order; a translation (bear.ru.ts, kita.ru.ts)
 // only holds the words, by id and in the same order, and is laid over the German
-// one here. A language without a translation tells the stories in German.
+// one here. A language without a translation – or a story, feeling or kind thing
+// not translated yet (translations come only on request) – is told in German.
 
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { COMFORTS, type Comfort, type ComfortId, type Feeling, type FeelingId } from "./bear";
@@ -39,11 +40,11 @@ export interface SituationText {
 }
 
 /** The translations of the kind things, by language. */
-export const COMFORT_TEXTS: Partial<Record<TargetLanguageId, Record<ComfortId, ComfortText>>> = { ru: COMFORTS_RU };
+export const COMFORT_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<ComfortId, ComfortText>>>> = { ru: COMFORTS_RU };
 /** The translations of the bear's feelings, by language. */
-export const FEELING_TEXTS: Partial<Record<TargetLanguageId, Record<FeelingId, FeelingText>>> = { ru: FEELINGS_RU };
+export const FEELING_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<FeelingId, FeelingText>>>> = { ru: FEELINGS_RU };
 /** The translations of the kindergarten stories, by language. */
-export const SITUATION_TEXTS: Partial<Record<TargetLanguageId, Record<SituationId, SituationText>>> = { ru: SITUATIONS_RU };
+export const SITUATION_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<SituationId, SituationText>>>> = { ru: SITUATIONS_RU };
 
 /** All kind things in `language`. */
 export function comfortsIn(language: TargetLanguageId): Record<ComfortId, Comfort> {

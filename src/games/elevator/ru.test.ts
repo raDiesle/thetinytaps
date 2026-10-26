@@ -4,8 +4,8 @@ import { RU } from "./ru";
 import { TRAIL_LEVELS } from "./trail/levels";
 import type { Station, Way } from "./trail/types";
 
-// Every German sentence the game speaks, and every title, has its Russian one in `ru.ts` – a missing one would
-// be said in German in the Russian app – and nothing in `ru.ts` is left over from a sentence that changed.
+// Translations come only on request, so a German sentence may lack its Russian one (it is said in German then);
+// but nothing in `ru.ts` is left over from a sentence that changed, and what is there is Russian.
 
 /** Every German text of the stories and levels that is spoken or shown to grown-ups. */
 function germanTexts(): string[] {
@@ -36,11 +36,6 @@ function germanTexts(): string[] {
   }
   return all;
 }
-
-test("every German sentence and title has its Russian one", () => {
-  const missing = germanTexts().filter((german) => !RU[german]);
-  expect(missing).toEqual([]);
-});
 
 test("the Russian phrasebook has nothing left over", () => {
   const used = new Set(germanTexts());

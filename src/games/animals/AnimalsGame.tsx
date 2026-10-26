@@ -45,6 +45,28 @@ export function AnimalsGame() {
           />
         </>
       }
+      info={
+        <>
+          <p>
+            {t({
+              de: "Tiere füttern: Ein Tier hat Hunger, und das Kind zieht das passende Futter zu ihm – die Möhre zum Hasen, den Knochen zum Hund.",
+              ru: "Покорми зверюшку: зверюшка проголодалась, и ребёнок тянет к ней подходящую еду – морковку к зайке, косточку к собачке.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Wer wohnt wo? Das Kind bringt das Tier in sein Zuhause: den Vogel ins Nest, die Kuh in den Stall.",
+              ru: "Кто где живёт? Ребёнок относит зверюшку в её домик: птичку в гнездо, корову в хлев.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Wer schaut da raus? Nur ein Stück von einem Tier schaut aus dem Busch oder dem Teich. Das Kind tippt unten auf das ganze Tier, und es kommt heraus.",
+              ru: "Кто там выглядывает? Из куста или пруда видна только часть зверюшки. Ребёнок нажимает внизу на всю зверюшку, и она выходит.",
+            })}
+          </p>
+        </>
+      }
       settings={
         <>
           <SettingsGroup title={t({ de: "Anzeige", ru: "Отображение" })}>

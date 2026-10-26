@@ -70,14 +70,11 @@ test("a story with recordings has one for every line and none left over (yarn vo
   }
 });
 
-test("every story is in Russian, the app language, with its title and a name for every step on the route", () => {
+// Translations come only on request, so a story may lack a title or step names in a language (they show in German).
+test("Russian titles and step names, where a story has them, are written in Cyrillic", () => {
   for (const { dir, story } of STORIES) {
     const ru = story.translations?.ru;
-    expect(ru, `${dir}: lines.ru.ts`).toBeDefined();
-    expect(ru?.title, `${dir}: title`).toBeTruthy();
-    expect(
-      ru?.steps.flatMap((s, i) => (s.name ? [] : [`${i + 1} ${story.lines[i].icon}`])),
-      `${dir}: steps without a name`,
-    ).toEqual([]);
+    const names = [ru?.title, ...(ru?.steps.map((s) => s.name) ?? [])].flatMap((n) => (n ? [n] : []));
+    for (const name of names) expect(name, `${dir}: ${name}`).toMatch(/^[^A-Za-z]*$/);
   }
 });

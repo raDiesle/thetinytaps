@@ -1,13 +1,20 @@
 import { useEffect } from "react";
-import { useT } from "@/lib/language";
+import { useLocation } from "react-router";
+import { fullTitle, SITE_NAME, seoFor } from "@/content/seo";
+import { useAppLanguage, useT } from "@/lib/language";
 
-const SITE = "The Tiny Taps";
-
-/** Sets the browser tab title; without a page title the site's default is used. */
+/**
+ * Sets the browser tab title. A page with a search engine entry (src/content/seo.ts)
+ * gets that title, the same Google got from the built page, while the app speaks German;
+ * otherwise the page title (in the app language), and without one the site's default.
+ */
 export function useTitle(page?: string) {
+  const { pathname } = useLocation();
+  const { id } = useAppLanguage();
   const t = useT();
   const fallback = t({ de: "Spiele für die Kleinsten", ru: "Игры для самых маленьких" });
   useEffect(() => {
-    document.title = page ? `${page} – ${SITE}` : `${SITE} – ${fallback}`;
-  }, [page, fallback]);
+    const seo = id === "de" ? seoFor(pathname) : undefined;
+    document.title = seo ? fullTitle(seo) : page ? `${page} – ${SITE_NAME}` : `${SITE_NAME} – ${fallback}`;
+  }, [page, pathname, id, fallback]);
 }

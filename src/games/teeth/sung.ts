@@ -1,4 +1,5 @@
 import type { Localized } from "@/lib/language";
+import { playLanguage } from "@/lib/locale";
 
 // The sung brushing songs: musik/musik-zaehneputzen-lied-<lang>.mp3, one per language,
 // with a .json of the same name saying where each verse begins. A new language needs
@@ -22,12 +23,15 @@ export const SUNG_LABELS: Record<string, Localized> = {
 
 /**
  * The language the song is sung in for the setting `singing`, out of the languages
- * that have a song: "auto" (the default) is the app language when there is a song in
- * it, a language is that one, and "off" or a language without a song is the plain tune (null).
+ * that have a song: "auto" (the default) is the app language when it is not German and
+ * there is a song in it, else `fallback` (the browser's language, else English:
+ * playLanguage) – German is also what the app shows every browser it doesn't speak, so
+ * it says nothing about the family. A language is that one, and "off" or a language
+ * without a song is the plain tune (null).
  */
-export function sungLanguageFor(singing: string, appLanguage: string, available: readonly string[]): string | null {
-  const wanted = singing === "auto" ? appLanguage : singing;
-  return available.includes(wanted) ? wanted : null;
+export function sungLanguageFor(singing: string, appLanguage: string, available: readonly string[], fallback = playLanguage(available)): string | null {
+  const wanted = singing !== "auto" ? singing : appLanguage !== "de" && available.includes(appLanguage) ? appLanguage : fallback;
+  return wanted !== undefined && available.includes(wanted) ? wanted : null;
 }
 
 /** The language code in a sung song's file name, or null for any other file. */

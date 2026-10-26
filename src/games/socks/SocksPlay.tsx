@@ -2,8 +2,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProp
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { playBoing, playCountNote, playKnock, playMelody, playPlop, playRandomNote, playWash } from "@/lib/sfx";
-import { useAppLanguage, useT } from "@/lib/language";
+import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { dealPairs, MAX_PAIRS, oneOf, SOCK_TEXTS, shuffle, type SockLook } from "./content";
 import { Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
@@ -113,9 +114,11 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
 
   const say = useCallback(
     (text: string) => {
-      if (settings.speech) speak(text, language.speechLang, { rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { rate: 0.85 });
     },
-    [settings.speech, language.speechLang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   // The socks get as big as the floor allows, also when the screen turns.
@@ -278,7 +281,9 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const next = pairs < MAX_PAIRS ? { emoji: "🧦", name: texts.pairs(pairs + 1), onNext: () => startRound(pairs + 1) } : undefined;
+  // One pair more each time; after the most pairs, the number the grown-up started with again.
+  const nextPairs = pairs < MAX_PAIRS ? pairs + 1 : Number(settings.pairs);
+  const next = { emoji: "🧦", name: texts.pairs(nextPairs), onNext: () => startRound(nextPairs) };
 
   return (
     <div className={`socks-play ${phase}`} onPointerDown={onBackgroundDown}>
@@ -340,6 +345,8 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
                       }${gone ? " gone" : ""}`}
                       style={{ translate, rotate: flight ? "0deg" : `${sock.rotate}deg`, scale: flight ? `${flight.scale}` : undefined }}
                       aria-label={texts.sock(i + 1)}
+                      // With one sock in hand, its partner is the right one.
+                      data-tap={tapState({ goal: selected !== null && selected !== i && round.socks[selected].pair === sock.pair, done: gone })}
                       onPointerDown={onSockDown(i)}
                     >
                       <SockDrawing look={round.looks[sock.pair]} />

@@ -255,6 +255,25 @@ export interface Point2 {
   depth: number;
 }
 
+/**
+ * Whether `p` lies inside the closed outline `points` and at least `margin`
+ * away from its edge – used for "inside the lip opening, not on the lip".
+ */
+export function insideBy(p: { x: number; y: number }, points: { x: number; y: number }[], margin: number): boolean {
+  let inside = false;
+  let nearest = Number.POSITIVE_INFINITY;
+  for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+    const a = points[j];
+    const b = points[i];
+    if (b.y > p.y !== a.y > p.y && p.x < ((a.x - b.x) * (p.y - b.y)) / (a.y - b.y) + b.x) inside = !inside;
+    const dx = a.x - b.x;
+    const dy = a.y - b.y;
+    const k = Math.max(0, Math.min(1, ((p.x - b.x) * dx + (p.y - b.y) * dy) / (dx * dx + dy * dy || 1)));
+    nearest = Math.min(nearest, Math.hypot(p.x - (b.x + k * dx), p.y - (b.y + k * dy)));
+  }
+  return inside && nearest >= margin;
+}
+
 /** Turns 3D points into picture coordinates for a view. */
 export function projector(view: View) {
   const yaw = rad(view.yaw);

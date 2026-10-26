@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { pick, useAppLanguage } from "@/lib/language";
+import { pick, useAppLanguage, type Spoken, spokenIn } from "@/lib/language";
 import { playRoar, playSqueak } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { Acacia, Lion, Mouse, Tuft } from "./animals";
@@ -50,14 +50,11 @@ export function VoicePlay({ settings, mic, listen, celebrate, onDone }: LevelPro
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const say = useCallback(
-    (text: string) => {
-      const rate = 0.85;
-      deafUntil.current = Math.max(deafUntil.current, performance.now() + (text.length * SPEECH_MS_PER_CHAR) / rate + 600);
-      speak(text, language.speechLang, { rate });
-    },
-    [language.speechLang],
-  );
+  const say = useCallback(({ text, lang }: Spoken) => {
+    const rate = 0.85;
+    deafUntil.current = Math.max(deafUntil.current, performance.now() + (text.length * SPEECH_MS_PER_CHAR) / rate + 600);
+    speak(text, lang, { rate });
+  }, []);
 
   const later = useCallback((ms: number, run: () => void) => {
     const timer = setTimeout(() => {
@@ -97,10 +94,13 @@ export function VoicePlay({ settings, mic, listen, celebrate, onDone }: LevelPro
         busyUntil.current = deafUntil.current = Infinity;
         later(REACT_MS[who], () => celebrate(onDone));
       } else if (settings.speech) {
-        later(SPEECH_DELAY_MS, () => say(pickOne(pick(SAYS[who], language.id))));
+        later(SPEECH_DELAY_MS, () => {
+          const line = spokenIn(SAYS[who], language);
+          say({ text: pickOne(line.text), lang: line.lang });
+        });
       }
     },
-    [celebrate, later, onDone, say, spawn, settings.speech, language.id],
+    [celebrate, later, onDone, say, spawn, settings.speech, language],
   );
 
   listen.current = (db, ms) => {
@@ -116,11 +116,11 @@ export function VoicePlay({ settings, mic, listen, celebrate, onDone }: LevelPro
       if (performance.now() - lastAct.current < NUDGE_MS) return;
       lastAct.current = performance.now();
       setNudge(next);
-      if (settings.speech) say(pick(NUDGES[next][mic === "on" ? "mic" : "tap"], language.id));
+      if (settings.speech) say(spokenIn(NUDGES[next][mic === "on" ? "mic" : "tap"], language));
       next = next === "lion" ? "mouse" : "lion";
     }, 1000);
     return () => clearInterval(tick);
-  }, [mic, say, settings.speech, language.id]);
+  }, [mic, say, settings.speech, language]);
 
   const threshold = meterAt(ear.loudDb(settings.sensitivity));
 
@@ -143,14 +143,14 @@ export function VoicePlay({ settings, mic, listen, celebrate, onDone }: LevelPro
 
         <Meter threshold={threshold} />
 
-        <g className="ll-mouse" transform="translate(215 508) scale(1.5)" onPointerDown={() => react("mouse")}>
+        <g className="ll-mouse" transform="translate(215 508) scale(1.5)" data-tap onPointerDown={() => react("mouse")}>
           <ellipse cx="0" cy="2" rx="58" ry="9" fill="#00000018" />
           <g key={count.mouse} className="ll-mouse-jump">
             <Mouse />
           </g>
         </g>
 
-        <g className="ll-lion" ref={lionRef} transform="translate(720 512)" onPointerDown={() => react("lion")}>
+        <g className="ll-lion" ref={lionRef} transform="translate(720 512)" data-tap onPointerDown={() => react("lion")}>
           <ellipse cx="0" cy="4" rx="150" ry="16" fill="#00000018" />
           <g key={count.lion} className="ll-lion-jump">
             <Lion />

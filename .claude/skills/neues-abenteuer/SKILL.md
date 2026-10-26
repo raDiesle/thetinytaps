@@ -74,7 +74,11 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
 - **`obstacle`** – something in the way: `need` (the thing that helps), `at` (where the
   thing flies to), `meet` (sounds on arrival), `sounds` + `ms` (while it is solved),
   `nope` (the funny sound for a wrong thing), `frees: true` only on the last one, which
-  gives the goal back. Drachen: dog → ball, horse → carrot, stream → plank, dark
+  gives the goal back, and `why` – the thought bubble that says why the thing helps:
+  `{ wants: [x, y] }` for a creature (or plants) thinking of what it wants, the bubble's tip just above its
+  head (it grows to the right, away from the child), or `{ worry: "wet" | "splash" | "dark" | "dig" }`
+  for the child thinking of what would happen (`worries.tsx`; draw a new worry there when none fits).
+  Drachen: dog → ball, horse → carrot, stream → plank, dark
   tunnel → lantern, squirrel with the kite → apple.
 - **`climb`** – stairs or a ladder: `steps` are ground points from the bottom up; the
   first tap climbs half, the second the rest. They must also be in `ground`
@@ -100,6 +104,9 @@ them:
   once), is wrapped in `<Nope id nope>` (it shakes its head at a wrong thing), and
   changes when solved (`.tl-dog.done` trots off and wags, the plank lies over the
   stream, `tl-dark` gets `lit`);
+- food that is given is eaten where it can be seen: it lies in the mouth (`tl-chew`) or at the beak, which pecks
+  at it while it gets smaller bite by bite (`tl-bites`, `late` when the animal first hops down to it) – never
+  left lying untouched (the bread just floating in the duck pond made no sense);
 - the goal itself is drawn by `TrailPlay`, not by the scenery; what must be in front
   of it (the sand that half hides the ball) goes into an optional `<Level>Front`.
 
@@ -140,9 +147,10 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
 4. **Add the data** to `levels.ts`: the `TrailLevel` with stations, sounds from
    `@/lib/sfx` (add a new sound to the fitting topic file there, built on `note()`),
    short German sentences in the present tense. Append it to `TRAIL_LEVELS`.
-   Give every sentence and the level title its Russian line in `src/games/elevator/ru.ts` in the same
-   change (`ru.test.ts` fails on a German text without one).
-5. **Add a mode** in `ElevatorGame.tsx`: `{ id: "<level id>", emoji, title }` after the
+   The level comes in German only: Russian lines in `src/games/elevator/ru.ts` are written only when
+   the user asks for them (a sentence without one is said in German). When you change a German sentence
+   that already has a Russian line, delete or update that line (`ru.test.ts` fails on a left-over one).
+5. **Add a mode** in `ElevatorGame.tsx`: `{ id: "<level id>", emoji, title: title("…"), kind: t(TRAIL) }` after the
    other trail levels. If the start-screen note mentions the levels or keys, keep it true.
 6. **The cards pick it up**: `cards.tsx` builds the end cards from `TRAIL_LEVELS` and
    `GOALS[level.goal]` – nothing to add, but check the new card shows the goal.
@@ -158,9 +166,10 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
   `finale.say`. Short words, present tense.
 - **Nothing is pointed at** beyond what `TrailPlay` shows by itself: before each tap
   yellow footprints lead to the child's pale ghost, standing where the tap takes it and
-  doing what it will do there, and the button shows the thing it gets (or feet, or
-  stairs). No extra arrows, frames or hands; the bag's right thing glows, the thought
-  bubble shows the goal.
+  doing what it will do there, the button shows the thing it gets (or feet, or
+  stairs), and a thing to pick up has a dashed yellow ring round it and waits pale, ringed the same, in the
+  backpack. No extra arrows, frames or hands; at an obstacle the `why` bubble explains and the bag's right
+  thing glows. The goal is shown in the bubble only when it goes away – reminders never show it again.
 - **One action button**, the same in every level (drawn by `TrailPlay`, framed, next to
   the bag on wide phones, bottom right otherwise). Don't add buttons, and no other way
   to leave than `GameShell`'s.
@@ -177,11 +186,12 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
 1. `yarn verify` – `levels.test.ts` runs for every level in `TRAIL_LEVELS`: unique
    station ids, ground and stations left to right, the bag never over three and
    always holding what the next obstacle needs, only the last station frees the
-   goal, stair steps on the ground. Also the unique-`@keyframes` and ideas tests.
+   goal, stair steps on the ground, a creature's `why` bubble on the screen next to the child. Also the unique-`@keyframes` and ideas tests.
 2. Play it through in the preview (`preview_start` with `dev`, `/kleine-abenteuer/`,
    pick the level): **Space** walks on at every station, **1–3** pick from the open
    bag. At every obstacle try a wrong thing first (shake, sound, it flies back, the
-   right one glows), then the right one. Look at each station: is the thing visible
+   right one glows), then the right one. Does the `why` bubble sit right above the creature, and is its
+   picture easy to read? Look at each station: is the thing visible
    and does it stand out, does the obstacle react, does the scenery change when
    solved, is nothing cut off at the screen edges? Climb takes two presses. At the
    end the goal comes back, confetti, and the cards (1–4) include the new level.

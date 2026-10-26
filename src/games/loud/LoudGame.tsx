@@ -38,33 +38,37 @@ export function LoudGame() {
           ]}
         />
       }
-      settings={
-        <SettingsGroup title={t({ de: "Mikrofon", ru: "Микрофон" })}>
-          <p className="setting-note">
+      info={
+        <>
+          <p>
             {t({
               de: "Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Nacheinander geht es nach zehn Tönen weiter zum Pusten.",
               ru: "Лев и мышка: если ребёнок громко кричит, лев рычит и подпрыгивает. Если говорит или шепчет тихо, пищит маленькая мышка. В режиме «Оба по очереди» после десяти звуков игра переходит к «Дуем».",
             })}
           </p>
-          <p className="setting-note">
+          <p>
             {t({
               de: "Pusten: Ins Mikrofon pusten bläst die Kerzen auf dem Geburtstagskuchen aus, lässt die Schirmchen der Pusteblume fliegen, dreht ein Windrad, bis der Regenbogen fertig ist, und treibt das Segelboot mit der Maus zum Löwen. Lautes Rufen pustet auch; so laut wie für den Löwen ist ganz fest gepustet.",
               ru: "Дуем: если дуть в микрофон, гаснут свечки на праздничном торте, разлетаются пушинки одуванчика, крутится вертушка, пока не появится радуга, и парусник везёт мышку ко льву. Громкий крик тоже дует; так громко, как для льва, — значит, подуть очень сильно.",
             })}
           </p>
-          <p className="setting-note">
+          <p>
             {t({
               de: "Das Spiel misst nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch: Ein Tipp ist ein kurzer Puster, Finger draufhalten pustet weiter.",
               ru: "Игра только измеряет, насколько сейчас громко, — ничего не записывается, не сохраняется и не отправляется. Нажимать тоже можно: короткое нажатие — короткий порыв ветра, если держать палец, ветер дует дальше.",
             })}
           </p>
-          <MicCheck sensitivity={settings.sensitivity} />
-          <p className="setting-note">
+          <p>
             {t({
               de: "Mit „Vorlesen“ auf der Startseite sprechen die Tiere („Roaaar! Ich bin der Löwe!“) und laden zum Rufen und Pusten ein.",
               ru: "Если на главной странице включено «Читать вслух», звери говорят («Р-р-р! Я лев!») и зовут кричать и дуть.",
             })}
           </p>
+        </>
+      }
+      settings={
+        <SettingsGroup title={t({ de: "Mikrofon", ru: "Микрофон" })}>
+          <MicCheck sensitivity={settings.sensitivity} />
         </SettingsGroup>
       }
     >

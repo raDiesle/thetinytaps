@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/sfx";
-import { pick, useAppLanguage } from "@/lib/language";
+import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { ANIMAL_TEXTS, ANIMALS, FOODS, type Animal, type Food } from "./content";
 import { HOMES, HomeDrawing, type Home } from "./homes";
 import type { AnimalsSettings } from "./settings";
@@ -95,9 +96,11 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, language.speechLang, { queue, rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
     },
-    [settings.speech, language.speechLang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   const prompt = (r: Round) => (r.kind === "feed" ? texts.hungry(r.animal) : texts.whereLives(r.animal));
@@ -354,6 +357,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
         won && round.kind === "feed" ? " munch" : ""
       }${yuck ? " yuck" : ""}`}
       style={round.kind === "home" ? moveStyle(offsetOf("animal")) : undefined}
+      data-tap
       onPointerDown={round.kind === "home" ? onMoverDown("animal") : onAnimalTap}
       onPointerMove={onMoverMove}
       onPointerUp={onMoverUp}
@@ -387,6 +391,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
               optionRefs.current[i] = el;
             }}
             className={`ap-option ap-plate${focus === i ? " focused" : ""}`}
+            data-tap={tapState({ goal: i === round.correct })}
             onPointerDown={onMoverDown(i)}
             onPointerMove={onMoverMove}
             onPointerUp={onMoverUp}
@@ -418,6 +423,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
               className={`ap-option ap-home${focus === i ? " focused" : ""}${hover === i ? " near" : ""}${
                 won && outcome.pick === i ? " happy" : ""
               }${peek ? " peek" : ""}`}
+              data-tap={tapState({ goal: i === round.correct })}
               onPointerDown={onHomeDown(i)}
             >
               <div className="ap-home-box">

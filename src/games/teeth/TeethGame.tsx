@@ -17,13 +17,49 @@ export function TeethGame() {
   const { touchOnly } = useDevice();
   const language = useAppLanguage();
   const t = useT();
-  // "auto" shows as what it plays: the song in the app language, or "Nur Musik" when there is none.
+  // "auto" shows as what it plays: the song in the app language, else in the browser's language or English, else "Nur Musik".
   const singing = sungLanguageFor(settings.singing, language.id, SUNG_LANGUAGES) ?? "off";
 
   return (
     <GameShell
       title={t({ de: "Zähne putzen", ru: "Чистим зубы" })}
       emoji="🦷"
+      info={
+        <>
+          <p>
+            {t({
+              de: `Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI (${KAI.de}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und nach verschwinden. Der Bildschirm bleibt dabei an.`,
+              ru: `Поставьте устройство — и вперёд: нажимать ничего не нужно. Чистим в семь шагов по порядку: ${t(KAI)}. Картинка каждый раз показывает, широко ли открыт рот или зубки сомкнуты (стрелки у губ показывают, когда открыть или закрыть рот), и какие зубы чистить сейчас. На всех ещё не почищенных зубах сидят сахарные монстры, они по очереди исчезают при чистке. Экран при этом не гаснет.`,
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Morgens geht die Sonne auf und am Kinn kleben Frühstückskrümel; abends scheint der Mond, der Ärmel ist ein Schlafanzug und zum Schluss heißt es „Gute Nacht“. Nach der Uhr ist bis 14 Uhr morgens.",
+              ru: "Утром встаёт солнце и на подбородке крошки от завтрака; вечером светит луна, рукав — это пижама, а в конце звучит «Спокойной ночи». «По часам» — до 14:00 считается утром.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren erbsengroß. Danach ausspucken, nicht nachspülen. Bis ins Grundschulalter putzen Eltern nach.",
+              ru: "Стоматологи советуют: дважды в день паста со фтором (1000 ppm), до 2 лет — с рисовое зёрнышко, с 2 лет — с горошину. Потом сплюнуть, не полоскать. До младшей школы родители дочищают зубы за ребёнком.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Unten neben dem Fortschrittsbalken pausiert ⏸️ das Putzen. Tippen oder Ziehen auf dem Balken springt an diese Stelle.",
+              ru: "Внизу рядом с полосой прогресса кнопка ⏸️ ставит чистку на паузу. Нажатие или перетаскивание по полосе переносит в это место.",
+            })}
+            {!touchOnly && (
+              <>
+                {" "}
+                {t({ de: "Mit Tastatur:", ru: "С клавиатуры:" })} <kbd>←</kbd> <kbd>→</kbd>{" "}
+                {t({ de: "springen zum vorigen oder nächsten Schritt, die", ru: "— к предыдущему или следующему шагу," })}{" "}
+                <kbd>{t({ de: "Leertaste", ru: "Пробел" })}</kbd> {t({ de: "pausiert.", ru: "— пауза." })}
+              </>
+            )}
+          </p>
+        </>
+      }
       settings={
         <SettingsGroup title={t({ de: "Putzen", ru: "Чистка" })}>
           <Choice
@@ -35,6 +71,14 @@ export function TeethGame() {
               { value: "evening", label: t({ de: "🌙 Abends", ru: "🌙 Вечером" }) },
             ]}
             onChange={(daytime) => update({ daytime })}
+          />
+          <Toggle
+            label={t({
+              de: "Vorher zeigen: Wie Zuckermonster entstehen (Süßes, dann wachsen sie)",
+              ru: "Сначала показать: откуда берутся сахарные монстры (сладкое, потом они вырастают)",
+            })}
+            checked={settings.origin}
+            onChange={(origin) => update({ origin })}
           />
           <Toggle
             label={t({ de: "Vorher zeigen: Zahnbürste holen, Zahnpasta drauf", ru: "Сначала показать: взять щётку, выдавить пасту" })}
@@ -80,48 +124,8 @@ export function TeethGame() {
                   ru: "Песенка поёт к каждому шагу, что сейчас делать, и чистка длится столько же, сколько песенка, — чуть больше 2 минут. С «Только музыка» — ровно 2 минуты.",
                 })}
               </p>
-              {!SUNG_LANGUAGES.includes(language.id) && (
-                <p className="setting-note">
-                  {t({
-                    de: "In der Sprache der App gibt es das Lied noch nicht: Es spielt nur Musik, oder das Lied in einer anderen Sprache.",
-                    ru: "Песенки на русском пока нет: играет просто музыка, а подсказки звучат по-русски. Можно выбрать песенку на другом языке.",
-                  })}
-                </p>
-              )}
             </>
           )}
-          <p className="setting-note">
-            {t({
-              de: `Gerät hinstellen und los: Niemand muss tippen. Geputzt wird in sieben Schritten nach KAI (${KAI.de}). Das Bild zeigt jedes Mal, ob der Mund weit auf ist oder die Zähne zusammen sind (Pfeile an den Lippen zeigen, wann er auf- oder zugeht) und welche Zähne gerade dran sind. Auf allen noch nicht geputzten Zähnen sitzen Zuckermonster, die beim Putzen nach und nach verschwinden. Der Bildschirm bleibt dabei an.`,
-              ru: `Поставьте устройство — и вперёд: нажимать ничего не нужно. Чистим в семь шагов по порядку: ${t(KAI)}. Картинка каждый раз показывает, широко ли открыт рот или зубки сомкнуты (стрелки у губ показывают, когда открыть или закрыть рот), и какие зубы чистить сейчас. На всех ещё не почищенных зубах сидят сахарные монстры, они по очереди исчезают при чистке. Экран при этом не гаснет.`,
-            })}
-          </p>
-          <p className="setting-note">
-            {t({
-              de: "Morgens geht die Sonne auf und am Kinn kleben Frühstückskrümel; abends scheint der Mond, der Ärmel ist ein Schlafanzug und zum Schluss heißt es „Gute Nacht“. Nach der Uhr ist bis 14 Uhr morgens.",
-              ru: "Утром встаёт солнце и на подбородке крошки от завтрака; вечером светит луна, рукав — это пижама, а в конце звучит «Спокойной ночи». «По часам» — до 14:00 считается утром.",
-            })}
-          </p>
-          <p className="setting-note">
-            {t({
-              de: "Zahnärzte empfehlen: zweimal täglich Zahnpasta mit Fluorid (1000 ppm), unter 2 Jahren reiskorngroß, ab 2 Jahren erbsengroß. Danach ausspucken, nicht nachspülen. Bis ins Grundschulalter putzen Eltern nach.",
-              ru: "Стоматологи советуют: дважды в день паста со фтором (1000 ppm), до 2 лет — с рисовое зёрнышко, с 2 лет — с горошину. Потом сплюнуть, не полоскать. До младшей школы родители дочищают зубы за ребёнком.",
-            })}
-          </p>
-          <p className="setting-note">
-            {t({
-              de: "Unten neben dem Fortschrittsbalken pausiert ⏸️ das Putzen. Tippen oder Ziehen auf dem Balken springt an diese Stelle.",
-              ru: "Внизу рядом с полосой прогресса кнопка ⏸️ ставит чистку на паузу. Нажатие или перетаскивание по полосе переносит в это место.",
-            })}
-            {!touchOnly && (
-              <>
-                {" "}
-                {t({ de: "Mit Tastatur:", ru: "С клавиатуры:" })} <kbd>←</kbd> <kbd>→</kbd>{" "}
-                {t({ de: "springen zum vorigen oder nächsten Schritt, die", ru: "— к предыдущему или следующему шагу," })}{" "}
-                <kbd>{t({ de: "Leertaste", ru: "Пробел" })}</kbd> {t({ de: "pausiert.", ru: "— пауза." })}
-              </>
-            )}
-          </p>
         </SettingsGroup>
       }
     >

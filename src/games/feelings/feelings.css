@@ -510,12 +510,15 @@
 
 /* ---------- Again and next, as round picture buttons ---------- */
 
+/* Three round buttons in a row: as big as the cards allow, and never wider than the room for the cards. */
 .fg-end {
-  --end-size: min(var(--card-w) * 0.75, 168px);
+  --end-gap: clamp(14px, 3cqmin, 40px);
+  --end-room: calc(100cqw - 2 * var(--pad));
+  --end-size: min(var(--card-w) * 0.8, 210px, (var(--end-room) - 2 * var(--end-gap)) / 2.5);
 
   display: flex;
   align-items: center;
-  gap: clamp(28px, 7vw, 72px);
+  gap: var(--end-gap);
   animation: pop-in 0.4s var(--pop);
 }
 
@@ -546,9 +549,10 @@
   stroke-linejoin: round;
 }
 
-/* Playing it again is the quieter choice. */
+/* Back to the menu and playing it again are the quieter choices. */
+.fg-round.menu,
 .fg-round.again {
-  --size: calc(var(--end-size) * 0.68);
+  --size: calc(var(--end-size) * 0.75);
   background: #fff;
 }
 
@@ -593,6 +597,17 @@
     padding: var(--x-clear) max(var(--pad), env(safe-area-inset-right)) max(var(--pad), env(safe-area-inset-bottom)) var(--pad);
   }
 
+  .story-play .fg-end {
+    --end-room: calc(var(--choices-w) - 2 * var(--pad));
+  }
+
+  /* The kindergarten cards stand one above the other, so the round buttons do too. */
+  .kita-play .fg-end {
+    --end-room: calc(var(--card-w) * 2.5);
+
+    flex-direction: column;
+  }
+
   /* Four cards at home: two by two. Nothing is above them, so they clear the ✕ themselves. */
   .bear-play {
     --x-clear: 68px;
@@ -609,8 +624,13 @@
     --small-w: calc((var(--card-w) * 2 - var(--gap)) / 3);
   }
 
-  .kita-play .story-choices {
+  .kita-play .story-choices,
+  .kita-play .fg-end {
     flex-direction: row;
+  }
+
+  .kita-play .fg-end {
+    --end-room: calc(var(--choices-w) - 2 * var(--pad));
   }
 }
 

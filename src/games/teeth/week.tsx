@@ -13,7 +13,9 @@ const SLOTS: { daytime: Daytime; icon: string; label: Localized }[] = [
 
 /**
  * The week from Monday to Sunday, a sun and a moon for every day. Each
- * brushing finished puts a star there; the one just earned pops in.
+ * brushing finished puts a star there; the one just earned pops in. Today
+ * stands out (bigger, „Heute“, coloured for morning or evening) and so does
+ * the slot of this brushing, so it is clear which star comes now.
  */
 export function Week({ log, today, now }: { log: WeekLog; today: Date; now: Daytime }) {
   const t = useT();
@@ -25,15 +27,17 @@ export function Week({ log, today, now }: { log: WeekLog; today: Date; now: Dayt
         const key = dayKey(day);
         const done = log[key] ?? [];
         return (
-          <li key={key} className={`teeth-day${key === todayKey ? " today" : ""}`}>
+          <li key={key} className={`teeth-day${key === todayKey ? ` today ${now}` : ""}`}>
+            {key === todayKey && <span className="teeth-today-tag">{t({ de: "Heute", ru: "Сегодня" })}</span>}
             <span className="teeth-day-name">{dayNames[i]}</span>
             {SLOTS.map(({ daytime, icon, label }) => {
               const star = done.includes(daytime);
-              const fresh = star && key === todayKey && daytime === now;
+              const current = key === todayKey && daytime === now;
+              const fresh = star && current;
               return (
                 <span
                   key={daytime}
-                  className={`teeth-slot${star ? " star" : ""}${fresh ? " fresh" : ""}`}
+                  className={`teeth-slot${star ? " star" : ""}${fresh ? " fresh" : ""}${current ? " now" : ""}`}
                   aria-label={`${dayNames[i]} ${t(label)}: ${star ? t({ de: "geputzt", ru: "почищено" }) : t({ de: "noch nicht", ru: "ещё нет" })}`}
                 >
                   {star ? "⭐" : icon}

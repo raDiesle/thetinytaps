@@ -1,4 +1,5 @@
 import { COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS } from "@/lib/common";
+import { afterLoad } from "@/lib/pwa";
 import { loadStored } from "@/lib/storage";
 
 // Downloading the background song (musik/musik-hintergrund.mp3, see the README
@@ -26,7 +27,11 @@ export function downloadMusic() {
   return bytes;
 }
 
-/** Called once at start-up: if music is on, the song is there by the time a game starts. */
+/**
+ * Called once at start-up: if music is on, the song is there by the time a game starts.
+ * Only after the page has loaded, so the song (a few MB) doesn't hold up the menu.
+ * A game started before that asks for it itself (downloadMusic).
+ */
 export function downloadMusicIfOn() {
-  if (loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS).music) void downloadMusic();
+  if (loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS).music) afterLoad(() => void downloadMusic());
 }

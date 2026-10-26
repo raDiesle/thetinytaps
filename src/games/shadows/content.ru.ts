@@ -15,7 +15,7 @@ export interface RussianName {
   many?: true;
 }
 
-/** Every picture of content.ts by its id; shadows.test.ts checks that none is missing. */
+/** Pictures of content.ts by their id; one without an entry is said in German (russianTexts). */
 export const RUSSIAN_NAMES: Record<string, RussianName> = {
   elefant: { name: "слон", of: "слона" },
   giraffe: { name: "жираф", of: "жирафа" },
@@ -89,16 +89,26 @@ export const RUSSIAN_NAMES: Record<string, RussianName> = {
 
 const capital = (text: string) => text.charAt(0).toLocaleUpperCase("ru-RU") + text.slice(1);
 
-/** The Russian name of `item`; the German one only if an entry is missing (the test makes sure none is). */
-const ru = (item: ShadowItem): RussianName => RUSSIAN_NAMES[item.id] ?? { name: item.name, of: item.name };
-
-export const RUSSIAN_TEXTS: ShadowTexts = {
-  name: (item) => capital(ru(item).name),
-  search: (item) => `${capital(ru(item).name)} ${ru(item).many ? "ищут" : "ищет"} свою тень.`,
-  found: (item) => `Ура! Вот тень ${ru(item).of}!`,
-  thatIs: (item) => `Это ${ru(item).name}.`,
-  peek: "Кто там выглядывает?",
-  there: (item) => `А вот и ${ru(item).name}!`,
-  shadow: (n) => `Тень ${n}`,
-  stars: (n) => `Готово: ${n}`,
-};
+/**
+ * The Russian texts. Translations come only when asked for, so a picture may have no
+ * Russian name yet: then the whole sentence comes from `german` (and is read by the
+ * German voice), never a German word inside a Russian sentence.
+ */
+export function russianTexts(german: ShadowTexts): ShadowTexts {
+  const about =
+    (sentence: (ru: RussianName) => string, fallback: (item: ShadowItem) => string) =>
+    (item: ShadowItem): string => {
+      const ru = RUSSIAN_NAMES[item.id];
+      return ru ? sentence(ru) : fallback(item);
+    };
+  return {
+    name: about((ru) => capital(ru.name), german.name),
+    search: about((ru) => `${capital(ru.name)} ${ru.many ? "ищут" : "ищет"} свою тень.`, german.search),
+    found: about((ru) => `Ура! Вот тень ${ru.of}!`, german.found),
+    thatIs: about((ru) => `Это ${ru.name}.`, german.thatIs),
+    peek: "Кто там выглядывает?",
+    there: about((ru) => `А вот и ${ru.name}!`, german.there),
+    shadow: (n) => `Тень ${n}`,
+    stars: (n) => `Готово: ${n}`,
+  };
+}

@@ -1,54 +1,13 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, test } from "@rstest/core";
 import { CATEGORIES } from "@/content/games";
 import { cyrillicLetterOf, RUSSIAN_KEYBOARD_ROWS } from "./cyrillicKeys";
 import { APP_LANGUAGES, OWN_NAMES } from "./language";
 
-const OTHER_LANGUAGES = APP_LANGUAGES.filter((id) => id !== "de");
-
-/** Every .ts/.tsx file below `dir`, tests left out. */
-function sources(dir: string): string[] {
-  return readdirSync(dir).flatMap((name) => {
-    const path = join(dir, name);
-    if (statSync(path).isDirectory()) return sources(path);
-    return /\.tsx?$/.test(name) && !name.includes(".test.") ? [path] : [];
-  });
-}
-
-/** The text from `start` (an opening brace) to its closing brace. */
-function braced(text: string, start: number) {
-  let depth = 0;
-  for (let i = start; i < text.length; i++) {
-    if (text[i] === "{") depth++;
-    else if (text[i] === "}" && --depth === 0) return text.slice(start, i + 1);
-  }
-  return text.slice(start);
-}
-
 describe("app languages", () => {
-  test("every category and game of the home menu has its name in each app language", () => {
-    for (const id of OTHER_LANGUAGES) {
-      for (const category of CATEGORIES) {
-        expect(category.title[id], `${category.id} title in ${id}`).toBeTruthy();
-        expect(category.subtitle[id], `${category.id} subtitle in ${id}`).toBeTruthy();
-        for (const game of category.games) expect(game.title[id], `${game.href} in ${id}`).toBeTruthy();
-      }
-    }
-  });
-
-  test("every t({ de: … }) and pick({ de: … }) in the code also gives each app language", () => {
-    const missing: string[] = [];
-    for (const file of sources("src")) {
-      const text = readFileSync(file, "utf8");
-      for (const match of text.matchAll(/\b(?:t|pick)\(\s*\{\s*de:/g)) {
-        const object = braced(text, text.indexOf("{", match.index));
-        for (const id of OTHER_LANGUAGES) {
-          if (!new RegExp(`\\b${id}:`).test(object)) missing.push(`${file}: ${object.slice(0, 60)}… has no ${id}`);
-        }
-      }
-    }
-    expect(missing).toEqual([]);
+  // Translations are made only on request, so a name may be missing (it shows in German); one that is there is Russian.
+  test("the Russian names of the home menu are written in Cyrillic", () => {
+    const names = CATEGORIES.flatMap((c) => [c.title, c.subtitle, ...c.games.map((g) => g.title)]).flatMap((text) => (text.ru ? [text.ru] : []));
+    for (const name of names) expect(name, name).toMatch(/^[^A-Za-z]*$/);
   });
 
   test("each app language has its own name for the language choice", () => {

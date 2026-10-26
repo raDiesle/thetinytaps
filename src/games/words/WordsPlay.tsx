@@ -284,7 +284,7 @@ export function WordsPlay({
             <div className="slots" style={{ "--letters": letters.length } as CSSProperties}>
               {letters.map((char, i) =>
                 i === typed ? (
-                  <span key={`${i}-${nudges}`} className={`slot next${nudges > 0 ? " nudge" : ""}`} onPointerDown={onNextLetterPointer}>
+                  <span key={`${i}-${nudges}`} className={`slot next${nudges > 0 ? " nudge" : ""}`} data-tap onPointerDown={onNextLetterPointer}>
                     {display(char)}
                   </span>
                 ) : (

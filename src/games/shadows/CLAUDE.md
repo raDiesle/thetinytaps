@@ -6,7 +6,9 @@ A picture looks for its shadow among 2–4 black ones (the same emoji with `filt
 
 ## Languages
 
-Both games speak the app language (German or Russian, `useAppLanguage()`): start screen texts inline with `t({ de, ru })`, game texts through `pick(SHADOW_TEXTS, language.id)` (`ShadowTexts` in `content.ts`), speech in `language.speechLang`. `content.ru.ts` gives every picture, by id, its Russian name in the nominative and the genitive for „Вот тень слона!“ (`many` for plural words like „ножницы“, so the verb is „ищут“).
-- A new picture needs its Russian entry in `content.ru.ts` in the same change; `shadows.test.ts` fails without it.
+Both games speak the app language (German or Russian, `useAppLanguage()`): start screen and „Über das Spiel“ texts inline with `t({ de, ru })`, game texts through `pick(SHADOW_TEXTS, language.id)` (`ShadowTexts` in `content.ts`), speech in `language.speechLang`. `content.ru.ts` gives pictures, by id, their Russian name in the nominative and the genitive for „Вот тень слона!“ (`many` for plural words like „ножницы“, so the verb is „ищут“).
+- Translations come only when the user asks. A new or changed German line comes German-only; add the Russian only on request. Gaps are marked in `src/content/ideas/languageStatus.ts`.
+- When a German line changes its meaning, delete its Russian in the same change (a stale translation is worse than German).
+- A picture without its Russian name is said entirely in German (`russianTexts` takes the whole German sentence, and `say` gives a sentence without Cyrillic to the German voice). `shadows.test.ts` checks that the Russian there is Cyrillic, no id is stale, and the fallback works.
 - Russian sentences must not use the past tense or depend on the picture's gender (no „нашёл/нашла“, no „его/её“); use the nominative or the stored genitive.
 - Never show `item.name` directly; it is German. Use `texts.name(item)`.

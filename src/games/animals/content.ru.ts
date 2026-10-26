@@ -1,11 +1,11 @@
 import type { Animal, AnimalTexts, Food } from "./content";
-import type { HomeId } from "./homes";
+import type { Home, HomeId } from "./homes";
 
 // Russian texts for "Was gehört zum Tier?", by the ids of the animals, foods and
 // homes in content.ts and homes.tsx. The sentences are built so that no word has
 // to agree with the animal's gender: "Мишка любит мёд", "Где живёт лиса?".
 
-/** Each animal's Russian name in the nominative, lower case, warm diminutives where a child would say them. */
+/** Animals by their id (one without an entry is said in German): the Russian name in the nominative, lower case, warm diminutives where a child would say them. */
 export const RUSSIAN_ANIMALS: Record<string, string> = {
   hase: "зайка",
   hund: "собачка",
@@ -40,7 +40,7 @@ export interface RussianFood {
   likes: string;
 }
 
-/** Each food by its id. */
+/** Foods by their id; one without an entry is said in German. */
 export const RUSSIAN_FOODS: Record<string, RussianFood> = {
   moehre: { name: "морковка", likes: "морковку" },
   knochen: { name: "косточка", likes: "косточки" },
@@ -70,8 +70,8 @@ export interface RussianHome {
   inPhrase: string;
 }
 
-/** Every home; a Record over HomeId, so a new home doesn't compile without its Russian. */
-export const RUSSIAN_HOMES: Record<HomeId, RussianHome> = {
+/** Homes by their id; one without an entry is said in German (russianTexts). */
+export const RUSSIAN_HOMES: Partial<Record<HomeId, RussianHome>> = {
   huette: { name: "будка", inPhrase: "в будке" },
   nest: { name: "гнездо", inPhrase: "в гнезде" },
   aquarium: { name: "аквариум", inPhrase: "в аквариуме" },
@@ -89,21 +89,27 @@ export const RUSSIAN_HOMES: Record<HomeId, RussianHome> = {
 
 const capital = (text: string) => text.charAt(0).toLocaleUpperCase("ru-RU") + text.slice(1);
 
-// The German word only if an entry is missing; content.test.ts makes sure none is.
-const animal = (a: Animal) => RUSSIAN_ANIMALS[a.id] ?? a.name;
-const food = (f: Food) => RUSSIAN_FOODS[f.id] ?? { name: f.name, likes: f.plural };
-
-export const RUSSIAN_TEXTS: AnimalTexts = {
-  animal: (a) => capital(animal(a)),
-  food: (f) => capital(food(f).name),
-  home: (h) => capital(RUSSIAN_HOMES[h.id].name),
-  hungry: (a) => `${capital(animal(a))} хочет кушать!`,
-  yummy: (a, f) => `Ням-ням, вкусно! ${capital(animal(a))} любит ${food(f).likes}. Спасибо!`,
-  yuck: (a) => `Фу! ${capital(animal(a))} такое не ест.`,
-  whereLives: (a) => `Где живёт ${animal(a)}?`,
-  movedIn: (a, h) => `Ура! ${capital(animal(a))} живёт ${RUSSIAN_HOMES[h.id].inPhrase}.`,
-  livesHere: (resident) => `Нет, тут живёт ${animal(resident)}!`,
-  yuckBubble: "Фу!",
-  thanksBubble: "Спасибо!",
-  stars: (n) => `Готово: ${n}`,
-};
+/**
+ * The Russian texts. Translations come only when asked for, so an animal, food or home
+ * may have no Russian word yet: then the whole sentence comes from `german` (and is read
+ * by the German voice), never a German word inside a Russian sentence.
+ */
+export function russianTexts(german: AnimalTexts): AnimalTexts {
+  const animal = (a: Animal) => RUSSIAN_ANIMALS[a.id];
+  const food = (f: Food) => RUSSIAN_FOODS[f.id];
+  const home = (h: Home) => RUSSIAN_HOMES[h.id];
+  return {
+    animal: (a) => (animal(a) ? capital(animal(a)) : german.animal(a)),
+    food: (f) => (food(f) ? capital(food(f)!.name) : german.food(f)),
+    home: (h) => (home(h) ? capital(home(h)!.name) : german.home(h)),
+    hungry: (a) => (animal(a) ? `${capital(animal(a))} хочет кушать!` : german.hungry(a)),
+    yummy: (a, f) => (animal(a) && food(f) ? `Ням-ням, вкусно! ${capital(animal(a))} любит ${food(f)!.likes}. Спасибо!` : german.yummy(a, f)),
+    yuck: (a) => (animal(a) ? `Фу! ${capital(animal(a))} такое не ест.` : german.yuck(a)),
+    whereLives: (a) => (animal(a) ? `Где живёт ${animal(a)}?` : german.whereLives(a)),
+    movedIn: (a, h) => (animal(a) && home(h) ? `Ура! ${capital(animal(a))} живёт ${home(h)!.inPhrase}.` : german.movedIn(a, h)),
+    livesHere: (resident) => (animal(resident) ? `Нет, тут живёт ${animal(resident)}!` : german.livesHere(resident)),
+    yuckBubble: "Фу!",
+    thanksBubble: "Спасибо!",
+    stars: (n) => `Готово: ${n}`,
+  };
+}

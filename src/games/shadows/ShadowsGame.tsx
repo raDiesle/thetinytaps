@@ -40,6 +40,24 @@ export function ShadowsGame() {
           ]}
         />
       }
+      info={
+        <>
+          <p>
+            {t({
+              de: "Ein Bild sucht seinen Schatten unter zwei bis vier schwarzen. Das Kind tippt auf den passenden Schatten oder zieht das Bild darauf. Ein anderer Schatten zeigt kurz seine Farben: „Das ist die Giraffe.“",
+              ru: "Картинка ищет свою тень среди двух–четырёх чёрных. Ребёнок нажимает на подходящую тень или перетаскивает на неё картинку. Другая тень ненадолго показывает свои цвета: «Это жираф».",
+            })}
+          </p>
+          {!device.touchOnly && (
+            <p>
+              {t({
+                de: "Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.",
+                ru: "С клавиатуры: стрелки выбирают картинку, пробел или Enter берёт её, 1–4 – сразу.",
+              })}
+            </p>
+          )}
+        </>
+      }
       settings={
         <>
           <SettingsGroup title={t({ de: "Anzeige", ru: "Отображение" })}>
@@ -56,14 +74,6 @@ export function ShadowsGame() {
               checked={settings.tap}
               onChange={(tap) => update({ tap })}
             />
-            {!device.touchOnly && (
-              <p className="setting-note">
-                {t({
-                  de: "Mit der Tastatur: Pfeiltasten wählen ein Bild, Leertaste oder Enter nimmt es, 1–4 direkt.",
-                  ru: "С клавиатуры: стрелки выбирают картинку, пробел или Enter берёт её, 1–4 сразу.",
-                })}
-              </p>
-            )}
           </SettingsGroup>
         </>
       }

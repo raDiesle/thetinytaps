@@ -1,8 +1,11 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "@rstest/core";
 import { CATEGORIES } from "./games";
-import { IDEA_AREAS, LANGUAGE_STATUS, TOP_PICKS } from "./ideas";
+import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, toLower, toUpper } from "./languages";
+import { RESEARCH } from "./research";
+import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
+import { SCENES } from "../games/scenes";
 import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
@@ -46,7 +49,57 @@ describe("ideas", () => {
   });
 });
 
-describe("language status on the ideas page", () => {
+describe("search engine texts (seo.ts)", () => {
+  const paths = SEO_PAGES.map((page) => page.path);
+
+  test("every page of the menu and every scene has one, and nothing else", () => {
+    const wanted = [
+      "/",
+      ...CATEGORIES.map((category) => `/spiele/${category.id}/`),
+      ...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)),
+      ...SCENES.map((scene) => `/bilder/${scene.id}/`),
+    ];
+    expect([...paths].sort()).toEqual([...new Set(wanted)].sort());
+  });
+
+  test.each(SEO_PAGES.map((page) => [page.path, page] as const))("%s: title and description fit in a search result", (_, page) => {
+    expect(fullTitle(page).length, fullTitle(page)).toBeLessThanOrEqual(70);
+    expect(page.description.length, page.description).toBeGreaterThanOrEqual(80);
+    expect(page.description.length, page.description).toBeLessThanOrEqual(160);
+    expect(page.text.length).toBeGreaterThan(60);
+  });
+
+  test("titles and descriptions are not shared between pages", () => {
+    for (const key of ["title", "description"] as const) {
+      const values = SEO_PAGES.map((page) => page[key]);
+      expect(values.filter((v, i) => values.indexOf(v) !== i)).toEqual([]);
+    }
+  });
+
+  test("grown-up pages are never in the search pages", () => {
+    for (const path of NO_INDEX_PATHS) expect(paths).not.toContain(path);
+  });
+});
+
+describe("research on the management page", () => {
+  const ideaIds = new Set(IDEA_AREAS.flatMap((area) => area.ideas.map((idea) => idea.id)));
+  const hrefs = new Set(CATEGORIES.flatMap((category) => category.games.map((game) => game.href)));
+
+  test.each(RESEARCH.map((r) => [r.id, r] as const))("%s names existing ideas and games", (_, research) => {
+    for (const id of [...research.ideas, ...research.topics.flatMap((topic) => topic.ideas)]) expect(ideaIds, id).toContain(id);
+    for (const game of research.games) expect(hrefs, game.href).toContain(game.href);
+    expect(research.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  test("ids are unique and the newest comes first", () => {
+    const ids = RESEARCH.map((r) => r.id);
+    expect(new Set(ids).size).toBe(ids.length);
+    const dates = RESEARCH.map((r) => r.date);
+    expect(dates).toEqual([...dates].sort().reverse());
+  });
+});
+
+describe("language status on the management page", () => {
   test("names every game of the home menu once, in menu order, then the home page", () => {
     const hrefs = [...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)), "/"];
     expect(LANGUAGE_STATUS.map((row) => row.href)).toEqual(hrefs);
@@ -58,6 +111,51 @@ describe("language status on the ideas page", () => {
       const row = LANGUAGE_STATUS.find((r) => r.href === href);
       expect(Object.keys(row?.languages ?? {}).sort(), href).toEqual(packs.sort());
     }
+  });
+
+  test("a game has its languages either as a whole or part by part, and only parts with recordings can lack them", () => {
+    for (const row of LANGUAGE_STATUS) {
+      expect(!!row.languages !== !!row.parts?.length, `${row.href}: languages or parts`).toBe(true);
+      for (const part of row.parts ?? [row]) {
+        const text = Object.entries(part.languages ?? {}).filter(([, state]) => state === "text");
+        if (!row.recorded && !part.recorded) expect(text, row.href).toEqual([]);
+      }
+    }
+  });
+
+  test("a game with parts is done only where every part is", () => {
+    const row = (...states: (LanguageState | undefined)[]) => ({ href: "/", parts: states.map((s) => ({ label: "", languages: s ? { en: s } : {} })) });
+    expect(languageStateOf(row("done", "done"), "en")).toBe("done");
+    expect(languageStateOf(row("done", "text"), "en")).toBe("text");
+    expect(languageStateOf(row("done", undefined), "en")).toBe("partial");
+    expect(languageStateOf(row(undefined, undefined), "en")).toBeUndefined();
+  });
+
+  // What a story speaks follows from its files: lines.<language>.ts is the translation, stimme/ (German)
+  // or stimme/<language>/ the recordings (src/games/adventure/CLAUDE.md).
+  test.each([
+    ["🏝️ Die Schatzinsel", "treasureIsland"],
+    ["☁️ Die Wolkenreise", "cloudTrip"],
+  ])("Bewegungsabenteuer: %s shows the translations and recordings it has", (label, folder) => {
+    const dir = `src/games/adventure/stories/${folder}`;
+    const recorded = (path: string) => existsSync(path) && readdirSync(path).some((f) => f.endsWith(".mp3"));
+    const translated = new Set(readdirSync(dir).flatMap((f) => /^lines\.([a-z]+)\.ts$/.exec(f)?.[1] ?? []));
+    const expected = Object.fromEntries(
+      TARGET_LANGUAGES.flatMap((l): [string, LanguageState][] => {
+        if (l.id === "de") return [["de", recorded(`${dir}/stimme`) ? "done" : "text"]];
+        if (!translated.has(l.id)) return [];
+        return [[l.id, recorded(`${dir}/stimme/${l.id}`) ? "done" : "text"]];
+      }),
+    );
+    const part = LANGUAGE_STATUS.find((r) => r.href === "/abenteuer/")?.parts?.find((p) => p.label === label);
+    expect(part?.languages).toEqual(expected);
+  });
+
+  test("Zähne putzen: the sung song speaks exactly the wanted languages it has a song in", () => {
+    const sung = readdirSync("src/games/teeth/musik").flatMap((f) => /^musik-zaehneputzen-lied-([a-z]{2})\.mp3$/.exec(f)?.[1] ?? []);
+    const wanted = sung.filter((id) => TARGET_LANGUAGES.some((l) => l.id === id));
+    const part = LANGUAGE_STATUS.find((r) => r.href === "/zaehne/")?.parts?.find((p) => p.recorded);
+    expect(part?.languages).toEqual(Object.fromEntries(wanted.map((id) => [id, "done"])));
   });
 
   test("German is wanted first and no language twice", () => {

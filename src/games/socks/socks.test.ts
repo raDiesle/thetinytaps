@@ -19,10 +19,10 @@ test("there are enough colours for the most pairs, and none twice", () => {
   expect(new Set(SOCK_PATTERNS).size).toBe(SOCK_PATTERNS.length);
 });
 
+// Translations come only when asked for: a sentence missing in a language is said in German, but never empty.
 test("every app language has every spoken sentence, with words", () => {
   for (const id of APP_LANGUAGES) {
     const texts = pick(SOCK_TEXTS, id);
-    expect(SOCK_TEXTS[id], id).toBeDefined();
     expect(texts.start.trim(), id).not.toBe("");
     expect(texts.done.trim(), id).not.toBe("");
     expect(texts.pair.length, id).toBeGreaterThan(0);

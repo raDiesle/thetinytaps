@@ -26,7 +26,7 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import type { Localized } from "@/lib/language";
-import { RUSSIAN_TEXTS } from "./content.ru";
+import { russianTexts } from "./content.ru";
 import type { ShadowTheme } from "./settings";
 
 // Pictures and German texts for "Schatten finden" (N-07); the Russian ones are in
@@ -173,4 +173,4 @@ const GERMAN_TEXTS: ShadowTexts = {
 };
 
 /** The texts by app language: `pick(SHADOW_TEXTS, language.id)`. */
-export const SHADOW_TEXTS: Localized<ShadowTexts> = { de: GERMAN_TEXTS, ru: RUSSIAN_TEXTS };
+export const SHADOW_TEXTS: Localized<ShadowTexts> = { de: GERMAN_TEXTS, ru: russianTexts(GERMAN_TEXTS) };

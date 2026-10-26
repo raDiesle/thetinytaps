@@ -500,23 +500,37 @@ export function Bubble({ pic, height, nudge = 0 }: { pic: PicId; height: number;
   return <ThoughtBubble picture={PICTURES[pic]} height={height} nudge={nudge} />;
 }
 
-/** The thought bubble with any drawing of size `w` × `h` standing on (0, 0); `nudge` as for `Bubble`. */
-export function ThoughtBubble({ picture, height, nudge = 0 }: { picture: { w: number; h: number; draw: () => ReactNode }; height: number; nudge?: number }) {
+/** The thought bubble with any drawing of size `w` × `h` standing on (0, 0); `nudge` as for `Bubble`. It grows up
+ * to the left of the head, or to the `right` (an animal looking left, with the child left of it). */
+export function ThoughtBubble({
+  picture,
+  height,
+  nudge = 0,
+  right = false,
+}: {
+  picture: { w: number; h: number; draw: () => ReactNode };
+  height: number;
+  nudge?: number;
+  right?: boolean;
+}) {
   const { w, h, draw } = picture;
   const s = Math.min(150 / w, 104 / h);
-  const puffs: [number, number, number][] = [
-    [-58, 4, 46],
-    [-20, -30, 50],
-    [30, -30, 48],
-    [64, 4, 44],
-    [28, 36, 46],
-    [-24, 36, 46],
-    [60, 86, 12],
-    [76, 104, 7],
-  ];
+  const side = right ? -1 : 1;
+  const puffs: [number, number, number][] = (
+    [
+      [-58, 4, 46],
+      [-20, -30, 50],
+      [30, -30, 48],
+      [64, 4, 44],
+      [28, 36, 46],
+      [-24, 36, 46],
+      [60, 86, 12],
+      [76, 104, 7],
+    ] as const
+  ).map(([x, y, r]) => [x * side, y, r]);
   return (
-    <g transform={`translate(-78 ${-height - 112})`}>
-      <g className="el-bubble" style={{ transformOrigin: "76px 104px" }}>
+    <g transform={`translate(${-78 * side} ${-height - 112})`}>
+      <g className="el-bubble" style={{ transformOrigin: `${76 * side}px 104px` }}>
         {puffs.map(([x, y, r]) => (
           <circle key={`o${x}${y}`} cx={x} cy={y} r={r + 4} fill={INK} />
         ))}

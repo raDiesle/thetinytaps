@@ -35,6 +35,17 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as SceneMode })}
+      info={
+        <>
+          <p>Ein Wimmelbild, in dem alles auf Antippen antwortet: Der Bagger baggert, die Kuh muht.</p>
+          <p>Ausmalen: Das Bild ist grau, und jedes angetippte Ding bekommt seine Farbe zurück; jeder Tipp malt auch einen Farbklecks in den Hintergrund.</p>
+          <p>
+            Suchen: Ein Ding erscheint groß in der Blase, und das Kind sucht es im Bild. Fragen: „Was ist rot?“, „Wer kann fliegen?“ – das Kind tippt, was
+            passt.
+          </p>
+          <p>Freies Entdecken: Alles darf angetippt werden, manches stößt etwas anderes an, und Fahrzeuge fahren am Rand in andere Bilder weiter.</p>
+        </>
+      }
       settings={
         <>
           <SettingsGroup title={t({ de: "Spiel", ru: "Игра" })}>

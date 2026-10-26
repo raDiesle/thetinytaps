@@ -38,6 +38,15 @@ export function WordsGame() {
           ]}
         />
       }
+      info={
+        <>
+          <p>Ganzes Wort: Ein Bild erscheint mit seinem Wort, und das Kind tippt es Buchstabe für Buchstabe. Erster Buchstabe: nur den Anfang zum Bild.</p>
+          <p>
+            Farben: Ein Farbwort wie „Rot“ tippen, und Dinge in dieser Farbe hüpfen herein. Tu-Wörter: „Hüpf“ oder „Tanz“ tippen, die Figur macht es vor, und
+            das Kind macht mit.
+          </p>
+        </>
+      }
       settings={
         <>
           <SettingsGroup title={t({ de: "Wörter", ru: "Слова" })}>

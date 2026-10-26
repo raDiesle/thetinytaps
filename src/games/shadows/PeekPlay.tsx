@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { pick, useAppLanguage } from "@/lib/language";
+import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
+import { tapState } from "@/lib/tapTargets";
 import { PEEK_ITEMS, hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } from "./content";
 import { shuffle, useDeck } from "./deck";
 import { emojiGlyph, type Glyph } from "./glyph";
@@ -115,9 +116,11 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, language.speechLang, { queue, rate: 0.85 });
+      // A sentence not translated yet comes in German, and the German voice reads it.
+      const voice = voiceFor(text, language);
+      if (settings.speech) speak(text, voice, { queue, rate: 0.85 });
     },
-    [settings.speech, language.speechLang],
+    [settings.speech, language.id, language.speechLang],
   );
 
   const nextRound = useCallback(() => {
@@ -263,7 +266,7 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
         {won ? texts.there(round.item) : texts.peek}
       </p>
       <div className="sh-top">
-        <div key={`stage-${round.id}`} className="pk-stage" onPointerDown={onHideoutDown}>
+        <div key={`stage-${round.id}`} className="pk-stage" data-tap onPointerDown={onHideoutDown}>
           {glyph.url ? (
             <img src={glyph.url} alt="" draggable={false} className={`pk-animal pk-${phase}${phase === "hidden" ? wiggle : ""}`} style={animalStyle} />
           ) : (
@@ -295,6 +298,7 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
               }`}
               role="button"
               aria-label={texts.name(c)}
+              data-tap={tapState({ goal: i === round.correct })}
               onPointerDown={onChoiceDown(i)}
             >
               <span className="pk-choice sh-emoji" aria-hidden>
