@@ -204,6 +204,11 @@ export function playLaugh() {
   });
 }
 
+/** „Mmmh!“ – a child humming because something tastes good: a closed-mouth hum that rises and falls. */
+export function playYum() {
+  voice({ pitch: [330, 420, 440, 340], vowels: [[260, 900]], duration: 0.8, volume: 0.6 });
+}
+
 /** „Aua!“ – a small child that got hurt: a high "a" gliding into "u", then a falling "a". */
 export function playAua() {
   const [a, u]: [number, number][] = [

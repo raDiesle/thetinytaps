@@ -74,6 +74,13 @@ const OVERBITE = 7;
 const GAP_OPEN = 124;
 const GUM = 18;
 const SAMPLES = 4;
+/**
+ * The gum line, as a share of the tooth's height from its base: the gum
+ * reaches furthest up between the teeth (the papillae) and arches down to
+ * show the crown in the middle of each tooth, so the teeth grow out of the
+ * gum instead of standing on it. Front teeth arch more than molars.
+ */
+const GUM_LINE = { papilla: [0.36, 0.34, 0.32, 0.24, 0.22], middle: 0.06 };
 
 const rad = (deg: number) => (deg * Math.PI) / 180;
 const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -140,10 +147,22 @@ function archPoint(jaw: Jaw, t: number, inset: number, y: number): Vec3 {
 }
 
 /** Angles from one end of a tooth to the other, in screen order. */
-function sweep(side: Side, from: number, to: number) {
-  const angles = Array.from({ length: SAMPLES + 1 }, (_, i) => from + ((to - from) * i) / SAMPLES);
+function sweep(side: Side, from: number, to: number, samples = SAMPLES) {
+  const angles = Array.from({ length: samples + 1 }, (_, i) => from + ((to - from) * i) / samples);
   return side === "left" ? angles.map((t) => -t).reverse() : angles;
 }
+
+/** How far up the gum reaches at angle `t` (degrees, positive) on tooth `n`, as a share of its height; between teeth it is at its highest. */
+function gumLine(n: number, t: number) {
+  const spec = TEETH[n];
+  const s = (t - spec.from) / (spec.to - spec.from);
+  // Behind the last molar the gum goes down again.
+  if (s > 1 && n === TEETH.length - 1) return GUM_LINE.middle;
+  if (s <= 0 || s >= 1) return GUM_LINE.papilla[n];
+  return GUM_LINE.papilla[n] - (GUM_LINE.papilla[n] - GUM_LINE.middle) * Math.sin(Math.PI * s) ** 0.7;
+}
+
+const lerp3 = (a: Vec3, b: Vec3, k: number): Vec3 => [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k, a[2] + (b[2] - a[2]) * k];
 
 function buildTooth(id: ToothId, open: number): Tooth {
   const spec = TEETH[id.n];
@@ -155,14 +174,18 @@ function buildTooth(id: ToothId, open: number): Tooth {
   const innerBase = angles.map((t) => archPoint(id.jaw, t, spec.depth, base));
   const center = mean([...outerTop, ...outerBase, ...innerTop, ...innerBase]);
   const last = SAMPLES;
+  // Only the crown shows: the faces end where the gum begins.
+  const line = angles.map((t) => gumLine(id.n, Math.abs(t)));
+  const outerGum = outerBase.map((p, i) => lerp3(p, outerTop[i], line[i]));
+  const innerGum = innerBase.map((p, i) => lerp3(p, innerTop[i], line[i]));
 
   const face = (kind: FaceKind, points: Vec3[]): Face => ({ kind, points, normal: normalOf(points, center), center: mean(points) });
   const faces = [
-    face("outer", [...outerTop, ...[...outerBase].reverse()]),
+    face("outer", [...outerTop, ...[...outerGum].reverse()]),
     face("top", [...outerTop, ...[...innerTop].reverse()]),
-    face("inner", [...innerTop, ...[...innerBase].reverse()]),
-    face("side", [outerTop[0], outerBase[0], innerBase[0], innerTop[0]]),
-    face("side", [outerTop[last], outerBase[last], innerBase[last], innerTop[last]]),
+    face("inner", [...innerTop, ...[...innerGum].reverse()]),
+    face("side", [outerTop[0], outerGum[0], innerGum[0], innerTop[0]]),
+    face("side", [outerTop[last], outerGum[last], innerGum[last], innerTop[last]]),
   ];
 
   // A shine on the cheek side, a little in from the left edge.
@@ -182,16 +205,18 @@ function buildTooth(id: ToothId, open: number): Tooth {
 
 function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   const spec = TEETH[n];
-  const { base, dir } = levels(jaw, n, open);
+  const { top, base, dir } = levels(jaw, n, open);
   const next = TEETH[n + 1];
   // Reach halfway into the gap to the next tooth so the gum has no holes.
   const to = next ? (spec.to + next.from) / 2 + 0.5 : spec.to + 4;
   const from = n === 0 ? 0 : (TEETH[n - 1].to + spec.from) / 2 - 0.5;
-  const angles = sweep(side, from, to);
+  // More points than a tooth has, so the gum line arches smoothly up between the teeth.
+  const angles = sweep(side, from, to, 4 * SAMPLES);
   const bottom = base - dir * GUM;
-  const outerRim = angles.map((t) => archPoint(jaw, t, -3, base));
+  const rim = (t: number) => base + (top - base) * gumLine(n, Math.abs(t));
+  const outerRim = angles.map((t) => archPoint(jaw, t, -3, rim(t)));
   const outerFoot = angles.map((t) => archPoint(jaw, t, -3, bottom));
-  const innerRim = angles.map((t) => archPoint(jaw, t, spec.depth + 4, base));
+  const innerRim = angles.map((t) => archPoint(jaw, t, spec.depth + 4, rim(t)));
   const innerFoot = angles.map((t) => archPoint(jaw, t, spec.depth + 4, bottom));
   const center = mean([...outerRim, ...outerFoot, ...innerRim, ...innerFoot]);
   const face = (kind: FaceKind, points: Vec3[]): Face => ({ kind, points, normal: normalOf(points, center), center: mean(points) });

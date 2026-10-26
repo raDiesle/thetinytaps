@@ -5,7 +5,7 @@ export interface TeethSettings {
   daytime: DaytimeChoice;
   /** At the end, a week with a star for every morning and evening brushed. */
   week: boolean;
-  /** First fetch the brush and put toothpaste on it, shown and said. */
+  /** First eat some sweets, then fetch the brush and put toothpaste on it, shown and said. */
   prep: boolean;
   /** Say where to brush next and how; off by default, the pictures and music carry the brushing. */
   speech: boolean;

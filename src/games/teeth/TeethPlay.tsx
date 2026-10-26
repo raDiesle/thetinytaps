@@ -2,22 +2,27 @@ import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } 
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useDevice } from "@/lib/device";
-import { playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
+import { loadRecordings, playChime, playCountNote, playPoof, playSqueak } from "@/lib/sfx";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, DAYTIME, daytimeOf, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
 import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { sungSteps, useBrushingMusic } from "./music";
-import { Prep } from "./prep";
+import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS } from "./steps";
+import { type Cue, Treat, TREAT_CUES, TREAT_MS, TREAT_RECORDINGS } from "./treat";
 import { Week } from "./week";
 import "./teeth.css";
 
 const MONSTER_COLORS = ["#8bd346", "#b388ff", "#ff9f43", "#ff7bd0", "#4cc9f0"];
 const MONSTER_VARIANTS = 3;
 const TICK_MS = 200;
+/** Before brushing the clock ticks faster, so the sounds of the sweets and the sink fall on their pictures. */
+const PRELUDE_TICK_MS = 80;
+/** A jump of the clock longer than this plays none of the sounds it skipped. */
+const CUE_GAP_MS = 600;
 const TICKLE_MS = 700;
 const TURN_MS = 1100;
 /** Opening or closing the mouth glides slower, so the child can do it along with the picture. */
@@ -29,13 +34,14 @@ const BRUSH_MS = 120_000;
 /** Dragging on the progress bar stops this far before the end. */
 const SEEK_END_MS = 1000;
 
-/** Before the clock starts: get the brush, toothpaste on, and meet the monsters. */
-type Prelude = "brush" | "paste" | "monsters";
+/** Before the clock starts: sweets, get the brush, toothpaste on, and meet the monsters. */
+type Prelude = "treat" | "brush" | "paste" | "monsters";
 
-/** The monsters' cue depends on the time of day, see DAYTIME. */
-const PRELUDE: Record<Prelude, { ms: number; title: string; cue?: string }> = {
-  brush: { ms: 7000, title: "🪥 Zahnbürste holen", cue: "Zuerst holen wir die Zahnbürste!" },
-  paste: { ms: 8000, title: "🫧 Zahnpasta drauf", cue: "Jetzt ein kleiner Klecks Zahnpasta drauf." },
+/** The monsters' cue depends on the time of day, see DAYTIME. `sounds` play at their moment of the part. */
+const PRELUDE: Record<Prelude, { ms: number; title: string; cue?: string; sounds?: Cue[] }> = {
+  treat: { ms: TREAT_MS, title: "🍭 Mmmh, lecker!", cue: "Oh, Süßigkeiten! Mampf, mampf. Lecker!", sounds: TREAT_CUES },
+  brush: { ms: PREP_MS.brush, title: "🪥 Zahnbürste holen", cue: "Jetzt holen wir die Zahnbürste!", sounds: PREP_CUES.brush },
+  paste: { ms: PREP_MS.paste, title: "🫧 Zahnpasta drauf", cue: "Jetzt ein kleiner Klecks Zahnpasta drauf.", sounds: PREP_CUES.paste },
   monsters: { ms: 4500, title: "😱 Zuckermonster!" },
 };
 
@@ -111,6 +117,9 @@ interface Clock {
 
 const readClock = (clock: Clock, now: number) => clock.banked + (clock.since === null ? 0 : now - clock.since);
 
+/** When a prelude part begins, in ms after the start. */
+const preludeStart = (prelude: Prelude[], p: Prelude) => prelude.slice(0, prelude.indexOf(p)).reduce((sum, q) => sum + PRELUDE[q].ms, 0);
+
 /** The prelude part running `elapsed` ms after the start. */
 function preludeAt(prelude: Prelude[], elapsed: number): Prelude {
   let end = 0;
@@ -144,7 +153,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   const daytime = useMemo(() => daytimeOf(settings.daytime), [settings.daytime, round]);
   const preludeCue = (p: Prelude) => PRELUDE[p].cue ?? DAYTIME[daytime].monsters;
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
-  const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
+  const prelude = useMemo<Prelude[]>(() => (settings.prep ? ["treat", "brush", "paste", "monsters"] : ["monsters"]), [settings.prep]);
   const introMs = prelude.reduce((sum, p) => sum + PRELUDE[p].ms, 0);
   // With a sung song the brushing lasts as long as the song and each step as long as its verse; otherwise two minutes in equal steps.
   const sungIn = settings.music && settings.singing !== "off" ? settings.singing : null;
@@ -175,11 +184,26 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
 
   useWakeLock(!done);
 
+  const inPrelude = before !== null;
   useEffect(() => {
     if (done || paused) return;
-    const timer = setInterval(() => setNow(performance.now()), TICK_MS);
+    const timer = setInterval(() => setNow(performance.now()), inPrelude ? PRELUDE_TICK_MS : TICK_MS);
     return () => clearInterval(timer);
-  }, [done, paused, round]);
+  }, [done, paused, round, inPrelude]);
+
+  useEffect(() => {
+    if (settings.sounds && settings.prep) loadRecordings([...TREAT_RECORDINGS, ...PREP_RECORDINGS]);
+  }, [settings.sounds, settings.prep]);
+
+  // The sounds of the sweets and the sink, each when the clock passes its moment; none of those a jump skips over.
+  const lastElapsed = useRef(elapsed);
+  useEffect(() => {
+    const from = lastElapsed.current;
+    lastElapsed.current = elapsed;
+    if (!settings.sounds || !before || elapsed <= from || elapsed - from > CUE_GAP_MS) return;
+    const start = preludeStart(prelude, before);
+    for (const cue of PRELUDE[before].sounds ?? []) if (start + cue.at > from && start + cue.at <= elapsed) cue.play();
+  }, [elapsed]);
 
   // The brushing has its own song (or none, when it is switched off).
   useNoBackgroundMusic();
@@ -264,11 +288,7 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
   /** Jump to the start of a part: the prelude ones first, then the steps, then the end. */
   const jumpTo = useCallback(
     (target: number) =>
-      seek(
-        target < prelude.length
-          ? prelude.slice(0, target).reduce((sum, p) => sum + PRELUDE[p].ms, 0)
-          : introMs + stepStarts[Math.min(target - prelude.length, STEPS.length)],
-      ),
+      seek(target < prelude.length ? preludeStart(prelude, prelude[target]) : introMs + stepStarts[Math.min(target - prelude.length, STEPS.length)]),
     [seek, prelude, introMs, stepStarts],
   );
 
@@ -360,7 +380,9 @@ export function TeethPlay({ speechLang, settings }: { speechLang: string; settin
       </div>
 
       <div className="teeth-stage">
-        {before === "brush" || before === "paste" ? (
+        {before === "treat" ? (
+          <Treat key={round} at={elapsed - preludeStart(prelude, before)} daytime={daytime} onTickle={() => settings.sounds && playSqueak()} />
+        ) : before === "brush" || before === "paste" ? (
           <Prep key={round} part={before} daytime={daytime} />
         ) : (
           <Mouth

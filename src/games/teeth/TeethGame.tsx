@@ -32,7 +32,7 @@ export function TeethGame() {
             ]}
             onChange={(daytime) => update({ daytime })}
           />
-          <Toggle label="Vorher zeigen: Zahnbürste holen, Zahnpasta drauf" checked={settings.prep} onChange={(prep) => update({ prep })} />
+          <Toggle label="Vorher zeigen: Naschen, Zahnbürste holen, Zahnpasta drauf" checked={settings.prep} onChange={(prep) => update({ prep })} />
           <Toggle
             label="Ansagen vorlesen („Mund weit auf!“) – auch wenn „Vorlesen“ auf der Startseite aus ist"
             checked={settings.speech}

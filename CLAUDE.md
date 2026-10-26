@@ -105,7 +105,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   defaults (so new fields need no migration); `speech`/`sounds` come from the shared
   options on the home page. Bump the key's `.vN` only when old values would break.
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
-  plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README).
+  plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README). A new file replaces the sound at every
+  `playRecorded(name, …)` in every game, so grep the name first and pick a new one unless all of them should change.
 - Music: `GameShell` plays one background song in every game from the child's first tap
   (`src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)

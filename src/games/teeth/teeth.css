@@ -500,56 +500,64 @@
   animation: tube-over 5.5s ease-in-out forwards;
 }
 
+/* Over to the tip of the brush, along the bristles while squeezing (like grown-ups do), lift off, lie down again. */
 @keyframes tube-over {
   0%,
-  8% {
+  6% {
     transform: translate(190px, 266px) rotate(-90deg);
   }
-  28%,
-  62% {
-    transform: translate(122px, 135px) rotate(35deg);
+  26% {
+    transform: translate(76px, 146px) rotate(35deg);
   }
-  85%,
+  30% {
+    transform: translate(78px, 150px) rotate(35deg);
+    animation-timing-function: linear;
+  }
+  58% {
+    transform: translate(150px, 150px) rotate(35deg);
+  }
+  68% {
+    transform: translate(160px, 118px) rotate(28deg);
+  }
+  88%,
   100% {
     transform: translate(190px, 266px) rotate(-90deg);
   }
 }
 
-/* A squeeze, and the blob comes out onto the bristles. */
+/* The tube gets squeezed while the toothpaste comes out. */
 .prep.at-paste .prep-tube > g {
   animation: squeeze 5.5s ease-in-out forwards;
 }
 
 @keyframes squeeze {
   0%,
-  32%,
-  58%,
+  28%,
+  62%,
   100% {
     transform: scaleX(1);
   }
-  40%,
-  50% {
-    transform: scaleX(0.78);
+  34%,
+  56% {
+    transform: scaleX(0.8);
   }
 }
 
-.prep-paste {
+/* The striped wave comes out from the tip of the brush towards the handle, as the tube goes along. */
+.prep-paste-reveal {
   transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation: paste-out 5.5s ease-out forwards;
+  transform-origin: 0 50%;
+  animation: paste-out 5.5s linear forwards;
 }
 
 @keyframes paste-out {
   0%,
-  34% {
-    transform: scale(0);
+  30% {
+    transform: scaleX(0);
   }
-  56% {
-    transform: scale(1.15);
-  }
-  62%,
+  60%,
   100% {
-    transform: scale(1);
+    transform: scaleX(1);
   }
 }
 
@@ -574,10 +582,157 @@
   }
 }
 
+.teeth-play.paused .treat *,
 .teeth-play.paused .prep *,
 .teeth-play.paused .lip-arrow,
 .teeth-play.paused .teeth-mouth-icon {
   animation-play-state: paused;
+}
+
+/* ---------- Before brushing: sweets at the table ---------- */
+
+/* Up to the mouth with a little bounce, and gone into it after the second bite. */
+.treat-sweet {
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+.treat-sweet.eaten {
+  transition: transform 0.22s ease-in;
+}
+
+.treat-hand {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.treat-hand.holding {
+  opacity: 1;
+}
+
+.treat-wrapper.off {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: treat-unwrap 0.7s ease-out forwards;
+}
+
+@keyframes treat-unwrap {
+  to {
+    transform: translate(40px, -70px) rotate(220deg) scale(0.6);
+    opacity: 0;
+  }
+}
+
+.treat-crumb {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: treat-crumb 0.7s ease-out forwards;
+}
+
+@keyframes treat-crumb {
+  to {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--spin));
+    opacity: 0;
+  }
+}
+
+/* Each new face pops in. */
+.treat-mouth {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: treat-mouth-pop 0.2s ease-out;
+}
+
+@keyframes treat-mouth-pop {
+  from {
+    transform: scale(0.6);
+  }
+}
+
+/* „Juhu!“ – a little jump for joy. */
+.treat-kid.joy {
+  animation: treat-hop 0.4s ease-in-out 3;
+}
+
+@keyframes treat-hop {
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+/* Chewing: the jaw goes up and down and the full cheeks squash. */
+.treat-kid.chew .treat-jaw {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: treat-chew 0.3s ease-in-out infinite alternate;
+}
+
+.treat-full-cheek {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: treat-cheek-in 0.2s ease-out;
+}
+
+.treat-kid.chew .treat-full-cheek {
+  animation: treat-cheek 0.3s ease-in-out infinite alternate;
+}
+
+@keyframes treat-chew {
+  to {
+    transform: translateY(5px) scaleX(0.8);
+  }
+}
+
+@keyframes treat-cheek-in {
+  from {
+    transform: scale(0.5);
+  }
+}
+
+@keyframes treat-cheek {
+  to {
+    transform: scale(0.9, 1.05);
+  }
+}
+
+.treat-lick {
+  animation: treat-lick 0.45s ease-in-out 3 alternate;
+}
+
+@keyframes treat-lick {
+  to {
+    transform: translate(-12px, 1px);
+  }
+}
+
+/* Hearts and stars rise and fade. */
+.treat-float {
+  animation: treat-float 1.4s ease-out backwards;
+  opacity: 0;
+}
+
+@keyframes treat-float {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  30% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-46px) scale(1);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .treat-kid.joy,
+  .treat-kid.chew .treat-jaw,
+  .treat-kid.chew .treat-full-cheek,
+  .treat-lick,
+  .treat-crumb {
+    animation: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -500,7 +500,8 @@ const MONSTER_TOPS = [
   "M-11 -10 L-8 -21 L-3 -14 Z M-3 -14 L0 -24 L3 -14 Z M3 -14 L8 -21 L11 -10 Z",
 ];
 
-function Monster({
+/** A sugar monster sitting on a tooth: it sways, and goes in a puff when `gone`. */
+export function Monster({
   color,
   variant,
   active,
