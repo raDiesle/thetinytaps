@@ -128,3 +128,91 @@
     animation: none;
   }
 }
+
+/* ---------- The lock over the menus when the play time is over ---------- */
+
+/* Above the menus and their fullscreen corner, below the "Bitte quer halten" note. */
+.playtime-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  outline: none;
+}
+
+/* Still: the lock waits for a grown-up, it doesn't play. */
+.playtime-lock .good-night,
+.playtime-lock .good-night-star,
+.playtime-lock .good-night-moon,
+.playtime-lock .good-night-sleeper,
+.playtime-lock .good-night-zzz {
+  animation: none;
+}
+
+.playtime-lock-unlock {
+  position: absolute;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.playtime-lock-hold {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border: 0;
+  border-radius: 50%;
+  background: conic-gradient(#fff4d6 var(--progress, 0%), #ffffff26 0);
+  font-family: var(--font-emoji);
+  font-size: 1.4rem;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+}
+
+/* The same filling ring as ✕ in a game (hold-progress, playing.css). */
+.playtime-lock-hold.holding {
+  animation: hold-progress var(--hold-ms) linear forwards;
+}
+
+.playtime-lock-hint {
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.playtime-lock-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  gap: 16px;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  overflow: auto;
+  background: #0b0d2acc;
+}
+
+.playtime-lock-panel .settings {
+  width: min(560px, 100%);
+  margin: 0;
+  border: var(--outline);
+  border-radius: 28px;
+  text-align: left;
+}
+
+.playtime-lock-close {
+  min-height: 44px;
+  padding: 6px 22px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}

@@ -27,7 +27,7 @@ export const allGamesIdeas: IdeaArea = {
       id: "A-03",
       emoji: "⏳",
       title: "Spielzeit-Timer",
-      text: "Eltern stellen z. B. 10 Minuten ein. Danach wird alles langsam ruhiger, eine Gute-Nacht-Animation (siehe N-03) und das Spiel endet von selbst.",
+      text: "Eltern stellen mit einem Schieberegler Minuten oder eine Anzahl Spiele pro Tag ein. Danach wird alles langsam ruhiger, eine Gute-Nacht-Animation (siehe N-03) und das Spiel endet von selbst; die Menüs bleiben gesperrt, bis ein Erwachsener ⏳ drei Sekunden hält.",
       why: "Die Grenze setzt das Spiel, nicht die Eltern.",
       effort: "M",
       done: true,

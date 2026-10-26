@@ -106,7 +106,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   { href: "/laut-leise/", languages: { de: "done", ru: "done" } },
   {
     href: "/",
-    languages: { de: "done", ru: "done" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
+    languages: { de: "done", ru: "partial" },
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. Russisch fehlt: die neuen Texte der Spielzeit (Minuten oder Spiele, Sperre der Menüs).",
   },
 ];

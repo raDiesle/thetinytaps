@@ -124,6 +124,10 @@ In a fresh worktree run `yarn install` first.
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
   of a level. Never add another.
+- Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
+  says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
+  holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
+  or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do).
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
   current game's own start screen before play, `useLeaveGame()` – never the home page; its picture is four cards,
   `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
