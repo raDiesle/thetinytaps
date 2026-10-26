@@ -77,6 +77,16 @@ function parseArgs(argv) {
 }
 
 /** One request: one picture, or one grid cut into several. Paths relative to the checkout. */
+/** The fields a job in --jobs may have; anything else is a typo that would be ignored silently. */
+const JOB_FIELDS = new Set(["out", "prompt", "ref", "refs", "panels", "aspect", "grid", "size", "quality", "transparent", "key"]);
+
+/** A job read from a --jobs file, checked for fields this script doesn't know. */
+function checkedJob(o) {
+  const unknown = Object.keys(o).filter((k) => !JOB_FIELDS.has(k));
+  if (unknown.length) fail(`unknown job field(s): ${unknown.join(", ")} – allowed: ${[...JOB_FIELDS].join(", ")}`);
+  return o;
+}
+
 function toJob(o) {
   const outs = Array.isArray(o.out)
     ? o.out
@@ -87,7 +97,8 @@ function toJob(o) {
   const job = {
     outs,
     prompt: o.prompt,
-    refs: o.refs ?? [],
+    // "ref" like the --ref option, or "refs"; a string or a list.
+    refs: [o.ref ?? [], o.refs ?? []].flat(),
     panels: o.panels ?? [],
     aspect: o.aspect,
     grid: o.grid,
@@ -481,7 +492,7 @@ if (opts.out === "status") {
   }
 } else {
   const shared = { refs: opts.refs, aspect: opts.aspect, size: opts.size, quality: opts.quality, transparent: opts.transparent, key: opts.key };
-  const jobs = opts.jobs ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((o) => toJob({ ...shared, ...o })) : [toJob(opts)];
+  const jobs = opts.jobs ? JSON.parse(readFileSync(opts.jobs, "utf8")).map((o) => toJob({ ...shared, ...checkedJob(o) })) : [toJob(opts)];
   if (opts.now) {
     for (const job of jobs) {
       const answer = await call(`models/${modelOf(opts)}:generateContent`, { method: "POST", body: JSON.stringify(buildRequest(job)) });
