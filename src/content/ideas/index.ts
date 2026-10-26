@@ -19,6 +19,7 @@ import { chainReactionIdeas } from "./r-chain-reactions";
 import { parentPhoneIdeas } from "./e-parent-phone";
 import { everydayHelpersIdeas } from "./h-everyday-helpers";
 import { allGamesIdeas } from "./a-all-games";
+import { figureIdeas } from "./f-figure";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
@@ -32,7 +33,7 @@ export const IDEA_GROUPS: IdeaGroup[] = [
     areas: [scenesIdeas, newScenesIdeas, lettersIdeas, wordsIdeas, marblesIdeas, chainReactionIdeas, adventureIdeas, littleAdventuresIdeas, otherGamesIdeas],
   },
   { emoji: "✨", title: "Ganz neue Spiele", areas: [newGamesIdeas] },
-  { emoji: "👪", title: "Für Eltern & Technik", areas: [everydayHelpersIdeas, parentPhoneIdeas, allGamesIdeas] },
+  { emoji: "👪", title: "Für Eltern & Technik", areas: [everydayHelpersIdeas, figureIdeas, parentPhoneIdeas, allGamesIdeas] },
 ];
 
 /** Every area in page order. */
