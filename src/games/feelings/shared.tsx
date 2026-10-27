@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLeaveGame } from "@/components/GameShell";
-import { appLanguage, pick, useAppLanguage, useT, type Localized } from "@/lib/language";
+import { appLanguage, pick, useAppLanguage, useT, voiceFor, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { framesFor, imageFor } from "./images";
@@ -62,18 +62,18 @@ export function useTimers() {
   return { later, clearAll };
 }
 
-/** Speech and sounds as the parent set them up; speech in the app language, as every text of the stories is. */
+/** Speech and sounds as the parent set them up; speech in the app language, a line not translated yet (still German) with the German voice. */
 export function useVoice(settings: FeelingsSettings) {
-  const { speechLang } = useAppLanguage();
+  const language = useAppLanguage();
   useEffect(() => {
     if (settings.sounds) loadRecordings(RECORDED_SOUNDS);
   }, [settings.sounds]);
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, speechLang, { queue, rate: 0.85 });
+      if (settings.speech) speak(text, voiceFor(text, language), { queue, rate: 0.85 });
     },
-    [settings.speech, speechLang],
+    [settings.speech, language],
   );
 
   const sound = useCallback(
@@ -201,27 +201,26 @@ export function StoryPicture({
   const shown = frame % Math.max(frames.length, 1);
 
   return (
-    <>
-      <div ref={frameRef} className={`fg-frame fg-look-${look}`} onPointerDown={onPointerDown}>
-        <div className="fg-picture">
-          {frames.map((src, i) => (
-            <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
-          ))}
-          {children}
-          {/* A card looked at big: a hand taps it again and again, so the child knows one more tap chooses it. */}
-          {look === "option" && (
-            <span className="fg-tap-hint" aria-hidden>
-              <span className="fg-tap-ripple" />
-              <span className="fg-tap-hand">👆</span>
-            </span>
-          )}
-        </div>
-        {/* On the corner, not over the picture, so what happened stays to be seen. */}
-        {look === "good" && <Mark good className="fg-picture-mark" />}
-        {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
+    <div ref={frameRef} className={`fg-frame fg-look-${look}`} onPointerDown={onPointerDown}>
+      <div className="fg-picture">
+        {frames.map((src, i) => (
+          <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
+        ))}
+        {frames.length === 0 && <Placeholder name={name} />}
+        {children}
+        {/* A card looked at big: a hand taps it again and again, so the child knows one more tap chooses it. */}
+        {look === "option" && (
+          <span className="fg-tap-hint" aria-hidden>
+            <span className="fg-tap-ripple" />
+            <span className="fg-tap-hand">👆</span>
+          </span>
+        )}
       </div>
+      {/* On the corner, not over the picture, so what happened stays to be seen. */}
+      {look === "good" && <Mark good className="fg-picture-mark" />}
+      {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
       <p className="fg-caption fg-picture-caption">{caption}</p>
-    </>
+    </div>
   );
 }
 
@@ -263,7 +262,7 @@ export function ChoiceCard({
           if (active) onChoose?.();
         }}
       >
-        <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} />
+        {imageFor(image) ? <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} /> : <Placeholder name={image} />}
         {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>
@@ -271,6 +270,21 @@ export function ChoiceCard({
         {caption}
       </span>
     </div>
+  );
+}
+
+/**
+ * Stands where a picture is planned but not made yet: its file name, so the grown-up can look up its prompt in
+ * bilder/README.md („Geplant“) and make it (`/bild-erzeugen`). The caption under it says what it will show.
+ */
+function Placeholder({ name }: { name: string }) {
+  return (
+    <span className="fg-placeholder">
+      <span className="fg-placeholder-icon" aria-hidden>
+        🖼️
+      </span>
+      <span className="fg-placeholder-name">{name}</span>
+    </span>
   );
 }
 

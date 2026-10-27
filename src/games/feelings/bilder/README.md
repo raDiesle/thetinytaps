@@ -279,39 +279,39 @@ Nur der kleine Bär, in einem gemütlichen Kinderzimmer. Wer tröstet, ist das K
 vor dem Bildschirm: zeige nur **Kinderhände oder -arme**, die von vorn ins Bild
 kommen, nie ein ganzes Kind.
 
-`baer-…` zeigt in der Mitte, wie es dem Bären am Anfang geht, `trost-…` sind die
-Karten (und danach das Bild in der Mitte), `baer-…-nein` ist die nicht so gute Idee
-zwischen den Karten, `baer-…-gut` zeigt ihn am Ende wieder froh.
-Alle mit zweitem Frame `…-b`, außer `trost-hug` und `baer-…-nein` (mit `baer-…` als `--ref` erzeugt).
+`baer-…` zeigt in der Mitte, wie es dem Bären am Anfang geht – in jeder der drei Runden wieder. Daneben
+zwei Karten: links die nicht so gute Idee der Runde (`baer-…-nein` in Runde 1, `baer-…-nein-2`, `baer-…-nein-3`),
+rechts die gute (`trost-…`, danach auch das Bild in der Mitte). `baer-…-gut` zeigt ihn am Ende wieder froh.
+Alle mit zweitem Frame `…-b`, außer `trost-hug` und `baer-…-nein…` (mit `baer-…` als `--ref` erzeugt).
 
-| Datei              | Prompt                                                                                                                                                            |
-| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baer-sad`         | The little bear sits on the floor and cries, big tears, shoulders down.                                                                                           |
-| `baer-angry`       | The little bear is angry: his block tower has fallen over next to him, red face, fists clenched.                                                                  |
-| `baer-tired`       | Night, a moon in the window. The little bear yawns widely and rubs his eyes.                                                                                      |
-| `baer-scared`      | Night, a thunderstorm with lightning outside the window. The little bear hides behind a pillow, big scared eyes.                                                  |
-| `trost-stroke`     | A child's hand gently strokes the little bear's head. The bear smiles with closed eyes; small hearts.                                                             |
-| `trost-hug`        | Side view: rainbow-sleeved arms from the left edge hug the bear; he hugs back, eyes closed, small hearts.                                                         |
-| `trost-teddy`      | A child's hands give the little bear a small teddy. He hugs it and smiles.                                                                                        |
-| `trost-stomp`      | The little bear stomps with both feet to let the anger out, determined face, motion lines at his feet. He is alone.                                               |
-| `trost-blow`       | The little bear breathes in deeply and blows out a big puff of air, cheeks round.                                                                                 |
-| `trost-blanket`    | The little bear lies in bed; a child's hands tuck him in with a pink striped blanket. Sleepy smile.                                                               |
-| `trost-lullaby`    | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile.                                                                |
-| `trost-hand`       | A child's hand holds the little bear's paw. The bear looks calm and smiles a little.                                                                              |
-| `trost-light`      | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles.                                                                    |
-| `baer-sad-nein`    | A child's hands take the small teddy away from the sad little bear. The bear cries even harder, reaching after the teddy.                                         |
-| `baer-angry-nein`  | The angry little bear throws his toys across the room: a block and a toy car fly through the air, red face, shouting.                                             |
-| `baer-tired-nein`  | Night. A child's hands bang loudly on a toy drum next to the bear's bed. The bear sits up wide awake, covers his ears, grumpy.                                    |
-| `baer-scared-nein` | Night, thunderstorm. A child's finger switches the bedside lamp off. The bear sits in bed, clearly visible, clutching a pillow, very scared.                      |
-| `baer-sad-gut`     | The little bear in his cosy room is happy again: he laughs, jumps up with both arms raised, small hearts float around him.                                        |
-| `baer-angry-gut`   | The little bear is calm again: he sits relaxed next to a rebuilt tall tower of colourful blocks and smiles contentedly.                                           |
-| `baer-tired-gut`   | Night, a moon in the window. The little bear sleeps peacefully in his bed under a pink striped blanket, holding a small teddy.                                    |
-| `baer-scared-gut`  | The storm is over: a rainbow outside the window, the lamp is on. Only the little bear: he sits on his bed, laughs and waves.                                      |
-| `baer-happy`       | Birthday in his cosy room: balloons, a birthday cake with candles on a little table. The little bear wears a party hat and beams with joy, clapping his paws.     |
-| `trost-dance`      | Birthday party, balloons. A child's hands hold the little bear's paws from the front; they dance together, the bear in a party hat jumps and laughs, music notes. |
-| `trost-streamers`  | Birthday party, balloons. Colourful paper streamers fly through the air from a child's hands at the front; the little bear in a party hat laughs with arms up.    |
-| `baer-happy-nein`  | Birthday. A child's hands take the birthday cake away from the little bear. His smile is gone: he is sad and reaches after the cake.                              |
-| `baer-happy-gut`   | A happy birthday party: the little bear in a party hat laughs and raises both arms; cake with candles, balloons, streamers and confetti everywhere.               |
+| Datei                | Prompt                                                                                                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baer-sad`           | The little bear sits on the floor and cries, big tears, shoulders down.                                                                                           |
+| `baer-angry`         | The little bear is angry: his block tower has fallen over next to him, red face, fists clenched.                                                                  |
+| `baer-tired`         | Night, a moon in the window. The little bear yawns widely and rubs his eyes.                                                                                      |
+| `baer-scared`        | Night, a thunderstorm with lightning outside the window. The little bear hides behind a pillow, big scared eyes.                                                  |
+| `trost-stroke`       | A child's hand gently strokes the little bear's head. The bear smiles with closed eyes; small hearts.                                                             |
+| `trost-hug`          | Side view: rainbow-sleeved arms from the left edge hug the bear; he hugs back, eyes closed, small hearts.                                                         |
+| `trost-teddy`        | A child's hands give the little bear a small teddy. He hugs it and smiles.                                                                                        |
+| `trost-stomp`        | The little bear stomps with both feet to let the anger out, determined face, motion lines at his feet. He is alone.                                               |
+| `trost-blow`         | The little bear breathes in deeply and blows out a big puff of air, cheeks round.                                                                                 |
+| `trost-blanket`      | The little bear lies in bed; a child's hands tuck him in with a pink striped blanket. Sleepy smile.                                                               |
+| `trost-lullaby`      | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile.                                                                |
+| `trost-hand`         | A child's hand holds the little bear's paw. The bear looks calm and smiles a little.                                                                              |
+| `trost-light`        | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles.                                                                    |
+| `baer-sad-nein-3`    | A child's hands take the small teddy away from the sad little bear. The bear cries even harder, reaching after the teddy.                                         |
+| `baer-angry-nein`    | The angry little bear throws his toys across the room: a block and a toy car fly through the air, red face, shouting.                                             |
+| `baer-tired-nein-2`  | Night. A child's hands bang loudly on a toy drum next to the bear's bed. The bear sits up wide awake, covers his ears, grumpy.                                    |
+| `baer-scared-nein-3` | Night, thunderstorm. A child's finger switches the bedside lamp off. The bear sits in bed, clearly visible, clutching a pillow, very scared.                      |
+| `baer-sad-gut`       | The little bear in his cosy room is happy again: he laughs, jumps up with both arms raised, small hearts float around him.                                        |
+| `baer-angry-gut`     | The little bear is calm again: he sits relaxed next to a rebuilt tall tower of colourful blocks and smiles contentedly.                                           |
+| `baer-tired-gut`     | Night, a moon in the window. The little bear sleeps peacefully in his bed under a pink striped blanket, holding a small teddy.                                    |
+| `baer-scared-gut`    | The storm is over: a rainbow outside the window, the lamp is on. Only the little bear: he sits on his bed, laughs and waves.                                      |
+| `baer-happy`         | Birthday in his cosy room: balloons, a birthday cake with candles on a little table. The little bear wears a party hat and beams with joy, clapping his paws.     |
+| `trost-dance`        | Birthday party, balloons. A child's hands hold the little bear's paws from the front; they dance together, the bear in a party hat jumps and laughs, music notes. |
+| `trost-streamers`    | Birthday party, balloons. Colourful paper streamers fly through the air from a child's hands at the front; the little bear in a party hat laughs with arms up.    |
+| `baer-happy-nein-3`  | Birthday. A child's hands take the birthday cake away from the little bear. His smile is gone: he is sad and reaches after the cake.                              |
+| `baer-happy-gut`     | A happy birthday party: the little bear in a party hat laughs and raises both arms; cake with candles, balloons, streamers and confetti everywhere.               |
 
 `trost-hug` hat nur einen Frame: von vorn war die Umarmung nie zu erkennen. Darum von der Seite – das Kind steht links
 knapp außerhalb, man sieht nur Ärmel und ein Stück Pulli, kein Gesicht; beide umarmen sich ganz fest.
@@ -328,3 +328,25 @@ nur ein Frame, mit `baer-sad-gut` als `--ref` für den Bären.
 | `wetter-wolke`    | A big grey cloud hangs above him. The little bear is tired and droopy, yawning, eyes half closed.                  |
 | `wetter-regen`    | A small rain cloud right above him, rain falls on him. The little bear is sad, shoulders down, a tear.             |
 | `wetter-gewitter` | A dark thunder cloud with lightning right above him. The little bear is angry: red face, fists clenched, stomping. |
+
+## Geplant (noch nicht erzeugt)
+
+Diese Bilder fragt das Spiel schon an; bis sie da sind, steht an ihrer Stelle ein Platzhalter mit dem Dateinamen
+(die Beschriftung darunter sagt, was er zeigen soll). Erst anschauen, dann erzeugen: jedes mit dem Raum-Prompt von
+„Zu Hause“ oben und dem Bild des Gefühls (`baer-…`) als einziger `--ref`, nur ein Frame. Ist ein Bild gemacht, wandert
+seine Zeile in die Tabelle „Zu Hause“ (`feelings.test.ts` prüft beides).
+
+Runde für Runde steht die nicht so gute Idee neben der guten, die sie besser macht:
+
+| Datei                | Runde, daneben          | Prompt                                                                                                                                            |
+| -------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baer-sad-nein`      | 1, Umarmen              | A child's hands push the sad little bear away; he tips backwards onto the rug and cries even harder, big tears. Gentle, no injuries.              |
+| `baer-sad-nein-2`    | 2, Streicheln           | A child's hands break the little bear's toy car in two right in front of him; he cries even harder, reaching after it.                            |
+| `baer-angry-nein-2`  | 2, Tief pusten          | The angry little bear screams very loudly next to his fallen tower, mouth wide open, red face, fists clenched, small shout lines around his head. |
+| `baer-angry-nein-3`  | 3, Umarmen              | The angry little bear hits a child's hand that comes in from the bottom edge, red face; the hand pulls back. Gentle, no injuries.                 |
+| `baer-tired-nein`    | 1, Zudecken             | Night, a moon in the window. A child's hands pull the pink striped blanket off the little bear in his bed; he curls up, cold and grumpy.          |
+| `baer-tired-nein-3`  | 3, Teddy geben          | Night, a moon in the window. A child's hands hold a bright glowing tablet in front of the little bear in his bed; he is wide awake, eyes big.     |
+| `baer-scared-nein`   | 1, Umarmen              | Night, thunderstorm. A child's hand holds up a spooky monster hand puppet in front of the little bear in bed, „boo!“; he startles, very scared.   |
+| `baer-scared-nein-2` | 2, Hand halten          | Night, thunderstorm. The little bear sits alone in his bed clutching a pillow, very scared; the door of the room is just closing, nobody there.   |
+| `baer-happy-nein`    | 1, Mittanzen            | Birthday, balloons. A child's hand pops one of the bear's balloons with a pin, a small burst; the little bear in a party hat flinches, sad.       |
+| `baer-happy-nein-2`  | 2, Luftschlangen werfen | Birthday. A child's hands take a wrapped present away from the little bear in a party hat; his smile is gone, he reaches after it.                |

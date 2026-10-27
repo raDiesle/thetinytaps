@@ -56,6 +56,8 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi muss mal: zum Töpfchen laufen, Hose runter, sitzen und dabei ein Warte-Lied (Suno, wie beim Zahnputzlied), plätschern, abziehen (das Wasser wirbelt), Hände waschen. Jeder Schritt ein Tippen. Dazu ein „Hat geklappt!“-Bild für Große: Konfetti, Applaus und ein Stern auf der Sternentafel (H-01).",
       why: "Eltern suchen „töpfchen lied“, „töpfchen app“, „töpfchen mit applaus“, „töpfchentraining ab wann“ und „belohnungssystem kinder toilette“. Genau im Alter der App.",
       effort: "M",
+      partial:
+        "„Aufs Töpfchen“ (/toepfchen/): Gemini-Bildgeschichte mit Tapsi dem Fuchs – essen, trinken, Blase drückt oder Bauch brummelt, Mama und Papa rufen, jeder Schritt ein Tippen; beim Sitzen machen Mama und Papa bei jedem Tippen etwas anderes (Wasser plätschert bei Pipi, Drücken bei Kaka, Quatsch), bis der grüne Haken „fertig“ sagt. „Hat geklappt!“ mit Stern auf einer eigenen Wochentafel. Das Warte-Lied ist noch synthetisch (kein Suno-Lied), und die Sterne landen noch nicht auf einer gemeinsamen Sternentafel (H-01).",
     },
     {
       id: "H-07",

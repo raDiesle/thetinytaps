@@ -19,33 +19,33 @@ export const COMFORTS_RU: Partial<Record<ComfortId, ComfortText>> = {
   streamers: { caption: "Бросить серпантин", narration: "Ты бросаешь яркий серпантин. Ура!" },
 };
 
-/** The bear's feelings in Russian. */
+/** The bear's feelings in Russian; `null` for a not-so-good idea not translated yet (told in German). */
 export const FEELINGS_RU: Partial<Record<FeelingId, FeelingText>> = {
   sad: {
     title: "Грустно, плачет",
     intro: "Мишке грустно. Он плачет.",
-    instead: { caption: "Забрать игрушку", answer: "Хм, теперь Мишка плачет ещё сильнее. Лучше утешь его." },
+    instead: [null, null, { caption: "Забрать игрушку", answer: "Хм, теперь Мишка плачет ещё сильнее. Лучше утешь его." }],
     end: { narration: "Мишке снова весело!", line: "Спасибо!" },
     endCaption: "Снова весёлый",
   },
   angry: {
     title: "Злость, башня упала",
     intro: "Мишка злится! Его башня упала.",
-    instead: { caption: "Бросать игрушки", answer: "Хм, когда бросаешь, вещи ломаются. Лучше выпусти злость: топни сильно-сильно!" },
+    instead: [{ caption: "Бросать игрушки", answer: "Хм, когда бросаешь, вещи ломаются. Лучше выпусти злость: топни сильно-сильно!" }, null, null],
     end: { narration: "Злости больше нет. Мишка снова спокойный.", line: "Спасибо!" },
     endCaption: "Снова спокойный",
   },
   tired: {
     title: "Сонный вечер",
     intro: "Мишка хочет спать. Он зевает.",
-    instead: { caption: "Громко барабанить", answer: "Хм, так громко Мишка не может уснуть. Лучше сиди тихо-тихо." },
+    instead: [null, { caption: "Громко барабанить", answer: "Хм, так громко Мишка не может уснуть. Лучше сиди тихо-тихо." }, null],
     end: { narration: "Мишка сладко засыпает. Спокойной ночи!", line: "Спокойной ночи …" },
     endCaption: "Засыпает",
   },
   scared: {
     title: "Страшно в грозу",
     intro: "Мишке страшно. Гром гремит!",
-    instead: { caption: "Выключить свет", answer: "Хм, в темноте Мишке ещё страшнее. Лучше включи свет." },
+    instead: [null, null, { caption: "Выключить свет", answer: "Хм, в темноте Мишке ещё страшнее. Лучше включи свет." }],
     end: { narration: "Гроза кончается. Мишка снова смеётся!", line: "Спасибо!" },
     endCaption: "Снова весёлый",
   },
@@ -53,7 +53,7 @@ export const FEELINGS_RU: Partial<Record<FeelingId, FeelingText>> = {
     title: "Радость, день рождения",
     intro: "У Мишки день рождения! Он так радуется.",
     question: "Как ты отпразднуешь с ним?",
-    instead: { caption: "Забрать торт", answer: "Хм, это его праздничный торт. Теперь Мишке грустно. Лучше празднуй вместе с ним." },
+    instead: [null, null, { caption: "Забрать торт", answer: "Хм, это его праздничный торт. Теперь Мишке грустно. Лучше празднуй вместе с ним." }],
     end: { narration: "Какой чудесный день рождения!", line: "Спасибо! Как здорово!" },
     endCaption: "Праздник",
   },

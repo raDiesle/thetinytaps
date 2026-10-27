@@ -36,8 +36,7 @@ export function FeelingsGame() {
         <>
           <p>
             {t({
-              de: "Zu Hause ist der kleine Bär traurig, wütend, müde oder hat Angst. Drei Karten zeigen, was ihm hilft – umarmen, Hand halten, stampfen, Licht an … Sind alle drei getan, ist er wieder froh. Und an seinem Geburtstag freut er sich, und das Kind feiert mit: tanzen, Luftschlangen, umarmen.",
-              ru: "Дома Мишке грустно, он злится, хочет спать или боится. Три карточки показывают, что ему помогает: обнять, взять за лапку, потопать, включить свет … Когда сделаны все три, Мишка снова радуется. А в свой день рождения он и так счастлив, и ребёнок празднует вместе с ним: танцы, серпантин, объятия.",
+              de: "Zu Hause ist der kleine Bär traurig, wütend, müde oder hat Angst. In drei Runden zeigt das große Bild, wie es ihm geht, daneben zwei Karten: eine nicht so gute Idee und eine, die ihm hilft – umarmen, Hand halten, stampfen, Licht an … Nach drei guten Ideen ist er wieder froh. Und an seinem Geburtstag freut er sich, und das Kind feiert mit: tanzen, Luftschlangen, umarmen.",
             })}
           </p>
           <p>
@@ -54,8 +53,7 @@ export function FeelingsGame() {
           </p>
           <p>
             {t({
-              de: "Links liegt immer eine nicht so gute Idee (z. B. zurückschubsen, Licht aus), daneben die guten, die beste zuerst. Tippt das Kind auf die nicht so gute, erscheint sie groß mit rotem Kreuz und es wird erklärt, warum. Die guten Ideen bekommen einen grünen Haken.",
-              ru: "Слева всегда не самая хорошая идея (например, толкнуть в ответ или выключить свет), рядом – хорошие, лучшая первой. Если ребёнок выбирает не самую хорошую, она появляется крупно с красным крестиком, и объясняется почему. Хорошие идеи получают зелёную галочку.",
+              de: "Vor jeder Wahl zeigt das große Bild wieder, was passiert ist, daneben genau zwei Karten: zuerst (oben oder links) eine nicht so gute Idee (z. B. zurückschubsen, Licht aus), dann die gute. Tippt das Kind auf die nicht so gute, erscheint sie groß mit rotem Kreuz und es wird erklärt, warum. Die gute Idee bekommt einen grünen Haken.",
             })}
           </p>
           <p>

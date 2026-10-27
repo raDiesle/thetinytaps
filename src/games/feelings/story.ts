@@ -1,6 +1,7 @@
 // What both parts of the feelings game are made of: short beats that are told
 // (or read aloud) while a big picture shows what happens.
 
+import type { Localized } from "@/lib/language";
 import { playAua, playBlow, playBoing, playChime, playCrash, playCry, playHum, playLaugh, playMelody, playPop, playRecorded, playRumble } from "@/lib/sfx";
 
 const recordings: string[] = [];
@@ -52,6 +53,9 @@ export type OopsSound = "aua" | "crash";
 
 /** Sounds with a recording in src/lib/sounds/, loaded when a story starts so the first one isn't synthesized. */
 export const RECORDED_SOUNDS: readonly string[] = [...recordings, "switch"];
+
+/** Asked before every round after the first, at home and in the kindergarten. */
+export const NEXT_QUESTION: Localized = { de: "Und jetzt?", ru: "А теперь?" };
 
 export interface Beat {
   /** Told from outside; read aloud, never shown. */

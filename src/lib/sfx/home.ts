@@ -29,6 +29,18 @@ export function playFlush() {
   [1.4, 1.55, 1.7].forEach((delay, i) => note({ from: 220 + i * 60, to: 520 + i * 80, duration: 0.09, type: "sine", volume: 0.18, delay }));
 }
 
+/** "Plitsch, plätscher" – a little trickle into the potty: soft rushing and quick, falling drops. */
+export function playTrickle() {
+  hiss({ from: 2200, to: 1500, duration: 1.4, volume: 0.12, q: 1.5 });
+  for (let i = 0; i < 10; i++) note({ from: 1500 - (i % 4) * 150, to: 1100 - (i % 4) * 120, duration: 0.06, type: "sine", volume: 0.08, delay: i * 0.13 });
+}
+
+/** "Ratsch!" – toilet paper torn off the roll. */
+export function playRip() {
+  hiss({ from: 3000, to: 1800, duration: 0.18, volume: 0.25, q: 1.2 });
+  hiss({ from: 2400, to: 1200, duration: 0.12, volume: 0.2, delay: 0.16, q: 1.2 });
+}
+
 /** "Ssssss!" – warm air from a hair dryer, with the soft hum of its motor. */
 export function playBlow() {
   hiss({ from: 1400, to: 1900, duration: 1.3, volume: 0.22, q: 0.6 });
