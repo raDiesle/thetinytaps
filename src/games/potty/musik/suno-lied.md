@@ -14,7 +14,7 @@ Suno adds an intro and an ending anyway: when converting, cut the file from the 
 the first verse to the end of the last turnaround (on the measured beat grid, `bun run song`), so
 the whole file loops without a gap.
 
-## Deutsch (`de`, written 26 Oct 2026, rewritten 27 Oct 2026: all about going to the potty and waiting; not made yet)
+## Deutsch (`de`, written 26 Oct 2026, rewritten 27 Oct 2026: all about going to the potty and waiting; made 27 Oct 2026 → `musik-toepfchen-warten-de.mp3`)
 
 What the child sees while it plays: Tapsi on the potty, Mama and Papa clapping softly, a clock ticking on the wall.
 „Kaka“ like everywhere else in the game.

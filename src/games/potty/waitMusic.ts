@@ -28,6 +28,18 @@ const VOLUME = 0.35;
 const DUCKED = 0.08;
 const DUCK_CHECK_MS = 150;
 
+/**
+ * The part of each song that repeats, in seconds, measured on its beat grid (`bun run song`): from just before the
+ * first sung word to the same place in the bar after the last turnaround, a whole number of bars, so the beat goes on
+ * across the jump. Looping inside the file rather than the whole file keeps it seamless in every browser, however it
+ * trims the silence an MP3 starts and ends with. A song without an entry repeats the whole file.
+ */
+const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
+  // 100 BPM, beats at 0.48 + 0.6 k s; „Ich“ comes on the eighth before the first bar; 55 bars (verses, choruses,
+  // bridge, the 8-bar turnaround), then the file holds a little of what follows, never reached.
+  de: { loopStart: 0.08, loopEnd: 0.08 + 55 * 2.4 },
+};
+
 const loading = new Map<string, Promise<AudioBuffer | null>>();
 
 const speaking = () => typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking;
@@ -64,7 +76,8 @@ export function useWaitingMusic(playing: boolean, appLanguage: string) {
       return () => clearInterval(timer);
     }
     let ducked = speaking();
-    const loop: Loop | null = playLoop(song, { offset: 0, volume: ducked ? DUCKED : VOLUME });
+    const part = (lang && LOOPS[lang]) || { loopStart: 0, loopEnd: song.duration };
+    const loop: Loop | null = playLoop(song, { offset: part.loopStart, volume: ducked ? DUCKED : VOLUME, ...part });
     const timer = setInterval(() => {
       if (speaking() === ducked) return;
       ducked = !ducked;
@@ -74,5 +87,5 @@ export function useWaitingMusic(playing: boolean, appLanguage: string) {
       clearInterval(timer);
       loop?.stop();
     };
-  }, [playing, song]);
+  }, [playing, song, lang]);
 }

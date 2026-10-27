@@ -115,8 +115,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🎵 Warte-Lied (gesungen)",
         recorded: true,
-        languages: {},
-        note: "Noch keins: bis dahin wiederholt sich eine kleine Melodie. Ein Lied von Suno pro Sprache, endlos wiederholbar: src/games/potty/musik/musik-toepfchen-warten-<Sprache>.mp3 (/musik-erzeugen).",
+        languages: { de: "done" },
+        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
       },
     ],
   },
