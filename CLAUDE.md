@@ -93,7 +93,9 @@ In a fresh worktree run `yarn install` first.
   are German where they are user-facing (`/bilder/`, `/aufzug/`).
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
   classes and `@keyframes` by game or scene (`el-`, `bs-`); never style another
-  game's classes. A game using another game's parts imports that CSS itself.
+  game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
+  (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
+  keyframes from another game's CSS (`css.test.ts` checks it).
 - Drawings are SVG in React components, animated with CSS classes; no image files
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
@@ -166,7 +168,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
-  song files are named `musik-*.mp3`, see `/musik-erzeugen`. The shared options (`useCommonSettings`) are one
+  song files are named `musik-*.mp3`, see `/musik-erzeugen`. A game that runs along its own song (its steps follow it)
+  starts loading it on its start screen and waits for it before the part that follows the song, showing how far it is
+  when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
   "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“ lets a grown-up play upright for

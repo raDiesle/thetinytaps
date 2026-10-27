@@ -39,7 +39,10 @@ pictures when they are ready.
   session – so nothing that is still coming in gets lost.
 - **Put many pictures in one batch** with `--jobs jobs.json` (an array of
   `{ "out", "prompt", "ref": [...], … }`, same names as the options) instead of
-  many single runs. A picture that needs another as `--ref` (second frames) goes into
+  many single runs. The script stops on a field it doesn't know: a misspelled one (it once
+  read only `refs`, so every `ref` was dropped and the pictures came without reference –
+  new rooms, new style) must never be ignored silently. After a batch with references,
+  look first whether the room and style really match the reference. A picture that needs another as `--ref` (second frames) goes into
   the next batch.
 - **Commit the pictures as soon as they are saved** and merge into main, so the
   worktree can be archived. `yarn archive-check` lists every worktree with what
@@ -97,6 +100,11 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   `yarn frames --scenes` lists pictures whose border (the background) differs from
   the story's first picture; a look at the story side by side shows a missing or
   extra character.
+- **What stays put across pictures comes from a picture where it already is.** Several pictures in which a
+  character keeps sitting, lying or holding something (sitting on the potty while the parents do things) are
+  drawn from the picture where it already does so, not from the place's first picture: from the empty room the
+  model drew the potty again where it stood and the child sitting on nothing beside it. Say in the prompt that
+  there is only one of the thing.
 - **`2x2` only for pictures that are never shown big** (icons, stickers, small
   cards): each panel is only about 590 px wide.
 - Check both pieces: nothing cut off at the inner edges, no pink seam left.

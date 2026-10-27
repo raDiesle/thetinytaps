@@ -1,10 +1,13 @@
+import { useEffect } from "react";
 import { GameShell } from "@/components/GameShell";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
-import { useT } from "@/lib/language";
+import { useAppLanguage, useT } from "@/lib/language";
+import { preloadSong, SUNG_LANGUAGES } from "./music";
 import { DEFAULT_TEETH_SETTINGS, type TeethSettings, TEETH_SETTINGS_KEY } from "./settings";
 import { KAI } from "./steps";
+import { sungLanguageFor } from "./sung";
 import { TeethPlay } from "./TeethPlay";
 
 /** What is shown before the brushing, as one choice: the sweets story, the sink, both or neither. */
@@ -23,6 +26,9 @@ export function TeethGame() {
   const [settings, update] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
   const { touchOnly } = useDevice();
   const t = useT();
+  const language = useAppLanguage();
+  // The song loads from the moment the game is chosen, while the grown-up looks at this screen and the story plays.
+  useEffect(() => preloadSong(sungLanguageFor(language.id, SUNG_LANGUAGES)), [language.id]);
 
   return (
     <GameShell

@@ -50,6 +50,17 @@ export function playTuneNote(i: number) {
   if (i % 4 === 0) note({ from: TUNE_BASS[Math.floor(i / 4) % TUNE_BASS.length], duration: 0.9, type: "sine", volume: 0.14 });
 }
 
+/** A calm waiting tune for sitting on the potty, in four bars of four beats; null is a rest. */
+const WAIT_TUNE = [4, 4, 2, null, 4, 4, 2, null, 5, 4, 3, 2, 1, null, 0, null];
+const WAIT_BASS = [130.81, 174.61, 196.0, 130.81];
+
+/** The i-th beat of the waiting tune, which repeats every four bars; a soft bass note starts every bar. */
+export function playWaitNote(i: number) {
+  const step = WAIT_TUNE[i % WAIT_TUNE.length];
+  if (step !== null) note({ from: PENTATONIC[step], duration: 0.4, type: "triangle", volume: 0.13 });
+  if (i % 4 === 0) note({ from: WAIT_BASS[Math.floor(i / 4) % WAIT_BASS.length], duration: 1.4, type: "sine", volume: 0.14 });
+}
+
 /** "Puff!" – a little monster vanishes in a cloud, with a sparkle after. */
 export function playPoof() {
   note({ from: 900, to: 180, duration: 0.25, type: "sine", volume: 0.25 });
