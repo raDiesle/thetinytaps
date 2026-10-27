@@ -1,6 +1,5 @@
-import { Link } from "react-router";
-import { FullscreenCorner } from "@/components/FullscreenButton";
 import { GameCard } from "@/components/GameCard";
+import { MenuTop } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
@@ -22,10 +21,7 @@ export function ScenesMenu() {
   return (
     <main className="home">
       <Sky />
-      <FullscreenCorner />
-      <Link to={CATEGORY ? categoryHref(CATEGORY) : "/"} className="back-link">
-        ← {CATEGORY ? t(CATEGORY.title) : t({ de: "Alle Spiele", ru: "Все игры" })}
-      </Link>
+      <MenuTop to={CATEGORY ? categoryHref(CATEGORY) : "/"}>{CATEGORY ? t(CATEGORY.title) : t({ de: "Alle Spiele", ru: "Все игры" })}</MenuTop>
       <h1 className="menu-title">
         <span aria-hidden>🖼️</span> {title}
       </h1>

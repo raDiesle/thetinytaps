@@ -1,6 +1,7 @@
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
-import { FullscreenButton, FullscreenCorner } from "@/components/FullscreenButton";
+import { FullscreenButton } from "@/components/FullscreenButton";
+import { MenuTop } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -165,10 +166,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   return (
     <main className="start-screen">
       <Sky />
-      <FullscreenCorner />
-      <Link to={back} className="back-link">
-        ← {backText}
-      </Link>
+      <MenuTop to={back}>{backText}</MenuTop>
       <h1 className="menu-title">
         <span aria-hidden>{emoji}</span> {title}
       </h1>

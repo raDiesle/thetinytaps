@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "bun:test";
+import { PHONE_SCREEN } from "@/lib/fitGrid";
 
 // All CSS is global, and games are loaded one by one: a name used twice means the
 // look depends on which game was opened first. Prefix names by game or scene.
@@ -58,6 +59,19 @@ test("keyframes come from the same game or from a stylesheet every page loads", 
       const where = definedIn.get(name);
       if (!where) wrong.push(`${file}: ${name} is not defined anywhere`);
       else if (!everyPage.includes(where) && owner(file) !== owner(where)) wrong.push(`${file}: ${name} comes from ${where}`);
+    }
+  }
+  expect(wrong).toEqual([]);
+});
+
+// Menus switch to their phone layout in the styles and in useFitGrid at the same size,
+// or the cards are sized for one layout and drawn in the other.
+test("phone media queries use useFitGrid's phone size for width and height", () => {
+  const phone = `(max-width: ${PHONE_SCREEN - 0.02}px), (max-height: ${PHONE_SCREEN - 0.02}px)`;
+  const wrong: string[] = [];
+  for (const file of cssFiles) {
+    for (const [query] of readFileSync(file, "utf8").matchAll(/@media[^{]*\b(?:max-width|max-height): 599\.98px[^{]*/g)) {
+      if (query.trim() !== `@media ${phone}`) wrong.push(`${file}: ${query.trim()}`);
     }
   }
   expect(wrong).toEqual([]);

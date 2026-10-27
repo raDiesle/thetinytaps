@@ -496,18 +496,21 @@ kbd {
 }
 
 /*
- * More room for the cards on big screens: the back link moves up into the corner, bigger and yellow so
- * a grown-up finds it at once, and stays there while the page scrolls.
+ * More room for the cards on big screens: the back link (with the fullscreen button next to it) moves up
+ * into the corner, bigger and yellow so a grown-up finds it at once, and stays there while the page scrolls.
  */
 @media (min-width: 900px) and (min-height: 600px) {
-  .home > .back-link,
-  .start-screen > .back-link {
+  .home > .menu-top,
+  .start-screen > .menu-top {
     position: fixed;
     top: max(20px, env(safe-area-inset-top));
     left: max(20px, env(safe-area-inset-left));
     z-index: 10;
-    min-height: 60px;
     margin: 0;
+  }
+
+  .menu-top > .back-link {
+    min-height: 60px;
     padding: 10px 30px 10px 24px;
     background: var(--sunshine);
     font-size: 1.4rem;
@@ -555,4 +558,131 @@ kbd {
 .playtime-status button:active {
   transform: translateY(3px);
   box-shadow: 0 1px 0 var(--ink);
+}
+
+/* A fitted card lower than useFitGrid's FLAT_ROW shows emoji and title side by side. */
+@container (max-height: 129.98px) {
+  .game-list.fit .game-card {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 6px 22px 6px 8px;
+    border-radius: 24px;
+    text-align: left;
+  }
+
+  .game-list.fit .game-emoji {
+    --size: min(96px, 70cqh, 30cqw);
+    border-width: 3px;
+  }
+
+  .game-list.fit .game-title {
+    font-size: clamp(0.9rem, min(20cqh, 7cqw), 1.4rem);
+  }
+
+  /* Out of the emoji's way: on the bottom edge, like the "zuletzt" badge on the top one. */
+  .game-list.fit .mode-kind {
+    top: auto;
+    bottom: -10px;
+  }
+
+  .game-list.fit .game-go {
+    width: 36px;
+    height: 36px;
+    right: -6px;
+    bottom: -8px;
+    font-size: 0.9rem;
+  }
+}
+
+/*
+ * Phones (shorter side under 600 px, like useFitGrid): everything tighter, so the cards get the room. The back
+ * link sits left of the title: the ::after line break keeps the rest below those two.
+ */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .start-screen {
+    flex-flow: row wrap;
+    align-content: center;
+    gap: 10px;
+    padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .start-screen::after {
+    content: "";
+    order: 1;
+    flex-basis: 100%;
+    margin-top: -10px;
+  }
+
+  .start-screen > :not(.menu-top, .menu-title) {
+    order: 2;
+  }
+
+  /* The back link stays left, also on a line of its own when the title doesn't fit beside it. */
+  .start-screen > .menu-top {
+    margin-right: auto;
+  }
+
+  .start-screen > .menu-title {
+    margin-inline: auto;
+  }
+
+  .start-screen > .shared-settings-note {
+    flex-basis: 100%;
+  }
+
+  .back-link {
+    min-height: 40px;
+    padding: 4px 16px;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 0 var(--ink);
+  }
+
+  .mode-picker {
+    gap: 8px;
+  }
+
+  .mode-heading {
+    padding: 2px 14px;
+    font-size: 0.95rem;
+  }
+
+  .mode-level {
+    padding: 4px 14px;
+    border-radius: 22px;
+    font-size: 0.95rem;
+  }
+
+  .mode-list:not(.fit) .mode-card .game-emoji {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+
+  .start-button {
+    padding: 10px 32px 10px 12px;
+    box-shadow: 0 6px 0 var(--ink);
+    font-size: 1.6rem;
+  }
+
+  .settings-panel {
+    gap: 10px;
+  }
+
+  .panel-button {
+    min-height: 40px;
+    padding: 4px 16px;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 0 var(--ink);
+  }
+
+  .home:has(> .game-list.fit),
+  .start-screen:has(.game-list.fit) {
+    padding-bottom: 12px;
+  }
+
+  .game-list.fit {
+    gap: 14px;
+  }
 }

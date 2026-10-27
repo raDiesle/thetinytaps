@@ -124,6 +124,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. Russisch fehlt: die neuen Texte der Spielzeit (Minuten oder Spiele, Sperre der Menüs) und der Untertitel von „Weitere“ (mit Töpfchen).",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. Russisch fehlt: die neuen Texte der Spielzeit (Minuten oder Spiele, Sperre der Menüs) der Untertitel von „Weitere“ (mit Töpfchen) und „Schließen“ und „Weiter unten gibt es mehr“ der Optionen am Handy.",
   },
 ];
