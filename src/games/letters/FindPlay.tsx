@@ -15,7 +15,7 @@ import type { LettersSettings } from "./settings";
 
 /** Keys closer together than this only spawn shapes, so mashing the whole keyboard doesn't count as finding. */
 const MIN_PRESS_MS = 300;
-/** Time to enjoy a found key before a key or tap brings the next letter. */
+/** Time to enjoy a found key before the next letter comes by itself – one right key is all it takes. */
 const CELEBRATE_MS = 1500;
 /** After this many wrong keys, the wanted key lights up and the question is asked again. */
 const HINT_AFTER_WRONG = 3;
@@ -66,7 +66,6 @@ export function FindPlay({
   const t = useT();
 
   const lastPress = useRef(0);
-  const foundAt = useRef(0);
   const nextId = useRef(0);
   const deck = useRef<LetterEntry[]>([]);
   const wordIndex = useRef(new Map<string, number>());
@@ -102,29 +101,33 @@ export function FindPlay({
   );
 
   // Go through all letters in random order before any letter comes again.
-  const nextLetter = useCallback(() => {
-    if (deck.current.length === 0) {
-      deck.current = shuffle(letters);
-      // The deck is used from the end; don't start the new round with the letter just found.
-      const last = deck.current.length - 1;
-      if (last > 0 && deck.current[last] === current?.letter) {
-        [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
+  const nextLetter = useCallback(
+    (queue = false) => {
+      if (deck.current.length === 0) {
+        deck.current = shuffle(letters);
+        // The deck is used from the end; don't start the new round with the letter just found.
+        const last = deck.current.length - 1;
+        if (last > 0 && deck.current[last] === current?.letter) {
+          [deck.current[0], deck.current[last]] = [deck.current[last], deck.current[0]];
+        }
       }
-    }
-    const letter = deck.current.pop()!;
-    const id = nextId.current++;
-    setCurrent({ id, letter, word: pickWord(letter) });
-    setWrong(0);
-    setFound(false);
-    setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
-    say(pack.findPrompt(letter));
-  }, [letters, current, pack, pickWord, say]);
+      const letter = deck.current.pop()!;
+      const id = nextId.current++;
+      setCurrent({ id, letter, word: pickWord(letter) });
+      setWrong(0);
+      setFound(false);
+      setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
+      // After a find, the question waits for the praise instead of cutting it off.
+      say(pack.findPrompt(letter), queue);
+    },
+    [letters, current, pack, pickWord, say],
+  );
 
-  /** Once a found key has been celebrated long enough, bring the next letter. */
-  const tryNextLetter = useCallback(() => {
-    if (!found || performance.now() - foundAt.current < CELEBRATE_MS) return false;
-    nextLetter();
-    return true;
+  // A found key is celebrated, then the next letter comes without another key or tap.
+  useEffect(() => {
+    if (!found) return;
+    const timer = setTimeout(() => nextLetter(true), CELEBRATE_MS);
+    return () => clearTimeout(timer);
   }, [found, nextLetter]);
 
   // Start with a letter right away; settings can't change while playing.
@@ -135,7 +138,7 @@ export function FindPlay({
     (key: string) => {
       if (!current) return;
       if (found) {
-        if (!tryNextLetter()) funBurst();
+        funBurst();
         return;
       }
       const now = performance.now();
@@ -146,7 +149,6 @@ export function FindPlay({
       lastPress.current = now;
 
       if (keyMatches(key, current.letter.upper, pack)) {
-        foundAt.current = now;
         setFound(true);
         setFoundCount((n) => n + 1);
         if (settings.sounds) playChime();
@@ -161,7 +163,7 @@ export function FindPlay({
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, second, translation, say, spawn, funBurst, tryNextLetter, settings.sounds, settings.speech],
+    [current, found, wrong, pack, second, translation, say, spawn, funBurst, settings.sounds, settings.speech],
   );
 
   useEffect(() => {
@@ -176,14 +178,12 @@ export function FindPlay({
   const touchKeys = useTouchKeys(settings.touchKeys);
   const rows = useMemo(() => keyRows(pack.letters.map((l) => l.upper)), [pack]);
 
-  // Tapping the card asks again; once the key is found, any tap moves on.
+  // Tapping the card asks again.
   const onPlayAreaPointer = (e: PointerEvent) => {
-    if (tryNextLetter()) return;
     funBurst(e.clientX, e.clientY);
   };
   const onCardPointer = (e: PointerEvent) => {
     e.stopPropagation();
-    if (tryNextLetter()) return;
     if (current && !found) say(pack.findPrompt(current.letter));
     funBurst(e.clientX, e.clientY);
   };

@@ -4,6 +4,11 @@ Route `/buchstaben/`.
 
 Free typing (a number shows its things and digit at once, or optionally counts them aloud, step by step or by tapping each thing), "Wo ist das B?" (find the key for a shown letter, `FindPlay.tsx`) or the Buchstaben-Zug (keys become wagons, `TrainPlay.tsx`).
 
+## Rules
+
+- One right key is all a round takes: after a short celebration (`CELEBRATE_MS`) the next letter comes by itself,
+  never waiting for another key or tap. Keys and taps during the celebration only make shapes and sounds.
+
 ## Languages
 
 The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`) are shared with „Wörter tippen“; the choice is
