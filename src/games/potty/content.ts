@@ -19,17 +19,17 @@ export const TAPSI = {
 export type Need = "pipi" | "kaka";
 
 /**
- * What the child said it has to do, chosen by a grown-up before the story: often nobody
- * knows yet ("unsure"), so the story says „muss mal“ and the waiting brings scenes for both.
- * What really came is chosen at the ✓.
+ * What the child said it has to do, tapped by a grown-up on a round button while Tapsi eats and
+ * drinks: often nobody knows yet ("unsure", also when nobody taps), so the story says „muss mal“
+ * and the waiting brings scenes for both. What really came is chosen at the ✓.
  */
 export type Said = Need | "unsure";
 
-/** The choices of `Said` in their order, which „Weiter“ follows; the emoji stands for it on buttons. */
+/** The choices of `Said` in the order of their buttons; the emoji stands for it. */
 export const SAID: { id: Said; emoji: string }[] = [
   { id: "pipi", emoji: "💧" },
   { id: "kaka", emoji: "💩" },
-  { id: "unsure", emoji: "🚽" },
+  { id: "unsure", emoji: "❓" },
 ];
 
 /** The steps of the story, one tap each. */
@@ -156,6 +156,8 @@ export interface PottyTexts {
   steps: Record<StepId, (name: string, said: Said) => string>;
   /** Said when a waiting scene comes, by its id. */
   scenes: Record<string, string>;
+  /** Said when a grown-up taps what the child said, and the button's name for screen readers. */
+  said: Record<Said, string>;
   /** Said once while sitting, so a grown-up knows what the two ✓ are for. */
   finish: string;
   /** What each ✓ means, for screen readers. */
@@ -202,6 +204,11 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       jonglieren: "Papa jongliert mit Klopapier!",
       kuckuck: "Wo ist Mama? Kuckuck!",
       seifenblasen: "Papa macht Seifenblasen. Plopp, plopp!",
+    },
+    said: {
+      pipi: "Tapsi muss bald Pipi.",
+      kaka: "Tapsi muss bald Kaka.",
+      unsure: "Tapsi muss bald mal.",
     },
     finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka!",
     went: {

@@ -16,6 +16,7 @@ describe("Aufs Töpfchen", () => {
     for (const texts of Object.values(POTTY_TEXTS)) {
       for (const said of SAIDS) for (const step of STEPS) expect(texts.steps[step.id](TAPSI.name, said).trim()).not.toBe("");
       for (const need of NEEDS) expect(texts.went[need].trim()).not.toBe("");
+      for (const said of SAIDS) expect(texts.said[said].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
       for (const scene of WAIT_SCENES) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
       expect(texts.star.trim()).not.toBe("");

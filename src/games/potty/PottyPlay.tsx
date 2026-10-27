@@ -57,15 +57,17 @@ const START: At = { step: -1, scene: -1 };
 const NEEDS: Need[] = ["pipi", "kaka"];
 const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
 const DONE = STEPS.findIndex((s) => s.id === "done");
+const NEED = STEPS.findIndex((s) => s.id === "need");
 
 /**
  * „Aufs Töpfchen“ (H-06): Tapsi eats, drinks, has to go, calls Mama and Papa and goes to the potty, one tap for every step.
- * What it has to do is what the child said (`settings.said`, maybe unknown); what came is chosen by a grown-up at the ✓.
+ * What it has to do is what the child said, tapped by a grown-up on a round button while Tapsi eats (unknown until then);
+ * what came is chosen at the ✓.
  */
 export function PottyPlay({ settings }: { settings: PottySettings }) {
   const language = useAppLanguage();
   const texts = useT()(POTTY_TEXTS);
-  const [said, setSaid] = useState<Said>(settings.said);
+  const [said, setSaid] = useState<Said>("unsure");
   /** What really came, chosen at the ✓; null before. */
   const [went, setWent] = useState<Need | null>(null);
   const scenes = useMemo(() => scenesFor(said), [said]);
@@ -245,16 +247,25 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     else begin(next);
   };
 
+  /** A round button while eating: what the child said; the bladder or the tummy follows in the need step. */
+  const pick = (choice: Said, e: PointerEvent) => {
+    if (settings.sounds) playPop();
+    spawn(e.clientX, e.clientY);
+    if (choice === said) return;
+    setSaid(choice);
+    say(texts.said[choice]);
+  };
+
   /** A ✓ while sitting: a grown-up says what is in the potty, and the story goes on with it. */
   const finish = (came: Need) => {
     setWent(came);
     begin(atRef.current.step + 1, came);
   };
 
-  const restart = (nextSaid: Said) => {
+  const restart = () => {
     timers.current.forEach(clearTimeout);
     timers.current.clear();
-    setSaid(nextSaid);
+    setSaid("unsure");
     setWent(null);
     atRef.current = START;
     busyRef.current = false;
@@ -276,8 +287,6 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   const pictures = sitting && at.scene >= 0 ? [scenePicture(scenes[at.scene])] : step ? picturesFor(step, went ?? said) : ["essen"];
   const done = at.step === STEPS.length - 1;
-  // „Weiter“: the next choice of what the child says, round and round.
-  const nextSaid = SAID[(SAID.findIndex((s) => s.id === said) + 1) % SAID.length];
   /** The needs Tapsi feels and calls for: both while nobody knows. */
   const feels = said === "unsure" ? NEEDS : [said];
 
@@ -299,6 +308,28 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
           <span>📣</span>
           {feels.map((n) => (
             <span key={n}>{NEED_EMOJI[n]}</span>
+          ))}
+        </div>
+      )}
+
+      {/* While Tapsi eats and drinks, a grown-up taps what the child said; untouched it stays „muss mal“. */}
+      {at.step < NEED && (
+        <div className="pt-saids">
+          {SAID.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              className={`pt-said${s.id === said ? " picked" : ""}`}
+              data-tap
+              aria-label={texts.said[s.id]}
+              aria-pressed={s.id === said}
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                pick(s.id, e);
+              }}
+            >
+              {s.emoji}
+            </button>
           ))}
         </div>
       )}
@@ -340,13 +371,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         ))}
       </ol>
 
-      {done && (
-        <GameEnd
-          delayMs={STEPS[at.step].ms}
-          onAgain={() => restart(said)}
-          next={{ emoji: nextSaid.emoji, name: TAPSI.name, onNext: () => restart(nextSaid.id) }}
-        />
-      )}
+      {done && <GameEnd delayMs={STEPS[at.step].ms} onAgain={restart} next={{ emoji: "🚽", name: TAPSI.name, onNext: restart }} />}
       <BurstLayer bursts={bursts} />
     </div>
   );
