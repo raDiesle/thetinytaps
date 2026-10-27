@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { FullscreenCorner } from "@/components/FullscreenButton";
+import { MenuTop } from "@/components/MenuTop";
 import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
@@ -147,10 +147,7 @@ export function ManagementPage() {
 
   return (
     <main className="home ideas">
-      <FullscreenCorner />
-      <Link to="/" className="back-link">
-        ← Alle Spiele
-      </Link>
+      <MenuTop to="/">Alle Spiele</MenuTop>
       <h1>
         <span aria-hidden>🧭</span> Management
       </h1>

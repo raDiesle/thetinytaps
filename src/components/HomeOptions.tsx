@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
@@ -11,51 +11,43 @@ import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "
 import { downloadMusic } from "@/lib/musicFile";
 
 /**
- * On the home page, for the grown-ups: small buttons at the top – the play
- * time for all games on the left, fullscreen and the options most games share
- * on the right – each opening its menu only when tapped, so the games fill the screen.
+ * On the home page, for the grown-ups: small buttons in the top left corner –
+ * the play time for all games, the language, fullscreen and the options most
+ * games share – each opening its menu only when tapped, so the games fill the
+ * screen. All on the left, so the sun in the top right corner stays in sight.
  */
 export function HomeOptions() {
   const t = useT();
   const language = useAppLanguage();
   return (
     <nav className="home-bar" aria-label={t({ de: "Für Erwachsene", ru: "Для взрослых" })}>
-      <MenuButton icon="⏳" label={t({ de: "Spielzeit", ru: "Время игры" })} side="left">
+      <MenuButton icon="⏳" label={t({ de: "Spielzeit", ru: "Время игры" })}>
         <PlaytimeOptions />
       </MenuButton>
-      <div className="home-bar-right">
-        {/* The language by its own name, so a grown-up who can't read the other one still finds theirs. */}
-        <MenuButton icon="🌐" label={OWN_NAMES[language.id].split(" ")[1]} side="right">
-          <AppLanguageOptions />
-        </MenuButton>
-        <FullscreenButton />
-        <MenuButton icon="⚙️" label={t({ de: "Einstellungen für alle Spiele", ru: "Настройки для всех игр" })} iconOnly side="right">
-          <CommonOptions />
-        </MenuButton>
-      </div>
+      {/* The language by its own name, so a grown-up who can't read the other one still finds theirs. */}
+      <MenuButton icon="🌐" label={OWN_NAMES[language.id].split(" ")[1]}>
+        <AppLanguageOptions />
+      </MenuButton>
+      <FullscreenButton />
+      <MenuButton icon="⚙️" label={t({ de: "Einstellungen für alle Spiele", ru: "Настройки для всех игр" })} iconOnly>
+        <CommonOptions />
+      </MenuButton>
     </nav>
   );
 }
 
 /**
- * A small button that drops down a menu. Tapping outside or Escape closes it;
+ * A small button that drops down a menu; on a phone the menu covers the whole
+ * screen, with its name and ✕ on top. Tapping outside, ✕ or Escape closes it;
  * the tap that closes it lands on a see-through backdrop, so it never also
- * starts the game underneath.
+ * starts the game underneath. While there is more below, a bar at the bottom
+ * says so, so a grown-up knows to scroll.
  */
-function MenuButton({
-  icon,
-  label,
-  iconOnly = false,
-  side,
-  children,
-}: {
-  icon: string;
-  label: string;
-  iconOnly?: boolean;
-  side: "left" | "right";
-  children: ReactNode;
-}) {
+function MenuButton({ icon, label, iconOnly = false, children }: { icon: string; label: string; iconOnly?: boolean; children: ReactNode }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
+  const [more, setMore] = useState(false);
+  const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -66,8 +58,29 @@ function MenuButton({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
+  // Whether anything is hidden below: checked on scrolling and whenever the menu or its content changes size.
+  useEffect(() => {
+    const box = panel.current;
+    if (!open || !box) return;
+    const check = () => setMore(box.scrollTop + box.clientHeight < box.scrollHeight - 8);
+    check();
+    const observer = new ResizeObserver(check);
+    observer.observe(box);
+    for (const child of box.children) observer.observe(child);
+    box.addEventListener("scroll", check, { passive: true });
+    return () => {
+      observer.disconnect();
+      box.removeEventListener("scroll", check);
+    };
+  }, [open]);
+
+  const scrollDown = () => {
+    const box = panel.current;
+    box?.scrollBy({ top: box.clientHeight * 0.7, behavior: "smooth" });
+  };
+
   return (
-    <div className={`home-menu ${side}`}>
+    <div className="home-menu">
       {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
       {open && <div className="home-menu-backdrop" onClick={() => setOpen(false)} />}
       <button
@@ -81,7 +94,24 @@ function MenuButton({
         <span aria-hidden>{icon}</span>
         {!iconOnly && label}
       </button>
-      {open && <div className="home-menu-panel">{children}</div>}
+      {open && (
+        <div ref={panel} className="home-menu-panel">
+          <div className="home-menu-head">
+            <span className="home-menu-name">
+              <span aria-hidden>{icon}</span> {label}
+            </span>
+            <button type="button" className="home-menu-close" aria-label={t({ de: "Schließen" })} onClick={() => setOpen(false)}>
+              ✕
+            </button>
+          </div>
+          <div className="home-menu-body">{children}</div>
+          {more && (
+            <button type="button" className="home-menu-more" onClick={scrollDown}>
+              <span aria-hidden>▼</span> {t({ de: "Weiter unten gibt es mehr" })}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

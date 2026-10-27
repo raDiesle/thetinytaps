@@ -15,10 +15,15 @@ export function InstallHint() {
     </span>
   );
 
-  if (app) return offline ? <p className="install-hint">{offline}</p> : null;
+  if (app)
+    return offline ? (
+      <p className="install-hint" data-below-fold>
+        {offline}
+      </p>
+    ) : null;
   if (installPrompt) {
     return (
-      <p className="install-hint">
+      <p className="install-hint" data-below-fold>
         <button type="button" className="install-button" onClick={() => void install()}>
           <span aria-hidden>📲</span> {t({ de: "Als App installieren", ru: "Установить как приложение" })}
         </button>
@@ -28,7 +33,7 @@ export function InstallHint() {
   }
   if (isIos()) {
     return (
-      <p className="install-hint">
+      <p className="install-hint" data-below-fold>
         <span>
           <span aria-hidden>📲</span>{" "}
           {t({
@@ -48,5 +53,9 @@ export function InstallHint() {
       </p>
     );
   }
-  return offline ? <p className="install-hint">{offline}</p> : null;
+  return offline ? (
+    <p className="install-hint" data-below-fold>
+      {offline}
+    </p>
+  ) : null;
 }

@@ -1,6 +1,7 @@
 /* ---------- Menus ---------- */
 
 .home {
+  position: relative;
   max-width: 1040px;
   margin: 0 auto;
   padding: max(40px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) 160px max(20px, env(safe-area-inset-left));
@@ -205,9 +206,16 @@ button.game-card:focus-visible {
   font-size: 1.3rem;
 }
 
-.home > .back-link {
+/* The back link and, for grown-ups, the fullscreen button, in the top left corner of a menu (MenuTop). */
+.menu-top {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
   width: fit-content;
+}
+
+.home > .menu-top {
   margin-bottom: 24px;
 }
 
@@ -246,16 +254,20 @@ button.game-card:focus-visible {
   font-family: var(--font-emoji);
 }
 
-/* Bottom left on the home page, small, for parents: when the running version was built. */
+/*
+ * At the very end of the home page, small, for parents: when the running version was built. Seen only after
+ * scrolling all the way down: it starts below the first screen even when everything else fits on it.
+ */
 .home-version {
-  position: fixed;
-  left: max(12px, env(safe-area-inset-left));
-  bottom: max(8px, env(safe-area-inset-bottom));
+  position: absolute;
+  top: max(100%, 100dvh);
+  right: 0;
+  left: 0;
   margin: 0;
+  padding: 8px 0 max(12px, env(safe-area-inset-bottom));
   font-size: 0.75rem;
   font-weight: 600;
   opacity: 0.55;
-  pointer-events: none;
 }
 
 .install-button {
@@ -283,4 +295,74 @@ button.game-card:focus-visible {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+
+/*
+ * Phones (shorter side under 600 px, like useFitGrid): small headings and tight margins, so the cards get
+ * the room; in a menu the back link sits left of the title instead of above it.
+ */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .home {
+    padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) 24px max(12px, env(safe-area-inset-left));
+  }
+
+  .logo {
+    font-size: clamp(2rem, 9vh, 3rem);
+  }
+
+  .home-subtitle {
+    margin: 6px 0 12px;
+    padding: 2px 14px;
+    font-size: 0.95rem;
+  }
+
+  .menu-title {
+    padding: 0.15em 0.7em;
+    box-shadow: 0 5px 0 var(--ink);
+    font-size: clamp(1.3rem, 4.5vw, 1.8rem);
+  }
+
+  .home > .menu-top:has(+ .menu-title) {
+    float: left;
+    margin: 0 12px 0 0;
+  }
+
+  .menu-title + .home-subtitle {
+    clear: both;
+  }
+
+  /* Scrolling lists (when not all cards fit): flat cards, emoji beside the title, many side by side. */
+  .game-list:not(.fit) {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+    gap: 16px 14px;
+  }
+
+  .game-list:not(.fit) .game-card {
+    flex-direction: row;
+    gap: 10px;
+    padding: 8px 26px 8px 8px;
+    border-radius: 24px;
+    text-align: left;
+  }
+
+  .game-list:not(.fit) .game-emoji {
+    width: 60px;
+    height: 60px;
+    border-width: 3px;
+    font-size: 2rem;
+  }
+
+  .game-list:not(.fit) .game-title {
+    font-size: 1rem;
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+
+  .game-list:not(.fit) .game-go {
+    right: -6px;
+    bottom: -8px;
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
 }

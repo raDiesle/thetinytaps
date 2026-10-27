@@ -137,9 +137,16 @@ In a fresh worktree run `bun install` first.
   overlap, the right answer wins (`data-tap="goal"`), then one not tapped yet (not `"done"`), then the
   nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
-- Grown-ups on a computer (≥ 900 px wide with a mouse) always see the fullscreen button: top right in every menu
-  (`FullscreenCorner`) and next to ✕ while playing; there the back link of a menu is big, yellow and fixed in the
+- Grown-ups on a computer (≥ 900 px wide with a mouse) always see the fullscreen button: in every menu next to
+  the back link (`MenuTop`) and next to ✕ while playing; there the back link of a menu is big, yellow and fixed in the
   top left corner, so it never scrolls away. Phones and tablets keep both out of a child's reach.
+- Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
+  in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): small headings, the back
+  link beside the title, smaller and flat cards (emoji beside the title). Buttons for grown-ups sit in the top
+  left corner, never over the sun in the top right one. What only grown-ups need below the cards (version,
+  install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
+  page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
+  while there is more to scroll to. Check menus at 844×390 and 390×844 as well as tablet and computer.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end

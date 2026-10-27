@@ -1,6 +1,6 @@
-import { Link, Navigate, useParams } from "react-router";
-import { FullscreenCorner } from "@/components/FullscreenButton";
+import { Navigate, useParams } from "react-router";
 import { GameCard } from "@/components/GameCard";
+import { MenuTop } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
@@ -20,10 +20,7 @@ export function CategoryPage() {
   return (
     <main className="home">
       <Sky />
-      <FullscreenCorner />
-      <Link to="/" className="back-link">
-        ← {t({ de: "Alle Spiele", ru: "Все игры" })}
-      </Link>
+      <MenuTop to="/">{t({ de: "Alle Spiele", ru: "Все игры" })}</MenuTop>
       <h1 className="menu-title">
         <span aria-hidden>{category.emoji}</span> {t(category.title)}
       </h1>
