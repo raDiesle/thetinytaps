@@ -3,18 +3,24 @@
 Route `/toepfchen/` · idea H-06 (Töpfchen-Partys; built in the style of „Zähne putzen“, but tapped step by step).
 
 A picture story like „Gefühle“: every step is a Gemini picture (`bilder/`, see its README) filling the screen,
-its second frame (`-b`) fading in and out so the foxes move a little. Drawn on top (emoji and CSS): what Tapsi
-feels (💦 for pipi, the picture shakes when the tummy rumbles), the call bubble, the round buttons for what the
-child said while eating, the three green ✓ while sitting,
-the row of step icons at the bottom (each one jumps there), confetti.
+its second frame (`-b`) fading in and out so the foxes move a little; a new picture fades in over the one before
+(which stays below it meanwhile) and settles from a little closer. A step can play a tiny animation once before its
+picture (`Step.moves`: trousers going down, sitting down; `StoryPicture`'s `moves`). Drawn on top (emoji and CSS):
+what Tapsi feels (💦 for pipi, the picture shakes when the tummy rumbles), the call bubble, confetti, and at the
+bottom the row of step icons (each one jumps there) with the grown-ups' buttons in the corner next to it.
 
 „Muss mal!“ (`PottyPlay.tsx`, mode `story`): one story for both needs, since a child often can't tell beforehand.
 Opening the game (its tile on the home menu) starts it at once (`GameShell`'s `startMode`); the start screen with
 „Hat geklappt!“, the info and the cards shows only after leaving with ✕ or „Menü“. It opens on the first step, `eat`: Tapsi the fox
 (`TAPSI` in `content.ts`) at the kitchen table, eating and drinking by turns (the `essen` and `trinken` pictures are that step's
-frames, moving at once but silent until the first tap). Meanwhile three round buttons bottom right
-(`SAID`: 💧, 💩, ❓) let a grown-up tap what the child said; untouched it stays `unsure`.
-Every tap or key is the next step (`STEPS`): eating and drinking, the bladder presses or the tummy rumbles (`need`; when
+frames, moving at once).
+The story goes on by itself where nothing real has to happen (`Step.auto`: eating, the need, calling, going to the
+bathroom, sitting down into the waiting, done); where the child really does something (trousers down, wipe, trousers up,
+flush, wash) it waits. Every tap or key, and the small „Weiter“ ▶ in the corner (on every step but sitting, where the ✓
+are), is the next step at once (`STEPS`). While Tapsi calls Mama and Papa, four small buttons in the corner (`SAID`: 💧, 💩,
+💧💩, ❓) let a grown-up note what the child said – only noted, the story goes on anyway; on the way to the bathroom
+they show again while nothing but ❓ was picked. Untouched it stays `unsure`.
+The steps: eating and drinking, the bladder presses or the tummy rumbles (`need`; when
 unsure Tapsi „muss mal“, the bladder and the tummy picture take turns as frames, `picturesFor`, and the row shows ❓),
 calling „Mama! Papa!“ – they come in together and stay in every picture from then on – into the bathroom together,
 trousers down, sit down, then the waiting, done (whatever the grown-up's ✓ chose is in the potty, the parents cheer),
@@ -24,13 +30,15 @@ shows only fur.
 The row of step icons at the bottom is a row of buttons (`jump`): a tap on one jumps there at once, also while a step
 still plays (its pending sounds stop). Jumping to „fertig“ or later without a ✓ takes what the child said as what came
 (pipi when nobody knew); jumping back before it forgets the ✓. They are plain buttons without `data-tap`, so only a tap
-right on one jumps: a tap beside the row goes on with the story, and the ✓ above keep their grown reach.
+right on one jumps: a tap beside the row goes on with the story, and the grown-ups' buttons next to it keep their reach.
 
-The waiting (`WAIT_SCENES`, `scenesFor`): while Tapsi sits, every tap brings the next thing Mama and Papa do,
-round and round without end – for pipi things that flow and splash (watering can, tap, balloon let go, jug, shower),
-for kaka things that are pressed (toothpaste, blowing up a balloon, pushing a basket, sponge, a train through a
-tunnel), when unsure both taking turns, and in between plain silliness (dancing, juggling, peekaboo, soap bubbles).
-Only one of the three big green ✓ (bottom right, 💧, 💩 and 💧💩 on their badges, pulsing, a hand points at the one the child
+The waiting (`WAIT_SCENES`, `scenesFor`): while Tapsi sits, the next thing Mama and Papa do comes by itself every
+`WAIT_SCENE_MS`, or at once on a tap, round and round without end – only scenes for what the child said: for pipi
+things that flow and splash (watering can, tap, balloon let go, jug, shower), for kaka things that are pressed
+(toothpaste, blowing up a balloon, pushing a basket, sponge, a train through a tunnel), for both or when unsure the two
+taking turns. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are drawn but not shown
+since the user wanted only the helping ones. Only tapped scenes speak (and the first, which explains the ✓).
+Only one of the three green ✓ (in the corner, 💧, 💩 and 💧💩 on their badges, a yellow ring on the one the child
 said; Enter on a keyboard is that one) ends the waiting. So a child can sit on the real potty and play along, and a
 grown-up taps the ✓ of what really came (`Went`) – that picks `fertig-pipi` or `fertig-kaka`, or both taking turns as frames.
 
@@ -52,20 +60,25 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   whole story of about 50 pictures drawn again. Never add another animal or family unless the user asks for it.
 - The game is opened when the child has to go now: the tile starts „Muss mal!“ at once, with no start screen or
   submenu before it. Anything else (the star, the info) lives on the start screen behind ✕.
-- So unlike other games the first picture moves before any tap (the user's choice): Tapsi eats and drinks by turns
-  while a grown-up picks what the child said. Still no sound until the first tap. Eating and drinking are one step,
-  never two taps.
+- So unlike other games the story moves before any tap (the user's choice): Tapsi eats and drinks by turns and the
+  story goes on by itself after about three seconds. Eating and drinking are one step, never two.
+- The story goes on by itself only where nothing real has to happen (`Step.auto`); where the child does something
+  itself (trousers down, wipe, trousers up, flush, wash) it waits for a tap or „Weiter“. Every step without its own
+  buttons for going on has „Weiter“ (`potty.test.ts` checks which steps wait).
+- The grown-ups' buttons (what was said, „Weiter“, the ✓) are small, pale and still, in the bottom right corner level
+  with the row of steps: the child looks at the story, not at them. No pulsing, no pointing hand, nothing big on them.
 - A grown-up can jump to any step at any time by tapping it in the row; keep every step reachable that way.
 - What the child has to do is chosen inside the story, never on the start screen (neither a card each nor a choice
-  above the cards): „Muss mal!“ starts at once, what the child said is tapped on round buttons while Tapsi eats (💧,
-  💩, ❓, unsure when untouched), what came on the three ✓ while sitting (pipi, kaka, both) – a child saying „Pipi“
-  may still do kaka, or both.
-- Every step is one tap. What the child really does (sitting on the potty) has no fixed length: it never ends on a
-  timer or on an ordinary tap. Taps while sitting keep the child there (a new waiting scene each, endlessly); only
-  the clearly marked ✓ say „fertig“, and they must be seen at once (big, green, pulsing, a pointing hand).
-- Sitting needs variety: every waiting tap brings a different scene with its own sound, and the scenes fit the
-  need – flowing water and letting go for pipi, pressing for kaka – between silly ones. A new scene goes into
-  `WAIT_SCENES`, `POTTY_TEXTS.scenes` and gets its two frames.
+  above the cards): „Muss mal!“ starts at once, what the child said is noted while Tapsi calls (💧, 💩, 💧💩, ❓,
+  unsure when untouched) and once more on the way while it is still ❓ – a note, never a jump; what came on the
+  three ✓ while sitting (pipi, kaka, both) – a child saying „Pipi“ may still do kaka, or both.
+- What the child really does (sitting on the potty) has no fixed length: it never ends on a timer or on an ordinary
+  tap. The waiting scenes follow each other by themselves (and on every tap), endlessly; only the ✓ say „fertig“.
+- The waiting shows only scenes for what was said – flowing water and letting go for pipi, pressing for kaka, both
+  taking turns for both or ❓ – each with its own sound. A new scene goes into `WAIT_SCENES`, `POTTY_TEXTS.scenes` and
+  gets its two frames.
+- A picture of a movement (`moves`) is drawn from the step's own picture as its only reference, changing only the
+  child's trousers and pose, so it blends into it without anything jumping (`prompts.py moves`).
 - Mama and Papa stand together and, once called, stay in every picture to the end, cheering or being silly.
   Nobody else comes in; every picture of a place is drawn from that place's first picture (`essen` for the
   kitchen, `bad` for the bathroom) as its only reference, so the room never changes – and the waiting scenes

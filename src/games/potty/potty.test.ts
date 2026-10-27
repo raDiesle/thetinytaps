@@ -1,7 +1,22 @@
 import { readdirSync } from "node:fs";
 import { describe, expect, it } from "@rstest/core";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
-import { iconFor, picturesFor, POTTY_TEXTS, SAID, type Said, scenePicture, scenesFor, STEPS, TAPSI, WAIT_SCENES, type Went, type Which } from "./content";
+import {
+  iconFor,
+  picturesFor,
+  POTTY_TEXTS,
+  SAID,
+  type Said,
+  SCENE_MS,
+  scenePicture,
+  scenesFor,
+  STEPS,
+  TAPSI,
+  WAIT_SCENE_MS,
+  WAIT_SCENES,
+  type Went,
+  type Which,
+} from "./content";
 import { addStar } from "./stars";
 import { waitLanguageFor, waitLanguageOf } from "./waitMusic";
 
@@ -13,7 +28,7 @@ describe("Aufs Töpfchen", () => {
   it("has steps with their own ids, every one said for pipi, kaka and not knowing, ending with the party", () => {
     expect(new Set(STEPS.map((s) => s.id)).size).toBe(STEPS.length);
     expect(STEPS.at(-1)?.id).toBe("party");
-    expect(SAIDS.sort()).toEqual(["kaka", "pipi", "unsure"]);
+    expect([...SAIDS].sort()).toEqual(["both", "kaka", "pipi", "unsure"]);
     for (const texts of Object.values(POTTY_TEXTS)) {
       for (const which of WHICHES) for (const step of STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
       for (const went of WENTS) expect(texts.went[went].trim()).not.toBe("");
@@ -24,20 +39,28 @@ describe("Aufs Töpfchen", () => {
     }
   });
 
-  it("brings every waiting scene of what was said, its own and the silly ones taking turns, both needs when nobody knows", () => {
+  it("brings only the waiting scenes of what was said, pipi and kaka taking turns for both or when nobody knows", () => {
     for (const said of SAIDS) {
       const scenes = scenesFor(said);
-      const fits = (s: (typeof WAIT_SCENES)[number]) => s.need === "both" || said === "unsure" || s.need === said;
+      const fits = (s: (typeof WAIT_SCENES)[number]) => s.need === said || ((said === "both" || said === "unsure") && s.need !== "silly");
       expect(new Set(scenes.map((s) => s.id))).toEqual(new Set(WAIT_SCENES.filter(fits).map((s) => s.id)));
       // Never the same scene twice in a row, also when the round starts again.
       expect(scenes.filter((s, i) => s.id === scenes[(i + 1) % scenes.length].id)).toEqual([]);
-      expect(scenes[1].need).toBe("both");
     }
     expect(
       scenesFor("unsure")
         .map((s) => s.need)
         .slice(0, 4),
-    ).toEqual(["pipi", "both", "kaka", "both"]);
+    ).toEqual(["pipi", "kaka", "pipi", "kaka"]);
+  });
+
+  it("goes on by itself only where nothing real has to happen, and the waiting scenes stay longer than their sounds", () => {
+    const auto = (id: string) => STEPS.find((s) => s.id === id)?.auto;
+    // The child takes its trousers down, wipes, pulls them up, flushes and washes itself: that waits for a tap or „Weiter“.
+    for (const id of ["down", "wipe", "up", "flush", "wash", "party"]) expect(auto(id)).toBeUndefined();
+    for (const id of ["eat", "need", "call", "go", "sit", "done"]) expect(auto(id)).toBeGreaterThan(0);
+    for (const step of STEPS) if (step.auto !== undefined) expect(step.auto).toBeGreaterThan(step.ms);
+    expect(WAIT_SCENE_MS).toBeGreaterThan(SCENE_MS);
   });
 
   it("shows both need pictures in turn and ❓ in the row while nobody knows", () => {
@@ -60,7 +83,7 @@ describe("Aufs Töpfchen", () => {
   it("has every picture of the story, the waiting scenes moving (with a second frame), and no pictures of anybody else", () => {
     const files = readdirSync("src/games/potty/bilder").filter((f) => f.endsWith(".webp"));
     const names = new Set([
-      ...STEPS.flatMap((s) => WHICHES.flatMap((which) => picturesFor(s, which))),
+      ...STEPS.flatMap((s) => [...WHICHES.flatMap((which) => picturesFor(s, which)), ...(s.moves ?? [])]),
       ...WAIT_SCENES.flatMap((s) => [scenePicture(s), `${scenePicture(s)}-b`]),
     ]);
     expect([...names].map((name) => `${TAPSI.pictures}-${name}.webp`).filter((f) => !files.includes(f))).toEqual([]);

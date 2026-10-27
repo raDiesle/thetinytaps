@@ -18,15 +18,16 @@ export const TAPSI = {
 /** What the animal has to do: the bladder presses after drinking, or the tummy rumbles after eating. */
 export type Need = "pipi" | "kaka";
 
-/**
- * What the child said it has to do, tapped by a grown-up on a round button while Tapsi eats and
- * drinks: often nobody knows yet ("unsure", also when nobody taps), so the story says „muss mal“
- * and the waiting brings scenes for both. What really came is chosen at the ✓.
- */
-export type Said = Need | "unsure";
-
 /** What really came, chosen at a ✓ while sitting: pipi, kaka or both at once. */
 export type Went = Need | "both";
+
+/**
+ * What the child said it has to do, tapped by a grown-up on a small button while Tapsi calls Mama and Papa
+ * (and again on the way to the bathroom while nothing was picked): often nobody knows yet ("unsure", also
+ * when nobody taps), so the story says „muss mal“ and the waiting brings scenes for both. Picking only notes
+ * it down, the story goes on by itself. What really came is chosen at the ✓.
+ */
+export type Said = Went | "unsure";
 
 /** What a step is about: what the child said before the ✓, what came after it. */
 export type Which = Said | Went;
@@ -35,8 +36,12 @@ export type Which = Said | Went;
 export const SAID: { id: Said; emoji: string }[] = [
   { id: "pipi", emoji: "💧" },
   { id: "kaka", emoji: "💩" },
+  { id: "both", emoji: "💧💩" },
   { id: "unsure", emoji: "❓" },
 ];
+
+/** What the ✓ of what the child said is, and what came when a grown-up skips the ✓: pipi when nobody knew. */
+export const expectedWent = (said: Said): Went => (said === "unsure" ? "pipi" : said);
 
 /** The steps of the story, one tap each. */
 export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party";
@@ -49,8 +54,15 @@ export interface Step {
   arrow?: "↓" | "↑";
   /** Its picture's name after the animal's (`fox-essen`), for each need; several take turns as its frames. */
   picture: string | string[] | Record<Need, string>;
+  /** Pictures played once before `picture`, one after the other: a tiny animation of what happens (trousers going down). */
+  moves?: string[];
   /** How long its sounds take before the next tap goes on; a tap before that only sparkles. */
   ms: number;
+  /**
+   * The story goes on by itself after this long. Without it the step waits for a tap or „Weiter“: what the child
+   * really does with its own trousers, bottom and hands takes as long as it takes.
+   */
+  auto?: number;
 }
 
 /** The synthesized waiting tune's beat while sitting (when there is no recorded song). */
@@ -62,16 +74,21 @@ export const SIT_GUARD_MS = 1500;
 /** How long a waiting scene runs before the next tap brings another one. */
 export const SCENE_MS = 900;
 
+/** How long a waiting scene shows before the next one comes by itself. */
+export const WAIT_SCENE_MS = 2600;
+
 export const STEPS: Step[] = [
   // Eating and drinking take turns by themselves, moving from the start, while a grown-up taps what the child said.
-  { id: "eat", icon: "🍝", picture: ["essen", "trinken"], ms: 2000 },
-  { id: "need", icon: { pipi: "💦", kaka: "🌀" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600 },
-  { id: "call", icon: "📣", picture: "rufen", ms: 1800 },
-  { id: "go", icon: "🚪", picture: "bad", ms: 1800 },
-  { id: "down", icon: "👖", arrow: "↓", picture: "runter", ms: 1000 },
-  // Sitting has no fixed length: the parents play scene after scene, one per tap, until the ✓ (see WAIT_SCENES).
-  { id: "sit", icon: "⏳", picture: "sitzen", ms: SIT_GUARD_MS },
-  { id: "done", icon: { pipi: "💧", kaka: "💩" }, picture: { pipi: "fertig-pipi", kaka: "fertig-kaka" }, ms: 2000 },
+  { id: "eat", icon: "🍝", picture: ["essen", "trinken"], ms: 2000, auto: 3000 },
+  { id: "need", icon: { pipi: "💦", kaka: "🌀" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600, auto: 3000 },
+  // Here (and on the way, while nothing was picked) a grown-up notes what the child said; the story goes on anyway.
+  { id: "call", icon: "📣", picture: "rufen", ms: 1800, auto: 4000 },
+  { id: "go", icon: "🚪", picture: "bad", ms: 1800, auto: 4000 },
+  // The child takes its own trousers down: no timer, „Weiter“ when it's done.
+  { id: "down", icon: "👖", arrow: "↓", picture: "runter", ms: 1200 },
+  // Sitting down goes on by itself into the waiting, which has no fixed length: scene after scene until the ✓ (see WAIT_SCENES).
+  { id: "sit", icon: "⏳", picture: "sitzen", ms: SIT_GUARD_MS, auto: 3000 },
+  { id: "done", icon: { pipi: "💧", kaka: "💩" }, picture: { pipi: "fertig-pipi", kaka: "fertig-kaka" }, ms: 2000, auto: 3500 },
   { id: "wipe", icon: "🧻", picture: "abwischen", ms: 1600 },
   { id: "up", icon: "👖", arrow: "↑", picture: "hoch", ms: 1200 },
   { id: "flush", icon: "🚽", picture: "abziehen", ms: 2600 },
@@ -122,8 +139,8 @@ export type SceneSound =
 export interface WaitScene {
   /** Its picture's name after the animal's: `fox-warten-giesskanne`. */
   id: string;
-  /** For which need it shows; "both" are the silly ones. */
-  need: Need | "both";
+  /** For which need it shows; "silly" ones are kept but not shown (see scenesFor). */
+  need: Need | "silly";
   sound: SceneSound;
 }
 
@@ -138,24 +155,23 @@ export const WAIT_SCENES: WaitScene[] = [
   { id: "schieben", need: "kaka", sound: "push" },
   { id: "schwamm", need: "kaka", sound: "drops" },
   { id: "zug", need: "kaka", sound: "train" },
-  { id: "tanzen", need: "both", sound: "dance" },
-  { id: "jonglieren", need: "both", sound: "juggle" },
-  { id: "kuckuck", need: "both", sound: "peekaboo" },
-  { id: "seifenblasen", need: "both", sound: "bubbles" },
+  { id: "tanzen", need: "silly", sound: "dance" },
+  { id: "jonglieren", need: "silly", sound: "juggle" },
+  { id: "kuckuck", need: "silly", sound: "peekaboo" },
+  { id: "seifenblasen", need: "silly", sound: "bubbles" },
 ];
 
 /**
- * The waiting scenes for what the child said, in the order the taps bring them: one for the need,
- * one silly one, and so on (the silly ones come round again when there are more of the need's).
- * While nobody knows, pipi and kaka scenes take turns.
+ * The waiting scenes for what the child said, in the order they come: only the scenes that help with that
+ * need (the user's choice, so the waiting stays on letting go or pressing); for both or while nobody knows,
+ * pipi and kaka scenes take turns. The silly ones are not shown.
  */
 export function scenesFor(said: Said): WaitScene[] {
   const of = (need: Need) => WAIT_SCENES.filter((s) => s.need === need);
-  const own = said === "unsure" ? of("pipi").flatMap((s, i) => [s, of("kaka")[i]]) : of(said);
-  const silly = WAIT_SCENES.filter((s) => s.need === "both");
-  return Array.from({ length: Math.max(own.length, silly.length) }, (_, i) => [own[i], silly[i % silly.length]]).flatMap((pair) =>
-    pair.filter((s) => s !== undefined),
-  );
+  if (said === "pipi" || said === "kaka") return of(said);
+  return of("pipi")
+    .flatMap((s, i) => [s, of("kaka")[i]])
+    .filter((s) => s !== undefined);
 }
 
 /** The name of a waiting scene's picture, after the animal's. */
@@ -169,6 +185,8 @@ export interface PottyTexts {
   scenes: Record<string, string>;
   /** Said when a grown-up taps what the child said, and the button's name for screen readers. */
   said: Record<Said, string>;
+  /** The „Weiter“ button's name for screen readers. */
+  next: string;
   /** Said once while sitting, so a grown-up knows what the two ✓ are for. */
   finish: string;
   /** What each ✓ means, for screen readers. */
@@ -187,8 +205,10 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
           ? `Oh! Die Blase drückt. ${name} muss Pipi!`
           : said === "kaka"
             ? `Oh! Der Bauch brummelt. ${name} muss Kaka!`
-            : `Oh! Da drückt was. ${name} muss mal!`,
-      call: (_, said) => `Mama! Papa! Ich muss ${said === "pipi" ? "Pipi" : said === "kaka" ? "Kaka" : "mal"}!`,
+            : said === "both"
+              ? `Oh! Die Blase drückt und der Bauch brummelt. ${name} muss Pipi und Kaka!`
+              : `Oh! Da drückt was. ${name} muss mal!`,
+      call: (_, said) => `Mama! Papa! Ich muss ${said === "pipi" ? "Pipi" : said === "kaka" ? "Kaka" : said === "both" ? "Pipi und Kaka" : "mal"}!`,
       go: () => "Mama und Papa kommen mit. Schnell ins Bad!",
       down: () => "Hose runter!",
       sit: () => "Hinsetzen. Mama und Papa warten mit.",
@@ -223,8 +243,10 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
     said: {
       pipi: "Tapsi muss bald Pipi.",
       kaka: "Tapsi muss bald Kaka.",
+      both: "Tapsi muss bald Pipi und Kaka.",
       unsure: "Tapsi muss bald mal.",
     },
+    next: "Weiter",
     finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka. Beides: drück auf beide!",
     went: {
       pipi: "Pipi ist im Töpfchen",

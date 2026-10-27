@@ -3,8 +3,8 @@
 /*
  * The story is a Gemini picture filling the screen (StoryPicture.tsx), its two frames
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
- * calls (.pt-feel, .pt-call), what the child said while eating (.pt-said), the three ✓ while sitting (.pt-finish),
- * the row of steps, each one a button that jumps there.
+ * calls (.pt-feel, .pt-call), and at the bottom the row of steps (each one a button that jumps there) with the
+ * grown-ups' buttons in the corner next to it: what the child said (.pt-said), the three ✓ while sitting (.pt-finish), „Weiter“ (.pt-next).
  * Root classes: pt-pipi / pt-kaka / pt-unsure / pt-both (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
  * Only the eating picture moves before the first tap (the game is opened when the child has to go now).
  */
@@ -21,12 +21,17 @@
 .pt-picture {
   position: absolute;
   inset: 0;
-  animation: pt-picture-in 0.3s ease-out;
+}
+
+/* A new picture fades in over the one before (still lying below it) and settles from a little closer. */
+.pt-picture-new {
+  animation: pt-picture-in 0.6s ease-out;
 }
 
 @keyframes pt-picture-in {
   from {
-    opacity: 0.4;
+    opacity: 0;
+    transform: scale(1.04);
   }
 }
 
@@ -44,9 +49,9 @@
   user-select: none;
 }
 
-/* The first frame always shows, so the second only fades in over it – never a gap between the two. */
-.pt-picture img:first-child,
-.pt-party-picture img:first-child,
+/* The base frame always shows, so the other only fades in over it – never a gap between the two. */
+.pt-picture img.base,
+.pt-party-picture img.base,
 .pt-picture img.on,
 .pt-party-picture img.on {
   opacity: 1;
@@ -102,6 +107,7 @@
 }
 
 .pt-kaka.pt-at-need.busy .pt-picture,
+.pt-both.pt-at-need.busy .pt-picture,
 .pt-unsure.pt-at-need.busy .pt-picture {
   animation: pt-rumble 0.5s ease-in-out 3;
 }
@@ -132,136 +138,112 @@
   }
 }
 
-/* While Tapsi eats and drinks: three round buttons for what the child said (💧, 💩, ❓). They stand still
-   (nothing moves before a tap); the picked one is yellow and a little bigger. */
-.pt-saids {
+/*
+ * The bottom: the row of steps in the middle, the grown-ups' buttons in the corner level with it. Where the
+ * corner is too narrow for them, the row moves aside a little (a side column never gets narrower than what is in it).
+ */
+.pt-bottom {
   position: absolute;
-  right: max(16px, env(safe-area-inset-right));
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + clamp(48px, min(7vw, 10vmin), 72px));
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 10px;
+}
+
+.pt-grown {
+  grid-column: 3;
+  justify-self: end;
   display: flex;
-  gap: clamp(14px, 3vmin, 24px);
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* The grown-ups' buttons are small, pale and still: the child looks at the story, not at them. */
+.pt-said,
+.pt-next,
+.pt-finish {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2px solid #2a1e5c40;
+  border-radius: 999px;
+  background: #ffffffa6;
+  line-height: 1;
+  cursor: pointer;
+}
+
+/* What the child said: four small buttons in a square (💧, 💩, 💧💩, ❓); the picked one turns light yellow. */
+.pt-saids {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 6px;
 }
 
 .pt-said {
-  display: grid;
-  place-items: center;
-  width: clamp(72px, 15vmin, 120px);
-  height: clamp(72px, 15vmin, 120px);
-  padding: 0;
-  border: 5px solid #fff;
-  border-radius: 50%;
-  background: #fffdf4;
-  box-shadow:
-    0 0 0 4px #2a1e5c,
-    0 6px 16px #0004;
-  font-size: clamp(36px, 8vmin, 64px);
-  line-height: 1;
-  cursor: pointer;
-  transition:
-    transform 0.2s,
-    background-color 0.2s;
+  min-width: clamp(34px, 8vmin, 50px);
+  height: clamp(34px, 8vmin, 50px);
+  padding: 0 4px;
+  font-size: clamp(15px, 3.6vmin, 24px);
+  white-space: nowrap;
+  filter: saturate(0.7);
 }
 
 .pt-said.picked {
-  background: #ffd23f;
-  transform: scale(1.12);
+  border-color: #2a1e5c;
+  background: #ffe08ae6;
+  filter: none;
 }
 
-/* While sitting: three big green ✓ say „fertig“ – for pipi, kaka or both, told apart by the badge.
-   They pulse and a hand points at the one the child said, so nobody misses them. */
+.pt-next {
+  width: clamp(42px, 10vmin, 60px);
+  height: clamp(42px, 10vmin, 60px);
+  color: #2a1e5c;
+  font-size: clamp(18px, 4.4vmin, 28px);
+}
+
+/* While sitting: three ✓ say „fertig“ – for pipi, kaka or both, told apart by the badge. Green, so a grown-up
+   finds them at once; the one the child said has a yellow ring. */
 .pt-finishes {
-  position: absolute;
-  right: max(16px, env(safe-area-inset-right));
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + clamp(48px, min(7vw, 10vmin), 72px));
   display: flex;
-  gap: clamp(28px, 6vmin, 48px);
+  gap: 8px;
 }
 
 .pt-finish {
   position: relative;
-  display: grid;
-  place-items: center;
-  width: clamp(92px, 19vmin, 150px);
-  height: clamp(92px, 19vmin, 150px);
-  padding: 0;
-  border: 6px solid #fff;
-  border-radius: 50%;
-  background: #3ec300;
-  box-shadow:
-    0 0 0 4px #2a1e5c,
-    0 8px 22px #0005;
-  cursor: pointer;
-  animation:
-    pt-finish-in 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both,
-    pt-finish-pulse 1.4s ease-in-out 0.6s infinite;
+  width: clamp(40px, 9vmin, 58px);
+  height: clamp(40px, 9vmin, 58px);
+  border-color: #fff;
+  background: #3ec300d9;
+}
+
+.pt-finish.expected {
+  box-shadow: 0 0 0 3px #ffd23f;
 }
 
 .pt-finish-check {
   color: #fff;
-  font-size: clamp(56px, 12vmin, 96px);
+  font-size: clamp(22px, 5vmin, 34px);
   font-weight: 900;
-  line-height: 1;
 }
 
 .pt-finish-need {
   position: absolute;
-  top: -12%;
-  left: -12%;
-  display: grid;
-  place-items: center;
-  width: 54%;
-  height: 54%;
-  border: 3px solid #2a1e5c;
-  border-radius: 50%;
-  background: #fff;
-  font-size: clamp(26px, 6vmin, 48px);
-}
-
-/* Both emoji side by side need a wider badge. */
-.pt-finish-need.pt-finish-both {
-  width: 84%;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 4px;
   border-radius: 999px;
-  font-size: clamp(20px, 4.6vmin, 38px);
-}
-
-.pt-finish-hand {
-  position: absolute;
-  bottom: -38%;
-  left: 18%;
-  font-size: clamp(40px, 9vmin, 70px);
-  filter: drop-shadow(0 3px 4px #0005);
-  /* It hangs over the row of steps: a tap there is for the step below, not the ✓. */
-  pointer-events: none;
-  animation: pt-point 0.9s ease-in-out infinite alternate;
-}
-
-@keyframes pt-finish-in {
-  from {
-    transform: scale(0);
-  }
-}
-
-@keyframes pt-finish-pulse {
-  50% {
-    box-shadow:
-      0 0 0 4px #2a1e5c,
-      0 0 0 18px #3ec30055,
-      0 8px 22px #0005;
-  }
-}
-
-@keyframes pt-point {
-  to {
-    transform: translate(-6px, -14px);
-  }
+  background: #ffffffd9;
+  font-size: clamp(11px, 2.6vmin, 17px);
+  white-space: nowrap;
 }
 
 /* The row of steps lies on the picture, so it gets a little more contrast. */
 .pt-steps {
-  position: absolute;
-  left: 50%;
-  bottom: max(10px, env(safe-area-inset-bottom));
-  transform: translateX(-50%);
+  grid-column: 2;
   display: flex;
   gap: clamp(4px, 1vw, 10px);
   margin: 0;

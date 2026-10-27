@@ -131,6 +131,20 @@ def second(name):
           "same clothes, colours, background, every object where it is, same camera framing (no zoom, no shift), same composition and line style. "
           f"Nothing appears, disappears or moves except this small movement: {MOVE[name]}. No text, no letters.")
 
+# The moments before "runter" and "sitzen", played once before them as a tiny animation (Step.moves in content.ts).
+# Drawn from the end picture itself, so only the child's trousers and pose change and the room stays the same.
+def earlier(what):
+  return ("Redraw this exact picture as an earlier moment of the same tiny animation. Keep EVERYTHING identical: the same bathroom, every object where it is, "
+          "the small turquoise potty exactly where it stands, Mama and Papa exactly as they are (same places, poses and faces), the same camera framing (no zoom, no shift), "
+          f"the same colours and line style. Tapsi stays at the same place and size. Nothing appears, disappears or moves except Tapsi: {what} No text, no letters.")
+
+MOVES = {
+ "runter-1": "the blue trousers are still up at the waist, fully on; Tapsi holds the waistband with both paws, ready to pull them down, smiling.",
+ "runter-2": "Tapsi bends forward a little and pushes the blue trousers down with both paws, the trousers are halfway down at the knees; the T-shirt covers the tummy, only fur shows.",
+ "sitzen-1": "Tapsi stands upright right in front of the potty, back to it, about to sit down, trousers down at the ankles, the T-shirt covering the tummy, only fur shows; the empty potty is seen behind Tapsi's legs.",
+ "sitzen-2": "Tapsi bends the knees and lowers the bottom onto the potty, halfway down, just above it, not touching it yet, paws stretched forward for balance, trousers at the ankles, the T-shirt covering the tummy, only fur shows.",
+}
+
 def job(a, name, prompt, ref=None):
   j = dict(out=f"src/games/potty/bilder/{a}-{name}.webp", prompt=prompt, aspect="16:9", size="1376", quality=65)
   if ref: j["ref"] = [ref]
@@ -147,6 +161,8 @@ def stage(st, a):
   if st == "frames-kitchen": return [job(a, n + "-b", second(n), raw(a, n)) for n in ["essen", "trinken", "blase", "bauch", "rufen"]]
   if st == "frames-bath": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n not in ["essen", "trinken", "blase", "bauch", "rufen"] and not n.startswith("warten-")]
   if st == "frames-wait": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n.startswith("warten-")]
+  # From the game's own pictures: the raw ones of the first round are gone.
+  if st == "moves": return [job(a, n, earlier(p), f"src/games/potty/bilder/{a}-{n.split('-')[0]}.webp") for n, p in MOVES.items()]
   raise SystemExit("unknown stage")
 
 if __name__ == "__main__":
