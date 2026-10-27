@@ -46,7 +46,8 @@ In a fresh worktree run `yarn install` first.
   (German; read it before touching a level and check the work against it); work done with a skill →
   its `.claude/skills/<name>/SKILL.md`; every game or how to work here → this file. When a rule
   already covers it, sharpen that rule instead of adding a second one; when new feedback
-  contradicts a rule, replace the old one. The same goes for mistakes you find yourself (a failed
+  contradicts a rule, replace the old one. Feedback the user gives "only to keep" about how future
+  content should be made (stories, pictures) is such a rule too, not an idea in `src/content/ideas/`. The same goes for mistakes you find yourself (a failed
   check, a bug seen in the preview, a wrong assumption) that the next session could make again.
   A check beats a sentence: when a test can catch it, add the test. Claude's private memory is only
   for things that don't belong in the repo. A `UserPromptSubmit` hook (`.claude/hooks/feedback-reminder.md`)

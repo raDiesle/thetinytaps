@@ -35,11 +35,18 @@ usually a parent – so texts never say „Kind“. A feeling's title names the 
 a few words („Angst bei Gewitter“, „Müde am Abend“) and is also the caption of its
 first picture.
 
-Open point (feedback, not changed yet – idea X-14, the user decides): it is not
-always clear from a card _who_ acts – the one from the first picture himself (the bear
-says „Stopp!“), someone else, e.g. the child comforting the bear, or the crying one
-going to someone to be comforted. Until X-14 is decided, a new card or picture must
-make plain who does the thing: that one is in front and doing it.
+**Who acts must be plain (user feedback):** a grown-up must never wonder whether a card means
+the one from the first picture does it himself (the bear says „Stopp!“, goes away), someone
+else does it for him (the child comforts the bear), or the one with the feeling goes to someone
+to be comforted. For every new situation and its pictures:
+- Decide for each card who does it, and write it into the step: the narration names that one
+  („Du nimmst den Bären in den Arm.“ when the child helps, „Der Bär sagt laut: Stopp!“ when he acts,
+  „Der Bär läuft zur Erzieherin.“ when he fetches comfort), and the card's prompt says it in its
+  first sentence.
+- In the picture the one who acts is in front, big and clearly doing it; the others look at or
+  react to it. When the child helps, only its hands or arms come in from the edge (as at home);
+  when the bear acts, no hands from the edge. When the one with the feeling goes to someone, he is
+  seen moving towards them, not already in their arms.
 
 Every choice has a not-so-good idea next to it, so the child always really
 chooses: at home one per round (`Feeling.instead`), in the

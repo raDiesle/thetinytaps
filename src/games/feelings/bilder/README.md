@@ -63,6 +63,14 @@ der Geschichte und listet, was nach neuem Ort, Zoom oder neuer Kamera aussieht. 
 liegen bei 0–10 %. Ob alle Figuren da sind, sieht das Skript nicht – das zeigt nur ein Blick auf die Bilder
 einer Geschichte nebeneinander. `bye` darf auffallen, dort wechselt der Ort.
 
+## Wer handelt, sieht man sofort
+
+Jede Karte zeigt eindeutig, wer etwas tut: der Bär selbst (sagt „Stopp!“, geht weg, holt Hilfe),
+das Kind für den Bären (nur Hände oder Arme vom Rand), oder der Bär geht zu jemandem, um sich trösten
+zu lassen (man sieht ihn hingehen, nicht schon im Arm). Der erste Satz des Prompts sagt, wer handelt;
+diese Figur ist vorn, groß und tut es deutlich, die anderen schauen hin oder reagieren. Regeln dazu in
+`../CLAUDE.md` („Who acts must be plain“).
+
 ## So bleiben die Figuren gleich
 
 Bildgeneratoren erfinden die Figuren sonst jedes Mal neu. Darum:
