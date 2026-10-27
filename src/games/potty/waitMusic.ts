@@ -38,6 +38,10 @@ const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
   // 100 BPM, beats at 0.48 + 0.6 k s; „Ich“ comes on the eighth before the first bar; 55 bars (verses, choruses,
   // bridge, the 8-bar turnaround), then the file holds a little of what follows, never reached.
   de: { loopStart: 0.08, loopEnd: 0.08 + 55 * 2.4 },
+  // 97.42 BPM (Suno sang it a little slower than asked), beats at 0.898 + 0.6159 k s; „Си-“ comes on the eighth
+  // before the first bar; 47 bars (verses, choruses, bridge, the instrumental after the last chorus), ending just
+  // before the bass drops into an extra quiet chorus that is never reached.
+  ru: { loopStart: 0.5, loopEnd: 0.5 + 47 * (240 / 97.42) },
 };
 
 const loading = new Map<string, Promise<AudioBuffer | null>>();

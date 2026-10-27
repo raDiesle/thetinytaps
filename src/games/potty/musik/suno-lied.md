@@ -111,12 +111,14 @@ Title:
 Warten auf dem Töpfchen
 ```
 
-## Русский (`ru`, written 27 Oct 2026)
+## Русский (`ru`, written 27 Oct 2026; made 27 Oct 2026 → `musik-toepfchen-warten-ru.mp3`)
 
 The German song in Russian, verse for verse, same tempo, key and instruments, so the loop is measured the same way.
 Sung by the one who sits, in the present tense and without anything that changes for boy or girl: no „я большой“, no
 past tense of „я“ („расту“, „умею“, „сижу“ instead), the shout-back answers are just „Я!“. „Пи-пи“ and „ка-ка“ as
 Russian parents say to toddlers. Not yet read by a native speaker.
+Suno sang it at 97.4 BPM instead of 100, with a 13 s intro and one more quiet chorus after the instrumental; Whisper
+heard every line in order.
 
 Lyrics:
 

@@ -37,6 +37,11 @@ parts change exactly with the brushing steps, a finale on the end screen.
   `32 × 60 / BPM` s: 112 BPM → 17.14 s = one step of a 2-minute timer with 7 steps;
   120 BPM → 16 s; 96 BPM → 20 s. Suno kept 112 BPM exactly and made clean 8-bar parts.
   It can't be told "change at 0:17" – the game follows the measured song instead.
+- **A loop is cut on the measured grid, never the asked tempo.** The Russian waiting song (Aufs Töpfchen) came at
+  97.4 BPM where 100 was asked, with a 13 s intro and an extra chorus at the end. Fit the beat over the whole loop
+  and check short windows against it (an off-beat bass shows as half a beat off, not as drift), place the start and
+  end on the same bar position (a quiet break or a change in the bass marks a bar line), and keep both clear of
+  what is never meant to play (the intro's pickup, the next part's first note).
 - Suno usually adds a part and an ending (pause + final chord): useful as a finale
   for the end screen.
 - **Download WAV** (best for cutting and converting), otherwise MP3.
