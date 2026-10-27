@@ -56,6 +56,11 @@ to be comforted. For every new situation and its pictures:
   when the bear acts, no hands from the edge. When the one with the feeling goes to someone, he is
   seen moving towards them, not already in their arms.
 
+A card only takes, throws or breaks what the story's first picture already shows (a teddy the
+bear doesn't hold can't be taken from him): pick another idea rather than redraw the first picture.
+A card may bring something new (the teddy from the toy box, the light). `bilder/README.md` lists what
+each first picture shows.
+
 Every choice has a not-so-good idea next to it, so the child always really
 chooses: at home one per round (`Feeling.instead`), in the
 kindergarten one before each step (`KitaStep.instead`). The order is fixed: the
@@ -70,6 +75,9 @@ with the ring alone): while a card is shown big, a big hand 👆 taps the pictur
 again and again with a white ring where the finger lands (`.fg-tap-hint`), and the
 other cards stop calling and fade a little, still to be tapped. Any step that waits
 for one more tap shows such a hand, never only a glow.
+A card looked at big can always be left without choosing it (user feedback): the first picture
+sits small in the big picture's top left corner with ↩ on it (`BackButton`, `StoryPicture`'s `back`),
+and tapping it – or Backspace – shows the first picture with the question again.
 Only then comes the answer, seen and heard (`cheer`/`oops` in `shared.tsx`): the
 good idea gets a green frame that hops, stars and a laugh („Juhu!“ when speech is
 on), then the bear does it; the not-so-good one a red frame that shakes and what it

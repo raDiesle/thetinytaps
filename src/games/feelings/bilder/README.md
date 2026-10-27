@@ -292,6 +292,11 @@ zwei Karten: links die nicht so gute Idee der Runde (`baer-…-nein` in Runde 1,
 rechts die gute (`trost-…`, danach auch das Bild in der Mitte). `baer-…-gut` zeigt ihn am Ende wieder froh.
 Alle mit zweitem Frame `…-b`, außer `trost-hug` und `baer-…-nein…` (mit `baer-…` als `--ref` erzeugt).
 
+**Nur was im Bild ist:** Eine Karte nimmt, wirft oder macht nur kaputt, was im ersten Bild der Geschichte schon zu
+sehen ist (`baer-sad`: Bauklötze auf dem Teppich, die Spielzeugkiste mit Teddy und Dino, Bücher im Regal, das Bett).
+Hält der Bär dort keinen Teddy, kann ihn auch keine Karte wegnehmen – dann eine andere Idee wählen, statt das erste
+Bild neu zu zeichnen. Mitbringen darf eine Karte etwas Neues (Teddy aus der Kiste geben, Licht anmachen).
+
 | Datei                | Prompt                                                                                                                                                            |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `baer-sad`           | The little bear sits on the floor and cries, big tears, shoulders down.                                                                                           |
@@ -307,7 +312,6 @@ Alle mit zweitem Frame `…-b`, außer `trost-hug` und `baer-…-nein…` (mit `
 | `trost-lullaby`      | The little bear lies in bed, music notes float through the air, he is falling asleep with a smile.                                                                |
 | `trost-hand`         | A child's hand holds the little bear's paw. The bear looks calm and smiles a little.                                                                              |
 | `trost-light`        | A lamp is switched on; warm light fills the dark room. The little bear is relieved and smiles.                                                                    |
-| `baer-sad-nein-3`    | A child's hands take the small teddy away from the sad little bear. The bear cries even harder, reaching after the teddy.                                         |
 | `baer-angry-nein`    | The angry little bear throws his toys across the room: a block and a toy car fly through the air, red face, shouting.                                             |
 | `baer-tired-nein-2`  | Night. A child's hands bang loudly on a toy drum next to the bear's bed. The bear sits up wide awake, covers his ears, grumpy.                                    |
 | `baer-scared-nein-3` | Night, thunderstorm. A child's finger switches the bedside lamp off. The bear sits in bed, clearly visible, clutching a pillow, very scared.                      |
@@ -346,15 +350,16 @@ seine Zeile in die Tabelle „Zu Hause“ (`feelings.test.ts` prüft beides).
 
 Runde für Runde steht die nicht so gute Idee neben der guten, die sie besser macht:
 
-| Datei                | Runde, daneben          | Prompt                                                                                                                                            |
-| -------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `baer-sad-nein`      | 1, Umarmen              | A child's hands push the sad little bear away; he tips backwards onto the rug and cries even harder, big tears. Gentle, no injuries.              |
-| `baer-sad-nein-2`    | 2, Streicheln           | A child's hands break the little bear's toy car in two right in front of him; he cries even harder, reaching after it.                            |
-| `baer-angry-nein-2`  | 2, Tief pusten          | The angry little bear screams very loudly next to his fallen tower, mouth wide open, red face, fists clenched, small shout lines around his head. |
-| `baer-angry-nein-3`  | 3, Umarmen              | The angry little bear hits a child's hand that comes in from the bottom edge, red face; the hand pulls back. Gentle, no injuries.                 |
-| `baer-tired-nein`    | 1, Zudecken             | Night, a moon in the window. A child's hands pull the pink striped blanket off the little bear in his bed; he curls up, cold and grumpy.          |
-| `baer-tired-nein-3`  | 3, Teddy geben          | Night, a moon in the window. A child's hands hold a bright glowing tablet in front of the little bear in his bed; he is wide awake, eyes big.     |
-| `baer-scared-nein`   | 1, Umarmen              | Night, thunderstorm. A child's hand holds up a spooky monster hand puppet in front of the little bear in bed, „boo!“; he startles, very scared.   |
-| `baer-scared-nein-2` | 2, Hand halten          | Night, thunderstorm. The little bear sits alone in his bed clutching a pillow, very scared; the door of the room is just closing, nobody there.   |
-| `baer-happy-nein`    | 1, Mittanzen            | Birthday, balloons. A child's hand pops one of the bear's balloons with a pin, a small burst; the little bear in a party hat flinches, sad.       |
-| `baer-happy-nein-2`  | 2, Luftschlangen werfen | Birthday. A child's hands take a wrapped present away from the little bear in a party hat; his smile is gone, he reaches after it.                |
+| Datei                | Runde, daneben          | Prompt                                                                                                                                                                 |
+| -------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `baer-sad-nein`      | 1, Umarmen              | A child's hands push the sad little bear away; he tips backwards onto the rug and cries even harder, big tears. Gentle, no injuries.                                   |
+| `baer-sad-nein-2`    | 2, Streicheln           | A child's hands take the green toy dinosaur out of the toy box and break it in two right in front of the little bear; he cries even harder, reaching after it.         |
+| `baer-sad-nein-3`    | 3, Teddy geben          | A child's hands sweep away the wooden toy blocks from the rug next to the sad little bear and take them out of the picture; he cries even harder, reaching after them. |
+| `baer-angry-nein-2`  | 2, Tief pusten          | The angry little bear screams very loudly next to his fallen tower, mouth wide open, red face, fists clenched, small shout lines around his head.                      |
+| `baer-angry-nein-3`  | 3, Umarmen              | The angry little bear hits a child's hand that comes in from the bottom edge, red face; the hand pulls back. Gentle, no injuries.                                      |
+| `baer-tired-nein`    | 1, Zudecken             | Night, a moon in the window. A child's hands pull the pink striped blanket off the little bear in his bed; he curls up, cold and grumpy.                               |
+| `baer-tired-nein-3`  | 3, Teddy geben          | Night, a moon in the window. A child's hands hold a bright glowing tablet in front of the little bear in his bed; he is wide awake, eyes big.                          |
+| `baer-scared-nein`   | 1, Umarmen              | Night, thunderstorm. A child's hand holds up a spooky monster hand puppet in front of the little bear in bed, „boo!“; he startles, very scared.                        |
+| `baer-scared-nein-2` | 2, Hand halten          | Night, thunderstorm. The little bear sits alone in his bed clutching a pillow, very scared; the door of the room is just closing, nobody there.                        |
+| `baer-happy-nein`    | 1, Mittanzen            | Birthday, balloons. A child's hand pops one of the bear's balloons with a pin, a small burst; the little bear in a party hat flinches, sad.                            |
+| `baer-happy-nein-2`  | 2, Luftschlangen werfen | Birthday. A child's hands take a wrapped present away from the little bear in a party hat; his smile is gone, he reaches after it.                                     |

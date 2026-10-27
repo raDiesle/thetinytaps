@@ -167,6 +167,7 @@ export function StoryPicture({
   caption,
   look = "story",
   zoom = false,
+  back,
   children,
   onPointerDown,
 }: {
@@ -176,6 +177,8 @@ export function StoryPicture({
   look?: PictureLook;
   /** Grows out of the card with the same picture when it appears, so the child sees which card it is. */
   zoom?: boolean;
+  /** While a card is looked at big: the picture to go back to (the story's first one), small in the corner, and what tapping it does. */
+  back?: { image: string; onBack: () => void };
   /** Things on top of the picture: floating hearts. */
   children?: ReactNode;
   onPointerDown?: (e: PointerEvent) => void;
@@ -220,6 +223,8 @@ export function StoryPicture({
             <span className="fg-tap-hand">👆</span>
           </span>
         )}
+        {/* A card looked at big, but not wanted: the first picture, small, with an arrow back – tapped, it is big again. */}
+        {look === "option" && back && <BackButton image={back.image} onBack={back.onBack} />}
       </div>
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
@@ -281,6 +286,30 @@ export function ChoiceCard({
         {caption}
       </span>
     </div>
+  );
+}
+
+/** Back to the story's first picture: a small copy of it with a ↩ on it, in the big picture's corner. */
+function BackButton({ image, onBack }: { image: string; onBack: () => void }) {
+  const t = useT();
+  const src = framesFor(image)[0];
+  return (
+    <button
+      type="button"
+      className="fg-back"
+      data-tap
+      aria-label={t({ de: "Zurück zum Bild" })}
+      onPointerDown={(e: PointerEvent) => {
+        e.stopPropagation();
+        onBack();
+      }}
+    >
+      {src ? <img src={src} alt="" decoding="async" draggable={false} /> : <Placeholder name={image} />}
+      <svg className="fg-back-arrow" viewBox="0 0 24 24" aria-hidden>
+        <path d="M9 14 4 9l5-5" />
+        <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+      </svg>
+    </button>
   );
 }
 

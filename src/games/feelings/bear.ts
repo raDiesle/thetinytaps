@@ -131,7 +131,7 @@ export const FEELINGS: Feeling[] = [
     instead: [
       { caption: "Wegschubsen", answer: "Hmm, Schubsen tut weh. Nimm ihn lieber in den Arm.", sound: "aua" },
       { caption: "Spielzeug kaputt machen", answer: "Hmm, jetzt ist sein Spielzeug kaputt. Streichel ihn lieber.", sound: "crash" },
-      { caption: "Teddy wegnehmen", answer: "Hmm, jetzt weint der Bär noch mehr. Tröste ihn lieber." },
+      { caption: "Bauklötze wegnehmen", answer: "Hmm, jetzt weint der Bär noch mehr. Gib ihm lieber seinen Teddy." },
     ],
     end: { narration: "Jetzt ist der Bär wieder fröhlich!", line: "Danke!" },
     endCaption: "Wieder fröhlich",

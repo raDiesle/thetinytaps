@@ -166,13 +166,18 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
     [ready, run.picked, run.stepsDone, sound, doStep, tryInstead],
   );
 
+  /** Back from a card looked at big to the first picture, without choosing. */
+  const unpick = useCallback(() => setRun((r) => ({ ...r, picked: null })), []);
+
   // The left arrow picks the not-so-good idea on the left; every other key picks the good idea, so mashing keys still tells the story.
+  // Backspace goes back from a card looked at big.
   const pressKey = useCallback(
     (key: string) => {
       if (run.phase === "done") return onNext();
+      if (key === "Backspace" && run.picked) return unpick();
       pick(!run.tried && key === "ArrowLeft" ? "instead" : "good");
     },
-    [run.phase, run.tried, onNext, pick],
+    [run.phase, run.tried, run.picked, onNext, pick, unpick],
   );
 
   useEffect(() => {
@@ -232,6 +237,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
           caption={caption}
           look={look}
           zoom={run.picked !== null}
+          back={{ image: storyImages.problem(situation.id), onBack: unpick }}
           onPointerDown={() => run.picked && pick(run.picked)}
         >
           <FloaterLayer floaters={floaters} />

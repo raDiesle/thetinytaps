@@ -167,8 +167,13 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
   };
 
   // The left arrow picks the not-so-good idea on the left; every other key the kind thing, so mashing keys still comforts him.
+  /** Back from a card looked at big to the first picture, without choosing. */
+  const unpick = () => setRound((r) => ({ ...r, picked: null }));
+
+  // Backspace goes back from a card looked at big, like the small first picture in its corner.
   const pressKey = (key: string) => {
     if (happy) return tryNextFeeling();
+    if (key === "Backspace" && round.picked) return unpick();
     pick(!round.tried && key === "ArrowLeft" ? "instead" : "good");
   };
 
@@ -204,7 +209,15 @@ export function BearPlay({ feeling, settings, onNext }: { feeling: Feeling; sett
         <StepDots total={feeling.comforts.length} done={happy ? feeling.comforts.length : index + (playing ? 1 : 0)} current={!happy} />
       </header>
       <main className="story-middle">
-        <StoryPicture key={`${round.key}-${picture}`} name={picture} caption={caption} look={look} zoom={round.picked !== null} onPointerDown={onBearPointer}>
+        <StoryPicture
+          key={`${round.key}-${picture}`}
+          name={picture}
+          caption={caption}
+          look={look}
+          zoom={round.picked !== null}
+          back={{ image: bearImages.feeling(feeling.id), onBack: unpick }}
+          onPointerDown={onBearPointer}
+        >
           <FloaterLayer floaters={floaters} />
         </StoryPicture>
       </main>

@@ -24,7 +24,7 @@ export const FEELINGS_RU: Partial<Record<FeelingId, FeelingText>> = {
   sad: {
     title: "Грустно, плачет",
     intro: "Мишке грустно. Он плачет.",
-    instead: [null, null, { caption: "Забрать игрушку", answer: "Хм, теперь Мишка плачет ещё сильнее. Лучше утешь его." }],
+    instead: [null, null, null],
     end: { narration: "Мишке снова весело!", line: "Спасибо!" },
     endCaption: "Снова весёлый",
   },
