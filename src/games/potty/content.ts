@@ -63,6 +63,11 @@ export interface Step {
    * really does with its own trousers, bottom and hands takes as long as it takes.
    */
   auto?: number;
+  /**
+   * Only „Weiter“ (or Enter) goes on, and it calls for attention, since a grown-up reads the story out at their own
+   * pace: the first steps, where nothing real happens yet. A tap on the picture only sparkles there.
+   */
+  nudge?: true;
 }
 
 /** The synthesized waiting tune's beat while sitting (when there is no recorded song). */
@@ -71,22 +76,22 @@ export const BEAT_MS = 500;
 /** Taps only sparkle this long after sitting down, so the tap that sat down doesn't end the waiting at once. */
 export const SIT_GUARD_MS = 1500;
 
-/** How long a waiting scene runs before the next tap brings another one. */
+/** How long a thought runs before the next tap brings another one. */
 export const SCENE_MS = 900;
 
-/** How long a waiting scene shows before the next one comes by itself. */
+/** How long a thought shows before the next one comes by itself. */
 export const WAIT_SCENE_MS = 2600;
 
 export const STEPS: Step[] = [
-  // Eating and drinking take turns by themselves, moving from the start, while a grown-up taps what the child said.
-  { id: "eat", icon: "🍝", picture: ["essen", "trinken"], ms: 2000, auto: 3000 },
-  { id: "need", icon: { pipi: "💦", kaka: "🌀" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600, auto: 3000 },
-  // Here (and on the way, while nothing was picked) a grown-up notes what the child said; the story goes on anyway.
-  { id: "call", icon: "📣", picture: "rufen", ms: 1800, auto: 4000 },
-  { id: "go", icon: "🚪", picture: "bad", ms: 1800, auto: 4000 },
+  // Eating and drinking take turns as the step's frames, moving from the start; the first steps wait for „Weiter“.
+  { id: "eat", icon: "🍝", picture: ["essen", "trinken"], ms: 2000, nudge: true },
+  { id: "need", icon: { pipi: "💦", kaka: "🌀" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600, nudge: true },
+  // Here (and on the way, while nothing was picked) a grown-up notes what the child said.
+  { id: "call", icon: "📣", picture: "rufen", ms: 1800, nudge: true },
+  { id: "go", icon: "🚪", picture: "bad", ms: 1800, nudge: true },
   // The child takes its own trousers down: no timer, „Weiter“ when it's done.
   { id: "down", icon: "👖", arrow: "↓", picture: "runter", moves: ["runter-1", "runter-2"], ms: 1200 },
-  // Sitting down goes on by itself into the waiting, which has no fixed length: scene after scene until the ✓ (see WAIT_SCENES).
+  // Sitting down goes on by itself into the waiting, which has no fixed length: thought after thought until the ✓ (see WAIT_SCENES).
   { id: "sit", icon: "⏳", picture: "sitzen", moves: ["sitzen-1"], ms: SIT_GUARD_MS, auto: 3000 },
   { id: "done", icon: { pipi: "💧", kaka: "💩" }, picture: { pipi: "fertig-pipi", kaka: "fertig-kaka" }, ms: 2000, auto: 3500 },
   { id: "wipe", icon: "🧻", picture: "abwischen", ms: 1600 },
@@ -132,33 +137,34 @@ export type SceneSound =
   | "bubbles";
 
 /**
- * Something Mama and Papa do while the animal sits, to keep it there: things that
- * flow and splash for pipi (letting go), things that are pressed for kaka, and
- * plain silliness for both.
+ * What Tapsi thinks of while it sits, in a thought bubble over the still bathroom picture: things that
+ * flow and splash for pipi (letting go), things that are pressed for kaka, and plain silliness.
  */
 export interface WaitScene {
-  /** Its picture's name after the animal's: `fox-warten-giesskanne`. */
+  /** Its picture's name after the animal's: `fox-denken-giesskanne`. */
   id: string;
+  /** Shown in the bubble while it has no picture yet. */
+  emoji: string;
   /** For which need it shows; "silly" ones are kept but not shown (see scenesFor). */
   need: Need | "silly";
   sound: SceneSound;
 }
 
 export const WAIT_SCENES: WaitScene[] = [
-  { id: "giesskanne", need: "pipi", sound: "trickle" },
-  { id: "wasserhahn", need: "pipi", sound: "splash" },
-  { id: "ballon", need: "pipi", sound: "whoosh" },
-  { id: "krug", need: "pipi", sound: "glug" },
-  { id: "dusche", need: "pipi", sound: "trickle" },
-  { id: "zahnpasta", need: "kaka", sound: "squeeze" },
-  { id: "aufblasen", need: "kaka", sound: "blow" },
-  { id: "schieben", need: "kaka", sound: "push" },
-  { id: "schwamm", need: "kaka", sound: "drops" },
-  { id: "zug", need: "kaka", sound: "train" },
-  { id: "tanzen", need: "silly", sound: "dance" },
-  { id: "jonglieren", need: "silly", sound: "juggle" },
-  { id: "kuckuck", need: "silly", sound: "peekaboo" },
-  { id: "seifenblasen", need: "silly", sound: "bubbles" },
+  { id: "giesskanne", emoji: "🌻💦", need: "pipi", sound: "trickle" },
+  { id: "wasserhahn", emoji: "🚰💦", need: "pipi", sound: "splash" },
+  { id: "ballon", emoji: "🎈💨", need: "pipi", sound: "whoosh" },
+  { id: "krug", emoji: "🫗", need: "pipi", sound: "glug" },
+  { id: "dusche", emoji: "🚿🦆", need: "pipi", sound: "trickle" },
+  { id: "zahnpasta", emoji: "🪥", need: "kaka", sound: "squeeze" },
+  { id: "aufblasen", emoji: "😤🎈", need: "kaka", sound: "blow" },
+  { id: "schieben", emoji: "🧺💪", need: "kaka", sound: "push" },
+  { id: "schwamm", emoji: "🧽💧", need: "kaka", sound: "drops" },
+  { id: "zug", emoji: "🚂", need: "kaka", sound: "train" },
+  { id: "tanzen", emoji: "💃🕺", need: "silly", sound: "dance" },
+  { id: "jonglieren", emoji: "🤹", need: "silly", sound: "juggle" },
+  { id: "kuckuck", emoji: "🙈", need: "silly", sound: "peekaboo" },
+  { id: "seifenblasen", emoji: "🫧", need: "silly", sound: "bubbles" },
 ];
 
 /**
@@ -174,8 +180,8 @@ export function scenesFor(said: Said): WaitScene[] {
     .filter((s) => s !== undefined);
 }
 
-/** The name of a waiting scene's picture, after the animal's. */
-export const scenePicture = (scene: WaitScene) => `warten-${scene.id}`;
+/** The name of a waiting scene's picture in the thought bubble, after the animal's. */
+export const scenePicture = (scene: WaitScene) => `denken-${scene.id}`;
 
 /** What is said, in one language; `name` is Tapsi's. */
 export interface PottyTexts {
@@ -187,6 +193,10 @@ export interface PottyTexts {
   said: Record<Said, string>;
   /** The „Weiter“ button's name for screen readers. */
   next: string;
+  /** Over the buttons for what the child said, for the grown-up. */
+  askSaid: string;
+  /** Over the ✓ while sitting, for the grown-up. */
+  askWent: string;
   /** Said once while sitting, so a grown-up knows what the two ✓ are for. */
   finish: string;
   /** What each ✓ means, for screen readers. */
@@ -247,6 +257,8 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       unsure: "Tapsi muss bald mal.",
     },
     next: "Weiter",
+    askSaid: "Was muss dein Kind?",
+    askWent: "Was ist im Töpfchen?",
     finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka. Beides: drück auf beide!",
     went: {
       pipi: "Pipi ist im Töpfchen",

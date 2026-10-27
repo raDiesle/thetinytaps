@@ -19,6 +19,9 @@ Die Stufen nacheinander, jede braucht die Bilder der vorigen als Referenz (`.ima
 4. `bath` – alle anderen Badbilder, mit `bad` als einziger Referenz.
 5. `wait` – die Warte-Szenen (`warten-…`), mit `sitzen` als einziger Referenz: dort sitzt das Kind schon auf dem
    Töpfchen. Mit `bad` als Referenz blieb das Töpfchen leer in der Mitte stehen und das Kind saß daneben auf nichts.
+   **Werden nicht mehr gezeigt:** jedes Bild war ein wenig anders gezeichnet, der Wechsel alle paar Sekunden ließ das
+   Bad springen. Beim Warten bleibt `sitzen` stehen; was Tapsi denkt, kommt in eine Denkblase (`denken-…`, noch nicht
+   gemacht, bis dahin ein Emoji), gezeichnet ohne Badezimmer.
 6. `frames-kitchen`, `frames-bath`, `frames-wait` – die zweiten Frames, jeder mit seinem ersten als Referenz.
 7. `moves` – die Bewegung vor einem Bild (`Step.moves`): `runter-1`, `runter-2` (Hose noch oben, an den Knien) vor
    `runter`, `sitzen-1` (steht vor dem Töpfchen) vor `sitzen`, jedes mit dem Endbild als einziger Referenz (aus

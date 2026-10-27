@@ -58,7 +58,10 @@ describe("Aufs Töpfchen", () => {
     const auto = (id: string) => STEPS.find((s) => s.id === id)?.auto;
     // The child takes its trousers down, wipes, pulls them up, flushes and washes itself: that waits for a tap or „Weiter“.
     for (const id of ["down", "wipe", "up", "flush", "wash", "party"]) expect(auto(id)).toBeUndefined();
-    for (const id of ["eat", "need", "call", "go", "sit", "done"]) expect(auto(id)).toBeGreaterThan(0);
+    // A grown-up tells the first steps at their own pace: only „Weiter“ goes on there, and it calls for attention.
+    expect(STEPS.filter((s) => s.nudge).map((s) => s.id)).toEqual(["eat", "need", "call", "go"]);
+    for (const step of STEPS) if (step.nudge) expect(step.auto).toBeUndefined();
+    for (const id of ["sit", "done"]) expect(auto(id)).toBeGreaterThan(0);
     for (const step of STEPS) if (step.auto !== undefined) expect(step.auto).toBeGreaterThan(step.ms);
     expect(WAIT_SCENE_MS).toBeGreaterThan(SCENE_MS);
   });
@@ -80,11 +83,13 @@ describe("Aufs Töpfchen", () => {
     for (const texts of Object.values(POTTY_TEXTS)) expect(texts.steps.done(TAPSI.name, "both")).not.toBe(texts.steps.done(TAPSI.name, "pipi"));
   });
 
-  it("has every picture of the story, the waiting scenes moving (with a second frame), and no pictures of anybody else", () => {
+  it("has every picture of the story, a thought bubble's with both frames if at all, and no pictures of anybody else", () => {
     const files = readdirSync("src/games/potty/bilder").filter((f) => f.endsWith(".webp"));
+    // A thought bubble shows its emoji until it has a picture; a picture it has moves.
+    const thoughts = WAIT_SCENES.map(scenePicture).filter((name) => files.some((f) => f.startsWith(`${TAPSI.pictures}-${name}`)));
     const names = new Set([
       ...STEPS.flatMap((s) => [...WHICHES.flatMap((which) => picturesFor(s, which)), ...(s.moves ?? [])]),
-      ...WAIT_SCENES.flatMap((s) => [scenePicture(s), `${scenePicture(s)}-b`]),
+      ...thoughts.flatMap((name) => [name, `${name}-b`]),
     ]);
     expect([...names].map((name) => `${TAPSI.pictures}-${name}.webp`).filter((f) => !files.includes(f))).toEqual([]);
     // Only Tapsi goes to the potty: pictures of other animals would only be downloaded for nothing.

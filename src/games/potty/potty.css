@@ -4,7 +4,8 @@
  * The story is a Gemini picture filling the screen (StoryPicture.tsx), its two frames
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
  * calls (.pt-feel, .pt-call), and at the bottom the row of steps (each one a button that jumps there) with the
- * grown-ups' buttons in the corner next to it: what the child said (.pt-said), the three ✓ while sitting (.pt-finish), „Weiter“ (.pt-next).
+ * grown-ups' buttons on the right next to it: a choice (.pt-choice) of what the child said (.pt-said) or the three ✓ while
+ * sitting (.pt-finish), and „Weiter“ (.pt-next). While sitting the waiting (.pt-wait) and Tapsi's thought bubble (.pt-think).
  * Root classes: pt-pipi / pt-kaka / pt-unsure / pt-both (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
  * Only the eating picture moves before the first tap (the game is opened when the child has to go now).
  */
@@ -139,8 +140,9 @@
 }
 
 /*
- * The bottom: the row of steps in the middle, the grown-ups' buttons in the corner level with it. Where the
- * corner is too narrow for them, the row moves aside a little (a side column never gets narrower than what is in it).
+ * The bottom: the row of steps in the middle, the grown-ups' buttons on the right level with it – the choice (what
+ * the child said, or the ✓) as one framed group with its question, „Weiter“ apart next to it. Where one row is too
+ * narrow for them, the group stands above „Weiter“ on the right, reaching up from the bottom.
  */
 .pt-bottom {
   position: absolute;
@@ -158,17 +160,44 @@
   justify-self: end;
   display: flex;
   align-items: flex-end;
-  gap: 8px;
+  gap: 10px;
 }
 
-/* The grown-ups' buttons are plainly buttons (white, outlined, raised) but mid-sized and still, in the corner:
+/* One either-or choice: a white frame with its question on top and the buttons side by side, all alike. */
+.pt-choice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px 8px;
+  border: 3px solid #2a1e5c;
+  border-radius: 20px;
+  background: #ffffffe6;
+  box-shadow: 0 4px 12px #0003;
+}
+
+.pt-choice-label {
+  color: #2a1e5c;
+  font-size: clamp(12px, 2.8vmin, 16px);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pt-choice-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+/* The grown-ups' buttons are plainly buttons (outlined, raised, pressed in on a tap) but mid-sized, in the corner:
    a grown-up finds them, the child looks at the story. */
 .pt-said,
 .pt-next,
 .pt-finish {
-  display: grid;
-  place-items: center;
-  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 0 8px;
   border: 3px solid #2a1e5c;
   border-radius: 999px;
   background: #fff;
@@ -176,6 +205,7 @@
     0 4px 0 #2a1e5c,
     0 6px 12px #0003;
   line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition:
     transform 0.1s,
@@ -192,19 +222,11 @@
     0 2px 6px #0003;
 }
 
-/* What the child said: four small buttons in a square (💧, 💩, 💧💩, ❓); the picked one turns light yellow. */
-.pt-saids {
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 6px;
-}
-
+/* What the child said (💧, 💩, 💧💩, ❓): the picked one turns yellow. */
 .pt-said {
-  min-width: clamp(40px, 9.5vmin, 60px);
-  height: clamp(40px, 9.5vmin, 60px);
-  padding: 0 6px;
+  min-width: clamp(42px, 10vmin, 62px);
+  height: clamp(42px, 10vmin, 62px);
   font-size: clamp(18px, 4.4vmin, 28px);
-  white-space: nowrap;
 }
 
 .pt-said.picked {
@@ -212,24 +234,41 @@
 }
 
 .pt-next {
-  width: clamp(50px, 12vmin, 72px);
-  height: clamp(50px, 12vmin, 72px);
+  width: clamp(54px, 13vmin, 80px);
+  height: clamp(54px, 13vmin, 80px);
+  padding: 0;
   background: #ffd23f;
   color: #2a1e5c;
   font-size: clamp(22px, 5.4vmin, 34px);
 }
 
-/* While sitting: three ✓ say „fertig“ – for pipi, kaka or both, told apart by the badge. Green, so a grown-up
-   finds them at once; the one the child said has a yellow ring. */
-.pt-finishes {
-  display: flex;
-  gap: 8px;
+/* The first steps wait for „Weiter“ alone, so there it calls: it swells and a ring goes out from it. */
+.pt-next.nudge {
+  animation: pt-nudge 1.4s ease-in-out infinite;
 }
 
+@keyframes pt-nudge {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      0 4px 0 #2a1e5c,
+      0 6px 12px #0003,
+      0 0 0 0 #ffd23fcc;
+  }
+  50% {
+    transform: scale(1.12);
+    box-shadow:
+      0 4px 0 #2a1e5c,
+      0 6px 12px #0003,
+      0 0 0 14px #ffd23f00;
+  }
+}
+
+/* While sitting: three ✓ say „fertig“ – for pipi, kaka or both, told apart by the need next to the ✓. Green, so a
+   grown-up finds them at once; the one the child said has a yellow ring. */
 .pt-finish {
-  position: relative;
-  width: clamp(48px, 11vmin, 66px);
-  height: clamp(48px, 11vmin, 66px);
+  height: clamp(42px, 10vmin, 62px);
   background: #3ec300;
 }
 
@@ -239,20 +278,195 @@
 
 .pt-finish-check {
   color: #fff;
-  font-size: clamp(26px, 6vmin, 40px);
+  font-size: clamp(22px, 5vmin, 34px);
   font-weight: 900;
 }
 
 .pt-finish-need {
+  font-size: clamp(16px, 3.8vmin, 24px);
+}
+
+/* Too narrow for one row (phones on their side, tablets): the choice stands above „Weiter“, its buttons two by two. */
+@media (max-width: 1279px) {
+  .pt-grown {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .pt-choice-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+  }
+
+  .pt-choice:has(.pt-finish) .pt-choice-buttons {
+    grid-template-columns: auto;
+    justify-items: stretch;
+  }
+}
+
+/* Everybody waits: bottom left, above the row of steps and below the thought bubble, an hourglass turns over and
+   over, three dots go up and down beside it. */
+.pt-wait {
   position: absolute;
-  top: -30%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 1px 4px;
+  left: max(16px, env(safe-area-inset-left));
+  bottom: calc(max(10px, env(safe-area-inset-bottom)) + clamp(58px, min(5.5vw, 9vmin) + 30px, 82px));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
+  border: 3px solid #2a1e5c;
   border-radius: 999px;
-  background: #ffffffd9;
-  font-size: clamp(11px, 2.6vmin, 17px);
+  background: #ffffffe6;
+  box-shadow: 0 4px 12px #0003;
+  pointer-events: none;
+}
+
+.pt-wait-glass {
+  display: inline-block;
+  font-size: clamp(38px, 11vmin, 72px);
+  line-height: 1;
+  animation: pt-wait-turn 2.4s ease-in-out infinite;
+}
+
+@keyframes pt-wait-turn {
+  0%,
+  70% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(180deg);
+  }
+}
+
+.pt-wait-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.pt-wait-dots i {
+  width: clamp(9px, 2.4vmin, 16px);
+  height: clamp(9px, 2.4vmin, 16px);
+  border-radius: 50%;
+  background: #2a1e5c;
+  animation: pt-wait-dot 1.2s ease-in-out infinite;
+}
+
+.pt-wait-dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.pt-wait-dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pt-wait-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.35;
+  }
+  30% {
+    transform: translateY(-8px);
+    opacity: 1;
+  }
+}
+
+/* What Tapsi thinks of, top left on the wall: a cloud with two small puffs leading down towards Tapsi. A new
+   thought pops in inside it, so only the bubble changes, never the room. */
+.pt-think {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  top: max(12px, env(safe-area-inset-top));
+  width: clamp(150px, 42vmin, 340px);
+  aspect-ratio: 4 / 3;
+  border: 4px solid #2a1e5c;
+  border-radius: 46% 54% 50% 50% / 55% 50% 50% 45%;
+  background: #fff;
+  box-shadow: 0 6px 18px #2a1e5c33;
+  pointer-events: none;
+  transform-origin: 100% 100%;
+  animation: pt-think-in 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+@keyframes pt-think-in {
+  from {
+    transform: scale(0);
+  }
+}
+
+.pt-think::before,
+.pt-think::after {
+  content: "";
+  position: absolute;
+  border: 4px solid #2a1e5c;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.pt-think::before {
+  right: -4%;
+  bottom: -14%;
+  width: 14%;
+  aspect-ratio: 1;
+}
+
+.pt-think::after {
+  right: -12%;
+  bottom: -28%;
+  width: 8%;
+  aspect-ratio: 1;
+}
+
+.pt-think-scene {
+  position: absolute;
+  inset: 7%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 40%;
+  animation: pt-think-scene 0.45s ease-out;
+}
+
+@keyframes pt-think-scene {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+.pt-think-picture {
+  position: absolute;
+  inset: 0;
+}
+
+.pt-think-picture img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.35s ease-in-out;
+}
+
+.pt-think-picture img.base,
+.pt-think-picture img.on {
+  opacity: 1;
+}
+
+.pt-think-emoji {
+  font-size: clamp(44px, 14vmin, 120px);
+  line-height: 1;
   white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt-next.nudge,
+  .pt-wait-glass,
+  .pt-wait-dots i {
+    animation: none;
+  }
 }
 
 /* The row of steps lies on the picture, so it gets a little more contrast. */
