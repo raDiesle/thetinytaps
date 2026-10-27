@@ -85,9 +85,13 @@ In a fresh worktree run `bun install` first.
   Instead keep `src/content/ideas/languageStatus.ts` (shown on `/management/`) true in the same commit: what is
   there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
   `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell.
-  Every language choice (the Spielsprache on the home page, a game's own) starts on `playLanguage(…)`
-  (`src/lib/locale.ts`): German while developing, for players the browser's language if offered, else
-  English – never a hard-coded `"de"`. Where a game lacks the chosen language, it plays in English, then German.
+  **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
+  (🌐 on the home page, `useAppLanguage()`); no game or menu adds a language choice of its own (a „Spielsprache“ once
+  put Russian letters under German menus). A language joins `APP_LANGUAGES` only once the menus and the letters and
+  words games speak it (`language.test.ts` checks the pack); until then packs and recordings in other languages wait
+  in the code. Only the opt-in „Zweite Sprache“ adds a second one, next to the first. The app language starts on
+  `playLanguage(…)` (`src/lib/locale.ts`): German while developing, for players the browser's language if offered,
+  else the first one – never a hard-coded `"de"`. Where a game lacks the language, it plays in English, then German.
   Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
 - **The whole app also speaks Russian** (🌐 on the home page, `src/lib/language.ts`): grown-ups' screens and what

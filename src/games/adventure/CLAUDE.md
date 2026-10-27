@@ -22,9 +22,9 @@ camera often looks from the right from then on. The timing helpers (`passTime`, 
 What Tapsi says is in `stories/<story>/lines.ts` (no three.js there, so Node can read it), and in the other
 languages of the app (`src/content/targetLanguages.ts`) in `lines.<language>.ts` next to it: the same steps and
 lines in the same order (`StoryTranslation`, listed in the story's `translations.ts`; `storyIn()` swaps them in).
-Tapsi speaks the play language of the home page („Spielsprache“, `LanguageSetting.tsx`, which lists these
-languages too); Turkish and Polish, and a story without a translation into the chosen language, are said in
-German (and „Über das Spiel“ says so). Translations say
+Tapsi speaks the app language (🌐 on the home page), like the menus; a story without a translation into it
+is said in English, then German (and „Über das Spiel“ says so). The other recorded languages wait until the
+whole app speaks them and they join 🌐. Translations say
 nothing that changes for a boy or a girl (no "you did", no "brave boy"): commands, "we" and "your turn".
 Each line can have a recording in `stories/<story>/stimme/<hash>.mp3` (German) or
 `stimme/<language>/<language>-<hash>.mp3`, made with ElevenLabs as a warm children's coach voice, the same voice
@@ -44,12 +44,12 @@ are not kept offline by every phone, only once the story has started in that lan
   10,399 characters (all seven missing story languages) cost 995 credits, about 0.1 per character, so check
   `bun run voice credits` after a run instead of holding back translations for the estimate.
 
-The game has no settings of its own: read aloud, sounds, its own music and the language follow the shared options on the home page (`useCommonSettings`, `useLanguages`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen only has „Über das Spiel“.
+The game has no settings of its own: read aloud, sounds, its own music and the language follow the shared options on the home page (`useCommonSettings`, `useAppLanguage`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen only has „Über das Spiel“.
 
 ## Grown-ups' texts in the app language
 
-- The start screen, buttons, tooltips and notes follow the app language of the home page (`src/lib/language.ts`), not
-  Tapsi's Spielsprache. A text that has a translation is written as `t({ de: "…", ru: "…" })` (`useT()`); new texts
+- The start screen, buttons, tooltips and notes follow the app language of the home page (`src/lib/language.ts`), as
+  Tapsi does. A text that has a translation is written as `t({ de: "…", ru: "…" })` (`useT()`); new texts
   come in German only, like Tapsi's lines, until the user asks for a language.
 - A story's title and its step names on the route come from its translations (`title`, `name` per step in
   `lines.<language>.ts`), shown in the app language (`storyTitle`, `stepName` in `AdventurePlay.tsx`), German where a

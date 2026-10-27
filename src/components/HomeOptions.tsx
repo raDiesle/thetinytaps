@@ -114,12 +114,6 @@ function CommonOptions() {
   return (
     <section className="settings">
       <LanguageSetting settings={languages.settings} update={languages.update} />
-      <p className="setting-note">
-        {t({
-          de: "Die Sprache gilt für „Buchstaben & Zahlen“, „Wörter tippen“ und für das, was Tapsi im Bewegungsabenteuer sagt; die anderen Spiele sprechen die Sprache der App (🌐 oben).",
-          ru: "Этот язык действует для «Букв и цифр», «Печатаем слова» и для того, что говорит Тапси в «Приключениях в движении»; остальные игры говорят на языке приложения (🌐 вверху).",
-        })}
-      </p>
 
       <SettingsGroup title={t({ de: "Ton", ru: "Звук" })}>
         <Toggle

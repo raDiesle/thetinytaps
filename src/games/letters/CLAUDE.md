@@ -11,8 +11,9 @@ Free typing (a number shows its things and digit at once, or optionally counts t
 
 ## Languages
 
-The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`) are shared with „Wörter tippen“; the choice is
-`LanguageSetting` (`tinytaps.language.v1`, default `"app"`: the app language, German or Russian, until the parents pick one).
+The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`) are shared with „Wörter tippen“. Both play in the
+app language (🌐, `useLanguages()` in `LanguageSetting.tsx`), never in another one than the menus; the only choice is
+an optional „Zweite Sprache“ (`tinytaps.language.v1`), shown next to the first.
 - Grown-up texts (start screen, settings, hints on the play screen) go through `useT()`: `t({ de: "…", ru: "…" })`, never a bare German string.
 - Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` (Russian) types
   by key place (Q = Й, also on a German keyboard). Compare keys only with `keyMatches`/`toUpper(…, pack)`, never with `e.key` directly.
