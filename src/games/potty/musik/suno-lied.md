@@ -209,3 +209,101 @@ Title:
 ```text
 Сижу на горшочке
 ```
+
+## English (`en`, written 27 Oct 2026)
+
+The German song in American English, verse for verse, same tempo, key and instruments. „Mommy“ and „Daddy“,
+„diaper“, „pee-pee“ and „poo-poo“ as American parents say to toddlers; the shout-back answers are „Me!“. Not yet
+read by a native speaker. English is not an app language yet (`APP_LANGUAGES`), so the song waits until it is.
+
+Lyrics:
+
+```text
+[Tempo: 100 BPM, steady, bouncy]
+
+[Verse 1 – ukulele, woodblock ticking]
+I'm sitting on my potty,
+no diaper, hip hooray!
+I'm getting big, I can do it,
+I'm learning every day.
+
+[Chorus – glockenspiel joins]
+Tick, tock, we're waiting,
+we've got a lot of time.
+Pee-pee or a poo-poo —
+it comes, and that is fine!
+
+[Verse 2 – ukulele, light shaker]
+Mommy goes on the big toilet,
+and Daddy does, it's true!
+And I have got my potty,
+my very own, brand-new!
+
+[Chorus – glockenspiel]
+Tick, tock, we're waiting,
+we've got a lot of time.
+Pee-pee or a poo-poo —
+it comes, and that is fine!
+
+[Verse 3 – playful, kazoo answers]
+My teddy wears a diaper,
+he's still so very small.
+But I'm big now, I tell you:
+"I need to go!" — that's all!
+
+[Chorus – glockenspiel]
+Tick, tock, we're waiting,
+we've got a lot of time.
+Pee-pee or a poo-poo —
+it comes, and that is fine!
+
+[Bridge – call and response, the same voice shouts back, woodblock]
+Who needs no diaper? (Me!)
+Who's sitting on the pot? (Me!)
+Who's waiting nice and patient? (Me!)
+Who's growing such a lot? (Me!)
+
+[Verse 4 – softer, calm]
+Sometimes it's very quick,
+and sometimes it takes long.
+I just sit nice and calmly,
+the clock ticks out its song.
+
+[Chorus – glockenspiel]
+Tick, tock, we're waiting,
+we've got a lot of time.
+Pee-pee or a poo-poo —
+it comes, and that is fine!
+
+[Verse 5 – bouncy again, kazoo]
+And when it all has worked out,
+then everyone claps along,
+then flush, and wash our hands up —
+that is my potty song!
+
+[Chorus – glockenspiel, everything together]
+Tick, tock, we're waiting,
+we've got a lot of time.
+Pee-pee or a poo-poo —
+it comes, and that is fine!
+
+[Instrumental turnaround – 2 bars, woodblock tick-tock, leads back to Verse 1]
+```
+
+Style of Music:
+
+```text
+playful cheerful children's song for toddlers, sung in American English, 100 BPM, F major, one warm cheerful voice singing clearly, slow clear pronunciation, ukulele, glockenspiel, woodblock ticking like a clock, kazoo answers, light shaker, bouncy and silly but never hectic, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 3:00
+```
+
+Exclude Styles:
+
+```text
+rap, heavy drums, electric guitar, distortion, choir, sad, fast, tempo changes, long intro, fade out, final chord
+```
+
+Title:
+
+```text
+Waiting on the Potty
+```
