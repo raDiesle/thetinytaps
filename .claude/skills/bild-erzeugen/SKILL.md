@@ -88,7 +88,9 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   the first as the only `--ref` and a prompt that names just the small movement
   ("Redraw this exact picture … Nothing appears, disappears or moves except …").
   Then run `bun run frames` (a folder or files): it lists pairs where more than the
-  movement changed, above all at the edge, which is background.
+  movement changed, above all at the edge, which is background. It doesn't notice the opposite: the Lite model
+  sometimes returns the second frame almost unchanged (a block put on a tower), so look at both, and name a
+  movement big enough to see (a head turned, a paw waving).
 - **The same place stays the same** from picture to picture of a story: only the core
   of the picture (what the characters do) may change, never the background, objects or
   camera around it. Get the story's first picture right (cast, every object once), then

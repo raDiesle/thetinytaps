@@ -44,7 +44,7 @@ export const SAID: { id: Said; emoji: string }[] = [
 export const expectedWent = (said: Said): Went => (said === "unsure" ? "pipi" : said);
 
 /** The steps of the story, one tap each. */
-export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party";
+export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party" | "play";
 
 export interface Step {
   id: StepId;
@@ -56,6 +56,8 @@ export interface Step {
   picture: string | string[] | Record<Need, string>;
   /** Pictures played once before `picture`, one after the other: a tiny animation of what happens (trousers going down). */
   moves?: string[];
+  /** The tiny animation (`moves`) plays again after this pause, over and over until the story goes on. */
+  again?: number;
   /** How long its sounds take before the next tap goes on; a tap before that only sparkles. */
   ms: number;
   /**
@@ -64,8 +66,8 @@ export interface Step {
    */
   auto?: number;
   /**
-   * Only „Weiter“ (or Enter) goes on, and it calls for attention, since a grown-up reads the story out at their own
-   * pace: the first steps, where nothing real happens yet. A tap on the picture only sparkles there.
+   * Never goes on by itself, and „Weiter“ calls for attention, since a grown-up reads the story out at their own
+   * pace: the first steps, where nothing real happens yet. Any tap or key goes on there too.
    */
   nudge?: true;
 }
@@ -90,7 +92,8 @@ export const STEPS: Step[] = [
   { id: "call", icon: "📣", picture: "rufen", ms: 1800, nudge: true },
   { id: "go", icon: "🚪", picture: "bad", ms: 1800, nudge: true },
   // The child takes its own trousers down: no timer, „Weiter“ when it's done.
-  { id: "down", icon: "👖", arrow: "↓", picture: "runter", moves: ["runter-1", "runter-2"], ms: 1200 },
+  // The trousers go down again and again, so the child sees what to do while it does it.
+  { id: "down", icon: "👖", arrow: "↓", picture: "runter", moves: ["runter-1", "runter-2"], again: 1500, ms: 1200 },
   // Sitting down goes on by itself into the waiting, which has no fixed length: thought after thought until the ✓ (see WAIT_SCENES).
   { id: "sit", icon: "⏳", picture: "sitzen", moves: ["sitzen-1"], ms: SIT_GUARD_MS, auto: 3000 },
   { id: "done", icon: { pipi: "💧", kaka: "💩" }, picture: { pipi: "fertig-pipi", kaka: "fertig-kaka" }, ms: 2000, auto: 3500 },
@@ -100,6 +103,21 @@ export const STEPS: Step[] = [
   { id: "wash", icon: "🧼", picture: "waschen", ms: 2400 },
   { id: "party", icon: "🎉", picture: "party", ms: 2400 },
 ];
+
+const SIT = STEPS.findIndex((s) => s.id === "sit");
+
+/**
+ * The story when nothing came on the potty (the „nichts“ next to the ✓): from sitting straight to washing hands, then
+ * Tapsi plays in its room and Mama and Papa look in at the door to ask whether it has to go – the story ends there.
+ */
+export const NOTHING_STEPS: Step[] = [
+  ...STEPS.slice(0, SIT + 1),
+  ...STEPS.filter((s) => s.id === "wash"),
+  { id: "play", icon: "🧸", picture: "spielen", ms: 2400 },
+];
+
+/** The steps of the story: the usual one, or the one when nothing came. */
+export const storyFor = (nothing: boolean) => (nothing ? NOTHING_STEPS : STEPS);
 
 /** A step's icon in the row: ❓ where it depends on the need and nobody knows it yet, both icons when both came. */
 export function iconFor(step: Step, which: Which): string {
@@ -187,6 +205,8 @@ export interface PottyTexts {
   finish: string;
   /** What each ✓ means, for screen readers. */
   went: Record<Went, string>;
+  /** The button for nothing next to the ✓, for screen readers, and said when it is tapped. */
+  nothing: string;
   /** Said when a star comes for really going. */
   star: string;
 }
@@ -219,6 +239,7 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       flush: () => "Ausleeren und abziehen. Wuuusch!",
       wash: () => "Hände waschen mit Seife.",
       party: (name) => `Geschafft! Toll gemacht, ${name}!`,
+      play: (name) => `${name} spielt. Mama und Papa schauen rein: Musst du Pipi oder Kaka?`,
     },
     scenes: {
       giesskanne: "Tapsi gießt die Blume. Plitsch, platsch!",
@@ -250,6 +271,7 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       kaka: "Kaka ist im Töpfchen",
       both: "Pipi und Kaka sind im Töpfchen",
     },
+    nothing: "Heute kommt nichts. Macht nichts!",
     star: "Hat geklappt! Hurra, ein Stern für dich!",
   },
 };

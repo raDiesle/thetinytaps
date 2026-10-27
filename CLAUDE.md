@@ -151,7 +151,8 @@ In a fresh worktree run `bun install` first.
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
   current game's own start screen before play, `useLeaveGame()` – never the home page; its picture is four cards,
   `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
-  the first, so there is always one). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
+  the first, so there is always one). A game with only one level or story leaves „Weiter“ out (`next` is optional):
+  two buttons doing the same thing confuse. A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
   it has a use for, just as big.
 
 ## Architecture

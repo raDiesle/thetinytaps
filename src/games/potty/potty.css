@@ -5,7 +5,7 @@
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
  * calls (.pt-feel, .pt-call), and at the bottom the row of steps (each one a button that jumps there) with the
  * grown-ups' buttons on the right next to it: a choice (.pt-choice) of what the child said (.pt-said) or the three ✓ while
- * sitting (.pt-finish), and „Weiter“ (.pt-next). While sitting the clock on the wall (.pt-clock) and Tapsi's thought bubble (.pt-think).
+ * sitting (.pt-finish) with 🤷 for nothing (.pt-nothing), and „Weiter“ (.pt-next). While sitting the clock on the wall (.pt-clock) and Tapsi's thought bubble (.pt-think).
  * Root classes: pt-pipi / pt-kaka / pt-unsure / pt-both (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
  * Only the eating picture moves before the first tap (the game is opened when the child has to go now).
  */
@@ -58,6 +58,11 @@
 .pt-picture img.on,
 .pt-party-picture img.on {
   opacity: 1;
+}
+
+/* An animation starting again: its first picture fades in on top of the picture it ended on. */
+.pt-picture img.on.top {
+  z-index: 1;
 }
 
 /* The bladder presses: drops pop up over the wiggling animal. The tummy rumbles: the picture shakes a little. */
@@ -288,6 +293,12 @@
   font-size: clamp(16px, 3.8vmin, 24px);
 }
 
+/* Nothing came: white, unlike the green ✓, since it leads to a story of its own. */
+.pt-finish.pt-nothing {
+  background: #fff;
+  font-size: clamp(20px, 4.6vmin, 30px);
+}
+
 /* Too narrow for one row (phones on their side, tablets): the choice stands above „Weiter“, its buttons two by two. */
 @media (max-width: 1279px) {
   .pt-grown {
@@ -347,14 +358,15 @@
   }
 }
 
-/* What Tapsi thinks of, top left on the wall: a cloud with two small puffs leading down towards Tapsi. A new
-   thought pops in inside it, so only the bubble changes, never the room. */
+/* What Tapsi thinks of, top left on the wall: a big cloud with two small puffs leading towards Tapsi. A new
+   thought pops in inside it, so only the bubble changes, never the room. As big as the room left of Tapsi allows
+   (Tapsi sits from about 38 % of the screen's width on every screen) and above the row of steps. */
 .pt-think {
   position: absolute;
   left: max(16px, env(safe-area-inset-left));
   top: max(12px, env(safe-area-inset-top));
-  width: clamp(150px, 42vmin, 340px);
-  aspect-ratio: 4 / 3;
+  width: min(36vw, (100dvh - 100px) * 1.2, 680px);
+  aspect-ratio: 6 / 5;
   border: 4px solid #2a1e5c;
   border-radius: 46% 54% 50% 50% / 55% 50% 50% 45%;
   background: #fff;
@@ -380,26 +392,26 @@
 }
 
 .pt-think::before {
-  right: -4%;
-  bottom: -14%;
-  width: 14%;
+  right: 4%;
+  bottom: -11%;
+  width: 9%;
   aspect-ratio: 1;
 }
 
 .pt-think::after {
-  right: -12%;
-  bottom: -28%;
-  width: 8%;
+  right: -4%;
+  bottom: -21%;
+  width: 5.5%;
   aspect-ratio: 1;
 }
 
 .pt-think-scene {
   position: absolute;
-  inset: 7%;
+  inset: 4%;
   display: grid;
   place-items: center;
   overflow: hidden;
-  border-radius: 40%;
+  border-radius: 44%;
   animation: pt-think-scene 0.45s ease-out;
 }
 
@@ -410,9 +422,10 @@
   }
 }
 
+/* Zoomed in a little: the thought pictures fade to white at their edges, the bubble shows their middle. */
 .pt-think-picture {
   position: absolute;
-  inset: 0;
+  inset: -14%;
 }
 
 .pt-think-picture img {
@@ -431,7 +444,7 @@
 }
 
 .pt-think-emoji {
-  font-size: clamp(44px, 14vmin, 120px);
+  font-size: clamp(64px, 22vmin, 190px);
   line-height: 1;
   white-space: nowrap;
 }

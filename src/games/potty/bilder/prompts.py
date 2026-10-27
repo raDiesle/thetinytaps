@@ -49,6 +49,17 @@ def bathroom_first(a):
     "and a small round turquoise potty standing on the floor in the middle. " + cast(a) +
     f"Now this happens: {k} walks into the bathroom holding Mama's paw, Papa walks next to them; all three smile. The potty waits in the middle. " + END)
 
+# When nothing came: Tapsi plays in its own room, and Mama and Papa look in at the door to ask whether it has to go.
+# A new room like the bathroom, from "rufen" for the three characters; its door stands near the middle, since the edges get cut.
+def playroom_first(a):
+  k = CAST[a]["kid_short"]
+  return ("Use the reference picture only for the three characters and the drawing style: " + STYLE + WIDE +
+    "New place: a bright, cozy children's room seen from the front: soft green walls, a light wooden floor with a round blue rug, "
+    "a low toy shelf with a few soft toys, a small bed with a yellow blanket on the left, and a white door in the back wall right of the middle, standing wide open. "
+    + cast(a) + f"Now this happens: {k} sits on the rug in the middle of the room, playing happily with big colourful wooden blocks, building a small tower; trousers are up. "
+    "Mama and Papa stand together in the open doorway, fully inside the door frame, looking in at Tapsi with friendly, curious faces, "
+    "Mama with one paw on the door frame, Papa with his head tilted a little, as if asking a question. " + END)
+
 SIT = lambda a: f"{CAST[a]['kid_short']} sits on the small turquoise potty in the middle, trousers down at the ankles, T-shirt covering the tummy, only fur shows. "
 
 def bathroom(a):
@@ -111,6 +122,7 @@ MOVE = {
  "abziehen": "the water in the toilet swirls further, the child's paw is lifted from the button",
  "waschen": "the paws rub the other way, more foam bubbles",
  "party": "everyone is in the air a bit higher, the confetti has moved",
+ "spielen": "Tapsi now turns its head towards the door and looks at Mama and Papa with open eyes, one paw lifted holding a red block; Mama waves with her free paw",
  "warten-giesskanne": "the watering can is tipped further, more water pours, the plant has a new flower",
  "warten-wasserhahn": "more water in the tub and a bigger splash",
  "warten-ballon": "the balloon is further up near the ceiling, smaller, twisting",
@@ -203,9 +215,11 @@ def stage(st, a):
   if st == "kitchen": return [job(a, n, p, raw(a, "essen")) for n, p in kitchen(a).items() if n != "essen"]
   if st == "bath-first": return [job(a, "bad", bathroom_first(a), raw(a, "rufen"))]  # a new room
   if st == "bath": return [job(a, n, p, raw(a, "bad")) for n, p in bathroom(a).items()]
+  if st == "play-first": return [job(a, "spielen", playroom_first(a), f"src/games/potty/bilder/{a}-rufen.webp")]  # a new room
+  if st == "frames-play": return [job(a, "spielen-b", second("spielen"), raw(a, "spielen"))]
   if st == "wait": return [job(a, n, p, raw(a, "sitzen")) for n, p in waiting(a).items()]
   if st == "frames-kitchen": return [job(a, n + "-b", second(n), raw(a, n)) for n in ["essen", "trinken", "blase", "bauch", "rufen"]]
-  if st == "frames-bath": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n not in ["essen", "trinken", "blase", "bauch", "rufen"] and not n.startswith("warten-")]
+  if st == "frames-bath": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n not in ["essen", "trinken", "blase", "bauch", "rufen", "spielen"] and not n.startswith("warten-")]
   if st == "frames-wait": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n.startswith("warten-")]
   # From the game's own pictures: the raw ones of the first round are gone.
   if st == "think": return [job(a, "denken-" + n, thought(a, w), f"src/games/potty/bilder/{a}-essen.webp", "4:3", "1200") for n, w in THOUGHTS.items()]
