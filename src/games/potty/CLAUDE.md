@@ -6,8 +6,8 @@ A picture story like „Gefühle“: every step is a Gemini picture (`bilder/`, 
 its second frame (`-b`) fading in and out so the foxes move a little; a new picture fades in over the one before
 (which stays below it meanwhile) and settles from a little closer. A step can play a tiny animation once before its
 picture (`Step.moves`: trousers going down, sitting down; `StoryPicture`'s `moves`). Drawn on top (emoji and CSS):
-what Tapsi feels (💦 for pipi, the picture shakes when the tummy rumbles), the call bubble, while sitting the waiting
-hourglass and the thought bubble, confetti, and at the bottom the row of step icons (each one jumps there) with the
+what Tapsi feels (💦 for pipi, the picture shakes when the tummy rumbles), the call bubble, while sitting the clock on
+the wall and the thought bubble, confetti, and at the bottom the row of step icons (each one jumps there) with the
 grown-ups' buttons on the right next to it.
 
 „Muss mal!“ (`PottyPlay.tsx`, mode `story`): one story for both needs, since a child often can't tell beforehand.
@@ -36,14 +36,16 @@ still plays (its pending sounds stop). Jumping to „fertig“ or later without 
 right on one jumps: a tap beside the row goes on with the story, and the grown-ups' buttons next to it keep their reach.
 
 The waiting (`WAIT_SCENES`, `scenesFor`): while Tapsi sits, the bathroom picture (`sitzen`, Mama and Papa clapping
-softly) stays as it is, an hourglass turns bottom left (`.pt-wait`) and a thought bubble top left (`.pt-think`) shows
+softly) stays as it is, a clock ticks on the wall above the bathtub (`WaitClock.tsx`, SVG in
+`.pt-scene`, a layer cut exactly like the pictures so it stays on the wall on every screen) and a thought bubble top left (`.pt-think`) shows
 what Tapsi thinks of: the next thought comes by itself every `WAIT_SCENE_MS`, or at once on a tap, round and round
 without end – only thoughts for what the child said: for pipi
-things that flow and splash (watering can, tap, balloon let go, jug, shower), for kaka things that are pressed
-(toothpaste, blowing up a balloon, pushing a basket, sponge, a train through a tunnel), for both or when unsure the two
+things that flow and splash (watering a flower, a fountain, a balloon let go, rain and a puddle, a garden hose), for
+kaka things that are pressed until something comes (ketchup, blowing up a balloon, a hen laying an egg, play dough
+through a press), all with Tapsi alone and away from the bathroom; for both or when unsure the two
 taking turns. A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
-else its emoji (`WaitScene.emoji`); the pictures are not made yet. The old full-screen waiting pictures
-(`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are drawn but not shown
+else its emoji (`WaitScene.emoji`); `prompts.py think` and `frames-think` make them. The old full-screen waiting pictures
+(`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are kept but not shown
 since the user wanted only the helping ones. Only tapped scenes speak (and the first, which explains the ✓).
 Only one of the three green ✓ (a framed group „Was ist im Töpfchen?“, ✓💧, ✓💩 and ✓💧💩, a yellow ring on the one
 the child said; Enter on a keyboard is that one) ends the waiting. So a child can sit on the real potty and play along, and a
@@ -88,7 +90,8 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   tap. The thoughts follow each other by themselves (and on every tap), endlessly; only the ✓ say „fertig“.
 - While sitting the full picture never changes: pictures drawn one by one never match exactly, and swapping them every
   few seconds made the room jump. What changes goes into the thought bubble, drawn away from the bathroom, and a clear
-  animation (the hourglass) shows that everybody waits.
+  animation shows that everybody waits: a clock drawn into the room (on the wall, no frame round it), always moving.
+  Something drawn into a picture goes into `.pt-scene` at its place in the picture's 1376 × 768, never at a screen corner.
 - The thoughts are only for what was said – flowing water and letting go for pipi, pressing for kaka, both
   taking turns for both or ❓ – each with its own sound. A new one goes into `WAIT_SCENES` (with an emoji) and
   `POTTY_TEXTS.scenes`; its picture, when made, gets two frames.

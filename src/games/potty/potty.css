@@ -5,7 +5,7 @@
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
  * calls (.pt-feel, .pt-call), and at the bottom the row of steps (each one a button that jumps there) with the
  * grown-ups' buttons on the right next to it: a choice (.pt-choice) of what the child said (.pt-said) or the three ✓ while
- * sitting (.pt-finish), and „Weiter“ (.pt-next). While sitting the waiting (.pt-wait) and Tapsi's thought bubble (.pt-think).
+ * sitting (.pt-finish), and „Weiter“ (.pt-next). While sitting the clock on the wall (.pt-clock) and Tapsi's thought bubble (.pt-think).
  * Root classes: pt-pipi / pt-kaka / pt-unsure / pt-both (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
  * Only the eating picture moves before the first tap (the game is opened when the child has to go now).
  */
@@ -15,6 +15,8 @@
   inset: 0;
   overflow: hidden;
   background: #fbe7b5;
+  /* For .pt-scene, which is cut like the pictures. */
+  container-type: size;
 }
 
 /* The frames lie on top of each other; the shown one fades in over the other. The pictures are
@@ -304,71 +306,44 @@
   }
 }
 
-/* Everybody waits: bottom left, above the row of steps and below the thought bubble, an hourglass turns over and
-   over, three dots go up and down beside it. */
-.pt-wait {
+/* A layer cut exactly like the pictures (object-fit: cover, object-position 50% 72%), so what is drawn into it
+   stays at its place in the room on every screen. */
+.pt-scene {
   position: absolute;
-  left: max(16px, env(safe-area-inset-left));
-  bottom: calc(max(10px, env(safe-area-inset-bottom)) + clamp(58px, min(5.5vw, 9vmin) + 30px, 82px));
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px 8px 10px;
-  border: 3px solid #2a1e5c;
-  border-radius: 999px;
-  background: #ffffffe6;
-  box-shadow: 0 4px 12px #0003;
+  left: 50%;
+  top: 72%;
+  width: max(100cqw, 100cqh * 1376 / 768);
+  height: max(100cqh, 100cqw * 768 / 1376);
+  transform: translate(-50%, -72%);
   pointer-events: none;
 }
 
-.pt-wait-glass {
-  display: inline-block;
-  font-size: clamp(38px, 11vmin, 72px);
-  line-height: 1;
-  animation: pt-wait-turn 2.4s ease-in-out infinite;
+/* Everybody waits: a clock on the bathroom wall, its red second hand ticking, the long hand going round. */
+.pt-clock {
+  animation: pt-clock-in 0.5s ease-out;
 }
 
-@keyframes pt-wait-turn {
-  0%,
-  70% {
-    transform: rotate(0);
-  }
-  100% {
-    transform: rotate(180deg);
+@keyframes pt-clock-in {
+  from {
+    opacity: 0;
   }
 }
 
-.pt-wait-dots {
-  display: flex;
-  gap: 5px;
+.pt-clock-second {
+  animation: pt-clock-turn 60s steps(60) infinite;
 }
 
-.pt-wait-dots i {
-  width: clamp(9px, 2.4vmin, 16px);
-  height: clamp(9px, 2.4vmin, 16px);
-  border-radius: 50%;
-  background: #2a1e5c;
-  animation: pt-wait-dot 1.2s ease-in-out infinite;
+.pt-clock-minute {
+  animation: pt-clock-turn 20s linear infinite;
 }
 
-.pt-wait-dots i:nth-child(2) {
-  animation-delay: 0.2s;
+.pt-clock-hour {
+  animation: pt-clock-turn 240s linear infinite;
 }
 
-.pt-wait-dots i:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes pt-wait-dot {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.35;
-  }
-  30% {
-    transform: translateY(-8px);
-    opacity: 1;
+@keyframes pt-clock-turn {
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -463,8 +438,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pt-next.nudge,
-  .pt-wait-glass,
-  .pt-wait-dots i {
+  .pt-clock line {
     animation: none;
   }
 }

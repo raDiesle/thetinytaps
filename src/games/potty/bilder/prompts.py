@@ -149,10 +149,52 @@ MOVES = {
               "trousers down at the ankles, the T-shirt covering the tummy, only fur shows; the whole empty potty is visible behind Tapsi's legs, eyes open, smiling."),
 }
 
-def job(a, name, prompt, ref=None):
-  j = dict(out=f"src/games/potty/bilder/{a}-{name}.webp", prompt=prompt, aspect="16:9", size="1376", quality=65)
+# What Tapsi thinks of while sitting, shown in a thought bubble over the still bathroom (content.ts WAIT_SCENES):
+# away from the bathroom, one big clear thing in the middle, the edges plain and light since the bubble cuts them.
+# Tapsi's look comes from "essen", the story's first picture; the second frames from each first one.
+def thought(a, what):
+  k = CAST[a]["kid_short"]
+  return ("Use the reference picture only for Tapsi's look and the drawing style. " + STYLE +
+    "The picture will be shown inside a round thought bubble: one big, clear scene in the middle that a toddler understands at once, "
+    "a soft plain light background that fades to almost white towards all four edges, nothing important near the edges, "
+    "no outline, border, cloud shape or frame drawn around the picture. "
+    "No bathroom, no potty, no toilet, no Mama or Papa. "
+    + CAST[a]["first"] + f", appears exactly once, wearing its trousers. Now this happens: {what} " + END)
+
+THOUGHTS = {
+ # Pipi: things that flow, splash and let go.
+ "giesskanne": "Outside in a sunny garden, Tapsi waters a big yellow sunflower with a small red watering can; a thin stream of water pours from the spout onto the flower. Tapsi smiles.",
+ "brunnen": "In a sunny park, a small round stone fountain bubbles: water shoots up in a high arc and splashes into its basin. Tapsi stands at the edge and holds one paw into the falling water, laughing.",
+ "ballon": "Outside under a blue sky, Tapsi has just let go of a big red balloon: it whizzes up and away, twisting, with a little puff of air behind it. Tapsi looks up after it, mouth open in delight.",
+ "regen": "Outside, a small grey cloud lets it rain onto a few flowers; Tapsi in yellow rain boots jumps into a big puddle, water splashing up. Tapsi laughs.",
+ "schlauch": "In a sunny garden, Tapsi holds a green garden hose and sprays a long arc of water into a small blue paddling pool where a yellow rubber duck floats. Tapsi grins.",
+ # Kaka: things that are pressed until something comes out.
+ "ketchup": "At a small table outside, Tapsi squeezes a big red ketchup bottle with both paws, pressing hard with rosy cheeks; a long red stripe of ketchup comes out onto a plate of noodles.",
+ "aufblasen": "Outside on a meadow, Tapsi blows up a big red balloon, cheeks puffed up round and red with effort, pressing hard, eyes squeezed.",
+ "huhn": "On a farm, a plump brown hen sits in a straw nest and presses with a red face, eyes squeezed shut; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
+ "knete": "At a small table, Tapsi presses colourful play dough (orange, purple, green) through a toy dough press with both paws, pressing hard; long soft dough sausages come out of the holes.",
+}
+THOUGHT_MOVES = {
+ "giesskanne": "the watering can is tipped further, more water pours, the sunflower nods a little",
+ "brunnen": "the water arc is a little higher, new splashes in the basin and on Tapsi's paw",
+ "ballon": "the balloon is further up and smaller, twisting the other way",
+ "regen": "Tapsi has landed, a big splash of the puddle flies up, more raindrops fall",
+ "schlauch": "the water arc reaches further, the rubber duck bobs and splashes",
+ "ketchup": "the bottle is squeezed flatter, the ketchup stripe on the noodles is much longer",
+ "aufblasen": "the balloon is much bigger, the cheeks even rounder",
+ "huhn": "plop: the hen has stood up a little, a white egg lies in the straw under it; Tapsi cheers with both arms up",
+ "knete": "the dough sausages are much longer and curl onto the table, Tapsi presses further down",
+}
+
+def job(a, name, prompt, ref=None, aspect="16:9", size="1376"):
+  j = dict(out=f"src/games/potty/bilder/{a}-{name}.webp", prompt=prompt, aspect=aspect, size=size, quality=65)
   if ref: j["ref"] = [ref]
   return j
+
+def second_of(what):
+  return ("Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters at exactly the same places and sizes, "
+          "same clothes, colours, background, every object where it is, same camera framing (no zoom, no shift), same composition and line style. "
+          f"Nothing appears, disappears or moves except this small movement: {what}. No text, no letters.")
 
 raw = lambda a, n: f".image-raw/{a}-{n}.png"
 
@@ -166,6 +208,8 @@ def stage(st, a):
   if st == "frames-bath": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n not in ["essen", "trinken", "blase", "bauch", "rufen"] and not n.startswith("warten-")]
   if st == "frames-wait": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n.startswith("warten-")]
   # From the game's own pictures: the raw ones of the first round are gone.
+  if st == "think": return [job(a, "denken-" + n, thought(a, w), f"src/games/potty/bilder/{a}-essen.webp", "4:3", "1200") for n, w in THOUGHTS.items()]
+  if st == "frames-think": return [job(a, f"denken-{n}-b", second_of(m), raw(a, "denken-" + n), "4:3", "1200") for n, m in THOUGHT_MOVES.items()]
   if st == "moves": return [job(a, n, earlier(p), f"src/games/potty/bilder/{a}-{n.split('-')[0]}.webp") for n, p in MOVES.items()]
   raise SystemExit("unknown stage")
 

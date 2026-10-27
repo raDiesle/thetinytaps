@@ -121,20 +121,7 @@ export function picturesFor(step: Step, which: Which): string[] {
 }
 
 /** The sound a waiting scene makes when it comes (see PottyPlay.tsx). */
-export type SceneSound =
-  | "trickle"
-  | "splash"
-  | "glug"
-  | "whoosh"
-  | "squeeze"
-  | "blow"
-  | "push"
-  | "drops"
-  | "train"
-  | "dance"
-  | "juggle"
-  | "peekaboo"
-  | "bubbles";
+export type SceneSound = "trickle" | "splash" | "glug" | "whoosh" | "squeeze" | "blow" | "plop" | "dance" | "juggle" | "peekaboo" | "bubbles";
 
 /**
  * What Tapsi thinks of while it sits, in a thought bubble over the still bathroom picture: things that
@@ -152,15 +139,14 @@ export interface WaitScene {
 
 export const WAIT_SCENES: WaitScene[] = [
   { id: "giesskanne", emoji: "🌻💦", need: "pipi", sound: "trickle" },
-  { id: "wasserhahn", emoji: "🚰💦", need: "pipi", sound: "splash" },
+  { id: "brunnen", emoji: "⛲", need: "pipi", sound: "splash" },
   { id: "ballon", emoji: "🎈💨", need: "pipi", sound: "whoosh" },
-  { id: "krug", emoji: "🫗", need: "pipi", sound: "glug" },
-  { id: "dusche", emoji: "🚿🦆", need: "pipi", sound: "trickle" },
-  { id: "zahnpasta", emoji: "🪥", need: "kaka", sound: "squeeze" },
+  { id: "regen", emoji: "🌧️☔", need: "pipi", sound: "trickle" },
+  { id: "schlauch", emoji: "💦🦆", need: "pipi", sound: "splash" },
+  { id: "ketchup", emoji: "🍅🍝", need: "kaka", sound: "squeeze" },
   { id: "aufblasen", emoji: "😤🎈", need: "kaka", sound: "blow" },
-  { id: "schieben", emoji: "🧺💪", need: "kaka", sound: "push" },
-  { id: "schwamm", emoji: "🧽💧", need: "kaka", sound: "drops" },
-  { id: "zug", emoji: "🚂", need: "kaka", sound: "train" },
+  { id: "huhn", emoji: "🐔🥚", need: "kaka", sound: "plop" },
+  { id: "knete", emoji: "🟠🟣🟢", need: "kaka", sound: "squeeze" },
   { id: "tanzen", emoji: "💃🕺", need: "silly", sound: "dance" },
   { id: "jonglieren", emoji: "🤹", need: "silly", sound: "juggle" },
   { id: "kuckuck", emoji: "🙈", need: "silly", sound: "peekaboo" },
@@ -235,16 +221,15 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       party: (name) => `Geschafft! Toll gemacht, ${name}!`,
     },
     scenes: {
-      giesskanne: "Papa gießt die Blume. Plitsch, platsch!",
-      wasserhahn: "Mama lässt das Wasser laufen. Hörst du es plätschern?",
-      ballon: "Mama lässt den Luftballon los. Pfffft!",
-      krug: "Papa gießt Wasser ins Glas. Gluck, gluck, gluck!",
-      dusche: "Papa lässt es regnen. Die Ente wird nass!",
-      zahnpasta: "Papa drückt die Zahnpasta. Drücken, drücken!",
-      aufblasen: "Mama bläst den Ballon auf. Ganz fest pusten!",
-      schieben: "Papa schiebt den schweren Korb. Hau ruck!",
-      schwamm: "Mama drückt den Schwamm aus. Drücken!",
-      zug: "Der Zug fährt durch den Tunnel. Tschu, tschu – und raus!",
+      giesskanne: "Tapsi gießt die Blume. Plitsch, platsch!",
+      brunnen: "Der Brunnen sprudelt. Hörst du es plätschern?",
+      ballon: "Tapsi lässt den Luftballon los. Pfffft!",
+      regen: "Es regnet. Platsch, in die Pfütze!",
+      schlauch: "Tapsi spritzt mit dem Schlauch. Die Ente wird nass!",
+      ketchup: "Tapsi drückt den Ketchup. Drücken, drücken!",
+      aufblasen: "Tapsi bläst den Ballon auf. Ganz fest pusten!",
+      huhn: "Das Huhn drückt ganz fest. Plopp, ein Ei!",
+      knete: "Tapsi drückt die Knete. Da kommen Würstchen raus!",
       tanzen: "Mama und Papa tanzen!",
       jonglieren: "Papa jongliert mit Klopapier!",
       kuckuck: "Wo ist Mama? Kuckuck!",

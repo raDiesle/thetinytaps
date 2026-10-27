@@ -22,7 +22,6 @@ import {
   playScrub,
   playSplash,
   playSqueak,
-  playTrain,
   playTrickle,
   playTusch,
   playBlow,
@@ -50,6 +49,7 @@ import {
 import { framesFor, preloadImages } from "./images";
 import type { PottySettings } from "./settings";
 import { StoryPicture } from "./StoryPicture";
+import { WaitClock } from "./WaitClock";
 import { useWaitingMusic } from "./waitMusic";
 
 const flush = recorded("flush", playFlush);
@@ -231,9 +231,11 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     whoosh: () => playWhoosh(),
     squeeze: () => playSqueak(),
     blow: () => blow(),
-    push: () => playRumble(),
-    drops: () => playDrops(),
-    train: () => playTrain(),
+    // The hen presses (a squeak), then the egg drops.
+    plop: () => {
+      playSqueak();
+      later(700, playPlop);
+    },
     dance: () => {
       playDrumRoll(0);
       later(1000, playTusch);
@@ -373,17 +375,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
           {feels.map((n) => (n === "pipi" ? "💦" : "🌀")).join("")}
         </div>
       )}
-      {/* While sitting: everybody waits (an hourglass turning on the left), Tapsi thinks of things that help in a bubble. */}
-      {sitting && (
-        <div className="pt-wait" aria-hidden>
-          <span className="pt-wait-glass">⏳</span>
-          <span className="pt-wait-dots">
-            <i />
-            <i />
-            <i />
-          </span>
-        </div>
-      )}
+      {/* While sitting: everybody waits (a clock on the wall ticks), Tapsi thinks of things that help in a bubble. */}
+      {sitting && <WaitClock />}
       {thought && (
         <div className="pt-think" aria-hidden>
           <div key={beat} className="pt-think-scene">
