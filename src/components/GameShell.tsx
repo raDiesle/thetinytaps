@@ -46,6 +46,11 @@ interface GameShellProps {
   /** The mode played last, marked on its card. */
   mode?: string;
   onMode?: (id: string) => void;
+  /**
+   * Plays this mode as soon as the page opens, without the start screen, for a game a grown-up opens in the
+   * moment (the child has to go now). The start screen shows only after leaving the game (✕, Esc, „Menü“).
+   */
+  startMode?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
   /** What the game is, how it is played and what helps; behind its own button on the start screen, apart from the settings. */
@@ -64,7 +69,7 @@ interface GameShellProps {
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({ title, emoji, modes, mode, onMode, level, info, settings, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({ title, emoji, modes, mode, onMode, startMode, level, info, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const t = useT();
   const category = categoryOf(location.pathname);
@@ -131,6 +136,15 @@ export function GameShell({ title, emoji, modes, mode, onMode, level, info, sett
       window.removeEventListener("gesturestart", block);
     };
   }, [playing]);
+
+  // A game that starts at once does so only when the page opens, once (React runs effects twice while developing).
+  const started = useRef(false);
+  useEffect(() => {
+    if (!startMode || started.current) return;
+    started.current = true;
+    onMode?.(startMode);
+    void start();
+  }, []);
 
   if (playing) {
     return (

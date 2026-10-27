@@ -8,8 +8,9 @@ feels (💦 for pipi, the picture shakes when the tummy rumbles), the call bubbl
 child said while eating, the two green ✓ while sitting,
 the row of step icons at the bottom, confetti.
 
-„Muss mal!“ (`PottyPlay.tsx`, mode `story`): one story for both needs, since a child often can't tell beforehand;
-the card starts it at once. While Tapsi eats and drinks (before the `need` step), three round buttons bottom right
+„Muss mal!“ (`PottyPlay.tsx`, mode `story`): one story for both needs, since a child often can't tell beforehand.
+Opening the game (its tile on the home menu) starts it at once (`GameShell`'s `startMode`); the start screen with
+„Hat geklappt!“, the info and the cards shows only after leaving with ✕ or „Menü“. While Tapsi eats and drinks (before the `need` step), three round buttons bottom right
 (`SAID`: 💧, 💩, ❓) let a grown-up tap what the child said; untouched it stays `unsure`. Tapsi the fox (`TAPSI` in `content.ts`) sits at the kitchen
 table, still and silent. Every tap or key is the next step (`STEPS`): eat, drink, the bladder presses or the tummy rumbles (`need`; when
 unsure Tapsi „muss mal“, the bladder and the tummy picture take turns as frames, `picturesFor`, and the row shows ❓),
@@ -42,6 +43,8 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 
 - Only Tapsi goes to the potty (the user's choice, to save pictures and tokens): every animal more would need the
   whole story of about 50 pictures drawn again. Never add another animal or family unless the user asks for it.
+- The game is opened when the child has to go now: the tile starts „Muss mal!“ at once, with no start screen or
+  submenu before it. Anything else (the star, the info) lives on the start screen behind ✕.
 - What the child has to do is chosen inside the story, never on the start screen (neither a card each nor a choice
   above the cards): „Muss mal!“ starts at once, what the child said is tapped on round buttons while Tapsi eats (💧,
   💩, ❓, unsure when untouched), what came on the two ✓ while sitting – a child saying „Pipi“ may still do kaka.

@@ -25,6 +25,8 @@ export function PottyGame() {
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as PottyMode })}
+      // Opened when the child has to go: the story starts at once; „Hat geklappt!“ and the info are behind ✕.
+      startMode="story"
       info={
         <>
           <p>
@@ -44,7 +46,7 @@ export function PottyGame() {
           </p>
           <p>
             {t({
-              de: "Töpfchentraining beginnt meist zwischen 2 und 3 Jahren, wenn das Kind merkt, dass es muss. Druck hilft nicht; Mitfreuen und feste Zeiten (nach dem Aufwachen, nach dem Essen) schon.",
+              de: "Das Spiel startet sofort mit „Muss mal!“, wenn Sie es öffnen – hierher kommen Sie, wenn Sie ✕ gedrückt halten. Töpfchentraining beginnt meist zwischen 2 und 3 Jahren, wenn das Kind merkt, dass es muss. Druck hilft nicht; Mitfreuen und feste Zeiten (nach dem Aufwachen, nach dem Essen) schon.",
             })}
             {!touchOnly && (
               <>

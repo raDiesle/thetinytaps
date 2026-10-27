@@ -153,7 +153,8 @@ src/content/             home menu (games.ts), language packs (de/en/tr/pl), ide
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
-- Start screen: what the game is and how it is played (also keys and tips for grown-ups) goes into `info`
+- Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now) skips it with `startMode` and plays
+  at once; the start screen comes only after ✕ or „Menü“. What the game is and how it is played (also keys and tips for grown-ups) goes into `info`
   („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
   that explain them. A game adds no own switch for what the home page already sets for all games
   (Vorlesen, Töne, Musik, Sprache), nor a choice for what the game can tell by itself (morning or evening by the clock).
