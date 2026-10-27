@@ -20,15 +20,10 @@ Die Stufen nacheinander, jede braucht die Bilder der vorigen als Referenz (`.ima
 5. `wait` – die Warte-Szenen (`warten-…`), mit `sitzen` als einziger Referenz: dort sitzt das Kind schon auf dem
    Töpfchen. Mit `bad` als Referenz blieb das Töpfchen leer in der Mitte stehen und das Kind saß daneben auf nichts.
 6. `frames-kitchen`, `frames-bath`, `frames-wait` – die zweiten Frames, jeder mit seinem ersten als Referenz.
-7. `moves` – die Bewegung vor einem Bild (`Step.moves`): `runter-1`, `runter-2` (Hose noch oben, auf den Knien) vor
-   `runter`, `sitzen-1`, `sitzen-2` (steht vor dem Töpfchen, setzt sich) vor `sitzen`, jedes mit dem Endbild als
-   einziger Referenz (aus `bilder/`, die Rohbilder der ersten Runde sind weg).
-
-## Geplant
-
-Die vier Bilder von `moves` (Stufe 7): beim ersten Versuch am 27.10.2026 war das Gemini-Guthaben aufgebraucht.
-Sind sie da, kommen sie als `moves: ["runter-1", "runter-2"]` an den Schritt `down` und `moves: ["sitzen-1", "sitzen-2"]`
-an `sit` in `content.ts`.
+7. `moves` – die Bewegung vor einem Bild (`Step.moves`): `runter-1`, `runter-2` (Hose noch oben, an den Knien) vor
+   `runter`, `sitzen-1` (steht vor dem Töpfchen) vor `sitzen`, jedes mit dem Endbild als einziger Referenz (aus
+   `bilder/`, die Rohbilder der ersten Runde sind weg). Der Prompt muss sagen, was noch NICHT so ist, sonst zeichnet
+   das Modell die Endpose. Ein Bild „halb hingesetzt“ gelang in drei Versuchen nicht (es saß immer schon) und fehlt.
 
 Nur Tapsi geht aufs Töpfchen – jedes weitere Tier bräuchte alle rund 50 Bilder noch einmal. Ein anderes Tier nur,
 wenn es ausdrücklich gewünscht ist.

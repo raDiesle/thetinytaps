@@ -190,7 +190,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         sound(STEPS[index].moves ? 700 : 0, playWhoosh);
         break;
       case "sit":
-        sound(STEPS[index].moves ? 1500 : 300, playPlop);
+        sound(STEPS[index].moves ? 800 : 300, playPlop);
         break;
       case "done":
         if (came !== "kaka") sound(0, playTrickle);

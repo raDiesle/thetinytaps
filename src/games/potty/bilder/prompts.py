@@ -138,11 +138,15 @@ def earlier(what):
           "the small turquoise potty exactly where it stands, Mama and Papa exactly as they are (same places, poses and faces), the same camera framing (no zoom, no shift), "
           f"the same colours and line style. Tapsi stays at the same place and size. Nothing appears, disappears or moves except Tapsi: {what} No text, no letters.")
 
+# The model keeps the end pose from the reference unless the prompt says plainly what is NOT so yet (first try:
+# trousers already at the ankles, the child already sitting). Halfway down onto the potty never worked: three tries
+# with the Lite model all drew the child sitting, so sitting down is only "sitzen-1" (standing in front) before "sitzen".
 MOVES = {
  "runter-1": "the blue trousers are still up at the waist, fully on; Tapsi holds the waistband with both paws, ready to pull them down, smiling.",
- "runter-2": "Tapsi bends forward a little and pushes the blue trousers down with both paws, the trousers are halfway down at the knees; the T-shirt covers the tummy, only fur shows.",
- "sitzen-1": "Tapsi stands upright right in front of the potty, back to it, about to sit down, trousers down at the ankles, the T-shirt covering the tummy, only fur shows; the empty potty is seen behind Tapsi's legs.",
- "sitzen-2": "Tapsi bends the knees and lowers the bottom onto the potty, halfway down, just above it, not touching it yet, paws stretched forward for balance, trousers at the ankles, the T-shirt covering the tummy, only fur shows.",
+ "runter-2": ("the blue trousers are NOT at the ankles yet: they are bunched around Tapsi's knees, halfway down, the lower legs below them show orange fur and the feet; "
+              "Tapsi bends forward a little with both paws on the trousers at the knees, eyes open, smiling; the T-shirt covers the tummy, only fur shows."),
+ "sitzen-1": ("Tapsi is NOT sitting yet: Tapsi stands upright on both feet on the floor right in front of the potty, straight legs, back to the potty, "
+              "trousers down at the ankles, the T-shirt covering the tummy, only fur shows; the whole empty potty is visible behind Tapsi's legs, eyes open, smiling."),
 }
 
 def job(a, name, prompt, ref=None):

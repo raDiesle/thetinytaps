@@ -105,6 +105,10 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
   drawn from the picture where it already does so, not from the place's first picture: from the empty room the
   model drew the potty again where it stood and the child sitting on nothing beside it. Say in the prompt that
   there is only one of the thing.
+- **A moment before a picture** (trousers still up, about to sit down) is drawn from that picture as the only `--ref`,
+  so the room stays the same – but the model keeps the reference's pose unless told plainly what is not so yet:
+  "Tapsi is NOT sitting yet: stands upright …, a visible gap between …". With only the wanted pose described, the
+  child sat on the potty again and the trousers were at the ankles again. Look at each one: does the pose really differ?
 - **`2x2` only for pictures that are never shown big** (icons, stickers, small
   cards): each panel is only about 590 px wide.
 - Check both pieces: nothing cut off at the inner edges, no pink seam left.

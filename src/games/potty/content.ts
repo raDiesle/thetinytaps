@@ -85,9 +85,9 @@ export const STEPS: Step[] = [
   { id: "call", icon: "📣", picture: "rufen", ms: 1800, auto: 4000 },
   { id: "go", icon: "🚪", picture: "bad", ms: 1800, auto: 4000 },
   // The child takes its own trousers down: no timer, „Weiter“ when it's done.
-  { id: "down", icon: "👖", arrow: "↓", picture: "runter", ms: 1200 },
+  { id: "down", icon: "👖", arrow: "↓", picture: "runter", moves: ["runter-1", "runter-2"], ms: 1200 },
   // Sitting down goes on by itself into the waiting, which has no fixed length: scene after scene until the ✓ (see WAIT_SCENES).
-  { id: "sit", icon: "⏳", picture: "sitzen", ms: SIT_GUARD_MS, auto: 3000 },
+  { id: "sit", icon: "⏳", picture: "sitzen", moves: ["sitzen-1"], ms: SIT_GUARD_MS, auto: 3000 },
   { id: "done", icon: { pipi: "💧", kaka: "💩" }, picture: { pipi: "fertig-pipi", kaka: "fertig-kaka" }, ms: 2000, auto: 3500 },
   { id: "wipe", icon: "🧻", picture: "abwischen", ms: 1600 },
   { id: "up", icon: "👖", arrow: "↑", picture: "hoch", ms: 1200 },

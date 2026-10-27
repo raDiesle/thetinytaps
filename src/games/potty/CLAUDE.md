@@ -65,8 +65,10 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 - The story goes on by itself only where nothing real has to happen (`Step.auto`); where the child does something
   itself (trousers down, wipe, trousers up, flush, wash) it waits for a tap or „Weiter“. Every step without its own
   buttons for going on has „Weiter“ (`potty.test.ts` checks which steps wait).
-- The grown-ups' buttons (what was said, „Weiter“, the ✓) are small, pale and still, in the bottom right corner level
-  with the row of steps: the child looks at the story, not at them. No pulsing, no pointing hand, nothing big on them.
+- The grown-ups' buttons (what was said, „Weiter“, the ✓) sit in the bottom right corner level with the row of steps,
+  mid-sized and still: the child looks at the story, not at them – no pulsing, no pointing hand. But they must read as
+  buttons at once (white or coloured, dark outline, raised with a shadow, pressed in on a tap); pale see-through circles
+  were too faint for the user.
 - A grown-up can jump to any step at any time by tapping it in the row; keep every step reachable that way.
 - What the child has to do is chosen inside the story, never on the start screen (neither a card each nor a choice
   above the cards): „Muss mal!“ starts at once, what the child said is noted while Tapsi calls (💧, 💩, 💧💩, ❓,

@@ -42,11 +42,13 @@ export function StoryPicture({
   // The floor always shows, so the shown frame only fades in over it – never a gap. During the animation it is
   // its first picture, then the picture's first frame, so nothing of the animation shines through the frames.
   const floor = intro ? 0 : once.length;
+  // When the animation ends its last picture stays below the picture's first frame while that fades in, so nothing flickers.
+  const below = intro ? -1 : once.length - 1;
 
   return (
     <div className={className}>
       {[...once, ...loop].map((src, i) => (
-        <img key={src} className={i === shown ? "on" : i === floor ? "base" : undefined} src={src} alt="" decoding="async" draggable={false} />
+        <img key={src} className={i === shown ? "on" : i === floor || i === below ? "base" : undefined} src={src} alt="" decoding="async" draggable={false} />
       ))}
     </div>
   );
