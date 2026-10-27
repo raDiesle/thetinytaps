@@ -4,6 +4,7 @@
  * the game (and must be prefixed, see CLAUDE.md).
  */
 @import "./styles/base.css";
+@import "./styles/animations.css";
 @import "./styles/sky.css";
 @import "./styles/menus.css";
 @import "./styles/start-screen.css";

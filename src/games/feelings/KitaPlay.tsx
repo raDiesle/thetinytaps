@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { type Localized, useT } from "@/lib/language";
 import { imageFor, preloadImages, storyImages } from "./images";
-import { QUESTION, type Situation } from "./kita";
+import type { Situation } from "./kita";
 import type { FeelingsSettings } from "./settings";
 import {
   CHEER_MS,
@@ -20,9 +19,6 @@ import {
   type PictureLook,
 } from "./shared";
 import { beatMs, type Beat } from "./story";
-
-/** Asked before every step after the first. */
-const NEXT_QUESTION: Localized = { de: "Und jetzt?", ru: "А теперь?" };
 
 type Phase = "intro" | "steps" | "outro" | "done";
 
@@ -50,23 +46,28 @@ function freshRun(key: number): Run {
   return { key, phase: "intro", stepsDone: 0, tried: false, trying: false, picked: null, cheering: false, busy: true };
 }
 
-/** The big picture for this moment: what happened, a card tapped once, the step the bear just did, the not-so-good idea, or the happy end. */
-function pictureName(situation: Situation, { phase, stepsDone, trying, picked }: Run): string {
+/**
+ * The big picture for this moment: a card tapped once, the not-so-good idea, the happy end, the step the bear is doing,
+ * and otherwise – before every choice – what happened, so each step starts from the same picture.
+ */
+function pictureName(situation: Situation, { phase, stepsDone, trying, picked, busy }: Run): string {
   const { id, steps } = situation;
   if (picked === "good") return storyImages.step(id, stepsDone);
   if (trying || picked === "instead") return storyImages.instead(id, stepsDone);
   if (phase === "outro" || phase === "done") {
     return imageFor(storyImages.end(id)) ? storyImages.end(id) : storyImages.step(id, steps.length - 1);
   }
-  return stepsDone > 0 ? storyImages.step(id, stepsDone - 1) : storyImages.problem(id);
+  return busy && stepsDone > 0 ? storyImages.step(id, stepsDone - 1) : storyImages.problem(id);
 }
 
 /** What the big picture shows, in a few words for grown-ups. */
-function pictureCaption(situation: Situation, { phase, stepsDone, trying, picked }: Run): string {
+function pictureCaption(situation: Situation, { phase, stepsDone, trying, picked, busy }: Run): string {
   if (picked === "good") return situation.steps[stepsDone].caption;
   if (trying || picked === "instead") return situation.steps[stepsDone].instead.caption;
   if (phase === "outro" || phase === "done") return situation.endCaption;
-  return stepsDone > 0 ? situation.steps[stepsDone - 1].caption : situation.caption;
+  // While the child chooses, the step's question: it tells grown-ups who acts.
+  if (phase === "steps" && !busy) return situation.steps[stepsDone].question;
+  return busy && stepsDone > 0 ? situation.steps[stepsDone - 1].caption : situation.caption;
 }
 
 /** Im Kindergarten: one story (its words already in the app language), step by step. `onNext` goes on to the next story. */
@@ -76,7 +77,6 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
   const { later, clearAll } = useTimers();
   const { say, sound } = useVoice(settings);
   const { floaters, float } = useFloaters();
-  const t = useT();
 
   /** Plays the beats one after another, then calls `then`. */
   const playBeats = useCallback(
@@ -114,9 +114,9 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
     setRun(freshRun(nextKey.current++));
     playBeats(situation.intro, () => {
       setRun((r) => ({ ...r, phase: "steps" }));
-      ask(t(QUESTION));
+      ask(situation.steps[0].question);
     });
-  }, [situation, clearAll, playBeats, ask, t]);
+  }, [situation, clearAll, playBeats, ask]);
 
   useEffect(() => startSituation(), []);
 
@@ -131,7 +131,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
         playBeats(step.beats, () => {
           if (i + 1 < situation.steps.length) {
             setRun((r) => ({ ...r, tried: false }));
-            ask(t(NEXT_QUESTION));
+            ask(situation.steps[i + 1].question);
             return;
           }
           setRun((r) => ({ ...r, phase: "outro" }));
@@ -139,7 +139,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
         });
       }, CHEER_MS);
     },
-    [situation, say, sound, float, later, playBeats, ask, t],
+    [situation, say, sound, float, later, playBeats, ask],
   );
 
   // The not-so-good idea stays big in a red frame that shakes, with crying or a crash, while the answer says why.
@@ -166,13 +166,18 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
     [ready, run.picked, run.stepsDone, sound, doStep, tryInstead],
   );
 
+  /** Back from a card looked at big to the first picture, without choosing. */
+  const unpick = useCallback(() => setRun((r) => ({ ...r, picked: null })), []);
+
   // The left arrow picks the not-so-good idea on the left; every other key picks the good idea, so mashing keys still tells the story.
+  // Backspace goes back from a card looked at big.
   const pressKey = useCallback(
     (key: string) => {
       if (run.phase === "done") return onNext();
+      if (key === "Backspace" && run.picked) return unpick();
       pick(!run.tried && key === "ArrowLeft" ? "instead" : "good");
     },
-    [run.phase, run.tried, onNext, pick],
+    [run.phase, run.tried, run.picked, onNext, pick, unpick],
   );
 
   useEffect(() => {
@@ -232,6 +237,7 @@ export function KitaPlay({ situation, settings, onNext }: { situation: Situation
           caption={caption}
           look={look}
           zoom={run.picked !== null}
+          back={{ image: storyImages.problem(situation.id), onBack: unpick }}
           onPointerDown={() => run.picked && pick(run.picked)}
         >
           <FloaterLayer floaters={floaters} />

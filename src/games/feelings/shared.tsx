@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { useLeaveGame } from "@/components/GameShell";
-import { appLanguage, pick, useAppLanguage, useT, type Localized } from "@/lib/language";
+import { appLanguage, pick, useAppLanguage, useT, voiceFor, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { framesFor, imageFor } from "./images";
+import { framesFor } from "./images";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
 
@@ -62,18 +62,18 @@ export function useTimers() {
   return { later, clearAll };
 }
 
-/** Speech and sounds as the parent set them up; speech in the app language, as every text of the stories is. */
+/** Speech and sounds as the parent set them up; speech in the app language, a line not translated yet (still German) with the German voice. */
 export function useVoice(settings: FeelingsSettings) {
-  const { speechLang } = useAppLanguage();
+  const language = useAppLanguage();
   useEffect(() => {
     if (settings.sounds) loadRecordings(RECORDED_SOUNDS);
   }, [settings.sounds]);
 
   const say = useCallback(
     (text: string, queue = false) => {
-      if (settings.speech) speak(text, speechLang, { queue, rate: 0.85 });
+      if (settings.speech) speak(text, voiceFor(text, language), { queue, rate: 0.85 });
     },
-    [settings.speech, speechLang],
+    [settings.speech, language],
   );
 
   const sound = useCallback(
@@ -139,6 +139,20 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
  */
 export type PictureLook = "story" | "quiet" | "option" | "good" | "bad";
 
+/** Which of `count` frames shows now: they take turns while `moving`, like a tiny GIF; otherwise the first. */
+function useFrame(count: number, moving: boolean): number {
+  const [frame, setFrame] = useState(0);
+  const loops = moving && count > 1;
+
+  useEffect(() => {
+    if (!loops || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
+    return () => clearInterval(timer);
+  }, [loops]);
+
+  return loops ? frame % count : 0;
+}
+
 /** How long the picture of a tapped card takes to grow from the card to its place. */
 const ZOOM_MS = 320;
 
@@ -153,6 +167,7 @@ export function StoryPicture({
   caption,
   look = "story",
   zoom = false,
+  back,
   children,
   onPointerDown,
 }: {
@@ -162,20 +177,15 @@ export function StoryPicture({
   look?: PictureLook;
   /** Grows out of the card with the same picture when it appears, so the child sees which card it is. */
   zoom?: boolean;
+  /** While a card is looked at big: the picture to go back to (the story's first one), small in the corner, and what tapping it does. */
+  back?: { image: string; onBack: () => void };
   /** Things on top of the picture: floating hearts. */
   children?: ReactNode;
   onPointerDown?: (e: PointerEvent) => void;
 }) {
   const frames = framesFor(name);
-  const [frame, setFrame] = useState(0);
-  const moving = frames.length > 1;
+  const shown = useFrame(frames.length, true);
   const frameRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!moving || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
-    return () => clearInterval(timer);
-  }, [moving]);
 
   // Before the first paint: start where the card is and grow to the picture's place.
   useLayoutEffect(() => {
@@ -198,23 +208,29 @@ export function StoryPicture({
     return () => grow.cancel();
   }, []);
 
-  const shown = frame % Math.max(frames.length, 1);
-
   return (
-    <>
-      <div ref={frameRef} className={`fg-frame fg-look-${look}`} onPointerDown={onPointerDown}>
-        <div className="fg-picture">
-          {frames.map((src, i) => (
-            <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
-          ))}
-          {children}
-        </div>
-        {/* On the corner, not over the picture, so what happened stays to be seen. */}
-        {look === "good" && <Mark good className="fg-picture-mark" />}
-        {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
+    <div ref={frameRef} className={`fg-frame fg-look-${look}`} onPointerDown={onPointerDown}>
+      <div className="fg-picture">
+        {frames.map((src, i) => (
+          <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
+        ))}
+        {frames.length === 0 && <Placeholder name={name} />}
+        {children}
+        {/* A card looked at big: a hand taps it again and again, so the child knows one more tap chooses it. */}
+        {look === "option" && (
+          <span className="fg-tap-hint" aria-hidden>
+            <span className="fg-tap-ripple" />
+            <span className="fg-tap-hand">👆</span>
+          </span>
+        )}
       </div>
+      {/* A card looked at big, but not wanted: the first picture, small on the corner with an arrow back – tapped, it is big again. */}
+      {look === "option" && back && <BackButton image={back.image} onBack={back.onBack} />}
+      {/* On the corner, not over the picture, so what happened stays to be seen. */}
+      {look === "good" && <Mark good className="fg-picture-mark" />}
+      {look === "bad" && <Mark good={false} className="fg-picture-mark" />}
       <p className="fg-caption fg-picture-caption">{caption}</p>
-    </>
+    </div>
   );
 }
 
@@ -241,6 +257,9 @@ export function ChoiceCard({
   onChoose?: () => void;
 }) {
   const active = state === "choose" || state === "picked";
+  // A card that can be chosen moves like the big picture, so the child sees what happens before choosing it.
+  const frames = framesFor(image);
+  const shown = useFrame(frames.length, active);
   return (
     <div className={`fg-choice${small ? " small" : ""}`}>
       <button
@@ -256,7 +275,10 @@ export function ChoiceCard({
           if (active) onChoose?.();
         }}
       >
-        <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} />
+        {frames.map((src, i) => (
+          <img key={src} className={`fg-card-image${i === shown ? " on" : ""}`} src={src} alt="" decoding="async" draggable={false} />
+        ))}
+        {frames.length === 0 && <Placeholder name={image} />}
         {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>
@@ -264,6 +286,45 @@ export function ChoiceCard({
         {caption}
       </span>
     </div>
+  );
+}
+
+/** Back to the story's first picture: a small copy of it with a ↩ on it, in the big picture's corner. */
+function BackButton({ image, onBack }: { image: string; onBack: () => void }) {
+  const t = useT();
+  const src = framesFor(image)[0];
+  return (
+    <button
+      type="button"
+      className="fg-back"
+      data-tap
+      aria-label={t({ de: "Zurück zum Bild" })}
+      onPointerDown={(e: PointerEvent) => {
+        e.stopPropagation();
+        onBack();
+      }}
+    >
+      {src ? <img src={src} alt="" decoding="async" draggable={false} /> : <Placeholder name={image} />}
+      <svg className="fg-back-arrow" viewBox="0 0 24 24" aria-hidden>
+        <path d="M9 14 4 9l5-5" />
+        <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+      </svg>
+    </button>
+  );
+}
+
+/**
+ * Stands where a picture is planned but not made yet: its file name, so the grown-up can look up its prompt in
+ * bilder/README.md („Geplant“) and make it (`/bild-erzeugen`). The caption under it says what it will show.
+ */
+function Placeholder({ name }: { name: string }) {
+  return (
+    <span className="fg-placeholder">
+      <span className="fg-placeholder-icon" aria-hidden>
+        🖼️
+      </span>
+      <span className="fg-placeholder-name">{name}</span>
+    </span>
   );
 }
 

@@ -1,7 +1,7 @@
-// Zu Hause: the bear and his feelings, what he feels and what helps. Three kind
-// things make him happy again, one not-so-good idea lies among them; tapping the
-// bear strokes him, which always helps too. On his birthday he is happy already,
-// and the three kind things are celebrating with him.
+// Zu Hause: the bear and his feelings, what he feels and what helps. Three rounds,
+// each showing how he feels at the start next to two cards: a not-so-good idea and
+// a kind thing. Three kind things make him happy again. On his birthday he is happy
+// already, and the three kind things are celebrating with him.
 
 import type { OopsSound, SoundName } from "./story";
 
@@ -86,6 +86,13 @@ export const COMFORTS: Record<ComfortId, Comfort> = {
   },
 };
 
+/** A not-so-good idea at home: what its picture shows, why it doesn't help (read aloud), and what is heard (see `KitaInstead.sound`). */
+export interface BearInstead {
+  caption: string;
+  answer: string;
+  sound?: OopsSound;
+}
+
 export type FeelingId = "sad" | "angry" | "tired" | "scared" | "happy";
 
 /** How the bear feels at the start, and what makes him happy again. */
@@ -95,14 +102,15 @@ export interface Feeling {
   emoji: string;
   /** The scene in a few words („Angst bei Gewitter“): on the start screen and under the first picture. */
   title: string;
-  /** Read aloud with the question. */
-  intro: string;
-  /** Asked after the intro, if not „Wie kannst du ihm helfen?“. */
-  question?: string;
-  /** The kind things on the cards, the best one first. */
+  /**
+   * One question per round, read aloud and shown under the picture while the child chooses: how he feels, then who
+   * acts – „Was machst du?“ when the child helps him, „Was kann er machen?“ when he does it himself.
+   */
+  questions: string[];
+  /** The kind things, one per round, the best one first. */
   comforts: ComfortId[];
-  /** The not-so-good idea, the first card: what its picture shows, why it doesn't help (read aloud), and what is heard (see `KitaInstead.sound`). */
-  instead: { caption: string; answer: string; sound?: OopsSound };
+  /** The not-so-good idea of each round, next to the kind thing of the same round (`bearImages.instead(id, i)`). */
+  instead: BearInstead[];
   /** Read aloud when he is happy again: what is told, then what he says. */
   end: { narration: string; line: string };
   /** What the picture of him happy again shows. */
@@ -114,9 +122,17 @@ export const FEELINGS: Feeling[] = [
     id: "sad",
     emoji: "😢",
     title: "Traurig, weint",
-    intro: "Der Bär ist traurig. Er weint.",
+    questions: [
+      "Der Bär ist traurig und weint. Was machst du?",
+      "Der Bär ist noch traurig. Was machst du?",
+      "Der Bär ist noch ein bisschen traurig. Was machst du?",
+    ],
     comforts: ["hug", "stroke", "teddy"],
-    instead: { caption: "Teddy wegnehmen", answer: "Hmm, jetzt weint der Bär noch mehr. Tröste ihn lieber." },
+    instead: [
+      { caption: "Wegschubsen", answer: "Hmm, Schubsen tut weh. Nimm ihn lieber in den Arm.", sound: "aua" },
+      { caption: "Spielzeug kaputt machen", answer: "Hmm, jetzt ist sein Spielzeug kaputt. Streichel ihn lieber.", sound: "crash" },
+      { caption: "Bauklötze wegnehmen", answer: "Hmm, jetzt weint der Bär noch mehr. Gib ihm lieber seinen Teddy." },
+    ],
     end: { narration: "Jetzt ist der Bär wieder fröhlich!", line: "Danke!" },
     endCaption: "Wieder fröhlich",
   },
@@ -124,9 +140,17 @@ export const FEELINGS: Feeling[] = [
     id: "angry",
     emoji: "😠",
     title: "Wut, Turm umgefallen",
-    intro: "Der Bär ist wütend! Sein Turm ist umgefallen.",
+    questions: [
+      "Der Turm ist umgefallen, der Bär ist wütend. Was kann er machen?",
+      "Der Bär ist noch wütend. Was kann er machen?",
+      "Der Bär ist noch ein bisschen wütend. Was machst du?",
+    ],
     comforts: ["stomp", "blow", "hug"],
-    instead: { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", sound: "crash" },
+    instead: [
+      { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", sound: "crash" },
+      { caption: "Laut schreien", answer: "Hmm, vom Schreien wird die Wut noch größer. Puste lieber ganz tief: Puuuh." },
+      { caption: "Hauen", answer: "Hmm, Hauen tut weh. Nimm ihn lieber in den Arm.", sound: "aua" },
+    ],
     end: { narration: "Die Wut ist weg. Der Bär ist wieder ruhig.", line: "Danke!" },
     endCaption: "Wieder ruhig",
   },
@@ -134,9 +158,13 @@ export const FEELINGS: Feeling[] = [
     id: "tired",
     emoji: "😴",
     title: "Müde am Abend",
-    intro: "Der Bär ist müde. Er gähnt.",
+    questions: ["Der Bär ist müde und gähnt. Was machst du?", "Der Bär ist noch wach. Was machst du?", "Der Bär ist fast eingeschlafen. Was machst du?"],
     comforts: ["blanket", "lullaby", "teddy"],
-    instead: { caption: "Laut trommeln", answer: "Hmm, so laut kann der Bär nicht schlafen. Sei lieber ganz leise." },
+    instead: [
+      { caption: "Decke wegziehen", answer: "Hmm, ohne Decke friert der Bär. Deck ihn lieber zu." },
+      { caption: "Laut trommeln", answer: "Hmm, so laut kann der Bär nicht schlafen. Sei lieber ganz leise." },
+      { caption: "Tablet zeigen", answer: "Hmm, das helle Bild macht den Bären wieder wach. Gib ihm lieber seinen Teddy." },
+    ],
     end: { narration: "Der Bär schläft glücklich ein. Gute Nacht!", line: "Gute Nacht …" },
     endCaption: "Schläft ein",
   },
@@ -144,9 +172,13 @@ export const FEELINGS: Feeling[] = [
     id: "scared",
     emoji: "😨",
     title: "Angst bei Gewitter",
-    intro: "Der Bär hat Angst. Es donnert!",
+    questions: ["Es donnert, der Bär hat Angst. Was machst du?", "Der Bär hat noch Angst. Was machst du?", "Es ist so dunkel. Was machst du?"],
     comforts: ["hug", "hand", "light"],
-    instead: { caption: "Licht ausmachen", answer: "Hmm, im Dunkeln hat der Bär noch mehr Angst. Mach lieber Licht an." },
+    instead: [
+      { caption: "„Buh!“ machen", answer: "Hmm, jetzt hat der Bär noch mehr Angst. Nimm ihn lieber in den Arm." },
+      { caption: "Allein lassen", answer: "Hmm, allein hat der Bär noch mehr Angst. Halt lieber seine Pfote." },
+      { caption: "Licht ausmachen", answer: "Hmm, im Dunkeln hat der Bär noch mehr Angst. Mach lieber Licht an." },
+    ],
     end: { narration: "Das Gewitter ist vorbei. Der Bär lacht wieder!", line: "Danke!" },
     endCaption: "Wieder fröhlich",
   },
@@ -154,14 +186,14 @@ export const FEELINGS: Feeling[] = [
     id: "happy",
     emoji: "🥳",
     title: "Freude, Geburtstag",
-    intro: "Der Bär hat Geburtstag! Er freut sich so.",
-    question: "Wie feierst du mit ihm?",
+    questions: ["Der Bär hat Geburtstag! Wie feierst du mit ihm?", "Der Bär feiert noch. Was machst du?", "Der Bär freut sich so. Was machst du?"],
     comforts: ["dance", "streamers", "hug"],
-    instead: { caption: "Kuchen wegnehmen", answer: "Hmm, das ist sein Geburtstagskuchen. Jetzt ist er traurig. Feier lieber mit ihm." },
+    instead: [
+      { caption: "Luftballon kaputt machen", answer: "Hmm, jetzt ist sein Luftballon kaputt. Tanz lieber mit ihm.", sound: "crash" },
+      { caption: "Geschenk wegnehmen", answer: "Hmm, das ist sein Geschenk. Jetzt ist er traurig. Feier lieber mit ihm." },
+      { caption: "Kuchen wegnehmen", answer: "Hmm, das ist sein Geburtstagskuchen. Jetzt ist er traurig. Feier lieber mit ihm." },
+    ],
     end: { narration: "Was für ein schöner Geburtstag!", line: "Danke! Das war toll!" },
     endCaption: "Geburtstagsfeier",
   },
 ];
-
-/** This many kind things make the bear happy again. */
-export const COMFORTS_NEEDED = 3;

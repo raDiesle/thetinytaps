@@ -72,7 +72,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
     ],
   },
-  { href: "/gefuehle/", languages: { de: "done", ru: "done" } },
+  {
+    href: "/gefuehle/",
+    languages: { de: "done", ru: "partial" },
+    note: "Russisch fehlt noch: zu Hause je Gefühl zwei nicht so gute Ideen, beim traurigen Bären alle drei (Runde mit nur zwei Karten, Oktober 2026) und zwei Absätze unter „Über das Spiel“; bis dahin auf Deutsch mit deutscher Stimme. Dazu die Fragen vor jeder Wahl, die sagen, wer handelt („Was machst du?“ / „Was kann der kleine Bär tun?“, Oktober 2026): bis dahin fragt Russisch allgemein („Как ты можешь ему помочь?“, „Что может сделать Мишка?“).",
+  },
   { href: "/kettenreaktion/", languages: { de: "done", ru: "done" } },
   { href: "/kleine-abenteuer/", languages: { de: "done", ru: "done" } },
   { href: "/tiere/", languages: { de: "done", ru: "done" } },
@@ -93,13 +97,26 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "🪥 Hinweise und Bilder",
-        languages: { de: "done", ru: "done" },
+        languages: { de: "done", ru: "partial" },
+        note: "Russisch fehlt nur „Musik lädt …“ (wenn das Lied nach dem Vorspann noch nicht da ist).",
       },
       {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
-        languages: { de: "done", en: "done", zh: "done", es: "done", ru: "done", it: "done" },
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ru: "done", it: "done" },
         note: "Text und Lied von Suno, eine neue Sprache: /zahnputzlied.",
+      },
+    ],
+  },
+  {
+    href: "/toepfchen/",
+    parts: [
+      { label: "🚽 Bilder und Texte", languages: { de: "done" }, note: "Neu im Oktober 2026, nur auf Deutsch." },
+      {
+        label: "🎵 Warte-Lied (gesungen)",
+        recorded: true,
+        languages: {},
+        note: "Noch keins: bis dahin wiederholt sich eine kleine Melodie. Ein Lied von Suno pro Sprache, endlos wiederholbar: src/games/potty/musik/musik-toepfchen-warten-<Sprache>.mp3 (/musik-erzeugen).",
       },
     ],
   },
@@ -107,6 +124,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. Russisch fehlt: die neuen Texte der Spielzeit (Minuten oder Spiele, Sperre der Menüs).",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. Russisch fehlt: die neuen Texte der Spielzeit (Minuten oder Spiele, Sperre der Menüs) und der Untertitel von „Weitere“ (mit Töpfchen).",
   },
 ];

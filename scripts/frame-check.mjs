@@ -83,7 +83,7 @@ function scenePairs() {
     const ref = `baer-${id}`;
     // A comfort shown for more than one feeling can't match every room; it is left out.
     const own = comforts.filter((c) => used.indexOf(c) === used.lastIndexOf(c)).map((c) => `trost-${c}`);
-    for (const n of [`${ref}-nein`, `${ref}-gut`, ...own]) if (names.includes(n)) pairs.push([ref, n]);
+    for (const n of [`${ref}-nein`, `${ref}-nein-2`, `${ref}-nein-3`, `${ref}-gut`, ...own]) if (names.includes(n)) pairs.push([ref, n]);
   }
   return pairs.map(([ref, n]) => [join(folder, `${ref}.webp`), join(folder, `${n}.webp`)]);
 }

@@ -25,6 +25,11 @@ export interface KitaInstead {
 export interface KitaStep {
   /** What to do, in a word or two („Weggehen“): for grown-ups under the card, said by screen readers. */
   caption: string;
+  /**
+   * Read aloud and shown under the picture before this step is chosen: what is the matter now, then who acts –
+   * „Was kann der kleine Bär tun?“, since in the kindergarten the bear helps himself.
+   */
+  question: string;
   beats: Beat[];
   instead: KitaInstead;
 }
@@ -44,7 +49,7 @@ export interface Situation {
   endCaption: string;
 }
 
-/** Asked before the first step of a story. */
+/** Asked before a step in a language whose translation has no questions of its own yet. */
 export const QUESTION: Localized = { de: "Was kann der kleine Bär tun?", ru: "Что может сделать Мишка?" };
 
 export const SITUATIONS: Situation[] = [
@@ -57,16 +62,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "„Stopp!“ sagen",
+        question: "Der Fuchs schubst den kleinen Bären. Was kann der Bär tun?",
         beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Nein! Ich will das nicht!" }],
         instead: { caption: "Zurückschubsen", answer: "Hmm, dann tut es noch mehr weh. Sag lieber laut: Stopp!", sound: "aua" },
       },
       {
         caption: "Weggehen",
+        question: "Der Fuchs ist noch da. Was kann der kleine Bär tun?",
         beats: [{ narration: "Dann geht er weg. So hat er Abstand." }],
         instead: { caption: "Sand werfen", answer: "Hmm, Sand in den Augen tut weh. Geh lieber weg.", sound: "aua" },
       },
       {
         caption: "Erzieherin holen",
+        question: "Der kleine Bär braucht Hilfe. Was kann er tun?",
         beats: [
           { narration: "Er holt die Erzieherin.", line: "Der Fuchs hat mich geschubst!" },
           { line: "Stopp, Fuchs. Schubsen tut weh." },
@@ -87,16 +95,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "„Stopp!“ sagen",
+        question: "Der Fuchs tritt den kleinen Bären. Was kann der Bär tun?",
         beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Nicht treten!" }],
         instead: { caption: "Zurücktreten", answer: "Hmm, dann tut es beiden weh. Sag lieber laut: Stopp!", sound: "aua" },
       },
       {
         caption: "Weggehen",
+        question: "Der Fuchs ist noch da. Was kann der kleine Bär tun?",
         beats: [{ narration: "Er geht ein paar Schritte weg." }],
         instead: { caption: "Am Ohr ziehen", answer: "Hmm, Ziehen tut auch weh. Geh lieber weg.", sound: "aua" },
       },
       {
         caption: "Erzieherin rufen",
+        question: "Der kleine Bär braucht Hilfe. Was kann er tun?",
         beats: [
           { narration: "Er ruft die Erzieherin.", line: "Hilfe! Der Fuchs hat mich getreten." },
           { line: "Fuchs, Treten tut weh. Das machen wir nicht." },
@@ -117,16 +128,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "„Das ist meins!“ sagen",
+        question: "Der Fuchs nimmt den Traktor weg. Was kann der kleine Bär tun?",
         beats: [{ narration: "Der kleine Bär sagt laut:", line: "Stopp! Das ist mein Traktor!" }],
         instead: { caption: "Traktor wegreißen", answer: "Hmm, dann zerren beide und es gibt Streit. Sag lieber: Stopp, das ist meins!" },
       },
       {
         caption: "Um Traktor bitten",
+        question: "Der Fuchs hat noch den Traktor. Was kann der kleine Bär tun?",
         beats: [{ line: "Gib ihn mir bitte zurück." }, { line: "Hier. Entschuldigung." }, { sound: "pop" }],
         instead: { caption: "Hauen", answer: "Hmm, Hauen tut weh. Sag lieber: Gib ihn mir bitte zurück.", sound: "aua" },
       },
       {
         caption: "Zusammen spielen",
+        question: "Der kleine Bär hat den Traktor wieder. Was kann er tun?",
         beats: [{ line: "Willst du mitspielen? Du kannst den Eimer haben." }, { line: "Au ja!" }],
         instead: { caption: "Wegschicken", answer: "Hmm, jetzt ist der Fuchs allein und traurig. Frag lieber: Willst du mitspielen?" },
       },
@@ -143,16 +157,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "Anstellen",
+        question: "Die Rutsche ist voll. Was kann der kleine Bär tun?",
         beats: [{ narration: "Er stellt sich hinten an.", line: "Ich bin nach dem Fuchs dran." }],
         instead: { caption: "Vordrängeln", answer: "Hmm, auf der Rutsche kann jemand runterfallen. Lieber hinten anstellen.", sound: "aua" },
       },
       {
         caption: "Warten",
+        question: "Der kleine Bär steht in der Reihe. Was kann er tun?",
         beats: [{ narration: "Er wartet. Erst rutscht der Hase …" }, { narration: "… dann der Fuchs." }],
         instead: { caption: "Schreien und strampeln", answer: "Hmm, Schreien macht es nicht schneller. Warte lieber, gleich bist du dran." },
       },
       {
         caption: "Rutschen",
+        question: "Der kleine Bär ist dran. Was kann er tun?",
         beats: [{ narration: "Jetzt ist der kleine Bär dran!" }, { line: "Juhuu!", sound: "slide" }],
         instead: { caption: "Oben sitzen bleiben", answer: "Hmm, dann kann keiner mehr rutschen. Rutsch lieber runter, dann ist der Nächste dran." },
       },
@@ -169,16 +186,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "Fragen",
+        question: "Der kleine Bär will das Auto. Was kann er tun?",
         beats: [{ narration: "Er fragt:", line: "Darf ich auch mal?" }, { line: "Gleich. Ich spiele noch." }],
         instead: { caption: "Auto wegnehmen", answer: "Hmm, dann ist der Hase traurig. Frag lieber: Darf ich auch mal?" },
       },
       {
         caption: "Warten, Ball spielen",
+        question: "Der Hase spielt noch. Was kann der kleine Bär tun?",
         beats: [{ narration: "Der kleine Bär wartet. Solange spielt er mit dem Ball.", sound: "bounce" }],
         instead: { caption: "Anschreien", answer: "Hmm, Schreien macht den Hasen traurig. Warte lieber und spiel solange mit dem Ball." },
       },
       {
         caption: "Tauschen",
+        question: "Der kleine Bär hat den Ball. Was kann er tun?",
         beats: [{ line: "Jetzt darfst du. Tauschen wir?" }, { line: "Ja! Danke!", sound: "pop" }],
         instead: { caption: "Alles behalten", answer: "Hmm, jetzt hat der Hase gar nichts. Lieber tauschen: Auto gegen Ball." },
       },
@@ -198,16 +218,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "Stampfen",
+        question: "Der kleine Bär ist wütend. Was kann er tun?",
         beats: [{ narration: "Aber er stampft lieber. Stampf, stampf!", sound: "stomp" }],
         instead: { caption: "Schubsen", answer: "Hmm, Schubsen tut weh. Lass die Wut lieber raus: Stampf ganz fest!", sound: "aua" },
       },
       {
         caption: "Tief pusten",
+        question: "Der kleine Bär ist noch wütend. Was kann er tun?",
         beats: [{ narration: "Er atmet tief ein und pustet: Puuuh." }],
         instead: { caption: "Turm umtreten", answer: "Hmm, jetzt weint der Fuchs auch. Puste lieber ganz tief: Puuuh.", sound: "crash" },
       },
       {
         caption: "„Ich bin wütend!“ sagen",
+        question: "Der kleine Bär ist noch ein bisschen wütend. Was kann er tun?",
         beats: [
           { narration: "Dann sagt er:", line: "Ich bin wütend! Mein Turm ist kaputt!" },
           { line: "Oh, Entschuldigung! Ich helfe dir." },
@@ -231,16 +254,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "Fest drücken",
+        question: "Der große Bär muss gehen. Was kann der kleine Bär tun?",
         beats: [{ narration: "Der kleine Bär drückt den großen Bären ganz fest.", line: "Tschüss! Hab dich lieb!" }, { line: "Ich hole dich nachher ab." }],
         instead: { caption: "Hinterherrennen", answer: "Hmm, draußen fahren Autos, das ist gefährlich. Drück ihn lieber ganz fest zum Tschüss." },
       },
       {
         caption: "Am Fenster winken",
+        question: "Der große Bär geht jetzt. Was kann der kleine Bär tun?",
         beats: [{ narration: "Dann winkt er am Fenster.", line: "Tschüss!" }, { narration: "Der große Bär winkt zurück." }],
         instead: { caption: "Verstecken", answer: "Hmm, allein im Versteck ist es traurig. Wink lieber am Fenster." },
       },
       {
         caption: "Mitspielen",
+        question: "Der kleine Bär ist noch traurig. Was kann er tun?",
         beats: [{ line: "Komm, wir bauen mit dem Fuchs einen Turm." }, { narration: "Der kleine Bär hört auf zu weinen. Er spielt mit.", sound: "pop" }],
         instead: { caption: "Allein in der Ecke", answer: "Hmm, allein in der Ecke ist es langweilig. Spiel lieber mit." },
       },
@@ -257,16 +283,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "Hallo sagen",
+        question: "Der Igel ist neu und allein. Was kann der kleine Bär tun?",
         beats: [{ narration: "Der kleine Bär geht hin und winkt.", line: "Hallo! Ich bin der Bär." }, { line: "Hallo. Ich bin der Igel." }],
         instead: { caption: "Auslachen", answer: "Hmm, jetzt ist der Igel traurig. Sag lieber: Hallo!" },
       },
       {
         caption: "Bauklötze zeigen",
+        question: "Der Igel ist noch schüchtern. Was kann der kleine Bär tun?",
         beats: [{ line: "Guck mal, hier sind die Bauklötze." }, { narration: "Der Igel guckt. Er lächelt ein bisschen." }],
         instead: { caption: "Bauklötze verstecken", answer: "Hmm, so kann der Igel nicht mitspielen. Zeig ihm lieber die Bauklötze." },
       },
       {
         caption: "Mitspielen lassen",
+        question: "Der Igel möchte mitspielen. Was kann der kleine Bär tun?",
         beats: [{ line: "Willst du mitspielen?" }, { line: "Ja!", sound: "pop" }],
         instead: { caption: "Nur mit Fuchs spielen", answer: "Hmm, jetzt ist der Igel ganz allein. Frag ihn lieber: Willst du mitspielen?" },
       },
@@ -283,16 +312,19 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "Hilfe rufen",
+        question: "Der kleine Bär ist hingefallen. Was kann er tun?",
         beats: [{ narration: "Der kleine Bär ruft:", line: "Aua! Hilfe!" }, { line: "Ich komme! Zeig mal her." }],
         instead: { caption: "Strampeln und schreien", answer: "Hmm, so kann ihm keiner helfen. Ruf lieber die Erzieherin." },
       },
       {
         caption: "Pflaster drauf",
+        question: "Die Erzieherin hat ein Pflaster. Was macht der kleine Bär?",
         beats: [{ narration: "Die Erzieherin klebt ein Pflaster drauf und pustet." }, { line: "So. Gleich ist es besser." }],
         instead: { caption: "Pflaster abreißen", answer: "Hmm, dann tut es wieder weh. Lass das Pflaster lieber dran.", sound: "aua" },
       },
       {
         caption: "Langsam weiterspielen",
+        question: "Das Knie tut nicht mehr weh. Was kann der kleine Bär tun?",
         beats: [
           { narration: "Der Fuchs hilft ihm hoch.", line: "Komm, wir spielen langsam." },
           { narration: "Sie rollen sich den Ball zu.", sound: "bounce" },
@@ -315,6 +347,7 @@ export const SITUATIONS: Situation[] = [
     steps: [
       {
         caption: "„Stopp!“ sagen",
+        question: "Der Fuchs hört nicht auf. Was kann der kleine Bär tun?",
         beats: [
           { narration: "Der kleine Bär sagt laut:", line: "Stopp! Ich will das nicht mehr!" },
           { narration: "Der Fuchs hört auf.", line: "Oh. Okay." },
@@ -323,11 +356,13 @@ export const SITUATIONS: Situation[] = [
       },
       {
         caption: "Fangen vorschlagen",
+        question: "Der Fuchs hat aufgehört. Was kann der kleine Bär tun?",
         beats: [{ line: "Spielen wir lieber Fangen?" }, { line: "Au ja!" }],
         instead: { caption: "Zurückkitzeln", answer: "Hmm, jetzt will der Fuchs das nicht. Stopp heißt Stopp, für alle. Frag lieber: Spielen wir Fangen?" },
       },
       {
         caption: "Fangen spielen",
+        question: "Beide wollen Fangen spielen. Was kann der kleine Bär tun?",
         beats: [{ narration: "Sie rennen und lachen.", line: "Fang mich doch!", sound: "boing" }],
         instead: { caption: "Beleidigt weggehen", answer: "Hmm, jetzt sind beide allein. Spielt lieber zusammen Fangen." },
       },

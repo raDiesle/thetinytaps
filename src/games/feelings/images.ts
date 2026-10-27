@@ -47,8 +47,8 @@ export const bearImages = {
   /** How the bear feels at the start. */
   feeling: (id: string) => `baer-${id}`,
   comfort: (id: string) => `trost-${id}`,
-  /** The not-so-good idea among the comforts. */
-  instead: (id: string) => `baer-${id}-nein`,
+  /** The not-so-good idea of the n-th round, counted from 0: "baer-sad-nein", "baer-sad-nein-2". */
+  instead: (id: string, i: number) => (i === 0 ? `baer-${id}-nein` : `baer-${id}-nein-${i + 1}`),
   /** Happy (or asleep) again at the end. */
   happy: (id: string) => `baer-${id}-gut`,
 };

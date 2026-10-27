@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 // Installing packages is where a supply-chain attack gets in, so bunfig.toml keeps Bun careful
@@ -27,4 +27,13 @@ test("Bun is the only package manager", () => {
   expect(pkg.packageManager).toStartWith("bun@");
   expect(existsSync(join(ROOT, "bun.lock"))).toBe(true);
   for (const other of ["yarn.lock", "package-lock.json", "pnpm-lock.yaml", ".yarnrc.yml", ".npmrc"]) expect(existsSync(join(ROOT, other)), other).toBe(false);
+});
+
+test("docs, skills, scripts and tests say bun, not yarn, npx or Rstest (branches started before the move still might)", () => {
+  const files = ["CLAUDE.md", "README.md", ...readdirSync(join(ROOT, "scripts")).map((f) => `scripts/${f}`)];
+  for (const folder of ["src", ".claude/skills"])
+    for (const f of readdirSync(join(ROOT, folder), { recursive: true }) as string[]) if (/\.(md|ts|tsx|mjs)$/.test(f)) files.push(`${folder}/${f}`);
+  const old = /\b(?:yarn|npx) (?!or |and )[a-z]|@rstest\/core/;
+  const found = files.filter((f) => f !== "src/packageSafety.test.ts" && old.test(readFileSync(join(ROOT, f), "utf8")));
+  expect(found).toEqual([]);
 });

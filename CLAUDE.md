@@ -53,7 +53,8 @@ In a fresh worktree run `bun install` first.
   (German; read it before touching a level and check the work against it); work done with a skill →
   its `.claude/skills/<name>/SKILL.md`; every game or how to work here → this file. When a rule
   already covers it, sharpen that rule instead of adding a second one; when new feedback
-  contradicts a rule, replace the old one. The same goes for mistakes you find yourself (a failed
+  contradicts a rule, replace the old one. Feedback the user gives "only to keep" about how future
+  content should be made (stories, pictures) is such a rule too, not an idea in `src/content/ideas/`. The same goes for mistakes you find yourself (a failed
   check, a bug seen in the preview, a wrong assumption) that the next session could make again.
   A check beats a sentence: when a test can catch it, add the test. Claude's private memory is only
   for things that don't belong in the repo. A `UserPromptSubmit` hook (`.claude/hooks/feedback-reminder.md`)
@@ -100,7 +101,9 @@ In a fresh worktree run `bun install` first.
   are German where they are user-facing (`/bilder/`, `/aufzug/`).
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
   classes and `@keyframes` by game or scene (`el-`, `bs-`); never style another
-  game's classes. A game using another game's parts imports that CSS itself.
+  game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
+  (`pop-in`, `wiggle`, `bob`, …) live in `src/styles/animations.css`, which every page loads – never use
+  keyframes from another game's CSS (`css.test.ts` checks it).
 - Drawings are SVG in React components, animated with CSS classes; no image files
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
@@ -157,7 +160,8 @@ src/content/             home menu (games.ts), language packs (de/en/tr/pl), ide
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
-- Start screen: what the game is and how it is played (also keys and tips for grown-ups) goes into `info`
+- Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now) skips it with `startMode` and plays
+  at once; the start screen comes only after ✕ or „Menü“. What the game is and how it is played (also keys and tips for grown-ups) goes into `info`
   („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
   that explain them. A game adds no own switch for what the home page already sets for all games
   (Vorlesen, Töne, Musik, Sprache), nor a choice for what the game can tell by itself (morning or evening by the clock).
@@ -173,7 +177,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
-  song files are named `musik-*.mp3`, see `/musik-erzeugen`. The shared options (`useCommonSettings`) are one
+  song files are named `musik-*.mp3`, see `/musik-erzeugen`. A game that runs along its own song (its steps follow it)
+  starts loading it on its start screen and waits for it before the part that follows the song, showing how far it is
+  when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
 - Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
   "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“ lets a grown-up play upright for

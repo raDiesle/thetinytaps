@@ -1,29 +1,42 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
 import { COMFORTS, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, storyImages } from "./images";
 import { SITUATIONS } from "./kita";
 import { FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { MOOD_ID, WEATHERS } from "./mood";
-import { STORIES } from "./stories";
+import { STORIES, storyAfter } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
-// Every picture the game asks for is in bilder/; a missing one shows an empty card.
+// Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
+// allowed only while bilder/README.md lists it under „Geplant“ with its prompt, for the grown-up to look at first.
+const README = readFileSync("src/games/feelings/bilder/README.md", "utf8");
+const PLANNED = README.slice(README.indexOf("## Geplant"));
+const PLANNED_NAMES = [...PLANNED.matchAll(/^\| `([\w-]+)`/gm)].map((m) => m[1]);
+
+function expectPicture(name: string) {
+  if (!imageFor(name)) expect(PLANNED_NAMES, `${name}: no picture in bilder/, and not planned in README.md`).toContain(name);
+}
 
 test("every kindergarten story has its pictures", () => {
   for (const { id, steps } of SITUATIONS) {
-    const names = [storyImages.problem(id), storyImages.end(id), ...steps.flatMap((_, i) => [storyImages.step(id, i), storyImages.instead(id, i)])];
-    for (const name of names) expect(imageFor(name), name).toBeDefined();
+    [storyImages.problem(id), storyImages.end(id), ...steps.flatMap((_, i) => [storyImages.step(id, i), storyImages.instead(id, i)])].forEach(expectPicture);
   }
 });
 
-test("the bear has a picture for every feeling and every comfort", () => {
-  for (const { id } of FEELINGS) {
+test("the bear has a picture for every feeling, every round and every comfort", () => {
+  for (const { id, comforts, instead } of FEELINGS) {
     expect(imageFor(bearImages.feeling(id)), bearImages.feeling(id)).toBeDefined();
     expect(imageFor(bearImages.happy(id)), bearImages.happy(id)).toBeDefined();
-    expect(imageFor(bearImages.instead(id)), bearImages.instead(id)).toBeDefined();
+    // Every round: the kind thing and the not-so-good idea next to it.
+    expect(instead.length, id).toBe(comforts.length);
+    instead.forEach((_, i) => expectPicture(bearImages.instead(id, i)));
   }
   for (const id of Object.keys(COMFORTS)) expect(imageFor(bearImages.comfort(id)), bearImages.comfort(id)).toBeDefined();
+});
+
+test("a planned picture that is made leaves „Geplant“", () => {
+  for (const name of PLANNED_NAMES) expect(imageFor(name), `${name} is made: move its row out of „Geplant“`).toBeUndefined();
 });
 
 test("every story on the start screen has its own id", () => {
@@ -31,6 +44,12 @@ test("every story on the start screen has its own id", () => {
   expect(new Set(ids).size).toBe(ids.length);
   expect(ids).not.toContain("all");
   expect(ids).not.toContain(MOOD_ID);
+});
+
+test("„Weiter“ goes through the stories in the start screen's order", () => {
+  const played = [STORIES[0]];
+  for (let i = 1; i <= STORIES.length; i++) played.push(storyAfter(played[i - 1]));
+  expect(played).toEqual([...STORIES, STORIES[0]]);
 });
 
 test("every weather has its card and leads to a feeling of the bear", () => {
@@ -64,13 +83,32 @@ test("every translation of a kindergarten story matches the German beat for beat
   }
 });
 
-test("every translation of the bear's feelings asks its own question where the German does", () => {
+test("every translation of the bear's feelings has its rounds", () => {
   for (const [language, texts] of Object.entries(FEELING_TEXTS)) {
     for (const feeling of FEELINGS) {
       const text = texts[feeling.id];
-      if (text) expect(!!text.question, `${language} ${feeling.id}`).toBe(!!feeling.question);
+      if (!text) continue;
+      // One not-so-good idea and one question per round, `null` where it is not translated yet: a shorter list would shift them into the wrong round.
+      expect(text.instead.length, `${language} ${feeling.id} rounds`).toBe(feeling.instead.length);
+      if (text.questions) expect(text.questions.length, `${language} ${feeling.id} questions`).toBe(feeling.questions.length);
     }
   }
+});
+
+// Grown-ups once could not tell whether a card meant the bear does it or the child does it for him: every choice
+// asks a question that ends by saying who acts – „… machst du?“ / „… feierst du …?“ or „… kann (der kleine Bär | er) tun/machen?“.
+test("every choice asks who acts", () => {
+  const whoActs = /(\bdu\b[^.!?]*|\b(der (kleine )?Bär|er)\b[^.!?]*)\?$/;
+  const asks = (question: string, where: string) => {
+    const last = question.split(/(?<=[.!?])\s+/).at(-1) ?? "";
+    expect(last, where).toMatch(whoActs);
+    expect(last.startsWith("W"), `${where}: a W-question`).toBe(true);
+  };
+  for (const feeling of FEELINGS) {
+    expect(feeling.questions.length, `${feeling.id} questions`).toBe(feeling.comforts.length);
+    feeling.questions.forEach((q, i) => asks(q, `${feeling.id} round ${i + 1}`));
+  }
+  for (const situation of SITUATIONS) situation.steps.forEach((step, i) => asks(step.question, `${situation.id} step ${i + 1}`));
 });
 
 // Translations come only on request, so a story may have none yet (it is told in German); one that has keeps the sounds.

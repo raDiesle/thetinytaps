@@ -1,0 +1,432 @@
+/* ---------- Aufs Töpfchen ---------- */
+
+/*
+ * The story is a Gemini picture filling the screen (StoryPicture.tsx), its two frames
+ * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
+ * calls (.pt-feel, .pt-call), and at the bottom the row of steps (each one a button that jumps there) with the
+ * grown-ups' buttons in the corner next to it: what the child said (.pt-said), the three ✓ while sitting (.pt-finish), „Weiter“ (.pt-next).
+ * Root classes: pt-pipi / pt-kaka / pt-unsure / pt-both (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
+ * Only the eating picture moves before the first tap (the game is opened when the child has to go now).
+ */
+
+.potty-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #fbe7b5;
+}
+
+/* The frames lie on top of each other; the shown one fades in over the other. The pictures are
+   drawn wide (16:9) with everything important in the middle, so cutting the edges off fits any screen. */
+.pt-picture {
+  position: absolute;
+  inset: 0;
+}
+
+/* A new picture fades in over the one before (still lying below it) and settles from a little closer. */
+.pt-picture-new {
+  animation: pt-picture-in 0.6s ease-out;
+}
+
+@keyframes pt-picture-in {
+  from {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+.pt-picture img,
+.pt-party-picture img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Low screens cut more off the top (wall) than the bottom, where the potty and the feet are. */
+  object-position: 50% 72%;
+  opacity: 0;
+  transition: opacity 0.35s ease-in-out;
+  user-select: none;
+}
+
+/* The base frame always shows, so the other only fades in over it – never a gap between the two. */
+.pt-picture img.base,
+.pt-party-picture img.base,
+.pt-picture img.on,
+.pt-party-picture img.on {
+  opacity: 1;
+}
+
+/* The bladder presses: drops pop up over the wiggling animal. The tummy rumbles: the picture shakes a little. */
+.pt-feel {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  font-size: clamp(48px, 12vmin, 110px);
+  filter: drop-shadow(0 3px 6px #0004);
+  pointer-events: none;
+  animation: pt-feel 1.6s ease-out forwards;
+}
+
+@keyframes pt-feel {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 30px) scale(0.4);
+  }
+  25% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.15);
+  }
+  45%,
+  65% {
+    transform: translate(-50%, 0) scale(0.95);
+  }
+  55%,
+  75% {
+    transform: translate(-50%, 0) scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes pt-rumble {
+  0%,
+  100% {
+    transform: none;
+  }
+  20%,
+  60% {
+    transform: translateX(-6px) rotate(-0.4deg);
+  }
+  40%,
+  80% {
+    transform: translateX(6px) rotate(0.4deg);
+  }
+}
+
+.pt-kaka.pt-at-need.busy .pt-picture,
+.pt-both.pt-at-need.busy .pt-picture,
+.pt-unsure.pt-at-need.busy .pt-picture {
+  animation: pt-rumble 0.5s ease-in-out 3;
+}
+
+/* „Mama! Papa!“: a speech bubble with the need, without words. */
+.pt-call {
+  position: absolute;
+  left: 50%;
+  top: 6%;
+  display: flex;
+  gap: 0.15em;
+  padding: 0.15em 0.4em;
+  border: 4px solid #2a1e5c;
+  border-radius: 999px;
+  background: #fff;
+  font-size: clamp(40px, 10vmin, 90px);
+  box-shadow: 0 6px 18px #2a1e5c33;
+  pointer-events: none;
+  animation: pt-call 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+@keyframes pt-call {
+  from {
+    transform: translateX(-50%) scale(0);
+  }
+  to {
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/*
+ * The bottom: the row of steps in the middle, the grown-ups' buttons in the corner level with it. Where the
+ * corner is too narrow for them, the row moves aside a little (a side column never gets narrower than what is in it).
+ */
+.pt-bottom {
+  position: absolute;
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(10px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 10px;
+}
+
+.pt-grown {
+  grid-column: 3;
+  justify-self: end;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* The grown-ups' buttons are plainly buttons (white, outlined, raised) but mid-sized and still, in the corner:
+   a grown-up finds them, the child looks at the story. */
+.pt-said,
+.pt-next,
+.pt-finish {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 3px solid #2a1e5c;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow:
+    0 4px 0 #2a1e5c,
+    0 6px 12px #0003;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s;
+}
+
+/* Pressed in, like a real button. */
+.pt-said:active,
+.pt-next:active,
+.pt-finish:active {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #2a1e5c,
+    0 2px 6px #0003;
+}
+
+/* What the child said: four small buttons in a square (💧, 💩, 💧💩, ❓); the picked one turns light yellow. */
+.pt-saids {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 6px;
+}
+
+.pt-said {
+  min-width: clamp(40px, 9.5vmin, 60px);
+  height: clamp(40px, 9.5vmin, 60px);
+  padding: 0 6px;
+  font-size: clamp(18px, 4.4vmin, 28px);
+  white-space: nowrap;
+}
+
+.pt-said.picked {
+  background: #ffd23f;
+}
+
+.pt-next {
+  width: clamp(50px, 12vmin, 72px);
+  height: clamp(50px, 12vmin, 72px);
+  background: #ffd23f;
+  color: #2a1e5c;
+  font-size: clamp(22px, 5.4vmin, 34px);
+}
+
+/* While sitting: three ✓ say „fertig“ – for pipi, kaka or both, told apart by the badge. Green, so a grown-up
+   finds them at once; the one the child said has a yellow ring. */
+.pt-finishes {
+  display: flex;
+  gap: 8px;
+}
+
+.pt-finish {
+  position: relative;
+  width: clamp(48px, 11vmin, 66px);
+  height: clamp(48px, 11vmin, 66px);
+  background: #3ec300;
+}
+
+.pt-finish.expected {
+  outline: 4px solid #ffd23f;
+}
+
+.pt-finish-check {
+  color: #fff;
+  font-size: clamp(26px, 6vmin, 40px);
+  font-weight: 900;
+}
+
+.pt-finish-need {
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1px 4px;
+  border-radius: 999px;
+  background: #ffffffd9;
+  font-size: clamp(11px, 2.6vmin, 17px);
+  white-space: nowrap;
+}
+
+/* The row of steps lies on the picture, so it gets a little more contrast. */
+.pt-steps {
+  grid-column: 2;
+  display: flex;
+  gap: clamp(4px, 1vw, 10px);
+  margin: 0;
+  padding: 6px 12px;
+  list-style: none;
+  border-radius: 999px;
+  background: #ffffffcc;
+  box-shadow: 0 2px 10px #0002;
+}
+
+.pt-steps li {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* Big enough to hit, since a tap on a step jumps there. */
+  width: clamp(30px, min(5.5vw, 9vmin), 52px);
+  height: clamp(30px, min(5.5vw, 9vmin), 52px);
+  border-radius: 50%;
+  font-size: clamp(17px, min(3.3vw, 5.4vmin), 30px);
+  opacity: 0.45;
+  filter: grayscale(0.7);
+  transition: transform 0.3s;
+}
+
+.pt-steps button {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.pt-steps li.done {
+  opacity: 1;
+  filter: none;
+  background: #d8f5d0;
+}
+
+.pt-steps li.now {
+  opacity: 1;
+  filter: none;
+  background: #ffe08a;
+  transform: scale(1.2);
+}
+
+.pt-arrow {
+  position: absolute;
+  right: -3px;
+  bottom: -5px;
+  font-size: 0.6em;
+  font-weight: 900;
+  color: #3f88c5;
+}
+
+/* ---------- „Hat geklappt!“ ---------- */
+
+.potty-party {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3vw;
+  padding: max(56px, env(safe-area-inset-top)) 16px 16px;
+  background: radial-gradient(circle at 30% 50%, #fff7d6, #ffe3ec);
+}
+
+.pt-party-picture {
+  position: relative;
+  flex: 0 1 auto;
+  width: min(46vw, 84vh * 16 / 9);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 4px solid #2a1e5c;
+  border-radius: 24px;
+  background: #fff;
+}
+
+.pt-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: clamp(4px, 1vw, 10px);
+  width: min(54vw, 620px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pt-day {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-height: min(40vh, 280px);
+  padding: 8px 2px;
+  border-radius: 16px;
+  background: #ffffffd9;
+}
+
+.pt-day.today {
+  background: #fff3b0;
+  outline: 4px solid #ffb703;
+  transform: scale(1.06);
+}
+
+.pt-today-tag {
+  position: absolute;
+  top: -14px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #ffb703;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pt-day-name {
+  font-size: clamp(14px, 2.4vw, 22px);
+  font-weight: 800;
+}
+
+.pt-day-stars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: clamp(18px, 3.6vw, 34px);
+  line-height: 1.1;
+}
+
+.pt-star.empty {
+  color: #e0a800;
+}
+
+@keyframes pt-star-pop {
+  0% {
+    transform: scale(0) rotate(-120deg);
+  }
+  70% {
+    transform: scale(1.5) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.pt-star.fresh {
+  display: inline-block;
+  animation: pt-star-pop 0.8s ease-out 0.9s both;
+}
+
+@media (orientation: portrait) {
+  .potty-party {
+    flex-direction: column;
+  }
+
+  .pt-party-picture {
+    width: min(94vw, 42vh * 16 / 9);
+  }
+
+  .pt-week {
+    width: min(94vw, 620px);
+  }
+
+  .pt-day {
+    min-height: 26vh;
+  }
+}
