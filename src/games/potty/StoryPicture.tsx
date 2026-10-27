@@ -7,10 +7,11 @@ const FRAME_MS = 900;
 /**
  * A picture of the story; in „Muss mal!“ it fills the screen. Its two frames fade into each
  * other, like a tiny GIF, once the story has started (`moving`); before the first
- * tap it stands still. Give it a new `key` for every picture.
+ * tap it stands still. Several names show one picture's frames after the other's. Give it a new
+ * `key` for every picture.
  */
-export function StoryPicture({ name, moving, className = "pt-picture" }: { name: string; moving: boolean; className?: string }) {
-  const frames = framesFor(name);
+export function StoryPicture({ name, moving, className = "pt-picture" }: { name: string | string[]; moving: boolean; className?: string }) {
+  const frames = (typeof name === "string" ? [name] : name).flatMap(framesFor);
   const [frame, setFrame] = useState(0);
   const animated = moving && frames.length > 1;
 

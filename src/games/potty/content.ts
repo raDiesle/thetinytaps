@@ -18,12 +18,26 @@ export const TAPSI = {
 /** What the animal has to do: the bladder presses after drinking, or the tummy rumbles after eating. */
 export type Need = "pipi" | "kaka";
 
+/**
+ * What the child said it has to do, chosen by a grown-up before the story: often nobody
+ * knows yet ("unsure"), so the story says „muss mal“ and the waiting brings scenes for both.
+ * What really came is chosen at the ✓.
+ */
+export type Said = Need | "unsure";
+
+/** The choices of `Said` in their order, which „Weiter“ follows; the emoji stands for it on buttons. */
+export const SAID: { id: Said; emoji: string }[] = [
+  { id: "pipi", emoji: "💧" },
+  { id: "kaka", emoji: "💩" },
+  { id: "unsure", emoji: "🚽" },
+];
+
 /** The steps of the story, one tap each. */
 export type StepId = "eat" | "drink" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party";
 
 export interface Step {
   id: StepId;
-  /** Its picture in the row of steps at the bottom, for each need. */
+  /** Its picture in the row of steps at the bottom, for each need (see `iconFor`). */
   icon: string | Record<Need, string>;
   /** A small arrow next to the icon, for trousers down and up. */
   arrow?: "↓" | "↑";
@@ -61,6 +75,17 @@ export const STEPS: Step[] = [
 
 /** The value for `need` of a field that may differ between pipi and kaka. */
 export const forNeed = <T extends string>(value: T | Record<Need, T>, need: Need): T => (typeof value === "string" ? value : value[need]);
+
+/** A step's icon in the row: ❓ where it depends on the need and nobody knows it yet. */
+export const iconFor = (step: Step, said: Said) =>
+  said === "unsure" && typeof step.icon !== "string" ? "❓" : forNeed(step.icon, said === "unsure" ? "pipi" : said);
+
+/**
+ * The pictures a step shows, one after the other as its frames: while nobody knows the need,
+ * the bladder and the tummy picture take turns, so Tapsi presses its legs and holds its tummy.
+ */
+export const picturesFor = (step: Step, said: Said): string[] =>
+  said === "unsure" && typeof step.picture !== "string" ? [step.picture.pipi, step.picture.kaka] : [forNeed(step.picture, said === "unsure" ? "pipi" : said)];
 
 /** The sound a waiting scene makes when it comes (see PottyPlay.tsx). */
 export type SceneSound =
@@ -108,11 +133,18 @@ export const WAIT_SCENES: WaitScene[] = [
   { id: "seifenblasen", need: "both", sound: "bubbles" },
 ];
 
-/** The waiting scenes for `need` in the order the taps bring them: one for the need, one silly one, and so on. */
-export function scenesFor(need: Need): WaitScene[] {
-  const own = WAIT_SCENES.filter((s) => s.need === need);
+/**
+ * The waiting scenes for what the child said, in the order the taps bring them: one for the need,
+ * one silly one, and so on (the silly ones come round again when there are more of the need's).
+ * While nobody knows, pipi and kaka scenes take turns.
+ */
+export function scenesFor(said: Said): WaitScene[] {
+  const of = (need: Need) => WAIT_SCENES.filter((s) => s.need === need);
+  const own = said === "unsure" ? of("pipi").flatMap((s, i) => [s, of("kaka")[i]]) : of(said);
   const silly = WAIT_SCENES.filter((s) => s.need === "both");
-  return Array.from({ length: Math.max(own.length, silly.length) }, (_, i) => [own[i], silly[i]]).flatMap((pair) => pair.filter((s) => s !== undefined));
+  return Array.from({ length: Math.max(own.length, silly.length) }, (_, i) => [own[i], silly[i % silly.length]]).flatMap((pair) =>
+    pair.filter((s) => s !== undefined),
+  );
 }
 
 /** The name of a waiting scene's picture, after the animal's. */
@@ -121,11 +153,13 @@ export const scenePicture = (scene: WaitScene) => `warten-${scene.id}`;
 /** What is said, in one language; `name` is Tapsi's. */
 export interface PottyTexts {
   /** Said at each step, as it begins. */
-  steps: Record<StepId, (name: string, need: Need) => string>;
+  steps: Record<StepId, (name: string, said: Said) => string>;
   /** Said when a waiting scene comes, by its id. */
   scenes: Record<string, string>;
-  /** Said once while sitting, so a grown-up knows what the ✓ is for. */
-  finish: Record<Need, string>;
+  /** Said once while sitting, so a grown-up knows what the two ✓ are for. */
+  finish: string;
+  /** What each ✓ means, for screen readers. */
+  went: Record<Need, string>;
   /** Said when a star comes for really going. */
   star: string;
 }
@@ -136,8 +170,13 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
     steps: {
       eat: (name) => `Mmh! ${name} isst Nudeln.`,
       drink: () => "Und trinkt einen großen Schluck Wasser.",
-      need: (name, need) => (need === "pipi" ? `Oh! Die Blase drückt. ${name} muss Pipi!` : `Oh! Der Bauch brummelt. ${name} muss Kaka!`),
-      call: (_, need) => `Mama! Papa! Ich muss ${need === "pipi" ? "Pipi" : "Kaka"}!`,
+      need: (name, said) =>
+        said === "pipi"
+          ? `Oh! Die Blase drückt. ${name} muss Pipi!`
+          : said === "kaka"
+            ? `Oh! Der Bauch brummelt. ${name} muss Kaka!`
+            : `Oh! Da drückt was. ${name} muss mal!`,
+      call: (_, said) => `Mama! Papa! Ich muss ${said === "pipi" ? "Pipi" : said === "kaka" ? "Kaka" : "mal"}!`,
       go: () => "Mama und Papa kommen mit. Schnell ins Bad!",
       down: () => "Hose runter!",
       sit: () => "Hinsetzen. Mama und Papa warten mit.",
@@ -164,9 +203,10 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       kuckuck: "Wo ist Mama? Kuckuck!",
       seifenblasen: "Papa macht Seifenblasen. Plopp, plopp!",
     },
-    finish: {
-      pipi: "Ist das Pipi im Töpfchen? Dann drück auf den grünen Haken!",
-      kaka: "Ist das Kaka im Töpfchen? Dann drück auf den grünen Haken!",
+    finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka!",
+    went: {
+      pipi: "Pipi ist im Töpfchen",
+      kaka: "Kaka ist im Töpfchen",
     },
     star: "Hat geklappt! Hurra, ein Stern für dich!",
   },
