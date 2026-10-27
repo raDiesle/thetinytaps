@@ -42,6 +42,7 @@ import {
   scenePicture,
   scenesFor,
   STEPS,
+  storyFor,
   TAPSI,
   WAIT_SCENE_MS,
   type Went,
@@ -66,10 +67,12 @@ interface At {
   step: number;
   /** While sitting: the scene in the thought bubble (an index into scenesFor), -1 before the first one. */
   scene: number;
+  /** Nothing came on the potty: the story goes on with `NOTHING_STEPS`. */
+  nothing: boolean;
 }
 
 /** The story opens on Tapsi eating and drinking, already moving but silent until the first tap. */
-const START: At = { step: 0, scene: -1 };
+const START: At = { step: 0, scene: -1, nothing: false };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
 const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
@@ -77,11 +80,22 @@ const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
 const WENTS: Went[] = ["pipi", "kaka", "both"];
 const WENT_EMOJI: Record<Went, string> = { ...NEED_EMOJI, both: "💧💩" };
 const DONE = STEPS.findIndex((s) => s.id === "done");
+const SIT = STEPS.findIndex((s) => s.id === "sit");
+
+/** What `begin` plays a step with, when it is not what is picked now. */
+interface Begin {
+  /** What the ✓ chose. */
+  came?: Went | null;
+  /** What the child said, when it was just picked. */
+  said?: Said;
+  /** Whether nothing came (the other story). */
+  nothing?: boolean;
+}
 
 /**
- * „Aufs Töpfchen“ (H-06): Tapsi eats, drinks, has to go, calls Mama and Papa and goes to the potty. The first steps go on
- * on „Weiter“ only (`Step.nudge`), a few by themselves (`Step.auto`), the rest on a tap or „Weiter“. What it has to do is what the
- * child said, noted by a grown-up on a small button while Tapsi calls (unknown until then); what came is chosen at the ✓.
+ * „Aufs Töpfchen“ (H-06): Tapsi eats, drinks, has to go, calls Mama and Papa and goes to the potty. Any tap or key goes on, a few
+ * steps by themselves (`Step.auto`); while sitting a tap brings the next thought. What it has to do is what the child said,
+ * picked by a grown-up while Tapsi calls (unknown until then); what came – or that nothing came – is chosen at the ✓.
  */
 export function PottyPlay({ settings }: { settings: PottySettings }) {
   const language = useAppLanguage();
@@ -118,9 +132,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const step = STEPS[at.step];
+  const story = storyFor(at.nothing);
+  const step = story[at.step];
   const sitting = step.id === "sit";
-  const last = at.step === STEPS.length - 1;
+  const last = at.step === story.length - 1;
 
   // The waiting song is part of sitting (like the brushing song), so it plays even with Töne or Musik off;
   // the background song waits meanwhile.
@@ -130,11 +145,12 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   // The next step's pictures load while this one plays, the thought bubble's once the animal sits.
   useEffect(() => {
     // After sitting both endings load, since either can come.
-    const next = STEPS[at.step + 1];
-    const names = next ? picturesFor(next, next.id === "done" ? "unsure" : (went ?? said)).map((p) => `${TAPSI.pictures}-${p}`) : [];
-    if (STEPS[at.step]?.id === "down") names.push(...scenes.map((s) => `${TAPSI.pictures}-${scenePicture(s)}`));
+    const here = storyFor(at.nothing);
+    const nexts = here[at.step]?.id === "sit" ? [STEPS[SIT + 1], ...storyFor(true).slice(SIT + 1)] : [here[at.step + 1]];
+    const names = nexts.flatMap((s) => (s ? picturesFor(s, s.id === "done" ? "unsure" : (went ?? said)) : [])).map((p) => `${TAPSI.pictures}-${p}`);
+    if (here[at.step]?.id === "down") names.push(...scenes.map((s) => `${TAPSI.pictures}-${scenePicture(s)}`));
     preloadImages(names);
-  }, [at.step, said, went, scenes]);
+  }, [at.step, at.nothing, said, went, scenes]);
 
   const say = (text: string) => {
     if (settings.speech) speak(text, voiceFor(text, language));
@@ -158,12 +174,13 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     });
   };
 
-  /** Plays step `index`: its picture shows, its sounds and words come here. `came` is what the ✓ chose. */
-  const begin = (index: number, came: Went | null = went) => {
-    const { id, ms } = STEPS[index];
-    goTo({ step: index, scene: -1 }, ms);
-    setAsking(id === "call" || (id === "go" && said === "unsure"));
-    say(texts.steps[id](TAPSI.name, came ?? said));
+  /** Plays step `index`: its picture shows, its sounds and words come here. */
+  const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing }: Begin = {}) => {
+    const { id, ms, moves } = storyFor(nothing)[index];
+    goTo({ step: index, scene: -1, nothing }, ms);
+    setAsking(id === "call" || (id === "go" && saidNow === "unsure"));
+    const line = texts.steps[id](TAPSI.name, came ?? saidNow);
+    say(nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
     switch (id) {
       case "eat":
         // In time with the pictures: eating first, drinking when its picture comes.
@@ -171,13 +188,13 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         sound(1800, playGlug);
         break;
       case "need":
-        if (said !== "kaka") {
+        if (saidNow !== "kaka") {
           sound(0, playBoing);
           sound(500, playDrops);
         }
-        if (said !== "pipi") {
-          sound(said === "kaka" ? 0 : 900, playRumble);
-          sound(said === "kaka" ? 700 : 1300, playRumble);
+        if (saidNow !== "pipi") {
+          sound(saidNow === "kaka" ? 0 : 900, playRumble);
+          sound(saidNow === "kaka" ? 700 : 1300, playRumble);
         }
         break;
       case "call":
@@ -187,10 +204,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         footsteps(1500);
         break;
       case "down":
-        sound(STEPS[index].moves ? 700 : 0, playWhoosh);
+        sound(moves ? 700 : 0, playWhoosh);
         break;
       case "sit":
-        sound(STEPS[index].moves ? 800 : 300, playPlop);
+        sound(moves ? 800 : 300, playPlop);
         break;
       case "done":
         if (came !== "kaka") sound(0, playTrickle);
@@ -217,6 +234,12 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         sound(0, cheer);
         sound(300, partyHorn);
         for (let i = 0; i < 12; i++) later(i * 150, () => spawn());
+        break;
+      case "play":
+        // Mama and Papa knock at the open door before they ask.
+        sound(0, () => playKnock(440));
+        sound(260, () => playKnock(440));
+        sound(1200, playGiggle);
         break;
     }
   };
@@ -252,7 +275,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const nextScene = (tapped: boolean) => {
     const index = (atRef.current.scene + 1) % scenes.length;
     const scene = scenes[index];
-    goTo({ step: atRef.current.step, scene: index }, SCENE_MS);
+    goTo({ ...atRef.current, scene: index }, SCENE_MS);
     if (settings.sounds) SCENE_SOUNDS[scene.sound]();
     // Once per round the voice says what the ✓ is for; after that only tapped scenes speak.
     if (!toldFinish.current) {
@@ -262,47 +285,57 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   };
 
   /**
-   * A tap or key: the next step (or thought) when the last one has finished, a sparkle while it still runs – and on
-   * the first steps, which only „Weiter“ ends.
+   * A tap or key anywhere does what makes most sense there: while sitting the next thought, everywhere else what
+   * „Weiter“ does (what the child said stays as picked, ❓ when nobody did). Only while a step's sounds still run,
+   * and at the end, it sparkles.
    */
   const act = (x?: number, y?: number) => {
-    const next = atRef.current.step + 1;
-    if (busyRef.current || next >= STEPS.length || STEPS[atRef.current.step].nudge) {
+    const { step: index, nothing } = atRef.current;
+    const here = storyFor(nothing);
+    if (busyRef.current || index >= here.length - 1) {
       spawn(x, y);
       if (settings.sounds) playRandomNote();
       return;
     }
-    if (STEPS[atRef.current.step]?.id === "sit") nextScene(true);
-    else begin(next);
+    if (here[index].id === "sit") nextScene(true);
+    else jump(index + 1);
   };
 
   // The story goes on by itself where nothing real has to happen (Step.auto), and the thoughts follow each other. Through a ref, so the timer started for a step runs with what was picked meanwhile.
   const goOn = useRef(() => {});
   goOn.current = () => {
-    if (STEPS[atRef.current.step].id === "sit") nextScene(false);
+    if (storyFor(atRef.current.nothing)[atRef.current.step].id === "sit") nextScene(false);
     else begin(atRef.current.step + 1);
   };
   useEffect(() => {
-    const here = STEPS[at.step];
+    const here = storyFor(at.nothing)[at.step];
     const ms = here.id === "sit" && at.scene >= 0 ? WAIT_SCENE_MS : here.auto;
     if (ms === undefined) return;
     const timer = setTimeout(() => goOn.current(), ms);
     return () => clearTimeout(timer);
   }, [at]);
 
-  /** A button while calling: what the child said, only noted – „Weiter“ goes on. */
+  /** A button while calling: what the child said is kept, and the story goes on with it at once, as „Weiter“ would. */
   const pick = (choice: Said, e: PointerEvent) => {
     if (settings.sounds) playPop();
     spawn(e.clientX, e.clientY);
-    if (choice === said) return;
     setSaid(choice);
+    stopTimers();
+    begin(atRef.current.step + 1, { came: null, said: choice });
+    // Said before the next step's words, which the speech queues after it.
     say(texts.said[choice]);
   };
 
   /** A ✓ while sitting: a grown-up says what is in the potty, and the story goes on with it. */
   const finish = (came: Went) => {
     setWent(came);
-    begin(atRef.current.step + 1, came);
+    begin(atRef.current.step + 1, { came });
+  };
+
+  /** Nothing came: the other story, washing hands and then playing, until Mama and Papa ask again. */
+  const finishWithNothing = () => {
+    setWent(null);
+    begin(SIT + 1, { came: null, nothing: true });
   };
 
   /** Stops what the step before still had to play, so another one can begin at once. */
@@ -315,12 +348,14 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   /**
    * A tap on the row of steps: the story jumps there at once, also while a step still plays. Before the
    * potty nothing has come yet; from „fertig“ on, what the child said came (pipi when nobody knew) unless a ✓ chose.
+   * Back on the potty or before it, the usual story starts again, since nothing has been chosen there yet.
    */
   const jump = (index: number) => {
     stopTimers();
-    const came = index < DONE ? null : (went ?? expectedWent(said));
+    const nothing = atRef.current.nothing && index > SIT;
+    const came = nothing || index < DONE ? null : (went ?? expectedWent(said));
     setWent(came);
-    begin(index, came);
+    begin(index, { came, nothing });
   };
 
   /** „Weiter“: the next step at once, also while this one's sounds still play. */
@@ -335,17 +370,16 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     setSaid("unsure");
     setWent(null);
     toldFinish.current = false;
-    begin(0, null);
+    begin(0, { came: null, said: "unsure", nothing: false });
   };
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
       // While sitting Enter is the ✓ for what the child said (pipi when nobody knew), every other key the next thought.
-      // On the first steps Enter is „Weiter“, other keys only sparkle.
-      const here = STEPS[atRef.current.step];
+      // Everywhere else every key is „Weiter“.
+      const here = storyFor(atRef.current.nothing)[atRef.current.step];
       if (e.key === "Enter" && here?.id === "sit" && !busyRef.current) finish(expectedWent(said));
-      else if (e.key === "Enter" && here?.nudge) jump(atRef.current.step + 1);
       else act();
     };
     window.addEventListener("keydown", onKeyDown);
@@ -367,7 +401,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   return (
     <div className={`potty-play pt-${went ?? said} pt-at-${step.id}${busy ? " busy" : ""}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
       {shown.before && <StoryPicture key={`before-${shown.before.join()}`} name={shown.before} moving={false} />}
-      <StoryPicture key={pictures.join()} name={pictures} moves={moves} moving className="pt-picture pt-picture-new" />
+      <StoryPicture key={pictures.join()} name={pictures} moves={moves} again={step.again} moving className="pt-picture pt-picture-new" />
 
       {/* Drawn on top of the picture: what the animal feels and says, without words. */}
       {step.id === "need" && (
@@ -402,7 +436,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         {/* Every step in the row jumps there. Plain buttons, not grown tap areas: only a tap right on one jumps,
             one next to the row goes on with the story, and the buttons next to it keep their reach. */}
         <ol className="pt-steps">
-          {STEPS.map((s, i) => (
+          {story.map((s, i) => (
             <li key={s.id} className={i < at.step ? "done" : i === at.step ? "now" : undefined}>
               <button
                 type="button"
@@ -466,6 +500,20 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     <span className="pt-finish-need">{WENT_EMOJI[n]}</span>
                   </button>
                 ))}
+                {/* Nothing came: a story of its own, so it looks unlike the ✓. */}
+                <button
+                  type="button"
+                  className="pt-finish pt-nothing"
+                  data-tap
+                  aria-label={texts.nothing}
+                  onPointerDown={(e) => {
+                    if (busyRef.current) return; // the tap goes on to sparkle
+                    e.stopPropagation();
+                    finishWithNothing();
+                  }}
+                >
+                  🤷
+                </button>
               </div>
             </div>
           )}
@@ -479,7 +527,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         </div>
       </div>
 
-      {last && <GameEnd delayMs={STEPS[at.step].ms} onAgain={restart} next={{ emoji: "🚽", name: TAPSI.name, onNext: restart }} />}
+      {/* There is one story only, so „Weiter“ would be „Nochmal“ again: only „Menü“ and „Nochmal“. */}
+      {last && <GameEnd delayMs={step.ms} onAgain={restart} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

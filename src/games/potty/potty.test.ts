@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import {
   iconFor,
+  NOTHING_STEPS,
   picturesFor,
   POTTY_TEXTS,
   SAID,
@@ -23,6 +24,8 @@ import { waitLanguageFor, waitLanguageOf } from "./waitMusic";
 const SAIDS: Said[] = SAID.map((s) => s.id);
 const WENTS: Went[] = ["pipi", "kaka", "both"];
 const WHICHES: Which[] = [...new Set([...SAIDS, ...WENTS])];
+/** The steps of both stories. */
+const ALL_STEPS = [...new Set([...STEPS, ...NOTHING_STEPS])];
 
 describe("Aufs Töpfchen", () => {
   it("has steps with their own ids, every one said for pipi, kaka and not knowing, ending with the party", () => {
@@ -30,13 +33,22 @@ describe("Aufs Töpfchen", () => {
     expect(STEPS.at(-1)?.id).toBe("party");
     expect([...SAIDS].sort()).toEqual(["both", "kaka", "pipi", "unsure"]);
     for (const texts of Object.values(POTTY_TEXTS)) {
-      for (const which of WHICHES) for (const step of STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
+      for (const which of WHICHES) for (const step of ALL_STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
+      expect(texts.nothing.trim()).not.toBe("");
       for (const went of WENTS) expect(texts.went[went].trim()).not.toBe("");
       for (const said of SAIDS) expect(texts.said[said].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
       for (const scene of WAIT_SCENES) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
       expect(texts.star.trim()).not.toBe("");
     }
+  });
+
+  it("goes from sitting to washing hands and playing when nothing came, ending there", () => {
+    const sit = STEPS.findIndex((s) => s.id === "sit");
+    expect(NOTHING_STEPS.slice(0, sit + 1)).toEqual(STEPS.slice(0, sit + 1));
+    expect(NOTHING_STEPS.slice(sit + 1).map((s) => s.id)).toEqual(["wash", "play"]);
+    // Tapsi plays until Mama and Papa ask: nothing goes on by itself there.
+    expect(NOTHING_STEPS.at(-1)?.auto).toBeUndefined();
   });
 
   it("brings only the waiting scenes of what was said, pipi and kaka taking turns for both or when nobody knows", () => {
@@ -62,7 +74,9 @@ describe("Aufs Töpfchen", () => {
     expect(STEPS.filter((s) => s.nudge).map((s) => s.id)).toEqual(["eat", "need", "call", "go"]);
     for (const step of STEPS) if (step.nudge) expect(step.auto).toBeUndefined();
     for (const id of ["sit", "done"]) expect(auto(id)).toBeGreaterThan(0);
-    for (const step of STEPS) if (step.auto !== undefined) expect(step.auto).toBeGreaterThan(step.ms);
+    for (const step of ALL_STEPS) if (step.auto !== undefined) expect(step.auto).toBeGreaterThan(step.ms);
+    // The trousers go down again and again until the story goes on, after a pause longer than a frame.
+    for (const step of ALL_STEPS) if (step.again !== undefined) expect(step.moves?.length).toBeGreaterThan(0);
     expect(WAIT_SCENE_MS).toBeGreaterThan(SCENE_MS);
   });
 
@@ -88,7 +102,7 @@ describe("Aufs Töpfchen", () => {
     // A thought bubble shows its emoji until it has a picture; a picture it has moves.
     const thoughts = WAIT_SCENES.map(scenePicture).filter((name) => files.some((f) => f.startsWith(`${TAPSI.pictures}-${name}`)));
     const names = new Set([
-      ...STEPS.flatMap((s) => [...WHICHES.flatMap((which) => picturesFor(s, which)), ...(s.moves ?? [])]),
+      ...ALL_STEPS.flatMap((s) => [...WHICHES.flatMap((which) => picturesFor(s, which)), ...(s.moves ?? [])]),
       ...thoughts.flatMap((name) => [name, `${name}-b`]),
     ]);
     expect([...names].map((name) => `${TAPSI.pictures}-${name}.webp`).filter((f) => !files.includes(f))).toEqual([]);

@@ -23,7 +23,11 @@ Die Stufen nacheinander, jede braucht die Bilder der vorigen als Referenz (`.ima
    Bad springen. Beim Warten bleibt `sitzen` stehen; was Tapsi denkt, kommt in eine Denkblase (`denken-…`, noch nicht
    gemacht, bis dahin ein Emoji), gezeichnet ohne Badezimmer.
 6. `frames-kitchen`, `frames-bath`, `frames-wait` – die zweiten Frames, jeder mit seinem ersten als Referenz.
-7. `moves` – die Bewegung vor einem Bild (`Step.moves`): `runter-1`, `runter-2` (Hose noch oben, an den Knien) vor
+7. `play-first` – `spielen`: das Kinderzimmer (wenn nichts kam), ein neuer Raum wie das Bad, mit `rufen` als Referenz
+   für die drei; die Tür steht nah der Mitte, Mama und Papa schauen dort herein. Danach `frames-play` für `spielen-b`:
+   die erste Bewegung („noch ein Klotz auf den Turm“) kam fast gleich zurück, erst „Tapsi dreht den Kopf zur Tür,
+   Mama winkt“ bewegte sich sichtbar – die Bewegung eines zweiten Frames muss groß genug sein, um sie zu sehen.
+8. `moves` – die Bewegung vor einem Bild (`Step.moves`): `runter-1`, `runter-2` (Hose noch oben, an den Knien) vor
    `runter`, `sitzen-1` (steht vor dem Töpfchen) vor `sitzen`, jedes mit dem Endbild als einziger Referenz (aus
    `bilder/`, die Rohbilder der ersten Runde sind weg). Der Prompt muss sagen, was noch NICHT so ist, sonst zeichnet
    das Modell die Endpose. Ein Bild „halb hingesetzt“ gelang in drei Versuchen nicht (es saß immer schon) und fehlt.
