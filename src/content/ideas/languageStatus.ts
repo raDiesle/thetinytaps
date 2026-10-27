@@ -72,7 +72,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
     ],
   },
-  { href: "/gefuehle/", languages: { de: "done", ru: "done" } },
+  {
+    href: "/gefuehle/",
+    languages: { de: "done", ru: "partial" },
+    note: "Russisch fehlt noch: zu Hause je Gefühl zwei nicht so gute Ideen (Runde mit nur zwei Karten, Oktober 2026) und zwei Absätze unter „Über das Spiel“; bis dahin auf Deutsch mit deutscher Stimme.",
+  },
   { href: "/kettenreaktion/", languages: { de: "done", ru: "done" } },
   { href: "/kleine-abenteuer/", languages: { de: "done", ru: "done" } },
   { href: "/tiere/", languages: { de: "done", ru: "done" } },

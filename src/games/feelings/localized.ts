@@ -21,7 +21,8 @@ export interface FeelingText {
   intro: string;
   /** Only where the German feeling has its own question. */
   question?: string;
-  instead: { caption: string; answer: string };
+  /** One per round like the German; `null` where it is not translated yet (that card is told in German). */
+  instead: ({ caption: string; answer: string } | null)[];
   end: { narration: string; line: string };
   endCaption: string;
 }
@@ -62,7 +63,7 @@ export function feelingIn(feeling: Feeling, language: TargetLanguageId): Feeling
     ...text,
     // The German feeling decides whether there is a question of its own.
     question: feeling.question && text.question,
-    instead: { ...feeling.instead, ...text.instead },
+    instead: feeling.instead.map((instead, i) => ({ ...instead, ...text.instead[i] })),
   };
 }
 

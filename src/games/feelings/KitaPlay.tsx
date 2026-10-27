@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
-import { type Localized, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
 import { imageFor, preloadImages, storyImages } from "./images";
 import { QUESTION, type Situation } from "./kita";
 import type { FeelingsSettings } from "./settings";
@@ -19,10 +19,7 @@ import {
   type CardState,
   type PictureLook,
 } from "./shared";
-import { beatMs, type Beat } from "./story";
-
-/** Asked before every step after the first. */
-const NEXT_QUESTION: Localized = { de: "Und jetzt?", ru: "А теперь?" };
+import { beatMs, NEXT_QUESTION, type Beat } from "./story";
 
 type Phase = "intro" | "steps" | "outro" | "done";
 
@@ -50,23 +47,26 @@ function freshRun(key: number): Run {
   return { key, phase: "intro", stepsDone: 0, tried: false, trying: false, picked: null, cheering: false, busy: true };
 }
 
-/** The big picture for this moment: what happened, a card tapped once, the step the bear just did, the not-so-good idea, or the happy end. */
-function pictureName(situation: Situation, { phase, stepsDone, trying, picked }: Run): string {
+/**
+ * The big picture for this moment: a card tapped once, the not-so-good idea, the happy end, the step the bear is doing,
+ * and otherwise – before every choice – what happened, so each step starts from the same picture.
+ */
+function pictureName(situation: Situation, { phase, stepsDone, trying, picked, busy }: Run): string {
   const { id, steps } = situation;
   if (picked === "good") return storyImages.step(id, stepsDone);
   if (trying || picked === "instead") return storyImages.instead(id, stepsDone);
   if (phase === "outro" || phase === "done") {
     return imageFor(storyImages.end(id)) ? storyImages.end(id) : storyImages.step(id, steps.length - 1);
   }
-  return stepsDone > 0 ? storyImages.step(id, stepsDone - 1) : storyImages.problem(id);
+  return busy && stepsDone > 0 ? storyImages.step(id, stepsDone - 1) : storyImages.problem(id);
 }
 
 /** What the big picture shows, in a few words for grown-ups. */
-function pictureCaption(situation: Situation, { phase, stepsDone, trying, picked }: Run): string {
+function pictureCaption(situation: Situation, { phase, stepsDone, trying, picked, busy }: Run): string {
   if (picked === "good") return situation.steps[stepsDone].caption;
   if (trying || picked === "instead") return situation.steps[stepsDone].instead.caption;
   if (phase === "outro" || phase === "done") return situation.endCaption;
-  return stepsDone > 0 ? situation.steps[stepsDone - 1].caption : situation.caption;
+  return busy && stepsDone > 0 ? situation.steps[stepsDone - 1].caption : situation.caption;
 }
 
 /** Im Kindergarten: one story (its words already in the app language), step by step. `onNext` goes on to the next story. */
