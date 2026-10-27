@@ -110,3 +110,102 @@ Title:
 ```text
 Warten auf dem Töpfchen
 ```
+
+## Русский (`ru`, written 27 Oct 2026)
+
+The German song in Russian, verse for verse, same tempo, key and instruments, so the loop is measured the same way.
+Sung by the one who sits, in the present tense and without anything that changes for boy or girl: no „я большой“, no
+past tense of „я“ („расту“, „умею“, „сижу“ instead), the shout-back answers are just „Я!“. „Пи-пи“ and „ка-ка“ as
+Russian parents say to toddlers. Not yet read by a native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 100 BPM, steady, bouncy]
+
+[Verse 1 – ukulele, woodblock ticking]
+Сижу я на горшочке,
+подгузника уж нет!
+Расту, уже умею —
+и в этом весь секрет!
+
+[Chorus – glockenspiel joins]
+Тик-так, мы подождём,
+у нас полно минут.
+Пи-пи или ка-ка —
+вот-вот они придут!
+
+[Verse 2 – ukulele, light shaker]
+У мамы — взрослый унитаз,
+у папы тоже, да!
+А у меня — горшочек,
+и это красота!
+
+[Chorus – glockenspiel]
+Тик-так, мы подождём,
+у нас полно минут.
+Пи-пи или ка-ка —
+вот-вот они придут!
+
+[Verse 3 – playful, kazoo answers]
+У мишки есть подгузник,
+он маленький ещё.
+А я скажу: «Мне надо!» —
+и это хорошо.
+
+[Chorus – glockenspiel]
+Тик-так, мы подождём,
+у нас полно минут.
+Пи-пи или ка-ка —
+вот-вот они придут!
+
+[Bridge – call and response, the same voice shouts back, woodblock]
+Кто без подгузника? (Я!)
+Кто на горшке сидит? (Я!)
+Кто ждёт совсем спокойно? (Я!)
+Кто у нас растёт? (Я!)
+
+[Verse 4 – softer, calm]
+Бывает — очень быстро,
+бывает — долго ждать.
+Сижу себе спокойно,
+часы стучат опять.
+
+[Chorus – glockenspiel]
+Тик-так, мы подождём,
+у нас полно минут.
+Пи-пи или ка-ка —
+вот-вот они придут!
+
+[Verse 5 – bouncy again, kazoo]
+А если получилось —
+все хлопают: «Ура!»
+Смываем, моем ручки —
+пойдём, уже пора!
+
+[Chorus – glockenspiel, everything together]
+Тик-так, мы подождём,
+у нас полно минут.
+Пи-пи или ка-ка —
+вот-вот они придут!
+
+[Instrumental turnaround – 2 bars, woodblock tick-tock, leads back to Verse 1]
+```
+
+Style of Music:
+
+```text
+playful cheerful Russian children's song for toddlers, sung in Russian, 100 BPM, F major, one warm cheerful voice singing clearly, slow clear pronunciation, ukulele, glockenspiel, woodblock ticking like a clock, kazoo answers, light shaker, bouncy and silly but never hectic, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 3:00
+```
+
+Exclude Styles:
+
+```text
+rap, heavy drums, electric guitar, distortion, choir, sad, fast, tempo changes, long intro, fade out, final chord
+```
+
+Title:
+
+```text
+Сижу на горшочке
+```

@@ -138,6 +138,27 @@ describe("Aufs Töpfchen", () => {
     const lyrics = [...sheet.matchAll(/Lyrics:\s*```text\n([\s\S]*?)```/g)].map((m) => m[1].toLowerCase());
     expect(lyrics.length).toBeGreaterThan(0);
     const banned = ["regen", "wasser", "brunnen", "gieß", "schlauch", "ballon", "ketchup", "huhn", "ei!", "knete", "drück", "plitsch", "platsch", "plopp"];
+    // The same in Russian (whole stems: „дожд“ alone is in „подождём“): water, rain, fountain, watering can, hose, balloon, ketchup, hen, egg, play dough, pushing, splashing.
+    banned.push(
+      "вода",
+      "воду",
+      "водичк",
+      "дождь",
+      "дождик",
+      "дожди",
+      "фонтан",
+      "лейк",
+      "шланг",
+      "шарик",
+      "кетчуп",
+      "куриц",
+      "яйц",
+      "пластилин",
+      "туж",
+      "плюх",
+      "буль",
+      "кап-",
+    );
     for (const text of lyrics) expect(banned.filter((word) => text.includes(word))).toEqual([]);
   });
 });
