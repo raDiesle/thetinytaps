@@ -121,7 +121,7 @@ export function PartyPlay({ settings, onStory }: { settings: PottySettings; onSt
           );
         })}
       </ol>
-      {ended && <GameEnd onAgain={celebrate} next={{ emoji: "💧", name: t({ de: "Muss Pipi!" }), onNext: onStory }} />}
+      {ended && <GameEnd onAgain={celebrate} next={{ emoji: "🚽", name: t({ de: "Muss mal!" }), onNext: onStory }} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

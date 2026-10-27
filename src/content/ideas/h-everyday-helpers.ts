@@ -57,7 +57,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "Eltern suchen „töpfchen lied“, „töpfchen app“, „töpfchen mit applaus“, „töpfchentraining ab wann“ und „belohnungssystem kinder toilette“. Genau im Alter der App.",
       effort: "M",
       partial:
-        "„Aufs Töpfchen“ (/toepfchen/): Gemini-Bildgeschichte mit Tapsi dem Fuchs – essen, trinken, Blase drückt oder Bauch brummelt, Mama und Papa rufen, jeder Schritt ein Tippen; beim Sitzen machen Mama und Papa bei jedem Tippen etwas anderes (Wasser plätschert bei Pipi, Drücken bei Kaka, Quatsch), bis der grüne Haken „fertig“ sagt. „Hat geklappt!“ mit Stern auf einer eigenen Wochentafel. Das Warte-Lied ist noch synthetisch (kein Suno-Lied), und die Sterne landen noch nicht auf einer gemeinsamen Sternentafel (H-01).",
+        "„Aufs Töpfchen“ (/toepfchen/): Gemini-Bildgeschichte mit Tapsi dem Fuchs – essen, trinken, Blase drückt oder Bauch brummelt, Mama und Papa rufen, jeder Schritt ein Tippen. Eine Geschichte „Muss mal!“: der Erwachsene wählt, was das Kind gesagt hat (Pipi, Kaka oder „Weiß nicht“); beim Sitzen machen Mama und Papa bei jedem Tippen etwas anderes (Wasser plätschert bei Pipi, Drücken bei Kaka, Quatsch), bis ein grüner Haken „fertig“ sagt – einer für Pipi, einer für Kaka, je nachdem, was wirklich kam. „Hat geklappt!“ mit Stern auf einer eigenen Wochentafel. Das Warte-Lied ist noch synthetisch (kein Suno-Lied), und die Sterne landen noch nicht auf einer gemeinsamen Sternentafel (H-01).",
     },
     {
       id: "H-07",

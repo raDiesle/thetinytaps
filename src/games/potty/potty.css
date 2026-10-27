@@ -3,8 +3,8 @@
 /*
  * The story is a Gemini picture filling the screen (StoryPicture.tsx), its two frames
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
- * calls (.pt-feel, .pt-call), the ✓ while sitting (.pt-finish), the row of steps.
- * Root classes: pt-pipi / pt-kaka, pt-at-<step>, busy while a step's sounds run.
+ * calls (.pt-feel, .pt-call), the two ✓ while sitting (.pt-finish), the row of steps.
+ * Root classes: pt-pipi / pt-kaka / pt-unsure (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
  * Nothing moves before the first tap.
  */
 
@@ -100,7 +100,8 @@
   }
 }
 
-.pt-kaka.pt-at-need.busy .pt-picture {
+.pt-kaka.pt-at-need.busy .pt-picture,
+.pt-unsure.pt-at-need.busy .pt-picture {
   animation: pt-rumble 0.5s ease-in-out 3;
 }
 
@@ -130,11 +131,18 @@
   }
 }
 
-/* While sitting: the big green ✓ says „fertig“. It pulses and a hand points at it, so nobody misses it. */
-.pt-finish {
+/* While sitting: two big green ✓ say „fertig“ – one for pipi, one for kaka, told apart by the badge.
+   They pulse and a hand points at the one the child said, so nobody misses them. */
+.pt-finishes {
   position: absolute;
   right: max(16px, env(safe-area-inset-right));
   bottom: calc(max(10px, env(safe-area-inset-bottom)) + clamp(48px, min(7vw, 10vmin), 72px));
+  display: flex;
+  gap: clamp(28px, 6vmin, 48px);
+}
+
+.pt-finish {
+  position: relative;
   display: grid;
   place-items: center;
   width: clamp(92px, 19vmin, 150px);
@@ -165,12 +173,12 @@
   left: -12%;
   display: grid;
   place-items: center;
-  width: 46%;
-  height: 46%;
+  width: 54%;
+  height: 54%;
   border: 3px solid #2a1e5c;
   border-radius: 50%;
   background: #fff;
-  font-size: clamp(22px, 5vmin, 40px);
+  font-size: clamp(26px, 6vmin, 48px);
 }
 
 .pt-finish-hand {
