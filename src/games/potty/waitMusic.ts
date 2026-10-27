@@ -1,3 +1,4 @@
+import songFiles from "./musik/*.mp3?glob";
 import { useEffect, useState } from "react";
 import { type Loop, loadSound, playLoop, playWaitNote } from "@/lib/sfx";
 import { BEAT_MS } from "./content";
@@ -5,7 +6,6 @@ import { BEAT_MS } from "./content";
 // The waiting song while the animal sits on the potty: musik/musik-toepfchen-warten-<lang>.mp3,
 // found by its file name, so a new language needs only its file (see the README there).
 // Sitting lasts as long as it lasts, so the song repeats until the tap that ends it.
-const files = import.meta.webpackContext("./musik", { regExp: /\.mp3$/ });
 
 /** The language code in a waiting song's file name, or null for any other file. */
 export const waitLanguageOf = (file: string) => /musik-toepfchen-warten-([a-z]{2})\.mp3$/.exec(file)?.[1] ?? null;
@@ -16,10 +16,9 @@ export const waitLanguageFor = (appLanguage: string, available: readonly string[
 
 /** The bundled waiting songs by language. */
 const SONGS: Record<string, string> = Object.fromEntries(
-  files.keys().flatMap((file) => {
+  Object.entries(songFiles).flatMap(([file, url]) => {
     const lang = waitLanguageOf(file);
-    const module = files(file) as string | { default: string };
-    return lang ? [[lang, typeof module === "string" ? module : module.default]] : [];
+    return lang ? [[lang, url]] : [];
   }),
 );
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import type { MarbleLevel } from "./settings";
 import type { MachineEvent } from "./machineKit";
+import { PROD } from "@/lib/buildInfo";
 
 /** How fast the camera catches up with the action, per second. */
 const CAMERA_FOLLOW = 2.6;
@@ -51,7 +52,7 @@ export function MachineStage({
 
   // For trying out the machine in the browser console: __machine.seek(20)
   useEffect(() => {
-    if (import.meta.env.PROD) return;
+    if (PROD) return;
     Object.assign(window, {
       __machine: {
         duration: machine.duration,

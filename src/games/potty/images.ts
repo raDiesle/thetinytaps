@@ -2,13 +2,9 @@
 // "<animal>-<picture>": "fox-essen", "fox-warten-giesskanne". A second frame "-b"
 // fades in and out with the first, so the animals move a little (as in „Gefühle“).
 
-const files = import.meta.webpackContext("./bilder", { regExp: /\.webp$/ });
+import pictureFiles from "./bilder/*.webp?glob";
 
-const IMAGES = new Map<string, string>();
-for (const key of files.keys()) {
-  const module = files(key) as string | { default: string };
-  IMAGES.set(key.replace(/^\.\//, "").replace(/\.webp$/, ""), typeof module === "string" ? module : module.default);
-}
+const IMAGES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
 
 /** All frames of the picture `name`, first one first; empty if there is none. */
 export function framesFor(name: string): string[] {

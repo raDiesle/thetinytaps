@@ -11,6 +11,7 @@ import type { LoudLevel, LoudSettings } from "./settings";
 import { LEVEL_TEXTS } from "./texts";
 import { VoicePlay } from "./VoicePlay";
 import "./loud.css";
+import { DEV } from "@/lib/buildInfo";
 
 /** The microphone's loudness of one frame, in dBFS, and the time since the last one. */
 export type FrameHandler = (db: number, ms: number) => void;
@@ -33,7 +34,7 @@ const LEVELS: { id: LoudLevel; emoji: string; name: Localized; tapHint: Localize
 
 /** Which levels to play, in turn; in development `?level=blow` in the address picks one. */
 function chosenLevels(choice: LoudSettings["levels"]): LoudLevel[] {
-  const fromUrl = import.meta.env.DEV ? new URLSearchParams(window.location.search).get("level") : null;
+  const fromUrl = DEV ? new URLSearchParams(window.location.search).get("level") : null;
   const one = LEVELS.find((l) => l.id === (fromUrl ?? choice));
   return one ? [one.id] : LEVELS.map((l) => l.id);
 }

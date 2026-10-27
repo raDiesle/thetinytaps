@@ -140,7 +140,7 @@ Shared helpers in `@/lib/sfx`: `loadSound(url)` decodes a file, `playLoop(buffer
 and returns `{ fade, stop }`. Build a small hook like `useBrushingMusic` in
 `src/games/teeth/music.ts`:
 
-- find the file with `import.meta.webpackContext("./musik", …)`, so the game still
+- find the file with `import songFiles from "./musik/*.mp3?glob"`, so the game still
   builds without it and falls back to its synthesized tune;
 - the measured times in one constant (`SONG`) with a comment on the tempo;
 - play at the game's own time (offset = first beat + game time), restart when the

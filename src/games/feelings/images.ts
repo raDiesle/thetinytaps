@@ -2,14 +2,9 @@
 // A picture can have more frames for a little movement: "push-1" is the first,
 // "push-1-b" the second; they fade into each other in a loop.
 
-const files = import.meta.webpackContext("./bilder", { regExp: /\.(webp|png|jpe?g)$/ });
+import pictureFiles from "./bilder/*.webp?glob";
 
-const IMAGES = new Map<string, string>();
-for (const key of files.keys()) {
-  const module = files(key) as string | { default: string };
-  const name = key.replace(/^\.\//, "").replace(/\.\w+$/, "");
-  IMAGES.set(name, typeof module === "string" ? module : module.default);
-}
+const IMAGES = new Map(Object.entries(pictureFiles).map(([file, url]) => [file.replace(/\.webp$/, ""), url]));
 
 const FRAME_SUFFIXES = ["", "-b", "-c"];
 

@@ -1,18 +1,13 @@
+import songFiles from "./musik/*.mp3?glob";
+import timingFiles from "./musik/*.json?glob";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { audioContext, decodeSound, type Loop, playLoop, playTuneNote } from "@/lib/sfx";
 import { type SungTimes, sungLanguageOf } from "./sung";
 
 // The sung brushing songs in musik/ (see the README there). While one is still
 // loading, or when it can't be loaded, the synthesized tune plays instead.
-const files = import.meta.webpackContext("./musik", { regExp: /\.mp3$/ });
-const timings = import.meta.webpackContext("./musik", { regExp: /\.json$/ });
-
 /** The bundled URL of a song file, or null when it isn't there. */
-const urlOf = (file: string) => {
-  if (!files.keys().includes(file)) return null;
-  const module = files(file) as string | { default: string };
-  return typeof module === "string" ? module : module.default;
-};
+const urlOf = (file: string) => songFiles[file] ?? null;
 
 /** A song file and where things are in it, in seconds. Measure again for a new song. */
 interface Song {
@@ -31,12 +26,11 @@ interface Song {
  * the steps follow the verses (`sungSteps`) instead of the other way round.
  */
 const SUNG: Record<string, Song & SungTimes> = Object.fromEntries(
-  files.keys().flatMap((file) => {
+  Object.keys(songFiles).flatMap((file) => {
     const lang = sungLanguageOf(file);
-    const times = file.replace(/\.mp3$/, ".json");
-    if (!lang || !timings.keys().includes(times)) return [];
-    const module = timings(times) as SungTimes | { default: SungTimes };
-    const { verses } = "default" in module ? module.default : module;
+    const times = timingFiles[file.replace(/\.mp3$/, ".json")] as unknown as SungTimes | undefined;
+    if (!lang || !times) return [];
+    const { verses } = times;
     const finale = verses[verses.length - 1];
     return [[lang, { file, verses, start: verses[0], finale, loopEnd: finale }]];
   }),

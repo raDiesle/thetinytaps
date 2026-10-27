@@ -1,3 +1,4 @@
+import { DEV } from "@/lib/buildInfo";
 // Which language a language choice starts on, before a grown-up picks one: the
 // browser's own language when the game has it, otherwise English, which more
 // players understand than German. While developing (`bun run dev`) it is always
@@ -25,7 +26,7 @@ function browserLanguages(): readonly string[] {
  * The default of a language choice offering `supported`: German while developing,
  * for players the browser's language, else English, else the first one offered.
  */
-export function playLanguage<T extends string>(supported: readonly T[], dev = import.meta.env?.DEV ?? false): T {
+export function playLanguage<T extends string>(supported: readonly T[], dev = DEV): T {
   const wanted = dev ? ["de"] : [...browserLanguages(), "en"];
   return pickLanguage(supported, wanted) ?? supported[0];
 }

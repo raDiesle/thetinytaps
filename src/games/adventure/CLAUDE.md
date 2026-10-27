@@ -33,7 +33,7 @@ the key in `ELEVENLABS_API_KEY`). The file name is a hash of the text (`voiceId.
 recording until `bun run voice make` records it again; `voice.ts` plays recordings and falls back to the browser's
 voice for lines without one. `voice.test.ts` checks the translations against the German steps and that a
 language with recordings has one for every line and no extra ones. Recordings in other languages than German
-are not kept offline by every phone, only once the story has started in that language (`rsbuild.config.ts`, `src/sw.js`).
+are not kept offline by every phone, only once the story has started in that language (`tools/build.ts`, `src/sw.js`).
 - A new story or changed lines come in German only: translate (`lines.<language>.ts`) and record (`bun run voice make`)
   only when the user asks for it, and keep the story's row in `src/content/ideas/languageStatus.ts` true
   (`content.test.ts` checks it against the files).

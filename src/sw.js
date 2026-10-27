@@ -1,7 +1,7 @@
 // Service worker: keeps every file of the site in the browser, so the games
 // start without network (plane, no WLAN) and right away. Not bundled – the
 // build copies this file to out/sw.js and fills in VERSION and FILES
-// (rsbuild.config.ts, pluginOffline).
+// (tools/build.ts, writeServiceWorker).
 
 const VERSION = "__VERSION__";
 /** All files of the build, relative to this script, without the songs and other languages' voices. */

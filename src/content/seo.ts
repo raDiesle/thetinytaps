@@ -1,8 +1,8 @@
 // What search engines and link previews see of each page: title, description and
-// a short text. The build writes a page of its own for every entry (rsbuild.config.ts),
+// a short text. The build writes a page of its own for every entry (tools/build.ts),
 // so Google gets a real page with status 200 instead of 404.html, and the app sets
 // the same title and description while it runs (src/lib/title.ts, SeoHead).
-// No `@/` imports here: rsbuild.config.ts reads this file too.
+// No `@/` imports here: tools/build.ts reads this file too.
 // The texts are what parents search for (see the research on /management/).
 
 /** The site's name, after every title. */

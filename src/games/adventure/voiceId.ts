@@ -17,7 +17,7 @@ export function voiceId(text: string): string {
 /**
  * The file name (without .mp3) of the recording of `text` in `language`: the hash for German
  * (stimme/<hash>.mp3), the language in front for the others (stimme/en/en-<hash>.mp3), so the
- * build can leave those out of what every phone keeps offline (rsbuild.config.ts).
+ * build can leave those out of what every phone keeps offline (tools/build.ts).
  */
 export const recordingName = (text: string, language: string) => (language === "de" ? voiceId(text) : `${language}-${voiceId(text)}`);
 

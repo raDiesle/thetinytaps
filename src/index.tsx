@@ -10,13 +10,14 @@ import { downloadMusicIfOn } from "./lib/musicFile";
 import { setUpPwa } from "./lib/pwa";
 import "@fontsource-variable/fredoka";
 import "./globals.css";
+import { BASE_URL } from "@/lib/buildInfo";
 
 setUpPwa();
 downloadMusicIfOn();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <BrowserRouter basename={BASE_URL}>
       <App />
       <PlaytimeLock />
       <ScreenHint />

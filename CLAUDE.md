@@ -1,7 +1,7 @@
 # The Tiny Taps – notes for Claude
 
 Keyboard and touch games for toddlers (2–3 years). A React 19 single-page app
-built with Rsbuild, deployed to GitHub Pages, works offline (PWA). No backend.
+built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backend.
 
 ## Commands (always Bun, never npm, yarn or npx)
 
@@ -9,18 +9,24 @@ built with Rsbuild, deployed to GitHub Pages, works offline (PWA). No backend.
 bun run verify     # lint + format check + typecheck + unit tests – run before every commit
 bun run format     # format everything and apply safe lint fixes (Biome)
 bun test           # unit tests only (bun test, < 1 s); bun test --watch while working
-bun run build      # production build into out/ (Rsbuild) – never `bun build`, that is Bun's own bundler
+bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
 bun run image ...  # picture with Gemini, see /bild-erzeugen
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
 bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
-Bun installs, runs the scripts and tools (`[run] bun = true`, no Node needed) and tests; Rsbuild still bundles.
+Bun does everything: installs, runs the scripts and tools (`[run] bun = true`, no Node needed), tests, bundles
+(`tools/build.ts`) and serves (`tools/dev.ts`, `tools/preview.ts`); no other bundler, no Node.
 `bunfig.toml` keeps installs safe and `src/packageSafety.test.ts` checks it stays so: only the public npm
 registry, only versions at least 3 days old (`minimumReleaseAge`), no install scripts, no packages fetched on
 the fly. Never loosen these; add a package with `bun add --exact <name>` (`-d` for tools), never with `bunx`
-or `bun x`, which fetch past the lockfile. Tests import from `bun:test`. Rspack-only code
-(`import.meta.webpackContext`) works in tests through `src/testPreload.ts`.
+or `bun x`, which fetch past the lockfile. Tests import from `bun:test`.
+What a bundler adds to the code comes from one Bun plugin (`tools/appPlugin.ts`), used alike by build, dev server
+(`bunfig.toml`, `[serve.static]`) and tests (`src/testPreload.ts`): a folder of files is `import files from
+"./bilder/*.webp?glob"` (one extension per pattern – Bun can't load `{a,b}` – `**` for subfolders), facts about the
+build come from `src/lib/buildInfo.ts` (never `import.meta.env`), and in the build a stylesheet a module imports travels in
+that module's chunk (Bun alone would load every game's CSS with the start page; the dev server still does, for hot
+reload, so a game borrowing another's CSS shows only in `preview-pages` – `css.test.ts` checks the keyframes). Keep it that way when adding such code.
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
 Use `dev` – it moves to the next free port when another session has 3000, so

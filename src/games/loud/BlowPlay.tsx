@@ -5,6 +5,7 @@ import type { LevelProps } from "./LoudPlay";
 import { createWind } from "./mic";
 import { Boat, Candles, Dandelion, Pinwheel, type Step, type StationProps } from "./stations";
 import { STATION_TEXTS, type StationId } from "./texts";
+import { DEV } from "@/lib/buildInfo";
 
 /** The pictures in play order; their texts are in texts.ts. */
 const STATIONS: { id: StationId; Station: ComponentType<StationProps> }[] = [
@@ -16,7 +17,7 @@ const STATIONS: { id: StationId; Station: ComponentType<StationProps> }[] = [
 
 /** All pictures in turn; in development `?station=boat` in the address picks one. */
 function chosenStations() {
-  const fromUrl = import.meta.env.DEV ? new URLSearchParams(window.location.search).get("station") : null;
+  const fromUrl = DEV ? new URLSearchParams(window.location.search).get("station") : null;
   const one = STATIONS.find((s) => s.id === fromUrl);
   return one ? [one] : STATIONS;
 }

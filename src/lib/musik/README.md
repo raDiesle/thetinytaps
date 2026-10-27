@@ -5,7 +5,7 @@ downloaded in `../musicFile.ts`), except games with music of their own or a reas
 stay quiet. It was made for Lebendige Bilder. Without it there is no music.
 
 Song files are named `musik-*.mp3`: the service worker leaves them out of its offline
-copy, so they are only downloaded while music is on (`rsbuild.config.ts`, `src/sw.js`).
+copy, so they are only downloaded while music is on (`tools/build.ts`, `src/sw.js`).
 
 The song is instrumental, 97 BPM, with a new part every 8 bars (19.79 s). It goes
 round the first eight parts (`SONG` in `music.ts`); the file is cut there, so the

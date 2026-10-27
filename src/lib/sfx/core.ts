@@ -1,3 +1,4 @@
+import soundFiles from "../sounds/*.mp3?glob";
 import { silent } from "../silent";
 
 // The audio context, recorded sounds and the note helpers every synthesized sound is made of.
@@ -33,12 +34,7 @@ export function unlockAudio() {
 
 // Real recordings for sounds that should sound like the real thing (animals,
 // bells, water …), one file per sound name; sources in sounds/README.md.
-const files = import.meta.webpackContext("../sounds", { regExp: /\.mp3$/ });
-const RECORDING_URLS = new Map<string, string>();
-for (const key of files.keys()) {
-  const module = files(key) as string | { default: string };
-  RECORDING_URLS.set(key.replace(/^\.\//, "").replace(/\.mp3$/, ""), typeof module === "string" ? module : module.default);
-}
+const RECORDING_URLS = new Map(Object.entries(soundFiles).map(([file, url]) => [file.replace(/\.mp3$/, ""), url]));
 const recordings = new Map<string, Promise<AudioBuffer | null>>();
 const loaded = new Map<string, AudioBuffer>();
 

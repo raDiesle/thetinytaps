@@ -6,18 +6,18 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 
 ```bash
 bun install
-bun run dev        # http://localhost:3000 (Rsbuild dev server)
+bun run dev        # http://localhost:3000 (Bun's dev server with hot reload, tools/dev.ts)
 bun run verify     # lint + format check (Biome), typecheck, unit tests (bun test)
 bun run format     # format and apply safe lint fixes
 bun test           # unit tests only
-bun run build      # static site in out/ (`bun build` is Bun's own bundler, not this)
-bun run preview    # serve the built site
+bun run build      # static site in out/ (tools/build.ts; `bun build` is Bun's bare bundler, not this)
+bun run preview    # serve the built site like GitHub Pages (tools/preview.ts)
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 (repo settings → Pages → Source: **GitHub Actions**).
 
-Use **Bun** (not npm or yarn) for everything: installing, scripts, tests; dependencies are locked in `bun.lock`.
+Use **Bun** (not npm or yarn) for everything: installing, scripts, tests, bundling, dev server; dependencies are locked in `bun.lock`.
 `bunfig.toml` keeps installs safe: only the public npm registry, only versions at least 3 days old, no install scripts.
 
 Working with Claude Code: [`CLAUDE.md`](CLAUDE.md) has the rules and the map of
@@ -29,7 +29,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 
 | Path | What |
 | --- | --- |
-| `rsbuild.config.ts`, `index.html` | Build setup (Rsbuild, single-page app; `404.html` fallback for GitHub Pages deep links; writes `sw.js` with the list of all built files) |
+| `tools/`, `index.html` | Build setup (Bun, single-page app): `build.ts` bundles and adds a page per search engine entry, `404.html` fallback for GitHub Pages deep links and `sw.js` with the list of all built files; `dev.ts` and `preview.ts` serve; `appPlugin.ts` for `?glob` imports, build facts and CSS per chunk |
 | `src/sw.js`, `src/lib/pwa.ts`, `public/manifest.webmanifest` | Offline and installable (PWA): the service worker keeps every file in the browser and starts the app from there; registration, the install button and the offline note on the home page (`src/components/InstallHint.tsx`) |
 | `public/icons/` | App icon: `icon.svg` (rounded) and `icon-maskable.svg` (full bleed, for home screens); the PNGs are made from them, see [App icon](#app-icon) |
 | `src/App.tsx` | Routes (React Router) |

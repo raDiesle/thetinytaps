@@ -22,6 +22,7 @@ import { TrackLevel } from "./TrackLevel";
 import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
+import { DEV } from "@/lib/buildInfo";
 
 /** The levels in turn (names and first lines in `content.ts`). The marble run takes the rebuild and pick settings, so it is drawn by itself below (`Level` is null). */
 const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps> | null }[] = [
@@ -41,7 +42,7 @@ const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps>
 
 /** The levels in turn, beginning with the chosen one (in development `?level=garden` in the address), so „Weiter“ always has a next. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
-  const fromUrl = import.meta.env.DEV ? new URLSearchParams(window.location.search).get("level") : null;
+  const fromUrl = DEV ? new URLSearchParams(window.location.search).get("level") : null;
   const first = Math.max(
     0,
     LEVELS.findIndex((l) => l.id === (fromUrl ?? choice)),

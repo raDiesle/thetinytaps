@@ -1,3 +1,4 @@
+import recordingFiles from "./stories/*/stimme/**/*.mp3?glob";
 import { audioContext, loadSound } from "@/lib/sfx";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { speak, stopSpeaking } from "@/lib/speech";
@@ -10,13 +11,8 @@ import { recordingName, spokenLines } from "./voiceId";
 // a recording plays from its file; any other line falls back to the browser's
 // voice, so a line changed but not recorded again is still said.
 
-const files = import.meta.webpackContext("./stories", { recursive: true, regExp: /\/stimme\/(?:[a-z]{2}\/[a-z]{2}-)?[0-9a-f]{8}\.mp3$/ });
 /** Each recording by its file name (recordingName). */
-const URLS = new Map<string, string>();
-for (const key of files.keys()) {
-  const module = files(key) as string | { default: string };
-  URLS.set(key.slice(key.lastIndexOf("/") + 1, -4), typeof module === "string" ? module : module.default);
-}
+const URLS = new Map(Object.entries(recordingFiles).map(([file, url]) => [file.slice(file.lastIndexOf("/") + 1, -4), url]));
 
 const buffers = new Map<string, Promise<AudioBuffer | null>>();
 const load = (url: string) => {

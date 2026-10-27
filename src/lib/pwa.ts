@@ -1,4 +1,5 @@
 import { useEffect, useSyncExternalStore } from "react";
+import { BASE_URL, BUILD_TIME, PROD } from "@/lib/buildInfo";
 
 // Offline and "install as app" (PWA). The service worker itself is src/sw.js.
 
@@ -53,7 +54,7 @@ export function afterLoad(task: () => void) {
 /** Called once at start-up. */
 export function setUpPwa() {
   if (!("serviceWorker" in navigator)) return;
-  if (!import.meta.env.PROD) {
+  if (!PROD) {
     // A worker left over from `bun run preview` on the same port would serve the old build.
     void navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => void reg.unregister()));
     return;
@@ -71,7 +72,7 @@ export function setUpPwa() {
     if (hadWorker) update({ updateReady: true });
   });
 
-  const base = `${import.meta.env.BASE_URL.replace(/\/$/, "")}/`;
+  const base = `${BASE_URL.replace(/\/$/, "")}/`;
   // Only once the page has loaded and is idle: the new worker downloads every file of
   // the site for offline use, and on a first visit that must not slow down the page
   // itself (what the visitor and Google measure). Returning visitors already have it.

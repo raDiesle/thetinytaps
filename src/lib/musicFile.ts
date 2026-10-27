@@ -1,3 +1,4 @@
+import songFiles from "./musik/*.mp3?glob";
 import { COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS } from "@/lib/common";
 import { afterLoad } from "@/lib/pwa";
 import { loadStored } from "@/lib/storage";
@@ -7,10 +8,7 @@ import { loadStored } from "@/lib/storage";
 // needs none of the sound code. While music is off on the home page the file is
 // never downloaded; the service worker leaves songs out of its offline copy too
 // and keeps them only once a page has fetched them (src/sw.js).
-const files = import.meta.webpackContext("./musik", { regExp: /\.mp3$/ });
-const SONG_FILE = "./musik-hintergrund.mp3";
-const songModule = files.keys().includes(SONG_FILE) ? (files(SONG_FILE) as string | { default: string }) : null;
-const SONG_URL = typeof songModule === "string" ? songModule : (songModule?.default ?? null);
+const SONG_URL = songFiles["musik-hintergrund.mp3"] ?? null;
 
 let bytes: Promise<ArrayBuffer | null> | null = null;
 

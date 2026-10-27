@@ -13,6 +13,7 @@ import { StoryPlayer } from "./three/player";
 import { Silhouette } from "./three/silhouette";
 import { hush, loadVoice, say } from "./voice";
 import "./adventure.css";
+import { PROD } from "@/lib/buildInfo";
 
 const CUES: Record<Cue, () => void> = {
   splash: playSplash,
@@ -126,7 +127,7 @@ export function AdventurePlay({
     if (settings.speech) loadVoice(story, language);
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
-    if (!import.meta.env.PROD) Object.assign(window, { __adventure: player });
+    if (!PROD) Object.assign(window, { __adventure: player });
     const fit = () => player.resize(canvas.clientWidth, canvas.clientHeight);
     fit();
     const observer = new ResizeObserver(fit);

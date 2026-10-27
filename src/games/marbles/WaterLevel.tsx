@@ -38,6 +38,7 @@ import {
   type Pose,
 } from "./water";
 import "./water.css";
+import { PROD } from "@/lib/buildInfo";
 
 const WATER = "#5cc8f5";
 const WATER_DEEP = "#3aa6e0";
@@ -145,7 +146,7 @@ export function WaterLevel({ sound, say, onDone }: LevelProps) {
 
   // For trying out a stretch in the browser console: __water.seek(2, 1.5) is one and a half seconds after the third gate opened.
   useEffect(() => {
-    if (import.meta.env.PROD) return;
+    if (PROD) return;
     Object.assign(window, {
       __water: {
         seek(stretch: number, seconds: number) {
