@@ -1,4 +1,4 @@
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import {
@@ -116,5 +116,14 @@ describe("Aufs Töpfchen", () => {
     const part = LANGUAGE_STATUS.find((row) => row.href === "/toepfchen/")?.parts?.find((p) => p.label.includes("Warte-Lied"));
     const listed = Object.entries(part?.languages ?? {}).flatMap(([lang, state]) => (state === "done" ? [lang] : []));
     expect(listed.sort()).toEqual(sung.sort());
+  });
+
+  it("keeps the thought bubble's stand-ins for pipi and kaka out of the waiting song", () => {
+    // Every block of lyrics in the Suno sheet; the song is about the waiting, the bubble shows the rest.
+    const sheet = readFileSync("src/games/potty/musik/suno-lied.md", "utf8");
+    const lyrics = [...sheet.matchAll(/Lyrics:\s*```text\n([\s\S]*?)```/g)].map((m) => m[1].toLowerCase());
+    expect(lyrics.length).toBeGreaterThan(0);
+    const banned = ["regen", "wasser", "brunnen", "gieß", "schlauch", "ballon", "ketchup", "huhn", "ei!", "knete", "drück", "plitsch", "platsch", "plopp"];
+    for (const text of lyrics) expect(banned.filter((word) => text.includes(word))).toEqual([]);
   });
 });

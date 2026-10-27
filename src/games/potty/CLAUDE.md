@@ -103,4 +103,7 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 - The pictures are 16:9 and cover the screen: everything that matters stays in the middle, the edges are only
   wall and floor, since phones on their side cut the top and bottom and tablets the sides.
 - A song that waits for a tap is recorded as a seamless loop and played with `playLoop`, never as a fixed-length piece.
+- The waiting song is long, funny and about the waiting itself (toes, a sneeze, Papa's glasses, the clock); it never
+  sings the thought bubble's stand-ins for pipi and kaka (water, rain, balloon, ketchup, the hen …) or „drücken“ –
+  `potty.test.ts` checks the lyrics in `musik/suno-lied.md`.
 - The story never gives a star; only „Hat geklappt!“ does, once per opening. No empty fields that say „not done“.

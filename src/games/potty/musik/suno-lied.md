@@ -1,28 +1,30 @@
 # Warte-Lied: what to type into Suno
 
 The waiting song (`musik-toepfchen-warten-<lang>.mp3`) plays while the animal sits on the
-potty and repeats until the tap that says „fertig“, so it has no beginning or end of its own:
-verse and chorus three times, calm, sung by the one who sits („ich“, so the child can sing
-along, nothing that changes for boy or girl). It never pushes: waiting is fine, „Pipi oder Kaka“
-comes when it comes. The verses follow what is on screen while it plays. Create → Custom, Instrumental off.
+potty and repeats until the tap that says „fertig“, so it has no beginning or end of its own.
+It is sung by the one who sits („ich“, so the child can sing along, nothing that changes for boy or girl),
+playful and funny – wiggling toes, a sneeze, Papa's glasses – with a part to shout along, and long (about
+three minutes), so it doesn't come round again too soon. It never pushes: waiting is fine, „Pipi oder Kaka“
+comes when it comes. The song never sings the stand-ins of the thought bubble (water, rain, fountain, balloon,
+ketchup, the hen, play dough) or „drücken“: those are the bubble's job, the song is about the waiting itself
+(the user's choice). Create → Custom, Instrumental off.
 
 Suno adds an intro and an ending anyway: when converting, cut the file from the first beat of
 the first verse to the end of the last turnaround (on the measured beat grid, `bun run song`), so
 the whole file loops without a gap.
 
-## Deutsch (`de`, written 26 Oct 2026, rewritten 27 Oct 2026 for the scene as it is now, not made yet)
+## Deutsch (`de`, written 26 Oct 2026, rewritten 27 Oct 2026: longer, funnier, nothing of the thought bubble; not made yet)
 
-What the child sees while it plays: Tapsi on the potty, Mama and Papa clapping softly, a clock ticking on the wall,
-and in a thought bubble things that flow (rain, a watering can, a fountain) or are pressed (ketchup, a balloon blown
-up, a hen laying an egg). The song sings about exactly that – no window (there is none in the bathroom), and
-„Kaka“ like everywhere else in the game.
+What the child sees while it plays: Tapsi on the potty, Mama (red flower at her ear) and Papa (round glasses)
+clapping softly, a clock ticking on the wall. No window (there is none in the bathroom), „Kaka“ like everywhere
+else in the game.
 
 Lyrics:
 
 ```text
-[Tempo: 92 BPM, steady, calm]
+[Tempo: 100 BPM, steady, bouncy]
 
-[Verse 1 – soft ukulele]
+[Verse 1 – ukulele, woodblock ticking]
 Ich sitz auf meinem Töpfchen,
 die Uhr macht tick, tick, tack.
 Mama und Papa warten
@@ -34,11 +36,11 @@ ich hab ganz viel Zeit.
 Pipi oder Kaka –
 bald ist es so weit.
 
-[Verse 2 – soft ukulele, light shaker]
-Ich denk an Regen: plitsch, platsch,
-die Gießkanne gießt,
-der Brunnen, der sprudelt,
-das Wasser, das fließt.
+[Verse 2 – ukulele, light shaker]
+Ich wackle mit den Zehen,
+eins, zwei, drei und vier –
+der fünfte will nicht wackeln,
+der schläft noch, glaub es mir!
 
 [Chorus – glockenspiel]
 Tick, tack, tick, tack,
@@ -46,11 +48,11 @@ ich hab ganz viel Zeit.
 Pipi oder Kaka –
 bald ist es so weit.
 
-[Verse 3 – softer, gentle]
-Ich drück wie beim Ketchup,
-ich puste den Ballon,
-das Huhn, das drückt ganz feste –
-und plopp, da ist es schon!
+[Verse 3 – playful, kazoo answers]
+Mein Schwanz, der wedelt hin und her,
+wisch-wasch, ganz flauschig weich,
+er kitzelt Papa an der Nase –
+hatschi! Da niest er gleich.
 
 [Chorus – glockenspiel]
 Tick, tack, tick, tack,
@@ -58,13 +60,43 @@ ich hab ganz viel Zeit.
 Pipi oder Kaka –
 bald ist es so weit.
 
-[Instrumental turnaround – 2 bars, leads back to Verse 1]
+[Bridge – call and response, the same voice echoes, woodblock]
+Die Uhr macht: Tick! (Tick!)
+Die Uhr macht: Tack! (Tack!)
+Papa macht: Hatschi! (Hatschi!)
+Und Mama: Klipp-klapp! (Klipp-klapp!)
+
+[Verse 4 – ukulele, kazoo]
+Papas Brille rutscht und rutscht
+bis vorne auf die Nase,
+er schielt mich an und ruft „Kuckuck!“ –
+er ist ein lustiger Hase!
+
+[Chorus – glockenspiel]
+Tick, tack, tick, tack,
+ich hab ganz viel Zeit.
+Pipi oder Kaka –
+bald ist es so weit.
+
+[Verse 5 – softer, swaying]
+Ich sing mit der Uhr im Takt,
+die Ohren wippen mit,
+Mama summt und Papa brummt –
+das ist ein Töpfchen-Hit!
+
+[Chorus – glockenspiel, everything together]
+Tick, tack, tick, tack,
+ich hab ganz viel Zeit.
+Pipi oder Kaka –
+bald ist es so weit.
+
+[Instrumental turnaround – 2 bars, woodblock tick-tock, leads back to Verse 1]
 ```
 
 Style of Music:
 
 ```text
-gentle cheerful children's song, 92 BPM, F major, warm friendly voice singing clearly and slowly, soft ukulele, glockenspiel, light shaker, calm and patient, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 2:00
+playful funny children's song, 100 BPM, F major, warm cheerful voice singing clearly, ukulele, glockenspiel, woodblock ticking like a clock, kazoo answers, light shaker, bouncy and silly but never hectic, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 3:00
 ```
 
 Exclude Styles:
