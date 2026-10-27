@@ -31,12 +31,12 @@ export function PottyGame() {
         <>
           <p>
             {t({
-              de: "„Muss mal!“: Tapsi der Fuchs isst und trinkt – dann drückt die Blase oder der Bauch brummelt, je nachdem, was Ihr Kind gesagt hat: Solange Tapsi isst und trinkt, stehen unten rechts drei runde Knöpfe – 💧 Pipi, 💩 Kaka oder ❓ weiß nicht (dann muss Tapsi einfach mal; das gilt auch, wenn keiner getippt wird). Tapsi ruft Mama und Papa, und alle gehen zusammen ins Bad: Hose runter, aufs Töpfchen, abwischen, Hose hoch, ausleeren und abziehen, Hände waschen – und dann wird gefeiert. Jedes Tippen ist ein Schritt; unten zeigt eine Reihe Bilder, welcher dran ist.",
+              de: "„Muss mal!“: Tapsi der Fuchs isst und trinkt abwechselnd, gleich vom Start an – dann drückt die Blase oder der Bauch brummelt, je nachdem, was Ihr Kind gesagt hat: Solange Tapsi isst und trinkt, stehen unten rechts drei runde Knöpfe – 💧 Pipi, 💩 Kaka oder ❓ weiß nicht (dann muss Tapsi einfach mal; das gilt auch, wenn keiner getippt wird). Tapsi ruft Mama und Papa, und alle gehen zusammen ins Bad: Hose runter, aufs Töpfchen, abwischen, Hose hoch, ausleeren und abziehen, Hände waschen – und dann wird gefeiert. Jedes Tippen ist ein Schritt; unten zeigt eine Reihe Bilder, welcher dran ist – tippen Sie dort auf ein Bild, springt die Geschichte sofort zu diesem Schritt.",
             })}
           </p>
           <p>
             {t({
-              de: "Auf dem Töpfchen darf man sich Zeit lassen: Solange Tapsi sitzt, machen Mama und Papa bei jedem Tippen etwas anderes – bei Pipi plätschert Wasser (Gießkanne, Wasserhahn, Dusche), bei Kaka wird gedrückt (Zahnpasta, Luftballon aufpusten, schwerer Korb), bei ❓ beides im Wechsel, und zwischendurch Quatsch (tanzen, jonglieren, Kuckuck). Dazu spielt ein Warte-Lied. Erst einer der beiden großen grünen Haken unten rechts sagt „fertig“ – so kann Ihr Kind auf dem echten Töpfchen mit Tapsi zusammen sitzen, und Sie tippen den Haken mit dem Tropfen 💧, wenn Pipi kam, oder den mit dem Kaka 💩. Was kam, zeigt dann auch Tapsis Töpfchen.",
+              de: "Auf dem Töpfchen darf man sich Zeit lassen: Solange Tapsi sitzt, machen Mama und Papa bei jedem Tippen etwas anderes – bei Pipi plätschert Wasser (Gießkanne, Wasserhahn, Dusche), bei Kaka wird gedrückt (Zahnpasta, Luftballon aufpusten, schwerer Korb), bei ❓ beides im Wechsel, und zwischendurch Quatsch (tanzen, jonglieren, Kuckuck). Dazu spielt ein Warte-Lied. Erst einer der drei großen grünen Haken unten rechts sagt „fertig“ – so kann Ihr Kind auf dem echten Töpfchen mit Tapsi zusammen sitzen, und Sie tippen den Haken mit dem Tropfen 💧, wenn Pipi kam, den mit dem Kaka 💩 oder den mit beidem 💧💩. Was kam, zeigt dann auch Tapsis Töpfchen.",
             })}
           </p>
           <p>
@@ -52,7 +52,7 @@ export function PottyGame() {
               <>
                 {" "}
                 {t({
-                  de: "Mit der Tastatur: jede Taste ist ein Tippen, beim Sitzen ist Enter der Haken für das, was Ihr Kind gesagt hat (bei ❓ Pipi); den anderen tippen Sie mit der Maus an.",
+                  de: "Mit der Tastatur: jede Taste ist ein Tippen, beim Sitzen ist Enter der Haken für das, was Ihr Kind gesagt hat (bei ❓ Pipi); die anderen tippen Sie mit der Maus an.",
                 })}
               </>
             )}

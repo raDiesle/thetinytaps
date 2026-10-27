@@ -1,12 +1,13 @@
 import { readdirSync } from "node:fs";
 import { describe, expect, it } from "@rstest/core";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
-import { iconFor, type Need, picturesFor, POTTY_TEXTS, SAID, type Said, scenePicture, scenesFor, STEPS, TAPSI, WAIT_SCENES } from "./content";
+import { iconFor, picturesFor, POTTY_TEXTS, SAID, type Said, scenePicture, scenesFor, STEPS, TAPSI, WAIT_SCENES, type Went, type Which } from "./content";
 import { addStar } from "./stars";
 import { waitLanguageFor, waitLanguageOf } from "./waitMusic";
 
-const NEEDS: Need[] = ["pipi", "kaka"];
 const SAIDS: Said[] = SAID.map((s) => s.id);
+const WENTS: Went[] = ["pipi", "kaka", "both"];
+const WHICHES: Which[] = [...new Set([...SAIDS, ...WENTS])];
 
 describe("Aufs Töpfchen", () => {
   it("has steps with their own ids, every one said for pipi, kaka and not knowing, ending with the party", () => {
@@ -14,8 +15,8 @@ describe("Aufs Töpfchen", () => {
     expect(STEPS.at(-1)?.id).toBe("party");
     expect(SAIDS.sort()).toEqual(["kaka", "pipi", "unsure"]);
     for (const texts of Object.values(POTTY_TEXTS)) {
-      for (const said of SAIDS) for (const step of STEPS) expect(texts.steps[step.id](TAPSI.name, said).trim()).not.toBe("");
-      for (const need of NEEDS) expect(texts.went[need].trim()).not.toBe("");
+      for (const which of WHICHES) for (const step of STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
+      for (const went of WENTS) expect(texts.went[went].trim()).not.toBe("");
       for (const said of SAIDS) expect(texts.said[said].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
       for (const scene of WAIT_SCENES) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
@@ -47,10 +48,19 @@ describe("Aufs Töpfchen", () => {
     expect(iconFor(need, "pipi")).toBe("💦");
   });
 
+  it("starts with eating and drinking taking turns in one step, and shows both endings when both came", () => {
+    expect(STEPS[0].id).toBe("eat");
+    expect(picturesFor(STEPS[0], "unsure")).toEqual(["essen", "trinken"]);
+    const done = STEPS.find((s) => s.id === "done")!;
+    expect(picturesFor(done, "both")).toEqual(["fertig-pipi", "fertig-kaka"]);
+    expect(iconFor(done, "both")).toBe("💧💩");
+    for (const texts of Object.values(POTTY_TEXTS)) expect(texts.steps.done(TAPSI.name, "both")).not.toBe(texts.steps.done(TAPSI.name, "pipi"));
+  });
+
   it("has every picture of the story, the waiting scenes moving (with a second frame), and no pictures of anybody else", () => {
     const files = readdirSync("src/games/potty/bilder").filter((f) => f.endsWith(".webp"));
     const names = new Set([
-      ...STEPS.flatMap((s) => SAIDS.flatMap((said) => picturesFor(s, said))),
+      ...STEPS.flatMap((s) => WHICHES.flatMap((which) => picturesFor(s, which))),
       ...WAIT_SCENES.flatMap((s) => [scenePicture(s), `${scenePicture(s)}-b`]),
     ]);
     expect([...names].map((name) => `${TAPSI.pictures}-${name}.webp`).filter((f) => !files.includes(f))).toEqual([]);

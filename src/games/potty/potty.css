@@ -3,10 +3,10 @@
 /*
  * The story is a Gemini picture filling the screen (StoryPicture.tsx), its two frames
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
- * calls (.pt-feel, .pt-call), what the child said while eating (.pt-said), the two ✓ while sitting (.pt-finish),
- * the row of steps.
- * Root classes: pt-pipi / pt-kaka / pt-unsure (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
- * Nothing moves before the first tap.
+ * calls (.pt-feel, .pt-call), what the child said while eating (.pt-said), the three ✓ while sitting (.pt-finish),
+ * the row of steps, each one a button that jumps there.
+ * Root classes: pt-pipi / pt-kaka / pt-unsure / pt-both (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
+ * Only the eating picture moves before the first tap (the game is opened when the child has to go now).
  */
 
 .potty-play {
@@ -167,7 +167,7 @@
   transform: scale(1.12);
 }
 
-/* While sitting: two big green ✓ say „fertig“ – one for pipi, one for kaka, told apart by the badge.
+/* While sitting: three big green ✓ say „fertig“ – for pipi, kaka or both, told apart by the badge.
    They pulse and a hand points at the one the child said, so nobody misses them. */
 .pt-finishes {
   position: absolute;
@@ -217,12 +217,21 @@
   font-size: clamp(26px, 6vmin, 48px);
 }
 
+/* Both emoji side by side need a wider badge. */
+.pt-finish-need.pt-finish-both {
+  width: 84%;
+  border-radius: 999px;
+  font-size: clamp(20px, 4.6vmin, 38px);
+}
+
 .pt-finish-hand {
   position: absolute;
   bottom: -38%;
   left: 18%;
   font-size: clamp(40px, 9vmin, 70px);
   filter: drop-shadow(0 3px 4px #0005);
+  /* It hangs over the row of steps: a tap there is for the step below, not the ✓. */
+  pointer-events: none;
   animation: pt-point 0.9s ease-in-out infinite alternate;
 }
 
@@ -267,13 +276,27 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: clamp(24px, min(5vw, 7vmin), 48px);
-  height: clamp(24px, min(5vw, 7vmin), 48px);
+  /* Big enough to hit, since a tap on a step jumps there. */
+  width: clamp(30px, min(5.5vw, 9vmin), 52px);
+  height: clamp(30px, min(5.5vw, 9vmin), 52px);
   border-radius: 50%;
-  font-size: clamp(15px, min(3vw, 4.4vmin), 28px);
+  font-size: clamp(17px, min(3.3vw, 5.4vmin), 30px);
   opacity: 0.45;
   filter: grayscale(0.7);
   transition: transform 0.3s;
+}
+
+.pt-steps button {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  font: inherit;
+  cursor: pointer;
 }
 
 .pt-steps li.done {

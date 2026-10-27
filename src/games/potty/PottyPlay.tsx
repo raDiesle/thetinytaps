@@ -30,7 +30,21 @@ import {
   recorded,
 } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { iconFor, picturesFor, POTTY_TEXTS, SAID, type Said, SCENE_MS, scenePicture, scenesFor, STEPS, TAPSI, type Need, type SceneSound } from "./content";
+import {
+  iconFor,
+  type Need,
+  picturesFor,
+  POTTY_TEXTS,
+  SAID,
+  type Said,
+  SCENE_MS,
+  type SceneSound,
+  scenePicture,
+  scenesFor,
+  STEPS,
+  TAPSI,
+  type Went,
+} from "./content";
 import { preloadImages } from "./images";
 import type { PottySettings } from "./settings";
 import { StoryPicture } from "./StoryPicture";
@@ -44,18 +58,22 @@ const blow = recorded("blow", playBlow);
 const cheer = recorded("cheer", playMelody);
 const partyHorn = recorded("partyhorn", playPop);
 
-/** Where the story is: before the first tap, at a step, or sitting with Mama and Papa playing a waiting scene. */
+/** Where the story is: at a step, or sitting with Mama and Papa playing a waiting scene. */
 interface At {
-  /** Index in STEPS; -1 before the first tap. */
+  /** Index in STEPS. */
   step: number;
   /** While sitting: the waiting scene shown (an index into scenesFor), -1 for the sitting picture itself. */
   scene: number;
 }
 
-const START: At = { step: -1, scene: -1 };
+/** The story opens on Tapsi eating and drinking, already moving but silent until the first tap. */
+const START: At = { step: 0, scene: -1 };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
 const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
+/** The ✓ while sitting, one for each thing that can be in the potty. */
+const WENTS: Went[] = ["pipi", "kaka", "both"];
+const WENT_EMOJI: Record<Went, string> = { ...NEED_EMOJI, both: "💧💩" };
 const DONE = STEPS.findIndex((s) => s.id === "done");
 const NEED = STEPS.findIndex((s) => s.id === "need");
 
@@ -69,7 +87,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const texts = useT()(POTTY_TEXTS);
   const [said, setSaid] = useState<Said>("unsure");
   /** What really came, chosen at the ✓; null before. */
-  const [went, setWent] = useState<Need | null>(null);
+  const [went, setWent] = useState<Went | null>(null);
   const scenes = useMemo(() => scenesFor(said), [said]);
   const [at, setAt] = useState<At>(START);
   const [busy, setBusy] = useState(false);
@@ -97,8 +115,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     return () => pending.forEach(clearTimeout);
   }, []);
 
-  const step = at.step >= 0 ? STEPS[at.step] : undefined;
-  const sitting = step?.id === "sit";
+  const step = STEPS[at.step];
+  const sitting = step.id === "sit";
 
   // The waiting song is part of sitting (like the brushing song), so it plays even with Töne or Musik off;
   // the background song waits meanwhile.
@@ -137,17 +155,15 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   };
 
   /** Plays step `index`: its picture shows, its sounds and words come here. `came` is what the ✓ chose. */
-  const begin = (index: number, came = went) => {
+  const begin = (index: number, came: Went | null = went) => {
     const { id, ms } = STEPS[index];
     goTo({ step: index, scene: -1 }, ms);
     say(texts.steps[id](TAPSI.name, came ?? said));
     switch (id) {
       case "eat":
+        // In time with the pictures: eating first, drinking when its picture comes.
         sound(0, munch);
-        break;
-      case "drink":
-        sound(0, playGlug);
-        sound(700, playGlug);
+        sound(1800, playGlug);
         break;
       case "need":
         if (said !== "kaka") {
@@ -172,8 +188,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         sound(300, playPlop);
         break;
       case "done":
-        if (came === "pipi") sound(0, playTrickle);
-        else sound(0, playPlop);
+        if (came !== "kaka") sound(0, playTrickle);
+        if (came !== "pipi") sound(came === "both" ? 500 : 0, playPlop);
         sound(900, cheer);
         for (let i = 0; i < 8; i++) later(600 + i * 120, () => spawn());
         break;
@@ -257,21 +273,35 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   };
 
   /** A ✓ while sitting: a grown-up says what is in the potty, and the story goes on with it. */
-  const finish = (came: Need) => {
+  const finish = (came: Went) => {
     setWent(came);
     begin(atRef.current.step + 1, came);
   };
 
-  const restart = () => {
+  /** Stops what the step before still had to play, so another one can begin at once. */
+  const stopTimers = () => {
     timers.current.forEach(clearTimeout);
     timers.current.clear();
+    busyRef.current = false;
+  };
+
+  /**
+   * A tap on the row of steps: the story jumps there at once, also while a step still plays. Before the
+   * potty nothing has come yet; from „fertig“ on, what the child said came (pipi when nobody knew) unless a ✓ chose.
+   */
+  const jump = (index: number) => {
+    stopTimers();
+    const came = index < DONE ? null : (went ?? (said === "kaka" ? "kaka" : "pipi"));
+    setWent(came);
+    begin(index, came);
+  };
+
+  const restart = () => {
+    stopTimers();
     setSaid("unsure");
     setWent(null);
-    atRef.current = START;
-    busyRef.current = false;
     toldFinish.current = false;
-    setAt(START);
-    setBusy(false);
+    begin(0, null);
   };
 
   useEffect(() => {
@@ -285,25 +315,22 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  const pictures = sitting && at.scene >= 0 ? [scenePicture(scenes[at.scene])] : step ? picturesFor(step, went ?? said) : ["essen"];
+  const pictures = sitting && at.scene >= 0 ? [scenePicture(scenes[at.scene])] : picturesFor(step, went ?? said);
   const done = at.step === STEPS.length - 1;
   /** The needs Tapsi feels and calls for: both while nobody knows. */
   const feels = said === "unsure" ? NEEDS : [said];
 
   return (
-    <div
-      className={`potty-play pt-${went ?? said} pt-at-${step?.id ?? "start"}${busy ? " busy" : ""}`}
-      onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}
-    >
-      <StoryPicture key={pictures.join()} name={pictures.map((p) => `${TAPSI.pictures}-${p}`)} moving={at.step >= 0} />
+    <div className={`potty-play pt-${went ?? said} pt-at-${step.id}${busy ? " busy" : ""}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
+      <StoryPicture key={pictures.join()} name={pictures.map((p) => `${TAPSI.pictures}-${p}`)} moving />
 
       {/* Drawn on top of the picture: what the animal feels and says, without words. */}
-      {step?.id === "need" && (
+      {step.id === "need" && (
         <div key={beat} className="pt-feel" aria-hidden>
           {feels.map((n) => (n === "pipi" ? "💦" : "🌀")).join("")}
         </div>
       )}
-      {step?.id === "call" && (
+      {step.id === "call" && (
         <div key={beat} className="pt-call" aria-hidden>
           <span>📣</span>
           {feels.map((n) => (
@@ -334,10 +361,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         </div>
       )}
 
-      {/* Two ✓, since what comes may not be what the child said: a grown-up taps the one that is in the potty. */}
+      {/* Three ✓, since what comes may not be what the child said: a grown-up taps what is in the potty. */}
       {sitting && (
         <div className="pt-finishes">
-          {NEEDS.map((n) => (
+          {WENTS.map((n) => (
             <button
               key={n}
               type="button"
@@ -351,7 +378,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
               }}
             >
               <span className="pt-finish-check">✓</span>
-              <span className="pt-finish-need">{NEED_EMOJI[n]}</span>
+              <span className={`pt-finish-need pt-finish-${n}`}>{WENT_EMOJI[n]}</span>
               {n === (said === "kaka" ? "kaka" : "pipi") && (
                 <span className="pt-finish-hand" aria-hidden>
                   👆
@@ -362,11 +389,21 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         </div>
       )}
 
-      <ol className="pt-steps" aria-hidden>
+      {/* Every step in the row jumps there. Plain buttons, not grown tap areas: only a tap right on one jumps,
+          one next to the row goes on with the story, and the ✓ above it keep their reach. */}
+      <ol className="pt-steps">
         {STEPS.map((s, i) => (
           <li key={s.id} className={i < at.step ? "done" : i === at.step ? "now" : undefined}>
-            {iconFor(s, i >= DONE ? (went ?? said) : said)}
-            {s.arrow && <span className="pt-arrow">{s.arrow}</span>}
+            <button
+              type="button"
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                jump(i);
+              }}
+            >
+              {iconFor(s, i >= DONE ? (went ?? said) : said)}
+              {s.arrow && <span className="pt-arrow">{s.arrow}</span>}
+            </button>
           </li>
         ))}
       </ol>
