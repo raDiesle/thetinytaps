@@ -127,6 +127,8 @@ In a fresh worktree run `bun install` first.
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice.
+- Where the child picks one of several (Zuordnen, Schatten, a quiz), exactly one choice fits: never offer a wrong
+  choice a child could rightly pick (no lettuce or apple next to the rabbit's carrot – a rabbit eats those too).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load).
 - Speech is off by default (`src/lib/common.ts`); sounds are on.
