@@ -537,7 +537,21 @@
   height: 100%;
   border-radius: 18px;
   object-fit: cover;
+  transition:
+    opacity 0.3s ease-in-out,
+    filter 0.3s;
   user-select: none;
+}
+
+/* A moving card: its frames lie on top of the first one and fade in in turn, like in the big picture. */
+.fg-card-image + .fg-card-image {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.fg-card-image + .fg-card-image.on {
+  opacity: 1;
 }
 
 .fg-card.small {

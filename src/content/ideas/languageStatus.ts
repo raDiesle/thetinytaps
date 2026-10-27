@@ -75,7 +75,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/gefuehle/",
     languages: { de: "done", ru: "partial" },
-    note: "Russisch fehlt noch: zu Hause je Gefühl zwei nicht so gute Ideen (Runde mit nur zwei Karten, Oktober 2026) und zwei Absätze unter „Über das Spiel“; bis dahin auf Deutsch mit deutscher Stimme.",
+    note: "Russisch fehlt noch: zu Hause je Gefühl zwei nicht so gute Ideen (Runde mit nur zwei Karten, Oktober 2026) und zwei Absätze unter „Über das Spiel“; bis dahin auf Deutsch mit deutscher Stimme. Dazu die Fragen vor jeder Wahl, die sagen, wer handelt („Was machst du?“ / „Was kann der kleine Bär tun?“, Oktober 2026): bis dahin fragt Russisch allgemein („Как ты можешь ему помочь?“, „Что может сделать Мишка?“).",
   },
   { href: "/kettenreaktion/", languages: { de: "done", ru: "done" } },
   { href: "/kleine-abenteuer/", languages: { de: "done", ru: "done" } },

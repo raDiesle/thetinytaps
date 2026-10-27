@@ -32,8 +32,16 @@ next to `Feeling.comforts[i]`, `bearImages.instead(id, i)`), as every kindergart
 
 The bear stands for the child, and at home whoever comforts it is anyone there –
 usually a parent – so texts never say „Kind“. A feeling's title names the scene in
-a few words („Angst bei Gewitter“, „Müde am Abend“) and is also the caption of its
-first picture.
+a few words („Angst bei Gewitter“, „Müde am Abend“) and is the caption of its
+first picture while the story is told.
+
+Every choice is asked with a question that says who acts (`Feeling.questions`, one per round;
+`KitaStep.question`): first what is the matter, then „Was machst du?“ when the child helps the bear
+(at home, mostly), „Was kann der kleine Bär tun?“ / „Was kann er machen?“ when he does it himself
+(the kindergarten, and the angry bear at home stomping and blowing). It is read aloud before the
+round and stands as the big picture's caption while the child chooses, so grown-ups can tell too.
+`feelings.test.ts` fails when a question doesn't end by naming who acts. A Russian story without its
+own questions asks the old general ones (`HELP_QUESTION`, `QUESTION`) until they are translated.
 
 **Who acts must be plain (user feedback):** a grown-up must never wonder whether a card means
 the one from the first picture does it himself (the bear says „Stopp!“, goes away), someone
@@ -90,7 +98,8 @@ Every picture is a Gemini illustration from `bilder/`, shown big in the middle.
 `images.ts` finds them by name (`storyImages`, `bearImages`: `push-passiert`,
 `push-1`, `push-nein`, `push-nein-2`, `push-ende`, `baer-sad`, `trost-hug`,
 `baer-sad-nein`, `baer-sad-nein-2`, `baer-sad-gut`); a second frame `-b` (or `-c`) fades in and out
-for a little movement. A picture the game asks for that is not made yet shows a placeholder with its
+for a little movement – in the big picture and on every card that can be chosen (`useFrame` in
+`shared.tsx`), so the child sees what happens before it taps; a card that is done or waits stands still. A picture the game asks for that is not made yet shows a placeholder with its
 file name (`Placeholder` in `shared.tsx`): new pictures are never generated on your own – list each one
 with its prompt in `bilder/README.md` under „Geplant“, so the user can look at the idea first and then
 make it with `/bild-erzeugen`. `feelings.test.ts` allows a missing picture only while it is listed there,

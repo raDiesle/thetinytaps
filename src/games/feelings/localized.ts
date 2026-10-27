@@ -5,9 +5,10 @@
 // not translated yet (translations come only on request) – is told in German.
 
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import { pick, type Localized } from "@/lib/language";
 import { COMFORTS, type Comfort, type ComfortId, type Feeling, type FeelingId } from "./bear";
 import { COMFORTS_RU, FEELINGS_RU } from "./bear.ru";
-import type { Situation, SituationId } from "./kita";
+import { QUESTION, type Situation, type SituationId } from "./kita";
 import { SITUATIONS_RU } from "./kita.ru";
 import type { Story } from "./stories";
 import type { Beat } from "./story";
@@ -18,8 +19,11 @@ export type ComfortText = Pick<Comfort, "caption" | "narration">;
 /** A feeling's words in another language: every text of `Feeling`, nothing else. */
 export interface FeelingText {
   title: string;
+  /** One question per round like the German `questions`; until they are translated, `intro` and `question` stand in. */
+  questions?: string[];
+  /** What is the matter, said before the first question while `questions` are missing. */
   intro: string;
-  /** Only where the German feeling has its own question. */
+  /** Asked every round while `questions` are missing, if not „Wie kannst du ihm helfen?“. */
   question?: string;
   /** One per round like the German; `null` where it is not translated yet (that card is told in German). */
   instead: ({ caption: string; answer: string } | null)[];
@@ -35,7 +39,8 @@ export interface SituationText {
   title: string;
   caption: string;
   intro: BeatText[];
-  steps: { caption: string; beats: BeatText[]; instead: { caption: string; answer: string } }[];
+  /** `question` like the German step's; while it is missing, the general „Was kann der kleine Bär tun?“ stands in. */
+  steps: { caption: string; question?: string; beats: BeatText[]; instead: { caption: string; answer: string } }[];
   outro: BeatText[];
   endCaption: string;
 }
@@ -54,15 +59,18 @@ export function comfortsIn(language: TargetLanguageId): Record<ComfortId, Comfor
   return Object.fromEntries(Object.entries(COMFORTS).map(([id, comfort]) => [id, { ...comfort, ...texts[id as ComfortId] }])) as Record<ComfortId, Comfort>;
 }
 
+/** Asked every round at home in a translation without questions of its own. */
+const HELP_QUESTION: Localized = { de: "Wie kannst du ihm helfen?", ru: "Как ты можешь ему помочь?" };
+
 /** The bear's feeling with its words in `language`. */
 export function feelingIn(feeling: Feeling, language: TargetLanguageId): Feeling {
   const text = FEELING_TEXTS[language]?.[feeling.id];
   if (!text) return feeling;
+  const { intro, question = pick(HELP_QUESTION, language), questions, ...words } = text;
   return {
     ...feeling,
-    ...text,
-    // The German feeling decides whether there is a question of its own.
-    question: feeling.question && text.question,
+    ...words,
+    questions: questions ?? feeling.questions.map((_, i) => (i === 0 ? `${intro} ${question}` : question)),
     instead: feeling.instead.map((instead, i) => ({ ...instead, ...text.instead[i] })),
   };
 }
@@ -83,6 +91,7 @@ export function situationIn(situation: Situation, language: TargetLanguageId): S
     outro: beatsIn(situation.outro, text.outro),
     steps: situation.steps.map((step, i) => ({
       caption: text.steps[i].caption,
+      question: text.steps[i].question ?? pick(QUESTION, language),
       beats: beatsIn(step.beats, text.steps[i].beats),
       instead: { ...step.instead, ...text.steps[i].instead },
     })),

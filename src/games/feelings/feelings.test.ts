@@ -77,16 +77,32 @@ test("every translation of a kindergarten story matches the German beat for beat
   }
 });
 
-test("every translation of the bear's feelings asks its own question where the German does, and has its rounds", () => {
+test("every translation of the bear's feelings has its rounds", () => {
   for (const [language, texts] of Object.entries(FEELING_TEXTS)) {
     for (const feeling of FEELINGS) {
       const text = texts[feeling.id];
       if (!text) continue;
-      expect(!!text.question, `${language} ${feeling.id}`).toBe(!!feeling.question);
-      // One not-so-good idea per round, `null` where it is not translated yet: a shorter list would shift them into the wrong round.
+      // One not-so-good idea and one question per round, `null` where it is not translated yet: a shorter list would shift them into the wrong round.
       expect(text.instead.length, `${language} ${feeling.id} rounds`).toBe(feeling.instead.length);
+      if (text.questions) expect(text.questions.length, `${language} ${feeling.id} questions`).toBe(feeling.questions.length);
     }
   }
+});
+
+// Grown-ups once could not tell whether a card meant the bear does it or the child does it for him: every choice
+// asks a question that ends by saying who acts – „… machst du?“ / „… feierst du …?“ or „… kann (der kleine Bär | er) tun/machen?“.
+test("every choice asks who acts", () => {
+  const whoActs = /(\bdu\b[^.!?]*|\b(der (kleine )?Bär|er)\b[^.!?]*)\?$/;
+  const asks = (question: string, where: string) => {
+    const last = question.split(/(?<=[.!?])\s+/).at(-1) ?? "";
+    expect(last, where).toMatch(whoActs);
+    expect(last.startsWith("W"), `${where}: a W-question`).toBe(true);
+  };
+  for (const feeling of FEELINGS) {
+    expect(feeling.questions.length, `${feeling.id} questions`).toBe(feeling.comforts.length);
+    feeling.questions.forEach((q, i) => asks(q, `${feeling.id} round ${i + 1}`));
+  }
+  for (const situation of SITUATIONS) situation.steps.forEach((step, i) => asks(step.question, `${situation.id} step ${i + 1}`));
 });
 
 // Translations come only on request, so a story may have none yet (it is told in German); one that has keeps the sounds.

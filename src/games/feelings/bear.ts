@@ -102,10 +102,11 @@ export interface Feeling {
   emoji: string;
   /** The scene in a few words („Angst bei Gewitter“): on the start screen and under the first picture. */
   title: string;
-  /** Read aloud with the question. */
-  intro: string;
-  /** Asked after the intro, if not „Wie kannst du ihm helfen?“. */
-  question?: string;
+  /**
+   * One question per round, read aloud and shown under the picture while the child chooses: how he feels, then who
+   * acts – „Was machst du?“ when the child helps him, „Was kann er machen?“ when he does it himself.
+   */
+  questions: string[];
   /** The kind things, one per round, the best one first. */
   comforts: ComfortId[];
   /** The not-so-good idea of each round, next to the kind thing of the same round (`bearImages.instead(id, i)`). */
@@ -121,7 +122,11 @@ export const FEELINGS: Feeling[] = [
     id: "sad",
     emoji: "😢",
     title: "Traurig, weint",
-    intro: "Der Bär ist traurig. Er weint.",
+    questions: [
+      "Der Bär ist traurig und weint. Was machst du?",
+      "Der Bär ist noch traurig. Was machst du?",
+      "Der Bär ist noch ein bisschen traurig. Was machst du?",
+    ],
     comforts: ["hug", "stroke", "teddy"],
     instead: [
       { caption: "Wegschubsen", answer: "Hmm, Schubsen tut weh. Nimm ihn lieber in den Arm.", sound: "aua" },
@@ -135,7 +140,11 @@ export const FEELINGS: Feeling[] = [
     id: "angry",
     emoji: "😠",
     title: "Wut, Turm umgefallen",
-    intro: "Der Bär ist wütend! Sein Turm ist umgefallen.",
+    questions: [
+      "Der Turm ist umgefallen, der Bär ist wütend. Was kann er machen?",
+      "Der Bär ist noch wütend. Was kann er machen?",
+      "Der Bär ist noch ein bisschen wütend. Was machst du?",
+    ],
     comforts: ["stomp", "blow", "hug"],
     instead: [
       { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", sound: "crash" },
@@ -149,7 +158,7 @@ export const FEELINGS: Feeling[] = [
     id: "tired",
     emoji: "😴",
     title: "Müde am Abend",
-    intro: "Der Bär ist müde. Er gähnt.",
+    questions: ["Der Bär ist müde und gähnt. Was machst du?", "Der Bär ist noch wach. Was machst du?", "Der Bär ist fast eingeschlafen. Was machst du?"],
     comforts: ["blanket", "lullaby", "teddy"],
     instead: [
       { caption: "Decke wegziehen", answer: "Hmm, ohne Decke friert der Bär. Deck ihn lieber zu." },
@@ -163,7 +172,7 @@ export const FEELINGS: Feeling[] = [
     id: "scared",
     emoji: "😨",
     title: "Angst bei Gewitter",
-    intro: "Der Bär hat Angst. Es donnert!",
+    questions: ["Es donnert, der Bär hat Angst. Was machst du?", "Der Bär hat noch Angst. Was machst du?", "Es ist so dunkel. Was machst du?"],
     comforts: ["hug", "hand", "light"],
     instead: [
       { caption: "„Buh!“ machen", answer: "Hmm, jetzt hat der Bär noch mehr Angst. Nimm ihn lieber in den Arm." },
@@ -177,8 +186,7 @@ export const FEELINGS: Feeling[] = [
     id: "happy",
     emoji: "🥳",
     title: "Freude, Geburtstag",
-    intro: "Der Bär hat Geburtstag! Er freut sich so.",
-    question: "Wie feierst du mit ihm?",
+    questions: ["Der Bär hat Geburtstag! Wie feierst du mit ihm?", "Der Bär feiert noch. Was machst du?", "Der Bär freut sich so. Was machst du?"],
     comforts: ["dance", "streamers", "hug"],
     instead: [
       { caption: "Luftballon kaputt machen", answer: "Hmm, jetzt ist sein Luftballon kaputt. Tanz lieber mit ihm.", sound: "crash" },

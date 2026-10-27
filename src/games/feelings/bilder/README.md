@@ -7,8 +7,8 @@ Auswahl-Karten. Fehlt ein Bild, bleibt die Stelle leer.
 - **Format:** WebP, 1200 × 900 Pixel (4:3, quer), Qualität 65 – so bleibt jedes Bild unter ~60 KB.
 - **Bewegung:** Ein zweites Bild mit `-b` dahinter (`push-1-b.webp`) ist der zweite
   Frame. Er zeigt dieselbe Szene mit einer kleinen Bewegung; in der Mitte blenden
-  die Frames im Wechsel ineinander über, wie ein kleines GIF. Die Karten zeigen nur
-  den ersten Frame.
+  die Frames im Wechsel ineinander über, wie ein kleines GIF – auch auf den Karten,
+  solange das Kind sie wählen kann.
 
 Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`, Modell Nano Banana 2 Lite – das günstigste, 1K reicht; läuft als Batch zum halben Preis, das Skript wartet, bis die Bilder da sind):
 

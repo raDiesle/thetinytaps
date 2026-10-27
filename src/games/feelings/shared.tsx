@@ -3,7 +3,7 @@ import { useLeaveGame } from "@/components/GameShell";
 import { appLanguage, pick, useAppLanguage, useT, voiceFor, type Localized } from "@/lib/language";
 import { loadRecordings } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { framesFor, imageFor } from "./images";
+import { framesFor } from "./images";
 import { RECORDED_SOUNDS, SOUNDS, type OopsSound, type SoundName } from "./story";
 import type { FeelingsSettings } from "./settings";
 
@@ -139,6 +139,20 @@ export function FloaterLayer({ floaters }: { floaters: Floater[] }) {
  */
 export type PictureLook = "story" | "quiet" | "option" | "good" | "bad";
 
+/** Which of `count` frames shows now: they take turns while `moving`, like a tiny GIF; otherwise the first. */
+function useFrame(count: number, moving: boolean): number {
+  const [frame, setFrame] = useState(0);
+  const loops = moving && count > 1;
+
+  useEffect(() => {
+    if (!loops || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
+    return () => clearInterval(timer);
+  }, [loops]);
+
+  return loops ? frame % count : 0;
+}
+
 /** How long the picture of a tapped card takes to grow from the card to its place. */
 const ZOOM_MS = 320;
 
@@ -167,15 +181,8 @@ export function StoryPicture({
   onPointerDown?: (e: PointerEvent) => void;
 }) {
   const frames = framesFor(name);
-  const [frame, setFrame] = useState(0);
-  const moving = frames.length > 1;
+  const shown = useFrame(frames.length, true);
   const frameRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!moving || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const timer = setInterval(() => setFrame((f) => f + 1), FRAME_MS);
-    return () => clearInterval(timer);
-  }, [moving]);
 
   // Before the first paint: start where the card is and grow to the picture's place.
   useLayoutEffect(() => {
@@ -197,8 +204,6 @@ export function StoryPicture({
     );
     return () => grow.cancel();
   }, []);
-
-  const shown = frame % Math.max(frames.length, 1);
 
   return (
     <div ref={frameRef} className={`fg-frame fg-look-${look}`} onPointerDown={onPointerDown}>
@@ -247,6 +252,9 @@ export function ChoiceCard({
   onChoose?: () => void;
 }) {
   const active = state === "choose" || state === "picked";
+  // A card that can be chosen moves like the big picture, so the child sees what happens before choosing it.
+  const frames = framesFor(image);
+  const shown = useFrame(frames.length, active);
   return (
     <div className={`fg-choice${small ? " small" : ""}`}>
       <button
@@ -262,7 +270,10 @@ export function ChoiceCard({
           if (active) onChoose?.();
         }}
       >
-        {imageFor(image) ? <img className="fg-card-image" src={imageFor(image)} alt="" decoding="async" draggable={false} /> : <Placeholder name={image} />}
+        {frames.map((src, i) => (
+          <img key={src} className={`fg-card-image${i === shown ? " on" : ""}`} src={src} alt="" decoding="async" draggable={false} />
+        ))}
+        {frames.length === 0 && <Placeholder name={image} />}
         {(state === "playing" || state === "done") && <Mark good className="fg-card-mark" />}
         {state === "wrong" && <Mark good={false} className="fg-card-mark" />}
       </button>
