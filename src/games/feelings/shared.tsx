@@ -208,6 +208,13 @@ export function StoryPicture({
             <img key={src} className={i === shown ? "on" : undefined} src={src} alt="" decoding="async" draggable={false} />
           ))}
           {children}
+          {/* A card looked at big: a hand taps it again and again, so the child knows one more tap chooses it. */}
+          {look === "option" && (
+            <span className="fg-tap-hint" aria-hidden>
+              <span className="fg-tap-ripple" />
+              <span className="fg-tap-hand">👆</span>
+            </span>
+          )}
         </div>
         {/* On the corner, not over the picture, so what happened stays to be seen. */}
         {look === "good" && <Mark good className="fg-picture-mark" />}

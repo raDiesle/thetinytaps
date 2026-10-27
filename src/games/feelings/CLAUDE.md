@@ -28,6 +28,12 @@ usually a parent – so texts never say „Kind“. A feeling's title names the 
 a few words („Angst bei Gewitter“, „Müde am Abend“) and is also the caption of its
 first picture.
 
+Open point (feedback, not changed yet – idea X-14, the user decides): it is not
+always clear from a card _who_ acts – the one from the first picture himself (the bear
+says „Stopp!“), someone else, e.g. the child comforting the bear, or the crying one
+going to someone to be comforted. Until X-14 is decided, a new card or picture must
+make plain who does the thing: that one is in front and doing it.
+
 Every choice has a not-so-good idea next to it, so the child always really
 chooses: at home one card before the three comforts (`Feeling.instead`), in the
 kindergarten one before each step (`KitaStep.instead`). The order is fixed: the
@@ -37,6 +43,11 @@ Choosing takes two taps: the first grows the card into the big picture's place
 (yellow ring, the card lifted), so the child sees once more what it picked; the
 second – on that card or the big picture – chooses it. Tapping the other card shows
 that one instead. Keys do the same: the first press shows, the second chooses.
+That a second tap is needed must be seen without words (grown-ups found it unclear
+with the ring alone): while a card is shown big, a big hand 👆 taps the picture
+again and again with a white ring where the finger lands (`.fg-tap-hint`), and the
+other cards stop calling and fade a little, still to be tapped. Any step that waits
+for one more tap shows such a hand, never only a glow.
 Only then comes the answer, seen and heard (`cheer`/`oops` in `shared.tsx`): the
 good idea gets a green frame that hops, stars and a laugh („Juhu!“ when speech is
 on), then the bear does it; the not-so-good one a red frame that shakes and what it

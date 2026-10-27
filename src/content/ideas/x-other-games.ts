@@ -119,5 +119,13 @@ export const otherGamesIdeas: IdeaArea = {
       why: "Eltern suchen „zahnputzlied feuerwehr“, „zahnputzlied krokodil“ und „zahnputzlied lustig“. Ein neues Lied macht das tägliche Putzen wieder spannend.",
       effort: "S",
     },
+    {
+      id: "X-14",
+      emoji: "🫵",
+      title: "Gefühle: Wer tut es?",
+      text: "Rückmeldung: Bei den Karten ist nicht immer klar, wer handelt – der aus dem Ausgangsbild selbst (der Bär sagt „Stopp!“), jemand Drittes (das Kind soll den Bären trösten) oder ob der Weinende zu jemandem geht, um sich trösten zu lassen. Noch offen, wie es deutlicher wird: z. B. wer handelt, steht immer vorn und groß im Bild, oder die Karten werden pro Geschichte einheitlich aus einer Sicht gezeichnet.",
+      why: "Das Kind soll verstehen, was es selbst tun kann und was der Bär tut – sonst lernt es die falsche Rolle.",
+      effort: "M",
+    },
   ],
 };

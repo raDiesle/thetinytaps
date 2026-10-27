@@ -183,6 +183,84 @@
   }
 }
 
+/* Tapped once: a big hand taps the picture again and again, with a ring where the finger lands – "tap once more".
+   It comes after the picture has grown, low on the right, so most of the picture stays to be seen. */
+.fg-tap-hint {
+  position: absolute;
+  right: 4%;
+  bottom: 2%;
+  z-index: 5;
+  width: 42cqh;
+  height: 42cqh;
+  pointer-events: none;
+  opacity: 0;
+  animation: fg-tap-show 0.3s 0.35s ease-out forwards;
+}
+
+@keyframes fg-tap-show {
+  to {
+    opacity: 1;
+  }
+}
+
+.fg-tap-hand {
+  position: absolute;
+  inset: 0;
+  font-family: var(--font-emoji);
+  font-size: 34cqh;
+  line-height: 1.2;
+  text-align: center;
+  filter: drop-shadow(0 0 0.6cqh #fff) drop-shadow(0 0 0.6cqh #fff) drop-shadow(0 0.8cqh 0 var(--ink));
+  animation: fg-tap-press 1.2s 0.35s ease-in-out infinite;
+}
+
+@keyframes fg-tap-press {
+  0%,
+  100% {
+    translate: 4% 8%;
+    scale: 1;
+  }
+  40% {
+    translate: 0 -6%;
+    scale: 0.88;
+  }
+  50% {
+    translate: 0 -6%;
+    scale: 0.88;
+  }
+}
+
+/* Where the fingertip lands: a white ring spreads, the moment the hand presses. */
+.fg-tap-ripple {
+  position: absolute;
+  top: -14%;
+  left: 50%;
+  width: 40%;
+  aspect-ratio: 1;
+  border: 1.4cqh solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.5cqh var(--ink);
+  translate: -50% 0;
+  opacity: 0;
+  animation: fg-tap-ripple 1.2s 0.35s ease-out infinite;
+}
+
+@keyframes fg-tap-ripple {
+  0%,
+  40% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  45% {
+    opacity: 1;
+    scale: 0.5;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
 /* A good idea: a green frame, and the picture hops for joy. */
 .fg-look-good .fg-picture {
   box-shadow:
@@ -433,6 +511,12 @@
     0 0 0 9px var(--sunshine),
     0 0 0 12px var(--ink),
     0 16px 0 4px var(--ink);
+}
+
+/* While one card is shown big, the others stop calling and fade a little – still to be tapped, but the eye goes to the chosen one. */
+.story-choices:has(.fg-card-picked) .fg-card-choose {
+  animation: none;
+  filter: saturate(0.5) opacity(0.75);
 }
 
 /* Cards to choose from take turns calling. */
