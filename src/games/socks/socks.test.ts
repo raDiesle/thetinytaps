@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { APP_LANGUAGES, pick } from "@/lib/language";
 import { dealPairs, MAX_PAIRS, SOCK_COLORS, SOCK_PATTERNS, SOCK_TEXTS } from "./content";
 

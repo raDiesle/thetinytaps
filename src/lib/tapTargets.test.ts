@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { distanceToRect, pickTap, tapState } from "./tapTargets";
 
 describe("tap targets", () => {

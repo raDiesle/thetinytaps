@@ -174,6 +174,15 @@ export default defineConfig({
       { tag: "link", attrs: { rel: "apple-touch-icon", href: "icons/apple-touch-icon.png" } },
     ],
   },
-  server: { base, port: 3000, historyApiFallback: true },
+  // Several sessions run dev servers side by side, each moving on to the next free port. Bun (unlike Node)
+  // takes "localhost" as 127.0.0.1 and wouldn't see a server already on [::1]:3000 – where the browser goes
+  // first – so it listens on ::1 itself, and prints it as localhost.
+  server: {
+    base,
+    port: 3000,
+    host: "::1",
+    printUrls: ({ urls }) => urls.map((url) => url.replace("[::1]", "localhost")),
+    historyApiFallback: true,
+  },
   output: { distPath: { root: "out" } },
 });

@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { addBrushing, dayKey, daytimeOf, weekOf } from "./daytime";
 
 // Dates are easy to get wrong by one: the week starts on Monday, local dates, no double stars.

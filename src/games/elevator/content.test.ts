@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { STORIES } from "./content";

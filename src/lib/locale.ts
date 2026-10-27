@@ -1,6 +1,6 @@
 // Which language a language choice starts on, before a grown-up picks one: the
 // browser's own language when the game has it, otherwise English, which more
-// players understand than German. While developing (`yarn dev`) it is always
+// players understand than German. While developing (`bun run dev`) it is always
 // German, the language the app is written and checked in.
 
 /** The first of the `wanted` languages ("de-AT", "zh-Hans-CN", "en") that is `supported`, by its two-letter code. */
@@ -16,7 +16,9 @@ export function pickLanguage<T extends string>(supported: readonly T[], wanted: 
 /** The languages the browser asks for, best first; none outside a browser (unit tests). */
 function browserLanguages(): readonly string[] {
   if (typeof navigator === "undefined") return [];
-  return navigator.languages?.length ? navigator.languages : [navigator.language];
+  if (navigator.languages?.length) return navigator.languages;
+  // Bun's navigator has no language at all.
+  return navigator.language ? [navigator.language] : [];
 }
 
 /**

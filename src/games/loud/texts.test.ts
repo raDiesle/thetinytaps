@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { type Localized, spokenIn } from "@/lib/language";
 import { LEVEL_TEXTS, NUDGES, SAYS, STATION_TEXTS, VOICE_WORDS } from "./texts";

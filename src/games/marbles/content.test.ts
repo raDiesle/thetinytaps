@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import type { Localized } from "@/lib/language";
 import { buildBuilding } from "./building";
 import { buildCircus } from "./circus";

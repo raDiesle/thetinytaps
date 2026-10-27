@@ -3,14 +3,14 @@
 // exactly `bars` bars at `bpm`, so the parts fall on the game's step times again.
 // Guide: .claude/skills/musik-erzeugen/SKILL.md
 //
-//   yarn song:stretch <song.wav> <out.wav|out.mp3> --bpm 112 --start 0.3 [--bars 8] [--lead 0.2]
+//   bun run song:stretch <song.wav> <out.wav|out.mp3> --bpm 112 --start 0.3 [--bars 8] [--lead 0.2]
 //
 // --start: about where the first part's first beat is, within 0.1 s; take it from
-// `yarn song` and its spectrogram (guessing it from the bass was a beat off in
+// `bun run song` and its spectrogram (guessing it from the bass was a beat off in
 // two of three Suno songs). --lead: put that beat at exactly this time
 // (cuts or adds silence before it), so songs made this way share one timing.
 // An .mp3 out is loudness-normalized and converted for the game like any song.
-// Prints the parts found and the stretch of each; measure the result with `yarn song`.
+// Prints the parts found and the stretch of each; measure the result with `bun run song`.
 // The pitch stays, only the speed changes (ffmpeg atempo). Needs ffmpeg.
 import { execFileSync } from "node:child_process";
 
@@ -23,7 +23,7 @@ const [file, out] = args.filter((a, i) => !a.startsWith("--") && !args[i - 1]?.s
 const bpm = option("bpm", null);
 const near = option("start", null);
 if (!file || !out || !bpm || near === null) {
-  console.error("usage: yarn song:stretch <song.wav> <out.wav|out.mp3> --bpm 112 --start 0.3 [--bars 8] [--lead 0.2]");
+  console.error("usage: bun run song:stretch <song.wav> <out.wav|out.mp3> --bpm 112 --start 0.3 [--bars 8] [--lead 0.2]");
   process.exit(1);
 }
 const beats = option("bars", 8) * 4;

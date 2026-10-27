@@ -4,7 +4,7 @@
 // verses to a fixed number of bars, so counting bars is not enough.
 // Guide: .claude/skills/zahnputzlied/SKILL.md
 //
-//   yarn song:verses <song.wav> <out.mp3> --lang en [--lyrics src/games/teeth/musik/suno-lied.md]
+//   bun run song:verses <song.wav> <out.mp3> --lang en [--lyrics src/games/teeth/musik/suno-lied.md]
 //
 // The lyrics file has a section "## … (`<lang>`, …)" with the text typed into Suno; the
 // first sung line after every [Part N] tag is looked for in the song, in order.
@@ -25,7 +25,7 @@ const [file, out] = args.filter((a, i) => !a.startsWith("--") && !args[i - 1]?.s
 const lang = option("lang", null);
 const lyricsFile = option("lyrics", "src/games/teeth/musik/suno-lied.md");
 if (!file || !out?.endsWith(".mp3") || !lang) {
-  console.error("usage: yarn song:verses <song.wav> <out.mp3> --lang en [--lyrics src/games/teeth/musik/suno-lied.md]");
+  console.error("usage: bun run song:verses <song.wav> <out.mp3> --lang en [--lyrics src/games/teeth/musik/suno-lied.md]");
   process.exit(1);
 }
 const model = process.env.WHISPER_MODEL ?? join(homedir(), ".cache/whisper/ggml-base.bin");

@@ -9,7 +9,7 @@ Scene engine (modes in menu order: colouring in – a tapped item gets its colou
 - New picture or many new items: run `/neue-szene` (`.claude/skills/neue-szene/SKILL.md`); it has the full
   guide to depth, keys, drawing style, animations and the browser checks.
 - `scenes.test.ts` checks every picture's data (unique ids, articles, tap sizes, chains, keys,
-  plural grammar in questions, roads). `yarn test` after every change to items.
+  plural grammar in questions, roads). `bun test` after every change to items.
 - `ScenePlay.tsx` is the engine and is shared by every picture (sounds in `sounds.ts`, the marks drawn over a picture in `marks.tsx`): keep scene-specific things in the
   scene's folder and its CSS, and prefix CSS classes and SVG ids by the scene (CSS is global).
 - Music is the background song of all games (`src/lib/backgroundMusic.ts`, played once for the whole app by

@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { FLOOR, KINDS, layOutRow, leavesOf, pickAnimals, plannedSeconds } from "./sneeze";
 
 /** A repeatable stand-in for Math.random, so every test run sees the same rows. */

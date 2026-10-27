@@ -54,7 +54,7 @@ export function afterLoad(task: () => void) {
 export function setUpPwa() {
   if (!("serviceWorker" in navigator)) return;
   if (!import.meta.env.PROD) {
-    // A worker left over from `yarn preview` on the same port would serve the old build.
+    // A worker left over from `bun run preview` on the same port would serve the old build.
     void navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => void reg.unregister()));
     return;
   }

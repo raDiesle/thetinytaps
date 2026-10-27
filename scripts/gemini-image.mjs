@@ -1,18 +1,18 @@
 // Makes pictures with Gemini and saves them ready for the game (WebP or PNG).
 // Guide and examples: .claude/skills/bild-erzeugen/SKILL.md
 //
-//   yarn image <out.webp> "<prompt>" [--ref a.png ...] [--aspect 4:3] [--size 1200x900]
+//   bun run image <out.webp> "<prompt>" [--ref a.png ...] [--aspect 4:3] [--size 1200x900]
 //              [--transparent] [--key ff00ff] [--quality 80] [--model <id>]
-//   yarn image a.webp,b.webp "<prompt>" --grid 1x2 --panel "<a>" --panel "<b>" [options]
-//   yarn image --jobs jobs.json            many pictures in one batch
-//   yarn image <out.webp> --from <picture.png> [--transparent] [--size ...]
-//   yarn image status                      batches still running, in all checkouts
-//   yarn image fetch [--wait]              saves what is ready (and waits for the rest)
+//   bun run image a.webp,b.webp "<prompt>" --grid 1x2 --panel "<a>" --panel "<b>" [options]
+//   bun run image --jobs jobs.json            many pictures in one batch
+//   bun run image <out.webp> --from <picture.png> [--transparent] [--size ...]
+//   bun run image status                      batches still running, in all checkouts
+//   bun run image fetch [--wait]              saves what is ready (and waits for the rest)
 //
 // By default the pictures go through the Batch API: half the price, but they can
 // take minutes to hours. The script waits and saves them when they are ready;
 // --no-wait only sends them, --now asks right away at the full price. Running
-// batches are noted in the shared .git folder, so `yarn image fetch` gets them
+// batches are noted in the shared .git folder, so `bun run image fetch` gets them
 // from any checkout, even after the worktree that sent them is gone.
 //
 // --grid asks for several pictures in one (half or a quarter of the price each)
@@ -83,7 +83,7 @@ function toJob(o) {
     : String(o.out ?? "")
         .split(",")
         .filter(Boolean);
-  if (!outs.length || !o.prompt) fail('usage: yarn image <out.webp> "<prompt>" [options]  (see the top of scripts/gemini-image.mjs)');
+  if (!outs.length || !o.prompt) fail('usage: bun run image <out.webp> "<prompt>" [options]  (see the top of scripts/gemini-image.mjs)');
   const job = {
     outs,
     prompt: o.prompt,
@@ -472,7 +472,7 @@ if (opts.out === "status") {
   else if (opts.wait) await waitFor(records);
   else for (const record of records) if (!(await check(record))) console.log(`${record.name}: not ready yet`);
 } else if (opts.from) {
-  if (!opts.out) fail("usage: yarn image <out.webp> --from <picture.png>");
+  if (!opts.out) fail("usage: bun run image <out.webp> --from <picture.png>");
   const job = toJob({ ...opts, prompt: "-" });
   const picture = readFileSync(opts.from);
   const pieces = job.grid ? await splitGrid(picture, ...parseGrid(job.grid), gapColour(job)) : [picture];
@@ -492,6 +492,6 @@ if (opts.out === "status") {
   } else {
     const record = await submit(jobs, modelOf(opts));
     if (opts.wait !== false) await waitFor([record]);
-    else console.log("not waiting – `yarn image fetch` saves the pictures once they are ready");
+    else console.log("not waiting – `bun run image fetch` saves the pictures once they are ready");
   }
 }

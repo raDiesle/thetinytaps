@@ -1,12 +1,12 @@
 import { existsSync, readdirSync } from "node:fs";
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { TARGET_LANGUAGES } from "@/content/targetLanguages";
 import { CLOUD_TRIP } from "./stories/cloudTrip";
 import { DEFAULT_TURN, type Story, storyIn } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
 import { recordingName, spokenLines } from "./voiceId";
 
-// Recordings are named by the hash of their line (voice.ts, `yarn voice make`).
+// Recordings are named by the hash of their line (voice.ts, `bun run voice make`).
 const STORIES = [
   { dir: "src/games/adventure/stories/treasureIsland", story: TREASURE_ISLAND },
   { dir: "src/games/adventure/stories/cloudTrip", story: CLOUD_TRIP },
@@ -54,7 +54,7 @@ test("no two lines of a story share a recording", () => {
   }
 });
 
-test("a story with recordings has one for every line and none left over (yarn voice make)", () => {
+test("a story with recordings has one for every line and none left over (bun run voice make)", () => {
   for (const { folder, story, language } of voices()) {
     if (!existsSync(folder)) continue;
     const wanted = linesOf(story).map((l) => `${recordingName(l.text, language)}.mp3`);

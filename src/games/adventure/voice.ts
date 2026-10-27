@@ -5,7 +5,7 @@ import { DEFAULT_TURN, type Story } from "./stories/story";
 import { recordingName, spokenLines } from "./voiceId";
 
 // Tapsi's recorded voice: a warm coach voice made with ElevenLabs
-// (scripts/elevenlabs-voice.mjs, `yarn voice`), one file per line in the
+// (scripts/elevenlabs-voice.mjs, `bun run voice`), one file per line in the
 // story's stimme/ folder (German) or stimme/<language>/ (the others). A line with
 // a recording plays from its file; any other line falls back to the browser's
 // voice, so a line changed but not recorded again is still said.

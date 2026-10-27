@@ -5,19 +5,20 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 ## Development
 
 ```bash
-yarn install
-yarn dev           # http://localhost:3000 (Rsbuild dev server)
-yarn verify        # lint + format check (Biome), typecheck, unit tests (Rstest)
-yarn format        # format and apply safe lint fixes
-yarn test          # unit tests only
-yarn build         # static site in out/
-yarn preview       # serve the built site
+bun install
+bun run dev        # http://localhost:3000 (Rsbuild dev server)
+bun run verify     # lint + format check (Biome), typecheck, unit tests (bun test)
+bun run format     # format and apply safe lint fixes
+bun test           # unit tests only
+bun run build      # static site in out/ (`bun build` is Bun's own bundler, not this)
+bun run preview    # serve the built site
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 (repo settings → Pages → Source: **GitHub Actions**).
 
-Use **yarn** (not npm); dependencies are locked in `yarn.lock`.
+Use **Bun** (not npm or yarn) for everything: installing, scripts, tests; dependencies are locked in `bun.lock`.
+`bunfig.toml` keeps installs safe: only the public npm registry, only versions at least 3 days old, no install scripts.
 
 Working with Claude Code: [`CLAUDE.md`](CLAUDE.md) has the rules and the map of
 the code; each game folder has its own `CLAUDE.md` with what the game does and
@@ -56,7 +57,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/adventure/` | Game „Bewegungsabenteuer“: 3D movement story with the fox Tapsi (three.js, lazy-loaded). Details in its [`CLAUDE.md`](src/games/adventure/CLAUDE.md) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |
 | `src/lib/sounds/` | Real recordings (CC0, from Freesound; sources in its `README.md`) for animals, bells, water, horn …, one MP3 per sound name. So far only "Lebendige Bilder", "Buchstaben & Zahlen" and "Kleine Abenteuer" use them (`playRecorded` / `recorded` in `src/lib/sfx/core.ts`); until a file is loaded, and in all other games, the synthesized sound plays |
-| `scripts/gemini-image.mjs` | `yarn image <out.webp> "<prompt>"`: makes a picture with Gemini (needs `GEMINI_API_KEY` in your shell), optionally cut out (`--transparent`), sized and saved as WebP; the raw result stays in `.image-raw/`. Guide: the Claude Code skill [`.claude/skills/bild-erzeugen/SKILL.md`](.claude/skills/bild-erzeugen/SKILL.md) (`/bild-erzeugen`) |
+| `scripts/gemini-image.mjs` | `bun run image <out.webp> "<prompt>"`: makes a picture with Gemini (needs `GEMINI_API_KEY` in your shell), optionally cut out (`--transparent`), sized and saved as WebP; the raw result stays in `.image-raw/`. Guide: the Claude Code skill [`.claude/skills/bild-erzeugen/SKILL.md`](.claude/skills/bild-erzeugen/SKILL.md) (`/bild-erzeugen`) |
 | `src/content/ideas/` | Idea collection, one file per area (`n-new-games.ts` …) with fixed IDs (e.g. `N-03`), shown on the hidden page `/management/` – hold the „p“ in the home page title for 2 seconds |
 | `src/content/seo.ts` | Title, description and text for search engines per game, category and scene; the build writes a page of its own for each, plus `sitemap.xml` and `robots.txt` |
 | `src/content/research.ts` | Research for grown-ups (e.g. what parents search on Google), with date, method, findings and the ideas it led to, also shown on `/management/` |
@@ -106,7 +107,7 @@ fullscreen (it would end); otherwise at the next start. The home page shows
 small in the bottom left corner when the running version was built („Stand …“). Speech offline uses only the
 voices on the device (the online „Google“ voices need network). The service
 worker only runs in the built site; to try it locally use the `preview-pages`
-launch config (`PUBLIC_BASE_PATH=/thetinytaps`, port 3200) – `yarn dev` removes
+launch config (`PUBLIC_BASE_PATH=/thetinytaps`, port 3200) – `bun run dev` removes
 it again.
 
 ### App icon

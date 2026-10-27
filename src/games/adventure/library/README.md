@@ -31,7 +31,7 @@ stehen in `../three/clips/` (77 Clips, keiner fehlt): eine Datei je Körperteil 
 2. Einen vorhandenen `motion`-Clip wählen oder in `../three/clips/` einen neuen bauen, in der Datei des Körperteils, um den es geht – sie bestimmt, was leuchtet.
 3. In mindestens einem Szenario (`scenarios.ts`) einsetzen.
 4. Bei einem neuen Clip: in `situations.ts` sechs Situationen dazuschreiben, mindestens zwei aus dem Alltag.
-5. `yarn typecheck`.
+5. `bun run typecheck`.
 
 ## Ergebnis F: Situationskatalog
 

@@ -72,7 +72,7 @@ and which file holds what. Add notes that save the next session time: dev helper
 
 ## Checks before you finish
 
-1. `yarn verify`; add a `<game>.test.ts` for content rules (unique ids, every
+1. `bun run verify`; add a `<game>.test.ts` for content rules (unique ids, every
    sentence non-empty, references between lists exist).
 2. Preview (`preview_start` with `dev`): start screen, every mode, touch and keys,
    the end of a level, leaving with Esc held. `document.getAnimations()` is empty

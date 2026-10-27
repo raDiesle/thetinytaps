@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import { ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
 

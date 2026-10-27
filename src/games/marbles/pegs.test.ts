@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { BALL_R } from "./path";
 import { BIN_TOP, BINS, BOARD, DIVIDER_R, DIVIDERS, fall, freeSlot, keySpot, newFalling, PEG_R, PEGS, PILE_SLOTS, binAt } from "./pegs";
 

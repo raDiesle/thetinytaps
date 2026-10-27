@@ -183,7 +183,7 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
 
 ## Checks before you finish
 
-1. `yarn verify` – `levels.test.ts` runs for every level in `TRAIL_LEVELS`: unique
+1. `bun run verify` – `levels.test.ts` runs for every level in `TRAIL_LEVELS`: unique
    station ids, ground and stations left to right, the bag never over three and
    always holding what the next obstacle needs, only the last station frees the
    goal, stair steps on the ground, a creature's `why` bubble on the screen next to the child. Also the unique-`@keyframes` and ideas tests.

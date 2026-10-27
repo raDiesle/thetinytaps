@@ -8,7 +8,7 @@ import { TRANSLATION as it } from "./lines.it";
 import { TRANSLATION as ru } from "./lines.ru";
 import { TRANSLATION as zh } from "./lines.zh";
 
-// Every lines.<language>.ts of „Die Wolkenreise“ (yarn voice finds them by their file name;
+// Every lines.<language>.ts of „Die Wolkenreise“ (bun run voice finds them by their file name;
 // voice.test.ts checks that each one is listed here).
 
 /** What Tapsi says in the languages besides German. */

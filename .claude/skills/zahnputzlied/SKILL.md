@@ -71,7 +71,7 @@ choir, rap, autotune, whisper, heavy drums, electric guitar, distortion, sad, te
 ## 3. Put it in
 
 ```bash
-yarn song:verses "/Users/…/Downloads/Song.wav" src/games/teeth/musik/musik-zaehneputzen-lied-<lang>.mp3 --lang <lang>
+bun run song:verses "/Users/…/Downloads/Song.wav" src/games/teeth/musik/musik-zaehneputzen-lied-<lang>.mp3 --lang <lang>
 ```
 
 It converts the song for the game, listens to it with Whisper (needs
@@ -114,7 +114,7 @@ Then:
 
 - `musik/README.md`: a row in the table (source Suno, date); `suno-lied.md`: a note on
   anything odd in the take.
-- `yarn verify` – `sung.test.ts` checks that every song has its `.json` (one start per
+- `bun run verify` – `sung.test.ts` checks that every song has its `.json` (one start per
   step plus the finale, steps 8–30 s) and its lyrics in `suno-lied.md`.
 
 ## 4. Check

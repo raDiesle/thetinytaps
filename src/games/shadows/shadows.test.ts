@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { ITEMS, SHADOW_TEXTS } from "./content";
 import { RUSSIAN_NAMES } from "./content.ru";
 

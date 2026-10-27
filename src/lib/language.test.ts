@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { CATEGORIES } from "@/content/games";
 import { cyrillicLetterOf, RUSSIAN_KEYBOARD_ROWS } from "./cyrillicKeys";
 import { APP_LANGUAGES, OWN_NAMES } from "./language";

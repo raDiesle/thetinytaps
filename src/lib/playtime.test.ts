@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { DEFAULT_PLAYTIME_SETTINGS, limitReached, parseSettings } from "./playtime";
 
 const day = new Date().toDateString();

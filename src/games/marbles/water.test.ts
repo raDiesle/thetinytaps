@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { along } from "./machineKit";
 import { BASINS, buildWater, gateX, GROUND, groundY, POOL, POOL_SPOT, poseAt, SKY_TOP, waitSpot, WORLD_H, WORLD_W } from "./water";
 

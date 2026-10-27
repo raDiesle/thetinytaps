@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { CATEGORIES } from "./categories";
 import { MOVEMENTS } from "./movements";
 import { SCENARIOS } from "./scenarios";

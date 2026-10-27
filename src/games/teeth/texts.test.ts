@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { DAYTIME } from "./daytime";
 import { DAYTIME_RU } from "./daytime.ru";
@@ -15,7 +15,7 @@ const CYRILLIC = /[а-яё]/i;
 const russian = targetLanguageFor("ru");
 
 test("every step has its own id, and the Russian step texts are Cyrillic and belong to a step", () => {
-  const ids = STEPS.map((s) => s.id);
+  const ids: string[] = STEPS.map((s) => s.id);
   expect(new Set(ids).size).toBe(STEPS.length);
   for (const [id, texts] of Object.entries(STEP_TEXTS_RU)) {
     expect(ids, id).toContain(id);

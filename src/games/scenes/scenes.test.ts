@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { isCyrillic, RUSSIAN_KEYBOARD_ROWS } from "@/lib/cyrillicKeys";
 import { APP_LANGUAGES, pick } from "@/lib/language";
 import { SCENES } from ".";

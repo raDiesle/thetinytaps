@@ -188,8 +188,8 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
 
 ## Checks before you finish
 
-1. `yarn verify` (typecheck + `scenes.test.ts`: ids, articles, tap sizes, chains,
-   keys, question grammar, roads) and `yarn build` (always yarn, never npm).
+1. `bun run verify` (typecheck + `scenes.test.ts`: ids, articles, tap sizes, chains,
+   keys, question grammar, roads) and `bun run build` (always Bun, never npm or yarn).
 2. Preview (`.claude/launch.json`, `preview_start`) at `/bilder/<id>`, then:
    - every item is tappable: for each item, `document.elementFromPoint` inside its
      hit area returns an element within `.item-<id>`;

@@ -5,7 +5,7 @@ one per language: one verse per step singing what is shown, then the finale. Whi
 one loads the synthesized tune plays. `suno-lied.md` has what
 was typed into Suno. Suno doesn't sing its verses equally long, so the
 `musik-zaehneputzen-lied-<lang>.json` next to each says where its verses begin (heard
-with Whisper) and the steps follow them. Both files are made by `yarn song:verses`.
+with Whisper) and the steps follow them. Both files are made by `bun run song:verses`.
 A new language: the `/zahnputzlied` skill.
 
 | File                             | Source                                               | Terms                                                                  |

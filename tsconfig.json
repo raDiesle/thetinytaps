@@ -18,6 +18,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src", "rsbuild.config.ts", "rstest.config.ts"],
+  "include": ["src", "rsbuild.config.ts"],
   "exclude": ["node_modules", "out"]
 }

@@ -1,6 +1,6 @@
 // Which session worktrees can be archived without losing anything?
 //
-//   yarn archive-check
+//   bun run archive-check
 //
 // Not safe while a worktree still waits for Gemini pictures (a batch sent from
 // it), has changes that are not committed, or commits that are not in main yet.
@@ -31,7 +31,7 @@ for (const { path, branch } of worktrees) {
   if (branch === MAIN) continue;
   const reasons = [];
   const waiting = batches.filter((b) => b.checkout === path);
-  if (waiting.length) reasons.push(`waits for ${waiting.length} picture batch(es) – yarn image status`);
+  if (waiting.length) reasons.push(`waits for ${waiting.length} picture batch(es) – bun run image status`);
   if (existsSync(path)) {
     const changes = git("-C", path, "status", "--porcelain").split("\n").filter(Boolean).length;
     if (changes) reasons.push(`${changes} file(s) not committed`);
@@ -46,6 +46,6 @@ for (const { path, branch } of worktrees) {
 }
 
 const orphans = batches.filter((b) => !existsSync(b.checkout));
-for (const b of orphans) console.log(`KEEP  batch ${b.name} from a worktree that is gone – yarn image fetch saves it here`);
+for (const b of orphans) console.log(`KEEP  batch ${b.name} from a worktree that is gone – bun run image fetch saves it here`);
 
 console.log(unsafe || orphans.length ? "\nArchive only the ones marked ok." : "\nAll worktrees can be archived.");

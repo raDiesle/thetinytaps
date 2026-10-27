@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 
 // All CSS is global, and games are loaded one by one: a name used twice means the
 // look depends on which game was opened first. Prefix names by game or scene.

@@ -3,14 +3,14 @@
   "configurations": [
     {
       "name": "dev",
-      "runtimeExecutable": "yarn",
-      "runtimeArgs": ["dev"],
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "dev"],
       "port": 3000
     },
     {
       "name": "preview-pages",
       "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "export PUBLIC_BASE_PATH=/thetinytaps && yarn build && yarn preview --port 3200"],
+      "runtimeArgs": ["-c", "export PUBLIC_BASE_PATH=/thetinytaps && bun run build && bun run preview --port 3200"],
       "port": 3200
     }
   ]

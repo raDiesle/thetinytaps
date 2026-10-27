@@ -1,0 +1,33 @@
+# Bun settings for this project: package manager, script runner and test runner.
+# The [install] part is about supply-chain safety: only the public npm registry, only versions that
+# have been out for a while, no install scripts, and nothing fetched behind the lockfile's back.
+
+# No usage data sent to Bun.
+telemetry = false
+
+[install]
+# Always the public npm registry, also when a machine-wide npm or Bun config points somewhere else.
+registry = "https://registry.npmjs.org/"
+# A version must be at least 3 days old (in seconds) before it is installed: a hijacked release is
+# usually found and pulled within that time.
+minimumReleaseAge = 259200
+# Packages never run install scripts (none of ours needs one: biome, rspack and sharp ship binaries
+# as optional packages). Re-check with `bun pm untrusted` before turning this off for one package.
+ignoreScripts = true
+# `bun some-script.ts` never downloads a missing package on the fly: everything comes from bun.lock.
+auto = "disable"
+# Each package sees only the packages it depends on itself, like pnpm.
+linker = "isolated"
+# `bun add` writes exact versions, so package.json says what bun.lock installs.
+exact = true
+
+[run]
+# `bun run <script>` runs tools written for Node (rsbuild, tsc) on Bun too: Node isn't needed.
+bun = true
+
+[test]
+# Tests live next to the code in src/; without this, `bun test` in the main checkout would also run
+# the tests of every worktree in .claude/worktrees/.
+root = "src"
+# Teaches Bun Rspack's `import.meta.webpackContext`, which the app uses to list its sound and picture files.
+preload = ["./src/testPreload.ts"]

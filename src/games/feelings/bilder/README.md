@@ -13,7 +13,7 @@ Auswahl-Karten. Fehlt ein Bild, bleibt die Stelle leer.
 Mit Gemini direkt aus dem Projekt (Key in `GEMINI_API_KEY`, Modell Nano Banana 2 Lite – das günstigste, 1K reicht; läuft als Batch zum halben Preis, das Skript wartet, bis die Bilder da sind):
 
 ```
-yarn image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --quality 65 --ref src/games/feelings/bilder/push-2.webp
+bun run image src/games/feelings/bilder/push-1.webp "<Stilblock> <Figuren> <Prompt>" --aspect 4:3 --size 1200x900 --quality 65 --ref src/games/feelings/bilder/push-2.webp
 ```
 
 Neues bewegtes Bild: erst den ersten Frame allein, dann den zweiten mit dem ersten als Referenz,
@@ -22,10 +22,10 @@ Gemini die Szene zweimal, Kamera, Kinder, Luftballons oder ein Tisch springen, u
 es unruhig, man kann der Geschichte kaum folgen.
 
 ```
-yarn image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters at exactly the same places and sizes, same clothes, colours, background, every object where it is, same camera framing (no zoom, no shift), same composition and line style. Nothing appears, disappears or moves except this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
+bun run image src/games/feelings/bilder/push-1-b.webp "Redraw this exact picture as the second frame of a tiny two-frame animation. Keep EVERYTHING identical: same characters at exactly the same places and sizes, same clothes, colours, background, every object where it is, same camera framing (no zoom, no shift), same composition and line style. Nothing appears, disappears or moves except this small movement: <Bewegung>. No text, no letters." --ref src/games/feelings/bilder/push-1.webp --aspect 4:3 --size 1200x900 --quality 65
 ```
 
-Danach `yarn frames` (oder `yarn frames <datei-b.webp>`): listet Paare, bei denen mehr als die Bewegung
+Danach `bun run frames` (oder `bun run frames <datei-b.webp>`): listet Paare, bei denen mehr als die Bewegung
 anders ist, vor allem am Rand, wo fast immer Hintergrund ist. `baer-scared` darf auffallen – dort blitzt es.
 
 ## So bleibt die Szene gleich
@@ -48,7 +48,7 @@ Fenster, Kamera. Springt der Hintergrund, schaut ein Kleinkind auf das Neue stat
 Prompt für jedes weitere Bild einer Geschichte (ohne Stilblock – den Stil bringt die Referenz mit):
 
 ```
-yarn image src/games/feelings/bilder/push-2.webp "Redraw this exact picture as a later moment of the same story. Keep the place exactly as it is: the same background, sky, ground, trees, playground things, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. <Was sonst gleich bleibt, z. B. Exactly one small red toy car.> Only the characters' poses, faces and places change. In the picture, each exactly once: <Figuren mit Kurzbeschreibung>. Nobody else: no other children, no other grown-ups. Now this happens: <Handlung>. Gentle, no injuries, no blood. No text, no letters." --ref src/games/feelings/bilder/push-passiert.webp --aspect 4:3 --size 1200x900 --quality 65
+bun run image src/games/feelings/bilder/push-2.webp "Redraw this exact picture as a later moment of the same story. Keep the place exactly as it is: the same background, sky, ground, trees, playground things, furniture and objects at the same places, the same camera framing (no zoom, no shift), the same colours and line style. <Was sonst gleich bleibt, z. B. Exactly one small red toy car.> Only the characters' poses, faces and places change. In the picture, each exactly once: <Figuren mit Kurzbeschreibung>. Nobody else: no other children, no other grown-ups. Now this happens: <Handlung>. Gentle, no injuries, no blood. No text, no letters." --ref src/games/feelings/bilder/push-passiert.webp --aspect 4:3 --size 1200x900 --quality 65
 ```
 
 Zu Hause: „Redraw this exact picture. Keep the room exactly as it is: the same walls, window, curtains, bed,
@@ -58,7 +58,7 @@ or arms may come in from the bottom edge, never a whole child, no child's face. 
 mit `baer-…` als `--ref`. Karten, die bei mehreren Gefühlen vorkommen (`trost-hug`, `trost-teddy`), passen
 nicht in jeden Raum; sie zeigen den Bären nah, mit wenig Raum drumherum.
 
-Danach `yarn frames --scenes`: vergleicht den Rand jedes Bildes (fast immer Hintergrund) mit dem ersten Bild
+Danach `bun run frames --scenes`: vergleicht den Rand jedes Bildes (fast immer Hintergrund) mit dem ersten Bild
 der Geschichte und listet, was nach neuem Ort, Zoom oder neuer Kamera aussieht. So neu gezeichnete Bilder
 liegen bei 0–10 %. Ob alle Figuren da sind, sieht das Skript nicht – das zeigt nur ein Blick auf die Bilder
 einer Geschichte nebeneinander. `bye` darf auffallen, dort wechselt der Ort.
@@ -208,7 +208,7 @@ In den vier Geschichten unten haben diese Bilder nur einen Frame, weil im zweite
 sprang statt sich nur ein wenig zu bewegen: `bye-passiert`, `bye-3`, `bye-nein`,
 `new-passiert`, `new-nein`, `new-ende`, `fall-3`, `fall-ende`, `stop-1`, `stop-nein`.
 Die übrigen zweiten Frames dieser Geschichten waren als `--grid 1x2` entstanden und sprangen auch; sie sind
-neu mit dem ersten Frame als Referenz gezeichnet (siehe oben, `yarn frames`).
+neu mit dem ersten Frame als Referenz gezeichnet (siehe oben, `bun run frames`).
 
 ### Abschied an der Tür (`bye`) – Eingang mit Garderobe, Tür und Fenster
 

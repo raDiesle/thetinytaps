@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { BULBS, buildLight, DOME_Y, FIREFLIES, LAMP, NAILS, WIRE, wireY } from "./light";
 
 describe("Licht-Kette", () => {

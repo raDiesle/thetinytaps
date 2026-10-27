@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { STEPS } from "./steps";
 import { type SungTimes, sungLanguageOf } from "./sung";
 

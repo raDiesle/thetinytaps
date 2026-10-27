@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { CLOUD_TRIP } from ".";
 import { ARC_PERIOD } from "../../three/clips";
 import { RAINBOW_COLORS } from "./layout";

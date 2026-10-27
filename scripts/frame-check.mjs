@@ -1,8 +1,8 @@
 // Do the pictures of a moving story stay the same scene?
 //
-//   yarn frames [folder or files …]     the two frames of each moving picture
-//   yarn frames --scenes [folder]       every picture of a story against its first one
-//   yarn frames --all                   also list the pictures that look fine
+//   bun run frames [folder or files …]     the two frames of each moving picture
+//   bun run frames --scenes [folder]       every picture of a story against its first one
+//   bun run frames --all                   also list the pictures that look fine
 //
 // Default folder: src/games/feelings/bilder.
 //

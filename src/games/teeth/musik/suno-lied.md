@@ -458,7 +458,7 @@ Title: `Laviamo i denti!`
 
 Made in Suno on 26 Oct 2026 with the texts below. A short intro until 2.5 s, then every line
 about 4.3 s after the last without breaks between the parts (about 115 BPM), so every step is
-16 to 17 s; the brushing lasts 1:57, the song runs 2:26. `yarn song:verses` couldn't match the
+16 to 17 s; the brushing lasts 1:57, the song runs 2:26. `bun run song:verses` couldn't match the
 lines (Whisper writes traditional characters and hears homophones: 牙齿 → 雅之), so the starts
 were written by hand from Whisper's line times and the spectrogram (see `/zahnputzlied`).
 Mandarin, simplified characters, seven syllables a line, every pair

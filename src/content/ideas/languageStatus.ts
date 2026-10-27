@@ -58,7 +58,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   { href: "/bilder/", languages: { de: "done", ru: "done" }, note: "Viele Namen und Sätze je Bild; Russisch in ru.ts jeder Szene." },
   {
     href: "/abenteuer/",
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (yarn voice make, kostet Credits); ohne Aufnahme liest die Browserstimme. Eine Geschichte ohne Übersetzung spricht Deutsch.",
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme liest die Browserstimme. Eine Geschichte ohne Übersetzung spricht Deutsch.",
     parts: [
       {
         label: "🏝️ Die Schatzinsel",

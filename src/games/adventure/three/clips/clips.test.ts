@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { CLIP_GROUPS, CLIP_IDS } from ".";
 
 describe("motion clips", () => {

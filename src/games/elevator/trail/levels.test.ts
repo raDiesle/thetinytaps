@@ -1,4 +1,4 @@
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { allStations, groundY, pathsOf, route } from "./ground";
 import type { ItemId } from "./items";
 import { TRAIL_LEVELS } from "./levels";

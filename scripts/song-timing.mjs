@@ -2,7 +2,7 @@
 // part starts, quiet stretches in the bass, and a spectrogram picture to check by eye.
 // Guide: .claude/skills/musik-erzeugen/SKILL.md
 //
-//   yarn song <song.wav|mp3> [--bpm 112] [--bars 8]
+//   bun run song <song.wav|mp3> [--bpm 112] [--bars 8]
 //
 // --bpm is what was asked of Suno (the search looks ±4 BPM around it, otherwise
 // 70–160); --bars is the length of one part. Needs ffmpeg.
@@ -17,7 +17,7 @@ const option = (name, fallback) => {
 };
 const file = args.find((a, i) => !a.startsWith("--") && !args[i - 1]?.startsWith("--"));
 if (!file) {
-  console.error("usage: yarn song <song.wav|mp3> [--bpm 112] [--bars 8]");
+  console.error("usage: bun run song <song.wav|mp3> [--bpm 112] [--bars 8]");
   process.exit(1);
 }
 const askedBpm = option("bpm", null);

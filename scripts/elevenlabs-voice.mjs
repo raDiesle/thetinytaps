@@ -5,11 +5,11 @@
 // The game plays them (src/games/adventure/voice.ts) and falls back to the browser's
 // voice for a line that has no recording.
 //
-//   yarn voice credits                       credits left this month
-//   yarn voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
-//   yarn voice save <1|2|3> ["<name>"]       keeps a draft as the voice (src/games/adventure/stimme.json)
-//   yarn voice try "<text>" [--kind turn] [--lang en]   one line with the voice, into .voice-raw/probe.mp3
-//   yarn voice make [--dry] [--lang de,en] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
+//   bun run voice credits                       credits left this month
+//   bun run voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
+//   bun run voice save <1|2|3> ["<name>"]       keeps a draft as the voice (src/games/adventure/stimme.json)
+//   bun run voice try "<text>" [--kind turn] [--lang en]   one line with the voice, into .voice-raw/probe.mp3
+//   bun run voice make [--dry] [--lang de,en] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
 //                                            records every line that has no recording yet, in all
 //                                            languages or those of --lang (and again: lines with
 //                                            that text part, of that kind, or all); --model eleven_v4_turbo
@@ -113,7 +113,7 @@ async function rate(model) {
 }
 
 function readConfig() {
-  if (!existsSync(CONFIG)) fail(`No voice yet: run "yarn voice design", listen, then "yarn voice save <1|2|3>"`);
+  if (!existsSync(CONFIG)) fail(`No voice yet: run "bun run voice design", listen, then "bun run voice save <1|2|3>"`);
   return JSON.parse(readFileSync(CONFIG, "utf8"));
 }
 
@@ -183,12 +183,12 @@ async function design() {
     return preview.generated_voice_id;
   });
   writeFileSync(join(RAW_DIR, "entwurf.json"), JSON.stringify({ description, drafts }, null, 2));
-  console.log(`Listen, then: yarn voice save <1-${drafts.length}> "<name>"`);
+  console.log(`Listen, then: bun run voice save <1-${drafts.length}> "<name>"`);
 }
 
 async function save() {
   const file = join(RAW_DIR, "entwurf.json");
-  if (!existsSync(file)) fail(`No drafts: run "yarn voice design" first`);
+  if (!existsSync(file)) fail(`No drafts: run "bun run voice design" first`);
   const { description, drafts } = JSON.parse(readFileSync(file, "utf8"));
   const chosen = drafts[Number(rest[0]) - 1];
   if (!chosen) fail(`Which draft? 1-${drafts.length}`);
@@ -198,12 +198,12 @@ async function save() {
   });
   const { voice_id } = await response.json();
   writeFileSync(CONFIG, `${JSON.stringify({ voice: voice_id, name, model: DEFAULT_MODEL, description }, null, 2)}\n`);
-  console.log(`Saved "${name}" (${voice_id}) in ${CONFIG}. Next: yarn voice try "Jetzt du – stampf mit!" or yarn voice make --dry`);
+  console.log(`Saved "${name}" (${voice_id}) in ${CONFIG}. Next: bun run voice try "Jetzt du – stampf mit!" or bun run voice make --dry`);
 }
 
 async function tryLine() {
   const text = rest[0];
-  if (!text) fail('What should it say? yarn voice try "Jetzt du – stampf mit!"');
+  if (!text) fail('What should it say? bun run voice try "Jetzt du – stampf mit!"');
   const kind = values.kind ?? "turn";
   if (!TAGS[kind]) fail(`--kind is one of ${Object.keys(TAGS).join(", ")}`);
   mkdirSync(RAW_DIR, { recursive: true });
@@ -262,5 +262,5 @@ const COMMANDS = {
   try: tryLine,
   make,
 };
-if (!COMMANDS[command]) fail(`yarn voice ${Object.keys(COMMANDS).join(" | ")} – see scripts/elevenlabs-voice.mjs`);
+if (!COMMANDS[command]) fail(`bun run voice ${Object.keys(COMMANDS).join(" | ")} – see scripts/elevenlabs-voice.mjs`);
 await COMMANDS[command]();

@@ -1,6 +1,6 @@
 // The sung brushing songs: musik/musik-zaehneputzen-lied-<lang>.mp3, one per language,
 // with a .json of the same name saying where each verse begins. A new language needs
-// only these two files (`yarn song:verses` makes both, see the /zahnputzlied skill).
+// only these two files (`bun run song:verses` makes both, see the /zahnputzlied skill).
 
 /**
  * The language the song is sung in, out of the languages that have a song: always the

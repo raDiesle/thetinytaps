@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { STORIES, texts } from "./content";
 import { RU } from "./ru";
 import { TRAIL_LEVELS } from "./trail/levels";

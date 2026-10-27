@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { TREASURE_ISLAND } from ".";
 import { CYCLES, clipLength } from "./script";
 

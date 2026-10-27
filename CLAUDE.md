@@ -3,29 +3,36 @@
 Keyboard and touch games for toddlers (2–3 years). A React 19 single-page app
 built with Rsbuild, deployed to GitHub Pages, works offline (PWA). No backend.
 
-## Commands (always yarn, never npm)
+## Commands (always Bun, never npm, yarn or npx)
 
 ```bash
-yarn verify        # lint + format check + typecheck + unit tests – run before every commit
-yarn format        # format everything and apply safe lint fixes (Biome)
-yarn test          # unit tests only (Rstest, ~1 s); yarn test:watch while working
-yarn build         # production build into out/
-yarn image ...     # picture with Gemini, see /bild-erzeugen
-yarn song ...      # measure a song from Suno, see /musik-erzeugen
-yarn frames        # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
+bun run verify     # lint + format check + typecheck + unit tests – run before every commit
+bun run format     # format everything and apply safe lint fixes (Biome)
+bun test           # unit tests only (bun test, < 1 s); bun test --watch while working
+bun run build      # production build into out/ (Rsbuild) – never `bun build`, that is Bun's own bundler
+bun run image ...  # picture with Gemini, see /bild-erzeugen
+bun run song ...   # measure a song from Suno, see /musik-erzeugen
+bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
+
+Bun installs, runs the scripts and tools (`[run] bun = true`, no Node needed) and tests; Rsbuild still bundles.
+`bunfig.toml` keeps installs safe and `src/packageSafety.test.ts` checks it stays so: only the public npm
+registry, only versions at least 3 days old (`minimumReleaseAge`), no install scripts, no packages fetched on
+the fly. Never loosen these; add a package with `bun add --exact <name>` (`-d` for tools), never with `bunx`
+or `bun x`, which fetch past the lockfile. Tests import from `bun:test`. Rspack-only code
+(`import.meta.webpackContext`) works in tests through `src/testPreload.ts`.
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
 Use `dev` – it moves to the next free port when another session has 3000, so
 never add configs with fixed ports. `preview-pages` serves the built site with
 the service worker. Sound and speech are muted when the browser
 is Claude's preview (`src/lib/silent.ts`).
-In a fresh worktree run `yarn install` first.
+In a fresh worktree run `bun install` first.
 
 ## Working here
 
 - Several Claude sessions work in parallel, each in its own worktree. When a task
-  is done: `yarn verify`, commit on the branch, merge into **local** `main` without asking,
+  is done: `bun run verify`, commit on the branch, merge into **local** `main` without asking,
   never push (and don't offer to – pushing is the user's move). Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
   the user once checked another session's server by mistake.
@@ -99,7 +106,7 @@ In a fresh worktree run `yarn install` first.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
-  `yarn format`. Lint rules that don't fit SVG drawings (index keys, `role` on `<g>`)
+  `bun run format`. Lint rules that don't fit SVG drawings (index keys, `role` on `<g>`)
   are off; fix what the rest reports instead of ignoring it.
 
 ## Rules for every game (toddlers play alone)
@@ -185,7 +192,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 
 ## Checking your work
 
-1. `yarn verify`. The tests (`*.test.ts` next to the code) check data that is easy to
+1. `bun run verify`. The tests (`*.test.ts` next to the code) check data that is easy to
    get wrong by hand: scene items (ids, tap sizes, chains, keys, plural grammar), roads,
    the home menu against the routes and kid tiles, ideas, language packs, the movement
    library, the Gefühle pictures, unique `@keyframes` names.

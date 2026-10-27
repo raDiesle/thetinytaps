@@ -1,5 +1,5 @@
 import { existsSync } from "node:fs";
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { COMFORTS, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, storyImages } from "./images";
 import { SITUATIONS } from "./kita";

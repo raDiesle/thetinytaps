@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { describe, expect, test } from "@rstest/core";
+import { describe, expect, test } from "bun:test";
 import { CATEGORIES } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, toLower, toUpper } from "./languages";

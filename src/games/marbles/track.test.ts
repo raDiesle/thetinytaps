@@ -1,4 +1,4 @@
-import { expect, test } from "@rstest/core";
+import { expect, test } from "bun:test";
 import { BALL_R, type Pt } from "./path";
 import {
   BASKET_FULL,
