@@ -41,6 +41,7 @@ export const IDEA_AREAS: IdeaArea[] = IDEA_GROUPS.flatMap((g) => g.areas);
 
 /** My suggestion of what to do first, with a short reason each. */
 export const TOP_PICKS: { id: string; reason: string }[] = [
+  { id: "X-14", reason: "Zuerst: Heute kann eine richtige Antwort als falsch gelten (der Hase mag auch Salat)." },
   { id: "N-01", reason: "Klein, sofort lustig, nutzt den vorhandenen Klang-Baukasten." },
   { id: "N-03", reason: "Löst das Problem „Bildschirmzeit beenden“." },
   { id: "B-01", reason: "Guck-guck passt perfekt zu 2-Jährigen und zur bestehenden Baustelle." },
