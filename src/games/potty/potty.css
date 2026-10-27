@@ -3,7 +3,8 @@
 /*
  * The story is a Gemini picture filling the screen (StoryPicture.tsx), its two frames
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
- * calls (.pt-feel, .pt-call), the two ✓ while sitting (.pt-finish), the row of steps.
+ * calls (.pt-feel, .pt-call), what the child said while eating (.pt-said), the two ✓ while sitting (.pt-finish),
+ * the row of steps.
  * Root classes: pt-pipi / pt-kaka / pt-unsure (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
  * Nothing moves before the first tap.
  */
@@ -129,6 +130,41 @@
   to {
     transform: translateX(-50%) scale(1);
   }
+}
+
+/* While Tapsi eats and drinks: three round buttons for what the child said (💧, 💩, ❓). They stand still
+   (nothing moves before a tap); the picked one is yellow and a little bigger. */
+.pt-saids {
+  position: absolute;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(max(10px, env(safe-area-inset-bottom)) + clamp(48px, min(7vw, 10vmin), 72px));
+  display: flex;
+  gap: clamp(14px, 3vmin, 24px);
+}
+
+.pt-said {
+  display: grid;
+  place-items: center;
+  width: clamp(72px, 15vmin, 120px);
+  height: clamp(72px, 15vmin, 120px);
+  padding: 0;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: #fffdf4;
+  box-shadow:
+    0 0 0 4px #2a1e5c,
+    0 6px 16px #0004;
+  font-size: clamp(36px, 8vmin, 64px);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    background-color 0.2s;
+}
+
+.pt-said.picked {
+  background: #ffd23f;
+  transform: scale(1.12);
 }
 
 /* While sitting: two big green ✓ say „fertig“ – one for pipi, one for kaka, told apart by the badge.
