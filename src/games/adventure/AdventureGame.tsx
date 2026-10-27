@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 import { GameShell } from "@/components/GameShell";
-import { useLanguages } from "@/components/LanguageSetting";
 import { type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
@@ -22,7 +21,6 @@ const STORIES: { id: AdventureStoryId; emoji: string; story: Story }[] = [
 export function AdventureGame() {
   const [settings, update] = useStoredSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
-  const languages = useLanguages();
   const { touchOnly } = useDevice();
   const t = useT();
   const app = useAppLanguage();
@@ -33,11 +31,10 @@ export function AdventureGame() {
   const chosen = STORIES[at].story;
   // „Weiter“ at the end: the next story on the start screen, after the last the first.
   const next = STORIES[(at + 1) % STORIES.length];
-  // The play language of the home page. A story not told in it yet (Turkish, Polish, …) is said in English,
-  // or else German – never German words with a Spanish voice.
-  const wanted = languages.chosen;
+  // The app language, like every game. A story not told in it yet is said in English,
+  // or else German – never German words with a Russian voice.
   const told = (id: string) => id === "de" || Boolean(chosen.translations?.[id as TargetLanguageId]);
-  const language = targetLanguageFor(told(wanted.id) ? wanted.id : told("en") ? "en" : "de");
+  const language = targetLanguageFor(told(app.id) ? app.id : told("en") ? "en" : "de");
   // Built once per story and language: the game starts anew when the story changes.
   const story = useMemo(() => storyIn(chosen, language.id), [chosen, language.id]);
 
@@ -82,14 +79,14 @@ export function AdventureGame() {
           </p>
           <p>
             {t({
-              de: "Ob Tapsi spricht und in welcher Sprache, Töne und Musik stellt ⚙️ auf der Startseite für alle Spiele ein.",
-              ru: "Говорит ли Тапси и на каком языке, звуки и музыку настраивает ⚙️ на главной странице для всех игр.",
+              de: "Ob Tapsi spricht, Töne und Musik stellt ⚙️ auf der Startseite für alle Spiele ein, die Sprache 🌐.",
+              ru: "Говорит ли Тапси, звуки и музыку настраивает ⚙️ на главной странице для всех игр, язык – 🌐.",
             })}
-            {language.id !== wanted.id &&
+            {language.id !== app.id &&
               t({
-                de: ` „${storyTitle(chosen, "de")}“ gibt es noch nicht auf ${wanted.label.split(" ")[1]}, Tapsi spricht dort ${language.label.split(" ")[1]}.`,
+                de: ` „${storyTitle(chosen, "de")}“ gibt es noch nicht auf ${app.label.split(" ")[1]}, Tapsi spricht dort ${language.label.split(" ")[1]}.`,
                 // The language only by its flag, so its Russian name needs no declining.
-                ru: ` Для истории «${storyTitle(chosen, "ru")}» ещё нет перевода на этот язык (${wanted.label.split(" ")[0]}), Тапси говорит ${language.id === "en" ? "по-английски" : "по-немецки"}.`,
+                ru: ` Для истории «${storyTitle(chosen, "ru")}» ещё нет перевода на этот язык (${app.label.split(" ")[0]}), Тапси говорит ${language.id === "en" ? "по-английски" : "по-немецки"}.`,
               })}
           </p>
           {!touchOnly && (

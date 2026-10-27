@@ -1,88 +1,57 @@
 import { Choice, SettingsGroup } from "@/components/SettingControls";
-import { LANGUAGES, languageFor, type LanguageId, languageName } from "@/content/languages";
-import { TARGET_LANGUAGES, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
-import { languageLabel, useAppLanguage, useT } from "@/lib/language";
-import { playLanguage } from "@/lib/locale";
+import { LANGUAGES, type LanguageId, languageFor, languageName } from "@/content/languages";
+import { useAppLanguage, useT } from "@/lib/language";
 import { useStoredSettings } from "@/lib/storage";
 
-/** A play language: one with a pack for letters and words, or one only the Bewegungsabenteuer speaks so far. */
-export type PlayLanguageId = LanguageId | TargetLanguageId;
-
-/** The play languages to choose from: those with a pack first, then the wanted ones without one. */
-const PLAY_LANGUAGES: { id: PlayLanguageId; label: string }[] = [...LANGUAGES, ...TARGET_LANGUAGES.filter((t) => !LANGUAGES.some((l) => l.id === t.id))].map(
-  ({ id, label }) => ({ id, label }),
-);
-
-/** Flag and name of a play language in the app language: "🇷🇺 Russisch" on German screens, "🇷🇺 Русский" on Russian ones. */
-const nameOf = (id: PlayLanguageId, appLanguageId: TargetLanguageId) =>
-  LANGUAGES.some((l) => l.id === id) ? languageName(languageFor(id), appLanguageId) : languageLabel(targetLanguageFor(id), appLanguageId);
+// One language for everything: the letters and words games and Tapsi play in the app language (🌐 on the home
+// page), so menus, letters and voice never mix. A language joins 🌐 only once the whole app speaks it.
 
 export interface LanguageSettings {
-  /** The language the child plays in; a game that doesn't speak it plays in English (`packFor`). */
-  language: PlayLanguageId;
   /** Optional second language: every word is also shown and said in it, „Bär – bear“. */
   second: LanguageId | "none";
 }
 
-// Until the parents choose, the child plays in the browser's language (English when the app has none of it).
-const DEFAULT_LANGUAGE_SETTINGS: LanguageSettings = { language: playLanguage(PLAY_LANGUAGES.map((l) => l.id)), second: "none" };
+const DEFAULT_LANGUAGE_SETTINGS: LanguageSettings = { second: "none" };
 
-/** The play language with this id; German for anything unknown, e.g. an old saved setting. */
-const playLanguageFor = (id: string) => PLAY_LANGUAGES.find((l) => l.id === id) ?? PLAY_LANGUAGES[0];
-
-/** The pack letters and words play in: English where the play language has none (Spanish, Chinese, …). */
-const packFor = (id: string) => LANGUAGES.find((l) => l.id === id) ?? languageFor("en");
-
-// Shared by the letters and words games and the Bewegungsabenteuer, so parents choose the language once.
+// Shared by the letters and words games, so parents choose the second language once. An old saved play
+// language (`language`) is no longer read: the app language decides.
 const LANGUAGE_SETTINGS_KEY = "tinytaps.language.v1";
 
-/** The chosen play language (id and label), its language pack, the second one (or null) and the settings to change them. */
+/** The language pack of the app language, the second one (or null) and the settings to change it. */
 export function useLanguages() {
   const [settings, update] = useStoredSettings(LANGUAGE_SETTINGS_KEY, DEFAULT_LANGUAGE_SETTINGS);
-  const chosen = playLanguageFor(settings.language);
-  const main = packFor(chosen.id);
+  const main = languageFor(useAppLanguage().id);
   const second = settings.second === "none" || settings.second === main.id ? null : languageFor(settings.second);
-  return { settings, update, chosen, language: main, second };
+  return { settings, update, language: main, second };
 }
 
+/** The choice of a second language for the letters and words games; the first one is the app language. */
 export function LanguageSetting({ settings, update }: { settings: LanguageSettings; update: (patch: Partial<LanguageSettings>) => void }) {
   const t = useT();
   const app = useAppLanguage();
-  const chosen = playLanguageFor(settings.language);
-  const main = packFor(chosen.id).id;
+  const main = languageFor(app.id).id;
   return (
     <SettingsGroup title={t({ de: "Sprache", ru: "Язык" })}>
-      <Choice<PlayLanguageId>
-        label={t({ de: "Spielsprache", ru: "Язык игры" })}
-        value={chosen.id}
-        onChange={(language) => update({ language, second: language === settings.second ? "none" : settings.second })}
-        options={PLAY_LANGUAGES.map((l) => ({ value: l.id, label: nameOf(l.id, app.id) }))}
-      />
-      {main !== chosen.id && (
-        <p className="setting-note">
-          {t({
-            de: `Auf ${chosen.label.split(" ")[1]} spricht bisher nur Tapsi im Bewegungsabenteuer; „Buchstaben & Zahlen“ und „Wörter tippen“ sind auf Englisch.`,
-            ru: "На этом языке пока говорит только Тапси в «Приключениях в движении»; «Буквы и цифры» и «Печатаем слова» — на английском.",
-          })}
-        </p>
-      )}
       <Choice<LanguageId | "none">
         label={t({ de: "Zweite Sprache", ru: "Второй язык" })}
         value={settings.second === main ? "none" : settings.second}
         onChange={(second) => update({ second })}
         options={[
           { value: "none", label: t({ de: "Aus", ru: "Выкл." }) },
-          ...LANGUAGES.filter((l) => l.id !== main).map((l) => ({ value: l.id, label: nameOf(l.id, app.id) })),
+          ...LANGUAGES.filter((l) => l.id !== main).map((l) => ({ value: l.id, label: languageName(l, app.id) })),
         ]}
       />
-      {settings.second !== "none" && settings.second !== main && (
-        <p className="setting-note">
-          {t({
-            de: "Unter jedem Wort steht es auch in der zweiten Sprache und wird danach vorgelesen: „Bär – bear“.",
-            ru: "Под каждым словом оно написано и на втором языке и потом читается вслух: «Медведь – bear».",
-          })}
-        </p>
-      )}
+      <p className="setting-note">
+        {settings.second !== "none" && settings.second !== main
+          ? t({
+              de: "„Buchstaben & Zahlen“ und „Wörter tippen“ zeigen jedes Wort auch in der zweiten Sprache und lesen es danach vor: „Bär – bear“.",
+              ru: "«Буквы и цифры» и «Печатаем слова» показывают каждое слово и на втором языке и потом читают его вслух: «Медведь – bear».",
+            })
+          : t({
+              de: "Alle Spiele sprechen die Sprache der App (🌐 oben).",
+              ru: "Все игры говорят на языке приложения (🌐 вверху).",
+            })}
+      </p>
     </SettingsGroup>
   );
 }

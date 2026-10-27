@@ -18,7 +18,7 @@ export interface Language {
   pack: LanguagePack;
 }
 
-/** Languages of the letters and words games; the home page's play language may also be one without a pack (`LanguageSetting.tsx`). */
+/** Languages of the letters and words games: the app language's pack, and the packs a „Zweite Sprache“ can add. */
 export const LANGUAGES: Language[] = [
   { id: "de", label: "🇩🇪 Deutsch", russian: "🇩🇪 Немецкий", adjective: "deutsche", pack: de },
   { id: "en", label: "🇺🇸 Englisch", russian: "🇺🇸 Английский", adjective: "englische", pack: en },

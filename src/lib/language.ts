@@ -4,10 +4,9 @@ import { playLanguage } from "@/lib/locale";
 
 // The language of the whole app, chosen once on the home page: the grown-ups'
 // screens (home page, start screens, settings) and what the child hears and sees
-// in every game that speaks it. A text gives the German and the translations next
-// to each other, t({ de: "Musik", ru: "Музыка" }); a language a text lacks falls
-// back to German. The letters and words games and the Bewegungsabenteuer speak the
-// Spielsprache instead (LanguageSetting.tsx), which offers more languages.
+// in every game, the letters and words games and Tapsi included: one language,
+// never mixed. A text gives the German and the translations next to each other,
+// t({ de: "Musik", ru: "Музыка" }); a language a text lacks falls back to German.
 
 /** The same thing in several languages; German is always there and is used for the others missing. */
 export type Localized<T = string> = { de: T } & Partial<Record<TargetLanguageId, T>>;
