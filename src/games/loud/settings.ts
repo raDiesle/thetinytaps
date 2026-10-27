@@ -4,18 +4,16 @@ export type Sensitivity = "low" | "mid" | "high";
 /** One level of the game: the lion and the mouse, or blowing (idea X-06). */
 export type LoudLevel = "voice" | "blow";
 
-/** Which levels to play: both in turn, or only one. */
-export type LoudLevels = "all" | LoudLevel;
-
 export interface LoudSettings {
-  levels: LoudLevels;
+  /** The level to begin with; „Weiter“ at its end goes on with the other. Older saves may say "all": that begins with the first. */
+  levels: LoudLevel;
   sensitivity: Sensitivity;
   /** The animals say something, and a hint after a quiet while. */
   speech: boolean;
 }
 
 export const DEFAULT_LOUD_SETTINGS: LoudSettings = {
-  levels: "all",
+  levels: "voice",
   sensitivity: "mid",
   speech: false,
 };

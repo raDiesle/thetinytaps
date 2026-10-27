@@ -1,15 +1,15 @@
 # Gefühle
 
-Route `/gefuehle/`: one start screen (`FeelingsGame`) with „Alle“ first, then
-„Wie geht's dir?“, then one card per story (`stories.ts`, `settings.story`): the
+Route `/gefuehle/`: one start screen (`FeelingsGame`) with
+„Wie geht's dir?“ first, then one card per story (`stories.ts`, `settings.story`): the
 bear's feelings at home, then the kindergarten stories. There are no sub-menus per place; the old addresses
 `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
 `FeelingsPlay` plays one story after another, always in the start screen's order (user feedback, never
-shuffled): „Alle“ starts with the first story, a picked one with itself, and „Weiter“ brings the next one
+shuffled): a picked story starts with itself (there is no „Alle“ card: „Weiter“ does that), and „Weiter“ brings the next one
 there, after the last the first (`storyAfter` in `stories.ts`, checked in `feelings.test.ts`).
 
-„Wie geht's dir?“ (`mood.ts`, `MoodPlay.tsx`, `settings.story` = `"mood"`, not in
-„Alle“): four weather cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show
+„Wie geht's dir?“ (`mood.ts`, `MoodPlay.tsx`, `settings.story` = `"mood"`, the default, never
+reached by „Weiter“): four weather cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show
 the bear under that weather, feeling the same. The child picks the one that fits;
 it shows big while the bear says „Das kenne ich auch!“, then the bear's story with
 that feeling plays (sun → birthday, cloud → tired, rain → sad, storm → angry) and

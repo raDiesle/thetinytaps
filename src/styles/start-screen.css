@@ -420,30 +420,6 @@ kbd {
   white-space: nowrap;
 }
 
-/* The one card above the rest ("all of them in turn"): a whole row, in rainbow stripes. */
-.mode-list .mode-featured {
-  grid-column: 1 / -1;
-  --tilt: 0deg;
-}
-
-.mode-featured .mode-card {
-  flex-direction: row;
-  justify-content: center;
-  gap: 24px;
-  padding: 22px 28px 26px;
-  background: linear-gradient(100deg, #ff8fa0, #ffc46b, #fff07a, #8ee08a, #7fd3ff, #b7a8ff);
-}
-
-.mode-featured .mode-card .game-emoji {
-  width: 100px;
-  height: 100px;
-  font-size: 3.3rem;
-}
-
-.mode-featured .mode-card .game-title {
-  font-size: clamp(1.6rem, 4vw, 2.2rem);
-}
-
 /*
  * On a tablet or computer, all cards and the buttons under them fit on one
  * screen: useFitGrid picks the columns and row height, the cards scale with it.
@@ -489,10 +465,6 @@ kbd {
   right: -8px;
   bottom: -12px;
   font-size: 1.1rem;
-}
-
-.game-list.fit .mode-featured .game-title {
-  font-size: clamp(1.2rem, 20cqh, 2.2rem);
 }
 
 /*
@@ -595,41 +567,37 @@ kbd {
   }
 }
 
-/*
- * Phones (shorter side under 600 px, like useFitGrid): everything tighter, so the cards get the room. The back
- * link sits left of the title: the ::after line break keeps the rest below those two.
- */
+/* A flat card too narrow for emoji, title and ▶ side by side (many pictures on a phone): emoji above a small title, no ▶. */
+@container (max-height: 129.98px) and (max-width: 179.98px) {
+  .game-list.fit .game-card {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    padding: 2px 4px;
+    text-align: center;
+  }
+
+  .game-list.fit .game-emoji {
+    --size: min(48cqh, 34cqw);
+    border-width: 2px;
+  }
+
+  .game-list.fit .game-title {
+    font-size: min(0.8rem, 10.5cqw);
+    line-height: 1.05;
+  }
+
+  .game-list.fit .game-go {
+    display: none;
+  }
+}
+
+/* Phones (shorter side under 600 px, like useFitGrid): everything tighter, so the cards get the room. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .start-screen {
-    flex-flow: row wrap;
-    align-content: center;
     gap: 10px;
     padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom))
       max(12px, env(safe-area-inset-left));
-  }
-
-  .start-screen::after {
-    content: "";
-    order: 1;
-    flex-basis: 100%;
-    margin-top: -10px;
-  }
-
-  .start-screen > :not(.menu-top, .menu-title) {
-    order: 2;
-  }
-
-  /* The back link stays left, also on a line of its own when the title doesn't fit beside it. */
-  .start-screen > .menu-top {
-    margin-right: auto;
-  }
-
-  .start-screen > .menu-title {
-    margin-inline: auto;
-  }
-
-  .start-screen > .shared-settings-note {
-    flex-basis: 100%;
   }
 
   .back-link {
@@ -641,11 +609,6 @@ kbd {
 
   .mode-picker {
     gap: 8px;
-  }
-
-  .mode-heading {
-    padding: 2px 14px;
-    font-size: 0.95rem;
   }
 
   .mode-level {

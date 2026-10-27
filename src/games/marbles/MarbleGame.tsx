@@ -2,13 +2,12 @@ import { GameShell } from "@/components/GameShell";
 import { SettingsGroup, Toggle } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
-import { ALL_LEVELS, GAME_TITLE, LEVEL_TEXTS } from "./content";
+import { GAME_TITLE, LEVEL_TEXTS } from "./content";
 import { MarblePlay } from "./MarblePlay";
-import { DEFAULT_MARBLE_SETTINGS, MARBLE_SETTINGS_KEY, type MarbleLevel, type MarbleLevels } from "./settings";
+import { DEFAULT_MARBLE_SETTINGS, MARBLE_SETTINGS_KEY, type MarbleLevel } from "./settings";
 
-/** The mode cards in menu order: all levels, then each level by itself. */
-const MODES: { id: MarbleLevels; emoji: string; featured?: boolean }[] = [
-  { id: "all", emoji: "🌈", featured: true },
+/** The mode cards in menu order, one per level; „Weiter“ at a level's end goes on with the next. */
+const MODES: { id: MarbleLevel; emoji: string }[] = [
   { id: "track", emoji: "🎢" },
   { id: "machine", emoji: "⚙️" },
   { id: "sneeze", emoji: "🤧" },
@@ -26,9 +25,9 @@ const MODES: { id: MarbleLevels; emoji: string; featured?: boolean }[] = [
 export function MarbleGame() {
   const t = useT();
   const [settings, update] = useGameSettings(MARBLE_SETTINGS_KEY, DEFAULT_MARBLE_SETTINGS);
-  // Older saves may hold a choice that is gone ("both", "machines"): those play all.
-  const mode = MODES.some((m) => m.id === settings.levels) ? settings.levels : "all";
-  const modes = MODES.map((m) => ({ ...m, title: t(m.id === "all" ? ALL_LEVELS : LEVEL_TEXTS[m.id as MarbleLevel].name) }));
+  // Older saves may hold a choice that is gone ("all", "both", "machines"): those begin with the first level.
+  const mode = MODES.some((m) => m.id === settings.levels) ? settings.levels : MODES[0].id;
+  const modes = MODES.map((m) => ({ ...m, title: t(LEVEL_TEXTS[m.id].name) }));
 
   return (
     <GameShell
@@ -36,7 +35,7 @@ export function MarbleGame() {
       emoji="🎳"
       modes={modes}
       mode={mode}
-      onMode={(levels) => update({ levels: levels as MarbleLevels })}
+      onMode={(levels) => update({ levels: levels as MarbleLevel })}
       info={
         <p>
           {t({

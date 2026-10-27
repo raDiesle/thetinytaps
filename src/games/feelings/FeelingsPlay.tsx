@@ -17,7 +17,7 @@ export function FeelingsPlay({ settings }: { settings: FeelingsSettings }) {
   const chosen = STORIES.find((s) => s.id === settings.story);
   const { id: language } = useAppLanguage();
 
-  // „Weiter“ always goes on in the menu's order: „Alle“ starts with its first story, a picked one (or the one the weather led to) with itself.
+  // „Weiter“ always goes on in the menu's order, from the picked story (or the one the weather led to); an old „Alle“ starts with the first.
   const pick = (after?: Story): Story => (after ? storyAfter(after) : (chosen ?? STORIES[0]));
 
   const [now, setNow] = useState<{ story?: Story; key: number }>(() => ({ story: mood ? undefined : pick(), key: 0 }));

@@ -6,11 +6,11 @@ import { type Localized, useT } from "@/lib/language";
 import { unlockAudio } from "@/lib/sfx";
 import { createEar, meterAt, useMicPermission, useMicrophone, type Heard } from "./mic";
 import { LoudPlay } from "./LoudPlay";
-import { DEFAULT_LOUD_SETTINGS, LOUD_SETTINGS_KEY, type LoudLevels, type Sensitivity } from "./settings";
+import { DEFAULT_LOUD_SETTINGS, LOUD_SETTINGS_KEY, type LoudLevel, type Sensitivity } from "./settings";
 import "./loud.css";
 
-const MODES: { id: string; emoji: string; title: Localized; featured?: boolean }[] = [
-  { id: "all", emoji: "🌈", title: { de: "Beides nacheinander", ru: "Оба по очереди" }, featured: true },
+/** One card per level; „Weiter“ at a level's end goes on with the other. */
+const MODES: { id: LoudLevel; emoji: string; title: Localized }[] = [
   { id: "voice", emoji: "🦁", title: { de: "Löwe und Maus", ru: "Лев и мышка" } },
   { id: "blow", emoji: "🎂", title: { de: "Pusten", ru: "Дуем" } },
 ];
@@ -25,7 +25,7 @@ export function LoudGame() {
       emoji="🦁"
       modes={MODES.map((m) => ({ ...m, title: t(m.title) }))}
       mode={settings.levels}
-      onMode={(levels) => update({ levels: levels as LoudLevels })}
+      onMode={(levels) => update({ levels: levels as LoudLevel })}
       level={
         <Choice<Sensitivity>
           label={t({ de: "Wie laut?", ru: "Насколько громко?" })}
@@ -42,8 +42,7 @@ export function LoudGame() {
         <>
           <p>
             {t({
-              de: "Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Nacheinander geht es nach zehn Tönen weiter zum Pusten.",
-              ru: "Лев и мышка: если ребёнок громко кричит, лев рычит и подпрыгивает. Если говорит или шепчет тихо, пищит маленькая мышка. В режиме «Оба по очереди» после десяти звуков игра переходит к «Дуем».",
+              de: "Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Nach zehn Tönen geht es mit „Weiter“ zum Pusten.",
             })}
           </p>
           <p>

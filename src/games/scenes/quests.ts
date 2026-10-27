@@ -1,5 +1,6 @@
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { pick as pickLanguage } from "@/lib/language";
+import { type ColourTrait, isColourTrait } from "./colourParts";
 import { SCENE_PHRASES } from "./phrases";
 import type { SceneMode } from "./settings";
 import type { Scene, SceneItem, SceneTrait } from "./types";
@@ -12,6 +13,10 @@ export interface Quest {
   question: string;
   /** Every item that is a right answer. */
   answers: SceneItem[];
+  /** Colour questions: any other item with a part in this colour is right too (`coloursIn`). */
+  colour?: ColourTrait;
+  /** Said instead of `praise` for such an item: "Da ist Rot!" */
+  partPraise?: string;
   /** How many of them make the question done. */
   needed: number;
   /** Find mode: the item, drawn in the bubble. */
@@ -42,9 +47,10 @@ export function questsFor(mode: SceneMode, scene: Scene, languageId: TargetLangu
   }
   if (mode === "questions") {
     return TRAITS.map((trait): Quest => {
-      const { question, praise, emoji } = words.traits[trait];
+      const { question, praise, part, emoji } = words.traits[trait];
       const answers = scene.items.filter((item) => item.traits?.includes(trait));
-      return { id: trait, question, answers, needed: Math.min(MAX_NEEDED, answers.length), emoji, praise };
+      const colour = isColourTrait(trait) ? trait : undefined;
+      return { id: trait, question, answers, colour, partPraise: part, needed: Math.min(MAX_NEEDED, answers.length), emoji, praise };
     }).filter((quest) => quest.answers.length >= 2);
   }
   return [];

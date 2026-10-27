@@ -15,6 +15,7 @@ import { assignKeys, pressedKey } from "./keys";
 import { localizeScene, sceneLanguage } from "./localize";
 import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
 import { capitalize, SCENE_PHRASES } from "./phrases";
+import { coloursIn, type ColourTrait } from "./colourParts";
 import { nextQuest, questsFor, type Quest } from "./quests";
 import { driveDistance, guestFor, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
@@ -236,6 +237,19 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
     },
     [later, soundsOn, nextSurprise, questMode, bedtime],
   );
+
+  /** The asked colours each item shows somewhere, read from the drawing once (colour questions, `coloursIn`). */
+  const itemColours = useRef(new Map<string, Set<ColourTrait>>());
+  const hasColour = (item: SceneItem, colour: ColourTrait) => {
+    let colours = itemColours.current.get(item.id);
+    if (!colours) {
+      const drawn = svgRef.current?.querySelector(`[data-item="${item.id}"]`);
+      if (!drawn) return false;
+      colours = coloursIn(drawn);
+      itemColours.current.set(item.id, colours);
+    }
+    return colours.has(colour);
+  };
 
   /** Asks the question (again). */
   const ask = useCallback(
@@ -505,7 +519,9 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       }
       return;
     }
-    const isAnswer = quest.answers.includes(item);
+    // "Was ist rot?": an item with only a red part is right too.
+    const isPart = !quest.answers.includes(item) && quest.colour !== undefined && hasColour(item, quest.colour);
+    const isAnswer = quest.answers.includes(item) || isPart;
     if (celebrating.current || (isAnswer && answeredRef.current.has(item.id))) {
       if (!animate(item) && how !== "hover") funBurst(x, y);
       return;
@@ -519,7 +535,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       setHint(false);
       setFound((n) => n + 1);
       misses.current = 0;
-      say(`${pick(words.praise)} ${quest.praise(item)}`);
+      say(`${pick(words.praise)} ${isPart && quest.partPraise ? quest.partPraise : quest.praise(item)}`);
       if (answeredRef.current.size >= quest.needed) {
         celebrating.current = true;
         later(() => newQuestion(true), NEXT_QUESTION_MS);
@@ -779,7 +795,8 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
         <button
           type="button"
           key={quest.id}
-          className="find-question"
+          className={quest.item ? "find-question find-item" : "find-question"}
+          aria-label={quest.question}
           onPointerDown={(e) => {
             e.stopPropagation();
             ask(quest);
@@ -787,7 +804,8 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
         >
           {quest.item && <Thumbnail item={quest.item} />}
           {quest.emoji && <span className="find-emoji">{quest.emoji}</span>}
-          <span>{quest.question}</span>
+          {/* Find mode shows only the picture: nothing to read, and the bubble covers less of the scene. */}
+          {!quest.item && <span>{quest.question}</span>}
           {quest.needed > 1 && (
             <span className="find-progress" aria-label={words.of(answered.size, quest.needed)}>
               {Array.from({ length: quest.needed }, (_, i) => (

@@ -8,9 +8,6 @@ import type { MarbleLevel } from "./settings";
 /** The game's name, on its start screen and in the browser tab. */
 export const GAME_TITLE: Localized = { de: "Kettenreaktion", ru: "Цепная реакция" };
 
-/** The mode card that plays every level in turn. */
-export const ALL_LEVELS: Localized = { de: "Alle nacheinander", ru: "Все по очереди" };
-
 /** Each level's name (mode card, „Weiter“ button, the picture's label) and the line said when it starts. */
 export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localized }> = {
   track: {

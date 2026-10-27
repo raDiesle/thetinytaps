@@ -1,9 +1,9 @@
 /**
+ * In menu order – Explore ("Freies Entdecken", the first and default): tap anything to see and hear it.
  * Colour: the picture starts grey, every tapped item gets its colour back.
  * Find: "Wo ist der Bagger?" Questions: "Was ist rot?", several right answers.
- * Explore ("Freies Entdecken"): tap anything to see and hear it.
  */
-export type SceneMode = "colour" | "find" | "questions" | "explore";
+export type SceneMode = "explore" | "colour" | "find" | "questions";
 
 /** Modes in which the child looks for something that was asked. */
 export const isQuestMode = (mode: SceneMode) => mode === "find" || mode === "questions";
@@ -45,7 +45,7 @@ export interface ScenesSettings {
 }
 
 export const DEFAULT_SCENES_SETTINGS: ScenesSettings = {
-  mode: "colour",
+  mode: "explore",
   trigger: "tap",
   speech: false,
   announce: "sentence",

@@ -33,8 +33,6 @@ export interface GameMode {
   id: string;
   emoji: string;
   title: string;
-  /** Drawn bigger and across the whole row, e.g. for "all of them in turn". */
-  featured?: boolean;
   /** A small tag for the parent, what sort of level it is when a game has several (e.g. „🛗 Aufzug“). */
   kind?: string;
 }
@@ -80,7 +78,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   // The panel opened below the two buttons, if any: folded away by default, so the start screen stays short.
   const [panel, setPanel] = useState<"info" | "settings" | null>(null);
   const playtime = usePlaytime(playing);
-  const grid = useFitGrid(modes?.length ?? 0, modes?.filter((m) => m.featured).length);
+  const grid = useFitGrid(modes?.length ?? 0);
   // The background song runs on from the menus into the game (BackgroundMusic), until the play time is over.
   useNoBackgroundMusic(playing && playtime.goodNight);
   // Taps a little next to something the child can tap still count for it (see tapTargets.ts).
@@ -177,7 +175,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {modes.map((m) => (
-              <li key={m.id} className={m.featured ? "mode-featured" : undefined}>
+              <li key={m.id}>
                 <button type="button" className="game-card mode-card" onClick={() => pick(m.id)}>
                   <span className="game-emoji" aria-hidden>
                     {m.emoji}

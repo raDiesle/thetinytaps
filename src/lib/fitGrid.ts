@@ -6,7 +6,7 @@ export const PHONE_SCREEN = 600;
 const MIN_ROW = 100;
 const MIN_ROW_PHONE = 64;
 const MIN_WIDTH = 140;
-const MIN_WIDTH_PHONE = 120;
+const MIN_WIDTH_PHONE = 100;
 /** Cards never grow taller than this, however much room there is. */
 const MAX_ROW = 220;
 /** Cards look best about this much wider than tall. */
@@ -26,16 +26,15 @@ interface Fit {
   row: number;
 }
 
-/** Columns and row height that give `count` cards the most room; `wide` of them take a whole row. */
-function bestFit(count: number, wide: number, width: number, height: number, phone: boolean): Fit | null {
+/** Columns and row height that give `count` cards the most room. */
+function bestFit(count: number, width: number, height: number, phone: boolean): Fit | null {
   const minRow = phone ? MIN_ROW_PHONE : MIN_ROW;
   const minWidth = phone ? MIN_WIDTH_PHONE : MIN_WIDTH;
   const gap = phone ? GAP_PHONE : GAP;
-  const rest = count - wide;
   let best: Fit | null = null;
   let bestSize = 0;
-  for (let columns = 1; columns <= Math.max(1, rest); columns++) {
-    const rows = wide + Math.ceil(rest / columns);
+  for (let columns = 1; columns <= Math.max(1, count); columns++) {
+    const rows = Math.ceil(count / columns);
     const cardWidth = (width - (columns - 1) * gap) / columns;
     const row = (height - (rows - 1) * gap) / rows;
     if (row < minRow || cardWidth < minWidth) continue;
@@ -70,7 +69,7 @@ function contentHeight(page: HTMLElement) {
  * What is marked `data-below-fold` (the install hint for grown-ups) is left out:
  * it waits below the cards until a grown-up scrolls down.
  */
-export function useFitGrid(count: number, wide = 0) {
+export function useFitGrid(count: number) {
   // Kept as state, so a menu shown again (e.g. after playing) is measured anew.
   const [list, setList] = useState<HTMLUListElement | null>(null);
   const [fit, setFit] = useState<Fit | null>(null);
@@ -82,13 +81,7 @@ export function useFitGrid(count: number, wide = 0) {
       // An open settings panel grows the page below the cards; they keep their size.
       if (page.querySelector("details[open]")) return;
       const phone = Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
-      const next = bestFit(
-        count,
-        wide,
-        list.clientWidth,
-        window.innerHeight - (contentHeight(page) - list.offsetHeight) - (phone ? BOTTOM_PHONE : BOTTOM),
-        phone,
-      );
+      const next = bestFit(count, list.clientWidth, window.innerHeight - (contentHeight(page) - list.offsetHeight) - (phone ? BOTTOM_PHONE : BOTTOM), phone);
       setFit((prev) => (prev?.columns === next?.columns && prev?.row === next?.row ? prev : next));
     };
     measure();
@@ -100,7 +93,7 @@ export function useFitGrid(count: number, wide = 0) {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [list, count, wide]);
+  }, [list, count]);
 
   return {
     ref: setList,

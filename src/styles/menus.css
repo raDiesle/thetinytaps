@@ -310,30 +310,27 @@ button.game-card:focus-visible {
     font-size: clamp(2rem, 9vh, 3rem);
   }
 
-  .home-subtitle {
-    margin: 6px 0 12px;
-    padding: 2px 14px;
-    font-size: 0.95rem;
+  /* The cards say enough: a menu's title, the line under it and „Was spielen wir?“ are only read out, so more cards fit. */
+  .menu-title,
+  .home-subtitle,
+  .mode-heading {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
 
-  .menu-title {
-    padding: 0.15em 0.7em;
-    box-shadow: 0 5px 0 var(--ink);
-    font-size: clamp(1.3rem, 4.5vw, 1.8rem);
-  }
-
-  .home > .menu-top:has(+ .menu-title) {
-    float: left;
-    margin: 0 12px 0 0;
-  }
-
-  .menu-title + .home-subtitle {
-    clear: both;
+  .home > .menu-top {
+    margin-bottom: 10px;
   }
 
   /* Scrolling lists (when not all cards fit): flat cards, emoji beside the title, many side by side. */
   .game-list:not(.fit) {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
     gap: 16px 14px;
   }
 

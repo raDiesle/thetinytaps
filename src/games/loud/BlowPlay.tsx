@@ -154,7 +154,7 @@ export function BlowPlay({ settings, mic, listen, celebrate, onDone }: LevelProp
       const last = round % stations.length === stations.length - 1;
       later(pause, () => {
         say(texts.cheer);
-        celebrate(() => (last && onDone ? onDone() : setRound((r) => r + 1)));
+        celebrate(() => (last ? onDone() : setRound((r) => r + 1)));
       });
     },
     [celebrate, later, onDone, round, say, texts, stations.length],

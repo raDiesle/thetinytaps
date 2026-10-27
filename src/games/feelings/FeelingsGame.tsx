@@ -8,15 +8,13 @@ import { DEFAULT_FEELINGS_SETTINGS, FEELINGS_SETTINGS_KEY } from "./settings";
 import { STORIES } from "./stories";
 import "./feelings.css";
 
-/** The start screen: all stories in turn, or just one – the bear's feelings at home and the kindergarten stories side by side. */
+/** The start screen: one card per story – the bear's feelings at home and the kindergarten stories side by side; „Weiter“ goes on with the next. */
 export function FeelingsGame() {
   const [settings, update] = useGameSettings(FEELINGS_SETTINGS_KEY, DEFAULT_FEELINGS_SETTINGS);
   const t = useT();
   const { id: language } = useAppLanguage();
 
   const modes: GameMode[] = [
-    // "All in turn" comes first and across the whole row.
-    { id: "all", emoji: "🌈", title: t({ de: "Alle", ru: "Все" }), featured: true },
     // Asks for the child's weather first, then the bear's story with that feeling.
     { id: MOOD_ID, emoji: "🌦️", title: t({ de: "Wie geht's dir?", ru: "Как дела?" }) },
     ...STORIES.map((story) => {

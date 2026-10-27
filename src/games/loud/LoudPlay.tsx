@@ -23,8 +23,8 @@ export interface LevelProps {
   listen: RefObject<FrameHandler | null>;
   /** Cheer, then `then`; the microphone is deaf meanwhile. */
   celebrate: (then: () => void) => void;
-  /** Set when another level follows: the level calls it when it is over. */
-  onDone?: () => void;
+  /** The level calls it when it is over: „Menü“, „Nochmal“ and „Weiter“ come. */
+  onDone: () => void;
 }
 
 const LEVELS: { id: LoudLevel; emoji: string; name: Localized; tapHint: Localized; Level: ComponentType<LevelProps> }[] = [
@@ -32,11 +32,14 @@ const LEVELS: { id: LoudLevel; emoji: string; name: Localized; tapHint: Localize
   { id: "blow", emoji: "🎂", ...LEVEL_TEXTS.blow, Level: BlowPlay },
 ];
 
-/** Which levels to play, in turn; in development `?level=blow` in the address picks one. */
+/** The levels in turn, beginning with the chosen one (in development `?level=blow` in the address), so „Weiter“ always has a next. */
 function chosenLevels(choice: LoudSettings["levels"]): LoudLevel[] {
   const fromUrl = DEV ? new URLSearchParams(window.location.search).get("level") : null;
-  const one = LEVELS.find((l) => l.id === (fromUrl ?? choice));
-  return one ? [one.id] : LEVELS.map((l) => l.id);
+  const first = Math.max(
+    0,
+    LEVELS.findIndex((l) => l.id === (fromUrl ?? choice)),
+  );
+  return [...LEVELS.slice(first), ...LEVELS.slice(0, first)].map((l) => l.id);
 }
 
 /** Party time after a level or a blowing picture, before the next picture (or "Nochmal" and "Weiter") comes. */
@@ -44,7 +47,7 @@ const PARTY_MS = 3200;
 
 /**
  * "Laut und leise": everything with the microphone, one level after the
- * other (or only one, as the grown-up chose); after each level the child
+ * other, beginning with the one the grown-up chose; after each level the child
  * plays it again or goes on. The microphone only measures how loud it is.
  */
 export function LoudPlay({ settings }: { settings: LoudSettings }) {
@@ -108,7 +111,7 @@ export function LoudPlay({ settings }: { settings: LoudSettings }) {
   const Level = level.Level;
   return (
     <div className={["loud-root", party && "party"].filter(Boolean).join(" ")}>
-      <Level key={round} settings={settings} mic={mic} listen={listen} celebrate={celebrate} onDone={levels.length > 1 ? () => setEnded(true) : undefined} />
+      <Level key={round} settings={settings} mic={mic} listen={listen} celebrate={celebrate} onDone={() => setEnded(true)} />
       {ended && <GameEnd onAgain={() => startLevel(index)} next={{ emoji: next.emoji, name: t(next.name), onNext: () => startLevel(index + 1) }} />}
       <MicNote state={mic} tapHint={t(level.tapHint)} />
       <BurstLayer bursts={bursts} />

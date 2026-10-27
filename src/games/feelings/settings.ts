@@ -1,5 +1,5 @@
 export interface FeelingsSettings {
-  /** One story only (an id from `STORIES`, for a problem the child has right now), or "all" in turn. */
+  /** The story to begin with (an id from `STORIES`, or "mood"); „Weiter“ goes on with the next. Older saves may say "all": that begins with the first. */
   story: string;
   /** Read the story, the bubbles and the praise aloud. */
   speech: boolean;
@@ -8,7 +8,7 @@ export interface FeelingsSettings {
 }
 
 export const DEFAULT_FEELINGS_SETTINGS: FeelingsSettings = {
-  story: "all",
+  story: "mood",
   speech: false,
   sounds: true,
 };

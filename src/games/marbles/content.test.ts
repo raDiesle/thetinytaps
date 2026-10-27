@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import type { Localized } from "@/lib/language";
 import { buildBuilding } from "./building";
 import { buildCircus } from "./circus";
-import { ALL_LEVELS, GAME_TITLE, LEVEL_TEXTS } from "./content";
+import { GAME_TITLE, LEVEL_TEXTS } from "./content";
 import { buildGarden } from "./garden";
 import { buildKitchen } from "./kitchen";
 import { buildLight } from "./light";
@@ -17,7 +17,6 @@ const complete = (text: Localized) => text.de.trim().length > 0 && (text.ru === 
 describe("Kettenreaktion texts", () => {
   test("the title and every level's name and first line have their German, and a Russian one is Russian", () => {
     expect(complete(GAME_TITLE)).toBe(true);
-    expect(complete(ALL_LEVELS)).toBe(true);
     for (const [id, { name, intro }] of Object.entries(LEVEL_TEXTS)) {
       expect({ id, name: complete(name), intro: complete(intro) }).toEqual({ id, name: true, intro: true });
     }

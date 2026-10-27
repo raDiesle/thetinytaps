@@ -15,6 +15,8 @@ export interface TraitWords {
   question: string;
   /** "Der Bus ist rot!" */
   praise: (item: SceneItem) => string;
+  /** Colours: said for an item with only a part in that colour ("Da ist Rot!"); without it, `praise`. */
+  part?: string;
   emoji: string;
 }
 
@@ -86,15 +88,15 @@ const de: ScenePhrases = {
   hereIs: (item) => `Das ${item.plural ? "sind" : "ist"} ${item.name}!`,
   thatIs: (item, question) => `Das ${item.plural ? "sind" : "ist"} ${item.name}. ${question}`,
   traits: {
-    red: deTrait("Was ist rot?", "ist rot", "sind rot", "🔴"),
-    yellow: deTrait("Was ist gelb?", "ist gelb", "sind gelb", "🟡"),
-    blue: deTrait("Was ist blau?", "ist blau", "sind blau", "🔵"),
-    green: deTrait("Was ist grün?", "ist grün", "sind grün", "🟢"),
-    flies: deTrait("Wer kann fliegen?", "kann fliegen", "können fliegen", "🪽"),
-    big: deTrait("Was ist ganz groß?", "ist ganz groß", "sind ganz groß", "🐘"),
-    small: deTrait("Was ist ganz klein?", "ist ganz klein", "sind ganz klein", "🐜"),
-    animal: deTrait("Wo ist ein Tier?", "ist ein Tier", "sind Tiere", "🐾"),
-    wheels: deTrait("Was hat Räder?", "hat Räder", "haben Räder", "🛞"),
+    red: deTrait("Was ist rot?", "ist rot", "sind rot", "Da ist Rot!", "🔴"),
+    yellow: deTrait("Was ist gelb?", "ist gelb", "sind gelb", "Da ist Gelb!", "🟡"),
+    blue: deTrait("Was ist blau?", "ist blau", "sind blau", "Da ist Blau!", "🔵"),
+    green: deTrait("Was ist grün?", "ist grün", "sind grün", "Da ist Grün!", "🟢"),
+    flies: deTrait("Wer kann fliegen?", "kann fliegen", "können fliegen", undefined, "🪽"),
+    big: deTrait("Was ist ganz groß?", "ist ganz groß", "sind ganz groß", undefined, "🐘"),
+    small: deTrait("Was ist ganz klein?", "ist ganz klein", "sind ganz klein", undefined, "🐜"),
+    animal: deTrait("Wo ist ein Tier?", "ist ein Tier", "sind Tiere", undefined, "🐾"),
+    wheels: deTrait("Was hat Räder?", "hat Räder", "haben Räder", undefined, "🛞"),
   },
   places: {
     stadt: { to: "in die Stadt", from: "aus der Stadt", at: "in der Stadt" },
@@ -115,9 +117,9 @@ const de: ScenePhrases = {
   rotate: "Quer halten – dann wird das Bild groß",
 };
 
-/** A German trait: the question, and the answer after the name for one thing and for several. */
-function deTrait(question: string, answer: string, pluralAnswer: string, emoji: string): TraitWords {
-  return { question, emoji, praise: (item) => `${capitalize(item.name)} ${item.plural ? pluralAnswer : answer}!` };
+/** A German trait: the question, the answer after the name for one thing and for several, and for colours the praise of a part. */
+function deTrait(question: string, answer: string, pluralAnswer: string, part: string | undefined, emoji: string): TraitWords {
+  return { question, emoji, part, praise: (item) => `${capitalize(item.name)} ${item.plural ? pluralAnswer : answer}!` };
 }
 
 /** The word that agrees with the item's name: masculine, feminine, neuter or plural (a name without gender counts as masculine). */

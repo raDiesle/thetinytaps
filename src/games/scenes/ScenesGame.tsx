@@ -28,10 +28,10 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
       backHref="/bilder/"
       backLabel={t({ de: "Alle Bilder", ru: "Все картинки" })}
       modes={[
+        { id: "explore", emoji: "👆", title: t({ de: "Freies Entdecken", ru: "Свободная игра" }) },
         { id: "colour", emoji: "🖍️", title: t({ de: "Ausmalen", ru: "Раскраска" }) },
         { id: "find", emoji: "🔍", title: t({ de: "Suchen", ru: "Поиск" }) },
         { id: "questions", emoji: "❓", title: t({ de: "Fragen", ru: "Вопросы" }) },
-        { id: "explore", emoji: "👆", title: t({ de: "Freies Entdecken", ru: "Свободная игра" }) },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as SceneMode })}
@@ -45,20 +45,19 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
           </p>
           <p>
             {t({
+              de: "Freies Entdecken: Alles darf angetippt werden, manches stößt etwas anderes an, und Fahrzeuge fahren am Rand in andere Bilder weiter.",
+              ru: "Свободная игра: можно нажимать на всё, одно иногда приводит в движение другое, а машины уезжают за край в другие картинки.",
+            })}
+          </p>
+          <p>
+            {t({
               de: "Ausmalen: Das Bild ist grau, und jedes angetippte Ding bekommt seine Farbe zurück; jeder Tipp malt auch einen Farbklecks in den Hintergrund.",
               ru: "Раскраска: картинка серая, и каждая вещь, которой коснулся ребёнок, снова становится цветной; каждое касание ещё оставляет цветную кляксу на фоне.",
             })}
           </p>
           <p>
             {t({
-              de: "Suchen: Ein Ding erscheint groß in der Blase, und das Kind sucht es im Bild. Fragen: „Was ist rot?“, „Wer kann fliegen?“ – das Kind tippt, was passt.",
-              ru: "Поиск: в пузыре появляется большая вещь, и ребёнок ищет её на картинке. Вопросы: «Что красное?», «Кто умеет летать?» – ребёнок нажимает на то, что подходит.",
-            })}
-          </p>
-          <p>
-            {t({
-              de: "Freies Entdecken: Alles darf angetippt werden, manches stößt etwas anderes an, und Fahrzeuge fahren am Rand in andere Bilder weiter.",
-              ru: "Свободная игра: можно нажимать на всё, одно иногда приводит в движение другое, а машины уезжают за край в другие картинки.",
+              de: "Suchen: Ein Ding erscheint in einer leuchtenden Blase, und das Kind sucht es im Bild. Fragen: „Was ist rot?“, „Wer kann fliegen?“ – das Kind tippt, was passt; es reicht, wenn ein Teil passt (das rote Dach eines Hauses).",
             })}
           </p>
         </>

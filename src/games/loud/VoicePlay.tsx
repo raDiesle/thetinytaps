@@ -89,7 +89,7 @@ export function VoicePlay({ settings, mic, listen, celebrate, onDone }: LevelPro
         later(260, playSqueak);
       }
       later(REACT_MS[who], () => setActive((a) => (a === who ? null : a)));
-      if (onDone && ++sounds.current >= ROUND_SOUNDS) {
+      if (++sounds.current >= ROUND_SOUNDS) {
         // Busy and deaf for good: the party and the next level follow.
         busyUntil.current = deafUntil.current = Infinity;
         later(REACT_MS[who], () => celebrate(onDone));

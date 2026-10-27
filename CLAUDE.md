@@ -142,8 +142,9 @@ In a fresh worktree run `bun install` first.
   the back link (`MenuTop`) and next to ✕ while playing; there the back link of a menu is big, yellow and fixed in the
   top left corner, so it never scrolls away. Phones and tablets keep both out of a child's reach.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
-  in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): small headings, the back
-  link beside the title, smaller and flat cards (emoji beside the title). Buttons for grown-ups sit in the top
+  in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
+  no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
+  cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). Buttons for grown-ups sit in the top
   left corner, never over the sun in the top right one. What only grown-ups need below the cards (version,
   install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
@@ -159,7 +160,8 @@ In a fresh worktree run `bun install` first.
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
   current game's own start screen before play, `useLeaveGame()` – never the home page; its picture is four cards,
   `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
-  the first, so there is always one). A game with only one level or story leaves „Weiter“ out (`next` is optional):
+  the first, so there is always one). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
+  the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
   it has a use for, just as big.
 

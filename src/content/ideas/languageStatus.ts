@@ -55,7 +55,11 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 
 /** Every game of the home menu once, in menu order, then the home page. */
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
-  { href: "/bilder/", languages: { de: "done", ru: "done" }, note: "Viele Namen und Sätze je Bild; Russisch in ru.ts jeder Szene." },
+  {
+    href: "/bilder/",
+    languages: { de: "done", ru: "partial" },
+    note: "Viele Namen und Sätze je Bild; Russisch in ru.ts jeder Szene. Russisch fehlt (Oktober 2026): der Absatz zu Suchen und Fragen unter „Über das Spiel“ und das Lob für einen Teil in der Farbe („Da ist Rot!“; bis dahin lobt Russisch wie für das ganze Ding).",
+  },
   {
     href: "/abenteuer/",
     note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme liest die Browserstimme. Eine Geschichte ohne Übersetzung spricht Deutsch.",
@@ -120,7 +124,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
     ],
   },
-  { href: "/laut-leise/", languages: { de: "done", ru: "done" } },
+  {
+    href: "/laut-leise/",
+    languages: { de: "done", ru: "partial" },
+    note: "Russisch fehlt der Absatz zu Löwe und Maus unter „Über das Spiel“ (mit „Weiter“ zum Pusten, Oktober 2026).",
+  },
   {
     href: "/",
     languages: { de: "done", ru: "partial" },
