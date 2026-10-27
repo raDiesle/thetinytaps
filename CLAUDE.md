@@ -89,7 +89,8 @@ In a fresh worktree run `bun install` first.
   (🌐 on the home page, `useAppLanguage()`); no game or menu adds a language choice of its own (a „Spielsprache“ once
   put Russian letters under German menus). A language joins `APP_LANGUAGES` only once the menus and the letters and
   words games speak it (`language.test.ts` checks the pack); until then packs and recordings in other languages wait
-  in the code. Only the opt-in „Zweite Sprache“ adds a second one, next to the first. The app language starts on
+  in the code. No second language next to the first either (a „Zweite Sprache“, „Bär – bear“, was removed), and
+  grown-ups choose exactly one language, in one place: 🌐. The app language starts on
   `playLanguage(…)` (`src/lib/locale.ts`): German while developing, for players the browser's language if offered,
   else the first one – never a hard-coded `"de"`. Where a game lacks the language, it plays in English, then German.
   Code, comments, docs and commit messages are English, except

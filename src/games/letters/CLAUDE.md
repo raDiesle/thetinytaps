@@ -12,13 +12,12 @@ Free typing (a number shows its things and digit at once, or optionally counts t
 ## Languages
 
 The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`) are shared with „Wörter tippen“. Both play in the
-app language (🌐, `useLanguages()` in `LanguageSetting.tsx`), never in another one than the menus; the only choice is
-an optional „Zweite Sprache“ (`tinytaps.language.v1`), shown next to the first.
+pack of the app language (🌐, `useLanguagePack()`), never in another one and never with a second one next to it; the
+games have no language choice of their own.
 - Grown-up texts (start screen, settings, hints on the play screen) go through `useT()`: `t({ de: "…", ru: "…" })`, never a bare German string.
 - Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` (Russian) types
   by key place (Q = Й, also on a German keyboard). Compare keys only with `keyMatches`/`toUpper(…, pack)`, never with `e.key` directly.
 - A new pack needs every letter with a spoken name and words (a letter no word starts with, like Ъ Ы Ь, gets
   `inWord: true` and words with it inside; the card marks it there), number words 0–9, plural forms that are right
-  for 0–9 (see `ru.ts`/`pl.ts` for three forms), keyboard rows covering every letter, and `moreWords` for pictures
-  of the other packs. `content.test.ts` checks this; add a check for any new rule.
+  for 0–9 (see `ru.ts`/`pl.ts` for three forms) and keyboard rows covering every letter. `content.test.ts` checks this; add a check for any new rule.
 - "Wo ist das B?" only asks for letters with a key of their own on most keyboards (`findableLetters`: no umlauts, no Ё).

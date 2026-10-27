@@ -47,7 +47,8 @@ export const allGamesIdeas: IdeaArea = {
       text: "Englisch, Türkisch, Polnisch, … als weiteres LanguagePack. Optional zweisprachig: „Bär – bear“.",
       why: "Für mehrsprachige Familien; die Struktur dafür gibt es schon.",
       effort: "M",
-      done: true,
+      partial:
+        "Die Pakete für Englisch, Türkisch und Polnisch sind da und spielen, sobald die ganze App die Sprache spricht (🌐). Zweisprachig („Bär – bear“) gab es, ist im Oktober 2026 entfernt: eine Sprache für alles, nie gemischt.",
     },
     {
       id: "A-06",

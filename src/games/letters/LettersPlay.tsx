@@ -3,7 +3,6 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
-import { translate, translateCountable } from "@/content/translate";
 import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { loadRecordings, playBoing, playChime, playCountNote, playHonk, playRandomNote, playWhistle, recorded } from "@/lib/sfx";
 import { useT } from "@/lib/language";
@@ -64,16 +63,7 @@ function isSame(target: Target | null, shown: Shown) {
 const firstStage = (s: Shown) => (s.kind === "letter" ? 0 : Math.min(1, s.n));
 const lastStage = (s: Shown) => (s.kind === "letter" ? 0 : s.n + 1);
 
-export function LettersPlay({
-  pack,
-  second,
-  settings,
-}: {
-  pack: LanguagePack;
-  /** Optional second language: the word is also shown and said in it. */
-  second: LanguagePack | null;
-  settings: LettersSettings;
-}) {
+export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [shown, setShown] = useState<Shown | null>(null);
   const [stage, setStage] = useState(0);
   /** Counting by tapping: indices of the tapped things, in order. */
@@ -117,41 +107,13 @@ export function LettersPlay({
     [pack, settings.announce],
   );
 
-  /** What a fully revealed letter or number is in the second language: "bear!", "three ducks!". */
-  const secondSentenceFor = useCallback(
-    (s: Shown) => {
-      if (!second) return null;
-      if (s.kind === "number") {
-        const thing = translateCountable(s.thing, second);
-        if (s.n === 0 || !thing) return `${second.numberWords[s.n]}!`;
-        return second.countSentence(s.n, thing);
-      }
-      if (settings.announce === "letter") return null;
-      const word = translate(s.word, second);
-      return word ? `${word}!` : null;
-    },
-    [second, settings.announce],
-  );
-
-  /** The full sentence, then the same in the second language. */
-  const sayAll = useCallback(
-    (s: Shown, queue = false) => {
-      say(sentenceFor(s), queue);
-      const also = secondSentenceFor(s);
-      if (settings.speech && second && also) {
-        speak(also, second.speechLang, { queue: true, rate: 0.85 });
-      }
-    },
-    [say, sentenceFor, secondSentenceFor, second, settings.speech],
-  );
-
   /** Speak and play the sound for reaching `stage`. */
   const announce = useCallback(
     (s: Shown, stage: number, queue = false) => {
       const sound = (play: () => void) => settings.sounds && play();
       if (stage === lastStage(s)) {
         sound(playChime);
-        sayAll(s, queue);
+        say(sentenceFor(s), queue);
       } else if (stage === 0) {
         say(pack.zero.sentence, queue);
       } else {
@@ -159,7 +121,7 @@ export function LettersPlay({
         say(pack.numberWords[stage], queue);
       }
     },
-    [pack, say, sayAll, settings.sounds],
+    [pack, say, sentenceFor, settings.sounds],
   );
 
   const funBurst = useCallback(
@@ -417,7 +379,7 @@ export function LettersPlay({
   const repeat = (e: PointerEvent) => {
     e.stopPropagation();
     const counting = settings.finishCounting && performance.now() < countingUntil.current;
-    if (shown && !counting) sayAll(shown);
+    if (shown && !counting) say(sentenceFor(shown));
     funBurst(e.clientX, e.clientY);
   };
   const onCardPointer = stepByStep || byTap(shown) ? undefined : repeat;
@@ -436,7 +398,6 @@ export function LettersPlay({
               key={shown.id}
               letter={shown.letter}
               word={shown.word}
-              translation={second ? translate(shown.word, second) : undefined}
               settings={settings}
               onPointerDown={onCardPointer}
               onPicturePointerDown={nextWord}

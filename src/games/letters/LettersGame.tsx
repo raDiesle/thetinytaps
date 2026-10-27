@@ -1,8 +1,7 @@
 import { GameShell } from "@/components/GameShell";
-import { useLanguages } from "@/components/LanguageSetting";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting, useTouchKeys } from "@/components/TouchKeyboard";
-import { sampleLetter } from "@/content/languages";
+import { sampleLetter, useLanguagePack } from "@/content/languages";
 import { useGameSettings } from "@/lib/common";
 import { useT } from "@/lib/language";
 import {
@@ -20,10 +19,8 @@ import { TrainPlay } from "./TrainPlay";
 
 export function LettersGame() {
   const [settings, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
-  const languages = useLanguages();
-  const pack = languages.language.pack;
-  const second = languages.second?.pack ?? null;
-  // Examples in the settings, in the chosen language: „Be, wie Bär“.
+  const pack = useLanguagePack();
+  // Examples in the settings, in the app language: „Be, wie Bär“.
   const b = sampleLetter(pack);
   const a = pack.letters[0];
   const t = useT();
@@ -165,11 +162,11 @@ export function LettersGame() {
       }
     >
       {settings.mode === "find" ? (
-        <FindPlay pack={pack} second={second} settings={settings} />
+        <FindPlay pack={pack} settings={settings} />
       ) : settings.mode === "train" ? (
         <TrainPlay pack={pack} settings={settings} />
       ) : (
-        <LettersPlay pack={pack} second={second} settings={settings} />
+        <LettersPlay pack={pack} settings={settings} />
       )}
     </GameShell>
   );

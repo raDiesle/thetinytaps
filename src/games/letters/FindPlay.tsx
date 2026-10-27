@@ -5,7 +5,6 @@ import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
-import { translate } from "@/content/translate";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
 import { useT } from "@/lib/language";
 import { playChime, playRandomNote } from "@/lib/sfx";
@@ -46,16 +45,7 @@ function shuffle<T>(items: T[]): T[] {
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
 /** "Wo ist das B?": a letter and its picture appear, and the child looks for the key. */
-export function FindPlay({
-  pack,
-  second,
-  settings,
-}: {
-  pack: LanguagePack;
-  /** Optional second language: the word is also shown and said in it. */
-  second: LanguagePack | null;
-  settings: LettersSettings;
-}) {
+export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [current, setCurrent] = useState<{ id: number; letter: LetterEntry; word: WordEntry } | null>(null);
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [wrong, setWrong] = useState(0);
@@ -72,7 +62,6 @@ export function FindPlay({
 
   const letters = useMemo(() => findableLetters(pack, settings.theme), [pack, settings.theme]);
   const showHint = settings.hints && wrong >= HINT_AFTER_WRONG;
-  const translation = current && second ? translate(current.word, second) : undefined;
 
   const say = useCallback(
     (text: string, queue = false) => {
@@ -153,9 +142,6 @@ export function FindPlay({
         setFoundCount((n) => n + 1);
         if (settings.sounds) playChime();
         say(`${pack.letterSentence(current.letter, current.word)} ${pick(pack.praise)}`);
-        if (settings.speech && second && translation) {
-          speak(`${translation}!`, second.speechLang, { queue: true, rate: 0.85 });
-        }
         for (let i = 0; i < 8; i++) spawn();
         return;
       }
@@ -163,7 +149,7 @@ export function FindPlay({
       if ((wrong + 1) % HINT_AFTER_WRONG === 0) say(pack.findPrompt(current.letter));
       setWrong(wrong + 1);
     },
-    [current, found, wrong, pack, second, translation, say, spawn, funBurst, settings.sounds, settings.speech],
+    [current, found, wrong, pack, say, spawn, funBurst, settings.sounds],
   );
 
   useEffect(() => {
@@ -199,7 +185,6 @@ export function FindPlay({
           <div key={current.id} className={`card find-card${found ? " done" : ""}`} data-tap onPointerDown={onCardPointer}>
             <Picture word={current.word} />
             {settings.showWord && <LetterWord letter={current.letter} word={current.word} />}
-            {settings.showWord && translation && <div className="translation">{translation}</div>}
             <div key={wrong} className={`find-key${wrong > 0 ? " nudge" : ""}`} aria-label={pack.findPrompt(current.letter)}>
               {glyphs.map((g) => (
                 <span key={g}>{g}</span>

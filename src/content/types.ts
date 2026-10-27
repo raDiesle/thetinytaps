@@ -92,9 +92,4 @@ export interface LanguagePack {
   joinIn: (word: ActionWord) => string;
   /** "Tschu-tschu!", said when the letter train leaves. */
   whistle: string;
-  /**
-   * Words by emoji for pictures that only other languages have (🐊 is no
-   * German letter word), so a second language can always say what is shown.
-   */
-  moreWords?: Record<string, string>;
 }

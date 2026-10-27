@@ -32,15 +32,12 @@ function Reveal({ visible, hint, children }: { visible: boolean; hint: boolean; 
 export function LetterCard({
   letter,
   word,
-  translation,
   settings,
   onPointerDown,
   onPicturePointerDown,
 }: {
   letter: LetterEntry;
   word: WordEntry;
-  /** The word in the second language, shown under it. */
-  translation?: string;
   settings: LettersSettings;
   onPointerDown?: PointerEventHandler;
   /** Tapping the picture, e.g. for the next word with the same letter. */
@@ -64,12 +61,7 @@ export function LetterCard({
       <div onPointerDown={onPicturePointerDown}>
         <Picture word={word} />
       </div>
-      {settings.showWord && (
-        <>
-          <LetterWord letter={letter} word={word} />
-          {translation && <div className="translation">{translation}</div>}
-        </>
-      )}
+      {settings.showWord && <LetterWord letter={letter} word={word} />}
     </div>
   );
 }

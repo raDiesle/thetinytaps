@@ -1,5 +1,5 @@
 import { GameShell } from "@/components/GameShell";
-import { useLanguages } from "@/components/LanguageSetting";
+import { useLanguagePack } from "@/content/languages";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting } from "@/components/TouchKeyboard";
 import { useGameSettings } from "@/lib/common";
@@ -9,8 +9,7 @@ import { WordsPlay } from "./WordsPlay";
 
 export function WordsGame() {
   const [settings, update] = useGameSettings(WORDS_SETTINGS_KEY, DEFAULT_WORDS_SETTINGS);
-  const languages = useLanguages();
-  const pack = languages.language.pack;
+  const pack = useLanguagePack();
   const t = useT();
 
   return (
@@ -118,7 +117,7 @@ export function WordsGame() {
         </>
       }
     >
-      <WordsPlay pack={pack} second={languages.second?.pack ?? null} settings={settings} />
+      <WordsPlay pack={pack} settings={settings} />
     </GameShell>
   );
 }

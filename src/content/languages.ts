@@ -1,3 +1,4 @@
+import { useAppLanguage } from "@/lib/language";
 import { de } from "./de";
 import { en } from "./en";
 import { pl } from "./pl";
@@ -18,7 +19,7 @@ export interface Language {
   pack: LanguagePack;
 }
 
-/** Languages of the letters and words games: the app language's pack, and the packs a „Zweite Sprache“ can add. */
+/** Language packs of the letters and words games; they play in the pack of the app language (`useLanguagePack`). */
 export const LANGUAGES: Language[] = [
   { id: "de", label: "🇩🇪 Deutsch", russian: "🇩🇪 Немецкий", adjective: "deutsche", pack: de },
   { id: "en", label: "🇺🇸 Englisch", russian: "🇺🇸 Английский", adjective: "englische", pack: en },
@@ -32,6 +33,12 @@ export const languageName = (language: Language, appLanguageId: string) => (appL
 
 /** The language with this id; German for anything unknown, e.g. an old saved setting. */
 export const languageFor = (id: string) => LANGUAGES.find((l) => l.id === id) ?? LANGUAGES[0];
+
+/**
+ * The pack the letters and words games play in: the one of the app language (🌐), so letters, words and voice
+ * are always in the language of the menus, never another one next to it.
+ */
+export const useLanguagePack = () => languageFor(useAppLanguage().id).pack;
 
 export const toUpper = (text: string, pack: LanguagePack) => text.toLocaleUpperCase(pack.speechLang);
 export const toLower = (text: string, pack: LanguagePack) => text.toLocaleLowerCase(pack.speechLang);

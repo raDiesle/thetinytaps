@@ -1,10 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
-import { LanguageSetting, useLanguages } from "@/components/LanguageSetting";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { VoiceSetting } from "@/components/VoiceSetting";
-import { sampleLetter } from "@/content/languages";
+import { sampleLetter, useLanguagePack } from "@/content/languages";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings } from "@/lib/common";
 import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
@@ -107,14 +106,11 @@ function AppLanguageOptions() {
 function CommonOptions() {
   const t = useT();
   const [common, update] = useCommonSettings();
-  const languages = useLanguages();
-  const pack = languages.language.pack;
+  const pack = useLanguagePack();
   const b = sampleLetter(pack);
 
   return (
     <section className="settings">
-      <LanguageSetting settings={languages.settings} update={languages.update} />
-
       <SettingsGroup title={t({ de: "Ton", ru: "Звук" })}>
         <Toggle
           label={t({ de: "Vorlesen (Namen, Sätze, Fragen)", ru: "Читать вслух (названия, фразы, вопросы)" })}

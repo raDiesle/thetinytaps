@@ -4,7 +4,6 @@ import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
 import { keyMatches, keyOf, toLower, toUpper } from "@/content/languages";
 import { inTheme } from "@/content/themes";
-import { translate } from "@/content/translate";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
@@ -60,16 +59,7 @@ function paradeSpots(count: number) {
   }));
 }
 
-export function WordsPlay({
-  pack,
-  second,
-  settings,
-}: {
-  pack: LanguagePack;
-  /** Optional second language: the finished word is also shown and said in it. */
-  second: LanguagePack | null;
-  settings: WordsSettings;
-}) {
+export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: WordsSettings }) {
   const [current, setCurrent] = useState<{ id: number; word: WordEntry } | null>(null);
   const [typed, setTyped] = useState(0);
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
@@ -94,7 +84,6 @@ export function WordsPlay({
   const puzzle = useMemo(() => (reveal === "puzzle" ? puzzleGrid(letters.length) : null), [reveal, letters]);
   const color = current && isColor(current.word) ? current.word : null;
   const action = current && isAction(current.word) ? current.word : null;
-  const translation = current && second ? translate(current.word, second) : undefined;
   const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
 
   const say = useCallback(
@@ -156,12 +145,9 @@ export function WordsPlay({
     if (settings.sounds) playChime();
     const word = current.word;
     say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
-    if (settings.speech && second && translation) {
-      speak(`${translation}!`, second.speechLang, { queue: true, rate: 0.85 });
-    }
     if (isColor(word)) setBackground(word.color);
     for (let i = 0; i < 8; i++) spawn();
-  }, [current, done, letters, typed, firstOnly, pack, second, translation, say, sayLetter, spawn, settings.sounds, settings.speech]);
+  }, [current, done, letters, typed, firstOnly, pack, say, sayLetter, spawn, settings.sounds]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -294,7 +280,6 @@ export function WordsPlay({
                 ),
               )}
             </div>
-            {done && translation && <div className="translation">{translation}</div>}
           </div>
         )}
       </div>
