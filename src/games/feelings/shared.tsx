@@ -223,9 +223,9 @@ export function StoryPicture({
             <span className="fg-tap-hand">👆</span>
           </span>
         )}
-        {/* A card looked at big, but not wanted: the first picture, small, with an arrow back – tapped, it is big again. */}
-        {look === "option" && back && <BackButton image={back.image} onBack={back.onBack} />}
       </div>
+      {/* A card looked at big, but not wanted: the first picture, small on the corner with an arrow back – tapped, it is big again. */}
+      {look === "option" && back && <BackButton image={back.image} onBack={back.onBack} />}
       {/* On the corner, not over the picture, so what happened stays to be seen. */}
       {look === "good" && <Mark good className="fg-picture-mark" />}
       {look === "bad" && <Mark good={false} className="fg-picture-mark" />}

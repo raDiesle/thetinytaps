@@ -4,9 +4,9 @@ Route `/gefuehle/`: one start screen (`FeelingsGame`) with „Alle“ first, the
 „Wie geht's dir?“, then one card per story (`stories.ts`, `settings.story`): the
 bear's feelings at home, then the kindergarten stories. There are no sub-menus per place; the old addresses
 `/gefuehle/zuhause/` and `/gefuehle/kindergarten/` lead back to `/gefuehle/`.
-`FeelingsPlay` plays one story after another: a picked one comes first, then
-„Weiter“ goes on with the next ones in list order, so it never repeats the same;
-„Alle“ plays every story in random order.
+`FeelingsPlay` plays one story after another, always in the start screen's order (user feedback, never
+shuffled): „Alle“ starts with the first story, a picked one with itself, and „Weiter“ brings the next one
+there, after the last the first (`storyAfter` in `stories.ts`, checked in `feelings.test.ts`).
 
 „Wie geht's dir?“ (`mood.ts`, `MoodPlay.tsx`, `settings.story` = `"mood"`, not in
 „Alle“): four weather cards (`wetter-sonne`, `-wolke`, `-regen`, `-gewitter`) show
@@ -76,8 +76,10 @@ again and again with a white ring where the finger lands (`.fg-tap-hint`), and t
 other cards stop calling and fade a little, still to be tapped. Any step that waits
 for one more tap shows such a hand, never only a glow.
 A card looked at big can always be left without choosing it (user feedback): the first picture
-sits small in the big picture's top left corner with ↩ on it (`BackButton`, `StoryPicture`'s `back`),
-and tapping it – or Backspace – shows the first picture with the question again.
+sits small on the big picture's top left corner with ↩ on it (`BackButton`, `StoryPicture`'s `back`),
+and tapping it – or Backspace – shows the first picture with the question again. Like the tick and the
+cross it sits half outside the frame and stays small (about a sixth of the picture's width), so it never
+covers much of the card shown big (grown-ups found a quarter of the width too much).
 Only then comes the answer, seen and heard (`cheer`/`oops` in `shared.tsx`): the
 good idea gets a green frame that hops, stars and a laugh („Juhu!“ when speech is
 on), then the bear does it; the not-so-good one a red frame that shakes and what it

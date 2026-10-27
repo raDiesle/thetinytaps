@@ -263,22 +263,23 @@
   }
 }
 
-/* Back to the first picture: a small copy of it in the top left corner, with a round arrow on it. */
+/* Back to the first picture: a small copy of it on the top left corner of the frame, half outside like the tick,
+   with a round arrow on it – so it covers little of the card's picture. Its tap area is bigger than it looks (data-tap). */
 .fg-back {
   position: absolute;
-  top: 4%;
-  left: 3%;
+  top: -12px;
+  left: -12px;
   z-index: 6;
-  width: 26%;
+  width: clamp(60px, 16%, 128px);
   aspect-ratio: 4 / 3;
   padding: 0;
   overflow: hidden;
-  border: 0.8cqh solid #fff;
-  border-radius: 3cqh;
+  border: 3px solid #fff;
+  border-radius: 12px;
   background: #fff;
   box-shadow:
-    0 0 0 0.5cqh var(--ink),
-    0 1cqh 0 0.5cqh var(--ink);
+    0 0 0 2px var(--ink),
+    0 4px 0 2px var(--ink);
   cursor: pointer;
   touch-action: manipulation;
   opacity: 0;
@@ -304,7 +305,7 @@
   stroke-width: 3.2;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 0.6cqh #fff) drop-shadow(0 0 0.6cqh #fff);
+  filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
 }
 
 /* A good idea: a green frame, and the picture hops for joy. */

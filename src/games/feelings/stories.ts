@@ -15,3 +15,6 @@ export const STORIES: Story[] = [
 
 /** The bear's story at home with this feeling. */
 export const homeStory = (id: FeelingId): Story => STORIES.find((s) => s.kind === "home" && s.feeling.id === id)!;
+
+/** The story „Weiter“ brings after this one: the next on the start screen, after the last the first. */
+export const storyAfter = (story: Story): Story => STORIES[(STORIES.indexOf(story) + 1) % STORIES.length];

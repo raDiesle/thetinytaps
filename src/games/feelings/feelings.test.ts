@@ -5,7 +5,7 @@ import { bearImages, imageFor, moodImages, storyImages } from "./images";
 import { SITUATIONS } from "./kita";
 import { FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { MOOD_ID, WEATHERS } from "./mood";
-import { STORIES } from "./stories";
+import { STORIES, storyAfter } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
 
 // Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
@@ -44,6 +44,12 @@ test("every story on the start screen has its own id", () => {
   expect(new Set(ids).size).toBe(ids.length);
   expect(ids).not.toContain("all");
   expect(ids).not.toContain(MOOD_ID);
+});
+
+test("„Weiter“ goes through the stories in the start screen's order", () => {
+  const played = [STORIES[0]];
+  for (let i = 1; i <= STORIES.length; i++) played.push(storyAfter(played[i - 1]));
+  expect(played).toEqual([...STORIES, STORIES[0]]);
 });
 
 test("every weather has its card and leads to a feeling of the bear", () => {
