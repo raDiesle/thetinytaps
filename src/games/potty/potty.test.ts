@@ -162,6 +162,25 @@ describe("Aufs Töpfchen", () => {
     // And in English (" hen" and " hose" with the space, since „then“ and „those“ hold them): water, rain, fountain,
     // hose, balloon, ketchup, hen, egg, play dough, pushing, splashing.
     banned.push("water", " rain", "fountain", " hose", "balloon", "ketchup", " hen", "chicken", " egg", "dough", "push", "squeez", "splash", "drip");
+    // And in Spanish: water, rain, fountain, watering can, hose, balloon, ketchup, hen, egg, play dough, pushing, splashing, drops.
+    banned.push(
+      "agua",
+      "lluvi",
+      "fuente",
+      "regadera",
+      "manguera",
+      "globo",
+      "kétchup",
+      "gallina",
+      "huevo",
+      "plastilina",
+      "empuj",
+      "apriet",
+      "puj",
+      "chapot",
+      "salpic",
+      "gota",
+    );
     for (const text of lyrics) expect(banned.filter((word) => text.includes(word))).toEqual([]);
   });
 });
