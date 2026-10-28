@@ -168,9 +168,10 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
       <h1 className="menu-title">
         <span aria-hidden>{emoji}</span> {title}
       </h1>
-      {/* Right under the title, so it stays in sight however long the options get. */}
+      {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
+          cards leave (data-spread), so the back link stays on top and the grown-ups' buttons on the bottom edge. */}
       {modes ? (
-        <section className="mode-picker" aria-label={t({ de: "Spielart wählen", ru: "Выбрать игру" })}>
+        <section className="mode-picker" data-spread aria-label={t({ de: "Spielart wählen", ru: "Выбрать игру" })}>
           <h2 className="mode-heading">{t({ de: "Was spielen wir?", ru: "Во что играем?" })}</h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
@@ -192,7 +193,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
           </ul>
         </section>
       ) : (
-        <button type="button" className="start-button" onClick={start}>
+        <button type="button" className="start-button" data-spread onClick={start}>
           <span className="start-icon" aria-hidden>
             ▶
           </span>

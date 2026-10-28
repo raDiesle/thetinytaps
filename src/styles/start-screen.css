@@ -8,9 +8,17 @@
   align-items: center;
   justify-content: center;
   gap: 28px;
-  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(140px, env(safe-area-inset-bottom))
-    max(20px, env(safe-area-inset-left));
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   text-align: center;
+}
+
+/*
+ * When everything fits on one screen, the free room goes above and below the cards (or „Los geht’s!“):
+ * the back link stays in the top corner and the grown-ups' buttons sit on the bottom edge, instead of all
+ * of them floating together in the middle. useFitGrid leaves this room out when it sizes the cards.
+ */
+.start-screen > [data-spread] {
+  margin-block: auto;
 }
 
 .back-link {
