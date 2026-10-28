@@ -1,11 +1,12 @@
 import { useT } from "@/lib/language";
-import { canFullscreen, enterFullscreen, exitFullscreen, useFullscreen } from "@/lib/fullscreen";
+import { canFullscreen, enterFullscreen, enterKidMode, exitFullscreen, useFullscreen } from "@/lib/fullscreen";
 
 /**
  * Small round button for the grown-ups: puts the whole app, menus included,
  * into fullscreen or back out. Hidden where the browser can't (iPhone).
+ * While playing (`playing`) it also locks the keyboard again, as starting the game did.
  */
-export function FullscreenButton({ className = "home-menu-button icon-only" }: { className?: string }) {
+export function FullscreenButton({ className = "home-menu-button icon-only", playing = false }: { className?: string; playing?: boolean }) {
   const on = useFullscreen();
   const t = useT();
   if (!canFullscreen()) return null;
@@ -13,7 +14,8 @@ export function FullscreenButton({ className = "home-menu-button icon-only" }: {
   return (
     <button
       type="button"
-      className={className}
+      // "on" lets the styles hide it in fullscreen where only entering is wanted (a game on a tablet).
+      className={`${className}${on ? " on" : ""}`}
       aria-label={label}
       title={label}
       // The game underneath must not take the click for a tap.
@@ -21,7 +23,7 @@ export function FullscreenButton({ className = "home-menu-button icon-only" }: {
       onClick={(e) => {
         // Not left focused: a child's space bar would toggle it again.
         e.currentTarget.blur();
-        void (on ? exitFullscreen() : enterFullscreen());
+        void (on ? exitFullscreen() : playing ? enterKidMode() : enterFullscreen());
       }}
     >
       <svg className="fullscreen-icon" viewBox="0 0 24 24" aria-hidden>
@@ -33,14 +35,13 @@ export function FullscreenButton({ className = "home-menu-button icon-only" }: {
 }
 
 /**
- * The same button in the top right corner of the other menus: always on
- * computers, elsewhere only in fullscreen, so the grown-up can leave it right
- * there without going back to the home page first.
+ * The same button next to the back link of the other menus, always: the browser
+ * leaves fullscreen when a phone switches to another app and back, so the
+ * grown-up gets it back right there, or leaves it, without going to the home page first.
  */
 export function FullscreenCorner() {
-  const on = useFullscreen();
   return (
-    <div className={`fullscreen-corner${on ? " on" : ""}`}>
+    <div className="fullscreen-corner">
       <FullscreenButton />
     </div>
   );

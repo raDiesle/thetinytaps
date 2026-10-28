@@ -360,8 +360,8 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
       <span className="exit-hint" aria-hidden>
         {label} · {t({ de: "halten", ru: "удерживать" })}
       </span>
-      {/* On computers only (CSS): a finger on a tablet would end fullscreen by accident. */}
-      <FullscreenButton className="play-fullscreen" />
+      {/* On phones and tablets only to get back into fullscreen (CSS): a child's finger must not end it. */}
+      <FullscreenButton className="play-fullscreen" playing />
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}

@@ -140,9 +140,11 @@ In a fresh worktree run `bun install` first.
   overlap, the right answer wins (`data-tap="goal"`), then one not tapped yet (not `"done"`), then the
   nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
-- Grown-ups on a computer (≥ 900 px wide with a mouse) always see the fullscreen button: in every menu next to
-  the back link (`MenuTop`) and next to ✕ while playing; there the back link of a menu is big, yellow and fixed in the
-  top left corner, so it never scrolls away. Phones and tablets keep both out of a child's reach.
+- The fullscreen button is always there to get back into fullscreen, which a phone leaves whenever another app was
+  opened in between: in every menu next to the back link (`MenuTop`) and next to ✕ while playing. Grown-ups on a
+  computer (≥ 900 px wide with a mouse) see it always, also to leave fullscreen; on phones and tablets a game shows it
+  only while out of fullscreen, so a child's tap can't end it. On a computer the back link of a menu is big, yellow and
+  fixed in the top left corner, so it never scrolls away; phones and tablets keep it small.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
   no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
