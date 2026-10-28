@@ -10,7 +10,11 @@ export function ScenePage() {
   const found = findScene(scene);
   const language = useAppLanguage();
   const t = useT();
-  useTitle(found ? localizeScene(found, language.id).title : t({ de: "Lebendige Bilder", ru: "Живые картинки" }));
+  useTitle(
+    found
+      ? localizeScene(found, language.id).title
+      : t({ de: "Lebendige Bilder", ru: "Живые картинки", en: "Living Pictures", zh: "会动的图画", hi: "जीवंत तस्वीरें", es: "Imágenes vivas", ar: "صور حيّة" }),
+  );
   if (!found) return <Navigate to="/bilder/" replace />;
   return <ScenesGame sceneId={found.id} />;
 }

@@ -1,20 +1,34 @@
 import { describe, expect, test } from "bun:test";
-import { isCyrillic, RUSSIAN_KEYBOARD_ROWS } from "@/lib/cyrillicKeys";
-import { APP_LANGUAGES, pick } from "@/lib/language";
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import { ARABIC_KEYBOARD_ROWS } from "@/lib/arabicKeys";
+import { RUSSIAN_KEYBOARD_ROWS } from "@/lib/cyrillicKeys";
+import { HINDI_KEYBOARD_ROWS } from "@/lib/devanagariKeys";
+import { pick } from "@/lib/language";
 import { SCENES } from ".";
-import { assignKeys, pressedKey, RUSSIAN_SCENE_KEYS, SCENE_KEYS, sceneKeysFor } from "./keys";
+import { ARABIC_SCENE_KEYS, assignKeys, HINDI_SCENE_KEYS, pressedKey, RUSSIAN_SCENE_KEYS, SCENE_KEYS, sceneKeysFor } from "./keys";
 import { localizeScene, sceneLanguage } from "./localize";
 import { SCENE_PHRASES } from "./phrases";
 import { questsFor } from "./quests";
 import { ROADS } from "./roads";
 import { SCENE_TRANSLATIONS } from "./translations";
-import { placeBox, type Scene, type SceneItem, type SceneTranslation } from "./types";
+import { placeBox, type Scene, type SceneItem, type SceneItemTranslation, type SceneTranslation } from "./types";
 
 // The checks from the neue-szene skill that need no browser: they run on the
 // scene data alone, so a new or changed picture can't break them unnoticed.
 
 /** The smallest tap area a finger must still hit; the skill aims for ~60. */
 const MIN_TAP = 40;
+
+/** Every language the engine speaks (phrases.ts), German first. */
+const LANGUAGES = Object.keys(SCENE_PHRASES) as TargetLanguageId[];
+
+/** The script each language's names and sentences are written in, where it is not Latin: no Latin letter may slip in there. */
+const SCRIPTS: Partial<Record<TargetLanguageId, RegExp>> = {
+  ru: /\p{Script=Cyrillic}/u,
+  zh: /\p{Script=Han}/u,
+  hi: /\p{Script=Devanagari}/u,
+  ar: /\p{Script=Arabic}/u,
+};
 
 const hitAreas = (item: SceneItem) => (item.hitAreas ?? [item.box]).map((box) => placeBox(box, item.place));
 
@@ -103,7 +117,7 @@ describe("roads between pictures", () => {
     const to = SCENES.find((scene) => scene.id === road.to);
     expect(from?.items.map((item) => item.id)).toContain(road.item);
     expect(to).toBeDefined();
-    for (const language of APP_LANGUAGES) {
+    for (const language of LANGUAGES) {
       const { places } = pick(SCENE_PHRASES, language);
       expect(places[road.from], `${language} ${road.from}`).toBeDefined();
       expect(places[road.to], `${language} ${road.to}`).toBeDefined();
@@ -115,8 +129,31 @@ describe("roads between pictures", () => {
   });
 });
 
+/**
+ * The grammar each language's names need (see phrases.ts): Russian a gender or `plural`; Spanish, Hindi and Arabic
+ * always a gender, plurals too; English only `plural`; Chinese nothing.
+ */
+function grammarProblem(language: string, words: SceneItemTranslation): string | undefined {
+  switch (language) {
+    case "ru":
+      if (words.plural && words.gender) return "plural with a gender";
+      if (!words.plural && !words.gender) return "no gender";
+      return undefined;
+    case "es":
+    case "hi":
+    case "ar":
+      return words.gender === "m" || words.gender === "f" ? undefined : "no gender (m or f)";
+    case "en":
+      return words.gender ? "a gender" : undefined;
+    case "zh":
+      return words.gender || words.plural ? "a gender or plural" : undefined;
+    default:
+      return undefined;
+  }
+}
+
 /** What is wrong with a scene's translation: missing or unknown items, empty sentences, chains of the wrong shape, grammar left out. */
-function translationProblems(scene: Scene, translation: SceneTranslation): string[] {
+function translationProblems(scene: Scene, translation: SceneTranslation, language: string): string[] {
   const problems: string[] = [];
   const ids = new Set(scene.items.map((item) => item.id));
   if (!translation.title.trim()) problems.push("no title");
@@ -126,8 +163,8 @@ function translationProblems(scene: Scene, translation: SceneTranslation): strin
     if (!ids.has(id)) problems.push(`${id}: not an item of the scene`);
     if (!words.name.trim()) problems.push(`${id}: no name`);
     if (words.sentences.length === 0 || words.sentences.some((s) => !s.trim())) problems.push(`${id}: no sentence`);
-    if (words.plural && words.gender) problems.push(`${id}: plural with a gender`);
-    if (!words.plural && !words.gender) problems.push(`${id}: no gender`);
+    const grammar = grammarProblem(language, words);
+    if (grammar) problems.push(`${id}: ${grammar}`);
   }
   const chains = scene.chains ?? [];
   if ((translation.chains?.length ?? 0) > chains.length) problems.push(`chains: ${translation.chains?.length} instead of ${chains.length}`);
@@ -140,8 +177,10 @@ function translationProblems(scene: Scene, translation: SceneTranslation): strin
   return problems;
 }
 
-test("the Russian keys are exactly the letters of the Russian keyboard and the digits", () => {
+test("the Russian, Hindi and Arabic keys are exactly the letters of their keyboard and the digits", () => {
   expect([...RUSSIAN_SCENE_KEYS].sort()).toEqual([...RUSSIAN_KEYBOARD_ROWS.join(""), "Ё", ..."1234567890"].sort());
+  expect([...HINDI_SCENE_KEYS].sort()).toEqual([...HINDI_KEYBOARD_ROWS.join(""), ..."1234567890"].sort());
+  expect([...ARABIC_SCENE_KEYS].sort()).toEqual([...ARABIC_KEYBOARD_ROWS.join(""), ..."1234567890"].sort());
 });
 
 describe("scene translations", () => {
@@ -153,21 +192,46 @@ describe("scene translations", () => {
     for (const { sceneId, language, translation } of translations) {
       const scene = SCENES.find((s) => s.id === sceneId);
       expect(scene, sceneId).toBeDefined();
-      expect(translationProblems(scene!, translation), `${sceneId} ${language}`).toEqual([]);
+      expect(translationProblems(scene!, translation, language), `${sceneId} ${language}`).toEqual([]);
     }
   });
 
-  test("Russian names start with a Cyrillic letter, so keys mode can give them their own key", () => {
+  test("names start with a letter of their language, so keys mode can give them their own key", () => {
     for (const { sceneId, language, translation } of translations) {
-      if (language !== "ru") continue;
-      for (const [id, words] of Object.entries(translation.items)) expect(isCyrillic(words.name.charAt(0)), `${sceneId}.${id} „${words.name}“`).toBe(true);
+      const script = SCRIPTS[language as TargetLanguageId] ?? /\p{Script=Latin}/u;
+      for (const [id, words] of Object.entries(translation.items))
+        expect(script.test(words.name.charAt(0)), `${sceneId}.${id} ${language} „${words.name}“`).toBe(true);
     }
   });
 
-  test("in every app language each scene gets a key for every item, and every key does something", () => {
-    for (const language of APP_LANGUAGES) {
+  test("names come without the article the engine adds (English, Spanish)", () => {
+    for (const { sceneId, language, translation } of translations) {
+      const article = language === "en" ? /^(the|a|an) /i : language === "es" ? /^(el|la|los|las|un|una) /i : undefined;
+      if (!article) continue;
+      for (const [id, words] of Object.entries(translation.items)) expect(words.name, `${sceneId}.${id} ${language}`).not.toMatch(article);
+    }
+  });
+
+  test("Russian, Chinese, Hindi and Arabic say no Latin letters: names, sentences, chains, title", () => {
+    for (const { sceneId, language, translation } of translations) {
+      if (!SCRIPTS[language as TargetLanguageId]) continue;
+      const lines = [
+        translation.title,
+        translation.description,
+        ...Object.values(translation.items).flatMap((words) => [words.name, ...words.sentences]),
+        ...(translation.chains ?? []).flat(),
+      ];
+      expect(
+        lines.filter((line) => /[A-Za-z]/.test(line)),
+        `${sceneId} ${language}`,
+      ).toEqual([]);
+    }
+  });
+
+  test("in every language each scene gets a key for every item, and every key does something", () => {
+    for (const language of LANGUAGES) {
       for (const scene of SCENES) {
-        const { byKey, keyOf } = assignKeys(localizeScene(scene, language).items, language);
+        const { byKey, keyOf } = assignKeys(localizeScene(scene, language).items, language, scene.id);
         expect(keyOf.size, `${scene.id} ${language}`).toBe(scene.items.length);
         for (const key of sceneKeysFor(language)) expect(byKey.get(key)?.length, `${scene.id} ${language} ${key}`).toBeGreaterThan(0);
       }
@@ -175,10 +239,63 @@ describe("scene translations", () => {
   });
 
   test("every language has the engine's sentences for every trait and every picture a vehicle drives to", () => {
-    for (const language of APP_LANGUAGES) {
+    for (const language of LANGUAGES) {
       const words = pick(SCENE_PHRASES, language);
       expect(Object.keys(words.traits).sort(), language).toEqual(Object.keys(SCENE_PHRASES.de.traits).sort());
       expect(Object.keys(words.places).sort(), language).toEqual(Object.keys(SCENE_PHRASES.de.places).sort());
+    }
+  });
+
+  test("the engine's sentences in Russian, Chinese, Hindi and Arabic have no Latin letters", () => {
+    for (const language of LANGUAGES) {
+      if (!SCRIPTS[language]) continue;
+      const words = pick(SCENE_PHRASES, language);
+      const item = { ...SCENES[0].items[0], name: "…" };
+      const place = Object.values(words.places)[0];
+      const lines = [
+        ...Object.values(words.prompts),
+        ...Object.values(words.colourPrompts),
+        ...words.praise,
+        words.allColoured,
+        words.allFound,
+        words.goodNight,
+        words.peekaboo("…"),
+        words.whereIs(item),
+        words.hereIs(item),
+        words.thatIs(item, "…"),
+        ...Object.values(words.traits).flatMap((trait) => [trait.question, trait.praise(item), trait.part ?? ""]),
+        ...Object.values(words.places).flatMap((p) => [p.to, p.from, p.at]),
+        words.backHome(item, place),
+        words.comesFrom(item, place),
+        words.drivesTo(item, place),
+        words.follow(item),
+        words.of(1, 2),
+        words.foundCount(1),
+        words.discoveredCount(1, 2),
+        words.spaceBar,
+        words.rotate,
+      ];
+      expect(
+        lines.filter((line) => /[A-Za-z]/.test(line)),
+        language,
+      ).toEqual([]);
+    }
+  });
+
+  test("questions and praise name the item in every language a picture is translated into", () => {
+    for (const language of LANGUAGES) {
+      for (const scene of SCENES) {
+        if (sceneLanguage(scene.id, language) !== language) continue;
+        const localized = localizeScene(scene, language);
+        for (const mode of ["find", "questions"] as const) {
+          for (const quest of questsFor(mode, localized, language)) {
+            for (const item of quest.answers) {
+              const praise = quest.praise(item);
+              expect(praise.toLowerCase(), `${scene.id} ${language}`).toContain(item.name.toLowerCase());
+            }
+          }
+        }
+      }
     }
   });
 });
@@ -251,5 +368,81 @@ describe("a scene in Russian (fixture)", () => {
     expect(pressedKey({ key: "^", code: "Backquote" }, "ru")).toBe("Ё");
     expect(pressedKey({ key: "3", code: "Digit3" }, "ru")).toBe("3");
     expect(pressedKey({ key: "b", code: "KeyB" }, "de")).toBe("B");
+  });
+});
+
+/** The engine's sentences with made-up items, one grammar case each: articles, agreement, plurals. */
+describe("the engine's grammar in other languages", () => {
+  const base = SCENES[0].items[0];
+  const item = (name: string, gender?: "m" | "f", plural?: boolean): SceneItem => ({ ...base, name, gender, plural });
+
+  test("English adds “the” and follows the plural", () => {
+    const { whereIs, traits, comesFrom, places } = SCENE_PHRASES.en!;
+    expect(whereIs(item("bus"))).toBe("Where is the bus?");
+    expect(whereIs(item("chicks", undefined, true))).toBe("Where are the chicks?");
+    expect(traits.red.praise(item("bus"))).toBe("The bus is red!");
+    expect(traits.wheels.praise(item("trucks", undefined, true))).toBe("The trucks have wheels!");
+    expect(traits.flies.praise(item("Santa Claus"))).toBe("Santa Claus can fly!");
+    expect(whereIs(item("Christmas tree"))).toBe("Where is the Christmas tree?");
+    expect(whereIs(item("T. rex"))).toBe("Where is the T. rex?");
+    expect(comesFrom(item("bus"), places.zoo)).toBe("Here comes the bus from the zoo!");
+  });
+
+  test("Spanish picks el / la / los / las and agrees the adjective", () => {
+    const { whereIs, traits, follow } = SCENE_PHRASES.es!;
+    expect(whereIs(item("grúa", "f"))).toBe("¿Dónde está la grúa?");
+    expect(whereIs(item("pollitos", "m", true))).toBe("¿Dónde están los pollitos?");
+    expect(traits.red.praise(item("grúa", "f"))).toBe("¡La grúa es roja!");
+    expect(traits.small.praise(item("flores", "f", true))).toBe("¡Las flores son muy pequeñas!");
+    expect(traits.yellow.praise(item("agua", "f"))).toBe("¡El agua es amarilla!");
+    expect(follow(item("tractor", "m"))).toBe("Seguir al tractor");
+  });
+
+  test("Hindi agrees adjectives and verbs with gender and plural", () => {
+    const { hereIs, traits } = SCENE_PHRASES.hi!;
+    expect(hereIs(item("हाथी", "m"))).toBe("यह रहा हाथी!");
+    expect(hereIs(item("गाय", "f"))).toBe("यह रही गाय!");
+    expect(traits.yellow.praise(item("केला", "m"))).toBe("केला पीला है!");
+    expect(traits.yellow.praise(item("चूज़े", "m", true))).toBe("चूज़े पीले हैं!");
+    expect(traits.flies.praise(item("तितली", "f"))).toBe("तितली उड़ सकती है!");
+  });
+
+  test("Arabic agrees with gender, things in the plural as feminine, people in the plural as masculine plural", () => {
+    const { traits, comesFrom, places } = SCENE_PHRASES.ar!;
+    expect(traits.red.praise(item("الحافلة", "f"))).toBe("الحافلة حمراء!");
+    expect(traits.red.praise(item("الجرار", "m"))).toBe("الجرار أحمر!");
+    expect(traits.small.praise(item("الكتاكيت", "f", true))).toBe("الكتاكيت صغيرة جدا!");
+    expect(traits.small.praise(item("الأطفال", "m", true))).toBe("الأطفال صغار جدا!");
+    expect(comesFrom(item("الأطفال", "m", true), places.zoo)).toBe("يأتي الأطفال من حديقة الحيوان!");
+  });
+
+  test("Chinese says the bare name", () => {
+    expect(SCENE_PHRASES.zh!.whereIs(item("公交车"))).toBe("公交车在哪里？");
+  });
+
+  test("keys mode: first letters in every script, a Hindi letter on Shift counts without it", () => {
+    const keyOf = (name: string, language: TargetLanguageId) => assignKeys([item(name)], language).keyOf.get(base.id);
+    expect(keyOf("árbol", "es")).toBe("A");
+    expect(keyOf("ñu", "es")).toBe("N");
+    expect(keyOf("excavator", "en")).toBe("E");
+    expect(keyOf("खरगोश", "hi")).toBe("क");
+    expect(keyOf("ज़ेबरा", "hi")).toBe("ज");
+    expect(keyOf("ऊँट", "hi")).toBe("ऊ");
+    expect(keyOf("الحافلة", "ar")).toBe("ح");
+    expect(keyOf("الأسد", "ar")).toBe("ا");
+    expect(keyOf("سيارة الإطفاء", "ar")).toBe("س");
+    // Chinese plays on the German keys: the German name's first letter (or the wished key).
+    const german = SCENES[0].items.find((i) => !i.key)!;
+    const zh = assignKeys([{ ...german, name: "…" }], "zh", SCENES[0].id).keyOf.get(german.id);
+    expect(zh).toBe(assignKeys([german], "de").keyOf.get(german.id));
+
+    expect(pressedKey({ key: "k", code: "KeyK" }, "hi")).toBe("क");
+    expect(pressedKey({ key: "K", code: "KeyK", shiftKey: true }, "hi")).toBe("क");
+    expect(pressedKey({ key: "ख", code: "KeyK" }, "hi")).toBe("क");
+    expect(pressedKey({ key: "३", code: "Digit3" }, "hi")).toBe("3");
+    expect(pressedKey({ key: "h", code: "KeyH" }, "ar")).toBe("ا");
+    expect(pressedKey({ key: "أ", code: "KeyH" }, "ar")).toBe("ا");
+    expect(pressedKey({ key: "ñ", code: "Semicolon" }, "es")).toBe("N");
+    expect(pressedKey({ key: "a", code: "KeyA" }, "en")).toBe("A");
   });
 });

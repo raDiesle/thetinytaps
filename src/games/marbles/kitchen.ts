@@ -364,7 +364,17 @@ export function buildKitchen() {
   at(tToast, { sound: playPlop });
   at(tToast + 0.15, { sound: playTwinkle });
   at(tToast + 0.35, { sound: playWhistle });
-  at(tToast + 0.5, { say: { de: "Ping! Der Toast ist fertig!", ru: "Дзинь! Тост готов!" } });
+  at(tToast + 0.5, {
+    say: {
+      de: "Ping! Der Toast ist fertig!",
+      en: "Ding! The toast is ready!",
+      zh: "叮！吐司烤好啦！",
+      hi: "टिंग! टोस्ट तैयार है!",
+      es: "¡Ding! ¡La tostada está lista!",
+      ar: "دينغ! الخبز المحمّص جاهز!",
+      ru: "Дзинь! Тост готов!",
+    },
+  });
   at(tDone, { done: true });
 
   const toastAt = (t: number): { pt: Pt; angle: number; flat: number } => {

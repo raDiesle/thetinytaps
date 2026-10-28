@@ -1,0 +1,57 @@
+import type { SceneTranslation } from "../types";
+
+// The English words of the Baustelle picture: names, what each item says and the chain sentences.
+// Names are nouns without article, lower case; plural names are marked `plural`.
+
+/** „Baustelle“ in English. */
+export const EN: SceneTranslation = {
+  title: "Construction Site",
+  description: "Excavator, crane and dump truck at work.",
+  items: {
+    sonne: { name: "sun", sentences: ["The sun is shining!", "The sun is smiling."] },
+    wolke: { name: "cloud", sentences: ["The cloud makes it rain. Pitter, patter!", "The cloud is white and soft."] },
+    ballon: { name: "hot-air balloon", sentences: ["The hot-air balloon flies way up high!", "Whoosh! The flame makes hot air."] },
+    heli: { name: "helicopter", sentences: ["The helicopter takes off!", "Chop, chop, goes the helicopter."] },
+    baum: { name: "tree", sentences: ["The wind rustles in the tree.", "Red apples grow on the tree."] },
+    eichhoernchen: { name: "squirrel", sentences: ["Hop! The squirrel climbs up the tree.", "The squirrel has a bushy tail."] },
+    container: { name: "container", sentences: ["The rubble goes into the container.", "Crash! Everything into the container."] },
+    hase: { name: "rabbit", sentences: ["Look, a rabbit in the bush!", "Hop, hop, goes the rabbit."] },
+    klo: { name: "toilet", sentences: ["Knock, knock! The toilet is busy.", "This is the construction site toilet.", "The door opens. Who is in there?"] },
+    bauwagen: { name: "site trailer", sentences: ["The builders take a break in the site trailer.", "Yum, there is cocoa in the site trailer!"] },
+    gabelstapler: { name: "forklift", sentences: ["The forklift lifts the boxes up.", "Up and down with the forklift!"] },
+    haus: { name: "house", sentences: ["A house is being built here!", "Brick on brick, the house grows quick.", "Soon someone will live here."] },
+    katze: { name: "cat", sentences: ["Meow! The cat is watching.", "The cat sits on the wall."] },
+    kran: { name: "crane", sentences: ["The crane lifts the bricks up!", "The crane is very tall.", "Up, up, up with the crane!"] },
+    vogel: { name: "bird", sentences: ["Tweet, tweet! The bird is flying.", "The bird sits on the crane."] },
+    radio: { name: "radio", sentences: ["The radio plays music. La, la, la!", "Work is easier with music."] },
+    bagger: { name: "excavator", sentences: ["The excavator is digging!", "Vroom, vroom! The excavator digs a hole.", "The excavator is yellow."] },
+    arbeiter: { name: "builder", sentences: ["Hello! I am the builder.", "The builder wears a helmet."] },
+    kabeltrommel: { name: "cable reel", sentences: ["The cable reel rolls.", "There is a long cable on the cable reel."] },
+    igel: { name: "hedgehog", sentences: ["The hedgehog has lots of spines.", "Sniff, sniff, goes the hedgehog."] },
+    karre: { name: "wheelbarrow", sentences: ["The wheelbarrow rolls!", "There is sand in the wheelbarrow."] },
+    schild: { name: "sign", sentences: ["Watch out, construction site!", "The sign says: people are working here."] },
+    laterne: { name: "street lamp", sentences: ["The street lamp turns on. Now it is bright!", "The street lamp shines when it is dark."] },
+    walze: { name: "road roller", sentences: ["The road roller makes the road smooth.", "The roller is heavy and rolls very slowly."] },
+    kipper: { name: "dump truck", sentences: ["The dump truck tips out the sand!", "Watch out, the dump truck is backing up!"] },
+    mischer: { name: "cement mixer", sentences: ["The cement mixer turns and turns!", "There is concrete in the cement mixer."] },
+    ampel: { name: "traffic light", sentences: ["Red, yellow, green! Now everyone can go.", "On red we stop and wait."] },
+    schnecke: { name: "snail", sentences: ["The snail crawls very slowly.", "The snail carries its house on its back."] },
+    hund: { name: "dog", sentences: ["Woof, woof! The dog wants to play too.", "The dog wags its tail."] },
+    maulwurf: { name: "mole", sentences: ["Hello, mole! It digs tunnels under the ground.", "The mole peeks out of its hill."] },
+    sandhaufen: { name: "sand pile", sentences: ["The shovel scoops up sand.", "You can dig in the sand pile."] },
+    frosch: { name: "frog", sentences: ["Ribbit! The frog hops.", "The frog is green."] },
+    hammer: { name: "jackhammer", sentences: ["Rat-a-tat-tat! The jackhammer is loud.", "The builder opens up the road."] },
+    falter: { name: "butterfly", sentences: ["A butterfly flutters around.", "The butterfly likes the flowers."] },
+    maus: { name: "mouse", sentences: ["Squeak! The mouse lives in the pipe.", "Hello, little mouse!"] },
+    ente: { name: "duck", sentences: ["Quack, quack! The duck splashes in the puddle.", "The duck likes water."] },
+    saege: { name: "saw", sentences: ["Zip, zap! The saw cuts the board.", "The saw makes the wood short."] },
+    werkzeug: { name: "toolbox", sentences: ["There is a hammer, pliers and a wrench in the toolbox.", "Clack! The toolbox opens."] },
+    huetchen: { name: "traffic cone", sentences: ["The traffic cone hops!", "The traffic cone is orange."] },
+    marienkaefer: { name: "ladybug", sentences: ["The ladybug flies away!", "The ladybug has black spots."] },
+  },
+  chains: [
+    ["The cat gets a fright!", "And the bird flies away fast!"],
+    ["What is all that noise? The mole peeks out.", "The hedgehog would rather run away."],
+    ["Rain! The frog is happy and hops.", "And the duck splashes in the puddle."],
+  ],
+};

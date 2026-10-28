@@ -5,11 +5,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Wolkenreise“ in English. */
 export const TRANSLATION: StoryTranslation = {
+  title: "The Cloud Trip",
   defaultTurn: "Your turn!",
   opening: ["Oh! Where is the sun?", "It's hiding behind the big rain cloud.", "Let's get it out! Are you coming along?"],
   steps: [
     // 👋
     {
+      name: "Wave to Kiki",
       situation: "Hello! I'm Tapsi. And this is Woolly, my cloud!",
       instruction: "Here comes Kiki! We wave – like this!",
       turn: "Can you wave to Kiki too?",
@@ -18,6 +20,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐦
     {
+      name: "Flap like a bird",
       situation: "Woolly wants to fly. Let's help!",
       instruction: "Flap your arms like a bird – like this!",
       turn: "Your turn – flap along!",
@@ -26,6 +29,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ✈️
     {
+      name: "Duck under the planes",
       situation: "Oh, here come little planes!",
       instruction: "When one comes, we duck – like this!",
       turn: "Watch out! Duck!",
@@ -34,6 +38,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎈
     {
+      name: "Tap the balloons",
       situation: "So many balloons!",
       instruction: "We tap them – pop! Like this!",
       turn: "Your turn – tap them!",
@@ -41,9 +46,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "So much confetti!",
     },
     // 🪑
-    { instruction: "Now it gets fast! Sit down with me – like this!", praise: "Hold on tight!" },
+    { name: "Sit down", instruction: "Now it gets fast! Sit down with me – like this!", praise: "Hold on tight!" },
     // ⭐
     {
+      name: "Lean into the curves for stars",
       situation: "Look at all the stars!",
       instruction: "Lean to the side and grab the star – like this!",
       turn: "Your turn – lean to the side!",
@@ -51,9 +57,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "We got all the stars!",
     },
     // 🧍
-    { instruction: "There's the rain cloud! Stand up with me – like this!", praise: "Now let's get the sun!" },
+    { name: "Stand up", instruction: "There's the rain cloud! Stand up with me – like this!", praise: "Now let's get the sun!" },
     // 🌧️
     {
+      name: "Push the rain cloud up",
       situation: "It's raining here! The sun is up there.",
       instruction: "Push the cloud up with both arms – like this!",
       turn: "Your turn – push with me!",
@@ -62,6 +69,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌈
     {
+      name: "Paint a rainbow",
       situation: "Now we just need the rainbow.",
       instruction: "Paint a big arc with your arm – like this!",
       turn: "Your turn – paint with me!",
@@ -70,6 +78,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "Hooray!",
       situation: "The sun is smiling!",
       instruction: "Arms up – hooray!",
       turn: "You too – hooray!",
@@ -77,6 +86,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🏡
     {
+      name: "Wave goodbye",
       situation: "Woolly flies us home.",
       instruction: "We wave bye-bye – like this!",
       turn: "Will you wave too?",

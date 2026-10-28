@@ -27,6 +27,27 @@ test("the Russian texts that are there are written in Cyrillic", () => {
   }
 });
 
+// The scripts of the translated languages not written in Latin letters: no Latin word may slip into them.
+const SCRIPTS = { zh: /\p{Script=Han}/u, hi: /\p{Script=Devanagari}/u, ar: /\p{Script=Arabic}/u } as const;
+
+// A text with Russian was translated into all of them (October 2026); a new German-only text has none yet.
+test("a translated text is there in en, zh, hi, es and ar too, Chinese, Hindi and Arabic without Latin letters", () => {
+  for (const [path, text] of ALL) {
+    if (text.ru === undefined) continue;
+    for (const id of ["en", "zh", "hi", "es", "ar"] as const) {
+      const lines = [text[id] ?? []].flat();
+      expect(lines.length, `${path} ${id}`).toBe([text.de].flat().length);
+      for (const line of lines) {
+        expect(line.trim(), `${path} ${id}`).not.toBe("");
+        if (id in SCRIPTS) {
+          expect(line, `${path} ${id}`).toMatch(SCRIPTS[id as keyof typeof SCRIPTS]);
+          expect(line, `${path} ${id}`).not.toMatch(/[A-Za-z]/);
+        }
+      }
+    }
+  }
+});
+
 test("a text without Russian is spoken in German with the German voice", () => {
   const russian = targetLanguageFor("ru");
   expect(spokenIn({ de: "Hallo" }, russian)).toEqual({ text: "Hallo", lang: "de-DE" });

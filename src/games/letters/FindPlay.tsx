@@ -24,10 +24,14 @@ const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#ff
 /**
  * Letters to look for. Umlauts are left out: their keys are missing on many
  * keyboards, and they are rarely among the first letters children know. The same
- * goes for Russian Ё (outside А–Я), whose key sits left of the 1.
+ * goes for Russian Ё (outside А–Я), whose key sits left of the 1, and Spanish Ñ.
+ * In other scripts (Hindi, Arabic) the letters printed on the keyboard rows, so
+ * none that needs Shift (Hindi ख, ङ).
  */
 function findableLetters(pack: LanguagePack, theme: "all" | ThemeId): LetterEntry[] {
-  const plain = pack.letters.filter((l) => /^[A-ZА-Я]$/.test(l.upper));
+  const keys = pack.keyboardRows.join("");
+  const findable = (upper: string) => /^[A-ZА-Я]$/.test(upper) || (!/[\p{Script=Latin}\p{Script=Cyrillic}]/u.test(upper) && keys.includes(upper));
+  const plain = pack.letters.filter((l) => findable(l.upper));
   if (theme === "all") return plain;
   const matching = plain.filter((l) => l.words.some((w) => w.theme === theme));
   return matching.length > 0 ? matching : plain;
@@ -184,7 +188,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
         {current && (
           <div key={current.id} className={`card find-card${found ? " done" : ""}`} data-tap onPointerDown={onCardPointer}>
             <Picture word={current.word} />
-            {settings.showWord && <LetterWord letter={current.letter} word={current.word} />}
+            {settings.showWord && <LetterWord pack={pack} letter={current.letter} word={current.word} />}
             <div key={wrong} className={`find-key${wrong > 0 ? " nudge" : ""}`} aria-label={pack.findPrompt(current.letter)}>
               {glyphs.map((g) => (
                 <span key={g}>{g}</span>
@@ -194,7 +198,18 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
         )}
       </div>
       {foundCount > 0 && (
-        <div className="find-stars" aria-label={t({ de: `${foundCount} gefunden`, ru: `Найдено: ${foundCount}` })}>
+        <div
+          className="find-stars"
+          aria-label={t({
+            de: `${foundCount} gefunden`,
+            ru: `Найдено: ${foundCount}`,
+            en: `${foundCount} found`,
+            zh: `找到了${foundCount}个`,
+            hi: `मिले: ${foundCount}`,
+            es: `Encontradas: ${foundCount}`,
+            ar: `وجدنا ${foundCount}`,
+          })}
+        >
           {"⭐".repeat(Math.min(foundCount, 10))}
           {foundCount > 10 && <span className="find-count">{foundCount}</span>}
         </div>

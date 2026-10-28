@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES, categoryHref, hasPage } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
-import { keyMatches, keyOf, LANGUAGES, languageFor, toLower, toUpper } from "./languages";
+import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
 import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
 import { SCENES } from "../games/scenes";
@@ -173,9 +173,11 @@ describe.each(LANGUAGES.map((language) => [language.id, language] as const))("la
   test("every letter has words that start with it (or, for a letter no word starts with, have it inside)", () => {
     for (const letter of pack.letters) {
       expect(letter.words.length, letter.upper).toBeGreaterThan(0);
-      for (const { word } of letter.words) {
-        if (letter.inWord) expect(toUpper(word, pack).slice(1), word).toContain(letter.upper);
-        else expect(toUpper(word.charAt(0), pack), word).toBe(letter.upper);
+      // Counted in the pieces a word is typed by (its pinyin for Chinese), the plain form counts (أ for ا).
+      for (const word of letter.words) {
+        const at = letterIndex(word, letter, pack);
+        if (letter.inWord) expect(at, word.word).toBeGreaterThan(0);
+        else expect(at, word.word).toBe(0);
       }
     }
   });

@@ -1,4 +1,4 @@
-import type { ShadowItem, ShadowTexts } from "./content";
+import type { ShadowItem, ShadowTexts, ShadowTranslation } from "./content";
 
 // Russian texts for "Schatten finden" and "Wer schaut da raus?", by the ids of
 // the pictures in content.ts. Russian has no article to carry the case, so each
@@ -112,3 +112,6 @@ export function russianTexts(german: ShadowTexts): ShadowTexts {
     stars: (n) => `Готово: ${n}`,
   };
 }
+
+/** Russian, for the table of languages in content.ts. */
+export const RUSSIAN: ShadowTranslation = { names: RUSSIAN_NAMES, texts: russianTexts };

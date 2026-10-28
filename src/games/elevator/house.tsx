@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { Cloud } from "@/games/scenes/shared";
 import { useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
@@ -204,52 +204,6 @@ export function Hint({ floor }: { floor: number }) {
   );
 }
 
-/** Room around the wanted thing inside its outline. */
-const CONTOUR_PAD = 12;
-
-/** A thin dashed yellow outline around the thing in the bubble, in the room of `floor`, so the child sees where to
- * ride. It finds the thing by its `data-wish` in the picture and measures it; `glow` makes it pulse with the room's
- * glow. It doesn't move by itself. */
-export function Contour({ wish, floor, glow }: { wish: string; floor: number; glow: boolean }) {
-  const ref = useRef<SVGGElement>(null);
-  const [box, setBox] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
-  useLayoutEffect(() => {
-    const svg = ref.current?.ownerSVGElement;
-    const thing = svg?.querySelector(`[data-wish~="${wish}"]`);
-    const toSvg = svg?.getScreenCTM()?.inverse();
-    if (!thing || !toSvg) return;
-    const r = thing.getBoundingClientRect();
-    const a = new DOMPoint(r.left, r.top).matrixTransform(toSvg);
-    const b = new DOMPoint(r.right, r.bottom).matrixTransform(toSvg);
-    // Kept inside the room, so it never covers the walls or the lift.
-    const top = floorLine(floor) - ROOM_H + 8;
-    const x = Math.max(ROOM_L + 8, a.x - CONTOUR_PAD);
-    const y = Math.max(top, a.y - CONTOUR_PAD);
-    setBox({ x, y, w: Math.min(ROOM_R - 8, b.x + CONTOUR_PAD) - x, h: Math.min(floorLine(floor) - 4, b.y + CONTOUR_PAD) - y });
-  }, [wish, floor]);
-  return (
-    <g ref={ref} className={glow ? "el-contour glow" : "el-contour"}>
-      {box && (
-        <>
-          <rect x={box.x} y={box.y} width={box.w} height={box.h} rx="18" fill="none" stroke="#fff" strokeWidth="10" opacity="0.6" />
-          <rect
-            x={box.x}
-            y={box.y}
-            width={box.w}
-            height={box.h}
-            rx="18"
-            fill="none"
-            stroke="#fab005"
-            strokeWidth="5"
-            strokeDasharray="14 9"
-            strokeLinecap="round"
-          />
-        </>
-      )}
-    </g>
-  );
-}
-
 /** The big action button of the trail adventures, in its own framed box: grey while there is nothing to do, red,
  * glowing and sending out rings while a tap is awaited. Any tap or key does the same; the button only shows when,
  * and its `picture` (drawn around its middle, the star if none) what the tap will do. A new `nudge` makes it jump again. */
@@ -275,7 +229,11 @@ export function ActionButton({
   const t = useT();
   const [bx, by, bw, bh] = box;
   return (
-    <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label={t({ de: "Los", ru: "Вперёд" })}>
+    <g
+      className={`el-action${waiting ? " on" : ""}`}
+      role="button"
+      aria-label={t({ de: "Los", ru: "Вперёд", en: "Go", zh: "出发", hi: "चलो", es: "Vamos", ar: "هيّا" })}
+    >
       <rect x={bx + 8} y={by + 8} width={bw} height={bh} rx="36" className="el-action-shadow" />
       <rect x={bx} y={by} width={bw} height={bh} rx="36" className="el-action-box" strokeWidth="6" />
       {[0, 1].map((i) => (
@@ -332,7 +290,15 @@ export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: numb
             data-tap={tapState({ goal: hint === f })}
             onPointerDown={down(f)}
             role="button"
-            aria-label={t({ de: `Stock ${f + 1}`, ru: `Этаж ${f + 1}` })}
+            aria-label={t({
+              de: `Stock ${f + 1}`,
+              ru: `Этаж ${f + 1}`,
+              en: `Floor ${f + 1}`,
+              zh: `${f + 1} 楼`,
+              hi: `मंज़िल ${f + 1}`,
+              es: `Piso ${f + 1}`,
+              ar: `الطابق ${f + 1}`,
+            })}
           >
             <circle cx={BUTTON_X} cy={cy + 6} r={BUTTON_R} fill="#78909c" />
             <circle className="el-button-face" cx={BUTTON_X} cy={cy} r={BUTTON_R} stroke="#90a4ae" strokeWidth="6" />

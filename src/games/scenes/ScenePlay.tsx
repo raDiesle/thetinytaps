@@ -570,7 +570,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
     return [point.x, point.y];
   }, []);
 
-  const keys = useMemo(() => assignKeys(scene.items, language.id), [scene, language.id]);
+  const keys = useMemo(() => assignKeys(scene.items, language.id, scene.id), [scene, language.id]);
   const keyTurns = useRef(new Map<string, number>());
 
   const tapItem = (item: SceneItem, e: PointerEvent) => {

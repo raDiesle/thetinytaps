@@ -658,11 +658,12 @@ export function RainHat() {
   );
 }
 
-/** The outline of the glass bowl, from the rim down to its foot. */
-const BOWL = "M-56 -56 Q-54 -8 -24 -3 H24 Q54 -8 56 -56 Z";
+/** The bowl's front, from the near half of its rim down to its foot; its opening is an ellipse, as seen a little from above. */
+const BOWL = "M-56 -56 A56 14 0 0 0 56 -56 Q54 -8 24 -3 H-24 Q-54 -8 -56 -56 Z";
 
-/** The glass mixing bowl, so the child sees what goes in, tap by tap: `eggs` (yolks), `milk`, `flour` (a white heap);
- * `mixed` stirs it all into yellow batter, and every pancake `poured` lowers it. `children` (the mixer) dip into it. */
+/** The mixing bowl, seen a little from above, so the child sees what goes in, tap by tap: `eggs` (yolks), `milk`,
+ * `flour` (a white heap); `mixed` stirs it all into yellow batter, and every pancake `poured` lowers it. `children`
+ * (the mixer) dip into it. The bowl itself is solid: what is in it shows in its opening, never through its side. */
 export function Bowl({
   eggs = 0,
   milk = false,
@@ -679,55 +680,43 @@ export function Bowl({
   children?: ReactNode;
 }) {
   const clip = useId();
-  /** The top of the milk, then of the batter, which sinks with every pancake. */
-  const milkTop = -28;
-  const batterTop = -38 + poured * 9;
-  const yolkY = milk ? milkTop : -9;
+  /** The top of what is in the bowl: yolks lie on the bottom or on the milk; the batter sinks with every pancake. */
+  const yolkY = milk ? -57 : -51;
+  const batterTop = -55 + poured * 4;
   return (
     <>
       <clipPath id={clip}>
-        <path d={BOWL} />
+        <ellipse cx="0" cy="-56" rx="54" ry="12" />
       </clipPath>
-      <ellipse cx="0" cy="-56" rx="56" ry="11" fill="#e7f5ff" fillOpacity="0.5" stroke="#495057" strokeWidth="4" />
+      {/* The inside, lighter than the outside, with the bottom further down */}
+      <ellipse cx="0" cy="-56" rx="56" ry="14" fill="#d0bfff" stroke="#495057" strokeWidth="4" />
+      <ellipse cx="0" cy="-50" rx="32" ry="6" fill="#b197fc" />
       <g clipPath={`url(#${clip})`}>
         {mixed > 0 ? (
           poured < 3 && (
             <g className="el-blend">
-              <rect x="-60" y={batterTop} width="120" height="60" fill="#fcc419" />
-              <ellipse cx="0" cy={batterTop} rx="60" ry="7" fill="#ffd43b" />
+              <ellipse cx="0" cy={batterTop} rx="56" ry="13" fill="#ffd43b" />
+              <path d={`M-20 ${batterTop} Q0 ${batterTop + 5} 20 ${batterTop}`} stroke="#fab005" strokeWidth="3" strokeLinecap="round" fill="none" />
             </g>
           )
         ) : (
           <>
-            {milk && (
-              <>
-                <rect x="-60" y={milkTop} width="120" height="40" fill="#fff" />
-                <ellipse cx="0" cy={milkTop} rx="60" ry="6" fill="#f1f3f5" />
-              </>
-            )}
+            {milk && <ellipse cx="0" cy="-55" rx="56" ry="12" fill="#fff" />}
             {[-16, 14].slice(0, eggs).map((x) => (
               <g key={x}>
                 <ellipse cx={x} cy={yolkY} rx="13" ry="5" fill="#fff" stroke="#e9ecef" strokeWidth="2" />
                 <circle cx={x} cy={yolkY - 1} r="7" fill="#fab005" />
               </g>
             ))}
-            {flour > 0 && (
-              <path
-                d={`M-34 ${milk ? milkTop + 2 : -6} Q-6 ${(milk ? milkTop : -6) - 30} 34 ${milk ? milkTop + 2 : -6} Z`}
-                fill="#fff"
-                stroke="#adb5bd"
-                strokeWidth="2.5"
-              />
-            )}
           </>
         )}
       </g>
+      {flour > 0 && !mixed && <path d={`M-32 ${yolkY + 2} Q-6 ${yolkY - 30} 32 ${yolkY + 2} Z`} fill="#fff" stroke="#adb5bd" strokeWidth="2.5" />}
       {children}
-      {/* The glass in front: a light tint, a dark outline and a shine, so the bowl stands out from any wall */}
-      <path d={BOWL} fill="#d0ebff" fillOpacity="0.18" stroke="#495057" strokeWidth="4" strokeLinejoin="round" />
-      <path d="M-44 -46 Q-42 -20 -26 -12" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.8" />
+      {/* The solid front, purple so it stands out from the yellow wall, the green tiles and the blue worktop */}
+      <path d={BOWL} fill="#9775fa" stroke="#495057" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M-44 -40 Q-42 -20 -26 -12" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.6" />
       <rect x="-22" y="-4" width="44" height="6" rx="3" fill="#495057" />
-      <path d="M-56 -56 A56 11 0 0 0 56 -56" fill="none" stroke="#495057" strokeWidth="4" />
     </>
   );
 }

@@ -250,6 +250,19 @@
   color: var(--accent);
 }
 
+/* Spacing letters apart would tear joined scripts (Arabic, Hindi's headline). */
+.word:is(:lang(ar), :lang(hi)) {
+  letter-spacing: normal;
+}
+
+/* Chinese: the pinyin under the characters, where the letter is marked. */
+.word-spelling {
+  display: block;
+  font-size: 0.6em;
+  font-weight: 600;
+  text-align: center;
+}
+
 .count-grid {
   display: flex;
   flex-direction: column;

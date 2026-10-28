@@ -6,11 +6,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Wolkenreise“ in Arabic. */
 export const TRANSLATION: StoryTranslation = {
+  title: "رحلة الغيمة",
   defaultTurn: "دورك الآن!",
   opening: ["أوه! أين الشمس؟", "إنها مختبئة خلف سحابة المطر الكبيرة.", "هيّا نُخرجها! هل نذهب معًا؟"],
   steps: [
     // 👋
     {
+      name: "التلويح لكيكي",
       situation: "مرحبًا! أنا تابسي. وهذه قطنة، غيمتي الصغيرة!",
       instruction: "ها هو كيكي قادم! نلوّح بأيدينا – هكذا!",
       turn: "هيّا نلوّح لكيكي معًا!",
@@ -19,6 +21,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐦
     {
+      name: "الرفرفة مثل العصفور",
       situation: "قطنة تريد أن تطير. هيّا نساعدها!",
       instruction: "نرفرف بذراعينا مثل العصفور – هكذا!",
       turn: "دورك الآن – هيّا نرفرف!",
@@ -27,6 +30,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ✈️
     {
+      name: "الانحناء تحت الطائرات",
       situation: "أوه، طائرات صغيرة قادمة!",
       instruction: "عندما تأتي طائرة، ننحني – هكذا!",
       turn: "حذارِ! هيّا ننحني!",
@@ -35,6 +39,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎈
     {
+      name: "لمس البالونات",
       situation: "بالونات كثيرة!",
       instruction: "نلمسها – بوب! هكذا!",
       turn: "دورك الآن – هيّا نلمسها!",
@@ -42,9 +47,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "قصاصات ملوّنة كثيرة!",
     },
     // 🪑
-    { instruction: "الآن نسرع! هيّا نجلس معًا – هكذا!", praise: "نتمسّك جيدًا!" },
+    { name: "الجلوس", instruction: "الآن نسرع! هيّا نجلس معًا – هكذا!", praise: "نتمسّك جيدًا!" },
     // ⭐
     {
+      name: "الميل في المنعطفات لالتقاط النجوم",
       situation: "هنا نجوم كثيرة معلّقة!",
       instruction: "نميل إلى الجانب ونأخذ النجمة – هكذا!",
       turn: "دورك الآن – هيّا نميل إلى الجانب!",
@@ -52,9 +58,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "أخذنا كل النجوم!",
     },
     // 🧍
-    { instruction: "ها هي سحابة المطر! هيّا نقف معًا – هكذا!", praise: "الآن نُخرج الشمس!" },
+    { name: "الوقوف", instruction: "ها هي سحابة المطر! هيّا نقف معًا – هكذا!", praise: "الآن نُخرج الشمس!" },
     // 🌧️
     {
+      name: "دفع غيمة المطر إلى الأعلى",
       situation: "هنا تمطر! والشمس هناك في الأعلى.",
       instruction: "ندفع السحابة إلى الأعلى بذراعينا – هكذا!",
       turn: "دورك الآن – هيّا ندفع معًا!",
@@ -63,6 +70,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌈
     {
+      name: "رسم قوس قزح",
       situation: "الآن ينقصنا قوس قزح فقط.",
       instruction: "نرسم بذراعنا قوسًا كبيرًا – هكذا!",
       turn: "دورك الآن – هيّا نرسم معًا!",
@@ -71,6 +79,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "مرحى!",
       situation: "الشمس تبتسم!",
       instruction: "الأيدي إلى الأعلى – مرحى!",
       turn: "هيّا معًا – مرحى!",
@@ -78,6 +87,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🏡
     {
+      name: "التلويح للوداع",
       situation: "قطنة تأخذنا إلى البيت.",
       instruction: "نلوّح مودّعين – هكذا!",
       turn: "هيّا نلوّح معًا!",

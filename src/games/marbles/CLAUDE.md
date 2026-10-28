@@ -6,18 +6,21 @@ was a game of its own for a while and is the first level here again, so marble r
 Twelve levels in turn, beginning with the one picked on the start screen; after each one „Menü“, „Nochmal“ or „Weiter“ (any key goes on; after the last level the first). Shared by the marble run and the
 machines: the points-along-a-way helpers in `path.ts`, the marble and rail drawings in `parts.tsx`, `useFrames`/`useAnyKey` in `level.ts`. "Alles fällt um" (`ToppleLevel.tsx`): everyday things (`things.tsx`) stand small to tall and topple onto each other like dominoes until the drum; each round picks other things. "Große Maschine" (`MachineLevel.tsx`, layout and timing in `machine.ts`): a Rube Goldberg machine through a 6900 px long playroom – one tap, and for about 30 seconds one thing sets off the next (marble, xylophone, bell, funnel, ten dominoes, a toy car through a loop onto a seesaw catapult, a beach ball down block stairs into a bucket, which pulls up a gate for the train, which presses the button for the jack-in-the-box); the camera follows whatever moves. Everything is a function of the seconds since the tap; in development `__machine.seek(seconds)` in the console jumps to a moment. Six more Rube Goldberg machines run the same way, each with its own world and no element repeated from another: „Verrückte Küche" (`kitchen.ts`, `KitchenLevel.tsx`), „Im Garten" (`garden.ts`), „Baustelle" (`building.ts`), „Zirkus" (`circus.ts`), „Raketenstart" (`space.ts`), „Licht-Kette" (`light.ts`, R-10: light instead of noise – a torch, a mirror, a disco ball, fireflies, fairy lights and a star lamp in a dark room; the night is a dark veil over the room (`Night`) with soft holes in its mask wherever something shines). They share the helpers in `machineKit.ts` (paths, rolling, hops, timeline, camera), the stage in `MachineStage.tsx` (clock, sounds, camera, tap) and wall pictures in `scenery.tsx`; in development `?level=garden` in the address opens one level directly.
 
-## Languages (German and Russian)
+## Languages (German, English, Chinese, Hindi, Spanish, Arabic, Russian)
 
 Kettenreaktion follows the app language (home page): start screen, settings, the level names and every spoken line.
 - Level names and first lines live in `content.ts` (`LEVEL_TEXTS`), used by the mode cards, the „Weiter“ button and each
-  picture's `aria-label` (`useLevelName`). The start screen's notes are inline `t({ de, ru })` in `MarbleGame.tsx`.
-- `say` (in `LevelProps`) and a machine event's `say` take a `Localized` line, `{ de, ru }`, written next to its moment;
-  `MarblePlay` picks the app language and speaks it with that language's voice. Never pass a bare German string.
-- Text drawn in a picture (the „START!“/„ПУСК!“ on the rocket's board) uses `useT()`; in files where `t` is the time,
+  picture's `aria-label` (`useLevelName`). The start screen's notes are inline `t({ de, en, zh, hi, es, ar, ru })` in `MarbleGame.tsx`.
+- `say` (in `LevelProps`) and a machine event's `say` take a `Localized` line, `{ de, en, zh, hi, es, ar, ru }`, written next to its moment;
+  `MarblePlay` speaks it through `spokenIn`: the app language with its voice, or the German line with the German voice where a translation is missing. Never pass a bare German string.
+- Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,
   name the helper differently (`tr`, or call `useT()(…)` directly).
-- New lines come in German only (`{ de: "…" }`); the Russian is added only when the user asks. When you change a German
-  line that has a Russian one, update or drop the Russian with it, so they never say different things.
-  `content.test.ts` checks every name, first line and machine line: German there, Russian (if any) in Cyrillic.
+- New lines come in German only (`{ de: "…" }`); translations are added only when the user asks. When you change a German
+  line that has translations, update or drop them with it, so they never say different things.
+  `content.test.ts` checks every name, first line and machine line: German there, Russian, Chinese, Hindi and Arabic (if
+  any) in their own script with no Latin letters, and a line with Russian has all five other languages too.
+- The game is „Chain Reaction“ / „连锁反应“ / „चेन रिएक्शन“ / „Reacción en cadena“ / „تفاعل متسلسل“. Arabic lines speak
+  as "we" (هيّا ن…), Hindi gives commands or says "let's" (चलो), Spanish says tú: nothing changes for a boy or a girl.
   A new machine goes into that test's list.
 
 ## Levels to join in

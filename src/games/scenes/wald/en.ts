@@ -1,0 +1,60 @@
+import type { SceneTranslation } from "../types";
+
+// The English words of the Wald picture: names, what each item says and the chain sentences.
+// Names are nouns without article, lower case; plural names are marked `plural`.
+
+/** „Wald“ in English. */
+export const EN: SceneTranslation = {
+  title: "Forest",
+  description: "Owl, woodpecker, deer and fox in the clearing by the stream.",
+  items: {
+    sonne: { name: "sun", sentences: ["The sun shines through the trees.", "The sun is smiling."] },
+    wolke: { name: "cloud", sentences: ["The cloud makes it rain. Pitter, patter!", "After the rain the mushrooms grow."] },
+    birke: { name: "birch tree", sentences: ["The birch tree has a white trunk.", "The birch leaves sparkle in the wind."] },
+    specht: { name: "woodpecker", sentences: ["Tock, tock, tock! The woodpecker knocks on the tree.", "The woodpecker has a red cap."] },
+    vogelnest: { name: "bird's nest", sentences: ["Peep, peep! The baby birds are hungry.", "Mommy brings a worm."] },
+    eiche: { name: "oak tree", sentences: ["The oak tree is old and thick.", "Plop! Acorns fall down."] },
+    eule: { name: "owl", sentences: ["Hoo-hoo! The owl turns its head.", "The owl lives in the hole in the tree.", "The owl has big eyes."] },
+    hirsch: { name: "stag", sentences: ["Bellow! The stag calls very loudly.", "The stag has big antlers."] },
+    tanne: { name: "fir tree", sentences: ["The fir tree is tall and green.", "Plop! A pine cone falls down."] },
+    kuckuck: { name: "cuckoo", sentences: ["Cuckoo, cuckoo! A call from the forest.", "The cuckoo sits on the fir tree."] },
+    ameisenhaufen: { name: "anthill", sentences: ["Lots and lots of ants live in the anthill.", "The ants walk one after another."] },
+    dachs: { name: "badger", sentences: ["The badger peeks out of its den.", "Sniff, sniff! The badger has a striped nose."] },
+    eichhoernchen: { name: "squirrel", sentences: ["The squirrel hides a nut.", "The squirrel has a bushy tail."] },
+    biber: { name: "beaver", sentences: ["The beaver nibbles on a branch.", "Splash! The beaver slaps its tail.", "The beaver builds a dam."] },
+    reh: { name: "deer", sentences: ["Whee! The deer jumps.", "The deer has big ears."] },
+    fuchs: { name: "fox", sentences: ["Hop! The fox jumps up high.", "The fox has a bushy tail.", "The fox barks: Woof!"] },
+    rehkitz: { name: "fawn", sentences: ["The fawn is the deer's baby.", "Squeak! The fawn has white spots."] },
+    wildschwein: { name: "wild boar", sentences: ["Oink, oink! The wild boar digs in the dirt.", "The wild boar is looking for acorns."] },
+    frischlinge: { name: "boar piglets", plural: true, sentences: ["The boar piglets are the wild boar's babies.", "The boar piglets have stripes."] },
+    bruecke: { name: "bridge", sentences: ["Clop, clop! The bridge goes over the stream.", "The water splashes under the bridge."] },
+    holzstapel: { name: "woodpile", sentences: ["The forester stacked up the wood.", "Rumble, tumble! The logs wobble."] },
+    hirschkaefer: { name: "stag beetle", sentences: ["The stag beetle has big pincers.", "Snap! The stag beetle opens and closes its pincers."] },
+    wegweiser: { name: "signpost", sentences: ["The signpost shows the way.", "This way to the forest, and that way to the stream."] },
+    rabe: { name: "raven", sentences: ["Caw, caw! The raven calls.", "The raven is all black."] },
+    kind: { name: "child", sentences: ["The child collects colorful leaves.", "Hop! The child jumps into the leaves.", "Hello! The child waves."] },
+    hase: { name: "rabbit", sentences: ["Hop, hop! The rabbit hops.", "The rabbit nibbles a leaf."] },
+    foersterin: {
+      name: "forester",
+      sentences: ["The forester looks through her binoculars.", "The forester takes care of the forest.", "Hello! The forester whistles a song."],
+    },
+    libelle: { name: "dragonfly", sentences: ["Zzzzt! The dragonfly flies over the stream.", "The dragonfly is blue."] },
+    fisch: { name: "fish", sentences: ["Splash! The fish jumps out of the water.", "The fish swims in the stream. Blub!"] },
+    igel: { name: "hedgehog", sentences: ["The hedgehog rolls up into a ball.", "The hedgehog has lots of spines.", "Sniff! The hedgehog carries an apple."] },
+    baumstumpf: { name: "tree stump", sentences: ["Knock, knock! Who lives in the tree stump?", "Little mushrooms grow on the tree stump."] },
+    maus: { name: "mouse", sentences: ["Squeak! The mouse lives in the tree stump.", "Hello, little mouse!"] },
+    beerenstrauch: { name: "berry bush", sentences: ["Blueberries and raspberries grow on the bush.", "Mmm, the berries are yummy!"] },
+    schmetterling: { name: "butterfly", sentences: ["The butterfly is blue.", "The butterfly flutters over the berries."] },
+    frosch: { name: "frog", sentences: ["Ribbit! The frog sits on a stone.", "Zap! The frog catches a fly."] },
+    fliegenpilz: { name: "toadstool", sentences: ["The toadstool is red with white spots.", "The toadstool is poisonous. Just look!"] },
+    farn: { name: "fern", sentences: ["The fern has long green leaves.", "The fern unrolls its leaf."] },
+    marienkaefer: { name: "ladybug", sentences: ["The ladybug is red with black spots.", "Fly, ladybug, fly!"] },
+    schnecke: { name: "snail", sentences: ["The snail crawls very slowly.", "The snail carries its house on its back."] },
+    maulwurf: { name: "mole", sentences: ["Oops! The mole peeks out of the ground.", "The mole digs with its shovel hands."] },
+  },
+  chains: [
+    ["The owl wakes up: Hoo-hoo! Who is knocking?", "And the cuckoo calls: Cuckoo!"],
+    ["The boar piglets oink along.", "And the badger looks: What is going on?"],
+    ["The mouse peeks out: Who is knocking?", "And the hedgehog quickly rolls up into a ball."],
+  ],
+};

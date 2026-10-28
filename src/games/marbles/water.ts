@@ -416,7 +416,18 @@ export function buildWater() {
     at(pool.spray, { sound: playDrops });
     at(pool.spray + 1.2, { sound: playDrops });
     pool.quacks.forEach((t) => at(t, { sound: playQuack }));
-    at(pool.sparkle, { sound: playTwinkle, say: { de: "Quak! Da sind die Entenbabys!", ru: "Кря! А вот и утята!" } });
+    at(pool.sparkle, {
+      sound: playTwinkle,
+      say: {
+        de: "Quak! Da sind die Entenbabys!",
+        en: "Quack! Here are the ducklings!",
+        zh: "嘎嘎！小鸭子们来啦！",
+        hi: "क्वैक! ये रहे बत्तख के बच्चे!",
+        es: "¡Cuac! ¡Ahí están los patitos!",
+        ar: "كواك! ها هي البطّات الصغيرة!",
+        ru: "Кря! А вот и утята!",
+      },
+    });
     at(pool.done, { done: true });
   });
   /** How high a duckling hops (0 to 1) when it quacks, `t` seconds into the last stretch. */

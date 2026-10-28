@@ -6,11 +6,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Schatzinsel“ in Arabic. */
 export const TRANSLATION: StoryTranslation = {
+  title: "جزيرة الكنز",
   defaultTurn: "دورك الآن!",
   opening: ["هناك، بعيدًا – جزيرة الكنز!", "وهناك كنز!", "هل نذهب معًا؟"],
   steps: [
     // 👋
     {
+      name: "التلويح لكيكي",
       situation: "أهلًا! أنا تابسي. وهذا كيكي، ببغائي!",
       instruction: "ألوّح لكيكي بيدي – هكذا!",
       turn: "هيّا نلوّح لكيكي معًا!",
@@ -19,6 +21,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎣
     {
+      name: "رمي صنارة الصيد",
       situation: "الآن نصطاد السمك!",
       instruction: "نرفع الصنّارة فوق الكتف – ونرميها بعيدًا، هكذا!",
       turn: "دورك الآن – هيّا نرمي الصنّارة!",
@@ -26,9 +29,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "سمك كثير!",
     },
     // 🪑
-    { instruction: "هيّا نجلس معًا – هكذا!", praise: "هيّا بنا!" },
+    { name: "الجلوس", instruction: "هيّا نجلس معًا – هكذا!", praise: "هيّا بنا!" },
     // 🛶
     {
+      name: "التجديف",
       situation: "أولي يسبح – إلى جزيرة الكنز!",
       instruction: "المجداف في الماء يمينًا – ثم يسارًا، هكذا.",
       turn: "هيّا نجدّف معًا!",
@@ -36,9 +40,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "وصلنا! أولي على الشاطئ.",
     },
     // 🧍
-    { instruction: "نحن على الجزيرة! هيّا نقف معًا – هكذا!", praise: "هيّا نكمل!" },
+    { name: "الوقوف", instruction: "نحن على الجزيرة! هيّا نقف معًا – هكذا!", praise: "هيّا نكمل!" },
     // 🦂
     {
+      name: "الدبدبة على العقارب",
       situation: "أوه! عقارب تزحف على أولي!",
       instruction: "نرفع القدم – ونضرب الأرض بقوة وبسرعة، هكذا!",
       turn: "دورك الآن – هيّا ندبدب معًا!",
@@ -47,6 +52,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌉
     {
+      name: "القفز فوق الجسر",
       situation: "جسر صغير! وفوقه صناديق كثيرة تطفو.",
       instruction: "هوب – ونضرب الصندوق بالرأس، بوم!",
       turn: "دورك الآن – هيّا نقفز معًا!",
@@ -55,6 +61,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪵
     {
+      name: "الانحناء تحت الجذع",
       situation: "انتباه! هناك جذع يتأرجح في الأعلى.",
       instruction: "عندما يأتي، ننحني – هكذا!",
       turn: "إنه قادم! ننحني!",
@@ -63,6 +70,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥁
     {
+      name: "قرع الطبل",
       situation: "أوه، طيور كثيرة على الطريق! وهناك طبلتان معلّقتان.",
       instruction: "يسارًا – بوم! ويمينًا – بوم! هكذا!",
       turn: "دورك الآن – هيّا نطبّل معًا!",
@@ -71,6 +79,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ⚙️
     {
+      name: "تدوير المِقبض",
       situation: "بوّابة! وهناك مِقبض.",
       instruction: "ندير المقبض – ندور وندور، هكذا!",
       turn: "دورك الآن – هيّا ندير معًا!",
@@ -79,6 +88,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥥
     {
+      name: "خطوة جانبًا",
       situation: "أوه، القرد يُسقط جوز الهند! إنه يتدحرج نحونا.",
       instruction: "خطوة كبيرة إلى الجانب – ثم نعود. هكذا!",
       turn: "جوز هند! خطوة كبيرة إلى الجانب!",
@@ -87,6 +97,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦵
     {
+      name: "الساق إلى الأعلى وجوز الهند تحتها",
       situation: "الآن يتدحرج من اليسار!",
       instruction: "نرفع الرِّجل – وجوز الهند يمرّ من تحتها. هكذا!",
       turn: "دورك الآن – الرِّجل إلى الأعلى!",
@@ -95,6 +106,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦶
     {
+      name: "الساقان مفتوحتان وجوز الهند بينهما",
       situation: "والآن يأتي من الوسط!",
       instruction: "نفتح الرِّجلين واسعًا – وجوز الهند يمرّ بينهما. هكذا!",
       turn: "دورك الآن – الرِّجلان واسعًا!",
@@ -103,6 +115,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐒
     {
+      name: "تفادي جوز الهند",
       situation: "أوه، قرود! إنها ترمي جوز الهند!",
       instruction: "نتنحّى ببطء شديد – إلى الجانب، هكذا!",
       turn: "دورك الآن – هيّا نتنحّى!",
@@ -111,6 +124,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🍎
     {
+      name: "قطف تفاحة",
       situation: "شجرة تفاح! وهناك سلّة.",
       instruction: "نمدّ أيدينا عاليًا ونقطف – هكذا!",
       turn: "دورك الآن – هيّا نقطف تفاحة!",
@@ -119,6 +133,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🧩
     {
+      name: "لغز الصور",
       situation: "باب عليه ثلاث صور. لغز!",
       instruction: "نقلّد الصور. أولًا نتمدّد عاليًا جدًا – هكذا!",
       turn: "دورك الآن – عاليًا جدًا!",
@@ -127,6 +142,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🕸️
     {
+      name: "إزاحة خيوط العنكبوت",
       situation: "أوه، خيوط عنكبوت كثيرة! لا نستطيع المرور.",
       instruction: "نرفع اليد – ونلوّح بعيدًا إلى الجانب، هكذا!",
       turn: "دورك الآن – هيّا نلوّح معًا!",
@@ -135,6 +151,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪢
     {
+      name: "سحب الصندوق بالحبل",
       situation: "ها هو صندوق الكنز يطفو!",
       instruction: "نسحب الحبل، يدًا بعد يد – هكذا!",
       turn: "هيّا نسحب معًا!",
@@ -143,6 +160,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🔑
     {
+      name: "تدوير المفتاح",
       situation: "أوه، قفل! كيكي يُحضر المفتاح.",
       instruction: "نأخذه، ندخله، ونديره – هكذا!",
       turn: "دورك الآن – هيّا ندير المفتاح!",
@@ -151,6 +169,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 💰
     {
+      name: "رمي الذهب",
       situation: "أوه! ذهب! السرطانات تُحضر لنا الصندوق. أقفز إلى الأسفل!",
       instruction: "نُدخل اليد عميقًا – ونرمي النقود عاليًا! هكذا!",
       turn: "دورك الآن – ندخل اليد ونرمي عاليًا!",
@@ -159,6 +178,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "مرحى!",
       situation: "وجدنا الكنز!",
       instruction: "الأيدي إلى الأعلى – مرحى!",
       turn: "وأنت أيضًا – مرحى!",
@@ -167,6 +187,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌅
     {
+      name: "التلويح للوداع",
       situation: "الشمس تغرب.",
       instruction: "ألوّح لكيكي: مع السلامة – هكذا!",
       turn: "هيّا نلوّح معًا مرة أخرى!",

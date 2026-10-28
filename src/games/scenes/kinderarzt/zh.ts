@@ -1,0 +1,55 @@
+import type { SceneTranslation } from "../types";
+
+// The paediatrician picture in Chinese (Mandarin, simplified characters): the title, every item's name and
+// sentences and the chain sentences. Names are bare nouns, without measure word or 这/那.
+
+/** „Kinderarzt“ in Chinese. */
+export const ZH: SceneTranslation = {
+  title: "儿科医生",
+  description: "体重秤、听诊器，最后还有一张贴纸。",
+  items: {
+    mobile: { name: "风铃", sentences: ["风铃在转。叮，叮！", "云朵、星星和月亮荡呀荡。"] },
+    fenster: { name: "窗户", sentences: ["窗户打开了。好新鲜的空气！", "叽叽！一只小鸟往里看。"] },
+    hampelmann: { name: "拉线小人", sentences: ["拉一拉绳子！拉线小人动起来。", "手举高，腿抬高！"] },
+    uhr: { name: "钟", sentences: ["滴答，滴答！钟在走。", "指针转呀转。"] },
+    tuer: { name: "门", sentences: ["咚咚！是谁呀？", "门开了。你好，请进！"] },
+    sehtafel: { name: "视力表", sentences: ["你看见什么？一个太阳、一座房子、一辆汽车！", "图片越来越小。"] },
+    messlatte: { name: "身高尺", sentences: ["长颈鹿量量你有多高。", "嗖！尺子滑下来了。", "你已经这么高啦！"] },
+    schrank: { name: "柜子", sentences: ["柜门打开了。柜子里有什么？", "有创可贴和绷带。"] },
+    seifenspender: { name: "洗手液", sentences: ["按一按！泡泡出来啦。", "先洗手！"] },
+    lampe: { name: "灯", sentences: ["咔嗒！灯亮了。", "现在好亮呀。"] },
+    papa: { name: "爸爸", sentences: ["爸爸一边等一边看书。", "啊——！爸爸打个哈欠，伸个懒腰。"] },
+    waschbecken: { name: "洗手池", sentences: ["哗啦啦！水在流。", "柜子里有毛巾和一只小鸭子。还有谁呀？"] },
+    aquarium: { name: "鱼缸", sentences: ["咕噜，咕噜！小鱼在游。", "宝箱打开了。", "下面的柜子里放着鱼食。"] },
+    waage: { name: "体重秤", sentences: ["站上去！嘀嘀！", "指针在转。你有多重呀？"] },
+    wasserspender: { name: "饮水机", sentences: ["咕嘟，咕嘟！一杯水。", "咕噜！泡泡往上冒。"] },
+    arzthelferin: { name: "护士", sentences: ["你好！护士在挥手。", "她在哼歌：啦啦啦！"] },
+    empfang: { name: "前台", sentences: ["在这里登记。", "抽屉打开了。里面有笔！"] },
+    telefon: { name: "电话", sentences: ["铃铃！电话响啦。", "你好，这里是儿科医生！"] },
+    aufkleber: { name: "贴纸", sentences: ["最后有一张贴纸！", "星星和爱心飞出来啦。", "你喜欢哪一张？"] },
+    liege: { name: "检查床", sentences: ["你躺到检查床上。", "沙沙！纸在滚。", "抽屉开了，又关上。"] },
+    kind: { name: "小朋友", sentences: ["小朋友坐在检查床上。嘻嘻！", "小朋友好勇敢。", "膝盖上贴着创可贴。"] },
+    kinderwagen: { name: "婴儿车", sentences: ["婴儿车摇呀摇。", "小宝宝笑了：嘻嘻！"] },
+    spielkiste: { name: "玩具箱", sentences: ["盖子打开了。", "嘣！一只兔子跳出来。", "箱子里有一个球和一只小鸭子。"] },
+    aerztin: { name: "医生", sentences: ["你好！我是儿科医生。", "医生挥挥手，笑一笑。", "在这里你会好起来的。"] },
+    rollwagen: { name: "推车", sentences: ["吱吱！推车滚起来了。", "抽屉一个接一个地打开。"] },
+    stethoskop: { name: "听诊器", sentences: ["咚咚，咚咚！这是你的心跳声。", "医生用听诊器听一听。"] },
+    ohrenlampe: { name: "耳镜", sentences: ["叮！灯亮了。", "医生用耳镜看看耳朵。", "全都干干净净！"] },
+    pflaster: { name: "创可贴", sentences: ["盒子打开了。创可贴！", "一张有星星的创可贴。好多颜色！"] },
+    muelleimer: { name: "垃圾桶", sentences: ["踩一下！盖子打开了。", "纸飞进垃圾桶。"] },
+    schaukelpferd: { name: "摇摇马", sentences: ["驾，驾！摇摇马摇起来。", "咴——！小马点点头。"] },
+    pflanze: { name: "盆栽", sentences: ["沙沙，沙沙！叶子在晃。", "一只瓢虫在爬。"] },
+    arzttasche: { name: "医药箱", sentences: ["咔嗒！医药箱打开了。", "里面有一把小锤子。咚，咚！"] },
+    bauklotz: { name: "积木塔", sentences: ["哎呀！积木塔在晃。", "可是它没有倒！"] },
+    teddy: { name: "小熊", sentences: ["小熊缠着绷带。", "小熊挥挥手。已经不疼啦！", "小熊又好起来啦。"] },
+    kugelbahn: { name: "滚珠轨道", sentences: ["小球滚来滚去。", "咔哒，咔哒！小球到底下啦。"] },
+    ball: { name: "皮球", sentences: ["嘣，嘣！皮球跳起来。", "皮球的颜色真多。"] },
+    feuerwehr: { name: "消防车", sentences: ["呜哇呜哇！消防车开走啦。", "云梯升起来了。"] },
+    bilderbuch: { name: "图画书", sentences: ["书页翻过去。沙沙！", "书里有一颗爱心和一颗星星。"] },
+  },
+  chains: [
+    ["护士接电话。", "下一个小朋友已经来啦！"],
+    ["医生听一听：咚咚！一切都好。", "小朋友笑了：好痒呀！"],
+    ["哎呀！积木塔在晃。", "消防车开走啦：呜哇呜哇！"],
+  ],
+};

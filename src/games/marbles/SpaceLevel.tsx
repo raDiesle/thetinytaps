@@ -805,7 +805,7 @@ function SlotHole() {
 /** The board wakes up when the iron ball drops into its slot, then counts down: three lamps one after the other, then all green for the start. */
 function CountdownBoard({ space, t }: { space: Space; t: number }) {
   // The word on the screen at lift-off, as the voice says it (`t` is the time here).
-  const liftWord = useT()({ de: "START!", ru: "ПУСК!" });
+  const liftWord = useT()({ de: "START!", en: "LIFTOFF!", zh: "发射！", hi: "उड़ान!", es: "¡DESPEGUE!", ar: "انطلاق!", ru: "ПУСК!" });
   const { x, y, w, h } = BOARD;
   const step = space.countAt(t);
   const awake = t >= space.tWake;

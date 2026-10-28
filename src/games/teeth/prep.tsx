@@ -268,10 +268,34 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
       role="img"
       aria-label={
         part === "brush"
-          ? t({ de: "Die Zahnbürste steht im Becher am Waschbecken", ru: "Зубная щётка стоит в стаканчике у раковины" })
+          ? t({
+              de: "Die Zahnbürste steht im Becher am Waschbecken",
+              en: "The toothbrush stands in the cup by the sink",
+              zh: "牙刷放在洗手池边的杯子里",
+              hi: "टूथब्रश सिंक के पास गिलास में खड़ा है",
+              es: "El cepillo de dientes está en el vaso junto al lavabo",
+              ar: "فرشاة الأسنان في الكوب بجانب المغسلة",
+              ru: "Зубная щётка стоит в стаканчике у раковины",
+            })
           : part === "paste"
-            ? t({ de: "Zahnpasta kommt auf die Zahnbürste", ru: "Зубная паста ложится на щётку" })
-            : t({ de: "Die Zahnbürste wird ausgespült und kommt zurück in den Becher", ru: "Щётку споласкивают и ставят обратно в стаканчик" })
+            ? t({
+                de: "Zahnpasta kommt auf die Zahnbürste",
+                en: "Toothpaste goes onto the toothbrush",
+                zh: "牙膏挤到牙刷上",
+                hi: "टूथपेस्ट ब्रश पर लगता है",
+                es: "La pasta de dientes va sobre el cepillo",
+                ar: "المعجون يوضع على الفرشاة",
+                ru: "Зубная паста ложится на щётку",
+              })
+            : t({
+                de: "Die Zahnbürste wird ausgespült und kommt zurück in den Becher",
+                en: "The toothbrush is rinsed and goes back into the cup",
+                zh: "牙刷冲干净后放回杯子里",
+                hi: "टूथब्रश धोकर वापस गिलास में रखा जाता है",
+                es: "El cepillo se enjuaga y vuelve al vaso",
+                ar: "تُشطف الفرشاة وتعود إلى الكوب",
+                ru: "Щётку споласкивают и ставят обратно в стаканчик",
+              })
       }
     >
       <defs>

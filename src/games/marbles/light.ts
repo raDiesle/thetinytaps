@@ -211,7 +211,17 @@ export function buildLight() {
   const dark = (t: number) => 0.68 - 0.5 * easeInOut(seg(t, tLamp + 0.4, tLamp + 2.6));
   at(tLamp, { sound: playMusicbox });
   at(tLamp + 0.7, { sound: playTwinkle });
-  at(tLamp + 1.2, { say: { de: "Licht an! Alles funkelt!", ru: "Свет горит! Всё сверкает!" } });
+  at(tLamp + 1.2, {
+    say: {
+      de: "Licht an! Alles funkelt!",
+      en: "Lights on! Everything sparkles!",
+      zh: "灯亮啦！一切都闪闪发光！",
+      hi: "रोशनी जल गई! सब चमक रहा है!",
+      es: "¡Luz encendida! ¡Todo brilla!",
+      ar: "النور مضاء! كل شيء يلمع!",
+      ru: "Свет горит! Всё сверкает!",
+    },
+  });
   at(tOwl, { sound: playHoot });
   at(tOwl + 0.6, { sound: playTwinkle });
   at(tDone, { done: true });

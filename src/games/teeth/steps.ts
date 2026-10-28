@@ -1,12 +1,17 @@
-import type { TargetLanguage } from "@/content/targetLanguages";
+import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, type Spoken, spokenIn } from "@/lib/language";
 import { ALL_TEETH, type Jaw, type Side, type Surface, type ToothId, type View } from "./jaw";
+import { STEP_TEXTS_AR } from "./steps.ar";
+import { STEP_TEXTS_EN } from "./steps.en";
+import { STEP_TEXTS_ES } from "./steps.es";
+import { STEP_TEXTS_HI } from "./steps.hi";
 import { STEP_TEXTS_RU } from "./steps.ru";
+import { STEP_TEXTS_ZH } from "./steps.zh";
 
 /** How the brush moves: back and forth on the chewing surfaces, small circles outside, wiping from gum to tooth inside. */
 export type Motion = "scrub" | "circle" | "wipe";
 
-/** Names the step, so its translations (steps.ru.ts) can find it. */
+/** Names the step, so its translations (steps.<language>.ts) can find it. */
 export type StepId = "lower-top" | "upper-top" | "outer-left" | "outer-front" | "outer-right" | "inner-lower" | "inner-upper";
 
 /** What is shown and said in a step, in one language. */
@@ -39,7 +44,15 @@ const FLAT = { upper: 0, lower: 0 };
 const CLOSED_FRONT: View = { open: 0, pitch: 6, yaw: 0, look: [0, 8, 100], zoom: 1.3, tilt: FLAT };
 
 /** The routine German kindergartens teach, for the grown-ups. */
-export const KAI: Localized = { de: "Kauflächen, Außenflächen, Innenflächen", ru: "жевательные, наружные, внутренние поверхности" };
+export const KAI: Localized = {
+  de: "Kauflächen, Außenflächen, Innenflächen",
+  en: "chewing surfaces, outer surfaces, inner surfaces",
+  zh: "咬合面、外侧面、内侧面",
+  hi: "चबाने वाली सतह, बाहरी सतह, अंदरूनी सतह",
+  es: "superficies de masticación, exteriores, interiores",
+  ar: "أسطح المضغ، الأسطح الخارجية، الأسطح الداخلية",
+  ru: "жевательные, наружные, внутренние поверхности",
+};
 
 export const STEPS: Step[] = [
   {
@@ -121,9 +134,19 @@ export const STEPS: Step[] = [
   },
 ];
 
+/** The step texts in the other languages (steps.<language>.ts), by language and step id. */
+export const STEP_TRANSLATIONS: Partial<Record<TargetLanguageId, Partial<Record<StepId, Partial<StepTexts>>>>> = {
+  en: STEP_TEXTS_EN,
+  zh: STEP_TEXTS_ZH,
+  hi: STEP_TEXTS_HI,
+  es: STEP_TEXTS_ES,
+  ar: STEP_TEXTS_AR,
+  ru: STEP_TEXTS_RU,
+};
+
 /** Title, hint or cue of `step` in `language` and the voice for it; the German one with the German voice where there is no translation. */
 export const stepText = (step: Step, key: keyof StepTexts, language: TargetLanguage): Spoken =>
-  spokenIn({ de: step[key], ru: STEP_TEXTS_RU[step.id]?.[key] }, language);
+  spokenIn({ de: step[key], [language.id]: language.id === "de" ? step[key] : STEP_TRANSLATIONS[language.id]?.[step.id]?.[key] }, language);
 
 /** While the monsters arrive and when everything is clean: a big grin. */
 export const GRIN_VIEW = CLOSED_FRONT;

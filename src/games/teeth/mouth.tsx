@@ -232,7 +232,15 @@ const jawOrder = (view: View): Jaw[] => {
 };
 
 export function Mouth({ view, zone, monsters, brush, happy, daytime, action, paused, free, onTickle }: MouthProps) {
-  const pictureLabel = useT()({ de: "Ein Kindergesicht im Spiegel beim Zähneputzen", ru: "Лицо ребёнка в зеркале во время чистки зубов" });
+  const pictureLabel = useT()({
+    de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
+    en: "A child's face in the mirror while brushing teeth",
+    zh: "刷牙时镜子里孩子的脸",
+    hi: "दाँत साफ़ करते समय आईने में एक बच्चे का चेहरा",
+    es: "La cara de un niño en el espejo mientras se lava los dientes",
+    ar: "وجه طفل في المرآة أثناء تنظيف الأسنان",
+    ru: "Лицо ребёнка в зеркале во время чистки зубов",
+  });
   const model = useMemo(() => buildMouth(view.open), [view.open]);
   const all = projectors(view);
   const project = all.face;

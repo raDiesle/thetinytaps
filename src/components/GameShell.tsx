@@ -73,7 +73,11 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   const t = useT();
   const category = categoryOf(location.pathname);
   const back = backHref ?? (category ? categoryHref(category) : "/");
-  const backText = backLabel ?? (category ? t(category.title) : t({ de: "Alle Spiele", ru: "Все игры" }));
+  const backText =
+    backLabel ??
+    (category
+      ? t(category.title)
+      : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
   const [playing, setPlaying] = useState(false);
   // The panel opened below the two buttons, if any: folded away by default, so the start screen stays short.
   const [panel, setPanel] = useState<"info" | "settings" | null>(null);
@@ -151,7 +155,18 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
       <div ref={playArea} className="play-area" onPointerDownCapture={unlockAudio}>
         {playtime.goodNight ? <GoodNight /> : <LeaveGame value={stop}>{children}</LeaveGame>}
         {!playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
-        <ExitButton onExit={stop} label={t({ de: "Zurück zum Menü", ru: "Назад в меню" })} />
+        <ExitButton
+          onExit={stop}
+          label={t({
+            de: "Zurück zum Menü",
+            ru: "Назад в меню",
+            en: "Back to menu",
+            zh: "返回菜单",
+            hi: "मेन्यू पर वापस",
+            es: "Volver al menú",
+            ar: "العودة إلى القائمة",
+          })}
+        />
       </div>
     );
   }
@@ -179,14 +194,14 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
             open={panel === "info"}
             onClick={() => setPanel(panel === "info" ? null : "info")}
             emoji="ℹ️"
-            label={t({ de: "Über das Spiel", ru: "Об игре" })}
+            label={t({ de: "Über das Spiel", ru: "Об игре", en: "About the game", zh: "关于游戏", hi: "खेल के बारे में", es: "Sobre el juego", ar: "عن اللعبة" })}
           />
           {settings && (
             <PanelButton
               open={panel === "settings"}
               onClick={() => setPanel(panel === "settings" ? null : "settings")}
               emoji="⚙️"
-              label={t({ de: "Einstellungen", ru: "Настройки" })}
+              label={t({ de: "Einstellungen", ru: "Настройки", en: "Settings", zh: "设置", hi: "सेटिंग्स", es: "Ajustes", ar: "الإعدادات" })}
             />
           )}
         </div>
@@ -196,8 +211,30 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
       {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
           cards leave (data-spread), so the back link and the grown-ups' buttons stay in the top row. */}
       {modes ? (
-        <section className="mode-picker" data-spread aria-label={t({ de: "Spielart wählen", ru: "Выбрать игру" })}>
-          <h2 className="mode-heading">{t({ de: "Was spielen wir?", ru: "Во что играем?" })}</h2>
+        <section
+          className="mode-picker"
+          data-spread
+          aria-label={t({
+            de: "Spielart wählen",
+            ru: "Выбрать игру",
+            en: "Choose a way to play",
+            zh: "选择玩法",
+            hi: "खेलने का तरीका चुनें",
+            es: "Elegir modo de juego",
+            ar: "اختيار طريقة اللعب",
+          })}
+        >
+          <h2 className="mode-heading">
+            {t({
+              de: "Was spielen wir?",
+              ru: "Во что играем?",
+              en: "What shall we play?",
+              zh: "我们玩什么？",
+              hi: "क्या खेलें?",
+              es: "¿A qué jugamos?",
+              ar: "ماذا نلعب؟",
+            })}
+          </h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {modes.map((m) => (
@@ -211,7 +248,11 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
                   <span className="game-go" aria-hidden>
                     ▶
                   </span>
-                  {m.id === mode && modes.length > 1 && <span className="badge">{t({ de: "zuletzt", ru: "в прошлый раз" })}</span>}
+                  {m.id === mode && modes.length > 1 && (
+                    <span className="badge">
+                      {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
+                    </span>
+                  )}
                 </button>
               </li>
             ))}
@@ -222,7 +263,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
           <span className="start-icon" aria-hidden>
             ▶
           </span>
-          {t({ de: "Los geht’s!", ru: "Поехали!" })}
+          {t({ de: "Los geht’s!", ru: "Поехали!", en: "Let’s go!", zh: "出发！", hi: "चलो!", es: "¡Vamos!", ar: "هيّا بنا!" })}
         </button>
       )}
       <PlaytimeNote />
@@ -243,10 +284,20 @@ function PlaytimeNote() {
         ? t({
             de: `Spielzeit heute: ${playedMinutes} von ${settings.minutes} Min.`,
             ru: `Время игры сегодня: ${playedMinutes} из ${settings.minutes} мин.`,
+            en: `Play time today: ${playedMinutes} of ${settings.minutes} min`,
+            zh: `今天的游戏时间：${playedMinutes} / ${settings.minutes} 分钟`,
+            hi: `आज खेलने का समय: ${settings.minutes} में से ${playedMinutes} मिनट`,
+            es: `Tiempo de juego hoy: ${playedMinutes} de ${settings.minutes} min`,
+            ar: `وقت اللعب اليوم: ${playedMinutes} من ${settings.minutes} دقيقة`,
           })
         : t({
             de: `Spiele heute: ${Math.min(played.games, settings.games)} von ${settings.games}`,
             ru: `Игры сегодня: ${Math.min(played.games, settings.games)} из ${settings.games}`,
+            en: `Games today: ${Math.min(played.games, settings.games)} of ${settings.games}`,
+            zh: `今天的游戏：${Math.min(played.games, settings.games)} / ${settings.games} 局`,
+            hi: `आज के खेल: ${settings.games} में से ${Math.min(played.games, settings.games)}`,
+            es: `Juegos hoy: ${Math.min(played.games, settings.games)} de ${settings.games}`,
+            ar: `ألعاب اليوم: ${Math.min(played.games, settings.games)} من ${settings.games}`,
           })}
     </p>
   );
@@ -286,7 +337,15 @@ function Dusk({ level }: { level: number }) {
 function GoodNight() {
   const t = useT();
   const language = useAppLanguage();
-  const sentence = t({ de: "Gute Nacht! Die Spielzeit ist vorbei.", ru: "Спокойной ночи! Время игры закончилось." });
+  const sentence = t({
+    de: "Gute Nacht! Die Spielzeit ist vorbei.",
+    ru: "Спокойной ночи! Время игры закончилось.",
+    en: "Good night! Play time is over.",
+    zh: "晚安！游戏时间结束了。",
+    hi: "शुभ रात्रि! खेलने का समय ख़त्म हो गया।",
+    es: "¡Buenas noches! Se acabó el tiempo de juego.",
+    ar: "ليلة سعيدة! انتهى وقت اللعب.",
+  });
   useEffect(() => {
     playLullaby();
     const timer = setTimeout(() => speak(sentence, language.speechLang, { rate: 0.7 }), 1200);
@@ -306,11 +365,18 @@ function GoodNight() {
       <span className="good-night-sleeper" aria-hidden>
         🧸<span className="good-night-zzz">💤</span>
       </span>
-      <p className="good-night-text">{t({ de: "Gute Nacht!", ru: "Спокойной ночи!" })}</p>
+      <p className="good-night-text">
+        {t({ de: "Gute Nacht!", ru: "Спокойной ночи!", en: "Good night!", zh: "晚安！", hi: "शुभ रात्रि!", es: "¡Buenas noches!", ar: "ليلة سعيدة!" })}
+      </p>
       <p className="good-night-hint">
         {t({
           de: "Die Spielzeit ist vorbei. Zum Beenden ✕ oben rechts gedrückt halten.",
           ru: "Время игры закончилось. Чтобы выйти, удерживайте ✕ справа вверху.",
+          en: "Play time is over. To leave, hold ✕ at the top right.",
+          zh: "游戏时间结束了。按住右上角的 ✕ 即可退出。",
+          hi: "खेलने का समय ख़त्म हो गया। बाहर निकलने के लिए ऊपर दाईं ओर ✕ दबाए रखें।",
+          es: "Se acabó el tiempo de juego. Para salir, mantenga pulsada la ✕ arriba a la derecha.",
+          ar: "انتهى وقت اللعب. للخروج اضغطوا مطولًا على ✕ في الأعلى يمينًا.",
         })}
       </p>
     </div>
@@ -367,7 +433,7 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   return (
     <div className={`exit-corner${hint || holding ? " hinted" : ""}`} data-tap-keep>
       <span className="exit-hint" aria-hidden>
-        {label} · {t({ de: "halten", ru: "удерживать" })}
+        {label} · {t({ de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })}
       </span>
       {/* On phones and tablets only to get back into fullscreen (CSS): a child's finger must not end it. */}
       <FullscreenButton className="play-fullscreen" playing />
@@ -375,7 +441,7 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}
         style={{ "--hold-ms": `${EXIT_DELAY_MS}ms` } as CSSProperties}
-        aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать" })})`}
+        aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })})`}
         onPointerDown={(e: PointerEvent<HTMLButtonElement>) => {
           // Keep the game from reacting to the tap on the button.
           e.stopPropagation();

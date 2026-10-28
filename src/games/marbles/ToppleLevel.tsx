@@ -181,7 +181,15 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
           } else {
             drumAt.current = t;
             sound(playDrum);
-            say({ de: "Bumm! Alles umgefallen!", ru: "Бум! Всё упало!" });
+            say({
+              de: "Bumm! Alles umgefallen!",
+              en: "Boom! Everything fell over!",
+              zh: "砰！全倒啦！",
+              hi: "धड़ाम! सब गिर गया!",
+              es: "¡Bum! ¡Todo se cayó!",
+              ar: "بوم! سقط كل شيء!",
+              ru: "Бум! Всё упало!",
+            });
             finish();
           }
         }

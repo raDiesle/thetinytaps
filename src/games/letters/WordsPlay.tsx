@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import { BRIGHT_COLORS, BurstLayer, useBursts } from "@/components/Bursts";
 import { Picture } from "@/components/Picture";
 import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard";
-import { keyMatches, keyOf, toLower, toUpper } from "@/content/languages";
+import { isRightToLeftPack, keyMatches, keyOf, toLower, toUpper } from "@/content/languages";
+import { joinedForms, spellingOf, textUnits, unitKey } from "@/content/spelling";
 import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
@@ -18,9 +19,12 @@ const HINT_AFTER_WRONG = 3;
 
 const BACKGROUNDS = ["#fff4d6", "#e3f6ff", "#e9ffe0", "#ffe8f0", "#efe9ff", "#fff0e0"];
 
-/** Words that can be typed letter by letter: no hyphens or spaces, and not too long. */
+/**
+ * Words that can be typed letter by letter: no hyphens, spaces or apostrophes, and not too long – counted in the
+ * pieces that are typed (a Hindi letter with its vowel sign is one, a Chinese word counts its pinyin letters).
+ */
 function typeableWords(pack: LanguagePack, maxLetters: number, theme: "all" | ThemeId): WordEntry[] {
-  const words = pack.letters.flatMap((l) => l.words).filter((w) => /^\p{L}+$/u.test(w.word) && w.word.length <= maxLetters);
+  const words = pack.letters.flatMap((l) => l.words).filter((w) => /^[\p{L}\p{M}]+$/u.test(spellingOf(w)) && textUnits(spellingOf(w)).length <= maxLetters);
   return inTheme(words, theme);
 }
 
@@ -71,7 +75,9 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     () => wordsFor(pack, settings.wordKind, Number(settings.wordLength), settings.theme),
     [pack, settings.wordKind, settings.wordLength, settings.theme],
   );
-  const letters = useMemo(() => (current ? Array.from(current.word.word) : []), [current]);
+  /** The pieces typed one by one: letters, a Hindi letter with its vowel sign (कि), or the pinyin of a Chinese word. */
+  const letters = useMemo(() => (current ? textUnits(spellingOf(current.word)) : []), [current]);
+  const forms = useMemo(() => joinedForms(letters), [letters]);
   const done = current !== null && typed === letters.length;
   const firstOnly = settings.wordTyping === "first";
   const color = current && isColor(current.word) ? current.word : null;
@@ -85,10 +91,14 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     [settings.speech, pack.speechLang],
   );
 
+  /** Says the letter's name ("Be!", "باء!"); a Hindi piece is said as it sounds ("कि!"). */
   const sayLetter = useCallback(
-    (char: string) => {
-      const upper = toUpper(char, pack);
-      say(`${pack.letters.find((l) => l.upper === upper)?.spoken ?? char}!`);
+    (unit: string) => {
+      const upper = toUpper(unit, pack);
+      const letter = /\p{Script=Devanagari}/u.test(unit)
+        ? undefined
+        : (pack.letters.find((l) => l.upper === upper) ?? pack.letters.find((l) => keyMatches(unitKey(unit), l.upper, pack)));
+      say(`${letter?.spoken ?? unit}!`);
     },
     [pack, say],
   );
@@ -168,7 +178,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
         if (!tryNextWord()) funBurst();
         return;
       }
-      if (keyMatches(key, letters[typed], pack)) {
+      if (keyMatches(key, unitKey(letters[typed]), pack)) {
         if (!tryType()) funBurst();
         return;
       }
@@ -208,12 +218,15 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     funBurst(e.clientX, e.clientY);
   };
 
-  // The key for the next letter; "Ó" has none on the screen, so its "O" lights up.
-  const wanted = letters[typed] && toUpper(letters[typed], pack);
-  const wantedKey = !wanted || pack.letters.some((l) => l.upper === wanted) ? wanted : wanted.normalize("NFD")[0];
+  // The key for the next letter; "Ó" has none on the screen, so its "O" lights up (أ: ا, कि: क).
+  const wanted = letters[typed] && toUpper(unitKey(letters[typed]), pack);
+  const wantedKey = !wanted || pack.letters.some((l) => l.upper === wanted) ? wanted : pack.letters.find((l) => keyMatches(wanted, l.upper, pack))?.upper;
 
   // „A a“ writes the word as it is written, „Bär“.
   const display = (char: string) => (settings.letterCase === "upper" ? toUpper(char, pack) : settings.letterCase === "lower" ? toLower(char, pack) : char);
+
+  /** Arabic letters join, and Hindi ones hang from one line: their pieces sit close together. */
+  const joined = /[\p{Script=Arabic}\p{Script=Devanagari}]/u.test(letters.join(""));
 
   const figureClass = ["figure", action && "actor", done && action && `act-${action.action}`].filter(Boolean).join(" ");
 
@@ -245,8 +258,13 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
               </div>
               {action && done && <div className="join-in">{pack.joinIn(action)} 🙌</div>}
             </div>
-            <div className="slots" style={{ "--letters": letters.length } as CSSProperties}>
-              {letters.map((char, i) =>
+            {current.word.spelling && <div className="words-characters">{current.word.word}</div>}
+            <div
+              className={`slots${joined ? " joined" : ""}`}
+              dir={isRightToLeftPack(pack) ? "rtl" : undefined}
+              style={{ "--letters": letters.length } as CSSProperties}
+            >
+              {forms.map((char, i) =>
                 i === typed ? (
                   <span key={`${i}-${nudges}`} className={`slot next${nudges > 0 ? " nudge" : ""}`} data-tap onPointerDown={onNextLetterPointer}>
                     {display(char)}

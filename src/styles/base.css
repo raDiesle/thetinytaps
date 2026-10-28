@@ -20,6 +20,11 @@
   box-sizing: border-box;
 }
 
+/* Arabic: each line of text runs right to left by its own letters, while menus, pictures and games keep their layout. */
+:root[lang="ar"] :is(p, h1, h2, h3, li, label, button, figcaption, span) {
+  unicode-bidi: plaintext;
+}
+
 html,
 body {
   margin: 0;

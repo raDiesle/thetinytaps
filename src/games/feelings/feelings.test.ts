@@ -1,12 +1,16 @@
 import { existsSync, readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
-import { COMFORTS, FEELINGS } from "./bear";
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import { COMFORTS, type ComfortId, FEELINGS } from "./bear";
 import { bearImages, imageFor, moodImages, storyImages } from "./images";
 import { SITUATIONS } from "./kita";
-import { FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
+import { COMFORT_TEXTS, FEELING_TEXTS, SITUATION_TEXTS, storyIn } from "./localized";
 import { MOOD_ID, WEATHERS } from "./mood";
 import { STORIES, storyAfter } from "./stories";
 import { RECORDED_SOUNDS } from "./story";
+
+/** The languages the whole game has been translated into. */
+const TRANSLATED: TargetLanguageId[] = ["en", "zh", "hi", "es", "ar", "ru"];
 
 // Every picture the game asks for is in bilder/. A missing one shows a placeholder with its file name, which is
 // allowed only while bilder/README.md lists it under „Geplant“ with its prompt, for the grown-up to look at first.
@@ -113,14 +117,41 @@ test("every choice asks who acts", () => {
 
 // Translations come only on request, so a story may have none yet (it is told in German); one that has keeps the sounds.
 test("a translated story has no German title left and keeps its sounds", () => {
-  for (const story of STORIES) {
-    const ru = storyIn(story, "ru");
-    if (story.kind === "home" ? !FEELING_TEXTS.ru?.[story.feeling.id] : !SITUATION_TEXTS.ru?.[story.situation.id]) continue;
-    expect(ru.title).not.toBe(story.title);
-    if (story.kind === "kita" && ru.kind === "kita") {
-      expect(ru.situation.steps.map((s) => s.instead.sound)).toEqual(story.situation.steps.map((s) => s.instead.sound));
-      expect(ru.situation.intro.map((b) => b.sound)).toEqual(story.situation.intro.map((b) => b.sound));
+  for (const language of Object.keys(FEELING_TEXTS) as TargetLanguageId[]) {
+    for (const story of STORIES) {
+      const translated = storyIn(story, language);
+      if (story.kind === "home" ? !FEELING_TEXTS[language]?.[story.feeling.id] : !SITUATION_TEXTS[language]?.[story.situation.id]) continue;
+      expect(translated.title, `${language} ${story.id}`).not.toBe(story.title);
+      if (story.kind === "kita" && translated.kind === "kita") {
+        expect(translated.situation.steps.map((s) => s.instead.sound)).toEqual(story.situation.steps.map((s) => s.instead.sound));
+        expect(translated.situation.intro.map((b) => b.sound)).toEqual(story.situation.intro.map((b) => b.sound));
+      }
     }
   }
   expect(storyIn(STORIES[0], "de")).toEqual(STORIES[0]);
+});
+
+/** Every string inside a translation, however deep. */
+const stringsIn = (value: unknown): string[] =>
+  typeof value === "string" ? [value] : value && typeof value === "object" ? Object.values(value).flatMap(stringsIn) : [];
+
+// The languages asked for so far are translated whole: every kind thing, feeling (each not-so-good idea too) and
+// kindergarten story, so none of them is told half in German.
+test("every translated language has every story", () => {
+  for (const language of TRANSLATED) {
+    for (const id of Object.keys(COMFORTS) as ComfortId[]) expect(COMFORT_TEXTS[language]?.[id], `${language} comfort ${id}`).toBeDefined();
+    for (const { id } of FEELINGS) {
+      expect(FEELING_TEXTS[language]?.[id], `${language} feeling ${id}`).toBeDefined();
+      expect(FEELING_TEXTS[language]?.[id]?.instead, `${language} feeling ${id}`).not.toContain(null);
+    }
+    for (const { id } of SITUATIONS) expect(SITUATION_TEXTS[language]?.[id], `${language} story ${id}`).toBeDefined();
+  }
+});
+
+// A language in its own script has no word left in Latin letters (a name like Tapsi is written in its letters too).
+test("translations in another script have no Latin letters", () => {
+  for (const language of ["ru", "zh", "hi", "ar"] as const) {
+    const texts = [COMFORT_TEXTS[language], FEELING_TEXTS[language], SITUATION_TEXTS[language]].flatMap(stringsIn);
+    for (const text of texts) expect(text, language).not.toMatch(/[A-Za-z]/);
+  }
 });

@@ -34,7 +34,7 @@ export function GameCard({ href, emoji, title }: GameCardProps) {
   return (
     <div className="game-card disabled" aria-disabled>
       {content}
-      <span className="badge">{t({ de: "bald", ru: "скоро" })}</span>
+      <span className="badge">{t({ de: "bald", ru: "скоро", en: "soon", zh: "即将推出", hi: "जल्द ही", es: "pronto", ar: "قريبًا" })}</span>
     </div>
   );
 }

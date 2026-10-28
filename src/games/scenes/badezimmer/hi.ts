@@ -1,0 +1,55 @@
+import type { SceneTranslation } from "../types";
+
+// The bathroom picture in Hindi: the title, every item's name and sentences and the chain sentences.
+// Names are the everyday words a child in India hears, English loanwords where people say them (शावर, टॉयलेट).
+
+/** „Badezimmer“ in Hindi. */
+export const HI: SceneTranslation = {
+  title: "बाथरूम",
+  description: "रबर की बत्तख, झाग का पहाड़ और फ़्लश होता टॉयलेट।",
+  items: {
+    luefter: { name: "पंखा", gender: "m", sentences: ["घर्र-घर्र! पंखा घूमता है।", "पंखा भाप को बाहर उड़ाता है।"] },
+    fenster: { name: "खिड़की", gender: "f", sentences: ["खिड़की खुलती है। ताज़ी हवा!", "चीं-चीं! एक चिड़िया अंदर झाँकती है।"] },
+    dusche: { name: "शावर", gender: "m", sentences: ["शावर से पानी छिटकता है। छप-छप!", "पानी अच्छा गरम है।"] },
+    lampe: { name: "बत्ती", gender: "f", sentences: ["क्लिक! बत्ती जलती है।", "अब खूब उजाला है।"] },
+    spiegel: { name: "शीशा", gender: "m", sentences: ["शीशा पूरा गीला हो जाता है।", "देखो, एक हँसता चेहरा!"] },
+    handtuch: { name: "तौलिया", gender: "m", sentences: ["तौलिया नरम और नीला है।", "तौलिया इधर-उधर झूलता है।"] },
+    shampoo: { name: "शैम्पू", gender: "m", sentences: ["शैम्पू से खूब झाग बनता है।", "बुड़-बुड़! बुलबुले ऊपर उड़ते हैं।"] },
+    pflanze: { name: "पौधा", gender: "m", sentences: ["पौधा अपने पत्ते हिलाता है।", "देखो, एक फूल खिलता है!"] },
+    uhr: { name: "घड़ी", gender: "f", sentences: ["टिक-टिक! घड़ी चलती है।", "सुइयाँ गोल-गोल घूमती हैं।"] },
+    klopapier: { name: "टॉयलेट पेपर", gender: "m", sentences: ["रोल घूमता है।", "टॉयलेट पेपर खुलता है और फिर लिपट जाता है।"] },
+    spinne: { name: "मकड़ी", gender: "f", sentences: ["छोटी मकड़ी धागे से नीचे उतरती है।", "हेलो! मकड़ी आठ पैरों से हाथ हिलाती है।"] },
+    tuer: { name: "दरवाज़ा", gender: "m", sentences: ["खट-खट! कौन है?", "मम्मी झाँकती हैं और हाथ हिलाती हैं।"] },
+    waschmaschine: { name: "वॉशिंग मशीन", gender: "f", sentences: ["घर्र-घर्र! वॉशिंग मशीन कपड़े धोती है।", "कपड़े गोल-गोल घूमते हैं।"] },
+    waschbecken: { name: "वॉशबेसिन", gender: "m", sentences: ["गुड़-गुड़! पानी नीचे बह जाता है।", "दरवाज़े खुलते हैं। अंदर टॉयलेट पेपर है!"] },
+    wasserhahn: { name: "नल", gender: "m", sentences: ["टप-टप! नल टपकता है।", "नल बंद! अब सब चुप है।"] },
+    zahnbuerste: { name: "टूथब्रश", gender: "m", sentences: ["घिस-घिस! टूथब्रश दाँत साफ़ करता है।", "दाँत चमचमाते साफ़ हो जाते हैं।"] },
+    zahnpasta: { name: "टूथपेस्ट", gender: "m", sentences: ["टूथपेस्ट ट्यूब से निकलता है।", "टूथब्रश के लिए थोड़ा सा!"] },
+    toilette: { name: "टॉयलेट", gender: "m", sentences: ["शू-ऊ-ऊ! टॉयलेट में पानी बहता है।", "ढक्कन खुलता है और फिर बंद होता है।"] },
+    badewanne: { name: "बाथटब", gender: "m", sentences: ["बाथटब पानी से भरा है।", "छप-छप! पानी लहराता है।", "बाथटब बहुत बड़ा है।"] },
+    kind: { name: "बच्चा", gender: "m", sentences: ["बच्चा नहाता है और गाता है: ला, ला, ला!", "बच्चा दोनों हाथ हिलाता है।"] },
+    ente: { name: "बत्तख", gender: "f", sentences: ["चूँ-चूँ! बत्तख तैरती है।", "रबर की बत्तख पीली है।"] },
+    schaumberg: { name: "झाग", gender: "m", sentences: ["झाग ऊँचा और ऊँचा होता जाता है!", "बुड़-बुड़! बुलबुले उड़ जाते हैं।"] },
+    muelleimer: { name: "कूड़ेदान", gender: "m", sentences: ["खट! ढक्कन खुलता है।", "कागज़ कूड़ेदान में उड़ता है।"] },
+    waeschekorb: { name: "कपड़ों की टोकरी", gender: "f", sentences: ["ढक्कन ऊपर उठता है।", "हेलो! एक मोज़ा बाहर झाँकता है।"] },
+    kroko: { name: "मगरमच्छ", gender: "m", sentences: ["खप-खप! मगरमच्छ मुँह खोलता है।", "मगरमच्छ रबर का है।"] },
+    foehn: { name: "हेयर ड्रायर", gender: "m", sentences: ["स्स्स्स! हेयर ड्रायर गरम हवा फेंकता है।", "अब बाल सूख जाते हैं।"] },
+    waage: { name: "वज़न मशीन", gender: "f", sentences: ["बीप-बीप! वज़न मशीन एक नंबर दिखाती है।", "तुम्हारा वज़न कितना है?"] },
+    toepfchen: { name: "पॉटी", gender: "f", sentences: ["पॉटी उछलती है। हॉप!", "टा-डा! सब हो गया!"] },
+    katze: { name: "बिल्ली", gender: "f", sentences: ["म्याऊँ! बिल्ली खुद को साफ़ करती है।", "बिल्ली अपना पंजा चाटती है।"] },
+    wal: { name: "व्हेल", gender: "f", sentences: ["फ़्फ़्फ़! व्हेल पानी का फव्वारा छोड़ती है।", "छोटी व्हेल नहाने का खिलौना है।"] },
+    seife: { name: "साबुन", gender: "m", sentences: ["ऊई! साबुन फिसल जाता है।", "साबुन से बुलबुले बनते हैं।"] },
+    hausschuhe: { name: "चप्पलें", gender: "f", plural: true, sentences: ["खरगोश वाली चप्पलें उछलती हैं।", "हॉप, हॉप! कान हिलते हैं।"] },
+    frosch: { name: "मेंढक", gender: "m", sentences: ["टर्र! मेंढक उछलता है।", "मेंढक पानी छिटकाता है!"] },
+    hund: { name: "कुत्ता", gender: "m", sentences: ["कुत्ता खुद को झटकता है। सब गीला हो जाता है!", "भौं-भौं! कुत्ता भी नहाकर आया है।"] },
+    wasserball: { name: "गेंद", gender: "f", sentences: ["गेंद उछलती है। बोइंग!", "गेंद रंग-बिरंगी है।"] },
+    seifenblasen: { name: "बुलबुले", gender: "m", plural: true, sentences: ["फूँ! ढेर सारे बुलबुले उड़ते हैं।", "पॉप! बुलबुला फूट गया।"] },
+    schiffchen: { name: "नाव", gender: "f", sentences: ["भों-भों! नाव डोलती है।", "हवा पाल में फूँक मारती है।"] },
+    schwamm: { name: "स्पंज", gender: "m", sentences: ["स्पंज दबता है। छप!", "स्पंज से पानी टपकता है।"] },
+  },
+  chains: [
+    ["बच्चा हँसता है और वापस पानी छिटकाता है!", "और बत्तख लहरों पर डोलती है।"],
+    ["हवा तौलिये को उड़ाती है।", "और बुलबुले उड़ जाते हैं!"],
+    ["बिल्ली डर जाती है: म्याऊँ!", "और कुत्ता भौंकता है: भौं-भौं!"],
+  ],
+};

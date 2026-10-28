@@ -41,6 +41,22 @@
   color: #2b2d421c;
 }
 
+/* Scripts whose letters join (Arabic, Hindi's headline): the pieces sit close, on one writing line. */
+.slots.joined {
+  gap: 0;
+}
+
+.slots.joined .slot {
+  min-width: 0;
+}
+
+/* Chinese: the characters above the pinyin that is typed. */
+.words-characters {
+  font-size: min(14cqh, 18cqw);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
 .card.done .slot {
   animation: hop 0.5s ease-in-out calc(var(--i) * 80ms) 2;
 }

@@ -5,11 +5,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Wolkenreise“ in Spanish. */
 export const TRANSLATION: StoryTranslation = {
+  title: "El viaje en nube",
   defaultTurn: "¡Ahora tú!",
   opening: ["¡Oh! ¿Dónde está el sol?", "Está escondido detrás de la gran nube de lluvia.", "¡Vamos a sacarlo! ¿Vienes conmigo?"],
   steps: [
     // 👋
     {
+      name: "Saludar a Kiki",
       situation: "¡Hola! Soy Tapsi. ¡Y esta es Pelusa, mi nubecita!",
       instruction: "¡Ahí viene Kiki! Saludamos con la mano, ¡así!",
       turn: "¿Saludas tú también a Kiki?",
@@ -18,6 +20,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐦
     {
+      name: "Aletear como un pájaro",
       situation: "Pelusa quiere volar. ¡La ayudamos!",
       instruction: "Aletea con los brazos, como un pájaro, ¡así!",
       turn: "Ahora tú: ¡aletea!",
@@ -26,6 +29,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ✈️
     {
+      name: "Agacharse bajo los aviones",
       situation: "¡Oh, vienen avioncitos!",
       instruction: "Cuando viene uno, nos agachamos, ¡así!",
       turn: "¡Cuidado! ¡Agáchate!",
@@ -34,6 +38,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎈
     {
+      name: "Tocar los globos",
       situation: "¡Cuántos globos!",
       instruction: "Los tocamos, ¡y pop! ¡Así!",
       turn: "Ahora tú: ¡tócalos!",
@@ -41,9 +46,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "¡Cuánto confeti!",
     },
     // 🪑
-    { instruction: "¡Ahora vamos rápido! Siéntate conmigo, ¡así!", praise: "¡Agárrate fuerte!" },
+    { name: "Sentarse", instruction: "¡Ahora vamos rápido! Siéntate conmigo, ¡así!", praise: "¡Agárrate fuerte!" },
     // ⭐
     {
+      name: "Inclinarse en las curvas por estrellas",
       situation: "¡Cuántas estrellas!",
       instruction: "Inclínate a un lado y agarra la estrella, ¡así!",
       turn: "Ahora tú: ¡inclínate a un lado!",
@@ -51,9 +57,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "¡Tenemos todas las estrellas!",
     },
     // 🧍
-    { instruction: "¡Ahí está la nube de lluvia! Levántate conmigo, ¡así!", praise: "¡Ahora sacamos el sol!" },
+    { name: "Levantarse", instruction: "¡Ahí está la nube de lluvia! Levántate conmigo, ¡así!", praise: "¡Ahora sacamos el sol!" },
     // 🌧️
     {
+      name: "Empujar la nube de lluvia",
       situation: "¡Aquí llueve! El sol está allá arriba.",
       instruction: "Empuja la nube hacia arriba con los dos brazos, ¡así!",
       turn: "Ahora tú: ¡empuja conmigo!",
@@ -62,6 +69,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌈
     {
+      name: "Pintar un arcoíris",
       situation: "Ahora solo falta el arcoíris.",
       instruction: "Pinta un gran arco con el brazo, ¡así!",
       turn: "Ahora tú: ¡pinta conmigo!",
@@ -70,6 +78,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "¡Hurra!",
       situation: "¡El sol sonríe!",
       instruction: "Brazos arriba, ¡hurra!",
       turn: "¡Tú también, hurra!",
@@ -77,6 +86,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🏡
     {
+      name: "Decir adiós",
       situation: "Pelusa nos lleva a casa.",
       instruction: "Decimos adiós con la mano, ¡así!",
       turn: "¿Dices adiós conmigo?",

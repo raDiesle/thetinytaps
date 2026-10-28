@@ -352,7 +352,17 @@ export function buildCircus() {
   const tDone = tShow + 2.4;
   at(tShow, { sound: playWhoosh });
   at(tShow + 0.15, { sound: playMelody });
-  at(tShow + 0.3, { say: { de: "Tusch! Bravo, kleiner Clown!", ru: "Та-дам! Браво, клоун!" } });
+  at(tShow + 0.3, {
+    say: {
+      de: "Tusch! Bravo, kleiner Clown!",
+      en: "Ta-da! Bravo, little clown!",
+      zh: "锵锵！小丑真棒！",
+      hi: "टा-डा! वाह, छोटे जोकर!",
+      es: "¡Tachán! ¡Bravo, payasito!",
+      ar: "تا-دا! برافو أيها المهرّج الصغير!",
+      ru: "Та-дам! Браво, клоун!",
+    },
+  });
   at(tShow + 1.2, { sound: playTwinkle });
   at(tShow + 1.6, { sound: playGiggle });
   at(tDone, { done: true });

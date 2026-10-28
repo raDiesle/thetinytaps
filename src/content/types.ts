@@ -15,6 +15,11 @@ export interface WordEntry {
   /** Optional illustration in /public, used instead of the emoji. */
   image?: string;
   theme?: ThemeId;
+  /**
+   * The letters the word is typed and marked by, where they are not the written word itself: Chinese pinyin
+   * with its tone marks ("bàba" for 爸爸), shown under the characters. Without it the word's own letters count.
+   */
+  spelling?: string;
 }
 
 export interface LetterEntry {
@@ -57,6 +62,9 @@ export interface Countable {
   theme?: ThemeId;
 }
 
+/** What the games read of a key event. */
+export type KeyPress = Pick<KeyboardEvent, "key" | "code"> & { shiftKey?: boolean };
+
 export interface LanguagePack {
   /** BCP-47 tag used for speech synthesis and for upper/lower case ("i" is "İ" in Turkish), e.g. "de-DE". */
   speechLang: string;
@@ -74,10 +82,17 @@ export interface LanguagePack {
   /** The keyboard as printed on the keys, one string per row from the top. */
   keyboardRows: string[];
   /**
-   * For a script most keyboards don't print (Russian): the letter at the pressed key's
+   * For a script most keyboards don't print (Russian, Hindi, Arabic): the letter at the pressed key's
    * place, so any keyboard types it (Q = Й). Without it the key's own letter counts.
    */
-  letterOfKey?: (e: Pick<KeyboardEvent, "key" | "code">) => string | undefined;
+  letterOfKey?: (e: KeyPress) => string | undefined;
+  /**
+   * For a keyboard where Shift gives a second letter on a key (Hindi K = क, Shift+K = ख): whether `key`
+   * is the other letter of `letter`'s key. Then it counts for `letter` too – a toddler doesn't hold Shift.
+   */
+  sameKey?: (key: string, letter: string) => boolean;
+  /** The letter of the examples on start screens („Be, wie Bär“); "B" when left out (Russian: Б). */
+  exampleLetter?: string;
   /** "drei Äpfel" / "ein Apfel" */
   countSentence: (n: number, thing: Countable) => string;
   /** Short cheers, one is picked when a word has been typed. */
