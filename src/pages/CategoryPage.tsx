@@ -1,8 +1,8 @@
 import { Navigate, useParams } from "react-router";
 import { GameCard } from "@/components/GameCard";
-import { MenuTop } from "@/components/MenuTop";
+import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
-import { CATEGORIES } from "@/content/games";
+import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useT } from "@/lib/language";
 import { useUpdateBetweenGames } from "@/lib/pwa";
@@ -17,13 +17,20 @@ export function CategoryPage() {
   useUpdateBetweenGames();
   const grid = useFitGrid(category?.games.length ?? 0);
   if (!category) return <Navigate to="/" replace />;
+  // An old address of a category that has only one game now.
+  if (!hasPage(category)) return <Navigate to={categoryHref(category)} replace />;
   return (
     <main className="home">
       <Sky />
-      <MenuTop to="/">{t({ de: "Alle Spiele", ru: "Все игры" })}</MenuTop>
-      <h1 className="menu-title">
-        <span aria-hidden>{category.emoji}</span> {t(category.title)}
-      </h1>
+      <MenuHead
+        to="/"
+        back={t({ de: "Alle Spiele", ru: "Все игры" })}
+        title={
+          <>
+            <span aria-hidden>{category.emoji}</span> {t(category.title)}
+          </>
+        }
+      />
       <p className="home-subtitle">{t(category.subtitle)}</p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {category.games.map((g) => (

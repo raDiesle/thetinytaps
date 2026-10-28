@@ -22,29 +22,31 @@ export type Need = "pipi" | "kaka";
 export type Went = Need | "both";
 
 /**
- * What the child said it has to do, tapped by a grown-up on a small button while Tapsi calls Mama and Papa
- * (and again on the way to the bathroom while nothing was picked): often nobody knows yet ("unsure", also
- * when nobody taps), so the story says „muss mal“ and the waiting brings scenes for both. Picking only notes
- * it down, the story goes on by itself. What really came is chosen at the ✓.
+ * What the child said it has to do, tapped by a grown-up on a button while Tapsi calls Mama and Papa: one of
+ * pipi, kaka or both, and the story goes on only with that tap. Before it nobody knows yet ("unsure", also
+ * after jumping past calling in the row of steps, which asks again on the way), so the story says „muss mal“
+ * and otherwise treats it like both. What really came is chosen at the ✓.
  */
 export type Said = Went | "unsure";
 
 /** What a step is about: what the child said before the ✓, what came after it. */
 export type Which = Said | Went;
 
-/** The choices of `Said` in the order of their buttons; the emoji stands for it. */
-export const SAID: { id: Said; emoji: string }[] = [
+/**
+ * The buttons for what the child said, in their order; the emoji stands for it. No ❓: not knowing is
+ * the same as both (the user's choice), so 💧💩 is that button.
+ */
+export const SAID: { id: Went; emoji: string }[] = [
   { id: "pipi", emoji: "💧" },
   { id: "kaka", emoji: "💩" },
   { id: "both", emoji: "💧💩" },
-  { id: "unsure", emoji: "❓" },
 ];
 
-/** What the ✓ of what the child said is, and what came when a grown-up skips the ✓: pipi when nobody knew. */
-export const expectedWent = (said: Said): Went => (said === "unsure" ? "pipi" : said);
+/** What the ✓ of what the child said is, and what came when a grown-up skips the ✓: both when nobody knew. */
+export const expectedWent = (said: Said): Went => (said === "unsure" ? "both" : said);
 
 /** The steps of the story, one tap each. */
-export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party" | "play";
+export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party" | "stars" | "play";
 
 export interface Step {
   id: StepId;
@@ -67,7 +69,8 @@ export interface Step {
   auto?: number;
   /**
    * Never goes on by itself, and „Weiter“ calls for attention, since a grown-up reads the story out at their own
-   * pace: the first steps, where nothing real happens yet. Any tap or key goes on there too.
+   * pace: the first steps, where nothing real happens yet. Any tap or key goes on there too – except while the
+   * buttons for what the child said show: they are the only way on then, and call for attention instead.
    */
   nudge?: true;
 }
@@ -88,7 +91,7 @@ export const STEPS: Step[] = [
   // Eating and drinking take turns as the step's frames, moving from the start; the first steps wait for „Weiter“.
   { id: "eat", icon: "🍝", picture: ["essen", "trinken"], ms: 2000, nudge: true },
   { id: "need", icon: { pipi: "💦", kaka: "🌀" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600, nudge: true },
-  // Here (and on the way, while nothing was picked) a grown-up notes what the child said.
+  // Here (and on the way, while nothing was picked) a grown-up taps what the child said, and only that goes on.
   { id: "call", icon: "📣", picture: "rufen", ms: 1800, nudge: true },
   { id: "go", icon: "🚪", picture: "bad", ms: 1800, nudge: true },
   // The child takes its own trousers down: no timer, „Weiter“ when it's done.
@@ -102,6 +105,8 @@ export const STEPS: Step[] = [
   { id: "flush", icon: "🚽", picture: "abziehen", ms: 2600 },
   { id: "wash", icon: "🧼", picture: "waschen", ms: 2400 },
   { id: "party", icon: "🎉", picture: "party", ms: 2400 },
+  // The end: this week's stars over the party picture, with a new one today when a grown-up tapped a ✓ (PottyPlay.tsx).
+  { id: "stars", icon: "⭐", picture: "party", ms: 2400 },
 ];
 
 const SIT = STEPS.findIndex((s) => s.id === "sit");
@@ -139,7 +144,20 @@ export function picturesFor(step: Step, which: Which): string[] {
 }
 
 /** The sound a waiting scene makes when it comes (see PottyPlay.tsx). */
-export type SceneSound = "trickle" | "splash" | "glug" | "whoosh" | "squeeze" | "blow" | "plop" | "dance" | "juggle" | "peekaboo" | "bubbles";
+export type SceneSound =
+  | "trickle"
+  | "splash"
+  | "glug"
+  | "whoosh"
+  | "squeeze"
+  | "blow"
+  | "plop"
+  | "dance"
+  | "juggle"
+  | "peekaboo"
+  | "bubbles"
+  | "toot"
+  | "chime";
 
 /**
  * What Tapsi thinks of while it sits, in a thought bubble over the still bathroom picture: things that
@@ -161,10 +179,20 @@ export const WAIT_SCENES: WaitScene[] = [
   { id: "ballon", emoji: "🎈💨", need: "pipi", sound: "whoosh" },
   { id: "regen", emoji: "🌧️☔", need: "pipi", sound: "trickle" },
   { id: "schlauch", emoji: "💦🦆", need: "pipi", sound: "splash" },
+  { id: "wasserrad", emoji: "💧🎡", need: "pipi", sound: "trickle" },
+  { id: "tee", emoji: "🫖☕", need: "pipi", sound: "glug" },
+  { id: "elefant", emoji: "🐘💦", need: "pipi", sound: "splash" },
+  { id: "wal", emoji: "🐳", need: "pipi", sound: "blow" },
+  { id: "trichter", emoji: "🫗", need: "pipi", sound: "trickle" },
   { id: "ketchup", emoji: "🍅🍝", need: "kaka", sound: "squeeze" },
   { id: "aufblasen", emoji: "😤🎈", need: "kaka", sound: "blow" },
   { id: "huhn", emoji: "🐔🥚", need: "kaka", sound: "plop" },
   { id: "knete", emoji: "🟠🟣🟢", need: "kaka", sound: "squeeze" },
+  { id: "spritzbeutel", emoji: "🍰", need: "kaka", sound: "squeeze" },
+  { id: "erbsen", emoji: "🫛", need: "kaka", sound: "plop" },
+  // Waiting until something comes out, without pressing: for children afraid of kaka.
+  { id: "tunnel", emoji: "🚂", need: "kaka", sound: "toot" },
+  { id: "schmetterling", emoji: "🦋", need: "kaka", sound: "chime" },
   { id: "tanzen", emoji: "💃🕺", need: "silly", sound: "dance" },
   { id: "jonglieren", emoji: "🤹", need: "silly", sound: "juggle" },
   { id: "kuckuck", emoji: "🙈", need: "silly", sound: "peekaboo" },
@@ -194,20 +222,22 @@ export interface PottyTexts {
   /** Said when a waiting scene comes, by its id. */
   scenes: Record<string, string>;
   /** Said when a grown-up taps what the child said, and the button's name for screen readers. */
-  said: Record<Said, string>;
+  said: Record<Went, string>;
   /** The „Weiter“ button's name for screen readers. */
   next: string;
-  /** Over the buttons for what the child said, for the grown-up. */
+  /** Over the buttons for what the child said, for the grown-up, and said when a tap misses them. */
   askSaid: string;
   /** Over the ✓ while sitting, for the grown-up. */
   askWent: string;
   /** Said once while sitting, so a grown-up knows what the two ✓ are for. */
   finish: string;
   /** What each ✓ means, for screen readers. */
-  went: Record<Went, string>;
+  went: Record<Need, string>;
   /** The button for nothing next to the ✓, for screen readers, and said when it is tapped. */
   nothing: string;
-  /** Said when a star comes for really going. */
+  /** What that button says, for the grown-up. */
+  nothingButton: string;
+  /** Said at the end instead of the step's line when a star comes for really going. */
   star: string;
 }
 
@@ -239,6 +269,7 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       flush: () => "Ausleeren und abziehen. Wuuusch!",
       wash: () => "Hände waschen mit Seife.",
       party: (name) => `Geschafft! Toll gemacht, ${name}!`,
+      stars: () => "Das sind deine Sterne.",
       play: (name) => `${name} spielt. Mama und Papa schauen rein: Musst du Pipi oder Kaka?`,
     },
     scenes: {
@@ -251,6 +282,15 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       aufblasen: "Tapsi bläst den Ballon auf. Ganz fest pusten!",
       huhn: "Das Huhn drückt ganz fest. Plopp, ein Ei!",
       knete: "Tapsi drückt die Knete. Da kommen Würstchen raus!",
+      wasserrad: "Das Wasser dreht das Rad. Plätscher, plätscher!",
+      tee: "Tapsi gießt Tee ein. Gluck, gluck, gluck!",
+      spritzbeutel: "Tapsi drückt den Spritzbeutel. Sahne auf den Kuchen!",
+      erbsen: "Tapsi drückt die Schote. Plopp, plopp, die Erbsen!",
+      tunnel: "Der Zug ist im Tunnel. Tuut, da kommt er raus!",
+      elefant: "Der Elefant spritzt mit dem Rüssel. Pschhh!",
+      wal: "Der Wal pustet Wasser hoch. Pfffft!",
+      trichter: "Tapsi gießt Wasser in den Trichter. Unten läuft es raus!",
+      schmetterling: "Der Schmetterling drückt sich raus. Jetzt fliegt er!",
       tanzen: "Mama und Papa tanzen!",
       jonglieren: "Papa jongliert mit Klopapier!",
       kuckuck: "Wo ist Mama? Kuckuck!",
@@ -260,18 +300,17 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       pipi: "Tapsi muss bald Pipi.",
       kaka: "Tapsi muss bald Kaka.",
       both: "Tapsi muss bald Pipi und Kaka.",
-      unsure: "Tapsi muss bald mal.",
     },
     next: "Weiter",
     askSaid: "Was muss dein Kind?",
     askWent: "Was ist im Töpfchen?",
-    finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka. Beides: drück auf beide!",
+    finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka.",
     went: {
       pipi: "Pipi ist im Töpfchen",
       kaka: "Kaka ist im Töpfchen",
-      both: "Pipi und Kaka sind im Töpfchen",
     },
     nothing: "Heute kommt nichts. Macht nichts!",
+    nothingButton: "nichts",
     star: "Hat geklappt! Hurra, ein Stern für dich!",
   },
   ru: {
@@ -298,6 +337,7 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       flush: () => "Выливаем и смываем. Вжууух!",
       wash: () => "Моем руки с мылом.",
       party: (name) => `Получилось! Молодец, ${name}!`,
+      stars: () => "Это твои звёздочки.",
       play: (name) => `${name} играет. Мама и папа заглядывают: тебе надо пи-пи или ка-ка?`,
     },
     scenes: {
@@ -310,6 +350,15 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       aufblasen: "Тапси надувает шарик. Дуем сильно-сильно!",
       huhn: "Курочка тужится изо всех сил. Плюх – яичко!",
       knete: "Тапси жмёт пластилин. Вылезают колбаски!",
+      wasserrad: "Вода крутит колесо. Буль-буль!",
+      tee: "Тапси наливает чай. Буль, буль, буль!",
+      spritzbeutel: "Тапси жмёт кондитерский мешок. Крем на торт!",
+      erbsen: "Тапси жмёт стручок. Чпок, чпок – горошинки!",
+      tunnel: "Поезд в тоннеле. Ту-ту, вот он выезжает!",
+      elefant: "Слон брызгает хоботом. Пшшш!",
+      wal: "Кит пускает фонтан. Пффф!",
+      trichter: "Тапси льёт воду в воронку. Внизу она вытекает!",
+      schmetterling: "Бабочка выбирается наружу. Теперь она летит!",
       tanzen: "Мама и папа танцуют!",
       jonglieren: "Папа жонглирует туалетной бумагой!",
       kuckuck: "Где мама? Ку-ку!",
@@ -319,18 +368,17 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       pipi: "Тапси скоро нужно пи-пи.",
       kaka: "Тапси скоро нужно ка-ка.",
       both: "Тапси скоро нужно пи-пи и ка-ка.",
-      unsure: "Тапси скоро нужно на горшок.",
     },
     next: "Дальше",
     askSaid: "Что нужно малышу?",
     askWent: "Что в горшке?",
-    finish: "Что-нибудь есть в горшке? Пи-пи – нажмите на капельку. Ка-ка – нажмите на ка-ка. И то и другое – нажмите на кнопку с обоими!",
+    finish: "Что-нибудь есть в горшке? Пи-пи – нажмите на капельку. Ка-ка – нажмите на ка-ка.",
     went: {
       pipi: "Пи-пи в горшке",
       kaka: "Ка-ка в горшке",
-      both: "Пи-пи и ка-ка в горшке",
     },
     nothing: "Сегодня ничего нет. Ничего страшного!",
+    nothingButton: "ничего",
     star: "Получилось! Ура, звёздочка для тебя!",
   },
 };

@@ -43,12 +43,11 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/components/Sky.tsx`, `Logo.tsx` | Menu look: sky backdrop and the bouncy logo; colours and buttons in `src/styles/` (all loaded in order by `src/globals.css`) |
 | `src/content/de.ts` | German words, pictures, number words – edit here to change content |
 | `src/content/en.ts`, `tr.ts`, `pl.ts` | English, Turkish and Polish for the letters and words games, chosen under „Sprache“ on the home page (`src/content/languages.ts`, `src/components/LanguageSetting.tsx`). An optional second language shows and says every word in it too („Bär – bear“); words are matched by their emoji (`src/content/translate.ts`), and `moreWords` names pictures that only other languages have. The other games are German only |
-| `src/games/letters/` | Game „Buchstaben & Zahlen“: free typing, „Wo ist das B?“ and the Buchstaben-Zug. Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
+| `src/games/letters/` | Game „Buchstaben & Zahlen“: free typing, „Zählen“, „Wo ist das B?“ and „Wörter tippen“ (whole words or first letters; picture, colour and doing words). Details in its [`CLAUDE.md`](src/games/letters/CLAUDE.md) |
 | `src/games/scenes/` | Game „Lebendige Bilder“: the Wimmelbild engine and all its pictures. Details in its [`CLAUDE.md`](src/games/scenes/CLAUDE.md) |
 | `src/games/animals/` | Game „Was gehört zum Tier?“: feed the animal, bring it home, „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/animals/CLAUDE.md) |
 | `src/games/shadows/` | Game „Schatten finden“: find the shadow of a picture; also hosts „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/shadows/CLAUDE.md) |
 | `src/games/socks/` | Game „Socken-Paare“: socks tumble out of the washing machine, two same ones hop onto the line. Details in its [`CLAUDE.md`](src/games/socks/CLAUDE.md) |
-| `src/games/words/` | Game „Wörter tippen“: whole words, first letters, colour and doing words. Details in its [`CLAUDE.md`](src/games/words/CLAUDE.md) |
 | `src/games/potty/` | Game „Aufs Töpfchen“: an animal goes to the potty, one tap per step; „Hat geklappt!“ gives a star. Details in its [`CLAUDE.md`](src/games/potty/CLAUDE.md) |
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
 | `src/games/loud/` | Game „Laut und leise“: the microphone's loudness moves lion and mouse; „Pusten“. Details in its [`CLAUDE.md`](src/games/loud/CLAUDE.md) |

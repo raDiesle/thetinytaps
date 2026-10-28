@@ -1,7 +1,7 @@
 import { useLocation } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
-import { MenuTop } from "@/components/MenuTop";
+import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -164,13 +164,39 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   return (
     <main className="start-screen">
       <Sky />
-      <MenuTop to={back}>{backText}</MenuTop>
-      <h1 className="menu-title">
-        <span aria-hidden>{emoji}</span> {title}
-      </h1>
-      {/* Right under the title, so it stays in sight however long the options get. */}
+      {/* Small, at the top next to the way back: for grown-ups, out of the cards' way, never under them. */}
+      <MenuHead
+        to={back}
+        back={backText}
+        title={
+          <>
+            <span aria-hidden>{emoji}</span> {title}
+          </>
+        }
+      >
+        <div className="panel-buttons">
+          <PanelButton
+            open={panel === "info"}
+            onClick={() => setPanel(panel === "info" ? null : "info")}
+            emoji="ℹ️"
+            label={t({ de: "Über das Spiel", ru: "Об игре" })}
+          />
+          {settings && (
+            <PanelButton
+              open={panel === "settings"}
+              onClick={() => setPanel(panel === "settings" ? null : "settings")}
+              emoji="⚙️"
+              label={t({ de: "Einstellungen", ru: "Настройки" })}
+            />
+          )}
+        </div>
+      </MenuHead>
+      {panel === "info" && <section className="settings game-info">{info}</section>}
+      {panel === "settings" && settings && <section className="settings">{settings}</section>}
+      {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
+          cards leave (data-spread), so the back link and the grown-ups' buttons stay in the top row. */}
       {modes ? (
-        <section className="mode-picker" aria-label={t({ de: "Spielart wählen", ru: "Выбрать игру" })}>
+        <section className="mode-picker" data-spread aria-label={t({ de: "Spielart wählen", ru: "Выбрать игру" })}>
           <h2 className="mode-heading">{t({ de: "Was spielen wir?", ru: "Во что играем?" })}</h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
@@ -192,7 +218,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
           </ul>
         </section>
       ) : (
-        <button type="button" className="start-button" onClick={start}>
+        <button type="button" className="start-button" data-spread onClick={start}>
           <span className="start-icon" aria-hidden>
             ▶
           </span>
@@ -200,26 +226,6 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
         </button>
       )}
       <PlaytimeNote />
-      <div className="settings-panel">
-        <div className="panel-buttons">
-          <PanelButton
-            open={panel === "info"}
-            onClick={() => setPanel(panel === "info" ? null : "info")}
-            emoji="ℹ️"
-            label={t({ de: "Über das Spiel", ru: "Об игре" })}
-          />
-          {settings && (
-            <PanelButton
-              open={panel === "settings"}
-              onClick={() => setPanel(panel === "settings" ? null : "settings")}
-              emoji="⚙️"
-              label={t({ de: "Einstellungen", ru: "Настройки" })}
-            />
-          )}
-        </div>
-        {panel === "info" && <section className="settings game-info">{info}</section>}
-        {panel === "settings" && settings && <section className="settings">{settings}</section>}
-      </div>
     </main>
   );
 }
@@ -246,7 +252,7 @@ function PlaytimeNote() {
   );
 }
 
-/** One of the buttons under the mode cards that opens its panel below them, or folds it away again. */
+/** One of the small buttons in the top row that opens its panel below that row, or folds it away again. */
 function PanelButton({ open, onClick, emoji, label }: { open: boolean; onClick: () => void; emoji: string; label: string }) {
   return (
     <button type="button" className="panel-button" aria-expanded={open} onClick={onClick}>
@@ -363,8 +369,8 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
       <span className="exit-hint" aria-hidden>
         {label} · {t({ de: "halten", ru: "удерживать" })}
       </span>
-      {/* On computers only (CSS): a finger on a tablet would end fullscreen by accident. */}
-      <FullscreenButton className="play-fullscreen" />
+      {/* On phones and tablets only to get back into fullscreen (CSS): a child's finger must not end it. */}
+      <FullscreenButton className="play-fullscreen" playing />
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}

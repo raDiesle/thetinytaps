@@ -1,5 +1,5 @@
 import { GameCard } from "@/components/GameCard";
-import { MenuTop } from "@/components/MenuTop";
+import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
@@ -21,10 +21,15 @@ export function ScenesMenu() {
   return (
     <main className="home">
       <Sky />
-      <MenuTop to={CATEGORY ? categoryHref(CATEGORY) : "/"}>{CATEGORY ? t(CATEGORY.title) : t({ de: "Alle Spiele", ru: "Все игры" })}</MenuTop>
-      <h1 className="menu-title">
-        <span aria-hidden>🖼️</span> {title}
-      </h1>
+      <MenuHead
+        to={CATEGORY ? categoryHref(CATEGORY) : "/"}
+        back={CATEGORY ? t(CATEGORY.title) : t({ de: "Alle Spiele", ru: "Все игры" })}
+        title={
+          <>
+            <span aria-hidden>🖼️</span> {title}
+          </>
+        }
+      />
       <p className="home-subtitle">{t({ de: "Bild aussuchen – dann alles antippen und entdecken!", ru: "Выбери картинку – и нажимай на всё, что видишь!" })}</p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {SCENES.map((scene) => localizeScene(scene, language.id)).map((s) => (

@@ -47,10 +47,8 @@ export const CATEGORIES: Category[] = [
     emoji: "🔤",
     title: { de: "Buchstaben & Zahlen", ru: "Буквы и цифры" },
     subtitle: { de: "Tasten drücken, Buchstaben finden, Wörter tippen.", ru: "Нажимать клавиши, искать буквы, печатать слова." },
-    games: [
-      { href: "/buchstaben/", emoji: "🔤", title: { de: "Buchstaben & Zahlen", ru: "Буквы и цифры" } },
-      { href: "/woerter/", emoji: "✍️", title: { de: "Wörter tippen", ru: "Печатаем слова" } },
-    ],
+    // One game, so the home card opens it directly (see categoryHref).
+    games: [{ href: "/buchstaben/", emoji: "🔤", title: { de: "Buchstaben & Zahlen", ru: "Буквы и цифры" } }],
   },
   {
     id: "weitere",
@@ -65,10 +63,14 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-export const categoryHref = (category: Category) => `/spiele/${category.id}/`;
+/** A category of one game has no page of its own: a menu with a single card would only be one tap more. */
+export const hasPage = (category: Category) => category.games.length > 1;
 
-/** The category a game page belongs to, e.g. for its back link. */
+/** Where the category's home card leads: its page, or its only game. */
+export const categoryHref = (category: Category) => (hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+
+/** The category page a game page belongs to, for its back link; none for the only game of a category (back to home then). */
 export function categoryOf(pathname: string) {
   const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
-  return CATEGORIES.find((c) => c.games.some((g) => path.startsWith(g.href)));
+  return CATEGORIES.find((c) => hasPage(c) && c.games.some((g) => path.startsWith(g.href)));
 }

@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import {
+  expectedWent,
   iconFor,
   NOTHING_STEPS,
   picturesFor,
@@ -21,26 +22,39 @@ import {
 import { addStar } from "./stars";
 import { waitLanguageFor, waitLanguageOf } from "./waitMusic";
 
-const SAIDS: Said[] = SAID.map((s) => s.id);
+/** What the child can have said: a button each, or nothing yet. */
+const SAIDS: Said[] = [...SAID.map((s) => s.id), "unsure"];
 const WENTS: Went[] = ["pipi", "kaka", "both"];
 const WHICHES: Which[] = [...new Set([...SAIDS, ...WENTS])];
 /** The steps of both stories. */
 const ALL_STEPS = [...new Set([...STEPS, ...NOTHING_STEPS])];
 
 describe("Aufs Töpfchen", () => {
-  it("has steps with their own ids, every one said for pipi, kaka and not knowing, ending with the party", () => {
+  it("has steps with their own ids, every one said for pipi, kaka and not knowing, ending with the party and then the stars", () => {
     expect(new Set(STEPS.map((s) => s.id)).size).toBe(STEPS.length);
-    expect(STEPS.at(-1)?.id).toBe("party");
+    // „Hat geklappt!“ is no mode of its own any more: the week's stars are the story's last step, over the party picture.
+    expect(STEPS.slice(-2).map((s) => s.id)).toEqual(["party", "stars"]);
+    expect(STEPS.at(-1)?.picture).toBe(STEPS.at(-2)?.picture);
     expect([...SAIDS].sort()).toEqual(["both", "kaka", "pipi", "unsure"]);
     for (const texts of Object.values(POTTY_TEXTS)) {
       for (const which of WHICHES) for (const step of ALL_STEPS) expect(texts.steps[step.id](TAPSI.name.de, which).trim()).not.toBe("");
       expect(texts.nothing.trim()).not.toBe("");
-      for (const went of WENTS) expect(texts.went[went].trim()).not.toBe("");
-      for (const said of SAIDS) expect(texts.said[said].trim()).not.toBe("");
+      for (const need of ["pipi", "kaka"] as const) expect(texts.went[need].trim()).not.toBe("");
+      // „Was ist im Töpfchen?“ offers pipi and kaka only (the user's choice), and „nichts“ in a word.
+      expect(Object.keys(texts.went).sort()).toEqual(["kaka", "pipi"]);
+      expect(texts.nothingButton.trim()).not.toBe("");
+      for (const { id } of SAID) expect(texts.said[id].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
       for (const scene of WAIT_SCENES) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
       expect(texts.star.trim()).not.toBe("");
     }
+  });
+
+  it("asks what the child said with one button each for pipi, kaka and both, and no ❓, since not knowing is both", () => {
+    // ❓ was the same as 💧💩 to the user: a button that means what another one means only makes a grown-up think.
+    expect(SAID.map((s) => s.id)).toEqual(["pipi", "kaka", "both"]);
+    expect(expectedWent("unsure")).toBe("both");
+    expect(scenesFor("unsure")).toEqual(scenesFor("both"));
   });
 
   it("goes from sitting to washing hands and playing when nothing came, ending there", () => {
@@ -69,7 +83,7 @@ describe("Aufs Töpfchen", () => {
   it("goes on by itself only where nothing real has to happen, and the waiting scenes stay longer than their sounds", () => {
     const auto = (id: string) => STEPS.find((s) => s.id === id)?.auto;
     // The child takes its trousers down, wipes, pulls them up, flushes and washes itself: that waits for a tap or „Weiter“.
-    for (const id of ["down", "wipe", "up", "flush", "wash", "party"]) expect(auto(id)).toBeUndefined();
+    for (const id of ["down", "wipe", "up", "flush", "wash", "party", "stars"]) expect(auto(id)).toBeUndefined();
     // A grown-up tells the first steps at their own pace: only „Weiter“ goes on there, and it calls for attention.
     expect(STEPS.filter((s) => s.nudge).map((s) => s.id)).toEqual(["eat", "need", "call", "go"]);
     for (const step of STEPS) if (step.nudge) expect(step.auto).toBeUndefined();
@@ -181,6 +195,25 @@ describe("Aufs Töpfchen", () => {
     // And in English (" hen" and " hose" with the space, since „then“ and „those“ hold them): water, rain, fountain,
     // hose, balloon, ketchup, hen, egg, play dough, pushing, splashing.
     banned.push("water", " rain", "fountain", " hose", "balloon", "ketchup", " hen", "chicken", " egg", "dough", "push", "squeez", "splash", "drip");
+    // And in Spanish: water, rain, fountain, watering can, hose, balloon, ketchup, hen, egg, play dough, pushing, splashing, drops.
+    banned.push(
+      "agua",
+      "lluvi",
+      "fuente",
+      "regadera",
+      "manguera",
+      "globo",
+      "kétchup",
+      "gallina",
+      "huevo",
+      "plastilina",
+      "empuj",
+      "apriet",
+      "puj",
+      "chapot",
+      "salpic",
+      "gota",
+    );
     for (const text of lyrics) expect(banned.filter((word) => text.includes(word))).toEqual([]);
   });
 });

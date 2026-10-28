@@ -42,6 +42,12 @@ parts change exactly with the brushing steps, a finale on the end screen.
   and check short windows against it (an off-beat bass shows as half a beat off, not as drift), place the start and
   end on the same bar position (a quiet break or a change in the bass marks a bar line), and keep both clear of
   what is never meant to play (the intro's pickup, the next part's first note).
+- **Check a loop's seam against the song itself.** Beat fits over the few seconds round the jump disagreed by half a
+  beat in the Spanish waiting song (voice and bass lead them astray). Instead find where the same two parts follow
+  each other inside the song (last chorus → first verse is like chorus 1 → verse 2) and cross-correlate onsets: the
+  bars before the jump with the bars before that verse, the bars after it with that verse's start – both must land
+  within a few hundredths of the seam. Repeated choruses give the most exact times; verses (other words) and
+  Whisper's first words after a bell intro (smeared over it) do not.
 - Suno usually adds a part and an ending (pause + final chord): useful as a finale
   for the end screen.
 - **Download WAV** (best for cutting and converting), otherwise MP3.

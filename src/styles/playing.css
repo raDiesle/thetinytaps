@@ -52,9 +52,12 @@
   }
 }
 
-/* Fullscreen on and off while playing, as quiet as the ✕ next to it; only on computers. */
+/*
+ * Fullscreen on and off while playing, as quiet as the ✕ next to it. On computers always; on phones and
+ * tablets only while out of fullscreen (switching apps leaves it), to get back in – never to leave it.
+ */
 .play-fullscreen {
-  display: none;
+  display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
@@ -75,8 +78,12 @@
   stroke: var(--ink);
 }
 
+.play-fullscreen.on {
+  display: none;
+}
+
 @media (min-width: 900px) and (any-pointer: fine) {
-  .play-fullscreen {
+  .play-fullscreen.on {
     display: grid;
   }
 }

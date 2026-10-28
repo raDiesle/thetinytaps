@@ -8,9 +8,17 @@
   align-items: center;
   justify-content: center;
   gap: 28px;
-  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(140px, env(safe-area-inset-bottom))
-    max(20px, env(safe-area-inset-left));
+  padding: max(24px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   text-align: center;
+}
+
+/*
+ * When everything fits on one screen, the free room goes above and below the cards (or „Los geht’s!“):
+ * the top row stays on top and what comes under the cards (the play time note) on the bottom edge, instead
+ * of all of them floating together in the middle. useFitGrid leaves this room out when it sizes the cards.
+ */
+.start-screen > [data-spread] {
+  margin-block: auto;
 }
 
 .back-link {
@@ -53,28 +61,22 @@
   font-size: 1.15rem;
 }
 
-/* "Über das Spiel" and the options are folded into two buttons until a grown-up opens one. */
-.settings-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  max-width: 680px;
-}
-
+/*
+ * "Über das Spiel" and the options, small at the top in the menu's head, folded into two buttons until a
+ * grown-up opens one (its panel opens under the head). Above the cards, never under them.
+ */
 .panel-button {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 8px 22px;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 14px;
   border: 3px solid var(--ink);
   border-radius: 999px;
   background: #fff;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  box-shadow: 0 5px 0 var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
   color: inherit;
   font-family: inherit;
   cursor: pointer;
@@ -102,8 +104,7 @@
 .panel-buttons {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .game-info {
@@ -470,10 +471,11 @@ kbd {
 /*
  * More room for the cards on big screens: the back link (with the fullscreen button next to it) moves up
  * into the corner, bigger and yellow so a grown-up finds it at once, and stays there while the page scrolls.
+ * The title stays clear of it: MenuHead starts the title's column where the corner ends.
  */
 @media (min-width: 900px) and (min-height: 600px) {
   .home > .menu-top,
-  .start-screen > .menu-top {
+  .menu-head > .menu-top {
     position: fixed;
     top: max(20px, env(safe-area-inset-top));
     left: max(20px, env(safe-area-inset-left));
@@ -627,17 +629,6 @@ kbd {
     padding: 10px 32px 10px 12px;
     box-shadow: 0 6px 0 var(--ink);
     font-size: 1.6rem;
-  }
-
-  .settings-panel {
-    gap: 10px;
-  }
-
-  .panel-button {
-    min-height: 40px;
-    padding: 4px 16px;
-    font-size: 0.95rem;
-    box-shadow: 0 4px 0 var(--ink);
   }
 
   .home:has(> .game-list.fit),

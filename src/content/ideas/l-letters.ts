@@ -58,7 +58,7 @@ export const lettersIdeas: IdeaArea = {
       text: "Jeder gedrückte Buchstabe wird ein Waggon an einer Lok. Bei 5 Waggons (oder Leertaste) pfeift der Zug und fährt mit allen Buchstaben davon, die Lok liest sie „vor“.",
       why: "Das Kind „schreibt“ eine Reihe, ohne es zu merken; sichtbares Ergebnis vieler Tastendrücke.",
       effort: "M",
-      done: true,
+      rejected: true,
     },
     {
       id: "L-07",

@@ -23,6 +23,8 @@ Die Stufen nacheinander, jede braucht die Bilder der vorigen als Referenz (`.ima
    Bad springen. Beim Warten bleibt `sitzen` stehen; was Tapsi denkt, kommt in eine Denkblase (`denken-…`, noch nicht
    gemacht, bis dahin ein Emoji), gezeichnet ohne Badezimmer.
 6. `frames-kitchen`, `frames-bath`, `frames-wait` – die zweiten Frames, jeder mit seinem ersten als Referenz.
+   Die Denkblase: `think` (mit `essen` nur für Tapsis Aussehen) und danach `frames-think`; ein drittes Argument nimmt
+   nur neue Gedanken, ohne die alten noch einmal zu zeichnen: `prompts.py think fox tee,erbsen`.
 7. `play-first` – `spielen`: das Kinderzimmer (wenn nichts kam), ein neuer Raum wie das Bad, mit `rufen` als Referenz
    für die drei; die Tür steht nah der Mitte, Mama und Papa schauen dort herein. Danach `frames-play` für `spielen-b`:
    die erste Bewegung („noch ein Klotz auf den Turm“) kam fast gleich zurück, erst „Tapsi dreht den Kopf zur Tür,
@@ -38,6 +40,8 @@ wenn es ausdrücklich gewünscht ist.
 Danach `bun run frames src/games/potty/bilder` (springt ein Frame?) und `bun run frames --scenes`-artig nebeneinander
 anschauen: gleiches Bad, gleiche Eltern, niemand doppelt, das Töpfchen bleibt türkis in der Mitte.
 
-Worauf achten: Hose runter zeigt nur Fell, das T-Shirt deckt den Bauch. Kaka im Töpfchen ist ein kleiner brauner
+Worauf achten: Hose runter zeigt nur Fell, das T-Shirt deckt den Bauch. In der Denkblase ist Tapsi immer ganz
+angezogen, hellblaues T-Shirt und blaue Hose (der Tunnel kam einmal ohne T-Shirt, mit „wearing its trousers“ im Prompt;
+jetzt nennt `thought` beides). Kaka im Töpfchen ist ein kleiner brauner
 Kringel ohne Gesicht. Was zählt, steht in der Mitte – am Rand nur Wand und Boden, weil Handys oben und unten,
 Tablets links und rechts abschneiden.

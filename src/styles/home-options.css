@@ -21,19 +21,9 @@
   stroke-linejoin: round;
 }
 
-/* Next to the back link: on a computer always, so a grown-up finds it; on phones and tablets only to leave fullscreen. */
+/* Next to the back link, always: phones leave fullscreen when another app was opened in between. */
 .fullscreen-corner {
-  display: none;
-}
-
-.fullscreen-corner.on {
   display: block;
-}
-
-@media (min-width: 900px) and (any-pointer: fine) {
-  .fullscreen-corner {
-    display: block;
-  }
 }
 
 .home-menu-backdrop {

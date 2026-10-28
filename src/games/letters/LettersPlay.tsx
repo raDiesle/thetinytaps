@@ -51,6 +51,12 @@ function resolveKey(key: string, pack: LanguagePack): Target | null {
   return letter ? { kind: "letter", letter } : null;
 }
 
+/** Zählen: a number by chance for a key that is no digit, never the one on screen. */
+function randomNumber(shown: Shown | null): Target {
+  const others = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter((n) => shown?.kind !== "number" || n !== shown.n);
+  return { kind: "number", n: others[Math.floor(Math.random() * others.length)] };
+}
+
 function isSame(target: Target | null, shown: Shown) {
   if (target?.kind === "letter" && shown.kind === "letter") return target.letter === shown.letter;
   if (target?.kind === "number" && shown.kind === "number") return target.n === shown.n;
@@ -63,7 +69,11 @@ function isSame(target: Target | null, shown: Shown) {
 const firstStage = (s: Shown) => (s.kind === "letter" ? 0 : Math.min(1, s.n));
 const lastStage = (s: Shown) => (s.kind === "letter" ? 0 : s.n + 1);
 
-export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
+/**
+ * Frei tippen: every key shows its letter or number. With `numbersOnly` (Zählen) only numbers come: a digit shows
+ * itself, and any other key that has no meaning of its own a number by chance.
+ */
+export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: LanguagePack; settings: LettersSettings; numbersOnly?: boolean }) {
   const [shown, setShown] = useState<Shown | null>(null);
   const [stage, setStage] = useState(0);
   /** Counting by tapping: indices of the tapped things, in order. */
@@ -325,7 +335,8 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
   /** A key was pressed, on the keyboard or on the screen. */
   const pressKey = useCallback(
     (key: string) => {
-      const target = resolveKey(key, pack);
+      let target = resolveKey(key, pack);
+      if (numbersOnly && target?.kind === "letter") target = null;
       // Step by step, Space and Enter reveal the next part until everything is shown; then they are special keys again.
       const revealing = shown !== null && stage < lastStage(shown);
       const isNextKey = ((key === " " || key === "Enter") && revealing) || (shown !== null && isSame(target, shown));
@@ -334,6 +345,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         return;
       }
       if (!target && specialKey(key)) return;
+      if (!target && numbersOnly) target = randomNumber(shown);
       const now = performance.now();
       const counting = settings.finishCounting && now < countingUntil.current;
       if (!target || counting || now - lastChange.current < MIN_CHANGE_MS) {
@@ -343,7 +355,7 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
       lastChange.current = now;
       show(target);
     },
-    [pack, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, stepByStep, settings.finishCounting],
+    [pack, numbersOnly, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, stepByStep, settings.finishCounting],
   );
 
   useEffect(() => {
@@ -355,9 +367,9 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [pressKey, pack]);
 
-  // Touch screens: digits, then the alphabet.
+  // Touch screens: digits, then the alphabet (only the digits for Zählen).
   const touchKeys = useTouchKeys(settings.touchKeys, true);
-  const rows = useMemo(() => keyRows([..."1234567890", ...pack.letters.map((l) => l.upper)]), [pack]);
+  const rows = useMemo(() => keyRows([..."1234567890", ...(numbersOnly ? [] : pack.letters.map((l) => l.upper))]), [pack, numbersOnly]);
 
   useEffect(() => () => countTimers.current.forEach(clearTimeout), []);
 
@@ -390,7 +402,11 @@ export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: 
         <div ref={cardBox} className="card-box" style={{ translate: `${push[0]}cqw ${push[1]}cqh` }}>
           {shown === null && (
             <p className="letters-welcome">
-              {touchKeys ? t({ de: "Tipp auf einen Buchstaben! 👇", ru: "Нажми на букву! 👇" }) : t({ de: "Drück eine Taste! ⌨️", ru: "Нажми на клавишу! ⌨️" })}
+              {!touchKeys
+                ? t({ de: "Drück eine Taste! ⌨️", ru: "Нажми на клавишу! ⌨️" })
+                : numbersOnly
+                  ? t({ de: "Tipp auf eine Zahl! 👇", ru: "Нажми на цифру! 👇" })
+                  : t({ de: "Tipp auf einen Buchstaben! 👇", ru: "Нажми на букву! 👇" })}
             </p>
           )}
           {shown?.kind === "letter" && (

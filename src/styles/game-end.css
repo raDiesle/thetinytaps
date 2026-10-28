@@ -40,6 +40,28 @@
   animation: none;
 }
 
+/* Small in the bottom corners (`corners`): „Menü“ left, the others right, the picture free between them. */
+.game-end.corners {
+  left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(8px, env(safe-area-inset-bottom));
+  justify-content: space-between;
+  translate: none;
+  pointer-events: none;
+}
+
+.game-end.corners .game-end-button {
+  min-width: 0;
+  padding: 4px 14px 8px;
+  border-radius: 22px;
+  font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+  pointer-events: auto;
+}
+
+.game-end.corners .game-end-emoji {
+  font-size: clamp(1.6rem, 7vh, 2.8rem);
+}
+
 /* „Menü“: four cards drawn in the size of an emoji. */
 .menu-icon {
   width: 0.9em;

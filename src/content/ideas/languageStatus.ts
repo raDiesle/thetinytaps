@@ -89,12 +89,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/buchstaben/",
     languages: { de: "done", en: "done", ru: "done" },
-    note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Russisch tippt jede Taste als den kyrillischen Buchstaben an ihrer Stelle (ЙЦУКЕН); Chinesisch, Hindi und Arabisch haben eine andere Schrift und Tastatur.",
-  },
-  {
-    href: "/woerter/",
-    languages: { de: "done", en: "done", ru: "done" },
-    note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch, dieselben Sprachpakete wie „Buchstaben & Zahlen“.",
+    note: "Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Russisch tippt jede Taste als den kyrillischen Buchstaben an ihrer Stelle (ЙЦУКЕН); Chinesisch, Hindi und Arabisch haben eine andere Schrift und Tastatur.",
   },
   {
     href: "/zaehne/",
@@ -115,8 +110,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🎵 Warte-Lied (gesungen)",
         recorded: true,
-        languages: { de: "done", en: "text", ru: "done" },
-        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. Russisch aufgenommen (Oktober 2026); Englisch: Text für Suno fertig, noch nicht aufgenommen. Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
+        languages: { de: "done", en: "text", es: "done", ru: "done" },
+        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. Russisch und Spanisch aufgenommen (Oktober 2026; Spanisch spielt, sobald Spanisch eine App-Sprache ist); Englisch: Text für Suno fertig, noch nicht aufgenommen. Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
       },
     ],
   },

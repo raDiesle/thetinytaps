@@ -77,7 +77,7 @@
 }
 
 /* Under a short menu title the subtitle still starts its own line. */
-.menu-title + .home-subtitle {
+.menu-head + .home-subtitle {
   display: table;
   margin-inline: auto;
 }
@@ -219,6 +219,33 @@ button.game-card:focus-visible {
   margin-bottom: 24px;
 }
 
+/*
+ * The top of a menu (MenuHead): the corner on the left, the title centred next to it and the small buttons for
+ * grown-ups under the title. The title's column starts where the corner ends (--corner, measured, since a
+ * computer keeps the corner fixed outside the grid), so the title moves right or wraps instead of hiding under it.
+ */
+.menu-head {
+  display: grid;
+  grid-template-columns: minmax(var(--corner, auto), 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px 0;
+  align-self: stretch;
+}
+
+.menu-head > .menu-top {
+  grid-area: 1 / 1;
+  justify-self: start;
+}
+
+.menu-head > .menu-title {
+  grid-area: 1 / 2;
+}
+
+.menu-head > :not(.menu-top, .menu-title) {
+  grid-column: 1 / -1;
+  justify-content: center;
+}
+
 .badge {
   position: absolute;
   top: -12px;
@@ -324,8 +351,16 @@ button.game-card:focus-visible {
     white-space: nowrap;
   }
 
-  .home > .menu-top {
+  .home > .menu-top,
+  .home > .menu-head {
     margin-bottom: 10px;
+  }
+
+  /* No title on a phone: the small buttons for grown-ups come into the row next to the back link. */
+  .menu-head {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   /* Scrolling lists (when not all cards fit): flat cards, emoji beside the title, many side by side. */

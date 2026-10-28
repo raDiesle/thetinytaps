@@ -309,3 +309,106 @@ Title:
 ```text
 Waiting on the Potty
 ```
+
+## Español (`es`, written 28 Oct 2026; made 28 Oct 2026 → `musik-toepfchen-warten-es.mp3`)
+
+The German song in neutral Spanish, verse for verse, same tempo, key and instruments. „Orinal“ (understood everywhere,
+though Mexico says „bacinica“), „pañal“, „pipí“ and „caca“ as parents say to toddlers; the shout-back answers are
+„¡Yo!“. Present tense and nothing that changes for boy or girl: no „sentado/sentada“, „listo/lista“, „solito/solita“
+(„espero con calma“, „ya soy grande“ instead). „¡Adiós!“ is waving it off when flushing, as toddlers do. Not yet read
+by a native speaker. Spanish is not an app language yet (`APP_LANGUAGES`), so the song waits until it is.
+Suno sang it at about 101 BPM (99.6 at the start, 101.7 at the end), with a 4-bar bell intro, and after the last
+chorus a bell interlude and the last verse once more; Whisper heard every line in order, but smeared the first line
+over the intro (its words from 0.1 s, sung from 9.7 s).
+
+Lyrics:
+
+```text
+[Tempo: 100 BPM, steady, bouncy]
+
+[Verse 1 – ukulele, woodblock ticking]
+Me siento en mi orinal,
+¡ya no hay pañal, olé!
+Estoy creciendo, puedo,
+aquí me quedaré.
+
+[Chorus – glockenspiel joins]
+Tic, tac, esperamos,
+tenemos tiempo, sí.
+Pipí o bien caca —
+¡ya pronto están aquí!
+
+[Verse 2 – ukulele, light shaker]
+Mamá va al baño grande,
+papá también, ¡ajá!
+Y yo tengo mi orinal,
+¡qué bien, qué bien está!
+
+[Chorus – glockenspiel]
+Tic, tac, esperamos,
+tenemos tiempo, sí.
+Pipí o bien caca —
+¡ya pronto están aquí!
+
+[Verse 3 – playful, kazoo answers]
+Mi osito lleva pañal,
+es chiquitito aún.
+Yo ya soy grande y aviso:
+«¡Tengo que ir!» — ¡y pum!
+
+[Chorus – glockenspiel]
+Tic, tac, esperamos,
+tenemos tiempo, sí.
+Pipí o bien caca —
+¡ya pronto están aquí!
+
+[Bridge – call and response, the same voice shouts back, woodblock]
+¿Quién ya no usa pañal? (¡Yo!)
+¿Quién se sienta en el orinal? (¡Yo!)
+¿Quién espera con calma? (¡Yo!)
+¿Quién ya es tan grande? (¡Yo!)
+
+[Verse 4 – softer, calm]
+A veces va muy rápido,
+y a veces tarda más.
+Espero con mucha calma,
+el reloj marca el compás.
+
+[Chorus – glockenspiel]
+Tic, tac, esperamos,
+tenemos tiempo, sí.
+Pipí o bien caca —
+¡ya pronto están aquí!
+
+[Verse 5 – bouncy again, kazoo]
+Y cuando por fin sale,
+aplauden: ¡qué emoción!
+¡Adiós! Me lavo las manos —
+¡y canto mi canción!
+
+[Chorus – glockenspiel, everything together]
+Tic, tac, esperamos,
+tenemos tiempo, sí.
+Pipí o bien caca —
+¡ya pronto están aquí!
+
+[Instrumental turnaround – 2 bars, woodblock tick-tock, leads back to Verse 1]
+```
+
+Style of Music:
+
+```text
+playful cheerful children's song for toddlers, sung in neutral Spanish, 100 BPM, F major, one warm cheerful voice singing clearly, slow clear pronunciation, ukulele, glockenspiel, woodblock ticking like a clock, kazoo answers, light shaker, bouncy and silly but never hectic, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 3:00
+```
+
+Exclude Styles:
+
+```text
+rap, heavy drums, electric guitar, distortion, choir, sad, fast, tempo changes, long intro, fade out, final chord, reggaeton, flamenco
+```
+
+Title:
+
+```text
+Esperando en el orinal
+```
