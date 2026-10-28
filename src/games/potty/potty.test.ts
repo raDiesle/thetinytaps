@@ -30,9 +30,11 @@ const WHICHES: Which[] = [...new Set([...SAIDS, ...WENTS])];
 const ALL_STEPS = [...new Set([...STEPS, ...NOTHING_STEPS])];
 
 describe("Aufs Töpfchen", () => {
-  it("has steps with their own ids, every one said for pipi, kaka and not knowing, ending with the party", () => {
+  it("has steps with their own ids, every one said for pipi, kaka and not knowing, ending with the party and then the stars", () => {
     expect(new Set(STEPS.map((s) => s.id)).size).toBe(STEPS.length);
-    expect(STEPS.at(-1)?.id).toBe("party");
+    // „Hat geklappt!“ is no mode of its own any more: the week's stars are the story's last step, over the party picture.
+    expect(STEPS.slice(-2).map((s) => s.id)).toEqual(["party", "stars"]);
+    expect(STEPS.at(-1)?.picture).toBe(STEPS.at(-2)?.picture);
     expect([...SAIDS].sort()).toEqual(["both", "kaka", "pipi", "unsure"]);
     for (const texts of Object.values(POTTY_TEXTS)) {
       for (const which of WHICHES) for (const step of ALL_STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
@@ -81,7 +83,7 @@ describe("Aufs Töpfchen", () => {
   it("goes on by itself only where nothing real has to happen, and the waiting scenes stay longer than their sounds", () => {
     const auto = (id: string) => STEPS.find((s) => s.id === id)?.auto;
     // The child takes its trousers down, wipes, pulls them up, flushes and washes itself: that waits for a tap or „Weiter“.
-    for (const id of ["down", "wipe", "up", "flush", "wash", "party"]) expect(auto(id)).toBeUndefined();
+    for (const id of ["down", "wipe", "up", "flush", "wash", "party", "stars"]) expect(auto(id)).toBeUndefined();
     // A grown-up tells the first steps at their own pace: only „Weiter“ goes on there, and it calls for attention.
     expect(STEPS.filter((s) => s.nudge).map((s) => s.id)).toEqual(["eat", "need", "call", "go"]);
     for (const step of STEPS) if (step.nudge) expect(step.auto).toBeUndefined();

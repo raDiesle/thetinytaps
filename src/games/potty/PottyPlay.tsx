@@ -24,6 +24,7 @@ import {
   playSqueak,
   playTrickle,
   playTusch,
+  playTwinkle,
   playBlow,
   playWhistle,
   playWhoosh,
@@ -50,8 +51,10 @@ import {
 } from "./content";
 import { framesFor, preloadImages } from "./images";
 import type { PottySettings } from "./settings";
+import { addStar, loadStars, saveStars, type StarLog } from "./stars";
 import { StoryPicture } from "./StoryPicture";
 import { WaitClock } from "./WaitClock";
+import { WeekStars } from "./WeekStars";
 import { useWaitingMusic } from "./waitMusic";
 
 const flush = recorded("flush", playFlush);
@@ -123,6 +126,13 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const toldFinish = useRef(false);
   /** When the step began, for `TAP_GUARD_MS`. */
   const startedAt = useRef(0);
+  /** A grown-up tapped a ✓ in this round: something really came, so the end brings a star. */
+  const checked = useRef(false);
+  /** This round's star is on the chart: one round, one star, also when the end is reached twice. */
+  const starred = useRef(false);
+  const [log, setLog] = useState<StarLog>(loadStars);
+  /** The star of this round pops in on the chart. */
+  const [fresh, setFresh] = useState(false);
 
   const later = useCallback((ms: number, run: () => void) => {
     const timer = setTimeout(() => {
@@ -186,7 +196,9 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     startedAt.current = performance.now();
     setAsking(id === "call" || (id === "go" && saidNow === "unsure"));
     const line = texts.steps[id](TAPSI.name, came ?? saidNow);
-    say(nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
+    // The end shows this week's stars, with a new one only when a ✓ said what really came in this round.
+    const star = id === "stars" && checked.current && !starred.current;
+    say(star ? texts.star : nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
     switch (id) {
       case "eat":
         // In time with the pictures: eating first, drinking when its picture comes.
@@ -240,6 +252,17 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         sound(0, cheer);
         sound(300, partyHorn);
         for (let i = 0; i < 12; i++) later(i * 150, () => spawn());
+        break;
+      case "stars":
+        if (star) {
+          starred.current = true;
+          const next = addStar(loadStars(), new Date());
+          saveStars(next);
+          setLog(next);
+          setFresh(true);
+          // In time with the new star popping in.
+          sound(900, playTwinkle);
+        } else setLog(loadStars());
         break;
       case "play":
         // Mama and Papa knock at the open door before they ask.
@@ -342,12 +365,14 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   /** A ✓ while sitting: a grown-up says what is in the potty, and the story goes on with it. */
   const finish = (came: Went) => {
+    checked.current = true;
     setWent(came);
     begin(atRef.current.step + 1, { came });
   };
 
   /** Nothing came: the other story, washing hands and then playing, until Mama and Papa ask again. */
   const finishWithNothing = () => {
+    checked.current = false;
     setWent(null);
     begin(SIT + 1, { came: null, nothing: true });
   };
@@ -368,6 +393,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     stopTimers();
     const nothing = atRef.current.nothing && index > SIT;
     const came = nothing || index < DONE ? null : (went ?? expectedWent(said));
+    if (came === null) checked.current = false;
     setWent(came);
     begin(index, { came, nothing });
   };
@@ -384,6 +410,9 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     setSaid("unsure");
     setWent(null);
     toldFinish.current = false;
+    checked.current = false;
+    starred.current = false;
+    setFresh(false);
     begin(0, { came: null, said: "unsure", nothing: false });
   };
 
@@ -437,6 +466,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
           </div>
         </div>
       )}
+      {/* The end: this week's stars over the party picture. */}
+      {step.id === "stars" && <WeekStars log={log} fresh={fresh} />}
       {step.id === "call" && (
         <div className="pt-call" aria-hidden>
           <span>📣</span>

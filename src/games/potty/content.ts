@@ -46,7 +46,7 @@ export const SAID: { id: Went; emoji: string }[] = [
 export const expectedWent = (said: Said): Went => (said === "unsure" ? "both" : said);
 
 /** The steps of the story, one tap each. */
-export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party" | "play";
+export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party" | "stars" | "play";
 
 export interface Step {
   id: StepId;
@@ -105,6 +105,8 @@ export const STEPS: Step[] = [
   { id: "flush", icon: "🚽", picture: "abziehen", ms: 2600 },
   { id: "wash", icon: "🧼", picture: "waschen", ms: 2400 },
   { id: "party", icon: "🎉", picture: "party", ms: 2400 },
+  // The end: this week's stars over the party picture, with a new one today when a grown-up tapped a ✓ (PottyPlay.tsx).
+  { id: "stars", icon: "⭐", picture: "party", ms: 2400 },
 ];
 
 const SIT = STEPS.findIndex((s) => s.id === "sit");
@@ -235,7 +237,7 @@ export interface PottyTexts {
   nothing: string;
   /** What that button says, for the grown-up. */
   nothingButton: string;
-  /** Said when a star comes for really going. */
+  /** Said at the end instead of the step's line when a star comes for really going. */
   star: string;
 }
 
@@ -267,6 +269,7 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       flush: () => "Ausleeren und abziehen. Wuuusch!",
       wash: () => "Hände waschen mit Seife.",
       party: (name) => `Geschafft! Toll gemacht, ${name}!`,
+      stars: () => "Das sind deine Sterne.",
       play: (name) => `${name} spielt. Mama und Papa schauen rein: Musst du Pipi oder Kaka?`,
     },
     scenes: {
