@@ -21,8 +21,8 @@ Scene engine (modes in menu order: "Freies Entdecken" first and the default, see
 The pictures speak the app language (chosen on the home page, `src/lib/language.ts`). Rules:
 - An item's words live in two places: German in the scene's item (`name`, `sentences`, chains), every other
   language in the scene folder's `ru.ts`, `en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts` (`SceneTranslation`: title,
-  description, items by id with name, sentences, `gender`/`plural`, chain sentences in order), wired up in
-  `translations.ts`. New items and sentences come in German only until the user asks for a language; when a German
+  description, items by id with name, sentences, `gender`/`plural`, chain sentences in order), listed in
+  `src/content/texts/texts-<lang>.ts` (loaded with the app language, `translations.ts` fills `SCENE_TRANSLATIONS`). New items and sentences come in German only until the user asks for a language; when a German
   line's meaning changes, delete its translations. A picture plays in a language only when its translation covers
   every item and chain step, otherwise entirely in German, voice and keys included (`sceneLanguage` in
   `localize.ts`), never mixed; mark such a gap in `src/content/ideas/languageStatus.ts`.

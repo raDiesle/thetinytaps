@@ -21,7 +21,7 @@ camera often looks from the right from then on. The timing helpers (`passTime`, 
 
 What Tapsi says is in `stories/<story>/lines.ts` (no three.js there, so Node can read it), and in the other
 languages of the app (`src/content/targetLanguages.ts`) in `lines.<language>.ts` next to it: the same steps and
-lines in the same order (`StoryTranslation`, listed in the story's `translations.ts`; `storyIn()` swaps them in).
+lines in the same order (`StoryTranslation`, listed in `src/content/texts/texts-<lang>.ts` (`stories`), which fills the story's `translations.ts`; `storyIn()` swaps them in).
 Tapsi speaks the app language (🌐 on the home page), like the menus; a story without a translation into it
 is said in English, then German (and „Über das Spiel“ says so). The other recorded languages wait until the
 whole app speaks them and they join 🌐. Translations say

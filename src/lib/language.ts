@@ -1,6 +1,8 @@
 import { useSyncExternalStore } from "react";
 import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
+import { hasTexts, loadTexts } from "@/content/texts";
 import { playLanguage } from "@/lib/locale";
+import { keepTextsOffline } from "@/lib/pwa";
 
 // The language of the whole app, chosen once on the home page: the grown-ups'
 // screens (home page, start screens, settings) and what the child hears and sees
@@ -39,16 +41,39 @@ function apply(id: TargetLanguageId) {
 }
 apply(current);
 
-/** Switches the whole app to `id` and remembers it; every component using the language renders again. */
-export function setAppLanguage(id: TargetLanguageId) {
-  current = id;
-  apply(id);
+/**
+ * Loads the texts of the app language (src/content/texts) before the first screen shows (index.tsx), so
+ * nothing starts in German and turns into another language. Where they can't be loaded (offline before the
+ * service worker kept them), this visit plays in German, never half in one language and half in another.
+ */
+export async function loadAppLanguage() {
   try {
-    localStorage.setItem(KEY, id);
+    await loadTexts(current);
+    keepTextsOffline(current);
   } catch {
-    // Storage full or disabled: the language still applies for this visit.
+    current = "de";
+    apply(current);
   }
-  for (const listener of listeners) listener();
+}
+
+/**
+ * Switches the whole app to `id` and remembers it; every component using the language renders again. A language
+ * not loaded yet switches once its texts are there; offline without them, the app stays in the language it has.
+ */
+export function setAppLanguage(id: TargetLanguageId) {
+  const switchTo = () => {
+    current = id;
+    apply(id);
+    try {
+      localStorage.setItem(KEY, id);
+    } catch {
+      // Storage full or disabled: the language still applies for this visit.
+    }
+    keepTextsOffline(id);
+    for (const listener of listeners) listener();
+  };
+  if (hasTexts(id)) switchTo();
+  else loadTexts(id).then(switchTo, () => {});
 }
 
 /** The app language outside React, e.g. in a sound helper; components use useAppLanguage. */

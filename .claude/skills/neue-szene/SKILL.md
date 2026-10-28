@@ -182,7 +182,7 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   `/bilder/` row of `src/content/ideas/languageStatus.ts`. When asked for Russian: `src/games/scenes/<id>/ru.ts`
   (`export const RU: SceneTranslation`, see an existing scene) with the title, description, every item (`name` in
   the nominative without article, starting with a Cyrillic letter – it is the item's key; `gender` m/f/n or
-  `plural: true` as Russian has it) and the chain sentences in order, imported in `src/games/scenes/translations.ts`;
+  `plural: true` as Russian has it) and the chain sentences in order, imported in `src/content/texts/texts-ru.ts` (`scenes`);
   present tense, "ты", nothing that changes for boy or girl. Changing a German item of a translated scene: delete
   its Russian when the meaning changes.
 

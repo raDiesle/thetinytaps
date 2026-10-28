@@ -1,15 +1,9 @@
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import { byLanguage } from "@/content/texts";
 import type { StoryTranslation } from "../story";
-import { TRANSLATION as ar } from "./lines.ar";
-import { TRANSLATION as en } from "./lines.en";
-import { TRANSLATION as es } from "./lines.es";
-import { TRANSLATION as hi } from "./lines.hi";
-import { TRANSLATION as it } from "./lines.it";
-import { TRANSLATION as ru } from "./lines.ru";
-import { TRANSLATION as zh } from "./lines.zh";
 
-// Every lines.<language>.ts of „Die Wolkenreise“ (bun run voice finds them by their file name;
-// voice.test.ts checks that each one is listed here).
+// Every lines.<language>.ts of „Die Wolkenreise“, loaded with the app language: each is listed in
+// src/content/texts/texts-<language>.ts (bun run voice finds them by their file name; voice.test.ts checks that each one is there).
 
 /** What Tapsi says in the languages besides German. */
-export const TRANSLATIONS: Partial<Record<TargetLanguageId, StoryTranslation>> = { en, zh, hi, es, ar, ru, it };
+export const TRANSLATIONS: Partial<Record<TargetLanguageId, StoryTranslation>> = byLanguage((texts) => texts.stories?.cloudTrip);

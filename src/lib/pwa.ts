@@ -95,6 +95,15 @@ export function setUpPwa() {
   void navigator.serviceWorker.ready.then(() => update({ offlineReady: true }));
 }
 
+/**
+ * Asks the service worker to keep the texts of `language` (src/content/texts) for offline use: it keeps only the
+ * languages pages play in, and on the very first visit the page loads them before the worker is there.
+ */
+export function keepTextsOffline(language: string) {
+  if (!PROD || !("serviceWorker" in navigator)) return;
+  void navigator.serviceWorker.ready.then((registration) => registration.active?.postMessage({ keepTexts: language }));
+}
+
 /** Reloading in fullscreen would end it, and only a tap brings it back; such a page waits for the next start. */
 const reloadNow = () => {
   if (state.updateReady && !document.fullscreenElement) location.reload();

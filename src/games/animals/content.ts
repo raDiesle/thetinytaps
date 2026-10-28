@@ -1,12 +1,7 @@
+import { byLanguage } from "@/content/texts";
 import { playBark, playBuzz, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Localized } from "@/lib/language";
-import { ARABIC } from "./content.ar";
-import { ENGLISH } from "./content.en";
-import { SPANISH } from "./content.es";
-import { HINDI } from "./content.hi";
-import { RUSSIAN } from "./content.ru";
-import { CHINESE } from "./content.zh";
 import type { Home, HomeId } from "./homes";
 
 // Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
@@ -119,17 +114,7 @@ export interface AnimalTranslation {
 }
 
 /** Every language besides German, by its id. */
-export const ANIMAL_TRANSLATIONS: Partial<Record<TargetLanguageId, AnimalTranslation>> = {
-  en: ENGLISH,
-  zh: CHINESE,
-  hi: HINDI,
-  es: SPANISH,
-  ar: ARABIC,
-  ru: RUSSIAN,
-};
+export const ANIMAL_TRANSLATIONS: Partial<Record<TargetLanguageId, AnimalTranslation>> = byLanguage((texts) => texts.animals);
 
 /** The texts by app language: `pick(ANIMAL_TEXTS, language.id)`. */
-export const ANIMAL_TEXTS: Localized<AnimalTexts> = {
-  de: GERMAN_TEXTS,
-  ...Object.fromEntries(Object.entries(ANIMAL_TRANSLATIONS).map(([id, translation]) => [id, translation.texts(GERMAN_TEXTS)])),
-};
+export const ANIMAL_TEXTS: Localized<AnimalTexts> = byLanguage((texts) => texts.animals?.texts(GERMAN_TEXTS), GERMAN_TEXTS);

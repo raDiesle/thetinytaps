@@ -1,12 +1,7 @@
+import { byLanguage } from "@/content/texts";
 import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, type Spoken, spokenIn } from "@/lib/language";
 import { ALL_TEETH, type Jaw, type Side, type Surface, type ToothId, type View } from "./jaw";
-import { STEP_TEXTS_AR } from "./steps.ar";
-import { STEP_TEXTS_EN } from "./steps.en";
-import { STEP_TEXTS_ES } from "./steps.es";
-import { STEP_TEXTS_HI } from "./steps.hi";
-import { STEP_TEXTS_RU } from "./steps.ru";
-import { STEP_TEXTS_ZH } from "./steps.zh";
 
 /** How the brush moves: back and forth on the chewing surfaces, small circles outside, wiping from gum to tooth inside. */
 export type Motion = "scrub" | "circle" | "wipe";
@@ -135,14 +130,7 @@ export const STEPS: Step[] = [
 ];
 
 /** The step texts in the other languages (steps.<language>.ts), by language and step id. */
-export const STEP_TRANSLATIONS: Partial<Record<TargetLanguageId, Partial<Record<StepId, Partial<StepTexts>>>>> = {
-  en: STEP_TEXTS_EN,
-  zh: STEP_TEXTS_ZH,
-  hi: STEP_TEXTS_HI,
-  es: STEP_TEXTS_ES,
-  ar: STEP_TEXTS_AR,
-  ru: STEP_TEXTS_RU,
-};
+export const STEP_TRANSLATIONS: Partial<Record<TargetLanguageId, Partial<Record<StepId, Partial<StepTexts>>>>> = byLanguage((texts) => texts.teethSteps);
 
 /** Title, hint or cue of `step` in `language` and the voice for it; the German one with the German voice where there is no translation. */
 export const stepText = (step: Step, key: keyof StepTexts, language: TargetLanguage): Spoken =>

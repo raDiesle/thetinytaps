@@ -1,11 +1,6 @@
+import { byLanguage } from "@/content/texts";
 import { type Spoken, spokenIn } from "@/lib/language";
 import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages";
-import { DAYTIME_AR } from "./daytime.ar";
-import { DAYTIME_EN } from "./daytime.en";
-import { DAYTIME_ES } from "./daytime.es";
-import { DAYTIME_HI } from "./daytime.hi";
-import { DAYTIME_RU } from "./daytime.ru";
-import { DAYTIME_ZH } from "./daytime.zh";
 
 // Brushing in the morning looks different from brushing at night: the sun
 // rises or the moon is out, crumbs from breakfast or pyjamas before bed. The
@@ -51,14 +46,7 @@ export const DAYTIME: Record<Daytime, DaytimeTexts> = {
 };
 
 /** The morning and evening texts in the other languages, by language. */
-export const DAYTIME_TRANSLATIONS: Partial<Record<TargetLanguageId, Record<Daytime, Partial<DaytimeTexts>>>> = {
-  en: DAYTIME_EN,
-  zh: DAYTIME_ZH,
-  hi: DAYTIME_HI,
-  es: DAYTIME_ES,
-  ar: DAYTIME_AR,
-  ru: DAYTIME_RU,
-};
+export const DAYTIME_TRANSLATIONS: Partial<Record<TargetLanguageId, Record<Daytime, Partial<DaytimeTexts>>>> = byLanguage((texts) => texts.teethDaytime);
 
 /** One of the daytime's texts in `language` and the voice for it; the German one with the German voice where there is no translation. */
 export const daytimeText = (daytime: Daytime, key: keyof DaytimeTexts, language: TargetLanguage): Spoken =>

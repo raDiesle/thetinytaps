@@ -26,13 +26,8 @@ import {
   playWhoosh,
 } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
-import { ARABIC } from "./content.ar";
-import { ENGLISH } from "./content.en";
-import { SPANISH } from "./content.es";
-import { HINDI } from "./content.hi";
-import { RUSSIAN } from "./content.ru";
-import { CHINESE } from "./content.zh";
 import type { ShadowTheme } from "./settings";
 
 // Pictures and German texts for "Schatten finden" (N-07); the other languages are in
@@ -190,17 +185,7 @@ export interface ShadowTranslation {
 }
 
 /** Every language besides German, by its id. */
-export const SHADOW_TRANSLATIONS: Partial<Record<TargetLanguageId, ShadowTranslation>> = {
-  en: ENGLISH,
-  zh: CHINESE,
-  hi: HINDI,
-  es: SPANISH,
-  ar: ARABIC,
-  ru: RUSSIAN,
-};
+export const SHADOW_TRANSLATIONS: Partial<Record<TargetLanguageId, ShadowTranslation>> = byLanguage((texts) => texts.shadows);
 
 /** The texts by app language: `pick(SHADOW_TEXTS, language.id)`. */
-export const SHADOW_TEXTS: Localized<ShadowTexts> = {
-  de: GERMAN_TEXTS,
-  ...Object.fromEntries(Object.entries(SHADOW_TRANSLATIONS).map(([id, translation]) => [id, translation.texts(GERMAN_TEXTS)])),
-};
+export const SHADOW_TEXTS: Localized<ShadowTexts> = byLanguage((texts) => texts.shadows?.texts(GERMAN_TEXTS), GERMAN_TEXTS);

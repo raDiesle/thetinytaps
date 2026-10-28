@@ -1,15 +1,8 @@
 import { useAppLanguage } from "@/lib/language";
-import { ar } from "./ar";
 import { de } from "./de";
-import { en } from "./en";
-import { es } from "./es";
-import { hi } from "./hi";
-import { pl } from "./pl";
-import { ru } from "./ru";
+import { byLanguage } from "./texts";
 import { spellingOf, textUnits, unitKey } from "./spelling";
 import type { KeyPress, LanguagePack, LetterEntry, WordEntry } from "./types";
-import { tr } from "./tr";
-import { zh } from "./zh";
 
 export type LanguageId = "de" | "en" | "tr" | "pl" | "ru" | "es" | "zh" | "hi" | "ar";
 
@@ -17,20 +10,32 @@ export interface Language {
   id: LanguageId;
   /** For German start screens: "🇺🇸 Englisch". */
   label: string;
-  pack: LanguagePack;
+  /** Its pack: German until the language's texts are loaded (`loadTexts`), so no screen ever waits for one. */
+  readonly pack: LanguagePack;
 }
+
+/** The packs besides German, as their languages load (src/content/texts). */
+const PACKS = byLanguage((texts) => texts.pack);
+
+const language = (id: LanguageId, label: string): Language => ({
+  id,
+  label,
+  get pack() {
+    return (id === "de" ? undefined : PACKS[id]) ?? de;
+  },
+});
 
 /** Language packs of the letters and words games; they play in the pack of the app language (`useLanguagePack`). */
 export const LANGUAGES: Language[] = [
-  { id: "de", label: "🇩🇪 Deutsch", pack: de },
-  { id: "en", label: "🇺🇸 Englisch", pack: en },
-  { id: "tr", label: "🇹🇷 Türkisch", pack: tr },
-  { id: "pl", label: "🇵🇱 Polnisch", pack: pl },
-  { id: "ru", label: "🇷🇺 Russisch", pack: ru },
-  { id: "es", label: "🇪🇸 Spanisch", pack: es },
-  { id: "zh", label: "🇨🇳 Chinesisch", pack: zh },
-  { id: "hi", label: "🇮🇳 Hindi", pack: hi },
-  { id: "ar", label: "🇸🇦 Arabisch", pack: ar },
+  language("de", "🇩🇪 Deutsch"),
+  language("en", "🇺🇸 Englisch"),
+  language("tr", "🇹🇷 Türkisch"),
+  language("pl", "🇵🇱 Polnisch"),
+  language("ru", "🇷🇺 Russisch"),
+  language("es", "🇪🇸 Spanisch"),
+  language("zh", "🇨🇳 Chinesisch"),
+  language("hi", "🇮🇳 Hindi"),
+  language("ar", "🇸🇦 Arabisch"),
 ];
 
 /** The language with this id; German for anything unknown, e.g. an old saved setting. */

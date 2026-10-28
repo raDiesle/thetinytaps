@@ -5,21 +5,10 @@
 // not translated yet (translations come only on request) – is told in German.
 
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import { byLanguage } from "@/content/texts";
 import { pick, type Localized } from "@/lib/language";
 import { COMFORTS, type Comfort, type ComfortId, type Feeling, type FeelingId } from "./bear";
-import { COMFORTS_AR, FEELINGS_AR } from "./bear.ar";
-import { COMFORTS_EN, FEELINGS_EN } from "./bear.en";
-import { COMFORTS_ES, FEELINGS_ES } from "./bear.es";
-import { COMFORTS_HI, FEELINGS_HI } from "./bear.hi";
-import { COMFORTS_RU, FEELINGS_RU } from "./bear.ru";
-import { COMFORTS_ZH, FEELINGS_ZH } from "./bear.zh";
 import { QUESTION, type Situation, type SituationId } from "./kita";
-import { SITUATIONS_AR } from "./kita.ar";
-import { SITUATIONS_EN } from "./kita.en";
-import { SITUATIONS_ES } from "./kita.es";
-import { SITUATIONS_HI } from "./kita.hi";
-import { SITUATIONS_RU } from "./kita.ru";
-import { SITUATIONS_ZH } from "./kita.zh";
 import type { Story } from "./stories";
 import type { Beat } from "./story";
 
@@ -56,32 +45,11 @@ export interface SituationText {
 }
 
 /** The translations of the kind things, by language. */
-export const COMFORT_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<ComfortId, ComfortText>>>> = {
-  en: COMFORTS_EN,
-  zh: COMFORTS_ZH,
-  hi: COMFORTS_HI,
-  es: COMFORTS_ES,
-  ar: COMFORTS_AR,
-  ru: COMFORTS_RU,
-};
+export const COMFORT_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<ComfortId, ComfortText>>>> = byLanguage((texts) => texts.comforts);
 /** The translations of the bear's feelings, by language. */
-export const FEELING_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<FeelingId, FeelingText>>>> = {
-  en: FEELINGS_EN,
-  zh: FEELINGS_ZH,
-  hi: FEELINGS_HI,
-  es: FEELINGS_ES,
-  ar: FEELINGS_AR,
-  ru: FEELINGS_RU,
-};
+export const FEELING_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<FeelingId, FeelingText>>>> = byLanguage((texts) => texts.feelings);
 /** The translations of the kindergarten stories, by language. */
-export const SITUATION_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<SituationId, SituationText>>>> = {
-  en: SITUATIONS_EN,
-  zh: SITUATIONS_ZH,
-  hi: SITUATIONS_HI,
-  es: SITUATIONS_ES,
-  ar: SITUATIONS_AR,
-  ru: SITUATIONS_RU,
-};
+export const SITUATION_TEXTS: Partial<Record<TargetLanguageId, Partial<Record<SituationId, SituationText>>>> = byLanguage((texts) => texts.situations);
 
 /** All kind things in `language`. */
 export function comfortsIn(language: TargetLanguageId): Record<ComfortId, Comfort> {

@@ -163,18 +163,27 @@ async function writePages(template: string) {
 // so every change installs a new one. 404.html is left out: the worker answers deep links with
 // index.html itself. So are songs (files named musik-*.mp3): music can be switched off for all games,
 // and then they must not be downloaded; the worker keeps a song once a page has fetched it. The same
-// for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/games/adventure/voiceId.ts):
-// only the chosen one is needed.
+// for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/games/adventure/voiceId.ts)
+// and the texts of each language (texts-ru.<hash>.js, src/content/texts): only the chosen one is needed, and
+// the worker keeps the one a page asks for (TEXTS, by language).
 async function writeServiceWorker() {
-  const files = (await filesIn(OUT)).filter(
-    (file) => file !== "404.html" && file !== "sw.js" && !/\.(map|LICENSE\.txt)$/.test(file) && !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file),
+  const all = await filesIn(OUT);
+  const texts = Object.fromEntries(all.flatMap((file) => /^static\/texts-([a-z]{2})\.[^/]*\.js$/.exec(file)?.slice(1, 2).map((id) => [id, `./${file}`]) ?? []));
+  const files = all.filter(
+    (file) =>
+      file !== "404.html" &&
+      file !== "sw.js" &&
+      !/\.(map|LICENSE\.txt)$/.test(file) &&
+      !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file) &&
+      !Object.values(texts).includes(`./${file}`),
   );
   const template = await readFile(join(ROOT, "src/sw.js"), "utf8");
   const hash = createHash("sha256").update(template);
   for (const file of files) hash.update(file).update(await readFile(join(OUT, file)));
   const worker = template
     .replace('"__VERSION__"', JSON.stringify(hash.digest("hex").slice(0, 12)))
-    .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)));
+    .replace("__FILES__", JSON.stringify(files.map((file) => `./${file}`)))
+    .replace("__TEXTS__", JSON.stringify(texts));
   await writeFile(join(OUT, "sw.js"), worker);
 }
 

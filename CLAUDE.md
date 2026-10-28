@@ -99,7 +99,11 @@ In a fresh worktree run `bun install` first.
   `APP_LANGUAGES` in `src/lib/language.ts`): grown-ups' screens and what the child hears and sees, translated once on
   request (Russian, then the other five, October 2026). Write every user-facing text so it can be translated: short
   texts inline as `t({ de: "…" })` (`useT()`), adding the other languages only when translations are asked for; larger
-  content gets a `<lang>.ts` / `*.<lang>.ts` file next to the German data, keyed by id, and a registry by language.
+  content gets a `<lang>.ts` / `*.<lang>.ts` file next to the German data, keyed by id, and a table by language.
+  A visit downloads only its own language: such a file is imported only by `src/content/texts/texts-<lang>.ts` (one chunk
+  per language, loaded before the first screen; the service worker keeps only the languages played), and the game's
+  table fills from there with `byLanguage(…)` – never import it from game code, or every visitor downloads it
+  (`texts.test.ts` checks this).
   A text without a translation shows and speaks in German, with the German voice – never German words with another
   language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`), never a
   fixed `de-DE`. When the meaning of a German line changes, delete its translations (they fall back to German) rather

@@ -6,12 +6,14 @@
 const VERSION = "__VERSION__";
 /** All files of the build, relative to this script, without the songs and other languages' voices. */
 const FILES = __FILES__;
+/** The texts of each language besides German (static/texts-ru.<hash>.js), by language; left out of FILES. */
+const TEXTS = __TEXTS__;
 /**
  * Left out of FILES and kept once fetched: songs (musik-*.mp3), because music can be off and then
- * they are never downloaded, and Tapsi's voice in other languages than German (en-<hash>.mp3), of
- * which only the chosen one is needed.
+ * they are never downloaded, Tapsi's voice in other languages than German (en-<hash>.mp3) and the texts
+ * of each language (texts-ru.<hash>.js), of which only the chosen one is needed.
  */
-const ON_DEMAND = /\/(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/;
+const ON_DEMAND = /\/((musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3|static\/texts-[a-z]{2}\.[^/]*\.js)$/;
 
 const PREFIX = "tinytaps-";
 const CACHE = PREFIX + VERSION;
@@ -23,6 +25,15 @@ self.addEventListener("install", (event) => {
       const cache = await caches.open(CACHE);
       // "reload" skips the HTTP cache, so no file from an older build sneaks in.
       await cache.addAll(FILES.map((file) => new Request(file, { cache: "reload" })));
+      // The languages an older build kept (the app language, at least) come along, so the app still
+      // starts offline in its language after an update.
+      const kept = new Set();
+      for (const key of await caches.keys()) {
+        if (!key.startsWith(PREFIX) || key === CACHE) continue;
+        for (const request of await (await caches.open(key)).keys()) kept.add(/\/static\/texts-([a-z]{2})\./.exec(request.url)?.[1]);
+      }
+      const texts = [...kept].map((id) => TEXTS[id]).filter(Boolean);
+      await cache.addAll(texts.map((file) => new Request(file, { cache: "reload" })));
       await self.skipWaiting();
     })(),
   );
@@ -36,6 +47,19 @@ self.addEventListener("activate", (event) => {
       const old = (await caches.keys()).filter((key) => key.startsWith(PREFIX) && key !== CACHE);
       await Promise.all(old.slice(0, -1).map((key) => caches.delete(key)));
       await self.clients.claim();
+    })(),
+  );
+});
+
+// A page keeps the texts of the language it plays in (keepTextsOffline in src/lib/pwa.ts): on the very first
+// visit it loaded them before this worker was there, and after a switch they are new.
+self.addEventListener("message", (event) => {
+  const file = TEXTS[event.data?.keepTexts];
+  if (!file) return;
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(CACHE);
+      if (!(await cache.match(file))) await cache.add(file);
     })(),
   );
 });

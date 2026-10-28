@@ -6,6 +6,7 @@ import { BackgroundMusic } from "./components/BackgroundMusic";
 import { PlaytimeLock } from "./components/PlaytimeLock";
 import { ScreenHint } from "./components/ScreenHint";
 import { SeoHead } from "./components/SeoHead";
+import { loadAppLanguage } from "./lib/language";
 import { downloadMusicIfOn } from "./lib/musicFile";
 import { setUpPwa } from "./lib/pwa";
 import "@fontsource-variable/fredoka";
@@ -14,6 +15,9 @@ import { BASE_URL } from "@/lib/buildInfo";
 
 setUpPwa();
 downloadMusicIfOn();
+
+// Only the app language's texts are downloaded, and they are there before the first screen (src/content/texts).
+await loadAppLanguage();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
