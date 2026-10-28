@@ -106,8 +106,14 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const scenes = useMemo(() => scenesFor(said), [said]);
   const [at, setAt] = useState<At>(START);
   const [busy, setBusy] = useState(false);
-  /** The buttons for what the child said show in this step: while calling, and on the way while nothing was picked. */
+  /**
+   * The buttons for what the child said show in this step: while calling, and on the way while nothing was picked.
+   * They are the only way on then: no „Weiter“, and a tap elsewhere only points at them.
+   */
   const [asking, setAsking] = useState(false);
+  const askingRef = useRef(false);
+  /** Bumped for every tap that misses the buttons for what the child said, so they shake again. */
+  const [poke, setPoke] = useState(0);
   /** Bumped for every step and scene, so the overlays and the picture start again. */
   const [beat, setBeat] = useState(0);
   const { bursts, spawn } = useBursts();
@@ -178,7 +184,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing }: Begin = {}) => {
     const { id, ms, moves } = storyFor(nothing)[index];
     goTo({ step: index, scene: -1, nothing }, ms);
-    setAsking(id === "call" || (id === "go" && saidNow === "unsure"));
+    askingRef.current = id === "call" || (id === "go" && saidNow === "unsure");
+    setAsking(askingRef.current);
     const line = texts.steps[id](TAPSI.name, came ?? saidNow);
     say(nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
     switch (id) {
@@ -285,13 +292,20 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   };
 
   /**
-   * A tap or key anywhere does what makes most sense there: while sitting the next thought, everywhere else what
-   * „Weiter“ does (what the child said stays as picked, ❓ when nobody did). Only while a step's sounds still run,
-   * and at the end, it sparkles.
+   * A tap or key anywhere does what makes most sense there: while sitting the next thought, while asking what the child
+   * said a shake of those buttons (only they go on), everywhere else what „Weiter“ does. Only while a step's sounds
+   * still run, and at the end, it sparkles.
    */
   const act = (x?: number, y?: number) => {
     const { step: index, nothing } = atRef.current;
     const here = storyFor(nothing);
+    if (askingRef.current) {
+      spawn(x, y);
+      if (settings.sounds) playBoing();
+      setPoke((p) => p + 1);
+      if (!busyRef.current) say(texts.askSaid);
+      return;
+    }
     if (busyRef.current || index >= here.length - 1) {
       spawn(x, y);
       if (settings.sounds) playRandomNote();
@@ -315,8 +329,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     return () => clearTimeout(timer);
   }, [at]);
 
-  /** A button while calling: what the child said is kept, and the story goes on with it at once, as „Weiter“ would. */
-  const pick = (choice: Said, e: PointerEvent) => {
+  /** A button while calling: what the child said is kept, and the story goes on with it at once – the only way on there. */
+  const pick = (choice: Went, e: PointerEvent) => {
     if (settings.sounds) playPop();
     spawn(e.clientX, e.clientY);
     setSaid(choice);
@@ -347,7 +361,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
 
   /**
    * A tap on the row of steps: the story jumps there at once, also while a step still plays. Before the
-   * potty nothing has come yet; from „fertig“ on, what the child said came (pipi when nobody knew) unless a ✓ chose.
+   * potty nothing has come yet; from „fertig“ on, what the child said came (both when nobody knew) unless a ✓ chose.
    * Back on the potty or before it, the usual story starts again, since nothing has been chosen there yet.
    */
   const jump = (index: number) => {
@@ -376,8 +390,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
-      // While sitting Enter is the ✓ for what the child said (pipi when nobody knew), every other key the next thought.
-      // Everywhere else every key is „Weiter“.
+      // While sitting Enter is the ✓ for what the child said (both when nobody knew), every other key the next thought.
+      // While asking what the child said every key shakes those buttons, everywhere else every key is „Weiter“.
       const here = storyFor(atRef.current.nothing)[atRef.current.step];
       if (e.key === "Enter" && here?.id === "sit" && !busyRef.current) finish(expectedWent(said));
       else act();
@@ -453,9 +467,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         </ol>
 
         <div className="pt-grown">
-          {/* What the child said: one choice of four, only noted; untouched it stays „muss mal“. */}
+          {/* What the child said: one choice of three and the only way on, so each carries „Weiter“'s ▶, they call for
+              attention like „Weiter“ does elsewhere, and a tap that misses them shakes them (keyed by `poke`). */}
           {asking && (
-            <div className="pt-choice" role="group" aria-label={texts.askSaid}>
+            <div key={poke} className={`pt-choice pt-ask${poke ? " poked" : ""}`} role="group" aria-label={texts.askSaid}>
               <span className="pt-choice-label">{texts.askSaid}</span>
               <div className="pt-choice-buttons">
                 {SAID.map((s) => (
@@ -472,6 +487,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     }}
                   >
                     {s.emoji}
+                    <span className="pt-said-next">▶</span>
                   </button>
                 ))}
               </div>
@@ -518,8 +534,9 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
             </div>
           )}
 
-          {/* On the first steps nothing goes on without it, so it calls for attention there. */}
-          {!sitting && !last && (
+          {/* On the first steps nothing goes on without it, so it calls for attention there; never next to the buttons
+              for what the child said, which are the way on then. */}
+          {!sitting && !last && !asking && (
             <button type="button" className={`pt-next${step.nudge ? " nudge" : ""}`} data-tap aria-label={texts.next} onPointerDown={next}>
               ▶
             </button>

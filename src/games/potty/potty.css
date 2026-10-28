@@ -229,15 +229,74 @@
     0 2px 6px #0003;
 }
 
-/* What the child said (💧, 💩, 💧💩, ❓): the picked one turns yellow. */
+/* What the child said (💧, 💩, 💧💩): the only way on there, so each is a „Weiter“ – yellow like it, with its ▶ –
+   and they swell one after the other, the way „Weiter“ calls on the first steps. The picked one has a dark ring. */
 .pt-said {
-  min-width: clamp(42px, 10vmin, 62px);
-  height: clamp(42px, 10vmin, 62px);
+  position: relative;
+  min-width: clamp(54px, 13vmin, 80px);
+  height: clamp(48px, 11vmin, 66px);
+  background: #ffd23f;
+  color: #2a1e5c;
   font-size: clamp(18px, 4.4vmin, 28px);
+  animation: pt-nudge 1.4s ease-in-out infinite;
+}
+
+.pt-said:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.pt-said:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.pt-said:active {
+  animation: none;
 }
 
 .pt-said.picked {
-  background: #ffd23f;
+  outline: 4px solid #2a1e5c;
+  outline-offset: 2px;
+}
+
+/* „Weiter“'s ▶ as a badge on the corner, so it takes no room from the emoji on a phone. */
+.pt-said-next {
+  position: absolute;
+  right: -7px;
+  bottom: -7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(18px, 4.4vmin, 26px);
+  height: clamp(18px, 4.4vmin, 26px);
+  padding-left: 2px;
+  border-radius: 50%;
+  background: #2a1e5c;
+  color: #ffd23f;
+  font-size: clamp(9px, 2.2vmin, 13px);
+}
+
+/* A tap or key that missed the buttons: the frame shakes, so it is plain that only they go on. */
+.pt-ask.poked {
+  animation: pt-poke 0.5s ease-in-out;
+}
+
+@keyframes pt-poke {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  20% {
+    transform: translateX(-8px) scale(1.06);
+  }
+  40% {
+    transform: translateX(8px) scale(1.06);
+  }
+  60% {
+    transform: translateX(-6px) scale(1.04);
+  }
+  80% {
+    transform: translateX(4px) scale(1.02);
+  }
 }
 
 .pt-next {
@@ -309,6 +368,11 @@
   .pt-choice-buttons {
     display: grid;
     grid-template-columns: repeat(2, auto);
+  }
+
+  /* The three for what the child said: 💧 and 💩 side by side, 💧💩 under both. */
+  .pt-ask .pt-said:nth-child(3) {
+    grid-column: span 2;
   }
 
   .pt-choice:has(.pt-finish) .pt-choice-buttons {
@@ -451,6 +515,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .pt-next.nudge,
+  .pt-said,
+  .pt-ask.poked,
   .pt-clock line {
     animation: none;
   }

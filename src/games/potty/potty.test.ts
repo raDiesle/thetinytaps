@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "bun:test";
 import { LANGUAGE_STATUS } from "@/content/ideas/languageStatus";
 import {
+  expectedWent,
   iconFor,
   NOTHING_STEPS,
   picturesFor,
@@ -21,7 +22,8 @@ import {
 import { addStar } from "./stars";
 import { waitLanguageFor, waitLanguageOf } from "./waitMusic";
 
-const SAIDS: Said[] = SAID.map((s) => s.id);
+/** What the child can have said: a button each, or nothing yet. */
+const SAIDS: Said[] = [...SAID.map((s) => s.id), "unsure"];
 const WENTS: Went[] = ["pipi", "kaka", "both"];
 const WHICHES: Which[] = [...new Set([...SAIDS, ...WENTS])];
 /** The steps of both stories. */
@@ -36,11 +38,18 @@ describe("Aufs Töpfchen", () => {
       for (const which of WHICHES) for (const step of ALL_STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
       expect(texts.nothing.trim()).not.toBe("");
       for (const went of WENTS) expect(texts.went[went].trim()).not.toBe("");
-      for (const said of SAIDS) expect(texts.said[said].trim()).not.toBe("");
+      for (const { id } of SAID) expect(texts.said[id].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
       for (const scene of WAIT_SCENES) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
       expect(texts.star.trim()).not.toBe("");
     }
+  });
+
+  it("asks what the child said with one button each for pipi, kaka and both, and no ❓, since not knowing is both", () => {
+    // ❓ was the same as 💧💩 to the user: a button that means what another one means only makes a grown-up think.
+    expect(SAID.map((s) => s.id)).toEqual(["pipi", "kaka", "both"]);
+    expect(expectedWent("unsure")).toBe("both");
+    expect(scenesFor("unsure")).toEqual(scenesFor("both"));
   });
 
   it("goes from sitting to washing hands and playing when nothing came, ending there", () => {

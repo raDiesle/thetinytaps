@@ -22,26 +22,28 @@ export type Need = "pipi" | "kaka";
 export type Went = Need | "both";
 
 /**
- * What the child said it has to do, tapped by a grown-up on a small button while Tapsi calls Mama and Papa
- * (and again on the way to the bathroom while nothing was picked): often nobody knows yet ("unsure", also
- * when nobody taps), so the story says „muss mal“ and the waiting brings scenes for both. Picking only notes
- * it down, the story goes on by itself. What really came is chosen at the ✓.
+ * What the child said it has to do, tapped by a grown-up on a button while Tapsi calls Mama and Papa: one of
+ * pipi, kaka or both, and the story goes on only with that tap. Before it nobody knows yet ("unsure", also
+ * after jumping past calling in the row of steps, which asks again on the way), so the story says „muss mal“
+ * and otherwise treats it like both. What really came is chosen at the ✓.
  */
 export type Said = Went | "unsure";
 
 /** What a step is about: what the child said before the ✓, what came after it. */
 export type Which = Said | Went;
 
-/** The choices of `Said` in the order of their buttons; the emoji stands for it. */
-export const SAID: { id: Said; emoji: string }[] = [
+/**
+ * The buttons for what the child said, in their order; the emoji stands for it. No ❓: not knowing is
+ * the same as both (the user's choice), so 💧💩 is that button.
+ */
+export const SAID: { id: Went; emoji: string }[] = [
   { id: "pipi", emoji: "💧" },
   { id: "kaka", emoji: "💩" },
   { id: "both", emoji: "💧💩" },
-  { id: "unsure", emoji: "❓" },
 ];
 
-/** What the ✓ of what the child said is, and what came when a grown-up skips the ✓: pipi when nobody knew. */
-export const expectedWent = (said: Said): Went => (said === "unsure" ? "pipi" : said);
+/** What the ✓ of what the child said is, and what came when a grown-up skips the ✓: both when nobody knew. */
+export const expectedWent = (said: Said): Went => (said === "unsure" ? "both" : said);
 
 /** The steps of the story, one tap each. */
 export type StepId = "eat" | "need" | "call" | "go" | "down" | "sit" | "done" | "wipe" | "up" | "flush" | "wash" | "party" | "play";
@@ -67,7 +69,8 @@ export interface Step {
   auto?: number;
   /**
    * Never goes on by itself, and „Weiter“ calls for attention, since a grown-up reads the story out at their own
-   * pace: the first steps, where nothing real happens yet. Any tap or key goes on there too.
+   * pace: the first steps, where nothing real happens yet. Any tap or key goes on there too – except while the
+   * buttons for what the child said show: they are the only way on then, and call for attention instead.
    */
   nudge?: true;
 }
@@ -88,7 +91,7 @@ export const STEPS: Step[] = [
   // Eating and drinking take turns as the step's frames, moving from the start; the first steps wait for „Weiter“.
   { id: "eat", icon: "🍝", picture: ["essen", "trinken"], ms: 2000, nudge: true },
   { id: "need", icon: { pipi: "💦", kaka: "🌀" }, picture: { pipi: "blase", kaka: "bauch" }, ms: 1600, nudge: true },
-  // Here (and on the way, while nothing was picked) a grown-up notes what the child said.
+  // Here (and on the way, while nothing was picked) a grown-up taps what the child said, and only that goes on.
   { id: "call", icon: "📣", picture: "rufen", ms: 1800, nudge: true },
   { id: "go", icon: "🚪", picture: "bad", ms: 1800, nudge: true },
   // The child takes its own trousers down: no timer, „Weiter“ when it's done.
@@ -194,10 +197,10 @@ export interface PottyTexts {
   /** Said when a waiting scene comes, by its id. */
   scenes: Record<string, string>;
   /** Said when a grown-up taps what the child said, and the button's name for screen readers. */
-  said: Record<Said, string>;
+  said: Record<Went, string>;
   /** The „Weiter“ button's name for screen readers. */
   next: string;
-  /** Over the buttons for what the child said, for the grown-up. */
+  /** Over the buttons for what the child said, for the grown-up, and said when a tap misses them. */
   askSaid: string;
   /** Over the ✓ while sitting, for the grown-up. */
   askWent: string;
@@ -260,7 +263,6 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       pipi: "Tapsi muss bald Pipi.",
       kaka: "Tapsi muss bald Kaka.",
       both: "Tapsi muss bald Pipi und Kaka.",
-      unsure: "Tapsi muss bald mal.",
     },
     next: "Weiter",
     askSaid: "Was muss dein Kind?",
