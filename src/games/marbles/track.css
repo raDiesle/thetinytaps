@@ -114,3 +114,46 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/*
+ * The ⬆ button in the bottom left corner, once the camera has followed the
+ * things down: back up to the shelf, to let out the next one. Round and
+ * yellow like the app's other buttons.
+ */
+.run-up {
+  position: absolute;
+  bottom: max(18px, calc(env(safe-area-inset-bottom) + 8px));
+  left: max(18px, calc(env(safe-area-inset-left) + 8px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(64px, 9vh, 84px);
+  height: clamp(64px, 9vh, 84px);
+  padding: 0;
+  border: var(--outline);
+  border-radius: 50%;
+  background: var(--sunshine);
+  box-shadow: var(--lift);
+  cursor: pointer;
+  animation: pop-in 0.25s ease-out;
+  transition:
+    transform 0.08s,
+    box-shadow 0.08s;
+}
+
+.run-up:active {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.run-up svg {
+  width: 62%;
+  height: 62%;
+}
+
+.run-up-arrow {
+  fill: #fff8e8;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linejoin: round;
+}
