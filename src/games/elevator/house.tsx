@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import type { CSSProperties, PointerEvent, ReactNode } from "react";
 import { Cloud } from "@/games/scenes/shared";
 import { useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
@@ -201,52 +201,6 @@ export function Hint({ floor }: { floor: number }) {
       stroke="#ffd43b"
       strokeWidth="12"
     />
-  );
-}
-
-/** Room around the wanted thing inside its outline. */
-const CONTOUR_PAD = 12;
-
-/** A thin dashed yellow outline around the thing in the bubble, in the room of `floor`, so the child sees where to
- * ride. It finds the thing by its `data-wish` in the picture and measures it; `glow` makes it pulse with the room's
- * glow. It doesn't move by itself. */
-export function Contour({ wish, floor, glow }: { wish: string; floor: number; glow: boolean }) {
-  const ref = useRef<SVGGElement>(null);
-  const [box, setBox] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
-  useLayoutEffect(() => {
-    const svg = ref.current?.ownerSVGElement;
-    const thing = svg?.querySelector(`[data-wish~="${wish}"]`);
-    const toSvg = svg?.getScreenCTM()?.inverse();
-    if (!thing || !toSvg) return;
-    const r = thing.getBoundingClientRect();
-    const a = new DOMPoint(r.left, r.top).matrixTransform(toSvg);
-    const b = new DOMPoint(r.right, r.bottom).matrixTransform(toSvg);
-    // Kept inside the room, so it never covers the walls or the lift.
-    const top = floorLine(floor) - ROOM_H + 8;
-    const x = Math.max(ROOM_L + 8, a.x - CONTOUR_PAD);
-    const y = Math.max(top, a.y - CONTOUR_PAD);
-    setBox({ x, y, w: Math.min(ROOM_R - 8, b.x + CONTOUR_PAD) - x, h: Math.min(floorLine(floor) - 4, b.y + CONTOUR_PAD) - y });
-  }, [wish, floor]);
-  return (
-    <g ref={ref} className={glow ? "el-contour glow" : "el-contour"}>
-      {box && (
-        <>
-          <rect x={box.x} y={box.y} width={box.w} height={box.h} rx="18" fill="none" stroke="#fff" strokeWidth="10" opacity="0.6" />
-          <rect
-            x={box.x}
-            y={box.y}
-            width={box.w}
-            height={box.h}
-            rx="18"
-            fill="none"
-            stroke="#fab005"
-            strokeWidth="5"
-            strokeDasharray="14 9"
-            strokeLinecap="round"
-          />
-        </>
-      )}
-    </g>
   );
 }
 
