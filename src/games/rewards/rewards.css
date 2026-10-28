@@ -8,8 +8,7 @@
 }
 
 .rw-boards,
-.rw-chips,
-.rw-templates {
+.rw-chips {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -22,7 +21,6 @@
 
 .rw-boards button,
 .rw-chips button,
-.rw-template,
 .rw-task-buttons button {
   min-height: 40px;
   padding: 4px 14px;
@@ -47,17 +45,113 @@
   cursor: default;
 }
 
-.rw-template {
-  min-height: 52px;
-  font-size: 1.05rem;
-}
-
 .rw-panel-title {
   margin: 0;
   font-size: 1.2rem;
 }
 
 /* ---------- The board on screen ---------- */
+
+/* The first screen: head, the rows of views and boards, and the board filling the rest. */
+.rw-first {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: calc(100dvh - 48px);
+}
+
+.rw-pickers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* The views of the board: one bar of four, like a switch. */
+.rw-views {
+  display: inline-flex;
+  overflow: hidden;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.rw-views button {
+  padding: 6px 16px;
+  border: 0;
+  border-left: 2px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rw-views button:first-child {
+  border-left: 0;
+}
+
+.rw-views button.selected {
+  background: var(--sunshine);
+}
+
+.rw-boards .rw-add {
+  border-style: dashed;
+}
+
+/* Phones: views and boards in one row that scrolls sideways, so the board keeps the screen. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .rw-first {
+    gap: 6px;
+  }
+
+  .rw-pickers {
+    flex-direction: row;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .rw-views,
+  .rw-boards {
+    flex: none;
+    flex-wrap: nowrap;
+  }
+
+  .rw-views button,
+  .rw-boards button {
+    min-height: 34px;
+    padding: 2px 10px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+}
+
+/* On a computer: Gestalten and Drucken open below the first screen, side by side when there is room. */
+.rw-below {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  align-items: start;
+  gap: 20px;
+  width: 100%;
+}
+
+.rw-below-part {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  scroll-margin-top: 90px;
+}
+
+.rw-below-part > .settings {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
 
 /* Fills the room the page leaves below the rows (the page is at least the screen's height). */
 .rw-screen {
@@ -191,6 +285,51 @@
 .rw-day.today,
 .rw-cell.today {
   background: color-mix(in srgb, var(--rw-main) 40%, transparent);
+}
+
+/* Month: a calendar, a box per day with a small field per task. */
+.rw-calendar {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.7cqmin;
+}
+
+.rw-mday {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.4cqmin 0.6cqmin;
+  border: 0.3cqmin solid color-mix(in srgb, var(--rw-main) 70%, transparent);
+  border-radius: 1.6cqmin;
+  background: #fff;
+}
+
+.rw-mday.today {
+  background: color-mix(in srgb, var(--rw-main) 40%, #fff);
+}
+
+.rw-mday.off {
+  border-style: dashed;
+  background: transparent;
+}
+
+.rw-mnum {
+  text-align: left;
+  font-size: 2.6cqmin;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.rw-mfields {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.rw-mfields > .rw-cell {
+  flex: 1;
 }
 
 /* Day: big cards side by side. */

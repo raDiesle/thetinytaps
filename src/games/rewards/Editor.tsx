@@ -2,13 +2,13 @@ import { Choice, SettingsGroup, Slider, Toggle } from "@/components/SettingContr
 import { useT } from "@/lib/language";
 import { type Board, type BoardTask, COLLECT_GOALS, fieldCount, MAX_TASKS, newId, rewardFromCatalog, taskFromCatalog } from "./board";
 import { useBoardTitle, useRewardLabel, useTaskLabel } from "./BoardSheet";
-import { type BoardKind, KINDS, MARKS, REWARDS, TASK_BY_ID, TASKS, THEMES } from "./catalog";
+import { MARKS, REWARDS, TASK_BY_ID, TASKS, THEMES } from "./catalog";
 
 const DAY_NAMES = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
 /**
  * Everything a grown-up can change on a board, live under the board's preview:
- * kind, name and heading, tasks (from pictures or their own), weekdays, goal,
+ * name and heading (the kind is the row of views above the board), tasks (from pictures or their own), weekdays, goal,
  * reward, mark and colours – and starting over or removing the board.
  */
 export function Editor({
@@ -27,7 +27,6 @@ export function Editor({
   const taskLabel = useTaskLabel();
   const rewardLabel = useRewardLabel();
   const autoTitle = useBoardTitle()({ ...board, title: "" });
-  const kind = KINDS.find((k) => k.id === board.kind) ?? KINDS[0];
   const fields = fieldCount(board, new Date());
   const unused = TASKS.filter((task) => !board.tasks.some((own) => own.catalog === task.id));
 
@@ -39,24 +38,9 @@ export function Editor({
     onChange({ tasks });
   };
   const addTask = (task: BoardTask) => board.tasks.length < MAX_TASKS && onChange({ tasks: [...board.tasks, task] });
-  const setKind = (id: BoardKind) => {
-    // A collecting board counts fields, the others stars in the week: keep a goal that fits the new kind.
-    const goal = id === "collect" ? (COLLECT_GOALS.includes(board.goal) ? board.goal : 5) : board.goal;
-    onChange({ kind: id, goal });
-  };
 
   return (
     <section className="settings rw-editor">
-      <SettingsGroup title={t({ de: "Art der Tafel" })}>
-        <Choice
-          label={t({ de: "Wie werden die Sterne gesammelt?" })}
-          value={board.kind}
-          onChange={setKind}
-          options={KINDS.map((k) => ({ value: k.id, label: `${k.emoji} ${t(k.label)}` }))}
-        />
-        <p className="setting-note">{t(kind.hint)}</p>
-      </SettingsGroup>
-
       <SettingsGroup title={t({ de: "Name und Überschrift" })}>
         <label className="rw-input">
           <span>{t({ de: "Name des Kindes (steht in der Überschrift, bleibt auf diesem Gerät)" })}</span>
@@ -149,7 +133,7 @@ export function Editor({
         )}
       </SettingsGroup>
 
-      {board.kind === "week" && (
+      {(board.kind === "week" || board.kind === "month") && (
         <SettingsGroup title={t({ de: "Tage" })}>
           <div className="rw-chips" role="group" aria-label={t({ de: "Wochentage" })}>
             {DAY_NAMES.map((name, i) => {
@@ -168,7 +152,9 @@ export function Editor({
               );
             })}
           </div>
-          <p className="setting-note">{t({ de: "Zum Beispiel nur Kita-Tage, oder ohne die Tage bei Oma. Jeden Montag beginnt die Tafel von selbst neu." })}</p>
+          <p className="setting-note">
+            {t({ de: "Zum Beispiel nur Kita-Tage, oder ohne die Tage bei Oma. Die Woche beginnt jeden Montag von selbst neu, der Monat an jedem Ersten." })}
+          </p>
         </SettingsGroup>
       )}
 
@@ -181,9 +167,9 @@ export function Editor({
             options={COLLECT_GOALS.map((n) => ({ value: String(n), label: String(n) }))}
           />
         )}
-        {board.kind === "week" && fields > 1 && (
+        {(board.kind === "week" || board.kind === "month") && fields > 1 && (
           <Slider
-            label={t({ de: "Sterne in der Woche bis zur Belohnung" })}
+            label={board.kind === "week" ? t({ de: "Sterne in der Woche bis zur Belohnung" }) : t({ de: "Sterne im Monat bis zur Belohnung" })}
             value={Math.min(board.goal, fields)}
             min={1}
             max={fields}

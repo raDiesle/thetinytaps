@@ -232,7 +232,7 @@ export function BoardScreen({
         for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 90);
         say(board.reward ? `${t({ de: "Geschafft! Jetzt gibt es:" })} ${rewardLabel(board.reward)}` : t({ de: "Geschafft! Hurra!" }));
       }, 500);
-    } else if (board.kind === "week" && !wasFull && dayFull(board, next[board.id], linked, pending.day)) {
+    } else if ((board.kind === "week" || board.kind === "month") && !wasFull && dayFull(board, next[board.id], linked, pending.day)) {
       // A day with all its stars: a small party right there.
       for (let i = 0; i < 5; i++) setTimeout(() => spawn(x, y), 120 + i * 110);
       setTimeout(() => sound(playChime), 300);

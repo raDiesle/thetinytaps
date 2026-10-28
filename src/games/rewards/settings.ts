@@ -3,7 +3,7 @@ import { TEMPLATES } from "./catalog";
 
 /** How the board is printed. */
 export interface PrintOptions {
-  /** "auto": landscape for week and collecting boards, portrait for a day board. */
+  /** "auto": landscape for most boards, portrait for a day board with one or two tasks. */
   orientation: "auto" | "landscape" | "portrait";
   /** In colour, or black and white to save ink. */
   color: boolean;
@@ -11,6 +11,8 @@ export interface PrintOptions {
   colorIn: boolean;
   /** A second page of marks to cut out and stick on. */
   stickers: boolean;
+  /** A month board prints next month's calendar instead of this one's (printed near the month's end). */
+  nextMonth: boolean;
 }
 
 export interface RewardsSettings {
@@ -28,7 +30,7 @@ const FIRST: Board = { ...boardFromTemplate(TEMPLATES[0]), id: "erste" };
 export const DEFAULT_REWARDS_SETTINGS: RewardsSettings = {
   boards: [FIRST],
   current: FIRST.id,
-  print: { orientation: "auto", color: true, colorIn: false, stickers: false },
+  print: { orientation: "auto", color: true, colorIn: false, stickers: false, nextMonth: false },
   speech: false,
   sounds: true,
 };

@@ -44,6 +44,17 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
             { value: "portrait", label: t({ de: "Hochkant" }) },
           ]}
         />
+        {board.kind === "month" && (
+          <Choice
+            label={t({ de: "Monat" })}
+            value={options.nextMonth ? "next" : "this"}
+            onChange={(value) => onChange({ nextMonth: value === "next" })}
+            options={[
+              { value: "this", label: t({ de: "Dieser" }) },
+              { value: "next", label: t({ de: "Nächster" }) },
+            ]}
+          />
+        )}
         <Toggle label={t({ de: "In Farbe (aus: Schwarz-weiß, spart Tinte)" })} checked={options.color} onChange={(color) => onChange({ color })} />
         <Toggle
           label={t({ de: "Felder zum Ausmalen (statt leerer Kreise zum Bekleben)" })}
@@ -79,12 +90,15 @@ function PrintPages({ board, options, look, orientation }: { board: Board; optio
   const theme = THEME_BY_ID.get(board.theme) ?? THEMES[0];
   // The body of the sheet is roughly the page without heading and goal: what the path of a collecting board fits into.
   const aspect = (width - 20) / (height - 60);
+  const now = new Date();
+  // Only a month board prints a date of its own: its calendar, this month's or the next one's.
+  const day = board.kind === "month" && options.nextMonth ? new Date(now.getFullYear(), now.getMonth() + 1, 1) : now;
   return (
     <>
       {/* @page can only be set by a stylesheet; this one comes and goes with the panel. */}
       <style>{`@page { size: A4 ${orientation}; margin: 0; }`}</style>
       <div className="rw-page" style={{ width: `${width}mm`, height: `${height}mm` }}>
-        <BoardSheet board={board} stars={undefined} linked={NO_LINKED} today={new Date()} look={look} aspect={aspect} />
+        <BoardSheet board={board} stars={undefined} linked={NO_LINKED} today={day} look={look} aspect={aspect} />
       </div>
       {options.stickers && (
         <div

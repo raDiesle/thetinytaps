@@ -121,27 +121,30 @@ export const THEMES: Theme[] = [
   { id: "nacht", label: { de: "🌙 Nacht" }, paper: "#f1efff", main: "#b3a8ff", ink: "#3d2f8f" },
 ];
 
-/** The three kinds of board. */
-export type BoardKind = "week" | "day" | "collect";
+/** The kinds of board, which are also the views of one board: day, week and month share its stars. */
+export type BoardKind = "day" | "week" | "month" | "collect";
 
-export const KINDS: { id: BoardKind; emoji: string; label: Localized; hint: Localized }[] = [
-  {
-    id: "collect",
-    emoji: "🐾",
-    label: { de: "Sterne sammeln" },
-    hint: { de: "Ein Weg aus Feldern bis zur Belohnung, ohne Wochentage. Am besten für den Anfang: wenige Felder, bald ein Fest." },
-  },
+/** In the order of the row of views: from the shortest time to the longest, collecting last. */
+export const KINDS: { id: BoardKind; emoji: string; label: Localized }[] = [
   {
     id: "day",
     emoji: "☀️",
-    label: { de: "Tagestafel" },
-    hint: { de: "Die Aufgaben von heute als große Bilder, jeden Tag neu – zum Beispiel morgens oder abends der Reihe nach." },
+    label: { de: "Tag" },
   },
   {
     id: "week",
     emoji: "📅",
-    label: { de: "Wochentafel" },
-    hint: { de: "Aufgaben in Zeilen, Wochentage in Spalten. Jede Woche beginnt von selbst eine neue." },
+    label: { de: "Woche" },
+  },
+  {
+    id: "month",
+    emoji: "🗓️",
+    label: { de: "Monat" },
+  },
+  {
+    id: "collect",
+    emoji: "🐾",
+    label: { de: "Sammeln" },
   },
 ];
 
@@ -161,30 +164,9 @@ export interface Template {
   title?: Localized;
 }
 
+/** Shown as a row of chips from the first visit on, grouped by kind in the order of KINDS; the first is the board a new visitor sees. */
 export const TEMPLATES: Template[] = [
   { id: "zaehne-woche", emoji: "🪥", label: { de: "Zähne-Woche" }, kind: "week", tasks: ["zaehne"], goal: 5, reward: "buch", mark: "stern", theme: "meer" },
-  {
-    id: "fuenf",
-    emoji: "⭐",
-    label: { de: "5 Sterne bis zum Spielplatz" },
-    kind: "collect",
-    tasks: ["anziehen"],
-    goal: 5,
-    reward: "spielplatz",
-    mark: "stern",
-    theme: "sonne",
-  },
-  {
-    id: "toepfchen",
-    emoji: "🚽",
-    label: { de: "Töpfchen-Woche" },
-    kind: "week",
-    tasks: ["toepfchen"],
-    goal: 5,
-    reward: "seifenblasen",
-    mark: "stern",
-    theme: "wiese",
-  },
   {
     id: "morgen",
     emoji: "🌅",
@@ -210,6 +192,61 @@ export const TEMPLATES: Template[] = [
     title: { de: "Mein Abend" },
   },
   {
+    id: "toepfchen",
+    emoji: "🚽",
+    label: { de: "Töpfchen-Woche" },
+    kind: "week",
+    tasks: ["toepfchen"],
+    goal: 5,
+    reward: "seifenblasen",
+    mark: "stern",
+    theme: "wiese",
+  },
+  {
+    id: "woche",
+    emoji: "📅",
+    label: { de: "Woche mit drei Aufgaben" },
+    kind: "week",
+    tasks: ["zaehne", "anziehen", "aufraeumen"],
+    goal: 10,
+    reward: "zoo",
+    mark: "stern",
+    theme: "sonne",
+  },
+  {
+    id: "zaehne-monat",
+    emoji: "🗓️",
+    label: { de: "Zähne-Monat" },
+    kind: "month",
+    tasks: ["zaehne"],
+    goal: 20,
+    reward: "zoo",
+    mark: "stern",
+    theme: "meer",
+  },
+  {
+    id: "monat",
+    emoji: "📆",
+    label: { de: "Monat mit zwei Aufgaben" },
+    kind: "month",
+    tasks: ["toepfchen", "bett"],
+    goal: 30,
+    reward: "schwimmen",
+    mark: "herz",
+    theme: "beere",
+  },
+  {
+    id: "fuenf",
+    emoji: "⭐",
+    label: { de: "5 Sterne bis zum Spielplatz" },
+    kind: "collect",
+    tasks: ["anziehen"],
+    goal: 5,
+    reward: "spielplatz",
+    mark: "stern",
+    theme: "sonne",
+  },
+  {
     id: "bett",
     emoji: "🛏️",
     label: { de: "7 Nächte im eigenen Bett" },
@@ -219,17 +256,6 @@ export const TEMPLATES: Template[] = [
     reward: "backen",
     mark: "herz",
     theme: "nacht",
-  },
-  {
-    id: "woche",
-    emoji: "📅",
-    label: { de: "Wochentafel mit drei Aufgaben" },
-    kind: "week",
-    tasks: ["zaehne", "anziehen", "aufraeumen"],
-    goal: 10,
-    reward: "zoo",
-    mark: "stern",
-    theme: "sonne",
   },
 ];
 
