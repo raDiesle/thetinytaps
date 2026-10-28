@@ -57,7 +57,7 @@ export const CATEGORIES: Category[] = [
     subtitle: { de: "Zähne putzen, aufs Töpfchen gehen, Sterne sammeln und laut oder leise rufen." },
     games: [
       { href: "/zaehne/", emoji: "🦷", title: { de: "Zähne putzen", ru: "Чистим зубы" } },
-      { href: "/toepfchen/", emoji: "🚽", title: { de: "Aufs Töpfchen" } },
+      { href: "/toepfchen/", emoji: "🚽", title: { de: "Aufs Töpfchen", ru: "На горшок" } },
       { href: "/belohnungstafel/", emoji: "🌟", title: { de: "Belohnungstafel" } },
       { href: "/laut-leise/", emoji: "🦁", title: { de: "Laut und leise", ru: "Громко и тихо" } },
     ],

@@ -102,7 +102,8 @@ In a fresh worktree run `bun install` first.
   without Russian shows and speaks in German, with the German voice – never German words with a Russian voice:
   speak a text with the speech language of the language it is in (`useAppLanguage().speechLang`), never a fixed
   `de-DE`. When the meaning of a German line changes, delete its Russian line (it falls back to German) rather
-  than leaving a wrong one. Russian for the child: present tense, "ты", nothing that changes for boy or girl.
+  than leaving a wrong one. Russian for the child: present tense, "ты", nothing that changes for boy or girl. Names the voice says (Tapsi →
+  „Тапси“) are written in the language's own letters too, never left in Latin letters inside a Russian sentence.
   Keys that stand for letters take the Cyrillic letter at their ЙЦУКЕН place (`src/lib/cyrillicKeys.ts`).
   The app language starts on `playLanguage(APP_LANGUAGES)` like every language choice. Only the management
   page and the SEO pages stay German.

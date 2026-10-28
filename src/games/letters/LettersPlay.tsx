@@ -405,7 +405,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
               {!touchKeys
                 ? t({ de: "Drück eine Taste! ⌨️", ru: "Нажми на клавишу! ⌨️" })
                 : numbersOnly
-                  ? t({ de: "Tipp auf eine Zahl! 👇" })
+                  ? t({ de: "Tipp auf eine Zahl! 👇", ru: "Нажми на цифру! 👇" })
                   : t({ de: "Tipp auf einen Buchstaben! 👇", ru: "Нажми на букву! 👇" })}
             </p>
           )}

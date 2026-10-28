@@ -102,7 +102,8 @@ interface Begin {
  */
 export function PottyPlay({ settings }: { settings: PottySettings }) {
   const language = useAppLanguage();
-  const texts = useT()(POTTY_TEXTS);
+  const t = useT();
+  const texts = t(POTTY_TEXTS);
   const [said, setSaid] = useState<Said>("unsure");
   /** What really came, chosen at the ✓; null before. */
   const [went, setWent] = useState<Went | null>(null);
@@ -195,7 +196,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     goTo({ step: index, scene: -1, nothing }, ms);
     startedAt.current = performance.now();
     setAsking(id === "call" || (id === "go" && saidNow === "unsure"));
-    const line = texts.steps[id](TAPSI.name, came ?? saidNow);
+    const line = texts.steps[id](t(TAPSI.name), came ?? saidNow);
     // The end shows this week's stars, with a new one only when a ✓ said what really came in this round.
     const star = id === "stars" && checked.current && !starred.current;
     say(star ? texts.star : nothing && id === "wash" ? `${texts.nothing} ${line}` : line);

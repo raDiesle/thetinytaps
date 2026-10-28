@@ -9,8 +9,8 @@ import type { Localized } from "@/lib/language";
 /** Tapsi the fox, who goes to the potty; Mama and Papa fox are in its pictures. */
 export const TAPSI = {
   emoji: "🦊",
-  /** Said and shown. */
-  name: "Tapsi",
+  /** Said and shown, in the app language (a Russian voice reads „Tapsi“ badly). */
+  name: { de: "Tapsi", ru: "Тапси" } as Localized,
   /** The first part of every picture's name: `fox-essen`. */
   pictures: "fox",
 };
@@ -241,7 +241,7 @@ export interface PottyTexts {
   star: string;
 }
 
-/** German only so far; a translation goes next to it when asked for. */
+/** German and Russian; another language goes next to them when asked for. */
 export const POTTY_TEXTS: Localized<PottyTexts> = {
   de: {
     steps: {
@@ -312,5 +312,73 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
     nothing: "Heute kommt nichts. Macht nichts!",
     nothingButton: "nichts",
     star: "Hat geklappt! Hurra, ein Stern für dich!",
+  },
+  ru: {
+    steps: {
+      eat: (name) => `Ням! ${name} ест макароны и пьёт воду.`,
+      need: (name, said) =>
+        said === "pipi"
+          ? `Ой! Пи-пи просится наружу. ${name} хочет пи-пи!`
+          : said === "kaka"
+            ? `Ой! В животике бурчит. ${name} хочет ка-ка!`
+            : said === "both"
+              ? `Ой! Пи-пи просится, и в животике бурчит. ${name} хочет пи-пи и ка-ка!`
+              : `Ой! Что-то просится наружу. ${name} надо на горшок!`,
+      call: (_, said) =>
+        said === "unsure"
+          ? "Мама! Папа! Мне надо на горшок!"
+          : `Мама! Папа! Я хочу ${said === "pipi" ? "пи-пи" : said === "kaka" ? "ка-ка" : "пи-пи и ка-ка"}!`,
+      go: () => "Мама и папа идут тоже. Скорее в ванную!",
+      down: () => "Штанишки вниз!",
+      sit: () => "Садимся. Мама и папа ждут вместе.",
+      done: (_, came) => (came === "pipi" ? "Кап-кап! Пи-пи в горшке!" : came === "kaka" ? "Плюх! Ка-ка в горшке!" : "Кап-кап, плюх! Пи-пи и ка-ка в горшке!"),
+      wipe: () => "Вытираем бумагой.",
+      up: () => "Штанишки вверх!",
+      flush: () => "Выливаем и смываем. Вжууух!",
+      wash: () => "Моем руки с мылом.",
+      party: (name) => `Получилось! Молодец, ${name}!`,
+      stars: () => "Это твои звёздочки.",
+      play: (name) => `${name} играет. Мама и папа заглядывают: тебе надо пи-пи или ка-ка?`,
+    },
+    scenes: {
+      giesskanne: "Тапси поливает цветок. Кап-кап!",
+      brunnen: "Фонтан журчит. Слышишь, как плещется?",
+      ballon: "Тапси отпускает шарик. Пффф!",
+      regen: "Идёт дождь. Шлёп – в лужу!",
+      schlauch: "Тапси брызгает из шланга. Уточка мокрая!",
+      ketchup: "Тапси жмёт кетчуп. Жмём, жмём!",
+      aufblasen: "Тапси надувает шарик. Дуем сильно-сильно!",
+      huhn: "Курочка тужится изо всех сил. Плюх – яичко!",
+      knete: "Тапси жмёт пластилин. Вылезают колбаски!",
+      wasserrad: "Вода крутит колесо. Буль-буль!",
+      tee: "Тапси наливает чай. Буль, буль, буль!",
+      spritzbeutel: "Тапси жмёт кондитерский мешок. Крем на торт!",
+      erbsen: "Тапси жмёт стручок. Чпок, чпок – горошинки!",
+      tunnel: "Поезд в тоннеле. Ту-ту, вот он выезжает!",
+      elefant: "Слон брызгает хоботом. Пшшш!",
+      wal: "Кит пускает фонтан. Пффф!",
+      trichter: "Тапси льёт воду в воронку. Внизу она вытекает!",
+      schmetterling: "Бабочка выбирается наружу. Теперь она летит!",
+      tanzen: "Мама и папа танцуют!",
+      jonglieren: "Папа жонглирует туалетной бумагой!",
+      kuckuck: "Где мама? Ку-ку!",
+      seifenblasen: "Папа пускает мыльные пузыри. Чпок, чпок!",
+    },
+    said: {
+      pipi: "Тапси скоро нужно пи-пи.",
+      kaka: "Тапси скоро нужно ка-ка.",
+      both: "Тапси скоро нужно пи-пи и ка-ка.",
+    },
+    next: "Дальше",
+    askSaid: "Что нужно малышу?",
+    askWent: "Что в горшке?",
+    finish: "Что-нибудь есть в горшке? Пи-пи – нажмите на капельку. Ка-ка – нажмите на ка-ка.",
+    went: {
+      pipi: "Пи-пи в горшке",
+      kaka: "Ка-ка в горшке",
+    },
+    nothing: "Сегодня ничего нет. Ничего страшного!",
+    nothingButton: "ничего",
+    star: "Получилось! Ура, звёздочка для тебя!",
   },
 };

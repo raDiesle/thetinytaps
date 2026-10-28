@@ -5,7 +5,7 @@ import type { StarLog } from "./stars";
 /** More stars than this on one day are shown as a number. */
 const MAX_SHOWN = 4;
 
-const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
+const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"], ru: ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"] };
 
 /**
  * This week's stars, a column per day with today's marked, at the end of the story: the star of this round (`fresh`)
@@ -18,14 +18,14 @@ export function WeekStars({ log, fresh }: { log: StarLog; fresh: boolean }) {
   const dayNames = t(DAY_NAMES);
 
   return (
-    <ol className="pt-week" aria-label={t({ de: "Sterne dieser Woche" })}>
+    <ol className="pt-week" aria-label={t({ de: "Sterne dieser Woche", ru: "Звёздочки этой недели" })}>
       {weekOf(today).map((day, i) => {
         const key = dayKey(day);
         const isToday = key === todayKey;
         const count = log[key] ?? 0;
         return (
           <li key={key} className={`pt-day${isToday ? " today" : ""}`}>
-            {isToday && <span className="pt-today-tag">{t({ de: "Heute" })}</span>}
+            {isToday && <span className="pt-today-tag">{t({ de: "Heute", ru: "Сегодня" })}</span>}
             <span className="pt-day-name">{dayNames[i]}</span>
             <span className="pt-day-stars" aria-label={`${count} ⭐`}>
               {count > MAX_SHOWN ? (

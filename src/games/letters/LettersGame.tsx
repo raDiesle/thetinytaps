@@ -40,7 +40,7 @@ export function LettersGame() {
       emoji="🔤"
       modes={[
         { id: "free", emoji: "⌨️", title: t({ de: "Frei tippen", ru: "Печатать что хочешь" }) },
-        { id: "count", emoji: "🔢", title: t({ de: "Zählen" }) },
+        { id: "count", emoji: "🔢", title: t({ de: "Zählen", ru: "Считаем" }) },
         { id: "find", emoji: "🔍", title: findTitle },
         { id: "words", emoji: "✍️", title: t({ de: "Wörter tippen", ru: "Печатаем слова" }) },
       ]}
@@ -73,7 +73,7 @@ export function LettersGame() {
             value={settings.wordKind}
             onChange={(wordKind) => update({ wordKind })}
             options={[
-              { value: "nouns", label: t({ de: "🐻 Substantive" }) },
+              { value: "nouns", label: t({ de: "🐻 Substantive", ru: "🐻 Предметы" }) },
               { value: "all", label: t({ de: "🌈 Alle", ru: "🌈 Все" }) },
               { value: "colors", label: t({ de: "🎨 Farben", ru: "🎨 Цвета" }) },
               { value: "actions", label: t({ de: "🦘 Tu-Wörter", ru: "🦘 Слова-действия" }) },
@@ -105,6 +105,7 @@ export function LettersGame() {
           <p>
             {t({
               de: "Zählen: Nur Zahlen kommen, jede mit so vielen Dingen. Eine Ziffer zeigt sich selbst, jede andere Taste bringt eine Zahl zufällig.",
+              ru: "Считаем: появляются только цифры, каждая с таким же числом вещей. Цифра показывает саму себя, любая другая клавиша – случайную цифру.",
             })}
           </p>
           <p>
@@ -140,7 +141,7 @@ export function LettersGame() {
               ]}
             />
             <Toggle
-              label={t({ de: "Wort unter dem Bild anzeigen (nicht bei Wörter tippen)" })}
+              label={t({ de: "Wort unter dem Bild anzeigen (nicht bei Wörter tippen)", ru: "Показывать слово под картинкой (кроме «Печатаем слова»)" })}
               checked={settings.showWord}
               onChange={(showWord) => update({ showWord })}
             />
@@ -176,7 +177,7 @@ export function LettersGame() {
             )}
           </SettingsGroup>
 
-          <SettingsGroup title={t({ de: "⌨️ Frei tippen und 🔢 Zählen" })}>
+          <SettingsGroup title={t({ de: "⌨️ Frei tippen und 🔢 Zählen", ru: "⌨️ Печатать что хочешь и 🔢 Считаем" })}>
             <Choice<NumberReveal>
               label={t({ de: "Zahlen", ru: "Цифры" })}
               value={settings.numbers}

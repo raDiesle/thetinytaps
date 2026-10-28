@@ -244,7 +244,10 @@ function PlaytimeNote() {
             de: `Spielzeit heute: ${playedMinutes} von ${settings.minutes} Min.`,
             ru: `Время игры сегодня: ${playedMinutes} из ${settings.minutes} мин.`,
           })
-        : t({ de: `Spiele heute: ${Math.min(played.games, settings.games)} von ${settings.games}` })}
+        : t({
+            de: `Spiele heute: ${Math.min(played.games, settings.games)} von ${settings.games}`,
+            ru: `Игры сегодня: ${Math.min(played.games, settings.games)} из ${settings.games}`,
+          })}
     </p>
   );
 }

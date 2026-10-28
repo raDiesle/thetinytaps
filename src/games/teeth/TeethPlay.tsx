@@ -617,7 +617,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {/* Only when the song is still not there after the story: the brushing waits for it. */}
       {waiting && (
         <div className="teeth-loading" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(song.progress * 100)}>
-          🎵 {t({ de: "Musik lädt …" })}
+          🎵 {t({ de: "Musik lädt …", ru: "Музыка загружается …" })}
           <span className="teeth-loading-bar">
             <span style={{ width: `${song.progress * 100}%` }} />
           </span>

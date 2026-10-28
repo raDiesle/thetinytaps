@@ -131,6 +131,9 @@ function ruAdjective(m: string, f: string, n: string, pl: string, emoji: string,
   return { question: `Что ${prefix}${n}?`, emoji, praise: (item) => `${capitalize(item.name)} ${prefix}${agree(item, m, f, n, pl)}!` };
 }
 
+/** A Russian colour trait, praising a part in that colour by the colour's name ("Вот красный цвет!"). */
+const ruColour = (m: string, f: string, n: string, pl: string, emoji: string): TraitWords => ({ ...ruAdjective(m, f, n, pl, emoji), part: `Вот ${m} цвет!` });
+
 const ru: ScenePhrases = {
   prompts: { tap: "Нажми на что-нибудь! 👆", hover: "Покажи на что-нибудь! 👆", keys: "Нажми на клавишу! ⌨️" },
   colourPrompts: {
@@ -147,10 +150,10 @@ const ru: ScenePhrases = {
   hereIs: (item) => `Вот ${item.name}!`,
   thatIs: (item, question) => `Это ${item.name}. ${question}`,
   traits: {
-    red: ruAdjective("красный", "красная", "красное", "красные", "🔴"),
-    yellow: ruAdjective("жёлтый", "жёлтая", "жёлтое", "жёлтые", "🟡"),
-    blue: ruAdjective("синий", "синяя", "синее", "синие", "🔵"),
-    green: ruAdjective("зелёный", "зелёная", "зелёное", "зелёные", "🟢"),
+    red: ruColour("красный", "красная", "красное", "красные", "🔴"),
+    yellow: ruColour("жёлтый", "жёлтая", "жёлтое", "жёлтые", "🟡"),
+    blue: ruColour("синий", "синяя", "синее", "синие", "🔵"),
+    green: ruColour("зелёный", "зелёная", "зелёное", "зелёные", "🟢"),
     flies: { question: "Кто летает?", emoji: "🪽", praise: (item) => `${capitalize(item.name)} ${item.plural ? "летают" : "летает"}!` },
     big: ruAdjective("большой", "большая", "большое", "большие", "🐘", true),
     small: ruAdjective("маленький", "маленькая", "маленькое", "маленькие", "🐜", true),

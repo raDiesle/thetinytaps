@@ -58,6 +58,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
           <p>
             {t({
               de: "Suchen: Ein Ding erscheint in einer leuchtenden Blase, und das Kind sucht es im Bild. Fragen: „Was ist rot?“, „Wer kann fliegen?“ – das Kind tippt, was passt; es reicht, wenn ein Teil passt (das rote Dach eines Hauses).",
+              ru: "Поиск: в светящемся пузыре появляется вещь, и ребёнок ищет её на картинке. Вопросы: «Что красное?», «Кто летает?» – ребёнок нажимает то, что подходит; достаточно, если подходит часть (красная крыша дома).",
             })}
           </p>
         </>

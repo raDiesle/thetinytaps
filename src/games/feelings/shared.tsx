@@ -298,7 +298,7 @@ function BackButton({ image, onBack }: { image: string; onBack: () => void }) {
       type="button"
       className="fg-back"
       data-tap
-      aria-label={t({ de: "Zurück zum Bild" })}
+      aria-label={t({ de: "Zurück zum Bild", ru: "Назад к картинке" })}
       onPointerDown={(e: PointerEvent) => {
         e.stopPropagation();
         onBack();

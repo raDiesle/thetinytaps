@@ -1,7 +1,7 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playCountNote, playPop, playTusch, playTwinkle, playWhoosh, unlockAudio } from "@/lib/sfx";
-import { useAppLanguage, useT } from "@/lib/language";
+import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type Board, cellKey, dayFull, type LinkedDays, progress, type StarLog, takeBackStar } from "./board";
@@ -67,7 +67,8 @@ export function BoardScreen({
   const stars = log[board.id];
 
   const sound = (play: () => void) => sounds && play();
-  const say = (text: string) => speech && speak(text, language.speechLang);
+  // A line without its translation is German and gets the German voice.
+  const say = (text: string) => speech && speak(text, voiceFor(text, language));
 
   // The path of a collecting board follows the shape of the room it has.
   useEffect(() => {

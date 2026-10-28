@@ -37,7 +37,7 @@ describe("Aufs Töpfchen", () => {
     expect(STEPS.at(-1)?.picture).toBe(STEPS.at(-2)?.picture);
     expect([...SAIDS].sort()).toEqual(["both", "kaka", "pipi", "unsure"]);
     for (const texts of Object.values(POTTY_TEXTS)) {
-      for (const which of WHICHES) for (const step of ALL_STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
+      for (const which of WHICHES) for (const step of ALL_STEPS) expect(texts.steps[step.id](TAPSI.name.de, which).trim()).not.toBe("");
       expect(texts.nothing.trim()).not.toBe("");
       for (const need of ["pipi", "kaka"] as const) expect(texts.went[need].trim()).not.toBe("");
       // „Was ist im Töpfchen?“ offers pipi and kaka only (the user's choice), and „nichts“ in a word.
@@ -108,7 +108,26 @@ describe("Aufs Töpfchen", () => {
     const done = STEPS.find((s) => s.id === "done")!;
     expect(picturesFor(done, "both")).toEqual(["fertig-pipi", "fertig-kaka"]);
     expect(iconFor(done, "both")).toBe("💧💩");
-    for (const texts of Object.values(POTTY_TEXTS)) expect(texts.steps.done(TAPSI.name, "both")).not.toBe(texts.steps.done(TAPSI.name, "pipi"));
+    for (const texts of Object.values(POTTY_TEXTS)) expect(texts.steps.done(TAPSI.name.de, "both")).not.toBe(texts.steps.done(TAPSI.name.de, "pipi"));
+  });
+
+  it("says everything in Russian in Cyrillic, Tapsi's name too", () => {
+    const ru = POTTY_TEXTS.ru;
+    const name = TAPSI.name.ru;
+    if (!ru || !name) throw new Error("Russian texts and name expected");
+    const lines = [
+      ...ALL_STEPS.flatMap((step) => WHICHES.map((which) => ru.steps[step.id](name, which))),
+      ...Object.values(ru.scenes),
+      ...Object.values(ru.said),
+      ...Object.values(ru.went),
+      ru.next,
+      ru.askSaid,
+      ru.askWent,
+      ru.finish,
+      ru.nothing,
+      ru.star,
+    ];
+    for (const line of lines) expect(line, line).not.toMatch(/[A-Za-zÄÖÜäöüß]/);
   });
 
   it("has every picture of the story, a thought bubble's with both frames if at all, and no pictures of anybody else", () => {
