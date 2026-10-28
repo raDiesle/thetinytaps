@@ -168,7 +168,7 @@ export const CATEGORIES: Category[] = [
     id: "weitere",
     emoji: "🎈",
     title: { de: "Weitere", ru: "Ещё", en: "More", zh: "更多", hi: "और भी", es: "Más", ar: "المزيد" },
-    subtitle: { de: "Zähne putzen, aufs Töpfchen gehen, Sterne sammeln und laut oder leise rufen." },
+    subtitle: { de: "Zähne putzen, aufs Töpfchen gehen, Sterne sammeln, den Tag in Bildern sehen und laut oder leise rufen." },
     games: [
       {
         href: "/zaehne/",
@@ -181,6 +181,7 @@ export const CATEGORIES: Category[] = [
         title: { de: "Aufs Töpfchen", ru: "На горшок", en: "Potty Time", zh: "坐便盆", hi: "पॉटी पर चलो", es: "Al orinal", ar: "إلى النونية" },
       },
       { href: "/belohnungstafel/", emoji: "🌟", title: { de: "Belohnungstafel" } },
+      { href: "/tagesplan/", emoji: "🗓️", title: { de: "Tagesplan" } },
       {
         href: "/laut-leise/",
         emoji: "🦁",

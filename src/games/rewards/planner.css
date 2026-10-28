@@ -1,0 +1,374 @@
+/* ---------- Tagesplan (pl-): the plan's own parts; the page and the sheet come from rewards.css ---------- */
+
+/* Day view: the day's steps as big cards in reading order, „Jetzt“ and „Dann“ above them. */
+.pl-steps {
+  display: grid;
+  flex: 1;
+  gap: 2cqmin 2.4cqmin;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pl-slot {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+  gap: 2cqmin;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pl-tag {
+  flex: none;
+  font-size: clamp(0.8rem, 11cqmin, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.pl-tag.empty {
+  visibility: hidden;
+}
+
+/* A card sizes its picture and word by itself (it is their container). */
+.pl-card {
+  container-type: size;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3cqmin;
+  min-width: 0;
+  min-height: 0;
+  padding: 4cqmin;
+  border: max(2px, 3cqmin) solid var(--rw-main);
+  border-radius: 12cqmin;
+  background: #fff;
+  cursor: pointer;
+  transition:
+    opacity 0.3s,
+    scale 0.3s;
+}
+
+.pl-emoji {
+  font-family: var(--font-emoji);
+  font-size: 52cqmin;
+  line-height: 1;
+}
+
+.pl-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: max(0.6rem, 11cqmin);
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* The card to do now: in front and outlined, without moving by itself (nothing moves until the child acts). */
+.pl-card.now {
+  border-color: var(--rw-ink);
+  background: color-mix(in srgb, var(--rw-main) 35%, #fff);
+  box-shadow:
+    0 0 0 max(3px, 3.5cqmin) var(--rw-main),
+    0 max(3px, 3cqmin) 0 max(3px, 3.5cqmin) var(--rw-ink);
+}
+
+.pl-card.done {
+  opacity: 0.55;
+}
+
+.rw-on-paper .pl-card {
+  opacity: 1;
+}
+
+.pl-number {
+  position: absolute;
+  top: 3cqmin;
+  left: 3cqmin;
+  display: grid;
+  place-items: center;
+  width: 17cqmin;
+  height: 17cqmin;
+  border-radius: 50%;
+  background: var(--rw-main);
+  color: var(--rw-ink);
+  font-size: 10cqmin;
+  font-weight: 800;
+}
+
+.pl-tick {
+  position: absolute;
+  top: -4cqmin;
+  right: -4cqmin;
+  display: grid;
+  place-items: center;
+  width: 32cqmin;
+  height: 32cqmin;
+  border: max(2px, 2cqmin) solid #fff;
+  border-radius: 50%;
+  background: #2f9e44;
+  color: #fff;
+  font-size: 22cqmin;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.pl-card.fresh .pl-tick {
+  animation: pl-tick-in 0.5s ease-out;
+}
+
+@keyframes pl-tick-in {
+  from {
+    scale: 2.4;
+    opacity: 0;
+  }
+  60% {
+    scale: 0.85;
+    opacity: 1;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+.pl-card.wiggle {
+  animation: wiggle 0.45s ease-in-out;
+}
+
+.pl-card.twinkle .pl-tick {
+  animation: pl-twinkle 0.6s ease-in-out;
+}
+
+@keyframes pl-twinkle {
+  40% {
+    rotate: 18deg;
+    scale: 1.25;
+  }
+  70% {
+    rotate: -10deg;
+  }
+}
+
+.pl-empty {
+  align-self: center;
+  grid-column: 1 / -1;
+  font-size: 4cqmin;
+  text-align: center;
+}
+
+/* Erst – Dann: two big cards with an arrow between them. */
+.pl-firstthen {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 3cqmin;
+  min-height: 0;
+}
+
+.pl-firstthen > .pl-slot:first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.pl-firstthen > .pl-slot:nth-child(2) {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.pl-arrow {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  font-size: 12cqmin;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.pl-firstthen .pl-tag {
+  font-size: clamp(1rem, 12cqmin, 3rem);
+}
+
+/* Week view: a column per day, today's tinted, moons over the days to come. */
+.pl-week {
+  display: grid;
+  flex: 1;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 1.2cqmin;
+  min-height: 0;
+}
+
+/* A column's own sizes are the sheet's (cqmin); what is inside it sizes by the column's width (cqi). */
+.pl-col {
+  container-type: inline-size;
+  display: grid;
+  grid-template-rows: auto repeat(var(--pl-rows), minmax(0, 1fr));
+  gap: 1cqmin;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.8cqmin;
+  border-radius: 2.5cqmin;
+}
+
+.pl-col.today {
+  background: color-mix(in srgb, var(--rw-main) 45%, transparent);
+  box-shadow: inset 0 0 0 max(2px, 0.5cqmin) var(--rw-ink);
+}
+
+.pl-col.past {
+  opacity: 0.6;
+}
+
+.pl-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 24cqi;
+  cursor: pointer;
+}
+
+.pl-day-name {
+  font-size: max(0.7rem, 17cqi);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.pl-moons {
+  max-width: 100%;
+  overflow: hidden;
+  font-family: var(--font-emoji);
+  font-size: max(0.55rem, 13cqi);
+  line-height: 1.1;
+  letter-spacing: -0.25em;
+  white-space: nowrap;
+}
+
+.pl-day.wiggle {
+  animation: wiggle 0.45s ease-in-out;
+}
+
+.pl-card.small {
+  gap: 2cqmin;
+  padding: 3cqmin;
+  border-width: max(2px, 3cqmin);
+  border-radius: 14cqmin;
+}
+
+.pl-card.small .pl-emoji {
+  font-size: 68cqmin;
+}
+
+.pl-card.small .pl-tick {
+  top: -6cqmin;
+  right: -6cqmin;
+  width: 46cqmin;
+  height: 46cqmin;
+  font-size: 32cqmin;
+}
+
+.pl-card.small .pl-label {
+  display: none;
+  font-size: max(0.55rem, 12cqw);
+}
+
+/* The word only where the card has room for it below the picture. */
+@container (min-height: 76px) and (min-width: 64px) {
+  .pl-card.small .pl-label {
+    display: block;
+  }
+
+  .pl-card.small .pl-emoji {
+    font-size: 46cqmin;
+  }
+}
+
+/* „Von vorn“ after the last step: for the next Erst–Dann, or a new start. */
+.pl-again {
+  align-self: center;
+  min-height: 44px;
+  padding: 4px 18px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+
+/* „＋ Neuer Plan“: the Vorlagen in place of the plan. */
+.pl-picker {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 1400px;
+  padding: 12px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 24px;
+  background: #fff;
+}
+
+.pl-picker .rw-wizard-head h2 {
+  flex: 1;
+}
+
+.pl-day-count {
+  font-family: var(--font-emoji);
+  font-size: 0.8em;
+  letter-spacing: -0.2em;
+}
+
+.pl-edit-number {
+  min-width: 1.6em;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* ---------- Bildkarten to cut out ---------- */
+
+.pl-card-page {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 6mm;
+}
+
+.pl-card-page.wide {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+
+.pl-cut-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+  border: 1mm solid var(--rw-main, #999);
+  border-radius: 6mm;
+  background: var(--rw-paper, #fff);
+  outline: 0.3mm dashed #999;
+  outline-offset: 2mm;
+}
+
+.pl-cut-card .pl-emoji {
+  font-size: 30mm;
+}
+
+.pl-cut-card .pl-label {
+  font-size: 7mm;
+}
+
+.rw-grey :is(.pl-emoji) {
+  filter: grayscale(1) contrast(1.15);
+}

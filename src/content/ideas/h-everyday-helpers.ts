@@ -36,6 +36,8 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Große Bildkarten in einer Reihe: Abendessen → Baden → Schlafanzug → Zähne → Buch → Licht aus. Die jetzige Karte leuchtet; das Kind tippt sie, wenn es fertig ist, sie bekommt einen Haken und die nächste leuchtet. Die Zähne-Karte öffnet Zähne putzen und kommt danach zurück. Dasselbe für den Morgen. Eltern stellen die Karten zusammen.",
       why: "Eltern suchen „abendroutine kinder bilder zum ausdrucken“, „tagesablauf kleinkind 2 jahre“ und „wochenplan kinder symbole“. Anders als A-17 läuft hier der echte Abend, nicht eine Reihe von Spielen.",
       effort: "M",
+      partial:
+        "Gebaut als Tagesplan (/tagesplan/): Karten in einer Reihe, „Jetzt“ leuchtet, das Kind tippt ab, Haken und Fest; Vorlagen für Morgen, Abend, Kita-Tag, Erst–Dann und Wochenplan; Zähne putzen hakt sich von selbst ab. Offen: die Zähne-Karte öffnet das Spiel und kommt danach zurück.",
     },
     {
       id: "H-04",
@@ -343,6 +345,30 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "Langsam drücken, dann ist es geschafft und leicht.",
       effort: "S",
       done: true,
+    },
+    {
+      id: "H-41",
+      emoji: "🌙",
+      title: "Wie oft noch schlafen? Countdown bis zum großen Tag",
+      text: "Ein Großer wählt einen Tag (Geburtstag, Urlaub, Oma kommt) und ein Bild dazu. Das Kind sieht einen Mond für jedes Mal Schlafen bis dahin; jeden Morgen ist einer weniger, und am Tag selbst steht das Bild groß da. Antippen sagt „Noch dreimal schlafen, dann Geburtstag“.",
+      why: "Die Frage „Wie oft noch schlafen?“ stellt jedes Kleinkind; der Wochenplan des Tagesplans zeigt die Monde schon für sieben Tage, ein Countdown reicht weiter.",
+      effort: "S",
+    },
+    {
+      id: "H-42",
+      emoji: "🧺",
+      title: "Fertig-Kiste im Tagesplan",
+      text: "Statt eines Hakens fliegt eine geschaffte Karte in eine Kiste unten am Rand, wie bei einer Klett-Tafel zu Hause; die Reihe wird kürzer, bis nur noch das Bett übrig ist. Am Ende holt „Von vorn“ alle Karten wieder heraus.",
+      why: "So machen es Eltern und Kitas mit gedruckten Bildkarten („Fertig-Tasche“); auf dem Bildschirm sieht das Kind genauso, wie der Tag kürzer wird.",
+      effort: "S",
+    },
+    {
+      id: "H-43",
+      emoji: "▶️",
+      title: "Den Tag vorspielen",
+      text: "Ein großer ▶ über dem Tagesplan: jede Karte leuchtet nacheinander auf und wird vorgelesen („Erst Frühstück, dann Kita, dann …“). Für das gemeinsame Anschauen am Morgen, das Ratgeber empfehlen, bevor der Tag losgeht.",
+      why: "Ratgeber zu Bildfahrplänen raten, den Plan zusammen durchzugehen; Zweijährige können nicht lesen, aber zuhören und zeigen.",
+      effort: "S",
     },
   ],
 };

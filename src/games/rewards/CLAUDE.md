@@ -1,7 +1,7 @@
 # Belohnungstafel
 
 Route `/belohnungstafel/` · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
-„belohnungstafel“ in `src/content/research.ts`.
+„belohnungstafel“ in `src/content/research.ts`. The folder also holds the **Tagesplan** (`/tagesplan/`, below).
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
 the same on screen and on paper (A4 from the browser, also offline). It is in the „Weitere“ category, but has no
@@ -107,3 +107,47 @@ use the same way.
 - Class names built from data get a prefix of their own (`rw-kind-${kind}`), never plain `rw-${id}`: `rw-day` and
   `rw-month` once styled a whole sheet with the rules of a weekday label and the calendar.
 - A new catalogue entry needs its picture prompt and line-art twin in `bilder/prompts.ts` (`rewards.test.ts` checks).
+
+# Tagesplan
+
+Route `/tagesplan/` · ideas H-03 (partial), H-41–H-43, T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
+
+A picture schedule („Strukturtafel“): the steps of a day as big cards in order, „Jetzt“ above the one to do now, and a
+week of columns. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
+shares the board's parts (sheet look, themes, `A4`/`Preview`, the gallery's classes, the star log).
+
+## Files
+
+- `plan.ts` – a plan (`Plan`: view `day` or `week`, `days` as seven lists Monday first, or `same: true` and only
+  `days[0]`), pure functions: `planFromTemplate`, `stepsOn`, `stepDone` (a tick in the log, or the linked game –
+  brushing only for the step's `slot`), `currentStep`, `exampleTicks`, `restartDay`, `nightsUntil`, `withSteps`,
+  `withSame`, `distinctSteps` (the cards to print).
+- `catalog.ts` – `ACTIVITIES` (the day's parts, beside the board's `TASKS`), `PLAN_VIEWS` and `PLAN_TEMPLATES`:
+  Morgenroutine, Abendroutine, Erst – Dann, Kita-Tag (own weekdays), Wochenplan.
+- `PlanSheet.tsx` – the sheet for screen and print: day cards (`planLayout` picks rows and columns for the box),
+  Erst–Dann with the arrow when a day has exactly two steps, the week's columns with moons for the nights until a day.
+- `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
+  `PlanPrint.tsx` – „🖨️ Drucken“ with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures;
+  `planSettings.ts` – plans, current one, print options (`tinytaps.planner.v1`); `PlannerGame.tsx` – the page;
+  `pageParts.tsx` – `useComputer`, `PanelButton`, shared with `RewardsGame.tsx`; `planner.css` – classes `pl-`.
+- Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
+
+## The tick flow
+
+The child taps the card under „Jetzt“: it gets its ✓ with a sound, and the voice (if on) names what comes next; the
+last one starts a small party. A done card twinkles, a later one wiggles (in the week: „Noch N-mal schlafen“). No
+grown-up hold as on the board: a plan is a guide through the day, not a reward. A key wiggles the „Jetzt“ card but
+never ticks it. „↶ Zurück“ shows for a moment after a tick; when the day is done „↺ Von vorn“ starts it again (for the
+next Erst–Dann). A new plan shows example ticks (the first steps of today, never all), and the first tap only ends them.
+
+## Rules
+
+- A key never ticks a card – only a tap on „Jetzt“ does, so a child hammering keys doesn't finish the day.
+- Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most; a template stays within it (`plan.test.ts`).
+- No clock times: order, „Jetzt – Dann“ and moons for the days to come; toddlers read no clock.
+- Printed cards are big (about 6 cm) and the texts suggest Velcro (Klett), never small magnets: they are a choking
+  hazard under three (research „belohnungstafel“, „tagesplan“).
+- A new activity needs its `schritt-<id>` prompt and line-art twin in `bilder/prompts.ts` (`plan.test.ts` checks).
+- Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
+  it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
+- Defaults are the same on every load (the first plan has the fixed id `erster-plan`), as for the board.

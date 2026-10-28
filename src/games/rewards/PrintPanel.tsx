@@ -8,7 +8,7 @@ import { MARK_BY_ID, MARKS, THEME_BY_ID, THEMES } from "./catalog";
 import type { PrintOptions } from "./settings";
 
 /** A4 in millimetres. */
-const A4 = { long: 297, short: 210 };
+export const A4 = { long: 297, short: 210 };
 /** CSS pixels per millimetre, to scale the preview. */
 const PX_PER_MM = 96 / 25.4;
 /** Marks on the cut-out page: a full page (7 × 5 of 34 mm either way round), enough for a few weeks. */
@@ -117,7 +117,7 @@ function PrintPages({ board, options, look, orientation }: { board: Board; optio
 }
 
 /** The pages made small enough for the panel, exactly as they will print. */
-function Preview({ orientation, children }: { orientation: "landscape" | "portrait"; children: ReactNode }) {
+export function Preview({ orientation, children }: { orientation: "landscape" | "portrait"; children: ReactNode }) {
   const t = useT();
   const box = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(600);

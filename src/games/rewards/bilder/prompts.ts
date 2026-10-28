@@ -1,5 +1,5 @@
 import type { PicturePrompt, PicturePromptSet } from "@/content/picturePrompts";
-import { MARKS, REWARDS, TASKS, THEMES } from "../catalog";
+import { ACTIVITIES, MARKS, REWARDS, TASKS, THEMES } from "../catalog";
 
 // Every picture the Belohnungstafel may get, as prompts for the grown-up to check on
 // /management/ (Bildvorschläge) before any is made. Nothing here is generated yet: the
@@ -61,6 +61,30 @@ const MORE_TASKS: { id: string; use: string; action: string }[] = [
   { id: "trinken", use: "Wasser trinken (fehlt im Katalog)", action: "drinks from a small cup with both paws, eyes happily closed" },
 ];
 
+/** What Tapsi does on each card of the Tagesplan, by activity id: one moment of the day a toddler knows. */
+const ACTIVITY_ACTIONS: Record<string, string> = {
+  aufstehen: "sits up in its bed in the morning, stretching both arms up with a big yawn, sunlight through the window",
+  fruehstueck: "sits at a little table eating cereal from a bowl with a spoon, a glass of milk next to it",
+  kita: "walks happily towards a small colourful kindergarten building with a little backpack on its back",
+  mittagessen: "sits at a little table with a plate of noodles and vegetables, holding a fork",
+  mittagsschlaf: "naps on a small mattress under a light blanket in daylight, hugging a soft toy rabbit",
+  draussen: "runs across a green meadow under a tree, arms out, a ball in front of it",
+  spielplatz: "sits on a swing on a playground, laughing, a small slide behind it",
+  spielen: "builds a tower of colourful wooden blocks on the floor, concentrating",
+  malen: "paints with a thick brush on a sheet of paper on a little table, colourful blobs on the paper",
+  abendessen: "sits at a table in the evening eating a slice of bread, a lamp glowing above",
+  vorlesen: `sits on the lap of ${PAPA} in an armchair, both looking at a picture book (the pages show only pictures)`,
+  schlafen: "sleeps in its bed under a blue blanket at night, a crescent moon and stars in the window",
+  oma: "hugs a kind grandmother fox with grey fur, round glasses and a knitted cardigan, both smiling",
+  freunde: "plays with a little rabbit friend and a little bear friend, all three holding hands in a circle",
+  einkaufen: "sits in the seat of a shopping trolley full of fruit and vegetables, holding a banana",
+  ausflug: "walks along a forest path with a small backpack and a little water bottle, pointing ahead",
+  schwimmen: "jumps into a children's pool wearing orange water wings, splashing",
+  turnen: "does a forward roll on a blue gym mat, a small ball and a balance beam nearby",
+  musik: "plays a small drum with two sticks, music notes in the air",
+  arzt: "sits on an examination table while a friendly doctor bear with a stethoscope listens to its chest, Tapsi smiling",
+};
+
 /** What Tapsi (and its parents) do on each reward's picture, by catalogue id. */
 const REWARD_SCENES: Record<string, string> = {
   spielplatz: `${TAPSI} slides down a small yellow slide on a playground, arms up, laughing; ${PAPA} waits at the bottom with open arms`,
@@ -114,6 +138,13 @@ const TASK_PROMPTS = [
   ...MORE_TASKS.map((t) => task(t.id, t.use, t.action)),
 ];
 
+/** The cards of the Tagesplan: like a task's picture, a moment Tapsi lives through. */
+const STEP_PROMPTS: PicturePrompt[] = ACTIVITIES.map((a) => ({
+  ...task(a.id, `Tagesplan-Karte „${a.label.de}“ (statt ${a.emoji})`, ACTIVITY_ACTIONS[a.id]),
+  id: `schritt-${a.id}`,
+  file: `${DIR}/schritt-${a.id}.webp`,
+}));
+
 const REWARD_PROMPTS: PicturePrompt[] = REWARDS.map((r) => ({
   id: `belohnung-${r.id}`,
   file: `${DIR}/belohnung-${r.id}.webp`,
@@ -147,6 +178,11 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
       title: "Aufgaben",
       note: "Freigestellt (transparent), 512 px. Jede Aufgabe des Katalogs, dazu vier, für die es kein Emoji gibt.",
       prompts: TASK_PROMPTS,
+    },
+    {
+      title: "Tagesplan-Karten",
+      note: "Freigestellt, 512 px: die Schritte eines Tages (Essen, Kita, Schlafen …) für den Tagesplan und seine Bildkarten zum Ausschneiden; Aufgaben wie Zähne putzen nehmen die Bilder oben.",
+      prompts: STEP_PROMPTS,
     },
     { title: "Belohnungen", note: "Freigestellt, 768 px: im Ziel-Feld groß und beim Fest bildschirmfüllend.", prompts: REWARD_PROMPTS },
     {
@@ -202,8 +238,8 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
     },
     {
       title: "Zum Ausmalen (Schwarz-weiß-Druck)",
-      note: "Jedes Aufgaben- und Belohnungsbild noch einmal als Ausmalbild, mit dem farbigen als einziger Referenz – erst nachdem das farbige gelungen ist.",
-      prompts: [...TASK_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
+      note: "Jedes Aufgaben-, Tagesplan- und Belohnungsbild noch einmal als Ausmalbild, mit dem farbigen als einziger Referenz – erst nachdem das farbige gelungen ist.",
+      prompts: [...TASK_PROMPTS, ...STEP_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
     },
   ],
 };

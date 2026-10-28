@@ -171,6 +171,7 @@ export const rewardChartIdeas: IdeaArea = {
       title: "Aufgaben-Kärtchen zum Ausschneiden",
       text: "Im Ausdruck eine Seite mit den Aufgabenbildern als Kärtchen, für eine Magnet- oder Klett-Tafel zu Hause oder den Bildfahrplan (H-03).",
       effort: "S",
+      partial: "Der Tagesplan druckt jedes seiner Bilder als Karte zum Ausschneiden (etwa 6 cm, für eine Klett-Tafel); die Belohnungstafel noch nicht.",
     },
     {
       id: "T-22",

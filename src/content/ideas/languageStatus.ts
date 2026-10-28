@@ -125,6 +125,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     note: "Neu im Oktober 2026, nur auf Deutsch: Tafel, Gestalten, Drucken und der Katalog (catalog.ts). Für eine Sprache: die Labels im Katalog und die t()-Texte; Wochentage und Überschriften (possessive) brauchen je Sprache eine eigene Form.",
   },
   {
+    href: "/tagesplan/",
+    languages: { de: "done" },
+    note: "Neu im Oktober 2026, nur auf Deutsch: Plan, Gestalten, Drucken und die Tagesschritte im Katalog (ACTIVITIES in src/games/rewards/catalog.ts).",
+  },
+  {
     href: "/laut-leise/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },

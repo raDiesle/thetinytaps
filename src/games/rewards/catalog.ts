@@ -293,7 +293,135 @@ export const TEMPLATES: Template[] = [
   },
 ];
 
+/**
+ * What a day is made of, for the Tagesplan: meals, Kita, sleep, outings. Not habits to reward but steps of a day; a
+ * plan takes these and the tasks above (Zähne putzen, Anziehen …). Ids differ from the tasks' (one map holds both).
+ */
+export const ACTIVITIES: CatalogTask[] = [
+  { id: "aufstehen", emoji: "🌅", label: { de: "Aufstehen" } },
+  { id: "fruehstueck", emoji: "🥣", label: { de: "Frühstück" } },
+  { id: "kita", emoji: "🏫", label: { de: "Kita" } },
+  { id: "mittagessen", emoji: "🍲", label: { de: "Mittagessen" } },
+  { id: "mittagsschlaf", emoji: "💤", label: { de: "Mittagsschlaf" } },
+  { id: "draussen", emoji: "🌳", label: { de: "Draußen spielen" } },
+  { id: "spielplatz", emoji: "🛝", label: { de: "Spielplatz" } },
+  { id: "spielen", emoji: "🧱", label: { de: "Spielen" } },
+  { id: "malen", emoji: "🎨", label: { de: "Malen" } },
+  { id: "abendessen", emoji: "🍝", label: { de: "Abendessen" } },
+  { id: "vorlesen", emoji: "📖", label: { de: "Buch lesen" } },
+  { id: "schlafen", emoji: "😴", label: { de: "Schlafen" } },
+  { id: "oma", emoji: "👵", label: { de: "Oma und Opa" } },
+  { id: "freunde", emoji: "👫", label: { de: "Freunde" } },
+  { id: "einkaufen", emoji: "🛒", label: { de: "Einkaufen" } },
+  { id: "ausflug", emoji: "🎒", label: { de: "Ausflug" } },
+  { id: "schwimmen", emoji: "🏊", label: { de: "Schwimmen" } },
+  { id: "turnen", emoji: "🤸", label: { de: "Turnen" } },
+  { id: "musik", emoji: "🎵", label: { de: "Musik" } },
+  { id: "arzt", emoji: "🩺", label: { de: "Zum Arzt" } },
+];
+
+/** The two views of a plan: today's steps as big cards one after the other, or the whole week. */
+export type PlanView = "day" | "week";
+
+/** A view of a plan with what it shows, in one line for grown-ups. */
+export interface PlanViewInfo {
+  id: PlanView;
+  emoji: string;
+  label: Localized;
+  hint: Localized;
+}
+
+export const PLAN_VIEWS: PlanViewInfo[] = [
+  { id: "day", emoji: "☀️", label: { de: "Tag" }, hint: { de: "Heute: Schritt für Schritt, was jetzt kommt und was danach" } },
+  { id: "week", emoji: "📅", label: { de: "Woche" }, hint: { de: "Was an welchem Tag ist – und wie oft noch schlafen" } },
+];
+
+/** A ready-made plan: catalogue ids per weekday (Monday first), or one list for every day. */
+export interface PlanTemplate {
+  id: string;
+  emoji: string;
+  label: Localized;
+  view: PlanView;
+  /** One list for every day, or seven (Monday first). */
+  days: string[] | string[][];
+  /** The time of day a linked step belongs to: a morning routine's brushing is the morning one. */
+  slots?: Record<string, Slot>;
+  theme: string;
+  title?: Localized;
+  /** One line for grown-ups under its picture. */
+  hint: Localized;
+}
+
+const KITA_DAY = ["fruehstueck", "kita", "mittagessen", "mittagsschlaf", "spielplatz", "abendessen", "schlafen"];
+const HOME_DAY = ["fruehstueck", "ausflug", "mittagessen", "mittagsschlaf", "spielen", "abendessen", "schlafen"];
+
+/** The gallery of the Tagesplan, day plans first; the first is the plan a new visitor sees. */
+export const PLAN_TEMPLATES: PlanTemplate[] = [
+  {
+    id: "morgenroutine",
+    emoji: "🌅",
+    label: { de: "Morgenroutine" },
+    view: "day",
+    days: ["aufstehen", "anziehen", "fruehstueck", "zaehne", "schuhe"],
+    slots: { zaehne: "morning" },
+    theme: "sonne",
+    title: { de: "Mein Morgen" },
+    hint: { de: "Aufstehen, Anziehen, Frühstück, Zähne, Schuhe – jeden Morgen gleich" },
+  },
+  {
+    id: "abendroutine",
+    emoji: "🌙",
+    label: { de: "Abendroutine" },
+    view: "day",
+    days: ["abendessen", "baden", "zaehne", "vorlesen", "schlafen"],
+    slots: { zaehne: "evening" },
+    theme: "nacht",
+    title: { de: "Mein Abend" },
+    hint: { de: "Essen, Baden, Zähne, Buch, Schlafen – ruhig in den Schlaf" },
+  },
+  {
+    id: "erst-dann",
+    emoji: "➡️",
+    label: { de: "Erst – Dann" },
+    view: "day",
+    days: ["schuhe", "spielplatz"],
+    theme: "wiese",
+    title: { de: "Erst – Dann" },
+    hint: { de: "Zwei große Karten: erst das eine, dann das Schöne" },
+  },
+  {
+    id: "kita-tag",
+    emoji: "🏫",
+    label: { de: "Tagesablauf mit Kita" },
+    view: "day",
+    days: [KITA_DAY, KITA_DAY, KITA_DAY, KITA_DAY, KITA_DAY, HOME_DAY, HOME_DAY],
+    theme: "meer",
+    title: { de: "Mein Tag" },
+    hint: { de: "Der ganze Tag in Bildern, am Wochenende ohne Kita" },
+  },
+  {
+    id: "wochenplan",
+    emoji: "📅",
+    label: { de: "Wochenplan" },
+    view: "week",
+    days: [
+      ["kita", "turnen"],
+      ["kita", "oma"],
+      ["kita", "schwimmen"],
+      ["kita", "musik"],
+      ["kita", "freunde"],
+      ["einkaufen", "ausflug"],
+      ["oma", "spielplatz"],
+    ],
+    theme: "beere",
+    title: { de: "Meine Woche" },
+    hint: { de: "Was ist wann? Kita, Oma, Schwimmen – und noch wie oft schlafen" },
+  },
+];
+
 export const TASK_BY_ID = new Map(TASKS.map((t) => [t.id, t]));
+/** Tasks and activities: everything a plan's step can come from. */
+export const STEP_BY_ID = new Map([...ACTIVITIES, ...TASKS].map((t) => [t.id, t]));
 export const REWARD_BY_ID = new Map(REWARDS.map((r) => [r.id, r]));
 export const MARK_BY_ID = new Map(MARKS.map((m) => [m.id, m]));
 export const THEME_BY_ID = new Map(THEMES.map((t) => [t.id, t]));
