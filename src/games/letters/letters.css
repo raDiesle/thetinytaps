@@ -357,3 +357,68 @@
     transform: translateY(-120px) scale(0.9) rotate(calc(var(--rotate) * 2));
   }
 }
+
+/*
+ * Phones on their side (Frei tippen, Zählen): letter, picture and word – or the things and their digit – side by side,
+ * so each gets the height the on-screen keys leave, instead of three small ones stacked.
+ */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  @container (min-aspect-ratio: 1 / 1) {
+    .letters-play .card:not(.find-card) {
+      flex-direction: row;
+      gap: 4cqw;
+    }
+
+    .letters-play .card:not(.find-card) .glyphs {
+      font-size: min(72cqh, 22cqw);
+    }
+
+    .letters-play .card:not(.find-card) .picture {
+      font-size: min(66cqh, 22cqw);
+    }
+
+    .letters-play .card:not(.find-card) .picture-image {
+      width: min(80cqh, 26cqw);
+    }
+
+    .letters-play .card:not(.find-card) .word {
+      font-size: min(30cqh, 9cqw);
+    }
+
+    .letters-play .card:not(.find-card) .count-item {
+      font-size: min(27cqh, 10cqw);
+    }
+
+    .letters-play .card:not(.find-card) :is(.count-1, .count-2, .count-3) .count-item {
+      font-size: min(50cqh, 14cqw);
+    }
+
+    .letters-play .card:not(.find-card) .count-badge {
+      font-size: min(9cqh, 3cqw);
+    }
+  }
+}
+
+/* Above the mode cards: the letters for every mode, then what „Wörter tippen“ plays, flowing in as few lines as fit. */
+.letters-level {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 22px;
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .letters-level {
+    gap: 4px 14px;
+  }
+
+  .letters-level .choice {
+    gap: 6px;
+  }
+
+  .letters-level .choice button {
+    min-height: 36px;
+    padding: 2px 10px;
+    box-shadow: 0 3px 0 var(--ink);
+  }
+}

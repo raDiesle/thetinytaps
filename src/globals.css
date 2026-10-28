@@ -16,5 +16,4 @@
 @import "./games/letters/letters.css";
 @import "./games/letters/find.css";
 @import "./games/scenes/scenes.css";
-@import "./games/words/words.css";
-@import "./games/letters/train.css";
+@import "./games/letters/words.css";

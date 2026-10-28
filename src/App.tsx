@@ -25,7 +25,6 @@ const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
 const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage");
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage");
-const WordsPage = page(() => import("@/pages/WordsPage"), "WordsPage");
 
 export function App() {
   return (
@@ -34,7 +33,8 @@ export function App() {
         <Route index element={<Home />} />
         <Route path="spiele/:category" element={<CategoryPage />} />
         <Route path="buchstaben" element={<LettersPage />} />
-        <Route path="woerter" element={<WordsPage />} />
+        {/* „Wörter tippen“ had a page of its own; it is a mode of Buchstaben & Zahlen now. */}
+        <Route path="woerter" element={<Navigate to="/buchstaben/" replace />} />
         <Route path="tiere" element={<AnimalsPage />} />
         <Route path="bilder" element={<ScenesMenu />} />
         <Route path="bilder/:scene" element={<ScenePage />} />

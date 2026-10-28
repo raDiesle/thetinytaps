@@ -7,7 +7,7 @@ import { inTheme } from "@/content/themes";
 import type { ActionWord, ColorWord, LanguagePack, ThemeId, WordEntry } from "@/content/types";
 import { playChime, playCountNote, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
-import { MAX_LETTERS, type WordsMode, type WordsSettings } from "./settings";
+import type { LettersSettings, WordKind } from "./settings";
 
 /** Keys closer together than this only spawn shapes, so mashing doesn't race through the word. */
 const MIN_TYPE_MS = 300;
@@ -24,10 +24,11 @@ function typeableWords(pack: LanguagePack, maxLetters: number, theme: "all" | Th
   return inTheme(words, theme);
 }
 
-function wordsFor(pack: LanguagePack, mode: WordsMode, maxLetters: number, theme: "all" | ThemeId): WordEntry[] {
-  if (mode === "colors") return pack.colors;
-  if (mode === "actions") return pack.actions;
-  return typeableWords(pack, maxLetters, theme);
+function wordsFor(pack: LanguagePack, kind: WordKind, maxLetters: number, theme: "all" | ThemeId): WordEntry[] {
+  if (kind === "colors") return pack.colors;
+  if (kind === "actions") return pack.actions;
+  const nouns = typeableWords(pack, maxLetters, theme);
+  return kind === "all" ? [...nouns, ...pack.colors, ...pack.actions] : nouns;
 }
 
 const isColor = (word: WordEntry): word is ColorWord => "color" in word;
@@ -44,13 +45,6 @@ function shuffle<T>(items: T[]): T[] {
 
 const pick = <T,>(list: readonly T[]) => list[Math.floor(Math.random() * list.length)];
 
-/** Puzzle pieces over the picture, in a grid about as square as the letters allow. */
-function puzzleGrid(letters: number) {
-  const cols = Math.ceil(Math.sqrt(letters));
-  const rows = Math.ceil(letters / cols);
-  return { cols, rows, order: shuffle(Array.from({ length: cols * rows }, (_, i) => i)) };
-}
-
 /** Where the things of a colour hop in: around the edges, so the word stays readable. */
 function paradeSpots(count: number) {
   return Array.from({ length: count }, (_, i) => ({
@@ -59,7 +53,8 @@ function paradeSpots(count: number) {
   }));
 }
 
-export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: WordsSettings }) {
+/** „Wörter tippen“: a picture with its word, typed letter by letter (or only the first letter). */
+export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [current, setCurrent] = useState<{ id: number; word: WordEntry } | null>(null);
   const [typed, setTyped] = useState(0);
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
@@ -73,15 +68,12 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
   const deck = useRef<WordEntry[]>([]);
 
   const words = useMemo(
-    () => wordsFor(pack, settings.mode, MAX_LETTERS[settings.length], settings.theme),
-    [pack, settings.mode, settings.length, settings.theme],
+    () => wordsFor(pack, settings.wordKind, Number(settings.wordLength), settings.theme),
+    [pack, settings.wordKind, settings.wordLength, settings.theme],
   );
   const letters = useMemo(() => (current ? Array.from(current.word.word) : []), [current]);
   const done = current !== null && typed === letters.length;
-  const firstOnly = settings.mode === "first";
-  // The first-letter game needs the picture as its only clue.
-  const reveal = firstOnly ? "now" : settings.picture;
-  const puzzle = useMemo(() => (reveal === "puzzle" ? puzzleGrid(letters.length) : null), [reveal, letters]);
+  const firstOnly = settings.wordTyping === "first";
   const color = current && isColor(current.word) ? current.word : null;
   const action = current && isAction(current.word) ? current.word : null;
   const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
@@ -176,7 +168,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
         if (!tryNextWord()) funBurst();
         return;
       }
-      if (settings.anyKey || keyMatches(key, letters[typed], pack)) {
+      if (keyMatches(key, letters[typed], pack)) {
         if (!tryType()) funBurst();
         return;
       }
@@ -184,7 +176,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
       if ((nudges + 1) % HINT_AFTER_WRONG === 0) sayLetter(letters[typed]);
       setNudges(nudges + 1);
     },
-    [current, done, letters, typed, nudges, pack, settings.anyKey, tryType, tryNextWord, funBurst, sayLetter],
+    [current, done, letters, typed, nudges, pack, tryType, tryNextWord, funBurst, sayLetter],
   );
 
   useEffect(() => {
@@ -220,9 +212,10 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
   const wanted = letters[typed] && toUpper(letters[typed], pack);
   const wantedKey = !wanted || pack.letters.some((l) => l.upper === wanted) ? wanted : wanted.normalize("NFD")[0];
 
+  // „A a“ writes the word as it is written, „Bär“.
   const display = (char: string) => (settings.letterCase === "upper" ? toUpper(char, pack) : settings.letterCase === "lower" ? toLower(char, pack) : char);
 
-  const figureClass = ["figure", puzzle && "puzzle", action && "actor", done && action && `act-${action.action}`].filter(Boolean).join(" ");
+  const figureClass = ["figure", action && "actor", done && action && `act-${action.action}`].filter(Boolean).join(" ");
 
   /** Typed letters are bright; colour words are written in their colour, and in white once the screen has it. */
   const typedColor = (i: number) => (color ? (done ? "#fff" : color.color) : BRIGHT_COLORS[i % BRIGHT_COLORS.length]);
@@ -246,24 +239,9 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Wo
         )}
         {current && (
           <div key={current.id} className={`card${done ? " done" : ""}`}>
-            <div className={`reveal ${reveal !== "end" || done ? "shown" : "waiting"}`} onPointerDown={onPicturePointer}>
+            <div className="reveal shown" onPointerDown={onPicturePointer}>
               <div className={figureClass}>
                 <Picture word={current.word} />
-                {puzzle && (
-                  <div
-                    className="puzzle-cover"
-                    style={{ gridTemplateColumns: `repeat(${puzzle.cols}, 1fr)`, gridTemplateRows: `repeat(${puzzle.rows}, 1fr)` }}
-                    aria-hidden
-                  >
-                    {puzzle.order.map((piece, n) => (
-                      <span
-                        key={piece}
-                        className={`piece${n < Math.round((typed / letters.length) * puzzle.order.length) ? " off" : ""}`}
-                        style={{ order: piece, background: BRIGHT_COLORS[piece % BRIGHT_COLORS.length] }}
-                      />
-                    ))}
-                  </div>
-                )}
               </div>
               {action && done && <div className="join-in">{pack.joinIn(action)} 🙌</div>}
             </div>

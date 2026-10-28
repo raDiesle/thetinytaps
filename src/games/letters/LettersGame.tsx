@@ -12,10 +12,13 @@ import {
   type LettersMode,
   type LettersSettings,
   type NumberReveal,
+  type WordKind,
+  type WordLength,
+  type WordTyping,
 } from "./settings";
 import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
-import { TrainPlay } from "./TrainPlay";
+import { WordsPlay } from "./WordsPlay";
 
 export function LettersGame() {
   const [settings, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
@@ -26,9 +29,10 @@ export function LettersGame() {
   const t = useT();
   const quote = (text: string) => t({ de: `„${text}“`, ru: `«${text}»` });
   const findTitle = t({ de: `Wo ist das ${b.upper}?`, ru: `Где буква ${b.upper}?` });
-  // Free typing: the ABC keys on every touch screen, the other modes only on tablets.
-  const anyTouch = settings.mode === "free";
+  // Free typing and Zählen: the keys on every touch screen, the other modes only on tablets.
+  const anyTouch = settings.mode === "free" || settings.mode === "count";
   const touchKeys = useTouchKeys(settings.touchKeys, anyTouch);
+  const pictureWords = settings.wordKind === "nouns" || settings.wordKind === "all";
 
   return (
     <GameShell
@@ -36,22 +40,59 @@ export function LettersGame() {
       emoji="🔤"
       modes={[
         { id: "free", emoji: "⌨️", title: t({ de: "Frei tippen", ru: "Печатать что хочешь" }) },
+        { id: "count", emoji: "🔢", title: t({ de: "Zählen" }) },
         { id: "find", emoji: "🔍", title: findTitle },
-        { id: "train", emoji: "🚂", title: t({ de: "Buchstaben-Zug", ru: "Поезд из букв" }) },
+        { id: "words", emoji: "✍️", title: t({ de: "Wörter tippen", ru: "Печатаем слова" }) },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as LettersMode })}
       level={
-        <Choice<LetterCase>
-          label={t({ de: "Buchstaben", ru: "Буквы" })}
-          value={settings.letterCase}
-          onChange={(letterCase) => update({ letterCase })}
-          options={[
-            { value: "upper", label: a.upper },
-            { value: "both", label: `${a.upper} ${a.lower}` },
-            { value: "lower", label: a.lower },
-          ]}
-        />
+        // Always in sight above the cards: the letters for every mode, then what „Wörter tippen“ plays.
+        <div className="letters-level">
+          <Choice<LetterCase>
+            label={t({ de: "Buchstaben", ru: "Буквы" })}
+            value={settings.letterCase}
+            onChange={(letterCase) => update({ letterCase })}
+            options={[
+              { value: "upper", label: a.upper },
+              { value: "both", label: `${a.upper} ${a.lower}` },
+              { value: "lower", label: a.lower },
+            ]}
+          />
+          <Choice<WordTyping>
+            label={t({ de: "✍️ Wörter tippen", ru: "✍️ Печатаем слова" })}
+            value={settings.wordTyping}
+            onChange={(wordTyping) => update({ wordTyping })}
+            options={[
+              { value: "spell", label: t({ de: "Ganzes Wort", ru: "Целое слово" }) },
+              { value: "first", label: t({ de: "Erster Buchstabe", ru: "Первая буква" }) },
+            ]}
+          />
+          <Choice<WordKind>
+            label={t({ de: "Wörter", ru: "Слова" })}
+            value={settings.wordKind}
+            onChange={(wordKind) => update({ wordKind })}
+            options={[
+              { value: "nouns", label: t({ de: "🐻 Substantive" }) },
+              { value: "all", label: t({ de: "🌈 Alle", ru: "🌈 Все" }) },
+              { value: "colors", label: t({ de: "🎨 Farben", ru: "🎨 Цвета" }) },
+              { value: "actions", label: t({ de: "🦘 Tu-Wörter", ru: "🦘 Слова-действия" }) },
+            ]}
+          />
+          {/* Colours and doing words are short fixed lists, so the length only applies to the picture words. */}
+          {pictureWords && (
+            <Choice<WordLength>
+              label={t({ de: "Wortlänge", ru: "Длина слова" })}
+              value={settings.wordLength}
+              onChange={(wordLength) => update({ wordLength })}
+              options={[
+                { value: "3", label: "3" },
+                { value: "4", label: "4" },
+                { value: "7", label: "7" },
+              ]}
+            />
+          )}
+        </div>
       }
       info={
         <>
@@ -63,14 +104,25 @@ export function LettersGame() {
           </p>
           <p>
             {t({
+              de: "Zählen: Nur Zahlen kommen, jede mit so vielen Dingen. Eine Ziffer zeigt sich selbst, jede andere Taste bringt eine Zahl zufällig.",
+            })}
+          </p>
+          <p>
+            {t({
               de: `Wo ist das ${b.upper}? Ein Buchstabe und sein Bild erscheinen, und das Kind sucht die Taste dafür.`,
               ru: `Где ${b.upper}? Появляются буква и её картинка, и ребёнок ищет нужную клавишу.`,
             })}
           </p>
           <p>
             {t({
-              de: "Buchstaben-Zug: Jede Taste hängt einen Wagen mit ihrem Buchstaben an. Ist der Zug voll, pfeift er und fährt los.",
-              ru: "Поезд с буквами: каждая клавиша прицепляет вагон со своей буквой. Когда поезд полный, он гудит и уезжает.",
+              de: "Ganzes Wort: Ein Bild erscheint mit seinem Wort, und das Kind tippt es Buchstabe für Buchstabe. Erster Buchstabe: nur den Anfang zum Bild.",
+              ru: "Целое слово: появляется картинка со своим словом, и ребёнок печатает его буква за буквой. Первая буква: только начало слова к картинке.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Farben: Ein Farbwort wie „Rot“ tippen, und Dinge in dieser Farbe hüpfen herein. Tu-Wörter: „Hüpf“ oder „Tanz“ tippen, die Figur macht es vor, und das Kind macht mit.",
+              ru: "Цвета: напечатать слово цвета, например «Красный», и вещи этого цвета запрыгивают на экран. Слова-действия: напечатать «Прыгай» или «Танцуй», фигурка показывает, а ребёнок повторяет.",
             })}
           </p>
         </>
@@ -88,7 +140,7 @@ export function LettersGame() {
               ]}
             />
             <Toggle
-              label={t({ de: "Wort anzeigen (nicht beim Zug)", ru: "Показывать слово (кроме поезда)" })}
+              label={t({ de: "Wort unter dem Bild anzeigen (nicht bei Wörter tippen)" })}
               checked={settings.showWord}
               onChange={(showWord) => update({ showWord })}
             />
@@ -122,6 +174,9 @@ export function LettersGame() {
                 ]}
               />
             )}
+          </SettingsGroup>
+
+          <SettingsGroup title={t({ de: "⌨️ Frei tippen und 🔢 Zählen" })}>
             <Choice<NumberReveal>
               label={t({ de: "Zahlen", ru: "Цифры" })}
               value={settings.numbers}
@@ -163,10 +218,11 @@ export function LettersGame() {
     >
       {settings.mode === "find" ? (
         <FindPlay pack={pack} settings={settings} />
-      ) : settings.mode === "train" ? (
-        <TrainPlay pack={pack} settings={settings} />
+      ) : settings.mode === "words" ? (
+        <WordsPlay pack={pack} settings={settings} />
       ) : (
-        <LettersPlay pack={pack} settings={settings} />
+        // Also for a mode saved before it was taken away (the Buchstaben-Zug).
+        <LettersPlay pack={pack} settings={settings} numbersOnly={settings.mode === "count"} />
       )}
     </GameShell>
   );

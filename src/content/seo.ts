@@ -54,13 +54,6 @@ export const SEO_PAGES: PageSeo[] = [
     text: "Erste Zuordnungsspiele: Futter zum Tier bringen, den passenden Schatten finden, Socken-Paare an die Leine hängen. Antippen oder hinziehen, ohne Fehler.",
   },
   {
-    path: "/spiele/buchstaben-zahlen/",
-    title: "Buchstaben und Zahlen lernen ab 2 Jahren",
-    description:
-      "Tasten drücken, Buchstaben finden, erste Wörter tippen: Buchstaben und Zahlen spielerisch für Kleinkinder, mit Bildern und Stimme, ohne Werbung.",
-    text: "Jede Taste zeigt ihren Buchstaben mit einem Bild und sagt ihn. Dazu Zahlen mit Dingen zum Zählen, „Wo ist das B?“, der Buchstaben-Zug und erste Wörter.",
-  },
-  {
     path: "/spiele/weitere/",
     title: "Zähneputzen und Laut-leise-Spiel für Kleinkinder",
     description: "Zähneputzen mit Lied und Timer und ein Spiel für laute und leise Stimme – für Kinder ab 2 Jahren, kostenlos, ohne Werbung und offline.",
@@ -122,14 +115,8 @@ export const SEO_PAGES: PageSeo[] = [
   {
     path: "/buchstaben/",
     title: "Buchstaben und Zahlen lernen – Tastatur-Spiel ab 2",
-    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Zahlen zum Zählen, „Wo ist das B?“ und der Buchstaben-Zug. Ab 2 Jahren.",
-    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Buchstaben mit Bild und Wort, Zahlen mit Dingen zum Zählen, Buchstaben suchen und ein Zug aus Buchstaben.",
-  },
-  {
-    path: "/woerter/",
-    title: "Erste Wörter tippen – Lernspiel für Kinder",
-    description: "Ein Bild, ein Wort: Kinder tippen Buchstabe für Buchstabe auf der Tastatur. Ganze Wörter, nur der Anfangsbuchstabe, Farben und Tun-Wörter.",
-    text: "Erste Wörter auf der Tastatur: Zu jedem Bild das Wort tippen, Buchstabe für Buchstabe, oder für die Kleinsten nur den ersten Buchstaben.",
+    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Dazu Zählen, „Wo ist das B?“ und erste Wörter tippen. Ab 2 Jahren.",
+    text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Buchstaben mit Bild und Wort, Zahlen mit Dingen zum Zählen, Buchstaben suchen und erste Wörter, Farben und Tu-Wörter tippen.",
   },
   {
     path: "/zaehne/",

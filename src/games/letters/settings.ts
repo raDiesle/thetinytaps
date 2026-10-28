@@ -4,10 +4,19 @@ import type { ThemeId } from "@/content/types";
 export type LetterCase = "upper" | "both" | "lower";
 
 /**
- * "free": every key shows its letter or number. "find": a letter is shown and the child looks for its key.
- * "train": every key adds a wagon to a train.
+ * "free": every key shows its letter or number. "count": only numbers, any other key brings one by chance.
+ * "find": a letter is shown and the child looks for its key. "words": a picture's word is typed letter by letter.
  */
-export type LettersMode = "free" | "find" | "train";
+export type LettersMode = "free" | "count" | "find" | "words";
+
+/** Which words „Wörter tippen“ plays: picture words, colour words, doing words, or all of them mixed. */
+export type WordKind = "nouns" | "all" | "colors" | "actions";
+
+/** „Wörter tippen“: type the whole word, or only its first letter while the rest flies in by itself. */
+export type WordTyping = "spell" | "first";
+
+/** The longest picture word „Wörter tippen“ asks for, in letters; shown as that number on the start screen. */
+export type WordLength = "3" | "4" | "7";
 
 /**
  * How a number comes in. "all": the things and the digit at once. "count": the things pop in
@@ -44,6 +53,12 @@ export interface LettersSettings {
   finishCounting: boolean;
   /** Big letter keys on the screen, for tablets without a keyboard. */
   touchKeys: TouchKeysMode;
+  /** „Wörter tippen“: which words. */
+  wordKind: WordKind;
+  /** „Wörter tippen“: whole word or first letter. */
+  wordTyping: WordTyping;
+  /** „Wörter tippen“: the longest picture word; colour and doing words are short fixed lists and always all play. */
+  wordLength: WordLength;
 }
 
 export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
@@ -60,6 +75,9 @@ export const DEFAULT_LETTERS_SETTINGS: LettersSettings = {
   numbers: "all",
   finishCounting: true,
   touchKeys: "auto",
+  wordKind: "nouns",
+  wordTyping: "spell",
+  wordLength: "4",
 };
 
 // v2: speech is off by default now, so old saved settings start fresh.

@@ -88,13 +88,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   { href: "/socken/", languages: { de: "done", ru: "done" } },
   {
     href: "/buchstaben/",
-    languages: { de: "done", en: "done", ru: "done" },
-    note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Russisch tippt jede Taste als den kyrillischen Buchstaben an ihrer Stelle (ЙЦУКЕН); Chinesisch, Hindi und Arabisch haben eine andere Schrift und Tastatur.",
-  },
-  {
-    href: "/woerter/",
-    languages: { de: "done", en: "done", ru: "done" },
-    note: "Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch, dieselben Sprachpakete wie „Buchstaben & Zahlen“.",
+    languages: { de: "done", en: "done", ru: "partial" },
+    note: "Mit „Wörter tippen“. Russisch fehlt, was im Oktober 2026 neu kam (bis dahin auf Deutsch): die Art „Zählen“ (Name, „Tipp auf eine Zahl!“, ihr Absatz unter „Über das Spiel“), „Substantive“ über den Karten und zwei Zeilen der Einstellungen. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Russisch tippt jede Taste als den kyrillischen Buchstaben an ihrer Stelle (ЙЦУКЕН); Chinesisch, Hindi und Arabisch haben eine andere Schrift und Tastatur.",
   },
   {
     href: "/zaehne/",

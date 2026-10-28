@@ -13,7 +13,7 @@ export const wordsIdeas: IdeaArea = {
       text: "Jeder richtige Buchstabe deckt ein Puzzleteil des Bildes auf. Beim letzten Buchstaben ist das Bild komplett und bewegt sich.",
       why: "Belohnung nach jedem Buchstaben statt erst am Ende – hält bei längeren Wörtern durch.",
       effort: "S",
-      done: true,
+      rejected: true,
     },
     {
       id: "W-02",

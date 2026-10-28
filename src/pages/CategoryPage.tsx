@@ -2,7 +2,7 @@ import { Navigate, useParams } from "react-router";
 import { GameCard } from "@/components/GameCard";
 import { MenuTop } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
-import { CATEGORIES } from "@/content/games";
+import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useT } from "@/lib/language";
 import { useUpdateBetweenGames } from "@/lib/pwa";
@@ -17,6 +17,8 @@ export function CategoryPage() {
   useUpdateBetweenGames();
   const grid = useFitGrid(category?.games.length ?? 0);
   if (!category) return <Navigate to="/" replace />;
+  // An old address of a category that has only one game now.
+  if (!hasPage(category)) return <Navigate to={categoryHref(category)} replace />;
   return (
     <main className="home">
       <Sky />

@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES } from "./games";
+import { CATEGORIES, categoryHref, hasPage } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, toLower, toUpper } from "./languages";
 import { RESEARCH } from "./research";
@@ -15,6 +15,12 @@ describe("home menu", () => {
 
   test.each(games.map((game) => [game.href, game] as const))("%s has a route in App.tsx", (href) => {
     expect(routes).toContain(href);
+  });
+
+  test("a category of one game opens it directly, without a menu of one card", () => {
+    for (const category of CATEGORIES) {
+      expect(categoryHref(category), category.id).toBe(category.games.length === 1 ? category.games[0].href : `/spiele/${category.id}/`);
+    }
   });
 
   test("category ids and game addresses are unique", () => {
@@ -55,7 +61,7 @@ describe("search engine texts (seo.ts)", () => {
   test("every page of the menu and every scene has one, and nothing else", () => {
     const wanted = [
       "/",
-      ...CATEGORIES.map((category) => `/spiele/${category.id}/`),
+      ...CATEGORIES.filter(hasPage).map((category) => `/spiele/${category.id}/`),
       ...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)),
       ...SCENES.map((scene) => `/bilder/${scene.id}/`),
     ];
@@ -105,12 +111,10 @@ describe("language status on the management page", () => {
     expect(LANGUAGE_STATUS.map((row) => row.href)).toEqual(hrefs);
   });
 
-  test("letters and words speak exactly the wanted languages that have a language pack", () => {
+  test("Buchstaben & Zahlen speaks exactly the wanted languages that have a language pack", () => {
     const packs = LANGUAGES.map((language) => language.id as string).filter((id) => TARGET_LANGUAGES.some((target) => target.id === id));
-    for (const href of ["/buchstaben/", "/woerter/"]) {
-      const row = LANGUAGE_STATUS.find((r) => r.href === href);
-      expect(Object.keys(row?.languages ?? {}).sort(), href).toEqual(packs.sort());
-    }
+    const row = LANGUAGE_STATUS.find((r) => r.href === "/buchstaben/");
+    expect(Object.keys(row?.languages ?? {}).sort()).toEqual(packs.sort());
   });
 
   test("a game has its languages either as a whole or part by part, and only parts with recordings can lack them", () => {

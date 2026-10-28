@@ -145,6 +145,9 @@ In a fresh worktree run `bun install` first.
   computer (≥ 900 px wide with a mouse) see it always, also to leave fullscreen; on phones and tablets a game shows it
   only while out of fullscreen, so a child's tap can't end it. On a computer the back link of a menu is big, yellow and
   fixed in the top left corner, so it never scrolls away; phones and tablets keep it small.
+- No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
+  in `content.test.ts`), and variants of one way to play (which words, how long, whole word or first letter) are
+  choices in the always visible row above the cards (`level`), not cards or a menu of their own.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
   no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
