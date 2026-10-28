@@ -1,8 +1,5 @@
-/** "story": Tapsi goes to the potty step by step; "party": the child went for real and gets a star. */
-export type PottyMode = "story" | "party";
-
+/** The story has no modes (the star is its last step), so only the shared options are kept. */
 export interface PottySettings {
-  mode: PottyMode;
   /** Says what happens at every step. */
   speech: boolean;
   /** Eating, drinking, the waiting scenes, trickle, flush and the applause. */
@@ -10,10 +7,9 @@ export interface PottySettings {
 }
 
 export const DEFAULT_POTTY_SETTINGS: PottySettings = {
-  mode: "story",
   speech: false,
   sounds: true,
 };
 
-// v3: „Muss Pipi!“ and „Muss Kaka!“ became one story – an old "pipi" or "kaka" mode would match no mode.
+// v3: „Muss Pipi!“ and „Muss Kaka!“ became one story. An old saved mode is merged in and ignored.
 export const POTTY_SETTINGS_KEY = "tinytaps.potty.v3";

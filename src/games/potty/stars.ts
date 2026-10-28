@@ -1,7 +1,7 @@
 import { dayKey } from "@/games/teeth/daytime";
 
-// „Hat geklappt!“: every time the child really went, a grown-up opens the
-// party and a star goes on today's column. Kept for two weeks, so the chart
+// Every time the child really went (a grown-up tapped a ✓ on the potty), the end
+// of the story puts a star on today's column. Kept for two weeks, so the chart
 // can show this week and the log stays small.
 
 /** How many stars each day got, keyed by the local date ("2026-10-26"). */

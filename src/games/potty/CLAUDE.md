@@ -11,9 +11,9 @@ what Tapsi feels (💦 for pipi, the picture shakes when the tummy rumbles), the
 the wall and the thought bubble, confetti, and at the bottom the row of step icons (each one jumps there) with the
 grown-ups' buttons on the right next to it.
 
-„Muss mal!“ (`PottyPlay.tsx`, mode `story`): one story for both needs, since a child often can't tell beforehand.
-Opening the game (its tile on the home menu) starts it at once (`GameShell`'s `startMode`); the start screen with
-„Hat geklappt!“, the info and the cards shows only after leaving with ✕ or „Menü“. It opens on the first step, `eat`: Tapsi the fox
+The story (`PottyPlay.tsx`, once called „Muss mal!“): one story for both needs, since a child often can't tell beforehand.
+The game has no modes. Opening it (its tile on the home menu) starts the story at once (`GameShell`'s `startMode`); the
+start screen, with only „Los geht’s!“ and the info, shows only after leaving with ✕ or „Menü“. It opens on the first step, `eat`: Tapsi the fox
 (`TAPSI` in `content.ts`) at the kitchen table, eating and drinking by turns (the `essen` and `trinken` pictures are that step's
 frames, moving at once).
 Every tap on the picture or background (anything but a button) and every key does the most sensible thing there
@@ -32,7 +32,7 @@ The steps: eating and drinking, the bladder presses or the tummy rumbles (`need`
 unsure – before calling, nobody has said anything yet – Tapsi „muss mal“, the bladder and the tummy picture take turns as frames, `picturesFor`, and the row shows ❓),
 calling „Mama! Papa!“ – they come in together and stay in every picture from then on – into the bathroom together,
 trousers down, sit down, then the waiting, done (whatever the grown-up's ✓ chose is in the potty, the parents cheer),
-wipe, trousers up, flush, wash hands, party, then `GameEnd` with „Menü“ and „Nochmal“ only (one story, so „Weiter“
+wipe, trousers up, flush, wash hands, party, the week's stars (`stars`, see below), then `GameEnd` with „Menü“ and „Nochmal“ only (one story, so „Weiter“
 would be „Nochmal“ again), small in the bottom corners (`GameEnd`'s `corners`: „Menü“ left, „Nochmal“ right, the party
 picture free between them), which starts a new round, unsure again. Only a tap within `TAP_GUARD_MS` of a step's start
 sparkles (a double tap), and while sitting one while a thought still runs.
@@ -69,12 +69,18 @@ potty and play along, and a grown-up taps the ✓ of what really came – that p
 no ✓ for both (the user's choice: for both, either one); `Went` keeps `both` only for jumping in the row after the child
 said both, where both endings take turns as frames.
 
-„Hat geklappt!“ (`PartyPlay.tsx`): for real successes. A grown-up opens it after the child went; the first tap brings applause, confetti, Tapsi's party picture moving and a star on today's column of a week chart (`stars.ts`, `tinytaps.potty.stars.v1`, counts per day, kept two weeks; `dayKey`/`weekOf` come from Zähne putzen's `daytime.ts`). One opening is one star; further taps only sparkle, „Nochmal“ celebrates again without a star, „Weiter“ goes to „Muss mal!“.
+The stars (`stars`, the last step, once the mode „Hat geklappt!“): over the party picture (still moving) this week's
+chart pops in at the top (`WeekStars.tsx`, a column per day, today marked; `stars.ts`, `tinytaps.potty.stars.v1`,
+counts per day, kept two weeks; `dayKey`/`weekOf` come from Zähne putzen's `daytime.ts`). When a grown-up tapped a ✓
+in this round (`checked`), a new star pops onto today with a twinkle and „Hat geklappt! Hurra, ein Stern für dich!“;
+one round, one star (`starred`), also when the row jumps to the end again. Reached without a ✓ (jumping in the row,
+or a ✓ forgotten by jumping back before „fertig“), the chart shows only the stars there are. The story when nothing
+came ends on `play` and never shows the chart.
 
 Files: `content.ts` (Tapsi, steps with their pictures and icons, waiting scenes, German texts), `images.ts` (finds
 `bilder/fox-<picture>.webp` and its `-b` frame), `StoryPicture.tsx` (the picture with its frames, also in the bubble),
-`PottyPlay.tsx` (steps, sounds, speech, the ✓), `potty.css`, `settings.ts` (`tinytaps.potty.v3`: mode;
-speech and sounds from the home page). `potty.test.ts` fails when a picture of the story is missing, a
+`PottyPlay.tsx` (steps, sounds, speech, the ✓, the star), `WeekStars.tsx`, `potty.css`, `settings.ts`
+(`tinytaps.potty.v3`: only speech and sounds, from the home page). `potty.test.ts` fails when a picture of the story is missing, a
 thought's picture lacks its second frame, or `bilder/` holds a picture of anybody else.
 
 German only so far (`POTTY_TEXTS` is `Localized`, a translation goes next to `de` when asked for).
@@ -85,8 +91,9 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 
 - Only Tapsi goes to the potty (the user's choice, to save pictures and tokens): every animal more would need the
   whole story of about 50 pictures drawn again. Never add another animal or family unless the user asks for it.
-- The game is opened when the child has to go now: the tile starts „Muss mal!“ at once, with no start screen or
-  submenu before it. Anything else (the star, the info) lives on the start screen behind ✕.
+- The game is opened when the child has to go now: the tile starts the story at once, with no start screen or
+  submenu before it, and the game has no modes – everything (the star too) is a step of the one story, the start
+  screen behind ✕ has only „Los geht’s!“ and the info. Never add a mode card for something the story can show as a step.
 - So unlike other games the picture moves before any tap (the user's choice): Tapsi eats and drinks by turns. Eating
   and drinking are one step, never two.
 - The first steps never go on by themselves (`Step.nudge`; going on alone after three seconds was too fast for the user),
@@ -144,4 +151,5 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   Mama and Papa on the toilet too, waiting as long as it takes, the cheering after – no side stories (toes, sneezes,
   glasses, tails, animals). It never sings the thought bubble's stand-ins for pipi and kaka (water, rain, balloon,
   ketchup, the hen …) or „drücken“ – `potty.test.ts` checks the lyrics in `musik/suno-lied.md`.
-- The story never gives a star; only „Hat geklappt!“ does, once per opening. No empty fields that say „not done“.
+- A star comes only for what really came: at the end of the story, after a grown-up tapped a ✓ in that round, one per
+  round (never for jumping to the end, never for „nichts“). No empty fields that say „not done“.
