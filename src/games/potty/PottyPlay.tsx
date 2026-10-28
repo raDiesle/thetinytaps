@@ -99,7 +99,8 @@ interface Begin {
  */
 export function PottyPlay({ settings }: { settings: PottySettings }) {
   const language = useAppLanguage();
-  const texts = useT()(POTTY_TEXTS);
+  const t = useT();
+  const texts = t(POTTY_TEXTS);
   const [said, setSaid] = useState<Said>("unsure");
   /** What really came, chosen at the ✓; null before. */
   const [went, setWent] = useState<Went | null>(null);
@@ -179,7 +180,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     const { id, ms, moves } = storyFor(nothing)[index];
     goTo({ step: index, scene: -1, nothing }, ms);
     setAsking(id === "call" || (id === "go" && saidNow === "unsure"));
-    const line = texts.steps[id](TAPSI.name, came ?? saidNow);
+    const line = texts.steps[id](t(TAPSI.name), came ?? saidNow);
     say(nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
     switch (id) {
       case "eat":

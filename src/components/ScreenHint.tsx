@@ -75,7 +75,7 @@ export function ScreenHint() {
             </button>
           )}
           <button type="button" className="screen-hint-button secondary" onClick={playUpright}>
-            {t({ de: "Trotzdem hochkant" })}
+            {t({ de: "Trotzdem hochkant", ru: "Всё равно вертикально" })}
           </button>
         </div>
       </div>

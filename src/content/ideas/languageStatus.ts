@@ -57,8 +57,8 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/bilder/",
-    languages: { de: "done", ru: "partial" },
-    note: "Viele Namen und Sätze je Bild; Russisch in ru.ts jeder Szene. Russisch fehlt (Oktober 2026): der Absatz zu Suchen und Fragen unter „Über das Spiel“ und das Lob für einen Teil in der Farbe („Da ist Rot!“; bis dahin lobt Russisch wie für das ganze Ding).",
+    languages: { de: "done", ru: "done" },
+    note: "Viele Namen und Sätze je Bild; Russisch in ru.ts jeder Szene.",
   },
   {
     href: "/abenteuer/",
@@ -78,8 +78,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/gefuehle/",
-    languages: { de: "done", ru: "partial" },
-    note: "Russisch fehlt noch: zu Hause je Gefühl zwei nicht so gute Ideen, beim traurigen Bären alle drei (Runde mit nur zwei Karten, Oktober 2026) und zwei Absätze unter „Über das Spiel“; bis dahin auf Deutsch mit deutscher Stimme. Dazu die Fragen vor jeder Wahl, die sagen, wer handelt („Was machst du?“ / „Was kann der kleine Bär tun?“, Oktober 2026): bis dahin fragt Russisch allgemein („Как ты можешь ему помочь?“, „Что может сделать Мишка?“).",
+    languages: { de: "done", ru: "done" },
+    note: "Russisch in bear.ru.ts und kita.ru.ts, Wort für Wort neben den deutschen Geschichten.",
   },
   { href: "/kettenreaktion/", languages: { de: "done", ru: "done" } },
   { href: "/kleine-abenteuer/", languages: { de: "done", ru: "done" } },
@@ -99,11 +99,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/zaehne/",
     parts: [
-      {
-        label: "🪥 Hinweise und Bilder",
-        languages: { de: "done", ru: "partial" },
-        note: "Russisch fehlt nur „Musik lädt …“ (wenn das Lied nach dem Vorspann noch nicht da ist).",
-      },
+      { label: "🪥 Hinweise und Bilder", languages: { de: "done", ru: "done" } },
       {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
@@ -115,7 +111,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/toepfchen/",
     parts: [
-      { label: "🚽 Bilder und Texte", languages: { de: "done" }, note: "Neu im Oktober 2026, nur auf Deutsch." },
+      { label: "🚽 Bilder und Texte", languages: { de: "done", ru: "done" }, note: "Russisch seit Oktober 2026; Tapsi heißt dort „Тапси“." },
       {
         label: "🎵 Warte-Lied (gesungen)",
         recorded: true,
@@ -126,12 +122,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/laut-leise/",
-    languages: { de: "done", ru: "partial" },
-    note: "Russisch fehlt der Absatz zu Löwe und Maus unter „Über das Spiel“ (mit „Weiter“ zum Pusten, Oktober 2026).",
+    languages: { de: "done", ru: "done" },
   },
   {
     href: "/",
-    languages: { de: "done", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. Russisch fehlt: die neuen Texte der Spielzeit (Minuten oder Spiele, Sperre der Menüs) der Untertitel von „Weitere“ (mit Töpfchen) und „Schließen“ und „Weiter unten gibt es mehr“ der Optionen am Handy.",
+    languages: { de: "done", ru: "done" },
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
   },
 ];

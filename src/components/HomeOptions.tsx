@@ -99,14 +99,14 @@ function MenuButton({ icon, label, iconOnly = false, children }: { icon: string;
             <span className="home-menu-name">
               <span aria-hidden>{icon}</span> {label}
             </span>
-            <button type="button" className="home-menu-close" aria-label={t({ de: "Schließen" })} onClick={() => setOpen(false)}>
+            <button type="button" className="home-menu-close" aria-label={t({ de: "Schließen", ru: "Закрыть" })} onClick={() => setOpen(false)}>
               ✕
             </button>
           </div>
           <div className="home-menu-body">{children}</div>
           {more && (
             <button type="button" className="home-menu-more" onClick={scrollDown}>
-              <span aria-hidden>▼</span> {t({ de: "Weiter unten gibt es mehr" })}
+              <span aria-hidden>▼</span> {t({ de: "Weiter unten gibt es mehr", ru: "Ниже есть ещё" })}
             </button>
           )}
         </div>

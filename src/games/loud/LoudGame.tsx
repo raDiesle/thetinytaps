@@ -43,6 +43,7 @@ export function LoudGame() {
           <p>
             {t({
               de: "Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Nach zehn Tönen geht es mit „Weiter“ zum Pusten.",
+              ru: "Лев и мышка: если ребёнок громко кричит, лев рычит и прыгает. Если говорит или шепчет тихо, пищит маленькая мышка. После десяти звуков «Дальше» ведёт к игре «Дуем».",
             })}
           </p>
           <p>

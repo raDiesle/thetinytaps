@@ -41,7 +41,14 @@ function Lock() {
   }, []);
 
   return (
-    <div ref={root} className="playtime-lock" role="dialog" aria-modal aria-label={t({ de: "Die Spielzeit ist vorbei" })} tabIndex={-1}>
+    <div
+      ref={root}
+      className="playtime-lock"
+      role="dialog"
+      aria-modal
+      aria-label={t({ de: "Die Spielzeit ist vorbei", ru: "Время игры закончилось" })}
+      tabIndex={-1}
+    >
       <div className="good-night">
         {STARS.map(([x, y], i) => (
           <span key={i} className="good-night-star" style={{ left: `${x}%`, top: `${y}%` }} aria-hidden>
@@ -61,7 +68,7 @@ function Lock() {
         <div className="playtime-lock-panel">
           <PlaytimeOptions />
           <button type="button" className="playtime-lock-close" onClick={() => setOpen(false)}>
-            {t({ de: "Schließen" })}
+            {t({ de: "Schließen", ru: "Закрыть" })}
           </button>
         </div>
       )}
@@ -100,7 +107,7 @@ function HoldToUnlock({ onUnlock }: { onUnlock: () => void }) {
         type="button"
         className={`playtime-lock-hold${holding ? " holding" : ""}`}
         style={{ "--hold-ms": `${UNLOCK_HOLD_MS}ms` } as CSSProperties}
-        aria-label={t({ de: "Für Erwachsene: Spielzeit (3 Sekunden gedrückt halten)" })}
+        aria-label={t({ de: "Für Erwachsene: Spielzeit (3 Sekunden gedrückt halten)", ru: "Для взрослых: время игры (удерживать 3 секунды)" })}
         onPointerDown={(e) => {
           // A finger that slides a little still counts as holding.
           e.currentTarget.setPointerCapture(e.pointerId);
@@ -119,7 +126,9 @@ function HoldToUnlock({ onUnlock }: { onUnlock: () => void }) {
       >
         ⏳
       </button>
-      <span className="playtime-lock-hint">{t({ de: "Für Erwachsene: ⏳ drei Sekunden gedrückt halten" })}</span>
+      <span className="playtime-lock-hint">
+        {t({ de: "Für Erwachsene: ⏳ drei Sekunden gedrückt halten", ru: "Для взрослых: удерживайте ⏳ три секунды" })}
+      </span>
     </div>
   );
 }

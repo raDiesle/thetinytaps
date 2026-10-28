@@ -63,13 +63,16 @@ grown-up taps the ✓ of what really came (`Went`) – that picks `fertig-pipi` 
 
 „Hat geklappt!“ (`PartyPlay.tsx`): for real successes. A grown-up opens it after the child went; the first tap brings applause, confetti, Tapsi's party picture moving and a star on today's column of a week chart (`stars.ts`, `tinytaps.potty.stars.v1`, counts per day, kept two weeks; `dayKey`/`weekOf` come from Zähne putzen's `daytime.ts`). One opening is one star; further taps only sparkle, „Nochmal“ celebrates again without a star, „Weiter“ goes to „Muss mal!“.
 
-Files: `content.ts` (Tapsi, steps with their pictures and icons, waiting scenes, German texts), `images.ts` (finds
+Files: `content.ts` (Tapsi, steps with their pictures and icons, waiting scenes, German and Russian texts), `images.ts` (finds
 `bilder/fox-<picture>.webp` and its `-b` frame), `StoryPicture.tsx` (the picture with its frames, also in the bubble),
 `PottyPlay.tsx` (steps, sounds, speech, the ✓), `potty.css`, `settings.ts` (`tinytaps.potty.v3`: mode;
 speech and sounds from the home page). `potty.test.ts` fails when a picture of the story is missing, a
 thought's picture lacks its second frame, or `bilder/` holds a picture of anybody else.
 
-German only so far (`POTTY_TEXTS` is `Localized`, a translation goes next to `de` when asked for).
+German and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart inline `t({ de, ru })`): another language
+goes next to them when asked for, and a new or changed German line loses its Russian until then. Tapsi is „Тапси“ in
+Russian (`TAPSI.name` is `Localized`), „Pipi“ and „Kaka“ are „пи-пи“ and „ка-ка“ as in the Russian song; to the grown-up
+Russian says „вы“, to the child „ты“.
 
 The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and gets quiet while the voice speaks. German and Russian so far (`LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
 

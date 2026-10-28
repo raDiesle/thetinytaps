@@ -35,6 +35,7 @@ export function FeelingsGame() {
           <p>
             {t({
               de: "Zu Hause ist der kleine Bär traurig, wütend, müde oder hat Angst. In drei Runden zeigt das große Bild, wie es ihm geht, daneben zwei Karten: eine nicht so gute Idee und eine, die ihm hilft – umarmen, Hand halten, stampfen, Licht an … Nach drei guten Ideen ist er wieder froh. Und an seinem Geburtstag freut er sich, und das Kind feiert mit: tanzen, Luftschlangen, umarmen.",
+              ru: "Дома Мишке грустно, он злится, хочет спать или боится. В трёх раундах большая картинка показывает, как он себя чувствует, а рядом две карточки: не очень хорошая идея и та, что ему помогает, – обнять, держать за лапку, потопать, включить свет … После трёх хороших идей он снова весёлый. А в свой день рождения он радуется, и ребёнок празднует вместе с ним: танцы, серпантин, обнимашки.",
             })}
           </p>
           <p>
@@ -52,6 +53,7 @@ export function FeelingsGame() {
           <p>
             {t({
               de: "Vor jeder Wahl zeigt das große Bild wieder, was passiert ist, daneben genau zwei Karten: zuerst (oben oder links) eine nicht so gute Idee (z. B. zurückschubsen, Licht aus), dann die gute. Tippt das Kind auf die nicht so gute, erscheint sie groß mit rotem Kreuz und es wird erklärt, warum. Die gute Idee bekommt einen grünen Haken.",
+              ru: "Перед каждым выбором большая картинка снова показывает, что случилось, а рядом ровно две карточки: сначала (сверху или слева) не очень хорошая идея (например, толкнуть в ответ, выключить свет), потом хорошая. Если ребёнок нажимает не очень хорошую, она становится большой с красным крестиком, и объясняется, почему. Хорошая идея получает зелёную галочку.",
             })}
           </p>
           <p>
