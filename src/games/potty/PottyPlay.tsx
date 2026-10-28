@@ -76,9 +76,8 @@ const START: At = { step: 0, scene: -1, nothing: false };
 
 const NEEDS: Need[] = ["pipi", "kaka"];
 const NEED_EMOJI: Record<Need, string> = { pipi: "💧", kaka: "💩" };
-/** The ✓ while sitting, one for each thing that can be in the potty. */
-const WENTS: Went[] = ["pipi", "kaka", "both"];
-const WENT_EMOJI: Record<Went, string> = { ...NEED_EMOJI, both: "💧💩" };
+/** Taps this soon after a step began only sparkle, so a double tap doesn't skip a step. */
+const TAP_GUARD_MS = 350;
 const DONE = STEPS.findIndex((s) => s.id === "done");
 const SIT = STEPS.findIndex((s) => s.id === "sit");
 
@@ -108,12 +107,9 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const [busy, setBusy] = useState(false);
   /**
    * The buttons for what the child said show in this step: while calling, and on the way while nothing was picked.
-   * They are the only way on then: no „Weiter“, and a tap elsewhere only points at them.
+   * They carry „Weiter“'s ▶ then, so there is no „Weiter“ beside them; a tap elsewhere goes on with nothing picked.
    */
   const [asking, setAsking] = useState(false);
-  const askingRef = useRef(false);
-  /** Bumped for every tap that misses the buttons for what the child said, so they shake again. */
-  const [poke, setPoke] = useState(0);
   /** Bumped for every step and scene, so the overlays and the picture start again. */
   const [beat, setBeat] = useState(0);
   const { bursts, spawn } = useBursts();
@@ -124,6 +120,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
   /** The ✓ was explained once in this round. */
   const toldFinish = useRef(false);
+  /** When the step began, for `TAP_GUARD_MS`. */
+  const startedAt = useRef(0);
 
   const later = useCallback((ms: number, run: () => void) => {
     const timer = setTimeout(() => {
@@ -184,8 +182,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const begin = (index: number, { came = went, said: saidNow = said, nothing = atRef.current.nothing }: Begin = {}) => {
     const { id, ms, moves } = storyFor(nothing)[index];
     goTo({ step: index, scene: -1, nothing }, ms);
-    askingRef.current = id === "call" || (id === "go" && saidNow === "unsure");
-    setAsking(askingRef.current);
+    startedAt.current = performance.now();
+    setAsking(id === "call" || (id === "go" && saidNow === "unsure"));
     const line = texts.steps[id](TAPSI.name, came ?? saidNow);
     say(nothing && id === "wash" ? `${texts.nothing} ${line}` : line);
     switch (id) {
@@ -292,27 +290,24 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   };
 
   /**
-   * A tap or key anywhere does what makes most sense there: while sitting the next thought, while asking what the child
-   * said a shake of those buttons (only they go on), everywhere else what „Weiter“ does. Only while a step's sounds
-   * still run, and at the end, it sparkles.
+   * A tap anywhere on the picture (not on a button) or a key: while sitting the next thought, everywhere else just what
+   * „Weiter“ does, also while the step's sounds still run (what the child said stays as picked, unknown when nobody
+   * did). It only sparkles at the end, right after a step began (a double tap), and while a thought still runs.
    */
   const act = (x?: number, y?: number) => {
     const { step: index, nothing } = atRef.current;
     const here = storyFor(nothing);
-    if (askingRef.current) {
-      spawn(x, y);
-      if (settings.sounds) playBoing();
-      setPoke((p) => p + 1);
-      if (!busyRef.current) say(texts.askSaid);
-      return;
-    }
-    if (busyRef.current || index >= here.length - 1) {
+    const sittingNow = here[index].id === "sit";
+    if (index >= here.length - 1 || (sittingNow ? busyRef.current : performance.now() - startedAt.current < TAP_GUARD_MS)) {
       spawn(x, y);
       if (settings.sounds) playRandomNote();
       return;
     }
-    if (here[index].id === "sit") nextScene(true);
-    else jump(index + 1);
+    if (sittingNow) nextScene(true);
+    else {
+      if (settings.sounds) playPop();
+      jump(index + 1);
+    }
   };
 
   // The story goes on by itself where nothing real has to happen (Step.auto), and the thoughts follow each other. Through a ref, so the timer started for a step runs with what was picked meanwhile.
@@ -390,10 +385,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
-      // While sitting Enter is the ✓ for what the child said (both when nobody knew), every other key the next thought.
-      // While asking what the child said every key shakes those buttons, everywhere else every key is „Weiter“.
+      // While sitting Enter is the ✓ for what the child said (pipi when it said both or nothing), every other key the
+      // next thought. Everywhere else every key is „Weiter“.
       const here = storyFor(atRef.current.nothing)[atRef.current.step];
-      if (e.key === "Enter" && here?.id === "sit" && !busyRef.current) finish(expectedWent(said));
+      if (e.key === "Enter" && here?.id === "sit" && !busyRef.current) finish(expected ?? "pipi");
       else act();
     };
     window.addEventListener("keydown", onKeyDown);
@@ -410,7 +405,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   if (shown.now.join() !== pictures.join()) setShown({ now: pictures, before: shown.now });
   /** The needs Tapsi feels and calls for: both while nobody knows. */
   const feels = said === "pipi" || said === "kaka" ? [said] : NEEDS;
-  const expected = expectedWent(said);
+  /** The ✓ with a yellow ring: what the child said, when that was one of the two. */
+  const expected = said === "pipi" || said === "kaka" ? said : null;
 
   return (
     <div className={`potty-play pt-${went ?? said} pt-at-${step.id}${busy ? " busy" : ""}`} onPointerDown={(e: PointerEvent) => act(e.clientX, e.clientY)}>
@@ -467,10 +463,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         </ol>
 
         <div className="pt-grown">
-          {/* What the child said: one choice of three and the only way on, so each carries „Weiter“'s ▶, they call for
-              attention like „Weiter“ does elsewhere, and a tap that misses them shakes them (keyed by `poke`). */}
+          {/* What the child said: one choice of three, each going on at once, so each carries „Weiter“'s ▶ and they
+              call for attention like „Weiter“ does elsewhere. */}
           {asking && (
-            <div key={poke} className={`pt-choice pt-ask${poke ? " poked" : ""}`} role="group" aria-label={texts.askSaid}>
+            <div className="pt-choice pt-ask" role="group" aria-label={texts.askSaid}>
               <span className="pt-choice-label">{texts.askSaid}</span>
               <div className="pt-choice-buttons">
                 {SAID.map((s) => (
@@ -494,12 +490,13 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
             </div>
           )}
 
-          {/* Three ✓, since what comes may not be what the child said: a grown-up taps what is in the potty. */}
+          {/* A ✓ for pipi and one for kaka, since what comes may not be what the child said: a grown-up taps what is in
+              the potty (for both, either one: the user wanted only the two). */}
           {sitting && (
             <div className="pt-choice" role="group" aria-label={texts.askWent}>
               <span className="pt-choice-label">{texts.askWent}</span>
               <div className="pt-choice-buttons">
-                {WENTS.map((n) => (
+                {NEEDS.map((n) => (
                   <button
                     key={n}
                     type="button"
@@ -513,10 +510,10 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     }}
                   >
                     <span className="pt-finish-check">✓</span>
-                    <span className="pt-finish-need">{WENT_EMOJI[n]}</span>
+                    <span className="pt-finish-need">{NEED_EMOJI[n]}</span>
                   </button>
                 ))}
-                {/* Nothing came: a story of its own, so it looks unlike the ✓. */}
+                {/* Nothing came: a story of its own, so it looks unlike the ✓, and says so in a word for the grown-up. */}
                 <button
                   type="button"
                   className="pt-finish pt-nothing"
@@ -528,7 +525,7 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
                     finishWithNothing();
                   }}
                 >
-                  🤷
+                  {texts.nothingButton}
                 </button>
               </div>
             </div>
@@ -544,8 +541,9 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
         </div>
       </div>
 
-      {/* There is one story only, so „Weiter“ would be „Nochmal“ again: only „Menü“ and „Nochmal“. */}
-      {last && <GameEnd delayMs={step.ms} onAgain={restart} />}
+      {/* There is one story only, so „Weiter“ would be „Nochmal“ again: only „Menü“ and „Nochmal“, small in the corners
+          so the party picture stays free. */}
+      {last && <GameEnd delayMs={step.ms} onAgain={restart} corners />}
       <BurstLayer bursts={bursts} />
     </div>
   );

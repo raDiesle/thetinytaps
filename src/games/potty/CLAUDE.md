@@ -16,16 +16,16 @@ Opening the game (its tile on the home menu) starts it at once (`GameShell`'s `s
 „Hat geklappt!“, the info and the cards shows only after leaving with ✕ or „Menü“. It opens on the first step, `eat`: Tapsi the fox
 (`TAPSI` in `content.ts`) at the kitchen table, eating and drinking by turns (the `essen` and `trinken` pictures are that step's
 frames, moving at once).
-Every tap on the picture or background and every key does the most sensible thing there (`act`): „Weiter“ on every
-step, the next thought while sitting (Enter there is the ✓ of what the child said), a shake of the buttons while they
-ask what the child said. The first steps (eating, the need, calling, going to the bathroom; `Step.nudge`) never go on
+Every tap on the picture or background (anything but a button) and every key does the most sensible thing there
+(`act`): „Weiter“ on every step, at once also while the step's sounds still run, and the next thought while sitting
+(Enter there is the ✓ of what the child said). The first steps (eating, the need, calling, going to the bathroom; `Step.nudge`) never go on
 by themselves, and there „Weiter“ ▶ swells and sends out a ring, since everybody waits for it. Sitting down goes on
 into the waiting by itself and „fertig“ to wiping (`Step.auto`). „Weiter“ is on every step but sitting, where the ✓
 are, and while the buttons for what the child said show.
 While Tapsi calls Mama and Papa, a framed group „Was muss dein Kind?“ with three buttons (`SAID`: 💧, 💩, 💧💩) asks a
-grown-up what the child said, and only a tap on one of them goes on: the pick is kept and the next step begins at once.
-So there is no „Weiter“ then; the three are yellow like it, each with its ▶, swelling one after the other, and a tap or
-key anywhere else shakes the group (`poke`, with a boing and, with Vorlesen on, „Was muss dein Kind?“). There is no ❓:
+grown-up what the child said: a tap on one keeps the pick and begins the next step at once. So there is no „Weiter“
+then; the three are yellow like it, each with its ▶, swelling one after the other. A tap on the picture still goes on,
+with nothing picked. There is no ❓:
 not knowing is the same as both (the user's choice), so `unsure` – the state before anybody picked, and after jumping
 past calling in the row, when the group asks again on the way to the bathroom – plays like both, only saying „muss mal“.
 The steps: eating and drinking, the bladder presses or the tummy rumbles (`need`; when
@@ -33,9 +33,11 @@ unsure – before calling, nobody has said anything yet – Tapsi „muss mal“
 calling „Mama! Papa!“ – they come in together and stay in every picture from then on – into the bathroom together,
 trousers down, sit down, then the waiting, done (whatever the grown-up's ✓ chose is in the potty, the parents cheer),
 wipe, trousers up, flush, wash hands, party, then `GameEnd` with „Menü“ and „Nochmal“ only (one story, so „Weiter“
-would be „Nochmal“ again), which starts a new round, unsure again. A tap while a step's sounds still run only sparkles (`busy`).
+would be „Nochmal“ again), small in the bottom corners (`GameEnd`'s `corners`: „Menü“ left, „Nochmal“ right, the party
+picture free between them), which starts a new round, unsure again. Only a tap within `TAP_GUARD_MS` of a step's start
+sparkles (a double tap), and while sitting one while a thought still runs.
 
-When nothing comes, the 🤷 next to the ✓ („nichts“) takes the other story (`NOTHING_STEPS`, `storyFor`, `At.nothing`):
+When nothing comes, the „nichts“ next to the ✓ takes the other story (`NOTHING_STEPS`, `storyFor`, `At.nothing`):
 „Heute kommt nichts. Macht nichts!“ and washing hands (the usual `waschen` picture), then `play`: Tapsi plays with
 blocks in its room and Mama and Papa look in at the open door and ask „Musst du Pipi oder Kaka?“ (`spielen`, a new room
 drawn from `rufen` for the three, see `bilder/README.md`); a tap there ends with the same `GameEnd`. The row of steps
@@ -60,9 +62,11 @@ taking turns. A thought shows its picture `fox-denken-<id>` (two frames, away fr
 else its emoji (`WaitScene.emoji`); `prompts.py think` and `frames-think` make them. The old full-screen waiting pictures
 (`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are kept but not shown
 since the user wanted only the helping ones. Only tapped scenes speak (and the first, which explains the ✓).
-Only one of the three green ✓ (a framed group „Was ist im Töpfchen?“, ✓💧, ✓💩 and ✓💧💩, a yellow ring on the one
-the child said; Enter on a keyboard is that one) ends the waiting. So a child can sit on the real potty and play along, and a
-grown-up taps the ✓ of what really came (`Went`) – that picks `fertig-pipi` or `fertig-kaka`, or both taking turns as frames.
+Only one of the two green ✓ (a framed group „Was ist im Töpfchen?“, ✓💧 and ✓💩, a yellow ring on the one the child
+said; Enter on a keyboard is that one, else ✓💧) or „nichts“ under them ends the waiting. So a child can sit on the real
+potty and play along, and a grown-up taps the ✓ of what really came – that picks `fertig-pipi` or `fertig-kaka`. There is
+no ✓ for both (the user's choice: for both, either one); `Went` keeps `both` only for jumping in the row after the child
+said both, where both endings take turns as frames.
 
 „Hat geklappt!“ (`PartyPlay.tsx`): for real successes. A grown-up opens it after the child went; the first tap brings applause, confetti, Tapsi's party picture moving and a star on today's column of a week chart (`stars.ts`, `tinytaps.potty.stars.v1`, counts per day, kept two weeks; `dayKey`/`weekOf` come from Zähne putzen's `daytime.ts`). One opening is one star; further taps only sparkle, „Nochmal“ celebrates again without a star, „Weiter“ goes to „Muss mal!“.
 
@@ -87,16 +91,19 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 - The first steps never go on by themselves (`Step.nudge`; going on alone after three seconds was too fast for the user),
   and „Weiter“ calls for attention there, since everybody waits for it. But any tap or key always does the most
   sensible thing – „Weiter“, or the next thought while sitting – never only a sparkle (a sparkle-only tap on the
-  first steps felt broken to the user); only while a step's sounds still run and on the last step it sparkles.
-  Where a grown-up's choice is the way on (what the child said), there is no „Weiter“ beside it and a tap elsewhere
-  doesn't go on: the choice's buttons look like „Weiter“ (yellow, ▶), call for attention and shake at every tap that
-  misses them, so it is plain that one of them has to be pressed. Only
+  first steps felt broken to the user). A tap anywhere on the picture that is not on a button is „Weiter“, on every
+  step and at once – also while the step's sounds still run and while the buttons for what the child said show
+  (the user asked for it after both a sparkle-only tap and a tap that only shook those buttons); only a double tap
+  (`TAP_GUARD_MS`) and the last step sparkle. Where a grown-up's choice goes on (what the child said), there is no
+  „Weiter“ beside it: the choice's buttons look like „Weiter“ (yellow, ▶) and call for attention instead. Only
   going into and out of the waiting goes on by itself (`Step.auto`); where the child does something itself it waits
   for a tap or „Weiter“. Every step without its own buttons for going on has „Weiter“ (`potty.test.ts` checks which
   steps wait).
 - A choice that is the only thing left to do on a step (what the child said) goes on by itself when picked, as
   „Weiter“ would; never make a grown-up pick and then press „Weiter“ as well. Never offer a choice that means what
-  another one means (a ❓ next to 💧💩 – not knowing is both): each button is a different way on.
+  another one means (a ❓ next to 💧💩 – not knowing is both), and none the grown-up doesn't need (a ✓💧💩 next to ✓💧
+  and ✓💩): each button is a different way on. A button whose emoji isn't plain at once says it in a word for the
+  grown-up („nichts“; a 🤷 was unclear to the user).
 - The grown-ups' buttons sit on the right level with the row of steps and must read as buttons at once (white or
   coloured, dark outline, raised with a shadow, pressed in on a tap); pale see-through circles were too faint for the
   user. An either-or choice (what was said, what came) is one framed group with its question on top
@@ -104,13 +111,16 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   buttons for what the child said, see above); all in one row where it fits (a computer), else the group stands on the
   right above „Weiter“, reaching up from the bottom. Only the way on moves on the first steps („Weiter“, or the buttons
   for what the child said); everything else there stays still, the child looks at the story.
-- A grown-up can jump to any step at any time by tapping it in the row; keep every step reachable that way.
+- A grown-up can jump to any step at any time by tapping it in the row; keep every step reachable that way. The row
+  is small and right at the bottom (the user's choice): it is for the grown-up, the picture is the story.
+- The end of the story keeps its picture free: „Menü“ and „Nochmal“ small in the bottom corners (`corners`), never big
+  in the middle over the party.
 - What the child has to do is chosen inside the story, never on the start screen (neither a card each nor a choice
   above the cards): „Muss mal!“ starts at once, what the child said is picked while Tapsi calls (💧, 💩, 💧💩)
   and once more on the way when calling was jumped past – the next step, never a jump further; what came on the
-  three ✓ while sitting (pipi, kaka, both) – a child saying „Pipi“ may still do kaka, or both.
+  two ✓ while sitting (pipi, kaka) – a child saying „Pipi“ may still do kaka.
 - What the child really does (sitting on the potty) has no fixed length: it never ends on a timer or on an ordinary
-  tap. Sometimes nothing comes: the 🤷 next to the ✓ leads to a story of its own (washing hands, playing, Mama and
+  tap. Sometimes nothing comes: „nichts“ next to the ✓ leads to a story of its own (washing hands, playing, Mama and
   Papa asking again later), never a sad ending. The thoughts follow each other by themselves (and on every tap), endlessly; only the ✓ say „fertig“.
 - While sitting the full picture never changes: pictures drawn one by one never match exactly, and swapping them every
   few seconds made the room jump. What changes goes into the thought bubble, drawn away from the bathroom, and a clear
