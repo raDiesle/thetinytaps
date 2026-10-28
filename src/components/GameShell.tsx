@@ -1,7 +1,7 @@
 import { useLocation } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
-import { MenuTop } from "@/components/MenuTop";
+import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -164,9 +164,16 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   return (
     <main className="start-screen">
       <Sky />
-      {/* Small, in the top row next to the way back: for grown-ups, out of the cards' way, never under them. */}
-      <div className="start-top">
-        <MenuTop to={back}>{backText}</MenuTop>
+      {/* Small, at the top next to the way back: for grown-ups, out of the cards' way, never under them. */}
+      <MenuHead
+        to={back}
+        back={backText}
+        title={
+          <>
+            <span aria-hidden>{emoji}</span> {title}
+          </>
+        }
+      >
         <div className="panel-buttons">
           <PanelButton
             open={panel === "info"}
@@ -183,12 +190,9 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
             />
           )}
         </div>
-      </div>
+      </MenuHead>
       {panel === "info" && <section className="settings game-info">{info}</section>}
       {panel === "settings" && settings && <section className="settings">{settings}</section>}
-      <h1 className="menu-title">
-        <span aria-hidden>{emoji}</span> {title}
-      </h1>
       {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
           cards leave (data-spread), so the back link and the grown-ups' buttons stay in the top row. */}
       {modes ? (

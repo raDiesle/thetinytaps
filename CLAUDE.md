@@ -144,7 +144,8 @@ In a fresh worktree run `bun install` first.
   opened in between: in every menu next to the back link (`MenuTop`) and next to ✕ while playing. Grown-ups on a
   computer (≥ 900 px wide with a mouse) see it always, also to leave fullscreen; on phones and tablets a game shows it
   only while out of fullscreen, so a child's tap can't end it. On a computer the back link of a menu is big, yellow and
-  fixed in the top left corner, so it never scrolls away; phones and tablets keep it small.
+  fixed in the top left corner, so it never scrolls away; phones and tablets keep it small. A menu's title goes into
+  `MenuHead` with that corner, which keeps the title clear of it (it moves right or wraps, never under the corner).
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`), and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own.
