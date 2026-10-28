@@ -133,6 +133,13 @@ const LAST_SECTION = SLOTS.length * 2;
 const LEAD_ROOM = 260;
 /** How quickly the camera catches up, per second. */
 const CAMERA_PULL = 4;
+/**
+ * The camera may go this far above the wall's top, so the shelf and the hopper
+ * sit a bit lower in the picture, clear of the top edge and the ✕.
+ */
+const TOP_ROOM = 160;
+/** With the camera's top lower than this on the wall, the shelf is cut off, and the ⬆ button shows. */
+const UP_SHOWN_BELOW = 40;
 
 const INK = "#2a1e5c";
 
@@ -288,7 +295,13 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
   const done = useRef(false);
   const now = useRef(performance.now());
   /** The top of the view and its height, in the wall's coordinates. */
-  const camera = useRef({ y: 0, h: VIEW_H });
+  const camera = useRef({ y: -TOP_ROOM, h: VIEW_H });
+  /**
+   * The ⬆ button was pressed: the camera stays up at the shelf until the next
+   * thing is let out, and from then on follows only the things let out since.
+   */
+  const lookingUp = useRef(false);
+  const followFrom = useRef(0);
   const box = useRef<HTMLDivElement>(null);
   /** The three things on the shelf, when each was put there, and which a key or a tap on the wall lets out next. */
   const [firstShelf] = useState(() => [...ROLLERS].sort(() => Math.random() - 0.5).slice(0, SHELF.things.length));
@@ -563,22 +576,31 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
   const follow = (dt: number) => {
     const cam = camera.current;
     const el = box.current;
-    if (el && el.clientWidth) cam.h = Math.min(TRACK_H, Math.max(VIEW_H, (VIEW_W * el.clientHeight) / el.clientWidth));
-    const ys = marbles.current.map((m) => m.y);
-    let middle = landed.current.length ? TRACK_H : 0;
-    if (ys.length) {
+    if (el && el.clientWidth) cam.h = Math.min(TRACK_H + TOP_ROOM, Math.max(VIEW_H, (VIEW_W * el.clientHeight) / el.clientWidth));
+    const ys = marbles.current.filter((m) => m.id >= followFrom.current).map((m) => m.y);
+    let middle = landed.current.length && !lookingUp.current ? TRACK_H : -TOP_ROOM;
+    if (ys.length && !lookingUp.current) {
       const lowest = Math.max(...ys);
       middle = Math.max((Math.min(...ys) + lowest) / 2, lowest + LEAD_ROOM - cam.h / 2);
     }
-    const top = Math.min(TRACK_H - cam.h, Math.max(0, middle - cam.h / 2));
+    const top = Math.min(TRACK_H - cam.h, Math.max(-TOP_ROOM, middle - cam.h / 2));
     cam.y += (top - cam.y) * Math.min(1, dt * CAMERA_PULL);
-    cam.y = Math.min(TRACK_H - cam.h, Math.max(0, cam.y));
+    cam.y = Math.min(TRACK_H - cam.h, Math.max(-TOP_ROOM, cam.y));
+  };
+
+  /** The ⬆ button (or the up arrow key): back up to the shelf, to let out the next thing. */
+  const lookUp = () => {
+    if (lookingUp.current) return;
+    lookingUp.current = true;
+    followFrom.current = nextId.current;
+    sound(playWhoosh);
   };
 
   /** Lets a thing into the run at the hopper, or first flies it there from the shelf. */
   const release = (kind: Roller, from?: Pt) => {
     const id = nextId.current++;
     const start = from ?? HOPPER;
+    lookingUp.current = false;
     marbles.current.push({
       id,
       kind,
@@ -629,6 +651,9 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
     if (rebuild && e.key === " ") {
       e.preventDefault();
       rebuildNext();
+    } else if (pick && e.key === "ArrowUp" && camera.current.y > UP_SHOWN_BELOW) {
+      e.preventDefault();
+      lookUp();
     } else if (pick && place >= 0) take(place);
     else if (pick || openedAt.current === null) open();
     else if (marbles.current.length) marbles.current.forEach((m) => nudge(m, t));
@@ -859,12 +884,31 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
 
         {pick && <Shelf things={shelf.current} filled={filled.current} color={BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length]} t={t} onTake={take} />}
 
-        {!started && (
-          <text className="run-hint" x={pick ? SHELF.things[1] + 40 : HOPPER.x + 92} y={pick ? SHELF.y + 100 : HOPPER.y + 96} fontSize="90" textAnchor="middle">
+        {/* Before the first tap and after ⬆: a big hand on the middle thing on the shelf says „tap me“ */}
+        {pick && (!started || lookingUp.current) && <ShelfHint />}
+        {!pick && !started && (
+          <text className="run-hint" x={HOPPER.x + 92} y={HOPPER.y + 96} fontSize="90" textAnchor="middle">
             👆
           </text>
         )}
       </svg>
+      {/* Down the run, the ⬆ button in the bottom left corner takes the camera back up to the shelf */}
+      {pick && !done.current && !lookingUp.current && cam.y > UP_SHOWN_BELOW && (
+        <button
+          type="button"
+          className="run-up"
+          data-tap
+          aria-label={tr({ de: "Nach oben" })}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            lookUp();
+          }}
+        >
+          <svg viewBox="-32 -32 64 64" aria-hidden>
+            <path className="run-up-arrow" d="M0 -26 L24 2 H10 V26 H-10 V2 H-24 Z" />
+          </svg>
+        </button>
+      )}
       {/* On a computer the space bar at the bottom rebuilds the run */}
       {rebuild && !touchOnly && !done.current && (
         <button
@@ -1051,6 +1095,10 @@ function Peek({ animal, age }: { animal: string; age: number }) {
 function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled: number[]; color: string; t: number; onTake: (i: number) => void }) {
   return (
     <g>
+      {/* A sunny glow behind each place, so the things read as buttons: these are to be tapped */}
+      {SHELF.things.map((x, i) => (
+        <circle key={i} cx={x} cy={SHELF.y - 38} r="54" fill="#fff3a6" stroke={STAR_GOLD} strokeWidth="7" />
+      ))}
       <rect x={SHELF.x0} y={SHELF.y} width={SHELF.x1 - SHELF.x0} height="13" rx="6" fill="#b8763d" stroke={INK} strokeWidth="3" />
       {things.map((kind, i) => {
         const at = shelfSpot(i, kind);
@@ -1074,6 +1122,19 @@ function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled:
         );
       })}
     </g>
+  );
+}
+
+/**
+ * Says „tap a thing on the shelf, and it rolls“: a big hand points down at the
+ * middle thing from the room above the wall, so it covers nothing. It stands
+ * still, like every hint here.
+ */
+function ShelfHint() {
+  return (
+    <text className="run-hint" x={SHELF.things[1] + 18} y="-26" fontSize="100" textAnchor="middle">
+      👇
+    </text>
   );
 }
 

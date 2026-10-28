@@ -54,7 +54,11 @@ part the next spot moves on too (`rebuildNext`).
 „Was rollt denn da?“ (K-07, a setting, on by default): instead of six marbles in a row, a shelf over the first row holds
 three of five things (marble, tennis ball, iron ball, apple, soap bubble; `ROLLER` in `track.ts`); tapping one flies it into
 the hopper and something else pops up in its place, a key or a tap on the wall takes them in turn. On a computer the keys
-1, 2 and 3 hang under the shelf and let out the thing in that place (`ShelfKeys`). Each rolls its own way on
+1, 2 and 3 hang under the shelf and let out the thing in that place (`ShelfKeys`). A sunny glow behind each place
+marks the three things as what to tap, and before the first one a big still 👇 points at the middle thing (`ShelfHint`).
+Once the camera has followed the things down, a round yellow ⬆ button in the bottom left corner (or the up arrow key)
+takes it back up to the shelf, where it stays, with the 👇 again, until the next thing is let out; from then on it follows
+only the things let out since, not the ones further down. Each rolls its own way on
 the same route: the tennis ball hops along the rows, the iron ball is slow with deep notes and thumps, the apple bumps, the
 soap bubble floats at an even speed and bursts above the basket instead of landing (so it doesn't fill it).
 
@@ -72,6 +76,8 @@ takes a `look`); other things keep their look and an animal looks out for them.
 - `TrackLevel.tsx`: the marbles (rolling downhill with gravity and friction, fixed speed on wheel, funnel, seesaw and loop),
   the drawing, and the camera. The camera follows the marbles down: on a tall screen it shows more of the wall (up to all of
   it), before the tap the hopper, after the last marble the basket.
+- The camera may go `TOP_ROOM` above the wall's top, so the shelf and the hopper sit clear of the top edge and the ✕.
+  Never put what the child taps right at the wall's top edge: on a phone on its side the picture is cut there.
 - `track.css`: its styles (classes `run-`). The pick and rebuild settings are on Kettenreaktion's start screen, and
   `MarblePlay.tsx` draws this level by itself because it takes them; while it is on, the background music is off (the run
   plays its own notes and scales).
