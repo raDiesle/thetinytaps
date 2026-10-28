@@ -310,13 +310,16 @@ Title:
 Waiting on the Potty
 ```
 
-## Español (`es`, written 28 Oct 2026)
+## Español (`es`, written 28 Oct 2026; made 28 Oct 2026 → `musik-toepfchen-warten-es.mp3`)
 
 The German song in neutral Spanish, verse for verse, same tempo, key and instruments. „Orinal“ (understood everywhere,
 though Mexico says „bacinica“), „pañal“, „pipí“ and „caca“ as parents say to toddlers; the shout-back answers are
 „¡Yo!“. Present tense and nothing that changes for boy or girl: no „sentado/sentada“, „listo/lista“, „solito/solita“
 („espero con calma“, „ya soy grande“ instead). „¡Adiós!“ is waving it off when flushing, as toddlers do. Not yet read
 by a native speaker. Spanish is not an app language yet (`APP_LANGUAGES`), so the song waits until it is.
+Suno sang it at about 101 BPM (99.6 at the start, 101.7 at the end), with a 4-bar bell intro, and after the last
+chorus a bell interlude and the last verse once more; Whisper heard every line in order, but smeared the first line
+over the intro (its words from 0.1 s, sung from 9.7 s).
 
 Lyrics:
 
