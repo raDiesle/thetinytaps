@@ -142,7 +142,20 @@ export function picturesFor(step: Step, which: Which): string[] {
 }
 
 /** The sound a waiting scene makes when it comes (see PottyPlay.tsx). */
-export type SceneSound = "trickle" | "splash" | "glug" | "whoosh" | "squeeze" | "blow" | "plop" | "dance" | "juggle" | "peekaboo" | "bubbles" | "toot";
+export type SceneSound =
+  | "trickle"
+  | "splash"
+  | "glug"
+  | "whoosh"
+  | "squeeze"
+  | "blow"
+  | "plop"
+  | "dance"
+  | "juggle"
+  | "peekaboo"
+  | "bubbles"
+  | "toot"
+  | "chime";
 
 /**
  * What Tapsi thinks of while it sits, in a thought bubble over the still bathroom picture: things that
@@ -166,6 +179,9 @@ export const WAIT_SCENES: WaitScene[] = [
   { id: "schlauch", emoji: "💦🦆", need: "pipi", sound: "splash" },
   { id: "wasserrad", emoji: "💧🎡", need: "pipi", sound: "trickle" },
   { id: "tee", emoji: "🫖☕", need: "pipi", sound: "glug" },
+  { id: "elefant", emoji: "🐘💦", need: "pipi", sound: "splash" },
+  { id: "wal", emoji: "🐳", need: "pipi", sound: "blow" },
+  { id: "trichter", emoji: "🫗", need: "pipi", sound: "trickle" },
   { id: "ketchup", emoji: "🍅🍝", need: "kaka", sound: "squeeze" },
   { id: "aufblasen", emoji: "😤🎈", need: "kaka", sound: "blow" },
   { id: "huhn", emoji: "🐔🥚", need: "kaka", sound: "plop" },
@@ -174,6 +190,7 @@ export const WAIT_SCENES: WaitScene[] = [
   { id: "erbsen", emoji: "🫛", need: "kaka", sound: "plop" },
   // Waiting until something comes out, without pressing: for children afraid of kaka.
   { id: "tunnel", emoji: "🚂", need: "kaka", sound: "toot" },
+  { id: "schmetterling", emoji: "🦋", need: "kaka", sound: "chime" },
   { id: "tanzen", emoji: "💃🕺", need: "silly", sound: "dance" },
   { id: "jonglieren", emoji: "🤹", need: "silly", sound: "juggle" },
   { id: "kuckuck", emoji: "🙈", need: "silly", sound: "peekaboo" },
@@ -267,6 +284,10 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       spritzbeutel: "Tapsi drückt den Spritzbeutel. Sahne auf den Kuchen!",
       erbsen: "Tapsi drückt die Schote. Plopp, plopp, die Erbsen!",
       tunnel: "Der Zug ist im Tunnel. Tuut, da kommt er raus!",
+      elefant: "Der Elefant spritzt mit dem Rüssel. Pschhh!",
+      wal: "Der Wal pustet Wasser hoch. Pfffft!",
+      trichter: "Tapsi gießt Wasser in den Trichter. Unten läuft es raus!",
+      schmetterling: "Der Schmetterling drückt sich raus. Jetzt fliegt er!",
       tanzen: "Mama und Papa tanzen!",
       jonglieren: "Papa jongliert mit Klopapier!",
       kuckuck: "Wo ist Mama? Kuckuck!",

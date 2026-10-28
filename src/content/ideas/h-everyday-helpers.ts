@@ -247,6 +247,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Im Zoo spritzt ein Elefant mit dem Rüssel einen Wasserstrahl in die Luft, Tapsi steht staunend daneben. Gesagt: „Der Elefant spritzt mit dem Rüssel. Pschhh!“ Ton: spritzen. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Ein langer Wasserstrahl, lustig und groß – und Elefanten kennt jedes Kind.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-30",
@@ -255,6 +256,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Auf dem Meer pustet ein freundlicher Wal eine hohe Wasserfontäne, Tapsi winkt vom Strand. Gesagt: „Der Wal pustet Wasser hoch. Pfffft!“ Ton: pusten und plätschern. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Loslassen und Wasser in einem: die Fontäne kommt einfach heraus.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-31",
@@ -263,6 +265,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi gießt mit einem Becher Wasser in einen bunten Trichter, unten läuft es in eine Flasche. Gesagt: „Tapsi gießt Wasser in den Trichter. Unten läuft es raus!“ Ton: rieseln. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Oben hinein, unten heraus, genau in das kleine Gefäß – wie Pipi ins Töpfchen.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-32",
@@ -335,6 +338,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "An einem Zweig drückt sich ein Schmetterling langsam aus seiner Puppe und breitet die Flügel aus, Tapsi schaut zu. Gesagt: „Der Schmetterling drückt sich raus. Jetzt fliegt er!“ Ton: Glitzern. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Langsam drücken, dann ist es geschafft und leicht.",
       effort: "S",
+      done: true,
     },
   ],
 };

@@ -185,11 +185,15 @@ THOUGHTS = {
  "aufblasen": "Outside on a meadow, Tapsi blows up a big red balloon, cheeks puffed up round and red with effort, pressing hard, eyes squeezed.",
  "huhn": "On a farm, a plump brown hen sits in a straw nest and presses with a red face, eyes squeezed shut; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
  "wasserrad": "At a sunny water playground, a stream of water runs down a little wooden channel and turns a small wooden water wheel, splashing; Tapsi kneels beside it and watches, delighted, one paw pointing at the wheel.",
+ "elefant": "At the zoo, a friendly grey elephant sprays a long arc of water from its trunk high into the air, drops sparkling; Tapsi stands next to the fence and looks up, laughing.",
+ "wal": "At the seaside, a friendly blue whale in the calm sea blows a tall fountain of water up from its head; Tapsi stands on the sandy beach in front and waves at it, delighted.",
+ "trichter": "Outside at a small table, Tapsi pours water from a red cup into a big yellow funnel stuck in a clear bottle; the water runs out at the bottom of the funnel into the bottle. Tapsi watches closely, smiling.",
  "tee": "On a picnic blanket on a meadow, Tapsi holds a small white teapot with blue dots in both paws and pours a stream of tea into a little cup in front of a brown teddy bear; Tapsi smiles.",
  "knete": "At a small table, Tapsi presses colourful play dough (orange, purple, green) through a toy dough press with both paws, pressing hard; long soft dough sausages come out of the holes.",
  "spritzbeutel": "At a small table, Tapsi squeezes a big white piping bag with both paws, pressing hard with rosy cheeks; a thick white swirl of whipped cream comes out onto a round strawberry cake.",
  "erbsen": "In a vegetable garden, Tapsi presses a long green pea pod open with both thumbs, pressing hard with rosy cheeks; round green peas pop out of it and jump into the air above a small wooden bowl.",
  # Waiting until something comes out, without pressing.
+ "schmetterling": "In a garden, a butterfly chrysalis hangs from a twig; a colourful butterfly is pressing its way out of it, half out, its wings still folded; Tapsi crouches below and watches, excited, both paws at its cheeks.",
  "tunnel": ("On a playroom floor, a wooden toy railway runs through a small toy tunnel in a green felt hill; only the back end of a red toy train still sticks out of the tunnel's left side, "
             "the right side of the tunnel is an empty dark opening; Tapsi, in its light blue T-shirt and blue trousers, kneels beside it and peeks at the tunnel, curious."),
 }
@@ -204,9 +208,13 @@ THOUGHT_MOVES = {
  "huhn": "plop: the hen has stood up a little, a white egg lies in the straw under it; Tapsi cheers with both arms up",
  "knete": "the dough sausages are much longer and curl onto the table, Tapsi presses further down",
  "wasserrad": "the water wheel has turned on (its paddles stand at other places), new splashes fly up, Tapsi claps both paws",
+ "elefant": "the elephant has lifted its trunk higher, the water arc is longer and splashes down near Tapsi, Tapsi holds both paws up laughing",
+ "wal": "the water fountain is much higher and splashes into the sea around the whale, Tapsi jumps with both arms up",
+ "trichter": "the cup is tipped further, more water swirls in the funnel and the bottle is half full, Tapsi claps both paws",
  "tee": "the teapot is tipped further, the cup in front of the teddy is full to the brim with a little splash, Tapsi laughs",
  "spritzbeutel": "Tapsi has lifted its head and smiles proudly with open eyes and an open mouth, the cheeks no longer puffed; the piping bag is squeezed flat and empty; a second tall white cream swirl now sits on the cake next to the first",
  "erbsen": "the pod is wide open and empty, the peas have landed in the bowl, Tapsi laughs with both arms up",
+ "schmetterling": "the butterfly is out and spreads its big colourful wings above the empty chrysalis, flying up; Tapsi cheers with both arms up",
  "tunnel": "the back of the train is gone from the left side; the red toy engine now comes out of the right side of the tunnel, Tapsi points at it and cheers",
 }
 

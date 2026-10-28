@@ -274,6 +274,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     bubbles: () => [0, 250, 500, 750].forEach((ms) => later(ms, playPop)),
     // The train whistles as it comes out of the tunnel.
     toot: () => later(500, playWhistle),
+    // The butterfly is out and flies away.
+    chime: () => playChime(),
   };
 
   /**
