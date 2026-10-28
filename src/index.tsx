@@ -1,32 +1,12 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router";
-import { App } from "./App";
-import { BackgroundMusic } from "./components/BackgroundMusic";
-import { PlaytimeLock } from "./components/PlaytimeLock";
-import { ScreenHint } from "./components/ScreenHint";
-import { SeoHead } from "./components/SeoHead";
-import { loadAppLanguage } from "./lib/language";
-import { downloadMusicIfOn } from "./lib/musicFile";
-import { setUpPwa } from "./lib/pwa";
 import "@fontsource-variable/fredoka";
 import "./globals.css";
-import { BASE_URL } from "@/lib/buildInfo";
+import { loadAppLanguage } from "./lib/language";
+import { setUpPwa } from "./lib/pwa";
+
+// The start of the page. The app's code (src/main.tsx) runs only once the app language's texts are loaded:
+// the texts written inline in it are made in that language as its modules run (src/content/texts), and so is
+// everything else, which never switches language later. Only this file and what it imports run before.
 
 setUpPwa();
-downloadMusicIfOn();
-
-// Only the app language's texts are downloaded, and they are there before the first screen (src/content/texts).
 await loadAppLanguage();
-
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <BrowserRouter basename={BASE_URL}>
-      <App />
-      <PlaytimeLock />
-      <ScreenHint />
-      <SeoHead />
-      <BackgroundMusic />
-    </BrowserRouter>
-  </StrictMode>,
-);
+await import("./main");

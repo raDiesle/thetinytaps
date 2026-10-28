@@ -32,6 +32,7 @@ import { COMFORTS_ES as comforts, FEELINGS_ES as feelings } from "@/games/feelin
 import { SITUATIONS_ES as situations } from "@/games/feelings/kita.es";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.es";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.es";
+import inline from "inline-texts:es";
 import type { LanguageTexts } from ".";
 
 // Everything in Spanish that lives in files of its own, one chunk loaded only when the app plays in Spanish
@@ -39,6 +40,7 @@ import type { LanguageTexts } from ".";
 
 /** The Spanish texts. */
 export const TEXTS: LanguageTexts = {
+  inline,
   pack,
   scenes: {
     badezimmer,

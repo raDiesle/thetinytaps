@@ -32,6 +32,7 @@ import { COMFORTS_HI as comforts, FEELINGS_HI as feelings } from "@/games/feelin
 import { SITUATIONS_HI as situations } from "@/games/feelings/kita.hi";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.hi";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.hi";
+import inline from "inline-texts:hi";
 import type { LanguageTexts } from ".";
 
 // Everything in Hindi that lives in files of its own, one chunk loaded only when the app plays in Hindi
@@ -39,6 +40,7 @@ import type { LanguageTexts } from ".";
 
 /** The Hindi texts. */
 export const TEXTS: LanguageTexts = {
+  inline,
   pack,
   scenes: {
     badezimmer,

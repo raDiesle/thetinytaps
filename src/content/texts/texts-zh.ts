@@ -32,6 +32,7 @@ import { COMFORTS_ZH as comforts, FEELINGS_ZH as feelings } from "@/games/feelin
 import { SITUATIONS_ZH as situations } from "@/games/feelings/kita.zh";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.zh";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.zh";
+import inline from "inline-texts:zh";
 import type { LanguageTexts } from ".";
 
 // Everything in Chinese that lives in files of its own, one chunk loaded only when the app plays in Chinese
@@ -39,6 +40,7 @@ import type { LanguageTexts } from ".";
 
 /** The Chinese texts. */
 export const TEXTS: LanguageTexts = {
+  inline,
   pack,
   scenes: {
     badezimmer,

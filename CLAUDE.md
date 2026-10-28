@@ -101,9 +101,14 @@ In a fresh worktree run `bun install` first.
   texts inline as `t({ de: "…" })` (`useT()`), adding the other languages only when translations are asked for; larger
   content gets a `<lang>.ts` / `*.<lang>.ts` file next to the German data, keyed by id, and a table by language.
   A visit downloads only its own language: such a file is imported only by `src/content/texts/texts-<lang>.ts` (one chunk
-  per language, loaded before the first screen; the service worker keeps only the languages played), and the game's
-  table fills from there with `byLanguage(…)` – never import it from game code, or every visitor downloads it
-  (`texts.test.ts` checks this).
+  per language; the service worker keeps only the languages played), and the game's table fills from there with
+  `byLanguage(…)` – never import it from game code, or every visitor downloads it (`texts.test.ts` checks this). The
+  build moves inline texts into those chunks too (`tools/inlineTexts.ts`): an object of only language keys and plain
+  strings becomes `{ de: "…", ...inlineText(key) }`, so the app's code (`src/main.tsx`) runs only after the app
+  language is loaded (`src/index.tsx` imports nothing with inline texts, `inlineTexts.test.ts` checks it), and switching
+  the language starts the page afresh. A file of tables needed in every language at once (the languages' names, the
+  language table) says `@language-tables` and stays whole; functions, JSX and `${…}` texts stay inline. The dev
+  server reads the moved texts once at its start: restart it to see a changed translation.
   A text without a translation shows and speaks in German, with the German voice – never German words with another
   language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`), never a
   fixed `de-DE`. When the meaning of a German line changes, delete its translations (they fall back to German) rather
@@ -178,7 +183,7 @@ In a fresh worktree run `bun install` first.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
   of a level. Never add another.
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
-  says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
+  says good night, and `PlaytimeLock` (mounted in `main.tsx`) covers every menu, so a child stays there until a grown-up
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
   or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do).
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
@@ -219,7 +224,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README). A new file replaces the sound at every
   `playRecorded(name, …)` in every game, so grep the name first and pick a new one unless all of them should change.
 - Music: one background song plays behind the menus and every game from the first tap or key of the visit
-  (`src/components/BackgroundMusic.tsx`, mounted once in `index.tsx`, so it runs on without a break from the
+  (`src/components/BackgroundMusic.tsx`, mounted once in `main.tsx`, so it runs on without a break from the
   menus into a game and back; `src/lib/backgroundMusic.ts`), on by default, "🎵 Musik" on the home page turns it off
   for all games and then no song is downloaded. A game with its own music (or a microphone)
   calls `useNoBackgroundMusic()` while it needs quiet, and the song goes on where it stopped afterwards;
@@ -227,7 +232,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   starts loading it on its start screen and waits for it before the part that follows the song, showing how far it is
   when it is late – never switch a song in or decode it mid-play, that makes the picture stutter on phones. The shared options (`useCommonSettings`) are one
   store for the app, so a switch reaches everything already playing.
-- Phones and tablets are played sideways: `ScreenHint` (mounted in `index.tsx`) covers menus and games with
+- Phones and tablets are played sideways: `ScreenHint` (mounted in `main.tsx`) covers menus and games with
   "Bitte quer halten" while the device stands upright (its „Trotzdem hochkant“ lets a grown-up play upright for
   the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
