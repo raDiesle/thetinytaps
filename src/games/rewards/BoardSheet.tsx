@@ -1,8 +1,8 @@
 import type { CSSProperties } from "react";
 import { dayKey } from "@/games/teeth/daytime";
-import { type Localized, useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type TapState, tapState } from "@/lib/tapTargets";
-import { type Board, type BoardTask, boardDays, cellKey, isFilled, type LinkedDays, possessive, progress } from "./board";
+import { type Board, type BoardTask, boardDays, cellKey, isFilled, type LinkedDays, monthOf, possessive, progress, weekday } from "./board";
 import { type CatalogMark, MARK_BY_ID, MARKS, REWARD_BY_ID, TASK_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
 
 const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
@@ -10,7 +10,7 @@ const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa"
 /** Goals up to this many stars show one dot each under the reward; more show a bar. */
 const MAX_DOTS = 15;
 
-/** What a field is now: has its star, can get one, or lies in the future (a later day of the week). */
+/** What a field is now: has its star, can get one, or lies in the future (a later day of the week or month). */
 export type FieldState = "filled" | "open" | "future";
 
 /** How a sheet is drawn: on screen with the stars there are, or empty on paper. */
@@ -31,6 +31,7 @@ export function useBoardTitle() {
     if (board.title.trim()) return board.title.trim();
     const name = board.childName.trim();
     if (board.kind === "week") return name ? t({ de: `${possessive(name)} Sterne-Woche` }) : t({ de: "Meine Sterne-Woche" });
+    if (board.kind === "month") return name ? t({ de: `${possessive(name)} Sterne-Monat` }) : t({ de: "Mein Sterne-Monat" });
     if (board.kind === "day") return name ? t({ de: `${possessive(name)} Tag` }) : t({ de: "Mein Tag" });
     return name ? t({ de: `${possessive(name)} Sterne` }) : t({ de: "Meine Sterne" });
   };
@@ -94,6 +95,7 @@ export function BoardSheet({
   holding?: string | null;
 }) {
   const t = useT();
+  const { speechLang } = useAppLanguage();
   const title = useBoardTitle()(board);
   const rewardLabel = useRewardLabel();
   const theme = THEME_BY_ID.get(board.theme) ?? THEMES[0];
@@ -107,7 +109,7 @@ export function BoardSheet({
   const fieldProps = { mark, look, fresh, holding };
 
   return (
-    <div className={`rw-sheet rw-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}`} style={style}>
+    <div className={`rw-sheet rw-kind-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}`} style={style}>
       <header className="rw-head">
         <span className="rw-title">
           <span className="rw-title-mark" aria-hidden>
@@ -117,9 +119,11 @@ export function BoardSheet({
         </span>
         {look.print && board.kind === "week" && <span className="rw-blank">{t({ de: "Woche vom" })} ____________</span>}
         {look.print && board.kind === "day" && <span className="rw-blank">{t({ de: "Datum" })} ____________</span>}
+        {board.kind === "month" && <span className="rw-blank">{new Intl.DateTimeFormat(speechLang, { month: "long", year: "numeric" }).format(today)}</span>}
       </header>
       <div className="rw-body">
         {board.kind === "week" && <WeekGrid board={board} stars={shown} linked={linked} today={today} {...fieldProps} />}
+        {board.kind === "month" && <MonthGrid board={board} stars={shown} linked={linked} today={today} {...fieldProps} />}
         {board.kind === "day" && <DayCards board={board} stars={shown} linked={linked} today={today} {...fieldProps} />}
         {board.kind === "collect" && <CollectPath board={board} count={count} aspect={aspect} rewardLabel={rewardLabel} {...fieldProps} />}
       </div>
@@ -159,8 +163,11 @@ interface FieldLook {
   holding?: string | null;
 }
 
-/** One field: a dashed ring, with the mark in it once it has its star. */
-function Field({ id, state, mark, look, fresh, holding, next = false }: FieldLook & { id: string; state: FieldState; next?: boolean }) {
+/**
+ * One field: a dashed ring, with the mark in it once it has its star. `hint` shows pale in an empty ring which task
+ * it is for, where a day has several small fields (month).
+ */
+function Field({ id, state, mark, look, fresh, holding, next = false, hint }: FieldLook & { id: string; state: FieldState; next?: boolean; hint?: string }) {
   const tap: TapState = look.print || state === "future" ? "" : tapState({ goal: next || state === "open", done: state === "filled" });
   return (
     <div
@@ -180,6 +187,8 @@ function Field({ id, state, mark, look, fresh, holding, next = false }: FieldLoo
           ) : (
             <span className="rw-mark pale">{mark.emoji}</span>
           )
+        ) : hint ? (
+          <span className="rw-mark pale">{hint}</span>
         ) : null}
         {holding === id && (
           <svg className="rw-hold" viewBox="0 0 100 100" aria-hidden>
@@ -243,6 +252,48 @@ function WeekGrid({ board, stars, linked, today, ...look }: GridProps) {
           ))}
         </div>
       ))}
+    </div>
+  );
+}
+
+/**
+ * A calendar of the month: weekdays in columns, a box per day with its number and one field per task (the
+ * task's picture pale in it when there are several). Weekdays the board leaves out stay as plain boxes.
+ */
+function MonthGrid({ board, stars, linked, today, ...look }: GridProps) {
+  const t = useT();
+  const names = t(DAY_NAMES);
+  const days = monthOf(today);
+  const lead = weekday(days[0]);
+  const weeks = Math.ceil((lead + days.length) / 7);
+  const todayKey = dayKey(today);
+  const several = board.tasks.length > 1;
+  const state = (day: Date, task: BoardTask): FieldState => (look.look.print ? "open" : fieldState(stars, linked, day, task, today));
+  return (
+    <div className="rw-calendar" style={{ gridTemplateRows: `auto repeat(${weeks}, minmax(0, 1fr))` }}>
+      {names.map((name) => (
+        <span key={name} className="rw-day">
+          {name}
+        </span>
+      ))}
+      {days.map((day, i) => {
+        const on = board.days.includes(weekday(day));
+        const isToday = !look.look.print && dayKey(day) === todayKey;
+        return (
+          <div key={dayKey(day)} className={`rw-mday${isToday ? " today" : ""}${on ? "" : " off"}`} style={i === 0 ? { gridColumnStart: lead + 1 } : undefined}>
+            <span className="rw-mnum">{day.getDate()}</span>
+            {on && (
+              <span className="rw-mfields">
+                {board.tasks.map((task) => (
+                  <span key={task.id} className="rw-cell">
+                    <Field id={cellKey(day, task.id)} state={state(day, task)} hint={several ? task.emoji : undefined} {...look} />
+                  </span>
+                ))}
+              </span>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

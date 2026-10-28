@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { addStar, boardFromTemplate, NO_LINKED, type StarLog, possessive, progress, startOver, takeBackStar } from "./board";
+import { addStar, boardDays, boardFromTemplate, monthOf, NO_LINKED, type StarLog, possessive, progress, startOver, takeBackStar, withKind } from "./board";
 import { snakeLayout } from "./BoardSheet";
-import { MARKS, REWARDS, TASK_BY_ID, TASKS, TEMPLATES, THEMES, MARK_BY_ID, REWARD_BY_ID, THEME_BY_ID } from "./catalog";
+import { KINDS, MARKS, REWARDS, TASK_BY_ID, TASKS, TEMPLATES, THEMES, MARK_BY_ID, REWARD_BY_ID, THEME_BY_ID } from "./catalog";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { DEFAULT_REWARDS_SETTINGS } from "./settings";
 
@@ -21,6 +21,21 @@ describe("catalogue", () => {
       expect(MARK_BY_ID.has(t.mark), t.mark).toBe(true);
       expect(THEME_BY_ID.has(t.theme), t.theme).toBe(true);
     }
+  });
+
+  // Every view is one tap from the first visit, with at least one ready-made board in it.
+  test("every view has a ready-made board, and the first one is a week", () => {
+    for (const kind of KINDS)
+      expect(
+        TEMPLATES.some((t) => t.kind === kind.id),
+        kind.id,
+      ).toBe(true);
+    for (const t of TEMPLATES)
+      expect(
+        KINDS.some((k) => k.id === t.kind),
+        t.id,
+      ).toBe(true);
+    expect(TEMPLATES[0].kind).toBe("week");
   });
 
   // Generated pictures will replace the emoji, so nothing in the catalogue may lack a prompt.
@@ -103,6 +118,37 @@ describe("stars", () => {
     expect(progress(week, takeBackStar(log, "w", `2026-10-28|${task}`).w, NO_LINKED, wednesday).count).toBe(1);
     const older = addStar(log, "w", `2026-10-20|${task}`, wednesday);
     expect(Object.keys(startOver(older, week, wednesday).w)).toEqual([`2026-10-20|${task}`]);
+  });
+
+  test("a month board has the chosen weekdays of this month, and starting over clears only this month", () => {
+    expect(monthOf(wednesday)).toHaveLength(31);
+    expect(monthOf(new Date(2026, 1, 10))).toHaveLength(28);
+    const month = { ...withKind(week, "month"), days: [0, 1, 2, 3, 4] };
+    const days = boardDays(month, wednesday);
+    expect(days).toHaveLength(22);
+    expect(days.every((d) => d.getMonth() === 9 && d.getDay() !== 0 && d.getDay() !== 6)).toBe(true);
+    const task = month.tasks[0].id;
+    let log = addStar({}, "w", `2026-10-01|${task}`, wednesday);
+    log = addStar(log, "w", `2026-09-30|${task}`, wednesday);
+    expect(Object.keys(startOver(log, month, wednesday).w)).toEqual([`2026-09-30|${task}`]);
+  });
+
+  test("day, week and month share their stars, and the goal changes to fit the view", () => {
+    const task = week.tasks[0].id;
+    const log = addStar({}, "w", `2026-10-28|${task}`, wednesday);
+    for (const kind of ["day", "week", "month"] as const) expect(progress(withKind(week, kind), log.w, NO_LINKED, wednesday).count, kind).toBe(1);
+    expect(withKind(week, "month").goal).toBe(week.goal * 4);
+    expect(withKind(withKind(week, "month"), "week").goal).toBe(week.goal);
+    expect(withKind({ ...week, goal: 10 }, "collect").goal).toBe(10);
+    expect(withKind({ ...week, goal: 12 }, "collect").goal).toBe(5);
+    expect(withKind(collect, "month").goal).toBe(20);
+    expect(withKind(week, "week")).toBe(week);
+  });
+
+  test("a heading that came with a ready-made board goes with a new view, one of the grown-up's stays", () => {
+    const morning = boardFromTemplate(TEMPLATES.find((t) => t.title) ?? TEMPLATES[0]);
+    expect(withKind(morning, "week", morning.title).title).toBe("");
+    expect(withKind({ ...morning, title: "Unsere Tafel" }, "week", morning.title).title).toBe("Unsere Tafel");
   });
 
   test("stars older than two months are dropped when a new one comes", () => {

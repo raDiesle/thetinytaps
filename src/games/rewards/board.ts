@@ -33,9 +33,9 @@ export interface Board {
   /** The heading; empty means one made from the kind and the name. */
   title: string;
   tasks: BoardTask[];
-  /** Weekdays of a week board, 0 = Monday. */
+  /** Weekdays of a week or month board, 0 = Monday. */
   days: number[];
-  /** Stars until the reward (week), or fields to fill (collect); a day board's goal is all its tasks. */
+  /** Stars until the reward (week, month), or fields to fill (collect); a day board's goal is all its tasks. */
   goal: number;
   /** Null: no reward, only a party together. */
   reward: BoardReward | null;
@@ -43,9 +43,11 @@ export interface Board {
   mark: string;
   /** Catalogue theme id. */
   theme: string;
+  /** The ready-made board it was made from: its chip in the row of boards selects it again. */
+  template?: string;
 }
 
-/** Stars per board: "YYYY-MM-DD|taskId" → 1 on week and day boards, "count" → n on a collecting board. */
+/** Stars per board: "YYYY-MM-DD|taskId" → 1 on week, month and day boards, "count" → n on a collecting board. */
 export type StarLog = Record<string, Record<string, number>>;
 
 /** Days that got a star from a linked game, as day keys. */
@@ -69,6 +71,7 @@ export const newId = () => Math.random().toString(36).slice(2, 9);
 export function boardFromTemplate(template: Template): Board {
   return {
     id: newId(),
+    template: template.id,
     kind: template.kind,
     childName: "",
     title: template.title?.de ?? "",
@@ -79,6 +82,33 @@ export function boardFromTemplate(template: Template): Board {
     mark: template.mark,
     theme: template.theme,
   };
+}
+
+/** About this many stars of a month for one of a week, when a board changes between the two. */
+const WEEKS_PER_MONTH = 4;
+
+/**
+ * The same board in another view. Day, week and month share their stars (they are kept per day), so only the
+ * goal changes to fit: a week's stars times four for a month, a collecting board's fields from COLLECT_GOALS.
+ * A heading that came with the ready-made board („Mein Morgen“) goes, the one for the new view comes instead.
+ */
+export function withKind(board: Board, kind: BoardKind, templateTitle = ""): Board {
+  if (kind === board.kind) return board;
+  const goal =
+    kind === "collect"
+      ? COLLECT_GOALS.includes(board.goal)
+        ? board.goal
+        : 5
+      : board.kind === "collect"
+        ? kind === "month"
+          ? 20
+          : 5
+        : kind === "month" && board.kind === "week"
+          ? board.goal * WEEKS_PER_MONTH
+          : kind === "week" && board.kind === "month"
+            ? Math.max(1, Math.round(board.goal / WEEKS_PER_MONTH))
+            : board.goal;
+  return { ...board, kind, goal, title: templateTitle && board.title === templateTitle ? "" : board.title };
 }
 
 /** A board task for a catalogue task; linked to its game where it has one. */
@@ -99,11 +129,23 @@ export function possessive(name: string): string {
   return /(s|ß|x|z|ce)$/i.test(name) ? `${name}’` : `${name}s`;
 }
 
-/** The days a board shows today: this week's chosen weekdays, only today, or none (collecting). */
+/** Every day of the month `day` is in. */
+export function monthOf(day: Date): Date[] {
+  const length = new Date(day.getFullYear(), day.getMonth() + 1, 0).getDate();
+  return Array.from({ length }, (_, i) => new Date(day.getFullYear(), day.getMonth(), i + 1));
+}
+
+/** Monday = 0 … Sunday = 6. */
+export const weekday = (day: Date) => (day.getDay() + 6) % 7;
+
+/**
+ * The days a board has fields on: this week's or this month's chosen weekdays, only today, or none (collecting).
+ * `today` is the day the board is for – a printed month board may be next month's.
+ */
 export function boardDays(board: Board, today: Date): Date[] {
   if (board.kind === "day") return [today];
   if (board.kind === "collect") return [];
-  return weekOf(today).filter((_, i) => board.days.includes(i));
+  return (board.kind === "month" ? monthOf(today) : weekOf(today)).filter((day) => board.days.includes(weekday(day)));
 }
 
 export const cellKey = (day: Date, taskId: string) => `${dayKey(day)}|${taskId}`;
@@ -148,10 +190,10 @@ export function takeBackStar(log: StarLog, boardId: string, key: string | null):
   return { ...log, [boardId]: stars };
 }
 
-/** The log with a board starting over: a collecting board empty, a week or day board without this week's stars. */
+/** The log with a board starting over: a collecting board empty, the others without this week's (or month's) stars. */
 export function startOver(log: StarLog, board: Board, today: Date): StarLog {
   if (board.kind === "collect") return { ...log, [board.id]: {} };
-  const week = new Set(weekOf(today).map(dayKey));
+  const week = new Set((board.kind === "month" ? monthOf(today) : weekOf(today)).map(dayKey));
   const kept = Object.fromEntries(Object.entries(log[board.id] ?? {}).filter(([k]) => !week.has(k.slice(0, 10))));
   return { ...log, [board.id]: kept };
 }

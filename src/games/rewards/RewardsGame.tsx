@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { MenuHead } from "@/components/MenuTop";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useGameSettings } from "@/lib/common";
 import { type Localized, useT } from "@/lib/language";
 import { useStoredSettings } from "@/lib/storage";
-import { type Board, boardFromTemplate, startOver, type StarLog } from "./board";
+import { type Board, boardFromTemplate, newId, startOver, type StarLog, withKind } from "./board";
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
-import { MARK_BY_ID, TEMPLATES } from "./catalog";
+import { type BoardKind, KINDS, MARK_BY_ID, TEMPLATES } from "./catalog";
 import { Editor } from "./Editor";
 import { loadLinkedDays } from "./linked";
 import { PrintPanel } from "./PrintPanel";
@@ -18,18 +18,39 @@ import "./rewards.css";
 /** The page's name, in the menu head and the browser tab. */
 export const REWARDS_TITLE: Localized = { de: "Belohnungstafel" };
 
-type Panel = "info" | "edit" | "print" | "new";
+type Panel = "info" | "edit" | "print";
+
+/** Grown-ups on a computer, with room to scroll: the same limit as the fixed back link (`playing.css`). */
+const COMPUTER = "(min-width: 900px) and (any-pointer: fine)";
+
+/** Whether this is a computer with a mouse and a wide window; follows the window as it changes. */
+function useComputer() {
+  const [computer, setComputer] = useState(() => matchMedia(COMPUTER).matches);
+  useEffect(() => {
+    const query = matchMedia(COMPUTER);
+    const change = () => setComputer(query.matches);
+    query.addEventListener("change", change);
+    return () => query.removeEventListener("change", change);
+  }, []);
+  return computer;
+}
+
+/** Ready-made boards in the order of the row of views: the day ones first, collecting last. */
+const PRESETS = [...TEMPLATES].sort((a, b) => KINDS.findIndex((k) => k.id === a.kind) - KINDS.findIndex((k) => k.id === b.kind));
 
 /**
- * The Belohnungstafel: the current board as big as the screen allows, the grown-ups'
- * buttons above it (about, design, print), and a row of boards when there are several
- * (one per child or habit). Not a game: no GameShell, no play time counted, so a star
- * after the evening brushing still comes when today's play time is over.
+ * The Belohnungstafel: the current board as big as the screen allows, and above it, from the
+ * first visit on, what is easy to switch – the view (Tag, Woche, Monat, Sammeln, the same stars)
+ * and a row of ready-made boards, each its own board with its own stars once tapped, plus the
+ * grown-ups' own ones. On a computer „Gestalten“ and „Drucken“ lie open below the board (scroll
+ * down); on phones and tablets they open from the buttons on top. Not a game: no GameShell, no
+ * play time counted, so a star after the evening brushing still comes when play time is over.
  */
 export function RewardsGame() {
   const t = useT();
   const location = useLocation();
   const category = categoryOf(location.pathname);
+  const computer = useComputer();
   const [settings, update] = useGameSettings(REWARDS_SETTINGS_KEY, DEFAULT_REWARDS_SETTINGS);
   const [stored, setStored] = useStoredSettings(REWARDS_STARS_KEY, { log: NO_STARS });
   const [linked] = useState(loadLinkedDays);
@@ -38,14 +59,32 @@ export function RewardsGame() {
   const board = settings.boards.find((b) => b.id === settings.current) ?? settings.boards[0];
   const log = stored.log;
   const setLog = (next: StarLog) => setStored({ log: next });
+  const own = settings.boards.filter((b) => !b.template || !TEMPLATES.some((tpl) => tpl.id === b.template));
 
   const changeBoard = (patch: Partial<Board>) => update({ boards: settings.boards.map((b) => (b.id === board.id ? { ...b, ...patch } : b)) });
-  const toggle = (which: Panel) => setPanel(panel === which ? null : which);
-  const addBoard = (templateId: string) => {
+  const setKind = (kind: BoardKind) => {
+    const template = TEMPLATES.find((tpl) => tpl.id === board.template);
+    changeBoard(withKind(board, kind, template?.title?.de));
+  };
+  // On a computer the panels are always open below the board: the buttons on top only scroll there.
+  const toggle = (which: Panel) => {
+    if (computer && which !== "info") document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    else setPanel(panel === which ? null : which);
+  };
+  /** A ready-made board: the one made from it before, with its stars, or a new one. */
+  const pickPreset = (templateId: string) => {
+    const made = settings.boards.find((b) => b.template === templateId);
+    if (made) return update({ current: made.id });
     const template = TEMPLATES.find((tpl) => tpl.id === templateId) ?? TEMPLATES[0];
     const fresh = boardFromTemplate(template);
     update({ boards: [...settings.boards, fresh], current: fresh.id });
-    setPanel("edit");
+  };
+  /** An own board, starting as a copy of the one shown, to change at once. */
+  const addOwn = () => {
+    const fresh: Board = { ...board, id: newId(), template: undefined, title: t({ de: "Eigene Tafel" }) };
+    update({ boards: [...settings.boards, fresh], current: fresh.id });
+    if (computer) requestAnimationFrame(() => document.getElementById("rw-edit")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    else setPanel("edit");
   };
   const removeBoard = () => {
     const boards = settings.boards.filter((b) => b.id !== board.id);
@@ -54,67 +93,92 @@ export function RewardsGame() {
     setPanel(null);
   };
 
+  const editor = (
+    <Editor
+      board={board}
+      onChange={changeBoard}
+      onStartOver={() => setLog(startOver(log, board, new Date()))}
+      onRemove={settings.boards.length > 1 ? removeBoard : undefined}
+    />
+  );
+  const print = <PrintPanel board={board} options={settings.print} onChange={(patch) => update({ print: { ...settings.print, ...patch } })} />;
+  const screen = <BoardScreen board={board} log={log} setLog={setLog} linked={linked} sounds={settings.sounds} speech={settings.speech} />;
+
   return (
-    <main className="start-screen rw-page-screen">
-      <MenuHead
-        to={category ? categoryHref(category) : "/"}
-        back={category ? t(category.title) : t({ de: "Alle Spiele" })}
-        title={
-          <>
-            <span aria-hidden>🌟</span> {t(REWARDS_TITLE)}
-          </>
-        }
-      >
-        <div className="panel-buttons">
-          <PanelButton open={panel === "info"} onClick={() => toggle("info")} emoji="ℹ️" label={t({ de: "Über die Tafel" })} />
-          <PanelButton open={panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t({ de: "Gestalten" })} />
-          <PanelButton open={panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t({ de: "Drucken" })} />
-          <PanelButton open={panel === "new"} onClick={() => toggle("new")} emoji="＋" label={t({ de: "Neue Tafel" })} />
-        </div>
-      </MenuHead>
+    <main className={`start-screen rw-page-screen${computer ? " rw-computer" : ""}`}>
+      {/* The first screen: everything down to the board, which fills what is left of it. */}
+      <div className="rw-first">
+        <MenuHead
+          to={category ? categoryHref(category) : "/"}
+          back={category ? t(category.title) : t({ de: "Alle Spiele" })}
+          title={
+            <>
+              <span aria-hidden>🌟</span> {t(REWARDS_TITLE)}
+            </>
+          }
+        >
+          <div className="panel-buttons">
+            <PanelButton open={panel === "info"} onClick={() => toggle("info")} emoji="ℹ️" label={t({ de: "Über die Tafel" })} />
+            <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t({ de: "Gestalten" })} />
+            <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t({ de: "Drucken" })} />
+          </div>
+        </MenuHead>
 
-      {settings.boards.length > 1 && (
-        <nav className="rw-boards" aria-label={t({ de: "Tafeln" })}>
-          {settings.boards.map((b) => (
-            <button
-              key={b.id}
-              type="button"
-              className={b.id === board.id ? "selected" : undefined}
-              aria-pressed={b.id === board.id}
-              onClick={() => update({ current: b.id })}
-            >
-              {MARK_BY_ID.get(b.mark)?.emoji} {title(b)}
-            </button>
-          ))}
-        </nav>
-      )}
-
-      {panel === "info" && <Info />}
-      {panel === "new" && (
-        <section className="settings">
-          <h2 className="rw-panel-title">{t({ de: "Womit fangen wir an?" })}</h2>
-          <div className="rw-templates">
-            {TEMPLATES.map((tpl) => (
-              <button key={tpl.id} type="button" className="rw-template" onClick={() => addBoard(tpl.id)}>
-                <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
+        <div className="rw-pickers">
+          <div className="rw-views" role="group" aria-label={t({ de: "Ansicht" })}>
+            {KINDS.map((kind) => (
+              <button
+                key={kind.id}
+                type="button"
+                className={kind.id === board.kind ? "selected" : undefined}
+                aria-pressed={kind.id === board.kind}
+                onClick={() => setKind(kind.id)}
+              >
+                <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
               </button>
             ))}
           </div>
-          <p className="setting-note">{t({ de: "Danach lässt sich alles ändern: Aufgaben, Tage, Ziel, Belohnung, Farben." })}</p>
-        </section>
-      )}
-      {panel === "edit" && (
-        <Editor
-          board={board}
-          onChange={changeBoard}
-          onStartOver={() => setLog(startOver(log, board, new Date()))}
-          onRemove={settings.boards.length > 1 ? removeBoard : undefined}
-        />
-      )}
-      {panel === "print" ? (
-        <PrintPanel board={board} options={settings.print} onChange={(patch) => update({ print: { ...settings.print, ...patch } })} />
-      ) : (
-        <BoardScreen board={board} log={log} setLog={setLog} linked={linked} sounds={settings.sounds} speech={settings.speech} />
+          <nav className="rw-boards" aria-label={t({ de: "Tafeln" })}>
+            {PRESETS.map((tpl) => {
+              const made = settings.boards.find((b) => b.template === tpl.id);
+              const on = made?.id === board.id;
+              return (
+                <button key={tpl.id} type="button" className={on ? "selected" : undefined} aria-pressed={on} onClick={() => pickPreset(tpl.id)}>
+                  <span aria-hidden>{tpl.emoji}</span> {made && (made.childName.trim() || made.kind !== tpl.kind) ? title(made) : t(tpl.label)}
+                </button>
+              );
+            })}
+            {own.map((b) => (
+              <button
+                key={b.id}
+                type="button"
+                className={b.id === board.id ? "selected" : undefined}
+                aria-pressed={b.id === board.id}
+                onClick={() => update({ current: b.id })}
+              >
+                <span aria-hidden>{MARK_BY_ID.get(b.mark)?.emoji}</span> {title(b)}
+              </button>
+            ))}
+            <button type="button" className="rw-add" onClick={addOwn}>
+              ＋ {t({ de: "Eigene Tafel" })}
+            </button>
+          </nav>
+        </div>
+
+        {panel === "info" && <Info />}
+        {!computer && panel === "edit" && editor}
+        {computer || panel !== "print" ? screen : print}
+      </div>
+      {computer && (
+        <div className="rw-below">
+          <section id="rw-edit" className="rw-below-part">
+            <h2 className="rw-panel-title">✏️ {t({ de: "Gestalten" })}</h2>
+            {editor}
+          </section>
+          <section id="rw-print" className="rw-below-part">
+            {print}
+          </section>
+        </div>
       )}
     </main>
   );
@@ -135,7 +199,7 @@ function Info() {
     <section className="settings game-info">
       <p>
         {t({
-          de: "Eine Tafel, auf der Ihr Kind Sterne sammelt – auf dem Bildschirm und, genau gleich, zum Ausdrucken. Unter „Gestalten“ stellen Sie alles ein: eine Wochentafel (Aufgaben × Tage), eine Tagestafel (die Aufgaben von heute als große Bilder) oder Sterne sammeln (ein Weg bis zur Belohnung); dazu Name, Aufgaben, Tage, Ziel, Belohnung, Zeichen und Farben. Mehrere Tafeln gehen auch, z. B. eine pro Kind.",
+          de: "Eine Tafel, auf der Ihr Kind Sterne sammelt – auf dem Bildschirm und, genau gleich, zum Ausdrucken. Oben wechseln Sie die Ansicht: Tag (die Aufgaben von heute als große Bilder), Woche (Aufgaben × Tage), Monat (ein Kalender) oder Sammeln (ein Weg bis zur Belohnung) – Tag, Woche und Monat zeigen dieselben Sterne. Darunter stehen fertige Tafeln zum Antippen; jede behält ihre eigenen Sterne. Unter „Gestalten“ ändern Sie alles: Name, Aufgaben, Tage, Ziel, Belohnung, Zeichen und Farben. Mit „Eigene Tafel“ kommt eine weitere dazu, z. B. eine pro Kind.",
         })}
       </p>
       <p>
