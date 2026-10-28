@@ -582,14 +582,6 @@
   animation: el-hint 1.1s ease-in-out infinite alternate;
 }
 
-.el-contour {
-  pointer-events: none;
-}
-
-.el-contour.glow {
-  animation: el-hint 1.1s ease-in-out infinite alternate;
-}
-
 /* A child drawn inside a picture (the puddle jump in the bubble) keeps still and floats without its shadow. */
 .el-pic-kid .el-kid * {
   animation: none;

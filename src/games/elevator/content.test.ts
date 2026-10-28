@@ -1,6 +1,4 @@
 import { expect, test } from "bun:test";
-import { createElement } from "react";
-import { renderToStaticMarkup } from "react-dom/server";
 import { STORIES } from "./content";
 
 // The rules of CLAUDE.md that data can show: few presses in a row, and a wish in the room only where the bubble can be seen.
@@ -33,15 +31,4 @@ test("a wish in the room only while the child can be seen", () => {
   for (const story of STORIES)
     for (const step of story.steps)
       if (step.hide) for (const task of step.tasks ?? []) expect(task.wish, `${story.id} ${step.wish} ${task.name}`).toBeUndefined();
-});
-
-test("the thing of every wish can be found in its room, for its outline", () => {
-  // The outline finds the thing by `data-wish`; the brother is not part of the room but the child waiting there.
-  for (const story of STORIES)
-    for (const step of story.steps) {
-      if (step.wish === "brother") continue;
-      const room = renderToStaticMarkup(createElement(story.rooms[step.floor], { playing: null, used: [], task: null, taps: {} }));
-      const tags = [...room.matchAll(/data-wish="([^"]*)"/g)].flatMap((m) => m[1].split(" "));
-      expect(tags, `${story.id} ${step.wish}`).toContain(step.wish);
-    }
 });
