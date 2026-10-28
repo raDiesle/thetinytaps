@@ -13,13 +13,18 @@ interface GameEndProps {
   next?: { emoji: ReactNode; name: string; onNext: () => void };
   /** Waits this long before showing up, so the party can be watched first. */
   delayMs?: number;
+  /**
+   * Small buttons in the bottom corners, „Menü“ left and the others right, so the picture stays free (Aufs Töpfchen,
+   * the user's choice there); taps between them reach the game.
+   */
+  corners?: boolean;
 }
 
 /**
  * The end of a level: three big buttons, back to the game's start screen
  * („Menü“), play it again („Nochmal“) or go on to the next („Weiter“, only where there is another).
  */
-export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
+export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEndProps) {
   const t = useT();
   const leave = useLeaveGame();
   const [shown, setShown] = useState(delayMs <= 0);
@@ -46,7 +51,7 @@ export function GameEnd({ onAgain, next, delayMs = 0 }: GameEndProps) {
   };
 
   return (
-    <div className="game-end" data-tap-root onPointerDown={(e) => e.stopPropagation()}>
+    <div className={`game-end${corners ? " corners" : ""}`} data-tap-root onPointerDown={(e) => e.stopPropagation()}>
       {/* A click, not pointer down: leaving on the way down would let the lifted finger tap the start screen. */}
       <button type="button" className="game-end-button menu" onClick={leave}>
         <span className="game-end-emoji" aria-hidden>

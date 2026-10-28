@@ -207,9 +207,11 @@ export interface PottyTexts {
   /** Said once while sitting, so a grown-up knows what the two ✓ are for. */
   finish: string;
   /** What each ✓ means, for screen readers. */
-  went: Record<Went, string>;
+  went: Record<Need, string>;
   /** The button for nothing next to the ✓, for screen readers, and said when it is tapped. */
   nothing: string;
+  /** What that button says, for the grown-up. */
+  nothingButton: string;
   /** Said when a star comes for really going. */
   star: string;
 }
@@ -267,13 +269,13 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
     next: "Weiter",
     askSaid: "Was muss dein Kind?",
     askWent: "Was ist im Töpfchen?",
-    finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka. Beides: drück auf beide!",
+    finish: "Ist was im Töpfchen? Pipi: drück auf den Tropfen. Kaka: drück auf das Kaka.",
     went: {
       pipi: "Pipi ist im Töpfchen",
       kaka: "Kaka ist im Töpfchen",
-      both: "Pipi und Kaka sind im Töpfchen",
     },
     nothing: "Heute kommt nichts. Macht nichts!",
+    nothingButton: "nichts",
     star: "Hat geklappt! Hurra, ein Stern für dich!",
   },
 };

@@ -167,7 +167,8 @@ In a fresh worktree run `bun install` first.
   the first, so there is always one). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
   two buttons doing the same thing confuse. A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
-  it has a use for, just as big.
+  it has a use for, just as big. Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
+  in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
 
 ## Architecture
 

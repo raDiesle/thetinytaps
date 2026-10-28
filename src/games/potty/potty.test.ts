@@ -37,7 +37,10 @@ describe("Aufs Töpfchen", () => {
     for (const texts of Object.values(POTTY_TEXTS)) {
       for (const which of WHICHES) for (const step of ALL_STEPS) expect(texts.steps[step.id](TAPSI.name, which).trim()).not.toBe("");
       expect(texts.nothing.trim()).not.toBe("");
-      for (const went of WENTS) expect(texts.went[went].trim()).not.toBe("");
+      for (const need of ["pipi", "kaka"] as const) expect(texts.went[need].trim()).not.toBe("");
+      // „Was ist im Töpfchen?“ offers pipi and kaka only (the user's choice), and „nichts“ in a word.
+      expect(Object.keys(texts.went).sort()).toEqual(["kaka", "pipi"]);
+      expect(texts.nothingButton.trim()).not.toBe("");
       for (const { id } of SAID) expect(texts.said[id].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
       for (const scene of WAIT_SCENES) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();

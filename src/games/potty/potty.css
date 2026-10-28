@@ -4,8 +4,8 @@
  * The story is a Gemini picture filling the screen (StoryPicture.tsx), its two frames
  * fading into each other like a tiny GIF. Drawn on top: what the animal feels and
  * calls (.pt-feel, .pt-call), and at the bottom the row of steps (each one a button that jumps there) with the
- * grown-ups' buttons on the right next to it: a choice (.pt-choice) of what the child said (.pt-said) or the three ✓ while
- * sitting (.pt-finish) with 🤷 for nothing (.pt-nothing), and „Weiter“ (.pt-next). While sitting the clock on the wall (.pt-clock) and Tapsi's thought bubble (.pt-think).
+ * grown-ups' buttons on the right next to it: a choice (.pt-choice) of what the child said (.pt-said) or the two ✓ while
+ * sitting (.pt-finish) with „nichts“ (.pt-nothing), and „Weiter“ (.pt-next). While sitting the clock on the wall (.pt-clock) and Tapsi's thought bubble (.pt-think).
  * Root classes: pt-pipi / pt-kaka / pt-unsure / pt-both (what was said, then what came), pt-at-<step>, busy while a step's sounds run.
  * Only the eating picture moves before the first tap (the game is opened when the child has to go now).
  */
@@ -155,7 +155,7 @@
   position: absolute;
   left: max(12px, env(safe-area-inset-left));
   right: max(12px, env(safe-area-inset-right));
-  bottom: max(10px, env(safe-area-inset-bottom));
+  bottom: max(4px, env(safe-area-inset-bottom));
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: end;
@@ -275,30 +275,6 @@
   font-size: clamp(9px, 2.2vmin, 13px);
 }
 
-/* A tap or key that missed the buttons: the frame shakes, so it is plain that only they go on. */
-.pt-ask.poked {
-  animation: pt-poke 0.5s ease-in-out;
-}
-
-@keyframes pt-poke {
-  0%,
-  100% {
-    transform: translateX(0) scale(1);
-  }
-  20% {
-    transform: translateX(-8px) scale(1.06);
-  }
-  40% {
-    transform: translateX(8px) scale(1.06);
-  }
-  60% {
-    transform: translateX(-6px) scale(1.04);
-  }
-  80% {
-    transform: translateX(4px) scale(1.02);
-  }
-}
-
 .pt-next {
   width: clamp(54px, 13vmin, 80px);
   height: clamp(54px, 13vmin, 80px);
@@ -331,7 +307,7 @@
   }
 }
 
-/* While sitting: three ✓ say „fertig“ – for pipi, kaka or both, told apart by the need next to the ✓. Green, so a
+/* While sitting: two ✓ say „fertig“ – for pipi or kaka, told apart by the need next to the ✓. Green, so a
    grown-up finds them at once; the one the child said has a yellow ring. */
 .pt-finish {
   height: clamp(42px, 10vmin, 62px);
@@ -352,10 +328,13 @@
   font-size: clamp(16px, 3.8vmin, 24px);
 }
 
-/* Nothing came: white, unlike the green ✓, since it leads to a story of its own. */
+/* Nothing came: white with the word „nichts“, unlike the green ✓, since it leads to a story of its own. */
 .pt-finish.pt-nothing {
+  padding: 0 12px;
   background: #fff;
-  font-size: clamp(20px, 4.6vmin, 30px);
+  color: #2a1e5c;
+  font-size: clamp(14px, 3.4vmin, 20px);
+  font-weight: 800;
 }
 
 /* Too narrow for one row (phones on their side, tablets): the choice stands above „Weiter“, its buttons two by two. */
@@ -516,19 +495,19 @@
 @media (prefers-reduced-motion: reduce) {
   .pt-next.nudge,
   .pt-said,
-  .pt-ask.poked,
   .pt-clock line {
     animation: none;
   }
 }
 
-/* The row of steps lies on the picture, so it gets a little more contrast. */
+/* The row of steps lies on the picture, so it gets a little more contrast. Small and low, for the grown-up: the
+   picture is the story. */
 .pt-steps {
   grid-column: 2;
   display: flex;
-  gap: clamp(4px, 1vw, 10px);
+  gap: clamp(2px, 0.6vw, 6px);
   margin: 0;
-  padding: 6px 12px;
+  padding: 3px 8px;
   list-style: none;
   border-radius: 999px;
   background: #ffffffcc;
@@ -539,11 +518,11 @@
   position: relative;
   display: grid;
   place-items: center;
-  /* Big enough to hit, since a tap on a step jumps there. */
-  width: clamp(30px, min(5.5vw, 9vmin), 52px);
-  height: clamp(30px, min(5.5vw, 9vmin), 52px);
+  /* Still big enough to hit with a grown-up's finger, since a tap on a step jumps there. */
+  width: clamp(22px, min(3.4vw, 5.6vmin), 34px);
+  height: clamp(22px, min(3.4vw, 5.6vmin), 34px);
   border-radius: 50%;
-  font-size: clamp(17px, min(3.3vw, 5.4vmin), 30px);
+  font-size: clamp(12px, min(2.1vw, 3.4vmin), 20px);
   opacity: 0.45;
   filter: grayscale(0.7);
   transition: transform 0.3s;
