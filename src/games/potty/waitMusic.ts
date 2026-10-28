@@ -42,6 +42,10 @@ const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
   // before the first bar; 47 bars (verses, choruses, bridge, the instrumental after the last chorus), ending just
   // before the bass drops into an extra quiet chorus that is never reached.
   ru: { loopStart: 0.5, loopEnd: 0.5 + 47 * (240 / 97.42) },
+  // 100.91 BPM on average (Suno sped up a little, from 99.6 to 101.7), the first verse's first bar at 0.5 s and „Me“
+  // just after it; 48 bars (verses, choruses, bridge), from a tenth before that bar to the same place after the last
+  // chorus, where Suno goes on into a bell interlude and sings the last verse again – never reached.
+  es: { loopStart: 0.4, loopEnd: 0.4 + 48 * (240 / 100.91) },
 };
 
 const loading = new Map<string, Promise<AudioBuffer | null>>();
