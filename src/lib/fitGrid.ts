@@ -47,10 +47,15 @@ function bestFit(count: number, width: number, height: number, phone: boolean): 
   return best;
 }
 
-/** Height of the page's content from its top edge, without the bottom padding and the footer for grown-ups. */
+/**
+ * Height of the page's content from its top edge, without the bottom padding and the footer for grown-ups.
+ * The free room a `data-spread` part takes with its auto margins (to push the buttons under it to the bottom
+ * edge) is left out: it is there for the cards to grow into.
+ */
 function contentHeight(page: HTMLElement) {
   let top = Infinity;
   let bottom = -Infinity;
+  let free = 0;
   for (const child of page.children) {
     const style = getComputedStyle(child);
     if (style.position === "fixed" || style.position === "absolute" || style.display === "none") continue;
@@ -58,8 +63,9 @@ function contentHeight(page: HTMLElement) {
     const rect = child.getBoundingClientRect();
     top = Math.min(top, rect.top - parseFloat(style.marginTop));
     bottom = Math.max(bottom, rect.bottom + parseFloat(style.marginBottom));
+    if (child instanceof HTMLElement && child.dataset.spread !== undefined) free += parseFloat(style.marginTop) + parseFloat(style.marginBottom);
   }
-  return bottom - top + parseFloat(getComputedStyle(page).paddingTop);
+  return bottom - top - free + parseFloat(getComputedStyle(page).paddingTop);
 }
 
 /**
@@ -79,7 +85,7 @@ export function useFitGrid(count: number) {
     if (!list || !page) return;
     const measure = () => {
       // An open settings panel grows the page below the cards; they keep their size.
-      if (page.querySelector("details[open]")) return;
+      if (page.querySelector(".panel-button[aria-expanded='true']")) return;
       const phone = Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
       const next = bestFit(count, list.clientWidth, window.innerHeight - (contentHeight(page) - list.offsetHeight) - (phone ? BOTTOM_PHONE : BOTTOM), phone);
       setFit((prev) => (prev?.columns === next?.columns && prev?.row === next?.row ? prev : next));

@@ -152,7 +152,9 @@ In a fresh worktree run `bun install` first.
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
   no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). Buttons for grown-ups sit in the top
-  left corner, never over the sun in the top right one. What only grown-ups need below the cards (version,
+  left corner, never over the sun in the top right one. When a menu fits on one screen, the free room goes around its cards
+  (or „Los geht’s!“, `data-spread`), so the back link stays on top and the buttons under the cards (ℹ️, ⚙️) sit on the bottom
+  edge – never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
   install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
   while there is more to scroll to. Check menus at 844×390 and 390×844 as well as tablet and computer.
