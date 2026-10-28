@@ -32,7 +32,6 @@ import { COMFORTS_AR as comforts, FEELINGS_AR as feelings } from "@/games/feelin
 import { SITUATIONS_AR as situations } from "@/games/feelings/kita.ar";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.ar";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.ar";
-import inline from "inline-texts:ar";
 import type { LanguageTexts } from ".";
 
 // Everything in Arabic that lives in files of its own, one chunk loaded only when the app plays in Arabic
@@ -40,7 +39,6 @@ import type { LanguageTexts } from ".";
 
 /** The Arabic texts. */
 export const TEXTS: LanguageTexts = {
-  inline,
   pack,
   scenes: {
     badezimmer,

@@ -32,7 +32,6 @@ import { COMFORTS_RU as comforts, FEELINGS_RU as feelings } from "@/games/feelin
 import { SITUATIONS_RU as situations } from "@/games/feelings/kita.ru";
 import { TRANSLATION as cloudTrip } from "@/games/adventure/stories/cloudTrip/lines.ru";
 import { TRANSLATION as treasureIsland } from "@/games/adventure/stories/treasureIsland/lines.ru";
-import inline from "inline-texts:ru";
 import type { LanguageTexts } from ".";
 
 // Everything in Russian that lives in files of its own, one chunk loaded only when the app plays in Russian
@@ -40,7 +39,6 @@ import type { LanguageTexts } from ".";
 
 /** The Russian texts. */
 export const TEXTS: LanguageTexts = {
-  inline,
   pack,
   scenes: {
     badezimmer,

@@ -1,6 +1,5 @@
 import { dirname, join } from "node:path";
 import type { BunPlugin } from "bun";
-import { inlineTextTables, moveInlineTexts, movesInlineTexts } from "./inlineTexts";
 
 // The one Bun plugin of the app, used by the build (tools/build.ts), the dev server (tools/dev.ts) and
 // the tests (src/testPreload.ts). It does what a bundler must do for us:
@@ -14,9 +13,6 @@ import { inlineTextTables, moveInlineTexts, movesInlineTexts } from "./inlineTex
 //   game is opened. Bun itself would put every imported stylesheet into the start page's CSS – which the
 //   dev server keeps, since it reloads only stylesheets it bundles itself. src/globals.css (and what it
 //   @imports) stays the one stylesheet every page loads.
-// - Texts written inline in several languages, t({ de: "Musik", ru: "Музыка" }), move into the chunk of
-//   their language (tools/inlineTexts.ts), which `import inline from "inline-texts:ru"` gives
-//   src/content/texts/texts-ru.ts – in the build and the dev server; the tests see the sources as written.
 
 /** What src/lib/buildInfo.ts says about the running build; see the fields there. */
 export interface BuildInfo {
@@ -63,19 +59,6 @@ export function appPlugin(info?: BuildInfo, styles?: ReadonlyMap<string, string>
             .join("\n"),
           loader: "ts",
         }));
-      // Each language's inline texts, read from all sources once per build (or dev server start).
-      let tables: Promise<Record<string, Record<string, string>>> | undefined;
-      build.onResolve({ filter: /^inline-texts:/ }, ({ path }) => ({ path: path.slice("inline-texts:".length), namespace: "inline-texts" }));
-      build.onLoad({ filter: /.*/, namespace: "inline-texts" }, async ({ path }) => {
-        tables ??= info ? inlineTextTables(SRC) : Promise.resolve({});
-        return { contents: `export default ${JSON.stringify((await tables)[path] ?? {})};`, loader: "js" };
-      });
-      if (info)
-        build.onLoad({ filter: /\/src\/.*\.tsx?$/ }, async ({ path }) => {
-          const code = await Bun.file(path).text();
-          const moved = movesInlineTexts(path) ? moveInlineTexts(code, join(SRC, "content/texts/index.ts")) : undefined;
-          return { contents: moved ?? code, loader: path.endsWith("x") ? "tsx" : "ts" };
-        });
       if (!styles) return;
       build.onResolve({ filter: /\.css$/ }, ({ path, importer }) => {
         if (!/\.[jt]sx?$/.test(importer) || path.endsWith("/globals.css")) return undefined;

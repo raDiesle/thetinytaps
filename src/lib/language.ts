@@ -1,5 +1,6 @@
+import { useSyncExternalStore } from "react";
 import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
-import { loadAppTexts, loadTexts } from "@/content/texts";
+import { hasTexts, loadTexts } from "@/content/texts";
 import { playLanguage } from "@/lib/locale";
 import { keepTextsOffline } from "@/lib/pwa";
 
@@ -8,9 +9,6 @@ import { keepTextsOffline } from "@/lib/pwa";
 // in every game, the letters and words games and Tapsi included: one language,
 // never mixed. A text gives the German and the translations next to each other,
 // t({ de: "Musik", ru: "Музыка" }); a language a text lacks falls back to German.
-//
-// @language-tables: the names of the languages below are needed in every language at once, so the build
-// leaves this file's objects by language whole (tools/inlineTexts.ts).
 
 /** The same thing in several languages; German is always there and is used for the others missing. */
 export type Localized<T = string> = { de: T } & Partial<Record<TargetLanguageId, T>>;
@@ -22,6 +20,7 @@ export const APP_LANGUAGES: TargetLanguageId[] = ["de", "en", "zh", "hi", "es", 
 export const pick = <T>(texts: Localized<T>, language: TargetLanguageId): T => texts[language] ?? texts.de;
 
 const KEY = "tinytaps.applanguage.v1";
+const listeners = new Set<() => void>();
 
 /** The saved app language; until a grown-up picks one, the browser's language if the app speaks it (playLanguage). */
 function load(): TargetLanguageId {
@@ -43,48 +42,51 @@ function apply(id: TargetLanguageId) {
 apply(current);
 
 /**
- * Loads the texts of the app language (src/content/texts) before the app's code runs (src/index.tsx), so nothing
- * starts in German and turns into another language. Where they can't be loaded (offline before the service worker
- * kept them), this visit plays in German, never half in one language and half in another.
+ * Loads the texts of the app language (src/content/texts) before the first screen shows (index.tsx), so
+ * nothing starts in German and turns into another language. Where they can't be loaded (offline before the
+ * service worker kept them), this visit plays in German, never half in one language and half in another.
  */
 export async function loadAppLanguage() {
   try {
-    await loadAppTexts(current);
+    await loadTexts(current);
     keepTextsOffline(current);
   } catch {
     current = "de";
     apply(current);
-    await loadAppTexts(current);
   }
 }
 
 /**
- * Switches the whole app to `id` and remembers it. The texts written inline get the app language as the modules
- * run (src/content/texts), so the page starts afresh in the new one – once its texts are there; offline without
- * them, nothing changes.
+ * Switches the whole app to `id` and remembers it; every component using the language renders again. A language
+ * not loaded yet switches once its texts are there; offline without them, the app stays in the language it has.
  */
 export function setAppLanguage(id: TargetLanguageId) {
-  if (id === current) return;
-  loadTexts(id).then(
-    () => {
-      try {
-        localStorage.setItem(KEY, id);
-      } catch {
-        // Storage full or disabled: a fresh start would come back in the same language.
-        return;
-      }
-      location.reload();
-    },
-    () => {},
-  );
+  const switchTo = () => {
+    current = id;
+    apply(id);
+    try {
+      localStorage.setItem(KEY, id);
+    } catch {
+      // Storage full or disabled: the language still applies for this visit.
+    }
+    keepTextsOffline(id);
+    for (const listener of listeners) listener();
+  };
+  if (hasTexts(id)) switchTo();
+  else loadTexts(id).then(switchTo, () => {});
 }
 
 /** The app language outside React, e.g. in a sound helper; components use useAppLanguage. */
 export const appLanguage = () => current;
 
-/** The app language (id, speech language, label); it stays the same while the page runs (setAppLanguage starts afresh). */
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+/** The app language (id, speech language, label); shared by all components, so switching it updates every screen at once. */
 export function useAppLanguage(): TargetLanguage {
-  return targetLanguageFor(current);
+  return targetLanguageFor(useSyncExternalStore(subscribe, appLanguage));
 }
 
 /** A line to speak and the voice for it. */

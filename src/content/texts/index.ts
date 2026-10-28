@@ -1,5 +1,4 @@
 import type { LanguageId } from "@/content/languages";
-import { DEV } from "@/lib/buildInfo";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { LanguagePack } from "@/content/types";
 import type { StoryTranslation } from "@/games/adventure/stories/story";
@@ -20,11 +19,6 @@ import type { StepId, StepTexts } from "@/games/teeth/steps";
 // written into the code itself and always there. The service worker keeps only the languages a page has
 // loaded (tools/build.ts leaves texts-*.js out of the files it keeps for every visitor).
 //
-// Texts written inline, t({ de: "Musik", ru: "Музыка" }), come along too: the build moves them into the language
-// chunks (tools/inlineTexts.ts), and the object a module makes as it runs gets the app language's text from there
-// (inlineText). So the app's code runs only once the app language is loaded (src/index.tsx), and switching the
-// language starts the page afresh (setAppLanguage).
-//
 // The games keep their tables by language (`PHRASEBOOKS`, `SHADOW_TRANSLATIONS`, …); `byLanguage` makes such
 // a table and fills it as languages load, so a game reads it as before.
 
@@ -33,8 +27,6 @@ export type TextsLanguageId = Exclude<TargetLanguageId | LanguageId, "de">;
 
 /** All texts of one language that live in files of their own; a part the language has no translation of yet is left out. */
 export interface LanguageTexts {
-  /** The texts written inline in the code, `t({ de: "Musik", ru: "Музыка" })`, by key (tools/inlineTexts.ts). */
-  inline?: Record<string, string>;
   /** The pack of the letters and words games (`src/content/<id>.ts`). */
   pack?: LanguagePack;
   /** Lebendige Bilder: each picture's translation by scene id (`scenes/<scene>/<id>.ts`). */
@@ -80,6 +72,9 @@ const loaded = new Map<TextsLanguageId, LanguageTexts>();
 const loading = new Map<TextsLanguageId, Promise<void>>();
 const fillers = new Set<(id: TextsLanguageId, texts: LanguageTexts) => void>();
 
+/** Whether the texts of `id` are there (German always is). */
+export const hasTexts = (id: TargetLanguageId | LanguageId) => id === "de" || loaded.has(id);
+
 /** Downloads the texts of `id` once and fills every table made with `byLanguage`; fails when offline and not kept. */
 export function loadTexts(id: TargetLanguageId | LanguageId): Promise<void> {
   if (id === "de" || loaded.has(id)) return Promise.resolve();
@@ -119,26 +114,4 @@ export function byLanguage<T>(select: (texts: LanguageTexts) => T | undefined, g
     if (value !== undefined) table[id] = value;
   });
   return table;
-}
-
-/** The language whose inline texts `inlineText` gives; undefined until the app language is loaded. */
-let inlineLanguage: TargetLanguageId | undefined;
-
-/** Loads the app language (`id`); from then on the inline texts the app's modules make are in it. */
-export async function loadAppTexts(id: TargetLanguageId) {
-  await loadTexts(id);
-  inlineLanguage = id;
-}
-
-/**
- * The build turns an inline text into `{ de: "Musik", ...inlineText("3f9c0a1b") }` (tools/inlineTexts.ts): this is
- * its text in the app language, or nothing (German) where there is none.
- */
-export function inlineText(key: string): Partial<Record<TargetLanguageId, string>> | undefined {
-  if (inlineLanguage === undefined) {
-    if (DEV) throw new Error(`Inline text ${key} made before the app language was loaded: import the module from src/main.tsx, not src/index.tsx.`);
-    return undefined;
-  }
-  const text = inlineLanguage === "de" ? undefined : loaded.get(inlineLanguage)?.inline?.[key];
-  return text === undefined ? undefined : { [inlineLanguage]: text };
 }

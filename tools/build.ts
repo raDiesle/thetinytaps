@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { join } from "node:path";
 import { fullTitle, NO_INDEX_PATHS, type PageSeo, SEO_PAGES, SITE_NAME, SITE_PROMISE } from "../src/content/seo";
 import { appPlugin } from "./appPlugin";
 
@@ -191,12 +191,7 @@ const started = performance.now();
 await rm(OUT, { recursive: true, force: true });
 const result = await bundle();
 await cp(join(ROOT, "public"), OUT, { recursive: true });
-// The app's code (src/main.tsx) runs only once the app language's texts are loaded (src/index.tsx); the browser
-// fetches it meanwhile instead of after them.
-const main = result.outputs.find((output) => /\/static\/main\.[^/]*\.js$/.test(output.path));
-if (!main) throw new Error("build: no main chunk (src/main.tsx)");
-const preload = `<link rel="modulepreload" crossorigin href="${href(`/${relative(OUT, main.path)}`)}" />`;
-const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${APP_LINKS.join("")}${preload}</head>`);
+const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${APP_LINKS.join("")}</head>`);
 await writeFile(join(OUT, "index.html"), template);
 await writePages(template);
 await writeServiceWorker();
