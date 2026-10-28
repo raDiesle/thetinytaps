@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
+import { PicturePromptReview } from "@/components/PicturePromptReview";
 import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
@@ -66,6 +67,7 @@ const CONTENTS: { id: string; label: string }[] = [
   { id: "uebersicht", label: "📊 Überblick" },
   { id: "sprachen", label: "🌍 Sprachen" },
   { id: "recherchen", label: "🔍 Recherchen" },
+  { id: "bilder", label: "🎨 Bildvorschläge" },
   { id: "ideas-list", label: "💡 Alle Ideen" },
 ];
 
@@ -152,8 +154,8 @@ export function ManagementPage() {
         <span aria-hidden>🧭</span> Management
       </h1>
       <p className="home-subtitle">
-        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen. {active - done} offene Ideen, {done} schon umgesetzt, {rejected} abgelehnt. Die Nummern
-        (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
+        Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, Bildvorschläge. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
+        abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
       </p>
       <Progress done={done} total={active} />
       <nav className="ideas-contents" aria-label="Inhalt">
@@ -188,6 +190,8 @@ export function ManagementPage() {
           <ResearchPanel key={research.id} research={research} open={i === 0} onShow={showIdea} />
         ))}
       </section>
+
+      <PicturePromptReview />
 
       {picks.length > 0 && (
         <section className="ideas-panel">

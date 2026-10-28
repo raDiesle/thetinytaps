@@ -120,6 +120,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
+    href: "/belohnungstafel/",
+    languages: { de: "done" },
+    note: "Neu im Oktober 2026, nur auf Deutsch: Tafel, Gestalten, Drucken und der Katalog (catalog.ts). Für eine Sprache: die Labels im Katalog und die t()-Texte; Wochentage und Überschriften (possessive) brauchen je Sprache eine eigene Form.",
+  },
+  {
     href: "/laut-leise/",
     languages: { de: "done", ru: "partial" },
     note: "Russisch fehlt der Absatz zu Löwe und Maus unter „Über das Spiel“ (mit „Weiter“ zum Pusten, Oktober 2026).",

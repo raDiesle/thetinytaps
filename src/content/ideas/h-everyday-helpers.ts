@@ -15,7 +15,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Eltern wählen ein bis drei Gewohnheiten als Bilder: Zähne putzen, Töpfchen, Anziehen, Hände waschen, im eigenen Bett schlafen. Nach Zähne putzen kommt der Stern von selbst, sonst hält ein Großer das Bild gedrückt. Das Kind tippt den Stern an, er fliegt mit einem Klang auf die Tafel. Nach fünf Sternen feiert Tapsi eine kleine Party.",
       why: "Eltern suchen „belohnungstafel kinder“, „belohnungssystem kinder 3 jahre“ und „belohnungstafel app“. Für 2-Jährige zählt das Sofort: der Stern direkt danach, nicht ein Geschenk in zehn Tagen.",
       effort: "M",
-      partial: "Zähne putzen hat eine Wochentafel mit Sonne und Mond für jeden Tag.",
+      done: true,
+      partial:
+        "Gebaut als eigene Belohnungstafel (/belohnungstafel/, Bereich T): Wochen-, Tages- und Sammeltafel, Sterne von Zähne putzen und Töpfchen von selbst.",
     },
     {
       id: "H-02",
@@ -24,6 +26,8 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Eine Druckseite für Eltern, gemacht aus unseren Zeichnungen: Sternentafel (H-01), Abend-Bildkarten (H-03), Wochenplan-Symbole, Ausmalbilder der Lebendigen Bilder, Brief der Schnullerfee (H-11). Druckt als A4 direkt aus dem Browser, ohne PDF-Dateien, auch offline.",
       why: "„zum ausdrucken pdf kostenlos“ hängt an fast jeder Suche: Belohnungstafel, Abendroutine, Wochenplan, Schnullerfee-Brief. So finden Eltern die Seite über Google und dann die Spiele.",
       effort: "M",
+      partial:
+        "Die Belohnungstafel druckt A4 direkt aus dem Browser (farbig, grau, zum Ausmalen, mit Ausschneidebogen); dieselbe Druckweise passt für die anderen Seiten.",
     },
     {
       id: "H-03",

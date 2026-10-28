@@ -20,6 +20,7 @@ const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage");
+const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
 const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
 const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
@@ -40,6 +41,7 @@ export function App() {
         <Route path="bilder/:scene" element={<ScenePage />} />
         <Route path="zaehne" element={<TeethPage />} />
         <Route path="toepfchen" element={<PottyPage />} />
+        <Route path="belohnungstafel" element={<RewardsPage />} />
         <Route path="gefuehle" element={<FeelingsPage />} />
         {/* Zu Hause and Kindergarten had pages of their own; all stories are on one start screen now. */}
         <Route path="gefuehle/:place" element={<Navigate to="/gefuehle/" replace />} />

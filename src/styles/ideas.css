@@ -611,3 +611,78 @@ button.idea-id {
 .ideas-research-table td .idea-id {
   margin: 0 4px 4px 0;
 }
+
+/* Picture prompts to check before they are generated (PicturePromptReview). */
+.ideas-prompt-group h3 {
+  margin-bottom: 4px;
+}
+
+.ideas-prompts {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ideas-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 2px solid #2a1e5c33;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.ideas-prompt.ok {
+  border-color: var(--mint);
+  background: #effcf5;
+}
+
+.ideas-prompt.edited {
+  border-color: var(--sunshine);
+}
+
+.ideas-prompt textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 10px;
+  border: 2px solid #2a1e5c55;
+  border-radius: 10px;
+  font:
+    0.9rem / 1.4 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  resize: vertical;
+}
+
+.ideas-prompt-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ideas-prompt-foot code {
+  flex: 1;
+  min-width: 14em;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.ideas-prompt-foot button {
+  min-height: 36px;
+  padding: 2px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ideas-prompt-foot button.selected {
+  background: var(--mint);
+}

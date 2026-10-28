@@ -56,8 +56,9 @@ export const SEO_PAGES: PageSeo[] = [
   {
     path: "/spiele/weitere/",
     title: "Zähneputzen und Laut-leise-Spiel für Kleinkinder",
-    description: "Zähneputzen mit Lied und Timer und ein Spiel für laute und leise Stimme – für Kinder ab 2 Jahren, kostenlos, ohne Werbung und offline.",
-    text: "Zähne putzen mit Zahnputzlied, Zuckermonstern und Sternentafel, und Laut und leise: Brüllen lässt den Löwen springen, Flüstern die Maus piepsen.",
+    description:
+      "Zähneputzen mit Lied und Timer, Töpfchen, eine Belohnungstafel zum Ausdrucken und ein Spiel für laute und leise Stimme – für Kinder ab 2 Jahren.",
+    text: "Zähne putzen mit Zahnputzlied, Zuckermonstern und Sternentafel, Aufs Töpfchen mit Tapsi, eine Belohnungstafel zum Gestalten und Ausdrucken, und Laut und leise: Brüllen lässt den Löwen springen, Flüstern die Maus piepsen.",
   },
   {
     path: "/bilder/",
@@ -131,6 +132,13 @@ export const SEO_PAGES: PageSeo[] = [
     description:
       "Tapsi muss Pipi oder Kaka: Mama und Papa rufen, Hose runter, sitzen, abziehen, Hände waschen – ein Tippen pro Schritt. Ein Stern, wenn es wirklich klappt.",
     text: "Ein Töpfchen-Spiel für Kleinkinder in bewegten Bildern: Tapsi der Fuchs isst und trinkt, merkt, dass er muss, ruft Mama und Papa und geht Schritt für Schritt aufs Töpfchen. Beim Sitzen machen Mama und Papa Quatsch, gießen Blumen oder drücken Zahnpasta – bis ein grüner Haken „fertig“ sagt: der Erwachsene tippt, ob Pipi, Kaka oder beides kam. Am Ende feiert eine Wochentafel echte Erfolge mit einem Stern.",
+  },
+  {
+    path: "/belohnungstafel/",
+    title: "Belohnungstafel für Kinder – gestalten und drucken",
+    description:
+      "Belohnungstafel für Kleinkinder selbst gestalten: Woche, Tag oder Sterne sammeln, mit Bildern, Name und Belohnung. Am Tablet nutzen oder A4 ausdrucken.",
+    text: "Eine Belohnungstafel für Kinder ab 2, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Keine Strafen, nichts wird weggenommen.",
   },
   {
     path: "/laut-leise/",

@@ -1,0 +1,736 @@
+/* ---------- Belohnungstafel (rw-) ---------- */
+
+/* The page: the grown-ups' rows on top, the board filling all the room below. */
+.rw-page-screen {
+  justify-content: flex-start;
+  gap: 12px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+
+.rw-boards,
+.rw-chips,
+.rw-templates {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rw-chips {
+  justify-content: flex-start;
+}
+
+.rw-boards button,
+.rw-chips button,
+.rw-template,
+.rw-task-buttons button {
+  min-height: 40px;
+  padding: 4px 14px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rw-boards button.selected,
+.rw-chips button.selected {
+  background: var(--sunshine);
+}
+
+.rw-chips button:disabled,
+.rw-task-buttons button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rw-template {
+  min-height: 52px;
+  font-size: 1.05rem;
+}
+
+.rw-panel-title {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+/* ---------- The board on screen ---------- */
+
+/* Fills the room the page leaves below the rows (the page is at least the screen's height). */
+.rw-screen {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 280px;
+}
+
+.rw-screen-box {
+  flex: 1;
+  display: flex;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ---------- The sheet: the same picture on screen and on paper ---------- */
+
+/*
+ * Every size is relative to the sheet (cq units), so it fills a phone, a tablet or A4 alike;
+ * a field sizes its ring by its own cell.
+ */
+.rw-sheet {
+  container-type: size;
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2cqmin;
+  width: 100%;
+  height: 100%;
+  padding: 2.5cqmin 3cqmin;
+  border: 0.7cqmin solid var(--rw-ink, #222);
+  border-radius: 4cqmin;
+  background: var(--rw-paper, #fff);
+  color: var(--rw-ink, #222);
+}
+
+.rw-grey {
+  --rw-paper: #fff;
+  --rw-main: #a0a0a0;
+  --rw-ink: #222;
+}
+
+.rw-grey :is(.rw-title-mark, .rw-task-emoji, .rw-reward-emoji, .rw-mark, .rw-path-start),
+.rw-grey.rw-sticker-page .rw-sticker {
+  filter: grayscale(1) contrast(1.15);
+}
+
+.rw-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1cqmin 4cqmin;
+}
+
+.rw-title {
+  font-size: 6.4cqmin;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.rw-blank {
+  font-size: 3.2cqmin;
+  font-weight: 600;
+}
+
+.rw-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.rw-task {
+  display: flex;
+  align-items: center;
+  gap: 1.5cqmin;
+  min-width: 0;
+  min-height: 0;
+  padding: 0.6cqmin 1.8cqmin;
+  overflow: hidden;
+  border: 0.5cqmin solid var(--rw-main);
+  border-radius: 3cqmin;
+  background: #fff;
+}
+
+.rw-task-emoji {
+  font-family: var(--font-emoji);
+  font-size: 9cqmin;
+  line-height: 1;
+}
+
+.rw-task-label {
+  font-size: 4cqmin;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.rw-cell {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 3cqmin;
+}
+
+/* Week: tasks in rows, days in columns. */
+.rw-grid {
+  display: grid;
+  flex: 1;
+  align-content: center;
+  gap: 1cqmin;
+}
+
+.rw-row {
+  display: contents;
+}
+
+.rw-day {
+  padding: 0.4cqmin;
+  border-radius: 2cqmin;
+  font-size: 3.8cqmin;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rw-day.today,
+.rw-cell.today {
+  background: color-mix(in srgb, var(--rw-main) 40%, transparent);
+}
+
+/* Day: big cards side by side. */
+.rw-cards {
+  display: grid;
+  flex: 1;
+  grid-auto-rows: minmax(0, 1fr);
+  gap: 2cqmin;
+}
+
+.rw-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1cqmin;
+  min-height: 0;
+  padding: 1.5cqmin;
+  border: 0.6cqmin solid var(--rw-main);
+  border-radius: 4cqmin;
+  background: #fff;
+}
+
+.rw-card .rw-task {
+  flex-direction: column;
+  padding: 0;
+  border: none;
+  text-align: center;
+}
+
+.rw-card .rw-task-emoji {
+  font-size: 13cqmin;
+}
+
+.rw-card .rw-task-label {
+  font-size: 4cqmin;
+}
+
+.rw-card .rw-cell {
+  flex: 1;
+}
+
+/* Collect: fields along a dotted path to the reward. */
+.rw-path {
+  position: relative;
+  display: grid;
+  flex: 1;
+}
+
+.rw-path-line {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.rw-path-line polyline {
+  fill: none;
+  stroke: var(--rw-main);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 14;
+}
+
+.rw-path .rw-cell {
+  position: relative;
+}
+
+.rw-path-start {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  font-family: var(--font-emoji);
+  font-size: 22cqmin;
+  line-height: 1;
+}
+
+.rw-path-end {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqmin;
+}
+
+.rw-path-end .rw-reward-emoji {
+  font-size: 52cqmin;
+}
+
+.rw-path-end .rw-reward-label {
+  padding: 0 4cqmin;
+  border-radius: 999px;
+  background: #fff;
+  font-size: 11cqmin;
+  font-weight: 800;
+  text-align: center;
+}
+
+/* A field: a dashed ring that gets its mark. */
+.rw-field {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.rw-ring {
+  position: relative;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 84cqmin;
+  height: 84cqmin;
+  border: max(1.5px, 4cqmin) dashed var(--rw-main);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.rw-field.filled .rw-ring {
+  border-style: solid;
+  background: color-mix(in srgb, var(--rw-main) 30%, #fff);
+}
+
+.rw-field.future .rw-ring {
+  opacity: 0.4;
+}
+
+.rw-field.next .rw-ring {
+  border-color: var(--rw-ink);
+}
+
+.rw-mark {
+  font-family: var(--font-emoji);
+  font-size: 56cqmin;
+  line-height: 1;
+}
+
+.rw-mark.pale {
+  opacity: 0.25;
+  filter: grayscale(1);
+}
+
+.rw-outline {
+  width: 68%;
+  height: 68%;
+}
+
+.rw-outline path {
+  fill: none;
+  stroke: #8a8a8a;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* While a grown-up holds a field, its ring fills (HOLD_MS in BoardScreen). */
+.rw-hold {
+  position: absolute;
+  inset: -8%;
+  width: 116%;
+  height: 116%;
+  rotate: -90deg;
+}
+
+.rw-hold circle {
+  fill: none;
+  stroke: var(--rw-ink);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: rw-hold 0.7s linear forwards;
+}
+
+@keyframes rw-hold {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.rw-field.fresh .rw-mark {
+  animation: rw-land 0.5s ease-out;
+}
+
+@keyframes rw-land {
+  from {
+    scale: 2.2;
+  }
+  60% {
+    scale: 0.85;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+.rw-field.wiggle .rw-ring {
+  animation: wiggle 0.45s ease-in-out;
+}
+
+.rw-field.twinkle .rw-mark {
+  animation: rw-twinkle 0.6s ease-in-out;
+}
+
+@keyframes rw-twinkle {
+  40% {
+    rotate: 18deg;
+    scale: 1.25;
+  }
+  70% {
+    rotate: -10deg;
+  }
+}
+
+/* The goal: the reward and a dot for every star it needs. */
+.rw-goal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5cqmin 3cqmin;
+}
+
+.rw-reward {
+  display: flex;
+  align-items: center;
+  gap: 1.5cqmin;
+  padding: 0.3cqmin 3cqmin;
+  border: 0.6cqmin solid var(--rw-main);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.rw-reward-emoji {
+  font-family: var(--font-emoji);
+  line-height: 1;
+}
+
+.rw-goal .rw-reward-emoji {
+  font-size: 8.5cqmin;
+}
+
+.rw-goal .rw-reward-label {
+  font-size: 4.4cqmin;
+  font-weight: 800;
+}
+
+.rw-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8cqmin;
+}
+
+.rw-dot {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 6.4cqmin;
+  height: 6.4cqmin;
+  border: 0.5cqmin dashed var(--rw-main);
+  border-radius: 50%;
+  background: #fff;
+  font-family: var(--font-emoji);
+  font-size: 4cqmin;
+}
+
+.rw-dot.filled {
+  border-style: solid;
+}
+
+.rw-bar {
+  width: 40cqw;
+  height: 3.5cqmin;
+  overflow: hidden;
+  border: 0.45cqmin solid var(--rw-ink);
+  border-radius: 999px;
+  background: #fff;
+}
+
+.rw-bar > span {
+  display: block;
+  height: 100%;
+  background: var(--rw-main);
+}
+
+/* ---------- A star on its way, „Stern zurück“ and the party ---------- */
+
+.rw-pending {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: #2a1e5c40;
+}
+
+.rw-big-star {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-emoji);
+  font-size: min(42vmin, 280px);
+  line-height: 1;
+  cursor: pointer;
+  animation: rw-call 1.1s ease-in-out infinite;
+}
+
+@keyframes rw-call {
+  50% {
+    scale: 1.12;
+    rotate: 8deg;
+  }
+}
+
+.rw-big-star.fly {
+  animation: rw-fly 0.65s ease-in forwards;
+}
+
+@keyframes rw-fly {
+  to {
+    translate: var(--dx) var(--dy);
+    scale: var(--to);
+  }
+}
+
+.rw-pending-cancel,
+.rw-undo {
+  min-height: 44px;
+  padding: 4px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}
+
+.rw-pending-cancel {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+}
+
+.rw-undo {
+  position: fixed;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  left: max(16px, env(safe-area-inset-left));
+  z-index: 40;
+}
+
+.rw-party {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: none;
+  background: #fff8e1f0;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.rw-party-emoji {
+  font-family: var(--font-emoji);
+  font-size: min(45vmin, 300px);
+  line-height: 1;
+  animation: pop-in 0.6s ease-out;
+}
+
+.rw-party-text {
+  font-size: clamp(1.6rem, 7vmin, 3.2rem);
+  font-weight: 800;
+}
+
+/* ---------- Gestalten ---------- */
+
+.rw-input {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.rw-input input,
+.rw-task-edit input {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 3px solid var(--ink);
+  border-radius: 14px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.rw-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rw-task-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.rw-emoji-input {
+  width: 3.4em;
+  font-family: var(--font-emoji);
+  font-size: 1.3rem;
+  text-align: center;
+}
+
+.rw-label-input {
+  flex: 1;
+  min-width: 10em;
+}
+
+.rw-task-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.rw-task-buttons button {
+  min-width: 44px;
+  padding: 4px 10px;
+}
+
+.rw-linked {
+  flex-basis: 100%;
+}
+
+/* ---------- Drucken ---------- */
+
+.rw-print-panel {
+  max-width: 1100px;
+}
+
+.rw-print-button {
+  min-height: 56px;
+  padding: 8px 26px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: inherit;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  box-shadow: 0 5px 0 var(--ink);
+  cursor: pointer;
+}
+
+.rw-preview {
+  width: 100%;
+  overflow: hidden;
+}
+
+.rw-preview-pages {
+  display: flex;
+  flex-direction: column;
+  gap: 10mm;
+}
+
+.rw-preview .rw-page {
+  box-shadow: 0 1mm 5mm #2a1e5c40;
+}
+
+/* One A4 page; its size comes from PrintPanel. */
+.rw-page {
+  box-sizing: border-box;
+  display: flex;
+  padding: 10mm;
+  overflow: hidden;
+  background: #fff;
+  color: #222;
+}
+
+.rw-sticker-page {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34mm, 1fr));
+  align-content: start;
+  gap: 5mm;
+}
+
+.rw-sticker {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 0.4mm dashed #888;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rw-main, #ddd) 30%, #fff);
+  font-family: var(--font-emoji);
+  font-size: 19mm;
+  line-height: 1;
+}
+
+/* Only while printing: the pages, and nothing else of the app. */
+.rw-print-root {
+  display: none;
+}
+
+@media print {
+  body > :not(.rw-print-root) {
+    display: none !important;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: #fff !important;
+  }
+
+  .rw-print-root {
+    display: block;
+  }
+
+  .rw-print-root .rw-page {
+    break-after: page;
+  }
+
+  .rw-print-root .rw-page:last-child {
+    break-after: auto;
+  }
+
+  .rw-print-root * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
