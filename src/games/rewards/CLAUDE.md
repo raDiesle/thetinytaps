@@ -12,33 +12,63 @@ targets) – keep it that way.
 
 ## Files
 
-- `catalog.ts` – what grown-ups pick from: tasks (with `linked` for Zähne putzen and Töpfchen), rewards (time
-  together first, the ice cream last), marks for a field (with an outline to colour in for some), colours, the four
-  views (`KINDS`: Tag, Woche, Monat, Sammeln) and the templates. All emoji for now.
-- `board.ts` – a board and the star log, pure functions: days of a week or month board, field keys (`YYYY-MM-DD|task`, or
-  `count` on a collecting board), progress, add, take back, start over, `withKind` (the same board in another view: stars stay, the goal fits), `possessive` for the title („Lenas Sterne“).
-- `linked.ts` – the days Zähne putzen (`loadWeek`) and Aufs Töpfchen (`loadStars`) were done; such a field is filled
-  without a star in the log. Only on day, week and month boards: those games keep two weeks, a collecting board would lose stars.
+- `catalog.ts` – what grown-ups pick from: tasks (with `linked` for Zähne putzen and Töpfchen, and `slots` for the
+  times of day they come with – Zähne putzen: morning and evening), the times of day (`SLOTS`: ☀️ morgens, 🌤️ mittags,
+  🌙 abends), rewards (time together first, the ice cream last), marks for a field (with an outline to colour in for
+  some), colours, the four views (`KINDS`: Tag, Woche, Monat, Sammeln, each with a line for grown-ups) and the
+  templates (each with a `hint`, and `slots` where a task has fewer times than in the catalogue). All emoji for now.
+- `board.ts` – a board and the star log, pure functions: days of a week or month board, field keys (`YYYY-MM-DD|task`,
+  with a time of day `YYYY-MM-DD|task|evening`, or `count` on a collecting board; `cellKey`/`parseCellKey`), the fields
+  of a task (`taskSlots`), progress, add, take back, start over, `withKind` (the same board in another view: stars
+  stay, the goal fits), `exampleStars`, `shiftPeriod`/`samePeriod` for looking back, `possessive` for the title („Lenas Sterne“).
+- `linked.ts` – what Zähne putzen (`loadWeek`, with morning or evening) and Aufs Töpfchen (`loadStars`, a count) did
+  on which day; such a field is filled without a star in the log – brushing fills the field of its time of day, the
+  potty fills a task's fields in the order of the day. Only on day, week and month boards: those games keep two weeks,
+  a collecting board would lose stars.
 - `settings.ts` – boards, the current one and the print options (`tinytaps.rewards.v1`); stars live apart
   (`tinytaps.rewards.stars.v1`), so changing a board never loses them. The first board has the fixed id `erste`, so
   its stars stay before anything was saved.
 - `BoardSheet.tsx` – the sheet itself, used for screen and print alike: week grid, month calendar, day cards or a snaking path
   (`snakeLayout`) to the reward, and the goal below. Sized in container units (`cq*`), so it fits any box.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
-- `Editor.tsx` – „✏️ Gestalten“; `PrintPanel.tsx` – „🖨️ Drucken“ with the preview and the print pages;
-  `RewardsGame.tsx` – the page (below).
+- `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
+  with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars;
+  `Wizard.tsx` – „＋ Neue Tafel“ step by step; `RewardsGame.tsx` – the page (below).
 - `bilder/prompts.ts` – every picture the chart may want, as Gemini prompts. No picture is made yet: the user reviews
   them on `/management/` (🎨 Bildvorschläge, `src/components/PicturePromptReview.tsx`) first. Only generate after
   that, with the reviewed text, and then swap the emoji for the pictures.
 
 ## The page
 
-From the first visit, above the board: a row of the four views (switching keeps the board and its stars – day, week
-and month keep stars per day, so all three show the same ones) and a row of chips with every ready-made board, the
-grown-up's own boards and „＋ Eigene Tafel“. A chip makes its board from the template the first time and selects it
-after that (`Board.template`). On phones both rows share one line that scrolls sideways, so the board keeps the screen.
+From the first visit, above the board: the switch of views – Tag, Woche, Monat as one big switch (the same stars,
+kept per day, seen for a day, a week or a month), Sammeln smaller beside it (it counts stars, not days) – and ‹ › to
+go back to earlier days, weeks or months (about two months, as long as stars are kept) to add a forgotten star; the
+label turns yellow while it shows the past, and another board or view starts at today again. Below the switch the
+row of the grown-up's boards (a tab says the template's name until the board has a heading or a child's name),
+„＋ Neue Tafel“ and, where the gallery has no room, „🧩 Vorlagen“. On phones both rows share one line that scrolls
+sideways, so the board keeps the screen.
+
+Beside the board (≥ 1000 × 600 px) the gallery of Vorlagen: every template as a small picture of the board with its
+example stars, its name, view and one line. A template whose board was made before selects that board (with its
+stars); otherwise it opens the wizard on it. The wizard (in place of the board): 1 Vorlage (or „Leer anfangen“),
+2 Ansicht, 3 Aufgaben with their times of day, 4 Belohnung and goal, 5 Name and colours, with the board as it will
+look beside each step; „✓ So nehmen“ makes the board from any step after the first, its footer stays in sight.
+
+A new board (from a template, the wizard or the default) shows example stars (`Board.examples`, `exampleStars`): the
+first two days of a week (Monday and Tuesday, the second short of one), the first four days of a month, all but the
+last card of a day, two on a path – pale, with a line under the board saying so and „Ausblenden“. They are never in
+the log and never printed; the first real star or „Ausblenden“ ends them. An example field is open: holding it gives
+the real star.
+
 On a computer (≥ 900 px, mouse) „✏️ Gestalten“ and „🖨️ Drucken“ lie open below the board, reached by scrolling (the
 buttons on top scroll there); on phones and tablets they open as panels in place of the board.
+
+## Times of day
+
+A task can have a field per time of day (`BoardTask.slots`: morning, noon, evening; none means once a day), chosen
+with `SlotChips` in the wizard and under Gestalten. Brushing teeth comes with morning and evening. The week grid
+gives such a task a row per time under one head, the month and day views put its fields side by side; every such
+field carries its sun or moon on its edge, filled or not, on screen and on paper. A day is full with every time.
 
 ## The star flow
 
@@ -66,8 +96,14 @@ use the same way.
 - What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout.
 - Defaults are the same on every load: no random id in anything `DEFAULT_REWARDS_SETTINGS` holds, since an unsaved
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
-- Ready-made boards and views stay visible from the first visit, never behind a menu: every view has at least one
-  template (`rewards.test.ts` checks), and switching a view never loses stars.
+- The views and the ready-made boards are clear from the first visit, never behind a menu: Tag, Woche and Monat are
+  the big switch above the board (parents do ask for months: „belohnungskalender“, „monthly reward chart“), every
+  view has at least one template (`rewards.test.ts` checks), the gallery lies beside the board where there is room
+  and „🧩 Vorlagen“ is in the first row where there is not, and switching a view never loses stars.
+- A board is never shown empty the first time: templates and new boards show example stars as if in use, but never a
+  full board (`rewards.test.ts` checks), pale and named as examples, never saved and never printed.
+- What is done more than once a day gets a field each time, marked with its time of day (Zähne putzen: morning and
+  evening); a linked game fills the field of the time it was played, never every field of the day.
 - Class names built from data get a prefix of their own (`rw-kind-${kind}`), never plain `rw-${id}`: `rw-day` and
   `rw-month` once styled a whole sheet with the rules of a weekday label and the calendar.
 - A new catalogue entry needs its picture prompt and line-art twin in `bilder/prompts.ts` (`rewards.test.ts` checks).

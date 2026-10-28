@@ -1,6 +1,27 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
-import { addStar, boardDays, boardFromTemplate, monthOf, NO_LINKED, type StarLog, possessive, progress, startOver, takeBackStar, withKind } from "./board";
+import {
+  addStar,
+  boardDays,
+  boardFromTemplate,
+  cellKey,
+  dayFull,
+  exampleStars,
+  fieldCount,
+  isFilled,
+  type LinkedDays,
+  monthOf,
+  NO_LINKED,
+  parseCellKey,
+  possessive,
+  progress,
+  samePeriod,
+  shiftPeriod,
+  type StarLog,
+  startOver,
+  takeBackStar,
+  withKind,
+} from "./board";
 import { snakeLayout } from "./BoardSheet";
 import { KINDS, MARKS, REWARDS, TASK_BY_ID, TASKS, TEMPLATES, THEMES, MARK_BY_ID, REWARD_BY_ID, THEME_BY_ID } from "./catalog";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
@@ -111,7 +132,7 @@ describe("stars", () => {
   });
 
   test("a week board counts its fields, and starting over clears only this week", () => {
-    const task = week.tasks[0].id;
+    const task = week.tasks[1].id;
     let log = addStar({}, "w", `2026-10-27|${task}`, wednesday);
     log = addStar(log, "w", `2026-10-28|${task}`, wednesday);
     expect(progress(week, log.w, NO_LINKED, wednesday).count).toBe(2);
@@ -134,7 +155,7 @@ describe("stars", () => {
   });
 
   test("day, week and month share their stars, and the goal changes to fit the view", () => {
-    const task = week.tasks[0].id;
+    const task = week.tasks[1].id;
     const log = addStar({}, "w", `2026-10-28|${task}`, wednesday);
     for (const kind of ["day", "week", "month"] as const) expect(progress(withKind(week, kind), log.w, NO_LINKED, wednesday).count, kind).toBe(1);
     expect(withKind(week, "month").goal).toBe(week.goal * 4);
@@ -162,4 +183,85 @@ test("possessive follows German spelling", () => {
   expect(possessive("Max")).toBe("Max’");
   expect(possessive("Hans")).toBe("Hans’");
   expect(possessive("Fritz")).toBe("Fritz’");
+});
+
+describe("times of day", () => {
+  const wednesday = new Date(2026, 9, 28);
+  const teethWeek = { ...boardFromTemplate(TEMPLATES[0]), id: "z" };
+  const teeth = teethWeek.tasks[0];
+
+  test("brushing teeth has a field in the morning and one in the evening, everywhere it is picked", () => {
+    expect(TASK_BY_ID.get("zaehne")?.slots).toEqual(["morning", "evening"]);
+    expect(teeth.slots).toEqual(["morning", "evening"]);
+    expect(fieldCount(teethWeek, wednesday)).toBe(14);
+    // A template may give a task fewer times: Mein Morgen brushes only in the morning.
+    const morning = boardFromTemplate(TEMPLATES.find((t) => t.id === "morgen") ?? TEMPLATES[0]);
+    expect(morning.tasks.find((t) => t.catalog === "zaehne")?.slots).toEqual(["morning"]);
+    for (const tpl of TEMPLATES) for (const id of Object.keys(tpl.slots ?? {})) expect(tpl.tasks, `${tpl.id}: ${id}`).toContain(id);
+  });
+
+  test("a field's key has its time of day, and reads back", () => {
+    const key = cellKey(wednesday, teeth.id, "evening");
+    expect(key).toBe(`2026-10-28|${teeth.id}|evening`);
+    expect(parseCellKey(key)).toEqual({ day: new Date("2026-10-28T12:00"), taskId: teeth.id, slot: "evening" });
+    expect(parseCellKey(`2026-10-28|${teeth.id}`).slot).toBeUndefined();
+  });
+
+  test("a day is full only with every time of day", () => {
+    const log = addStar({}, "z", cellKey(wednesday, teeth.id, "morning"), wednesday);
+    expect(dayFull(teethWeek, log.z, NO_LINKED, wednesday)).toBe(false);
+    const both = addStar(log, "z", cellKey(wednesday, teeth.id, "evening"), wednesday);
+    expect(dayFull(teethWeek, both.z, NO_LINKED, wednesday)).toBe(true);
+    expect(progress(teethWeek, both.z, NO_LINKED, wednesday).count).toBe(2);
+  });
+
+  test("Zähne putzen fills the field of its time of day, Aufs Töpfchen fills them in the order of the day", () => {
+    const linked: LinkedDays = { teeth: { "2026-10-28": { count: 1, slots: ["evening"] } }, potty: { "2026-10-28": { count: 2, slots: [] } } };
+    expect(isFilled(undefined, linked, wednesday, teeth, "morning")).toBe(false);
+    expect(isFilled(undefined, linked, wednesday, teeth, "evening")).toBe(true);
+    const potty = { id: "p", emoji: "🚽", linked: "potty" as const, slots: ["morning" as const, "noon" as const, "evening" as const] };
+    expect([
+      isFilled(undefined, linked, wednesday, potty, "morning"),
+      isFilled(undefined, linked, wednesday, potty, "noon"),
+      isFilled(undefined, linked, wednesday, potty, "evening"),
+    ]).toEqual([true, true, false]);
+    // A task without times of day is filled by any of it.
+    expect(isFilled(undefined, linked, wednesday, { ...teeth, slots: undefined })).toBe(true);
+  });
+});
+
+describe("example stars", () => {
+  const wednesday = new Date(2026, 9, 28);
+
+  // A new board looks like one in use, but never full: the user asked for Monday and Tuesday with stars.
+  test("every template starts with example stars on its first days, and none fills the board", () => {
+    for (const tpl of TEMPLATES) {
+      const board = boardFromTemplate(tpl);
+      expect(board.examples, tpl.id).toBe(true);
+      const examples = exampleStars(board, wednesday);
+      const { count, goal } = progress(board, examples, NO_LINKED, wednesday);
+      expect(count, tpl.id).toBeGreaterThan(0);
+      expect(count, tpl.id).toBeLessThan(goal);
+    }
+    const week = exampleStars(boardFromTemplate(TEMPLATES[0]), wednesday);
+    expect(Object.keys(week).map((k) => k.slice(0, 10))).toEqual(["2026-10-26", "2026-10-26", "2026-10-27"]);
+  });
+
+  test("the default board shows them, and they are never in the saved stars", () => {
+    expect(DEFAULT_REWARDS_SETTINGS.boards[0].examples).toBe(true);
+  });
+});
+
+describe("looking back", () => {
+  const wednesday = new Date(2026, 9, 28);
+
+  test("back by a day, a week (to its Monday) or a month (to its first)", () => {
+    expect(shiftPeriod("day", wednesday, -1)).toEqual(new Date(2026, 9, 27));
+    expect(shiftPeriod("week", wednesday, -1)).toEqual(new Date(2026, 9, 19));
+    expect(shiftPeriod("week", wednesday, 0)).toEqual(new Date(2026, 9, 26));
+    expect(shiftPeriod("month", wednesday, -1)).toEqual(new Date(2026, 8, 1));
+    expect(shiftPeriod("month", new Date(2026, 0, 31), -1)).toEqual(new Date(2025, 11, 1));
+    expect(samePeriod("week", wednesday, new Date(2026, 10, 1))).toBe(true);
+    expect(samePeriod("week", wednesday, new Date(2026, 10, 2))).toBe(false);
+  });
 });

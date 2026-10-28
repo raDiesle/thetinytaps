@@ -8,6 +8,18 @@ import type { Localized } from "@/lib/language";
 /** A game whose own end puts a star on the board by itself. */
 export type LinkedGame = "teeth" | "potty";
 
+/** A time of day a task can have its own field for: brushing teeth in the morning and in the evening. */
+export type Slot = "morning" | "noon" | "evening";
+
+/** The times of day in the order of the day, with the picture that marks their field. */
+export const SLOTS: { id: Slot; emoji: string; label: Localized }[] = [
+  { id: "morning", emoji: "☀️", label: { de: "Morgens" } },
+  { id: "noon", emoji: "🌤️", label: { de: "Mittags" } },
+  { id: "evening", emoji: "🌙", label: { de: "Abends" } },
+];
+
+export const SLOT_BY_ID = new Map(SLOTS.map((s) => [s.id, s]));
+
 /** A habit a board can ask for. */
 export interface CatalogTask {
   id: string;
@@ -15,11 +27,13 @@ export interface CatalogTask {
   label: Localized;
   /** The game that gives this task its star by itself (Zähne putzen, Aufs Töpfchen). */
   linked?: LinkedGame;
+  /** A field for each of these times of day instead of one a day, when the task is picked. */
+  slots?: Slot[];
 }
 
 /** Tasks for two- and three-year-olds, the most asked for first. */
 export const TASKS: CatalogTask[] = [
-  { id: "zaehne", emoji: "🪥", label: { de: "Zähne putzen" }, linked: "teeth" },
+  { id: "zaehne", emoji: "🪥", label: { de: "Zähne putzen" }, linked: "teeth", slots: ["morning", "evening"] },
   { id: "toepfchen", emoji: "🚽", label: { de: "Aufs Töpfchen" }, linked: "potty" },
   { id: "anziehen", emoji: "👕", label: { de: "Anziehen" } },
   { id: "bett", emoji: "🛏️", label: { de: "Im eigenen Bett schlafen" } },
@@ -124,28 +138,23 @@ export const THEMES: Theme[] = [
 /** The kinds of board, which are also the views of one board: day, week and month share its stars. */
 export type BoardKind = "day" | "week" | "month" | "collect";
 
-/** In the order of the row of views: from the shortest time to the longest, collecting last. */
-export const KINDS: { id: BoardKind; emoji: string; label: Localized }[] = [
-  {
-    id: "day",
-    emoji: "☀️",
-    label: { de: "Tag" },
-  },
-  {
-    id: "week",
-    emoji: "📅",
-    label: { de: "Woche" },
-  },
-  {
-    id: "month",
-    emoji: "🗓️",
-    label: { de: "Monat" },
-  },
-  {
-    id: "collect",
-    emoji: "🐾",
-    label: { de: "Sammeln" },
-  },
+/** A kind of board with what it is for, in one line for grown-ups. */
+export interface KindInfo {
+  id: BoardKind;
+  emoji: string;
+  label: Localized;
+  hint: Localized;
+}
+
+/**
+ * In the order of the switch above the board: day, week and month are the main views (the same stars, seen
+ * for a shorter or longer time), collecting comes last and apart – it counts stars, not days.
+ */
+export const KINDS: KindInfo[] = [
+  { id: "day", emoji: "☀️", label: { de: "Tag" }, hint: { de: "Heute: die Aufgaben als große Bilder" } },
+  { id: "week", emoji: "📅", label: { de: "Woche" }, hint: { de: "Aufgaben und Wochentage, Montag bis Sonntag" } },
+  { id: "month", emoji: "🗓️", label: { de: "Monat" }, hint: { de: "Ein Kalender für den ganzen Monat" } },
+  { id: "collect", emoji: "🐾", label: { de: "Sammeln" }, hint: { de: "Ein Weg mit 3 bis 30 Sternen bis zur Belohnung" } },
 ];
 
 /** A ready-made board to start from; the grown-up changes what they like afterwards. */
@@ -162,22 +171,39 @@ export interface Template {
   mark: string;
   theme: string;
   title?: Localized;
+  /** Times of day of a task, where they differ from the catalogue's (Mein Morgen brushes only in the morning). */
+  slots?: Record<string, Slot[]>;
+  /** One line for grown-ups under its picture in the gallery and the wizard. */
+  hint: Localized;
 }
 
-/** Shown as a row of chips from the first visit on, grouped by kind in the order of KINDS; the first is the board a new visitor sees. */
+/** Shown in the gallery of Vorlagen and the wizard, in the order of KINDS; the first is the board a new visitor sees. */
 export const TEMPLATES: Template[] = [
-  { id: "zaehne-woche", emoji: "🪥", label: { de: "Zähne-Woche" }, kind: "week", tasks: ["zaehne"], goal: 5, reward: "buch", mark: "stern", theme: "meer" },
+  {
+    id: "zaehne-woche",
+    emoji: "🪥",
+    label: { de: "Zähne-Woche" },
+    kind: "week",
+    tasks: ["zaehne"],
+    goal: 10,
+    reward: "buch",
+    mark: "stern",
+    theme: "meer",
+    hint: { de: "Morgens und abends ein Stern – nach „Zähne putzen“ kommt er von selbst" },
+  },
   {
     id: "morgen",
     emoji: "🌅",
     label: { de: "Mein Morgen" },
     kind: "day",
     tasks: ["anziehen", "zaehne", "schuhe"],
+    slots: { zaehne: ["morning"] },
     goal: 3,
     reward: null,
     mark: "sonne",
     theme: "sonne",
     title: { de: "Mein Morgen" },
+    hint: { de: "Anziehen, Zähne, Schuhe – jeden Morgen neu" },
   },
   {
     id: "abend",
@@ -185,11 +211,13 @@ export const TEMPLATES: Template[] = [
     label: { de: "Mein Abend" },
     kind: "day",
     tasks: ["baden", "zaehne", "aufraeumen"],
+    slots: { zaehne: ["evening"] },
     goal: 3,
     reward: "buch",
     mark: "stern",
     theme: "nacht",
     title: { de: "Mein Abend" },
+    hint: { de: "Baden, Zähne, Aufräumen – dann eine Geschichte" },
   },
   {
     id: "toepfchen",
@@ -201,6 +229,7 @@ export const TEMPLATES: Template[] = [
     reward: "seifenblasen",
     mark: "stern",
     theme: "wiese",
+    hint: { de: "Ein Stern an jedem Tag mit Töpfchen" },
   },
   {
     id: "woche",
@@ -208,10 +237,11 @@ export const TEMPLATES: Template[] = [
     label: { de: "Woche mit drei Aufgaben" },
     kind: "week",
     tasks: ["zaehne", "anziehen", "aufraeumen"],
-    goal: 10,
+    goal: 15,
     reward: "zoo",
     mark: "stern",
     theme: "sonne",
+    hint: { de: "Zähne morgens und abends, Anziehen, Aufräumen" },
   },
   {
     id: "zaehne-monat",
@@ -219,10 +249,11 @@ export const TEMPLATES: Template[] = [
     label: { de: "Zähne-Monat" },
     kind: "month",
     tasks: ["zaehne"],
-    goal: 20,
+    goal: 40,
     reward: "zoo",
     mark: "stern",
     theme: "meer",
+    hint: { de: "Ein ganzer Monat Zähneputzen, morgens und abends" },
   },
   {
     id: "monat",
@@ -234,6 +265,7 @@ export const TEMPLATES: Template[] = [
     reward: "schwimmen",
     mark: "herz",
     theme: "beere",
+    hint: { de: "Töpfchen und eigenes Bett, für größere Ziele" },
   },
   {
     id: "fuenf",
@@ -245,6 +277,7 @@ export const TEMPLATES: Template[] = [
     reward: "spielplatz",
     mark: "stern",
     theme: "sonne",
+    hint: { de: "Kurz und bald: für die Kleinsten" },
   },
   {
     id: "bett",
@@ -256,6 +289,7 @@ export const TEMPLATES: Template[] = [
     reward: "backen",
     mark: "herz",
     theme: "nacht",
+    hint: { de: "Jede Nacht im eigenen Bett ein Herz" },
   },
 ];
 

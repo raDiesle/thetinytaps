@@ -70,22 +70,33 @@
   width: 100%;
 }
 
-/* The views of the board: one bar of four, like a switch. */
+/* The views: Tag, Woche, Monat as one big switch, Sammeln beside it, then the arrows to earlier days. */
+.rw-switch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 14px;
+}
+
 .rw-views {
   display: inline-flex;
   overflow: hidden;
   border: 3px solid var(--ink);
   border-radius: 999px;
   background: #fff;
+  box-shadow: 0 4px 0 var(--ink);
 }
 
 .rw-views button {
-  padding: 6px 16px;
+  min-height: 52px;
+  padding: 6px 24px;
   border: 0;
   border-left: 2px solid color-mix(in srgb, var(--ink) 25%, transparent);
   background: transparent;
   color: inherit;
   font: inherit;
+  font-size: 1.2rem;
   font-weight: 800;
   cursor: pointer;
 }
@@ -98,8 +109,64 @@
   background: var(--sunshine);
 }
 
+.rw-view-emoji {
+  font-family: var(--font-emoji);
+}
+
+.rw-collect-view,
+.rw-period button {
+  min-height: 44px;
+  padding: 4px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-collect-view.selected {
+  background: var(--sunshine);
+}
+
+.rw-period {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rw-period button {
+  min-width: 44px;
+  padding: 0;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.rw-period button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rw-period-label {
+  min-width: 7.5em;
+  font-weight: 800;
+  text-align: center;
+}
+
+.rw-period-label.past {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--sunshine);
+}
+
 .rw-boards .rw-add {
   border-style: dashed;
+}
+
+/* Where the gallery has no room beside the board, „🧩 Vorlagen“ opens the wizard on it. */
+.rw-templates-button {
+  display: none;
 }
 
 /* Phones: views and boards in one row that scrolls sideways, so the board keeps the screen. */
@@ -115,18 +182,389 @@
     scrollbar-width: thin;
   }
 
-  .rw-views,
+  .rw-switch,
   .rw-boards {
     flex: none;
     flex-wrap: nowrap;
+    gap: 6px;
+  }
+
+  .rw-views {
+    box-shadow: none;
   }
 
   .rw-views button,
+  .rw-collect-view,
+  .rw-period button,
   .rw-boards button {
-    min-height: 34px;
-    padding: 2px 10px;
-    font-size: 0.85rem;
+    min-height: 36px;
+    padding: 2px 12px;
+    font-size: 0.9rem;
     white-space: nowrap;
+  }
+
+  .rw-period button {
+    min-width: 36px;
+    padding: 0;
+  }
+
+  .rw-period-label {
+    min-width: 0;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+}
+
+/* The board and, where there is room, the gallery of Vorlagen beside it. */
+.rw-main {
+  display: flex;
+  flex: 1;
+  gap: 14px;
+  width: 100%;
+  min-height: 0;
+}
+
+.rw-side {
+  display: none;
+}
+
+@media (min-width: 1000px) and (min-height: 600px) {
+  /* As tall as the board, never taller: the gallery scrolls inside it. */
+  .rw-side {
+    position: relative;
+    display: block;
+    flex: none;
+    width: clamp(200px, 18vw, 260px);
+  }
+
+  .rw-side .rw-gallery {
+    position: absolute;
+    inset: 34px 0 0;
+    grid-template-columns: 1fr;
+    align-content: start;
+    overflow-y: auto;
+    padding: 4px 6px 10px 4px;
+    scrollbar-width: thin;
+  }
+}
+
+@media not ((min-width: 1000px) and (min-height: 600px)) {
+  .rw-templates-button {
+    display: inline-block;
+  }
+}
+
+.rw-side-title {
+  margin: 0;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* ---------- Vorlagen: small pictures of boards with example stars ---------- */
+
+.rw-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rw-tpl {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  padding: 6px 6px 8px;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rw-tpl:hover {
+  background: color-mix(in srgb, var(--sunshine) 30%, #fff);
+}
+
+.rw-tpl.selected {
+  background: var(--sunshine);
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.rw-thumb {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 1.45;
+  pointer-events: none;
+}
+
+.rw-thumb-blank {
+  place-items: center;
+  justify-content: center;
+  align-items: center;
+  border: 3px dashed color-mix(in srgb, var(--ink) 40%, transparent);
+  border-radius: 14px;
+  font-family: var(--font-emoji);
+  font-size: 2.6rem;
+}
+
+.rw-tpl-name {
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.rw-tpl-hint {
+  font-size: 0.82rem;
+  line-height: 1.25;
+  opacity: 0.85;
+}
+
+.rw-tpl-kind {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* ---------- Neue Tafel: the wizard ---------- */
+
+.rw-wizard {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 1400px;
+  padding: 12px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 24px;
+  background: #fff;
+}
+
+.rw-wizard-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rw-steps {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rw-steps button,
+.rw-wizard-close,
+.rw-wizard-foot button,
+.rw-kind-cards button,
+.rw-wizard-task button {
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-steps button {
+  min-height: 40px;
+  padding: 2px 12px 2px 4px;
+}
+
+.rw-steps button.selected {
+  background: var(--sunshine);
+}
+
+.rw-steps button:disabled,
+.rw-wizard-foot button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rw-step-number {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7em;
+  height: 1.7em;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.rw-wizard-close {
+  width: 44px;
+  height: 44px;
+  font-size: 1.1rem;
+}
+
+.rw-wizard-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: start;
+  gap: 18px;
+  flex: 1;
+}
+
+.rw-wizard-body.rw-wizard-wide {
+  grid-template-columns: 1fr;
+}
+
+.rw-wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.rw-wizard-step h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.rw-wizard-preview {
+  position: sticky;
+  top: 12px;
+}
+
+.rw-kind-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.rw-kind-cards button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 18px;
+  text-align: center;
+}
+
+.rw-kind-cards button.selected {
+  background: var(--sunshine);
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.rw-kind-emoji {
+  font-family: var(--font-emoji);
+  font-size: 2rem;
+  line-height: 1.1;
+}
+
+.rw-kind-label {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.rw-kind-hint {
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.rw-wizard-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rw-wizard-tasks li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 2px solid color-mix(in srgb, var(--ink) 25%, transparent);
+  border-radius: 16px;
+}
+
+.rw-wizard-task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+}
+
+.rw-wizard-task button {
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+}
+
+/* Stays in sight while a long step scrolls, so „Weiter“ and „So nehmen“ are always one tap away. */
+.rw-wizard-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 8px 0 max(4px, env(safe-area-inset-bottom));
+  background: #fff;
+}
+
+.rw-wizard-foot button {
+  min-height: 48px;
+  padding: 4px 22px;
+}
+
+.rw-wizard-back {
+  margin-right: auto;
+}
+
+.rw-wizard-done {
+  background: var(--sunshine) !important;
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+/* A phone on its side: steps as numbers, the preview small beside the step. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .rw-wizard {
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 16px;
+  }
+
+  .rw-step-label {
+    display: none;
+  }
+
+  .rw-steps button.selected .rw-step-label {
+    display: inline;
+  }
+
+  .rw-wizard-step h2 {
+    font-size: 1.1rem;
+  }
+
+  .rw-wizard-foot button {
+    min-height: 40px;
+  }
+}
+
+/* Too narrow for the step and the picture side by side: the picture goes on top. */
+@media (max-width: 700px) {
+  .rw-wizard-body {
+    grid-template-columns: 1fr;
+  }
+
+  .rw-wizard-preview {
+    order: -1;
+    position: static;
   }
 }
 
@@ -157,8 +595,44 @@
 .rw-screen {
   display: flex;
   flex: 1;
+  flex-direction: column;
+  gap: 6px;
   width: 100%;
+  min-width: 0;
   min-height: 280px;
+}
+
+/* Says the stars are examples, small in the corner, with a way to hide them. */
+.rw-example-note {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  gap: 8px;
+  padding: 2px 2px 2px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  background: #fffdf2f0;
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+
+.rw-example-note button {
+  flex: none;
+  min-height: 34px;
+  padding: 2px 12px;
+  border: 2px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .rw-example-note {
+    font-size: 0.72rem;
+  }
 }
 
 .rw-screen-box {
@@ -366,7 +840,14 @@
   font-size: 4cqmin;
 }
 
-.rw-card .rw-cell {
+.rw-card-fields {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  gap: 1cqmin;
+}
+
+.rw-card-fields > .rw-cell {
   flex: 1;
 }
 
@@ -464,6 +945,28 @@
 .rw-mark {
   font-family: var(--font-emoji);
   font-size: 56cqmin;
+  line-height: 1;
+}
+
+/* An example star: there, but paler than a real one. */
+.rw-field.example .rw-ring {
+  border-style: dashed;
+  background: #fff;
+}
+
+.rw-field.example .rw-mark,
+.rw-dot.example {
+  opacity: 0.5;
+}
+
+/* The time of day of a field, on its edge: a sun in the morning, a moon in the evening. */
+.rw-slot {
+  position: absolute;
+  top: -8%;
+  right: -10%;
+  z-index: 1;
+  font-family: var(--font-emoji);
+  font-size: 26cqmin;
   line-height: 1;
 }
 

@@ -2,9 +2,40 @@ import { Choice, SettingsGroup, Slider, Toggle } from "@/components/SettingContr
 import { useT } from "@/lib/language";
 import { type Board, type BoardTask, COLLECT_GOALS, fieldCount, MAX_TASKS, newId, rewardFromCatalog, taskFromCatalog } from "./board";
 import { useBoardTitle, useRewardLabel, useTaskLabel } from "./BoardSheet";
-import { MARKS, REWARDS, TASK_BY_ID, TASKS, THEMES } from "./catalog";
+import { MARKS, REWARDS, SLOTS, TASK_BY_ID, TASKS, THEMES } from "./catalog";
 
 const DAY_NAMES = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
+
+/**
+ * How often a day a task gets a star: chips for morning, noon and evening, each its own field; none on means once a
+ * day. Brushing teeth comes with morning and evening on.
+ */
+export function SlotChips({ task, onChange }: { task: BoardTask; onChange: (patch: Partial<BoardTask>) => void }) {
+  const t = useT();
+  const on = task.slots ?? [];
+  return (
+    <div className="rw-chips rw-slot-chips" role="group" aria-label={t({ de: "Wann am Tag?" })}>
+      <button type="button" className={on.length === 0 ? "selected" : undefined} aria-pressed={on.length === 0} onClick={() => onChange({ slots: undefined })}>
+        1× {t({ de: "am Tag" })}
+      </button>
+      {SLOTS.map((slot) => {
+        const has = on.includes(slot.id);
+        const slots = has ? on.filter((s) => s !== slot.id) : SLOTS.map((s) => s.id).filter((s) => s === slot.id || on.includes(s));
+        return (
+          <button
+            key={slot.id}
+            type="button"
+            className={has ? "selected" : undefined}
+            aria-pressed={has}
+            onClick={() => onChange({ slots: slots.length ? slots : undefined })}
+          >
+            {slot.emoji} {t(slot.label)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 /**
  * Everything a grown-up can change on a board, live under the board's preview:
@@ -96,6 +127,7 @@ export function Editor({
                     ✕
                   </button>
                 </span>
+                {board.kind !== "collect" && <SlotChips task={task} onChange={(patch) => setTask(task.id, patch)} />}
                 {catalog?.linked && board.kind !== "collect" && (
                   <span className="rw-linked">
                     <Toggle

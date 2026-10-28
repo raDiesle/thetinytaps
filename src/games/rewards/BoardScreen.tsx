@@ -4,7 +4,7 @@ import { playChime, playCountNote, playPop, playTusch, playTwinkle, playWhoosh, 
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
-import { addStar, type Board, cellKey, dayFull, type LinkedDays, progress, type StarLog, takeBackStar } from "./board";
+import { addStar, type Board, dayFull, exampleStars, type LinkedDays, parseCellKey, progress, type StarLog, takeBackStar } from "./board";
 import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { MARK_BY_ID, MARKS } from "./catalog";
 
@@ -32,21 +32,28 @@ interface Pending {
  * field wiggles it (or twinkles a star that is there), so every tap does something but
  * no tap alone gives a star. A full day, and the reward reached, are celebrated.
  * Stars are never taken away – „Stern zurück“ only undoes a wrong hold right after it.
+ * A new board shows example stars (`Board.examples`) until its first real star.
  */
 export function BoardScreen({
   board,
   log,
   setLog,
   linked,
+  day,
   sounds,
   speech,
+  onExamplesOff,
 }: {
   board: Board;
   log: StarLog;
   setLog: (log: StarLog) => void;
   linked: LinkedDays;
+  /** A day of the week, month or day shown: today, or an earlier one a grown-up went back to. */
+  day: Date;
   sounds: boolean;
   speech: boolean;
+  /** The example stars go: with the first real star, or when a grown-up hides them. */
+  onExamplesOff: () => void;
 }) {
   const t = useT();
   const language = useAppLanguage();
@@ -132,7 +139,7 @@ export function BoardScreen({
   };
 
   /** What a field stands for, to say it: the task of a week or day board. */
-  const fieldTask = (field: string) => board.tasks.find((task) => field.endsWith(`|${task.id}`));
+  const fieldTask = (field: string) => board.tasks.find((task) => task.id === parseCellKey(field).taskId);
 
   const onPointerDown = (e: React.PointerEvent) => {
     const el = (e.target as Element).closest<HTMLElement>("[data-field]");
@@ -187,9 +194,7 @@ export function BoardScreen({
       setPending({ field: `c${count}`, key: null, day: today });
       return;
     }
-    const task = fieldTask(field);
-    const day = new Date(`${field.slice(0, 10)}T12:00`);
-    if (task) setPending({ field, key: cellKey(day, task.id), day });
+    if (fieldTask(field)) setPending({ field, key: field, day: parseCellKey(field).day });
   };
 
   /** The child taps the big star: it flies to its field, then lands there. */
@@ -209,11 +214,12 @@ export function BoardScreen({
 
   const land = () => {
     if (!pending) return;
-    const before = progress(board, stars, linked, today);
+    const before = progress(board, stars, linked, day);
     const wasFull = dayFull(board, stars, linked, pending.day);
     const next = addStar(log, board.id, pending.key, today);
-    const after = progress(board, next[board.id], linked, today);
+    const after = progress(board, next[board.id], linked, day);
     setLog(next);
+    if (board.examples) onExamplesOff();
     setPending(null);
     setFlight(null);
     setFresh(pending.field);
@@ -253,8 +259,27 @@ export function BoardScreen({
     <div className="rw-screen">
       {/* The fields inside are the targets; one listener for all of them. */}
       <div ref={box} className="rw-screen-box" onPointerDown={onPointerDown} onPointerUp={letGo} onPointerCancel={letGo} onPointerMove={onPointerMove}>
-        <BoardSheet board={board} stars={stars} linked={linked} today={today} look={SCREEN_LOOK} aspect={aspect} fresh={fresh} holding={holding} />
+        <BoardSheet
+          board={board}
+          stars={stars}
+          examples={board.examples ? exampleStars(board, day) : null}
+          linked={linked}
+          today={today}
+          day={day}
+          look={SCREEN_LOOK}
+          aspect={aspect}
+          fresh={fresh}
+          holding={holding}
+        />
       </div>
+      {board.examples && (
+        <div className="rw-example-note">
+          <span>✨ {t({ de: "Blasse Sterne sind nur ein Beispiel – mit dem ersten echten Stern gehen sie weg." })}</span>
+          <button type="button" onClick={onExamplesOff}>
+            {t({ de: "Ausblenden" })}
+          </button>
+        </div>
+      )}
       {undo && (
         <button type="button" className="rw-undo" onClick={takeBack}>
           ↶ {t({ de: "Stern zurück" })}

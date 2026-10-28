@@ -1,5 +1,5 @@
 import { dayKey, weekOf } from "@/games/teeth/daytime";
-import { type BoardKind, type LinkedGame, TASK_BY_ID, type Template, REWARD_BY_ID } from "./catalog";
+import { type BoardKind, type LinkedGame, REWARD_BY_ID, type Slot, SLOTS, TASK_BY_ID, type Template } from "./catalog";
 
 // A board as the grown-up made it, and the stars on it. Everything here is plain
 // data and pure functions, so the screen, the print and the tests share them.
@@ -15,6 +15,8 @@ export interface BoardTask {
   catalog?: string;
   /** Its game puts the star on the board by itself (week and day boards only). */
   linked?: LinkedGame;
+  /** A field for each of these times of day (brushing in the morning and the evening); none: one field a day. */
+  slots?: Slot[];
 }
 
 /** What the stars lead to. */
@@ -43,17 +45,25 @@ export interface Board {
   mark: string;
   /** Catalogue theme id. */
   theme: string;
-  /** The ready-made board it was made from: its chip in the row of boards selects it again. */
+  /** The ready-made board it was made from: picking it in the gallery again selects this board. */
   template?: string;
+  /** Shows example stars (Monday and Tuesday filled), so a new board looks like one in use; gone with the first real star. */
+  examples?: boolean;
 }
 
 /** Stars per board: "YYYY-MM-DD|taskId" → 1 on week, month and day boards, "count" → n on a collecting board. */
 export type StarLog = Record<string, Record<string, number>>;
 
-/** Days that got a star from a linked game, as day keys. */
-export type LinkedDays = Record<LinkedGame, Set<string>>;
+/** What a linked game did on one day: how often, and at which times of day where the game knows them (Zähne putzen). */
+export interface LinkedDay {
+  count: number;
+  slots: Slot[];
+}
 
-export const NO_LINKED: LinkedDays = { teeth: new Set(), potty: new Set() };
+/** Per linked game, what it did on each day, by day key. */
+export type LinkedDays = Record<LinkedGame, Record<string, LinkedDay>>;
+
+export const NO_LINKED: LinkedDays = { teeth: {}, potty: {} };
 
 /** At most this many tasks; parents' guides advise one to three for toddlers. */
 export const MAX_TASKS = 8;
@@ -75,12 +85,17 @@ export function boardFromTemplate(template: Template): Board {
     kind: template.kind,
     childName: "",
     title: template.title?.de ?? "",
-    tasks: template.tasks.map((id) => ({ ...taskFromCatalog(id), id })),
+    tasks: template.tasks.map((id) => {
+      const task = { ...taskFromCatalog(id), id };
+      const slots = template.slots?.[id];
+      return slots ? { ...task, slots } : task;
+    }),
     days: [0, 1, 2, 3, 4, 5, 6],
     goal: template.goal,
     reward: template.reward ? rewardFromCatalog(template.reward) : null,
     mark: template.mark,
     theme: template.theme,
+    examples: true,
   };
 }
 
@@ -115,7 +130,8 @@ export function withKind(board: Board, kind: BoardKind, templateTitle = ""): Boa
 export function taskFromCatalog(id: string): BoardTask {
   const task = TASK_BY_ID.get(id);
   if (!task) throw new Error(`No task ${id}`);
-  return { id: newId(), emoji: task.emoji, catalog: id, linked: task.linked };
+  const made: BoardTask = { id: newId(), emoji: task.emoji, catalog: id, linked: task.linked };
+  return task.slots ? { ...made, slots: [...task.slots] } : made;
 }
 
 export function rewardFromCatalog(id: string): BoardReward {
@@ -148,30 +164,86 @@ export function boardDays(board: Board, today: Date): Date[] {
   return (board.kind === "month" ? monthOf(today) : weekOf(today)).filter((day) => board.days.includes(weekday(day)));
 }
 
-export const cellKey = (day: Date, taskId: string) => `${dayKey(day)}|${taskId}`;
+/** The fields a task has on a day: one per time of day, or a single one (`undefined`). */
+export const taskSlots = (task: BoardTask): (Slot | undefined)[] =>
+  task.slots?.length ? SLOTS.map((s) => s.id).filter((s) => task.slots?.includes(s)) : [undefined];
 
-/** Whether a field has its star: put there by hand, or by the task's game on that day. */
-export function isFilled(stars: Record<string, number> | undefined, linked: LinkedDays, day: Date, task: BoardTask): boolean {
-  if (stars?.[cellKey(day, task.id)]) return true;
-  return !!task.linked && linked[task.linked].has(dayKey(day));
+/** A field's key in the log and on screen: "2026-10-28|zaehne", with its time of day "2026-10-28|zaehne|evening". */
+export const cellKey = (day: Date, taskId: string, slot?: Slot) => `${dayKey(day)}|${taskId}${slot ? `|${slot}` : ""}`;
+
+/** The parts of a `cellKey`. */
+export function parseCellKey(key: string): { day: Date; taskId: string; slot?: Slot } {
+  const [day, taskId, slot] = key.split("|");
+  return { day: new Date(`${day}T12:00`), taskId, slot: slot as Slot | undefined };
 }
 
-/** Whether every task of a day has its star. */
+/**
+ * Whether a field has its star: put there by hand, or by the task's game on that day. A game that knows the time of
+ * day (Zähne putzen) fills that time's field; one that only counts (Aufs Töpfchen) fills the fields in the order of the day.
+ */
+export function isFilled(stars: Record<string, number> | undefined, linked: LinkedDays, day: Date, task: BoardTask, slot?: Slot): boolean {
+  if (stars?.[cellKey(day, task.id, slot)]) return true;
+  const done = task.linked ? linked[task.linked][dayKey(day)] : undefined;
+  if (!done || done.count === 0) return false;
+  if (!slot) return true;
+  return done.slots.length > 0 ? done.slots.includes(slot) : taskSlots(task).indexOf(slot) < done.count;
+}
+
+/** Every field of a task on a day, filled or not. */
+const taskFilled = (stars: Record<string, number> | undefined, linked: LinkedDays, day: Date, task: BoardTask) =>
+  taskSlots(task).map((slot) => isFilled(stars, linked, day, task, slot));
+
+/** Whether every task of a day has all its stars. */
 export function dayFull(board: Board, stars: Record<string, number> | undefined, linked: LinkedDays, day: Date): boolean {
-  return board.tasks.length > 0 && board.tasks.every((task) => isFilled(stars, linked, day, task));
+  return board.tasks.length > 0 && board.tasks.every((task) => taskFilled(stars, linked, day, task).every(Boolean));
 }
+
+/** Fields of all tasks on one day. */
+export const fieldsPerDay = (board: Board) => board.tasks.reduce((sum, task) => sum + taskSlots(task).length, 0);
 
 /** All fields a board shows now. */
 export function fieldCount(board: Board, today: Date): number {
-  return board.kind === "collect" ? board.goal : board.tasks.length * boardDays(board, today).length;
+  return board.kind === "collect" ? board.goal : fieldsPerDay(board) * boardDays(board, today).length;
 }
 
 /** Stars the board has now, and how many lead to the reward (never more than there are fields). */
 export function progress(board: Board, stars: Record<string, number> | undefined, linked: LinkedDays, today: Date): { count: number; goal: number } {
   const fields = fieldCount(board, today);
   if (board.kind === "collect") return { count: Math.min(stars?.count ?? 0, board.goal), goal: board.goal };
-  const count = boardDays(board, today).reduce((sum, day) => sum + board.tasks.filter((task) => isFilled(stars, linked, day, task)).length, 0);
+  const count = boardDays(board, today).reduce(
+    (sum, day) => sum + board.tasks.reduce((n, task) => n + taskFilled(stars, linked, day, task).filter(Boolean).length, 0),
+    0,
+  );
   return { count, goal: board.kind === "day" ? fields : Math.max(1, Math.min(board.goal, fields)) };
+}
+
+/**
+ * Example stars, so a new board looks like one in use: on a week the first two days of the board (Monday and
+ * Tuesday), the second one short of its last field; on a month its first four days alike; on a day all but the last
+ * field; two on a collecting board. Shown pale until the first real star, never saved and never printed.
+ */
+export function exampleStars(board: Board, today: Date): Record<string, number> {
+  if (board.kind === "collect") return { count: Math.min(2, board.goal - 1) };
+  const keys = (day: Date) => board.tasks.flatMap((task) => taskSlots(task).map((slot) => cellKey(day, task.id, slot)));
+  const days = board.kind === "day" ? [today] : boardDays(board, today).slice(0, board.kind === "month" ? 4 : 2);
+  const fields = days.flatMap((day, i) => {
+    const all = keys(day);
+    // Not every day is full, as on a real board: the day board, the second day and the third day of a month lack one.
+    return (board.kind === "day" || i === 1 || i === 2) && all.length > 1 ? all.slice(0, -1) : all;
+  });
+  return Object.fromEntries(fields.map((key) => [key, 1]));
+}
+
+/** The first day of the week, month or day `day` is in, `by` periods later (earlier when negative). */
+export function shiftPeriod(kind: BoardKind, day: Date, by: number): Date {
+  if (kind === "month") return new Date(day.getFullYear(), day.getMonth() + by, 1);
+  if (kind === "week") return new Date(day.getFullYear(), day.getMonth(), day.getDate() - weekday(day) + 7 * by);
+  return new Date(day.getFullYear(), day.getMonth(), day.getDate() + by);
+}
+
+/** Whether two days lie in the same day, week or month of a board. */
+export function samePeriod(kind: BoardKind, a: Date, b: Date): boolean {
+  return dayKey(shiftPeriod(kind, a, 0)) === dayKey(shiftPeriod(kind, b, 0));
 }
 
 /** The log with a star on a field (a key of `cellKey`), or one more collected; old days dropped. */

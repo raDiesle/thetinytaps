@@ -67,6 +67,7 @@ export const RESEARCH: Research[] = [
       "Nie Sterne wegnehmen, nie strafen; als Belohnung am besten gemeinsame Zeit, und die Tafel nach einer Weile ausklingen lassen.",
       "Kritik: Belohnungen können lenken statt verbinden (Juul) und eigene Freude verdrängen (Überrechtfertigungs-Effekt, Lepper, Greene und Nisbett 1973); Lob für Mühe statt Können (Dweck); für Grundbedürfnisse wie Töpfchen raten manche ganz ab.",
       "Lücken, die kein gefundenes Angebot füllt: Ausmalen statt Aufkleber, ein tintensparender Schwarz-weiß-Druck, Bildschirm und Papier genau gleich, und eine Tafel, auf der ein Zweijähriger seinen Stern selbst antippt.",
+      "Monatstafeln werden gesucht (Google-Autovervollständigung, 28. Oktober 2026): „belohnungskalender kinder (zum ausdrucken)“, „belohnungskalender toilette“, „monthly reward chart printable“, „monthly sticker reward chart“ – auf Deutsch eher als Kalender als als „belohnungstafel monat“. Tag und Woche: „daily reward chart“, „tagesplan kinder“, „belohnungstafel kinder wochenplan“. Darum bleiben Tag, Woche und Monat die drei Ansichten.",
     ],
     topics: [
       {
@@ -79,7 +80,7 @@ export const RESEARCH: Research[] = [
           "wochenplan kinder zum ausdrucken",
           "reward chart printable toddler",
         ],
-        ideas: ["T-04", "T-05", "T-06", "T-07", "T-08", "T-20"],
+        ideas: ["T-04", "T-05", "T-06", "T-07", "T-08", "T-20", "T-24", "T-25"],
       },
       {
         emoji: "⭐",
@@ -90,14 +91,21 @@ export const RESEARCH: Research[] = [
       {
         emoji: "📅",
         title: "Wochen- und Tagesroutine",
-        searches: ["belohnungstafel woche", "morgenroutine kinder bilder", "abendroutine kinder bilder", "routine chart toddler"],
-        ideas: ["T-01", "T-03", "T-17", "T-18"],
+        searches: [
+          "belohnungstafel woche",
+          "belohnungskalender kinder",
+          "monthly reward chart",
+          "morgenroutine kinder bilder",
+          "abendroutine kinder bilder",
+          "routine chart toddler",
+        ],
+        ideas: ["T-01", "T-03", "T-17", "T-18", "T-22", "T-26"],
       },
       {
         emoji: "🪥",
         title: "Zähne putzen und Töpfchen",
         searches: ["belohnungstafel zähneputzen", "belohnungstafel töpfchen", "töpfchentraining belohnung", "potty training reward chart"],
-        ideas: ["T-10", "H-06"],
+        ideas: ["T-10", "T-23", "H-06"],
       },
       {
         emoji: "🌱",

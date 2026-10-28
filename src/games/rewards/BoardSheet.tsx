@@ -2,8 +2,8 @@ import type { CSSProperties } from "react";
 import { dayKey } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type TapState, tapState } from "@/lib/tapTargets";
-import { type Board, type BoardTask, boardDays, cellKey, isFilled, type LinkedDays, monthOf, possessive, progress, weekday } from "./board";
-import { type CatalogMark, MARK_BY_ID, MARKS, REWARD_BY_ID, TASK_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import { type Board, type BoardTask, boardDays, cellKey, isFilled, type LinkedDays, monthOf, possessive, progress, taskSlots, weekday } from "./board";
+import { type CatalogMark, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
 
 const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
 
@@ -75,8 +75,10 @@ export function snakeLayout(stops: number, aspect: number): { cols: number; rows
 export function BoardSheet({
   board,
   stars,
+  examples,
   linked,
   today,
+  day = today,
   look,
   aspect,
   fresh,
@@ -84,8 +86,13 @@ export function BoardSheet({
 }: {
   board: Board;
   stars: Record<string, number> | undefined;
+  /** Example stars to show pale where there is no real one (`exampleStars`); never on paper. */
+  examples?: Record<string, number> | null;
   linked: LinkedDays;
+  /** The real today: highlighted, and the days after it can't get a star yet. */
   today: Date;
+  /** A day of the week, month or day shown – today's unless a grown-up looks back. */
+  day?: Date;
   look: SheetLook;
   /** Width / height of the sheet, for the path of a collecting board. */
   aspect: number;
@@ -101,15 +108,23 @@ export function BoardSheet({
   const theme = THEME_BY_ID.get(board.theme) ?? THEMES[0];
   const mark = MARK_BY_ID.get(board.mark) ?? MARKS[0];
   // Paper starts empty: the stars come on it with stickers or crayons.
-  const shown = look.print ? undefined : stars;
-  const { count, goal } = progress(board, shown, linked, today);
+  const real = look.print ? undefined : stars;
+  const example = look.print || !examples ? undefined : examples;
+  const shown = example ? { ...example, ...real, count: Math.max(real?.count ?? 0, example.count ?? 0) } : real;
+  const { count, goal } = progress(board, shown, linked, day);
+  const realCount = example ? progress(board, real, linked, day).count : count;
   // Grey prints take their colours from .rw-grey; inline ones would win over it.
   const grey = look.print && !look.color;
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
-  const fieldProps = { mark, look, fresh, holding };
+  const fieldProps = { mark, look, fresh, holding, example };
+  const dateFormat = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(speechLang, options);
+  const week = board.kind === "week" ? boardDays({ ...board, days: [0, 1, 2, 3, 4, 5, 6] }, day) : [];
 
   return (
-    <div className={`rw-sheet rw-kind-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}`} style={style}>
+    <div
+      className={`rw-sheet rw-kind-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}${example ? " rw-with-examples" : ""}`}
+      style={style}
+    >
       <header className="rw-head">
         <span className="rw-title">
           <span className="rw-title-mark" aria-hidden>
@@ -119,13 +134,19 @@ export function BoardSheet({
         </span>
         {look.print && board.kind === "week" && <span className="rw-blank">{t({ de: "Woche vom" })} ____________</span>}
         {look.print && board.kind === "day" && <span className="rw-blank">{t({ de: "Datum" })} ____________</span>}
-        {board.kind === "month" && <span className="rw-blank">{new Intl.DateTimeFormat(speechLang, { month: "long", year: "numeric" }).format(today)}</span>}
+        {!look.print && board.kind === "week" && (
+          <span className="rw-blank">{dateFormat({ day: "numeric", month: "short" }).formatRange(week[0], week[6])}</span>
+        )}
+        {!look.print && board.kind === "day" && <span className="rw-blank">{dateFormat({ weekday: "long", day: "numeric", month: "long" }).format(day)}</span>}
+        {board.kind === "month" && <span className="rw-blank">{dateFormat({ month: "long", year: "numeric" }).format(day)}</span>}
       </header>
       <div className="rw-body">
-        {board.kind === "week" && <WeekGrid board={board} stars={shown} linked={linked} today={today} {...fieldProps} />}
-        {board.kind === "month" && <MonthGrid board={board} stars={shown} linked={linked} today={today} {...fieldProps} />}
-        {board.kind === "day" && <DayCards board={board} stars={shown} linked={linked} today={today} {...fieldProps} />}
-        {board.kind === "collect" && <CollectPath board={board} count={count} aspect={aspect} rewardLabel={rewardLabel} {...fieldProps} />}
+        {board.kind === "week" && <WeekGrid board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
+        {board.kind === "month" && <MonthGrid board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
+        {board.kind === "day" && <DayCards board={board} stars={shown} real={real} linked={linked} today={today} day={day} {...fieldProps} />}
+        {board.kind === "collect" && (
+          <CollectPath board={board} count={count} real={Math.min(real?.count ?? 0, board.goal)} aspect={aspect} rewardLabel={rewardLabel} {...fieldProps} />
+        )}
       </div>
       {board.kind !== "collect" && (board.reward || goal <= MAX_DOTS) && (
         <footer className="rw-goal">
@@ -140,7 +161,7 @@ export function BoardSheet({
           {goal <= MAX_DOTS ? (
             <span className="rw-dots" role="img" aria-label={`${count} / ${goal}`}>
               {Array.from({ length: goal }, (_, i) => (
-                <span key={i} className={i < count ? "rw-dot filled" : "rw-dot"}>
+                <span key={i} className={i < count ? `rw-dot filled${i >= realCount ? " example" : ""}` : "rw-dot"}>
                   {i < count && mark.emoji}
                 </span>
               ))}
@@ -161,22 +182,42 @@ interface FieldLook {
   look: SheetLook;
   fresh?: string | null;
   holding?: string | null;
+  /** Example stars shown, if any. */
+  example?: Record<string, number>;
 }
 
 /**
  * One field: a dashed ring, with the mark in it once it has its star. `hint` shows pale in an empty ring which task
- * it is for, where a day has several small fields (month).
+ * it is for, where a day has several small fields (month); `slot` puts a small sun or moon on its edge, filled or not.
+ * An example star (`isExample`) looks filled but stays open: holding it gives the real star.
  */
-function Field({ id, state, mark, look, fresh, holding, next = false, hint }: FieldLook & { id: string; state: FieldState; next?: boolean; hint?: string }) {
-  const tap: TapState = look.print || state === "future" ? "" : tapState({ goal: next || state === "open", done: state === "filled" });
+function Field({
+  id,
+  state,
+  mark,
+  look,
+  fresh,
+  holding,
+  next = false,
+  hint,
+  slot,
+  isExample = false,
+}: FieldLook & { id: string; state: FieldState; next?: boolean; hint?: string; slot?: Slot; isExample?: boolean }) {
+  const real = isExample ? (state === "filled" ? "open" : state) : state;
+  const tap: TapState = look.print || real === "future" ? "" : tapState({ goal: next || real === "open", done: real === "filled" });
   return (
     <div
-      className={`rw-field ${state}${next ? " next" : ""}${fresh === id ? " fresh" : ""}${holding === id ? " holding" : ""}`}
+      className={`rw-field ${state}${isExample ? " example" : ""}${next ? " next" : ""}${fresh === id ? " fresh" : ""}${holding === id ? " holding" : ""}`}
       data-field={look.print ? undefined : id}
-      data-state={state}
+      data-state={real}
       data-tap={look.print ? undefined : tap}
     >
       <span className="rw-ring">
+        {slot && (
+          <span className="rw-slot" aria-hidden>
+            {SLOT_BY_ID.get(slot)?.emoji}
+          </span>
+        )}
         {state === "filled" ? (
           <span className="rw-mark">{mark.emoji}</span>
         ) : look.colorIn ? (
@@ -200,10 +241,11 @@ function Field({ id, state, mark, look, fresh, holding, next = false, hint }: Fi
   );
 }
 
-function TaskHead({ task }: { task: BoardTask }) {
+/** A task's picture and words; `span` rows high where the task has a row per time of day. */
+function TaskHead({ task, span = 1 }: { task: BoardTask; span?: number }) {
   const label = useTaskLabel()(task);
   return (
-    <div className="rw-task">
+    <div className="rw-task" style={span > 1 ? { gridRow: `span ${span}` } : undefined}>
       <span className="rw-task-emoji" aria-hidden>
         {task.emoji}
       </span>
@@ -212,19 +254,38 @@ function TaskHead({ task }: { task: BoardTask }) {
   );
 }
 
-type GridProps = FieldLook & { board: Board; stars: Record<string, number> | undefined; linked: LinkedDays; today: Date };
+type GridProps = FieldLook & {
+  board: Board;
+  /** Real stars and example ones together. */
+  stars: Record<string, number> | undefined;
+  /** Only the real ones: a field filled by an example alone stays open. */
+  real: Record<string, number> | undefined;
+  linked: LinkedDays;
+  today: Date;
+  day: Date;
+};
 
-const fieldState = (stars: Record<string, number> | undefined, linked: LinkedDays, day: Date, task: BoardTask, today: Date): FieldState =>
-  isFilled(stars, linked, day, task) ? "filled" : dayKey(day) > dayKey(today) ? "future" : "open";
+/** The state of a task's field on a day, and whether only an example star fills it. */
+function fieldOf({ stars, real, linked, today, look }: GridProps, day: Date, task: BoardTask, slot: Slot | undefined) {
+  // On paper every day is just a day: no today, no future.
+  if (look.print) return { state: "open" as FieldState, isExample: false };
+  const filled = isFilled(stars, linked, day, task, slot);
+  const state: FieldState = filled ? "filled" : dayKey(day) > dayKey(today) ? "future" : "open";
+  return { state, isExample: filled && !isFilled(real, linked, day, task, slot) };
+}
 
-/** Tasks in rows, the chosen weekdays in columns, today's column marked on screen. */
-function WeekGrid({ board, stars, linked, today, ...look }: GridProps) {
+/** The props of `Field` that come from the sheet, without the grid's own. */
+const fieldLook = ({ mark, look, fresh, holding, example }: GridProps): FieldLook => ({ mark, look, fresh, holding, example });
+
+/** Tasks in rows (a row per time of day where a task has several), the chosen weekdays in columns, today's column marked on screen. */
+function WeekGrid(props: GridProps) {
+  const { board, today, day, look } = props;
   const t = useT();
   const names = t(DAY_NAMES);
-  const days = boardDays(board, today);
+  const days = boardDays(board, day);
   const todayKey = dayKey(today);
-  // On paper every day is just a day: no today, no future.
-  const state = (day: Date, task: BoardTask): FieldState => (look.look.print ? "open" : fieldState(stars, linked, day, task, today));
+  const rows = board.tasks.flatMap((task) => taskSlots(task).map((slot, i) => ({ task, slot, first: i === 0, span: taskSlots(task).length })));
+  const isToday = (d: Date) => !look.print && dayKey(d) === todayKey;
   // A row is never much taller than a day column is wide: with one or two tasks the field can't grow
   // beyond its column anyway, so the rows stay together in the middle instead of stretching.
   const rowMax = `${(110 / (1.7 + days.length)).toFixed(1)}cqw`;
@@ -233,21 +294,22 @@ function WeekGrid({ board, stars, linked, today, ...look }: GridProps) {
       className="rw-grid"
       style={{
         gridTemplateColumns: `minmax(0, 1.7fr) repeat(${days.length}, minmax(0, 1fr))`,
-        gridTemplateRows: `auto repeat(${board.tasks.length}, minmax(0, ${rowMax}))`,
+        gridTemplateRows: `auto repeat(${rows.length}, minmax(0, ${rowMax}))`,
       }}
     >
       <span />
-      {days.map((day) => (
-        <span key={dayKey(day)} className={`rw-day${!look.look.print && dayKey(day) === todayKey ? " today" : ""}`}>
-          {names[(day.getDay() + 6) % 7]}
+      {days.map((d) => (
+        <span key={dayKey(d)} className={`rw-day${isToday(d) ? " today" : ""}`}>
+          {names[weekday(d)]}
         </span>
       ))}
-      {board.tasks.map((task) => (
-        <div key={task.id} className="rw-row">
-          <TaskHead task={task} />
-          {days.map((day) => (
-            <div key={dayKey(day)} className={`rw-cell${!look.look.print && dayKey(day) === todayKey ? " today" : ""}`}>
-              <Field id={cellKey(day, task.id)} state={state(day, task)} {...look} />
+      {rows.map(({ task, slot, first, span }) => (
+        <div key={`${task.id}|${slot}`} className="rw-row">
+          {/* A task with several times of day has one head over all its rows. */}
+          {first && <TaskHead task={task} span={span} />}
+          {days.map((d) => (
+            <div key={dayKey(d)} className={`rw-cell${isToday(d) ? " today" : ""}`}>
+              <Field id={cellKey(d, task.id, slot)} slot={slot} {...fieldOf(props, d, task, slot)} {...fieldLook(props)} />
             </div>
           ))}
         </div>
@@ -257,18 +319,18 @@ function WeekGrid({ board, stars, linked, today, ...look }: GridProps) {
 }
 
 /**
- * A calendar of the month: weekdays in columns, a box per day with its number and one field per task (the
- * task's picture pale in it when there are several). Weekdays the board leaves out stay as plain boxes.
+ * A calendar of the month: weekdays in columns, a box per day with its number and one field per task and time of day
+ * (the task's picture pale in it when there are several tasks). Weekdays the board leaves out stay as plain boxes.
  */
-function MonthGrid({ board, stars, linked, today, ...look }: GridProps) {
+function MonthGrid(props: GridProps) {
+  const { board, today, day, look } = props;
   const t = useT();
   const names = t(DAY_NAMES);
-  const days = monthOf(today);
+  const days = monthOf(day);
   const lead = weekday(days[0]);
   const weeks = Math.ceil((lead + days.length) / 7);
   const todayKey = dayKey(today);
   const several = board.tasks.length > 1;
-  const state = (day: Date, task: BoardTask): FieldState => (look.look.print ? "open" : fieldState(stars, linked, day, task, today));
   return (
     <div className="rw-calendar" style={{ gridTemplateRows: `auto repeat(${weeks}, minmax(0, 1fr))` }}>
       {names.map((name) => (
@@ -276,19 +338,27 @@ function MonthGrid({ board, stars, linked, today, ...look }: GridProps) {
           {name}
         </span>
       ))}
-      {days.map((day, i) => {
-        const on = board.days.includes(weekday(day));
-        const isToday = !look.look.print && dayKey(day) === todayKey;
+      {days.map((d, i) => {
+        const on = board.days.includes(weekday(d));
+        const isToday = !look.print && dayKey(d) === todayKey;
         return (
-          <div key={dayKey(day)} className={`rw-mday${isToday ? " today" : ""}${on ? "" : " off"}`} style={i === 0 ? { gridColumnStart: lead + 1 } : undefined}>
-            <span className="rw-mnum">{day.getDate()}</span>
+          <div key={dayKey(d)} className={`rw-mday${isToday ? " today" : ""}${on ? "" : " off"}`} style={i === 0 ? { gridColumnStart: lead + 1 } : undefined}>
+            <span className="rw-mnum">{d.getDate()}</span>
             {on && (
               <span className="rw-mfields">
-                {board.tasks.map((task) => (
-                  <span key={task.id} className="rw-cell">
-                    <Field id={cellKey(day, task.id)} state={state(day, task)} hint={several ? task.emoji : undefined} {...look} />
-                  </span>
-                ))}
+                {board.tasks.flatMap((task) =>
+                  taskSlots(task).map((slot) => (
+                    <span key={`${task.id}|${slot}`} className="rw-cell">
+                      <Field
+                        id={cellKey(d, task.id, slot)}
+                        slot={slot}
+                        hint={several ? task.emoji : undefined}
+                        {...fieldOf(props, d, task, slot)}
+                        {...fieldLook(props)}
+                      />
+                    </span>
+                  )),
+                )}
               </span>
             )}
           </div>
@@ -298,16 +368,21 @@ function MonthGrid({ board, stars, linked, today, ...look }: GridProps) {
   );
 }
 
-/** Today's tasks as big cards side by side, each with its field below. */
-function DayCards({ board, stars, linked, today, ...look }: GridProps) {
+/** The day's tasks as big cards side by side, each with its fields below (one per time of day). */
+function DayCards(props: GridProps) {
+  const { board, day } = props;
   const cols = board.tasks.length > 4 ? Math.ceil(board.tasks.length / 2) : Math.max(1, board.tasks.length);
   return (
     <div className="rw-cards" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
       {board.tasks.map((task) => (
         <div key={task.id} className="rw-card">
           <TaskHead task={task} />
-          <div className="rw-cell">
-            <Field id={cellKey(today, task.id)} state={look.look.print ? "open" : fieldState(stars, linked, today, task, today)} {...look} />
+          <div className="rw-card-fields">
+            {taskSlots(task).map((slot) => (
+              <div key={String(slot)} className="rw-cell">
+                <Field id={cellKey(day, task.id, slot)} slot={slot} {...fieldOf(props, day, task, slot)} {...fieldLook(props)} />
+              </div>
+            ))}
           </div>
         </div>
       ))}
@@ -319,10 +394,19 @@ function DayCards({ board, stars, linked, today, ...look }: GridProps) {
 function CollectPath({
   board,
   count,
+  real,
   aspect,
   rewardLabel,
   ...look
-}: FieldLook & { board: Board; count: number; aspect: number; rewardLabel: (r: { label?: string; catalog?: string }) => string }) {
+}: FieldLook & {
+  board: Board;
+  /** Stars shown, examples included. */
+  count: number;
+  /** Real stars: the next free field is the one after them. */
+  real: number;
+  aspect: number;
+  rewardLabel: (r: { label?: string; catalog?: string }) => string;
+}) {
   const { cols, rows, cells } = snakeLayout(board.goal + 1, aspect);
   const points = cells.map(({ row, col }) => `${col + 0.5},${row + 0.5}`).join(" ");
   const end = cells[cells.length - 1];
@@ -338,7 +422,13 @@ function CollectPath({
               {board.tasks.map((task) => task.emoji).join("")}
             </span>
           )}
-          <Field id={`c${i}`} state={!look.look.print && i < count ? "filled" : "open"} next={!look.look.print && i === count} {...look} />
+          <Field
+            id={`c${i}`}
+            state={!look.look.print && i < count ? "filled" : "open"}
+            isExample={!look.look.print && i >= real && i < count}
+            next={!look.look.print && i === real}
+            {...look}
+          />
         </div>
       ))}
       <div className="rw-cell rw-path-end" style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}>
