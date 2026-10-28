@@ -14,8 +14,8 @@
 
 /*
  * When everything fits on one screen, the free room goes above and below the cards (or „Los geht’s!“):
- * the back link stays in the top corner and the grown-ups' buttons sit on the bottom edge, instead of all
- * of them floating together in the middle. useFitGrid leaves this room out when it sizes the cards.
+ * the top row stays on top and what comes under the cards (the play time note) on the bottom edge, instead
+ * of all of them floating together in the middle. useFitGrid leaves this room out when it sizes the cards.
  */
 .start-screen > [data-spread] {
   margin-block: auto;
@@ -61,28 +61,34 @@
   font-size: 1.15rem;
 }
 
-/* "Über das Spiel" and the options are folded into two buttons until a grown-up opens one. */
-.settings-panel {
+/*
+ * The top row: the way back and, small next to it, "Über das Spiel" and the options, folded into two buttons
+ * until a grown-up opens one (its panel opens under the row). Above the cards, never under them.
+ */
+.start-top {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
-  width: 100%;
-  max-width: 680px;
+  gap: 12px;
+  align-self: stretch;
+}
+
+.start-top > .menu-top {
+  align-self: center;
 }
 
 .panel-button {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 48px;
-  padding: 8px 22px;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 14px;
   border: 3px solid var(--ink);
   border-radius: 999px;
   background: #fff;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  box-shadow: 0 5px 0 var(--ink);
+  box-shadow: 0 4px 0 var(--ink);
   color: inherit;
   font-family: inherit;
   cursor: pointer;
@@ -110,8 +116,7 @@
 .panel-buttons {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .game-info {
@@ -478,10 +483,11 @@ kbd {
 /*
  * More room for the cards on big screens: the back link (with the fullscreen button next to it) moves up
  * into the corner, bigger and yellow so a grown-up finds it at once, and stays there while the page scrolls.
+ * The title takes the top row next to it, so "Über das Spiel" and the options come centred under the title.
  */
 @media (min-width: 900px) and (min-height: 600px) {
   .home > .menu-top,
-  .start-screen > .menu-top {
+  .start-top > .menu-top {
     position: fixed;
     top: max(20px, env(safe-area-inset-top));
     left: max(20px, env(safe-area-inset-left));
@@ -499,6 +505,14 @@ kbd {
 
   .start-screen {
     gap: 20px;
+  }
+
+  .start-screen > .menu-title {
+    order: -1;
+  }
+
+  .start-top {
+    justify-content: center;
   }
 
   .home-subtitle {
@@ -637,15 +651,8 @@ kbd {
     font-size: 1.6rem;
   }
 
-  .settings-panel {
+  .start-top {
     gap: 10px;
-  }
-
-  .panel-button {
-    min-height: 40px;
-    padding: 4px 16px;
-    font-size: 0.95rem;
-    box-shadow: 0 4px 0 var(--ink);
   }
 
   .home:has(> .game-list.fit),

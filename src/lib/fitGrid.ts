@@ -49,8 +49,8 @@ function bestFit(count: number, width: number, height: number, phone: boolean): 
 
 /**
  * Height of the page's content from its top edge, without the bottom padding and the footer for grown-ups.
- * The free room a `data-spread` part takes with its auto margins (to push the buttons under it to the bottom
- * edge) is left out: it is there for the cards to grow into.
+ * The free room a `data-spread` part takes with its auto margins (to centre itself between the top row and
+ * the bottom edge) is left out: it is there for the cards to grow into.
  */
 function contentHeight(page: HTMLElement) {
   let top = Infinity;
@@ -69,7 +69,7 @@ function contentHeight(page: HTMLElement) {
 }
 
 /**
- * Sizes a menu's card grid so that every card and the buttons under it fit on
+ * Sizes a menu's card grid so that every card and what is around it fit on
  * one screen without scrolling, on phones too (with smaller, flatter cards).
  * Only when the cards would get too small does the menu keep its scrolling list.
  * What is marked `data-below-fold` (the install hint for grown-ups) is left out:
