@@ -171,7 +171,7 @@ def thought(a, what):
     "a soft plain light background that fades to almost white towards all four edges, nothing important near the edges, "
     "no outline, border, cloud shape or frame drawn around the picture. "
     "No bathroom, no potty, no toilet, no Mama or Papa. "
-    + CAST[a]["first"] + f", appears exactly once, wearing its trousers. Now this happens: {what} " + END)
+    + CAST[a]["first"] + f", appears exactly once, fully dressed in its light blue T-shirt and blue trousers. Now this happens: {what} " + END)
 
 THOUGHTS = {
  # Pipi: things that flow, splash and let go.
@@ -184,7 +184,14 @@ THOUGHTS = {
  "ketchup": "At a small table outside, Tapsi squeezes a big red ketchup bottle with both paws, pressing hard with rosy cheeks; a long red stripe of ketchup comes out onto a plate of noodles.",
  "aufblasen": "Outside on a meadow, Tapsi blows up a big red balloon, cheeks puffed up round and red with effort, pressing hard, eyes squeezed.",
  "huhn": "On a farm, a plump brown hen sits in a straw nest and presses with a red face, eyes squeezed shut; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
+ "wasserrad": "At a sunny water playground, a stream of water runs down a little wooden channel and turns a small wooden water wheel, splashing; Tapsi kneels beside it and watches, delighted, one paw pointing at the wheel.",
+ "tee": "On a picnic blanket on a meadow, Tapsi holds a small white teapot with blue dots in both paws and pours a stream of tea into a little cup in front of a brown teddy bear; Tapsi smiles.",
  "knete": "At a small table, Tapsi presses colourful play dough (orange, purple, green) through a toy dough press with both paws, pressing hard; long soft dough sausages come out of the holes.",
+ "spritzbeutel": "At a small table, Tapsi squeezes a big white piping bag with both paws, pressing hard with rosy cheeks; a thick white swirl of whipped cream comes out onto a round strawberry cake.",
+ "erbsen": "In a vegetable garden, Tapsi presses a long green pea pod open with both thumbs, pressing hard with rosy cheeks; round green peas pop out of it and jump into the air above a small wooden bowl.",
+ # Waiting until something comes out, without pressing.
+ "tunnel": ("On a playroom floor, a wooden toy railway runs through a small toy tunnel in a green felt hill; only the back end of a red toy train still sticks out of the tunnel's left side, "
+            "the right side of the tunnel is an empty dark opening; Tapsi, in its light blue T-shirt and blue trousers, kneels beside it and peeks at the tunnel, curious."),
 }
 THOUGHT_MOVES = {
  "giesskanne": "the watering can is tipped further, more water pours, the sunflower nods a little",
@@ -196,6 +203,11 @@ THOUGHT_MOVES = {
  "aufblasen": "the balloon is much bigger, the cheeks even rounder",
  "huhn": "plop: the hen has stood up a little, a white egg lies in the straw under it; Tapsi cheers with both arms up",
  "knete": "the dough sausages are much longer and curl onto the table, Tapsi presses further down",
+ "wasserrad": "the water wheel has turned on (its paddles stand at other places), new splashes fly up, Tapsi claps both paws",
+ "tee": "the teapot is tipped further, the cup in front of the teddy is full to the brim with a little splash, Tapsi laughs",
+ "spritzbeutel": "Tapsi has lifted its head and smiles proudly with open eyes and an open mouth, the cheeks no longer puffed; the piping bag is squeezed flat and empty; a second tall white cream swirl now sits on the cake next to the first",
+ "erbsen": "the pod is wide open and empty, the peas have landed in the bowl, Tapsi laughs with both arms up",
+ "tunnel": "the back of the train is gone from the left side; the red toy engine now comes out of the right side of the tunnel, Tapsi points at it and cheers",
 }
 
 def job(a, name, prompt, ref=None, aspect="16:9", size="1376"):
@@ -209,6 +221,8 @@ def second_of(what):
           f"Nothing appears, disappears or moves except this small movement: {what}. No text, no letters.")
 
 raw = lambda a, n: f".image-raw/{a}-{n}.png"
+# A third argument names only some thoughts, so new ones are made without drawing the old ones again: think fox tee,erbsen
+wanted = lambda n: len(sys.argv) < 4 or n in sys.argv[3].split(",")
 
 def stage(st, a):
   if st == "kitchen-first": return [job(a, "essen", kitchen(a)["essen"])]
@@ -222,8 +236,8 @@ def stage(st, a):
   if st == "frames-bath": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n not in ["essen", "trinken", "blase", "bauch", "rufen", "spielen"] and not n.startswith("warten-")]
   if st == "frames-wait": return [job(a, n + "-b", second(n), raw(a, n)) for n in MOVE if n.startswith("warten-")]
   # From the game's own pictures: the raw ones of the first round are gone.
-  if st == "think": return [job(a, "denken-" + n, thought(a, w), f"src/games/potty/bilder/{a}-essen.webp", "4:3", "1200") for n, w in THOUGHTS.items()]
-  if st == "frames-think": return [job(a, f"denken-{n}-b", second_of(m), raw(a, "denken-" + n), "4:3", "1200") for n, m in THOUGHT_MOVES.items()]
+  if st == "think": return [job(a, "denken-" + n, thought(a, w), f"src/games/potty/bilder/{a}-essen.webp", "4:3", "1200") for n, w in THOUGHTS.items() if wanted(n)]
+  if st == "frames-think": return [job(a, f"denken-{n}-b", second_of(m), raw(a, "denken-" + n), "4:3", "1200") for n, m in THOUGHT_MOVES.items() if wanted(n)]
   if st == "moves": return [job(a, n, earlier(p), f"src/games/potty/bilder/{a}-{n.split('-')[0]}.webp") for n, p in MOVES.items()]
   raise SystemExit("unknown stage")
 

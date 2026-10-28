@@ -142,7 +142,7 @@ export function picturesFor(step: Step, which: Which): string[] {
 }
 
 /** The sound a waiting scene makes when it comes (see PottyPlay.tsx). */
-export type SceneSound = "trickle" | "splash" | "glug" | "whoosh" | "squeeze" | "blow" | "plop" | "dance" | "juggle" | "peekaboo" | "bubbles";
+export type SceneSound = "trickle" | "splash" | "glug" | "whoosh" | "squeeze" | "blow" | "plop" | "dance" | "juggle" | "peekaboo" | "bubbles" | "toot";
 
 /**
  * What Tapsi thinks of while it sits, in a thought bubble over the still bathroom picture: things that
@@ -164,10 +164,16 @@ export const WAIT_SCENES: WaitScene[] = [
   { id: "ballon", emoji: "🎈💨", need: "pipi", sound: "whoosh" },
   { id: "regen", emoji: "🌧️☔", need: "pipi", sound: "trickle" },
   { id: "schlauch", emoji: "💦🦆", need: "pipi", sound: "splash" },
+  { id: "wasserrad", emoji: "💧🎡", need: "pipi", sound: "trickle" },
+  { id: "tee", emoji: "🫖☕", need: "pipi", sound: "glug" },
   { id: "ketchup", emoji: "🍅🍝", need: "kaka", sound: "squeeze" },
   { id: "aufblasen", emoji: "😤🎈", need: "kaka", sound: "blow" },
   { id: "huhn", emoji: "🐔🥚", need: "kaka", sound: "plop" },
   { id: "knete", emoji: "🟠🟣🟢", need: "kaka", sound: "squeeze" },
+  { id: "spritzbeutel", emoji: "🍰", need: "kaka", sound: "squeeze" },
+  { id: "erbsen", emoji: "🫛", need: "kaka", sound: "plop" },
+  // Waiting until something comes out, without pressing: for children afraid of kaka.
+  { id: "tunnel", emoji: "🚂", need: "kaka", sound: "toot" },
   { id: "tanzen", emoji: "💃🕺", need: "silly", sound: "dance" },
   { id: "jonglieren", emoji: "🤹", need: "silly", sound: "juggle" },
   { id: "kuckuck", emoji: "🙈", need: "silly", sound: "peekaboo" },
@@ -256,6 +262,11 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
       aufblasen: "Tapsi bläst den Ballon auf. Ganz fest pusten!",
       huhn: "Das Huhn drückt ganz fest. Plopp, ein Ei!",
       knete: "Tapsi drückt die Knete. Da kommen Würstchen raus!",
+      wasserrad: "Das Wasser dreht das Rad. Plätscher, plätscher!",
+      tee: "Tapsi gießt Tee ein. Gluck, gluck, gluck!",
+      spritzbeutel: "Tapsi drückt den Spritzbeutel. Sahne auf den Kuchen!",
+      erbsen: "Tapsi drückt die Schote. Plopp, plopp, die Erbsen!",
+      tunnel: "Der Zug ist im Tunnel. Tuut, da kommt er raus!",
       tanzen: "Mama und Papa tanzen!",
       jonglieren: "Papa jongliert mit Klopapier!",
       kuckuck: "Wo ist Mama? Kuckuck!",

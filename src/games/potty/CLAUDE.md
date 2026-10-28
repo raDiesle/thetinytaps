@@ -55,9 +55,10 @@ softly) stays as it is, a clock ticks on the wall above the bathtub (`WaitClock.
 left (`.pt-think`, as wide as the room left of Tapsi, its picture zoomed past the white edges) shows
 what Tapsi thinks of: the next thought comes by itself every `WAIT_SCENE_MS`, or at once on a tap, round and round
 without end – only thoughts for what the child said: for pipi
-things that flow and splash (watering a flower, a fountain, a balloon let go, rain and a puddle, a garden hose), for
-kaka things that are pressed until something comes (ketchup, blowing up a balloon, a hen laying an egg, play dough
-through a press), all with Tapsi alone and away from the bathroom; for both or when unsure the two
+things that flow and splash (watering a flower, a fountain, a balloon let go, rain and a puddle, a garden hose, a water
+wheel, pouring tea for the teddy), for kaka things that are pressed until something comes (ketchup, blowing up a
+balloon, a hen laying an egg, play dough through a press, a piping bag, peas from their pod) and one that only waits
+until something comes out (a toy train in a tunnel, for children afraid of kaka), all with Tapsi alone and away from the bathroom; for both or when unsure the two
 taking turns. A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
 else its emoji (`WaitScene.emoji`); `prompts.py think` and `frames-think` make them. The old full-screen waiting pictures
 (`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are kept but not shown

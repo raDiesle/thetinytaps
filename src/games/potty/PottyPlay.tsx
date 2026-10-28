@@ -25,6 +25,7 @@ import {
   playTrickle,
   playTusch,
   playBlow,
+  playWhistle,
   playWhoosh,
   recorded,
 } from "@/lib/sfx";
@@ -271,6 +272,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     juggle: () => [0, 300, 600].forEach((ms) => later(ms, playBoing)),
     peekaboo: () => playGiggle(),
     bubbles: () => [0, 250, 500, 750].forEach((ms) => later(ms, playPop)),
+    // The train whistles as it comes out of the tunnel.
+    toot: () => later(500, playWhistle),
   };
 
   /**
