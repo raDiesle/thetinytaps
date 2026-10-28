@@ -403,15 +403,40 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
           {shown === null && (
             <p className="letters-welcome">
               {!touchKeys
-                ? t({ de: "Drück eine Taste! ⌨️", ru: "Нажми на клавишу! ⌨️" })
+                ? t({
+                    de: "Drück eine Taste! ⌨️",
+                    ru: "Нажми на клавишу! ⌨️",
+                    en: "Press a key! ⌨️",
+                    zh: "按一个键吧！⌨️",
+                    hi: "कोई बटन दबाओ! ⌨️",
+                    es: "¡Pulsa una tecla! ⌨️",
+                    ar: "هيّا نضغط على زر! ⌨️",
+                  })
                 : numbersOnly
-                  ? t({ de: "Tipp auf eine Zahl! 👇", ru: "Нажми на цифру! 👇" })
-                  : t({ de: "Tipp auf einen Buchstaben! 👇", ru: "Нажми на букву! 👇" })}
+                  ? t({
+                      de: "Tipp auf eine Zahl! 👇",
+                      ru: "Нажми на цифру! 👇",
+                      en: "Tap a number! 👇",
+                      zh: "点一个数字吧！👇",
+                      hi: "कोई अंक दबाओ! 👇",
+                      es: "¡Toca un número! 👇",
+                      ar: "هيّا نلمس رقما! 👇",
+                    })
+                  : t({
+                      de: "Tipp auf einen Buchstaben! 👇",
+                      ru: "Нажми на букву! 👇",
+                      en: "Tap a letter! 👇",
+                      zh: "点一个字母吧！👇",
+                      hi: "कोई अक्षर दबाओ! 👇",
+                      es: "¡Toca una letra! 👇",
+                      ar: "هيّا نلمس حرفا! 👇",
+                    })}
             </p>
           )}
           {shown?.kind === "letter" && (
             <LetterCard
               key={shown.id}
+              pack={pack}
               letter={shown.letter}
               word={shown.word}
               settings={settings}

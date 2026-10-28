@@ -77,16 +77,20 @@ one round, one star (`starred`), also when the row jumps to the end again. Reach
 or a ✓ forgotten by jumping back before „fertig“), the chart shows only the stars there are. The story when nothing
 came ends on `play` and never shows the chart.
 
-Files: `content.ts` (Tapsi, steps with their pictures and icons, waiting scenes, German and Russian texts), `images.ts` (finds
+Files: `content.ts` (Tapsi, steps with their pictures and icons, waiting scenes, texts in every language), `images.ts` (finds
 `bilder/fox-<picture>.webp` and its `-b` frame), `StoryPicture.tsx` (the picture with its frames, also in the bubble),
 `PottyPlay.tsx` (steps, sounds, speech, the ✓, the star), `WeekStars.tsx`, `potty.css`, `settings.ts`
 (`tinytaps.potty.v3`: only speech and sounds, from the home page). `potty.test.ts` fails when a picture of the story is missing, a
 thought's picture lacks its second frame, or `bilder/` holds a picture of anybody else.
 
-German and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart inline `t({ de, ru })`): another language
-goes next to them when asked for, and a new or changed German line loses its Russian until then. Tapsi is „Тапси“ in
-Russian (`TAPSI.name` is `Localized`), „Pipi“ and „Kaka“ are „пи-пи“ and „ка-ка“ as in the Russian song; to the grown-up
-Russian says „вы“, to the child „ты“.
+German, English, Chinese, Hindi, Spanish, Arabic and Russian (`POTTY_TEXTS` is `Localized`; start screen and week chart
+inline `t({ … })`): another language goes next to them when asked for, and a new or changed German line loses its
+translations until then. Tapsi (`TAPSI.name` is `Localized`) is „Tapsi“ in English and Spanish, „塔普西“, „टैप्सी“,
+„تابسي“, „Тапси“. „Pipi“ and „Kaka“ are pee/poop, pipí/popó, 尿尿/便便, सू-सू/पॉटी, بيبي/كاكا, „пи-пи“/„ка-ка“ (as in the
+Russian song); the potty chair is potty, orinal, 小马桶, पॉटी-सीट, النونية, горшок. To the grown-up: usted, आप, Arabic
+plural, „вы“; to the child: tú, तुम, „ты“. Hindi verbs agree with the subject's gender, so Tapsi and the child are
+never the subject of a gendered verb („टैप्सी को सू-सू जाना है“); Arabic says "we" (هيّا نغسل), "I" or „بحاجة إلى“.
+`potty.test.ts` checks that every language has every line, Chinese, Hindi and Arabic with no Latin letters.
 
 The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and gets quiet while the voice speaks. German, Russian and Spanish so far (Spanish waits until it is an app language; `LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
 

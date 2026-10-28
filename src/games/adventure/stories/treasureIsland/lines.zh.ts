@@ -5,11 +5,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Schatzinsel“ in Chinese. */
 export const TRANSLATION: StoryTranslation = {
+  title: "金银岛",
   defaultTurn: "轮到你啦！",
   opening: ["看——那边就是宝藏岛！", "那里有一个宝藏！", "你跟我一起去吗？"],
   steps: [
     // 👋
     {
+      name: "向琪琪挥手",
       situation: "啊嗬！我是塔普西。琪琪来啦，它是我的鹦鹉！",
       instruction: "我跟琪琪挥挥手——像这样！",
       turn: "你也跟琪琪挥挥手吧？",
@@ -18,6 +20,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎣
     {
+      name: "甩出鱼竿",
       situation: "现在我们去钓鱼！",
       instruction: "从肩膀后面甩——远远地抛出去，像这样！",
       turn: "轮到你——把鱼竿甩出去！",
@@ -25,9 +28,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "好多鱼呀！",
     },
     // 🪑
-    { instruction: "跟我一起坐下——像这样！", praise: "出发啦！" },
+    { name: "坐下", instruction: "跟我一起坐下——像这样！", praise: "出发啦！" },
     // 🛶
     {
+      name: "划桨",
       situation: "奥乐游起来啦——游向宝藏岛！",
       instruction: "看：桨在右边划水——再在左边。",
       turn: "跟我一起划！",
@@ -35,9 +39,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "到啦！奥乐到沙滩上了。",
     },
     // 🧍
-    { instruction: "我们到岛上啦！跟我一起站起来——像这样！", praise: "继续出发！" },
+    { name: "站起来", instruction: "我们到岛上啦！跟我一起站起来——像这样！", praise: "继续出发！" },
     // 🦂
     {
+      name: "跺脚赶蝎子",
       situation: "哎呀！蝎子爬到奥乐身上啦！",
       instruction: "抬起脚——快快用力跺，像这样！",
       turn: "轮到你——跟我一起跺！",
@@ -46,6 +51,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌉
     {
+      name: "跳过小桥",
       situation: "一座小桥！上面飘着好多箱子。",
       instruction: "跳——用头顶箱子，砰！",
       turn: "轮到你——跟我一起跳！",
@@ -54,6 +60,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪵
     {
+      name: "在树干下弯腰",
       situation: "小心！上面有根木头在晃。",
       instruction: "它过来的时候，我们蹲下——像这样！",
       turn: "来啦！蹲下！",
@@ -62,6 +69,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥁
     {
+      name: "打鼓",
       situation: "哦，路上停着好多小鸟！那里还挂着两面鼓。",
       instruction: "左边——咚！右边——咚！像这样！",
       turn: "轮到你——跟我一起敲鼓！",
@@ -70,6 +78,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ⚙️
     {
+      name: "摇把手",
       situation: "一扇大门！那里有个摇把。",
       instruction: "我们转摇把——转呀转，像这样！",
       turn: "轮到你——跟我一起转！",
@@ -78,6 +87,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥥
     {
+      name: "往旁边迈一步",
       situation: "哦，猴子扔下椰子啦！椰子正朝我们滚过来。",
       instruction: "往旁边迈一大步——再回来。像这样！",
       turn: "椰子来啦！往旁边迈一大步！",
@@ -86,6 +96,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦵
     {
+      name: "抬腿让椰子过去",
       situation: "现在它们从左边滚过来！",
       instruction: "抬起腿——椰子从下面滚过去。像这样！",
       turn: "轮到你——抬腿！",
@@ -94,6 +105,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦶
     {
+      name: "叉开腿让椰子过去",
       situation: "现在它们从中间滚过来！",
       instruction: "两腿张得大大的——椰子从中间滚过去。像这样！",
       turn: "轮到你——张开腿！",
@@ -102,6 +114,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐒
     {
+      name: "躲椰子",
       situation: "哦，猴子！它们在扔椰子！",
       instruction: "我们慢慢地躲开——往旁边，像这样！",
       turn: "轮到你——躲开！",
@@ -110,6 +123,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🍎
     {
+      name: "摘苹果",
       situation: "一棵苹果树！那里有个篮子。",
       instruction: "伸得高高的，摘苹果——像这样！",
       turn: "轮到你——摘个苹果！",
@@ -118,6 +132,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🧩
     {
+      name: "图画谜题",
       situation: "一扇门上有三幅画。是个谜题！",
       instruction: "我们学画里的样子。先变得高高的——像这样！",
       turn: "轮到你——变高高！",
@@ -126,6 +141,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🕸️
     {
+      name: "拨开蜘蛛网",
       situation: "哦，好多蜘蛛网！我们过不去。",
       instruction: "爪子举高——往旁边远远地挥，像这样！",
       turn: "轮到你——跟我一起挥！",
@@ -134,6 +150,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪢
     {
+      name: "用绳子拉宝箱",
       situation: "宝箱漂过来啦！",
       instruction: "两只手轮流拉绳子——像这样！",
       turn: "跟我一起拉！",
@@ -142,6 +159,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🔑
     {
+      name: "转钥匙",
       situation: "哦，有把锁！琪琪带来了钥匙。",
       instruction: "捡起来，插进去，转一转——像这样！",
       turn: "轮到你——转钥匙！",
@@ -150,6 +168,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 💰
     {
+      name: "抛金币",
       situation: "哦！金子！螃蟹把宝箱搬过来啦。我跳下来！",
       instruction: "手深深伸进去——把金币抛得高高的！像这样！",
       turn: "轮到你——伸进去，抛高高！",
@@ -158,6 +177,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "好耶！",
       situation: "我们找到宝藏啦！",
       instruction: "举起手臂——耶！",
       turn: "你也来——耶！",
@@ -166,6 +186,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌅
     {
+      name: "挥手告别",
       situation: "太阳下山啦。",
       instruction: "我跟琪琪挥手说再见——像这样！",
       turn: "你也挥挥手吗？",

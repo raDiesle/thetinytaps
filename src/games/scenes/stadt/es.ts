@@ -1,0 +1,61 @@
+import type { SceneTranslation } from "../types";
+
+// The Spanish words of the Stadt picture: names (without article, with gender for el/la),
+// what each item says and the chain sentences. Neutral Spanish for Spain and Latin America.
+
+/** „Stadt“ in Spanish. */
+export const ES: SceneTranslation = {
+  title: "Ciudad",
+  description: "Autobús, bomberos y panadería en la ciudad.",
+  items: {
+    sonne: { name: "sol", gender: "m", sentences: ["¡El sol brilla!", "El sol sonríe."] },
+    wolke: { name: "nube", gender: "f", sentences: ["La nube trae lluvia. ¡Plic, plac!", "La nube es blanca y suave."] },
+    flugzeug: { name: "avión", gender: "m", sentences: ["¡El avión da una vuelta en el aire!", "¡Brum! El avión vuela sobre la ciudad."] },
+    kirche: { name: "iglesia", gender: "f", sentences: ["¡Din, don! Suena la campana.", "Arriba en la torre hay un gallo.", "El reloj dice qué hora es."] },
+    haus: { name: "casa", gender: "f", sentences: ["En la casa vive mucha gente.", "¡Se enciende la luz!", "¡Hola! Un niño saluda desde la ventana."] },
+    katze: { name: "gato", gender: "m", sentences: ["¡Miau! El gato está en la ventana.", "El gato mira la calle."] },
+    baeckerei: { name: "panadería", gender: "f", sentences: ["¡Mmm, en la panadería hay pan recién hecho!", "El panadero hace pan y panecillos."] },
+    feuerwache: {
+      name: "estación de bomberos",
+      gender: "f",
+      sentences: ["Esta es la estación de bomberos.", "La puerta se abre. Aquí vive el camión de bomberos."],
+    },
+    baum: { name: "árbol", gender: "m", sentences: ["En el árbol crecen manzanas rojas.", "El viento sopla en el árbol."] },
+    vogel: { name: "pájaro", gender: "m", sentences: ["¡Pío, pío! El pájaro vuela.", "El pájaro vive en el árbol."] },
+    schaukel: { name: "columpio", gender: "m", sentences: ["¡Uy! El niño se columpia muy alto.", "Adelante y atrás, adelante y atrás."] },
+    eiswagen: { name: "camión de helados", gender: "m", sentences: ["¡Qué rico, un helado!", "¿Fresa, chocolate o vainilla?"] },
+    oma: { name: "abuela", gender: "f", sentences: ["¡Hola! La abuela saluda.", "La abuela está sentada en el banco."] },
+    briefkasten: { name: "buzón", gender: "m", sentences: ["¡Una carta para ti!", "El buzón es amarillo."] },
+    spatz: { name: "gorrión", gender: "m", sentences: ["¡Pío! El gorrión está en el buzón.", "El gorrión es pequeño y marrón."] },
+    laterne: { name: "farola", gender: "f", sentences: ["La farola se enciende. ¡Ya hay luz!", "La farola alumbra por la noche."] },
+    hydrant: { name: "hidrante", gender: "m", sentences: ["Del hidrante sale agua para los bomberos.", "¡Plic, plic, plas!"] },
+    bus: { name: "autobús", gender: "m", sentences: ["El autobús para. ¡Todos arriba!", "Las puertas se abren y se cierran.", "¡Pi, pi! El autobús arranca."] },
+    polizei: { name: "coche de policía", gender: "m", sentences: ["¡Nino, nino! Llega la policía.", "La luz azul brilla."] },
+    fahrrad: { name: "bicicleta", gender: "f", sentences: ["¡Rin, rin! Aquí viene la bicicleta.", "Con casco vamos seguros."] },
+    enten: { name: "familia de patos", gender: "f", sentences: ["¡Cua, cua! Los patos cruzan la calle.", "Los coches esperan a los patos."] },
+    auto: { name: "coche", gender: "m", sentences: ["¡Pi, pi! El coche pita.", "El coche es rojo."] },
+    feuerwehr: {
+      name: "camión de bomberos",
+      gender: "m",
+      sentences: ["¡Nino, nino! Salen los bomberos.", "La escalera sube muy alto.", "El camión de bomberos es rojo."],
+    },
+    muellauto: { name: "camión de la basura", gender: "m", sentences: ["El camión de la basura recoge la basura.", "¡Arriba el cubo y adentro!"] },
+    ampel: { name: "semáforo", gender: "m", sentences: ["Muñequito rojo: ¡nos quedamos quietos!", "Muñequito verde: ya podemos cruzar."] },
+    muelleimer: { name: "papelera", gender: "f", sentences: ["La basura va a la papelera.", "¡Uy, la papelera se tambalea!"] },
+    blumen: { name: "flores", gender: "f", plural: true, sentences: ["Las flores son de muchos colores.", "Rosa, amarillo y lila."] },
+    falter: { name: "mariposa", gender: "f", sentences: ["Una mariposa revolotea.", "A la mariposa le gustan las flores."] },
+    roller: { name: "patinete", gender: "m", sentences: ["¡El patinete rueda!", "Con el patinete se va rápido."] },
+    kinderwagen: { name: "cochecito", gender: "m", sentences: ["En el cochecito hay un bebé.", "El bebé se ríe. ¡Jiji!"] },
+    brunnen: { name: "fuente", gender: "f", sentences: ["¡La fuente echa agua muy alto!", "¡Chap, chap!"] },
+    luftballon: { name: "globo", gender: "m", sentences: ["El globo es rojo.", "¡Agárralo fuerte!"] },
+    hund: { name: "perro", gender: "m", sentences: ["¡Guau, guau! El perro quiere jugar.", "El perro mueve la cola."] },
+    marienkaefer: { name: "mariquita", gender: "f", sentences: ["¡La mariquita sale volando!", "La mariquita tiene puntos negros."] },
+    taube: { name: "paloma", gender: "f", sentences: ["¡Cu, cu! La paloma picotea migas.", "La paloma es gris."] },
+    maus: { name: "ratón", gender: "m", sentences: ["¡Pii! El ratón vive en la alcantarilla.", "¡Hola, ratoncito!"] },
+  },
+  chains: [
+    ["¡El gato de la ventana arquea el lomo!", "¡Y el pájaro sale volando rápido!"],
+    ["¡Nino, nino! Salen los bomberos.", "¡Agua va!"],
+    ["¡Verde! Los patos cruzan la calle.", "El coche espera y pita: ¡pi, pi!"],
+  ],
+};

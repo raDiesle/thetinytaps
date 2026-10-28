@@ -1,0 +1,61 @@
+import type { SceneTranslation } from "../types";
+
+// The Spanish words of the Badezimmer picture: names (without article, with gender for el/la,
+// `plural` for „pantuflas“ and „burbujas de jabón“), what each item says and the chain sentences.
+// Neutral Spanish for Spain and Latin America.
+
+/** „Badezimmer“ in Spanish. */
+export const ES: SceneTranslation = {
+  title: "Baño",
+  description: "Patito de goma, montaña de espuma y cadena del inodoro.",
+  items: {
+    luefter: { name: "ventilador", gender: "m", sentences: ["¡Zzz, zzz! El ventilador gira.", "El ventilador se lleva el vapor."] },
+    fenster: { name: "ventana", gender: "f", sentences: ["La ventana se abre. ¡Aire fresco!", "¡Pío, pío! Un pájaro se asoma."] },
+    dusche: { name: "ducha", gender: "f", sentences: ["La ducha salpica. ¡Plic, plac!", "El agua está calentita."] },
+    lampe: { name: "lámpara", gender: "f", sentences: ["¡Clic! La lámpara se enciende.", "Ahora hay mucha luz."] },
+    spiegel: { name: "espejo", gender: "m", sentences: ["El espejo se moja todo.", "¡Mira, una cara sonriente!"] },
+    handtuch: { name: "toalla", gender: "f", sentences: ["La toalla es suave y azul.", "La toalla se balancea de un lado a otro."] },
+    shampoo: { name: "champú", gender: "m", sentences: ["El champú hace mucha espuma.", "¡Blub! Las burbujas suben volando."] },
+    pflanze: { name: "planta", gender: "f", sentences: ["La planta mueve las hojas.", "¡Mira, se abre una flor!"] },
+    uhr: { name: "reloj", gender: "m", sentences: ["¡Tic, tac! El reloj hace tictac.", "Las agujas dan vueltas y vueltas."] },
+    klopapier: { name: "papel higiénico", gender: "m", sentences: ["El rollo gira.", "El papel higiénico se desenrolla y se enrolla."] },
+    spinne: { name: "araña", gender: "f", sentences: ["La arañita baja por su hilo.", "¡Hola! La araña saluda con ocho patas."] },
+    tuer: { name: "puerta", gender: "f", sentences: ["¡Toc, toc! ¿Quién es?", "Mamá se asoma y saluda."] },
+    waschmaschine: { name: "lavadora", gender: "f", sentences: ["¡Brum, brum! La lavadora lava.", "La ropa da vueltas y vueltas."] },
+    waschbecken: { name: "lavabo", gender: "m", sentences: ["¡Glu, glu! El agua se va.", "Las puertas se abren. ¡Ahí está el papel higiénico!"] },
+    wasserhahn: { name: "grifo", gender: "m", sentences: ["¡Plic, plic! El grifo gotea.", "¡Grifo cerrado! Ya no gotea."] },
+    zahnbuerste: { name: "cepillo de dientes", gender: "m", sentences: ["¡Fric, fric! El cepillo de dientes limpia.", "Los dientes quedan muy limpios."] },
+    zahnpasta: { name: "pasta de dientes", gender: "f", sentences: ["La pasta de dientes sale del tubo.", "¡Un poquito para el cepillo!"] },
+    toilette: { name: "inodoro", gender: "m", sentences: ["¡Fuuush! El inodoro tira el agua.", "La tapa se abre y se cierra."] },
+    badewanne: { name: "bañera", gender: "f", sentences: ["La bañera está llena de agua.", "¡Plic, plac! El agua se mueve.", "La bañera es muy grande."] },
+    kind: { name: "niño", gender: "m", sentences: ["El niño se baña y canta: ¡la, la, la!", "El niño saluda con las dos manos."] },
+    ente: { name: "patito de goma", gender: "m", sentences: ["¡Cuic, cuic! El patito nada.", "El patito de goma es amarillo."] },
+    schaumberg: { name: "montaña de espuma", gender: "f", sentences: ["¡La espuma sube y sube!", "¡Blub! Las burbujas salen volando."] },
+    muelleimer: { name: "papelera", gender: "f", sentences: ["¡Clac! La tapa se abre.", "El papel cae en la papelera."] },
+    waeschekorb: { name: "cesto de la ropa", gender: "m", sentences: ["La tapa se levanta.", "¡Hola! Se asoma un calcetín."] },
+    kroko: { name: "cocodrilo", gender: "m", sentences: ["¡Ñac, ñac! El cocodrilo abre la boca.", "El cocodrilo es de goma."] },
+    foehn: { name: "secador", gender: "m", sentences: ["¡Fsss! El secador echa aire caliente.", "Ahora el pelo se seca."] },
+    waage: { name: "báscula", gender: "f", sentences: ["¡Pi, pi! La báscula muestra un número.", "¿Cuánto pesas?"] },
+    toepfchen: { name: "orinal", gender: "m", sentences: ["El orinal salta. ¡Hop!", "¡Tachán! ¡Todo listo!"] },
+    katze: { name: "gato", gender: "m", sentences: ["¡Miau! El gato se lava.", "El gato se lame la pata."] },
+    wal: { name: "ballena", gender: "f", sentences: ["¡Pffft! La ballena echa un chorro de agua.", "La ballenita es un juguete de baño."] },
+    seife: { name: "jabón", gender: "m", sentences: ["¡Uy! El jabón se escapa.", "El jabón hace burbujas."] },
+    hausschuhe: { name: "pantuflas", gender: "f", plural: true, sentences: ["Las pantuflas de conejo saltan.", "¡Hop, hop! Las orejas se mueven."] },
+    frosch: { name: "rana", gender: "f", sentences: ["¡Croac! La rana salta.", "¡La rana echa agua!"] },
+    hund: { name: "perro", gender: "m", sentences: ["El perro se sacude. ¡Todo se moja!", "¡Guau, guau! El perro también se ha bañado."] },
+    wasserball: { name: "pelota de playa", gender: "f", sentences: ["La pelota de playa rebota. ¡Boing!", "La pelota es de muchos colores."] },
+    seifenblasen: {
+      name: "burbujas de jabón",
+      gender: "f",
+      plural: true,
+      sentences: ["¡Fuu! Salen volando muchas burbujas de jabón.", "¡Plop! La burbuja ha explotado."],
+    },
+    schiffchen: { name: "barquito", gender: "m", sentences: ["¡Tuut, tuut! El barquito se mece.", "El viento sopla en la vela."] },
+    schwamm: { name: "esponja", gender: "f", sentences: ["Aprietan la esponja. ¡Plas!", "El agua gotea."] },
+  },
+  chains: [
+    ["¡El niño se ríe y salpica también!", "Y el patito se mece en las olas."],
+    ["El viento sopla en la toalla.", "¡Y las burbujas de jabón salen volando!"],
+    ["El gato se asusta: ¡miau!", "Y el perro ladra: ¡guau, guau!"],
+  ],
+};

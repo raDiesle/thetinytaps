@@ -3,7 +3,7 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playMelody } from "@/lib/sfx";
-import { type Localized, pick, useAppLanguage } from "@/lib/language";
+import { type Localized, pick, spokenIn, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { BuildingLevel } from "./BuildingLevel";
 import { CircusLevel } from "./CircusLevel";
@@ -81,10 +81,12 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
     },
     [settings.sounds],
   );
-  // Every line is said in the app language, with that language's voice.
+  // Every line is said in the app language, with that language's voice; a line not translated yet in German, with the German voice.
   const say = useCallback(
     (text: Localized) => {
-      if (settings.speech) speak(pick(text, language.id), language.speechLang, { queue: true });
+      if (!settings.speech) return;
+      const line = spokenIn(text, language);
+      speak(line.text, line.lang, { queue: true });
     },
     [settings.speech, language],
   );

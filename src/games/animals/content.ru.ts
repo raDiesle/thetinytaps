@@ -1,4 +1,4 @@
-import type { Animal, AnimalTexts, Food } from "./content";
+import type { Animal, AnimalTexts, AnimalTranslation, Food } from "./content";
 import type { Home, HomeId } from "./homes";
 
 // Russian texts for "Was gehört zum Tier?", by the ids of the animals, foods and
@@ -113,3 +113,6 @@ export function russianTexts(german: AnimalTexts): AnimalTexts {
     stars: (n) => `Готово: ${n}`,
   };
 }
+
+/** Russian, for the table of languages in content.ts. */
+export const RUSSIAN: AnimalTranslation = { words: { animals: RUSSIAN_ANIMALS, foods: RUSSIAN_FOODS, homes: RUSSIAN_HOMES }, texts: russianTexts };

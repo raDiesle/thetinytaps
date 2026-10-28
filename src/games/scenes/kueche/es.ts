@@ -1,0 +1,73 @@
+import type { SceneTranslation } from "../types";
+
+// The Spanish words of the Küche picture: names (without article, with gender for el/la,
+// `plural` for „cajones“ and „cucharas de madera“), what each item says and the chain sentences.
+// Neutral Spanish for Spain and Latin America.
+
+/** „Küche“ in Spanish. */
+export const ES: SceneTranslation = {
+  title: "Cocina",
+  description: "La olla burbujea, la tostadora salta y el pastel sube.",
+  items: {
+    schrank: { name: "armario", gender: "m", sentences: ["Las puertas se abren. ¡Ahí están las tazas!", "¡Clin, clin! Las tazas saltan."] },
+    fenster: { name: "ventana", gender: "f", sentences: ["La ventana se abre. ¡Aire fresco!", "El viento mueve la cortina de un lado a otro."] },
+    vogel: { name: "pájaro", gender: "m", sentences: ["¡Pío, pío! El pájaro canta.", "El pajarito está sentado en la rama."] },
+    blume: { name: "flor", gender: "f", sentences: ["La flor mueve las hojas.", "¡Mira, la flor se abre!"] },
+    uhr: { name: "reloj", gender: "m", sentences: ["¡Tic, tac! El reloj hace tictac.", "Las agujas dan vueltas y vueltas."] },
+    haube: { name: "campana extractora", gender: "f", sentences: ["¡Fsss! La campana se lleva el vapor.", "¡Clic! Se enciende la luz."] },
+    keksschrank: {
+      name: "armario de las galletas",
+      gender: "m",
+      sentences: ["Las puertas se abren. ¡Ahí está la caja de galletas!", "¡Hop! Sale una galleta de un salto."],
+    },
+    kuehlschrank: {
+      name: "nevera",
+      gender: "f",
+      sentences: ["La nevera se abre. ¡Brrr, qué frío!", "Ahí están la leche y la gelatina.", "¡Mmmm! La nevera zumba."],
+    },
+    geschirrspueler: { name: "lavaplatos", gender: "m", sentences: ["El lavaplatos se abre. ¡Todo está limpio!", "Mira cómo brillan los platos."] },
+    spuele: { name: "fregadero", gender: "m", sentences: ["El agua cae en el fregadero.", "¡Blub! Mucha espuma para fregar."] },
+    backofen: { name: "horno", gender: "m", sentences: ["El pastel sube. ¡Mmm, qué rico!", "¡Ding! El pastel está listo.", "¡Cuidado, el horno quema!"] },
+    schubladen: { name: "cajones", gender: "m", plural: true, sentences: ["¡Abrir, cerrar! Los cajones se abren.", "Ahí están las cucharas y los tenedores."] },
+    kaffeemaschine: { name: "cafetera", gender: "f", sentences: ["¡Blub, blub! El café cae en la taza.", "El café es para papá."] },
+    waage: { name: "báscula", gender: "f", sentences: ["¡Pi! La báscula pesa la harina.", "Los números suben y suben."] },
+    wasserhahn: { name: "grifo", gender: "m", sentences: ["¡Grifo abierto! El agua corre.", "¡Plic, plic! Ya está cerrado."] },
+    spuelmittel: { name: "jabón de platos", gender: "m", sentences: ["¡Aprieta! El jabón de platos hace burbujas.", "Las burbujas suben volando."] },
+    topf: { name: "olla", gender: "f", sentences: ["¡Blub, blub! La sopa hierve.", "La tapa salta. ¡Clac, clac!"] },
+    pfanne: { name: "sartén", gender: "f", sentences: ["¡Chis, chas! El huevo se fríe.", "¡Hop! El huevo sube volando y vuelve a caer."] },
+    kochloeffel: {
+      name: "cucharas de madera",
+      gender: "f",
+      plural: true,
+      sentences: ["¡Hop, hop! Las cucharas de madera saltan.", "¡Pum, pum! ¡Tocamos el tambor!"],
+    },
+    toaster: { name: "tostadora", gender: "f", sentences: ["¡Plop! La tostada salta.", "La tostada está muy crujiente."] },
+    wasserkocher: { name: "hervidor", gender: "m", sentences: ["¡Fiiiii! El hervidor silba.", "El agua hierve. ¡Ahora hay té!"] },
+    mixer: { name: "batidora", gender: "f", sentences: ["¡Brrrrr! La batidora mezcla la masa.", "¡Uy, la masa salpica!"] },
+    lampe: { name: "lámpara", gender: "f", sentences: ["¡Clic! La lámpara se enciende.", "La lámpara se balancea de un lado a otro."] },
+    besen: { name: "escoba", gender: "f", sentences: ["¡Fris, fras! La escoba barre.", "Ahora el suelo está limpio."] },
+    maus: { name: "ratón", gender: "m", sentences: ["¡Pii, pii! El ratoncito olfatea.", "El ratón vive en el agujero."] },
+    muelleimer: { name: "cubo de basura", gender: "m", sentences: ["¡Pisa el pedal! La tapa se abre.", "La cáscara de plátano cae dentro."] },
+    mama: { name: "mamá", gender: "f", sentences: ["Mamá remueve la masa del pastel.", "¡La, la, la! Mamá canta mientras cocina."] },
+    katze: { name: "gato", gender: "m", sentences: ["¡Miau! El gato come de su plato.", "Mmm, al gato le gusta."] },
+    hund: { name: "perro", gender: "m", sentences: ["¡Guau, guau! El perro se sienta y pide.", "El perro también quiere una galleta."] },
+    papa: { name: "papá", gender: "m", sentences: ["¡Ñam! Papá come una galleta.", "Papá dice: ¡mmm, qué rico!"] },
+    tisch: { name: "mesa", gender: "f", sentences: ["La mesa se tambalea. ¡Los platos tintinean!", "El mantel es rojo y blanco."] },
+    brotkorb: { name: "panera", gender: "f", sentences: ["¡Snif, snif! Los panecillos huelen bien.", "Los panecillos saltan en la panera."] },
+    teekanne: { name: "tetera", gender: "f", sentences: ["La tetera sirve té en la taza.", "El té está caliente. ¡Fuu, fuu!"] },
+    banane: { name: "plátano", gender: "m", sentences: ["El plátano se abre. ¡Mmm!", "El plátano es amarillo y curvo."] },
+    apfel: { name: "manzana", gender: "f", sentences: ["¡Hola! Se asoma un gusanito.", "La manzana es roja y redonda."] },
+    nudelholz: { name: "rodillo", gender: "m", sentences: ["El rodillo aplana la masa.", "¡Ahora hacemos galletas!"] },
+    eieruhr: { name: "temporizador", gender: "m", sentences: ["¡Riiiin! El temporizador suena.", "El temporizador parece un tomate."] },
+    kind: { name: "bebé", gender: "m", sentences: ["El bebé agita el sonajero.", "¡Jiji! El bebé patalea."] },
+    teddy: { name: "osito", gender: "m", sentences: ["El osito saluda. ¡Hola!", "El osito es muy suave."] },
+    korb: { name: "cesta", gender: "f", sentences: ["¡Hop! La zanahoria salta de la cesta.", "En la cesta hay muchas verduras."] },
+    bobbycar: { name: "carrito", gender: "m", sentences: ["¡Pi, pi! El carrito arranca.", "El carrito es rojo y tiene cuatro ruedas."] },
+    ball: { name: "pelota", gender: "f", sentences: ["¡Boing, boing! La pelota rebota.", "La pelota es de muchos colores."] },
+  },
+  chains: [
+    ["¡El gato ha oído al ratón!", "Y el perro ladra: ¡guau, guau!"],
+    ["El bebé se alegra: ¡pastel!", "Y papá dice: ¡mmm, qué rico!"],
+    ["El agua caliente va a la tetera.", "Y el temporizador suena: ¡riiiin!"],
+  ],
+};

@@ -275,7 +275,11 @@ export function ActionButton({
   const t = useT();
   const [bx, by, bw, bh] = box;
   return (
-    <g className={`el-action${waiting ? " on" : ""}`} role="button" aria-label={t({ de: "Los", ru: "Вперёд" })}>
+    <g
+      className={`el-action${waiting ? " on" : ""}`}
+      role="button"
+      aria-label={t({ de: "Los", ru: "Вперёд", en: "Go", zh: "出发", hi: "चलो", es: "Vamos", ar: "هيّا" })}
+    >
       <rect x={bx + 8} y={by + 8} width={bw} height={bh} rx="36" className="el-action-shadow" />
       <rect x={bx} y={by} width={bw} height={bh} rx="36" className="el-action-box" strokeWidth="6" />
       {[0, 1].map((i) => (
@@ -332,7 +336,15 @@ export function Buttons({ lit, hint, onPress }: { lit: number | null; hint: numb
             data-tap={tapState({ goal: hint === f })}
             onPointerDown={down(f)}
             role="button"
-            aria-label={t({ de: `Stock ${f + 1}`, ru: `Этаж ${f + 1}` })}
+            aria-label={t({
+              de: `Stock ${f + 1}`,
+              ru: `Этаж ${f + 1}`,
+              en: `Floor ${f + 1}`,
+              zh: `${f + 1} 楼`,
+              hi: `मंज़िल ${f + 1}`,
+              es: `Piso ${f + 1}`,
+              ar: `الطابق ${f + 1}`,
+            })}
           >
             <circle cx={BUTTON_X} cy={cy + 6} r={BUTTON_R} fill="#78909c" />
             <circle className="el-button-face" cx={BUTTON_X} cy={cy} r={BUTTON_R} stroke="#90a4ae" strokeWidth="6" />

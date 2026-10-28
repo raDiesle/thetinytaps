@@ -9,8 +9,8 @@ import type { Localized } from "@/lib/language";
 /** Tapsi the fox, who goes to the potty; Mama and Papa fox are in its pictures. */
 export const TAPSI = {
   emoji: "🦊",
-  /** Said and shown, in the app language (a Russian voice reads „Tapsi“ badly). */
-  name: { de: "Tapsi", ru: "Тапси" } as Localized,
+  /** Said and shown, in the app language, in its own letters (a Russian voice reads „Tapsi“ badly). */
+  name: { de: "Tapsi", en: "Tapsi", zh: "塔普西", hi: "टैप्सी", es: "Tapsi", ar: "تابسي", ru: "Тапси" } as Localized,
   /** The first part of every picture's name: `fox-essen`. */
   pictures: "fox",
 };
@@ -241,7 +241,7 @@ export interface PottyTexts {
   star: string;
 }
 
-/** German and Russian; another language goes next to them when asked for. */
+/** German and its translations; a new or changed German line comes German-only until translations are asked for. */
 export const POTTY_TEXTS: Localized<PottyTexts> = {
   de: {
     steps: {
@@ -312,6 +312,358 @@ export const POTTY_TEXTS: Localized<PottyTexts> = {
     nothing: "Heute kommt nichts. Macht nichts!",
     nothingButton: "nichts",
     star: "Hat geklappt! Hurra, ein Stern für dich!",
+  },
+  // English: "pee" and "poop", the potty is the potty, Mommy and Daddy.
+  en: {
+    steps: {
+      eat: (name) => `Yum! ${name} eats noodles and drinks water.`,
+      need: (name, said) =>
+        said === "pipi"
+          ? `Oh! The bladder feels full. ${name} needs to pee!`
+          : said === "kaka"
+            ? `Oh! The tummy rumbles. ${name} needs to poop!`
+            : said === "both"
+              ? `Oh! The bladder feels full and the tummy rumbles. ${name} needs to pee and poop!`
+              : `Oh! Something's pressing. ${name} needs to go!`,
+      call: (_, said) => `Mommy! Daddy! I need to ${said === "pipi" ? "pee" : said === "kaka" ? "poop" : said === "both" ? "pee and poop" : "go"}!`,
+      go: () => "Mommy and Daddy come along. Quick, to the bathroom!",
+      down: () => "Pants down!",
+      sit: () => "Sit down. Mommy and Daddy wait too.",
+      done: (_, came) =>
+        came === "pipi"
+          ? "Splish, splash! The pee is in the potty!"
+          : came === "kaka"
+            ? "Plop! The poop is in the potty!"
+            : "Splish, splash, plop! Pee and poop are in the potty!",
+      wipe: () => "Wipe with paper.",
+      up: () => "Pants up!",
+      flush: () => "Empty it and flush. Whoosh!",
+      wash: () => "Wash hands with soap.",
+      party: (name) => `You did it! Great job, ${name}!`,
+      stars: () => "These are your stars.",
+      play: (name) => `${name} is playing. Mommy and Daddy look in: Do you need to pee or poop?`,
+    },
+    scenes: {
+      giesskanne: "Tapsi waters the flower. Splish, splash!",
+      brunnen: "The fountain bubbles. Can you hear it splashing?",
+      ballon: "Tapsi lets the balloon go. Pfffft!",
+      regen: "It's raining. Splash, into the puddle!",
+      schlauch: "Tapsi sprays with the hose. The duck gets wet!",
+      ketchup: "Tapsi squeezes the ketchup. Squeeze, squeeze!",
+      aufblasen: "Tapsi blows up the balloon. Blow really hard!",
+      huhn: "The hen pushes really hard. Plop, an egg!",
+      knete: "Tapsi squeezes the play dough. Out come little sausages!",
+      wasserrad: "The water turns the wheel. Splish, splash!",
+      tee: "Tapsi pours the tea. Glug, glug, glug!",
+      spritzbeutel: "Tapsi squeezes the piping bag. Cream on the cake!",
+      erbsen: "Tapsi squeezes the pod. Pop, pop, the peas!",
+      tunnel: "The train is in the tunnel. Toot toot, here it comes out!",
+      elefant: "The elephant sprays with its trunk. Pshhh!",
+      wal: "The whale blows water up high. Pfffft!",
+      trichter: "Tapsi pours water into the funnel. It runs out at the bottom!",
+      schmetterling: "The butterfly squeezes out. Now it flies!",
+      tanzen: "Mommy and Daddy are dancing!",
+      jonglieren: "Daddy juggles toilet paper!",
+      kuckuck: "Where's Mommy? Peekaboo!",
+      seifenblasen: "Daddy blows soap bubbles. Pop, pop!",
+    },
+    said: {
+      pipi: "Tapsi needs to pee soon.",
+      kaka: "Tapsi needs to poop soon.",
+      both: "Tapsi needs to pee and poop soon.",
+    },
+    next: "Next",
+    askSaid: "What does your child need?",
+    askWent: "What's in the potty?",
+    finish: "Is something in the potty? Pee: press the drop. Poop: press the poop.",
+    went: {
+      pipi: "Pee is in the potty",
+      kaka: "Poop is in the potty",
+    },
+    nothing: "Nothing today. That's okay!",
+    nothingButton: "nothing",
+    star: "It worked! Hooray, a star for you!",
+  },
+  // Chinese: 尿尿 and 便便, the potty is 小马桶, Tapsi is 塔普西.
+  zh: {
+    steps: {
+      eat: (name) => `嗯！${name}在吃面条，喝水。`,
+      need: (name, said) =>
+        said === "pipi"
+          ? `哎呀！小肚子胀胀的。${name}要尿尿！`
+          : said === "kaka"
+            ? `哎呀！肚子咕噜咕噜响。${name}要便便！`
+            : said === "both"
+              ? `哎呀！小肚子胀胀的，肚子还咕噜咕噜响。${name}要尿尿，也要便便！`
+              : `哎呀！有点憋不住了。${name}要上厕所！`,
+      call: (_, said) => `妈妈！爸爸！我要${said === "pipi" ? "尿尿" : said === "kaka" ? "便便" : said === "both" ? "尿尿和便便" : "上厕所"}！`,
+      go: () => "妈妈和爸爸一起来。快去卫生间！",
+      down: () => "裤子脱下来！",
+      sit: () => "坐下来。妈妈和爸爸陪着等。",
+      done: (_, came) =>
+        came === "pipi" ? "哗啦啦！尿尿在小马桶里啦！" : came === "kaka" ? "扑通！便便在小马桶里啦！" : "哗啦啦，扑通！尿尿和便便都在小马桶里啦！",
+      wipe: () => "用纸擦一擦。",
+      up: () => "裤子穿上去！",
+      flush: () => "倒掉，冲水。哗——！",
+      wash: () => "用肥皂洗洗手。",
+      party: (name) => `成功啦！真棒，${name}！`,
+      stars: () => "这些是你的星星。",
+      play: (name) => `${name}在玩。妈妈和爸爸探头问：你要尿尿还是便便？`,
+    },
+    scenes: {
+      giesskanne: "塔普西给花浇水。哗啦，哗啦！",
+      brunnen: "喷泉在冒水。听到哗哗的水声了吗？",
+      ballon: "塔普西松开气球。噗——！",
+      regen: "下雨啦。啪嗒，踩进水坑！",
+      schlauch: "塔普西用水管喷水。小鸭子湿啦！",
+      ketchup: "塔普西挤番茄酱。挤呀，挤呀！",
+      aufblasen: "塔普西吹气球。使劲吹！",
+      huhn: "母鸡使劲用力。啵，一个蛋！",
+      knete: "塔普西挤彩泥。挤出小香肠啦！",
+      wasserrad: "水推着轮子转。哗啦啦，哗啦啦！",
+      tee: "塔普西倒茶。咕嘟，咕嘟，咕嘟！",
+      spritzbeutel: "塔普西挤裱花袋。奶油挤到蛋糕上！",
+      erbsen: "塔普西挤豆荚。啵，啵，豌豆出来啦！",
+      tunnel: "火车在隧道里。呜呜，它开出来啦！",
+      elefant: "大象用鼻子喷水。噗嗤——！",
+      wal: "鲸鱼把水喷得高高的。噗——！",
+      trichter: "塔普西往漏斗里倒水。水从下面流出来啦！",
+      schmetterling: "蝴蝶使劲钻出来。现在它飞啦！",
+      tanzen: "妈妈和爸爸在跳舞！",
+      jonglieren: "爸爸用卫生纸玩抛接！",
+      kuckuck: "妈妈在哪儿？躲猫猫，在这儿！",
+      seifenblasen: "爸爸吹泡泡。啵，啵！",
+    },
+    said: {
+      pipi: "塔普西马上要尿尿。",
+      kaka: "塔普西马上要便便。",
+      both: "塔普西马上要尿尿和便便。",
+    },
+    next: "继续",
+    askSaid: "孩子要做什么？",
+    askWent: "小马桶里有什么？",
+    finish: "小马桶里有东西吗？尿尿：按水滴。便便：按便便。",
+    went: {
+      pipi: "尿尿在小马桶里",
+      kaka: "便便在小马桶里",
+    },
+    nothing: "今天没有。没关系！",
+    nothingButton: "没有",
+    star: "成功啦！好耶，给你一颗星星！",
+  },
+  // Hindi: सू-सू and पॉटी, the potty chair is पॉटी-सीट, मम्मी and पापा, Tapsi is टैप्सी. Verbs agree with their
+  // subject's gender, so Tapsi and the child are never the subject of one: "टैप्सी को सू-सू जाना है", "मुझे जाना है",
+  // commands (धोओ) and "let's" (चलो बैठें); the thoughts tell what the things do.
+  hi: {
+    steps: {
+      eat: (name) => `म्म! ${name} के लिए नूडल्स और पानी।`,
+      need: (name, said) =>
+        said === "pipi"
+          ? `अरे! ज़ोर से सू-सू लगी है। ${name} को सू-सू जाना है!`
+          : said === "kaka"
+            ? `अरे! पेट गुड़गुड़ कर रहा है। ${name} को पॉटी जाना है!`
+            : said === "both"
+              ? `अरे! सू-सू लगी है और पेट गुड़गुड़ कर रहा है। ${name} को सू-सू और पॉटी जाना है!`
+              : `अरे! कुछ दबाव है। ${name} को जाना है!`,
+      call: (_, said) => `मम्मी! पापा! मुझे ${said === "pipi" ? "सू-सू " : said === "kaka" ? "पॉटी " : said === "both" ? "सू-सू और पॉटी " : ""}जाना है!`,
+      go: () => "मम्मी और पापा साथ आते हैं। जल्दी से बाथरूम में!",
+      down: () => "पैंट नीचे!",
+      sit: () => "चलो बैठें। मम्मी और पापा साथ में इंतज़ार करते हैं।",
+      done: (_, came) => (came === "pipi" ? "छप-छप! सू-सू पॉटी-सीट में है!" : came === "kaka" ? "धप! पॉटी, पॉटी-सीट में है!" : "छप-छप, धप! सू-सू और पॉटी, पॉटी-सीट में हैं!"),
+      wipe: () => "काग़ज़ से पोंछो।",
+      up: () => "पैंट ऊपर!",
+      flush: () => "खाली करो और फ़्लश करो। वूऊश!",
+      wash: () => "साबुन से हाथ धोओ।",
+      party: (name) => `हो गया! शाबाश, ${name}!`,
+      stars: () => "ये तुम्हारे तारे हैं।",
+      play: (name) => `${name} के खेलने का समय। मम्मी और पापा झाँककर पूछते हैं: सू-सू या पॉटी जाना है?`,
+    },
+    scenes: {
+      giesskanne: "फूल को पानी मिल रहा है। छप, छप!",
+      brunnen: "फ़व्वारा चल रहा है। कल-कल सुनो!",
+      ballon: "गुब्बारा छूट गया। फ़्फ़्फ़्फ़!",
+      regen: "बारिश हो रही है। छपाक, पानी में!",
+      schlauch: "पाइप से पानी की धार। बत्तख भीग गई!",
+      ketchup: "केचप की बोतल दबाओ। दबाओ, दबाओ!",
+      aufblasen: "गुब्बारा फुलाओ। ज़ोर से फूँको!",
+      huhn: "मुर्गी ज़ोर लगाती है। टप, एक अंडा!",
+      knete: "क्ले दबाओ। लंबी-लंबी डोरियाँ निकलती हैं!",
+      wasserrad: "पानी पहिया घुमाता है। कल-कल, कल-कल!",
+      tee: "प्याले में चाय। गुड़, गुड़, गुड़!",
+      spritzbeutel: "क्रीम की थैली दबाओ। केक पर क्रीम!",
+      erbsen: "फली दबाओ। टप, टप, मटर!",
+      tunnel: "ट्रेन सुरंग में है। छुक-छुक, वो बाहर आई!",
+      elefant: "हाथी सूँड़ से पानी उछालता है। फ़्श्श्श!",
+      wal: "व्हेल पानी ऊपर उछालती है। फ़्फ़्फ़्फ़!",
+      trichter: "कीप में पानी डालो। नीचे से निकल जाता है!",
+      schmetterling: "तितली बाहर निकल रही है। अब वो उड़ती है!",
+      tanzen: "मम्मी और पापा नाच रहे हैं!",
+      jonglieren: "पापा टॉयलेट पेपर उछाल-उछालकर करतब दिखा रहे हैं!",
+      kuckuck: "मम्मी कहाँ है? ये रही!",
+      seifenblasen: "पापा बुलबुले बनाते हैं। फट, फट!",
+    },
+    said: {
+      pipi: "टैप्सी को जल्दी सू-सू जाना है।",
+      kaka: "टैप्सी को जल्दी पॉटी जाना है।",
+      both: "टैप्सी को जल्दी सू-सू और पॉटी जाना है।",
+    },
+    next: "आगे",
+    askSaid: "आपके बच्चे को सू-सू जाना है या पॉटी?",
+    askWent: "पॉटी-सीट में क्या है?",
+    finish: "पॉटी-सीट में कुछ है? सू-सू: बूँद दबाइए। पॉटी: पॉटी दबाइए।",
+    went: {
+      pipi: "सू-सू पॉटी-सीट में है",
+      kaka: "पॉटी, पॉटी-सीट में है",
+    },
+    nothing: "आज कुछ नहीं आया। कोई बात नहीं!",
+    nothingButton: "कुछ नहीं",
+    star: "हो गया! हुर्रे, तुम्हारे लिए एक तारा!",
+  },
+  // Spanish: "pipí" and "popó", the potty is the orinal, tú for the child and usted for the grown-up; the steps
+  // say "we" (nos lavamos) like a parent does, nothing changes for a boy or a girl.
+  es: {
+    steps: {
+      eat: (name) => `¡Mmm! ${name} come fideos y bebe agua.`,
+      need: (name, said) =>
+        said === "pipi"
+          ? `¡Oh! La vejiga aprieta. ¡${name} tiene que hacer pipí!`
+          : said === "kaka"
+            ? `¡Oh! La barriga hace ruido. ¡${name} tiene que hacer popó!`
+            : said === "both"
+              ? `¡Oh! La vejiga aprieta y la barriga hace ruido. ¡${name} tiene que hacer pipí y popó!`
+              : `¡Oh! Algo aprieta. ¡${name} tiene que ir al orinal!`,
+      call: (_, said) =>
+        said === "unsure"
+          ? "¡Mamá! ¡Papá! ¡Tengo que ir al orinal!"
+          : `¡Mamá! ¡Papá! ¡Tengo que hacer ${said === "pipi" ? "pipí" : said === "kaka" ? "popó" : "pipí y popó"}!`,
+      go: () => "Mamá y papá vienen también. ¡Rápido, al baño!",
+      down: () => "¡Pantalón abajo!",
+      sit: () => "Nos sentamos. Mamá y papá esperan también.",
+      done: (_, came) =>
+        came === "pipi"
+          ? "¡Plis, plas! ¡El pipí está en el orinal!"
+          : came === "kaka"
+            ? "¡Plof! ¡El popó está en el orinal!"
+            : "¡Plis, plas, plof! ¡El pipí y el popó están en el orinal!",
+      wipe: () => "Nos limpiamos con papel.",
+      up: () => "¡Pantalón arriba!",
+      flush: () => "Vaciamos y tiramos de la cadena. ¡Fiuuush!",
+      wash: () => "Nos lavamos las manos con jabón.",
+      party: (name) => `¡Lo lograste! ¡Muy bien, ${name}!`,
+      stars: () => "Estas son tus estrellas.",
+      play: (name) => `${name} juega. Mamá y papá se asoman: ¿tienes que hacer pipí o popó?`,
+    },
+    scenes: {
+      giesskanne: "Tapsi riega la flor. ¡Plis, plas!",
+      brunnen: "La fuente burbujea. ¿Oyes cómo chapotea?",
+      ballon: "Tapsi suelta el globo. ¡Pffff!",
+      regen: "Llueve. ¡Plas, al charco!",
+      schlauch: "Tapsi echa agua con la manguera. ¡El pato se moja!",
+      ketchup: "Tapsi aprieta el kétchup. ¡Aprieta, aprieta!",
+      aufblasen: "Tapsi infla el globo. ¡Sopla muy fuerte!",
+      huhn: "La gallina aprieta muy fuerte. ¡Plop, un huevo!",
+      knete: "Tapsi aprieta la plastilina. ¡Salen salchichitas!",
+      wasserrad: "El agua mueve la rueda. ¡Chap, chap!",
+      tee: "Tapsi sirve el té. ¡Glu, glu, glu!",
+      spritzbeutel: "Tapsi aprieta la manga pastelera. ¡Nata sobre el pastel!",
+      erbsen: "Tapsi aprieta la vaina. ¡Plop, plop, los guisantes!",
+      tunnel: "El tren está en el túnel. ¡Chu-chu, ahí sale!",
+      elefant: "El elefante echa agua con la trompa. ¡Pshhh!",
+      wal: "La ballena echa agua hacia arriba. ¡Pffff!",
+      trichter: "Tapsi echa agua en el embudo. ¡Sale por abajo!",
+      schmetterling: "La mariposa sale apretando. ¡Ahora vuela!",
+      tanzen: "¡Mamá y papá bailan!",
+      jonglieren: "¡Papá hace malabares con papel higiénico!",
+      kuckuck: "¿Dónde está mamá? ¡Cucú!",
+      seifenblasen: "Papá hace pompas de jabón. ¡Plop, plop!",
+    },
+    said: {
+      pipi: "Tapsi tiene que hacer pipí pronto.",
+      kaka: "Tapsi tiene que hacer popó pronto.",
+      both: "Tapsi tiene que hacer pipí y popó pronto.",
+    },
+    next: "Siguiente",
+    askSaid: "¿Qué tiene que hacer su peque?",
+    askWent: "¿Qué hay en el orinal?",
+    finish: "¿Hay algo en el orinal? Pipí: pulse la gota. Popó: pulse el popó.",
+    went: {
+      pipi: "Hay pipí en el orinal",
+      kaka: "Hay popó en el orinal",
+    },
+    nothing: "Hoy no sale nada. ¡No pasa nada!",
+    nothingButton: "nada",
+    star: "¡Funcionó! ¡Hurra, una estrella para ti!",
+  },
+  // Arabic: بيبي and كاكا, the potty is النونية, ماما and بابا, Tapsi is تابسي. Verbs about the child or Tapsi
+  // would differ for a boy and a girl, so the lines say "we" (نغسل), "I" (أريد) or "needs" (بحاجة إلى).
+  ar: {
+    steps: {
+      eat: (name) => `مممم! معكرونة وماء لـ${name}.`,
+      need: (name, said) =>
+        said === "pipi"
+          ? `أوه! المثانة تضغط. ${name} بحاجة إلى بيبي!`
+          : said === "kaka"
+            ? `أوه! البطن يقرقر. ${name} بحاجة إلى كاكا!`
+            : said === "both"
+              ? `أوه! المثانة تضغط والبطن يقرقر. ${name} بحاجة إلى بيبي وكاكا!`
+              : `أوه! شيء ما يضغط. ${name} بحاجة إلى النونية!`,
+      call: (_, said) =>
+        said === "unsure"
+          ? "ماما! بابا! أحتاج إلى النونية!"
+          : `ماما! بابا! أريد أن أعمل ${said === "pipi" ? "بيبي" : said === "kaka" ? "كاكا" : "بيبي وكاكا"}!`,
+      go: () => "ماما وبابا يأتيان معًا. بسرعة إلى الحمّام!",
+      down: () => "ننزل البنطال!",
+      sit: () => "نجلس. ماما وبابا ينتظران معنا.",
+      done: (_, came) =>
+        came === "pipi" ? "طش، طش! البيبي في النونية!" : came === "kaka" ? "بلوب! الكاكا في النونية!" : "طش، طش، بلوب! البيبي والكاكا في النونية!",
+      wipe: () => "نمسح بالورق.",
+      up: () => "نرفع البنطال!",
+      flush: () => "نُفرغ النونية ونشدّ السيفون. ووووش!",
+      wash: () => "نغسل اليدين بالصابون.",
+      party: (name) => `نجحنا! رائع يا ${name}!`,
+      stars: () => "هذه نجوم الأسبوع.",
+      play: (name) => `وقت اللعب لـ${name}. ماما وبابا ينظران من الباب: هل حان وقت البيبي أو الكاكا؟`,
+    },
+    scenes: {
+      giesskanne: "إبريق الري يسقي الزهرة. طش، طش!",
+      brunnen: "النافورة تفور. خرير، خرير!",
+      ballon: "البالون يفلت. بففففت!",
+      regen: "المطر ينزل. طش، في البركة!",
+      schlauch: "الماء يرشّ من الخرطوم. البطة تبتلّ!",
+      ketchup: "نضغط زجاجة الكاتشب. نضغط، نضغط!",
+      aufblasen: "ننفخ البالون. ننفخ بقوة!",
+      huhn: "الدجاجة تضغط بقوة. بوب، بيضة!",
+      knete: "نضغط الصلصال. تخرج منه نقانق!",
+      wasserrad: "الماء يدير الدولاب. خرير، خرير!",
+      tee: "نصبّ الشاي. غلوك، غلوك، غلوك!",
+      spritzbeutel: "نضغط كيس الكريمة. كريمة على الكعكة!",
+      erbsen: "نضغط قرن البازلاء. بوب، بوب، حبات البازلاء!",
+      tunnel: "القطار في النفق. توت توت، ها هو يخرج!",
+      elefant: "الفيل يرشّ الماء بخرطومه. بششش!",
+      wal: "الحوت ينفث الماء عاليًا. بففففت!",
+      trichter: "نصبّ الماء في القمع. يخرج من الأسفل!",
+      schmetterling: "الفراشة تخرج من الشرنقة. والآن تطير!",
+      tanzen: "ماما وبابا يرقصان!",
+      jonglieren: "بابا يرمي ورق الحمّام ويلتقطه!",
+      kuckuck: "أين ماما؟ ها هي!",
+      seifenblasen: "بابا يصنع فقاعات الصابون. بوب، بوب!",
+    },
+    said: {
+      pipi: "تابسي بحاجة قريبًا إلى بيبي.",
+      kaka: "تابسي بحاجة قريبًا إلى كاكا.",
+      both: "تابسي بحاجة قريبًا إلى بيبي وكاكا.",
+    },
+    next: "التالي",
+    askSaid: "ماذا يحتاج طفلكم؟",
+    askWent: "ماذا في النونية؟",
+    finish: "هل في النونية شيء؟ بيبي: اضغطوا على القطرة. كاكا: اضغطوا على الكاكا.",
+    went: {
+      pipi: "البيبي في النونية",
+      kaka: "الكاكا في النونية",
+    },
+    nothing: "اليوم لا شيء. لا بأس!",
+    nothingButton: "لا شيء",
+    star: "نجحنا! مرحى، نجمة لك!",
   },
   ru: {
     steps: {

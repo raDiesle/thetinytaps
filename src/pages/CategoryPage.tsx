@@ -24,7 +24,7 @@ export function CategoryPage() {
       <Sky />
       <MenuHead
         to="/"
-        back={t({ de: "Alle Spiele", ru: "Все игры" })}
+        back={t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" })}
         title={
           <>
             <span aria-hidden>{category.emoji}</span> {t(category.title)}

@@ -1,9 +1,20 @@
 import { expect, test } from "bun:test";
-import { ANIMAL_TEXTS, ANIMALS, FOODS } from "./content";
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS } from "./content";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
-import { HOMES } from "./homes";
+import { HOMES, type HomeId } from "./homes";
 
 const CYRILLIC = /^[а-яё -]+$/;
+
+/** The languages translated whole so far: every animal, food and home has its words. */
+const COMPLETE: TargetLanguageId[] = ["en", "zh", "hi", "es", "ar", "ru"];
+
+/** The languages in a script of their own: no Latin letter may be left in their sentences. */
+const OWN_SCRIPT: TargetLanguageId[] = ["zh", "hi", "ar", "ru"];
+
+/** Every string inside a language's words, however deep. */
+const stringsIn = (value: unknown): string[] =>
+  typeof value === "string" ? [value] : value && typeof value === "object" ? Object.values(value).flatMap(stringsIn) : [];
 
 // Translations come only when asked for, so an animal, food or home may lack its Russian words; those it has must be well formed.
 test("every Russian word for an animal, food or home is Cyrillic lower case", () => {
@@ -18,28 +29,52 @@ test("every Russian word for an animal, food or home is Cyrillic lower case", ()
   }
 });
 
-test("no Russian word is left over from an animal or food that is gone", () => {
+test("no word of any language is left over from an animal, food or home that is gone", () => {
   const animals = new Set(ANIMALS.map((a) => a.id));
   const foods = new Set(FOODS.map((f) => f.id));
-  for (const id of Object.keys(RUSSIAN_ANIMALS)) expect(animals.has(id), id).toBe(true);
-  for (const id of Object.keys(RUSSIAN_FOODS)) expect(foods.has(id), id).toBe(true);
-});
-
-test("the Russian sentences have no German left in them", () => {
-  const ru = ANIMAL_TEXTS.ru!;
-  for (const animal of ANIMALS.filter((a) => RUSSIAN_ANIMALS[a.id])) {
-    const sentences = [ru.animal(animal), ru.hungry(animal), ru.yuck(animal), ru.whereLives(animal), ru.livesHere(animal)];
-    if (animal.food && RUSSIAN_FOODS[animal.food.id]) sentences.push(ru.food(animal.food), ru.yummy(animal, animal.food));
-    if (animal.home && RUSSIAN_HOMES[animal.home]) sentences.push(ru.home(HOMES[animal.home]), ru.movedIn(animal, HOMES[animal.home]));
-    for (const sentence of sentences) expect(sentence, animal.id).not.toMatch(/[a-zäöüß]/i);
+  for (const [language, { words }] of Object.entries(ANIMAL_TRANSLATIONS)) {
+    for (const id of Object.keys(words.animals)) expect(animals.has(id), `${language} ${id}`).toBe(true);
+    for (const id of Object.keys(words.foods)) expect(foods.has(id), `${language} ${id}`).toBe(true);
+    for (const id of Object.keys(words.homes)) expect(id in HOMES, `${language} ${id}`).toBe(true);
   }
 });
 
-test("an animal without its Russian word gets the whole German sentence", () => {
+test("the translated languages have words for every animal, food and home", () => {
+  for (const language of COMPLETE) {
+    const { words } = ANIMAL_TRANSLATIONS[language]!;
+    for (const { id } of ANIMALS) expect(words.animals[id], `${language} ${id}`).toBeDefined();
+    for (const { id } of FOODS) expect(words.foods[id], `${language} ${id}`).toBeDefined();
+    for (const id of Object.keys(HOMES) as HomeId[]) expect(words.homes[id], `${language} ${id}`).toBeDefined();
+  }
+});
+
+test("the sentences have no German left in them, and none in another script has Latin letters", () => {
+  for (const [language, { words }] of Object.entries(ANIMAL_TRANSLATIONS) as [TargetLanguageId, (typeof ANIMAL_TRANSLATIONS)["ru"] & {}][]) {
+    const texts = ANIMAL_TEXTS[language]!;
+    const german = ANIMAL_TEXTS.de;
+    for (const animal of ANIMALS.filter((a) => words.animals[a.id])) {
+      // Each sentence next to its German one.
+      const pairs: [string, string][] = (["hungry", "yuck", "whereLives", "livesHere"] as const).map((key) => [texts[key](animal), german[key](animal)]);
+      if (animal.food && words.foods[animal.food.id]) pairs.push([texts.yummy(animal, animal.food), german.yummy(animal, animal.food)]);
+      if (animal.home && words.homes[animal.home]) pairs.push([texts.movedIn(animal, HOMES[animal.home]), german.movedIn(animal, HOMES[animal.home])]);
+      for (const [sentence, de] of pairs) expect(sentence, `${language} ${animal.id}`).not.toBe(de);
+      if (OWN_SCRIPT.includes(language)) {
+        const shown = [...pairs.map(([sentence]) => sentence), texts.animal(animal), texts.yuckBubble, texts.thanksBubble, texts.stars(3)];
+        for (const sentence of shown) expect(sentence, `${language} ${animal.id}`).not.toMatch(/[A-Za-zäöüß]/);
+      }
+    }
+    if (OWN_SCRIPT.includes(language)) for (const word of stringsIn(words)) expect(word, language).not.toMatch(/[A-Za-z]/);
+  }
+});
+
+test("an animal without its words gets the whole German sentence, in every language", () => {
   const withFood = ANIMALS.find((a) => a.food && a.home)!;
   const animal = { ...withFood, id: "not-translated" };
-  const [ru, de] = [ANIMAL_TEXTS.ru!, ANIMAL_TEXTS.de];
-  expect(ru.hungry(animal)).toBe(de.hungry(animal));
-  expect(ru.yummy(animal, withFood.food!)).toBe(de.yummy(animal, withFood.food!));
-  expect(ru.movedIn(animal, HOMES[withFood.home!])).toBe(de.movedIn(animal, HOMES[withFood.home!]));
+  const de = ANIMAL_TEXTS.de;
+  for (const language of Object.keys(ANIMAL_TRANSLATIONS) as TargetLanguageId[]) {
+    const texts = ANIMAL_TEXTS[language]!;
+    expect(texts.hungry(animal), language).toBe(de.hungry(animal));
+    expect(texts.yummy(animal, withFood.food!), language).toBe(de.yummy(animal, withFood.food!));
+    expect(texts.movedIn(animal, HOMES[withFood.home!]), language).toBe(de.movedIn(animal, HOMES[withFood.home!]));
+  }
 });

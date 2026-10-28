@@ -8,6 +8,7 @@ import type { Scene, SceneItem, SceneTranslation } from "./types";
 // (translations.ts), everything else (drawings, boxes, sounds) stays the same.
 // Translations are made only on request, so a picture can be half translated: it
 // then plays entirely in German (names, sentences, voice and keys), never mixed.
+// The same for every language: ru, en, zh, hi, es and ar each on their own.
 
 /** Whether `translation` covers every item and every chain step of `scene`. */
 const covers = (scene: Pick<Scene, "items" | "chains">, translation: SceneTranslation) =>

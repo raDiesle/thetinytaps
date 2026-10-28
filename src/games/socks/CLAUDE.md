@@ -10,8 +10,8 @@ Keys: any key starts the machine; arrows (and any other key) move a frame over t
 
 ## Languages
 
-The game speaks the app language (German or Russian, `useAppLanguage()`): start screen and „Über das Spiel“ texts inline with `t({ de, ru })`, spoken texts and the pair counts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, Russian in `content.ru.ts`), speech in `language.speechLang`.
+The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage()`): start screen and „Über das Spiel“ texts inline with `t({ de, en, zh, hi, es, ar, ru })`, spoken texts and the pair counts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, the others in `content.<language>.ts`: sock / calcetín / 袜子 (pairs 双) / मोज़ा (pair जोड़ा) / جورب), speech in `language.speechLang`. Arabic talks to the child with "let's" (هيّا نبحث), Hindi with commands, Spanish with tú: nothing that changes for a boy or a girl.
 - Translations come only when the user asks. A new or changed German line comes German-only; add the Russian only on request. Gaps are marked in `src/content/ideas/languageStatus.ts`.
 - When a German line changes its meaning, delete its Russian in the same change (a stale translation is worse than German).
-- The Russian texts are `Partial<SockTexts>`: a sentence they lack is said in German, and `say` gives a sentence without Cyrillic to the German voice.
-- Numbers with a word ("3 Paare", „5 пар“) go through `texts.pairs(n)`, which picks the Russian form with `Intl.PluralRules`; `socks.test.ts` checks the forms and that no sentence is empty.
+- The translated texts are `Partial<SockTexts>`: a sentence they lack is said in German, and `say` gives a sentence without the language's own letters to the German voice (`voiceFor`).
+- Numbers with a word ("3 Paare", „5 пар“, „3 أزواج“) go through `texts.pairs(n)`, which picks the form per language (Russian and Arabic with `Intl.PluralRules`; Arabic says „زوج واحد“ and „زوجان“ for 1 and 2); `socks.test.ts` checks the forms, that no sentence is empty and that Chinese, Hindi and Arabic have no Latin letters.

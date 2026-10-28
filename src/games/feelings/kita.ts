@@ -50,7 +50,15 @@ export interface Situation {
 }
 
 /** Asked before a step in a language whose translation has no questions of its own yet. */
-export const QUESTION: Localized = { de: "Was kann der kleine Bär tun?", ru: "Что может сделать Мишка?" };
+export const QUESTION: Localized = {
+  de: "Was kann der kleine Bär tun?",
+  ru: "Что может сделать Мишка?",
+  en: "What can Little Bear do?",
+  zh: "小熊可以怎么做？",
+  hi: "भालू क्या कर सकता है?",
+  es: "¿Qué puede hacer Osito?",
+  ar: "ماذا يستطيع الدبدوب أن يفعل؟",
+};
 
 export const SITUATIONS: Situation[] = [
   {

@@ -237,8 +237,24 @@ export function Origin({
       role="img"
       aria-label={
         part === "sweets"
-          ? t({ de: "Ein Kind isst Süßigkeiten", ru: "Ребёнок ест сладости" })
-          : t({ de: "Aus dem Zucker auf den Zähnen wachsen kleine Monster", ru: "Из сахара на зубках вырастают маленькие монстры" })
+          ? t({
+              de: "Ein Kind isst Süßigkeiten",
+              en: "A child eats sweets",
+              zh: "一个孩子在吃甜食",
+              hi: "एक बच्चा मिठाई खा रहा है",
+              es: "Un niño come dulces",
+              ar: "طفل يأكل الحلوى",
+              ru: "Ребёнок ест сладости",
+            })
+          : t({
+              de: "Aus dem Zucker auf den Zähnen wachsen kleine Monster",
+              en: "Little monsters grow out of the sugar on the teeth",
+              zh: "牙齿上的糖长成了小怪兽",
+              hi: "दाँतों पर लगी चीनी से छोटे मॉन्स्टर बनते हैं",
+              es: "Del azúcar en los dientes crecen monstruitos",
+              ar: "من السكر على الأسنان تنمو وحوش صغيرة",
+              ru: "Из сахара на зубках вырастают маленькие монстры",
+            })
       }
     >
       <defs>

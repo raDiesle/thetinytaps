@@ -47,7 +47,15 @@ function Lock() {
       className="playtime-lock"
       role="dialog"
       aria-modal
-      aria-label={t({ de: "Die Spielzeit ist vorbei", ru: "Время игры закончилось" })}
+      aria-label={t({
+        de: "Die Spielzeit ist vorbei",
+        ru: "Время игры закончилось",
+        en: "Play time is over",
+        zh: "游戏时间结束了",
+        hi: "खेलने का समय ख़त्म हो गया",
+        es: "Se acabó el tiempo de juego",
+        ar: "انتهى وقت اللعب",
+      })}
       tabIndex={-1}
     >
       <div className="good-night">
@@ -62,14 +70,16 @@ function Lock() {
         <span className="good-night-sleeper" aria-hidden>
           🧸<span className="good-night-zzz">💤</span>
         </span>
-        <p className="good-night-text">{t({ de: "Gute Nacht!", ru: "Спокойной ночи!" })}</p>
+        <p className="good-night-text">
+          {t({ de: "Gute Nacht!", ru: "Спокойной ночи!", en: "Good night!", zh: "晚安！", hi: "शुभ रात्रि!", es: "¡Buenas noches!", ar: "ليلة سعيدة!" })}
+        </p>
         {!open && <HoldToUnlock onUnlock={() => setOpen(true)} />}
       </div>
       {open && (
         <div className="playtime-lock-panel">
           <PlaytimeOptions />
           <button type="button" className="playtime-lock-close" onClick={() => setOpen(false)}>
-            {t({ de: "Schließen", ru: "Закрыть" })}
+            {t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
           </button>
         </div>
       )}
@@ -108,7 +118,15 @@ function HoldToUnlock({ onUnlock }: { onUnlock: () => void }) {
         type="button"
         className={`playtime-lock-hold${holding ? " holding" : ""}`}
         style={{ "--hold-ms": `${UNLOCK_HOLD_MS}ms` } as CSSProperties}
-        aria-label={t({ de: "Für Erwachsene: Spielzeit (3 Sekunden gedrückt halten)", ru: "Для взрослых: время игры (удерживать 3 секунды)" })}
+        aria-label={t({
+          de: "Für Erwachsene: Spielzeit (3 Sekunden gedrückt halten)",
+          ru: "Для взрослых: время игры (удерживать 3 секунды)",
+          en: "For grown-ups: play time (hold for 3 seconds)",
+          zh: "家长专用：游戏时间（按住 3 秒）",
+          hi: "बड़ों के लिए: खेलने का समय (3 सेकंड दबाए रखें)",
+          es: "Para adultos: tiempo de juego (mantener pulsado 3 segundos)",
+          ar: "للكبار: وقت اللعب (ضغط مطوّل 3 ثوانٍ)",
+        })}
         onPointerDown={(e) => {
           // A finger that slides a little still counts as holding.
           e.currentTarget.setPointerCapture(e.pointerId);
@@ -128,7 +146,15 @@ function HoldToUnlock({ onUnlock }: { onUnlock: () => void }) {
         ⏳
       </button>
       <span className="playtime-lock-hint">
-        {t({ de: "Für Erwachsene: ⏳ drei Sekunden gedrückt halten", ru: "Для взрослых: удерживайте ⏳ три секунды" })}
+        {t({
+          de: "Für Erwachsene: ⏳ drei Sekunden gedrückt halten",
+          ru: "Для взрослых: удерживайте ⏳ три секунды",
+          en: "For grown-ups: hold ⏳ for three seconds",
+          zh: "家长专用：按住 ⏳ 三秒",
+          hi: "बड़ों के लिए: ⏳ को तीन सेकंड दबाए रखें",
+          es: "Para adultos: mantenga pulsado ⏳ tres segundos",
+          ar: "للكبار: اضغطوا على ⏳ مطولًا ثلاث ثوانٍ",
+        })}
       </span>
     </div>
   );

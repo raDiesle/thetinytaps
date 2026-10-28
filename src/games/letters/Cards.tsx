@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type PointerEvent, type PointerEventHandler, type ReactNode } from "react";
 import { Picture } from "@/components/Picture";
-import type { Countable, LetterEntry, WordEntry } from "@/content/types";
+import { letterIndex } from "@/content/languages";
+import { isRightToLeft, joinedForms, spellingOf, textUnits } from "@/content/spelling";
+import type { Countable, LanguagePack, LetterEntry, WordEntry } from "@/content/types";
 import { tapState } from "@/lib/tapTargets";
 import type { LettersSettings } from "./settings";
 import { TraceGlyphs } from "./TraceGlyphs";
@@ -30,12 +32,14 @@ function Reveal({ visible, hint, children }: { visible: boolean; hint: boolean; 
 
 /** A letter with its picture in the middle and the word underneath, all shown at once. */
 export function LetterCard({
+  pack,
   letter,
   word,
   settings,
   onPointerDown,
   onPicturePointerDown,
 }: {
+  pack: LanguagePack;
   letter: LetterEntry;
   word: WordEntry;
   settings: LettersSettings;
@@ -61,24 +65,36 @@ export function LetterCard({
       <div onPointerDown={onPicturePointerDown}>
         <Picture word={word} />
       </div>
-      {settings.showWord && <LetterWord letter={letter} word={word} />}
+      {settings.showWord && <LetterWord pack={pack} letter={letter} word={word} />}
     </div>
   );
 }
 
 /**
- * The word with its letter highlighted: the first one, or for a letter no word
- * starts with (Russian Ы in "Сыр") the letter where it is inside.
+ * The word with its letter highlighted: the first one, or for a letter no word starts with (Russian Ы in "Сыр")
+ * the letter where it is inside. A Hindi letter is marked with its vowel sign (कि), an Arabic one keeps its joined
+ * shape, and a Chinese word shows its pinyin underneath, where the letter is marked.
  */
-export function LetterWord({ letter, word }: { letter: LetterEntry; word: WordEntry }) {
-  const found = letter.inWord ? Array.from(word.word).findIndex((char) => char === letter.lower || char === letter.upper) : 0;
-  const at = Math.max(found, 0);
-  const chars = Array.from(word.word);
+export function LetterWord({ pack, letter, word }: { pack: LanguagePack; letter: LetterEntry; word: WordEntry }) {
+  const forms = joinedForms(textUnits(spellingOf(word)));
+  const at = Math.max(letterIndex(word, letter, pack), 0);
+  const marked = (
+    <>
+      {forms.slice(0, at).join("")}
+      <span className="first-letter">{forms[at]}</span>
+      {forms.slice(at + 1).join("")}
+    </>
+  );
   return (
-    <div className="word">
-      {chars.slice(0, at).join("")}
-      <span className="first-letter">{chars[at]}</span>
-      {chars.slice(at + 1).join("")}
+    <div className="word" dir={isRightToLeft(word.word) ? "rtl" : undefined}>
+      {word.spelling ? (
+        <>
+          {word.word}
+          <span className="word-spelling">{marked}</span>
+        </>
+      ) : (
+        marked
+      )}
     </div>
   );
 }

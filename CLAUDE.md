@@ -95,18 +95,23 @@ In a fresh worktree run `bun install` first.
   else the first one – never a hard-coded `"de"`. Where a game lacks the language, it plays in English, then German.
   Code, comments, docs and commit messages are English, except
   German names of games, modes and content.
-- **The whole app also speaks Russian** (🌐 on the home page, `src/lib/language.ts`): grown-ups' screens and what
-  the child hears and sees, translated once on request (October 2026). Write every user-facing text so it can
-  be translated: short texts inline as `t({ de: "…" })` (`useT()`), adding `ru: "…"` only when translations
-  are asked for; larger content gets a `*.ru.ts` / `ru.ts` file next to the German data, keyed by id. A text
-  without Russian shows and speaks in German, with the German voice – never German words with a Russian voice:
-  speak a text with the speech language of the language it is in (`useAppLanguage().speechLang`), never a fixed
-  `de-DE`. When the meaning of a German line changes, delete its Russian line (it falls back to German) rather
-  than leaving a wrong one. Russian for the child: present tense, "ты", nothing that changes for boy or girl. Names the voice says (Tapsi →
-  „Тапси“) are written in the language's own letters too, never left in Latin letters inside a Russian sentence.
-  Keys that stand for letters take the Cyrillic letter at their ЙЦУКЕН place (`src/lib/cyrillicKeys.ts`).
-  The app language starts on `playLanguage(APP_LANGUAGES)` like every language choice. Only the management
-  page and the SEO pages stay German.
+- **The whole app speaks German, English, Chinese, Hindi, Spanish, Arabic and Russian** (🌐 on the home page,
+  `APP_LANGUAGES` in `src/lib/language.ts`): grown-ups' screens and what the child hears and sees, translated once on
+  request (Russian, then the other five, October 2026). Write every user-facing text so it can be translated: short
+  texts inline as `t({ de: "…" })` (`useT()`), adding the other languages only when translations are asked for; larger
+  content gets a `<lang>.ts` / `*.<lang>.ts` file next to the German data, keyed by id, and a registry by language.
+  A text without a translation shows and speaks in German, with the German voice – never German words with another
+  language's voice: speak a text with the speech language of the language it is in (`spokenIn`, `voiceFor`), never a
+  fixed `de-DE`. When the meaning of a German line changes, delete its translations (they fall back to German) rather
+  than leaving wrong ones. For the child: present tense, informal (ты, tú, तुम, 你), and nothing that changes for boy or
+  girl – Spanish without adjectives about the child, Hindi with requests or „let's“ instead of gendered verbs, Arabic
+  with „let's“ (هيّا ن…) instead of an imperative. Grown-ups: вы, usted, आप, Arabic plural. Names the voice says
+  (Tapsi → „Тапси“, „塔普西“, „टैप्सी“, „تابسي“) are written in the language's own script, never in Latin letters inside a
+  Russian, Chinese, Hindi or Arabic sentence (the tests check those four for Latin letters). Keys that stand for
+  letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
+  Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
+  keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
+  in `base.css`) while pictures and layout stay as they are. Only the management page and the SEO pages stay German.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games

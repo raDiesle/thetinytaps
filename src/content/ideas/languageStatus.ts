@@ -57,8 +57,8 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/bilder/",
-    languages: { de: "done", ru: "done" },
-    note: "Viele Namen und Sätze je Bild; Russisch in ru.ts jeder Szene.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Viele Namen und Sätze je Bild; jede Sprache in <Sprache>.ts jeder Szene (ru.ts, en.ts …), Satzbau in phrases.ts.",
   },
   {
     href: "/abenteuer/",
@@ -78,23 +78,23 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/gefuehle/",
-    languages: { de: "done", ru: "done" },
-    note: "Russisch in bear.ru.ts und kita.ru.ts, Wort für Wort neben den deutschen Geschichten.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
   },
-  { href: "/kettenreaktion/", languages: { de: "done", ru: "done" } },
-  { href: "/kleine-abenteuer/", languages: { de: "done", ru: "done" } },
-  { href: "/tiere/", languages: { de: "done", ru: "done" } },
-  { href: "/schatten/", languages: { de: "done", ru: "done" } },
-  { href: "/socken/", languages: { de: "done", ru: "done" } },
+  { href: "/kettenreaktion/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  { href: "/kleine-abenteuer/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  { href: "/schatten/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  { href: "/socken/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   {
     href: "/buchstaben/",
-    languages: { de: "done", en: "done", ru: "done" },
-    note: "Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Russisch tippt jede Taste als den kyrillischen Buchstaben an ihrer Stelle (ЙЦУКЕН); Chinesisch, Hindi und Arabisch haben eine andere Schrift und Tastatur.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
   },
   {
     href: "/zaehne/",
     parts: [
-      { label: "🪥 Hinweise und Bilder", languages: { de: "done", ru: "done" } },
+      { label: "🪥 Hinweise und Bilder", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
       {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
@@ -106,12 +106,16 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/toepfchen/",
     parts: [
-      { label: "🚽 Bilder und Texte", languages: { de: "done", ru: "done" }, note: "Russisch seit Oktober 2026; Tapsi heißt dort „Тапси“." },
+      {
+        label: "🚽 Bilder und Texte",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“.",
+      },
       {
         label: "🎵 Warte-Lied (gesungen)",
         recorded: true,
         languages: { de: "done", en: "text", es: "done", ru: "done" },
-        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. Russisch und Spanisch aufgenommen (Oktober 2026; Spanisch spielt, sobald Spanisch eine App-Sprache ist); Englisch: Text für Suno fertig, noch nicht aufgenommen. Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
+        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. Russisch und Spanisch aufgenommen (Oktober 2026); Englisch: Text für Suno fertig, noch nicht aufgenommen. Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
       },
     ],
   },
@@ -122,11 +126,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/laut-leise/",
-    languages: { de: "done", ru: "done" },
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/",
-    languages: { de: "done", ru: "done" },
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
   },
 ];

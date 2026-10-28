@@ -1,0 +1,55 @@
+import type { SceneTranslation } from "../types";
+
+// The fire station picture in Chinese (Mandarin, simplified characters): the title, every item's name and
+// sentences and the chain sentences. Names are bare nouns, without measure word or 这/那.
+
+/** „Feuerwache“ in Chinese. */
+export const ZH: SceneTranslation = {
+  title: "消防站",
+  description: "消防站里的云梯车、警笛和消防狗。",
+  items: {
+    sonne: { name: "太阳", sentences: ["太阳出来啦！", "太阳在笑。"] },
+    wolke: { name: "云朵", sentences: ["云朵下雨啦。滴答，滴答！", "云朵在帮消防员。"] },
+    hubschrauber: { name: "直升机", sentences: ["直升机在飞。呼呼呼！", "下面挂着一桶水。"] },
+    turm: { name: "晾水带塔", sentences: ["水带挂在塔里晾干。", "门开了。你好！", "塔好高好高。"] },
+    sirene: { name: "警笛", sentences: ["呜哇呜哇！警笛响啦。", "消防员们，快来！"] },
+    wache: { name: "消防站", sentences: ["这是消防站。消防车住在这里。", "窗户打开了。你好！", "钟在转：叮，咚！"] },
+    tor: { name: "大门", sentences: ["大门打开了！", "里面停着小消防车。", "大门又关上了。"] },
+    helme: { name: "头盔", sentences: ["这里挂着衣服和头盔。", "快穿上，出发啦！"] },
+    rutschstange: { name: "滑杆", sentences: ["嗖——！消防员顺着滑杆滑下来。", "这样下去好快呀。"] },
+    glocke: { name: "警铃", sentences: ["铃铃铃！警铃响啦。", "警报！消防员要出发啦。"] },
+    taube: { name: "鸽子", sentences: ["咕咕！鸽子站在屋顶上。", "鸽子是灰色的。"] },
+    fahne: { name: "旗子", sentences: ["旗子在风里飘。", "旗子上有一顶头盔。"] },
+    vogel: { name: "小鸟", sentences: ["叽叽！小鸟在唱歌。", "小鸟站在旗子最顶上。"] },
+    blumen: { name: "花", sentences: ["花儿开了，红的黄的。", "消防员给花儿浇水。"] },
+    schmetterling: { name: "蝴蝶", sentences: ["蝴蝶飞来飞去。", "蝴蝶喜欢花。"] },
+    baum: { name: "大树", sentences: ["风吹大树，沙沙响。", "大树上长着红苹果。"] },
+    katze: { name: "小猫", sentences: ["喵！小猫坐在树上。", "小猫下不来啦。消防员来帮忙！"] },
+    eichhoernchen: { name: "松鼠", sentences: ["松鼠在啃坚果。", "你好，松鼠！"] },
+    kommandowagen: { name: "指挥车", sentences: ["队长坐在指挥车里。", "车门开了。嘀嘀！"] },
+    hydrant: { name: "消防栓", sentences: ["水管的水从消防栓里来。", "咕噜，咕噜！"] },
+    krankenwagen: { name: "救护车", sentences: ["呜哇呜哇！有人生病了，救护车来帮忙。", "车门开了。小熊在挥手！"] },
+    grill: { name: "烤炉", sentences: ["爷爷在烤香肠。嗯！", "烤炉冒了一点烟。"] },
+    opa: { name: "爷爷", sentences: ["爷爷把香肠翻过来。", "你好！爷爷在笑。"] },
+    puppe: { name: "练习假人", sentences: ["消防员用假人练习。", "哎哟，假人晃一晃！"] },
+    feuerwehrauto: { name: "消防车", sentences: ["呜哇呜哇！消防车来啦。", "云梯升得好高好高。", "消防车是红色的。"] },
+    feuerwehrfrau: { name: "女消防员", sentences: ["放水！女消防员在喷水。", "水带又长又红。"] },
+    feuerwehrmann: { name: "消防员", sentences: ["嘟——！消防员吹哨子。", "消防员挥挥手。你好！"] },
+    huetchen: { name: "路锥", sentences: ["路锥是橙白色的。", "嘿！路锥跳起来。"] },
+    hund: { name: "消防狗", sentences: ["汪汪！消防狗戴着头盔。", "小狗身上有黑点点。"] },
+    kind: { name: "小朋友", sentences: ["小朋友来看消防员。", "小朋友也有头盔。好耶！"] },
+    luftballon: { name: "气球", sentences: ["气球是黄色的。", "抓紧它！"] },
+    feuerloescher: { name: "灭火器", sentences: ["噗——！灭火器喷出白色的泡沫。", "灭火器是红色的。"] },
+    bobbycar: { name: "玩具车", sentences: ["玩具车是一辆小消防车。", "嘀嘀！玩具车开走啦。"] },
+    ente: { name: "小鸭子", sentences: ["嘎！小鸭子在水坑里游泳。", "小鸭子是黄色的。"] },
+    schlauchrolle: { name: "水带卷盘", sentences: ["水带卷在卷盘上。", "卷盘转起来。咔哒哒！"] },
+    stiefel: { name: "靴子", sentences: ["靴子准备好啦。穿上就出发！", "咚咚，咚咚！"] },
+    maus: { name: "小老鼠", sentences: ["吱！小老鼠住在靴子里。", "你好，小老鼠！"] },
+    schnecke: { name: "蜗牛", sentences: ["蜗牛爬得慢慢的。", "蜗牛把房子背在背上。"] },
+  },
+  chains: [
+    ["铃铃铃！烤炉冒烟啦。警报！", "放水！女消防员在喷水。", "爷爷笑了：谢谢消防员！"],
+    ["云梯升到小猫那里！", "好耶！小猫得救啦！"],
+    ["快！消防员顺着滑杆滑下来。", "大门打开了！", "消防狗叫起来：汪汪！"],
+  ],
+};

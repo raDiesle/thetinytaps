@@ -1,0 +1,63 @@
+import type { SceneTranslation } from "../types";
+
+// The Spanish words of the Supermarkt picture: names (without article, with gender for el/la,
+// `plural` where the Spanish name is a plural: globos, cereales, caramelos, the fruit and vegetables),
+// what each item says and the chain sentences. „pasta“ is singular, as Spanish says it.
+// Neutral Spanish for Spain and Latin America.
+
+/** „Supermarkt“ in Spanish. */
+export const ES: SceneTranslation = {
+  title: "Supermercado",
+  description: "La caja pita, el carro rueda y pesamos la fruta.",
+  items: {
+    schiebetuer: { name: "puerta automática", gender: "f", sentences: ["¡Fiuuu! La puerta automática se abre.", "La abuela entra y saluda."] },
+    hund: { name: "perro", gender: "m", sentences: ["¡Guau, guau! El perro espera fuera.", "El perro mueve la cola."] },
+    brezel: { name: "pretzel", gender: "m", sentences: ["El pretzel grande se balancea de un lado a otro.", "¡Aquí está la panadería!"] },
+    baeckerin: { name: "panadera", gender: "f", sentences: ["¡Rin! La panadera toca el timbre.", "La panadera saluda: ¡hola! ¿Quién quiere pan?"] },
+    brottheke: { name: "mostrador del pan", gender: "m", sentences: ["¡Snif, snif! El pan huele muy bien.", "El pan todavía está calentito."] },
+    kaese: { name: "queso", gender: "m", sentences: ["El queso tiene muchos agujeros.", "¡Uy! Se asoma un ratoncito."] },
+    fisch: { name: "pez", gender: "m", sentences: ["¡Blub, blub! El pez nada en la pecera.", "El pez hace burbujas."] },
+    krabbe: { name: "cangrejo", gender: "m", sentences: ["¡Clic, clac! El cangrejo pellizca.", "El cangrejo siempre camina de lado."] },
+    lautsprecher: { name: "altavoz", gender: "m", sentences: ["¡Din, dan, don! Un aviso.", "¡Hoy hay fresas!"] },
+    kuehlregal: { name: "refrigerador", gender: "m", sentences: ["Las puertas se abren. ¡Brrr, qué frío!", "En el refrigerador hay yogur y mantequilla."] },
+    milch: { name: "leche", gender: "f", sentences: ["¡Muuu! La leche viene de la vaca.", "Los cartones de leche saltan."] },
+    pfandautomat: { name: "máquina de botellas", gender: "f", sentences: ["La botella entra rodando en la máquina.", "¡Brum, brum! Y sale un papelito."] },
+    luftballons: { name: "globos", gender: "m", plural: true, sentences: ["Los globos de colores bailan.", "¡Rojo, amarillo, azul y verde!"] },
+    muesli: { name: "cereales", gender: "m", plural: true, sentences: ["¡Chiqui, chiqui! Los cereales se mueven.", "Los copos salen volando."] },
+    nudeln: { name: "pasta", gender: "f", sentences: ["La pasta salta. ¡Hop, hop!", "Espaguetis largos y espirales pequeñas."] },
+    saft: { name: "jugo", gender: "m", sentences: ["El jugo se mueve en la botella.", "Jugo de naranja y jugo de manzana. ¡Qué rico!"] },
+    bonbons: { name: "caramelos", gender: "m", plural: true, sentences: ["La tapa se abre. ¡Caramelos!", "Saltan caramelos rojos, amarillos y azules."] },
+    blumen: { name: "flores", gender: "f", plural: true, sentences: ["Las flores se mecen de un lado a otro.", "¡Bzzz! Una abeja visita las flores."] },
+    tafel: { name: "pizarra", gender: "f", sentences: ["En la pizarra hay una fresa pintada.", "La pizarra se mueve. ¡Hoy en oferta!"] },
+    einkaufskorb: { name: "cesta", gender: "f", sentences: ["¡Hop! La cesta da un salto.", "Las cestas son rojas."] },
+    verkaeufer: { name: "vendedor", gender: "m", sentences: ["El vendedor está en la escalera.", "Coloca la estantería y silba una canción."] },
+    wischmaschine: {
+      name: "máquina de limpiar",
+      gender: "f",
+      sentences: ["¡Brum, brum! La máquina de limpiar friega el suelo.", "El cepillo gira y hace espuma."],
+    },
+    dosenturm: { name: "torre de latas", gender: "f", sentences: ["La torre de latas se tambalea. ¡Cuidado!", "¡Clonc! La lata de arriba salta."] },
+    eistruhe: { name: "congelador", gender: "m", sentences: ["El congelador se abre. ¡Brrr!", "¡Mira, un helado de tres bolas!"] },
+    kleinerwagen: { name: "carrito pequeño", gender: "m", sentences: ["¡Pi, pi! La niña empuja el carrito pequeño.", "La bandera ondea al viento."] },
+    bananen: { name: "plátanos", gender: "m", plural: true, sentences: ["Los plátanos se balancean.", "Los plátanos son amarillos y curvos."] },
+    karotten: { name: "zanahorias", gender: "f", plural: true, sentences: ["¡Plop, plop! Las zanahorias saltan.", "Las zanahorias son naranjas."] },
+    tomaten: { name: "tomates", gender: "m", plural: true, sentences: ["Los tomates saltan.", "Un tomate se va rodando y vuelve."] },
+    aepfel: { name: "manzanas", gender: "f", plural: true, sentences: ["Las manzanas saltan. ¡Hop!", "¿Quién se asoma por la manzana? ¡Un gusanito!"] },
+    wassermelone: { name: "sandía", gender: "f", sentences: ["La sandía es redonda y pesada.", "Por dentro es roja y jugosa."] },
+    waage: { name: "báscula", gender: "f", sentences: ["¡Ping! La báscula pesa el plátano.", "Sale un papelito con el precio."] },
+    einkaufswagen: { name: "carro de la compra", gender: "m", sentences: ["El carro de la compra rueda. ¡Traca, traca!", "El carro está muy lleno."] },
+    kind: { name: "niño", gender: "m", sentences: ["El niño va sentado en el carro.", "¡Hurra! El niño saluda con los dos brazos."] },
+    kaugummiautomat: { name: "máquina de chicles", gender: "f", sentences: ["La manivela gira. ¡Clac, clac!", "Sale rodando una bola de chicle."] },
+    einkaufstuete: { name: "bolsa de la compra", gender: "f", sentences: ["La bolsa de la compra está muy llena.", "¡Hop! Sale una manzana de un salto."] },
+    warnschild: { name: "señal de aviso", gender: "f", sentences: ["¡Cuidado, el suelo está mojado!", "¡Plas! No te resbales."] },
+    kassiererin: { name: "cajera", gender: "f", sentences: ["La cajera dice: ¡hola!", "La cajera saluda y se ríe."] },
+    laufband: { name: "cinta", gender: "f", sentences: ["La cinta lleva las cosas a la caja.", "¡Zzz, zzz! Todo avanza."] },
+    kasse: { name: "caja registradora", gender: "f", sentences: ["¡Pi, pi! La caja registradora pita.", "El cajón se abre. ¡Ahí está el dinero!"] },
+    eierkarton: { name: "cartón de huevos", gender: "m", sentences: ["El cartón de huevos se abre.", "¡Pío, pío! Se asoma un pollito."] },
+  },
+  chains: [
+    ["¡La cinta arranca!", "Y en el cartón de huevos pía un pollito."],
+    ["¡Cuidado, ahora el suelo está mojado!", "¡Y la torre de latas se tambalea!"],
+    ["El perro ladra: ¡guau, guau!", "Y el altavoz dice: ¡bienvenidos!"],
+  ],
+};

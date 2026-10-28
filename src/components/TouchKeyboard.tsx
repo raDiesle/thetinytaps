@@ -49,9 +49,10 @@ export function TouchKeyboard({
   const t = useT();
   let index = 0;
   return (
-    <div className="touch-keyboard" role="group" aria-label={t({ de: "Tasten", ru: "Клавиши" })}>
+    <div className="touch-keyboard" role="group" aria-label={t({ de: "Tasten", ru: "Клавиши", en: "Keys", zh: "按键", hi: "बटन", es: "Teclas", ar: "أزرار" })}>
       {rows.map((row, r) => (
-        <div key={r} className="touch-row">
+        // An Arabic alphabet runs from right to left, the digits stay as on a keyboard.
+        <div key={r} className="touch-row" dir={/\p{Script=Arabic}/u.test(row[0] ?? "") ? "rtl" : undefined}>
           {row.map((key) => {
             const color = BRIGHT_COLORS[index++ % BRIGHT_COLORS.length];
             return (
@@ -78,20 +79,55 @@ export function TouchKeysSetting({ value, onChange, anyTouch = false }: { value:
   const t = useT();
   if (!device.hasTouch) return null;
   return (
-    <SettingsGroup title={t({ de: "Tablet", ru: "Планшет" })}>
+    <SettingsGroup title={t({ de: "Tablet", ru: "Планшет", en: "Tablet", zh: "平板", hi: "टैबलेट", es: "Tableta", ar: "الجهاز اللوحي" })}>
       <Choice<TouchKeysMode>
-        label={t({ de: "Tasten auf dem Bildschirm", ru: "Клавиши на экране" })}
+        label={t({
+          de: "Tasten auf dem Bildschirm",
+          ru: "Клавиши на экране",
+          en: "Keys on the screen",
+          zh: "屏幕上的按键",
+          hi: "स्क्रीन पर बटन",
+          es: "Teclas en la pantalla",
+          ar: "أزرار على الشاشة",
+        })}
         value={value}
         onChange={onChange}
         options={[
           {
             value: "auto",
             label: anyTouch
-              ? t({ de: "📱 Auf Touch-Bildschirmen", ru: "📱 На сенсорных экранах" })
-              : t({ de: "📱 Nur auf Tablets", ru: "📱 Только на планшетах" }),
+              ? t({
+                  de: "📱 Auf Touch-Bildschirmen",
+                  ru: "📱 На сенсорных экранах",
+                  en: "📱 On touch screens",
+                  zh: "📱 在触摸屏上",
+                  hi: "📱 टच स्क्रीन पर",
+                  es: "📱 En pantallas táctiles",
+                  ar: "📱 على الشاشات اللمسية",
+                })
+              : t({
+                  de: "📱 Nur auf Tablets",
+                  ru: "📱 Только на планшетах",
+                  en: "📱 Only on tablets",
+                  zh: "📱 只在平板上",
+                  hi: "📱 सिर्फ़ टैबलेट पर",
+                  es: "📱 Solo en tabletas",
+                  ar: "📱 على الأجهزة اللوحية فقط",
+                }),
           },
-          { value: "on", label: t({ de: "Immer", ru: "Всегда" }) },
-          { value: "off", label: t({ de: "Nie (mit angeschlossener Tastatur)", ru: "Никогда (с подключённой клавиатурой)" }) },
+          { value: "on", label: t({ de: "Immer", ru: "Всегда", en: "Always", zh: "总是", hi: "हमेशा", es: "Siempre", ar: "دائما" }) },
+          {
+            value: "off",
+            label: t({
+              de: "Nie (mit angeschlossener Tastatur)",
+              ru: "Никогда (с подключённой клавиатурой)",
+              en: "Never (with a keyboard attached)",
+              zh: "从不（已连接键盘）",
+              hi: "कभी नहीं (कीबोर्ड लगा हो तो)",
+              es: "Nunca (con teclado conectado)",
+              ar: "أبدا (مع لوحة مفاتيح موصولة)",
+            }),
+          },
         ]}
       />
     </SettingsGroup>

@@ -1,0 +1,57 @@
+import type { SceneTranslation } from "../types";
+
+// The supermarket picture in Chinese (Mandarin, simplified characters): the title, every item's name and
+// sentences and the chain sentences. Names are bare nouns, without measure word or 这/那.
+
+/** „Supermarkt“ in Chinese. */
+export const ZH: SceneTranslation = {
+  title: "超市",
+  description: "收银台嘀嘀响，购物车在滚，水果放上秤。",
+  items: {
+    schiebetuer: { name: "自动门", sentences: ["呼！自动门打开了。", "奶奶走进来，挥挥手。"] },
+    hund: { name: "小狗", sentences: ["汪汪！小狗在外面等。", "小狗摇尾巴。"] },
+    brezel: { name: "扭结饼", sentences: ["大扭结饼摇来摇去。", "这里是面包店！"] },
+    baeckerin: { name: "面包师", sentences: ["叮！面包师按响铃铛。", "面包师挥挥手：你好，谁要面包？"] },
+    brottheke: { name: "面包柜台", sentences: ["闻一闻！面包好香。", "面包还热乎乎的。"] },
+    kaese: { name: "奶酪", sentences: ["奶酪上有好多洞。", "哎呀！一只小老鼠探出头来。"] },
+    fisch: { name: "鱼", sentences: ["咕噜，咕噜！鱼在水池里游。", "鱼在吐泡泡。"] },
+    krabbe: { name: "螃蟹", sentences: ["咔嚓咔嚓！螃蟹夹一夹。", "螃蟹总是横着走。"] },
+    lautsprecher: { name: "喇叭", sentences: ["叮，当，咚！有广播。", "今天有草莓！"] },
+    kuehlregal: { name: "冷柜", sentences: ["柜门打开了。哇，好冷！", "冷柜里有酸奶和黄油。"] },
+    milch: { name: "牛奶", sentences: ["哞！牛奶是奶牛给的。", "牛奶盒跳起来。"] },
+    pfandautomat: { name: "瓶子回收机", sentences: ["瓶子滚进机器里。", "咕隆，咕隆！一张小票出来啦。"] },
+    luftballons: { name: "气球", sentences: ["彩色的气球在跳舞。", "红的、黄的、蓝的、绿的！"] },
+    muesli: { name: "麦片", sentences: ["沙沙，沙沙！麦片在晃。", "麦片飞出来啦。"] },
+    nudeln: { name: "面条", sentences: ["面条跳起来。嘿，嘿！", "长长的意大利面和小小的螺旋面。"] },
+    saft: { name: "果汁", sentences: ["果汁在瓶子里晃。", "橙汁和苹果汁。真好喝！"] },
+    bonbons: { name: "糖果", sentences: ["盖子打开了。糖果！", "红的、黄的、蓝的糖果跳起来。"] },
+    blumen: { name: "花", sentences: ["花儿摇来摇去。", "嗡嗡！一只蜜蜂来看花儿。"] },
+    tafel: { name: "小黑板", sentences: ["小黑板上画着一颗草莓。", "小黑板晃一晃。今天有特价！"] },
+    einkaufskorb: { name: "购物篮", sentences: ["嘿！购物篮跳起来。", "购物篮是红色的。"] },
+    verkaeufer: { name: "售货员", sentences: ["售货员站在梯子上。", "他一边摆货架，一边吹口哨。"] },
+    wischmaschine: { name: "洗地机", sentences: ["嗡嗡！洗地机在擦地板。", "刷子转呀转，冒出泡沫。"] },
+    dosenturm: { name: "罐头塔", sentences: ["罐头塔在晃。小心！", "当！最上面的罐头跳起来。"] },
+    eistruhe: { name: "冰柜", sentences: ["冰柜打开了。哇，好冷！", "快看，有三个球的冰淇淋！"] },
+    kleinerwagen: { name: "小购物车", sentences: ["嘀嘀！小女孩推着小购物车。", "小旗子在风里飘。"] },
+    bananen: { name: "香蕉", sentences: ["香蕉荡来荡去。", "香蕉黄黄的，弯弯的。"] },
+    karotten: { name: "胡萝卜", sentences: ["噗，噗！胡萝卜跳起来。", "胡萝卜是橙色的。"] },
+    tomaten: { name: "西红柿", sentences: ["西红柿跳呀跳。", "一个西红柿滚走了，又滚回来。"] },
+    aepfel: { name: "苹果", sentences: ["苹果跳起来。嘿！", "谁从苹果里探出头？一条小虫子！"] },
+    wassermelone: { name: "西瓜", sentences: ["西瓜又圆又重。", "西瓜里面红红的，水水的。"] },
+    waage: { name: "电子秤", sentences: ["叮！电子秤在称香蕉。", "一张写着价钱的小票出来啦。"] },
+    einkaufswagen: { name: "购物车", sentences: ["购物车滚起来了。哗啦，哗啦！", "购物车装得满满的。"] },
+    kind: { name: "小朋友", sentences: ["小朋友坐在购物车里。", "好耶！小朋友挥挥两只手。"] },
+    kaugummiautomat: { name: "泡泡糖机", sentences: ["摇把转起来。咔哒，咔哒！", "一颗泡泡糖滚出来啦。"] },
+    einkaufstuete: { name: "购物袋", sentences: ["购物袋装得满满的。", "嘿！一个苹果跳出来。"] },
+    warnschild: { name: "警示牌", sentences: ["小心，地板湿！", "啪嗒！别滑倒。"] },
+    kassiererin: { name: "收银员", sentences: ["收银员说：你好！", "收银员挥挥手，笑一笑。"] },
+    laufband: { name: "传送带", sentences: ["传送带把东西送到收银台。", "呼呼！东西都跟着走。"] },
+    kasse: { name: "收银台", sentences: ["嘀嘀！收银台在响。", "抽屉打开了。钱在这里！"] },
+    eierkarton: { name: "鸡蛋盒", sentences: ["鸡蛋盒打开了。", "叽叽！一只小鸡探出头来。"] },
+  },
+  chains: [
+    ["传送带动起来啦！", "鸡蛋盒里有一只小鸡在叽叽叫。"],
+    ["小心，现在地板湿了！", "罐头塔在晃！"],
+    ["小狗叫起来：汪汪！", "喇叭说：欢迎光临！"],
+  ],
+};

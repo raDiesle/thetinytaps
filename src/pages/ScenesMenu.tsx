@@ -14,7 +14,15 @@ const CATEGORY = categoryOf("/bilder/");
 export function ScenesMenu() {
   const language = useAppLanguage();
   const t = useT();
-  const title = t({ de: "Lebendige Bilder", ru: "Живые картинки" });
+  const title = t({
+    de: "Lebendige Bilder",
+    ru: "Живые картинки",
+    en: "Living Pictures",
+    zh: "会动的图画",
+    hi: "जीवित तस्वीरें",
+    es: "Dibujos vivos",
+    ar: "صور حية",
+  });
   useTitle(title);
   useUpdateBetweenGames();
   const grid = useFitGrid(SCENES.length + UPCOMING_SCENES.length);
@@ -23,14 +31,28 @@ export function ScenesMenu() {
       <Sky />
       <MenuHead
         to={CATEGORY ? categoryHref(CATEGORY) : "/"}
-        back={CATEGORY ? t(CATEGORY.title) : t({ de: "Alle Spiele", ru: "Все игры" })}
+        back={
+          CATEGORY
+            ? t(CATEGORY.title)
+            : t({ de: "Alle Spiele", ru: "Все игры", en: "All games", zh: "所有游戏", hi: "सारे खेल", es: "Todos los juegos", ar: "كل الألعاب" })
+        }
         title={
           <>
             <span aria-hidden>🖼️</span> {title}
           </>
         }
       />
-      <p className="home-subtitle">{t({ de: "Bild aussuchen – dann alles antippen und entdecken!", ru: "Выбери картинку – и нажимай на всё, что видишь!" })}</p>
+      <p className="home-subtitle">
+        {t({
+          de: "Bild aussuchen – dann alles antippen und entdecken!",
+          ru: "Выбери картинку – и нажимай на всё, что видишь!",
+          en: "Pick a picture – then tap everything and discover!",
+          zh: "选一幅图画，然后点一点，看看都有什么！",
+          hi: "एक तस्वीर चुनो – फिर सब कुछ छूकर खोजो!",
+          es: "¡Elige un dibujo y toca todo para descubrirlo!",
+          ar: "هيّا نختار صورة – ثم نلمس كل شيء ونكتشف!",
+        })}
+      </p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {SCENES.map((scene) => localizeScene(scene, language.id)).map((s) => (
           <li key={s.id}>

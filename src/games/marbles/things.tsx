@@ -28,7 +28,7 @@ function crayon(): Thing {
   const h = 130;
   return {
     kind: "crayon",
-    name: { de: "Buntstift", ru: "Карандаш" },
+    name: { de: "Buntstift", en: "Crayon", zh: "彩色铅笔", hi: "रंगीन पेंसिल", es: "Lápiz de color", ar: "قلم تلوين", ru: "Карандаш" },
     w,
     h,
     sound: () => playKnock(1500),
@@ -52,7 +52,7 @@ function block(): Thing {
   const h = 104;
   return {
     kind: "block",
-    name: { de: "Bauklotz", ru: "Кубик" },
+    name: { de: "Bauklotz", en: "Building block", zh: "积木", hi: "ब्लॉक", es: "Bloque", ar: "مكعّب", ru: "Кубик" },
     w,
     h,
     sound: () => playKnock(900),
@@ -73,7 +73,7 @@ function toiletRoll(): Thing {
   const h = 96;
   return {
     kind: "roll",
-    name: { de: "Klopapierrolle", ru: "Рулон бумаги" },
+    name: { de: "Klopapierrolle", en: "Toilet paper roll", zh: "卫生纸卷", hi: "टॉयलेट पेपर का रोल", es: "Rollo de papel", ar: "لفّة ورق", ru: "Рулон бумаги" },
     w,
     h,
     sound: playThump,
@@ -97,7 +97,7 @@ function can(): Thing {
   const h = 108;
   return {
     kind: "can",
-    name: { de: "Dose", ru: "Банка" },
+    name: { de: "Dose", en: "Can", zh: "罐子", hi: "डिब्बा", es: "Lata", ar: "علبة", ru: "Банка" },
     w,
     h,
     sound: playClonk,
@@ -120,7 +120,7 @@ function book(): Thing {
   const h = pick([150, 172, 196, 218]);
   return {
     kind: "book",
-    name: { de: "Buch", ru: "Книжка" },
+    name: { de: "Buch", en: "Book", zh: "书", hi: "किताब", es: "Libro", ar: "كتاب", ru: "Книжка" },
     w,
     h,
     sound: () => playKnock(520),
@@ -140,7 +140,7 @@ function juice(): Thing {
   const h = 150;
   return {
     kind: "juice",
-    name: { de: "Saftpackung", ru: "Пакетик сока" },
+    name: { de: "Saftpackung", en: "Juice box", zh: "果汁盒", hi: "जूस का डिब्बा", es: "Zumo en brik", ar: "علبة عصير", ru: "Пакетик сока" },
     w,
     h,
     sound: playThump,
@@ -162,7 +162,7 @@ function bottle(): Thing {
   const neck = 16;
   return {
     kind: "bottle",
-    name: { de: "Flasche", ru: "Бутылка" },
+    name: { de: "Flasche", en: "Bottle", zh: "瓶子", hi: "बोतल", es: "Botella", ar: "زجاجة", ru: "Бутылка" },
     w,
     h,
     sound: playClonk,
@@ -187,7 +187,7 @@ function cereal(): Thing {
   const h = 236;
   return {
     kind: "cereal",
-    name: { de: "Müslipackung", ru: "Коробка хлопьев" },
+    name: { de: "Müslipackung", en: "Cereal box", zh: "麦片盒", hi: "सीरियल का डिब्बा", es: "Caja de cereales", ar: "علبة حبوب", ru: "Коробка хлопьев" },
     w,
     h,
     sound: playRustle,
@@ -211,7 +211,7 @@ function umbrella(): Thing {
   const h = 300;
   return {
     kind: "umbrella",
-    name: { de: "Regenschirm", ru: "Зонтик" },
+    name: { de: "Regenschirm", en: "Umbrella", zh: "雨伞", hi: "छाता", es: "Paraguas", ar: "مظلّة", ru: "Зонтик" },
     w,
     h,
     sound: () => playKnock(600),

@@ -399,7 +399,17 @@ export function buildBuilding() {
   at(tRoofLand + 0.08, { sound: playClonk });
   at(tTree, { sound: playPop });
   at(tTree + 0.15, { sound: playTwinkle });
-  at(tTree + 0.25, { say: { de: "Hurra! Das Dach ist drauf!", ru: "Ура! Крыша на месте!" } });
+  at(tTree + 0.25, {
+    say: {
+      de: "Hurra! Das Dach ist drauf!",
+      en: "Hooray! The roof is on!",
+      zh: "好耶！屋顶盖好啦！",
+      hi: "हुर्रे! छत लग गई!",
+      es: "¡Hurra! ¡El tejado está puesto!",
+      ar: "مرحى! السقف في مكانه!",
+      ru: "Ура! Крыша на месте!",
+    },
+  });
   at(tGreen, { sound: playDing });
   at(tGreen + 0.5, { sound: playBells });
   at(tGo - 0.3, { sound: playHonk });

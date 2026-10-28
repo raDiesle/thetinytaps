@@ -1,0 +1,57 @@
+import type { SceneTranslation } from "../types";
+
+// The English words of the Supermarkt picture: names, what each item says and the chain sentences.
+// Names are nouns without article, lower case; plural names are marked `plural`.
+
+/** „Supermarkt“ in English. */
+export const EN: SceneTranslation = {
+  title: "Supermarket",
+  description: "The register beeps, the cart rolls and the fruit gets weighed.",
+  items: {
+    schiebetuer: { name: "sliding door", sentences: ["Whoosh! The sliding door opens.", "Grandma comes in and waves."] },
+    hund: { name: "dog", sentences: ["Woof, woof! The dog waits outside.", "The dog wags its tail."] },
+    brezel: { name: "pretzel", sentences: ["The big pretzel swings back and forth.", "Here is the bakery!"] },
+    baeckerin: { name: "baker", sentences: ["Ding! The baker rings the bell.", "The baker waves: Hello, who would like some bread?"] },
+    brottheke: { name: "bread counter", sentences: ["Sniff, sniff! The bread smells yummy.", "The bread is still warm."] },
+    kaese: { name: "cheese", sentences: ["The cheese has lots of holes.", "Oh! A little mouse peeks out."] },
+    fisch: { name: "fish", sentences: ["Blub, blub! The fish swims in the tank.", "The fish makes bubbles."] },
+    krabbe: { name: "crab", sentences: ["Snip, snap! The crab pinches.", "The crab always walks sideways."] },
+    lautsprecher: { name: "loudspeaker", sentences: ["Ding, dang, dong! An announcement.", "Today we have strawberries!"] },
+    kuehlregal: { name: "fridge", sentences: ["The doors open. Brrr, it's cold!", "There is yogurt and butter in the fridge."] },
+    milch: { name: "milk", sentences: ["Moo! Milk comes from the cow.", "The milk cartons are hopping."] },
+    pfandautomat: { name: "bottle machine", sentences: ["The bottle rolls into the machine.", "Rumble, rumble! And out comes a ticket."] },
+    luftballons: { name: "balloons", plural: true, sentences: ["The colorful balloons are dancing.", "Red, yellow, blue and green!"] },
+    muesli: { name: "cereal", sentences: ["Rattle, rattle! The cereal wobbles.", "The flakes fly out."] },
+    nudeln: { name: "noodles", plural: true, sentences: ["The noodles are hopping. Hop, hop!", "Long spaghetti and little spirals."] },
+    saft: { name: "juice", sentences: ["The juice sloshes in the bottle.", "Orange juice and apple juice. Yummy!"] },
+    bonbons: { name: "candies", plural: true, sentences: ["The lid opens. Candies!", "Red, yellow and blue candies are hopping."] },
+    blumen: { name: "flowers", plural: true, sentences: ["The flowers sway back and forth.", "Buzz, buzz! A bee visits the flowers."] },
+    tafel: { name: "chalkboard", sentences: ["There is a strawberry drawn on the chalkboard.", "The chalkboard wobbles. Special offer today!"] },
+    einkaufskorb: { name: "shopping basket", sentences: ["Hop! The shopping basket jumps up.", "The baskets are red."] },
+    verkaeufer: { name: "shop assistant", sentences: ["The shop assistant stands on the ladder.", "He fills the shelf and whistles a song."] },
+    wischmaschine: { name: "floor cleaner", sentences: ["Hum, hum! The floor cleaner cleans the floor.", "The brush spins and makes foam."] },
+    dosenturm: { name: "tower of cans", sentences: ["The tower of cans wobbles. Careful!", "Clonk! The top can hops."] },
+    eistruhe: { name: "ice cream freezer", sentences: ["The ice cream freezer opens. Brrr!", "Look, an ice cream with three scoops!"] },
+    kleinerwagen: { name: "little cart", sentences: ["Beep, beep! The girl pushes the little cart.", "The flag flutters in the wind."] },
+    bananen: { name: "bananas", plural: true, sentences: ["The bananas swing.", "The bananas are yellow and curved."] },
+    karotten: { name: "carrots", plural: true, sentences: ["Pop, pop! The carrots jump up.", "Carrots are orange."] },
+    tomaten: { name: "tomatoes", plural: true, sentences: ["The tomatoes are hopping.", "A tomato rolls away and back again."] },
+    aepfel: { name: "apples", plural: true, sentences: ["The apples are hopping. Hop!", "Who is peeking out of the apple? A little worm!"] },
+    wassermelone: { name: "watermelon", sentences: ["The watermelon is round and heavy.", "Inside it is red and juicy."] },
+    waage: { name: "scale", sentences: ["Ping! The scale weighs the banana.", "A ticket with the price comes out."] },
+    einkaufswagen: { name: "shopping cart", sentences: ["The shopping cart rolls. Rattle, rattle!", "The cart is very full."] },
+    kind: { name: "child", sentences: ["The child rides along in the shopping cart.", "Hooray! The child waves with both arms."] },
+    kaugummiautomat: { name: "gumball machine", sentences: ["The handle turns. Click, clack!", "A gumball rolls out."] },
+    einkaufstuete: { name: "shopping bag", sentences: ["The shopping bag is very full.", "Hop! An apple jumps out."] },
+    warnschild: { name: "warning sign", sentences: ["Careful, the floor is wet!", "Splash! Don't slip."] },
+    kassiererin: { name: "cashier", sentences: ["The cashier says: Hello!", "The cashier waves and laughs."] },
+    laufband: { name: "conveyor belt", sentences: ["The conveyor belt takes the things to the register.", "Whirr, whirr! Everything rolls along."] },
+    kasse: { name: "register", sentences: ["Beep, beep! The register beeps.", "The drawer opens. There is the money!"] },
+    eierkarton: { name: "egg carton", sentences: ["The egg carton opens.", "Peep, peep! A chick peeks out."] },
+  },
+  chains: [
+    ["The conveyor belt starts moving!", "And a chick peeps in the egg carton."],
+    ["Careful, now the floor is wet!", "And the tower of cans wobbles!"],
+    ["The dog barks: Woof, woof!", "And the loudspeaker says: Welcome!"],
+  ],
+};

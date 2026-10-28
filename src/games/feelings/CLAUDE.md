@@ -146,27 +146,30 @@ the characters do changes: every picture is drawn from the story's first one
 `bun run frames --scenes` lists pictures whose background drifted. `feelings.test.ts` fails when a story or the
 bear asks for a picture that is not in `bilder/`.
 
-## Russian
+## Languages
 
-The game speaks the app language (German or Russian, chosen on the home page,
-`src/lib/language.ts`): start screen, captions and everything read aloud. The German
-data (`bear.ts`, `kita.ts`) holds pictures, sounds and order; `bear.ru.ts` and
-`kita.ru.ts` hold only the Russian words, by id, step for step and beat for beat,
-and `localized.ts` lays them over the German (`feelingIn`, `situationIn`,
-`comfortsIn`, `storyIn`). Small texts (the questions, praise, weather captions,
-start screen notes) are `Localized` inline: `t({ de, ru })`. Speech uses the app
-language's voice, a line still in German the German one (`useVoice`). Rules:
-- New stories, feelings and kind things come in German only; their Russian is written
-  only when the user asks (a missing entry in `bear.ru.ts`/`kita.ru.ts` is told in German).
-  A not-so-good idea at home without Russian is `null` in `bear.ru.ts` and told in German;
-  `useVoice` speaks a line that is still German with the German voice (`voiceFor`).
-  But a story that has a translation must match the German step for step and beat for
-  beat (a sound-only beat is `{}`): when you add or remove a step or beat in a translated
-  story, change `kita.ru.ts` too, or delete that story's entry. `feelings.test.ts` fails
-  when they don't match.
-- Russian names: the bear is „Мишка“ (at home and in the kindergarten), the fox
-  „Лисёнок“, the hare „Зайчик“, the hedgehog „Ёжик“, the kindergarten teacher
-  „воспитательница“, the one who brings Мишка „большой медведь“.
-- Nothing said to or about the child depends on boy or girl: feelings as
-  „Мишке грустно“, captions as adverbs („Дождь, грустно“), praise „Молодец!“.
-  The not-so-good answers start with „Хм,“ like the German „Hmm,“.
+The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic or Russian, chosen on the home
+page, `src/lib/language.ts`): start screen, captions and everything read aloud. The German data (`bear.ts`,
+`kita.ts`) holds pictures, sounds and order; `bear.<lang>.ts` and `kita.<lang>.ts` (en, zh, hi, es, ar, ru) hold
+only the words, by id, step for step and beat for beat, and `localized.ts` lays them over the German (`feelingIn`,
+`situationIn`, `comfortsIn`, `storyIn`; `COMFORT_TEXTS`, `FEELING_TEXTS`, `SITUATION_TEXTS` by language). Small texts
+(the questions, praise, weather captions, start screen notes) are `Localized` inline: `t({ de, en, zh, hi, es, ar, ru })`.
+Speech uses the app language's voice, a line still in German the German one (`useVoice`). Rules:
+- New stories, feelings and kind things come in German only; their translations are written only when the user
+  asks (a missing entry in `bear.<lang>.ts`/`kita.<lang>.ts` is told in German). A not-so-good idea at home
+  without its translation is `null` and told in German; `useVoice` speaks a line that is still German with the
+  German voice (`voiceFor`). But a story that has a translation must match the German step for step and beat for
+  beat (a sound-only beat is `{}`): when you add or remove a step or beat in a translated story, change every
+  `kita.<lang>.ts` too, or delete that story's entry there. `feelings.test.ts` fails when they don't match, when a
+  language translated so far misses a story, feeling or kind thing, and when Russian, Chinese, Hindi or Arabic has
+  a Latin letter.
+- Names: the bear is „Little Bear“ / „小熊“ / „भालू“ (kindergarten „छोटा भालू“) / „Osito“ / „الدبدوب“ / „Мишка“ (at home and in the
+  kindergarten); the fox „Little Fox“ / „小狐狸“ / „लोमड़ी“ / „Zorrito“ / „الثعلب الصغير“ / „Лисёнок“; the hare „Bunny“ /
+  „小兔子“ / „खरगोश“ / „Conejito“ / „الأرنب“ / „Зайчик“; the hedgehog „Hedgehog“ / „小刺猬“ / „साही“ / „Erizo“ / „القنفذ“ /
+  „Ёжик“; the teacher „the teacher“ / „老师“ / „टीचर“ / „la maestra“ / „المعلمة“ / „воспитательница“; the one who brings
+  the bear „Big Bear“ / „大熊“ / „बड़ा भालू“ / „el oso grande“ / „الدب الكبير“ / „большой медведь“. Spanish is Latin American
+  („¡Alto!“, „enojado“), Hindi's kindergarten the „प्ले स्कूल“.
+- Nothing said to or about the child depends on boy or girl: Russian feelings as „Мишке грустно“, captions as
+  adverbs („Дождь, грустно“), praise „Молодец!“; Spanish „tú“ without adjectives about the child; Hindi requests
+  (सहलाओ) or the bear as subject; Arabic „we“ (نعانق، ماذا نفعل؟) or what the bear can do, never a command.
+  The not-so-good answers start with „Hmm,“ / „嗯，“ / „Хм,“ like the German „Hmm,“.

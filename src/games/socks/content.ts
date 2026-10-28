@@ -1,5 +1,10 @@
 import type { Localized } from "@/lib/language";
+import { ARABIC_TEXTS } from "./content.ar";
+import { ENGLISH_TEXTS } from "./content.en";
+import { SPANISH_TEXTS } from "./content.es";
+import { HINDI_TEXTS } from "./content.hi";
 import { RUSSIAN_TEXTS } from "./content.ru";
+import { CHINESE_TEXTS } from "./content.zh";
 import type { SockMode } from "./settings";
 
 /** A sock colour: the knitted body and the lighter cuff, heel and toe. */
@@ -82,5 +87,13 @@ const GERMAN_TEXTS: SockTexts = {
   sock: (n) => `Socke ${n}`,
 };
 
-/** The texts by app language: `pick(SOCK_TEXTS, language.id)`; the Russian ones are in content.ru.ts. */
-export const SOCK_TEXTS: Localized<SockTexts> = { de: GERMAN_TEXTS, ru: { ...GERMAN_TEXTS, ...RUSSIAN_TEXTS } };
+/** The texts by app language: `pick(SOCK_TEXTS, language.id)`; the others are in content.<language>.ts, German fills their gaps. */
+export const SOCK_TEXTS: Localized<SockTexts> = {
+  de: GERMAN_TEXTS,
+  en: { ...GERMAN_TEXTS, ...ENGLISH_TEXTS },
+  zh: { ...GERMAN_TEXTS, ...CHINESE_TEXTS },
+  hi: { ...GERMAN_TEXTS, ...HINDI_TEXTS },
+  es: { ...GERMAN_TEXTS, ...SPANISH_TEXTS },
+  ar: { ...GERMAN_TEXTS, ...ARABIC_TEXTS },
+  ru: { ...GERMAN_TEXTS, ...RUSSIAN_TEXTS },
+};

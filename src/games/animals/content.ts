@@ -1,10 +1,16 @@
 import { playBark, playBuzz, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
+import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Localized } from "@/lib/language";
-import { russianTexts } from "./content.ru";
+import { ARABIC } from "./content.ar";
+import { ENGLISH } from "./content.en";
+import { SPANISH } from "./content.es";
+import { HINDI } from "./content.hi";
+import { RUSSIAN } from "./content.ru";
+import { CHINESE } from "./content.zh";
 import type { Home, HomeId } from "./homes";
 
 // Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
-// and who lives where (N-09). The Russian texts are in content.ru.ts, by the same ids.
+// and who lives where (N-09). The other languages are in content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids.
 
 export interface Food {
   /** Same id = same food, so two animals can share one (cat and penguin both like fish). */
@@ -101,5 +107,29 @@ const GERMAN_TEXTS: AnimalTexts = {
   stars: (n) => `${n} geschafft`,
 };
 
+/** A language of the game besides German: its words by id and the sentences built from them with its grammar. */
+export interface AnimalTranslation {
+  /** The words of each animal, food and home by id, in whatever shape the language's grammar needs; one without an entry is said in German. */
+  words: { animals: Record<string, unknown>; foods: Record<string, unknown>; homes: Partial<Record<HomeId, unknown>> };
+  /**
+   * All texts. Translations come only when asked for, so an animal, food or home may have no words yet: then the
+   * whole sentence comes from `german` (and is read by the German voice), never a German word inside another language.
+   */
+  texts: (german: AnimalTexts) => AnimalTexts;
+}
+
+/** Every language besides German, by its id. */
+export const ANIMAL_TRANSLATIONS: Partial<Record<TargetLanguageId, AnimalTranslation>> = {
+  en: ENGLISH,
+  zh: CHINESE,
+  hi: HINDI,
+  es: SPANISH,
+  ar: ARABIC,
+  ru: RUSSIAN,
+};
+
 /** The texts by app language: `pick(ANIMAL_TEXTS, language.id)`. */
-export const ANIMAL_TEXTS: Localized<AnimalTexts> = { de: GERMAN_TEXTS, ru: russianTexts(GERMAN_TEXTS) };
+export const ANIMAL_TEXTS: Localized<AnimalTexts> = {
+  de: GERMAN_TEXTS,
+  ...Object.fromEntries(Object.entries(ANIMAL_TRANSLATIONS).map(([id, translation]) => [id, translation.texts(GERMAN_TEXTS)])),
+};

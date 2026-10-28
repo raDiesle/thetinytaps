@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import { targetLanguageFor } from "@/content/targetLanguages";
-import { DAYTIME } from "./daytime";
+import { DAYTIME, DAYTIME_TRANSLATIONS, daytimeText } from "./daytime";
 import { DAYTIME_RU } from "./daytime.ru";
 import { spokenIn } from "@/lib/language";
-import { KAI, STEPS, stepText } from "./steps";
+import { KAI, STEP_TRANSLATIONS, STEPS, stepText } from "./steps";
 import { STEP_TEXTS_RU } from "./steps.ru";
 import { sungLanguageFor } from "./sung";
 
@@ -36,6 +36,38 @@ test("the Russian morning and evening texts are Cyrillic and have a German one",
     }
   }
   if (KAI.ru) expect(KAI.ru).toMatch(CYRILLIC);
+});
+
+/** The script of each translated language not written in Latin letters: no Latin word may slip into it. */
+const SCRIPTS = { zh: /\p{Script=Han}/u, hi: /\p{Script=Devanagari}/u, ar: /\p{Script=Arabic}/u } as const;
+const TRANSLATED = ["en", "zh", "hi", "es", "ar"] as const;
+
+// A text with Russian was translated into all of them (October 2026); a new German-only text has none yet.
+test("a step or daytime text with Russian is there in en, zh, hi, es and ar too, Chinese, Hindi and Arabic without Latin letters", () => {
+  for (const id of TRANSLATED) {
+    const language = targetLanguageFor(id);
+    const lines = [
+      ...STEPS.flatMap((step) =>
+        (["title", "hint", "cue"] as const).filter((key) => STEP_TEXTS_RU[step.id]?.[key]).map((key) => stepText(step, key, language)),
+      ),
+      ...(["morning", "evening"] as const).flatMap((daytime) =>
+        (["hello", "grow", "doneTitle", "after"] as const).filter((key) => DAYTIME_RU[daytime][key]).map((key) => daytimeText(daytime, key, language)),
+      ),
+      ...(KAI.ru ? [{ text: KAI[id] ?? "", lang: language.speechLang }] : []),
+    ];
+    for (const { text, lang } of lines) {
+      expect(lang, `${id}: ${text}`).toBe(language.speechLang);
+      expect(text.trim(), id).not.toBe("");
+      if (id in SCRIPTS) expect(text, id).not.toMatch(/[A-Za-z]/);
+    }
+    for (const step of STEPS) {
+      // A title keeps the German one's emoji, which shows the way.
+      const title = STEP_TRANSLATIONS[id]?.[step.id]?.title;
+      if (title) expect(title.split(" ")[0], `${id} ${step.id}`).toBe(step.title.split(" ")[0]);
+    }
+    for (const [daytime, texts] of Object.entries(DAYTIME_TRANSLATIONS[id] ?? {}))
+      for (const key of Object.keys(texts)) expect(Object.keys(DAYTIME[daytime as keyof typeof DAYTIME]), `${id} ${daytime}`).toContain(key);
+  }
 });
 
 test("a text without Russian is said in German with the German voice", () => {

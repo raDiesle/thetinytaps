@@ -57,25 +57,25 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEnd
         <span className="game-end-emoji" aria-hidden>
           <MenuIcon />
         </span>
-        {t({ de: "Menü", ru: "Меню" })}
+        {t({ de: "Menü", ru: "Меню", en: "Menu", zh: "菜单", hi: "मेन्यू", es: "Menú", ar: "القائمة" })}
       </button>
       <button type="button" className="game-end-button again" onPointerDown={press(onAgain)}>
         <span className="game-end-emoji" aria-hidden>
           🔁
         </span>
-        {t({ de: "Nochmal", ru: "Ещё раз" })}
+        {t({ de: "Nochmal", ru: "Ещё раз", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى" })}
       </button>
       {next && (
         <button
           type="button"
           className="game-end-button next"
-          aria-label={`${t({ de: "Weiter", ru: "Дальше" })}: ${next.name}`}
+          aria-label={`${t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })}: ${next.name}`}
           onPointerDown={press(next.onNext)}
         >
           <span className="game-end-emoji" aria-hidden>
             {next.emoji}
           </span>
-          {t({ de: "Weiter", ru: "Дальше" })} ▶
+          {t({ de: "Weiter", ru: "Дальше", en: "Next", zh: "下一个", hi: "आगे", es: "Siguiente", ar: "التالي" })} ▶
         </button>
       )}
     </div>

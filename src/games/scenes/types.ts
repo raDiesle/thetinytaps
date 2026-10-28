@@ -120,7 +120,7 @@ export interface SceneItem {
   traits?: SceneTrait[];
   /** The name is a plural ("die Küken"), so questions say "Wo sind …?". */
   plural?: boolean;
-  /** Grammatical gender of a translated name ("красный/красная/красное"); set by localizeScene, German names have none. */
+  /** Grammatical gender of a translated name ("красный/красная/красное", "rojo/roja"); set by localizeScene, German names have none. */
   gender?: "m" | "f" | "n";
   /** Length of the tap animation; taps on the same item are ignored meanwhile. */
   durationMs: number;
@@ -175,13 +175,19 @@ export interface Scene {
 
 /** An item's words in another language (by its id in `SceneTranslation.items`). */
 export interface SceneItemTranslation {
-  /** The name as used inside a sentence, without article where the language has none: "экскаватор". */
+  /**
+   * The name as used inside a sentence: "экскаватор"; without the article the engine adds (English "excavator",
+   * Spanish "excavadora"), with it where it belongs to the word (Arabic "الحفارة"); Chinese a bare noun.
+   */
   name: string;
   /** Spoken one after the other when the item is tapped, like the German `sentences` (same meaning, not word for word). */
   sentences: string[];
-  /** Grammatical gender of the name, for sentences that need it (Russian "мой/моя/моё"); left out for plurals. */
+  /**
+   * Grammatical gender of the name, for sentences that need it (see phrases.ts): Russian "m"/"f"/"n", left out for
+   * plurals; Spanish, Hindi and Arabic always "m" or "f", plurals too (Arabic plurals of things "f"); English and Chinese none.
+   */
   gender?: "m" | "f" | "n";
-  /** The name is a plural ("цыплята"). */
+  /** The name is a plural ("цыплята", "chicks"); never in Chinese. */
   plural?: boolean;
 }
 

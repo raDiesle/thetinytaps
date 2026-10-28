@@ -1,0 +1,55 @@
+import type { SceneTranslation } from "../types";
+
+// The bathroom picture in English: the title, every item's name and sentences and the chain sentences.
+// Names are nouns without article, lower case; plural names are marked `plural`.
+
+/** „Badezimmer“ in English. */
+export const EN: SceneTranslation = {
+  title: "Bathroom",
+  description: "Rubber duck, a mountain of bubbles and a flushing toilet.",
+  items: {
+    luefter: { name: "fan", sentences: ["Whirr, whirr! The fan is spinning.", "The fan blows the steam away."] },
+    fenster: { name: "window", sentences: ["The window opens. Fresh air!", "Tweet, tweet! A bird looks in."] },
+    dusche: { name: "shower", sentences: ["The shower sprays. Splish, splash!", "The water is nice and warm."] },
+    lampe: { name: "lamp", sentences: ["Click! The lamp turns on.", "Now it is nice and bright."] },
+    spiegel: { name: "mirror", sentences: ["The mirror gets all wet.", "Look, a smiling face!"] },
+    handtuch: { name: "towel", sentences: ["The towel is soft and blue.", "The towel swings back and forth."] },
+    shampoo: { name: "shampoo", sentences: ["The shampoo makes lots of foam.", "Blub! The bubbles float up."] },
+    pflanze: { name: "plant", sentences: ["The plant wiggles its leaves.", "Look, a flower is opening!"] },
+    uhr: { name: "clock", sentences: ["Tick, tock! The clock is ticking.", "The hands go round and round."] },
+    klopapier: { name: "toilet paper", sentences: ["The roll is turning.", "The toilet paper rolls off and back on again."] },
+    spinne: { name: "spider", sentences: ["The little spider lets itself down on a thread.", "Hello! The spider waves with eight legs."] },
+    tuer: { name: "door", sentences: ["Knock, knock! Who is there?", "Mommy looks in and waves."] },
+    waschmaschine: { name: "washing machine", sentences: ["Hum, hum! The washing machine is washing.", "The laundry goes round and round."] },
+    waschbecken: { name: "sink", sentences: ["Gurgle, gurgle! The water drains away.", "The doors open. There is the toilet paper!"] },
+    wasserhahn: { name: "faucet", sentences: ["Drip, drop! The faucet is dripping.", "Faucet off! Now it is quiet."] },
+    zahnbuerste: { name: "toothbrush", sentences: ["Scrub, scrub! The toothbrush is brushing.", "The teeth get nice and clean."] },
+    zahnpasta: { name: "toothpaste", sentences: ["The toothpaste comes out of the tube.", "A blob for the toothbrush!"] },
+    toilette: { name: "toilet", sentences: ["Whoosh! The toilet flushes.", "The lid goes up and down again."] },
+    badewanne: { name: "bathtub", sentences: ["The bathtub is full of water.", "Splish, splash! The water sloshes.", "The bathtub is very big."] },
+    kind: { name: "child", sentences: ["The child takes a bath and sings: La, la, la!", "The child waves with both hands."] },
+    ente: { name: "rubber duck", sentences: ["Squeak, squeak! The duck is swimming.", "The rubber duck is yellow."] },
+    schaumberg: { name: "bubble mountain", sentences: ["The bubbles get higher and higher!", "Blub! The bubbles fly away."] },
+    muelleimer: { name: "trash can", sentences: ["Clack! The lid opens.", "The paper flies into the trash can."] },
+    waeschekorb: { name: "laundry basket", sentences: ["The lid lifts up.", "Hello! A sock peeks out."] },
+    kroko: { name: "crocodile", sentences: ["Snap, snap! The crocodile opens its mouth.", "The crocodile is made of rubber."] },
+    foehn: { name: "hair dryer", sentences: ["Whoosh! The hair dryer blows warm air.", "Now the hair gets dry."] },
+    waage: { name: "scale", sentences: ["Beep, beep! The scale shows a number.", "How heavy are you?"] },
+    toepfchen: { name: "potty", sentences: ["The potty hops. Hop!", "Ta-da! All done!"] },
+    katze: { name: "cat", sentences: ["Meow! The cat is washing itself.", "The cat licks its paw."] },
+    wal: { name: "whale", sentences: ["Pfffft! The whale sprays a fountain.", "The little whale is a bath toy."] },
+    seife: { name: "soap", sentences: ["Whee! The soap slips away.", "The soap makes bubbles."] },
+    hausschuhe: { name: "slippers", plural: true, sentences: ["The bunny slippers are hopping.", "Hop, hop! The ears wiggle."] },
+    frosch: { name: "frog", sentences: ["Ribbit! The frog hops.", "The frog squirts water!"] },
+    hund: { name: "dog", sentences: ["The dog shakes itself. Everything gets wet!", "Woof, woof! The dog had a bath too."] },
+    wasserball: { name: "beach ball", sentences: ["The beach ball bounces. Boing!", "The ball is very colorful."] },
+    seifenblasen: { name: "soap bubbles", plural: true, sentences: ["Whoo! Lots of soap bubbles are flying.", "Pop! The bubble burst."] },
+    schiffchen: { name: "toy boat", sentences: ["Toot, toot! The toy boat rocks.", "The wind blows into the sail."] },
+    schwamm: { name: "sponge", sentences: ["Someone squeezes the sponge. Splash!", "The water drips out."] },
+  },
+  chains: [
+    ["The child laughs and splashes back!", "And the duck rocks on the waves."],
+    ["The wind blows on the towel.", "And the soap bubbles fly away!"],
+    ["The cat gets a fright: Meow!", "And the dog barks: Woof, woof!"],
+  ],
+};

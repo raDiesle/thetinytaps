@@ -7,8 +7,24 @@ import { isStandalone } from "@/lib/pwa";
 
 const PORTRAIT = "(orientation: portrait)";
 
-const TURN = { de: "Bitte quer halten", ru: "Поверните экран горизонтально" };
-const ASK = { de: "Im Vollbild spielen?", ru: "Играть в полноэкранном режиме?" };
+const TURN = {
+  de: "Bitte quer halten",
+  ru: "Поверните экран горизонтально",
+  en: "Please hold sideways",
+  zh: "请横过来拿",
+  hi: "कृपया आड़ा पकड़ें",
+  es: "Por favor, gire el dispositivo",
+  ar: "يرجى تدوير الجهاز أفقيًا",
+};
+const ASK = {
+  de: "Im Vollbild spielen?",
+  ru: "Играть в полноэкранном режиме?",
+  en: "Play in full screen?",
+  zh: "全屏玩吗？",
+  hi: "फ़ुल स्क्रीन में खेलें?",
+  es: "¿Jugar en pantalla completa?",
+  ar: "اللعب بملء الشاشة؟",
+};
 
 function subscribePortrait(onChange: () => void) {
   const query = matchMedia(PORTRAIT);
@@ -71,11 +87,20 @@ export function ScreenHint() {
         <div className="screen-hint-buttons">
           {fullscreenPossible && (
             <button type="button" className="screen-hint-button" onClick={goFullscreen}>
-              <FullscreenIcon /> {t({ de: "Vollbild", ru: "Полный экран" })}
+              <FullscreenIcon />{" "}
+              {t({ de: "Vollbild", ru: "Полный экран", en: "Full screen", zh: "全屏", hi: "फ़ुल स्क्रीन", es: "Pantalla completa", ar: "ملء الشاشة" })}
             </button>
           )}
           <button type="button" className="screen-hint-button secondary" onClick={playUpright}>
-            {t({ de: "Trotzdem hochkant", ru: "Всё равно вертикально" })}
+            {t({
+              de: "Trotzdem hochkant",
+              ru: "Всё равно вертикально",
+              en: "Upright anyway",
+              zh: "仍然竖着玩",
+              hi: "फिर भी खड़ा रखें",
+              es: "Vertical de todos modos",
+              ar: "عموديًا على أي حال",
+            })}
           </button>
         </div>
       </div>
@@ -88,10 +113,11 @@ export function ScreenHint() {
         <p className="screen-hint-title">{t(ASK)}</p>
         <div className="screen-hint-buttons">
           <button type="button" className="screen-hint-button" onClick={goFullscreen}>
-            <FullscreenIcon /> {t({ de: "Vollbild", ru: "Полный экран" })}
+            <FullscreenIcon />{" "}
+            {t({ de: "Vollbild", ru: "Полный экран", en: "Full screen", zh: "全屏", hi: "फ़ुल स्क्रीन", es: "Pantalla completa", ar: "ملء الشاشة" })}
           </button>
           <button type="button" className="screen-hint-button secondary" onClick={() => setAsked(true)}>
-            {t({ de: "Nein", ru: "Нет" })}
+            {t({ de: "Nein", ru: "Нет", en: "No", zh: "不用", hi: "नहीं", es: "No", ar: "لا" })}
           </button>
         </div>
       </div>

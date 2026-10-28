@@ -10,7 +10,17 @@ export function FullscreenButton({ className = "home-menu-button icon-only", pla
   const on = useFullscreen();
   const t = useT();
   if (!canFullscreen()) return null;
-  const label = on ? t({ de: "Vollbild beenden", ru: "Выйти из полноэкранного режима" }) : t({ de: "Vollbild", ru: "Полный экран" });
+  const label = on
+    ? t({
+        de: "Vollbild beenden",
+        ru: "Выйти из полноэкранного режима",
+        en: "Exit full screen",
+        zh: "退出全屏",
+        hi: "फ़ुल स्क्रीन बंद करें",
+        es: "Salir de pantalla completa",
+        ar: "إنهاء ملء الشاشة",
+      })
+    : t({ de: "Vollbild", ru: "Полный экран", en: "Full screen", zh: "全屏", hi: "फ़ुल स्क्रीन", es: "Pantalla completa", ar: "ملء الشاشة" });
   return (
     <button
       type="button"

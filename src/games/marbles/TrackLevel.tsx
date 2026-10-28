@@ -396,7 +396,15 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
       done.current = true;
       fullAt.current = t;
       sound(playBells);
-      say({ de: "Der Korb ist voll!", ru: "Корзина полна!" });
+      say({
+        de: "Der Korb ist voll!",
+        en: "The basket is full!",
+        zh: "篮子满啦！",
+        hi: "टोकरी भर गई!",
+        es: "¡La cesta está llena!",
+        ar: "السلة ممتلئة!",
+        ru: "Корзина полна!",
+      });
       setTimeout(onDone, DONE_AFTER_FULL_MS);
     }
   };
@@ -870,7 +878,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         <button
           type="button"
           className={`run-space${held.current === " " ? " down" : ""}`}
-          aria-label={tr({ de: "Leertaste", ru: "Пробел" })}
+          aria-label={tr({ de: "Leertaste", en: "Space", zh: "空格键", hi: "स्पेस", es: "Espacio", ar: "مسافة", ru: "Пробел" })}
           onPointerDown={(e) => {
             e.stopPropagation();
             rebuildNext();

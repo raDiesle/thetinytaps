@@ -1,0 +1,57 @@
+import type { SceneTranslation } from "../types";
+
+// The forest picture in Chinese (Mandarin, simplified characters): the title, every item's name and
+// sentences and the chain sentences. Names are bare nouns, without measure word or 这/那.
+
+/** „Wald“ in Chinese. */
+export const ZH: SceneTranslation = {
+  title: "森林",
+  description: "小溪边林间空地上的猫头鹰、啄木鸟、小鹿和狐狸。",
+  items: {
+    sonne: { name: "太阳", sentences: ["阳光穿过大树照下来。", "太阳在笑。"] },
+    wolke: { name: "云朵", sentences: ["云朵下雨啦。滴答，滴答！", "下过雨，蘑菇长出来啦。"] },
+    birke: { name: "白桦树", sentences: ["白桦树的树干是白色的。", "白桦树的叶子在风里闪闪发亮。"] },
+    specht: { name: "啄木鸟", sentences: ["笃，笃，笃！啄木鸟在敲树。", "啄木鸟戴着一顶红帽子。"] },
+    vogelnest: { name: "鸟窝", sentences: ["叽叽！鸟宝宝们饿了。", "鸟妈妈叼来一条虫子。"] },
+    eiche: { name: "橡树", sentences: ["橡树是一棵又老又粗的大树。", "扑通！橡果掉下来了。"] },
+    eule: { name: "猫头鹰", sentences: ["咕咕！猫头鹰转转头。", "猫头鹰住在树洞里。", "猫头鹰有一双大眼睛。"] },
+    hirsch: { name: "雄鹿", sentences: ["呦——！雄鹿大声叫。", "雄鹿有一对大鹿角。"] },
+    tanne: { name: "冷杉", sentences: ["冷杉又高又绿。", "扑通！一个松果掉下来。"] },
+    kuckuck: { name: "布谷鸟", sentences: ["布谷，布谷！森林里有声音在叫。", "布谷鸟站在冷杉上。"] },
+    ameisenhaufen: { name: "蚂蚁窝", sentences: ["蚂蚁窝里住着好多好多蚂蚁。", "蚂蚁们一个跟着一个走。"] },
+    dachs: { name: "獾", sentences: ["獾从洞里探出头。", "嗅嗅，嗅嗅！獾的鼻子上有条纹。"] },
+    eichhoernchen: { name: "松鼠", sentences: ["松鼠在藏坚果。", "松鼠的尾巴毛茸茸的。"] },
+    biber: { name: "河狸", sentences: ["河狸在啃树枝。", "啪！河狸用尾巴拍水。", "河狸在筑水坝。"] },
+    reh: { name: "小鹿", sentences: ["呼！小鹿跳起来。", "小鹿有大大的耳朵。"] },
+    fuchs: { name: "狐狸", sentences: ["嘿！狐狸跳得高高的。", "狐狸的尾巴毛茸茸的。", "狐狸叫：汪！"] },
+    rehkitz: { name: "鹿宝宝", sentences: ["鹿宝宝是小鹿的孩子。", "呦！鹿宝宝身上有白点点。"] },
+    wildschwein: { name: "野猪", sentences: ["哼哼！野猪在拱土。", "野猪在找橡果。"] },
+    frischlinge: { name: "小野猪", sentences: ["小野猪是野猪的孩子。", "小野猪身上有条纹。"] },
+    bruecke: { name: "小桥", sentences: ["嗒，嗒！从小桥上走过小溪。", "小桥下面，水哗哗地流。"] },
+    holzstapel: { name: "木头堆", sentences: ["护林员把木头堆起来了。", "咕隆，咕隆！木头在晃。"] },
+    hirschkaefer: { name: "锹甲", sentences: ["锹甲有一对大钳子。", "咔嚓！锹甲的钳子张开又合上。"] },
+    wegweiser: { name: "路牌", sentences: ["路牌告诉我们怎么走。", "这边去森林，那边去小溪。"] },
+    rabe: { name: "乌鸦", sentences: ["呱，呱！乌鸦在叫。", "乌鸦全身黑黑的。"] },
+    kind: { name: "小朋友", sentences: ["小朋友在捡彩色的树叶。", "嘿！小朋友跳进树叶堆。", "你好！小朋友在挥手。"] },
+    hase: { name: "小兔子", sentences: ["蹦蹦跳跳！小兔子跳呀跳。", "小兔子在啃一片叶子。"] },
+    foersterin: { name: "护林员", sentences: ["护林员用望远镜看一看。", "护林员在守护森林。", "你好！护林员吹着口哨唱歌。"] },
+    libelle: { name: "蜻蜓", sentences: ["嗖！蜻蜓飞过小溪。", "蜻蜓是蓝色的。"] },
+    fisch: { name: "小鱼", sentences: ["哗啦！小鱼跳出水面。", "小鱼在小溪里游。咕噜！"] },
+    igel: { name: "刺猬", sentences: ["刺猬缩成一个球。", "刺猬身上有好多刺。", "嗅嗅！刺猬背着一个苹果。"] },
+    baumstumpf: { name: "树桩", sentences: ["咚咚！谁住在树桩里？", "树桩上长着小蘑菇。"] },
+    maus: { name: "小老鼠", sentences: ["吱！小老鼠住在树桩里。", "你好，小老鼠！"] },
+    beerenstrauch: { name: "浆果丛", sentences: ["浆果丛上长着蓝莓和覆盆子。", "嗯，浆果真好吃！"] },
+    schmetterling: { name: "蝴蝶", sentences: ["蝴蝶是蓝色的。", "蝴蝶在浆果上面飞。"] },
+    frosch: { name: "青蛙", sentences: ["呱！青蛙坐在石头上。", "嗖！青蛙抓住一只苍蝇。"] },
+    fliegenpilz: { name: "毒蘑菇", sentences: ["毒蘑菇是红色的，有白点点。", "毒蘑菇有毒。只能看看！"] },
+    farn: { name: "蕨类", sentences: ["蕨类有长长的绿叶子。", "蕨类展开它的叶子。"] },
+    marienkaefer: { name: "瓢虫", sentences: ["瓢虫是红色的，有黑点点。", "飞吧，瓢虫，飞吧！"] },
+    schnecke: { name: "蜗牛", sentences: ["蜗牛爬得慢慢的。", "蜗牛把房子背在背上。"] },
+    maulwurf: { name: "鼹鼠", sentences: ["哎呀！鼹鼠从土里探出头。", "鼹鼠用铲子一样的手挖土。"] },
+  },
+  chains: [
+    ["猫头鹰醒了：咕咕！谁在敲？", "布谷鸟叫：布谷！"],
+    ["小野猪也一起哼哼。", "獾看一看：发生什么事啦？"],
+    ["小老鼠探出头：谁在敲？", "刺猬赶快缩成一个球。"],
+  ],
+};

@@ -1,0 +1,55 @@
+import type { SceneTranslation } from "../types";
+
+// The bathroom picture in Chinese (Mandarin, simplified characters): the title, every item's name and
+// sentences and the chain sentences. Names are bare nouns, without measure word or 这/那.
+
+/** „Badezimmer“ in Chinese. */
+export const ZH: SceneTranslation = {
+  title: "浴室",
+  description: "小黄鸭、泡泡山和冲水马桶。",
+  items: {
+    luefter: { name: "排气扇", sentences: ["呼呼！排气扇在转。", "排气扇把水汽吹走。"] },
+    fenster: { name: "窗户", sentences: ["窗户打开了。好新鲜的空气！", "叽叽！一只小鸟往里看。"] },
+    dusche: { name: "淋浴", sentences: ["淋浴在喷水。哗啦啦！", "水暖暖的。"] },
+    lampe: { name: "灯", sentences: ["咔嗒！灯亮了。", "现在好亮呀。"] },
+    spiegel: { name: "镜子", sentences: ["镜子湿湿的。", "快看，一张笑脸！"] },
+    handtuch: { name: "毛巾", sentences: ["毛巾软软的，是蓝色的。", "毛巾荡来荡去。"] },
+    shampoo: { name: "洗发水", sentences: ["洗发水起了好多泡泡。", "噗！泡泡飞上去啦。"] },
+    pflanze: { name: "盆栽", sentences: ["盆栽摇摇叶子。", "快看，开花啦！"] },
+    uhr: { name: "钟", sentences: ["滴答，滴答！钟在走。", "指针转呀转。"] },
+    klopapier: { name: "卫生纸", sentences: ["纸卷在转。", "卫生纸拉出来，又卷回去。"] },
+    spinne: { name: "小蜘蛛", sentences: ["小蜘蛛吊着丝下来了。", "你好！小蜘蛛用八条腿挥手。"] },
+    tuer: { name: "门", sentences: ["咚咚！是谁呀？", "妈妈往里看，挥挥手。"] },
+    waschmaschine: { name: "洗衣机", sentences: ["嗡嗡！洗衣机在洗衣服。", "衣服转呀转。"] },
+    waschbecken: { name: "洗手池", sentences: ["咕噜咕噜！水流走啦。", "小门打开了。里面有卫生纸！"] },
+    wasserhahn: { name: "水龙头", sentences: ["滴答，滴答！水龙头在滴水。", "关上水龙头！现在安静啦。"] },
+    zahnbuerste: { name: "牙刷", sentences: ["刷刷刷！牙刷在刷牙。", "牙齿变得干干净净。"] },
+    zahnpasta: { name: "牙膏", sentences: ["牙膏从管子里挤出来。", "挤一点到牙刷上！"] },
+    toilette: { name: "马桶", sentences: ["哗——！马桶冲水啦。", "盖子打开，又关上。"] },
+    badewanne: { name: "浴缸", sentences: ["浴缸里装满了水。", "哗啦哗啦！水在晃。", "浴缸好大好大。"] },
+    kind: { name: "小朋友", sentences: ["小朋友一边洗澡一边唱：啦啦啦！", "小朋友挥挥两只手。"] },
+    ente: { name: "小黄鸭", sentences: ["吱吱！小黄鸭在游泳。", "小黄鸭是黄色的。"] },
+    schaumberg: { name: "泡泡山", sentences: ["泡泡越堆越高！", "噗！泡泡飞走啦。"] },
+    muelleimer: { name: "垃圾桶", sentences: ["咔嗒！盖子打开了。", "纸飞进垃圾桶。"] },
+    waeschekorb: { name: "洗衣篮", sentences: ["盖子抬起来了。", "你好！一只袜子探出头来。"] },
+    kroko: { name: "鳄鱼", sentences: ["啊呜，啊呜！鳄鱼张开大嘴。", "鳄鱼是橡胶做的。"] },
+    foehn: { name: "吹风机", sentences: ["呼呼！吹风机吹出热风。", "头发吹干啦。"] },
+    waage: { name: "体重秤", sentences: ["嘀嘀！体重秤显示一个数字。", "你有多重呀？"] },
+    toepfchen: { name: "小马桶", sentences: ["小马桶跳一跳。嘿！", "哒哒！全好啦！"] },
+    katze: { name: "小猫", sentences: ["喵！小猫在洗脸。", "小猫舔舔小爪子。"] },
+    wal: { name: "鲸鱼", sentences: ["噗——！鲸鱼喷出水柱。", "小鲸鱼是洗澡玩具。"] },
+    seife: { name: "肥皂", sentences: ["哧溜！肥皂滑走啦。", "肥皂吹出泡泡。"] },
+    hausschuhe: { name: "拖鞋", sentences: ["小兔子拖鞋跳呀跳。", "蹦蹦！耳朵晃呀晃。"] },
+    frosch: { name: "青蛙", sentences: ["呱！青蛙跳起来。", "青蛙在喷水！"] },
+    hund: { name: "小狗", sentences: ["小狗抖抖身子。全都湿啦！", "汪汪！小狗也洗过澡啦。"] },
+    wasserball: { name: "沙滩球", sentences: ["沙滩球弹起来。嘣！", "球的颜色真多。"] },
+    seifenblasen: { name: "肥皂泡", sentences: ["呼！好多肥皂泡飞起来。", "啪！泡泡破啦。"] },
+    schiffchen: { name: "小船", sentences: ["嘟嘟！小船摇呀摇。", "风吹着船帆。"] },
+    schwamm: { name: "海绵", sentences: ["挤一挤海绵。啪嗒！", "水滴下来啦。"] },
+  },
+  chains: [
+    ["小朋友笑着往回喷水！", "小黄鸭在波浪上摇呀摇。"],
+    ["风把毛巾吹起来。", "肥皂泡飞走啦！"],
+    ["小猫吓了一跳：喵！", "小狗叫起来：汪汪！"],
+  ],
+};

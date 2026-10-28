@@ -4,11 +4,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Schatzinsel“ in English. */
 export const TRANSLATION: StoryTranslation = {
+  title: "Treasure Island",
   defaultTurn: "Your turn!",
   opening: ["Look – over there is Treasure Island!", "And there's a treasure!", "Are you coming along?"],
   steps: [
     // 👋
     {
+      name: "Wave to Kiki",
       situation: "Ahoy! I'm Tapsi. And here comes Kiki, my parrot!",
       instruction: "I wave hello to Kiki – like this!",
       turn: "Can you wave to Kiki too?",
@@ -17,6 +19,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎣
     {
+      name: "Cast the fishing rod",
       situation: "Now we go fishing!",
       instruction: "Swing back over your shoulder – and cast far, like this!",
       turn: "Your turn – cast the line!",
@@ -24,9 +27,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "So many fish!",
     },
     // 🪑
-    { instruction: "Sit down with me – like this!", praise: "Off we go!" },
+    { name: "Sit down", instruction: "Sit down with me – like this!", praise: "Off we go!" },
     // 🛶
     {
+      name: "Paddle",
       situation: "Ole swims off – to Treasure Island!",
       instruction: "Look: the paddle in the water on the right – and on the left.",
       turn: "Paddle with me!",
@@ -34,9 +38,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "We made it! Ole is on the beach.",
     },
     // 🧍
-    { instruction: "We're on the island! Stand up with me – like this!", praise: "On we go!" },
+    { name: "Stand up", instruction: "We're on the island! Stand up with me – like this!", praise: "On we go!" },
     // 🦂
     {
+      name: "Stomp on the scorpions",
       situation: "Oh no! Scorpions are crawling on Ole!",
       instruction: "Foot up – and stomp hard and fast, like this!",
       turn: "Your turn – stomp with me!",
@@ -45,6 +50,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌉
     {
+      name: "Hop over the bridge",
       situation: "A little bridge! And lots of boxes are floating up there.",
       instruction: "Hop – and bump the box with your head, boom!",
       turn: "Your turn – jump with me!",
@@ -53,6 +59,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪵
     {
+      name: "Duck under the log",
       situation: "Watch out! A log is swinging up there.",
       instruction: "When it comes, we duck – like this!",
       turn: "Here it comes! Duck!",
@@ -61,6 +68,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥁
     {
+      name: "Drum",
       situation: "Oh, lots of birds are sitting on the path! And two drums are hanging there.",
       instruction: "Left – boom! And right – boom! Like this!",
       turn: "Your turn – drum with me!",
@@ -69,6 +77,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ⚙️
     {
+      name: "Turn the crank",
       situation: "A gate! And there's a crank.",
       instruction: "We turn the crank – round and round, like this!",
       turn: "Your turn – turn it with me!",
@@ -77,6 +86,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥥
     {
+      name: "Step aside",
       situation: "Oh, the monkey is dropping coconuts! They roll right to us.",
       instruction: "One big step to the side – and back. Like this!",
       turn: "Coconut! Big step to the side!",
@@ -85,6 +95,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦵
     {
+      name: "Leg up, coconut under it",
       situation: "Now they roll on the left!",
       instruction: "Leg up – the coconut rolls underneath. Like this!",
       turn: "Your turn – leg up!",
@@ -93,6 +104,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦶
     {
+      name: "Legs wide, coconut between them",
       situation: "And now they come in the middle!",
       instruction: "Legs wide apart – the coconut rolls through. Like this!",
       turn: "Your turn – legs wide!",
@@ -101,6 +113,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐒
     {
+      name: "Dodge the coconuts",
       situation: "Oh, monkeys! They're throwing coconuts!",
       instruction: "We move out of the way very slowly – to the side, like this!",
       turn: "Your turn – move aside!",
@@ -109,6 +122,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🍎
     {
+      name: "Pick an apple",
       situation: "An apple tree! And there's a basket.",
       instruction: "Stretch up high and pick – like this!",
       turn: "Your turn – pick an apple!",
@@ -117,6 +131,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🧩
     {
+      name: "Picture riddle",
       situation: "A door with three pictures. A riddle!",
       instruction: "We copy the pictures. First very tall – like this!",
       turn: "Your turn – very tall!",
@@ -125,6 +140,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🕸️
     {
+      name: "Wave away the cobwebs",
       situation: "Oh, lots of cobwebs! We can't get through.",
       instruction: "Paw up high – and wave far to the side, like this!",
       turn: "Your turn – wave with me!",
@@ -133,6 +149,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪢
     {
+      name: "Pull the chest in by the rope",
       situation: "There's the treasure chest, floating!",
       instruction: "Pull the rope hand over hand – like this!",
       turn: "Pull with me!",
@@ -141,6 +158,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🔑
     {
+      name: "Turn the key",
       situation: "Oh, a lock! Kiki brings the key.",
       instruction: "Pick it up, put it in and turn it – like this!",
       turn: "Your turn – turn the key!",
@@ -149,6 +167,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 💰
     {
+      name: "Toss the gold",
       situation: "Oh! Gold! The crabs bring us the chest. I hop down!",
       instruction: "Reach in deep – and throw the coins up high! Like this!",
       turn: "Your turn – reach in and throw them up!",
@@ -157,6 +176,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "Hooray!",
       situation: "We found the treasure!",
       instruction: "Arms up – hooray!",
       turn: "You too – hooray!",
@@ -165,6 +185,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌅
     {
+      name: "Wave goodbye",
       situation: "The sun is going down.",
       instruction: "I wave goodbye to Kiki – like this!",
       turn: "Will you wave too?",

@@ -6,11 +6,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Schatzinsel“ in Hindi. */
 export const TRANSLATION: StoryTranslation = {
+  title: "ख़ज़ाने का द्वीप",
   defaultTurn: "अब तुम्हारी बारी!",
   opening: ["देखो – वहाँ है ख़ज़ाने वाला द्वीप!", "और वहाँ है एक ख़ज़ाना!", "चलो, साथ चलें?"],
   steps: [
     // 👋
     {
+      name: "कीकी को हाथ हिलाना",
       situation: "अहोय! मैं टैप्सी हूँ। और ये रहा कीकी, मेरा तोता!",
       instruction: "चलो, कीकी को हाथ हिलाकर हेलो करें – ऐसे!",
       turn: "तुम भी कीकी को हाथ हिलाओ!",
@@ -19,6 +21,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎣
     {
+      name: "बंसी फेंकना",
       situation: "अब मछली पकड़ते हैं!",
       instruction: "कंधे के ऊपर से पीछे ले जाओ – और दूर फेंको, ऐसे!",
       turn: "अब तुम – काँटा फेंको!",
@@ -26,9 +29,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "कितनी सारी मछलियाँ!",
     },
     // 🪑
-    { instruction: "मेरे साथ बैठ जाओ – ऐसे!", praise: "चलो चलें!" },
+    { name: "बैठना", instruction: "मेरे साथ बैठ जाओ – ऐसे!", praise: "चलो चलें!" },
     // 🛶
     {
+      name: "चप्पू चलाना",
       situation: "ओले तैर चला – ख़ज़ाने वाले द्वीप की ओर!",
       instruction: "देखो: चप्पू दाईं ओर पानी में – और बाईं ओर।",
       turn: "मेरे साथ चप्पू चलाओ!",
@@ -36,9 +40,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "पहुँच गए! ओले किनारे पर है।",
     },
     // 🧍
-    { instruction: "हम द्वीप पर हैं! मेरे साथ उठो – ऐसे!", praise: "आगे चलें!" },
+    { name: "खड़े होना", instruction: "हम द्वीप पर हैं! मेरे साथ उठो – ऐसे!", praise: "आगे चलें!" },
     // 🦂
     {
+      name: "बिच्छुओं पर पैर पटकना",
       situation: "अरे! ओले पर बिच्छू चढ़ रहे हैं!",
       instruction: "पैर ऊपर – और ज़ोर से जल्दी-जल्दी पटको, ऐसे!",
       turn: "अब तुम – मेरे साथ पैर पटको!",
@@ -47,6 +52,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌉
     {
+      name: "पुल पर कूदना",
       situation: "एक छोटा पुल! और ऊपर बहुत सारे डिब्बे तैर रहे हैं।",
       instruction: "कूदो – और सिर से डिब्बे को, धम!",
       turn: "अब तुम – मेरे साथ कूदो!",
@@ -55,6 +61,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪵
     {
+      name: "लट्ठे के नीचे झुकना",
       situation: "ध्यान से! ऊपर एक लट्ठा झूल रहा है।",
       instruction: "जब वो आए, हम झुक जाएँ – ऐसे!",
       turn: "वो आ रहा है! झुको!",
@@ -63,6 +70,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥁
     {
+      name: "ढोल बजाना",
       situation: "अरे, रास्ते पर बहुत सारी चिड़ियाँ बैठी हैं! और वहाँ दो ढोल लटके हैं।",
       instruction: "बाएँ – ढम! और दाएँ – ढम! ऐसे!",
       turn: "अब तुम – मेरे साथ ढोल बजाओ!",
@@ -71,6 +79,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ⚙️
     {
+      name: "हैंडल घुमाना",
       situation: "एक फाटक! और वहाँ एक हैंडल है।",
       instruction: "हैंडल घुमाएँ – गोल-गोल, ऐसे!",
       turn: "अब तुम – मेरे साथ घुमाओ!",
@@ -79,6 +88,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🥥
     {
+      name: "बगल में क़दम",
       situation: "अरे, बंदर नारियल गिरा रहा है! वो सीधे हमारी तरफ़ लुढ़क रहे हैं।",
       instruction: "एक बड़ा कदम बगल में – और वापस। ऐसे!",
       turn: "नारियल! बड़ा कदम बगल में!",
@@ -87,6 +97,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦵
     {
+      name: "पैर ऊपर, नीचे से नारियल",
       situation: "अब वो बाईं तरफ़ से लुढ़क रहे हैं!",
       instruction: "पैर ऊपर – नारियल नीचे से निकल जाता है। ऐसे!",
       turn: "अब तुम – पैर ऊपर!",
@@ -95,6 +106,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🦶
     {
+      name: "पैर फैलाकर, बीच से नारियल",
       situation: "और अब वो बीच में आ रहे हैं!",
       instruction: "पैर ख़ूब चौड़े – नारियल बीच से निकल जाता है। ऐसे!",
       turn: "अब तुम – पैर चौड़े!",
@@ -103,6 +115,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐒
     {
+      name: "नारियलों से बचना",
       situation: "अरे, बंदर! वो नारियल फेंक रहे हैं!",
       instruction: "धीरे-धीरे बगल में हट जाएँ – ऐसे!",
       turn: "अब तुम – बगल में हटो!",
@@ -111,6 +124,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🍎
     {
+      name: "सेब तोड़ना",
       situation: "एक सेब का पेड़! और वहाँ एक टोकरी है।",
       instruction: "हाथ ख़ूब ऊपर बढ़ाओ और तोड़ो – ऐसे!",
       turn: "अब तुम – एक सेब तोड़ो!",
@@ -119,6 +133,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🧩
     {
+      name: "तस्वीरों वाली पहेली",
       situation: "एक दरवाज़ा, उस पर तीन तस्वीरें। एक पहेली!",
       instruction: "तस्वीरों जैसा करें। पहले हाथ ख़ूब ऊपर – ऐसे!",
       turn: "अब तुम – हाथ ख़ूब ऊपर!",
@@ -127,6 +142,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🕸️
     {
+      name: "जाले हटाना",
       situation: "अरे, बहुत सारे मकड़ी के जाले! हम निकल नहीं सकते।",
       instruction: "पंजा ऊपर – और दूर बगल तक हिलाओ, ऐसे!",
       turn: "अब तुम – मेरे साथ हिलाओ!",
@@ -135,6 +151,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🪢
     {
+      name: "रस्सी से संदूक खींचना",
       situation: "वो तैर रहा है ख़ज़ाने का संदूक!",
       instruction: "रस्सी खींचो, एक हाथ के बाद दूसरा – ऐसे!",
       turn: "मेरे साथ खींचो!",
@@ -143,6 +160,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🔑
     {
+      name: "चाबी घुमाना",
       situation: "अरे, एक ताला! कीकी चाबी ला रहा है।",
       instruction: "उठाओ, अंदर डालो और घुमाओ – ऐसे!",
       turn: "अब तुम – चाबी घुमाओ!",
@@ -151,6 +169,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 💰
     {
+      name: "सोना उछालना",
       situation: "अरे! सोना! केकड़े हमारे लिए संदूक ला रहे हैं। चलो, नीचे कूदें!",
       instruction: "अंदर गहरा हाथ डालो – और सिक्के ऊपर उछालो! ऐसे!",
       turn: "अब तुम – हाथ डालो और ऊपर उछालो!",
@@ -159,6 +178,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "हुर्रे!",
       situation: "हमें ख़ज़ाना मिल गया!",
       instruction: "हाथ ऊपर – हुर्रे!",
       turn: "तुम भी – हुर्रे!",
@@ -167,6 +187,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌅
     {
+      name: "अलविदा कहना",
       situation: "सूरज डूब रहा है।",
       instruction: "चलो, कीकी को हाथ हिलाकर बाय करें – ऐसे!",
       turn: "तुम भी हाथ हिलाओ!",

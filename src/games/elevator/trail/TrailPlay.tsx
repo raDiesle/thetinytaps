@@ -1037,7 +1037,7 @@ export function TrailPlay({
               data-tap={tapState({ goal: need !== null && view.bag[i] === need })}
               onPointerDown={pressSlot(i)}
               role="button"
-              aria-label={view.bag[i] ?? pick({ de: "leer", ru: "пусто" }, language.id)}
+              aria-label={view.bag[i] ?? pick({ de: "leer", ru: "пусто", en: "empty", zh: "空的", hi: "ख़ाली", es: "vacío", ar: "فارغ" }, language.id)}
               className="tl-slot-tap"
             />
           ))}

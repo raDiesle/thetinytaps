@@ -130,6 +130,11 @@ function MicNote({ state, tapHint }: { state: MicState; tapHint: string }) {
         <p>
           {t({
             de: "Darf das Spiel das Mikrofon benutzen? Bitte „Erlauben“ tippen. Es wird nichts aufgenommen.",
+            en: "May the game use the microphone? Please tap “Allow”. Nothing is recorded.",
+            zh: "可以让游戏使用麦克风吗？请点“允许”。不会录下任何内容。",
+            hi: "क्या खेल माइक्रोफ़ोन इस्तेमाल कर सकता है? कृपया “अनुमति दें” पर टैप करें। कुछ भी रिकॉर्ड नहीं होता।",
+            es: "¿Puede el juego usar el micrófono? Toque «Permitir». No se graba nada.",
+            ar: "هل يمكن للعبة استخدام الميكروفون؟ يُرجى لمس «السماح». لا يُسجَّل شيء.",
             ru: "Можно игре пользоваться микрофоном? Нажмите «Разрешить». Ничего не записывается.",
           })}
         </p>
@@ -138,11 +143,28 @@ function MicNote({ state, tapHint }: { state: MicState; tapHint: string }) {
         <p>
           {t({
             de: `Das Mikrofon ist blockiert. In den Browser-Einstellungen für diese Seite erlauben – bis dahin ${tapHint}.`,
+            en: `The microphone is blocked. Allow it for this site in the browser settings – until then, ${tapHint}.`,
+            zh: `麦克风被阻止了。请在浏览器设置中为本网站允许——在那之前，${tapHint}。`,
+            hi: `माइक्रोफ़ोन ब्लॉक है। ब्राउज़र की सेटिंग में इस साइट के लिए अनुमति दें – तब तक ${tapHint}।`,
+            es: `El micrófono está bloqueado. Permítalo para este sitio en la configuración del navegador; mientras tanto, ${tapHint}.`,
+            ar: `الميكروفون محظور. اسمحوا به لهذا الموقع في إعدادات المتصفح – وحتى ذلك الحين ${tapHint}.`,
             ru: `Микрофон заблокирован. Разрешите его в настройках браузера для этого сайта, а пока ${tapHint}.`,
           })}
         </p>
       )}
-      {state === "missing" && <p>{t({ de: `Kein Mikrofon gefunden – einfach ${tapHint}.`, ru: `Микрофон не найден — просто ${tapHint}.` })}</p>}
+      {state === "missing" && (
+        <p>
+          {t({
+            de: `Kein Mikrofon gefunden – einfach ${tapHint}.`,
+            en: `No microphone found – just ${tapHint}.`,
+            zh: `没有找到麦克风——${tapHint}就行。`,
+            hi: `कोई माइक्रोफ़ोन नहीं मिला – बस ${tapHint}।`,
+            es: `No se encontró ningún micrófono: simplemente ${tapHint}.`,
+            ar: `لم يُعثر على ميكروفون – ببساطة ${tapHint}.`,
+            ru: `Микрофон не найден — просто ${tapHint}.`,
+          })}
+        </p>
+      )}
     </div>
   );
 }

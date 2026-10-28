@@ -379,7 +379,17 @@ export function buildGarden() {
   for (let i = 0; i < SPURTS; i++) at(tGrow + i * 1.1, { sound: () => playCountNote(i * 2) });
   at(tBloom, { sound: playPop });
   at(tBloom + 0.15, { sound: playTwinkle });
-  at(tBloom + 0.4, { say: { de: "Juhu! Die Sonnenblume blüht!", ru: "Ура! Подсолнух цветёт!" } });
+  at(tBloom + 0.4, {
+    say: {
+      de: "Juhu! Die Sonnenblume blüht!",
+      en: "Yay! The sunflower is blooming!",
+      zh: "好耶！向日葵开花啦！",
+      hi: "वाह! सूरजमुखी खिल गया!",
+      es: "¡Bien! ¡El girasol florece!",
+      ar: "مرحى! زهرة عبّاد الشمس تتفتّح!",
+      ru: "Ура! Подсолнух цветёт!",
+    },
+  });
   at(tBloom + 1.2, { sound: playTweet });
   at(tBloom + 1.6, { sound: playSniff });
   at(tBloom + 1.9, { sound: playTrill });

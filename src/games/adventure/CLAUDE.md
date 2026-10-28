@@ -49,12 +49,14 @@ The game has no settings of its own: read aloud, sounds, its own music and the l
 ## Grown-ups' texts in the app language
 
 - The start screen, buttons, tooltips and notes follow the app language of the home page (`src/lib/language.ts`), as
-  Tapsi does. A text that has a translation is written as `t({ de: "…", ru: "…" })` (`useT()`); new texts
+  Tapsi does. A text that has a translation is written as `t({ de: "…", en: "…", zh: "…", hi: "…", es: "…", ar: "…", ru: "…" })` (`useT()`); new texts
   come in German only, like Tapsi's lines, until the user asks for a language.
 - A story's title and its step names on the route come from its translations (`title`, `name` per step in
   `lines.<language>.ts`), shown in the app language (`storyTitle`, `stepName` in `AdventurePlay.tsx`), German where a
   translation has none; the movement library itself stays German (notes for building stories, shown only as a fallback name).
-- Names in Russian: Wolle is „Пушинка“, Tapsi „Тапси“, Ole „Оле“, Kiki „Кики“.
+- Names: Wolle is Woolly / 棉棉 / रुई / Pelusa / قطنة / „Пушинка“; Tapsi is Tapsi / 塔普西 / टैप्सी / تابسي / „Тапси“;
+  Kiki is Kiki / 琪琪 / कीकी / كيكي / „Кики“; Ole is Ole / 奥乐 / ओले / أولي / „Оле“. Both stories have a title and every step name in
+  all six languages (`voice.test.ts` checks it, and that Russian, Chinese, Hindi and Arabic ones have no Latin letters).
 
 ## Working on levels
 

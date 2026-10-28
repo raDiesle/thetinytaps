@@ -71,10 +71,27 @@ test("a story with recordings has one for every line and none left over (bun run
 });
 
 // Translations come only on request, so a story may lack a title or step names in a language (they show in German).
-test("Russian titles and step names, where a story has them, are written in Cyrillic", () => {
+test("Russian, Chinese, Hindi and Arabic titles and step names, where a story has them, are written in their own letters", () => {
+  for (const { dir, story } of STORIES) {
+    for (const language of ["ru", "zh", "hi", "ar"] as const) {
+      const own = story.translations?.[language];
+      const names = [own?.title, ...(own?.steps.map((s) => s.name) ?? [])].flatMap((n) => (n ? [n] : []));
+      for (const name of names) expect(name, `${dir} ${language}: ${name}`).toMatch(/^[^A-Za-z]*$/);
+    }
+  }
+});
+
+// A story with Russian titles and step names has them in the other translated languages too (October 2026).
+test("a story with a Russian title and step names has them in en, zh, hi, es and ar too", () => {
   for (const { dir, story } of STORIES) {
     const ru = story.translations?.ru;
-    const names = [ru?.title, ...(ru?.steps.map((s) => s.name) ?? [])].flatMap((n) => (n ? [n] : []));
-    for (const name of names) expect(name, `${dir}: ${name}`).toMatch(/^[^A-Za-z]*$/);
+    if (!ru?.title) continue;
+    for (const language of ["en", "zh", "hi", "es", "ar"] as const) {
+      const own = story.translations?.[language];
+      expect(own?.title?.trim(), `${dir} ${language}`).toBeTruthy();
+      ru.steps.forEach((step, i) => {
+        if (step.name) expect(own?.steps[i]?.name?.trim(), `${dir} ${language} step ${i}`).toBeTruthy();
+      });
+    }
   }
 });

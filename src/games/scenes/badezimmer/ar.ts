@@ -1,0 +1,55 @@
+import type { SceneTranslation } from "../types";
+
+// The Arabic words of the Badezimmer picture (Modern Standard Arabic, simple, no vowel marks): names with the
+// article ال and their gender, what each item says and the chain sentences.
+
+/** „Badezimmer“ in Arabic. */
+export const AR: SceneTranslation = {
+  title: "الحمام",
+  description: "البطة المطاطية وجبل الرغوة وماء المرحاض.",
+  items: {
+    luefter: { name: "المروحة", gender: "f", sentences: ["ززز! المروحة تدور.", "المروحة تطرد البخار."] },
+    fenster: { name: "النافذة", gender: "f", sentences: ["النافذة تفتح. هواء نقي!", "صوصو! عصفور ينظر إلى الداخل."] },
+    dusche: { name: "الدش", gender: "m", sentences: ["الدش يرش الماء. طش، طش!", "الماء دافئ وجميل."] },
+    lampe: { name: "المصباح", gender: "m", sentences: ["تك! المصباح يضيء.", "الآن المكان منير جدا."] },
+    spiegel: { name: "المرآة", gender: "f", sentences: ["المرآة مبللة كلها.", "ها هو وجه يضحك!"] },
+    handtuch: { name: "المنشفة", gender: "f", sentences: ["المنشفة ناعمة وزرقاء.", "المنشفة تتأرجح هنا وهناك."] },
+    shampoo: { name: "الشامبو", gender: "m", sentences: ["الشامبو يصنع رغوة كثيرة.", "بلب! الفقاعات تطير عاليا."] },
+    pflanze: { name: "النبتة", gender: "f", sentences: ["النبتة تهز أوراقها.", "يا سلام، زهرة تتفتح!"] },
+    uhr: { name: "الساعة", gender: "f", sentences: ["تك، تك! الساعة تدق.", "العقارب تدور وتدور."] },
+    klopapier: { name: "ورق المرحاض", gender: "m", sentences: ["اللفة تدور.", "ورق المرحاض ينفك ثم يلتف من جديد."] },
+    spinne: { name: "العنكبوت", gender: "m", sentences: ["العنكبوت الصغير ينزل على خيطه.", "مرحبا! العنكبوت يلوح بأرجله الثماني."] },
+    tuer: { name: "الباب", gender: "m", sentences: ["طق، طق! من هناك؟", "ماما تنظر إلى الداخل وتلوح."] },
+    waschmaschine: { name: "الغسالة", gender: "f", sentences: ["برر، برر! الغسالة تغسل.", "الملابس تدور وتدور."] },
+    waschbecken: { name: "المغسلة", gender: "f", sentences: ["قرقر! الماء يجري ويذهب.", "الأبواب تفتح. هنا ورق المرحاض!"] },
+    wasserhahn: { name: "الحنفية", gender: "f", sentences: ["طق، طق! الحنفية تقطر.", "الحنفية مغلقة! الآن هدوء."] },
+    zahnbuerste: { name: "فرشاة الأسنان", gender: "f", sentences: ["فرك، فرك! فرشاة الأسنان تنظف.", "الأسنان تصبح نظيفة جدا."] },
+    zahnpasta: { name: "معجون الأسنان", gender: "m", sentences: ["معجون الأسنان يخرج من الأنبوب.", "قليل من المعجون لفرشاة الأسنان!"] },
+    toilette: { name: "المرحاض", gender: "m", sentences: ["ووووش! ماء المرحاض يتدفق.", "الغطاء يرتفع وينزل."] },
+    badewanne: { name: "حوض الاستحمام", gender: "m", sentences: ["حوض الاستحمام مليء بالماء.", "طش، طش! الماء يتموج.", "حوض الاستحمام كبير جدا."] },
+    kind: { name: "الطفل", gender: "m", sentences: ["الطفل يستحم ويغني: لا، لا، لا!", "الطفل يلوح بيديه الاثنتين."] },
+    ente: { name: "البطة المطاطية", gender: "f", sentences: ["زيق، زيق! البطة تسبح.", "البطة المطاطية صفراء."] },
+    schaumberg: { name: "جبل الرغوة", gender: "m", sentences: ["الرغوة تعلو وتعلو!", "بلب! الفقاعات تطير بعيدا."] },
+    muelleimer: { name: "سلة المهملات", gender: "f", sentences: ["طاخ! الغطاء يفتح.", "الورقة تطير في سلة المهملات."] },
+    waeschekorb: { name: "سلة الغسيل", gender: "f", sentences: ["الغطاء يرتفع.", "مرحبا! جورب يطل منها."] },
+    kroko: { name: "التمساح", gender: "m", sentences: ["طق، طق! التمساح يفتح فمه.", "التمساح من المطاط."] },
+    foehn: { name: "مجفف الشعر", gender: "m", sentences: ["سسسس! مجفف الشعر ينفخ هواء دافئا.", "الآن يجف الشعر."] },
+    waage: { name: "الميزان", gender: "m", sentences: ["بيب، بيب! الميزان يظهر رقما.", "كم الوزن؟"] },
+    toepfchen: { name: "النونية", gender: "f", sentences: ["النونية تقفز. هوب!", "تادا! انتهينا!"] },
+    katze: { name: "القطة", gender: "f", sentences: ["مياو! القطة تنظف نفسها.", "القطة تلعق كفها."] },
+    wal: { name: "الحوت", gender: "m", sentences: ["فففف! الحوت يرش نافورة.", "الحوت الصغير لعبة للحمام."] },
+    seife: { name: "الصابونة", gender: "f", sentences: ["أوه! الصابونة تنزلق.", "الصابونة تصنع فقاعات."] },
+    hausschuhe: { name: "الشباشب", gender: "f", plural: true, sentences: ["شباشب الأرانب تقفز.", "هوب، هوب! الآذان تهتز."] },
+    frosch: { name: "الضفدع", gender: "m", sentences: ["نق! الضفدع يقفز.", "الضفدع يرش الماء!"] },
+    hund: { name: "الكلب", gender: "m", sentences: ["الكلب ينفض نفسه. كل شيء يبتل!", "هو، هو! الكلب استحم أيضا."] },
+    wasserball: { name: "الكرة", gender: "f", sentences: ["الكرة تقفز. بوينغ!", "الكرة ملونة جدا."] },
+    seifenblasen: { name: "فقاعات الصابون", gender: "f", plural: true, sentences: ["فوو! فقاعات صابون كثيرة تطير.", "بوب! الفقاعة انفجرت."] },
+    schiffchen: { name: "القارب الصغير", gender: "m", sentences: ["توت، توت! القارب الصغير يتأرجح.", "الريح تنفخ في الشراع."] },
+    schwamm: { name: "الإسفنجة", gender: "f", sentences: ["الإسفنجة تنعصر. طش!", "الماء يقطر منها."] },
+  },
+  chains: [
+    ["الطفل يضحك ويرش أيضا!", "والبطة تتأرجح على الأمواج."],
+    ["الهواء ينفخ المنشفة.", "وفقاعات الصابون تطير بعيدا!"],
+    ["القطة تخاف: مياو!", "والكلب ينبح: هو، هو!"],
+  ],
+};

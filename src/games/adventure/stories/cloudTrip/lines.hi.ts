@@ -6,11 +6,13 @@ import type { StoryTranslation } from "../story";
 
 /** „Die Wolkenreise“ in Hindi. */
 export const TRANSLATION: StoryTranslation = {
+  title: "बादलों की सैर",
   defaultTurn: "अब तुम्हारी बारी!",
   opening: ["अरे! सूरज कहाँ है?", "वो मोटे से बारिश वाले बादल के पीछे छिपा है।", "चलो, उसे बाहर निकालें! साथ चलें?"],
   steps: [
     // 👋
     {
+      name: "कीकी को हाथ हिलाना",
       situation: "नमस्ते! मैं टैप्सी हूँ। और ये है रुई, मेरा बादल!",
       instruction: "देखो, कीकी आ रहा है! चलो, हाथ हिलाएँ – ऐसे!",
       turn: "तुम भी कीकी को हाथ हिलाओ!",
@@ -19,6 +21,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🐦
     {
+      name: "चिड़िया की तरह फड़फड़ाना",
       situation: "रुई उड़ना चाहता है। चलो, मदद करें!",
       instruction: "चिड़िया की तरह हाथ फड़फड़ाओ – ऐसे!",
       turn: "अब तुम – हाथ फड़फड़ाओ!",
@@ -27,6 +30,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // ✈️
     {
+      name: "हवाई जहाज़ों के नीचे झुकना",
       situation: "अरे, छोटे-छोटे हवाई जहाज़ आ रहे हैं!",
       instruction: "जब जहाज़ आए, हम झुक जाएँ – ऐसे!",
       turn: "ध्यान से! झुक जाओ!",
@@ -35,6 +39,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🎈
     {
+      name: "गुब्बारों को छूना",
       situation: "कितने सारे गुब्बारे!",
       instruction: "हम उन्हें छूते हैं – फट! ऐसे!",
       turn: "अब तुम – उन्हें छुओ!",
@@ -42,9 +47,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "कितनी सारी कॉन्फ़ेटी!",
     },
     // 🪑
-    { instruction: "अब तेज़ चलेंगे! मेरे साथ बैठ जाओ – ऐसे!", praise: "कसकर पकड़ो!" },
+    { name: "बैठना", instruction: "अब तेज़ चलेंगे! मेरे साथ बैठ जाओ – ऐसे!", praise: "कसकर पकड़ो!" },
     // ⭐
     {
+      name: "मोड़ों पर झुककर तारे लेना",
       situation: "यहाँ कितने सारे तारे लटके हैं!",
       instruction: "एक तरफ़ झुको और तारा पकड़ो – ऐसे!",
       turn: "अब तुम – एक तरफ़ झुको!",
@@ -52,9 +58,10 @@ export const TRANSLATION: StoryTranslation = {
       praise: "सारे तारे मिल गए!",
     },
     // 🧍
-    { instruction: "वो रहा बारिश वाला बादल! मेरे साथ उठो – ऐसे!", praise: "अब सूरज को निकालें!" },
+    { name: "खड़े होना", instruction: "वो रहा बारिश वाला बादल! मेरे साथ उठो – ऐसे!", praise: "अब सूरज को निकालें!" },
     // 🌧️
     {
+      name: "बारिश के बादल को ऊपर धकेलना",
       situation: "यहाँ बारिश हो रही है! सूरज ऊपर है।",
       instruction: "दोनों हाथों से बादल को ऊपर धकेलो – ऐसे!",
       turn: "अब तुम – मेरे साथ धकेलो!",
@@ -63,6 +70,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🌈
     {
+      name: "इंद्रधनुष बनाना",
       situation: "अब बस इंद्रधनुष बाकी है।",
       instruction: "हाथ से एक बड़ा सा धनुष बनाओ – ऐसे!",
       turn: "अब तुम – मेरे साथ बनाओ!",
@@ -71,6 +79,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🙌
     {
+      name: "हुर्रे!",
       situation: "सूरज मुस्कुरा रहा है!",
       instruction: "हाथ ऊपर – हुर्रे!",
       turn: "तुम भी – हुर्रे!",
@@ -78,6 +87,7 @@ export const TRANSLATION: StoryTranslation = {
     },
     // 🏡
     {
+      name: "अलविदा कहना",
       situation: "रुई हमें घर ले जा रहा है।",
       instruction: "चलो, टाटा करें – ऐसे!",
       turn: "तुम भी टाटा करो!",

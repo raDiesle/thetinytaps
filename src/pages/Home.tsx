@@ -44,7 +44,17 @@ export function Home() {
           onContextMenu: (e) => e.preventDefault(),
         }}
       />
-      <p className="home-subtitle">{t({ de: "Spiele für die Kleinsten (2–3 Jahre)", ru: "Игры для самых маленьких (2–3 года)" })}</p>
+      <p className="home-subtitle">
+        {t({
+          de: "Spiele für die Kleinsten (2–3 Jahre)",
+          ru: "Игры для самых маленьких (2–3 года)",
+          en: "Games for little ones (ages 2–3)",
+          zh: "给小宝宝的游戏（2–3 岁）",
+          hi: "नन्हे-मुन्नों के लिए खेल (2–3 साल)",
+          es: "Juegos para los más pequeños (2–3 años)",
+          ar: "ألعاب للصغار (من 2 إلى 3 سنوات)",
+        })}
+      </p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {CATEGORIES.map((c) => (
           <li key={c.id}>
@@ -54,7 +64,7 @@ export function Home() {
       </ul>
       <InstallHint />
       <p className="home-version">
-        {t({ de: "Stand", ru: "Версия от" })} {buildDate()}
+        {t({ de: "Stand", ru: "Версия от", en: "Version", zh: "版本", hi: "संस्करण", es: "Versión", ar: "الإصدار" })} {buildDate()}
       </p>
     </main>
   );

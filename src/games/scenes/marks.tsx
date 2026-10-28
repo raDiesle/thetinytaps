@@ -2,7 +2,8 @@ import { useMemo, type PointerEvent } from "react";
 import { pick, useAppLanguage } from "@/lib/language";
 import { findScene } from ".";
 import { SCENE_PHRASES } from "./phrases";
-import type { Trip } from "./roads";
+import { sceneLanguage } from "./localize";
+import { ROADS, roadId, type Trip } from "./roads";
 import { placeBox, type Box, type Scene, type SceneItem } from "./types";
 
 // The marks ScenePlay draws over a picture: exit signs, hint and focus rings, key badges, find thumbnails.
@@ -11,6 +12,15 @@ import { placeBox, type Box, type Scene, type SceneItem } from "./types";
 export type Lit = { id: string; count: number };
 /** The sign at the edge where a vehicle drove off; tapping it follows the vehicle into the other picture. */
 export type Exit = { item: SceneItem; to: string; trip: Trip };
+
+/** The language the picture an exit sign stands in plays in, so the label speaks the same language as the vehicle's name. */
+function useExitLanguage(exit: Exit) {
+  const appLanguage = useAppLanguage().id;
+  const road = ROADS.find((r) => roadId(r) === exit.trip.road);
+  // Going home, the vehicle leaves the picture it visited.
+  const here = road && (exit.trip.home ? road.to : road.from);
+  return here ? sceneLanguage(here, appLanguage) : appLanguage;
+}
 
 /**
  * Where a vehicle drove off: a bubble at the edge with the vehicle in it, an
@@ -21,7 +31,7 @@ export function ExitSign({ exit, right, width, onFollow }: { exit: Exit; right: 
   const cy = Math.min(860, Math.max(140, y + h / 2));
   const [bx, by, bw, bh] = exit.item.box;
   const dir = right ? 1 : -1;
-  const words = pick(SCENE_PHRASES, useAppLanguage().id);
+  const words = pick(SCENE_PHRASES, useExitLanguage(exit));
   return (
     <g
       className="scene-exit"

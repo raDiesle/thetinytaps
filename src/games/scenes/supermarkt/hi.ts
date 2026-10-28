@@ -1,0 +1,58 @@
+import type { SceneTranslation } from "../types";
+
+// The supermarket in Hindi: the title, every item's name and sentences and the chain sentences.
+// The words of an Indian supermarket: ट्रॉली, बिलिंग counter's „कैश मशीन“, the cashier „कैशियर दीदी“,
+// sweets are „टॉफ़ियाँ“; the cheese is „चीज़“, feminine like the everyday word.
+
+/** „Supermarkt“ in Hindi. */
+export const HI: SceneTranslation = {
+  title: "सुपरमार्केट",
+  description: "कैश मशीन बीप करती है, ट्रॉली चलती है और फल तौले जाते हैं।",
+  items: {
+    schiebetuer: { name: "दरवाज़ा", gender: "m", sentences: ["सर्र! दरवाज़ा अपने आप खुलता है।", "दादी अंदर आती हैं और हाथ हिलाती हैं।"] },
+    hund: { name: "कुत्ता", gender: "m", sentences: ["भौं-भौं! कुत्ता बाहर इंतज़ार करता है।", "कुत्ता पूँछ हिलाता है।"] },
+    brezel: { name: "प्रेट्ज़ेल", gender: "m", sentences: ["बड़ा प्रेट्ज़ेल इधर-उधर झूलता है।", "यहाँ बेकरी है!"] },
+    baeckerin: { name: "बेकर दीदी", gender: "f", sentences: ["टिंग! बेकर दीदी घंटी बजाती है।", "बेकर दीदी हाथ हिलाती है: हेलो, ब्रेड किसे चाहिए?"] },
+    brottheke: { name: "ब्रेड काउंटर", gender: "m", sentences: ["सूँ, सूँ! ब्रेड की ख़ुशबू कितनी अच्छी है।", "ब्रेड अभी भी गरम है।"] },
+    kaese: { name: "चीज़", gender: "f", sentences: ["चीज़ में बहुत सारे छेद हैं।", "अरे! एक छोटा चूहा बाहर झाँकता है।"] },
+    fisch: { name: "मछली", gender: "f", sentences: ["ब्लब, ब्लब! मछली टंकी में तैरती है।", "मछली बुलबुले बनाती है।"] },
+    krabbe: { name: "केकड़ा", gender: "m", sentences: ["चट, पट! केकड़ा चुटकी काटता है।", "केकड़ा हमेशा तिरछा चलता है।"] },
+    lautsprecher: { name: "स्पीकर", gender: "m", sentences: ["डिंग, डैंग, डॉन्ग! एक घोषणा।", "आज स्ट्रॉबेरी मिल रही है!"] },
+    kuehlregal: { name: "फ़्रिज", gender: "m", sentences: ["दरवाज़े खुलते हैं। ब्र्र, कितना ठंडा!", "फ़्रिज में दही और मक्खन है।"] },
+    milch: { name: "दूध", gender: "m", sentences: ["मू! दूध गाय से आता है।", "दूध के पैकेट उछलते हैं।"] },
+    pfandautomat: { name: "बोतल मशीन", gender: "f", sentences: ["बोतल मशीन में लुढ़कती है।", "खड़, खड़! और एक पर्ची निकलती है।"] },
+    luftballons: { name: "गुब्बारे", gender: "m", plural: true, sentences: ["रंग-बिरंगे गुब्बारे नाचते हैं।", "लाल, पीले, नीले और हरे!"] },
+    muesli: { name: "मूसली", gender: "f", sentences: ["खड़, खड़! मूसली हिलती है।", "दाने बाहर उड़ते हैं।"] },
+    nudeln: { name: "नूडल्स", gender: "m", plural: true, sentences: ["नूडल्स उछलते हैं। हॉप, हॉप!", "लंबे नूडल्स और छोटे घुमावदार पास्ता!"] },
+    saft: { name: "जूस", gender: "m", sentences: ["जूस बोतल में हिलता है।", "संतरे का जूस और सेब का जूस। स्वादिष्ट!"] },
+    bonbons: { name: "टॉफ़ियाँ", gender: "f", plural: true, sentences: ["ढक्कन खुलता है। टॉफ़ियाँ!", "लाल, पीली और नीली टॉफ़ियाँ उछलती हैं।"] },
+    blumen: { name: "फूल", gender: "m", plural: true, sentences: ["फूल इधर-उधर झूलते हैं।", "भिन, भिन! एक मधुमक्खी फूलों से मिलने आती है।"] },
+    tafel: { name: "बोर्ड", gender: "m", sentences: ["बोर्ड पर एक स्ट्रॉबेरी बनी है।", "बोर्ड हिलता है। आज ख़ास ऑफ़र!"] },
+    einkaufskorb: { name: "टोकरी", gender: "f", sentences: ["हॉप! टोकरी ऊपर उछलती है।", "टोकरियाँ लाल हैं।"] },
+    verkaeufer: { name: "दुकानदार", gender: "m", sentences: ["दुकानदार सीढ़ी पर खड़ा है।", "वो शेल्फ़ में सामान रखता है और सीटी बजाकर गाना गाता है।"] },
+    wischmaschine: { name: "पोंछा मशीन", gender: "f", sentences: ["घर्र, घर्र! पोंछा मशीन फ़र्श साफ़ करती है।", "ब्रश घूमता है और झाग बनाता है।"] },
+    dosenturm: { name: "डिब्बों की मीनार", gender: "f", sentences: ["डिब्बों की मीनार हिलती है। ध्यान से!", "खन! सबसे ऊपर का डिब्बा उछलता है।"] },
+    eistruhe: { name: "आइसक्रीम फ़्रीज़र", gender: "m", sentences: ["आइसक्रीम फ़्रीज़र खुलता है। ब्र्र!", "देखो, तीन गोलों वाली आइसक्रीम!"] },
+    kleinerwagen: { name: "छोटी ट्रॉली", gender: "f", sentences: ["पीं, पीं! लड़की छोटी ट्रॉली धकेलती है।", "झंडा हवा में लहराता है।"] },
+    bananen: { name: "केले", gender: "m", plural: true, sentences: ["केले झूलते हैं।", "केले पीले और टेढ़े हैं।"] },
+    karotten: { name: "गाजरें", gender: "f", plural: true, sentences: ["पॉप, पॉप! गाजरें ऊपर उछलती हैं।", "गाजरें नारंगी हैं।"] },
+    tomaten: { name: "टमाटर", gender: "m", plural: true, sentences: ["टमाटर उछलते हैं।", "एक टमाटर लुढ़ककर जाता है और फिर लौट आता है।"] },
+    aepfel: { name: "सेब", gender: "m", plural: true, sentences: ["सेब उछलते हैं। हॉप!", "सेब से कौन झाँक रहा है? एक छोटा कीड़ा!"] },
+    wassermelone: { name: "तरबूज़", gender: "m", sentences: ["तरबूज़ गोल और भारी है।", "अंदर से तरबूज़ लाल और रसीला है।"] },
+    waage: { name: "तराज़ू", gender: "m", sentences: ["टिंग! तराज़ू केला तौलता है।", "दाम वाली पर्ची बाहर आती है।"] },
+    einkaufswagen: { name: "ट्रॉली", gender: "f", sentences: ["ट्रॉली चलती है। खड़, खड़!", "ट्रॉली पूरी भरी है।"] },
+    kind: { name: "बच्चा", gender: "m", sentences: ["बच्चा ट्रॉली में बैठकर घूमता है।", "हुर्रे! बच्चा दोनों हाथ हिलाता है।"] },
+    kaugummiautomat: { name: "च्युइंग गम मशीन", gender: "f", sentences: ["हैंडल घूमता है। खट, खट!", "च्युइंग गम की एक गोली बाहर लुढ़कती है।"] },
+    einkaufstuete: { name: "थैला", gender: "m", sentences: ["थैला पूरा भरा है।", "हॉप! एक सेब बाहर कूदता है।"] },
+    warnschild: { name: "चेतावनी बोर्ड", gender: "m", sentences: ["ध्यान दो, फ़र्श गीला है!", "छपाक! फिसलना मत।"] },
+    kassiererin: { name: "कैशियर दीदी", gender: "f", sentences: ["कैशियर दीदी कहती है: हेलो!", "कैशियर दीदी हाथ हिलाती है और हँसती है।"] },
+    laufband: { name: "बेल्ट", gender: "f", sentences: ["बेल्ट सामान को काउंटर तक ले जाती है।", "घर्र, घर्र! सब कुछ साथ में चलता है।"] },
+    kasse: { name: "कैश मशीन", gender: "f", sentences: ["बीप, बीप! कैश मशीन बीप करती है।", "दराज़ खुलती है। उसमें पैसे हैं!"] },
+    eierkarton: { name: "अंडों का डिब्बा", gender: "m", sentences: ["अंडों का डिब्बा खुलता है।", "चीं, चीं! एक चूज़ा बाहर झाँकता है।"] },
+  },
+  chains: [
+    ["बेल्ट चल पड़ती है!", "और अंडों के डिब्बे से एक चूज़ा चीं-चीं करता है।"],
+    ["ध्यान दो, अब फ़र्श गीला है!", "और डिब्बों की मीनार हिलती है!"],
+    ["कुत्ता भौंकता है: भौं, भौं!", "और स्पीकर कहता है: आपका स्वागत है!"],
+  ],
+};

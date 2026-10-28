@@ -57,38 +57,123 @@ const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized; 
   sweets: {
     ms: ORIGIN_MS.sweets,
     sounds: ORIGIN_CUES,
-    title: { de: "🍭 Süßes essen", ru: "🍭 Едим сладкое" },
-    cue: { de: "Mmh, Süßes! Ein bisschen Zucker bleibt an den Zähnen.", ru: "Ммм, сладкое! Немного сахара остаётся на зубках." },
+    title: {
+      de: "🍭 Süßes essen",
+      en: "🍭 Eating sweets",
+      zh: "🍭 吃甜食",
+      hi: "🍭 मीठा खाना",
+      es: "🍭 Comer dulces",
+      ar: "🍭 نأكل الحلوى",
+      ru: "🍭 Едим сладкое",
+    },
+    cue: {
+      de: "Mmh, Süßes! Ein bisschen Zucker bleibt an den Zähnen.",
+      en: "Mmm, sweets! A little sugar stays on the teeth.",
+      zh: "嗯，好甜！一点点糖留在了牙齿上。",
+      hi: "म्म, मीठा! थोड़ी-सी चीनी दाँतों पर रह जाती है।",
+      es: "¡Mmm, dulces! Un poco de azúcar se queda en los dientes.",
+      ar: "مممم، حلوى! يبقى قليل من السكر على الأسنان.",
+      ru: "Ммм, сладкое! Немного сахара остаётся на зубках.",
+    },
   },
-  grow: { ms: ORIGIN_MS.grow, title: { de: "👾 Zuckermonster wachsen", ru: "👾 Растут сахарные монстры" } },
+  grow: {
+    ms: ORIGIN_MS.grow,
+    title: {
+      de: "👾 Zuckermonster wachsen",
+      en: "👾 Sugar monsters grow",
+      zh: "👾 糖怪兽长大了",
+      hi: "👾 चीनी-मॉन्स्टर बढ़ते हैं",
+      es: "👾 Crecen los monstruos de azúcar",
+      ar: "👾 وحوش السكر تكبر",
+      ru: "👾 Растут сахарные монстры",
+    },
+  },
   brush: {
     ms: PREP_MS.brush,
     sounds: PREP_CUES.brush,
-    title: { de: "🪥 Zahnbürste holen", ru: "🪥 Берём щётку" },
-    cue: { de: "Zuerst holen wir die Zahnbürste!", ru: "Сначала берём зубную щётку!" },
+    title: {
+      de: "🪥 Zahnbürste holen",
+      en: "🪥 Get the toothbrush",
+      zh: "🪥 拿牙刷",
+      hi: "🪥 टूथब्रश लेना",
+      es: "🪥 Tomar el cepillo",
+      ar: "🪥 نُحضر الفرشاة",
+      ru: "🪥 Берём щётку",
+    },
+    cue: {
+      de: "Zuerst holen wir die Zahnbürste!",
+      en: "First we get the toothbrush!",
+      zh: "先拿牙刷！",
+      hi: "पहले हम टूथब्रश लेते हैं!",
+      es: "¡Primero tomamos el cepillo de dientes!",
+      ar: "أولًا نُحضر فرشاة الأسنان!",
+      ru: "Сначала берём зубную щётку!",
+    },
   },
   paste: {
     ms: PREP_MS.paste,
     sounds: PREP_CUES.paste,
-    title: { de: "🫧 Zahnpasta drauf", ru: "🫧 Немного пасты" },
-    cue: { de: "Jetzt ein kleiner Klecks Zahnpasta drauf.", ru: "Теперь капельку зубной пасты." },
+    title: {
+      de: "🫧 Zahnpasta drauf",
+      en: "🫧 Toothpaste on",
+      zh: "🫧 挤牙膏",
+      hi: "🫧 टूथपेस्ट लगाना",
+      es: "🫧 Un poco de pasta",
+      ar: "🫧 قليل من المعجون",
+      ru: "🫧 Немного пасты",
+    },
+    cue: {
+      de: "Jetzt ein kleiner Klecks Zahnpasta drauf.",
+      en: "Now a little blob of toothpaste.",
+      zh: "现在挤一点点牙膏。",
+      hi: "अब थोड़ा-सा टूथपेस्ट।",
+      es: "Ahora, un poquito de pasta de dientes.",
+      ar: "والآن قليل من معجون الأسنان.",
+      ru: "Теперь капельку зубной пасты.",
+    },
   },
   monsters: {
     ms: 4500,
-    title: { de: "😱 Zuckermonster!", ru: "😱 Сахарные монстры!" },
-    cue: { de: "Oh je, da sind sie! Komm, wir putzen sie alle weg!", ru: "Ой-ой, вот они! Давай прогоним их щёткой!" },
+    title: {
+      de: "😱 Zuckermonster!",
+      en: "😱 Sugar monsters!",
+      zh: "😱 糖怪兽！",
+      hi: "😱 चीनी-मॉन्स्टर!",
+      es: "😱 ¡Monstruos de azúcar!",
+      ar: "😱 وحوش السكر!",
+      ru: "😱 Сахарные монстры!",
+    },
+    cue: {
+      de: "Oh je, da sind sie! Komm, wir putzen sie alle weg!",
+      en: "Oh no, there they are! Come on, let's brush them all away!",
+      zh: "哎呀，它们在这儿！来，我们把它们都刷掉！",
+      hi: "अरे, ये रहे! चलो, इन सबको ब्रश से भगाएँ!",
+      es: "¡Ay, ahí están! ¡Ven, vamos a cepillarlos todos!",
+      ar: "يا إلهي، ها هي! هيّا ننظّفها كلها!",
+      ru: "Ой-ой, вот они! Давай прогоним их щёткой!",
+    },
   },
 };
 
 /** Said at the end, before the daytime's goodbye (unless the sung finale sings it). */
 const DONE_SAY: Localized = {
   de: "Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!",
+  en: "Done! All the sugar monsters are gone. Now spit out the foam. Sparkling clean!",
+  zh: "刷好啦！糖怪兽都没有了。现在把泡沫吐掉。亮晶晶！",
+  hi: "हो गया! सारे चीनी-मॉन्स्टर चले गए। अब झाग थूक दो। चमचमाते दाँत!",
+  es: "¡Listo! Ya no quedan monstruos de azúcar. Ahora escupe la espuma. ¡Relucientes!",
+  ar: "انتهينا! لم تعد هناك وحوش سكر. والآن هيّا نبصق الرغوة. نظيفة لامعة!",
   ru: "Готово! Сахарных монстров больше нет. Теперь сплюнь пенку. Чисто-чисто!",
 };
 
 /** Said while the brush is rinsed and put away (unless the song sings). */
 const TIDY_SAY: Localized = {
   de: "Zahnbürste ausspülen und zurück in den Becher. Geschafft!",
+  en: "Rinse the toothbrush and back into the cup. All done!",
+  zh: "把牙刷冲干净，放回杯子里。完成啦！",
+  hi: "टूथब्रश धोकर वापस गिलास में। हो गया!",
+  es: "Enjuagamos el cepillo y de vuelta al vaso. ¡Listo!",
+  ar: "نشطف الفرشاة ونعيدها إلى الكوب. انتهينا!",
   ru: "Споласкиваем щётку и ставим в стаканчик. Готово!",
 };
 
@@ -472,7 +557,18 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       </span>
       {/* Before the brushing it counts down to its start; the brushing time left sits next to the progress bar. */}
       {before && (
-        <p className="teeth-clock" aria-label={t({ de: "Zeit bis zum Start", ru: "Время до начала" })}>
+        <p
+          className="teeth-clock"
+          aria-label={t({
+            de: "Zeit bis zum Start",
+            en: "Time until the start",
+            zh: "距开始的时间",
+            hi: "शुरू होने में बाकी समय",
+            es: "Tiempo hasta empezar",
+            ar: "الوقت حتى البداية",
+            ru: "Время до начала",
+          })}
+        >
           🪥 {formatTime(-brushed)}
         </p>
       )}
@@ -483,14 +579,37 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             <h2 className="teeth-cue">{t(PRELUDE[before].title)}</h2>
           ) : (
             <h2 className="teeth-cue teeth-done">
-              <Medal label={t({ de: "Goldmedaille", ru: "Золотая медаль" })} />
-              {t({ de: "Geschafft!", ru: "Ура, получилось!" })}
+              <Medal
+                label={t({ de: "Goldmedaille", en: "Gold medal", zh: "金牌", hi: "स्वर्ण पदक", es: "Medalla de oro", ar: "ميدالية ذهبية", ru: "Золотая медаль" })}
+              />
+              {t({ de: "Geschafft!", en: "Done it!", zh: "成功啦！", hi: "हो गया!", es: "¡Lo logramos!", ar: "نجحنا!", ru: "Ура, получилось!" })}
             </h2>
           )}
           {before === "paste" && (
             <p className="teeth-mouth prep">
-              👌 {t({ de: "Erbsengroß", ru: "С горошину" })}
-              <span className="teeth-hint"> · {t({ de: "unter 2 Jahren nur reiskorngroß", ru: "до 2 лет — с рисовое зёрнышко" })}</span>
+              👌{" "}
+              {t({
+                de: "Erbsengroß",
+                en: "Pea-sized",
+                zh: "豌豆大小",
+                hi: "मटर के दाने जितना",
+                es: "Del tamaño de un guisante",
+                ar: "بحجم حبة البازلاء",
+                ru: "С горошину",
+              })}
+              <span className="teeth-hint">
+                {" "}
+                ·{" "}
+                {t({
+                  de: "unter 2 Jahren nur reiskorngroß",
+                  en: "under 2 years only rice-grain-sized",
+                  zh: "2岁以下只要米粒大小",
+                  hi: "2 साल से कम में सिर्फ़ चावल के दाने जितना",
+                  es: "antes de los 2 años, solo como un grano de arroz",
+                  ar: "تحت السنتين بحجم حبة الأرز فقط",
+                  ru: "до 2 лет — с рисовое зёрнышко",
+                })}
+              </span>
             </p>
           )}
           {/* First spit out; when the brush is put away, the daytime's goodbye. */}
@@ -501,8 +620,20 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
           ) : (
             done && (
               <p className="teeth-mouth spit">
-                💦 {t({ de: "Ausspucken", ru: "Сплюнуть" })}
-                <span className="teeth-hint"> · {t({ de: "nicht mit Wasser nachspülen", ru: "водой не полоскать" })}</span>
+                💦 {t({ de: "Ausspucken", en: "Spit out", zh: "吐掉", hi: "थूकना", es: "Escupir", ar: "البصق", ru: "Сплюнуть" })}
+                <span className="teeth-hint">
+                  {" "}
+                  ·{" "}
+                  {t({
+                    de: "nicht mit Wasser nachspülen",
+                    en: "don't rinse with water",
+                    zh: "不要用水漱口",
+                    hi: "पानी से कुल्ला नहीं",
+                    es: "sin enjuagar con agua",
+                    ar: "دون المضمضة بالماء",
+                    ru: "водой не полоскать",
+                  })}
+                </span>
               </p>
             )
           )}
@@ -542,10 +673,10 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             {settings.week && <Week log={week} today={new Date()} now={daytime} />}
             <div className="teeth-end-buttons">
               <button type="button" className="teeth-again teeth-menu" onClick={leave}>
-                <MenuIcon /> {t({ de: "Menü", ru: "Меню" })}
+                <MenuIcon /> {t({ de: "Menü", en: "Menu", zh: "菜单", hi: "मेन्यू", es: "Menú", ar: "القائمة", ru: "Меню" })}
               </button>
               <button type="button" className="teeth-again" onClick={again}>
-                🔁 {t({ de: "Nochmal", ru: "Ещё раз" })}
+                🔁 {t({ de: "Nochmal", en: "Again", zh: "再来一次", hi: "फिर से", es: "Otra vez", ar: "مرة أخرى", ru: "Ещё раз" })}
               </button>
             </div>
           </div>
@@ -563,14 +694,18 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
               type="button"
               className="teeth-pause"
               onClick={togglePause}
-              aria-label={paused ? t({ de: "Weiter", ru: "Дальше" }) : t({ de: "Pause", ru: "Пауза" })}
+              aria-label={
+                paused
+                  ? t({ de: "Weiter", en: "Next", zh: "继续", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Дальше" })
+                  : t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })
+              }
             >
               {paused ? "▶️" : "⏸️"}
             </button>
             <div
               className="teeth-progress"
               role="slider"
-              aria-label={t({ de: "Fortschritt", ru: "Сколько уже почищено" })}
+              aria-label={t({ de: "Fortschritt", en: "Progress", zh: "进度", hi: "प्रगति", es: "Progreso", ar: "التقدّم", ru: "Сколько уже почищено" })}
               aria-valuemin={0}
               aria-valuemax={Math.round(totalMs / 1000)}
               aria-valuenow={Math.round(Math.max(0, Math.min(brushed, totalMs)) / 1000)}
@@ -594,7 +729,18 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
             </div>
             {/* The brushing time left, for the grown-up; only where the screen is wide enough (teeth.css). */}
             {!before && (
-              <span className="teeth-time" aria-label={t({ de: "Restzeit", ru: "Осталось времени" })}>
+              <span
+                className="teeth-time"
+                aria-label={t({
+                  de: "Restzeit",
+                  en: "Time left",
+                  zh: "剩余时间",
+                  hi: "बाकी समय",
+                  es: "Tiempo restante",
+                  ar: "الوقت المتبقي",
+                  ru: "Осталось времени",
+                })}
+              >
                 {formatTime(totalMs - Math.max(0, Math.min(brushed, totalMs)))}
               </span>
             )}
@@ -610,14 +756,23 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       )}
       {step && phase === 0 && brushed < GO_MS && (
         <p className="teeth-count go" aria-live="polite">
-          {t({ de: "Los!", ru: "Поехали!" })}
+          {t({ de: "Los!", en: "Go!", zh: "开始！", hi: "चलो!", es: "¡Ya!", ar: "هيّا!", ru: "Поехали!" })}
         </p>
       )}
 
       {/* Only when the song is still not there after the story: the brushing waits for it. */}
       {waiting && (
         <div className="teeth-loading" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(song.progress * 100)}>
-          🎵 {t({ de: "Musik lädt …", ru: "Музыка загружается …" })}
+          🎵{" "}
+          {t({
+            de: "Musik lädt …",
+            en: "Music is loading …",
+            zh: "音乐加载中……",
+            hi: "संगीत लोड हो रहा है …",
+            es: "Cargando la música …",
+            ar: "الموسيقى قيد التحميل …",
+            ru: "Музыка загружается …",
+          })}
           <span className="teeth-loading-bar">
             <span style={{ width: `${song.progress * 100}%` }} />
           </span>
@@ -629,9 +784,19 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
           <span className="teeth-paused-icon" aria-hidden>
             ⏸️
           </span>
-          {t({ de: "Pause", ru: "Пауза" })}
+          {t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })}
           <small>
-            {touchOnly ? t({ de: "Tippen: weiter", ru: "Нажми — и дальше" }) : t({ de: "Leertaste oder Tippen: weiter", ru: "Пробел или нажатие — и дальше" })}
+            {touchOnly
+              ? t({ de: "Tippen: weiter", en: "Tap: go on", zh: "点一下：继续", hi: "टैप: आगे", es: "Toca: seguir", ar: "لمسة: متابعة", ru: "Нажми — и дальше" })
+              : t({
+                  de: "Leertaste oder Tippen: weiter",
+                  en: "Space or tap: go on",
+                  zh: "空格键或点一下：继续",
+                  hi: "स्पेस या टैप: आगे",
+                  es: "Espacio o toque: seguir",
+                  ar: "المسافة أو لمسة: متابعة",
+                  ru: "Пробел или нажатие — и дальше",
+                })}
           </small>
         </button>
       )}

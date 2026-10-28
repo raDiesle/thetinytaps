@@ -20,7 +20,7 @@ export type HomeId =
 
 export interface Home {
   id: HomeId;
-  /** The German name; the Russian name and phrase are in content.ru.ts (RUSSIAN_HOMES). */
+  /** The German name; the other languages' names and phrases are in content.<lang>.ts (e.g. RUSSIAN_HOMES). */
   name: string;
   /** "in der Hütte", for "Der Hund wohnt in der Hütte." */
   inPhrase: string;

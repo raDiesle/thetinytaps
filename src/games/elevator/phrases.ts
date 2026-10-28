@@ -1,13 +1,18 @@
 import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
+import { AR } from "./ar";
+import { EN } from "./en";
+import { ES } from "./es";
+import { HI } from "./hi";
 import { RU } from "./ru";
+import { ZH } from "./zh";
 
 // The stories and levels are written in German (`content.ts`, `trail/levels.ts`); each other language
-// has a phrasebook with the same sentences, by the German text (`ru.ts`). Speech always uses the voice of
-// the language the sentence is in, so a sentence missing from a phrasebook is said in German by the
-// German voice, never German words by a Russian voice.
+// has a phrasebook with the same sentences, by the German text (`en.ts`, `zh.ts`, `hi.ts`, `es.ts`, `ar.ts`,
+// `ru.ts`). Speech always uses the voice of the language the sentence is in, so a sentence missing from a
+// phrasebook is said in German by the German voice, never German words by another language's voice.
 
 /** The phrasebook of each language besides German. */
-const PHRASEBOOKS: Partial<Record<TargetLanguageId, Record<string, string>>> = { ru: RU };
+export const PHRASEBOOKS: Partial<Record<TargetLanguageId, Record<string, string>>> = { en: EN, zh: ZH, hi: HI, es: ES, ar: AR, ru: RU };
 
 const GERMAN = targetLanguageFor("de");
 

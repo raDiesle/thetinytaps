@@ -190,7 +190,17 @@ export function AdventurePlay({
   if (failed) {
     return (
       <div className="adventure adventure-failed">
-        <p>{t({ de: "Dieses Gerät kann die 3D-Bilder leider nicht zeigen.", ru: "К сожалению, это устройство не может показать 3D-картинки." })}</p>
+        <p>
+          {t({
+            de: "Dieses Gerät kann die 3D-Bilder leider nicht zeigen.",
+            en: "Sorry, this device can't show the 3D pictures.",
+            zh: "抱歉，这台设备无法显示 3D 画面。",
+            hi: "माफ़ कीजिए, यह डिवाइस 3D तस्वीरें नहीं दिखा सकता।",
+            es: "Lo sentimos, este dispositivo no puede mostrar las imágenes en 3D.",
+            ar: "عذرًا، لا يستطيع هذا الجهاز عرض الصور ثلاثية الأبعاد.",
+            ru: "К сожалению, это устройство не может показать 3D-картинки.",
+          })}
+        </p>
       </div>
     );
   }
@@ -198,11 +208,11 @@ export function AdventurePlay({
   // For screen readers: what happens in this step (the library's description), in other app languages Tapsi's first line there.
   const own = app.id === "de" ? undefined : story.translations?.[app.id]?.steps[step];
   const scene = own ? (own.situation ?? own.instruction) : story.sequence.steps[step].situation;
-  const back = t({ de: "Zurück", ru: "Назад" });
-  const forward = t({ de: "Vor", ru: "Вперёд" });
-  const resume = t({ de: "Weiter", ru: "Дальше" });
-  const pause = t({ de: "Pause", ru: "Пауза" });
-  const space = t({ de: "Leertaste", ru: "Пробел" });
+  const back = t({ de: "Zurück", en: "Back", zh: "后退", hi: "पीछे", es: "Atrás", ar: "رجوع", ru: "Назад" });
+  const forward = t({ de: "Vor", en: "Forward", zh: "前进", hi: "आगे", es: "Adelante", ar: "تقدّم", ru: "Вперёд" });
+  const resume = t({ de: "Weiter", en: "Go on", zh: "继续", hi: "जारी रखें", es: "Seguir", ar: "متابعة", ru: "Дальше" });
+  const pause = t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" });
+  const space = t({ de: "Leertaste", en: "Space", zh: "空格键", hi: "स्पेस", es: "Espacio", ar: "مسافة", ru: "Пробел" });
 
   return (
     <div className="adventure">

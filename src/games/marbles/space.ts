@@ -287,9 +287,9 @@ export function buildSpace() {
   const tIgnite = tCount[2] + 0.4;
   const tDone = tLift + 2.8;
   [
-    { de: "Drei!", ru: "Три!" },
-    { de: "Zwei!", ru: "Два!" },
-    { de: "Eins!", ru: "Один!" },
+    { de: "Drei!", en: "Three!", zh: "三！", hi: "तीन!", es: "¡Tres!", ar: "ثلاثة!", ru: "Три!" },
+    { de: "Zwei!", en: "Two!", zh: "二！", hi: "दो!", es: "¡Dos!", ar: "اثنان!", ru: "Два!" },
+    { de: "Eins!", en: "One!", zh: "一！", hi: "एक!", es: "¡Uno!", ar: "واحد!", ru: "Один!" },
   ].forEach((word, i) => {
     at(tCount[i], { sound: playPing });
     at(tCount[i] + 0.05, { say: word });
@@ -298,7 +298,17 @@ export function buildSpace() {
   at(tArm, { sound: playCreak });
   at(tIgnite, { sound: playRumble });
   at(tLift, { sound: playLaunch });
-  at(tLift + 0.05, { say: { de: "Start! Die Rakete fliegt zum Mond!", ru: "Пуск! Ракета летит на Луну!" } });
+  at(tLift + 0.05, {
+    say: {
+      de: "Start! Die Rakete fliegt zum Mond!",
+      en: "Liftoff! The rocket flies to the moon!",
+      zh: "发射！火箭飞向月亮！",
+      hi: "उड़ान! रॉकेट चाँद की ओर उड़ता है!",
+      es: "¡Despegue! ¡El cohete vuela a la luna!",
+      ar: "انطلاق! الصاروخ يطير إلى القمر!",
+      ru: "Пуск! Ракета летит на Луну!",
+    },
+  });
   at(tLift + 1.2, { sound: playTwinkle });
   at(tLift + 1.8, { sound: playTwinkle });
   at(tDone, { done: true });

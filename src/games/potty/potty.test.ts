@@ -111,23 +111,45 @@ describe("Aufs Töpfchen", () => {
     for (const texts of Object.values(POTTY_TEXTS)) expect(texts.steps.done(TAPSI.name.de, "both")).not.toBe(texts.steps.done(TAPSI.name.de, "pipi"));
   });
 
-  it("says everything in Russian in Cyrillic, Tapsi's name too", () => {
-    const ru = POTTY_TEXTS.ru;
-    const name = TAPSI.name.ru;
-    if (!ru || !name) throw new Error("Russian texts and name expected");
-    const lines = [
-      ...ALL_STEPS.flatMap((step) => WHICHES.map((which) => ru.steps[step.id](name, which))),
-      ...Object.values(ru.scenes),
-      ...Object.values(ru.said),
-      ...Object.values(ru.went),
-      ru.next,
-      ru.askSaid,
-      ru.askWent,
-      ru.finish,
-      ru.nothing,
-      ru.star,
+  /** Every line said or shown in a language, with Tapsi's name in it. */
+  const linesIn = (id: keyof typeof POTTY_TEXTS) => {
+    const texts = POTTY_TEXTS[id];
+    const name = TAPSI.name[id];
+    if (!texts || !name) throw new Error(`${id}: texts and Tapsi's name expected`);
+    return [
+      name,
+      ...ALL_STEPS.flatMap((step) => WHICHES.map((which) => texts.steps[step.id](name, which))),
+      ...Object.values(texts.scenes),
+      ...Object.values(texts.said),
+      ...Object.values(texts.went),
+      texts.next,
+      texts.askSaid,
+      texts.askWent,
+      texts.finish,
+      texts.nothing,
+      texts.nothingButton,
+      texts.star,
     ];
-    for (const line of lines) expect(line, line).not.toMatch(/[A-Za-zÄÖÜäöüß]/);
+  };
+
+  it("says everything in Russian in Cyrillic, Tapsi's name too", () => {
+    for (const line of linesIn("ru")) expect(line, line).not.toMatch(/[A-Za-zÄÖÜäöüß]/);
+  });
+
+  it("says everything in en, zh, hi, es and ar, Chinese, Hindi and Arabic without Latin letters, Tapsi's name too", () => {
+    const scripts = { zh: /\p{Script=Han}/u, hi: /\p{Script=Devanagari}/u, ar: /\p{Script=Arabic}/u };
+    for (const id of ["en", "zh", "hi", "es", "ar"] as const) {
+      const texts = POTTY_TEXTS[id];
+      // Every thought has its line, and no line is left without words.
+      expect(Object.keys(texts?.scenes ?? {}).sort(), id).toEqual(WAIT_SCENES.map((s) => s.id).sort());
+      for (const line of linesIn(id)) {
+        expect(line.trim(), id).not.toBe("");
+        if (id in scripts) {
+          expect(line, `${id}: ${line}`).not.toMatch(/[A-Za-zÄÖÜäöüß]/);
+          expect(line, `${id}: ${line}`).toMatch(scripts[id as keyof typeof scripts]);
+        }
+      }
+    }
   });
 
   it("has every picture of the story, a thought bubble's with both frames if at all, and no pictures of anybody else", () => {

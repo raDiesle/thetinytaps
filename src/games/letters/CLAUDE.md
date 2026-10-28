@@ -28,13 +28,29 @@ Four ways to play, as cards on one start screen:
 
 ## Languages
 
-The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`). The game plays in the pack of the app language
-(🌐, `useLanguagePack()`), never in another one and never with a second one next to it; it has no language choice of its own.
-- Grown-up texts (start screen, settings, hints on the play screen) go through `useT()`: `t({ de: "…", ru: "…" })`, never a bare German string.
-- Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` (Russian) types
-  by key place (Q = Й, also on a German keyboard). Compare keys only with `keyMatches`/`toUpper(…, pack)`, never with `e.key` directly.
-- A new pack needs every letter with a spoken name and words (a letter no word starts with, like Ъ Ы Ь, gets
-  `inWord: true` and words with it inside; the card marks it there), number words 0–9, plural forms that are right
-  for 0–9 (see `ru.ts`/`pl.ts` for three forms) and keyboard rows covering every letter. `content.test.ts` checks this; add a check for any new rule.
-  Colours and doing words of a new pack are `relabel(de.colors|de.actions, …)`.
-- "Wo ist das B?" only asks for letters with a key of their own on most keyboards (`findableLetters`: no umlauts, no Ё).
+The language packs in `src/content/` (`de`, `en`, `tr`, `pl`, `ru`, `es`, `zh`, `hi`, `ar`). The game plays in the pack of
+the app language (🌐, `useLanguagePack()`), never in another one and never with a second one next to it; it has no language choice of its own.
+- Grown-up texts (start screen, settings, hints on the play screen) go through `useT()` with every app language
+  (`t({ de, ru, en, zh, hi, es, ar })`), never a bare German string.
+- Every key event goes through `keyOf(e, pack)` before the game looks at it: a pack with `letterOfKey` types by key
+  place on its own keyboard, also on a German one (Russian ЙЦУКЕН Q = Й, Hindi InScript K = क, Arabic F = ب, Spanish Ñ
+  right of L). Compare keys only with `keyMatches`/`toUpper(…, pack)`, never with `e.key` directly. `keyMatches` lets the
+  plain letter count for its forms (A for Á, ا for أ/إ, ت for ة) and, in Hindi, a key for both its letters (`sameKey`:
+  क and ख on K) – a toddler never needs Shift.
+- Words are typed and marked in pieces (`textUnits`, `src/content/spelling.ts`), never in single code points: a Hindi
+  letter with its vowel sign and joined consonants (कि, ट्र) is one piece, typed by its first letter (क) and said as it
+  sounds; an Arabic letter is one piece and keeps its joined shape when drawn on its own (`joinedForms`, zero-width
+  joiners), and Arabic slots run right to left. Chinese words are typed and marked by their pinyin (`WordEntry.spelling`,
+  with tone marks, no key needed for a tone): the characters stand above, the pinyin under them; the voice says the
+  Chinese word, and letters are named as Chinese children read pinyin (b → 玻).
+- Hindi and Arabic letters have one form (`hasCase`): the start screen hides A / A a / a and plays with the one form.
+- The start screen's examples use `sampleLetter` (B, Russian Б, or the pack's `exampleLetter`: Hindi क, Arabic ب).
+- A new pack needs every letter with a spoken name and words (a letter no word starts with, like Ъ Ы Ь, Hindi ङ ञ ण ष
+  or pinyin I O U, gets `inWord: true` and words with it inside; the card marks it there), number words 0–9, counting
+  that is right for 0–9 (three forms in `ru.ts`/`pl.ts`, gender and dual in `ar.ts`, measure words in `zh.ts`) and keyboard
+  rows covering every letter. A pack in another script says and shows no Latin letters (pinyin aside). Every piece of every
+  word must have a letter in the pack, or the on-screen keys can't type it. `content.test.ts` and `packs.test.ts` check
+  this; add a check for any new rule. Colours and doing words of a new pack are `relabel(de.colors|de.actions, …)`, one
+  word each (they must be typeable: Hindi leaves out sleep, wave and clap, which need two words).
+- "Wo ist das B?" only asks for letters with a key of their own on most keyboards (`findableLetters`: no umlauts, no Ё,
+  no Ñ; in Hindi and Arabic the letters printed on the keyboard rows, none that needs Shift).

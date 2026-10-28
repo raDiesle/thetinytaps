@@ -175,7 +175,7 @@ export function SneezeLevel({ sound, say, onDone }: LevelProps) {
     b.sneezeT = clock.current;
     b.haT = Math.min(b.haT, clock.current);
     sound(() => playHatschi(sizeAt(i)));
-    if (i === last) say({ de: "Hatschi!", ru: "Апчхи!" });
+    if (i === last) say({ de: "Hatschi!", en: "Achoo!", zh: "阿嚏！", hi: "आछू!", es: "¡Achís!", ar: "أتشو!", ru: "Апчхи!" });
   };
   const arrive = (i: number) => {
     beasts.current[i].arriveT = clock.current;

@@ -1,0 +1,65 @@
+import type { SceneTranslation } from "../types";
+
+// The English words of the Gute Nacht picture: names, what each item says and the chain sentences.
+// Names are nouns without article, lower case except family words said like names („Grandpa“),
+// which the engine says without „the“; plural names are marked `plural`.
+
+/** „Gute Nacht“ in English. */
+export const EN: SceneTranslation = {
+  title: "Good Night",
+  description: "Everyone says good night – until the room is dark.",
+  items: {
+    lichterkette: {
+      name: "fairy lights",
+      plural: true,
+      sentences: ["The fairy lights glow in many colors. Good night, lights!", "One light after another goes out."],
+    },
+    bild: { name: "picture", sentences: ["The sun in the picture goes down. Good night, sun!", "It is getting evening in the picture."] },
+    mobile: { name: "mobile", sentences: ["The mobile turns very quietly. Good night, mobile!", "The little moon on the mobile falls asleep."] },
+    kuckucksuhr: { name: "cuckoo clock", sentences: ["Cuckoo! Good night, cuckoo!", "The cuckoo goes into its little house."] },
+    mond: { name: "moon", sentences: ["The moon yawns: Yaaawn! Good night, moon!", "The moon is wearing a nightcap."] },
+    sterne: { name: "stars", plural: true, sentences: ["The stars twinkle. Good night, stars!", "Twinkle, twinkle, little star."] },
+    gluehwuermchen: { name: "fireflies", plural: true, sentences: ["The fireflies glow. Good night, fireflies!", "Buzz, buzz! They fly in a circle."] },
+    eule: { name: "owl", sentences: ["Hoo-hoo! Good night, owl!", "The owl closes its big eyes."] },
+    vorhang: { name: "curtain", sentences: ["The curtain closes. Good night, curtain!", "The curtain sways very gently."] },
+    schlafanzug: { name: "pajamas", plural: true, sentences: ["The pajamas swing on the hook. Good night, pajamas!", "The pajamas are blue with stars."] },
+    nachtlicht: {
+      name: "night light",
+      sentences: ["The night light shines all night long. Good night, night light!", "The night light watches over everyone."],
+    },
+    maus: { name: "mouse", sentences: ["Squeak! Good night, little mouse!", "The mouse snuggles into its hole."] },
+    tuer: { name: "door", sentences: ["The door stays open a crack. Good night, door!", "It is bright and warm in the hallway."] },
+    mama: { name: "Mommy", sentences: ["Mommy says: Good night, sleep tight!", "Mommy blows a kiss."] },
+    goldfisch: { name: "goldfish", sentences: ["Blub! Good night, little goldfish!", "The goldfish swims in a circle."] },
+    buch: { name: "bedtime book", sentences: ["The book opens. Good night, book!", "Once upon a time there was a little sheep …"] },
+    spieluhr: { name: "music box", sentences: ["The music box plays a lullaby. Good night, music box!", "Ping, pong. Very softly."] },
+    puppenhaus: { name: "dollhouse", sentences: ["The lights go out in the dollhouse. Good night, dolls!", "The dollhouse door opens and closes."] },
+    nachttisch: { name: "nightstand", sentences: ["The drawer opens. Good night, nightstand!", "Look, there is a sock inside!"] },
+    lampe: { name: "lamp", sentences: ["Click! The lamp turns off. Good night, lamp!", "Now it is nice and cozy."] },
+    wecker: { name: "alarm clock", sentences: ["Tick, tock! Good night, alarm clock!", "Tomorrow morning the alarm clock wakes us up."] },
+    bett: { name: "bed", sentences: ["The bed is nice and soft. Good night, bed!", "The stars on the bed twinkle."] },
+    decke: { name: "blanket", sentences: ["The blanket is nice and warm. Good night, blanket!", "In, out. The blanket breathes along."] },
+    kind: { name: "child", sentences: ["The child yawns: Yaaawn! Good night!", "The child waves and snuggles in."] },
+    teddy: { name: "teddy bear", sentences: ["The teddy bear waves. Good night, teddy!", "The teddy bear sleeps next to the child."] },
+    teppich: { name: "rug", sentences: ["The rug is nice and soft. Good night, rug!", "Stars twinkle on the rug."] },
+    hase: { name: "bunny", sentences: ["The bunny sniffs. Good night, bunny!", "The long ears flop down."] },
+    bausteine: { name: "blocks", plural: true, sentences: ["The blocks wobble. Good night, blocks!", "The tower stays up. Phew!"] },
+    katze: { name: "cat", sentences: ["Meow! The cat yawns. Good night, cat!", "The cat curls up in its basket."] },
+    schaukelpferd: { name: "rocking horse", sentences: ["The rocking horse rocks. Good night, horsey!", "Giddy-up! And now very slowly."] },
+    eisenbahn: { name: "toy train", sentences: ["Toot, toot! The toy train goes to sleep. Good night, train!", "The wheels turn very slowly."] },
+    ball: { name: "ball", sentences: ["The ball bounces one more time. Good night, ball!", "Hop! And now it lies still."] },
+    puppenwagen: { name: "doll stroller", sentences: ["The doll stroller rocks. Good night, dolly!", "The doll sleeps in the stroller."] },
+    roboter: { name: "robot", sentences: ["Beep, bip! Good night, robot!", "The robot's eyes go out."] },
+    kreisel: { name: "spinning top", sentences: ["The spinning top spins. Good night, top!", "It spins slower and slower."] },
+    schaf: { name: "sheep", sentences: ["Baa! Good night, little sheep!", "The sheep counts the stars."] },
+    elefant: { name: "elephant", sentences: ["Toot-toot, very softly! Good night, elephant!", "The elephant wiggles its ears."] },
+    hausschuhe: { name: "slippers", plural: true, sentences: ["The slippers hop to the bed. Good night, slippers!", "The bunny ears wiggle."] },
+    taschenlampe: { name: "flashlight", sentences: ["Click! The flashlight turns off. Good night, flashlight!", "Now it is dark and cozy."] },
+    spielzeugkiste: { name: "toy box", sentences: ["Clack! The toy box closes. Good night, toys!", "Everything is tidied up."] },
+  },
+  chains: [
+    ["The mobile turns to the music.", "And the child yawns: Yaaawn!"],
+    ["The cat hears the owl and yawns.", "And the mouse snuggles into its hole."],
+    ["Mommy turns off the light. Click!", "And the teddy bear snuggles in."],
+  ],
+};

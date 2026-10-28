@@ -25,12 +25,18 @@ import {
   playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
+import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Localized } from "@/lib/language";
-import { russianTexts } from "./content.ru";
+import { ARABIC } from "./content.ar";
+import { ENGLISH } from "./content.en";
+import { SPANISH } from "./content.es";
+import { HINDI } from "./content.hi";
+import { RUSSIAN } from "./content.ru";
+import { CHINESE } from "./content.zh";
 import type { ShadowTheme } from "./settings";
 
-// Pictures and German texts for "Schatten finden" (N-07); the Russian ones are in
-// content.ru.ts, by the same ids. The pictures are emojis; their shadow is the
+// Pictures and German texts for "Schatten finden" (N-07); the other languages are in
+// content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids. The pictures are emojis; their shadow is the
 // same emoji in black, so each one needs a shape of its own – whole bodies
 // rather than faces, nothing that is just a round blob.
 
@@ -172,5 +178,29 @@ const GERMAN_TEXTS: ShadowTexts = {
   stars: (n) => `${n} geschafft`,
 };
 
+/** A language of the game besides German: the pictures' names by id and the sentences built from them with its grammar. */
+export interface ShadowTranslation {
+  /** Each picture's name by id, in whatever shape the language's grammar needs; one without an entry is said in German. */
+  names: Record<string, unknown>;
+  /**
+   * All texts. Translations come only when asked for, so a picture may have no name yet: then the whole sentence
+   * comes from `german` (and is read by the German voice), never a German word inside another language.
+   */
+  texts: (german: ShadowTexts) => ShadowTexts;
+}
+
+/** Every language besides German, by its id. */
+export const SHADOW_TRANSLATIONS: Partial<Record<TargetLanguageId, ShadowTranslation>> = {
+  en: ENGLISH,
+  zh: CHINESE,
+  hi: HINDI,
+  es: SPANISH,
+  ar: ARABIC,
+  ru: RUSSIAN,
+};
+
 /** The texts by app language: `pick(SHADOW_TEXTS, language.id)`. */
-export const SHADOW_TEXTS: Localized<ShadowTexts> = { de: GERMAN_TEXTS, ru: russianTexts(GERMAN_TEXTS) };
+export const SHADOW_TEXTS: Localized<ShadowTexts> = {
+  de: GERMAN_TEXTS,
+  ...Object.fromEntries(Object.entries(SHADOW_TRANSLATIONS).map(([id, translation]) => [id, translation.texts(GERMAN_TEXTS)])),
+};
