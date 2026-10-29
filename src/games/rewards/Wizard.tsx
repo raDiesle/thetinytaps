@@ -1,31 +1,31 @@
 import { useState } from "react";
-import { Slider } from "@/components/SettingControls";
-import { useT } from "@/lib/language";
-import {
-  type Board,
-  type BoardTask,
-  boardFromTemplate,
-  COLLECT_GOALS,
-  fieldCount,
-  MAX_TASKS,
-  newId,
-  rewardFromCatalog,
-  taskFromCatalog,
-  withKind,
-} from "./board";
-import { useTaskLabel } from "./BoardSheet";
-import { KINDS, MARKS, REWARDS, type Template, TASKS, THEMES } from "./catalog";
-import { SlotChips } from "./Editor";
+import { type Localized, useT } from "@/lib/language";
+import { type Board, boardFromTemplate, newId } from "./board";
+import { CHART_TYPES, type ChartType, PLAN_TEMPLATES, type PlanTemplate, type Template, TEMPLATES } from "./catalog";
 import { TemplateGallery, Thumb } from "./Gallery";
+import { Pick } from "./pageParts";
+import { type Plan, planFromTemplate } from "./plan";
+import { PlanGallery, PlanThumb } from "./PlanGallery";
+import { BOARD_STEPS, BoardStep } from "./WizardBoard";
+import { PLAN_STEPS, PlanStepView } from "./WizardPlan";
 
-/** The wizard's steps, in order; a board can be made from any step after the first. */
-const STEPS = [
-  { id: "start", emoji: "🧩", label: { de: "Vorlage" } },
-  { id: "kind", emoji: "📅", label: { de: "Ansicht" } },
-  { id: "tasks", emoji: "🪥", label: { de: "Aufgaben" } },
-  { id: "goal", emoji: "🎁", label: { de: "Belohnung" } },
-  { id: "look", emoji: "🎨", label: { de: "Name und Farben" } },
-] as const;
+/** What the wizard makes: a board or a plan, while it is being chosen. */
+export type Draft = { type: "board"; board: Board } | { type: "plan"; plan: Plan };
+
+/** Where the wizard starts: on a template picked in the gallery beside the board. */
+export type WizardStart = { type: "board"; template: Template } | { type: "plan"; template: PlanTemplate };
+
+/** A wizard step: its id and its name in the row of steps. */
+export interface WizardStep {
+  id: string;
+  label: Localized;
+}
+
+/** The two steps every chart begins with; the type's own steps follow. */
+const FIRST_STEPS: WizardStep[] = [
+  { id: "type", label: { de: "Art" } },
+  { id: "template", label: { de: "Vorlage" } },
+];
 
 /** A board with nothing on it yet, for „Leer anfangen“. */
 function blankBoard(): Board {
@@ -44,40 +44,68 @@ function blankBoard(): Board {
   };
 }
 
+/** A plan with no cards yet, for „Leer anfangen“: a day, the same every day. */
+function blankPlan(): Plan {
+  return { id: newId(), view: "day", childName: "", title: "", days: [[]], same: true, theme: "sonne", examples: true };
+}
+
+/** The first board and plan of the gallery, as the pictures of the first step: what each kind looks like in use. */
+const TYPE_PICTURES = { board: boardFromTemplate(TEMPLATES[0]), plan: planFromTemplate(PLAN_TEMPLATES[0]) };
+
+/** A draft made from a template, with an id of its own (the template's board made before keeps its stars). */
+const fromStart = (start: WizardStart): Draft =>
+  start.type === "board"
+    ? { type: "board", board: { ...boardFromTemplate(start.template), id: newId() } }
+    : { type: "plan", plan: planFromTemplate(start.template) };
+
 /**
- * „Neue Tafel“ step by step: a template (or empty), the view, the tasks with their times of day, the reward and goal,
- * name and colours – with the board as it will look, example stars and all, beside it. „Fertig“ makes it from any step
- * after the first; everything can still be changed later under „Gestalten“. Opened on a template from the gallery,
- * it starts on the second step with that template.
+ * „＋ Neu“ step by step, for a Belohnungstafel and a Tagesplan alike: 1 the kind (two big pictures), 2 a Vorlage (or
+ * „Leer anfangen“), then the kind's own steps – a board's view, tasks, reward and look, a plan's view, cards and look.
+ * Every choice shows what it makes (a small picture of the board or plan as it would be, or a big picture card), and
+ * the whole board or plan stands beside each step. „✓ So nehmen“ makes it from any step after the Vorlage;
+ * everything can still be changed under „Gestalten“. Opened on a template from the gallery, it starts on step 3.
  */
-export function Wizard({ start, onDone, onCancel }: { start?: Template; onDone: (board: Board) => void; onCancel: () => void }) {
+export function Wizard({
+  type: startType,
+  start,
+  onDone,
+  onCancel,
+}: {
+  /** The kind marked on the first step (the address or the chart shown). */
+  type: ChartType;
+  start?: WizardStart;
+  onDone: (draft: Draft) => void;
+  onCancel: () => void;
+}) {
   const t = useT();
-  const taskLabel = useTaskLabel();
-  const [draft, setDraft] = useState<Board | null>(() => (start ? { ...boardFromTemplate(start), id: newId() } : null));
-  const [step, setStep] = useState(start ? 1 : 0);
-  const change = (patch: Partial<Board>) => setDraft((b) => (b ? { ...b, ...patch } : b));
-  const pick = (board: Board) => {
-    setDraft({ ...board, id: newId() });
+  const [type, setType] = useState<ChartType>(start?.type ?? startType);
+  const [draft, setDraft] = useState<Draft | null>(() => (start ? fromStart(start) : null));
+  const [step, setStep] = useState(start ? 2 : 0);
+  const steps = [...FIRST_STEPS, ...(type === "board" ? BOARD_STEPS : PLAN_STEPS)];
+  const id = steps[step].id;
+
+  const pickType = (next: ChartType) => {
+    if (next !== type) setDraft(null);
+    setType(next);
     setStep(1);
   };
-
-  const id = STEPS[step].id;
-  const fields = draft ? fieldCount(draft, new Date()) : 0;
-  const setTask = (taskId: string, patch: Partial<BoardTask>) =>
-    draft && change({ tasks: draft.tasks.map((task) => (task.id === taskId ? { ...task, ...patch } : task)) });
-  const addTask = (catalogId: string) => draft && draft.tasks.length < MAX_TASKS && change({ tasks: [...draft.tasks, taskFromCatalog(catalogId)] });
+  const pick = (made: Draft) => {
+    setDraft(made);
+    setStep(2);
+  };
+  const ready = draft?.type === "board" ? draft.board.tasks.length > 0 || draft.board.kind === "collect" : !!draft?.plan.days.some((day) => day.length > 0);
 
   return (
-    <section className="rw-wizard" aria-label={t({ de: "Neue Tafel" })}>
+    <section className="rw-wizard" aria-label={t({ de: "Neu anlegen" })}>
       <header className="rw-wizard-head">
         <ol className="rw-steps">
-          {STEPS.map((s, i) => (
+          {steps.map((s, i) => (
             <li key={s.id}>
               <button
                 type="button"
                 className={i === step ? "selected" : undefined}
                 aria-current={i === step ? "step" : undefined}
-                disabled={!draft && i > 0}
+                disabled={!draft && i > 1}
                 onClick={() => setStep(i)}
               >
                 <span className="rw-step-number">{i + 1}</span> <span className="rw-step-label">{t(s.label)}</span>
@@ -90,180 +118,57 @@ export function Wizard({ start, onDone, onCancel }: { start?: Template; onDone: 
         </button>
       </header>
 
-      <div className={`rw-wizard-body${id === "start" ? " rw-wizard-wide" : ""}`}>
+      <div className={`rw-wizard-body${step < 2 ? " rw-wizard-wide" : ""}`}>
         <div className="rw-wizard-step">
-          {id === "start" && (
+          {id === "type" && (
+            <>
+              <h2>{t({ de: "Was möchten Sie anlegen?" })}</h2>
+              <div className="rw-picks rw-picks-type">
+                {CHART_TYPES.map((kind) => (
+                  <Pick
+                    key={kind.id}
+                    selected={kind.id === type}
+                    onClick={() => pickType(kind.id)}
+                    picture={kind.id === "board" ? <Thumb board={TYPE_PICTURES.board} /> : <PlanThumb plan={TYPE_PICTURES.plan} />}
+                    label={`${kind.emoji} ${t(kind.label)}`}
+                    hint={t(kind.hint)}
+                  />
+                ))}
+              </div>
+              <p className="setting-note">
+                {t({
+                  de: "Beides geht auch zusammen: eine Tafel für die Sterne und ein Plan für den Tag. Sie finden sie danach oben nebeneinander.",
+                })}
+              </p>
+            </>
+          )}
+
+          {id === "template" && (
             <>
               <h2>{t({ de: "Womit fangen wir an?" })}</h2>
               <p className="setting-note">{t({ de: "Eine Vorlage antippen – danach lässt sich alles ändern." })}</p>
-              <TemplateGallery onPick={(tpl) => pick(boardFromTemplate(tpl))} blank={() => pick(blankBoard())} />
-            </>
-          )}
-
-          {draft && id === "kind" && (
-            <>
-              <h2>{t({ de: "Wie lange geht die Tafel?" })}</h2>
-              <div className="rw-kind-cards">
-                {KINDS.map((kind) => (
-                  <button
-                    key={kind.id}
-                    type="button"
-                    className={kind.id === draft.kind ? "selected" : undefined}
-                    aria-pressed={kind.id === draft.kind}
-                    onClick={() => setDraft(withKind(draft, kind.id))}
-                  >
-                    <span className="rw-kind-emoji" aria-hidden>
-                      {kind.emoji}
-                    </span>
-                    <span className="rw-kind-label">{t(kind.label)}</span>
-                    <span className="rw-kind-hint">{t(kind.hint)}</span>
-                  </button>
-                ))}
-              </div>
-              <p className="setting-note">
-                {t({
-                  de: "Tag, Woche und Monat zeigen dieselben Sterne – oben über der Tafel lässt sich jederzeit umschalten. Für Zweijährige ist ein Tag oder ein kurzer Weg mit 5 Sternen oft genug.",
-                })}
-              </p>
-            </>
-          )}
-
-          {draft && id === "tasks" && (
-            <>
-              <h2>{draft.kind === "collect" ? t({ de: "Wofür gibt es Sterne?" }) : t({ de: "Was soll klappen?" })}</h2>
-              {draft.tasks.length > 0 && (
-                <ul className="rw-wizard-tasks">
-                  {draft.tasks.map((task) => (
-                    <li key={task.id}>
-                      <span className="rw-wizard-task">
-                        <span aria-hidden>{task.emoji}</span> {taskLabel(task) || t({ de: "Eigene Aufgabe" })}
-                        <button
-                          type="button"
-                          aria-label={t({ de: `${taskLabel(task)} entfernen` })}
-                          onClick={() => change({ tasks: draft.tasks.filter((own) => own !== task) })}
-                        >
-                          ✕
-                        </button>
-                      </span>
-                      {draft.kind !== "collect" && <SlotChips task={task} onChange={(patch) => setTask(task.id, patch)} />}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <div className="rw-chips" role="group" aria-label={t({ de: "Aufgabe dazu" })}>
-                {TASKS.filter((task) => !draft.tasks.some((own) => own.catalog === task.id)).map((task) => (
-                  <button key={task.id} type="button" disabled={draft.tasks.length >= MAX_TASKS} onClick={() => addTask(task.id)}>
-                    + {task.emoji} {t(task.label)}
-                  </button>
-                ))}
-              </div>
-              <p className="setting-note">
-                {t({
-                  de: "Am besten eine bis drei Aufgaben, eine davon leicht. Zähne putzen bekommt morgens ☀️ und abends 🌙 je einen Stern – das Spiel „Zähne putzen“ setzt beide von selbst.",
-                })}
-              </p>
-            </>
-          )}
-
-          {draft && id === "goal" && (
-            <>
-              <h2>{t({ de: "Worauf freut ihr euch?" })}</h2>
-              <div className="rw-chips" role="group" aria-label={t({ de: "Belohnung" })}>
-                <button type="button" className={draft.reward ? undefined : "selected"} aria-pressed={!draft.reward} onClick={() => change({ reward: null })}>
-                  🎉 {t({ de: "Nur zusammen freuen" })}
-                </button>
-                {REWARDS.map((reward) => {
-                  const on = draft.reward?.catalog === reward.id;
-                  return (
-                    <button
-                      key={reward.id}
-                      type="button"
-                      className={on ? "selected" : undefined}
-                      aria-pressed={on}
-                      onClick={() => change({ reward: rewardFromCatalog(reward.id) })}
-                    >
-                      {reward.emoji} {t(reward.label)}
-                    </button>
-                  );
-                })}
-              </div>
-              {draft.kind === "collect" && (
-                <div className="rw-chips" role="group" aria-label={t({ de: "Sterne bis zur Belohnung" })}>
-                  {COLLECT_GOALS.map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      className={n === draft.goal ? "selected" : undefined}
-                      aria-pressed={n === draft.goal}
-                      onClick={() => change({ goal: n })}
-                    >
-                      {n} ⭐
-                    </button>
-                  ))}
-                </div>
-              )}
-              {(draft.kind === "week" || draft.kind === "month") && fields > 1 && (
-                <Slider
-                  label={draft.kind === "week" ? t({ de: "Sterne in der Woche bis zur Belohnung" }) : t({ de: "Sterne im Monat bis zur Belohnung" })}
-                  value={Math.min(draft.goal, fields)}
-                  min={1}
-                  max={fields}
-                  format={(n) => (n === fields ? t({ de: `${n} (alle)` }) : String(n))}
-                  onChange={(goal) => change({ goal })}
+              {type === "board" ? (
+                <TemplateGallery
+                  selected={draft?.type === "board" ? draft.board.template : undefined}
+                  onPick={(tpl) => pick({ type: "board", board: { ...boardFromTemplate(tpl), id: newId() } })}
+                  blank={() => pick({ type: "board", board: blankBoard() })}
+                />
+              ) : (
+                <PlanGallery
+                  selected={draft?.type === "plan" ? draft.plan.template : undefined}
+                  onPick={(tpl) => pick({ type: "plan", plan: planFromTemplate(tpl) })}
+                  blank={() => pick({ type: "plan", plan: blankPlan() })}
                 />
               )}
-              {draft.kind === "day" && <p className="setting-note">{t({ de: "Gefeiert wird, wenn alle Aufgaben des Tages ihren Stern haben." })}</p>}
-              <p className="setting-note">{t({ de: "Kleine freuen sich am meisten über Zeit zusammen – und über eine Belohnung, die bald kommt." })}</p>
             </>
           )}
 
-          {draft && id === "look" && (
-            <>
-              <h2>{t({ de: "Für wen ist die Tafel?" })}</h2>
-              <label className="rw-input">
-                <span>{t({ de: "Name des Kindes (steht in der Überschrift, bleibt auf diesem Gerät)" })}</span>
-                <input
-                  type="text"
-                  value={draft.childName}
-                  maxLength={24}
-                  placeholder={t({ de: "z. B. Lena" })}
-                  onChange={(e) => change({ childName: e.target.value })}
-                />
-              </label>
-              <div className="rw-chips" role="group" aria-label={t({ de: "Was kommt ins Feld?" })}>
-                {MARKS.map((mark) => (
-                  <button
-                    key={mark.id}
-                    type="button"
-                    className={mark.id === draft.mark ? "selected" : undefined}
-                    aria-pressed={mark.id === draft.mark}
-                    onClick={() => change({ mark: mark.id })}
-                  >
-                    {mark.emoji} {t(mark.label)}
-                  </button>
-                ))}
-              </div>
-              <div className="rw-chips" role="group" aria-label={t({ de: "Farben" })}>
-                {THEMES.map((theme) => (
-                  <button
-                    key={theme.id}
-                    type="button"
-                    className={theme.id === draft.theme ? "selected" : undefined}
-                    aria-pressed={theme.id === draft.theme}
-                    onClick={() => change({ theme: theme.id })}
-                  >
-                    {t(theme.label)}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+          {draft?.type === "board" && step > 1 && <BoardStep step={id} board={draft.board} onChange={(board) => setDraft({ type: "board", board })} />}
+          {draft?.type === "plan" && step > 1 && <PlanStepView step={id} plan={draft.plan} onChange={(plan) => setDraft({ type: "plan", plan })} />}
         </div>
 
-        {draft && id !== "start" && (
-          <div className="rw-wizard-preview">
-            <Thumb board={draft} />
-          </div>
+        {draft && step > 1 && (
+          <div className="rw-wizard-preview">{draft.type === "board" ? <Thumb board={draft.board} /> : <PlanThumb plan={draft.plan} />}</div>
         )}
       </div>
 
@@ -271,14 +176,14 @@ export function Wizard({ start, onDone, onCancel }: { start?: Template; onDone: 
         <button type="button" className="rw-wizard-back" disabled={step === 0} onClick={() => setStep(step - 1)}>
           ‹ {t({ de: "Zurück" })}
         </button>
-        {draft && step < STEPS.length - 1 && step > 0 && (
-          <button type="button" className="rw-wizard-next" onClick={() => setStep(step + 1)}>
+        {(step === 0 || (draft && step > 1 && step < steps.length - 1)) && (
+          <button type="button" className="rw-wizard-next" onClick={() => (step === 0 ? pickType(type) : setStep(step + 1))}>
             {t({ de: "Weiter" })} ›
           </button>
         )}
-        {draft && step > 0 && (
-          <button type="button" className="rw-wizard-done" disabled={draft.tasks.length === 0 && draft.kind !== "collect"} onClick={() => onDone(draft)}>
-            ✓ {step === STEPS.length - 1 ? t({ de: "Tafel anlegen" }) : t({ de: "So nehmen" })}
+        {draft && step > 1 && (
+          <button type="button" className="rw-wizard-done" disabled={!ready} onClick={() => onDone(draft)}>
+            ✓ {step === steps.length - 1 ? (type === "board" ? t({ de: "Tafel anlegen" }) : t({ de: "Plan anlegen" })) : t({ de: "So nehmen" })}
           </button>
         )}
       </footer>

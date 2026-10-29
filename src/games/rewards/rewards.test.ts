@@ -24,7 +24,8 @@ import {
   withKind,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
-import { KINDS, MARKS, REWARDS, TASK_BY_ID, TASKS, TEMPLATES, THEMES, MARK_BY_ID, REWARD_BY_ID, THEME_BY_ID } from "./catalog";
+import { CHART_TYPES, KINDS, MARKS, PLAN_TEMPLATES, REWARDS, TASK_BY_ID, TASKS, TEMPLATES, THEMES, MARK_BY_ID, REWARD_BY_ID, THEME_BY_ID } from "./catalog";
+import { CATEGORIES } from "@/content/games";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { DEFAULT_REWARDS_SETTINGS } from "./settings";
 
@@ -285,5 +286,19 @@ describe("looking back", () => {
       [2, 1],
     ]);
     expect(reviewPeriods({ ...week, kind: "collect" }, { count: 4 }, NO_LINKED, wednesday)).toEqual([]);
+  });
+});
+
+describe("one page for boards and plans", () => {
+  test("the wizard's first step offers both kinds, each with Vorlagen to start from", () => {
+    expect(CHART_TYPES.map((kind) => kind.id).sort()).toEqual(["board", "plan"]);
+    expect(TEMPLATES.length).toBeGreaterThan(0);
+    expect(PLAN_TEMPLATES.length).toBeGreaterThan(0);
+  });
+
+  test("the home menu has one card for both, and /tagesplan/ is another address of it", () => {
+    const games = CATEGORIES.flatMap((category) => category.games);
+    expect(games.find((game) => game.href === "/belohnungstafel/")?.also).toEqual(["/tagesplan/"]);
+    expect(games.some((game) => game.href === "/tagesplan/")).toBe(false);
   });
 });

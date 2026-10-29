@@ -13,7 +13,7 @@ describe("home menu", () => {
   const routes = new Set([...app.matchAll(/path="([^"]+)"/g)].map((match) => `/${match[1]}/`));
   const games = CATEGORIES.flatMap((category) => category.games);
 
-  test.each(games.map((game) => [game.href, game] as const))("%s has a route in App.tsx", (href) => {
+  test.each(games.flatMap((game) => [game.href, ...(game.also ?? [])]).map((href) => [href] as const))("%s has a route in App.tsx", (href) => {
     expect(routes).toContain(href);
   });
 
@@ -62,7 +62,7 @@ describe("search engine texts (seo.ts)", () => {
     const wanted = [
       "/",
       ...CATEGORIES.filter(hasPage).map((category) => `/spiele/${category.id}/`),
-      ...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)),
+      ...CATEGORIES.flatMap((category) => category.games.flatMap((game) => [game.href, ...(game.also ?? [])])),
       ...SCENES.map((scene) => `/bilder/${scene.id}/`),
     ];
     expect([...paths].sort()).toEqual([...new Set(wanted)].sort());
@@ -89,7 +89,7 @@ describe("search engine texts (seo.ts)", () => {
 
 describe("research on the management page", () => {
   const ideaIds = new Set(IDEA_AREAS.flatMap((area) => area.ideas.map((idea) => idea.id)));
-  const hrefs = new Set(CATEGORIES.flatMap((category) => category.games.map((game) => game.href)));
+  const hrefs = new Set(CATEGORIES.flatMap((category) => category.games.flatMap((game) => [game.href, ...(game.also ?? [])])));
 
   test.each(RESEARCH.map((r) => [r.id, r] as const))("%s names existing ideas and games", (_, research) => {
     for (const id of [...research.ideas, ...research.topics.flatMap((topic) => topic.ideas)]) expect(ideaIds, id).toContain(id);

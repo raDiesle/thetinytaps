@@ -498,8 +498,7 @@
 .rw-steps button,
 .rw-wizard-close,
 .rw-wizard-foot button,
-.rw-kind-cards button,
-.rw-wizard-task button {
+.rw-wizard-card-buttons button {
   border: 3px solid var(--ink);
   border-radius: 999px;
   background: #fff;
@@ -570,44 +569,6 @@
   top: 12px;
 }
 
-.rw-kind-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-}
-
-.rw-kind-cards button {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 10px;
-  border-radius: 18px;
-  text-align: center;
-}
-
-.rw-kind-cards button.selected {
-  background: var(--sunshine);
-  box-shadow: 0 4px 0 var(--ink);
-}
-
-.rw-kind-emoji {
-  font-family: var(--font-emoji);
-  font-size: 2rem;
-  line-height: 1.1;
-}
-
-.rw-kind-label {
-  font-size: 1.15rem;
-  font-weight: 800;
-}
-
-.rw-kind-hint {
-  font-size: 0.82rem;
-  font-weight: 500;
-  line-height: 1.25;
-}
-
 .rw-wizard-tasks {
   display: flex;
   flex-direction: column;
@@ -633,10 +594,176 @@
   font-weight: 800;
 }
 
-.rw-wizard-task button {
-  width: 36px;
-  height: 36px;
-  margin-left: auto;
+/* ---------- The wizard's choices: what each one makes, as a picture ---------- */
+
+.rw-wizard-sub {
+  margin: 4px 0 0;
+  font-size: 1.05rem;
+}
+
+.rw-picks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 170px), 1fr));
+  gap: 10px;
+}
+
+/* The first step: the two kinds, big. */
+.rw-picks-type {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  width: 100%;
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+/* Picture cards (tasks, rewards, cards of a day): small tiles with a big emoji. */
+.rw-picks-tiles {
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+/* The colours: the board or plan in each, small. */
+.rw-picks-small {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.rw-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px 6px;
+  border: 3px solid var(--ink);
+  border-radius: 18px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.rw-pick-picture {
+  align-items: stretch;
+  padding: 6px 6px 8px;
+  text-align: left;
+}
+
+.rw-pick:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--sunshine) 30%, #fff);
+}
+
+.rw-pick.selected {
+  background: var(--sunshine);
+  box-shadow: 0 4px 0 var(--ink);
+}
+
+.rw-pick:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rw-pick-emoji {
+  font-family: var(--font-emoji);
+  font-size: 2.2rem;
+  line-height: 1.15;
+}
+
+.rw-pick-label {
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.rw-picks-type .rw-pick-label {
+  font-size: 1.25rem;
+}
+
+.rw-pick-hint {
+  font-size: 0.82rem;
+  line-height: 1.25;
+  opacity: 0.85;
+}
+
+/* A plan's cards in their order, as in the plan: a row of big cards with ‹ ✕ › under each. */
+.rw-wizard-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rw-wizard-row li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 96px;
+}
+
+.rw-wizard-card {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 6px 4px;
+  border: 3px solid var(--sunshine);
+  border-radius: 16px;
+  background: #fff;
+  text-align: center;
+}
+
+.rw-wizard-card-number {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  display: grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  background: var(--sunshine);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.rw-wizard-card-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.rw-wizard-card-buttons {
+  display: flex;
+  gap: 2px;
+}
+
+.rw-wizard-card-buttons button {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-width: 2px;
+  font-size: 0.85rem;
+}
+
+.rw-wizard-card-buttons button:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.rw-wizard-empty {
+  margin: 0;
+  padding: 14px;
+  border: 3px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 16px;
+  text-align: center;
 }
 
 /* Stays in sight while a long step scrolls, so „Weiter“ and „So nehmen“ are always one tap away. */
@@ -687,6 +814,28 @@
 
   .rw-wizard-foot button {
     min-height: 40px;
+  }
+
+  .rw-picks-tiles {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 6px;
+  }
+
+  .rw-pick {
+    padding: 6px 4px;
+    border-radius: 14px;
+  }
+
+  .rw-pick-emoji {
+    font-size: 1.8rem;
+  }
+
+  .rw-pick-label {
+    font-size: 0.82rem;
+  }
+
+  .rw-wizard-row li {
+    width: 76px;
   }
 }
 

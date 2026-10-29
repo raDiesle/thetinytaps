@@ -3,146 +3,264 @@ import { useLocation } from "react-router";
 import { MenuHead } from "@/components/MenuTop";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useGameSettings } from "@/lib/common";
-import { type Localized, useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { takeFinishedStep } from "@/lib/routine";
 import { useStoredSettings } from "@/lib/storage";
-import { type Board, OLDEST_BACK, samePeriod, shiftPeriod, startOver, type StarLog, withKind } from "./board";
+import { addStar, type Board, OLDEST_BACK, samePeriod, shiftPeriod, type StarLog, startOver, withKind } from "./board";
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
-import { type BoardKind, KINDS, MARK_BY_ID, type Template, TEMPLATES } from "./catalog";
+import {
+  type BoardKind,
+  type ChartType,
+  KINDS,
+  MARK_BY_ID,
+  PLAN_TEMPLATES,
+  PLAN_VIEWS,
+  type PlanTemplate,
+  type PlanView,
+  type Template,
+  TEMPLATES,
+} from "./catalog";
 import { Editor } from "./Editor";
 import { TemplateGallery } from "./Gallery";
+import { BoardInfo, PlanInfo } from "./Info";
 import { loadLinkedDays } from "./linked";
-import { PrintPanel } from "./PrintPanel";
-import { DEFAULT_REWARDS_SETTINGS, NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY } from "./settings";
 import { PanelButton, useComputer } from "./pageParts";
+import { type Plan, parseRoutineStep, restartDay } from "./plan";
+import { PlanEditor } from "./PlanEditor";
+import { PlanGallery } from "./PlanGallery";
+import { PlanPrint } from "./PlanPrint";
+import { PlanScreen } from "./PlanScreen";
+import { usePlanTitle } from "./PlanSheet";
+import { DEFAULT_PLANNER_SETTINGS, PLANNER_SETTINGS_KEY } from "./planSettings";
+import { PrintPanel } from "./PrintPanel";
 import { Review, usePeriodLabel } from "./Review";
-import { Wizard } from "./Wizard";
+import { CHARTS_KEY, type ChartsSettings, DEFAULT_REWARDS_SETTINGS, firstVisit, NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, saved } from "./settings";
+import { type Draft, Wizard, type WizardStart } from "./Wizard";
 import "./rewards.css";
+import "./planner.css";
 
 /** The page's name, in the menu head and the browser tab. */
-export const REWARDS_TITLE: Localized = { de: "Belohnungstafel" };
+export const REWARDS_TITLE: Localized = { de: "Sterne & Tagesplan" };
 
 type Panel = "info" | "edit" | "print" | "review";
 
-/** The main views: the same stars for a day, a week or a month. Collecting stands apart in the switch. */
+/** The main views of a board: the same stars for a day, a week or a month. Collecting stands apart in the switch. */
 const MAIN_KINDS = KINDS.filter((k) => k.id !== "collect");
 const COLLECT_KIND = KINDS.find((k) => k.id === "collect");
 
+/** How far a plan's day view goes back and ahead: a week either way. */
+const DAYS_BACK = 7;
+const DAYS_AHEAD = 6;
+
+/** The wizard: closed, open on its first step, or on a template picked in the gallery. */
+type WizardState = null | { start?: WizardStart };
+
 /**
- * The Belohnungstafel: the current board as big as the screen allows. Above it, from the first visit on, the
- * switch of views – Tag, Woche, Monat (the same stars) and Sammeln – with arrows back to earlier days, weeks or
- * months, and the row of boards with „＋ Neue Tafel“ (a wizard). Beside the board on wide screens the gallery of
- * Vorlagen, each a small picture with example stars; on smaller ones „🧩 Vorlagen“ opens the wizard on them. A new
- * board shows example stars until its first real one. On a computer „Gestalten“ and „Drucken“ lie open below the
- * board (scroll down); on phones and tablets they open from the buttons on top. Not a game: no GameShell, no play
- * time counted, so a star after the evening brushing still comes when play time is over. „📜 Rückblick“ shows the last
- * weeks (months) in place of the board, to look at together.
+ * The Belohnungstafel and the Tagesplan on one page: the grown-up's boards (stars to collect) and plans (the day in
+ * pictures) side by side in one row on top, the one chosen as big as the screen allows. „＋ Neu“ opens the wizard,
+ * which asks step by step – kind, Vorlage, view, tasks or cards, reward, look – and shows every choice as a picture
+ * of what it makes; a first visit starts there. Above the chart its switch of views (a board's Tag, Woche, Monat and
+ * Sammeln, a plan's Tag and Woche) with arrows to earlier days; beside it on wide screens the Vorlagen of its kind. On
+ * a computer „Gestalten“ and „Drucken“ lie open below (scroll down); on phones and tablets they open from the buttons
+ * on top. Not a game: no GameShell, no play time counted, so the evening routine and its star still work when play
+ * time is over. `/tagesplan/` opens the same page on a plan.
  */
-export function RewardsGame() {
+export function RewardsGame({ type: routeType = "board" }: { type?: ChartType }) {
   const t = useT();
   const location = useLocation();
   const category = categoryOf(location.pathname);
   const computer = useComputer();
-  const [settings, update] = useGameSettings(REWARDS_SETTINGS_KEY, DEFAULT_REWARDS_SETTINGS);
+  const [boards, updateBoards] = useGameSettings(REWARDS_SETTINGS_KEY, DEFAULT_REWARDS_SETTINGS);
+  const [plans, updatePlans] = useGameSettings(PLANNER_SETTINGS_KEY, DEFAULT_PLANNER_SETTINGS);
+  const [page, updatePage] = useStoredSettings<ChartsSettings>(CHARTS_KEY, {});
   const [stored, setStored] = useStoredSettings(REWARDS_STARS_KEY, { log: NO_STARS });
   const [linked] = useState(loadLinkedDays);
   const [panel, setPanel] = useState<Panel | null>(null);
-  /** The wizard, open on its first step (`true`) or on a template picked in the gallery. */
-  const [wizard, setWizard] = useState<Template | true | null>(null);
-  /** Weeks (days, months) back from the current one; 0 is now. */
+  // A first visit starts with the wizard: it shows both kinds and every Vorlage as pictures.
+  const [wizard, setWizard] = useState<WizardState>(() => (firstVisit() ? {} : null));
+  /** Weeks (days, months) back from the current one on a board, days from today on a plan; 0 is now. */
   const [back, setBack] = useState(0);
-  const title = useBoardTitle();
-  // A tab says which board it is: its own heading or the child's name, else the template's name („Zähne-Woche“).
-  const tabLabel = (b: Board) => {
-    const template = TEMPLATES.find((tpl) => tpl.id === b.template);
-    return b.title.trim() || b.childName.trim() || !template ? title(b) : t(template.label);
-  };
-  const board = settings.boards.find((b) => b.id === settings.current) ?? settings.boards[0];
+  const boardTitle = useBoardTitle();
+  const planTitle = usePlanTitle();
+
+  // `/tagesplan/` always opens on a plan; the home card's address on what was shown last.
+  const [type, setType] = useState<ChartType>(() => (routeType === "plan" ? "plan" : (page.shown ?? routeType)));
+  const board = boards.boards.find((b) => b.id === boards.current) ?? boards.boards[0];
+  const plan = plans.plans.find((p) => p.id === plans.current) ?? plans.plans[0];
   const log = stored.log;
   const setLog = (next: StarLog) => setStored({ log: next });
   const today = new Date();
-  const day = back === 0 ? today : shiftPeriod(board.kind, today, -back);
+  const boardDay = back === 0 ? today : shiftPeriod(board.kind, today, -back);
+  const planDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (plan.view === "day" ? -back : 0), 12);
 
-  // Another board or view starts at today again.
-  useEffect(() => setBack(0), [board.id, board.kind]);
+  // Back from a game a plan's card opened (the brushing): that card gets its tick, whatever time of day the game counted.
+  useEffect(() => {
+    const finished = takeFinishedStep(location.pathname);
+    if (!finished) return;
+    const { planId, key } = parseRoutineStep(finished);
+    if (!log[planId]?.[key]) setLog(addStar(log, planId, key, new Date()));
+  }, []);
 
-  const changeBoard = (patch: Partial<Board>) => update({ boards: settings.boards.map((b) => (b.id === board.id ? { ...b, ...patch } : b)) });
+  // Another board, plan or view starts at today again.
+  const shownId = type === "board" ? `${board.id}|${board.kind}` : `${plan.id}|${plan.view}`;
+  useEffect(() => setBack(0), [shownId]);
+
+  // A tab says which board or plan it is: its own heading or the child's name, else the template's name.
+  const boardTab = (b: Board) => {
+    const template = TEMPLATES.find((tpl) => tpl.id === b.template);
+    return b.title.trim() || b.childName.trim() || !template ? boardTitle(b) : t(template.label);
+  };
+  const planTab = (p: Plan) => {
+    const template = PLAN_TEMPLATES.find((tpl) => tpl.id === p.template);
+    return p.childName.trim() || !template ? planTitle(p) : t(template.label);
+  };
+
+  const changeBoard = (patch: Partial<Board>) => updateBoards({ boards: boards.boards.map((b) => (b.id === board.id ? { ...b, ...patch } : b)) });
+  const changePlan = (next: Plan) => updatePlans({ plans: plans.plans.map((p) => (p.id === plan.id ? next : p)) });
   const setKind = (kind: BoardKind) => {
     const template = TEMPLATES.find((tpl) => tpl.id === board.template);
     changeBoard(withKind(board, kind, template?.title?.de));
   };
-  // On a computer the panels are always open below the board: the buttons on top only scroll there.
+  const setView = (view: PlanView) => changePlan({ ...plan, view });
+  const show = (shown: ChartType) => {
+    setWizard(null);
+    setType(shown);
+    updatePage({ shown });
+  };
+  const showBoard = (id: string) => {
+    updateBoards({ current: id });
+    show("board");
+  };
+  const showPlan = (id: string) => {
+    updatePlans({ current: id });
+    show("plan");
+  };
+  // The first board and plan are there before anything is saved; never used, they are no tabs of their own (a
+  // grown-up who makes a plan sees no Zähne-Woche they never chose) and the first one made takes their place.
+  const untouched = (shown: ChartType) =>
+    !saved(shown === "board" ? REWARDS_SETTINGS_KEY : PLANNER_SETTINGS_KEY) &&
+    !Object.keys(log[shown === "board" ? boards.boards[0].id : plans.plans[0].id] ?? {}).length;
+  // On a computer the panels are always open below the chart: the buttons on top only scroll there.
   const toggle = (which: Panel) => {
     setWizard(null);
     if (computer && which !== "info" && which !== "review") document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
     else setPanel(panel === which ? null : which);
   };
-  /** A template from the gallery: the board made from it before, with its stars, or the wizard on it. */
-  const pickTemplate = (template: Template) => {
-    const made = settings.boards.find((b) => b.template === template.id);
-    if (made) {
-      setWizard(null);
-      update({ current: made.id });
-    } else {
-      setPanel(null);
-      setWizard(template);
-    }
-  };
-  const addBoard = (fresh: Board) => {
-    update({ boards: [...settings.boards, fresh], current: fresh.id });
-    setWizard(null);
-  };
-  const openWizard = () => {
+  const openWizard = (start?: WizardStart) => {
     setPanel(null);
-    setWizard(true);
+    setWizard({ start });
+  };
+  // Closing the wizard saves the page's choice, so a first visit that looked and left starts on the chart next time.
+  const closeWizard = () => show(type);
+  /** A template from the gallery: the board or plan made from it before, with its stars, or the wizard on it. */
+  const pickTemplate = (template: Template) => {
+    const made = boards.boards.find((b) => b.template === template.id);
+    if (made) showBoard(made.id);
+    else openWizard({ type: "board", template });
+  };
+  const pickPlanTemplate = (template: PlanTemplate) => {
+    const made = plans.plans.find((p) => p.template === template.id);
+    if (made) showPlan(made.id);
+    else openWizard({ type: "plan", template });
+  };
+  const add = (draft: Draft) => {
+    const replace = untouched(draft.type);
+    if (draft.type === "board") updateBoards({ boards: [...(replace ? [] : boards.boards), draft.board], current: draft.board.id });
+    else updatePlans({ plans: [...(replace ? [] : plans.plans), draft.plan], current: draft.plan.id });
+    show(draft.type);
   };
   const removeBoard = () => {
-    const boards = settings.boards.filter((b) => b.id !== board.id);
+    const rest = boards.boards.filter((b) => b.id !== board.id);
     setLog(Object.fromEntries(Object.entries(log).filter(([id]) => id !== board.id)));
-    update({ boards, current: boards[0].id });
+    updateBoards({ boards: rest, current: rest[0].id });
+    setPanel(null);
+  };
+  const removePlan = () => {
+    const rest = plans.plans.filter((p) => p.id !== plan.id);
+    setLog(Object.fromEntries(Object.entries(log).filter(([id]) => id !== plan.id)));
+    updatePlans({ plans: rest, current: rest[0].id });
     setPanel(null);
   };
 
-  const editor = (
-    <Editor
-      board={board}
-      onChange={changeBoard}
-      onStartOver={() => setLog(startOver(log, board, day))}
-      onRemove={settings.boards.length > 1 ? removeBoard : undefined}
-    />
-  );
-  const print = <PrintPanel board={board} options={settings.print} onChange={(patch) => update({ print: { ...settings.print, ...patch } })} />;
-  const screen = (
-    <BoardScreen
-      board={board}
-      log={log}
-      setLog={setLog}
-      linked={linked}
-      day={day}
-      sounds={settings.sounds}
-      speech={settings.speech}
-      onExamplesOff={() => changeBoard({ examples: false })}
-    />
-  );
+  const editor =
+    type === "board" ? (
+      <Editor
+        board={board}
+        onChange={changeBoard}
+        onStartOver={() => setLog(startOver(log, board, boardDay))}
+        onRemove={boards.boards.length > 1 ? removeBoard : undefined}
+      />
+    ) : (
+      <PlanEditor
+        key={plan.id}
+        plan={plan}
+        day={planDay}
+        onChange={changePlan}
+        onRestartToday={() => setLog(restartDay(log, plan.id, today))}
+        onRemove={plans.plans.length > 1 ? removePlan : undefined}
+      />
+    );
+  const print =
+    type === "board" ? (
+      <PrintPanel board={board} options={boards.print} onChange={(patch) => updateBoards({ print: { ...boards.print, ...patch } })} />
+    ) : (
+      <PlanPrint plan={plan} day={planDay} options={plans.print} onChange={(patch) => updatePlans({ print: { ...plans.print, ...patch } })} />
+    );
+  const screen =
+    type === "board" ? (
+      <BoardScreen
+        board={board}
+        log={log}
+        setLog={setLog}
+        linked={linked}
+        day={boardDay}
+        sounds={boards.sounds}
+        speech={boards.speech}
+        onExamplesOff={() => changeBoard({ examples: false })}
+      />
+    ) : (
+      <PlanScreen
+        plan={plan}
+        log={log}
+        setLog={setLog}
+        linked={linked}
+        day={planDay}
+        sounds={plans.sounds}
+        speech={plans.speech}
+        onExamplesOff={() => changePlan({ ...plan, examples: false })}
+      />
+    );
+  const review = type === "board" && board.kind !== "collect";
   const main = wizard ? (
-    <Wizard key={wizard === true ? "new" : wizard.id} start={wizard === true ? undefined : wizard} onDone={addBoard} onCancel={() => setWizard(null)} />
+    <Wizard
+      key={wizard.start ? `${wizard.start.type}-${wizard.start.template.id}` : "new"}
+      type={type}
+      start={wizard.start}
+      onDone={add}
+      onCancel={closeWizard}
+    />
   ) : !computer && panel === "print" ? (
     print
-  ) : panel === "review" && board.kind !== "collect" ? (
-    <Review board={board} log={log} linked={linked} sounds={settings.sounds} onClose={() => setPanel(null)} />
+  ) : panel === "review" && review ? (
+    <Review board={board} log={log} linked={linked} sounds={boards.sounds} onClose={() => setPanel(null)} />
   ) : (
     <div className="rw-main">
       {screen}
       <aside className="rw-side" aria-label={t({ de: "Vorlagen" })}>
         <h2 className="rw-side-title">🧩 {t({ de: "Vorlagen" })}</h2>
-        <TemplateGallery selected={board.template} onPick={pickTemplate} />
+        {type === "board" ? (
+          <TemplateGallery selected={board.template} onPick={pickTemplate} />
+        ) : (
+          <PlanGallery selected={plan.template} onPick={pickPlanTemplate} />
+        )}
       </aside>
     </div>
   );
 
   return (
     <main className={`start-screen rw-page-screen${computer ? " rw-computer" : ""}`}>
-      {/* The first screen: everything down to the board, which fills what is left of it. */}
+      {/* The first screen: everything down to the chart, which fills what is left of it. */}
       <div className="rw-first">
         <MenuHead
           to={category ? categoryHref(category) : "/"}
@@ -153,35 +271,27 @@ export function RewardsGame() {
             </>
           }
         >
-          <div className="panel-buttons">
-            <PanelButton open={panel === "info"} onClick={() => toggle("info")} emoji="ℹ️" label={t({ de: "Über die Tafel" })} />
-            <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t({ de: "Gestalten" })} />
-            <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t({ de: "Drucken" })} />
-            {board.kind !== "collect" && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t({ de: "Rückblick" })} />}
-          </div>
+          {/* While the wizard is open, nothing on top belongs to the chart behind it. */}
+          {!wizard && (
+            <div className="panel-buttons">
+              <PanelButton
+                open={panel === "info"}
+                onClick={() => toggle("info")}
+                emoji="ℹ️"
+                label={type === "board" ? t({ de: "Über die Tafel" }) : t({ de: "Über den Plan" })}
+              />
+              <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t({ de: "Gestalten" })} />
+              <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t({ de: "Drucken" })} />
+              {review && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t({ de: "Rückblick" })} />}
+            </div>
+          )}
         </MenuHead>
 
         <div className="rw-pickers">
-          {/* While the wizard is open its own step chooses the view. */}
-          {!wizard && (
+          {/* While the wizard is open its own steps choose the view. */}
+          {!wizard && type === "board" && (
             <div className="rw-switch">
-              <div className="rw-views" role="group" aria-label={t({ de: "Ansicht" })}>
-                {MAIN_KINDS.map((kind) => (
-                  <button
-                    key={kind.id}
-                    type="button"
-                    className={kind.id === board.kind ? "selected" : undefined}
-                    aria-pressed={kind.id === board.kind}
-                    title={t(kind.hint)}
-                    onClick={() => setKind(kind.id)}
-                  >
-                    <span className="rw-view-emoji" aria-hidden>
-                      {kind.emoji}
-                    </span>{" "}
-                    {t(kind.label)}
-                  </button>
-                ))}
-              </div>
+              <ViewSwitch views={MAIN_KINDS} selected={board.kind} onPick={setKind} />
               {COLLECT_KIND && (
                 <button
                   type="button"
@@ -193,38 +303,58 @@ export function RewardsGame() {
                   <span aria-hidden>{COLLECT_KIND.emoji}</span> {t(COLLECT_KIND.label)}
                 </button>
               )}
-              {board.kind !== "collect" && panel !== "review" && <PeriodNav kind={board.kind} day={day} back={back} setBack={setBack} />}
+              {board.kind !== "collect" && panel !== "review" && <PeriodNav kind={board.kind} day={boardDay} back={back} setBack={setBack} />}
             </div>
           )}
-          <nav className="rw-boards" aria-label={t({ de: "Tafeln" })}>
-            {settings.boards.map((b) => (
-              <button
-                key={b.id}
-                type="button"
-                className={b.id === board.id && !wizard ? "selected" : undefined}
-                aria-pressed={b.id === board.id}
-                onClick={() => {
-                  setWizard(null);
-                  update({ current: b.id });
-                }}
-              >
-                <span aria-hidden>{TEMPLATES.find((tpl) => tpl.id === b.template)?.emoji ?? MARK_BY_ID.get(b.mark)?.emoji}</span> {tabLabel(b)}
-              </button>
-            ))}
-            <button type="button" className="rw-add" aria-pressed={wizard === true} onClick={openWizard}>
-              ＋ {t({ de: "Neue Tafel" })}
+          {!wizard && type === "plan" && (
+            <div className="rw-switch">
+              <ViewSwitch views={PLAN_VIEWS} selected={plan.view} onPick={setView} />
+              {plan.view === "day" && <DayNav day={planDay} shift={-back} setShift={(shift) => setBack(-shift)} />}
+            </div>
+          )}
+          <nav className="rw-boards" aria-label={t({ de: "Tafeln und Pläne" })}>
+            {boards.boards.map(
+              (b) =>
+                (type === "board" || !untouched("board")) && (
+                  <button
+                    key={b.id}
+                    type="button"
+                    className={type === "board" && b.id === board.id && !wizard ? "selected" : undefined}
+                    aria-pressed={type === "board" && b.id === board.id}
+                    onClick={() => showBoard(b.id)}
+                  >
+                    <span aria-hidden>{TEMPLATES.find((tpl) => tpl.id === b.template)?.emoji ?? MARK_BY_ID.get(b.mark)?.emoji}</span> {boardTab(b)}
+                  </button>
+                ),
+            )}
+            {plans.plans.map(
+              (p) =>
+                (type === "plan" || !untouched("plan")) && (
+                  <button
+                    key={p.id}
+                    type="button"
+                    className={type === "plan" && p.id === plan.id && !wizard ? "selected" : undefined}
+                    aria-pressed={type === "plan" && p.id === plan.id}
+                    onClick={() => showPlan(p.id)}
+                  >
+                    <span aria-hidden>{PLAN_TEMPLATES.find((tpl) => tpl.id === p.template)?.emoji ?? "🗓️"}</span> {planTab(p)}
+                  </button>
+                ),
+            )}
+            <button type="button" className="rw-add" aria-pressed={!!wizard && !wizard.start} onClick={() => openWizard()}>
+              ＋ {t({ de: "Neu" })}
             </button>
-            <button type="button" className="rw-templates-button" onClick={openWizard}>
+            <button type="button" className="rw-templates-button" onClick={() => openWizard()}>
               🧩 {t({ de: "Vorlagen" })}
             </button>
           </nav>
         </div>
 
-        {panel === "info" && <Info />}
+        {panel === "info" && (type === "board" ? <BoardInfo /> : <PlanInfo />)}
         {!computer && panel === "edit" && !wizard && editor}
         {main}
       </div>
-      {computer && (
+      {computer && !wizard && (
         <div className="rw-below">
           <section id="rw-edit" className="rw-below-part">
             <h2 className="rw-panel-title">✏️ {t({ de: "Gestalten" })}</h2>
@@ -239,7 +369,39 @@ export function RewardsGame() {
   );
 }
 
-/** ‹ and › around the day, week or month shown: back to earlier ones to add a forgotten star, never into the future. */
+/** The big switch of views above the chart: a board's Tag, Woche, Monat or a plan's Tag, Woche. */
+function ViewSwitch<V extends string>({
+  views,
+  selected,
+  onPick,
+}: {
+  views: { id: V; emoji: string; label: Localized; hint: Localized }[];
+  selected: V;
+  onPick: (view: V) => void;
+}) {
+  const t = useT();
+  return (
+    <div className="rw-views" role="group" aria-label={t({ de: "Ansicht" })}>
+      {views.map((view) => (
+        <button
+          key={view.id}
+          type="button"
+          className={view.id === selected ? "selected" : undefined}
+          aria-pressed={view.id === selected}
+          title={t(view.hint)}
+          onClick={() => onPick(view.id)}
+        >
+          <span className="rw-view-emoji" aria-hidden>
+            {view.emoji}
+          </span>{" "}
+          {t(view.label)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** ‹ and › around the day, week or month of a board: back to earlier ones to add a forgotten star, never into the future. */
 function PeriodNav({ kind, day, back, setBack }: { kind: BoardKind; day: Date; back: number; setBack: (back: number) => void }) {
   const t = useT();
   const label = usePeriodLabel();
@@ -256,31 +418,27 @@ function PeriodNav({ kind, day, back, setBack }: { kind: BoardKind; day: Date; b
   );
 }
 
-/** For grown-ups: how the board works, and what parents' guides advise about rewards for toddlers. */
-function Info() {
+/** ‹ and › around a plan's day: a week back and ahead, to see what tomorrow brings or tick yesterday's. */
+function DayNav({ day, shift, setShift }: { day: Date; shift: number; setShift: (shift: number) => void }) {
   const t = useT();
+  const { speechLang } = useAppLanguage();
+  const label =
+    shift === 0
+      ? t({ de: "Heute" })
+      : shift === 1
+        ? t({ de: "Morgen" })
+        : shift === -1
+          ? t({ de: "Gestern" })
+          : new Intl.DateTimeFormat(speechLang, { weekday: "short", day: "numeric", month: "numeric" }).format(day);
   return (
-    <section className="settings game-info">
-      <p>
-        {t({
-          de: "Eine Tafel, auf der Ihr Kind Sterne sammelt – auf dem Bildschirm und, genau gleich, zum Ausdrucken. Oben wechseln Sie die Ansicht: Tag (die Aufgaben von heute als große Bilder), Woche (Aufgaben × Tage) oder Monat (ein Kalender) – alle drei zeigen dieselben Sterne; mit ‹ geht es zu früheren Tagen, Wochen oder Monaten, um einen vergessenen Stern nachzutragen. Unter „Rückblick“ blättern Sie mit Ihrem Kind durch die letzten Wochen und schauen zusammen, was schon geklappt hat. „Sammeln“ ist ein Weg bis zur Belohnung, ohne Tage. Die Vorlagen zeigen mit Beispiel-Sternen, wie eine Tafel in Benutzung aussieht; „＋ Neue Tafel“ führt Schritt für Schritt zu einer eigenen, z. B. eine pro Kind. Unter „Gestalten“ ändern Sie später alles.",
-        })}
-      </p>
-      <p>
-        {t({
-          de: "So kommt ein Stern auf die Tafel: Sie halten ein Feld gedrückt, bis sein Ring voll ist – dann erscheint ein großer Stern, und Ihr Kind tippt ihn an. Er fliegt in sein Feld. Ein kurzes Tippen allein gibt keinen Stern, das Feld wackelt nur. Eine Aufgabe kann morgens ☀️, mittags 🌤️ und abends 🌙 je ein eigenes Feld haben – Zähne putzen hat morgens und abends eins. Sterne aus „Zähne putzen“ (zur richtigen Tageszeit) und „Aufs Töpfchen“ kommen von selbst, wenn die Aufgabe aus dem Katalog stammt. Haben Sie das falsche Feld erwischt, gibt es kurz danach „Stern zurück“.",
-        })}
-      </p>
-      <p>
-        {t({
-          de: "Was Ratgeber für Zwei- und Dreijährige empfehlen: eine bis drei Aufgaben, eine davon leicht; der Stern sofort danach; die Belohnung bald (lieber 5 Sterne als eine ganze Woche) und am liebsten Zeit zusammen statt Süßigkeiten. Sterne werden nie weggenommen und es gibt keine Strafe – ein leeres Feld ist einfach noch frei. Klappt etwas von allein, feiern Sie den Abschluss und lassen die Tafel ausklingen. Beim Töpfchen und beim Schlafen gilt besonders: mitfreuen, nie drängen.",
-        })}
-      </p>
-      <p>
-        {t({
-          de: "Alles bleibt auf diesem Gerät, ohne Anmeldung. Unter „Drucken“: A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und einem Bogen Sterne zum Ausschneiden.",
-        })}
-      </p>
-    </section>
+    <span className="rw-period">
+      <button type="button" aria-label={t({ de: "Früher" })} disabled={shift <= -DAYS_BACK} onClick={() => setShift(shift - 1)}>
+        ‹
+      </button>
+      <span className={`rw-period-label${shift === 0 ? "" : " past"}`}>{label}</span>
+      <button type="button" aria-label={t({ de: "Später" })} disabled={shift >= DAYS_AHEAD} onClick={() => setShift(shift + 1)}>
+        ›
+      </button>
+    </span>
   );
 }

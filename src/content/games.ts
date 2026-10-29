@@ -2,6 +2,8 @@ import type { Localized } from "@/lib/language";
 
 export interface Game {
   href: string;
+  /** More addresses of the same page, each with its own search entry: `/tagesplan/` opens the Belohnungstafel's page on a plan. */
+  also?: string[];
   emoji: string;
   /** The game's name in every language of the app (see lib/language.ts). */
   title: Localized;
@@ -180,8 +182,7 @@ export const CATEGORIES: Category[] = [
         emoji: "🚽",
         title: { de: "Aufs Töpfchen", ru: "На горшок", en: "Potty Time", zh: "坐便盆", hi: "पॉटी पर चलो", es: "Al orinal", ar: "إلى النونية" },
       },
-      { href: "/belohnungstafel/", emoji: "🌟", title: { de: "Belohnungstafel" } },
-      { href: "/tagesplan/", emoji: "🗓️", title: { de: "Tagesplan" } },
+      { href: "/belohnungstafel/", also: ["/tagesplan/"], emoji: "🌟", title: { de: "Sterne & Tagesplan" } },
       {
         href: "/laut-leise/",
         emoji: "🦁",
@@ -200,5 +201,5 @@ export const categoryHref = (category: Category) => (hasPage(category) ? `/spiel
 /** The category page a game page belongs to, for its back link; none for the only game of a category (back to home then). */
 export function categoryOf(pathname: string) {
   const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
-  return CATEGORIES.find((c) => hasPage(c) && c.games.some((g) => path.startsWith(g.href)));
+  return CATEGORIES.find((c) => hasPage(c) && c.games.some((g) => [g.href, ...(g.also ?? [])].some((href) => path.startsWith(href))));
 }

@@ -138,14 +138,14 @@ export const SEO_PAGES: PageSeo[] = [
     title: "Belohnungstafel für Kinder – gestalten und drucken",
     description:
       "Belohnungstafel für Kleinkinder selbst gestalten: Tag, Woche, Monat oder Sterne sammeln, mit Bildern, Name und Belohnung. Am Tablet nutzen oder A4 ausdrucken.",
-    text: "Eine Belohnungstafel für Kinder ab 2, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Keine Strafen, nichts wird weggenommen.",
+    text: "Eine Belohnungstafel für Kinder ab 2, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Ein Assistent führt Schritt für Schritt zur eigenen Tafel und zeigt jede Wahl als Bild. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Keine Strafen, nichts wird weggenommen. Auf derselben Seite: ein Tagesplan in Bildern.",
   },
   {
     path: "/tagesplan/",
     title: "Tagesplan für Kinder – Tag und Woche in Bildern",
     description:
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Mit Bildkarten zum Ausdrucken.",
-    text: "Ein Tagesplan in Bildern (Strukturtafel) für Kinder ab 2: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Alles frei einstellbar, und zum Ausdrucken als A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel.",
+    text: "Ein Tagesplan in Bildern (Strukturtafel) für Kinder ab 2: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
   },
   {
     path: "/laut-leise/",

@@ -8,6 +8,15 @@ import type { Localized } from "@/lib/language";
 /** A game whose own end puts a star on the board by itself. */
 export type LinkedGame = "teeth" | "potty";
 
+/** What a grown-up makes on the page: a reward chart (stars) or a picture schedule (the steps of a day). */
+export type ChartType = "board" | "plan";
+
+/** The two kinds of chart, the first choice of the wizard, each with one line for grown-ups. */
+export const CHART_TYPES: { id: ChartType; emoji: string; label: Localized; hint: Localized }[] = [
+  { id: "board", emoji: "🌟", label: { de: "Belohnungstafel" }, hint: { de: "Sterne sammeln für das, was klappen soll – bis zur Belohnung" } },
+  { id: "plan", emoji: "🗓️", label: { de: "Tagesplan" }, hint: { de: "Bilder zeigen, was jetzt kommt und was danach – das Kind hakt selbst ab" } },
+];
+
 /** A time of day a task can have its own field for: brushing teeth in the morning and in the evening. */
 export type Slot = "morning" | "noon" | "evening";
 

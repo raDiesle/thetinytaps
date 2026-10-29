@@ -160,13 +160,24 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/belohnungstafel/",
-    languages: { de: "done" },
-    note: "Neu im Oktober 2026, nur auf Deutsch: Tafel, Gestalten, Drucken und der Katalog (catalog.ts). Für eine Sprache: die Labels im Katalog und die t()-Texte; Wochentage und Überschriften (possessive) brauchen je Sprache eine eigene Form.",
-  },
-  {
-    href: "/tagesplan/",
-    languages: { de: "done" },
-    note: "Neu im Oktober 2026, nur auf Deutsch: Plan, Gestalten, Drucken und die Tagesschritte im Katalog (ACTIVITIES in src/games/rewards/catalog.ts).",
+    note: "Belohnungstafel und Tagesplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite.",
+    parts: [
+      {
+        label: "🌟 Belohnungstafel",
+        languages: { de: "done" },
+        note: "Neu im Oktober 2026, nur auf Deutsch: Tafel, Gestalten, Drucken und der Katalog (catalog.ts). Für eine Sprache: die Labels im Katalog und die t()-Texte; Wochentage und Überschriften (possessive) brauchen je Sprache eine eigene Form.",
+      },
+      {
+        label: "🗓️ Tagesplan",
+        languages: { de: "done" },
+        note: "Neu im Oktober 2026, nur auf Deutsch: Plan, Gestalten, Drucken und die Tagesschritte im Katalog (ACTIVITIES in src/games/rewards/catalog.ts).",
+      },
+      {
+        label: "🧭 Assistent „＋ Neu“",
+        languages: { de: "done" },
+        note: "Nur auf Deutsch: Wizard.tsx, WizardBoard.tsx, WizardPlan.tsx und CHART_TYPES im Katalog.",
+      },
+    ],
   },
   {
     href: "/laut-leise/",

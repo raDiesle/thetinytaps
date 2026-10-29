@@ -1,7 +1,35 @@
-# Belohnungstafel
+# Sterne & Tagesplan: Belohnungstafel and Tagesplan on one page
 
-Route `/belohnungstafel/` · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
-„belohnungstafel“ in `src/content/research.ts`. The folder also holds the **Tagesplan** (`/tagesplan/`, below).
+Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan: `also` in `games.ts`, so it keeps its
+own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
+„belohnungstafel“ in `src/content/research.ts`. One home card, „🌟 Sterne & Tagesplan“: the **Belohnungstafel**
+(boards of stars, first part below) and the **Tagesplan** (plans of picture cards, second part) share one page, one
+row of tabs and one wizard.
+
+## One page, one wizard
+
+`RewardsGame.tsx` is the page for both. On top the grown-up's boards and plans side by side in one row (boards first),
+„＋ Neu“ and, where the gallery has no room, „🧩 Vorlagen“; above that row the switch of views of the one shown (a
+board's Tag/Woche/Monat/Sammeln, a plan's Tag/Woche) with ‹ ›; beside it the Vorlagen of its kind; „Gestalten“,
+„Drucken“ (and a board's „Rückblick“) work on the one shown. The page remembers whether a board or a plan was shown
+(`CHARTS_KEY`, `tinytaps.tafeln.v1`); `/tagesplan/` always opens on a plan, so the teeth card's return and a search
+visitor land there.
+
+„＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart: 1 Art (two big pictures: a board with example stars, a
+plan with example ticks), 2 Vorlage (that kind's gallery, „Leer anfangen“ last), then the kind's own steps –
+`WizardBoard.tsx`: Ansicht, Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Ansicht (and which days), Bilder,
+Aussehen. Every choice is a `Pick` (`pageParts.tsx`): a small picture of the board or plan as that choice would make
+it (views, colours) or a big picture card (tasks, cards, rewards, marks) – never a plain list of words. The whole
+board or plan stands beside each step; „✓ So nehmen“ makes it from any step after the Vorlage. A Vorlage from the
+gallery beside the chart opens the wizard on step 3 (or shows the board or plan made from it before). While the wizard
+is open nothing on top or below belongs to the chart behind it.
+
+A first visit (nothing saved under any of the keys, `firstVisit`) opens with the wizard. The first board and plan
+(`erste`, `erster-plan`) exist before anything is saved; never used (`untouched`: their store never saved, no stars),
+they are no tabs of their own unless shown, and the first board or plan the wizard makes takes their place – a
+grown-up who makes a plan never sees a Zähne-Woche they didn't choose.
+
+# Belohnungstafel
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
 the same on screen and on paper (A4 from the browser, also offline). It is in the „Weitere“ category, but has no
@@ -34,8 +62,9 @@ targets) – keep it that way.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars;
-  `Wizard.tsx` – „＋ Neue Tafel“ step by step; `Review.tsx` – „📜 Rückblick“ (and `usePeriodLabel`, „Letzte Woche“,
-  shared with the ‹ › on top); `RewardsGame.tsx` – the page (below).
+  `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
+  `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Info.tsx` – „ℹ️ Über die Tafel“ and „Über den
+  Plan“; `RewardsGame.tsx` – the page for boards and plans (above).
 - `bilder/prompts.ts` – every picture the chart may want, as Gemini prompts. No picture is made yet: the user reviews
   them on `/management/` (🎨 Bildvorschläge, `src/components/PicturePromptReview.tsx`) first. Only generate after
   that, with the reviewed text, and then swap the emoji for the pictures.
@@ -46,15 +75,13 @@ From the first visit, above the board: the switch of views – Tag, Woche, Monat
 kept per day, seen for a day, a week or a month), Sammeln smaller beside it (it counts stars, not days) – and ‹ › to
 go back to earlier days, weeks or months (about two months, as long as stars are kept) to add a forgotten star; the
 label turns yellow while it shows the past, and another board or view starts at today again. Below the switch the
-row of the grown-up's boards (a tab says the template's name until the board has a heading or a child's name),
-„＋ Neue Tafel“ and, where the gallery has no room, „🧩 Vorlagen“. On phones both rows share one line that scrolls
-sideways, so the board keeps the screen.
+row of tabs (a board's tab says the template's name until the board has a heading or a child's name). On phones both
+rows share one line that scrolls sideways, so the board keeps the screen.
 
 Beside the board (≥ 1000 × 600 px) the gallery of Vorlagen: every template as a small picture of the board with its
 example stars, its name, view and one line. A template whose board was made before selects that board (with its
-stars); otherwise it opens the wizard on it. The wizard (in place of the board): 1 Vorlage (or „Leer anfangen“),
-2 Ansicht, 3 Aufgaben with their times of day, 4 Belohnung and goal, 5 Name and colours, with the board as it will
-look beside each step; „✓ So nehmen“ makes the board from any step after the first, its footer stays in sight.
+stars); otherwise it opens the wizard on it (above). In the wizard a task gets its times of day, and the footer stays
+in sight.
 
 A new board (from a template, the wizard or the default) shows example stars (`Board.examples`, `exampleStars`): the
 first two days of a week (Monday and Tuesday, the second short of one), the first four days of a month, all but the
@@ -116,10 +143,16 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout.
 - Defaults are the same on every load: no random id in anything `DEFAULT_REWARDS_SETTINGS` holds, since an unsaved
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
-- The views and the ready-made boards are clear from the first visit, never behind a menu: Tag, Woche and Monat are
-  the big switch above the board (parents do ask for months: „belohnungskalender“, „monthly reward chart“), every
-  view has at least one template (`rewards.test.ts` checks), the gallery lies beside the board where there is room
-  and „🧩 Vorlagen“ is in the first row where there is not, and switching a view never loses stars.
+- The views and the ready-made boards are clear from the first visit, never behind a menu: a first visit opens the
+  wizard, whose first steps show both kinds and every Vorlage as pictures; Tag, Woche and Monat are the big switch
+  above the board (parents do ask for months: „belohnungskalender“, „monthly reward chart“), every view has at least
+  one template (`rewards.test.ts` checks), the gallery lies beside the board where there is room and „🧩 Vorlagen“ is
+  in the first row where there is not, and switching a view never loses stars.
+- Making a board or plan is the wizard's job, and the wizard shows what each choice makes: a picture of the result
+  (views, colours) or a big picture card (tasks, cards, rewards, marks), never only words or small chips. A new choice
+  in the wizard is a `Pick`; detail that needs typing (own words, own emoji) stays under „Gestalten“.
+- Boards and plans are one page: never a second page, menu card or wizard for one of them; a new kind of chart joins
+  `CHART_TYPES` and the wizard's first step.
 - A board is never shown empty the first time: templates and new boards show example stars as if in use, but never a
   full board (`rewards.test.ts` checks), pale and named as examples, never saved and never printed.
 - What is done more than once a day gets a field each time, marked with its time of day (Zähne putzen: morning and
@@ -130,11 +163,12 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 
 # Tagesplan
 
-Route `/tagesplan/` · ideas H-03, H-41–H-43 (H-42 done), T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
+Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-43 (H-42 done), T-20 (partial) · research
+„tagesplan“ in `src/content/research.ts`.
 
 A picture schedule („Strukturtafel“): the steps of a day as big cards in order, „Jetzt“ above the one to do now, and a
 week of columns. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
-shares the board's parts (sheet look, themes, `A4`/`Preview`, the gallery's classes, the star log).
+shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the gallery's classes, the star log).
 
 ## Files
 
@@ -147,9 +181,10 @@ shares the board's parts (sheet look, themes, `A4`/`Preview`, the gallery's clas
 - `PlanSheet.tsx` – the sheet for screen and print: day cards (`planLayout` picks rows and columns for the box) and on
   screen the Fertig-Kiste below them (`DoneBox`), Erst–Dann with the arrow while both of its two steps are open, the week's columns with moons for the nights until a day.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
-  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures;
-  `planSettings.ts` – plans, current one, print options (`tinytaps.planner.v1`); `PlannerGame.tsx` – the page;
-  `pageParts.tsx` – `useComputer`, `PanelButton`, shared with `RewardsGame.tsx`; `planner.css` – classes `pl-`.
+  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
+  `WizardPlan.tsx` – a plan's steps in the wizard; `planSettings.ts` – plans, current one, print options
+  (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick`;
+  `planner.css` – classes `pl-`.
 - Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
 
 ## The tick flow

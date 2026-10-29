@@ -1,5 +1,6 @@
 import { type Board, boardFromTemplate, type StarLog } from "./board";
-import { TEMPLATES } from "./catalog";
+import { type ChartType, TEMPLATES } from "./catalog";
+import { PLANNER_SETTINGS_KEY } from "./planSettings";
 import type { PhotoFormat } from "./photo";
 
 /** How the board is printed. */
@@ -44,3 +45,23 @@ export const REWARDS_SETTINGS_KEY = "tinytaps.rewards.v1";
 export const REWARDS_STARS_KEY = "tinytaps.rewards.stars.v1";
 
 export const NO_STARS: StarLog = {};
+
+/** What the page itself remembers: whether a board or a plan was shown last, so it opens there again. */
+export interface ChartsSettings {
+  /** Missing until the grown-up has chosen: then the address decides (`/tagesplan/` a plan). */
+  shown?: ChartType;
+}
+
+export const CHARTS_KEY = "tinytaps.tafeln.v1";
+
+/** Whether something was saved under a key; without storage, as if it was (nothing is hidden or replaced then). */
+export function saved(key: string): boolean {
+  try {
+    return localStorage.getItem(key) !== null;
+  } catch {
+    return true;
+  }
+}
+
+/** Nothing saved yet by the board, the plan or the page: the page opens with the wizard. */
+export const firstVisit = () => ![REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, PLANNER_SETTINGS_KEY, CHARTS_KEY].some(saved);

@@ -21,7 +21,7 @@ const PREVIEWS = new Map(PLAN_TEMPLATES.map((tpl) => [tpl.id, planFromTemplate(t
 
 /**
  * The Vorlagen of the Tagesplan: every ready-made plan as a small picture, its name, view and one line – beside the
- * plan on wide screens, and in place of it for „＋ Neuer Plan“ (with „Leer anfangen“ last).
+ * plan on wide screens, and the second step of the wizard (with „Leer anfangen“ last).
  */
 export function PlanGallery({ selected, onPick, blank }: { selected?: string; onPick: (template: PlanTemplate) => void; blank?: () => void }) {
   const t = useT();
