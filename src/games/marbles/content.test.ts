@@ -3,6 +3,7 @@ import type { Localized } from "@/lib/language";
 import { buildBuilding } from "./building";
 import { buildCircus } from "./circus";
 import { GAME_TITLE, LEVEL_TEXTS } from "./content";
+import { buildFarm } from "./farm";
 import { buildGarden } from "./garden";
 import { buildKitchen } from "./kitchen";
 import { buildLight } from "./light";
@@ -38,7 +39,7 @@ describe("Kettenreaktion texts", () => {
 
   test("every line a machine or the Wasserbahn says has its German, and its translations are complete and in their own script", () => {
     const water = { events: buildWater().stretches.flatMap((s) => s.events) };
-    const machines = { buildMachine, buildKitchen, buildGarden, buildBuilding, buildCircus, buildSpace, buildLight, buildWater: () => water };
+    const machines = { buildMachine, buildKitchen, buildGarden, buildBuilding, buildCircus, buildSpace, buildLight, buildFarm, buildWater: () => water };
     for (const [name, build] of Object.entries(machines)) {
       const lines = build().events.flatMap((e) => (e.say ? [e.say] : []));
       expect({ name, said: lines.length > 0 }).toEqual({ name, said: true });
