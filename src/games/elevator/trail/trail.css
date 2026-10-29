@@ -1128,3 +1128,156 @@
     transform: translate(50px, -40px) rotate(40deg);
   }
 }
+
+/* ---------- A thief that takes the goal away (the hare in „Der Schneemann“) ---------- */
+
+/* It jumps up out of the snow at the goal, pulls it away backwards, then turns round – a flip round the goal's
+   middle, so its mouth goes from the carrot's tip to the thick end – and runs off. */
+.tl-thief {
+  transform-origin: 0 0;
+  animation: tl-thief 0.9s ease-out both;
+}
+
+/* ---------- „Der Schneemann“ ---------- */
+
+/* The shovel digs, the drift sinks down and its snow lands at the sides. */
+.tl-snow-drift {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  transition: transform 1.6s ease-in 0.3s;
+}
+
+.tl-snow-drift.done {
+  transform: scale(1.1, 0.05);
+}
+
+.tl-snow-dig {
+  transform-origin: 0 0;
+  animation:
+    tl-snow-shovel 0.4s ease-in-out 4 alternate,
+    tl-ball-away 2s ease-in both;
+}
+
+@keyframes tl-snow-shovel {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(40deg) translateY(-20px);
+  }
+}
+
+.tl-snow-heaps {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: tl-snow-grow 1.6s ease-out both;
+}
+
+/* With the seed in the bird table, the birds fly up onto it and peck. */
+.tl-snow-bird {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 1.2s cubic-bezier(0.4, 1.4, 0.6, 1) 0.3s;
+}
+
+.tl-snow-bird.b0.done {
+  transform: translate(212px, -90px);
+}
+
+.tl-snow-bird.b1.done {
+  transform: translate(106px, -90px) scaleX(-1);
+}
+
+.tl-snow-bird.done .tl-snow-bird-head {
+  animation: tl-munch 0.25s ease-in-out 1.6s 12 alternate;
+}
+
+.tl-nope .tl-snow-bird-head,
+.tl-nope .tl-snow-hare-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The bucket tips over the ice and goes; the sand lands on the ice grain by grain. */
+.tl-snow-pour {
+  animation: tl-ball-away 1.8s ease-in both;
+}
+
+.tl-snow-sand {
+  animation: tl-snow-strew 0.4s ease-in both;
+}
+
+/* With the cabbage, the hare nibbles. */
+.tl-snow-hare {
+  transition: transform 1.2s ease-in-out;
+}
+
+.tl-snow-hare.done {
+  transform: translate(-20px, 0);
+}
+
+.tl-snow-hare.done .tl-snow-hare-head {
+  animation: tl-munch 0.4s ease-in-out 0.4s 8 alternate;
+}
+
+/* With its nose, the snowman dances: it rocks from side to side, hops and waves its stick arms. */
+.tl-snow-snowman.dance {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: tl-snow-dance 0.5s ease-in-out 10 alternate;
+}
+
+.tl-snow-snowman.dance .tl-snowman-arm {
+  animation: tl-snow-wave 0.25s ease-in-out 20 alternate;
+}
+
+@keyframes tl-thief {
+  0% {
+    transform: translateY(40px) scale(0.3);
+    opacity: 0;
+  }
+  25% {
+    transform: none;
+    opacity: 1;
+  }
+  75% {
+    transform: none;
+  }
+  88%,
+  100% {
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes tl-snow-grow {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+}
+
+@keyframes tl-snow-strew {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+}
+
+@keyframes tl-snow-dance {
+  from {
+    transform: rotate(-7deg);
+  }
+  50% {
+    transform: translateY(-24px);
+  }
+  to {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes tl-snow-wave {
+  to {
+    transform: rotate(-24deg);
+  }
+}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
@@ -264,6 +264,10 @@ interface View {
   fork: { id: string; ways: Next[]; nudge: number } | null;
   /** The friend walking along, once a creature has joined. */
   friend: FriendState | null;
+  /** The goal is going away, with the level's thief round it (the hare). */
+  away: boolean;
+  /** The child sits on this while it slides down (the sled). */
+  riding: ComponentType | null;
   party: boolean;
 }
 
@@ -289,6 +293,8 @@ const startView = (level: TrailLevel): View => {
     bubble: null,
     fork: null,
     friend: null,
+    away: false,
+    riding: null,
     party: false,
   };
 };
@@ -820,9 +826,10 @@ export function TrailPlay({
       kid({ walk: 0, pose: "stand" });
     }
     if (station.slide) {
-      // Down the slide by itself: "Huiii!" A friend, who waited at the bottom, runs along below.
+      // Down the slide by itself: "Huiii!" – on the sled, if there is one. A friend, who waited at the bottom, runs along below.
       sound(playSlide);
-      kid({ pose: "cheer" });
+      if (station.sled) put({ here: station.id, riding: station.sled });
+      kid({ pose: station.sled ? "sit" : "cheer" });
       const { slide } = station;
       const from = [steps[steps.length - 1], ...slide].map(place);
       const slideMs = slide.map(place).reduce((sum, [x, y], i) => sum + Math.hypot(x - from[i][0], y - from[i][1]) * SLIDE_MS, 0);
@@ -835,6 +842,7 @@ export function TrailPlay({
         kid({ x, y, walk: ms });
         await wait(ms);
       }
+      if (station.sled) put((v) => ({ here: null, riding: null, done: [...v.done, station.id] }));
       kid({ walk: 0, pose: "cheer" });
       friendStays();
       sound(playGiggle);
@@ -907,7 +915,9 @@ export function TrailPlay({
     await wait(900);
     cue(level.away.sounds);
     kid({ pose: "shake" });
+    put({ away: true });
     await flyGoal(level.away, null);
+    put({ away: false });
     kid({ pose: "stand" });
     put({ bubble: { picture: theGoal, at: null, nudge: 0 } });
     say(level.away.say);
@@ -921,6 +931,8 @@ export function TrailPlay({
     for (let i = 0; i < 8; i++) later(i * 250, () => spawn());
     const finaleMs = level.finale.ms + (level.finale.via ?? []).reduce((sum, [, ms]) => sum + ms, 0);
     await flyGoal(level.finale, onString ? handOf(viewRef.current.kid) : null);
+    const { into } = level.finale;
+    if (into) put((v) => ({ done: [...v.done, into] }));
     await wait(Math.max(0, END_MS - finaleMs));
     put({ picking: true });
   };
@@ -1047,6 +1059,8 @@ export function TrailPlay({
   const { Scenery, Front, Backdrop } = level;
   const friends = view.friend ? [view.friend.id] : [];
   const Friend = view.friend && FRIENDS[view.friend.id];
+  const Thief = level.away.thief;
+  const Sled = view.riding;
   // While the child picks from the bag at an obstacle, the thing that helps is the right one to tap.
   const stop = view.choosing ? allStations(level).find((s) => s.id === view.here) : undefined;
   const need = stop?.kind === "obstacle" ? stop.need : null;
@@ -1077,7 +1091,12 @@ export function TrailPlay({
         <g className="tl-pan" style={pan(1)}>
           <Scenery done={view.done} here={view.here} nope={view.nope} party={view.party} friends={friends} />
           <line ref={stringEl} className="tl-string" stroke={INK} strokeWidth="3" {...firstString} />
-          <g ref={goalEl} className="tl-goal" transform={firstGoal}>
+          <g ref={goalEl} className="tl-goal" transform={firstGoal} display={level.finale.into && view.done.includes(level.finale.into) ? "none" : undefined}>
+            {view.away && Thief && (
+              <g className="tl-thief">
+                <Thief />
+              </g>
+            )}
             <g className={view.party && onString ? "tl-sway" : undefined}>
               <g ref={spinEl}>{(theGoal.world ?? theGoal.draw)()}</g>
             </g>
@@ -1155,6 +1174,7 @@ export function TrailPlay({
           </g>
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
             {raft && afloat(k.x) && <raft.Raft paddling={k.pose === "paddle"} done={view.done} />}
+            {Sled && <Sled />}
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={view.wear} face={k.face} backpack={view.pack} />
             </g>

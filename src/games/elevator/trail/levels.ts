@@ -30,6 +30,7 @@ import {
   playRustle,
   playSizzle,
   playSnap,
+  playSlide,
   playSneeze,
   playSniff,
   playSplash,
@@ -66,6 +67,7 @@ import { CAT_AT, DOG_MOUTH, DOG_WANTS, FLOOR, KATZE_GROUND, KatzeBackdrop, Katze
 import { LOK_AT, LokBackdrop, LokFront, LokScenery, OVER_GROUND, SIGN_OVER, SIGN_THROUGH, StairsSign, TunnelSign, STAIRS as LOK_STAIRS } from "./lok";
 import { GAP_AT, PAIL_AT, SANDBURG_GROUND, SandburgBackdrop, SandburgFront, SandburgScenery, STEPS as SANDBURG_STEPS } from "./sandburg";
 import { PICKNICK_GROUND, PicknickBackdrop, PicknickFront, PicknickScenery, STONES, TEDDY_AT, TEDDY_PICNIC } from "./picknick";
+import { CARROT_AT, GROUND_Y as SNOW_Y, HareThief, NOSE_AT, SchneemannBackdrop, SchneemannScenery, SLED_RUN, Sled, STAIRS as SNOW_STAIRS } from "./schneemann";
 import type { TrailLevel } from "./types";
 
 // The trail levels. Every sentence is only spoken, and only with "Vorlesen": the child can't read,
@@ -1029,4 +1031,136 @@ const katze: TrailLevel = {
 };
 
 /** All trail levels, in the order of their cards. */
-export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, sandburg, picknick, floss, katze];
+// G-06: the hare snatches the snowman's carrot nose and hops off; the child follows its tracks through the snow, rides
+// the sled down the hill, and at the end the snowman gets its nose back and dances.
+const schneemann: TrailLevel = {
+  id: "schneemann",
+  title: "Der Schneemann",
+  goal: "nose",
+  Scenery: SchneemannScenery,
+  Backdrop: SchneemannBackdrop,
+  ground: [[-3000, SNOW_Y], [3110, SNOW_Y], ...SNOW_STAIRS, ...SLED_RUN, [9000, SNOW_Y]],
+  start: 300,
+  away: {
+    // The hare jumps up at the carrot's tip, pulls it out of the hands, turns round and hops away with it.
+    via: [
+      [[600, 650], 700],
+      [[760, 702], 300],
+      [[900, 610], 280],
+      [[1040, 702], 280],
+      [[1180, 610], 280],
+      [[1320, 702], 280],
+    ],
+    to: CARROT_AT,
+    ms: 1400,
+    sway: 0,
+    thief: HareThief,
+    pose: "reach",
+    sounds: [
+      [0, playPop],
+      [200, playSniff],
+      [900, playBoing],
+      [1460, playBoing],
+      [2020, playBoing],
+    ],
+    say: "Huch! Der Hase nimmt die Nase vom Schneemann mit. Hinterher!",
+  },
+  stations: [
+    {
+      kind: "pickup",
+      id: "snowshovel",
+      x: 540,
+      item: "snowshovel",
+      at: [640, 680],
+      sound: playClonk,
+      ask: "Eine Schneeschaufel.",
+      done: "Die nehmen wir mit.",
+    },
+    { kind: "pickup", id: "seeds", x: 860, item: "seeds", at: [950, 660], sound: playRustle, ask: "Ein Sack Körner.", done: "Ab in den Rucksack!" },
+    {
+      kind: "obstacle",
+      id: "drift",
+      x: 1180,
+      need: "snowshovel",
+      why: { worry: "stuck" },
+      at: [1300, 660],
+      meet: [[100, playPoof]],
+      sounds: [
+        [0, playCrunch],
+        [500, playCrunch],
+        [1000, playCrunch],
+        [1500, playPoof],
+      ],
+      ms: 2200,
+      nope: playBoing,
+      ask: "Ganz viel Schnee! Wie kommen wir durch?",
+      done: "Mit der Schaufel! Wir schaufeln den Weg frei.",
+    },
+    { kind: "pickup", id: "sand", x: 1560, item: "sand", at: [1660, 620], sound: playClonk, ask: "Ein Eimer Sand.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "birds",
+      x: 1880,
+      need: "seeds",
+      why: { wants: [1990, 640] },
+      at: [2236, 590],
+      meet: [[100, playTweet]],
+      sounds: [
+        [0, playRustle],
+        [700, playTweet],
+        [1600, playPeck],
+        [2100, playPeck],
+        [2600, playPeck],
+        [3000, playTweet],
+      ],
+      ms: 3400,
+      nope: playSneeze,
+      ask: "Die Vögel haben Hunger. Das Vogelhaus ist leer. Was geben wir ihnen?",
+      done: "Die Körner! Piep, piep, lecker.",
+    },
+    { kind: "pickup", id: "cabbage", x: 2460, item: "cabbage", at: [2560, 688], sound: playLeaves, ask: "Ein Kohlkopf!", done: "Ab in den Rucksack!" },
+    {
+      kind: "obstacle",
+      id: "pond",
+      x: 2740,
+      need: "sand",
+      why: { worry: "slip" },
+      at: [2860, 700],
+      meet: [[100, playCreak]],
+      sounds: [
+        [200, playRustle],
+        [900, playRustle],
+        [1500, playTwinkle],
+      ],
+      ms: 2000,
+      nope: playSlide,
+      ask: "Der Teich ist zugefroren. Ganz glatt! Was hilft?",
+      done: "Der Sand! Jetzt rutschen wir nicht.",
+    },
+    { kind: "climb", id: "hill", x: 3100, steps: SNOW_STAIRS, slide: SLED_RUN, sled: Sled, ask: "Ein Berg! Hoch geht's.", done: "Mit dem Schlitten! Hui!" },
+    {
+      kind: "obstacle",
+      id: "hare",
+      x: 4680,
+      need: "cabbage",
+      why: { wants: [4865, 590] },
+      at: [4835, 686],
+      meet: [[100, playSniff]],
+      sounds: [
+        [300, playMunch],
+        [1000, playMunch],
+        [1700, playMunch],
+      ],
+      ms: 2400,
+      nope: playSneeze,
+      frees: true,
+      ask: "Da ist der Hase mit der Nase! Was geben wir ihm?",
+      done: "Den Kohl! Danke, Hase.",
+    },
+  ],
+  // Up and onto the snowman's face; there it stays, and the snowman dances.
+  finale: { via: [[[5020, 380], 700]], to: NOSE_AT, ms: 600, sway: 0, into: "nose", say: "Der Schneemann hat seine Nase wieder! Er tanzt!" },
+};
+
+/** All trail levels, in the order of their cards. */
+export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, sandburg, picknick, floss, katze, schneemann];

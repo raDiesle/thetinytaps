@@ -60,6 +60,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Der Schneemann hat seine Nase verloren – ein Hase hat die Karotte. Das Kind folgt den Spuren im Schnee: Schlitten den Berg hinunter, zugefrorener Teich (Sand streuen), Vogelhaus (Körner), am Ende bekommt der Schneemann die Nase und tanzt.",
       why: "Winter; Spuren im Schnee folgen.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-07",
