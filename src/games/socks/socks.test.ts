@@ -31,20 +31,32 @@ test("every wash has pairs that all look different, and what tells them apart is
   }
 });
 
-test("the steps start easy and never ask for more pairs than fit", () => {
-  expect(SOCK_LEVELS[0]).toEqual({ pairs: 2, kind: "colors" });
-  for (const level of SOCK_LEVELS) expect(level.pairs).toBeLessThanOrEqual(MAX_PAIRS);
+test("the steps start easy, never ask for more pairs than fit, and get harder only in what is seen", () => {
+  expect(SOCK_LEVELS[0]).toEqual({ pairs: 2, kind: "colors", covered: 0 });
+  for (const level of SOCK_LEVELS) {
+    expect(level.pairs).toBeLessThanOrEqual(MAX_PAIRS);
+    expect(level.covered).toBeGreaterThanOrEqual(0);
+    expect(level.covered).toBeLessThanOrEqual(level.pairs * 2);
+  }
   const kinds = SOCK_LEVELS.map((l) => ["colors", "patterns", "sameColor", "mixed"].indexOf(l.kind));
   expect(kinds).toEqual([...kinds].sort((a, b) => a - b));
+  // A new kind starts with few baskets; within a kind they only get more.
+  for (let i = 1; i < SOCK_LEVELS.length; i++) {
+    const [before, level] = [SOCK_LEVELS[i - 1], SOCK_LEVELS[i]];
+    if (before.kind === level.kind) expect(level.covered, `step ${i}`).toBeGreaterThanOrEqual(before.covered);
+    else expect(level.covered, `step ${i}`).toBeLessThanOrEqual(1);
+  }
 });
 
-test("quick and sure goes up, a long search or many misses goes down, and it stays within the steps", () => {
+test("sure goes up, many misses or a very long search goes down, and it stays within the steps", () => {
   const last = SOCK_LEVELS.length - 1;
   expect(nextLevel(0, { pairs: 2, misses: 0, ms: 4000 })).toBe(2);
   expect(nextLevel(0, { pairs: 2, misses: 1, ms: 9000 })).toBe(1);
+  // Slow but sure still goes up: harder never means faster.
+  expect(nextLevel(3, { pairs: 3, misses: 0, ms: 27000 })).toBe(4);
   expect(nextLevel(3, { pairs: 3, misses: 2, ms: 24000 })).toBe(3);
   expect(nextLevel(3, { pairs: 3, misses: 5, ms: 9000 })).toBe(2);
-  expect(nextLevel(3, { pairs: 3, misses: 0, ms: 40000 })).toBe(2);
+  expect(nextLevel(3, { pairs: 3, misses: 0, ms: 70000 })).toBe(2);
   expect(nextLevel(0, { pairs: 2, misses: 9, ms: 60000 })).toBe(0);
   expect(nextLevel(last, { pairs: 6, misses: 0, ms: 6000 })).toBe(last);
 });

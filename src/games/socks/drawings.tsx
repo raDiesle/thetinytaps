@@ -138,3 +138,32 @@ export function WashingMachine({ looks }: { looks: SockLook[] }) {
     </svg>
   );
 }
+
+/** An upside-down laundry basket of woven willow, put over a sock so it can't be seen (100 × 110). */
+export function Basket() {
+  const clip = `basket${useId().replace(/[^\w-]/g, "")}`;
+  return (
+    <svg className="sock-basket-svg" viewBox="0 0 100 110" aria-hidden>
+      <defs>
+        <clipPath id={clip}>
+          <path d="M18 8 H82 L95 100 H5 Z" />
+        </clipPath>
+      </defs>
+      <path d="M18 8 H82 L95 100 H5 Z" fill="#e3b46a" stroke="#a8742f" strokeWidth="3" strokeLinejoin="round" />
+      <g clipPath={`url(#${clip})`} stroke="#c48f45" strokeWidth="3">
+        {/* The weave: bands across, and the willow rods going down between them. */}
+        {[22, 36, 50, 64, 78].map((y) => (
+          <line key={y} x1="0" y1={y} x2="100" y2={y} />
+        ))}
+        {[20, 35, 50, 65, 80].map((x) => (
+          <line key={x} x1={x - (50 - x) * 0.05} y1="8" x2={x - (50 - x) * 0.2} y2="100" strokeWidth="2" />
+        ))}
+      </g>
+      {/* Handles near the rim (the rim is at the bottom, since the basket stands upside down). */}
+      <rect x="14" y="80" width="18" height="8" rx="4" fill="#7a5223" />
+      <rect x="68" y="80" width="18" height="8" rx="4" fill="#7a5223" />
+      <rect x="2" y="98" width="96" height="9" rx="4" fill="#c98f3e" stroke="#a8742f" strokeWidth="3" />
+      <rect x="15" y="4" width="70" height="8" rx="4" fill="#c98f3e" stroke="#a8742f" strokeWidth="3" />
+    </svg>
+  );
+}

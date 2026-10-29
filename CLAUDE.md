@@ -139,6 +139,9 @@ In a fresh worktree run `bun install` first.
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice.
+- A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
+  some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
+  Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.
 - What the child taps to set things off is plainly marked (a glow, and a still hand pointing at it before the first tap)
   and lies wholly in the picture, clear of the edges and the ✕. Where the picture moves away from it, a big button
   brings it back.
@@ -265,4 +268,4 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
-   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`.
+   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`, `?level=<n>` on `/socken/`.
