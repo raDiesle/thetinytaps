@@ -124,7 +124,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/schatten/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
-  { href: "/socken/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/socken/",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Gespielt wird ganz übersetzt; nur zwei Absätze in „Über das Spiel“ (Waschmaschine von selbst, wie die Schwierigkeit mitwächst) sind noch deutsch.",
+  },
   {
     href: "/buchstaben/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },

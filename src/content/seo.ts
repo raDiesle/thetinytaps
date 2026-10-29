@@ -111,7 +111,7 @@ export const SEO_PAGES: PageSeo[] = [
     path: "/socken/",
     title: "Socken-Paare finden – Spiel für Kleinkinder",
     description: "Die Waschmaschine ist fertig: Socken-Paare finden und an die Wäscheleine hängen. Erstes Paare-Suchen für Kinder ab 2 Jahren, ohne Werbung.",
-    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine.",
+    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine. Erst wenige Paare in bunten Farben, dann mehr und mit Mustern – so schnell, wie das Kind sicher wird.",
   },
   {
     path: "/buchstaben/",

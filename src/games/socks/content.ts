@@ -1,6 +1,5 @@
 import { byLanguage } from "@/content/texts";
 import type { Localized } from "@/lib/language";
-import type { SockMode } from "./settings";
 
 /** A sock colour: the knitted body and the lighter cuff, heel and toe. */
 export interface SockColor {
@@ -34,8 +33,35 @@ export interface SockLook {
 /** The most pairs in one wash: 12 socks still fit on a phone, and every pattern is used once. */
 export const MAX_PAIRS = SOCK_PATTERNS.length;
 
-/** In "Muster" only these colours are used, so two pairs share one and the pattern makes the difference. */
-const PATTERN_COLORS = ["red", "blue", "green"];
+/**
+ * What tells the pairs apart, from easy to hard:
+ * colors – plain socks, every pair its own colour;
+ * patterns – a pattern per pair, and every pair still its own colour, so the colour helps;
+ * sameColor – a pattern per pair in few colours, so pairs of the same colour sit side by side and only the pattern tells;
+ * mixed – two colours times a few patterns, so every pair has one twin with its pattern and others with its colour.
+ */
+export type SockKind = "colors" | "patterns" | "sameColor" | "mixed";
+
+/** One step of the difficulty: how many pairs in the wash, and what tells them apart. */
+export interface SockLevel {
+  pairs: number;
+  kind: SockKind;
+}
+
+/** The steps the game climbs (or goes back down) by how the child plays, see `nextLevel`; the first is where it begins. */
+export const SOCK_LEVELS: SockLevel[] = [
+  { pairs: 2, kind: "colors" },
+  { pairs: 3, kind: "colors" },
+  { pairs: 4, kind: "colors" },
+  { pairs: 3, kind: "patterns" },
+  { pairs: 4, kind: "patterns" },
+  { pairs: 3, kind: "sameColor" },
+  { pairs: 4, kind: "sameColor" },
+  { pairs: 5, kind: "sameColor" },
+  { pairs: 4, kind: "mixed" },
+  { pairs: 5, kind: "mixed" },
+  { pairs: 6, kind: "mixed" },
+];
 
 /** A new list with the same items in random order. */
 export function shuffle<T>(items: T[]): T[] {
@@ -47,16 +73,38 @@ export function shuffle<T>(items: T[]): T[] {
   return result;
 }
 
-/** `count` pairs that all look different from each other. */
-export function dealPairs(mode: SockMode, count: number): SockLook[] {
-  if (mode === "colors")
-    return shuffle(SOCK_COLORS)
-      .slice(0, count)
-      .map((color) => ({ color, pattern: "plain" }));
-  const colors = shuffle(SOCK_COLORS.filter((c) => PATTERN_COLORS.includes(c.id)));
-  return shuffle(SOCK_PATTERNS)
-    .slice(0, count)
-    .map((pattern, i) => ({ color: colors[i % colors.length], pattern }));
+/** The pairs of one wash at `level`; no two look the same. */
+export function dealPairs({ pairs, kind }: SockLevel): SockLook[] {
+  const colors = shuffle(SOCK_COLORS);
+  const patterns = shuffle(SOCK_PATTERNS);
+  if (kind === "colors") return colors.slice(0, pairs).map((color) => ({ color, pattern: "plain" }));
+  if (kind === "patterns") return patterns.slice(0, pairs).map((pattern, i) => ({ color: colors[i], pattern }));
+  if (kind === "sameColor") {
+    // Every colour at least twice: 3 pairs in one colour, 4 in two, 5 in two.
+    const used = Math.max(1, Math.floor(pairs / 2));
+    return shuffle(patterns.slice(0, pairs).map((pattern, i) => ({ color: colors[i % used], pattern })));
+  }
+  return shuffle(Array.from({ length: pairs }, (_, i) => ({ color: colors[i % 2], pattern: patterns[Math.floor(i / 2)] })));
+}
+
+/** How one wash went: how many pairs, how often another sock was taken than the partner, and how long it took. */
+export interface WashResult {
+  pairs: number;
+  /** Taps on a sock that wasn't the partner of the lifted one; never "wrong" for the child, only counted here. */
+  misses: number;
+  /** From the socks lying on the floor to the last pair found. */
+  ms: number;
+}
+
+/** Quick and sure goes up, two steps when it flies; many misses or a long search goes one step back; else it stays. */
+export function nextLevel(level: number, { pairs, misses, ms }: WashResult): number {
+  const missesPerPair = misses / pairs;
+  const secondsPerPair = ms / 1000 / pairs;
+  let step = 0;
+  if (misses === 0 && secondsPerPair <= 3) step = 2;
+  else if (missesPerPair <= 0.5 && secondsPerPair <= 6) step = 1;
+  else if (missesPerPair >= 1.5 || secondsPerPair >= 12) step = -1;
+  return Math.max(0, Math.min(SOCK_LEVELS.length - 1, level + step));
 }
 
 /** One of `list`, at random. */
@@ -68,8 +116,6 @@ export interface SockTexts {
   /** Praise for a pair found; one of them, at random. */
   pair: string[];
   done: string;
-  /** "3 Paare", on the start screen and the „Weiter“ button. */
-  pairs: (n: number) => string;
   /** For screen readers: the sock at place `n` (from 1) on the floor. */
   sock: (n: number) => string;
 }
@@ -78,7 +124,6 @@ const GERMAN_TEXTS: SockTexts = {
   start: "Such zwei gleiche Socken!",
   pair: ["Ein Paar!", "Die passen zusammen!", "Gleich und gleich!", "Zwei gleiche!"],
   done: "Alle Socken hängen auf der Leine!",
-  pairs: (n) => `${n} ${n === 1 ? "Paar" : "Paare"}`,
   sock: (n) => `Socke ${n}`,
 };
 
