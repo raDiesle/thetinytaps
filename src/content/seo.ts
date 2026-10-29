@@ -84,7 +84,7 @@ export const SEO_PAGES: PageSeo[] = [
     title: "Kettenreaktion und Kugelbahn für Kinder",
     description:
       "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kinder ab 2 Jahren, ohne Werbung.",
-    text: "Dreizehn Maschinen: Kugeln rollen, Dominosteine fallen, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion – zum Staunen und Nochmal-Machen.",
+    text: "Vierzehn Maschinen: Kugeln rollen, Dominosteine fallen, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion – zum Staunen und Nochmal-Machen.",
   },
   {
     path: "/kleine-abenteuer/",

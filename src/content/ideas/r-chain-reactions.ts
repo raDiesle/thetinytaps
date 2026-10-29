@@ -48,6 +48,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Neue Welt: Die Zahnpastatube drückt einen Klecks auf die Bürste, die kippt ins Zahnputzglas, das Glas schubst die Quietscheente in die Wanne, die Wanne läuft über, und Seifenblasen steigen bis zur Lampe.",
       why: "Passt zu „Zähne putzen“ und zum Abend vor dem Baden.",
       effort: "M",
+      done: true,
     },
     {
       id: "R-06",
