@@ -6,12 +6,15 @@ import type { Station, Way } from "./trail/types";
 
 // Translations come only on request, so a German sentence may lack its translation (it is said in German then);
 // but nothing in a phrasebook is left over from a sentence that changed, and what is there is in its language.
-// The languages translated so far have every sentence.
+// The languages translated so far have every sentence of each story and level whose title they have: a new level
+// comes in German only, its title untranslated too, until translations are asked for.
 
-/** Every German text of the stories and levels that is spoken or shown to grown-ups. */
-function germanTexts(): string[] {
+/** Every German text of the stories and levels that is spoken or shown to grown-ups; with `has`, only of the stories
+ * and levels whose title it has. */
+function germanTexts(has: (title: string) => boolean = () => true): string[] {
   const all: string[] = [...Object.values(texts)];
   for (const story of STORIES) {
+    if (!has(story.title)) continue;
     all.push(story.title, story.need.say);
     for (const step of story.steps) {
       all.push(step.ask, step.done);
@@ -27,6 +30,7 @@ function germanTexts(): string[] {
     w.stations.forEach(station);
   };
   for (const level of TRAIL_LEVELS) {
+    if (!has(level.title)) continue;
     all.push(level.title, level.away.say, level.finale.say);
     for (const s of level.stations) {
       if (s.kind === "fork") {
@@ -53,12 +57,11 @@ test("no phrasebook has anything left over", () => {
     ).toEqual([]);
 });
 
-test("the translated languages have every sentence and title", () => {
-  const all = [...new Set(germanTexts())];
+test("the translated languages have every sentence of the stories and levels they have the title of", () => {
   for (const language of COMPLETE) {
     const book = PHRASEBOOKS[language as keyof typeof PHRASEBOOKS] ?? {};
     expect(
-      all.filter((german) => !book[german]),
+      [...new Set(germanTexts((title) => Boolean(book[title])))].filter((german) => !book[german]),
       language,
     ).toEqual([]);
   }
