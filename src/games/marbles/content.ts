@@ -170,4 +170,8 @@ export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localize
       ru: "Нажми — и зажжётся свет!",
     },
   },
+  night: {
+    name: { de: "Gute-Nacht-Maschine" },
+    intro: { de: "Tipp! Dann spielt die Spieluhr." },
+  },
 };

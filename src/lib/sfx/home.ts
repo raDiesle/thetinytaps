@@ -240,3 +240,15 @@ export function playCrash() {
     note({ from: pitch, to: pitch * 0.6, duration: 0.07, type: "triangle", volume: 0.18, delay });
   });
 }
+
+/** "Wuuusch" – a curtain gliding shut along its rail: soft, falling noise and the rings clicking now and then. */
+export function playCurtain() {
+  hiss({ from: 1600, to: 700, duration: 2.6, volume: 0.07, q: 0.5 });
+  [0.2, 0.9, 1.6, 2.3].forEach((delay) => note({ from: 2400, to: 2100, duration: 0.04, type: "triangle", volume: 0.05, delay }));
+}
+
+/** "Klick" – a lamp's pull chain switching it off: one short, dry click. */
+export function playClick() {
+  note({ from: 2600, to: 1800, duration: 0.03, type: "square", volume: 0.08, lowpass: 3500 });
+  note({ from: 400, to: 200, duration: 0.05, type: "triangle", volume: 0.1, delay: 0.01 });
+}

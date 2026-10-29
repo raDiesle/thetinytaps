@@ -64,6 +64,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Eine ganz ruhige Maschine: Die Spieluhr dreht sich, ein Stern rollt sanft eine Rinne hinunter, der Vorhang geht zu, das Licht geht aus, der Mond geht auf. Am Ende schlafen alle Teile, leise Töne, langsames Tempo.",
       why: "Ein ruhiger letzter Durchgang vor dem Schlafen; passt zur Spielzeit-Grenze (N-03, A-03).",
       effort: "M",
+      done: true,
     },
     {
       id: "R-08",

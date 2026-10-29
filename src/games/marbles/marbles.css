@@ -42,6 +42,10 @@
   background: #384067;
 }
 
+.marble-play:has([aria-label="Gute-Nacht-Maschine"]) {
+  background: #6b5a86;
+}
+
 .marble-svg {
   display: block;
   width: 100%;

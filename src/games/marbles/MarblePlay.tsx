@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState, type ComponentType, type Poin
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
-import { playMelody } from "@/lib/sfx";
+import { playLullaby, playMelody } from "@/lib/sfx";
 import { type Localized, pick, spokenIn, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { BuildingLevel } from "./BuildingLevel";
@@ -13,6 +13,7 @@ import { KitchenLevel } from "./KitchenLevel";
 import { useAnyKey, type LevelProps } from "./level";
 import { LightLevel } from "./LightLevel";
 import { MachineLevel } from "./MachineLevel";
+import { NightLevel } from "./NightLevel";
 import { PegsLevel } from "./PegsLevel";
 import type { MarbleLevel, MarbleSettings } from "./settings";
 import { SneezeLevel } from "./SneezeLevel";
@@ -38,6 +39,7 @@ const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps>
   { id: "circus", emoji: "🎪", Level: CircusLevel },
   { id: "space", emoji: "🚀", Level: SpaceLevel },
   { id: "light", emoji: "🔦", Level: LightLevel },
+  { id: "night", emoji: "🌙", Level: NightLevel },
 ];
 
 /** The levels in turn, beginning with the chosen one (in development `?level=garden` in the address), so „Weiter“ always has a next. */
@@ -71,8 +73,8 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const level = levelAt(index);
   const next = levelAt(index + 1);
   const { bursts, spawn } = useBursts();
-  // The marble run plays its own notes and scales; a song on top would clash with them.
-  useNoBackgroundMusic(level.id === "track");
+  // The marble run plays its own notes and scales, and the good-night machine its music box: a song on top would clash with them.
+  useNoBackgroundMusic(level.id === "track" || level.id === "night");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const sound = useCallback(
@@ -99,7 +101,8 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
 
   const onDone = useCallback(() => {
     setParty(true);
-    sound(playMelody);
+    // The good-night machine ends as calmly as it ran.
+    sound(level.id === "night" ? playLullaby : playMelody);
     for (let i = 0; i < 14; i++) timers.current.push(setTimeout(() => spawn(), i * 120));
     timers.current.push(
       setTimeout(() => {
@@ -107,7 +110,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
         setEnded(true);
       }, PARTY_MS),
     );
-  }, [sound, spawn]);
+  }, [sound, spawn, level.id]);
 
   const startLevel = (nextIndex: number) => {
     setEnded(false);
