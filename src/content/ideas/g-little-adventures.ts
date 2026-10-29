@@ -50,6 +50,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Eine Welle nimmt Schaufel und Eimer mit ans andere Ende vom Strand. Unterwegs: eine Krabbe will eine Muschel, die Möwe will das Brötchen, ein Felsen mit Wasser dazwischen (Luftmatratze als Brücke), heißer Sand (Badelatschen). Am Ende bauen alle zusammen eine Sandburg.",
       why: "Sommer-Erinnerung zum Nachspielen.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-06",

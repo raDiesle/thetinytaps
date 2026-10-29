@@ -45,6 +45,7 @@ export function ElevatorGame() {
         { id: "ball", emoji: "⚽", title: title("Der Ball rollt weg"), kind: t(TRAIL) },
         { id: "ballon", emoji: "🎈", title: title("Der Luftballon"), kind: t(TRAIL) },
         { id: "lok", emoji: "🚂", title: title("Die kleine Lok"), kind: t(TRAIL) },
+        { id: "sandburg", emoji: "🏖️", title: title("Die Sandburg"), kind: t(TRAIL) },
         { id: "floss", emoji: "⛵", title: title("Das Floß"), kind: t(RAFT) },
       ]}
       mode={settings.story}

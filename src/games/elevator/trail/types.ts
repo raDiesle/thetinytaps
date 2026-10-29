@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import type { Pose } from "../kid";
+import type { Outfit, Pose } from "../kid";
 import type { GoalId, ItemId } from "./items";
 import type { Worry } from "./worries";
 
@@ -24,6 +24,8 @@ export interface SceneryProps {
   here: string | null;
   /** A wrong thing was just tried at this station; a new `n` wiggles it again. */
   nope: { id: string; n: number } | null;
+  /** The goal is back and everybody is happy (the end's party): the sandcastle gets built. */
+  party: boolean;
 }
 
 interface StationBase {
@@ -69,6 +71,8 @@ export interface Obstacle extends StationBase {
    * `at` above the child (the open umbrella over the waterfall); then the child puts it down at `put` from its feet
    * (the umbrella stuck into the raft), where the level's drawing shows it from then on. */
   float?: { to: Point[]; put: Point };
+  /** What the child wears from when it is solved on (the flip-flops on the hot sand): the thing is put on, not given. */
+  wear?: Outfit[];
 }
 
 /** Stairs or a ladder: the first tap climbs half of the steps, the second the rest (never more taps in a row). */
@@ -144,6 +148,8 @@ export interface TrailLevel {
   ground: Point[];
   /** Where the child starts, on the ground. */
   start: number;
+  /** What the child wears at the start (bare feet at the beach); shoes when left out. */
+  wear?: Outfit[];
   /** At the start: the goal leaves the child's hands for `to` (where the last obstacle keeps it). */
   away: Flight & { pose: Pose; sounds: Cue[]; say: string };
   stations: (Station | Fork)[];

@@ -3,12 +3,13 @@ import { HERO, KidHead } from "../kid";
 import { Football, type Picture } from "./items";
 
 // What the child thinks at an obstacle without a creature that wants something: what would happen if it went on
-// without the right thing (it gets wet, falls into the water, can't see in the dark), or what it could do (dig).
+// without the right thing (it gets wet, falls into the water, can't see in the dark, burns its
+// bare feet on hot sand), or what it could do (dig).
 // Each is drawn standing on (0, 0) like the things, for the thought bubble; the child is a big, frowning, still head,
 // since the bubble is small.
 
 /** A worry the child can have at an obstacle. */
-export type Worry = "wet" | "splash" | "dark" | "dig" | "blocked" | "fall";
+export type Worry = "wet" | "splash" | "dark" | "dig" | "hot" | "blocked" | "fall";
 
 /** The child's head, big and frowning, with its chin on (0, 0). */
 function Head() {
@@ -112,6 +113,27 @@ function Dig() {
   );
 }
 
+/** Glowing hot sand under the child, the heat rising round its head, the sun above: barefoot, it would burn. */
+function Hot() {
+  return (
+    <>
+      <circle cx="78" cy="-122" r="20" fill="#ffd43b" stroke="#f08c00" strokeWidth="4" />
+      <g transform="translate(0 -30)">
+        <Head />
+      </g>
+      <path d="M-96 -6 Q-60 -36 -20 -22 Q24 -40 96 -6 V0 H-96 Z" fill="#ff922b" stroke="#e8590c" strokeWidth="4" strokeLinejoin="round" />
+      {[-70, -30, 18, 62].map((x) => (
+        <circle key={x} cx={x} cy={-12 + (x % 3) * 2} r="3.5" fill="#e03131" />
+      ))}
+      <g stroke="#f03e3e" strokeWidth="5" fill="none" strokeLinecap="round">
+        {[-84, -62, 62, 84].map((x) => (
+          <path key={x} d={`M${x} -34 q-9 -10 0 -20 q9 -10 0 -20 q-9 -10 0 -20`} />
+        ))}
+      </g>
+    </>
+  );
+}
+
 /** A thick branch with leaves right across in front of the child's face, bumped into: it can't get past. */
 function Blocked() {
   return (
@@ -170,6 +192,7 @@ export const WORRIES: Record<Worry, Picture> = {
   splash: { w: 200, h: 145, draw: () => <Splash /> },
   dark: { w: 192, h: 140, draw: () => <Dark /> },
   dig: { w: 210, h: 150, draw: () => <Dig /> },
+  hot: { w: 200, h: 150, draw: () => <Hot /> },
   blocked: { w: 230, h: 160, draw: () => <Blocked /> },
   fall: { w: 220, h: 165, draw: () => <Fall /> },
 };

@@ -94,14 +94,16 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/kleine-abenteuer/",
     parts: [
+      { label: "🧭 Die anderen sieben Geschichten", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
       {
-        label: "🧭 Menüs, Aufzug-Geschichten und die übrigen Weg-Abenteuer",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        label: "🏖️ Die Sandburg",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-05, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
         label: "⛵ Das Floß",
         languages: { de: "done" },
-        note: "Neues Weg-Abenteuer (G-08), bisher nur auf Deutsch: sein Titel und seine Sätze fehlen in den Sprachbüchern (en.ts, ru.ts …), ebenso der Kartenhinweis „🛶 Paddeln“.",
+        note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026), ebenso der Kartenhinweis „🛶 Paddeln“; bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
     ],
   },
