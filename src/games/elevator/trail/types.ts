@@ -74,6 +74,10 @@ export interface Climb extends StationBase {
   steps: Point[];
   /** A slide from the top: the child slides down these ground points by itself, fast. */
   slide?: Point[];
+  /** What the child sits on to slide down (the sled waiting at the top), drawn under it standing on (0, 0). While it
+   * rides, the climb's id is `here`; at the bottom it goes into `done`, so the scenery draws the sled at the top
+   * before and at the bottom after. */
+  sled?: ComponentType;
 }
 
 /** Something that happens by itself when the child gets there (the traffic light turns green): no bag, no extra tap. */
@@ -138,8 +142,20 @@ export interface TrailLevel {
   /** Where the child starts, on the ground. */
   start: number;
   /** At the start: the goal leaves the child's hands for `to` (where the last obstacle keeps it). */
-  away: Flight & { pose: Pose; sounds: Cue[]; say: string };
+  away: Flight & {
+    pose: Pose;
+    sounds: Cue[];
+    say: string;
+    /** Who takes the goal away (the hare with the carrot in its mouth): drawn round the goal while it goes, so the goal
+     * is at (0, 0) of the drawing; it jumps up out of the snow. The scenery draws it again where it ends up. */
+    thief?: ComponentType;
+  };
   stations: (Station | Fork)[];
   /** At the end, with the goal back in hand: it goes to `to`, and everybody is happy. */
-  finale: Flight & { say: string };
+  finale: Flight & {
+    say: string;
+    /** The goal becomes part of the world where it lands (the nose on the snowman's face): there it is hidden and this
+     * id goes into `done`, so the scenery draws it in place. */
+    into?: string;
+  };
 }

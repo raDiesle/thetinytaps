@@ -134,6 +134,10 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
      hidden in boxes, nothing fetched from a second place.
    - The last station is an obstacle with `frees: true` that holds the goal.
    - Stops at least ~200 points apart, so every walk is a visible walk.
+   - Keep the room round each stop free: no tree, post or other scenery right behind the child's
+     stop (its ghost shows there before the tap), and a creature's `why` bubble must not cover the
+     place the obstacle is about (the empty bird table the birds want to eat at) – move the place
+     beside the bubble. Both were found only in the preview („Der Schneemann“), so look for them there.
 3. **Draw the scenery** in `src/games/elevator/trail/<level>.tsx`: export the ground
    constants, `<Level>Scenery` and `<Level>Backdrop`, built like `drachen.tsx`
    (ground strip first, then places from left to right, obstacles as their own

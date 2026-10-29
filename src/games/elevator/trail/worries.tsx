@@ -3,12 +3,13 @@ import { HERO, KidHead } from "../kid";
 import { Football, type Picture } from "./items";
 
 // What the child thinks at an obstacle without a creature that wants something: what would happen if it went on
-// without the right thing (it gets wet, falls into the water, can't see in the dark), or what it could do (dig).
+// without the right thing (it gets wet, falls into the water, can't see in the dark, gets stuck in the snow, slips on
+// the ice), or what it could do (dig).
 // Each is drawn standing on (0, 0) like the things, for the thought bubble; the child is a big, frowning, still head,
 // since the bubble is small.
 
 /** A worry the child can have at an obstacle. */
-export type Worry = "wet" | "splash" | "dark" | "dig";
+export type Worry = "wet" | "splash" | "dark" | "dig" | "stuck" | "slip";
 
 /** The child's head, big and frowning, with its chin on (0, 0). */
 function Head() {
@@ -112,10 +113,79 @@ function Dig() {
   );
 }
 
+/** A snowflake: a small white star with blue edges. */
+function Flake({ x, y }: { x: number; y: number }) {
+  return (
+    <path
+      d={`M${x - 9} ${y} H${x + 9} M${x - 5} ${y - 8} L${x + 5} ${y + 8} M${x + 5} ${y - 8} L${x - 5} ${y + 8}`}
+      stroke="#74c0fc"
+      strokeWidth="4"
+      strokeLinecap="round"
+    />
+  );
+}
+
+/** The child's head deep in a heap of snow, snow on its hair and flakes round it: it would get stuck. */
+function Stuck() {
+  const flakes: [number, number][] = [
+    [-80, -120],
+    [78, -112],
+    [-92, -70],
+    [90, -64],
+  ];
+  return (
+    <>
+      <g transform="translate(0 -6)">
+        <Head />
+      </g>
+      <path d="M-34 -122 Q0 -150 34 -122 Q20 -114 0 -118 Q-20 -114 -34 -122 Z" fill="#fff" stroke="#74c0fc" strokeWidth="3" strokeLinejoin="round" />
+      <path
+        d="M-104 0 Q-100 -50 -60 -46 Q-40 -66 -14 -40 Q10 -62 36 -42 Q64 -64 82 -40 Q106 -38 104 0 Z"
+        fill="#fff"
+        stroke="#74c0fc"
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      {flakes.map(([x, y]) => (
+        <Flake key={`${x}${y}`} x={x} y={y} />
+      ))}
+    </>
+  );
+}
+
+/** The child's head tipping over on shiny ice, with swish lines: it would slip and fall. */
+function Slip() {
+  return (
+    <>
+      <ellipse cx="0" cy="-14" rx="100" ry="14" fill="#a5d8ff" stroke="#1c7ed6" strokeWidth="4" />
+      <path d="M-66 -16 H-30 M16 -12 H60" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+      <g transform="translate(-6 -22) rotate(-28)">
+        <Head />
+      </g>
+      <path d="M58 -110 q22 6 30 26 M66 -136 q30 8 38 34" stroke={INK} strokeWidth="4" fill="none" strokeLinecap="round" />
+      {[
+        [-82, -112],
+        [-96, -80],
+      ].map(([x, y]) => (
+        <path
+          key={x}
+          d={`M${x} ${y - 10} L${x + 3} ${y - 3} L${x + 10} ${y} L${x + 3} ${y + 3} L${x} ${y + 10} L${x - 3} ${y + 3} L${x - 10} ${y} L${x - 3} ${y - 3} Z`}
+          fill="#ffd43b"
+          stroke="#f08c00"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+      ))}
+    </>
+  );
+}
+
 /** The worries' pictures, sized like the things'. */
 export const WORRIES: Record<Worry, Picture> = {
   wet: { w: 170, h: 140, draw: () => <Wet /> },
   splash: { w: 200, h: 145, draw: () => <Splash /> },
   dark: { w: 192, h: 140, draw: () => <Dark /> },
   dig: { w: 210, h: 150, draw: () => <Dig /> },
+  stuck: { w: 210, h: 150, draw: () => <Stuck /> },
+  slip: { w: 210, h: 150, draw: () => <Slip /> },
 };

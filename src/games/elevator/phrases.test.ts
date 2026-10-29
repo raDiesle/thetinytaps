@@ -6,7 +6,7 @@ import type { Station, Way } from "./trail/types";
 
 // Translations come only on request, so a German sentence may lack its translation (it is said in German then);
 // but nothing in a phrasebook is left over from a sentence that changed, and what is there is in its language.
-// The languages translated so far have every sentence.
+// A sentence translated is translated into every language translated so far; a new German-only one has none yet.
 
 /** Every German text of the stories and levels that is spoken or shown to grown-ups. */
 function germanTexts(): string[] {
@@ -53,15 +53,13 @@ test("no phrasebook has anything left over", () => {
     ).toEqual([]);
 });
 
-test("the translated languages have every sentence and title", () => {
-  const all = [...new Set(germanTexts())];
-  for (const language of COMPLETE) {
-    const book = PHRASEBOOKS[language as keyof typeof PHRASEBOOKS] ?? {};
-    expect(
-      all.filter((german) => !book[german]),
-      language,
-    ).toEqual([]);
-  }
+test("a sentence or title translated at all is translated into every language translated so far", () => {
+  const books = COMPLETE.map((language) => PHRASEBOOKS[language as keyof typeof PHRASEBOOKS] ?? {});
+  const half = [...new Set(germanTexts())].filter((german) => {
+    const have = books.filter((book) => book[german]).length;
+    return have > 0 && have < books.length;
+  });
+  expect(half).toEqual([]);
 });
 
 test("sentences in another script are in its letters, with no Latin letters", () => {
