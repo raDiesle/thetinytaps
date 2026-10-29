@@ -20,7 +20,8 @@ targets) – keep it that way.
 - `board.ts` – a board and the star log, pure functions: days of a week or month board, field keys (`YYYY-MM-DD|task`,
   with a time of day `YYYY-MM-DD|task|evening`, or `count` on a collecting board; `cellKey`/`parseCellKey`), the fields
   of a task (`taskSlots`), progress, add, take back, start over, `withKind` (the same board in another view: stars
-  stay, the goal fits), `exampleStars`, `shiftPeriod`/`samePeriod` for looking back, `possessive` for the title („Lenas Sterne“).
+  stay, the goal fits), `exampleStars`, `shiftPeriod`/`samePeriod`/`OLDEST_BACK` for looking back, `reviewPeriods`
+  for the Rückblick, `possessive` for the title („Lenas Sterne“).
 - `linked.ts` – what Zähne putzen (`loadWeek`, with morning or evening) and Aufs Töpfchen (`loadStars`, a count) did
   on which day; such a field is filled without a star in the log – brushing fills the field of its time of day, the
   potty fills a task's fields in the order of the day. Only on day, week and month boards: those games keep two weeks,
@@ -33,7 +34,8 @@ targets) – keep it that way.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars;
-  `Wizard.tsx` – „＋ Neue Tafel“ step by step; `RewardsGame.tsx` – the page (below).
+  `Wizard.tsx` – „＋ Neue Tafel“ step by step; `Review.tsx` – „📜 Rückblick“ (and `usePeriodLabel`, „Letzte Woche“,
+  shared with the ‹ › on top); `RewardsGame.tsx` – the page (below).
 - `bilder/prompts.ts` – every picture the chart may want, as Gemini prompts. No picture is made yet: the user reviews
   them on `/management/` (🎨 Bildvorschläge, `src/components/PicturePromptReview.tsx`) first. Only generate after
   that, with the reviewed text, and then swap the emoji for the pictures.
@@ -59,6 +61,12 @@ first two days of a week (Monday and Tuesday, the second short of one), the firs
 last card of a day, two on a path – pale, with a line under the board saying so and „Ausblenden“. They are never in
 the log and never printed; the first real star or „Ausblenden“ ends them. An example field is open: holding it gives
 the real star.
+
+„📜 Rückblick“ (not on a collecting board) shows in place of the board the last weeks to look at together with the
+child – what already worked (T-18): one big, newest first, and all of them below as small pictures in a strip that
+scrolls sideways. A tap on the big one, ‹ › or the arrow keys flip on (round), a small one shows it big. A month board
+looks back by months, a day board by weeks (a day is too little). Only weeks with stars, as far back as stars are
+kept; nothing can be changed there – a forgotten star is added on the board with ‹.
 
 On a computer (≥ 900 px, mouse) „✏️ Gestalten“ and „🖨️ Drucken“ lie open below the board, reached by scrolling (the
 buttons on top scroll there); on phones and tablets they open as panels in place of the board.
@@ -91,6 +99,8 @@ use the same way.
 
 - No punishment, ever: a star is never taken away by the board, only undone right after a mistake; a missed day stays
   an empty field, not a cross or a sad face. No screen time as a reward (T-21 rejected).
+- The Rückblick shows only what worked: a week without stars is left out, never shown empty or counted as missed
+  (`rewards.test.ts` checks `reviewPeriods`).
 - Few tasks: the editor advises one to three and allows `MAX_TASKS`; templates use at most three.
 - The child's name stays in localStorage only – never in a URL, a log or a picture prompt.
 - What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout.

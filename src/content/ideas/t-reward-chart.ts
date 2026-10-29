@@ -156,6 +156,7 @@ export const rewardChartIdeas: IdeaArea = {
       title: "Rückblick",
       text: "Die letzten Wochen einer Wochentafel als kleine Bilder zum Durchblättern – zusammen anschauen, was schon geklappt hat.",
       effort: "S",
+      done: true,
     },
     {
       id: "T-19",

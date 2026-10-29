@@ -15,6 +15,7 @@ import {
   parseCellKey,
   possessive,
   progress,
+  reviewPeriods,
   samePeriod,
   shiftPeriod,
   type StarLog,
@@ -263,5 +264,26 @@ describe("looking back", () => {
     expect(shiftPeriod("month", new Date(2026, 0, 31), -1)).toEqual(new Date(2025, 11, 1));
     expect(samePeriod("week", wednesday, new Date(2026, 10, 1))).toBe(true);
     expect(samePeriod("week", wednesday, new Date(2026, 10, 2))).toBe(false);
+  });
+
+  test("the Rückblick shows the weeks with stars, newest first, and leaves an empty week out", () => {
+    const week = { ...boardFromTemplate(TEMPLATES.find((t) => t.id === "woche") ?? TEMPLATES[0]), id: "w", examples: false };
+    const task = (week.tasks.find((t) => !t.slots) ?? week.tasks[0]).id;
+    let log: StarLog = {};
+    for (const day of [new Date(2026, 9, 27), new Date(2026, 9, 28), new Date(2026, 9, 6), new Date(2026, 7, 1)])
+      log = addStar(log, "w", cellKey(day, task), wednesday);
+    const periods = reviewPeriods(week, log.w, NO_LINKED, wednesday);
+    expect(periods.map((p) => [p.back, p.count])).toEqual([
+      [0, 2],
+      [3, 1],
+    ]);
+    expect(periods[1].day).toEqual(new Date(2026, 9, 5));
+    // A day board looks back by weeks, a month board by months, a collecting board not at all.
+    expect(reviewPeriods({ ...week, kind: "day" }, log.w, NO_LINKED, wednesday).map((p) => p.back)).toEqual([0, 3]);
+    expect(reviewPeriods({ ...week, kind: "month" }, log.w, NO_LINKED, wednesday).map((p) => [p.back, p.count])).toEqual([
+      [0, 3],
+      [2, 1],
+    ]);
+    expect(reviewPeriods({ ...week, kind: "collect" }, { count: 4 }, NO_LINKED, wednesday)).toEqual([]);
   });
 });

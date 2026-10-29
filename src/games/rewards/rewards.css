@@ -329,6 +329,140 @@
   white-space: nowrap;
 }
 
+/* ---------- Rückblick: the last weeks, one big and all of them small to flip through ---------- */
+
+.rw-review {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  min-height: 280px;
+}
+
+.rw-review-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+}
+
+.rw-review-now {
+  flex: 1;
+  font-weight: 700;
+}
+
+.rw-review-close,
+.rw-review-arrow {
+  min-height: 44px;
+  padding: 4px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-review-stage {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-height: 0;
+}
+
+.rw-review-arrow {
+  flex: none;
+  min-width: 48px;
+  min-height: 64px;
+  padding: 0;
+  font-size: 2rem;
+}
+
+.rw-review-arrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* The big week fills the room between the arrows. */
+.rw-review-sheet {
+  display: flex;
+  align-self: stretch;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Newest on the left, older to the right; scrolls sideways on a phone. */
+.rw-review-strip {
+  display: flex;
+  flex: none;
+  gap: 10px;
+  margin: 0;
+  padding: 2px 2px 8px;
+  overflow-x: auto;
+  list-style: none;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.rw-review-strip li {
+  flex: none;
+  width: clamp(120px, 15vw, 190px);
+  scroll-snap-align: center;
+}
+
+.rw-review-strip .rw-tpl-name {
+  font-size: 0.8rem;
+}
+
+.rw-review-empty {
+  max-width: 40em;
+  margin: 40px auto;
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+/* On a phone the big week keeps the room: no heading (the button on top says it), a small strip without names. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .rw-review {
+    gap: 6px;
+    min-height: 0;
+  }
+
+  .rw-review-head .rw-panel-title,
+  .rw-review-strip .rw-tpl-name {
+    display: none;
+  }
+
+  .rw-review-close {
+    min-height: 36px;
+    padding: 2px 12px;
+  }
+
+  .rw-review-strip {
+    padding-bottom: 4px;
+  }
+
+  .rw-review-strip li {
+    width: 84px;
+  }
+
+  .rw-review-strip .rw-tpl {
+    padding: 3px;
+    border-radius: 12px;
+  }
+}
+
 /* ---------- Neue Tafel: the wizard ---------- */
 
 .rw-wizard {

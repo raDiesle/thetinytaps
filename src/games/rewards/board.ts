@@ -246,6 +246,36 @@ export function samePeriod(kind: BoardKind, a: Date, b: Date): boolean {
   return dayKey(shiftPeriod(kind, a, 0)) === dayKey(shiftPeriod(kind, b, 0));
 }
 
+/** How many days, weeks or months a grown-up can go back: about as long as stars are kept (`KEEP_DAYS`). */
+export const OLDEST_BACK: Record<BoardKind, number> = { day: 60, week: 8, month: 2, collect: 0 };
+
+/** The view a Rückblick shows a board in: months for a month board, weeks for the others (a day is too little to look back on). */
+export const reviewKind = (kind: BoardKind): "week" | "month" => (kind === "month" ? "month" : "week");
+
+/** One week (or month) of a Rückblick. */
+export interface ReviewPeriod {
+  /** Weeks (months) back from the current one; 0 is now. */
+  back: number;
+  /** Its first day. */
+  day: Date;
+  /** Stars it got, by hand or from a linked game. */
+  count: number;
+}
+
+/**
+ * The weeks (months on a month board) to look back on together, newest first: the current one and the earlier ones
+ * whose stars are still kept, each only with at least one star – an empty week is left out, never shown as a failure.
+ */
+export function reviewPeriods(board: Board, stars: Record<string, number> | undefined, linked: LinkedDays, today: Date): ReviewPeriod[] {
+  if (board.kind === "collect") return [];
+  const kind = reviewKind(board.kind);
+  const shown = withKind(board, kind);
+  return Array.from({ length: OLDEST_BACK[kind] + 1 }, (_, back) => {
+    const day = shiftPeriod(kind, today, -back);
+    return { back, day, count: progress(shown, stars, linked, day).count };
+  }).filter((period) => period.count > 0);
+}
+
 /** The log with a star on a field (a key of `cellKey`), or one more collected; old days dropped. */
 export function addStar(log: StarLog, boardId: string, key: string | null, today: Date): StarLog {
   const oldest = dayKey(new Date(today.getFullYear(), today.getMonth(), today.getDate() - KEEP_DAYS));

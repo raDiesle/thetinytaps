@@ -3,9 +3,9 @@ import { useLocation } from "react-router";
 import { MenuHead } from "@/components/MenuTop";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useGameSettings } from "@/lib/common";
-import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { type Localized, useT } from "@/lib/language";
 import { useStoredSettings } from "@/lib/storage";
-import { type Board, samePeriod, shiftPeriod, startOver, type StarLog, withKind } from "./board";
+import { type Board, OLDEST_BACK, samePeriod, shiftPeriod, startOver, type StarLog, withKind } from "./board";
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
 import { type BoardKind, KINDS, MARK_BY_ID, type Template, TEMPLATES } from "./catalog";
@@ -15,13 +15,14 @@ import { loadLinkedDays } from "./linked";
 import { PrintPanel } from "./PrintPanel";
 import { DEFAULT_REWARDS_SETTINGS, NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY } from "./settings";
 import { PanelButton, useComputer } from "./pageParts";
+import { Review, usePeriodLabel } from "./Review";
 import { Wizard } from "./Wizard";
 import "./rewards.css";
 
 /** The page's name, in the menu head and the browser tab. */
 export const REWARDS_TITLE: Localized = { de: "Belohnungstafel" };
 
-type Panel = "info" | "edit" | "print";
+type Panel = "info" | "edit" | "print" | "review";
 
 /** The main views: the same stars for a day, a week or a month. Collecting stands apart in the switch. */
 const MAIN_KINDS = KINDS.filter((k) => k.id !== "collect");
@@ -34,7 +35,8 @@ const COLLECT_KIND = KINDS.find((k) => k.id === "collect");
  * Vorlagen, each a small picture with example stars; on smaller ones „🧩 Vorlagen“ opens the wizard on them. A new
  * board shows example stars until its first real one. On a computer „Gestalten“ and „Drucken“ lie open below the
  * board (scroll down); on phones and tablets they open from the buttons on top. Not a game: no GameShell, no play
- * time counted, so a star after the evening brushing still comes when play time is over.
+ * time counted, so a star after the evening brushing still comes when play time is over. „📜 Rückblick“ shows the last
+ * weeks (months) in place of the board, to look at together.
  */
 export function RewardsGame() {
   const t = useT();
@@ -72,7 +74,7 @@ export function RewardsGame() {
   // On a computer the panels are always open below the board: the buttons on top only scroll there.
   const toggle = (which: Panel) => {
     setWizard(null);
-    if (computer && which !== "info") document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (computer && which !== "info" && which !== "review") document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
     else setPanel(panel === which ? null : which);
   };
   /** A template from the gallery: the board made from it before, with its stars, or the wizard on it. */
@@ -126,6 +128,8 @@ export function RewardsGame() {
     <Wizard key={wizard === true ? "new" : wizard.id} start={wizard === true ? undefined : wizard} onDone={addBoard} onCancel={() => setWizard(null)} />
   ) : !computer && panel === "print" ? (
     print
+  ) : panel === "review" && board.kind !== "collect" ? (
+    <Review board={board} log={log} linked={linked} sounds={settings.sounds} onClose={() => setPanel(null)} />
   ) : (
     <div className="rw-main">
       {screen}
@@ -153,6 +157,7 @@ export function RewardsGame() {
             <PanelButton open={panel === "info"} onClick={() => toggle("info")} emoji="ℹ️" label={t({ de: "Über die Tafel" })} />
             <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t({ de: "Gestalten" })} />
             <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t({ de: "Drucken" })} />
+            {board.kind !== "collect" && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t({ de: "Rückblick" })} />}
           </div>
         </MenuHead>
 
@@ -188,7 +193,7 @@ export function RewardsGame() {
                   <span aria-hidden>{COLLECT_KIND.emoji}</span> {t(COLLECT_KIND.label)}
                 </button>
               )}
-              {board.kind !== "collect" && <PeriodNav kind={board.kind} day={day} back={back} setBack={setBack} />}
+              {board.kind !== "collect" && panel !== "review" && <PeriodNav kind={board.kind} day={day} back={back} setBack={setBack} />}
             </div>
           )}
           <nav className="rw-boards" aria-label={t({ de: "Tafeln" })}>
@@ -237,26 +242,13 @@ export function RewardsGame() {
 /** ‹ and › around the day, week or month shown: back to earlier ones to add a forgotten star, never into the future. */
 function PeriodNav({ kind, day, back, setBack }: { kind: BoardKind; day: Date; back: number; setBack: (back: number) => void }) {
   const t = useT();
-  const { speechLang } = useAppLanguage();
-  const now = new Date();
-  const label =
-    back === 0
-      ? t(kind === "day" ? { de: "Heute" } : kind === "week" ? { de: "Diese Woche" } : { de: "Dieser Monat" })
-      : back === 1
-        ? t(kind === "day" ? { de: "Gestern" } : kind === "week" ? { de: "Letzte Woche" } : { de: "Letzter Monat" })
-        : kind === "month"
-          ? new Intl.DateTimeFormat(speechLang, { month: "long" }).format(day)
-          : kind === "week"
-            ? `${t({ de: "Woche vom" })} ${new Intl.DateTimeFormat(speechLang, { day: "numeric", month: "numeric" }).format(day)}`
-            : new Intl.DateTimeFormat(speechLang, { weekday: "short", day: "numeric", month: "numeric" }).format(day);
-  // Stars are kept about two months: no further back than that.
-  const oldest = kind === "month" ? 2 : kind === "week" ? 8 : 60;
+  const label = usePeriodLabel();
   return (
     <span className="rw-period">
-      <button type="button" aria-label={t({ de: "Früher" })} disabled={back >= oldest} onClick={() => setBack(back + 1)}>
+      <button type="button" aria-label={t({ de: "Früher" })} disabled={back >= OLDEST_BACK[kind]} onClick={() => setBack(back + 1)}>
         ‹
       </button>
-      <span className={`rw-period-label${samePeriod(kind, day, now) ? "" : " past"}`}>{label}</span>
+      <span className={`rw-period-label${samePeriod(kind, day, new Date()) ? "" : " past"}`}>{label(kind, back, day)}</span>
       <button type="button" aria-label={t({ de: "Später" })} disabled={back === 0} onClick={() => setBack(back - 1)}>
         ›
       </button>
@@ -271,7 +263,7 @@ function Info() {
     <section className="settings game-info">
       <p>
         {t({
-          de: "Eine Tafel, auf der Ihr Kind Sterne sammelt – auf dem Bildschirm und, genau gleich, zum Ausdrucken. Oben wechseln Sie die Ansicht: Tag (die Aufgaben von heute als große Bilder), Woche (Aufgaben × Tage) oder Monat (ein Kalender) – alle drei zeigen dieselben Sterne; mit ‹ geht es zu früheren Tagen, Wochen oder Monaten, um einen vergessenen Stern nachzutragen. „Sammeln“ ist ein Weg bis zur Belohnung, ohne Tage. Die Vorlagen zeigen mit Beispiel-Sternen, wie eine Tafel in Benutzung aussieht; „＋ Neue Tafel“ führt Schritt für Schritt zu einer eigenen, z. B. eine pro Kind. Unter „Gestalten“ ändern Sie später alles.",
+          de: "Eine Tafel, auf der Ihr Kind Sterne sammelt – auf dem Bildschirm und, genau gleich, zum Ausdrucken. Oben wechseln Sie die Ansicht: Tag (die Aufgaben von heute als große Bilder), Woche (Aufgaben × Tage) oder Monat (ein Kalender) – alle drei zeigen dieselben Sterne; mit ‹ geht es zu früheren Tagen, Wochen oder Monaten, um einen vergessenen Stern nachzutragen. Unter „Rückblick“ blättern Sie mit Ihrem Kind durch die letzten Wochen und schauen zusammen, was schon geklappt hat. „Sammeln“ ist ein Weg bis zur Belohnung, ohne Tage. Die Vorlagen zeigen mit Beispiel-Sternen, wie eine Tafel in Benutzung aussieht; „＋ Neue Tafel“ führt Schritt für Schritt zu einer eigenen, z. B. eine pro Kind. Unter „Gestalten“ ändern Sie später alles.",
         })}
       </p>
       <p>
