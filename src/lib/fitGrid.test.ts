@@ -3,7 +3,7 @@ import { packGroups } from "./fitGrid";
 
 describe("packGroups", () => {
   test("a small group sits beside an earlier one when the row has room", () => {
-    // Kleine Abenteuer: 3 lift stories, 8 walks, 1 raft.
+    // Three groups of 3, 8 and 1 cards.
     const { places, lines } = packGroups([3, 8, 1], 4);
     expect(lines).toEqual([1, 2]);
     expect(places[2]).toEqual({ column: 3, row: 0, line: 0, width: 1, height: 1 });
