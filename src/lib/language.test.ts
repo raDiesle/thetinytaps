@@ -10,7 +10,7 @@ describe("app languages", () => {
   // Translations are made only on request, so a name may be missing (it shows in German); one that is there is in
   // the language's own script, never German words in Latin letters on a Russian, Chinese, Hindi or Arabic menu.
   test("the home menu's names in languages with their own script have no Latin letters", () => {
-    const texts = CATEGORIES.flatMap((c) => [c.title, c.subtitle, ...c.games.map((g) => g.title)]);
+    const texts = CATEGORIES.flatMap((c) => [c.title, ...(c.subtitle ? [c.subtitle] : []), ...c.games.map((g) => g.title)]);
     for (const id of ["ru", "zh", "hi", "ar"] as const) {
       for (const name of texts.flatMap((text) => text[id] ?? [])) expect(name, `${id}: ${name}`).toMatch(/^[^A-Za-z]*$/);
     }

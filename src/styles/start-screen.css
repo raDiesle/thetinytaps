@@ -443,6 +443,11 @@ kbd {
   background: rgb(255 255 255 / 0.45);
 }
 
+/* A group without a name (the home page's category cards) stands on no frame. */
+.mode-group-bare::before {
+  content: none;
+}
+
 .mode-group-cards {
   margin: 0;
   padding: 0;

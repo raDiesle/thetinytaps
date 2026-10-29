@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, categoryHref, hasPage } from "./games";
+import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
@@ -19,7 +19,16 @@ describe("home menu", () => {
 
   test("a category of one game opens it directly, without a menu of one card", () => {
     for (const category of CATEGORIES) {
+      if (category.onHome) continue;
       expect(categoryHref(category), category.id).toBe(category.games.length === 1 ? category.games[0].href : `/spiele/${category.id}/`);
+    }
+  });
+
+  test("a category whose games stand on the home page has no page, and its games lead back home", () => {
+    for (const category of CATEGORIES.filter((c) => c.onHome)) {
+      expect(hasPage(category), category.id).toBe(false);
+      expect(category.subtitle, category.id).toBeUndefined();
+      for (const game of category.games) expect(categoryOf(game.href), game.href).toBeUndefined();
     }
   });
 

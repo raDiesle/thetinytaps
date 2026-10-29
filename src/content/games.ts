@@ -13,8 +13,10 @@ export interface Category {
   id: string;
   emoji: string;
   title: Localized;
-  /** Under the title on the category's own page. */
-  subtitle: Localized;
+  /** Under the title on the category's own page (none for one whose games stand on the home page). */
+  subtitle?: Localized;
+  /** Its games stand on the home page itself, together on a frame with the category's name above, instead of behind a card of their own. */
+  onHome?: boolean;
   games: Game[];
 }
 
@@ -170,7 +172,8 @@ export const CATEGORIES: Category[] = [
     id: "weitere",
     emoji: "🎈",
     title: { de: "Weitere", ru: "Ещё", en: "More", zh: "更多", hi: "और भी", es: "Más", ar: "المزيد" },
-    subtitle: { de: "Zähne putzen, aufs Töpfchen gehen, Sterne sammeln, den Tag in Bildern sehen und laut oder leise rufen." },
+    // Its games are few and stand apart from each other, so a tap on „Weitere“ first would only hide them.
+    onHome: true,
     games: [
       {
         href: "/zaehne/",
@@ -192,11 +195,14 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-/** A category of one game has no page of its own: a menu with a single card would only be one tap more. */
-export const hasPage = (category: Category) => category.games.length > 1;
+/**
+ * A category of one game has no page of its own: a menu with a single card would only be one tap more.
+ * Neither has one whose games stand on the home page.
+ */
+export const hasPage = (category: Category) => !category.onHome && category.games.length > 1;
 
-/** Where the category's home card leads: its page, or its only game. */
-export const categoryHref = (category: Category) => (hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+/** Where the category's home card leads: its page, or its only game; the home page for one whose games stand there. */
+export const categoryHref = (category: Category) => (category.onHome ? "/" : hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
 
 /** The category page a game page belongs to, for its back link; none for the only game of a category (back to home then). */
 export function categoryOf(pathname: string) {
