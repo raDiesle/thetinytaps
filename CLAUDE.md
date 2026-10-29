@@ -180,7 +180,8 @@ In a fresh worktree run `bun install` first.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
-  of a level. Never add another.
+  of a level. Never add another. Starting a game shows no note on how to leave (that goes into `info`): the
+  „Zurück zum Menü“ next to ✕ appears only while it is held or a mouse is over it.
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock

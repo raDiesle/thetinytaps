@@ -20,9 +20,6 @@ const EXIT_DELAY_MS = 500;
 /** Esc has to be held, since children press it while typing. */
 const ESC_HOLD_MS = 1000;
 
-/** How long the "Zurück zum Menü" note shows next to ✕ when a game starts. */
-const EXIT_HINT_MS = 4000;
-
 /** Leaves the game for its start screen, like holding ✕; the end of a level offers it as „Menü“. */
 const LeaveGame = createContext<() => void>(() => {});
 
@@ -408,21 +405,19 @@ const STARS: [number, number, number][] = [
 /**
  * The ✕ in the corner: it has to be held for half a second while the ring
  * fills; letting go earlier keeps playing. A short note next to it says what
- * it does when the game starts.
+ * it does while it is held (or a mouse is over it) – never by itself when a game starts.
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   const t = useT();
   const [holding, setHolding] = useState(false);
-  const [hint, setHint] = useState(true);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    const hide = setTimeout(() => setHint(false), EXIT_HINT_MS);
-    return () => {
-      clearTimeout(hide);
+  useEffect(
+    () => () => {
       if (timer.current) clearTimeout(timer.current);
-    };
-  }, []);
+    },
+    [],
+  );
 
   const press = () => {
     if (timer.current) return;
@@ -439,7 +434,7 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   const isPressKey = (key: string) => key === "Enter" || key === " ";
 
   return (
-    <div className={`exit-corner${hint || holding ? " hinted" : ""}`} data-tap-keep>
+    <div className={`exit-corner${holding ? " hinted" : ""}`} data-tap-keep>
       <span className="exit-hint" aria-hidden>
         {label} · {t({ de: "halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })}
       </span>

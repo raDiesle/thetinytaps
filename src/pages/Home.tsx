@@ -46,13 +46,13 @@ export function Home() {
       />
       <p className="home-subtitle">
         {t({
-          de: "Spiele für die Kleinsten (2–3 Jahre)",
-          ru: "Игры для самых маленьких (2–3 года)",
-          en: "Games for little ones (ages 2–3)",
-          zh: "给小宝宝的游戏（2–3 岁）",
-          hi: "नन्हे-मुन्नों के लिए खेल (2–3 साल)",
-          es: "Juegos para los más pequeños (2–3 años)",
-          ar: "ألعاب للصغار (من 2 إلى 3 سنوات)",
+          de: "Spiele für die Kleinsten",
+          ru: "Игры для самых маленьких",
+          en: "Games for little ones",
+          zh: "给小宝宝的游戏",
+          hi: "नन्हे-मुन्नों के लिए खेल",
+          es: "Juegos para los más pequeños",
+          ar: "ألعاب للصغار",
         })}
       </p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>

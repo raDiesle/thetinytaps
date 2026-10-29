@@ -21,7 +21,7 @@
   gap: 8px;
 }
 
-/* "Zurück zum Menü": shown for a moment when a game starts, and while leaving; left of the buttons, taking no room. */
+/* "Zurück zum Menü": shown only while leaving (and under a mouse), never when a game starts; left of the buttons, taking no room. */
 .exit-hint {
   position: absolute;
   right: calc(100% + 8px);
