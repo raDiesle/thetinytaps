@@ -27,6 +27,20 @@ export interface ResearchExclusion {
   why: string;
 }
 
+/** One address checked for a domain research: which endings were free, and how well it fits. */
+export interface ResearchDomain {
+  /** The name without ending, e.g. "tapsiland". */
+  name: string;
+  /** 1 is the best; same number, same fit. */
+  rank: number;
+  /** Endings that were free on the research date, e.g. ["de", "com"]. */
+  free: string[];
+  /** Endings already registered by someone. */
+  taken: string[];
+  /** Why it is ranked so, in one or two sentences. */
+  why: string;
+}
+
 /** One piece of research with its results. */
 export interface Research {
   id: string;
@@ -46,9 +60,158 @@ export interface Research {
   /** Ideas that came out of it besides those of the topics. */
   ideas: string[];
   sources: { label: string; url: string }[];
+  /** For a domain research: the addresses checked, best first. */
+  domains?: ResearchDomain[];
 }
 
 export const RESEARCH: Research[] = [
+  {
+    id: "domain",
+    date: "2026-10-29",
+    emoji: "🌐",
+    title: "Welche Domain? Name, Suche und was noch frei ist",
+    question:
+      "Welche Adresse passt zu allem, was die App heute kann (Wimmelbilder, Bewegungsabenteuer mit dem Fuchs Tapsi, Gefühle, Kettenreaktion, Zuordnen, Buchstaben und Zahlen, Zähne putzen, Töpfchen, Belohnungstafel, Tagesplan, Laut und leise – offline, ohne Werbung und Konto), hilft bei Google, bleibt Eltern im Kopf und ist noch zu haben?",
+    method:
+      "Verfügbarkeit am 29. Oktober 2026 für 57 Namen mit je sechs Endungen (.de, .com, .app, .net, .eu, .io) über die Register selbst abgefragt: RDAP von DENIC, Verisign und Google Registry, whois von EURid und NIC.io; die .de-Treffer zusätzlich im DENIC-whois bestätigt. „Frei“ heißt nur: nicht registriert – Premium-Preise oder gesperrte Namen zeigt das nicht, und frei ist es nur bis jemand anderes kauft. Dazu rund 30 Abfragen der Google-Autovervollständigung (Deutschland, Deutsch) und sechs Websuchen zu Googles Aussagen über Domains, zu Länder-Endungen, Namensregeln und Marken. Markenregister (DPMA, EUIPO) sind nicht durchsucht – das steht vor dem Kauf noch aus.",
+    findings: [
+      "Wörter in der Domain bringen bei Google keinen Vorsprung: John Mueller (Google) sagt seit 2011 immer wieder, eine Keyword-Domain sei kein Rankingfaktor; das EMD-Update 2012 hat dünne Keyword-Domains sogar abgewertet. Was zählt, sind die Seiten selbst (Titel und Texte in seo.ts) und Erwähnungen – ein Name, den Eltern sich merken und wieder eintippen, baut genau das auf.",
+      "Eltern suchen nach dem, was die App ist, nicht nach einem Namen: „spiele für kleinkinder (online, kostenlos, ab 2 jahren)“, „kleinkind spiele app“, „kinderspiele ab 2 online kostenlos“, „app für kleinkinder offline“, „wimmelbild app ohne werbung“, „erste spiele ab 2“. Diese Wörter gehören in Seitentitel und Texte; als Domain wären sie lang, mit Bindestrich oder Zahl, und nicht zu schützen.",
+      "„spiele-ab-2“ ist doppeldeutig: Google ergänzt es sofort zu „spiele ab 2 personen“ (Brettspiele zu zweit). Bindestrich und Zahl fallen außerdem beim Vorlesen durch – wer den Namen einmal hört, tippt ihn falsch.",
+      "Der jetzige Name passt schlecht: „TinyTap“ ist eine bekannte Lern-App für Kinder (TinyTap Ltd., seit 2022 bei Animoca Brands) mit eingetragener US-Wortmarke für Software und Bildung (Klassen 9 und 41, seit 2014) – „The Tiny Taps“ liegt einen Buchstaben daneben. Google ergänzt „tiny taps“ zu einer Bar in Chicago und Zapfanlagen; deutsche Eltern verstehen „taps“ nicht, und „The“ ist ein Füllwort, das beim Tippen vergessen wird.",
+      "Tapsi trägt den Namen schon: Der Fuchs führt durch Bewegungsabenteuer, Zähne putzen und Töpfchen, und „tapsig“ ist im Deutschen genau, wie Zweijährige laufen – Eltern verstehen es sofort, man schreibt es, wie man es hört. „tapsi“ allein ist überall vergeben und wird auch anders benutzt (die Katze in HABAs „Tapsi, Flo & Co“, 2023; Überraschungsei-Schildkröten von 1992; Pflaster), als Zusammensetzung aber frei.",
+      "„Tapsiland“ ist auf allen sechs Endungen frei, 9 Buchstaben, ohne Bindestrich, auf Deutsch und Englisch gleich auszusprechen und groß genug für alle Spiele und für neue – deshalb Platz 1. „Tapsiwelt“ und „Tapsispiele“ sind ebenso frei, aber nur auf Deutsch verständlich bzw. länger.",
+      "Endung: Alle Suchmaschinen-Seiten sind Deutsch (seo.ts), also .de als Hauptadresse – sie zielt bei Google auf Deutschland und ist die Endung, der deutsche Eltern am meisten trauen. .com und .app gelten bei Google als allgemein ohne Land; sie dazu kaufen und auf .de umleiten, als Reserve für den Tag, an dem andere Sprachen eigene Seiten bekommen. .app erzwingt HTTPS, was GitHub Pages kann. .io und .net sagen Eltern nichts.",
+      "Eine Keyword-Domain wie kleinkindspiele.de (frei, .com vergeben) kann man billig sichern und umleiten, nur damit sie kein Nachahmer bekommt; Suchplätze bringt die Umleitung nicht.",
+      "Umzug früh machen: Gespeichertes hängt an der Adresse – Einstellungen, Sterne der Belohnungstafel, Spielzeit und die installierte App bleiben bei radiesle.github.io zurück und fangen auf der neuen Domain leer an. Technisch reicht in GitHub Pages die eigene Domain (GitHub leitet die alte Adresse um) und im Bau SITE_ORIGIN mit PUBLIC_BASE_PATH „/“ statt „/<repo>“.",
+      "Vor dem Kauf noch prüfen: Wortmarken „Tapsi“ und „Tapsiland“ im DPMA-Register und bei der EUIPO (Klassen 9, 28, 41), sowie ob die Namen bei App-Stores und sozialen Netzen frei sind.",
+    ],
+    topics: [
+      {
+        emoji: "🔎",
+        title: "Was Eltern suchen (gehört in Titel, nicht in die Domain)",
+        searches: [
+          "spiele für kleinkinder",
+          "spiele für kleinkinder ab 2 jahren online kostenlos",
+          "kleinkind spiele app",
+          "kinderspiele ab 2 online kostenlos",
+          "app für kleinkinder offline",
+          "wimmelbild app ohne werbung",
+          "erste spiele ab 2",
+        ],
+        ideas: [],
+      },
+      {
+        emoji: "🏷️",
+        title: "Namen, die schon jemand trägt",
+        searches: ["tinytap", "tiny taps app", "tapsi katjes", "tapsi pflaster", "tapsi törtels"],
+        ideas: [],
+      },
+    ],
+    games: [],
+    excluded: [
+      { title: "Umlaute in der Domain (kleinkindspiele-für-…)", why: "Werden als xn--… angezeigt und geteilt und auf englischen Tastaturen nicht getippt." },
+      { title: "Zahlen und Bindestriche (spiele-ab-2.de)", why: "Fallen beim Vorlesen durch, und „spiele ab 2“ heißt bei Google auch Brettspiele zu zweit." },
+      {
+        title: "Domain mit „TinyTap“ (tinytaps.eu, tinytaps.io)",
+        why: "Fast die Marke einer bekannten Kinder-Lern-App – Verwechslung und Ärger, keine Suchplätze.",
+      },
+    ],
+    ideas: [],
+    sources: [
+      {
+        label: "Google Search Central – Mehrsprachige und regionale Websites",
+        url: "https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites",
+      },
+      {
+        label: "Search Engine Roundtable – Keywords in der Domain sind nicht nötig (Mueller)",
+        url: "https://www.seroundtable.com/google-keywords-domain-unnecessary-18667.html",
+      },
+      { label: "Search Engine Journal – Ist der Domainname ein Rankingfaktor?", url: "https://www.searchenginejournal.com/ranking-factors/domain-name/" },
+      { label: "Saw.com – Der Radio-Test für Domainnamen", url: "https://saw.com/blog/en/articles/saw-video-the-radio-test" },
+      { label: "Trademark-Verzeichnis – TINYTAP (US 85972963)", url: "https://trademarkdir.com/trademark/tinytap-85972963" },
+      { label: "App Store – TinyTap: Kids' Learning Games", url: "https://apps.apple.com/DE/app/id493868874" },
+    ],
+    domains: [
+      {
+        name: "tapsiland",
+        rank: 1,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Der Fuchs der App plus „Land“ für alle Spiele; deutsch wie englisch verständlich, 9 Buchstaben, schreibt sich, wie man es hört. Hauptadresse .de, dazu .com.",
+      },
+      {
+        name: "tapsiwelt",
+        rank: 2,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Gleich gut auf Deutsch, aber „welt“ sagt Kindern und Eltern anderer Sprachen nichts. Gute Reserve.",
+      },
+      {
+        name: "tapsispiele",
+        rank: 3,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Name und „Spiele“ in einem – klar, aber 11 Buchstaben und nur deutsch; Belohnungstafel und Tagesplan sind keine Spiele.",
+      },
+      {
+        name: "erstespiele",
+        rank: 3,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Trifft „erste spiele ab 2“, ist aber kaum zu unterscheiden von HABAs Reihe „Meine ersten Spiele“ (meine-ersten-spiele.de ist vergeben).",
+      },
+      {
+        name: "kleinkindspiele",
+        rank: 4,
+        free: ["de", "app", "net", "eu", "io"],
+        taken: ["com"],
+        why: "Genau ein Suchwort, aber ohne Vorsprung bei Google, nicht als Marke zu schützen und wie ein Portal. Höchstens billig sichern und umleiten.",
+      },
+      {
+        name: "kleinkinderspiele",
+        rank: 4,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Google ergänzt „kleinkindspiele“ hierzu; sonst wie kleinkindspiele.",
+      },
+      {
+        name: "tipptapsi",
+        rank: 5,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Tippen und Tapsi, verspielt – aber beim Hören unklar, ob „tip“ oder „tipp“.",
+      },
+      {
+        name: "tappsiland",
+        rank: 5,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Häufiger Tippfehler von Tapsiland; nur als Umleitung, wenn Tapsiland gekauft wird.",
+      },
+      {
+        name: "thetinytaps",
+        rank: 6,
+        free: ["de", "com", "app", "net", "eu", "io"],
+        taken: [],
+        why: "Der jetzige Name, überall frei – aber nah an der Marke TinyTap, „taps“ verstehen deutsche Eltern nicht, und „the“ wird vergessen.",
+      },
+      {
+        name: "tinytaps",
+        rank: 7,
+        free: ["eu", "io"],
+        taken: ["de", "com", "app", "net"],
+        why: "Fast überall vergeben, und noch näher an TinyTap.",
+      },
+      {
+        name: "tapsi",
+        rank: 7,
+        free: [],
+        taken: ["de", "com", "app", "net", "eu", "io"],
+        why: "Überall vergeben.",
+      },
+    ],
+  },
   {
     id: "tagesplan",
     date: "2026-10-28",

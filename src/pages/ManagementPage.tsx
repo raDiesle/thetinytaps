@@ -659,6 +659,35 @@ function ResearchPanel({ research, open, onShow }: { research: Research; open: b
           </div>
         </>
       )}
+      {research.domains && (
+        <>
+          <h3>Domains – frei am {date}</h3>
+          <div className="ideas-overview-scroll">
+            <table className="ideas-research-table">
+              <thead>
+                <tr>
+                  <th>Platz</th>
+                  <th>Name</th>
+                  <th>Frei</th>
+                  <th>Vergeben</th>
+                  <th>Warum</th>
+                </tr>
+              </thead>
+              <tbody>
+                {research.domains.map((domain) => (
+                  <tr key={domain.name}>
+                    <td>{domain.rank}</td>
+                    <th>{domain.name}</th>
+                    <td>{domain.free.map((tld) => `.${tld}`).join(" ") || "–"}</td>
+                    <td>{domain.taken.map((tld) => `.${tld}`).join(" ") || "–"}</td>
+                    <td>{domain.why}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
       {research.excluded.length > 0 && (
         <>
           <h3>Bewusst weggelassen</h3>

@@ -97,6 +97,19 @@ describe("research on the management page", () => {
     expect(research.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 
+  test("checked domains come best first, each ending once as free or taken", () => {
+    for (const research of RESEARCH) {
+      const domains = research.domains ?? [];
+      const ranks = domains.map((d) => d.rank);
+      expect(ranks, research.id).toEqual([...ranks].sort((a, b) => a - b));
+      expect(new Set(domains.map((d) => d.name)).size, research.id).toBe(domains.length);
+      for (const { name, free, taken } of domains) {
+        const endings = [...free, ...taken];
+        expect(new Set(endings).size, name).toBe(endings.length);
+      }
+    }
+  });
+
   test("ids are unique and the newest comes first", () => {
     const ids = RESEARCH.map((r) => r.id);
     expect(new Set(ids).size).toBe(ids.length);
