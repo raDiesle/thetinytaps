@@ -9,12 +9,20 @@ export function shuffle<T>(items: T[]): T[] {
   return result;
 }
 
-/** Draws from `pool` in random order: all of them before one comes again, and never the same one twice in a row. */
+/**
+ * Draws from `pool` in random order: all of them before one comes again, and never the same one twice in a row.
+ * A new `pool` (another kind of pictures) starts a new deck, so nothing of the old one comes any more.
+ */
 export function useDeck<T>(pool: T[]) {
   const deck = useRef<T[]>([]);
   const last = useRef<T | null>(null);
+  const dealtFrom = useRef(pool);
 
   return useCallback(() => {
+    if (dealtFrom.current !== pool) {
+      dealtFrom.current = pool;
+      deck.current = [];
+    }
     if (deck.current.length === 0) deck.current.push(...shuffle(pool));
     let next = deck.current.pop()!;
     if (next === last.current && deck.current.length > 0) {
