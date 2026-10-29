@@ -1,40 +1,5 @@
 /* Animations of the Unterwasser scene. Durations match durationMs in Unterwasser.tsx. Sun and cloud: ../sky.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .uw-cloud {
-  animation: uw-drift 30s ease-in-out infinite alternate;
-}
-
-.scene.lively .uw-ray {
-  animation: uw-shimmer 5s ease-in-out calc(var(--i) * -1.3s) infinite alternate;
-}
-
-.scene.lively .uw-seegras-blade,
-.scene.lively .uw-anemone path {
-  animation: uw-sway 3s ease-in-out calc(var(--i) * -0.4s) infinite alternate;
-}
-
-.scene.lively .uw-blase {
-  animation: uw-blase-rise 4s ease-in calc(var(--i) * -1s) infinite;
-}
-
-.scene.lively .uw-qualle-body {
-  animation: uw-hover 4s ease-in-out infinite alternate;
-}
-
-.scene.lively .uw-fish-tail {
-  animation: uw-wag 0.6s ease-in-out infinite alternate;
-}
-
-.scene.lively .uw-schwarm-fish {
-  animation: uw-school-drift 3s ease-in-out calc(var(--i) * -0.3s) infinite alternate;
-}
-
-.scene.lively .uw-uboot-prop {
-  animation: uw-prop 0.4s linear infinite;
-}
-
 /* Puffs, bubbles, splashes and other things that only show up in an animation; they can't be tapped meanwhile. */
 .uw-leucht-beams,
 .uw-boot-puffs circle,
@@ -116,18 +81,6 @@
   transform-origin: 50% 100%;
 }
 
-@keyframes uw-drift {
-  to {
-    transform: translateX(80px);
-  }
-}
-
-@keyframes uw-shimmer {
-  to {
-    opacity: 0.45;
-  }
-}
-
 @keyframes uw-sway {
   from {
     transform: rotate(-5deg);
@@ -137,21 +90,9 @@
   }
 }
 
-@keyframes uw-hover {
-  to {
-    transform: translateY(-14px);
-  }
-}
-
 @keyframes uw-wag {
   to {
     transform: rotate(16deg);
-  }
-}
-
-@keyframes uw-school-drift {
-  to {
-    transform: translate(-8px, 5px);
   }
 }
 

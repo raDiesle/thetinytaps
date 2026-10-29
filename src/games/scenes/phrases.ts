@@ -1,5 +1,4 @@
 import type { Localized } from "@/lib/language";
-import type { SceneTrigger } from "./settings";
 import type { SceneItem, SceneTrait } from "./types";
 
 // Every sentence the engine builds itself, in each language: prompts, praise,
@@ -27,12 +26,15 @@ export interface PlaceWords {
   at: string;
 }
 
+/** What starts the picture: a tap, or a key in keys mode. */
+type ScenePrompt = "tap" | "keys";
+
 /** The engine's words in one language. */
 export interface ScenePhrases {
-  /** Shown until the first tap, by trigger. */
-  prompts: Record<SceneTrigger, string>;
+  /** Shown until the first tap, tap or key. */
+  prompts: Record<ScenePrompt, string>;
   /** The same in colour mode. */
-  colourPrompts: Record<SceneTrigger, string>;
+  colourPrompts: Record<ScenePrompt, string>;
   /** Said before the praise of a right answer, one at random. */
   praise: string[];
   /** The party when everything is coloured / discovered. */
@@ -68,15 +70,17 @@ export interface ScenePhrases {
   discoveredCount: (count: number, total: number) => string;
   /** Label of the space bar on screen. */
   spaceBar: string;
+  /** The ⌨️ in the picture that switches keys mode (and its badges) off and on, for grown-ups. */
+  keysToggle: string;
   /** Shown on a phone held upright. */
   rotate: string;
 }
 
 const de: ScenePhrases = {
-  prompts: { tap: "Tipp etwas an! 👆", hover: "Zeig auf etwas! 👆", keys: "Drück eine Taste! ⌨️" },
+  prompts: { tap: "Tipp etwas an! 👆", keys: "Drück eine Taste! ⌨️" },
   colourPrompts: {
     tap: "Tipp etwas an – es wird bunt! 🖍️",
-    hover: "Zeig auf etwas – es wird bunt! 🖍️",
+
     keys: "Drück eine Taste – es wird bunt! 🖍️",
   },
   praise: ["Super!", "Toll!", "Prima!", "Ja, genau!", "Richtig!"],
@@ -114,6 +118,7 @@ const de: ScenePhrases = {
   foundCount: (count) => `${count} gefunden`,
   discoveredCount: (count, total) => `${count} von ${total} entdeckt`,
   spaceBar: "Leertaste",
+  keysToggle: "Tasten im Bild zeigen",
   rotate: "Quer halten – dann wird das Bild groß",
 };
 
@@ -135,10 +140,10 @@ function ruAdjective(m: string, f: string, n: string, pl: string, emoji: string,
 const ruColour = (m: string, f: string, n: string, pl: string, emoji: string): TraitWords => ({ ...ruAdjective(m, f, n, pl, emoji), part: `Вот ${m} цвет!` });
 
 const ru: ScenePhrases = {
-  prompts: { tap: "Нажми на что-нибудь! 👆", hover: "Покажи на что-нибудь! 👆", keys: "Нажми на клавишу! ⌨️" },
+  prompts: { tap: "Нажми на что-нибудь! 👆", keys: "Нажми на клавишу! ⌨️" },
   colourPrompts: {
     tap: "Нажми на что-нибудь – и оно станет цветным! 🖍️",
-    hover: "Покажи на что-нибудь – и оно станет цветным! 🖍️",
+
     keys: "Нажми на клавишу – и что-то станет цветным! 🖍️",
   },
   praise: ["Молодец!", "Здорово!", "Супер!", "Да, точно!", "Правильно!"],
@@ -176,6 +181,7 @@ const ru: ScenePhrases = {
   foundCount: (count) => `Найдено: ${count}`,
   discoveredCount: (count, total) => `Найдено ${count} из ${total}`,
   spaceBar: "Пробел",
+  keysToggle: "Показывать клавиши на картинке",
   rotate: "Поверни телефон – и картинка станет большой",
 };
 
@@ -194,10 +200,10 @@ function enTrait(question: string, answer: string, pluralAnswer: string, part: s
 }
 
 const en: ScenePhrases = {
-  prompts: { tap: "Tap something! 👆", hover: "Point at something! 👆", keys: "Press a key! ⌨️" },
+  prompts: { tap: "Tap something! 👆", keys: "Press a key! ⌨️" },
   colourPrompts: {
     tap: "Tap something – it gets colorful! 🖍️",
-    hover: "Point at something – it gets colorful! 🖍️",
+
     keys: "Press a key – something gets colorful! 🖍️",
   },
   praise: ["Super!", "Great!", "Well done!", "Yes, exactly!", "That's right!"],
@@ -235,6 +241,7 @@ const en: ScenePhrases = {
   foundCount: (count) => `${count} found`,
   discoveredCount: (count, total) => `${count} of ${total} discovered`,
   spaceBar: "Space bar",
+  keysToggle: "Show the keys in the picture",
   rotate: "Turn it sideways – the picture gets big",
 };
 
@@ -250,10 +257,10 @@ const zhTrait = (question: string, answer: string, part: string | undefined, emo
 });
 
 const zh: ScenePhrases = {
-  prompts: { tap: "点一点！👆", hover: "用手指指一指！👆", keys: "按一个键！⌨️" },
+  prompts: { tap: "点一点！👆", keys: "按一个键！⌨️" },
   colourPrompts: {
     tap: "点一点，它就变成彩色的！🖍️",
-    hover: "指一指，它就变成彩色的！🖍️",
+
     keys: "按一个键，就有东西变成彩色的！🖍️",
   },
   praise: ["真棒！", "太好了！", "好厉害！", "对，就是它！", "答对了！"],
@@ -292,6 +299,7 @@ const zh: ScenePhrases = {
   foundCount: (count) => `找到了${count}个`,
   discoveredCount: (count, total) => `发现了${count}个，一共${total}个`,
   spaceBar: "空格键",
+  keysToggle: "在图画上显示按键",
   rotate: "把手机横过来，画就变大了",
 };
 
@@ -313,10 +321,10 @@ function hiAdjective(question: string, m: string, f: string, pl: string, part: s
 }
 
 const hi: ScenePhrases = {
-  prompts: { tap: "कुछ भी छुओ! 👆", hover: "किसी चीज़ की ओर इशारा करो! 👆", keys: "कोई भी बटन दबाओ! ⌨️" },
+  prompts: { tap: "कुछ भी छुओ! 👆", keys: "कोई भी बटन दबाओ! ⌨️" },
   colourPrompts: {
     tap: "कुछ भी छुओ – उसमें रंग भर जाएगा! 🖍️",
-    hover: "किसी चीज़ की ओर इशारा करो – उसमें रंग भर जाएगा! 🖍️",
+
     keys: "कोई भी बटन दबाओ – कहीं रंग भर जाएगा! 🖍️",
   },
   praise: ["शाबाश!", "बहुत बढ़िया!", "वाह!", "हाँ, बिल्कुल!", "सही!"],
@@ -363,6 +371,7 @@ const hi: ScenePhrases = {
   foundCount: (count) => `${count} मिले`,
   discoveredCount: (count, total) => `${total} में से ${count} खोजे`,
   spaceBar: "स्पेस बार",
+  keysToggle: "तस्वीर में बटन दिखाएँ",
   rotate: "फ़ोन को आड़ा करो – तस्वीर बड़ी हो जाएगी",
 };
 
@@ -394,10 +403,10 @@ function esAdjective(question: string, m: string, f: string, mPl: string, fPl: s
 }
 
 const es: ScenePhrases = {
-  prompts: { tap: "¡Toca algo! 👆", hover: "¡Señala algo! 👆", keys: "¡Pulsa una tecla! ⌨️" },
+  prompts: { tap: "¡Toca algo! 👆", keys: "¡Pulsa una tecla! ⌨️" },
   colourPrompts: {
     tap: "¡Toca algo y se llena de color! 🖍️",
-    hover: "¡Señala algo y se llena de color! 🖍️",
+
     keys: "¡Pulsa una tecla y algo se llena de color! 🖍️",
   },
   praise: ["¡Súper!", "¡Genial!", "¡Muy bien!", "¡Sí, exacto!", "¡Correcto!"],
@@ -440,6 +449,7 @@ const es: ScenePhrases = {
   foundCount: (count) => `${count} encontrados`,
   discoveredCount: (count, total) => `${count} de ${total} descubiertos`,
   spaceBar: "Barra espaciadora",
+  keysToggle: "Mostrar las teclas en el dibujo",
   rotate: "Gira la pantalla y el dibujo se hace grande",
 };
 
@@ -464,10 +474,10 @@ function arAdjective(question: string, m: string, f: string, mPl: string, part: 
 }
 
 const ar: ScenePhrases = {
-  prompts: { tap: "هيّا نلمس شيئا! 👆", hover: "هيّا نشير إلى شيء! 👆", keys: "هيّا نضغط على زر! ⌨️" },
+  prompts: { tap: "هيّا نلمس شيئا! 👆", keys: "هيّا نضغط على زر! ⌨️" },
   colourPrompts: {
     tap: "هيّا نلمس شيئا فيصبح ملونا! 🖍️",
-    hover: "هيّا نشير إلى شيء فيصبح ملونا! 🖍️",
+
     keys: "هيّا نضغط على زر فيصبح شيء ملونا! 🖍️",
   },
   praise: ["رائع!", "ممتاز!", "جميل جدا!", "نعم، بالضبط!", "صحيح!"],
@@ -505,6 +515,7 @@ const ar: ScenePhrases = {
   foundCount: (count) => `وجدنا ${count}`,
   discoveredCount: (count, total) => `اكتشفنا ${count} من ${total}`,
   spaceBar: "مفتاح المسافة",
+  keysToggle: "إظهار المفاتيح في الصورة",
   rotate: "أديروا الهاتف بالعرض فتكبر الصورة",
 };
 

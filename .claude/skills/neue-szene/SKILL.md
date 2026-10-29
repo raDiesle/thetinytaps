@@ -6,7 +6,7 @@ description: Create a new "Lebendige Bilder" scene (Wimmelbild) for The Tiny Tap
 # New scene for "Lebendige Bilder"
 
 A scene is a hand-drawn SVG picture (React components) for toddlers aged 2–3.
-Every item can be tapped, hovered or triggered by a key; then it plays a short
+Every item can be tapped or triggered by a key; then it plays a short
 animation and a sound, and may say a German sentence. `baustelle/` is the
 reference – read it before starting and copy its patterns.
 
@@ -164,10 +164,9 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   Draw these parts as separate elements with their own class from the start, so
   they can move – a door painted into the wall can't open.
 - **The picture is still and silent unless someone acts.** No sound ever plays
-  without a tap, hover or key (also not with idle movement on). Idle movement (clouds, rotors,
-  blinking lights, wagging tails) only under `.scene.lively …` – that class is set
-  only when the parent turns on "Bild bewegt sich auch von allein". Check with
-  `document.getAnimations().length === 0` after load.
+  without a tap or key, and nothing moves by itself: no idle movement (clouds, rotors, blinking lights,
+  wagging tails) – the option „Bild bewegt sich auch von allein“ was removed, so don't write `.scene.lively`
+  rules. Check with `document.getAnimations().length === 0` after load.
 - Calm mode is handled by the engine (quieter sounds, no idle movement); tap
   animations still play, so keep them short and never flashing.
 
@@ -195,11 +194,11 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
      hit area returns an element within `.item-<id>`;
    - each item animates when tapped and returns to rest;
    - `document.getAnimations()` is empty when nothing was tapped;
-   - keys mode (trigger "⌨️ Jedes Ding hat eine Taste", "Tasten im Bild zeigen"):
+   - keys mode (on by itself with a keyboard, ⌨️ bottom left switches it):
      every item shows a badge next to it (not on it), badges don't overlap, the key
      triggers it and its badge lights up;
    - tap every item once and look: do all doors, windows, lids and faces move?
-   - hover mode and find mode work; the hint ring sits on the item;
+   - find mode works; the hint ring sits on the item;
    - "Fragen" and "Geräusch-Rätsel" ask sensible questions; every chain plays through;
    - "Ausmalen": everything starts grey and gets its colour when tapped.
 3. Screenshot the whole picture and look for items on one line, overlaps, empty

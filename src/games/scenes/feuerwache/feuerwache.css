@@ -1,43 +1,5 @@
 /* Animations of the Feuerwache scene. Durations match durationMs in Feuerwache.tsx. Sun and cloud: ../sky.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .fw-cloud {
-  animation: fw-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .fw-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .fw-heli-rotor {
-  animation: fw-rotor 0.2s linear infinite alternate;
-}
-
-.scene.lively .fw-fahne-cloth {
-  animation: fw-wave-flag 1.4s ease-in-out infinite alternate;
-}
-
-.scene.lively .fw-hund-tail {
-  animation: fw-wag 0.6s ease-in-out infinite alternate;
-}
-
-.scene.lively .fw-katze-tail {
-  animation: fw-wag 2.4s ease-in-out infinite alternate;
-}
-
-.scene.lively .fw-falter-wings {
-  animation: fw-flap 0.35s ease-in-out infinite alternate;
-}
-
-.scene.lively .fw-turm-hose {
-  animation: fw-sway 3s ease-in-out calc(var(--i) * 0.4s) infinite alternate;
-}
-
-.scene.lively .fw-grill-smoke circle {
-  animation: fw-smoke 3s ease-out calc(var(--i) * 1s) infinite;
-}
-
 /* Lights, puffs, drops and sound lines are hidden until their animation shows them, and can't be tapped meanwhile. */
 .fw-sirene-waves > g,
 .fw-sirene-lamp,
@@ -144,12 +106,6 @@
 }
 
 /* ---------- Shared keyframes ---------- */
-
-@keyframes fw-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
 
 @keyframes fw-rotor {
   to {

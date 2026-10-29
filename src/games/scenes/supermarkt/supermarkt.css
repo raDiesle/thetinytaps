@@ -1,27 +1,5 @@
 /* Animations of the Supermarkt scene. Durations match durationMs in Supermarkt.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .sm-ballon {
-  animation: sm-ballon-idle 4s ease-in-out calc(var(--i) * -1s) infinite;
-}
-
-.scene.lively .sm-fisch-tail {
-  animation: sm-wag 1.2s ease-in-out infinite;
-}
-
-.scene.lively .sm-hund-tail {
-  animation: sm-wag 0.8s ease-in-out infinite;
-}
-
-.scene.lively .sm-kwagen-flag {
-  animation: sm-flag 2s ease-in-out infinite;
-}
-
-.scene.lively .sm-band-stripes {
-  animation: sm-belt 0.6s linear infinite;
-}
-
 /* Puffs, notes, sparkles and other things that only show up in an animation; they can't be tapped meanwhile. */
 .sm-lid,
 .sm-lines path,
@@ -238,12 +216,6 @@
   12%,
   85% {
     opacity: 0;
-  }
-}
-
-@keyframes sm-ballon-idle {
-  50% {
-    transform: rotate(3deg);
   }
 }
 

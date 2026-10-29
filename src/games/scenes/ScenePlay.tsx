@@ -7,7 +7,8 @@ import { loadRecordings, playChime, playLullaby, playMelody, playRandomNote } fr
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { pick as pickLanguage, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
-import { tapState, tapTargetAt } from "@/lib/tapTargets";
+import { touchOnly } from "@/lib/device";
+import { tapState } from "@/lib/tapTargets";
 import { SCENES } from ".";
 import { ARROWS, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
@@ -31,13 +32,6 @@ const NEXT_QUESTION_MS = 2600;
 /** Find modes: when the hint ring appears. */
 const HINT_AFTER_MS = 8000;
 const HINT_AFTER_MISSES = 2;
-/** Without taps for this long, the picture starts moving by itself… */
-const AMBIENT_IDLE_MS = 4000;
-/** …one item every few seconds, at random. */
-const AMBIENT_MIN_MS = 4000;
-const AMBIENT_MAX_MS = 9000;
-/** Hover mode: how long the pointer has to rest on an item, so just passing by doesn't count. */
-const HOVER_DWELL_MS = 200;
 /** Chain reactions: the next item reacts this long after the one before. */
 const CHAIN_STEP_MS = 1100;
 /** "Alles entdeckt!": the party starts a moment after the last item, and everything dances for a while. */
@@ -85,7 +79,7 @@ function paleGrey(hex: string) {
 }
 
 /** Plays `scene` (already in the app language, see localize.ts); the engine's own sentences come from phrases.ts. */
-export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesSettings }) {
+export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings: ScenesSettings; onKeys: (keys: boolean) => void }) {
   // A picture that is not translated completely plays in German, voice and keys included (localize.ts).
   const appLanguage = useAppLanguage();
   const language = targetLanguageFor(sceneLanguage(scene.id, appLanguage.id));
@@ -113,7 +107,11 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
   const { bursts, spawn } = useBursts();
   const location = useLocation();
   const navigate = useNavigate();
-  const roadsOn = settings.roads && settings.mode === "explore";
+  const roadsOn = settings.mode === "explore";
+  // Keys mode wherever there is a keyboard: on a computer from the start, on a tablet from its first key press
+  // on – unless a grown-up switched it off with ⌨️.
+  const [keyboard, setKeyboard] = useState(() => !touchOnly());
+  const keysOn = keyboard && settings.keys;
   // Opened by following a vehicle: it drives in, as a guest or back at home. Read once, the play is keyed by scene.
   const [arrival] = useState(() => (roadsOn ? tripTo(scene.id, location.state) : null));
   const [guest] = useState(() => (arrival && !arrival.home ? (guestFor(arrival.road, language.id) ?? null) : null));
@@ -140,7 +138,6 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
   const lastKey = useRef(0);
   const lastQuestion = useRef(0);
   const lastKeyItem = useRef<SceneItem | null>(null);
-  const lastInteraction = useRef(0);
   /** Taps per vehicle that can drive off: every second one sends it on its way. */
   const driveTaps = useRef(new Map<string, number>());
   const sentenceIndex = useRef(new Map<string, number>());
@@ -190,15 +187,11 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
   );
 
   // Repeated taps cycle through the item's sentences, so there is always something new to hear.
-  const describe = useCallback(
-    (item: SceneItem) => {
-      if (settings.announce === "name") return `${capitalize(item.name)}!`;
-      const index = sentenceIndex.current.get(item.id) ?? 0;
-      sentenceIndex.current.set(item.id, index + 1);
-      return item.sentences[index % item.sentences.length];
-    },
-    [settings.announce],
-  );
+  const describe = useCallback((item: SceneItem) => {
+    const index = sentenceIndex.current.get(item.id) ?? 0;
+    sentenceIndex.current.set(item.id, index + 1);
+    return item.sentences[index % item.sentences.length];
+  }, []);
 
   const funBurst = useCallback(
     (x?: number, y?: number) => {
@@ -282,7 +275,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
 
   // The hint ring marks an answer that hasn't been found yet; after each found one the wait starts again.
   // Not when looking for a named thing: a ring around it would give it away.
-  const hintsOn = settings.hints && hasHints(settings.mode);
+  const hintsOn = hasHints(settings.mode);
   const hintItem = quest?.answers.find((item) => !answered.has(item.id));
   useEffect(() => {
     if (!quest || !hintsOn) return;
@@ -290,28 +283,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
     return () => clearTimeout(timer);
   }, [quest, answered, hintsOn]);
 
-  // Ambient life (only if switched on): when nobody taps for a while, items move by themselves, silently.
-  // While something is looked for, the answers stay still, so they aren't given away.
-  useEffect(() => {
-    if (!settings.ambient) return;
-    let timer: ReturnType<typeof setTimeout>;
-    const schedule = () => {
-      timer = setTimeout(
-        () => {
-          if (performance.now() - lastInteraction.current > AMBIENT_IDLE_MS) {
-            animate(pick(items.filter((item) => !questRef.current?.answers.includes(item))), true);
-          }
-          schedule();
-        },
-        AMBIENT_MIN_MS + Math.random() * (AMBIENT_MAX_MS - AMBIENT_MIN_MS),
-      );
-    };
-    schedule();
-    return () => clearTimeout(timer);
-  }, [items, animate, settings.ambient]);
-
   const interacted = () => {
-    lastInteraction.current = performance.now();
     setTouched(true);
   };
 
@@ -353,7 +325,6 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
 
   /** Explore and colour mode: count the item (and colour it in), and celebrate when it was the last one. */
   const discover = (item: SceneItem, x: number, y: number) => {
-    if (!colouring && !settings.goal && !bedtime) return;
     // A guest from another picture isn't part of this one.
     if (item === guest?.item || discoveredRef.current.has(item.id)) return;
     discoveredRef.current = new Set(discoveredRef.current).add(item.id);
@@ -362,7 +333,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
     if (colouring) for (let i = 0; i < 3; i++) spawn(x + (Math.random() - 0.5) * 120, y + (Math.random() - 0.5) * 120);
     if (discoveredRef.current.size !== scene.items.length) return;
     if (bedtime) later(goodNight, PARTY_AFTER_MS);
-    else if (settings.goal) later(party, PARTY_AFTER_MS);
+    else later(party, PARTY_AFTER_MS);
   };
 
   /**
@@ -410,7 +381,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       later(
         () => {
           const next = itemsById.get(step.item);
-          if (next && animate(next)) say(settings.announce === "name" ? describe(next) : step.sentence, true);
+          if (next && animate(next)) say(step.sentence, true);
         },
         (i + 1) * CHAIN_STEP_MS,
       );
@@ -484,12 +455,9 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
   };
 
   /**
-   * An item was tapped, pointed at for a moment (hover mode) or its key was
-   * pressed (keys mode). Hovering is quieter in the find modes: wrong items only
-   * move, so sweeping the mouse or a finger across the picture doesn't start a
-   * stream of talk.
+   * An item was tapped or its key was pressed (keys mode).
    */
-  const activate = (item: SceneItem, x: number, y: number, how: "tap" | "hover" | "key") => {
+  const activate = (item: SceneItem, x: number, y: number) => {
     interacted();
     // A vehicle that drove off: its sign (or its key) follows it.
     const exit = exits.find((e) => e.item === item);
@@ -498,7 +466,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       return;
     }
     // The arrow keys go on from the activated item, but it gets no frame; its key badge lights up instead.
-    if (settings.trigger === "keys") {
+    if (keysOn) {
       focusRef.current = item;
       setFocus(null);
       setLit((prev) => ({ id: item.id, count: (prev?.count ?? 0) + 1 }));
@@ -510,7 +478,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       if (started) {
         say(describe(item));
         if (item.hideout) say(words.peekaboo(pickLanguage(SURPRISES[lastSurprise.current.get(item.id)!].found, language.id)), true);
-      } else if (how !== "hover") funBurst(x, y);
+      } else funBurst(x, y);
       paint(x, y);
       discover(item, x, y);
       if (started) {
@@ -523,7 +491,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
     const isPart = !quest.answers.includes(item) && quest.colour !== undefined && hasColour(item, quest.colour);
     const isAnswer = quest.answers.includes(item) || isPart;
     if (celebrating.current || (isAnswer && answeredRef.current.has(item.id))) {
-      if (!animate(item) && how !== "hover") funBurst(x, y);
+      if (!animate(item)) funBurst(x, y);
       return;
     }
     if (isAnswer) {
@@ -547,7 +515,6 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       return;
     }
     animate(item);
-    if (how === "hover") return;
     // Wrong item: no "wrong", just say what it is and ask again.
     misses.current++;
     if (hintsOn && misses.current >= HINT_AFTER_MISSES) setHint(true);
@@ -575,7 +542,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
 
   const tapItem = (item: SceneItem, e: PointerEvent) => {
     e.stopPropagation();
-    activate(item, e.clientX, e.clientY, "tap");
+    activate(item, e.clientX, e.clientY);
   };
 
   const onBackgroundPointer = (e: PointerEvent) => {
@@ -584,37 +551,11 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
     paint(e.clientX, e.clientY);
   };
 
-  // Hover mode: whatever is under the mouse, or under a finger sliding over the
-  // picture, comes alive after a short pause. Looking the item up by position
-  // works for touch too, where the finger's events all go to where it started.
-  const hovered = useRef<string | null>(null);
-  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const endHover = () => {
-    hovered.current = null;
-    if (hoverTimer.current) clearTimeout(hoverTimer.current);
-  };
-
-  const onPointerMove = (e: PointerEvent) => {
-    if (settings.trigger !== "hover") return;
-    // The same grown tap areas as for taps (see tapTargets.ts).
-    const under = tapTargetAt(e.clientX, e.clientY, document.elementFromPoint(e.clientX, e.clientY));
-    const id = under?.closest("[data-item]")?.getAttribute("data-item") ?? null;
-    if (id === hovered.current) return;
-    endHover();
-    hovered.current = id;
-    const item = id ? itemsById.get(id) : undefined;
-    if (!item) return;
-    const { clientX, clientY } = e;
-    hoverTimer.current = setTimeout(() => activate(item, clientX, clientY, "hover"), HOVER_DWELL_MS);
-  };
-
-  useEffect(() => endHover, []);
-
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       e.preventDefault();
       if (e.repeat) return;
+      if (!keyboard) setKeyboard(true);
 
       // Colour mode: the space bar paints the background where nothing happens (Enter still starts the item in the frame).
       if (colouring && e.key === " ") {
@@ -625,7 +566,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
 
       // Keys mode: the key's own item; items sharing a key take turns.
       // Only the item's own animation limits how fast keys can be pressed.
-      if (settings.trigger === "keys") {
+      if (keysOn) {
         // Arrow keys move the glowing frame, Space and Enter start the item in it.
         const arrow = ARROWS[e.key];
         if (arrow) {
@@ -648,7 +589,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
           item = list[turn % list.length];
         }
         const [x, y] = screenPoint(item);
-        activateRef.current(item, x, y, "key");
+        activateRef.current(item, x, y);
         return;
       }
 
@@ -670,7 +611,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       const item = pick(here(items).filter((i) => i !== lastKeyItem.current));
       lastKeyItem.current = item;
       const [x, y] = screenPoint(item);
-      activateRef.current(item, x, y, "key");
+      activateRef.current(item, x, y);
     };
     const onKeyUp = (e: KeyboardEvent) => e.key === " " && setSpaceDown(false);
     window.addEventListener("keydown", onKeyDown);
@@ -679,24 +620,20 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [scene, items, here, keys, screenPoint, colouring, settings.trigger, settings.sounds, ask, funBurst, moveFocus, language.id]);
+  }, [scene, items, here, keys, screenPoint, colouring, keyboard, keysOn, settings.sounds, ask, funBurst, moveFocus, language.id]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
   const greyFilter = `url(#${greyId})`;
   // The grey copy of the background, with holes where it was painted.
   const greyCopy = { filter: greyFilter, mask: `url(#${svgId}-paint)` };
-  const sceneClass = ["scene", settings.ambient && "lively", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
+  const sceneClass = ["scene", colouring && "colouring", partying && "party", night && "night"].filter(Boolean).join(" ");
 
   return (
     <div
       className={sceneClass}
       style={{ "--sky": grey ? paleGrey(scene.sky) : scene.sky, "--ground": grey ? paleGrey(scene.ground) : scene.ground } as CSSProperties}
       onPointerDown={onBackgroundPointer}
-      onPointerMove={onPointerMove}
-      onPointerLeave={endHover}
-      onPointerUp={(e) => e.pointerType === "touch" && endHover()}
-      onPointerCancel={endHover}
     >
       <svg ref={svgRef} className="scene-svg" viewBox={`0 0 ${scene.width} ${scene.height}`} preserveAspectRatio="xMidYMid meet">
         {colouring && (
@@ -786,8 +723,8 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
             }}
           />
         ))}
-        {settings.trigger === "keys" && settings.showKeys && <KeyBadges scene={scene} keyOf={keys.keyOf} lit={lit} />}
-        {settings.trigger === "keys" && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
+        {keysOn && <KeyBadges scene={scene} keyOf={keys.keyOf} lit={lit} />}
+        {keysOn && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
       </svg>
 
@@ -821,7 +758,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
           {found > 10 && <span className="find-count">{found}</span>}
         </div>
       )}
-      {!questMode && settings.goal && (
+      {!questMode && (
         <div className={`scene-goal${allDiscovered ? " done" : ""}`} aria-label={words.discoveredCount(discovered.size, scene.items.length)}>
           <span className="scene-goal-star">{allDiscovered ? (bedtime ? "🌙" : "🎉") : "⭐"}</span>
           {discovered.size}/{scene.items.length}
@@ -832,7 +769,7 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
         <GameEnd delayMs={END_BUTTONS_MS} onAgain={startOver} next={{ emoji: nextScene.emoji, name: nextScene.title, onNext: goToNextScene }} />
       )}
       {/* Colour mode with the key badges on: the space bar, small at the bottom, paints where nothing happens. */}
-      {colouring && settings.trigger === "keys" && settings.showKeys && !allDiscovered && (
+      {colouring && keysOn && !allDiscovered && (
         <button
           type="button"
           className={`scene-space${spaceDown ? " down" : ""}`}
@@ -849,7 +786,22 @@ export function ScenePlay({ scene, settings }: { scene: Scene; settings: ScenesS
           </span>
         </button>
       )}
-      {!questMode && !touched && <p className="scene-prompt">{(colouring ? words.colourPrompts : words.prompts)[settings.trigger]}</p>}
+      {/* For grown-ups, small in the bottom left corner: keys mode off and on again. Only where there is a keyboard. */}
+      {keyboard && (
+        <button
+          type="button"
+          className={`scene-keys-toggle${keysOn ? "" : " off"}`}
+          aria-label={words.keysToggle}
+          aria-pressed={keysOn}
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            onKeys(!settings.keys);
+          }}
+        >
+          ⌨️
+        </button>
+      )}
+      {!questMode && !touched && <p className="scene-prompt">{(colouring ? words.colourPrompts : words.prompts)[keysOn ? "keys" : "tap"]}</p>}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
       <p className="scene-rotate">
         <span className="scene-rotate-phone" aria-hidden>

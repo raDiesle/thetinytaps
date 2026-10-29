@@ -1,35 +1,5 @@
 /* Animations of the Flughafen & Bahnhof scene. Durations match durationMs in Flughafen.tsx. Sun and cloud: ../sky.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .fh-cloud {
-  animation: fh-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .fh-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .fh-heli-rotor {
-  animation: fh-rotor 0.2s linear infinite alternate;
-}
-
-.scene.lively .fh-blimp-prop {
-  animation: fh-prop 0.2s linear infinite alternate;
-}
-
-.scene.lively .fh-turm-radar {
-  animation: fh-radar 2.4s ease-in-out infinite;
-}
-
-.scene.lively .fh-sack-sock {
-  animation: fh-flutter 1.6s ease-in-out infinite alternate;
-}
-
-.scene.lively .fh-hund-tail {
-  animation: fh-wag 0.6s ease-in-out infinite alternate;
-}
-
 /* Lights, puffs, notes and sound lines are hidden until their animation shows them, and can't be tapped meanwhile. */
 .fh-flug-puffs circle,
 .fh-blimp-hearts path,
@@ -137,12 +107,6 @@
 
 /* ---------- Shared keyframes ---------- */
 
-@keyframes fh-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
-
 @keyframes fh-rotor {
   to {
     transform: scaleX(0.15);
@@ -168,15 +132,6 @@
   }
   50% {
     transform: scaleX(-1);
-  }
-}
-
-@keyframes fh-flutter {
-  from {
-    transform: rotate(4deg) scaleY(0.9);
-  }
-  to {
-    transform: rotate(-4deg) scaleY(1.05);
   }
 }
 

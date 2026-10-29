@@ -1,34 +1,5 @@
 /* Animations of the Weltall scene. Durations match durationMs in Weltall.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .wa-bgstar {
-  animation: wa-bg-twinkle 2.6s ease-in-out calc(var(--i) * -0.7s) infinite alternate;
-}
-
-.scene.lively .wa-ufo-body {
-  animation: wa-hover 3s ease-in-out infinite alternate;
-}
-
-.scene.lively .wa-astro-body {
-  animation: wa-hover 4s ease-in-out infinite alternate;
-}
-
-.scene.lively .wa-saturn-spin {
-  animation: wa-ring-spin 6s linear infinite;
-}
-
-.scene.lively .wa-station-beacon,
-.scene.lively .wa-basis-beacon,
-.scene.lively .wa-lander-light,
-.scene.lively .wa-sat-light {
-  animation: wa-light 1.6s ease-in-out infinite;
-}
-
-.scene.lively .wa-rh-tail {
-  animation: wa-wag 0.5s ease-in-out infinite alternate;
-}
-
 /* Lids, puffs, sparkles and lights that only show up in an animation; they can't be tapped meanwhile. */
 .wa-lid,
 .wa-erde-sparkle path,
@@ -127,19 +98,6 @@
 
 .wa-basis-face {
   transform: translateY(24px);
-}
-
-@keyframes wa-bg-twinkle {
-  to {
-    opacity: 0.3;
-    transform: scale(0.6);
-  }
-}
-
-@keyframes wa-hover {
-  to {
-    transform: translateY(-8px);
-  }
 }
 
 @keyframes wa-ring-spin {

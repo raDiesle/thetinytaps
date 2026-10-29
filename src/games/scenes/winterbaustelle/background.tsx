@@ -5,8 +5,7 @@ import { Cloud, INK } from "../shared";
 import { Cap, SNOW, SNOW_SHADE } from "./parts";
 
 // The Baustelle in winter: a pale sky, snowy roofs in the city, white hills and a site covered
-// in snow. The road has been ploughed and has snow banks on both sides. Falling snow is only
-// shown when the picture may move by itself (.scene.lively).
+// in snow. The road has been ploughed and has snow banks on both sides.
 
 const FENCE_TOP = HORIZON - 28;
 const ROAD_TOP = 648;
@@ -171,27 +170,6 @@ function Bank({ y, h, shade }: { y: number; h: number; shade?: boolean }) {
   );
 }
 
-// Falling snowflakes, two copies stacked so the layer can loop: [x, y, r].
-const FLAKES = Array.from({ length: 70 }, (_, i) => [(i * 233) % 1600, (i * 137) % 1000, 2 + ((i * 7) % 4)]);
-
-function Snowfall() {
-  return (
-    <g className="wb-snowfall" fill="#fff" opacity="0.9">
-      {[0, 1].map((layer) => (
-        <g key={layer} className={layer ? "wb-snow-far" : "wb-snow-near"}>
-          {[0, -1000].map((dy) => (
-            <g key={dy} transform={`translate(${layer * 57} ${dy})`}>
-              {FLAKES.filter((_, i) => i % 2 === layer).map(([x, y, r]) => (
-                <circle key={`${x}-${y}`} cx={x} cy={y} r={layer ? r * 0.7 : r} />
-              ))}
-            </g>
-          ))}
-        </g>
-      ))}
-    </g>
-  );
-}
-
 export function Background() {
   return (
     <>
@@ -324,7 +302,6 @@ export function Background() {
           <circle key={`${x}-${y}`} cx={x + 30} cy={y + 6} r={2.5 * depthScale(y)} />
         ))}
       </g>
-      <Snowfall />
     </>
   );
 }

@@ -1,35 +1,5 @@
 /* Animations of the Küche scene. Durations match durationMs in Kueche.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .kc-uhr-minute {
-  animation: kc-spin 60s linear infinite;
-}
-
-.scene.lively .kc-fenster-curtain {
-  animation: kc-curtain 4s ease-in-out infinite;
-}
-
-.scene.lively .kc-katze-tail {
-  animation: kc-tail-swish 5s ease-in-out infinite;
-}
-
-.scene.lively .kc-hund-tail {
-  animation: kc-wiggle 1s ease-in-out infinite;
-}
-
-.scene.lively .kc-maus-nose {
-  animation: kc-sniff 2s ease-in-out infinite;
-}
-
-.scene.lively .kc-vogel-body {
-  animation: kc-bob 3s ease-in-out infinite;
-}
-
-.scene.lively .kc-lampe-swing {
-  animation: kc-lamp-idle 6s ease-in-out infinite;
-}
-
 /* Puffs, drops, bubbles and other things that only show up in an animation; they can't be tapped meanwhile. */
 .kc-lid,
 .kc-steam > g,
@@ -342,26 +312,6 @@
   }
   20% {
     transform: none;
-  }
-}
-
-@keyframes kc-bob {
-  0%,
-  100% {
-    transform: none;
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-@keyframes kc-lamp-idle {
-  0%,
-  100% {
-    transform: rotate(1.5deg);
-  }
-  50% {
-    transform: rotate(-1.5deg);
   }
 }
 
