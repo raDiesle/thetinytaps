@@ -87,8 +87,6 @@ const GRAVITY = 1600;
 const FRICTION = 0.3;
 const MIN_SPEED = 280;
 const MAX_SPEED = 950;
-/** After the tap the hopper lets out one marble after the other, this far apart. */
-const RELEASE_GAP_MS = 1400;
 const LAND_MS = 380;
 /** The flag springs up out of the full basket; then the level is done. */
 const FLAG_MS = 500;
@@ -232,51 +230,36 @@ interface Glitter {
   at: number;
 }
 
-/** What the level gets from the game around it. */
-export interface TrackLevelProps extends LevelProps {
-  /** Tapping one of the spots swaps its part. */
-  rebuild: boolean;
-  /** Three things to pick from at the hopper instead of six marbles in a row (K-07). */
-  pick: boolean;
-}
-
 /** Times something along the way was last hit, one per thing, for its flash or swing. */
 const never = (n: number) => Array.from({ length: n }, () => -Infinity);
 
 /**
- * A long wooden marble run down a tall wall. One tap opens the hopper, and the
- * marbles come out one after the other by themselves: each rolls over a
- * xylophone, through spots that hold a bell, a funnel, a paddle wheel or a
- * trampoline, rides the seesaw, goes through the tunnel, zigzags down past
+ * A long wooden marble run down a tall wall. Three big things lie on a shelf
+ * over the first row (K-07), and tapping one lets out just that one. Each rolls
+ * over a xylophone, through spots that hold a bell, a funnel, a paddle wheel or
+ * a trampoline, rides the seesaw, goes through the tunnel, zigzags down past
  * bumpers, loops the loop, hops over three drums, knocks the chimes and plays
- * a whole scale before it drops into the basket. The camera follows the
- * marbles down. When the basket is full a flag springs up out of it. If the
- * grown-ups allow it, tapping a spot swaps its part, and the next marble
- * takes the new way.
+ * a whole scale before it drops into the basket – each its own way: the tennis
+ * ball hops, the iron ball rumbles slowly with deep notes, the soap bubble
+ * floats and bursts above the basket. The camera follows them down. When the
+ * basket is full a flag springs up out of it. Tapping a spot swaps its part,
+ * and the next thing takes the new way.
  *
- * With `pick` (K-07) nothing comes out by itself: three big things lie on a
- * shelf over the first row, and tapping one lets out just that one. Each rolls
- * its own way – the tennis ball hops, the iron ball rumbles slowly with deep
- * notes, the soap bubble floats and bursts above the basket.
- *
- * The child can join in all the time: a tapped thing hops and twirls (K-03;
- * without the shelf a key hops all of them), the bars, seesaw, drums, chimes,
- * looping, tunnel, basket and – if they can't be swapped – the parts in the
- * spots sound and move when tapped, and the bare wall sparkles (K-04). Every
- * marble comes out of the tunnel changed (K-06).
+ * The child can join in all the time: a tapped thing hops and twirls (K-03),
+ * the bars, seesaw, drums, chimes, looping, tunnel and basket sound and move
+ * when tapped, and the bare wall sparkles (K-04). Every marble comes out of
+ * the tunnel changed (K-06).
  */
-export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProps) {
+export function TrackLevel({ sound, say, onDone }: LevelProps) {
   const label = useLevelName("track");
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
   const routes = useMemo(buildRoutes, []);
-  const build = useRef<Piece[]>(rebuild ? [...keptBuild] : [...DEFAULT_BUILD]);
+  const build = useRef<Piece[]>([...keptBuild]);
   const spots = useRef<SpotState[]>(SLOTS.map(() => ({ hit: -Infinity, swapped: -Infinity, angle: 0, spin: 0, pending: null })));
   const marbles = useRef<Marble[]>([]);
   const landed = useRef<Landed[]>([]);
   const nextId = useRef(0);
-  /** When the tap opened the hopper. */
-  const openedAt = useRef<number | null>(null);
   const fullAt = useRef(-Infinity);
   const bars = useRef(never(BARS.length));
   const bumps = useRef(never(TURNS.length));
@@ -289,8 +272,6 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
   const glitters = useRef<Glitter[]>([]);
   const peek = useRef({ at: -Infinity, animal: PEEKERS[0] });
   const [magicStart] = useState(() => Math.floor(Math.random() * MAGIC.length));
-  /** The bar a key plays when no marble is rolling. */
-  const keyBar = useRef(0);
   const svg = useRef<SVGSVGElement>(null);
   const done = useRef(false);
   const now = useRef(performance.now());
@@ -458,33 +439,8 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
     while (i < SLOTS.length && advance(i)) i++;
   };
 
-  /** Something on the run was tapped: it reacts, and the wall behind doesn't sparkle. Without the shelf the first tap still opens the hopper. */
-  const tapped = (e: PointerEvent) => {
-    e.stopPropagation();
-    if (!pick) open();
-  };
-
-  /** A tap on a spot that can't be rebuilt plays its part, with or without a marble (K-04). */
-  const playSpot = (i: number, e: PointerEvent) => {
-    tapped(e);
-    const spot = spots.current[i];
-    spot.hit = performance.now();
-    switch (build.current[i]) {
-      case "bell":
-        sound(playDing);
-        break;
-      case "trampoline":
-        sound(playBoing);
-        break;
-      case "funnel":
-        sound(playSwirl);
-        break;
-      case "wheel":
-        spot.spin = (SLOTS[i].dir * 2.5 * 170) / wheelIn(SLOTS[i]).path;
-        sound(playTick);
-        break;
-    }
-  };
+  /** Something on the run was tapped: it reacts, and the wall behind doesn't sparkle. */
+  const tapped = (e: PointerEvent) => e.stopPropagation();
 
   /** A rolling thing gets a little push: a hop with a twirl, and a bit more speed (K-03). */
   const nudge = (m: Marble, t: number) => {
@@ -504,7 +460,6 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
 
   useFrames((dt, t) => {
     now.current = t;
-    if (!pick && openedAt.current !== null && nextId.current < BASKET_FULL && t - openedAt.current >= nextId.current * RELEASE_GAP_MS) release("marble");
     const onWheel = SLOTS.map(() => false);
     let onSeesaw = false;
     for (const m of marbles.current) {
@@ -640,35 +595,24 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
     filled.current[i] = performance.now();
   };
 
-  /** A key or a tap on the wall: the hopper opens, or with the shelf the next thing on it goes in turn. */
-  const open = () => {
-    if (pick) take(turn.current++ % SHELF.things.length);
-    else if (openedAt.current === null) openedAt.current = performance.now();
-  };
+  /** A key or a tap on the wall: the next thing on the shelf goes, in turn. */
+  const open = () => take(turn.current++ % SHELF.things.length);
 
   /**
-   * A key: with the shelf 1, 2 and 3 let out the thing in that place, any
-   * other key the next thing in turn; the space bar rebuilds the run, if it
-   * may be rebuilt. Without the shelf the first key opens the hopper, later
-   * ones hop every rolling marble, or play the next bar when none is rolling.
+   * A key: 1, 2 and 3 let out the thing in that place, any other key the next
+   * thing in turn; the space bar rebuilds the run, the up arrow looks up to the shelf.
    */
   useAnyKey((e) => {
     held.current = e.key;
-    const t = performance.now();
     const place = SHELF.things.findIndex((_, i) => e.key === `${i + 1}`);
-    if (rebuild && e.key === " ") {
+    if (e.key === " ") {
       e.preventDefault();
       rebuildNext();
-    } else if (pick && e.key === "ArrowUp" && camera.current.y > UP_SHOWN_BELOW) {
+    } else if (e.key === "ArrowUp" && camera.current.y > UP_SHOWN_BELOW) {
       e.preventDefault();
       lookUp();
-    } else if (pick && place >= 0) take(place);
-    else if (pick || openedAt.current === null) open();
-    else if (marbles.current.length) marbles.current.forEach((m) => nudge(m, t));
-    else {
-      playBar(keyBar.current, t);
-      keyBar.current = (keyBar.current + 1) % BARS.length;
-    }
+    } else if (place >= 0) take(place);
+    else open();
   });
 
   useEffect(() => {
@@ -690,7 +634,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
   };
 
   const t = now.current;
-  const started = pick ? nextId.current > 0 : openedAt.current !== null;
+  const started = nextId.current > 0;
   const flagAge = t - fullAt.current;
   const spot = (i: number, layer: "back" | "front") => <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />;
   const cam = camera.current;
@@ -712,8 +656,10 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill="#f3d5a4" />
         <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill={`url(#${pegs})`} />
 
-        {/* The boards the spots sit on, if they may be rebuilt */}
-        {rebuild && SLOTS.map((slot, i) => <SpotBoard key={i} slot={slot} />)}
+        {/* The boards the spots sit on */}
+        {SLOTS.map((slot, i) => (
+          <SpotBoard key={i} slot={slot} />
+        ))}
 
         {/* Rows 1a and 1b with the xylophone */}
         <Xylophone row={ROW1A} hits={bars.current} t={t} onTap={tapBar} />
@@ -763,26 +709,6 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
 
         {SLOTS.map((_, i) => spot(i, "back"))}
 
-        {/* Where a tap plays the part in a spot, if it can't be swapped; marbles in front can still be tapped */}
-        {!rebuild &&
-          SLOTS.map((slot, i) => {
-            const b = slotBoard(slot);
-            return (
-              <rect
-                key={i}
-                className="run-spot-tap"
-                x={b.x}
-                y={b.y}
-                width={b.w}
-                height={b.h}
-                rx="28"
-                fill="transparent"
-                data-tap
-                onPointerDown={(e) => playSpot(i, e)}
-              />
-            );
-          })}
-
         {/* Seesaw; a tap tips it */}
         <g
           data-tap
@@ -825,7 +751,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
           })}
         </g>
         {/* On a computer the keys 1, 2 and 3 under the shelf; behind the marbles rolling past */}
-        {pick && !touchOnly && <ShelfKeys held={held.current} onTake={take} />}
+        {!touchOnly && <ShelfKeys held={held.current} onTake={take} />}
         {marbles.current.map((m) => {
           const k = (t - m.nudged) / NUDGE_MS;
           return (
@@ -874,34 +800,28 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         ))}
 
         {/* Where a tap swaps the part: the whole board, with a wrench in the corner */}
-        {rebuild &&
-          SLOTS.map((slot, i) => {
-            const b = slotBoard(slot);
-            const pending = spots.current[i].pending;
-            const wx = slot.dir > 0 ? b.x + b.w - 30 : b.x + 30;
-            return (
-              <g key={i} className="run-spot-tap" data-tap onPointerDown={(e) => swap(i, e)}>
-                <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="transparent" />
-                <circle cx={wx} cy={b.y + 30} r="24" fill="#fff8e8" stroke="#c48a4d" strokeWidth="3" />
-                <text x={wx} y={b.y + 41} fontSize="28" textAnchor="middle" className={pending ? "run-wrench busy" : "run-wrench"}>
-                  🔧
-                </text>
-              </g>
-            );
-          })}
+        {SLOTS.map((slot, i) => {
+          const b = slotBoard(slot);
+          const pending = spots.current[i].pending;
+          const wx = slot.dir > 0 ? b.x + b.w - 30 : b.x + 30;
+          return (
+            <g key={i} className="run-spot-tap" data-tap onPointerDown={(e) => swap(i, e)}>
+              <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="transparent" />
+              <circle cx={wx} cy={b.y + 30} r="24" fill="#fff8e8" stroke="#c48a4d" strokeWidth="3" />
+              <text x={wx} y={b.y + 41} fontSize="28" textAnchor="middle" className={pending ? "run-wrench busy" : "run-wrench"}>
+                🔧
+              </text>
+            </g>
+          );
+        })}
 
-        {pick && <Shelf things={shelf.current} filled={filled.current} color={BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length]} t={t} onTake={take} />}
+        <Shelf things={shelf.current} filled={filled.current} color={BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length]} t={t} onTake={take} />
 
         {/* Before the first tap and after ⬆: a big hand on the middle thing on the shelf says „tap me“ */}
-        {pick && (!started || lookingUp.current) && <ShelfHint />}
-        {!pick && !started && (
-          <text className="run-hint" x={HOPPER.x + 92} y={HOPPER.y + 96} fontSize="90" textAnchor="middle">
-            👆
-          </text>
-        )}
+        {(!started || lookingUp.current) && <ShelfHint />}
       </svg>
       {/* Down the run, the ⬆ button in the bottom left corner takes the camera back up to the shelf */}
-      {pick && !done.current && !lookingUp.current && cam.y > UP_SHOWN_BELOW && (
+      {!done.current && !lookingUp.current && cam.y > UP_SHOWN_BELOW && (
         <button
           type="button"
           className="run-up"
@@ -918,7 +838,7 @@ export function TrackLevel({ sound, say, onDone, rebuild, pick }: TrackLevelProp
         </button>
       )}
       {/* On a computer the space bar at the bottom rebuilds the run */}
-      {rebuild && !touchOnly && !done.current && (
+      {!touchOnly && !done.current && (
         <button
           type="button"
           className={`run-space${held.current === " " ? " down" : ""}`}

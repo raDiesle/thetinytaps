@@ -176,7 +176,7 @@ In a fresh worktree run `bun install` first.
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
   no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). Buttons for grown-ups sit in the top
-  left corner, never over the sun in the top right one. „ℹ️ Über das Spiel“ and „⚙️ Einstellungen“ are small, above the cards,
+  left corner, never over the sun in the top right one. „ℹ️ Über das Spiel“ and „⚙️ Einstellungen“ (where a game still has them) are small, above the cards,
   never under them: in the top row next to the back link (on a computer centred under the title), and a panel opens right
   under that row. When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
@@ -221,9 +221,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
   before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once; the start screen comes only after ✕ or „Menü“. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or
-  „Menü“ go back to the routine. What the game is and how it is played (also keys and tips for grown-ups) goes into `info`
-  („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
-  that explain them. A game adds no own switch for what the home page already sets for all games
+  „Menü“ go back to the routine.
+  **Aim for no settings and no description**, so start screens stay clear: a game should explain itself by playing
+  (a glow, the pointing hand, a reaction to every tap), and what a switch would choose is decided once, the way that
+  plays best, instead of being left to grown-ups. `info` („ℹ️ Über das Spiel“) and `settings` („⚙️ Einstellungen“)
+  are optional in `GameShell`, and their buttons show only when a game passes them; Kettenreaktion has neither. Never add one
+  to a game that has none, and when touching a game that still has them, prefer removing them (keep the default
+  behaviour, delete the code for the other). Where one is still kept, `info` says what the game is and how it is played (also
+  keys and tips for grown-ups), `settings` holds only options and the notes that explain them. A game adds no own switch for what the home page already sets for all games
   (Vorlesen, Töne, Musik, Sprache), nor a choice for what the game can tell by itself (morning or evening by the clock).
   A song that is the game itself (the Zahnputzlied sings the steps) plays even with Musik off and sings in the app language.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the

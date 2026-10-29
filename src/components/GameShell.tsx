@@ -50,9 +50,12 @@ interface GameShellProps {
   startMode?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
-  /** What the game is, how it is played and what helps; behind its own button on the start screen, apart from the settings. */
-  info: ReactNode;
-  /** Parent-facing options shown on the start screen. */
+  /**
+   * What the game is, how it is played and what helps; behind its own button on the start screen, apart from the settings.
+   * Left out where the game explains itself, so the start screen stays clear.
+   */
+  info?: ReactNode;
+  /** Parent-facing options shown on the start screen; left out where the game needs none. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
   children: ReactNode;
@@ -194,24 +197,36 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
           </>
         }
       >
-        <div className="panel-buttons">
-          <PanelButton
-            open={panel === "info"}
-            onClick={() => setPanel(panel === "info" ? null : "info")}
-            emoji="ℹ️"
-            label={t({ de: "Über das Spiel", ru: "Об игре", en: "About the game", zh: "关于游戏", hi: "खेल के बारे में", es: "Sobre el juego", ar: "عن اللعبة" })}
-          />
-          {settings && (
-            <PanelButton
-              open={panel === "settings"}
-              onClick={() => setPanel(panel === "settings" ? null : "settings")}
-              emoji="⚙️"
-              label={t({ de: "Einstellungen", ru: "Настройки", en: "Settings", zh: "设置", hi: "सेटिंग्स", es: "Ajustes", ar: "الإعدادات" })}
-            />
-          )}
-        </div>
+        {(info || settings) && (
+          <div className="panel-buttons">
+            {info && (
+              <PanelButton
+                open={panel === "info"}
+                onClick={() => setPanel(panel === "info" ? null : "info")}
+                emoji="ℹ️"
+                label={t({
+                  de: "Über das Spiel",
+                  ru: "Об игре",
+                  en: "About the game",
+                  zh: "关于游戏",
+                  hi: "खेल के बारे में",
+                  es: "Sobre el juego",
+                  ar: "عن اللعبة",
+                })}
+              />
+            )}
+            {settings && (
+              <PanelButton
+                open={panel === "settings"}
+                onClick={() => setPanel(panel === "settings" ? null : "settings")}
+                emoji="⚙️"
+                label={t({ de: "Einstellungen", ru: "Настройки", en: "Settings", zh: "设置", hi: "सेटिंग्स", es: "Ajustes", ar: "الإعدادات" })}
+              />
+            )}
+          </div>
+        )}
       </MenuHead>
-      {panel === "info" && <section className="settings game-info">{info}</section>}
+      {panel === "info" && info && <section className="settings game-info">{info}</section>}
       {panel === "settings" && settings && <section className="settings">{settings}</section>}
       {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
           cards leave (data-spread), so the back link and the grown-ups' buttons stay in the top row. */}

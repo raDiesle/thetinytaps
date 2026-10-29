@@ -14,9 +14,10 @@ song while it plays (its music box would clash) and its end plays `playLullaby` 
 
 ## Languages (German, English, Chinese, Hindi, Spanish, Arabic, Russian)
 
-Kettenreaktion follows the app language (home page): start screen, settings, the level names and every spoken line.
+Kettenreaktion follows the app language (home page): start screen, the level names and every spoken line.
 - Level names and first lines live in `content.ts` (`LEVEL_TEXTS`), used by the mode cards, the „Weiter“ button and each
-  picture's `aria-label` (`useLevelName`). The start screen's notes are inline `t({ de, en, zh, hi, es, ar, ru })` in `MarbleGame.tsx`.
+  picture's `aria-label` (`useLevelName`). The start screen has only the level cards: no „Über das Spiel“ and no „Einstellungen“ (removed October 2026 – the game
+  explains itself by playing, and the shelf and the 🔧 spots are always on). Don't add either back.
 - `say` (in `LevelProps`) and a machine event's `say` take a `Localized` line, `{ de, en, zh, hi, es, ar, ru }`, written next to its moment;
   `MarblePlay` speaks it through `spokenIn`: the app language with its voice, or the German line with the German voice where a translation is missing. Never pass a bare German string.
 - Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,
@@ -61,12 +62,12 @@ and six marbles come out one after the other. Each rolls over a xylophone, throu
 trampoline, bell, funnel by default), rides the seesaw, goes through the tunnel, zigzags down past bumpers, loops the loop,
 hops over three drums, knocks five chimes and plays a whole scale on the second xylophone before it drops into the basket.
 A full basket raises the flag and ends the level („Nochmal“ / „Weiter“; any key goes on). A first marble takes about 21 s, the
-whole round about 35 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel); a setting turns this off.
+whole round about 35 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
 On a computer a yellow space-bar button sits at the bottom in the middle, and Space rebuilds the run to the next
 of all its builds, counting like a car's mileage: the first spot takes its next part, and each time it is back at the first
 part the next spot moves on too (`rebuildNext`).
 
-„Was rollt denn da?“ (K-07, a setting, on by default): instead of six marbles in a row, a shelf over the first row holds
+„Was rollt denn da?“ (K-07, always on): a shelf over the first row holds
 three of five things (marble, tennis ball, iron ball, apple, soap bubble; `ROLLER` in `track.ts`); tapping one flies it into
 the hopper and something else pops up in its place, a key or a tap on the wall takes them in turn. On a computer the keys
 1, 2 and 3 hang under the shelf and let out the thing in that place (`ShelfKeys`). A sunny glow behind each place
@@ -93,8 +94,7 @@ takes a `look`); other things keep their look and an animal looks out for them.
   it), before the tap the hopper, after the last marble the basket.
 - The camera may go `TOP_ROOM` above the wall's top, so the shelf and the hopper sit clear of the top edge and the ✕.
   Never put what the child taps right at the wall's top edge: on a phone on its side the picture is cut there.
-- `track.css`: its styles (classes `run-`). The pick and rebuild settings are on Kettenreaktion's start screen, and
-  `MarblePlay.tsx` draws this level by itself because it takes them; while it is on, the background music is off (the run
+- `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,
   useAnyKey, wobble).
