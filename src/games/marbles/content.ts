@@ -170,4 +170,8 @@ export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localize
       ru: "Нажми — и зажжётся свет!",
     },
   },
+  bath: {
+    name: { de: "Badezimmer" },
+    intro: { de: "Tipp auf den Knopf! Dann geht es ins Bad." },
+  },
 };
