@@ -128,14 +128,6 @@
   pointer-events: none;
   transform-box: fill-box;
   transform-origin: center;
-  animation: hint-pulse 1.2s ease-in-out infinite;
-}
-
-@keyframes hint-pulse {
-  50% {
-    stroke: var(--accent);
-    transform: scale(1.04);
-  }
 }
 
 /* Idea B-19: a vehicle drives out of the picture (into another one) and comes back in from behind itself. */
@@ -235,7 +227,6 @@
   padding: 12px 28px;
   font-size: clamp(1.4rem, 4vw, 2.4rem);
   pointer-events: none;
-  animation: bob 1.6s ease-in-out infinite;
 }
 
 .find-question {
@@ -354,6 +345,27 @@
 .scene-goal.done {
   background: #fff;
   animation: pop-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* For grown-ups: keys mode off and on, small and pale in the bottom left corner; struck through while off. */
+.scene-keys-toggle {
+  position: absolute;
+  bottom: max(10px, env(safe-area-inset-bottom));
+  left: max(12px, env(safe-area-inset-left));
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #ffffffb0;
+  font-family: var(--font-emoji);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.scene-keys-toggle.off {
+  opacity: 0.55;
+  background: linear-gradient(to top right, transparent calc(50% - 2px), #c0392b calc(50% - 2px) calc(50% + 2px), transparent calc(50% + 2px)), #ffffff80;
 }
 
 /*
@@ -478,10 +490,4 @@
   100% {
     transform: rotate(-90deg);
   }
-}
-
-/* Unless the picture may move by itself, nothing moves without the child doing something. */
-.scene:not(.lively) .scene-prompt,
-.scene:not(.lively) .scene-hint {
-  animation: none;
 }

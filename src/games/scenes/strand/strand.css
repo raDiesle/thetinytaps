@@ -2,78 +2,6 @@
    beach ball are the playground's drawings and are animated in spielplatz.css, as are the
    blinking eyelids (sp-lid) and the floating words (sp-notes). */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .sd-cloud {
-  animation: sd-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .sd-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .sd-sea-wave {
-  animation: sd-sea 3s ease-in-out calc(var(--i) * -0.75s) infinite alternate;
-}
-
-.scene.lively .sd-foam {
-  animation: sd-foam 3.2s ease-in-out infinite alternate;
-}
-
-.scene.lively .sd-welle {
-  animation: sd-welle-idle 2.6s ease-in-out calc(var(--i) * -0.8s) infinite alternate;
-}
-
-.scene.lively .sd-leucht-beams path {
-  animation: sd-beam-idle 6s ease-in-out infinite;
-}
-
-.scene.lively .sd-leucht-beam-right {
-  animation-delay: -3s;
-}
-
-.scene.lively .sd-segel-rock,
-.scene.lively .sd-boot-rock {
-  animation: sd-rock-idle 3.4s ease-in-out infinite alternate;
-}
-
-.scene.lively .sd-schiff-body,
-.scene.lively .sd-boje-body,
-.scene.lively .sd-ring-bob,
-.scene.lively .sd-ente-bob,
-.scene.lively .sd-matratze-rock {
-  animation: sd-bob-idle 2.8s ease-in-out infinite alternate;
-}
-
-.scene.lively .sd-schiff-flag,
-.scene.lively .sd-segel-flag,
-.scene.lively .sd-turm-flag,
-.scene.lively .sd-burg-flag {
-  animation: sd-flag 0.9s ease-in-out infinite alternate;
-}
-
-.scene.lively .sd-haus-pennants path {
-  animation: sd-pennant 1.2s ease-in-out calc(var(--i) * -0.2s) infinite alternate;
-}
-
-.scene.lively .sd-windrad-blades {
-  animation: sd-spin 4s linear infinite;
-}
-
-.scene.lively .sd-drachen-tail {
-  animation: sd-wiggle 1.4s ease-in-out infinite alternate;
-}
-
-.scene.lively .sd-schirm-flaps path {
-  animation: sd-flap 0.8s ease-in-out calc(var(--i) * -0.13s) infinite alternate;
-}
-
-@keyframes sd-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
-
 @keyframes sd-sea {
   to {
     transform: translateX(8px);
@@ -84,39 +12,6 @@
   to {
     transform: translateY(5px);
     opacity: 0.6;
-  }
-}
-
-@keyframes sd-welle-idle {
-  to {
-    transform: translateX(10px) scaleY(1.08);
-  }
-}
-
-@keyframes sd-beam-idle {
-  0%,
-  30%,
-  100% {
-    opacity: 0;
-  }
-  12%,
-  18% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes sd-rock-idle {
-  from {
-    transform: rotate(-2deg);
-  }
-  to {
-    transform: rotate(2deg);
-  }
-}
-
-@keyframes sd-bob-idle {
-  to {
-    transform: translateY(-4px);
   }
 }
 
@@ -132,12 +27,6 @@
   }
   to {
     transform: rotate(8deg);
-  }
-}
-
-@keyframes sd-spin {
-  to {
-    transform: rotate(1turn);
   }
 }
 

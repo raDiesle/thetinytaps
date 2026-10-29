@@ -1,49 +1,6 @@
 /* Animations of the Stadt scene. Durations match durationMs in Stadt.tsx. Sun and cloud: ../sky.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .st-cloud {
-  animation: st-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .st-cloud-slow {
-  animation-duration: 40s;
-}
-
 /* A car passes in the far lane now and then. */
-.scene.lively .st-car {
-  animation: st-car 20s linear infinite;
-}
-
-.scene.lively .st-flug-prop {
-  animation: st-prop 0.15s linear infinite alternate;
-}
-
-.scene.lively .st-wache-flag {
-  animation: st-flag 1.2s ease-in-out infinite alternate;
-}
-
-.scene.lively .st-falter-wings {
-  animation: st-flap 0.35s ease-in-out infinite alternate;
-}
-
-.scene.lively .st-katze-tail {
-  animation: st-wag 2.5s ease-in-out infinite alternate;
-}
-
-.scene.lively .st-hund-tail {
-  animation: st-wag 0.6s ease-in-out infinite alternate;
-}
-
-.scene.lively .st-schaukel-swing {
-  animation: st-swing-soft 3s ease-in-out infinite;
-}
-
-.scene.lively .st-baecker-steam circle,
-.scene.lively .st-haus-smoke circle {
-  animation: st-smoke 3s ease-out calc(var(--i) * 1s) infinite;
-}
-
 /* Puffs, lights and drops are hidden until their animation shows them, and can't be tapped meanwhile. */
 .st-haus-smoke circle,
 .st-haus-light,
@@ -163,12 +120,6 @@
   transform-origin: center bottom;
 }
 
-@keyframes st-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
-
 @keyframes st-car {
   0% {
     transform: translateX(0);
@@ -203,15 +154,6 @@
   }
   to {
     transform: rotate(14deg);
-  }
-}
-
-@keyframes st-swing-soft {
-  25% {
-    transform: rotate(6deg);
-  }
-  75% {
-    transform: rotate(-6deg);
   }
 }
 

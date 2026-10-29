@@ -383,6 +383,18 @@ kbd {
   margin-top: 8px;
 }
 
+/* A choice in the menu's head (Lebendige Bilder's modes): only its buttons, without a frame, so the cards keep the room. */
+.menu-head > .mode-level {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.menu-head > .mode-level .choice button {
+  min-height: 40px;
+  padding: 4px 14px;
+}
+
 .mode-list {
   width: 100%;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
@@ -675,6 +687,29 @@ kbd {
     padding: 4px 14px;
     border-radius: 22px;
     font-size: 0.95rem;
+  }
+
+  /* On a phone it goes into the top row next to the back link: smaller, and without its label. */
+  .menu-head > .mode-level {
+    font-size: 0.85rem;
+  }
+
+  .menu-head > .mode-level .choice {
+    gap: 6px;
+  }
+
+  .menu-head > .mode-level legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .menu-head > .mode-level .choice button {
+    min-width: 0;
+    padding: 4px 8px;
+    box-shadow: 0 4px 0 var(--ink);
   }
 
   .mode-list:not(.fit) .mode-card .game-emoji {
