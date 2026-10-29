@@ -94,6 +94,11 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
   be the level's ground before the fork and after the way. The child taps a sign or 1 / 2;
   the level draws only the signpost. Put the first station of each way within ~800
   points of the fork, so both ghosts are on the screen. Ways contain no further forks.
+- **On water** (G-08, „Das Floß“): `raft: { Raft, until }` puts the child on a raft from the
+  start; it paddles instead of walking up to `until`, which must be a `climb` (a ladder onto a
+  jetty), where the raft stays behind. An obstacle with `float: { to, put }` lets the child
+  float slowly down the ground points `to` after it is solved, holding the thing up (the umbrella
+  down the waterfall), and then put it down at `put` (the drawing shows it there from then on).
 
 The world drawing (`drachen.tsx`) exports the ground constants, `<Level>Scenery` and
 `<Level>Backdrop`. `Scenery` gets `{ done, here, nope }` and draws every station from

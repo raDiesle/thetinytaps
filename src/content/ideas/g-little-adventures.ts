@@ -74,6 +74,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Ein Weg-Abenteuer auf dem Wasser: das Floß treibt den Fluss hinunter, das Kind paddelt mit jedem Tippen. Ein Ast versperrt den Weg (Säge), eine Ente sucht ihre Küken, ein Wasserfall (Regenschirm aufspannen und langsam hinunterschweben).",
       why: "Bewegung durch eine Welt ohne Gehen; Wasser macht Spaß.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-09",

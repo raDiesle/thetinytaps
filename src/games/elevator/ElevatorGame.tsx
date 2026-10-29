@@ -13,6 +13,8 @@ import "./elevator.css";
 /** The small tags on the cards: which levels ride the lift in the house, which walk through the world. */
 const LIFT = { de: "🛗 Aufzug", ru: "🛗 Лифт", en: "🛗 Elevator", zh: "🛗 电梯", hi: "🛗 लिफ़्ट", es: "🛗 Ascensor", ar: "🛗 المصعد" };
 const TRAIL = { de: "🚶 Laufen", ru: "🚶 Пешком", en: "🚶 Walking", zh: "🚶 走路", hi: "🚶 पैदल", es: "🚶 A pie", ar: "🚶 مشيا" };
+/** A trail level on the water, where the child paddles a raft instead of walking. */
+const RAFT = { de: "🛶 Paddeln" };
 
 /** "Kleine Abenteuer": the lift stories in the house and the trail levels through the world. */
 export function ElevatorGame() {
@@ -43,6 +45,7 @@ export function ElevatorGame() {
         { id: "ball", emoji: "⚽", title: title("Der Ball rollt weg"), kind: t(TRAIL) },
         { id: "ballon", emoji: "🎈", title: title("Der Luftballon"), kind: t(TRAIL) },
         { id: "lok", emoji: "🚂", title: title("Die kleine Lok"), kind: t(TRAIL) },
+        { id: "floss", emoji: "⛵", title: title("Das Floß"), kind: t(RAFT) },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}

@@ -30,6 +30,8 @@ const WALK_MS = 2.6;
 const STEP_MS = 380;
 /** Sliding time per world point: much faster than walking. */
 const SLIDE_MS = 0.9;
+/** Floating time per world point, under the umbrella: much slower than walking. */
+const FLOAT_MS = 9;
 /** A thing flying from the child's hand to an obstacle. */
 const FLY_MS = 650;
 /** How big a thing is while the child carries it, in world points. */
@@ -153,14 +155,25 @@ interface Next {
   prints: Point[];
   ghost: Point;
   pose: Pose;
-  icon: ItemId | "walk" | "climb";
+  icon: ItemId | "walk" | "climb" | "paddle";
   /** Where the thing lies that the tap picks up: a yellow ring goes round it, and its pale picture waits in the
    * backpack where it will go. */
   at?: Point;
 }
 
+/** The thing the next tap picks up, if it picks one up. */
+const itemOf = (icon: Next["icon"]): ItemId | null => (icon === "walk" || icon === "climb" || icon === "paddle" ? null : icon);
+
 /** The picture on the action button for what the next tap does. */
 function NextIcon({ icon }: { icon: Next["icon"] }) {
+  if (icon === "paddle")
+    return (
+      <g transform="rotate(30)">
+        <path d="M0 -40 V14" stroke={INK} strokeWidth="12" strokeLinecap="round" />
+        <path d="M0 -40 V14" stroke="#c08552" strokeWidth="6" strokeLinecap="round" />
+        <ellipse cy="24" rx="14" ry="22" fill="#fcc419" stroke={INK} strokeWidth="4" />
+      </g>
+    );
   if (icon === "climb")
     return <path d="M-30 26 H-12 V8 H6 V-10 H24 V-28" fill="none" stroke={INK} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />;
   if (icon === "walk")
@@ -264,6 +277,9 @@ export function TrailPlay({
   onPick: (id: string) => void;
 }) {
   const theGoal = GOALS[level.goal];
+  const { raft } = level;
+  /** On the raft here: from the start until the child gets off at `raft.until`. */
+  const afloat = (x: number) => !!raft && x <= raft.until;
   const onString = theGoal.carry === "string";
   const [view, setView] = useState<View>(() => startView(level));
   const viewRef = useRef<View>(view);
@@ -414,7 +430,7 @@ export function TrailPlay({
       const k = viewRef.current.kid;
       const ms = Math.hypot(px - k.x, py - k.y) * WALK_MS;
       if (ms < 1) continue;
-      kid({ x: px, y: py, walk: ms, pose: "walk", face: px >= k.x ? 1 : -1 });
+      kid({ x: px, y: py, walk: ms, pose: afloat(px) ? "paddle" : "walk", face: px >= k.x ? 1 : -1 });
       await wait(ms);
     }
     kid({ walk: 0, pose: "stand", face: 1 });
@@ -430,8 +446,9 @@ export function TrailPlay({
     shown.setAttribute("transform", `translate(${at[0]} ${at[1]}) scale(${s})`);
   };
 
-  /** Moves the carried thing to `to` in `ms` along a bow `arc` points high, growing or shrinking to `s`. */
-  const moveCarry = (to: Point, ms: number, s = carried.current.s, arc = 0) => {
+  /** Moves the carried thing to `to` in `ms` along a bow `arc` points high, growing or shrinking to `s`; `linear` keeps
+   * pace with the child walking or floating. */
+  const moveCarry = (to: Point, ms: number, s = carried.current.s, arc = 0, linear = false) => {
     const {
       at: [x0, y0],
       s: s0,
@@ -442,7 +459,7 @@ export function TrailPlay({
     const frame = (now: number) => {
       if (g !== generation.current || move !== mover.current) return;
       const t = Math.min(1, (now - begin) / ms);
-      const e = ease(t);
+      const e = linear ? t : ease(t);
       drawCarry([x0 + (to[0] - x0) * e, y0 + (to[1] - y0) * e - arc * 4 * t * (1 - t)], s0 + (s - s0) * e);
       if (t < 1) requestAnimationFrame(frame);
     };
@@ -523,7 +540,7 @@ export function TrailPlay({
     prints: printsTo(x, [], on),
     ghost: [x, groundY(on, x)],
     pose,
-    icon,
+    icon: icon === "walk" && afloat(x) ? "paddle" : icon,
   });
 
   /** What the first tap at `station` does: for stairs, walking there and up the first half of the steps. */
@@ -605,9 +622,10 @@ export function TrailPlay({
       await packAway(item, slot);
       put({ nope: null, hint: station.need, choosing: true });
     }
-    put((v) => ({ carry: null, done: [...v.done, station.id], bubble: null }));
+    put((v) => ({ carry: station.float ? v.carry : null, done: station.float ? v.done : [...v.done, station.id], bubble: null }));
     cue(station.sounds);
     say(station.done);
+    if (station.float) await float(station.float, station.id);
     await wait(500);
     kid({ pose: "cheer" });
     await wait(Math.max(0, station.ms - 500));
@@ -617,6 +635,27 @@ export function TrailPlay({
       if (onString) drawGoal(goal.current.at, handOf(viewRef.current.kid));
     } else kid({ pose: "stand" });
     put({ here: null });
+  };
+
+  /** The child holds the thing up (the open umbrella) and floats down slowly by itself, the thing going along; then it
+   * puts the thing down where the level's drawing shows it (stuck into the raft), and the station is done. */
+  const float = async ({ to, put: down }: NonNullable<Obstacle["float"]>, id: string) => {
+    const k0 = viewRef.current.kid;
+    const [hx, hy] = carried.current.at;
+    const held: Point = [hx - k0.x, hy - k0.y];
+    kid({ pose: "lift" });
+    await wait(400);
+    for (const [x, y] of to) {
+      const k = viewRef.current.kid;
+      const ms = Math.hypot(x - k.x, y - k.y) * FLOAT_MS;
+      kid({ x, y, walk: ms });
+      void moveCarry([x + held[0], y + held[1]], ms, carried.current.s, 0, true);
+      await wait(ms);
+    }
+    kid({ walk: 0, pose: "take" });
+    await moveCarry(byKid(down), 600);
+    put((v) => ({ carry: null, done: [...v.done, id] }));
+    kid({ pose: "stand" });
   };
 
   /** Two taps: the first walks to the stairs and climbs half of them, the second the rest; a note per step. */
@@ -822,7 +861,8 @@ export function TrailPlay({
   /** Bumped by the reminders: the footprints, the ghost and the ring come again. */
   const again = view.action?.nudge ?? 0;
   /** The free place in the backpack where the next thing goes, when the next tap picks one up. */
-  const packing = next?.at && next.icon !== "walk" && next.icon !== "climb" ? { item: next.icon, slot: view.bag.indexOf(null) } : null;
+  const nextItem = next?.at ? itemOf(next.icon) : null;
+  const packing = nextItem ? { item: nextItem, slot: view.bag.indexOf(null) } : null;
   const forks = level.stations.filter((s): s is Fork => s.kind === "fork");
   const { bagBox, slots, action, actionBox } = hud.current;
   const [bx, , bw] = bagBox;
@@ -867,12 +907,13 @@ export function TrailPlay({
           {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
           {shown.map((n, w) => (
             <g key={`${n.ghost}-${again}`} className="tl-next">
-              {n.at && n.icon !== "walk" && n.icon !== "climb" && <WantRing at={n.at} r={ringOf(ITEMS[n.icon])} />}
+              {n.at && itemOf(n.icon) && <WantRing at={n.at} r={ringOf(ITEMS[itemOf(n.icon)!])} />}
               {n.prints.map(([x, y], i) => (
                 <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
               ))}
               <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
                 <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
+                  {raft && afloat(n.ghost[0]) && <raft.Raft paddling={false} done={view.done} />}
                   <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} backpack={PACK_SHUT} />
                 </g>
               </g>
@@ -909,10 +950,17 @@ export function TrailPlay({
               );
             }),
           )}
+          {/* The raft stays behind where the child got off */}
+          {raft && !afloat(k.x) && (
+            <g transform={`translate(${raft.until} ${groundY(level.ground, raft.until)})`}>
+              <raft.Raft paddling={false} done={view.done} />
+            </g>
+          )}
           <g ref={carryBack} className="tl-carry">
             {carry}
           </g>
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
+            {raft && afloat(k.x) && <raft.Raft paddling={k.pose === "paddle"} done={view.done} />}
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
               <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} backpack={view.pack} />
             </g>

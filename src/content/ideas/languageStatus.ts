@@ -91,7 +91,20 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       { label: "🧸 Aufräum-Maschine", languages: { de: "done" }, note: "Name, erster Satz und „Alles aufgeräumt!“ nur auf Deutsch (R-08, Oktober 2026)." },
     ],
   },
-  { href: "/kleine-abenteuer/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/kleine-abenteuer/",
+    parts: [
+      {
+        label: "🧭 Menüs, Aufzug-Geschichten und die übrigen Weg-Abenteuer",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "⛵ Das Floß",
+        languages: { de: "done" },
+        note: "Neues Weg-Abenteuer (G-08), bisher nur auf Deutsch: sein Titel und seine Sätze fehlen in den Sprachbüchern (en.ts, ru.ts …), ebenso der Kartenhinweis „🛶 Paddeln“.",
+      },
+    ],
+  },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/schatten/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/socken/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
