@@ -140,13 +140,15 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    away, where the child follows it, and how it comes back.
 2. **Plan the stations** before drawing – a list with x positions:
    - 8–12 stations, about 3–5 minutes; something happens by itself between the taps
-     (the walk, the obstacle's answer). Never more than two taps in a row.
+     (the walk, the obstacle's answer). Never more than two taps in a row. Only pickups, moments and
+     climbs take a tap; the child walks to an obstacle or a fork by itself, so give a walk only a tap
+     where something worth it happens at its end.
    - The bag holds three things at most. When the child reaches an obstacle, the bag
      should hold at least one thing that is **not** needed there (a distractor), so
      there is a real choice. Pick up two or three things first, then alternate.
    - Each thing has one obvious use a 2-year-old knows (ball for the dog, carrot for
      the horse, plank over water, lantern in the dark). No combining, no tricks.
-   - Exactly one climb in two taps (stairs, ladder, hill path), usually near the end.
+   - Exactly one climb, one tap up all its steps (stairs, ladder, hill path), usually near the end.
    - Only things that can be seen: every thing lies visibly on the way; nothing
      hidden in boxes, nothing fetched from a second place.
    - The last station is an obstacle with `frees: true` that holds the goal.
@@ -193,8 +195,12 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
   backpack. No extra arrows, frames or hands; at an obstacle the `why` bubble explains and the bag's right
   thing glows. The goal is shown in the bubble only when it goes away – reminders never show it again.
 - **One action button**, the same in every level (drawn by `TrailPlay`, framed, next to
-  the bag on wide phones, bottom right otherwise). Don't add buttons, and no other way
+  the bag along the screen's bottom edge, under the child). Don't add buttons, and no other way
   to leave than `GameShell`'s.
+- **Room for bag and button under the child.** The screen puts the child's feet just above them
+  and zooms tall screens in, so keep what matters (things, creatures, bubbles) above the ground and
+  within about 650 above the child's feet; nothing a child must see lies more than ~200 below the ground
+  at a stop.
 - **Things fit together.** What an animal wants is what it really eats or plays with
   (a dog a bone or a ball, a horse a carrot, ducks bread), and a thing comes from a
   place where it belongs (the bone from the pet shop, not a pretzel from the bakery).
@@ -215,7 +221,8 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
    right one glows), then the right one. Does the `why` bubble sit right above the creature, and is its
    picture easy to read? Look at each station: is the thing visible
    and does it stand out, does the obstacle react, does the scenery change when
-   solved, is nothing cut off at the screen edges? Climb takes two presses. At the
+   solved, is nothing cut off at the screen edges, does nothing hide behind bag and button? Climb takes
+   one press; the child walks to each obstacle by itself. At the
    end the goal comes back, confetti, and the cards (1–4) include the new level.
    `document.getAnimations()` is empty right after load; the console has no errors.
 3. Play „Der Drachen“ once too if `TrailPlay.tsx`, `items.tsx` or `trail.css`

@@ -22,13 +22,13 @@
   pointer-events: none;
 }
 
-/* Measures the screen without a notch, so bag and button keep clear of it. */
+/* Measures the screen without a notch or a home bar, so bag and button keep clear of them. */
 .tl-safe {
   position: absolute;
   top: 0;
   left: env(safe-area-inset-left, 0px);
   right: env(safe-area-inset-right, 0px);
-  height: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
   pointer-events: none;
 }
 
@@ -111,14 +111,9 @@
 
 /* ---------- The backpack on the screen ---------- */
 
-/* Its frame sets it off from the picture: the backpack in it is the child's own, open. */
+/* Its shadow sets it off from the picture: the backpack is the child's own, open. */
 .tl-bag-shadow {
   fill: #3d405b;
-}
-
-.tl-bag-box {
-  fill: #f1d6b0;
-  stroke: #3d405b;
 }
 
 .tl-slot-tap {
@@ -155,6 +150,23 @@
 
 .tl-bag.open .tl-slot {
   animation: tl-slot-hop 0.5s cubic-bezier(0.3, 1.6, 0.6, 1) both;
+}
+
+/* While the child picks, every pocket holding a thing is a lit button: a yellow frame round it breathes, like the
+   waiting action button's. */
+.tl-fach-ring {
+  stroke: #ffd43b;
+  filter: drop-shadow(0 0 2px #3d405b) drop-shadow(0 0 2px #3d405b);
+  animation: tl-fach-ring 0.9s ease-in-out infinite alternate both;
+}
+
+/* A pocket whose thing comes out is pressed in, like a button. */
+.tl-pocket {
+  transition: transform 0.12s ease-out;
+}
+
+.tl-pocket.press {
+  transform: translateY(7px);
 }
 
 /* The thing that helps glows. */
@@ -500,6 +512,17 @@
   }
   to {
     transform: scale(1);
+  }
+}
+
+@keyframes tl-fach-ring {
+  from {
+    stroke: #ffd43b;
+    stroke-width: 7;
+  }
+  to {
+    stroke: #fff3bf;
+    stroke-width: 11;
   }
 }
 

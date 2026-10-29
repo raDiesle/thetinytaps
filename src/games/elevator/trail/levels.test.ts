@@ -123,8 +123,9 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
       for (const station of path.stations) {
         if (station.kind !== "obstacle" || !("wants" in station.why)) continue;
         const [x, y] = station.why.wants;
-        // The child stands at 760 of 1600 on the screen, its feet at 740 of 900 (in a world going up the screen shows
-        // the drawing's x 0–1600); the bubble grows 160 away from the child and 200 up from its tip.
+        // The screen shows at least 840 of the way ahead of the child and about 680 above its feet (`layoutHud`; in a
+        // world going up the screen shows the drawing's x 0–1600); the bubble grows 160 away from the child and 200 up
+        // from its tip.
         const ahead = (x - placed(level.turns, [station.x, 0])[0]) * facing(level.turns, station.x);
         expect(ahead).toBeGreaterThan(40);
         expect(ahead).toBeLessThan(640);
@@ -133,7 +134,7 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
           expect(x).toBeLessThan(1400);
         }
         expect(groundY(path.ground, station.x) - y).toBeGreaterThan(0);
-        expect(groundY(path.ground, station.x) - y).toBeLessThan(520);
+        expect(groundY(path.ground, station.x) - y).toBeLessThan(440);
       }
     });
 
