@@ -120,7 +120,7 @@ use the same way.
 
 # Tagesplan
 
-Route `/tagesplan/` · ideas H-03 (partial), H-41–H-43, T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
+Route `/tagesplan/` · ideas H-03, H-41–H-43, T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
 
 A picture schedule („Strukturtafel“): the steps of a day as big cards in order, „Jetzt“ above the one to do now, and a
 week of columns. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
@@ -150,9 +150,22 @@ grown-up hold as on the board: a plan is a guide through the day, not a reward. 
 never ticks it. „↶ Zurück“ shows for a moment after a tick; when the day is done „↺ Von vorn“ starts it again (for the
 next Erst–Dann). A new plan shows example ticks (the first steps of today, never all), and the first tap only ends them.
 
+The teeth card under „Jetzt“ opens Zähne putzen instead of ticking (`gameOf`, `GAME_ROUTES` in `plan.ts`): the plan
+navigates there with `{ returnTo }` in the router state (`src/lib/routine.ts`), `GameShell` plays at once without the
+start screen, and leaving (✕, Esc, „Menü“) goes back to the plan. The plan first notes the card (`waitForStep`, per
+visit), the brushing's end calls `finishRoutineStep`, and back on the plan `takeFinishedStep` ticks exactly that card –
+also a morning routine's teeth brushed after 14:00, which Zähne putzen files as evening. Left early with ✕, the card
+stays „Jetzt“. Such
+a step is part of the day, not play: no game counted, no play time, and `PlaytimeLock` lets it through. Under
+Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when the family brushes without the app.
+
 ## Rules
 
 - A key never ticks a card – only a tap on „Jetzt“ does, so a child hammering keys doesn't finish the day.
+- A card whose game ticks it opens that game only when it is „Jetzt“ (never a done or later card), and the game always
+  comes back to the plan; never tick it by the tap as well. A finished game ticks the card it was opened for, whatever
+  its own log says (by the clock a late morning brushing is an evening one), so the child never comes back to a card
+  that still glows after brushing.
 - Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most; a template stays within it (`plan.test.ts`).
 - No clock times: order, „Jetzt – Dann“ and moons for the days to come; toddlers read no clock.
 - Printed cards are big (about 6 cm) and the texts suggest Velcro (Klett), never small magnets: they are a choking

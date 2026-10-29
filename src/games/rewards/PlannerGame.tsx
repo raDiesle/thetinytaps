@@ -4,11 +4,12 @@ import { MenuHead } from "@/components/MenuTop";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useGameSettings } from "@/lib/common";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
+import { takeFinishedStep } from "@/lib/routine";
 import { useStoredSettings } from "@/lib/storage";
-import { newId, type StarLog } from "./board";
+import { addStar, newId, type StarLog } from "./board";
 import { PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate, type PlanView } from "./catalog";
 import { loadLinkedDays } from "./linked";
-import { type Plan, planFromTemplate, restartDay } from "./plan";
+import { parseRoutineStep, type Plan, planFromTemplate, restartDay } from "./plan";
 import { PlanEditor } from "./PlanEditor";
 import { PlanGallery } from "./PlanGallery";
 import { PlanPrint } from "./PlanPrint";
@@ -56,6 +57,14 @@ export function PlannerGame() {
   const setLog = (next: StarLog) => setStored({ log: next });
   const today = new Date();
   const day = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (plan.view === "day" ? shift : 0), 12);
+
+  // Back from a game a card opened (the brushing): that card gets its tick, whatever time of day the game counted.
+  useEffect(() => {
+    const finished = takeFinishedStep(location.pathname);
+    if (!finished) return;
+    const { planId, key } = parseRoutineStep(finished);
+    if (!log[planId]?.[key]) setLog(addStar(log, planId, key, new Date()));
+  }, []);
 
   // Another plan or view starts at today again.
   useEffect(() => setShift(0), [plan.id, plan.view]);
@@ -264,7 +273,7 @@ function Info() {
       </p>
       <p>
         {t({
-          de: "Zähne putzen hakt sich von selbst ab, wenn im Spiel „Zähne putzen“ fertig geputzt ist – in der Morgenroutine nur das Putzen am Morgen. Hat Ihr Kind zu früh getippt, gibt es kurz danach „Zurück“; „Von vorn“ beginnt den Tag neu. Mit ‹ › sehen Sie andere Tage, etwa was morgen kommt.",
+          de: "Ist die Zähne-Karte dran, öffnet ein Tippen darauf gleich das Spiel „Zähne putzen“. Nach dem Putzen (oder mit ✕) geht es zurück zum Plan, und die Karte hat ihren Haken – in der Morgenroutine nur nach dem Putzen am Morgen. Das Putzen zählt nicht zur Spielzeit und geht auch, wenn sie vorbei ist. Wer ohne das Spiel putzt, stellt unter „Gestalten“ die Karte auf „Nur abhaken“. Hat Ihr Kind zu früh getippt, gibt es kurz danach „Zurück“; „Von vorn“ beginnt den Tag neu. Mit ‹ › sehen Sie andere Tage, etwa was morgen kommt.",
         })}
       </p>
       <p>

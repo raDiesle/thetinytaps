@@ -1,4 +1,4 @@
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { MenuHead } from "@/components/MenuTop";
@@ -9,6 +9,7 @@ import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { useAppLanguage, useT } from "@/lib/language";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
+import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
@@ -70,7 +71,10 @@ interface GameShellProps {
  */
 export function GameShell({ title, emoji, modes, mode, onMode, startMode, level, info, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const t = useT();
+  // Opened as a step of a routine (the Tagesplan): plays at once, without play time, and goes back there afterwards.
+  const returnTo = routineReturn(location.state);
   const category = categoryOf(location.pathname);
   const back = backHref ?? (category ? categoryHref(category) : "/");
   const backText =
@@ -81,7 +85,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   const [playing, setPlaying] = useState(false);
   // The panel opened below the two buttons, if any: folded away by default, so the start screen stays short.
   const [panel, setPanel] = useState<"info" | "settings" | null>(null);
-  const playtime = usePlaytime(playing);
+  const playtime = usePlaytime(playing && !returnTo);
   const grid = useFitGrid(modes?.length ?? 0);
   // The background song runs on from the menus into the game (BackgroundMusic), until the play time is over.
   useNoBackgroundMusic(playing && playtime.goodNight);
@@ -90,9 +94,11 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
   const start = async () => {
-    // The menus are locked then (PlaytimeLock); this also stops a key that slips past it.
-    if (isPlaytimeOver()) return;
-    countGame();
+    // The menus are locked then (PlaytimeLock); this also stops a key that slips past it. A routine's step is no game.
+    if (!returnTo) {
+      if (isPlaytimeOver()) return;
+      countGame();
+    }
     // These need the click as a user gesture, so run them before any await.
     unlockAudio();
     unlockSpeech();
@@ -105,6 +111,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
     setPlaying(false);
     // Only the keyboard lock ends: fullscreen stays on, the menus are part of the app too.
     exitKidMode();
+    if (returnTo) navigate(returnTo, { replace: true });
   };
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -140,12 +147,13 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
     };
   }, [playing]);
 
-  // A game that starts at once does so only when the page opens, once (React runs effects twice while developing).
+  // A game that starts at once (or a routine's step) does so only when the page opens, once (React runs effects twice
+  // while developing).
   const started = useRef(false);
   useEffect(() => {
-    if (!startMode || started.current) return;
+    if ((!startMode && !returnTo) || started.current) return;
     started.current = true;
-    onMode?.(startMode);
+    if (startMode) onMode?.(startMode);
     void start();
   }, []);
 

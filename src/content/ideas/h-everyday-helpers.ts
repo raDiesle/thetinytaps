@@ -36,8 +36,9 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Große Bildkarten in einer Reihe: Abendessen → Baden → Schlafanzug → Zähne → Buch → Licht aus. Die jetzige Karte leuchtet; das Kind tippt sie, wenn es fertig ist, sie bekommt einen Haken und die nächste leuchtet. Die Zähne-Karte öffnet Zähne putzen und kommt danach zurück. Dasselbe für den Morgen. Eltern stellen die Karten zusammen.",
       why: "Eltern suchen „abendroutine kinder bilder zum ausdrucken“, „tagesablauf kleinkind 2 jahre“ und „wochenplan kinder symbole“. Anders als A-17 läuft hier der echte Abend, nicht eine Reihe von Spielen.",
       effort: "M",
+      done: true,
       partial:
-        "Gebaut als Tagesplan (/tagesplan/): Karten in einer Reihe, „Jetzt“ leuchtet, das Kind tippt ab, Haken und Fest; Vorlagen für Morgen, Abend, Kita-Tag, Erst–Dann und Wochenplan; Zähne putzen hakt sich von selbst ab. Offen: die Zähne-Karte öffnet das Spiel und kommt danach zurück.",
+        "Gebaut als Tagesplan (/tagesplan/): Karten in einer Reihe, „Jetzt“ leuchtet, das Kind tippt ab, Haken und Fest; Vorlagen für Morgen, Abend, Kita-Tag, Erst–Dann und Wochenplan; die Zähne-Karte öffnet Zähne putzen und kommt danach mit Haken zurück (auch nach der Spielzeit).",
     },
     {
       id: "H-04",

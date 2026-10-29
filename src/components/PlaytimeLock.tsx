@@ -3,6 +3,7 @@ import { useLocation } from "react-router";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { useT } from "@/lib/language";
 import { usePlaytimeState } from "@/lib/playtime";
+import { routineReturn } from "@/lib/routine";
 
 /** How long a grown-up holds ⏳ to open the play time; far longer than a toddler's tap. */
 const UNLOCK_HOLD_MS = 3000;
@@ -12,14 +13,15 @@ const UNLOCK_HOLD_MS = 3000;
  * start screens – so no game can be started; the child stays on it. Only holding ⏳ for
  * three seconds opens the play time options, where a grown-up gives more time or starts
  * the day afresh; then the lock goes away by itself. A game on screen shows its own good
- * night instead (GameShell), and the management page for grown-ups, the Belohnungstafel and the Tagesplan stay open.
+ * night instead (GameShell), and the management page for grown-ups, the Belohnungstafel and the Tagesplan stay open,
+ * as does a game the Tagesplan opened for one of its steps (brushing teeth is part of the evening, not play).
  */
 export function PlaytimeLock() {
   const { over, inGame } = usePlaytimeState();
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
   // The Belohnungstafel and the Tagesplan are tools for the day, not games: the evening routine still works.
   const tool = ["/management", "/ideen", "/belohnungstafel", "/tagesplan"].some((path) => pathname.startsWith(path));
-  const locked = over && !inGame && !tool;
+  const locked = over && !inGame && !tool && !routineReturn(state);
   return locked ? <Lock /> : null;
 }
 

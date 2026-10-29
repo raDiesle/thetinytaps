@@ -12,6 +12,9 @@ Morning or evening (`daytime.ts`, by the clock: until 14:00 is the morning, no c
 
 Languages: everything follows the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage`/`useT` from `@/lib/language`), the start screen and „Über das Spiel“ as well as what the child sees and hears. The steps' German texts are in `steps.ts`, the translations in `steps.<language>.ts` by step id (`STEP_TRANSLATIONS`, `stepText(step, key, language)`); morning and evening in `daytime.ts` / `daytime.<language>.ts` (`DAYTIME_TRANSLATIONS`, `daytimeText`); the prelude, the end, the buttons and the picture labels inline as `{ de, en, zh, hi, es, ar, ru }`. The sugar monsters are sugar monsters, monstruos del azúcar, 糖怪兽, चीनी-मॉन्स्टर, وحوش السكر, сахарные монстры. Every spoken line goes through `spokenIn` (`src/lib/language.ts`): the line in the app language with its voice, or where it is missing the German line with the German voice, never German words in another voice. `texts.test.ts` checks that the translations that are there belong to a step or daytime text that exists, Russian, Chinese, Hindi and Arabic in their own script with no Latin letters, and that a text with Russian has the other five too; it does not ask a German-only text for any.
 
+The Tagesplan (`/tagesplan/`) opens this game for its 🪥 card (`src/lib/routine.ts`): the brushing starts at once
+without the start screen, outside play time, and „Menü“ or ✕ go back to the plan, which the finished brushing ticks.
+
 ## Rules
 
 - The monsters grow only in the story at the start. In the mirror they are already on the teeth: never let them pop up or arrive there (they only fade in softly as a side of the teeth turns into view), that would be a second, illogical origin.

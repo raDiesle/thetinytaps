@@ -209,7 +209,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now) skips it with `startMode` and plays
-  at once; the start screen comes only after ✕ or „Menü“. What the game is and how it is played (also keys and tips for grown-ups) goes into `info`
+  at once; the start screen comes only after ✕ or „Menü“. A game a routine opens for one of its steps (the Tagesplan's
+  🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or
+  „Menü“ go back to the routine. What the game is and how it is played (also keys and tips for grown-ups) goes into `info`
   („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
   that explain them. A game adds no own switch for what the home page already sets for all games
   (Vorlesen, Töne, Musik, Sprache), nor a choice for what the game can tell by itself (morning or evening by the clock).

@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { dayKey } from "@/games/teeth/daytime";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/sfx";
+import { type RoutineVisit, waitForStep } from "@/lib/routine";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
-import { currentStep, exampleTicks, nightsUntil, type Plan, restartDay, stepsOn } from "./plan";
+import { currentStep, exampleTicks, gameOf, nightsUntil, type Plan, restartDay, routineStep, stepsOn } from "./plan";
 import { PLAN_SCREEN, PlanSheet, type StepState, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
@@ -16,8 +18,9 @@ const UNDO_MS = 8000;
  * A plan on screen, as big as the room allows, and how its steps get done: the child taps the card that glows
  * („Jetzt“) when that step is done – it gets a tick with a sound and the next card glows. A card done before
  * twinkles, a later one wiggles and says when it comes („noch 2-mal schlafen“ in the week). The last tick of the day
- * is a party, and „↺ Von vorn“ starts the day again (after an Erst–Dann, the next one). A new plan shows example ticks
- * until the first tap.
+ * is a party, and „↺ Von vorn“ starts the day again (after an Erst–Dann, the next one). The teeth card under „Jetzt“
+ * opens Zähne putzen instead, which comes back here and ticks it by itself. A new plan shows example ticks until the
+ * first tap.
  */
 export function PlanScreen({
   plan,
@@ -42,6 +45,8 @@ export function PlanScreen({
   const t = useT();
   const language = useAppLanguage();
   const stepLabel = useStepLabel();
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const box = useRef<HTMLDivElement>(null);
   const [aspect, setAspect] = useState(1.6);
   const [fresh, setFresh] = useState<string | null>(null);
@@ -133,6 +138,14 @@ export function PlanScreen({
       sound(playPop);
       const nights = nightsUntil(today, stepDay);
       say(nights > 0 ? `${t({ de: nights === 1 ? "Noch einmal schlafen:" : `Noch ${nights}-mal schlafen:` })} ${label}` : label);
+      return;
+    }
+    // The teeth card opens Zähne putzen; leaving comes back here, and a finished brushing ticks this card.
+    const game = gameOf(step);
+    if (game) {
+      sound(playPop);
+      waitForStep(pathname, routineStep(plan.id, key));
+      navigate(game, { state: { returnTo: pathname } satisfies RoutineVisit });
       return;
     }
     // The card to do now: done, with a tick, and the next one glows.

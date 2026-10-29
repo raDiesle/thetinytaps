@@ -1,8 +1,26 @@
 import { describe, expect, test } from "bun:test";
+import { CATEGORIES } from "@/content/games";
+import { finishRoutineStep, routineReturn, takeFinishedStep, waitForStep } from "@/lib/routine";
 import { addStar, cellKey, type LinkedDays, NO_LINKED } from "./board";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { ACTIVITIES, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
-import { currentStep, distinctSteps, exampleTicks, MAX_STEPS, nightsUntil, planFromTemplate, restartDay, stepDone, stepsOn, withSame, withSteps } from "./plan";
+import {
+  currentStep,
+  distinctSteps,
+  exampleTicks,
+  gameOf,
+  MAX_STEPS,
+  nightsUntil,
+  parseRoutineStep,
+  planFromTemplate,
+  restartDay,
+  routineStep,
+  stepDone,
+  stepFromCatalog,
+  stepsOn,
+  withSame,
+  withSteps,
+} from "./plan";
 import { planLayout } from "./PlanSheet";
 import { DEFAULT_PLANNER_SETTINGS } from "./planSettings";
 
@@ -135,5 +153,51 @@ describe("cards of a day", () => {
       const { cols, rows } = planLayout(n, 1.4);
       expect(cols * rows).toBeGreaterThanOrEqual(n);
     }
+  });
+});
+
+describe("a card that opens its game", () => {
+  test("the teeth card opens Zähne putzen, a page of the home menu; „Nur abhaken“ and other cards only tick", () => {
+    const teeth = stepFromCatalog("zaehne", "evening");
+    const game = gameOf(teeth);
+    expect(game).toBe("/zaehne/");
+    expect(CATEGORIES.flatMap((c) => c.games).some((g) => g.href === game)).toBe(true);
+    expect(gameOf({ ...teeth, noGame: true })).toBeUndefined();
+    expect(gameOf(stepFromCatalog("toepfchen"))).toBeUndefined();
+  });
+
+  test("the game goes back only to a page of this app", () => {
+    expect(routineReturn({ returnTo: "/tagesplan/" })).toBe("/tagesplan/");
+    expect(routineReturn({ returnTo: "//example.com/" })).toBeUndefined();
+    expect(routineReturn({ returnTo: "https://example.com/" })).toBeUndefined();
+    expect(routineReturn(null)).toBeUndefined();
+    expect(routineReturn(undefined)).toBeUndefined();
+  });
+});
+
+describe("a card the game finished", () => {
+  // The visit's storage, as in the browser.
+  const store = new Map<string, string>();
+  globalThis.sessionStorage ??= {
+    getItem: (key: string) => store.get(key) ?? null,
+    setItem: (key: string, value: string) => void store.set(key, value),
+    removeItem: (key: string) => void store.delete(key),
+  } as Storage;
+
+  test("a finished brushing hands back the card it was opened for, once", () => {
+    const step = routineStep("erster-plan", cellKey(WED, "zaehne"));
+    expect(parseRoutineStep(step)).toEqual({ planId: "erster-plan", key: "2026-10-28|zaehne" });
+    waitForStep("/tagesplan/", step);
+    finishRoutineStep();
+    expect(takeFinishedStep("/belohnungstafel/")).toBeUndefined();
+    expect(takeFinishedStep("/tagesplan/")).toBe(step);
+    expect(takeFinishedStep("/tagesplan/")).toBeUndefined();
+  });
+
+  test("left before the end, nothing is ticked – and a later brushing from the menu ticks nothing either", () => {
+    waitForStep("/tagesplan/", routineStep("erster-plan", cellKey(WED, "zaehne")));
+    expect(takeFinishedStep("/tagesplan/")).toBeUndefined();
+    finishRoutineStep();
+    expect(takeFinishedStep("/tagesplan/")).toBeUndefined();
   });
 });

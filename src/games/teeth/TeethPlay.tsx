@@ -7,6 +7,7 @@ import { useCommonSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
 import { loadRecordings, playChime, playCountNote, playDrumRoll, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
+import { finishRoutineStep } from "@/lib/routine";
 import { speak, stopSpeaking } from "@/lib/speech";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, daytimeOf, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
@@ -418,6 +419,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       const next = addBrushing(loadWeek(), new Date(), daytime);
       saveWeek(next);
       setWeek(next);
+      // Opened by the Tagesplan's teeth card: that card is done, morning or evening.
+      finishRoutineStep();
       for (let i = 0; i < 24; i++) setTimeout(() => spawn(), i * 160);
     }
     // Only when the part changes, not when a setting does.

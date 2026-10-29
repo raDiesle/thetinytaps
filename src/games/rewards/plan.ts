@@ -18,6 +18,8 @@ export interface PlanStep {
   linked?: LinkedGame;
   /** The time of day of a linked step: only a brushing in the morning ticks a morning routine's teeth. */
   slot?: Slot;
+  /** A tap ticks it like any card instead of opening its game: for a family that brushes without the app. */
+  noGame?: boolean;
 }
 
 /** A plan as it is shown and printed. */
@@ -42,6 +44,21 @@ export interface Plan {
 
 /** At most this many steps a day: more would not fit as pictures a child can follow. */
 export const MAX_STEPS = 8;
+
+/** The game a linked card opens when the child taps it under „Jetzt“; it comes back to the plan afterwards. */
+const GAME_ROUTES: Partial<Record<LinkedGame, string>> = { teeth: "/zaehne/" };
+
+/** The page a step's tap opens (Zähne putzen for the teeth card), or none when a tap ticks it. */
+export const gameOf = (step: PlanStep): string | undefined => (step.linked && !step.noGame ? GAME_ROUTES[step.linked] : undefined);
+
+/** A card as the routine hands it to the game it opens (`waitForStep`): plan id and field key in one string. */
+export const routineStep = (planId: string, key: string) => `${planId}\n${key}`;
+
+/** The plan id and field key of a card a game finished (`takeFinishedStep`). */
+export function parseRoutineStep(step: string): { planId: string; key: string } {
+  const at = step.indexOf("\n");
+  return { planId: step.slice(0, at), key: step.slice(at + 1) };
+}
 
 /** A step from the catalogue, linked to its game where it has one. */
 export function stepFromCatalog(id: string, slot?: Slot): PlanStep {
