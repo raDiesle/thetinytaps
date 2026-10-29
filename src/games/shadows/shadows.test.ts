@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ITEMS, SHADOW_TEXTS, SHADOW_TRANSLATIONS } from "./content";
 import { RUSSIAN_NAMES } from "./content.ru";
+import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -56,4 +57,45 @@ test("a picture without its name gets the whole German sentence, in every langua
     const texts = SHADOW_TEXTS[language]!;
     for (const key of ["name", "search", "found", "thatIs", "there"] as const) expect(texts[key](item), `${language} ${key}`).toBe(de[key](item));
   }
+});
+
+const ANIMAL = ITEMS.find((i) => i.id === "elefant")!;
+
+test("each step deals its number of shadows, the picture's own among them once, and no shadow twice", () => {
+  for (const level of SHADOW_LEVELS) {
+    for (const pool of [ITEMS, ITEMS.filter((i) => i.theme === "animals"), ITEMS.filter((i) => i.theme === "vehicles")]) {
+      const item = pool[0];
+      const shadows = dealShadows(item, pool, level);
+      expect(shadows.length).toBe(level.shadows);
+      expect(new Set(shadows).size).toBe(shadows.length);
+      expect(shadows.filter((s) => s === item).length).toBe(1);
+      expect(shadows.every((s) => pool.includes(s))).toBe(true);
+    }
+  }
+});
+
+test("mixed pictures: the early steps show shadows of other kinds, the later ones of the same kind", () => {
+  for (const level of SHADOW_LEVELS) {
+    const others = dealShadows(ANIMAL, ITEMS, level).filter((s) => s !== ANIMAL);
+    expect(others.every((s) => (s.theme === ANIMAL.theme) === level.alike)).toBe(true);
+  }
+});
+
+test("the steps only get harder, and the first is the easiest", () => {
+  SHADOW_LEVELS.slice(1).forEach((level, i) => {
+    const before = SHADOW_LEVELS[i];
+    expect(level.shadows > before.shadows || (level.shadows === before.shadows && level.alike && !before.alike)).toBe(true);
+  });
+  expect(SHADOW_LEVELS[0]).toEqual({ shadows: 2, alike: false });
+});
+
+test("sure goes up, unsure goes down, never past the ends", () => {
+  expect(nextLevel(0, [0])).toBe(0);
+  expect(nextLevel(0, [0, 0])).toBe(1);
+  expect(nextLevel(SHADOW_LEVELS.length - 1, [0, 0])).toBe(SHADOW_LEVELS.length - 1);
+  expect(nextLevel(2, [1, 0])).toBe(2);
+  expect(nextLevel(2, [2])).toBe(1);
+  expect(nextLevel(2, [1])).toBe(2);
+  expect(nextLevel(2, [1, 1])).toBe(1);
+  expect(nextLevel(0, [3])).toBe(0);
 });

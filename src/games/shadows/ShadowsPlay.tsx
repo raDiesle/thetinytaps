@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { playChime, playPop, playRandomNote } from "@/lib/sfx";
-import { pick, useAppLanguage, voiceFor } from "@/lib/language";
+import { type Localized, pick, useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
 import { ITEMS, SHADOW_TEXTS, type ShadowItem } from "./content";
-import { shuffle, useDeck } from "./deck";
-import type { ShadowsSettings } from "./settings";
+import { useDeck } from "./deck";
+import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
+import type { ShadowsSettings, ShadowTheme } from "./settings";
 
 /** A finger that moves less than this is a tap, not a drag. */
 const TAP_PX = 12;
@@ -16,6 +17,34 @@ const CELEBRATE_MS = 2600;
 const WRONG_MS = 1500;
 /** Dropped this close to a shadow (as a share of its size) still counts: small fingers don't aim well. */
 const SNAP = 0.3;
+
+/** The kinds of pictures to pick from while playing, each shown by its emoji; "all" by one of each kind. */
+const THEMES: { id: ShadowTheme; emoji: string[]; label: Localized }[] = [
+  {
+    id: "all",
+    emoji: ["🐘", "🚗", "🍌", "☂️"],
+    label: { de: "Gemischt", ru: "Вперемешку", en: "Mixed", zh: "混合", hi: "मिले-जुले", es: "Mezclado", ar: "منوعة" },
+  },
+  { id: "animals", emoji: ["🐘"], label: { de: "Tiere", ru: "Животные", en: "Animals", zh: "动物", hi: "जानवर", es: "Animales", ar: "حيوانات" } },
+  {
+    id: "vehicles",
+    emoji: ["🚗"],
+    label: { de: "Fahrzeuge", ru: "Транспорт", en: "Vehicles", zh: "交通工具", hi: "गाड़ियाँ", es: "Vehículos", ar: "مركبات" },
+  },
+  { id: "food", emoji: ["🍌"], label: { de: "Essen", ru: "Еда", en: "Food", zh: "食物", hi: "खाना", es: "Comida", ar: "طعام" } },
+  { id: "things", emoji: ["☂️"], label: { de: "Dinge", ru: "Вещи", en: "Things", zh: "东西", hi: "चीज़ें", es: "Cosas", ar: "أشياء" } },
+];
+
+/** A theme's picture: one emoji, or a small square of four for "all". */
+function ThemeIcon({ emoji }: { emoji: string[] }) {
+  return (
+    <span className={`sh-theme-icon${emoji.length > 1 ? " mixed" : ""}`}>
+      {emoji.map((e) => (
+        <span key={e}>{e}</span>
+      ))}
+    </span>
+  );
+}
 
 interface Round {
   id: number;
@@ -38,11 +67,18 @@ function near(r: DOMRect, x: number, y: number) {
   return x > r.left - margin && x < r.right + margin && y > r.top - margin && y < r.bottom + margin;
 }
 
-/** "Schatten finden" (N-07): drag the picture onto its shadow, or tap the right shadow. */
+/**
+ * "Schatten finden" (N-07): drag the picture onto its shadow, or tap the right shadow. More shadows, and closer
+ * ones, come as the child gets quicker and surer; fewer when it gets hard.
+ */
 export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const language = useAppLanguage();
+  const t = useT();
   const texts = pick(SHADOW_TEXTS, language.id);
   const [round, setRound] = useState<Round | null>(null);
+  const [theme, setTheme] = useState<ShadowTheme>("all");
+  /** The theme menu is open. */
+  const [themesOpen, setThemesOpen] = useState(false);
   const [drag, setDrag] = useState<{ x: number; y: number } | null>(null);
   /** The shadow the picture is dragged over, so it can grow a little. */
   const [hover, setHover] = useState<number | null>(null);
@@ -65,6 +101,14 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
   const pointer = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  // Refs, since `nextRound` is also called from timers set before a change: it always deals at the current ones.
+  const themeRef = useRef(theme);
+  /** The difficulty step (an index into `SHADOW_LEVELS`); every visit begins on the first. */
+  const levelRef = useRef(0);
+  /** The wrong shadows tapped in each picture on the current step, newest last; cleared on each step up or down. */
+  const resultsRef = useRef<number[]>([]);
+  /** Wrong shadows tapped in the current picture. */
+  const missesRef = useRef(0);
 
   const later = useCallback((ms: number, run: () => void) => {
     const timer = setTimeout(() => {
@@ -88,15 +132,19 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     [settings.speech, language.id, language.speechLang],
   );
 
-  const pool = settings.theme === "all" ? ITEMS : ITEMS.filter((i) => i.theme === settings.theme);
+  const pool = useMemo(() => (theme === "all" ? ITEMS : ITEMS.filter((i) => i.theme === theme)), [theme]);
+  const poolRef = useRef(pool);
+  poolRef.current = pool;
 
   const drawItem = useDeck(pool);
+  const drawRef = useRef(drawItem);
+  drawRef.current = drawItem;
 
   const nextRound = useCallback(() => {
-    const item = drawItem();
-    const count = Number(settings.choices);
-    const shadows = shuffle([item, ...shuffle(pool.filter((i) => i !== item)).slice(0, count - 1)]);
+    const item = drawRef.current();
+    const shadows = dealShadows(item, poolRef.current, SHADOW_LEVELS[levelRef.current]);
     const next = { id: nextId.current++, item, shadows, correct: shadows.indexOf(item) };
+    missesRef.current = 0;
     setRound(next);
     setDrag(null);
     setHover(null);
@@ -107,7 +155,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     busy.current = false;
     say(texts.search(item));
     if (settings.sounds) later(400, () => item.sound?.());
-  }, [settings.choices, settings.sounds, pool, drawItem, say, later]);
+  }, [settings.sounds, say, later]);
 
   // Start with a picture right away; settings can't change while playing.
   useEffect(() => nextRound(), []);
@@ -130,6 +178,8 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     setHover(null);
 
     if (!ok) {
+      // Never a "wrong" for the child; only the difficulty takes note.
+      missesRef.current++;
       // The shadow lights up and shows who it really belongs to.
       const owner = round.shadows[index];
       if (settings.sounds) later(250, () => (owner.sound ?? playPop)());
@@ -141,6 +191,12 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       });
       return;
     }
+
+    // How this picture went decides the next one's step.
+    const results = [...resultsRef.current, missesRef.current];
+    const level = nextLevel(levelRef.current, results);
+    resultsRef.current = level === levelRef.current ? results : [];
+    levelRef.current = level;
 
     // The picture flies onto its shadow and shrinks to fit it exactly.
     const picture = pictureRef.current;
@@ -233,9 +289,40 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
 
   const onShadowDown = (index: number) => (e: PointerEvent) => {
     e.stopPropagation();
-    if (settings.tap) choose(index);
-    else setNudge((n) => n + 1);
+    setThemesOpen(false);
+    choose(index);
   };
+
+  const onThemesDown = (e: PointerEvent) => {
+    e.stopPropagation();
+    if (settings.sounds) playPop();
+    setThemesOpen((open) => !open);
+  };
+
+  /** Only pictures of `next` from now on ("all" mixes them): a new picture comes at once, at the same step. */
+  const pickTheme = (next: ShadowTheme) => (e: PointerEvent) => {
+    e.stopPropagation();
+    setThemesOpen(false);
+    if (next === themeRef.current) {
+      if (settings.sounds) playPop();
+      return;
+    }
+    themeRef.current = next;
+    setTheme(next);
+  };
+
+  // A new theme brings a new picture of it; what was still to come of the old one is dropped.
+  const firstTheme = useRef(true);
+  useEffect(() => {
+    if (firstTheme.current) {
+      firstTheme.current = false;
+      return;
+    }
+    timers.current.forEach(clearTimeout);
+    timers.current.clear();
+    resultsRef.current = [];
+    nextRound();
+  }, [theme]);
 
   // Arrow keys (or any key) move the frame, Space or Enter picks, 1–4 pick straight away.
   useEffect(() => {
@@ -253,6 +340,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
         setFocus(to);
       };
       const current = focusRef.current;
+      if (themesOpen) setThemesOpen(false);
       if (Number.isInteger(digit) && digit >= 1 && digit <= count) {
         move(digit - 1);
         choose(digit - 1);
@@ -275,10 +363,13 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const offset = landed ?? drag;
 
   return (
-    <div className={`shadows-play`} onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
-      <p key={`${round.id}-${won}`} className="sh-prompt">
-        {won ? texts.found(round.item) : texts.search(round.item)}
-      </p>
+    <div
+      className="shadows-play"
+      onPointerDown={(e) => {
+        setThemesOpen(false);
+        funBurst(e.clientX, e.clientY);
+      }}
+    >
       <div className="sh-top">
         <div key={`picture-${round.id}`} className="sh-picture-box">
           <span
@@ -297,11 +388,14 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
           >
             {round.item.emoji}
           </span>
-          {settings.names && <span className={`sh-name${landed ? " gone" : ""}`}>{texts.name(round.item)}</span>}
         </div>
       </div>
       <div className="sh-ground">
-        <div className="sh-options" style={{ "--n": round.shadows.length } as CSSProperties}>
+        <div
+          className="sh-options"
+          // Upright, two in a row while that leaves at most two rows, else three.
+          style={{ "--n": round.shadows.length, "--tall-cols": round.shadows.length > 4 ? 3 : Math.min(round.shadows.length, 2) } as CSSProperties}
+        >
           {round.shadows.map((s, i) => {
             const peek = outcome?.pick === i && !outcome.ok;
             return (
@@ -327,18 +421,48 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
                 >
                   {s.emoji}
                 </span>
-                {peek && settings.names && <span className="sh-bubble">{texts.name(s)}</span>}
               </div>
             );
           })}
         </div>
       </div>
-      {stars > 0 && (
-        <div className="find-stars" aria-label={texts.stars(stars)}>
-          {"⭐".repeat(Math.min(stars, 10))}
-          {stars > 10 && <span className="find-count">{stars}</span>}
+      <div className="sh-bar">
+        <div className="sh-themes" data-tap-root>
+          <button
+            type="button"
+            className={`sh-theme-button${themesOpen ? " open" : ""}`}
+            aria-label={t({ de: "Bilder wählen" })}
+            aria-expanded={themesOpen}
+            data-tap
+            onPointerDown={onThemesDown}
+          >
+            <ThemeIcon emoji={THEMES.find((th) => th.id === theme)!.emoji} />
+          </button>
+          {themesOpen && (
+            <div className="sh-theme-menu" role="menu">
+              {THEMES.map((th) => (
+                <button
+                  key={th.id}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={th.id === theme}
+                  className={`sh-theme-choice${th.id === theme ? " current" : ""}`}
+                  aria-label={t(th.label)}
+                  data-tap
+                  onPointerDown={pickTheme(th.id)}
+                >
+                  <ThemeIcon emoji={th.emoji} />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+        {stars > 0 && (
+          <div className="sh-stars" aria-label={texts.stars(stars)}>
+            {"⭐".repeat(Math.min(stars, 10))}
+          </div>
+        )}
+      </div>
       <BurstLayer bursts={bursts} />
     </div>
   );

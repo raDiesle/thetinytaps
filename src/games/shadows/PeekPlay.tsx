@@ -8,7 +8,7 @@ import { PEEK_ITEMS, hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } fr
 import { shuffle, useDeck } from "./deck";
 import { emojiGlyph, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
-import type { ShadowsSettings } from "./settings";
+import type { AnimalsSettings } from "@/games/animals/settings";
 
 /** Time to watch the animal that came out before the next one hides. */
 const CELEBRATE_MS = 3000;
@@ -74,7 +74,7 @@ const HIDE_DIRECTION: Record<Side, { x: number; y: number }> = {
 };
 
 /** The settings "Wer schaut da raus?" reads; it is played from "Was gehört zum Tier?". */
-export type PeekSettings = Pick<ShadowsSettings, "choices" | "names" | "speech" | "sounds">;
+export type PeekSettings = Pick<AnimalsSettings, "choices" | "names" | "speech" | "sounds">;
 
 /**
  * "Wer schaut da raus?" (X-04): a part of an animal peeks out of a bush or the pond; tap the whole animal below.
@@ -310,9 +310,11 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
         </div>
       </div>
       {stars > 0 && (
-        <div className="find-stars" aria-label={texts.stars(stars)}>
-          {"⭐".repeat(Math.min(stars, 10))}
-          {stars > 10 && <span className="find-count">{stars}</span>}
+        <div className="sh-bar">
+          <div className="sh-stars" aria-label={texts.stars(stars)}>
+            {"⭐".repeat(Math.min(stars, 10))}
+            {stars > 10 && <span className="sh-count">{stars}</span>}
+          </div>
         </div>
       )}
       <BurstLayer bursts={bursts} />
