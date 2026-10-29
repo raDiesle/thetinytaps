@@ -134,7 +134,6 @@ export const EN: Record<string, string> = {
   "Die Ampel ist rot. Wir drücken den Knopf.": "The light is red. We press the button.",
   "Grün! Jetzt gehen wir rüber.": "Green! Now we cross.",
   "Ein Knochen!": "A bone!",
-  "Eine Schaufel.": "A shovel.",
   "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?": "The dog is sitting in the way. He's hungry. What shall we give him?",
   "Der Knochen! Mmh, lecker.": "The bone! Mmm, yummy.",
   "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?": "The flowers are hanging their heads. They're thirsty. What helps?",
@@ -142,7 +141,6 @@ export const EN: Record<string, string> = {
   "Die Rutsche! Hoch geht's.": "The slide! Up we go.",
   "Hui!": "Wheee!",
   "Da ist der Ball! Er steckt im Sand. Was hilft?": "There's the ball! It's stuck in the sand. What helps?",
-  "Die Schaufel! Wir graben ihn aus.": "The shovel! We dig it out.",
   "Der Ball ist wieder da! Hurra!": "The ball is back! Hooray!",
 
   // Der Luftballon

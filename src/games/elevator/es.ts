@@ -135,7 +135,6 @@ export const ES: Record<string, string> = {
   "Die Ampel ist rot. Wir drücken den Knopf.": "El semáforo está en rojo. Apretamos el botón.",
   "Grün! Jetzt gehen wir rüber.": "¡Verde! Ahora cruzamos.",
   "Ein Knochen!": "¡Un hueso!",
-  "Eine Schaufel.": "Una pala.",
   "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?": "El perro está sentado en el camino. Tiene hambre. ¿Qué le damos?",
   "Der Knochen! Mmh, lecker.": "¡El hueso! Mmm, qué rico.",
   "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?": "Las flores tienen la cabeza caída. Tienen sed. ¿Qué nos ayuda?",
@@ -143,7 +142,6 @@ export const ES: Record<string, string> = {
   "Die Rutsche! Hoch geht's.": "¡El tobogán! Vamos para arriba.",
   "Hui!": "¡Uiii!",
   "Da ist der Ball! Er steckt im Sand. Was hilft?": "¡Ahí está la pelota! Está metida en la arena. ¿Qué nos ayuda?",
-  "Die Schaufel! Wir graben ihn aus.": "¡La pala! La desenterramos.",
   "Der Ball ist wieder da! Hurra!": "¡La pelota volvió! ¡Hurra!",
 
   // Der Luftballon

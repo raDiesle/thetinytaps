@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { FRIENDS } from "./friends";
 import { allStations, groundY, pathsOf, route } from "./ground";
 import type { ItemId } from "./items";
 import { TRAIL_LEVELS } from "./levels";
@@ -78,8 +79,22 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
         } else if (station.kind === "obstacle") {
           expect(bag).toContain(station.need);
           bag.splice(bag.indexOf(station.need), 1);
+          // A creature that joins puts its picture into the bag (G-10).
+          if (station.befriends) bag.push(station.befriends.friend);
+          expect(bag.length).toBeLessThanOrEqual(3);
         }
       }
+    });
+
+    test("a friend joins once, is a friend, and is never something to pick up", () => {
+      const joins = path.stations.flatMap((s) => (s.kind === "obstacle" && s.befriends ? [s.befriends] : []));
+      // TrailPlay walks with one friend at a time.
+      expect(joins.length).toBeLessThanOrEqual(1);
+      for (const { friend, from } of joins) {
+        expect(FRIENDS[friend]).toBeDefined();
+        expect(groundY(path.ground, from[0])).toBe(from[1]);
+      }
+      for (const station of path.stations) if (station.kind === "pickup") expect(FRIENDS[station.item]).toBeUndefined();
     });
 
     test("a creature's why-bubble is above the ground next to the child, where the screen shows it", () => {

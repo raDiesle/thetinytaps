@@ -12,6 +12,7 @@ import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, PACK, ThoughtBubble, type Pose } from "../kid";
 import { spokenIn } from "../phrases";
 import type { ElevatorSettings } from "../settings";
+import { FRIENDS, type FriendPose } from "./friends";
 import { allStations, groundY, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
 import type { Climb, Cue, Flight, Fork, Moment, Obstacle, Pickup, Point, Station, TrailLevel, Way } from "./types";
@@ -70,6 +71,10 @@ const KID_SHIFT = 80;
 const PRINT_GAP = 62;
 /** The round picture sign of each way at a fork. */
 const WAY_R = 66;
+/** A friend walks this far behind the child, clear of its backpack. */
+const FRIEND_GAP = 170;
+/** A friend running to help or back, per world point: faster than the child walks. */
+const RUN_MS = 1.4;
 
 /** Where the bag and the action button are on the screen, in the picture's units. */
 interface Hud {
@@ -191,6 +196,20 @@ interface KidState {
   hop: number;
 }
 
+/** The creature walking along with the child (G-10), drawn by its `FRIENDS` entry. */
+interface FriendState {
+  /** Its picture in the bag, and the key of `FRIENDS`. */
+  id: ItemId;
+  x: number;
+  y: number;
+  /** Length of the current run in ms; 0 while it stays. */
+  ms: number;
+  face: 1 | -1;
+  pose: FriendPose;
+  /** Bumped to make it hop (joining, setting off, tapped). */
+  hop: number;
+}
+
 interface View {
   picking: boolean;
   kid: KidState;
@@ -221,6 +240,8 @@ interface View {
   bubble: { picture: Picture; at: Point | null; nudge: number } | null;
   /** At a fork: the child picks a way by its sign; each shows where it goes first. `nudge` makes the signs hop. */
   fork: { id: string; ways: Next[]; nudge: number } | null;
+  /** The friend walking along, once a creature has joined. */
+  friend: FriendState | null;
   party: boolean;
 }
 
@@ -242,6 +263,7 @@ const startView = (level: TrailLevel): View => ({
   action: null,
   bubble: null,
   fork: null,
+  friend: null,
   party: false,
 });
 
@@ -408,16 +430,37 @@ export function TrailPlay({
   /** The camera: the world moves so that the child stays at `KID_AT` (moved right by the HUD's `kidX`). */
   const camOf = (k: KidState): Point => [k.x - hud.current.kidX, k.y - KID_AT[1]];
 
-  /** Walks the child along the ground to `x`; the world scrolls along. */
+  /** The friend (if there is one) runs to `x` on the ground in `ms`, doing `pose` there once it arrives. */
+  const friendTo = (x: number, ms: number) =>
+    put((v) => ({ friend: v.friend && { ...v.friend, x, y: groundY(ground.current, x), ms, face: x >= v.friend.x ? 1 : -1, pose: "walk" } }));
+
+  /** The friend stays where it is now, doing `pose`, facing the way on. */
+  const friendStays = (pose: FriendPose = "sit") => put((v) => ({ friend: v.friend && { ...v.friend, ms: 0, face: 1, pose } }));
+
+  /** The friend runs to `x` (a little faster than the child walks) and does `pose` there. */
+  const runFriend = async (x: number, pose: FriendPose = "sit") => {
+    const f = viewRef.current.friend;
+    if (!f) return;
+    const ms = Math.max(300, Math.abs(x - f.x) * RUN_MS);
+    friendTo(x, ms);
+    await wait(ms);
+    friendStays(pose);
+  };
+
+  const hopFriend = () => put((v) => ({ friend: v.friend && { ...v.friend, hop: v.friend.hop + 1 } }));
+
+  /** Walks the child along the ground to `x`; the world scrolls along, and a friend follows behind. */
   const walkTo = async (x: number) => {
     for (const [px, py] of route(ground.current, viewRef.current.kid.x, x)) {
       const k = viewRef.current.kid;
       const ms = Math.hypot(px - k.x, py - k.y) * WALK_MS;
       if (ms < 1) continue;
       kid({ x: px, y: py, walk: ms, pose: "walk", face: px >= k.x ? 1 : -1 });
+      friendTo(px - FRIEND_GAP, ms);
       await wait(ms);
     }
     kid({ walk: 0, pose: "stand", face: 1 });
+    friendStays();
   };
 
   /** Draws the carried thing at `at`, `s` times its carrying size, in front of the child or `behind` it. */
@@ -569,6 +612,48 @@ export function TrailPlay({
 
   const nextChoice = () => new Promise<number>((resolve) => (chooser.current = resolve));
 
+  /** The friend's picture rises out of the backpack on the screen, and the friend barks and runs off to `x` to help. */
+  const sendFriend = async (slot: number, x: number, pose: FriendPose) => {
+    const f = viewRef.current.friend!;
+    put((v) => ({ leaving: slot, bagBump: v.bagBump + 1 }));
+    sound(playPop);
+    await wait(320);
+    put((v) => ({ leaving: null, bag: v.bag.map((thing, i) => (i === slot ? null : thing)) }));
+    kid({ pose: "reach" });
+    hopFriend();
+    sound(FRIENDS[f.id]!.sound);
+    await wait(400);
+    await runFriend(x, pose);
+  };
+
+  /** The friend runs back behind the child; its picture drops into the backpack again at `slot`. */
+  const friendBack = async (slot: number | null) => {
+    await runFriend(viewRef.current.kid.x - FRIEND_GAP);
+    if (slot === null) return;
+    const id = viewRef.current.friend!.id;
+    put((v) => ({ bag: v.bag.map((thing, i) => (i === slot ? id : thing)), entering: slot, bagBump: v.bagBump + 1 }));
+    sound(playPop);
+    await wait(500);
+    put({ entering: null });
+  };
+
+  /** The creature just helped joins (G-10): in its place the friend hops and calls, its picture drops into the
+   * backpack, and it runs round behind the child. */
+  const befriend = async ({ friend: id, from, say: line }: NonNullable<Obstacle["befriends"]>) => {
+    put({ friend: { id, x: from[0], y: from[1], ms: 0, face: -1, pose: "sit", hop: 1 } });
+    sound(FRIENDS[id]!.sound);
+    say(line);
+    kid({ pose: "cheer" });
+    await wait(600);
+    const slot = viewRef.current.bag.indexOf(null);
+    put((v) => ({ bag: v.bag.map((thing, i) => (i === slot ? id : thing)), entering: slot, bagBump: v.bagBump + 1 }));
+    sound(playPop);
+    await wait(500);
+    put({ entering: null });
+    kid({ pose: "stand" });
+    await runFriend(viewRef.current.kid.x - FRIEND_GAP);
+  };
+
   const obstacle = async (station: Obstacle, picked: boolean) => {
     if (!picked) await go(nextOf(station));
     await walkTo(station.x);
@@ -578,6 +663,8 @@ export function TrailPlay({
     put({ here: station.id, choosing: true, shake: viewRef.current.shake + 1, bubble });
     cue(station.meet);
     say(station.ask);
+    /** A friend helped, instead of a thing: it runs back once its job is done. */
+    let helped = false;
     for (;;) {
       let stop = () => {};
       const nudge = () => {
@@ -590,6 +677,24 @@ export function TrailPlay({
       stop();
       const item = viewRef.current.bag[slot]!;
       put({ choosing: false, hint: null });
+      if (item === viewRef.current.friend?.id) {
+        // The friend runs over: it does the job itself, or tries, gets a funny "no" and comes back.
+        const right = item === station.need;
+        await sendFriend(slot, station.at[0], right ? "work" : "sit");
+        if (right) {
+          helped = true;
+          break;
+        }
+        put((v) => ({ nope: { id: station.id, n: (v.nope?.n ?? 0) + 1 } }));
+        sound(station.nope);
+        kid({ pose: "shake" });
+        hopFriend();
+        await wait(1000);
+        kid({ pose: "stand" });
+        await friendBack(slot);
+        put({ nope: null, hint: station.need, choosing: true });
+        continue;
+      }
       // Out of the backpack, up high, and over to the obstacle.
       await takeOut(item, slot);
       kid({ pose: "take" });
@@ -611,6 +716,8 @@ export function TrailPlay({
     await wait(500);
     kid({ pose: "cheer" });
     await wait(Math.max(0, station.ms - 500));
+    if (helped) await friendBack(null);
+    if (station.befriends) await befriend(station.befriends);
     if (station.frees) {
       kid({ pose: "reach" });
       await moveGoal(heldOf(viewRef.current.kid, theGoal), 1200, null, onString ? 30 : 0);
@@ -634,16 +741,21 @@ export function TrailPlay({
       kid({ walk: 0, pose: "stand" });
     }
     if (station.slide) {
-      // Down the slide by itself: "Huiii!"
+      // Down the slide by itself: "Huiii!" A friend, who waited at the bottom, runs along below.
       sound(playSlide);
       kid({ pose: "cheer" });
-      for (const [x, y] of station.slide) {
+      const { slide } = station;
+      const from = [steps[steps.length - 1], ...slide];
+      const slideMs = slide.reduce((sum, [x, y], i) => sum + Math.hypot(x - from[i][0], y - from[i][1]) * SLIDE_MS, 0);
+      friendTo(slide[slide.length - 1][0] - FRIEND_GAP, slideMs);
+      for (const [x, y] of slide) {
         const k = viewRef.current.kid;
         const ms = Math.hypot(x - k.x, y - k.y) * SLIDE_MS;
         kid({ x, y, walk: ms });
         await wait(ms);
       }
       kid({ walk: 0, pose: "cheer" });
+      friendStays();
       sound(playGiggle);
       await wait(700);
       kid({ pose: "stand" });
@@ -771,6 +883,28 @@ export function TrailPlay({
     pickWay(way);
   };
 
+  /** The friend was tapped: while the bag is open it is picked like its picture, otherwise it hops and calls. */
+  const tapFriend = (e: PointerEvent) => {
+    e.stopPropagation();
+    const v = viewRef.current;
+    if (!v.friend) return;
+    const slot = v.bag.indexOf(v.friend.id);
+    const pick = chooser.current;
+    if (pick && slot >= 0) {
+      chooser.current = null;
+      spawn(e.clientX, e.clientY);
+      return pick(slot);
+    }
+    if (tapper.current) {
+      spawn(e.clientX, e.clientY);
+      return tap();
+    }
+    if (pick || picker.current) showHint();
+    if (v.friend.ms) return;
+    hopFriend();
+    sound(FRIENDS[v.friend.id]!.sound);
+  };
+
   const tapKid = (e: PointerEvent) => {
     e.stopPropagation();
     if (tapper.current) return tap();
@@ -829,6 +963,8 @@ export function TrailPlay({
   const [cx, cy] = camOf(k);
   const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
   const { Scenery, Front, Backdrop } = level;
+  const friends = view.friend ? [view.friend.id] : [];
+  const Friend = view.friend && FRIENDS[view.friend.id];
   // While the child picks from the bag at an obstacle, the thing that helps is the right one to tap.
   const stop = view.choosing ? allStations(level).find((s) => s.id === view.here) : undefined;
   const need = stop?.kind === "obstacle" ? stop.need : null;
@@ -857,14 +993,30 @@ export function TrailPlay({
           <Backdrop />
         </g>
         <g className="tl-pan" style={pan(1)}>
-          <Scenery done={view.done} here={view.here} nope={view.nope} />
+          <Scenery done={view.done} here={view.here} nope={view.nope} friends={friends} />
           <line ref={stringEl} className="tl-string" stroke={INK} strokeWidth="3" {...firstString} />
           <g ref={goalEl} className="tl-goal" transform={firstGoal}>
             <g className={view.party && onString ? "tl-sway" : undefined}>
               <g ref={spinEl}>{(theGoal.world ?? theGoal.draw)()}</g>
             </g>
           </g>
-          {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
+          {Front && <Front done={view.done} here={view.here} nope={view.nope} friends={friends} />}
+          {/* The friend walking along, behind the child */}
+          {view.friend && Friend && (
+            <g className="tl-walker" style={{ transform: `translate(${view.friend.x}px, ${view.friend.y}px)`, transitionDuration: `${view.friend.ms}ms` }}>
+              <g transform={view.friend.face < 0 ? "scale(-1 1)" : undefined}>
+                <g className={view.party ? "tl-friend-party" : undefined}>
+                  <g
+                    className={view.friend.hop ? `el-hopper hop-${view.friend.hop % 2}` : "el-hopper"}
+                    data-tap={tapState({ goal: need === view.friend.id })}
+                    onPointerDown={tapFriend}
+                  >
+                    <Friend.Body pose={view.friend.pose} />
+                  </g>
+                </g>
+              </g>
+            </g>
+          )}
           {shown.map((n, w) => (
             <g key={`${n.ghost}-${again}`} className="tl-next">
               {n.at && n.icon !== "walk" && n.icon !== "climb" && <WantRing at={n.at} r={ringOf(ITEMS[n.icon])} />}

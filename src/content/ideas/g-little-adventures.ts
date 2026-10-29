@@ -91,6 +91,8 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Ein Tier, dem das Kind geholfen hat, läuft mit und hilft später selbst: der Hund gräbt einen Schlüssel aus, das Eichhörnchen holt etwas vom Baum. Im Beutel kann dann auch ein Tier-Bild stehen: „Wer hilft?“",
       why: "Wie in Monkey Island: was man früher tut, hilft später.",
       effort: "M",
+      partial:
+        "Der Hund in „Der Ball rollt weg“ kommt nach dem Knochen mit, steht als Bild im Rucksack und buddelt am Ende den Ball aus dem Sand. Das Eichhörnchen als Freund fehlt noch.",
     },
     {
       id: "G-11",

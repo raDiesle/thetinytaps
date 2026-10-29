@@ -86,14 +86,16 @@ function Dark() {
   );
 }
 
-/** A heap of sand with the football half in it, sand flying off a shovel: the ball can be dug out. */
+/** A heap of sand with the football half in it, sand flying up off it: the ball can be dug out (by whoever digs –
+ * in „Der Ball rollt weg“ the dog, so no tool is drawn). */
 function Dig() {
   const grains: [number, number][] = [
-    [30, -120],
-    [52, -138],
-    [70, -112],
-    [44, -96],
-    [84, -130],
+    [-84, -44],
+    [-104, -82],
+    [52, -50],
+    [80, -86],
+    [36, -104],
+    [-70, -112],
   ];
   return (
     <>
@@ -101,10 +103,6 @@ function Dig() {
         <Football />
       </g>
       <path d="M-110 0 Q-70 -50 -20 -26 Q30 -56 100 0 Z" fill="#ffe066" stroke="#e8a317" strokeWidth="4" strokeLinejoin="round" />
-      <g transform="translate(40 -30) rotate(40)">
-        <rect x="-5" y="-110" width="10" height="80" rx="4" fill="#a0673a" stroke={INK} strokeWidth="3" />
-        <path d="M-22 -34 H22 L16 6 Q0 18 -16 6 Z" fill="#4dabf7" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      </g>
       {grains.map(([x, y]) => (
         <circle key={`${x}${y}`} cx={x} cy={y} r="6" fill="#ffe066" stroke="#e8a317" strokeWidth="2" />
       ))}

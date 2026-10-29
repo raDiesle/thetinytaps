@@ -1,12 +1,27 @@
 import type { ReactNode } from "react";
 import { INK } from "@/games/scenes/shared";
+import { DogFace } from "./friends";
 
 // The things the child finds on the way and carries in its bag, and the things a level is about
 // (the kite that flies away). Each is drawn standing on (0, 0), centred, so the same drawing works
 // in the world, in a bag slot and in the thought bubble.
 
 /** A thing that fits into the bag. */
-export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "bone" | "can" | "shovel" | "bread" | "fish" | "sunflower" | "umbrella" | "corn";
+export type ItemId =
+  | "ball"
+  | "carrot"
+  | "plank"
+  | "lantern"
+  | "apple"
+  | "bone"
+  | "can"
+  | "shovel"
+  | "bread"
+  | "fish"
+  | "sunflower"
+  | "umbrella"
+  | "corn"
+  | "dog";
 
 /** A drawing and its size, to fit it into a slot, a bubble or a card. */
 export interface Picture {
@@ -312,6 +327,8 @@ export const ITEMS: Record<ItemId, Picture> = {
   sunflower: { w: 96, h: 172, draw: () => <Sunflower /> },
   umbrella: { w: 144, h: 184, draw: () => <Umbrella /> },
   corn: { w: 80, h: 136, draw: () => <Corn /> },
+  /** Not a thing: the dog that walks along (`friends.tsx`), its picture in the backpack. */
+  dog: { w: 100, h: 134, draw: () => <DogFace /> },
 };
 
 /** What a level is about: its picture, and how the child carries it in the world. */

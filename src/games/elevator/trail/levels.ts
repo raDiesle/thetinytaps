@@ -34,7 +34,7 @@ import {
   playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
-import { BALL_AT, BallBackdrop, BallFront, BallScenery, LADDER, SLIDE, GROUND_Y as STREET_Y } from "./ball";
+import { BALL_AT, BallBackdrop, BallFront, BallScenery, DOG_AT, LADDER, SLIDE, GROUND_Y as STREET_Y } from "./ball";
 import { BALLON_GROUND, BallonBackdrop, BallonScenery, BRIDGE_DIP, DOVE_HOLDS, STAIRS as BALLON_STAIRS } from "./ballon";
 import { DrachenBackdrop, DrachenScenery, GROUND_Y, STAIRS, TOP_Y } from "./drachen";
 import { LOK_AT, LokBackdrop, LokFront, LokScenery, OVER_GROUND, SIGN_OVER, SIGN_THROUGH, StairsSign, TunnelSign, STAIRS as LOK_STAIRS } from "./lok";
@@ -202,7 +202,6 @@ const ball: TrailLevel = {
       done: "Grün! Jetzt gehen wir rüber.",
     },
     { kind: "pickup", id: "bone", x: 1600, item: "bone", at: [1690, 676], sound: playPop, ask: "Ein Knochen!", done: "Ab in den Rucksack!" },
-    { kind: "pickup", id: "shovel", x: 1900, item: "shovel", at: [2010, 680], sound: playClonk, ask: "Eine Schaufel.", done: "Die nehmen wir mit." },
     {
       kind: "obstacle",
       id: "dog",
@@ -214,10 +213,12 @@ const ball: TrailLevel = {
       sounds: [
         [100, playMunch],
         [800, playMunch],
-        [1500, playBark],
+        [1500, playMunch],
       ],
-      ms: 2200,
+      ms: 2800,
       nope: playSneeze,
+      // G-10: the dog comes along, and at the sandbox it digs the ball out.
+      befriends: { friend: "dog", from: DOG_AT, say: "Der Hund kommt mit!" },
       ask: "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?",
       done: "Der Knochen! Mmh, lecker.",
     },
@@ -243,24 +244,29 @@ const ball: TrailLevel = {
     {
       kind: "obstacle",
       id: "sandbox",
-      x: 4260,
-      need: "shovel",
+      x: 4200,
+      need: "dog",
       why: { worry: "dig" },
-      at: [4400, 700],
+      // The dog stands on the sand left of the ball and digs with its front paws.
+      at: [4350, 700],
       meet: [[100, playBoing]],
       sounds: [
-        [0, playCrunch],
-        [1300, playPop],
+        [0, playSniff],
+        [500, playCrunch],
+        [1000, playCrunch],
+        [1500, playCrunch],
+        [2300, playPop],
+        [2700, playBark],
       ],
-      ms: 1800,
+      ms: 3000,
       nope: playPlop,
       frees: true,
       ask: "Da ist der Ball! Er steckt im Sand. Was hilft?",
-      done: "Die Schaufel! Wir graben ihn aus.",
+      done: "Der Hund buddelt ihn aus!",
     },
   ],
-  // Up into the air and back into the hands (they reach out at x 4326, y 662).
-  finale: { via: [[[4380, 300], 1000]], to: [4326, 662], ms: 1000, sway: 0, say: "Der Ball ist wieder da! Hurra!" },
+  // Up into the air and back into the hands (they reach out at x 4266, y 662).
+  finale: { via: [[[4320, 300], 1000]], to: [4266, 662], ms: 1000, sway: 0, say: "Der Ball ist wieder da! Hurra!" },
 };
 
 const ballon: TrailLevel = {

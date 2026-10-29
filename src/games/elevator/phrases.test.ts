@@ -21,7 +21,10 @@ function germanTexts(): string[] {
       }
     }
   }
-  const station = (s: Station) => all.push(s.ask, s.done);
+  const station = (s: Station) => {
+    all.push(s.ask, s.done);
+    if (s.kind === "obstacle" && s.befriends) all.push(s.befriends.say);
+  };
   const way = (w: Way) => {
     all.push(w.say);
     w.stations.forEach(station);
@@ -44,6 +47,19 @@ const SCRIPTS: Record<string, RegExp> = { ru: /\p{Script=Cyrillic}/u, zh: /\p{Sc
 /** The languages translated whole so far. */
 const COMPLETE = ["en", "zh", "hi", "es", "ar", "ru"];
 
+/** New or changed sentences, in German only until translations are asked for (said in German meanwhile);
+ * `languageStatus.ts` says which part lacks them. Remove a sentence here once it is translated. */
+const GERMAN_ONLY = new Set(["Der Hund kommt mit!", "Der Hund buddelt ihn aus!"]);
+
+test("the German-only sentences are still spoken and still untranslated", () => {
+  const used = new Set(germanTexts());
+  for (const german of GERMAN_ONLY) {
+    expect({ german, used: used.has(german) }).toEqual({ german, used: true });
+    for (const language of COMPLETE)
+      expect({ german, language, translated: !!PHRASEBOOKS[language as keyof typeof PHRASEBOOKS]?.[german] }).toEqual({ german, language, translated: false });
+  }
+});
+
 test("no phrasebook has anything left over", () => {
   const used = new Set(germanTexts());
   for (const [language, book] of Object.entries(PHRASEBOOKS))
@@ -58,7 +74,7 @@ test("the translated languages have every sentence and title", () => {
   for (const language of COMPLETE) {
     const book = PHRASEBOOKS[language as keyof typeof PHRASEBOOKS] ?? {};
     expect(
-      all.filter((german) => !book[german]),
+      all.filter((german) => !book[german] && !GERMAN_ONLY.has(german)),
       language,
     ).toEqual([]);
   }

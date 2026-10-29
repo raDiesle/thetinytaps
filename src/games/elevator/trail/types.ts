@@ -24,6 +24,8 @@ export interface SceneryProps {
   here: string | null;
   /** A wrong thing was just tried at this station; a new `n` wiggles it again. */
   nope: { id: string; n: number } | null;
+  /** The creatures walking along with the child (`friends.tsx`): `TrailPlay` draws them, so the scenery leaves them out. */
+  friends: ItemId[];
 }
 
 interface StationBase {
@@ -49,9 +51,9 @@ export interface Pickup extends StationBase {
 /** Something in the way: the child picks from the bag what helps. */
 export interface Obstacle extends StationBase {
   kind: "obstacle";
-  /** The thing from the bag that helps. */
+  /** The thing from the bag that helps, or a friend that walks along (`friends.tsx`), who does the job itself. */
   need: ItemId;
-  /** Where the thing flies to when it is used or tried. */
+  /** Where the thing flies to when it is used or tried; a friend runs to the ground below it. */
   at: Point;
   /** Sounds when the child arrives (a bark, a neigh). */
   meet: Cue[];
@@ -65,6 +67,9 @@ export interface Obstacle extends StationBase {
   why: { wants: Point } | { worry: Worry };
   /** Solving it gives the goal back: it comes into the child's hands. */
   frees?: boolean;
+  /** The creature helped here walks along from now on, and its picture goes into the bag (G-10): `friend` is its
+   * picture in `FRIENDS`, `from` where its feet are in the scenery, `say` spoken when it joins. */
+  befriends?: { friend: ItemId; from: Point; say: string };
 }
 
 /** Stairs or a ladder: the first tap climbs half of the steps, the second the rest (never more taps in a row). */

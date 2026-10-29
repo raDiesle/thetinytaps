@@ -135,7 +135,6 @@ export const AR: Record<string, string> = {
   "Die Ampel ist rot. Wir drücken den Knopf.": "إشارة المرور حمراء. نضغط على الزر.",
   "Grün! Jetzt gehen wir rüber.": "أخضر! الآن نعبر.",
   "Ein Knochen!": "عظمة!",
-  "Eine Schaufel.": "مجرفة.",
   "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?": "الكلب جالس في الطريق. إنه جائع. ماذا نعطيه؟",
   "Der Knochen! Mmh, lecker.": "العظمة! مممم، لذيذة.",
   "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?": "الأزهار منحنية الرؤوس. إنها عطشى. ما الذي يساعدها؟",
@@ -143,7 +142,6 @@ export const AR: Record<string, string> = {
   "Die Rutsche! Hoch geht's.": "الزحليقة! هيّا إلى الأعلى.",
   "Hui!": "ووووي!",
   "Da ist der Ball! Er steckt im Sand. Was hilft?": "ها هي الكرة! إنها عالقة في الرمل. ما الذي يساعدنا؟",
-  "Die Schaufel! Wir graben ihn aus.": "المجرفة! نحفر ونخرجها.",
   "Der Ball ist wieder da! Hurra!": "عادت الكرة! مرحى!",
 
   // Der Luftballon

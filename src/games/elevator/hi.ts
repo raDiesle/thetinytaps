@@ -136,7 +136,6 @@ export const HI: Record<string, string> = {
   "Die Ampel ist rot. Wir drücken den Knopf.": "बत्ती लाल है। चलो, बटन दबाएँ।",
   "Grün! Jetzt gehen wir rüber.": "हरी बत्ती! चलो, अब सड़क पार करें।",
   "Ein Knochen!": "एक हड्डी!",
-  "Eine Schaufel.": "एक फावड़ा।",
   "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?": "कुत्ता रास्ते में बैठा है। उसे भूख लगी है। उसे क्या दें?",
   "Der Knochen! Mmh, lecker.": "हड्डी! म्म्म, स्वादिष्ट।",
   "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?": "फूलों ने सिर झुका लिए हैं। उन्हें प्यास लगी है। किससे मदद मिलेगी?",
@@ -144,7 +143,6 @@ export const HI: Record<string, string> = {
   "Die Rutsche! Hoch geht's.": "फिसलपट्टी! चलो ऊपर।",
   "Hui!": "सर्र्र!",
   "Da ist der Ball! Er steckt im Sand. Was hilft?": "वो रही गेंद! वह रेत में फँसी है। किससे मदद मिलेगी?",
-  "Die Schaufel! Wir graben ihn aus.": "फावड़ा! चलो, उसे खोदकर निकालें।",
   "Der Ball ist wieder da! Hurra!": "गेंद वापस आ गई! हुर्रे!",
 
   // Der Luftballon

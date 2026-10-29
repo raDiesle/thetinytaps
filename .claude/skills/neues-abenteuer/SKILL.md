@@ -80,6 +80,12 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
   for the child thinking of what would happen (`worries.tsx`; draw a new worry there when none fits).
   Drachen: dog → ball, horse → carrot, stream → plank, dark
   tunnel → lantern, squirrel with the kite → apple.
+  With `befriends: { friend, from, say }` the creature helped here comes along (G-10, `friends.tsx`): `friend`
+  is its picture in the backpack (an `ItemId` with an entry in `FRIENDS`), `from` where its feet are in the
+  scenery; the scenery stops drawing it once `friends` (in `SceneryProps`) has it. A later obstacle can then
+  `need` the friend: it runs to `at` (on the ground) and does its job in pose `work`. One friend per level;
+  a friend counts as a thing in the bag of three. Never keep a thing that does the friend's job too.
+  „Der Ball rollt weg“: the dog joins after the bone and digs the ball out of the sand.
 - **`climb`** – stairs or a ladder: `steps` are ground points from the bottom up; the
   first tap climbs half, the second the rest. They must also be in `ground`
   (Drachen exports `STAIRS` from `drachen.tsx` and uses it in both). With `slide`

@@ -134,7 +134,6 @@ export const ZH: Record<string, string> = {
   "Die Ampel ist rot. Wir drücken den Knopf.": "红灯了。我们按一下按钮。",
   "Grün! Jetzt gehen wir rüber.": "绿灯！现在我们过马路。",
   "Ein Knochen!": "一根骨头！",
-  "Eine Schaufel.": "一把小铲子。",
   "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?": "小狗坐在路上。它饿了。我们给它什么？",
   "Der Knochen! Mmh, lecker.": "骨头！嗯——真好吃。",
   "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?": "花儿都低下了头。它们渴了。用什么呢？",
@@ -142,7 +141,6 @@ export const ZH: Record<string, string> = {
   "Die Rutsche! Hoch geht's.": "滑梯！往上爬喽。",
   "Hui!": "呜——！",
   "Da ist der Ball! Er steckt im Sand. Was hilft?": "皮球在这儿！它陷在沙子里。用什么呢？",
-  "Die Schaufel! Wir graben ihn aus.": "小铲子！我们把它挖出来。",
   "Der Ball ist wieder da! Hurra!": "皮球找回来啦！好耶！",
 
   // Der Luftballon

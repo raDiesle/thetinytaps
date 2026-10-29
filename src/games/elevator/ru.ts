@@ -135,7 +135,6 @@ export const RU: Record<string, string> = {
   "Die Ampel ist rot. Wir drücken den Knopf.": "Светофор красный. Нажимаем кнопку.",
   "Grün! Jetzt gehen wir rüber.": "Зелёный! Теперь переходим.",
   "Ein Knochen!": "Косточка!",
-  "Eine Schaufel.": "Лопатка.",
   "Der Hund sitzt im Weg. Er hat Hunger. Was geben wir ihm?": "Собачка сидит на дороге. Она хочет кушать. Что ей дадим?",
   "Der Knochen! Mmh, lecker.": "Косточку! Ммм, вкусно.",
   "Die Blumen lassen die Köpfe hängen. Sie haben Durst. Was hilft?": "Цветочки грустят. Они хотят пить. Что поможет?",
@@ -143,7 +142,6 @@ export const RU: Record<string, string> = {
   "Die Rutsche! Hoch geht's.": "Горка! Идём наверх.",
   "Hui!": "Уи-и-и!",
   "Da ist der Ball! Er steckt im Sand. Was hilft?": "Вот мячик! Он в песке. Что поможет?",
-  "Die Schaufel! Wir graben ihn aus.": "Лопатку! Выкапываем его.",
   "Der Ball ist wieder da! Hurra!": "Мячик снова с нами! Ура!",
 
   // Der Luftballon

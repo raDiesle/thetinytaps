@@ -301,6 +301,79 @@
   transform-origin: 0 0;
 }
 
+/* ---------- A friend walking along (friends.tsx) ---------- */
+
+/* Running: the legs swing in pairs and the tail wags, only while it runs. */
+.tl-friend-dog.walk .tl-friend-leg.a {
+  animation: tl-friend-step 0.18s ease-in-out infinite alternate;
+}
+
+.tl-friend-dog.walk .tl-friend-leg.b {
+  animation: tl-friend-step 0.18s ease-in-out infinite alternate-reverse;
+}
+
+.tl-friend-dog.walk .tl-friend-tail {
+  animation: tl-wag 0.2s ease-in-out infinite alternate;
+}
+
+/* Digging: head down, the front paws scrape and sand flies back between the hind legs. */
+.tl-friend-dog.work .tl-friend-head {
+  transform: rotate(26deg);
+}
+
+.tl-friend-dog.work .tl-friend-paw {
+  animation: tl-friend-scrape 0.22s ease-in-out 10 alternate;
+}
+
+.tl-friend-dog.work .tl-friend-tail {
+  animation: tl-wag 0.25s ease-in-out 8 alternate;
+}
+
+.tl-friend-sand {
+  opacity: 0;
+  animation: tl-friend-fling 0.55s ease-out 4;
+}
+
+/* At the party it jumps for joy with the child. */
+.tl-friend-party {
+  animation: tl-friend-jump 0.5s ease-out 0.3s 6;
+}
+
+@keyframes tl-friend-step {
+  from {
+    transform: rotate(-22deg);
+  }
+  to {
+    transform: rotate(22deg);
+  }
+}
+
+@keyframes tl-friend-scrape {
+  from {
+    transform: rotate(-10deg);
+  }
+  to {
+    transform: rotate(-60deg);
+  }
+}
+
+@keyframes tl-friend-fling {
+  from {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-60px, -50px);
+  }
+}
+
+@keyframes tl-friend-jump {
+  40% {
+    transform: translateY(-50px);
+  }
+}
+
 /* ---------- "Der Ball rollt weg" ---------- */
 
 /* The child presses the button: its lamp blinks while the light is red. */
@@ -308,15 +381,7 @@
   animation: tl-ball-blink 0.4s ease-in-out 6 alternate;
 }
 
-/* With the bone, the dog goes back to its door and wags. */
-.tl-ball-dog {
-  transition: transform 1.4s ease-in-out;
-}
-
-.tl-ball-dog.done {
-  transform: translate(70px, -40px) scale(0.85);
-}
-
+/* With the bone, the dog chews and wags where it sits (then it comes along as a friend). */
 .tl-ball-dog.done .tl-ball-dog-tail {
   transform-box: fill-box;
   transform-origin: bottom left;
@@ -347,18 +412,11 @@
   animation: tl-ball-drop 0.5s ease-in 4;
 }
 
-/* The shovel digs, the sand heap flies away. */
-.tl-ball-dig {
-  transform-origin: 0 0;
-  animation:
-    tl-ball-shovel 0.4s ease-in-out 4 alternate,
-    tl-ball-away 2s ease-in both;
-}
-
+/* The dog digs, the sand heap flies away. */
 .tl-ball-heap {
   transform-box: fill-box;
   transform-origin: bottom center;
-  animation: tl-ball-scatter 1.4s ease-in both;
+  animation: tl-ball-scatter 1.4s ease-in 0.8s both;
 }
 
 /* ---------- Keyframes ---------- */
@@ -386,15 +444,6 @@
   to {
     opacity: 0;
     transform: translateY(70px);
-  }
-}
-
-@keyframes tl-ball-shovel {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(40deg) translateY(-20px);
   }
 }
 

@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { Cloud, INK } from "@/games/scenes/shared";
-import { Bone, Shovel, WateringCan } from "./items";
+import { Bone, WateringCan } from "./items";
 import type { Point, SceneryProps } from "./types";
 
 // "Der Ball rollt weg": down the own street – the front garden, the traffic light with its button
-// and the zebra crossing, the pet shop, the dog at its door – into the park, past the sunflowers,
-// up the ladder and down the slide to the sandbox, where the ball is stuck in the sand.
+// and the zebra crossing, the pet shop, the dog at its door, who comes along once it has its bone – into the park,
+// past the sunflowers, up the ladder and down the slide to the sandbox, where the dog digs the ball out of the sand.
 // World points: the pavement is at y = 740 the whole way; only the ladder and the slide go up.
 
 export const GROUND_Y = 740;
@@ -255,8 +255,8 @@ function PetShop({ bone }: { bone: boolean }) {
   );
 }
 
-/** A street tree in its little fenced bed; the sand shovel leans against the fence. */
-function StreetTree({ shovel }: { shovel: boolean }) {
+/** A street tree in its little fenced bed. */
+function StreetTree() {
   return (
     <g>
       <path d="M2086 740 L2092 520 H2112 L2118 740 Z" fill={WOOD_DARK} stroke={INK} strokeWidth="4" />
@@ -268,20 +268,20 @@ function StreetTree({ shovel }: { shovel: boolean }) {
         <circle key={x} cx={x} cy={y} r={r} fill="#40c057" stroke="#2b8a3e" strokeWidth="4" />
       ))}
       <path d="M2050 740 V700 H2154 V740 M2050 716 H2154" stroke="#495057" strokeWidth="5" fill="none" />
-      {shovel && (
-        <g transform={`translate(2010 ${GROUND_Y}) rotate(-8)`}>
-          <Shovel />
-        </g>
-      )}
     </g>
   );
 }
 
-/** The dog sits on the pavement and looks hungry; with the bone it goes back to its door and wags. */
-function Dog({ done, here, nope }: SceneryProps) {
+/** Where the dog sits on the pavement, its feet; from here it comes along as a friend. */
+export const DOG_AT: Point = [2470, GROUND_Y];
+
+/** The dog sits on the pavement and looks hungry; with the bone it chews and wags, then it comes along (drawn by
+ * `TrailPlay` as a friend from then on). */
+function Dog({ done, here, nope, friends }: SceneryProps) {
   const solved = done.includes("dog");
+  if (friends.includes("dog")) return null;
   return (
-    <g transform={`translate(2470 ${GROUND_Y})`}>
+    <g transform={`translate(${DOG_AT[0]} ${DOG_AT[1]})`}>
       <g className={`tl-ball-dog${solved ? " done" : ""}`}>
         <Nope id="dog" nope={nope}>
           <g className={here === "dog" && !solved ? "tl-meet" : undefined}>
@@ -437,9 +437,8 @@ function Slide() {
   );
 }
 
-/** The sandbox behind the ball: back board, sand and a few toys; with the shovel the child digs. */
-function Sandbox({ done }: { done: string[] }) {
-  const dug = done.includes("sandbox");
+/** The sandbox behind the ball: back board, sand and a few toys; the dog digs in it. */
+function Sandbox() {
   return (
     <g>
       <rect x="4300" y="712" width="420" height="20" fill={WOOD} stroke={INK} strokeWidth="4" />
@@ -448,15 +447,6 @@ function Sandbox({ done }: { done: string[] }) {
       <path d="M4600 744 L4608 716 H4652 L4660 744 Z" fill="#f4c27a" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
       <path d="M4640 680 L4648 716 H4684 L4692 680 Z" fill="#cc5de8" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
       <path d="M4640 680 Q4666 650 4692 680" stroke={INK} strokeWidth="3" fill="none" />
-      {dug && (
-        <g transform="translate(4400 744)">
-          <g className="tl-ball-dig">
-            <g transform="rotate(-30)">
-              <Shovel />
-            </g>
-          </g>
-        </g>
-      )}
     </g>
   );
 }
@@ -510,14 +500,14 @@ export function BallScenery(props: SceneryProps) {
       <Crossing />
       <TrafficLight {...props} />
       <PetShop bone={!done.includes("bone")} />
-      <StreetTree shovel={!done.includes("shovel")} />
+      <StreetTree />
       <Front x={2210} w={380} h={300} wall="#e5dbff" roof="#5f3dc4" door={2490} />
       <Dog {...props} />
       <ParkGate />
       <Sunflowers {...props} />
       <Slide />
       <ParkTree x={4180} />
-      <Sandbox done={done} />
+      <Sandbox />
       <ParkTree x={4900} />
       <Bench x={5000} />
       <ParkTree x={5400} />

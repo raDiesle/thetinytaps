@@ -91,7 +91,17 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       { label: "🧸 Aufräum-Maschine", languages: { de: "done" }, note: "Name, erster Satz und „Alles aufgeräumt!“ nur auf Deutsch (R-08, Oktober 2026)." },
     ],
   },
-  { href: "/kleine-abenteuer/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/kleine-abenteuer/",
+    parts: [
+      { label: "🧭 Die anderen Geschichten und Wege", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "⚽ Der Ball rollt weg",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Der Hund kommt mit (G-10, Oktober 2026): „Der Hund kommt mit!“ und „Der Hund buddelt ihn aus!“ nur auf Deutsch.",
+      },
+    ],
+  },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/schatten/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/socken/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
