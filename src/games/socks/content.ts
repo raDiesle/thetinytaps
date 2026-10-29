@@ -42,25 +42,33 @@ export const MAX_PAIRS = SOCK_PATTERNS.length;
  */
 export type SockKind = "colors" | "patterns" | "sameColor" | "mixed";
 
-/** One step of the difficulty: how many pairs in the wash, and what tells them apart. */
+/**
+ * One step of the difficulty: how many pairs in the wash, what tells them apart, and how many socks a laundry basket
+ * covers once they lie (like memory: the child has to remember or look under it). Never anything faster.
+ */
 export interface SockLevel {
   pairs: number;
   kind: SockKind;
+  covered: number;
 }
 
 /** The steps the game climbs (or goes back down) by how the child plays, see `nextLevel`; the first is where it begins. */
 export const SOCK_LEVELS: SockLevel[] = [
-  { pairs: 2, kind: "colors" },
-  { pairs: 3, kind: "colors" },
-  { pairs: 4, kind: "colors" },
-  { pairs: 3, kind: "patterns" },
-  { pairs: 4, kind: "patterns" },
-  { pairs: 3, kind: "sameColor" },
-  { pairs: 4, kind: "sameColor" },
-  { pairs: 5, kind: "sameColor" },
-  { pairs: 4, kind: "mixed" },
-  { pairs: 5, kind: "mixed" },
-  { pairs: 6, kind: "mixed" },
+  { pairs: 2, kind: "colors", covered: 0 },
+  { pairs: 3, kind: "colors", covered: 0 },
+  { pairs: 3, kind: "colors", covered: 1 },
+  { pairs: 4, kind: "colors", covered: 2 },
+  { pairs: 3, kind: "patterns", covered: 0 },
+  { pairs: 4, kind: "patterns", covered: 1 },
+  { pairs: 4, kind: "patterns", covered: 2 },
+  { pairs: 3, kind: "sameColor", covered: 0 },
+  { pairs: 4, kind: "sameColor", covered: 1 },
+  { pairs: 4, kind: "sameColor", covered: 3 },
+  { pairs: 5, kind: "sameColor", covered: 4 },
+  { pairs: 4, kind: "mixed", covered: 1 },
+  { pairs: 5, kind: "mixed", covered: 3 },
+  { pairs: 6, kind: "mixed", covered: 4 },
+  { pairs: 6, kind: "mixed", covered: 6 },
 ];
 
 /** A new list with the same items in random order. */
@@ -74,7 +82,7 @@ export function shuffle<T>(items: T[]): T[] {
 }
 
 /** The pairs of one wash at `level`; no two look the same. */
-export function dealPairs({ pairs, kind }: SockLevel): SockLook[] {
+export function dealPairs({ pairs, kind }: Pick<SockLevel, "pairs" | "kind">): SockLook[] {
   const colors = shuffle(SOCK_COLORS);
   const patterns = shuffle(SOCK_PATTERNS);
   if (kind === "colors") return colors.slice(0, pairs).map((color) => ({ color, pattern: "plain" }));
@@ -96,14 +104,17 @@ export interface WashResult {
   ms: number;
 }
 
-/** Quick and sure goes up, two steps when it flies; many misses or a long search goes one step back; else it stays. */
+/**
+ * Sure goes up, two steps when it was easy (no miss and quick); many misses or a very long search goes one step back;
+ * else it stays. Time is only a hint how easy it was, never something to beat: the limits are generous.
+ */
 export function nextLevel(level: number, { pairs, misses, ms }: WashResult): number {
   const missesPerPair = misses / pairs;
   const secondsPerPair = ms / 1000 / pairs;
   let step = 0;
   if (misses === 0 && secondsPerPair <= 3) step = 2;
-  else if (missesPerPair <= 0.5 && secondsPerPair <= 6) step = 1;
-  else if (missesPerPair >= 1.5 || secondsPerPair >= 12) step = -1;
+  else if (missesPerPair <= 0.5 && secondsPerPair <= 10) step = 1;
+  else if (missesPerPair >= 1.5 || secondsPerPair >= 20) step = -1;
   return Math.max(0, Math.min(SOCK_LEVELS.length - 1, level + step));
 }
 

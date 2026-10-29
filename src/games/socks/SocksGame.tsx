@@ -38,7 +38,7 @@ export function SocksGame() {
           </p>
           <p>
             {t({
-              de: "Das Spiel fängt leicht an, mit zwei Paaren in zwei Farben. Je schneller und sicherer Ihr Kind die Paare findet, desto mehr Paare kommen, dann Muster statt Farben und zuletzt Muster in derselben Farbe; dauert es lange oder geht vieles daneben, wird es wieder leichter. Es gibt keine Uhr: Wer Paare schnell hintereinander findet, hört die Töne höher klettern, und die Socken fliegen flinker an die Leine.",
+              de: "Das Spiel fängt leicht an, mit zwei Paaren in zwei Farben. Findet Ihr Kind die Paare sicher, kommen mehr Paare, dann Muster statt Farben, dann Muster in derselben Farbe – und Wäschekörbe, die sich wie bei Memory über erst eine, dann mehrere Socken stülpen; ein Tipp auf den Korb hebt ihn an. Geht vieles daneben, wird es wieder leichter. Schneller muss niemand werden: Es gibt keine Uhr. Paare hintereinander ohne Danebengreifen lassen die Töne höher klettern.",
             })}
           </p>
           {!device.touchOnly && (
