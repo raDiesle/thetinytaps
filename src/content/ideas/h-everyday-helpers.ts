@@ -27,7 +27,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       why: "„zum ausdrucken pdf kostenlos“ hängt an fast jeder Suche: Belohnungstafel, Abendroutine, Wochenplan, Schnullerfee-Brief. So finden Eltern die Seite über Google und dann die Spiele.",
       effort: "M",
       partial:
-        "Die Belohnungstafel druckt A4 direkt aus dem Browser (farbig, grau, zum Ausmalen, mit Ausschneidebogen); dieselbe Druckweise passt für die anderen Seiten.",
+        "Die Belohnungstafel und der Tagesplan drucken A4 direkt aus dem Browser (farbig, grau, zum Ausmalen, mit Ausschneidebogen). Die Bildkarten des Tagesplans und die Sterne der Tafel gibt es als Fotoabzug: 10 × 15, 13 × 18 oder 20 × 30 cm (überall zu bestellen, auch als 4 × 6″), als JPG zum Speichern oder Teilen, mit Schnittlinien und einer Anleitung bis zu den Klettpunkten. Offen: Ausmalbilder der Lebendigen Bilder, Brief der Schnullerfee.",
     },
     {
       id: "H-03",
@@ -362,6 +362,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Statt eines Hakens fliegt eine geschaffte Karte in eine Kiste unten am Rand, wie bei einer Klett-Tafel zu Hause; die Reihe wird kürzer, bis nur noch das Bett übrig ist. Am Ende holt „Von vorn“ alle Karten wieder heraus.",
       why: "So machen es Eltern und Kitas mit gedruckten Bildkarten („Fertig-Tasche“); auf dem Bildschirm sieht das Kind genauso, wie der Tag kürzer wird.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-43",

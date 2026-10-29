@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES } from "@/content/games";
 import { finishRoutineStep, routineReturn, takeFinishedStep, waitForStep } from "@/lib/routine";
-import { addStar, cellKey, type LinkedDays, NO_LINKED } from "./board";
+import { addStar, cellKey, type LinkedDays, NO_LINKED, type StarLog } from "./board";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { ACTIVITIES, PLAN_TEMPLATES, PLAN_VIEWS, STEP_BY_ID, TASKS, THEME_BY_ID } from "./catalog";
 import {
@@ -15,6 +15,7 @@ import {
   planFromTemplate,
   restartDay,
   routineStep,
+  splitDone,
   stepDone,
   stepFromCatalog,
   stepsOn,
@@ -100,6 +101,18 @@ describe("plans", () => {
     const again = restartDay(all, plan.id, WED);
     expect(currentStep(steps, again[plan.id], NO_LINKED, WED)).toBe(0);
     expect(Object.keys(again[plan.id])).toEqual([cellKey(new Date("2026-10-27T12:00"), steps[1].id)]);
+  });
+
+  // H-42: the row gets shorter from the front until only the last card (the bed) is left; „Von vorn“ empties the box.
+  test("done cards leave the row for the Fertig-Kiste, both in the day's order", () => {
+    const evening = planFromTemplate(PLAN_TEMPLATES.find((tpl) => tpl.id === "abendroutine") ?? PLAN_TEMPLATES[0]);
+    const steps = stepsOn(evening, WED);
+    expect(splitDone(steps, undefined, NO_LINKED, WED)).toEqual({ open: steps, done: [] });
+    const allButLast = steps.slice(0, -1).reduce<StarLog>((l, s) => addStar(l, evening.id, cellKey(WED, s.id), WED), {});
+    expect(splitDone(steps, allButLast[evening.id], NO_LINKED, WED)).toEqual({ open: steps.slice(-1), done: steps.slice(0, -1) });
+    expect(steps.at(-1)?.catalog).toBe("schlafen");
+    const again = restartDay(allButLast, evening.id, WED);
+    expect(splitDone(steps, again[evening.id], NO_LINKED, WED).done).toEqual([]);
   });
 
   test("brushing ticks the teeth card of its own time of day only", () => {

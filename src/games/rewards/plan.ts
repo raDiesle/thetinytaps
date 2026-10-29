@@ -108,6 +108,17 @@ export function currentStep(steps: PlanStep[], ticks: Record<string, number> | u
   return steps.findIndex((step) => !stepDone(ticks, linked, day, step));
 }
 
+/**
+ * A day's steps parted for the day view: those still to do stay in the row, the done ones lie in the Fertig-Kiste –
+ * both in the day's order, so the row gets shorter from the front until only the last card (the bed) is left.
+ */
+export function splitDone(steps: PlanStep[], ticks: Record<string, number> | undefined, linked: LinkedDays, day: Date): { open: PlanStep[]; done: PlanStep[] } {
+  const open: PlanStep[] = [];
+  const done: PlanStep[] = [];
+  for (const step of steps) (stepDone(ticks, linked, day, step) ? done : open).push(step);
+  return { open, done };
+}
+
 /** Example ticks so a new plan looks like one in use: today's first step or two, never all of them. */
 export function exampleTicks(plan: Plan, today: Date): Record<string, number> {
   const steps = stepsOn(plan, today);

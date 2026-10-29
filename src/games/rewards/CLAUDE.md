@@ -92,8 +92,18 @@ one. A full day gets small bursts, the goal a party (and speech, if Vorlesen is 
 CSS hides everything else. The print is empty, with „Woche vom ____“ / „Datum ____“ to fill in (a month board prints its month, this one or
 the next); options: orientation
 (auto: portrait for a day board with up to two tasks), colour or grey (no inline colours, so `.rw-grey` wins), fields
-to colour in, and a page of stickers to cut out. Any later print feature (H-02: Bildkarten, Schnullerfee-Brief) can
+to colour in, and a page of stickers to cut out. Any later print feature (H-02: Schnullerfee-Brief) can
 use the same way.
+
+**Fotoabzug** (`photo.ts`, `PhotoPrint.tsx`, H-02): cards for a Velcro board are made for photo paper first – firm,
+wipeable, no laminating, and every drugstore, photo kiosk and online shop prints it. The grown-up picks 10 × 15
+(default, 4 × 6″ abroad), 13 × 18 (5 × 7″) or 20 × 30 cm (8 × 12″); `photoLayout` lays square cards of at least
+`MIN_CARD_MM` (a plan's pictures) or `MIN_STAR_MM` (the board's stars) on it inside a white `PHOTO_MARGIN_MM`, with cut
+lines from edge to edge and a white rim inside each cell. A canvas draws each photo as a 300-dpi JPG in the exact
+shape of the format (`photoPx`), shown in the panel with „💾 Speichern“ (and „📤 Teilen“ where the browser can share
+files, so a phone hands it to the photo app or a shop's app). Below it the guide „Anleitung: vom Foto zur Klett-Tafel“:
+save, order like holiday photos (matt, „ganzes Bild“), cut and round the corners, 20 mm Velcro dots (soft side on the
+card), safety. The Tagesplan shows it first, before A4; the board after its A4 page.
 
 ## Rules
 
@@ -120,7 +130,7 @@ use the same way.
 
 # Tagesplan
 
-Route `/tagesplan/` · ideas H-03, H-41–H-43, T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
+Route `/tagesplan/` · ideas H-03, H-41–H-43 (H-42 done), T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
 
 A picture schedule („Strukturtafel“): the steps of a day as big cards in order, „Jetzt“ above the one to do now, and a
 week of columns. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
@@ -130,33 +140,37 @@ shares the board's parts (sheet look, themes, `A4`/`Preview`, the gallery's clas
 
 - `plan.ts` – a plan (`Plan`: view `day` or `week`, `days` as seven lists Monday first, or `same: true` and only
   `days[0]`), pure functions: `planFromTemplate`, `stepsOn`, `stepDone` (a tick in the log, or the linked game –
-  brushing only for the step's `slot`), `currentStep`, `exampleTicks`, `restartDay`, `nightsUntil`, `withSteps`,
+  brushing only for the step's `slot`), `currentStep`, `splitDone` (the row and the Fertig-Kiste), `exampleTicks`, `restartDay`, `nightsUntil`, `withSteps`,
   `withSame`, `distinctSteps` (the cards to print).
 - `catalog.ts` – `ACTIVITIES` (the day's parts, beside the board's `TASKS`), `PLAN_VIEWS` and `PLAN_TEMPLATES`:
   Morgenroutine, Abendroutine, Erst – Dann, Kita-Tag (own weekdays), Wochenplan.
-- `PlanSheet.tsx` – the sheet for screen and print: day cards (`planLayout` picks rows and columns for the box),
-  Erst–Dann with the arrow when a day has exactly two steps, the week's columns with moons for the nights until a day.
+- `PlanSheet.tsx` – the sheet for screen and print: day cards (`planLayout` picks rows and columns for the box) and on
+  screen the Fertig-Kiste below them (`DoneBox`), Erst–Dann with the arrow while both of its two steps are open, the week's columns with moons for the nights until a day.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
-  `PlanPrint.tsx` – „🖨️ Drucken“ with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures;
+  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures;
   `planSettings.ts` – plans, current one, print options (`tinytaps.planner.v1`); `PlannerGame.tsx` – the page;
   `pageParts.tsx` – `useComputer`, `PanelButton`, shared with `RewardsGame.tsx`; `planner.css` – classes `pl-`.
 - Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
 
 ## The tick flow
 
-The child taps the card under „Jetzt“: it gets its ✓ with a sound, and the voice (if on) names what comes next; the
-last one starts a small party. A done card twinkles, a later one wiggles (in the week: „Noch N-mal schlafen“). No
+The child taps the card under „Jetzt“: in the day view it flies with a sound into the Fertig-Kiste at the bottom edge
+(H-42), as on a Velcro board at home, and the row gets shorter until only the last card (the bed) is left; the voice (if
+on) names what comes next, and the last one starts a small party, the full basket filling the sheet. The flight
+(`PlanScreen`, Web Animations from the card's old place) only follows a tap, and is left out with reduced motion. In the
+week the cards are small and stay in their column with a ✓. A done card (in the box) twinkles, the box itself names
+what is in it, a later one wiggles (in the week: „Noch N-mal schlafen“). No
 grown-up hold as on the board: a plan is a guide through the day, not a reward. A key wiggles the „Jetzt“ card but
 never ticks it. „↶ Zurück“ shows for a moment after a tick; when the day is done „↺ Von vorn“ starts it again (for the
-next Erst–Dann). A new plan shows example ticks (the first steps of today, never all), and the first tap only ends them.
+next Erst–Dann) and every card flies back out of the box. A new plan shows example ticks (the first steps of today,
+never all; in the day view pale cards in the box), and the first tap only ends them.
 
 The teeth card under „Jetzt“ opens Zähne putzen instead of ticking (`gameOf`, `GAME_ROUTES` in `plan.ts`): the plan
 navigates there with `{ returnTo }` in the router state (`src/lib/routine.ts`), `GameShell` plays at once without the
 start screen, and leaving (✕, Esc, „Menü“) goes back to the plan. The plan first notes the card (`waitForStep`, per
 visit), the brushing's end calls `finishRoutineStep`, and back on the plan `takeFinishedStep` ticks exactly that card –
 also a morning routine's teeth brushed after 14:00, which Zähne putzen files as evening. Left early with ✕, the card
-stays „Jetzt“. Such
-a step is part of the day, not play: no game counted, no play time, and `PlaytimeLock` lets it through. Under
+stays „Jetzt“. Such a step is part of the day, not play: no game counted, no play time, and `PlaytimeLock` lets it through. Under
 Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when the family brushes without the app.
 
 ## Rules
@@ -168,9 +182,15 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
   that still glows after brushing.
 - Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most; a template stays within it (`plan.test.ts`).
 - No clock times: order, „Jetzt – Dann“ and moons for the days to come; toddlers read no clock.
-- Printed cards are big (about 6 cm) and the texts suggest Velcro (Klett), never small magnets: they are a choking
-  hazard under three (research „belohnungstafel“, „tagesplan“).
+- Printed cards are big (at least `MIN_CARD_MM`, 4.5 cm, room for a 20 mm Velcro dot) and the texts suggest Velcro
+  (Klett), never small magnets: they are a choking hazard under three (research „belohnungstafel“, „tagesplan“).
+- Pictures for the boards are made for print first: cards go on a photo format every shop sells (`PHOTO_FORMATS`,
+  never a size of our own), in its exact shape at 300 dpi, nothing that matters within `PHOTO_MARGIN_MM` of the edge
+  (`photo.test.ts` checks). A generated picture that replaces an emoji must still be sharp there: at least 600 px
+  square (5 cm at 300 dpi).
 - A new activity needs its `schritt-<id>` prompt and line-art twin in `bilder/prompts.ts` (`plan.test.ts` checks).
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
 - Defaults are the same on every load (the first plan has the fixed id `erster-plan`), as for the board.
+- A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
+  than tall, or the last card stretched across the whole sheet.

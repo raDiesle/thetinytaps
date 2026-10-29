@@ -6,6 +6,8 @@ import { NO_LINKED } from "./board";
 import { THEME_BY_ID, THEMES } from "./catalog";
 import { distinctSteps, type Plan } from "./plan";
 import { PlanSheet, type PlanLook, useStepLabel } from "./PlanSheet";
+import { MIN_CARD_MM, type PhotoFormat } from "./photo";
+import { PhotoPrint } from "./PhotoPrint";
 import { A4, Preview } from "./PrintPanel";
 
 /** How a plan is printed. */
@@ -15,6 +17,8 @@ export interface PlanPrintOptions {
   color: boolean;
   /** A page (or more) of the plan's pictures as cards to cut out, for a Velcro board. */
   cards: boolean;
+  /** The photo size the cards are laid out on; missing in options saved before photo prints. */
+  photo?: PhotoFormat["id"];
 }
 
 /** Cards on a page of cards to cut out: 3 × 4 or 4 × 3, each about 6 cm. */
@@ -29,8 +33,9 @@ export const planOrientation = (plan: Plan, options: PlanPrintOptions, day: Date
       : "landscape";
 
 /**
- * Printing a plan, the same way as a board (PrintPanel): the plan as on screen but without ticks, and if wanted every
- * picture of it as a card to cut out – „Bildkarten“ for a Velcro board, which parents look for most.
+ * Printing a plan. First the cards as photo prints (PhotoPrint): firm, wipeable photo paper from any drugstore is
+ * what Velcro cards are best made of, so that comes first. Then the same way as a board (PrintPanel): the plan as on
+ * screen but without ticks on A4, and if wanted every picture as a card to cut out of plain paper.
  */
 export function PlanPrint({
   plan,
@@ -44,11 +49,22 @@ export function PlanPrint({
   onChange: (patch: Partial<PlanPrintOptions>) => void;
 }) {
   const t = useT();
+  const label = useStepLabel();
   const orientation = planOrientation(plan, options, day);
   const pages = <PlanPages plan={plan} day={day} options={options} orientation={orientation} />;
   return (
     <section className="settings rw-print-panel">
-      <SettingsGroup title={t({ de: "Drucken" })}>
+      <PhotoPrint
+        title={t({ de: "Bildkarten als Fotoabzug" })}
+        note={t({ de: "Jedes Bild des Plans einmal, von allen Tagen, als Karte für eine Klett-Tafel." })}
+        cards={distinctSteps(plan).map((step) => ({ emoji: step.emoji, label: label(step) }))}
+        min={MIN_CARD_MM}
+        theme={THEME_BY_ID.get(plan.theme) ?? THEMES[0]}
+        name="tagesplan-karten"
+        format={options.photo}
+        onFormat={(photo) => onChange({ photo })}
+      />
+      <SettingsGroup title={t({ de: "Auf A4 drucken" })}>
         <Choice
           label={t({ de: "Seite (A4)" })}
           value={options.orientation}
@@ -65,8 +81,8 @@ export function PlanPrint({
           {t({
             de:
               plan.view === "day" && !plan.same
-                ? "Gedruckt wird der Tag, der gerade zu sehen ist. Laminiert halten die Karten mit Klettpunkten auf einer Tafel (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden): so legt Ihr Kind den Tag selbst, und geschaffte Karten wandern in eine „Fertig“-Tasche."
-                : "Laminiert halten die Karten mit Klettpunkten auf einer Tafel (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden): so legt Ihr Kind den Tag selbst, und geschaffte Karten wandern in eine „Fertig“-Tasche.",
+                ? "Gedruckt wird der Tag, der gerade zu sehen ist. Karten aus Normalpapier halten laminiert mit Klettpunkten (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden): so legt Ihr Kind den Tag selbst, und geschaffte Karten wandern in eine „Fertig“-Tasche."
+                : "Karten aus Normalpapier halten laminiert mit Klettpunkten (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden): so legt Ihr Kind den Tag selbst, und geschaffte Karten wandern in eine „Fertig“-Tasche.",
           })}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>

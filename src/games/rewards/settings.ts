@@ -1,5 +1,6 @@
 import { type Board, boardFromTemplate, type StarLog } from "./board";
 import { TEMPLATES } from "./catalog";
+import type { PhotoFormat } from "./photo";
 
 /** How the board is printed. */
 export interface PrintOptions {
@@ -13,6 +14,8 @@ export interface PrintOptions {
   stickers: boolean;
   /** A month board prints next month's calendar instead of this one's (printed near the month's end). */
   nextMonth: boolean;
+  /** The photo size the stars are laid out on; missing in options saved before photo prints. */
+  photo?: PhotoFormat["id"];
 }
 
 export interface RewardsSettings {

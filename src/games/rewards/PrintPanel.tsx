@@ -5,6 +5,8 @@ import { useT } from "@/lib/language";
 import { type Board, NO_LINKED } from "./board";
 import { BoardSheet, type SheetLook } from "./BoardSheet";
 import { MARK_BY_ID, MARKS, THEME_BY_ID, THEMES } from "./catalog";
+import { MIN_STAR_MM, photoFormat, photoLayout } from "./photo";
+import { PhotoPrint } from "./PhotoPrint";
 import type { PrintOptions } from "./settings";
 
 /** A4 in millimetres. */
@@ -30,6 +32,8 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
   const orientation = orientationOf(board, options);
   const look: SheetLook = { print: true, color: options.color, colorIn: options.colorIn };
   const pages = <PrintPages board={board} options={options} look={look} orientation={orientation} />;
+  const mark = MARK_BY_ID.get(board.mark) ?? MARKS[0];
+  const stars = photoLayout(photoFormat(options.photo), MIN_STAR_MM);
 
   return (
     <section className="settings rw-print-panel">
@@ -76,6 +80,18 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
         </button>
       </SettingsGroup>
       <Preview orientation={orientation}>{pages}</Preview>
+      <PhotoPrint
+        title={t({ de: `${mark.emoji} Zum Ankletten: als Fotoabzug` })}
+        note={t({
+          de: "Ein Foto voller Zeichen der Tafel: ausgeschnitten und mit Klettpunkten bekommt Ihr Kind jeden Stern zum Selbst-Ankletten, und die laminierte Tafel hält viele Wochen.",
+        })}
+        cards={Array.from({ length: stars.cols * stars.rows }, () => ({ emoji: mark.emoji }))}
+        min={MIN_STAR_MM}
+        theme={THEME_BY_ID.get(board.theme) ?? THEMES[0]}
+        name="belohnungstafel-sterne"
+        format={options.photo}
+        onFormat={(photo) => onChange({ photo })}
+      />
       {createPortal(<div className="rw-print-root">{pages}</div>, document.body)}
     </section>
   );

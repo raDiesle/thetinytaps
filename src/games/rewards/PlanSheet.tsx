@@ -4,7 +4,7 @@ import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { cellKey, type LinkedDays, possessive, weekday } from "./board";
 import { STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
-import { currentStep, nightsUntil, type Plan, type PlanStep, stepDone, stepsOn } from "./plan";
+import { currentStep, nightsUntil, type Plan, type PlanStep, splitDone, stepDone, stepsOn } from "./plan";
 
 const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
 
@@ -178,43 +178,96 @@ function StepCard({
   );
 }
 
-/** One day's steps as big cards in their order; on screen „Jetzt“ over the one to do and „Dann“ over the next. */
+/**
+ * One day's steps as big cards in their order; on screen „Jetzt“ over the one to do and „Dann“ over the next. On screen
+ * a done card leaves the row for the Fertig-Kiste below it, as on a Velcro board at home: the row gets shorter until
+ * only the last card is left. Paper keeps every card in the row.
+ */
 function DaySteps(props: StepsProps & { aspect: number }) {
-  const { plan, day, look, aspect, fresh } = props;
+  const { plan, ticks, linked, day, look, aspect, fresh } = props;
   const t = useT();
   const steps = stepsOn(plan, day);
   const states = statesOf(props, day, steps);
-  const now = states.indexOf("now");
-  // Two cards are an Erst–Dann: always named so, with a big arrow between them.
-  if (steps.length === 2) {
+  const { open, done } = look.print ? { open: steps, done: [] } : splitDone(steps, ticks, linked, day);
+  const stateOf = (step: PlanStep) => states[steps.indexOf(step)];
+  const now = open.findIndex((step) => stateOf(step) === "now");
+  // Two cards are an Erst–Dann: always named so, with a big arrow between them while both are to do.
+  const firstThen = steps.length === 2;
+  const box =
+    look.print || steps.length === 0 ? null : (
+      <DoneBox day={day} done={done} example={plan.examples} fresh={fresh} full={steps.length > 0 && open.length === 0} />
+    );
+  if (firstThen && open.length === 2) {
     return (
-      <div className="pl-firstthen">
-        {steps.map((step, i) => (
-          <div key={step.id} className="pl-slot">
-            <span className="pl-tag">{i === 0 ? t({ de: "Erst" }) : t({ de: "Dann" })}</span>
-            <StepCard day={day} step={step} state={states[i]} look={look} fresh={fresh} />
-          </div>
-        ))}
-        <span className="pl-arrow" aria-hidden>
-          ➜
-        </span>
+      <div className="pl-dayview">
+        <div className="pl-firstthen">
+          {steps.map((step, i) => (
+            <div key={step.id} className="pl-slot">
+              <span className="pl-tag">{i === 0 ? t({ de: "Erst" }) : t({ de: "Dann" })}</span>
+              <StepCard day={day} step={step} state={states[i]} look={look} fresh={fresh} />
+            </div>
+          ))}
+          <span className="pl-arrow" aria-hidden>
+            ➜
+          </span>
+        </div>
+        {box}
       </div>
     );
   }
-  // The body is a little less wide than the sheet: the heading takes some of its height.
-  const { cols, rows } = planLayout(steps.length, aspect * 1.12);
+  const tag = (step: PlanStep, i: number) => {
+    if (firstThen) return steps.indexOf(step) === 0 ? t({ de: "Erst" }) : t({ de: "Dann" });
+    return i === now ? t({ de: "Jetzt" }) : now >= 0 && i === now + 1 ? t({ de: "Dann" }) : "";
+  };
+  // The body is a little less wide than the sheet: the heading takes some of its height, the box below a little more.
+  const { cols, rows } = planLayout(open.length, aspect * (box ? 1.5 : 1.12));
   return (
-    <ol className="pl-steps" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}>
-      {steps.map((step, i) => (
-        <li key={step.id} className="pl-slot">
-          <span className={`pl-tag${i === now || (now >= 0 && i === now + 1) ? "" : " empty"}`}>
-            {i === now ? t({ de: "Jetzt" }) : now >= 0 && i === now + 1 ? t({ de: "Dann" }) : " "}
-          </span>
-          <StepCard day={day} step={step} state={states[i]} number={i + 1} look={look} fresh={fresh} />
-        </li>
-      ))}
-      {steps.length === 0 && <li className="pl-empty">{t({ de: "Noch keine Schritte – unter „Gestalten“ hinzufügen." })}</li>}
-    </ol>
+    <div className="pl-dayview">
+      {open.length > 0 && (
+        <ol className="pl-steps" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}>
+          {open.map((step, i) => (
+            <li key={step.id} className="pl-slot">
+              <span className={`pl-tag${tag(step, i) ? "" : " empty"}`}>{tag(step, i) || " "}</span>
+              <StepCard day={day} step={step} state={stateOf(step)} number={steps.indexOf(step) + 1} look={look} fresh={fresh} />
+            </li>
+          ))}
+        </ol>
+      )}
+      {steps.length === 0 && <p className="pl-empty">{t({ de: "Noch keine Schritte – unter „Gestalten“ hinzufügen." })}</p>}
+      {box}
+    </div>
+  );
+}
+
+/**
+ * The Fertig-Kiste at the bottom edge: the day's done cards stand in it, peeking over its rim, in the order they were
+ * done. When every card is in it, it fills the sheet. A card in it can be tapped (it twinkles and says itself), the box
+ * too (it names what is done).
+ */
+function DoneBox({ day, done, example, fresh, full }: { day: Date; done: PlanStep[]; example?: boolean; fresh?: string | null; full: boolean }) {
+  const stepLabel = useStepLabel();
+  return (
+    <div className={`pl-box${full ? " full" : ""}`} data-box="" data-tap="done">
+      <div className="pl-box-cards" style={{ "--pl-in-box": Math.max(1, done.length) } as CSSProperties}>
+        {done.map((step, i) => {
+          const key = cellKey(day, step.id);
+          return (
+            <span
+              key={step.id}
+              className={`pl-box-card${fresh === key ? " fresh" : ""}${example ? " example" : ""}`}
+              data-step={key}
+              data-state="done"
+              data-tap="done"
+              title={stepLabel(step)}
+              style={{ "--pl-tilt": `${(i % 2 ? 1 : -1) * (4 + ((i * 3) % 5))}deg` } as CSSProperties}
+            >
+              {step.emoji}
+            </span>
+          );
+        })}
+      </div>
+      <span className="pl-box-front" aria-hidden />
+    </div>
   );
 }
 

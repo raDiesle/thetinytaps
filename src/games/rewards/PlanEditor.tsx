@@ -186,7 +186,7 @@ export function PlanEditor({
         </ol>
         <p className="setting-note">
           {t({
-            de: "Drei bis sechs Bilder reichen für Zwei- und Dreijährige. Ist die Zähne-Karte dran, öffnet ein Tippen das Spiel „Zähne putzen“; danach geht es zurück zum Plan, und die Karte hat ihren Haken. Wer ohne das Spiel putzt, wählt „Nur abhaken“. Aufs Töpfchen hakt sich nach einem Haken im Töpfchen-Spiel ab.",
+            de: "Drei bis sechs Bilder reichen für Zwei- und Dreijährige. Ist die Zähne-Karte dran, öffnet ein Tippen das Spiel „Zähne putzen“; danach geht es zurück zum Plan, und die Karte ist geschafft. Wer ohne das Spiel putzt, wählt „Nur abhaken“. Aufs Töpfchen hakt sich nach einem Haken im Töpfchen-Spiel ab.",
           })}
         </p>
         <div className="rw-chips" role="group" aria-label={t({ de: "Schritt hinzufügen" })}>
