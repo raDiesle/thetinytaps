@@ -217,6 +217,20 @@
   height: 100%;
 }
 
+/* Everything that moves in the mirror lies over the still picture in a layer of its own (mouth.tsx), so the
+   brush moving on every frame doesn't have the browser paint the face and the teeth again. Only the monsters
+   in it take taps. */
+.mouth-moving {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.mouth-moving .monster-body {
+  pointer-events: auto;
+}
+
 /* The surfaces to brush now shine. */
 .zone-glow {
   animation: glow-pulse 2.14s ease-in-out infinite;

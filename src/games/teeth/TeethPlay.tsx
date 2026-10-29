@@ -453,12 +453,16 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   );
 
   // Tapping isn't needed, but a tapped monster giggles and wiggles.
-  const tickle = (id: number) => {
-    if (settings.sounds) playSqueak();
-    setTickled(id);
-    if (tickleTimer.current) clearTimeout(tickleTimer.current);
-    tickleTimer.current = setTimeout(() => setTickled(null), TICKLE_MS);
-  };
+  // The same function from tick to tick, so the monsters in the mirror aren't drawn again with every tick (`PlacedMonster`).
+  const tickle = useCallback(
+    (id: number) => {
+      if (settings.sounds) playSqueak();
+      setTickled(id);
+      if (tickleTimer.current) clearTimeout(tickleTimer.current);
+      tickleTimer.current = setTimeout(() => setTickled(null), TICKLE_MS);
+    },
+    [settings.sounds],
+  );
 
   const again = useCallback(() => {
     const t = performance.now();

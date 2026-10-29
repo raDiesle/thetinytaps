@@ -124,7 +124,8 @@ function motionOffset(pose: Pose, motion: Motion, jawUp: Vec3, t: number): Vec3 
   return scale(jawUp, -10 + 20 * s);
 }
 
-interface Box {
+/** A part of the brush: its extent along the handle (u), across the head (w) and along the bristles (b), in brush units. */
+export interface Box {
   u: [number, number];
   w: [number, number];
   b: [number, number];
@@ -160,7 +161,8 @@ const TUFTS: Box[] = TUFT_ROWS.flatMap((u, row) =>
   ].map((w): Box => ({ u, w: w as [number, number], b: [-11, row === 0 ? 0 : -1.5 - (row % 2)], fills: row % 2 ? SKY : WHITE, line: 1.5 })),
 );
 
-const BOXES: Box[] = [
+/** The brush's parts, all apart from each other along one of its axes, so `drawOrder` can stack them. */
+export const BOXES: Box[] = [
   ...TUFTS,
   // Head, with a rounded-off tip.
   { u: [-21, 22], w: [-9.5, 9.5], b: [-17, -11], fills: BLUE },
@@ -191,6 +193,50 @@ const FOAM: Vec3[] = [
 const FOAM_FULL_S = 30;
 /** How far the brush rocks on its handle while it scrubs or circles (0.15 is about 9°). */
 const ROCK = 0.15;
+
+type Axis = "u" | "w" | "b";
+/** How much each of the brush's own axes points at the viewer (above 0: towards, below 0: away). */
+export type Facing = Record<Axis, number>;
+
+/** Whether box `a` lies behind box `b`, told by a plane between them across one of the brush's axes; null when none is between them. */
+function behind(a: Box, b: Box, facing: Facing): boolean | null {
+  for (const axis of ["u", "w", "b"] as const) {
+    if (a[axis][1] <= b[axis][0]) return facing[axis] > 0;
+    if (b[axis][1] <= a[axis][0]) return facing[axis] < 0;
+  }
+  return null;
+}
+
+/**
+ * The order to draw the boxes in, back to front. Sorting by each box's middle goes wrong next to the long head:
+ * a small bristle tuft at its far end can have its middle nearer than the head's, and then shows through the
+ * plastic. The planes between the boxes always tell which is in front.
+ */
+export function drawOrder(boxes: Box[], facing: Facing): number[] {
+  const back = boxes.map((a) => boxes.map((b) => a !== b && behind(a, b, facing) === true));
+  const left = boxes.map((_, i) => i);
+  const order: number[] = [];
+  while (left.length > 0) {
+    // Next the one with no box left behind it (the fewest, should the planes ever go round in a circle).
+    const hidden = left.map((i) => left.filter((j) => back[j][i]).length);
+    const pick = hidden.indexOf(Math.min(...hidden));
+    order.push(left[pick]);
+    left.splice(pick, 1);
+  }
+  return order;
+}
+
+/** The brush's order only depends on which way each axis points, so there are just 27 of them: worked out once each. */
+const ORDERS = new Map<string, number[]>();
+function brushOrder(facing: Facing): number[] {
+  const signs = { u: Math.sign(facing.u), w: Math.sign(facing.w), b: Math.sign(facing.b) };
+  const key = `${signs.u} ${signs.w} ${signs.b}`;
+  const known = ORDERS.get(key);
+  if (known) return known;
+  const order = drawOrder(BOXES, signs);
+  ORDERS.set(key, order);
+  return order;
+}
 
 const fmt = (p: { x: number; y: number }) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
 
@@ -279,14 +325,7 @@ export function Brush({
   const rocked = add(scale(pose.b, Math.cos(tilt)), scale(side, Math.sin(tilt)));
   const moved = { u: pose.u, b: rocked, at: add(pose.at, motionOffset(pose, motion, jawUp, t)) };
   const w = cross(moved.u, moved.b);
-  const center = (box: Box) =>
-    project.point(
-      add(
-        moved.at,
-        scale(add(scale(moved.u, (box.u[0] + box.u[1]) / 2), add(scale(w, (box.w[0] + box.w[1]) / 2), scale(moved.b, (box.b[0] + box.b[1]) / 2))), SIZE),
-      ),
-    ).depth;
-  const boxes = BOXES.map((box, i) => ({ box, i, depth: center(box) })).sort((a, b) => a.depth - b.depth);
+  const order = brushOrder({ u: project.facing(moved.u), w: project.facing(w), b: project.facing(moved.b) });
   const backShows = project.facing(scale(moved.b, -1)) > 0;
   const foamCount = Math.min(FOAM.length, 4 + Math.floor(((FOAM.length - 4) * t) / FOAM_FULL_S));
   const foam = (
@@ -302,7 +341,7 @@ export function Brush({
     <g className="brush" pointerEvents="none">
       {/* Seen from the back of the head, the foam is behind it. */}
       {backShows && foam}
-      {boxes.map(({ box, i }) => drawBox(box, moved, w, project, i))}
+      {order.map((i) => drawBox(BOXES[i], moved, w, project, i))}
       {!backShows && foam}
     </g>
   );
