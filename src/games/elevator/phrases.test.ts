@@ -6,10 +6,12 @@ import type { Station, Way } from "./trail/types";
 
 // Translations come only on request, so a German sentence may lack its translation (it is said in German then);
 // but nothing in a phrasebook is left over from a sentence that changed, and what is there is in its language.
-// The languages translated so far have every sentence.
+// The languages translated so far have every sentence – except in a level that came later in German only (its
+// title has no translation yet), which is translated all at once when the grown-up asks for it.
 
-/** Every German text of the stories and levels that is spoken or shown to grown-ups. */
-function germanTexts(): string[] {
+/** Every German text of the stories and levels that is spoken or shown to grown-ups; `translatedOnly` leaves out the
+ * levels whose title has no translation in `language` yet. */
+function germanTexts(translatedOnly?: string): string[] {
   const all: string[] = [...Object.values(texts)];
   for (const story of STORIES) {
     all.push(story.title, story.need.say);
@@ -27,6 +29,7 @@ function germanTexts(): string[] {
     w.stations.forEach(station);
   };
   for (const level of TRAIL_LEVELS) {
+    if (translatedOnly && !PHRASEBOOKS[translatedOnly as keyof typeof PHRASEBOOKS]?.[level.title]) continue;
     all.push(level.title, level.away.say, level.finale.say);
     for (const s of level.stations) {
       if (s.kind === "fork") {
@@ -53,9 +56,9 @@ test("no phrasebook has anything left over", () => {
     ).toEqual([]);
 });
 
-test("the translated languages have every sentence and title", () => {
-  const all = [...new Set(germanTexts())];
+test("the translated languages have every sentence and title, of every level translated into them", () => {
   for (const language of COMPLETE) {
+    const all = [...new Set(germanTexts(language))];
     const book = PHRASEBOOKS[language as keyof typeof PHRASEBOOKS] ?? {};
     expect(
       all.filter((german) => !book[german]),

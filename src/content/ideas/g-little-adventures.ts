@@ -42,6 +42,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Die Katze läuft durchs Treppenhaus nach oben. Die Welt rollt nach oben statt zur Seite: Stockwerk für Stockwerk die Treppe hoch, bei den Nachbarn klingeln (die Oma gibt einen Wollknäuel), eine Leiter auf den Dachboden, oben im Korb liegt die Katze mit Kätzchen.",
       why: "Treppen und oben/unten; eine Welt, die senkrecht rollt.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-05",

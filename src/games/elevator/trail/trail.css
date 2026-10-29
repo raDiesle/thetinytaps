@@ -712,3 +712,85 @@
 .tl-lok-gate.open {
   transform: scaleX(0.18);
 }
+
+/* ---------- „Wo ist die Katze?“ ---------- */
+
+/* With the bone, the dog trots down the stairs to its mat and chews there. */
+.tl-katze-dog.done {
+  animation: tl-katze-dog-home 2.4s ease-in-out forwards;
+}
+
+.tl-katze-dog.done .tl-dog-tail {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: tl-wag 0.25s ease-in-out 12 alternate;
+}
+
+.tl-katze-dog.done .tl-dog-head {
+  animation: tl-munch 0.4s ease-in-out 2.4s 6 alternate;
+}
+
+/* The bell rings, then Oma's door swings open and she waves. */
+.tl-katze-door {
+  transition: transform 1s ease-in-out 0.8s;
+}
+
+.tl-katze-door.open {
+  transform: scaleX(0.15);
+}
+
+.tl-katze-oma.open .tl-katze-oma-wave {
+  animation: tl-wag 0.35s ease-in-out 1.4s 6 alternate;
+}
+
+/* Oma rolls the ball of wool out of the door onto the landing. */
+.tl-katze-roll {
+  animation: tl-katze-roll 1s ease-out 1.4s both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* With the wool, the kittens hop and bat the ball between them. */
+.tl-katze-play .tl-katze-kitten {
+  animation: tl-katze-hop 0.4s ease-in-out 6 alternate;
+}
+
+.tl-katze-bat {
+  animation: tl-katze-bat 0.5s ease-in-out 6 alternate;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes tl-katze-dog-home {
+  35% {
+    transform: translate(100px, 80px);
+  }
+  to {
+    transform: translate(520px, 80px) scale(0.9);
+  }
+}
+
+@keyframes tl-katze-roll {
+  from {
+    opacity: 0;
+    transform: translateX(200px) rotate(450deg);
+  }
+  15% {
+    opacity: 1;
+  }
+}
+
+@keyframes tl-katze-hop {
+  to {
+    transform: translateY(-30px);
+  }
+}
+
+@keyframes tl-katze-bat {
+  from {
+    transform: translate(-50px, 0) rotate(-40deg);
+  }
+  to {
+    transform: translate(50px, -40px) rotate(40deg);
+  }
+}

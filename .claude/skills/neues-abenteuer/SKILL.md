@@ -94,6 +94,12 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
   be the level's ground before the fork and after the way. The child taps a sign or 1 / 2;
   the level draws only the signpost. Put the first station of each way within ~800
   points of the fork, so both ghosts are on the screen. Ways contain no further forks.
+- **`turns`** (on the level) – a world that goes up instead of sideways (G-04, „Wo ist die
+  Katze?“, a stairwell): the ground's x is the way walked, and at each turn the drawing runs
+  back the other way, one floor above (`placed`/`facing` in `ground.ts`). Ground, `start`,
+  station `x` and steps are in walked x; `at`, `wants`, flights and the drawing are in drawn
+  points between x 0 and 1600. The camera follows only the height. Draw the floors in
+  `<level>.tsx` in drawn points (as `katze.tsx` does); `levels.test.ts` checks the ground stays inside.
 
 The world drawing (`drachen.tsx`) exports the ground constants, `<Level>Scenery` and
 `<Level>Backdrop`. `Scenery` gets `{ done, here, nope }` and draws every station from
