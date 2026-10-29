@@ -94,11 +94,27 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/kleine-abenteuer/",
     parts: [
+      { label: "🧭 Die anderen sieben Geschichten", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
       {
-        label: "🧭 Die Aufzug-Geschichten und die anderen vier Weg-Abenteuer",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        label: "🏖️ Die Sandburg",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-05, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
-      { label: "⛄ Der Schneemann", languages: { de: "done" }, note: "Name und alle Sätze des Levels nur auf Deutsch (G-06, Oktober 2026)." },
+      {
+        label: "🧺 Picknick im Wald",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-07, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
+      },
+      {
+        label: "⛵ Das Floß",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026), ebenso der Kartenhinweis „🛶 Paddeln“; bis zur Übersetzung spricht das Level ganz Deutsch.",
+      },
+      {
+        label: "⛄ Der Schneemann",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-06, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
+      },
     ],
   },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },

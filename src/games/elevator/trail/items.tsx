@@ -20,6 +20,15 @@ export type ItemId =
   | "sunflower"
   | "umbrella"
   | "corn"
+  | "shell"
+  | "roll"
+  | "flipflops"
+  | "mattress"
+  | "nut"
+  | "honey"
+  | "berries"
+  | "saw"
+  | "stick"
   | "snowshovel"
   | "seeds"
   | "sand"
@@ -386,6 +395,233 @@ export function Snowman({ nose }: { nose: boolean }) {
   );
 }
 
+/** A sea snail's shell, pink with its spiral, the opening to the left: a house a hermit crab moves into. */
+export function Shell() {
+  return (
+    <g>
+      <path d="M-44 -6 Q-56 -40 -24 -62 Q12 -84 40 -54 Q58 -30 40 -6 Q0 6 -44 -6 Z" fill="#ffa8a8" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <path
+        d="M6 -36 Q22 -38 22 -24 Q20 -12 6 -14 Q-6 -16 -4 -30 Q0 -50 22 -50 Q44 -46 42 -24"
+        stroke="#e8590c"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <ellipse cx="-30" cy="-18" rx="13" ry="10" fill="#fff0f6" stroke={INK} strokeWidth="3.5" />
+      <circle cx="-20" cy="-50" r="5" fill="#fff" opacity="0.7" />
+    </g>
+  );
+}
+
+/** A bread roll, golden brown with its cut along the top. */
+export function Roll() {
+  return (
+    <g>
+      <path d="M-46 -4 Q-54 -44 -10 -48 Q0 -49 10 -48 Q54 -44 46 -4 Q0 6 -46 -4 Z" fill="#d9822b" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <path d="M-30 -30 Q0 -44 30 -30" stroke="#ffe8a3" strokeWidth="7" fill="none" strokeLinecap="round" />
+      <ellipse cx="-22" cy="-16" rx="8" ry="4" fill="#f0a35a" />
+    </g>
+  );
+}
+
+/** A pair of flip-flops, seen from above, standing side by side: blue soles, red straps. */
+export function FlipFlops() {
+  return (
+    <g>
+      {[-1, 1].map((s) => (
+        <g key={s} transform={`translate(${s * 24} 0) rotate(${s * 8} 0 -50)`}>
+          <path
+            d="M0 -100 Q20 -100 18 -64 Q16 -38 16 -14 Q14 0 0 0 Q-14 0 -16 -14 Q-16 -38 -18 -64 Q-20 -100 0 -100 Z"
+            fill="#22b8cf"
+            stroke={INK}
+            strokeWidth="4"
+            strokeLinejoin="round"
+          />
+          <path d="M-15 -60 L0 -82 L15 -60" stroke="#f03e3e" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="0" cy="-82" r="4" fill="#f03e3e" stroke={INK} strokeWidth="2" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** An air mattress, lying flat: puffy stripes in red and yellow, the pillow end on the left. */
+export function Mattress() {
+  return (
+    <g>
+      <rect x="-112" y="-40" width="224" height="40" rx="18" fill="#ffd43b" stroke={INK} strokeWidth="5" />
+      {[-62, -22, 18, 58].map((x) => (
+        <rect key={x} x={x} y="-36" width="20" height="32" rx="9" fill="#fa5252" />
+      ))}
+      <path d="M-82 -38 V-2" stroke={INK} strokeWidth="3" opacity="0.5" />
+      <path d="M-100 -30 Q-60 -36 -20 -32" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.7" />
+      <rect x="104" y="-26" width="10" height="8" rx="3" fill="#fff" stroke={INK} strokeWidth="2.5" />
+    </g>
+  );
+}
+
+/** The sand bucket with the shovel in it: a blue bucket with a yellow rim and handle, the red shovel sticking out. */
+export function Pail() {
+  return (
+    <g>
+      <g transform="translate(14 -70) rotate(18)">
+        <rect x="-6" y="-70" width="12" height="70" rx="5" fill="#f03e3e" stroke={INK} strokeWidth="4" />
+        <rect x="-16" y="-78" width="32" height="13" rx="6" fill="#f03e3e" stroke={INK} strokeWidth="4" />
+      </g>
+      <path d="M-46 -84 Q0 -150 46 -84" stroke={INK} strokeWidth="9" fill="none" strokeLinecap="round" />
+      <path d="M-46 -84 Q0 -150 46 -84" stroke="#fcc419" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <path d="M-46 -86 L-36 -4 Q-34 0 -30 0 H30 Q34 0 36 -4 L46 -86 Z" fill="#339af0" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      <rect x="-50" y="-94" width="100" height="16" rx="7" fill="#fcc419" stroke={INK} strokeWidth="4.5" />
+      <path d="M-24 -66 L-20 -14" stroke="#a5d8ff" strokeWidth="7" strokeLinecap="round" />
+      <path d="M-4 -46 l7 -12 l7 12 l7 -12 l7 12" stroke="#fff" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A hazelnut: brown, its tip up and its pale base on the ground. */
+export function Nut() {
+  return (
+    <g>
+      <path d="M0 -66 Q-34 -50 -32 -26 Q-30 0 0 0 Q30 0 32 -26 Q34 -50 0 -66 Z" fill="#a9622b" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <path d="M-22 -10 Q0 -22 22 -10 Q16 0 0 0 Q-16 0 -22 -10 Z" fill="#f3d9a4" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-10 -52 Q-20 -40 -18 -26" stroke="#e0a26a" strokeWidth="5" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A jar of golden honey with a red cloth tied over its lid and a drop running down. */
+export function Honey() {
+  return (
+    <g>
+      <rect x="-32" y="-74" width="64" height="74" rx="16" fill="#fab005" stroke={INK} strokeWidth="4.5" />
+      <path d="M-20 -60 V-18" stroke="#ffe066" strokeWidth="7" strokeLinecap="round" />
+      <path d="M-38 -74 Q-40 -92 -30 -90 H30 Q40 -92 38 -74 Q0 -66 -38 -74 Z" fill="#fa5252" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      {[-24, -8, 8, 24].map((x) => (
+        <circle key={x} cx={x} cy="-81" r="3.5" fill="#fff" />
+      ))}
+      <path d="M-32 -70 H32" stroke={INK} strokeWidth="3" />
+      <path d="M12 -70 Q12 -54 18 -50 Q24 -54 22 -70 Z" fill="#f08c00" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+    </g>
+  );
+}
+
+/** One blackberry: a dark ball of small round drupelets. */
+function Blackberry({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r="14" fill="#2b124c" stroke={INK} strokeWidth="3" />
+      {[
+        [-6, -5],
+        [5, -6],
+        [-1, 3],
+        [7, 5],
+        [-7, 6],
+      ].map(([dx, dy]) => (
+        <circle key={`${dx}${dy}`} cx={x + dx} cy={y + dy} r="3.2" fill="#7048e8" />
+      ))}
+    </g>
+  );
+}
+
+/** A twig of blackberries with a green leaf, standing on its cut end. */
+export function Berries() {
+  return (
+    <g>
+      <path d="M0 0 Q6 -40 -4 -92" stroke="#8d5a3b" strokeWidth="5" fill="none" strokeLinecap="round" />
+      <path d="M2 -20 Q-30 -40 -40 -22 Q-20 -10 2 -20 Z" fill="#51cf66" stroke="#2b8a3e" strokeWidth="3" />
+      <Blackberry x={-16} y={-62} />
+      <Blackberry x={14} y={-70} />
+      <Blackberry x={-2} y={-90} />
+      <Blackberry x={14} y={-42} />
+    </g>
+  );
+}
+
+/** The teddy, standing, with the picnic basket (a red-and-white cloth over it) in its arms. */
+export function TeddyBear() {
+  const fur = "#d9944a";
+  const light = "#f8deb4";
+  return (
+    <g transform="scale(0.8)">
+      {[-16, 16].map((x) => (
+        <g key={x}>
+          <ellipse cx={x} cy="-14" rx="14" ry="15" fill={fur} stroke={INK} strokeWidth="4" />
+          <ellipse cx={x} cy="-6" rx="8" ry="5" fill={light} />
+        </g>
+      ))}
+      <ellipse cx="0" cy="-50" rx="30" ry="32" fill={fur} stroke={INK} strokeWidth="4" />
+      <ellipse cx="0" cy="-48" rx="17" ry="20" fill={light} />
+      <ellipse cx="-30" cy="-58" rx="10" ry="18" transform="rotate(20 -30 -58)" fill={fur} stroke={INK} strokeWidth="4" />
+      {[-22, 22].map((x) => (
+        <g key={x}>
+          <circle cx={x} cy="-124" r="12" fill={fur} stroke={INK} strokeWidth="4" />
+          <circle cx={x} cy="-124" r="6" fill={light} />
+        </g>
+      ))}
+      <circle cx="0" cy="-102" r="28" fill={fur} stroke={INK} strokeWidth="4" />
+      <ellipse cx="0" cy="-92" rx="13" ry="10" fill={light} />
+      <ellipse cx="0" cy="-97" rx="5" ry="4" fill={INK} />
+      <path d="M-5 -89 Q0 -85 5 -89" stroke={INK} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <circle cx="-10" cy="-110" r="3.5" fill={INK} />
+      <circle cx="10" cy="-110" r="3.5" fill={INK} />
+      <path d="M-13 -78 L0 -73 L-13 -67 Z M13 -78 L0 -73 L13 -67 Z" fill="#4dabf7" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      {/* The picnic basket, held in front */}
+      <g transform="translate(22 -26)">
+        <path d="M-22 -22 Q0 -58 22 -22" stroke="#8d5a3b" strokeWidth="6" fill="none" />
+        <path d="M-30 -24 H30 L24 10 H-24 Z" fill="#e8a35c" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        <path d="M-27 -10 H27 M-25 2 H25 M-12 -24 V10 M12 -24 V10" stroke="#a0673a" strokeWidth="2.5" />
+        <path d="M-26 -24 Q-14 -38 0 -26 Q14 -38 26 -24 Z" fill="#fa5252" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        <circle cx="-10" cy="-29" r="2.5" fill="#fff" />
+        <circle cx="10" cy="-29" r="2.5" fill="#fff" />
+      </g>
+      <ellipse cx="30" cy="-58" rx="10" ry="18" transform="rotate(-30 30 -58)" fill={fur} stroke={INK} strokeWidth="4" />
+    </g>
+  );
+}
+
+/** A hand saw: a grey blade with teeth along its bottom edge, a red wooden handle on the left. */
+export function Saw() {
+  const teeth = Array.from({ length: 9 }, (_, i) => `L${-34 + i * 13} -8 L${-28 + i * 13} -16`).join(" ");
+  return (
+    <g>
+      <path d={`M-40 -16 L-40 -54 L84 -30 L84 -16 ${teeth} Z`} fill="#dee2e6" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M-30 -44 L70 -26" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+      <circle cx="60" cy="-28" r="4" fill="#868e96" />
+      <path d="M-40 -60 H-74 Q-90 -60 -90 -44 V-20 Q-90 -6 -74 -6 H-40 Z" fill="#e03131" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <rect x="-76" y="-46" width="26" height="24" rx="10" fill="#fff" stroke={INK} strokeWidth="3.5" />
+    </g>
+  );
+}
+
+/** A stick from a tree, lying on its side, with a twig and a leaf. */
+export function Stick() {
+  return (
+    <g>
+      <path d="M-74 -14 L70 -22" stroke={INK} strokeWidth="20" strokeLinecap="round" />
+      <path d="M-74 -14 L70 -22" stroke="#a0673a" strokeWidth="12" strokeLinecap="round" />
+      <path d="M-60 -16 L-20 -18 M10 -20 L50 -22" stroke="#d9a066" strokeWidth="3" strokeLinecap="round" />
+      <path d="M20 -20 L42 -46" stroke={INK} strokeWidth="11" strokeLinecap="round" />
+      <path d="M20 -20 L42 -46" stroke="#a0673a" strokeWidth="5" strokeLinecap="round" />
+      <path d="M42 -46 Q60 -66 76 -54 Q60 -36 42 -46 Z" fill="#69db7c" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The toy sailboat: a red hull, a white sail with a blue stripe and a yellow flag; it floats with the hull's bottom on (0, 0). */
+export function Sailboat() {
+  return (
+    <g>
+      <path d="M2 -26 V-132" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+      <path d="M8 -128 Q46 -84 52 -36 H8 Z" fill="#fff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M8 -78 Q32 -76 46 -70" stroke="#4dabf7" strokeWidth="8" fill="none" />
+      <path d="M-4 -118 Q-30 -76 -36 -40 H-4 Z" fill="#fff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M2 -132 L26 -140 L2 -148 Z" fill="#ffd43b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-62 -34 H64 L44 -2 Q0 4 -44 -2 Z" fill="#fa5252" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      <path d="M-50 -22 H52" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+}
+
 /** The wooden toy locomotive: red boiler, blue cab, yellow chimney, black wheels on (0, 0); it faces right. */
 export function Loco() {
   return (
@@ -459,6 +695,15 @@ export const ITEMS: Record<ItemId, Picture> = {
   sunflower: { w: 96, h: 172, draw: () => <Sunflower /> },
   umbrella: { w: 144, h: 184, draw: () => <Umbrella /> },
   corn: { w: 80, h: 136, draw: () => <Corn /> },
+  shell: { w: 104, h: 80, draw: () => <Shell /> },
+  roll: { w: 104, h: 56, draw: () => <Roll /> },
+  flipflops: { w: 96, h: 104, draw: () => <FlipFlops /> },
+  mattress: { w: 228, h: 44, draw: () => <Mattress /> },
+  nut: { w: 70, h: 70, draw: () => <Nut /> },
+  honey: { w: 80, h: 96, draw: () => <Honey /> },
+  berries: { w: 84, h: 108, draw: () => <Berries /> },
+  saw: { w: 180, h: 62, draw: () => <Saw /> },
+  stick: { w: 160, h: 64, draw: () => <Stick /> },
   snowshovel: { w: 90, h: 164, draw: () => <SnowShovel /> },
   seeds: { w: 84, h: 80, draw: () => <Seeds /> },
   sand: { w: 80, h: 100, draw: () => <SandBucket /> },
@@ -475,7 +720,7 @@ export interface Goal extends Picture {
   roll?: number;
 }
 
-export type GoalId = "kite" | "football" | "balloon" | "loco" | "nose";
+export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy" | "sailboat" | "nose";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
@@ -493,6 +738,9 @@ export const GOALS: Record<GoalId, Goal> = {
     carry: "string",
   },
   loco: { w: 130, h: 116, draw: () => <Loco />, carry: "hands" },
+  pail: { w: 104, h: 170, draw: () => <Pail />, carry: "hands" },
+  teddy: { w: 96, h: 116, draw: () => <TeddyBear />, carry: "hands" },
+  sailboat: { w: 132, h: 150, draw: () => <Sailboat />, carry: "hands" },
   // Its picture is the snowman with its nose, which is what the child wants; in the world it is the carrot.
   nose: { w: 250, h: 356, draw: () => <Snowman nose />, world: () => <Nose />, carry: "hands" },
 };

@@ -76,7 +76,7 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
   `nope` (the funny sound for a wrong thing), `frees: true` only on the last one, which
   gives the goal back, and `why` – the thought bubble that says why the thing helps:
   `{ wants: [x, y] }` for a creature (or plants) thinking of what it wants, the bubble's tip just above its
-  head (it grows to the right, away from the child), or `{ worry: "wet" | "splash" | "dark" | "dig" }`
+  head (it grows to the right, away from the child), or `{ worry: "wet" | "splash" | "dark" | "dig" | "hot" }`
   for the child thinking of what would happen (`worries.tsx`; draw a new worry there when none fits).
   Drachen: dog → ball, horse → carrot, stream → plank, dark
   tunnel → lantern, squirrel with the kite → apple.
@@ -94,9 +94,14 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
   be the level's ground before the fork and after the way. The child taps a sign or 1 / 2;
   the level draws only the signpost. Put the first station of each way within ~800
   points of the fork, so both ghosts are on the screen. Ways contain no further forks.
+- **On water** (G-08, „Das Floß“): `raft: { Raft, until }` puts the child on a raft from the
+  start; it paddles instead of walking up to `until`, which must be a `climb` (a ladder onto a
+  jetty), where the raft stays behind. An obstacle with `float: { to, put }` lets the child
+  float slowly down the ground points `to` after it is solved, holding the thing up (the umbrella
+  down the waterfall), and then put it down at `put` (the drawing shows it there from then on).
 
 The world drawing (`drachen.tsx`) exports the ground constants, `<Level>Scenery` and
-`<Level>Backdrop`. `Scenery` gets `{ done, here, nope }` and draws every station from
+`<Level>Backdrop`. `Scenery` gets `{ done, here, nope, party }` (`party`: the goal is back) and draws every station from
 them:
 
 - a pickup is drawn only while `!done.includes(id)` (`<Shed plank={!done.includes("plank")} />`);
@@ -151,9 +156,10 @@ points with their times, then `to`; `sway` swings them (120 for the kite, 0 for 
 4. **Add the data** to `levels.ts`: the `TrailLevel` with stations, sounds from
    `@/lib/sfx` (add a new sound to the fitting topic file there, built on `note()`),
    short German sentences in the present tense. Append it to `TRAIL_LEVELS`.
-   The level comes in German only: Russian lines in `src/games/elevator/ru.ts` are written only when
-   the user asks for them (a sentence without one is said in German). When you change a German sentence
-   that already has a Russian line, delete or update that line (`ru.test.ts` fails on a left-over one).
+   The level comes in German only: its lines in the phrasebooks (`src/games/elevator/en.ts`, `ru.ts`, …) are
+   written only when the user asks for them, and until then the whole level is said in German (its title has no
+   translation). Add a German-only row part for it in `src/content/ideas/languageStatus.ts`. When you change a
+   German sentence that already has translations, delete or update them (`phrases.test.ts` fails on a left-over one).
 5. **Add a mode** in `ElevatorGame.tsx`: `{ id: "<level id>", emoji, title: title("…"), kind: t(TRAIL) }` after the
    other trail levels. If the start-screen note mentions the levels or keys, keep it true.
 6. **The cards pick it up**: `cards.tsx` builds the end cards from `TRAIL_LEVELS` and
