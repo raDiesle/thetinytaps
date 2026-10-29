@@ -53,6 +53,18 @@
 }
 
 /*
+ * The ✕ and the fullscreen button sit on every game's picture, light or dark (night sky, space, a dark room):
+ * a pale, see-through disc with a thin dark edge and a dark sign stays findable on both, and still quiet.
+ */
+.play-fullscreen,
+.hold-exit {
+  background-color: #ffffff99;
+  box-shadow:
+    0 0 0 1px #0000001f,
+    0 1px 4px #00000026;
+}
+
+/*
  * Fullscreen on and off while playing, as quiet as the ✕ next to it. On computers always; on phones and
  * tablets only while out of fullscreen (switching apps leaves it), to get back in – never to leave it.
  */
@@ -64,14 +76,13 @@
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: #00000014;
   cursor: pointer;
 }
 
 .play-fullscreen .fullscreen-icon {
   width: 20px;
   height: 20px;
-  stroke: #00000055;
+  stroke: #0000008c;
 }
 
 .play-fullscreen:hover .fullscreen-icon {
@@ -98,8 +109,8 @@
   height: 44px;
   border: 0;
   border-radius: 50%;
-  background: conic-gradient(var(--ink) var(--progress, 0%), #00000014 0);
-  color: #00000055;
+  background-image: conic-gradient(var(--ink) var(--progress, 0%), transparent 0);
+  color: #0000008c;
   font-size: 1.1rem;
   cursor: pointer;
 }
