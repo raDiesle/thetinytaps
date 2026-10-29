@@ -225,6 +225,7 @@
 }
 
 .sock-cell {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -271,12 +272,47 @@
   border-radius: 18px;
 }
 
-/* The hop is quicker with Schwung (pairs found one after the other): its time comes as --fly-ms. */
 .sock.flying {
   z-index: 4;
   pointer-events: none;
-  transition-duration: var(--fly-ms), var(--fly-ms), var(--fly-ms), 0.25s;
-  animation: sock-hop var(--fly-ms) ease-in-out;
+  animation: sock-hop 0.8s ease-in-out;
+}
+
+/* A laundry basket over a sock, like a memory card: it drops once all socks lie, lifts while its sock is in hand and
+   comes back down when another one is taken. Taps go through it to the sock. */
+.sock-basket {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--sock-h) * 0.86);
+  height: calc(var(--sock-h) * 0.95);
+  margin: calc(var(--sock-h) * -0.475) 0 0 calc(var(--sock-h) * -0.43);
+  pointer-events: none;
+  filter: drop-shadow(0 5px 3px #00000033);
+  transition:
+    translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+    rotate 0.35s,
+    scale 0.35s,
+    opacity 0.4s;
+  animation: sock-basket-drop 0.5s cubic-bezier(0.5, 0, 0.75, 0) backwards;
+}
+
+.sock-basket.up {
+  z-index: 5;
+  translate: 30% -78%;
+  rotate: 18deg;
+  scale: 0.75;
+}
+
+.sock-basket.gone {
+  opacity: 0;
+}
+
+.sock-basket-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .sock.gone {
@@ -353,6 +389,16 @@
   50% {
     translate: 0 -18%;
     rotate: -6deg;
+  }
+}
+
+@keyframes sock-basket-drop {
+  from {
+    opacity: 0;
+    translate: 0 -60vh;
+  }
+  30% {
+    opacity: 1;
   }
 }
 

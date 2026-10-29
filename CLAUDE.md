@@ -139,6 +139,9 @@ In a fresh worktree run `bun install` first.
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice.
+- A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
+  some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
+  Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.
 - What the child taps to set things off is plainly marked (a glow, and a still hand pointing at it before the first tap)
   and lies wholly in the picture, clear of the edges and the ✕. Where the picture moves away from it, a big button
   brings it back.
@@ -161,7 +164,9 @@ In a fresh worktree run `bun install` first.
   computer (≥ 900 px wide with a mouse) see it always, also to leave fullscreen; on phones and tablets a game shows it
   only while out of fullscreen, so a child's tap can't end it. Starting or leaving a game in fullscreen must not make the browser
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
-  (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). On a computer the back link of a menu is big, yellow and
+  (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
+  lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
+  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them. On a computer the back link of a menu is big, yellow and
   fixed in the top left corner, so it never scrolls away; phones and tablets keep it small. A menu's title goes into
   `MenuHead` with that corner, which keeps the title clear of it (it moves right or wraps, never under the corner).
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
@@ -263,4 +268,4 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
-   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`.
+   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`, `?level=<n>` on `/socken/`.
