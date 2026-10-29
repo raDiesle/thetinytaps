@@ -28,6 +28,8 @@ export type ItemId =
   | "nut"
   | "honey"
   | "berries"
+  | "saw"
+  | "stick"
   | "dog";
 
 /** A drawing and its size, to fit it into a slot, a bubble or a card. */
@@ -445,6 +447,49 @@ export function TeddyBear() {
   );
 }
 
+/** A hand saw: a grey blade with teeth along its bottom edge, a red wooden handle on the left. */
+export function Saw() {
+  const teeth = Array.from({ length: 9 }, (_, i) => `L${-34 + i * 13} -8 L${-28 + i * 13} -16`).join(" ");
+  return (
+    <g>
+      <path d={`M-40 -16 L-40 -54 L84 -30 L84 -16 ${teeth} Z`} fill="#dee2e6" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M-30 -44 L70 -26" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+      <circle cx="60" cy="-28" r="4" fill="#868e96" />
+      <path d="M-40 -60 H-74 Q-90 -60 -90 -44 V-20 Q-90 -6 -74 -6 H-40 Z" fill="#e03131" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <rect x="-76" y="-46" width="26" height="24" rx="10" fill="#fff" stroke={INK} strokeWidth="3.5" />
+    </g>
+  );
+}
+
+/** A stick from a tree, lying on its side, with a twig and a leaf. */
+export function Stick() {
+  return (
+    <g>
+      <path d="M-74 -14 L70 -22" stroke={INK} strokeWidth="20" strokeLinecap="round" />
+      <path d="M-74 -14 L70 -22" stroke="#a0673a" strokeWidth="12" strokeLinecap="round" />
+      <path d="M-60 -16 L-20 -18 M10 -20 L50 -22" stroke="#d9a066" strokeWidth="3" strokeLinecap="round" />
+      <path d="M20 -20 L42 -46" stroke={INK} strokeWidth="11" strokeLinecap="round" />
+      <path d="M20 -20 L42 -46" stroke="#a0673a" strokeWidth="5" strokeLinecap="round" />
+      <path d="M42 -46 Q60 -66 76 -54 Q60 -36 42 -46 Z" fill="#69db7c" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The toy sailboat: a red hull, a white sail with a blue stripe and a yellow flag; it floats with the hull's bottom on (0, 0). */
+export function Sailboat() {
+  return (
+    <g>
+      <path d="M2 -26 V-132" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+      <path d="M8 -128 Q46 -84 52 -36 H8 Z" fill="#fff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M8 -78 Q32 -76 46 -70" stroke="#4dabf7" strokeWidth="8" fill="none" />
+      <path d="M-4 -118 Q-30 -76 -36 -40 H-4 Z" fill="#fff" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M2 -132 L26 -140 L2 -148 Z" fill="#ffd43b" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-62 -34 H64 L44 -2 Q0 4 -44 -2 Z" fill="#fa5252" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      <path d="M-50 -22 H52" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+}
+
 /** The wooden toy locomotive: red boiler, blue cab, yellow chimney, black wheels on (0, 0); it faces right. */
 export function Loco() {
   return (
@@ -525,6 +570,8 @@ export const ITEMS: Record<ItemId, Picture> = {
   nut: { w: 70, h: 70, draw: () => <Nut /> },
   honey: { w: 80, h: 96, draw: () => <Honey /> },
   berries: { w: 84, h: 108, draw: () => <Berries /> },
+  saw: { w: 180, h: 62, draw: () => <Saw /> },
+  stick: { w: 160, h: 64, draw: () => <Stick /> },
   /** Not a thing: the dog that walks along (`friends.tsx`), its picture in the backpack. */
   dog: { w: 100, h: 134, draw: () => <DogFace /> },
 };
@@ -539,7 +586,7 @@ export interface Goal extends Picture {
   roll?: number;
 }
 
-export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy";
+export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy" | "sailboat";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
@@ -559,6 +606,7 @@ export const GOALS: Record<GoalId, Goal> = {
   loco: { w: 130, h: 116, draw: () => <Loco />, carry: "hands" },
   pail: { w: 104, h: 170, draw: () => <Pail />, carry: "hands" },
   teddy: { w: 96, h: 116, draw: () => <TeddyBear />, carry: "hands" },
+  sailboat: { w: 132, h: 150, draw: () => <Sailboat />, carry: "hands" },
 };
 
 /** `picture` scaled to fit a `width` × `height` box around (0, 0). */

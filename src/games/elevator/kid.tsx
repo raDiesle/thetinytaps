@@ -67,7 +67,9 @@ export type Pose =
   // Trail adventures: taking a thing (arm out, still), holding it up high, reaching back into the backpack.
   | "take"
   | "lift"
-  | "pack";
+  | "pack"
+  // On a raft: both hands on the paddle, which strokes through the water.
+  | "paddle";
 
 /** What the child wears; "barefoot" and "flipflops" are for the beach (feet instead of shoes). */
 export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat" | "barefoot" | "flipflops";
@@ -111,6 +113,22 @@ function leftArm(pose: Pose, front: boolean, umbrella: boolean): Arm {
   if (pose === "tummy") return "belly";
   if (pose === "pack") return "back";
   return front ? "front" : "down";
+}
+
+/** Both arms holding the paddle at the child's right side, its blade down in the water beside the raft (pose
+ * "paddle"); the whole group strokes back and forth. */
+function Paddle({ sleeve }: { sleeve: string }) {
+  return (
+    <g className="el-paddle">
+      <path d="M-22 -100 Q-6 -126 24 -120" stroke={sleeve} strokeWidth="14" strokeLinecap="round" fill="none" />
+      <path d="M8 -154 L90 16" stroke={INK} strokeWidth="10" strokeLinecap="round" />
+      <path d="M8 -154 L90 16" stroke="#c08552" strokeWidth="5" strokeLinecap="round" />
+      <ellipse cx="94" cy="26" rx="13" ry="30" transform="rotate(-26 94 26)" fill="#fcc419" stroke={INK} strokeWidth="4" />
+      <path d="M22 -100 Q44 -86 52 -64" stroke={sleeve} strokeWidth="14" strokeLinecap="round" fill="none" />
+      <circle cx="24" cy="-120" r="8" fill={SKIN} />
+      <circle cx="52" cy="-62" r="8" fill={SKIN} />
+    </g>
+  );
 }
 
 /** The backpack's colours, shared with the big backpack on the screen that shows what is in it. */
@@ -339,25 +357,28 @@ export function Kid({
         )}
         {backpack && <path d="M-20 -106 Q-25 -80 -21 -52 M19 -106 Q24 -80 20 -52" stroke={PACK.dark} strokeWidth="7" strokeLinecap="round" fill="none" />}
         {front && <g transform={`translate(0 -54) scale(${front.scale})`}>{front.draw()}</g>}
+        {pose === "paddle" && <Paddle sleeve={sleeve} />}
         {/* Arms */}
-        <g className="el-arm el-arm-l" style={{ transformOrigin: "-22px -100px" }}>
-          {/* Drawn as a right arm and mirrored */}
-          <g transform="scale(-1 1)">
-            <path d={left.d} stroke={sleeve} strokeWidth="14" strokeLinecap="round" fill="none" />
-            <circle cx={lx} cy={ly} r="8" fill={SKIN} />
-            {umbrella &&
-              (left === ARMS.side ? (
-                <g transform={`translate(${lx} ${ly + 4}) rotate(12) scale(0.74)`}>
-                  <OpenUmbrella />
-                </g>
-              ) : (
-                <g transform={`translate(${lx + 4} 2) scale(0.42)`}>
-                  <Umbrella />
-                </g>
-              ))}
+        {pose !== "paddle" && (
+          <g className="el-arm el-arm-l" style={{ transformOrigin: "-22px -100px" }}>
+            {/* Drawn as a right arm and mirrored */}
+            <g transform="scale(-1 1)">
+              <path d={left.d} stroke={sleeve} strokeWidth="14" strokeLinecap="round" fill="none" />
+              <circle cx={lx} cy={ly} r="8" fill={SKIN} />
+              {umbrella &&
+                (left === ARMS.side ? (
+                  <g transform={`translate(${lx} ${ly + 4}) rotate(12) scale(0.74)`}>
+                    <OpenUmbrella />
+                  </g>
+                ) : (
+                  <g transform={`translate(${lx + 4} 2) scale(0.42)`}>
+                    <Umbrella />
+                  </g>
+                ))}
+            </g>
           </g>
-        </g>
-        {!sitting && rightArmEl}
+        )}
+        {!sitting && pose !== "paddle" && rightArmEl}
         {/* Head */}
         <rect x="-7" y="-116" width="14" height="12" fill={SKIN} />
         <g className="el-head" style={{ transformOrigin: "0px -108px" }}>

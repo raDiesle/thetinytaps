@@ -105,6 +105,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-07, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
+      {
+        label: "⛵ Das Floß",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026), ebenso der Kartenhinweis „🛶 Paddeln“; bis zur Übersetzung spricht das Level ganz Deutsch.",
+      },
     ],
   },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },

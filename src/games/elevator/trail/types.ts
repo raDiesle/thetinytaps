@@ -69,6 +69,10 @@ export interface Obstacle extends StationBase {
   why: { wants: Point } | { worry: Worry };
   /** Solving it gives the goal back: it comes into the child's hands. */
   frees?: boolean;
+  /** Solved, the child floats down the ground points `to` by itself, slowly, and the thing goes along where it is, at
+   * `at` above the child (the open umbrella over the waterfall); then the child puts it down at `put` from its feet
+   * (the umbrella stuck into the raft), where the level's drawing shows it from then on. */
+  float?: { to: Point[]; put: Point };
   /** What the child wears from when it is solved on (the flip-flops on the hot sand): the thing is put on, not given. */
   wear?: Outfit[];
   /** The creature helped here walks along from now on, and its picture goes into the bag (G-10): `friend` is its
@@ -140,6 +144,9 @@ export interface TrailLevel {
   Scenery: ComponentType<SceneryProps>;
   /** Drawn in front of the goal (the sand that half hides the ball), behind the child. */
   Front?: ComponentType<SceneryProps>;
+  /** A raft the child stands on from the start and paddles instead of walking, until it gets off at `until` (where the
+   * raft stays behind). Its drawing stands on (0, 0) under the child's feet; `paddling` while it moves. */
+  raft?: { Raft: ComponentType<{ paddling: boolean; done: string[] }>; until: number };
   /** Far hills and clouds; they move slower than the world, which makes it deep. */
   Backdrop: ComponentType;
   /** The ground line the child walks on, from left to right; stairs are one point per step. */

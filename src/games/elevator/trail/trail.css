@@ -949,3 +949,100 @@
     transform: scale(1.3, 0.7);
   }
 }
+
+/* ---------- „Das Floß“ ---------- */
+
+/* While the child paddles, a little wake runs out behind the raft. */
+.tl-floss-wake {
+  animation: tl-floss-wake 0.6s ease-out infinite;
+}
+
+/* The saw goes back and forth across the branch, then it is gone; the cut part falls into the water and drifts off. */
+.tl-floss-sawing {
+  animation:
+    tl-floss-saw 0.25s ease-in-out 6 alternate,
+    tl-ball-away 1.6s ease-in both;
+}
+
+.tl-floss-limb.done {
+  animation: tl-floss-limb 1.6s ease-in 1.4s both;
+}
+
+/* The reeds bend aside, the ducklings come out and swim to their mother, she turns round, and off they all swim. */
+.tl-floss-reed {
+  transition: rotate 0.8s cubic-bezier(0.3, 1.4, 0.6, 1);
+}
+
+.tl-floss-chick {
+  transition: transform 1.2s ease-in-out;
+}
+
+.tl-floss-chick.out {
+  transform: translateX(84px);
+}
+
+.tl-floss-mother {
+  transition: transform 0.5s ease-in-out 1.6s;
+}
+
+.tl-floss-mother.done {
+  transform: scaleX(-1);
+}
+
+.tl-floss-family {
+  transition: transform 2s ease-in-out;
+}
+
+.tl-floss-family.done {
+  transform: translate(120px, -56px);
+}
+
+/* With the stick, the beaver gnaws it bite by bite, then goes back to its lodge. */
+.tl-floss-beaver {
+  transition: transform 1.4s ease-in-out 2.2s;
+}
+
+.tl-floss-beaver.done {
+  transform: translate(120px, -20px) scale(0.85);
+}
+
+.tl-floss-beaver.done .tl-floss-beaver-head {
+  animation: tl-munch 0.3s ease-in-out 0.4s 6 alternate;
+}
+
+.tl-nope .tl-floss-beaver-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes tl-floss-wake {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+}
+
+@keyframes tl-floss-saw {
+  from {
+    transform: translateX(-24px);
+  }
+  to {
+    transform: translateX(24px);
+  }
+}
+
+@keyframes tl-floss-limb {
+  30% {
+    transform: rotate(18deg);
+    opacity: 1;
+  }
+  to {
+    transform: translate(160px, 120px) rotate(40deg);
+    opacity: 0;
+  }
+}
