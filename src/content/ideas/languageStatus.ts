@@ -111,6 +111,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026), ebenso der Kartenhinweis „🛶 Paddeln“; bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
+        label: "🐈 Wo ist die Katze?",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-04, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
+      },
+      {
         label: "⛄ Der Schneemann",
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-06, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",

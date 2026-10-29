@@ -29,6 +29,8 @@ export type ItemId =
   | "berries"
   | "saw"
   | "stick"
+  | "yarn"
+  | "torch"
   | "snowshovel"
   | "seeds"
   | "sand"
@@ -261,136 +263,6 @@ export function Corn() {
         <path d="M-4 0 Q-40 -30 -32 -86 Q-18 -50 2 -24 Z" />
         <path d="M4 0 Q40 -30 32 -86 Q18 -50 -2 -24 Z" />
       </g>
-    </g>
-  );
-}
-
-/** A snow shovel, standing on its wide blue blade, with a red grip. */
-export function SnowShovel() {
-  return (
-    <g>
-      <rect x="-6" y="-150" width="12" height="112" rx="5" fill="#c08552" stroke={INK} strokeWidth="4" />
-      <rect x="-22" y="-160" width="44" height="14" rx="7" fill="#e03131" stroke={INK} strokeWidth="4" />
-      <path d="M-42 -46 H42 L36 0 H-36 Z" fill="#339af0" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
-      <path d="M-28 -36 V-10" stroke="#a5d8ff" strokeWidth="5" strokeLinecap="round" />
-    </g>
-  );
-}
-
-/** A small sack of bird seed, open at the top, the yellow seeds showing. */
-export function Seeds() {
-  const seeds: [number, number][] = [
-    [-12, -66],
-    [2, -70],
-    [14, -65],
-    [-2, -62],
-    [8, -74],
-  ];
-  return (
-    <g>
-      <path d="M-34 0 Q-46 -38 -26 -62 H26 Q46 -38 34 0 Z" fill="#c69a6a" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
-      <path d="M-20 -40 Q-14 -20 -18 -6 M14 -44 Q20 -24 16 -8" stroke="#a47148" strokeWidth="3" fill="none" strokeLinecap="round" />
-      <ellipse cx="0" cy="-62" rx="27" ry="9" fill="#ffd43b" stroke={INK} strokeWidth="3.5" />
-      {seeds.map(([x, y]) => (
-        <ellipse key={`${x}${y}`} cx={x} cy={y} rx="4" ry="2.5" fill="#e8a500" />
-      ))}
-      <path d="M-27 -52 Q0 -46 27 -52" stroke="#e03131" strokeWidth="5" fill="none" strokeLinecap="round" />
-    </g>
-  );
-}
-
-/** A red bucket full of sand, for icy paths. */
-export function SandBucket() {
-  return (
-    <g>
-      <path d="M-30 -58 Q0 -98 30 -58" stroke={INK} strokeWidth="4" fill="none" />
-      <path d="M-34 -58 Q0 -84 34 -58 Z" fill="#f4c27a" stroke="#c8913f" strokeWidth="3" strokeLinejoin="round" />
-      <path d="M-34 -56 H34 L26 0 H-26 Z" fill="#fa5252" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
-      <rect x="-38" y="-62" width="76" height="10" rx="4" fill="#e03131" stroke={INK} strokeWidth="4" />
-      <path d="M-20 -44 L-16 -10" stroke="#ffa8a8" strokeWidth="5" strokeLinecap="round" />
-    </g>
-  );
-}
-
-/** A round head of cabbage between its two big outer leaves. */
-export function Cabbage() {
-  return (
-    <g>
-      <g fill="#51cf66" stroke={INK} strokeWidth="3.5" strokeLinejoin="round">
-        <path d="M-6 0 Q-54 -4 -50 -48 Q-24 -52 -12 -28 Z" />
-        <path d="M6 0 Q54 -4 50 -48 Q24 -52 12 -28 Z" />
-      </g>
-      <circle cx="0" cy="-34" r="30" fill="#b2f2bb" stroke={INK} strokeWidth="4" />
-      <path d="M0 -6 Q-8 -34 0 -62 M-2 -40 Q-14 -44 -22 -54 M-2 -28 Q12 -34 22 -46" stroke="#2b8a3e" strokeWidth="3" fill="none" strokeLinecap="round" />
-    </g>
-  );
-}
-
-/** The snowman's nose: a carrot lying on its side, the thick end (with its leaves) on the left at (-52, -16), the
- * tip on the right; stuck into the snowman's face it has no leaves. */
-export function Nose({ leaves = true }: { leaves?: boolean }) {
-  return (
-    <g>
-      {leaves && (
-        <g fill="#51cf66" stroke="#2b8a3e" strokeWidth="3" strokeLinejoin="round">
-          <path d="M-50 -18 Q-70 -42 -80 -34 Q-68 -22 -50 -16 Z" />
-          <path d="M-50 -14 Q-72 -2 -80 -10 Q-66 -20 -50 -16 Z" />
-        </g>
-      )}
-      <path d="M-52 -32 Q-58 -16 -52 0 Q0 -6 56 -16 Q0 -26 -52 -32 Z" fill="#ff922b" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <path d="M-30 -24 v9 M-6 -22 v7 M18 -19 v5" stroke="#d9480f" strokeWidth="3" strokeLinecap="round" />
-    </g>
-  );
-}
-
-/** A snowman of three balls with a black hat, red scarf, coal eyes and stick arms, standing on (0, 0); with its
- * `nose` it smiles, without it looks sad. */
-export function Snowman({ nose }: { nose: boolean }) {
-  // Coal pieces in a smile, or turned down.
-  const mouth = nose
-    ? [
-        [-16, -242],
-        [-6, -237],
-        [6, -237],
-        [16, -242],
-      ]
-    : [
-        [-16, -234],
-        [-6, -239],
-        [6, -239],
-        [16, -234],
-      ];
-  return (
-    <g>
-      <g className="tl-snowman-arm" style={{ transformOrigin: "-48px -186px" }}>
-        <path d="M-48 -186 L-112 -232 M-92 -218 L-104 -246 M-92 -218 L-122 -214" stroke="#8d5a3b" strokeWidth="7" strokeLinecap="round" fill="none" />
-      </g>
-      <g className="tl-snowman-arm" style={{ transformOrigin: "48px -186px" }}>
-        <path d="M48 -186 L112 -232 M92 -218 L104 -246 M92 -218 L122 -214" stroke="#8d5a3b" strokeWidth="7" strokeLinecap="round" fill="none" />
-      </g>
-      <g fill="#fff" stroke="#74c0fc" strokeWidth="5">
-        <circle cx="0" cy="-70" r="70" />
-        <circle cx="0" cy="-180" r="52" />
-        <circle cx="0" cy="-262" r="40" />
-      </g>
-      {[-200, -178, -156].map((y) => (
-        <circle key={y} cx="0" cy={y} r="6" fill={INK} />
-      ))}
-      <path d="M-38 -226 Q0 -212 38 -226 L36 -212 Q0 -198 -36 -212 Z" fill="#e03131" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <path d="M20 -210 L30 -168 H46 L34 -212 Z" fill="#e03131" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
-      <circle cx="-14" cy="-276" r="5.5" fill={INK} />
-      <circle cx="14" cy="-276" r="5.5" fill={INK} />
-      {mouth.map(([x, y]) => (
-        <circle key={x} cx={x} cy={y} r="3.5" fill={INK} />
-      ))}
-      {nose && (
-        <g transform="translate(52 -248)">
-          <Nose leaves={false} />
-        </g>
-      )}
-      <rect x="-46" y="-302" width="92" height="12" rx="5" fill="#343a40" stroke={INK} strokeWidth="4" />
-      <rect x="-30" y="-352" width="60" height="54" rx="5" fill="#343a40" stroke={INK} strokeWidth="4" />
-      <rect x="-30" y="-312" width="60" height="10" fill="#e03131" />
     </g>
   );
 }
@@ -680,6 +552,136 @@ export function Kite({ tail = true }: { tail?: boolean }) {
   );
 }
 
+/** A snow shovel, standing on its wide blue blade, with a red grip. */
+export function SnowShovel() {
+  return (
+    <g>
+      <rect x="-6" y="-150" width="12" height="112" rx="5" fill="#c08552" stroke={INK} strokeWidth="4" />
+      <rect x="-22" y="-160" width="44" height="14" rx="7" fill="#e03131" stroke={INK} strokeWidth="4" />
+      <path d="M-42 -46 H42 L36 0 H-36 Z" fill="#339af0" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      <path d="M-28 -36 V-10" stroke="#a5d8ff" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A small sack of bird seed, open at the top, the yellow seeds showing. */
+export function Seeds() {
+  const seeds: [number, number][] = [
+    [-12, -66],
+    [2, -70],
+    [14, -65],
+    [-2, -62],
+    [8, -74],
+  ];
+  return (
+    <g>
+      <path d="M-34 0 Q-46 -38 -26 -62 H26 Q46 -38 34 0 Z" fill="#c69a6a" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d="M-20 -40 Q-14 -20 -18 -6 M14 -44 Q20 -24 16 -8" stroke="#a47148" strokeWidth="3" fill="none" strokeLinecap="round" />
+      <ellipse cx="0" cy="-62" rx="27" ry="9" fill="#ffd43b" stroke={INK} strokeWidth="3.5" />
+      {seeds.map(([x, y]) => (
+        <ellipse key={`${x}${y}`} cx={x} cy={y} rx="4" ry="2.5" fill="#e8a500" />
+      ))}
+      <path d="M-27 -52 Q0 -46 27 -52" stroke="#e03131" strokeWidth="5" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A red bucket full of sand, for icy paths. */
+export function SandBucket() {
+  return (
+    <g>
+      <path d="M-30 -58 Q0 -98 30 -58" stroke={INK} strokeWidth="4" fill="none" />
+      <path d="M-34 -58 Q0 -84 34 -58 Z" fill="#f4c27a" stroke="#c8913f" strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-34 -56 H34 L26 0 H-26 Z" fill="#fa5252" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      <rect x="-38" y="-62" width="76" height="10" rx="4" fill="#e03131" stroke={INK} strokeWidth="4" />
+      <path d="M-20 -44 L-16 -10" stroke="#ffa8a8" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A round head of cabbage between its two big outer leaves. */
+export function Cabbage() {
+  return (
+    <g>
+      <g fill="#51cf66" stroke={INK} strokeWidth="3.5" strokeLinejoin="round">
+        <path d="M-6 0 Q-54 -4 -50 -48 Q-24 -52 -12 -28 Z" />
+        <path d="M6 0 Q54 -4 50 -48 Q24 -52 12 -28 Z" />
+      </g>
+      <circle cx="0" cy="-34" r="30" fill="#b2f2bb" stroke={INK} strokeWidth="4" />
+      <path d="M0 -6 Q-8 -34 0 -62 M-2 -40 Q-14 -44 -22 -54 M-2 -28 Q12 -34 22 -46" stroke="#2b8a3e" strokeWidth="3" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** The snowman's nose: a carrot lying on its side, the thick end (with its leaves) on the left at (-52, -16), the
+ * tip on the right; stuck into the snowman's face it has no leaves. */
+export function Nose({ leaves = true }: { leaves?: boolean }) {
+  return (
+    <g>
+      {leaves && (
+        <g fill="#51cf66" stroke="#2b8a3e" strokeWidth="3" strokeLinejoin="round">
+          <path d="M-50 -18 Q-70 -42 -80 -34 Q-68 -22 -50 -16 Z" />
+          <path d="M-50 -14 Q-72 -2 -80 -10 Q-66 -20 -50 -16 Z" />
+        </g>
+      )}
+      <path d="M-52 -32 Q-58 -16 -52 0 Q0 -6 56 -16 Q0 -26 -52 -32 Z" fill="#ff922b" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <path d="M-30 -24 v9 M-6 -22 v7 M18 -19 v5" stroke="#d9480f" strokeWidth="3" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A snowman of three balls with a black hat, red scarf, coal eyes and stick arms, standing on (0, 0); with its
+ * `nose` it smiles, without it looks sad. */
+export function Snowman({ nose }: { nose: boolean }) {
+  // Coal pieces in a smile, or turned down.
+  const mouth = nose
+    ? [
+        [-16, -242],
+        [-6, -237],
+        [6, -237],
+        [16, -242],
+      ]
+    : [
+        [-16, -234],
+        [-6, -239],
+        [6, -239],
+        [16, -234],
+      ];
+  return (
+    <g>
+      <g className="tl-snowman-arm" style={{ transformOrigin: "-48px -186px" }}>
+        <path d="M-48 -186 L-112 -232 M-92 -218 L-104 -246 M-92 -218 L-122 -214" stroke="#8d5a3b" strokeWidth="7" strokeLinecap="round" fill="none" />
+      </g>
+      <g className="tl-snowman-arm" style={{ transformOrigin: "48px -186px" }}>
+        <path d="M48 -186 L112 -232 M92 -218 L104 -246 M92 -218 L122 -214" stroke="#8d5a3b" strokeWidth="7" strokeLinecap="round" fill="none" />
+      </g>
+      <g fill="#fff" stroke="#74c0fc" strokeWidth="5">
+        <circle cx="0" cy="-70" r="70" />
+        <circle cx="0" cy="-180" r="52" />
+        <circle cx="0" cy="-262" r="40" />
+      </g>
+      {[-200, -178, -156].map((y) => (
+        <circle key={y} cx="0" cy={y} r="6" fill={INK} />
+      ))}
+      <path d="M-38 -226 Q0 -212 38 -226 L36 -212 Q0 -198 -36 -212 Z" fill="#e03131" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <path d="M20 -210 L30 -168 H46 L34 -212 Z" fill="#e03131" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <circle cx="-14" cy="-276" r="5.5" fill={INK} />
+      <circle cx="14" cy="-276" r="5.5" fill={INK} />
+      {mouth.map(([x, y]) => (
+        <circle key={x} cx={x} cy={y} r="3.5" fill={INK} />
+      ))}
+      {nose && (
+        <g transform="translate(52 -248)">
+          <Nose leaves={false} />
+        </g>
+      )}
+      <rect x="-46" y="-302" width="92" height="12" rx="5" fill="#343a40" stroke={INK} strokeWidth="4" />
+      <rect x="-30" y="-352" width="60" height="54" rx="5" fill="#343a40" stroke={INK} strokeWidth="4" />
+      <rect x="-30" y="-312" width="60" height="10" fill="#e03131" />
+    </g>
+  );
+}
+
 /** The things of the bag, for the slots and the throws. */
 export const ITEMS: Record<ItemId, Picture> = {
   ball: { w: 64, h: 64, draw: () => <Ball /> },
@@ -704,11 +706,66 @@ export const ITEMS: Record<ItemId, Picture> = {
   berries: { w: 84, h: 108, draw: () => <Berries /> },
   saw: { w: 180, h: 62, draw: () => <Saw /> },
   stick: { w: 160, h: 64, draw: () => <Stick /> },
+  yarn: { w: 76, h: 76, draw: () => <Yarn /> },
+  torch: { w: 52, h: 124, draw: () => <Torch /> },
   snowshovel: { w: 90, h: 164, draw: () => <SnowShovel /> },
   seeds: { w: 84, h: 80, draw: () => <Seeds /> },
   sand: { w: 80, h: 100, draw: () => <SandBucket /> },
   cabbage: { w: 110, h: 70, draw: () => <Cabbage /> },
 };
+
+/** A ball of pink wool, its thread wound round and its loose end hanging down. */
+export function Yarn() {
+  return (
+    <g>
+      <path d="M22 -10 Q40 -2 34 10" stroke="#c2255c" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <circle cx="0" cy="-32" r="32" fill="#f783ac" stroke={INK} strokeWidth="4" />
+      <g stroke="#c2255c" strokeWidth="3.5" fill="none" strokeLinecap="round">
+        <path d="M-24 -52 Q4 -40 18 -2" />
+        <path d="M-31 -38 Q0 -26 8 1" />
+        <path d="M-12 -62 Q16 -48 28 -16" />
+        <path d="M-28 -18 Q-6 -36 22 -56" />
+      </g>
+      <ellipse cx="-12" cy="-46" rx="7" ry="5" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
+/** A torch standing on its end, the glass at the top; `lit` makes the glass shine. */
+export function Torch({ lit = false }: { lit?: boolean }) {
+  return (
+    <g>
+      <rect x="-15" y="-88" width="30" height="88" rx="8" fill="#fcc419" stroke={INK} strokeWidth="4" />
+      <path d="M-15 -70 H15 M-15 -20 H15" stroke="#e8a500" strokeWidth="4" />
+      <rect x="-7" y="-56" width="14" height="20" rx="4" fill="#e03131" stroke={INK} strokeWidth="3" />
+      <path d="M-15 -86 L-24 -112 H24 L15 -86 Z" fill="#495057" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <ellipse cx="0" cy="-114" rx="25" ry="8" fill={lit ? "#ffe066" : "#e7f5ff"} stroke={INK} strokeWidth="4" />
+    </g>
+  );
+}
+
+/** A cat standing, looking right: orange with darker stripes and a white chest; `colour` for a grey or black one. */
+export function Cat({ colour = "#ffa94d", stripe = "#e8590c" }: { colour?: string; stripe?: string }) {
+  return (
+    <g>
+      <path d="M-44 -40 Q-74 -44 -70 -82 Q-68 -96 -58 -96" stroke={INK} strokeWidth="16" strokeLinecap="round" fill="none" />
+      <path d="M-44 -40 Q-74 -44 -70 -82 Q-68 -96 -58 -96" stroke={colour} strokeWidth="9" strokeLinecap="round" fill="none" />
+      {[-34, -16, 14, 30].map((x) => (
+        <rect key={x} x={x - 6} y="-34" width="12" height="34" rx="5" fill={colour} stroke={INK} strokeWidth="3.5" />
+      ))}
+      <ellipse cx="-4" cy="-40" rx="46" ry="22" fill={colour} stroke={INK} strokeWidth="4" />
+      <path d="M-20 -60 V-46 M-6 -62 V-48 M8 -61 V-48" stroke={stripe} strokeWidth="5" strokeLinecap="round" />
+      <path d="M26 -84 L24 -112 L44 -92 Z M50 -94 L66 -112 L68 -84 Z" fill={colour} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <circle cx="44" cy="-70" r="26" fill={colour} stroke={INK} strokeWidth="4" />
+      <ellipse cx="50" cy="-56" rx="14" ry="9" fill="#fff" />
+      <circle cx="40" cy="-74" r="3.5" fill={INK} />
+      <circle cx="58" cy="-74" r="3.5" fill={INK} />
+      <path d="M47 -64 l3 3 l3 -3 Z" fill="#ff8fa3" stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M44 -58 q6 4 12 0" stroke={INK} strokeWidth="2" fill="none" />
+      <path d="M62 -62 H82 M62 -58 L80 -52 M38 -62 H20 M38 -58 L22 -52" stroke={INK} strokeWidth="1.8" />
+    </g>
+  );
+}
 
 /** What a level is about: its picture, and how the child carries it in the world. */
 export interface Goal extends Picture {
@@ -718,9 +775,11 @@ export interface Goal extends Picture {
   carry: "string" | "hands";
   /** For a ball: its radius; it turns as it rolls along. */
   roll?: number;
+  /** It looks the way it moves (the cat running up the stairs); its drawing looks right. */
+  turn?: boolean;
 }
 
-export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy" | "sailboat" | "nose";
+export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy" | "sailboat" | "cat" | "nose";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
@@ -741,6 +800,7 @@ export const GOALS: Record<GoalId, Goal> = {
   pail: { w: 104, h: 170, draw: () => <Pail />, carry: "hands" },
   teddy: { w: 96, h: 116, draw: () => <TeddyBear />, carry: "hands" },
   sailboat: { w: 132, h: 150, draw: () => <Sailboat />, carry: "hands" },
+  cat: { w: 160, h: 116, draw: () => <Cat />, carry: "hands", turn: true },
   // Its picture is the snowman with its nose, which is what the child wants; in the world it is the carrot.
   nose: { w: 250, h: 356, draw: () => <Snowman nose />, world: () => <Nose />, carry: "hands" },
 };

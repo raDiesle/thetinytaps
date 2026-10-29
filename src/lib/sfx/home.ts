@@ -252,3 +252,9 @@ export function playClick() {
   note({ from: 2600, to: 1800, duration: 0.03, type: "square", volume: 0.08, lowpass: 3500 });
   note({ from: 400, to: 200, duration: 0.05, type: "triangle", volume: 0.1, delay: 0.01 });
 }
+
+/** "Ding-dong!" – a doorbell: a high note, then a lower one. */
+export function playDoorbell() {
+  note({ from: 1319, duration: 0.7, type: "sine", volume: 0.2 });
+  note({ from: 1047, duration: 1.1, type: "sine", volume: 0.2, delay: 0.42 });
+}
