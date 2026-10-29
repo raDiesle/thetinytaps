@@ -89,20 +89,13 @@ test("the steps only get harder, and the first is the easiest", () => {
   expect(SHADOW_LEVELS[0]).toEqual({ shadows: 2, alike: false });
 });
 
-test("quick and sure goes up, slow or unsure goes down, never past the ends", () => {
-  const quick = { misses: 0, ms: 2000 };
-  expect(nextLevel(0, [quick])).toBe(0);
-  expect(nextLevel(0, [quick, quick])).toBe(1);
-  expect(nextLevel(SHADOW_LEVELS.length - 1, [quick, quick])).toBe(SHADOW_LEVELS.length - 1);
-  expect(nextLevel(2, [{ misses: 0, ms: 9000 }, quick])).toBe(2);
-  expect(nextLevel(2, [{ misses: 2, ms: 3000 }])).toBe(1);
-  expect(nextLevel(2, [{ misses: 0, ms: 20000 }])).toBe(1);
-  expect(nextLevel(2, [{ misses: 1, ms: 3000 }])).toBe(2);
-  expect(
-    nextLevel(2, [
-      { misses: 1, ms: 3000 },
-      { misses: 1, ms: 3000 },
-    ]),
-  ).toBe(1);
-  expect(nextLevel(0, [{ misses: 3, ms: 30000 }])).toBe(0);
+test("sure goes up, unsure goes down, never past the ends", () => {
+  expect(nextLevel(0, [0])).toBe(0);
+  expect(nextLevel(0, [0, 0])).toBe(1);
+  expect(nextLevel(SHADOW_LEVELS.length - 1, [0, 0])).toBe(SHADOW_LEVELS.length - 1);
+  expect(nextLevel(2, [1, 0])).toBe(2);
+  expect(nextLevel(2, [2])).toBe(1);
+  expect(nextLevel(2, [1])).toBe(2);
+  expect(nextLevel(2, [1, 1])).toBe(1);
+  expect(nextLevel(0, [3])).toBe(0);
 });

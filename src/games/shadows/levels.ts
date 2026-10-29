@@ -18,29 +18,18 @@ export const SHADOW_LEVELS: ShadowLevel[] = [
   { shadows: 6, alike: true },
 ];
 
-/** How one picture went: wrong shadows tapped before the right one, and the time it took. */
-export interface RoundResult {
-  misses: number;
-  ms: number;
-}
-
-/** Quick enough for a step up, when no shadow was wrong. */
-const QUICK_MS = 5000;
-/** This slow, the step was too hard. */
-const SLOW_MS = 15000;
-
 /**
- * The step after a picture, from the pictures played on the current step (newest last): two quick ones without a
- * miss go one up; two wrong shadows, a long wait, or a miss in two pictures in a row go one down.
+ * The step after a picture, from the wrong shadows tapped in each picture on the current step (newest last): two
+ * pictures without one go one up; two in one picture, or one in each of two pictures in a row, go one down. Time
+ * plays no part: a slow but sure child climbs too, and nothing asks it to be quick.
  */
-export function nextLevel(level: number, results: RoundResult[]): number {
-  const last = results.at(-1);
-  if (!last) return level;
-  const recent = results.slice(-2);
+export function nextLevel(level: number, misses: number[]): number {
+  const last = misses.at(-1);
+  if (last === undefined) return level;
+  const recent = misses.slice(-2);
   let step = 0;
-  if (last.misses >= 2 || last.ms >= SLOW_MS) step = -1;
-  else if (recent.length === 2 && recent.every((r) => r.misses > 0)) step = -1;
-  else if (recent.length === 2 && recent.every((r) => r.misses === 0 && r.ms <= QUICK_MS)) step = 1;
+  if (last >= 2 || (recent.length === 2 && recent.every((m) => m > 0))) step = -1;
+  else if (recent.length === 2 && recent.every((m) => m === 0)) step = 1;
   return Math.max(0, Math.min(SHADOW_LEVELS.length - 1, level + step));
 }
 

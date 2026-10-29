@@ -6,7 +6,7 @@ import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
 import { ITEMS, SHADOW_TEXTS, type ShadowItem } from "./content";
 import { useDeck } from "./deck";
-import { dealShadows, nextLevel, SHADOW_LEVELS, type RoundResult } from "./levels";
+import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
 
 /** A finger that moves less than this is a tap, not a drag. */
@@ -105,10 +105,9 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const themeRef = useRef(theme);
   /** The difficulty step (an index into `SHADOW_LEVELS`); every visit begins on the first. */
   const levelRef = useRef(0);
-  /** How the pictures on the current step went, newest last; cleared on each step up or down. */
-  const resultsRef = useRef<RoundResult[]>([]);
-  /** When the current picture came and how many wrong shadows were tapped since. */
-  const roundStartRef = useRef(0);
+  /** The wrong shadows tapped in each picture on the current step, newest last; cleared on each step up or down. */
+  const resultsRef = useRef<number[]>([]);
+  /** Wrong shadows tapped in the current picture. */
   const missesRef = useRef(0);
 
   const later = useCallback((ms: number, run: () => void) => {
@@ -145,7 +144,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     const item = drawRef.current();
     const shadows = dealShadows(item, poolRef.current, SHADOW_LEVELS[levelRef.current]);
     const next = { id: nextId.current++, item, shadows, correct: shadows.indexOf(item) };
-    roundStartRef.current = performance.now();
     missesRef.current = 0;
     setRound(next);
     setDrag(null);
@@ -195,7 +193,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
     }
 
     // How this picture went decides the next one's step.
-    const results = [...resultsRef.current, { misses: missesRef.current, ms: performance.now() - roundStartRef.current }];
+    const results = [...resultsRef.current, missesRef.current];
     const level = nextLevel(levelRef.current, results);
     resultsRef.current = level === levelRef.current ? results : [];
     levelRef.current = level;

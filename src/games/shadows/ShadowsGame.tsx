@@ -38,7 +38,7 @@ export function ShadowsGame() {
           </p>
           <p>
             {t({
-              de: "Das Spiel fängt leicht an, mit zwei Schatten von ganz verschiedenen Dingen. Findet Ihr Kind die Schatten schnell und sicher, kommen mehr dazu (bis zu sechs) und dann ähnliche, etwa nur Tiere; dauert es lange oder geht vieles daneben, wird es wieder leichter.",
+              de: "Das Spiel fängt leicht an, mit zwei Schatten von ganz verschiedenen Dingen. Findet Ihr Kind die Schatten sicher, kommen mehr dazu (bis zu sechs) und dann ähnliche, etwa nur Tiere; geht vieles daneben, wird es wieder leichter. Es gibt keine Uhr: Wie lange es dauert, zählt nicht.",
             })}
           </p>
           <p>

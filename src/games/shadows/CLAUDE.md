@@ -4,7 +4,7 @@ Route `/schatten/`.
 
 Its card plays at once (`startMode`): there is nothing to choose before playing. A picture looks for its shadow among 2–6 black ones (the same emoji with `filter: brightness(0)`); tap the right shadow or drag the picture onto it, or choose with arrow keys + Enter / 1–6. A wrong shadow shows its colours for a moment (spoken: "Das ist die Giraffe."). Pictures and texts in `content.ts`, by theme (Tiere, Fahrzeuge, Essen, Dinge).
 
-**Difficulty** (`SHADOW_LEVELS`, `nextLevel`, `dealShadows` in `levels.ts`, like Socken-Paare): it begins with 2 shadows of different kinds (an animal among a car and a banana), then 3, then 3 of the same kind (`alike`), up to 6. After each picture, from the pictures played on the current step: two quick ones (≤ 5 s) without a wrong shadow → one up; two wrong shadows, ≥ 15 s, or a wrong shadow in two pictures in a row → one down. Every visit begins on the first step.
+**Difficulty** (`SHADOW_LEVELS`, `nextLevel`, `dealShadows` in `levels.ts`, like Socken-Paare): it begins with 2 shadows of different kinds (an animal among a car and a banana), then 3, then 3 of the same kind (`alike`), up to 6. After each picture, from the wrong shadows tapped in the pictures on the current step: two pictures in a row without one → one up; two in one picture, or one in each of two pictures in a row → one down. Time plays no part (a slow but sure child climbs too). Every visit begins on the first step.
 
 **Kind of pictures**: mixed at the start of every visit (not saved). The button in the top left corner (its emoji; four small ones for mixed) opens a row of five emoji buttons below it: mixed, Tiere, Fahrzeuge, Essen, Dinge. Picking one brings a new picture of it at once, on the same step; a tap anywhere else closes the row. With one kind only, `alike` makes no difference.
 
@@ -15,6 +15,7 @@ Its card plays at once (`startMode`): there is nothing to choose before playing.
 - No text on the screen while playing: no question, no names under the pictures or on a wrong shadow, no numbers. What is said comes only with Vorlesen; the pictures carry their names only as `aria-label`.
 - No options: no start screen before playing and no settings. Difficulty comes from `nextLevel`, the kind of pictures from the button while playing – the user asked for both.
 - A wrong shadow never shows or sounds as wrong; it only feeds `nextLevel`.
+- Harder means more shadows and closer outlines, never quicker: no clock, and time doesn't count for the difficulty.
 
 ## Languages
 
