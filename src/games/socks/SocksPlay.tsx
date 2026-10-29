@@ -1,29 +1,40 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { GameEnd } from "@/components/GameEnd";
-import { playBoing, playCountNote, playKnock, playMelody, playPlop, playRandomNote, playWash } from "@/lib/sfx";
+import { playBoing, playCountNote, playKnock, playMelody, playPlop, playRandomNote, playTwinkle, playWash, playWhoosh } from "@/lib/sfx";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
+import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { dealPairs, MAX_PAIRS, oneOf, SOCK_TEXTS, shuffle, type SockLook } from "./content";
+import { dealPairs, nextLevel, oneOf, SOCK_LEVELS, SOCK_TEXTS, shuffle, type SockLook } from "./content";
 import { Peg, SockDrawing, WashingMachine } from "./drawings";
 import type { SocksSettings } from "./settings";
 
+/** The full machine stands still for a moment before it starts on its own. */
+const INTRO_MS = 600;
 /** How long the drum turns before the door opens; matches the drum animation in socks.css. */
 const WASH_MS = 2400;
-/** Between two socks falling out of the machine. */
+/** Between two socks falling out of the machine, on the first step; it gets quicker as the child climbs. */
 const TUMBLE_STEP_MS = 110;
-/** A pair's hop from the floor onto the line; matches `.sock.flying` in socks.css. */
+/** How long one sock takes to tumble onto the floor; matches `.sock-cell` in socks.css. */
+const TUMBLE_MS = 600;
+/** A pair's hop from the floor onto the line, without any Schwung; matches `.sock` in socks.css. */
 const FLY_MS = 800;
-/** After the last pair hangs: time for the party before „Nochmal / Weiter“ show. */
-const END_DELAY_MS = 1800;
+/** The quickest hop, with much Schwung. */
+const FLY_MIN_MS = 420;
+/** After the last pair hangs: they jump for joy before the line is pulled away. */
+const CHEER_MS = 1500;
+/** The line with all socks is pulled out of the picture; matches `sock-line-pull` in socks.css. */
+const PULL_MS = 1000;
 /** Width of the sock drawing as a share of its height (its viewBox is 64 × 96). */
 const SOCK_ASPECT = 64 / 96;
 /** The biggest a sock on the floor gets, on a large screen with few socks. */
 const MAX_SOCK_PX = 170;
 
-/** ready: the full machine waits for a tap; washing: the drum turns; sorting: socks on the floor; done: all on the line. */
-type Phase = "ready" | "washing" | "sorting" | "done";
+/**
+ * intro: only the full machine; washing: the drum turns; sorting: socks on the floor; cheer: all on the line, they jump;
+ * pull: the line is pulled out of the picture, then the next socks tumble out (sorting again).
+ */
+type Phase = "intro" | "washing" | "sorting" | "cheer" | "pull";
 
 /** One sock lying on the floor, a little crooked. */
 interface FloorSock {
@@ -35,25 +46,28 @@ interface FloorSock {
 
 interface Round {
   id: number;
+  /** The difficulty step it was dealt at (an index into `SOCK_LEVELS`). */
+  level: number;
   looks: SockLook[];
   socks: FloorSock[];
 }
 
-/** Where a sock flies to on the line, relative to where it lies. */
+/** Where a sock flies to on the line, relative to where it lies, and how long it takes. */
 interface Flight {
   x: number;
   y: number;
   scale: number;
+  ms: number;
 }
 
-function newRound(id: number, settings: SocksSettings, pairs: number): Round {
-  const looks = dealPairs(settings.mode, pairs);
+function newRound(id: number, level: number): Round {
+  const looks = dealPairs(SOCK_LEVELS[level]);
   const socks = shuffle(looks.flatMap((_, pair) => [pair, pair])).map((pair) => ({
     pair,
     rotate: Math.round(Math.random() * 60 - 30),
     shift: [Math.round(Math.random() * 20 - 10), Math.round(Math.random() * 16 - 8)] as [number, number],
   }));
-  return { id, looks, socks };
+  return { id, level, looks, socks };
 }
 
 /** Columns and sock height that give `count` socks the most room in a `width` × `height` box. */
@@ -67,15 +81,20 @@ function fitPile(count: number, width: number, height: number) {
   return best;
 }
 
+/** Socks tumble out a little quicker on each step up. */
+const tumbleStep = (level: number) => Math.max(60, TUMBLE_STEP_MS - level * 5);
+
 const centre = (r: DOMRect) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
 
-/** "Socken-Paare" (N-45): the washing machine spins, socks tumble out, two same ones hop onto the line together. */
+/**
+ * "Socken-Paare" (N-45): the washing machine spins by itself, socks tumble out, two same ones hop onto the line
+ * together. When all hang, the line is pulled away and the next wash tumbles out, harder or easier by how it went.
+ */
 export function SocksPlay({ settings }: { settings: SocksSettings }) {
   const language = useAppLanguage();
   const texts = useT()(SOCK_TEXTS);
-  const [pairs, setPairs] = useState(Number(settings.pairs));
-  const [round, setRound] = useState(() => newRound(0, settings, pairs));
-  const [phase, setPhase] = useState<Phase>("ready");
+  const [round, setRound] = useState(() => newRound(0, 0));
+  const [phase, setPhase] = useState<Phase>("intro");
   const [selected, setSelected] = useState<number | null>(null);
   /** Bumped to make the selected sock wiggle again when it is tapped once more. */
   const [nudge, setNudge] = useState(0);
@@ -97,6 +116,11 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
   const selectedRef = useRef<number | null>(null);
   const matchedRef = useRef(new Set<number>());
   const focusRef = useRef<number | null>(null);
+  /** For the difficulty: when the socks of this wash lay on the floor, and how often another sock than the partner came. */
+  const sortStartRef = useRef(0);
+  const missesRef = useRef(0);
+  /** Schwung: pairs found one after the other without another sock in between, over the washes. */
+  const streakRef = useRef(0);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
 
   const later = useCallback((ms: number, run: () => void) => {
@@ -140,21 +164,33 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     if (settings.sounds) playRandomNote();
   };
 
-  /** The child starts the machine; when it stops, the socks tumble out. */
-  const wash = () => {
-    setPhase("washing");
-    if (settings.sounds) playWash();
-    later(WASH_MS, () => {
-      setPhase("sorting");
-      say(texts.start);
-      if (settings.sounds) round.socks.forEach((_, i) => later(200 + i * TUMBLE_STEP_MS, playPlop));
-    });
+  /** The socks of `next` tumble out of the machine onto the floor. */
+  const tumble = (next: Round) => {
+    setPhase("sorting");
+    const step = tumbleStep(next.level);
+    if (settings.sounds) next.socks.forEach((_, i) => later(200 + i * step, playPlop));
+    // The clock for the difficulty starts once the last sock lies; a toddler can't pick one still in the air.
+    sortStartRef.current = performance.now() + (next.socks.length - 1) * step + TUMBLE_MS;
+    missesRef.current = 0;
   };
 
-  const startRound = (count: number) => {
-    setPairs(count);
-    setRound((r) => newRound(r.id + 1, settings, count));
-    setPhase("ready");
+  // The game starts on its own (its card was the tap): the full machine, a moment later it washes, then the socks.
+  // Everything goes through `later`, so React's second mount while developing doesn't wash twice.
+  useEffect(() => {
+    later(INTRO_MS, () => {
+      setPhase("washing");
+      if (settings.sounds) playWash();
+    });
+    later(INTRO_MS + WASH_MS, () => {
+      say(texts.start);
+      tumble(round);
+    });
+  }, []);
+
+  /** The next wash: a fresh floor and an empty line, at the difficulty `level`. */
+  const startRound = (level: number) => {
+    const next = newRound(round.id + 1, level);
+    setRound(next);
     setSelected(null);
     selectedRef.current = null;
     matchedRef.current = new Set();
@@ -163,11 +199,33 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     setFlights({});
     setFocus(null);
     focusRef.current = null;
+    tumble(next);
+  };
+
+  /** All pairs hang: they jump for joy, then the line is pulled out of the picture and the next wash comes. */
+  const finish = () => {
+    const level = nextLevel(round.level, { pairs: round.looks.length, misses: missesRef.current, ms: performance.now() - sortStartRef.current });
+    setPhase("cheer");
+    if (settings.sounds) playMelody();
+    say(texts.done);
+    for (let i = 0; i < 10; i++) later(i * 120, () => spawn());
+    later(CHEER_MS, () => {
+      // Every wash is a game for a game limit: with the last one played, the game says good night (GameShell).
+      gameEnded();
+      if (isPlaytimeOver()) return;
+      countGame();
+      setPhase("pull");
+      if (settings.sounds) playWhoosh();
+      later(PULL_MS, () => startRound(level));
+    });
   };
 
   /** Both socks of `pair` (found by the child) hop from the floor onto their place on the line. */
   const hang = (pair: number, a: number, b: number) => {
     matchedRef.current.add(pair);
+    const streak = ++streakRef.current;
+    // The more Schwung, the quicker the hop.
+    const ms = Math.max(FLY_MIN_MS, FLY_MS - (streak - 1) * 80);
     const slot = matchedRef.current.size - 1;
     setLineOrder((order) => [...order, pair]);
     const next: Record<number, Flight> = {};
@@ -181,31 +239,31 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       const middle = centre(cell.getBoundingClientRect());
       const from = { x: middle.x + (shiftX / 100) * sock.offsetWidth, y: middle.y + (shiftY / 100) * sock.offsetHeight };
       const to = centre(target.getBoundingClientRect());
-      next[index] = { x: to.x - from.x, y: to.y - from.y, scale: target.offsetHeight / sock.offsetHeight };
+      next[index] = { x: to.x - from.x, y: to.y - from.y, scale: target.offsetHeight / sock.offsetHeight, ms };
     });
     setFlights((f) => ({ ...f, ...next }));
     if (settings.sounds) {
-      playCountNote(pair);
+      // Each pair in a row a note higher up the scale, so a quick run climbs like a tune.
+      later(120, () => playCountNote(Math.min(streak - 1, 7)));
       later(150, playBoing);
     }
     say(oneOf(texts.pair));
 
-    later(FLY_MS, () => {
+    later(ms, () => {
       setLanded((l) => [...l, pair]);
       if (settings.sounds) {
         playKnock(1500);
         later(120, () => playKnock(1300));
+        if (streak >= 3) playTwinkle();
+      }
+      // Stars at the line from the third pair in a row on.
+      if (streak >= 3) {
+        const target = slotRefs.current[slot * 2]?.getBoundingClientRect();
+        if (target) for (let i = 0; i < Math.min(streak - 1, 5); i++) spawn(target.right, target.top + target.height / 2);
       }
     });
 
-    if (matchedRef.current.size === round.looks.length) {
-      later(FLY_MS + 400, () => {
-        setPhase("done");
-        if (settings.sounds) playMelody();
-        say(texts.done);
-        for (let i = 0; i < 10; i++) later(i * 120, () => spawn());
-      });
-    }
+    if (matchedRef.current.size === round.looks.length) later(ms + 300, finish);
   };
 
   /** The child tapped (or chose by key) the sock at `index` on the floor. */
@@ -224,7 +282,12 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       hang(sock.pair, before, index);
       return;
     }
-    // A different one: the first goes back down, this one is lifted instead. No "wrong".
+    // A different one: the first goes back down, this one is lifted instead. No "wrong" for the child; only the
+    // difficulty and the Schwung take note.
+    if (before !== null) {
+      missesRef.current++;
+      streakRef.current = 0;
+    }
     selectedRef.current = index;
     setSelected(index);
   };
@@ -235,19 +298,12 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     else pick(index);
   };
 
-  const onBackgroundDown = (e: PointerEvent) => {
-    if (phase === "ready") wash();
-    else funBurst(e.clientX, e.clientY);
-  };
+  const onBackgroundDown = (e: PointerEvent) => funBurst(e.clientX, e.clientY);
 
   // Arrow keys (or any key) move the frame over the socks still on the floor, Space or Enter takes one, 1–9 straight away.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
-      if (phase === "ready") {
-        wash();
-        return;
-      }
       if (phase !== "sorting") {
         funBurst();
         return;
@@ -281,12 +337,10 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  // One pair more each time; after the most pairs, the number the grown-up started with again.
-  const nextPairs = pairs < MAX_PAIRS ? pairs + 1 : Number(settings.pairs);
-  const next = { emoji: "🧦", name: texts.pairs(nextPairs), onNext: () => startRound(nextPairs) };
+  const machineShut = phase === "intro" || phase === "washing";
 
   return (
-    <div className={`socks-play ${phase}`} onPointerDown={onBackgroundDown}>
+    <div className={`socks-play ${phase}`} onPointerDown={onBackgroundDown} style={{ "--pull-ms": `${PULL_MS}ms` } as CSSProperties}>
       <div className="sock-line" style={{ "--pairs": round.looks.length } as CSSProperties}>
         <span className="sock-post left" />
         <span className="sock-post right" />
@@ -320,13 +374,12 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
       </div>
 
       <div className="sock-floor">
-        <div className={`sock-machine${phase === "ready" || phase === "washing" ? "" : " open"}`}>
+        <div className={`sock-machine${machineShut ? "" : " open"}`}>
           <WashingMachine looks={round.looks} />
         </div>
         <div className="sock-pile">
           <div ref={gridRef} className="sock-grid" style={{ "--cols": fit.columns, "--sock-h": `${fit.size}px` } as CSSProperties}>
-            {phase !== "ready" &&
-              phase !== "washing" &&
+            {!machineShut &&
               round.socks.map((sock, i) => {
                 const flight = flights[i];
                 const gone = landed.includes(sock.pair);
@@ -334,7 +387,7 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
                   ? `calc(${sock.shift[0]}% + ${flight.x}px) calc(${sock.shift[1]}% + ${flight.y}px)`
                   : `${sock.shift[0]}% ${sock.shift[1]}%`;
                 return (
-                  <div key={`${round.id}-${i}`} className="sock-cell" style={{ animationDelay: `${i * TUMBLE_STEP_MS}ms` }}>
+                  <div key={`${round.id}-${i}`} className="sock-cell" style={{ animationDelay: `${i * tumbleStep(round.level)}ms` }}>
                     <button
                       type="button"
                       ref={(el) => {
@@ -343,7 +396,14 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
                       className={`sock${selected === i ? ` selected nudge-${nudge % 2}` : ""}${focus === i ? " focused" : ""}${
                         flight ? " flying" : ""
                       }${gone ? " gone" : ""}`}
-                      style={{ translate, rotate: flight ? "0deg" : `${sock.rotate}deg`, scale: flight ? `${flight.scale}` : undefined }}
+                      style={
+                        {
+                          translate,
+                          rotate: flight ? "0deg" : `${sock.rotate}deg`,
+                          scale: flight ? `${flight.scale}` : undefined,
+                          "--fly-ms": flight ? `${flight.ms}ms` : undefined,
+                        } as CSSProperties
+                      }
                       aria-label={texts.sock(i + 1)}
                       // With one sock in hand, its partner is the right one.
                       data-tap={tapState({ goal: selected !== null && selected !== i && round.socks[selected].pair === sock.pair, done: gone })}
@@ -358,7 +418,6 @@ export function SocksPlay({ settings }: { settings: SocksSettings }) {
         </div>
       </div>
 
-      {phase === "done" && <GameEnd delayMs={END_DELAY_MS} onAgain={() => startRound(pairs)} next={next} />}
       <BurstLayer bursts={bursts} />
     </div>
   );

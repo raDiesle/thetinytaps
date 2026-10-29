@@ -145,7 +145,8 @@ In a fresh worktree run `bun install` first.
 - Where the child picks one of several (Zuordnen, Schatten, a quiz), exactly one choice fits: never offer a wrong
   choice a child could rightly pick (no lettuce or apple next to the rabbit's carrot – a rabbit eats those too).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
-  animation unless the parent turns it on (`document.getAnimations()` is empty after load).
+  animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
+  at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away.
 - Speech is off by default (`src/lib/common.ts`); sounds are on.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
@@ -191,7 +192,8 @@ In a fresh worktree run `bun install` first.
   `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
   the first, so there is always one). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
-  two buttons doing the same thing confuse. A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
+  two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
+  wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
   it has a use for, just as big. Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
   in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
 
@@ -211,8 +213,8 @@ src/content/             home menu (games.ts), language packs (de/en/tr/pl), ide
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
-- Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now) skips it with `startMode` and plays
-  at once; the start screen comes only after ✕ or „Menü“. A game a routine opens for one of its steps (the Tagesplan's
+- Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
+  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once; the start screen comes only after ✕ or „Menü“. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or
   „Menü“ go back to the routine. What the game is and how it is played (also keys and tips for grown-ups) goes into `info`
   („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes

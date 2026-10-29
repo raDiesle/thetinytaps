@@ -18,6 +18,13 @@
   --hang-h: min(18vh, calc((100vw - 48px) / var(--pairs) / 2.4 / 0.667));
   position: relative;
   flex: 0 0 calc(var(--rope-y) + var(--hang-h) + 3vh);
+  transition: flex-basis 0.8s ease-in-out;
+}
+
+/* At first only the washing machine: the line comes down once the socks tumble out. */
+.socks-play:is(.intro, .washing) .sock-line {
+  flex-basis: 0;
+  overflow: hidden;
 }
 
 .sock-rope {
@@ -25,9 +32,14 @@
   top: var(--rope-y);
   left: 14px;
   right: 14px;
-  height: 4px;
-  border-radius: 2px;
-  background: #b08968;
+  height: 5px;
+  border-radius: 3px;
+  /* Twisted strands, so one sees the rope move when it is pulled. */
+  background: repeating-linear-gradient(90deg, #b08968 0 9px, #8d6e63 9px 12px);
+}
+
+.socks-play.pull .sock-rope {
+  animation: sock-rope-pull var(--pull-ms) cubic-bezier(0.5, 0, 0.75, 0.4) forwards;
 }
 
 .sock-post {
@@ -54,6 +66,16 @@
   right: 24px;
   display: flex;
   justify-content: space-evenly;
+}
+
+/* The line is pulled: a little tug back first, then all socks go off to the right, trailing behind. */
+.socks-play.pull .sock-slots {
+  animation: sock-line-pull var(--pull-ms) cubic-bezier(0.5, 0, 0.75, 0.4) forwards;
+}
+
+.socks-play.pull .sock-hang .sock-svg {
+  transform-origin: 50% 5%;
+  animation: sock-trail var(--pull-ms) ease-out forwards;
 }
 
 .sock-hang {
@@ -87,7 +109,7 @@
 }
 
 /* All socks on the line: they jump for joy, one pair after the other. */
-.socks-play.done .sock-hang .sock-svg {
+.socks-play.cheer .sock-hang .sock-svg {
   animation: sock-cheer 0.6s ease-in-out 2 calc(var(--slot) * 0.12s);
 }
 
@@ -112,7 +134,7 @@
   z-index: 2;
   left: 50%;
   top: 50%;
-  height: min(78%, 70vw);
+  height: min(88%, 74vw);
   aspect-ratio: 200 / 236;
   translate: -50% -50%;
   transition:
@@ -249,10 +271,12 @@
   border-radius: 18px;
 }
 
+/* The hop is quicker with Schwung (pairs found one after the other): its time comes as --fly-ms. */
 .sock.flying {
   z-index: 4;
   pointer-events: none;
-  animation: sock-hop 0.8s ease-in-out;
+  transition-duration: var(--fly-ms), var(--fly-ms), var(--fly-ms), 0.25s;
+  animation: sock-hop var(--fly-ms) ease-in-out;
 }
 
 .sock.gone {
@@ -329,5 +353,32 @@
   50% {
     translate: 0 -18%;
     rotate: -6deg;
+  }
+}
+
+@keyframes sock-line-pull {
+  12% {
+    translate: -3vw 0;
+  }
+  to {
+    translate: 115vw 0;
+  }
+}
+
+@keyframes sock-rope-pull {
+  12% {
+    background-position-x: -3vw;
+  }
+  to {
+    background-position-x: 115vw;
+  }
+}
+
+@keyframes sock-trail {
+  15% {
+    rotate: 8deg;
+  }
+  to {
+    rotate: -22deg;
   }
 }
