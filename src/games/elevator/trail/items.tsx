@@ -24,6 +24,9 @@ export type ItemId =
   | "roll"
   | "flipflops"
   | "mattress"
+  | "nut"
+  | "honey"
+  | "berries"
   | "saw"
   | "stick";
 
@@ -341,6 +344,107 @@ export function Pail() {
   );
 }
 
+/** A hazelnut: brown, its tip up and its pale base on the ground. */
+export function Nut() {
+  return (
+    <g>
+      <path d="M0 -66 Q-34 -50 -32 -26 Q-30 0 0 0 Q30 0 32 -26 Q34 -50 0 -66 Z" fill="#a9622b" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <path d="M-22 -10 Q0 -22 22 -10 Q16 0 0 0 Q-16 0 -22 -10 Z" fill="#f3d9a4" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-10 -52 Q-20 -40 -18 -26" stroke="#e0a26a" strokeWidth="5" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A jar of golden honey with a red cloth tied over its lid and a drop running down. */
+export function Honey() {
+  return (
+    <g>
+      <rect x="-32" y="-74" width="64" height="74" rx="16" fill="#fab005" stroke={INK} strokeWidth="4.5" />
+      <path d="M-20 -60 V-18" stroke="#ffe066" strokeWidth="7" strokeLinecap="round" />
+      <path d="M-38 -74 Q-40 -92 -30 -90 H30 Q40 -92 38 -74 Q0 -66 -38 -74 Z" fill="#fa5252" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      {[-24, -8, 8, 24].map((x) => (
+        <circle key={x} cx={x} cy="-81" r="3.5" fill="#fff" />
+      ))}
+      <path d="M-32 -70 H32" stroke={INK} strokeWidth="3" />
+      <path d="M12 -70 Q12 -54 18 -50 Q24 -54 22 -70 Z" fill="#f08c00" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+    </g>
+  );
+}
+
+/** One blackberry: a dark ball of small round drupelets. */
+function Blackberry({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <circle cx={x} cy={y} r="14" fill="#2b124c" stroke={INK} strokeWidth="3" />
+      {[
+        [-6, -5],
+        [5, -6],
+        [-1, 3],
+        [7, 5],
+        [-7, 6],
+      ].map(([dx, dy]) => (
+        <circle key={`${dx}${dy}`} cx={x + dx} cy={y + dy} r="3.2" fill="#7048e8" />
+      ))}
+    </g>
+  );
+}
+
+/** A twig of blackberries with a green leaf, standing on its cut end. */
+export function Berries() {
+  return (
+    <g>
+      <path d="M0 0 Q6 -40 -4 -92" stroke="#8d5a3b" strokeWidth="5" fill="none" strokeLinecap="round" />
+      <path d="M2 -20 Q-30 -40 -40 -22 Q-20 -10 2 -20 Z" fill="#51cf66" stroke="#2b8a3e" strokeWidth="3" />
+      <Blackberry x={-16} y={-62} />
+      <Blackberry x={14} y={-70} />
+      <Blackberry x={-2} y={-90} />
+      <Blackberry x={14} y={-42} />
+    </g>
+  );
+}
+
+/** The teddy, standing, with the picnic basket (a red-and-white cloth over it) in its arms. */
+export function TeddyBear() {
+  const fur = "#d9944a";
+  const light = "#f8deb4";
+  return (
+    <g transform="scale(0.8)">
+      {[-16, 16].map((x) => (
+        <g key={x}>
+          <ellipse cx={x} cy="-14" rx="14" ry="15" fill={fur} stroke={INK} strokeWidth="4" />
+          <ellipse cx={x} cy="-6" rx="8" ry="5" fill={light} />
+        </g>
+      ))}
+      <ellipse cx="0" cy="-50" rx="30" ry="32" fill={fur} stroke={INK} strokeWidth="4" />
+      <ellipse cx="0" cy="-48" rx="17" ry="20" fill={light} />
+      <ellipse cx="-30" cy="-58" rx="10" ry="18" transform="rotate(20 -30 -58)" fill={fur} stroke={INK} strokeWidth="4" />
+      {[-22, 22].map((x) => (
+        <g key={x}>
+          <circle cx={x} cy="-124" r="12" fill={fur} stroke={INK} strokeWidth="4" />
+          <circle cx={x} cy="-124" r="6" fill={light} />
+        </g>
+      ))}
+      <circle cx="0" cy="-102" r="28" fill={fur} stroke={INK} strokeWidth="4" />
+      <ellipse cx="0" cy="-92" rx="13" ry="10" fill={light} />
+      <ellipse cx="0" cy="-97" rx="5" ry="4" fill={INK} />
+      <path d="M-5 -89 Q0 -85 5 -89" stroke={INK} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+      <circle cx="-10" cy="-110" r="3.5" fill={INK} />
+      <circle cx="10" cy="-110" r="3.5" fill={INK} />
+      <path d="M-13 -78 L0 -73 L-13 -67 Z M13 -78 L0 -73 L13 -67 Z" fill="#4dabf7" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      {/* The picnic basket, held in front */}
+      <g transform="translate(22 -26)">
+        <path d="M-22 -22 Q0 -58 22 -22" stroke="#8d5a3b" strokeWidth="6" fill="none" />
+        <path d="M-30 -24 H30 L24 10 H-24 Z" fill="#e8a35c" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        <path d="M-27 -10 H27 M-25 2 H25 M-12 -24 V10 M12 -24 V10" stroke="#a0673a" strokeWidth="2.5" />
+        <path d="M-26 -24 Q-14 -38 0 -26 Q14 -38 26 -24 Z" fill="#fa5252" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        <circle cx="-10" cy="-29" r="2.5" fill="#fff" />
+        <circle cx="10" cy="-29" r="2.5" fill="#fff" />
+      </g>
+      <ellipse cx="30" cy="-58" rx="10" ry="18" transform="rotate(-30 30 -58)" fill={fur} stroke={INK} strokeWidth="4" />
+    </g>
+  );
+}
+
 /** A hand saw: a grey blade with teeth along its bottom edge, a red wooden handle on the left. */
 export function Saw() {
   const teeth = Array.from({ length: 9 }, (_, i) => `L${-34 + i * 13} -8 L${-28 + i * 13} -16`).join(" ");
@@ -461,6 +565,9 @@ export const ITEMS: Record<ItemId, Picture> = {
   roll: { w: 104, h: 56, draw: () => <Roll /> },
   flipflops: { w: 96, h: 104, draw: () => <FlipFlops /> },
   mattress: { w: 228, h: 44, draw: () => <Mattress /> },
+  nut: { w: 70, h: 70, draw: () => <Nut /> },
+  honey: { w: 80, h: 96, draw: () => <Honey /> },
+  berries: { w: 84, h: 108, draw: () => <Berries /> },
   saw: { w: 180, h: 62, draw: () => <Saw /> },
   stick: { w: 160, h: 64, draw: () => <Stick /> },
 };
@@ -475,7 +582,7 @@ export interface Goal extends Picture {
   roll?: number;
 }
 
-export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "sailboat";
+export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy" | "sailboat";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
@@ -494,6 +601,7 @@ export const GOALS: Record<GoalId, Goal> = {
   },
   loco: { w: 130, h: 116, draw: () => <Loco />, carry: "hands" },
   pail: { w: 104, h: 170, draw: () => <Pail />, carry: "hands" },
+  teddy: { w: 96, h: 116, draw: () => <TeddyBear />, carry: "hands" },
   sailboat: { w: 132, h: 150, draw: () => <Sailboat />, carry: "hands" },
 };
 

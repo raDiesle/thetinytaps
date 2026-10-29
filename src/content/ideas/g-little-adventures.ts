@@ -67,6 +67,8 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Der Teddy ist mit dem Picknickkorb vorausgelaufen. Durch den Wald: der Bär will Honig, über den Fluss auf einem Baumstamm, Brombeeren pflücken (Korb), ein Igel rollt sich ein (leise sein – das Kind tippt ganz sacht), auf der Lichtung essen alle zusammen.",
       why: "Natur und Tiere des Waldes; Essen teilen.",
       effort: "M",
+      partial:
+        "Gebaut als Weg-Abenteuer „Picknick im Wald“ (Nuss fürs Eichhörnchen, Brombeeren für die Rotkehlchen, Baumstamm über den Fluss, Regenschirm am Wasserfall, Honig für den Bären, Picknick mit allen). Ohne das sachte Tippen: am Igel bleibt das Kind von selbst still stehen; die Brombeeren sind ein Zweig, ohne Korb.",
     },
     {
       id: "G-08",

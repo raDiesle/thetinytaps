@@ -2,9 +2,10 @@ import {
   playBark,
   playBlub,
   playBoing,
+  playBuzz,
   playChatter,
-  playCluck,
   playClonk,
+  playCluck,
   playCoo,
   playCreak,
   playCrunch,
@@ -23,6 +24,7 @@ import {
   playPop,
   playSaw,
   playQuack,
+  playRoar,
   playRustle,
   playSizzle,
   playSnap,
@@ -38,6 +40,7 @@ import {
   playTwinkle,
   playWhistle,
   playWhoosh,
+  playYum,
 } from "@/lib/sfx";
 import { BALL_AT, BallBackdrop, BallFront, BallScenery, LADDER, SLIDE, GROUND_Y as STREET_Y } from "./ball";
 import { BALLON_GROUND, BallonBackdrop, BallonScenery, BRIDGE_DIP, DOVE_HOLDS, STAIRS as BALLON_STAIRS } from "./ballon";
@@ -59,6 +62,7 @@ import {
 import { DrachenBackdrop, DrachenScenery, GROUND_Y, STAIRS, TOP_Y } from "./drachen";
 import { LOK_AT, LokBackdrop, LokFront, LokScenery, OVER_GROUND, SIGN_OVER, SIGN_THROUGH, StairsSign, TunnelSign, STAIRS as LOK_STAIRS } from "./lok";
 import { GAP_AT, PAIL_AT, SANDBURG_GROUND, SandburgBackdrop, SandburgFront, SandburgScenery, STEPS as SANDBURG_STEPS } from "./sandburg";
+import { PICKNICK_GROUND, PicknickBackdrop, PicknickFront, PicknickScenery, STONES, TEDDY_AT, TEDDY_PICNIC } from "./picknick";
 import type { TrailLevel } from "./types";
 
 // The trail levels. Every sentence is only spoken, and only with "Vorlesen": the child can't read,
@@ -774,5 +778,134 @@ const sandburg: TrailLevel = {
   finale: { via: [[[4720, 400], 900]], to: [4666, 662], ms: 900, sway: 0, say: "Eimer und Schaufel sind wieder da! Wir bauen eine Sandburg." },
 };
 
+// G-07: the teddy runs ahead into the forest with the picnic basket; on the clearing the bear holds it,
+// and once the bear has its honey everybody has a picnic together.
+const picknick: TrailLevel = {
+  id: "picknick",
+  title: "Picknick im Wald",
+  goal: "teddy",
+  Scenery: PicknickScenery,
+  Front: PicknickFront,
+  Backdrop: PicknickBackdrop,
+  ground: PICKNICK_GROUND,
+  start: 300,
+  away: {
+    via: [
+      [[430, 740], 350],
+      [[520, 680], 260],
+      [[610, 740], 260],
+    ],
+    to: TEDDY_AT,
+    ms: 3400,
+    sway: 0,
+    pose: "reach",
+    sounds: [
+      [300, playBoing],
+      [900, playBoing],
+      [1300, playWhoosh],
+    ],
+    say: "Huch! Der Teddy läuft mit dem Picknickkorb in den Wald. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "nut", x: 540, item: "nut", at: [640, 712], sound: playClonk, ask: "Eine Nuss!", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "honey", x: 880, item: "honey", at: [970, 654], sound: playBuzz, ask: "Ein Topf Honig.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "squirrel",
+      x: 1240,
+      need: "nut",
+      why: { wants: [1346, 596] },
+      at: [1330, 694],
+      meet: [[100, playChatter]],
+      sounds: [
+        [300, playChatter],
+        [1200, playCrunch],
+        [1900, playCrunch],
+      ],
+      ms: 2400,
+      nope: playSneeze,
+      ask: "Das Eichhörnchen sitzt im Weg. Es hat Hunger. Was geben wir ihm?",
+      done: "Die Nuss! Knack, knack, lecker.",
+    },
+    { kind: "pickup", id: "berries", x: 1600, item: "berries", at: [1680, 676], sound: playLeaves, ask: "Brombeeren!", done: "Gepflückt! Ab in den Rucksack." },
+    {
+      kind: "moment",
+      id: "hedgehog",
+      x: 1900,
+      pose: "stand",
+      sounds: [
+        [100, playRustle],
+        [1800, playSniff],
+        [2800, playSniff],
+      ],
+      ms: 3600,
+      ask: "Pssst! Ein Igel. Er rollt sich ein. Wir sind ganz leise.",
+      done: "Der Igel läuft weiter.",
+    },
+    {
+      kind: "obstacle",
+      id: "robins",
+      x: 2200,
+      need: "berries",
+      why: { wants: [2330, 610] },
+      at: [2276, 716],
+      meet: [[100, playTweet]],
+      sounds: [
+        [200, playTweet],
+        [500, playPeck],
+        [1100, playPeck],
+        [1700, playPeck],
+        [2600, playWhoosh],
+        [3200, playTweet],
+      ],
+      ms: 3600,
+      nope: playTweet,
+      ask: "Die Vögel sitzen im Weg. Sie haben Hunger. Was geben wir ihnen?",
+      done: "Die Brombeeren! Pick, pick, lecker.",
+    },
+    { kind: "climb", id: "log", x: 2570, steps: STONES, ask: "Ein Baumstamm über den Fluss! Hoch geht's.", done: "Oben! Jetzt gehen wir rüber." },
+    { kind: "pickup", id: "umbrella", x: 3560, item: "umbrella", at: [3650, 650], sound: playPoof, ask: "Ein Regenschirm.", done: "Den nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "waterfall",
+      x: 3960,
+      need: "umbrella",
+      why: { worry: "wet" },
+      at: [4132, 640],
+      meet: [[100, playTrickle]],
+      sounds: [
+        [0, playPoof],
+        [500, playDrops],
+        [1100, playGiggle],
+      ],
+      ms: 1800,
+      nope: playSplash,
+      ask: "Ein Wasserfall! Da werden wir nass. Was hilft?",
+      done: "Der Regenschirm! Jetzt bleiben wir trocken.",
+    },
+    {
+      kind: "obstacle",
+      id: "bear",
+      x: 4440,
+      need: "honey",
+      why: { wants: [4600, 432] },
+      at: [4560, 600],
+      meet: [[100, playRoar]],
+      sounds: [
+        [300, playYum],
+        [1100, playMunch],
+        [1800, playMunch],
+      ],
+      ms: 2400,
+      nope: playRoar,
+      frees: true,
+      ask: "Der Bär hat den Teddy. Er mag Honig. Was geben wir ihm?",
+      done: "Den Honig! Danke, Bär.",
+    },
+  ],
+  // Up into the air and down onto the picnic blanket, where everybody eats together.
+  finale: { via: [[[4660, 520], 900]], to: TEDDY_PICNIC, ms: 900, sway: 0, say: "Der Teddy ist wieder da! Jetzt machen alle Picknick." },
+};
+
 /** All trail levels, in the order of their cards. */
-export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, sandburg, floss];
+export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, sandburg, picknick, floss];
