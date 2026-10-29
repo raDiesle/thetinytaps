@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from "react";
+import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
 import { useT } from "@/lib/language";
 import {
@@ -242,10 +242,9 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
     ru: "Лицо ребёнка в зеркале во время чистки зубов",
   });
   const model = useMemo(() => buildMouth(view.open), [view.open]);
-  const all = projectors(view);
+  const all = useMemo(() => projectors(view), [view]);
   const project = all.face;
-  const zoneKeys = new Set(zone?.teeth.map(toothKey));
-  const teethByKey = new Map(model.teeth.map((t) => [t.key, t]));
+  const teethByKey = useMemo(() => new Map(model.teeth.map((t) => [t.key, t])), [model]);
   const toothFace = (id: ToothId, surface: Surface) => surfaceFace(teethByKey.get(toothKey(id))!.faces, surface);
 
   /** Where on a tooth the brush works. Outside with the teeth together, it brushes both rows at once, on the bite. */
@@ -260,115 +259,140 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
     return { at: alongFace(face, stop.spot), normal: face.normal, along };
   };
 
-  const head = project.point([0, 20, -60]);
-  const lipPoints = model.lips.map(project.point);
-  const lipsPath = smoothPath(lipPoints);
+  const lipPoints = useMemo(() => model.lips.map(project.point), [model, project]);
+  const lipsPath = useMemo(() => smoothPath(lipPoints), [lipPoints]);
 
   const svg = useRef<SVGSVGElement>(null);
   const { box, unit } = fitBox(useRoom(svg, free), mouthFocus(lipPoints, project.zoom, view.open));
   const frame = screenFrame(box, unit);
+  const viewBox = `${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`;
 
-  const jawParts = jawOrder(view).map((jaw) => {
-    const project = all[jaw];
-    const p = project.point;
-    const gums = model.gums.filter((g) => g.jaw === jaw).sort((a, b) => p(a.center).depth - p(b.center).depth);
-    const teeth = model.teeth.filter((t) => t.id.jaw === jaw).sort((a, b) => p(a.center).depth - p(b.center).depth);
+  // The face and the teeth change only while the head turns or the mouth opens: built once for each view,
+  // not again with every tick of the clock (hundreds of paths, too slow for a phone five times a second).
+  const zoneSurface = zone?.surface;
+  const zoneTeeth = zone?.teeth;
+  const still = useMemo(() => {
+    const zoneKeys = new Set(zoneTeeth?.map(toothKey));
+    const jawParts = jawOrder(view).map((jaw) => {
+      const project = all[jaw];
+      const p = project.point;
+      const gums = model.gums.filter((g) => g.jaw === jaw).sort((a, b) => p(a.center).depth - p(b.center).depth);
+      const teeth = model.teeth.filter((t) => t.id.jaw === jaw).sort((a, b) => p(a.center).depth - p(b.center).depth);
+      return (
+        <g key={jaw}>
+          {gums.flatMap((g, i) =>
+            g.faces
+              .filter((f) => project.facing(f.normal) > MIN_FACING)
+              .map((f, j) => {
+                const d = facePath(f, project);
+                return <path key={`${i}-${j}`} d={d} fill={GUM_FILLS[f.kind]} stroke={GUM_FILLS[f.kind]} strokeWidth={1.5} />;
+              }),
+          )}
+          {teeth.map((t) => (
+            <g key={t.key}>
+              {t.faces
+                // Slivers of the sides between teeth only add clutter.
+                .filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING))
+                .map((f, j) => (
+                  <path
+                    key={j}
+                    d={facePath(f, project, f.kind === "outer" ? 7 : 3)}
+                    fill={f.kind === zoneSurface && zoneKeys.has(t.key) ? ZONE_FILL : TOOTH_FILLS[f.kind]}
+                    stroke={INK}
+                    strokeWidth={2.2}
+                    strokeLinejoin="round"
+                  />
+                ))}
+              {project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
+                <path d={`M${fmt(p(t.shine[0]))} L${fmt(p(t.shine[1]))}`} stroke="#fff" strokeWidth={4} strokeLinecap="round" opacity={0.9} />
+              )}
+              {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && (
+                <path d={`M${t.groove.map((g) => fmt(p(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />
+              )}
+            </g>
+          ))}
+        </g>
+      );
+    });
+
+    const tongueUp = all.lower.facing([0, 1, 0.2]) > 0.05;
+    const palateDown = all.upper.facing([0, -1, 0.2]) > 0.05;
     return (
-      <g key={jaw}>
-        {gums.flatMap((g, i) =>
-          g.faces
-            .filter((f) => project.facing(f.normal) > MIN_FACING)
-            .map((f, j) => {
-              const d = facePath(f, project);
-              return <path key={`${i}-${j}`} d={d} fill={GUM_FILLS[f.kind]} stroke={GUM_FILLS[f.kind]} strokeWidth={1.5} />;
-            }),
-        )}
-        {teeth.map((t) => (
-          <g key={t.key}>
-            {t.faces
-              // Slivers of the sides between teeth only add clutter.
-              .filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING))
-              .map((f, j) => (
-                <path
-                  key={j}
-                  d={facePath(f, project, f.kind === "outer" ? 7 : 3)}
-                  fill={zone && f.kind === zone.surface && zoneKeys.has(t.key) ? ZONE_FILL : TOOTH_FILLS[f.kind]}
-                  stroke={INK}
-                  strokeWidth={2.2}
-                  strokeLinejoin="round"
-                />
-              ))}
-            {project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
-              <path d={`M${fmt(p(t.shine[0]))} L${fmt(p(t.shine[1]))}`} stroke="#fff" strokeWidth={4} strokeLinecap="round" opacity={0.9} />
-            )}
-            {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && (
-              <path d={`M${t.groove.map((g) => fmt(p(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />
-            )}
-          </g>
-        ))}
-      </g>
-    );
-  });
-
-  const tongueUp = all.lower.facing([0, 1, 0.2]) > 0.05;
-  const palateDown = all.upper.facing([0, -1, 0.2]) > 0.05;
-
-  return (
-    <svg
-      ref={svg}
-      className="mouth"
-      viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`}
-      role="img"
-      aria-label={pictureLabel}
-    >
-      <defs>
-        <clipPath id="mirror">
-          <rect {...frame} />
-        </clipPath>
-        <clipPath id="mouth-inside">
-          <path d={lipsPath} />
-        </clipPath>
-        <radialGradient id="monster-glow">
-          <stop offset="0.5" stopColor="#fffbd1" />
-          <stop offset="0.72" stopColor="#ffd23f" stopOpacity={0.95} />
-          <stop offset="1" stopColor="#ffb703" stopOpacity={0} />
-        </radialGradient>
-      </defs>
-
-      <rect {...frame} fill="#dff6ff" />
-      <g clipPath="url(#mirror)">
-        <KidFace project={project} head={head} happy={happy} open={view.open} crumbs={daytime === "morning" && !happy} />
-
+      <>
+        <KidFace project={all.face} head={all.face.point([0, 20, -60])} happy={happy} open={view.open} crumbs={daytime === "morning" && !happy} />
         <g clipPath="url(#mouth-inside)">
           <path d={lipsPath} fill="#5c1430" />
           {tongueUp && <path d={smoothPath(model.tongue.map(all.lower.point))} fill="#ff6f91" stroke="#d94f74" strokeWidth={3} />}
           {palateDown && <path d={smoothPath(model.palate.map(all.upper.point))} fill="#c94a6e" />}
           {jawParts}
-          {zone?.teeth.map((id) => {
-            const face = toothFace(id, zone.surface);
-            const at = all[id.jaw];
-            if (at.facing(face.normal) <= MIN_FACING) return null;
-            return <path key={toothKey(id)} className="zone-glow" d={facePath(face, at)} fill="none" stroke="#ffd23f" strokeWidth={5} strokeLinejoin="round" />;
-          })}
         </g>
+      </>
+    );
+  }, [view, all, model, lipsPath, zoneSurface, zoneTeeth, happy, daytime]);
 
-        <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
-        <path d={lipsPath} fill="none" stroke="#ff7088" strokeWidth={27} strokeLinejoin="round" />
+  // Two pictures on top of each other: the still one below, and above it in a layer of its own everything that
+  // moves (the glow, the monsters, the brush; the lips go with them, over the glow), so the brush moving on every frame never has the browser paint the
+  // face and the teeth again. Both have the same viewBox and size, so they line up exactly.
+  return (
+    <>
+      <svg ref={svg} className="mouth" viewBox={viewBox} role="img" aria-label={pictureLabel}>
+        <defs>
+          <clipPath id="mirror">
+            <rect {...frame} />
+          </clipPath>
+          <clipPath id="mouth-inside">
+            <path d={lipsPath} />
+          </clipPath>
+        </defs>
+        <rect {...frame} fill="#dff6ff" />
+        <g clipPath="url(#mirror)">{still}</g>
+      </svg>
 
-        {/* The ones being brushed now on top. */}
-        {[...monsters.filter((m) => m.waiting), ...monsters.filter((m) => !m.waiting)].map((m) => {
-          const face = toothFace(m.tooth, m.surface);
-          const jaw = all[m.tooth.jaw];
-          const facing = jaw.facing(face.normal);
-          // The ones being brushed stay even on a steep face. The waiting ones only where nothing hides them:
-          // with the teeth together, only the outside of the teeth shows.
-          if (m.waiting ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
-          const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
-          // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
-          if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
-          return (
-            <g key={m.id} transform={`translate(${at.x.toFixed(1)} ${at.y.toFixed(1)}) scale(${(MONSTER_SIZE * project.zoom).toFixed(2)})`}>
-              <Monster
+      <svg className="mouth mouth-moving" viewBox={viewBox} aria-hidden>
+        <defs>
+          <clipPath id="mirror-moving">
+            <rect {...frame} />
+          </clipPath>
+          <clipPath id="mouth-inside-moving">
+            <path d={lipsPath} />
+          </clipPath>
+          <radialGradient id="monster-glow">
+            <stop offset="0.5" stopColor="#fffbd1" />
+            <stop offset="0.72" stopColor="#ffd23f" stopOpacity={0.95} />
+            <stop offset="1" stopColor="#ffb703" stopOpacity={0} />
+          </radialGradient>
+        </defs>
+        <g clipPath="url(#mirror-moving)">
+          <g clipPath="url(#mouth-inside-moving)">
+            {zone?.teeth.map((id) => {
+              const face = toothFace(id, zone.surface);
+              const at = all[id.jaw];
+              if (at.facing(face.normal) <= MIN_FACING) return null;
+              return (
+                <path key={toothKey(id)} className="zone-glow" d={facePath(face, at)} fill="none" stroke="#ffd23f" strokeWidth={5} strokeLinejoin="round" />
+              );
+            })}
+          </g>
+          {/* The lips over the glow's edge, here rather than with the still picture, so the glow stays inside them. */}
+          <path d={lipsPath} fill="none" stroke={INK} strokeWidth={34} strokeLinejoin="round" />
+          <path d={lipsPath} fill="none" stroke="#ff7088" strokeWidth={27} strokeLinejoin="round" />
+
+          {/* The ones being brushed now on top. */}
+          {[...monsters.filter((m) => m.waiting), ...monsters.filter((m) => !m.waiting)].map((m) => {
+            const face = toothFace(m.tooth, m.surface);
+            const jaw = all[m.tooth.jaw];
+            const facing = jaw.facing(face.normal);
+            // The ones being brushed stay even on a steep face. The waiting ones only where nothing hides them:
+            // with the teeth together, only the outside of the teeth shows.
+            if (m.waiting ? facing <= WAITING_FACING || (view.open < 0.5 && m.surface !== "outer") : facing <= -0.3) return null;
+            const at = jaw.point(lift(alongFace(face, m.spot), face, 4));
+            // Back teeth hidden behind the corners of the lips: their monsters would sit on the lip.
+            if (!insideBy(at, lipPoints, LIP_EDGE)) return null;
+            return (
+              <PlacedMonster
+                key={m.id}
+                id={m.id}
+                transform={`translate(${at.x.toFixed(1)} ${at.y.toFixed(1)}) scale(${(MONSTER_SIZE * project.zoom).toFixed(2)})`}
                 color={m.color}
                 variant={m.variant}
                 active={!m.waiting}
@@ -376,58 +400,75 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
                 scared={m.scared}
                 tickled={m.tickled}
                 blinkMs={m.blinkMs}
-                onTickle={() => onTickle(m.id)}
+                onTickle={onTickle}
               />
-            </g>
-          );
-        })}
-
-        {happy &&
-          model.teeth.map((t, i) => {
-            const face = surfaceFace(t.faces, "outer");
-            if (all[t.id.jaw].facing(face.normal) < 0.4 || t.id.n > 2) return null;
-            const at = all[t.id.jaw].point(face.center);
-            return (
-              <g key={t.key} transform={`translate(${(at.x - 10).toFixed(1)} ${(at.y - 10).toFixed(1)}) scale(0.2)`}>
-                {/* The animation's transform would replace a transform attribute, so that sits on the group. */}
-                <path
-                  className="tooth-sparkle"
-                  d={STAR_PATH}
-                  fill="#ffd23f"
-                  stroke={INK}
-                  strokeWidth={8}
-                  style={{ "--delay": `${i * 90}ms` } as CSSProperties}
-                />
-              </g>
             );
           })}
 
-        {brush &&
-          brush.stops.length > 0 &&
-          (() => {
-            // Glide between the two stops either side of `at`.
-            const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
-            const next = Math.min(brush.stops.length - 1, i + 1);
-            const k = Math.min(1, Math.max(0, brush.at - i));
-            const a = anchorAt(brush.stops[i], brush.surface);
-            const b = anchorAt(brush.stops[next], brush.surface);
-            const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
-            const tooth = brush.stops[k < 0.5 ? i : next].tooth;
-            return <Brush anchor={anchor} surface={brush.surface} tooth={tooth} motion={brush.motion} project={all[tooth.jaw]} paused={paused} />;
-          })()}
+          {happy &&
+            model.teeth.map((t, i) => {
+              const face = surfaceFace(t.faces, "outer");
+              if (all[t.id.jaw].facing(face.normal) < 0.4 || t.id.n > 2) return null;
+              const at = all[t.id.jaw].point(face.center);
+              return (
+                <g key={t.key} transform={`translate(${(at.x - 10).toFixed(1)} ${(at.y - 10).toFixed(1)}) scale(0.2)`}>
+                  {/* The animation's transform would replace a transform attribute, so that sits on the group. */}
+                  <path
+                    className="tooth-sparkle"
+                    d={STAR_PATH}
+                    fill="#ffd23f"
+                    stroke={INK}
+                    strokeWidth={8}
+                    style={{ "--delay": `${i * 90}ms` } as CSSProperties}
+                  />
+                </g>
+              );
+            })}
 
-        {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
+          {brush &&
+            brush.stops.length > 0 &&
+            (() => {
+              // Glide between the two stops either side of `at`.
+              const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
+              const next = Math.min(brush.stops.length - 1, i + 1);
+              const k = Math.min(1, Math.max(0, brush.at - i));
+              const a = anchorAt(brush.stops[i], brush.surface);
+              const b = anchorAt(brush.stops[next], brush.surface);
+              const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
+              const tooth = brush.stops[k < 0.5 ? i : next].tooth;
+              return <Brush anchor={anchor} surface={brush.surface} tooth={tooth} motion={brush.motion} project={all[tooth.jaw]} paused={paused} />;
+            })()}
 
-        {/* The mirror glass catches the light. */}
-        <g fill="#fff" opacity={0.35} pointerEvents="none" transform={`translate(${box.x.toFixed(1)} ${box.y.toFixed(1)}) scale(${(1.6 * unit).toFixed(3)})`}>
-          <path d="M80 10 L135 10 L10 135 L10 80 Z" />
-          <path d="M160 10 L178 10 L10 178 L10 160 Z" />
+          {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
+
+          {/* The mirror glass catches the light. */}
+          <g fill="#fff" opacity={0.35} pointerEvents="none" transform={`translate(${box.x.toFixed(1)} ${box.y.toFixed(1)}) scale(${(1.6 * unit).toFixed(3)})`}>
+            <path d="M80 10 L135 10 L10 135 L10 80 Z" />
+            <path d="M160 10 L178 10 L10 178 L10 160 Z" />
+          </g>
         </g>
-      </g>
-      <FrameStroke frame={frame} unit={unit} />
-    </svg>
+        <FrameStroke frame={frame} unit={unit} />
+      </svg>
+    </>
   );
 }
+
+/**
+ * A monster on its tooth. Drawn again only when one of its own props changes, not with every tick of the clock:
+ * `onTickle` has to stay the same function (useCallback) for that.
+ */
+const PlacedMonster = memo(function PlacedMonster({
+  id,
+  transform,
+  onTickle,
+  ...monster
+}: { id: number; transform: string; onTickle: (id: number) => void } & Omit<Parameters<typeof Monster>[0], "onTickle">) {
+  return (
+    <g transform={transform}>
+      <Monster {...monster} onTickle={() => onTickle(id)} />
+    </g>
+  );
+});
 
 /** A point just in front of a face, where a monster or the brush sits. */
 const lift = (at: Vec3, face: Face, by: number): Vec3 => [at[0] + face.normal[0] * by, at[1] + face.normal[1] * by, at[2] + face.normal[2] * by];
