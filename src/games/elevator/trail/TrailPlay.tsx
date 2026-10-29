@@ -3,14 +3,14 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
-import type { TargetLanguage } from "@/content/targetLanguages";
+import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
-import { HERO, KID_H, Kid, PACK, ThoughtBubble, type Pose } from "../kid";
-import { spokenIn } from "../phrases";
+import { HERO, KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose } from "../kid";
+import { spokenIn, translationOf } from "../phrases";
 import type { ElevatorSettings } from "../settings";
 import { allStations, groundY, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
@@ -46,6 +46,8 @@ const PACK_SHUT = { open: false, bump: 0 };
 const NUDGE_MS = 7000;
 /** From the end of the level until „Nochmal“ and „Weiter“ come. */
 const END_MS = 6000;
+/** The language a level speaks until it is translated. */
+const GERMAN = targetLanguageFor("de");
 /** The backpack on the screen holds three things at most, standing side by side in it. */
 const SLOT_COUNT = 3;
 /** From one thing's middle to the next, and from the frame's left edge to the first. */
@@ -203,6 +205,8 @@ interface View {
   bagBump: number;
   /** The thing the child carries in the world, between where it lies, the hands and the backpack. */
   carry: ItemId | null;
+  /** What the child wears (bare feet, flip-flops). */
+  wear: Outfit[];
   /** The backpack on the child's back: its lid is open while a thing goes in or out; `bump` bounces it. */
   pack: { open: boolean; bump: number };
   done: string[];
@@ -232,6 +236,7 @@ const startView = (level: TrailLevel): View => ({
   leaving: null,
   bagBump: 0,
   carry: null,
+  wear: level.wear ?? [],
   pack: PACK_SHUT,
   done: [],
   here: null,
@@ -352,10 +357,14 @@ export function TrailPlay({
     [],
   );
 
+  /** A level not yet translated into the app language (its title has no translation) is said all in German, so
+   * its new lines and the shared ones („Ab in den Rucksack!“) never come in two languages. */
+  const voice = translationOf(level.title, language.id) === undefined ? GERMAN : language;
+
   /** Speaks a German sentence of the level in the app language (only with "Vorlesen"). */
   const say = (german: string) => {
     if (!settings.speech) return;
-    const { text, speechLang } = spokenIn(german, language);
+    const { text, speechLang } = spokenIn(german, voice);
     speak(text, speechLang, { rate: 0.85 });
   };
 
@@ -605,7 +614,7 @@ export function TrailPlay({
       await packAway(item, slot);
       put({ nope: null, hint: station.need, choosing: true });
     }
-    put((v) => ({ carry: null, done: [...v.done, station.id], bubble: null }));
+    put((v) => ({ carry: null, done: [...v.done, station.id], bubble: null, wear: station.wear ?? v.wear }));
     cue(station.sounds);
     say(station.done);
     await wait(500);
@@ -857,14 +866,14 @@ export function TrailPlay({
           <Backdrop />
         </g>
         <g className="tl-pan" style={pan(1)}>
-          <Scenery done={view.done} here={view.here} nope={view.nope} />
+          <Scenery done={view.done} here={view.here} nope={view.nope} party={view.party} />
           <line ref={stringEl} className="tl-string" stroke={INK} strokeWidth="3" {...firstString} />
           <g ref={goalEl} className="tl-goal" transform={firstGoal}>
             <g className={view.party && onString ? "tl-sway" : undefined}>
               <g ref={spinEl}>{(theGoal.world ?? theGoal.draw)()}</g>
             </g>
           </g>
-          {Front && <Front done={view.done} here={view.here} nope={view.nope} />}
+          {Front && <Front done={view.done} here={view.here} nope={view.nope} party={view.party} />}
           {shown.map((n, w) => (
             <g key={`${n.ghost}-${again}`} className="tl-next">
               {n.at && n.icon !== "walk" && n.icon !== "climb" && <WantRing at={n.at} r={ringOf(ITEMS[n.icon])} />}
@@ -873,7 +882,7 @@ export function TrailPlay({
               ))}
               <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
                 <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
-                  <Kid look={HERO} pose={n.pose} holding={null} wear={[]} face={1} backpack={PACK_SHUT} />
+                  <Kid look={HERO} pose={n.pose} holding={null} wear={view.wear} face={1} backpack={PACK_SHUT} />
                 </g>
               </g>
             </g>
@@ -914,7 +923,7 @@ export function TrailPlay({
           </g>
           <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
             <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
-              <Kid look={HERO} pose={k.pose} holding={null} wear={[]} face={k.face} backpack={view.pack} />
+              <Kid look={HERO} pose={k.pose} holding={null} wear={view.wear} face={k.face} backpack={view.pack} />
             </g>
             {view.bubble && !view.bubble.at && <ThoughtBubble picture={view.bubble.picture} height={KID_H} nudge={view.bubble.nudge} />}
           </g>

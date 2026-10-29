@@ -4,8 +4,8 @@ import {
   playBoing,
   playBuzz,
   playChatter,
-  playCluck,
   playClonk,
+  playCluck,
   playCoo,
   playCreak,
   playCrunch,
@@ -21,19 +21,21 @@ import {
   playPing,
   playPlop,
   playPoof,
-  playRoar,
   playPop,
   playQuack,
+  playRoar,
   playRustle,
+  playSizzle,
+  playSnap,
   playSneeze,
   playSniff,
   playSplash,
   playSquawk,
   playThump,
-  playTrickle,
-  playTweet,
   playTick,
   playTrain,
+  playTrickle,
+  playTweet,
   playTwinkle,
   playWhistle,
   playWhoosh,
@@ -43,6 +45,7 @@ import { BALL_AT, BallBackdrop, BallFront, BallScenery, LADDER, SLIDE, GROUND_Y 
 import { BALLON_GROUND, BallonBackdrop, BallonScenery, BRIDGE_DIP, DOVE_HOLDS, STAIRS as BALLON_STAIRS } from "./ballon";
 import { DrachenBackdrop, DrachenScenery, GROUND_Y, STAIRS, TOP_Y } from "./drachen";
 import { LOK_AT, LokBackdrop, LokFront, LokScenery, OVER_GROUND, SIGN_OVER, SIGN_THROUGH, StairsSign, TunnelSign, STAIRS as LOK_STAIRS } from "./lok";
+import { GAP_AT, PAIL_AT, SANDBURG_GROUND, SandburgBackdrop, SandburgFront, SandburgScenery, STEPS as SANDBURG_STEPS } from "./sandburg";
 import { PICKNICK_GROUND, PicknickBackdrop, PicknickFront, PicknickScenery, STONES, TEDDY_AT, TEDDY_PICNIC } from "./picknick";
 import type { TrailLevel } from "./types";
 
@@ -537,6 +540,120 @@ const lok: TrailLevel = {
   finale: { via: [[[4260, 330], 1000]], to: [4226, 662], ms: 1000, sway: 0, say: "Die Lok ist wieder da! Tuut, tuut!" },
 };
 
+// G-05: at the beach a wave takes the bucket and the shovel. The child goes barefoot and puts on the flip-flops for the
+// hot sand; at the end a hermit crab trades the bucket for a shell, and everybody builds a sandcastle.
+const sandburg: TrailLevel = {
+  id: "sandburg",
+  title: "Die Sandburg",
+  goal: "pail",
+  Scenery: SandburgScenery,
+  Front: SandburgFront,
+  Backdrop: SandburgBackdrop,
+  ground: SANDBURG_GROUND,
+  start: 300,
+  wear: ["barefoot"],
+  away: {
+    via: [
+      [[440, 600], 500],
+      [[1000, 650], 900],
+    ],
+    to: PAIL_AT,
+    ms: 3400,
+    sway: 30,
+    pose: "reach",
+    sounds: [
+      [0, playSplash],
+      [600, playWhoosh],
+      [1600, playSplash],
+    ],
+    say: "Huch! Eine Welle nimmt Eimer und Schaufel mit. Hinterher!",
+  },
+  stations: [
+    { kind: "pickup", id: "shell", x: 560, item: "shell", at: [650, 706], sound: playPing, ask: "Eine Muschel!", done: "Ab in den Rucksack!" },
+    { kind: "pickup", id: "roll", x: 880, item: "roll", at: [960, 600], sound: playCrunch, ask: "Ein Brötchen.", done: "Das nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "gull",
+      x: 1240,
+      need: "roll",
+      why: { wants: [1470, 600] },
+      at: [1370, 718],
+      meet: [[100, playSquawk]],
+      sounds: [
+        [200, playSquawk],
+        [500, playPeck],
+        [1100, playPeck],
+        [1700, playPeck],
+        [2600, playWhoosh],
+      ],
+      ms: 3400,
+      nope: playSneeze,
+      ask: "Die Möwe steht im Weg. Sie hat Hunger. Was geben wir ihr?",
+      done: "Das Brötchen! Die Möwe pickt.",
+    },
+    { kind: "pickup", id: "flipflops", x: 1620, item: "flipflops", at: [1720, 690], sound: playPlop, ask: "Badelatschen!", done: "Die nehmen wir mit." },
+    { kind: "pickup", id: "mattress", x: 1940, item: "mattress", at: [2023, 628], sound: playPoof, ask: "Eine Luftmatratze.", done: "Die nehmen wir mit." },
+    {
+      kind: "obstacle",
+      id: "hot",
+      x: 2300,
+      need: "flipflops",
+      why: { worry: "hot" },
+      at: [2316, 690],
+      meet: [[100, playSizzle]],
+      sounds: [
+        [0, playPlop],
+        [400, playPlop],
+        [1000, playGiggle],
+      ],
+      ms: 1800,
+      nope: playBoing,
+      wear: ["flipflops"],
+      ask: "Der Sand ist ganz heiß! Was hilft?",
+      done: "Die Badelatschen! Jetzt geht's.",
+    },
+    { kind: "climb", id: "steps", x: 2900, steps: SANDBURG_STEPS, ask: "Stufen im Felsen! Hoch geht's.", done: "Oben!" },
+    {
+      kind: "obstacle",
+      id: "gap",
+      x: 3500,
+      need: "mattress",
+      why: { worry: "splash" },
+      at: [GAP_AT[0], GAP_AT[1] - 22],
+      meet: [[100, playSplash]],
+      sounds: [
+        [0, playPoof],
+        [500, playSplash],
+      ],
+      ms: 1600,
+      nope: playPlop,
+      ask: "Wasser zwischen den Felsen! Wie kommen wir rüber?",
+      done: "Mit der Luftmatratze! Eine Brücke.",
+    },
+    {
+      kind: "obstacle",
+      id: "crab",
+      x: 4600,
+      need: "shell",
+      why: { wants: [4810, 580] },
+      at: [4700, 706],
+      meet: [[100, playSnap]],
+      sounds: [
+        [200, playPop],
+        [900, playSnap],
+        [1500, playGiggle],
+      ],
+      ms: 2200,
+      nope: playSnap,
+      frees: true,
+      ask: "Eine Krabbe wohnt im Eimer! Sie sucht ein Haus. Was geben wir ihr?",
+      done: "Die Muschel! Ein neues Haus für die Krabbe.",
+    },
+  ],
+  // Up into the air and back into the hands (they hold it at x 4666, y 662), while everybody builds the sandcastle.
+  finale: { via: [[[4720, 400], 900]], to: [4666, 662], ms: 900, sway: 0, say: "Eimer und Schaufel sind wieder da! Wir bauen eine Sandburg." },
+};
+
 // G-07: the teddy runs ahead into the forest with the picnic basket; on the clearing the bear holds it,
 // and once the bear has its honey everybody has a picnic together.
 const picknick: TrailLevel = {
@@ -667,4 +784,4 @@ const picknick: TrailLevel = {
 };
 
 /** All trail levels, in the order of their cards. */
-export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, picknick];
+export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, sandburg, picknick];

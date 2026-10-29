@@ -713,6 +713,126 @@
   transform: scaleX(0.18);
 }
 
+/* ---------- „Die Sandburg“ ---------- */
+
+/* At the start a wave rolls up the beach once, takes the bucket and runs out again. */
+.tl-sand-wave {
+  transform-box: fill-box;
+  transform-origin: bottom left;
+  animation: tl-sand-wave 1.8s ease-out 0.6s both;
+}
+
+/* With the roll, the gull pecks it up where it fell, then flies off over the sea. */
+.tl-sand-gull {
+  transition: transform 1.4s ease-in 2.4s;
+}
+
+.tl-sand-gull.done {
+  transform: translate(420px, -760px);
+}
+
+.tl-sand-gull.done .tl-sand-peck {
+  animation: tl-sand-peck 0.3s ease-in-out 0.3s 6 alternate;
+}
+
+.tl-nope .tl-sand-gull-head {
+  animation: tl-head-no 0.33s ease-in-out 3;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The heat rises from the hot sand while the child stands at it. */
+.tl-sand-heat.on {
+  animation: tl-sand-heat 0.8s ease-in-out 6 alternate;
+}
+
+/* With the shell, the crab climbs out of the bucket into its new house; at the party it goes over to the sandcastle
+   and waves its claw. */
+.tl-sand-movein {
+  animation: tl-sand-movein 0.9s ease-in-out both;
+}
+
+.tl-sand-crab {
+  transition: transform 1.6s ease-in-out;
+}
+
+.tl-sand-crab.party {
+  transform: translateX(150px);
+}
+
+.tl-sand-crab.party .tl-sand-claw {
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: tl-wag 0.3s ease-in-out 1.6s 10 alternate;
+}
+
+/* The sandcastle's towers grow up one after the other; the gull comes back and lands on one. */
+.tl-sand-tower {
+  transform-box: fill-box;
+  transform-origin: bottom center;
+  animation: tl-sand-grow 0.6s cubic-bezier(0.3, 1.5, 0.6, 1) both;
+}
+
+.tl-sand-land {
+  animation: tl-sand-land 1.4s ease-out 1.8s both;
+}
+
+@keyframes tl-sand-wave {
+  from {
+    opacity: 0;
+    transform: translate(-80px, 60px) scale(0.5);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate(220px, 30px) scale(0.8, 0.3);
+  }
+}
+
+@keyframes tl-sand-peck {
+  to {
+    transform: rotate(-40deg);
+  }
+}
+
+@keyframes tl-sand-heat {
+  to {
+    transform: translateY(-14px);
+    opacity: 0.25;
+  }
+}
+
+@keyframes tl-sand-movein {
+  from {
+    transform: translate(100px, -110px);
+  }
+  50% {
+    transform: translate(50px, -160px);
+  }
+  to {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes tl-sand-grow {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes tl-sand-land {
+  from {
+    opacity: 0;
+    transform: translate(500px, -600px);
+  }
+  20% {
+    opacity: 1;
+  }
+}
+
 /* ---------- „Picknick im Wald“ ---------- */
 
 .tl-picknick-squirrel,

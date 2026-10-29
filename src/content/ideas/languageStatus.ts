@@ -94,11 +94,16 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/kleine-abenteuer/",
     parts: [
-      { label: "🧭 Die anderen Geschichten und Wege", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      { label: "🧭 Die anderen sieben Geschichten", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🏖️ Die Sandburg",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-05, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
+      },
       {
         label: "🧺 Picknick im Wald",
         languages: { de: "done" },
-        note: "Name und alle Sätze nur auf Deutsch (G-07, Oktober 2026); die Phrasebooks (en.ts, ru.ts …) haben sie noch nicht.",
+        note: "Name und alle Sätze nur auf Deutsch (G-07, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
     ],
   },
