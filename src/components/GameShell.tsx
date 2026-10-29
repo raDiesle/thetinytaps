@@ -31,8 +31,18 @@ export interface GameMode {
   id: string;
   emoji: string;
   title: string;
-  /** A small tag for the parent, what sort of level it is when a game has several (e.g. „🛗 Aufzug“). */
+  /**
+   * What sort of level it is when a game has several (e.g. „🛗 Aufzug“): the cards of one sort stand together in a
+   * frame, with the sort's name once above them.
+   */
   kind?: string;
+}
+
+/** The modes in runs of one `kind` each, in the order the kinds first come; one run without kinds when none has one. */
+function byKind(modes: GameMode[]) {
+  const groups = new Map<string | undefined, GameMode[]>();
+  for (const m of modes) groups.set(m.kind, [...(groups.get(m.kind) ?? []), m]);
+  return [...groups].map(([kind, modes]) => ({ kind, modes }));
 }
 
 interface GameShellProps {
@@ -86,7 +96,11 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   // The panel opened below the two buttons, if any: folded away by default, so the start screen stays short.
   const [panel, setPanel] = useState<"info" | "settings" | null>(null);
   const playtime = usePlaytime(playing && !returnTo);
-  const grid = useFitGrid(modes?.length ?? 0);
+  const groups = modes?.some((m) => m.kind) ? byKind(modes) : undefined;
+  const grid = useFitGrid(
+    modes?.length ?? 0,
+    groups?.map((g) => g.modes.length),
+  );
   // The background song runs on from the menus into the game (BackgroundMusic), until the play time is over.
   useNoBackgroundMusic(playing && playtime.goodNight);
   // Taps a little next to something the child can tap still count for it (see tapTargets.ts).
@@ -179,6 +193,26 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
     );
   }
 
+  /** One mode's card. */
+  const card = (m: GameMode) => (
+    <li key={m.id}>
+      <button type="button" className="game-card mode-card" onClick={() => pick(m.id)}>
+        <span className="game-emoji" aria-hidden>
+          {m.emoji}
+        </span>
+        <span className="game-title">{m.title}</span>
+        <span className="game-go" aria-hidden>
+          ▶
+        </span>
+        {m.id === mode && (modes?.length ?? 0) > 1 && (
+          <span className="badge">
+            {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
+          </span>
+        )}
+      </button>
+    </li>
+  );
+
   const pick = (id: string) => {
     onMode?.(id);
     void start();
@@ -257,25 +291,16 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
           </h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
-            {modes.map((m) => (
-              <li key={m.id}>
-                <button type="button" className="game-card mode-card" onClick={() => pick(m.id)}>
-                  <span className="game-emoji" aria-hidden>
-                    {m.emoji}
-                  </span>
-                  <span className="game-title">{m.title}</span>
-                  {m.kind && <span className="mode-kind">{m.kind}</span>}
-                  <span className="game-go" aria-hidden>
-                    ▶
-                  </span>
-                  {m.id === mode && modes.length > 1 && (
-                    <span className="badge">
-                      {t({ de: "zuletzt", ru: "в прошлый раз", en: "last time", zh: "上次玩的", hi: "पिछली बार", es: "la última vez", ar: "آخر مرة" })}
-                    </span>
-                  )}
-                </button>
-              </li>
-            ))}
+            {groups
+              ? groups.map((g, i) => (
+                  <li key={g.kind ?? ""} className="mode-group" style={grid.places?.[i]}>
+                    {g.kind && <span className="mode-group-label">{g.kind}</span>}
+                    <ul className="mode-group-cards" aria-label={g.kind}>
+                      {g.modes.map(card)}
+                    </ul>
+                  </li>
+                ))
+              : modes.map(card)}
           </ul>
         </section>
       ) : (

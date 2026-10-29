@@ -2,7 +2,7 @@
 
 Route `/kleine-abenteuer/` (the old `/aufzug/` redirects there) · ideas N-37 and area G („Kleine Abenteuer“), in „Lebendige Welten“. Was called „Spaß im Aufzug“; the folder, the code names (`Elevator…`) and the settings key `tinytaps.elevator.v2` keep the old name so saved settings and other branches still fit.
 
-Picture adventures of a few minutes for 2–3-year-olds. Two kinds of levels, picked on the start screen (each card has a small tag for the parent, „🛗 Aufzug“, „🚶 Laufen“ or „🛶 Paddeln“, the `kind` of `GameMode`); at the end „Menü“ goes back to the start screen, „Nochmal“ plays the same one again and „Weiter“ (with the next one's picture, any key too) goes on to the next in `CARDS` order, after the last back to the first (`cards.tsx`, the shared `GameEnd`):
+Picture adventures of a few minutes for 2–3-year-olds. Two kinds of levels, picked on the start screen, where the cards stand in groups on pale frames with the group's name once above them („🛗 Aufzug“, „🚶 Laufen“, „🛶 Paddeln“: the `kind` of `GameMode`, which `GameShell` groups by); at the end „Menü“ goes back to the start screen, „Nochmal“ plays the same one again and „Weiter“ (with the next one's picture, any key too) goes on to the next in `CARDS` order, after the last back to the first (`cards.tsx`, the shared `GameEnd`):
 
 ## Lift stories (`content.ts`, `ElevatorPlay.tsx`)
 
