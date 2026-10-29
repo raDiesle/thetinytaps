@@ -43,10 +43,10 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 - `useGameSettings(KEY, DEFAULTS)` in `<X>Game`; include `speech` and `sounds` fields
   if the game talks or makes noise – they are filled in from the home page options.
   Defaults: `speech: false`, `sounds: true`.
-- What the game is and how it is played goes into `info` (required, „ℹ️ Über das Spiel“): short German
-  `<p>`s for grown-ups, one per mode, keyboard hints only when `!useDevice().touchOnly`.
-- Parent options go into `settings` with `SettingsGroup`, `Toggle`, `Choice`
-  (`src/components/SettingControls.tsx`) – only options, no description; no own switch for
+- A new game has no `info` („ℹ️ Über das Spiel“) and no `settings` („⚙️ Einstellungen“): it explains itself by playing
+  (glow, pointing hand, a reaction to every tap), and what a switch would choose is decided once, the way that plays
+  best. Only if the user asks for an option, put it into `settings` with `SettingsGroup`, `Toggle`, `Choice`
+  (`src/components/SettingControls.tsx`) – only options, no description; never an own switch for
   Vorlesen, Töne, Musik or Sprache, the home page sets those for all games.
 - Sounds: build on `note()` and friends in `src/lib/sfx/core.ts` (the new sound goes into the topic file it fits), or `playRecorded(name, fallback)`
   for a recording in `src/lib/sounds/`. Speech: `speak()` from `src/lib/speech.ts`, only if
