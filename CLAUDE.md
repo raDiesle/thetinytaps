@@ -129,6 +129,10 @@ In a fresh worktree run `bun install` first.
   keyframes from another game's CSS (`css.test.ts` checks it).
 - Drawings are SVG in React components, animated with CSS classes; no image files
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
+  Phones must keep up: what moves across a big picture as a whole (a scrolling world, a camera) is an HTML layer of its
+  own (its own svg in a `div` with `will-change: transform`), never a moved group inside one big svg, which the browser
+  paints whole again in every frame; and a big still drawing is built once (`useMemo`, `memo`), not again with every
+  tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this).
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
