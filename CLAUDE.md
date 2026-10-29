@@ -172,6 +172,8 @@ In a fresh worktree run `bun install` first.
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`), and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own.
+  Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
+  cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
   no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
