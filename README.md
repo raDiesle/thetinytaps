@@ -53,7 +53,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
 | `src/games/loud/` | Game „Laut und leise“: the microphone's loudness moves lion and mouse; „Pusten“. Details in its [`CLAUDE.md`](src/games/loud/CLAUDE.md) |
 | `src/games/feelings/` | Game „Gefühle“: comfort the bear, kindergarten stories with picture choices. Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |
-| `src/games/marbles/` | Game „Kettenreaktion“: the Klingende Kugelbahn (a long marble run with parts to swap), „Alles fällt um“, seven Rube Goldberg machines, and Nagelbrett, Hatschi-Kette and Wasserbahn to join in. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
+| `src/games/marbles/` | Game „Kettenreaktion“: the Klingende Kugelbahn (a long marble run with parts to swap), „Alles fällt um“, eight Rube Goldberg machines, and Nagelbrett, Hatschi-Kette and Wasserbahn to join in. Details in its [`CLAUDE.md`](src/games/marbles/CLAUDE.md) |
 | `src/games/elevator/` | Game „Kleine Abenteuer“ (was „Spaß im Aufzug“): picture stories in a house with a lift, and trail adventures through a scrolling world with a bag of things. Details in its [`CLAUDE.md`](src/games/elevator/CLAUDE.md) |
 | `src/games/adventure/` | Game „Bewegungsabenteuer“: 3D movement story with the fox Tapsi (three.js, lazy-loaded). Details in its [`CLAUDE.md`](src/games/adventure/CLAUDE.md) |
 | `src/lib/` | Speech (Web Speech API), synthesized sounds, settings storage, PWA |

@@ -170,6 +170,18 @@ export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localize
       ru: "Нажми — и зажжётся свет!",
     },
   },
+  bath: {
+    name: { de: "Badezimmer" },
+    intro: { de: "Tipp auf den Knopf! Dann geht es ins Bad." },
+  },
+  farm: {
+    name: { de: "Bauernhof" },
+    intro: { de: "Tipp! Dann kräht der Hahn." },
+  },
+  night: {
+    name: { de: "Gute-Nacht-Maschine" },
+    intro: { de: "Tipp! Dann spielt die Spieluhr." },
+  },
   tidy: {
     name: { de: "Aufräum-Maschine" },
     intro: { de: "Tipp! Dann räumt die Maschine auf." },

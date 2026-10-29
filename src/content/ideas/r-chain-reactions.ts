@@ -48,6 +48,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Neue Welt: Die Zahnpastatube drückt einen Klecks auf die Bürste, die kippt ins Zahnputzglas, das Glas schubst die Quietscheente in die Wanne, die Wanne läuft über, und Seifenblasen steigen bis zur Lampe.",
       why: "Passt zu „Zähne putzen“ und zum Abend vor dem Baden.",
       effort: "M",
+      done: true,
     },
     {
       id: "R-06",
@@ -56,6 +57,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Jedes Glied der Kette ist ein Tier: Der Hahn kräht, das Schwein springt erschrocken in die Pfütze, der Spritzer weckt die Katze, die schubst den Eimer um, die Kuh muht … bis alle Tiere im Stall zusammen singen.",
       why: "Tierstimmen kennen die Kinder schon; vertraute Figuren machen die Kette leicht verständlich.",
       effort: "M",
+      done: true,
     },
     {
       id: "R-07",
@@ -64,6 +66,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Eine ganz ruhige Maschine: Die Spieluhr dreht sich, ein Stern rollt sanft eine Rinne hinunter, der Vorhang geht zu, das Licht geht aus, der Mond geht auf. Am Ende schlafen alle Teile, leise Töne, langsames Tempo.",
       why: "Ein ruhiger letzter Durchgang vor dem Schlafen; passt zur Spielzeit-Grenze (N-03, A-03).",
       effort: "M",
+      done: true,
     },
     {
       id: "R-08",

@@ -84,8 +84,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/kettenreaktion/",
     parts: [
-      { label: "⛓️ Alle anderen Level", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
-      { label: "🧸 Aufräum-Maschine", languages: { de: "done" }, note: "Neu im Oktober 2026: Name, erster Satz und „Alles aufgeräumt!“ nur auf Deutsch." },
+      { label: "🎢 Die anderen zwölf Level", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      { label: "🛁 Badezimmer", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze der Maschine nur auf Deutsch (R-05)." },
+      { label: "🐓 Bauernhof", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze unterwegs nur auf Deutsch." },
+      { label: "🌙 Gute-Nacht-Maschine", languages: { de: "done" }, note: "Name, erster Satz und Gute-Nacht-Sätze nur auf Deutsch (R-07, Oktober 2026)." },
+      { label: "🧸 Aufräum-Maschine", languages: { de: "done" }, note: "Name, erster Satz und „Alles aufgeräumt!“ nur auf Deutsch (R-08, Oktober 2026)." },
     ],
   },
   { href: "/kleine-abenteuer/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
