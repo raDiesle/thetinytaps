@@ -13,6 +13,9 @@ function keyboardApi(): KeyboardLock | undefined {
   return (navigator as Navigator & { keyboard?: KeyboardLock }).keyboard;
 }
 
+// Whether this page locked the keyboard, so leaving a game only unlocks what it locked.
+let keyboardLocked = false;
+
 // Older iPad Safari only has the prefixed API (iPhone Safari has none at all).
 type WebkitElement = HTMLElement & { webkitRequestFullscreen?: () => Promise<void> | void };
 type WebkitDocument = Document & {
@@ -73,7 +76,7 @@ export async function enterFullscreen(): Promise<boolean> {
 
 /** Leave fullscreen, e.g. when the grown-up taps the button on the home page. */
 export async function exitFullscreen() {
-  keyboardApi()?.unlock?.();
+  exitKidMode();
   if (!isFullscreen()) return;
   const doc = document as WebkitDocument;
   try {
@@ -86,12 +89,17 @@ export async function exitFullscreen() {
 /**
  * Enter fullscreen and, where supported (Chrome/Edge), lock the keyboard so
  * shortcuts like Cmd+W or Esc reach the game instead of the browser.
+ * Phones and tablets get no lock: they have no keys to guard, and Chrome shows
+ * its "how to leave fullscreen" note again on every lock and unlock, so it
+ * would pop up over each game start and each way back to the menu.
  * Returns whether fullscreen was entered.
  */
 export async function enterKidMode(): Promise<boolean> {
   if (!(await enterFullscreen())) return false;
+  if (touchOnly()) return true;
   try {
     await keyboardApi()?.lock?.();
+    keyboardLocked = true;
   } catch {
     // Keyboard Lock is optional; fullscreen alone is still useful.
   }
@@ -103,6 +111,8 @@ export async function enterKidMode(): Promise<boolean> {
  * leaves fullscreen), but the page stays in fullscreen.
  */
 export function exitKidMode() {
+  if (!keyboardLocked) return;
+  keyboardLocked = false;
   keyboardApi()?.unlock?.();
 }
 
