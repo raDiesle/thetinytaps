@@ -105,6 +105,12 @@ two spoken sentences `ask` (on arrival) and `done` – only with „Vorlesen“:
   jetty), where the raft stays behind. An obstacle with `float: { to, put }` lets the child
   float slowly down the ground points `to` after it is solved, holding the thing up (the umbrella
   down the waterfall), and then put it down at `put` (the drawing shows it there from then on).
+- **`turns`** (on the level) – a world that goes up instead of sideways (G-04, „Wo ist die
+  Katze?“, a stairwell): the ground's x is the way walked, and at each turn the drawing runs
+  back the other way, one floor above (`placed`/`facing` in `ground.ts`). Ground, `start`,
+  station `x` and steps are in walked x; `at`, `wants`, flights and the drawing are in drawn
+  points between x 0 and 1600. The camera follows only the height. Draw the floors in
+  `<level>.tsx` in drawn points (as `katze.tsx` does); `levels.test.ts` checks the ground stays inside.
 
 The world drawing (`drachen.tsx`) exports the ground constants, `<Level>Scenery` and
 `<Level>Backdrop`. `Scenery` gets `{ done, here, nope, party }` (`party`: the goal is back) and draws every station from

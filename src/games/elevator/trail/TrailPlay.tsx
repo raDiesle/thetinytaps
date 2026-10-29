@@ -13,7 +13,7 @@ import { HERO, KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose } from ".
 import { spokenIn, translationOf } from "../phrases";
 import type { ElevatorSettings } from "../settings";
 import { FRIENDS, type FriendPose } from "./friends";
-import { allStations, groundY, route } from "./ground";
+import { allStations, facing, groundY, placed, route } from "./ground";
 import { Fitted, GOALS, ITEMS, type Goal, type ItemId, type Picture } from "./items";
 import type { Climb, Cue, Flight, Fork, Moment, Obstacle, Pickup, Point, Station, TrailLevel, Way } from "./types";
 import { WORRIES } from "./worries";
@@ -23,6 +23,9 @@ const VIEW_W = 1600;
 const VIEW_H = 900;
 /** Where the child's feet are on the screen: the world scrolls so that it stays there. */
 const KID_AT: Point = [760, 740];
+/** How high the child's feet are on the screen in a world that goes up (`turns`): higher than `KID_AT`, since the
+ * child walks across the whole width there, over the bag and the button too. */
+const UP_FEET = 620;
 /** How much slower the far hills move than the world. */
 const FAR = 0.3;
 /** Walking time per world point. */
@@ -161,6 +164,8 @@ function KeyCap({ x, y, w, on, down, children }: { x: number; y: number; w: numb
 interface Next {
   prints: Point[];
   ghost: Point;
+  /** The way the ghost looks: in a world that turns, it may look left. */
+  face: 1 | -1;
   pose: Pose;
   icon: ItemId | "walk" | "climb" | "paddle";
   /** Where the thing lies that the tap picks up: a yellow ring goes round it, and its pale picture waits in the
@@ -262,33 +267,36 @@ interface View {
   party: boolean;
 }
 
-const startView = (level: TrailLevel): View => ({
-  picking: false,
-  kid: { x: level.start, y: groundY(level.ground, level.start), walk: 0, pose: "stand", face: 1, hop: 0 },
-  bag: [null, null, null],
-  entering: null,
-  leaving: null,
-  bagBump: 0,
-  carry: null,
-  wear: level.wear ?? [],
-  pack: PACK_SHUT,
-  done: [],
-  here: null,
-  nope: null,
-  choosing: false,
-  hint: null,
-  shake: 0,
-  action: null,
-  bubble: null,
-  fork: null,
-  friend: null,
-  party: false,
-});
+const startView = (level: TrailLevel): View => {
+  const [x, y] = placed(level.turns, [level.start, groundY(level.ground, level.start)]);
+  return {
+    picking: false,
+    kid: { x, y, walk: 0, pose: "stand", face: facing(level.turns, level.start), hop: 0 },
+    bag: [null, null, null],
+    entering: null,
+    leaving: null,
+    bagBump: 0,
+    carry: null,
+    wear: level.wear ?? [],
+    pack: PACK_SHUT,
+    done: [],
+    here: null,
+    nope: null,
+    choosing: false,
+    hint: null,
+    shake: 0,
+    action: null,
+    bubble: null,
+    fork: null,
+    friend: null,
+    party: false,
+  };
+};
 
-/** The hand of the child reaching out (pose "reach", facing right), where the string is held. */
-const handOf = (kid: KidState): Point => [kid.x + 62, kid.y - 112];
+/** The hand of the child reaching out (pose "reach"), where the string is held. */
+const handOf = (kid: KidState): Point => [kid.x + 62 * kid.face, kid.y - 112];
 /** Where the goal is while the child holds it: high up on its string, or in the reaching hand. */
-const heldOf = (kid: KidState, goal: Goal): Point => (goal.carry === "string" ? [kid.x + 140, kid.y - 250] : [kid.x + 66, kid.y - 78]);
+const heldOf = (kid: KidState, goal: Goal): Point => (goal.carry === "string" ? [kid.x + 140 * kid.face, kid.y - 250] : [kid.x + 66 * kid.face, kid.y - 78]);
 
 /** "Weg-Abenteuer": the goal goes away, the child follows it through a scrolling world and uses what it finds. */
 export function TrailPlay({
@@ -350,6 +358,10 @@ export function TrailPlay({
   const picker = useRef<((way: number) => void) | null>(null);
   /** The ground the child walks on: the level's, and from a fork on the picked way's. */
   const ground = useRef(level.ground);
+  /** How far along the ground the child is (its x there); in a world that turns, the child is drawn elsewhere. */
+  const along = useRef(level.start);
+  /** Where a point of the ground is drawn. */
+  const place = (p: Point) => placed(level.turns, p);
 
   // The goal (the kite, the ball, the balloon) moves along curves, so it is moved frame by frame, not by React.
   const goalEl = useRef<SVGGElement>(null);
@@ -432,6 +444,7 @@ export function TrailPlay({
   /** Moves the goal to `to` in `ms`, swaying sideways by `sway` on the way. */
   const moveGoal = (to: Point, ms: number, hand: Point | null, sway = 0) => {
     const [x0, y0] = goal.current.at;
+    if (theGoal.turn && to[0] !== x0) spinEl.current?.setAttribute("transform", `scale(${to[0] > x0 ? 1 : -1} 1)`);
     const g = generation.current;
     const begin = performance.now();
     const frame = (now: number) => {
@@ -452,22 +465,26 @@ export function TrailPlay({
     await moveGoal(flight.to, flight.ms, hand, flight.sway);
   };
 
-  /** The camera: the world moves so that the child stays at `KID_AT` (moved right by the HUD's `kidX`). */
-  const camOf = (k: KidState): Point => [k.x - hud.current.kidX, k.y - KID_AT[1]];
+  /** The camera: the world moves so that the child stays at `KID_AT` (moved right by the HUD's `kidX`); a world that
+   * goes up stays put sideways and only follows the child's height. */
+  const camOf = (k: KidState): Point => (level.turns ? [0, k.y - UP_FEET] : [k.x - hud.current.kidX, k.y - KID_AT[1]]);
 
-  /** The friend (if there is one) runs to `x` on the ground in `ms`, doing `pose` there once it arrives. */
-  const friendTo = (x: number, ms: number) =>
-    put((v) => ({ friend: v.friend && { ...v.friend, x, y: groundY(ground.current, x), ms, face: x >= v.friend.x ? 1 : -1, pose: "walk" } }));
+  /** Where the ground is drawn at `x` of the way. */
+  const onGround = (x: number) => place([x, groundY(ground.current, x)]);
+
+  /** The friend (if there is one) runs to the drawn point `to` in `ms`. */
+  const friendTo = ([x, y]: Point, ms: number) => put((v) => ({ friend: v.friend && { ...v.friend, x, y, ms, face: x >= v.friend.x ? 1 : -1, pose: "walk" } }));
 
   /** The friend stays where it is now, doing `pose`, facing the way on. */
-  const friendStays = (pose: FriendPose = "sit") => put((v) => ({ friend: v.friend && { ...v.friend, ms: 0, face: 1, pose } }));
+  const friendStays = (pose: FriendPose = "sit") =>
+    put((v) => ({ friend: v.friend && { ...v.friend, ms: 0, face: facing(level.turns, along.current), pose } }));
 
-  /** The friend runs to `x` (a little faster than the child walks) and does `pose` there. */
-  const runFriend = async (x: number, pose: FriendPose = "sit") => {
+  /** The friend runs to the drawn point `to` (a little faster than the child walks) and does `pose` there. */
+  const runFriend = async (to: Point, pose: FriendPose = "sit") => {
     const f = viewRef.current.friend;
     if (!f) return;
-    const ms = Math.max(300, Math.abs(x - f.x) * RUN_MS);
-    friendTo(x, ms);
+    const ms = Math.max(300, Math.hypot(to[0] - f.x, to[1] - f.y) * RUN_MS);
+    friendTo(to, ms);
     await wait(ms);
     friendStays(pose);
   };
@@ -476,15 +493,17 @@ export function TrailPlay({
 
   /** Walks the child along the ground to `x`; the world scrolls along, and a friend follows behind. */
   const walkTo = async (x: number) => {
-    for (const [px, py] of route(ground.current, viewRef.current.kid.x, x)) {
+    for (const corner of route(ground.current, along.current, x)) {
       const k = viewRef.current.kid;
+      const [px, py] = place(corner);
+      along.current = corner[0];
       const ms = Math.hypot(px - k.x, py - k.y) * WALK_MS;
       if (ms < 1) continue;
-      kid({ x: px, y: py, walk: ms, pose: afloat(px) ? "paddle" : "walk", face: px >= k.x ? 1 : -1 });
-      friendTo(px - FRIEND_GAP, ms);
+      kid({ x: px, y: py, walk: ms, pose: afloat(corner[0]) ? "paddle" : "walk", face: px >= k.x ? 1 : -1 });
+      friendTo(onGround(corner[0] - FRIEND_GAP), ms);
       await wait(ms);
     }
-    kid({ walk: 0, pose: "stand", face: 1 });
+    kid({ walk: 0, pose: "stand", face: facing(level.turns, x) });
     friendStays();
   };
 
@@ -580,17 +599,18 @@ export function TrailPlay({
     }
   };
 
-  /** Footprints along `on` (the ground) from the child to `x`, then one on each of `steps`. */
+  /** Footprints along `on` (the ground) from the child to `x`, then one on each of `steps`, where they are drawn. */
   const printsTo = (x: number, steps: Point[] = [], on = ground.current): Point[] => {
     const prints: Point[] = [];
-    for (let px = viewRef.current.kid.x + PRINT_GAP; px < x - PRINT_GAP / 2; px += PRINT_GAP) prints.push([px, groundY(on, px)]);
-    return [...prints, ...steps];
+    for (let px = along.current + PRINT_GAP; px < x - PRINT_GAP / 2; px += PRINT_GAP) prints.push([px, groundY(on, px)]);
+    return [...prints, ...steps].map(place);
   };
 
   /** Walking on to `x` and doing `pose` there, shown before the tap. */
   const nextAt = (x: number, pose: Pose, icon: Next["icon"], on = ground.current): Next => ({
     prints: printsTo(x, [], on),
-    ghost: [x, groundY(on, x)],
+    ghost: place([x, groundY(on, x)]),
+    face: facing(level.turns, x),
     pose,
     icon: icon === "walk" && afloat(x) ? "paddle" : icon,
   });
@@ -601,7 +621,8 @@ export function TrailPlay({
     if (station.kind === "moment") return nextAt(station.x, station.pose, "walk", on);
     if (station.kind === "obstacle") return nextAt(station.x, "stand", "walk", on);
     const half = station.steps.slice(0, Math.ceil(station.steps.length / 2));
-    return { prints: printsTo(station.x, half, on), ghost: half[half.length - 1], pose: "stand", icon: "climb" };
+    const top = half[half.length - 1];
+    return { prints: printsTo(station.x, half, on), ghost: place(top), face: facing(level.turns, top[0]), pose: "stand", icon: "climb" };
   };
 
   /** The action button lights up until the child taps (it, anywhere, or any key), and footprints and the child's
@@ -638,8 +659,8 @@ export function TrailPlay({
 
   const nextChoice = () => new Promise<number>((resolve) => (chooser.current = resolve));
 
-  /** The friend's picture rises out of the backpack on the screen, and the friend barks and runs off to `x` to help. */
-  const sendFriend = async (slot: number, x: number, pose: FriendPose) => {
+  /** The friend's picture rises out of the backpack on the screen, and the friend barks and runs off to `to` to help. */
+  const sendFriend = async (slot: number, to: Point, pose: FriendPose) => {
     const f = viewRef.current.friend!;
     put((v) => ({ leaving: slot, bagBump: v.bagBump + 1 }));
     sound(playPop);
@@ -649,12 +670,12 @@ export function TrailPlay({
     hopFriend();
     sound(FRIENDS[f.id]!.sound);
     await wait(400);
-    await runFriend(x, pose);
+    await runFriend(to, pose);
   };
 
   /** The friend runs back behind the child; its picture drops into the backpack again at `slot`. */
   const friendBack = async (slot: number | null) => {
-    await runFriend(viewRef.current.kid.x - FRIEND_GAP);
+    await runFriend(onGround(along.current - FRIEND_GAP));
     if (slot === null) return;
     const id = viewRef.current.friend!.id;
     put((v) => ({ bag: v.bag.map((thing, i) => (i === slot ? id : thing)), entering: slot, bagBump: v.bagBump + 1 }));
@@ -677,7 +698,7 @@ export function TrailPlay({
     await wait(500);
     put({ entering: null });
     kid({ pose: "stand" });
-    await runFriend(viewRef.current.kid.x - FRIEND_GAP);
+    await runFriend(onGround(along.current - FRIEND_GAP));
   };
 
   const obstacle = async (station: Obstacle, picked: boolean) => {
@@ -706,7 +727,7 @@ export function TrailPlay({
       if (item === viewRef.current.friend?.id) {
         // The friend runs over: it does the job itself, or tries, gets a funny "no" and comes back.
         const right = item === station.need;
-        await sendFriend(slot, station.at[0], right ? "work" : "sit");
+        await sendFriend(slot, [station.at[0], viewRef.current.kid.y], right ? "work" : "sit");
         if (right) {
           helped = true;
           break;
@@ -766,7 +787,9 @@ export function TrailPlay({
     const held: Point = [hx - k0.x, hy - k0.y];
     kid({ pose: "lift" });
     await wait(400);
-    for (const [x, y] of to) {
+    for (const point of to) {
+      const [x, y] = place(point);
+      along.current = point[0];
       const k = viewRef.current.kid;
       const ms = Math.hypot(x - k.x, y - k.y) * FLOAT_MS;
       kid({ x, y, walk: ms });
@@ -786,8 +809,11 @@ export function TrailPlay({
     if (!picked) await go(nextOf(station));
     await walkTo(station.x);
     say(station.ask);
-    for (const [i, [x, y]] of steps.entries()) {
-      if (i === half) await go({ prints: steps.slice(half), ghost: steps[steps.length - 1], pose: "stand", icon: "climb" });
+    for (const [i, step] of steps.entries()) {
+      const top = steps[steps.length - 1];
+      if (i === half) await go({ prints: steps.slice(half).map(place), ghost: place(top), face: facing(level.turns, top[0]), pose: "stand", icon: "climb" });
+      const [x, y] = place(step);
+      along.current = step[0];
       kid({ x, y, walk: STEP_MS, pose: "walk" });
       sound(() => playCountNote(i));
       await wait(STEP_MS);
@@ -798,11 +824,13 @@ export function TrailPlay({
       sound(playSlide);
       kid({ pose: "cheer" });
       const { slide } = station;
-      const from = [steps[steps.length - 1], ...slide];
-      const slideMs = slide.reduce((sum, [x, y], i) => sum + Math.hypot(x - from[i][0], y - from[i][1]) * SLIDE_MS, 0);
-      friendTo(slide[slide.length - 1][0] - FRIEND_GAP, slideMs);
-      for (const [x, y] of slide) {
+      const from = [steps[steps.length - 1], ...slide].map(place);
+      const slideMs = slide.map(place).reduce((sum, [x, y], i) => sum + Math.hypot(x - from[i][0], y - from[i][1]) * SLIDE_MS, 0);
+      friendTo(onGround(slide[slide.length - 1][0] - FRIEND_GAP), slideMs);
+      for (const point of slide) {
         const k = viewRef.current.kid;
+        const [x, y] = place(point);
+        along.current = point[0];
         const ms = Math.hypot(x - k.x, y - k.y) * SLIDE_MS;
         kid({ x, y, walk: ms });
         await wait(ms);
@@ -1080,7 +1108,7 @@ export function TrailPlay({
               <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
                 <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
                   {raft && afloat(n.ghost[0]) && <raft.Raft paddling={false} done={view.done} />}
-                  <Kid look={HERO} pose={n.pose} holding={null} wear={view.wear} face={1} backpack={PACK_SHUT} />
+                  <Kid look={HERO} pose={n.pose} holding={null} wear={view.wear} face={n.face} backpack={PACK_SHUT} />
                 </g>
               </g>
             </g>
@@ -1137,7 +1165,7 @@ export function TrailPlay({
           </g>
           {view.bubble?.at && (
             <g transform={`translate(${view.bubble.at[0]} ${view.bubble.at[1]})`}>
-              <ThoughtBubble picture={view.bubble.picture} height={0} nudge={view.bubble.nudge} right />
+              <ThoughtBubble picture={view.bubble.picture} height={0} nudge={view.bubble.nudge} right={view.bubble.at[0] >= k.x} />
             </g>
           )}
         </g>

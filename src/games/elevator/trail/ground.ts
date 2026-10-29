@@ -45,3 +45,28 @@ export function pathsOf(level: TrailLevel): Path[] {
 
 /** Every station of `level`, those of all ways included. */
 export const allStations = (level: TrailLevel): Station[] => level.stations.flatMap((s) => (s.kind === "fork" ? s.ways.flatMap((w) => w.stations) : [s]));
+
+/** Where a point of the ground is drawn. In a world that turns (`TrailLevel.turns`, a stairwell going up) x is the way
+ * walked, and after each turn the drawing goes back the other way; without turns it is the point itself. */
+export function placed(turns: number[] | undefined, [x, y]: Point): Point {
+  let at = 0;
+  let from = 0;
+  let dir = 1;
+  for (const turn of turns ?? []) {
+    if (x <= turn) break;
+    at += dir * (turn - from);
+    from = turn;
+    dir = -dir;
+  }
+  return [at + dir * (x - from), y];
+}
+
+/** Which way the child looks while walking on at `x`: 1 to the right, -1 to the left; at a turn still the way it came. */
+export function facing(turns: number[] | undefined, x: number): 1 | -1 {
+  let dir: 1 | -1 = 1;
+  for (const turn of turns ?? []) {
+    if (x <= turn) break;
+    dir = dir === 1 ? -1 : 1;
+  }
+  return dir;
+}

@@ -30,6 +30,8 @@ export type ItemId =
   | "berries"
   | "saw"
   | "stick"
+  | "yarn"
+  | "torch"
   | "dog";
 
 /** A drawing and its size, to fit it into a slot, a bubble or a card. */
@@ -572,9 +574,64 @@ export const ITEMS: Record<ItemId, Picture> = {
   berries: { w: 84, h: 108, draw: () => <Berries /> },
   saw: { w: 180, h: 62, draw: () => <Saw /> },
   stick: { w: 160, h: 64, draw: () => <Stick /> },
+  yarn: { w: 76, h: 76, draw: () => <Yarn /> },
+  torch: { w: 52, h: 124, draw: () => <Torch /> },
   /** Not a thing: the dog that walks along (`friends.tsx`), its picture in the backpack. */
   dog: { w: 100, h: 134, draw: () => <DogFace /> },
 };
+
+/** A ball of pink wool, its thread wound round and its loose end hanging down. */
+export function Yarn() {
+  return (
+    <g>
+      <path d="M22 -10 Q40 -2 34 10" stroke="#c2255c" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <circle cx="0" cy="-32" r="32" fill="#f783ac" stroke={INK} strokeWidth="4" />
+      <g stroke="#c2255c" strokeWidth="3.5" fill="none" strokeLinecap="round">
+        <path d="M-24 -52 Q4 -40 18 -2" />
+        <path d="M-31 -38 Q0 -26 8 1" />
+        <path d="M-12 -62 Q16 -48 28 -16" />
+        <path d="M-28 -18 Q-6 -36 22 -56" />
+      </g>
+      <ellipse cx="-12" cy="-46" rx="7" ry="5" fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
+/** A torch standing on its end, the glass at the top; `lit` makes the glass shine. */
+export function Torch({ lit = false }: { lit?: boolean }) {
+  return (
+    <g>
+      <rect x="-15" y="-88" width="30" height="88" rx="8" fill="#fcc419" stroke={INK} strokeWidth="4" />
+      <path d="M-15 -70 H15 M-15 -20 H15" stroke="#e8a500" strokeWidth="4" />
+      <rect x="-7" y="-56" width="14" height="20" rx="4" fill="#e03131" stroke={INK} strokeWidth="3" />
+      <path d="M-15 -86 L-24 -112 H24 L15 -86 Z" fill="#495057" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <ellipse cx="0" cy="-114" rx="25" ry="8" fill={lit ? "#ffe066" : "#e7f5ff"} stroke={INK} strokeWidth="4" />
+    </g>
+  );
+}
+
+/** A cat standing, looking right: orange with darker stripes and a white chest; `colour` for a grey or black one. */
+export function Cat({ colour = "#ffa94d", stripe = "#e8590c" }: { colour?: string; stripe?: string }) {
+  return (
+    <g>
+      <path d="M-44 -40 Q-74 -44 -70 -82 Q-68 -96 -58 -96" stroke={INK} strokeWidth="16" strokeLinecap="round" fill="none" />
+      <path d="M-44 -40 Q-74 -44 -70 -82 Q-68 -96 -58 -96" stroke={colour} strokeWidth="9" strokeLinecap="round" fill="none" />
+      {[-34, -16, 14, 30].map((x) => (
+        <rect key={x} x={x - 6} y="-34" width="12" height="34" rx="5" fill={colour} stroke={INK} strokeWidth="3.5" />
+      ))}
+      <ellipse cx="-4" cy="-40" rx="46" ry="22" fill={colour} stroke={INK} strokeWidth="4" />
+      <path d="M-20 -60 V-46 M-6 -62 V-48 M8 -61 V-48" stroke={stripe} strokeWidth="5" strokeLinecap="round" />
+      <path d="M26 -84 L24 -112 L44 -92 Z M50 -94 L66 -112 L68 -84 Z" fill={colour} stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+      <circle cx="44" cy="-70" r="26" fill={colour} stroke={INK} strokeWidth="4" />
+      <ellipse cx="50" cy="-56" rx="14" ry="9" fill="#fff" />
+      <circle cx="40" cy="-74" r="3.5" fill={INK} />
+      <circle cx="58" cy="-74" r="3.5" fill={INK} />
+      <path d="M47 -64 l3 3 l3 -3 Z" fill="#ff8fa3" stroke={INK} strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M44 -58 q6 4 12 0" stroke={INK} strokeWidth="2" fill="none" />
+      <path d="M62 -62 H82 M62 -58 L80 -52 M38 -62 H20 M38 -58 L22 -52" stroke={INK} strokeWidth="1.8" />
+    </g>
+  );
+}
 
 /** What a level is about: its picture, and how the child carries it in the world. */
 export interface Goal extends Picture {
@@ -584,9 +641,11 @@ export interface Goal extends Picture {
   carry: "string" | "hands";
   /** For a ball: its radius; it turns as it rolls along. */
   roll?: number;
+  /** It looks the way it moves (the cat running up the stairs); its drawing looks right. */
+  turn?: boolean;
 }
 
-export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy" | "sailboat";
+export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail" | "teddy" | "sailboat" | "cat";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
@@ -607,6 +666,7 @@ export const GOALS: Record<GoalId, Goal> = {
   pail: { w: 104, h: 170, draw: () => <Pail />, carry: "hands" },
   teddy: { w: 96, h: 116, draw: () => <TeddyBear />, carry: "hands" },
   sailboat: { w: 132, h: 150, draw: () => <Sailboat />, carry: "hands" },
+  cat: { w: 160, h: 116, draw: () => <Cat />, carry: "hands", turn: true },
 };
 
 /** `picture` scaled to fit a `width` × `height` box around (0, 0). */

@@ -151,6 +151,11 @@ export interface TrailLevel {
   Backdrop: ComponentType;
   /** The ground line the child walks on, from left to right; stairs are one point per step. */
   ground: Point[];
+  /** For a world that goes up instead of sideways (a stairwell): at each of these x of the ground the way turns round,
+   * so the drawing zigzags up (`placed` in `ground.ts`). Then x in `ground`, `start`, the stations' `x` and the steps
+   * is the way walked, while every other point (`at`, `wants`, flights) is where it is drawn; the drawing fits
+   * between x 0 and 1600, and the camera follows only the height. Each turn is a point of `ground`. */
+  turns?: number[];
   /** Where the child starts, on the ground. */
   start: number;
   /** What the child wears at the start (bare feet at the beach); shoes when left out. */

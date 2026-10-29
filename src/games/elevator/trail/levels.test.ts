@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { FRIENDS } from "./friends";
-import { allStations, groundY, pathsOf, route } from "./ground";
+import { allStations, facing, groundY, pathsOf, placed, route } from "./ground";
 import type { ItemId } from "./items";
 import { TRAIL_LEVELS } from "./levels";
 import type { Fork } from "./types";
@@ -31,6 +31,16 @@ describe("ground", () => {
       [50, 100],
     ]);
   });
+
+  test("a way that turns round is drawn zigzagging back, facing the way it goes", () => {
+    const turns = [100, 300];
+    expect(placed(turns, [50, 7])).toEqual([50, 7]);
+    expect(placed(turns, [100, 7])).toEqual([100, 7]);
+    expect(placed(turns, [160, 7])).toEqual([40, 7]);
+    expect(placed(turns, [350, 7])).toEqual([-50, 7]);
+    expect([50, 100, 160, 300, 350].map((x) => facing(turns, x))).toEqual([1, 1, -1, -1, 1]);
+    expect(placed(undefined, [500, 7])).toEqual([500, 7]);
+  });
 });
 
 describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail level %s", (_, level) => {
@@ -59,6 +69,18 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
         const end = way.stations[way.stations.length - 1].x;
         for (const x of [level.start, ...before, fork.x, ...after, end + 2000]) expect(groundY(way.ground, x)).toBe(groundY(level.ground, x));
       }
+    }
+  });
+
+  test("a world going up turns at points of its ground, and stays inside its drawing", () => {
+    if (!level.turns) return;
+    const xs = level.ground.map(([x]) => x);
+    expect(level.turns).toEqual([...level.turns].sort((a, b) => a - b));
+    for (const turn of level.turns) expect(xs).toContain(turn);
+    for (const point of [...level.ground, ...allStations(level).map((s): [number, number] => [s.x, 0])]) {
+      const [x] = placed(level.turns, point);
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(1600);
     }
   });
 
@@ -101,10 +123,15 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
       for (const station of path.stations) {
         if (station.kind !== "obstacle" || !("wants" in station.why)) continue;
         const [x, y] = station.why.wants;
-        // The child stands at 760 of 1600 on the screen, its feet at 740 of 900; the bubble grows 160 to the right
-        // and 200 up from its tip.
-        expect(x - station.x).toBeGreaterThan(40);
-        expect(x - station.x).toBeLessThan(640);
+        // The child stands at 760 of 1600 on the screen, its feet at 740 of 900 (in a world going up the screen shows
+        // the drawing's x 0–1600); the bubble grows 160 away from the child and 200 up from its tip.
+        const ahead = (x - placed(level.turns, [station.x, 0])[0]) * facing(level.turns, station.x);
+        expect(ahead).toBeGreaterThan(40);
+        expect(ahead).toBeLessThan(640);
+        if (level.turns) {
+          expect(x).toBeGreaterThan(200);
+          expect(x).toBeLessThan(1400);
+        }
         expect(groundY(path.ground, station.x) - y).toBeGreaterThan(0);
         expect(groundY(path.ground, station.x) - y).toBeLessThan(520);
       }
