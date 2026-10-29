@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import type { Pose } from "../kid";
+import type { Outfit, Pose } from "../kid";
 import type { GoalId, ItemId } from "./items";
 import type { Worry } from "./worries";
 
@@ -24,6 +24,8 @@ export interface SceneryProps {
   here: string | null;
   /** A wrong thing was just tried at this station; a new `n` wiggles it again. */
   nope: { id: string; n: number } | null;
+  /** The goal is back and everybody is happy (the end's party): the sandcastle gets built. */
+  party: boolean;
   /** The creatures walking along with the child (`friends.tsx`): `TrailPlay` draws them, so the scenery leaves them out. */
   friends: ItemId[];
 }
@@ -67,6 +69,8 @@ export interface Obstacle extends StationBase {
   why: { wants: Point } | { worry: Worry };
   /** Solving it gives the goal back: it comes into the child's hands. */
   frees?: boolean;
+  /** What the child wears from when it is solved on (the flip-flops on the hot sand): the thing is put on, not given. */
+  wear?: Outfit[];
   /** The creature helped here walks along from now on, and its picture goes into the bag (G-10): `friend` is its
    * picture in `FRIENDS`, `from` where its feet are in the scenery, `say` spoken when it joins. */
   befriends?: { friend: ItemId; from: Point; say: string };
@@ -142,6 +146,8 @@ export interface TrailLevel {
   ground: Point[];
   /** Where the child starts, on the ground. */
   start: number;
+  /** What the child wears at the start (bare feet at the beach); shoes when left out. */
+  wear?: Outfit[];
   /** At the start: the goal leaves the child's hands for `to` (where the last obstacle keeps it). */
   away: Flight & { pose: Pose; sounds: Cue[]; say: string };
   stations: (Station | Fork)[];

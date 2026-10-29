@@ -43,6 +43,8 @@ export function ElevatorGame() {
         { id: "ball", emoji: "⚽", title: title("Der Ball rollt weg"), kind: t(TRAIL) },
         { id: "ballon", emoji: "🎈", title: title("Der Luftballon"), kind: t(TRAIL) },
         { id: "lok", emoji: "🚂", title: title("Die kleine Lok"), kind: t(TRAIL) },
+        { id: "sandburg", emoji: "🏖️", title: title("Die Sandburg"), kind: t(TRAIL) },
+        { id: "picknick", emoji: "🧺", title: title("Picknick im Wald"), kind: t(TRAIL) },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}

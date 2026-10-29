@@ -69,7 +69,8 @@ export type Pose =
   | "lift"
   | "pack";
 
-export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat";
+/** What the child wears; "barefoot" and "flipflops" are for the beach (feet instead of shoes). */
+export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat" | "barefoot" | "flipflops";
 export type Holding = "eggs" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
 
 /** Held in front with both hands. */
@@ -216,6 +217,8 @@ export function Kid({
   const pyjama = wear.includes("pyjama");
   const coat = wear.includes("coat");
   const boots = wear.includes("boots");
+  const flipflops = wear.includes("flipflops");
+  const barefoot = flipflops || wear.includes("barefoot");
   const umbrella = wear.includes("umbrella");
   const chef = wear.includes("chef");
   const hat = wear.includes("hat");
@@ -281,6 +284,20 @@ export function Kid({
                   strokeLinejoin="round"
                 />
                 <rect x={s * 11 - 10} y="-33" width="20" height="6" rx="3" fill="#fab005" />
+              </>
+            ) : barefoot ? (
+              <>
+                {flipflops && <rect x={s * 13 - 16} y={legH - 52} width="32" height="7" rx="3.5" fill="#22b8cf" stroke={INK} strokeWidth="2" />}
+                <ellipse cx={s * 13} cy={legH - 56} rx="12" ry="6" fill={SKIN} />
+                {flipflops && (
+                  <path
+                    d={`M${s * 13 - 8} ${legH - 51} L${s * 13 + s * 4} ${legH - 60} L${s * 13 + 8} ${legH - 51}`}
+                    stroke="#f03e3e"
+                    strokeWidth="3.5"
+                    fill="none"
+                    strokeLinecap="round"
+                  />
+                )}
               </>
             ) : (
               <ellipse cx={s * 13} cy={legH - 54} rx="13" ry="7" fill={pyjama ? "#f783ac" : "#495057"} />
