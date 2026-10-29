@@ -120,7 +120,7 @@ use the same way.
 
 # Tagesplan
 
-Route `/tagesplan/` · ideas H-03 (partial), H-41–H-43, T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
+Route `/tagesplan/` · ideas H-03 (partial), H-41–H-43 (H-42 done), T-20 (partial) · research „tagesplan“ in `src/content/research.ts`.
 
 A picture schedule („Strukturtafel“): the steps of a day as big cards in order, „Jetzt“ above the one to do now, and a
 week of columns. Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
@@ -130,12 +130,12 @@ shares the board's parts (sheet look, themes, `A4`/`Preview`, the gallery's clas
 
 - `plan.ts` – a plan (`Plan`: view `day` or `week`, `days` as seven lists Monday first, or `same: true` and only
   `days[0]`), pure functions: `planFromTemplate`, `stepsOn`, `stepDone` (a tick in the log, or the linked game –
-  brushing only for the step's `slot`), `currentStep`, `exampleTicks`, `restartDay`, `nightsUntil`, `withSteps`,
+  brushing only for the step's `slot`), `currentStep`, `splitDone` (the row and the Fertig-Kiste), `exampleTicks`, `restartDay`, `nightsUntil`, `withSteps`,
   `withSame`, `distinctSteps` (the cards to print).
 - `catalog.ts` – `ACTIVITIES` (the day's parts, beside the board's `TASKS`), `PLAN_VIEWS` and `PLAN_TEMPLATES`:
   Morgenroutine, Abendroutine, Erst – Dann, Kita-Tag (own weekdays), Wochenplan.
-- `PlanSheet.tsx` – the sheet for screen and print: day cards (`planLayout` picks rows and columns for the box),
-  Erst–Dann with the arrow when a day has exactly two steps, the week's columns with moons for the nights until a day.
+- `PlanSheet.tsx` – the sheet for screen and print: day cards (`planLayout` picks rows and columns for the box) and on
+  screen the Fertig-Kiste below them (`DoneBox`), Erst–Dann with the arrow while both of its two steps are open, the week's columns with moons for the nights until a day.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
   `PlanPrint.tsx` – „🖨️ Drucken“ with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures;
   `planSettings.ts` – plans, current one, print options (`tinytaps.planner.v1`); `PlannerGame.tsx` – the page;
@@ -144,11 +144,16 @@ shares the board's parts (sheet look, themes, `A4`/`Preview`, the gallery's clas
 
 ## The tick flow
 
-The child taps the card under „Jetzt“: it gets its ✓ with a sound, and the voice (if on) names what comes next; the
-last one starts a small party. A done card twinkles, a later one wiggles (in the week: „Noch N-mal schlafen“). No
+The child taps the card under „Jetzt“: in the day view it flies with a sound into the Fertig-Kiste at the bottom edge
+(H-42), as on a Velcro board at home, and the row gets shorter until only the last card (the bed) is left; the voice (if
+on) names what comes next, and the last one starts a small party, the full basket filling the sheet. The flight
+(`PlanScreen`, Web Animations from the card's old place) only follows a tap, and is left out with reduced motion. In the
+week the cards are small and stay in their column with a ✓. A done card (in the box) twinkles, the box itself names
+what is in it, a later one wiggles (in the week: „Noch N-mal schlafen“). No
 grown-up hold as on the board: a plan is a guide through the day, not a reward. A key wiggles the „Jetzt“ card but
 never ticks it. „↶ Zurück“ shows for a moment after a tick; when the day is done „↺ Von vorn“ starts it again (for the
-next Erst–Dann). A new plan shows example ticks (the first steps of today, never all), and the first tap only ends them.
+next Erst–Dann) and every card flies back out of the box. A new plan shows example ticks (the first steps of today,
+never all; in the day view pale cards in the box), and the first tap only ends them.
 
 ## Rules
 
@@ -161,3 +166,5 @@ next Erst–Dann). A new plan shows example ticks (the first steps of today, nev
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
 - Defaults are the same on every load (the first plan has the fixed id `erster-plan`), as for the board.
+- A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
+  than tall, or the last card stretched across the whole sheet.

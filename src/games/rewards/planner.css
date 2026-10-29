@@ -20,6 +20,14 @@
   min-height: 0;
 }
 
+/* Never wider than tall: with one or two cards left (the rest in the Fertig-Kiste) a card would stretch across the sheet. */
+.pl-steps > .pl-slot {
+  align-self: stretch;
+  justify-self: center;
+  aspect-ratio: 1;
+  max-width: 100%;
+}
+
 .pl-tag {
   flex: none;
   font-size: clamp(0.8rem, 11cqmin, 2.4rem);
@@ -157,10 +165,93 @@
 }
 
 .pl-empty {
-  align-self: center;
-  grid-column: 1 / -1;
+  margin: auto;
   font-size: 4cqmin;
   text-align: center;
+}
+
+/* Day view on screen: the cards still to do, and the Fertig-Kiste below them. */
+.pl-dayview {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.5cqmin;
+  min-width: 0;
+  min-height: 0;
+}
+
+/*
+ * The Fertig-Kiste (H-42): a basket at the bottom edge, its done cards standing in it and peeking over the rim. It is
+ * the container of its cards, so they grow with it when every card is in and it fills the sheet. The cards share its
+ * width in columns narrower than a card, so many overlap like cards dropped in.
+ */
+.pl-box {
+  container-type: size;
+  position: relative;
+  flex: none;
+  align-self: center;
+  width: min(100%, 72cqmin);
+  height: 25cqmin;
+  cursor: pointer;
+}
+
+.pl-box.full {
+  flex: 1;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: 2.6;
+  min-height: 0;
+}
+
+.pl-box-cards {
+  position: absolute;
+  inset: 0 12% 16%;
+  display: grid;
+  grid-template-columns: repeat(var(--pl-in-box), minmax(0, 1fr));
+  align-items: end;
+}
+
+.pl-box-card {
+  container-type: size;
+  box-sizing: border-box;
+  display: grid;
+  place-items: start center;
+  justify-self: center;
+  width: 58cqh;
+  height: 74cqh;
+  padding-top: 7cqh;
+  border: max(2px, 3.5cqh) solid var(--rw-main);
+  border-radius: 10cqh;
+  background: #fff;
+  font-family: var(--font-emoji);
+  font-size: 34cqh;
+  line-height: 1;
+  rotate: var(--pl-tilt);
+}
+
+.pl-box-card.example {
+  opacity: 0.6;
+}
+
+.pl-box-card.twinkle {
+  animation: pl-twinkle 0.6s ease-in-out;
+}
+
+/* The basket's front, woven: it hides the lower half of the cards, so the picture at a card's top peeks out. */
+.pl-box-front {
+  position: absolute;
+  inset: auto 0 0;
+  box-sizing: border-box;
+  height: 50%;
+  border: max(2px, 3cqh) solid #8a5a2b;
+  border-top-width: max(4px, 8cqh);
+  border-radius: 6cqh 6cqh 22cqh 22cqh;
+  background: repeating-linear-gradient(90deg, transparent 0 7cqh, #00000018 7cqh 8.5cqh), repeating-linear-gradient(0deg, #e0a868 0 7cqh, #cf9555 7cqh 14cqh);
+}
+
+.pl-box.wiggle {
+  animation: wiggle 0.45s ease-in-out;
 }
 
 /* Erst – Dann: two big cards with an arrow between them. */

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { dayKey } from "@/games/teeth/daytime";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
@@ -6,18 +6,42 @@ import { playChime, playPop, playTusch, playTwinkle, unlockAudio } from "@/lib/s
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
-import { currentStep, exampleTicks, nightsUntil, type Plan, restartDay, stepsOn } from "./plan";
+import { currentStep, exampleTicks, nightsUntil, type Plan, restartDay, stepDone, stepsOn } from "./plan";
 import { PLAN_SCREEN, PlanSheet, type StepState, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
 const UNDO_MS = 8000;
 
 /**
+ * A card on its way between the row and the Fertig-Kiste, started on the next render: `into` the box from where it
+ * was in the row, or back out of the box (one card after „Zurück“, all of them after „Von vorn“ – `key` empty).
+ */
+interface Move {
+  key: string;
+  from: DOMRect;
+  into: boolean;
+}
+
+/** Plays a card's way from `from` to where it now is, shrunk or grown from `scale`. */
+function flyFrom(el: HTMLElement, from: DOMRect, scale: number, delay = 0) {
+  const to = el.getBoundingClientRect();
+  const dx = from.left + from.width / 2 - (to.left + to.width / 2);
+  const dy = from.top + from.height / 2 - (to.top + to.height / 2);
+  el.animate([{ transform: `translate(${dx}px, ${dy}px) scale(${scale})` }, { transform: "none" }], {
+    duration: 550,
+    delay,
+    easing: "cubic-bezier(0.3, 0, 0.2, 1)",
+    fill: "backwards",
+  });
+}
+
+/**
  * A plan on screen, as big as the room allows, and how its steps get done: the child taps the card that glows
  * („Jetzt“) when that step is done – it gets a tick with a sound and the next card glows. A card done before
  * twinkles, a later one wiggles and says when it comes („noch 2-mal schlafen“ in the week). The last tick of the day
- * is a party, and „↺ Von vorn“ starts the day again (after an Erst–Dann, the next one). A new plan shows example ticks
- * until the first tap.
+ * is a party, and „↺ Von vorn“ starts the day again (after an Erst–Dann, the next one). In the day view a done card
+ * flies into the Fertig-Kiste instead of getting a tick, and „Von vorn“ takes them all out again. A new plan shows
+ * example ticks until the first tap.
  */
 export function PlanScreen({
   plan,
@@ -48,6 +72,7 @@ export function PlanScreen({
   const [undo, setUndo] = useState<string | null>(null);
   const [party, setParty] = useState<string | null>(null);
   const { bursts, spawn } = useBursts();
+  const move = useRef<Move | null>(null);
   const today = new Date();
   const ticks = log[plan.id];
   const shown = plan.examples ? { ...exampleTicks(plan, today), ...ticks } : ticks;
@@ -81,6 +106,24 @@ export function PlanScreen({
     setParty(null);
   }, [plan.id]);
 
+  // A card that just went into the box or came out of it flies there from where it was (only after a tap).
+  useLayoutEffect(() => {
+    const m = move.current;
+    const root = box.current;
+    move.current = null;
+    if (!m || !root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (m.into) {
+      const card = root.querySelector<HTMLElement>(`.pl-box-card[data-step="${m.key}"]`);
+      if (card) flyFrom(card, m.from, m.from.height / Math.max(1, card.getBoundingClientRect().height));
+      return;
+    }
+    const cards = root.querySelectorAll<HTMLElement>(m.key ? `.pl-dayview .pl-card[data-step="${m.key}"]` : ".pl-dayview .pl-card");
+    cards.forEach((card, i) => flyFrom(card, m.from, 0.2, i * 70));
+  });
+
+  /** Where the Fertig-Kiste is now, for a card leaving it; null in the week, which has none. */
+  const boxRect = () => box.current?.querySelector(".pl-box")?.getBoundingClientRect() ?? null;
+
   /** Restarts a short CSS animation on a card. */
   const poke = (el: Element, name: "wiggle" | "twinkle") => {
     el.classList.remove("wiggle", "twinkle");
@@ -107,13 +150,18 @@ export function PlanScreen({
     const header = (e.target as Element).closest<HTMLElement>("[data-day]");
     if (header) return sayDay(header);
     const el = (e.target as Element).closest<HTMLElement>("[data-step]");
-    if (!el) return;
+    const doneBox = el ? null : (e.target as Element).closest<HTMLElement>("[data-box]");
+    if (!el && !doneBox) return;
     // The first tap ends the examples and shows the plan as it really is.
     if (plan.examples) {
+      const from = boxRect();
+      if (from) move.current = { key: "", from, into: false };
       onExamplesOff();
       sound(playPop);
       return;
     }
+    if (doneBox) return sayBox(doneBox);
+    if (!el) return;
     const key = el.dataset.step as string;
     const state = el.dataset.state as StepState;
     const { day: stepDay, taskId } = parseCellKey(key);
@@ -137,6 +185,7 @@ export function PlanScreen({
     }
     // The card to do now: done, with a tick, and the next one glows.
     const next = addStar(log, plan.id, key, today);
+    if (plan.view === "day") move.current = { key, from: el.getBoundingClientRect(), into: true };
     setLog(next);
     setFresh(key);
     setUndo(key);
@@ -154,6 +203,14 @@ export function PlanScreen({
     } else {
       say(`${t({ de: "Super! Jetzt:" })} ${stepLabel(steps[after])}`);
     }
+  };
+
+  /** The Fertig-Kiste tapped: it wiggles and names what is in it. */
+  const sayBox = (el: HTMLElement) => {
+    poke(el, "wiggle");
+    sound(playPop);
+    const done = stepsOn(plan, day).filter((step) => stepDone(ticks, linked, day, step));
+    say(done.length ? `${t({ de: "Schon fertig:" })} ${done.map(stepLabel).join(", ")}` : t({ de: "Hier kommt rein, was fertig ist." }));
   };
 
   /** A day of the week tapped: it says when it is and what comes then. */
@@ -175,9 +232,18 @@ export function PlanScreen({
 
   const takeBack = () => {
     if (!undo) return;
+    const from = boxRect();
+    if (from) move.current = { key: undo, from, into: false };
     setLog(takeBackStar(log, plan.id, undo));
     setUndo(null);
     setFresh(null);
+  };
+
+  /** „Von vorn“: the day's ticks go, and in the day view every card comes back out of the box. */
+  const startOver = () => {
+    const from = boxRect();
+    if (from) move.current = { key: "", from, into: false };
+    setLog(restartDay(log, plan.id, today));
   };
 
   return (
@@ -187,14 +253,19 @@ export function PlanScreen({
       </div>
       {plan.examples && (
         <div className="rw-example-note">
-          <span>✨ {t({ de: "Die Haken sind nur ein Beispiel – mit dem ersten Tippen gehen sie weg." })}</span>
+          <span>
+            ✨{" "}
+            {plan.view === "day"
+              ? t({ de: "Die Karten in der Kiste sind nur ein Beispiel – mit dem ersten Tippen kommen sie wieder heraus." })
+              : t({ de: "Die Haken sind nur ein Beispiel – mit dem ersten Tippen gehen sie weg." })}
+          </span>
           <button type="button" onClick={onExamplesOff}>
             {t({ de: "Ausblenden" })}
           </button>
         </div>
       )}
       {!plan.examples && allDone && dayKey(day) === dayKey(today) && (
-        <button type="button" className="pl-again" onClick={() => setLog(restartDay(log, plan.id, today))}>
+        <button type="button" className="pl-again" onClick={startOver}>
           ↺ {t({ de: "Von vorn" })}
         </button>
       )}

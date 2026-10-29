@@ -361,6 +361,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Statt eines Hakens fliegt eine geschaffte Karte in eine Kiste unten am Rand, wie bei einer Klett-Tafel zu Hause; die Reihe wird kürzer, bis nur noch das Bett übrig ist. Am Ende holt „Von vorn“ alle Karten wieder heraus.",
       why: "So machen es Eltern und Kitas mit gedruckten Bildkarten („Fertig-Tasche“); auf dem Bildschirm sieht das Kind genauso, wie der Tag kürzer wird.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-43",

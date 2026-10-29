@@ -259,12 +259,12 @@ function Info() {
       </p>
       <p>
         {t({
-          de: "„Tag“ zeigt die Schritte von heute als große Karten. Die Karte, die jetzt dran ist, leuchtet („Jetzt“), darüber steht, was „Dann“ kommt. Ist ein Schritt geschafft, tippt Ihr Kind selbst auf die leuchtende Karte: sie bekommt einen Haken, und die nächste leuchtet. Nach dem letzten Schritt gibt es ein kleines Fest. Ein Plan mit zwei Karten ist eine Erst–Dann-Tafel: erst das eine, dann das Schöne. „Woche“ zeigt, was an welchem Tag ist (Kita, Oma, Schwimmen), und Monde über den nächsten Tagen zeigen, wie oft man noch schlafen muss.",
+          de: "„Tag“ zeigt die Schritte von heute als große Karten. Die Karte, die jetzt dran ist, leuchtet („Jetzt“), darüber steht, was „Dann“ kommt. Ist ein Schritt geschafft, tippt Ihr Kind selbst auf die leuchtende Karte: sie fliegt in die Fertig-Kiste unten, wie bei einer Klett-Tafel zu Hause, und die nächste leuchtet. So wird die Reihe kürzer, bis nur noch der letzte Schritt übrig ist; danach gibt es ein kleines Fest, und „Von vorn“ holt alle Karten wieder heraus. Ein Plan mit zwei Karten ist eine Erst–Dann-Tafel: erst das eine, dann das Schöne. „Woche“ zeigt, was an welchem Tag ist (Kita, Oma, Schwimmen), und Monde über den nächsten Tagen zeigen, wie oft man noch schlafen muss.",
         })}
       </p>
       <p>
         {t({
-          de: "Zähne putzen hakt sich von selbst ab, wenn im Spiel „Zähne putzen“ fertig geputzt ist – in der Morgenroutine nur das Putzen am Morgen. Hat Ihr Kind zu früh getippt, gibt es kurz danach „Zurück“; „Von vorn“ beginnt den Tag neu. Mit ‹ › sehen Sie andere Tage, etwa was morgen kommt.",
+          de: "Zähne putzen hakt sich von selbst ab, wenn im Spiel „Zähne putzen“ fertig geputzt ist – in der Morgenroutine nur das Putzen am Morgen. Hat Ihr Kind zu früh getippt, gibt es kurz danach „Zurück“; „Von vorn“ beginnt den Tag neu. In der Woche bekommen geschaffte Karten einen Haken. Mit ‹ › sehen Sie andere Tage, etwa was morgen kommt.",
         })}
       </p>
       <p>
