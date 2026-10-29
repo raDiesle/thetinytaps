@@ -86,6 +86,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       { label: "🎢 Die anderen zwölf Level", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
       { label: "🛁 Badezimmer", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze der Maschine nur auf Deutsch (R-05)." },
+      { label: "🐓 Bauernhof", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze unterwegs nur auf Deutsch." },
       { label: "🌙 Gute-Nacht-Maschine", languages: { de: "done" }, note: "Name, erster Satz und Gute-Nacht-Sätze nur auf Deutsch (R-07, Oktober 2026)." },
     ],
   },

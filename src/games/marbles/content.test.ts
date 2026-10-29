@@ -4,6 +4,7 @@ import { buildBath } from "./bath";
 import { buildBuilding } from "./building";
 import { buildCircus } from "./circus";
 import { GAME_TITLE, LEVEL_TEXTS } from "./content";
+import { buildFarm } from "./farm";
 import { buildGarden } from "./garden";
 import { buildKitchen } from "./kitchen";
 import { buildLight } from "./light";
@@ -49,6 +50,7 @@ describe("Kettenreaktion texts", () => {
       buildSpace,
       buildLight,
       buildBath,
+      buildFarm,
       buildNight,
       buildWater: () => water,
     };

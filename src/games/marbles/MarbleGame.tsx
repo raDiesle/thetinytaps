@@ -21,6 +21,7 @@ const MODES: { id: MarbleLevel; emoji: string }[] = [
   { id: "space", emoji: "🚀" },
   { id: "light", emoji: "🔦" },
   { id: "bath", emoji: "🛁" },
+  { id: "farm", emoji: "🐓" },
   { id: "night", emoji: "🌙" },
 ];
 

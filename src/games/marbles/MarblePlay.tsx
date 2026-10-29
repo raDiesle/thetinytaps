@@ -9,6 +9,7 @@ import { BathLevel } from "./BathLevel";
 import { BuildingLevel } from "./BuildingLevel";
 import { CircusLevel } from "./CircusLevel";
 import { LEVEL_TEXTS } from "./content";
+import { FarmLevel } from "./FarmLevel";
 import { GardenLevel } from "./GardenLevel";
 import { KitchenLevel } from "./KitchenLevel";
 import { useAnyKey, type LevelProps } from "./level";
@@ -41,6 +42,7 @@ const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps>
   { id: "space", emoji: "🚀", Level: SpaceLevel },
   { id: "light", emoji: "🔦", Level: LightLevel },
   { id: "bath", emoji: "🛁", Level: BathLevel },
+  { id: "farm", emoji: "🐓", Level: FarmLevel },
   { id: "night", emoji: "🌙", Level: NightLevel },
 ];
 

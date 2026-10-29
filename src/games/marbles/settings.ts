@@ -13,6 +13,7 @@ export type MarbleLevel =
   | "space"
   | "light"
   | "bath"
+  | "farm"
   | "night";
 
 export interface MarbleSettings {

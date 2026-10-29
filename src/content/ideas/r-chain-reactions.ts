@@ -57,6 +57,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Jedes Glied der Kette ist ein Tier: Der Hahn kräht, das Schwein springt erschrocken in die Pfütze, der Spritzer weckt die Katze, die schubst den Eimer um, die Kuh muht … bis alle Tiere im Stall zusammen singen.",
       why: "Tierstimmen kennen die Kinder schon; vertraute Figuren machen die Kette leicht verständlich.",
       effort: "M",
+      done: true,
     },
     {
       id: "R-07",
