@@ -91,7 +91,17 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       { label: "🧸 Aufräum-Maschine", languages: { de: "done" }, note: "Name, erster Satz und „Alles aufgeräumt!“ nur auf Deutsch (R-08, Oktober 2026)." },
     ],
   },
-  { href: "/kleine-abenteuer/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/kleine-abenteuer/",
+    parts: [
+      { label: "🧭 Die anderen sieben Geschichten", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🏖️ Die Sandburg",
+        languages: { de: "done" },
+        note: "Name und alle Sätze nur auf Deutsch (G-05, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
+      },
+    ],
+  },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/schatten/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/socken/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },

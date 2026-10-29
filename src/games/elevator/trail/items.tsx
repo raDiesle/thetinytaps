@@ -6,7 +6,24 @@ import { INK } from "@/games/scenes/shared";
 // in the world, in a bag slot and in the thought bubble.
 
 /** A thing that fits into the bag. */
-export type ItemId = "ball" | "carrot" | "plank" | "lantern" | "apple" | "bone" | "can" | "shovel" | "bread" | "fish" | "sunflower" | "umbrella" | "corn";
+export type ItemId =
+  | "ball"
+  | "carrot"
+  | "plank"
+  | "lantern"
+  | "apple"
+  | "bone"
+  | "can"
+  | "shovel"
+  | "bread"
+  | "fish"
+  | "sunflower"
+  | "umbrella"
+  | "corn"
+  | "shell"
+  | "roll"
+  | "flipflops"
+  | "mattress";
 
 /** A drawing and its size, to fit it into a slot, a bubble or a card. */
 export interface Picture {
@@ -239,6 +256,89 @@ export function Corn() {
   );
 }
 
+/** A sea snail's shell, pink with its spiral, the opening to the left: a house a hermit crab moves into. */
+export function Shell() {
+  return (
+    <g>
+      <path d="M-44 -6 Q-56 -40 -24 -62 Q12 -84 40 -54 Q58 -30 40 -6 Q0 6 -44 -6 Z" fill="#ffa8a8" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <path
+        d="M6 -36 Q22 -38 22 -24 Q20 -12 6 -14 Q-6 -16 -4 -30 Q0 -50 22 -50 Q44 -46 42 -24"
+        stroke="#e8590c"
+        strokeWidth="4"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <ellipse cx="-30" cy="-18" rx="13" ry="10" fill="#fff0f6" stroke={INK} strokeWidth="3.5" />
+      <circle cx="-20" cy="-50" r="5" fill="#fff" opacity="0.7" />
+    </g>
+  );
+}
+
+/** A bread roll, golden brown with its cut along the top. */
+export function Roll() {
+  return (
+    <g>
+      <path d="M-46 -4 Q-54 -44 -10 -48 Q0 -49 10 -48 Q54 -44 46 -4 Q0 6 -46 -4 Z" fill="#d9822b" stroke={INK} strokeWidth="4.5" strokeLinejoin="round" />
+      <path d="M-30 -30 Q0 -44 30 -30" stroke="#ffe8a3" strokeWidth="7" fill="none" strokeLinecap="round" />
+      <ellipse cx="-22" cy="-16" rx="8" ry="4" fill="#f0a35a" />
+    </g>
+  );
+}
+
+/** A pair of flip-flops, seen from above, standing side by side: blue soles, red straps. */
+export function FlipFlops() {
+  return (
+    <g>
+      {[-1, 1].map((s) => (
+        <g key={s} transform={`translate(${s * 24} 0) rotate(${s * 8} 0 -50)`}>
+          <path
+            d="M0 -100 Q20 -100 18 -64 Q16 -38 16 -14 Q14 0 0 0 Q-14 0 -16 -14 Q-16 -38 -18 -64 Q-20 -100 0 -100 Z"
+            fill="#22b8cf"
+            stroke={INK}
+            strokeWidth="4"
+            strokeLinejoin="round"
+          />
+          <path d="M-15 -60 L0 -82 L15 -60" stroke="#f03e3e" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="0" cy="-82" r="4" fill="#f03e3e" stroke={INK} strokeWidth="2" />
+        </g>
+      ))}
+    </g>
+  );
+}
+
+/** An air mattress, lying flat: puffy stripes in red and yellow, the pillow end on the left. */
+export function Mattress() {
+  return (
+    <g>
+      <rect x="-112" y="-40" width="224" height="40" rx="18" fill="#ffd43b" stroke={INK} strokeWidth="5" />
+      {[-62, -22, 18, 58].map((x) => (
+        <rect key={x} x={x} y="-36" width="20" height="32" rx="9" fill="#fa5252" />
+      ))}
+      <path d="M-82 -38 V-2" stroke={INK} strokeWidth="3" opacity="0.5" />
+      <path d="M-100 -30 Q-60 -36 -20 -32" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" opacity="0.7" />
+      <rect x="104" y="-26" width="10" height="8" rx="3" fill="#fff" stroke={INK} strokeWidth="2.5" />
+    </g>
+  );
+}
+
+/** The sand bucket with the shovel in it: a blue bucket with a yellow rim and handle, the red shovel sticking out. */
+export function Pail() {
+  return (
+    <g>
+      <g transform="translate(14 -70) rotate(18)">
+        <rect x="-6" y="-70" width="12" height="70" rx="5" fill="#f03e3e" stroke={INK} strokeWidth="4" />
+        <rect x="-16" y="-78" width="32" height="13" rx="6" fill="#f03e3e" stroke={INK} strokeWidth="4" />
+      </g>
+      <path d="M-46 -84 Q0 -150 46 -84" stroke={INK} strokeWidth="9" fill="none" strokeLinecap="round" />
+      <path d="M-46 -84 Q0 -150 46 -84" stroke="#fcc419" strokeWidth="4" fill="none" strokeLinecap="round" />
+      <path d="M-46 -86 L-36 -4 Q-34 0 -30 0 H30 Q34 0 36 -4 L46 -86 Z" fill="#339af0" stroke={INK} strokeWidth="5" strokeLinejoin="round" />
+      <rect x="-50" y="-94" width="100" height="16" rx="7" fill="#fcc419" stroke={INK} strokeWidth="4.5" />
+      <path d="M-24 -66 L-20 -14" stroke="#a5d8ff" strokeWidth="7" strokeLinecap="round" />
+      <path d="M-4 -46 l7 -12 l7 12 l7 -12 l7 12" stroke="#fff" strokeWidth="4" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+    </g>
+  );
+}
+
 /** The wooden toy locomotive: red boiler, blue cab, yellow chimney, black wheels on (0, 0); it faces right. */
 export function Loco() {
   return (
@@ -312,6 +412,10 @@ export const ITEMS: Record<ItemId, Picture> = {
   sunflower: { w: 96, h: 172, draw: () => <Sunflower /> },
   umbrella: { w: 144, h: 184, draw: () => <Umbrella /> },
   corn: { w: 80, h: 136, draw: () => <Corn /> },
+  shell: { w: 104, h: 80, draw: () => <Shell /> },
+  roll: { w: 104, h: 56, draw: () => <Roll /> },
+  flipflops: { w: 96, h: 104, draw: () => <FlipFlops /> },
+  mattress: { w: 228, h: 44, draw: () => <Mattress /> },
 };
 
 /** What a level is about: its picture, and how the child carries it in the world. */
@@ -324,7 +428,7 @@ export interface Goal extends Picture {
   roll?: number;
 }
 
-export type GoalId = "kite" | "football" | "balloon" | "loco";
+export type GoalId = "kite" | "football" | "balloon" | "loco" | "pail";
 
 /** Pictures of what a level is about, for its card and the thought bubble, and how they move. */
 export const GOALS: Record<GoalId, Goal> = {
@@ -342,6 +446,7 @@ export const GOALS: Record<GoalId, Goal> = {
     carry: "string",
   },
   loco: { w: 130, h: 116, draw: () => <Loco />, carry: "hands" },
+  pail: { w: 104, h: 170, draw: () => <Pail />, carry: "hands" },
 };
 
 /** `picture` scaled to fit a `width` × `height` box around (0, 0). */
