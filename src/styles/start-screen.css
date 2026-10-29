@@ -407,18 +407,77 @@ kbd {
   font-size: 1.35rem;
 }
 
-/* What sort of level a card is, small in its top-left corner (the "zuletzt" badge is in the right one). */
-.mode-kind {
+/*
+ * Cards of one sort (GameMode.kind) stand together on a pale frame, the sort's name once above them. The group and its
+ * list of cards take the menu's columns (subgrid), so all cards keep one size; the frame lies round the cards
+ * (--group-pad) without taking room from them.
+ */
+.mode-list {
+  --group-pad: 8px;
+  /* The track above each line of groups; matches LABEL in useFitGrid. The name reaches down into the gap under it. */
+  --group-label: 12px;
+  /* How far the name reaches into that gap (the fitted gap less a little room above the cards). */
+  --group-label-drop: 16px;
+}
+
+.mode-group,
+.mode-group-cards {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: subgrid;
+  gap: inherit;
+}
+
+.mode-group {
+  position: relative;
+  z-index: 0;
+}
+
+.mode-group::before {
+  content: "";
   position: absolute;
-  top: 10px;
-  left: 12px;
-  padding: 2px 10px;
-  border: 2px solid var(--ink);
+  inset: calc(-1 * var(--group-pad));
+  z-index: -1;
+  border: 3px solid rgb(42 30 92 / 0.18);
+  border-radius: 46px;
+  background: rgb(255 255 255 / 0.45);
+}
+
+.mode-group-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mode-group-label {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 2px 14px;
+  border: 3px solid var(--ink);
   border-radius: 999px;
   background: #fff;
-  font-size: 0.8rem;
+  font-size: 0.95rem;
   font-weight: 700;
   white-space: nowrap;
+}
+
+/* Fitted: useFitGrid places each group (a track for its name, then its rows), and the rows come from the menu too. */
+.game-list.fit .mode-group,
+.game-list.fit .mode-group-cards {
+  grid-template-rows: subgrid;
+}
+
+.game-list.fit .mode-group {
+  container-type: normal;
+}
+
+.game-list.fit .mode-group-cards {
+  grid-row: 2 / -1;
+}
+
+.game-list.fit .mode-group-label {
+  align-self: end;
+  margin-bottom: calc(-1 * var(--group-label-drop));
 }
 
 /*
@@ -554,12 +613,6 @@ kbd {
     font-size: clamp(0.9rem, min(20cqh, 7cqw), 1.4rem);
   }
 
-  /* Out of the emoji's way: on the bottom edge, like the "zuletzt" badge on the top one. */
-  .game-list.fit .mode-kind {
-    top: auto;
-    bottom: -10px;
-  }
-
   .game-list.fit .game-go {
     width: 36px;
     height: 36px;
@@ -638,5 +691,21 @@ kbd {
 
   .game-list.fit {
     gap: 14px;
+  }
+
+  .mode-list {
+    --group-pad: 4px;
+    --group-label-drop: 9px;
+  }
+
+  .mode-group::before {
+    border-width: 2px;
+    border-radius: 30px;
+  }
+
+  .mode-group-label {
+    padding: 0 10px;
+    border-width: 2px;
+    font-size: 0.8rem;
   }
 }

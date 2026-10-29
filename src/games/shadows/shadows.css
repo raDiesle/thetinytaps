@@ -30,6 +30,7 @@
   background: #b5e48c;
 }
 
+/* The sentence above the stage of „Wer schaut da raus?“; „Schatten finden“ shows no text. */
 .sh-prompt {
   position: absolute;
   top: max(14px, env(safe-area-inset-top));
@@ -103,19 +104,7 @@
   animation: sh-hop-again 0.45s ease-in-out;
 }
 
-.sh-name {
-  font-size: clamp(1.1rem, 3.4vh, 2rem);
-  font-weight: 800;
-  line-height: 1.1;
-  pointer-events: none;
-  transition: opacity 0.3s;
-}
-
-.sh-name.gone {
-  opacity: 0;
-}
-
-/* The shadows to choose from, in one row; they shrink to fit 2, 3 or 4 side by side. */
+/* The shadows to choose from, in one row; they shrink to fit 2 to 6 side by side. */
 .sh-options {
   --cols: var(--n);
   display: flex;
@@ -124,10 +113,10 @@
   justify-content: center;
 }
 
-/* Phones upright: two per row, so they stay big enough for a finger. */
+/* Phones upright: two or three per row (`--tall-cols`), so they stay big enough for a finger. */
 @media (max-aspect-ratio: 4 / 5) {
   .sh-options {
-    --cols: min(var(--n), 2);
+    --cols: var(--tall-cols);
   }
 }
 
@@ -168,6 +157,14 @@
   animation-delay: 0.24s;
 }
 
+.sh-option:nth-child(5) {
+  animation-delay: 0.32s;
+}
+
+.sh-option:nth-child(6) {
+  animation-delay: 0.4s;
+}
+
 .sh-option.focused {
   outline: 6px solid var(--sunshine);
   outline-offset: 6px;
@@ -202,20 +199,100 @@
   animation: wiggle 0.5s ease-in-out 0.6s 2;
 }
 
-.sh-bubble {
+/* Top left: the button for the kind of pictures, and the stars for the shadows found. */
+.sh-bar {
   position: absolute;
-  bottom: calc(100% + 10px);
-  left: 50%;
-  translate: -50% 0;
-  padding: 0.15em 0.6em;
+  z-index: 7;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(16px, env(safe-area-inset-left));
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.sh-themes {
+  position: relative;
+}
+
+.sh-theme-button,
+.sh-theme-choice {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
   border: var(--outline);
-  border-radius: 1em;
+  border-radius: 18px;
+  background: #fffbea;
+  box-shadow: var(--lift);
+  cursor: pointer;
+  touch-action: none;
+}
+
+.sh-theme-button.open {
+  background: #fff3a8;
+}
+
+/* The menu opens below the button: one big emoji per kind. */
+.sh-theme-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: var(--outline);
+  border-radius: 24px;
   background: #fff;
-  font-size: clamp(1.1rem, 3.6vh, 2rem);
-  font-weight: 800;
-  white-space: nowrap;
+  box-shadow: var(--lift);
+  animation: pop-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sh-theme-choice {
+  width: 72px;
+  height: 72px;
+}
+
+.sh-theme-choice.current {
+  outline: 5px solid var(--sunshine);
+  outline-offset: 2px;
+}
+
+.sh-theme-icon {
+  font-family: var(--font-emoji);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.sh-theme-choice .sh-theme-icon {
+  font-size: 44px;
+}
+
+/* "Mixed": one picture of each kind, in a small square. */
+.sh-theme-icon.mixed {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  font-size: 18px;
+}
+
+.sh-theme-choice .sh-theme-icon.mixed {
+  font-size: 24px;
+}
+
+.sh-stars {
+  max-width: 30vw;
+  padding-top: 10px;
+  font-family: var(--font-emoji);
+  font-size: clamp(1.4rem, 3vw, 2rem);
   pointer-events: none;
-  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* The number after ten stars, in „Wer schaut da raus?“ only. */
+.sh-count {
+  margin-left: 6px;
+  font-family: var(--font-rounded);
+  font-weight: 800;
 }
 
 /* ---------- Wer schaut da raus? (X-04) ---------- */

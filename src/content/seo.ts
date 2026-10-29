@@ -104,14 +104,14 @@ export const SEO_PAGES: PageSeo[] = [
     path: "/schatten/",
     title: "Schatten finden – Zuordnungsspiel für Kinder",
     description:
-      "Welcher Schatten gehört zur Giraffe? Ein Bild sucht seinen Schatten unter zwei bis vier – erstes Zuordnen für Kinder ab 2 Jahren, ohne Werbung.",
-    text: "Tiere, Fahrzeuge, Essen und Dinge suchen ihren Schatten. Antippen oder hinziehen; ein falscher Schatten zeigt kurz, wer er ist.",
+      "Welcher Schatten gehört zur Giraffe? Ein Bild sucht seinen Schatten unter zwei bis sechs – erstes Zuordnen für Kinder ab 2 Jahren, ohne Werbung.",
+    text: "Tiere, Fahrzeuge, Essen und Dinge suchen ihren Schatten. Antippen oder hinziehen; ein falscher Schatten zeigt kurz, wer er ist. Erst zwei ganz verschiedene Schatten, dann mehr und ähnlichere, sobald das Kind sicher wird.",
   },
   {
     path: "/socken/",
     title: "Socken-Paare finden – Spiel für Kleinkinder",
     description: "Die Waschmaschine ist fertig: Socken-Paare finden und an die Wäscheleine hängen. Erstes Paare-Suchen für Kinder ab 2 Jahren, ohne Werbung.",
-    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine.",
+    text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine. Erst wenige Paare in bunten Farben, dann mehr, mit Mustern und unter Wäschekörben wie bei Memory – sobald das Kind sicher wird.",
   },
   {
     path: "/buchstaben/",

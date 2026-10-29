@@ -17,6 +17,9 @@ const FLAT_ASPECT = 2.4;
 /** Space between the cards; matches `.game-list.fit` in the styles (smaller on a phone). */
 const GAP = 24;
 const GAP_PHONE = 14;
+/** Extra room above each line of grouped cards for the group's name; matches `--group-label` in the styles. */
+const LABEL = 12;
+const LABEL_PHONE = 12;
 /** Room under the last row; matches the page's bottom padding while the cards fit. */
 const BOTTOM = 32;
 const BOTTOM_PHONE = 12;
@@ -26,17 +29,51 @@ interface Fit {
   row: number;
 }
 
-/** Columns and row height that give `count` cards the most room. */
-function bestFit(count: number, width: number, height: number, phone: boolean): Fit | null {
+/** Where a group of cards sits in the grid: its first column and card row (from 0), and how many of each it takes. */
+export interface GroupPlace {
+  column: number;
+  row: number;
+  /** The line of groups it belongs to; each line has the groups' names above it. */
+  line: number;
+  width: number;
+  height: number;
+}
+
+/**
+ * Lays groups of cards out in lines, each group a rectangle of whole rows. A group that fits in one row shares a line
+ * with others while there is room (the first line with room, so a small group may sit beside an earlier one);
+ * a longer group fills the whole width and has its lines to itself.
+ */
+export function packGroups(sizes: number[], columns: number): { places: GroupPlace[]; lines: number[] } {
+  const lines: { used: number; height: number }[] = [];
+  const places = sizes.map((size) => {
+    const width = Math.min(size, columns);
+    const height = Math.ceil(size / columns);
+    let line = height === 1 ? lines.findIndex((l) => l.height === 1 && l.used + width <= columns) : -1;
+    if (line < 0) line = lines.push({ used: 0, height }) - 1;
+    const column = lines[line].used;
+    lines[line].used += width;
+    return { column, line, width, height };
+  });
+  const heights = lines.map((l) => l.height);
+  const firstRow = (line: number) => heights.slice(0, line).reduce((a, b) => a + b, 0);
+  return { places: places.map((p) => ({ ...p, row: firstRow(p.line) })), lines: heights };
+}
+
+/** Columns and row height that give `count` cards the most room; with `groups` (their sizes) every group keeps together. */
+function bestFit(count: number, width: number, height: number, phone: boolean, groups?: number[]): Fit | null {
   const minRow = phone ? MIN_ROW_PHONE : MIN_ROW;
   const minWidth = phone ? MIN_WIDTH_PHONE : MIN_WIDTH;
   const gap = phone ? GAP_PHONE : GAP;
   let best: Fit | null = null;
   let bestSize = 0;
   for (let columns = 1; columns <= Math.max(1, count); columns++) {
-    const rows = Math.ceil(count / columns);
+    const lines = groups ? packGroups(groups, columns).lines : [Math.ceil(count / columns)];
+    const rows = lines.reduce((a, b) => a + b, 0);
+    // Each line of groups has its names above it: one more track and gap.
+    const labels = groups ? lines.length * ((phone ? LABEL_PHONE : LABEL) + gap) : 0;
     const cardWidth = (width - (columns - 1) * gap) / columns;
-    const row = (height - (rows - 1) * gap) / rows;
+    const row = (height - labels - (rows - 1) * gap) / rows;
     if (row < minRow || cardWidth < minWidth) continue;
     const size = Math.min(cardWidth / (row < FLAT_ROW ? FLAT_ASPECT : CARD_ASPECT), row);
     if (size > bestSize) {
@@ -74,8 +111,10 @@ function contentHeight(page: HTMLElement) {
  * Only when the cards would get too small does the menu keep its scrolling list.
  * What is marked `data-below-fold` (the install hint for grown-ups) is left out:
  * it waits below the cards until a grown-up scrolls down.
+ * With `groups` (the sizes of runs of cards that belong together, in order) each group is kept in one rectangle
+ * with its name above it: `places` gives each group's place in the grid.
  */
-export function useFitGrid(count: number) {
+export function useFitGrid(count: number, groups?: number[]) {
   // Kept as state, so a menu shown again (e.g. after playing) is measured anew.
   const [list, setList] = useState<HTMLUListElement | null>(null);
   const [fit, setFit] = useState<Fit | null>(null);
@@ -87,7 +126,13 @@ export function useFitGrid(count: number) {
       // An open settings panel grows the page below the cards; they keep their size.
       if (page.querySelector(".panel-button[aria-expanded='true']")) return;
       const phone = Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
-      const next = bestFit(count, list.clientWidth, window.innerHeight - (contentHeight(page) - list.offsetHeight) - (phone ? BOTTOM_PHONE : BOTTOM), phone);
+      const next = bestFit(
+        count,
+        list.clientWidth,
+        window.innerHeight - (contentHeight(page) - list.offsetHeight) - (phone ? BOTTOM_PHONE : BOTTOM),
+        phone,
+        groups,
+      );
       setFit((prev) => (prev?.columns === next?.columns && prev?.row === next?.row ? prev : next));
     };
     measure();
@@ -99,11 +144,17 @@ export function useFitGrid(count: number) {
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [list, count]);
+  }, [list, count, groups?.join()]);
 
+  const packed = fit && groups ? packGroups(groups, fit.columns) : undefined;
+  // A track for the names above each line of groups, then the line's card rows.
+  const rows = packed?.lines.map((height) => `var(--group-label) repeat(${height}, var(--fit-row))`).join(" ");
   return {
     ref: setList,
     className: fit ? "fit" : "",
-    style: fit ? ({ "--fit-columns": fit.columns, "--fit-row": `${fit.row}px` } as CSSProperties) : undefined,
+    style: fit ? ({ "--fit-columns": fit.columns, "--fit-row": `${fit.row}px`, gridTemplateRows: rows } as CSSProperties) : undefined,
+    places: packed?.places.map(
+      (p): CSSProperties => ({ gridColumn: `${p.column + 1} / span ${p.width}`, gridRow: `${p.row + p.line + 1} / span ${p.height + 1}` }),
+    ),
   };
 }

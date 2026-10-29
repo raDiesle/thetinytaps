@@ -7,6 +7,5 @@ export const ENGLISH_TEXTS: Partial<SockTexts> = {
   start: "Find two socks that match!",
   pair: ["A pair!", "They match!", "Just the same!", "Two the same!"],
   done: "All the socks are on the line!",
-  pairs: (n) => `${n} ${n === 1 ? "pair" : "pairs"}`,
   sock: (n) => `Sock ${n}`,
 };

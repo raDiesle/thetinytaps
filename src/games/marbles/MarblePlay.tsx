@@ -28,9 +28,9 @@ import "./marbles.css";
 import "./track.css";
 import { DEV } from "@/lib/buildInfo";
 
-/** The levels in turn (names and first lines in `content.ts`). The marble run takes the rebuild and pick settings, so it is drawn by itself below (`Level` is null). */
-const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps> | null }[] = [
-  { id: "track", emoji: "🎢", Level: null },
+/** The levels in turn (names and first lines in `content.ts`). */
+const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps> }[] = [
+  { id: "track", emoji: "🎢", Level: TrackLevel },
   { id: "machine", emoji: "⚙️", Level: MachineLevel },
   { id: "sneeze", emoji: "🤧", Level: SneezeLevel },
   { id: "kitchen", emoji: "🍳", Level: KitchenLevel },
@@ -138,11 +138,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
-      {level.Level ? (
-        <level.Level key={round} sound={sound} say={say} onDone={onDone} />
-      ) : (
-        <TrackLevel key={round} sound={sound} say={say} onDone={onDone} rebuild={settings.rebuild} pick={settings.pick} />
-      )}
+      <level.Level key={round} sound={sound} say={say} onDone={onDone} />
       {ended && <GameEnd onAgain={again} next={{ emoji: next.emoji, name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
       <BurstLayer bursts={bursts} />
     </div>

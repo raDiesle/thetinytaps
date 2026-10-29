@@ -7,11 +7,21 @@
   background: linear-gradient(#74c0fc, #d0ebff 70%);
 }
 
-/* The world and the far hills scroll with the child; the walker moves at the same pace. */
-.tl-pan,
-.tl-walker {
+/* The picture's layers (`Layer` in TrailPlay.tsx): the world and the far hills scroll with the child, a walker
+   moves at the same pace. Each is a layer of its own that the browser only moves, never paints again. */
+.tl-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
   transition-property: transform;
   transition-timing-function: linear;
+}
+
+/* A layer covers the whole screen: only what is drawn in it takes a tap, the rest goes through to the layers below
+   (`:where` keeps any class's own `pointer-events` above this). */
+:where(.tl-layer svg > *) {
+  pointer-events: visiblePainted;
 }
 
 .tl-carry,

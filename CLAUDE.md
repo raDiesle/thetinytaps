@@ -129,6 +129,10 @@ In a fresh worktree run `bun install` first.
   keyframes from another game's CSS (`css.test.ts` checks it).
 - Drawings are SVG in React components, animated with CSS classes; no image files
   unless an emoji or drawing can't do it (`public/images/`, `bilder/` folders).
+  Phones must keep up: what moves across a big picture as a whole (a scrolling world, a camera) is an HTML layer of its
+  own (its own svg in a `div` with `will-change: transform`), never a moved group inside one big svg, which the browser
+  paints whole again in every frame; and a big still drawing is built once (`useMemo`, `memo`), not again with every
+  tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this).
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
@@ -139,13 +143,17 @@ In a fresh worktree run `bun install` first.
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice.
+- A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
+  some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
+  Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.
 - What the child taps to set things off is plainly marked (a glow, and a still hand pointing at it before the first tap)
   and lies wholly in the picture, clear of the edges and the ✕. Where the picture moves away from it, a big button
   brings it back.
 - Where the child picks one of several (Zuordnen, Schatten, a quiz), exactly one choice fits: never offer a wrong
   choice a child could rightly pick (no lettuce or apple next to the rabbit's carrot – a rabbit eats those too).
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
-  animation unless the parent turns it on (`document.getAnimations()` is empty after load).
+  animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
+  at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away.
 - Speech is off by default (`src/lib/common.ts`); sounds are on.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
@@ -160,17 +168,21 @@ In a fresh worktree run `bun install` first.
   computer (≥ 900 px wide with a mouse) see it always, also to leave fullscreen; on phones and tablets a game shows it
   only while out of fullscreen, so a child's tap can't end it. Starting or leaving a game in fullscreen must not make the browser
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
-  (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). On a computer the back link of a menu is big, yellow and
+  (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
+  lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
+  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them. On a computer the back link of a menu is big, yellow and
   fixed in the top left corner, so it never scrolls away; phones and tablets keep it small. A menu's title goes into
   `MenuHead` with that corner, which keeps the title clear of it (it moves right or wraps, never under the corner).
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`), and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own.
+  Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
+  cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
   no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). Buttons for grown-ups sit in the top
-  left corner, never over the sun in the top right one. „ℹ️ Über das Spiel“ and „⚙️ Einstellungen“ are small, above the cards,
+  left corner, never over the sun in the top right one. „ℹ️ Über das Spiel“ and „⚙️ Einstellungen“ (where a game still has them) are small, above the cards,
   never under them: in the top row next to the back link (on a computer centred under the title), and a panel opens right
   under that row. When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
@@ -191,7 +203,8 @@ In a fresh worktree run `bun install` first.
   `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
   the first, so there is always one). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
-  two buttons doing the same thing confuse. A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
+  two buttons doing the same thing confuse. A game that flows on from round to round by itself (Socken-Paare: the next
+  wash comes on its own) has no end to show it at; it counts each round as a game itself (`gameEnded`, `countGame`). A game with its own end buttons (Gefühle, Zähne putzen) still offers all three
   it has a use for, just as big. Where the end picture is the point (Aufs Töpfchen's party), `corners` puts them small
   in the bottom corners instead – „Menü“ left, the others right – and only where that game's rules say so.
 
@@ -211,12 +224,17 @@ src/content/             home menu (games.ts), language packs (de/en/tr/pl), ide
 src/lib/                 speech, sfx (synthesized + recorded sounds), storage, device, PWA
 ```
 
-- Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now) skips it with `startMode` and plays
-  at once; the start screen comes only after ✕ or „Menü“. A game a routine opens for one of its steps (the Tagesplan's
+- Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
+  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once; the start screen comes only after ✕ or „Menü“. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or
-  „Menü“ go back to the routine. What the game is and how it is played (also keys and tips for grown-ups) goes into `info`
-  („ℹ️ Über das Spiel“, every game has one); `settings` („⚙️ Einstellungen“) holds only options and the notes
-  that explain them. A game adds no own switch for what the home page already sets for all games
+  „Menü“ go back to the routine.
+  **Aim for no settings and no description**, so start screens stay clear: a game should explain itself by playing
+  (a glow, the pointing hand, a reaction to every tap), and what a switch would choose is decided once, the way that
+  plays best, instead of being left to grown-ups. `info` („ℹ️ Über das Spiel“) and `settings` („⚙️ Einstellungen“)
+  are optional in `GameShell`, and their buttons show only when a game passes them; Kettenreaktion has neither. Never add one
+  to a game that has none, and when touching a game that still has them, prefer removing them (keep the default
+  behaviour, delete the code for the other). Where one is still kept, `info` says what the game is and how it is played (also
+  keys and tips for grown-ups), `settings` holds only options and the notes that explain them. A game adds no own switch for what the home page already sets for all games
   (Vorlesen, Töne, Musik, Sprache), nor a choice for what the game can tell by itself (morning or evening by the clock).
   A song that is the game itself (the Zahnputzlied sings the steps) plays even with Musik off and sings in the app language.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
@@ -261,4 +279,4 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
-   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`.
+   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`, `?level=<n>` on `/socken/`.

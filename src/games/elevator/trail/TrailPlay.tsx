@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ComponentType, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { type ComponentType, type PointerEvent, type ReactNode, type Ref, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
@@ -335,6 +335,49 @@ const startView = (level: TrailLevel): View => {
   };
 };
 
+/**
+ * One layer of the picture: its own svg over the whole screen, moved as a whole by CSS. Moving a group inside one
+ * svg makes the browser paint the whole picture again in every frame while the world scrolls, which stutters on
+ * phones; a layer of its own is only shifted. `pan` is where the camera is (times the layer's depth) and `walker`
+ * where someone walking stands in the world, drawn on (0, 0) of the svg – both in the picture's units, moving in
+ * their `ms`; `scale` turns the picture's units into pixels. `stage` places and zooms the world in the svg (it
+ * changes only with the screen), so `scale` then includes the zoom.
+ */
+function Layer({
+  scale,
+  stage,
+  pan: [px, py],
+  ms,
+  walker,
+  svgRef,
+  children,
+}: {
+  scale: number;
+  stage?: string;
+  pan: Point;
+  ms: number;
+  walker?: { x: number; y: number; ms: number };
+  svgRef?: Ref<SVGSVGElement>;
+  children: ReactNode;
+}) {
+  const svg = (
+    <svg ref={svgRef} className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
+      {stage ? <g transform={stage}>{children}</g> : children}
+    </svg>
+  );
+  return (
+    <div className="tl-layer" style={{ transform: `translate(${-px * scale}px, ${-py * scale}px)`, transitionDuration: `${ms}ms` }}>
+      {walker ? (
+        <div className="tl-layer" style={{ transform: `translate(${walker.x * scale}px, ${walker.y * scale}px)`, transitionDuration: `${walker.ms}ms` }}>
+          {svg}
+        </div>
+      ) : (
+        svg
+      )}
+    </div>
+  );
+}
+
 /** The hand of the child reaching out (pose "reach"), where the string is held. */
 const handOf = (kid: KidState): Point => [kid.x + 62 * kid.face, kid.y - 112];
 /** Where the goal is while the child holds it: high up on its string, or in the reaching hand. */
@@ -370,6 +413,8 @@ export function TrailPlay({
   const svgEl = useRef<SVGSVGElement>(null);
   const safeEl = useRef<HTMLDivElement>(null);
   const [screen, setScreen] = useState<Screen>({ left: 0, right: VIEW_W, top: 0, bottom: VIEW_H });
+  /** Pixels per unit of the picture, for moving its layers. */
+  const [scale, setScale] = useState(1);
   useLayoutEffect(() => {
     const measure = () => {
       const box = svgEl.current?.getBoundingClientRect();
@@ -380,6 +425,7 @@ export function TrailPlay({
       const toX = (px: number) => Math.round(VIEW_W / 2 + (px - box.left - box.width / 2) / scale);
       const toY = (px: number) => Math.round(VIEW_H / 2 + (px - box.top - box.height / 2) / scale);
       setScreen({ left: toX(free.left), right: toX(free.right), top: toY(free.top), bottom: toY(free.bottom) });
+      setScale(scale);
     };
     measure();
     const watch = new ResizeObserver(measure);
@@ -1130,9 +1176,18 @@ export function TrailPlay({
   const [cx, cy] = camOf(k);
   /** Puts the picture's `KID_AT` where the HUD wants the child's feet, zoomed; a world going up keeps the picture. */
   const stage = level.turns ? undefined : `translate(${feet[0]} ${feet[1]}) scale(${zoom}) translate(${-KID_AT[0]} ${-KID_AT[1]})`;
-  const pan = (depth: number): CSSProperties => ({ transform: `translate(${-cx * depth}px, ${-cy * depth}px)`, transitionDuration: `${k.walk}ms` });
+  /** Pixels per unit of the world, zoomed with it. */
+  const worldScale = level.turns ? scale : scale * zoom;
   const { Scenery, Front, Backdrop } = level;
-  const friends = view.friend ? [view.friend.id] : [];
+  // The world's drawings are big and change only with a station: they are built again only then, not with every
+  // step, tap or key (each build cost a phone several frames).
+  const friendId = view.friend?.id;
+  const { done, here, nope, party } = view;
+  const backdrop = useMemo(() => <Backdrop />, [Backdrop]);
+  const [scenery, front] = useMemo(() => {
+    const props = { done, here, nope, party, friends: friendId ? [friendId] : [] };
+    return [<Scenery key="scenery" {...props} />, Front && <Front key="front" {...props} />];
+  }, [Scenery, Front, done, here, nope, party, friendId]);
   const Friend = view.friend && FRIENDS[view.friend.id];
   const Thief = level.away.thief;
   const Sled = view.riding;
@@ -1160,126 +1215,119 @@ export function TrailPlay({
       }}
     >
       <div ref={safeEl} className="tl-safe" />
-      <svg ref={svgEl} className="el-svg" viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} preserveAspectRatio="xMidYMid meet">
-        <g transform={stage}>
-          <g className="tl-pan" style={pan(FAR)}>
-            <Backdrop />
-          </g>
-          <g className="tl-pan" style={pan(1)}>
-            <Scenery done={view.done} here={view.here} nope={view.nope} party={view.party} friends={friends} />
-            <line ref={stringEl} className="tl-string" stroke={INK} strokeWidth="3" {...firstString} />
-            <g ref={goalEl} className="tl-goal" transform={firstGoal} display={level.finale.into && view.done.includes(level.finale.into) ? "none" : undefined}>
-              {view.away && Thief && (
-                <g className="tl-thief">
-                  <Thief />
-                </g>
-              )}
-              <g className={view.party && onString ? "tl-sway" : undefined}>
-                <g ref={spinEl}>{(theGoal.world ?? theGoal.draw)()}</g>
-              </g>
+      {/* The picture in layers that move as a whole: the far hills, the world, the friend, the child, what is in front of
+          it, and bag and button on top */}
+      <Layer scale={worldScale} stage={stage} pan={[cx * FAR, cy * FAR]} ms={k.walk}>
+        {backdrop}
+      </Layer>
+      <Layer scale={worldScale} stage={stage} pan={[cx, cy]} ms={k.walk}>
+        {scenery}
+        <line ref={stringEl} className="tl-string" stroke={INK} strokeWidth="3" {...firstString} />
+        <g ref={goalEl} className="tl-goal" transform={firstGoal} display={level.finale.into && view.done.includes(level.finale.into) ? "none" : undefined}>
+          {view.away && Thief && (
+            <g className="tl-thief">
+              <Thief />
             </g>
-            {Front && <Front done={view.done} here={view.here} nope={view.nope} party={view.party} friends={friends} />}
-            {/* The friend walking along, behind the child */}
-            {view.friend && Friend && (
-              <g className="tl-walker" style={{ transform: `translate(${view.friend.x}px, ${view.friend.y}px)`, transitionDuration: `${view.friend.ms}ms` }}>
-                <g transform={view.friend.face < 0 ? "scale(-1 1)" : undefined}>
-                  <g className={view.party ? "tl-friend-party" : undefined}>
-                    <g
-                      className={view.friend.hop ? `el-hopper hop-${view.friend.hop % 2}` : "el-hopper"}
-                      data-tap={tapState({ goal: need === view.friend.id })}
-                      onPointerDown={tapFriend}
-                    >
-                      <Friend.Body pose={view.friend.pose} />
-                    </g>
-                  </g>
-                </g>
-              </g>
-            )}
-            {shown.map((n, w) => (
-              <g key={`${n.ghost}-${again}`} className="tl-next">
-                {n.at && itemOf(n.icon) && <WantRing at={n.at} r={ringOf(ITEMS[itemOf(n.icon)!])} />}
-                {n.prints.map(([x, y], i) => (
-                  <ellipse
-                    key={`${x}-${y}`}
-                    className="tl-print"
-                    cx={x + (i % 2 ? 6 : -6)}
-                    cy={y - 4}
-                    rx="18"
-                    ry="7"
-                    style={{ animationDelay: `${i * 90}ms` }}
-                  />
-                ))}
-                <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
-                  <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
-                    {raft && afloat(n.ghost[0]) && <raft.Raft paddling={false} done={view.done} />}
-                    <Kid look={HERO} pose={n.pose} holding={null} wear={view.wear} face={n.face} backpack={PACK_SHUT} />
-                  </g>
-                </g>
-              </g>
-            ))}
-            {/* The picture signs of the ways at a fork: always there; while the child picks a way they hop and glow */}
-            {forks.flatMap((f) =>
-              f.ways.map(({ id, Sign, sign: [x, y], say: wayName }, w) => {
-                const on = view.fork?.id === f.id;
-                return (
-                  <g
-                    key={`${id}-${on ? view.fork?.nudge : "off"}`}
-                    className={`tl-way${on ? " on" : ""}`}
-                    data-tap
-                    onPointerDown={pressWay(w)}
-                    role="button"
-                    aria-label={spokenIn(wayName, language).text}
-                  >
-                    <g className="tl-way-board" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${w * 120}ms` }}>
-                      <circle cx={x} cy={y} r={WAY_R + 12} className="tl-way-glow" fill="none" strokeWidth="14" />
-                      <circle cx={x} cy={y} r={WAY_R} className="tl-way-face" stroke={INK} strokeWidth="6" />
-                      <g transform={`translate(${x} ${y})`}>
-                        <Sign />
-                      </g>
-                    </g>
-                    {on && !touchOnly && (
-                      <KeyCap x={x} y={y + WAY_R + 40} w={40} on down={held === `${w + 1}`}>
-                        <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
-                          {w + 1}
-                        </text>
-                      </KeyCap>
-                    )}
-                  </g>
-                );
-              }),
-            )}
-            {/* The raft stays behind where the child got off */}
-            {raft && !afloat(k.x) && (
-              <g transform={`translate(${raft.until} ${groundY(level.ground, raft.until)})`}>
-                <raft.Raft paddling={false} done={view.done} />
-              </g>
-            )}
-            <g ref={carryBack} className="tl-carry">
-              {carry}
-            </g>
-            <g className="tl-walker" style={{ transform: `translate(${k.x}px, ${k.y}px)`, transitionDuration: `${k.walk}ms` }}>
-              {raft && afloat(k.x) && <raft.Raft paddling={k.pose === "paddle"} done={view.done} />}
-              {Sled && <Sled />}
-              <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
-                <Kid look={HERO} pose={k.pose} holding={null} wear={view.wear} face={k.face} backpack={view.pack} />
-              </g>
-              {view.bubble && !view.bubble.at && <ThoughtBubble picture={view.bubble.picture} height={KID_H} nudge={view.bubble.nudge} />}
-            </g>
-            <g ref={carryFront} className="tl-carry">
-              {carry}
-            </g>
-            {view.bubble?.at && (
-              <g
-                transform={`translate(${view.bubble.at[0]} ${view.bubble.at[1]})`}
-                data-tap={view.choosing ? tapState({ goal: true }) : undefined}
-                onPointerDown={tapBubble}
-              >
-                <ThoughtBubble picture={view.bubble.picture} height={0} nudge={view.bubble.nudge} right={view.bubble.at[0] >= k.x} />
-              </g>
-            )}
+          )}
+          <g className={view.party && onString ? "tl-sway" : undefined}>
+            <g ref={spinEl}>{(theGoal.world ?? theGoal.draw)()}</g>
           </g>
         </g>
-
+        {front}
+        {shown.map((n, w) => (
+          <g key={`${n.ghost}-${again}`} className="tl-next">
+            {n.at && itemOf(n.icon) && <WantRing at={n.at} r={ringOf(ITEMS[itemOf(n.icon)!])} />}
+            {n.prints.map(([x, y], i) => (
+              <ellipse key={`${x}-${y}`} className="tl-print" cx={x + (i % 2 ? 6 : -6)} cy={y - 4} rx="18" ry="7" style={{ animationDelay: `${i * 90}ms` }} />
+            ))}
+            <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
+              <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
+                {raft && afloat(n.ghost[0]) && <raft.Raft paddling={false} done={view.done} />}
+                <Kid look={HERO} pose={n.pose} holding={null} wear={view.wear} face={n.face} backpack={PACK_SHUT} />
+              </g>
+            </g>
+          </g>
+        ))}
+        {/* The picture signs of the ways at a fork: always there; while the child picks a way they hop and glow */}
+        {forks.flatMap((f) =>
+          f.ways.map(({ id, Sign, sign: [x, y], say: wayName }, w) => {
+            const on = view.fork?.id === f.id;
+            return (
+              <g
+                key={`${id}-${on ? view.fork?.nudge : "off"}`}
+                className={`tl-way${on ? " on" : ""}`}
+                data-tap
+                onPointerDown={pressWay(w)}
+                role="button"
+                aria-label={spokenIn(wayName, language).text}
+              >
+                <g className="tl-way-board" style={{ transformOrigin: `${x}px ${y}px`, animationDelay: `${w * 120}ms` }}>
+                  <circle cx={x} cy={y} r={WAY_R + 12} className="tl-way-glow" fill="none" strokeWidth="14" />
+                  <circle cx={x} cy={y} r={WAY_R} className="tl-way-face" stroke={INK} strokeWidth="6" />
+                  <g transform={`translate(${x} ${y})`}>
+                    <Sign />
+                  </g>
+                </g>
+                {on && !touchOnly && (
+                  <KeyCap x={x} y={y + WAY_R + 40} w={40} on down={held === `${w + 1}`}>
+                    <text y="9" textAnchor="middle" fontSize="24" fontWeight="800" fontFamily="inherit" fill={INK}>
+                      {w + 1}
+                    </text>
+                  </KeyCap>
+                )}
+              </g>
+            );
+          }),
+        )}
+        {/* The raft stays behind where the child got off */}
+        {raft && !afloat(k.x) && (
+          <g transform={`translate(${raft.until} ${groundY(level.ground, raft.until)})`}>
+            <raft.Raft paddling={false} done={view.done} />
+          </g>
+        )}
+        <g ref={carryBack} className="tl-carry">
+          {carry}
+        </g>
+      </Layer>
+      {/* The friend walking along, behind the child */}
+      {view.friend && Friend && (
+        <Layer scale={worldScale} stage={stage} pan={[cx, cy]} ms={k.walk} walker={{ x: view.friend.x, y: view.friend.y, ms: view.friend.ms }}>
+          <g transform={view.friend.face < 0 ? "scale(-1 1)" : undefined}>
+            <g className={view.party ? "tl-friend-party" : undefined}>
+              <g
+                className={view.friend.hop ? `el-hopper hop-${view.friend.hop % 2}` : "el-hopper"}
+                data-tap={tapState({ goal: need === view.friend.id })}
+                onPointerDown={tapFriend}
+              >
+                <Friend.Body pose={view.friend.pose} />
+              </g>
+            </g>
+          </g>
+        </Layer>
+      )}
+      <Layer scale={worldScale} stage={stage} pan={[cx, cy]} ms={k.walk} walker={{ x: k.x, y: k.y, ms: k.walk }}>
+        {raft && afloat(k.x) && <raft.Raft paddling={k.pose === "paddle"} done={view.done} />}
+        {Sled && <Sled />}
+        <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
+          <Kid look={HERO} pose={k.pose} holding={null} wear={view.wear} face={k.face} backpack={view.pack} />
+        </g>
+        {view.bubble && !view.bubble.at && <ThoughtBubble picture={view.bubble.picture} height={KID_H} nudge={view.bubble.nudge} />}
+      </Layer>
+      <Layer scale={worldScale} stage={stage} pan={[cx, cy]} ms={k.walk}>
+        <g ref={carryFront} className="tl-carry">
+          {carry}
+        </g>
+        {view.bubble?.at && (
+          <g
+            transform={`translate(${view.bubble.at[0]} ${view.bubble.at[1]})`}
+            data-tap={view.choosing ? tapState({ goal: true }) : undefined}
+            onPointerDown={tapBubble}
+          >
+            <ThoughtBubble picture={view.bubble.picture} height={0} nudge={view.bubble.nudge} right={view.bubble.at[0] >= k.x} />
+          </g>
+        )}
+      </Layer>
+      <Layer scale={scale} pan={[0, 0]} ms={0} svgRef={svgEl}>
         <g transform={`translate(${corner[0]} ${corner[1]}) scale(${zoom}) translate(${-bx} ${-(HUD_TOP + HUD_H)})`}>
           <ActionButton
             waiting={!!view.action || view.queued}
@@ -1296,7 +1344,7 @@ export function TrailPlay({
             </KeyCap>
           )}
           {/* The child's backpack again, big and open at the bottom left: its body is the frame, the handle on top
-              sticks out, and the things stand side by side in its three pockets */}
+            sticks out, and the things stand side by side in its three pockets */}
           <g className={`tl-bag${view.choosing ? " open" : ""}`}>
             <path d={handle} stroke={INK} strokeWidth="20" strokeLinecap="round" fill="none" />
             <path d={handle} stroke={PACK.dark} strokeWidth="10" strokeLinecap="round" fill="none" />
@@ -1372,7 +1420,7 @@ export function TrailPlay({
                 </g>
               )}
               {/* The front of each pocket, raised like a button and pressed in when its thing comes out: its number key
-                on a computer, a buckle on a tablet */}
+              on a computer, a buckle on a tablet */}
               {slots.map(([x], i) => (
                 <g key={x}>
                   <rect x={x - FACH} y={POCKET_Y + 8} width={2 * FACH} height={POCKET_H} rx="18" fill={PACK.dark} stroke={INK} strokeWidth="4" />
@@ -1435,7 +1483,7 @@ export function TrailPlay({
             <Confetti />
           </g>
         )}
-      </svg>
+      </Layer>
 
       {view.picking && <StoryEnd id={level.id} onPick={onPick} />}
       <BurstLayer bursts={bursts} />
