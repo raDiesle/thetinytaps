@@ -955,6 +955,19 @@ export function TrailPlay({
     } else funBurst(e.clientX, e.clientY);
   };
 
+  /** A creature's bubble was tapped while the bag is open: it shows the thing it wants, so that thing is given, just
+   * as if its slot in the backpack (or the friend) had been tapped. Otherwise the tap goes on to the picture. */
+  const tapBubble = (e: PointerEvent) => {
+    const pick = chooser.current;
+    const here = allStations(level).find((s) => s.id === viewRef.current.here);
+    const slot = here?.kind === "obstacle" ? viewRef.current.bag.indexOf(here.need) : -1;
+    if (!pick || slot < 0) return;
+    e.stopPropagation();
+    chooser.current = null;
+    spawn(e.clientX, e.clientY);
+    pick(slot);
+  };
+
   /** While the bag is open, a tap elsewhere or another key shows which thing helps; at a fork the signs hop. */
   const showHint = () => {
     if (viewRef.current.fork) return put((v) => ({ fork: v.fork && { ...v.fork, nudge: v.fork.nudge + 1 } }));
@@ -1184,7 +1197,11 @@ export function TrailPlay({
             {carry}
           </g>
           {view.bubble?.at && (
-            <g transform={`translate(${view.bubble.at[0]} ${view.bubble.at[1]})`}>
+            <g
+              transform={`translate(${view.bubble.at[0]} ${view.bubble.at[1]})`}
+              data-tap={view.choosing ? tapState({ goal: true }) : undefined}
+              onPointerDown={tapBubble}
+            >
               <ThoughtBubble picture={view.bubble.picture} height={0} nudge={view.bubble.nudge} right={view.bubble.at[0] >= k.x} />
             </g>
           )}
