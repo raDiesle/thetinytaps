@@ -5,6 +5,7 @@ import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { playMelody } from "@/lib/sfx";
 import { type Localized, pick, spokenIn, useAppLanguage } from "@/lib/language";
 import { speak } from "@/lib/speech";
+import { BathLevel } from "./BathLevel";
 import { BuildingLevel } from "./BuildingLevel";
 import { CircusLevel } from "./CircusLevel";
 import { LEVEL_TEXTS } from "./content";
@@ -39,6 +40,7 @@ const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps>
   { id: "circus", emoji: "🎪", Level: CircusLevel },
   { id: "space", emoji: "🚀", Level: SpaceLevel },
   { id: "light", emoji: "🔦", Level: LightLevel },
+  { id: "bath", emoji: "🛁", Level: BathLevel },
   { id: "farm", emoji: "🐓", Level: FarmLevel },
 ];
 

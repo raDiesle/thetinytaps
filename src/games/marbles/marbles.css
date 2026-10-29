@@ -42,6 +42,10 @@
   background: #384067;
 }
 
+.marble-play:has([aria-label="Badezimmer"]) {
+  background: #e3f4ff;
+}
+
 .marble-play:has([aria-label="Bauernhof"]) {
   /* Sky above and grass below, like the picture, where the screen is taller than it. */
   background: linear-gradient(#9ad8ff 66.7%, #7cc94e 66.7%);
