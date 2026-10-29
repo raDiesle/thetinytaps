@@ -8,6 +8,7 @@ import { buildKitchen } from "./kitchen";
 import { buildLight } from "./light";
 import { buildMachine } from "./machine";
 import { buildSpace } from "./space";
+import { buildTidy } from "./tidy";
 import { buildWater } from "./water";
 
 // Translations come only on request, so a text may be German alone (it is said in German then); but the German is
@@ -38,7 +39,7 @@ describe("Kettenreaktion texts", () => {
 
   test("every line a machine or the Wasserbahn says has its German, and its translations are complete and in their own script", () => {
     const water = { events: buildWater().stretches.flatMap((s) => s.events) };
-    const machines = { buildMachine, buildKitchen, buildGarden, buildBuilding, buildCircus, buildSpace, buildLight, buildWater: () => water };
+    const machines = { buildMachine, buildKitchen, buildGarden, buildBuilding, buildCircus, buildSpace, buildLight, buildTidy, buildWater: () => water };
     for (const [name, build] of Object.entries(machines)) {
       const lines = build().events.flatMap((e) => (e.say ? [e.say] : []));
       expect({ name, said: lines.length > 0 }).toEqual({ name, said: true });

@@ -1,5 +1,18 @@
 /** One level of the game. */
-export type MarbleLevel = "track" | "pegs" | "sneeze" | "water" | "topple" | "machine" | "kitchen" | "garden" | "building" | "circus" | "space" | "light";
+export type MarbleLevel =
+  | "track"
+  | "pegs"
+  | "sneeze"
+  | "water"
+  | "topple"
+  | "machine"
+  | "kitchen"
+  | "garden"
+  | "building"
+  | "circus"
+  | "space"
+  | "light"
+  | "tidy";
 
 export interface MarbleSettings {
   /**

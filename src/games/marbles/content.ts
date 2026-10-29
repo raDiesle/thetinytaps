@@ -170,4 +170,8 @@ export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localize
       ru: "Нажми — и зажжётся свет!",
     },
   },
+  tidy: {
+    name: { de: "Aufräum-Maschine" },
+    intro: { de: "Tipp! Dann räumt die Maschine auf." },
+  },
 };

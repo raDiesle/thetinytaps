@@ -20,6 +20,7 @@ const MODES: { id: MarbleLevel; emoji: string }[] = [
   { id: "circus", emoji: "🎪" },
   { id: "space", emoji: "🚀" },
   { id: "light", emoji: "🔦" },
+  { id: "tidy", emoji: "🧸" },
 ];
 
 export function MarbleGame() {

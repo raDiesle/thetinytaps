@@ -81,7 +81,13 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
   },
-  { href: "/kettenreaktion/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/kettenreaktion/",
+    parts: [
+      { label: "⛓️ Alle anderen Level", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      { label: "🧸 Aufräum-Maschine", languages: { de: "done" }, note: "Neu im Oktober 2026: Name, erster Satz und „Alles aufgeräumt!“ nur auf Deutsch." },
+    ],
+  },
   { href: "/kleine-abenteuer/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   { href: "/schatten/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },

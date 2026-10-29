@@ -72,6 +72,7 @@ export const chainReactionIdeas: IdeaArea = {
       text: "Ein unordentliches Kinderzimmer. Ein Tipp, und die Kettenreaktion räumt auf: Der Ball rollt die Bauklötze in die Kiste, das Auto schiebt die Bücher ins Regal, der Teddy fliegt ins Bett. Danach ist alles ordentlich und glitzert.",
       why: "Macht Aufräumen lustig; Eltern können es als Auftakt zum echten Aufräumen nutzen.",
       effort: "M",
+      done: true,
     },
     {
       id: "R-09",
