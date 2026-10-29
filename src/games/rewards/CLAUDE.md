@@ -92,8 +92,18 @@ one. A full day gets small bursts, the goal a party (and speech, if Vorlesen is 
 CSS hides everything else. The print is empty, with „Woche vom ____“ / „Datum ____“ to fill in (a month board prints its month, this one or
 the next); options: orientation
 (auto: portrait for a day board with up to two tasks), colour or grey (no inline colours, so `.rw-grey` wins), fields
-to colour in, and a page of stickers to cut out. Any later print feature (H-02: Bildkarten, Schnullerfee-Brief) can
+to colour in, and a page of stickers to cut out. Any later print feature (H-02: Schnullerfee-Brief) can
 use the same way.
+
+**Fotoabzug** (`photo.ts`, `PhotoPrint.tsx`, H-02): cards for a Velcro board are made for photo paper first – firm,
+wipeable, no laminating, and every drugstore, photo kiosk and online shop prints it. The grown-up picks 10 × 15
+(default, 4 × 6″ abroad), 13 × 18 (5 × 7″) or 20 × 30 cm (8 × 12″); `photoLayout` lays square cards of at least
+`MIN_CARD_MM` (a plan's pictures) or `MIN_STAR_MM` (the board's stars) on it inside a white `PHOTO_MARGIN_MM`, with cut
+lines from edge to edge and a white rim inside each cell. A canvas draws each photo as a 300-dpi JPG in the exact
+shape of the format (`photoPx`), shown in the panel with „💾 Speichern“ (and „📤 Teilen“ where the browser can share
+files, so a phone hands it to the photo app or a shop's app). Below it the guide „Anleitung: vom Foto zur Klett-Tafel“:
+save, order like holiday photos (matt, „ganzes Bild“), cut and round the corners, 20 mm Velcro dots (soft side on the
+card), safety. The Tagesplan shows it first, before A4; the board after its A4 page.
 
 ## Rules
 
@@ -137,7 +147,7 @@ shares the board's parts (sheet look, themes, `A4`/`Preview`, the gallery's clas
 - `PlanSheet.tsx` – the sheet for screen and print: day cards (`planLayout` picks rows and columns for the box),
   Erst–Dann with the arrow when a day has exactly two steps, the week's columns with moons for the nights until a day.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
-  `PlanPrint.tsx` – „🖨️ Drucken“ with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures;
+  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures;
   `planSettings.ts` – plans, current one, print options (`tinytaps.planner.v1`); `PlannerGame.tsx` – the page;
   `pageParts.tsx` – `useComputer`, `PanelButton`, shared with `RewardsGame.tsx`; `planner.css` – classes `pl-`.
 - Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
@@ -155,8 +165,12 @@ next Erst–Dann). A new plan shows example ticks (the first steps of today, nev
 - A key never ticks a card – only a tap on „Jetzt“ does, so a child hammering keys doesn't finish the day.
 - Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most; a template stays within it (`plan.test.ts`).
 - No clock times: order, „Jetzt – Dann“ and moons for the days to come; toddlers read no clock.
-- Printed cards are big (about 6 cm) and the texts suggest Velcro (Klett), never small magnets: they are a choking
-  hazard under three (research „belohnungstafel“, „tagesplan“).
+- Printed cards are big (at least `MIN_CARD_MM`, 4.5 cm, room for a 20 mm Velcro dot) and the texts suggest Velcro
+  (Klett), never small magnets: they are a choking hazard under three (research „belohnungstafel“, „tagesplan“).
+- Pictures for the boards are made for print first: cards go on a photo format every shop sells (`PHOTO_FORMATS`,
+  never a size of our own), in its exact shape at 300 dpi, nothing that matters within `PHOTO_MARGIN_MM` of the edge
+  (`photo.test.ts` checks). A generated picture that replaces an emoji must still be sharp there: at least 600 px
+  square (5 cm at 300 dpi).
 - A new activity needs its `schritt-<id>` prompt and line-art twin in `bilder/prompts.ts` (`plan.test.ts` checks).
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
