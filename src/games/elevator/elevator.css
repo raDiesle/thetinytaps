@@ -92,6 +92,16 @@
   animation: el-swing 0.42s ease-in-out infinite alternate;
 }
 
+/* On a raft: the paddle strokes through the water, the child leaning into it. */
+.pose-paddle .el-paddle {
+  transform-origin: 30px -110px;
+  animation: el-paddle 0.7s ease-in-out infinite alternate;
+}
+
+.pose-paddle .el-kid-body {
+  animation: el-bob 0.35s ease-in-out infinite alternate;
+}
+
 /* Hungry: hands on the tummy, which rumbles. */
 .pose-tummy .el-rumble {
   animation: el-flicker 0.65s steps(2) infinite;
@@ -1206,6 +1216,15 @@
   }
 }
 
+@keyframes el-paddle {
+  from {
+    transform: rotate(-16deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+
 @keyframes el-fall {
   from {
     transform: translateY(-40px) rotate(0deg);
@@ -1221,6 +1240,8 @@
   .pose-walk .el-kid-body,
   .pose-walk .el-arm-l,
   .pose-walk .el-arm-r,
+  .pose-paddle .el-paddle,
+  .pose-paddle .el-kid-body,
   .el-rain-lines,
   .el-confetti rect {
     animation: none;

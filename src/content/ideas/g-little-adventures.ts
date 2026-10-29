@@ -51,6 +51,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Eine Welle nimmt Schaufel und Eimer mit ans andere Ende vom Strand. Unterwegs: eine Krabbe will eine Muschel, die Möwe will das Brötchen, ein Felsen mit Wasser dazwischen (Luftmatratze als Brücke), heißer Sand (Badelatschen). Am Ende bauen alle zusammen eine Sandburg.",
       why: "Sommer-Erinnerung zum Nachspielen.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-06",
@@ -67,6 +68,8 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Der Teddy ist mit dem Picknickkorb vorausgelaufen. Durch den Wald: der Bär will Honig, über den Fluss auf einem Baumstamm, Brombeeren pflücken (Korb), ein Igel rollt sich ein (leise sein – das Kind tippt ganz sacht), auf der Lichtung essen alle zusammen.",
       why: "Natur und Tiere des Waldes; Essen teilen.",
       effort: "M",
+      partial:
+        "Gebaut als Weg-Abenteuer „Picknick im Wald“ (Nuss fürs Eichhörnchen, Brombeeren für die Rotkehlchen, Baumstamm über den Fluss, Regenschirm am Wasserfall, Honig für den Bären, Picknick mit allen). Ohne das sachte Tippen: am Igel bleibt das Kind von selbst still stehen; die Brombeeren sind ein Zweig, ohne Korb.",
     },
     {
       id: "G-08",
@@ -75,6 +78,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Ein Weg-Abenteuer auf dem Wasser: das Floß treibt den Fluss hinunter, das Kind paddelt mit jedem Tippen. Ein Ast versperrt den Weg (Säge), eine Ente sucht ihre Küken, ein Wasserfall (Regenschirm aufspannen und langsam hinunterschweben).",
       why: "Bewegung durch eine Welt ohne Gehen; Wasser macht Spaß.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-09",

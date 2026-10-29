@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import type { Pose } from "../kid";
+import type { Outfit, Pose } from "../kid";
 import type { GoalId, ItemId } from "./items";
 import type { Worry } from "./worries";
 
@@ -24,6 +24,8 @@ export interface SceneryProps {
   here: string | null;
   /** A wrong thing was just tried at this station; a new `n` wiggles it again. */
   nope: { id: string; n: number } | null;
+  /** The goal is back and everybody is happy (the end's party): the sandcastle gets built. */
+  party: boolean;
 }
 
 interface StationBase {
@@ -65,6 +67,12 @@ export interface Obstacle extends StationBase {
   why: { wants: Point } | { worry: Worry };
   /** Solving it gives the goal back: it comes into the child's hands. */
   frees?: boolean;
+  /** Solved, the child floats down the ground points `to` by itself, slowly, and the thing goes along where it is, at
+   * `at` above the child (the open umbrella over the waterfall); then the child puts it down at `put` from its feet
+   * (the umbrella stuck into the raft), where the level's drawing shows it from then on. */
+  float?: { to: Point[]; put: Point };
+  /** What the child wears from when it is solved on (the flip-flops on the hot sand): the thing is put on, not given. */
+  wear?: Outfit[];
 }
 
 /** Stairs or a ladder: the first tap climbs half of the steps, the second the rest (never more taps in a row). */
@@ -131,6 +139,9 @@ export interface TrailLevel {
   Scenery: ComponentType<SceneryProps>;
   /** Drawn in front of the goal (the sand that half hides the ball), behind the child. */
   Front?: ComponentType<SceneryProps>;
+  /** A raft the child stands on from the start and paddles instead of walking, until it gets off at `until` (where the
+   * raft stays behind). Its drawing stands on (0, 0) under the child's feet; `paddling` while it moves. */
+  raft?: { Raft: ComponentType<{ paddling: boolean; done: string[] }>; until: number };
   /** Far hills and clouds; they move slower than the world, which makes it deep. */
   Backdrop: ComponentType;
   /** The ground line the child walks on, from left to right; stairs are one point per step. */
@@ -142,6 +153,8 @@ export interface TrailLevel {
   turns?: number[];
   /** Where the child starts, on the ground. */
   start: number;
+  /** What the child wears at the start (bare feet at the beach); shoes when left out. */
+  wear?: Outfit[];
   /** At the start: the goal leaves the child's hands for `to` (where the last obstacle keeps it). */
   away: Flight & { pose: Pose; sounds: Cue[]; say: string };
   stations: (Station | Fork)[];

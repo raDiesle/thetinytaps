@@ -136,5 +136,18 @@ describe.each(TRAIL_LEVELS.map((level) => [level.id, level] as const))("trail le
         for (const [x, y] of station.slide ?? []) expect(groundY(path.ground, x)).toBe(y);
       }
     });
+
+    test("a float goes down the ground, and a raft is left where stairs or a ladder go up", () => {
+      for (const station of path.stations) {
+        if (station.kind !== "obstacle" || !station.float) continue;
+        for (const [x, y] of station.float.to) expect(groundY(path.ground, x)).toBe(y);
+        expect(station.float.to[0][0]).toBeGreaterThan(station.x);
+      }
+      if (!level.raft) return;
+      const until = level.raft.until;
+      // The child gets off at a climb, so it never walks on the water; nothing stops on the water after that.
+      expect(path.stations.find((s) => s.x === until)?.kind).toBe("climb");
+      for (const station of path.stations) if (station.x > until && station.kind === "climb") expect(station.steps[0][0]).toBeGreaterThan(until);
+    });
   });
 });
