@@ -5,6 +5,8 @@ import { PicturePromptReview } from "@/components/PicturePromptReview";
 import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
+  FOX_STATUS,
+  type FoxTask,
   IDEA_AREAS,
   IDEA_GROUPS,
   LANGUAGE_STATUS,
@@ -17,6 +19,7 @@ import {
   type IdeaStatus,
   type LanguageState,
   languageStateOf,
+  waitingFoxPictures,
 } from "@/content/ideas";
 import { RESEARCH, type Research } from "@/content/research";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/content/targetLanguages";
@@ -66,6 +69,7 @@ const DEFAULTS = {
 const CONTENTS: { id: string; label: string }[] = [
   { id: "uebersicht", label: "📊 Überblick" },
   { id: "sprachen", label: "🌍 Sprachen" },
+  { id: "fuechse", label: "🦊 Füchse" },
   { id: "stimmen", label: "🎙️ Stimmen" },
   { id: "recherchen", label: "🔍 Recherchen" },
   { id: "bilder", label: "🎨 Bildvorschläge" },
@@ -186,6 +190,8 @@ export function ManagementPage() {
       </section>
 
       <Languages />
+
+      <Foxes onShow={showIdea} />
 
       <section id="stimmen" className="ideas-panel">
         <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
@@ -561,6 +567,78 @@ function Languages() {
                   {LANGUAGE_STATUS.filter((row) => languageStateOf(row, l.id) === "done").length}/{LANGUAGE_STATUS.length}
                 </td>
               ))}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+const FOX_WORK: Record<FoxTask["work"], string> = { drawing: "✏️ Zeichnung", picture: "🖼️ Gemini-Bild" };
+const FOX_STATE: Record<NonNullable<FoxTask["state"]>, string> = { done: "✅", partial: "🟡" };
+
+/**
+ * Where the foxes of toddlerfox.com still have to go (content/ideas/foxStatus.ts), game by game: drawings can be done
+ * any time, Gemini pictures wait and are made together in one batch, so the footer counts them.
+ */
+function Foxes({ onShow }: { onShow: (id: string) => void }) {
+  const tasks = FOX_STATUS.flatMap((row) => row.tasks);
+  return (
+    <section id="fuechse" className="ideas-panel">
+      <h2>🦊 Füchse: wo der Fuchs von toddlerfox.com noch hin soll</h2>
+      <p className="ideas-hint">
+        Spiel für Spiel, nach Aufwand. ✏️ Zeichnungen sind Code und gehen jederzeit; 🖼️ Gemini-Bilder warten und werden zusammen in einem Batch gemacht, das ist
+        günstiger – sag dann z. B. „mach die wartenden Fuchsbilder“. ✅ fertig, 🟡 teilweise, · offen. Ideen dazu: D-14 bis D-19.
+      </p>
+      <div className="ideas-overview-scroll">
+        <table className="ideas-overview ideas-languages ideas-foxes">
+          <thead>
+            <tr>
+              <th>Spiel und Aufgabe</th>
+              <th>Wie</th>
+              <th>Aufwand</th>
+              <th>Idee</th>
+              <th>Stand</th>
+            </tr>
+          </thead>
+          <tbody>
+            {FOX_STATUS.flatMap((row) => {
+              const game = GAME_BY_HREF.get(row.href);
+              return [
+                <tr key={row.href}>
+                  <th colSpan={5}>
+                    {game ? `${game.emoji} ${game.title.de}` : "🏠 Startseite, Cover & Menüs"}
+                    {row.note && <small>{row.note}</small>}
+                  </th>
+                </tr>,
+                ...row.tasks.map((task) => (
+                  <tr key={`${row.href} ${task.label}`} className="ideas-languages-part">
+                    <th>
+                      {task.label}
+                      {task.note && <small>{task.note}</small>}
+                    </th>
+                    <td>
+                      {FOX_WORK[task.work]}
+                      {task.pictures && task.pictures > 1 && ` ×${task.pictures}`}
+                    </td>
+                    <td>
+                      <EffortTag effort={task.effort} short />
+                    </td>
+                    <td>
+                      <IdeaLink id={task.idea ?? "D-18"} onShow={onShow} />
+                    </td>
+                    {task.state ? <td>{FOX_STATE[task.state]}</td> : <td className="ideas-zero">·</td>}
+                  </tr>
+                )),
+              ];
+            })}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colSpan={5}>
+                Fertig {tasks.filter((t) => t.state === "done").length}/{tasks.length} · Gemini-Bilder für den nächsten Batch: {waitingFoxPictures()}
+              </th>
             </tr>
           </tfoot>
         </table>

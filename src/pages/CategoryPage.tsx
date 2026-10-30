@@ -8,6 +8,7 @@ import { useT } from "@/lib/language";
 import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
+import { SeoText } from "@/components/SeoText";
 
 /** One category of the home menu with its games. */
 export function CategoryPage() {
@@ -40,6 +41,7 @@ export function CategoryPage() {
           </li>
         ))}
       </ul>
+      <SeoText />
     </main>
   );
 }

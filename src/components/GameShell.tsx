@@ -2,6 +2,8 @@ import { useLocation, useNavigate } from "react-router";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { MenuHead } from "@/components/MenuTop";
+import { PageCornerArt } from "@/components/PageCornerArt";
+import { SeoText } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -323,6 +325,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
         </button>
       )}
       <PlaytimeNote />
+      <SeoText />
     </main>
   );
 }
@@ -465,8 +468,8 @@ const STARS: [number, number, number][] = [
 ];
 
 /**
- * The ✕ in the corner: it has to be held for half a second while the ring
- * fills; letting go earlier keeps playing. A short note next to it says what
+ * The ✕ in the corner (in the book look the page's turned-up corner): it has to be held for half a second while the
+ * ring fills (the corner lifts); letting go earlier keeps playing. A short note next to it says what
  * it does while it is held (or a mouse is over it) – never by itself when a game starts.
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
@@ -486,7 +489,9 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
         aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })})`}
         {...props}
       >
-        ✕
+        {/* In the book look the page's turned-up corner instead (`book.css`), lifting further while held. */}
+        <span className="hold-exit-sign">✕</span>
+        <PageCornerArt sign="close" />
       </button>
     </div>
   );

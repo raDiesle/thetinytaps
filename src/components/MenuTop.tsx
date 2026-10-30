@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
+import { BookFamily } from "@/components/BookFamily";
 import { FullscreenCorner } from "@/components/FullscreenButton";
+import { PageCornerArt } from "@/components/PageCornerArt";
 import { useTurnPage } from "@/lib/look";
 
 /**
@@ -25,16 +27,36 @@ export function MenuTop({ to, back, children }: { to: string; back: string; chil
  * The top of a menu: the way back (MenuTop, with `tools` next to it) right left of the centred title, close to the
  * cards where a grown-up looks, and the fullscreen button on the right, across from the sun in the top left corner.
  * `children`, such as a start screen's labelled buttons for grown-ups, go in a row of their own under the title.
+ * In the book look the way back is the page's turned-up corner instead (PageCorner), and where the page has no room for
+ * them beside the cards, the animal families sit in the row's free room.
  */
 export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: ReactNode; tools?: ReactNode; children?: ReactNode }) {
   return (
     <div className="menu-head">
+      <BookFamily family="fox" />
       <MenuTop to={to} back={back}>
         {tools}
       </MenuTop>
       <h1 className="menu-title">{title}</h1>
+      <BookFamily family="bear" />
       <FullscreenCorner />
+      <PageCorner to={to} back={back} />
       {children}
     </div>
+  );
+}
+
+/**
+ * The way back in the book look (user decision, October 2026): the page's top right corner stands up as if a finger
+ * had lifted it, its back showing with a little arrow on it, and a tap on it turns the page back. Big, so a grown-up
+ * finds it at once; `back` names where it leads, as tooltip and for screen readers. Hidden in the toy look, which keeps
+ * the round arrow.
+ */
+function PageCorner({ to, back }: { to: string; back: string }) {
+  const turnPage = useTurnPage(to, "back");
+  return (
+    <Link to={to} className="page-corner" aria-label={back} title={back} onClick={turnPage} data-tap>
+      <PageCornerArt sign="back" />
+    </Link>
   );
 }

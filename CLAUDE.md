@@ -6,7 +6,7 @@ built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backe
 ## Commands (always Bun, never npm, yarn or npx)
 
 ```bash
-bun run verify     # lint + format check + typecheck + unit tests – run before every commit (never piped into tail: that hides a failure)
+bun run verify     # lint + format check + typecheck + unit tests – run before every commit (never piped into tail or grep before `&& git commit`: the pipe hides a failure and the commit goes in anyway)
 bun run format     # format everything and apply safe lint fixes (Biome)
 bun test           # unit tests only (bun test, < 1 s); bun test --watch while working
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
@@ -120,7 +120,7 @@ In a fresh worktree run `bun install` first.
   letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
-  in `base.css`) while pictures and layout stay as they are. Only the management page and the SEO pages stay German.
+  in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines are German and English (see Search engines).
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games
@@ -143,6 +143,13 @@ In a fresh worktree run `bun install` first.
   or a new part that moves a lot, gets a scenario there; run it after changing what moves (`bun run perf <name>`,
   `--profile` names the functions that cost, `--shots` shows what was measured). The build ships React's production code
   (`PRODUCTION` in `tools/appPlugin.ts`, checked in `buildTools.test.ts`): without it every game ran several times slower.
+- **The app's animal is the fox** (the site is toddlerfox.com, Tapsi is a fox; user decision, October 2026): new pictures
+  and games take foxes in wherever they fit – fox grown-ups instead of drawn people (the baker, the doctor, the driver),
+  a fox child peeking out of the background, Tapsi cheering at the end – and the book's readers are foxes only (no
+  bears). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Existing games
+  are turned over step by step from the table „🦊 Füchse“ on `/management/` (`src/content/ideas/foxStatus.ts`, area D):
+  a game that gets its foxes marks it there in the same commit, and a new game or picture adds its row or task.
+  Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
@@ -205,10 +212,17 @@ In a fresh worktree run `bun install` first.
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
   (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
   lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
-  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them. The way back from a menu is a big yellow
+  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them (in the book look the ✕
+  is the page's corner, see below). The way back from a menu is a big yellow
   round arrow without words (its target only as tooltip and read out, `MenuTop`), right next to the title on its left, close to the
   cards – never far off in the screen's corner, where grown-ups on a big monitor didn't find it (biggest on a computer). A
-  menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right.
+  menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right. In the
+  book look the way back is instead the page's turned-up corner in the top right (`PageCorner`, user decision, October
+  2026) – where a reader turns a page back, so it is found there – with the fullscreen button left of it and the round
+  arrow hidden (`MenuTop.test.ts`); nothing else goes into that corner. Every way back in the book look is that corner:
+  while playing, the ✕ held to leave is the same corner at the page's top right with a ✕ on it (`PageCornerArt`), held
+  just like the ✕ – it lifts further while held instead of a ring filling – with the fullscreen button and „Zurück zum
+  Menü · halten“ left of it, clear of the room it lifts into (user feedback, October 2026).
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); a category of a few games that stand apart (`onHome`: „Weitere“) has no card and no page of its
   own, its games stand right on the home page on a frame named after it, like a game's sorts below; and variants of one way to play (which words, how long, whole word or first letter) are
@@ -224,7 +238,8 @@ In a fresh worktree run `bun install` first.
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
   either (only read out; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
-  left corner; buttons for grown-ups never cover it (the home page's sit on the right, a phone's way back in the middle). „Über das Spiel“
+  left corner (in the book look, where the families take its place, they do); buttons for grown-ups never cover it (the
+  home page's sit on the right, a phone's way back in the middle). „Über das Spiel“
   and „Einstellungen“ (where a game still has them) are small round signs without words (a plain „i“, ⚙️; the name as
   tooltip and read out) right next to the way back, so they take no row of their own; a panel opens right under the top row. When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
@@ -313,26 +328,58 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   whose cards open lazy pages does the same.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
   brings back the old toy-block look, `src/lib/look.ts`): a cover to open on the first visit to the home page
-  (`BookCover`, its picture of Tapsi's family and the little bear's in `src/components/bilder/`), the home page as the
+  (`BookCover`, shown once per visit – `sessionStorage` – and only on the home page), the home page as the
   contents page with page numbers, paper and softened colours, and the game's picture inside the page's paper margin
   (`.book-frame`). All of it is CSS under `:root[data-look="book"]` in `src/styles/book.css`; games don't style for it.
+  It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
+  drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
+  open page lies on the book's cloth-covered board, lit from above. The cover's picture (`bilder/buch-cover.webp`) shows
+  one fox family reading a book together – no other animal family, never a third grown-up or a child too many (user
+  feedback, October 2026; the picture with the bears still waits for its new one, D-14).
   Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
   any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
-  one. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; ✕ and the fullscreen
-  button stay pale see-through discs there too. Pictures of animal parents with their children (the fox and bear
-  families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
+  one. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
+  with it – `look.test.ts`): its corner lifts first, the page bends and catches the light, then darkens as it turns away,
+  and its shadow slides across the page beneath with its edge; never a quick flick, never a stiff board. A lifted page
+  must not swell past the screen (keep the eye far: `perspective(320vw)`), and its keyframes run `linear` – an easing
+  restarts at every keyframe, so the page would stop and start.
+  Where the page has no room for the families beside the cards (below 1400 × 640), they sit in the menu's top row
+  instead of the sun and clouds (`BookFamily`, in `MenuHead` and the home page's `.home-top`), shrinking into the room
+  left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
+  that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
+  of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
+  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of foxes reading with their children beside the menu's
+  cards – a fox parent with its child, and grandma or grandpa fox laughing with the child over the book, never bears
+  (D-15; the bears still stand there until that picture is made) – show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
   home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
-  (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
-  with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
-  (`useTitle`, `SeoHead`). Texts say only what the page really does. Heavy downloads (service worker copy,
+  and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
+  line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own
+  `index.html` per entry and language – German at `/zaehne/`, English at `/en/zaehne/`, joined by hreflang (GitHub
+  Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
+  and head in step (`useTitle`, `SeoHead`). Under `/en/` the router runs below the prefix (`routerBase()`,
+  `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
+  browser's language. Texts say only what the page really does. Google reads the page after the app ran, in an
+  English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
+  a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
+  it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
+  panel of its own; a new menu page does the same. Pages that must stay out of results get a
+  `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
+  `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
+- Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
+  repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
+  cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
+- Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked next to the version
+  below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
+  stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung
+  and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work

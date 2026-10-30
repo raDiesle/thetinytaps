@@ -1,6 +1,8 @@
 /* ---------- Start screen (parents) ---------- */
 
 .start-screen {
+  /* The page's foot for grown-ups (.page-foot) is placed below its first screen. */
+  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;

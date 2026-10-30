@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
+import { SeoText } from "@/components/SeoText";
 import { MenuHead } from "@/components/MenuTop";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useGameSettings } from "@/lib/common";
@@ -413,6 +414,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
           </section>
         </div>
       )}
+      <SeoText />
     </main>
   );
 }

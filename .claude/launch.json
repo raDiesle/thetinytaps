@@ -10,7 +10,7 @@
     {
       "name": "preview-pages",
       "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "export PUBLIC_BASE_PATH=/thetinytaps && bun run build && bun run preview --port 3200"],
+      "runtimeArgs": ["-c", "bun run build && bun run preview --port 3200"],
       "port": 3200
     }
   ]

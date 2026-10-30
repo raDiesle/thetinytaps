@@ -8,6 +8,11 @@
   text-align: center;
 }
 
+/* The home page's buttons for grown-ups and its title: laid out as the page's own children, except in the book look (book.css). */
+.home-top {
+  display: contents;
+}
+
 .logo {
   display: flex;
   flex-wrap: wrap;
@@ -243,7 +248,7 @@ button.game-card:focus-visible {
   justify-self: end;
 }
 
-.menu-head > :not(.menu-top, .menu-title, .fullscreen-corner) {
+.menu-head > :not(.menu-top, .menu-title, .fullscreen-corner, .book-family-slot) {
   grid-column: 1 / -1;
   justify-content: center;
 }
@@ -284,16 +289,43 @@ button.game-card:focus-visible {
 }
 
 /*
- * At the very end of the home page, small, for parents: when the running version was built. Seen only after
- * scrolling all the way down: it starts below the first screen even when everything else fits on it.
+ * At the very end of a menu, for parents and search engines: what the page is (SeoText), and on the home page
+ * when the running version was built. Seen only after scrolling down: it starts below the first screen even
+ * when everything else fits on it.
  */
-.home-version {
+.page-foot {
   position: absolute;
   top: max(100%, 100dvh);
   right: 0;
   left: 0;
+  /* Room at the bottom so the last line clears the book's board round the page (book look). */
+  padding: 24px max(20px, env(safe-area-inset-right)) max(36px, calc(env(safe-area-inset-bottom) + 12px)) max(20px, env(safe-area-inset-left));
+  text-align: center;
+}
+
+/* On a panel of its own: a start screen's world (floor, rug, toys) stays in place behind it. */
+.seo-text {
+  max-width: 640px;
+  margin: 0 auto 16px;
+  padding: 14px 20px 8px;
+  border-radius: 18px;
+  background: #ffffffd9;
+  color: #3d3045d9;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.seo-text h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.seo-text p {
+  margin: 0 0 8px;
+}
+
+.home-version {
   margin: 0;
-  padding: 8px 0 max(12px, env(safe-area-inset-bottom));
   font-size: 0.75rem;
   font-weight: 600;
   opacity: 0.55;

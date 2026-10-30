@@ -33,6 +33,8 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 3. The idea in `src/content/ideas/<area>.ts`: `done: true` (or `partial: "…"`).
    And its entry in `src/content/seo.ts`: a title with what parents search for (see the research
    on `/management/`), a description of 80–160 characters and a short text; true to what the game does.
+   The same three in English in `src/content/seo.en.ts` (what English-speaking parents search for), for the
+   page under `/en/`.
 4. One line in the README structure table and the roadmap.
 5. German only, unless the user asks for other languages (see the root `CLAUDE.md`): the title in `games.ts`
    as `{ de: "…" }`, start-screen texts as `t({ de: "…" })`, so a translation can be added later without
