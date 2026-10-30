@@ -1,11 +1,26 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { dayKey } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type TapState, tapState } from "@/lib/tapTargets";
-import { type Board, type BoardTask, boardDays, cellKey, isFilled, type LinkedDays, monthOf, possessive, progress, taskSlots, weekday } from "./board";
-import { type CatalogMark, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import {
+  AUTO_TITLES,
+  type Board,
+  type BoardTask,
+  boardDays,
+  cellKey,
+  isFilled,
+  isTemplateTitle,
+  type LinkedDays,
+  monthOf,
+  progress,
+  taskSlots,
+  weekday,
+} from "./board";
+import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
+import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
 
-const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
+/** „Woche vom ____“: the line on a printed week to write its first day on. */
+export const WEEK_OF: Localized = { de: "Woche vom", en: "Week of", zh: "起始日期", hi: "हफ़्ता शुरू", es: "Semana del", ar: "أسبوع يبدأ في", ru: "Неделя с" };
 
 /** Goals up to this many stars show one dot each under the reward; more show a bar. */
 const MAX_DOTS = 15;
@@ -28,25 +43,29 @@ export const SCREEN_LOOK: SheetLook = { print: false, color: true, colorIn: fals
 export function useBoardTitle() {
   const t = useT();
   return (board: Board) => {
-    if (board.title.trim()) return board.title.trim();
-    const name = board.childName.trim();
-    if (board.kind === "week") return name ? t({ de: `${possessive(name)} Sterne-Woche` }) : t({ de: "Meine Sterne-Woche" });
-    if (board.kind === "month") return name ? t({ de: `${possessive(name)} Sterne-Monat` }) : t({ de: "Mein Sterne-Monat" });
-    if (board.kind === "day") return name ? t({ de: `${possessive(name)} Tag` }) : t({ de: "Mein Tag" });
-    return name ? t({ de: `${possessive(name)} Sterne` }) : t({ de: "Meine Sterne" });
+    const own = board.title.trim();
+    const template = TEMPLATES.find((tpl) => tpl.id === board.template)?.title;
+    if (own) return isTemplateTitle(own, template) ? t(template) : own;
+    return t(AUTO_TITLES[board.kind])(board.childName.trim());
   };
 }
 
 /** A task's words: the grown-up's own or the catalogue's. */
 export function useTaskLabel() {
   const t = useT();
-  return (task: { label?: string; catalog?: string }) => task.label ?? (task.catalog ? t(TASK_BY_ID.get(task.catalog)?.label ?? { de: "" }) : "");
+  return (task: { label?: string; catalog?: string }) => {
+    const known = task.catalog ? TASK_BY_ID.get(task.catalog)?.label : undefined;
+    return task.label ?? (known ? t(known) : "");
+  };
 }
 
 /** A reward's words: the grown-up's own or the catalogue's. */
 export function useRewardLabel() {
   const t = useT();
-  return (reward: { label?: string; catalog?: string }) => reward.label ?? (reward.catalog ? t(REWARD_BY_ID.get(reward.catalog)?.label ?? { de: "" }) : "");
+  return (reward: { label?: string; catalog?: string }) => {
+    const known = reward.catalog ? REWARD_BY_ID.get(reward.catalog)?.label : undefined;
+    return reward.label ?? (known ? t(known) : "");
+  };
 }
 
 /**
@@ -114,7 +133,7 @@ export function BoardSheet({
   const { count, goal } = progress(board, shown, linked, day);
   const realCount = example ? progress(board, real, linked, day).count : count;
   // Grey prints take their colours from .rw-grey; inline ones would win over it.
-  const grey = look.print && !look.color;
+  const grey = greyPrint(look);
   const style = grey ? undefined : ({ "--rw-paper": theme.paper, "--rw-main": theme.main, "--rw-ink": theme.ink } as CSSProperties);
   const fieldProps = { mark, look, fresh, holding, example };
   const dateFormat = (options: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(speechLang, options);
@@ -125,15 +144,18 @@ export function BoardSheet({
       className={`rw-sheet rw-kind-${board.kind}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}${example ? " rw-with-examples" : ""}`}
       style={style}
     >
+      {look.print && look.color && <SheetStrip theme={theme} />}
       <header className="rw-head">
         <span className="rw-title">
           <span className="rw-title-mark" aria-hidden>
-            {mark.emoji}
+            <MarkPic mark={mark} />
           </span>{" "}
           {title}
         </span>
-        {look.print && board.kind === "week" && <span className="rw-blank">{t({ de: "Woche vom" })} ____________</span>}
-        {look.print && board.kind === "day" && <span className="rw-blank">{t({ de: "Datum" })} ____________</span>}
+        {look.print && board.kind === "week" && <span className="rw-blank">{t(WEEK_OF)} ____________</span>}
+        {look.print && board.kind === "day" && (
+          <span className="rw-blank">{t({ de: "Datum", en: "Date", zh: "日期", hi: "तारीख़", es: "Fecha", ar: "التاريخ", ru: "Дата" })} ____________</span>
+        )}
         {!look.print && board.kind === "week" && (
           <span className="rw-blank">{dateFormat({ day: "numeric", month: "short" }).formatRange(week[0], week[6])}</span>
         )}
@@ -153,7 +175,7 @@ export function BoardSheet({
           {board.reward && (
             <span className="rw-reward">
               <span className="rw-reward-emoji" aria-hidden>
-                {board.reward.emoji}
+                <ItemPic item={board.reward} kind="reward" lines={grey} />
               </span>
               <span className="rw-reward-label">{rewardLabel(board.reward)}</span>
             </span>
@@ -162,7 +184,7 @@ export function BoardSheet({
             <span className="rw-dots" role="img" aria-label={`${count} / ${goal}`}>
               {Array.from({ length: goal }, (_, i) => (
                 <span key={i} className={i < count ? `rw-dot filled${i >= realCount ? " example" : ""}` : "rw-dot"}>
-                  {i < count && mark.emoji}
+                  {i < count && <MarkPic mark={mark} />}
                 </span>
               ))}
             </span>
@@ -176,6 +198,9 @@ export function BoardSheet({
     </div>
   );
 }
+
+/** A print in grey: line-art pictures to colour in instead of coloured ones. */
+const greyPrint = (look: SheetLook) => look.print && !look.color;
 
 interface FieldLook {
   mark: CatalogMark;
@@ -202,7 +227,7 @@ function Field({
   hint,
   slot,
   isExample = false,
-}: FieldLook & { id: string; state: FieldState; next?: boolean; hint?: string; slot?: Slot; isExample?: boolean }) {
+}: FieldLook & { id: string; state: FieldState; next?: boolean; hint?: ReactNode; slot?: Slot; isExample?: boolean }) {
   const real = isExample ? (state === "filled" ? "open" : state) : state;
   const tap: TapState = look.print || real === "future" ? "" : tapState({ goal: next || real === "open", done: real === "filled" });
   return (
@@ -219,14 +244,18 @@ function Field({
           </span>
         )}
         {state === "filled" ? (
-          <span className="rw-mark">{mark.emoji}</span>
+          <span className="rw-mark">
+            <MarkPic mark={mark} />
+          </span>
         ) : look.colorIn ? (
           mark.outline ? (
             <svg className="rw-outline" viewBox="0 0 100 100" aria-hidden>
               <path d={mark.outline} />
             </svg>
           ) : (
-            <span className="rw-mark pale">{mark.emoji}</span>
+            <span className="rw-mark pale">
+              <MarkPic mark={mark} />
+            </span>
           )
         ) : hint ? (
           <span className="rw-mark pale">{hint}</span>
@@ -242,12 +271,12 @@ function Field({
 }
 
 /** A task's picture and words; `span` rows high where the task has a row per time of day. */
-function TaskHead({ task, span = 1 }: { task: BoardTask; span?: number }) {
+function TaskHead({ task, look, span = 1 }: { task: BoardTask; look: SheetLook; span?: number }) {
   const label = useTaskLabel()(task);
   return (
     <div className="rw-task" style={span > 1 ? { gridRow: `span ${span}` } : undefined}>
       <span className="rw-task-emoji" aria-hidden>
-        {task.emoji}
+        <ItemPic item={task} lines={greyPrint(look)} />
       </span>
       <span className="rw-task-label">{label}</span>
     </div>
@@ -306,7 +335,7 @@ function WeekGrid(props: GridProps) {
       {rows.map(({ task, slot, first, span }) => (
         <div key={`${task.id}|${slot}`} className="rw-row">
           {/* A task with several times of day has one head over all its rows. */}
-          {first && <TaskHead task={task} span={span} />}
+          {first && <TaskHead task={task} look={look} span={span} />}
           {days.map((d) => (
             <div key={dayKey(d)} className={`rw-cell${isToday(d) ? " today" : ""}`}>
               <Field id={cellKey(d, task.id, slot)} slot={slot} {...fieldOf(props, d, task, slot)} {...fieldLook(props)} />
@@ -352,7 +381,7 @@ function MonthGrid(props: GridProps) {
                       <Field
                         id={cellKey(d, task.id, slot)}
                         slot={slot}
-                        hint={several ? task.emoji : undefined}
+                        hint={several ? <ItemPic item={task} lines={greyPrint(look)} /> : undefined}
                         {...fieldOf(props, d, task, slot)}
                         {...fieldLook(props)}
                       />
@@ -370,13 +399,13 @@ function MonthGrid(props: GridProps) {
 
 /** The day's tasks as big cards side by side, each with its fields below (one per time of day). */
 function DayCards(props: GridProps) {
-  const { board, day } = props;
+  const { board, day, look } = props;
   const cols = board.tasks.length > 4 ? Math.ceil(board.tasks.length / 2) : Math.max(1, board.tasks.length);
   return (
     <div className="rw-cards" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
       {board.tasks.map((task) => (
         <div key={task.id} className="rw-card">
-          <TaskHead task={task} />
+          <TaskHead task={task} look={look} />
           <div className="rw-card-fields">
             {taskSlots(task).map((slot) => (
               <div key={String(slot)} className="rw-cell">
@@ -419,7 +448,9 @@ function CollectPath({
         <div key={i} className="rw-cell" style={{ gridRow: row + 1, gridColumn: col + 1 }}>
           {i === 0 && board.tasks.length > 0 && (
             <span className="rw-path-start" aria-hidden>
-              {board.tasks.map((task) => task.emoji).join("")}
+              {board.tasks.map((task) => (
+                <ItemPic key={task.id} item={task} lines={greyPrint(look.look)} />
+              ))}
             </span>
           )}
           <Field
@@ -433,7 +464,7 @@ function CollectPath({
       ))}
       <div className="rw-cell rw-path-end" style={{ gridRow: end.row + 1, gridColumn: end.col + 1 }}>
         <span className="rw-reward-emoji" aria-hidden>
-          {board.reward?.emoji ?? "🎉"}
+          {board.reward ? <ItemPic item={board.reward} kind="reward" lines={greyPrint(look.look)} /> : <Pic src={picture("fest")} emoji="🎉" />}
         </span>
         {board.reward && <span className="rw-reward-label">{rewardLabel(board.reward)}</span>}
       </div>

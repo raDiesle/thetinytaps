@@ -5,7 +5,7 @@ import { Kaffeemaschine, Kochloeffel, Mixer, Pfanne, Toaster, Topf, Waage, Wasse
 import { Background } from "./background";
 import { Backofen, Geschirrspueler, Schubladen, Spuele, Spuelmittel, Wasserhahn } from "./counter";
 import { Ball, Besen, Bobbycar, Korb, Muelleimer, Teddy } from "./floor";
-import { TABLE, onCounter, onTable } from "./layout";
+import { TABLE, WORKTOP_BACK, onCounter, onTable } from "./layout";
 import { Kind, Mama, Papa } from "./people";
 import { Apfel, Banane, Brotkorb, Eieruhr, Nudelholz, Teekanne, Tisch } from "./table";
 import { Blume, Fenster, Haube, Keksschrank, Kuehlschrank, Lampe, Schrank, Uhr, Vogel } from "./wall";
@@ -23,6 +23,11 @@ export const kueche: Scene = {
   sky: "#fff3cf",
   ground: "#fbf0dc",
   Background,
+  // A spider comes down the wall; a beetle crawls out of the floor tiles (or across the worktop).
+  spots: [
+    { box: [0, 0, 1600, WORKTOP_BACK], kinds: ["spider"] },
+    { box: [0, WORKTOP_BACK, 1600, 1000 - WORKTOP_BACK], kinds: ["bug"] },
+  ],
   items: [
     // ---------- On the wall ----------
     {

@@ -32,7 +32,7 @@ grown-up who makes a plan never sees a Zähne-Woche they didn't choose.
 # Belohnungstafel
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
-the same on screen and on paper (A4 from the browser, also offline). It is in the „Weitere“ category, but has no
+the same on screen and on paper (A4 from the browser, also offline). It stands in the „Weitere“ frame on the home page, but has no
 `GameShell`: nothing to start or leave, no play time counted, and `PlaytimeLock` lets it through, so the evening
 brushing's star still lands after the minutes are over. It may become a website of its own one day (T-19), so the
 folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, speech, tap
@@ -44,7 +44,8 @@ targets) – keep it that way.
   times of day they come with – Zähne putzen: morning and evening), the times of day (`SLOTS`: ☀️ morgens, 🌤️ mittags,
   🌙 abends), rewards (time together first, the ice cream last), marks for a field (with an outline to colour in for
   some), colours, the four views (`KINDS`: Tag, Woche, Monat, Sammeln, each with a line for grown-ups) and the
-  templates (each with a `hint`, and `slots` where a task has fewer times than in the catalogue). All emoji for now.
+  templates (each with a `hint`, and `slots` where a task has fewer times than in the catalogue). Each entry has an
+  emoji; its picture comes from `pictures.tsx`.
 - `board.ts` – a board and the star log, pure functions: days of a week or month board, field keys (`YYYY-MM-DD|task`,
   with a time of day `YYYY-MM-DD|task|evening`, or `count` on a collecting board; `cellKey`/`parseCellKey`), the fields
   of a task (`taskSlots`), progress, add, take back, start over, `withKind` (the same board in another view: stars
@@ -65,9 +66,16 @@ targets) – keep it that way.
   `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
   `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Info.tsx` – „ℹ️ Über die Tafel“ and „Über den
   Plan“; `RewardsGame.tsx` – the page for boards and plans (above).
-- `bilder/prompts.ts` – every picture the chart may want, as Gemini prompts. No picture is made yet: the user reviews
-  them on `/management/` (🎨 Bildvorschläge, `src/components/PicturePromptReview.tsx`) first. Only generate after
-  that, with the reviewed text, and then swap the emoji for the pictures.
+- `pictures.tsx` – the pictures of `bilder/` in place of the catalogue's emoji (`ItemPic`, `MarkPic`, `Pic`): tasks,
+  plan cards, rewards and marks on screen, in the wizard and the editor's chips, on paper and on the photo prints
+  (`PhotoCard.picture`, drawn on the canvas); Tapsi celebrating (`fest`) at a party without a reward and at the end of a
+  plan, Tapsi with the star (`stern-halten`) in „Über die Tafel“, a theme's strip (`SheetStrip`) along the top of a
+  colour print, and the `-linie` twins on grey prints. An `<img class="rw-pic">` takes its size from the font size the
+  emoji had (`1.2em`, more where there is room). `tafel.webp` waits for pages with their own og:image (idea V-10).
+- `bilder/prompts.ts` – every picture of the chart as its Gemini prompt (made on 30 October 2026, shown on
+  `/management/`, 🎨 Bildvorschläge). A changed or new prompt is reviewed there first, then made. Card pictures are
+  free-standing cut-outs (never „inside a circle“, `rewards.test.ts`), at least 600 px for photo prints; the `-linie`
+  twins are drawn from the colour picture flattened onto white.
 
 ## The page
 
@@ -159,7 +167,12 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   evening); a linked game fills the field of the time it was played, never every field of the day.
 - Class names built from data get a prefix of their own (`rw-kind-${kind}`), never plain `rw-${id}`: `rw-day` and
   `rw-month` once styled a whole sheet with the rules of a weekday label and the calendar.
-- A new catalogue entry needs its picture prompt and line-art twin in `bilder/prompts.ts` (`rewards.test.ts` checks).
+- A new catalogue entry needs its picture prompt and line-art twin in `bilder/prompts.ts`, and the pictures made
+  (`rewards.test.ts` checks both).
+- A picture stands for the catalogue's emoji only: a task, card or reward whose emoji a grown-up changed, and an own
+  one, shows that emoji (`itemPicture`); never put a picture over what a grown-up chose.
+- On paper a picture never takes more room than the emoji it replaces where words stand beside it (a week row): the
+  bigger pictures cut „Zähne putzen“ to „Zähne putze“ in the A4 preview. Look at the print preview after changing sizes.
 
 # Tagesplan
 
@@ -229,3 +242,17 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
 - Defaults are the same on every load (the first plan has the fixed id `erster-plan`), as for the board.
 - A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
   than tall, or the last card stretched across the whole sheet.
+
+## Languages
+
+Board, plan, wizard, prints and the catalog speak the app language (German, English, Chinese, Hindi, Spanish, Arabic,
+Russian; `useAppLanguage()`), translated in October 2026: every text inline as `t({ de, en, zh, hi, es, ar, ru })` or a
+`Localized` in `catalog.ts`. New or changed lines come German-only until translations are asked for, marked in
+`src/content/ideas/languageStatus.ts` (`inlineTexts.test.ts` fails on a German-only line while the row says done).
+- What is built from parts has a form per language, never German pieces glued together: weekday names from
+  `DAY_NAMES` (catalog.ts), headings with the child's name from `AUTO_TITLES` (board.ts; Russian puts the name first,
+  „Лена: мой день“, as a typed name can't be declined), „Noch 3-mal schlafen“ with `Intl.PluralRules` (`SLEEPS_LEFT`).
+- A template's title is stored in the language the board or plan was made in, and shown in the app language as long
+  as it is still a template's own title in any language (`isTemplateTitle`); a title a grown-up typed stays as typed.
+- Chinese, Hindi and Arabic have no Latin letters (no „A4“ there, „cm“ as 厘米 / सेमी / سم); German shop names and
+  links (dm, CEWE, amazon.de) stay on German screens only.

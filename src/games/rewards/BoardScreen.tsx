@@ -7,6 +7,7 @@ import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type Board, dayFull, exampleStars, type LinkedDays, parseCellKey, progress, type StarLog, takeBackStar } from "./board";
 import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { MARK_BY_ID, MARKS } from "./catalog";
+import { ItemPic, MarkPic, Pic, picture } from "./pictures";
 
 /** How long a grown-up holds a field before its star comes. */
 export const HOLD_MS = 700;
@@ -236,15 +237,37 @@ export function BoardScreen({
         setParty(true);
         sound(playTusch);
         for (let i = 0; i < 12; i++) setTimeout(() => spawn(), i * 90);
-        say(board.reward ? `${t({ de: "Geschafft! Jetzt gibt es:" })} ${rewardLabel(board.reward)}` : t({ de: "Geschafft! Hurra!" }));
+        say(
+          board.reward
+            ? `${t({ de: "Geschafft! Jetzt gibt es:", en: "You did it! Now it’s time for:", zh: "完成啦！现在可以：", hi: "हो गया! अब बारी है:", es: "¡Lo lograste! Ahora toca:", ar: "نجحنا! والآن:", ru: "Получилось! А теперь:" })} ${rewardLabel(board.reward)}`
+            : t({
+                de: "Geschafft! Hurra!",
+                en: "You did it! Hooray!",
+                zh: "完成啦！好耶！",
+                hi: "हो गया! हुर्रे!",
+                es: "¡Lo lograste! ¡Hurra!",
+                ar: "نجحنا! يا للفرح!",
+                ru: "Получилось! Ура!",
+              }),
+        );
       }, 500);
     } else if ((board.kind === "week" || board.kind === "month") && !wasFull && dayFull(board, next[board.id], linked, pending.day)) {
       // A day with all its stars: a small party right there.
       for (let i = 0; i < 5; i++) setTimeout(() => spawn(x, y), 120 + i * 110);
       setTimeout(() => sound(playChime), 300);
-      say(t({ de: "Super! Der Tag ist voll!" }));
+      say(
+        t({
+          de: "Super! Der Tag ist voll!",
+          en: "Super! The day is full!",
+          zh: "太棒了！今天满啦！",
+          hi: "शाबाश! आज का दिन पूरा हो गया!",
+          es: "¡Genial! ¡El día está completo!",
+          ar: "رائع! اكتمل اليوم!",
+          ru: "Супер! Весь день в звёздах!",
+        }),
+      );
     } else {
-      say(t({ de: "Super!" }));
+      say(t({ de: "Super!", en: "Super!", zh: "太棒了！", hi: "शाबाश!", es: "¡Genial!", ar: "رائع!", ru: "Супер!" }));
     }
   };
 
@@ -274,15 +297,35 @@ export function BoardScreen({
       </div>
       {board.examples && (
         <div className="rw-example-note">
-          <span>✨ {t({ de: "Blasse Sterne sind nur ein Beispiel – mit dem ersten echten Stern gehen sie weg." })}</span>
+          <span>
+            ✨{" "}
+            {t({
+              de: "Blasse Sterne sind nur ein Beispiel – mit dem ersten echten Stern gehen sie weg.",
+              en: "Pale stars are only an example – they go away with the first real star.",
+              zh: "浅色星星只是示例——放上第一颗真星星后就会消失。",
+              hi: "हल्के सितारे सिर्फ़ उदाहरण हैं – पहला असली सितारा मिलते ही ये हट जाएँगे।",
+              es: "Las estrellas pálidas son solo un ejemplo: desaparecen con la primera estrella de verdad.",
+              ar: "النجوم الباهتة مجرد مثال – تختفي مع أول نجمة حقيقية.",
+              ru: "Бледные звёзды – только пример: они исчезнут с первой настоящей звездой.",
+            })}
+          </span>
           <button type="button" onClick={onExamplesOff}>
-            {t({ de: "Ausblenden" })}
+            {t({ de: "Ausblenden", en: "Hide", zh: "隐藏", hi: "छिपाएँ", es: "Ocultar", ar: "إخفاء", ru: "Скрыть" })}
           </button>
         </div>
       )}
       {undo && (
         <button type="button" className="rw-undo" onClick={takeBack}>
-          ↶ {t({ de: "Stern zurück" })}
+          ↶{" "}
+          {t({
+            de: "Stern zurück",
+            en: "Take star back",
+            zh: "撤回星星",
+            hi: "सितारा वापस लें",
+            es: "Quitar la estrella",
+            ar: "التراجع عن النجمة",
+            ru: "Убрать звезду",
+          })}
         </button>
       )}
       {pending && (
@@ -293,12 +336,25 @@ export function BoardScreen({
             className={`rw-big-star${flight ? " fly" : ""}`}
             style={flight ?? undefined}
             data-tap="goal"
-            aria-label={t({ de: "Stern" })}
+            aria-label={t({ de: "Stern", en: "Star", zh: "星星", hi: "सितारा", es: "Estrella", ar: "نجمة", ru: "Звезда" })}
             onPointerDown={fly}
           >
-            {mark.emoji}
+            <MarkPic mark={mark} />
           </button>
-          <button type="button" className="rw-pending-cancel" aria-label={t({ de: "Doch keinen Stern" })} onClick={() => setPending(null)}>
+          <button
+            type="button"
+            className="rw-pending-cancel"
+            aria-label={t({
+              de: "Doch keinen Stern",
+              en: "No star after all",
+              zh: "还是不给星星",
+              hi: "सितारा न दें",
+              es: "Mejor sin estrella",
+              ar: "بدون نجمة",
+              ru: "Без звезды",
+            })}
+            onClick={() => setPending(null)}
+          >
             ✕
           </button>
         </div>
@@ -306,9 +362,13 @@ export function BoardScreen({
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(false)}>
           <span className="rw-party-emoji" aria-hidden>
-            {board.reward?.emoji ?? "🎉"}
+            {board.reward ? <ItemPic item={board.reward} kind="reward" /> : <Pic src={picture("fest")} emoji="🎉" />}
           </span>
-          <span className="rw-party-text">{board.reward ? rewardLabel(board.reward) : t({ de: "Geschafft!" })}</span>
+          <span className="rw-party-text">
+            {board.reward
+              ? rewardLabel(board.reward)
+              : t({ de: "Geschafft!", en: "You did it!", zh: "完成啦！", hi: "हो गया!", es: "¡Lo lograste!", ar: "نجحنا!", ru: "Получилось!" })}
+          </span>
         </button>
       )}
       <BurstLayer bursts={bursts} />

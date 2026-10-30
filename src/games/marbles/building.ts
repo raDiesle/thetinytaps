@@ -1,32 +1,61 @@
 // The building site ("Baustelle"), a Rube Goldberg machine on a construction
 // site: one tap starts the motors, and one thing sets off the next for about
-// half a minute until the tower crane sets the roof on the new house.
+// forty seconds until the tower crane sets the roof on the new house: mixer,
+// spirit level, rubble chute, conveyor belt, traffic cone, wrecking ball, brick
+// tower, cable drum – which plops into a sand pile and bonks the excavator awake –
+// excavator (digs a scoop, swings round, tips it out, pats the roller), road
+// roller (puffs off and presses the sand into a road), jackhammer (rattles and
+// hops onto the winch's crank), winch, crane.
 // Everything is worked out ahead as a function of the seconds since the tap,
 // so BuildingLevel.tsx only asks where each thing is at a moment. Coordinates
-// are those of the site, 5100 × 900; the screen shows 1600 of it at a time.
-
+// are those of the site, 6600 × 900; the screen shows 1600 of it at a time.
 import {
   playBells,
   playBlub,
+  playBoing,
   playClonk,
   playCreak,
+  playCrunch,
   playDing,
   playDrum,
   playEngine,
   playHonk,
   playKnock,
+  playPlop,
   playPop,
+  playPuff,
+  playRattle,
   playRumble,
   playThump,
   playTick,
+  playTrickle,
   playTwinkle,
+  playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
 import { wobble } from "./level";
-import { along, cameraOn, distAt, easeIn, easeInOut, easeOut, GRAVITY, hop, lerp, pathOf, rad, roll, seg, STEP, timeline, timeWhen } from "./machineKit";
+import {
+  along,
+  beside,
+  cameraOn,
+  distAt,
+  easeIn,
+  easeInOut,
+  easeOut,
+  GRAVITY,
+  hop,
+  lerp,
+  pathOf,
+  rad,
+  roll,
+  seg,
+  STEP,
+  timeline,
+  timeWhen,
+} from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 5100;
+export const WORLD_W = 6600;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -93,23 +122,52 @@ export const SPOOL_X0 = TOWER.x + TOWER.w + Math.sqrt((TOWER_H + SPOOL.r - 6) **
 /** Where the loose end of its cable lies, plugged into the power box. */
 export const PLUG_X = SPOOL_X0 - 120;
 
+/** The sand pile below the deck's end that the cable drum drops into: its middle, half its width and its height. */
+export const PILE = { x: 3130, w: 140, h: 90, dug: 70 };
+/** The top of a sand heap `h` high, `w` either side of `x`, at `at` (the floor beyond its feet). */
+export const moundY = (x: number, w: number, h: number, at: number) => {
+  const u = (at - x) / w;
+  return Math.abs(u) >= 1 ? FLOOR : FLOOR - h * (1 - u * u) ** 2;
+};
+
+/** The excavator: the middle of its turntable on top of its tracks, and how far the tracks reach either side. */
+export const EXC = { x: 3440, y: FLOOR - 58, track: 106 };
+/**
+ * Its arm, in the excavator's own frame (facing right, the turntable's middle at 0 0): the boom's shoulder, the
+ * boom's and the stick's lengths. Facing left, the frame is mirrored.
+ */
+export const ARM = { s: { x: 50, y: -62 }, boom: 250, stick: 200 };
+/** The scoop, from the wrist: its mouth runs `mouth` forward, its bowl hangs `deep` below the mouth. */
+export const SCOOP = { mouth: 56, deep: 57 };
+
+/** The road roller: its drum's middle at the start (x) and the drum's radius; its roof's top, and the spot it is patted on. */
+export const ROLLER = { x0: 3730, drum: 52, roof: FLOOR - 215, patX: -110 };
+/** The scoop of sand the excavator tips in front of the roller. */
+export const HEAP = { x: 3880, w: 66, h: 54 };
+
+/** The jackhammer standing in the roller's way: where its chisel stands on the ground, and how wide its body is. */
+export const JACK = { x: 4250, w: 36, h: 112 };
+
+/** Everything from the winch on stands this much further right than before the excavator and the roller came. */
+export const SHIFT = 1500;
+
 /** The winch at the crane's foot: its drum lets out the crane rope as its crank turns. */
-export const WINCH = { x: 3110, y: 712, drum: 26, arm: 66, knob: 9 };
+export const WINCH = { x: 3110 + SHIFT, y: 712, drum: 26, arm: 66, knob: 9 };
 
 /** The tower crane; its rope runs from the winch round the foot and top pulleys and along the jib to the trolley. */
-export const CRANE = { x: 3420, jibTop: 96, jibY: 120, end: 4400, back: 3160, apexY: 36 };
-export const FOOT_PULLEY = { x: 3380, y: 724, r: 14 };
-export const TOP_PULLEY = { x: 3380, y: 108, r: 12 };
-export const TROLLEY_X = 4020;
+export const CRANE = { x: 3420 + SHIFT, jibTop: 96, jibY: 120, end: 4400 + SHIFT, back: 3160 + SHIFT, apexY: 36 };
+export const FOOT_PULLEY = { x: 3380 + SHIFT, y: 724, r: 14 };
+export const TOP_PULLEY = { x: 3380 + SHIFT, y: 108, r: 12 };
+export const TROLLEY_X = 4020 + SHIFT;
 
-export const HOUSE = { x0: 3770, x1: 4270, top: 540 };
+export const HOUSE = { x0: 3770 + SHIFT, x1: 4270 + SHIFT, top: 540 };
 /** The roof hangs from the crane hook by an eye on its top and comes down `drop` onto the walls. */
 export const ROOF = { w: 580, h: 150, drop: 200 };
 /** Turns of the winch drum while the roof comes down, in radians. */
 const CRANK_TURN = ROOF.drop / WINCH.drum;
 
-export const LIGHT_X = 4480;
-export const TRUCK_X = 4560;
+export const LIGHT_X = 4480 + SHIFT;
+export const TRUCK_X = 4560 + SHIFT;
 
 /* ---------- Helpers ---------- */
 
@@ -123,6 +181,18 @@ export function crankKnob(turned: number): Pt {
   const a = Math.PI - turned;
   return { x: WINCH.x + WINCH.arm * Math.cos(a), y: WINCH.y + WINCH.arm * Math.sin(a) };
 }
+
+/** The excavator's arm reaching its wrist for `w` (in its own frame): the elbow stays up, as on a real excavator. */
+export function reachFor(w: Pt): { e: Pt; w: Pt } {
+  const { s, boom, stick } = ARM;
+  const d = Math.min(boom + stick - 1, Math.max(Math.abs(boom - stick) + 1, Math.hypot(w.x - s.x, w.y - s.y)));
+  const phi = Math.atan2(w.y - s.y, w.x - s.x);
+  const b = phi - Math.acos((boom * boom + d * d - stick * stick) / (2 * boom * d));
+  return { e: { x: s.x + boom * Math.cos(b), y: s.y + boom * Math.sin(b) }, w: { x: s.x + d * Math.cos(phi), y: s.y + d * Math.sin(phi) } };
+}
+
+/** A spot of the scoop (`p` in the scoop's own frame: the wrist at 0 0, mouth up along +x) turned `cup` degrees, in the excavator's frame. */
+export const onScoop = (w: Pt, cup: number, p: Pt): Pt => turnAround({ x: w.x + p.x, y: w.y + p.y }, w, rad(cup));
 
 /** `p` turned by `angle` radians around `c` (clockwise on screen). */
 function turnAround(p: Pt, c: Pt, angle: number): Pt {
@@ -345,30 +415,29 @@ export function buildBuilding() {
   at(tHit + TOWER_FALL, { sound: playRumble });
   at(tPush, { sound: () => playKnock(450) });
 
-  /* The cable drum rolls along the deck unrolling its cable, over the edge, and onto the winch's crank. */
+  /* The cable drum rolls along the deck unrolling its cable, over the edge, plop into the sand pile, over it and bonk against the excavator's tracks. */
   const edge = { x: DECK2.x1, y: DECK2.y };
   const spoolRun = roll(pathOf(line({ x: SPOOL_X0, y: spoolY }, { x: edge.x, y: spoolY }), arc(edge.x, edge.y, SPOOL.r, -90, -56)), 470, 150, 600, 0.45);
   const tEdge = tPush + spoolRun.duration;
   const spoolOff = spoolRun.path.pts[spoolRun.path.pts.length - 1];
-  /** The drum resting on the crank's knob; `lean` tips it over to the left of the knob as the knob goes down. */
-  const onKnob = (turned: number, lean = 0) => {
-    const k = crankKnob(turned);
-    const d = SPOOL.r + WINCH.knob;
-    return { x: k.x - d * Math.sin(lean), y: k.y - d * Math.cos(lean) };
-  };
-  const spoolDrop = toss(spoolOff, 150, onKnob(0));
-  const tCrank = tEdge + spoolDrop.T;
-  const PUSH = 0.65;
-  const tRoofLand = tCrank + 6;
-  /** How far the crank has turned: the drum pushes it round a bit, then the roof's weight keeps it going. */
-  const crankAt = (t: number) => PUSH * easeOut(seg(t, tCrank, tCrank + 0.3)) + (CRANK_TURN - PUSH) * easeInOut(seg(t, tCrank + 0.2, tRoofLand));
-  const restX = WINCH.x - WINCH.arm - 36;
-  const tRest = tCrank + 0.3 + 0.38;
+  // The drum's middle rolling over the pile: the pile's top lifted by the drum's radius, never below the floor.
+  const LAND_X = 3075;
+  const STOP_X = EXC.x - EXC.track - SPOOL.r - 2;
+  const surface: Pt[] = [];
+  for (let x = LAND_X - 40; x <= PILE.x + PILE.w + 40; x += 5) surface.push({ x, y: moundY(PILE.x, PILE.w, PILE.h, x) });
+  const overPile: Pt[] = [];
+  for (const p of beside(surface, -SPOOL.r)) {
+    const q = { x: p.x, y: Math.min(p.y, FLOOR - SPOOL.r) };
+    if (q.x >= LAND_X && q.x < STOP_X && q.x > (overPile[overPile.length - 1]?.x ?? -1)) overPile.push(q);
+  }
+  overPile.push({ x: STOP_X, y: FLOOR - SPOOL.r });
+  const spoolDrop = toss(spoolOff, 150, overPile[0]);
+  const tPlof = tEdge + spoolDrop.T;
+  const pileRun = roll(pathOf(overPile), 200, 70, 420, 0.5);
+  const tBonk = tPlof + pileRun.duration;
   at(tPush + 0.2, { sound: playRumble });
-  at(tCrank, { sound: playClonk });
-  at(tRest, { sound: playThump });
-  at(tCrank + 0.4, { sound: playCreak });
-  for (let k = 0; k < 4; k++) at(tCrank + 0.9 + k * 1.3, { sound: playTick });
+  at(tPlof, { sound: playPlop });
+  at(tBonk, { sound: playClonk });
 
   const spoolAt = (t: number): { pt: Pt; turned: number } => {
     const start = { x: SPOOL_X0, y: spoolY };
@@ -378,16 +447,190 @@ export function buildBuilding() {
       return { pt: along(spoolRun.path, d).pt, turned: d };
     }
     const rolled = spoolRun.path.total;
-    if (t < tCrank) return { pt: spoolDrop.at(t - tEdge), turned: rolled + (t - tEdge) * 150 };
-    const ride = seg(t, tCrank, tCrank + 0.3);
-    const ridden = onKnob(crankAt(Math.min(t, tCrank + 0.3)), rad(50) * ride);
-    if (t < tCrank + 0.3) return { pt: ridden, turned: rolled + 0.3 * 150 };
-    // Off the knob, down onto the ground beside the winch.
-    const k = seg(t, tCrank + 0.3, tRest);
-    return { pt: hop(ridden, { x: restX, y: FLOOR - SPOOL.r }, 18, k), turned: rolled + 45 - k * 30 };
+    const flown = spoolDrop.T * 150;
+    if (t < tPlof) return { pt: spoolDrop.at(t - tEdge), turned: rolled + (t - tEdge) * 150 };
+    if (t < tBonk) {
+      const d = distAt(pileRun, t - tPlof);
+      return { pt: along(pileRun.path, d).pt, turned: rolled + flown + d };
+    }
+    // It bounces back a little off the tracks and stays there.
+    const back = 14 * easeOut(seg(t, tBonk, tBonk + 0.4));
+    return { pt: { x: STOP_X - back, y: FLOOR - SPOOL.r }, turned: rolled + flown + pileRun.path.total - back };
   };
   /** How much of the cable is still on the drum, from 1 down to a little. */
-  const cableLeft = (t: number) => 1 - 0.75 * seg(spoolAt(t).pt.x, SPOOL_X0, edge.x + 60);
+  const cableLeft = (t: number) => 1 - 0.75 * seg(spoolAt(t).pt.x, SPOOL_X0, STOP_X);
+  /** Sand puffing up where the drum plopped into the pile, `age` seconds after. */
+  const plofAge = (t: number) => t - tPlof;
+
+  /* The excavator wakes up with a shudder and three puffs, digs a scoop out of the pile, swings round and tips it in front of the roller, then pats the roller's roof. */
+  const tWake = tBonk;
+  at(tWake + 0.1, { sound: playEngine });
+  const exhaust = [0.15, 0.45, 0.75].map((d) => tWake + d);
+  for (const p of exhaust) at(p, { sound: playPuff });
+  /** The wrist's spots in the excavator's own frame, facing right (facing left, the pile lies at +x too). */
+  const REST = { x: 150, y: -150 };
+  const HOVER = { x: EXC.x - PILE.x - 10, y: -100 };
+  const DIG = { x: EXC.x - PILE.x - 10, y: -8 };
+  const CURLED = { x: EXC.x - PILE.x - 40, y: -22 };
+  const CARRY = { x: 170, y: -235 };
+  // Tipped over, the scoop's mouth hangs about 24 back from the wrist: the sand falls from there onto the heap.
+  const TIP = 150;
+  const mouthMid = onScoop({ x: 0, y: 0 }, TIP, { x: SCOOP.mouth / 2, y: 0 });
+  const OVER = { x: HEAP.x - EXC.x - mouthMid.x, y: -72 };
+  // Patting the roof with the scoop's round bottom.
+  const PAT = { x: ROLLER.x0 + ROLLER.patX - EXC.x - SCOOP.mouth * 0.4, y: ROLLER.roof - EXC.y - SCOOP.deep };
+  const ABOVE_ROOF = { x: PAT.x, y: PAT.y - 45 };
+  const LIFTED = { x: OVER.x - 40, y: -250 };
+  const UP = { x: 120, y: -262 };
+  const t0 = tWake + 0.7;
+  const tDig = t0 + 1.4;
+  const tSwing = t0 + 2.8;
+  const tSwung = tSwing + 1.4;
+  const tTip = tSwung + 0.9;
+  const tPat = tTip + 1.8;
+  const keys: { at: number; w: Pt; cup: number }[] = [
+    { at: t0, w: REST, cup: 40 },
+    { at: t0 + 0.9, w: HOVER, cup: 100 },
+    { at: tDig, w: DIG, cup: 100 },
+    { at: tDig + 0.6, w: CURLED, cup: 0 },
+    { at: tSwing, w: CARRY, cup: 0 },
+    { at: tSwung, w: CARRY, cup: 0 },
+    { at: tSwung + 0.5, w: { x: OVER.x, y: -200 }, cup: 0 },
+    { at: tTip, w: OVER, cup: 0 },
+    { at: tTip + 0.5, w: OVER, cup: TIP },
+    { at: tTip + 0.9, w: OVER, cup: TIP },
+    { at: tTip + 1.3, w: LIFTED, cup: 60 },
+    { at: tPat - 0.3, w: ABOVE_ROOF, cup: 0 },
+    { at: tPat, w: PAT, cup: 0 },
+    { at: tPat + 0.3, w: ABOVE_ROOF, cup: 0 },
+    { at: tPat + 1.1, w: UP, cup: 20 },
+  ];
+  at(t0, { sound: playWhirr });
+  at(tDig, { sound: playCrunch });
+  at(tDig + 0.6, { sound: playWhirr });
+  at(tSwing, { sound: playCreak });
+  at(tSwing + 0.5, { sound: playRumble });
+  at(tTip, { sound: playWhirr });
+  at(tTip + 0.2, { sound: playTrickle });
+  at(tTip + 0.75, { sound: playPlop });
+  at(tPat, { sound: playBoing });
+
+  /** The excavator at a moment: which way its top faces (−1 left … 1 right), its shudder, its arm (own frame) and whether the scoop holds sand. */
+  const excavatorAt = (t: number) => {
+    const last = keys[keys.length - 1];
+    let pose = { w: t >= last.at ? last.w : keys[0].w, cup: t >= last.at ? last.cup : keys[0].cup };
+    for (let i = 0; i < keys.length - 1; i++) {
+      const a = keys[i];
+      const b = keys[i + 1];
+      if (t < a.at || t >= b.at) continue;
+      const k = easeInOut(seg(t, a.at, b.at));
+      pose = { w: { x: lerp(a.w.x, b.w.x, k), y: lerp(a.w.y, b.w.y, k) }, cup: lerp(a.cup, b.cup, k) };
+    }
+    const { e, w } = reachFor(pose.w);
+    const face = -Math.cos(Math.PI * easeInOut(seg(t, tSwing, tSwung)));
+    // Waking up it shudders hard, working it hums along.
+    const shake = t < tWake ? 0 : t < t0 ? 4 * Math.sin((t - tWake) * 55) * (1 - seg(t, tWake + 0.4, t0)) : 0.8 * Math.sin(t * 47);
+    return { face, shake, e, w, cup: pose.cup, full: t >= tDig + 0.35 && t < tTip + 0.45 };
+  };
+  /** The wrist in site coordinates. */
+  const wristAt = (t: number): Pt => {
+    const { face, w } = excavatorAt(t);
+    return { x: EXC.x + face * w.x, y: EXC.y + w.y };
+  };
+  /** How high the sand pile is: a scoop less once it is dug. */
+  const pileH = (t: number) => lerp(PILE.h, PILE.dug, easeOut(seg(t, tDig, tDig + 0.6)));
+  /** How high the tipped sand heap is, as it pours out. */
+  const heapH = (t: number) => HEAP.h * easeOut(seg(t, tTip + 0.2, tTip + 0.85));
+  /** How far into the pour the falling sand is (0 … 1), or −1 when nothing falls. */
+  const pourAt = (t: number) => (t < tTip + 0.15 || t > tTip + 0.85 ? -1 : seg(t, tTip + 0.15, tTip + 0.85));
+
+  /* The road roller: patted on its roof, it squashes, puffs three times and rolls off over the sand, pressing it flat into a road, until its drum bumps the jackhammer. */
+  const tRollerGo = tPat + 0.8;
+  const ROLL_V = 125;
+  const ROLL_ACC = 0.6;
+  const rollDist = JACK.x - JACK.w / 2 - ROLLER.drum - ROLLER.x0;
+  const tJack = tRollerGo + ROLL_ACC / 2 + rollDist / ROLL_V;
+  const chimney = [0.15, 0.45, 0.75].map((d) => tPat + d);
+  for (let p = tRollerGo + 0.6; p < tJack; p += 0.8) chimney.push(p);
+  for (const p of chimney) at(p, { sound: playPuff });
+  at(tRollerGo, { sound: playRumble });
+  at(tRollerGo + 1.6, {
+    say: {
+      de: "Die Walze macht alles platt!",
+      en: "The roller flattens everything!",
+      zh: "压路机把一切都压平啦！",
+      hi: "रोलर सब कुछ चपटा कर देता है!",
+      es: "¡La aplanadora lo deja todo plano!",
+      ar: "المدحلة تجعل كل شيء مسطّحًا!",
+      ru: "Каток всё укатывает!",
+    },
+  });
+  at(tJack, { sound: () => playKnock(500) });
+  const rolled = (t: number) => {
+    const u = t - tRollerGo;
+    if (u <= 0) return 0;
+    if (t < tJack) return u < ROLL_ACC ? (ROLL_V * u * u) / (2 * ROLL_ACC) : ROLL_V * (u - ROLL_ACC / 2);
+    // It stops at the bump and rocks back a little.
+    return rollDist - 10 * Math.sin(Math.PI * seg(t, tJack, tJack + 0.5));
+  };
+  /** The heap's top at `x` where the drum hasn't flattened it yet. */
+  const heapY = (t: number, x: number) => (x < ROLLER.x0 + rolled(t) ? FLOOR : moundY(HEAP.x, HEAP.w, heapH(t), x));
+  /** The roller at a moment: its drum's middle (x), how high it rides on the sand, how far it has rolled, its squash from the pat. */
+  const rollerAt = (t: number) => {
+    const x = ROLLER.x0 + rolled(t);
+    const lift = (FLOOR - moundY(HEAP.x, HEAP.w, heapH(t), x + ROLLER.drum * 0.4)) * 0.7;
+    const squash = t < tPat ? 0 : wobble(t - tPat, 0.12, 22, 5);
+    const jiggle = t < tPat + 0.1 || t > tJack + 0.5 ? 0 : 1.2 * Math.sin(t * 40);
+    return { x, lift: lift + jiggle, turned: rolled(t), squash };
+  };
+  /** Where the flat new road reaches: from the heap's left foot to just behind the drum. */
+  const roadTo = (t: number) => Math.max(HEAP.x - HEAP.w, ROLLER.x0 + rolled(t) - ROLLER.drum * 0.3);
+
+  /* The jackhammer switches on, rattles and hops along to the winch, and its last hop lands on the crank's knob. */
+  const tStart = tJack + 0.35;
+  const HOPS = 3;
+  const HOP_T = 0.42;
+  const knobTop = (turned: number, lean = 0) => {
+    const k = crankKnob(turned);
+    return { x: k.x - WINCH.knob * Math.sin(lean), y: k.y - WINCH.knob * Math.cos(lean) };
+  };
+  const hopFrom = (i: number): Pt => ({ x: lerp(JACK.x, knobTop(0).x, i / HOPS), y: FLOOR });
+  const tCrank = tStart + (HOPS - 1) * HOP_T + 0.55;
+  at(tJack + 0.1, { sound: playRattle });
+  for (let i = 1; i < HOPS; i++) at(tStart + i * HOP_T, { sound: () => playKnock(1000 + i * 150) });
+  at(tStart + HOP_T, { sound: playRattle });
+
+  /* The jackhammer's weight pushes the crank round, and the roof's weight keeps it going. */
+  const PUSH = 0.65;
+  const tRoofLand = tCrank + 6;
+  /** How far the crank has turned: the jackhammer pushes it round a bit, then the roof's weight keeps it going. */
+  const crankAt = (t: number) => PUSH * easeOut(seg(t, tCrank, tCrank + 0.3)) + (CRANK_TURN - PUSH) * easeInOut(seg(t, tCrank + 0.2, tRoofLand));
+  const restX = WINCH.x - WINCH.arm - 60;
+  const tRest = tCrank + 0.3 + 0.4;
+  at(tCrank, { sound: playClonk });
+  at(tRest, { sound: playThump });
+  at(tCrank + 0.4, { sound: playCreak });
+  for (let k = 0; k < 4; k++) at(tCrank + 0.9 + k * 1.3, { sound: playTick });
+
+  /** The jackhammer at a moment: where its chisel's tip is, its lean (radians, clockwise) and its rattling shake. */
+  const jackAt = (t: number): { tip: Pt; lean: number; buzz: number } => {
+    const rattling = t >= tJack + 0.1 && t < tRest;
+    const buzz = rattling ? 2.5 * Math.sin(t * 90) : 0;
+    if (t < tStart) return { tip: { x: JACK.x, y: FLOOR }, lean: rad(wobble(t - tJack, 9, 18, 4)), buzz };
+    if (t < tCrank - 0.55) {
+      const i = Math.floor((t - tStart) / HOP_T);
+      const k = seg(t, tStart + i * HOP_T, tStart + (i + 1) * HOP_T);
+      return { tip: hop(hopFrom(i), hopFrom(i + 1), 34, k), lean: rad(8 * Math.sin(k * Math.PI)), buzz };
+    }
+    if (t < tCrank) return { tip: hop(hopFrom(HOPS - 1), knobTop(0), 120, seg(t, tCrank - 0.55, tCrank)), lean: 0, buzz };
+    const ride = seg(t, tCrank, tCrank + 0.3);
+    const lean = rad(40) * ride;
+    const ridden = knobTop(crankAt(Math.min(t, tCrank + 0.3)), lean);
+    if (t < tCrank + 0.3) return { tip: ridden, lean: -lean, buzz };
+    // Off the knob, down onto the ground beside the winch, where it stands still.
+    const k = seg(t, tCrank + 0.3, tRest);
+    return { tip: hop(ridden, { x: restX, y: FLOOR }, 30, k), lean: -lean * (1 - k) + rad(wobble(t - tRest, 8, 16, 4)), buzz };
+  };
 
   /* The finale: the roof sits on the house, the topping-out tree springs up, the light turns green. */
   const roofDrop = (t: number) => WINCH.drum * Math.min(CRANK_TURN, crankAt(t));
@@ -423,8 +666,13 @@ export function buildBuilding() {
     if (t < tKnock) return marbleAt(t).pt.x;
     if (t < tHit) return Math.max(marbleAt(t).pt.x, ballAt(t).x);
     if (t < tPush) return TOWER.x + 150;
-    if (t < tCrank) return spoolAt(t).pt.x;
-    if (t < tRoofLand) return WINCH.x - WINCH.arm - 110 + 672;
+    if (t < tBonk) return spoolAt(t).pt.x;
+    // The pile, the excavator, the roller and the heap all at once.
+    if (t < tRollerGo) return 3572;
+    if (t < tStart) return Math.max(3572, rollerAt(t).x + 150);
+    if (t < tCrank) return Math.max(3572, rollerAt(t).x + 150, jackAt(t).tip.x + 150);
+    // The winch, the jackhammer resting beside it and the house all at once.
+    if (t < tRoofLand) return WINCH.x - 300 + 672;
     return (HOUSE.x0 + HOUSE.x1) / 2 + 300;
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
@@ -436,7 +684,17 @@ export function buildBuilding() {
     tChute,
     tRelease,
     tHit,
+    tPlof,
+    tBonk,
+    tDig,
+    tSwing,
+    tSwung,
+    tTip,
+    tPat,
+    tRollerGo,
+    tJack,
     tCrank,
+    tRest,
     tRoofLand,
     tTree,
     tGreen,
@@ -450,6 +708,18 @@ export function buildBuilding() {
     towerAngle,
     spoolAt,
     cableLeft,
+    plofAge,
+    exhaust,
+    excavatorAt,
+    wristAt,
+    pileH,
+    heapH,
+    heapY,
+    pourAt,
+    chimney,
+    rollerAt,
+    roadTo,
+    jackAt,
     crankAt,
     roofDrop,
     truckGone,

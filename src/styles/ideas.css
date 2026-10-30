@@ -645,8 +645,25 @@ button.idea-id {
   border-color: var(--sunshine);
 }
 
+.ideas-prompt-body {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* A made picture beside its prompt, on a checkerboard so cut-outs show their edges. */
+.ideas-prompt-body img {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+}
+
 .ideas-prompt textarea {
   box-sizing: border-box;
+  flex: 1;
   width: 100%;
   padding: 8px 10px;
   border: 2px solid #2a1e5c55;
@@ -685,4 +702,37 @@ button.idea-id {
 
 .ideas-prompt-foot button.selected {
   background: var(--mint);
+}
+
+/* Voices still to record: one folded panel per game inside the section, its lines small and numbered. */
+.voice-overview td {
+  text-align: right;
+}
+
+.voice-game {
+  margin: 12px 0 0;
+  padding: 12px 16px;
+  border: 2px solid #0001;
+}
+
+.voice-game summary h3 {
+  display: inline;
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.voice-group h4 {
+  margin: 16px 0 4px;
+}
+
+.voice-lines {
+  margin: 0;
+  padding-left: 2.5em;
+  font-size: 0.9rem;
+  columns: 22rem;
+  column-gap: 32px;
+}
+
+.voice-lines li {
+  break-inside: avoid;
 }

@@ -1,0 +1,649 @@
+/* Lebendige Bilder: what a tap on the background brings out (spots.tsx). Every effect runs once, for --spot-ms. */
+
+.spot-layer {
+  pointer-events: none;
+}
+
+/* A thing of the background that moves when tapped turns around its bottom middle. */
+[data-poke] {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  cursor: pointer;
+}
+
+[data-poke="spin"],
+[data-poke="glow"] {
+  transform-origin: 50% 50%;
+}
+
+[data-poke="swing"] {
+  transform-origin: 50% 0;
+}
+
+/* Only the animated parts: on a part with a transform attribute, fill-box would move its origin. */
+.spot [class^="spot-"] {
+  transform-box: fill-box;
+}
+
+/* ---------- wind ---------- */
+
+.spot-wind-shade,
+.spot-wind-air {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 45 100;
+  stroke-dashoffset: 45;
+  animation: spot-wind-blow var(--spot-ms) ease-in-out both;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+.spot-wind-shade {
+  stroke: #3d405b;
+  stroke-opacity: 0.14;
+  stroke-width: 18;
+}
+
+.spot-wind-air {
+  stroke: #fff;
+  stroke-width: 10;
+}
+
+@keyframes spot-wind-blow {
+  0% {
+    stroke-dashoffset: 45;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: -100;
+    opacity: 0;
+  }
+}
+
+.spot-wind-leaf {
+  transform-origin: center;
+  animation: spot-wind-leaf var(--spot-ms) ease-in-out both;
+  animation-delay: calc(var(--i) * 150ms);
+}
+
+@keyframes spot-wind-leaf {
+  0% {
+    transform: translate(-260px, 20px) rotate(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(0, -40px) rotate(300deg);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(300px, 10px) rotate(620deg);
+    opacity: 0;
+  }
+}
+
+/* ---------- shooting star ---------- */
+
+.spot-stars-fall {
+  transform-origin: center;
+  animation: spot-stars-fall var(--spot-ms) ease-in both;
+}
+
+.spot-stars-tail {
+  stroke: #fff3bf;
+  stroke-width: 8;
+  stroke-linecap: round;
+  opacity: 0.8;
+}
+
+@keyframes spot-stars-fall {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+  15% {
+    transform: translate(-30px, 18px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-380px, 230px) scale(0.6);
+    opacity: 0;
+  }
+}
+
+.spot-stars-twinkle {
+  transform-origin: center;
+  animation: spot-stars-twinkle var(--spot-ms) ease-in-out both;
+  animation-delay: calc(var(--i) * 140ms);
+}
+
+@keyframes spot-stars-twinkle {
+  0%,
+  100% {
+    transform: scale(0) rotate(0);
+  }
+  40% {
+    transform: scale(1.4) rotate(40deg);
+  }
+  70% {
+    transform: scale(0.9) rotate(70deg);
+  }
+}
+
+/* ---------- fireflies ---------- */
+
+.spot-firefly {
+  transform-origin: center;
+  animation: spot-firefly var(--spot-ms) ease-in-out both;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+@keyframes spot-firefly {
+  0% {
+    transform: translate(0, 0) scale(0.3);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(calc(var(--dx) * 0.6), calc(var(--dy) * 0.5)) scale(1);
+    opacity: 0.6;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.8);
+    opacity: 0;
+  }
+}
+
+/* ---------- bug out of the floor ---------- */
+
+.spot-bug-crack {
+  fill: none;
+  stroke: #3d405b;
+  stroke-opacity: 0.55;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: center;
+  animation: spot-bug-crack var(--spot-ms) ease-out both;
+}
+
+@keyframes spot-bug-crack {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  8% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.spot-bug-walk {
+  transform-origin: 50% 100%;
+  animation: spot-bug-walk var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-bug-walk {
+  0% {
+    transform: translate(0, 14px) scale(0);
+  }
+  18% {
+    transform: translate(0, 0) scale(1.1);
+  }
+  26% {
+    transform: translate(0, 0) scale(1);
+  }
+  90% {
+    transform: translate(calc(var(--dir) * 280px), -20px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--dir) * 320px), -24px) scale(1);
+    opacity: 0;
+  }
+}
+
+.spot-bug-body {
+  animation: spot-bug-step 0.24s ease-in-out infinite alternate;
+}
+
+@keyframes spot-bug-step {
+  to {
+    transform: translateY(-2px);
+  }
+}
+
+.spot-bug-legs {
+  stroke: #2b2d42;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  transform-origin: 50% 50%;
+  animation: spot-bug-legs 0.24s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * -80ms);
+}
+
+@keyframes spot-bug-legs {
+  to {
+    transform: rotate(18deg);
+  }
+}
+
+/* ---------- spider on its thread ---------- */
+
+.spot-spider-drop {
+  animation: spot-spider-drop var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-spider-drop {
+  0% {
+    transform: translateY(-300px);
+  }
+  30% {
+    transform: translateY(14px);
+  }
+  38% {
+    transform: translateY(-6px);
+  }
+  45%,
+  72% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-320px);
+  }
+}
+
+.spot-spider-legs {
+  transform-origin: 50% 30%;
+  animation: spot-spider-wave var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-spider-wave {
+  0%,
+  42%,
+  76%,
+  100% {
+    transform: scale(1, 1);
+  }
+  50%,
+  66% {
+    transform: scale(1.15, 0.85);
+  }
+  58% {
+    transform: scale(0.95, 1.1);
+  }
+}
+
+/* ---------- flower and butterfly ---------- */
+
+.spot-flower-grow {
+  transform-origin: 50% 100%;
+  animation: spot-flower-grow var(--spot-ms) ease-out both;
+}
+
+@keyframes spot-flower-grow {
+  0% {
+    transform: scale(0.1, 0);
+  }
+  22% {
+    transform: scale(1, 1.08);
+  }
+  30%,
+  80% {
+    transform: scale(1, 1);
+  }
+  100% {
+    transform: scale(0.2, 0);
+  }
+}
+
+.spot-flower-head {
+  transform-origin: center;
+  animation: spot-flower-head var(--spot-ms) ease-out both;
+}
+
+@keyframes spot-flower-head {
+  0%,
+  16% {
+    transform: scale(0) rotate(-90deg);
+  }
+  34% {
+    transform: scale(1.15) rotate(0);
+  }
+  42%,
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.spot-flower-butterfly {
+  animation: spot-flower-fly var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-flower-fly {
+  0%,
+  30% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  36% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  65% {
+    transform: translate(calc(var(--dir) * 90px), -120px);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--dir) * 220px), -260px);
+    opacity: 0;
+  }
+}
+
+.spot-flower-wings {
+  transform-origin: center;
+  animation: spot-flower-flap 0.2s ease-in-out infinite alternate;
+}
+
+@keyframes spot-flower-flap {
+  to {
+    transform: scaleX(0.35);
+  }
+}
+
+/* ---------- something peeks out of a mound (mole, bunny in the snow) ---------- */
+
+.spot-peek-mound {
+  transform-origin: 50% 100%;
+  animation: spot-peek-mound var(--spot-ms) ease-out both;
+}
+
+@keyframes spot-peek-mound {
+  0% {
+    transform: scale(0.2, 0);
+  }
+  12%,
+  85% {
+    transform: scale(1, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1, 0.6);
+    opacity: 0;
+  }
+}
+
+.spot-peek-animal {
+  animation: spot-peek-animal var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-peek-animal {
+  0%,
+  14% {
+    transform: translateY(110px);
+  }
+  30% {
+    transform: translateY(-12px);
+  }
+  36%,
+  46% {
+    transform: translateY(0);
+  }
+  52% {
+    transform: translateY(0) rotate(-6deg);
+  }
+  60%,
+  70% {
+    transform: translateY(0) rotate(6deg);
+  }
+  76% {
+    transform: translateY(0) rotate(0);
+  }
+  92%,
+  100% {
+    transform: translateY(110px);
+  }
+}
+
+.spot-peek-crumb {
+  animation: spot-peek-crumb var(--spot-ms) ease-out both;
+  animation-delay: calc(var(--i) * 40ms);
+}
+
+@keyframes spot-peek-crumb {
+  0%,
+  10% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  24% {
+    transform: translate(calc(var(--dx) * 0.6), -50px);
+  }
+  38% {
+    transform: translate(var(--dx), 6px);
+    opacity: 1;
+  }
+  50%,
+  100% {
+    transform: translate(var(--dx), 6px);
+    opacity: 0;
+  }
+}
+
+/* ---------- splash and jumping fish ---------- */
+
+.spot-splash-ring {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 5;
+  transform-origin: center;
+  animation: spot-splash-ring var(--spot-ms) ease-out both;
+  animation-delay: calc(var(--i) * 250ms);
+}
+
+@keyframes spot-splash-ring {
+  0% {
+    transform: scale(0.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.spot-splash-fish {
+  transform-origin: center;
+  animation: spot-splash-fish var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-splash-fish {
+  0% {
+    transform: translate(-90px, 20px) rotate(-60deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate(0, -170px) rotate(0);
+  }
+  88% {
+    transform: translate(90px, 10px) rotate(60deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(100px, 30px) rotate(70deg);
+    opacity: 0;
+  }
+}
+
+.spot-splash-drop {
+  animation: spot-splash-drop var(--spot-ms) ease-out both;
+  animation-delay: calc(var(--i) * 30ms);
+}
+
+@keyframes spot-splash-drop {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  30% {
+    transform: translate(calc(var(--dx) * 0.6), -90px);
+  }
+  55% {
+    transform: translate(var(--dx), 0);
+    opacity: 1;
+  }
+  60%,
+  100% {
+    transform: translate(var(--dx), 0);
+    opacity: 0;
+  }
+}
+
+/* ---------- bubbles under water ---------- */
+
+.spot-bubble {
+  fill: #ffffff55;
+  stroke: #fff;
+  stroke-width: 3;
+  animation: spot-bubble var(--spot-ms) ease-out both;
+  animation-delay: calc(var(--i) * 110ms);
+}
+
+@keyframes spot-bubble {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  40% {
+    transform: translate(var(--dx), -120px);
+  }
+  70% {
+    transform: translate(calc(var(--dx) * -0.5), -230px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), -320px);
+    opacity: 0;
+  }
+}
+
+.spot-bubbles-fish {
+  animation: spot-bubbles-fish var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-bubbles-fish {
+  0% {
+    transform: translate(calc(var(--dir) * -60px), 40px);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--dir) * 320px), 10px);
+    opacity: 0;
+  }
+}
+
+/* ---------- crab out of the sand ---------- */
+
+.spot-crab-sand {
+  transform-origin: center;
+  animation: spot-crab-sand var(--spot-ms) ease-out both;
+}
+
+@keyframes spot-crab-sand {
+  0% {
+    transform: translate(0, 0) scale(0.3);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  30% {
+    transform: translate(var(--dx), -10px) scale(1);
+    opacity: 0.8;
+  }
+  50%,
+  100% {
+    transform: translate(var(--dx), -4px) scale(1.2);
+    opacity: 0;
+  }
+}
+
+.spot-crab-walk {
+  transform-origin: 50% 100%;
+  animation: spot-crab-walk var(--spot-ms) ease-in-out both;
+}
+
+@keyframes spot-crab-walk {
+  0% {
+    transform: translate(0, 20px) scale(0.4, 0);
+  }
+  20% {
+    transform: translate(0, 0) scale(1.1, 1.1);
+  }
+  30% {
+    transform: translate(0, 0) scale(1);
+  }
+  90% {
+    transform: translate(calc(var(--dir) * 300px), -10px);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--dir) * 340px), -12px);
+    opacity: 0;
+  }
+}
+
+.spot-crab-body {
+  transform-origin: 50% 100%;
+  animation: spot-crab-scuttle 0.18s ease-in-out infinite alternate;
+}
+
+@keyframes spot-crab-scuttle {
+  from {
+    transform: rotate(-4deg);
+  }
+  to {
+    transform: rotate(4deg);
+  }
+}

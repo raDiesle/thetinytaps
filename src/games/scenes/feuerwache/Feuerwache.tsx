@@ -1,10 +1,10 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Eichhoernchen, Ente, Hund, Katze, Maus, Schmetterling, Schnecke, Taube, Vogel } from "./animals";
 import { Background } from "./background";
 import { Feuerwehrfrau, Feuerwehrmann, Kind, Luftballon, Opa, Puppe } from "./figures";
-import { BEET, BOOTS, FIREWOMAN, FLAG, HYDRANT, PUDDLE, STATION, TOWER, TREE, TRUCK } from "./layout";
+import { BEET, BOOTS, FIREWOMAN, FLAG, HYDRANT, PUDDLE, STATION, STATION_Y, TOWER, TREE, TRUCK, YARD_BOTTOM } from "./layout";
 import { Fahne, Glocke, Helme, Rutschstange, Sirene, Tor, Turm, Wache } from "./station";
 import { Baum, Blumen, Feuerloescher, Grill, Huetchen, Hydrant, Stiefel } from "./things";
 import { Bobbycar, Feuerwehrauto, Hubschrauber, Kommandowagen, Krankenwagen, Schlauchrolle } from "./vehicles";
@@ -25,6 +25,13 @@ export const feuerwache: Scene = {
   sky: "#8fd3ff",
   ground: "#6fbf82",
   Background,
+  // The puddle splashes, a beetle crawls over the yard, the meadow and the lawn grow flowers or a mole peeks out.
+  spots: [
+    { box: [1100, 922, 180, 36], kinds: ["splash"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, STATION_Y, 1080, YARD_BOTTOM - STATION_Y], kinds: ["bug"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

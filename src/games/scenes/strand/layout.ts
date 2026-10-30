@@ -1,4 +1,5 @@
-import { ground } from "../layout";
+import { HORIZON, ground } from "../layout";
+import type { Box } from "../types";
 
 // Every drawing of this scene has its foot point at (0, 0) and is placed with `ground`;
 // things on the water stand on the water line. From back to front: the lighthouse, the
@@ -27,6 +28,9 @@ export function shoreY(x: number) {
   const t = Math.max(0, Math.min(1, (x - x1) / (x2 - x1)));
   return y1 + ((y2 - y1) * (1 - Math.cos(t * Math.PI))) / 2;
 }
+
+/** Boxes that stay on the sea from the horizon down to the water's edge (it comes nearer on the left), for a fish to jump. */
+export const SEA_BOXES: Box[] = Array.from({ length: 10 }, (_, i) => [i * 160, HORIZON, 160, Math.min(shoreY(i * 160), shoreY((i + 1) * 160)) - HORIZON]);
 
 /** The towel under the sunshade: the sunshade, mum and her chips stand on it. */
 export const TOWEL = ground(0, 0, 720, 772, 1);

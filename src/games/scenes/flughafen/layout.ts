@@ -17,6 +17,9 @@ export const PLATFORM_TOP = 574;
 export const PLATFORM_BOTTOM = 664;
 /** Where the apron (left) and the forecourt road (right) meet. */
 export const FORECOURT_X = 880;
+/** Where the road of the forecourt begins and ends, and the pavement in front of it. */
+export const ROAD_TOP = 690;
+export const ROAD_BOTTOM = 884;
 
 /** The train: locomotive and two coaches, each placed on the track. */
 export const trainAt = (x: number) => ground(0, 0, x, TRACK, 1.15);

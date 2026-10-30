@@ -155,6 +155,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Die Szene ist Nacht und dunkel; wo der Finger (oder die Maus) ist, leuchtet ein runder Lichtkegel. Was im Licht liegt, wacht auf und winkt. Tastatur: Pfeiltasten schieben das Licht.",
       why: "Suchen ohne Frage und ohne Falsch – jede Bewegung zeigt etwas Neues.",
       effort: "M",
+      done: true,
     },
     {
       id: "B-18",
@@ -172,6 +173,15 @@ export const scenesIdeas: IdeaArea = {
       text: "Fahrzeuge fahren aus einer Szene hinaus und kommen in der nächsten an: Das Feuerwehrauto verlässt die Stadt und parkt in der Feuerwache, der Traktor fährt vom Bauernhof in den Wald. Antippen am Bildrand folgt ihm.",
       why: "Aus einzelnen Bildern wird eine Welt; macht Lust, die anderen Szenen zu besuchen.",
       effort: "L",
+      done: true,
+    },
+    {
+      id: "B-20",
+      emoji: "🌬️",
+      title: "Jeder Tipp macht etwas",
+      text: "Auch der Hintergrund lebt: Bäume, Häuser, Zäune und Wolken wackeln beim Antippen. Ein Tipp in den Himmel macht einen Windstoß, der die Bäume biegt; auf dem Boden im Haus krabbelt ein Käfer aus den Fliesen, an der Wand seilt sich eine Spinne ab, auf der Wiese wächst eine Blume mit Schmetterling oder ein Maulwurf guckt heraus, im Wasser springt ein Fisch.",
+      why: "Kein Tipp ins Leere – das Kind lernt, dass das ganze Bild antwortet, und entdeckt auch die Stellen zwischen den Dingen.",
+      effort: "M",
       done: true,
     },
   ],

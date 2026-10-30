@@ -45,7 +45,8 @@ describe("Aufs Töpfchen", () => {
       expect(texts.nothingButton.trim()).not.toBe("");
       for (const { id } of SAID) expect(texts.said[id].trim()).not.toBe("");
       expect(texts.finish.trim()).not.toBe("");
-      for (const scene of WAIT_SCENES) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
+      // A new thought comes in German first; the game says it in German until it is translated (sayScene).
+      for (const scene of WAIT_SCENES) if (texts === POTTY_TEXTS.de || scene.id in texts.scenes) expect(texts.scenes[scene.id]?.trim()).toBeTruthy();
       expect(texts.star.trim()).not.toBe("");
     }
   });
@@ -140,8 +141,12 @@ describe("Aufs Töpfchen", () => {
     const scripts = { zh: /\p{Script=Han}/u, hi: /\p{Script=Devanagari}/u, ar: /\p{Script=Arabic}/u };
     for (const id of ["en", "zh", "hi", "es", "ar"] as const) {
       const texts = POTTY_TEXTS[id];
-      // Every thought has its line, and no line is left without words.
-      expect(Object.keys(texts?.scenes ?? {}).sort(), id).toEqual(WAIT_SCENES.map((s) => s.id).sort());
+      // A translated line belongs to a thought (new ones wait in German, see sayScene), and no line is left without words.
+      for (const scene of Object.keys(texts?.scenes ?? {}))
+        expect(
+          WAIT_SCENES.map((s) => s.id),
+          id,
+        ).toContain(scene);
       for (const line of linesIn(id)) {
         expect(line.trim(), id).not.toBe("");
         if (id in scripts) {
@@ -236,6 +241,11 @@ describe("Aufs Töpfchen", () => {
       "salpic",
       "gota",
     );
+    // And in Chinese, Hindi and Arabic: water, rain, fountain, watering, hose, balloon, ketchup, hen, egg, play dough,
+    // pushing, squeezing, splashing, drops.
+    banned.push("水", "雨", "喷泉", "浇", "气球", "番茄酱", "鸡", "蛋", "橡皮泥", "用力", "挤");
+    banned.push("पानी", "बारिश", "फव्वारा", "फ़व्वारा", "पाइप", "गुब्बारा", "केचप", "मुर्गी", "अंड", "ज़ोर", "जोर", "छपाक", "बूँद");
+    banned.push("ماء", "مطر", "نافورة", "خرطوم", "بالون", "كاتشب", "دجاج", "بيض", "صلصال", "ضغط", "اضغط", "رذاذ", "قطرة");
     for (const text of lyrics) expect(banned.filter((word) => text.includes(word))).toEqual([]);
   });
 });

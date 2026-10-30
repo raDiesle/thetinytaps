@@ -1,39 +1,5 @@
 /* Animations of the Kinderarzt scene. Durations match durationMs in Kinderarzt.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .ka-mobile-bar {
-  animation: ka-sway 6s ease-in-out infinite;
-}
-
-.scene.lively .ka-uhr-minute {
-  animation: ka-spin 60s linear infinite;
-}
-
-.scene.lively .ka-aqua-fish {
-  animation: ka-fish-swim 9s ease-in-out calc(var(--i) * -3s) infinite;
-}
-
-.scene.lively .ka-aqua-fish-body {
-  animation: ka-fish-flip 9s linear calc(var(--i) * -3s) infinite;
-}
-
-.scene.lively .ka-aqua-plant {
-  animation: ka-wiggle-small 4s ease-in-out calc(var(--i) * -1s) infinite;
-}
-
-.scene.lively .ka-giraffe-tail {
-  animation: ka-wiggle 3s ease-in-out infinite;
-}
-
-.scene.lively .ka-wagen-toy {
-  animation: ka-wiggle-small 3s ease-in-out infinite;
-}
-
-.scene.lively .ka-fenster-curtain {
-  animation: ka-curtain 4s ease-in-out calc(var(--i) * -2s) infinite;
-}
-
 /* Puffs, drops, lights and other things that only show up in an animation; they can't be tapped meanwhile. */
 .ka-lid,
 .ka-hearts path,

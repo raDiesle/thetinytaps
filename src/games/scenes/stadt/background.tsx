@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, towardsHorizon } from "../layout";
 import { Cloud, INK } from "../shared";
+import { Poke } from "../spots";
 import { HOUSES, PARK_X, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, ZEBRA } from "./layout";
 
 // Far away the city fades into the haze; then a row of light houses behind the
@@ -46,7 +47,7 @@ function Skyline() {
   return (
     <g>
       {TOWERS.map(([x, y, w]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={y} width={w} height={HORIZON + 20 - y} rx="3" fill="#d3def4" />
           <rect x={x + w - 8} y={y} width="8" height={HORIZON + 20 - y} fill="#c3d1ec" />
           {Array.from({ length: Math.floor((HORIZON - 10 - y) / 22) }, (_, row) => (
@@ -57,13 +58,15 @@ function Skyline() {
               strokeWidth="6"
             />
           ))}
-        </g>
+        </Poke>
       ))}
       {/* TV tower */}
-      <path d="M1300 340 L1306 120 H1314 L1320 340 Z" fill="#c3d1ec" />
-      <circle cx="1310" cy="140" r="22" fill="#c3d1ec" />
-      <rect x="1296" y="150" width="28" height="8" rx="3" fill="#b5c4e3" />
-      <path d="M1310 118 V60" stroke="#c3d1ec" strokeWidth="5" />
+      <Poke kind="wobble">
+        <path d="M1300 340 L1306 120 H1314 L1320 340 Z" fill="#c3d1ec" />
+        <circle cx="1310" cy="140" r="22" fill="#c3d1ec" />
+        <rect x="1296" y="150" width="28" height="8" rx="3" fill="#b5c4e3" />
+        <path d="M1310 118 V60" stroke="#c3d1ec" strokeWidth="5" />
+      </Poke>
     </g>
   );
 }
@@ -73,7 +76,7 @@ function BackRow() {
   return (
     <g>
       {BACK_ROW.map(([x, w, h, color]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={HOUSES - Number(h)} width={w} height={h} fill={String(color)} />
           <path
             d={`M${Number(x) - 6} ${HOUSES - Number(h)} L${Number(x) + Number(w) / 2} ${HOUSES - Number(h) - 40} L${Number(x) + Number(w) + 6} ${HOUSES - Number(h)} Z`}
@@ -85,7 +88,7 @@ function BackRow() {
               <rect x={Number(x) + Number(w) - 38} y={HOUSES - Number(h) + 20 + row * 44} width="22" height="26" rx="3" />
             </g>
           ))}
-        </g>
+        </Poke>
       ))}
     </g>
   );
@@ -93,13 +96,15 @@ function BackRow() {
 
 function ParkTree({ x, y, scale }: { x: number; y: number; scale: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-6" y="-50" width="12" height="50" fill="#8d5a2b" />
-      <circle cx="0" cy="-60" r="34" fill="#52b788" />
-      <circle cx="-22" cy="-44" r="22" fill="#40916c" />
-      <circle cx="22" cy="-46" r="24" fill="#40916c" />
-      <circle cx="-10" cy="-72" r="12" fill="#74c69d" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <rect x="-6" y="-50" width="12" height="50" fill="#8d5a2b" />
+        <circle cx="0" cy="-60" r="34" fill="#52b788" />
+        <circle cx="-22" cy="-44" r="22" fill="#40916c" />
+        <circle cx="22" cy="-46" r="24" fill="#40916c" />
+        <circle cx="-10" cy="-72" r="12" fill="#74c69d" />
+      </g>
+    </Poke>
   );
 }
 
@@ -180,7 +185,9 @@ export function Background() {
       <circle cx="1520" cy="88" r="140" fill="url(#st-sunglow)" />
       <Cloud x={300} y={210} scale={0.3} className="st-cloud st-cloud-slow" />
       <Cloud x={1160} y={170} scale={0.4} className="st-cloud" />
-      <path d="M760 170 q6 -6 12 0 q6 -6 12 0 M800 156 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      <Poke kind="drift">
+        <path d="M760 170 q6 -6 12 0 q6 -6 12 0 M800 156 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      </Poke>
       <Skyline />
       <rect y="230" width="1600" height="120" fill="url(#st-haze)" />
 
@@ -211,8 +218,10 @@ export function Background() {
       <path d="M0 682 H1600" stroke="#fff" strokeWidth="5" strokeDasharray="44 36" />
       <Zebra />
       <Car />
-      <ellipse cx="380" cy="752" rx="30" ry="7" fill="#495057" />
-      <path d="M360 752 H400 M366 747 H394 M366 757 H394" stroke="#6c757d" strokeWidth="2" />
+      <Poke kind="hop">
+        <ellipse cx="380" cy="752" rx="30" ry="7" fill="#495057" />
+        <path d="M360 752 H400 M366 747 H394 M366 757 H394" stroke="#6c757d" strokeWidth="2" />
+      </Poke>
       <rect y={ROAD_BOTTOM} width="1600" height={PAVEMENT - ROAD_BOTTOM} fill="#dee2e6" />
       <rect y={ROAD_BOTTOM} width="1600" height="3" fill="#ced4da" />
       <path
@@ -225,24 +234,30 @@ export function Background() {
       <rect y={PAVEMENT} width="1600" height={1000 - PAVEMENT} fill="url(#st-front)" />
       <Tiles x1={-200} x2={1800} y1={PAVEMENT} y2={1000} stroke="#ced4da" />
       {/* A tree pit with a little bush, and bollards by the crossing */}
-      <g transform={`translate(1380 872) scale(${depthScale(872)})`}>
-        <ellipse cx="0" cy="0" rx="70" ry="14" fill="#a98467" />
-        <circle cx="-26" cy="-26" r="28" fill="#40916c" />
-        <circle cx="22" cy="-30" r="32" fill="#52b788" />
-        <circle cx="0" cy="-50" r="26" fill="#74c69d" />
-      </g>
-      {[640, 920].map((x) => (
-        <g key={x} transform={`translate(${x} 806) scale(${depthScale(806)})`}>
-          <ellipse cx="0" cy="0" rx="12" ry="4" fill={INK} opacity="0.15" />
-          <rect x="-8" y="-50" width="16" height="50" rx="6" fill="#495057" />
-          <rect x="-8" y="-40" width="16" height="7" fill="#f8f9fa" />
+      <Poke kind="sway">
+        <g transform={`translate(1380 872) scale(${depthScale(872)})`}>
+          <ellipse cx="0" cy="0" rx="70" ry="14" fill="#a98467" />
+          <circle cx="-26" cy="-26" r="28" fill="#40916c" />
+          <circle cx="22" cy="-30" r="32" fill="#52b788" />
+          <circle cx="0" cy="-50" r="26" fill="#74c69d" />
         </g>
+      </Poke>
+      {[640, 920].map((x) => (
+        <Poke key={x} kind="wobble">
+          <g transform={`translate(${x} 806) scale(${depthScale(806)})`}>
+            <ellipse cx="0" cy="0" rx="12" ry="4" fill={INK} opacity="0.15" />
+            <rect x="-8" y="-50" width="16" height="50" rx="6" fill="#495057" />
+            <rect x="-8" y="-40" width="16" height="7" fill="#f8f9fa" />
+          </g>
+        </Poke>
       ))}
 
       {/* Grass tufts */}
       <g stroke="#52b788" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
     </>

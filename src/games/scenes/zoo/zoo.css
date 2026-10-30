@@ -1,34 +1,5 @@
 /* Animations of the Zoo scene. Durations match durationMs in Zoo.tsx. Sun and cloud: ../sky.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .zo-cloud {
-  animation: zo-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .zo-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .zo-giraffe-tail,
-.scene.lively .zo-zebra-tail,
-.scene.lively .zo-loewe-tail {
-  animation: zo-swish 2.6s ease-in-out infinite alternate;
-}
-
-.scene.lively .zo-elefant-ear,
-.scene.lively .zo-baby-ear {
-  animation: zo-ear 3s ease-in-out infinite alternate;
-}
-
-.scene.lively .zo-affe-swing {
-  animation: zo-sway 3s ease-in-out infinite alternate;
-}
-
-.scene.lively .zo-schmetterling-wings {
-  animation: zo-flutter 0.4s ease-in-out infinite alternate;
-}
-
 /* Puffs, drops, fish and other things that only show up in an animation; they can't be tapped meanwhile. */
 .zo-giraffe-tongue,
 .zo-giraffe-leaves ellipse,
@@ -191,12 +162,6 @@
   }
 }
 
-@keyframes zo-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
-
 @keyframes zo-spin {
   to {
     transform: rotate(1turn);
@@ -215,15 +180,6 @@
 @keyframes zo-ear {
   to {
     transform: rotate(8deg);
-  }
-}
-
-@keyframes zo-sway {
-  from {
-    transform: rotate(-4deg);
-  }
-  to {
-    transform: rotate(4deg);
   }
 }
 

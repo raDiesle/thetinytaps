@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { HORIZON, depthScale, transformOf, onFloor } from "../layout";
 import { INK, STEEL } from "../shared";
+import { Poke } from "../spots";
 import { GONDOLA, STAND } from "./layout";
 
 // The back wall: a ceiling strip with lamps, a fruit border, tiles behind the bakery, the cheese
@@ -86,7 +87,7 @@ function Gondola({ side }: { side: -1 | 1 }) {
   const width = Math.abs(fx2 - fx1);
   const top = fBottom - height * front;
   return (
-    <g>
+    <>
       {/* Shadow on the floor */}
       <path d={poly([at(outer, front), at(inner, front), at(inner, back), at(outer, back)])} fill="#adb5bd" opacity="0.35" transform="translate(0 6)" />
       {/* Top */}
@@ -102,10 +103,10 @@ function Gondola({ side }: { side: -1 | 1 }) {
         const [x, y] = at((inner + outer) / 2 + (i ? 30 : -20), s, 1);
         const w = 70 * s;
         return (
-          <g key={s}>
+          <Poke key={s} kind="hop">
             <rect x={x - w / 2} y={y - w * 0.7} width={w} height={w * 0.7} fill="#d4a373" />
             <path d={`M${x - w / 2} ${y - w * 0.45} H${x + w / 2}`} stroke="#bc8a5f" strokeWidth="3" />
-          </g>
+          </Poke>
         );
       })}
       {/* Side facing the aisle */}
@@ -125,33 +126,33 @@ function Gondola({ side }: { side: -1 | 1 }) {
         </g>
       ))}
       <path d={`M${left} ${top} V${fBottom} M${left + width} ${top} V${fBottom}`} stroke="#ced4da" strokeWidth="4" />
-    </g>
+    </>
   );
 }
 
 /** Hanging sign over an aisle with its number. */
 function AisleSign({ x, y, n, colour }: { x: number; y: number; n: number; colour: string }) {
   return (
-    <g>
+    <Poke kind="swing">
       <path d={`M${x - 16} 26 V${y - 16} M${x + 16} 26 V${y - 16}`} stroke={STEEL} strokeWidth="2" />
       <rect x={x - 26} y={y - 18} width="52" height="38" rx="8" fill={colour} />
       <circle cx={x} cy={y + 1} r="13" fill="#fff" />
       <text x={x} y={y + 7} textAnchor="middle" fontSize="18" fontWeight="bold" fill={colour} fontFamily="sans-serif">
         {n}
       </text>
-    </g>
+    </Poke>
   );
 }
 
 /** Round counter sign hanging from the ceiling with a little picture. */
 function CounterSign({ x, y, colour, children }: { x: number; y: number; colour: string; children: ReactElement }) {
   return (
-    <g>
+    <Poke kind="swing">
       <path d={`M${x - 12} 26 L${x - 8} ${y - 26} M${x + 12} 26 L${x + 8} ${y - 26}`} stroke={STEEL} strokeWidth="2" />
       <circle cx={x} cy={y} r="28" fill={colour} />
       <circle cx={x} cy={y} r="22" fill="#fff" />
       {children}
-    </g>
+    </Poke>
   );
 }
 
@@ -165,7 +166,9 @@ function FishCounter() {
       <path d="M830 168 q10 -5 20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0 t20 0" stroke="#fff" strokeWidth="3" fill="none" opacity="0.7" />
       <path d="M830 238 V226 Q860 216 890 224 Q930 214 990 224 V238 Z" fill="#ffe8a3" />
       {[846, 860, 978].map((x, i) => (
-        <path key={x} d={`M${x} 228 q-8 -16 0 -30 q8 -14 0 -26`} stroke="#40c057" strokeWidth={6 - i} strokeLinecap="round" fill="none" />
+        <Poke key={x} kind="sway">
+          <path d={`M${x} 228 q-8 -16 0 -30 q8 -14 0 -26`} stroke="#40c057" strokeWidth={6 - i} strokeLinecap="round" fill="none" />
+        </Poke>
       ))}
       <circle cx="900" cy="228" r="5" fill="#ffa8a8" />
       <circle cx="912" cy="231" r="3.5" fill="#fff" />
@@ -174,10 +177,14 @@ function FishCounter() {
       <rect x="805" y="242" width="195" height="88" fill="#e7f5ff" />
       <path d="M810 252 H995 V286 H810 Z" fill="#fff" />
       {[828, 852, 878, 904, 930, 956, 980].map((x, i) => (
-        <circle key={x} cx={x} cy={276 - (i % 2) * 4} r={i % 3 ? 7 : 9} fill={i % 2 ? "#ffe066" : "#e9ecef"} />
+        <Poke key={x} kind="hop">
+          <circle cx={x} cy={276 - (i % 2) * 4} r={i % 3 ? 7 : 9} fill={i % 2 ? "#ffe066" : "#e9ecef"} />
+        </Poke>
       ))}
       {[842, 920, 966].map((x) => (
-        <path key={x} d={`M${x - 8} 272 Q${x} 258 ${x + 8} 272 Z`} fill="#ffc9c9" />
+        <Poke key={x} kind="hop">
+          <path d={`M${x - 8} 272 Q${x} 258 ${x + 8} 272 Z`} fill="#ffc9c9" />
+        </Poke>
       ))}
       <rect x="805" y="286" width="195" height="44" fill="#74c0fc" />
       <path d="M805 300 q12 -8 24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0 t24 0" stroke="#fff" strokeWidth="4" fill="none" opacity="0.8" />
@@ -193,10 +200,10 @@ function CheeseCounter() {
       <rect x="600" y="242" width="195" height="88" fill="#fff9db" />
       <path d="M606 252 H789 V290 H606 Z" fill="#fff" opacity="0.8" />
       {[620, 668, 716, 760].map((x, i) => (
-        <g key={x}>
+        <Poke key={x} kind="hop">
           <path d={`M${x} 286 L${x + 34} 286 L${x + 34} 266 Z`} fill={i % 2 ? "#ffd43b" : "#fcc419"} />
           <circle cx={x + 26} cy="279" r="3" fill="#fab005" />
-        </g>
+        </Poke>
       ))}
       <rect x="600" y="290" width="195" height="40" fill="#ffd43b" />
       <path d="M612 304 H783" stroke="#fff" strokeWidth="5" strokeDasharray="12 10" strokeLinecap="round" opacity="0.7" />
@@ -214,10 +221,10 @@ function BakeryShelf() {
         <g key={y}>
           <rect x="232" y={y} width="178" height="9" fill="#b07d48" />
           {[252, 296, 340, 384].map((x, i) => (
-            <g key={x}>
+            <Poke key={x} kind="hop">
               <ellipse cx={x} cy={y - 11} rx={i % 2 ? 18 : 20} ry="12" fill={i % 2 ? "#c8814a" : "#e0a060"} />
               <path d={`M${x - 9} ${y - 16} l5 8 M${x - 1} ${y - 18} l5 8 M${x + 7} ${y - 16} l5 8`} stroke="#f3d9b1" strokeWidth="2.5" strokeLinecap="round" />
-            </g>
+            </Poke>
           ))}
         </g>
       ))}
@@ -238,11 +245,13 @@ function FruitStand() {
       <rect x="-250" y="-46" width="500" height="20" rx="4" fill="#c8814a" />
       <rect x="-244" y="-28" width="488" height="22" fill="#9c6b3c" />
       {/* Sign on top: an apple and a carrot */}
-      <rect x="-70" y="-338" width="140" height="48" rx="10" fill="#2b8a3e" stroke="#e9ecef" strokeWidth="5" />
-      <circle cx="-26" cy="-312" r="14" fill="#ff6b6b" />
-      <path d="M-26 -326 q4 -8 10 -8" stroke="#69db7c" strokeWidth="4" strokeLinecap="round" fill="none" />
-      <path d="M16 -324 L44 -300 L10 -312 Z" fill="#ff922b" />
-      <path d="M14 -324 l-6 -8 M16 -324 l2 -10" stroke="#69db7c" strokeWidth="4" strokeLinecap="round" />
+      <Poke kind="sway">
+        <rect x="-70" y="-338" width="140" height="48" rx="10" fill="#2b8a3e" stroke="#e9ecef" strokeWidth="5" />
+        <circle cx="-26" cy="-312" r="14" fill="#ff6b6b" />
+        <path d="M-26 -326 q4 -8 10 -8" stroke="#69db7c" strokeWidth="4" strokeLinecap="round" fill="none" />
+        <path d="M16 -324 L44 -300 L10 -312 Z" fill="#ff922b" />
+        <path d="M14 -324 l-6 -8 M16 -324 l2 -10" stroke="#69db7c" strokeWidth="4" strokeLinecap="round" />
+      </Poke>
     </g>
   );
 }
@@ -270,7 +279,9 @@ export function Background() {
       {/* A green band with fruit along the top */}
       <rect y="26" width="1600" height="12" fill="#69db7c" />
       {Array.from({ length: 20 }, (_, i) => (
-        <circle key={i} cx={40 + i * 80} cy="32" r="5" fill={["#ff6b6b", "#ffd43b", "#ff922b", "#fff"][i % 4]} />
+        <Poke key={i} kind="hop">
+          <circle cx={40 + i * 80} cy="32" r="5" fill={["#ff6b6b", "#ffd43b", "#ff922b", "#fff"][i % 4]} />
+        </Poke>
       ))}
       {/* Tiles behind the cheese and the fish counter */}
       <rect x="596" y="118" width="204" height="124" fill="#fff3bf" />
@@ -287,18 +298,22 @@ export function Background() {
       {/* Ceiling with lamps */}
       <rect width="1600" height="26" fill="#ced4da" />
       {[120, 440, 760, 1080, 1400].map((x) => (
-        <g key={x}>
+        <Poke key={x} kind="glow">
           <rect x={x} y="14" width="120" height="12" rx="4" fill="#fff" />
           <rect x={x + 8} y="24" width="104" height="4" rx="2" fill="#fff9db" />
-        </g>
+        </Poke>
       ))}
 
       {/* Window next to the entrance: outside the sun shines on the pavement */}
       <rect x="2" y="114" width="96" height="216" fill="#dee2e6" />
       <rect x="8" y="120" width="84" height="202" fill="#a5d8ff" />
-      <circle cx="70" cy="150" r="14" fill="#ffe066" />
-      <circle cx="26" cy="232" r="30" fill="#69db7c" />
-      <circle cx="66" cy="240" r="26" fill="#51cf66" />
+      <Poke kind="glow">
+        <circle cx="70" cy="150" r="14" fill="#ffe066" />
+      </Poke>
+      <Poke kind="sway">
+        <circle cx="26" cy="232" r="30" fill="#69db7c" />
+        <circle cx="66" cy="240" r="26" fill="#51cf66" />
+      </Poke>
       <rect x="8" y="258" width="84" height="64" fill="#ced4da" />
       <path d="M8 280 H92 M8 302 H92 M36 258 V322 M66 258 V322" stroke="#adb5bd" strokeWidth="2" />
 
@@ -333,10 +348,12 @@ export function Background() {
       <rect y={HORIZON} width="1600" height="50" fill="url(#sm-haze)" />
 
       {/* Doormat at the entrance */}
-      <g transform={`translate(164 ${HORIZON + 14}) scale(${depthScale(HORIZON + 14)})`}>
-        <rect x="-150" y="-22" width="300" height="44" rx="10" fill="#868e96" />
-        <rect x="-136" y="-14" width="272" height="28" rx="6" fill="none" stroke="#adb5bd" strokeWidth="4" strokeDasharray="8 8" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={`translate(164 ${HORIZON + 14}) scale(${depthScale(HORIZON + 14)})`}>
+          <rect x="-150" y="-22" width="300" height="44" rx="10" fill="#868e96" />
+          <rect x="-136" y="-14" width="272" height="28" rx="6" fill="none" stroke="#adb5bd" strokeWidth="4" strokeDasharray="8 8" />
+        </g>
+      </Poke>
 
       <Gondola side={-1} />
       <Gondola side={1} />

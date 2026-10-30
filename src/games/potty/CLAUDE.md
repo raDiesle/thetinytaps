@@ -56,10 +56,13 @@ left (`.pt-think`, as wide as the room left of Tapsi, its picture zoomed past th
 what Tapsi thinks of: the next thought comes by itself every `WAIT_SCENE_MS`, or at once on a tap, round and round
 without end – only thoughts for what the child said: for pipi
 things that flow and splash (watering a flower, a fountain, a balloon let go, rain and a puddle, a garden hose, a water
-wheel, pouring tea for the teddy, an elephant's trunk, a whale's fountain, a funnel), for kaka things that are pressed until something comes (ketchup, blowing up a
-balloon, a hen laying an egg, play dough through a press, a piping bag, peas from their pod, a butterfly out of its chrysalis) and one that only waits
-until something comes out (a toy train in a tunnel, for children afraid of kaka), all with Tapsi alone and away from the bathroom; for both or when unsure the two
-taking turns. A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
+wheel, pouring tea for the teddy, an elephant's trunk, a whale's fountain, a funnel, a water slide, a paper boat on a
+stream, a bucket into a sandcastle's moat, a dandelion clock, a garden pump, an hourglass, a kite let go), for kaka things that are pressed until something comes (ketchup, blowing up a
+balloon, a hen laying an egg, play dough through a press, a piping bag, peas from their pod, a carrot pulled out, a chick
+hatching, a wheelbarrow pushed up a hill, a honey bottle, a chestnut out of its case, a butterfly out of its chrysalis, a mole out of its hill) and some that only wait
+until something comes out (a toy train in a tunnel, a tortoise, a tube slide; for children afraid of kaka), all with Tapsi alone and away from the bathroom; for both or when unsure the two
+taking turns (there are never more kaka thoughts than pipi ones, or some would never come). The thoughts added on 30 October 2026 speak German in every
+language until they are translated (`sayScene`). A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
 else its emoji (`WaitScene.emoji`); `prompts.py think` and `frames-think` make them. The old full-screen waiting pictures
 (`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are kept but not shown
 since the user wanted only the helping ones. Only tapped scenes speak (and the first, which explains the ✓).
@@ -92,7 +95,7 @@ plural, „вы“; to the child: tú, तुम, „ты“. Hindi verbs agree 
 never the subject of a gendered verb („टैप्सी को सू-सू जाना है“); Arabic says "we" (هيّا نغسل), "I" or „بحاجة إلى“.
 `potty.test.ts` checks that every language has every line, Chinese, Hindi and Arabic with no Latin letters.
 
-The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and gets quiet while the voice speaks. German, Russian and Spanish so far (Spanish waits until it is an app language; `LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
+The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-warten-<lang>.mp3`, found by its file name, sung in the app language, else German; it loops without end and gets quiet while the voice speaks. German, Russian, Spanish, English, Chinese and Hindi so far; Arabic has its Suno texts in `musik/suno-lied.md`, not yet recorded (`LOOPS` holds where each song repeats, a whole number of bars from just before the first word). While there is no file or it loads, the synthesized tune (`playWaitNote`, four bars on `BEAT_MS`) repeats instead. Like the brushing song it is part of the game and plays even with Töne or Musik off. Songs come from Suno (`/musik-erzeugen`, see `musik/README.md`: a seamless loop, no fade-out); `languageStatus.ts` lists the sung languages, `potty.test.ts` checks that against the files.
 
 ## Rules
 

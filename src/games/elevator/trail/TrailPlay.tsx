@@ -5,12 +5,12 @@ import { useDevice } from "@/lib/device";
 import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
-import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
 import { HERO, KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose } from "../kid";
 import { spokenIn, translationOf } from "../phrases";
+import { sayIn } from "../voice";
 import type { ElevatorSettings } from "../settings";
 import { FRIENDS, type FriendPose } from "./friends";
 import { allStations, facing, groundY, placed, route } from "./ground";
@@ -499,12 +499,8 @@ export function TrailPlay({
    * its new lines and the shared ones („Ab in den Rucksack!“) never come in two languages. */
   const voice = translationOf(level.title, language.id) === undefined ? GERMAN : language;
 
-  /** Speaks a German sentence of the level in the app language (only with "Vorlesen"). */
-  const say = (german: string) => {
-    if (!settings.speech) return;
-    const { text, speechLang } = spokenIn(german, voice);
-    speak(text, speechLang, { rate: 0.85 });
-  };
+  /** Says a German sentence of the story in the app language, from its recording. */
+  const say = (german: string) => sayIn(german, voice);
 
   const sound = (play: () => void) => {
     if (settings.sounds) play();

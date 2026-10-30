@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { HORIZON, towardsHorizon, transformOf } from "../layout";
+import { Poke } from "../spots";
 import { SHELF, SHELF_BOARD_1, SHELF_BOARD_2, SHELF_TOP, WINDOW } from "./layout";
 import { sparkle, star } from "./parts";
 
@@ -18,7 +19,15 @@ function Wallpaper() {
     const y = 34 + row * 46;
     for (let col = 0; col < 24; col++) {
       const x = col * 70 + (row % 2) * 35 + 18;
-      shapes.push((col + row) % 3 ? <circle key={`${row}-${col}`} cx={x} cy={y} r="3.5" /> : <path key={`${row}-${col}`} d={star(x, y, 9)} />);
+      shapes.push(
+        (col + row) % 3 ? (
+          <circle key={`${row}-${col}`} cx={x} cy={y} r="3.5" />
+        ) : (
+          <Poke key={`${row}-${col}`} kind="glow">
+            <path d={star(x, y, 9)} />
+          </Poke>
+        ),
+      );
     }
   }
   return <g fill="#e6defa">{shapes}</g>;
@@ -63,7 +72,9 @@ function WindowView() {
         [820, 140, 2],
         [770, 64, 1.8],
       ].map(([sx, sy, r]) => (
-        <path key={`${sx}-${sy}`} d={sparkle(sx, sy, r * 2)} fill="#fff" opacity="0.7" />
+        <Poke key={`${sx}-${sy}`} kind="glow">
+          <path d={sparkle(sx, sy, r * 2)} fill="#fff" opacity="0.7" />
+        </Poke>
       ))}
       <path
         d={`M${x} ${bottom - 44} Q${x + 60} ${bottom - 70} ${x + 130} ${bottom - 48} Q${x + 190} ${bottom - 30} ${x + w} ${bottom - 56} V${bottom} H${x} Z`}
@@ -75,11 +86,11 @@ function WindowView() {
         [684, bottom - 46, 18, 16],
         [770, bottom - 50, 24, 22],
       ].map(([hx, hy, hw, hh]) => (
-        <g key={hx}>
+        <Poke key={hx} kind="glow">
           <rect x={hx} y={hy} width={hw} height={hh} fill="#3f4380" />
           <path d={`M${hx - 3} ${hy} L${hx + hw / 2} ${hy - hw * 0.5} L${hx + hw + 3} ${hy} Z`} fill="#3f4380" />
           <rect x={hx + hw * 0.3} y={hy + hh * 0.3} width={hw * 0.35} height={hh * 0.35} fill="#ffd8a8" />
-        </g>
+        </Poke>
       ))}
       <path d={`M${x} ${bottom - 18} Q${x + 100} ${bottom - 36} ${x + w} ${bottom - 14} V${bottom} H${x} Z`} fill="#454a85" />
       {/* The owl's branch, coming in from the right */}
@@ -90,7 +101,9 @@ function WindowView() {
         [818, 246, 20],
         [826, 222, -30],
       ].map(([lx, ly, a]) => (
-        <ellipse key={lx} cx={lx} cy={ly} rx="12" ry="6" transform={`rotate(${a} ${lx} ${ly})`} fill="#3d6b5a" />
+        <Poke key={lx} kind="sway">
+          <ellipse cx={lx} cy={ly} rx="12" ry="6" transform={`rotate(${a} ${lx} ${ly})`} fill="#3d6b5a" />
+        </Poke>
       ))}
     </>
   );
@@ -131,23 +144,25 @@ function Shelf() {
       {books.map((colour, i) => {
         const bh = 96 - (i % 3) * 12;
         return (
-          <g key={i}>
+          <Poke key={i} kind="hop">
             <rect x={-6 + i * 22} y={SHELF_BOARD_1 - bh} width="19" height={bh} rx="3" fill={colour} />
             <rect x={-6 + i * 22} y={SHELF_BOARD_1 - bh + 12} width="19" height="5" fill="#fff" opacity="0.5" />
-          </g>
+          </Poke>
         );
       })}
       {/* Puzzle boxes on the lower board */}
-      <rect x="30" y={SHELF_BOARD_2 - 34} width="104" height="34" rx="4" fill="#90be6d" />
-      <rect x="40" y={SHELF_BOARD_2 - 64} width="86" height="30" rx="4" fill="#f6bd60" />
-      <circle cx="83" cy={SHELF_BOARD_2 - 49} r="8" fill="#fff" opacity="0.6" />
+      <Poke kind="hop">
+        <rect x="30" y={SHELF_BOARD_2 - 34} width="104" height="34" rx="4" fill="#90be6d" />
+        <rect x="40" y={SHELF_BOARD_2 - 64} width="86" height="30" rx="4" fill="#f6bd60" />
+        <circle cx="83" cy={SHELF_BOARD_2 - 49} r="8" fill="#fff" opacity="0.6" />
+      </Poke>
       {/* Baskets in the bottom */}
       {[-72, 72].map((bx, i) => (
-        <g key={bx}>
+        <Poke key={bx} kind="hop">
           <path d={`M${bx - 60} -110 H${bx + 60} L${bx + 52} -16 H${bx - 52} Z`} fill={i ? "#f5cac3" : "#cdb4db"} />
           <path d={`M${bx - 58} -92 H${bx + 58} M${bx - 56} -66 H${bx + 56} M${bx - 54} -40 H${bx + 54}`} stroke="#fff" strokeWidth="4" opacity="0.4" />
           <rect x={bx - 16} y="-102" width="32" height="10" rx="5" fill="#fff" opacity="0.7" />
-        </g>
+        </Poke>
       ))}
     </g>
   );

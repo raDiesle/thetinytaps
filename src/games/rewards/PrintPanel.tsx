@@ -1,13 +1,33 @@
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { useT } from "@/lib/language";
+import { type Localized, useT } from "@/lib/language";
 import { type Board, NO_LINKED } from "./board";
 import { BoardSheet, type SheetLook } from "./BoardSheet";
 import { MARK_BY_ID, MARKS, THEME_BY_ID, THEMES } from "./catalog";
 import { MIN_STAR_MM, photoFormat, photoLayout } from "./photo";
+import { PRINT } from "./pageParts";
+import { MarkPic, markPicture } from "./pictures";
 import { PhotoPrint } from "./PhotoPrint";
 import type { PrintOptions } from "./settings";
+
+/** Print options both panels share. */
+export const PRINT_WORDS = {
+  page: { de: "Seite (A4)", en: "Page (A4)", zh: "页面（A4）", hi: "पेज (A4)", es: "Página (A4)", ar: "الصفحة (A4)", ru: "Страница (A4)" },
+  auto: { de: "Passend", en: "Automatic", zh: "自动", hi: "अपने-आप", es: "Automática", ar: "تلقائي", ru: "Автоматически" },
+  landscape: { de: "Quer", en: "Landscape", zh: "横向", hi: "आड़ा", es: "Horizontal", ar: "أفقي", ru: "Альбомная" },
+  portrait: { de: "Hochkant", en: "Portrait", zh: "纵向", hi: "खड़ा", es: "Vertical", ar: "عمودي", ru: "Книжная" },
+  color: {
+    de: "In Farbe (aus: Schwarz-weiß, spart Tinte)",
+    en: "In color (off: black and white, saves ink)",
+    zh: "彩色（关闭：黑白，省墨）",
+    hi: "रंगीन (बंद: श्वेत-श्याम, स्याही बचती है)",
+    es: "En color (desactivado: blanco y negro, ahorra tinta)",
+    ar: "بالألوان (عند الإيقاف: أبيض وأسود لتوفير الحبر)",
+    ru: "В цвете (выкл.: чёрно-белая, экономит чернила)",
+  },
+  now: { de: "Jetzt drucken", en: "Print now", zh: "立即打印", hi: "अभी प्रिंट करें", es: "Imprimir ahora", ar: "الطباعة الآن", ru: "Печатать" },
+} satisfies Record<string, Localized>;
 
 /** A4 in millimetres. */
 export const A4 = { long: 297, short: 210 };
@@ -37,58 +57,94 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
 
   return (
     <section className="settings rw-print-panel">
-      <SettingsGroup title={t({ de: "Drucken" })}>
+      <SettingsGroup title={t(PRINT)}>
         <Choice
-          label={t({ de: "Seite (A4)" })}
+          label={t(PRINT_WORDS.page)}
           value={options.orientation}
           onChange={(value) => onChange({ orientation: value })}
           options={[
-            { value: "auto", label: t({ de: "Passend" }) },
-            { value: "landscape", label: t({ de: "Quer" }) },
-            { value: "portrait", label: t({ de: "Hochkant" }) },
+            { value: "auto", label: t(PRINT_WORDS.auto) },
+            { value: "landscape", label: t(PRINT_WORDS.landscape) },
+            { value: "portrait", label: t(PRINT_WORDS.portrait) },
           ]}
         />
         {board.kind === "month" && (
           <Choice
-            label={t({ de: "Monat" })}
+            label={t({ de: "Monat", en: "Month", zh: "月份", hi: "महीना", es: "Mes", ar: "الشهر", ru: "Месяц" })}
             value={options.nextMonth ? "next" : "this"}
             onChange={(value) => onChange({ nextMonth: value === "next" })}
             options={[
-              { value: "this", label: t({ de: "Dieser" }) },
-              { value: "next", label: t({ de: "Nächster" }) },
+              { value: "this", label: t({ de: "Dieser", en: "This one", zh: "本月", hi: "यही", es: "Este", ar: "هذا الشهر", ru: "Этот" }) },
+              { value: "next", label: t({ de: "Nächster", en: "Next", zh: "下个月", hi: "अगला", es: "El próximo", ar: "الشهر القادم", ru: "Следующий" }) },
             ]}
           />
         )}
-        <Toggle label={t({ de: "In Farbe (aus: Schwarz-weiß, spart Tinte)" })} checked={options.color} onChange={(color) => onChange({ color })} />
+        <Toggle label={t(PRINT_WORDS.color)} checked={options.color} onChange={(color) => onChange({ color })} />
         <Toggle
-          label={t({ de: "Felder zum Ausmalen (statt leerer Kreise zum Bekleben)" })}
+          label={t({
+            de: "Felder zum Ausmalen (statt leerer Kreise zum Bekleben)",
+            en: "Fields to color in (instead of empty circles for stickers)",
+            zh: "可涂色的格子（代替贴贴纸的空圆圈）",
+            hi: "रंग भरने वाले खाने (स्टिकर के लिए खाली गोलों की जगह)",
+            es: "Casillas para colorear (en vez de círculos vacíos para pegatinas)",
+            ar: "خانات للتلوين (بدل دوائر فارغة للملصقات)",
+            ru: "Клеточки для раскрашивания (вместо пустых кружков для наклеек)",
+          })}
           checked={options.colorIn}
           onChange={(colorIn) => onChange({ colorIn })}
         />
         <Toggle
-          label={t({ de: "Zweite Seite: Sterne zum Ausschneiden und Aufkleben" })}
+          label={t({
+            de: "Zweite Seite: Sterne zum Ausschneiden und Aufkleben",
+            en: "Second page: stars to cut out and stick on",
+            zh: "第二页：可剪下粘贴的星星",
+            hi: "दूसरा पेज: काटकर चिपकाने के लिए सितारे",
+            es: "Segunda página: estrellas para recortar y pegar",
+            ar: "صفحة ثانية: نجوم للقص واللصق",
+            ru: "Вторая страница: звёзды, чтобы вырезать и наклеить",
+          })}
           checked={options.stickers}
           onChange={(stickers) => onChange({ stickers })}
         />
         <p className="setting-note">
           {t({
             de: "Gedruckt wird die Tafel leer – die Sterne kommen mit Aufklebern, Stempeln oder Buntstiften darauf. Laminiert (oder in einer Klarsichthülle) hält sie mit abwischbarem Stift viele Wochen.",
+            en: "The chart prints empty – the stars go on with stickers, stamps or crayons. Laminated (or in a clear sleeve) and used with a wipe-off marker, it lasts many weeks.",
+            zh: "奖励表打印出来是空的——星星用贴纸、印章或彩色笔加上去。过塑（或放进透明文件套）后用可擦笔，能用好几周。",
+            hi: "चार्ट खाली छपता है – सितारे स्टिकर, ठप्पे या रंगीन पेंसिल से लगते हैं। लैमिनेट करके (या प्लास्टिक कवर में रखकर) मिटने वाले पेन के साथ यह कई हफ़्ते चलता है।",
+            es: "La tabla se imprime vacía: las estrellas se ponen con pegatinas, sellos o lápices de colores. Plastificada (o en una funda transparente) y con un rotulador borrable, dura muchas semanas.",
+            ar: "تُطبع اللوحة فارغة – وتُضاف النجوم بالملصقات أو الأختام أو الأقلام الملونة. إذا غُلّفت (أو وُضعت في غلاف شفاف) واستُخدم قلم قابل للمسح، تدوم أسابيع كثيرة.",
+            ru: "Таблица печатается пустой – звёзды появляются с наклейками, штампами или карандашами. В ламинате (или в прозрачном файле) и со стираемым маркером она прослужит много недель.",
           })}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>
-          🖨️ {t({ de: "Jetzt drucken" })}
+          🖨️ {t(PRINT_WORDS.now)}
         </button>
       </SettingsGroup>
       <Preview orientation={orientation}>{pages}</Preview>
       <PhotoPrint
-        title={t({ de: `${mark.emoji} Zum Ankletten: als Fotoabzug` })}
+        title={`${mark.emoji} ${t({ de: "Zum Ankletten: als Fotoabzug", en: "To stick on with Velcro: as a photo print", zh: "用魔术贴贴：冲印成照片", hi: "वेल्क्रो से चिपकाने के लिए: फ़ोटो प्रिंट", es: "Para pegar con velcro: como copia fotográfica", ar: "للتثبيت بالفيلكرو: كصورة مطبوعة", ru: "На липучках: как фотоотпечаток" })}`}
         note={t({
           de: "Ein Foto voller Zeichen der Tafel: ausgeschnitten und mit Klettpunkten bekommt Ihr Kind jeden Stern zum Selbst-Ankletten, und die laminierte Tafel hält viele Wochen.",
+          en: "A photo full of the chart’s marks: cut out and with Velcro dots, every star is one your child can stick on, and the laminated chart lasts many weeks.",
+          zh: "一张印满奖励表标记的照片：剪开并贴上魔术贴后，孩子可以自己贴上每一颗星星，过塑的奖励表能用好几周。",
+          hi: "चार्ट के निशानों से भरी एक फ़ोटो: काटकर वेल्क्रो डॉट लगाने पर हर सितारा बच्चा खुद चिपका सकता है, और लैमिनेट किया चार्ट कई हफ़्ते चलता है।",
+          es: "Una foto llena de las marcas de la tabla: recortadas y con puntos de velcro, su peque puede pegar cada estrella, y la tabla plastificada dura muchas semanas.",
+          ar: "صورة مليئة بعلامات اللوحة: بعد قصّها وإضافة نقاط الفيلكرو يستطيع طفلكم تثبيت كل نجمة بنفسه، وتدوم اللوحة المغلّفة أسابيع كثيرة.",
+          ru: "Фото, полное значков таблицы: вырезанные и с липучками, каждую звезду ребёнок сможет прикрепить сам, а ламинированная таблица прослужит много недель.",
         })}
-        cards={Array.from({ length: stars.cols * stars.rows }, () => ({ emoji: mark.emoji }))}
+        cards={Array.from({ length: stars.cols * stars.rows }, () => ({ emoji: mark.emoji, picture: markPicture(mark) }))}
         min={MIN_STAR_MM}
         theme={THEME_BY_ID.get(board.theme) ?? THEMES[0]}
-        name="belohnungstafel-sterne"
+        name={t({
+          de: "belohnungstafel-sterne",
+          en: "reward-chart-stars",
+          zh: "奖励表-星星",
+          hi: "इनाम-चार्ट-सितारे",
+          es: "tabla-de-premios-estrellas",
+          ar: "لوحة-المكافآت-نجوم",
+          ru: "таблица-наград-звёзды",
+        })}
         format={options.photo}
         onFormat={(photo) => onChange({ photo })}
       />
@@ -123,7 +179,7 @@ function PrintPages({ board, options, look, orientation }: { board: Board; optio
         >
           {Array.from({ length: STICKERS_PER_PAGE }, (_, i) => (
             <span key={i} className="rw-sticker">
-              {mark.emoji}
+              <MarkPic mark={mark} />
             </span>
           ))}
         </div>
@@ -147,7 +203,19 @@ export function Preview({ orientation, children }: { orientation: "landscape" | 
   const pageWidth = (orientation === "landscape" ? A4.long : A4.short) * PX_PER_MM;
   const scale = Math.min(1, width / pageWidth);
   return (
-    <div ref={box} className="rw-preview" aria-label={t({ de: "So sieht der Ausdruck aus" })}>
+    <div
+      ref={box}
+      className="rw-preview"
+      aria-label={t({
+        de: "So sieht der Ausdruck aus",
+        en: "This is how the printout looks",
+        zh: "打印效果预览",
+        hi: "प्रिंट ऐसा दिखेगा",
+        es: "Así se verá la impresión",
+        ar: "هكذا ستبدو الطباعة",
+        ru: "Так будет выглядеть распечатка",
+      })}
+    >
       {/* zoom, not transform: the panel gets only as tall as the small pages. */}
       <div className="rw-preview-pages" style={{ zoom: scale, width: `${pageWidth}px` }}>
         {children}

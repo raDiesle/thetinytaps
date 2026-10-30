@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ARABIC_KEYBOARD_ROWS } from "@/lib/arabicKeys";
 import { RUSSIAN_KEYBOARD_ROWS } from "@/lib/cyrillicKeys";
@@ -10,6 +12,7 @@ import { localizeScene, sceneLanguage } from "./localize";
 import { SCENE_PHRASES } from "./phrases";
 import { questsFor } from "./quests";
 import { ROADS } from "./roads";
+import { spotAt } from "./spots";
 import { SCENE_TRANSLATIONS } from "./translations";
 import { placeBox, type Scene, type SceneItem, type SceneItemTranslation, type SceneTranslation } from "./types";
 
@@ -18,6 +21,9 @@ import { placeBox, type Scene, type SceneItem, type SceneItemTranslation, type S
 
 /** The smallest tap area a finger must still hit; the skill aims for ~60. */
 const MIN_TAP = 40;
+
+/** Things in a background that move when tapped (`<Poke>`, clouds), at least. */
+const MIN_POKES = 5;
 
 /** Every language the engine speaks (phrases.ts), German first. */
 const LANGUAGES = Object.keys(SCENE_PHRASES) as TargetLanguageId[];
@@ -77,6 +83,23 @@ describe.each(SCENES.map((scene) => [scene.id, scene] as const))("scene %s", (_,
       expect(ids).toContain(chain.start);
       for (const step of chain.steps) expect(ids).toContain(step.item);
     }
+  });
+
+  test("every tap on the background brings something out: the spots cover the whole picture", () => {
+    expect(scene.spots.length).toBeGreaterThan(0);
+    for (const spot of scene.spots) expect(spot.kinds.length).toBeGreaterThan(0);
+    const uncovered: string[] = [];
+    for (let y = 0; y <= scene.height; y += 10) {
+      for (let x = 0; x <= scene.width; x += 10) if (spotAt(scene.spots, scene.width, scene.height, x, y) < 0) uncovered.push(`${x},${y}`);
+    }
+    expect(uncovered.slice(0, 5)).toEqual([]);
+  });
+
+  test("things in the background move when tapped, and a moving group has no transform of its own", () => {
+    const markup = renderToStaticMarkup(createElement("svg", null, createElement(scene.Background)));
+    expect(markup.match(/data-poke=/g)?.length ?? 0).toBeGreaterThanOrEqual(MIN_POKES);
+    // The movement is a CSS transform, which would replace the group's own transform attribute.
+    expect(markup.match(/<g[^>]*data-poke=[^>]*>/g)?.filter((tag) => / transform=/.test(tag)) ?? []).toEqual([]);
   });
 
   test("every item gets a key and every key does something", () => {

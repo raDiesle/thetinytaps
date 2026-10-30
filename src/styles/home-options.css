@@ -65,6 +65,12 @@
   background: var(--sunshine);
 }
 
+/* Music switched off: the button fades, so the state shows at a glance. */
+.home-music[aria-pressed="false"] {
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+  background: #ffffffb0;
+}
+
 .home-menu-button:active {
   transform: translateY(3px);
   box-shadow: 0 1px 0 var(--ink);

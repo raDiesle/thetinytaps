@@ -1,4 +1,4 @@
-import { useId, useMemo, type ReactNode } from "react";
+import { memo, useId, useMemo, type ReactNode } from "react";
 import { useT } from "@/lib/language";
 import { VIEW_H, wobble, type LevelProps } from "./level";
 import { beside, deg, hop, lerp, svgLine } from "./machineKit";
@@ -31,11 +31,15 @@ import {
   RINGS,
   rampY,
   ROBOT,
+  ROCK,
   ROCKET,
+  SCOPE,
+  scopeTip,
   SLOT,
   TANK,
   TOWER,
   TOWER_ARM,
+  UFO_BELOW,
   WINDOW_UP,
   WORLD_W,
   type Space,
@@ -55,9 +59,12 @@ const GLOW = "#7dffb2";
  * A Rube Goldberg machine on a toy launch site at night. One tap lets the
  * marble out of the satellite dish, through the glowing rings and down the
  * zigzag pipe into a sleepy robot, which pushes the moon buggy over the hills
- * into the planet mobile; the earth knocks the switch, the magnet lets go of
- * its iron ball, the ball drops into the countdown board's slot, and after
- * „3, 2, 1“ the rocket lifts off. The camera travels along with whatever moves.
+ * into the planet mobile; the earth bonks the telescope, which swings round and
+ * points at the sky, where a UFO with a little alien sees it and comes floating
+ * in. It beams up a moon rock, carries it over and drops it onto the switch,
+ * waves and zooms off; the magnet lets go of its iron ball, the ball drops into
+ * the countdown board's slot, and after „3, 2, 1“ the rocket lifts off. The
+ * camera travels along with whatever moves.
  */
 export function SpaceLevel(props: LevelProps) {
   const space = useMemo(buildSpace, []);
@@ -75,8 +82,11 @@ export function SpaceLevel(props: LevelProps) {
           <DownRamp space={space} />
           <PipeBack space={space} t={t} />
           <Robot space={space} t={t} />
+          <Ufo space={space} t={t} />
           <StationTruss space={space} t={t} />
           <Mobile spin={space.spinAt(t)} />
+          <ScopeTripod />
+          <Telescope space={space} t={t} />
           <LeverBox space={space} t={t} />
           <SlotHole />
           <IronBall at={space.ironAt(t)} />
@@ -107,6 +117,7 @@ function MovingThings({ space, t }: { space: Space; t: number }) {
   return (
     <g>
       <Ball color={MARBLE_COLOR} x={marble.pt.x} y={marble.pt.y} spin={marble.spin} />
+      <MoonRock space={space} t={t} />
       <g transform={`translate(${buggy.pt.x} ${buggy.pt.y}) rotate(${deg(buggy.angle)})`}>
         <Buggy turned={buggy.turned} bob={buggy.bob} />
       </g>
@@ -247,7 +258,7 @@ function Moon({ awake }: { awake: boolean }) {
   );
 }
 
-const CRATERS = [180, 640, 1150, 1700, 2300, 2650, 3420, 4000, 4460, 5100, 5500, 6100];
+const CRATERS = [180, 640, 1150, 1700, 2300, 2650, 3420, 4000, 4460, 5000, 5360, 6000, 6400, 7000];
 
 function Ground() {
   const x0 = HILLS[0].x - HILLS[0].w / 2;
@@ -789,6 +800,168 @@ function LeverBox({ space, t }: { space: Space; t: number }) {
       <circle cx={LEVER.x} cy={LEVER.y} r="5" fill={INK} />
       <circle cx={LEVER.x + 21} cy={FLOOR - 16} r="6" fill={on ? GLOW : "#ff5d73"} stroke={INK} strokeWidth="2" />
       <circle cx={LEVER.x - 21} cy={FLOOR - 16} r="6" fill={on ? "#5a4a7a" : "#5a4a7a"} stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+/* ---------- Telescope, UFO and moon rock ---------- */
+
+/** The telescope's tripod: three legs from the mount down to the ground. It never moves, so it is drawn once. */
+const ScopeTripod = memo(function ScopeTripod() {
+  const { x, y } = SCOPE.pivot;
+  return (
+    <g>
+      <Beam
+        pts={[
+          { x: x + 4, y },
+          { x: x + 14, y: FLOOR - 4 },
+        ]}
+        w={5}
+        color={DARK_STEEL}
+      />
+      {[-1, 1].map((side) => (
+        <Beam
+          key={side}
+          pts={[
+            { x, y },
+            { x: x + side * 58, y: FLOOR - 4 },
+          ]}
+          w={6}
+          color="#ffb703"
+        />
+      ))}
+      {[-1, 1].map((side) => (
+        <rect key={side} x={x + side * 58 - 9} y={FLOOR - 8} width="18" height="8" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
+      ))}
+      <rect x={x - 12} y={y} width="24" height="22" rx="5" fill={DARK_STEEL} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+});
+
+/** The telescope's tube on its mount: it looks down at the mobile until the earth bonks it, then swings round to the sky, and its lens glints. */
+function Telescope({ space, t }: { space: Space; t: number }) {
+  const { pivot, front, back, lens } = SCOPE;
+  const angle = space.scopeAngle(t);
+  const tip = scopeTip(angle);
+  const glint = t - space.tGlint;
+  return (
+    <g>
+      <g transform={`translate(${pivot.x} ${pivot.y}) rotate(${angle})`}>
+        {/* Eyepiece behind, the tube widening to the front, gold rings, and a little finder on top */}
+        <rect x={-back - 4} y="-7" width="22" height="14" rx="3" fill={DARK_STEEL} stroke={INK} strokeWidth="2.5" />
+        <path
+          d={`M${-back + 14} -10 L${front - 14} -15 L${front - 14} 15 L${-back + 14} 10 Z`}
+          fill="#f4f5fb"
+          stroke={INK}
+          strokeWidth="3.5"
+          strokeLinejoin="round"
+        />
+        <rect x="18" y="-14" width="16" height="28" fill="#3a86ff" stroke={INK} strokeWidth="2.5" />
+        <line x1={-back + 22} y1="-6" x2="10" y2="-7" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.9" />
+        <rect x="-10" y="-22" width="34" height="9" rx="4" fill={STEEL} stroke={INK} strokeWidth="2.5" />
+        <rect x={front - 18} y={-lens - 3} width="20" height={2 * lens + 6} rx="5" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+        <ellipse cx={front + 2} rx="5" ry={lens - 2} fill="#8fd3ff" stroke={INK} strokeWidth="2.5" />
+        <circle r="8" fill={STEEL} stroke={INK} strokeWidth="2.5" />
+      </g>
+      {glint >= 0 && glint < 1.2 && (
+        <path
+          transform={`translate(${tip.x} ${tip.y}) scale(${2.2 * Math.exp(-glint * 2.5)}) rotate(${glint * 90})`}
+          d="M0 -16 L4 -4 L16 0 L4 4 L0 16 L-4 4 L-16 0 L-4 -4 Z"
+          fill="#fff7d6"
+        />
+      )}
+    </g>
+  );
+}
+
+const UFO_LIGHTS = [-60, -30, 0, 30, 60];
+
+/** The UFO with a little one-eyed alien under its glass dome, and its beam down to the ground while it is on. */
+function Ufo({ space, t }: { space: Space; t: number }) {
+  const ufo = space.ufoAt(t);
+  if (!ufo) return null;
+  const { pt, scale, tilt, waving, look } = ufo;
+  const beam = space.beamAt(t);
+  const top = pt.y + UFO_BELOW;
+  const rings = beam > 0 ? [0, 1, 2, 3] : [];
+  const hand = waving ? { x: 22 + 3 * Math.sin(t * 14), y: -44 + 4 * Math.abs(Math.sin(t * 7)) } : { x: 18, y: -16 };
+  return (
+    <g>
+      {beam > 0 && (
+        <g opacity={beam}>
+          <path d={`M${pt.x - 24} ${top} L${pt.x + 24} ${top} L${pt.x + 90} ${FLOOR} L${pt.x - 90} ${FLOOR} Z`} fill="#fff3a0" opacity="0.35" />
+          <path d={`M${pt.x - 12} ${top} L${pt.x + 12} ${top} L${pt.x + 46} ${FLOOR} L${pt.x - 46} ${FLOOR} Z`} fill="#fffbd0" opacity="0.35" />
+          {rings.map((i) => {
+            // Rings of light running up the beam.
+            const f = (t * 0.7 + i / rings.length) % 1;
+            const y = lerp(FLOOR, top, f);
+            const half = lerp(90, 24, f);
+            return <ellipse key={i} cx={pt.x} cy={y} rx={half} ry={half * 0.18} fill="none" stroke="#fffbd0" strokeWidth="3" opacity={0.8 * (1 - f)} />;
+          })}
+          <ellipse cx={pt.x} cy={FLOOR - 2} rx="92" ry="12" fill="#fff3a0" opacity="0.5" />
+        </g>
+      )}
+      <g transform={`translate(${pt.x} ${pt.y}) rotate(${tilt}) scale(${scale})`}>
+        {/* The alien under the dome */}
+        <path d="M-14 -4 Q-16 -20 -10 -24 L10 -24 Q16 -20 14 -4 Z" fill="#b98cff" stroke={INK} strokeWidth="2.5" />
+        <line x1="0" y1="-48" x2="5" y2="-60" stroke={INK} strokeWidth="2.5" />
+        <circle cx="5" cy="-61" r="4" fill="#ff7bd0" stroke={INK} strokeWidth="1.5" />
+        <circle cy="-34" r="16" fill="#b98cff" stroke={INK} strokeWidth="2.5" />
+        <circle cy="-37" r="8" fill="#fff" stroke={INK} strokeWidth="2" />
+        <circle cx={look.x * 3.5} cy={-37 + look.y * 3.5} r="4" fill={INK} />
+        <circle cx={look.x * 3.5 - 1.5} cy={-38.5 + look.y * 3.5} r="1.3" fill="#fff" />
+        <path d="M-6 -26 Q0 -21 6 -26" fill="none" stroke={INK} strokeWidth="2" strokeLinecap="round" />
+        <line x1="10" y1="-14" x2={hand.x} y2={hand.y} stroke={INK} strokeWidth="6" strokeLinecap="round" />
+        <line x1="10" y1="-14" x2={hand.x} y2={hand.y} stroke="#b98cff" strokeWidth="3" strokeLinecap="round" />
+        <circle cx={hand.x} cy={hand.y} r="4.5" fill="#b98cff" stroke={INK} strokeWidth="2" />
+        {/* The glass dome over it */}
+        <path d="M-38 -6 Q-38 -66 0 -66 Q38 -66 38 -6 Z" fill="#bde9ff" opacity="0.3" stroke={INK} strokeWidth="3" />
+        <path d="M-26 -30 Q-24 -52 -8 -58" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
+        {/* The saucer: rim, blinking lights, and the beam's lamp underneath */}
+        <ellipse cy="14" rx="32" ry="10" fill={beam > 0 ? "#fff3a0" : DARK_STEEL} stroke={INK} strokeWidth="3" />
+        <ellipse rx="82" ry="20" fill={STEEL} stroke={INK} strokeWidth="3.5" />
+        <path d="M-80 -2 Q0 -18 80 -2" fill="none" stroke="#ff5d73" strokeWidth="5" />
+        <path d="M-60 -10 Q-30 -16 -10 -16" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
+        {UFO_LIGHTS.map((x, i) => {
+          const on = Math.floor(t * 6) % UFO_LIGHTS.length === i;
+          return (
+            <circle
+              key={x}
+              cx={x}
+              cy={8 - Math.abs(x) * 0.06}
+              r="5.5"
+              fill={on ? "#ffd23f" : BAR_COLORS[i]}
+              stroke={INK}
+              strokeWidth="2"
+              opacity={on ? 1 : 0.75}
+            />
+          );
+        })}
+      </g>
+    </g>
+  );
+}
+
+const ROCK_SHAPE = Array.from({ length: 9 }, (_, i) => {
+  const a = (i / 9) * 2 * Math.PI;
+  const r = ROCK.r * (0.86 + 0.18 * Math.sin(i * 2.7));
+  return { x: r * Math.cos(a), y: r * Math.sin(a) * 0.9 };
+});
+
+/** The lumpy moon rock with a pink crystal, which sparkles while it is in the UFO's beam. */
+function MoonRock({ space, t }: { space: Space; t: number }) {
+  const { pt, spin } = space.rockAt(t);
+  const inBeam = space.beamAt(t) > 0 && t < space.tRelease;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y})`}>
+      {inBeam && <circle r={ROCK.r + 12} fill="#fff3a0" opacity={0.3 + 0.15 * Math.sin(t * 10)} />}
+      <g transform={`rotate(${spin})`}>
+        <path d={`${svgLine(ROCK_SHAPE)} Z`} fill="#b7aed6" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <circle cx="-7" cy="5" r="5" fill="#968cbf" />
+        <circle cx="9" cy="8" r="3.5" fill="#968cbf" />
+        <path d="M2 -16 L8 -30 L14 -16 Z M-4 -14 L-6 -25 L3 -16 Z" fill="#ff9bd7" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+        <circle cx="-8" cy="-7" r="3" fill="#fff" opacity="0.7" />
+      </g>
     </g>
   );
 }

@@ -16,17 +16,6 @@
   transform-origin: center;
 }
 
-/* Only with "Bild bewegt sich auch von allein" (.lively). */
-.scene.lively .wi-baum-light {
-  animation: wi-baum-glow 3s ease-in-out calc(var(--i) * 0.3s) infinite;
-}
-
-@keyframes wi-baum-glow {
-  50% {
-    opacity: 0.55;
-  }
-}
-
 /* ---------- Tannenbaum: the lights twinkle, the star shines, a present opens ---------- */
 
 .item-tannenbaum.playing .wi-baum-tree {

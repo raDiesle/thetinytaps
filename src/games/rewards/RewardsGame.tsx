@@ -6,7 +6,7 @@ import { useGameSettings } from "@/lib/common";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { takeFinishedStep } from "@/lib/routine";
 import { useStoredSettings } from "@/lib/storage";
-import { addStar, type Board, OLDEST_BACK, samePeriod, shiftPeriod, type StarLog, startOver, withKind } from "./board";
+import { addStar, type Board, isTemplateTitle, OLDEST_BACK, samePeriod, shiftPeriod, type StarLog, startOver, withKind } from "./board";
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
 import {
@@ -25,23 +25,36 @@ import { Editor } from "./Editor";
 import { TemplateGallery } from "./Gallery";
 import { BoardInfo, PlanInfo } from "./Info";
 import { loadLinkedDays } from "./linked";
-import { PanelButton, useComputer } from "./pageParts";
+import { PanelButton, PRINT, useComputer, VIEW } from "./pageParts";
 import { type Plan, parseRoutineStep, restartDay } from "./plan";
 import { PlanEditor } from "./PlanEditor";
 import { PlanGallery } from "./PlanGallery";
 import { PlanPrint } from "./PlanPrint";
 import { PlanScreen } from "./PlanScreen";
-import { usePlanTitle } from "./PlanSheet";
+import { TODAY, usePlanTitle } from "./PlanSheet";
 import { DEFAULT_PLANNER_SETTINGS, PLANNER_SETTINGS_KEY } from "./planSettings";
 import { PrintPanel } from "./PrintPanel";
-import { Review, usePeriodLabel } from "./Review";
+import { EARLIER, LATER, REVIEW, Review, usePeriodLabel, YESTERDAY } from "./Review";
 import { CHARTS_KEY, type ChartsSettings, DEFAULT_REWARDS_SETTINGS, firstVisit, NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, saved } from "./settings";
 import { type Draft, Wizard, type WizardStart } from "./Wizard";
 import "./rewards.css";
 import "./planner.css";
 
 /** The page's name, in the menu head and the browser tab. */
-export const REWARDS_TITLE: Localized = { de: "Sterne & Tagesplan" };
+export const REWARDS_TITLE: Localized = {
+  de: "Sterne & Tagesplan",
+  en: "Stars & Day Plan",
+  zh: "星星和日程表",
+  hi: "सितारे और दिन की योजना",
+  es: "Estrellas y plan del día",
+  ar: "النجوم وخطة اليوم",
+  ru: "Звёздочки и план дня",
+};
+
+/** „✏️ Gestalten“: the button on top and the heading of the editor below the chart. */
+const DESIGN: Localized = { de: "Gestalten", en: "Design", zh: "设计", hi: "डिज़ाइन", es: "Diseñar", ar: "تصميم", ru: "Оформление" };
+/** „🧩 Vorlagen“: beside the chart, and the button where there is no room for it. */
+const TEMPLATES_LABEL: Localized = { de: "Vorlagen", en: "Templates", zh: "模板", hi: "टेम्पलेट", es: "Plantillas", ar: "القوالب", ru: "Шаблоны" };
 
 type Panel = "info" | "edit" | "print" | "review";
 
@@ -120,7 +133,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const changePlan = (next: Plan) => updatePlans({ plans: plans.plans.map((p) => (p.id === plan.id ? next : p)) });
   const setKind = (kind: BoardKind) => {
     const template = TEMPLATES.find((tpl) => tpl.id === board.template);
-    changeBoard(withKind(board, kind, template?.title?.de));
+    changeBoard(withKind(board, kind, isTemplateTitle(board.title, template?.title) ? board.title : ""));
   };
   const setView = (view: PlanView) => changePlan({ ...plan, view });
   const show = (shown: ChartType) => {
@@ -247,8 +260,8 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   ) : (
     <div className="rw-main">
       {screen}
-      <aside className="rw-side" aria-label={t({ de: "Vorlagen" })}>
-        <h2 className="rw-side-title">🧩 {t({ de: "Vorlagen" })}</h2>
+      <aside className="rw-side" aria-label={t(TEMPLATES_LABEL)}>
+        <h2 className="rw-side-title">🧩 {t(TEMPLATES_LABEL)}</h2>
         {type === "board" ? (
           <TemplateGallery selected={board.template} onPick={pickTemplate} />
         ) : (
@@ -264,7 +277,11 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
       <div className="rw-first">
         <MenuHead
           to={category ? categoryHref(category) : "/"}
-          back={category ? t(category.title) : t({ de: "Alle Spiele" })}
+          back={
+            category
+              ? t(category.title)
+              : t({ de: "Alle Spiele", en: "All games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب", ru: "Все игры" })
+          }
           title={
             <>
               <span aria-hidden>🌟</span> {t(REWARDS_TITLE)}
@@ -278,11 +295,31 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
                 open={panel === "info"}
                 onClick={() => toggle("info")}
                 emoji="ℹ️"
-                label={type === "board" ? t({ de: "Über die Tafel" }) : t({ de: "Über den Plan" })}
+                label={
+                  type === "board"
+                    ? t({
+                        de: "Über die Tafel",
+                        en: "About the chart",
+                        zh: "关于奖励表",
+                        hi: "इनाम चार्ट के बारे में",
+                        es: "Sobre la tabla",
+                        ar: "عن اللوحة",
+                        ru: "О таблице",
+                      })
+                    : t({
+                        de: "Über den Plan",
+                        en: "About the plan",
+                        zh: "关于日程表",
+                        hi: "योजना के बारे में",
+                        es: "Sobre el plan",
+                        ar: "عن الخطة",
+                        ru: "О плане",
+                      })
+                }
               />
-              <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t({ de: "Gestalten" })} />
-              <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t({ de: "Drucken" })} />
-              {review && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t({ de: "Rückblick" })} />}
+              <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t(DESIGN)} />
+              <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t(PRINT)} />
+              {review && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t(REVIEW)} />}
             </div>
           )}
         </MenuHead>
@@ -312,7 +349,18 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
               {plan.view === "day" && <DayNav day={planDay} shift={-back} setShift={(shift) => setBack(-shift)} />}
             </div>
           )}
-          <nav className="rw-boards" aria-label={t({ de: "Tafeln und Pläne" })}>
+          <nav
+            className="rw-boards"
+            aria-label={t({
+              de: "Tafeln und Pläne",
+              en: "Charts and plans",
+              zh: "奖励表和日程表",
+              hi: "चार्ट और योजनाएँ",
+              es: "Tablas y planes",
+              ar: "اللوحات والخطط",
+              ru: "Таблицы и планы",
+            })}
+          >
             {boards.boards.map(
               (b) =>
                 (type === "board" || !untouched("board")) && (
@@ -342,10 +390,10 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
                 ),
             )}
             <button type="button" className="rw-add" aria-pressed={!!wizard && !wizard.start} onClick={() => openWizard()}>
-              ＋ {t({ de: "Neu" })}
+              ＋ {t({ de: "Neu", en: "New", zh: "新建", hi: "नया", es: "Nuevo", ar: "جديد", ru: "Создать" })}
             </button>
             <button type="button" className="rw-templates-button" onClick={() => openWizard()}>
-              🧩 {t({ de: "Vorlagen" })}
+              🧩 {t(TEMPLATES_LABEL)}
             </button>
           </nav>
         </div>
@@ -357,7 +405,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
       {computer && !wizard && (
         <div className="rw-below">
           <section id="rw-edit" className="rw-below-part">
-            <h2 className="rw-panel-title">✏️ {t({ de: "Gestalten" })}</h2>
+            <h2 className="rw-panel-title">✏️ {t(DESIGN)}</h2>
             {editor}
           </section>
           <section id="rw-print" className="rw-below-part">
@@ -381,7 +429,7 @@ function ViewSwitch<V extends string>({
 }) {
   const t = useT();
   return (
-    <div className="rw-views" role="group" aria-label={t({ de: "Ansicht" })}>
+    <div className="rw-views" role="group" aria-label={t(VIEW)}>
       {views.map((view) => (
         <button
           key={view.id}
@@ -407,11 +455,11 @@ function PeriodNav({ kind, day, back, setBack }: { kind: BoardKind; day: Date; b
   const label = usePeriodLabel();
   return (
     <span className="rw-period">
-      <button type="button" aria-label={t({ de: "Früher" })} disabled={back >= OLDEST_BACK[kind]} onClick={() => setBack(back + 1)}>
+      <button type="button" aria-label={t(EARLIER)} disabled={back >= OLDEST_BACK[kind]} onClick={() => setBack(back + 1)}>
         ‹
       </button>
       <span className={`rw-period-label${samePeriod(kind, day, new Date()) ? "" : " past"}`}>{label(kind, back, day)}</span>
-      <button type="button" aria-label={t({ de: "Später" })} disabled={back === 0} onClick={() => setBack(back - 1)}>
+      <button type="button" aria-label={t(LATER)} disabled={back === 0} onClick={() => setBack(back - 1)}>
         ›
       </button>
     </span>
@@ -424,19 +472,19 @@ function DayNav({ day, shift, setShift }: { day: Date; shift: number; setShift: 
   const { speechLang } = useAppLanguage();
   const label =
     shift === 0
-      ? t({ de: "Heute" })
+      ? t(TODAY)
       : shift === 1
-        ? t({ de: "Morgen" })
+        ? t({ de: "Morgen", en: "Tomorrow", zh: "明天", hi: "आने वाला कल", es: "Mañana", ar: "غدًا", ru: "Завтра" })
         : shift === -1
-          ? t({ de: "Gestern" })
+          ? t(YESTERDAY)
           : new Intl.DateTimeFormat(speechLang, { weekday: "short", day: "numeric", month: "numeric" }).format(day);
   return (
     <span className="rw-period">
-      <button type="button" aria-label={t({ de: "Früher" })} disabled={shift <= -DAYS_BACK} onClick={() => setShift(shift - 1)}>
+      <button type="button" aria-label={t(EARLIER)} disabled={shift <= -DAYS_BACK} onClick={() => setShift(shift - 1)}>
         ‹
       </button>
       <span className={`rw-period-label${shift === 0 ? "" : " past"}`}>{label}</span>
-      <button type="button" aria-label={t({ de: "Später" })} disabled={shift >= DAYS_AHEAD} onClick={() => setShift(shift + 1)}>
+      <button type="button" aria-label={t(LATER)} disabled={shift >= DAYS_AHEAD} onClick={() => setShift(shift + 1)}>
         ›
       </button>
     </span>

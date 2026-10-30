@@ -1,4 +1,4 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Ferkel, Hund, Kuh, Lamm, Pferd, Schaf, Schwein, Ziege } from "./animals";
@@ -7,7 +7,7 @@ import { Ente, Gans, Hahn, Huhn, Kueken, Storch } from "./birds";
 import { Bauernhaus, Bienenkorb, Huehnerstall, Scheune, Windmuehle } from "./buildings";
 import { Biene, Frosch, Hase, Katze, Maus, Schmetterling, Schnecke } from "./critters";
 import { Bauer, Traktor, Vogelscheuche } from "./farmer";
-import { BIENEN, HAUS, HEU, SCHEUNE, STALL, WIESE } from "./layout";
+import { BIENEN, HAUS, HEU, POND, SCHEUNE, STALL, TRACK_BOTTOM, TRACK_TOP, WIESE } from "./layout";
 import { Apfelbaum, Blumen, Heuballen, Kuerbis } from "./nature";
 import "./hof.css";
 
@@ -23,6 +23,14 @@ export const hof: Scene = {
   sky: "#8fd3ff",
   ground: "#74c365",
   Background,
+  // The pond splashes, a mole digs in the vegetable patch, a beetle crawls along the dirt track, the meadow grows flowers.
+  spots: [
+    { box: [POND[0] - POND[2], POND[1] - POND[3], 2 * POND[2], 2 * POND[3]], kinds: ["splash"] },
+    { box: [560, 800, 220, 72], kinds: ["mole"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, TRACK_TOP, 1600, TRACK_BOTTOM - TRACK_TOP], kinds: ["bug"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

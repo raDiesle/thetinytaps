@@ -279,7 +279,6 @@ export const en: LanguagePack = {
   keyboardRows: ["1234567890", "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"],
   countSentence: (n, thing) => `${en.numberWords[n]} ${n === 1 ? thing.singular : thing.plural}!`,
   praise: ["Super!", "Great!", "Well done!", "Hooray!", "Yay!"],
-  firstLetterPrompt: (word) => `${word.word}! What does ${word.word} start with?`,
   colors: relabel(de.colors, {
     "🔴": "Red",
     "🔵": "Blue",

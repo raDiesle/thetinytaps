@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { nth, sparklePath } from "../shared";
+import { Poke } from "../spots";
 import { ROCKET } from "./layout";
 
 // Deep blue space with tiny stars and a soft purple haze; at the horizon the moon's grey hills,
@@ -80,11 +81,13 @@ function Crater({ x, y, rx }: { x: number; y: number; rx: number }) {
   const s = depthScale(y);
   const far = y < 520;
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <ellipse cx="0" cy="0" rx={rx + 10} ry={(rx + 10) * 0.26} fill={far ? "#aeb1c8" : "#c9cbd8"} />
-      <ellipse cx="0" cy="1" rx={rx} ry={rx * 0.2} fill={far ? "#9295b0" : "#a3a6ba"} />
-      <path d={`M${-rx} 1 A${rx} ${rx * 0.2} 0 0 0 ${rx} 1 A${rx} ${rx * 0.12} 0 0 1 ${-rx} 1 Z`} fill={far ? "#a2a5bf" : "#b9bbcb"} />
-    </g>
+    <Poke kind="wobble">
+      <g transform={`translate(${x} ${y}) scale(${s})`}>
+        <ellipse cx="0" cy="0" rx={rx + 10} ry={(rx + 10) * 0.26} fill={far ? "#aeb1c8" : "#c9cbd8"} />
+        <ellipse cx="0" cy="1" rx={rx} ry={rx * 0.2} fill={far ? "#9295b0" : "#a3a6ba"} />
+        <path d={`M${-rx} 1 A${rx} ${rx * 0.2} 0 0 0 ${rx} 1 A${rx} ${rx * 0.12} 0 0 1 ${-rx} 1 Z`} fill={far ? "#a2a5bf" : "#b9bbcb"} />
+      </g>
+    </Poke>
   );
 }
 
@@ -114,12 +117,16 @@ export function Background() {
       <ellipse cx="1260" cy="260" rx="300" ry="50" fill="#f783ac" opacity="0.1" />
       <g fill="#fff">
         {STARS.map(([x, y, r], i) => (
-          <circle key={i} cx={x} cy={y} r={r} opacity={0.4 + (i % 3) * 0.2} />
+          <Poke key={i} kind="glow">
+            <circle cx={x} cy={y} r={r} opacity={0.4 + (i % 3) * 0.2} />
+          </Poke>
         ))}
       </g>
       <g fill="#fff3bf">
         {SPARKLES.map(([x, y, r], i) => (
-          <path key={i} className="wa-bgstar" d={sparklePath(x, y, r)} style={nth(i)} />
+          <Poke key={i} kind="glow">
+            <path className="wa-bgstar" d={sparklePath(x, y, r)} style={nth(i)} />
+          </Poke>
         ))}
       </g>
 
@@ -135,11 +142,13 @@ export function Background() {
         <Crater key={`${x}-${y}`} x={x} y={y} rx={rx} />
       ))}
       {PEBBLES.map(([x, y], i) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
-          <ellipse cx="0" cy="-6" rx={12 + (i % 3) * 4} ry="8" fill={y < 520 ? "#9a9db8" : "#a9abbf"} />
-          <ellipse cx="-3" cy="-9" rx={5 + (i % 3) * 2} ry="3" fill={y < 520 ? "#b2b5cc" : "#c7c9d7"} />
-          <ellipse cx="22" cy="-3" rx="7" ry="5" fill={y < 520 ? "#a3a6bf" : "#b5b7c8"} />
-        </g>
+        <Poke key={`${x}-${y}`} kind="hop">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
+            <ellipse cx="0" cy="-6" rx={12 + (i % 3) * 4} ry="8" fill={y < 520 ? "#9a9db8" : "#a9abbf"} />
+            <ellipse cx="-3" cy="-9" rx={5 + (i % 3) * 2} ry="3" fill={y < 520 ? "#b2b5cc" : "#c7c9d7"} />
+            <ellipse cx="22" cy="-3" rx="7" ry="5" fill={y < 520 ? "#a3a6bf" : "#b5b7c8"} />
+          </g>
+        </Poke>
       ))}
 
       {/* Tracks of the rover, running back towards the horizon */}
@@ -161,23 +170,25 @@ export function Background() {
       ))}
 
       {/* The rocket's launch pad and tower */}
-      <g transform={transformOf(ROCKET)}>
-        <path d="M-150 -6 V-330 M-118 -6 V-330" stroke="#868e96" strokeWidth="8" strokeLinecap="round" />
-        <path
-          d={`M-150 -20 ${Array.from({ length: 8 }, (_, i) => `L${i % 2 ? -150 : -118} ${-20 - (i + 1) * 38}`).join(" ")}`}
-          stroke="#adb5bd"
-          strokeWidth="5"
-          fill="none"
-        />
-        <rect x="-118" y="-306" width="72" height="12" rx="4" fill="#868e96" />
-        <rect x="-118" y="-186" width="72" height="12" rx="4" fill="#868e96" />
-        <rect x="-160" y="-344" width="52" height="16" rx="5" fill="#495057" />
-        <circle cx="-134" cy="-352" r="7" fill="#ff6b6b" />
-        <rect x="-176" y="-10" width="352" height="24" rx="6" fill="#868e96" />
-        <rect x="-176" y="-10" width="352" height="8" rx="4" fill="#adb5bd" />
-        <rect x="-44" y="-2" width="88" height="16" fill="#495057" />
-        <path d="M-160 14 H-120 M120 14 H160" stroke="#ffd60a" strokeWidth="6" strokeDasharray="10 10" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={transformOf(ROCKET)}>
+          <path d="M-150 -6 V-330 M-118 -6 V-330" stroke="#868e96" strokeWidth="8" strokeLinecap="round" />
+          <path
+            d={`M-150 -20 ${Array.from({ length: 8 }, (_, i) => `L${i % 2 ? -150 : -118} ${-20 - (i + 1) * 38}`).join(" ")}`}
+            stroke="#adb5bd"
+            strokeWidth="5"
+            fill="none"
+          />
+          <rect x="-118" y="-306" width="72" height="12" rx="4" fill="#868e96" />
+          <rect x="-118" y="-186" width="72" height="12" rx="4" fill="#868e96" />
+          <rect x="-160" y="-344" width="52" height="16" rx="5" fill="#495057" />
+          <circle cx="-134" cy="-352" r="7" fill="#ff6b6b" />
+          <rect x="-176" y="-10" width="352" height="24" rx="6" fill="#868e96" />
+          <rect x="-176" y="-10" width="352" height="8" rx="4" fill="#adb5bd" />
+          <rect x="-44" y="-2" width="88" height="16" fill="#495057" />
+          <path d="M-160 14 H-120 M120 14 H160" stroke="#ffd60a" strokeWidth="6" strokeDasharray="10 10" />
+        </g>
+      </Poke>
     </>
   );
 }

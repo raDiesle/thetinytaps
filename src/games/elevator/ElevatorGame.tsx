@@ -4,17 +4,18 @@ import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { useAppLanguage, useT } from "@/lib/language";
 import { ElevatorPlay } from "./ElevatorPlay";
+import { FilmPlay } from "./film/FilmPlay";
+import { FILMS } from "./film/films";
 import { titleIn } from "./phrases";
 import { DEFAULT_ELEVATOR_SETTINGS, ELEVATOR_SETTINGS_KEY, type ElevatorSettings } from "./settings";
 import { TRAIL_LEVELS } from "./trail/levels";
 import { TrailPlay } from "./trail/TrailPlay";
 import "./elevator.css";
 
-/** The small tags on the cards: which levels ride the lift in the house, which walk through the world. */
+/** The names of the card groups: which levels ride the lift in the house, which walk through the world, which are films. */
 const LIFT = { de: "🛗 Aufzug", ru: "🛗 Лифт", en: "🛗 Elevator", zh: "🛗 电梯", hi: "🛗 लिफ़्ट", es: "🛗 Ascensor", ar: "🛗 المصعد" };
 const TRAIL = { de: "🚶 Laufen", ru: "🚶 Пешком", en: "🚶 Walking", zh: "🚶 走路", hi: "🚶 पैदल", es: "🚶 A pie", ar: "🚶 مشيا" };
-/** A trail level on the water, where the child paddles a raft instead of walking. */
-const RAFT = { de: "🛶 Paddeln" };
+const FILM = { de: "🎬 Filme", ru: "🎬 Фильмы", en: "🎬 Films", zh: "🎬 电影", hi: "🎬 फ़िल्में", es: "🎬 Películas", ar: "🎬 أفلام" };
 
 /** "Kleine Abenteuer": the lift stories in the house and the trail levels through the world. */
 export function ElevatorGame() {
@@ -45,11 +46,12 @@ export function ElevatorGame() {
         { id: "ball", emoji: "⚽", title: title("Der Ball rollt weg"), kind: t(TRAIL) },
         { id: "ballon", emoji: "🎈", title: title("Der Luftballon"), kind: t(TRAIL) },
         { id: "lok", emoji: "🚂", title: title("Die kleine Lok"), kind: t(TRAIL) },
+        { id: "floss", emoji: "⛵", title: title("Das Floß"), kind: t(TRAIL) },
         { id: "sandburg", emoji: "🏖️", title: title("Die Sandburg"), kind: t(TRAIL) },
         { id: "picknick", emoji: "🧺", title: title("Picknick im Wald"), kind: t(TRAIL) },
-        { id: "floss", emoji: "⛵", title: title("Das Floß"), kind: t(RAFT) },
         { id: "katze", emoji: "🐈", title: title("Wo ist die Katze?"), kind: t(TRAIL) },
         { id: "schneemann", emoji: "⛄", title: title("Der Schneemann"), kind: t(TRAIL) },
+        { id: "feuerwehr", emoji: "🚒", title: title("Die Feuerwehr"), kind: t(FILM) },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}
@@ -75,6 +77,17 @@ export function ElevatorGame() {
               hi: "आख़िर में “फिर से” वही कहानी दोबारा चलाता है, “आगे” अगली कहानी।",
               es: "Al final, «Otra vez» vuelve a jugar la misma historia y «Siguiente», la próxima.",
               ar: "في النهاية يعيد زر «مرة أخرى» القصة نفسها، وزر «التالي» يبدأ القصة التالية.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Ein Film erzählt eine Geschichte von Ort zu Ort. Das Kind tippt, wo es leuchtet, und wählt zwischendurch, wie es weitergeht – jede Wahl ist richtig. Unten zeigt ein Streifen die Bilder des Films.",
+              ru: "Фильм рассказывает историю, переходя с места на место. Ребёнок нажимает туда, где светится, и время от времени выбирает, что будет дальше, – любой выбор правильный. Внизу полоска показывает кадры фильма.",
+              en: "A film tells a story from place to place. The child taps where something glows and now and then chooses how it goes on – every choice is right. A strip at the bottom shows the pictures of the film.",
+              zh: "影片从一个地方到另一个地方讲述一个故事。孩子点击发光的地方，中途选择故事怎么继续——每个选择都是对的。下方的一条画面带显示影片的各个画面。",
+              hi: "फ़िल्म एक जगह से दूसरी जगह जाते हुए कहानी सुनाती है। बच्चा वहाँ टैप करता है जहाँ कुछ चमकता है, और बीच-बीच में चुनता है कि आगे क्या हो – हर चुनाव सही है। नीचे एक पट्टी फ़िल्म की तस्वीरें दिखाती है।",
+              es: "Una película cuenta una historia de lugar en lugar. Su peque toca donde algo brilla y de vez en cuando elige cómo sigue: toda elección es correcta. Abajo, una tira muestra las imágenes de la película.",
+              ar: "يروي الفيلم قصة تنتقل من مكان إلى آخر. يلمس الطفل المكان الذي يضيء، ويختار بين حين وآخر كيف تستمر القصة، وكل اختيار صحيح. وفي الأسفل يعرض شريط صور الفيلم.",
             })}
           </p>
           {!device.touchOnly && (
@@ -104,6 +117,8 @@ function Stories({ settings }: { settings: ElevatorSettings }) {
   const [run, setRun] = useState({ story: settings.story, n: 0 });
   const pick = (story: string) => setRun((r) => ({ story, n: r.n + 1 }));
   const level = TRAIL_LEVELS.find((l) => l.id === run.story);
+  const film = FILMS.find((f) => f.id === run.story);
+  if (film) return <FilmPlay key={run.n} language={language} settings={settings} film={film} onPick={pick} />;
   return level ? (
     <TrailPlay key={run.n} language={language} settings={settings} level={level} onPick={pick} />
   ) : (

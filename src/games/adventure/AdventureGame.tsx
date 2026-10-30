@@ -17,7 +17,7 @@ const STORIES: { id: AdventureStoryId; emoji: string; story: Story }[] = [
   { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP },
 ];
 
-/** The start screen: no options of its own, read aloud, sounds, music and Tapsi's language come from the home page. */
+/** The start screen: no options of its own, music and Tapsi's language come from the home page. */
 export function AdventureGame() {
   const [settings, update] = useStoredSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
@@ -112,13 +112,13 @@ export function AdventureGame() {
           </p>
           <p>
             {t({
-              de: "Ob Tapsi spricht, Töne und Musik stellt ⚙️ auf der Startseite für alle Spiele ein, die Sprache 🌐.",
-              en: "Whether Tapsi talks, sounds and music are set with ⚙️ on the home page for all games, the language with 🌐.",
-              zh: "塔普西是否说话、声音和音乐，都在首页的 ⚙️ 里为所有游戏统一设置，语言用 🌐。",
-              hi: "टैप्सी बोले या नहीं, आवाज़ें और संगीत मुख्य पेज पर ⚙️ से सभी खेलों के लिए तय होते हैं, भाषा 🌐 से।",
-              es: "Si Tapsi habla, los sonidos y la música se ajustan con ⚙️ en la página de inicio para todos los juegos; el idioma, con 🌐.",
-              ar: "هل يتكلم تابسي، والأصوات والموسيقى، كلها تُضبط من ⚙️ في الصفحة الرئيسية لجميع الألعاب، واللغة من 🌐.",
-              ru: "Говорит ли Тапси, звуки и музыку настраивает ⚙️ на главной странице для всех игр, язык – 🌐.",
+              de: "Tapsi spricht immer. Die Musik stellt 🎵 auf der Startseite für alle Spiele ein, die Sprache 🌐.",
+              en: "Tapsi always speaks. 🎵 on the home page sets the music for all games, 🌐 the language.",
+              zh: "塔普西一直会说话。首页上的 🎵 为所有游戏设置音乐，🌐 设置语言。",
+              hi: "टैप्सी हमेशा बोलता है। मुखपृष्ठ पर 🎵 सभी खेलों का संगीत तय करता है, 🌐 भाषा।",
+              es: "Tapsi siempre habla. 🎵 en la página de inicio ajusta la música de todos los juegos, y 🌐 el idioma.",
+              ar: "تابسي يتكلم دائمًا. يضبط 🎵 في الصفحة الرئيسية الموسيقى لكل الألعاب، و🌐 اللغة.",
+              ru: "Тапси говорит всегда. 🎵 на главной странице включает музыку для всех игр, 🌐 – язык.",
             })}
             {language.id !== app.id &&
               t({

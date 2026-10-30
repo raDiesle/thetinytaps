@@ -5,15 +5,6 @@
   transform-origin: center;
 }
 
-/* Only with "Bild bewegt sich auch von allein" (.lively). */
-.scene.lively .weather-fall {
-  animation: weather-fall var(--fall) linear var(--delay) infinite;
-}
-
-.scene.lively .weather-leaf .weather-sway {
-  animation: weather-sway 2.4s ease-in-out calc(var(--i) * -0.5s) infinite alternate;
-}
-
 @keyframes weather-fall {
   from {
     transform: translateY(var(--from));

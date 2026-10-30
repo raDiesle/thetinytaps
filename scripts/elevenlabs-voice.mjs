@@ -1,19 +1,21 @@
-// Records what Tapsi says in the Bewegungsabenteuer with ElevenLabs: a warm, cheerful
-// coach voice for toddlers, one MP3 per line in the story's stimme/ folder
-// (src/games/adventure/stories/<story>/stimme/<hash of the text>.mp3), and the same
-// for every translation of the lines (lines.<language>.ts → stimme/<language>/<language>-<hash>.mp3).
-// The game plays them (src/games/adventure/voice.ts) and falls back to the browser's
-// voice for a line that has no recording.
+// Records what the games say with ElevenLabs: a warm, cheerful coach voice for toddlers (Tapsi), one MP3 per
+// line. Tapsi's lines in the Bewegungsabenteuer go into the story's stimme/ folder
+// (src/games/adventure/stories/<story>/stimme/<hash of the text>.mp3), and the same for every translation of
+// the lines (lines.<language>.ts → stimme/<language>/<language>-<hash>.mp3); the other games that are recorded
+// (Zähne putzen, Kleine Abenteuer, the good-night sentence) list their lines in every language in
+// src/content/recordedLines.ts, into the game's own stimme/ folder the same way. src/lib/voice.ts plays them;
+// a line without a recording stays silent.
 //
 //   bun run voice credits                       credits left this month
 //   bun run voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
 //   bun run voice save <1|2|3> ["<name>"]       keeps a draft as the voice (src/games/adventure/stimme.json)
 //   bun run voice try "<text>" [--kind turn] [--lang en]   one line with the voice, into .voice-raw/probe.mp3
-//   bun run voice make [--dry] [--lang de,en] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
+//   bun run voice make [--dry] [--lang de,en] [--only zaehne,gute-nacht] [--redo "<part of a line>"] [--kind again] [--all] [--no-tags]
 //                                            records every line that has no recording yet, in all
-//                                            languages or those of --lang (and again: lines with
-//                                            that text part, of that kind, or all); --model eleven_v4_turbo
-//                                            costs half, --no-tags leaves out how a line is said
+//                                            languages or those of --lang, of every story and game or
+//                                            those of --only (and again: lines with that text part, of
+//                                            that kind, or all); --model eleven_v4_turbo costs half,
+//                                            --no-tags leaves out how a line is said
 //
 // `make` only records what is missing (a line changed → new hash → new file) and
 // deletes recordings no line uses any more, so running it again costs nothing.
@@ -22,6 +24,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { plugin } from "bun";
 
 const API = "https://api.elevenlabs.io/v1";
 const ADVENTURE = "src/games/adventure";
@@ -55,6 +58,7 @@ const TAGS = {
   again: "[enthusiastically]",
   more: "[encouraging]",
   praise: "[proud]",
+  calm: "[softly]",
 };
 
 function fail(message) {
@@ -70,7 +74,7 @@ const values = {};
 const rest = [];
 for (let i = 0; i < argv.length; i++) {
   const a = argv[i];
-  if (a === "--redo" || a === "--kind" || a === "--model" || a === "--lang") {
+  if (a === "--redo" || a === "--kind" || a === "--model" || a === "--lang" || a === "--only") {
     if (i + 1 >= argv.length) fail(`${a} needs a value`);
     values[a.slice(2)] = argv[++i];
   } else if (a.startsWith("--")) flags.add(a.slice(2));
@@ -105,12 +109,12 @@ async function credits() {
   return { used, limit, left: limit - used };
 }
 
-/** Credits per character of a model (eleven_v4_turbo costs half), 1 if the service does not say. */
-async function rate(model) {
-  const response = await call("/models", { soft: true });
-  const found = response && (await response.json()).find((m) => m.model_id === model);
-  return found?.model_rates?.character_cost_multiplier ?? 1;
-}
+/**
+ * Credits a character really costs with the turbo model, as measured in October 2026: 0.096 (10,399 characters for
+ * 995), 0.078 (6,398 for 498) and 0.102 (34,408 for 3,506). The service's own `character_cost_multiplier` (0.5) is five times too high and once
+ * stopped a run that would have fit, so the check before a run goes by this, a little above both.
+ */
+const CREDITS_PER_CHARACTER = 0.1;
 
 function readConfig() {
   if (!existsSync(CONFIG)) fail(`No voice yet: run "bun run voice design", listen, then "bun run voice save <1|2|3>"`);
@@ -138,12 +142,21 @@ async function record(config, text, seed, language) {
 // ---------- The lines ----------
 
 const load = (path) => import(pathToFileURL(resolve(path)).href);
-const { recordingName, spokenLines, voiceId } = await load(join(ADVENTURE, "voiceId.ts"));
+// The games' data imports like the app's (`…?glob`) and reads translations loaded by language, as in the tests.
+plugin((await load("tools/appPlugin.ts")).appPlugin());
+const { loadTexts, TEXTS_LANGUAGES } = await load("src/content/texts/index.ts");
+await Promise.all(TEXTS_LANGUAGES.map(loadTexts));
+const { recordingName, voiceId } = await load("src/lib/voiceName.ts");
+const { spokenLines } = await load(join(ADVENTURE, "voiceId.ts"));
+const { RECORDED_GAMES, RECORDED_LANGUAGES } = await load("src/content/recordedLines.ts");
 const { DEFAULT_TURN, translateLines } = await load(join(STORIES, "story.ts"));
 /** The languages asked for with --lang, or null for all. */
 const LANGUAGES = values.lang ? new Set(values.lang.split(",")) : null;
 
-/** Every story in every language: its lines and the folder of their recordings. */
+/** The stories and games asked for with --only (by name, "treasureIsland", "zaehne"), or null for all. */
+const ONLY = values.only ? new Set(values.only.split(",")) : null;
+
+/** Every story and recorded game in every language: its lines and the folder of their recordings. */
 async function stories() {
   const found = [];
   for (const entry of readdirSync(STORIES, { withFileTypes: true })) {
@@ -164,7 +177,15 @@ async function stories() {
       });
     }
   }
-  return found.filter((story) => !LANGUAGES || LANGUAGES.has(story.language));
+  for (const game of RECORDED_GAMES) {
+    for (const language of RECORDED_LANGUAGES) {
+      const lines = game.lines(language);
+      if (!lines.length) continue;
+      const folder = language === "de" ? game.folder : join(game.folder, language);
+      found.push({ name: language === "de" ? game.name : `${game.name}/${language}`, language, folder, lines });
+    }
+  }
+  return found.filter((story) => (!LANGUAGES || LANGUAGES.has(story.language)) && (!ONLY || ONLY.has(story.name.split("/")[0])));
 }
 
 // ---------- Commands ----------
@@ -232,13 +253,15 @@ async function make() {
   const byStory = Object.entries(Object.groupBy(todo, (line) => line.story.name)).map(
     ([name, lines]) => `${name} ${lines.reduce((sum, line) => sum + spoken(line).length, 0)}`,
   );
-  console.log(`${todo.length} lines to record, ${characters} characters (≈ credits)${byStory.length > 1 ? `: ${byStory.join(", ")}` : ""}`);
+  console.log(
+    `${todo.length} lines to record, ${characters} characters, ≈ ${Math.ceil(characters * CREDITS_PER_CHARACTER)} credits${byStory.length > 1 ? ` (characters: ${byStory.join(", ")})` : ""}`,
+  );
   if (flags.has("dry")) {
     for (const line of todo) console.log(`  ${line.story.name}/${recordingName(line.text, line.story.language)}  ${spoken(line)}`);
     return;
   }
   if (!todo.length) return;
-  const needed = Math.ceil(characters * (await rate(values.model ?? config.model)));
+  const needed = Math.ceil(characters * CREDITS_PER_CHARACTER);
   const before = await credits();
   if (!before) console.log('The key may not read the credits ("User: Read" on elevenlabs.io), so they are not checked.');
   else if (before.left < needed) fail(`Only ${before.left} credits left this month, ${needed} needed`);

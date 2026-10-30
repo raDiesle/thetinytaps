@@ -1163,4 +1163,4 @@ const schneemann: TrailLevel = {
 };
 
 /** All trail levels, in the order of their cards. */
-export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, sandburg, picknick, floss, katze, schneemann];
+export const TRAIL_LEVELS: TrailLevel[] = [drachen, ball, ballon, lok, floss, sandburg, picknick, katze, schneemann];

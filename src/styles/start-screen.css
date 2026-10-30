@@ -378,14 +378,6 @@ kbd {
   max-width: 1040px;
 }
 
-.mode-heading {
-  margin: 0;
-  padding: 4px 20px;
-  border-radius: 999px;
-  background: #ffffffb0;
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
-}
-
 .mode-level {
   padding: 10px 20px;
   border: 3px solid var(--ink);
@@ -402,6 +394,18 @@ kbd {
 
 .mode-level .toggle {
   margin-top: 8px;
+}
+
+/* A choice in the menu's head (Lebendige Bilder's modes): only its buttons, without a frame, so the cards keep the room. */
+.menu-head > .mode-level {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.menu-head > .mode-level .choice button {
+  min-height: 40px;
+  padding: 4px 14px;
 }
 
 .mode-list {
@@ -462,6 +466,11 @@ kbd {
   border: 3px solid rgb(42 30 92 / 0.18);
   border-radius: 46px;
   background: rgb(255 255 255 / 0.45);
+}
+
+/* A group without a name (the home page's category cards) stands on no frame. */
+.mode-group-bare::before {
+  content: none;
 }
 
 .mode-group-cards {
@@ -676,6 +685,29 @@ kbd {
     padding: 4px 14px;
     border-radius: 22px;
     font-size: 0.95rem;
+  }
+
+  /* On a phone it goes into the top row next to the back link: smaller, and without its label. */
+  .menu-head > .mode-level {
+    font-size: 0.85rem;
+  }
+
+  .menu-head > .mode-level .choice {
+    gap: 6px;
+  }
+
+  .menu-head > .mode-level legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+
+  .menu-head > .mode-level .choice button {
+    min-width: 0;
+    padding: 4px 8px;
+    box-shadow: 0 4px 0 var(--ink);
   }
 
   .mode-list:not(.fit) .mode-card .game-emoji {

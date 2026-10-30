@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { GameShell } from "@/components/GameShell";
+import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { TouchKeysSetting, useTouchKeys } from "@/components/TouchKeyboard";
 import { hasCase, sampleLetter, useLanguagePack } from "@/content/languages";
@@ -15,13 +17,20 @@ import {
   type WordKind,
   type WordLength,
   type WordTyping,
+  upgradeLegacyMode,
 } from "./settings";
 import { FindPlay } from "./FindPlay";
 import { LettersPlay } from "./LettersPlay";
 import { WordsPlay } from "./WordsPlay";
 
 export function LettersGame() {
-  const [settings, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
+  const [saved, update] = useGameSettings(LETTERS_SETTINGS_KEY, DEFAULT_LETTERS_SETTINGS);
+  // Zählen and „Wo ist das B?“ saved as ways to play of their own become the options they are now, once.
+  const legacy = upgradeLegacyMode(saved);
+  useEffect(() => {
+    if (legacy) update(legacy);
+  }, []);
+  const settings: LettersSettings = legacy ? { ...saved, ...legacy } : saved;
   const pack = useLanguagePack();
   // Hindi and Arabic letters have one form only: no choice of big and small letters, the games show that one.
   const cased = hasCase(pack);
@@ -32,15 +41,6 @@ export function LettersGame() {
   const a = pack.letters[0];
   const t = useT();
   const quote = (text: string) => t({ de: `„${text}“`, ru: `«${text}»`, en: `“${text}”`, zh: `“${text}”`, hi: `“${text}”`, es: `«${text}»`, ar: `«${text}»` });
-  const findTitle = t({
-    de: `Wo ist das ${b.upper}?`,
-    ru: `Где буква ${b.upper}?`,
-    en: `Where is the ${b.upper}?`,
-    zh: `${b.upper}在哪里？`,
-    hi: `${b.upper} कहाँ है?`,
-    es: `¿Dónde está la ${b.upper}?`,
-    ar: `أين حرف ${b.upper}؟`,
-  });
   const freeTitle = t({
     de: "Frei tippen",
     ru: "Печатать что хочешь",
@@ -50,7 +50,6 @@ export function LettersGame() {
     es: "Teclear libre",
     ar: "كتابة حرة",
   });
-  const countTitle = t({ de: "Zählen", ru: "Считаем", en: "Counting", zh: "数一数", hi: "गिनती", es: "Contar", ar: "العدّ" });
   const wordsTitle = t({
     de: "Wörter tippen",
     ru: "Печатаем слова",
@@ -61,10 +60,28 @@ export function LettersGame() {
     ar: "كتابة كلمات",
   });
   const all = t({ de: "🌈 Alle", ru: "🌈 Все", en: "🌈 All", zh: "🌈 全部", hi: "🌈 सब", es: "🌈 Todas", ar: "🌈 الكل" });
-  // Free typing and Zählen: the keys on every touch screen, the other modes only on tablets.
-  const anyTouch = settings.mode === "free" || settings.mode === "count";
+  // Free typing: the keys on every touch screen, Wörter tippen only on tablets.
+  const anyTouch = settings.mode === "free";
   const touchKeys = useTouchKeys(settings.touchKeys, anyTouch);
   const pictureWords = settings.wordKind === "nouns" || settings.wordKind === "all";
+  /** Wörter tippen with the first letter only: a letter and its picture, and the child finds its key („Wo ist das B?“). */
+  const findLetter = settings.mode === "words" && settings.wordTyping === "first";
+
+  const showWord = (
+    <Toggle
+      label={t({
+        de: "Wort unter dem Bild anzeigen",
+        ru: "Показывать слово под картинкой",
+        en: "Show the word under the picture",
+        zh: "在图片下显示词语",
+        hi: "तस्वीर के नीचे शब्द दिखाएँ",
+        es: "Mostrar la palabra bajo el dibujo",
+        ar: "عرض الكلمة تحت الصورة",
+      })}
+      checked={settings.showWord}
+      onChange={(showWord) => update({ showWord })}
+    />
+  );
 
   return (
     <GameShell
@@ -80,92 +97,26 @@ export function LettersGame() {
       emoji="🔤"
       modes={[
         { id: "free", emoji: "⌨️", title: freeTitle },
-        { id: "count", emoji: "🔢", title: countTitle },
-        { id: "find", emoji: "🔍", title: findTitle },
         { id: "words", emoji: "✍️", title: wordsTitle },
       ]}
       mode={settings.mode}
       onMode={(mode) => update({ mode: mode as LettersMode })}
-      level={
-        // Always in sight above the cards: the letters for every mode, then what „Wörter tippen“ plays.
-        <div className="letters-level">
-          {cased && (
-            <Choice<LetterCase>
-              label={t({ de: "Buchstaben", ru: "Буквы", en: "Letters", zh: "字母", hi: "अक्षर", es: "Letras", ar: "الحروف" })}
-              value={settings.letterCase}
-              onChange={(letterCase) => update({ letterCase })}
-              options={[
-                { value: "upper", label: a.upper },
-                { value: "both", label: `${a.upper} ${a.lower}` },
-                { value: "lower", label: a.lower },
-              ]}
-            />
-          )}
-          <Choice<WordTyping>
-            label={`✍️ ${wordsTitle}`}
-            value={settings.wordTyping}
-            onChange={(wordTyping) => update({ wordTyping })}
-            options={[
-              {
-                value: "spell",
-                label: t({ de: "Ganzes Wort", ru: "Целое слово", en: "Whole word", zh: "整个词", hi: "पूरा शब्द", es: "Palabra entera", ar: "الكلمة كاملة" }),
-              },
-              {
-                value: "first",
-                label: t({
-                  de: "Erster Buchstabe",
-                  ru: "Первая буква",
-                  en: "First letter",
-                  zh: "第一个字母",
-                  hi: "पहला अक्षर",
-                  es: "Primera letra",
-                  ar: "الحرف الأول",
-                }),
-              },
-            ]}
-          />
-          <Choice<WordKind>
-            label={t({ de: "Wörter", ru: "Слова", en: "Words", zh: "词语", hi: "शब्द", es: "Palabras", ar: "الكلمات" })}
-            value={settings.wordKind}
-            onChange={(wordKind) => update({ wordKind })}
-            options={[
-              {
-                value: "nouns",
-                label: t({ de: "🐻 Substantive", ru: "🐻 Предметы", en: "🐻 Things", zh: "🐻 事物", hi: "🐻 चीज़ें", es: "🐻 Cosas", ar: "🐻 أشياء" }),
-              },
-              { value: "all", label: all },
-              { value: "colors", label: t({ de: "🎨 Farben", ru: "🎨 Цвета", en: "🎨 Colors", zh: "🎨 颜色", hi: "🎨 रंग", es: "🎨 Colores", ar: "🎨 ألوان" }) },
-              {
-                value: "actions",
-                label: t({
-                  de: "🦘 Tu-Wörter",
-                  ru: "🦘 Слова-действия",
-                  en: "🦘 Doing words",
-                  zh: "🦘 动作词",
-                  hi: "🦘 क्रिया-शब्द",
-                  es: "🦘 Acciones",
-                  ar: "🦘 حركات",
-                }),
-              },
-            ]}
-          />
-          {/* Colours and doing words are short fixed lists, so the length only applies to the picture words. */}
-          {pictureWords && (
-            <Choice<WordLength>
-              label={t({ de: "Wortlänge", ru: "Длина слова", en: "Word length", zh: "字母数", hi: "शब्द की लंबाई", es: "Longitud", ar: "طول الكلمة" })}
-              value={settings.wordLength}
-              onChange={(wordLength) => update({ wordLength })}
-              options={[
-                { value: "3", label: "3" },
-                { value: "4", label: "4" },
-                { value: "7", label: "7" },
-              ]}
-            />
-          )}
-        </div>
-      }
+      // Nothing to choose first: the card on the home page plays the way played last at once, and every option is
+      // changed while playing (⚙️ held in the top left corner). The start screen shows only after ✕ or „Menü“.
+      startMode={settings.mode}
       info={
         <>
+          <p>
+            {t({
+              de: "Das Spiel beginnt sofort. Die Einstellungen öffnen sich im Spiel: ⚙️ oben links gedrückt halten. Dort wechselt man auch zwischen Frei tippen und Wörter tippen.",
+              en: "The game starts right away. The settings open during play: press and hold ⚙️ in the top left corner. That's also where you switch between Free typing and Typing words.",
+              zh: "游戏马上开始。设置在游戏中打开：按住左上角的 ⚙️。在那里也可以在“随便按”和“拼词语”之间切换。",
+              hi: "खेल तुरंत शुरू होता है। सेटिंग्स खेल के दौरान खुलती हैं: ऊपर बाईं ओर ⚙️ दबाकर रखें। वहीं आप आज़ाद टाइपिंग और शब्द टाइपिंग के बीच भी बदल सकते हैं।",
+              es: "El juego empieza enseguida. Los ajustes se abren durante el juego: mantenga pulsado ⚙️ arriba a la izquierda. Ahí también se cambia entre Teclear libre y Escribir palabras.",
+              ar: "تبدأ اللعبة فورًا. تُفتح الإعدادات أثناء اللعب: اضغطوا مطولًا على ⚙️ في الزاوية العلوية اليسرى. وهناك أيضًا تبدّلون بين كتابة حرة وكتابة كلمات.",
+              ru: "Игра начинается сразу. Настройки открываются в игре: удерживайте ⚙️ в левом верхнем углу. Там же можно переключаться между «Печатать что хочешь» и «Печатаем слова».",
+            })}
+          </p>
           <p>
             {t({
               de: `Frei tippen: Jede Taste zeigt ihren Buchstaben groß mit einem Bild dazu, „${b.upper} wie ${word}“. Eine Zahl zeigt so viele Dinge – auf einmal, vorgezählt, Schritt für Schritt oder zum selbst Antippen.`,
@@ -179,35 +130,35 @@ export function LettersGame() {
           </p>
           <p>
             {t({
-              de: "Zählen: Nur Zahlen kommen, jede mit so vielen Dingen. Eine Ziffer zeigt sich selbst, jede andere Taste bringt eine Zahl zufällig.",
-              ru: "Считаем: появляются только цифры, каждая с таким же числом вещей. Цифра показывает саму себя, любая другая клавиша – случайную цифру.",
-              en: "Counting: only numbers come, each with that many things. A digit shows itself, any other key brings a number by chance.",
-              zh: "数一数：只出现数字，每个数字配上同样多的东西。按数字键就显示那个数字，按别的键会随机出现一个数字。",
-              hi: "गिनती: सिर्फ़ अंक आते हैं, हर एक के साथ उतनी ही चीज़ें। अंक वाला बटन वही अंक दिखाता है, कोई और बटन कोई भी अंक ले आता है।",
-              es: "Contar: solo salen números, cada uno con tantas cosas. Una cifra se muestra a sí misma; cualquier otra tecla trae un número al azar.",
-              ar: "العدّ: تظهر الأرقام فقط، كل رقم مع أشياء بعدده. زر الرقم يعرض الرقم نفسه، وأي زر آخر يأتي برقم عشوائي.",
+              de: "Nur Zahlen: Nur Zahlen kommen, jede mit so vielen Dingen. Eine Ziffer zeigt sich selbst, jede andere Taste bringt eine Zahl zufällig. Auf Wunsch erscheinen erst die Dinge und die Ziffer erst, wenn dieselbe Zahl gleich nochmal gedrückt wird.",
+              en: "Only numbers: only numbers come, each with that many things. A digit shows itself, any other key brings a number at random. If you like, the things appear first, and the digit only when the same number is pressed again right after.",
+              zh: "只有数字：只出现数字，每个数字配同样多的东西。按数字键就显示那个数字，按其他键会随机出现一个数字。也可以设置成先出现东西，马上再按一次同一个数字时才显示数字。",
+              hi: "सिर्फ़ अंक: सिर्फ़ अंक आते हैं, हर एक उतनी ही चीज़ों के साथ। अंक वाला बटन वही अंक दिखाता है, कोई और बटन कोई भी अंक ले आता है। चाहें तो पहले चीज़ें आती हैं और अंक तभी, जब वही अंक तुरंत दोबारा दबाया जाए।",
+              es: "Solo números: solo salen números, cada uno con tantas cosas. Una cifra se muestra a sí misma; cualquier otra tecla trae un número al azar. Si se desea, primero aparecen las cosas y la cifra solo cuando se vuelve a pulsar enseguida el mismo número.",
+              ar: "أرقام فقط: لا تأتي إلا الأرقام، كل رقم مع عدد مماثل من الأشياء. الرقم يُظهر نفسه، وأي زر آخر يأتي برقم عشوائي. وإن شئتم، تظهر الأشياء أولًا، ولا يظهر الرقم إلا عند الضغط على الرقم نفسه مرة أخرى فورًا.",
+              ru: "Только цифры: появляются только числа, каждое со столькими же вещами. Цифра показывает саму себя, любая другая клавиша – случайное число. По желанию сначала появляются вещи, а цифра – только когда то же число сразу нажимают ещё раз.",
             })}
           </p>
           <p>
             {t({
-              de: `Wo ist das ${b.upper}? Ein Buchstabe und sein Bild erscheinen, und das Kind sucht die Taste dafür.`,
-              ru: `Где ${b.upper}? Появляются буква и её картинка, и ребёнок ищет нужную клавишу.`,
-              en: `Where is the ${b.upper}? A letter and its picture appear, and the child looks for its key.`,
-              zh: `${b.upper}在哪里？屏幕上出现一个字母和它的图片，孩子去找对应的键。`,
-              hi: `${b.upper} कहाँ है? एक अक्षर और उसकी तस्वीर दिखती है, और बच्चा उसका बटन ढूँढता है।`,
-              es: `¿Dónde está la ${b.upper}? Aparecen una letra y su dibujo, y hay que buscar su tecla.`,
-              ar: `أين حرف ${b.upper}؟ يظهر حرف وصورته، ويبحث الطفل عن زره.`,
+              de: "Wörter tippen, Ganzes Wort: Ein Bild erscheint mit seinem Wort, und das Kind tippt es Buchstabe für Buchstabe.",
+              ru: "Целое слово: появляется картинка со своим словом, и ребёнок печатает его буква за буквой.",
+              en: "Whole word: a picture appears with its word, and the child types it letter by letter.",
+              zh: "整个词：出现一张图片和它的词语，孩子一个字母一个字母地打出它的拼音（不用打声调）。",
+              hi: "पूरा शब्द: एक तस्वीर अपने शब्द के साथ आती है, और बच्चा उसे अक्षर-अक्षर टाइप करता है – मात्रा अपने अक्षर के साथ अपने आप आ जाती है।",
+              es: "Palabra entera: aparece un dibujo con su palabra, y se escribe letra a letra (los acentos no hacen falta).",
+              ar: "الكلمة كاملة: تظهر صورة مع كلمتها، ويكتبها الطفل حرفا حرفا.",
             })}
           </p>
           <p>
             {t({
-              de: "Ganzes Wort: Ein Bild erscheint mit seinem Wort, und das Kind tippt es Buchstabe für Buchstabe. Erster Buchstabe: nur den Anfang zum Bild.",
-              ru: "Целое слово: появляется картинка со своим словом, и ребёнок печатает его буква за буквой. Первая буква: только начало слова к картинке.",
-              en: "Whole word: a picture appears with its word, and the child types it letter by letter. First letter: only the start of the picture's word.",
-              zh: "整个词：出现一张图片和它的词语，孩子一个字母一个字母地打出它的拼音（不用打声调）。第一个字母：只打拼音的第一个字母。",
-              hi: "पूरा शब्द: एक तस्वीर अपने शब्द के साथ आती है, और बच्चा उसे अक्षर-अक्षर टाइप करता है – मात्रा अपने अक्षर के साथ अपने आप आ जाती है। पहला अक्षर: सिर्फ़ शब्द की शुरुआत।",
-              es: "Palabra entera: aparece un dibujo con su palabra, y se escribe letra a letra (los acentos no hacen falta). Primera letra: solo el comienzo de la palabra.",
-              ar: "الكلمة كاملة: تظهر صورة مع كلمتها، ويكتبها الطفل حرفا حرفا. الحرف الأول: بداية الكلمة فقط.",
+              de: `Wörter tippen, Erster Buchstabe („Wo ist das ${b.upper}?“): Ein Buchstabe und sein Bild erscheinen, und das Kind sucht die Taste dafür.`,
+              ru: `Первая буква («Где ${b.upper}?»): появляются буква и её картинка, и ребёнок ищет для неё клавишу.`,
+              en: `First letter (“Where is ${b.upper}?”): a letter and its picture appear, and the child looks for its key.`,
+              zh: `第一个字母（“${b.upper}在哪里？”）：出现一个字母和它的图片，孩子去找对应的键。`,
+              hi: `पहला अक्षर (“${b.upper} कहाँ है?”): एक अक्षर और उसकी तस्वीर आती है, और उसका बटन ढूँढना है।`,
+              es: `Primera letra («¿Dónde está la ${b.upper}?»): aparecen una letra y su dibujo, y hay que buscar su tecla.`,
+              ar: `الحرف الأول («أين ${b.upper}؟»): يظهر حرف وصورته، ويبحث الطفل عن زرّه.`,
             })}
           </p>
           <p>
@@ -223,74 +174,42 @@ export function LettersGame() {
           </p>
         </>
       }
-      settings={
-        <>
-          <SettingsGroup title={t({ de: "Anzeige", ru: "Что видно", en: "Display", zh: "显示", hi: "दिखावट", es: "Pantalla", ar: "العرض" })}>
-            <Choice<LettersSettings["theme"]>
-              label={t({ de: "Bilder", ru: "Картинки", en: "Pictures", zh: "图片", hi: "तस्वीरें", es: "Dibujos", ar: "الصور" })}
-              value={settings.theme}
-              onChange={(theme) => update({ theme })}
-              options={[{ value: "all", label: all }, ...pack.themes.map((th) => ({ value: th.id, label: `${th.emoji} ${th.label}` }))]}
-            />
-            <Toggle
-              label={t({
-                de: "Wort unter dem Bild anzeigen (nicht bei Wörter tippen)",
-                ru: "Показывать слово под картинкой (кроме «Печатаем слова»)",
-                en: "Show the word under the picture (not in Typing words)",
-                zh: "在图片下显示词语（拼词语除外）",
-                hi: "तस्वीर के नीचे शब्द दिखाएँ (शब्द टाइपिंग में नहीं)",
-                es: "Mostrar la palabra bajo el dibujo (no en Escribir palabras)",
-                ar: "عرض الكلمة تحت الصورة (إلا في كتابة كلمات)",
-              })}
-              checked={settings.showWord}
-              onChange={(showWord) => update({ showWord })}
-            />
-          </SettingsGroup>
+    >
+      {findLetter ? (
+        // A new kind of pictures brings a new letter at once.
+        <FindPlay key={settings.theme} pack={pack} settings={play} />
+      ) : settings.mode === "words" ? (
+        // New words to type bring a new word at once.
+        <WordsPlay key={`${settings.wordKind}-${settings.wordLength}-${settings.theme}`} pack={pack} settings={play} />
+      ) : (
+        <LettersPlay pack={pack} settings={play} />
+      )}
+      <PlayOptions>
+        <Choice<LettersMode>
+          label={t({ de: "Spielart", en: "Way to play", zh: "玩法", hi: "खेलने का तरीका", es: "Modo de juego", ar: "طريقة اللعب", ru: "Как играем" })}
+          value={settings.mode}
+          onChange={(mode) => update({ mode })}
+          options={[
+            { value: "free", label: `⌨️ ${freeTitle}` },
+            { value: "words", label: `✍️ ${wordsTitle}` },
+          ]}
+        />
 
+        {settings.mode === "free" ? (
           <SettingsGroup title={`⌨️ ${freeTitle}`}>
             <Toggle
               label={t({
-                de: "Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen",
-                ru: "Обводить: буква из точек, палец или мышка зажигает звёздочки",
-                en: "Tracing: the letter in dots, a finger or the mouse makes stars appear",
-                zh: "描一描：字母由点组成，手指或鼠标描过的地方出现星星",
-                hi: "ट्रेस करना: बिंदुओं से बना अक्षर, उँगली या माउस से सितारे निकलते हैं",
-                es: "Repasar: la letra de puntos, el dedo o el ratón hace salir estrellas",
-                ar: "التتبع: حرف من نقاط، وتظهر نجوم حيث يمر الإصبع أو الفأرة",
+                de: "🔢 Nur Zahlen",
+                en: "🔢 Only numbers",
+                zh: "🔢 只有数字",
+                hi: "🔢 सिर्फ़ अंक",
+                es: "🔢 Solo números",
+                ar: "🔢 أرقام فقط",
+                ru: "🔢 Только цифры",
               })}
-              checked={settings.trace}
-              onChange={(trace) => update({ trace })}
+              checked={settings.numbersOnly}
+              onChange={(numbersOnly) => update({ numbersOnly })}
             />
-            {play.letterCase === "both" && !settings.trace && (
-              <Toggle
-                label={t({
-                  de: "Mama- und Baby-Buchstabe (mit Augen, an der Hand)",
-                  ru: "Буква-мама и буква-малыш (с глазками, за ручку)",
-                  en: "Mommy and baby letter (with eyes, holding hands)",
-                  zh: "字母妈妈和字母宝宝（有眼睛，手拉手）",
-                  hi: "माँ और बच्चा अक्षर (आँखों वाले, हाथ पकड़े)",
-                  es: "Letra mamá y letra bebé (con ojos, de la mano)",
-                  ar: "حرف الأم وحرف الصغير (بعيون، يدا بيد)",
-                })}
-                checked={settings.letterFamily}
-                onChange={(letterFamily) => update({ letterFamily })}
-              />
-            )}
-            {settings.speech && (
-              <Choice<Announce>
-                label={t({ de: "Ansage", ru: "Что звучит", en: "What is said", zh: "播报内容", hi: "क्या बोला जाए", es: "Qué se dice", ar: "ما يقال" })}
-                value={settings.announce}
-                onChange={(announce) => update({ announce })}
-                options={[
-                  { value: "letterAndWord", label: quote(pack.letterSentence(b, b.words[0]).replace(/[!！]$/, "")) },
-                  { value: "word", label: quote(word) },
-                  { value: "letter", label: quote(b.spoken) },
-                ]}
-              />
-            )}
-          </SettingsGroup>
-
-          <SettingsGroup title={`⌨️ ${freeTitle} ${t({ de: "und", ru: "и", en: "and", zh: "和", hi: "और", es: "y", ar: "و" })} 🔢 ${countTitle}`}>
             <Choice<NumberReveal>
               label={t({ de: "Zahlen", ru: "Цифры", en: "Numbers", zh: "数字", hi: "अंक", es: "Números", ar: "الأرقام" })}
               value={settings.numbers}
@@ -346,6 +265,22 @@ export function LettersGame() {
                 },
               ]}
             />
+            {/* Step by step and by tapping, the digit waits for more presses anyway. */}
+            {(settings.numbers === "all" || settings.numbers === "count") && (
+              <Toggle
+                label={t({
+                  de: "Ziffer erst zeigen, wenn dieselbe Zahl gleich nochmal gedrückt wird",
+                  en: "Show the digit only when the same number is pressed again right after",
+                  zh: "马上再按一次同一个数字时才显示数字",
+                  hi: "अंक तभी दिखाएँ, जब वही अंक तुरंत दोबारा दबाया जाए",
+                  es: "Mostrar la cifra solo cuando se pulse enseguida otra vez el mismo número",
+                  ar: "إظهار الرقم فقط عند الضغط على الرقم نفسه مرة أخرى فورًا",
+                  ru: "Показывать цифру, только когда то же число сразу нажимают ещё раз",
+                })}
+                checked={settings.digitOnRepeat}
+                onChange={(digitOnRepeat) => update({ digitOnRepeat })}
+              />
+            )}
             {settings.numbers === "count" && (
               <Toggle
                 label={t({
@@ -361,48 +296,181 @@ export function LettersGame() {
                 onChange={(finishCounting) => update({ finishCounting })}
               />
             )}
-          </SettingsGroup>
-
-          <SettingsGroup title={`🔍 ${findTitle}`}>
             <Toggle
-              label={
-                touchKeys
-                  ? t({
-                      de: "Gesuchte Taste aufleuchten lassen, wenn es länger dauert",
-                      ru: "Подсвечивать нужную клавишу, если поиск затянулся",
-                      en: "Light up the wanted key when it takes a while",
-                      zh: "找得久了，让要找的键亮起来",
-                      hi: "देर लगे तो ढूँढा जा रहा बटन चमकाएँ",
-                      es: "Iluminar la tecla buscada si tarda",
-                      ar: "إضاءة الزر المطلوب إذا طال البحث",
-                    })
-                  : t({
-                      de: "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert",
-                      ru: "Показывать клавишу на маленькой клавиатуре, если поиск затянулся",
-                      en: "Show the key on a small keyboard when it takes a while",
-                      zh: "找得久了，在小键盘图上显示那个键",
-                      hi: "देर लगे तो छोटे कीबोर्ड पर बटन दिखाएँ",
-                      es: "Mostrar la tecla en un teclado pequeño si tarda",
-                      ar: "إظهار الزر على لوحة مفاتيح صغيرة إذا طال البحث",
-                    })
-              }
-              checked={settings.hints}
-              onChange={(hints) => update({ hints })}
+              label={t({
+                de: "Nachspuren: Buchstabe aus Punkten, Finger oder Maus lässt Sterne erscheinen",
+                ru: "Обводить: буква из точек, палец или мышка зажигает звёздочки",
+                en: "Tracing: the letter in dots, a finger or the mouse makes stars appear",
+                zh: "描一描：字母由点组成，手指或鼠标描过的地方出现星星",
+                hi: "ट्रेस करना: बिंदुओं से बना अक्षर, उँगली या माउस से सितारे निकलते हैं",
+                es: "Repasar: la letra de puntos, el dedo o el ratón hace salir estrellas",
+                ar: "التتبع: حرف من نقاط، وتظهر نجوم حيث يمر الإصبع أو الفأرة",
+              })}
+              checked={settings.trace}
+              onChange={(trace) => update({ trace })}
             />
+            {!settings.numbersOnly && showWord}
+            {!settings.numbersOnly && play.letterCase === "both" && !settings.trace && (
+              <Toggle
+                label={t({
+                  de: "Mama- und Baby-Buchstabe (mit Augen, an der Hand)",
+                  ru: "Буква-мама и буква-малыш (с глазками, за ручку)",
+                  en: "Mommy and baby letter (with eyes, holding hands)",
+                  zh: "字母妈妈和字母宝宝（有眼睛，手拉手）",
+                  hi: "माँ और बच्चा अक्षर (आँखों वाले, हाथ पकड़े)",
+                  es: "Letra mamá y letra bebé (con ojos, de la mano)",
+                  ar: "حرف الأم وحرف الصغير (بعيون، يدا بيد)",
+                })}
+                checked={settings.letterFamily}
+                onChange={(letterFamily) => update({ letterFamily })}
+              />
+            )}
+            {!settings.numbersOnly && settings.speech && (
+              <Choice<Announce>
+                label={t({ de: "Ansage", ru: "Что звучит", en: "What is said", zh: "播报内容", hi: "क्या बोला जाए", es: "Qué se dice", ar: "ما يقال" })}
+                value={settings.announce}
+                onChange={(announce) => update({ announce })}
+                options={[
+                  { value: "letterAndWord", label: quote(pack.letterSentence(b, b.words[0]).replace(/[!！]$/, "")) },
+                  { value: "word", label: quote(word) },
+                  { value: "letter", label: quote(b.spoken) },
+                ]}
+              />
+            )}
           </SettingsGroup>
+        ) : (
+          <SettingsGroup title={`✍️ ${wordsTitle}`}>
+            <Choice<WordTyping>
+              label={t({
+                de: "Was tippen?",
+                en: "What to type?",
+                zh: "打什么？",
+                hi: "क्या टाइप करें?",
+                es: "¿Qué escribir?",
+                ar: "ماذا نكتب؟",
+                ru: "Что печатаем?",
+              })}
+              value={settings.wordTyping}
+              onChange={(wordTyping) => update({ wordTyping })}
+              options={[
+                {
+                  value: "spell",
+                  label: t({ de: "Ganzes Wort", ru: "Целое слово", en: "Whole word", zh: "整个词", hi: "पूरा शब्द", es: "Palabra entera", ar: "الكلمة كاملة" }),
+                },
+                {
+                  value: "first",
+                  label: t({
+                    de: "Erster Buchstabe",
+                    ru: "Первая буква",
+                    en: "First letter",
+                    zh: "第一个字母",
+                    hi: "पहला अक्षर",
+                    es: "Primera letra",
+                    ar: "الحرف الأول",
+                  }),
+                },
+              ]}
+            />
+            {findLetter ? (
+              <>
+                {showWord}
+                <Toggle
+                  label={
+                    touchKeys
+                      ? t({
+                          de: "Gesuchte Taste aufleuchten lassen, wenn es länger dauert",
+                          ru: "Подсвечивать нужную клавишу, если поиск затянулся",
+                          en: "Light up the wanted key when it takes a while",
+                          zh: "找得久了，让要找的键亮起来",
+                          hi: "देर लगे तो ढूँढा जा रहा बटन चमकाएँ",
+                          es: "Iluminar la tecla buscada si tarda",
+                          ar: "إضاءة الزر المطلوب إذا طال البحث",
+                        })
+                      : t({
+                          de: "Taste auf einer kleinen Tastatur zeigen, wenn es länger dauert",
+                          ru: "Показывать клавишу на маленькой клавиатуре, если поиск затянулся",
+                          en: "Show the key on a small keyboard when it takes a while",
+                          zh: "找得久了，在小键盘图上显示那个键",
+                          hi: "देर लगे तो छोटे कीबोर्ड पर बटन दिखाएँ",
+                          es: "Mostrar la tecla en un teclado pequeño si tarda",
+                          ar: "إظهار الزر على لوحة مفاتيح صغيرة إذا طال البحث",
+                        })
+                  }
+                  checked={settings.hints}
+                  onChange={(hints) => update({ hints })}
+                />
+              </>
+            ) : (
+              <>
+                <Choice<WordKind>
+                  label={t({ de: "Wörter", ru: "Слова", en: "Words", zh: "词语", hi: "शब्द", es: "Palabras", ar: "الكلمات" })}
+                  value={settings.wordKind}
+                  onChange={(wordKind) => update({ wordKind })}
+                  options={[
+                    {
+                      value: "nouns",
+                      label: t({ de: "🐻 Substantive", ru: "🐻 Предметы", en: "🐻 Things", zh: "🐻 事物", hi: "🐻 चीज़ें", es: "🐻 Cosas", ar: "🐻 أشياء" }),
+                    },
+                    { value: "all", label: all },
+                    {
+                      value: "colors",
+                      label: t({ de: "🎨 Farben", ru: "🎨 Цвета", en: "🎨 Colors", zh: "🎨 颜色", hi: "🎨 रंग", es: "🎨 Colores", ar: "🎨 ألوان" }),
+                    },
+                    {
+                      value: "actions",
+                      label: t({
+                        de: "🦘 Tu-Wörter",
+                        ru: "🦘 Слова-действия",
+                        en: "🦘 Doing words",
+                        zh: "🦘 动作词",
+                        hi: "🦘 क्रिया-शब्द",
+                        es: "🦘 Acciones",
+                        ar: "🦘 حركات",
+                      }),
+                    },
+                  ]}
+                />
+                {/* Colours and doing words are short fixed lists, so the length only applies to the picture words. */}
+                {pictureWords && (
+                  <Choice<WordLength>
+                    label={t({ de: "Wortlänge", ru: "Длина слова", en: "Word length", zh: "字母数", hi: "शब्द की लंबाई", es: "Longitud", ar: "طول الكلمة" })}
+                    value={settings.wordLength}
+                    onChange={(wordLength) => update({ wordLength })}
+                    options={[
+                      { value: "3", label: "3" },
+                      { value: "4", label: "4" },
+                      { value: "7", label: "7" },
+                    ]}
+                  />
+                )}
+              </>
+            )}
+          </SettingsGroup>
+        )}
 
-          <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} anyTouch={anyTouch} />
-        </>
-      }
-    >
-      {settings.mode === "find" ? (
-        <FindPlay pack={pack} settings={play} />
-      ) : settings.mode === "words" ? (
-        <WordsPlay pack={pack} settings={play} />
-      ) : (
-        // Also for a mode saved before it was taken away (the Buchstaben-Zug).
-        <LettersPlay pack={pack} settings={play} numbersOnly={settings.mode === "count"} />
-      )}
+        <SettingsGroup title={t({ de: "Anzeige", ru: "Что видно", en: "Display", zh: "显示", hi: "दिखावट", es: "Pantalla", ar: "العرض" })}>
+          {cased && (
+            <Choice<LetterCase>
+              label={t({ de: "Buchstaben", ru: "Буквы", en: "Letters", zh: "字母", hi: "अक्षर", es: "Letras", ar: "الحروف" })}
+              value={settings.letterCase}
+              onChange={(letterCase) => update({ letterCase })}
+              options={[
+                { value: "upper", label: a.upper },
+                { value: "both", label: `${a.upper} ${a.lower}` },
+                { value: "lower", label: a.lower },
+              ]}
+            />
+          )}
+          <Choice<LettersSettings["theme"]>
+            label={t({ de: "Bilder", ru: "Картинки", en: "Pictures", zh: "图片", hi: "तस्वीरें", es: "Dibujos", ar: "الصور" })}
+            value={settings.theme}
+            onChange={(theme) => update({ theme })}
+            options={[{ value: "all", label: all }, ...pack.themes.map((th) => ({ value: th.id, label: `${th.emoji} ${th.label}` }))]}
+          />
+        </SettingsGroup>
+
+        <TouchKeysSetting value={settings.touchKeys} onChange={(touchKeys) => update({ touchKeys })} anyTouch={anyTouch} />
+      </PlayOptions>
     </GameShell>
   );
 }

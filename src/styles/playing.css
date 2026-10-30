@@ -131,3 +131,84 @@
     --progress: 100%;
   }
 }
+
+/*
+ * A game's options while playing (PlayOptions): ⚙️ in the top left corner, the same quiet disc as ✕ and held like
+ * it; the panel covers the game until a grown-up closes it.
+ */
+.play-options-corner {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  z-index: 10;
+  display: flex;
+  align-items: center;
+}
+
+.play-options-button {
+  font-family: var(--font-emoji);
+}
+
+.play-options-hint {
+  position: absolute;
+  left: calc(100% + 8px);
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #ffffffd0;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  translate: -6px 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s,
+    translate 0.4s;
+}
+
+.play-options-corner.hinted .play-options-hint {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (hover: hover) {
+  .play-options-corner:hover .play-options-hint {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+.play-options-panel {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  gap: 16px;
+  padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  overflow: auto;
+  touch-action: pan-y;
+  background: #2a1e5c99;
+}
+
+.play-options-panel .settings {
+  flex-shrink: 0;
+  width: min(680px, 100%);
+}
+
+.play-options-close {
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 6px 26px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: var(--sunshine);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  box-shadow: 0 4px 0 var(--ink);
+  cursor: pointer;
+}

@@ -4,7 +4,7 @@
 
 import type { ReactNode } from "react";
 import type { Localized } from "@/lib/language";
-import { playClonk, playKnock, playRustle, playThump } from "@/lib/sfx";
+import { playClonk, playDing, playKnock, playRustle, playThump } from "@/lib/sfx";
 
 const INK = "#2a1e5c";
 const LINE = { stroke: INK, strokeWidth: 3, strokeLinejoin: "round" as const };
@@ -239,8 +239,110 @@ function umbrella(): Thing {
   };
 }
 
-const SMALL = [crayon, block, toiletRoll, can];
-const MIDDLE = [juice, bottle, cereal, umbrella];
+function saltShaker(): Thing {
+  const w = 44;
+  const h = 112;
+  return {
+    kind: "salt",
+    name: { de: "Salzstreuer", en: "Salt shaker", zh: "盐瓶", hi: "नमकदानी", es: "Salero", ar: "مملحة", ru: "Солонка" },
+    w,
+    h,
+    sound: () => playKnock(1300),
+    draw: () => (
+      <>
+        <path d={`M4 0 Q0 0 0 -6 L2 ${-h + 40} Q${w / 2} ${-h + 30} ${w - 2} ${-h + 40} L${w} -6 Q${w} 0 ${w - 4} 0 Z`} fill="#eef7ff" {...LINE} />
+        <path d={`M2 ${-h + 40} Q2 ${-h} ${w / 2} ${-h} Q${w - 2} ${-h} ${w - 2} ${-h + 40} Q${w / 2} ${-h + 30} 2 ${-h + 40} Z`} fill="#c9d1db" {...LINE} />
+        {[0.3, 0.5, 0.7].map((k) => (
+          <circle key={k} cx={w * k} cy={-h + 16 + (k === 0.5 ? -4 : 0)} r="2.5" fill={INK} />
+        ))}
+        <path d={`M6 -8 L6 ${-h + 52} L${w - 6} ${-h + 52} L${w - 6} -8 Z`} fill="#fff" opacity="0.8" />
+      </>
+    ),
+  };
+}
+
+function vase(): Thing {
+  const color = pick(["#3a86ff", "#ff7bd0", "#00b4d8"]);
+  const petal = pick(["#ff5d73", "#ffd23f", "#8e7dff"]);
+  const w = 62;
+  const h = 200;
+  return {
+    kind: "vase",
+    name: {
+      de: "Vase mit Blume",
+      en: "Vase with a flower",
+      zh: "插着花的花瓶",
+      hi: "फूल वाला गुलदान",
+      es: "Florero con flor",
+      ar: "مزهرية فيها وردة",
+      ru: "Ваза с цветком",
+    },
+    w,
+    h,
+    sound: playDing,
+    draw: () => (
+      <>
+        <path d={`M${w / 2} ${-h + 110} Q${w / 2 + 8} ${-h + 70} ${w / 2} ${-h + 34}`} stroke="#3ec300" strokeWidth="6" fill="none" strokeLinecap="round" />
+        <path d={`M${w / 2 + 4} ${-h + 80} q14 -14 22 -4 q-10 12 -22 4 Z`} fill="#3ec300" stroke={INK} strokeWidth="2" />
+        {[0, 72, 144, 216, 288].map((a) => (
+          <ellipse key={a} cx={w / 2} cy={-h + 16} rx="9" ry="15" transform={`rotate(${a} ${w / 2} ${-h + 30})`} fill={petal} stroke={INK} strokeWidth="2" />
+        ))}
+        <circle cx={w / 2} cy={-h + 30} r="9" fill="#ffb703" stroke={INK} strokeWidth="2" />
+        <path d={`M8 0 Q0 -40 6 -80 Q12 -104 18 -112 L${w - 18} -112 Q${w - 12} -104 ${w - 6} -80 Q${w} -40 ${w - 8} 0 Z`} fill={color} {...LINE} />
+        <rect x="14" y="-122" width={w - 28} height="12" rx="4" fill={color} {...LINE} />
+        <path d={`M8 -60 q${(w - 16) / 4} -12 ${(w - 16) / 2} 0 t${(w - 16) / 2} 0`} stroke="#fff" strokeWidth="5" fill="none" strokeLinecap="round" />
+      </>
+    ),
+  };
+}
+
+function thermos(): Thing {
+  const color = pick(["#ff5d73", "#3ec300", "#8e7dff"]);
+  const w = 60;
+  const h = 226;
+  return {
+    kind: "thermos",
+    name: { de: "Thermoskanne", en: "Flask", zh: "保温瓶", hi: "थर्मस", es: "Termo", ar: "ترمس", ru: "Термос" },
+    w,
+    h,
+    sound: playClonk,
+    draw: () => (
+      <>
+        <rect x="0" y={-h + 40} width={w} height={h - 40} rx="12" fill={color} {...LINE} />
+        <rect x="4" y={-h + 4} width={w - 8} height="40" rx="8" fill="#c9d1db" {...LINE} />
+        <rect x="0" y={-h + 60} width={w} height="14" fill="#fff8" />
+        <rect x="0" y="-34" width={w} height="14" fill="#fff8" />
+        <line x1="12" y1={-h + 86} x2="12" y2="-46" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity="0.6" />
+      </>
+    ),
+  };
+}
+
+function broom(): Thing {
+  const w = 70;
+  const h = 330;
+  return {
+    kind: "broom",
+    name: { de: "Besen", en: "Broom", zh: "扫帚", hi: "झाड़ू", es: "Escoba", ar: "مكنسة", ru: "Метла" },
+    w,
+    h,
+    sound: playThump,
+    draw: () => (
+      <>
+        <rect x={w / 2 - 6} y={-h} width="12" height={h - 80} rx="6" fill="#d08c4f" {...LINE} />
+        <circle cx={w / 2} cy={-h + 8} r="9" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+        <path d={`M${w / 2 - 14} -96 L${w / 2 + 14} -96 L${w} 0 L0 0 Z`} fill="#f1c453" {...LINE} />
+        {[0.2, 0.35, 0.5, 0.65, 0.8].map((k) => (
+          <line key={k} x1={w / 2 + (k - 0.5) * 22} y1="-84" x2={w * k} y2="-4" stroke="#c99a2e" strokeWidth="3" />
+        ))}
+        <rect x={w / 2 - 17} y="-104" width="34" height="14" rx="4" fill="#ff5d73" {...LINE} />
+      </>
+    ),
+  };
+}
+
+const SMALL = [crayon, block, toiletRoll, can, saltShaker];
+const MIDDLE = [juice, bottle, cereal, umbrella, vase, thermos];
 
 const shuffle = <T,>(list: T[]) =>
   list
@@ -251,11 +353,14 @@ const shuffle = <T,>(list: T[]) =>
 /**
  * A new row of things, in `groups` runs from small to tall, so each one can
  * reach the next: two small ones, two books, and two or three of the bigger
- * things. The tall end of one run falls onto the small start of the next.
+ * things. The tall end of one run falls onto the small start of the next,
+ * and the very last run ends with the broom, the tallest of all, which falls
+ * onto the drum.
  */
 export function pickThings(groups = 1): Thing[] {
-  return Array.from({ length: groups }, () => {
+  return Array.from({ length: groups }, (_, g) => {
     const makers = [...shuffle(SMALL).slice(0, 2), book, book, ...shuffle(MIDDLE).slice(0, pick([2, 3]))];
+    if (g === groups - 1) makers.push(broom);
     return makers.map((make) => make()).sort((a, b) => a.h - b.h);
   }).flat();
 }

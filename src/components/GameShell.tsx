@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router";
-import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
@@ -7,12 +7,15 @@ import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
-import { useAppLanguage, useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
 import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
-import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
+import { stopSpeaking, unlockSpeech } from "@/lib/speech";
+import { useHold } from "@/lib/hold";
 import { forwardNearTaps } from "@/lib/tapTargets";
+import { hush as hushVoice, recordedVoice } from "@/lib/voice";
+import goodNightFiles from "./stimme/**/*.mp3?glob";
 
 /** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
 const EXIT_DELAY_MS = 500;
@@ -58,6 +61,11 @@ interface GameShellProps {
    * moment (the child has to go now). The start screen shows only after leaving the game (✕, Esc, „Menü“).
    */
   startMode?: string;
+  /**
+   * With `startMode`: a game without a start screen of its own, whose menu is the page before it (a picture of
+   * Lebendige Bilder). Leaving the game (✕, Esc, „Menü“) goes there instead.
+   */
+  leaveTo?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
   /**
@@ -79,7 +87,7 @@ interface GameShellProps {
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({ title, emoji, modes, mode, onMode, startMode, level, info, settings, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveTo, level, info, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const t = useT();
@@ -122,10 +130,12 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
 
   const stop = () => {
     stopSpeaking();
+    hushVoice();
     setPlaying(false);
     // Only the keyboard lock ends: fullscreen stays on, the menus are part of the app too.
     exitKidMode();
     if (returnTo) navigate(returnTo, { replace: true });
+    else if (leaveTo) navigate(leaveTo, { replace: true });
   };
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -168,7 +178,9 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
     if ((!startMode && !returnTo) || started.current) return;
     started.current = true;
     if (startMode) onMode?.(startMode);
-    void start();
+    // Play time is over: no start screen to wait on, so back to the menu, which the lock covers.
+    if (leaveTo && !returnTo && isPlaytimeOver()) navigate(leaveTo, { replace: true });
+    else void start();
   }, []);
 
   if (playing) {
@@ -192,6 +204,9 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
       </div>
     );
   }
+
+  // Nothing to show before the game starts at once, or after it was left.
+  if (leaveTo) return null;
 
   /** One mode's card. */
   const card = (m: GameMode) => (
@@ -277,17 +292,6 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
             ar: "اختيار طريقة اللعب",
           })}
         >
-          <h2 className="mode-heading">
-            {t({
-              de: "Was spielen wir?",
-              ru: "Во что играем?",
-              en: "What shall we play?",
-              zh: "我们玩什么？",
-              hi: "क्या खेलें?",
-              es: "¿A qué jugamos?",
-              ar: "ماذا نلعب؟",
-            })}
-          </h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {groups
@@ -380,24 +384,32 @@ function Dusk({ level }: { level: number }) {
   return <div className="playtime-dusk" style={{ opacity: 0.65 * level }} aria-hidden />;
 }
 
+/** The good-night sentence's recordings. */
+const goodNightVoice = recordedVoice(goodNightFiles);
+
+/** Said when play time is over, from its recording (src/components/stimme/). */
+export const GOOD_NIGHT: Localized = {
+  de: "Gute Nacht! Die Spielzeit ist vorbei.",
+  ru: "Спокойной ночи! Время игры закончилось.",
+  en: "Good night! Play time is over.",
+  zh: "晚安！游戏时间结束了。",
+  hi: "शुभ रात्रि! खेलने का समय ख़त्म हो गया।",
+  es: "¡Buenas noches! Se acabó el tiempo de juego.",
+  ar: "ليلة سعيدة! انتهى وقت اللعب.",
+};
+
 /** Play time is over: a quiet night sky that ignores taps and keys until a grown-up exits. */
 function GoodNight() {
   const t = useT();
   const language = useAppLanguage();
-  const sentence = t({
-    de: "Gute Nacht! Die Spielzeit ist vorbei.",
-    ru: "Спокойной ночи! Время игры закончилось.",
-    en: "Good night! Play time is over.",
-    zh: "晚安！游戏时间结束了。",
-    hi: "शुभ रात्रि! खेलने का समय ख़त्म हो गया।",
-    es: "¡Buenas noches! Se acabó el tiempo de juego.",
-    ar: "ليلة سعيدة! انتهى وقت اللعب.",
-  });
   useEffect(() => {
     playLullaby();
-    const timer = setTimeout(() => speak(sentence, language.speechLang, { rate: 0.7 }), 1200);
-    return () => clearTimeout(timer);
-  }, [sentence, language.speechLang]);
+    const timer = setTimeout(() => goodNightVoice.say(GOOD_NIGHT[language.id] ?? GOOD_NIGHT.de, language.id), 1200);
+    return () => {
+      clearTimeout(timer);
+      hushVoice();
+    };
+  }, [language.id]);
 
   return (
     <div className="good-night" role="status">
@@ -451,29 +463,7 @@ const STARS: [number, number, number][] = [
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   const t = useT();
-  const [holding, setHolding] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-
-  const press = () => {
-    if (timer.current) return;
-    setHolding(true);
-    timer.current = setTimeout(onExit, EXIT_DELAY_MS);
-  };
-
-  const release = () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
-    setHolding(false);
-  };
-
-  const isPressKey = (key: string) => key === "Enter" || key === " ";
+  const { holding, props } = useHold(onExit, EXIT_DELAY_MS);
 
   return (
     <div className={`exit-corner${holding ? " hinted" : ""}`} data-tap-keep>
@@ -485,25 +475,8 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}
-        style={{ "--hold-ms": `${EXIT_DELAY_MS}ms` } as CSSProperties}
         aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })})`}
-        onPointerDown={(e: PointerEvent<HTMLButtonElement>) => {
-          // Keep the game from reacting to the tap on the button.
-          e.stopPropagation();
-          // A finger that slides a little still counts as holding.
-          e.currentTarget.setPointerCapture(e.pointerId);
-          press();
-        }}
-        onPointerUp={release}
-        onPointerCancel={release}
-        onContextMenu={(e) => e.preventDefault()}
-        onKeyDown={(e) => {
-          if (!isPressKey(e.key)) return;
-          e.preventDefault();
-          if (!e.repeat) press();
-        }}
-        onKeyUp={(e) => isPressKey(e.key) && release()}
-        onBlur={release}
+        {...props}
       >
         ✕
       </button>

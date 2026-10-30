@@ -7,7 +7,8 @@ const REVIEW_DEFAULTS = { edits: {} as Record<string, string>, ok: [] as string[
 
 /**
  * On the management page: every picture prompt a feature collected, to read, change
- * in place and mark as fine before anything is generated. The changes stay in this
+ * in place and mark as fine before anything is generated. A picture already made shows
+ * beside its prompt and counts as made, not as missing. The changes stay in this
  * browser until „Prüfung kopieren“ puts them into one text to hand to Claude.
  */
 export function PicturePromptReview() {
@@ -16,11 +17,11 @@ export function PicturePromptReview() {
     <section id="bilder" className="ideas-research">
       <h2>🎨 Bildvorschläge</h2>
       <p className="ideas-hint">
-        Bilder, die noch nicht erzeugt sind: erst hier prüfen und verbessern. Ändern direkt im Feld (bleibt in diesem Browser), 👍 heißt „passt so“; „Prüfung
-        kopieren“ gibt alles als Text für Claude.
+        Die Prompts aller Bilder: noch fehlende erst hier prüfen und verbessern, schon erzeugte (✅, mit Bild) bei Bedarf ändern und neu erzeugen lassen. Ändern
+        direkt im Feld (bleibt in diesem Browser), 👍 heißt „passt so“; „Prüfung kopieren“ gibt alles als Text für Claude.
       </p>
       {PICTURE_PROMPTS.map((set, i) => (
-        <PromptSet key={set.id} set={set} open={i === 0} review={review} update={update} />
+        <PromptSet key={set.id} set={set} open={i === 0 && set.groups.some((g) => g.prompts.some((p) => !p.url))} review={review} update={update} />
       ))}
     </section>
   );
@@ -42,12 +43,13 @@ function PromptSet({
   const key = (p: PicturePrompt) => `${set.id}/${p.id}`;
   const changed = all.filter((p) => review.edits[key(p)] !== undefined && review.edits[key(p)] !== p.prompt);
   const fine = all.filter((p) => review.ok.includes(key(p)));
+  const missing = all.filter((p) => !p.url);
   const date = new Date(`${set.date}T12:00:00`).toLocaleDateString("de-DE");
 
   const copy = () => {
     const lines = [`Bildvorschläge „${set.title}“ – geprüft auf /management/:`];
     if (fine.length) lines.push("", `Passt: ${fine.map((p) => p.id).join(", ")}`);
-    if (changed.length) lines.push("", "Geändert:", ...changed.map((p) => `- ${p.id}: ${review.edits[key(p)]}`));
+    if (changed.length) lines.push("", "Geändert:", ...changed.map((p) => `- ${p.id}${p.url ? " (neu erzeugen)" : ""}: ${review.edits[key(p)]}`));
     const unseen = all.filter((p) => !fine.includes(p) && !changed.includes(p)).length;
     lines.push("", `Noch nicht angesehen: ${unseen} von ${all.length}.`);
     navigator.clipboard.writeText(lines.join("\n")).then(() => {
@@ -60,13 +62,13 @@ function PromptSet({
     <details className="ideas-panel" open={open}>
       <summary>
         <h2>
-          {set.emoji} {set.title} ({all.length})
+          {set.emoji} {set.title} ({made(all.length, missing.length)})
         </h2>{" "}
         <small className="ideas-research-date">{date}</small>
       </summary>
       <p>{set.intro}</p>
       <p className="ideas-prompt-summary">
-        👍 {fine.length} passt · ✏️ {changed.length} geändert · {all.length} insgesamt{" "}
+        ✅ {all.length - missing.length} erzeugt · 👍 {fine.length} passt · ✏️ {changed.length} geändert · {all.length} insgesamt{" "}
         <button type="button" className="ideas-copy" onClick={copy}>
           {copied ? "Kopiert ✓" : "📋 Prüfung kopieren"}
         </button>
@@ -74,7 +76,7 @@ function PromptSet({
       {set.groups.map((group) => (
         <div key={group.title} className="ideas-prompt-group">
           <h3>
-            {group.title} ({group.prompts.length})
+            {group.title} ({made(group.prompts.length, group.prompts.filter((p) => !p.url).length)})
           </h3>
           {group.note && <p className="ideas-hint">{group.note}</p>}
           <ul className="ideas-prompts">
@@ -86,9 +88,17 @@ function PromptSet({
               return (
                 <li key={p.id} className={`ideas-prompt${ok ? " ok" : ""}${edited ? " edited" : ""}`}>
                   <div className="ideas-prompt-head">
-                    <b>{p.id}</b> <span>{p.use}</span>
+                    <b>{p.id}</b> {p.url ? "✅" : "· fehlt –"} <span>{p.use}</span>
                   </div>
-                  <textarea value={text} rows={4} aria-label={`Prompt ${p.id}`} onChange={(e) => update({ edits: { ...review.edits, [k]: e.target.value } })} />
+                  <div className="ideas-prompt-body">
+                    {p.url && <img src={p.url} alt="" loading="lazy" />}
+                    <textarea
+                      value={text}
+                      rows={4}
+                      aria-label={`Prompt ${p.id}`}
+                      onChange={(e) => update({ edits: { ...review.edits, [k]: e.target.value } })}
+                    />
+                  </div>
                   <div className="ideas-prompt-foot">
                     <code>
                       {p.file} {p.options}
@@ -116,4 +126,10 @@ function PromptSet({
       ))}
     </details>
   );
+}
+
+/** „23, alle erzeugt“ or „2 fehlen von 23“: how many of a set or group are still to make. */
+function made(total: number, missing: number) {
+  if (missing === 0) return `${total}, alle erzeugt`;
+  return `${missing} ${missing === 1 ? "fehlt" : "fehlen"} von ${total}`;
 }

@@ -7,14 +7,18 @@ export interface Game {
   emoji: string;
   /** The game's name in every language of the app (see lib/language.ts). */
   title: Localized;
+  /** One short line for grown-ups under the name, what the game is; shown only on tablets and computers. */
+  blurb: Localized;
 }
 
 export interface Category {
   id: string;
   emoji: string;
   title: Localized;
-  /** Under the title on the category's own page. */
-  subtitle: Localized;
+  /** One short line for grown-ups under the name on its home card, like `Game.blurb` (none for one without a card). */
+  blurb?: Localized;
+  /** Its games stand on the home page itself, together on a frame with the category's name above, instead of behind a card of their own. */
+  onHome?: boolean;
   games: Game[];
 }
 
@@ -24,20 +28,29 @@ export const CATEGORIES: Category[] = [
     id: "lebendige-welten",
     emoji: "🖼️",
     title: { de: "Lebendige Welten", ru: "Живые миры", en: "Living Worlds", zh: "生动的世界", hi: "जीवंत दुनिया", es: "Mundos vivos", ar: "عوالم حيّة" },
-    subtitle: {
-      de: "Bilder und Geschichten, die auf jedes Antippen antworten.",
-      ru: "Картинки и истории, которые отвечают на каждое касание.",
-      en: "Pictures and stories that answer every tap.",
-      zh: "每次点一点都会回应的图画和故事。",
-      hi: "तस्वीरें और कहानियाँ, जो हर टैप पर जवाब देती हैं।",
-      es: "Imágenes e historias que responden a cada toque.",
-      ar: "صور وقصص تستجيب لكل لمسة.",
+    blurb: {
+      de: "Bilder und Geschichten, die antworten",
+      en: "Pictures and stories that answer back",
+      zh: "会回应的图画和故事",
+      hi: "जवाब देने वाली तस्वीरें और कहानियाँ",
+      es: "Imágenes e historias que responden",
+      ar: "صور وقصص تتجاوب",
+      ru: "Картинки и истории, которые отвечают",
     },
     games: [
       {
         href: "/bilder/",
         emoji: "🖼️",
         title: { de: "Lebendige Bilder", ru: "Живые картинки", en: "Living Pictures", zh: "会动的图画", hi: "जीवंत तस्वीरें", es: "Imágenes vivas", ar: "صور حيّة" },
+        blurb: {
+          de: "Wimmelbilder zum Antippen",
+          en: "Busy pictures to tap",
+          zh: "可以点的热闹大图",
+          hi: "छूने के लिए भरी-पूरी तस्वीरें",
+          es: "Láminas llenas de cosas para tocar",
+          ar: "صور مزدحمة للّمس",
+          ru: "Большие картинки, где всё можно нажать",
+        },
       },
       {
         href: "/abenteuer/",
@@ -51,8 +64,30 @@ export const CATEGORIES: Category[] = [
           es: "Aventuras en movimiento",
           ar: "مغامرات الحركة",
         },
+        blurb: {
+          de: "Hüpfen, strecken, schleichen – mitmachen",
+          en: "Hop, stretch, sneak – join in",
+          zh: "跳一跳、伸一伸、悄悄走——一起动",
+          hi: "कूदना, खिंचना, दबे पाँव चलना – साथ में",
+          es: "Saltar, estirarse, agacharse: ¡a moverse!",
+          ar: "قفز وتمدّد ومشي على أطراف الأصابع – معًا",
+          ru: "Прыгать, тянуться, красться – вместе",
+        },
       },
-      { href: "/gefuehle/", emoji: "🐻", title: { de: "Gefühle", ru: "Чувства", en: "Feelings", zh: "情绪", hi: "भावनाएँ", es: "Emociones", ar: "المشاعر" } },
+      {
+        href: "/gefuehle/",
+        emoji: "🐻",
+        title: { de: "Gefühle", ru: "Чувства", en: "Feelings", zh: "情绪", hi: "भावनाएँ", es: "Emociones", ar: "المشاعر" },
+        blurb: {
+          de: "Der kleine Bär und seine Gefühle",
+          en: "Little Bear and his feelings",
+          zh: "小熊和它的心情",
+          hi: "भालू और उसकी भावनाएँ",
+          es: "El osito y sus emociones",
+          ar: "الدبدوب ومشاعره",
+          ru: "Мишка и его чувства",
+        },
+      },
       {
         href: "/kettenreaktion/",
         emoji: "🎳",
@@ -64,6 +99,15 @@ export const CATEGORIES: Category[] = [
           hi: "चेन रिएक्शन",
           es: "Reacción en cadena",
           ar: "تفاعل متسلسل",
+        },
+        blurb: {
+          de: "Eine Kugel stößt Maschinen an",
+          en: "A marble sets machines going",
+          zh: "一颗小球启动机器",
+          hi: "एक गेंद मशीनें चलाती है",
+          es: "Una canica pone en marcha máquinas",
+          ar: "كرة صغيرة تُشغّل الآلات",
+          ru: "Шарик запускает машины",
         },
       },
       {
@@ -78,6 +122,15 @@ export const CATEGORIES: Category[] = [
           es: "Pequeñas aventuras",
           ar: "مغامرات صغيرة",
         },
+        blurb: {
+          de: "Aufzug fahren, Wege gehen, sammeln",
+          en: "Ride the lift, walk the trails, collect",
+          zh: "坐电梯、走小路、收集东西",
+          hi: "लिफ़्ट, रास्ते और चीज़ें जमा करना",
+          es: "Ascensor, caminos y cosas que recoger",
+          ar: "ركوب المصعد والمشي في الطرق والجمع",
+          ru: "Лифт, прогулки, собирать вещи",
+        },
       },
     ],
   },
@@ -85,14 +138,14 @@ export const CATEGORIES: Category[] = [
     id: "zuordnen",
     emoji: "🧩",
     title: { de: "Zuordnen", ru: "Найди пару", en: "Matching", zh: "配一配", hi: "जोड़ी मिलाओ", es: "Emparejar", ar: "المطابقة" },
-    subtitle: {
-      de: "Was gehört zusammen? Antippen oder hinziehen.",
-      ru: "Что к чему подходит? Коснуться или перетащить.",
-      en: "What goes together? Tap or drag.",
-      zh: "什么和什么配成一对？点一点或拖过去。",
-      hi: "क्या किसके साथ जाता है? छूकर या खींचकर।",
-      es: "¿Qué va con qué? Tocar o arrastrar.",
-      ar: "ما الذي يتناسب معًا؟ باللمس أو بالسحب.",
+    blurb: {
+      de: "Was gehört zusammen?",
+      en: "What goes together?",
+      zh: "什么和什么是一对？",
+      hi: "क्या किसके साथ जाता है?",
+      es: "¿Qué va con qué?",
+      ar: "ما الذي يتناسب معًا؟",
+      ru: "Что к чему подходит?",
     },
     games: [
       {
@@ -107,11 +160,29 @@ export const CATEGORIES: Category[] = [
           es: "¿Qué necesita el animal?",
           ar: "ماذا يحتاج الحيوان؟",
         },
+        blurb: {
+          de: "Futter und Zuhause für die Tiere",
+          en: "Food and homes for the animals",
+          zh: "给动物找食物和家",
+          hi: "जानवरों के लिए खाना और घर",
+          es: "Comida y casa para los animales",
+          ar: "طعام وبيوت للحيوانات",
+          ru: "Корм и домики для зверей",
+        },
       },
       {
         href: "/schatten/",
         emoji: "👤",
         title: { de: "Schatten finden", ru: "Найди тень", en: "Find the Shadow", zh: "找影子", hi: "परछाईं ढूँढो", es: "Busca la sombra", ar: "أين الظل؟" },
+        blurb: {
+          de: "Welcher Schatten passt zum Bild?",
+          en: "Which shadow fits the picture?",
+          zh: "哪个影子和图片一样？",
+          hi: "कौन-सी परछाईं तस्वीर से मिलती है?",
+          es: "¿Qué sombra va con el dibujo?",
+          ar: "أي ظل يناسب الصورة؟",
+          ru: "Какая тень подходит к картинке?",
+        },
       },
       {
         href: "/socken/",
@@ -124,6 +195,15 @@ export const CATEGORIES: Category[] = [
           hi: "मोज़ों की जोड़ियाँ",
           es: "Pares de calcetines",
           ar: "أزواج الجوارب",
+        },
+        blurb: {
+          de: "Gleiche Socken finden",
+          en: "Find matching socks",
+          zh: "找一样的袜子",
+          hi: "एक जैसे मोज़े ढूँढना",
+          es: "Encontrar calcetines iguales",
+          ar: "إيجاد الجوارب المتشابهة",
+          ru: "Найти одинаковые носки",
         },
       },
     ],
@@ -140,14 +220,14 @@ export const CATEGORIES: Category[] = [
       es: "Letras y números",
       ar: "الحروف والأرقام",
     },
-    subtitle: {
-      de: "Tasten drücken, Buchstaben finden, Wörter tippen.",
-      ru: "Нажимать клавиши, искать буквы, печатать слова.",
-      en: "Press keys, find letters, type words.",
-      zh: "按按键，找字母，打单词。",
-      hi: "बटन दबाना, अक्षर ढूँढना, शब्द टाइप करना।",
-      es: "Pulsar teclas, buscar letras, escribir palabras.",
-      ar: "ضغط المفاتيح، والبحث عن الحروف، وكتابة الكلمات.",
+    blurb: {
+      de: "Tasten drücken, Buchstaben finden",
+      en: "Press keys, find letters",
+      zh: "按按键，找字母",
+      hi: "बटन दबाना, अक्षर ढूँढना",
+      es: "Pulsar teclas, encontrar letras",
+      ar: "الضغط على الأزرار وإيجاد الحروف",
+      ru: "Нажимать клавиши, находить буквы",
     },
     // One game, so the home card opens it directly (see categoryHref).
     games: [
@@ -163,6 +243,15 @@ export const CATEGORIES: Category[] = [
           es: "Letras y números",
           ar: "الحروف والأرقام",
         },
+        blurb: {
+          de: "Tasten drücken, Buchstaben finden",
+          en: "Press keys, find letters",
+          zh: "按按键，找字母",
+          hi: "बटन दबाना, अक्षर ढूँढना",
+          es: "Pulsar teclas, encontrar letras",
+          ar: "الضغط على الأزرار وإيجاد الحروف",
+          ru: "Нажимать клавиши, находить буквы",
+        },
       },
     ],
   },
@@ -170,36 +259,103 @@ export const CATEGORIES: Category[] = [
     id: "weitere",
     emoji: "🎈",
     title: { de: "Weitere", ru: "Ещё", en: "More", zh: "更多", hi: "और भी", es: "Más", ar: "المزيد" },
-    subtitle: { de: "Zähne putzen, aufs Töpfchen gehen, Sterne sammeln, den Tag in Bildern sehen und laut oder leise rufen." },
+    // Its games are few and stand apart from each other, so a tap on „Weitere“ first would only hide them.
+    onHome: true,
     games: [
       {
         href: "/zaehne/",
         emoji: "🦷",
         title: { de: "Zähne putzen", ru: "Чистим зубы", en: "Brushing Teeth", zh: "刷牙", hi: "दाँत साफ़ करना", es: "Lavarse los dientes", ar: "تنظيف الأسنان" },
+        blurb: {
+          de: "Zähneputzen mit Lied und Timer",
+          en: "Brushing teeth with a song and a timer",
+          zh: "跟着歌和计时器刷牙",
+          hi: "गाने और टाइमर के साथ दाँत साफ़ करना",
+          es: "Cepillarse con canción y temporizador",
+          ar: "تنظيف الأسنان مع أغنية ومؤقّت",
+          ru: "Чистим зубы с песенкой и таймером",
+        },
       },
       {
         href: "/toepfchen/",
         emoji: "🚽",
         title: { de: "Aufs Töpfchen", ru: "На горшок", en: "Potty Time", zh: "坐便盆", hi: "पॉटी पर चलो", es: "Al orinal", ar: "إلى النونية" },
+        blurb: {
+          de: "Aufs Klo gehen, Schritt für Schritt",
+          en: "Going to the toilet, step by step",
+          zh: "一步一步上厕所",
+          hi: "शौचालय जाना, क़दम-दर-क़दम",
+          es: "Ir al baño, paso a paso",
+          ar: "الذهاب إلى الحمّام خطوة بخطوة",
+          ru: "Ходим в туалет шаг за шагом",
+        },
       },
-      { href: "/belohnungstafel/", also: ["/tagesplan/"], emoji: "🌟", title: { de: "Sterne & Tagesplan" } },
+      {
+        href: "/belohnungstafel/",
+        also: ["/tagesplan/"],
+        emoji: "🌟",
+        title: {
+          de: "Sterne & Tagesplan",
+          en: "Stars & Day Plan",
+          zh: "星星和日程表",
+          hi: "सितारे और दिन की योजना",
+          es: "Estrellas y plan del día",
+          ar: "النجوم وخطة اليوم",
+          ru: "Звёздочки и план дня",
+        },
+        blurb: {
+          de: "Belohnungstafel und Tagesplan in Bildern",
+          en: "Reward chart and day plan in pictures",
+          zh: "用图画做的奖励表和日程表",
+          hi: "तस्वीरों में इनाम चार्ट और दिन की योजना",
+          es: "Premios y plan del día en imágenes",
+          ar: "لوحة المكافآت وخطة اليوم بالصور",
+          ru: "Таблица наград и план дня в картинках",
+        },
+      },
       {
         href: "/laut-leise/",
         emoji: "🦁",
         title: { de: "Laut und leise", ru: "Громко и тихо", en: "Loud and Quiet", zh: "大声和小声", hi: "ज़ोर से और धीरे", es: "Fuerte y suave", ar: "عالٍ وخافت" },
+        blurb: {
+          de: "Laut und leise sprechen üben",
+          en: "Practise speaking loud and quiet",
+          zh: "练习大声和小声说话",
+          hi: "ज़ोर से और धीरे बोलने का अभ्यास",
+          es: "Practicar hablar fuerte y suave",
+          ar: "التدرّب على الكلام بصوت عالٍ وخافت",
+          ru: "Учимся говорить громко и тихо",
+        },
       },
     ],
   },
 ];
 
-/** A category of one game has no page of its own: a menu with a single card would only be one tap more. */
-export const hasPage = (category: Category) => category.games.length > 1;
+/**
+ * A category of one game has no page of its own: a menu with a single card would only be one tap more.
+ * Neither has one whose games stand on the home page.
+ */
+export const hasPage = (category: Category) => !category.onHome && category.games.length > 1;
 
-/** Where the category's home card leads: its page, or its only game. */
-export const categoryHref = (category: Category) => (hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+/** Where the category's home card leads: its page, or its only game; the home page for one whose games stand there. */
+export const categoryHref = (category: Category) => (category.onHome ? "/" : hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+
+/** Whether a page belongs to the game: its address or one below it. */
+const isGamePage = (game: Game, path: string) => [game.href, ...(game.also ?? [])].some((href) => path.startsWith(href));
+
+const withSlash = (pathname: string) => (pathname.endsWith("/") ? pathname : `${pathname}/`);
 
 /** The category page a game page belongs to, for its back link; none for the only game of a category (back to home then). */
 export function categoryOf(pathname: string) {
-  const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
-  return CATEGORIES.find((c) => hasPage(c) && c.games.some((g) => [g.href, ...(g.also ?? [])].some((href) => path.startsWith(href))));
+  const path = withSlash(pathname);
+  return CATEGORIES.find((c) => hasPage(c) && c.games.some((g) => isGamePage(g, path)));
+}
+
+/**
+ * The category whose world (backdrop and card colours, see Worlds.tsx) a page shows: its own page or one of its
+ * games, also for a category without a page of its own. None for the home page.
+ */
+export function worldOf(pathname: string) {
+  const path = withSlash(pathname);
+  return CATEGORIES.find((c) => path.startsWith(`/spiele/${c.id}/`) || c.games.some((g) => isGamePage(g, path)));
 }

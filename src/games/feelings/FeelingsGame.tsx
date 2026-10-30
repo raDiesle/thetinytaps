@@ -91,19 +91,17 @@ export function FeelingsGame() {
               ar: "تحت كل صورة مكتوب بخط صغير ما تعرضه – ليقرأه الكبار ويحكوا القصة. الأطفال يختارون من الصورة فقط.",
             })}
           </p>
-          {!settings.speech && (
-            <p>
-              {t({
-                de: "Mit Vorlesen (auf der Startseite) wird die Geschichte erzählt, sonst erzählen Erwachsene sie anhand der Bilder.",
-                ru: "Если на главной странице включено «Читать вслух», историю рассказывает голос, иначе её рассказывают взрослые по картинкам.",
-                en: "With “Read aloud” on (on the home page) a voice tells the story; otherwise grown-ups tell it from the pictures.",
-                zh: "在首页打开“朗读”后，由声音来讲故事；否则由大人看着图片讲。",
-                hi: "मुखपृष्ठ पर “पढ़कर सुनाएँ” चालू हो तो आवाज़ कहानी सुनाती है, नहीं तो बड़े तस्वीरें देखकर कहानी सुनाते हैं।",
-                es: "Con «Leer en voz alta» activado (en la página de inicio), una voz cuenta la historia; si no, los adultos la cuentan con las imágenes.",
-                ar: "عند تشغيل «القراءة بصوت عال» في الصفحة الرئيسية يحكي صوت القصة، وإلا يحكيها الكبار من الصور.",
-              })}
-            </p>
-          )}
+          <p>
+            {t({
+              de: "Erwachsene erzählen die Geschichte anhand der Bilder.",
+              en: "Grown-ups tell the story using the pictures.",
+              zh: "大人看着图片讲故事。",
+              hi: "बड़े तस्वीरों को देखकर कहानी सुनाते हैं।",
+              es: "Los adultos cuentan la historia con ayuda de las imágenes.",
+              ar: "يروي الكبار القصة بالاستعانة بالصور.",
+              ru: "Взрослые рассказывают историю по картинкам.",
+            })}
+          </p>
         </>
       }
     >

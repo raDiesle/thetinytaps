@@ -28,7 +28,9 @@ parts change exactly with the brushing steps, a finale on the end screen.
   only.
 - **Give the user exact copy-paste blocks, one per Suno field**, numbered steps in
   the user's language. A general description ("make it loopable, ~90 s") left the
-  user not knowing what to do.
+  user not knowing what to do. Every field of every language is a whole block of its own, ready to paste as it is –
+  never "the same as above plus …" or a shared block with additions per language to put together by hand (the user
+  had to ask again for the Exclude Styles in full). Several languages at once: one complete section per language.
 - **Instrumental OFF, structure in the Lyrics field.** With "Instrumental" on, the
   Lyrics field disappears and there is no control over the parts. Lyrics that hold
   only `[bracket tags]` are read as directions and not sung. If Suno sings or hums
@@ -47,7 +49,14 @@ parts change exactly with the brushing steps, a finale on the end screen.
   each other inside the song (last chorus → first verse is like chorus 1 → verse 2) and cross-correlate onsets: the
   bars before the jump with the bars before that verse, the bars after it with that verse's start – both must land
   within a few hundredths of the seam. Repeated choruses give the most exact times; verses (other words) and
-  Whisper's first words after a bell intro (smeared over it) do not.
+  Whisper's first words after an intro (smeared over it, even a one-bar one) do not. Short windows (1–2 s) over a held
+  last note or the quiet gap before a verse have too few onsets and point a beat or a bar off (the English waiting
+  song seemed to hold its last chorus a bar longer); windows of 5–8 s reaching across the chorus-to-verse change decide.
+- **Find the parts from the music, not from Whisper's line times.** Whisper (base) heard the Hindi waiting song as
+  English, Urdu and an endless „tititi“ and put lines seconds off; it only shows the order of the lines. Where the
+  choruses are comes from matching one chorus's spectrum (log bands plus onsets, 10 ms frames) against the whole song:
+  the repeats scored 0.85–0.93, everything else below 0.75, and their distances give the tempo to the hundredth.
+  Whether anything is sung before the first bar: Whisper on that piece alone, padded with silence.
 - Suno usually adds a part and an ending (pause + final chord): useful as a finale
   for the end screen.
 - **Download WAV** (best for cutting and converting), otherwise MP3.

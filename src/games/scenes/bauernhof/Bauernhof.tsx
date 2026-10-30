@@ -1,4 +1,4 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import {
@@ -26,7 +26,7 @@ import {
 import { Background } from "./background";
 import { Bauernhaus, Pumpe, Scheune, Windmuehle } from "./buildings";
 import { Bauer, Vogelscheuche } from "./figures";
-import { FENCE, FENCE_END, HOF, SCHEUNE, SUNFLOWER, TREE } from "./layout";
+import { FENCE, FENCE_END, HOF, POND, ROAD_BOTTOM, ROAD_TOP, SCHEUNE, SUNFLOWER, TREE } from "./layout";
 import { Maehdrescher, Schubkarre, Traktor } from "./machines";
 import { Baum, Heuballen } from "./nature";
 import "./bauernhof.css";
@@ -43,6 +43,13 @@ export const bauernhof: Scene = {
   sky: "#8fd3ff",
   ground: "#74c69d",
   Background,
+  // The pond splashes, a beetle crawls along the dirt road, the meadow grows flowers or a mole peeks out.
+  spots: [
+    { box: [POND[0] - POND[2], POND[1] - POND[3], 2 * POND[2], 2 * POND[3]], kinds: ["splash"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, ROAD_TOP, 1600, ROAD_BOTTOM - ROAD_TOP], kinds: ["bug"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

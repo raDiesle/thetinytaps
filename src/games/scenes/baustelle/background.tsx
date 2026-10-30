@@ -1,7 +1,8 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
-import { DIGGER, FLOWERS, HAMMER, SITE } from "./layout";
+import { DIGGER, FLOWERS, HAMMER, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, SITE } from "./layout";
 import type { ReactNode } from "react";
 import { Cloud, INK } from "../shared";
+import { Poke } from "../spots";
 
 // The sky ends at the fence (HORIZON). Behind it lies the city in a light haze;
 // in front of it the ground gets darker and pebbles, tufts and kerb joints get
@@ -63,7 +64,7 @@ function Skyline() {
   return (
     <g>
       {TOWERS.map(([x, y, w]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={y} width={w} height={FENCE_TOP + 10 - y} rx="3" fill="#d3def4" />
           <rect x={x + w - 8} y={y} width="8" height={FENCE_TOP + 10 - y} fill="#c3d1ec" />
           {Array.from({ length: Math.floor((FENCE_TOP - 20 - y) / 20) }, (_, row) => (
@@ -74,7 +75,7 @@ function Skyline() {
               strokeWidth="6"
             />
           ))}
-        </g>
+        </Poke>
       ))}
       {/* Another crane, far away in the city */}
       <g stroke="#b5c4e3" strokeWidth="4" fill="none">
@@ -88,20 +89,22 @@ function Skyline() {
 
 function Tree({ x, y, scale }: { x: number; y: number; scale: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-6" y="0" width="12" height="50" fill="#8d5a2b" />
-      <circle cx="0" cy="-10" r="34" fill="#52b788" />
-      <circle cx="-22" cy="6" r="22" fill="#40916c" />
-      <circle cx="22" cy="4" r="24" fill="#40916c" />
-      <circle cx="-10" cy="-22" r="12" fill="#74c69d" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <rect x="-6" y="0" width="12" height="50" fill="#8d5a2b" />
+        <circle cx="0" cy="-10" r="34" fill="#52b788" />
+        <circle cx="-22" cy="6" r="22" fill="#40916c" />
+        <circle cx="22" cy="4" r="24" fill="#40916c" />
+        <circle cx="-10" cy="-22" r="12" fill="#74c69d" />
+      </g>
+    </Poke>
   );
 }
 
 /** Mesh fence panels with orange feet along the back of the site, small because it is far away. */
 function Fence() {
   return (
-    <g>
+    <Poke kind="wobble">
       <defs>
         <pattern id="bs-mesh" width="7" height="7" patternUnits="userSpaceOnUse">
           <path d="M0 0 L7 7 M7 0 L0 7" stroke="#adb5bd" strokeWidth="1" />
@@ -116,7 +119,7 @@ function Fence() {
       {/* A red-white barrier tape on the fence */}
       <path d={`M0 ${FENCE_TOP + 8} H1600`} stroke="#fff" strokeWidth="5" />
       <path d={`M0 ${FENCE_TOP + 8} H1600`} stroke="#e63946" strokeWidth="5" strokeDasharray="16 16" />
-    </g>
+    </Poke>
   );
 }
 
@@ -141,23 +144,25 @@ function Car() {
 
 function Flowers() {
   return (
-    <g transform={transformOf(FLOWERS)}>
-      <ellipse cx="1548" cy="996" rx="52" ry="7" fill="#8d5a2b" opacity="0.5" />
-      <path d="M1512 995 V950 M1548 995 V935 M1584 995 V955" stroke="#40916c" strokeWidth="5" />
-      <path d="M1530 978 q10 -14 18 -4 M1566 984 q10 -14 18 -4" stroke="#40916c" strokeWidth="5" fill="none" />
-      {[
-        [1512, 946, "#ff7bd0"],
-        [1548, 931, "#ffd60a"],
-        [1584, 951, "#8e7dff"],
-      ].map(([cx, cy, color]) => (
-        <g key={cx}>
-          {[0, 72, 144, 216, 288].map((a) => (
-            <circle key={a} cx={cx} cy={Number(cy) - 10} r="7" fill={String(color)} transform={`rotate(${a} ${cx} ${cy})`} />
-          ))}
-          <circle cx={cx} cy={cy} r="6" fill="#fff4d6" />
-        </g>
-      ))}
-    </g>
+    <Poke kind="sway">
+      <g transform={transformOf(FLOWERS)}>
+        <ellipse cx="1548" cy="996" rx="52" ry="7" fill="#8d5a2b" opacity="0.5" />
+        <path d="M1512 995 V950 M1548 995 V935 M1584 995 V955" stroke="#40916c" strokeWidth="5" />
+        <path d="M1530 978 q10 -14 18 -4 M1566 984 q10 -14 18 -4" stroke="#40916c" strokeWidth="5" fill="none" />
+        {[
+          [1512, 946, "#ff7bd0"],
+          [1548, 931, "#ffd60a"],
+          [1584, 951, "#8e7dff"],
+        ].map(([cx, cy, color]) => (
+          <g key={cx}>
+            {[0, 72, 144, 216, 288].map((a) => (
+              <circle key={a} cx={cx} cy={Number(cy) - 10} r="7" fill={String(color)} transform={`rotate(${a} ${cx} ${cy})`} />
+            ))}
+            <circle cx={cx} cy={cy} r="6" fill="#fff4d6" />
+          </g>
+        ))}
+      </g>
+    </Poke>
   );
 }
 
@@ -211,10 +216,6 @@ function Sacks() {
   );
 }
 
-const ROAD_TOP = 648;
-const ROAD_BOTTOM = 768;
-const PAVEMENT = 792;
-
 export function Background() {
   return (
     <>
@@ -246,7 +247,9 @@ export function Background() {
       <Cloud x={1080} y={150} scale={0.42} className="bs-cloud" />
       <Cloud x={720} y={210} scale={0.3} className="bs-cloud bs-cloud-slow" />
       {/* Birds far away */}
-      <path d="M560 150 q6 -6 12 0 q6 -6 12 0 M604 136 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      <Poke kind="drift">
+        <path d="M560 150 q6 -6 12 0 q6 -6 12 0 M604 136 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      </Poke>
       <Skyline />
       <path d="M0 290 Q160 250 360 280 T760 268 T1180 272 T1600 268 V340 H0 Z" fill="#d8f3dc" />
       <rect y="230" width="1600" height="80" fill="url(#bs-haze)" />
@@ -268,39 +271,49 @@ export function Background() {
       <Tracks />
       <g fill="#d4a373" opacity="0.7">
         {PEBBLES.map(([cx, cy]) => (
-          <ellipse key={`${cx}-${cy}`} cx={cx} cy={cy} rx={7 * depthScale(cy)} ry={5 * depthScale(cy)} />
+          <Poke key={`${cx}-${cy}`} kind="hop">
+            <ellipse cx={cx} cy={cy} rx={7 * depthScale(cy)} ry={5 * depthScale(cy)} />
+          </Poke>
         ))}
       </g>
 
       {/* Dirt pile the digger is working on */}
-      <g transform={transformOf(DIGGER)}>
-        <ellipse cx="562" cy="714" rx="120" ry="12" fill={INK} opacity="0.1" />
-        <path d="M455 714 Q560 600 670 714 Z" fill="#c68b59" />
-        <path d="M500 700 Q560 630 620 700" stroke="#d9a066" strokeWidth="10" fill="none" opacity="0.7" />
-        <g fill="#a86f45">
-          <circle cx="520" cy="690" r="6" />
-          <circle cx="575" cy="668" r="5" />
-          <circle cx="610" cy="700" r="7" />
+      <Poke kind="wobble">
+        <g transform={transformOf(DIGGER)}>
+          <ellipse cx="562" cy="714" rx="120" ry="12" fill={INK} opacity="0.1" />
+          <path d="M455 714 Q560 600 670 714 Z" fill="#c68b59" />
+          <path d="M500 700 Q560 630 620 700" stroke="#d9a066" strokeWidth="10" fill="none" opacity="0.7" />
+          <g fill="#a86f45">
+            <circle cx="520" cy="690" r="6" />
+            <circle cx="575" cy="668" r="5" />
+            <circle cx="610" cy="700" r="7" />
+          </g>
         </g>
-      </g>
+      </Poke>
 
-      <OnGround x={1214} y={522}>
-        <Planks />
-      </OnGround>
-      <OnGround x={492} y={640}>
-        <Sacks />
-      </OnGround>
+      <Poke kind="wobble">
+        <OnGround x={1214} y={522}>
+          <Planks />
+        </OnGround>
+      </Poke>
+      <Poke kind="wobble">
+        <OnGround x={492} y={640}>
+          <Sacks />
+        </OnGround>
+      </Poke>
 
       {/* Pallet of bricks below the crane */}
-      <g transform={transformOf(SITE)}>
-        <ellipse cx="720" cy="655" rx="52" ry="7" fill={INK} opacity="0.14" />
-        <rect x="676" y="644" width="88" height="10" rx="2" fill="#8d5a2b" />
-        <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
-          {[0, 1, 2].map((row) =>
-            [0, 1, 2].map((col) => <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />),
-          )}
+      <Poke kind="wobble">
+        <g transform={transformOf(SITE)}>
+          <ellipse cx="720" cy="655" rx="52" ry="7" fill={INK} opacity="0.14" />
+          <rect x="676" y="644" width="88" height="10" rx="2" fill="#8d5a2b" />
+          <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
+            {[0, 1, 2].map((row) =>
+              [0, 1, 2].map((col) => <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />),
+            )}
+          </g>
         </g>
-      </g>
+      </Poke>
 
       {/* Road with kerbs on both sides */}
       <rect y={ROAD_TOP} width="1600" height="10" fill="#ced4da" />
@@ -313,8 +326,11 @@ export function Background() {
       </g>
       <path d="M0 712 H1600" stroke="#fff" strokeWidth="5" strokeDasharray="44 36" />
       <Car />
-      <ellipse cx="520" cy="742" rx="28" ry="7" fill="#495057" />
-      <path d="M502 742 H538 M508 737 H532 M508 747 H532" stroke="#6c757d" strokeWidth="2" />
+      {/* A manhole cover that jumps */}
+      <Poke kind="hop">
+        <ellipse cx="520" cy="742" rx="28" ry="7" fill="#495057" />
+        <path d="M502 742 H538 M508 737 H532 M508 747 H532" stroke="#6c757d" strokeWidth="2" />
+      </Poke>
       <rect y={ROAD_BOTTOM} width="1600" height={PAVEMENT - ROAD_BOTTOM} fill="#dee2e6" />
       <rect y={ROAD_BOTTOM} width="1600" height="3" fill="#ced4da" />
       <path
@@ -334,7 +350,9 @@ export function Background() {
       {/* Grass tufts and flowers */}
       <g stroke="#52b788" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       <Flowers />

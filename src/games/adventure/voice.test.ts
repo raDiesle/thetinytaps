@@ -4,7 +4,8 @@ import { TARGET_LANGUAGES } from "@/content/targetLanguages";
 import { CLOUD_TRIP } from "./stories/cloudTrip";
 import { DEFAULT_TURN, type Story, storyIn } from "./stories/story";
 import { TREASURE_ISLAND } from "./stories/treasureIsland";
-import { recordingName, spokenLines } from "./voiceId";
+import { recordingName } from "@/lib/voiceName";
+import { spokenLines } from "./voiceId";
 
 // Recordings are named by the hash of their line (voice.ts, `bun run voice make`).
 const STORIES = [

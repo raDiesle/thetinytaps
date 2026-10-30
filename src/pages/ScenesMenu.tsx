@@ -1,15 +1,20 @@
 import { GameCard } from "@/components/GameCard";
 import { MenuHead } from "@/components/MenuTop";
+import { Choice } from "@/components/SettingControls";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
 import { localizeScene } from "@/games/scenes/localize";
+import { carryOverScenesSettings, DEFAULT_SCENES_SETTINGS, SCENE_MODES, SCENES_SETTINGS_KEY, type SceneMode } from "@/games/scenes/settings";
+import { useGameSettings } from "@/lib/common";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useAppLanguage, useT } from "@/lib/language";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
 const CATEGORY = categoryOf("/bilder/");
+
+carryOverScenesSettings();
 
 export function ScenesMenu() {
   const language = useAppLanguage();
@@ -25,6 +30,7 @@ export function ScenesMenu() {
   });
   useTitle(title);
   useUpdateBetweenGames();
+  const [settings, update] = useGameSettings(SCENES_SETTINGS_KEY, DEFAULT_SCENES_SETTINGS);
   const grid = useFitGrid(SCENES.length + UPCOMING_SCENES.length);
   return (
     <main className="home">
@@ -41,18 +47,26 @@ export function ScenesMenu() {
             <span aria-hidden>🖼️</span> {title}
           </>
         }
-      />
-      <p className="home-subtitle">
-        {t({
-          de: "Bild aussuchen – dann alles antippen und entdecken!",
-          ru: "Выбери картинку – и нажимай на всё, что видишь!",
-          en: "Pick a picture – then tap everything and discover!",
-          zh: "选一幅图画，然后点一点，看看都有什么！",
-          hi: "एक तस्वीर चुनो – फिर सब कुछ छूकर खोजो!",
-          es: "¡Elige un dibujo y toca todo para descubrirlo!",
-          ar: "هيّا نختار صورة – ثم نلمس كل شيء ونكتشف!",
-        })}
-      </p>
+      >
+        {/* How the picture is played, always in sight above the pictures (on a phone in the top row, so they all still
+            fit): a tap on a picture plays it so at once. */}
+        <div className="mode-level">
+          <Choice<SceneMode>
+            label={t({
+              de: "Spielart wählen",
+              ru: "Выбрать игру",
+              en: "Choose a way to play",
+              zh: "选择玩法",
+              hi: "खेलने का तरीका चुनें",
+              es: "Elegir modo de juego",
+              ar: "اختيار طريقة اللعب",
+            })}
+            value={settings.mode}
+            onChange={(mode) => update({ mode })}
+            options={SCENE_MODES.map(({ value, label }) => ({ value, label: t(label) }))}
+          />
+        </div>
+      </MenuHead>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {SCENES.map((scene) => localizeScene(scene, language.id)).map((s) => (
           <li key={s.id}>

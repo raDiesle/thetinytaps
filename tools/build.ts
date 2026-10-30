@@ -163,7 +163,7 @@ async function writePages(template: string) {
 // so every change installs a new one. 404.html is left out: the worker answers deep links with
 // index.html itself. So are songs (files named musik-*.mp3): music can be switched off for all games,
 // and then they must not be downloaded; the worker keeps a song once a page has fetched it. The same
-// for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/games/adventure/voiceId.ts)
+// for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/lib/voiceName.ts)
 // and the texts of each language (texts-ru.<hash>.js, src/content/texts): only the chosen one is needed, and
 // the worker keeps the one a page asks for (TEXTS, by language).
 async function writeServiceWorker() {

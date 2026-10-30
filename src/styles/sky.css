@@ -18,18 +18,21 @@
   width: clamp(130px, 18vw, 240px);
 }
 
-.sky-sun circle {
+.sky-sun circle,
+.world-sun circle {
   fill: var(--sunshine);
   stroke: var(--ink);
   stroke-width: 5;
 }
 
-.sky-sun .sky-sun-cheek {
+.sky-sun .sky-sun-cheek,
+.world-sun .sky-sun-cheek {
   fill: #ff9f9f;
   stroke: none;
 }
 
-.sky-sun .sky-sun-eye {
+.sky-sun .sky-sun-eye,
+.world-sun .sky-sun-eye {
   fill: var(--ink);
   stroke: none;
 }

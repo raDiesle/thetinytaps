@@ -127,7 +127,16 @@ no speech bubbles, no frames.
 ```
 
 For `--transparent` drop "Simple, uncluttered background" – the script adds the
-flat backdrop instruction itself. Folders with their own guide (like
+flat backdrop instruction itself. Never ask a cut-out for a shape behind its subject („a round sticker“, „inside a
+circle“): Gemini then draws a disc that keeps the magenta of the backdrop, a white ring, or a small circle on a white
+square, and the cut-out fails. Ask for a free-standing illustration with no circle, disc or frame behind it instead
+(only a sticker that *is* a shape, a star or a heart, is fine). Leave out light that spreads (a lamp's glow, sunbeams
+through a window): it came out magenta-pink. Ask for the whole thing to fit („the whole bathtub fits in the
+picture“), or the model cuts a tub or pool at the edge.
+A long strip (a print border, `--aspect 21:9` cropped to 4:1) comes back as a narrower strip with white bands
+above and below, even when the prompt says „edge to edge“: the cover crop then keeps white rows, or cuts the sides
+(the sun of a sky strip). Trim the white rows from the raw `.image-raw/` picture first (sharp `extract`), then crop
+to the size; move the crop (`position`) so the strip's main thing stays whole. Folders with their own guide (like
 `src/games/feelings/bilder/README.md`) have their own style block, characters and file
 names – use those.
 
@@ -137,6 +146,8 @@ names – use those.
    leave a placeholder in the game (the Gefühle game shows the file name, `Placeholder` in its `shared.tsx`)
    and list file name and prompt where the game keeps them (e.g. „Geplant“ in its `bilder/README.md`),
    so the user looks at the ideas first and then makes them with you.
+   Prompts collected for review on `/management/` (`src/content/picturePrompts.ts`) stay there once made, each with
+   the `url` of its picture, so the page shows it as made and not as missing (`picturePrompts.test.ts` checks it).
 1. Write the prompt in English: subject, pose, mood, what must be readable for a
    toddler. One clear subject; describe characters with the same words every time.
 2. For a recurring character, make a reference first (character sheet or the best

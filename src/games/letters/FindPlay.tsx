@@ -123,7 +123,7 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
     return () => clearTimeout(timer);
   }, [found, nextLetter]);
 
-  // Start with a letter right away; settings can't change while playing.
+  // Start with a letter right away; a new kind of pictures while playing brings a new game (its key in LettersGame).
   useEffect(() => nextLetter(), []);
 
   /** A key was pressed, on the keyboard or on the screen. */

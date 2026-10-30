@@ -1,4 +1,5 @@
-import { float, ground } from "../layout";
+import { depthScale, float, ground } from "../layout";
+import type { Box } from "../types";
 
 // Every drawing of this scene has its foot point at (0, 0) and is placed with `ground`.
 // From back to front: the friendly volcano at the horizon; the cliff with the cave, the
@@ -37,3 +38,28 @@ export const TRAIL = [
   [800, 900],
   [770, 1000],
 ] as const;
+
+/** Middle of the trail at ground height y, smoothly between its points. */
+export function trailX(y: number) {
+  const next = TRAIL.findIndex(([, py]) => py > y);
+  const i = next < 0 ? TRAIL.length - 2 : Math.max(0, next - 1);
+  const [x1, y1] = TRAIL[i];
+  const [x2, y2] = TRAIL[i + 1];
+  const t = Math.max(0, Math.min(1, (y - y1) / (y2 - y1)));
+  return x1 + ((x2 - x1) * (1 - Math.cos(t * Math.PI))) / 2;
+}
+
+/** Half the width of the trail at ground height y. */
+export const trailHalf = (y: number) => depthScale(y) * 54;
+
+/** Boxes that stay on the winding trail, in short steps from the back to the front, for a beetle on it. */
+export const TRAIL_BOXES: Box[] = Array.from({ length: 40 }, (_, i): Box => {
+  const top = TRAIL[0][1] + ((1000 - TRAIL[0][1]) * i) / 40;
+  const bottom = top + (1000 - TRAIL[0][1]) / 40;
+  const half = trailHalf(top) * 0.9;
+  const left = Math.max(trailX(top), trailX(bottom)) - half;
+  return [left, top, Math.min(trailX(top), trailX(bottom)) + half - left, bottom - top];
+}).filter(([, , w]) => w > 0);
+
+/** The lake's open water, inside its shore, for a fish to jump. */
+export const LAKE_WATER: Box = [LAKE.cx - LAKE.rx * 0.7, LAKE.cy - LAKE.ry * 0.7, LAKE.rx * 1.4, LAKE.ry * 1.4];

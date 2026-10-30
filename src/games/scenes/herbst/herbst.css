@@ -1,48 +1,5 @@
 /* Animations of the scene Herbst. Durations match durationMs in Herbst.tsx. Sun and cloud: ../sky.css, the pumpkin: kuerbis.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .he-cloud {
-  animation: he-drift 30s ease-in-out infinite alternate;
-}
-
-.scene.lively .he-cloud-slow {
-  animation-duration: 44s;
-}
-
-.scene.lively .he-drachen-fly {
-  animation: he-idle-sway 5s ease-in-out infinite alternate;
-}
-
-.scene.lively .he-windrad-blades {
-  animation: he-idle-spin 6s linear infinite;
-}
-
-.scene.lively .he-hund-tail {
-  animation: he-wag 1.4s ease-in-out infinite alternate;
-}
-
-@keyframes he-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
-
-@keyframes he-idle-sway {
-  from {
-    transform: rotate(-2deg);
-  }
-  to {
-    transform: rotate(2deg);
-  }
-}
-
-@keyframes he-idle-spin {
-  to {
-    transform: rotate(1turn);
-  }
-}
-
 /* ---------- Resting state ---------- */
 
 /* Puffs, leaves, notes, drops and sparkles only show while their item plays, and can't be tapped meanwhile. */

@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { HORIZON, depthScale, onFloor } from "../layout";
 import { STEEL } from "../shared";
+import { Poke } from "../spots";
 
 // The back wall: painted at the top, small tiles below with a blue border, and a skirting
 // at the bottom. The floor is a checkered tiled floor; its tiles get smaller and paler towards
@@ -15,7 +16,8 @@ const COLUMNS = Array.from({ length: 31 }, (_, k) => (k - 15) * TILE);
 
 /** Wall tiles: their size at the back wall. */
 const WALL_TILE = TILE * 0.45;
-const WALL_TILE_TOP = HORIZON - 3 * WALL_TILE;
+/** Where the band of wall tiles starts (its blue border is just above). */
+export const WALL_TILE_TOP = HORIZON - 3 * WALL_TILE;
 
 function FloorTiles() {
   const cells: ReactElement[] = [];
@@ -58,14 +60,16 @@ function WallTiles() {
 function Puddle({ x, y, w }: { x: number; y: number; w: number }) {
   const s = depthScale(y);
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path
-        d={`M${-w} 0 Q${-w} -14 ${-w * 0.4} -16 Q0 -24 ${w * 0.5} -16 Q${w} -12 ${w} 0 Q${w * 0.6} 12 0 10 Q${-w * 0.7} 14 ${-w} 0 Z`}
-        fill="#a5d8ff"
-        opacity="0.7"
-      />
-      <path d={`M${-w * 0.5} -8 Q0 -14 ${w * 0.3} -10`} stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.8" />
-    </g>
+    <Poke kind="wobble">
+      <g transform={`translate(${x} ${y}) scale(${s})`}>
+        <path
+          d={`M${-w} 0 Q${-w} -14 ${-w * 0.4} -16 Q0 -24 ${w * 0.5} -16 Q${w} -12 ${w} 0 Q${w * 0.6} 12 0 10 Q${-w * 0.7} 14 ${-w} 0 Z`}
+          fill="#a5d8ff"
+          opacity="0.7"
+        />
+        <path d={`M${-w * 0.5} -8 Q0 -14 ${w * 0.3} -10`} stroke="#fff" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.8" />
+      </g>
+    </Poke>
   );
 }
 
@@ -96,11 +100,13 @@ export function Background() {
       <path d={`M0 ${WALL_TILE_TOP - 14} H1600`} stroke="#fff" strokeWidth="3" opacity="0.6" />
       {/* Little fish on some tiles */}
       {[160, 560, 980, 1360].map((x) => (
-        <g key={x} transform={`translate(${x} ${HORIZON - WALL_TILE * 1.5}) scale(0.45)`} fill="#74c0fc">
-          <ellipse cx="0" cy="0" rx="22" ry="13" />
-          <path d="M18 0 L36 -12 V12 Z" />
-          <circle cx="-10" cy="-3" r="3" fill="#fff" />
-        </g>
+        <Poke key={x} kind="wobble">
+          <g transform={`translate(${x} ${HORIZON - WALL_TILE * 1.5}) scale(0.45)`} fill="#74c0fc">
+            <ellipse cx="0" cy="0" rx="22" ry="13" />
+            <path d="M18 0 L36 -12 V12 Z" />
+            <circle cx="-10" cy="-3" r="3" fill="#fff" />
+          </g>
+        </Poke>
       ))}
       <rect y={HORIZON - 8} width="1600" height="8" fill="#99d5db" />
 
@@ -111,22 +117,30 @@ export function Background() {
       <rect y={HORIZON} width="1600" height="60" fill="url(#bz-haze)" />
 
       {/* Towel rail and the toilet paper holder's plate */}
-      <rect x="852" y="124" width="10" height="18" rx="4" fill={STEEL} />
-      <rect x="958" y="124" width="10" height="18" rx="4" fill={STEEL} />
-      <rect x="852" y="128" width="116" height="8" rx="4" fill="#ced4da" />
-      <rect x="1136" y="242" width="52" height="10" rx="4" fill={STEEL} />
+      <Poke kind="wobble">
+        <rect x="852" y="124" width="10" height="18" rx="4" fill={STEEL} />
+        <rect x="958" y="124" width="10" height="18" rx="4" fill={STEEL} />
+        <rect x="852" y="128" width="116" height="8" rx="4" fill="#ced4da" />
+      </Poke>
+      <Poke kind="wobble">
+        <rect x="1136" y="242" width="52" height="10" rx="4" fill={STEEL} />
+      </Poke>
 
       {/* Shelf above the toilet */}
-      <rect x="990" y="196" width="190" height="12" rx="4" fill="#ffd6a5" />
-      <rect x="990" y="204" width="190" height="4" rx="2" fill="#e9b872" />
-      <path d="M1012 208 v14 h10 M1158 208 v14 h-10" stroke={STEEL} strokeWidth="4" fill="none" />
+      <Poke kind="wobble">
+        <rect x="990" y="196" width="190" height="12" rx="4" fill="#ffd6a5" />
+        <rect x="990" y="204" width="190" height="4" rx="2" fill="#e9b872" />
+        <path d="M1012 208 v14 h10 M1158 208 v14 h-10" stroke={STEEL} strokeWidth="4" fill="none" />
+      </Poke>
 
       {/* Bath mat in front of the tub */}
-      <g transform={`translate(300 690) scale(${matScale})`}>
-        <ellipse cx="0" cy="0" rx="190" ry="58" fill="#ffafcc" />
-        <ellipse cx="0" cy="0" rx="150" ry="42" fill="none" stroke="#fff" strokeWidth="6" strokeDasharray="4 12" strokeLinecap="round" />
-        <ellipse cx="0" cy="-4" rx="190" ry="58" fill="none" stroke="#ffc8dd" strokeWidth="6" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={`translate(300 690) scale(${matScale})`}>
+          <ellipse cx="0" cy="0" rx="190" ry="58" fill="#ffafcc" />
+          <ellipse cx="0" cy="0" rx="150" ry="42" fill="none" stroke="#fff" strokeWidth="6" strokeDasharray="4 12" strokeLinecap="round" />
+          <ellipse cx="0" cy="-4" rx="190" ry="58" fill="none" stroke="#ffc8dd" strokeWidth="6" />
+        </g>
+      </Poke>
 
       {/* Drops and puddles on the floor */}
       <Puddle x={640} y={975} w={90} />

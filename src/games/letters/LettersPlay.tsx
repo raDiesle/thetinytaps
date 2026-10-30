@@ -73,7 +73,7 @@ const lastStage = (s: Shown) => (s.kind === "letter" ? 0 : s.n + 1);
  * Frei tippen: every key shows its letter or number. With `numbersOnly` (Zählen) only numbers come: a digit shows
  * itself, and any other key that has no meaning of its own a number by chance.
  */
-export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: LanguagePack; settings: LettersSettings; numbersOnly?: boolean }) {
+export function LettersPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [shown, setShown] = useState<Shown | null>(null);
   const [stage, setStage] = useState(0);
   /** Counting by tapping: indices of the tapped things, in order. */
@@ -83,6 +83,9 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
   const { bursts, spawn } = useBursts();
   const t = useT();
   const stepByStep = settings.numbers === "step";
+  const numbersOnly = settings.numbersOnly;
+  /** A number stops before its digit, which comes only when the same number is pressed again (`digitOnRepeat`). */
+  const holdDigit = settings.digitOnRepeat && (settings.numbers === "all" || settings.numbers === "count");
 
   const lastChange = useRef(0);
   const countingUntil = useRef(0);
@@ -187,7 +190,8 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
         announce(next, from);
         return;
       }
-      const last = lastStage(next);
+      const full = lastStage(next);
+      const last = holdDigit && next.kind === "number" ? next.n : full;
       if (next.kind === "letter" || settings.numbers === "all") {
         setStage(last);
         announce(next, last);
@@ -207,9 +211,9 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
           ),
         );
       }
-      countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + COUNT_SUMMARY_MS;
+      countingUntil.current = performance.now() + (last - from) * COUNT_STEP_MS + (last === full ? COUNT_SUMMARY_MS : 0);
     },
-    [announce, replace, byTap, stepByStep, settings.numbers],
+    [announce, replace, byTap, stepByStep, holdDigit, settings.numbers],
   );
 
   const show = useCallback(
@@ -337,6 +341,18 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
     (key: string) => {
       let target = resolveKey(key, pack);
       if (numbersOnly && target?.kind === "letter") target = null;
+      // All things are there and the digit waits: the same number again brings it.
+      if (holdDigit && shown?.kind === "number" && stage === shown.n && isSame(target, shown)) {
+        const now = performance.now();
+        if (now - lastChange.current < MIN_CHANGE_MS || (settings.finishCounting && now < countingUntil.current)) {
+          funBurst();
+          return;
+        }
+        lastChange.current = now;
+        setStage(lastStage(shown));
+        announce(shown, lastStage(shown));
+        return;
+      }
       // Step by step, Space and Enter reveal the next part until everything is shown; then they are special keys again.
       const revealing = shown !== null && stage < lastStage(shown);
       const isNextKey = ((key === " " || key === "Enter") && revealing) || (shown !== null && isSame(target, shown));
@@ -355,7 +371,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
       lastChange.current = now;
       show(target);
     },
-    [pack, numbersOnly, shown, stage, show, tryAdvance, funBurst, byTap, specialKey, stepByStep, settings.finishCounting],
+    [pack, numbersOnly, holdDigit, shown, stage, show, announce, tryAdvance, funBurst, byTap, specialKey, stepByStep, settings.finishCounting],
   );
 
   useEffect(() => {
@@ -451,7 +467,7 @@ export function LettersPlay({ pack, settings, numbersOnly = false }: { pack: Lan
               thing={shown.thing}
               zeroEmoji={pack.zero.emoji}
               stage={stage}
-              hint={stepByStep || byTap(shown)}
+              hint={stepByStep || byTap(shown) || holdDigit}
               tapped={byTap(shown) ? tapped : undefined}
               trace={settings.trace ? { sounds: settings.sounds } : undefined}
               onItemPointer={onItemPointer}

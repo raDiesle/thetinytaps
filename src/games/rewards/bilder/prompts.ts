@@ -1,9 +1,10 @@
 import type { PicturePrompt, PicturePromptSet } from "@/content/picturePrompts";
 import { ACTIVITIES, MARKS, REWARDS, TASKS, THEMES } from "../catalog";
+import { picture } from "../pictures";
 
 // Every picture the Belohnungstafel may get, as prompts for the grown-up to check on
-// /management/ (Bildvorschläge) before any is made. Nothing here is generated yet: the
-// board shows the catalogue's emoji until a picture exists. Tapsi is the fox of
+// /management/ (Bildvorschläge) before any is made. All of them were made on 30 October 2026 (the user asked for them before
+// reviewing) and show in place of the catalogue's emoji (pictures.tsx). Tapsi is the fox of
 // „Aufs Töpfchen“, drawn after its first picture so it looks the same.
 
 const DIR = "src/games/rewards/bilder";
@@ -22,9 +23,13 @@ const PAPA = "Papa fox, a grown-up fox with a green sweater and round glasses";
 const TAPSI_REF = "src/games/potty/bilder/fox-essen.webp";
 const REF_ONLY = "Use the reference picture only for how the fox looks and for the drawing style, not for the place or the pose. ";
 
-/** A task or reward picture: one action a two-year-old knows at a glance, small enough for a field. */
+/**
+ * A task or reward picture: one action a two-year-old knows at a glance, small enough for a field. Free-standing, never
+ * „inside a circle“: asked for a round sticker, Gemini drew a disc that kept the magenta of the cut-out backdrop, or a
+ * white ring, or a small circle on a white square.
+ */
 const STICKER =
-  "A single round sticker-like picture: everything fits inside a circle, one clear action a two-year-old recognises at a glance, only the few things the action needs.";
+  "One clear action a two-year-old recognises at a glance, only the few things the action needs, drawn as a free-standing cut-out illustration that fills most of the picture: no circle, disc, ring, frame or background shape behind it, no floor patch, nothing pink or magenta.";
 
 /** What Tapsi does on each task's picture, by catalogue id. */
 const TASK_ACTIONS: Record<string, string> = {
@@ -40,7 +45,8 @@ const TASK_ACTIONS: Record<string, string> = {
   essen: "sits at a little table and eats soup by itself with a spoon, a bowl in front of it",
   tisch: "carries a plate and a cup carefully with both paws, proud, tongue a little out in concentration",
   baden: "sits in a bathtub full of foam and plays with a yellow rubber duck",
-  haare: "sits in the bathtub with foam on its head, holding a small washcloth over its eyes, smiling, while water from a hand shower rinses the foam",
+  haare:
+    "sits in a small bathtub with foam on its head, holding a small washcloth over its eyes, smiling, while a few light blue water drops from a hand shower rinse the foam; the whole bathtub fits in the picture",
   nase: "blows its nose into a white tissue held with both paws, eyes closed",
   eincremen: "rubs white cream onto its arm, a small cream bottle next to it",
   anschnallen: "sits in a child car seat and clicks the buckle shut, smiling",
@@ -63,7 +69,7 @@ const MORE_TASKS: { id: string; use: string; action: string }[] = [
 
 /** What Tapsi does on each card of the Tagesplan, by activity id: one moment of the day a toddler knows. */
 const ACTIVITY_ACTIONS: Record<string, string> = {
-  aufstehen: "sits up in its bed in the morning, stretching both arms up with a big yawn, sunlight through the window",
+  aufstehen: "sits up in a small wooden bed with a pillow and a yellow blanket over its legs, stretching both arms up with a big yawn; the whole bed shows",
   fruehstueck: "sits at a little table eating cereal from a bowl with a spoon, a glass of milk next to it",
   kita: "walks happily towards a small colourful kindergarten building with a little backpack on its back",
   mittagessen: "sits at a little table with a plate of noodles and vegetables, holding a fork",
@@ -72,14 +78,14 @@ const ACTIVITY_ACTIONS: Record<string, string> = {
   spielplatz: "sits on a swing on a playground, laughing, a small slide behind it",
   spielen: "builds a tower of colourful wooden blocks on the floor, concentrating",
   malen: "paints with a thick brush on a sheet of paper on a little table, colourful blobs on the paper",
-  abendessen: "sits at a table in the evening eating a slice of bread, a lamp glowing above",
+  abendessen: "sits at a table in the evening eating a slice of bread, a small lamp hanging above (just the lamp, no light rays or glow)",
   vorlesen: `sits on the lap of ${PAPA} in an armchair, both looking at a picture book (the pages show only pictures)`,
   schlafen: "sleeps in its bed under a blue blanket at night, a crescent moon and stars in the window",
   oma: "hugs a kind grandmother fox with grey fur, round glasses and a knitted cardigan, both smiling",
-  freunde: "plays with a little rabbit friend and a little bear friend, all three holding hands in a circle",
+  freunde: "stands hand in hand with a little white rabbit friend and a little brown bear friend, all three side by side and laughing",
   einkaufen: "sits in the seat of a shopping trolley full of fruit and vegetables, holding a banana",
   ausflug: "walks along a forest path with a small backpack and a little water bottle, pointing ahead",
-  schwimmen: "jumps into a children's pool wearing orange water wings, splashing",
+  schwimmen: "jumps into a small round children's pool wearing orange water wings, splashing; the whole pool fits in the picture",
   turnen: "does a forward roll on a blue gym mat, a small ball and a balance beam nearby",
   musik: "plays a small drum with two sticks, music notes in the air",
   arzt: "sits on an examination table while a friendly doctor bear with a stethoscope listens to its chest, Tapsi smiling",
@@ -129,7 +135,8 @@ const task = (id: string, use: string, action: string): PicturePrompt => ({
   file: `${DIR}/aufgabe-${id}.webp`,
   use,
   prompt: `${REF_ONLY}${STYLE} ${STICKER} ${TAPSI}, ${action}. Tapsi is the only character.`,
-  options: "--transparent --size 512",
+  // At least 600 px, so a card is still sharp as a 5 cm photo print at 300 dpi.
+  options: "--transparent --size 768",
   ref: [TAPSI_REF],
 });
 
@@ -154,34 +161,43 @@ const REWARD_PROMPTS: PicturePrompt[] = REWARDS.map((r) => ({
   ref: [TAPSI_REF],
 }));
 
-/** Line-art twins for black-and-white prints with „Felder zum Ausmalen“: the colour picture redrawn as outlines. */
+/**
+ * Line-art twins for black-and-white prints with „Felder zum Ausmalen“: the colour picture redrawn as outlines. When
+ * made, the reference is the colour picture flattened onto white (the cut-out's transparent parts might come out black).
+ */
 const lineArt = (picture: PicturePrompt): PicturePrompt => ({
   id: `${picture.id}-linie`,
   file: picture.file.replace(".webp", "-linie.webp"),
   use: `Ausmalfassung von ${picture.id}`,
   prompt:
     "Redraw this exact picture as a colouring page for toddlers: only clean, thick, even black outlines on pure white, no colour, no grey, no shading, no filled areas. Keep every character, pose and thing exactly as it is, the same framing. No text, no letters.",
-  options: "--size 512",
+  options: "--size 768",
   ref: [picture.file],
 });
 
+/** The prompts with the URL of each picture already in bilder/. */
+const withPictures = (set: PicturePromptSet): PicturePromptSet => ({
+  ...set,
+  groups: set.groups.map((g) => ({ ...g, prompts: g.prompts.map((p) => ({ ...p, url: picture(p.file.slice(DIR.length + 1, -".webp".length)) })) })),
+});
+
 /** All picture prompts of the Belohnungstafel, shown on /management/. */
-export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
+export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
   id: "belohnungstafel",
   emoji: "🌟",
   title: "Belohnungstafel",
   date: "2026-10-28",
   intro:
-    "Bilder, die die Emoji der Belohnungstafel ersetzen könnten – auf dem Bildschirm und im Ausdruck. Tapsi ist der Fuchs aus „Aufs Töpfchen“ (dessen erstes Bild ist die Referenz). Prüfen: Erkennt ein Zweijähriger die Aufgabe ohne Worte? Passt die Belohnung (Zeit zusammen)? Fehlt eine Aufgabe? Erst nach dem Prüfen wird erzeugt (Batch, je Bild etwa 2 Cent, Sticker im 2×2-Raster billiger).",
+    "Bilder, die die Emoji der Belohnungstafel ersetzen könnten – auf dem Bildschirm und im Ausdruck. Tapsi ist der Fuchs aus „Aufs Töpfchen“ (dessen erstes Bild ist die Referenz). Prüfen: Erkennt ein Zweijähriger die Aufgabe ohne Worte? Passt die Belohnung (Zeit zusammen)? Fehlt eine Aufgabe? Alle erzeugt am 30. Oktober 2026 (src/games/rewards/bilder/) und eingebaut; nur das Vorschaubild „tafel“ wartet noch auf eigene Vorschaubilder je Seite. Ein geändertes Bild wird einzeln neu erzeugt (Batch, je Bild etwa 2 Cent).",
   groups: [
     {
       title: "Aufgaben",
-      note: "Freigestellt (transparent), 512 px. Jede Aufgabe des Katalogs, dazu vier, für die es kein Emoji gibt.",
+      note: "Freigestellt (transparent), 768 px (scharf auch als Fotoabzug). Jede Aufgabe des Katalogs, dazu vier, für die es kein Emoji gibt.",
       prompts: TASK_PROMPTS,
     },
     {
       title: "Tagesplan-Karten",
-      note: "Freigestellt, 512 px: die Schritte eines Tages (Essen, Kita, Schlafen …) für den Tagesplan und seine Bildkarten zum Ausschneiden; Aufgaben wie Zähne putzen nehmen die Bilder oben.",
+      note: "Freigestellt, 768 px: die Schritte eines Tages (Essen, Kita, Schlafen …) für den Tagesplan und seine Bildkarten zum Ausschneiden; Aufgaben wie Zähne putzen nehmen die Bilder oben.",
       prompts: STEP_PROMPTS,
     },
     { title: "Belohnungen", note: "Freigestellt, 768 px: im Ziel-Feld groß und beim Fest bildschirmfüllend.", prompts: REWARD_PROMPTS },
@@ -232,7 +248,7 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
         id: `streifen-${th.id}`,
         file: `${DIR}/streifen-${th.id}.webp`,
         use: `Streifen für die Farbe ${th.label.de}`,
-        prompt: `Children's picture-book illustration for 2–4 year olds. Soft, flat, rounded shapes with thick dark-purple outlines (#2a1e5c), bright friendly colours, gentle shading. No text, no letters, no numbers. A long, narrow decorative strip showing ${THEME_LOOKS[th.id]}, evenly spread from left to right, nothing important at the very ends (they may be cut off).`,
+        prompt: `Children's picture-book illustration for 2–4 year olds. Soft, flat, rounded shapes with thick dark-purple outlines (#2a1e5c), bright friendly colours, gentle shading. No text, no letters, no numbers. A long, narrow decorative strip showing ${THEME_LOOKS[th.id]}, evenly spread from left to right, nothing important at the very ends (they may be cut off). The scene fills the whole picture from edge to edge: no border, margin, frame, outline round the strip or rounded corners.`,
         options: "--aspect 21:9 --size 1680x420",
       })),
     },
@@ -242,4 +258,4 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
       prompts: [...TASK_PROMPTS, ...STEP_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
     },
   ],
-};
+});

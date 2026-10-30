@@ -54,13 +54,6 @@ export const SEO_PAGES: PageSeo[] = [
     text: "Erste Zuordnungsspiele: Futter zum Tier bringen, den passenden Schatten finden, Socken-Paare an die Leine hängen. Antippen oder hinziehen, ohne Fehler.",
   },
   {
-    path: "/spiele/weitere/",
-    title: "Zähneputzen und Laut-leise-Spiel für Kleinkinder",
-    description:
-      "Zähneputzen mit Lied und Timer, Töpfchen, eine Belohnungstafel zum Ausdrucken und ein Spiel für laute und leise Stimme – für Kinder ab 2 Jahren.",
-    text: "Zähne putzen mit Zahnputzlied, Zuckermonstern und Sternentafel, Aufs Töpfchen mit Tapsi, eine Belohnungstafel zum Gestalten und Ausdrucken, und Laut und leise: Brüllen lässt den Löwen springen, Flüstern die Maus piepsen.",
-  },
-  {
     path: "/bilder/",
     title: "Lebendige Wimmelbilder zum Antippen für Kinder",
     description: "Über 20 Wimmelbilder für Kleinkinder: Baustelle, Bauernhof, Zoo, Feuerwache und mehr. Alles bewegt sich und macht Geräusche – ohne Werbung.",
@@ -84,7 +77,7 @@ export const SEO_PAGES: PageSeo[] = [
     title: "Kettenreaktion und Kugelbahn für Kinder",
     description:
       "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kinder ab 2 Jahren, ohne Werbung.",
-    text: "Sechzehn Maschinen: Kugeln rollen, Dominosteine fallen, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion – zum Staunen und Nochmal-Machen.",
+    text: "Zwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine fallen, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion – zum Staunen und Nochmal-Machen.",
   },
   {
     path: "/kleine-abenteuer/",

@@ -1,8 +1,8 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Amselnest, Eikueken, Glueckskaefer, Haeschen, Henne, Hummel, Laemmchen, Mutterschaf, Regenwurm, Zitronenfalter } from "./animals";
-import { Background } from "./background";
+import { Background, PATH_BOXES } from "./background";
 import { BlauesEi, GelbesEi, GruenesEi, Osterei, Osternest } from "./eggs";
 import { Blumentopf, Bollerwagen, Gartenhaus, Gartentor, Gartenzwerg, Giesskanne, Maltisch, Nistkasten, Schokohase, Schubkarre, Vogelbad } from "./garden";
 import { BUSH, POT, TABLE, TREE, WILLOW } from "./layout";
@@ -22,6 +22,12 @@ export const ostern: Scene = {
   sky: "#9fd4fb",
   ground: "#7cc870",
   Background,
+  // A gust of wind through the sky, a beetle on the gravel path, flowers or a mole in the lawn.
+  spots: [
+    ...PATH_BOXES.map((box) => ({ box, kinds: ["bug" as const] })),
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

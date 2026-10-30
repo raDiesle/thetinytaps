@@ -18,9 +18,9 @@ import {
   Schnecke,
   Vogel,
 } from "./figures";
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
-import { DIGGER, FLOWERS, HAMMER, SITE, TREE } from "./layout";
+import { DIGGER, FLOWERS, HAMMER, PAVEMENT, ROAD_TOP, SITE, TREE } from "./layout";
 import { Ampel, Bagger, Ballon, Betonmischer, Gabelstapler, Hubschrauber, Kipplaster, Kran, Walze } from "./machines";
 import { Bauwagen, Container, Haus, Huetchen, Kabeltrommel, Klo, Laterne, Radio, Saege, Sandhaufen, Schild, Schubkarre, Werkzeugkasten } from "./site";
 import "./baustelle.css";
@@ -37,6 +37,13 @@ export const baustelle: Scene = {
   sky: "#8fd3ff",
   ground: "#e5ad62",
   Background,
+  // Flowers grow by the flower bed, a beetle crawls along the road, a mole or a beetle comes out of the dirt, wind in the sky.
+  spots: [
+    { box: [1470, 890, 130, 110], kinds: ["flower"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, ROAD_TOP, 1600, PAVEMENT - ROAD_TOP], kinds: ["bug"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["mole", "bug"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

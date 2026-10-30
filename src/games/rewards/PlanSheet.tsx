@@ -2,11 +2,29 @@ import type { CSSProperties } from "react";
 import { dayKey, weekOf } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
-import { cellKey, type LinkedDays, possessive, weekday } from "./board";
-import { STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import { WEEK_OF } from "./BoardSheet";
+import { AUTO_TITLES, cellKey, isTemplateTitle, type LinkedDays, weekday } from "./board";
+import { DAY_NAMES, PLAN_TEMPLATES, STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import { ItemPic, SheetStrip } from "./pictures";
 import { currentStep, nightsUntil, type Plan, type PlanStep, splitDone, stepDone, stepsOn } from "./plan";
 
-const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
+/** Over the first of an Erst–Dann pair. */
+const FIRST: Localized = { de: "Erst", en: "First", zh: "先", hi: "पहले", es: "Primero", ar: "أولًا", ru: "Сначала" };
+/** Over the card after „Jetzt“, and the second of an Erst–Dann pair. */
+const THEN: Localized = { de: "Dann", en: "Then", zh: "然后", hi: "फिर", es: "Después", ar: "ثم", ru: "Потом" };
+/** Over today's column of a week. */
+export const TODAY: Localized = { de: "Heute", en: "Today", zh: "今天", hi: "आज", es: "Hoy", ar: "اليوم", ru: "Сегодня" };
+
+/** „Noch 3-mal schlafen“: the nights until a day of the week, said to the child (each language with its own plural). */
+export const SLEEPS_LEFT: Localized<(nights: number) => string> = {
+  de: (n) => (n === 1 ? "Noch einmal schlafen" : `Noch ${n}-mal schlafen`),
+  en: (n) => (n === 1 ? "One more sleep" : `${n} more sleeps`),
+  zh: (n) => (n === 1 ? "再睡一觉" : `再睡${n}觉`),
+  hi: (n) => (n === 1 ? "बस एक बार और सोना है" : `बस ${n} बार और सोना है`),
+  es: (n) => (n === 1 ? "Falta una noche" : `Faltan ${n} noches`),
+  ar: (n) => (n === 1 ? "بقيت ليلة واحدة" : n === 2 ? "بقيت ليلتان" : n <= 10 ? `بقيت ${n} ليالٍ` : `بقيت ${n} ليلة`),
+  ru: (n) => (n === 1 ? "Ещё разок поспать" : `Ещё ${n} ${new Intl.PluralRules("ru").select(n) === "few" ? "раза" : "раз"} поспать`),
+};
 
 /** At most this many moons count the nights until a day of the week; further days are next week's anyway. */
 const MAX_MOONS = 6;
@@ -25,17 +43,20 @@ export const PLAN_SCREEN: PlanLook = { print: false, color: true };
 /** A step's words: the grown-up's own or the catalogue's. */
 export function useStepLabel() {
   const t = useT();
-  return (step: { label?: string; catalog?: string }) => step.label ?? (step.catalog ? t(STEP_BY_ID.get(step.catalog)?.label ?? { de: "" }) : "");
+  return (step: { label?: string; catalog?: string }) => {
+    const known = step.catalog ? STEP_BY_ID.get(step.catalog)?.label : undefined;
+    return step.label ?? (known ? t(known) : "");
+  };
 }
 
 /** The heading: the grown-up's own, or one made from the child's name. */
 export function usePlanTitle() {
   const t = useT();
   return (plan: Plan) => {
-    if (plan.title.trim()) return plan.title.trim();
-    const name = plan.childName.trim();
-    if (plan.view === "week") return name ? t({ de: `${possessive(name)} Woche` }) : t({ de: "Meine Woche" });
-    return name ? t({ de: `${possessive(name)} Tag` }) : t({ de: "Mein Tag" });
+    const own = plan.title.trim();
+    const template = PLAN_TEMPLATES.find((tpl) => tpl.id === plan.template)?.title;
+    if (own) return isTemplateTitle(own, template) ? t(template) : own;
+    return t(AUTO_TITLES[plan.view === "week" ? "planWeek" : "day"])(plan.childName.trim());
   };
 }
 
@@ -95,7 +116,7 @@ export function PlanSheet({
   const sub =
     plan.view === "week"
       ? look.print
-        ? `${t({ de: "Woche vom" })} ____________`
+        ? `${t(WEEK_OF)} ____________`
         : dateFormat({ day: "numeric", month: "short" }).formatRange(weekOf(day)[0], weekOf(day)[6])
       : look.print
         ? plan.same
@@ -105,6 +126,7 @@ export function PlanSheet({
 
   return (
     <div className={`rw-sheet pl-sheet pl-view-${plan.view}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}`} style={style}>
+      {look.print && look.color && <SheetStrip theme={theme} />}
       <header className="rw-head">
         <span className="rw-title">{title}</span>
         {sub && <span className="rw-blank">{sub}</span>}
@@ -166,7 +188,7 @@ function StepCard({
     >
       {number !== undefined && <span className="pl-number">{number}</span>}
       <span className="pl-emoji" aria-hidden>
-        {step.emoji}
+        <ItemPic item={step} lines={look.print && !look.color} />
       </span>
       <span className="pl-label">{label}</span>
       {state === "done" && (
@@ -203,7 +225,7 @@ function DaySteps(props: StepsProps & { aspect: number }) {
         <div className="pl-firstthen">
           {steps.map((step, i) => (
             <div key={step.id} className="pl-slot">
-              <span className="pl-tag">{i === 0 ? t({ de: "Erst" }) : t({ de: "Dann" })}</span>
+              <span className="pl-tag">{i === 0 ? t(FIRST) : t(THEN)}</span>
               <StepCard day={day} step={step} state={states[i]} look={look} fresh={fresh} />
             </div>
           ))}
@@ -216,8 +238,8 @@ function DaySteps(props: StepsProps & { aspect: number }) {
     );
   }
   const tag = (step: PlanStep, i: number) => {
-    if (firstThen) return steps.indexOf(step) === 0 ? t({ de: "Erst" }) : t({ de: "Dann" });
-    return i === now ? t({ de: "Jetzt" }) : now >= 0 && i === now + 1 ? t({ de: "Dann" }) : "";
+    if (firstThen) return steps.indexOf(step) === 0 ? t(FIRST) : t(THEN);
+    return i === now ? t({ de: "Jetzt", en: "Now", zh: "现在", hi: "अभी", es: "Ahora", ar: "الآن", ru: "Сейчас" }) : now >= 0 && i === now + 1 ? t(THEN) : "";
   };
   // The body is a little less wide than the sheet: the heading takes some of its height, the box below a little more.
   const { cols, rows } = planLayout(open.length, aspect * (box ? 1.5 : 1.12));
@@ -233,7 +255,19 @@ function DaySteps(props: StepsProps & { aspect: number }) {
           ))}
         </ol>
       )}
-      {steps.length === 0 && <p className="pl-empty">{t({ de: "Noch keine Schritte – unter „Gestalten“ hinzufügen." })}</p>}
+      {steps.length === 0 && (
+        <p className="pl-empty">
+          {t({
+            de: "Noch keine Schritte – unter „Gestalten“ hinzufügen.",
+            en: "No steps yet – add some under “Design”.",
+            zh: "还没有步骤——请在“设计”里添加。",
+            hi: "अभी कोई क़दम नहीं – „डिज़ाइन“ में जोड़ें।",
+            es: "Aún no hay pasos: añádalos en «Diseñar».",
+            ar: "لا توجد خطوات بعد – أضيفوها في «تصميم».",
+            ru: "Пока нет шагов – добавьте их в разделе «Оформление».",
+          })}
+        </p>
+      )}
       {box}
     </div>
   );
@@ -261,7 +295,7 @@ function DoneBox({ day, done, example, fresh, full }: { day: Date; done: PlanSte
               title={stepLabel(step)}
               style={{ "--pl-tilt": `${(i % 2 ? 1 : -1) * (4 + ((i * 3) % 5))}deg` } as CSSProperties}
             >
-              {step.emoji}
+              <ItemPic item={step} />
             </span>
           );
         })}
@@ -288,9 +322,9 @@ function WeekColumns(props: StepsProps) {
         return (
           <div key={dayKey(d)} className={`pl-col${isToday ? " today" : ""}${nights < 0 ? " past" : ""}`}>
             <span className="pl-day" data-day={look.print ? undefined : dayKey(d)} data-tap={look.print ? undefined : ""}>
-              <span className="pl-day-name">{isToday ? t({ de: "Heute" }) : names[weekday(d)]}</span>
+              <span className="pl-day-name">{isToday ? t(TODAY) : names[weekday(d)]}</span>
               {nights > 0 && nights <= MAX_MOONS && (
-                <span className="pl-moons" role="img" aria-label={t({ de: `noch ${nights}-mal schlafen` })}>
+                <span className="pl-moons" role="img" aria-label={t(SLEEPS_LEFT)(nights)}>
                   {"🌙".repeat(nights)}
                 </span>
               )}
