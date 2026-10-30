@@ -5,7 +5,7 @@ import type { TargetLanguage } from "@/content/targetLanguages";
 import { StoryEnd, nextCard } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
-import { BROTHER, Bubble, HERO, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose } from "./kid";
+import { BROTHER, Bubble, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose, useHero } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
 import { sayIn } from "./voice";
 import { WeatherContext } from "./rooms";
@@ -121,6 +121,7 @@ export function ElevatorPlay({
   /** „Nochmal“ or „Weiter“ at the end: the game starts that story or level. */
   onPick: (id: string) => void;
 }) {
+  const hero = useHero();
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(START);
   const { bursts, spawn } = useBursts();
@@ -478,7 +479,7 @@ export function ElevatorPlay({
                     <g className="el-walker" style={inner}>
                       <g className={a.hop ? `el-hopper hop-${a.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid(who)}>
                         <g transform={who === "buddy" ? `scale(${BUDDY_SCALE})` : undefined}>
-                          <Kid look={who === "hero" ? HERO : BROTHER} pose={a.pose} holding={a.holding} wear={a.wear} face={a.face} />
+                          <Kid look={who === "hero" ? hero : BROTHER} pose={a.pose} holding={a.holding} wear={a.wear} face={a.face} />
                         </g>
                       </g>
                     </g>

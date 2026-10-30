@@ -17,7 +17,7 @@ import {
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
-import { FIRE_STRIPE, FireHelmet, HERO, Kid, type Look, type Pose } from "../kid";
+import { FIRE_STRIPE, FireHelmet, Kid, type Look, type Pose, useHero } from "../kid";
 import { Mug } from "../things";
 import type { Picture } from "../trail/items";
 import type { Point } from "../trail/types";
@@ -69,7 +69,8 @@ const AWAY = -700;
 
 /** The child in the fire brigade's clothes. */
 function Child({ pose, face = 1, wear = true }: { pose: Pose; face?: 1 | -1; wear?: boolean }) {
-  return <Kid look={HERO} pose={pose} holding={null} wear={wear ? ["fire"] : []} face={face} />;
+  const hero = useHero();
+  return <Kid look={hero} pose={pose} holding={null} wear={wear ? ["fire"] : []} face={face} />;
 }
 
 /** Something that pops in when it appears. */

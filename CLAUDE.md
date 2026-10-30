@@ -173,7 +173,15 @@ In a fresh worktree run `bun install` first.
   Abenteuer and the good-night sentence do; the management list then leaves its recorded lines out. Music hushes
   while a recording plays (`talking()`). The dev server keeps the file list of a `?glob` from its start: after
   recording (or adding any files to a globbed folder) restart it before checking, or the new files seem missing.
-  The home page's only option for all games is „🎵 Musik“, one tap on its own button, never a menu.
+  The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“.
+- **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 on the home page, a menu so a child's tap
+  can't switch it; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
+  the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
+  and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
+  Bewegungsabenteuer's dark dancer (no hair, it stands for anyone) stay as they are; no game adds a choice of its own for
+  it. A new drawing of the child goes on `CHILD_DRAWINGS` in `src/figure.test.ts`, which also checks that nothing calls
+  the child a „braver Junge“ or the like. With „Mädchen“ the menus get the girl's colours (`:root[data-figure="girl"]` in
+  `base.css`: a lilac sky going pink): a new shared colour of the menus gets its girl's value there too.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
   the room left between them, instead of a fixed box with empty space round it. Look at both sizes in the preview.

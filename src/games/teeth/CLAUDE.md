@@ -17,6 +17,9 @@ without the start screen, outside play time, and „Menü“ or ✕ go back to t
 
 ## Rules
 
+- The child's face (the mirror in `mouth.tsx`, the story in `origin.tsx`) follows „Junge / Mädchen“ from the home page
+  (`useFigure()`, F-04): the girl has two pigtails with yellow bands, and lashes at her eyes – in the mirror often only
+  the eyes are in sight. Mouth, teeth and monsters are the same for both; the song and the lines say nothing of boy or girl.
 - The monsters grow only in the story at the start. In the mirror they are already on the teeth: never let them pop up or arrive there (they only fade in softly as a side of the teeth turns into view), that would be a second, illogical origin.
 - A monster sits on its tooth, not over its neighbours: keep `MONSTER_SIZE` (`mouth.tsx`) small, and the story's monsters about a tooth wide.
 - The story is short (about 15 s): it explains, the brushing is the game.

@@ -1,5 +1,6 @@
 import { memo, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
+import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
 import {
   buildMouth,
@@ -32,6 +33,8 @@ const MIN_FACING = 0.03;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
 const WAITING_FACING = 0.25;
 const HEAD = 270;
+/** The child's hair, also its eyebrows. */
+const HAIR = "#8a5a3c";
 /** Small enough that a monster sits on its tooth rather than covering it and its neighbours. */
 const MONSTER_SIZE = 0.58;
 /** How far inside the lips' outline a monster's middle has to be: past the thick lip (half its stroke) onto the teeth. */
@@ -521,6 +524,12 @@ const CRUMBS: [number, number, number][] = [
   [174, -50, 8],
 ];
 
+/** Where the girl's two lashes start on the outer top of an eye: sideways and up from its middle. */
+const LASHES = [
+  [10, 14],
+  [15, 4],
+];
+
 function KidFace({ project, head, happy, open, crumbs }: { project: Project; head: Point2; happy: boolean; open: number; crumbs: boolean }) {
   const p = project.point;
   const feature = (x: number, y: number, z: number) => ({ at: p([x, y, z]), facing: project.facing([x / 200, 0.1, 0.95]) });
@@ -531,9 +540,32 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
   const cheeks = [-1, 1].map((s) => feature(s * 150, 84, 84));
   const nose = feature(0, 96, 148);
   const squash = (facing: number) => Math.max(0.25, Math.min(1, facing));
+  // The girl (👧 on the home page) has two pigtails above the ears, which turn with the head like the ears do, and
+  // lashes at her eyes – the mirror is so close that often only the eyes show.
+  const girl = useFigure() === "girl";
+  const pigtails = girl
+    ? [-1, 1].map((s) => ({
+        s,
+        tail: p([s * (HEAD + 60), 170, -90]),
+        band: { at: p([s * HEAD * 0.9, 200, -30]), facing: project.facing([s * 0.9, 0.4, 0.3]) },
+      }))
+    : [];
 
   return (
     <g>
+      {pigtails.map(({ s, tail }) => (
+        <ellipse
+          key={s}
+          cx={tail.x}
+          cy={tail.y}
+          rx={70 * project.zoom}
+          ry={115 * project.zoom}
+          transform={`rotate(${s * -35} ${tail.x} ${tail.y})`}
+          fill={HAIR}
+          stroke={INK}
+          strokeWidth={6}
+        />
+      ))}
       {ears.map(({ s, at }) => (
         <circle key={s} cx={at.x} cy={at.y} r={40 * project.zoom} fill={SKIN} stroke={INK} strokeWidth={5} />
       ))}
@@ -548,10 +580,13 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
         cy={head.y - 250 * project.zoom}
         rx={270 * project.zoom}
         ry={110 * project.zoom}
-        fill="#8a5a3c"
+        fill={HAIR}
         stroke={INK}
         strokeWidth={6}
       />
+      {pigtails.map(({ s, band }) =>
+        band.facing > 0 ? <circle key={s} cx={band.at.x} cy={band.at.y} r={26 * project.zoom} fill="#ffd43b" stroke={INK} strokeWidth={5} /> : null,
+      )}
       {cheeks.map(({ at, facing }, i) =>
         facing > 0 ? <ellipse key={i} cx={at.x} cy={at.y} rx={30 * squash(facing)} ry={20} fill="#ff8fa3" opacity={0.55} /> : null,
       )}
@@ -567,6 +602,14 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
           />
         ) : (
           <g key={i} className="face-eye">
+            {girl && (
+              <path
+                d={LASHES.map(([a, b]) => `M${at.x + (i ? 1 : -1) * a * squash(facing)} ${at.y - b} l${(i ? 1 : -1) * 9 * squash(facing)} -9`).join(" ")}
+                stroke={INK}
+                strokeWidth={5}
+                strokeLinecap="round"
+              />
+            )}
             <ellipse cx={at.x} cy={at.y} rx={14 * squash(facing)} ry={19} fill={INK} />
             <circle cx={at.x + 4 * squash(facing)} cy={at.y - 6} r={5} fill="#fff" />
           </g>
@@ -578,7 +621,7 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
             key={i}
             d={`M${at.x - 17 * squash(facing)} ${at.y + 4} Q${at.x} ${at.y - 7} ${at.x + 17 * squash(facing)} ${at.y + 4}`}
             fill="none"
-            stroke="#8a5a3c"
+            stroke={HAIR}
             strokeWidth={6}
             strokeLinecap="round"
           />

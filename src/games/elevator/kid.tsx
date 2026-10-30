@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CHEEK, INK, SKIN } from "@/games/scenes/shared";
+import { type Figure, useFigure } from "@/lib/common";
 import {
   Bed,
   Block,
@@ -38,9 +39,22 @@ export interface Look {
   pants: string;
   hair: string;
   curly?: boolean;
+  /** Two pigtails at the sides of the head, tied with bands of this colour (the girl). */
+  pigtails?: string;
 }
 
-export const HERO: Look = { shirt: "#ff922b", pants: "#4263eb", hair: "#8d5a3b" };
+const HEROES: Record<Figure, Look> = {
+  boy: { shirt: "#ff922b", pants: "#4263eb", hair: "#8d5a3b" },
+  girl: { shirt: "#e64980", pants: "#7048e8", hair: "#8d5a3b", pigtails: "#ffd43b" },
+};
+
+/** The child of the stories, a boy or a girl as chosen on the home page: same size, poses and clothes, only the
+ * hair and the colours of shirt and trousers differ. Never draw the child with a fixed look – ask `useHero()`. */
+export const heroLook = (figure: Figure): Look => HEROES[figure];
+
+/** The look of the child of the stories, following the figure chosen on the home page. */
+export const useHero = (): Look => heroLook(useFigure());
+
 export const BROTHER: Look = { shirt: "#40c057", pants: "#e8590c", hair: "#f2c14e", curly: true };
 
 /** Height of a child at scale 1, from the feet to the top of the hair. */
@@ -191,6 +205,14 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
       ) : (
         <path d="M-33 -146 Q-38 -180 0 -180 Q38 -180 33 -146 Z" fill={look.hair} />
       )}
+      {/* Pigtails behind the head, sticking out at both sides above the ears, each with its band. */}
+      {look.pigtails &&
+        [-1, 1].map((s) => (
+          <g key={s}>
+            <path d={`M${s * 26} -168 Q${s * 62} -176 ${s * 58} -140 Q${s * 52} -124 ${s * 44} -132 Q${s * 46} -150 ${s * 28} -154 Z`} fill={look.hair} />
+            <circle cx={s * 32} cy={-163} r="6" fill={look.pigtails} stroke={INK} strokeWidth="2" />
+          </g>
+        ))}
       <circle cx="0" cy="-140" r="32" fill={SKIN} />
       {/* The fringe, the cheeks and the face slide sideways when the head turns (pose "shake"), the face furthest, so it looks round. */}
       <g className="el-fringe">
@@ -199,7 +221,7 @@ export function KidHead({ look, asleep = false }: { look: Look; asleep?: boolean
         ) : (
           <>
             <path d="M-33 -142 Q-36 -178 0 -178 Q36 -178 33 -142 Q26 -160 8 -158 Q-6 -166 -20 -156 Q-28 -150 -33 -142 Z" fill={look.hair} />
-            <path d="M-2 -176 q4 -18 20 -14 q-12 2 -12 14 Z" fill={look.hair} />
+            {!look.pigtails && <path d="M-2 -176 q4 -18 20 -14 q-12 2 -12 14 Z" fill={look.hair} />}
           </>
         )}
       </g>
@@ -524,6 +546,7 @@ export const PICTURES: Record<PicId, { w: number; h: number; draw: () => ReactNo
 /** The wish to jump into puddles: the child in rain boots and raincoat in mid-air, cheering, over a puddle that
  * splashes up high, with rain around. Still, like every picture in a bubble. */
 function PuddleJump() {
+  const hero = useHero();
   const drops: [number, number][] = [
     [-96, -176],
     [-70, -128],
@@ -556,7 +579,7 @@ function PuddleJump() {
       {/* Lines beside the legs: the child comes down fast */}
       <path d="M-46 -112 V-80 M-58 -98 V-74 M46 -112 V-80 M58 -98 V-74" stroke="#1c7ed6" strokeWidth="4" strokeLinecap="round" />
       <g className="el-pic-kid" transform="translate(0 -44) scale(0.8)">
-        <Kid look={HERO} pose="cheer" holding={null} wear={["boots", "coat"]} face={1} />
+        <Kid look={hero} pose="cheer" holding={null} wear={["boots", "coat"]} face={1} />
       </g>
     </>
   );

@@ -8,7 +8,7 @@ import { pick } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
 import { ActionButton, Confetti } from "../house";
-import { HERO, KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose } from "../kid";
+import { KID_H, Kid, type Outfit, PACK, ThoughtBubble, type Pose, useHero } from "../kid";
 import { spokenIn, translationOf } from "../phrases";
 import { sayIn } from "../voice";
 import type { ElevatorSettings } from "../settings";
@@ -396,6 +396,7 @@ export function TrailPlay({
   level: TrailLevel;
   onPick: (id: string) => void;
 }) {
+  const hero = useHero();
   const theGoal = GOALS[level.goal];
   const { raft } = level;
   /** On the raft here: from the start until the child gets off at `raft.until`. */
@@ -1239,7 +1240,7 @@ export function TrailPlay({
             <g transform={`translate(${n.ghost[0]} ${n.ghost[1]})`} className={view.fork ? "tl-way-ghost" : undefined} data-tap onPointerDown={pressWay(w)}>
               <g className="tl-ghost" style={{ animationDelay: `${n.prints.length * 90}ms` }}>
                 {raft && afloat(n.ghost[0]) && <raft.Raft paddling={false} done={view.done} />}
-                <Kid look={HERO} pose={n.pose} holding={null} wear={view.wear} face={n.face} backpack={PACK_SHUT} />
+                <Kid look={hero} pose={n.pose} holding={null} wear={view.wear} face={n.face} backpack={PACK_SHUT} />
               </g>
             </g>
           </g>
@@ -1305,7 +1306,7 @@ export function TrailPlay({
         {raft && afloat(k.x) && <raft.Raft paddling={k.pose === "paddle"} done={view.done} />}
         {Sled && <Sled />}
         <g className={k.hop ? `el-hopper hop-${k.hop % 2}` : "el-hopper"} data-tap onPointerDown={tapKid}>
-          <Kid look={HERO} pose={k.pose} holding={null} wear={view.wear} face={k.face} backpack={view.pack} />
+          <Kid look={hero} pose={k.pose} holding={null} wear={view.wear} face={k.face} backpack={view.pack} />
         </g>
         {view.bubble && !view.bubble.at && <ThoughtBubble picture={view.bubble.picture} height={KID_H} nudge={view.bubble.nudge} />}
       </Layer>

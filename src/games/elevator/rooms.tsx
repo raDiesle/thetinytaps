@@ -1,6 +1,6 @@
 import { createContext, useContext, useId, type CSSProperties, type ReactNode } from "react";
 import { INK } from "@/games/scenes/shared";
-import { HERO, KidHead } from "./kid";
+import { KidHead, useHero } from "./kid";
 import { ROOM_H, ROOM_L, ROOM_R } from "./layout";
 import {
   Bed,
@@ -574,6 +574,7 @@ export function Wohnzimmer({ used, taps }: RoomProps) {
 
 /** The bathroom: bathtub with a duck, the washbasin with the tooth cup, a towel. */
 export function Bad({ playing, task, taps }: RoomProps) {
+  const hero = useHero();
   const bathing = playing === "bath";
   return (
     <>
@@ -624,7 +625,7 @@ export function Bad({ playing, task, taps }: RoomProps) {
             bathing ? (
               <g transform="translate(-24 34)">
                 <g className="el-bather">
-                  <KidHead look={HERO} />
+                  <KidHead look={hero} />
                 </g>
               </g>
             ) : undefined
@@ -637,6 +638,7 @@ export function Bad({ playing, task, taps }: RoomProps) {
 
 /** The bedroom: the bed with the star blanket, a night light and the moon outside. */
 export function Schlafzimmer({ playing, used, taps }: RoomProps) {
+  const hero = useHero();
   const sleeping = playing === "bed" || used.includes("bed");
   const dark = count(taps, "light") > 0;
   const slippers = count(taps, "slippers");
@@ -666,7 +668,7 @@ export function Schlafzimmer({ playing, used, taps }: RoomProps) {
             sleeping ? (
               <>
                 <g transform="translate(-66 22) scale(0.75)">
-                  <KidHead look={HERO} asleep />
+                  <KidHead look={hero} asleep />
                 </g>
                 <g transform="translate(-28 -60) scale(0.45)">
                   <Teddy />

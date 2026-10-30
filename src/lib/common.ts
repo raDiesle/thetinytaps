@@ -1,5 +1,5 @@
-// Options most games share, the same for all of them: read aloud, sounds and music.
-// Only music is a switch (🎵 on the home page); read aloud and sounds are decided once
+// Options most games share, the same for all of them: read aloud, sounds, music and the child's figure.
+// Music (🎵) and the figure (👦 / 👧) are set on the home page; read aloud and sounds are decided once
 // (FIXED). Each game keeps its own fields for read aloud and sounds and gets them filled
 // in from here (see withCommon).
 
@@ -17,7 +17,16 @@ export interface CommonSettings {
    * Zähne putzen: it sings the steps and sets how long the brushing lasts.
    */
   music: boolean;
+  /**
+   * Whether the figure that stands for the child is a boy or a girl (👦 / 👧 on the home page): the child
+   * in Kleine Abenteuer, the face in Zähne putzen's mirror, and the menus' colours (`data-figure` on html).
+   * Animals and the people in the pictures stay as they are.
+   */
+  figure: Figure;
 }
+
+/** The child's own figure: a boy (as everything was drawn first) or a girl. */
+export type Figure = "boy" | "girl";
 
 /**
  * No switch for these any more: the browser's voice sounds too poor to read to a child (spoken
@@ -26,7 +35,7 @@ export interface CommonSettings {
  */
 const FIXED = { speech: false, sounds: true } as const;
 
-export const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true };
+export const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true, figure: "boy" };
 
 /**
  * The options filled into a game's fields of the same name. Not music: a game with
@@ -46,13 +55,25 @@ const subscribe = (listener: () => void) => {
 };
 /** The shared options as saved, with read aloud and sounds always as FIXED says. */
 export const loadCommon = (): CommonSettings => ({ ...loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS), ...FIXED });
-const current = () => (common ??= loadCommon());
+const current = () => (common ??= showFigure(loadCommon()));
+
+/** Puts the figure on the html element, where the menus' second family of colours hangs on it (`base.css`). */
+function showFigure(settings: CommonSettings): CommonSettings {
+  if (typeof document !== "undefined") {
+    if (settings.figure === "girl") document.documentElement.dataset.figure = "girl";
+    else delete document.documentElement.dataset.figure;
+  }
+  return settings;
+}
+
+/** Sets the colours of the saved figure before the first screen (`index.tsx`), so a menu never flashes the other ones. */
+export const applySavedFigure = () => void current();
 
 /** The shared options and their setter; every component using them sees a change at once. */
 export function useCommonSettings() {
   const value = useSyncExternalStore(subscribe, current);
-  const update = useCallback((patch: Partial<Pick<CommonSettings, "music">>) => {
-    common = { ...current(), ...patch };
+  const update = useCallback((patch: Partial<Pick<CommonSettings, "music" | "figure">>) => {
+    common = showFigure({ ...current(), ...patch });
     try {
       localStorage.setItem(COMMON_SETTINGS_KEY, JSON.stringify(common));
     } catch {
@@ -62,6 +83,9 @@ export function useCommonSettings() {
   }, []);
   return [value, update] as const;
 }
+
+/** The child's figure, boy or girl: every drawing that stands for the child asks this (`heroLook`, the mirror's face). */
+export const useFigure = (): Figure => useCommonSettings()[0].figure;
 
 /** A game's own settings with the shared options put in, for the fields the game has. */
 export function withCommon<T extends object>(settings: T, common: CommonSettings): T {

@@ -16,6 +16,14 @@
   --lift: 0 8px 0 var(--ink);
 }
 
+/* The girl's family of colours (👧 on the home page, `data-figure` from src/lib/common.ts): a warm lilac sky
+   going pink, instead of the blue one. Not everything pink – the toy-block colours of the cards stay. */
+:root[data-figure="girl"] {
+  --accent: #e64980;
+  --sky-top: #b197fc;
+  --sky-bottom: #ffdeeb;
+}
+
 * {
   box-sizing: border-box;
 }

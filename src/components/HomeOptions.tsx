@@ -3,14 +3,14 @@ import { FullscreenButton } from "@/components/FullscreenButton";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { targetLanguageFor } from "@/content/targetLanguages";
-import { useCommonSettings } from "@/lib/common";
+import { type Figure, useCommonSettings } from "@/lib/common";
 import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
 import { downloadMusic } from "@/lib/musicFile";
 
 /**
  * On the home page, for the grown-ups: small buttons in the top right corner –
- * the play time for all games and the language, each opening its menu only when
- * tapped, so the games fill the screen, then music and fullscreen (last, where
+ * the play time for all games, the language and the child's figure (boy or girl), each
+ * opening its menu only when tapped, so the games fill the screen, then music and fullscreen (last, where
  * every menu has it), switched by one tap. All on the right, so the sun in the
  * top left corner stays in sight.
  */
@@ -32,6 +32,7 @@ export function HomeOptions() {
       <MenuButton icon="🌐" label={OWN_NAMES[language.id].split(" ")[1]}>
         <AppLanguageOptions />
       </MenuButton>
+      <FigureMenu />
       <MusicButton />
       <FullscreenButton />
     </nav>
@@ -148,6 +149,41 @@ function AppLanguageOptions() {
         />
       </SettingsGroup>
     </section>
+  );
+}
+
+/**
+ * Whether the figure that stands for the child is a boy or a girl: chosen once here, it holds for every game
+ * (`useFigure`). A menu rather than one tap that switches, so a child's tap on the bar doesn't change it.
+ */
+function FigureMenu() {
+  const t = useT();
+  const [common, update] = useCommonSettings();
+  const figures: { id: Figure; emoji: string; name: string }[] = [
+    { id: "boy", emoji: "👦", name: t({ de: "Junge" }) },
+    { id: "girl", emoji: "👧", name: t({ de: "Mädchen" }) },
+  ];
+  const shown = figures.find((f) => f.id === common.figure) ?? figures[0];
+  return (
+    <MenuButton icon={shown.emoji} label={shown.name}>
+      <section className="settings">
+        <SettingsGroup title={t({ de: "Junge oder Mädchen" })}>
+          <div className="home-figures">
+            {figures.map((f) => (
+              <button key={f.id} type="button" className="home-figure" aria-pressed={common.figure === f.id} onClick={() => update({ figure: f.id })}>
+                <span aria-hidden>{f.emoji}</span>
+                {f.name}
+              </button>
+            ))}
+          </div>
+          <p className="setting-note">
+            {t({
+              de: "Die Figur, die für Ihr Kind steht, ist ein Junge oder ein Mädchen – in Kleine Abenteuer und im Spiegel beim Zähneputzen –, und die Menüs bekommen ihre Farben. Tiere und die Leute in den Bildern bleiben, wie sie sind.",
+            })}
+          </p>
+        </SettingsGroup>
+      </section>
+    </MenuButton>
   );
 }
 

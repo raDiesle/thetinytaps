@@ -62,6 +62,9 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 - Every tappable thing carries `data-tap` (`tapState({ goal, done })` for the right answer / one tapped already),
   so taps next to it count too (`src/lib/tapTargets.ts`); react on `onPointerDown`, not `onClick`.
 - Still and silent until the child acts.
+- A figure that stands for the child (its own face, a child walking through the game) follows „Junge / Mädchen“ from
+  the home page: ask `useFigure()` (`src/lib/common.ts`) – or reuse `Kid`/`useHero()` from `src/games/elevator/kid.tsx` –
+  and add the file to `CHILD_DRAWINGS` in `src/figure.test.ts`. Never a choice of the game's own for it.
 - Drawings in SVG components with CSS animations; generated pictures via `/bild-erzeugen`.
 
 ## CLAUDE.md of the game

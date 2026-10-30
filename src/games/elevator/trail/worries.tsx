@@ -1,5 +1,5 @@
 import { INK } from "@/games/scenes/shared";
-import { HERO, KidHead } from "../kid";
+import { KidHead, useHero } from "../kid";
 import { Football, type Picture } from "./items";
 
 // What the child thinks at an obstacle without a creature that wants something: what would happen if it went on
@@ -13,9 +13,10 @@ export type Worry = "wet" | "splash" | "dark" | "dig" | "hot" | "blocked" | "fal
 
 /** The child's head, big and frowning, with its chin on (0, 0). */
 function Head() {
+  const hero = useHero();
   return (
     <g className="tl-worry" transform="scale(1.6) translate(0 108)">
-      <KidHead look={HERO} />
+      <KidHead look={hero} />
     </g>
   );
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { INK } from "@/games/scenes/shared";
-import { FireHelmet, HERO, KidHead } from "../kid";
+import { FireHelmet, KidHead, useHero } from "../kid";
 import { CREW } from "./people";
 
 /** The turntable ladder's pivot on the truck's back, and how long one section is. */
@@ -52,6 +52,7 @@ export function FireTruck({
   /** Who stands in the basket, drawn standing on its floor (0, 0). */
   basket?: ReactNode;
 }) {
+  const hero = useHero();
   const [px, py] = LADDER_PIVOT;
   const turn = { transition: `transform ${ladder.ms}ms ease-in-out` };
   return (
@@ -99,7 +100,7 @@ export function FireTruck({
             <FireHelmet />
           </g>
           <g transform="translate(262 -104) scale(0.46)">
-            <KidHead look={HERO} />
+            <KidHead look={hero} />
             <FireHelmet />
           </g>
         </g>

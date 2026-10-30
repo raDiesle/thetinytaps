@@ -1,5 +1,6 @@
 import { useRef, type CSSProperties, type RefObject } from "react";
 import { STAR_PATH } from "@/components/Bursts";
+import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
 import { playCrunch, playGiggle, playMunch, playRecorded, playRustle, playYum } from "@/lib/sfx";
 import type { Cue } from "./cues";
@@ -195,9 +196,25 @@ function SkyBody({ daytime }: { daytime: Daytime }) {
 }
 
 /** A big round eye with two shines; the pupil follows the sweets, and looks down at the teeth while the monsters grow. */
-function Eye({ x, y, look }: { x: number; y: number; look?: CSSProperties }) {
+function Eye({ x, y, side, look }: { x: number; y: number; side: -1 | 1; look?: CSSProperties }) {
+  // The girl (👧 on the home page) has three lashes at the outer top.
+  const girl = useFigure() === "girl";
   return (
     <g>
+      {girl && (
+        <path
+          d={[
+            [12, -22, 18, -34],
+            [19, -14, 30, -22],
+            [22, -4, 34, -8],
+          ]
+            .map(([x1, y1, x2, y2]) => `M${x + side * x1} ${y + y1} L${x + side * x2} ${y + y2}`)
+            .join(" ")}
+          stroke={INK}
+          strokeWidth={5}
+          strokeLinecap="round"
+        />
+      )}
       <ellipse cx={x} cy={y} rx={22} ry={26} fill="#fff" stroke={INK} strokeWidth={4} />
       <g className="origin-pupil" style={look}>
         <circle cx={x + 2} cy={y + 4} r={15} fill={INK} />
@@ -229,6 +246,7 @@ export function Origin({
   const frame = screenFrame(box, unit);
   const bottom = box.y + box.height;
   const sweets = part === "sweets";
+  const girl = useFigure() === "girl";
   return (
     <svg
       ref={svg}
@@ -285,6 +303,21 @@ export function Origin({
           strokeWidth={5}
         />
 
+        {/* The girl (👧 on the home page): two pigtails behind the head; their bands come over the hair below. */}
+        {girl &&
+          [-1, 1].map((s) => (
+            <ellipse
+              key={s}
+              cx={HEAD.x + s * (HEAD.r + 22)}
+              cy={140}
+              rx={44}
+              ry={72}
+              transform={`rotate(${s * -35} ${HEAD.x + s * (HEAD.r + 22)} 140)`}
+              fill="#8a5a3b"
+              stroke={INK}
+              strokeWidth={5}
+            />
+          ))}
         <g stroke={INK} strokeWidth={5}>
           <circle cx={HEAD.x - HEAD.r} cy={228} r={26} fill={SKIN} />
           <circle cx={HEAD.x + HEAD.r} cy={228} r={26} fill={SKIN} />
@@ -299,13 +332,14 @@ export function Origin({
           strokeLinejoin="round"
         />
         <path d="M222 44 C206 18 238 4 244 24 C248 38 230 42 228 32" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+        {girl && [-1, 1].map((s) => <circle key={s} cx={HEAD.x + s * (HEAD.r - 12)} cy={118} r={17} fill="#ffd43b" stroke={INK} strokeWidth={4} />)}
 
         <g style={sweets ? DELIGHT : undefined}>
           <path className="origin-brow left" d="M140 150 Q160 140 180 148" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
           <path className="origin-brow right" d="M260 148 Q280 140 300 150" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
         </g>
-        <Eye x={160} y={186} look={sweets ? LOOK : undefined} />
-        <Eye x={280} y={186} look={sweets ? LOOK : undefined} />
+        <Eye x={160} y={186} side={-1} look={sweets ? LOOK : undefined} />
+        <Eye x={280} y={186} side={1} look={sweets ? LOOK : undefined} />
         {/* Happy closed eyes while chewing: skin over the eye and a smiling arc. */}
         {sweets && (
           <g className="origin-happy-eyes" style={HAPPY_EYES}>

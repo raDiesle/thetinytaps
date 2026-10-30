@@ -67,6 +67,10 @@ The game follows the app language chosen on the home page (`useAppLanguage`). Th
 
 ## Rules for every story (from feedback; follow them in new stories and trail levels too)
 
+- **The child is a boy or a girl, as chosen on the home page** (👦 / 👧, F-01–F-03): draw it with `useHero()` from
+  `kid.tsx`, never a fixed `Look` – also as a head alone (bath, bed, worries, the fire engine's crew). The girl has two
+  pigtails with yellow bands and her own shirt and trousers; size, poses and outfits are the same, so a new pose or
+  outfit must look right on both. The brother stays a boy.
 - **The first thing in a room happens by itself.** Getting out of the lift, the child does the first move on its own (puts the hat on, opens the fridge, sits down) – the ride was the child's tap. A step whose whole point is one move needs no tap at all.
 - **Only ask for moves that matter.** A move in the room is wished for (a task with `wish`) only when it really belongs to what the child is doing and can clearly be seen: cracking eggs, pouring a pancake, flushing, tidying. Waving, chewing, blowing, putting on, looking in the mirror are only shown – they do themselves. No wish while the child is hidden in the tub or the bed (`content.test.ts`).
 - **A move in the room is asked like a floor.** The bubble shows the thing, and the number of the floor the child is on lights up to be pressed again – no extra action button in the lift stories (the trails keep theirs).
