@@ -1,10 +1,10 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Flugzeug, Hangar, Hubschrauber, Lichter, Luftschiff, Tower, Windsack } from "./airfield";
 import { Hase, Hund, Katze, Tauben } from "./animals";
 import { Background } from "./background";
-import { KULI, PILOT, UHR, trainAt } from "./layout";
+import { FENCE, FORECOURT_X, KULI, PILOT, PLATFORM_BOTTOM, ROAD_TOP, RUNWAY_BOTTOM, RUNWAY_TOP, UHR, trainAt } from "./layout";
 import { Einweiser, Kind, Pilotin, Reisende, Schaffner } from "./people";
 import { Automat, Lok, Signal, Speisewagen, Spatz, Tafel, Uhr, Wagen } from "./station";
 import { Bus, FollowMe, Gepaeckband, Gepaeckzug, Huetchen, Kofferkuli, Tankwagen, Taxi, Treppenwagen } from "./vehicles";
@@ -22,6 +22,14 @@ export const flughafen: Scene = {
   sky: "#8fd3ff",
   ground: "#d3d8dd",
   Background,
+  // A beetle crawls over the runway, the tracks, the platform, the apron and the road; the grass grows flowers or a mole peeks out.
+  spots: [
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, RUNWAY_TOP, 1600, RUNWAY_BOTTOM - RUNWAY_TOP], kinds: ["bug"] },
+    { box: [0, HORIZON, 1600, FENCE - HORIZON], kinds: ["flower", "mole"] },
+    { box: [FORECOURT_X + 30, PLATFORM_BOTTOM + 8, 1570 - FORECOURT_X, ROAD_TOP - PLATFORM_BOTTOM - 8], kinds: ["flower"] },
+    { box: [0, FENCE, 1600, 1000 - FENCE], kinds: ["bug"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

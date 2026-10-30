@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { HORIZON, depthScale, onFloor } from "../layout";
 import { STEEL } from "../shared";
+import { Poke } from "../spots";
 import { COUNTER_END, COUNTER_END_BACK, COUNTER_FOOT, WORKTOP_BACK, WORKTOP_FRONT } from "./layout";
 
 // The back wall: warm paint, a band of small tiles behind the worktop and a shelf strip. The
@@ -57,11 +58,11 @@ function Backsplash() {
 /** A cupboard door (picture coordinates) with a knob; for the cupboards that are no items. */
 export function CupboardDoor({ x, y, w, h, knob }: { x: number; y: number; w: number; h: number; knob: "left" | "right" }) {
   return (
-    <>
+    <Poke kind="wobble">
       <rect x={x} y={y} width={w} height={h} rx="6" fill={CUPBOARD} stroke={CUPBOARD_DARK} strokeWidth="3" />
       <rect x={x + 10} y={y + 10} width={w - 20} height={h - 20} rx="5" fill="none" stroke="#fff" strokeWidth="3" opacity="0.5" />
       <circle cx={knob === "left" ? x + 18 : x + w - 18} cy={y + 24} r="6" fill="#ffd166" stroke="#e9a23b" strokeWidth="2" />
-    </>
+    </Poke>
   );
 }
 
@@ -96,11 +97,13 @@ export function Background() {
       <rect y={COUNTER_FOOT} width="1600" height="40" fill="url(#kc-haze)" />
 
       {/* Round rug under the table */}
-      <g transform={`translate(760 800) scale(${rugScale})`}>
-        <ellipse cx="0" cy="0" rx="440" ry="110" fill="#ffc9c9" />
-        <ellipse cx="0" cy="0" rx="380" ry="88" fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="6 16" strokeLinecap="round" />
-        <ellipse cx="0" cy="-4" rx="440" ry="110" fill="none" stroke="#ffa8a8" strokeWidth="8" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={`translate(760 800) scale(${rugScale})`}>
+          <ellipse cx="0" cy="0" rx="440" ry="110" fill="#ffc9c9" />
+          <ellipse cx="0" cy="0" rx="380" ry="88" fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="6 16" strokeLinecap="round" />
+          <ellipse cx="0" cy="-4" rx="440" ry="110" fill="none" stroke="#ffa8a8" strokeWidth="8" />
+        </g>
+      </Poke>
 
       {/* Worktop, seen from above, and its front edge */}
       <path d={`M0 ${WORKTOP_BACK} H${COUNTER_END_BACK} L${COUNTER_END} ${WORKTOP_FRONT} H0 Z`} fill="#f3cf94" />

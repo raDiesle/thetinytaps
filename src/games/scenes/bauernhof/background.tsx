@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { Cloud } from "../shared";
+import { Poke } from "../spots";
 import { FENCE, FENCE_END, FIELD_X, MUD, POND, ROAD_BOTTOM, ROAD_TOP, SUNFLOWER } from "./layout";
 
 // Far away soft hills and woods fade into the haze; then the wheat field with the
@@ -48,12 +49,14 @@ const PEBBLES = Array.from({ length: 40 }, (_, i) => [(i * 97 + 30) % 1600, ROAD
 
 function RoundTree({ x, y, scale, light = false }: { x: number; y: number; scale: number; light?: boolean }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-6" y="-50" width="12" height="50" fill={light ? "#b7a48b" : "#8d5a2b"} />
-      <circle cx="0" cy="-64" r="36" fill={light ? "#a8d5ba" : "#52b788"} />
-      <circle cx="-20" cy="-48" r="22" fill={light ? "#95c8a8" : "#40916c"} />
-      <circle cx="22" cy="-50" r="24" fill={light ? "#95c8a8" : "#40916c"} />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <rect x="-6" y="-50" width="12" height="50" fill={light ? "#b7a48b" : "#8d5a2b"} />
+        <circle cx="0" cy="-64" r="36" fill={light ? "#a8d5ba" : "#52b788"} />
+        <circle cx="-20" cy="-48" r="22" fill={light ? "#95c8a8" : "#40916c"} />
+        <circle cx="22" cy="-50" r="24" fill={light ? "#95c8a8" : "#40916c"} />
+      </g>
+    </Poke>
   );
 }
 
@@ -81,13 +84,13 @@ function Field() {
 
 function Silo() {
   return (
-    <g>
+    <Poke kind="wobble">
       <rect x="54" y="208" width="72" height="262" fill="#a9c1d9" />
       <rect x="104" y="208" width="22" height="262" fill="#8faecb" />
       <path d="M54 210 Q90 160 126 210 Z" fill="#8d99ae" />
       <path d={Array.from({ length: 9 }, (_, i) => `M54 ${240 + i * 26} H126`).join(" ")} stroke="#8faecb" strokeWidth="3" />
       <path d="M72 230 V460" stroke="#fff" strokeOpacity="0.35" strokeWidth="6" />
-    </g>
+    </Poke>
   );
 }
 
@@ -96,7 +99,7 @@ function Fence() {
   const s = depthScale(FENCE) * 1.1;
   const posts = Array.from({ length: 12 }, (_, i) => -10 + i * 58).filter((x) => x < FENCE_END - 20);
   return (
-    <g>
+    <Poke kind="wobble">
       <path d={`M-10 ${FENCE - 70 * s} H${FENCE_END} M-10 ${FENCE - 34 * s} H${FENCE_END}`} stroke="#a47148" strokeWidth={9 * s} />
       {posts.map((x) => (
         <g key={x}>
@@ -104,7 +107,7 @@ function Fence() {
           <rect x={x - 13 * s} y={FENCE - 100 * s} width={26 * s} height={8 * s} rx="2" fill="#7f5539" />
         </g>
       ))}
-    </g>
+    </Poke>
   );
 }
 
@@ -192,15 +195,17 @@ function Pond() {
 
 function Sunflower() {
   return (
-    <g transform={transformOf(SUNFLOWER)}>
-      <path d="M0 0 Q-6 -100 0 -190" stroke="#40916c" strokeWidth="8" fill="none" />
-      <path d="M-2 -70 Q-30 -90 -46 -76 Q-26 -60 -2 -70 Z M0 -120 Q30 -140 44 -124 Q24 -108 0 -120 Z" fill="#52b788" />
-      {Array.from({ length: 12 }, (_, i) => (
-        <ellipse key={i} cx="0" cy="-226" rx="9" ry="20" fill="#ffd60a" transform={`rotate(${i * 30} 0 -200)`} />
-      ))}
-      <circle cx="0" cy="-200" r="18" fill="#7f5539" />
-      <circle cx="-5" cy="-205" r="5" fill="#9c6644" />
-    </g>
+    <Poke kind="sway">
+      <g transform={transformOf(SUNFLOWER)}>
+        <path d="M0 0 Q-6 -100 0 -190" stroke="#40916c" strokeWidth="8" fill="none" />
+        <path d="M-2 -70 Q-30 -90 -46 -76 Q-26 -60 -2 -70 Z M0 -120 Q30 -140 44 -124 Q24 -108 0 -120 Z" fill="#52b788" />
+        {Array.from({ length: 12 }, (_, i) => (
+          <ellipse key={i} cx="0" cy="-226" rx="9" ry="20" fill="#ffd60a" transform={`rotate(${i * 30} 0 -200)`} />
+        ))}
+        <circle cx="0" cy="-200" r="18" fill="#7f5539" />
+        <circle cx="-5" cy="-205" r="5" fill="#9c6644" />
+      </g>
+    </Poke>
   );
 }
 
@@ -273,17 +278,21 @@ export function Background() {
 
       {/* Flowers and grass tufts */}
       {FLOWERS.map(([x, y, color]) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
-          <path d="M0 0 V-22" stroke="#40916c" strokeWidth="3" />
-          {[0, 72, 144, 216, 288].map((a) => (
-            <circle key={a} cx="0" cy="-30" r="5" fill={color} transform={`rotate(${a} 0 -24)`} />
-          ))}
-          <circle cx="0" cy="-24" r="4" fill="#ffb703" />
-        </g>
+        <Poke key={`${x}-${y}`} kind="sway">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
+            <path d="M0 0 V-22" stroke="#40916c" strokeWidth="3" />
+            {[0, 72, 144, 216, 288].map((a) => (
+              <circle key={a} cx="0" cy="-30" r="5" fill={color} transform={`rotate(${a} 0 -24)`} />
+            ))}
+            <circle cx="0" cy="-24" r="4" fill="#ffb703" />
+          </g>
+        </Poke>
       ))}
       <g stroke="#40916c" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
     </>

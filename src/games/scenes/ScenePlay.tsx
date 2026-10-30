@@ -21,6 +21,7 @@ import { nextQuest, questsFor, type Quest } from "./quests";
 import { driveDistance, guestFor, roadId, roadsFrom, tripTo, withGuest, type Road, type Trip } from "./roads";
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
 import { playSound } from "./sounds";
+import { gust, poke, SPOTS, SpotEffectArt, spotAt, type SpotEffect } from "./spots";
 import { placeBox, type Scene, type SceneItem } from "./types";
 
 /** Key presses closer together than this only spawn shapes. */
@@ -70,6 +71,12 @@ const SPACE_TRIES = 40;
 /** Colour mode: a round patch of the background (and overlay) that got its colour back, in picture units. */
 type Dab = { x: number; y: number };
 
+/** A point on screen in picture units. */
+const pointIn = (matrix: DOMMatrix, clientX: number, clientY: number): [number, number] => {
+  const { x, y } = new DOMPoint(clientX, clientY).matrixTransform(matrix.inverse());
+  return [x, y];
+};
+
 /** Colour mode: a colour as the pale grey it has in the uncoloured picture (same as the grey filter). */
 function paleGrey(hex: string) {
   const n = parseInt(hex.slice(1), 16);
@@ -102,6 +109,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   /** Keys mode: the item in the glowing frame, moved with the arrow keys; hidden once an item starts. */
   const [focus, setFocus] = useState<SceneItem | null>(null);
   const [lit, setLit] = useState<Lit | null>(null);
+  /** What taps on the background brought out and is still playing (spots.tsx). */
+  const [effects, setEffects] = useState<SpotEffect[]>([]);
   /** Colour mode: the space bar is held, so its cap on the screen goes down too. */
   const [spaceDown, setSpaceDown] = useState(false);
   const { bursts, spawn } = useBursts();
@@ -145,6 +154,9 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const lastSurprise = useRef(new Map<string, number>());
   const lastSurpriseAnywhere = useRef(-1);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const nextEffect = useRef(0);
+  /** Taps per background spot, so its kinds take turns. */
+  const spotTaps = useRef(new Map<number, number>());
   const svgRef = useRef<SVGSVGElement>(null);
   // An SVG id without the colons React puts in, so it can go into url(#…).
   const svgId = `scene-${useId().replace(/[^\w-]/g, "")}`;
@@ -545,10 +557,38 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     activate(item, e.clientX, e.clientY);
   };
 
+  /**
+   * A tap on the background: a thing in it that can move (`<Poke>`) moves, and anywhere else something comes out of
+   * that part of the picture – wind in the sky, a beetle from the floor (spots.tsx). Never a tap without a reaction.
+   */
   const onBackgroundPointer = (e: PointerEvent) => {
     interacted();
-    funBurst(e.clientX, e.clientY);
     paint(e.clientX, e.clientY);
+    const thing = e.target instanceof Element ? e.target.closest("[data-poke]") : null;
+    if (thing) {
+      const sound = poke(thing);
+      if (soundsOn) playSound(sound);
+      return;
+    }
+    const matrix = svgRef.current?.getScreenCTM();
+    const [x, y] = matrix ? pointIn(matrix, e.clientX, e.clientY) : [Number.NaN, Number.NaN];
+    const index = spotAt(scene.spots, scene.width, scene.height, x, y);
+    if (index < 0) {
+      funBurst(e.clientX, e.clientY);
+      return;
+    }
+    const turn = spotTaps.current.get(index) ?? 0;
+    spotTaps.current.set(index, turn + 1);
+    const { kinds } = scene.spots[index];
+    const kind = kinds[turn % kinds.length];
+    const id = nextEffect.current++;
+    // Things walk off towards the middle, so they stay in the picture.
+    const effect: SpotEffect = { id, kind, x, y, dir: x < scene.width / 2 ? 1 : -1, variant: Math.floor(turn / kinds.length) };
+    setEffects((prev) => [...prev.slice(-5), effect]);
+    later(() => setEffects((prev) => prev.filter((other) => other.id !== id)), SPOTS[kind].ms);
+    const background = svgRef.current?.querySelector(`#${svgId}-bg`);
+    if ((kind === "wind" || kind === "flurry") && svgRef.current && background) gust(svgRef.current, background);
+    if (soundsOn) playSound(SPOTS[kind].sound);
   };
 
   useEffect(() => {
@@ -662,7 +702,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         <g id={`${svgId}-bg`}>
           <scene.Background />
         </g>
-        {grey && <use href={`#${svgId}-bg`} {...greyCopy} />}
+        {/* Taps go through the grey copy to the background, whose things move (`<Poke>`). */}
+        {grey && <use href={`#${svgId}-bg`} {...greyCopy} pointerEvents="none" />}
         {items.map((item, i) => {
           const play = plays[item.id];
           const place = item.place;
@@ -702,6 +743,11 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
             </g>
           );
         })}
+        <g className="spot-layer">
+          {effects.map((effect) => (
+            <SpotEffectArt key={effect.id} effect={effect} />
+          ))}
+        </g>
         {scene.Overlay && (
           <g className="scene-overlay">
             <g id={`${svgId}-overlay`}>

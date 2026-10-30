@@ -1,9 +1,9 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
-import type { Scene } from "../types";
+import type { Scene, SceneSpot } from "../types";
 import { Aeffchen, Affe, Flamingo, Kaenguru, Koala, Panda, Papagei, Pfau, Schmetterling, Taube } from "./animals";
 import { Background } from "./background";
-import { EUCALYPTUS, ICE_ROCK, LION_ROCK, MONKEY_TREE } from "./layout";
+import { ELEPHANT_POOL, EUCALYPTUS, FLAMINGO_POND, ICE_ROCK, LION_ROCK, MONKEY_TREE, PATH_BOTTOM, PATH_TOP, PENGUIN_POOL, RIVER_TOP, RIVER_X } from "./layout";
 import { Elefant, Elefantenbaby, Giraffe, Loewe, Loewenbaby, Nashorn, Strauss, Zebra } from "./savanna";
 import { Bimmelbahn, Eiswagen, Kind, Luftballon, Tierpfleger } from "./visitors";
 import { Erdmaennchen, Fisch, Krokodil, Nilpferd, Pelikan, Pinguin, Pinguinkueken, Schildkroete, Seehund } from "./water";
@@ -21,6 +21,15 @@ export const zoo: Scene = {
   sky: "#8fd3ff",
   ground: "#74c69d",
   Background,
+  // A fish jumps in the pools and the river, a beetle crawls out of the savanna sand and the zoo path, the meadow grows flowers.
+  spots: [
+    ...[ELEPHANT_POOL, FLAMINGO_POND, PENGUIN_POOL].map(([cx, cy, rx, ry]): SceneSpot => ({ box: [cx - rx, cy - ry, 2 * rx, 2 * ry], kinds: ["splash"] })),
+    { box: [RIVER_X + 20, RIVER_TOP + 10, 1600 - RIVER_X - 20, 1000 - RIVER_TOP - 10], kinds: ["splash"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, HORIZON, 1130, 530 - HORIZON], kinds: ["bug", "mole"] },
+    { box: [0, PATH_TOP, 1600, PATH_BOTTOM - PATH_TOP], kinds: ["bug"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

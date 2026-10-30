@@ -1,5 +1,5 @@
 import { Eichhoernchen, Hund } from "../baustelle/figures";
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne } from "../sky";
 import type { Scene } from "../types";
 import { Reh } from "../wald/animals";
@@ -68,6 +68,11 @@ export const winter: Scene = {
   ground: "#dce7f2",
   Background,
   Overlay: () => <FallingSnow seed="winter" />,
+  // Wind blows through the sky; out of the snow everywhere (the frozen pond's snowy ice too) a bunny peeks.
+  spots: [
+    { box: [0, 0, 1600, HORIZON], kinds: ["flurry"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["snow"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

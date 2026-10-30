@@ -1,10 +1,10 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Drachen, Flugzeug, Luftballon } from "./air";
 import { Eichhoernchen, Hund, Katze, Marienkaefer, Schmetterling, Schnecke, Tauben, Vogel } from "./animals";
 import { Background } from "./background";
-import { FLOWERS, PRAM, PUMP, SWING, TOWER, TREE, pathY } from "./layout";
+import { FLOWERS, PATH_BOXES, PRAM, PUMP, SAND_LEFT, SAND_RIGHT, SAND_TOP, STREAM, SWING, TOWER, TREE, pathY } from "./layout";
 import { Baum, Blumen } from "./nature";
 import { Eiswagen, Kind, Kinderwagen, Laufrad, Mama, Opa, Roller, Seifenblasen } from "./people";
 import { Karussell, Kletterturm, Rutsche, Schaukel, Schaukelpferd, Wippe } from "./play";
@@ -23,6 +23,14 @@ export const spielplatz: Scene = {
   sky: "#74c0fc",
   ground: "#69db7c",
   Background,
+  // A fish jumps in the pump's stream, a beetle crawls out of the sandpit, a beetle crawls along the gravel path, the lawn grows flowers or a mole peeks out.
+  spots: [
+    { box: STREAM, kinds: ["splash"] },
+    { box: [SAND_LEFT, SAND_TOP, SAND_RIGHT - SAND_LEFT, 1000 - SAND_TOP], kinds: ["bug"] },
+    ...PATH_BOXES.map((box) => ({ box, kinds: ["bug" as const] })),
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

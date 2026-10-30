@@ -1,5 +1,7 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { Cloud } from "../shared";
+import { Poke } from "../spots";
+import type { Box } from "../types";
 import { FallenLeaves, LEAF_COLOURS, Leaf } from "../weather";
 import { BOY, CHESTNUT_TREE, MAPLE, STAND } from "./layout";
 import { StandBack } from "./things";
@@ -59,11 +61,11 @@ function Woods() {
   return (
     <g>
       {WOODS.map(([x, y, r, fill]) => (
-        <g key={x}>
+        <Poke key={x} kind="sway">
           <rect x={x - 2.5} y={y} width="5" height="16" fill="#a68a64" />
           <circle cx={x} cy={y - r * 0.4} r={r} fill={fill} />
           <circle cx={x - r * 0.3} cy={y - r * 0.7} r={r * 0.35} fill="#fff" opacity="0.25" />
-        </g>
+        </Poke>
       ))}
     </g>
   );
@@ -73,17 +75,19 @@ function Village() {
   return (
     <g>
       {HOUSES.map(([x, w]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={286} width={w} height={22} fill="#f1e3c8" />
           <path d={`M${x - 4} 288 L${x + w / 2} ${270} L${x + w + 4} 288 Z`} fill="#d08c60" />
           <rect x={x + w / 2 - 4} y={294} width="8" height="8" fill="#a5b8c9" />
-        </g>
+        </Poke>
       ))}
       {/* The church tower */}
-      <rect x="1376" y="252" width="22" height="56" fill="#efe1c6" />
-      <path d="M1372 254 L1387 222 L1402 254 Z" fill="#8a9a8c" />
-      <path d="M1387 222 v-10 M1382 216 h10" stroke="#8a9a8c" strokeWidth="2" />
-      <circle cx="1387" cy="268" r="5" fill="#d9c7a4" />
+      <Poke kind="wobble">
+        <rect x="1376" y="252" width="22" height="56" fill="#efe1c6" />
+        <path d="M1372 254 L1387 222 L1402 254 Z" fill="#8a9a8c" />
+        <path d="M1387 222 v-10 M1382 216 h10" stroke="#8a9a8c" strokeWidth="2" />
+        <circle cx="1387" cy="268" r="5" fill="#d9c7a4" />
+      </Poke>
     </g>
   );
 }
@@ -115,6 +119,19 @@ function Field() {
     </g>
   );
 }
+
+/** The ploughed field and the stubble field, roughly, for the scene's spots. */
+export const FIELDS: Box[] = [
+  [270, HORIZON, 540, 74],
+  [960, HORIZON, 640, 50],
+];
+
+/** The sandy path, roughly, as boxes for the scene's spots: the narrow upper part, the bend, the wide front. */
+export const PATH_BOXES: Box[] = [
+  [860, 452, 90, 228],
+  [840, 680, 140, 100],
+  [790, 780, 250, 220],
+];
 
 /** The sandy path from the front up to the pumpkin stall. */
 function Path() {
@@ -208,14 +225,20 @@ export function Background() {
       <ellipse cx={BOY.x - 20} cy={BOY.y - 4} rx="80" ry="16" fill="#c7d57e" opacity="0.7" />
       <Path />
       {/* Small puddles from the last rain */}
-      <ellipse cx="420" cy="716" rx="40" ry="8" fill="#9cc3dd" opacity="0.8" />
-      <ellipse cx="1296" cy="770" rx="34" ry="7" fill="#9cc3dd" opacity="0.8" />
+      <Poke kind="wobble">
+        <ellipse cx="420" cy="716" rx="40" ry="8" fill="#9cc3dd" opacity="0.8" />
+      </Poke>
+      <Poke kind="wobble">
+        <ellipse cx="1296" cy="770" rx="34" ry="7" fill="#9cc3dd" opacity="0.8" />
+      </Poke>
       <LeafCarpet x={kx} y={ky + 4} rx={190} colours={["#e9c46a", "#f4a261", "#bc6c25"]} seed={10} />
       <LeafCarpet x={mx} y={my + 4} rx={150} colours={["#d62828", "#e85d04", "#faa307"]} seed={40} />
       <FallenLeaves seed="herbst" />
       <g stroke="#7f9a45" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       <g transform={transformOf(STAND)}>
@@ -227,7 +250,9 @@ export function Background() {
         [1460, 996, 2],
         [820, 940, 4],
       ].map(([x, y, c]) => (
-        <Leaf key={x} x={x} y={y} angle={x % 360} scale={2.2} colour={LEAF_COLOURS[c]} />
+        <Poke key={x} kind="hop">
+          <Leaf x={x} y={y} angle={x % 360} scale={2.2} colour={LEAF_COLOURS[c]} />
+        </Poke>
       ))}
     </>
   );

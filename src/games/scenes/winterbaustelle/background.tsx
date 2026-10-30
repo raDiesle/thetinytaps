@@ -1,16 +1,14 @@
 import type { ReactNode } from "react";
-import { DIGGER, SITE } from "../baustelle/layout";
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { Cloud, INK } from "../shared";
+import { Poke } from "../spots";
+import { DIGGER, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, SITE } from "./layout";
 import { Cap, SNOW, SNOW_SHADE } from "./parts";
 
 // The Baustelle in winter: a pale sky, snowy roofs in the city, white hills and a site covered
 // in snow. The road has been ploughed and has snow banks on both sides.
 
 const FENCE_TOP = HORIZON - 28;
-const ROAD_TOP = 648;
-const ROAD_BOTTOM = 768;
-const PAVEMENT = 792;
 
 // Far-away city above the hills: [x, top, width].
 const TOWERS = [
@@ -65,7 +63,7 @@ function Skyline() {
   return (
     <g>
       {TOWERS.map(([x, y, w], i) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={y} width={w} height={FENCE_TOP + 10 - y} rx="3" fill="#cfd9ea" />
           <rect x={x + w - 8} y={y} width="8" height={FENCE_TOP + 10 - y} fill="#bfcbe0" />
           {Array.from({ length: Math.floor((FENCE_TOP - 20 - y) / 20) }, (_, row) => (
@@ -77,7 +75,7 @@ function Skyline() {
             />
           ))}
           <rect x={x - 2} y={y - 5} width={w + 4} height="8" rx="4" fill={SNOW} />
-        </g>
+        </Poke>
       ))}
       {/* Another crane, far away in the city */}
       <g stroke="#b5c4e3" strokeWidth="4" fill="none">
@@ -93,18 +91,20 @@ function Skyline() {
 /** A small fir far away, with snow on its tiers. */
 function Fir({ x, y, scale }: { x: number; y: number; scale: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-5" y="0" width="10" height="20" fill="#8d6e53" />
-      <path d="M-34 4 L0 -44 L34 4 Z M-26 -24 L0 -64 L26 -24 Z" fill="#52796f" />
-      <path d="M-34 4 Q0 -6 34 4 Q0 10 -34 4 Z M-26 -24 Q0 -32 26 -24 Q0 -18 -26 -24 Z M-10 -50 L0 -64 L10 -50 Z" fill={SNOW} />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <rect x="-5" y="0" width="10" height="20" fill="#8d6e53" />
+        <path d="M-34 4 L0 -44 L34 4 Z M-26 -24 L0 -64 L26 -24 Z" fill="#52796f" />
+        <path d="M-34 4 Q0 -6 34 4 Q0 10 -34 4 Z M-26 -24 Q0 -32 26 -24 Q0 -18 -26 -24 Z M-10 -50 L0 -64 L10 -50 Z" fill={SNOW} />
+      </g>
+    </Poke>
   );
 }
 
 /** Mesh fence panels along the back of the site, with snow on top. */
 function Fence() {
   return (
-    <g>
+    <Poke kind="wobble">
       <defs>
         <pattern id="wb-mesh" width="7" height="7" patternUnits="userSpaceOnUse">
           <path d="M0 0 L7 7 M7 0 L0 7" stroke="#b6c2d0" strokeWidth="1" />
@@ -122,7 +122,7 @@ function Fence() {
         d={`M0 ${FENCE_TOP + 1} ${Array.from({ length: 32 }, (_, i) => `Q${i * 50 + 25} ${FENCE_TOP - 5 + (i % 2) * 2} ${i * 50 + 50} ${FENCE_TOP + 1}`).join(" ")} V${FENCE_TOP + 3} H0 Z`}
         fill={SNOW}
       />
-    </g>
+    </Poke>
   );
 }
 
@@ -223,34 +223,42 @@ export function Background() {
         <path d={`M860 640 L${towardsHorizon(860, 640, 470)} 470 M900 640 L${towardsHorizon(900, 640, 470)} 470`} />
       </g>
       {DRIFTS.map(([x, y, w]) => (
-        <OnGround key={`${x}-${y}`} x={x} y={y}>
-          <Drift w={w} />
-        </OnGround>
+        <Poke key={`${x}-${y}`} kind="wobble">
+          <OnGround x={x} y={y}>
+            <Drift w={w} />
+          </OnGround>
+        </Poke>
       ))}
 
       {/* Snow heap the digger is working on */}
-      <g transform={transformOf(DIGGER)}>
-        <ellipse cx="562" cy="714" rx="120" ry="12" fill={INK} opacity="0.08" />
-        <path d="M455 714 Q560 596 670 714 Z" fill={SNOW} />
-        <path d="M562 650 Q630 660 670 714 H600 Q600 680 562 650 Z" fill={SNOW_SHADE} />
-        <path d="M500 700 Q540 650 580 656" stroke="#fff" strokeWidth="8" fill="none" strokeLinecap="round" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={transformOf(DIGGER)}>
+          <ellipse cx="562" cy="714" rx="120" ry="12" fill={INK} opacity="0.08" />
+          <path d="M455 714 Q560 596 670 714 Z" fill={SNOW} />
+          <path d="M562 650 Q630 660 670 714 H600 Q600 680 562 650 Z" fill={SNOW_SHADE} />
+          <path d="M500 700 Q540 650 580 656" stroke="#fff" strokeWidth="8" fill="none" strokeLinecap="round" />
+        </g>
+      </Poke>
 
-      <OnGround x={1214} y={522}>
-        <Planks />
-      </OnGround>
+      <Poke kind="wobble">
+        <OnGround x={1214} y={522}>
+          <Planks />
+        </OnGround>
+      </Poke>
 
       {/* Pallet of bricks below the crane, with snow on top */}
-      <g transform={transformOf(SITE)}>
-        <ellipse cx="720" cy="655" rx="52" ry="7" fill={INK} opacity="0.12" />
-        <rect x="676" y="644" width="88" height="10" rx="2" fill="#8d5a2b" />
-        <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
-          {[0, 1, 2].map((row) =>
-            [0, 1, 2].map((col) => <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />),
-          )}
+      <Poke kind="wobble">
+        <g transform={transformOf(SITE)}>
+          <ellipse cx="720" cy="655" rx="52" ry="7" fill={INK} opacity="0.12" />
+          <rect x="676" y="644" width="88" height="10" rx="2" fill="#8d5a2b" />
+          <g fill="#e76f51" stroke="#f4a261" strokeWidth="2">
+            {[0, 1, 2].map((row) =>
+              [0, 1, 2].map((col) => <rect key={`${row}-${col}`} x={680 + col * 27 + (row % 2) * 6} y={626 - row * 18} width="27" height="18" />),
+            )}
+          </g>
+          <Cap x={686} y={590} w={82} h={10} />
         </g>
-        <Cap x={686} y={590} w={82} h={10} />
-      </g>
+      </Poke>
 
       {/* The ploughed road with snow banks on both sides */}
       <rect y={ROAD_TOP} width="1600" height={ROAD_BOTTOM - ROAD_TOP} fill="url(#wb-road)" />
@@ -290,10 +298,11 @@ export function Background() {
         {SPARKLES.map(([x, y]) => {
           const s = depthScale(y) * 6;
           return (
-            <path
-              key={`${x}-${y}`}
-              d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`}
-            />
+            <Poke key={`${x}-${y}`} kind="glow">
+              <path
+                d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`}
+              />
+            </Poke>
           );
         })}
       </g>

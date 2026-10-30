@@ -1,5 +1,6 @@
 import { HORIZON, depthScale } from "../layout";
 import { Cloud } from "../shared";
+import { Poke } from "../spots";
 import { BRIDGE_Y, BROOK_TOP, DAMM_Y, brookHalf, brookX, pathHalf, pathY } from "./layout";
 
 // A clearing in the forest. Far away rows of fir trees fade into the morning haze, sunbeams
@@ -80,7 +81,7 @@ const ANEMONES = [
   [300, 700],
 ];
 
-// Tiny mushrooms that are not tappable: [x, y].
+// Tiny mushrooms that are no items (they only wobble when tapped): [x, y].
 const SMALL_MUSHROOMS = [
   [450, 640],
   [1110, 610],
@@ -94,10 +95,12 @@ const PEBBLES = [70, 230, 360, 520, 640, 860, 980, 1110, 1450, 1560];
 function Fir({ x, y, h, fill }: { x: number; y: number; h: number; fill: string }) {
   const w = h * 0.36;
   return (
-    <path
-      d={`M${x} ${y - h} L${x + w * 0.55} ${y - h * 0.62} H${x + w * 0.3} L${x + w} ${y - h * 0.22} H${x + w * 0.2} V${y} H${x - w * 0.2} V${y - h * 0.22} H${x - w} L${x - w * 0.3} ${y - h * 0.62} H${x - w * 0.55} Z`}
-      fill={fill}
-    />
+    <Poke kind="sway">
+      <path
+        d={`M${x} ${y - h} L${x + w * 0.55} ${y - h * 0.62} H${x + w * 0.3} L${x + w} ${y - h * 0.22} H${x + w * 0.2} V${y} H${x - w * 0.2} V${y - h * 0.22} H${x - w} L${x - w * 0.3} ${y - h * 0.62} H${x - w * 0.55} Z`}
+        fill={fill}
+      />
+    </Poke>
   );
 }
 
@@ -105,13 +108,15 @@ function Fir({ x, y, h, fill }: { x: number; y: number; h: number; fill: string 
 function MidTree({ x, y, size }: { x: number; y: number; size: number }) {
   const s = depthScale(y) * size;
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <rect x="-9" y="-110" width="18" height="110" fill="#8b7765" />
-      <circle cx="0" cy="-150" r="62" fill="#6fa57d" />
-      <circle cx="-40" cy="-118" r="40" fill="#66997a" />
-      <circle cx="42" cy="-122" r="42" fill="#66997a" />
-      <circle cx="-14" cy="-176" r="26" fill="#8dbd96" opacity="0.7" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${s})`}>
+        <rect x="-9" y="-110" width="18" height="110" fill="#8b7765" />
+        <circle cx="0" cy="-150" r="62" fill="#6fa57d" />
+        <circle cx="-40" cy="-118" r="40" fill="#66997a" />
+        <circle cx="42" cy="-122" r="42" fill="#66997a" />
+        <circle cx="-14" cy="-176" r="26" fill="#8dbd96" opacity="0.7" />
+      </g>
+    </Poke>
   );
 }
 
@@ -162,7 +167,7 @@ function Dam() {
     return `M${x - 20 * s} ${y + (i % 3) * 5 * s - 6 * s} L${x + 26 * s} ${y - (i % 2) * 8 * s - 12 * s}`;
   });
   return (
-    <g>
+    <Poke kind="wobble">
       <path d={`M${x1} ${y + 6 * s} Q${(x1 + x2) / 2} ${y - 34 * s} ${x2} ${y + 6 * s} Z`} fill="#7f5539" />
       <path d={sticks.join(" ")} stroke="#9c6644" strokeWidth={8 * s} strokeLinecap="round" />
       <path d={`M${x1 + 10 * s} ${y - 6 * s} L${x2 - 4 * s} ${y - 18 * s}`} stroke="#b08968" strokeWidth={6 * s} strokeLinecap="round" />
@@ -175,7 +180,7 @@ function Dam() {
         opacity="0.7"
         fill="none"
       />
-    </g>
+    </Poke>
   );
 }
 
@@ -183,17 +188,19 @@ function Dam() {
 function Reeds({ x, y, flip = 1 }: { x: number; y: number; flip?: 1 | -1 }) {
   const s = depthScale(y);
   return (
-    <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`}>
-      <path
-        d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44"
-        stroke="#40916c"
-        strokeWidth="5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <ellipse cx="-12" cy="-90" rx="5" ry="13" fill="#7f5539" />
-      <ellipse cx="16" cy="-108" rx="5" ry="13" fill="#7f5539" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`}>
+        <path
+          d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44"
+          stroke="#40916c"
+          strokeWidth="5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <ellipse cx="-12" cy="-90" rx="5" ry="13" fill="#7f5539" />
+        <ellipse cx="16" cy="-108" rx="5" ry="13" fill="#7f5539" />
+      </g>
+    </Poke>
   );
 }
 
@@ -277,11 +284,11 @@ export function Background() {
         const s = depthScale(y) * size;
         const x = brookX(y) + off * brookHalf(y);
         return (
-          <g key={y}>
+          <Poke key={y} kind="hop">
             <ellipse cx={x} cy={y} rx={20 * s} ry={11 * s} fill="#adb5bd" />
             <ellipse cx={x - 4 * s} cy={y - 4 * s} rx={10 * s} ry={4 * s} fill="#fff" opacity="0.45" />
             <path d={`M${x - 24 * s} ${y + 6 * s} q${24 * s} ${8 * s} ${48 * s} 0`} stroke="#fff" strokeWidth={3 * s} opacity="0.6" fill="none" />
-          </g>
+          </Poke>
         );
       })}
       <Dam />
@@ -302,7 +309,11 @@ export function Background() {
         {PEBBLES.map((x) => {
           const y = pathY(x) - pathHalf(x) * 0.2;
           const s = depthScale(y);
-          return <ellipse key={x} cx={x} cy={y} rx={7 * s} ry={4 * s} />;
+          return (
+            <Poke key={x} kind="hop">
+              <ellipse cx={x} cy={y} rx={7 * s} ry={4 * s} />
+            </Poke>
+          );
         })}
       </g>
       {/* Brook water shows under the bridge */}
@@ -314,31 +325,39 @@ export function Background() {
       {/* Grass, flowers, leaves and little mushrooms */}
       <g stroke="#52a35f" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       {LEAVES.map(([x, y, colour, angle]) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)}) rotate(${angle})`}>
-          <path d="M-14 0 Q0 -10 14 0 Q0 10 -14 0 Z" fill={colour} />
-          <path d="M-12 0 H12" stroke="#bc6c25" strokeWidth="1.5" />
-        </g>
+        <Poke key={`${x}-${y}`} kind="hop">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)}) rotate(${angle})`}>
+            <path d="M-14 0 Q0 -10 14 0 Q0 10 -14 0 Z" fill={colour} />
+            <path d="M-12 0 H12" stroke="#bc6c25" strokeWidth="1.5" />
+          </g>
+        </Poke>
       ))}
       {ANEMONES.map(([x, y]) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
-          <path d="M0 0 V-12" stroke="#52a35f" strokeWidth="3" />
-          {[0, 72, 144, 216, 288].map((a) => (
-            <ellipse key={a} cx="0" cy="-19" rx="4" ry="6" fill="#fff" transform={`rotate(${a} 0 -13)`} />
-          ))}
-          <circle cy="-13" r="3" fill="#ffd60a" />
-        </g>
+        <Poke key={`${x}-${y}`} kind="sway">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
+            <path d="M0 0 V-12" stroke="#52a35f" strokeWidth="3" />
+            {[0, 72, 144, 216, 288].map((a) => (
+              <ellipse key={a} cx="0" cy="-19" rx="4" ry="6" fill="#fff" transform={`rotate(${a} 0 -13)`} />
+            ))}
+            <circle cy="-13" r="3" fill="#ffd60a" />
+          </g>
+        </Poke>
       ))}
       {SMALL_MUSHROOMS.map(([x, y]) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
-          <rect x="-4" y="-14" width="8" height="14" rx="3" fill="#f8f1e5" />
-          <path d="M-13 -12 Q0 -30 13 -12 Z" fill="#b5651d" />
-          <rect x="12" y="-10" width="6" height="10" rx="3" fill="#f8f1e5" />
-          <path d="M8 -8 Q15 -20 22 -8 Z" fill="#c68642" />
-        </g>
+        <Poke key={`${x}-${y}`} kind="wobble">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
+            <rect x="-4" y="-14" width="8" height="14" rx="3" fill="#f8f1e5" />
+            <path d="M-13 -12 Q0 -30 13 -12 Z" fill="#b5651d" />
+            <rect x="12" y="-10" width="6" height="10" rx="3" fill="#f8f1e5" />
+            <path d="M8 -8 Q15 -20 22 -8 Z" fill="#c68642" />
+          </g>
+        </Poke>
       ))}
     </>
   );

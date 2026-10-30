@@ -1,15 +1,13 @@
 import { HORIZON, depthScale, towardsHorizon } from "../layout";
 import { Cloud, INK } from "../shared";
-import { FENCE, FORECOURT_X, PLATFORM_BOTTOM, PLATFORM_TOP, RUNWAY_BOTTOM, RUNWAY_TOP, TRACK } from "./layout";
+import { Poke } from "../spots";
+import { FENCE, FORECOURT_X, PLATFORM_BOTTOM, PLATFORM_TOP, ROAD_BOTTOM, ROAD_TOP, RUNWAY_BOTTOM, RUNWAY_TOP, TRACK } from "./layout";
 
 // Far away the terminal and a few parked planes in the haze; then the airfield with the
 // runway, the railway fence, the track on its gravel bed, the platform; at the front the
 // concrete apron on the left and the forecourt road with its pavement on the right.
 // Joints, sleepers and tufts grow towards the front.
 
-/** Where the road of the forecourt begins and ends, and the pavement in front of it. */
-const ROAD_TOP = 690;
-const ROAD_BOTTOM = 884;
 /** The kerb between the apron and the forecourt, from the railing down to the bottom edge. */
 const KERB_BOTTOM_X = towardsHorizon(FORECOURT_X, PLATFORM_BOTTOM, 1000);
 const kerbAt = (y: number) => towardsHorizon(FORECOURT_X, PLATFORM_BOTTOM, y);
@@ -34,30 +32,36 @@ const FAR_TAILS = [
 function Terminal() {
   return (
     <g>
-      <rect x="150" y="296" width="520" height="44" rx="4" fill="#dfe7f3" />
-      <rect x="150" y="290" width="520" height="10" rx="4" fill="#c9d6ea" />
-      <path d={Array.from({ length: 25 }, (_, i) => `M${166 + i * 20} 306 v24`).join(" ")} stroke="#b8cbe6" strokeWidth="10" />
-      <path d="M380 290 Q410 262 440 290 Z" fill="#c9d6ea" />
+      <Poke kind="wobble">
+        <rect x="150" y="296" width="520" height="44" rx="4" fill="#dfe7f3" />
+        <rect x="150" y="290" width="520" height="10" rx="4" fill="#c9d6ea" />
+        <path d={Array.from({ length: 25 }, (_, i) => `M${166 + i * 20} 306 v24`).join(" ")} stroke="#b8cbe6" strokeWidth="10" />
+        <path d="M380 290 Q410 262 440 290 Z" fill="#c9d6ea" />
+      </Poke>
       {FAR_TAILS.map(([x, colour]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <path d={`M${x} 336 L${Number(x) - 6} 304 H${Number(x) + 6} L${Number(x) + 20} 336 Z`} fill={String(colour)} />
           <rect x={Number(x) - 30} y="328" width="70" height="10" rx="5" fill="#eef3fb" />
-        </g>
+        </Poke>
       ))}
-      <rect x="1180" y="306" width="30" height="34" fill="#dfe7f3" />
-      <rect x="1220" y="296" width="44" height="44" fill="#e7ecf5" />
+      <Poke kind="wobble">
+        <rect x="1180" y="306" width="30" height="34" fill="#dfe7f3" />
+        <rect x="1220" y="296" width="44" height="44" fill="#e7ecf5" />
+      </Poke>
     </g>
   );
 }
 
 function FarTree({ x, y, scale }: { x: number; y: number; scale: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-6" y="-50" width="12" height="50" fill="#9c6b3c" />
-      <circle cx="0" cy="-64" r="32" fill="#74c69d" />
-      <circle cx="-20" cy="-48" r="20" fill="#52b788" />
-      <circle cx="20" cy="-50" r="22" fill="#52b788" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <rect x="-6" y="-50" width="12" height="50" fill="#9c6b3c" />
+        <circle cx="0" cy="-64" r="32" fill="#74c69d" />
+        <circle cx="-20" cy="-48" r="20" fill="#52b788" />
+        <circle cx="20" cy="-50" r="22" fill="#52b788" />
+      </g>
+    </Poke>
   );
 }
 
@@ -85,11 +89,11 @@ function Runway() {
 function Fence() {
   const h = 34 * depthScale(FENCE);
   return (
-    <g>
+    <Poke kind="wobble">
       <rect y={FENCE - h} width="1600" height={h} fill="#e9ecef" opacity="0.35" />
       <path d={`M0 ${FENCE - h} H1600 M0 ${FENCE - h / 2} H1600`} stroke="#adb5bd" strokeWidth="2" />
       <path d={Array.from({ length: 33 }, (_, i) => `M${i * 50} ${FENCE} v${-h - 4}`).join(" ")} stroke="#868e96" strokeWidth="4" />
-    </g>
+    </Poke>
   );
 }
 
@@ -131,23 +135,27 @@ function Platform() {
       <rect y={PLATFORM_TOP + 12} width="1600" height="4" fill="#ffd60a" />
       <path d={[...rows, ...joints].join(" ")} stroke="#ced4da" strokeWidth="2" />
       {/* Bench */}
-      <g transform={`translate(330 636) scale(${s})`}>
-        <rect x="-70" y="-56" width="140" height="12" rx="5" fill="#3a86ff" />
-        <rect x="-70" y="-82" width="140" height="12" rx="5" fill="#3a86ff" />
-        <path d="M-56 -44 V0 M56 -44 V0 M-50 -70 V-56 M50 -70 V-56" stroke="#495057" strokeWidth="7" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={`translate(330 636) scale(${s})`}>
+          <rect x="-70" y="-56" width="140" height="12" rx="5" fill="#3a86ff" />
+          <rect x="-70" y="-82" width="140" height="12" rx="5" fill="#3a86ff" />
+          <path d="M-56 -44 V0 M56 -44 V0 M-50 -70 V-56 M50 -70 V-56" stroke="#495057" strokeWidth="7" />
+        </g>
+      </Poke>
       {/* Platform lamp */}
-      <g transform={`translate(1012 628) scale(${depthScale(628)})`}>
-        <rect x="-5" y="-210" width="10" height="210" fill="#6c757d" />
-        <path d="M0 -206 Q0 -226 26 -226" stroke="#6c757d" strokeWidth="8" fill="none" />
-        <path d="M14 -230 H44 L38 -214 H20 Z" fill="#495057" />
-        <ellipse cx="29" cy="-212" rx="10" ry="4" fill="#fff3b0" />
-      </g>
+      <Poke kind="sway">
+        <g transform={`translate(1012 628) scale(${depthScale(628)})`}>
+          <rect x="-5" y="-210" width="10" height="210" fill="#6c757d" />
+          <path d="M0 -206 Q0 -226 26 -226" stroke="#6c757d" strokeWidth="8" fill="none" />
+          <path d="M14 -230 H44 L38 -214 H20 Z" fill="#495057" />
+          <ellipse cx="29" cy="-212" rx="10" ry="4" fill="#fff3b0" />
+        </g>
+      </Poke>
       {/* Railing at the front of the platform */}
-      <g>
+      <Poke kind="wobble">
         <path d={`M0 ${PLATFORM_BOTTOM - 26} H1600`} stroke="#adb5bd" strokeWidth="5" />
         <path d={Array.from({ length: 23 }, (_, i) => `M${i * 72 + 20} ${PLATFORM_BOTTOM} v-26`).join(" ")} stroke="#868e96" strokeWidth="5" />
-      </g>
+      </Poke>
       <rect y={PLATFORM_BOTTOM} width="1600" height="8" fill="#adb5bd" />
     </g>
   );
@@ -196,13 +204,15 @@ function Forecourt() {
       <path d={`M${FORECOURT_X} ${PLATFORM_BOTTOM + 8} L${KERB_BOTTOM_X} 1000`} stroke="#adb5bd" strokeWidth="10" />
       <path d={`M${FORECOURT_X + 6} ${PLATFORM_BOTTOM + 8} L${KERB_BOTTOM_X + 8} 1000`} stroke="#ced4da" strokeWidth="4" />
       {/* Taxi sign by the road */}
-      <g transform={`translate(1576 ${ROAD_TOP - 2}) scale(${depthScale(ROAD_TOP - 2)})`}>
-        <rect x="-4" y="-150" width="8" height="150" fill="#6c757d" />
-        <rect x="-34" y="-180" width="68" height="34" rx="6" fill="#ffd60a" stroke={INK} strokeWidth="3" />
-        <text x="0" y="-163" fill={INK} fontSize="16" fontWeight="900" textAnchor="middle" dominantBaseline="central">
-          TAXI
-        </text>
-      </g>
+      <Poke kind="sway">
+        <g transform={`translate(1576 ${ROAD_TOP - 2}) scale(${depthScale(ROAD_TOP - 2)})`}>
+          <rect x="-4" y="-150" width="8" height="150" fill="#6c757d" />
+          <rect x="-34" y="-180" width="68" height="34" rx="6" fill="#ffd60a" stroke={INK} strokeWidth="3" />
+          <text x="0" y="-163" fill={INK} fontSize="16" fontWeight="900" textAnchor="middle" dominantBaseline="central">
+            TAXI
+          </text>
+        </g>
+      </Poke>
     </g>
   );
 }
@@ -240,7 +250,9 @@ export function Background() {
       <circle cx="1500" cy="80" r="140" fill="url(#fh-sunglow)" />
       <Cloud x={250} y={250} scale={0.3} className="fh-cloud fh-cloud-slow" />
       <Cloud x={880} y={220} scale={0.36} className="fh-cloud" />
-      <path d="M640 150 q6 -6 12 0 q6 -6 12 0 M680 136 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      <Poke kind="drift">
+        <path d="M640 150 q6 -6 12 0 q6 -6 12 0 M680 136 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      </Poke>
       <Terminal />
       <FarTree x={60} y={344} scale={0.4} />
       <FarTree x={820} y={340} scale={0.36} />
@@ -253,7 +265,9 @@ export function Background() {
       <Runway />
       <g stroke="#52b788" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       <Fence />
@@ -271,7 +285,9 @@ export function Background() {
           [1200, 700],
           [1500, 696],
         ].map(([x, y]) => (
-          <path key={x} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={x} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
     </>

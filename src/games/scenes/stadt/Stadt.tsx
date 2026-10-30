@@ -1,10 +1,10 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Background } from "./background";
 import { Ampel, Baeckerei, Briefkasten, Brunnen, Feuerwache, Haus, Hydrant, Kirche, Laterne, Muelleimer } from "./buildings";
 import { Enten, Hund, Katze, Luftballon, Marienkaefer, Maus, Oma, Roller, Schaukel, Spatz, Taube, Vogel } from "./figures";
-import { BEET, HAUS, HOUSES, POST, TREE } from "./layout";
+import { BEET, HAUS, HOUSES, PARK_X, POST, ROAD_TOP, TREE } from "./layout";
 import { Baum, Blumen, Falter } from "./nature";
 import { Auto, Bus, Eiswagen, Fahrrad, Feuerwehr, Flugzeug, Kinderwagen, Muellauto, Polizei } from "./vehicles";
 import "./stadt.css";
@@ -21,6 +21,14 @@ export const stadt: Scene = {
   sky: "#8fd3ff",
   ground: "#dfe2e6",
   Background,
+  // The park grows flowers or a mole peeks out, a spider comes down the house fronts, a beetle crawls along road and pavements.
+  spots: [
+    { box: [1300, 820, 160, 70], kinds: ["flower"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [PARK_X, HORIZON, 1600 - PARK_X, ROAD_TOP - HORIZON], kinds: ["flower", "mole"] },
+    { box: [0, HORIZON, PARK_X, HOUSES - HORIZON], kinds: ["spider"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["bug"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

@@ -174,5 +174,14 @@ export const scenesIdeas: IdeaArea = {
       effort: "L",
       done: true,
     },
+    {
+      id: "B-20",
+      emoji: "🌬️",
+      title: "Jeder Tipp macht etwas",
+      text: "Auch der Hintergrund lebt: Bäume, Häuser, Zäune und Wolken wackeln beim Antippen. Ein Tipp in den Himmel macht einen Windstoß, der die Bäume biegt; auf dem Boden im Haus krabbelt ein Käfer aus den Fliesen, an der Wand seilt sich eine Spinne ab, auf der Wiese wächst eine Blume mit Schmetterling oder ein Maulwurf guckt heraus, im Wasser springt ein Fisch.",
+      why: "Kein Tipp ins Leere – das Kind lernt, dass das ganze Bild antwortet, und entdeckt auch die Stellen zwischen den Dingen.",
+      effort: "M",
+      done: true,
+    },
   ],
 };

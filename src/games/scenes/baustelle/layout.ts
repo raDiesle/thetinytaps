@@ -12,3 +12,8 @@ export const TREE = ground(108, 572, 72, 410, 2);
 export const HAMMER = ground(1192, 996, 1360, 920);
 /** The flower bed and its butterfly. */
 export const FLOWERS = ground(1548, 995, 1550, 900);
+
+/** The road in front of the site: its back kerb, its front kerb, and the end of the pavement in front of it. */
+export const ROAD_TOP = 648;
+export const ROAD_BOTTOM = 768;
+export const PAVEMENT = 792;

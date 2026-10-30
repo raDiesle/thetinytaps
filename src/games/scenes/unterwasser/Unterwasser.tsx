@@ -1,4 +1,4 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Background } from "./background";
@@ -35,6 +35,12 @@ export const unterwasser: Scene = {
   sky: "#8fd3ff",
   ground: "#f3d69f",
   Background,
+  // Wind blows over the strip of sky; bubbles and a little fish rise in the water; a crab digs out of the sand.
+  spots: [
+    { box: [0, 0, 1600, SURFACE], kinds: ["wind"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["crab", "bubbles"] },
+    { box: [0, SURFACE, 1600, HORIZON - SURFACE], kinds: ["bubbles"] },
+  ],
   items: [
     // ---------- Above the water ----------
     {

@@ -1,24 +1,14 @@
 import { HORIZON, depthScale } from "../layout";
 import { Cloud } from "../shared";
-import { LAKE, TRAIL } from "./layout";
+import { Poke } from "../spots";
+import { LAKE, TRAIL, trailHalf, trailX } from "./layout";
 
 // A green valley long ago. Far away soft purple mountains and green hills fade into the
 // warm haze; a herd of long-necked dinosaurs walks along the horizon as tiny shadows.
 // A sandy trail winds from the front up to the volcano, with big three-toed footprints.
 // The lake lies in the middle right, with a sandy shore, stones and reeds; ferns, tufts,
-// pebbles and little flowers grow on the meadow. Nothing here can be tapped.
-
-/** Middle of the trail at ground height y, smoothly between its points. */
-function trailX(y: number) {
-  const next = TRAIL.findIndex(([, py]) => py > y);
-  const i = next < 0 ? TRAIL.length - 2 : Math.max(0, next - 1);
-  const [x1, y1] = TRAIL[i];
-  const [x2, y2] = TRAIL[i + 1];
-  const t = Math.max(0, Math.min(1, (y - y1) / (y2 - y1)));
-  return x1 + ((x2 - x1) * (1 - Math.cos(t * Math.PI))) / 2;
-}
-
-const trailHalf = (y: number) => depthScale(y) * 54;
+// pebbles and little flowers grow on the meadow. Nothing here is an item, but trees, ferns, flowers
+// and stones move when tapped.
 
 function trailPath() {
   const ys = Array.from({ length: 33 }, (_, i) => TRAIL[0][1] + ((1000 - TRAIL[0][1]) * i) / 32);
@@ -71,14 +61,16 @@ const HERD = [
 /** A tiny long-neck dinosaur shadow far away, foot at (x, y). */
 function FarDino({ x, y, size, dir }: { x: number; y: number; size: number; dir: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${size * dir} ${size})`} fill="#93a9a0">
-      <ellipse cx="0" cy="-14" rx="20" ry="10" />
-      <path d="M12 -18 Q22 -40 30 -46 L34 -42 Q26 -34 20 -12 Z" />
-      <circle cx="32" cy="-46" r="4.5" />
-      <path d="M-18 -16 Q-32 -12 -40 -4 Q-28 -8 -16 -10 Z" />
-      <rect x="-14" y="-8" width="5" height="9" rx="2" />
-      <rect x="8" y="-8" width="5" height="9" rx="2" />
-    </g>
+    <Poke kind="hop">
+      <g transform={`translate(${x} ${y}) scale(${size * dir} ${size})`} fill="#93a9a0">
+        <ellipse cx="0" cy="-14" rx="20" ry="10" />
+        <path d="M12 -18 Q22 -40 30 -46 L34 -42 Q26 -34 20 -12 Z" />
+        <circle cx="32" cy="-46" r="4.5" />
+        <path d="M-18 -16 Q-32 -12 -40 -4 Q-28 -8 -16 -10 Z" />
+        <rect x="-14" y="-8" width="5" height="9" rx="2" />
+        <rect x="8" y="-8" width="5" height="9" rx="2" />
+      </g>
+    </Poke>
   );
 }
 
@@ -95,15 +87,17 @@ const MID_PALMS = [
 function MidPalm({ x, y, size }: { x: number; y: number; size: number }) {
   const s = depthScale(y) * size;
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path d="M-5 0 Q-10 -60 4 -120 L12 -118 Q2 -60 7 0 Z" fill="#a1887f" />
-      <g fill="#7fb77e">
-        <path d="M8 -120 Q-30 -150 -70 -120 Q-30 -132 8 -114 Z" />
-        <path d="M8 -120 Q46 -150 84 -118 Q44 -130 8 -114 Z" />
-        <path d="M8 -122 Q-14 -170 -48 -170 Q-14 -150 4 -116 Z" />
-        <path d="M8 -122 Q34 -172 66 -164 Q30 -150 10 -116 Z" />
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${s})`}>
+        <path d="M-5 0 Q-10 -60 4 -120 L12 -118 Q2 -60 7 0 Z" fill="#a1887f" />
+        <g fill="#7fb77e">
+          <path d="M8 -120 Q-30 -150 -70 -120 Q-30 -132 8 -114 Z" />
+          <path d="M8 -120 Q46 -150 84 -118 Q44 -130 8 -114 Z" />
+          <path d="M8 -122 Q-14 -170 -48 -170 Q-14 -150 4 -116 Z" />
+          <path d="M8 -122 Q34 -172 66 -164 Q30 -150 10 -116 Z" />
+        </g>
       </g>
-    </g>
+    </Poke>
   );
 }
 
@@ -126,7 +120,7 @@ const TUFTS = [
   [700, 860],
 ];
 
-// Little flowers on the meadow (not tappable): [x, y, colour].
+// Little flowers on the meadow (no items, they only sway): [x, y, colour].
 const FLOWERS = [
   [250, 560, "#ffd6e0"],
   [560, 520, "#fff3b0"],
@@ -152,10 +146,12 @@ const SMALL_FERNS = [
 function SmallFern({ x, y, size, flip }: { x: number; y: number; size: number; flip: number }) {
   const s = depthScale(y) * size;
   return (
-    <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`} fill="none" stroke="#4f9d5d" strokeWidth="7" strokeLinecap="round">
-      <path d="M0 0 Q-20 -40 -60 -50 M0 0 Q-6 -50 -24 -76 M0 0 Q6 -54 20 -80 M0 0 Q24 -40 60 -48 M0 0 Q30 -14 62 -10" />
-      <path d="M-30 -42 l-6 -10 M-46 -48 l-4 -10 M-12 -52 l-8 -6 M10 -56 l8 -6 M34 -42 l6 -10 M46 -46 l4 -10" strokeWidth="5" stroke="#6bb26f" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`} fill="none" stroke="#4f9d5d" strokeWidth="7" strokeLinecap="round">
+        <path d="M0 0 Q-20 -40 -60 -50 M0 0 Q-6 -50 -24 -76 M0 0 Q6 -54 20 -80 M0 0 Q24 -40 60 -48 M0 0 Q30 -14 62 -10" />
+        <path d="M-30 -42 l-6 -10 M-46 -48 l-4 -10 M-12 -52 l-8 -6 M10 -56 l8 -6 M34 -42 l6 -10 M46 -46 l4 -10" strokeWidth="5" stroke="#6bb26f" />
+      </g>
+    </Poke>
   );
 }
 
@@ -184,17 +180,19 @@ const LAKE_STONES = [
 function Reeds({ x, y, flip = 1 }: { x: number; y: number; flip?: 1 | -1 }) {
   const s = depthScale(y);
   return (
-    <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`}>
-      <path
-        d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44"
-        stroke="#40916c"
-        strokeWidth="5"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <ellipse cx="-12" cy="-90" rx="5" ry="13" fill="#9c6644" />
-      <ellipse cx="16" cy="-108" rx="5" ry="13" fill="#9c6644" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${s * flip} ${s})`}>
+        <path
+          d="M0 0 q-4 -50 -12 -86 M10 0 q2 -60 6 -104 M20 0 q8 -40 22 -66 M-8 0 q-12 -30 -26 -44"
+          stroke="#40916c"
+          strokeWidth="5"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <ellipse cx="-12" cy="-90" rx="5" ry="13" fill="#9c6644" />
+        <ellipse cx="16" cy="-108" rx="5" ry="13" fill="#9c6644" />
+      </g>
+    </Poke>
   );
 }
 
@@ -233,10 +231,11 @@ export function Background() {
       <Cloud x={1130} y={130} scale={0.34} className="dt-cloud" />
       <g fill="#c9bfe0">
         {MOUNTAINS.map(([x, h, w]) => (
-          <path
-            key={x}
-            d={`M${x - w / 2} ${HORIZON + 4} Q${x - w * 0.22} ${HORIZON - h} ${x} ${HORIZON - h} Q${x + w * 0.22} ${HORIZON - h} ${x + w / 2} ${HORIZON + 4} Z`}
-          />
+          <Poke key={x} kind="wobble">
+            <path
+              d={`M${x - w / 2} ${HORIZON + 4} Q${x - w * 0.22} ${HORIZON - h} ${x} ${HORIZON - h} Q${x + w * 0.22} ${HORIZON - h} ${x + w / 2} ${HORIZON + 4} Z`}
+            />
+          </Poke>
         ))}
       </g>
       <g fill="#ffffff" opacity="0.6">
@@ -303,10 +302,10 @@ export function Background() {
       {LAKE_STONES.map(([x, y, size]) => {
         const s = depthScale(y) * size;
         return (
-          <g key={x}>
+          <Poke key={x} kind="hop">
             <ellipse cx={x} cy={y} rx={30 * s} ry={14 * s} fill="#b0a8a0" />
             <ellipse cx={x - 6 * s} cy={y - 5 * s} rx={14 * s} ry={5 * s} fill="#fff" opacity="0.4" />
-          </g>
+          </Poke>
         );
       })}
       <Reeds x={cx - rx + 10} y={cy - 8} flip={-1} />
@@ -319,22 +318,30 @@ export function Background() {
       ))}
       <g stroke="#5aa561" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       {FLOWERS.map(([x, y, colour]) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
-          <path d="M0 0 V-14" stroke="#52a35f" strokeWidth="3" />
-          {[0, 72, 144, 216, 288].map((a) => (
-            <ellipse key={a} cx="0" cy="-21" rx="4.5" ry="6.5" fill={colour} transform={`rotate(${a} 0 -15)`} />
-          ))}
-          <circle cy="-15" r="3.2" fill="#ffb703" />
-        </g>
+        <Poke key={`${x}-${y}`} kind="sway">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
+            <path d="M0 0 V-14" stroke="#52a35f" strokeWidth="3" />
+            {[0, 72, 144, 216, 288].map((a) => (
+              <ellipse key={a} cx="0" cy="-21" rx="4.5" ry="6.5" fill={colour} transform={`rotate(${a} 0 -15)`} />
+            ))}
+            <circle cy="-15" r="3.2" fill="#ffb703" />
+          </g>
+        </Poke>
       ))}
       <g fill="#c2b59b">
         {PEBBLES.map(([x, y]) => {
           const s = depthScale(y);
-          return <ellipse key={`${x}-${y}`} cx={x} cy={y} rx={9 * s} ry={5 * s} />;
+          return (
+            <Poke key={`${x}-${y}`} kind="hop">
+              <ellipse cx={x} cy={y} rx={9 * s} ry={5 * s} />
+            </Poke>
+          );
         })}
       </g>
     </>

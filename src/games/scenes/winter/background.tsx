@@ -1,13 +1,14 @@
 import type { ReactNode } from "react";
 import { HORIZON, depthScale } from "../layout";
 import { Cloud } from "../shared";
+import { Poke } from "../spots";
 import { Snow } from "../weather";
 import { Cap, SNOW, SNOW_SHADE } from "../winterbaustelle/parts";
 import { POND } from "./layout";
 
 // A snowy village edge: hills with a fir forest and the village far back, a garden fence,
 // the frozen pond in the middle, the sledging hill on the right and a trodden path in front.
-// Nothing here is tappable.
+// Nothing here is an item, but firs, houses, the fence, bushes, reeds and sparkles move when tapped.
 
 /** Small firs of the far forest: [x, y, scale]. */
 const FOREST = [
@@ -39,11 +40,13 @@ const VILLAGE = [
 /** A small far fir with snow on its tiers. */
 function Fir({ x, y, scale, colour = "#5d8a80" }: { x: number; y: number; scale: number; colour?: string }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-5" y="0" width="10" height="16" fill="#8d6e53" />
-      <path d="M-34 6 L0 -44 L34 6 Z M-26 -22 L0 -66 L26 -22 Z" fill={colour} />
-      <path d="M-34 6 Q0 -4 34 6 Q0 12 -34 6 Z M-26 -22 Q0 -30 26 -22 Q0 -16 -26 -22 Z M-10 -52 L0 -66 L10 -52 Z" fill={SNOW} />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <rect x="-5" y="0" width="10" height="16" fill="#8d6e53" />
+        <path d="M-34 6 L0 -44 L34 6 Z M-26 -22 L0 -66 L26 -22 Z" fill={colour} />
+        <path d="M-34 6 Q0 -4 34 6 Q0 12 -34 6 Z M-26 -22 Q0 -30 26 -22 Q0 -16 -26 -22 Z M-10 -52 L0 -66 L10 -52 Z" fill={SNOW} />
+      </g>
+    </Poke>
   );
 }
 
@@ -52,7 +55,7 @@ function Village() {
   return (
     <g>
       {VILLAGE.map(([x, w, h, roof, lit]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={base - h} width={w} height={h} fill="#efe6da" />
           <rect x={x + w - 10} y={base - h} width="10" height={h} fill="#ddd2c4" />
           <path d={`M${x - 6} ${base - h + 2} L${x + w / 2} ${base - h - 26} L${x + w + 6} ${base - h + 2} Z`} fill={roof} />
@@ -62,7 +65,7 @@ function Village() {
           />
           <rect x={x + 10} y={base - h + 8} width="10" height="10" rx="2" fill={lit ? "#ffe08a" : "#a9bfd6"} />
           <rect x={x + w - 24} y={base - h + 8} width="10" height="10" rx="2" fill="#a9bfd6" />
-        </g>
+        </Poke>
       ))}
       {/* Chimney smoke of the far houses: still, it only hangs there. */}
       <g fill="#fff" opacity="0.8">
@@ -85,7 +88,7 @@ function Fence({ x0, x1, y }: { x0: number; x1: number; y: number }) {
   const s = depthScale(y);
   const n = Math.floor((x1 - x0) / (34 * s));
   return (
-    <g>
+    <Poke kind="wobble">
       <rect x={x0} y={y - 66 * s} width={x1 - x0} height={10 * s} fill="#a0703f" />
       <rect x={x0} y={y - 34 * s} width={x1 - x0} height={10 * s} fill="#a0703f" />
       {Array.from({ length: n + 1 }, (_, i) => {
@@ -99,7 +102,7 @@ function Fence({ x0, x1, y }: { x0: number; x1: number; y: number }) {
         );
       })}
       <path d={`M${x0} ${y - 2} Q${(x0 + x1) / 2} ${y - 22 * s} ${x1} ${y - 2} V${y + 6} H${x0} Z`} fill={SNOW} />
-    </g>
+    </Poke>
   );
 }
 
@@ -179,12 +182,16 @@ function Pond() {
         d={`M${cx + rx} ${cy + 2} Q${cx + rx - 40} ${cy + 30} ${cx + rx - 120} ${cy + 48} Q${cx + rx - 60} ${cy + 24} ${cx + rx - 10} ${cy - 20} Z`}
         fill={SNOW}
       />
-      <OnGround x={cx - rx + 6} y={cy - 8} size={1.2}>
-        <Reeds />
-      </OnGround>
-      <OnGround x={cx + rx - 30} y={cy - 20} size={1}>
-        <Reeds />
-      </OnGround>
+      <Poke kind="sway">
+        <OnGround x={cx - rx + 6} y={cy - 8} size={1.2}>
+          <Reeds />
+        </OnGround>
+      </Poke>
+      <Poke kind="sway">
+        <OnGround x={cx + rx - 30} y={cy - 20} size={1}>
+          <Reeds />
+        </OnGround>
+      </Poke>
     </g>
   );
 }
@@ -300,15 +307,21 @@ export function Background() {
       <rect y={HORIZON} width="1600" height={1000 - HORIZON} fill="url(#wi-ground)" />
       <Snow seed="winter" />
       <Fence x0={150} x1={505} y={552} />
-      <OnGround x={616} y={558} size={1.2}>
-        <Bush w={90} />
-      </OnGround>
-      <OnGround x={34} y={760} size={1.3}>
-        <Bush w={110} />
-      </OnGround>
-      <OnGround x={1010} y={432}>
-        <Bush w={100} />
-      </OnGround>
+      <Poke kind="sway">
+        <OnGround x={616} y={558} size={1.2}>
+          <Bush w={90} />
+        </OnGround>
+      </Poke>
+      <Poke kind="sway">
+        <OnGround x={34} y={760} size={1.3}>
+          <Bush w={110} />
+        </OnGround>
+      </Poke>
+      <Poke kind="sway">
+        <OnGround x={1010} y={432}>
+          <Bush w={100} />
+        </OnGround>
+      </Poke>
       <Pond />
       <Hill />
       <Path />
@@ -320,10 +333,11 @@ export function Background() {
         {SPARKLES.map(([x, y]) => {
           const s = depthScale(y) * 6;
           return (
-            <path
-              key={`${x}-${y}`}
-              d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`}
-            />
+            <Poke key={`${x}-${y}`} kind="glow">
+              <path
+                d={`M${x} ${y - s} L${x + s * 0.3} ${y} L${x} ${y + s} L${x - s * 0.3} ${y} Z M${x - s} ${y} L${x} ${y + s * 0.3} L${x + s} ${y} L${x} ${y - s * 0.3} Z`}
+              />
+            </Poke>
           );
         })}
       </g>

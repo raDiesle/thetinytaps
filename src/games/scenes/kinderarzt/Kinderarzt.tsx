@@ -1,4 +1,4 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import type { Scene } from "../types";
 import { Background } from "./background";
 import { COUCH, DESK, TROLLEY } from "./layout";
@@ -36,6 +36,11 @@ export const kinderarzt: Scene = {
   sky: "#fff8e1",
   ground: "#f3f9fb",
   Background,
+  // A spider comes down the wall; a beetle crawls out of the floor tiles.
+  spots: [
+    { box: [0, 0, 1600, HORIZON], kinds: ["spider"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["bug"] },
+  ],
   items: [
     // ---------- On the wall and from the ceiling ----------
     {

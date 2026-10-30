@@ -122,9 +122,10 @@ export function Face({ cx, cy, size = 1 }: { cx: number; cy: number; size?: numb
 }
 
 /** A cloud whose left puff is centred on (x, y). */
+/** A white cloud; tapped or caught by a gust of wind it drifts a little way (`data-poke`, see spots.tsx). */
 export function Cloud({ x, y, scale = 1, className }: { x: number; y: number; scale?: number; className?: string }) {
   return (
-    <g className={className}>
+    <g className={className} data-poke="drift">
       <g transform={`translate(${x} ${y}) scale(${scale})`}>
         <g className="cloud-puffs" fill="#fff">
           <circle cx="0" cy="0" r="38" />
