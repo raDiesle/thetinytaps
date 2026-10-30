@@ -324,6 +324,13 @@ export const RESEARCH: Research[] = [
         why: "Frei, auch mit s, ein Ort zum Spielen und Lesen – aber 16 Buchstaben, und Google denkt an Kinderbetten und Spieltürme.",
       },
       {
+        name: "toddleradise",
+        rank: 9,
+        free: ["com"],
+        taken: [],
+        why: "Ein Kunstwort aus „toddler“ und „paradise“, die sich das r teilen: frei, eigen, als Marke zu schützen, Google kennt es nicht. Aber „-adise“ ist kein bekannter Baustein wie „-verse“: Wer es hört, weiß nicht, wie man es schreibt (toddlaradise, toddlerparadise – alle frei, man bräuchte mehrere), und Eltern in sieben Sprachen erkennen das Paradies kaum darin.",
+      },
+      {
         name: "foxbearbook",
         rank: 9,
         free: ["com"],
