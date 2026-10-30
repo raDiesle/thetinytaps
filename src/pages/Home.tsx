@@ -44,17 +44,6 @@ export function Home() {
           onContextMenu: (e) => e.preventDefault(),
         }}
       />
-      <p className="home-subtitle">
-        {t({
-          de: "Spiele für die Kleinsten",
-          ru: "Игры для самых маленьких",
-          en: "Games for little ones",
-          zh: "给小宝宝的游戏",
-          hi: "नन्हे-मुन्नों के लिए खेल",
-          es: "Juegos para los más pequeños",
-          ar: "ألعاب للصغار",
-        })}
-      </p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {CATEGORIES.map((c) => (
           <li key={c.id}>

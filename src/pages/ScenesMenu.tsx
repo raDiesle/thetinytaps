@@ -42,17 +42,6 @@ export function ScenesMenu() {
           </>
         }
       />
-      <p className="home-subtitle">
-        {t({
-          de: "Bild aussuchen – dann alles antippen und entdecken!",
-          ru: "Выбери картинку – и нажимай на всё, что видишь!",
-          en: "Pick a picture – then tap everything and discover!",
-          zh: "选一幅图画，然后点一点，看看都有什么！",
-          hi: "एक तस्वीर चुनो – फिर सब कुछ छूकर खोजो!",
-          es: "¡Elige un dibujo y toca todo para descubrirlo!",
-          ar: "هيّا نختار صورة – ثم نلمس كل شيء ونكتشف!",
-        })}
-      </p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {SCENES.map((scene) => localizeScene(scene, language.id)).map((s) => (
           <li key={s.id}>

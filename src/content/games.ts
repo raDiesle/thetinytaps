@@ -13,8 +13,6 @@ export interface Category {
   id: string;
   emoji: string;
   title: Localized;
-  /** Under the title on the category's own page. */
-  subtitle: Localized;
   games: Game[];
 }
 
@@ -24,15 +22,6 @@ export const CATEGORIES: Category[] = [
     id: "lebendige-welten",
     emoji: "🖼️",
     title: { de: "Lebendige Welten", ru: "Живые миры", en: "Living Worlds", zh: "生动的世界", hi: "जीवंत दुनिया", es: "Mundos vivos", ar: "عوالم حيّة" },
-    subtitle: {
-      de: "Bilder und Geschichten, die auf jedes Antippen antworten.",
-      ru: "Картинки и истории, которые отвечают на каждое касание.",
-      en: "Pictures and stories that answer every tap.",
-      zh: "每次点一点都会回应的图画和故事。",
-      hi: "तस्वीरें और कहानियाँ, जो हर टैप पर जवाब देती हैं।",
-      es: "Imágenes e historias que responden a cada toque.",
-      ar: "صور وقصص تستجيب لكل لمسة.",
-    },
     games: [
       {
         href: "/bilder/",
@@ -85,15 +74,6 @@ export const CATEGORIES: Category[] = [
     id: "zuordnen",
     emoji: "🧩",
     title: { de: "Zuordnen", ru: "Найди пару", en: "Matching", zh: "配一配", hi: "जोड़ी मिलाओ", es: "Emparejar", ar: "المطابقة" },
-    subtitle: {
-      de: "Was gehört zusammen? Antippen oder hinziehen.",
-      ru: "Что к чему подходит? Коснуться или перетащить.",
-      en: "What goes together? Tap or drag.",
-      zh: "什么和什么配成一对？点一点或拖过去。",
-      hi: "क्या किसके साथ जाता है? छूकर या खींचकर।",
-      es: "¿Qué va con qué? Tocar o arrastrar.",
-      ar: "ما الذي يتناسب معًا؟ باللمس أو بالسحب.",
-    },
     games: [
       {
         href: "/tiere/",
@@ -140,15 +120,6 @@ export const CATEGORIES: Category[] = [
       es: "Letras y números",
       ar: "الحروف والأرقام",
     },
-    subtitle: {
-      de: "Tasten drücken, Buchstaben finden, Wörter tippen.",
-      ru: "Нажимать клавиши, искать буквы, печатать слова.",
-      en: "Press keys, find letters, type words.",
-      zh: "按按键，找字母，打单词。",
-      hi: "बटन दबाना, अक्षर ढूँढना, शब्द टाइप करना।",
-      es: "Pulsar teclas, buscar letras, escribir palabras.",
-      ar: "ضغط المفاتيح، والبحث عن الحروف، وكتابة الكلمات.",
-    },
     // One game, so the home card opens it directly (see categoryHref).
     games: [
       {
@@ -170,7 +141,6 @@ export const CATEGORIES: Category[] = [
     id: "weitere",
     emoji: "🎈",
     title: { de: "Weitere", ru: "Ещё", en: "More", zh: "更多", hi: "और भी", es: "Más", ar: "المزيد" },
-    subtitle: { de: "Zähne putzen, aufs Töpfchen gehen, Sterne sammeln, den Tag in Bildern sehen und laut oder leise rufen." },
     games: [
       {
         href: "/zaehne/",

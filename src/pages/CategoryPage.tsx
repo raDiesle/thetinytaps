@@ -31,7 +31,6 @@ export function CategoryPage() {
           </>
         }
       />
-      <p className="home-subtitle">{t(category.subtitle)}</p>
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
         {category.games.map((g) => (
           <li key={g.href}>

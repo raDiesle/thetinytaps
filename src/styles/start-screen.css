@@ -357,14 +357,6 @@ kbd {
   max-width: 1040px;
 }
 
-.mode-heading {
-  margin: 0;
-  padding: 4px 20px;
-  border-radius: 999px;
-  background: #ffffffb0;
-  font-size: clamp(1.2rem, 3vw, 1.5rem);
-}
-
 .mode-level {
   padding: 10px 20px;
   border: 3px solid var(--ink);
