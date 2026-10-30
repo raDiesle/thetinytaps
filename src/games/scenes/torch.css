@@ -1,0 +1,13 @@
+/* Torch mode (torch.tsx): the night over the picture, with a round light that has a soft edge. Taps go through it. */
+.torch-night {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+  background: radial-gradient(circle var(--torch-r, 120px) at var(--torch-x, 50%) var(--torch-y, 50%), rgb(255 244 200 / 0.12) 0 45%, rgb(8 12 36 / 0.9) 100%);
+  transition: opacity 1.4s ease;
+}
+
+.torch-night.off {
+  opacity: 0;
+}
