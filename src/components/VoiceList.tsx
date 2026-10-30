@@ -18,7 +18,7 @@ const charactersOf = (lines: string[]) => lines.reduce((sum, line) => sum + line
 
 /**
  * On the management page: every German line the games would say, which ElevenLabs still has to record now that
- * the browser's voice is off – how many per game, what they cost, and the lines themselves to copy. Loaded only
+ * the browser's voice is off (but for the games told by their voice, until their recordings come) – how many per game, what they cost, and the lines themselves to copy. Loaded only
  * there (lazily), since it reads the data of every game (src/content/voiceLines.ts).
  */
 export function VoiceList() {
@@ -30,10 +30,11 @@ export function VoiceList() {
   return (
     <>
       <p className="ideas-hint">
-        Die Browserstimme spricht nicht mehr (Oktober 2026); was die Spiele sagen, kommt nur noch als Aufnahme und spielt dann immer, wie ein Geräusch. Hier
-        steht jeder deutsche Satz, der dafür noch keine Aufnahme hat – direkt aus den Spieldaten gelesen, also immer aktuell. Jede weitere Sprache braucht noch
-        einmal so viele. Credits geschätzt mit {String(CREDITS_PER_CHARACTER).replace(".", ",")} je Zeichen (Turbo-Modell, gemessen im Oktober 2026),{" "}
-        {number(CREDITS_PER_MONTH)} gibt es im Monat. Sag dann z. B. „nimm die Sätze von Socken-Paare auf“.
+        Die Browserstimme spricht nur noch dort, wo die Stimme die Geschichte erzählt (Kleine Abenteuer, Bewegungsabenteuer), und nur, bis die Aufnahme da ist
+        (Oktober 2026); sonst kommt, was die Spiele sagen, nur als Aufnahme und spielt dann immer, wie ein Geräusch. Hier steht jeder deutsche Satz, der dafür
+        noch keine Aufnahme hat – direkt aus den Spieldaten gelesen, also immer aktuell. Jede weitere Sprache braucht noch einmal so viele. Credits geschätzt
+        mit {String(CREDITS_PER_CHARACTER).replace(".", ",")} je Zeichen (Turbo-Modell, gemessen im Oktober 2026), {number(CREDITS_PER_MONTH)} gibt es im Monat.
+        Sag dann z. B. „nimm die Sätze von Socken-Paare auf“.
       </p>
       <div className="ideas-overview-scroll">
         <table className="ideas-overview voice-overview">
