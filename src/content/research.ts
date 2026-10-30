@@ -310,11 +310,11 @@ export const RESEARCH: Research[] = [
       { name: "toddlesmile", rank: 9, free: ["com"], taken: [], why: "Freundlich und allgemein, aber 11 Buchstaben und klingt nach Zahnarzt." },
       { name: "toddlegarden", rank: 9, free: ["com"], taken: [], why: "Allgemein, aber 12 Buchstaben, und Google denkt an Gartenspielzeug." },
       {
-        name: "toddlersparadise",
+        name: "toddlerparadise",
         rank: 9,
         free: ["com"],
         taken: [],
-        why: "Frei, auch ohne s (toddlerparadise), jedes Wort bekannt – aber 16 Buchstaben, beim Hören unklar, ob mit s, und Google denkt an Kitas und an Kompans Spielplatz „Toddler’s Paradise“; als Lobwort kaum als Marke zu schützen.",
+        why: "Die natürliche englische Form („toddler“ als Bestimmungswort wie in „toddler bed“; mit s nur als „toddlers’ paradise“ mit Apostroph, den eine Domain nicht kennt). Frei, auch mit s (toddlersparadise), jedes Wort bekannt – aber 15 Buchstaben, beim Hören unklar, ob mit s, und Google denkt an Kitas und an Kompans Spielplatz „Toddler’s Paradise“; als Lobwort kaum als Marke zu schützen.",
       },
       {
         name: "toddlertreehouse",
