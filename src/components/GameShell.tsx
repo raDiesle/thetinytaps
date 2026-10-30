@@ -13,6 +13,7 @@ import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
+import { turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
 import goodNightFiles from "./stimme/**/*.mp3?glob";
@@ -115,7 +116,8 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
   const playArea = useRef<HTMLDivElement>(null);
   useEffect(() => (playing && playArea.current ? forwardNearTaps(playArea.current) : undefined), [playing]);
 
-  const start = async () => {
+  /** Starts playing; `turn` turns the page into the game in the book look (not when the page opens playing). */
+  const start = async (turn = false) => {
     // The menus are locked then (PlaytimeLock); this also stops a key that slips past it. A routine's step is no game.
     if (!returnTo) {
       if (isPlaytimeOver()) return;
@@ -124,18 +126,22 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
     // These need the click as a user gesture, so run them before any await.
     unlockAudio();
     unlockSpeech();
-    setPlaying(true);
+    if (turn) turnPageWith("forward", () => setPlaying(true));
+    else setPlaying(true);
     await enterKidMode();
   };
 
   const stop = () => {
     stopSpeaking();
     hushVoice();
-    setPlaying(false);
     // Only the keyboard lock ends: fullscreen stays on, the menus are part of the app too.
     exitKidMode();
-    if (returnTo) navigate(returnTo, { replace: true });
-    else if (leaveTo) navigate(leaveTo, { replace: true });
+    // In the book look the page turns back from the game to its menu.
+    turnPageWith("back", () => {
+      setPlaying(false);
+      if (returnTo) navigate(returnTo, { replace: true });
+      else if (leaveTo) navigate(leaveTo, { replace: true });
+    });
   };
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -189,6 +195,8 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
       <div ref={playArea} className="play-area" onPointerDownCapture={unlockAudio}>
         {playtime.goodNight ? <GoodNight /> : <LeaveGame value={stop}>{children}</LeaveGame>}
         {!playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
+        {/* The edge of the book's page round the picture; shown only in the book look (`book.css`). */}
+        <div className="book-frame" aria-hidden />
         <ExitButton
           onExit={stop}
           label={t({
@@ -230,7 +238,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
 
   const pick = (id: string) => {
     onMode?.(id);
-    void start();
+    void start(true);
   };
 
   return (
@@ -307,7 +315,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
           </ul>
         </section>
       ) : (
-        <button type="button" className="start-button" data-spread onClick={start}>
+        <button type="button" className="start-button" data-spread onClick={() => void start(true)}>
           <span className="start-icon" aria-hidden>
             ▶
           </span>

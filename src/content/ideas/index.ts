@@ -22,6 +22,7 @@ import { allGamesIdeas } from "./a-all-games";
 import { figureIdeas } from "./f-figure";
 import { rewardChartIdeas } from "./t-reward-chart";
 import { firstVisitIdeas } from "./v-first-visit";
+import { bookIdeas } from "./d-book";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
@@ -38,7 +39,7 @@ export const IDEA_GROUPS: IdeaGroup[] = [
   {
     emoji: "👪",
     title: "Für Eltern & Technik",
-    areas: [everydayHelpersIdeas, rewardChartIdeas, figureIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
+    areas: [everydayHelpersIdeas, rewardChartIdeas, figureIdeas, bookIdeas, parentPhoneIdeas, firstVisitIdeas, allGamesIdeas],
   },
 ];
 

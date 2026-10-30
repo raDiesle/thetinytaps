@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { useT } from "@/lib/language";
+import { useTurnPage } from "@/lib/look";
 import { preloadPage } from "@/lib/preloadPages";
 
 /** The most games a category card shows in its collage; the count beside it tells how many there are. */
@@ -17,11 +18,15 @@ export interface GameCardProps {
   games?: string[];
   /** A picture behind the lower part of the card (a category's world). */
   scene?: ReactNode;
+  /** On which page of the book it is, as in a table of contents; shown only in the book look. */
+  page?: number;
 }
 
 /** A big tappable card for the game and scene menus. */
-export function GameCard({ href, emoji, title, blurb, games, scene }: GameCardProps) {
+export function GameCard({ href, emoji, title, blurb, games, scene, page }: GameCardProps) {
   const t = useT();
+  // In the book look the page turns over to the next one.
+  const turnPage = useTurnPage(href ?? "", "forward");
   const content = (
     <>
       {scene}
@@ -39,6 +44,11 @@ export function GameCard({ href, emoji, title, blurb, games, scene }: GameCardPr
       )}
       <span className="game-title">{title}</span>
       {blurb && <span className="game-blurb">{blurb}</span>}
+      {page !== undefined && (
+        <span className="game-page" aria-hidden>
+          {page}
+        </span>
+      )}
       {href && (
         <span className="game-go" aria-hidden>
           ▶
@@ -50,7 +60,7 @@ export function GameCard({ href, emoji, title, blurb, games, scene }: GameCardPr
   if (href) {
     return (
       // The page starts loading as the finger lands, not only once it is lifted.
-      <Link to={href} className={className} onPointerDown={() => preloadPage(href)}>
+      <Link to={href} className={className} onPointerDown={() => preloadPage(href)} onClick={turnPage}>
         {content}
       </Link>
     );
