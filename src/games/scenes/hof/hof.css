@@ -1,41 +1,5 @@
 /* Animations of the scene Hof am Teich. Durations match durationMs in Hof.tsx. Sun and cloud: ../sky.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .hf-cloud {
-  animation: hf-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .hf-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .hf-muehle-sails {
-  animation: hf-spin 14s linear infinite;
-}
-
-.scene.lively .hf-kuh-tail,
-.scene.lively .hf-pferd-tail {
-  animation: hf-swish 2.6s ease-in-out infinite alternate;
-}
-
-.scene.lively .hf-hund-tail {
-  animation: hf-wag 0.6s ease-in-out infinite alternate;
-}
-
-.scene.lively .hf-katze-tail {
-  animation: hf-wag 3s ease-in-out infinite alternate;
-}
-
-.scene.lively .hf-falter-wings,
-.scene.lively .hf-biene-wings {
-  animation: hf-flap 0.3s ease-in-out infinite alternate;
-}
-
-.scene.lively .hf-haus-smoke circle {
-  animation: hf-smoke 3s ease-out calc(var(--i) * 1s) infinite;
-}
-
 /* Puffs, eggs, notes and splashes are hidden until their animation shows them, and can't be tapped meanwhile. */
 .hf-scheune-bird,
 .hf-haus-smoke circle,
@@ -140,12 +104,6 @@
 .hf-bauer-walk {
   transform-box: fill-box;
   transform-origin: center bottom;
-}
-
-@keyframes hf-drift {
-  to {
-    transform: translateX(90px);
-  }
 }
 
 @keyframes hf-spin {

@@ -111,23 +111,22 @@ const reloadNow = () => {
 
 /**
  * For menu pages, between games: when a new version is ready, the page restarts
- * with it as soon as it is opened or the app goes to the background – never in
- * the middle of a game. Pages without it switch at the next menu or start.
+ * with it when the app goes to the background on a menu – never in the middle of a
+ * game, and never on a tap: restarting the whole app when a menu card was tapped made
+ * the next menu take seconds to show. Until then the old version runs on (the worker
+ * keeps its files), and the next start has the new one anyway.
  */
 export function useUpdateBetweenGames() {
   const { updateReady } = usePwa();
   useEffect(() => {
     if (!updateReady) return;
     if (document.visibilityState === "hidden") return reloadNow();
-    // Not while someone looks at the menu: a parent may be about to tap a game.
     const onHide = () => {
       if (document.visibilityState === "hidden") reloadNow();
     };
     document.addEventListener("visibilitychange", onHide);
     return () => document.removeEventListener("visibilitychange", onHide);
   }, [updateReady]);
-  // Opening a menu page (also coming back from a game) is a page change anyway.
-  useEffect(reloadNow, []);
 }
 
 /** When the running version was built, e.g. "25.10.2026, 14:30" (in the device's time zone). */

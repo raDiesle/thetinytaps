@@ -1,47 +1,5 @@
 /* Animations of the Spielplatz scene. Durations match durationMs in Spielplatz.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .sp-cloud {
-  animation: sp-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .sp-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .sp-drachen-tail {
-  animation: sp-wiggle 1.4s ease-in-out infinite alternate;
-}
-
-.scene.lively .sp-ballon-float {
-  animation: sp-bob 3s ease-in-out infinite alternate;
-}
-
-.scene.lively .sp-turm-flag,
-.scene.lively .sp-karussell-flag,
-.scene.lively .sp-burg-flag {
-  animation: sp-flag 0.9s ease-in-out infinite alternate;
-}
-
-.scene.lively .sp-schaukel-empty {
-  animation: sp-sway 3.2s ease-in-out infinite alternate;
-}
-
-.scene.lively .sp-hund-tail {
-  animation: sp-wag 0.4s ease-in-out infinite alternate;
-}
-
-.scene.lively .sp-stream-shine {
-  animation: sp-shine 2.2s ease-in-out infinite alternate;
-}
-
-@keyframes sp-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
-
 @keyframes sp-wiggle {
   from {
     transform: rotate(-8deg);
@@ -51,24 +9,9 @@
   }
 }
 
-@keyframes sp-bob {
-  to {
-    transform: translateY(-14px) rotate(3deg);
-  }
-}
-
 @keyframes sp-flag {
   to {
     transform: scaleX(0.75) skewY(6deg);
-  }
-}
-
-@keyframes sp-sway {
-  from {
-    transform: rotate(-4deg);
-  }
-  to {
-    transform: rotate(4deg);
   }
 }
 
@@ -78,12 +21,6 @@
   }
   to {
     transform: rotate(14deg);
-  }
-}
-
-@keyframes sp-shine {
-  to {
-    opacity: 0.3;
   }
 }
 
@@ -238,8 +175,7 @@
   animation: sp-plane-tilt 0.65s ease-in-out 4;
 }
 
-.item-flugzeug.playing .sp-flugzeug-prop,
-.scene.lively .sp-flugzeug-prop {
+.item-flugzeug.playing .sp-flugzeug-prop {
   animation: sp-prop 0.12s linear infinite;
 }
 

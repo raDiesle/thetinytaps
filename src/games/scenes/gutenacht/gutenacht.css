@@ -2,32 +2,6 @@
    This is a bedtime picture (Scene.bedtime): a tapped item gets the class `asleep` and keeps
    it, and when all items sleep the scene gets the class `night`. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .gn-kuckuck-pendel {
-  animation: gn-pendulum 1.4s ease-in-out infinite;
-}
-
-.scene.lively .gn-decke {
-  animation: gn-breathe 4s ease-in-out infinite;
-}
-
-.scene.lively :where(.scene-item:not(.asleep)) .gn-fly {
-  animation: gn-fly-loop 4s ease-in-out calc(var(--i) * -1.3s) infinite;
-}
-
-.scene.lively :where(.scene-item:not(.asleep)) .gn-mobile-bar {
-  animation: gn-mobile-turn 6s ease-in-out infinite;
-}
-
-.scene.lively :where(.scene-item:not(.asleep)) .gn-katze-tail {
-  animation: gn-tail-swish 3s ease-in-out infinite;
-}
-
-.scene.lively :where(.scene-item:not(.asleep)) .gn-fisch {
-  animation: gn-fish-swim 6s ease-in-out infinite;
-}
-
 /* Parts that only show up in an animation (or once asleep); they can't be tapped meanwhile. */
 .gn-shut,
 .gn-yawn,

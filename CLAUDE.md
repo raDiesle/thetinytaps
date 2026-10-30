@@ -174,7 +174,8 @@ In a fresh worktree run `bun install` first.
   fixed in the top left corner, so it never scrolls away; phones and tablets keep it small. A menu's title goes into
   `MenuHead` with that corner, which keeps the title clear of it (it moves right or wraps, never under the corner).
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
-  in `content.test.ts`), and variants of one way to play (which words, how long, whole word or first letter) are
+  in `content.test.ts`); a category of a few games that stand apart (`onHome`: „Weitere“) has no card and no page of its
+  own, its games stand right on the home page on a frame named after it, like a game's sorts below; and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own.
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
@@ -228,7 +229,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once; the start screen comes only after ✕ or „Menü“. A game a routine opens for one of its steps (the Tagesplan's
+  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once; the start screen comes only after ✕ or „Menü“. A game whose menu is
+  the page before it (a picture of Lebendige Bilder, its mode chosen in the row on `/bilder/`) has no start screen at all:
+  `leaveTo` sends ✕, Esc and „Menü“ back to that page. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or
   „Menü“ go back to the routine.
   **Aim for no settings and no description**, so start screens stay clear: a game should explain itself by playing
@@ -260,9 +263,19 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
-  only between games: menu pages call `useUpdateBetweenGames()` (`src/lib/pwa.ts`) – a new menu page does too, a game never.
+  only between games, while it is in the background on a menu: menu pages call `useUpdateBetweenGames()`
+  (`src/lib/pwa.ts`) – a new menu page does too, a game never. Never restart or reload on a tap: restarting when a
+  menu card was tapped made the next menu take seconds to show.
+- A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
+  cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
+  `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
+  whose cards open lazy pages does the same.
+- Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
+  it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
+  home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
+  Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
   with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step

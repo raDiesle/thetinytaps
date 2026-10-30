@@ -1,0 +1,424 @@
+/*
+ * ---------- Worlds of the home categories (Worlds.tsx) ----------
+ * Each category's pages show its own backdrop (Sky with data-world), and its cards come in one family of colours.
+ * The home page's category cards show the collage of their games and a piece of their world.
+ */
+
+/* Each world's family of card colours: the first is its card on the home page. */
+[data-world="lebendige-welten"] {
+  --w1: var(--sunshine);
+  --w2: #a6e35a;
+  --w3: var(--mint);
+}
+
+[data-world="zuordnen"] {
+  --w1: #ff9f5a;
+  --w2: var(--tomato);
+  --w3: #ffc078;
+}
+
+[data-world="buchstaben-zahlen"] {
+  --w1: var(--ocean);
+  --w2: #8fa6ff;
+  --w3: #8fe3ff;
+}
+
+[data-world="weitere"] {
+  --w1: var(--berry);
+  --w2: #f78fc4;
+  --w3: #d7b8ff;
+}
+
+.game-list li[data-world],
+.game-list[data-world] > li:nth-child(3n + 1),
+.game-list .mode-group[data-world] li:nth-child(3n + 1) {
+  --card: var(--w1);
+}
+
+.game-list[data-world] > li:nth-child(3n + 2),
+.game-list .mode-group[data-world] li:nth-child(3n + 2) {
+  --card: var(--w2);
+}
+
+.game-list[data-world] > li:nth-child(3n + 3),
+.game-list .mode-group[data-world] li:nth-child(3n + 3) {
+  --card: var(--w3);
+}
+
+/* „Weitere“ stands on the home page on a frame: its world, the children's room, is the frame's wallpaper. */
+.game-list .mode-group[data-world="weitere"]::before {
+  background:
+    radial-gradient(circle, #fff 0 5px, transparent 6px) 0 0 / 44px 44px,
+    #ffd9ecd0;
+}
+
+/* ----- The backdrop ----- */
+
+.world-thing {
+  position: absolute;
+  overflow: visible;
+}
+
+.world-line {
+  stroke: var(--ink);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.world-dot {
+  fill: var(--ink);
+  stroke: none;
+}
+
+.world-sign {
+  font-family: var(--font-rounded);
+  font-size: 30px;
+  font-weight: 700;
+  fill: #fff;
+  stroke-width: 3;
+  paint-order: stroke;
+}
+
+/* Lebendige Welten: a farm on the meadow. */
+.world-barn {
+  bottom: 3vh;
+  left: 3%;
+  width: clamp(80px, 14vh, 160px);
+}
+
+.world-fence {
+  bottom: 2vh;
+  left: calc(4% + clamp(80px, 14vh, 160px));
+  width: clamp(90px, 15vh, 180px);
+}
+
+.world-tree {
+  right: 4%;
+  bottom: 3vh;
+  width: clamp(56px, 11vh, 120px);
+}
+
+.world-tree2 {
+  right: calc(5% + clamp(56px, 11vh, 120px));
+  bottom: 6vh;
+  width: clamp(40px, 8vh, 86px);
+}
+
+/* Buchstaben & Zahlen: building blocks on the meadow. */
+.world-pile {
+  bottom: 2vh;
+  left: 3%;
+  width: clamp(90px, 17vh, 200px);
+}
+
+.world-tower {
+  right: 5%;
+  bottom: 3vh;
+  width: clamp(36px, 7vh, 76px);
+}
+
+/* The two worlds in a room: a wall instead of the sky, and the sun looks in at the window in the top right corner. */
+.sky[data-world="zuordnen"] {
+  background: repeating-linear-gradient(90deg, #ffeac0 0 48px, #ffe1a6 48px 96px);
+}
+
+.sky[data-world="weitere"] {
+  background:
+    radial-gradient(circle, #fff 0 5px, transparent 6px) 0 0 / 56px 56px,
+    radial-gradient(circle, #ffc2e0 0 4px, transparent 5px) 28px 28px / 56px 56px,
+    #ffe3f1;
+}
+
+.world-window {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: clamp(160px, 24vw, 270px);
+  overflow: visible;
+}
+
+.world-glass {
+  fill: #a8e6ff;
+}
+
+.world-cloud {
+  fill: #fff;
+}
+
+.world-frame-edge,
+.world-frame {
+  fill: none;
+  stroke-linejoin: round;
+}
+
+.world-frame-edge {
+  stroke: var(--ink);
+  stroke-width: 22;
+}
+
+.world-frame {
+  stroke: #fff;
+  stroke-width: 14;
+}
+
+/* Zuordnen: a table with toys on it. */
+.world-table {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(60px, 12vh, 130px);
+}
+
+.world-table-top,
+.world-table-front {
+  stroke: var(--ink);
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.world-table-top {
+  fill: #e8b27a;
+}
+
+.world-table-front {
+  fill: #c98250;
+}
+
+.world-ball {
+  bottom: calc(clamp(60px, 12vh, 130px) * 0.7);
+  left: 4%;
+  width: clamp(40px, 8vh, 80px);
+}
+
+.world-rings {
+  bottom: calc(clamp(60px, 12vh, 130px) * 0.68);
+  left: calc(5% + clamp(40px, 8vh, 80px));
+  width: clamp(44px, 9vh, 92px);
+}
+
+.world-duck {
+  right: 5%;
+  bottom: calc(clamp(60px, 12vh, 130px) * 0.7);
+  width: clamp(54px, 10vh, 110px);
+}
+
+/* Weitere: the children's room, with a wooden floor, a rug, a toy chest and a teddy. */
+.world-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(56px, 11vh, 120px);
+}
+
+.world-floor-boards {
+  fill: #e0aa6e;
+  stroke: var(--ink);
+  stroke-width: 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.world-floor-lines {
+  fill: none;
+  stroke: #b97c45;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.world-rug {
+  fill: #f78fc4;
+  stroke: var(--ink);
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+
+.world-chest {
+  bottom: calc(clamp(56px, 11vh, 120px) * 0.5);
+  left: 3%;
+  width: clamp(80px, 14vh, 160px);
+}
+
+.world-teddy {
+  right: 5%;
+  bottom: calc(clamp(56px, 11vh, 120px) * 0.45);
+  width: clamp(56px, 11vh, 120px);
+}
+
+/* ----- The cards ----- */
+
+/*
+ * A piece of the category's world across the top of its home card, inside the card's border: the collage of its
+ * games stands on it, title and line sit under it on the card's colour.
+ */
+.world-card-scene {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: 56%;
+  overflow: visible;
+  border-bottom: 3px solid var(--ink);
+  clip-path: inset(0 round 32px 32px 0 0);
+}
+
+.world-card-sky {
+  fill: #c4f1ff;
+}
+
+.world-card-wall {
+  fill: #ffeac0;
+}
+
+.world-card-scene .hill-back,
+.world-card-scene .hill-front {
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+/* Where a long title reaches up into the picture, it stays readable on a pale band. */
+.game-card.has-scene .game-title {
+  padding: 0 10px;
+  border-radius: 12px;
+  background: #ffffffc8;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* A fitted card that is not flat puts title and line at its foot, under the picture. */
+@container (min-height: 130px) {
+  .game-list.fit .game-card.has-scene {
+    justify-content: flex-end;
+  }
+}
+
+/* A category's games as a collage of up to four discs instead of one emoji, with how many there are in the corner. */
+.game-list .game-card .game-emoji.game-collage {
+  position: relative;
+  border: none;
+  border-radius: 0;
+  background: none;
+  container-type: size;
+}
+
+.game-collage > span {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 58%;
+  height: 58%;
+  border: max(2px, 2.6cqw) solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 32cqw;
+}
+
+.game-collage > :nth-child(1) {
+  top: 0;
+  left: 0;
+  rotate: -8deg;
+}
+
+.game-collage > :nth-child(2) {
+  top: 0;
+  left: 42%;
+  rotate: 6deg;
+}
+
+.game-collage > :nth-child(3) {
+  top: 42%;
+  left: 0;
+  rotate: 5deg;
+}
+
+.game-collage > :nth-child(4) {
+  top: 42%;
+  left: 42%;
+  rotate: -5deg;
+}
+
+/* Three games: one above the two; two: side by side. */
+.game-collage[data-count="3"] > :nth-child(1) {
+  left: 21%;
+}
+
+.game-collage[data-count="3"] > :nth-child(2) {
+  top: 42%;
+  left: 0;
+}
+
+.game-collage[data-count="3"] > :nth-child(3) {
+  left: 42%;
+}
+
+.game-collage[data-count="2"] > :nth-child(-n + 2) {
+  top: 21%;
+}
+
+.game-collage > .game-count {
+  top: -10%;
+  right: -18%;
+  left: auto;
+  z-index: 1;
+  width: 36%;
+  height: 36%;
+  background: #fff;
+  font-family: var(--font-rounded);
+  font-size: 22cqw;
+  font-weight: 700;
+  rotate: 0deg;
+}
+
+/* One line for grown-ups under a card's title: only on tablets and computers, where the cards have room for it. */
+.game-blurb {
+  display: none;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+@media (min-width: 600px) and (min-height: 600px) {
+  .game-blurb {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  /* A fitted card shows it only when tall enough, with a smaller picture to make room. */
+  @container (max-height: 169.98px) {
+    .game-list.fit .game-blurb {
+      display: none;
+    }
+  }
+
+  @container (min-height: 170px) {
+    .game-list.fit .game-card:has(.game-blurb) .game-emoji {
+      --size: min(112px, 38cqh);
+    }
+
+    .game-list.fit .game-card:has(.game-blurb) {
+      gap: 2cqh;
+    }
+
+    .game-list.fit .game-blurb {
+      font-size: clamp(0.8rem, 8cqh, 0.95rem);
+    }
+  }
+}
+
+/* A flat card (emoji beside the title, on phones) has no room above the title for the picture. */
+@container (max-height: 129.98px) {
+  .game-list.fit .world-card-scene {
+    display: none;
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .game-list:not(.fit) .world-card-scene {
+    display: none;
+  }
+}

@@ -1,39 +1,5 @@
 /* Animations of the Badezimmer scene. Durations match durationMs in Badezimmer.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .bz-luefter-blades {
-  animation: bz-spin 3s linear infinite;
-}
-
-.scene.lively .bz-uhr-minute {
-  animation: bz-spin 60s linear infinite;
-}
-
-.scene.lively .bz-wanne-wave {
-  animation: bz-wave 3s ease-in-out infinite;
-}
-
-.scene.lively .bz-blasen-rest {
-  animation: bz-blase-wobble 3s ease-in-out calc(var(--i) * -1s) infinite;
-}
-
-.scene.lively .bz-hund-tail {
-  animation: bz-wiggle 1s ease-in-out infinite;
-}
-
-.scene.lively .bz-katze-tail {
-  animation: bz-tail-swish 5s ease-in-out infinite;
-}
-
-.scene.lively .bz-spinne-body {
-  animation: bz-dangle 4s ease-in-out infinite;
-}
-
-.scene.lively .bz-fenster-curtain {
-  animation: bz-curtain 3s ease-in-out infinite;
-}
-
 /* Puffs, drops, bubbles and other things that only show up in an animation; they can't be tapped meanwhile. */
 .bz-lid,
 .bz-bubbles > g,
@@ -294,12 +260,6 @@
   }
   75% {
     transform: rotate(-12deg);
-  }
-}
-
-@keyframes bz-dangle {
-  50% {
-    transform: translateY(6px);
   }
 }
 

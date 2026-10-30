@@ -1,9 +1,5 @@
 /* Animations of the sun and the rain cloud, shared by all scenes. */
 
-.scene.lively .sonne-rays {
-  animation: sky-spin 40s linear infinite;
-}
-
 .wolke-rain path,
 .wolke-rainbow,
 .sonne-wink,

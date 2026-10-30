@@ -108,7 +108,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "⛵ Das Floß",
         languages: { de: "done" },
-        note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026), ebenso der Kartenhinweis „🛶 Paddeln“; bis zur Übersetzung spricht das Level ganz Deutsch.",
+        note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
         label: "🐈 Wo ist die Katze?",
@@ -193,7 +193,17 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
+    parts: [
+      {
+        label: "🏠 Startseite, Menüs und Einstellungen",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "📝 Zeilen für Eltern unter den Karten",
+        languages: { de: "done" },
+        note: "Nur auf Tablet und Computer zu sehen (`blurb` in games.ts); ohne Übersetzung stehen sie auf Deutsch da.",
+      },
+    ],
   },
 ];

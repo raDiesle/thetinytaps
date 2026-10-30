@@ -1,44 +1,6 @@
 /* Animations of the Ostern scene. Durations match durationMs in Ostern.tsx.
    Eyelids (sp-lid) and floating words (sp-notes) come with ../spielplatz/parts and animate on their own. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .os-cloud {
-  animation: os-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .os-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .os-hummel-wing,
-.scene.lively .os-falter-wing {
-  animation: os-flap 0.3s ease-in-out infinite alternate;
-}
-
-.scene.lively .os-strauch-egg {
-  animation: os-dangle 3s ease-in-out calc(var(--i) * -0.4s) infinite alternate;
-}
-
-.scene.lively .os-haeschen-nose {
-  animation: os-nose 0.4s ease-in-out infinite alternate;
-}
-
-@keyframes os-drift {
-  to {
-    transform: translateX(90px);
-  }
-}
-
-@keyframes os-dangle {
-  from {
-    transform: rotate(-6deg);
-  }
-  to {
-    transform: rotate(6deg);
-  }
-}
-
 /* ---------- Hidden until an item plays ---------- */
 
 .os-ei-ears,

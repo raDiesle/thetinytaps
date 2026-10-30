@@ -2,30 +2,6 @@
    Winter-Baustelle, the Baustelle and the Wald keep their ids and move with those scenes' CSS;
    the snowman and the Christmas tree are animated in schneemann.css. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .wi-cloud {
-  animation: wi-drift 28s ease-in-out infinite alternate;
-}
-
-.scene.lively .wi-cloud-slow {
-  animation-duration: 40s;
-}
-
-.scene.lively .wi-haus-smoke circle {
-  animation: wi-smoke 4.8s ease-out calc(var(--i) * 1.2s) infinite;
-}
-
-.scene.lively .wi-pferd-tail {
-  animation: wi-swish 2.4s ease-in-out infinite;
-}
-
-@keyframes wi-drift {
-  to {
-    transform: translateX(80px);
-  }
-}
-
 /* ---------- Hidden until their animation shows them ---------- */
 
 .wi-haus-smoke circle,

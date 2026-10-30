@@ -1,64 +1,6 @@
 /* Animations of the Baustelle scene. Durations match durationMs in Baustelle.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .bs-cloud {
-  animation: bs-drift 26s ease-in-out infinite alternate;
-}
-
-.scene.lively .bs-cloud-slow {
-  animation-duration: 40s;
-}
-
 /* A car passes behind the trucks now and then. */
-.scene.lively .bs-car {
-  animation: bs-car 22s linear infinite;
-}
-
-.scene.lively .bs-blink {
-  animation: bs-blink 1.2s steps(1) calc(var(--i, 0) * 0.6s) infinite;
-}
-
-.scene.lively .kran-light {
-  animation: bs-blink 1.6s steps(1) infinite;
-}
-
-.scene.lively .kran-flag {
-  animation: bs-flag 1.2s ease-in-out infinite alternate;
-}
-
-.scene.lively .bagger-smoke circle {
-  animation: bs-smoke 3s ease-out calc(var(--i) * 1s) infinite;
-}
-
-.scene.lively .heli-rotor {
-  animation: heli-rotor 0.15s linear infinite alternate;
-}
-
-.scene.lively .heli-tail-rotor {
-  animation: bs-spin 0.4s linear infinite;
-}
-
-.scene.lively .falter-wings {
-  animation: falter-flap 0.35s ease-in-out infinite alternate;
-}
-
-.scene.lively .katze-tail {
-  animation: katze-wag 2.5s ease-in-out infinite alternate;
-}
-
-.scene.lively .ente-body {
-  animation: ente-bob 2.4s ease-in-out infinite;
-}
-
-.scene.lively .ballon-body {
-  animation: ballon-bob 6s ease-in-out infinite alternate;
-}
-
-.scene.lively .hoernchen-tail {
-  animation: katze-wag 3s ease-in-out infinite alternate;
-}
-
 /* Puffs, drops and dust are hidden until their animation shows them. */
 .bagger-smoke circle,
 .wagen-smoke circle,
@@ -214,12 +156,6 @@
   }
 }
 
-@keyframes ballon-bob {
-  to {
-    transform: translate(16px, -10px);
-  }
-}
-
 @keyframes bs-car {
   40%,
   100% {
@@ -262,18 +198,6 @@
 @keyframes falter-flap {
   to {
     transform: scaleX(0.3);
-  }
-}
-
-@keyframes ente-bob {
-  50% {
-    transform: translateY(3px) rotate(-2deg);
-  }
-}
-
-@keyframes bs-drift {
-  to {
-    transform: translateX(90px);
   }
 }
 

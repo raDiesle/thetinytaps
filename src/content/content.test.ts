@@ -1,11 +1,12 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, categoryHref, hasPage } from "./games";
+import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
 import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
 import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
 import { SCENES } from "../games/scenes";
+import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
@@ -19,7 +20,27 @@ describe("home menu", () => {
 
   test("a category of one game opens it directly, without a menu of one card", () => {
     for (const category of CATEGORIES) {
+      if (category.onHome) continue;
       expect(categoryHref(category), category.id).toBe(category.games.length === 1 ? category.games[0].href : `/spiele/${category.id}/`);
+    }
+  });
+
+  test("a category whose games stand on the home page has no page, and its games lead back home", () => {
+    for (const category of CATEGORIES.filter((c) => c.onHome)) {
+      expect(hasPage(category), category.id).toBe(false);
+      for (const game of category.games) expect(categoryOf(game.href), game.href).toBeUndefined();
+    }
+  });
+
+  test("every category has its world (backdrop, card colours, the picture on its card)", () => {
+    for (const category of CATEGORIES) expect(WORLDS as readonly string[], category.id).toContain(category.id);
+  });
+
+  test("every card has a short line for grown-ups that fits in two lines", () => {
+    const lines = [...games.map((g) => [g.href, g.blurb] as const), ...CATEGORIES.filter((c) => !c.onHome).map((c) => [c.id, c.blurb] as const)];
+    for (const [where, blurb] of lines) {
+      expect(blurb?.de, where).toBeDefined();
+      for (const text of Object.values(blurb ?? {})) expect(text.length, where).toBeLessThanOrEqual(42);
     }
   });
 
