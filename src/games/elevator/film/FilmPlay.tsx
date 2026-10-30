@@ -2,8 +2,11 @@ import { type PointerEvent, useCallback, useEffect, useLayoutEffect, useRef, use
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { INK } from "@/games/scenes/shared";
+import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { useT } from "@/lib/language";
 import { playPop, playRandomNote, playRecorded, playTusch } from "@/lib/sfx";
 import { tapState } from "@/lib/tapTargets";
+import { hush } from "@/lib/voice";
 import { StoryEnd, nextCard } from "../cards";
 import { Confetti } from "../house";
 import { translationOf } from "../phrases";
@@ -65,6 +68,16 @@ const START: View = {
   picking: false,
 };
 
+/** A wait of the film's script that can be held while the film is paused. */
+interface Timer {
+  run: () => void;
+  /** Milliseconds still to wait when it was last held (or set). */
+  left: number;
+  /** When it is due, while it runs. */
+  due: number;
+  handle: number | null;
+}
+
 /** The strip of scenes along the bottom: as tall as this share of the screen, within these pixels. */
 const STRIP = { share: 0.12, min: 46, max: 92, gap: 6 };
 
@@ -84,6 +97,7 @@ export function FilmPlay({
   const [view, setView] = useState<View>(START);
   const viewRef = useRef<View>(view);
   const { bursts, spawn } = useBursts();
+  const t = useT();
 
   const put = useCallback((change: Partial<View> | ((v: View) => Partial<View>)) => {
     const patch = typeof change === "function" ? change(viewRef.current) : change;
@@ -105,9 +119,14 @@ export function FilmPlay({
     return () => watch.disconnect();
   }, []);
 
-  // The film is a script of waits; leaving bumps the generation and drops its timers.
+  // The film is a script of waits; leaving bumps the generation and drops its timers, a pause holds them.
   const generation = useRef(0);
-  const timers = useRef(new Set<number>());
+  const timers = useRef(new Set<Timer>());
+  const [paused, setPaused] = useState(false);
+  const pausedRef = useRef(false);
+  /** The animations the pause held, to go on with when it ends. */
+  const held = useRef<Animation[]>([]);
+  useNoBackgroundMusic(paused);
   /** Set while a beat waits for a tap anywhere. */
   const tapper = useRef<(() => void) | null>(null);
   /** Set while a choice waits: it gets the picked option's id. */
@@ -117,17 +136,47 @@ export function FilmPlay({
   /** The child has tapped once: from then on the hand comes only with a reminder. */
   const tapped = useRef(false);
 
+  const arm = (timer: Timer) => {
+    timer.due = performance.now() + timer.left;
+    timer.handle = window.setTimeout(() => {
+      timers.current.delete(timer);
+      timer.run();
+    }, timer.left);
+  };
+
   const later = (ms: number, run: () => void) => {
     const g = generation.current;
-    const timer = window.setTimeout(() => {
-      timers.current.delete(timer);
-      if (g === generation.current) run();
-    }, ms);
+    const timer: Timer = { run: () => g === generation.current && run(), left: ms, due: 0, handle: null };
     timers.current.add(timer);
+    if (!pausedRef.current) arm(timer);
     return () => {
-      clearTimeout(timer);
+      if (timer.handle !== null) clearTimeout(timer.handle);
       timers.current.delete(timer);
     };
+  };
+
+  /** Holds the film where it is – its waits, everything moving in the picture, the voice and the music – or goes on. */
+  const pause = (on: boolean) => {
+    if (pausedRef.current === on) return;
+    pausedRef.current = on;
+    setPaused(on);
+    const now = performance.now();
+    for (const timer of timers.current) {
+      if (!on) arm(timer);
+      else if (timer.handle !== null) {
+        clearTimeout(timer.handle);
+        timer.handle = null;
+        timer.left = Math.max(0, timer.due - now);
+      }
+    }
+    if (on) {
+      held.current = (playEl.current?.getAnimations({ subtree: true }) ?? []).filter((a) => a.playState === "running");
+      for (const a of held.current) a.pause();
+      hush();
+    } else {
+      for (const a of held.current) a.play();
+      held.current = [];
+    }
   };
 
   /** Resolves after `ms`; never, once the child has left, so the script just stops. */
@@ -136,7 +185,7 @@ export function FilmPlay({
   useEffect(
     () => () => {
       generation.current++;
-      timers.current.forEach(clearTimeout);
+      for (const timer of timers.current) if (timer.handle !== null) clearTimeout(timer.handle);
     },
     [],
   );
@@ -258,7 +307,7 @@ export function FilmPlay({
   /** A tap on the picture (or a key): it sets off the waiting beat, makes the options hop, or is kept for later. */
   const tap = (x?: number, y?: number) => {
     const v = viewRef.current;
-    if (v.picking) return;
+    if (v.picking || pausedRef.current) return;
     if (tapper.current) {
       spawn(x, y);
       sound(playPop);
@@ -278,16 +327,17 @@ export function FilmPlay({
 
   const pickOption = (id: string) => (e: PointerEvent) => {
     const choose = chooser.current;
-    if (!choose) return;
+    if (!choose || pausedRef.current) return;
     e.stopPropagation();
     spawn(e.clientX, e.clientY);
     choose(id);
   };
 
-  // Any key taps; 1–3 pick an option of a choice; any key at the end goes on to the next story.
+  // Any key taps; 1–3 pick an option of a choice; any key at the end goes on to the next story; paused, any key goes on.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.repeat || e.key === "Escape") return;
+      if (pausedRef.current) return pause(false);
       if (viewRef.current.picking) return onPick(nextCard(film.id).id);
       const options = viewRef.current.choice?.options;
       const option = chooser.current && options?.[Number(e.key) - 1];
@@ -312,6 +362,7 @@ export function FilmPlay({
   const viewBox = `${fx + fw / 2 - size.w / 2 / s} ${top} ${size.w / s} ${size.h / s}`;
 
   const { spot, choice } = view;
+  const goOn = t({ de: "Weiter", en: "Go on", zh: "继续", hi: "जारी रखें", es: "Seguir", ar: "متابعة", ru: "Дальше" });
   return (
     <div ref={playEl} className="fm-play" onPointerDown={(e) => tap(e.clientX, e.clientY)}>
       <svg className="fm-svg" viewBox={viewBox} preserveAspectRatio="xMidYMid meet" aria-hidden>
@@ -359,6 +410,22 @@ export function FilmPlay({
         {more && <div className="fm-frame more" />}
       </div>
       <div className={`fm-iris${view.shut ? " shut" : ""}`} />
+      {!view.picking && (
+        <button
+          type="button"
+          className="fm-pause"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={() => pause(!paused)}
+          aria-label={paused ? goOn : t({ de: "Pause", en: "Pause", zh: "暂停", hi: "रुकें", es: "Pausa", ar: "إيقاف مؤقت", ru: "Пауза" })}
+        >
+          {paused ? "▶" : "⏸"}
+        </button>
+      )}
+      {paused && (
+        <button type="button" className="fm-paused" onPointerDown={(e) => e.stopPropagation()} onClick={() => pause(false)} aria-label={goOn}>
+          ▶
+        </button>
+      )}
       {view.picking && <StoryEnd id={film.id} onPick={onPick} />}
       <BurstLayer bursts={bursts} />
     </div>
