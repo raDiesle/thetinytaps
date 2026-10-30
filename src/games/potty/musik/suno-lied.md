@@ -212,11 +212,13 @@ Title:
 Сижу на горшочке
 ```
 
-## English (`en`, written 27 Oct 2026)
+## English (`en`, written 27 Oct 2026; made 30 Oct 2026 → `musik-toepfchen-warten-en.mp3`)
 
 The German song in American English, verse for verse, same tempo, key and instruments. „Mommy“ and „Daddy“,
 „diaper“, „pee-pee“ and „poo-poo“ as American parents say to toddlers; the shout-back answers are „Me!“. Not yet
 read by a native speaker.
+Suno sang it at 98.7 BPM with a one-bar intro and a few bars of outro, steady to the end; Whisper heard every line
+in order, but smeared „I'm“ over the intro (its words from 0.1 s, sung from 2.3 s).
 
 Lyrics:
 
