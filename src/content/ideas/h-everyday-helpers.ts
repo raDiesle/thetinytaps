@@ -153,6 +153,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi saust eine Wasserrutsche hinunter, unten spritzt es. Gesagt: „Tapsi rutscht ins Wasser. Platsch!“ Ton: platschen. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Loslassen und Wasser in einem: sich hinuntersausen lassen wie das Pipi.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-18",
@@ -170,6 +171,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi setzt ein Papierschiffchen in einen Bach, das Wasser trägt es fort. Gesagt: „Das Schiffchen schwimmt den Bach hinunter. Plätscher, plätscher!“ Ton: plätschern. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Fließendes Wasser, ruhig und lang: zum Entspannen beim Warten.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-20",
@@ -178,6 +180,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi kippt einen Eimer Wasser in den Graben seiner Sandburg, das Wasser läuft rundherum. Gesagt: „Tapsi kippt den Eimer aus. Das Wasser läuft in den Graben!“ Ton: rieseln. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Ausleeren ist genau, was beim Pipi passiert; der Sandkasten ist vertraut.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-21",
@@ -186,6 +189,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi pustet eine Pusteblume, die Schirmchen fliegen davon. Gesagt: „Tapsi pustet die Pusteblume. Die Schirmchen fliegen!“ Ton: pusten. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Loslassen ohne Wasser, sanft wie der Luftballon: alles darf gehen.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-22",
@@ -203,6 +207,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi zieht im Garten ganz fest an einer Möhre, bis sie herausploppt. Gesagt: „Tapsi zieht ganz fest. Plopp, die Möhre ist raus!“ Ton: Plopp. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Kraft und dann kommt etwas heraus – mit einem Plopp, wie beim Kaka.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-24",
@@ -229,6 +234,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Ein Küken drückt von innen gegen sein Ei, bis die Schale knackt; Tapsi schaut zu. Gesagt: „Das Küken drückt und drückt. Knack, da ist es!“ Ton: knacken und piepsen. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Wie das Huhn: drücken, bis etwas kommt, und am Ende freut sich jemand.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-27",
@@ -246,6 +252,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi schiebt eine Schubkarre voll Laub einen kleinen Berg hinauf und kippt sie oben aus. Gesagt: „Tapsi schiebt ganz fest. Und oben: auskippen!“ Ton: Rumpeln, dann Rascheln. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Sich anstrengen und dann ist es geschafft: zeigt das Drücken als etwas Starkes.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-29",
@@ -281,6 +288,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi drückt den Schwengel einer alten Gartenpumpe, Wasser läuft in eine Gießkanne. Gesagt: „Tapsi pumpt. Das Wasser läuft!“ Ton: quietschen, dann plätschern. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Ein bisschen anfangen, dann fließt es von allein.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-33",
@@ -289,6 +297,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi dreht eine große Sanduhr um und schaut zu, wie der Sand nach unten rieselt. Gesagt: „Der Sand rieselt. Rieselt und rieselt!“ Ton: leises Rieseln. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Fließen ohne Wasser und dazu Warten: passt zum Sitzen auf dem Töpfchen.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-34",
@@ -297,6 +306,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Auf einer Wiese lässt Tapsi die Schnur locker, ein bunter Drachen steigt hoch in den Wind. Gesagt: „Tapsi lässt los. Der Drachen fliegt hoch!“ Ton: Wind. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Loslassen wie beim Luftballon: locker lassen, dann geht es.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-35",
@@ -305,6 +315,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi drückt eine Honigflasche über einem Brot, langsam kommt ein dicker Honigfaden heraus. Gesagt: „Tapsi drückt die Honigflasche. Langsam kommt der Honig!“ Ton: quietschen. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Drücken und Geduld: es kommt langsam, und das ist gut so.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-36",
@@ -313,6 +324,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Auf einer Wiese drückt sich ein Maulwurf aus seinem Erdhügel, Tapsi kniet davor und staunt. Gesagt: „Der Maulwurf drückt und drückt. Hallo, da ist er!“ Ton: Rascheln, dann Plopp. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Wie das Küken: drücken, bis etwas herauskommt, und am Ende ein fröhliches Hallo.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-37",
@@ -321,6 +333,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Eine Schildkröte hat sich in ihren Panzer zurückgezogen, Tapsi wartet ruhig davor, dann schaut der Kopf heraus. Gesagt: „Tapsi wartet ganz ruhig. Da kommt die Schildkröte raus!“ Ton: leises Ploppen. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Warten ohne Drücken, wie der Zug im Tunnel: für Kinder, die beim Kaka Angst haben.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-38",
@@ -329,6 +342,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Auf dem Spielplatz saust Tapsi durch eine bunte Röhrenrutsche und kommt unten heraus. Gesagt: „Tapsi rutscht durch die Röhre. Huiii, da kommt Tapsi raus!“ Ton: Huiii. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Durch ein Rohr und unten heraus – lustig statt unheimlich.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-39",
@@ -337,6 +351,7 @@ export const everydayHelpersIdeas: IdeaArea = {
       text: "Tapsi drückt eine stachelige grüne Kastanienschale auf, eine glänzende Kastanie springt heraus. Gesagt: „Tapsi drückt die Schale. Plopp, die Kastanie!“ Ton: Plopp. Ein Gedanke mehr für die Denkblase beim Warten in „Aufs Töpfchen“: Tapsi allein, weg vom Bad, ein Bild mit zwei Frames.",
       why: "Fest drücken, dann kommt es raus – im Herbst kennt das jedes Kind.",
       effort: "S",
+      done: true,
     },
     {
       id: "H-40",

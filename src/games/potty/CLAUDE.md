@@ -56,10 +56,13 @@ left (`.pt-think`, as wide as the room left of Tapsi, its picture zoomed past th
 what Tapsi thinks of: the next thought comes by itself every `WAIT_SCENE_MS`, or at once on a tap, round and round
 without end – only thoughts for what the child said: for pipi
 things that flow and splash (watering a flower, a fountain, a balloon let go, rain and a puddle, a garden hose, a water
-wheel, pouring tea for the teddy, an elephant's trunk, a whale's fountain, a funnel), for kaka things that are pressed until something comes (ketchup, blowing up a
-balloon, a hen laying an egg, play dough through a press, a piping bag, peas from their pod, a butterfly out of its chrysalis) and one that only waits
-until something comes out (a toy train in a tunnel, for children afraid of kaka), all with Tapsi alone and away from the bathroom; for both or when unsure the two
-taking turns. A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
+wheel, pouring tea for the teddy, an elephant's trunk, a whale's fountain, a funnel, a water slide, a paper boat on a
+stream, a bucket into a sandcastle's moat, a dandelion clock, a garden pump, an hourglass, a kite let go), for kaka things that are pressed until something comes (ketchup, blowing up a
+balloon, a hen laying an egg, play dough through a press, a piping bag, peas from their pod, a carrot pulled out, a chick
+hatching, a wheelbarrow pushed up a hill, a honey bottle, a chestnut out of its case, a butterfly out of its chrysalis, a mole out of its hill) and some that only wait
+until something comes out (a toy train in a tunnel, a tortoise, a tube slide; for children afraid of kaka), all with Tapsi alone and away from the bathroom; for both or when unsure the two
+taking turns (there are never more kaka thoughts than pipi ones, or some would never come). The thoughts added on 30 October 2026 speak German in every
+language until they are translated (`sayScene`). A thought shows its picture `fox-denken-<id>` (two frames, away from the bathroom) once there is one,
 else its emoji (`WaitScene.emoji`); `prompts.py think` and `frames-think` make them. The old full-screen waiting pictures
 (`fox-warten-*`) are no longer shown. The silly scenes (dancing, juggling, peekaboo, soap bubbles; `need: "silly"`) are kept but not shown
 since the user wanted only the helping ones. Only tapped scenes speak (and the first, which explains the ✓).

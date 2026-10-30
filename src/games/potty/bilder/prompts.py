@@ -196,6 +196,23 @@ THOUGHTS = {
  "schmetterling": "In a garden, a butterfly chrysalis hangs from a twig; a colourful butterfly is pressing its way out of it, half out, its wings still folded; Tapsi crouches below and watches, excited, both paws at its cheeks.",
  "tunnel": ("On a playroom floor, a wooden toy railway runs through a small toy tunnel in a green felt hill; only the back end of a red toy train still sticks out of the tunnel's left side, "
             "the right side of the tunnel is an empty dark opening; Tapsi, in its light blue T-shirt and blue trousers, kneels beside it and peeks at the tunnel, curious."),
+ # Pipi, added later (H-17 … H-34).
+ "rutsche": "At a sunny outdoor pool, Tapsi whizzes down a curved blue water slide on its bottom, arms up, laughing; water runs down the slide into a small pool below.",
+ "schiffchen": "At a little stream in a green meadow, Tapsi kneels on the bank and sets a white paper boat on the water; the clear water flows past with small ripples. Tapsi smiles.",
+ "eimer": "On a sunny beach, Tapsi tips a small red bucket of water into the moat round a big sandcastle; the water pours out of the bucket into the moat. Tapsi watches, delighted.",
+ "pusteblume": "On a green meadow, Tapsi holds a big round white dandelion clock and blows on it with round cheeks; a few little white seed parachutes fly off into the blue sky.",
+ "pumpe": "In a garden, Tapsi pushes down the handle of an old green hand water pump with both paws; a stream of water pours from the spout into a small red watering can below.",
+ "sanduhr": "On a little table, a big wooden hourglass with yellow sand stands upright, most sand still in the top; a thin stream of sand trickles into the bottom. Tapsi sits at the table, chin on its paws, and watches.",
+ "drachen": "On a windy green meadow under a blue sky, Tapsi holds the string of a colourful kite with a long tail of bows; the kite rises high into the sky. Tapsi looks up, mouth open in delight.",
+ # Kaka, added later (H-23 … H-39).
+ "moehre": "In a vegetable garden, Tapsi pulls hard at the green leaves of a carrot stuck in the soil with both paws, leaning back, eyes squeezed, rosy cheeks; only the top of the orange carrot shows.",
+ "kueken": "In a straw nest on a farm, a big white egg has a crack across it and a small piece of shell lifts off the top; Tapsi crouches next to the nest and watches, excited, both paws at its cheeks.",
+ "schubkarre": "In an autumn garden, Tapsi pushes a small green wheelbarrow full of colourful leaves up a little grassy hill, leaning forward, pushing hard, rosy cheeks.",
+ "honig": "At a small table, Tapsi squeezes a squeezy honey bottle with both paws over a slice of bread on a plate, pressing hard with rosy cheeks; a thick golden drop of honey just comes out of the tip.",
+ "maulwurf": "On a green meadow, a small brown mound of earth bulges up, earth crumbs rolling down; Tapsi kneels in front of it and stares, curious, both paws on its knees.",
+ "schildkroete": "On a green lawn, a friendly green tortoise has pulled its head and legs into its round shell; Tapsi lies on its tummy in front of it, chin on its paws, and waits calmly.",
+ "roehre": "On a playground, a big curly red tube slide comes down from a small wooden tower; Tapsi sits at the top of the tower, legs already in the tube's upper opening, ready to slide, smiling; the round opening at the bottom is empty.",
+ "kastanie": "Under a chestnut tree in autumn, Tapsi presses a spiky green chestnut case with both thumbs, pressing hard with rosy cheeks; the case has just begun to split open.",
 }
 THOUGHT_MOVES = {
  "giesskanne": "the watering can is tipped further, more water pours, the sunflower nods a little",
@@ -216,6 +233,21 @@ THOUGHT_MOVES = {
  "erbsen": "the pod is wide open and empty, the peas have landed in the bowl, Tapsi laughs with both arms up",
  "schmetterling": "the butterfly is out and spreads its big colourful wings above the empty chrysalis, flying up; Tapsi cheers with both arms up",
  "tunnel": "the back of the train is gone from the left side; the red toy engine now comes out of the right side of the tunnel, Tapsi points at it and cheers",
+ "rutsche": "Tapsi has landed in the pool at the bottom of the slide, a big splash of water flies up around Tapsi, who laughs with both arms up",
+ "schiffchen": "the paper boat has floated a good way further down the stream, Tapsi waves after it with one paw",
+ "eimer": "the bucket is tipped upside down and empty, the water has run all the way round the sandcastle's moat, Tapsi claps both paws",
+ "pusteblume": "the dandelion is bare, almost all seed parachutes fly high and far across the sky, Tapsi laughs with open eyes",
+ "pumpe": "the pump handle is pushed down further, much more water pours, the watering can is half full and splashing",
+ "sanduhr": "much more sand now lies in the bottom half and less is in the top, the sand stream still trickles",
+ "drachen": "the kite has risen much higher and further away, smaller now, its tail fluttering the other way",
+ "moehre": "plop: the whole long orange carrot is out of the soil and held up high in Tapsi's paws, Tapsi cheers, a few crumbs of earth fly",
+ "kueken": "the shell has broken open in two halves and a fluffy yellow chick sits in the nest, beak open, peeping; Tapsi cheers with both arms up",
+ "schubkarre": "Tapsi stands on top of the little hill and has tipped the wheelbarrow forward, the leaves tumble out and fly, Tapsi laughs",
+ "honig": "a long thick golden stream of honey now curls onto the bread, Tapsi smiles proudly with open eyes",
+ "maulwurf": "a small dark-grey mole with pink paws and a pink nose has popped its head out of the top of the mound, Tapsi waves at it with one paw, delighted",
+ "schildkroete": "the tortoise has stuck its smiling head and its four legs out of the shell, Tapsi lifts its head and smiles at it",
+ "roehre": "Tapsi is gone from the top of the tower and now whizzes out of the tube's bottom opening, arms up, laughing",
+ "kastanie": "plop: the case has burst open in two halves and a shiny brown chestnut jumps out into the air above Tapsi's paws, Tapsi laughs",
 }
 
 def job(a, name, prompt, ref=None, aspect="16:9", size="1376"):
