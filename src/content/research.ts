@@ -80,7 +80,7 @@ export const RESEARCH: Research[] = [
       "Englische Eltern suchen genau das, was die App anders macht: „toddler games online free“, „toddler games for 2 year olds“, „toddler apps that work offline“, „toddler apps without subscription“, „toddler apps without in app purchases“, „toddler apps that are actually free“. Diese Wörter gehören in Seitentitel und Texte, nicht in die Domain.",
       "Fast jeder kurze englische Name rund um Kleinkind und Tippen ist als .com vergeben: taptots, tapling(s), tinytappers, littletaps, toddlerplay, toddlergames, toddlertaps, tappytots, toddleland, toddletown und viele mehr.",
       "„Toddlefox“ ist frei und passte nach drei Runden am besten: „to toddle“ ist im Englischen genau das tapsige Laufen von Zweijährigen (daher „toddler“), und der Fuchs ist Tapsi, der durch Bewegungsabenteuer, Zähne putzen und Töpfchen führt – Tapsi kann so heißen bleiben. 9 Buchstaben, ohne Bindestrich, man schreibt es, wie man es hört; keine App und kein Spiel trägt den Namen.",
-      "Zwei Haken bei Toddlefox: Wer „toddler fox“ sucht, landet bei Kinderkleidung der Motocross-Marke Fox Racing, und „Toddle“ heißt eine Lernplattform für Schulen (toddleapp.com). Beides ist eine andere Welt; toddlerfox.com wäre als Tippfehler-Adresse auch frei, bleibt aber nach der Entscheidung ungekauft.",
+      "Zwei Haken bei Toddlefox: Wer „toddler fox“ sucht, landet bei Kinderkleidung der Motocross-Marke Fox Racing, und „Toddle“ heißt eine Lernplattform für Schulen (toddleapp.com). Beides ist eine andere Welt.",
       "„Tapsi“ ist kein englisches Wort: Englisch ergänzt Google es zu „tapsilog“ (ein philippinisches Frühstück) und „Taapsee Pannu“ (eine indische Schauspielerin – gerade für Hindi verwirrend). Darum Tapsi im Spiel, aber nicht in der Adresse.",
       "„Tappy“ ist schon ein Fuchs: Tapps Games hat eine Reihe von Kinderspielen um den Fuchs Tappy („Tappy Escape“, „Run Tappy Run“). tappyfox.com ist zwar frei, wäre aber eine Verwechslung.",
       "Zweite Runde: Kurze Kunstwörter (tappo, tapino, tapsu, foxi, toddo, boopi …) sind als .com alle vergeben; frei sind fast nur Zusammensetzungen aus zwei Wörtern.",
@@ -92,7 +92,9 @@ export const RESEARCH: Research[] = [
       "Was Google aus „toddle“ + Wort macht, entscheidet mit: toddlespot wird zu Hautflecken bei Kleinkindern („toddler spots“), toddlepals zu „toddler palsy“ (Zerebralparese), toddlenook zu einem Kinderbett namens Toddler Nook, „toddle home“ zur Anmeldeseite der Schulplattform Toddle; „tiny fox den“ führt zu Kitas und Zahnärzten namens Little Fox Den, „tot room“ zu „toy room“.",
       "„Toddle“ benutzen schon mehrere: die Schulplattform Toddle, die australische Kita-Suche toddle.com.au, das Musikprogramm Toddle Tunes und die Familien-App ToddleBop. Das betrifft jeden Namen mit „toddle“ – die Markensuche nach „Toddle“ in Klasse 41 zählt darum für alle Favoriten.",
       "Vierte Runde, das Buch: Seit die App wie ein Bilderbuch aussieht, das Eltern und Kind zusammen lesen (A-20), hat der Name ein Bild, das wirklich alles umfasst – in ein Buch passen Spiele, Zähne putzen, Töpfchen, Tafel und Tagesplan, und „book“ versteht man in allen sieben Sprachen. Der Umschlag zeigt Fuchs- und Bärenfamilie; „fox“ nennt nur eine davon.",
-      "„Toddlebook“ ist frei und passt jetzt am besten: „das Buch für Kleinkinder“, 10 Buchstaben, schreibt sich, wie man es hört, keine App und kein Buch trägt den Namen. Google ergänzt „toddle book“ zu „toddler books“, „toddler book subscription“ und „toddler books about feelings“ – genau Eltern, die für ihr Kleinkind etwas Gutes suchen. Der Haken ist derselbe wie bei jedem „toddle“-Namen: die Schulplattform Toddle.",
+      "Das r fällt durch den Radio-Test: Wer „toddle“ hört, schreibt „toddler“ – das ist beim Besprechen der Favoriten selbst passiert (toddlerbook statt toddlebook). Darum zählt, ob auch die Form mit r frei ist. toddlerbook.com gehört seit 2007 jemand anderem, toddlerbooks.com steht bei HugeDomains für rund 7.600 $ zum Verkauf, toddlerpages, toddlerstory und toddlerstar sind vergeben. Frei in beiden Formen sind nur toddlefox/toddlerfox, toddlehome/toddlerhome und toddleshelf/toddlershelf.",
+      "Darum heißt der Name besser gleich „toddler“: Das Verb „to toddle“ kennen nur wenige, auch Muttersprachler schreiben „toddler“. Frei mit „toddler“ sind vor allem toddlerfox, toddlerhome, toddlershelf, toddlerforest, toddlerhug, toddlerpaws, toddlercubs, toddlerstorybook, toddlerlibrary; bei fast allen denkt Google an Kinderkleidung und Fanartikel (toddler cubs: Chicago Cubs, toddler burrow: Joe Burrow, toddler island: Stühle, toddler forest: Waldkita). toddlerstorybook wäre das Buch, aber 16 Buchstaben, und die Mehrzahl toddlerstorybooks.com ist vergeben. Toddlerfox bleibt: kurz, beide Wörter bekannt, das Tier der App.",
+      "„Toddlebook“ ist frei und passt zum Buch-Look am besten: „das Buch für Kleinkinder“, 10 Buchstaben, keine App und kein Buch trägt den Namen. Google ergänzt „toddle book“ zu „toddler books“, „toddler book subscription“ und „toddler books about feelings“ – genau Eltern, die für ihr Kleinkind etwas Gutes suchen. Der Haken ist derselbe wie bei jedem „toddle“-Namen: die Schulplattform Toddle.",
       "Gleich dahinter: toddlepages (Seiten zum Umblättern; Google denkt an Ausmalbilder, „toddler pages to color“) und toddlestory (Google denkt an Vorlesestunden in der Bücherei, „toddler story time“). Beide frei, nichts Gleichnamiges, aber 11 Buchstaben, und eine Geschichte erzählen nur Kleine Abenteuer und Bewegungsabenteuer.",
       "„Toddlerverse“ ist als .com vergeben (dahinter antwortet eine Website), „toddleverse“ auch, und ein Mastodon-Nutzer entwirft unter „Toddlerverse“ gerade einen werbefreien Online-Raum für Kleinkinder – fast dieselbe Idee. Frei sind nur thetoddlerverse, toddlerverses und toddleverses: „the“ wird beim Tippen vergessen, die Mehrzahl hört man nicht. Dazu heißt „-verse“ vor allem Universum (Metaverse, Spider-Verse) und passt eher zu Welten als zum Buch; den Doppelsinn „Vers“ hören Nicht-Muttersprachler kaum.",
       "„Toddler Book Collection“ ist als Adresse zu lang (21 Buchstaben, toddlerbookcollection.com wäre frei), sagt aber gut, was die App ist: als Untertitel im Seitentitel und auf dem Umschlag, nicht in der Domain.",
@@ -103,7 +105,8 @@ export const RESEARCH: Research[] = [
       "Umzug früh machen: Gespeichertes hängt an der Adresse – Einstellungen, Sterne der Belohnungstafel, Spielzeit und die installierte App bleiben bei radiesle.github.io zurück und fangen auf der neuen Domain leer an. Technisch reicht in GitHub Pages die eigene Domain (GitHub leitet die alte Adresse um) und im Bau SITE_ORIGIN mit PUBLIC_BASE_PATH „/“ statt „/<repo>“.",
       "toddlebook.com nachgeprüft: Verisign-whois meldet „No match“, also nicht registriert; toddlebooks.com (die Mehrzahl, falls jemand ein s anhängt) ist auch frei, und .org, .net, .app und .de haben keine Nameserver. Eine Websuche fand kein Produkt und keine Marke „Toddlebook“, nur Bücher, die „Toddler Book“ im Titel tragen. In den USA hat aber die Schulplattform Toddle (Teacher Tools Private Limited) 2024 die Marke „TODDLE“ angemeldet, und „TODDLE DODDLE“ ist für gedruckte Kinderbücher angemeldet – darum vor dem Kauf im Register nachsehen, ob „Toddle“ allein für Software und Bücher geschützt ist.",
       "Wo kaufen: bei Cloudflare Registrar zum Einkaufspreis ohne Aufschlag (nur was Verisign und ICANN verlangen), Whois-Schutz kostenlos, Bezahlung mit Kreditkarte oder PayPal; die Nameserver liegen dann bei Cloudflare, was für GitHub Pages reicht (Einträge dort nur „DNS only“, ohne Proxy, damit GitHub das HTTPS-Zertifikat ausstellt). Gleich gut und ohne diese Bindung: Porkbun. Nicht bei Anbietern mit billigem ersten Jahr und teurer Verlängerung. Verisign erhöht den .com-Preis am 1. November 2026 von 10,26 auf 10,97 $ im Jahr und plant weitere rund 7 % jährlich.",
-      SCALAR(0x75f5037b40),
+      "Was kaufen (Stand 30. Oktober 2026 alles frei): toddlerfox.com als Adresse der App und toddlefox.com, die dorthin weiterleitet (für wen den Namen ohne r gelesen hat). Sinnvoll dazu: toddlerfox.de, weil die App zuerst für deutsche Eltern ist und eine .de wenig kostet – sie leitet nur weiter; Cloudflare verkauft meines Wissens keine .de, Porkbun oder INWX schon. Nicht nötig: Mehrzahl (toddlefoxes), Tippfehler (toddlfox, toddelfox) und .net, .org, .app – die tippt niemand, und vor Nachahmern schützt eine Marke besser als viele Domains.",
+      "Vor dem Kauf noch prüfen: Wortmarken „Toddlerfox“, „Toddlefox“, „Toddlebook“ und „Toddle“ bei USPTO, EUIPO und DPMA (Klassen 9, 28, 41), und ob der Name in den App-Stores und sozialen Netzen frei ist.",
     ],
     topics: [
       {
@@ -152,7 +155,7 @@ export const RESEARCH: Research[] = [
     ],
     games: [],
     excluded: [
-      { title: "Eine .de oder weitere Endungen", why: "Entschieden: erst einmal genau eine Domain, eine .com." },
+      { title: "Eine .de oder weitere Endungen", why: "Entschieden: erst einmal eine .com – höchstens die Schreibweise mit r dazu, die nur weiterleitet." },
       { title: "Deutsche Namen (tapsiland, tapsiwelt, kleinkindspiele)", why: "Die App spricht sieben Sprachen; der Name soll auf Englisch funktionieren." },
       {
         title: "Ein Name für nur einen Teil (toddlehop, toddlegames)",
@@ -204,18 +207,25 @@ export const RESEARCH: Research[] = [
     ],
     domains: [
       {
-        name: "toddlebook",
+        name: "toddlerfox",
         rank: 1,
-        free: ["com"],
+        free: ["com", "de"],
         taken: [],
-        why: "Das Buch für Kleinkinder: Ein Buch fasst alles, was die App kann, und sieht seit dem Buch-Look auch so aus; „book“ versteht jeder, 10 Buchstaben, nichts Gleichnamiges, und Google ergänzt es zu „toddler books“.",
+        why: "Zwei Wörter, die jeder Elternteil kennt und so schreibt, wie er sie hört – „toddler“ statt des seltenen „toddle“; nennt das Alter und den Fuchs Tapsi, also passt alles darunter; 10 Buchstaben, kein gleichnamiges Produkt. Google denkt bei „toddler fox“ an Kinderkleidung von Fox Racing, „toddlerfox“ in einem Wort ergänzt es zu nichts.",
       },
       {
         name: "toddlefox",
         rank: 2,
+        free: ["com", "de"],
+        taken: [],
+        why: "Nur als zweite Adresse, die zu toddlerfox weiterleitet, für wen es so geschrieben sah: „toddle“ kennen wenige, fast jeder schreibt „toddler“.",
+      },
+      {
+        name: "toddlebook",
+        rank: 3,
         free: ["com"],
         taken: [],
-        why: "Nennt nur das Alter („toddle“) und den Fuchs Tapsi, also passt alles darunter; englisch, 9 Buchstaben, schreibt sich, wie man es hört, nach drei Runden kein gleichnamiges Produkt.",
+        why: "Das Buch für Kleinkinder, passt am besten zum Buch-Look – aber wer es hört, tippt „toddlerbook“, und toddlerbook.com gehört seit 2007 jemand anderem (toddlerbooks.com steht für rund 7.600 $ zum Verkauf).",
       },
       {
         name: "toddlepages",
@@ -340,6 +350,13 @@ export const RESEARCH: Research[] = [
         taken: [],
         why: "Sagt genau, was die App ist, aber 21 Buchstaben – gehört als Untertitel in den Seitentitel, nicht in die Adresse.",
       },
+      {
+        name: "toddler-book",
+        rank: 11,
+        free: ["com"],
+        taken: [],
+        why: "Frei (wie toddler-books und toddle-book), aber wer „toddler book“ hört, tippt es ohne Bindestrich und landet auf toddlerbook.com, die jemand anderem gehört; dazu nur ein allgemeiner Ausdruck, den keine Marke schützt.",
+      },
       { name: "storytoddler", rank: 11, free: ["com"], taken: [], why: "Frei, aber Google macht aus „story toddler“ die Fernsehshow „Toddlers & Tiaras“." },
       {
         name: "toddlerhymes",
@@ -394,6 +411,13 @@ export const RESEARCH: Research[] = [
         free: [],
         taken: ["com"],
         why: "Vergeben (dahinter antwortet eine Website), wie toddleverse, tinyverse und foxverse; unter dem Namen entwirft jemand einen werbefreien Online-Raum für Kleinkinder.",
+      },
+      {
+        name: "toddleruniverse",
+        rank: 13,
+        free: [],
+        taken: ["com"],
+        why: "Seit 2011 vergeben, dahinter antwortet eine Website; toddlersuniverse.com auch. Frei wären nur Umwege (toddleuniverse, thetoddleruniverse), und Google denkt an „Steven Universe“ und Freizeitparks.",
       },
       { name: "toddletales", rank: 13, free: [], taken: ["com"], why: "Vergeben, wie toddlertales, tinytales und foxtales." },
       { name: "toddlerbook", rank: 13, free: [], taken: ["com"], why: "Vergeben, wie toddlerstories, toddlerbookclub und tinypages." },
