@@ -353,7 +353,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
   with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
-  (`useTitle`, `SeoHead`). Texts say only what the page really does. Heavy downloads (service worker copy,
+  (`useTitle`, `SeoHead`). Texts say only what the page really does. Google reads the page after the app ran,
+  in an English browser: so search engines play in German (`isCrawler` in `src/lib/locale.ts`), the language of the built
+  pages – a crawler that runs pages and isn't on its list gets added there. Pages that must stay out of results get a
+  `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
+  `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
 - Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
   repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets

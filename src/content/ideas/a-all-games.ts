@@ -168,5 +168,29 @@ export const allGamesIdeas: IdeaArea = {
       partial:
         "Gebaut und Standard (?buch=aus bringt den alten Look zurück): Cover mit Tierfamilien, Umblättern zwischen Menüs und beim Starten und Verlassen der Spiele, Inhaltsseite, Papierknöpfe, Papierrand im Spiel. Die Zeichnungen der Spiele selbst sind noch die alten – weitere Schritte im Bereich D „Das Bilderbuch“.",
     },
+    {
+      id: "A-21",
+      emoji: "📝",
+      title: "Der Text für Google bleibt auf der Seite",
+      text: "Die paar Sätze aus seo.ts (was das Spiel ist, für wen, „kostenlos, ohne Werbung, offline“) und die Links zu den anderen Spielen stehen heute nur in der gebauten Seite und verschwinden, sobald die App startet. Sie bleiben stattdessen unter der ersten Bildschirmseite stehen, klein, für Eltern – dort, wo auf der Startseite schon Version und Impressum stehen. Nur auf Deutsch, solange die Texte nicht übersetzt sind. Auf der ersten Bildschirmseite ändert sich nichts.",
+      why: "Google nimmt die Seite nach dem Start der App auf; heute findet es auf /zaehne/ vier Wörter. Mit Text kann es die Seite den Suchen der Eltern zuordnen (SEO-Prüfung, 30. Oktober 2026).",
+      effort: "M",
+    },
+    {
+      id: "A-22",
+      emoji: "🇬🇧",
+      title: "Seiten für Google auf Englisch",
+      text: "Jede Seite aus seo.ts bekommt eine englische Fassung unter eigener Adresse (z. B. /en/zaehne/), mit englischem Titel und Text und hreflang-Verweisen zwischen beiden. Wer über die englische Seite kommt, spielt auf Englisch. Danach weitere Sprachen der App.",
+      why: "toddlerfox.com ist eine englische Adresse, die App spricht sieben Sprachen, Google kennt aber nur deutsche Seiten. Englische Eltern suchen „toddler games online free“ oder „toddler apps without subscription“.",
+      effort: "M",
+    },
+    {
+      id: "A-23",
+      emoji: "⚡",
+      title: "Schneller zum ersten Bild",
+      text: "Das Stylesheet, auf das jede Seite vor dem ersten Bild wartet, trägt die Schrift Fredoka eingebettet, auch ihre hebräischen Buchstaben, die keine Sprache der App braucht. Nur Latein einbetten spart rund 12 KB; die übrigen Teile der Schrift (oder alle) als eigene Dateien, die der Browser nur lädt, wenn eine Seite sie braucht.",
+      why: "Auf einem Handy mit schwachem Netz kommt das erste Bild früher, und Google zählt die Ladezeit auf dem Handy mit (SEO-Prüfung, 30. Oktober 2026).",
+      effort: "S",
+    },
   ],
 };

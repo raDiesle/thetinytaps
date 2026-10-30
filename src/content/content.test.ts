@@ -4,7 +4,7 @@ import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
 import { FOX_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
-import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
+import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, fullTitle } from "./seo";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
@@ -101,6 +101,15 @@ describe("search engine texts (seo.ts)", () => {
       const values = SEO_PAGES.map((page) => page[key]);
       expect(values.filter((v, i) => values.indexOf(v) !== i)).toEqual([]);
     }
+  });
+
+  test("the picture for link previews is there, in the size the tags give", async () => {
+    const file = Bun.file(`${import.meta.dir}/../../public${PREVIEW_IMAGE.path}`);
+    expect(await file.exists()).toBe(true);
+    // A JPEG's size sits in its SOF0 marker (FF C0): height, then width, two bytes each.
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const sof = bytes.findIndex((byte, i) => byte === 0xff && bytes[i + 1] === 0xc0);
+    expect([(bytes[sof + 7] << 8) | bytes[sof + 8], (bytes[sof + 5] << 8) | bytes[sof + 6]]).toEqual([PREVIEW_IMAGE.width, PREVIEW_IMAGE.height]);
   });
 
   test("grown-up pages are never in the search pages", () => {
