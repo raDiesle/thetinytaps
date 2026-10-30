@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { useT } from "@/lib/language";
+import { preloadPage } from "@/lib/preloadPages";
 
 export interface GameCardProps {
   /** Without a link the card is shown greyed out as "coming soon". */
@@ -26,7 +27,8 @@ export function GameCard({ href, emoji, title }: GameCardProps) {
   );
   if (href) {
     return (
-      <Link to={href} className="game-card">
+      // The page starts loading as the finger lands, not only once it is lifted.
+      <Link to={href} className="game-card" onPointerDown={() => preloadPage(href)}>
         {content}
       </Link>
     );

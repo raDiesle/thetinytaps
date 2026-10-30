@@ -8,6 +8,7 @@ import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useT } from "@/lib/language";
+import { usePreloadPages } from "@/lib/preloadPages";
 import { buildDate, useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
@@ -20,11 +21,14 @@ const CARDS = CATEGORIES.filter((c) => !c.onHome);
 const FRAMED = CATEGORIES.filter((c) => c.onHome);
 /** How many cards each group on the page has: first the category cards, then each framed category's games. */
 const GROUPS = [CARDS.length, ...FRAMED.map((c) => c.games.length)];
+/** Where all cards of the page lead. */
+const HREFS = [...CARDS.map(categoryHref), ...FRAMED.flatMap((c) => c.games.map((g) => g.href))];
 
 export function Home() {
   useTitle();
   const t = useT();
   useUpdateBetweenGames();
+  usePreloadPages(HREFS);
   const navigate = useNavigate();
   const grid = useFitGrid(
     GROUPS.reduce((a, b) => a + b, 0),

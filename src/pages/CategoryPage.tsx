@@ -5,6 +5,7 @@ import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useT } from "@/lib/language";
+import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
@@ -15,6 +16,7 @@ export function CategoryPage() {
   const t = useT();
   useTitle(category && t(category.title));
   useUpdateBetweenGames();
+  usePreloadPages(category?.games.map((g) => g.href) ?? []);
   const grid = useFitGrid(category?.games.length ?? 0);
   if (!category) return <Navigate to="/" replace />;
   // An old address of a category that has only one game now.

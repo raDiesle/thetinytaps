@@ -260,7 +260,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   the rest of the visit), and asks once per visit for fullscreen, which on Android
   also locks landscape (`src/lib/fullscreen.ts`). Computers see neither.
 - Updates: an installed app looks for a new version every hour and when it comes back, and restarts with it
-  only between games: menu pages call `useUpdateBetweenGames()` (`src/lib/pwa.ts`) – a new menu page does too, a game never.
+  only between games, while it is in the background on a menu: menu pages call `useUpdateBetweenGames()`
+  (`src/lib/pwa.ts`) – a new menu page does too, a game never. Never restart or reload on a tap: restarting when a
+  menu card was tapped made the next menu take seconds to show.
+- A tap in a menu shows the next screen at once: the home page and the category pages load the lazy pages behind their
+  cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
+  `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
+  whose cards open lazy pages does the same.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
