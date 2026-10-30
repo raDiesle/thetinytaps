@@ -50,6 +50,8 @@ export interface Part {
   ms: number;
   /** Tap these one after the other while measuring, every `every` ms, as a child would. */
   tap?: { selector: string; every: number };
+  /** Press these keys one after the other while measuring, every `every` ms. */
+  type?: { keys: string[]; every: number };
 }
 
 /** One game (or one mode of it) to play. */
@@ -65,6 +67,8 @@ export interface Scenario {
 
 /** The first card or start button of a game's start screen. */
 const START: Step = { tap: ".start-button, .mode-card", optional: true };
+/** What a child taps while playing: anything that answers a tap. */
+const TAPS = { selector: "[data-tap]", every: 700 };
 const key = (k: string, times = 1): Step[] => Array.from({ length: times }, () => [{ key: k }, { wait: 150 }]).flat() as Step[];
 
 export const SCENARIOS: Scenario[] = [
@@ -83,4 +87,33 @@ export const SCENARIOS: Scenario[] = [
       { label: "Ende", before: key("ArrowRight", 2), ms: 6000 },
     ],
   },
+  {
+    name: "menues",
+    path: "/",
+    parts: [
+      { label: "Startseite", ms: 3000 },
+      { label: "Seite blättern in ein Spiel", before: [{ tap: ".game-card" }], ms: 2500 },
+    ],
+  },
+  {
+    name: "buchstaben",
+    path: "/buchstaben/",
+    parts: [{ label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } }],
+  },
+  { name: "tiere", path: "/tiere/", parts: [{ label: "Füttern", before: [START, { wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
+  { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },
+  { name: "gefuehle", path: "/gefuehle/", parts: [{ label: "Wie geht's dir?", before: [START, { wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "schatten", path: "/schatten/", parts: [{ label: "Schatten finden", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "socken", path: "/socken/", parts: [{ label: "Waschen", before: [{ wait: 500 }], ms: 8000 }, { label: "Socken paaren", ms: 8000, tap: TAPS }] },
+  { name: "laut-leise", path: "/laut-leise/", parts: [{ label: "Mikrofon", before: [START, { wait: 2000 }], ms: 8000, tap: TAPS }] },
+  { name: "kettenreaktion", path: "/kettenreaktion/", parts: [{ label: "Erstes Level", before: [START, { wait: 1500 }], ms: 10000, tap: TAPS }] },
+  {
+    name: "kleine-abenteuer",
+    path: "/kleine-abenteuer/",
+    parts: [{ label: "Erste Geschichte", before: [START, { wait: 2000 }], ms: 12000, tap: TAPS }],
+  },
+  // three.js: headless Chrome draws WebGL on the CPU (SwiftShader), so this measures more than a phone's GPU would cost.
+  { name: "abenteuer", path: "/abenteuer/", parts: [{ label: "Tapsi bewegt sich", before: [START, { wait: 3000 }], ms: 10000 }] },
 ];

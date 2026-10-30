@@ -12,6 +12,7 @@ bun test           # unit tests only (bun test, < 1 s); bun test --watch while w
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
 bun run image ...  # picture with Gemini, see /bild-erzeugen
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
+bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
@@ -134,7 +135,14 @@ In a fresh worktree run `bun install` first.
   Phones must keep up: what moves across a big picture as a whole (a scrolling world, a camera) is an HTML layer of its
   own (its own svg in a `div` with `will-change: transform`), never a moved group inside one big svg, which the browser
   paints whole again in every frame; and a big still drawing is built once (`useMemo`, `memo`), not again with every
-  tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this).
+  tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this). What moves on every frame
+  moves by CSS (`transform`, `opacity` of an HTML layer), never by React drawing it again per frame, and only what the
+  child is busy with moves (waiting figures stand still). `bun run perf` measures it: it plays each game in headless
+  Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget
+  (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy). A new game,
+  or a new part that moves a lot, gets a scenario there; run it after changing what moves (`bun run perf <name>`,
+  `--profile` names the functions that cost, `--shots` shows what was measured). The build ships React's production code
+  (`PRODUCTION` in `tools/appPlugin.ts`, checked in `buildTools.test.ts`): without it every game ran several times slower.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run

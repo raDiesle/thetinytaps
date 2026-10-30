@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { type Budget, BUDGET, DEVICES, type Device, SCENARIOS, type Scenario, type Step } from "./perfScenarios";
+import { type Budget, BUDGET, DEVICES, type Device, type Part, SCENARIOS, type Scenario, type Step } from "./perfScenarios";
 
 // `bun run perf`: plays every game in headless Chrome as an old Android phone would (a slow CPU, a small screen
 // with many pixels) and measures how smoothly its animations run. Nothing to install: it drives the Chrome that
@@ -77,7 +77,23 @@ class Cdp {
   send<T = Record<string, unknown>>(method: string, params: Record<string, unknown> = {}): Promise<T> {
     const id = this.next++;
     this.socket.send(JSON.stringify({ id, method, params }));
-    return new Promise((resolve, reject) => this.waiting.set(id, { resolve: resolve as (v: unknown) => void, reject }));
+    // A call that never answers (a tap gesture on a page that hangs) fails after a while instead of stopping the run.
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this.waiting.delete(id);
+        reject(new Error(`${method} did not answer within 30 s`));
+      }, 30000);
+      this.waiting.set(id, {
+        resolve: (v: unknown) => {
+          clearTimeout(timer);
+          (resolve as (v: unknown) => void)(v);
+        },
+        reject: (e: Error) => {
+          clearTimeout(timer);
+          reject(e);
+        },
+      });
+    });
   }
 
   /** Listens to an event until the returned function is called. */
@@ -102,6 +118,13 @@ class Cdp {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** Opens an address and waits until it has loaded – or 15 s, since going to the address already open may not load anew. */
+async function open(cdp: Cdp, url: string) {
+  const loaded = cdp.once("Page.loadEventFired");
+  await cdp.send("Page.navigate", { url });
+  await Promise.race([loaded, sleep(15000)]);
+}
+
 /** Starts headless Chrome and connects to its first tab. */
 async function launchChrome() {
   const profile = mkdtempSync(join(tmpdir(), "tinytaps-perf-"));
@@ -115,6 +138,9 @@ async function launchChrome() {
       "--no-default-browser-check",
       "--mute-audio",
       "--autoplay-policy=no-user-gesture-required",
+      // A microphone that hears a tone, allowed without asking (Laut & Leise).
+      "--use-fake-ui-for-media-stream",
+      "--use-fake-device-for-media-stream",
       `--window-size=${device.width},${device.height}`,
       "about:blank",
     ],
@@ -238,6 +264,13 @@ async function tapAt(cdp: Cdp, x: number, y: number) {
 
 const KEY_CODES: Record<string, number> = { ArrowRight: 39, ArrowLeft: 37, ArrowUp: 38, ArrowDown: 40, " ": 32, Enter: 13, Escape: 27 };
 
+async function pressKey(cdp: Cdp, key: string) {
+  const code = KEY_CODES[key] ?? key.toUpperCase().charCodeAt(0);
+  const base = { key, code: key === " " ? "Space" : key.length === 1 ? `Key${key.toUpperCase()}` : key, windowsVirtualKeyCode: code, nativeVirtualKeyCode: code };
+  await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", ...base, text: key.length === 1 ? key : undefined });
+  await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", ...base });
+}
+
 async function runStep(cdp: Cdp, step: Step) {
   if ("wait" in step) await sleep(step.wait);
   else if ("waitFor" in step) {
@@ -253,12 +286,24 @@ async function runStep(cdp: Cdp, step: Step) {
       throw new Error(`Nothing to tap: ${step.tap}`);
     }
     await tapAt(cdp, at.x, at.y);
-  } else if ("key" in step) {
-    const code = KEY_CODES[step.key] ?? step.key.toUpperCase().charCodeAt(0);
-    const base = { key: step.key, code: step.key === " " ? "Space" : step.key, windowsVirtualKeyCode: code, nativeVirtualKeyCode: code };
-    await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", ...base, text: step.key.length === 1 ? step.key : undefined });
-    await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", ...base });
-  } else if ("eval" in step) await evaluate(cdp, step.eval);
+  } else if ("key" in step) await pressKey(cdp, step.key);
+  else if ("eval" in step) await evaluate(cdp, step.eval);
+}
+
+/** Presses `keys` one after the other every `every` ms while a measurement runs, like a child on a keyboard. */
+function startTyping(cdp: Cdp, keys: string[], every: number) {
+  let stopped = false;
+  const run = async () => {
+    for (let i = 0; !stopped; i++) {
+      await pressKey(cdp, keys[i % keys.length]);
+      await sleep(every);
+    }
+  };
+  const done = run();
+  return async () => {
+    stopped = true;
+    await done;
+  };
 }
 
 /** Taps `selector` things one after the other every `every` ms while a measurement runs, like a child would. */
@@ -327,7 +372,8 @@ async function traced(cdp: Cdp, during: () => Promise<void>) {
 }
 
 /** Measures `ms` of whatever runs now. */
-async function measure(cdp: Cdp, scenario: Scenario, label: string, ms: number, budget: Budget, tap?: { selector: string; every: number }): Promise<Measurement> {
+async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget): Promise<Measurement> {
+  const { label, ms, tap, type } = part;
   await evaluate(cdp, FRAME_COUNTER);
   const before = await metrics(cdp);
   const start = performance.now();
@@ -335,8 +381,10 @@ async function measure(cdp: Cdp, scenario: Scenario, label: string, ms: number, 
   const { paintMs, rasterMs } = await traced(cdp, async () => {
     const play = async () => {
       const stopTapping = tap ? startTapping(cdp, tap.selector, tap.every) : null;
+      const stopTyping = type ? startTyping(cdp, type.keys, type.every) : null;
       await sleep(ms);
       await stopTapping?.();
+      await stopTyping?.();
     };
     if (flag("profile")) hot = await profiled(cdp, play);
     else await play();
@@ -422,14 +470,12 @@ function printRow(m: Measurement) {
 
 async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir: string | null): Promise<Measurement[]> {
   // Every scenario starts as a first visit would after the cover: fresh storage, the book already opened, in German.
-  await cdp.send("Page.navigate", { url: `${base}/` });
-  await cdp.once("Page.loadEventFired");
+  await open(cdp, `${base}/`);
   await evaluate(
     cdp,
     `localStorage.clear(); localStorage.setItem("tinytaps.book.opened", "1"); localStorage.setItem("tinytaps.applanguage.v1", "de"); ${scenario.storage ?? ""}`,
   );
-  await cdp.send("Page.navigate", { url: `${base}${scenario.path}` });
-  await cdp.once("Page.loadEventFired");
+  await open(cdp, `${base}${scenario.path}`);
   await sleep(1500);
   // On a phone the first tap of a visit goes to the fullscreen hint (ScreenHint), as a parent's would.
   await runStep(cdp, { tap: ".screen-hint-button", optional: true });
@@ -437,7 +483,7 @@ async function runScenario(cdp: Cdp, base: string, scenario: Scenario, shotsDir:
   const results: Measurement[] = [];
   for (const part of scenario.parts) {
     for (const step of part.before ?? []) await runStep(cdp, step);
-    const m = await measure(cdp, scenario, part.label, part.ms, BUDGET, part.tap);
+    const m = await measure(cdp, scenario, part, BUDGET);
     results.push(m);
     printRow(m);
     if (shotsDir) {
@@ -457,6 +503,8 @@ async function main() {
   const all: Measurement[] = [];
   try {
     await cdp.send("Page.enable");
+    // A game asks before the page is left (GameShell, so a child can't leave it); the next scenario leaves anyway.
+    cdp.on("Page.javascriptDialogOpening", () => void cdp.send("Page.handleJavaScriptDialog", { accept: true }));
     await cdp.send("Performance.enable", { timeDomain: "threadTicks" });
     await cdp.send("Emulation.setDeviceMetricsOverride", { width: device.width, height: device.height, deviceScaleFactor: device.scale, mobile: true });
     await cdp.send("Emulation.setTouchEmulationEnabled", { enabled: true, maxTouchPoints: 5 });

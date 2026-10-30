@@ -66,6 +66,28 @@ export interface Research {
 
 export const RESEARCH: Research[] = [
   {
+    id: "leistung-alte-handys",
+    date: "2026-10-30",
+    emoji: "🐢",
+    title: "Laufen die Spiele flüssig auf einem zehn Jahre alten Android-Handy?",
+    question:
+      "„Zähne putzen“ ruckelte auf Handys. Wie flüssig laufen alle Spiele auf einem etwa zehn Jahre alten Android-Handy (Galaxy S7, Moto G4, 2016), wo hakt es, und wie lässt sich das regelmäßig prüfen?",
+    method:
+      "Neues Werkzeug `bun run perf` (tools/perf.ts): spielt jedes Spiel im Chrome des Computers ohne Fenster, so wie ein altes Handy es sähe – Prozessor 6-mal langsamer (DevTools „Low-end mobile“), Bildschirm 640×360 mit 3-fach so vielen Pixeln, Berührung statt Maus –, tippt und drückt Tasten wie ein Kind und misst Bilder pro Sekunde, Ruckler (Bilder über 50 ms), wie lange das langsamste Zwanzigstel der Bilder dauert und wie beschäftigt der Hauptfaden ist; mit --profile die Funktionen, die am meisten Zeit kosten. Das ist eine Nachbildung, kein echtes Handy: Die Grafikkarte wird nicht gebremst, WebGL (Bewegungsabenteuer) zeichnet ohne Fenster sogar auf dem Prozessor und wirkt dadurch langsamer als auf einem Handy. Gemessen am 30. Oktober 2026, ein Durchgang je Spiel.",
+    findings: [
+      "Der größte Fund betraf alle Spiele: Die Version für Spieler enthielt Reacts Entwicklungs-Code (jedes Bild lief durch zusätzliche Prüfungen). Mit dem Produktions-Code ist das JavaScript rund 1 MB kleiner, und z. B. „Zähne putzen“ braucht beim Putzen ein Viertel statt vier Fünftel der Rechenzeit. Ein Test hält das fest.",
+      "„Zähne putzen“ ruckelte vor allem, weil die Zahnbürste mit jedem Bild neu gezeichnet und der ganze Spiegel bei jedem Takt neu aufgebaut wurde: vorher 44–46 Bilder pro Sekunde mit bis zu 20 Rucklern in 5 Sekunden, jetzt in allen neun gemessenen Abschnitten 53–60 Bilder pro Sekunde ohne Ruckler.",
+      "Innerhalb der Grenzen (höchstens 34 ms fürs langsamste Zwanzigstel, höchstens einen Ruckler alle zwei Sekunden, Hauptfaden höchstens 60 % beschäftigt): Menüs und Umblättern, Buchstaben & Zahlen, Tiere, Lebendige Bilder, Aufs Töpfchen, Sterne & Tagesplan, Schatten, Socken-Paare, Laut & Leise, Kettenreaktion, Kleine Abenteuer.",
+      "Knapp: Lebendige Bilder (Flughafen) ist zur Hälfte beschäftigt, fast nur mit Malen – viele kleine Bewegungen in einem großen Bild. Gefühle hatte in einem von zwei Durchgängen 9 kurze Hänger beim Bildwechsel (große Bilder werden entpackt), im zweiten nur einen.",
+      "Über der Grenze: Bewegungsabenteuer (three.js) – rund 2 200 Teile der 3D-Welt werden in jedem Bild neu berechnet (Tapsi allein 322), mit 350 Zeichenaufrufen; der Hauptfaden ist zu 70 % beschäftigt.",
+    ],
+    topics: [],
+    games: [],
+    excluded: [],
+    ideas: [],
+    sources: [],
+  },
+  {
     id: "domain",
     date: "2026-10-30",
     emoji: "🌐",
