@@ -52,6 +52,11 @@ parts change exactly with the brushing steps, a finale on the end screen.
   Whisper's first words after an intro (smeared over it, even a one-bar one) do not. Short windows (1–2 s) over a held
   last note or the quiet gap before a verse have too few onsets and point a beat or a bar off (the English waiting
   song seemed to hold its last chorus a bar longer); windows of 5–8 s reaching across the chorus-to-verse change decide.
+- **Find the parts from the music, not from Whisper's line times.** Whisper (base) heard the Hindi waiting song as
+  English, Urdu and an endless „tititi“ and put lines seconds off; it only shows the order of the lines. Where the
+  choruses are comes from matching one chorus's spectrum (log bands plus onsets, 10 ms frames) against the whole song:
+  the repeats scored 0.85–0.93, everything else below 0.75, and their distances give the tempo to the hundredth.
+  Whether anything is sung before the first bar: Whisper on that piece alone, padded with silence.
 - Suno usually adds a part and an ending (pause + final chord): useful as a finale
   for the end screen.
 - **Download WAV** (best for cutting and converting), otherwise MP3.

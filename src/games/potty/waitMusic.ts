@@ -50,6 +50,10 @@ const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
   // 44 bars (verses, choruses, bridge), from a tenth before „I'm“ to the same place after the last chorus, where the
   // backing goes on as before verse 2 and Suno ends with a few bars of outro – never reached.
   en: { loopStart: 0.4, loopEnd: 0.4 + 44 * (240 / 98.71) },
+  // 100.0 BPM (the choruses come exactly 8, 8, 12 and 8 bars apart), a woodblock count-in before „पॉटी“ at 0.5 s;
+  // 44 bars (verses, choruses, bridge), from a tenth before it to the same place after the last chorus, where the
+  // backing goes on as before verse 2 and Suno ends with a few bars of bells – never reached.
+  hi: { loopStart: 0.4, loopEnd: 0.4 + 44 * (240 / 100.007) },
 };
 
 const loading = new Map<string, Promise<AudioBuffer | null>>();

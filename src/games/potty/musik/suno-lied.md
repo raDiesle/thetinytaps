@@ -514,13 +514,15 @@ Title:
 小马桶上慢慢等
 ```
 
-## हिन्दी (`hi`, written 30 Oct 2026)
+## हिन्दी (`hi`, written 30 Oct 2026; made 30 Oct 2026 → `musik-toepfchen-warten-hi.mp3`)
 
 The German song in Hindi, verse for verse, same tempo, key and instruments. „पॉटी-सीट“ for the potty, „डायपर“,
 „सू-सू“ and „पॉटी“ as in the game, „मम्मी“ and „पापा“. Hindi verbs agree with the speaker's gender, so the child is
 never the subject of one: „let's“ and the subjunctive („चलो रुकें“, „फ्लश करें“), „मुझे … आता है“, and „समझदार“, which
 never changes, instead of „बड़ा/बड़ी“. The shout-back answers are „मैं!“, „मुझे!“, „मुझमें!“, as each question asks.
 Not yet read by a native speaker.
+Suno kept 100 BPM to the hundredth, with a short woodblock count-in (1.8 s) and a few bars of bells at the end;
+Whisper (base) hears Hindi poorly and smeared the first line over the count-in, but heard the lines in order.
 
 Lyrics:
 
