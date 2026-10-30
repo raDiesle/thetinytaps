@@ -189,6 +189,8 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
       <div ref={playArea} className="play-area" onPointerDownCapture={unlockAudio}>
         {playtime.goodNight ? <GoodNight /> : <LeaveGame value={stop}>{children}</LeaveGame>}
         {!playtime.goodNight && playtime.dusk > 0 && <Dusk level={playtime.dusk} />}
+        {/* The edge of the book's page round the picture; shown only in the book look (`book.css`). */}
+        <div className="book-frame" aria-hidden />
         <ExitButton
           onExit={stop}
           label={t({

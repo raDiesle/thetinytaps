@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
+import { BookCover } from "@/components/BookCover";
 import { GameCard } from "@/components/GameCard";
 import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
@@ -22,6 +23,8 @@ const CARDS = CATEGORIES.filter((c) => !c.onHome);
 const FRAMED = CATEGORIES.filter((c) => c.onHome);
 /** How many cards each group on the page has: first the category cards, then each framed category's games. */
 const GROUPS = [CARDS.length, ...FRAMED.map((c) => c.games.length)];
+/** The page of the book each card's chapter starts on, in the book look: the contents page lists them in order. */
+const pageOf = (card: number) => 3 + card * 4;
 /** Where all cards of the page lead. */
 const HREFS = [...CARDS.map(categoryHref), ...FRAMED.flatMap((c) => c.games.map((g) => g.href))];
 
@@ -64,7 +67,7 @@ export function Home() {
         <li className="mode-group mode-group-bare" style={grid.places?.[0]}>
           <ul className="mode-group-cards">
             {/* Each card shows a piece of its category's world, and the games behind it as a collage. */}
-            {CARDS.map((c) => (
+            {CARDS.map((c, i) => (
               <li key={c.id} data-world={c.id}>
                 <GameCard
                   href={categoryHref(c)}
@@ -73,6 +76,7 @@ export function Home() {
                   blurb={c.blurb && t(c.blurb)}
                   games={hasPage(c) ? c.games.map((g) => g.emoji) : undefined}
                   scene={<WorldCardScene world={c.id as WorldId} />}
+                  page={pageOf(i)}
                 />
               </li>
             ))}
@@ -84,9 +88,15 @@ export function Home() {
               <span aria-hidden>{c.emoji}</span> {t(c.title)}
             </span>
             <ul className="mode-group-cards" aria-label={t(c.title)}>
-              {c.games.map((g) => (
+              {c.games.map((g, j) => (
                 <li key={g.href}>
-                  <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
+                  <GameCard
+                    href={g.href}
+                    emoji={g.emoji}
+                    title={t(g.title)}
+                    blurb={t(g.blurb)}
+                    page={pageOf(CARDS.length + FRAMED.slice(0, i).reduce((n, f) => n + f.games.length, 0) + j)}
+                  />
                 </li>
               ))}
             </ul>
@@ -94,6 +104,7 @@ export function Home() {
         ))}
       </ul>
       <InstallHint />
+      <BookCover />
       <p className="home-version">
         {t({ de: "Stand", ru: "Версия от", en: "Version", zh: "版本", hi: "संस्करण", es: "Versión", ar: "الإصدار" })} {buildDate()}
       </p>

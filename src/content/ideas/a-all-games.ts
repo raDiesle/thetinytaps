@@ -158,5 +158,15 @@ export const allGamesIdeas: IdeaArea = {
       effort: "M",
       done: true,
     },
+    {
+      id: "A-20",
+      emoji: "📖",
+      title: "Die App als Bilderbuch",
+      text: "Alles sieht aus wie ein echtes Buch auf dem Tisch statt wie ein Bildschirmspiel: Beim Öffnen liegt ein Buch mit Stoffeinband da, ein Tippen schlägt es auf; die Startseite ist das Inhaltsverzeichnis mit Seitenzahlen, jede Karte ein eingeklebtes Bild mit Klebestreifen, ein Tippen blättert um; Papier, gedämpfte Farben, gedruckte statt hüpfende Schrift, und beim Spielen liegt das Bild im Papierrand der Seite.",
+      why: "Manche Eltern sehen Bildschirmspiele für Kleinkinder kritisch – ein Bilderbuch wirkt ruhiger und vertrauter.",
+      effort: "M",
+      partial:
+        "Als Entwurf zum Ausprobieren gebaut (?buch an, ?buch=aus aus): Cover, Umblättern, Inhaltsseite, Papierrand im Spiel. Die Zeichnungen der Spiele selbst sind noch die alten.",
+    },
   ],
 };
