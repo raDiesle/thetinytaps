@@ -259,9 +259,12 @@ export function playDoorbell() {
   note({ from: 1047, duration: 1.1, type: "sine", volume: 0.2, delay: 0.42 });
 }
 
-/** "Fffschup" – a big page of a picture book turned over: paper rushing past, then landing softly. */
-export function playPageTurn() {
-  hiss({ from: 900, to: 3200, duration: 0.35, volume: 0.09, q: 0.6 });
-  hiss({ from: 2600, to: 1200, duration: 0.25, volume: 0.06, delay: 0.3, q: 0.8 });
-  note({ from: 160, to: 90, duration: 0.12, type: "sine", volume: 0.12, delay: 0.5 });
+/**
+ * "Fffschup" – a big page of a picture book turned over: paper rushing past, then landing softly, `seconds` after the
+ * start (as long as the turn on screen takes).
+ */
+export function playPageTurn(seconds = 1.2) {
+  hiss({ from: 900, to: 3200, duration: seconds * 0.5, volume: 0.09, q: 0.6 });
+  hiss({ from: 2600, to: 1200, duration: seconds * 0.35, volume: 0.06, delay: seconds * 0.45, q: 0.8 });
+  note({ from: 160, to: 90, duration: 0.12, type: "sine", volume: 0.12, delay: seconds * 0.85 });
 }

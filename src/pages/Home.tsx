@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { BookCover } from "@/components/BookCover";
+import { BookFamily } from "@/components/BookFamily";
 import { GameCard } from "@/components/GameCard";
 import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
@@ -52,16 +53,22 @@ export function Home() {
   return (
     <main className="home">
       <Sky />
-      <HomeOptions />
-      <Logo
-        secretProps={{
-          onPointerDown: beginHold,
-          onPointerUp: cancelHold,
-          onPointerLeave: cancelHold,
-          onPointerCancel: cancelHold,
-          onContextMenu: (e) => e.preventDefault(),
-        }}
-      />
+      {/* The top of the page: the buttons for grown-ups and the title – in the book look one row on a phone, the title
+          in the top left, and the animal families beside the title where there is room. */}
+      <div className="home-top">
+        <HomeOptions />
+        <BookFamily family="fox" />
+        <Logo
+          secretProps={{
+            onPointerDown: beginHold,
+            onPointerUp: cancelHold,
+            onPointerLeave: cancelHold,
+            onPointerCancel: cancelHold,
+            onContextMenu: (e) => e.preventDefault(),
+          }}
+        />
+        <BookFamily family="bear" />
+      </div>
       <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
         {/* The category cards stand on no frame: a group of their own only so the framed games keep together. */}
         <li className="mode-group mode-group-bare" style={grid.places?.[0]}>
