@@ -1,6 +1,7 @@
 import { useEffect, useState, type PointerEvent, type ReactNode } from "react";
 import { useLeaveGame } from "@/components/GameShell";
 import { useT } from "@/lib/language";
+import { turnPageWith } from "@/lib/look";
 import { countGame, gameEnded } from "@/lib/playtime";
 
 interface GameEndProps {
@@ -47,7 +48,8 @@ export function GameEnd({ onAgain, next, delayMs = 0, corners = false }: GameEnd
   const press = (action: () => void) => (e: PointerEvent) => {
     e.stopPropagation();
     countGame();
-    action();
+    // In the book look the next round comes on a new page.
+    turnPageWith("forward", action);
   };
 
   return (

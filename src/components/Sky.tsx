@@ -2,6 +2,7 @@ import { memo } from "react";
 import { useLocation } from "react-router";
 import { INDOOR, Sun, type WorldId, WorldGround, WorldWindow } from "@/components/Worlds";
 import { worldOf } from "@/content/games";
+import pictures from "./bilder/*.webp?glob";
 
 /**
  * The menus' backdrop: a sunny sky with drifting clouds over rolling hills. Purely decorative.
@@ -30,6 +31,13 @@ export const Sky = memo(function Sky() {
         </>
       )}
       {world && <WorldGround world={world} />}
+      {/*
+       * In the book look, where the page is wide enough to leave room beside the cards: Tapsi's family and the little
+       * bear's read together on the page's margins, so grown-ups see the book is to be read with the child.
+       * Lazy, so a screen that hides them never downloads them.
+       */}
+      <img className="book-family fox" src={pictures["buch-fuechse.webp"]} alt="" loading="lazy" decoding="async" />
+      <img className="book-family bear" src={pictures["buch-baeren.webp"]} alt="" loading="lazy" decoding="async" />
     </div>
   );
 });

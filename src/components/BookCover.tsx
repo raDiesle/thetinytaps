@@ -1,8 +1,14 @@
 import { useEffect, useState } from "react";
-import { Sun } from "@/components/Worlds";
 import { useT } from "@/lib/language";
 import { isBookLook } from "@/lib/look";
 import { playPageTurn, unlockAudio } from "@/lib/sfx";
+import pictures from "./bilder/*.webp?glob";
+
+/** The cover's picture: Tapsi's family and the little bear's, reading one book together (Gemini, `bilder/`). */
+const COVER = pictures["buch-cover.webp"];
+
+/** The leather corners of the cover. */
+const CORNERS = ["top-right", "bottom-right"] as const;
 
 /** Once opened, the cover stays open for the rest of the visit. */
 const OPENED_KEY = "tinytaps.book.opened";
@@ -62,16 +68,12 @@ export function BookCover() {
         <span className="book-first-page" />
         <span className="book-cover">
           <span className="book-cover-front">
-            <span className="book-cover-label">
-              <span className="book-cover-title">The Tiny Taps</span>
-              <svg className="book-cover-picture" viewBox="0 0 300 170">
-                <path className="book-cover-hill-back" d="M0 120 C60 80 120 80 170 110 C220 140 260 90 300 100 V170 H0 Z" />
-                <path className="book-cover-hill" d="M0 145 C70 115 140 125 190 140 C240 155 270 130 300 135 V170 H0 Z" />
-                <svg x="105" y="8" width="90" height="90" viewBox="0 0 200 200">
-                  <Sun />
-                </svg>
-              </svg>
-            </span>
+            <span className="book-cover-title">The Tiny Taps</span>
+            {/* The animal families of the games reading the book together: it is read by a grown-up and a child. */}
+            <span className="book-cover-label">{COVER && <img src={COVER} alt="" decoding="async" fetchPriority="high" />}</span>
+            {CORNERS.map((corner) => (
+              <span key={corner} className={`book-corner ${corner}`} />
+            ))}
             <span className="book-cover-hand">👆</span>
           </span>
           <span className="book-cover-back" />

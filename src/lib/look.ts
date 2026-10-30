@@ -5,7 +5,7 @@ import { playPageTurn } from "@/lib/sfx";
 
 /**
  * The app's look: „Buch“ (a picture book – a cover to open, paper pages, a page's edge round every game) or the
- * toy-block look it had before. A design concept to try out: `?buch` turns it on, `?buch=aus` off, and the choice is
+ * toy-block look it had before. The book is the default: `?buch=aus` turns it off, `?buch` on again, and the choice is
  * kept for the next visits. The look lives only in CSS (`data-look` on html, `src/styles/book.css`) and in the cover.
  */
 export type Look = "book" | "toy";
@@ -35,20 +35,34 @@ export function applyLook() {
 /** Whether the app looks like a book. */
 export const isBookLook = () => document.documentElement.dataset.look === "book";
 
+/** Which way a page turns: `forward` over to the left (on into a menu or a game), `back` from the left. */
+export type TurnDirection = "forward" | "back";
+
 /**
- * In the book look, a tap that leads to another menu turns the page: forward over to the left, or `back` from the
- * left. The sound comes at once; the turn is a view transition (`book.css`) round the navigation, started here since
- * the router's own `viewTransition` works only with a data router. Returns the click handler for such a link.
+ * Does `update` (a navigation, a game starting or ending) as the turn of a page in the book look: the sound comes at
+ * once, the turn is a view transition round the change (`book.css`). In the toy look, or where a browser can't turn
+ * pages, it just does it.
  */
-export function useTurnPage(to: string, direction: "forward" | "back") {
+export function turnPageWith(direction: TurnDirection, update: () => void) {
+  if (!isBookLook() || !document.startViewTransition) {
+    update();
+    return;
+  }
+  playPageTurn();
+  document.documentElement.dataset.turn = direction;
+  // A skipped turn (a hidden page, a second tap mid-turn) still makes the change; it only needs no error report.
+  document.startViewTransition(() => flushSync(update)).ready.catch(() => {});
+}
+
+/**
+ * The click handler of a link to another menu, which turns the page there in the book look (the router's own
+ * `viewTransition` works only with a data router). A click that opens a new tab is left alone.
+ */
+export function useTurnPage(to: string, direction: TurnDirection) {
   const navigate = useNavigate();
   return (e: MouseEvent) => {
-    if (!isBookLook()) return;
-    playPageTurn();
-    if (!document.startViewTransition || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (!isBookLook() || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
-    document.documentElement.dataset.turn = direction;
-    // A skipped turn (a hidden page, a second tap mid-turn) still navigates; it only needs no error report.
-    document.startViewTransition(() => flushSync(() => navigate(to))).ready.catch(() => {});
+    turnPageWith(direction, () => navigate(to));
   };
 }

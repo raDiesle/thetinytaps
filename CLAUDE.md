@@ -303,6 +303,17 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
+- **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
+  brings back the old toy-block look, `src/lib/look.ts`): a cover to open on the first visit to the home page
+  (`BookCover`, its picture of Tapsi's family and the little bear's in `src/components/bilder/`), the home page as the
+  contents page with page numbers, paper and softened colours, and the game's picture inside the page's paper margin
+  (`.book-frame`). All of it is CSS under `:root[data-look="book"]` in `src/styles/book.css`; games don't style for it.
+  Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
+  any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
+  one. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; ✕ and the fullscreen
+  button stay pale see-through discs there too. Pictures of animal parents with their children (the fox and bear
+  families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
+  card or button. Nothing idles: the sky's clouds and rays stand still in the book.
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
   home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
