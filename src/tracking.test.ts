@@ -20,3 +20,23 @@ test("no tracker but Cloudflare Web Analytics", () => {
   const files = [join(ROOT, "index.html"), ...sources(join(ROOT, "src")), ...sources(join(ROOT, "tools"))];
   for (const file of files) expect(readFileSync(file, "utf8").match(TRACKERS)?.[0], file).toBeUndefined();
 });
+
+// The Datenschutzerklärung (src/pages/LegalPage.tsx) must say what the site really does: each thing the app or the
+// build uses that sends or reads something about the visitor has to be named there.
+test("the Datenschutzerklärung names what the site uses", () => {
+  const privacy = readFileSync(join(ROOT, "src/pages/LegalPage.tsx"), "utf8");
+  const code = [join(ROOT, "index.html"), ...sources(join(ROOT, "src")), ...sources(join(ROOT, "tools"))]
+    .filter((file) => !file.endsWith("LegalPage.tsx"))
+    .map((file) => readFileSync(file, "utf8"))
+    .join("\n");
+  const uses: [RegExp, string][] = [
+    [/cloudflareinsights/, "Cloudflare Web Analytics"],
+    [/getUserMedia\(\{[^}]*audio/, "Mikrofon"],
+    [/getUserMedia\(\{[^}]*video|capture=/, "Kamera"],
+    [/geolocation\./, "Standort"],
+    [/speechSynthesis/, "Sprachausgabe"],
+    [/localStorage/, "Local Storage"],
+    [/serviceWorker/, "Service Worker"],
+  ];
+  for (const [use, named] of uses) if (use.test(code)) expect(privacy, `${use} is used, so the Datenschutzerklärung names „${named}“`).toContain(named);
+});

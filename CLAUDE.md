@@ -119,7 +119,7 @@ In a fresh worktree run `bun install` first.
   letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
-  in `base.css`) while pictures and layout stay as they are. Only the management page and the SEO pages stay German.
+  in `base.css`) while pictures and layout stay as they are. Only the management page, the SEO pages and Impressum and Datenschutz (German law) stay German.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games
@@ -350,6 +350,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
   repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
   cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
+- Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked next to the version
+  below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
+  stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung
+  and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work

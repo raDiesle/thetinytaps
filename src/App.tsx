@@ -20,6 +20,8 @@ const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage", 
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage", "/gefuehle/");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage", "/buchstaben/");
 const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage", "/laut-leise/");
+const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
+const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
 const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
 const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
@@ -61,6 +63,8 @@ export function App() {
         {/* Its old name and address, for bookmarks and the home screen. */}
         <Route path="aufzug" element={<Navigate to="/kleine-abenteuer/" replace />} />
         <Route path="abenteuer" element={<AdventurePage />} />
+        <Route path="impressum" element={<ImprintPage />} />
+        <Route path="datenschutz" element={<PrivacyPage />} />
         <Route path="management" element={<ManagementPage />} />
         {/* Its old name and address, for bookmarks. */}
         <Route path="ideen" element={<Navigate to="/management/" replace />} />

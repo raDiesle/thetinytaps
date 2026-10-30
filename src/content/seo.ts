@@ -172,8 +172,8 @@ export const SEO_PAGES: PageSeo[] = [
   scene("ostern", "Ostern", "Osterhase, Lämmchen und Kirschbaum"),
 ];
 
-/** Addresses that must never be in a search result (for grown-ups only). */
-export const NO_INDEX_PATHS = ["/management/", "/ideen/"];
+/** Addresses that must never be in a search result (for grown-ups only; the Impressum names a private address). */
+export const NO_INDEX_PATHS = ["/management/", "/ideen/", "/impressum/", "/datenschutz/"];
 
 /** The entry for an address (with or without the trailing slash), if it has one. */
 export function seoFor(pathname: string): PageSeo | undefined {
