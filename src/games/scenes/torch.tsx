@@ -1,6 +1,6 @@
 import type { Ref } from "react";
 import "./torch.css";
-import { placeBox, type SceneItem } from "./types";
+import { itemsNear, type SceneItem } from "./types";
 
 // Torch mode ("Taschenlampe", idea B-17): the picture is night, and a round light shines where the finger, the mouse or
 // the arrow keys are. What comes into the light wakes up and moves; nothing is asked, so every move shows something.
@@ -15,16 +15,7 @@ export const TORCH_STEP = 0.07;
 const WAKE_REACH = 0.55;
 
 /** The items the light at (x, y) with radius `r` (picture units) shines on: those with a tap area near its middle. */
-export function litItems(items: readonly SceneItem[], x: number, y: number, r: number) {
-  return items.filter((item) =>
-    (item.hitAreas ?? [item.box]).some((area) => {
-      const [bx, by, w, h] = placeBox(area, item.place);
-      const dx = Math.max(bx - x, 0, x - (bx + w));
-      const dy = Math.max(by - y, 0, y - (by + h));
-      return Math.hypot(dx, dy) < r * WAKE_REACH;
-    }),
-  );
-}
+export const litItems = (items: readonly SceneItem[], x: number, y: number, r: number) => itemsNear(items, x, y, r * WAKE_REACH);
 
 /**
  * The night over the whole picture with the hole of the light in it: an HTML layer of its own above the svg, so

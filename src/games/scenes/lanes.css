@@ -1,0 +1,117 @@
+/* "Straße malen" (LaneLayer.tsx): roads and vehicles over the picture, a layer of its own. Taps go through it,
+   except on the vehicles. */
+.lane-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.lane-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lane-road path,
+.lane-layer mask path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The car's road: asphalt with a pale kerb and a dashed middle line. */
+.lane-asphalt .lane-edge {
+  stroke: #e9e4d4;
+  stroke-width: 62;
+}
+
+.lane-asphalt .lane-top {
+  stroke: #6c6f7d;
+  stroke-width: 50;
+}
+
+.lane-asphalt .lane-mark {
+  stroke: #fff;
+  stroke-width: 5;
+  stroke-dasharray: 20 18;
+  stroke-linecap: butt;
+}
+
+/* The tractor's road: a dirt track with two ruts. */
+.lane-track .lane-edge {
+  stroke: #8b5e34;
+  stroke-width: 58;
+}
+
+.lane-track .lane-top {
+  stroke: #c08552;
+  stroke-width: 46;
+}
+
+.lane-track .lane-mark {
+  stroke: #a0703f;
+  stroke-width: 6;
+  stroke-dasharray: 3 16;
+}
+
+/* The train's road: rails on wooden sleepers on a gravel bed. */
+.lane-rails .lane-bed {
+  stroke: #b8b0a2;
+  stroke-width: 54;
+}
+
+.lane-rails .lane-sleepers {
+  stroke: #7f5539;
+  stroke-width: 46;
+  stroke-dasharray: 9 11;
+  stroke-linecap: butt;
+}
+
+.lane-rails .lane-rail {
+  stroke: #6c757d;
+  stroke-width: 34;
+}
+
+.lane-vehicle {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.lane-art :is(path, rect, circle) {
+  stroke: var(--ink);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.lane-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Wheels turn only while driving, so a waiting vehicle is still. */
+.lane-driving .lane-wheel {
+  animation: lane-roll 0.45s linear infinite;
+}
+
+@keyframes lane-roll {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* Honking: the vehicle hops twice. */
+.lane-honk {
+  animation: lane-honk 0.7s ease-out;
+}
+
+@keyframes lane-honk {
+  20%,
+  60% {
+    transform: translateY(-22px);
+  }
+  40%,
+  80% {
+    transform: translateY(0);
+  }
+}

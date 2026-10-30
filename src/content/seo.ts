@@ -57,7 +57,7 @@ export const SEO_PAGES: PageSeo[] = [
     path: "/bilder/",
     title: "Lebendige Wimmelbilder zum Antippen für Kinder",
     description: "Über 20 Wimmelbilder für Kleinkinder: Baustelle, Bauernhof, Zoo, Feuerwache und mehr. Alles bewegt sich und macht Geräusche – ohne Werbung.",
-    text: "Wimmelbilder, die lebendig werden: Bagger baggern, Kühe muhen, das Feuerwehrauto fährt los. Mit Suchen, Ausmalen und Entdecken, für Kinder ab 2 Jahren.",
+    text: "Wimmelbilder, die lebendig werden: Bagger baggern, Kühe muhen, das Feuerwehrauto fährt los. Mit Suchen, Ausmalen, Straßen malen und Entdecken, für Kinder ab 2 Jahren.",
   },
   {
     path: "/abenteuer/",

@@ -5,8 +5,27 @@ Routes `/bilder/` (menu) and `/bilder/<id>/`. The menu has the mode as a choice 
 no „Über das Spiel“ and no „Einstellungen“ (`GameShell` with `startMode` and `leaveTo`), and ✕, Esc and „Menü“ go
 back to `/bilder/`.
 
-Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Taschenlampe" in `torch.tsx` (idea B-17: the picture lies under a night layer, an HTML div above the svg whose radial gradient leaves a round light where the mouse hovers, a finger slides or taps and the arrow keys push it; any other key takes the light to some item; no key badges and no ⌨️ there; what comes into the light wakes up – moves, sounds, speaks and is counted – and at the party the night fades away, while a bedtime picture stays dark; a tap still starts the tapped item itself); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
+Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Taschenlampe" in `torch.tsx` (idea B-17: the picture lies under a night layer, an HTML div above the svg whose radial gradient leaves a round light where the mouse hovers, a finger slides or taps and the arrow keys push it; any other key takes the light to some item; no key badges and no ⌨️ there; what comes into the light wakes up – moves, sounds, speaks and is counted – and at the party the night fades away, while a bedtime picture stays dark; a tap still starts the tapped item itself); "Straße malen" (see below); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
 badges in the picture; ⌨️ in the bottom left corner switches it off and on, kept for the next pictures); vehicles that drive into another picture in `roads.ts` – every second tap sends the fire engine, the tractor, the bus or the dump truck off, a sign at the edge follows it, and in the other picture the same drawing drives in and parks as a guest) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`, `kueche/`, `supermarkt/`, `flughafen/`, `winterbaustelle/` (reuses the Baustelle drawings with snow on top), `kita/`, `kinderarzt/`, `strand/`, `dinotal/`, `gutenacht/` (bedtime picture: `bedtime` on the scene makes every tapped thing fall asleep, and when all sleep the room goes dark instead of the party), and the season pictures `winter/`, `herbst/`, `ostern/`; every tap on the background brings something to life in `spots.tsx` (a thing of the background wrapped in `<Poke>` sways, wobbles, hops or glows; anywhere else the scene's `spots` say what comes out there – a gust of wind in the sky that bends the trees and blows the clouds along, a beetle crawling out of the floor tiles, a spider on the wall, a flower and butterfly from the meadow, a fish jumping out of the water; no speech, so nothing to translate); hidden surprises in `hideout.tsx` (an item with `hideout` draws a `<Hideout>` behind its door, lid or sand pile, and on every tap another animal or present peeks out); shared depth helpers (`onFloor` for rooms), drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx`; leaves and snow on the ground and in the air for outdoor pictures in `weather.tsx`.
+
+## Straße malen (idea N-43)
+
+Mode `road`, „🛣️ Straßen“ in the row. A line drawn with a finger or the mouse becomes a road, and a car, a tractor or a
+steam engine drives exactly along it, through bends and loops; at its end it honks, hops and waits. What it drives past
+wakes up like in the torch's light (moves, sounds, speaks, is counted), so the picture ends with the usual party.
+- `lanes.ts`: the numbers and geometry (points, pose along the road, the smooth path, the vehicle's turn and mirror so it
+  never drives upside down, the bend a key draws); `lanes.test.ts` checks them. `LaneLayer.tsx`: the roads, the three
+  vehicles, the pointer handling and the frame loop; `lanes.css` (classes `lane-`).
+- The layer is an HTML div of its own above the picture's svg (same viewBox), so a moving vehicle never repaints the
+  picture. It reads pointers on the picture without stopping them: a tap still does what it does in „Freies Entdecken“,
+  and only a line longer than `MIN_LANE` becomes a road (it appears once that long, and its vehicle follows the finger).
+- Each kind has its own road: the car asphalt with a dashed line, the tractor a dirt track, the train rails on sleepers.
+  A road begun near a waiting vehicle is that vehicle's next one; elsewhere the next kind in turn comes, and with all
+  three out, the one that has had its road longest jumps to it. At most `MAX_LANES` roads stay.
+- A tap on a waiting vehicle honks. Keys work as in „Freies Entdecken“ and also draw a road from the last waiting vehicle
+  (or the bottom middle) to the key's item (`LaneControl.driveTo`).
+- Everything is still once the vehicles wait: wheels turn only while driving, and the frame loop stops.
+- Its prompt (`roadPrompts` in `phrases.ts`) is German only; other languages show the usual prompt.
 
 ## Working on scenes
 
@@ -15,7 +34,9 @@ badges in the picture; ⌨️ in the bottom left corner switches it off and on, 
 - `scenes.test.ts` checks every picture's data (unique ids, articles, tap sizes, chains, keys,
   plural grammar in questions, roads). `bun test` after every change to items.
 - The mode labels for the row on `/bilder/` are `SCENE_MODES` in `settings.ts`, so their languages count for this game in
-  `languageStatus.ts`; a new mode comes with its label in German only and a part marking the gap there.
+  `languageStatus.ts`; a new mode comes with its label in German only and a part marking the gap there. Keep labels
+  short: all modes must fit in one row on a phone on its side (844 × 390), or the row wraps and pushes the pictures down
+  („Straße malen“ is „🛣️ Straßen“ there for this). Check the row there after adding a mode.
 - `ScenePlay.tsx` is the engine and is shared by every picture (sounds in `sounds.ts`, the marks drawn over a picture in `marks.tsx`): keep scene-specific things in the
   scene's folder and its CSS, and prefix CSS classes and SVG ids by the scene (CSS is global).
 - Music is the background song of all games (`src/lib/backgroundMusic.ts`, played once for the whole app by

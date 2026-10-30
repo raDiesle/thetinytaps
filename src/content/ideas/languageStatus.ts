@@ -65,6 +65,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done" },
         note: "Nur der Name der Spielart im Menü (SCENE_MODES in settings.ts) ist neu; das Spiel selbst sagt nur, was die Bilder schon sagen.",
       },
+      {
+        label: "🛣️ Straße malen",
+        languages: { de: "done" },
+        note: "Neu sind nur der Name der Spielart (SCENE_MODES) und der Hinweis „Mal eine Straße!“ (roadPrompts in phrases.ts); sonst sprechen nur die Bilder.",
+      },
     ],
   },
   {

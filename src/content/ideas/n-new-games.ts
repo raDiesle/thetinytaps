@@ -361,6 +361,7 @@ export const newGamesIdeas: IdeaArea = {
       text: "Mit dem Finger eine Straße auf eine Wiese malen; ein Auto, Traktor oder Zug fährt genau darauf entlang, auch durch Kurven und Schleifen. Am Ende der Linie hupt es und wartet auf die nächste.",
       why: "Malen bekommt eine Wirkung; Fahrzeuge sind ein Dauerbrenner.",
       effort: "M",
+      done: true,
     },
     {
       id: "N-44",
