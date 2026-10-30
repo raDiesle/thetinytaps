@@ -6,6 +6,7 @@ import { KINDS, MARKS, REWARDS, TASKS, THEMES } from "./catalog";
 import { SlotChips } from "./Editor";
 import { Thumb } from "./Gallery";
 import { Pick } from "./pageParts";
+import { ItemPic, MarkPic, Pic, picture } from "./pictures";
 import type { WizardStep } from "./Wizard";
 
 /** A board's own steps in the wizard, after the kind and the Vorlage. */
@@ -66,7 +67,10 @@ export function BoardStep({ step, board, onChange }: { step: string; board: Boar
             {board.tasks.map((task) => (
               <li key={task.id}>
                 <span className="rw-wizard-task">
-                  <span aria-hidden>{task.emoji}</span> {taskLabel(task) || t({ de: "Eigene Aufgabe" })}
+                  <span aria-hidden>
+                    <ItemPic item={task} />
+                  </span>{" "}
+                  {taskLabel(task) || t({ de: "Eigene Aufgabe" })}
                 </span>
                 <SlotChips task={task} onChange={(patch) => setTask(task.id, patch)} />
               </li>
@@ -82,7 +86,7 @@ export function BoardStep({ step, board, onChange }: { step: string; board: Boar
                 selected={on}
                 disabled={!on && board.tasks.length >= MAX_TASKS}
                 onClick={() => toggleTask(task.id)}
-                emoji={task.emoji}
+                emoji={<ItemPic item={{ emoji: task.emoji, catalog: task.id }} />}
                 label={t(task.label)}
               />
             );
@@ -101,13 +105,18 @@ export function BoardStep({ step, board, onChange }: { step: string; board: Boar
       <>
         <h2>{t({ de: "Worauf freut ihr euch?" })}</h2>
         <div className="rw-picks rw-picks-tiles" role="group" aria-label={t({ de: "Belohnung" })}>
-          <Pick selected={!board.reward} onClick={() => change({ reward: null })} emoji="🎉" label={t({ de: "Nur zusammen freuen" })} />
+          <Pick
+            selected={!board.reward}
+            onClick={() => change({ reward: null })}
+            emoji={<Pic src={picture("fest")} emoji="🎉" />}
+            label={t({ de: "Nur zusammen freuen" })}
+          />
           {REWARDS.map((reward) => (
             <Pick
               key={reward.id}
               selected={board.reward?.catalog === reward.id}
               onClick={() => change({ reward: rewardFromCatalog(reward.id) })}
-              emoji={reward.emoji}
+              emoji={<ItemPic item={{ emoji: reward.emoji, catalog: reward.id }} kind="reward" />}
               label={t(reward.label)}
             />
           ))}
@@ -158,7 +167,13 @@ export function BoardStep({ step, board, onChange }: { step: string; board: Boar
       <h3 className="rw-wizard-sub">{t({ de: "Was kommt ins Feld?" })}</h3>
       <div className="rw-picks rw-picks-tiles" role="group" aria-label={t({ de: "Was kommt ins Feld?" })}>
         {MARKS.map((mark) => (
-          <Pick key={mark.id} selected={mark.id === board.mark} onClick={() => change({ mark: mark.id })} emoji={mark.emoji} label={t(mark.label)} />
+          <Pick
+            key={mark.id}
+            selected={mark.id === board.mark}
+            onClick={() => change({ mark: mark.id })}
+            emoji={<MarkPic mark={mark} />}
+            label={t(mark.label)}
+          />
         ))}
       </div>
       <h3 className="rw-wizard-sub">{t({ de: "Farben" })}</h3>

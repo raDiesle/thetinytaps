@@ -1,4 +1,5 @@
 import { useT } from "@/lib/language";
+import { picture } from "./pictures";
 
 // „ℹ️ Über …“ for grown-ups: what the board or the plan shown is for and how it is used.
 
@@ -7,6 +8,7 @@ export function BoardInfo() {
   const t = useT();
   return (
     <section className="settings game-info">
+      <img className="rw-info-picture" src={picture("stern-halten")} alt="" />
       <p>
         {t({
           de: "Eine Tafel, auf der Ihr Kind Sterne sammelt – auf dem Bildschirm und, genau gleich, zum Ausdrucken. Oben wechseln Sie die Ansicht: Tag (die Aufgaben von heute als große Bilder), Woche (Aufgaben × Tage) oder Monat (ein Kalender) – alle drei zeigen dieselben Sterne; mit ‹ geht es zu früheren Tagen, Wochen oder Monaten, um einen vergessenen Stern nachzutragen. Unter „Rückblick“ blättern Sie mit Ihrem Kind durch die letzten Wochen und schauen zusammen, was schon geklappt hat. „Sammeln“ ist ein Weg bis zur Belohnung, ohne Tage. Die Vorlagen zeigen mit Beispiel-Sternen, wie eine Tafel in Benutzung aussieht; „＋ Neu“ führt Schritt für Schritt und in Bildern zu einer eigenen, z. B. eine pro Kind – oder zu einem Tagesplan, der oben in derselben Reihe steht. Unter „Gestalten“ ändern Sie später alles.",

@@ -8,6 +8,7 @@ import { type RoutineVisit, waitForStep } from "@/lib/routine";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
+import { Pic, picture } from "./pictures";
 import { currentStep, exampleTicks, gameOf, nightsUntil, type Plan, restartDay, routineStep, stepDone, stepsOn } from "./plan";
 import { PLAN_SCREEN, PlanSheet, type StepState, useStepLabel } from "./PlanSheet";
 
@@ -290,7 +291,7 @@ export function PlanScreen({
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(null)}>
           <span className="rw-party-emoji" aria-hidden>
-            {party}
+            <Pic src={picture("fest")} emoji={party} />
           </span>
           <span className="rw-party-text">{t({ de: "Alles geschafft!" })}</span>
         </button>

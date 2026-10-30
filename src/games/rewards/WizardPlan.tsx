@@ -3,6 +3,7 @@ import { useT } from "@/lib/language";
 import { weekday } from "./board";
 import { ACTIVITIES, PLAN_VIEWS, TASKS, THEMES } from "./catalog";
 import { Pick } from "./pageParts";
+import { ItemPic } from "./pictures";
 import { MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, withSame, withSteps } from "./plan";
 import { PlanThumb } from "./PlanGallery";
 import { useStepLabel } from "./PlanSheet";
@@ -93,7 +94,7 @@ export function PlanStepView({ step, plan, onChange }: { step: string; plan: Pla
                     {i + 1}
                   </span>
                   <span className="rw-pick-emoji" aria-hidden>
-                    {s.emoji}
+                    <ItemPic item={s} />
                   </span>
                   <span className="rw-wizard-card-label">{stepLabel(s)}</span>
                 </span>
@@ -123,7 +124,7 @@ export function PlanStepView({ step, plan, onChange }: { step: string; plan: Pla
                 selected={on}
                 disabled={!on && steps.length >= MAX_STEPS}
                 onClick={() => toggle(item.id)}
-                emoji={item.emoji}
+                emoji={<ItemPic item={{ emoji: item.emoji, catalog: item.id }} />}
                 label={t(item.label)}
               />
             );

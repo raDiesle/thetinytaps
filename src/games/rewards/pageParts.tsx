@@ -43,8 +43,8 @@ export function Pick({
   onClick: () => void;
   /** A small picture of the board or plan as it would be (`Thumb`, `PlanThumb`). */
   picture?: ReactNode;
-  /** Without a picture: a big emoji. */
-  emoji?: string;
+  /** Without a picture: a big emoji, or the catalogue's picture in its place (`ItemPic`). */
+  emoji?: ReactNode;
   label: string;
   hint?: string;
   disabled?: boolean;

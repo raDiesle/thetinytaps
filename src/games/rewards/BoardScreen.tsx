@@ -7,6 +7,7 @@ import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type Board, dayFull, exampleStars, type LinkedDays, parseCellKey, progress, type StarLog, takeBackStar } from "./board";
 import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { MARK_BY_ID, MARKS } from "./catalog";
+import { ItemPic, MarkPic, Pic, picture } from "./pictures";
 
 /** How long a grown-up holds a field before its star comes. */
 export const HOLD_MS = 700;
@@ -296,7 +297,7 @@ export function BoardScreen({
             aria-label={t({ de: "Stern" })}
             onPointerDown={fly}
           >
-            {mark.emoji}
+            <MarkPic mark={mark} />
           </button>
           <button type="button" className="rw-pending-cancel" aria-label={t({ de: "Doch keinen Stern" })} onClick={() => setPending(null)}>
             ✕
@@ -306,7 +307,7 @@ export function BoardScreen({
       {party && (
         <button type="button" className="rw-party" onClick={() => setParty(false)}>
           <span className="rw-party-emoji" aria-hidden>
-            {board.reward?.emoji ?? "🎉"}
+            {board.reward ? <ItemPic item={board.reward} kind="reward" /> : <Pic src={picture("fest")} emoji="🎉" />}
           </span>
           <span className="rw-party-text">{board.reward ? rewardLabel(board.reward) : t({ de: "Geschafft!" })}</span>
         </button>

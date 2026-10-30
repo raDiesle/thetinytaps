@@ -3,6 +3,7 @@ import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { useT } from "@/lib/language";
 import { newId, weekday } from "./board";
 import { ACTIVITIES, SLOTS, STEP_BY_ID, TASKS, THEMES } from "./catalog";
+import { ItemPic } from "./pictures";
 import { MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, stepsOn, withSame, withSteps } from "./plan";
 import { usePlanTitle, useStepLabel } from "./PlanSheet";
 
@@ -192,7 +193,7 @@ export function PlanEditor({
         <div className="rw-chips" role="group" aria-label={t({ de: "Schritt hinzufügen" })}>
           {OFFERED.map((item) => (
             <button key={item.id} type="button" disabled={steps.length >= MAX_STEPS} onClick={() => add(stepFromCatalog(item.id))}>
-              ＋ {item.emoji} {t(item.label)}
+              ＋ <ItemPic item={{ emoji: item.emoji, catalog: item.id }} /> {t(item.label)}
             </button>
           ))}
           <button type="button" disabled={steps.length >= MAX_STEPS} onClick={() => add({ id: newId(), emoji: "⭐", label: "" })}>

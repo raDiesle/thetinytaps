@@ -1,9 +1,9 @@
 import type { Localized } from "@/lib/language";
 
 // What grown-ups pick from when they make a board: tasks, rewards, the mark that
-// goes into a field, colours and ready-made boards. Emoji for now; every task and
-// reward has a picture prompt in bilder/prompts.ts, so generated pictures can
-// replace the emoji later (checked in rewards.test.ts).
+// goes into a field, colours and ready-made boards. Each has an emoji, and a picture
+// made from its prompt in bilder/prompts.ts that shows in its place (pictures.tsx,
+// checked in rewards.test.ts).
 
 /** A game whose own end puts a star on the board by itself. */
 export type LinkedGame = "teeth" | "potty";

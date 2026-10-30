@@ -445,3 +445,9 @@
 .rw-grey :is(.pl-emoji) {
   filter: grayscale(1) contrast(1.15);
 }
+
+/* A plan's picture fills more of its card than the emoji did. */
+.pl-card:not(.small) .pl-emoji .rw-pic {
+  width: 1.3em;
+  height: 1.3em;
+}
