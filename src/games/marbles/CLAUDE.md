@@ -27,8 +27,12 @@ Everything in a machine is a function of the seconds since the tap; in developme
 
 Kettenreaktion follows the app language (home page): start screen, the level names and every spoken line.
 - Level names and first lines live in `content.ts` (`LEVEL_TEXTS`), used by the mode cards, the „Weiter“ button and each
-  picture's `aria-label` (`useLevelName`). The start screen has only the level cards: no „Über das Spiel“ and no „Einstellungen“ (removed October 2026 – the game
+  picture's `aria-label` (`useLevelName`). The start screen has only the level cards and the row above them: no „Über das Spiel“ and no „Einstellungen“ (removed October 2026 – the game
   explains itself by playing, and the shelf and the 🔧 spots are always on). Don't add either back.
+- The row above the cards holds one choice for the whole game, „Schranke und Weiche“: „👆 Kind tippt“ (default) or
+  „🔄 Von selbst“ (`MarbleSettings.play`, passed to every level as `LevelProps.watch`). With „Von selbst“ nothing waits
+  for the child's tap. So far only the marble run uses it (barrier up, switch flips by itself); a level that gets
+  something else that waits for a tap should follow it too. Its texts are German only so far (`languageStatus.ts`).
 - `say` (in `LevelProps`) and a machine event's `say` take a `Localized` line, `{ de, en, zh, hi, es, ar, ru }`, written next to its moment;
   `MarblePlay` speaks it through `spokenIn`: the app language with its voice, or the German line with the German voice where a translation is missing. Never pass a bare German string.
 - Text drawn in a picture (the „START!“/„ПУСК!“/„发射！“ on the rocket's board) uses `useT()`; in files where `t` is the time,
@@ -72,8 +76,9 @@ stand still, so nothing moves before the child acts.
 Level `track` (`TrackLevel.tsx`, `track.ts`). Ideas N-34, X-08, K-19 (more in the K area of the ideas page).
 
 A wooden marble run down a wall 1600 × 2250 (`TRACK_W`/`TRACK_H`, two and a half screens). One tap or key opens the hopper,
-and six marbles come out one after the other. Each rolls over a xylophone, through six spots (bell, funnel, paddle wheel,
-trampoline, bell, funnel by default), rides the seesaw, goes through the tunnel, zigzags down past bumpers, loops the loop,
+and six marbles come out one after the other. Each rolls over a xylophone, through six spots (bell, paddle wheel, funnel,
+trampoline, bell, funnel by default), waits at the barrier, rides the seesaw, goes through the tunnel, takes the switch's way
+(zigzag down past bumpers, or the left way over its own xylophone), loops the loop,
 hops over three drums, knocks five chimes and plays a whole scale on the second xylophone before it drops into the basket.
 A full basket raises the flag and ends the level („Nochmal“ / „Weiter“; any key goes on). A first marble takes about 21 s, the
 whole round about 35 s. Tapping a spot swaps its part (bell, trampoline, funnel, paddle wheel), always.
@@ -92,6 +97,22 @@ only the things let out since, not the ones further down. Each rolls its own way
 the same route: the tennis ball hops along the rows, the iron ball is slow with deep notes and thumps, the apple bumps, the
 soap bubble floats at an even speed and bursts above the basket instead of landing (so it doesn't fill it).
 
+„Schranke und Stau“ (K-02): on row 2, just before the funnel (the default build keeps the funnel in the spot after it),
+a red-and-white arm hangs from a round red sign down onto the rail (`GATE`, `Gate`). Whatever rolls up to it stops, „klick“,
+and the next one stops behind the last (`waitAtGate`); waiting things fidget and the camera stays up with them and the
+shelf, so the child can let out more and see the row grow. While things wait, a sunny glow marks the sign, and until the
+barrier has first been lifted a still 👉 points at it. A tap on it (or Enter / ↓): „Achtung, fertig – los!“ – three rising
+notes while the arm swings up, then the sign turns green, the bell dings and everything rushes off together into the funnel
+(`stepGate`); a little later, once none is under it, the arm comes down again. Should the row ever reach back to the turn
+above, the barrier lifts by itself. With „Von selbst“ it stays up, and a tap only wobbles it.
+
+„Weichen umlegen“ (K-01): at the end of row 3 a switch (`SWITCH`, `Switch`): a yellow flap on a hinge and a thick lever with a
+red knob that leans the way the marble will go. Lifted, the marble rolls on into the zigzag down the right edge; hanging
+down, it knocks against the flap and drops onto the left way (`LEFT1` with four bars of its own, the left wall, `LEFT2`, and
+against the zigzag's wall from the other side), and both ways meet on row 4 at `JOIN`. A tap on the switch flips it, „klack“
+(← and → set it); a marble takes the way the switch is set to when it gets there, so flipping it while one rolls up
+changes where it goes. With „Von selbst“ it flips by itself after each marble.
+
 Joining in on the way: a tapped thing hops with a twirl and rolls on faster (K-03; without the shelf, after the hopper is
 open, a key hops all rolling marbles, or plays the next bar when none rolls). The bars, seesaw, drums, chimes, looping and
 basket react to a tap without a marble, as do bell, trampoline, funnel and wheel when the spots can't be swapped; a tap on
@@ -99,15 +120,21 @@ the tunnel lets an animal look out, and the bare wall sparkles where it is tappe
 wall doesn't also take the next thing or sparkle. In the middle of the tunnel (the `tunnel` event) every marble changes, in
 turn from a random start: another colour, stripes, dots, a golden star, or an animal looks out (K-06; `Ball` in `parts.tsx`
 takes a `look`); other things keep their look and an animal looks out for them.
-- `track.ts`: all the numbers. The route comes in sections – a fixed stretch before every spot, one section per part and
-  spot, and the stretch to the basket – so a marble takes whatever part is in a spot when it gets there. `TURNS` are the walls
-  the marble bounces off to change direction. `track.test.ts` checks that sections join up, nothing leaves the wall and spot
-  boards don't overlap: run it after moving anything.
+- `track.ts`: all the numbers. The route comes in sections (`Routes.sections`) – fixed stretches, one per spot with a way
+  for every part, and one for the switch with a way for each side – so a marble takes whatever part is in a spot, and the way
+  the switch is set to, when it gets there. `TURNS` are the walls the marble bounces off to change direction (`bottom` ends a
+  wall above a row that passes under it). `track.test.ts` checks that every way through a section joins every way through
+  the next, nothing leaves the wall, spot boards don't overlap, the lifted flap is clear of the right way, and the barrier
+  has room for a long row: run it after moving anything.
 - `TrackLevel.tsx`: the marbles (rolling downhill with gravity and friction, fixed speed on wheel, funnel, seesaw and loop),
   the drawing, and the camera. The camera follows the marbles down: on a tall screen it shows more of the wall (up to all of
   it), before the tap the hopper, after the last marble the basket.
 - The camera may go `TOP_ROOM` above the wall's top, so the shelf and the hopper sit clear of the top edge and the ✕.
   Never put what the child taps right at the wall's top edge: on a phone on its side the picture is cut there.
+- The camera never follows what waits for the child's tap (marbles at the barrier): it stays where the child can see
+  both that thing and what it taps, or it runs off and leaves the child looking at a waiting picture it can't reach.
+- A pointing hand or glow added for a new tap target sits beside it, not over another part (the bars, a spot): check it
+  next to its neighbours in the preview, a 👇 above the barrier once covered row 1's xylophone.
 - `track.css`: its styles (classes `run-`). While it is on, the background music is off (the run
   plays its own notes and scales).
 - Shared with the machines: `path.ts` (line, quad, arc), `parts.tsx` (Ball, Rail, BAR_COLORS) and `level.ts` (useFrames,

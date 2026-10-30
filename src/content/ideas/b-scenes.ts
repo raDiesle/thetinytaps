@@ -155,6 +155,7 @@ export const scenesIdeas: IdeaArea = {
       text: "Die Szene ist Nacht und dunkel; wo der Finger (oder die Maus) ist, leuchtet ein runder Lichtkegel. Was im Licht liegt, wacht auf und winkt. Tastatur: Pfeiltasten schieben das Licht.",
       why: "Suchen ohne Frage und ohne Falsch – jede Bewegung zeigt etwas Neues.",
       effort: "M",
+      done: true,
     },
     {
       id: "B-18",

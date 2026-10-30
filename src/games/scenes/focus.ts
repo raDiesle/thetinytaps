@@ -10,7 +10,7 @@ export const ARROWS: Record<string, [number, number]> = {
 };
 
 /** Middle of the item's main tap area in the picture: what the child sees as "the item". */
-function centre(item: SceneItem): [number, number] {
+export function centre(item: SceneItem): [number, number] {
   const [x, y, w, h] = placeBox(item.hitAreas?.[0] ?? item.box, item.place);
   return [x + w / 2, y + h / 2];
 }

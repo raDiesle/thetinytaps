@@ -57,8 +57,15 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/bilder/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Viele Namen und Sätze je Bild; jede Sprache in <Sprache>.ts jeder Szene (ru.ts, en.ts …), Satzbau in phrases.ts.",
+    parts: [
+      { label: "🖼️ Bilder und Spielarten", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🔦 Taschenlampe",
+        languages: { de: "done" },
+        note: "Nur der Name der Spielart im Menü (SCENE_MODES in settings.ts) ist neu; das Spiel selbst sagt nur, was die Bilder schon sagen.",
+      },
+    ],
   },
   {
     href: "/abenteuer/",
@@ -92,6 +99,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         label: "☃️ Schneebahn, 🪐 Weltraumbahn, 🛟 Wasserrutsche, 🏗️ Baustellen-Bahn",
         languages: { de: "done" },
         note: "Name, erster Satz und der Satz am Ende jeder Bahn (Oktober 2026) gibt es nur auf Deutsch; die Teile, die sie mit der Holzbahn teilen, sprechen alle Sprachen.",
+      },
+      {
+        label: "🚧 Schranke und Weiche der Kugelbahn",
+        languages: { de: "done" },
+        note: "Die Wahl „Schranke und Weiche: 👆 Kind tippt / 🔄 Von selbst“ und der Satz „Achtung, fertig – los!“ (K-01, K-02, Oktober 2026) gibt es nur auf Deutsch.",
       },
     ],
   },
