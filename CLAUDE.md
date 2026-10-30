@@ -135,6 +135,13 @@ In a fresh worktree run `bun install` first.
   own (its own svg in a `div` with `will-change: transform`), never a moved group inside one big svg, which the browser
   paints whole again in every frame; and a big still drawing is built once (`useMemo`, `memo`), not again with every
   tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this).
+- **The app's animal is the fox** (the site is toddlerfox.com, Tapsi is a fox; user decision, October 2026): new pictures
+  and games take foxes in wherever they fit – fox grown-ups instead of drawn people (the baker, the doctor, the driver),
+  a fox child peeking out of the background, Tapsi cheering at the end – and the book's readers are foxes only (no
+  bears). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Existing games
+  are turned over step by step from the table „🦊 Füchse“ on `/management/` (`src/content/ideas/foxStatus.ts`, area D):
+  a game that gets its foxes marks it there in the same commit, and a new game or picture adds its row or task.
+  Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
@@ -319,8 +326,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
   drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
   open page lies on the book's cloth-covered board, lit from above. The cover's picture (`bilder/buch-cover.webp`) shows
-  one family of each: a fox parent with a fox child and a bear parent with a bear child, one of the children a boy and
-  one a girl – never a third grown-up or a child too many (user feedback, October 2026).
+  one fox family reading a book together – no other animal family, never a third grown-up or a child too many (user
+  feedback, October 2026; the picture with the bears still waits for its new one, D-14).
   Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
   any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
   one. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
@@ -333,8 +340,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
   that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
   of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
-  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of animal parents with their children (the fox and bear
-  families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
+  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of foxes reading with their children beside the menu's
+  cards – a fox parent with its child, and grandma or grandpa fox laughing with the child over the book, never bears
+  (D-15; the bears still stand there until that picture is made) – show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
