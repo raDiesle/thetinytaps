@@ -38,6 +38,22 @@ export const LEVEL_TEXTS: Record<MarbleLevel, { name: Localized; intro: Localize
       ru: "Нажми — и шарики покатятся!",
     },
   },
+  snowtrack: {
+    name: { de: "Schneebahn" },
+    intro: { de: "Tipp! Dann rollen die Schneebälle und werden immer größer." },
+  },
+  spacetrack: {
+    name: { de: "Weltraumbahn" },
+    intro: { de: "Tipp! Dann rollen die Planeten zum Mond." },
+  },
+  slidetrack: {
+    name: { de: "Wasserrutsche" },
+    intro: { de: "Tipp! Dann geht es die Wasserrutsche hinunter." },
+  },
+  sitetrack: {
+    name: { de: "Baustellen-Bahn" },
+    intro: { de: "Tipp! Dann rollt alles über die Förderbänder." },
+  },
   machine: {
     name: { de: "Große Maschine", en: "Big Machine", zh: "大机器", hi: "बड़ी मशीन", es: "La gran máquina", ar: "الآلة الكبيرة", ru: "Большая машина" },
     intro: {

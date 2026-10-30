@@ -81,7 +81,20 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
   },
-  { href: "/kettenreaktion/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/kettenreaktion/",
+    parts: [
+      {
+        label: "🎢 Klingende Kugelbahn und die Maschinen",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "☃️ Schneebahn, 🪐 Weltraumbahn, 🛟 Wasserrutsche, 🏗️ Baustellen-Bahn",
+        languages: { de: "done" },
+        note: "Name, erster Satz und der Satz am Ende jeder Bahn (Oktober 2026) gibt es nur auf Deutsch; die Teile, die sie mit der Holzbahn teilen, sprechen alle Sprachen.",
+      },
+    ],
+  },
   {
     href: "/kleine-abenteuer/",
     parts: [

@@ -3,7 +3,7 @@
 Route `/kettenreaktion/` (`/kugelbahn/`, its old address and then the marble run's, leads here). The „Klingende Kugelbahn“
 was a game of its own for a while and is the first level here again, so marble run and machines are one game on the home menu.
 
-Sixteen levels in turn, beginning with the one picked on the start screen; after each one „Menü“, „Nochmal“ or „Weiter“ (any key goes on; after the last level the first). Shared by the marble run and the
+Twenty levels in turn, beginning with the one picked on the start screen; after each one „Menü“, „Nochmal“ or „Weiter“ (any key goes on; after the last level the first). Shared by the marble run and the
 machines: the points-along-a-way helpers in `path.ts`, the marble and rail drawings in `parts.tsx`, `useFrames`/`useAnyKey` in `level.ts`.
 
 "Alles fällt um" (`ToppleLevel.tsx`): everyday things (`things.tsx`) stand in seven runs, each small to tall, and topple onto each other like dominoes; each round picks other things, and the last one is always the broom, which falls onto the drum, bang, and sparkles burst out of it.
@@ -114,3 +114,29 @@ takes a `look`); other things keep their look and an animal looks out for them.
   useAnyKey, wobble).
 
 To look at the whole wall at once, make the browser window tall and narrow (e.g. 640 × 900).
+
+## Bahnen mit Thema (K-18)
+
+Four more marble runs follow the wooden one, each its own card and level: the same wall, route, spots, shelf, keys and
+camera (`Run` in `TrackLevel.tsx`), only drawn in another world, with other things on the shelf and another end.
+- „Schneebahn“ (`snowTrack.tsx`, `snowtrack`): icy rails over snowy hills; a snowball (it grows from small to big along
+  the way, `grow`), a penguin, a curling stone, a pine cone and a snowflake. What arrives builds a snowman part by part
+  (three balls, face with carrot, arms and buttons, hat and scarf); full, it waves and its hat hops.
+- „Weltraumbahn“ (`spaceTrack.tsx`, `spacetrack`): glowing rails in the starry sky; planets, a ringed planet, the moon, a
+  smiling star and a comet land in a little moon's crater; full, three shooting stars fly over it.
+- „Wasserrutsche“ (`slideTrack.tsx`, `slidetrack`): blue water chutes in a tiled swimming hall; a beach ball, a swim ring,
+  a melon, a rubber duck and a water drop splash into a pool; full, three fountains spray up.
+- „Baustellen-Bahn“ (`siteTrack.tsx`, `sitetrack`): conveyor belts on a brick wall; a log, a tyre, a stone, a big nut and a
+  balloon fall into a skip; full, the crane's hook comes down and lifts the skip with everything in it (`pileLift`).
+
+A world is a `TrackTheme` (`trackTheme.ts`): its backdrop, rail, colours of boards, posts, shelf, hopper and tunnel, one
+thing per `Roller` behaviour (`Thing`; the five behaviours stay as they are, only the drawing changes), its sounds, the line
+when full, the animals in the tunnel, and its `End` (drawn behind and in front of what landed, told how many have arrived,
+`fullAge` and `tapAge`). `TrackLook` hands it to every drawing in the run; the wooden run is `WOODEN` in `TrackLevel.tsx`.
+- A new world is a new file with a `TrackTheme`, a `MarbleLevel`, a card in `MODES`, a `LEVELS` entry, `LEVEL_TEXTS` and
+  `RUNS` in `MarblePlay.tsx` (no background music). Give it five things that look different from every other world's, and
+  an end that does something of its own when full – never the wooden basket and flag again.
+- Their names, first lines and the line when full are German only so far (a part of its own in `languageStatus.ts`);
+  everything shared with the wooden run speaks every language. The tunnel's colour-changing magic is the wooden run's only
+  (`magic`); the other worlds keep each thing's own look.
+- `trackTheme.test.ts` checks each world's level, its texts, the tunnel animals and that its landing spots stay on the wall.

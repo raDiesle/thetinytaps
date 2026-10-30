@@ -159,6 +159,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Andere Welten, gleiche Idee: Schneebahn (die Kugel wird ein immer größerer Schneeball und unten ein Schneemann), Wasserrutsche mit Badeente, Weltraumbahn mit Planeten und Sternschnuppen, Baustellen-Bahn mit Förderband und Kran.",
       why: "Neuer Reiz mit vertrauter Spielweise; passt zu den Themen der Lebendigen Bilder.",
       effort: "M",
+      done: true,
     },
     {
       id: "K-19",

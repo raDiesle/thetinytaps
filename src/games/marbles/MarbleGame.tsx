@@ -8,6 +8,10 @@ import { DEFAULT_MARBLE_SETTINGS, MARBLE_SETTINGS_KEY, type MarbleLevel } from "
 /** The mode cards in menu order, one per level; „Weiter“ at a level's end goes on with the next. */
 const MODES: { id: MarbleLevel; emoji: string }[] = [
   { id: "track", emoji: "🎢" },
+  { id: "snowtrack", emoji: "☃️" },
+  { id: "spacetrack", emoji: "🪐" },
+  { id: "slidetrack", emoji: "🛟" },
+  { id: "sitetrack", emoji: "🏗️" },
   { id: "machine", emoji: "⚙️" },
   { id: "sneeze", emoji: "🤧" },
   { id: "kitchen", emoji: "🍳" },

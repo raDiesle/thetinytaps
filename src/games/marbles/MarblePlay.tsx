@@ -22,7 +22,7 @@ import { SneezeLevel } from "./SneezeLevel";
 import { SpaceLevel } from "./SpaceLevel";
 import { TidyLevel } from "./TidyLevel";
 import { ToppleLevel } from "./ToppleLevel";
-import { TrackLevel } from "./TrackLevel";
+import { SiteTrackLevel, SlideTrackLevel, SnowTrackLevel, SpaceTrackLevel, TrackLevel } from "./TrackLevel";
 import { WaterLevel } from "./WaterLevel";
 import "./marbles.css";
 import "./track.css";
@@ -31,6 +31,10 @@ import { DEV } from "@/lib/buildInfo";
 /** The levels in turn (names and first lines in `content.ts`). */
 const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps> }[] = [
   { id: "track", emoji: "🎢", Level: TrackLevel },
+  { id: "snowtrack", emoji: "☃️", Level: SnowTrackLevel },
+  { id: "spacetrack", emoji: "🪐", Level: SpaceTrackLevel },
+  { id: "slidetrack", emoji: "🛟", Level: SlideTrackLevel },
+  { id: "sitetrack", emoji: "🏗️", Level: SiteTrackLevel },
   { id: "machine", emoji: "⚙️", Level: MachineLevel },
   { id: "sneeze", emoji: "🤧", Level: SneezeLevel },
   { id: "kitchen", emoji: "🍳", Level: KitchenLevel },
@@ -47,6 +51,9 @@ const LEVELS: { id: MarbleLevel; emoji: string; Level: ComponentType<LevelProps>
   { id: "night", emoji: "🌙", Level: NightLevel },
   { id: "tidy", emoji: "🧸", Level: TidyLevel },
 ];
+
+/** The marble runs, the wooden one and its other worlds (K-18). */
+const RUNS: MarbleLevel[] = ["track", "snowtrack", "spacetrack", "slidetrack", "sitetrack"];
 
 /** The levels in turn, beginning with the chosen one (in development `?level=garden` in the address), so „Weiter“ always has a next. */
 function chosenLevels(choice: MarbleSettings["levels"]): MarbleLevel[] {
@@ -79,8 +86,8 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
   const level = levelAt(index);
   const next = levelAt(index + 1);
   const { bursts, spawn } = useBursts();
-  // The marble run plays its own notes and scales, and the good-night machine its music box: a song on top would clash with them.
-  useNoBackgroundMusic(level.id === "track" || level.id === "night");
+  // The marble runs play their own notes and scales, and the good-night machine its music box: a song on top would clash with them.
+  useNoBackgroundMusic(RUNS.includes(level.id) || level.id === "night");
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const sound = useCallback(

@@ -1,6 +1,10 @@
 /** One level of the game. */
 export type MarbleLevel =
   | "track"
+  | "snowtrack"
+  | "spacetrack"
+  | "slidetrack"
+  | "sitetrack"
   | "pegs"
   | "sneeze"
   | "water"

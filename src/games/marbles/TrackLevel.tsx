@@ -1,7 +1,12 @@
-import { useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
+import { memo, useContext, useEffect, useId, useMemo, useRef, useState, type PointerEvent, type ReactNode } from "react";
 import { BRIGHT_COLORS } from "@/components/Bursts";
 import { type LevelProps, useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble } from "./level";
 import { Ball, BAR_COLORS, type BallLook, Rail, STAR_POINTS } from "./parts";
+import { SITE_TRACK } from "./siteTrack";
+import { SLIDE_TRACK } from "./slideTrack";
+import { SNOW_TRACK } from "./snowTrack";
+import { SPACE_TRACK } from "./spaceTrack";
+import { type EndProps, INK, type ThingProps, TrackLook, type TrackTheme } from "./trackTheme";
 import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
@@ -122,7 +127,6 @@ const PEEK_MS = 1700;
  */
 type Magic = "color" | "stripes" | "star" | "peek" | "dots";
 const MAGIC: Magic[] = ["color", "stripes", "star", "peek", "dots"];
-const PEEKERS = ["🐭", "🐸", "🐰", "🐱", "🐻", "🐥"];
 const STAR_GOLD = "#ffd23f";
 
 /** Sections of the run: a fixed one before every spot, the spot, and the fixed one to the basket. */
@@ -138,17 +142,6 @@ const CAMERA_PULL = 4;
 const TOP_ROOM = 160;
 /** With the camera's top lower than this on the wall, the shelf is cut off, and the ⬆ button shows. */
 const UP_SHOWN_BELOW = 40;
-
-const INK = "#2a1e5c";
-
-/** What each thing sounds like as it goes into the hopper. */
-const RELEASE_SOUND: Record<Roller, () => void> = {
-  marble: playPop,
-  tennis: playBoing,
-  iron: playRumble,
-  apple: () => playKnock(480),
-  bubble: playBlub,
-};
 
 /**
  * How far above its path a thing is drawn: bigger things sit higher on the
@@ -249,18 +242,26 @@ const never = (n: number) => Array.from({ length: n }, () => -Infinity);
  * the bars, seesaw, drums, chimes, looping, tunnel and basket sound and move
  * when tapped, and the bare wall sparkles (K-04). Every marble comes out of
  * the tunnel changed (K-06).
+ *
+ * The same run comes in other worlds too (K-18, `look`): snow, space, a water
+ * slide and a building site, each with its own wall, things and end.
  */
-export function TrackLevel({ sound, say, onDone }: LevelProps) {
-  const label = useLevelName("track");
+function Run({ sound, say, onDone, look }: LevelProps & { look: TrackTheme }) {
+  const label = useLevelName(look.level);
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
   const routes = useMemo(buildRoutes, []);
+  /** How long the whole run is with the parts it starts with, for how much of it lies behind a thing. */
+  const runLength = useMemo(
+    () => routes.fixed.reduce((sum, route) => sum + route.total, 0) + DEFAULT_BUILD.reduce((sum, piece, i) => sum + routes.pieces[i][piece].total, 0),
+    [routes],
+  );
   const build = useRef<Piece[]>([...keptBuild]);
   const spots = useRef<SpotState[]>(SLOTS.map(() => ({ hit: -Infinity, swapped: -Infinity, angle: 0, spin: 0, pending: null })));
   const marbles = useRef<Marble[]>([]);
   const landed = useRef<Landed[]>([]);
   const nextId = useRef(0);
-  const fullAt = useRef(-Infinity);
+  const fullAt = useRef(Infinity);
   const bars = useRef(never(BARS.length));
   const bumps = useRef(never(TURNS.length));
   const drums = useRef(never(DRUMS.length));
@@ -270,7 +271,7 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
   const seesawTapped = useRef(-Infinity);
   const basketTapped = useRef(-Infinity);
   const glitters = useRef<Glitter[]>([]);
-  const peek = useRef({ at: -Infinity, animal: PEEKERS[0] });
+  const peek = useRef({ at: -Infinity, animal: look.peekers[0] });
   const [magicStart] = useState(() => Math.floor(Math.random() * MAGIC.length));
   const svg = useRef<SVGSVGElement>(null);
   const done = useRef(false);
@@ -290,7 +291,6 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
   const filled = useRef(SHELF.things.map(() => -Infinity));
   const turn = useRef(0);
   const pops = useRef<{ id: number; x: number; y: number; at: number }[]>([]);
-  const pegs = useId();
   /** The key held down just now, so its cap on the screen goes down too (the picture is drawn on every frame anyway). */
   const held = useRef<string | null>(null);
   const { touchOnly } = useDevice();
@@ -318,15 +318,16 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
   };
 
   const peekOut = (t: number) => {
-    const others = PEEKERS.filter((a) => a !== peek.current.animal);
+    const others = look.peekers.filter((a) => a !== peek.current.animal);
     peek.current = { at: t, animal: others[Math.floor(Math.random() * others.length)] };
     sound(playSqueak);
   };
 
-  /** In the middle of the tunnel, out of sight, a marble changes; with anything else an animal looks out. */
+  /** In the middle of the tunnel, out of sight, a marble changes; with anything else (or in another world) an animal looks out. */
   const magic = (m: Marble, t: number) => {
-    const change = m.kind === "marble" ? MAGIC[(magicStart + m.id) % MAGIC.length] : "peek";
-    if (m.kind === "marble") {
+    const changes = look.magic && m.kind === "marble";
+    const change = changes ? MAGIC[(magicStart + m.id) % MAGIC.length] : "peek";
+    if (changes) {
       const others = BRIGHT_COLORS.filter((c) => c !== m.color);
       m.color = change === "star" ? STAR_GOLD : others[Math.floor(Math.random() * others.length)];
       if (change === "stripes" || change === "dots" || change === "star") m.look = change;
@@ -384,21 +385,15 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
 
   const land = (m: Marble, t: number) => {
     const slot = Math.min(landed.current.length, BASKET_SLOTS.length - 1);
-    landed.current.push({ id: m.id, kind: m.kind, color: m.color, look: m.look, from: { x: m.x, y: m.y }, to: BASKET_SLOTS[slot], at: t });
-    sound(m.kind === "iron" ? playThump : playPlop);
+    const to = look.landAt?.(landed.current.length) ?? BASKET_SLOTS[slot];
+    landed.current.push({ id: m.id, kind: m.kind, color: m.color, look: m.look, from: { x: m.x, y: m.y }, to, at: t });
+    sound(() => look.landSound(m.kind));
     if (!done.current && landed.current.length >= BASKET_FULL) {
       done.current = true;
-      fullAt.current = t;
-      sound(playBells);
-      say({
-        de: "Der Korb ist voll!",
-        en: "The basket is full!",
-        zh: "篮子满啦！",
-        hi: "टोकरी भर गई!",
-        es: "¡La cesta está llena!",
-        ar: "السلة ممتلئة!",
-        ru: "Корзина полна!",
-      });
+      // Full once the last thing is in, not when it sets off from the run.
+      fullAt.current = t + LAND_MS;
+      sound(look.fullSound);
+      say(look.full);
       setTimeout(onDone, DONE_AFTER_FULL_MS);
     }
   };
@@ -582,7 +577,7 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
       x: start.x,
       y: start.y,
     });
-    sound(RELEASE_SOUND[kind]);
+    sound(look.release[kind]);
   };
 
   /** The i-th thing on the shelf goes into the hopper, and something else pops up in its place. */
@@ -635,7 +630,13 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
 
   const t = now.current;
   const started = nextId.current > 0;
-  const flagAge = t - fullAt.current;
+  /** What the end needs to draw itself: when each thing arrived, when it got full and when it was tapped. */
+  const end = {
+    parts: landed.current.map((l) => l.at + LAND_MS).filter((at) => at <= t),
+    t,
+    fullAge: (t - fullAt.current) / 1000,
+    tapAge: (t - basketTapped.current) / 1000,
+  };
   const spot = (i: number, layer: "back" | "front") => <Spot key={i} slot={SLOTS[i]} piece={build.current[i]} state={spots.current[i]} t={t} layer={layer} />;
   const cam = camera.current;
   const age = (hit: number) => (t - hit) / 1000;
@@ -647,179 +648,179 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
 
   return (
     <div className="run-level" ref={box} onPointerDown={tapWall}>
-      <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
-        <defs>
-          <pattern id={pegs} width="50" height="50" patternUnits="userSpaceOnUse">
-            <circle cx="25" cy="25" r="4.5" fill="#d7ac72" />
-          </pattern>
-        </defs>
-        <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill="#f3d5a4" />
-        <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill={`url(#${pegs})`} />
+      <TrackLook.Provider value={look}>
+        <svg ref={svg} className="run-svg" viewBox={`0 ${cam.y} ${VIEW_W} ${cam.h}`} preserveAspectRatio="xMidYMid meet" aria-label={label}>
+          <look.Backdrop />
 
-        {/* The boards the spots sit on */}
-        {SLOTS.map((slot, i) => (
-          <SpotBoard key={i} slot={slot} />
-        ))}
+          {/* The boards the spots sit on */}
+          {SLOTS.map((slot, i) => (
+            <SpotBoard key={i} slot={slot} />
+          ))}
 
-        {/* Rows 1a and 1b with the xylophone */}
-        <Xylophone row={ROW1A} hits={bars.current} t={t} onTap={tapBar} />
-        <Xylophone row={ROW1B} hits={bars.current} t={t} onTap={tapBar} />
+          {/* Rows 1a and 1b with the xylophone */}
+          <Xylophone row={ROW1A} hits={bars.current} t={t} onTap={tapBar} />
+          <Xylophone row={ROW1B} hits={bars.current} t={t} onTap={tapBar} />
 
-        {/* The ledge, the walls the marble turns at, and the rows */}
-        <Rail a={{ x: LEDGE.x0, y: LEDGE.y }} b={{ x: LEDGE.x1, y: LEDGE.y }} />
-        {TURNS.map((turn, i) => (
-          <Wall key={i} turn={turn} index={i} age={age(bumps.current[i])} />
-        ))}
-        <Rail a={{ x: ROW2.from.x + 10, y: ROW2.from.y - 1 }} b={ROW2.to} />
-        <Rail a={{ x: ROW2B.from.x + 12, y: ROW2B.from.y - 1 }} b={ROW2B.to} />
-        {[...ZIGS, ROW4, ROW5, ROW5B, ROW6, ROW7, ROW8].map((row, i) => (
-          <Rail key={i} a={inset(row.from, row, 10)} b={row.to} />
-        ))}
-        <g
-          data-tap
-          onPointerDown={(e) => {
-            tapped(e);
-            looped.current = performance.now();
-            sound(playWhoosh);
-          }}
-        >
-          <Loop age={age(looped.current)} />
-        </g>
-        {DRUMS.map((_, i) => (
+          {/* The ledge, the walls the marble turns at, and the rows */}
+          <TrackRail a={{ x: LEDGE.x0, y: LEDGE.y }} b={{ x: LEDGE.x1, y: LEDGE.y }} />
+          {TURNS.map((turn, i) => (
+            <Wall key={i} turn={turn} index={i} age={age(bumps.current[i])} />
+          ))}
+          <TrackRail a={{ x: ROW2.from.x + 10, y: ROW2.from.y - 1 }} b={ROW2.to} />
+          <TrackRail a={{ x: ROW2B.from.x + 12, y: ROW2B.from.y - 1 }} b={ROW2B.to} />
+          {[...ZIGS, ROW4, ROW5, ROW5B, ROW6, ROW7, ROW8].map((row, i) => (
+            <TrackRail key={i} a={inset(row.from, row, 10)} b={row.to} />
+          ))}
           <g
-            key={i}
             data-tap
             onPointerDown={(e) => {
               tapped(e);
-              playDrum(i, performance.now());
+              looped.current = performance.now();
+              sound(playWhoosh);
             }}
           >
-            <Drum i={i} age={age(drums.current[i])} />
+            <Loop age={age(looped.current)} />
           </g>
-        ))}
-        <Chimes
-          hits={chimes.current}
-          t={t}
-          onTap={(i, e) => {
-            tapped(e);
-            playChimeAt(i, performance.now());
-          }}
-        />
-        <Xylophone row={ROW9} hits={bars.current} t={t} onTap={tapBar} />
-
-        {SLOTS.map((_, i) => spot(i, "back"))}
-
-        {/* Seesaw; a tap tips it */}
-        <g
-          data-tap
-          onPointerDown={(e) => {
-            tapped(e);
-            seesawTapped.current = performance.now();
-            sound(playBoing);
-          }}
-        >
-          <rect x={SEESAW.cx - SEESAW.half - 10} y={SEESAW.cy - 70} width={SEESAW.half * 2 + 20} height="140" fill="transparent" />
-          <path
-            d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`}
-            fill="#8a5a2b"
-            stroke={INK}
-            strokeWidth="3"
-            strokeLinejoin="round"
-          />
-          <g transform={`translate(${SEESAW.cx} ${SEESAW.cy}) rotate(${tilt.current})`}>
-            <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
-            <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
-          </g>
-          <circle cx={SEESAW.cx} cy={SEESAW.cy} r="6" fill={INK} />
-        </g>
-
-        {/* Row 3, and the back of the basket at the bottom */}
-        <Rail a={{ x: ROW3.from.x - 16, y: ROW3.from.y - 1 }} b={ROW3.to} />
-        <ellipse cx={(BASKET.x0 + BASKET.x1) / 2} cy={BASKET.rimY} rx={(BASKET.x1 - BASKET.x0) / 2} ry="14" fill="#6b4220" />
-        {done.current && <Flag rise={Math.min(1, flagAge / FLAG_MS)} sway={wobble(flagAge / 1000, 10, 9, 1.5)} />}
-
-        {/* An animal looks out of the tunnel, from behind its roof */}
-        <Peek animal={peek.current.animal} age={(t - peek.current.at) / PEEK_MS} />
-
-        <g data-tap onPointerDown={tapBasket}>
-          {landed.current.map((l, i) => {
-            const k = Math.min(1, (t - l.at) / LAND_MS);
-            const bounce = (k < 1 ? 0 : wobble((t - l.at - LAND_MS) / 1000, 6, 20, 8)) + wobble(basketAge - i * 0.06, 22, 16, 6);
-            const x = l.from.x + (l.to.x - l.from.x) * k;
-            const y = l.from.y + (l.to.y - l.from.y) * k * k - Math.abs(bounce) - (ROLLER[l.kind].r - BALL_R);
-            return <RollerBody key={l.id} kind={l.kind} color={l.color} look={l.look} x={x} y={y} spin={0} />;
-          })}
-        </g>
-        {/* On a computer the keys 1, 2 and 3 under the shelf; behind the marbles rolling past */}
-        {!touchOnly && <ShelfKeys held={held.current} onTake={take} />}
-        {marbles.current.map((m) => {
-          const k = (t - m.nudged) / NUDGE_MS;
-          return (
+          {DRUMS.map((_, i) => (
             <g
-              key={m.id}
+              key={i}
               data-tap
               onPointerDown={(e) => {
                 tapped(e);
-                nudge(m, performance.now());
+                playDrum(i, performance.now());
               }}
             >
-              <circle cx={m.x} cy={m.y} r="56" fill="transparent" />
-              <RollerBody
-                kind={m.kind}
-                color={m.color}
-                look={m.look}
-                x={m.x}
-                y={m.y}
-                spin={m.spin + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
-                scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : 1}
-              />
+              <Drum i={i} age={age(drums.current[i])} />
             </g>
-          );
-        })}
-        {pops.current.map((p) => (
-          <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
-        ))}
+          ))}
+          <Chimes
+            hits={chimes.current}
+            t={t}
+            onTap={(i, e) => {
+              tapped(e);
+              playChimeAt(i, performance.now());
+            }}
+          />
+          <Xylophone row={ROW9} hits={bars.current} t={t} onTap={tapBar} />
 
-        {/* In front of the marbles */}
-        <Hopper />
-        {SLOTS.map((_, i) => spot(i, "front"))}
-        <g
-          data-tap
-          onPointerDown={(e) => {
-            tapped(e);
-            peekOut(performance.now());
-          }}
-        >
-          <Tunnel />
-        </g>
-        <g data-tap onPointerDown={tapBasket}>
-          <Basket />
-        </g>
-        {glitters.current.map((g) => (
-          <Sparkles key={g.id} x={g.x} y={g.y} age={(t - g.at) / GLITTER_MS} />
-        ))}
+          {SLOTS.map((_, i) => spot(i, "back"))}
 
-        {/* Where a tap swaps the part: the whole board, with a wrench in the corner */}
-        {SLOTS.map((slot, i) => {
-          const b = slotBoard(slot);
-          const pending = spots.current[i].pending;
-          const wx = slot.dir > 0 ? b.x + b.w - 30 : b.x + 30;
-          return (
-            <g key={i} className="run-spot-tap" data-tap onPointerDown={(e) => swap(i, e)}>
-              <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="transparent" />
-              <circle cx={wx} cy={b.y + 30} r="24" fill="#fff8e8" stroke="#c48a4d" strokeWidth="3" />
-              <text x={wx} y={b.y + 41} fontSize="28" textAnchor="middle" className={pending ? "run-wrench busy" : "run-wrench"}>
-                🔧
-              </text>
+          {/* Seesaw; a tap tips it */}
+          <g
+            data-tap
+            onPointerDown={(e) => {
+              tapped(e);
+              seesawTapped.current = performance.now();
+              sound(playBoing);
+            }}
+          >
+            <rect x={SEESAW.cx - SEESAW.half - 10} y={SEESAW.cy - 70} width={SEESAW.half * 2 + 20} height="140" fill="transparent" />
+            <path
+              d={`M${SEESAW.cx} ${SEESAW.cy} L${SEESAW.cx - 34} ${SEESAW.cy + 62} L${SEESAW.cx + 34} ${SEESAW.cy + 62} Z`}
+              fill="#8a5a2b"
+              stroke={INK}
+              strokeWidth="3"
+              strokeLinejoin="round"
+            />
+            <g transform={`translate(${SEESAW.cx} ${SEESAW.cy}) rotate(${tilt.current})`}>
+              <rect x={-SEESAW.half} y="-7" width={SEESAW.half * 2} height="14" rx="7" fill="#ffb703" stroke={INK} strokeWidth="3" />
+              <rect x={-SEESAW.half + 6} y="-33" width="30" height="26" rx="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
             </g>
-          );
-        })}
+            <circle cx={SEESAW.cx} cy={SEESAW.cy} r="6" fill={INK} />
+          </g>
 
-        <Shelf things={shelf.current} filled={filled.current} color={BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length]} t={t} onTake={take} />
+          {/* Row 3, and the back of the end at the bottom (with the flag, the snowman, …) */}
+          <TrackRail a={{ x: ROW3.from.x - 16, y: ROW3.from.y - 1 }} b={ROW3.to} />
+          <g data-tap onPointerDown={tapBasket}>
+            <look.End layer="back" {...end} />
+          </g>
 
-        {/* Before the first tap and after ⬆: a big hand on the middle thing on the shelf says „tap me“ */}
-        {(!started || lookingUp.current) && <ShelfHint />}
-      </svg>
+          {/* An animal looks out of the tunnel, from behind its roof */}
+          <Peek animal={peek.current.animal} age={(t - peek.current.at) / PEEK_MS} />
+
+          <g data-tap onPointerDown={tapBasket}>
+            {landed.current.map((l, i) => {
+              const k = Math.min(1, (t - l.at) / LAND_MS);
+              // A thing that becomes part of the end (a snowman's ball) is gone once it is there.
+              if (look.absorb && k >= 1) return null;
+              const bounce = (k < 1 ? 0 : wobble((t - l.at - LAND_MS) / 1000, 6, 20, 8)) + wobble(basketAge - i * 0.06, 22, 16, 6);
+              const x = l.from.x + (l.to.x - l.from.x) * k;
+              const y = l.from.y + (l.to.y - l.from.y) * k * k - Math.abs(bounce) - (ROLLER[l.kind].r - BALL_R) - (look.pileLift?.(end.fullAge) ?? 0);
+              return <RollerBody key={l.id} kind={l.kind} color={l.color} look={l.look} x={x} y={y} spin={0} grow={1} />;
+            })}
+          </g>
+          {/* On a computer the keys 1, 2 and 3 under the shelf; behind the marbles rolling past */}
+          {!touchOnly && <ShelfKeys held={held.current} onTake={take} />}
+          {marbles.current.map((m) => {
+            const k = (t - m.nudged) / NUDGE_MS;
+            return (
+              <g
+                key={m.id}
+                data-tap
+                onPointerDown={(e) => {
+                  tapped(e);
+                  nudge(m, performance.now());
+                }}
+              >
+                <circle cx={m.x} cy={m.y} r="56" fill="transparent" />
+                <RollerBody
+                  kind={m.kind}
+                  color={m.color}
+                  look={m.look}
+                  x={m.x}
+                  y={m.y}
+                  spin={m.spin + (k >= 0 && k < 1 ? 4 * Math.PI * k : 0)}
+                  grow={Math.min(1, m.dist / runLength)}
+                  scale={m.fly ? SHELF.scale - (SHELF.scale - 1) * Math.min(1, (t - m.fly.at) / FLY_MS) : 1}
+                />
+              </g>
+            );
+          })}
+          {pops.current.map((p) => (
+            <BubblePop key={p.id} x={p.x} y={p.y} age={(t - p.at) / POP_MS} />
+          ))}
+
+          {/* In front of the marbles */}
+          <Hopper />
+          {SLOTS.map((_, i) => spot(i, "front"))}
+          <g
+            data-tap
+            onPointerDown={(e) => {
+              tapped(e);
+              peekOut(performance.now());
+            }}
+          >
+            <Tunnel />
+          </g>
+          <g data-tap onPointerDown={tapBasket}>
+            <look.End layer="front" {...end} />
+          </g>
+          {glitters.current.map((g) => (
+            <Sparkles key={g.id} x={g.x} y={g.y} age={(t - g.at) / GLITTER_MS} />
+          ))}
+
+          {/* Where a tap swaps the part: the whole board, with a wrench in the corner */}
+          {SLOTS.map((slot, i) => {
+            const b = slotBoard(slot);
+            const pending = spots.current[i].pending;
+            const wx = slot.dir > 0 ? b.x + b.w - 30 : b.x + 30;
+            return (
+              <g key={i} className="run-spot-tap" data-tap onPointerDown={(e) => swap(i, e)}>
+                <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="transparent" />
+                <circle cx={wx} cy={b.y + 30} r="24" fill="#fff8e8" stroke="#c48a4d" strokeWidth="3" />
+                <text x={wx} y={b.y + 41} fontSize="28" textAnchor="middle" className={pending ? "run-wrench busy" : "run-wrench"}>
+                  🔧
+                </text>
+              </g>
+            );
+          })}
+
+          <Shelf things={shelf.current} filled={filled.current} color={BRIGHT_COLORS[nextId.current % BRIGHT_COLORS.length]} t={t} onTake={take} />
+
+          {/* Before the first tap and after ⬆: a big hand on the middle thing on the shelf says „tap me“ */}
+          {(!started || lookingUp.current) && <ShelfHint />}
+        </svg>
+      </TrackLook.Provider>
       {/* Down the run, the ⬆ button in the bottom left corner takes the camera back up to the shelf */}
       {!done.current && !lookingUp.current && cam.y > UP_SHOWN_BELOW && (
         <button
@@ -862,11 +863,12 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
 
 /** The slightly darker board a spot sits on, with a dashed edge: here something can be swapped. */
 function SpotBoard({ slot }: { slot: Slot }) {
+  const { board } = useLook();
   const b = slotBoard(slot);
-  return <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill="#e9c08a" stroke="#c48a4d" strokeWidth="4" strokeDasharray="14 10" />;
+  return <rect x={b.x} y={b.y} width={b.w} height={b.h} rx="28" fill={board.fill} stroke={board.edge} strokeWidth="4" strokeDasharray="14 10" />;
 }
 
-/** A thing on the run (or bigger by `scale`, on the shelf), its middle at `x`, `y`, turned by `spin` as it rolls. */
+/** A thing on the run (or bigger by `scale`, on the shelf), its middle at `x`, `y`, turned by `spin` as it rolls; the run's world draws it. */
 function RollerBody({
   kind,
   color,
@@ -875,6 +877,7 @@ function RollerBody({
   y,
   spin,
   scale = 1,
+  grow = 0,
 }: {
   kind: Roller;
   color: string;
@@ -883,7 +886,19 @@ function RollerBody({
   y: number;
   spin: number;
   scale?: number;
+  /** How much of the run lies behind it (0–1). */
+  grow?: number;
 }) {
+  const { Thing } = useLook();
+  return (
+    <g transform={`translate(${x} ${y}) scale(${scale})`}>
+      <Thing kind={kind} color={color} look={look} spin={spin} grow={grow} />
+    </g>
+  );
+}
+
+/** The wooden run's things: a marble, a tennis ball, an iron ball, an apple and a soap bubble. */
+function WoodenThing({ kind, color, look, spin }: ThingProps) {
   const r = ROLLER[kind].r;
   const deg = (spin * 180) / Math.PI;
   let body: ReactNode;
@@ -960,7 +975,7 @@ function RollerBody({
       );
       break;
   }
-  return <g transform={`translate(${x} ${y}) scale(${scale})`}>{body}</g>;
+  return body;
 }
 
 /** The soap bubble bursting, `age` from 0 to 1: a ring that widens and fades, and droplets flying out. */
@@ -1021,13 +1036,14 @@ function Peek({ animal, age }: { animal: string; age: number }) {
  * has `color`, the colour it keeps on the run.
  */
 function Shelf({ things, filled, color, t, onTake }: { things: Roller[]; filled: number[]; color: string; t: number; onTake: (i: number) => void }) {
+  const { shelf } = useLook();
   return (
     <g>
       {/* A sunny glow behind each place, so the things read as buttons: these are to be tapped */}
       {SHELF.things.map((x, i) => (
         <circle key={i} cx={x} cy={SHELF.y - 38} r="54" fill="#fff3a6" stroke={STAR_GOLD} strokeWidth="7" />
       ))}
-      <rect x={SHELF.x0} y={SHELF.y} width={SHELF.x1 - SHELF.x0} height="13" rx="6" fill="#b8763d" stroke={INK} strokeWidth="3" />
+      <rect x={SHELF.x0} y={SHELF.y} width={SHELF.x1 - SHELF.x0} height="13" rx="6" fill={shelf} stroke={INK} strokeWidth="3" />
       {things.map((kind, i) => {
         const at = shelfSpot(i, kind);
         const age = (t - filled[i] - REFILL_MS) / 1000;
@@ -1108,7 +1124,7 @@ function Xylophone({ row, hits, t, onTap }: { row: Row; hits: number[]; t: numbe
   const slope = (Math.atan2(row.to.y - row.from.y, row.to.x - row.from.x) * 180) / Math.PI;
   return (
     <g>
-      <Rail a={at(row.from.x - 24)} b={at(first.x - 4)} />
+      <TrackRail a={at(row.from.x - 24)} b={at(first.x - 4)} />
       <line
         x1={first.x - 6}
         y1={rowY(row, first.x) + BALL_R + 26}
@@ -1133,7 +1149,7 @@ function Xylophone({ row, hits, t, onTap }: { row: Row; hits: number[]; t: numbe
           </g>
         );
       })}
-      <Rail a={at(last.x + last.w + 4)} b={row.to} />
+      <TrackRail a={at(last.x + last.w + 4)} b={row.to} />
     </g>
   );
 }
@@ -1154,7 +1170,7 @@ function Spot({ slot, piece, state, t, layer }: { slot: Slot; piece: Piece; stat
       const { pivot } = bellIn(slot);
       body =
         layer === "back" ? (
-          <Rail a={slot.from} b={slot.to} />
+          <TrackRail a={slot.from} b={slot.to} />
         ) : (
           <g>
             <line x1={pivot.x} y1={pivot.y - 44} x2={pivot.x} y2={pivot.y} stroke={INK} strokeWidth="5" strokeLinecap="round" />
@@ -1173,7 +1189,7 @@ function Spot({ slot, piece, state, t, layer }: { slot: Slot; piece: Piece; stat
         layer === "back" ? (
           <g>
             <ellipse cx={f.cx} cy={f.rimY} rx={f.rx} ry={f.ry} fill="#1b8fc4" opacity="0.45" />
-            <Rail a={{ x: f.cx - slot.dir * 20, y: slot.to.y }} b={slot.to} />
+            <TrackRail a={{ x: f.cx - slot.dir * 20, y: slot.to.y }} b={slot.to} />
           </g>
         ) : (
           <Funnel slot={slot} />
@@ -1190,6 +1206,7 @@ function Spot({ slot, piece, state, t, layer }: { slot: Slot; piece: Piece; stat
 
 /** The wall at a turn, with a round bumper where the marble hits it; the bumper flashes `age` seconds after a hit. */
 function Wall({ turn, index, age }: { turn: Turn; index: number; age: number }) {
+  const { post } = useLook();
   const side = turnSide(turn);
   const top = turn.from.y - 70;
   const bottom = turn.to.y + 40;
@@ -1198,7 +1215,7 @@ function Wall({ turn, index, age }: { turn: Turn; index: number; age: number }) 
   const squash = age >= 0 && age < 1 ? 5 * Math.exp(-age * 9) * Math.cos(age * 30) : 0;
   return (
     <g>
-      <rect x={side > 0 ? turn.x : turn.x - 18} y={top} width="18" height={bottom - top} rx="6" fill="#b8763d" stroke={INK} strokeWidth="3" />
+      <rect x={side > 0 ? turn.x : turn.x - 18} y={top} width="18" height={bottom - top} rx="6" fill={post} stroke={INK} strokeWidth="3" />
       <ellipse
         cx={turn.x - side * (5 - squash)}
         cy={y}
@@ -1223,8 +1240,8 @@ function Loop({ age }: { age: number }) {
       <circle cx={LOOP.cx} cy={LOOP.cy} r={r} fill="none" stroke={INK} strokeWidth="18" />
       <circle cx={LOOP.cx} cy={LOOP.cy} r={r} fill="none" stroke="#ff5d73" strokeWidth="12" />
       <circle cx={LOOP.cx} cy={LOOP.cy} r={r} fill="none" stroke="#fff" strokeWidth="12" strokeDasharray="22 22" opacity={0.5 + 0.5 * glow} />
-      <Rail a={inset(ROW4B.from, ROW4B, 10)} b={ROW4B.to} />
-      <Rail a={LOOP_OUT.from} b={LOOP_OUT.to} />
+      <TrackRail a={inset(ROW4B.from, ROW4B, 10)} b={ROW4B.to} />
+      <TrackRail a={LOOP_OUT.from} b={LOOP_OUT.to} />
       <rect x={LOOP.cx - 9} y={LOOP.cy + r + 8} width="18" height="70" fill="#8a5a2b" stroke={INK} strokeWidth="3" />
     </g>
   );
@@ -1297,11 +1314,12 @@ function Chimes({ hits, t, onTap }: { hits: number[]; t: number; onTap: (chime: 
 }
 
 function Hopper() {
+  const { hopper } = useLook();
   return (
     <g>
       <path
         d={`M${HOPPER.x - 58} -10 L${HOPPER.x + 58} -10 L${HOPPER.x + 28} 62 L${HOPPER.x - 28} 62 Z`}
-        fill="#8e7dff"
+        fill={hopper}
         stroke={INK}
         strokeWidth="4"
         strokeLinejoin="round"
@@ -1402,6 +1420,7 @@ function Funnel({ slot }: { slot: Slot }) {
 }
 
 function Tunnel() {
+  const { tunnel } = useLook();
   const { x0, x1 } = TUNNEL;
   const y = (x: number) => ROW3.from.y + ((x - ROW3.from.x) * (ROW3.to.y - ROW3.from.y)) / (ROW3.to.x - ROW3.from.x);
   const top0 = y(x0) - 52;
@@ -1412,14 +1431,14 @@ function Tunnel() {
     <g>
       <path
         d={`M${x0} ${base0} L${x0} ${top0 + 26} Q${x0} ${top0} ${x0 + 26} ${top0} L${x1 - 26} ${top1} Q${x1} ${top1} ${x1} ${top1 + 26} L${x1} ${base1} Z`}
-        fill="#3ec300"
+        fill={tunnel.fill}
         stroke={INK}
         strokeWidth="4"
         strokeLinejoin="round"
       />
       {[0.25, 0.5, 0.75].map((k) => {
         const x = x0 + (x1 - x0) * k;
-        return <line key={k} x1={x} y1={y(x) - 52} x2={x} y2={y(x) + BALL_R + 16} stroke="#2a9100" strokeWidth="6" />;
+        return <line key={k} x1={x} y1={y(x) - 52} x2={x} y2={y(x) + BALL_R + 16} stroke={tunnel.lines} strokeWidth="6" />;
       })}
     </g>
   );
@@ -1448,3 +1467,80 @@ function Basket() {
     </g>
   );
 }
+
+/** The end of the wooden run: the basket, and the flag springing up out of it when it is full. */
+function WoodenEnd({ layer, fullAge }: EndProps) {
+  if (layer === "front") return <Basket />;
+  return (
+    <g>
+      <ellipse cx={(BASKET.x0 + BASKET.x1) / 2} cy={BASKET.rimY} rx={(BASKET.x1 - BASKET.x0) / 2} ry="14" fill="#6b4220" />
+      {fullAge >= 0 && <Flag rise={Math.min(1, (fullAge * 1000) / FLAG_MS)} sway={wobble(fullAge, 10, 9, 1.5)} />}
+    </g>
+  );
+}
+
+/** The wooden wall with its rows of pegs, drawn once. */
+const WoodenBackdrop = memo(function WoodenBackdrop() {
+  const pegs = useId();
+  return (
+    <g>
+      <defs>
+        <pattern id={pegs} width="50" height="50" patternUnits="userSpaceOnUse">
+          <circle cx="25" cy="25" r="4.5" fill="#d7ac72" />
+        </pattern>
+      </defs>
+      <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill="#f3d5a4" />
+      <rect x="-400" y="-200" width={VIEW_W + 800} height={TRACK_H + 400} fill={`url(#${pegs})`} />
+    </g>
+  );
+});
+
+/** The wooden run, the first and plainest world. */
+export const WOODEN: TrackTheme = {
+  level: "track",
+  Backdrop: WoodenBackdrop,
+  Rail,
+  board: { fill: "#e9c08a", edge: "#c48a4d" },
+  post: "#b8763d",
+  shelf: "#b8763d",
+  hopper: "#8e7dff",
+  tunnel: { fill: "#3ec300", lines: "#2a9100" },
+  Thing: WoodenThing,
+  release: { marble: playPop, tennis: playBoing, iron: playRumble, apple: () => playKnock(480), bubble: playBlub },
+  landSound: (kind) => (kind === "iron" ? playThump() : playPlop()),
+  fullSound: playBells,
+  full: {
+    de: "Der Korb ist voll!",
+    en: "The basket is full!",
+    zh: "篮子满啦！",
+    hi: "टोकरी भर गई!",
+    es: "¡La cesta está llena!",
+    ar: "السلة ممتلئة!",
+    ru: "Корзина полна!",
+  },
+  peekers: ["🐭", "🐸", "🐰", "🐱", "🐻", "🐥"],
+  magic: true,
+  End: WoodenEnd,
+};
+
+/** The run's world, inside the run. */
+function useLook(): TrackTheme {
+  return useContext(TrackLook) ?? WOODEN;
+}
+
+/** A rail in the run's world. */
+function TrackRail(props: { a: Pt; b: Pt }) {
+  const { Rail: WorldRail } = useLook();
+  return <WorldRail {...props} />;
+}
+
+/** „Klingende Kugelbahn“: the wooden run. */
+export const TrackLevel = (props: LevelProps) => <Run {...props} look={WOODEN} />;
+/** „Schneebahn“: snowballs that grow on the way and build a snowman at the end (K-18). */
+export const SnowTrackLevel = (props: LevelProps) => <Run {...props} look={SNOW_TRACK} />;
+/** „Weltraumbahn“: planets, moon and stars roll down to the moon; shooting stars at the end (K-18). */
+export const SpaceTrackLevel = (props: LevelProps) => <Run {...props} look={SPACE_TRACK} />;
+/** „Wasserrutsche“: beach ball, swim ring and rubber duck slide down blue chutes into a pool (K-18). */
+export const SlideTrackLevel = (props: LevelProps) => <Run {...props} look={SLIDE_TRACK} />;
+/** „Baustellen-Bahn“: tyre, stone and log ride conveyor belts into a skip that the crane lifts (K-18). */
+export const SiteTrackLevel = (props: LevelProps) => <Run {...props} look={SITE_TRACK} />;
