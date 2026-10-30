@@ -6,7 +6,7 @@ built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backe
 ## Commands (always Bun, never npm, yarn or npx)
 
 ```bash
-bun run verify     # lint + format check + typecheck + unit tests – run before every commit (never piped into tail: that hides a failure)
+bun run verify     # lint + format check + typecheck + unit tests – run before every commit (never piped into tail or grep before `&& git commit`: the pipe hides a failure and the commit goes in anyway)
 bun run format     # format everything and apply safe lint fixes (Biome)
 bun test           # unit tests only (bun test, < 1 s); bun test --watch while working
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
