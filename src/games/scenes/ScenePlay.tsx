@@ -119,9 +119,10 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const navigate = useNavigate();
   const roadsOn = settings.mode === "explore";
   // Keys mode wherever there is a keyboard: on a computer from the start, on a tablet from its first key press
-  // on – unless a grown-up switched it off with ⌨️.
+  // on – unless a grown-up switched it off with ⌨️. Not with the torch: the light is how things are found there, and
+  // letters in the picture would give them away (its keys move the light, or take it to some item).
   const [keyboard, setKeyboard] = useState(() => !touchOnly());
-  const keysOn = keyboard && settings.keys;
+  const keysOn = keyboard && settings.keys && settings.mode !== "torch";
   // Opened by following a vehicle: it drives in, as a guest or back at home. Read once, the play is keyed by scene.
   const [arrival] = useState(() => (roadsOn ? tripTo(scene.id, location.state) : null));
   const [guest] = useState(() => (arrival && !arrival.home ? (guestFor(arrival.road, language.id) ?? null) : null));
@@ -503,8 +504,6 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const lit = here(litItems(items, ...lightAt.current, scene.width * TORCH_RADIUS));
     const before = inLight.current;
     inLight.current = new Set(lit.map((item) => item.id));
-    // Space and Enter start what is in the light.
-    focusRef.current = lit[0] ?? null;
     for (const item of lit) {
       if (before.has(item.id) || item.id === started) continue;
       if (animate(item)) say(describe(item));
@@ -909,7 +908,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         </button>
       )}
       {/* For grown-ups, small in the bottom left corner: keys mode off and on again. Only where there is a keyboard. */}
-      {keyboard && (
+      {keyboard && settings.mode !== "torch" && (
         <button
           type="button"
           className={`scene-keys-toggle${keysOn ? "" : " off"}`}
