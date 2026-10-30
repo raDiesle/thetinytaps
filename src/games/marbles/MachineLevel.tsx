@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BALL,
@@ -10,6 +10,7 @@ import {
   CABLE,
   CAR,
   CROSSING_X,
+  CUPS,
   DOMINO,
   dominoLeft,
   FLOOR,
@@ -18,6 +19,7 @@ import {
   GIFT,
   HOPPER,
   JUMP,
+  KREISEL,
   LOOP,
   PULLEYS,
   RAMP,
@@ -26,6 +28,7 @@ import {
   STAIRS,
   TABLE,
   TRAIN,
+  TRAIN_STOP,
   WORLD_W,
   type Machine,
 } from "./machine";
@@ -37,11 +40,13 @@ import { BAR_COLORS, Ball, Rail } from "./parts";
 
 /**
  * Level 3: the big machine. One tap lets the marble go, and then one thing
- * sets off the next for about half a minute: xylophone, bell, funnel, ten
+ * sets off the next for about 42 seconds: xylophone, bell, funnel, ten
  * dominoes, a toy car through a loop onto a seesaw that flings a ball down the
- * stairs into a bucket, which pulls up a gate for the train, which presses
- * the button for the jack-in-the-box. The camera travels along with whatever
- * moves.
+ * stairs into a bucket, which pulls up a gate for the train. The train bumps a
+ * humming top, which wanders across the floor into a tower of stacking cups;
+ * the cups tumble down plinking their notes, and the top one flicks off a
+ * paper plane, which loops the loop and glides onto the button for the
+ * jack-in-the-box. The camera travels along with whatever moves.
  */
 export function MachineLevel(props: LevelProps) {
   const machine = useMemo(buildMachine, []);
@@ -97,13 +102,22 @@ function MovingThings({ machine, t }: { machine: Machine; t: number }) {
       <BeachBall at={ball.pt} squash={ball.squash} />
       <Smoke machine={machine} t={t} />
       <Train machine={machine} t={t} />
+      {CUPS.map((_, i) => {
+        const cup = machine.cupAt(i, t);
+        return <Cup key={i} i={i} at={cup.pt} angle={cup.angle} />;
+      })}
+      <Kreisel {...machine.kreiselAt(t)} />
+      <PlaneTrail machine={machine} t={t} />
+      <PaperPlane {...machine.planeAt(t)} />
     </g>
   );
 }
 
 /* ---------- The room ---------- */
 
-function Room({ stripes }: { stripes: string }) {
+/** The wall, the floor and what hangs on the wall: never changes, so it is drawn once. */
+const Room = memo(function Room({ stripes }: { stripes: string }) {
+  const bunting = GIFT.x - 400;
   return (
     <g>
       <defs>
@@ -119,8 +133,11 @@ function Room({ stripes }: { stripes: string }) {
       <WallClock x={4330} y={230} />
       <Picture x={5300} y={110} />
       <Window x={5850} />
+      <Picture x={6600} y={110} />
+      <Window x={7720} />
+      <WallClock x={8330} y={200} />
       {Array.from({ length: 13 }, (_, i) => {
-        const x = 6060 + i * 64;
+        const x = bunting + i * 64;
         return (
           <path
             key={i}
@@ -132,7 +149,7 @@ function Room({ stripes }: { stripes: string }) {
           />
         );
       })}
-      <path d={`M6040 36 Q6480 60 6920 36`} stroke={INK} strokeWidth="4" fill="none" />
+      <path d={`M${bunting - 20} 36 Q${bunting + 420} 60 ${bunting + 860} 36`} stroke={INK} strokeWidth="4" fill="none" />
       <rect x="-400" y={FLOOR - 26} width={WORLD_W + 800} height="26" fill="#fff" stroke={INK} strokeWidth="3" />
       <rect x="-400" y={FLOOR} width={WORLD_W + 800} height={VIEW_H - FLOOR + 200} fill="#d9a066" />
       {Array.from({ length: 5 }, (_, i) => (
@@ -141,7 +158,7 @@ function Room({ stripes }: { stripes: string }) {
       <line x1="-400" y1={FLOOR} x2={WORLD_W + 400} y2={FLOOR} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /* ---------- Marble, xylophone, bell and funnel ---------- */
 
@@ -446,7 +463,7 @@ function Gate({ lift }: { lift: number }) {
 
 function Rails() {
   const x0 = TRAIN.front0 - 360;
-  const x1 = BUTTON.x;
+  const x1 = TRAIN_STOP + 20;
   return (
     <g>
       {Array.from({ length: Math.floor((x1 - x0) / 36) }, (_, i) => (
@@ -507,7 +524,7 @@ function Train({ machine, t }: { machine: Machine; t: number }) {
 function Smoke({ machine, t }: { machine: Machine; t: number }) {
   const puffs = [];
   const life = 1.6;
-  for (let te = machine.tTrain; te <= Math.min(t, machine.tButton); te += 0.32) {
+  for (let te = machine.tTrain; te <= Math.min(t, machine.tStop); te += 0.32) {
     const age = t - te;
     if (age > life) continue;
     const x = machine.trainFront(te) - 39 - 34 * age;
@@ -551,11 +568,98 @@ function Crossing({ machine, t }: { machine: Machine; t: number }) {
   );
 }
 
+/* ---------- Spinning top, stacking cups and paper plane ---------- */
+
+/**
+ * The humming top, standing on its tip at `pt` and leaning `tilt` degrees: a round tin body with spots round its
+ * middle that run round as it spins (`spin`, radians), and a plunger on top that `pump` pushes down.
+ */
+function Kreisel({ pt, tilt, spin, pump }: { pt: Pt; tilt: number; spin: number; pump: number }) {
+  const { rx, ry, mid, rod } = KREISEL;
+  const top = -mid - ry;
+  const rodTop = -rod + pump;
+  const spots = Array.from({ length: 8 }, (_, k) => ({ a: spin + (k * Math.PI) / 4, k })).filter(({ a }) => Math.cos(a) > 0.08);
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${tilt})`}>
+      <path d={`M-11 ${-mid + ry - 6} L0 0 L11 ${-mid + ry - 6} Z`} fill="#7d7d96" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <rect x="-5" y={rodTop} width="10" height={top - rodTop + 4} rx="3" fill="#c9cde0" stroke={INK} strokeWidth="2.5" />
+      {[0, 1, 2].map((k) => {
+        // The twist on the plunger runs up while the top spins.
+        const y = rodTop + 6 + ((((k * 12 - spin * 4) % 36) + 36) % 36);
+        return y < top - 2 ? <line key={k} x1="-5" y1={y + 4} x2="5" y2={y - 4} stroke={INK} strokeWidth="2" /> : null;
+      })}
+      <circle cy={rodTop - 9} r="11" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+      <ellipse cy={-mid} rx={rx} ry={ry} fill="#3a86ff" />
+      <path d={`M${-rx} ${-mid} A${rx} ${ry} 0 0 0 ${rx} ${-mid} Z`} fill="#ffd23f" />
+      {spots.map(({ a, k }) => (
+        <ellipse key={k} cx={rx * 0.84 * Math.sin(a)} cy={-mid} rx={8 * Math.cos(a)} ry="8" fill={k % 2 ? "#fff" : "#ff5d73"} stroke={INK} strokeWidth="1.5" />
+      ))}
+      <ellipse cy={-mid} rx={rx} ry={ry} fill="none" stroke={INK} strokeWidth="3.5" />
+      <path
+        d={`M${-rx + 12} ${-mid - 14} Q${-rx + 18} ${-mid - 28} ${-rx + 34} ${-mid - 32}`}
+        stroke="#fff9"
+        strokeWidth="5"
+        fill="none"
+        strokeLinecap="round"
+      />
+      <rect x="-14" y={top - 6} width="28" height="10" rx="4" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+const CUP_COLORS = [0, 1, 2, 3, 4, 6].map((i) => BAR_COLORS[i]);
+
+/** A stacking cup upside down (its open end at the bottom), its middle at `at`, turned `angle` degrees. */
+function Cup({ i, at, angle }: { i: number; at: Pt; angle: number }) {
+  const { W, w, H } = CUPS[i];
+  const band = W / 2 - ((W - w) / 2) * (12 / H);
+  return (
+    <g transform={`translate(${at.x} ${at.y}) rotate(${angle})`}>
+      <path
+        d={`M${-W / 2} ${H / 2} L${-w / 2} ${-H / 2} L${w / 2} ${-H / 2} L${W / 2} ${H / 2} Z`}
+        fill={CUP_COLORS[i]}
+        stroke={INK}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      <path d={`M${-band} ${H / 2 - 12} L${band} ${H / 2 - 12}`} stroke={INK} strokeWidth="2.5" />
+      <path d={`M${-W / 2 + 14} ${H / 2 - 18} L${-w / 2 + 9} ${-H / 2 + 9}`} stroke="#fff9" strokeWidth="5" strokeLinecap="round" />
+      <circle cy="-3" r="7" fill="#fff" stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+/** A folded paper plane seen from the side, its nose at `pt`, heading `angle` radians; `squash` crumples the nose. */
+function PaperPlane({ pt, angle, squash }: { pt: Pt; angle: number; squash: number }) {
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${deg(angle)}) scale(${1 - squash} 1)`}>
+      <path d="M0 0 L-104 2 L-98 14 Z" fill="#bde9ff" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M0 0 L-118 -30 L-104 2 Z" fill="#fff" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-24 -5 L-102 -24" stroke="#ff5d73" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** A few fading puffs behind the flying plane's tail, so the eye can follow its loop. */
+function PlaneTrail({ machine, t }: { machine: Machine; t: number }) {
+  if (t < machine.tSplit || t >= machine.tButton) return null;
+  const puffs = [];
+  for (let k = 1; k <= 7; k++) {
+    const te = t - k * 0.07;
+    if (te < machine.tSplit) break;
+    const { pt, angle } = machine.planeAt(te);
+    const x = pt.x - 108 * Math.cos(angle);
+    const y = pt.y - 108 * Math.sin(angle);
+    puffs.push(<circle key={k} cx={x} cy={y} r={7 - k * 0.6} fill="#fff" stroke="#b9bdd6" strokeWidth="2" opacity={1 - k / 8} />);
+  }
+  return <g>{puffs}</g>;
+}
+
 /* ---------- Finale ---------- */
 
 function ButtonBox({ machine, t }: { machine: Machine; t: number }) {
   const knobX = BUTTON.x - BUTTON.knob;
-  const press = Math.min(BUTTON.press, Math.max(0, machine.trainFront(t) - knobX));
+  const press = machine.buttonPress(t);
   const top = FLOOR - BUTTON.h;
   const k = seg(t, machine.tButton, machine.tPop);
   const spark = CABLE[Math.round(k * (CABLE.length - 1))];

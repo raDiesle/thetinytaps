@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   APPLE,
@@ -19,9 +19,16 @@ import {
   GROUND,
   GUTTER,
   gutterY,
+  HEDGEHOG,
   HOOP,
   HOSE,
+  knobAt,
+  LEAF_PILE,
+  LEAVES,
   LOW_BRANCH,
+  MOLE_PEEK_X,
+  MOLEHILL,
+  PINWHEEL,
   RAKE,
   RAKE_PIVOT,
   SHED,
@@ -36,7 +43,7 @@ import {
   WORLD_W,
   type Garden,
 } from "./garden";
-import { beside, deg, seg, svgLine } from "./machineKit";
+import { beside, deg, lerp, seg, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
@@ -51,12 +58,15 @@ const WATER = "#6fd3ff";
 
 /**
  * Level 5: the garden. One tap lets the marble roll out of the birdhouse, and
- * then one thing sets off the next for about half a minute: wind chimes, a
+ * then one thing sets off the next for about forty seconds: wind chimes, a
  * watering can that tips onto a water wheel, whose arm pushes a wheelbarrow
  * down the bank onto a rake, whose handle shakes the apple tree; the apple
- * rolls down the slide into a croquet ball, which opens the garden tap, and
- * the sprinkler waters the sunflower until it blooms. The camera travels along
- * with whatever moves.
+ * rolls down the slide into a croquet ball, which bonks the molehill. The
+ * dizzy mole digs under the lawn and pops up under the sleeping hedgehog,
+ * which flies up, curls into a ball and rolls through a pile of leaves; the
+ * leaves whirl up and spin the pinwheel, whose string pulls open the garden
+ * tap, and the sprinkler waters the sunflower until it blooms. The camera
+ * travels along with whatever moves.
  */
 export function GardenLevel(props: LevelProps) {
   const garden = useMemo(buildGarden, []);
@@ -81,12 +91,15 @@ export function GardenLevel(props: LevelProps) {
           <WaterWheel turned={garden.wheelAt(t)} />
           <Slide />
           <HoopBack />
+          <MoleTunnel garden={garden} t={t} clip={`${ids}-mole`} />
+          <LeafPile heap={garden.pileAt(t)} />
+          <Pinwheel garden={garden} t={t} />
           <FlowerBed />
           <Sunflower garden={garden} t={t} />
-          <Hedgehog garden={garden} t={t} />
           <Hose fill={garden.hoseAt(t)} t={t} />
           <Sprinkler spin={garden.spinAt(t)} />
           <Tap angle={garden.leverAt(t)} />
+          <PinwheelString garden={garden} t={t} />
 
           <MovingThings garden={garden} t={t} />
 
@@ -95,6 +108,9 @@ export function GardenLevel(props: LevelProps) {
           <WateringCan tilt={garden.tiltAt(t)} />
           <Pour garden={garden} t={t} />
           <HoopFront />
+          <Clods pts={garden.clodsAt(t)} />
+          <WhirlingLeaves garden={garden} t={t} />
+          <Gust k={garden.gustAt(t)} />
           <Spray drops={garden.sprayAt(t)} />
           <Birds garden={garden} t={t} />
           <Butterfly garden={garden} t={t} />
@@ -121,6 +137,7 @@ function MovingThings({ garden, t }: { garden: Garden; t: number }) {
       </g>
       <Apple at={apple.pt} spin={apple.spin} hanging={apple.hanging} sway={garden.swayAt(t)} />
       <CroquetBall at={ball.pt} spin={ball.spin} />
+      <Hedgehog garden={garden} t={t} />
     </g>
   );
 }
@@ -149,6 +166,8 @@ function Sky({ gradient }: { gradient: string }) {
         [3350, 190, 1.1],
         [4250, 110, 0.9],
         [5050, 200, 1],
+        [5850, 120, 0.9],
+        [6600, 180, 1.1],
       ].map(([x, y, s]) => (
         <Cloud key={x} x={x} y={y} s={s} />
       ))}
@@ -748,13 +767,13 @@ function Shed() {
         strokeWidth="4"
         strokeLinejoin="round"
       />
-      <rect x="3745" y="600" width="104" height={FLOOR - 600} rx="6" fill="#a5643a" stroke={INK} strokeWidth="4" />
-      <path d="M3797 640 c-12 -14 -28 0 0 22 c28 -22 12 -36 0 -22 Z" fill="#ff7bd0" stroke={INK} strokeWidth="2.5" />
-      <circle cx="3832" cy="710" r="6" fill="#ffd23f" stroke={INK} strokeWidth="2" />
-      <rect x="3640" y="574" width="80" height="64" rx="6" fill="#bfe9ff" stroke={INK} strokeWidth="4" />
-      <line x1="3680" y1="574" x2="3680" y2="638" stroke={INK} strokeWidth="4" />
-      <rect x="3632" y="638" width="96" height="18" rx="4" fill="#3ec300" stroke={INK} strokeWidth="3" />
-      {[3650, 3680, 3710].map((x, i) => (
+      <rect x={x0 + 265} y="600" width="104" height={FLOOR - 600} rx="6" fill="#a5643a" stroke={INK} strokeWidth="4" />
+      <path d={`M${x0 + 317} 640 c-12 -14 -28 0 0 22 c28 -22 12 -36 0 -22 Z`} fill="#ff7bd0" stroke={INK} strokeWidth="2.5" />
+      <circle cx={x0 + 352} cy="710" r="6" fill="#ffd23f" stroke={INK} strokeWidth="2" />
+      <rect x={x0 + 160} y="574" width="80" height="64" rx="6" fill="#bfe9ff" stroke={INK} strokeWidth="4" />
+      <line x1={x0 + 200} y1="574" x2={x0 + 200} y2="638" stroke={INK} strokeWidth="4" />
+      <rect x={x0 + 152} y="638" width="96" height="18" rx="4" fill="#3ec300" stroke={INK} strokeWidth="3" />
+      {[x0 + 170, x0 + 200, x0 + 230].map((x, i) => (
         <circle key={x} cx={x} cy="632" r="9" fill={BAR_COLORS[i * 3]} stroke={INK} strokeWidth="2" />
       ))}
     </g>
@@ -844,7 +863,7 @@ function FlowerBed() {
         strokeWidth="3"
         strokeLinejoin="round"
       />
-      {[4320, 4580, 4660, 4730].map((x, i) => (
+      {[x0 + 50, x0 + 310, x0 + 390, x0 + 460].map((x, i) => (
         <g key={x}>
           <line x1={x} y1={FLOOR - 18} x2={x} y2={FLOOR - 70 - (i % 2) * 14} stroke="#3e9a2e" strokeWidth="5" />
           <path
@@ -1017,24 +1036,385 @@ function Butterfly({ garden, t }: { garden: Garden; t: number }) {
   );
 }
 
-/** A hedgehog by the flower bed, who sniffs and lifts its nose when the sunflower opens. */
-function Hedgehog({ garden, t }: { garden: Garden; t: number }) {
-  const x = BED.x1 + 110;
-  const up = Math.min(1, Math.max(0, (t - garden.tBloom - 1.4) * 3)) * (1 + 0.15 * Math.sin(t * 25));
-  const spikes = Array.from({ length: 9 }, (_, i) => {
-    const a = Math.PI + (i / 8) * Math.PI;
-    const r = i % 2 ? 50 : 62;
-    return `${44 * Math.cos(a) * (r / 50) + 6} ${36 * Math.sin(a) * (r / 50)}`;
-  }).join(" L");
+/* ---------- Mole, hedgehog, leaves and pinwheel ---------- */
+
+const EARTH = "#7a4f2a";
+const EARTH_DARK = "#5c3a1a";
+const MOLE_FUR = "#5b4b63";
+const MOLE_PINK = "#ffb3c6";
+const SPINES = "#6b4423";
+const AUTUMN = ["#ff8c42", "#ffb703", "#e85d3a", LEAF_LIGHT];
+
+/** How much bigger the mole and its hills are drawn than the units their drawings are made in. */
+const MOLE_SIZE = MOLEHILL.h / 46;
+/** How much bigger the hedgehog is drawn than its drawing's units (a ball of radius 34 there). */
+const HOG_SIZE = HEDGEHOG.r / 34;
+
+/** The mole's three hills: its home, the little one on the way, and the one under the hedgehog. */
+const HILLS = [
+  { x: MOLEHILL.x, s: 1 },
+  { x: MOLE_PEEK_X, s: 0.75 },
+  { x: HEDGEHOG.x, s: 1 },
+];
+
+/** The ridge the mole pushes up under the lawn, its hills, and the mole looking out of them (cut off at the hill's top). */
+function MoleTunnel({ garden, t, clip }: { garden: Garden; t: number; clip: string }) {
+  const moles = garden.moleAt(t);
+  const hills = garden.hillsAt(t);
+  const tip = garden.ridgeAt(t);
+  const n = Math.max(2, Math.ceil((tip - MOLEHILL.x) / 20));
+  const ridge = Array.from({ length: n }, (_, i) => {
+    const x = lerp(MOLEHILL.x, tip, i / (n - 1));
+    return { x, y: FLOOR - 14 - 5 * Math.sin(x / 25) };
+  });
   return (
-    <g transform={`translate(${x} ${FLOOR - 2})`}>
-      <path d={`M${spikes} Z`} fill="#6b4423" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-      <g transform={`rotate(${-12 * up} -30 -14)`}>
-        <path d="M-20 -30 Q-46 -26 -60 -12 Q-46 -2 -20 0 Z" fill="#e8c39e" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
-        <circle cx="-61" cy="-12" r="5" fill={INK} />
-        <circle cx="-36" cy="-18" r="3.5" fill={INK} />
+    <g>
+      {t > garden.tPeek + 1 && tip > MOLEHILL.x + 10 && (
+        <path
+          d={`M${MOLEHILL.x} ${FLOOR + 2} L${svgLine(ridge).slice(1)} L${tip} ${FLOOR + 2} Z`}
+          fill={EARTH}
+          stroke={INK}
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+      )}
+      {garden.digging(t) && <ellipse cx={tip} cy={FLOOR - 6} rx="48" ry={27 + 6 * Math.sin(t * 22)} fill={EARTH} stroke={INK} strokeWidth="3" />}
+      {HILLS.map((hill, i) => {
+        if (hills[i] <= 0) return null;
+        const top = FLOOR - MOLEHILL.h * hill.s * hills[i];
+        // The home hill shakes when the croquet ball bumps it.
+        const squash = i === 0 ? wobble(t - garden.tKnock, 0.12, 30, 5) : 0;
+        const up = moles[i];
+        const look = i === 0 ? -3 : i === 1 ? 4 * Math.sin((t - garden.tMid) * 4) : 3;
+        return (
+          <g key={hill.x}>
+            {up > 0 && (
+              <>
+                <clipPath id={`${clip}${i}`}>
+                  <rect x={hill.x - 160} y={top - 400} width="320" height="426" />
+                </clipPath>
+                <g clipPath={`url(#${clip}${i})`}>
+                  <g transform={`translate(${hill.x} ${top + 90 - 148 * up}) scale(${MOLE_SIZE})`}>
+                    <Mole look={look} blink={(t * 0.7 + i * 0.3) % 1 < 0.08} rub={i === 0} wave={i === 2 ? Math.sin(t * 10) : 0} t={t} />
+                  </g>
+                </g>
+              </>
+            )}
+            <g transform={`translate(${hill.x} ${FLOOR}) scale(${hill.s * (1 + squash)} ${hill.s * hills[i] * (1 - squash)})`}>
+              <path d={`M${-MOLEHILL.rx} 2 A${MOLEHILL.rx} ${MOLEHILL.h} 0 0 1 ${MOLEHILL.rx} 2 Z`} fill={EARTH} stroke={INK} strokeWidth="3" />
+              {[
+                [-30, -14],
+                [8, -30],
+                [26, -10],
+                [-6, -8],
+              ].map(([x, y]) => (
+                <circle key={x} cx={x * MOLE_SIZE} cy={y * MOLE_SIZE} r={5 * MOLE_SIZE} fill={EARTH_DARK} />
+              ))}
+            </g>
+            {i === 0 && up > 0.3 && <DizzyStars t={t} x={hill.x} y={top - 150} />}
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
+/** The mole's head and big pink digging paws, around the middle of its head: dizzy rubbing its head, or waving. */
+function Mole({ look, blink, rub, wave, t }: { look: number; blink: boolean; rub: boolean; wave: number; t: number }) {
+  const rubX = 6 * Math.cos(t * 12);
+  return (
+    <g>
+      <ellipse rx="31" ry="38" cy="6" fill={MOLE_FUR} stroke={INK} strokeWidth="3" />
+      <ellipse cy="12" rx="20" ry="17" fill="#7a6a82" />
+      {blink
+        ? [-1, 1].map((side) => (
+            <line key={side} x1={side * 10 - 4 + look} y1="-6" x2={side * 10 + 4 + look} y2="-6" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+          ))
+        : [-1, 1].map((side) => <circle key={side} cx={side * 10 + look} cy="-6" r="3.5" fill={INK} />)}
+      {[-1, 1].map((side) => (
+        <path key={side} d={`M${side * 8} 16 l${side * 22} -6 M${side * 8} 19 l${side * 22} 4`} stroke={INK} strokeWidth="2" strokeLinecap="round" />
+      ))}
+      <ellipse cy="15" rx="11" ry="8" fill={MOLE_PINK} stroke={INK} strokeWidth="2.5" />
+      <ellipse cy="10" rx="7" ry="5" fill="#ff5d9e" stroke={INK} strokeWidth="2.5" />
+      <MolePaw x={-30} y={wave ? -16 + 6 * wave : 32} angle={wave ? -30 : 0} />
+      <MolePaw x={rub ? 14 + rubX : 30} y={rub ? -36 : 32} angle={rub ? 160 : 0} />
+    </g>
+  );
+}
+
+/** A broad pink mole's paw with three claws, turned by `angle` degrees. */
+function MolePaw({ x, y, angle }: { x: number; y: number; angle: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${angle})`}>
+      {[-8, 0, 8].map((dx) => (
+        <line key={dx} x1={dx} y1="-6" x2={dx * 1.3} y2="-16" stroke="#fff4dc" strokeWidth="4" strokeLinecap="round" />
+      ))}
+      <ellipse rx="15" ry="10" fill={MOLE_PINK} stroke={INK} strokeWidth="2.5" />
+    </g>
+  );
+}
+
+/** Three little stars circling round the bonked mole's head. */
+function DizzyStars({ t, x, y }: { t: number; x: number; y: number }) {
+  return (
+    <g>
+      {[0, 1, 2].map((i) => {
+        const a = t * 5 + i * 2.1;
+        return (
+          <path
+            key={i}
+            transform={`translate(${x + 40 * MOLE_SIZE * Math.cos(a)} ${y + 10 * MOLE_SIZE * Math.sin(a)}) scale(${MOLE_SIZE * (0.8 + 0.2 * Math.sin(a))})`}
+            d="M0 -12 L3.5 -4 L12 -4 L5 1.5 L7.5 10 L0 5 L-7.5 10 L-5 1.5 L-12 -4 L-3.5 -4 Z"
+            fill="#ffd23f"
+            stroke={INK}
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/** Clods of earth flying out of a molehill. */
+function Clods({ pts }: { pts: Pt[] }) {
+  return (
+    <g>
+      {pts.map((p, i) => (
+        <circle key={i} cx={p.x} cy={p.y} r={10 + (i % 3) * 3} fill={EARTH} stroke={INK} strokeWidth="2" />
+      ))}
+    </g>
+  );
+}
+
+/** Spines all round, for the hedgehog rolled into a ball (radius 34 in its drawing's units). */
+const BALL_SPINES = Array.from({ length: 22 }, (_, i) => {
+  const a = (i / 22) * 2 * Math.PI;
+  const r = i % 2 ? 34 : 46;
+  return `${r * Math.cos(a)} ${r * Math.sin(a)}`;
+}).join(" L");
+
+/** Spines along its back, for the hedgehog standing (facing right, its feet at 0). */
+const BACK_SPINES = Array.from({ length: 11 }, (_, i) => {
+  const a = Math.PI + (i / 10) * Math.PI;
+  const r = i % 2 ? 1 : 1.25;
+  return `${-6 - 46 * Math.cos(a) * r} ${38 * Math.sin(a) * r}`;
+}).join(" L");
+
+/** An autumn leaf caught on the hedgehog's spines. */
+function StuckLeaf({ x, y, angle, color }: { x: number; y: number; angle: number; color: string }) {
+  return <ellipse cx={x} cy={y} rx="12" ry="6" transform={`rotate(${angle} ${x} ${y})`} fill={color} stroke={INK} strokeWidth="2" />;
+}
+
+/**
+ * The hedgehog: asleep on the grass, surprised on top of the mole's new hill, a prickly ball spinning through the air
+ * and the leaves, and on its feet again at the end, sneezing.
+ */
+function Hedgehog({ garden, t }: { garden: Garden; t: number }) {
+  const { pt, spin, curl, shake, awake } = garden.hogAt(t);
+  const leafy = t > garden.tBurst;
+  if (curl >= 0.5) {
+    const s = HOG_SIZE * (0.7 + 0.6 * (curl - 0.5));
+    return (
+      <g transform={`translate(${pt.x} ${pt.y}) rotate(${deg(spin)}) scale(${s})`}>
+        <path d={`M${BALL_SPINES} Z`} fill={SPINES} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <circle r="26" fill="#8a5a3a" />
+        <circle cx="0" cy="14" r="12" fill="#e8c39e" stroke={INK} strokeWidth="2.5" />
+        <circle cx="0" cy="22" r="4" fill={INK} />
+        {leafy && (
+          <>
+            <StuckLeaf x={-24} y={-26} angle={30} color={AUTUMN[0]} />
+            <StuckLeaf x={28} y={-14} angle={-50} color={AUTUMN[1]} />
+          </>
+        )}
       </g>
-      <ellipse cx="-14" cy="0" rx="8" ry="4" fill="#4a2f1a" />
+    );
+  }
+  // Ha… ha… (nose up), tschi! (a nod down) – the sneeze's sound has its „tschi“ about a second in.
+  const tschi = garden.tHogStop + 1.1;
+  const nod = t < tschi ? 16 * seg(t, garden.tHogStop + 0.3, tschi) : -wobble(t - tschi, 22, 18, 4);
+  const surprised = awake && t < garden.tLandHog;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y + HEDGEHOG.r}) rotate(${shake}) scale(${HOG_SIZE * (1 - 0.6 * curl)} ${HOG_SIZE})`}>
+      <g transform="scale(-1 1)">
+        <path d={`M${BACK_SPINES} Z`} fill={SPINES} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <g transform={`rotate(${nod} -30 -14)`}>
+          <path d="M-20 -30 Q-46 -26 -60 -12 Q-46 -2 -20 0 Z" fill="#e8c39e" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+          <circle cx="-61" cy="-12" r="5" fill={INK} />
+          {awake ? (
+            <circle cx="-36" cy="-18" r={surprised ? 5 : 3.5} fill={INK} />
+          ) : (
+            <path d="M-41 -18 q5 4 10 0" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+          )}
+        </g>
+        <ellipse cx="-14" cy="0" rx="8" ry="4" fill="#4a2f1a" />
+        {leafy && <StuckLeaf x={8} y={-40} angle={-20} color={AUTUMN[0]} />}
+      </g>
+      {!awake && (
+        <text x="30" y="-58" fontSize="30" fontWeight="bold" fill={INK} textAnchor="middle">
+          z
+        </text>
+      )}
+      {surprised && (
+        <text x="10" y="-62" fontSize="42" fontWeight="bold" fill="#ff3b3b" stroke={INK} strokeWidth="1.5" textAnchor="middle">
+          !
+        </text>
+      )}
+      {t > tschi && t < tschi + 0.5 && (
+        <g opacity={1 - 2 * (t - tschi)}>
+          {[0, 1, 2].map((i) => (
+            <circle
+              key={i}
+              cx={78 + 22 * (t - tschi) * (4 + i)}
+              cy={-6 - 10 * i + 8 * i * (t - tschi)}
+              r={7 - i}
+              fill="#fff"
+              stroke="#9cc3e6"
+              strokeWidth="2"
+            />
+          ))}
+        </g>
+      )}
+    </g>
+  );
+}
+
+/** Where the leaves lie in the pile: across its width, higher in the middle. */
+const PILE_LEAVES = Array.from({ length: 13 }, (_, i) => {
+  const k = (i % 5) / 4;
+  const row = Math.floor(i / 5);
+  return {
+    x: LEAF_PILE.x - LEAF_PILE.w / 2 + 18 + k * (LEAF_PILE.w - 36) + row * 10,
+    h: (0.3 + row * 0.33) * Math.sin(Math.PI * (0.15 + 0.7 * k)),
+    a: (i * 47) % 180,
+  };
+});
+
+/** The pile of raked autumn leaves; `heap` is how much of it is still piled up. */
+function LeafPile({ heap }: { heap: number }) {
+  return (
+    <g>
+      <ellipse
+        cx={LEAF_PILE.x}
+        cy={FLOOR - 4}
+        rx={(LEAF_PILE.w / 2) * (0.6 + 0.4 * heap)}
+        ry={LEAF_PILE.h * 0.45 * heap + 4}
+        fill="#d9822b"
+        stroke={INK}
+        strokeWidth="3"
+      />
+      {PILE_LEAVES.map((l, i) => {
+        const y = FLOOR - 8 - LEAF_PILE.h * l.h * heap;
+        return <ellipse key={i} cx={l.x} cy={y} rx="14" ry="7" transform={`rotate(${l.a} ${l.x} ${y})`} fill={AUTUMN[i % 4]} stroke={INK} strokeWidth="2" />;
+      })}
+    </g>
+  );
+}
+
+/** The leaves the hedgehog sends whirling up, fluttering over to the pinwheel and down onto the grass. */
+function WhirlingLeaves({ garden, t }: { garden: Garden; t: number }) {
+  if (t < garden.tBurst) return null;
+  return (
+    <g>
+      {Array.from({ length: LEAVES }, (_, i) => {
+        const leaf = garden.leafAt(i, t);
+        if (!leaf) return null;
+        const { x, y } = leaf.pt;
+        return (
+          <ellipse key={i} cx={x} cy={y} rx="13" ry="6.5" transform={`rotate(${leaf.angle} ${x} ${y})`} fill={AUTUMN[i % 4]} stroke={INK} strokeWidth="2" />
+        );
+      })}
+    </g>
+  );
+}
+
+/** White swirls of wind on their way from the leaf pile to the pinwheel, `k` of the way. */
+function Gust({ k }: { k: number | null }) {
+  if (k === null) return null;
+  const x = lerp(LEAF_PILE.x, PINWHEEL.x - 40, k);
+  return (
+    <g opacity={Math.sin(k * Math.PI)} fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round">
+      {[
+        [-60, 640],
+        [0, 600],
+        [-30, 690],
+      ].map(([dx, y]) => (
+        <path key={y} d={`M${x + dx - 50} ${y} q20 -18 40 0 t40 0 q14 -20 -4 -26`} />
+      ))}
+    </g>
+  );
+}
+
+/** The flower pot the pinwheel is stuck in. */
+const PinwheelPot = memo(function PinwheelPot() {
+  const { x, potTop } = PINWHEEL;
+  return (
+    <g>
+      <path
+        d={`M${x - 40} ${potTop + 14} L${x + 40} ${potTop + 14} L${x + 30} ${FLOOR + 2} L${x - 30} ${FLOOR + 2} Z`}
+        fill="#e07a4f"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <rect x={x - 46} y={potTop} width="92" height="18" rx="5" fill="#f0915f" stroke={INK} strokeWidth="3" />
+      <ellipse cx={x} cy={potTop + 2} rx="38" ry="5" fill={EARTH_DARK} />
+      <path d={`M${x - 26} ${potTop + 30} L${x - 20} ${FLOOR - 12}`} stroke="#fff7" strokeWidth="5" strokeLinecap="round" />
+    </g>
+  );
+});
+
+const BLADE_COLORS = ["#ff5d73", "#ffd23f", "#3a86ff", "#3ec300"];
+
+/** The pinwheel on its stick: it leans in the gust and its four blades spin round. */
+function Pinwheel({ garden, t }: { garden: Garden; t: number }) {
+  const { x, hubY, r, potTop } = PINWHEEL;
+  return (
+    <g>
+      <g transform={`rotate(${garden.leanAt(t)} ${x} ${potTop})`}>
+        <line x1={x} y1={potTop + 4} x2={x} y2={hubY} stroke={INK} strokeWidth="10" strokeLinecap="round" />
+        <line x1={x} y1={potTop + 4} x2={x} y2={hubY} stroke={MID_WOOD} strokeWidth="5" strokeLinecap="round" />
+        <g transform={`translate(${x} ${hubY}) rotate(${deg(garden.pinwheelAt(t))})`}>
+          {BLADE_COLORS.map((color, i) => (
+            <g key={color} transform={`rotate(${i * 90})`}>
+              <path
+                d={`M0 0 L${-r * 0.15} ${-r} Q${r * 0.6} ${-r * 0.92} ${r * 0.45} ${-r * 0.4} Z`}
+                fill={color}
+                stroke={INK}
+                strokeWidth="3"
+                strokeLinejoin="round"
+              />
+              <path d={`M0 0 L${r * 0.45} ${-r * 0.4}`} stroke="#fff8" strokeWidth="3" />
+            </g>
+          ))}
+          <circle r="10" fill="#fff" stroke={INK} strokeWidth="3" />
+          <circle r="3.5" fill={INK} />
+        </g>
+      </g>
+      <PinwheelPot />
+    </g>
+  );
+}
+
+/** The string from the pinwheel's hub to the tap's lever: slack, then winding up taut, then slipped off and dangling. */
+function PinwheelString({ garden, t }: { garden: Garden; t: number }) {
+  const hub = garden.hubAt(t);
+  if (!garden.stringOn(t)) {
+    const swing = 14 * Math.exp(-(t - garden.tOpen) * 1.5) * Math.sin((t - garden.tOpen) * 6);
+    const d = `M${hub.x} ${hub.y} q${4 + swing / 2} 26 ${6 + swing} 52`;
+    return <StringLine d={d} />;
+  }
+  const knob = knobAt(garden.leverAt(t));
+  const sag = 26 * (1 - seg(t, garden.tGust, garden.tGust + 0.5));
+  const d = `M${hub.x} ${hub.y} Q${(hub.x + knob.x) / 2} ${(hub.y + knob.y) / 2 + sag} ${knob.x} ${knob.y}`;
+  return <StringLine d={d} />;
+}
+
+function StringLine({ d }: { d: string }) {
+  return (
+    <g fill="none" strokeLinecap="round">
+      <path d={d} stroke={INK} strokeWidth="5" />
+      <path d={d} stroke="#fffaf0" strokeWidth="2.5" />
     </g>
   );
 }

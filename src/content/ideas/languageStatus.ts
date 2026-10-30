@@ -84,7 +84,15 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/kettenreaktion/",
     parts: [
-      { label: "🎢 Die anderen zwölf Level", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🎢 Kugelbahn, Nagelbrett, Hatschi-Kette, Wasserbahn",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "⚙️ Alles fällt um und die sieben übersetzten Maschinen",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Längere Maschinen (Oktober 2026): Salzstreuer, Vase, Thermoskanne und Besen sowie die neuen Sätze (Papierflieger, Pfannkuchen, Walze, Ufo, Hase an der Wand) nur auf Deutsch.",
+      },
       { label: "🛁 Badezimmer", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze der Maschine nur auf Deutsch (R-05)." },
       { label: "🐓 Bauernhof", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze unterwegs nur auf Deutsch." },
       { label: "🌙 Gute-Nacht-Maschine", languages: { de: "done" }, note: "Name, erster Satz und Gute-Nacht-Sätze nur auf Deutsch (R-07, Oktober 2026)." },
