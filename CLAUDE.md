@@ -143,6 +143,9 @@ In a fresh worktree run `bun install` first.
   or a new part that moves a lot, gets a scenario there; run it after changing what moves (`bun run perf <name>`,
   `--profile` names the functions that cost, `--shots` shows what was measured). The build ships React's production code
   (`PRODUCTION` in `tools/appPlugin.ts`, checked in `buildTools.test.ts`): without it every game ran several times slower.
+  A scheduled task on the user's Mac (`tinytaps-perf-weekly`, Mondays) measures every game, keeps the numbers in
+  `tools/perf-history/<date>.json` to compare with the week before, and turns a game over budget or clearly worse into
+  an idea „Leistung: <Spiel> …“ in `src/content/ideas/a-all-games.ts` – the user picks it, the run fixes nothing.
 - **The app's animal is the fox** (the site is toddlerfox.com, Tapsi is a fox; user decision, October 2026): new pictures
   and games take foxes in wherever they fit – fox grown-ups instead of drawn people (the baker, the doctor, the driver),
   a fox child peeking out of the background, Tapsi cheering at the end – and the book's readers are foxes only (no
