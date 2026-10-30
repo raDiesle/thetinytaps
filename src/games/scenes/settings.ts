@@ -6,8 +6,10 @@ import type { Localized } from "@/lib/language";
  * Find: "Wo ist der Bagger?" Questions: "Was ist rot?", several right answers.
  * Torch ("Taschenlampe", idea B-17): the picture is dark, a round light follows the finger, the mouse or the arrow
  * keys, and what comes into the light wakes up.
+ * Road ("Straße malen", idea N-43): a line drawn with the finger becomes a road, a car, tractor or train drives
+ * along it and wakes what it passes, and honks at the end.
  */
-export type SceneMode = "explore" | "colour" | "find" | "questions" | "torch";
+export type SceneMode = "explore" | "colour" | "find" | "questions" | "torch" | "road";
 
 /** Modes in which the child looks for something that was asked. */
 export const isQuestMode = (mode: SceneMode) => mode === "find" || mode === "questions";
@@ -71,4 +73,6 @@ export const SCENE_MODES: { value: SceneMode; label: Localized }[] = [
   { value: "find", label: { de: "🔍 Suchen", ru: "🔍 Поиск", en: "🔍 Find it", zh: "🔍 找一找", hi: "🔍 ढूँढें", es: "🔍 Buscar", ar: "🔍 بحث" } },
   { value: "questions", label: { de: "❓ Fragen", ru: "❓ Вопросы", en: "❓ Questions", zh: "❓ 问一问", hi: "❓ सवाल", es: "❓ Preguntas", ar: "❓ أسئلة" } },
   { value: "torch", label: { de: "🔦 Taschenlampe" } },
+  // Short, so the six modes still fit in one row on a phone on its side (844 px).
+  { value: "road", label: { de: "🛣️ Straßen" } },
 ];

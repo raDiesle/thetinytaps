@@ -13,6 +13,7 @@ import { SCENES } from ".";
 import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
+import { LaneLayer, type LaneControl } from "./LaneLayer";
 import { localizeScene, sceneLanguage } from "./localize";
 import { ExitSign, FocusRing, HintRing, KeyBadges, Thumbnail, type Exit, type Lit } from "./marks";
 import { capitalize, SCENE_PHRASES } from "./phrases";
@@ -171,6 +172,9 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   const questMode = isQuestMode(settings.mode);
   const colouring = settings.mode === "colour";
   const torch = settings.mode === "torch";
+  /** "Straße malen" (N-43): drawn roads, and what a vehicle drives past wakes up (LaneLayer.tsx). */
+  const lanes = settings.mode === "road";
+  const laneRef = useRef<LaneControl>(null);
   const soundsOn = settings.sounds;
   const quests = useMemo(() => questsFor(settings.mode, scene, language.id), [settings.mode, scene, language.id]);
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
@@ -504,11 +508,13 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     const lit = here(litItems(items, ...lightAt.current, scene.width * TORCH_RADIUS));
     const before = inLight.current;
     inLight.current = new Set(lit.map((item) => item.id));
-    for (const item of lit) {
-      if (before.has(item.id) || item.id === started) continue;
-      if (animate(item)) say(describe(item));
-      discover(item, ...screenPoint(item));
-    }
+    for (const item of lit) if (!before.has(item.id) && item.id !== started) wake(item);
+  };
+
+  /** Torch and road mode: an item the light or a vehicle reaches moves, sounds, speaks and is counted. */
+  const wake = (item: SceneItem) => {
+    if (animate(item)) say(describe(item));
+    discover(item, ...screenPoint(item));
   };
 
   /** Torch mode: the light follows a tap, the finger and the mouse. */
@@ -656,6 +662,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       /** Starts the item of a key; in torch mode the light goes to it first. */
       const start = (item: SceneItem) => {
         if (torch) moveLightRef.current(...centre(item), item.id);
+        // Road mode: a road appears from the waiting vehicle to the item, and the vehicle drives there.
+        if (lanes) laneRef.current?.driveTo(centre(item));
         const [x, y] = screenPoint(item);
         activateRef.current(item, x, y);
       };
@@ -730,7 +738,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [scene, items, here, keys, screenPoint, colouring, torch, keyboard, keysOn, settings.sounds, ask, funBurst, moveFocus, language.id]);
+  }, [scene, items, here, keys, screenPoint, colouring, torch, lanes, keyboard, keysOn, settings.sounds, ask, funBurst, moveFocus, language.id]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
@@ -847,6 +855,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
       </svg>
       {/* Torch mode: the night over everything but the light; it goes when all were found (a bedtime picture stays dark). */}
+      {lanes && <LaneLayer ref={laneRef} width={scene.width} height={scene.height} items={items} sounds={soundsOn} onPass={wake} />}
       {torch && <TorchNight nightRef={nightRef} off={allDiscovered && !bedtime} />}
 
       {quest && (
@@ -922,7 +931,11 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           ⌨️
         </button>
       )}
-      {!questMode && !touched && <p className="scene-prompt">{(colouring ? words.colourPrompts : words.prompts)[keysOn ? "keys" : "tap"]}</p>}
+      {!questMode && !touched && (
+        <p className="scene-prompt">
+          {(colouring ? words.colourPrompts : lanes ? (words.roadPrompts ?? words.prompts) : words.prompts)[keysOn ? "keys" : "tap"]}
+        </p>
+      )}
       {/* Only shown by CSS on a phone held upright, where the wide picture gets tiny. */}
       <p className="scene-rotate">
         <span className="scene-rotate-phone" aria-hidden>

@@ -21,6 +21,16 @@ export function placeBox([x, y, w, h]: Box, place?: Placement): Box {
   return [dx + x * s, dy + y * s, w * s, h * s];
 }
 
+/** The items with a tap area closer than `reach` to (x, y), in picture units (the torch's light, a passing vehicle). */
+export function itemsNear(items: readonly SceneItem[], x: number, y: number, reach: number) {
+  return items.filter((item) =>
+    (item.hitAreas ?? [item.box]).some((area) => {
+      const [bx, by, w, h] = placeBox(area, item.place);
+      return Math.hypot(Math.max(bx - x, 0, x - (bx + w)), Math.max(by - y, 0, y - (by + h))) < reach;
+    }),
+  );
+}
+
 /** Synthesized effect played with an item's animation, see lib/sfx. */
 export type SceneSound =
   | "engine"

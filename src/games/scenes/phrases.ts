@@ -35,6 +35,8 @@ export interface ScenePhrases {
   prompts: Record<ScenePrompt, string>;
   /** The same in colour mode. */
   colourPrompts: Record<ScenePrompt, string>;
+  /** The same in road mode ("Straße malen"); German only so far, else `prompts`. */
+  roadPrompts?: Record<ScenePrompt, string>;
   /** Said before the praise of a right answer, one at random. */
   praise: string[];
   /** The party when everything is coloured / discovered. */
@@ -78,6 +80,7 @@ export interface ScenePhrases {
 
 const de: ScenePhrases = {
   prompts: { tap: "Tipp etwas an! 👆", keys: "Drück eine Taste! ⌨️" },
+  roadPrompts: { tap: "Mal eine Straße! ☝️", keys: "Mal eine Straße oder drück eine Taste! ⌨️" },
   colourPrompts: {
     tap: "Tipp etwas an – es wird bunt! 🖍️",
 
