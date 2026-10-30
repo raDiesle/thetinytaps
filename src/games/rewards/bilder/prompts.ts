@@ -1,5 +1,6 @@
 import type { PicturePrompt, PicturePromptSet } from "@/content/picturePrompts";
 import { ACTIVITIES, MARKS, REWARDS, TASKS, THEMES } from "../catalog";
+import { picture } from "../pictures";
 
 // Every picture the Belohnungstafel may get, as prompts for the grown-up to check on
 // /management/ (Bildvorschläge) before any is made. All of them were made on 30 October 2026 (the user asked for them before
@@ -174,8 +175,14 @@ const lineArt = (picture: PicturePrompt): PicturePrompt => ({
   ref: [picture.file],
 });
 
+/** The prompts with the URL of each picture already in bilder/. */
+const withPictures = (set: PicturePromptSet): PicturePromptSet => ({
+  ...set,
+  groups: set.groups.map((g) => ({ ...g, prompts: g.prompts.map((p) => ({ ...p, url: picture(p.file.slice(DIR.length + 1, -".webp".length)) })) })),
+});
+
 /** All picture prompts of the Belohnungstafel, shown on /management/. */
-export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
+export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
   id: "belohnungstafel",
   emoji: "🌟",
   title: "Belohnungstafel",
@@ -251,4 +258,4 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
       prompts: [...TASK_PROMPTS, ...STEP_PROMPTS, ...REWARD_PROMPTS].map(lineArt),
     },
   ],
-};
+});

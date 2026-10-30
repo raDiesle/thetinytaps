@@ -645,8 +645,25 @@ button.idea-id {
   border-color: var(--sunshine);
 }
 
+.ideas-prompt-body {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+/* A made picture beside its prompt, on a checkerboard so cut-outs show their edges. */
+.ideas-prompt-body img {
+  flex: none;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 0 0 / 16px 16px;
+}
+
 .ideas-prompt textarea {
   box-sizing: border-box;
+  flex: 1;
   width: 100%;
   padding: 8px 10px;
   border: 2px solid #2a1e5c55;

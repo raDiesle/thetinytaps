@@ -146,6 +146,8 @@ names – use those.
    leave a placeholder in the game (the Gefühle game shows the file name, `Placeholder` in its `shared.tsx`)
    and list file name and prompt where the game keeps them (e.g. „Geplant“ in its `bilder/README.md`),
    so the user looks at the ideas first and then makes them with you.
+   Prompts collected for review on `/management/` (`src/content/picturePrompts.ts`) stay there once made, each with
+   the `url` of its picture, so the page shows it as made and not as missing (`picturePrompts.test.ts` checks it).
 1. Write the prompt in English: subject, pose, mood, what must be readable for a
    toddler. One clear subject; describe characters with the same words every time.
 2. For a recurring character, make a reference first (character sheet or the best
