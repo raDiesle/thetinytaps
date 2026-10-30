@@ -131,6 +131,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Eine dritte Sorte neben „Aufzug“ und „Laufen“: „🎬 Filme“. Statt einer Welt, die mitrollt, springt der Film von Ort zu Ort wie im Fernsehen – Schnitt, nächstes Bild – und erzählt eine Geschichte von Anfang bis Ende, die zu einem Thema gehört (Feuerwehr, Krankenwagen, Bauernhof). Jedes Bild ist eine kurze Szene: ein Tipp, und etwas Großes passiert (das Telefon klingelt, das Tor geht auf, das Martinshorn geht an). Zwischen den Szenen ein deutlicher Übergang (die Kamera fährt weg, ein Wisch), damit das Kind merkt: jetzt sind wir woanders.",
       why: "Kinder lieben Abläufe, die sie kennen und wiedererkennen; ein Film erzählt einen ganzen Zusammenhang statt nur einen Weg.",
       effort: "L",
+      done: true,
     },
     {
       id: "G-15",
@@ -139,6 +140,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Der erste Film: Rauch steigt aus einem Haus → jemand ruft an (Telefon klingelt, Hörer ab) → in der Feuerwache klingelt die Glocke, alle rutschen die Stange hinunter, ziehen Stiefel, Jacke und Helm an → das Tor geht auf, das Feuerwehrauto fährt mit Blaulicht und Tatütata durch die Stadt, Autos machen Platz → am Haus fährt die Leiter aus, der Schlauch wird ausgerollt, Wasser marsch, die Flammen werden mit jedem Tipp kleiner (drei Flammen, drei Tipps) → alle Bewohner stehen gesund draußen und klatschen → zurück in der Wache wird das Auto gewaschen, alle essen zusammen. Das Kind ist mittendrin: es trägt selbst Helm und Stiefel und hält den Schlauch (wie das Kind in den anderen Abenteuern). Die Flammen sind freundlich, niemand hat Angst.",
       why: "Das Lieblingsthema vieler Zweijähriger als ganze Geschichte; zeigt nebenbei: anrufen, helfen, alle sind wieder froh. Anders als das abgelehnte N-19 ist Löschen hier nur eine Szene von vielen.",
       effort: "L",
+      done: true,
     },
     {
       id: "G-16",
@@ -147,6 +149,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Am Anfang des Feuerwehr-Films klingelt das Telefon, und eine Sprechblase zeigt drei Bilder: eine Katze oben im Baum, ein Haus mit Rauch, ein Auto im Graben. Das Kind tippt eins, und der Film erzählt diesen Einsatz: bei der Katze fährt die Leiter hoch und die Katze springt in die Arme; beim Feuer wird gelöscht; beim Auto wird ein Warndreieck aufgestellt, der Kran zieht es aus dem Graben, der Fahrerin geht es gut, sie bekommt eine Decke und Tee. Wache, Anziehen und Fahrt sind bei allen gleich – das Kind erkennt sie wieder. Jede Wahl ist richtig, es gibt kein Falsch.",
       why: "Eigene Entscheidung, die die ganze Geschichte ändert; jedes Mal ein anderer Film, aber vertraute Teile.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-17",
@@ -155,6 +158,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Die Wahl kann auch mitten im Film kommen: auf dem Rückweg funkt es im Feuerwehrauto, und zwei Bilder zeigen, was jetzt noch zu tun ist (die Katze im Baum oder ein Ball auf dem Dach). Wie die Weggabel (G-09): zwei große Bildschilder, Antippen wählt, beide führen zum frohen Ende. Höchstens eine Wahl am Anfang und eine in der Mitte, damit der Film kurz bleibt.",
       why: "Die Geschichte wird zu etwas, das das Kind selbst steuert, ohne dass es zu viel auf einmal wird.",
       effort: "M",
+      done: true,
     },
     {
       id: "G-18",
@@ -187,6 +191,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Am unteren Rand zeigt eine Reihe kleiner Bilder die Szenen des Films (Haus, Telefon, Wache, Fahrt, Löschen, Party); die Szene, in der das Kind gerade ist, ist groß und leuchtet, die gespielten bekommen einen Haken aus einem Stern. Am Ende läuft der Streifen einmal schnell durch: „Das war unser Film!“ Nichts zu lesen, nur Bilder.",
       why: "Zeigt, wo man in der Geschichte ist und wie viel noch kommt; zum Nacherzählen mit den Eltern.",
       effort: "S",
+      done: true,
     },
     {
       id: "G-22",
@@ -195,6 +200,7 @@ export const littleAdventuresIdeas: IdeaArea = {
       text: "Eine kleine Mannschaft, die immer wiederkommt: die Feuerwehrfrau, der Feuerwehrmann mit Bart, der Wachhund mit Helm. Sie haben eigene Stimmen und kleine Eigenheiten (der Hund bellt beim Martinshorn mit, einer vergisst immer den Helm und rennt zurück). In Bauernhof- oder Stadtfilmen tauchen sie kurz auf.",
       why: "Vertraute Figuren machen neue Filme sofort heimisch; Kinder freuen sich, sie wiederzusehen.",
       effort: "M",
+      partial: "Im Feuerwehr-Film ist es in jeder Szene dieselbe Mannschaft (zwei Feuerwehrleute); der Wachhund, eigene Stimmen und Eigenheiten fehlen noch.",
     },
   ],
 };

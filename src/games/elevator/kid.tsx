@@ -71,8 +71,33 @@ export type Pose =
   // On a raft: both hands on the paddle, which strokes through the water.
   | "paddle";
 
-/** What the child wears; "barefoot" and "flipflops" are for the beach (feet instead of shoes). */
-export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat" | "barefoot" | "flipflops";
+/** What the child wears; "barefoot" and "flipflops" are for the beach (feet instead of shoes), "fire" is the fire
+ * brigade's jacket, trousers and helmet. */
+export type Outfit = "pyjama" | "boots" | "coat" | "umbrella" | "chef" | "hat" | "barefoot" | "flipflops" | "fire";
+
+/** The dark blue of the fire brigade's clothes, and the yellow of their shining stripes. */
+export const FIRE_BLUE = "#2b3a8c";
+export const FIRE_STRIPE = "#ffd43b";
+
+/** A fire brigade's red helmet with its silver visor, on a head drawn like `KidHead`. */
+export function FireHelmet() {
+  return (
+    <g>
+      <path d="M-38 -146 Q-42 -194 0 -196 Q42 -194 38 -146 Z" fill="#e03131" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d="M-5 -195 Q0 -200 5 -195 L6 -150 H-6 Z" fill="#c92a2a" />
+      <path d="M-22 -184 Q-30 -170 -28 -156" stroke="#fff" strokeWidth="5" strokeLinecap="round" fill="none" opacity="0.5" />
+      <circle cx="0" cy="-166" r="9" fill={FIRE_STRIPE} stroke={INK} strokeWidth="2.5" />
+      <path
+        d="M-46 -146 Q0 -160 46 -146 Q48 -138 40 -138 Q0 -150 -40 -138 Q-48 -138 -46 -146 Z"
+        fill="#c92a2a"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M-30 -150 Q0 -158 30 -150 L28 -142 Q0 -150 -28 -142 Z" fill="#ced4da" opacity="0.85" />
+    </g>
+  );
+}
 export type Holding = "eggs" | "breakfast" | "juice" | "teddy" | "mug" | "toothbrush" | "boat";
 
 /** Held in front with both hands. */
@@ -240,9 +265,10 @@ export function Kid({
   const umbrella = wear.includes("umbrella");
   const chef = wear.includes("chef");
   const hat = wear.includes("hat");
+  const fire = wear.includes("fire");
   const front = holding ? IN_FRONT[holding] : undefined;
-  const shirt = pyjama ? "#a5d8ff" : look.shirt;
-  const pants = pyjama ? "#a5d8ff" : look.pants;
+  const shirt = pyjama ? "#a5d8ff" : fire ? FIRE_BLUE : look.shirt;
+  const pants = pyjama ? "#a5d8ff" : fire ? FIRE_BLUE : look.pants;
   const right = ARMS[rightArm(pose, !!front)];
   const left = ARMS[leftArm(pose, !!front, umbrella)];
   const sleeve = coat ? "#ffd43b" : shirt;
@@ -292,6 +318,7 @@ export function Kid({
           <g key={s} className={`el-leg el-leg-${s < 0 ? "l" : "r"}`} style={{ transformOrigin: `${s * 10}px -52px` }}>
             <rect x={s * 11 - 7} y="-54" width="14" height={legH} rx="6" fill={pants} />
             {pyjama && <path d={`M${s * 11 - 7} -36 H${s * 11 + 7} M${s * 11 - 7} -20 H${s * 11 + 7}`} stroke="#74c0fc" strokeWidth="4" />}
+            {fire && <path d={`M${s * 11 - 7} -24 H${s * 11 + 7}`} stroke={FIRE_STRIPE} strokeWidth="5" />}
             {boots ? (
               <>
                 <path
@@ -342,6 +369,8 @@ export function Kid({
             <rect x="-26" y="-108" width="52" height="62" rx="18" fill={shirt} />
             {pyjama ? (
               <path d="M-24 -92 H24 M-26 -76 H26 M-25 -60 H25" stroke="#74c0fc" strokeWidth="5" />
+            ) : fire ? (
+              <path d="M-26 -62 H26 M-26 -74 H26" stroke={FIRE_STRIPE} strokeWidth="5" />
             ) : (
               <path d="M-10 -82 l4 -9 l4 9 l4 -9 l4 9" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none" opacity="0.8" />
             )}
@@ -396,6 +425,7 @@ export function Kid({
               <RainHat />
             </g>
           )}
+          {fire && <FireHelmet />}
         </g>
         {sitting && rightArmEl}
         {/* Swish lines beside the head while it shakes, one per side as it swings there. */}

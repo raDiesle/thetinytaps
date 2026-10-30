@@ -1,6 +1,7 @@
 import { GameEnd } from "@/components/GameEnd";
 import { useAppLanguage } from "@/lib/language";
 import { STORIES } from "./content";
+import { FILMS } from "./film/films";
 import { PICTURES } from "./kid";
 import { titleIn } from "./phrases";
 import { Fitted, GOALS, type Picture } from "./trail/items";
@@ -14,10 +15,11 @@ export interface StoryCard {
   picture: Picture;
 }
 
-/** Every story of the game in play order: the lift stories first, then the trail levels. */
+/** Every story of the game in play order: the lift stories first, then the trail levels, then the films. */
 export const CARDS: StoryCard[] = [
   ...STORIES.map((s) => ({ id: s.id, title: s.title, picture: PICTURES[s.icon] })),
   ...TRAIL_LEVELS.map((l) => ({ id: l.id, title: l.title, picture: GOALS[l.goal] })),
+  ...FILMS.map((f) => ({ id: f.id, title: f.title, picture: f.picture })),
 ];
 
 /** The story after this one; after the last comes the first again. */

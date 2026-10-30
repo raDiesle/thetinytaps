@@ -120,6 +120,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-06, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
+      {
+        label: "🚒 Die Feuerwehr",
+        languages: { de: "done" },
+        note: "Der erste Film (G-15, Oktober 2026): Name und alle Sätze nur auf Deutsch; bis zur Übersetzung spricht der Film ganz Deutsch. Nur die Gruppe „🎬 Filme“ auf dem Startbildschirm ist übersetzt.",
+      },
     ],
   },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },

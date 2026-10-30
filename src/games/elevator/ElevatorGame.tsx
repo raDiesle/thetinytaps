@@ -4,15 +4,18 @@ import { useGameSettings } from "@/lib/common";
 import { useDevice } from "@/lib/device";
 import { useAppLanguage, useT } from "@/lib/language";
 import { ElevatorPlay } from "./ElevatorPlay";
+import { FilmPlay } from "./film/FilmPlay";
+import { FILMS } from "./film/films";
 import { titleIn } from "./phrases";
 import { DEFAULT_ELEVATOR_SETTINGS, ELEVATOR_SETTINGS_KEY, type ElevatorSettings } from "./settings";
 import { TRAIL_LEVELS } from "./trail/levels";
 import { TrailPlay } from "./trail/TrailPlay";
 import "./elevator.css";
 
-/** The small tags on the cards: which levels ride the lift in the house, which walk through the world. */
+/** The names of the card groups: which levels ride the lift in the house, which walk through the world, which are films. */
 const LIFT = { de: "🛗 Aufzug", ru: "🛗 Лифт", en: "🛗 Elevator", zh: "🛗 电梯", hi: "🛗 लिफ़्ट", es: "🛗 Ascensor", ar: "🛗 المصعد" };
 const TRAIL = { de: "🚶 Laufen", ru: "🚶 Пешком", en: "🚶 Walking", zh: "🚶 走路", hi: "🚶 पैदल", es: "🚶 A pie", ar: "🚶 مشيا" };
+const FILM = { de: "🎬 Filme", ru: "🎬 Фильмы", en: "🎬 Films", zh: "🎬 电影", hi: "🎬 फ़िल्में", es: "🎬 Películas", ar: "🎬 أفلام" };
 
 /** "Kleine Abenteuer": the lift stories in the house and the trail levels through the world. */
 export function ElevatorGame() {
@@ -48,6 +51,7 @@ export function ElevatorGame() {
         { id: "picknick", emoji: "🧺", title: title("Picknick im Wald"), kind: t(TRAIL) },
         { id: "katze", emoji: "🐈", title: title("Wo ist die Katze?"), kind: t(TRAIL) },
         { id: "schneemann", emoji: "⛄", title: title("Der Schneemann"), kind: t(TRAIL) },
+        { id: "feuerwehr", emoji: "🚒", title: title("Die Feuerwehr"), kind: t(FILM) },
       ]}
       mode={settings.story}
       onMode={(story) => update({ story })}
@@ -73,6 +77,11 @@ export function ElevatorGame() {
               hi: "आख़िर में “फिर से” वही कहानी दोबारा चलाता है, “आगे” अगली कहानी।",
               es: "Al final, «Otra vez» vuelve a jugar la misma historia y «Siguiente», la próxima.",
               ar: "في النهاية يعيد زر «مرة أخرى» القصة نفسها، وزر «التالي» يبدأ القصة التالية.",
+            })}
+          </p>
+          <p>
+            {t({
+              de: "Ein Film erzählt eine Geschichte von Ort zu Ort. Das Kind tippt, wo es leuchtet, und wählt zwischendurch, wie es weitergeht – jede Wahl ist richtig. Unten zeigt ein Streifen die Bilder des Films.",
             })}
           </p>
           {!device.touchOnly && (
@@ -102,6 +111,8 @@ function Stories({ settings }: { settings: ElevatorSettings }) {
   const [run, setRun] = useState({ story: settings.story, n: 0 });
   const pick = (story: string) => setRun((r) => ({ story, n: r.n + 1 }));
   const level = TRAIL_LEVELS.find((l) => l.id === run.story);
+  const film = FILMS.find((f) => f.id === run.story);
+  if (film) return <FilmPlay key={run.n} language={language} settings={settings} film={film} onPick={pick} />;
   return level ? (
     <TrailPlay key={run.n} language={language} settings={settings} level={level} onPick={pick} />
   ) : (

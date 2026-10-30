@@ -1,0 +1,388 @@
+/* Films of „Kleine Abenteuer“ (`film/`): the stage, the strip of scenes, the iris between scenes, and what moves in the
+   fire brigade's pictures. Classes and keyframes start with `fm-`. */
+
+.fm-play {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #a5d8ff;
+  touch-action: none;
+}
+
+.fm-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fm-confetti {
+  pointer-events: none;
+}
+
+/* What the child taps: a glowing yellow ring that breathes. */
+.fm-spot {
+  fill: #ffd43b;
+  fill-opacity: 0.18;
+  stroke: #ffd43b;
+  stroke-width: 12;
+  animation: fm-glow 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes fm-glow {
+  from {
+    stroke-opacity: 0.45;
+    fill-opacity: 0.08;
+  }
+  to {
+    stroke-opacity: 1;
+    fill-opacity: 0.28;
+  }
+}
+
+/* The hand stands still before the first tap; after a reminder it pops up once. */
+.fm-hand {
+  pointer-events: none;
+}
+
+.fm-hand.again {
+  animation: pop-in 0.45s ease-out backwards;
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+}
+
+.fm-option {
+  cursor: pointer;
+  transition: opacity 0.4s;
+}
+
+.fm-option.off {
+  opacity: 0.25;
+}
+
+.fm-option.picked .fm-spot {
+  fill-opacity: 0.4;
+  animation: none;
+}
+
+.fm-hop {
+  animation: fm-hop 0.5s ease-out;
+}
+
+@keyframes fm-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-40px);
+  }
+}
+
+/* The iris: a dark ring round a hole that closes for a cut and opens on the next scene. */
+.fm-iris {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 160vmax;
+  height: 160vmax;
+  border-radius: 50%;
+  box-shadow: 0 0 0 100vmax #212529;
+  transform: translate(-50%, -50%) scale(1);
+  transition: transform 0.45s ease-in-out;
+  pointer-events: none;
+}
+
+.fm-iris.shut {
+  transform: translate(-50%, -50%) scale(0);
+}
+
+/* The strip of scenes along the bottom: past ones solid, the one playing framed, the next to come pale. */
+.fm-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  pointer-events: none;
+}
+
+.fm-frame {
+  flex: 0 1 auto;
+  min-width: 0;
+  height: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 10px;
+  background: #fff;
+  border: 3px solid #495057;
+  opacity: 0.5;
+  overflow: hidden;
+}
+
+.fm-frame svg {
+  width: 100%;
+  height: 100%;
+}
+
+.fm-frame.done {
+  opacity: 0.9;
+}
+
+.fm-frame.now {
+  opacity: 1;
+  border-color: #fab005;
+  box-shadow: 0 0 0 4px #ffd43b;
+}
+
+.fm-frame.more {
+  background: rgba(255, 255, 255, 0.4);
+  border-style: dashed;
+}
+
+/* At the end the strip lights up scene by scene, as if the film ran through once more. */
+.fm-strip.run .fm-frame {
+  animation: fm-strip-run 0.7s ease-in-out backwards;
+}
+
+@keyframes fm-strip-run {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+  50% {
+    transform: translateY(-14px);
+    box-shadow: 0 0 0 5px #ffd43b;
+  }
+}
+
+/* Something that appears in a scene pops up from its feet. */
+.fm-pop {
+  animation: fm-pop-up 0.45s ease-out backwards;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+
+@keyframes fm-pop-up {
+  from {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Getting into the engine: who has walked to its door is gone. */
+.fm-board {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+/* The fire engine: the blue light flashes, the wheels turn. */
+.fm-blue-glow {
+  opacity: 0;
+}
+
+.fm-blue.on .fm-blue-glow {
+  animation: fm-blink 0.45s steps(2, jump-none) infinite alternate;
+}
+
+.fm-blue.on rect {
+  fill: #1c7ed6;
+}
+
+@keyframes fm-blink {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+.fm-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.fm-wheel.spin {
+  animation: fm-roll 0.5s linear infinite;
+}
+
+@keyframes fm-roll {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The fire: flames flicker and shrink away when the water hits them; a puff of steam rises, the smoke fades. */
+.fm-flame-size {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.9s ease-in;
+}
+
+.fm-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fm-flicker 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes fm-flicker {
+  from {
+    transform: scale(1, 1) skewX(-3deg);
+  }
+  to {
+    transform: scale(0.92, 1.1) skewX(4deg);
+  }
+}
+
+.fm-steam {
+  animation: fm-steam-up 1.8s ease-out forwards;
+}
+
+@keyframes fm-steam-up {
+  from {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(-140px);
+    opacity: 0;
+  }
+}
+
+.fm-smoke {
+  opacity: 0.8;
+  transition: opacity 2s;
+}
+
+.fm-smoke.gone {
+  opacity: 0;
+}
+
+.fm-smoke circle {
+  animation: fm-smoke-up 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes fm-smoke-up {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(24px, -40px);
+  }
+}
+
+/* The station's alarm bell swings while it rings. */
+.fm-ring {
+  animation: fm-swing 0.16s ease-in-out infinite alternate;
+}
+
+@keyframes fm-swing {
+  from {
+    transform: rotate(-14deg);
+  }
+  to {
+    transform: rotate(14deg);
+  }
+}
+
+.fm-ring-lines {
+  animation: fm-flash 0.3s steps(2, jump-none) infinite alternate;
+}
+
+@keyframes fm-flash {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* The roller gate rolls up into its box. */
+.fm-gate {
+  transition: transform 1.6s ease-in-out;
+}
+
+/* A hose rolls out, and a water jet shoots from the nozzle (drawn along their length, `pathLength` 100). */
+.fm-hose {
+  stroke-dasharray: 100;
+  animation: fm-draw 1.2s ease-out backwards;
+}
+
+.fm-jet {
+  stroke-dasharray: 100;
+  animation: fm-draw 0.45s ease-out backwards;
+}
+
+@keyframes fm-draw {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The car in the ditch tilts back onto the road while the winch pulls it. */
+.fm-tilt {
+  transform-origin: 0 0;
+  transition: transform 3s ease-in-out 0.3s;
+}
+
+/* Washing the engine: foam bubbles up, the mud goes. */
+.fm-mud {
+  transition: opacity 2.6s ease-in 0.4s;
+}
+
+.fm-mud.gone {
+  opacity: 0;
+}
+
+.fm-foam circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: fm-foam 1.6s ease-in-out backwards;
+}
+
+@keyframes fm-foam {
+  0% {
+    transform: scale(0);
+  }
+  40%,
+  70% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* The candles on the party cake. */
+.fm-candle {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: fm-flicker 0.5s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fm-spot,
+  .fm-wheel.spin,
+  .fm-flame,
+  .fm-smoke circle,
+  .fm-candle,
+  .fm-ring,
+  .fm-strip.run .fm-frame {
+    animation: none;
+  }
+}
