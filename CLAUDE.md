@@ -119,7 +119,7 @@ In a fresh worktree run `bun install` first.
   letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
-  in `base.css`) while pictures and layout stay as they are. Only the management page and the SEO pages stay German.
+  in `base.css`) while pictures and layout stay as they are. Only the management page, the SEO pages and Impressum and Datenschutz (German law) stay German.
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games
@@ -135,6 +135,13 @@ In a fresh worktree run `bun install` first.
   own (its own svg in a `div` with `will-change: transform`), never a moved group inside one big svg, which the browser
   paints whole again in every frame; and a big still drawing is built once (`useMemo`, `memo`), not again with every
   tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this).
+- **The app's animal is the fox** (the site is toddlerfox.com, Tapsi is a fox; user decision, October 2026): new pictures
+  and games take foxes in wherever they fit – fox grown-ups instead of drawn people (the baker, the doctor, the driver),
+  a fox child peeking out of the background, Tapsi cheering at the end – and the book's readers are foxes only (no
+  bears). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Existing games
+  are turned over step by step from the table „🦊 Füchse“ on `/management/` (`src/content/ideas/foxStatus.ts`, area D):
+  a game that gets its foxes marks it there in the same commit, and a new game or picture adds its row or task.
+  Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
@@ -319,8 +326,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
   drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
   open page lies on the book's cloth-covered board, lit from above. The cover's picture (`bilder/buch-cover.webp`) shows
-  one family of each: a fox parent with a fox child and a bear parent with a bear child, one of the children a boy and
-  one a girl – never a third grown-up or a child too many (user feedback, October 2026).
+  one fox family reading a book together – no other animal family, never a third grown-up or a child too many (user
+  feedback, October 2026; the picture with the bears still waits for its new one, D-14).
   Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
   any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
   one. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
@@ -333,8 +340,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
   that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
   of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
-  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of animal parents with their children (the fox and bear
-  families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
+  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of foxes reading with their children beside the menu's
+  cards – a fox parent with its child, and grandma or grandpa fox laughing with the child over the book, never bears
+  (D-15; the bears still stand there until that picture is made) – show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
@@ -345,8 +353,19 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
   with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
-  (`useTitle`, `SeoHead`). Texts say only what the page really does. Heavy downloads (service worker copy,
+  (`useTitle`, `SeoHead`). Texts say only what the page really does. Google reads the page after the app ran,
+  in an English browser: so search engines play in German (`isCrawler` in `src/lib/locale.ts`), the language of the built
+  pages – a crawler that runs pages and isn't on its list gets added there. Pages that must stay out of results get a
+  `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
+  `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
+- Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
+  repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
+  cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
+- Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked next to the version
+  below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
+  stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung
+  and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work

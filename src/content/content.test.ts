@@ -1,10 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
-import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
+import { FOX_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
-import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
+import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, fullTitle } from "./seo";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
@@ -103,6 +103,15 @@ describe("search engine texts (seo.ts)", () => {
     }
   });
 
+  test("the picture for link previews is there, in the size the tags give", async () => {
+    const file = Bun.file(`${import.meta.dir}/../../public${PREVIEW_IMAGE.path}`);
+    expect(await file.exists()).toBe(true);
+    // A JPEG's size sits in its SOF0 marker (FF C0): height, then width, two bytes each.
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    const sof = bytes.findIndex((byte, i) => byte === 0xff && bytes[i + 1] === 0xc0);
+    expect([(bytes[sof + 7] << 8) | bytes[sof + 8], (bytes[sof + 5] << 8) | bytes[sof + 6]]).toEqual([PREVIEW_IMAGE.width, PREVIEW_IMAGE.height]);
+  });
+
   test("grown-up pages are never in the search pages", () => {
     for (const path of NO_INDEX_PATHS) expect(paths).not.toContain(path);
   });
@@ -136,6 +145,25 @@ describe("research on the management page", () => {
     expect(new Set(ids).size).toBe(ids.length);
     const dates = RESEARCH.map((r) => r.date);
     expect(dates).toEqual([...dates].sort().reverse());
+  });
+});
+
+describe("fox table on the management page", () => {
+  test("names every game of the home menu once, in menu order, then the home page", () => {
+    const hrefs = [...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)), "/"];
+    expect(FOX_STATUS.map((row) => row.href)).toEqual(hrefs);
+  });
+
+  test("every task names an idea that exists and says how many pictures a picture needs", () => {
+    const ids = new Set(IDEA_AREAS.flatMap((area) => area.ideas.map((idea) => idea.id)));
+    for (const row of FOX_STATUS) {
+      expect(row.tasks.length, row.href).toBeGreaterThan(0);
+      for (const task of row.tasks) {
+        expect(ids, `${row.href} ${task.label}`).toContain(task.idea ?? "D-18");
+        expect(task.work === "picture" ? task.pictures : undefined, `${row.href} ${task.label}: pictures only on a picture`).toBe(task.pictures);
+        if (task.work === "picture") expect(task.pictures, `${row.href} ${task.label}`).toBeGreaterThan(0);
+      }
+    }
   });
 });
 

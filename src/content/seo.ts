@@ -4,6 +4,8 @@
 // the same title and description while it runs (src/lib/title.ts, SeoHead).
 // No `@/` imports here: tools/build.ts reads this file too.
 // The texts are what parents search for (see the research on /management/).
+// No <meta name="keywords">: Google has ignored it since 2009 and Bing reads it as a hint of spam; the
+// words parents search for belong in title, description and text instead.
 
 /** The site's name, after every title. */
 export const SITE_NAME = "The Tiny Taps";
@@ -19,6 +21,14 @@ export interface PageSeo {
   /** A few sentences for the page before the app has started (and for crawlers without JavaScript). */
   text: string;
 }
+
+/** The picture link previews show (WhatsApp, Messenger, Google Discover): 1200 × 630, the shape they crop to. */
+export const PREVIEW_IMAGE = {
+  path: "/images/vorschau.jpg",
+  width: 1200,
+  height: 630,
+  alt: "Eine Fuchs- und eine Bärenfamilie lesen auf einer Picknickdecke zusammen ein Bilderbuch.",
+};
 
 /** What every page says about the whole site, after its own text. */
 export const SITE_PROMISE = "Kostenlos, ohne Werbung, ohne Anmeldung, funktioniert offline. Für Kinder ab 2 Jahren, mit Touch oder Tastatur.";
@@ -172,8 +182,8 @@ export const SEO_PAGES: PageSeo[] = [
   scene("ostern", "Ostern", "Osterhase, Lämmchen und Kirschbaum"),
 ];
 
-/** Addresses that must never be in a search result (for grown-ups only). */
-export const NO_INDEX_PATHS = ["/management/", "/ideen/"];
+/** Addresses that must never be in a search result (for grown-ups only; the Impressum names a private address). */
+export const NO_INDEX_PATHS = ["/management/", "/ideen/", "/impressum/", "/datenschutz/"];
 
 /** The entry for an address (with or without the trailing slash), if it has one. */
 export function seoFor(pathname: string): PageSeo | undefined {

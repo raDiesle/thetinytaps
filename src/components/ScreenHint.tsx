@@ -60,8 +60,15 @@ export function ScreenHint() {
     if (fullscreen) setAsked(true);
   }, [fullscreen]);
 
-  // The management page is for grown-ups reading, not a menu or a game.
-  if (!device.touchOnly || pathname.startsWith("/management") || pathname.startsWith("/ideen")) return null;
+  // The management page, Impressum and Datenschutz are for grown-ups reading, not a menu or a game.
+  if (
+    !device.touchOnly ||
+    pathname.startsWith("/management") ||
+    pathname.startsWith("/ideen") ||
+    pathname.startsWith("/impressum") ||
+    pathname.startsWith("/datenschutz")
+  )
+    return null;
 
   const goFullscreen = () => {
     setAsked(true);

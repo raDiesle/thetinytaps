@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fullTitle, NO_INDEX_PATHS, type PageSeo, SEO_PAGES, SITE_NAME, SITE_PROMISE } from "../src/content/seo";
+import { fullTitle, NO_INDEX_PATHS, type PageSeo, PREVIEW_IMAGE, SEO_PAGES, SITE_NAME, SITE_PROMISE } from "../src/content/seo";
 import { appPlugin } from "./appPlugin";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
@@ -81,6 +81,15 @@ const APP_LINKS = [
   `<link rel="apple-touch-icon" href="${href("/icons/apple-touch-icon.png")}" />`,
 ];
 
+// Visits are counted by Cloudflare Web Analytics: no cookies, nothing kept on the device, so no consent
+// banner a child would have to get past. Its site token is the repository variable CF_BEACON_TOKEN (set in
+// GitHub, passed in by deploy.yml); without it, as in every local build, nothing is counted.
+const beaconToken = process.env.CF_BEACON_TOKEN?.trim();
+if (beaconToken && !/^[0-9a-f]{32}$/i.test(beaconToken)) throw new Error("build: CF_BEACON_TOKEN is not a Cloudflare Web Analytics site token");
+const ANALYTICS = beaconToken
+  ? [`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${beaconToken}", "spa": true}'></script>`]
+  : [];
+
 /** What a page shows before the app has started, and all a crawler without JavaScript sees: its text and links to the other pages. */
 function staticBody(page: PageSeo) {
   const isScene = (p: PageSeo) => p.path.startsWith("/bilder/") && p.path !== "/bilder/";
@@ -109,10 +118,16 @@ function headTags(page: PageSeo) {
     meta("og:title", page.title),
     meta("og:description", page.description),
     meta("og:url", url),
-    meta("og:image", `${siteUrl}/icons/icon-512.png`),
-    '<meta name="twitter:card" content="summary" />',
+    meta("og:image", `${siteUrl}${PREVIEW_IMAGE.path}`),
+    meta("og:image:width", String(PREVIEW_IMAGE.width)),
+    meta("og:image:height", String(PREVIEW_IMAGE.height)),
+    meta("og:image:alt", PREVIEW_IMAGE.alt),
+    '<meta name="twitter:card" content="summary_large_image" />',
   ];
   if (page.path === "/") {
+    // The site's name in Google's results comes from WebSite; without it Google guesses from the domain.
+    const site = { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, url: `${siteUrl}/`, inLanguage: "de" };
+    tags.push(`<script type="application/ld+json">${JSON.stringify(site)}</script>`);
     const app = {
       "@context": "https://schema.org",
       "@type": "WebApplication",
@@ -136,6 +151,10 @@ function headTags(page: PageSeo) {
 // 200) with its title, description, canonical link, preview tags and its text in #root, which the app
 // replaces when it starts. Then sitemap.xml and robots.txt, which names the sitemap (robots.txt only
 // counts at the root of a domain, so under a folder the sitemap has to be given to the Search Console by hand).
+// The pages for grown-ups only (NO_INDEX_PATHS) get a page too, with a noindex tag: Google has to be let in to
+// read that tag, so robots.txt must not block them – a blocked page that is linked (the Impressum is, from the
+// home page) can still turn up in results, as a bare address. The sitemap has no <lastmod>: the build date on
+// every page would be wrong, and Google ignores lastmod on a site where it is often wrong.
 // 404.html stays the plain start page, so deep links like /bilder/baustelle/ still boot the app.
 async function writePages(template: string) {
   await writeFile(join(OUT, "404.html"), template);
@@ -148,20 +167,23 @@ async function writePages(template: string) {
     await mkdir(dir, { recursive: true });
     await writeFile(join(dir, "index.html"), html);
   }
-  const today = new Date().toISOString().slice(0, 10);
-  const urls = SEO_PAGES.map((page) => `  <url><loc>${siteUrl}${page.path}</loc><lastmod>${today}</lastmod></url>`);
+  for (const path of NO_INDEX_PATHS) {
+    const dir = join(OUT, path);
+    await mkdir(dir, { recursive: true });
+    await writeFile(join(dir, "index.html"), replaceOnce(template, "</head>", '<meta name="robots" content="noindex" /></head>'));
+  }
+  const urls = SEO_PAGES.map((page) => `  <url><loc>${siteUrl}${page.path}</loc></url>`);
   await writeFile(
     join(OUT, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
   );
-  const disallow = NO_INDEX_PATHS.map((path) => `Disallow: ${href(path)}`).join("\n");
-  await writeFile(join(OUT, "robots.txt"), `User-agent: *\n${disallow}\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
+  await writeFile(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
 }
 
 // Offline support (PWA): writes out/sw.js from src/sw.js with the list of all built files, so the
 // service worker can keep them in the browser. The version is a hash over the worker and all files,
 // so every change installs a new one. 404.html is left out: the worker answers deep links with
-// index.html itself. So are songs (files named musik-*.mp3): music can be switched off for all games,
+// index.html itself, and so is the picture for link previews (PREVIEW_IMAGE), which only other sites fetch. So are songs (files named musik-*.mp3): music can be switched off for all games,
 // and then they must not be downloaded; the worker keeps a song once a page has fetched it. The same
 // for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/lib/voiceName.ts)
 // and the texts of each language (texts-ru.<hash>.js, src/content/texts): only the chosen one is needed, and
@@ -173,6 +195,7 @@ async function writeServiceWorker() {
     (file) =>
       file !== "404.html" &&
       file !== "sw.js" &&
+      `/${file}` !== PREVIEW_IMAGE.path &&
       !/\.(map|LICENSE\.txt)$/.test(file) &&
       !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file) &&
       !Object.values(texts).includes(`./${file}`),
@@ -191,7 +214,7 @@ const started = performance.now();
 await rm(OUT, { recursive: true, force: true });
 const result = await bundle();
 await cp(join(ROOT, "public"), OUT, { recursive: true });
-const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${APP_LINKS.join("")}</head>`);
+const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${[...APP_LINKS, ...ANALYTICS].join("")}</head>`);
 await writeFile(join(OUT, "index.html"), template);
 await writePages(template);
 await writeServiceWorker();

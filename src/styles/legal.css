@@ -1,0 +1,50 @@
+/* ---------- Impressum and Datenschutz (for grown-ups) ---------- */
+
+.legal {
+  text-align: left;
+}
+
+.legal h1 {
+  text-align: center;
+}
+
+.legal-panel,
+.legal-updated {
+  max-width: 760px;
+  margin: 0 auto 20px;
+}
+
+.legal-panel {
+  padding: 20px 24px;
+  border-radius: 24px;
+  background: #fff;
+  line-height: 1.5;
+}
+
+.legal-panel h2 {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+}
+
+.legal-panel p,
+.legal-panel address {
+  margin: 0 0 10px;
+  font-style: normal;
+}
+
+.legal-panel > :last-child {
+  margin-bottom: 0;
+}
+
+/* A field the site's owner has not filled in yet (src/content/legal.ts). */
+.legal-missing {
+  padding: 0 4px;
+  border-radius: 4px;
+  background: #ffe9a8;
+}
+
+.legal-updated {
+  padding-bottom: 24px;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
