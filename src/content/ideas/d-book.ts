@@ -19,7 +19,8 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-02",
-      partial: "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite.",
+      partial:
+        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Die Tiere aus den Spielen fehlen noch.",
       emoji: "🐻",
       title: "Tiereltern am Seitenrand",
       text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: Fuchs, Bär, und später die Tiere aus den Spielen (Gefühle-Tiere, Bauernhof-Tiere), jede Welt ihre eigenen. Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",

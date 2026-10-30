@@ -8,6 +8,11 @@
   text-align: center;
 }
 
+/* The home page's buttons for grown-ups and its title: laid out as the page's own children, except in the book look (book.css). */
+.home-top {
+  display: contents;
+}
+
 .logo {
   display: flex;
   flex-wrap: wrap;
@@ -243,7 +248,7 @@ button.game-card:focus-visible {
   justify-self: end;
 }
 
-.menu-head > :not(.menu-top, .menu-title, .fullscreen-corner) {
+.menu-head > :not(.menu-top, .menu-title, .fullscreen-corner, .book-family-slot) {
   grid-column: 1 / -1;
   justify-content: center;
 }

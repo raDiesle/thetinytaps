@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
+import { BookFamily } from "@/components/BookFamily";
 import { FullscreenCorner } from "@/components/FullscreenButton";
 import { useTurnPage } from "@/lib/look";
 
@@ -25,14 +26,17 @@ export function MenuTop({ to, back, children }: { to: string; back: string; chil
  * The top of a menu: the way back (MenuTop, with `tools` next to it) right left of the centred title, close to the
  * cards where a grown-up looks, and the fullscreen button on the right, across from the sun in the top left corner.
  * `children`, such as a start screen's labelled buttons for grown-ups, go in a row of their own under the title.
+ * In the book look, where the page has no room for them beside the cards, the animal families sit in the row's free room.
  */
 export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: ReactNode; tools?: ReactNode; children?: ReactNode }) {
   return (
     <div className="menu-head">
+      <BookFamily family="fox" />
       <MenuTop to={to} back={back}>
         {tools}
       </MenuTop>
       <h1 className="menu-title">{title}</h1>
+      <BookFamily family="bear" />
       <FullscreenCorner />
       {children}
     </div>

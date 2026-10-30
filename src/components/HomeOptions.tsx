@@ -86,9 +86,9 @@ function MenuButton({ icon, label, children }: { icon: string; label: string; ch
     <div className="home-menu">
       {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
       {open && <div className="home-menu-backdrop" onClick={() => setOpen(false)} />}
-      <button type="button" className="home-menu-button" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button type="button" className="home-menu-button" aria-expanded={open} title={label} onClick={() => setOpen(!open)}>
         <span aria-hidden>{icon}</span>
-        {label}
+        <span className="home-menu-label">{label}</span>
       </button>
       {open && (
         <div ref={panel} className="home-menu-panel">
@@ -230,7 +230,7 @@ function MusicButton() {
       }}
     >
       <span aria-hidden>{common.music ? "🎵" : "🔇"}</span>
-      {label}
+      <span className="home-menu-label">{label}</span>
     </button>
   );
 }

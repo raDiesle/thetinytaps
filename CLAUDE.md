@@ -216,7 +216,8 @@ In a fresh worktree run `bun install` first.
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
   either (only read out; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
-  left corner; buttons for grown-ups never cover it (the home page's sit on the right, a phone's way back in the middle). „Über das Spiel“
+  left corner (in the book look, where the families take its place, they do); buttons for grown-ups never cover it (the
+  home page's sit on the right, a phone's way back in the middle). „Über das Spiel“
   and „Einstellungen“ (where a game still has them) are small round signs without words (a plain „i“, ⚙️; the name as
   tooltip and read out) right next to the way back, so they take no row of their own; a panel opens right under the top row. When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
@@ -308,9 +309,17 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   (`BookCover`, its picture of Tapsi's family and the little bear's in `src/components/bilder/`), the home page as the
   contents page with page numbers, paper and softened colours, and the game's picture inside the page's paper margin
   (`.book-frame`). All of it is CSS under `:root[data-look="book"]` in `src/styles/book.css`; games don't style for it.
+  It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
+  drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close.
   Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
   any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
-  one. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; ✕ and the fullscreen
+  one. A page takes its time to turn, as a book's does (`TURN_SECONDS`, at least a second, its sound landing with it –
+  `look.test.ts`): corner first, dimming as it turns, its shadow lifting off the page beneath; never a quick flick.
+  Where the page has no room for the families beside the cards (below 1400 × 640), they sit in the menu's top row
+  instead of the sun and clouds (`BookFamily`, in `MenuHead` and the home page's `.home-top`), shrinking into the room
+  left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
+  that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
+  of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; ✕ and the fullscreen
   button stay pale see-through discs there too. Pictures of animal parents with their children (the fox and bear
   families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.

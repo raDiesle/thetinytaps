@@ -35,6 +35,9 @@ export function applyLook() {
 /** Whether the app looks like a book. */
 export const isBookLook = () => document.documentElement.dataset.look === "book";
 
+/** How long a page takes to turn: as long as `--turn-time` in `book.css` (`look.test.ts` checks), so its sound lands with it. */
+export const TURN_SECONDS = 1.2;
+
 /** Which way a page turns: `forward` over to the left (on into a menu or a game), `back` from the left. */
 export type TurnDirection = "forward" | "back";
 
@@ -48,7 +51,7 @@ export function turnPageWith(direction: TurnDirection, update: () => void) {
     update();
     return;
   }
-  playPageTurn();
+  playPageTurn(TURN_SECONDS);
   document.documentElement.dataset.turn = direction;
   // A skipped turn (a hidden page, a second tap mid-turn) still makes the change; it only needs no error report.
   document.startViewTransition(() => flushSync(update)).ready.catch(() => {});
