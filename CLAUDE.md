@@ -179,9 +179,12 @@ In a fresh worktree run `bun install` first.
   choices in the always visible row above the cards (`level`), not cards or a menu of their own.
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
+- Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
+  wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
+  choices may sit there.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
-  in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
-  no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
+  in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
+  either (only read out; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). Buttons for grown-ups sit in the top
   left corner, never over the sun in the top right one. „ℹ️ Über das Spiel“ and „⚙️ Einstellungen“ (where a game still has them) are small, above the cards,
   never under them: in the top row next to the back link (on a computer centred under the title), and a panel opens right
@@ -267,8 +270,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
+- Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
+  it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
+  home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
+  Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
   with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step

@@ -289,17 +289,6 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
             ar: "اختيار طريقة اللعب",
           })}
         >
-          <h2 className="mode-heading">
-            {t({
-              de: "Was spielen wir?",
-              ru: "Во что играем?",
-              en: "What shall we play?",
-              zh: "我们玩什么？",
-              hi: "क्या खेलें?",
-              es: "¿A qué jugamos?",
-              ar: "ماذا نلعب؟",
-            })}
-          </h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {groups

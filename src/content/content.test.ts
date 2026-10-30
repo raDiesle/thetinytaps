@@ -6,6 +6,7 @@ import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from 
 import { RESEARCH } from "./research";
 import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
 import { SCENES } from "../games/scenes";
+import { WORLDS } from "../components/Worlds";
 import { TARGET_LANGUAGES } from "./targetLanguages";
 
 describe("home menu", () => {
@@ -27,8 +28,19 @@ describe("home menu", () => {
   test("a category whose games stand on the home page has no page, and its games lead back home", () => {
     for (const category of CATEGORIES.filter((c) => c.onHome)) {
       expect(hasPage(category), category.id).toBe(false);
-      expect(category.subtitle, category.id).toBeUndefined();
       for (const game of category.games) expect(categoryOf(game.href), game.href).toBeUndefined();
+    }
+  });
+
+  test("every category has its world (backdrop, card colours, the picture on its card)", () => {
+    for (const category of CATEGORIES) expect(WORLDS as readonly string[], category.id).toContain(category.id);
+  });
+
+  test("every card has a short line for grown-ups that fits in two lines", () => {
+    const lines = [...games.map((g) => [g.href, g.blurb] as const), ...CATEGORIES.filter((c) => !c.onHome).map((c) => [c.id, c.blurb] as const)];
+    for (const [where, blurb] of lines) {
+      expect(blurb?.de, where).toBeDefined();
+      for (const text of Object.values(blurb ?? {})) expect(text.length, where).toBeLessThanOrEqual(42);
     }
   });
 
