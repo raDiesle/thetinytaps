@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
-import { IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
+import { FOX_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
 import { NO_INDEX_PATHS, SEO_PAGES, fullTitle } from "./seo";
@@ -136,6 +136,25 @@ describe("research on the management page", () => {
     expect(new Set(ids).size).toBe(ids.length);
     const dates = RESEARCH.map((r) => r.date);
     expect(dates).toEqual([...dates].sort().reverse());
+  });
+});
+
+describe("fox table on the management page", () => {
+  test("names every game of the home menu once, in menu order, then the home page", () => {
+    const hrefs = [...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)), "/"];
+    expect(FOX_STATUS.map((row) => row.href)).toEqual(hrefs);
+  });
+
+  test("every task names an idea that exists and says how many pictures a picture needs", () => {
+    const ids = new Set(IDEA_AREAS.flatMap((area) => area.ideas.map((idea) => idea.id)));
+    for (const row of FOX_STATUS) {
+      expect(row.tasks.length, row.href).toBeGreaterThan(0);
+      for (const task of row.tasks) {
+        expect(ids, `${row.href} ${task.label}`).toContain(task.idea ?? "D-18");
+        expect(task.work === "picture" ? task.pictures : undefined, `${row.href} ${task.label}: pictures only on a picture`).toBe(task.pictures);
+        if (task.work === "picture") expect(task.pictures, `${row.href} ${task.label}`).toBeGreaterThan(0);
+      }
+    }
   });
 });
 

@@ -1,12 +1,15 @@
 import type { IdeaArea } from "./types";
 
-/** D: das Buch – the app as a picture book a grown-up and a child read together (A-20), and what still doesn't fit it. */
+/**
+ * D: das Buch – the app as a picture book a grown-up and a child read together (A-20), what still doesn't fit it, and
+ * the foxes of toddlerfox.com that go into it (their tasks game by game in foxStatus.ts).
+ */
 export const bookIdeas: IdeaArea = {
   prefix: "D",
   emoji: "📖",
-  title: "Das Bilderbuch",
+  title: "Das Bilderbuch und die Füchse",
   intro:
-    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite.",
+    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite. Seit die App toddlerfox.com heißt, ist der Fuchs ihr Tier (D-14 bis D-19): Wer liest, sind Füchse, und in den Spielen kommen Füchse vor, wo es passt – Spiel für Spiel in der Tabelle „🦊 Füchse“ oben.",
   ideas: [
     {
       id: "D-01",
@@ -20,10 +23,10 @@ export const bookIdeas: IdeaArea = {
     {
       id: "D-02",
       partial:
-        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Die Tiere aus den Spielen fehlen noch.",
-      emoji: "🐻",
+        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Statt der Bären kommen Oma oder Opa Fuchs (D-15); Füchse passend zu jeder Welt fehlen noch.",
+      emoji: "🦊",
       title: "Tiereltern am Seitenrand",
-      text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: Fuchs, Bär, und später die Tiere aus den Spielen (Gefühle-Tiere, Bauernhof-Tiere), jede Welt ihre eigenen. Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
+      text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: die Fuchsfamilie, Oma oder Opa Fuchs, und später in jeder Welt Füchse, die zu ihr passen (mit Bauhelm auf der Baustelle, im Gummistiefel auf dem Bauernhof). Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
       why: "Erinnert Eltern bei jedem Blättern: Das Kind spielt nicht allein, wir schauen zusammen.",
       effort: "S",
     },
@@ -114,6 +117,54 @@ export const bookIdeas: IdeaArea = {
       title: "Mit dem Finger umblättern",
       text: "Auf Tablets lässt sich eine Menüseite auch mit einer Wischbewegung von der rechten Ecke umblättern, die Ecke biegt sich mit dem Finger mit; ein Tipp auf eine Karte bleibt wie bisher.",
       why: "Fühlt sich an wie ein echtes Buch in der Hand.",
+      effort: "M",
+    },
+    {
+      id: "D-14",
+      emoji: "🦊",
+      title: "Cover nur mit der Fuchsfamilie",
+      text: "Das Bild auf dem Cover zeigt nur noch Tapsis Fuchsfamilie: ein Fuchs-Elternteil und ein Fuchskind, die zusammen ein Buch anschauen und lachen. Die Bärenfamilie fällt weg. Ein Bild mit Gemini (buch-cover.webp), mit den Füchsen von buch-fuechse.webp als Vorlage, im Sammel-Batch der Tabelle „🦊 Füchse“.",
+      why: "toddlerfox.com: Schon das erste Bild sagt, wer hier vorliest – der Fuchs.",
+      effort: "S",
+    },
+    {
+      id: "D-15",
+      emoji: "👵",
+      title: "Oma oder Opa Fuchs statt der Bären",
+      text: "Wo heute die Bärenfamilie neben den Karten und in der obersten Zeile steht, sitzt Oma oder Opa Fuchs mit dem Fuchskind, beide lachen und schauen ins Buch. Ein Bild mit Gemini (freigestellt wie buch-fuechse.webp), dann fliegt der Bär aus BookFamily, Sky und MenuTop.",
+      why: "Keine Bären mehr im Fuchsbuch – und Großeltern lesen genauso oft vor wie Eltern.",
+      effort: "S",
+    },
+    {
+      id: "D-16",
+      emoji: "🔤",
+      title: "Titel „Toddlerfox“ auf Startseite und Cover",
+      text: "Die Startseite und das Cover heißen noch „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Toddlerfox“ in einer Buchschrift, mit einem kleinen gezeichneten Fuchs als Vignette (der Fuchs sitzt auf dem x oder schaut hinter dem Wort hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Fuchsohren. Hängt mit D-11 zusammen (Titel wie gedruckt).",
+      why: "Die Adresse heißt toddlerfox.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder.",
+      effort: "S",
+    },
+    {
+      id: "D-17",
+      emoji: "🌲",
+      title: "Startseite als Fuchswald",
+      text: "Hinter der Inhaltsseite steht heute nur ein Himmel. Neu: unten ein Waldrand mit Tapsis Fuchsbau, aus dem die Familie schaut, ein Pfad, Gräser, Pilze – still wie ein gedrucktes Bild, nichts bewegt sich von allein. Ein Tippen auf den Fuchsbau lässt ein Fuchskind kurz herausschauen. Jede Welt (Worlds.tsx) bekommt einen kleinen Fuchs irgendwo in ihrem Bild. Als Zeichnung (SVG), keine Bilddatei.",
+      why: "Die erste Seite zeigt sofort: Das ist das Fuchsbuch.",
+      effort: "M",
+    },
+    {
+      id: "D-18",
+      emoji: "🗂️",
+      title: "Füchse in allen Spielen",
+      text: "Jedes Spiel bekommt seine Füchse, Spiel für Spiel nach Aufwand: Fuchs-Erwachsene statt gezeichneter Menschen (Bäckerin, Ärztin, Feuerwehr), ein Fuchskind, das im Hintergrund hervorschaut, Tapsi, der am Ende klatscht. Die Aufgaben stehen in der Tabelle „🦊 Füchse“ oben (foxStatus.ts), getrennt nach Zeichnung (im Code, jederzeit) und Gemini-Bild (wartet und wird gesammelt in einem Batch gemacht, das ist günstiger).",
+      why: "Aus vielen einzelnen Spielen wird eine Welt mit einem Tier, das Kinder überall wiederfinden.",
+      effort: "L",
+    },
+    {
+      id: "D-19",
+      emoji: "🧒",
+      title: "Das Kind als Fuchskind?",
+      text: "Zu entscheiden: Bleibt die Figur, die für das Kind steht (Junge / Mädchen in Kleine Abenteuer, Zähne putzen, Aufzug), ein Menschenkind, oder wird sie ein Fuchskind mit Zöpfen bzw. ohne? Ein Menschenkind lässt das Kind sich selbst erkennen; ein Fuchskind passt zum Buch. Bis zur Entscheidung bleibt sie ein Menschenkind.",
+      why: "Die größte Frage des Fuchs-Umbaus – erst entscheiden, dann zeichnen.",
       effort: "M",
     },
   ],
