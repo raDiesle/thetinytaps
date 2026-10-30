@@ -81,6 +81,15 @@ const APP_LINKS = [
   `<link rel="apple-touch-icon" href="${href("/icons/apple-touch-icon.png")}" />`,
 ];
 
+// Visits are counted by Cloudflare Web Analytics: no cookies, nothing kept on the device, so no consent
+// banner a child would have to get past. Its site token is the repository variable CF_BEACON_TOKEN (set in
+// GitHub, passed in by deploy.yml); without it, as in every local build, nothing is counted.
+const beaconToken = process.env.CF_BEACON_TOKEN?.trim();
+if (beaconToken && !/^[0-9a-f]{32}$/i.test(beaconToken)) throw new Error("build: CF_BEACON_TOKEN is not a Cloudflare Web Analytics site token");
+const ANALYTICS = beaconToken
+  ? [`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${beaconToken}", "spa": true}'></script>`]
+  : [];
+
 /** What a page shows before the app has started, and all a crawler without JavaScript sees: its text and links to the other pages. */
 function staticBody(page: PageSeo) {
   const isScene = (p: PageSeo) => p.path.startsWith("/bilder/") && p.path !== "/bilder/";
@@ -191,7 +200,7 @@ const started = performance.now();
 await rm(OUT, { recursive: true, force: true });
 const result = await bundle();
 await cp(join(ROOT, "public"), OUT, { recursive: true });
-const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${APP_LINKS.join("")}</head>`);
+const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${[...APP_LINKS, ...ANALYTICS].join("")}</head>`);
 await writeFile(join(OUT, "index.html"), template);
 await writePages(template);
 await writeServiceWorker();

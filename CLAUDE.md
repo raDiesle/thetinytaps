@@ -347,6 +347,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
   (`useTitle`, `SeoHead`). Texts say only what the page really does. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
+- Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
+  repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
+  cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work

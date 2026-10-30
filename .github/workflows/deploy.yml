@@ -28,6 +28,9 @@ jobs:
       - run: bun run verify
       # The site is served from the root of https://toddlerfox.com (repo settings → Pages → Custom domain).
       - run: bun run build
+        env:
+          # Cloudflare Web Analytics' site token: Settings → Secrets and variables → Actions → Variables.
+          CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

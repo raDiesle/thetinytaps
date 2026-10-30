@@ -18,6 +18,9 @@ Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
 (repo settings → Pages → Source: **GitHub Actions**, Custom domain: **toddlerfox.com**, Enforce HTTPS).
 The domain is registered at Cloudflare; its DNS records are `tools/toddlerfox.com.zone` (import it under
 DNS → Records → Import, without „Proxy imported DNS records“, so GitHub can issue the HTTPS certificate).
+Visits are counted with Cloudflare Web Analytics (no cookies): Cloudflare → Analytics & Logs → Web Analytics →
+Add a site, manual setup, and its site token as the repository variable `CF_BEACON_TOKEN` (repo settings →
+Secrets and variables → Actions → Variables); without it the build counts nothing.
 
 Use **Bun** (not npm or yarn) for everything: installing, scripts, tests, bundling, dev server; dependencies are locked in `bun.lock`.
 `bunfig.toml` keeps installs safe: only the public npm registry, only versions at least 3 days old, no install scripts.
