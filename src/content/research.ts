@@ -101,6 +101,7 @@ export const RESEARCH: Research[] = [
       "Der jetzige Name ist inzwischen mehrfach besetzt: Seit April 2026 gibt es im App Store „Tiny Taps Baby“, ein werbefreies Tipp-Spiel für Kleinkinder, unter tinytaps.pages.dev eine Seite „TinyTaps“ und dazu die App „Little Taps“ – das trifft auch littletappers.",
       "Der jetzige Name passt schlecht: „TinyTap“ ist eine bekannte Lern-App für Kinder (TinyTap Ltd., seit 2022 bei Animoca Brands) mit eingetragener US-Wortmarke für Software und Bildung (Klassen 9 und 41, seit 2014) – „The Tiny Taps“ liegt einen Buchstaben daneben. thetinytaps.com ist frei, „the“ wird beim Tippen vergessen, und Google ergänzt „tiny taps“ zu einer Bar und zu Zapfanlagen.",
       "Umzug früh machen: Gespeichertes hängt an der Adresse – Einstellungen, Sterne der Belohnungstafel, Spielzeit und die installierte App bleiben bei radiesle.github.io zurück und fangen auf der neuen Domain leer an. Technisch reicht in GitHub Pages die eigene Domain (GitHub leitet die alte Adresse um) und im Bau SITE_ORIGIN mit PUBLIC_BASE_PATH „/“ statt „/<repo>“.",
+      "toddlebook.com nachgeprüft: Verisign-whois meldet „No match“, also nicht registriert; toddlebooks.com (die Mehrzahl, falls jemand ein s anhängt) ist auch frei, und .org, .net, .app und .de haben keine Nameserver. Eine Websuche fand kein Produkt und keine Marke „Toddlebook“, nur Bücher, die „Toddler Book“ im Titel tragen. In den USA hat aber die Schulplattform Toddle (Teacher Tools Private Limited) 2024 die Marke „TODDLE“ angemeldet, und „TODDLE DODDLE“ ist für gedruckte Kinderbücher angemeldet – darum vor dem Kauf im Register nachsehen, ob „Toddle“ allein für Software und Bücher geschützt ist.",
       "Vor dem Kauf noch prüfen: Wortmarken „Toddlebook“, „Toddlefox“ und „Toddle“ bei USPTO, EUIPO und DPMA (Klassen 9, 28, 41), und ob der Name in den App-Stores und sozialen Netzen frei ist.",
     ],
     topics: [
@@ -192,6 +193,8 @@ export const RESEARCH: Research[] = [
         url: "https://hackers.pub/@reiver@mastodon.social/019ab5bb-da03-7c71-ab1e-edd79b4f5f97/quotes",
       },
       { label: "App Store – Fable: Kids' Stories & Reading", url: "https://apps.apple.com/us/app/-/id6469246006" },
+      { label: "Trademarkdir – TODDLE (US 98678264, Teacher Tools)", url: "https://trademarkdir.com/trademark/toddle-98678264" },
+      { label: "Justia – TODDLE DODDLE (US 99044891, Kinderbücher)", url: "https://trademark.justia.com/990/44/toddle-99044891.html" },
     ],
     domains: [
       {
