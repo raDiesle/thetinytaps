@@ -1,14 +1,15 @@
-// Options most games share, chosen once on the home page for all of them:
-// read aloud, sounds and music. Each game keeps its own fields for read aloud
-// and sounds and gets them filled in from here (see withCommon).
+// Options most games share, the same for all of them: read aloud, sounds and music.
+// Only music is a switch (🎵 on the home page); read aloud and sounds are decided once
+// (FIXED). Each game keeps its own fields for read aloud and sounds and gets them filled
+// in from here (see withCommon).
 
 import { useCallback, useSyncExternalStore } from "react";
 import { loadStored, useStoredSettings } from "@/lib/storage";
 
 export interface CommonSettings {
-  /** Speak names, sentences and questions. */
+  /** Speak names, sentences and questions with the browser's voice – always off (FIXED). */
   speech: boolean;
-  /** Chimes, notes and noises. */
+  /** Chimes, notes and noises – always on (FIXED). */
   sounds: boolean;
   /**
    * The background song in every game (`backgroundMusic.ts`); off also silences a game's
@@ -18,7 +19,14 @@ export interface CommonSettings {
   music: boolean;
 }
 
-export const DEFAULT_COMMON_SETTINGS: CommonSettings = { speech: false, sounds: true, music: true };
+/**
+ * No switch for these any more: the browser's voice sounds too poor to read to a child (spoken
+ * lines come as ElevenLabs recordings instead, which play without a switch), and a game without
+ * its sounds gives a tap no answer. Also over a value a grown-up once saved, when they were switches.
+ */
+const FIXED = { speech: false, sounds: true } as const;
+
+export const DEFAULT_COMMON_SETTINGS: CommonSettings = { ...FIXED, music: true };
 
 /**
  * The options filled into a game's fields of the same name. Not music: a game with
@@ -36,12 +44,14 @@ const subscribe = (listener: () => void) => {
   listeners.add(listener);
   return () => listeners.delete(listener);
 };
-const current = () => (common ??= loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS));
+/** The shared options as saved, with read aloud and sounds always as FIXED says. */
+export const loadCommon = (): CommonSettings => ({ ...loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS), ...FIXED });
+const current = () => (common ??= loadCommon());
 
 /** The shared options and their setter; every component using them sees a change at once. */
 export function useCommonSettings() {
   const value = useSyncExternalStore(subscribe, current);
-  const update = useCallback((patch: Partial<CommonSettings>) => {
+  const update = useCallback((patch: Partial<Pick<CommonSettings, "music">>) => {
     common = { ...current(), ...patch };
     try {
       localStorage.setItem(COMMON_SETTINGS_KEY, JSON.stringify(common));

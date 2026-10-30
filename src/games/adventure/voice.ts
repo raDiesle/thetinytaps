@@ -1,15 +1,14 @@
 import recordingFiles from "./stories/*/stimme/**/*.mp3?glob";
 import { audioContext, loadSound } from "@/lib/sfx";
 import type { TargetLanguage } from "@/content/targetLanguages";
-import { speak, stopSpeaking } from "@/lib/speech";
 import { DEFAULT_TURN, type Story } from "./stories/story";
 import { recordingName, spokenLines } from "./voiceId";
 
 // Tapsi's recorded voice: a warm coach voice made with ElevenLabs
 // (scripts/elevenlabs-voice.mjs, `bun run voice`), one file per line in the
-// story's stimme/ folder (German) or stimme/<language>/ (the others). A line with
-// a recording plays from its file; any other line falls back to the browser's
-// voice, so a line changed but not recorded again is still said.
+// story's stimme/ folder (German) or stimme/<language>/ (the others). It plays
+// always, without a switch; a line without a recording (changed but not recorded
+// again) stays silent – the browser's voice sounds too poor for a child.
 
 /** Each recording by its file name (recordingName). */
 const URLS = new Map(Object.entries(recordingFiles).map(([file, url]) => [file.slice(file.lastIndexOf("/") + 1, -4), url]));
@@ -58,17 +57,13 @@ function play(buffer: AudioBuffer) {
 }
 
 /**
- * Says `text`: its recording if there is one, else with the browser's voice.
- * Like speak(), cuts off what is being said unless `queue`, which waits for it.
+ * Says `text` from its recording, if there is one.
+ * Cuts off what is being said unless `queue`, which waits for it.
  */
 export function say(text: string, language: TargetLanguage, { queue = false } = {}) {
   const url = recordingOf(text, language);
   if (!queue) hush();
-  // Without a recording it does not wait for one still playing; that only happens while lines are being recorded anew.
-  if (!url || !audioContext()) {
-    speak(text, language.speechLang, { queue: true });
-    return;
-  }
+  if (!url || !audioContext()) return;
   const at = generation;
   const buffer = load(url);
   chain = chain.then(async () => {
@@ -83,8 +78,7 @@ export function hush() {
   chain = Promise.resolve();
   playing?.stop();
   playing = null;
-  stopSpeaking();
 }
 
-/** True while a line is being said, recorded or by the browser: Tapsi's mouth moves. */
-export const talking = () => playing !== null || (typeof speechSynthesis !== "undefined" && speechSynthesis.speaking);
+/** True while a line is being said: Tapsi's mouth moves. */
+export const talking = () => playing !== null;
