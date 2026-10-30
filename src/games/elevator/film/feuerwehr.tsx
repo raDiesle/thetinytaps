@@ -17,7 +17,7 @@ import {
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
-import { type Look, HERO, Kid, type Pose } from "../kid";
+import { FIRE_STRIPE, FireHelmet, HERO, Kid, type Look, type Pose } from "../kid";
 import { Mug } from "../things";
 import type { Picture } from "../trail/items";
 import type { Point } from "../trail/types";
@@ -348,24 +348,87 @@ function StationHouse({ ring, open, hooks, children }: { ring: boolean; open: bo
   return (
     <g>
       <Outdoors />
+      {/* The crew room: warm wall with a skirting board, windows with curtains, a picture of an engine, a sofa and a plant */}
       <rect x="80" y="90" width="1440" height="310" fill="#fff4e6" />
-      <rect x="80" y="424" width="1440" height={GROUND - 424} fill="#e9ecef" />
+      <path d="M80 384 H1500" stroke="#e8b04b" strokeWidth="14" />
       {[900, 1220].map((x) => (
         <g key={x}>
           <rect x={x} y="150" width="160" height="130" rx="8" fill="#d0ebff" stroke={INK} strokeWidth="4" />
           <path d={`M${x + 80} 150 V280`} stroke={INK} strokeWidth="3" />
+          <path d={`M${x + 16} 168 l30 -10 M${x + 96} 168 l30 -10`} stroke="#fff" strokeWidth="6" strokeLinecap="round" />
+          <path
+            d={`M${x - 14} 140 Q${x + 4} 220 ${x - 8} 300 L${x - 24} 300 V140 Z M${x + 174} 140 Q${x + 156} 220 ${x + 168} 300 L${x + 184} 300 V140 Z`}
+            fill="#ff8787"
+            stroke={INK}
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <path d={`M${x - 30} 140 H${x + 190}`} stroke="#8d5a3b" strokeWidth="8" strokeLinecap="round" />
+          <rect x={x - 10} y="280" width="180" height="12" rx="4" fill="#fff" stroke={INK} strokeWidth="3" />
         </g>
       ))}
+      <g transform="translate(110 150)">
+        <rect width="130" height="90" rx="6" fill="#fff" stroke="#a0522d" strokeWidth="10" />
+        <g transform="translate(66 74) scale(0.15)">
+          <FireTruck />
+        </g>
+      </g>
+      <g transform="translate(1440 384)">
+        <path d="M-26 0 L-20 -50 H20 L26 0 Z" fill="#e8590c" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <g fill="#40c057" stroke={INK} strokeWidth="3">
+          <ellipse cx="-22" cy="-74" rx="14" ry="30" transform="rotate(-30 -22 -74)" />
+          <ellipse cx="22" cy="-74" rx="14" ry="30" transform="rotate(30 22 -74)" />
+          <ellipse cx="0" cy="-86" rx="14" ry="34" />
+        </g>
+      </g>
+      {/* The garage: tiles along the bottom of the wall, lamps, the extinguisher, boots under the jackets and warning stripes at the gate */}
+      <rect x="80" y="424" width="1440" height={GROUND - 424} fill="#e9ecef" />
+      <rect x="80" y={GROUND - 120} width="1420" height="120" fill="#d0ebff" opacity="0.6" />
+      <path
+        d={
+          Array.from({ length: 36 }, (_, i) => `M${80 + i * 40} ${GROUND - 120} V${GROUND}`).join(" ") +
+          ` M80 ${GROUND - 80} H1500 M80 ${GROUND - 40} H1500 M80 ${GROUND - 120} H1500`
+        }
+        stroke="#a5d8ff"
+        strokeWidth="2"
+      />
+      {[300, 1100].map((x) => (
+        <g key={x} transform={`translate(${x} 424)`}>
+          <path d="M0 0 V20" stroke="#495057" strokeWidth="4" />
+          <path d="M-40 44 Q-40 20 0 20 Q40 20 40 44 Z" fill="#495057" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+          <ellipse cx="0" cy="44" rx="30" ry="6" fill="#fff3bf" />
+        </g>
+      ))}
+      <g transform="translate(560 610)">
+        <rect x="-14" y="-90" width="10" height="20" fill="#495057" />
+        <path d="M-6 -86 Q20 -96 24 -70" stroke={INK} strokeWidth="5" fill="none" strokeLinecap="round" />
+        <rect x="-26" y="-74" width="52" height="96" rx="20" fill="#e03131" stroke={INK} strokeWidth="3" />
+        <rect x="-18" y="-40" width="36" height="26" rx="4" fill="#fff" stroke={INK} strokeWidth="2" />
+      </g>
+      <path d={`M1360 ${GROUND - 2} H1500`} stroke="#ffd43b" strokeWidth="16" />
+      <path d={`M1360 ${GROUND - 2} H1500`} stroke={INK} strokeWidth="16" strokeDasharray="16 16" />
       {[180, 300, 420].map((x) => (
         <g key={x} transform={`translate(${x} 520)`}>
           <Hook full={hooks} />
         </g>
       ))}
+      {hooks &&
+        [180, 300, 420].map((x) => (
+          <g key={x} transform={`translate(${x} ${GROUND})`}>
+            {[-22, 22].map((bx) => (
+              <g key={bx} transform={`translate(${bx} 0) scale(${bx < 0 ? -1 : 1} 1)`}>
+                <path d="M-10 -56 H10 V-18 Q30 -18 30 0 H-10 Z" fill="#212529" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+                <path d="M-10 -34 H10" stroke={FIRE_STRIPE} strokeWidth="5" />
+              </g>
+            ))}
+          </g>
+        ))}
       <g transform="translate(400 190)">
         <AlarmBell ring={ring} />
       </g>
-      {/* The gate: it rolls up into its box at the top */}
-      <rect x="1500" y="424" width="44" height={GROUND - 424} fill="#495057" />
+      {/* The gate: it rolls up into its box at the top, and the day outside shines in through it */}
+      <rect x="1500" y="424" width="44" height={GROUND - 424} fill="#a5d8ff" />
+      <rect x="1500" y={GROUND - 90} width="44" height="90" fill="#8ce99a" />
       <g className="fm-gate" style={{ transform: `scaleY(${open ? 0.08 : 1})`, transformOrigin: "0px 430px" }}>
         <rect x="1496" y="430" width="52" height={GROUND - 430} fill="#ced4da" stroke={INK} strokeWidth="3" />
         {Array.from({ length: 12 }, (_, i) => (
@@ -373,16 +436,45 @@ function StationHouse({ ring, open, hooks, children }: { ring: boolean; open: bo
         ))}
       </g>
       {children}
-      {/* The walls, the roof, the floor with its hole, and the pole */}
+      {/* The walls of brick, the roof with the siren and the brigade's badge, the floor with its hole, and the pole */}
       <rect x="40" y="50" width="1520" height="44" fill="#a51d1d" stroke={INK} strokeWidth="4" />
       <rect x="40" y="50" width="40" height={GROUND - 50} fill="#c92a2a" stroke={INK} strokeWidth="4" />
       <rect x="1500" y="50" width="60" height="380" fill="#c92a2a" stroke={INK} strokeWidth="4" />
+      <path d={BRICKS} stroke="#a51d1d" strokeWidth="3" />
+      <rect x="1494" y="418" width="72" height="16" rx="4" fill="#868e96" stroke={INK} strokeWidth="3" />
+      <g transform="translate(800 50)">
+        <rect x="-26" y="-34" width="52" height="30" rx="10" fill="#e03131" stroke={INK} strokeWidth="3" />
+        <path d="M-60 -4 H60" stroke={INK} strokeWidth="6" strokeLinecap="round" />
+        <circle cx="-180" cy="22" r="40" fill="#ffd43b" stroke={INK} strokeWidth="4" />
+        <g transform="translate(-180 92) scale(0.42)">
+          <FireHelmet />
+        </g>
+        <circle cx="180" cy="22" r="40" fill="#ffd43b" stroke={INK} strokeWidth="4" />
+        <g transform="translate(180 92) scale(0.42)">
+          <FireHelmet />
+        </g>
+      </g>
       <rect x="80" y={FLOOR} width={POLE - 40 - 80} height="24" fill="#adb5bd" stroke={INK} strokeWidth="3" />
       <rect x={POLE + 40} y={FLOOR} width={1500 - POLE - 40} height="24" fill="#adb5bd" stroke={INK} strokeWidth="3" />
+      <path d={`M80 ${FLOOR + 3} H${POLE - 40} M${POLE + 40} ${FLOOR + 3} H1500`} stroke="#c2884d" strokeWidth="6" />
       <rect x={POLE - 6} y="94" width="12" height={GROUND - 94} rx="5" fill="#fcc419" stroke={INK} strokeWidth="2.5" />
+      <path d={`M${POLE - 1} 100 V${GROUND - 6}`} stroke="#fff3bf" strokeWidth="3" />
+      <ellipse cx={POLE} cy={GROUND} rx="36" ry="8" fill="#ff8787" stroke={INK} strokeWidth="3" />
     </g>
   );
 }
+
+/** The joints of the bricks of the station's red walls, as one path. */
+const BRICKS = (() => {
+  let d = "";
+  for (let y = 116; y < GROUND; y += 30) {
+    const row = (y - 116) / 30;
+    d += `M44 ${y} H76 M${row % 2 ? 60 : 50} ${y - 30} V${y} `;
+    if (y < 430) d += `M1504 ${y} H1556 M${row % 2 ? 1530 : 1516} ${y - 30} V${y} `;
+  }
+  for (let x = 80; x < 1560; x += 60) d += `M${x} 54 V90 `;
+  return d;
+})();
 
 /** The crew room's table with its mugs. */
 function CrewTable() {
@@ -515,6 +607,8 @@ const station: Scene = {
 // ---------- On the way ----------
 
 const LANE = 830;
+/** The pavement's top on the way, where the houses stand. */
+const DRIVE_ROAD = 740;
 
 function DriveDraw({ step, busy }: SceneProps) {
   const truck = route<Point[]>(step, [
@@ -547,9 +641,9 @@ function DriveDraw({ step, busy }: SceneProps) {
         [1600, 210, 280, "#d0ebff", "#1971c2"],
         [1940, 220, 340, "#fff3bf", "#e8590c"],
       ].map(([x, w, h, wall, roof]) => (
-        <BackHouse key={x} x={x as number} w={w as number} h={h as number} wall={wall as string} roof={roof as string} />
+        <BackHouse key={x} x={x as number} w={w as number} h={h as number} wall={wall as string} roof={roof as string} base={DRIVE_ROAD} />
       ))}
-      <Road top={740} />
+      <Road top={DRIVE_ROAD} />
       <Go path={truck} ms={step >= 3 ? 2400 : 2000}>
         <FireTruck light={step >= 2} driving={busy && (step === 1 || step === 3)} crew />
       </Go>
@@ -754,13 +848,17 @@ function FireJob({ step, busy }: SceneProps) {
         </>
       )}
       {step >= 3 && !done && (
-        <path d={`M${NOZZLE[0] - 14} ${NOZZLE[1] + 6} l30 -10 l4 12 Z`} fill="#495057" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <g transform={`translate(${NOZZLE[0]} ${NOZZLE[1]}) rotate(-18)`}>
+          <path d="M6 -7 L36 -5 V5 L6 7 Z" fill="#ced4da" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+          <rect x="-18" y="-10" width="28" height="20" rx="6" fill="#e03131" stroke={INK} strokeWidth="3" />
+          <path d="M-2 -10 V-20 H8" stroke={INK} strokeWidth="4" strokeLinecap="round" fill="none" />
+        </g>
       )}
       {spraying && (
         <path
           key={step}
           className="fm-jet"
-          d={`M${NOZZLE[0] + 16} ${NOZZLE[1] - 6} Q${(NOZZLE[0] + spraying[0]) / 2} ${Math.min(NOZZLE[1], spraying[1]) - 180} ${spraying[0]} ${spraying[1]}`}
+          d={`M${NOZZLE[0] + 34} ${NOZZLE[1] - 11} Q${(NOZZLE[0] + spraying[0]) / 2} ${Math.min(NOZZLE[1], spraying[1]) - 180} ${spraying[0]} ${spraying[1]}`}
           stroke="#74c0fc"
           strokeWidth="16"
           strokeLinecap="round"
@@ -1083,7 +1181,7 @@ function HomeDraw({ step, busy, picks }: SceneProps) {
       {step >= 2 && (
         <>
           {[0, 1].map((i) => (
-            <g key={i} transform={`translate(${540 + i * 110} ${GROUND})`}>
+            <g key={i} transform={`translate(${510 + i * 105} ${GROUND})`}>
               <Pop>
                 <Grownup look={CREW[i]} pose={party && !busy ? "cheer" : "stand"} wear={["fire"]} face={1} />
               </Pop>

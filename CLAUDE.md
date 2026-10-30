@@ -156,13 +156,17 @@ In a fresh worktree run `bun install` first.
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away.
-- Sounds and voice have no switch (user decision, October 2026): sounds always play, and the browser's voice never
-  speaks (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
+- Sounds and voice have no switch (user decision, October 2026): sounds always play, and the browser's voice speaks
+  nothing of its own (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
   ElevenLabs recording (like Tapsi's lines in Bewegungsabenteuer), which always plays, like a sound; a line without
-  one stays silent. Never add a switch for either again. Recordings are made only when the user asks (see Language).
+  one stays silent – except in a game whose story is told by the voice and can't be followed without it (Kleine
+  Abenteuer, Bewegungsabenteuer): there the browser's voice (Google's) says a line until its recording is made
+  (`recordedVoice(files, { browser: true })`, user decision, October 2026). Give a game that fallback only where it
+  really helps, never for a game that plays fine silent. Never add a switch for either again. Recordings are made only when the user asks (see Language).
   What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
-  browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard).
+  browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard, and on
+  a game with the fallback that is not on its list).
   A game gets its recordings by listing its lines in every language in `src/content/recordedLines.ts` (`bun run voice
   make --only <name>` records what is missing into its `stimme/`, `--dry` first) and playing them with
   `recordedVoice(files)` from `src/lib/voice.ts` (a `./stimme/**/*.mp3?glob` import), as Zähne putzen, Kleine

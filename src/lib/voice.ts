@@ -1,10 +1,14 @@
+import { targetLanguageFor } from "@/content/targetLanguages";
 import { audioContext, loadSound } from "@/lib/sfx";
+import { speak, stopSpeaking } from "./speech";
 import { recordingName } from "./voiceName";
 
 // What the games say, from high-quality ElevenLabs recordings (scripts/elevenlabs-voice.mjs, `bun run voice`):
 // one file per line in the game's stimme/ folder (German) or stimme/<language>/ (the others), named by the hash
-// of the line's text (voiceName.ts). They play always, like a sound, without a switch; a line without a recording
-// (changed but not recorded again) stays silent – the browser's voice sounds too poor for a child.
+// of the line's text (voiceName.ts). They play always, like a sound, without a switch. A line without a recording
+// (new or changed, not recorded yet) stays silent – unless the game's story is told by the voice and can't be
+// followed without it (`browser`): there the browser's voice (Google's, where there is one) says it until the
+// recording is made (user decision, October 2026).
 
 /** The voice of one game: the recordings in its stimme/ folder and the folders below (a `?glob` import of their MP3s). */
 export interface RecordedVoice {
@@ -16,7 +20,7 @@ export interface RecordedVoice {
    * Says `text`, a line in `language` – or the German line where the game had no translation and fell back to it.
    * Cuts off what is being said unless `queue`, which waits for it.
    */
-  say: (text: string, language: string, options?: { queue?: boolean }) => void;
+  say: (text: string, language: string, options?: { queue?: boolean; speechLang?: string }) => void;
   /** True when `text` has a recording in `language` (or in German). */
   has: (text: string, language: string) => boolean;
 }
@@ -54,8 +58,12 @@ function play(buffer: AudioBuffer) {
   });
 }
 
-/** A game's voice from its recording files (file path → URL). */
-export function recordedVoice(files: Record<string, string>): RecordedVoice {
+/**
+ * A game's voice from its recording files (file path → URL). With `browser`, a line without a recording is said by
+ * the browser's voice, in `speechLang` (the voice of the language the text is in) or else `language`'s – only for
+ * games whose story is told by the voice (`voiceLines.test.ts` keeps the list).
+ */
+export function recordedVoice(files: Record<string, string>, { browser = false }: { browser?: boolean } = {}): RecordedVoice {
   const urls = new Map(Object.entries(files).map(([file, url]) => [file.slice(file.lastIndexOf("/") + 1, -4), url]));
   // A text with no recording in the language is a German fallback line of the game: its German recording.
   const urlOf = (text: string, language: string) => urls.get(recordingName(text, language)) ?? urls.get(recordingName(text, "de"));
@@ -70,10 +78,14 @@ export function recordedVoice(files: Record<string, string>): RecordedVoice {
       const own = language === "de" ? /^[0-9a-f]{8}$/ : new RegExp(`^(${language}-)?[0-9a-f]{8}$`);
       for (const [name, url] of urls) if (own.test(name)) void loadUrl(url);
     },
-    say: (text, language, { queue = false } = {}) => {
+    say: (text, language, { queue = false, speechLang } = {}) => {
       const url = urlOf(text, language);
       if (!queue) hush();
-      if (!url || !audioContext()) return;
+      if (!url) {
+        if (browser) speak(text, speechLang ?? targetLanguageFor(language).speechLang, { queue });
+        return;
+      }
+      if (!audioContext()) return;
       const at = generation;
       const buffer = loadUrl(url);
       chain = chain.then(async () => {
@@ -91,7 +103,8 @@ export function hush() {
   chain = Promise.resolve();
   playing?.stop();
   playing = null;
+  stopSpeaking();
 }
 
-/** True while a line is being said (Tapsi's mouth moves). */
-export const talking = () => playing !== null;
+/** True while a line is being said, from its recording or by the browser's voice (Tapsi's mouth moves). */
+export const talking = () => playing !== null || (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking);

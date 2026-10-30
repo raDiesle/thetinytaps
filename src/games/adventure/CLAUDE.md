@@ -31,7 +31,7 @@ Each line can have a recording in `stories/<story>/stimme/<hash>.mp3` (German) o
 in every language (`bun run voice`, see `scripts/elevenlabs-voice.mjs`; the voice and model are in `stimme.json`,
 the key in `ELEVENLABS_API_KEY`). The file name is a hash of the text (`src/lib/voiceName.ts`), so a changed line has no
 recording until `bun run voice make` records it again; `voice.ts` plays recordings always, without a switch, like a sound
-(root `CLAUDE.md`); a line without one stays silent, never the browser's voice. `voice.test.ts` checks the translations against the German steps and that a
+(root `CLAUDE.md`); a line without one is said by the browser's voice until it is recorded (Tapsi's lines are the game). `voice.test.ts` checks the translations against the German steps and that a
 language with recordings has one for every line and no extra ones. Recordings in other languages than German
 are not kept offline by every phone, only once the story has started in that language (`tools/build.ts`, `src/sw.js`).
 - A new story or changed lines come in German only: translate (`lines.<language>.ts`) and record (`bun run voice make`)

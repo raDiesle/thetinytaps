@@ -30,13 +30,21 @@ describe("lines still to record", () => {
     }
   });
 
-  // The browser's voice never speaks (root CLAUDE.md): a call of it only stays where the shared read aloud option,
-  // which is always off, guards it – the good-night screen once spoke without it. Its lines are on the list instead.
+  // The browser's voice speaks only for a line not recorded yet, and only in a game whose story is told by the voice
+  // (root CLAUDE.md): src/lib/voice.ts does that for the games below. Every other call of it stays where the shared
+  // read aloud option, which is always off, guards it – the good-night screen once spoke without it.
   test("every call of the browser's voice sits behind the read aloud option", () => {
     for (const file of sources("src")) {
+      if (file === join("src", "lib", "voice.ts")) continue;
       const code = readFileSync(file, "utf8");
-      if (!/import \{[^}]*\bspeak\b[^}]*\} from "@\/lib\/speech"/.test(code)) continue;
+      if (!/import \{[^}]*\bspeak\b[^}]*\} from "(@\/lib|\.)\/speech"/.test(code)) continue;
       expect({ file, guarded: /settings\.speech|\bspeech &&/.test(code) }).toEqual({ file, guarded: true });
     }
+  });
+
+  test("only the games told by their voice fall back to the browser's voice", () => {
+    const told = [join("src", "games", "elevator", "voice.ts"), join("src", "games", "adventure", "voice.ts")];
+    const using = sources("src").filter((file) => /recordedVoice\([^)]*browser: true/.test(readFileSync(file, "utf8")));
+    expect(using.sort()).toEqual(told.sort());
   });
 });
