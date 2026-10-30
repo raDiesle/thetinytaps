@@ -94,6 +94,7 @@ export const RESEARCH: Research[] = [
       "Vierte Runde, das Buch: Seit die App wie ein Bilderbuch aussieht, das Eltern und Kind zusammen lesen (A-20), hat der Name ein Bild, das wirklich alles umfasst – in ein Buch passen Spiele, Zähne putzen, Töpfchen, Tafel und Tagesplan, und „book“ versteht man in allen sieben Sprachen. Der Umschlag zeigt Fuchs- und Bärenfamilie; „fox“ nennt nur eine davon.",
       "Das r fällt durch den Radio-Test: Wer „toddle“ hört, schreibt „toddler“ – das ist beim Besprechen der Favoriten selbst passiert (toddlerbook statt toddlebook). Darum zählt, ob auch die Form mit r frei ist. toddlerbook.com gehört seit 2007 jemand anderem, toddlerbooks.com steht bei HugeDomains für rund 7.600 $ zum Verkauf, toddlerpages, toddlerstory und toddlerstar sind vergeben. Frei in beiden Formen sind nur toddlefox/toddlerfox, toddlehome/toddlerhome und toddleshelf/toddlershelf.",
       "Darum heißt der Name besser gleich „toddler“: Das Verb „to toddle“ kennen nur wenige, auch Muttersprachler schreiben „toddler“. Frei mit „toddler“ sind vor allem toddlerfox, toddlerhome, toddlershelf, toddlerforest, toddlerhug, toddlerpaws, toddlercubs, toddlerstorybook, toddlerlibrary; bei fast allen denkt Google an Kinderkleidung und Fanartikel (toddler cubs: Chicago Cubs, toddler burrow: Joe Burrow, toddler island: Stühle, toddler forest: Waldkita). toddlerstorybook wäre das Buch, aber 16 Buchstaben, und die Mehrzahl toddlerstorybooks.com ist vergeben. Toddlerfox bleibt: kurz, beide Wörter bekannt, das Tier der App.",
+      "Orte nach „toddler“ (paradise, castle, treehouse, oasis, hideaway, meadow): Mit und ohne s frei sind toddler(s)paradise, -castle, -treehouse, -meadow, -forest, -oasis, -hideaway und -hollow; vergeben sind wonderland, kingdom, world, land, planet, galaxy, haven, heaven, playland, corner, den, nest und universe. Solche Namen sind lang (toddlersparadise: 16 Buchstaben), beim Hören bleibt offen, ob mit s, und sie klingen wie Kitas und Spielplätze: Google ergänzt „toddlers paradise“ zu „nursery school“, und der Spielplatzbauer Kompan verkauft ein Spielplatzkonzept „Toddler’s Paradise“; castle, treehouse und hideaway werden zu Kinderbetten, oasis zu T-Shirts der Band. Ein allgemeines Lobwort ist zudem kaum als Marke zu schützen.",
       "„Toddlebook“ ist frei und passt zum Buch-Look am besten: „das Buch für Kleinkinder“, 10 Buchstaben, keine App und kein Buch trägt den Namen. Google ergänzt „toddle book“ zu „toddler books“, „toddler book subscription“ und „toddler books about feelings“ – genau Eltern, die für ihr Kleinkind etwas Gutes suchen. Der Haken ist derselbe wie bei jedem „toddle“-Namen: die Schulplattform Toddle.",
       "Gleich dahinter: toddlepages (Seiten zum Umblättern; Google denkt an Ausmalbilder, „toddler pages to color“) und toddlestory (Google denkt an Vorlesestunden in der Bücherei, „toddler story time“). Beide frei, nichts Gleichnamiges, aber 11 Buchstaben, und eine Geschichte erzählen nur Kleine Abenteuer und Bewegungsabenteuer.",
       "„Toddlerverse“ ist als .com vergeben (dahinter antwortet eine Website), „toddleverse“ auch, und ein Mastodon-Nutzer entwirft unter „Toddlerverse“ gerade einen werbefreien Online-Raum für Kleinkinder – fast dieselbe Idee. Frei sind nur thetoddlerverse, toddlerverses und toddleverses: „the“ wird beim Tippen vergessen, die Mehrzahl hört man nicht. Dazu heißt „-verse“ vor allem Universum (Metaverse, Spider-Verse) und passt eher zu Welten als zum Buch; den Doppelsinn „Vers“ hören Nicht-Muttersprachler kaum.",
@@ -204,6 +205,7 @@ export const RESEARCH: Research[] = [
         url: "https://domainnamewire.com/2026/08/27/verisign-announces-net-price-increase/",
       },
       { label: "Porkbun – Warum .com teurer wird", url: "https://kb.porkbun.com/article/201-why-did-com-prices-go-up-and-how-high-will-they-go" },
+      { label: "Kompan – Spielplatzkonzept „Toddler’s Paradise“", url: "https://kompan.com/en/us/inspiration/design-ideas/toddlers-paradise" },
     ],
     domains: [
       {
@@ -307,6 +309,27 @@ export const RESEARCH: Research[] = [
       { name: "tappytoddler", rank: 8, free: ["com"], taken: [], why: "Klar und freundlich, aber 12 Buchstaben, und beim Hören unklar, wie viele p und d." },
       { name: "toddlesmile", rank: 9, free: ["com"], taken: [], why: "Freundlich und allgemein, aber 11 Buchstaben und klingt nach Zahnarzt." },
       { name: "toddlegarden", rank: 9, free: ["com"], taken: [], why: "Allgemein, aber 12 Buchstaben, und Google denkt an Gartenspielzeug." },
+      {
+        name: "toddlerparadise",
+        rank: 9,
+        free: ["com"],
+        taken: [],
+        why: "Die natürliche englische Form („toddler“ als Bestimmungswort wie in „toddler bed“; mit s nur als „toddlers’ paradise“ mit Apostroph, den eine Domain nicht kennt). Frei, auch mit s (toddlersparadise), jedes Wort bekannt – aber 15 Buchstaben, beim Hören unklar, ob mit s, und Google denkt an Kitas und an Kompans Spielplatz „Toddler’s Paradise“; als Lobwort kaum als Marke zu schützen.",
+      },
+      {
+        name: "toddlertreehouse",
+        rank: 9,
+        free: ["com"],
+        taken: [],
+        why: "Frei, auch mit s, ein Ort zum Spielen und Lesen – aber 16 Buchstaben, und Google denkt an Kinderbetten und Spieltürme.",
+      },
+      {
+        name: "toddleradise",
+        rank: 9,
+        free: ["com"],
+        taken: [],
+        why: "Ein Kunstwort aus „toddler“ und „paradise“, die sich das r teilen: frei, eigen, als Marke zu schützen, Google kennt es nicht. Aber „-adise“ ist kein bekannter Baustein wie „-verse“: Wer es hört, weiß nicht, wie man es schreibt (toddlaradise, toddlerparadise – alle frei, man bräuchte mehrere), und Eltern in sieben Sprachen erkennen das Paradies kaum darin.",
+      },
       {
         name: "foxbearbook",
         rank: 9,
