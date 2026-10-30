@@ -10,7 +10,7 @@ import { speak } from "@/lib/speech";
 import { touchOnly } from "@/lib/device";
 import { tapState } from "@/lib/tapTargets";
 import { SCENES } from ".";
-import { ARROWS, middleItem, nextInDirection } from "./focus";
+import { ARROWS, centre, middleItem, nextInDirection } from "./focus";
 import { HideoutContext, peekTimes, SURPRISES } from "./hideout";
 import { assignKeys, pressedKey } from "./keys";
 import { localizeScene, sceneLanguage } from "./localize";
@@ -22,6 +22,7 @@ import { driveDistance, guestFor, roadId, roadsFrom, tripTo, withGuest, type Roa
 import { hasHints, isQuestMode, type ScenesSettings } from "./settings";
 import { playSound } from "./sounds";
 import { gust, poke, SPOTS, SpotEffectArt, spotAt, type SpotEffect } from "./spots";
+import { litItems, TORCH_RADIUS, TORCH_STEP, TorchNight } from "./torch";
 import { placeBox, type Scene, type SceneItem } from "./types";
 
 /** Key presses closer together than this only spawn shapes. */
@@ -158,12 +159,17 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   /** Taps per background spot, so its kinds take turns. */
   const spotTaps = useRef(new Map<number, number>());
   const svgRef = useRef<SVGSVGElement>(null);
+  /** Torch mode: the night over the picture, where the light is (picture units) and the items it shines on. */
+  const nightRef = useRef<HTMLDivElement>(null);
+  const lightAt = useRef<[number, number]>([scene.width / 2, scene.height / 2]);
+  const inLight = useRef<ReadonlySet<string>>(new Set());
   // An SVG id without the colons React puts in, so it can go into url(#…).
   const svgId = `scene-${useId().replace(/[^\w-]/g, "")}`;
   const greyId = `${svgId}-grey`;
 
   const questMode = isQuestMode(settings.mode);
   const colouring = settings.mode === "colour";
+  const torch = settings.mode === "torch";
   const soundsOn = settings.sounds;
   const quests = useMemo(() => questsFor(settings.mode, scene, language.id), [settings.mode, scene, language.id]);
   const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
@@ -326,6 +332,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     setDiscovered(discoveredRef.current);
     setDabs([]);
     setNight(false);
+    inLight.current = new Set();
   };
 
   /** The next picture in menu order (after the last one the first). The game stays open, like following a vehicle. */
@@ -466,6 +473,54 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
     navigate(`/bilder/${exit.to}/`, { replace: true, state: { ...(location.state as object | null), trip: exit.trip } });
   };
 
+  /** Torch mode: puts the night's hole where the light is, in pixels (also after the screen changed size). */
+  const showLight = useCallback(() => {
+    const night = nightRef.current;
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!night || !matrix) return;
+    const box = night.getBoundingClientRect();
+    const { x, y } = new DOMPoint(...lightAt.current).matrixTransform(matrix);
+    night.style.setProperty("--torch-x", `${x - box.left}px`);
+    night.style.setProperty("--torch-y", `${y - box.top}px`);
+    night.style.setProperty("--torch-r", `${scene.width * TORCH_RADIUS * matrix.a}px`);
+  }, [scene]);
+
+  useEffect(() => {
+    if (!torch) return;
+    showLight();
+    window.addEventListener("resize", showLight);
+    return () => window.removeEventListener("resize", showLight);
+  }, [torch, showLight]);
+
+  /**
+   * Torch mode: the light moves to (x, y) in picture units, and what comes into it wakes up – moves, sounds and is
+   * counted. `started` is an item the tap or key starts itself anyway.
+   */
+  const moveLight = (x: number, y: number, started?: string | null) => {
+    interacted();
+    lightAt.current = [Math.min(scene.width, Math.max(0, x)), Math.min(scene.height, Math.max(0, y))];
+    showLight();
+    const lit = here(litItems(items, ...lightAt.current, scene.width * TORCH_RADIUS));
+    const before = inLight.current;
+    inLight.current = new Set(lit.map((item) => item.id));
+    // Space and Enter start what is in the light.
+    focusRef.current = lit[0] ?? null;
+    for (const item of lit) {
+      if (before.has(item.id) || item.id === started) continue;
+      if (animate(item)) say(describe(item));
+      discover(item, ...screenPoint(item));
+    }
+  };
+
+  /** Torch mode: the light follows a tap, the finger and the mouse. */
+  const lightToPointer = (e: PointerEvent) => {
+    const matrix = svgRef.current?.getScreenCTM();
+    if (!matrix) return;
+    // A tapped item starts itself; one the light only moves over is woken by the light.
+    const tapped = e.type === "pointerdown" && e.target instanceof Element ? e.target.closest("[data-item]")?.getAttribute("data-item") : null;
+    moveLight(...pointIn(matrix, e.clientX, e.clientY), tapped);
+  };
+
   /**
    * An item was tapped or its key was pressed (keys mode).
    */
@@ -539,6 +594,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
   activateRef.current = activate;
   const paintSomewhereRef = useRef(paintSomewhere);
   paintSomewhereRef.current = paintSomewhere;
+  const moveLightRef = useRef(moveLight);
+  moveLightRef.current = moveLight;
 
   /** Where an item is on screen, for the shapes that fly out of it. */
   const screenPoint = useCallback((item: SceneItem): [number, number] => {
@@ -597,6 +654,23 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       if (e.repeat) return;
       if (!keyboard) setKeyboard(true);
 
+      /** Starts the item of a key; in torch mode the light goes to it first. */
+      const start = (item: SceneItem) => {
+        if (torch) moveLightRef.current(...centre(item), item.id);
+        const [x, y] = screenPoint(item);
+        activateRef.current(item, x, y);
+      };
+
+      // Torch mode: the arrow keys move the light, whether the key badges are on or not.
+      const arrow = ARROWS[e.key];
+      if (torch && arrow) {
+        const step = scene.width * TORCH_STEP;
+        const [x, y] = lightAt.current;
+        moveLightRef.current(x + arrow[0] * step, y + arrow[1] * step);
+        if (settings.sounds) playRandomNote();
+        return;
+      }
+
       // Colour mode: the space bar paints the background where nothing happens (Enter still starts the item in the frame).
       if (colouring && e.key === " ") {
         setSpaceDown(true);
@@ -608,7 +682,6 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       // Only the item's own animation limits how fast keys can be pressed.
       if (keysOn) {
         // Arrow keys move the glowing frame, Space and Enter start the item in it.
-        const arrow = ARROWS[e.key];
         if (arrow) {
           interacted();
           const from = focusRef.current;
@@ -628,8 +701,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
           keyTurns.current.set(key, turn + 1);
           item = list[turn % list.length];
         }
-        const [x, y] = screenPoint(item);
-        activateRef.current(item, x, y);
+        start(item);
         return;
       }
 
@@ -650,8 +722,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       // Exploring: every key brings another item to life.
       const item = pick(here(items).filter((i) => i !== lastKeyItem.current));
       lastKeyItem.current = item;
-      const [x, y] = screenPoint(item);
-      activateRef.current(item, x, y);
+      start(item);
     };
     const onKeyUp = (e: KeyboardEvent) => e.key === " " && setSpaceDown(false);
     window.addEventListener("keydown", onKeyDown);
@@ -660,7 +731,7 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("keyup", onKeyUp);
     };
-  }, [scene, items, here, keys, screenPoint, colouring, keyboard, keysOn, settings.sounds, ask, funBurst, moveFocus, language.id]);
+  }, [scene, items, here, keys, screenPoint, colouring, torch, keyboard, keysOn, settings.sounds, ask, funBurst, moveFocus, language.id]);
 
   // Colour mode: everything not yet tapped is pale grey, the background too until the picture is done.
   const grey = colouring && !allDiscovered;
@@ -674,6 +745,9 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
       className={sceneClass}
       style={{ "--sky": grey ? paleGrey(scene.sky) : scene.sky, "--ground": grey ? paleGrey(scene.ground) : scene.ground } as CSSProperties}
       onPointerDown={onBackgroundPointer}
+      onPointerDownCapture={torch ? lightToPointer : undefined}
+      // The mouse moves the light by hovering, a finger by sliding over the picture.
+      onPointerMove={torch ? (e) => (e.pointerType === "mouse" || e.buttons) && lightToPointer(e) : undefined}
     >
       <svg ref={svgRef} className="scene-svg" viewBox={`0 0 ${scene.width} ${scene.height}`} preserveAspectRatio="xMidYMid meet">
         {colouring && (
@@ -773,6 +847,8 @@ export function ScenePlay({ scene, settings, onKeys }: { scene: Scene; settings:
         {keysOn && focus && <FocusRing key={focus.id} box={placeBox(focus.box, focus.place)} />}
         {hint && hintItem && <HintRing box={placeBox(hintItem.box, hintItem.place)} />}
       </svg>
+      {/* Torch mode: the night over everything but the light; it goes when all were found (a bedtime picture stays dark). */}
+      {torch && <TorchNight nightRef={nightRef} off={allDiscovered && !bedtime} />}
 
       {quest && (
         <button

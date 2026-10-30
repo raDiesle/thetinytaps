@@ -5,7 +5,7 @@ import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { SCENES, UPCOMING_SCENES } from "@/games/scenes";
 import { localizeScene } from "@/games/scenes/localize";
-import { carryOverScenesSettings, DEFAULT_SCENES_SETTINGS, SCENES_SETTINGS_KEY, type SceneMode } from "@/games/scenes/settings";
+import { carryOverScenesSettings, DEFAULT_SCENES_SETTINGS, SCENE_MODES, SCENES_SETTINGS_KEY, type SceneMode } from "@/games/scenes/settings";
 import { useGameSettings } from "@/lib/common";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useAppLanguage, useT } from "@/lib/language";
@@ -63,29 +63,7 @@ export function ScenesMenu() {
             })}
             value={settings.mode}
             onChange={(mode) => update({ mode })}
-            options={[
-              {
-                value: "explore",
-                label: t({
-                  de: "👆 Freies Entdecken",
-                  ru: "👆 Свободная игра",
-                  en: "👆 Free exploring",
-                  zh: "👆 自由探索",
-                  hi: "👆 खुलकर खोजें",
-                  es: "👆 Explorar libremente",
-                  ar: "👆 استكشاف حر",
-                }),
-              },
-              {
-                value: "colour",
-                label: t({ de: "🖍️ Ausmalen", ru: "🖍️ Раскраска", en: "🖍️ Coloring", zh: "🖍️ 涂颜色", hi: "🖍️ रंग भरें", es: "🖍️ Colorear", ar: "🖍️ تلوين" }),
-              },
-              { value: "find", label: t({ de: "🔍 Suchen", ru: "🔍 Поиск", en: "🔍 Find it", zh: "🔍 找一找", hi: "🔍 ढूँढें", es: "🔍 Buscar", ar: "🔍 بحث" }) },
-              {
-                value: "questions",
-                label: t({ de: "❓ Fragen", ru: "❓ Вопросы", en: "❓ Questions", zh: "❓ 问一问", hi: "❓ सवाल", es: "❓ Preguntas", ar: "❓ أسئلة" }),
-              },
-            ]}
+            options={SCENE_MODES.map(({ value, label }) => ({ value, label: t(label) }))}
           />
         </div>
       </MenuHead>
