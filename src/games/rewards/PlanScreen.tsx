@@ -10,7 +10,7 @@ import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
 import { Pic, picture } from "./pictures";
 import { currentStep, exampleTicks, gameOf, nightsUntil, type Plan, restartDay, routineStep, stepDone, stepsOn } from "./plan";
-import { PLAN_SCREEN, PlanSheet, type StepState, useStepLabel } from "./PlanSheet";
+import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, type StepState, TODAY, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
 const UNDO_MS = 8000;
@@ -186,7 +186,7 @@ export function PlanScreen({
       poke(el, "wiggle");
       sound(playPop);
       const nights = nightsUntil(today, stepDay);
-      say(nights > 0 ? `${t({ de: nights === 1 ? "Noch einmal schlafen:" : `Noch ${nights}-mal schlafen:` })} ${label}` : label);
+      say(nights > 0 ? `${t(SLEEPS_LEFT)(nights)}: ${label}` : label);
       return;
     }
     // The teeth card opens Zähne putzen; leaving comes back here, and a finished brushing ticks this card.
@@ -212,10 +212,22 @@ export function PlanScreen({
         setParty(step.emoji);
         sound(playTusch);
         for (let i = 0; i < 10; i++) setTimeout(() => spawn(), i * 90);
-        say(t({ de: "Alles geschafft! Hurra!" }));
+        say(
+          t({
+            de: "Alles geschafft! Hurra!",
+            en: "All done! Hooray!",
+            zh: "全部完成啦！好耶！",
+            hi: "सब हो गया! हुर्रे!",
+            es: "¡Todo listo! ¡Hurra!",
+            ar: "انتهينا من كل شيء! يا للفرح!",
+            ru: "Всё готово! Ура!",
+          }),
+        );
       }, 450);
     } else {
-      say(`${t({ de: "Super! Jetzt:" })} ${stepLabel(steps[after])}`);
+      say(
+        `${t({ de: "Super! Jetzt:", en: "Super! Now:", zh: "太棒了！现在：", hi: "शाबाश! अब:", es: "¡Genial! Ahora:", ar: "رائع! والآن:", ru: "Супер! Теперь:" })} ${stepLabel(steps[after])}`,
+      );
     }
   };
 
@@ -224,7 +236,19 @@ export function PlanScreen({
     poke(el, "wiggle");
     sound(playPop);
     const done = stepsOn(plan, day).filter((step) => stepDone(ticks, linked, day, step));
-    say(done.length ? `${t({ de: "Schon fertig:" })} ${done.map(stepLabel).join(", ")}` : t({ de: "Hier kommt rein, was fertig ist." }));
+    say(
+      done.length
+        ? `${t({ de: "Schon fertig:", en: "Already done:", zh: "已经完成：", hi: "हो चुका है:", es: "Ya está hecho:", ar: "انتهينا من:", ru: "Уже готово:" })} ${done.map(stepLabel).join(", ")}`
+        : t({
+            de: "Hier kommt rein, was fertig ist.",
+            en: "What’s done goes in here.",
+            zh: "做完的放到这里。",
+            hi: "जो हो गया, वह यहाँ आता है।",
+            es: "Aquí va lo que ya está hecho.",
+            ar: "هنا نضع ما انتهينا منه.",
+            ru: "Сюда кладём то, что готово.",
+          }),
+    );
   };
 
   /** A day of the week tapped: it says when it is and what comes then. */
@@ -235,11 +259,19 @@ export function PlanScreen({
     const nights = nightsUntil(today, d);
     const when =
       nights === 0
-        ? t({ de: "Heute" })
+        ? t(TODAY)
         : nights === 1
-          ? t({ de: "Morgen, noch einmal schlafen" })
+          ? t({
+              de: "Morgen, noch einmal schlafen",
+              en: "Tomorrow, one more sleep",
+              zh: "明天，再睡一觉",
+              hi: "कल, बस एक बार और सोना है",
+              es: "Mañana, falta una noche",
+              ar: "غدًا، بعد ليلة واحدة",
+              ru: "Завтра, ещё разок поспать",
+            })
           : nights > 1
-            ? t({ de: `Noch ${nights}-mal schlafen` })
+            ? t(SLEEPS_LEFT)(nights)
             : new Intl.DateTimeFormat(language.speechLang, { weekday: "long" }).format(d);
     say(`${when}: ${stepsOn(plan, d).map(stepLabel).join(", ")}`);
   };
@@ -270,22 +302,38 @@ export function PlanScreen({
           <span>
             ✨{" "}
             {plan.view === "day"
-              ? t({ de: "Die Karten in der Kiste sind nur ein Beispiel – mit dem ersten Tippen kommen sie wieder heraus." })
-              : t({ de: "Die Haken sind nur ein Beispiel – mit dem ersten Tippen gehen sie weg." })}
+              ? t({
+                  de: "Die Karten in der Kiste sind nur ein Beispiel – mit dem ersten Tippen kommen sie wieder heraus.",
+                  en: "The cards in the box are only an example – the first tap brings them back out.",
+                  zh: "盒子里的卡片只是示例——第一次点按后它们就会回来。",
+                  hi: "डिब्बे के कार्ड सिर्फ़ उदाहरण हैं – पहली बार टैप करते ही ये बाहर आ जाएँगे।",
+                  es: "Las tarjetas de la caja son solo un ejemplo: con el primer toque vuelven a salir.",
+                  ar: "البطاقات في الصندوق مجرد مثال – تخرج منه مع أول نقرة.",
+                  ru: "Карточки в коробке – только пример: при первом касании они вернутся обратно.",
+                })
+              : t({
+                  de: "Die Haken sind nur ein Beispiel – mit dem ersten Tippen gehen sie weg.",
+                  en: "The ticks are only an example – they go away with the first tap.",
+                  zh: "这些勾只是示例——第一次点按后就会消失。",
+                  hi: "ये सही के निशान सिर्फ़ उदाहरण हैं – पहली बार टैप करते ही हट जाएँगे।",
+                  es: "Las marcas son solo un ejemplo: desaparecen con el primer toque.",
+                  ar: "علامات الصح مجرد مثال – تختفي مع أول نقرة.",
+                  ru: "Галочки – только пример: они исчезнут при первом касании.",
+                })}
           </span>
           <button type="button" onClick={onExamplesOff}>
-            {t({ de: "Ausblenden" })}
+            {t({ de: "Ausblenden", en: "Hide", zh: "隐藏", hi: "छिपाएँ", es: "Ocultar", ar: "إخفاء", ru: "Скрыть" })}
           </button>
         </div>
       )}
       {!plan.examples && allDone && dayKey(day) === dayKey(today) && (
         <button type="button" className="pl-again" onClick={startOver}>
-          ↺ {t({ de: "Von vorn" })}
+          ↺ {t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}
         </button>
       )}
       {undo && (
         <button type="button" className="rw-undo" onClick={takeBack}>
-          ↶ {t({ de: "Zurück" })}
+          ↶ {t({ de: "Zurück", en: "Undo", zh: "撤销", hi: "वापस", es: "Deshacer", ar: "تراجع", ru: "Отменить" })}
         </button>
       )}
       {party && (
@@ -293,7 +341,17 @@ export function PlanScreen({
           <span className="rw-party-emoji" aria-hidden>
             <Pic src={picture("fest")} emoji={party} />
           </span>
-          <span className="rw-party-text">{t({ de: "Alles geschafft!" })}</span>
+          <span className="rw-party-text">
+            {t({
+              de: "Alles geschafft!",
+              en: "All done!",
+              zh: "全部完成啦！",
+              hi: "सब हो गया!",
+              es: "¡Todo listo!",
+              ar: "انتهينا من كل شيء!",
+              ru: "Всё готово!",
+            })}
+          </span>
         </button>
       )}
       <BurstLayer bursts={bursts} />

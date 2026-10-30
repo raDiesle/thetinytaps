@@ -84,7 +84,9 @@ In a fresh worktree run `bun install` first.
   only, never translated or recorded on your own, also in a game that already speaks other languages.
   Instead keep `src/content/ideas/languageStatus.ts` (shown on `/management/`) true in the same commit: what is
   there and what is missing, per game, as `parts` where a part (a story, a mode, the song) differs, and
-  `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell.
+  `"text"` where it is translated but not yet recorded. `content.test.ts` checks it where files tell, and
+  `inlineTexts.test.ts` checks that every inline `t({ de: … })` of a game has each language its row marks as there
+  (so a German-only line in a translated game fails until its row says what is missing).
   **One language for everything, never mixed**: menus, letters and keys, words and voice all follow the app language
   (🌐 on the home page, `useAppLanguage()`); no game or menu adds a language choice of its own (a „Spielsprache“ once
   put Russian letters under German menus). A language joins `APP_LANGUAGES` only once the menus and the letters and

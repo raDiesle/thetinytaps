@@ -174,7 +174,15 @@ export function buildFarm() {
   at(tPigJump, { sound: playWhoosh });
   at(tSplash, {
     sound: splash,
-    say: { de: "Platsch! Das Schwein springt in die Pfütze." },
+    say: {
+      de: "Platsch! Das Schwein springt in die Pfütze.",
+      en: "Splash! The pig jumps into the puddle.",
+      zh: "扑通！小猪跳进水坑啦。",
+      hi: "छपाक! सूअर कीचड़ में कूदता है।",
+      es: "¡Plaf! El cerdito salta al charco.",
+      ar: "طشّ! الخنزير يقفز في البركة.",
+      ru: "Плюх! Свинка прыгает в лужу.",
+    },
   });
   /** The pig's middle on the ground, how high it is in the air, and how far it is up (0 asleep to 1 on its legs). */
   const pigAt = (t: number) => {
@@ -361,7 +369,18 @@ export function buildFarm() {
     at(tHaw[i], { sound: haw });
   });
   const tKick = tBray + 3;
-  at(tKick, { sound: bang, say: { de: "Der Esel tritt, und die Scheune geht auf." } });
+  at(tKick, {
+    sound: bang,
+    say: {
+      de: "Der Esel tritt, und die Scheune geht auf.",
+      en: "The donkey kicks, and the barn opens.",
+      zh: "小毛驴一踢，谷仓门开啦。",
+      hi: "गधा लात मारता है, और खलिहान खुल जाता है।",
+      es: "El burro patea, y el granero se abre.",
+      ar: "الحمار يرفس، فيُفتح باب الحظيرة.",
+      ru: "Ослик брыкается — и сарай открывается.",
+    },
+  });
   /** The donkey now: how far he leans (degrees, his rump up), how far his hind legs swing back, his head up (0 to 1), his mouth and a stamping hoof. */
   const donkeyAt = (t: number) => {
     // He crouches a little, then snaps his rump up and his hind legs back, and slowly stands again.
@@ -417,7 +436,18 @@ export function buildFarm() {
   const DONKEY_SOLO = tSolo.length - 1;
   at(tSolo[DONKEY_SOLO] + 0.5, { sound: haw });
   const tChoir = tSolo[DONKEY_SOLO] + 1.7;
-  at(tChoir, { sound: playTusch, say: { de: "Alle Tiere singen zusammen!" } });
+  at(tChoir, {
+    sound: playTusch,
+    say: {
+      de: "Alle Tiere singen zusammen!",
+      en: "All the animals sing together!",
+      zh: "所有动物一起唱歌！",
+      hi: "सारे जानवर मिलकर गाते हैं!",
+      es: "¡Todos los animales cantan juntos!",
+      ar: "كل الحيوانات تغنّي معًا!",
+      ru: "Все звери поют вместе!",
+    },
+  });
   [neigh, baa, cluck, bark, quack, moo, bleat, hee].forEach((sound, i) => at(tChoir + 0.15 + 0.05 * i, { sound }));
   at(tChoir + 0.9, { sound: haw });
   at(tChoir + 1, { sound: playTwinkle });

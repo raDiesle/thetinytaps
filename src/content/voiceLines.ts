@@ -92,7 +92,7 @@ export const INLINE_LINES: Record<string, InlineLine[]> = {
     { text: "Super! Jetzt:", file: "src/games/rewards/PlanScreen.tsx" },
     { text: "Schon fertig:", file: "src/games/rewards/PlanScreen.tsx" },
     { text: "Hier kommt rein, was fertig ist.", file: "src/games/rewards/PlanScreen.tsx" },
-    { text: "Noch einmal schlafen:", file: "src/games/rewards/PlanScreen.tsx" },
+    { text: "Noch einmal schlafen", file: "src/games/rewards/PlanSheet.tsx" },
   ],
 };
 

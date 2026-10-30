@@ -408,7 +408,17 @@ export function buildSpace() {
   };
 
   at(tAppear, { sound: playAlien });
-  at(tAppear + 0.1, { say: { de: "Oh, ein Ufo!" } });
+  at(tAppear + 0.1, {
+    say: {
+      de: "Oh, ein Ufo!",
+      en: "Oh, a UFO!",
+      zh: "哇，一个飞碟！",
+      hi: "अरे, एक उड़न तश्तरी!",
+      es: "¡Oh, un ovni!",
+      ar: "أوه، صحن طائر!",
+      ru: "Ой, летающая тарелка!",
+    },
+  });
   at(tAppear + 0.5, { sound: playWhoosh });
   at(tArrive, { sound: playTrill });
   at(tBeam, { sound: playBeam });

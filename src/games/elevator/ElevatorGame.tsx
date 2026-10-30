@@ -82,6 +82,12 @@ export function ElevatorGame() {
           <p>
             {t({
               de: "Ein Film erzählt eine Geschichte von Ort zu Ort. Das Kind tippt, wo es leuchtet, und wählt zwischendurch, wie es weitergeht – jede Wahl ist richtig. Unten zeigt ein Streifen die Bilder des Films.",
+              ru: "Фильм рассказывает историю, переходя с места на место. Ребёнок нажимает туда, где светится, и время от времени выбирает, что будет дальше, – любой выбор правильный. Внизу полоска показывает кадры фильма.",
+              en: "A film tells a story from place to place. The child taps where something glows and now and then chooses how it goes on – every choice is right. A strip at the bottom shows the pictures of the film.",
+              zh: "影片从一个地方到另一个地方讲述一个故事。孩子点击发光的地方，中途选择故事怎么继续——每个选择都是对的。下方的一条画面带显示影片的各个画面。",
+              hi: "फ़िल्म एक जगह से दूसरी जगह जाते हुए कहानी सुनाती है। बच्चा वहाँ टैप करता है जहाँ कुछ चमकता है, और बीच-बीच में चुनता है कि आगे क्या हो – हर चुनाव सही है। नीचे एक पट्टी फ़िल्म की तस्वीरें दिखाती है।",
+              es: "Una película cuenta una historia de lugar en lugar. Su peque toca donde algo brilla y de vez en cuando elige cómo sigue: toda elección es correcta. Abajo, una tira muestra las imágenes de la película.",
+              ar: "يروي الفيلم قصة تنتقل من مكان إلى آخر. يلمس الطفل المكان الذي يضيء، ويختار بين حين وآخر كيف تستمر القصة، وكل اختيار صحيح. وفي الأسفل يعرض شريط صور الفيلم.",
             })}
           </p>
           {!device.touchOnly && (

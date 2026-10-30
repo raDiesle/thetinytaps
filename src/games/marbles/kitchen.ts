@@ -515,7 +515,17 @@ export function buildKitchen() {
   const tBeep = tCake + 0.3;
   at(tToss, { sound: () => playKnock(500) });
   at(tToss + 0.02, { sound: playWhoosh });
-  at(tToss + 0.1, { say: { de: "Hui! Der Pfannkuchen fliegt!" } });
+  at(tToss + 0.1, {
+    say: {
+      de: "Hui! Der Pfannkuchen fliegt!",
+      en: "Whee! The pancake flies!",
+      zh: "呼！煎饼飞起来啦！",
+      hi: "वाह! पैनकेक उड़ रहा है!",
+      es: "¡Uy! ¡El panqueque vuela!",
+      ar: "هوب! الفطيرة تطير!",
+      ru: "Ух! Блинчик летит!",
+    },
+  });
   at(tCake, { sound: playPlop });
   at(tBeep, { sound: playBeeps });
   at(tBeep + 0.9, { sound: playHum });

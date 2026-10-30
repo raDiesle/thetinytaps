@@ -311,7 +311,17 @@ export function buildLight() {
     while (rabbitShadow(t).show < 0.5) t += 0.02;
     return t;
   })();
-  at(tRabbitShows, { say: { de: "Schau, ein Hase an der Wand!" } });
+  at(tRabbitShows, {
+    say: {
+      de: "Schau, ein Hase an der Wand!",
+      en: "Look, a bunny on the wall!",
+      zh: "看，墙上有只小兔子！",
+      hi: "देखो, दीवार पर खरगोश!",
+      es: "¡Mira, un conejito en la pared!",
+      ar: "واو، أرنب على الحائط!",
+      ru: "Смотри, зайчик на стене!",
+    },
+  });
   const tBirdShows = (() => {
     let t = tRabbitShows;
     while (shadowOf(cutout(BIRD0, t).a, t).show < 0.5) t += 0.02;

@@ -2,11 +2,25 @@ import type { CSSProperties, ReactNode } from "react";
 import { dayKey } from "@/games/teeth/daytime";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type TapState, tapState } from "@/lib/tapTargets";
-import { type Board, type BoardTask, boardDays, cellKey, isFilled, type LinkedDays, monthOf, possessive, progress, taskSlots, weekday } from "./board";
-import { type CatalogMark, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import {
+  AUTO_TITLES,
+  type Board,
+  type BoardTask,
+  boardDays,
+  cellKey,
+  isFilled,
+  isTemplateTitle,
+  type LinkedDays,
+  monthOf,
+  progress,
+  taskSlots,
+  weekday,
+} from "./board";
+import { type CatalogMark, DAY_NAMES, MARK_BY_ID, MARKS, REWARD_BY_ID, type Slot, SLOT_BY_ID, TASK_BY_ID, TEMPLATES, THEME_BY_ID, THEMES } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture, SheetStrip } from "./pictures";
 
-const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
+/** „Woche vom ____“: the line on a printed week to write its first day on. */
+export const WEEK_OF: Localized = { de: "Woche vom", en: "Week of", zh: "起始日期", hi: "हफ़्ता शुरू", es: "Semana del", ar: "أسبوع يبدأ في", ru: "Неделя с" };
 
 /** Goals up to this many stars show one dot each under the reward; more show a bar. */
 const MAX_DOTS = 15;
@@ -29,25 +43,29 @@ export const SCREEN_LOOK: SheetLook = { print: false, color: true, colorIn: fals
 export function useBoardTitle() {
   const t = useT();
   return (board: Board) => {
-    if (board.title.trim()) return board.title.trim();
-    const name = board.childName.trim();
-    if (board.kind === "week") return name ? t({ de: `${possessive(name)} Sterne-Woche` }) : t({ de: "Meine Sterne-Woche" });
-    if (board.kind === "month") return name ? t({ de: `${possessive(name)} Sterne-Monat` }) : t({ de: "Mein Sterne-Monat" });
-    if (board.kind === "day") return name ? t({ de: `${possessive(name)} Tag` }) : t({ de: "Mein Tag" });
-    return name ? t({ de: `${possessive(name)} Sterne` }) : t({ de: "Meine Sterne" });
+    const own = board.title.trim();
+    const template = TEMPLATES.find((tpl) => tpl.id === board.template)?.title;
+    if (own) return isTemplateTitle(own, template) ? t(template) : own;
+    return t(AUTO_TITLES[board.kind])(board.childName.trim());
   };
 }
 
 /** A task's words: the grown-up's own or the catalogue's. */
 export function useTaskLabel() {
   const t = useT();
-  return (task: { label?: string; catalog?: string }) => task.label ?? (task.catalog ? t(TASK_BY_ID.get(task.catalog)?.label ?? { de: "" }) : "");
+  return (task: { label?: string; catalog?: string }) => {
+    const known = task.catalog ? TASK_BY_ID.get(task.catalog)?.label : undefined;
+    return task.label ?? (known ? t(known) : "");
+  };
 }
 
 /** A reward's words: the grown-up's own or the catalogue's. */
 export function useRewardLabel() {
   const t = useT();
-  return (reward: { label?: string; catalog?: string }) => reward.label ?? (reward.catalog ? t(REWARD_BY_ID.get(reward.catalog)?.label ?? { de: "" }) : "");
+  return (reward: { label?: string; catalog?: string }) => {
+    const known = reward.catalog ? REWARD_BY_ID.get(reward.catalog)?.label : undefined;
+    return reward.label ?? (known ? t(known) : "");
+  };
 }
 
 /**
@@ -134,8 +152,10 @@ export function BoardSheet({
           </span>{" "}
           {title}
         </span>
-        {look.print && board.kind === "week" && <span className="rw-blank">{t({ de: "Woche vom" })} ____________</span>}
-        {look.print && board.kind === "day" && <span className="rw-blank">{t({ de: "Datum" })} ____________</span>}
+        {look.print && board.kind === "week" && <span className="rw-blank">{t(WEEK_OF)} ____________</span>}
+        {look.print && board.kind === "day" && (
+          <span className="rw-blank">{t({ de: "Datum", en: "Date", zh: "日期", hi: "तारीख़", es: "Fecha", ar: "التاريخ", ru: "Дата" })} ____________</span>
+        )}
         {!look.print && board.kind === "week" && (
           <span className="rw-blank">{dateFormat({ day: "numeric", month: "short" }).formatRange(week[0], week[6])}</span>
         )}

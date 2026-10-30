@@ -1,5 +1,7 @@
 import { expect, test } from "bun:test";
 import { STORIES, texts } from "./content";
+import { FILMS } from "./film/films";
+import type { Film } from "./film/types";
 import { PHRASEBOOKS } from "./phrases";
 import { TRAIL_LEVELS } from "./trail/levels";
 import type { Station, Way } from "./trail/types";
@@ -9,7 +11,24 @@ import type { Station, Way } from "./trail/types";
 // The languages translated so far have every shared text, and every sentence of each story and level they have
 // the title of: a new level comes in German only, and plays all in German until it is translated whole.
 
-/** The German texts of each story and level (its title first), and the shared ones under "". */
+/** Every line of a film along every way through it: the title first, then each scene's beats and choice, and the end. */
+function filmTexts(film: Film): string[] {
+  const all = [film.title];
+  const walk = (picks: string[]) => {
+    const scenes = film.scenes(picks);
+    for (const scene of scenes) {
+      for (const beat of scene.beats) for (const line of [beat.ask, beat.say]) if (line !== undefined) all.push(line);
+      if (scene.choice) all.push(scene.choice.ask, ...scene.choice.options.map((o) => o.say));
+    }
+    const last = scenes[scenes.length - 1];
+    if (last.choice) for (const o of last.choice.options) walk([...picks, o.id]);
+  };
+  walk([]);
+  all.push(film.end);
+  return [...new Set(all)];
+}
+
+/** The German texts of each story, level and film (its title first), and the shared ones under "". */
 function germanTextsByPart(): Record<string, string[]> {
   const parts: Record<string, string[]> = { "": [...Object.values(texts)] };
   for (const story of STORIES) {
@@ -41,10 +60,11 @@ function germanTextsByPart(): Record<string, string[]> {
     }
     parts[level.title] = all;
   }
+  for (const film of FILMS) parts[film.title] = filmTexts(film);
   return parts;
 }
 
-/** Every German text of the stories and levels that is spoken or shown to grown-ups. */
+/** Every German text of the stories, levels and films that is spoken or shown to grown-ups. */
 const germanTexts = () => Object.values(germanTextsByPart()).flat();
 
 /** Each language's own letters; Latin-letter languages are only checked for being there and complete. */

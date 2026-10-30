@@ -75,8 +75,28 @@ export function TemplateGallery({
             <span className="rw-thumb rw-thumb-blank" aria-hidden>
               ✏️
             </span>
-            <span className="rw-tpl-name">{t({ de: "Leer anfangen" })}</span>
-            <span className="rw-tpl-hint">{t({ de: "Alles selbst aussuchen" })}</span>
+            <span className="rw-tpl-name">
+              {t({
+                de: "Leer anfangen",
+                en: "Start blank",
+                zh: "从空白开始",
+                hi: "खाली से शुरू करें",
+                es: "Empezar en blanco",
+                ar: "البدء من الصفر",
+                ru: "Начать с чистого листа",
+              })}
+            </span>
+            <span className="rw-tpl-hint">
+              {t({
+                de: "Alles selbst aussuchen",
+                en: "Choose everything yourself",
+                zh: "全部自己挑选",
+                hi: "सब कुछ खुद चुनें",
+                es: "Elegir todo usted",
+                ar: "اختاروا كل شيء بأنفسكم",
+                ru: "Выбрать всё самим",
+              })}
+            </span>
           </button>
         </li>
       )}

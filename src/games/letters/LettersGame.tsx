@@ -109,6 +109,12 @@ export function LettersGame() {
           <p>
             {t({
               de: "Das Spiel beginnt sofort. Die Einstellungen öffnen sich im Spiel: ⚙️ oben links gedrückt halten. Dort wechselt man auch zwischen Frei tippen und Wörter tippen.",
+              en: "The game starts right away. The settings open during play: press and hold ⚙️ in the top left corner. That's also where you switch between Free typing and Typing words.",
+              zh: "游戏马上开始。设置在游戏中打开：按住左上角的 ⚙️。在那里也可以在“随便按”和“拼词语”之间切换。",
+              hi: "खेल तुरंत शुरू होता है। सेटिंग्स खेल के दौरान खुलती हैं: ऊपर बाईं ओर ⚙️ दबाकर रखें। वहीं आप आज़ाद टाइपिंग और शब्द टाइपिंग के बीच भी बदल सकते हैं।",
+              es: "El juego empieza enseguida. Los ajustes se abren durante el juego: mantenga pulsado ⚙️ arriba a la izquierda. Ahí también se cambia entre Teclear libre y Escribir palabras.",
+              ar: "تبدأ اللعبة فورًا. تُفتح الإعدادات أثناء اللعب: اضغطوا مطولًا على ⚙️ في الزاوية العلوية اليسرى. وهناك أيضًا تبدّلون بين كتابة حرة وكتابة كلمات.",
+              ru: "Игра начинается сразу. Настройки открываются в игре: удерживайте ⚙️ в левом верхнем углу. Там же можно переключаться между «Печатать что хочешь» и «Печатаем слова».",
             })}
           </p>
           <p>
@@ -125,6 +131,12 @@ export function LettersGame() {
           <p>
             {t({
               de: "Nur Zahlen: Nur Zahlen kommen, jede mit so vielen Dingen. Eine Ziffer zeigt sich selbst, jede andere Taste bringt eine Zahl zufällig. Auf Wunsch erscheinen erst die Dinge und die Ziffer erst, wenn dieselbe Zahl gleich nochmal gedrückt wird.",
+              en: "Only numbers: only numbers come, each with that many things. A digit shows itself, any other key brings a number at random. If you like, the things appear first, and the digit only when the same number is pressed again right after.",
+              zh: "只有数字：只出现数字，每个数字配同样多的东西。按数字键就显示那个数字，按其他键会随机出现一个数字。也可以设置成先出现东西，马上再按一次同一个数字时才显示数字。",
+              hi: "सिर्फ़ अंक: सिर्फ़ अंक आते हैं, हर एक उतनी ही चीज़ों के साथ। अंक वाला बटन वही अंक दिखाता है, कोई और बटन कोई भी अंक ले आता है। चाहें तो पहले चीज़ें आती हैं और अंक तभी, जब वही अंक तुरंत दोबारा दबाया जाए।",
+              es: "Solo números: solo salen números, cada uno con tantas cosas. Una cifra se muestra a sí misma; cualquier otra tecla trae un número al azar. Si se desea, primero aparecen las cosas y la cifra solo cuando se vuelve a pulsar enseguida el mismo número.",
+              ar: "أرقام فقط: لا تأتي إلا الأرقام، كل رقم مع عدد مماثل من الأشياء. الرقم يُظهر نفسه، وأي زر آخر يأتي برقم عشوائي. وإن شئتم، تظهر الأشياء أولًا، ولا يظهر الرقم إلا عند الضغط على الرقم نفسه مرة أخرى فورًا.",
+              ru: "Только цифры: появляются только числа, каждое со столькими же вещами. Цифра показывает саму себя, любая другая клавиша – случайное число. По желанию сначала появляются вещи, а цифра – только когда то же число сразу нажимают ещё раз.",
             })}
           </p>
           <p>
@@ -141,6 +153,12 @@ export function LettersGame() {
           <p>
             {t({
               de: `Wörter tippen, Erster Buchstabe („Wo ist das ${b.upper}?“): Ein Buchstabe und sein Bild erscheinen, und das Kind sucht die Taste dafür.`,
+              ru: `Первая буква («Где ${b.upper}?»): появляются буква и её картинка, и ребёнок ищет для неё клавишу.`,
+              en: `First letter (“Where is ${b.upper}?”): a letter and its picture appear, and the child looks for its key.`,
+              zh: `第一个字母（“${b.upper}在哪里？”）：出现一个字母和它的图片，孩子去找对应的键。`,
+              hi: `पहला अक्षर (“${b.upper} कहाँ है?”): एक अक्षर और उसकी तस्वीर आती है, और उसका बटन ढूँढना है।`,
+              es: `Primera letra («¿Dónde está la ${b.upper}?»): aparecen una letra y su dibujo, y hay que buscar su tecla.`,
+              ar: `الحرف الأول («أين ${b.upper}؟»): يظهر حرف وصورته، ويبحث الطفل عن زرّه.`,
             })}
           </p>
           <p>
@@ -168,7 +186,7 @@ export function LettersGame() {
       )}
       <PlayOptions>
         <Choice<LettersMode>
-          label={t({ de: "Spielart" })}
+          label={t({ de: "Spielart", en: "Way to play", zh: "玩法", hi: "खेलने का तरीका", es: "Modo de juego", ar: "طريقة اللعب", ru: "Как играем" })}
           value={settings.mode}
           onChange={(mode) => update({ mode })}
           options={[
@@ -179,7 +197,19 @@ export function LettersGame() {
 
         {settings.mode === "free" ? (
           <SettingsGroup title={`⌨️ ${freeTitle}`}>
-            <Toggle label={t({ de: "🔢 Nur Zahlen" })} checked={settings.numbersOnly} onChange={(numbersOnly) => update({ numbersOnly })} />
+            <Toggle
+              label={t({
+                de: "🔢 Nur Zahlen",
+                en: "🔢 Only numbers",
+                zh: "🔢 只有数字",
+                hi: "🔢 सिर्फ़ अंक",
+                es: "🔢 Solo números",
+                ar: "🔢 أرقام فقط",
+                ru: "🔢 Только цифры",
+              })}
+              checked={settings.numbersOnly}
+              onChange={(numbersOnly) => update({ numbersOnly })}
+            />
             <Choice<NumberReveal>
               label={t({ de: "Zahlen", ru: "Цифры", en: "Numbers", zh: "数字", hi: "अंक", es: "Números", ar: "الأرقام" })}
               value={settings.numbers}
@@ -238,7 +268,15 @@ export function LettersGame() {
             {/* Step by step and by tapping, the digit waits for more presses anyway. */}
             {(settings.numbers === "all" || settings.numbers === "count") && (
               <Toggle
-                label={t({ de: "Ziffer erst zeigen, wenn dieselbe Zahl gleich nochmal gedrückt wird" })}
+                label={t({
+                  de: "Ziffer erst zeigen, wenn dieselbe Zahl gleich nochmal gedrückt wird",
+                  en: "Show the digit only when the same number is pressed again right after",
+                  zh: "马上再按一次同一个数字时才显示数字",
+                  hi: "अंक तभी दिखाएँ, जब वही अंक तुरंत दोबारा दबाया जाए",
+                  es: "Mostrar la cifra solo cuando se pulse enseguida otra vez el mismo número",
+                  ar: "إظهار الرقم فقط عند الضغط على الرقم نفسه مرة أخرى فورًا",
+                  ru: "Показывать цифру, только когда то же число сразу нажимают ещё раз",
+                })}
                 checked={settings.digitOnRepeat}
                 onChange={(digitOnRepeat) => update({ digitOnRepeat })}
               />
@@ -303,7 +341,15 @@ export function LettersGame() {
         ) : (
           <SettingsGroup title={`✍️ ${wordsTitle}`}>
             <Choice<WordTyping>
-              label={t({ de: "Was tippen?" })}
+              label={t({
+                de: "Was tippen?",
+                en: "What to type?",
+                zh: "打什么？",
+                hi: "क्या टाइप करें?",
+                es: "¿Qué escribir?",
+                ar: "ماذا نكتب؟",
+                ru: "Что печатаем?",
+              })}
               value={settings.wordTyping}
               onChange={(wordTyping) => update({ wordTyping })}
               options={[

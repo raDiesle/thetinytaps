@@ -1,5 +1,7 @@
 import { dayKey, weekOf } from "@/games/teeth/daytime";
 import { type BoardKind, type LinkedGame, REWARD_BY_ID, type Slot, SLOTS, TASK_BY_ID, type Template } from "./catalog";
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import { type Localized, pick } from "@/lib/language";
 
 // A board as the grown-up made it, and the stars on it. Everything here is plain
 // data and pure functions, so the screen, the print and the tests share them.
@@ -75,16 +77,25 @@ const KEEP_DAYS = 62;
 export const newId = () => Math.random().toString(36).slice(2, 9);
 
 /**
- * A board made from a ready-made one. Its tasks keep their catalogue ids (unique within a template), so
+ * Whether `title` is a template's own heading in any language, never changed by a grown-up: such a heading is shown
+ * in the app language (`useBoardTitle`, `usePlanTitle`), whichever language the board or plan was made in.
+ */
+export function isTemplateTitle(title: string, templateTitle: Localized | undefined): templateTitle is Localized {
+  return !!templateTitle && Object.values(templateTitle).includes(title.trim());
+}
+
+/**
+ * A board made from a ready-made one, its heading in `language` (the default boards and the gallery's pictures are
+ * made before a language is known; their German heading shows in the app language anyway, see `isTemplateTitle`). Its tasks keep their catalogue ids (unique within a template), so
  * the default board, made anew on every load until something is saved, finds its stars again.
  */
-export function boardFromTemplate(template: Template): Board {
+export function boardFromTemplate(template: Template, language: TargetLanguageId = "de"): Board {
   return {
     id: newId(),
     template: template.id,
     kind: template.kind,
     childName: "",
-    title: template.title?.de ?? "",
+    title: template.title ? pick(template.title, language) : "",
     tasks: template.tasks.map((id) => {
       const task = { ...taskFromCatalog(id), id };
       const slots = template.slots?.[id];
@@ -144,6 +155,61 @@ export function rewardFromCatalog(id: string): BoardReward {
 export function possessive(name: string): string {
   return /(s|ß|x|z|ce)$/i.test(name) ? `${name}’` : `${name}s`;
 }
+
+/** Which heading a chart gets when the grown-up wrote none: a board's view, or a plan's week (a plan's day is `day`). */
+export type TitleKind = BoardKind | "planWeek";
+
+/**
+ * The heading made from the child's name ("" for none), per language: each builds its own possessive („Lenas Tag“,
+ * „Lena’s day“, „El día de Lena“, „يوم Lena“), and Russian puts the name in front, since a name can't be declined here.
+ */
+export const AUTO_TITLES: Record<TitleKind, Localized<(name: string) => string>> = {
+  week: {
+    de: (n) => (n ? `${possessive(n)} Sterne-Woche` : "Meine Sterne-Woche"),
+    en: (n) => (n ? `${n}’s star week` : "My star week"),
+    zh: (n) => `${n || "我"}的星星周`,
+    hi: (n) => (n ? `${n} का सितारों वाला हफ़्ता` : "मेरा सितारों वाला हफ़्ता"),
+    es: (n) => (n ? `La semana de estrellas de ${n}` : "Mi semana de estrellas"),
+    ar: (n) => (n ? `أسبوع نجوم ${n}` : "أسبوع نجومي"),
+    ru: (n) => (n ? `${n}: моя звёздная неделя` : "Моя звёздная неделя"),
+  },
+  month: {
+    de: (n) => (n ? `${possessive(n)} Sterne-Monat` : "Mein Sterne-Monat"),
+    en: (n) => (n ? `${n}’s star month` : "My star month"),
+    zh: (n) => `${n || "我"}的星星月`,
+    hi: (n) => (n ? `${n} का सितारों वाला महीना` : "मेरा सितारों वाला महीना"),
+    es: (n) => (n ? `El mes de estrellas de ${n}` : "Mi mes de estrellas"),
+    ar: (n) => (n ? `شهر نجوم ${n}` : "شهر نجومي"),
+    ru: (n) => (n ? `${n}: мой звёздный месяц` : "Мой звёздный месяц"),
+  },
+  day: {
+    de: (n) => (n ? `${possessive(n)} Tag` : "Mein Tag"),
+    en: (n) => (n ? `${n}’s day` : "My day"),
+    zh: (n) => `${n || "我"}的一天`,
+    hi: (n) => (n ? `${n} का दिन` : "मेरा दिन"),
+    es: (n) => (n ? `El día de ${n}` : "Mi día"),
+    ar: (n) => (n ? `يوم ${n}` : "يومي"),
+    ru: (n) => (n ? `${n}: мой день` : "Мой день"),
+  },
+  collect: {
+    de: (n) => (n ? `${possessive(n)} Sterne` : "Meine Sterne"),
+    en: (n) => (n ? `${n}’s stars` : "My stars"),
+    zh: (n) => `${n || "我"}的星星`,
+    hi: (n) => (n ? `${n} के सितारे` : "मेरे सितारे"),
+    es: (n) => (n ? `Las estrellas de ${n}` : "Mis estrellas"),
+    ar: (n) => (n ? `نجوم ${n}` : "نجومي"),
+    ru: (n) => (n ? `${n}: мои звёзды` : "Мои звёзды"),
+  },
+  planWeek: {
+    de: (n) => (n ? `${possessive(n)} Woche` : "Meine Woche"),
+    en: (n) => (n ? `${n}’s week` : "My week"),
+    zh: (n) => `${n || "我"}的一周`,
+    hi: (n) => (n ? `${n} का हफ़्ता` : "मेरा हफ़्ता"),
+    es: (n) => (n ? `La semana de ${n}` : "Mi semana"),
+    ar: (n) => (n ? `أسبوع ${n}` : "أسبوعي"),
+    ru: (n) => (n ? `${n}: моя неделя` : "Моя неделя"),
+  },
+};
 
 /** Every day of the month `day` is in. */
 export function monthOf(day: Date): Date[] {

@@ -91,7 +91,17 @@ export function FeelingsGame() {
               ar: "تحت كل صورة مكتوب بخط صغير ما تعرضه – ليقرأه الكبار ويحكوا القصة. الأطفال يختارون من الصورة فقط.",
             })}
           </p>
-          <p>{t({ de: "Erwachsene erzählen die Geschichte anhand der Bilder." })}</p>
+          <p>
+            {t({
+              de: "Erwachsene erzählen die Geschichte anhand der Bilder.",
+              en: "Grown-ups tell the story using the pictures.",
+              zh: "大人看着图片讲故事。",
+              hi: "बड़े तस्वीरों को देखकर कहानी सुनाते हैं।",
+              es: "Los adultos cuentan la historia con ayuda de las imágenes.",
+              ar: "يروي الكبار القصة بالاستعانة بالصور.",
+              ru: "Взрослые рассказывают историю по картинкам.",
+            })}
+          </p>
         </>
       }
     >

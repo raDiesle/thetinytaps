@@ -554,7 +554,17 @@ export function buildBuilding() {
   for (let p = tRollerGo + 0.6; p < tJack; p += 0.8) chimney.push(p);
   for (const p of chimney) at(p, { sound: playPuff });
   at(tRollerGo, { sound: playRumble });
-  at(tRollerGo + 1.6, { say: { de: "Die Walze macht alles platt!" } });
+  at(tRollerGo + 1.6, {
+    say: {
+      de: "Die Walze macht alles platt!",
+      en: "The roller flattens everything!",
+      zh: "压路机把一切都压平啦！",
+      hi: "रोलर सब कुछ चपटा कर देता है!",
+      es: "¡La aplanadora lo deja todo plano!",
+      ar: "المدحلة تجعل كل شيء مسطّحًا!",
+      ru: "Каток всё укатывает!",
+    },
+  });
   at(tJack, { sound: () => playKnock(500) });
   const rolled = (t: number) => {
     const u = t - tRollerGo;

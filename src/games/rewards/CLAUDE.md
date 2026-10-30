@@ -242,3 +242,17 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
 - Defaults are the same on every load (the first plan has the fixed id `erster-plan`), as for the board.
 - A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
   than tall, or the last card stretched across the whole sheet.
+
+## Languages
+
+Board, plan, wizard, prints and the catalog speak the app language (German, English, Chinese, Hindi, Spanish, Arabic,
+Russian; `useAppLanguage()`), translated in October 2026: every text inline as `t({ de, en, zh, hi, es, ar, ru })` or a
+`Localized` in `catalog.ts`. New or changed lines come German-only until translations are asked for, marked in
+`src/content/ideas/languageStatus.ts` (`inlineTexts.test.ts` fails on a German-only line while the row says done).
+- What is built from parts has a form per language, never German pieces glued together: weekday names from
+  `DAY_NAMES` (catalog.ts), headings with the child's name from `AUTO_TITLES` (board.ts; Russian puts the name first,
+  „Лена: мой день“, as a typed name can't be declined), „Noch 3-mal schlafen“ with `Intl.PluralRules` (`SLEEPS_LEFT`).
+- A template's title is stored in the language the board or plan was made in, and shown in the app language as long
+  as it is still a template's own title in any language (`isTemplateTitle`); a title a grown-up typed stays as typed.
+- Chinese, Hindi and Arabic have no Latin letters (no „A4“ there, „cm“ as 厘米 / सेमी / سم); German shop names and
+  links (dm, CEWE, amazon.de) stay on German screens only.

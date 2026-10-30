@@ -431,7 +431,15 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
           <button
             type="button"
             className={`sh-theme-button${themesOpen ? " open" : ""}`}
-            aria-label={t({ de: "Bilder wählen" })}
+            aria-label={t({
+              de: "Bilder wählen",
+              en: "Choose pictures",
+              zh: "选择图片",
+              hi: "तस्वीरें चुनें",
+              es: "Elegir dibujos",
+              ar: "اختيار الصور",
+              ru: "Выбрать картинки",
+            })}
             aria-expanded={themesOpen}
             data-tap
             onPointerDown={onThemesDown}
