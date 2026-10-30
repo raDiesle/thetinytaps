@@ -349,6 +349,13 @@ export const RESEARCH: Research[] = [
         taken: [],
         why: "Sagt genau, was die App ist, aber 21 Buchstaben – gehört als Untertitel in den Seitentitel, nicht in die Adresse.",
       },
+      {
+        name: "toddler-book",
+        rank: 11,
+        free: ["com"],
+        taken: [],
+        why: "Frei (wie toddler-books und toddle-book), aber wer „toddler book“ hört, tippt es ohne Bindestrich und landet auf toddlerbook.com, die jemand anderem gehört; dazu nur ein allgemeiner Ausdruck, den keine Marke schützt.",
+      },
       { name: "storytoddler", rank: 11, free: ["com"], taken: [], why: "Frei, aber Google macht aus „story toddler“ die Fernsehshow „Toddlers & Tiaras“." },
       {
         name: "toddlerhymes",
