@@ -138,7 +138,7 @@ export function MarblePlay({ settings }: { settings: MarbleSettings }) {
 
   return (
     <div className={`marble-play${party ? " party" : ""}`} onPointerDown={onPointerDown}>
-      <level.Level key={round} sound={sound} say={say} onDone={onDone} />
+      <level.Level key={round} sound={sound} say={say} onDone={onDone} watch={settings.play === "watch"} />
       {ended && <GameEnd onAgain={again} next={{ emoji: next.emoji, name: pick(LEVEL_TEXTS[next.id].name, language.id), onNext: goOn }} />}
       <BurstLayer bursts={bursts} />
     </div>

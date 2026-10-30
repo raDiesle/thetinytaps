@@ -2,8 +2,9 @@
 // at the top left down to the basket at the bottom right, in the coordinates
 // of a wall 1600 wide and two and a half screens tall (the camera follows the
 // marbles down). Six spots along the way hold a part that can be swapped by
-// tapping it (X-08), so the route comes in sections: the fixed stretches
-// between the spots, and one section for every part in every spot. The
+// tapping it (X-08), and a switch sends the marble one of two ways (K-01), so
+// the route comes in sections: the fixed stretches between them, one section
+// for every part in every spot, and one for each way at the switch. The
 // drawing in TrackLevel.tsx is laid out along the same numbers.
 
 import { arc, BALL_R, indexAt, line, quad, type Pt } from "./path";
@@ -28,6 +29,8 @@ export type TrackEvent =
   | { kind: "drum"; drum: number }
   | { kind: "chime"; chime: number }
   | { kind: "tunnel" }
+  | { kind: "flap"; fork: number }
+  | { kind: "gate" }
   | { kind: "basket" };
 
 /* ---------- Layout ---------- */
@@ -50,6 +53,12 @@ export const LEDGE = { x0: 1490, x1: 1552, y: 455 };
 
 export const ROW2: Row = { from: { x: 1550, y: 497 }, to: { x: 1000, y: 520 } };
 
+/**
+ * The barrier on row 2, just before the funnel (K-02): closed, the marbles wait
+ * in a row behind it until the child taps it. `x` is where the first one stops.
+ */
+export const GATE = { x: 1090 };
+
 export const ROW2B: Row = { from: { x: 720, y: 663 }, to: { x: 480, y: 683 } };
 
 /** The seesaw's beam turns around its middle; positive tilt tips the right end down. */
@@ -69,6 +78,21 @@ export const ZIGS: Row[] = [
   { from: { x: 1280, y: 1048 }, to: { x: 1530, y: 1068 } },
 ];
 export const ROW4: Row = { from: { x: 1550, y: 1138 }, to: { x: 1060, y: 1160 } };
+
+/** Where a switch can send the marble (K-01). */
+export type Way = "left" | "right";
+
+/**
+ * The switch at the end of row 3 (K-01): a flap on a hinge with a thick lever.
+ * Lifted, the marble rolls on to the right and zigzags down; hanging down, the
+ * marble knocks against it (its face is at `face`) and drops onto the left way,
+ * over a xylophone of its own, against the left wall and back. Both ways meet on
+ * row 4 at `join`.
+ */
+export const SWITCH = { hinge: { x: 1300, y: 720 }, length: 100, face: 1291 };
+export const LEFT1: Row = { from: { x: 1225, y: 880 }, to: { x: 420, y: 918 } };
+export const LEFT2: Row = { from: { x: 445, y: 990 }, to: { x: 1200, y: 1028 } };
+export const JOIN: Pt = { x: 1180, y: rowY(ROW4, 1180) };
 
 /** After the fourth spot: once round the looping (the marble's middle goes round this circle), then on to the left edge. */
 export const LOOP = { cx: 430, cy: 1230, r: 110 };
@@ -97,11 +121,12 @@ export const CHIMES = [940, 880, 820, 760, 700].map((x, i) => ({ x, length: 118 
 export const ROW8: Row = { from: { x: 350, y: 2010 }, to: { x: 110, y: 2022 } };
 export const ROW9: Row = { from: { x: 66, y: 2090 }, to: { x: 1250, y: 2140 } };
 
-/** Xylophone bars lying in rows 1a and 1b, and a whole scale on row 9 just before the basket. */
-export const BARS = Array.from({ length: 16 }, (_, i) => {
+/** Xylophone bars lying in rows 1a and 1b, a whole scale on row 9 just before the basket, and four on the switch's left way. */
+export const BARS = Array.from({ length: 20 }, (_, i) => {
   if (i < 4) return { x: 230 + i * 84, w: 76, row: ROW1A };
   if (i < 8) return { x: 890 + (i - 4) * 84, w: 76, row: ROW1B };
-  return { x: 300 + (i - 8) * 84, w: 76, row: ROW9 };
+  if (i < 16) return { x: 300 + (i - 8) * 84, w: 76, row: ROW9 };
+  return { x: 470 + (i - 16) * 84, w: 76, row: LEFT1 };
 });
 
 /**
@@ -112,6 +137,8 @@ export interface Turn {
   from: Pt;
   to: Pt;
   x: number;
+  /** Where the wall ends below, when a row passes under it; otherwise a little under `to`. */
+  bottom?: number;
 }
 
 /** A wall on the right of the marble (1) or on its left (-1). */
@@ -185,8 +212,8 @@ export const SLOTS: Slot[] = [
   { from: ROW7.to, to: ROW8.from, dir: -1 },
 ];
 
-/** What the run looks like before anyone swaps a part. */
-export const DEFAULT_BUILD: Piece[] = ["bell", "funnel", "wheel", "trampoline", "bell", "funnel"];
+/** What the run looks like before anyone swaps a part; the funnel is in the spot after the barrier. */
+export const DEFAULT_BUILD: Piece[] = ["bell", "wheel", "funnel", "trampoline", "bell", "funnel"];
 
 export const TURNS: Turn[] = [
   { from: SLOTS[1].to, to: ROW2.from, x: 1578 },
@@ -196,6 +223,9 @@ export const TURNS: Turn[] = [
   { from: LOOP_OUT.to, to: ROW5.from, x: 28 },
   { from: ROW6.to, to: ROW7.from, x: 1578 },
   { from: ROW8.to, to: ROW9.from, x: 28 },
+  // The switch's left way: against the left wall, and against the zigzag's wall from the other side down onto row 4.
+  { from: LEFT1.to, to: LEFT2.from, x: 385 },
+  { from: LEFT2.to, to: JOIN, x: 1234, bottom: 1110 },
 ];
 
 export const slotMiddle = (slot: Slot): Pt => ({ x: (slot.from.x + slot.to.x) / 2, y: (slot.from.y + slot.to.y) / 2 });
@@ -273,8 +303,14 @@ function rowParts(row: Row, stops: { x: number; event: TrackEvent }[] = []): Par
   return xs.slice(1).map((x, i) => ({ pts: line(on(xs[i]), on(x)), event: i ? stops[i - 1].event : undefined }));
 }
 
-/** Crossing bar i plays note i. */
-const barStops = (row: Row) => BARS.flatMap((bar, i) => (bar.row === row ? [{ x: bar.x + 8, event: { kind: "note", bar: i } as TrackEvent }] : []));
+/** Crossing bar i plays note i; on a row going left the bars come in the other order. */
+function barStops(row: Row) {
+  const right = row.to.x > row.from.x;
+  const stops = BARS.flatMap((bar, i) =>
+    bar.row === row ? [{ x: right ? bar.x + 8 : bar.x + bar.w - 8, event: { kind: "note", bar: i } as TrackEvent }] : [],
+  );
+  return right ? stops : stops.reverse();
+}
 
 /** Against the wall of turn `i` (its bumper sounds) and down onto the next row. */
 function turnPart(i: number): Part {
@@ -282,32 +318,26 @@ function turnPart(i: number): Part {
   return { pts: quad(turn.from, { x: turn.x - turnSide(turn) * 4, y: turn.from.y + 3 }, turn.to), event: { kind: "bump", turn: i } };
 }
 
-/** The fixed sections: hopper to the first spot, between the spots, and from the last spot to the basket. */
+/** The fixed sections: hopper to the first spot, between the spots and the switch, and from the last spot to the basket. */
 function fixedParts(): Part[][] {
   const start: Part[] = [
     { pts: [...line(HOPPER, { x: 120, y: 88 }), ...quad({ x: 120, y: 88 }, { x: 121, y: 108 }, ROW1A.from).slice(1)] },
     ...rowParts(ROW1A, barStops(ROW1A)),
   ];
   const middle = rowParts(ROW1B, barStops(ROW1B));
-  // Against the wall, down onto row 2 and along it to the third spot.
-  const turn: Part[] = [turnPart(0), ...rowParts(ROW2)];
-  // Row 2b to the seesaw, off it through the tunnel, then zigzag down to row 4.
+  // Against the wall, down onto row 2, past the barrier and along it to the third spot.
+  const turn: Part[] = [turnPart(0), ...rowParts(ROW2, [{ x: GATE.x, event: { kind: "gate" } }])];
+  // Row 2b to the seesaw, off it and through the tunnel to the switch.
   const land = seesawSpot(0, SEESAW.rest);
   const off = seesawSpot(1, SEESAW.tipped);
-  const zigzag: Part[] = [
+  const tunnel: Part[] = [
     { pts: [...line(ROW2B.from, ROW2B.to), ...line(ROW2B.to, land).slice(1)] },
     { pts: line(land, off, 4), event: { kind: "seesaw" }, speed: 140, seesaw: true },
     { pts: quad(off, { x: off.x + 20, y: ROW3.from.y - 8 }, ROW3.from) },
     ...rowParts(ROW3, [{ x: TUNNEL_MID, event: { kind: "tunnel" } }]),
-    { pts: quad(ROW3.to, { x: 1290, y: ROW3.to.y }, ZIGS[0].from) },
-    ...rowParts(ZIGS[0]),
-    turnPart(1),
-    ...rowParts(ZIGS[1]),
-    turnPart(2),
-    ...rowParts(ZIGS[2]),
-    turnPart(3),
-    ...rowParts(ROW4),
   ];
+  // Where both ways of the switch meet, along row 4 to the fourth spot.
+  const afterSwitch: Part[] = rowParts({ from: JOIN, to: ROW4.to });
   // Once round the looping, against the left wall, and hop, hop, hop over the drums.
   const hop = (a: Pt, b: Pt): Pt[] => quad(a, { x: (a.x + b.x) / 2, y: Math.min(a.y, b.y) - 170 }, b, 20);
   const drums: Part[] = [
@@ -336,7 +366,32 @@ function fixedParts(): Part[][] {
     ...rowParts(ROW9, barStops(ROW9)),
     { pts: quad(ROW9.to, { x: 1295, y: ROW9.to.y }, { x: 1322, y: BASKET.rimY - 22 }), event: { kind: "basket" } },
   ];
-  return [start, middle, turn, zigzag, drums, chimes, end];
+  return [start, middle, turn, tunnel, afterSwitch, drums, chimes, end];
+}
+
+/** The two ways at the switch, from the end of row 3 to where they meet on row 4. */
+function wayParts(way: Way): Part[] {
+  if (way === "right") {
+    // Under the lifted flap, zigzag down the right edge and along row 4.
+    return [
+      { pts: quad(ROW3.to, { x: 1290, y: ROW3.to.y }, ZIGS[0].from) },
+      ...rowParts(ZIGS[0]),
+      turnPart(1),
+      ...rowParts(ZIGS[1]),
+      turnPart(2),
+      ...rowParts(ZIGS[2]),
+      turnPart(3),
+      ...rowParts({ from: ROW4.from, to: JOIN }),
+    ];
+  }
+  // Knock against the flap, drop onto the left way, over its xylophone, and back.
+  return [
+    { pts: quad(ROW3.to, { x: SWITCH.face - 4, y: ROW3.to.y + 3 }, LEFT1.from), event: { kind: "flap", fork: 0 } },
+    ...rowParts(LEFT1, barStops(LEFT1)),
+    turnPart(7),
+    ...rowParts(LEFT2),
+    turnPart(8),
+  ];
 }
 
 /** Round and round down the funnel: the circle shrinks, and its front half is lower (nearer). */
@@ -424,21 +479,45 @@ function toRoute(parts: Part[]): Route {
   return { pts, s, total, events, zones };
 }
 
+/** One stretch of the run: always the same, a spot with whatever part is in it, or the switch with the way it is set to. */
+export type Section = { kind: "fixed"; route: Route } | { kind: "spot"; spot: number } | { kind: "switch" };
+
 export interface Routes {
-  /** The fixed sections, one more than there are spots. */
-  fixed: Route[];
+  /** In the order a marble goes through them, from the hopper to the basket. */
+  sections: Section[];
   /** For every spot, the way through each part. */
   pieces: Record<Piece, Route>[];
+  /** The two ways at the switch. */
+  ways: Record<Way, Route>;
+  /** The section with the barrier, the distance along it where the first waiting marble's front touches it, and where row 2 begins on it (the waiting row may reach back that far). */
+  gate: { section: number; s: number; start: number };
 }
 
 /**
- * All sections of the run. A marble goes fixed 0, spot 0, fixed 1, spot 1, …;
- * it takes whatever part is in a spot when it gets there.
+ * All sections of the run. A marble goes fixed, spot 0, fixed, spot 1, …, with
+ * the switch between the third and the fourth spot; it takes whatever part is
+ * in a spot, and the way the switch is set to, when it gets there.
  */
 export function buildRoutes(): Routes {
+  const fixed = fixedParts().map(toRoute);
+  const sections: Section[] = [];
+  fixed.forEach((route, i) => {
+    sections.push({ kind: "fixed", route });
+    // The switch sits between the stretch through the tunnel and the one after it.
+    if (i === 3) sections.push({ kind: "switch" });
+    else if (i < fixed.length - 1) sections.push({ kind: "spot", spot: i < 3 ? i : i - 1 });
+  });
+  const gateSection = sections.findIndex((sec) => sec.kind === "fixed" && sec.route.events.some((e) => e.event.kind === "gate"));
+  const gateRoute = (sections[gateSection] as { route: Route }).route;
   return {
-    fixed: fixedParts().map(toRoute),
+    sections,
     pieces: SLOTS.map((_, i) => Object.fromEntries(PIECES.map((piece) => [piece, toRoute(pieceParts(i, piece))])) as Record<Piece, Route>),
+    ways: { left: toRoute(wayParts("left")), right: toRoute(wayParts("right")) },
+    gate: {
+      section: gateSection,
+      s: gateRoute.events.find((e) => e.event.kind === "gate")?.s ?? 0,
+      start: gateRoute.s[gateRoute.pts.findIndex((pt) => pt.x === ROW2.from.x && pt.y === ROW2.from.y)],
+    },
   };
 }
 

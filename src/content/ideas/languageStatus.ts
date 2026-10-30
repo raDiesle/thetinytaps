@@ -88,7 +88,17 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
   },
-  { href: "/kettenreaktion/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/kettenreaktion/",
+    parts: [
+      { label: "🎳 Alle Level", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🚧 Schranke und Weiche der Kugelbahn",
+        languages: { de: "done" },
+        note: "Die Wahl „Schranke und Weiche: 👆 Kind tippt / 🔄 Von selbst“ und der Satz „Achtung, fertig – los!“ (K-01, K-02, Oktober 2026) gibt es nur auf Deutsch.",
+      },
+    ],
+  },
   {
     href: "/kleine-abenteuer/",
     parts: [

@@ -15,6 +15,8 @@ export const marblesIdeas: IdeaArea = {
       text: "Zwei oder drei große Weichen auf der Bahn mit einem dicken Hebel. Antippen klappt die Weiche mit „Klack“ um; die Kugel nimmt dann den anderen Weg: links über das Xylophon, rechts über Trommel und Glocke. Auch während eine Kugel rollt – sie biegt sofort anders ab.",
       why: "Das Kind entscheidet selbst, wohin die Kugel rollt, und sieht die Folge sofort. Erste Erfahrung mit „wenn – dann“.",
       effort: "M",
+      partial:
+        "Eine Weiche am Ende von Reihe 3: Klappe mit dickem Hebel, Antippen (oder ← →) klappt sie um. Rechts geht es wie bisher im Zickzack an den Prallkissen hinunter, links über ein eigenes Xylophon. Mit „🔄 Von selbst“ klappt sie nach jeder Kugel von allein um. Eine zweite und dritte Weiche fehlen noch.",
     },
     {
       id: "K-02",
@@ -23,6 +25,7 @@ export const marblesIdeas: IdeaArea = {
       text: "Vor dem Trichter eine Schranke. Ist sie zu, sammeln sich die Kugeln dahinter, stoßen leise klickernd aneinander und zappeln ungeduldig. Antippen der Schranke: „Achtung, fertig – los!“, alle rauschen auf einmal weiter, die Glocke bimmelt im Wirbel.",
       why: "Spannung aufbauen und selbst auflösen; das Kind bestimmt den großen Moment.",
       effort: "S",
+      done: true,
     },
     {
       id: "K-03",
