@@ -192,7 +192,7 @@ describe("language status on the management page", () => {
   test("Zähne putzen: the sung song speaks exactly the wanted languages it has a song in", () => {
     const sung = readdirSync("src/games/teeth/musik").flatMap((f) => /^musik-zaehneputzen-lied-([a-z]{2})\.mp3$/.exec(f)?.[1] ?? []);
     const wanted = sung.filter((id) => TARGET_LANGUAGES.some((l) => l.id === id));
-    const part = LANGUAGE_STATUS.find((r) => r.href === "/zaehne/")?.parts?.find((p) => p.recorded);
+    const part = LANGUAGE_STATUS.find((r) => r.href === "/zaehne/")?.parts?.find((p) => p.label.startsWith("🎵"));
     expect(part?.languages).toEqual(Object.fromEntries(wanted.map((id) => [id, "done"])));
   });
 

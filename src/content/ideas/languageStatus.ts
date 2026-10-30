@@ -102,34 +102,45 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/kleine-abenteuer/",
     parts: [
-      { label: "🧭 Die anderen sieben Geschichten", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🧭 Die anderen sieben Geschichten",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Alle Sätze von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); was neu dazukommt oder übersetzt wird: bun run voice make --only kleine-abenteuer.",
+      },
       {
         label: "🏖️ Die Sandburg",
+        recorded: true,
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-05, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
         label: "🧺 Picknick im Wald",
+        recorded: true,
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-07, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
         label: "⛵ Das Floß",
+        recorded: true,
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
         label: "🐈 Wo ist die Katze?",
+        recorded: true,
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-04, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
         label: "⛄ Der Schneemann",
+        recorded: true,
         languages: { de: "done" },
         note: "Name und alle Sätze nur auf Deutsch (G-06, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
       },
       {
         label: "🚒 Die Feuerwehr",
+        recorded: true,
         languages: { de: "done" },
         note: "Der erste Film (G-15, Oktober 2026): Name und alle Sätze nur auf Deutsch; bis zur Übersetzung spricht der Film ganz Deutsch. Nur die Gruppe „🎬 Filme“ auf dem Startbildschirm ist übersetzt.",
       },
@@ -154,7 +165,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/zaehne/",
     parts: [
-      { label: "🪥 Hinweise und Bilder", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🪥 Hinweise und Bilder",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Was vor dem Putzen und am Ende gesagt wird, von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); die Putzschritte auch, für den Fall, dass das Lied nicht lädt.",
+      },
       {
         label: "🎵 Zahnputzlied (gesungen)",
         recorded: true,
@@ -211,6 +227,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "🏠 Startseite, Menüs und Einstellungen",
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "🌙 „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele)",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026).",
       },
       {
         label: "📝 Zeilen für Eltern unter den Karten",

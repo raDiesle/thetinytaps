@@ -1,6 +1,7 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { downloadMusic } from "@/lib/musicFile";
 import { decodeSound, type Loop, playLoop, unlockAudio } from "@/lib/sfx";
+import { talking } from "@/lib/voice";
 
 // The song every game plays in the background (downloaded in musicFile.ts), unless
 // the game has its own music or must stay quiet. It is on by default and switched
@@ -40,7 +41,8 @@ let stoppedAt = SONG.start;
 /** Where in the song it is `seconds` after starting from `from`, going round the parts. */
 const songAt = (from: number, seconds: number) => SONG.start + ((from - SONG.start + seconds) % (SONG.loopEnd - SONG.start));
 
-const speaking = () => typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking;
+/** A recorded line is playing (src/lib/voice.ts), or the browser's voice speaks. */
+const speaking = () => talking() || (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking);
 
 const hidden = () => typeof document !== "undefined" && document.hidden;
 

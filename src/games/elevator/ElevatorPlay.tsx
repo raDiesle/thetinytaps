@@ -2,13 +2,12 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Poin
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
 import type { TargetLanguage } from "@/content/targetLanguages";
-import { speak } from "@/lib/speech";
 import { StoryEnd, nextCard } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";
 import { Backdrop, Buttons, CabinBack, CabinFront, Confetti, Hint, Shaft, Shell, Slabs } from "./house";
 import { BROTHER, Bubble, HERO, KID_H, Kid, type Holding, type Outfit, type PicId, type Pose } from "./kid";
 import { CABIN_L, FLOORS, IN_CABIN, ROOM_H, ROOM_L, ROOM_R, VIEW_H, VIEW_L, VIEW_W, floorLine } from "./layout";
-import { spokenIn } from "./phrases";
+import { sayIn } from "./voice";
 import { WeatherContext } from "./rooms";
 import type { ElevatorSettings } from "./settings";
 
@@ -173,12 +172,8 @@ export function ElevatorPlay({
     if (settings.sounds) loadRecordings(RECORDINGS);
   }, [settings.sounds]);
 
-  /** Speaks a German sentence of the story in the app language (only with "Vorlesen"). */
-  const say = (german: string) => {
-    if (!settings.speech) return;
-    const { text, speechLang } = spokenIn(german, language);
-    speak(text, speechLang, { rate: 0.85 });
-  };
+  /** Says a German sentence of the story in the app language, from its recording. */
+  const say = (german: string) => sayIn(german, language);
 
   const sound = (play: () => void) => {
     if (settings.sounds) play();

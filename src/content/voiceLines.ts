@@ -9,6 +9,8 @@ import { de } from "@/content/de";
 import { ANIMALS, ANIMAL_TEXTS } from "@/games/animals/content";
 import { HOMES } from "@/games/animals/homes";
 import { STORIES, texts as elevatorTexts } from "@/games/elevator/content";
+import { FILMS } from "@/games/elevator/film/films";
+import type { Film } from "@/games/elevator/film/types";
 import { TRAIL_LEVELS } from "@/games/elevator/trail/levels";
 import type { Station, Way } from "@/games/elevator/trail/types";
 import { COMFORTS, FEELINGS } from "@/games/feelings/bear";
@@ -41,6 +43,10 @@ import { SOCK_TEXTS } from "@/games/socks/content";
 import { DAYTIME } from "@/games/teeth/daytime";
 import { STEPS as TEETH_STEPS } from "@/games/teeth/steps";
 import { DONE_SAY, PRELUDE, TIDY_SAY } from "@/games/teeth/TeethPlay";
+import { voiceId } from "@/lib/voiceName";
+import goodNightFiles from "../components/stimme/*.mp3?glob";
+import elevatorFiles from "../games/elevator/stimme/*.mp3?glob";
+import teethFiles from "../games/teeth/stimme/*.mp3?glob";
 
 /** Lines of one kind in a game, each once. */
 export interface VoiceGroup {
@@ -220,8 +226,28 @@ function elevator(): VoiceGroup[] {
   return [
     { label: "Aufzug-Geschichten", lines: once(house) },
     { label: "Weg-Abenteuer", lines: once(trail) },
+    { label: "Filme", lines: once(FILMS.flatMap(filmLines)) },
     { label: "In allen Geschichten", lines: once(Object.values(elevatorTexts)) },
   ];
+}
+
+/** Everything a film says, along every way the child's picks can take it. */
+function filmLines(film: Film): (string | undefined)[] {
+  const lines: (string | undefined)[] = [film.end];
+  const walk = (picks: string[]) => {
+    const scenes = film.scenes(picks);
+    for (const scene of scenes) lines.push(...scene.beats.flatMap((b) => [b.ask, b.say]));
+    // A choice not picked yet (the last scene's): go on along each of its options.
+    const choice = scenes.at(-1)?.choice;
+    if (!choice || scenes.filter((s) => s.choice).length <= picks.length) return;
+    lines.push(choice.ask);
+    for (const option of choice.options) {
+      lines.push(option.say);
+      walk([...picks, option.id]);
+    }
+  };
+  walk([]);
+  return lines;
 }
 
 function marbles(): VoiceGroup[] {
@@ -285,7 +311,25 @@ function rewards(): VoiceGroup[] {
   ];
 }
 
-/** Every game that speaks, with all it says in German. Bewegungsabenteuer is not here: Tapsi's lines there are recorded. */
+/** The German recordings of the games in src/content/recordedLines.ts, by file name (the hash of the line). */
+const RECORDED = new Set(
+  [goodNightFiles, elevatorFiles, teethFiles].flatMap((files) => Object.keys(files).map((file) => file.slice(file.lastIndexOf("/") + 1, -4))),
+);
+
+/** The games and groups of `games` with only the lines that have no German recording yet. */
+export const stillToRecord = (games: VoiceGame[]): VoiceGame[] =>
+  games.flatMap((game) => {
+    const groups = game.groups.flatMap((g) => {
+      const lines = g.lines.filter((line) => !RECORDED.has(voiceId(line)));
+      return lines.length ? [{ ...g, lines }] : [];
+    });
+    return groups.length ? [{ ...game, groups }] : [];
+  });
+
+/**
+ * Every game that speaks, with all it says in German, recorded or not (stillToRecord leaves out what is).
+ * Bewegungsabenteuer is not here: its stories list Tapsi's lines themselves.
+ */
 export function voiceLines(): VoiceGame[] {
   return [
     { href: "/bilder/", groups: scenes() },

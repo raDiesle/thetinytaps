@@ -3,11 +3,11 @@ import { BurstLayer, useBursts } from "@/components/Bursts";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { INK } from "@/games/scenes/shared";
 import { playPop, playRandomNote, playRecorded, playTusch } from "@/lib/sfx";
-import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
 import { StoryEnd, nextCard } from "../cards";
 import { Confetti } from "../house";
-import { spokenIn, translationOf } from "../phrases";
+import { translationOf } from "../phrases";
+import { sayIn } from "../voice";
 import type { ElevatorSettings } from "../settings";
 import { Fitted } from "../trail/items";
 import type { Cue } from "../trail/types";
@@ -144,12 +144,8 @@ export function FilmPlay({
   /** A film not yet translated into the app language is said all in German, never in two languages. */
   const voice = translationOf(film.title, language.id) === undefined ? GERMAN : language;
 
-  /** Speaks a German line of the film in the app language (only with „Vorlesen“). */
-  const say = (german: string) => {
-    if (!settings.speech) return;
-    const { text, speechLang } = spokenIn(german, voice);
-    speak(text, speechLang, { rate: 0.85 });
-  };
+  /** Says a German line of the film in the app language, from its recording. */
+  const say = (german: string) => sayIn(german, voice);
 
   const sound = (play: () => void) => {
     if (settings.sounds) play();

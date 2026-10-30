@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { BunPlugin } from "bun";
 
@@ -47,7 +48,8 @@ export function appPlugin(info?: BuildInfo, styles?: ReadonlyMap<string, string>
         const [importerDir, pattern] = path.split("|");
         const { folder, glob } = splitPattern(pattern);
         const root = join(importerDir, folder);
-        const files = [...new Bun.Glob(glob).scanSync({ cwd: root })].sort();
+        // A folder not there yet (a game's stimme/ before its first recording) has no files.
+        const files = existsSync(root) ? [...new Bun.Glob(glob).scanSync({ cwd: root })].sort() : [];
         const imports = files.map((file, i) => `import f${i} from ${JSON.stringify(join(root, file))};`);
         const entries = files.map((file, i) => `  ${JSON.stringify(file)}: f${i},`);
         return { contents: `${imports.join("\n")}\nexport default {\n${entries.join("\n")}\n};\n`, loader: "js" };

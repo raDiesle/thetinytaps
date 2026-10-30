@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { CATEGORIES } from "@/content/games";
-import { type VoiceGame, voiceLines } from "@/content/voiceLines";
+import { stillToRecord, type VoiceGame, voiceLines } from "@/content/voiceLines";
 
 /** What a character costs with the turbo model, as measured in October 2026 (src/games/adventure/CLAUDE.md). */
 const CREDITS_PER_CHARACTER = 0.1;
@@ -22,15 +22,17 @@ const charactersOf = (lines: string[]) => lines.reduce((sum, line) => sum + line
  * there (lazily), since it reads the data of every game (src/content/voiceLines.ts).
  */
 export function VoiceList() {
-  const games = useMemo(voiceLines, []);
+  const all = useMemo(voiceLines, []);
+  const games = useMemo(() => stillToRecord(all), [all]);
+  const done = all.filter((game) => !games.some((g) => g.href === game.href));
   const total = games.flatMap(linesOf);
   const characters = charactersOf(total);
   return (
     <>
       <p className="ideas-hint">
         Die Browserstimme spricht nicht mehr (Oktober 2026); was die Spiele sagen, kommt nur noch als Aufnahme und spielt dann immer, wie ein Geräusch. Hier
-        steht jeder deutsche Satz, der dafür noch aufgenommen werden muss – direkt aus den Spieldaten gelesen, also immer aktuell. Jede weitere Sprache braucht
-        noch einmal so viele. Credits geschätzt mit {String(CREDITS_PER_CHARACTER).replace(".", ",")} je Zeichen (Turbo-Modell, gemessen im Oktober 2026),{" "}
+        steht jeder deutsche Satz, der dafür noch keine Aufnahme hat – direkt aus den Spieldaten gelesen, also immer aktuell. Jede weitere Sprache braucht noch
+        einmal so viele. Credits geschätzt mit {String(CREDITS_PER_CHARACTER).replace(".", ",")} je Zeichen (Turbo-Modell, gemessen im Oktober 2026),{" "}
         {number(CREDITS_PER_MONTH)} gibt es im Monat. Sag dann z. B. „nimm die Sätze von Socken-Paare auf“.
       </p>
       <div className="ideas-overview-scroll">
@@ -44,10 +46,12 @@ export function VoiceList() {
             </tr>
           </thead>
           <tbody>
-            <tr className="ideas-overview-finished">
-              <th>🏝️ Bewegungsabenteuer</th>
-              <td colSpan={3}>✅ schon aufgenommen</td>
-            </tr>
+            {["🏝️ Bewegungsabenteuer", ...done.map((game) => nameOf(game.href))].map((name) => (
+              <tr key={name} className="ideas-overview-finished">
+                <th>{name}</th>
+                <td colSpan={3}>✅ schon aufgenommen</td>
+              </tr>
+            ))}
             {games.map((game) => {
               const lines = linesOf(game);
               return (

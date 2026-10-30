@@ -7,13 +7,15 @@ import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
-import { useT } from "@/lib/language";
+import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
 import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
 import { forwardNearTaps } from "@/lib/tapTargets";
+import { hush as hushVoice, recordedVoice } from "@/lib/voice";
+import goodNightFiles from "./stimme/**/*.mp3?glob";
 
 /** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
 const EXIT_DELAY_MS = 500;
@@ -128,6 +130,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
 
   const stop = () => {
     stopSpeaking();
+    hushVoice();
     setPlaying(false);
     // Only the keyboard lock ends: fullscreen stays on, the menus are part of the app too.
     exitKidMode();
@@ -379,12 +382,32 @@ function Dusk({ level }: { level: number }) {
   return <div className="playtime-dusk" style={{ opacity: 0.65 * level }} aria-hidden />;
 }
 
+/** The good-night sentence's recordings. */
+const goodNightVoice = recordedVoice(goodNightFiles);
+
+/** Said when play time is over, from its recording (src/components/stimme/). */
+export const GOOD_NIGHT: Localized = {
+  de: "Gute Nacht! Die Spielzeit ist vorbei.",
+  ru: "Спокойной ночи! Время игры закончилось.",
+  en: "Good night! Play time is over.",
+  zh: "晚安！游戏时间结束了。",
+  hi: "शुभ रात्रि! खेलने का समय ख़त्म हो गया।",
+  es: "¡Buenas noches! Se acabó el tiempo de juego.",
+  ar: "ليلة سعيدة! انتهى وقت اللعب.",
+};
+
 /** Play time is over: a quiet night sky that ignores taps and keys until a grown-up exits. */
 function GoodNight() {
   const t = useT();
-  // Only the lullaby: the browser's voice never speaks (root CLAUDE.md). The sentence for it waits for its
-  // recording on the list in src/content/voiceLines.ts.
-  useEffect(() => playLullaby(), []);
+  const language = useAppLanguage();
+  useEffect(() => {
+    playLullaby();
+    const timer = setTimeout(() => goodNightVoice.say(GOOD_NIGHT[language.id] ?? GOOD_NIGHT.de, language.id), 1200);
+    return () => {
+      clearTimeout(timer);
+      hushVoice();
+    };
+  }, [language.id]);
 
   return (
     <div className="good-night" role="status">

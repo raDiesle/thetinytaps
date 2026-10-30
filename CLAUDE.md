@@ -161,6 +161,11 @@ In a fresh worktree run `bun install` first.
   What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
   `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
   browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard).
+  A game gets its recordings by listing its lines in every language in `src/content/recordedLines.ts` (`bun run voice
+  make --only <name>` records what is missing into its `stimme/`, `--dry` first) and playing them with
+  `recordedVoice(files)` from `src/lib/voice.ts` (a `./stimme/**/*.mp3?glob` import), as Zähne putzen, Kleine
+  Abenteuer and the good-night sentence do; the management list then leaves its recorded lines out. Music hushes
+  while a recording plays (`talking()`).
   The home page's only option for all games is „🎵 Musik“, one tap on its own button, never a menu.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into

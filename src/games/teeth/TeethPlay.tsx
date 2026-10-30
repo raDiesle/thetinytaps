@@ -8,7 +8,7 @@ import { useDevice } from "@/lib/device";
 import { type Localized, useAppLanguage, useT, type Spoken, spokenIn } from "@/lib/language";
 import { loadRecordings, playChime, playCountNote, playDrumRoll, playPoof, playRecorded, playSqueak, playTusch } from "@/lib/sfx";
 import { finishRoutineStep } from "@/lib/routine";
-import { speak, stopSpeaking } from "@/lib/speech";
+import { hush, recordedVoice } from "@/lib/voice";
 import { useWakeLock } from "@/lib/wakeLock";
 import { addBrushing, daytimeOf, daytimeText, loadWeek, saveWeek, type WeekLog } from "./daytime";
 import { lerpView, type ToothId, type View } from "./jaw";
@@ -22,7 +22,11 @@ import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
 import { sungLanguageFor } from "./sung";
 import { Week } from "./week";
+import voiceFiles from "./stimme/**/*.mp3?glob";
 import "./teeth.css";
+
+/** The recorded voice of the prelude and the end (`bun run voice make`, src/content/recordedLines.ts). */
+const voice = recordedVoice(voiceFiles);
 
 const MONSTER_COLORS = ["#8bd346", "#b388ff", "#ff9f43", "#ff7bd0", "#4cc9f0"];
 const MONSTER_VARIANTS = 3;
@@ -339,12 +343,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   /** In the last seconds before the brushing: 3, 2, 1. */
   const count = brushed < 0 && -brushed <= COUNTDOWN * 1000 ? Math.ceil(-brushed / 1000) : null;
 
-  const say = useCallback(
-    ({ text, lang }: Spoken, queue = false) => {
-      if (settings.speech) speak(text, lang, { queue, rate: 0.85 });
-    },
-    [settings.speech],
-  );
+  /** Says a line from its recording: in the app language, or the German line where it has no translation. */
+  const say = useCallback(({ text }: Spoken, queue = false) => voice.say(text, language.id, { queue }), [language.id]);
 
   useWakeLock(ending !== "rest");
 
@@ -364,6 +364,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     setNow(t);
     setClock((c) => (c.until === undefined ? c : { banked: readClock(c, t), since: c.since === null ? null : t }));
   }, [song.ready]);
+
+  useEffect(() => voice.loadAll(language.id), [language.id]);
 
   useEffect(() => {
     if (settings.sounds)
@@ -477,9 +479,12 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     setClock((c) => (c.since === null ? { ...c, since: t } : { ...c, banked: readClock(c, t), since: null }));
   }, []);
 
-  // Pausing stops the voice mid-sentence; going on repeats what to do.
+  // Pausing stops the voice mid-sentence; going on repeats what to do. Not at the start, where it cut off the hello.
+  const wasPaused = useRef(paused);
   useEffect(() => {
-    if (paused) stopSpeaking();
+    if (paused === wasPaused.current) return;
+    wasPaused.current = paused;
+    if (paused) hush();
     else if (cue && !(sung && step)) say(cue);
     // Only when pausing or going on.
   }, [paused]);

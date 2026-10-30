@@ -2,6 +2,7 @@ import songFiles from "./musik/*.mp3?glob";
 import timingFiles from "./musik/*.json?glob";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { audioContext, decodeSound, type Loop, playLoop, playTuneNote } from "@/lib/sfx";
+import { talking } from "@/lib/voice";
 import { type SungTimes, sungLanguageOf } from "./sung";
 
 // The sung brushing songs in musik/ (see the README there). While one is still
@@ -124,7 +125,8 @@ export function useSongLoad(sung: string): { ready: boolean; progress: number; b
 /** Where in `song` the brushing is after `ms`, going round the repeating parts. */
 const songAt = (song: Song, ms: number) => song.start + ((Math.max(0, ms) / 1000) % (song.loopEnd - song.start));
 
-const speaking = () => typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking;
+/** A recorded line is playing (src/lib/voice.ts), or the browser's voice speaks. */
+const speaking = () => talking() || (typeof window !== "undefined" && "speechSynthesis" in window && window.speechSynthesis.speaking);
 
 /**
  * The song sung in `sung` while brushing, always – even when music is off for all
