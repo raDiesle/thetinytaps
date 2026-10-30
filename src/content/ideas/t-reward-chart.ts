@@ -6,7 +6,7 @@ export const rewardChartIdeas: IdeaArea = {
   emoji: "🌟",
   title: "Belohnungstafel",
   intro:
-    "Eine Tafel, die Eltern frei gestalten, auf dem Bildschirm und genau gleich zum Ausdrucken (/belohnungstafel/). Belohnung heißt Mitfreuen: Sterne gehen nie verloren, keine Strafen, ein leeres Feld ist nur noch frei. Bilder sind noch Emoji – die Bildvorschläge für Gemini stehen unter 🎨 Bildvorschläge.",
+    "Eine Tafel, die Eltern frei gestalten, auf dem Bildschirm und genau gleich zum Ausdrucken (/belohnungstafel/). Belohnung heißt Mitfreuen: Sterne gehen nie verloren, keine Strafen, ein leeres Feld ist nur noch frei. Bilder sind noch Emoji – die Gemini-Bilder sind erzeugt (🎨 Bildvorschläge), aber noch nicht eingebaut.",
   ideas: [
     {
       id: "T-01",
@@ -110,7 +110,8 @@ export const rewardChartIdeas: IdeaArea = {
       text: "Tapsi zeigt jede Aufgabe und jede Belohnung, dazu Sticker-Zeichen, ein Fest-Bild, Druck-Schmuck je Farbe und Ausmalfassungen für den Schwarz-weiß-Druck.",
       why: "Emoji sehen auf jedem Gerät anders aus und drucken grau schlecht; Bilder im Stil der App machen die Tafel zu „unserer“.",
       effort: "M",
-      partial: "Alle Prompts gesammelt (🎨 Bildvorschläge auf dieser Seite), noch nicht geprüft und nicht erzeugt.",
+      partial:
+        "Alle Bilder erzeugt (30. Oktober 2026, src/games/rewards/bilder/, Prompts unter 🎨 Bildvorschläge), noch nicht eingebaut: Die Tafel zeigt weiter Emoji.",
     },
     {
       id: "T-13",

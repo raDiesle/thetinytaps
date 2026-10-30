@@ -83,6 +83,11 @@ describe("picture prompts", () => {
     }
   });
 
+  test("a cut-out picture never asks for a round shape behind it", () => {
+    // Asked for a picture „inside a circle“, Gemini drew a disc in the magenta of the backdrop, which stayed after the cut-out.
+    for (const p of prompts.filter((p) => p.options.includes("--transparent"))) expect(p.prompt, p.id).not.toMatch(/in(side)? a circle|round sticker/i);
+  });
+
   test("every reference picture exists", () => {
     const own = new Set(prompts.map((p) => p.file));
     for (const p of prompts) for (const ref of p.ref ?? []) expect(existsSync(ref) || own.has(ref), `${p.id}: ${ref}`).toBe(true);
