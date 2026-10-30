@@ -209,7 +209,9 @@ button.game-card:focus-visible {
   width: fit-content;
 }
 
-.home > .menu-top {
+/* Room between the head and the cards, so a tilted card's corner never touches a button in the head. */
+.home > .menu-top,
+.home > .menu-head {
   margin-bottom: 24px;
 }
 
@@ -346,7 +348,7 @@ button.game-card:focus-visible {
 
   .home > .menu-top,
   .home > .menu-head {
-    margin-bottom: 10px;
+    margin-bottom: 16px;
   }
 
   /* No title on a phone: the small buttons for grown-ups come into the row next to the back link. */
