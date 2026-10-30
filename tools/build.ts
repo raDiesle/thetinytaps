@@ -11,12 +11,12 @@ import { appPlugin } from "./appPlugin";
 const ROOT = join(import.meta.dir, "..");
 const OUT = join(ROOT, "out");
 
-// On GitHub Pages the site lives under /<repo-name>; locally it is served from the root.
+// The site lives at the root of its domain; PUBLIC_BASE_PATH only to try it under a folder (/<repo>/).
 const base = (process.env.PUBLIC_BASE_PATH || "/").replace(/\/$/, "");
 
 // Where the site is online, for links that search engines keep (canonical, sitemap).
-// GitHub Pages serves it from https://<user>.github.io/<repo>/; SITE_ORIGIN for another domain.
-const siteUrl = `${process.env.SITE_ORIGIN || "https://radiesle.github.io"}${base}`;
+// GitHub Pages serves it on its own domain (repo settings → Pages, DNS in tools/toddlerfox.com.zone).
+const siteUrl = `${process.env.SITE_ORIGIN || "https://toddlerfox.com"}${base}`;
 
 const escapeHtml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -134,8 +134,8 @@ function headTags(page: PageSeo) {
 // Search engines: GitHub Pages answers every address but the start page with 404.html and status 404,
 // which Google does not index. So every page of src/content/seo.ts gets an index.html of its own (status
 // 200) with its title, description, canonical link, preview tags and its text in #root, which the app
-// replaces when it starts. Then sitemap.xml and robots.txt (robots.txt only counts at the root of a
-// domain, so on <user>.github.io/<repo>/ the sitemap has to be given to the Search Console by hand).
+// replaces when it starts. Then sitemap.xml and robots.txt, which names the sitemap (robots.txt only
+// counts at the root of a domain, so under a folder the sitemap has to be given to the Search Console by hand).
 // 404.html stays the plain start page, so deep links like /bilder/baustelle/ still boot the app.
 async function writePages(template: string) {
   await writeFile(join(OUT, "404.html"), template);
