@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fullTitle, NO_INDEX_PATHS, type PageSeo, SEO_PAGES, SITE_NAME, SITE_PROMISE } from "../src/content/seo";
-import { appPlugin } from "./appPlugin";
+import { appPlugin, PRODUCTION } from "./appPlugin";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
 // After bundling it adds what GitHub Pages and an offline app need: public/, the manifest and icon links,
@@ -17,6 +17,9 @@ const base = (process.env.PUBLIC_BASE_PATH || "/").replace(/\/$/, "");
 // Where the site is online, for links that search engines keep (canonical, sitemap).
 // GitHub Pages serves it from https://<user>.github.io/<repo>/; SITE_ORIGIN for another domain.
 const siteUrl = `${process.env.SITE_ORIGIN || "https://radiesle.github.io"}${base}`;
+
+// READABLE=1 (`bun run perf --profile`): the same build with its names and lines kept, so a profile shows where time goes.
+const minify = process.env.READABLE === "1" ? { syntax: true, whitespace: false, identifiers: false } : true;
 
 const escapeHtml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -58,7 +61,8 @@ async function bundle() {
     entrypoints: [join(ROOT, "index.html")],
     outdir: OUT,
     splitting: true,
-    minify: true,
+    minify,
+    ...PRODUCTION,
     sourcemap: "none",
     publicPath: `${base}/`,
     naming: { entry: "[dir]/[name].[ext]", chunk: "static/[name].[hash].[ext]", asset: "static/[name].[hash].[ext]" },
