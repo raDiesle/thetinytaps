@@ -1,11 +1,19 @@
 // The crazy kitchen ("Verrückte Küche"), a Rube Goldberg machine along a long
 // kitchen counter: one tap lets a marble out of the spice jar, and one thing
-// sets off the next for about half a minute while the camera travels along.
+// sets off the next for about forty seconds while the camera travels along:
+// spoon, paper towel roll, rolling pin down the cutting board, the ladle that
+// throws a meatball against a plate, the plate rolling into the salad
+// spinner's crank – the spinner whirls, its lid pops off and lettuce flies,
+// one leaf slaps the egg timer on the cookie jar, which turns, ticks, rings
+// and rattles off onto the pancake pan's handle – the pancake somersaults
+// high onto the cooktop's touch field, popcorn pops into the mug on the
+// toaster lever, and the toast flies onto the bunny's plate.
 // Everything is worked out ahead as a function of the seconds since the tap,
 // so KitchenLevel.tsx only asks where each thing is at a moment. Coordinates
-// are those of the kitchen, 5800 × 900; the screen shows 1600 of it at a time.
+// are those of the kitchen, 6800 × 900; the screen shows 1600 of it at a time.
 
 import {
+  playAlarm,
   playBeeps,
   playBoing,
   playClonk,
@@ -14,12 +22,14 @@ import {
   playKnock,
   playPlop,
   playPop,
+  playRing,
   playRumble,
   playRustle,
   playSwirl,
   playThump,
   playTick,
   playTwinkle,
+  playWhirr,
   playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
@@ -28,6 +38,7 @@ import {
   along,
   beside,
   cameraOn,
+  deg,
   distAt,
   easeIn,
   easeInOut,
@@ -46,7 +57,7 @@ import {
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 5800;
+export const WORLD_W = 6800;
 export const FLOOR = 800;
 /** The top of the worktop: everything on the counter stands at this height. */
 export const COUNTER = 640;
@@ -93,18 +104,48 @@ export const PLATE_PEG_DX = Math.sqrt(PLATE.r ** 2 - (PLATE.r - PLATE.pegH) ** 2
 
 export const SPAGHETTI = { cx: 2845, rimY: 598, w: 140 };
 
+/**
+ * The salad spinner on the counter: a see-through bowl from `top` down to the
+ * counter (`w` wide at the top, `foot` at the bottom) and its lid, whose
+ * middle sits at `lidY` with the crank on top.
+ */
+export const SPINNER = { cx: 4350, top: 528, w: 164, foot: 136, lidY: 522 };
+/** The crank on the lid: its arm `r` long, the knob standing `knobUp` above the lid's middle; it starts pointing left. */
+export const CRANK = { r: 112, knobUp: 28, knobR: 11 };
+export const KNOB_Y = SPINNER.lidY - CRANK.knobUp;
+
+/** The wooden wedge under the pancake pan: the pan tips over its tip (`x`, `h` above the counter). */
+export const WEDGE = { x: 4700, h: 40, w: 60 };
+/**
+ * The pancake pan, measured from the wedge's tip along the pan's bottom: the
+ * bottom reaches `back` to the left, the handle `handle` to the right.
+ */
+export const PAN = { back: 150, rimH: 30, handle: 190, handleH: 14 };
+/** The pan's tilt in degrees (right side up): at rest its left edge is on the counter, then its handle. */
+export const PAN_REST = deg(Math.asin(WEDGE.h / PAN.back));
+export const PAN_DOWN = -deg(Math.asin(WEDGE.h / PAN.handle));
+/** The pancake: its radius and thickness, and where it lies in the pan (from the wedge's tip). */
+export const PANCAKE = { r: 52, h: 14, inPan: -78 };
+
+/** The cookie jar the egg timer stands on; `top` is the top of its lid. */
+export const JAR = { x0: 4910, x1: 5040, top: 450 };
+/** The egg timer, drawn round its middle: `foot` down to the bottom of its feet; it lands `onHandle` along the pan's handle. */
+export const TIMER = { rx: 36, ry: 44, foot: 48, onHandle: 172 };
+/** How far the egg timer's dial turns when it is wound up, in degrees. */
+export const DIAL_MAX = 300;
+
 /** The cooktop set into the worktop, with its touch field at the left end. */
-export const COOKTOP = { x0: 4120, x1: 4700, touchX: 4180 };
-export const KETTLE = { cx: 4400, h: 120 };
-export const POT = { cx: 4580, w: 150, h: 84 };
+export const COOKTOP = { x0: 5120, x1: 5700, touchX: 5180 };
+export const KETTLE = { cx: 5400, h: 120 };
+export const POT = { cx: 5580, w: 150, h: 84 };
 export const POT_RIM = COUNTER - POT.h;
 
 /** The toaster; its lever knob sticks out of the left side and goes down from `up` to `down`. */
-export const TOASTER = { x0: 4790, x1: 5010, top: 470, slotX: 4900 };
+export const TOASTER = { x0: 5790, x1: 6010, top: 470, slotX: 5900 };
 export const LEVER = { knobW: 28, up: 500, down: 576 };
 export const KNOB_X = TOASTER.x0 - LEVER.knobW;
 /** The mug hangs by its handle from the lever knob; `x` is its middle. */
-export const MUG = { x: 4718, w: 60, h: 58 };
+export const MUG = { x: 5718, w: 60, h: 58 };
 export const mugTop = (knobY: number) => knobY - 4;
 /** Popcorn in the mug that makes it heavy enough to pull the lever down. */
 export const MUG_FULL = 9;
@@ -115,8 +156,8 @@ const TOAST_UP = TOASTER.top - 30 + TOAST.h / 2;
 const TOAST_SINK = 46;
 
 /** The breakfast plate (lying flat) and the toy bunny waiting for the toast. */
-export const BREAKFAST = { cx: 5380, top: 622 };
-export const BUNNY = { x: 5570 };
+export const BREAKFAST = { cx: 6380, top: 622 };
+export const BUNNY = { x: 6570 };
 
 /* ---------- Helpers ---------- */
 
@@ -134,6 +175,11 @@ export function onLadle(p: Pt, angle: number): Pt {
   return turn({ x: LADLE.hook.x + p.x, y: LADLE.hook.y + p.y }, LADLE.hook, -rad(angle));
 }
 
+/** A spot on the pancake pan (measured from the wedge's tip along its bottom) when the pan is tilted by `angle` degrees. */
+export function onPan(p: Pt, angle: number): Pt {
+  return turn({ x: WEDGE.x + p.x, y: COUNTER - WEDGE.h + p.y }, { x: WEDGE.x, y: COUNTER - WEDGE.h }, -rad(angle));
+}
+
 /** Pseudo-random but fixed numbers between -1 and 1, so the popcorn flies the same way every time. */
 const jitter = (i: number) => Math.sin(i * 12.9898 + 4.1) * 0.5 + Math.sin(i * 7.233 + 1.3) * 0.5;
 
@@ -143,6 +189,12 @@ interface Flight {
   a: Pt;
   b: Pt;
   h: number;
+}
+
+/** A lettuce leaf flung out of the salad spinner: its flight, its turns in the air and how it lies once down. */
+export interface Leaf extends Flight {
+  turns: number;
+  rest: number;
 }
 
 /** One popped corn: where it flies, and where it ends up. */
@@ -281,32 +333,204 @@ export function buildKitchen() {
     return { pt, spin: t < meatFly.t1 ? 7 * k : 7 - 2 * k };
   };
 
-  /* The plate: over its peg, along the counter like a wheel, slowing down on the cooktop, then down flat on the touch field. */
+  /* The plate: over its peg, along the counter like a wheel, into the knob of the salad spinner's crank. */
   const pegCorner = { x: PLATE.x0 + PLATE_PEG_DX, y: COUNTER - PLATE.pegH };
   const a0 = (Math.atan2(PLATE_Y - pegCorner.y, PLATE.x0 - pegCorner.x) * 180) / Math.PI;
+  const knob0 = { x: SPINNER.cx - CRANK.r, y: KNOB_Y };
+  /** Where the plate's rim touches the crank's knob. */
+  const plateStopX = knob0.x - Math.sqrt((PLATE.r + CRANK.knobR) ** 2 - (PLATE_Y - KNOB_Y) ** 2);
   const platePath = pathOf(
     arc(pegCorner.x, pegCorner.y, PLATE.r, a0, -180 - a0),
-    line({ x: pegCorner.x + PLATE_PEG_DX, y: PLATE_Y }, { x: COOKTOP.touchX, y: PLATE_Y }),
+    line({ x: pegCorner.x + PLATE_PEG_DX, y: PLATE_Y }, { x: plateStopX, y: PLATE_Y }),
   );
   const plateRun = roll(platePath, 480, 150, 520, 0.25);
-  const tStop = tPlateHit + plateRun.duration;
-  const tFlat = tStop + 0.45;
-  const tBeep = tFlat + 0.25;
+  const tCrank = tPlateHit + plateRun.duration;
+  /** How far the plate bounces back off the knob before it lies down. */
+  const PLATE_BACK = 24;
+  const tFlat = tCrank + 0.75;
   at(tPlateHit + 0.25, { sound: playSwirl });
   at(tPlateHit + 2.1, { sound: playSwirl });
+  at(tCrank, { sound: () => playKnock(1400) });
   at(tFlat, { sound: playClonk });
-  at(tBeep, { sound: playBeeps });
-  at(tBeep + 0.9, { sound: playHum });
 
   const plateAt = (t: number): { pt: Pt; turned: number; tilt: number; flat: number } => {
     if (t < tPlateHit) return { pt: plateC, turned: 0, tilt: 0, flat: 0 };
-    if (t < tStop) {
+    if (t < tCrank) {
       const d = distAt(plateRun, t - tPlateHit);
       return { pt: along(platePath, d).pt, turned: d, tilt: 0, flat: 0 };
     }
-    // It wobbles to a stop, then lies down backwards (towards the wall) onto the touch field.
-    const tilt = wobble(t - tStop, 7, 14, 4);
-    return { pt: { x: COOKTOP.touchX, y: PLATE_Y }, turned: platePath.total, tilt, flat: easeIn(seg(t, tStop + 0.2, tFlat)) };
+    // It bounces back off the knob, wobbles, then lies down backwards (towards the wall).
+    const back = PLATE_BACK * easeOut(seg(t, tCrank, tCrank + 0.45));
+    const tilt = wobble(t - tCrank, 7, 14, 4);
+    return { pt: { x: plateStopX - back, y: PLATE_Y }, turned: platePath.total - back, tilt, flat: easeIn(seg(t, tCrank + 0.5, tFlat)) };
+  };
+
+  /* The salad spinner: the knob is knocked round, the basket whirls and slows down; the lid pops off and the lettuce flies. */
+  const WHIRL = 15;
+  const SLOW = 4;
+  /** The crank's angle as seen from above (radians): π points left, towards the plate; it turns on and on, slowing down. */
+  const crankAngle = (t: number) => (t < tCrank ? Math.PI : Math.PI - WHIRL * SLOW * (1 - Math.exp(-(t - tCrank) / SLOW)));
+  /** How fast the spinner turns, from 0 to 1. */
+  const whirl = (t: number) => (t < tCrank ? 0 : Math.exp(-(t - tCrank) / SLOW));
+  /** The spinner rattles on the counter while it whirls. */
+  const spinnerShake = (t: number) => 2.5 * whirl(t) * Math.sin(t * 61);
+  for (let i = 0; i < 6; i++) at(tCrank + 0.05 + i * 0.55, { sound: playWhirr });
+
+  const tLid = tCrank + 3.0;
+  const lid0 = { x: SPINNER.cx, y: SPINNER.lidY };
+  const lidFly: Flight = { t0: tLid, t1: tLid + Math.sqrt((8 * 240) / 1500), a: lid0, b: { x: lid0.x + 6, y: lid0.y }, h: 240 };
+  at(tLid, { sound: playBoing });
+  at(tLid + 0.02, { sound: playPop });
+  at(lidFly.t1, { sound: () => playKnock(1100) });
+
+  /** The lid with the crank: on the bowl, up in the air with a somersault, then back on, a little crooked. */
+  const lidAt = (t: number): { pt: Pt; angle: number } => {
+    if (t < tLid) return { pt: { x: lid0.x + spinnerShake(t), y: lid0.y }, angle: 0 };
+    if (t < lidFly.t1) {
+      const k = seg(t, lidFly.t0, lidFly.t1);
+      return { pt: hop(lidFly.a, lidFly.b, lidFly.h, k), angle: -360 * easeInOut(k) };
+    }
+    return { pt: { x: lidFly.b.x + spinnerShake(t), y: lidFly.b.y }, angle: 4 + wobble(t - lidFly.t1, 10, 15, 3) };
+  };
+
+  // Leaves fly out of the open basket one after the other; the last and biggest one flies to the egg timer.
+  const TIMER0 = { x: JAR.x0 + 75, y: JAR.top - TIMER.foot };
+  const leafFrom = (i: number) => ({ x: SPINNER.cx + jitter(i + 20) * 30, y: SPINNER.top - 6 });
+  const plateRest = { x: plateStopX - PLATE_BACK, y: COUNTER - 2 * PLATE.r * 0.18 - 10 };
+  const smallLeaves: [Pt, number][] = [
+    [{ x: 4060, y: COUNTER - 12 }, 170],
+    [{ x: 4472, y: COUNTER - 12 }, 140],
+    [plateRest, 210],
+    [{ x: 4515, y: COUNTER - 12 }, 230],
+    [{ x: 3985, y: COUNTER - 12 }, 280],
+  ];
+  const leaves: Leaf[] = smallLeaves.map(([b, h], i) => {
+    const t0 = tLid + 0.12 + i * 0.13;
+    return { t0, t1: t0 + 0.75 + h / 600, a: leafFrom(i), b, h, turns: i % 2 ? 1 : -1, rest: jitter(i + 30) * 12 };
+  });
+  const tBigLeaf = tLid + 0.12 + smallLeaves.length * 0.13;
+  const leafHit = { x: TIMER0.x - TIMER.rx - 24, y: TIMER0.y - 6 };
+  leaves.push({ t0: tBigLeaf, t1: tBigLeaf + 1.45, a: leafFrom(9), b: leafHit, h: 230, turns: 2, rest: 0 });
+  const tLeafHit = tBigLeaf + 1.45;
+  const BIG = leaves.length - 1;
+  /** Where the big leaf flutters down to, in front of the cookie jar. */
+  const leafDown = { x: JAR.x0 + 40, y: COUNTER - 20 };
+  const tLeafDown = tLeafHit + 1.5;
+  at(tLid + 0.2, { sound: playRustle });
+  at(tLid + 0.75, { sound: playRustle });
+  at(tLeafHit, { sound: () => playKnock(2000) });
+
+  /** A lettuce leaf: in the spinner until it flies (null), then in the air, then where it landed. */
+  const leafAt = (i: number, t: number): { pt: Pt; angle: number; big: boolean } | null => {
+    const leaf = leaves[i];
+    const big = i === BIG;
+    if (t < leaf.t0) return null;
+    if (t < leaf.t1) {
+      const k = seg(t, leaf.t0, leaf.t1);
+      return { pt: hop(leaf.a, leaf.b, leaf.h, k), angle: (leaf.turns * 360 + leaf.rest) * k, big };
+    }
+    if (!big) return { pt: leaf.b, angle: leaf.rest, big };
+    // The big leaf slaps the timer and flutters down, swaying from side to side.
+    const k = seg(t, tLeafHit, tLeafDown);
+    const sway = Math.sin(k * Math.PI * 3) * (1 - k);
+    return { pt: { x: lerp(leafHit.x, leafDown.x, k) + 22 * sway, y: lerp(leafHit.y, leafDown.y, easeIn(k)) }, angle: 35 * sway, big };
+  };
+
+  /* The egg timer: the slap winds it up, it ticks its dial back, rings and rattles off the jar onto the pan's handle. */
+  const tWound = tLeafHit + 1.2;
+  const TICK = 0.4;
+  const TICKS = 11;
+  /** It rings where the twelfth tick would be, once the dial is back at zero. */
+  const tRing = tWound + TICKS * TICK;
+  const HOPS = 3;
+  const HOP = 0.36;
+  const tHops = tRing + 0.5;
+  const tFall = tHops + HOPS * HOP;
+  const edgeX = JAR.x0 - 28;
+  const onHandle = { x: TIMER.onHandle, y: -PAN.handleH - TIMER.foot };
+  const timerLand = onPan(onHandle, PAN_REST);
+  const tHandle = tFall + Math.sqrt((2 * (timerLand.y - TIMER0.y)) / 1500);
+  at(tLeafHit + 0.05, { sound: playWhirr });
+  at(tWound, { sound: playTick });
+  at(tWound + 4 * TICK, { sound: playTick });
+  at(tWound + 8 * TICK, { sound: playTick });
+  at(tRing, { sound: playAlarm });
+  at(tRing + 0.96, { sound: playAlarm });
+  at(tHandle, { sound: playClonk });
+  at(tHandle + 0.05, { sound: playRing });
+
+  /** The pan's tilt in degrees: at rest until the timer lands on its handle, then tipped over with a little bounce. */
+  const TIP = 0.13;
+  const panAngle = (t: number) => {
+    if (t < tHandle) return PAN_REST;
+    if (t < tHandle + TIP) return lerp(PAN_REST, PAN_DOWN, easeIn(seg(t, tHandle, tHandle + TIP)));
+    return PAN_DOWN + Math.abs(wobble(t - tHandle - TIP, 4, 16, 5));
+  };
+
+  const timerAt = (t: number): { pt: Pt; tilt: number; dial: number; ringing: boolean } => {
+    if (t < tLeafHit) return { pt: TIMER0, tilt: 0, dial: 0, ringing: false };
+    if (t < tWound) {
+      // The slap turns its dial round and rocks it.
+      return { pt: TIMER0, tilt: wobble(t - tLeafHit, 12, 14, 3), dial: DIAL_MAX * easeOut(seg(t, tLeafHit, tWound)), ringing: false };
+    }
+    if (t < tRing) {
+      // Tick, tack: the dial steps back with every tick and the timer rocks a little to and fro.
+      const ticked = Math.min(TICKS, Math.floor((t - tWound) / TICK) + 1);
+      const since = t - tWound - (ticked - 1) * TICK;
+      const tilt = (ticked % 2 ? 4 : -4) * Math.exp(-since * 8);
+      return { pt: TIMER0, tilt, dial: DIAL_MAX * (1 - ticked / TICKS), ringing: false };
+    }
+    const shake = 7 * Math.sin((t - tRing) * 50);
+    if (t < tFall) {
+      // Ringing, it rattles and hops towards the jar's edge.
+      const n = Math.min(HOPS - 1, Math.max(0, Math.floor((t - tHops) / HOP)));
+      const k = t < tHops ? 0 : seg(t, tHops + n * HOP, tHops + (n + 1) * HOP);
+      const from = { x: lerp(TIMER0.x, edgeX, n / HOPS), y: TIMER0.y };
+      const to = { x: lerp(TIMER0.x, edgeX, (n + 1) / HOPS), y: TIMER0.y };
+      const pt = t < tHops ? TIMER0 : hop(from, to, 16, k);
+      return { pt: { x: pt.x + 2 * Math.sin(t * 70), y: pt.y }, tilt: shake, dial: 0, ringing: true };
+    }
+    if (t < tHandle) {
+      // Off the edge it tumbles down onto the handle.
+      const k = seg(t, tFall, tHandle);
+      return {
+        pt: { x: lerp(edgeX, timerLand.x, k), y: lerp(TIMER0.y, timerLand.y, k * k) },
+        tilt: -PAN_REST * k - 25 * Math.sin(Math.PI * k),
+        dial: 0,
+        ringing: true,
+      };
+    }
+    // It rides the handle down and stays there.
+    const angle = panAngle(t);
+    return { pt: onPan(onHandle, angle), tilt: -angle, dial: 0, ringing: false };
+  };
+
+  /* The pancake: the pan tips, and it flies high with two somersaults onto the cooktop's touch field. */
+  // It lies in the pan's opening, so its top shows over the rim.
+  const inPan = { x: PANCAKE.inPan, y: -PAN.rimH };
+  const tToss = tHandle + TIP;
+  const onTouch = { x: COOKTOP.touchX, y: COUNTER - PANCAKE.h / 2 };
+  const cakeFly: Flight = { t0: tToss, t1: tToss + Math.sqrt((8 * 420) / 1500), a: onPan(inPan, PAN_DOWN), b: onTouch, h: 420 };
+  const tCake = cakeFly.t1;
+  const tBeep = tCake + 0.3;
+  at(tToss, { sound: () => playKnock(500) });
+  at(tToss + 0.02, { sound: playWhoosh });
+  at(tToss + 0.1, { say: { de: "Hui! Der Pfannkuchen fliegt!" } });
+  at(tCake, { sound: playPlop });
+  at(tBeep, { sound: playBeeps });
+  at(tBeep + 0.9, { sound: playHum });
+
+  const pancakeAt = (t: number): { pt: Pt; angle: number; squash: number } => {
+    if (t < tToss) {
+      const angle = panAngle(t);
+      return { pt: onPan(inPan, angle), angle: -angle, squash: 1 };
+    }
+    if (t < tCake) {
+      const k = seg(t, cakeFly.t0, cakeFly.t1);
+      return { pt: hop(cakeFly.a, cakeFly.b, cakeFly.h, k), angle: lerp(-PAN_DOWN, 720, easeInOut(k)), squash: 1 };
+    }
+    // Flatsch: it squashes flat and wobbles back.
+    return { pt: onTouch, angle: 0, squash: 1 - Math.abs(wobble(t - tCake, 0.45, 14, 4)) };
   };
 
   /** How hot the cooktop is, from 0 to 1. */
@@ -392,9 +616,12 @@ export function buildKitchen() {
     if (t < tLadle) return pinAt(t).pt.x;
     if (t < tPeg) return LADLE.hook.x + 100;
     if (t < tPlateHit) return meatballAt(t).pt.x;
-    if (t < tFlat) return plateAt(t).pt.x;
+    if (t < tCrank) return plateAt(t).pt.x;
+    if (t < tLeafHit) return SPINNER.cx + 80;
+    if (t < tToss) return TIMER0.x - 250;
+    if (t < tCake) return Math.max(TIMER0.x - 250, pancakeAt(t).pt.x);
     if (t < tLever) return POT.cx;
-    return 5150;
+    return BREAKFAST.cx - 230;
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
 
@@ -407,7 +634,16 @@ export function buildKitchen() {
     tLadle,
     tPeg,
     tPlateHit,
+    tCrank,
     tFlat,
+    tLid,
+    tLeafHit,
+    tWound,
+    tRing,
+    tFall,
+    tHandle,
+    tToss,
+    tCake,
     tBeep,
     tLever,
     tPop,
@@ -419,6 +655,16 @@ export function buildKitchen() {
     ladleAngle,
     meatballAt,
     plateAt,
+    plateStopX,
+    crankAngle,
+    whirl,
+    spinnerShake,
+    lidAt,
+    leaves,
+    leafAt,
+    timerAt,
+    panAngle,
+    pancakeAt,
     heat,
     popped,
     heapY,

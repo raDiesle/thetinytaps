@@ -1,12 +1,16 @@
 // The garden machine ("Im Garten"), a Rube Goldberg machine through a long
 // garden: one tap lets a marble roll out of the birdhouse, and one thing sets
-// off the next for about half a minute while the camera travels along – wind
+// off the next for about forty seconds while the camera travels along – wind
 // chimes, a watering can, a water wheel, a wheelbarrow, a rake, an apple tree,
-// a slide, a croquet ball, the garden tap and the sprinkler, until the
-// sunflower blooms. Everything is worked out ahead as a function of the
-// seconds since the tap, so GardenLevel.tsx only asks where each thing is at a
-// moment. Coordinates are those of the garden, 5200 × 900; the screen shows
-// 1600 of it at a time.
+// a slide and a croquet ball that bonks the mole's hill. The dizzy mole digs
+// off under the lawn, looks out once on the way and pops up right under the
+// sleeping hedgehog, which flies up, curls into a prickly ball and rolls
+// through a pile of leaves; the leaves whirl up in a gust that spins the
+// pinwheel in its flower pot, whose string winds up and pulls open the garden
+// tap, and the sprinkler waters the sunflower until it blooms. Everything is
+// worked out ahead as a function of the seconds since the tap, so
+// GardenLevel.tsx only asks where each thing is at a moment. Coordinates are
+// those of the garden, 7110 × 900; the screen shows 1600 of it at a time.
 
 import {
   playBlub,
@@ -19,14 +23,20 @@ import {
   playKnock,
   playLeaves,
   playPlop,
+  playCrunch,
+  playPoof,
   playPop,
   playRumble,
+  playSneeze,
   playSniff,
   playSplash,
+  playSqueak,
+  playSwirl,
   playThump,
   playTrill,
   playTweet,
   playTwinkle,
+  playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
 import { wobble } from "./level";
@@ -54,7 +64,7 @@ import {
 } from "./machineKit";
 import { BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 5200;
+export const WORLD_W = 7110;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -134,25 +144,51 @@ const slideY = (x: number) => SLIDE.top.y + ((x - SLIDE.top.x) * (SLIDE.bottom.y
 export const CROQUET = { x: 3060, r: 32 };
 export const HOOP = { x: 3300, h: 104 };
 
-export const SHED = { x0: 3480, x1: 3900, wallTop: 540, roofTop: 420 };
-/** The garden tap on the shed: its lever hangs down (shut) from the pivot, with a knob at the end; turned up, the water runs. */
-export const TAP = { x: 3600, y: 650, lever: 112, knob: 12, open: 80 };
-const KNOB_Y = TAP.y + TAP.lever;
-/** The croquet ball touches the lever's knob here. */
-const LEVER_CONTACT = TAP.x - Math.sqrt((CROQUET.r + TAP.knob) ** 2 - (FLOOR - CROQUET.r - KNOB_Y) ** 2);
-/** How far the ball pushes the knob before the lever flips up on its own. */
-const LEVER_PUSH = 18;
+/** The mole's home: a mound of earth `rx` wide each way and `h` high, which the croquet ball runs into. */
+export const MOLEHILL = { x: 3600, rx: 105, h: 78 };
+/** Where the mole comes up once on its way under the lawn, to look around. */
+export const MOLE_PEEK_X = 3900;
+/**
+ * The hedgehog, asleep on the grass at x (the mole comes up right under it); curled up it is a ball of radius r,
+ * lands at `land` and rolls to `stop`.
+ */
+export const HEDGEHOG = { x: 4200, r: 58, land: 4420, stop: 5150 };
+/** The pile of raked leaves the hedgehog bursts through: middle, width and height. */
+export const LEAF_PILE = { x: 4950, w: 190, h: 60 };
+/** The pinwheel stuck in a flower pot: its hub at (x, hubY), blades r long; the pot's rim is at potTop. */
+export const PINWHEEL = { x: 5320, hubY: 600, r: 58, potTop: FLOOR - 74 };
 
-export const SPRINKLER = { x: 4160, headY: FLOOR - 120, arm: 56 };
+/** The croquet ball stops where it first touches the molehill's side. */
+const HILL_CONTACT = (() => {
+  const cy = FLOOR - CROQUET.r;
+  const touches = (cx: number) =>
+    Array.from({ length: 91 }, (_, i) => (Math.PI * i) / 90).some(
+      (a) => Math.hypot(MOLEHILL.x + MOLEHILL.rx * Math.cos(a) - cx, FLOOR - MOLEHILL.h * Math.sin(a) - cy) < CROQUET.r,
+    );
+  let x = MOLEHILL.x - MOLEHILL.rx - CROQUET.r - 20;
+  while (!touches(x + 1)) x += 1;
+  return x;
+})();
+
+export const SHED = { x0: 5400, x1: 5820, wallTop: 540, roofTop: 420 };
+/**
+ * The garden tap on the shed: its lever hangs down (shut) from the pivot, with a knob at the end; turned by `open`
+ * degrees (to the left, towards the pinwheel's string) the water runs.
+ */
+export const TAP = { x: SHED.x0 + 120, y: 650, lever: 112, knob: 12, open: -80 };
+/** Where the lever's knob is when the lever is turned `angle` degrees (positive swings it to the right). */
+export const knobAt = (angle: number): Pt => ({ x: TAP.x + TAP.lever * Math.sin(rad(angle)), y: TAP.y + TAP.lever * Math.cos(rad(angle)) });
+
+export const SPRINKLER = { x: 6080, headY: FLOOR - 120, arm: 56 };
 /** The orange garden hose from the tap's spout along the grass to the sprinkler. */
 export const HOSE = pathOf(
   quad({ x: TAP.x + 24, y: TAP.y + 40 }, { x: TAP.x + 24, y: FLOOR - 8 }, { x: TAP.x + 90, y: FLOOR - 8 }),
   line({ x: TAP.x + 90, y: FLOOR - 8 }, { x: SPRINKLER.x - 36, y: FLOOR - 8 }),
 );
 
-export const BED = { x0: 4270, x1: 4780 };
+export const BED = { x0: 6190, x1: 6700 };
 /** The sunflower grows out of the bed at x, up to its head at headY. */
-export const SUN = { x: 4440, headY: 300 };
+export const SUN = { x: 6360, headY: 300 };
 export const FENCE_TOP = 620;
 
 /* ---------- Helpers ---------- */
@@ -169,6 +205,9 @@ function alongOrBefore(path: Path, d: number): Pt {
   const p0 = path.pts[0];
   return { x: p0.x + d, y: p0.y };
 }
+
+/** How many leaves whirl up out of the pile. */
+export const LEAVES = 14;
 
 /* ---------- The machine ---------- */
 
@@ -303,28 +342,181 @@ export function buildGarden() {
     return { pt: { x: appleHit - back, y: appleOnGrass }, spin: (apple.path.total - back) / APPLE.r, hanging: false };
   };
 
-  /* The croquet ball: through the hoop to the tap's lever. */
+  /* The croquet ball: through the hoop and into the side of the molehill. */
   const ballY = FLOOR - CROQUET.r;
-  const ballPath = pathOf(line({ x: CROQUET.x, y: ballY }, { x: LEVER_CONTACT, y: ballY }));
+  const ballPath = pathOf(line({ x: CROQUET.x, y: ballY }, { x: HILL_CONTACT, y: ballY }));
   const ball = roll(ballPath, endSpeed(apple.d) * 0.85, 160, 600, 0.15);
-  const tLever = tBall + ball.duration;
-  const tSnap = tLever + 0.3;
-  const tOpen = tSnap + 0.18;
+  const tKnock = tBall + ball.duration;
   at(tBall + timeWhen(ball, (pt) => pt.x >= HOOP.x), { sound: playDing });
-  at(tLever, { sound: () => playKnock(900) });
-  at(tOpen, { sound: playClonk });
+  at(tKnock, { sound: () => playKnock(500) });
 
   const ballAt = (t: number): { pt: Pt; spin: number } => {
-    const d = t < tBall ? 0 : t < tLever ? distAt(ball, t - tBall) : ballPath.total + LEVER_PUSH * easeOut(seg(t, tLever, tSnap));
+    // After the bump it rolls back a little.
+    const d = t < tBall ? 0 : t < tKnock ? distAt(ball, t - tBall) : ballPath.total - 12 * easeOut(seg(t, tKnock, tKnock + 0.4));
     return { pt: { x: CROQUET.x + d, y: ballY }, spin: d / CROQUET.r };
   };
 
-  /** How far the lever has turned, in degrees: positive swings its knob to the right. */
+  /*
+   * The mole: bonked, it pops up out of its hill and rubs its head while stars circle round it, ducks and digs off
+   * under the lawn (a ridge of earth runs along), looks out of a new little hill on the way, and comes up out of a
+   * third one right under the sleeping hedgehog.
+   */
+  const tPeek = tKnock + 0.45;
+  const tDuck = tPeek + 1.9;
+  const tDig = tDuck + 0.3;
+  const tMid = tDig + 1.5;
+  const tMidDuck = tMid + 1.6;
+  const tDig2 = tMidDuck + 0.2;
+  const tPopB = tDig2 + 1.4;
+  // The new hill lifts the sleeping hedgehog, it wakes up surprised, and then the mole's head pops out and tosses it.
+  const tToss = tPopB + 0.7;
+  const LATER = 1e9;
+  const moleUp = (t: number, up: number, down: number) => easeOut(seg(t, up, up + 0.22)) * (1 - easeIn(seg(t, down, down + 0.22)));
+  /** How far the mole sticks out of each of its hills (home, on the way, under the hedgehog), 0 to 1. */
+  const moleAt = (t: number) => [moleUp(t, tPeek, tDuck), moleUp(t, tMid + 0.05, tMidDuck), moleUp(t, tToss - 0.2, LATER)];
+  /** How much of each hill is there: the home hill always, the others once the mole pushes them up. */
+  const hillsAt = (t: number) => [1, easeOut(seg(t, tMid - 0.1, tMid + 0.05)), easeOut(seg(t, tPopB, tPopB + 0.18))];
+  /** The front of the ridge of earth the digging mole pushes up under the lawn. */
+  const ridgeAt = (t: number) =>
+    t < tMidDuck ? lerp(MOLEHILL.x, MOLE_PEEK_X, easeInOut(seg(t, tDig, tMid))) : lerp(MOLE_PEEK_X, HEDGEHOG.x, easeInOut(seg(t, tDig2, tPopB)));
+  const digging = (t: number) => (t > tDig && t < tMid) || (t > tDig2 && t < tPopB);
+  at(tPeek, { sound: playPop });
+  at(tPeek + 0.25, { sound: playSwirl });
+  at(tPeek + 1.3, { sound: playSniff });
+  at(tDuck, { sound: playPlop });
+  at(tDig, { sound: playCrunch });
+  at(tMid, { sound: playPop });
+  at(tMid + 0.6, { sound: playSniff });
+  at(tMidDuck, { sound: playPlop });
+  at(tDig2, { sound: playCrunch });
+  at(tPopB, { sound: playPoof });
+
+  /** Clods of earth flying out where the mole comes up. */
+  const POPS = [
+    { x: MOLE_PEEK_X, t: tMid, n: 5, v: 0.7 },
+    { x: HEDGEHOG.x, t: tPopB, n: 9, v: 1 },
+  ];
+  const clodsAt = (t: number): Pt[] => {
+    const out: Pt[] = [];
+    for (const pop of POPS) {
+      const age = t - pop.t;
+      if (age < 0 || age > 1.5) continue;
+      for (let i = 0; i < pop.n; i++) {
+        const side = i % 2 ? 1 : -1;
+        const vx = side * (130 + 220 * ((i * 0.618) % 1)) * pop.v;
+        const vy = -(380 + 220 * ((i * 0.37) % 1)) * pop.v;
+        const y = FLOOR - MOLEHILL.h + vy * age + 0.5 * GRAVITY * age * age;
+        if (y < FLOOR - 4) out.push({ x: pop.x + vx * age, y });
+      }
+    }
+    return out;
+  };
+
+  /*
+   * The hedgehog: lifted by the new hill, it wakes up; tossed up by the mole, it curls into a prickly ball in the air,
+   * lands, rolls through the pile of leaves and slows down; then it uncurls, shakes itself and sneezes.
+   */
+  const HOG_R = HEDGEHOG.r;
+  const tLandHog = tToss + 1.15;
+  const hogFrom = { x: HEDGEHOG.x, y: FLOOR - HOG_R - MOLEHILL.h };
+  const hogLand = { x: HEDGEHOG.land, y: FLOOR - HOG_R };
+  const AIR_SPIN = 3 * Math.PI;
+  // It lands at HOG_V and slows down evenly until it stops.
+  const HOG_V = 450;
+  const hogRun = HEDGEHOG.stop - HEDGEHOG.land;
+  const HOG_T = (2 * hogRun) / HOG_V;
+  const tHogStop = tLandHog + HOG_T;
+  const pileLeft = LEAF_PILE.x - LEAF_PILE.w / 2;
+  const tBurst = tLandHog + HOG_T * (1 - Math.sqrt(1 - (pileLeft - HOG_R - HEDGEHOG.land) / hogRun));
+  at(tPopB + 0.15, { sound: playSqueak });
+  at(tToss - 0.2, { sound: playPop });
+  at(tToss, { sound: playWhoosh });
+  at(tLandHog, { sound: playThump });
+  at(tBurst, { sound: playLeaves });
+  at(tHogStop + 0.15, { sound: playSneeze });
+
+  /**
+   * The hedgehog's middle, how far it has turned (radians), how far it is curled up (0 to 1), its shake (degrees) and
+   * whether it is awake.
+   */
+  const hogAt = (t: number): { pt: Pt; spin: number; curl: number; shake: number; awake: boolean } => {
+    if (t < tToss) {
+      const lifted = FLOOR - HOG_R - MOLEHILL.h * easeOut(seg(t, tPopB, tPopB + 0.18));
+      // Woken up on top of the hill, it shivers with surprise.
+      return { pt: { x: HEDGEHOG.x, y: lifted }, spin: 0, curl: 0, shake: wobble(t - tPopB - 0.15, 5, 40, 3), awake: t > tPopB + 0.15 };
+    }
+    if (t < tLandHog) {
+      const k = seg(t, tToss, tLandHog);
+      return { pt: hop(hogFrom, hogLand, 220, k), spin: AIR_SPIN * k, curl: easeOut(seg(t, tToss, tToss + 0.3)), shake: 0, awake: true };
+    }
+    const d = hogRun * easeOut(seg(t, tLandHog, tHogStop));
+    // One little bounce after landing.
+    const u = seg(t, tLandHog, tLandHog + 0.35);
+    return {
+      pt: { x: HEDGEHOG.land + d, y: FLOOR - HOG_R - 4 * 32 * u * (1 - u) },
+      spin: AIR_SPIN + d / HOG_R,
+      curl: 1 - easeOut(seg(t, tHogStop + 0.1, tHogStop + 0.5)),
+      shake: wobble(t - tHogStop - 0.5, 8, 30, 4),
+      awake: true,
+    };
+  };
+
+  /* The leaves whirl up out of the pile and blow over to the pinwheel. */
+  /** How much of the leaf pile is still heaped up. */
+  const pileAt = (t: number) => 1 - 0.75 * easeOut(seg(t, tBurst, tBurst + 0.3));
+  /** Leaf `i` of those that whirl up: up and away to the right, fluttering, then down onto the grass. */
+  const leafAt = (i: number, t: number): { pt: Pt; angle: number } | null => {
+    const age = t - tBurst - i * 0.02;
+    if (age < 0) return null;
+    const x0 = pileLeft + 20 + ((i * 0.53) % 1) * (LEAF_PILE.w - 40);
+    const vx = 220 + 380 * ((i * 0.618) % 1);
+    const vy = -(380 + 260 * ((i * 0.41) % 1));
+    const x = x0 + (vx * (1 - Math.exp(-1.5 * age))) / 1.5 + 18 * Math.exp(-0.8 * age) * Math.sin(age * 5 + i);
+    const y = FLOOR - LEAF_PILE.h * 0.6 + (vy * (1 - Math.exp(-2 * age))) / 2 + 70 * age;
+    if (y >= FLOOR - 6) return { pt: { x, y: FLOOR - 6 }, angle: (i * 37) % 180 };
+    return { pt: { x, y }, angle: 40 * Math.sin(age * 6 + i) + age * 90 };
+  };
+  // The gust reaches the pinwheel with the first leaf.
+  let tGust = tBurst;
+  while (!Array.from({ length: LEAVES }, (_, i) => leafAt(i, tGust)).some((l) => l && l.pt.x >= PINWHEEL.x - PINWHEEL.r)) tGust += STEP;
+  /** Where the swirl of wind is on its way from the pile to the pinwheel (0 to 1), or null when there is none. */
+  const gustAt = (t: number) => {
+    const k = seg(t, tBurst, tGust + 0.3);
+    return k <= 0 || k >= 1 ? null : k;
+  };
+  at(tBurst + 0.1, { sound: playWhoosh });
+
+  /* The pinwheel spins in the gust; its string winds up on the hub and pulls the tap's lever round, which flips open. */
+  const tPull = tGust + 0.5;
+  const tSnap = tPull + 2.2;
+  const tOpen = tSnap + 0.18;
+  const PIN_W = 14;
+  const PIN_UP = 0.5;
+  const PIN_DOWN = 1.6;
+  /** Radians the pinwheel has turned: speeding up in the gust, steady while it winds the string, then slowing down. */
+  const pinwheelAt = (t: number) => {
+    const u = t - tGust;
+    if (u <= 0) return 0;
+    if (u < PIN_UP) return (PIN_W * u * u) / (2 * PIN_UP);
+    const b = tOpen - tGust;
+    if (u < b) return PIN_W * (PIN_UP / 2 + u - PIN_UP);
+    return PIN_W * (PIN_UP / 2 + b - PIN_UP) + PIN_W * PIN_DOWN * (1 - Math.exp(-(u - b) / PIN_DOWN));
+  };
+  /** How far the pinwheel's stick leans in the gust, in degrees around the pot's rim. */
+  const leanAt = (t: number) => wobble(t - tGust, 7, 9, 2.2);
+  const hubAt = (t: number) => turn({ x: PINWHEEL.x, y: PINWHEEL.hubY }, { x: PINWHEEL.x, y: PINWHEEL.potTop }, rad(leanAt(t)));
+  at(tGust, { sound: playWhirr });
+  at(tGust + 0.6, { sound: playWhirr });
+  at(tPull, { sound: playCreak });
+  at(tPull + 1.3, { sound: playWhirr });
+  at(tOpen, { sound: playClonk });
+
+  /** How far the lever has turned, in degrees: negative swings its knob to the left, towards the pinwheel. */
+  const PULLED = -50;
   const leverAt = (t: number) => {
-    if (t < tLever) return 0;
-    const pushed = (Math.asin(LEVER_PUSH / TAP.lever) * 180) / Math.PI;
-    if (t < tSnap) return pushed * easeOut(seg(t, tLever, tSnap));
-    return lerp(pushed, TAP.open, easeIn(seg(t, tSnap, tOpen))) + wobble(t - tOpen, 6, 22, 7);
+    if (t < tPull) return 0;
+    if (t < tSnap) return PULLED * easeInOut(seg(t, tPull, tSnap));
+    return lerp(PULLED, TAP.open, easeIn(seg(t, tSnap, tOpen))) + wobble(t - tOpen, 6, 22, 7);
   };
 
   /* Water runs through the hose, and the sprinkler starts turning and spraying. */
@@ -423,8 +615,10 @@ export function buildGarden() {
     if (t < tStop) return Math.max(barrowAt(t).pt.x, 1100);
     if (t < tLand) return (RAKE.x + APPLE.x) / 2;
     if (t < tBall) return Math.max(appleAt(t).pt.x, (RAKE.x + APPLE.x) / 2);
-    if (t < tLever) return ballAt(t).pt.x;
-    if (t < tOpen) return TAP.x;
+    if (t < tKnock) return ballAt(t).pt.x;
+    if (t < tDig) return MOLEHILL.x + 200;
+    if (t < tPopB) return Math.max(MOLEHILL.x + 200, ridgeAt(t) + 80);
+    if (t < tOpen) return Math.max(HEDGEHOG.x + 80, hogAt(t).pt.x);
     if (t < tSpray) return TAP.x + HOSE.total * hoseAt(t);
     return SUN.x;
   };
@@ -438,6 +632,17 @@ export function buildGarden() {
     tCup,
     tPush,
     tStop,
+    tBall,
+    tKnock,
+    tPeek,
+    tMid,
+    tPopB,
+    tToss,
+    tLandHog,
+    tBurst,
+    tHogStop,
+    tGust,
+    tOpen,
     tSpray,
     tGrow,
     tBloom,
@@ -467,6 +672,20 @@ export function buildGarden() {
     swayAt,
     appleAt,
     ballAt,
+    moleAt,
+    hillsAt,
+    ridgeAt,
+    digging,
+    clodsAt,
+    hogAt,
+    pileAt,
+    leafAt,
+    gustAt,
+    pinwheelAt,
+    leanAt,
+    hubAt,
+    /** Whether the pinwheel's string still holds the lever; it slips off when the lever flips open. */
+    stringOn: (t: number) => t < tOpen,
     leverAt,
     hoseAt,
     spinAt,

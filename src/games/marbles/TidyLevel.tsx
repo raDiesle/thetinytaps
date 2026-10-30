@@ -1,11 +1,13 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import { clamp01, lerp, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { BAR_COLORS, STAR_POINTS } from "./parts";
 import { INK, Picture, Sparkles, WallClock, Window } from "./scenery";
+import type { Pt } from "./path";
 import {
   BALL_R,
+  BASKET,
   BED,
   BELLOWS,
   BLOCK,
@@ -14,14 +16,26 @@ import {
   BOOKS,
   buildTidy,
   CHEST,
+  CRAYON,
+  CRAYONS,
   CUSHION,
   FLOOR,
   FRONT_WHEEL,
   HORSE,
   IN_BED,
   LID,
+  NOZZLE,
+  PIECES,
   PILLOW,
+  PLUG,
+  POT,
+  PUZZLE,
+  PUZZLE_X1,
   SHELF,
+  SOCK_BALL_R,
+  SOCKS,
+  slotCentre,
+  STOOL,
   type Tidy,
   TRUCK,
   WORLD_W,
@@ -37,8 +51,12 @@ const BUNNY = "#f3d9e8";
  * rocks the rocking horse, which kicks the football, the football rolls the
  * blocks into the toy chest and drops in after them, the lid slams shut and
  * sets off the toy truck, which pushes the books to the shelf, where they hop
- * in, and then rolls onto the bellows, whose puff blows the bunny into bed.
- * At the end everything is tidy and glitters.
+ * in, and then bounces on the bellows: each puff blows a sock into the laundry
+ * basket, and the last one throws the sock ball, which bounces off the basket
+ * and rolls along the floor – the crayons hop into the pencil pot, the pieces
+ * into the jigsaw puzzle – until it knocks the plug out of the air cushion,
+ * which jumps and throws the bunny into bed. At the end everything is tidy
+ * and glitters.
  */
 export function TidyLevel(props: LevelProps) {
   const tidy = useMemo(buildTidy, []);
@@ -62,18 +80,41 @@ export function TidyLevel(props: LevelProps) {
           <Shelf />
           <Hose tidy={tidy} t={t} />
           <Bellows tidy={tidy} t={t} />
+          {t < tidy.tBallOff && <SockBall tidy={tidy} t={t} />}
+          <BasketBack tilt={tidy.basketTilt(t)} />
+          {SOCKS.map((_, k) => (
+            <Sock key={k} k={k} tidy={tidy} t={t} />
+          ))}
+          <BasketFront tilt={tidy.basketTilt(t)} />
+          <NozzleBlast age={tidy.blast(t)} />
+
+          <Stool />
+          {CRAYONS.map((_, k) => (
+            <Crayon key={k} k={k} tidy={tidy} t={t} />
+          ))}
+          <Pot tilt={tidy.potTilt(t)} />
+          <PuzzleDefs ids={ids} />
+          <PuzzleBoard ids={ids} />
+          {PIECES.map((_, i) => (
+            <Piece key={i} i={i} ids={ids} tidy={tidy} t={t} />
+          ))}
+          <Sparkles x={(PUZZLE.x0 + PUZZLE_X1) / 2} y={PUZZLE.top + 90} age={t - tidy.tPuzzle} n={8} spread={170} />
           <Cushion tidy={tidy} t={t} />
+          <PlugCap tidy={tidy} t={t} />
+
           <Bed />
           {BOOKS.map((_, j) => (
             <Book key={j} j={j} tidy={tidy} t={t} />
           ))}
           <Truck tidy={tidy} t={t} />
+          {t >= tidy.tBallOff && <SockBall tidy={tidy} t={t} />}
+          <AirJet tidy={tidy} t={t} />
           <Bunny tidy={tidy} t={t} />
           <Blanket k={tidy.blanket(t)} />
 
-          <Sparkles x={(SHELF.x0 + SHELF.x1) / 2} y={SHELF.board - 90} age={t - tidy.tGlitter} n={10} spread={220} />
+          <Sparkles x={(PUZZLE.x0 + PUZZLE_X1) / 2} y={PUZZLE.top - 30} age={t - tidy.tGlitter} n={10} spread={220} />
           <Sparkles x={PILLOW.x - 120} y={BED.top - 70} age={t - tidy.tGlitter - 0.25} n={10} spread={240} />
-          <Sparkles x={BELLOWS.x0 - 40} y={FLOOR - 120} age={t - tidy.tGlitter - 0.5} n={8} spread={180} />
+          <Sparkles x={(CUSHION.x0 + CUSHION.x1) / 2} y={FLOOR - 140} age={t - tidy.tGlitter - 0.5} n={8} spread={180} />
           {/* Under the horse's belly, between its legs: the bottom edge of the picture is cut off on a phone on its side. */}
           <TapHint t={t} x={HORSE.x} y={FLOOR - 34} />
         </>
@@ -84,7 +125,8 @@ export function TidyLevel(props: LevelProps) {
 
 /* ---------- The room ---------- */
 
-function Room({ paper }: { paper: string }) {
+/** The room's wallpaper, pictures and floor: drawn once, it never changes. */
+const Room = memo(function Room({ paper }: { paper: string }) {
   return (
     <g>
       <defs>
@@ -98,6 +140,8 @@ function Room({ paper }: { paper: string }) {
       <Picture x={2620} y={300} />
       <WallClock x={3180} y={220} />
       <Picture x={4440} y={250} />
+      <Window x={5520} y={110} />
+      <Picture x={6280} y={250} />
       {/* Skirting board and floor */}
       <rect x="-400" y={FLOOR - 14} width={WORLD_W + 800} height="14" fill="#fff" stroke={INK} strokeWidth="3" />
       <rect x="-400" y={FLOOR} width={WORLD_W + 800} height={VIEW_H - FLOOR + 200} fill="#e3b37f" />
@@ -107,7 +151,7 @@ function Room({ paper }: { paper: string }) {
       <line x1="-400" y1={FLOOR} x2={WORLD_W + 400} y2={FLOOR} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** A soft, still glow behind the rocking horse: what to tap, until the machine starts. */
 function StartGlow({ id }: { id: string }) {
@@ -295,8 +339,8 @@ function Truck({ tidy, t }: { tidy: Tidy; t: number }) {
   );
 }
 
-/** The bookshelf on its legs, with a crayon cup below and a plant on top. */
-function Shelf() {
+/** The bookshelf on its legs, with a toy sailing boat below and a plant on top. */
+const Shelf = memo(function Shelf() {
   const { x0, x1, top, board, bottom } = SHELF;
   return (
     <g>
@@ -307,12 +351,12 @@ function Shelf() {
       {[top - 10, board, bottom].map((y) => (
         <rect key={y} x={x0 - 6} y={y} width={x1 - x0 + 12} height="16" rx="5" fill="#ffb703" stroke={INK} strokeWidth="4" />
       ))}
-      {/* Crayon cup */}
+      {/* Toy sailing boat */}
       <g transform={`translate(${x1 - 90} ${bottom})`}>
-        {["#ff5d73", "#3a86ff", "#3ec300"].map((c, k) => (
-          <rect key={c} x={-18 + k * 14} y={-92 + k * 8} width="10" height="60" rx="3" fill={c} stroke={INK} strokeWidth="2" />
-        ))}
-        <rect x="-26" y="-56" width="52" height="56" rx="6" fill="#00b4d8" stroke={INK} strokeWidth="3" />
+        <line x1="0" y1="-24" x2="0" y2="-96" stroke={INK} strokeWidth="4" />
+        <path d="M4 -92 L44 -34 L4 -34 Z" fill="#fff" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path d="M-4 -80 L-34 -34 L-4 -34 Z" fill="#ffd23f" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <path d="M-46 -26 L46 -26 L32 0 L-32 0 Z" fill="#ff5d73" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
       </g>
       {/* Plant on top */}
       <g transform={`translate(${x0 + 70} ${top - 10})`}>
@@ -321,7 +365,7 @@ function Shelf() {
       </g>
     </g>
   );
-}
+});
 
 /** The bellows: two boards with folds between, squashed flat by the truck. */
 function Bellows({ tidy, t }: { tidy: Tidy; t: number }) {
@@ -340,7 +384,7 @@ function Bellows({ tidy, t }: { tidy: Tidy; t: number }) {
   );
 }
 
-/** The hose under the shelf to the cushion; the puff of air runs along it as a bulge. */
+/** The hose under the shelf to the heap of socks, ending in an upturned nozzle; each puff of air runs along it as a bulge. */
 function Hose({ tidy, t }: { tidy: Tidy; t: number }) {
   const k = tidy.puff(t);
   const pts = tidy.hose;
@@ -349,28 +393,306 @@ function Hose({ tidy, t }: { tidy: Tidy; t: number }) {
     <g>
       <path d={svgLine(pts)} fill="none" stroke={INK} strokeWidth="13" strokeLinecap="round" />
       <path d={svgLine(pts)} fill="none" stroke="#3ec300" strokeWidth="7" strokeLinecap="round" />
+      <path
+        d={`M${NOZZLE.x - 10} ${NOZZLE.y + 4} L${NOZZLE.x - 14} ${NOZZLE.y - 18} L${NOZZLE.x + 14} ${NOZZLE.y - 18} L${NOZZLE.x + 10} ${NOZZLE.y + 4} Z`}
+        fill="#2f7d4a"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
       {bulge && <ellipse cx={bulge.x} cy={bulge.y} rx="18" ry="12" fill="#3ec300" stroke={INK} strokeWidth="3" />}
     </g>
   );
 }
 
-/** The air cushion: flat, then blown up round all at once. */
+/** The air cushion: blown up round, with its plug on the left; once the plug is out it jumps and goes flat. */
 function Cushion({ tidy, t }: { tidy: Tidy; t: number }) {
   const { x0, x1, flat, full } = CUSHION;
   const h = lerp(flat, full, tidy.cushion(t));
   const mid = (x0 + x1) / 2;
   return (
-    <g>
+    <g transform={`translate(0 ${-tidy.cushionHop(t)})`}>
+      <rect x={PLUG.x + 6} y={FLOOR - h / 2 - 7} width={x0 - PLUG.x} height="14" rx="4" fill="#5fb8f0" stroke={INK} strokeWidth="3" />
       <rect x={x0} y={FLOOR - h} width={x1 - x0} height={h} rx={Math.min(h / 2, 30)} fill="#9fd8ff" stroke={INK} strokeWidth="4" />
       <line x1={mid - 30} y1={FLOOR - h / 2} x2={mid + 30} y2={FLOOR - h / 2} stroke="#fff" strokeWidth="4" strokeLinecap="round" opacity="0.8" />
     </g>
   );
 }
 
+/** The cushion's red plug: in its valve, then knocked out high over the sock ball, lying on the floor. */
+function PlugCap({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { pt, angle } = tidy.capAt(t);
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle})`}>
+      <rect x="-7" y="-10" width="14" height="20" rx="5" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** The air rushing out of the cushion's valve once the plug is out: streaks and little clouds blowing to the left. */
+function AirJet({ tidy, t }: { tidy: Tidy; t: number }) {
+  const age = tidy.jet(t);
+  if (age < 0) return null;
+  const h = lerp(CUSHION.flat, CUSHION.full, tidy.cushion(t));
+  const hole = { x: PLUG.x + 4, y: FLOOR - h / 2 - tidy.cushionHop(t) };
+  const fade = 1 - age / 1.6;
+  return (
+    <g opacity={fade} stroke={INK} strokeWidth="3" strokeLinecap="round">
+      {[-14, 0, 14].map((dy, j) => {
+        const run = (age * 420 + j * 50) % 160;
+        return <line key={dy} x1={hole.x - 20 - run} y1={hole.y + dy * (1 + run / 120)} x2={hole.x - 60 - run} y2={hole.y + dy * (1 + run / 80)} />;
+      })}
+      {[0, 1, 2].map((j) => {
+        const run = (age * 360 + j * 80) % 240;
+        return <circle key={j} cx={hole.x - 30 - run} cy={hole.y - 6 + j * 6} r={6 + run / 20} fill="#fff" strokeWidth="2" opacity={1 - run / 240} />;
+      })}
+    </g>
+  );
+}
+
+/* ---------- Socks and laundry basket ---------- */
+
+/** A sock drawn upright (cuff at the top, toe to the right) round its middle; lying, it is turned by about 90°. */
+function SockShape({ color, stripe }: { color: string; stripe: string }) {
+  return (
+    <g transform="translate(-7 2)">
+      <path d="M-14 -28 L6 -28 L6 4 L18 4 Q28 4 28 14 Q28 24 18 24 L-4 24 Q-14 24 -14 12 Z" fill={color} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <rect x="-14" y="-28" width="20" height="9" fill={stripe} stroke={INK} strokeWidth="2.5" />
+      <rect x="-14" y="-12" width="20" height="6" fill={stripe} />
+      <path d="M18 4 Q28 4 28 14 Q28 24 18 24 Z" fill={stripe} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+    </g>
+  );
+}
+
+function Sock({ k, tidy, t }: { k: number; tidy: Tidy; t: number }) {
+  const { pt, angle } = tidy.sockAt(k, t);
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle})`}>
+      <SockShape color={SOCKS[k].color} stripe={SOCKS[k].stripe} />
+    </g>
+  );
+}
+
+/** The rolled-up sock ball, turning as it flies, bounces and rolls. */
+function SockBall({ tidy, t }: { tidy: Tidy; t: number }) {
+  const { pt, spin } = tidy.sockBallAt(t);
+  const r = SOCK_BALL_R;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${spin})`}>
+      <circle r={r} fill="#ff8c42" stroke={INK} strokeWidth="3.5" />
+      <path d={`M${-r + 4} -6 Q0 -18 ${r - 4} -6`} fill="none" stroke="#ffd23f" strokeWidth="6" strokeLinecap="round" />
+      <path d={`M${-r + 5} 8 Q0 -2 ${r - 5} 8`} fill="none" stroke="#ffd23f" strokeWidth="6" strokeLinecap="round" />
+      <path d={`M-10 ${r - 4} Q-2 6 12 ${r - 6}`} fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+    </g>
+  );
+}
+
+const BASKET_MID = (BASKET.x0 + BASKET.x1) / 2;
+/** The basket's outline: a little narrower at the bottom. */
+const BASKET_OUTLINE = `M${BASKET.x0} ${BASKET.top} L${BASKET.x1} ${BASKET.top} L${BASKET.x1 - 14} ${FLOOR} L${BASKET.x0 + 14} ${FLOOR} Z`;
+/** Rows of holes in the basket's woven front, cut out so the socks inside show through. */
+const BASKET_HOLES = [0, 1, 2]
+  .flatMap((row) =>
+    [0, 1, 2, 3, 4].map((col) => {
+      const y = BASKET.top + 46 + row * 36;
+      const x = BASKET.x0 + 34 + col * 28 + (row % 2) * 6;
+      return `M${x - 8} ${y} a8 12 0 1 0 16 0 a8 12 0 1 0 -16 0 Z`;
+    }),
+  )
+  .join(" ");
+
+/** The inside of the basket, behind the socks; it wobbles with the basket. */
+function BasketBack({ tilt }: { tilt: number }) {
+  return <path d={BASKET_OUTLINE} transform={`rotate(${tilt} ${BASKET_MID} ${FLOOR})`} fill="#1f7f99" />;
+}
+
+/** The basket's front, with holes, a rim and a handle, in front of the socks in it. */
+function BasketFront({ tilt }: { tilt: number }) {
+  return (
+    <g transform={`rotate(${tilt} ${BASKET_MID} ${FLOOR})`}>
+      <path d={`${BASKET_OUTLINE} ${BASKET_HOLES}`} fillRule="evenodd" fill="#48c9e0" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <rect x={BASKET.x0 - 6} y={BASKET.top - 6} width={BASKET.x1 - BASKET.x0 + 12} height="18" rx="7" fill="#48c9e0" stroke={INK} strokeWidth="4" />
+      <rect x={BASKET_MID - 26} y={BASKET.top + 16} width="52" height="12" rx="6" fill="#1f7f99" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+}
+
+/** A little cloud where a puff comes out of the nozzle under the socks. */
+function NozzleBlast({ age }: { age: number }) {
+  if (age < 0) return null;
+  const k = age / 0.4;
+  return (
+    <g opacity={1 - k}>
+      {[-24, 0, 24].map((dx) => (
+        <circle key={dx} cx={NOZZLE.x + dx * (1 + k)} cy={FLOOR - 50 - 50 * k} r={10 + 16 * k} fill="#fff" stroke={INK} strokeWidth="2" />
+      ))}
+    </g>
+  );
+}
+
+/* ---------- Crayons and pencil pot ---------- */
+
+/** The little stool by the wall; drawn once. */
+const Stool = memo(function Stool() {
+  const { x, w, top } = STOOL;
+  return (
+    <g>
+      {[-w / 2 + 14, w / 2 - 28].map((dx) => (
+        <rect key={dx} x={x + dx} y={top + 10} width="14" height={FLOOR - top - 10} rx="5" fill="#ffb703" stroke={INK} strokeWidth="3.5" />
+      ))}
+      <rect x={x - w / 2} y={top} width={w} height="16" rx="6" fill="#8e7dff" stroke={INK} strokeWidth="4" />
+    </g>
+  );
+});
+
+/** A crayon: lying with its tip to the right (turn 0), or standing tip up (−90). */
+function Crayon({ k, tidy, t }: { k: number; tidy: Tidy; t: number }) {
+  const { pt, angle } = tidy.crayonAt(k, t);
+  const { len, th } = CRAYON;
+  const h = th / 2;
+  const body = len / 2 - 12;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle})`}>
+      <polygon points={`${body},${-h} ${len / 2},0 ${body},${h}`} fill={CRAYONS[k].color} stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <rect x={-len / 2} y={-h} width={len / 2 + body} height={th} rx="3" fill={CRAYONS[k].color} stroke={INK} strokeWidth="2.5" />
+      <rect x={-len / 2 + 8} y={-h + 2} width={len - 30} height={th - 4} fill="#fff" opacity="0.5" />
+    </g>
+  );
+}
+
+/** The pencil pot on the stool, in front of the crayons standing in it; it wobbles with each one. */
+function Pot({ tilt }: { tilt: number }) {
+  const { x, w, h } = POT;
+  const top = STOOL.top - h;
+  return (
+    <g transform={`rotate(${tilt} ${x} ${STOOL.top})`}>
+      <rect x={x - w / 2} y={top} width={w} height={h} rx="8" fill="#00b4d8" stroke={INK} strokeWidth="4" />
+      <rect x={x - w / 2 + 2} y={top + 2} width={w - 4} height="10" rx="4" fill="#7fe0f0" />
+      <polygon points={STAR_POINTS} transform={`translate(${x} ${top + h / 2 + 4}) scale(1.3)`} fill="#ffd23f" stroke={INK} strokeWidth="2" />
+    </g>
+  );
+}
+
+/* ---------- Jigsaw puzzle ---------- */
+
+/** The outline of the piece for slot `slot`, in room coordinates: knobs stick out right and down, the neighbours have the matching holes. */
+function piecePath(slot: number) {
+  const col = slot % PUZZLE.cols;
+  const row = Math.floor(slot / PUZZLE.cols);
+  const x0 = PUZZLE.x0 + PUZZLE.frame + col * PUZZLE.w;
+  const y0 = PUZZLE.top + PUZZLE.frame + row * PUZZLE.h;
+  const x1 = x0 + PUZZLE.w;
+  const y1 = y0 + PUZZLE.h;
+  const out = [`M${x0} ${y0}`];
+  /** A straight edge from `a` to `b`, with a knob bulging towards `v` in its middle (none without `v`). */
+  const edge = (a: Pt, b: Pt, v: Pt | null) => {
+    if (v) {
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      const d = { x: (b.x - a.x) / len, y: (b.y - a.y) / len };
+      const m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const m1 = { x: m.x - d.x * 10, y: m.y - d.y * 10 };
+      const m2 = { x: m.x + d.x * 10, y: m.y + d.y * 10 };
+      const c = (q: Pt, s: number) => `${q.x + v.x * 20 + d.x * s} ${q.y + v.y * 20 + d.y * s}`;
+      out.push(`L${m1.x} ${m1.y}`, `C${c(m1, -8)} ${c(m2, 8)} ${m2.x} ${m2.y}`);
+    }
+    out.push(`L${b.x} ${b.y}`);
+  };
+  edge({ x: x0, y: y0 }, { x: x1, y: y0 }, row > 0 ? { x: 0, y: 1 } : null);
+  edge({ x: x1, y: y0 }, { x: x1, y: y1 }, col < PUZZLE.cols - 1 ? { x: 1, y: 0 } : null);
+  edge({ x: x1, y: y1 }, { x: x0, y: y1 }, row < PUZZLE.rows - 1 ? { x: 0, y: 1 } : null);
+  edge({ x: x0, y: y1 }, { x: x0, y: y0 }, col > 0 ? { x: 1, y: 0 } : null);
+  return `${out.join(" ")} Z`;
+}
+const PIECE_PATHS = Array.from({ length: PUZZLE.cols * PUZZLE.rows }, (_, slot) => piecePath(slot));
+/** The inside of the board, where the picture is. */
+const INNER = { x: PUZZLE.x0 + PUZZLE.frame, y: PUZZLE.top + PUZZLE.frame, w: PUZZLE.cols * PUZZLE.w, h: PUZZLE.rows * PUZZLE.h };
+
+/** The puzzle's picture (a smiling sun, a rainbow and a hill) and each piece's cut-out of it; drawn once. */
+const PuzzleDefs = memo(function PuzzleDefs({ ids }: { ids: string }) {
+  const { x, y, w, h } = INNER;
+  const arc = (r: number) => `M${x + 170 - r} ${y + 175} A${r} ${r} 0 0 1 ${x + 170 + r} ${y + 175}`;
+  return (
+    <defs>
+      <clipPath id={`${ids}-inner`}>
+        <rect x={x} y={y} width={w} height={h} />
+      </clipPath>
+      {PIECE_PATHS.map((d, slot) => (
+        <clipPath key={slot} id={`${ids}-piece${slot}`}>
+          <path d={d} />
+        </clipPath>
+      ))}
+      <g id={`${ids}-pic`} clipPath={`url(#${ids}-inner)`}>
+        <rect x={x} y={y} width={w} height={h} fill="#bfe9ff" />
+        {["#ff5d73", "#ffb703", "#3ec300", "#3a86ff"].map((c, k) => (
+          <path key={c} d={arc(125 - 15 * k)} fill="none" stroke={c} strokeWidth="15" />
+        ))}
+        <path
+          d={`M${x} ${y + h} L${x} ${y + 120} Q${x + 80} ${y + 80} ${x + 170} ${y + 130} Q${x + 220} ${y + 110} ${x + w} ${y + 125} L${x + w} ${y + h} Z`}
+          fill="#7ed957"
+          stroke={INK}
+          strokeWidth="3"
+        />
+        <line x1={x + 226} y1={y + 150} x2={x + 226} y2={y + 124} stroke="#2f7d4a" strokeWidth="4" />
+        <circle cx={x + 226} cy={y + 120} r="9" fill="#ff5d73" stroke={INK} strokeWidth="2.5" />
+        <circle cx={x + 226} cy={y + 120} r="3.5" fill="#ffd23f" />
+        {Array.from({ length: 8 }, (_, k) => {
+          const a = (k * Math.PI) / 4;
+          return (
+            <line
+              key={k}
+              x1={x + 52 + 34 * Math.cos(a)}
+              y1={y + 46 + 34 * Math.sin(a)}
+              x2={x + 52 + 44 * Math.cos(a)}
+              y2={y + 46 + 44 * Math.sin(a)}
+              stroke="#ff8c42"
+              strokeWidth="5"
+              strokeLinecap="round"
+            />
+          );
+        })}
+        <circle cx={x + 52} cy={y + 46} r="28" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+        <circle cx={x + 42} cy={y + 40} r="3.5" fill={INK} />
+        <circle cx={x + 62} cy={y + 40} r="3.5" fill={INK} />
+        <path d={`M${x + 40} ${y + 52} Q${x + 52} ${y + 64} ${x + 64} ${y + 52}`} fill="none" stroke={INK} strokeWidth="3" strokeLinecap="round" />
+      </g>
+    </defs>
+  );
+});
+
+/** The wooden puzzle board leaning on the wall: empty holes showing the picture faintly, so it is clear where each piece goes; drawn once. */
+const PuzzleBoard = memo(function PuzzleBoard({ ids }: { ids: string }) {
+  const bottom = PUZZLE.top + 2 * PUZZLE.frame + PUZZLE.rows * PUZZLE.h;
+  return (
+    <g>
+      <rect x={PUZZLE.x0} y={PUZZLE.top} width={PUZZLE_X1 - PUZZLE.x0} height={bottom - PUZZLE.top} rx="10" fill="#e9b872" stroke={INK} strokeWidth="4" />
+      <rect x={INNER.x} y={INNER.y} width={INNER.w} height={INNER.h} fill="#c98d4e" />
+      <use href={`#${ids}-pic`} opacity="0.25" />
+      {PIECE_PATHS.map((d, slot) => (
+        <path key={slot} d={d} fill="none" stroke="#8a5a2b" strokeWidth="2.5" strokeLinejoin="round" />
+      ))}
+    </g>
+  );
+});
+
+/** A puzzle piece: lying flat on the floor (squashed), hopping up and fitting into its hole in the board. */
+function Piece({ i, ids, tidy, t }: { i: number; ids: string; tidy: Tidy; t: number }) {
+  const { pt, angle, flat } = tidy.pieceAt(i, t);
+  const { slot } = PIECES[i];
+  const c = slotCentre(slot);
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle}) scale(1 ${flat}) translate(${-c.x} ${-c.y})`}>
+      <g clipPath={`url(#${ids}-piece${slot})`}>
+        <use href={`#${ids}-pic`} />
+      </g>
+      <path d={PIECE_PATHS[slot]} fill="none" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+    </g>
+  );
+}
+
 /* ---------- Bunny and bed ---------- */
 
-/** The bed, head end on the right, with the pillow. */
-function Bed() {
+/** The bed, head end on the right, with the pillow; drawn once. */
+const Bed = memo(function Bed() {
   const { x0, x1, top } = BED;
   return (
     <g>
@@ -380,7 +702,7 @@ function Bed() {
       <ellipse cx={PILLOW.x} cy={PILLOW.y} rx="80" ry="30" fill="#fff" stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** The blanket: crumpled at the foot of the bed, then spread smoothly up to the bunny's chin. */
 function Blanket({ k }: { k: number }) {

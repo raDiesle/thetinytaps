@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BALL,
@@ -15,16 +15,26 @@ import {
   CRANE,
   DECK1,
   DECK2,
+  EXC,
   FLOOR,
   FOOT_PULLEY,
+  HEAP,
   HOUSE,
+  JACK,
   LIGHT_X,
   MIXER,
+  moundY,
+  onScoop,
+  PILE,
   PIVOT,
   PLUG_X,
   POLE_X,
+  ROLLER,
   ROOF,
   SCAFFOLD_POLES,
+  SCOOP,
+  SHIFT,
+  ARM,
   SPIRIT,
   SPOOL,
   TOP_DECK,
@@ -38,7 +48,7 @@ import {
   crankKnob,
   type Building,
 } from "./building";
-import { deg } from "./machineKit";
+import { deg, rad } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import { DARK_WOOD, INK, MARBLE_COLOR, MID_WOOD, Sparkles, WOOD } from "./scenery";
 import { BALL_R, type Pt } from "./path";
@@ -53,12 +63,16 @@ const BRICK = "#e0533d";
 
 /**
  * The building site: one tap starts the motors, and then one thing sets off
- * the next for about half a minute: the cement mixer tips the marble onto a
+ * the next for about forty seconds: the cement mixer tips the marble onto a
  * spirit level, it rattles down the rubble chute, rides the conveyor belt up
  * and knocks over a traffic cone, which lets the wrecking ball go. The ball
- * smashes a brick tower, which bumps a cable drum along the scaffold onto the
- * winch's crank, and the tower crane lowers the roof onto the house. The camera
- * travels along with whatever moves.
+ * smashes a brick tower, which bumps a cable drum along the scaffold and plop
+ * into a sand pile, over it and against the excavator. The excavator wakes up,
+ * digs a scoop of sand, swings round and tips it in front of the road roller
+ * and pats the roller's roof; the roller puffs off, presses the sand into a
+ * road and bumps the jackhammer, which rattles and hops onto the winch's crank,
+ * and the tower crane lowers the roof onto the house. The camera travels along
+ * with whatever moves.
  */
 export function BuildingLevel(props: LevelProps) {
   const machine = useMemo(buildBuilding, []);
@@ -82,6 +96,7 @@ export function BuildingLevel(props: LevelProps) {
           <Deck2 />
           <Cable machine={machine} t={t} />
           <Tower angle={machine.towerAngle(t)} />
+          <Pile machine={machine} t={t} />
           <Winch turned={machine.crankAt(t)} />
           <Crane drop={machine.roofDrop(t)} />
           <House />
@@ -90,6 +105,12 @@ export function BuildingLevel(props: LevelProps) {
           <TrafficLight green={t >= machine.tGreen} />
           <Truck gone={machine.truckGone(t)} />
           <Spool machine={machine} t={t} />
+          {/* The excavator stands behind the roller, so its arm reaches over it */}
+          <Excavator machine={machine} t={t} />
+          <Road machine={machine} t={t} />
+          <Roller machine={machine} t={t} />
+          <Pour machine={machine} t={t} />
+          <Jackhammer machine={machine} t={t} />
           <Cone angle={machine.coneAngle(t)} />
 
           {!inMixer(t) && <Marble machine={machine} t={t} />}
@@ -145,7 +166,8 @@ function Site({ ids }: { ids: string }) {
       <Cloud x={620} y={90} s={0.8} />
       <Cloud x={2350} y={110} />
       <Cloud x={2980} y={260} s={0.7} />
-      <Cloud x={4700} y={90} s={0.9} />
+      <Cloud x={3900} y={150} s={0.8} />
+      <Cloud x={4700 + SHIFT} y={90} s={0.9} />
       <path
         d={`M-400 ${FLOOR - 120} Q400 ${FLOOR - 260} 1200 ${FLOOR - 140} T2800 ${FLOOR - 150} T4400 ${FLOOR - 130} T${WORLD_W + 400} ${FLOOR - 160} L${WORLD_W + 400} ${FLOOR} L-400 ${FLOOR} Z`}
         fill="#b6e3a0"
@@ -167,10 +189,10 @@ function Site({ ids }: { ids: string }) {
       ))}
       <line x1="-400" y1={FLOOR} x2={WORLD_W + 400} y2={FLOOR} stroke={INK} strokeWidth="4" />
       <SandPile x={1180} w={260} h={70} />
-      <SandPile x={4900} w={300} h={90} />
+      <SandPile x={4900 + SHIFT} w={300} h={90} />
       <Bags x={2470} />
       <TrafficCone x={1160} y={FLOOR} />
-      <TrafficCone x={3600} y={FLOOR} />
+      <TrafficCone x={3600 + SHIFT} y={FLOOR} />
     </g>
   );
 }
@@ -599,6 +621,302 @@ function Spool({ machine, t }: { machine: Building; t: number }) {
         <circle key={k} cx={(r - 6) * Math.cos((k * Math.PI) / 2)} cy={(r - 6) * Math.sin((k * Math.PI) / 2)} r="3.5" fill={DARK_WOOD} />
       ))}
       <circle r="5" fill={INK} />
+    </g>
+  );
+}
+
+/* ---------- Sand pile, excavator, road roller and jackhammer ---------- */
+
+const SAND = "#f2c46d";
+const SAND_DARK = "#d9a650";
+const ROAD = "#5b5b6e";
+
+/** The sand pile, a scoop lower once it is dug, with sand spraying up where the cable drum plopped in. */
+function Pile({ machine, t }: { machine: Building; t: number }) {
+  const h = machine.pileH(t);
+  const { x, w } = PILE;
+  const top: string[] = [];
+  for (let px = x - w; px <= x + w; px += 10) top.push(`${px} ${moundY(x, w, h, px)}`);
+  const age = machine.plofAge(t);
+  const at = machine.spoolAt(machine.tPlof).pt;
+  return (
+    <g>
+      <path d={`M${top.join(" L")} Z`} fill={SAND} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      <path d={`M${x - w * 0.45} ${FLOOR - h * 0.55} q24 -16 48 -12`} stroke="#fff6" strokeWidth="6" fill="none" strokeLinecap="round" />
+      {[-40, 10, 46].map((dx) => (
+        <circle key={dx} cx={x + dx} cy={FLOOR - h * 0.3 + (dx % 3) * 4} r="5" fill={SAND_DARK} />
+      ))}
+      {age >= 0 &&
+        age < 0.7 &&
+        Array.from({ length: 7 }, (_, i) => {
+          const dir = (i - 3) * 34;
+          const k = age / 0.7;
+          return (
+            <circle
+              key={i}
+              cx={at.x + dir * k * 1.4}
+              cy={at.y + SPOOL.r - 10 - 260 * k + 420 * k * k}
+              r={7 - (i % 3)}
+              fill={SAND}
+              stroke={INK}
+              strokeWidth="1.5"
+              opacity={1 - k}
+            />
+          );
+        })}
+    </g>
+  );
+}
+
+/** Little clouds of smoke, each rising and growing from where it was puffed out until it fades. */
+function Puffs({ puffs }: { puffs: { x: number; y: number; age: number }[] }) {
+  return (
+    <g>
+      {puffs.map(({ x, y, age }, i) =>
+        age < 0 || age > 1.4 ? null : (
+          <circle
+            key={i}
+            cx={x + 14 * age + (i % 2 ? 4 : -4) * age}
+            cy={y - 70 * age}
+            r={9 + 20 * age}
+            fill="#eef0f6"
+            stroke={INK}
+            strokeWidth="2"
+            opacity={0.9 * (1 - age / 1.4)}
+          />
+        ),
+      )}
+    </g>
+  );
+}
+
+/** The excavator's tracks, which never turn: drawn once. */
+const Tracks = memo(function Tracks() {
+  const { x, track } = EXC;
+  return (
+    <g>
+      <rect x={x - 60} y={FLOOR - 60} width="120" height="16" rx="4" fill="#4a4a5e" stroke={INK} strokeWidth="3" />
+      <rect x={x - track} y={FLOOR - 48} width={2 * track} height="48" rx="24" fill="#3b3b4f" stroke={INK} strokeWidth="3.5" />
+      {Array.from({ length: 5 }, (_, i) => (
+        <circle key={i} cx={x - track + 26 + (i * (2 * track - 52)) / 4} cy={FLOOR - 24} r="13" fill="#7d7d96" stroke={INK} strokeWidth="2.5" />
+      ))}
+      {Array.from({ length: 12 }, (_, i) => (
+        <line key={i} x1={x - track + 14 + i * 16.5} y1={FLOOR - 48} x2={x - track + 14 + i * 16.5} y2={FLOOR - 42} stroke={INK} strokeWidth="2.5" />
+      ))}
+    </g>
+  );
+});
+
+/** The scoop in its own frame: the wrist at 0 0, its mouth up along +x; full, it holds a heap of sand and stones. */
+function Scoop({ full }: { full: boolean }) {
+  const { mouth, deep } = SCOOP;
+  return (
+    <g>
+      {full && (
+        <g>
+          <path d={`M2 0 Q${mouth / 2} -30 ${mouth - 2} 0 Z`} fill={SAND} stroke={INK} strokeWidth="2.5" />
+          <circle cx={mouth * 0.35} cy="-9" r="5" fill="#9a9aaa" stroke={INK} strokeWidth="1.5" />
+          <circle cx={mouth * 0.65} cy="-6" r="4" fill="#b9bdd6" stroke={INK} strokeWidth="1.5" />
+        </g>
+      )}
+      <path
+        d={`M0 0 L${mouth} 0 Q${mouth + 8} ${deep} ${mouth * 0.4} ${deep} Q-8 ${deep - 4} 0 0 Z`}
+        fill="#5a6b80"
+        stroke={INK}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      <line x1={mouth} y1="0" x2={mouth + 4} y2="-8" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+      <path d={`M10 10 Q${mouth * 0.5} ${deep - 10} ${mouth - 6} 12`} stroke="#fff5" strokeWidth="4" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** The excavator: its top, arm and scoop turn round on the tracks (seen from the side, it flips), and it puffs from its exhaust. */
+function Excavator({ machine, t }: { machine: Building; t: number }) {
+  const { face, shake, e, w, cup, full } = machine.excavatorAt(t);
+  const { s } = ARM;
+  // The cylinder lifting the boom, from the body to a third of the way up the boom.
+  const lift = { x: s.x + (e.x - s.x) * 0.35, y: s.y + (e.y - s.y) * 0.35 };
+  const puffs = machine.exhaust.map((p) => ({ x: EXC.x - 73 * face, y: EXC.y - 112, age: t - p }));
+  const thick = (a: { x: number; y: number }, b: { x: number; y: number }, width: number, color: string) => (
+    <g>
+      <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={INK} strokeWidth={width + 7} strokeLinecap="round" />
+      <line x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke={color} strokeWidth={width} strokeLinecap="round" />
+    </g>
+  );
+  return (
+    <g>
+      <Tracks />
+      <g transform={`translate(${EXC.x} ${EXC.y + shake}) scale(${face} 1)`}>
+        {/* Body with its counterweight and exhaust pipe */}
+        <rect x="-78" y="-112" width="10" height="36" rx="3" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
+        <rect x="-108" y="-80" width="152" height="76" rx="12" fill={YELLOW} stroke={INK} strokeWidth="4" />
+        {[0, 1, 2].map((k) => (
+          <line key={k} x1="-94" y1={-58 + k * 13} x2="-58" y2={-58 + k * 13} stroke="#3b4a5c" strokeWidth="4" strokeLinecap="round" />
+        ))}
+        {/* The cab with its driver */}
+        <rect x="-22" y="-152" width="68" height="84" rx="9" fill={YELLOW} stroke={INK} strokeWidth="4" />
+        <rect x="-12" y="-142" width="48" height="44" rx="6" fill="#bde9ff" stroke={INK} strokeWidth="2.5" />
+        <circle cx="14" cy="-112" r="10" fill="#c98a4b" stroke={INK} strokeWidth="2" />
+        <path d="M2 -116 Q14 -134 26 -116 Z" fill={ORANGE} stroke={INK} strokeWidth="2" />
+        <circle cx="18" cy="-111" r="1.8" fill={INK} />
+        <path d="M-6 -136 l14 -2" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+        {/* The arm: cylinder, boom, stick and scoop */}
+        <line x1="36" y1="-24" x2={lift.x} y2={lift.y} stroke="#4a4a5e" strokeWidth="9" strokeLinecap="round" />
+        <line x1="36" y1="-24" x2={(36 + lift.x) / 2} y2={(-24 + lift.y) / 2} stroke="#d8d8e4" strokeWidth="5" strokeLinecap="round" />
+        {thick(s, e, 22, YELLOW)}
+        {thick(e, w, 15, YELLOW)}
+        <g transform={`translate(${w.x} ${w.y}) rotate(${cup})`}>
+          <Scoop full={full} />
+        </g>
+        {[s, e, w].map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r="6" fill={INK} />
+        ))}
+      </g>
+      <Puffs puffs={puffs} />
+    </g>
+  );
+}
+
+/** Sand and stones pouring out of the tipped scoop onto the heap. */
+function Pour({ machine, t }: { machine: Building; t: number }) {
+  const k = machine.pourAt(t);
+  if (k < 0) return null;
+  const { face, w, cup } = machine.excavatorAt(t);
+  const m = onScoop(w, cup, { x: SCOOP.mouth / 2, y: 0 });
+  const from = { x: EXC.x + face * m.x, y: EXC.y + m.y };
+  const to = FLOOR - machine.heapH(t);
+  return (
+    <g>
+      {Array.from({ length: 12 }, (_, i) => {
+        const f = (k * 3 + i / 12) % 1;
+        const stone = i % 4 === 0;
+        return (
+          <circle
+            key={i}
+            cx={from.x + ((i % 5) - 2) * 6 * f}
+            cy={from.y + (to - from.y) * f * f}
+            r={stone ? 6 : 4}
+            fill={stone ? "#9a9aaa" : SAND}
+            stroke={INK}
+            strokeWidth="1.5"
+          />
+        );
+      })}
+    </g>
+  );
+}
+
+/** The heap of tipped sand, and the flat new road the roller presses out of it. */
+function Road({ machine, t }: { machine: Building; t: number }) {
+  const x0 = HEAP.x - HEAP.w;
+  const end = machine.roadTo(t);
+  const top: string[] = [];
+  for (let x = x0; x <= HEAP.x + HEAP.w; x += 6) top.push(`${x} ${machine.heapY(t, x)}`);
+  return (
+    <g>
+      {end > x0 + 2 && (
+        <g>
+          <rect x={x0} y={FLOOR - 10} width={end - x0} height="12" rx="4" fill={ROAD} stroke={INK} strokeWidth="2.5" />
+          {Array.from({ length: Math.floor((end - x0) / 50) }, (_, i) => (
+            <line key={i} x1={x0 + 16 + i * 50} y1={FLOOR - 4} x2={x0 + 40 + i * 50} y2={FLOOR - 4} stroke="#fff" strokeWidth="3" strokeLinecap="round" />
+          ))}
+        </g>
+      )}
+      {machine.heapH(t) > 0.5 && <path d={`M${top.join(" L")} Z`} fill={SAND} stroke={INK} strokeWidth="3" strokeLinejoin="round" />}
+    </g>
+  );
+}
+
+/** The road roller: big drum in front, driver under a red roof, puffing from its chimney; patted, it squashes and springs back. */
+function Roller({ machine, t }: { machine: Building; t: number }) {
+  const { x, lift, turned, squash } = machine.rollerAt(t);
+  const r = ROLLER.drum;
+  const puffs = machine.chimney.map((p) => {
+    const at = machine.rollerAt(Math.max(0, p));
+    return { x: at.x - 164, y: FLOOR - at.lift - 140, age: t - p };
+  });
+  const spin = deg(turned / r);
+  return (
+    <g>
+      <g transform={`translate(${x} ${FLOOR - lift}) scale(${1 + squash * 0.5} ${1 - squash})`}>
+        {/* The rear wheel */}
+        <g transform={`translate(-135 -34) rotate(${deg(turned / 34)})`}>
+          <circle r="34" fill="#3b3b4f" stroke={INK} strokeWidth="3" />
+          <circle r="13" fill="#d8d8e4" />
+          <line x1="-28" y1="0" x2="28" y2="0" stroke="#d8d8e4" strokeWidth="4" />
+        </g>
+        {/* Chimney, body, canopy and driver */}
+        <rect x="-170" y="-140" width="12" height="44" rx="3" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
+        <rect x="-178" y="-100" width="130" height="64" rx="9" fill={YELLOW} stroke={INK} strokeWidth="4" />
+        {[0, 1].map((k) => (
+          <line key={k} x1="-166" y1={-80 + k * 14} x2="-130" y2={-80 + k * 14} stroke="#3b4a5c" strokeWidth="4" strokeLinecap="round" />
+        ))}
+        <rect x="-132" y="-120" width="28" height="20" rx="4" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
+        <rect x="-124" y="-146" width="22" height="28" rx="6" fill={ORANGE} stroke={INK} strokeWidth="2.5" />
+        <circle cx="-112" cy="-156" r="11" fill="#c98a4b" stroke={INK} strokeWidth="2" />
+        <path d="M-125 -160 Q-112 -178 -99 -160 Z" fill="#fff" stroke={INK} strokeWidth="2" />
+        <circle cx="-107" cy="-155" r="1.8" fill={INK} />
+        <path d="M-98 -128 L-84 -116" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+        <ellipse cx="-84" cy="-116" rx="9" ry="3" fill="#4a4a5e" stroke={INK} strokeWidth="2" />
+        {[-160, -64].map((px) => (
+          <g key={px}>
+            <line x1={px} y1="-100" x2={px} y2="-202" stroke={INK} strokeWidth="8" />
+            <line x1={px} y1="-100" x2={px} y2="-202" stroke={YELLOW} strokeWidth="4" />
+          </g>
+        ))}
+        <rect x="-172" y="-215" width="120" height="16" rx="5" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+        {/* The big drum under its hood, held by the side plate */}
+        <g transform={`translate(0 ${-r}) rotate(${spin})`}>
+          <circle r={r} fill="#b9bdd6" stroke={INK} strokeWidth="4" />
+          <circle r={r - 12} fill="#d8d8e4" stroke={INK} strokeWidth="2" />
+          {[0, 60, 120].map((a) => (
+            <line
+              key={a}
+              x1={(r - 12) * Math.cos(rad(a))}
+              y1={(r - 12) * Math.sin(rad(a))}
+              x2={-(r - 12) * Math.cos(rad(a))}
+              y2={-(r - 12) * Math.sin(rad(a))}
+              stroke="#9fa3bd"
+              strokeWidth="4"
+            />
+          ))}
+        </g>
+        <path d={`M${-r - 6} ${-r - 4} A${r + 8} ${r + 8} 0 0 1 ${r + 6} ${-r - 4}`} fill="none" stroke={INK} strokeWidth="14" strokeLinecap="round" />
+        <path d={`M${-r - 6} ${-r - 4} A${r + 8} ${r + 8} 0 0 1 ${r + 6} ${-r - 4}`} fill="none" stroke={YELLOW} strokeWidth="8" strokeLinecap="round" />
+        <path d={`M-52 -92 L-4 ${-r - 10} L-4 ${-r + 10} L-52 -44 Z`} fill={YELLOW} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        <circle cx="0" cy={-r} r="10" fill={YELLOW} stroke={INK} strokeWidth="3" />
+      </g>
+      <Puffs puffs={puffs} />
+    </g>
+  );
+}
+
+/** The jackhammer: chisel, red body and handlebar; while it runs it shakes, with little lines round its chisel. */
+function Jackhammer({ machine, t }: { machine: Building; t: number }) {
+  const { tip, lean, buzz } = machine.jackAt(t);
+  const { w, h } = JACK;
+  return (
+    <g transform={`translate(${tip.x} ${tip.y}) rotate(${deg(lean)})`}>
+      {buzz !== 0 &&
+        [-1, 1].map((side) => (
+          <g key={side} stroke={INK} strokeWidth="3" strokeLinecap="round">
+            <line x1={side * 12} y1="-6" x2={side * 24} y2="-12" />
+            <line x1={side * 13} y1="-18" x2={side * 26} y2="-22" />
+          </g>
+        ))}
+      <g transform={`translate(${buzz * 0.4} ${buzz})`}>
+        <path d="M-5 -36 L5 -36 L5 -7 L0 1 L-5 -7 Z" fill="#b9bdd6" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+        <rect x="-12" y="-46" width="24" height="12" rx="3" fill="#4a4a5e" stroke={INK} strokeWidth="2.5" />
+        <rect x={-w / 2} y={-h + 14} width={w} height={h - 58} rx="9" fill={BRICK} stroke={INK} strokeWidth="3.5" />
+        <line x1={-w / 2 + 7} y1={-h + 30} x2={w / 2 - 7} y2={-h + 30} stroke={YELLOW} strokeWidth="5" strokeLinecap="round" />
+        <path d={`M${-w / 2 + 8} ${-h + 44} L${-w / 2 + 8} ${-60}`} stroke="#fff6" strokeWidth="4" strokeLinecap="round" />
+        <rect x="-44" y={-h} width="88" height="13" rx="6" fill="#4a4a5e" stroke={INK} strokeWidth="3" />
+        {[-1, 1].map((side) => (
+          <rect key={side} x={side > 0 ? 26 : -46} y={-h - 3} width="20" height="19" rx="7" fill="#3b3b4f" stroke={INK} strokeWidth="2.5" />
+        ))}
+      </g>
     </g>
   );
 }

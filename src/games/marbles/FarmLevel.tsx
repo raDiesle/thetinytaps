@@ -1,22 +1,28 @@
-import { useEffect, useId, useMemo } from "react";
+import { memo, useEffect, useId, useMemo } from "react";
 import { loadRecordings } from "@/lib/sfx";
 import {
   BALE,
   BARN,
   BARN_MID,
   buildFarm,
+  CAN,
   CAT,
   COW,
   DOG_END,
+  DONKEY,
   DUCKS,
   FARM_SOUNDS,
   type Farm,
   FLOOR,
   KENNEL,
+  MOO_MOUTH,
+  MOO_RING_GROW,
+  MOO_RING_R0,
   PLANK,
   POND,
   POST,
   PUDDLE,
+  ROCKS,
   SINGERS,
   WORLD_W,
   YARN_R,
@@ -36,9 +42,12 @@ const BEAK = "#ff8c42";
 /**
  * Level: the farm machine (R-06). Every link of the chain is an animal: one
  * tap, and the rooster crows, the pig jumps into the puddle, the mud wakes the
- * cat, her ball of wool rolls onto the cow's nose, the moo wakes the dog, the
- * dog chases the ducks onto the barn roof, the barn doors open, and all the
- * animals sing together. The camera walks along the farmyard.
+ * cat, her ball of wool rolls onto the cow's nose, the moo wakes the goat, who
+ * hops down her rocks and butts the milk can (twice – the first time it only
+ * wobbles) into the kennel, the dog comes out and chases the ducks onto the
+ * donkey's back, the donkey brays „I-aah“ and kicks the barn, the ducks fly
+ * up onto its roof, the barn doors open, and all the animals sing together.
+ * The camera walks along the farmyard.
  */
 export function FarmLevel(props: LevelProps) {
   const farm = useMemo(buildFarm, []);
@@ -63,9 +72,13 @@ export function FarmLevel(props: LevelProps) {
           <Cat farm={farm} t={t} />
           <Mud farm={farm} t={t} />
           <Cow farm={farm} t={t} />
+          <Rocks />
+          <Goat farm={farm} t={t} />
           <Kennel farm={farm} t={t} />
+          <MilkCan farm={farm} t={t} />
           <Pond />
           <Barn farm={farm} t={t} still={still(t)} />
+          <Donkey farm={farm} t={t} still={still(t)} />
           <Dog farm={farm} t={t} still={still(t)} />
           {Array.from({ length: DUCKS }, (_, i) => (
             <Duck key={i} farm={farm} i={i} t={t} still={still(t)} />
@@ -394,23 +407,125 @@ function Cow({ farm, t }: { farm: Farm; t: number }) {
   );
 }
 
-/** Rings of the moo, rolling out over the meadow to the kennel. */
+/** Rings of the moo, rolling out over the meadow to the goat. */
 function MooRings({ farm, t }: { farm: Farm; t: number }) {
-  const mouth = { x: COW.x - 285, y: FLOOR - 150 };
   return (
     <g fill="none" stroke="#fff">
       {[0, 1, 2].map((i) => {
         const k = farm.mooRing(i, t);
         if (k <= 0 || k >= 1) return null;
-        return <circle key={i} cx={mouth.x} cy={mouth.y} r={40 + 760 * easeOut(k)} strokeWidth={14 * (1 - k) + 2} opacity={1 - k} />;
+        return <circle key={i} cx={MOO_MOUTH.x} cy={MOO_MOUTH.y} r={MOO_RING_R0 + MOO_RING_GROW * easeOut(k)} strokeWidth={14 * (1 - k) + 2} opacity={1 - k} />;
       })}
     </g>
   );
 }
 
-/** The kennel: it shakes when the moo arrives; before that the dog's sleepy head looks out of the door. */
+/** The goat's three stone steps, drawn once: the lower ones in front. */
+const Rocks = memo(function Rocks() {
+  return (
+    <g stroke={INK} strokeWidth="4" strokeLinejoin="round">
+      {ROCKS.map((r, i) => (
+        <g key={r.x0}>
+          <rect x={r.x0} y={r.top} width={r.x1 - r.x0} height={FLOOR - r.top + 6} rx="26" fill={i % 2 ? "#a7a9bd" : "#b9bbcd"} />
+          <path d={`M${r.x0 + 26} ${r.top + 22} q24 -10 44 0`} fill="none" stroke="#dfe0ea" strokeWidth="6" strokeLinecap="round" />
+          <path d={`M${r.x1 - 34} ${r.top + 40} l-12 22 l10 14`} fill="none" strokeWidth="3" strokeLinecap="round" />
+          <path d={`M${r.x0 + 14} ${r.top + 6} q8 -16 16 0 q8 -14 14 2`} fill="#7cc94e" strokeWidth="3" />
+        </g>
+      ))}
+    </g>
+  );
+});
+
+/** A little yellow star circling over a dizzy head. */
+function DizzyStar({ x, y }: { x: number; y: number }) {
+  return (
+    <path
+      d={`M${x} ${y - 12} L${x + 4} ${y - 4} L${x + 12} ${y} L${x + 4} ${y + 4} L${x} ${y + 12} L${x - 4} ${y + 4} L${x - 12} ${y} L${x - 4} ${y - 4} Z`}
+      fill="#ffd60a"
+    />
+  );
+}
+
+/**
+ * The goat, side on, looking right: dozing on the top step, up with a start at the moo, hopping down,
+ * then horns forward at the milk can – a shake of the head after the first butt, stars after the second.
+ */
+function Goat({ farm, t }: { farm: Farm; t: number }) {
+  const g = farm.goatAt(t);
+  const running = (t >= farm.tCharge1 && t < farm.tButt1) || (t >= farm.tCharge && t < farm.tButt);
+  const stride = running ? 26 * Math.sin(t * 24) : 0;
+  const fur = "#f3efe6";
+  const horn = "#c9a96e";
+  return (
+    <g transform={`translate(${g.pt.x} ${g.pt.y})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
+      <path d="M-54 -88 l-16 -22 l12 2 Z" fill={fur} />
+      {[-40, -22, 26, 44].map((x, i) => (
+        <g key={x} transform={`rotate(${i % 2 ? stride : -stride} ${x} -56)`}>
+          <rect x={x - 6} y="-56" width="12" height="56" rx="5" fill={fur} />
+          <rect x={x - 6} y="-10" width="12" height="10" rx="3" fill="#5b4636" />
+        </g>
+      ))}
+      <ellipse cx="0" cy="-80" rx="60" ry="32" fill={fur} />
+      <ellipse cx="-14" cy="-66" rx="26" ry="9" fill="#e6dccb" stroke="none" />
+      <g transform={`rotate(${44 * g.head + 9 * g.shake} 40 -94)`}>
+        <path d="M30 -102 L56 -150 L80 -132 L58 -88 Z" fill={fur} />
+        {[0, 10].map((dx) => (
+          <g key={dx}>
+            <path d={`M${58 + dx} -158 Q${50 + dx} -196 ${24 + dx} -186`} fill="none" stroke={INK} strokeWidth="13" strokeLinecap="round" />
+            <path d={`M${58 + dx} -158 Q${50 + dx} -196 ${24 + dx} -186`} fill="none" stroke={horn} strokeWidth="7" strokeLinecap="round" />
+          </g>
+        ))}
+        <ellipse cx="44" cy="-152" rx="20" ry="8" fill={fur} transform="rotate(-24 44 -152)" />
+        <ellipse cx="76" cy="-146" rx="26" ry="21" fill={fur} transform="rotate(32 76 -146)" />
+        <ellipse cx="92" cy="-128" rx="14" ry="12" fill="#eadbc8" />
+        <circle cx="98" cy="-132" r="2.5" fill={INK} stroke="none" />
+        <path d="M84 -116 l-4 26 l14 -22 Z" fill="#ddd3c3" />
+        {g.awake ? (
+          <>
+            <circle cx="76" cy="-152" r="8" fill="#fff" strokeWidth="3" />
+            <rect x="71" y="-153.5" width="10" height="3" rx="1.5" fill={INK} stroke="none" />
+          </>
+        ) : (
+          <path d="M69 -152 q7 5 14 0" fill="none" strokeLinecap="round" strokeWidth="3" />
+        )}
+      </g>
+      {g.dizzy > 0.05 &&
+        [0, 1, 2].map((i) => {
+          const a = t * 6 + i * 2.1;
+          return (
+            <g key={i} opacity={g.dizzy} strokeWidth="2.5">
+              <DizzyStar x={70 + 44 * Math.cos(a)} y={-196 + 12 * Math.sin(a)} />
+            </g>
+          );
+        })}
+    </g>
+  );
+}
+
+/** The milk can: it rocks after the goat's first butt, then tumbles over and over into the kennel. */
+function MilkCan({ farm, t }: { farm: Farm; t: number }) {
+  const { pt, angle } = farm.canAt(t);
+  const rock = farm.canRock(t);
+  const half = CAN.h / 2;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${angle}) rotate(${rock} 0 ${half})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
+      <rect x={-CAN.w / 2} y={-half + 26} width={CAN.w} height={CAN.h - 26} rx="8" fill="#d6dde3" />
+      <path
+        d={`M${-CAN.w / 2} ${-half + 30} Q${-CAN.w / 2} ${-half + 16} -15 ${-half + 12} H15 Q${CAN.w / 2} ${-half + 16} ${CAN.w / 2} ${-half + 30} Z`}
+        fill="#d6dde3"
+      />
+      <rect x="-14" y={-half + 4} width="28" height="10" fill="#c3ccd3" />
+      <rect x="-20" y={-half} width="40" height="9" rx="3" fill="#a9b4bd" />
+      <rect x={-CAN.w / 2} y="2" width={CAN.w} height="12" fill="#e63946" />
+      <path d={`M${-CAN.w / 2 - 2} ${-half + 34} q-12 10 0 20 M${CAN.w / 2 + 2} ${-half + 34} q12 10 0 20`} fill="none" strokeWidth="5" strokeLinecap="round" />
+      <path d={`M${-CAN.w / 2 + 12} ${-half + 40} V${half - 16}`} stroke="#f4f7f9" strokeWidth="6" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/** The kennel: it shakes when the milk can bumps into it; before that the dog's sleepy head looks out of the door. */
 function Kennel({ farm, t }: { farm: Farm; t: number }) {
-  const shake = wobble(t - (farm.tDog - 0.35), 5, 36, 4);
+  const shake = wobble(t - farm.tKennelHit, 5, 36, 4);
   const mid = (KENNEL.x0 + KENNEL.x1) / 2;
   return (
     <g transform={`rotate(${shake} ${mid} ${FLOOR})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
@@ -462,6 +577,74 @@ function Dog({ farm, t, still }: { farm: Farm; t: number; still: number }) {
   );
 }
 
+/**
+ * The donkey, side on, facing left, his rump to the barn: his back gives under each duck landing on it, he stamps,
+ * lifts his head for „I-aah“, and kicks the barn wall with his hind legs. At the end he sings along.
+ */
+function Donkey({ farm, t, still }: { farm: Farm; t: number; still: number }) {
+  const d = farm.donkeyAt(t);
+  const mouth = Math.max(d.mouth, farm.singing(5, t));
+  const sway = still >= farm.tChoir ? 4 * Math.sin(still * 5 + 5) : 0;
+  const grey = "#a39e9a";
+  const light = "#e8e1d8";
+  const { hip, pivot } = DONKEY;
+  // The ears prick up with each duck and lie back while he brays.
+  const ears = -1.6 * d.dip + 26 * d.head;
+  return (
+    <g transform={`translate(${DONKEY.x} ${FLOOR}) rotate(${d.tilt + sway} ${pivot.x} ${pivot.y})`} stroke={INK} strokeWidth="4" strokeLinejoin="round">
+      <g transform={`rotate(${d.swing} ${hip.x} ${hip.y})`}>
+        {[-12, 14].map((dx) => (
+          <g key={dx}>
+            <rect x={hip.x + dx - 11} y={hip.y} width="22" height={DONKEY.leg} rx="8" fill={grey} />
+            <rect x={hip.x + dx - 11} y={hip.y + DONKEY.leg - 16} width="22" height="16" rx="4" fill={INK} />
+          </g>
+        ))}
+      </g>
+      {[-82, -50].map((x, i) => (
+        <g key={x} transform={`rotate(${i ? 0 : 38 * d.stamp} ${x} -122)`}>
+          <rect x={x - 11} y="-125" width="22" height="125" rx="8" fill={grey} />
+          <rect x={x - 11} y="-16" width="22" height="16" rx="4" fill={INK} />
+        </g>
+      ))}
+      <g transform={`translate(0 ${d.dip})`}>
+        <path d="M108 -176 Q132 -136 120 -96" fill="none" strokeWidth="7" strokeLinecap="round" />
+        <path d="M120 -104 q-12 6 -6 26 q16 -2 14 -26 Z" fill={INK} />
+        <ellipse cx="0" cy={DONKEY.back.y} rx={DONKEY.back.rx} ry={DONKEY.back.ry} fill={grey} />
+        <ellipse cx="-6" cy="-116" rx="74" ry="16" fill={light} stroke="none" />
+        <path d="M-40 -198 q16 -8 30 0" fill="none" stroke="#5b5552" strokeWidth="5" strokeLinecap="round" />
+        <g transform={`rotate(${10 * d.head} -88 -170)`}>
+          <path d="M-60 -196 L-140 -262 L-172 -222 L-96 -134 Z" fill={grey} />
+          <path
+            d="M-64 -202 L-70 -222 L-80 -214 L-86 -234 L-96 -226 L-102 -246 L-112 -238 L-118 -258 L-128 -250 L-134 -270 L-140 -264"
+            fill="none"
+            stroke="#4a3b3b"
+            strokeWidth="8"
+            strokeLinecap="round"
+          />
+          {/* For „I-aah“ he throws his head back, nose up. */}
+          <g transform={`rotate(${34 * d.head} -150 -240)`}>
+            <ellipse cx="-142" cy="-300" rx="11" ry="44" fill={grey} transform={`rotate(${-14 + ears} -142 -262)`} />
+            <ellipse cx="-122" cy="-296" rx="11" ry="44" fill={grey} transform={`rotate(${10 + ears} -122 -258)`} />
+            <ellipse cx="-122" cy="-298" rx="5" ry="30" fill="#c9a3a8" stroke="none" transform={`rotate(${10 + ears} -122 -258)`} />
+            <ellipse cx="-178" cy="-226" rx="60" ry="32" fill={grey} transform="rotate(-32 -178 -226)" />
+            <ellipse cx="-222" cy="-196" rx="28" ry="24" fill={light} />
+            <circle cx="-236" cy="-204" r="3.5" fill={INK} stroke="none" />
+            <ellipse cx="-222" cy="-174" rx="13" ry={2 + 12 * mouth} fill="#8a3355" />
+            {t >= farm.tLand(0) ? (
+              <>
+                <circle cx="-174" cy="-240" r="9" fill="#fff" strokeWidth="3" />
+                <circle cx="-177" cy="-240" r="4" fill={INK} stroke="none" />
+              </>
+            ) : (
+              <path d="M-182 -240 q8 5 16 0" fill="none" strokeLinecap="round" strokeWidth="3" />
+            )}
+          </g>
+        </g>
+      </g>
+    </g>
+  );
+}
+
 /** The duck pond further back in the meadow, with reeds. */
 function Pond() {
   return (
@@ -480,14 +663,14 @@ function Pond() {
   );
 }
 
-/** A duck, side on, looking right: on the pond, in the air with beating wings, then on the barn roof, singing along at the end. */
+/** A duck, side on, looking right: on the pond, in the air with beating wings, on the donkey's back, with a somersault onto the barn roof, singing along at the end. */
 function Duck({ farm, i, t, still }: { farm: Farm; i: number; t: number; still: number }) {
-  const { pt, flying } = farm.duckAt(i, t);
+  const { pt, flying, spin } = farm.duckAt(i, t);
   const flap = flying ? 40 * Math.sin(t * 24 + i) : 0;
   const mouth = farm.singing(4, t);
   const bob = mouth * 4 * Math.sin(still * 12 + i);
   return (
-    <g transform={`translate(${pt.x} ${pt.y - bob}) scale(1.4)`} stroke={INK} strokeWidth="3" strokeLinejoin="round">
+    <g transform={`translate(${pt.x} ${pt.y - bob}) rotate(${spin} 0 -25) scale(1.4)`} stroke={INK} strokeWidth="3" strokeLinejoin="round">
       <path d="M-34 -22 L-48 -34 L-30 -12 Z" fill="#fff" />
       <ellipse cx="0" cy="-18" rx="36" ry="22" fill="#fff" />
       <path d="M-14 -24 q20 -12 34 4 q-16 12 -34 -4 Z" fill="#e9f2ff" transform={`rotate(${-flap} -6 -22)`} />
@@ -508,8 +691,10 @@ function Barn({ farm, t, still }: { farm: Farm; t: number; still: number }) {
   const half = (BARN.door1 - BARN.door0) / 2;
   const doorH = FLOOR - BARN.doorTop;
   const swing = Math.cos(open * Math.PI * 0.94);
+  // The donkey's kick shakes the whole barn.
+  const shake = wobble(t - farm.tKick, 1.2, 26, 3.5);
   return (
-    <g stroke={INK} strokeWidth="5" strokeLinejoin="round">
+    <g transform={`rotate(${shake} ${BARN_MID} ${FLOOR})`} stroke={INK} strokeWidth="5" strokeLinejoin="round">
       <rect x={BARN.x0} y={BARN.wallTop} width={BARN.x1 - BARN.x0} height={FLOOR - BARN.wallTop} fill={BARN_RED} />
       <path d={`M${BARN.x0 - 40} ${BARN.wallTop} L${BARN_MID} ${BARN.peak} L${BARN.x1 + 40} ${BARN.wallTop} Z`} fill="#7b2d26" />
       <circle cx={BARN_MID} cy={BARN.wallTop - 70} r="34" fill="#ffe8a3" />
@@ -605,6 +790,7 @@ function ChoirNotes({ farm, t }: { farm: Farm; t: number }) {
     { x: SINGERS[2].x, y: FLOOR - 150 },
     { x: DOG_END + 70, y: FLOOR - 160 },
     { x: BARN_MID, y: BARN.peak - 80 },
+    { x: DONKEY.x - 200, y: FLOOR - 330 },
   ];
   return (
     <g>

@@ -288,4 +288,4 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
-   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`, `?level=<n>` on `/socken/`.
+   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/` (the card tapped starts that level), `?level=<n>` on `/socken/`.
