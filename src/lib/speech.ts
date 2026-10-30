@@ -6,8 +6,6 @@ import { silent } from "./silent";
 // compact system ones. Voices matching none of these come last.
 const VOICE_RANKING = [/Google/, /Natural/, /Premium/, /Enhanced|Erweitert/, /Anna|Petra|Helena|Katja|Markus|Yannick|Viktor/];
 
-const VOICE_NAME_KEY = "tinytaps.voice.v1";
-
 function supported() {
   return typeof window !== "undefined" && "speechSynthesis" in window;
 }
@@ -19,7 +17,7 @@ const rank = (voice: SpeechSynthesisVoice) => {
 
 /**
  * Voices for `lang` (e.g. "de-DE"), nicest first. Empty if the browser has
- * none, or hasn't loaded them yet (see onVoicesChanged).
+ * none, or hasn't loaded them yet.
  */
 export function voicesFor(lang: string): SpeechSynthesisVoice[] {
   if (!supported()) return [];
@@ -30,37 +28,13 @@ export function voicesFor(lang: string): SpeechSynthesisVoice[] {
     .sort((a, b) => rank(a) - rank(b));
 }
 
-/** Calls `callback` when the browser has (re)loaded its voices; returns an unsubscribe function. */
-export function onVoicesChanged(callback: () => void) {
-  if (!supported()) return () => {};
-  window.speechSynthesis.addEventListener("voiceschanged", callback);
-  return () => window.speechSynthesis.removeEventListener("voiceschanged", callback);
-}
-
-/** Name of the voice chosen by the parent, if any. */
-export function savedVoiceName(): string | null {
-  try {
-    return localStorage.getItem(VOICE_NAME_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function saveVoiceName(name: string) {
-  try {
-    localStorage.setItem(VOICE_NAME_KEY, name);
-  } catch {
-    // Storage disabled: the default voice is used next time.
-  }
-}
-
 /**
- * The chosen voice for `lang`, else the nicest one, else null. Without network
+ * The nicest voice for `lang`, else null. Without network
  * only voices on the device itself (the online "Google" ones stay silent offline).
  */
 export function pickVoice(lang: string): SpeechSynthesisVoice | null {
   const voices = voicesFor(lang).filter((v) => navigator.onLine || v.localService);
-  return voices.find((v) => v.name === savedVoiceName()) ?? voices[0] ?? null;
+  return voices[0] ?? null;
 }
 
 /**

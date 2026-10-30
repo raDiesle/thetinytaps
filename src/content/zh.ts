@@ -296,7 +296,6 @@ export const zh: LanguagePack = {
   keyboardRows: ["1234567890", "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"],
   countSentence,
   praise: ["真棒！", "太好了！", "好厉害！", "耶！", "哇！"],
-  firstLetterPrompt: (word) => `${word.word}！${word.word}是哪个字母开头的？`,
   colors: withPinyin<ColorWord>(de.colors, {
     "🔴": ["红色", "hóngsè"],
     "🔵": ["蓝色", "lánsè"],

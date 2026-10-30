@@ -260,7 +260,6 @@ export const ar: LanguagePack = {
   exampleLetter: "ب",
   countSentence,
   praise: ["رائع!", "ممتاز!", "مرحى!", "عظيم!", "يا سلام!"],
-  firstLetterPrompt: (word) => `${word.word}! بأي حرف تبدأ ${word.word}؟`,
   colors: relabel(de.colors, {
     "🔴": "أحمر",
     "🔵": "أزرق",

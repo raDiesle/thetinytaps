@@ -62,7 +62,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abenteuer/",
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme liest die Browserstimme. Eine Geschichte ohne Übersetzung spricht Deutsch.",
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch. Der Satz zu 🎵 und 🌐 in „Über das Spiel“ nur auf Deutsch (Oktober 2026).",
     parts: [
       {
         label: "🏝️ Die Schatzinsel",
@@ -79,12 +79,20 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/gefuehle/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
+    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten. „Erwachsene erzählen die Geschichte anhand der Bilder.“ in „Über das Spiel“ nur auf Deutsch (Oktober 2026).",
   },
   {
     href: "/kettenreaktion/",
     parts: [
-      { label: "🎢 Die anderen zwölf Level", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+      {
+        label: "🎢 Kugelbahn, Nagelbrett, Hatschi-Kette, Wasserbahn",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "⚙️ Alles fällt um und die sieben übersetzten Maschinen",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Längere Maschinen (Oktober 2026): Salzstreuer, Vase, Thermoskanne und Besen sowie die neuen Sätze (Papierflieger, Pfannkuchen, Walze, Ufo, Hase an der Wand) nur auf Deutsch.",
+      },
       { label: "🛁 Badezimmer", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze der Maschine nur auf Deutsch (R-05)." },
       { label: "🐓 Bauernhof", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze unterwegs nur auf Deutsch." },
       { label: "🌙 Gute-Nacht-Maschine", languages: { de: "done" }, note: "Name, erster Satz und Gute-Nacht-Sätze nur auf Deutsch (R-07, Oktober 2026)." },
@@ -140,8 +148,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/buchstaben/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Gespielt wird ganz übersetzt; noch deutsch sind seit den Optionen im Spiel (Oktober 2026) „Weiter spielen“, „Spielart“, „Was tippen?“, „Nur Zahlen“, „Ziffer erst zeigen, …“ und drei Absätze in „Über das Spiel“ (Optionen im Spiel, Nur Zahlen, Erster Buchstabe). Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
   },
   {
     href: "/zaehne/",
@@ -198,7 +206,17 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
+    parts: [
+      {
+        label: "🏠 Startseite, Menüs und Einstellungen",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "📝 Zeilen für Eltern unter den Karten",
+        languages: { de: "done" },
+        note: "Nur auf Tablet und Computer zu sehen (`blurb` in games.ts); ohne Übersetzung stehen sie auf Deutsch da.",
+      },
+    ],
   },
 ];

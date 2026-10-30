@@ -1,6 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 import { HORIZON, depthScale, onFloor } from "../layout";
 import { STEEL } from "../shared";
+import { Poke } from "../spots";
 
 // The back wall: warm paint at the top, a mint wainscot with a white rail below, a painted
 // rainbow and pinned drawings in the waiting room. The waiting chairs stand under the window.
@@ -38,25 +39,29 @@ function FloorTiles() {
 function Chair({ x, y, colour, dark }: { x: number; y: number; colour: string; dark: string }) {
   const s = depthScale(y);
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path d="M-50 -110 L-56 0 M50 -110 L56 0" stroke={STEEL} strokeWidth="8" strokeLinecap="round" />
-      <path d="M-36 -110 L-40 -14 M36 -110 L40 -14" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" />
-      <rect x="-62" y="-250" width="124" height="120" rx="30" fill={colour} />
-      <path d="M-44 -232 Q-50 -190 -44 -150" stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.35" />
-      <path d="M-66 -132 H66 Q70 -104 58 -100 H-58 Q-70 -104 -66 -132 Z" fill={dark} />
-      <rect x="-66" y="-140" width="132" height="20" rx="10" fill={colour} />
-    </g>
+    <Poke kind="wobble">
+      <g transform={`translate(${x} ${y}) scale(${s})`}>
+        <path d="M-50 -110 L-56 0 M50 -110 L56 0" stroke={STEEL} strokeWidth="8" strokeLinecap="round" />
+        <path d="M-36 -110 L-40 -14 M36 -110 L40 -14" stroke="#adb5bd" strokeWidth="6" strokeLinecap="round" />
+        <rect x="-62" y="-250" width="124" height="120" rx="30" fill={colour} />
+        <path d="M-44 -232 Q-50 -190 -44 -150" stroke="#fff" strokeWidth="8" strokeLinecap="round" fill="none" opacity="0.35" />
+        <path d="M-66 -132 H66 Q70 -104 58 -100 H-58 Q-70 -104 -66 -132 Z" fill={dark} />
+        <rect x="-66" y="-140" width="132" height="20" rx="10" fill={colour} />
+      </g>
+    </Poke>
   );
 }
 
 /** A child's drawing pinned to the wall. */
 function Drawing({ x, y, tilt, children }: { x: number; y: number; tilt: number; children: ReactNode }) {
   return (
-    <g transform={`rotate(${tilt} ${x + 30} ${y + 24})`}>
-      <rect x={x} y={y} width="60" height="48" rx="3" fill="#fff" stroke="#e9ecef" strokeWidth="2" />
-      {children}
-      <circle cx={x + 30} cy={y + 4} r="4" fill="#ff6b6b" />
-    </g>
+    <Poke kind="wobble">
+      <g transform={`rotate(${tilt} ${x + 30} ${y + 24})`}>
+        <rect x={x} y={y} width="60" height="48" rx="3" fill="#fff" stroke="#e9ecef" strokeWidth="2" />
+        {children}
+        <circle cx={x + 30} cy={y + 4} r="4" fill="#ff6b6b" />
+      </g>
+    </Poke>
   );
 }
 
@@ -64,12 +69,14 @@ function Drawing({ x, y, tilt, children }: { x: number; y: number; tilt: number;
 function Foot({ x, y, colour }: { x: number; y: number; colour: string }) {
   const s = depthScale(y);
   return (
-    <g transform={`translate(${x} ${y}) scale(${s} ${s * 0.45})`} fill={colour}>
-      <ellipse cx="0" cy="0" rx="13" ry="22" />
-      {[-10, -4, 2, 8].map((dx, i) => (
-        <circle key={dx} cx={dx} cy={-28 - (i === 0 || i === 3 ? 0 : 3)} r={i === 0 ? 5 : 4} />
-      ))}
-    </g>
+    <Poke kind="hop">
+      <g transform={`translate(${x} ${y}) scale(${s} ${s * 0.45})`} fill={colour}>
+        <ellipse cx="0" cy="0" rx="13" ry="22" />
+        {[-10, -4, 2, 8].map((dx, i) => (
+          <circle key={dx} cx={dx} cy={-28 - (i === 0 || i === 3 ? 0 : 3)} r={i === 0 ? 5 : 4} />
+        ))}
+      </g>
+    </Poke>
   );
 }
 
@@ -103,22 +110,26 @@ export function Background() {
         strokeLinecap="round"
       />
       {Array.from({ length: 16 }, (_, i) => (
-        <circle key={i} cx={50 + i * 100} cy={RAIL + 66} r="5" fill={["#ffa8a8", "#ffd43b", "#74c0fc", "#b197fc"][i % 4]} opacity="0.8" />
+        <Poke key={i} kind="hop">
+          <circle cx={50 + i * 100} cy={RAIL + 66} r="5" fill={["#ffa8a8", "#ffd43b", "#74c0fc", "#b197fc"][i % 4]} opacity="0.8" />
+        </Poke>
       ))}
       <rect y={RAIL - 6} width="1600" height="10" rx="3" fill="#fff" />
       <rect y={RAIL + 2} width="1600" height="3" fill="#96f2d7" />
       <rect y={HORIZON - 8} width="1600" height="8" fill="#8ce99a" />
 
       {/* A rainbow painted on the waiting room wall, and pinned drawings */}
-      <g fill="none" strokeWidth="9" strokeLinecap="round">
-        {["#ff8787", "#ffc078", "#ffe066", "#8ce99a", "#74c0fc", "#b197fc"].map((c, i) => (
-          <path key={c} d={`M${370 + i * 9} 222 A${68 - i * 9} ${68 - i * 9} 0 0 1 ${506 - i * 9} 222`} stroke={c} />
-        ))}
-      </g>
-      <circle cx="372" cy="222" r="14" fill="#fff" />
-      <circle cx="386" cy="226" r="11" fill="#fff" />
-      <circle cx="504" cy="222" r="14" fill="#fff" />
-      <circle cx="490" cy="226" r="11" fill="#fff" />
+      <Poke kind="wobble">
+        <g fill="none" strokeWidth="9" strokeLinecap="round">
+          {["#ff8787", "#ffc078", "#ffe066", "#8ce99a", "#74c0fc", "#b197fc"].map((c, i) => (
+            <path key={c} d={`M${370 + i * 9} 222 A${68 - i * 9} ${68 - i * 9} 0 0 1 ${506 - i * 9} 222`} stroke={c} />
+          ))}
+        </g>
+        <circle cx="372" cy="222" r="14" fill="#fff" />
+        <circle cx="386" cy="226" r="11" fill="#fff" />
+        <circle cx="504" cy="222" r="14" fill="#fff" />
+        <circle cx="490" cy="226" r="11" fill="#fff" />
+      </Poke>
       <Drawing x={1050} y={178} tilt={-5}>
         <circle cx="1080" cy="196" r="9" fill="#ffd43b" />
         <path d="M1058 220 H1102" stroke="#51cf66" strokeWidth="5" />
@@ -139,12 +150,14 @@ export function Background() {
       <Chair x={302} y={412} colour="#74c0fc" dark="#339af0" />
 
       {/* The round play rug in the waiting room */}
-      <g transform={`translate(430 820) scale(${rugScale})`}>
-        <ellipse cx="0" cy="0" rx="500" ry="150" fill="#ffd8a8" />
-        <ellipse cx="0" cy="0" rx="430" ry="124" fill="#ffe8cc" />
-        <ellipse cx="0" cy="0" rx="340" ry="96" fill="none" stroke="#ff922b" strokeWidth="8" strokeDasharray="10 22" strokeLinecap="round" opacity="0.6" />
-        <ellipse cx="0" cy="-5" rx="500" ry="150" fill="none" stroke="#ffc078" strokeWidth="10" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={`translate(430 820) scale(${rugScale})`}>
+          <ellipse cx="0" cy="0" rx="500" ry="150" fill="#ffd8a8" />
+          <ellipse cx="0" cy="0" rx="430" ry="124" fill="#ffe8cc" />
+          <ellipse cx="0" cy="0" rx="340" ry="96" fill="none" stroke="#ff922b" strokeWidth="8" strokeDasharray="10 22" strokeLinecap="round" opacity="0.6" />
+          <ellipse cx="0" cy="-5" rx="500" ry="150" fill="none" stroke="#ffc078" strokeWidth="10" />
+        </g>
+      </Poke>
 
       {/* Footprints on the floor leading to the scale */}
       <Foot x={1085} y={605} colour="#ffa8a8" />

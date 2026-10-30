@@ -1,11 +1,11 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Biber, Dachs, Eichhoernchen, Frischlinge, Fuchs, Hase, Hirsch, Igel, Maulwurf, Maus, Reh, Rehkitz, Wildschwein } from "./animals";
 import { Background } from "./background";
 import { Eule, Kuckuck, Rabe, Specht, Vogelnest } from "./birds";
 import { Ameisenhaufen, Hirschkaefer, Marienkaefer, Schmetterling, Schnecke } from "./critters";
-import { BEEREN, BIBER, BIRKE, BRUECKE, EICHE, FARN, HOLZ, STUMPF, TANNE, WEGWEISER } from "./layout";
+import { BEEREN, BIBER, BIRKE, BROOK_BOXES, BRUECKE, EICHE, FARN, HOLZ, PATH_BOXES, STUMPF, TANNE, WEGWEISER } from "./layout";
 import { Foersterin, Kind, Wegweiser } from "./people";
 import { Beerenstrauch, Farn, Fliegenpilz } from "./plants";
 import { Baumstumpf, Birke, Eiche, Holzstapel, Tanne } from "./trees";
@@ -25,6 +25,13 @@ export const wald: Scene = {
   sky: "#8ed1f5",
   ground: "#6aa956",
   Background,
+  // A fish jumps out of the brook, a beetle crawls along the path, the forest floor grows flowers or a mole peeks out.
+  spots: [
+    ...BROOK_BOXES.map((box) => ({ box, kinds: ["splash" as const] })),
+    ...PATH_BOXES.map((box) => ({ box, kinds: ["bug" as const] })),
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

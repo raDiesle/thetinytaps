@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { Cloud } from "../shared";
+import { Poke } from "../spots";
 import { PUDDLE, STATION_Y, YARD_BOTTOM } from "./layout";
 
 // Far away hills with a village in the haze; then the meadow behind the station, the
@@ -48,12 +49,14 @@ const BAYS = [
 
 function FarTree({ x, y, scale }: { x: number; y: number; scale: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`}>
-      <rect x="-6" y="-50" width="12" height="50" fill="#9c6b3c" />
-      <circle cx="0" cy="-64" r="32" fill="#74c69d" />
-      <circle cx="-20" cy="-48" r="20" fill="#52b788" />
-      <circle cx="20" cy="-50" r="22" fill="#52b788" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${scale})`}>
+        <rect x="-6" y="-50" width="12" height="50" fill="#9c6b3c" />
+        <circle cx="0" cy="-64" r="32" fill="#74c69d" />
+        <circle cx="-20" cy="-48" r="20" fill="#52b788" />
+        <circle cx="20" cy="-50" r="22" fill="#52b788" />
+      </g>
+    </Poke>
   );
 }
 
@@ -93,21 +96,25 @@ export function Background() {
       <circle cx="1530" cy="76" r="140" fill="url(#fw-sunglow)" />
       <Cloud x={250} y={200} scale={0.32} className="fw-cloud fw-cloud-slow" />
       <Cloud x={880} y={230} scale={0.36} className="fw-cloud" />
-      <path d="M760 110 q6 -6 12 0 q6 -6 12 0 M800 96 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      <Poke kind="drift">
+        <path d="M760 110 q6 -6 12 0 q6 -6 12 0 M800 96 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      </Poke>
 
       {/* Far hills with a village */}
       <path d="M0 312 Q180 260 380 300 T760 296 T1140 280 T1600 300 V350 H0 Z" fill="#b7dfc4" />
       {VILLAGE.map(([x, y, w, colour]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={Number(y) - Number(w) * 0.7} width={w} height={Number(w) * 0.7} fill={String(colour)} />
           <path
             d={`M${Number(x) - 4} ${Number(y) - Number(w) * 0.7} L${Number(x) + Number(w) / 2} ${Number(y) - Number(w) * 1.15} L${Number(x) + Number(w) + 4} ${Number(y) - Number(w) * 0.7} Z`}
             fill="#e5989b"
           />
-        </g>
+        </Poke>
       ))}
-      <rect x="1290" y="252" width="12" height="44" fill="#e9ecef" />
-      <path d="M1286 252 L1296 226 L1306 252 Z" fill="#cdb4db" />
+      <Poke kind="wobble">
+        <rect x="1290" y="252" width="12" height="44" fill="#e9ecef" />
+        <path d="M1286 252 L1296 226 L1306 252 Z" fill="#cdb4db" />
+      </Poke>
       <rect y="250" width="1600" height="100" fill="url(#fw-haze)" />
 
       {/* Meadow behind the station, with far trees and a hedge */}
@@ -116,8 +123,10 @@ export function Background() {
       <FarTree x={1210} y={400} scale={0.42} />
       <FarTree x={1580} y={420} scale={0.55} />
       <FarTree x={20} y={410} scale={0.45} />
-      <path d="M1000 470 Q1080 446 1160 466 T1320 460 T1600 470 V500 H1000 Z" fill="#74c69d" />
-      <path d="M1000 470 Q1080 446 1160 466" stroke="#95d5b2" strokeWidth="6" fill="none" />
+      <Poke kind="sway">
+        <path d="M1000 470 Q1080 446 1160 466 T1320 460 T1600 470 V500 H1000 Z" fill="#74c69d" />
+        <path d="M1000 470 Q1080 446 1160 466" stroke="#95d5b2" strokeWidth="6" fill="none" />
+      </Poke>
 
       {/* The yard in front of the station */}
       <path d={`M180 ${STATION_Y} H1010 Q1120 640 1300 ${YARD_BOTTOM} H0 V620 Q120 520 180 ${STATION_Y} Z`} fill="url(#fw-yard)" />
@@ -128,14 +137,18 @@ export function Background() {
       </g>
       <g fill="#7c848c">
         {PEBBLES.map(([x, y]) => (
-          <ellipse key={`${x}${y}`} cx={x} cy={y} rx={5 * depthScale(y)} ry={2.5 * depthScale(y)} />
+          <Poke key={`${x}${y}`} kind="hop">
+            <ellipse cx={x} cy={y} rx={5 * depthScale(y)} ry={2.5 * depthScale(y)} />
+          </Poke>
         ))}
       </g>
       {/* A drain cover in the yard */}
-      <g transform={`translate(560 720) scale(${depthScale(720)})`}>
-        <ellipse cx="0" cy="0" rx="30" ry="8" fill="#6c757d" />
-        <path d="M-20 0 H20 M-14 -4 H14 M-14 4 H14" stroke="#495057" strokeWidth="2" />
-      </g>
+      <Poke kind="hop">
+        <g transform={`translate(560 720) scale(${depthScale(720)})`}>
+          <ellipse cx="0" cy="0" rx="30" ry="8" fill="#6c757d" />
+          <path d="M-20 0 H20 M-14 -4 H14 M-14 4 H14" stroke="#495057" strokeWidth="2" />
+        </g>
+      </Poke>
       {/* Kerb between the yard and the lawn */}
       <path d={`M0 ${YARD_BOTTOM} H1300`} stroke="#ced4da" strokeWidth="8" />
       <path d={`M1010 ${STATION_Y} Q1120 640 1300 ${YARD_BOTTOM}`} stroke="#ced4da" strokeWidth="6" fill="none" />
@@ -153,7 +166,9 @@ export function Background() {
       {/* Grass tufts */}
       <g stroke="#40916c" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       {/* Little flowers in the lawn */}
@@ -165,12 +180,14 @@ export function Background() {
           [1400, 880, "#ff8fab"],
           [1580, 720, "#fff"],
         ].map(([x, y, colour]) => (
-          <g key={`${x}`} transform={`translate(${x} ${y}) scale(${depthScale(Number(y))})`}>
-            {[0, 72, 144, 216, 288].map((a) => (
-              <circle key={a} cx={7 * Math.cos((a * Math.PI) / 180)} cy={7 * Math.sin((a * Math.PI) / 180)} r="5" fill={String(colour)} />
-            ))}
-            <circle r="4" fill="#ffb703" />
-          </g>
+          <Poke key={`${x}`} kind="sway">
+            <g transform={`translate(${x} ${y}) scale(${depthScale(Number(y))})`}>
+              {[0, 72, 144, 216, 288].map((a) => (
+                <circle key={a} cx={7 * Math.cos((a * Math.PI) / 180)} cy={7 * Math.sin((a * Math.PI) / 180)} r="5" fill={String(colour)} />
+              ))}
+              <circle r="4" fill="#ffb703" />
+            </g>
+          </Poke>
         ))}
       </g>
     </>

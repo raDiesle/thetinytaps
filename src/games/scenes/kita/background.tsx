@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { HORIZON, depthScale, onFloor, towardsHorizon } from "../layout";
 import { INK } from "../shared";
+import { Poke } from "../spots";
 
 // The back wall: sunny yellow paint with little dots, a mint band below with the wooden rail
 // and the skirting; the bench with the shoe cubbies below the coat hooks, the light switch,
@@ -78,10 +79,10 @@ function BuildingRug() {
         [300, back + 0.025],
         [380, front - 0.02],
       ].map(([x, s]) => (
-        <g key={x}>
+        <Poke key={x} kind="hop">
           <ellipse cx={x} cy={onFloor(0, s)[1]} rx="22" ry="8" fill="#51cf66" />
           <ellipse cx={x - 4} cy={onFloor(0, s)[1] - 2} rx="10" ry="4" fill="#69db7c" />
-        </g>
+        </Poke>
       ))}
     </>
   );
@@ -90,25 +91,27 @@ function BuildingRug() {
 /** The bench under the coat hooks, with cubbies for the shoes. */
 function Bench() {
   return (
-    <>
+    <Poke kind="wobble">
       <rect x="210" y="272" width="330" height="58" fill="#c88b3a" />
       {[0, 1, 2, 3].map((k) => (
         <g key={k}>
           <rect x={218 + k * 80} y="288" width="74" height="40" rx="3" fill="#8f6544" />
           {/* A pair of small shoes in each cubby */}
-          <ellipse cx={240 + k * 80} cy="320" rx="12" ry="7" fill={["#4dabf7", "#ff8787", "#69db7c", "#ffd43b"][k]} />
-          <ellipse cx={266 + k * 80} cy="320" rx="12" ry="7" fill={["#4dabf7", "#ff8787", "#69db7c", "#ffd43b"][k]} />
+          <Poke kind="hop">
+            <ellipse cx={240 + k * 80} cy="320" rx="12" ry="7" fill={["#4dabf7", "#ff8787", "#69db7c", "#ffd43b"][k]} />
+            <ellipse cx={266 + k * 80} cy="320" rx="12" ry="7" fill={["#4dabf7", "#ff8787", "#69db7c", "#ffd43b"][k]} />
+          </Poke>
         </g>
       ))}
       <rect x="206" y="266" width="338" height="14" rx="5" fill="#e9b872" />
-    </>
+    </Poke>
   );
 }
 
 /** The giraffe growth chart between the cupboard and the sleeping corner's window. */
 function Giraffe() {
   return (
-    <>
+    <Poke kind="sway">
       <rect x="1240" y="96" width="34" height="220" rx="10" fill="#ffd43b" />
       {[130, 176, 222, 268].map((y, i) => (
         <circle key={y} cx={1250 + (i % 2) * 14} cy={y} r="7" fill="#e67700" opacity="0.6" />
@@ -121,7 +124,7 @@ function Giraffe() {
       <circle cx="1250" cy="84" r="2.5" fill={INK} />
       <circle cx="1264" cy="84" r="2.5" fill={INK} />
       <ellipse cx="1257" cy="94" rx="9" ry="5" fill="#fab005" />
-    </>
+    </Poke>
   );
 }
 
@@ -153,18 +156,26 @@ export function Background() {
 
       <Bench />
       {/* Light switch next to the door */}
-      <rect x="200" y="176" width="16" height="24" rx="4" fill="#fff" stroke="#dee2e6" strokeWidth="2" />
-      <rect x="205" y="182" width="6" height="8" rx="2" fill="#ced4da" />
+      <Poke kind="wobble">
+        <rect x="200" y="176" width="16" height="24" rx="4" fill="#fff" stroke="#dee2e6" strokeWidth="2" />
+        <rect x="205" y="182" width="6" height="8" rx="2" fill="#ced4da" />
+      </Poke>
       <Giraffe />
       {/* Stickers right of the sleeping corner's window */}
-      <path d="M1574 120 A16 16 0 1 0 1574 152 A12 12 0 1 1 1574 120 Z" fill="#91a7ff" />
-      <path d="M1572 186 l4 9 h10 l-8 6 l3 10 l-9 -6 l-9 6 l3 -10 l-8 -6 h10 Z" fill="#ffd43b" />
+      <Poke kind="glow">
+        <path d="M1574 120 A16 16 0 1 0 1574 152 A12 12 0 1 1 1574 120 Z" fill="#91a7ff" />
+      </Poke>
+      <Poke kind="glow">
+        <path d="M1572 186 l4 9 h10 l-8 6 l3 10 l-9 -6 l-9 6 l3 -10 l-8 -6 h10 Z" fill="#ffd43b" />
+      </Poke>
       {/* A rainbow sticker between the coat hooks and the window */}
-      <g fill="none" strokeWidth="6" strokeLinecap="round">
-        <path d="M562 232 A22 22 0 0 1 606 232" stroke="#ff8787" />
-        <path d="M569 232 A15 15 0 0 1 599 232" stroke="#ffd43b" />
-        <path d="M576 232 A8 8 0 0 1 592 232" stroke="#74c0fc" />
-      </g>
+      <Poke kind="wobble">
+        <g fill="none" strokeWidth="6" strokeLinecap="round">
+          <path d="M562 232 A22 22 0 0 1 606 232" stroke="#ff8787" />
+          <path d="M569 232 A15 15 0 0 1 599 232" stroke="#ffd43b" />
+          <path d="M576 232 A8 8 0 0 1 592 232" stroke="#74c0fc" />
+        </g>
+      </Poke>
 
       {/* Floor */}
       <rect y={HORIZON} width="1600" height={1000 - HORIZON} fill="url(#ki-floor)" />
@@ -176,12 +187,14 @@ export function Background() {
       <path d={floorQuad(680, 2200, depthScale(398), depthScale(770))} fill="none" stroke="#a5d8ff" strokeWidth="5" strokeDasharray="14 12" />
       <BuildingRug />
       {/* The round reading rug */}
-      <g transform={`translate(770 668) scale(${depthScale(668)})`}>
-        <ellipse cx="0" cy="0" rx="250" ry="66" fill="#ffd8a8" />
-        <ellipse cx="0" cy="0" rx="200" ry="50" fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="6 16" strokeLinecap="round" />
-        <ellipse cx="0" cy="0" rx="110" ry="26" fill="#ffc078" />
-        <ellipse cx="0" cy="-3" rx="250" ry="66" fill="none" stroke="#ffa94d" strokeWidth="8" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={`translate(770 668) scale(${depthScale(668)})`}>
+          <ellipse cx="0" cy="0" rx="250" ry="66" fill="#ffd8a8" />
+          <ellipse cx="0" cy="0" rx="200" ry="50" fill="none" stroke="#fff" strokeWidth="8" strokeDasharray="6 16" strokeLinecap="round" />
+          <ellipse cx="0" cy="0" rx="110" ry="26" fill="#ffc078" />
+          <ellipse cx="0" cy="-3" rx="250" ry="66" fill="none" stroke="#ffa94d" strokeWidth="8" />
+        </g>
+      </Poke>
     </>
   );
 }

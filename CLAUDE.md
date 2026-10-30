@@ -154,7 +154,11 @@ In a fresh worktree run `bun install` first.
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away.
-- Speech is off by default (`src/lib/common.ts`); sounds are on.
+- Sounds and voice have no switch (user decision, October 2026): sounds always play, and the browser's voice never
+  speaks (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
+  ElevenLabs recording (like Tapsi's lines in Bewegungsabenteuer), which always plays, like a sound; a line without
+  one stays silent. Never add a switch for either again. Recordings are made only when the user asks (see Language).
+  The home page's only option for all games is „🎵 Musik“, one tap on its own button, never a menu.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
   the room left between them, instead of a fixed box with empty space round it. Look at both sizes in the preview.
@@ -176,12 +180,17 @@ In a fresh worktree run `bun install` first.
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); a category of a few games that stand apart (`onHome`: „Weitere“) has no card and no page of its
   own, its games stand right on the home page on a frame named after it, like a game's sorts below; and variants of one way to play (which words, how long, whole word or first letter) are
-  choices in the always visible row above the cards (`level`), not cards or a menu of their own.
+  choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
+  plays at once, options while playing behind ⚙️ held in the top left corner like ✕ (`PlayOptions`, Buchstaben & Zahlen),
+  never a tap a child could make by chance.
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
+- Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
+  wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
+  choices may sit there.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
-  in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
-  no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
+  in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
+  either (only read out; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). Buttons for grown-ups sit in the top
   left corner, never over the sun in the top right one. „ℹ️ Über das Spiel“ and „⚙️ Einstellungen“ (where a game still has them) are small, above the cards,
   never under them: in the top row next to the back link (on a computer centred under the title), and a panel opens right
@@ -238,11 +247,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   to a game that has none, and when touching a game that still has them, prefer removing them (keep the default
   behaviour, delete the code for the other). Where one is still kept, `info` says what the game is and how it is played (also
   keys and tips for grown-ups), `settings` holds only options and the notes that explain them. A game adds no own switch for what the home page already sets for all games
-  (Vorlesen, Töne, Musik, Sprache), nor a choice for what the game can tell by itself (morning or evening by the clock).
+  (Musik, Sprache), nor a switch for sounds or voice, nor a choice for what the game can tell by itself (morning or evening by the clock).
   A song that is the game itself (the Zahnputzlied sings the steps) plays even with Musik off and sings in the app language.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
-  defaults (so new fields need no migration); `speech`/`sounds` come from the shared
-  options on the home page. Bump the key's `.vN` only when old values would break.
+  defaults (so new fields need no migration); `speech`/`sounds` are filled in from the
+  shared options (always off and on). Bump the key's `.vN` only when old values would break.
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README). A new file replaces the sound at every
   `playRecorded(name, …)` in every game, so grep the name first and pick a new one unless all of them should change.
@@ -267,8 +276,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
+- Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
+  it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
+  home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
+  Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
   with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
@@ -288,4 +301,4 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
    `AudioBufferSourceNode.prototype.start` in the console and log `this.buffer.duration` and the offset
    (the length tells which song started, and when). Say that you checked it this way, not by ear.
    Development helpers: `__machine.seek(s)` (Kettenreaktion), `__adventure.seek(s)`
-   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/`, `?level=<n>` on `/socken/`.
+   (Bewegungsabenteuer), `?level=<id>` on `/kettenreaktion/` (the card tapped starts that level), `?level=<n>` on `/socken/`.

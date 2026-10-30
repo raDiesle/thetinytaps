@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router";
-import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
@@ -12,6 +12,7 @@ import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/
 import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
+import { useHold } from "@/lib/hold";
 import { forwardNearTaps } from "@/lib/tapTargets";
 
 /** How long ✕ has to be held to leave the game; the ring fills meanwhile. */
@@ -289,17 +290,6 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
             ar: "اختيار طريقة اللعب",
           })}
         >
-          <h2 className="mode-heading">
-            {t({
-              de: "Was spielen wir?",
-              ru: "Во что играем?",
-              en: "What shall we play?",
-              zh: "我们玩什么？",
-              hi: "क्या खेलें?",
-              es: "¿A qué jugamos?",
-              ar: "ماذا نلعب؟",
-            })}
-          </h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {groups
@@ -460,29 +450,7 @@ const STARS: [number, number, number][] = [
  */
 function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
   const t = useT();
-  const [holding, setHolding] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-
-  const press = () => {
-    if (timer.current) return;
-    setHolding(true);
-    timer.current = setTimeout(onExit, EXIT_DELAY_MS);
-  };
-
-  const release = () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
-    setHolding(false);
-  };
-
-  const isPressKey = (key: string) => key === "Enter" || key === " ";
+  const { holding, props } = useHold(onExit, EXIT_DELAY_MS);
 
   return (
     <div className={`exit-corner${holding ? " hinted" : ""}`} data-tap-keep>
@@ -494,25 +462,8 @@ function ExitButton({ onExit, label }: { onExit: () => void; label: string }) {
       <button
         type="button"
         className={`hold-exit${holding ? " holding" : ""}`}
-        style={{ "--hold-ms": `${EXIT_DELAY_MS}ms` } as CSSProperties}
         aria-label={`${label} (${t({ de: "gedrückt halten", ru: "удерживать", en: "hold", zh: "按住", hi: "दबाए रखें", es: "mantener pulsado", ar: "ضغط مطوّل" })})`}
-        onPointerDown={(e: PointerEvent<HTMLButtonElement>) => {
-          // Keep the game from reacting to the tap on the button.
-          e.stopPropagation();
-          // A finger that slides a little still counts as holding.
-          e.currentTarget.setPointerCapture(e.pointerId);
-          press();
-        }}
-        onPointerUp={release}
-        onPointerCancel={release}
-        onContextMenu={(e) => e.preventDefault()}
-        onKeyDown={(e) => {
-          if (!isPressKey(e.key)) return;
-          e.preventDefault();
-          if (!e.repeat) press();
-        }}
-        onKeyUp={(e) => isPressKey(e.key) && release()}
-        onBlur={release}
+        {...props}
       >
         ✕
       </button>

@@ -261,7 +261,6 @@ export const pl: LanguagePack = {
   keyboardRows: ["1234567890", "QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"],
   countSentence,
   praise: ["Super!", "Brawo!", "Świetnie!", "Hurra!", "Ekstra!"],
-  firstLetterPrompt: (word) => `${word.word}! Od jakiej litery zaczyna się ${word.word}?`,
   colors: relabel(de.colors, {
     "🔴": "Czerwony",
     "🔵": "Niebieski",

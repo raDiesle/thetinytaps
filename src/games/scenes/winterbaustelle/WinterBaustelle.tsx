@@ -2,10 +2,10 @@ import type { Scene } from "../types";
 import { Eichhoernchen, Hund, Katze } from "../baustelle/figures";
 import { Hubschrauber } from "../baustelle/machines";
 import { Radio } from "../baustelle/site";
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne } from "../sky";
 import { Background } from "./background";
-import { BIRD_TABLE, DIGGER, FIR, SITE, SQUIRREL } from "./layout";
+import { BIRD_TABLE, DIGGER, FIR, ROAD_BOTTOM, ROAD_TOP, SITE, SQUIRREL } from "./layout";
 import { Meise, Rotkehlchen, Schneetanne, Schneewolke, Vogelhaus, Winterfuchs } from "./nature";
 import { Schlitten, Schneeballkinder, Schneemann, Teearbeiter } from "./people";
 import {
@@ -43,6 +43,12 @@ export const winterbaustelle: Scene = {
   sky: "#9cc3e6",
   ground: "#d9e5f1",
   Background,
+  // A beetle crawls out of the ploughed road; a bunny peeks out of the snow everywhere else; a snowy gust in the sky.
+  spots: [
+    { box: [0, 0, 1600, HORIZON], kinds: ["flurry"] },
+    { box: [0, ROAD_TOP + 10, 1600, ROAD_BOTTOM - ROAD_TOP - 10], kinds: ["bug"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["snow"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

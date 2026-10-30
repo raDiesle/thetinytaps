@@ -1,4 +1,4 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import { Hund } from "../spielplatz/animals";
 import { Ball } from "../spielplatz/things";
@@ -7,7 +7,7 @@ import { Drachen, Flugzeug } from "./air";
 import { Krebs, Moewe, Muschel, Seestern } from "./animals";
 import { Background } from "./background";
 import { Pommesbude, Rettungsturm, Sonnenschirm, Strandhaus, Strandkorb, Strandzelt } from "./beach";
-import { LIFEGUARD, LIGHTHOUSE, TOWEL } from "./layout";
+import { LIFEGUARD, LIGHTHOUSE, SEA_BOXES, TOWEL } from "./layout";
 import { Kind, Mama, Pommes } from "./people";
 import { Boje, Boot, Delfin, Leuchtturm, Schiff, Segelboot } from "./sea";
 import { Eimer, Kuehlbox, Sandburg, Sandhaufen, Schatztruhe, Schaufel, Sonnencreme, Windrad } from "./toys";
@@ -27,6 +27,12 @@ export const strand: Scene = {
   sky: "#74c0fc",
   ground: "#efc982",
   Background,
+  // A fish jumps out of the sea, a crab digs out of the sand, wind blows through the sky.
+  spots: [
+    ...SEA_BOXES.map((box) => ({ box, kinds: ["splash" as const] })),
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["crab"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

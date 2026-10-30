@@ -1,4 +1,5 @@
 import { depthScale, ground } from "../layout";
+import type { Box } from "../types";
 
 // Every drawing of this scene has its foot point at (0, 0) and is placed with `ground`.
 // From back to front: the tree, the bench, the climbing tower with its slide, the swing and
@@ -31,6 +32,14 @@ export function pathHalf(x: number) {
   return depthScale(pathY(x)) * 46;
 }
 
+/** Boxes that stay on the gravel path from the left edge to the right one, for a beetle on it. */
+export const PATH_BOXES: Box[] = Array.from({ length: 10 }, (_, i) => {
+  const [x1, x2] = [i * 160, (i + 1) * 160];
+  const half = pathHalf((x1 + x2) / 2) * 0.9;
+  const top = pathY(x1) - half;
+  return [x1, top, 160, pathY(x2) + half - top];
+});
+
 /** The sandpit's wooden frame: back edge at SAND_TOP, running out of the picture at the bottom. */
 export const SAND_TOP = 846;
 export const SAND_LEFT = 250;
@@ -47,5 +56,7 @@ export const PRAM_X = 1340;
 export const PRAM = ground(0, 0, PRAM_X, pathY(PRAM_X) + 6, 1.05);
 /** The water pump and the little stream it fills. */
 export const PUMP = ground(0, 0, 1236, 900, 0.95);
+/** The little stream's water below the pump, in picture units. */
+export const STREAM: Box = [PUMP.x + 10 * PUMP.scale, PUMP.y, 90 * PUMP.scale, 1000 - PUMP.y];
 /** The flower bed with the butterfly and the ladybird. */
 export const FLOWERS = ground(0, 0, 1404, 946, 1);

@@ -1,7 +1,7 @@
-import { ground } from "../layout";
+import { HORIZON, ground } from "../layout";
 import type { Scene } from "../types";
 import { Hund, Katze, Spinne } from "./animals";
-import { Background } from "./background";
+import { Background, WALL_TILE_TOP } from "./background";
 import { Badewanne, Dusche, Ente, Kind, Schaumberg } from "./bath";
 import { Foehn, Hausschuhe, Muelleimer, Seife, Seifenblasen, Schwamm, Toepfchen, Waage, Waeschekorb, Wasserball } from "./floor";
 import { BATH, SINK, TOILET, WASHER } from "./layout";
@@ -22,6 +22,12 @@ export const badezimmer: Scene = {
   sky: "#fff4e0",
   ground: "#f8f1e7",
   Background,
+  // Bubbles rise from the fish tiles, a spider comes down the painted wall, a beetle crawls out of the floor tiles.
+  spots: [
+    { box: [0, WALL_TILE_TOP - 14, 1600, HORIZON - WALL_TILE_TOP + 14], kinds: ["bubbles"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["spider"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["bug"] },
+  ],
   items: [
     // ---------- On the wall ----------
     {

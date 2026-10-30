@@ -1,4 +1,4 @@
-import { ground } from "../layout";
+import { HORIZON, ground } from "../layout";
 import type { Scene } from "../types";
 import { Background } from "./background";
 import { TABLE, onTable } from "./layout";
@@ -35,6 +35,11 @@ export const kita: Scene = {
   sky: "#fff6d8",
   ground: "#f9e3c0",
   Background,
+  // A spider comes down the wall; a beetle crawls out between the floor planks.
+  spots: [
+    { box: [0, 0, 1600, HORIZON], kinds: ["spider"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["bug"] },
+  ],
   items: [
     // ---------- On the wall ----------
     {

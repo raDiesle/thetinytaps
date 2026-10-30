@@ -1,9 +1,15 @@
 // The big machine ("Große Maschine"), a Rube Goldberg machine through a long
 // playroom: one tap lets a marble go, and one thing sets off the next for about
-// half a minute while the camera travels along. Everything is worked out ahead
-// as a function of the seconds since the tap, so MachineLevel.tsx only asks
-// where each thing is at a moment. Coordinates are those of the playroom,
-// 6900 × 900; the screen shows 1600 of it at a time.
+// 42 seconds while the camera travels along – xylophone, bell, funnel, ten
+// dominoes, a toy car through a loop onto a seesaw, a beach ball down block
+// stairs into a bucket that pulls up the gate for the train. The train bumps a
+// humming top, which hums and wanders across the floor into a tower of stacking
+// cups; the tower sways and tumbles, every cup plinks its own note as it lands,
+// and the top cup flicks a paper plane off, which loops the loop and glides
+// through the room onto the button for the jack-in-the-box. Everything is
+// worked out ahead as a function of the seconds since the tap, so
+// MachineLevel.tsx only asks where each thing is at a moment. Coordinates are
+// those of the playroom, 9600 × 900; the screen shows 1600 of it at a time.
 
 import {
   playBoing,
@@ -12,14 +18,19 @@ import {
   playCuckoo,
   playDing,
   playHonk,
+  playHum,
   playKnock,
+  playPlink,
   playPlop,
   playPop,
+  playRattle,
   playRing,
+  playSlide,
   playSwirl,
   playThump,
   playTick,
   playTwinkle,
+  playWhirr,
   playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
@@ -39,12 +50,14 @@ import {
   roll,
   rounded,
   seg,
+  STEP,
   steady,
   timeWhen,
+  turn,
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6900;
+export const WORLD_W = 9600;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -93,11 +106,47 @@ export const GATE = { x: 5000, w: 40, h: 160 };
 
 export const TRAIN = { front0: 4985, loco: 160, wagon: 120, gap: 14 };
 export const CROSSING_X = 5620;
-/** A box with a red push button sticking out `knob` on the side the train comes from. */
-export const BUTTON = { x: 6300, w: 80, h: 100, knob: 16, press: 10 };
-export const GIFT = { x: 6460, w: 240, h: 190 };
+/** Where the train's front comes to a stop, against the spinning top; the rails end here. */
+export const TRAIN_STOP = 6300;
+
+/**
+ * The humming top (Brummkreisel), drawn standing on its tip: a round body `rx` × `ry` whose middle is `mid` above
+ * the tip, and a plunger `rod` long on top. The locomotive's boiler touches its body when the train's front is
+ * `push` short of the top's tip.
+ */
+export const KREISEL = { x0: 6320, rx: 48, ry: 38, mid: 50, rod: 128, push: 44 };
+/** The angle the top lies at once it has flopped over (degrees, to the left): body and plunger knob on the floor. */
+export const KREISEL_FALLEN = -115;
+
+/** The tower of stacking cups, standing upside down on the floor around `x`, biggest at the bottom. */
+export const TOWER = { x: 7000 };
+/** Each cup's width at its open end (`W`, at the bottom while stacked), at its closed end (`w`) and its height. */
+export const CUPS = Array.from({ length: 6 }, (_, i) => ({ W: 120 - i * 14, w: 0.72 * (120 - i * 14), H: 64 - i * 4 }));
+/** How high up the tower each cup stands: the heights of all cups below it. */
+export const cupBase = (i: number) => CUPS.slice(0, i).reduce((sum, c) => sum + c.H, 0);
+export const TOWER_TOP = FLOOR - cupBase(CUPS.length);
+/** Half a stacked cup's width `h` above its open end. */
+export const cupHalf = (i: number, h: number) => CUPS[i].W / 2 - ((CUPS[i].W - CUPS[i].w) / 2) * (h / CUPS[i].H);
+/**
+ * A cup lying on its side: turned a little past 90°, so its slanting side lies flat on the floor, with its middle
+ * `lift` above the floor.
+ */
+export function cupLying(i: number) {
+  const { W, w, H } = CUPS[i];
+  const slant = (W - w) / 2;
+  return { angle: 90 + (Math.atan2(slant, H) * 180) / Math.PI, lift: (H * (W + w)) / 4 / Math.hypot(H, slant) };
+}
+
+/** The paper plane loops the loop round this circle on its way from the tower to the button. */
+export const PLANE_LOOP = { cx: 7470, cy: 330, r: 105 };
+
+/** A box with a red push button sticking out `knob` on the side the paper plane comes from. */
+export const BUTTON = { x: 9000, w: 80, h: 100, knob: 16, press: 10 };
+/** The height of the middle of the red knob. */
+export const KNOB_Y = FLOOR - BUTTON.h + 46;
+export const GIFT = { x: 9160, w: 240, h: 190 };
 /** The cable from the button to the gift box, along which a spark runs. */
-export const CABLE = quad({ x: BUTTON.x + BUTTON.w, y: 770 }, { x: 6420, y: 812 }, { x: GIFT.x, y: 780 });
+export const CABLE = quad({ x: BUTTON.x + BUTTON.w, y: 770 }, { x: GIFT.x - 40, y: 812 }, { x: GIFT.x, y: 780 });
 
 /* ---------- Helpers ---------- */
 
@@ -285,9 +334,9 @@ export function buildMachine() {
     return { pt: hop(h.a, h.b, h.h, seg(t, h.t0, h.t1)), squash: h === hops[0] ? 0 : 0.22 * Math.exp(-age * 16) * Math.cos(age * 20) };
   };
 
-  /* The train: once the gate is up it chugs along, past the level crossing, into the button. */
+  /* The train: once the gate is up it chugs along, past the level crossing, and brakes against the spinning top. */
   const tTrain = tBucket + 1.5;
-  const trainLen = BUTTON.x - BUTTON.knob + BUTTON.press - TRAIN.front0;
+  const trainLen = TRAIN_STOP - TRAIN.front0;
   const trainT = 8;
   const speedUp = 1.6;
   const brake = 0.5;
@@ -301,7 +350,7 @@ export function buildMachine() {
     return trainLen;
   };
   const trainFront = (t: number) => TRAIN.front0 + trainGone(t);
-  const tButton = tTrain + trainT;
+  const tStop = tTrain + trainT;
   at(tTrain, { sound: playWhistle });
   const crossingStart = (x: number) => {
     // When the front gets to `x`: the train is fast by then, so solve the cruising part.
@@ -310,6 +359,177 @@ export function buildMachine() {
   };
   at(crossingStart(CROSSING_X - 60), { sound: playRing });
   at(crossingStart(CROSSING_X + 400), { sound: playRing });
+
+  /*
+   * The humming top: the braking locomotive bumps it along a little, which sets it spinning; it hums, wanders
+   * across the floor (dashing off, dithering back, dashing on) into the cup tower, bounces off, wobbles more and
+   * more as it slows down and flops onto its side.
+   */
+  let tContact = tStop;
+  for (let t = tTrain; t < tStop; t += STEP) {
+    if (trainFront(t) + KREISEL.push >= KREISEL.x0) {
+      tContact = t;
+      break;
+    }
+  }
+  const pushedTo = (t: number) => Math.max(KREISEL.x0, trainFront(Math.min(t, tStop)) + KREISEL.push);
+  const kreiselStart = pushedTo(tStop);
+  const tGo = tStop + 0.4;
+  const tTower = tGo + 4.2;
+  const kreiselHit = TOWER.x - cupHalf(0, KREISEL.mid) - KREISEL.rx;
+  const tFlop = tTower + 2.1;
+  const flopTime = 0.35;
+  /** How far along its way the top is, 0 to 1: quick at first, a little way back in the middle, quick again. */
+  const wander = (u: number) => u + 0.24 * Math.sin(2 * Math.PI * u);
+  const SPIN = 17;
+  const SPIN_LATE = 5;
+  /** How far the top has turned (radians): it spins up while the train pushes it and slows down after the tower. */
+  const spinAt = (t: number) => {
+    const up = tGo - tContact;
+    if (t < tContact) return 0;
+    if (t < tGo) return (SPIN * (t - tContact) ** 2) / (2 * up);
+    const atGo = (SPIN * up) / 2;
+    if (t < tTower) return atGo + SPIN * (t - tGo);
+    const atTower = atGo + SPIN * (tTower - tGo);
+    const slow = tFlop - tTower;
+    if (t < tFlop) {
+      const a = t - tTower;
+      return atTower + SPIN * a - ((SPIN - SPIN_LATE) * a * a) / (2 * slow);
+    }
+    const atFlop = atTower + ((SPIN + SPIN_LATE) * slow) / 2;
+    const a = Math.min(t - tFlop, flopTime);
+    return atFlop + SPIN_LATE * a - (SPIN_LATE * a * a) / (2 * flopTime);
+  };
+  /** The top's lean on its way: into the way it goes, with a slow sway, starting upright. */
+  const wanderTilt = (t: number) => {
+    const u = seg(t, tGo, tTower);
+    const speed = 1 + 0.24 * 2 * Math.PI * Math.cos(2 * Math.PI * u);
+    return (5 * speed + 6 * Math.sin((t - tGo) * 6)) * seg(t, tGo, tGo + 0.3);
+  };
+  /** The top's lean while it wobbles after the tower: wider and wider as it slows down. */
+  const lateWobble = (t: number) => {
+    const a = t - tTower;
+    return (3 + 7 * a) * Math.sin(a * 9) + wanderTilt(tTower) * Math.exp(-a * 6);
+  };
+  /** How far the body of a top leaning `tilt` degrees reaches below its tip, so it never sinks into the floor. */
+  const kreiselLift = (tilt: number) => {
+    const a = rad(Math.abs(tilt));
+    return Math.max(0, -KREISEL.mid * Math.cos(a) + Math.hypot(KREISEL.rx * Math.sin(a), KREISEL.ry * Math.cos(a)));
+  };
+  const kreiselAt = (t: number): { pt: Pt; tilt: number; spin: number; pump: number } => {
+    const spin = spinAt(t);
+    if (t < tContact) return { pt: { x: KREISEL.x0, y: FLOOR }, tilt: 0, spin: 0, pump: 0 };
+    if (t < tGo) {
+      // Bumped: it rocks away from the train, and the plunger bobs as if the push had pumped it.
+      const age = t - tContact;
+      return { pt: { x: pushedTo(t), y: FLOOR }, tilt: wobble(age, 9, 13, 3.5), spin, pump: 12 * Math.sin(Math.min(Math.PI, age * 6)) };
+    }
+    if (t < tTower) return { pt: { x: lerp(kreiselStart, kreiselHit, wander(seg(t, tGo, tTower))), y: FLOOR }, tilt: wanderTilt(t), spin, pump: 0 };
+    const x = kreiselHit - 70 * easeOut(seg(t, tTower, tTower + 0.6));
+    if (t < tFlop) return { pt: { x, y: FLOOR }, tilt: lateWobble(t), spin, pump: 0 };
+    const from = lateWobble(tFlop);
+    const tilt = lerp(from, KREISEL_FALLEN, easeIn(seg(t, tFlop, tFlop + flopTime))) + wobble(t - tFlop - flopTime, 5, 15, 4);
+    return { pt: { x, y: FLOOR - kreiselLift(tilt) }, tilt, spin, pump: 0 };
+  };
+  at(tContact, { sound: () => playKnock(520) });
+  at(tStop, { sound: playHum });
+  for (let t = tGo; t < tTower - 0.3; t += 0.8) at(t, { sound: playWhirr });
+  at(tTower, { sound: () => playKnock(1300) });
+  at(tFlop + flopTime, { sound: playThump });
+
+  /*
+   * The stacking cups: the tower sways harder and harder on its edges, tips over to the right and falls apart;
+   * each cup tumbles off on its own arc, the higher ones further, lands on its side with its own note (the
+   * smallest highest), bounces once and rocks.
+   */
+  const tTopple = tTower + 0.8;
+  const tSplit = tTopple + 0.3;
+  const leanAt = (t: number) => {
+    if (t < tTower) return 0;
+    if (t < tTopple) {
+      const a = t - tTower;
+      return (3 + 6 * (a / 0.8)) * Math.sin((a / 0.8) * 4 * Math.PI);
+    }
+    return 26 * easeIn(seg(t, tTopple, tTopple + 0.36));
+  };
+  const stacked = (i: number, lean: number) => {
+    // A tower rocks on the edge it leans towards.
+    const pivot = { x: TOWER.x + (lean >= 0 ? 1 : -1) * (CUPS[0].W / 2), y: FLOOR };
+    return { pt: turn({ x: TOWER.x, y: FLOOR - cupBase(i) - CUPS[i].H / 2 }, pivot, rad(lean)), angle: lean };
+  };
+  const cupFlights = CUPS.map((_, i) => {
+    const from = stacked(i, leanAt(tSplit));
+    const lying = cupLying(i);
+    const land = { x: TOWER.x + 110 + i * 90, y: FLOOR - lying.lift };
+    const t1 = tSplit + 0.5 + 0.2 * i;
+    return { from, land, end: { x: land.x + 34, y: land.y }, t1, t2: t1 + 0.32, h: 40 + 45 * i, angle: lying.angle + 360 * Math.floor(i / 2) };
+  });
+  const cupAt = (i: number, t: number): { pt: Pt; angle: number } => {
+    if (t < tSplit) return stacked(i, leanAt(t));
+    const f = cupFlights[i];
+    if (t < f.t1) {
+      const k = seg(t, tSplit, f.t1);
+      return { pt: hop(f.from.pt, f.land, f.h, k), angle: lerp(f.from.angle, f.angle, k) };
+    }
+    if (t < f.t2) return { pt: hop(f.land, f.end, 26, seg(t, f.t1, f.t2)), angle: f.angle };
+    return { pt: f.end, angle: f.angle + wobble(t - f.t2, 9, 13, 3) };
+  };
+  at(tTower + 0.05, { sound: playRattle });
+  cupFlights.forEach((f, i) => at(f.t1, { sound: () => playPlink(i) }));
+
+  /* The paper plane: on top of the tower until it tips, then flicked up, round the loop and gliding across the room onto the button. */
+  const knobX = BUTTON.x - BUTTON.knob;
+  /** The plane's nose sitting on the top cup, pointing right. */
+  const onTopCup = (t: number) => {
+    const top = cupAt(CUPS.length - 1, t);
+    const a = rad(top.angle);
+    const nose = turn({ x: top.pt.x + 50, y: top.pt.y - CUPS[CUPS.length - 1].H / 2 - 8 }, top.pt, a);
+    return { pt: nose, angle: a };
+  };
+  const launchPt = onTopCup(tSplit).pt;
+  const loopBottom = PLANE_LOOP.cy + PLANE_LOOP.r;
+  const planePath = pathOf(
+    rounded([launchPt, { x: launchPt.x + 70, y: 200 }, { x: PLANE_LOOP.cx - 130, y: loopBottom }, { x: PLANE_LOOP.cx, y: loopBottom }], 70),
+    arc(PLANE_LOOP.cx, PLANE_LOOP.cy, PLANE_LOOP.r, 90, -270),
+    rounded(
+      [
+        { x: PLANE_LOOP.cx, y: loopBottom },
+        { x: 8000, y: 260 },
+        { x: 8480, y: 560 },
+        { x: knobX - 220, y: KNOB_Y - 10 },
+        { x: knobX + BUTTON.press, y: KNOB_Y },
+      ],
+      90,
+    ),
+  );
+  const planeLoopIn = planePath.s[planePath.pts.findIndex((p) => p.x >= PLANE_LOOP.cx - 1 && p.y >= loopBottom - 1)];
+  const planeLoopOut = planeLoopIn + 2 * Math.PI * PLANE_LOOP.r;
+  const plane = roll(planePath, 650, 260, 620, 0.12, () => 0.4);
+  const tLoopOut = tSplit + timeWhen(plane, (_, d) => d >= planeLoopOut);
+  const tButton = tSplit + plane.duration;
+  const planeAt = (t: number): { pt: Pt; angle: number; squash: number } => {
+    if (t < tSplit) return { ...onTopCup(t), squash: 0 };
+    if (t < tButton) {
+      const { pt, angle } = along(planePath, distAt(plane, t - tSplit));
+      // A paper plane wobbles a little as it glides.
+      return { pt, angle: angle + rad(4) * Math.sin((t - tSplit) * 9), squash: 0 };
+    }
+    // Bonk: the nose crumples and the plane drops onto the floor in front of the button.
+    const k = seg(t, tButton, tButton + 0.45);
+    const last = along(planePath, planePath.total);
+    return {
+      pt: { x: last.pt.x - 26 * easeOut(k), y: lerp(KNOB_Y, FLOOR - 12, easeIn(k)) },
+      angle: lerp(last.angle, 0, easeIn(k)) + rad(wobble(t - tButton - 0.45, 8, 16, 4)),
+      squash: 0.14 * easeOut(seg(t, tButton, tButton + 0.12)),
+    };
+  };
+  /** How far the plane has pushed the red knob in. */
+  const buttonPress = (t: number) => (t >= tButton ? BUTTON.press : Math.min(BUTTON.press, Math.max(0, planeAt(t).pt.x - knobX)));
+  at(tSplit, { sound: playWhoosh });
+  at(tSplit + 0.3, { say: { de: "Huiii, ein Papierflieger!" } });
+  at(tSplit + timeWhen(plane, (_, d) => d >= planeLoopIn), { sound: playSwirl });
+  at(tLoopOut, { sound: playSlide });
+  at(tSplit + timeWhen(plane, (pt) => pt.x >= 8480), { sound: playSlide });
 
   /* The finale: a spark runs along the cable and the jack-in-the-box jumps out of the gift box. */
   const tPop = tButton + 0.6;
@@ -341,7 +561,12 @@ export function buildMachine() {
     if (t < tLaunch) return carAt(t).pt.x;
     if (t < tBucket) return ballAt(t).pt.x;
     if (t < tTrain) return (BUCKET.cx + GATE.x) / 2;
-    if (t < tButton) return trainFront(t) - 120;
+    if (t < tStop) return trainFront(t) - 120;
+    if (t < tTower) return kreiselAt(t).pt.x + 80;
+    if (t < tSplit) return TOWER.x;
+    // The cups land and the plane loops above them: show both.
+    if (t < tLoopOut) return TOWER.x + 260;
+    if (t < tButton) return planeAt(t).pt.x;
     return GIFT.x;
   };
   const cameraTarget = (t: number) => cameraOn(WORLD_W, focusX(t));
@@ -357,6 +582,15 @@ export function buildMachine() {
     tLand,
     tBucket,
     tTrain,
+    tContact,
+    tStop,
+    tGo,
+    tTower,
+    tFlop,
+    tTopple,
+    tSplit,
+    cupLandings: cupFlights.map((f) => f.t1),
+    tLoopOut,
     tButton,
     tPop,
     marbleAt,
@@ -366,6 +600,10 @@ export function buildMachine() {
     ballAt,
     bucketDrop,
     trainFront,
+    kreiselAt,
+    cupAt,
+    planeAt,
+    buttonPress,
     cameraTarget,
   };
 }

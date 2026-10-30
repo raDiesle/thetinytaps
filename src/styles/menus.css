@@ -76,12 +76,6 @@
   font-weight: 600;
 }
 
-/* Under a short menu title the subtitle still starts its own line. */
-.menu-head + .home-subtitle {
-  display: table;
-  margin-inline: auto;
-}
-
 .game-list {
   list-style: none;
   margin: 0;
@@ -337,10 +331,9 @@ button.game-card:focus-visible {
     font-size: clamp(2rem, 9vh, 3rem);
   }
 
-  /* The cards say enough: a menu's title, the line under it and „Was spielen wir?“ are only read out, so more cards fit. */
+  /* The cards say enough: a menu's title (and the line under the management page's) is only read out, so more cards fit. */
   .menu-title,
-  .home-subtitle,
-  .mode-heading {
+  .home-subtitle {
     position: absolute;
     width: 1px;
     height: 1px;

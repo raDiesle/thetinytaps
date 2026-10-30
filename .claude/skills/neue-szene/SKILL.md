@@ -20,7 +20,7 @@ src/games/scenes/
   <id>/
     <Name>.tsx     // export const <id>: Scene = { ..., items: [...] } – items back to front
     layout.ts      // placements of this scene (built with ../layout's ground())
-    background.tsx // sky, horizon, ground, static details – nothing tappable
+    background.tsx // sky, horizon, ground, static details – no items, but its things move when tapped (<Poke>)
     <group>.tsx    // item drawings, grouped (animals.tsx, buildings.tsx …)
     <id>.css       // all animations of this scene
 ```
@@ -55,6 +55,16 @@ and `../sky`. When a helper of one scene is needed by another, move it up to
   `depthScale(y)`; lines on the ground run towards the vanishing point
   (`towardsHorizon`). Far away = lighter colours and a little haze.
 - Leave space: items must not cover each other's hit areas. 35–45 items fit.
+- **Every tap brings something to life, the background too** (`../spots.tsx`): wrap each
+  distinct thing of the background in `<Poke kind>` – trees, bushes, flowers, tufts, flags
+  `sway` (and lean with a gust of wind), houses, fences, furniture, rugs `wobble`, small loose
+  things `hop`, lamps and stars `glow`; clouds (`Cloud`) drift by themselves. A `<Poke>` wraps
+  a `<g transform>` from outside, never sits on an element with its own `transform`. And give
+  the scene `spots`: boxes over the parts of the picture with what comes out of them – `wind`
+  in the sky (`flurry` with snowflakes in winter), `bug` from floors, paths and roads, `spider` on walls, `flower`/`mole` from
+  meadows, `splash` from water, `bubbles` under water, `crab` from sand, `snow`, `stars` and
+  `fireflies` at night – specific boxes first, catch-alls last, covering the whole picture
+  (`scenes.test.ts` checks the cover and at least 5 pokes).
 - Rooms (`badezimmer/`, `kueche/`, `supermarkt/`, `gutenacht/`): the back wall stands on
   the horizon; floor tiles and lines come from `onFloor` in `../layout`.
 - Bedtime pictures: `bedtime: true` on the scene makes tapped items keep the class

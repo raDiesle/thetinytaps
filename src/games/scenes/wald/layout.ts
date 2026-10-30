@@ -1,4 +1,5 @@
 import { HORIZON, depthScale, ground } from "../layout";
+import type { Box } from "../types";
 
 // Every drawing of this scene has its foot point at (0, 0) and is placed with `ground`.
 // From back to front: the big trees at the edge of the clearing with the stag behind
@@ -45,6 +46,22 @@ export function pathY(x: number) {
 export function pathHalf(x: number) {
   return depthScale(pathY(x)) * 44;
 }
+
+/** Boxes that stay inside the winding brook, from the back to the front, for a splash where its water is tapped. */
+export const BROOK_BOXES: Box[] = Array.from({ length: 11 }, (_, i) => {
+  const top = BROOK_TOP + ((1000 - BROOK_TOP) * i) / 11;
+  const height = (1000 - BROOK_TOP) / 11;
+  const half = brookHalf(top) * 0.75;
+  return [brookX(top + height / 2) - half, top, 2 * half, height];
+});
+
+/** Boxes that stay on the forest path from the left edge to the right one (it climbs a little), for a beetle on it. */
+export const PATH_BOXES: Box[] = Array.from({ length: 10 }, (_, i) => {
+  const [x1, x2] = [i * 160, (i + 1) * 160];
+  const half = pathHalf((x1 + x2) / 2) * 0.9;
+  const top = pathY(x1) - half;
+  return [x1, top, 160, pathY(x2) + half - top];
+});
 
 /** The bridge over the brook, where the path crosses it. */
 export const BRIDGE_Y = 690;

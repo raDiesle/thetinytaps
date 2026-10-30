@@ -146,6 +146,19 @@ export interface SceneChain {
   steps: { item: string; sentence: string }[];
 }
 
+/**
+ * What comes out of the background where a tap hits no item and no `<Poke>` (see spots.tsx):
+ * a gust of wind in the sky (`flurry`: with snowflakes, for winter), a beetle crawling out of the floor tiles, a spider
+ * on its thread on a wall, …
+ */
+export type SpotKind = "wind" | "flurry" | "stars" | "fireflies" | "bug" | "spider" | "flower" | "mole" | "splash" | "bubbles" | "crab" | "snow";
+
+/** A part of the background and what a tap there brings out; several kinds take turns, one per tap. */
+export interface SceneSpot {
+  box: Box;
+  kinds: SpotKind[];
+}
+
 /** A "living picture": a drawn scene whose items move and talk when tapped. */
 export interface Scene {
   id: string;
@@ -158,8 +171,13 @@ export interface Scene {
   /** Colours above and below the picture when the screen has another aspect ratio. */
   sky: string;
   ground: string;
-  /** Everything that is not tappable. Drawn first. */
+  /** Everything that is not an item. Drawn first; things in it wrapped in `<Poke>` move when tapped. */
   Background: ComponentType;
+  /**
+   * What a tap on the background brings out, by part of the picture: the first spot whose box holds the tap
+   * wins, and together they cover the whole picture, so every tap brings something out (scenes.test.ts).
+   */
+  spots: SceneSpot[];
   /** Tappable items, in drawing order (later ones are on top). */
   items: SceneItem[];
   /** Two or three chain reactions between items. */

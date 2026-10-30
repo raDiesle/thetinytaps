@@ -1,25 +1,33 @@
 // The circus machine ("Zirkus"), a Rube Goldberg machine in a circus tent:
 // one tap lets a marble drop out of the magician's top hat, and one act sets
-// off the next for about half a minute – a drum roll, a trampoline, a seal, an
-// elephant's trunk, a teddy on a unicycle on the high wire, a cannon that
+// off the next for about forty seconds – a drum roll, a trampoline, a seal, an
+// elephant's trunk that flings the marble up to a monkey on a trapeze, who
+// swings high and drops it into a dozing lion's mane, the lion that wakes with
+// a start, roars and leaps onto the next pedestal and shakes the marble out
+// into the basket of a teddy on a unicycle on the high wire, a cannon that
 // shoots the clown into the net – while the camera travels along. Everything
 // is worked out ahead as a function of the seconds since the tap, so
 // CircusLevel.tsx only asks where each thing is at a moment. Coordinates are
-// those of the tent, 5600 × 900; the screen shows 1600 of it at a time.
+// those of the tent, 6860 × 900; the screen shows 1600 of it at a time.
 
 import {
   playBark,
   playBoing,
+  playChatter,
+  playCreak,
   playDing,
   playDrum,
   playGiggle,
   playKnock,
   playLaunch,
+  playLeaves,
   playMelody,
   playPlop,
   playPop,
   playRing,
+  playRoar,
   playSqueak,
+  playThump,
   playTick,
   playTrumpet,
   playTwinkle,
@@ -34,7 +42,9 @@ import {
   easeIn,
   easeInOut,
   easeOut,
+  GRAVITY,
   hop,
+  lerp,
   pathOf,
   rad,
   roll,
@@ -47,7 +57,7 @@ import {
 } from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 5600;
+export const WORLD_W = 6860;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -94,30 +104,87 @@ const onHead = (a: number): Pt => ({ x: HEAD.x + (HEAD.r + BALL_R) * Math.cos(ra
 export const CHUTE = { from: { x: 1975, y: 340 }, to: onHead(HEAD_IN) };
 export const chuteY = (x: number) => CHUTE.from.y + ((x - CHUTE.from.x) * (CHUTE.to.y - CHUTE.from.y)) / (CHUTE.to.x - CHUTE.from.x);
 
-/** How steeply the curled-up tip of the trunk points upwards, in degrees: it flings the marble over the teddy. */
+/** How steeply the curled-up tip of the trunk points upwards, in degrees: it flings the marble up to the monkey. */
 const TIP_ANGLE = 60;
 
+/**
+ * The trapeze hangs from a hook in the tent roof at (x, y); its bar is `len`
+ * below the hook. The monkey hangs from the bar by its hands and catches the
+ * marble with its feet, `FEET` from the hook (trapeze hanging straight down).
+ */
+export const TRAPEZE = { x: 3000, y: 56, len: 250 };
+export const FEET: Pt = { x: -16, y: 404 };
+/** How high the trapeze swings at last, in degrees either side, and how long one swing there and back takes. */
+const SWING = 58;
+const SWING_T = 1.8;
+/** Where something `local` on the trapeze (from the hook, hanging straight) is when it has swung `angle` degrees to the right. */
+export const onTrapeze = (local: Pt, angle: number): Pt =>
+  turn({ x: TRAPEZE.x + local.x, y: TRAPEZE.y + local.y }, { x: TRAPEZE.x, y: TRAPEZE.y }, rad(-angle));
+
+/** The lion's two pedestals; `x` is the middle and `top` where the lion's paws stand. */
+export const LION_FROM = { x: 3320, top: 620 };
+export const LION_TO = { x: 3700, top: 590 };
+export const PEDESTAL_W = 170;
+/**
+ * The lion is drawn facing right in its own units, its paws' middle at 0 0:
+ * its mane round `MANE` with radius `r`, its head turning round `LION_NECK`.
+ * The marble lands in the top of the mane and sits in its fluff.
+ */
+export const MANE = { x: 14, y: -128, r: 58 };
+export const LION_NECK: Pt = { x: 14, y: -88 };
+
+/** How the lion looks at a moment: where its paws are, and how it squashes, turns, puffs up and roars. */
+export interface LionPose {
+  /** The middle of its paws. */
+  x: number;
+  y: number;
+  /** The whole lion turned, in degrees (negative lifts its nose). */
+  tilt: number;
+  /** Squashed or stretched: wider and lower, or longer and flatter in a leap. */
+  sx: number;
+  sy: number;
+  /** The head turned round the neck, in degrees. */
+  head: number;
+  /** How fluffed up the mane is (1 is calm). */
+  puff: number;
+  /** How wide the mouth is open, 0–1. */
+  roar: number;
+  /** 0 sitting, 1 legs stretched out in the leap. */
+  stretch: number;
+  eyes: "sleep" | "wide" | "open" | "squint";
+}
+
+/** Where a spot of the lion (in its own units) is in the tent, its head's spots turning with the head. */
+export function onLion(pose: LionPose, local: Pt, withHead: boolean): Pt {
+  const p = withHead ? turn(local, LION_NECK, rad(pose.head)) : local;
+  const scaled = { x: p.x * pose.sx, y: p.y * pose.sy };
+  const turned = turn(scaled, { x: 0, y: 0 }, rad(pose.tilt));
+  return { x: pose.x + turned.x, y: pose.y + turned.y };
+}
+/** Where the marble's middle sits in the top of the mane, in the lion's units. */
+const nestOf = (puff: number): Pt => ({ x: MANE.x, y: MANE.y - MANE.r * puff + 10 });
+
 /** The little platform where the unicycle waits, in front of the elephant. */
-export const PLATFORM = { x0: 2640, x1: 2800, y: 640 };
-export const UNICYCLE = { x0: 2740, r: 34 };
+export const PLATFORM = { x0: 3900, x1: 4060, y: 640 };
+export const UNICYCLE = { x0: 4000, r: 34 };
 /** Where the marble's middle is in the teddy's basket, from the middle of the wheel (unicycle upright). */
 export const BASKET: Pt = { x: 75, y: -150 };
 /** The basket's front rim, from the marble's middle: it catches the ribbon. */
 export const BASKET_RIM: Pt = { x: 30, y: -4 };
 
 /** The high wire, from the platform down to the end platform. */
-export const WIRE = { from: { x: PLATFORM.x1, y: PLATFORM.y }, to: { x: 3980, y: 722 } };
+export const WIRE = { from: { x: PLATFORM.x1, y: PLATFORM.y }, to: { x: 5240, y: 722 } };
 export const wireY = (x: number) => WIRE.from.y + ((x - WIRE.from.x) * (WIRE.to.y - WIRE.from.y)) / (WIRE.to.x - WIRE.from.x);
-export const END = { x0: WIRE.to.x, x1: 4110, y: WIRE.to.y };
+export const END = { x0: WIRE.to.x, x1: 5370, y: WIRE.to.y };
 
 /** The ring of paper flames on a pole, the high wire running through its middle. */
-export const HOOP = { x: 3390, y: wireY(3390) - 100, rx: 24, ry: 130 };
+export const HOOP = { x: 4650, y: wireY(4650) - 100, rx: 24, ry: 130 };
 
 /** Where the unicycle's wheel comes to a stop on the end platform. */
 export const STOP_X = END.x1 - 44;
 
 /** The confetti cannon, its barrel turned `angle` degrees up around the axle at (x, y). */
-export const CANNON = { x: 4300, y: FLOOR - 62, angle: 56, len: 210, back: 46, r: 38, cord: 150 };
+export const CANNON = { x: 5560, y: FLOOR - 62, angle: 56, len: 210, back: 46, r: 38, cord: 150 };
 const BARREL: Pt = { x: Math.cos(rad(CANNON.angle)), y: -Math.sin(rad(CANNON.angle)) };
 /** A spot on the barrel, `u` along it from the axle and `v` to the side (negative is the top side). */
 export const onBarrel = (u: number, v: number): Pt => ({ x: CANNON.x + u * BARREL.x - v * BARREL.y, y: CANNON.y + u * BARREL.y + v * BARREL.x });
@@ -128,14 +195,14 @@ export const MUZZLE: Pt = onBarrel(CANNON.len, 0);
  * like on a party popper – runs from the barrel up through the eye at its top
  * and hangs down to a tassel, just where the teddy's basket comes past.
  */
-export const MAST = { x: 3990, top: 300 };
+export const MAST = { x: 5250, top: 300 };
 export const EYE: Pt = { x: MAST.x, y: MAST.top + 10 };
 export const CORD_END: Pt = onBarrel(CANNON.cord, -CANNON.r);
 
 /** The safety net on two poles; `sag` is how far its middle hangs below the poles' hooks. */
-export const NET = { x0: 4830, x1: 5150, y: 640, sag: 24 };
+export const NET = { x0: 6090, x1: 6410, y: 640, sag: 24 };
 /** The stage with the curtain, behind the net. */
-export const STAGE = { x0: 4720, x1: 5260, top: 250 };
+export const STAGE = { x0: 5980, x1: 6520, top: 250 };
 
 /** The clown doll's middle is this far above its seat, and this far below the middle of its head. */
 export const CLOWN = { seat: 38, head: 38 };
@@ -235,11 +302,97 @@ export function buildCircus() {
   const tTip = tChute + elephantRun.duration;
   at(tTip, { sound: playTrumpet });
 
-  /* Over the teddy's head into its basket: the teddy catches the marble. */
-  const caught = { x: UNICYCLE.x0 + BASKET.x, y: PLATFORM.y - UNICYCLE.r + BASKET.y };
+  /* High up to the monkey on the trapeze, who catches the marble with its feet. */
+  const grabbed = onTrapeze(FEET, 0);
   // Rise just enough above the straight line that it leaves along the tip of the trunk.
-  const tossRise = (caught.y - tip.y + Math.tan(rad(TIP_ANGLE)) * (caught.x - tip.x)) / 4;
-  const tCatch = tTip + 0.85;
+  const tossRise = (grabbed.y - tip.y + Math.tan(rad(TIP_ANGLE)) * (grabbed.x - tip.x)) / 4;
+  const tGrab = tTip + 1;
+  at(tGrab, { sound: playPlop });
+  at(tGrab + 0.15, { sound: playChatter });
+
+  /*
+   * The catch gives the trapeze a push, and the monkey swings higher and
+   * higher, three times there and back; at the top of the last swing forward
+   * it opens its feet and lets the marble drop.
+   */
+  const tDrop = tGrab + 3.25 * SWING_T;
+  const swingAt = (t: number) => {
+    if (t < tGrab) return 0;
+    const w = (2 * Math.PI) / SWING_T;
+    if (t < tDrop) return SWING * (0.3 + 0.7 * easeOut(seg(t, tGrab, tDrop))) * Math.sin(w * (t - tGrab));
+    // Swinging out slowly once the monkey has let go.
+    return SWING * Math.cos(w * (t - tDrop)) * Math.exp(-(t - tDrop) * 0.45) * (1 - seg(t, tDrop + 5, tDrop + 8));
+  };
+  for (let k = 0; k < 3; k++) at(tGrab + 0.35 + k * SWING_T, { sound: playCreak });
+  at(tDrop - SWING_T / 4, { sound: playWhoosh });
+  at(tDrop, { sound: playGiggle });
+
+  /*
+   * The marble drops into the mane of the lion dozing on its pedestal. The lion
+   * wakes with a start, looks up at the monkey, roars (a small, friendly roar),
+   * crouches and leaps onto the next pedestal, higher up. There it shakes its
+   * mane, and the marble flies out into the teddy's basket.
+   */
+  const released = onTrapeze(FEET, SWING);
+  const restPose: LionPose = { x: LION_FROM.x, y: LION_FROM.top, tilt: 0, sx: 1, sy: 1, head: 0, puff: 1, roar: 0, stretch: 0, eyes: "sleep" };
+  const landed = onLion(restPose, nestOf(1), true);
+  const tPlop = tDrop + Math.sqrt((2 * (landed.y - released.y)) / GRAVITY);
+  const tLook = tPlop + 0.8;
+  const tRoar = tPlop + 1.6;
+  const tCrouch = tRoar + 1.3;
+  const tLeap = tCrouch + 0.45;
+  const tLand = tLeap + 0.9;
+  const tShake = tLand + 0.5;
+  const tOut = tShake + 0.4;
+  at(tPlop, { sound: playPlop });
+  at(tPlop + 0.05, { sound: playSqueak });
+  at(tPlop + 0.7, { sound: playChatter });
+  at(tRoar, { sound: playRoar });
+  at(tLeap, { sound: playWhoosh });
+  at(tLand, { sound: playThump });
+  at(tShake, { sound: playLeaves });
+  at(tOut, { sound: playPop });
+
+  const lionAt = (t: number): LionPose => {
+    if (t < tPlop) return restPose;
+    const leapK = seg(t, tLeap, tLand);
+    const spot = t < tLeap ? { x: LION_FROM.x, y: LION_FROM.top } : hop({ x: LION_FROM.x, y: LION_FROM.top }, { x: LION_TO.x, y: LION_TO.top }, 160, leapK);
+    // A jump in place with the fright.
+    const startle = t < tPlop + 0.55 ? 46 * Math.sin(Math.PI * seg(t, tPlop, tPlop + 0.55)) : 0;
+    const roar = easeOut(seg(t, tRoar, tRoar + 0.15)) * (1 - seg(t, tRoar + 0.9, tRoar + 1.1));
+    const fright = seg(t, tPlop, tPlop + 0.1) * Math.exp(-Math.max(0, t - tPlop - 0.1) * 2.5);
+    const crouch = easeInOut(seg(t, tCrouch, tCrouch + 0.35)) * (1 - seg(t, tLeap, tLeap + 0.12));
+    const flying = t >= tLeap && t < tLand ? Math.sin(Math.PI * leapK) : 0;
+    const squash = 0.2 * crouch - 0.06 * flying + wobble(t - tLand, 0.2, 16, 5);
+    const look = -14 * easeInOut(seg(t, tLook, tLook + 0.3)) * (1 - easeInOut(seg(t, tCrouch, tCrouch + 0.3)));
+    const shake = t >= tShake && t < tShake + 0.8 ? 20 * Math.sin(seg(t, tShake, tShake + 0.8) * 6 * Math.PI) : 0;
+    let eyes: LionPose["eyes"] = "open";
+    if (t < tLook) eyes = "wide";
+    else if (roar > 0.3 || (t >= tShake && t < tShake + 0.8)) eyes = "squint";
+    return {
+      x: spot.x,
+      y: spot.y - startle,
+      // The bottom wiggles before the leap; the nose goes up, then down to land.
+      tilt: -14 * Math.sin(2 * Math.PI * leapK) + 3 * crouch * Math.sin((t - tCrouch) * 22),
+      sx: 1 + squash * 0.6,
+      sy: 1 - squash,
+      head: look - 8 * roar + shake,
+      puff: 1 + 0.32 * fright + 0.18 * roar,
+      roar,
+      stretch: flying,
+      eyes,
+    };
+  };
+  /** Where the marble sits in the lion's mane. */
+  const nestAt = (t: number) => {
+    const pose = lionAt(t);
+    return onLion(pose, nestOf(pose.puff), true);
+  };
+
+  /* Out of the mane into the teddy's basket: the teddy catches the marble. */
+  const caught = { x: UNICYCLE.x0 + BASKET.x, y: PLATFORM.y - UNICYCLE.r + BASKET.y };
+  const flungFrom = nestAt(tOut);
+  const tCatch = tOut + 0.85;
   at(tCatch, { sound: playPlop });
   at(tCatch + 0.2, { sound: playGiggle });
 
@@ -304,8 +457,20 @@ export function buildCircus() {
       return { pt, spin: pt.x / BALL_R };
     }
     if (t >= tCatch) return { pt: basketAt(t), spin: caught.x / BALL_R };
+    if (t >= tOut) {
+      const pt = hop(flungFrom, caught, 120, seg(t, tOut, tCatch));
+      return { pt, spin: pt.x / BALL_R };
+    }
+    if (t >= tPlop) return { pt: nestAt(t), spin: landed.x / BALL_R };
+    if (t >= tDrop) {
+      // Straight down with gravity, from the top of the swing into the mane.
+      const u = t - tDrop;
+      const pt = { x: lerp(released.x, landed.x, seg(t, tDrop, tPlop)), y: released.y + (GRAVITY / 2) * u * u };
+      return { pt, spin: released.x / BALL_R };
+    }
+    if (t >= tGrab) return { pt: onTrapeze(FEET, swingAt(t)), spin: grabbed.x / BALL_R };
     if (t >= tTip) {
-      const pt = hop(tip, caught, tossRise, seg(t, tTip, tCatch));
+      const pt = hop(tip, grabbed, tossRise, seg(t, tTip, tGrab));
       return { pt, spin: pt.x / BALL_R };
     }
     if (t >= tChute) {
@@ -372,6 +537,10 @@ export function buildCircus() {
     if (t < 0) return 0;
     if (t < tNose) return Math.max(600, marbleAt(t).pt.x);
     if (t < tLetGo) return SEAL.x + 100;
+    if (t < tGrab) return marbleAt(t).pt.x;
+    // The whole swing, the lion's pedestal under it and the next one stay in sight.
+    if (t < tLeap) return TRAPEZE.x + 200;
+    if (t < tOut) return lionAt(t).x + 60;
     if (t < tUni) return marbleAt(t).pt.x;
     if (t < tStop) return unicycleAt(t).pt.x;
     if (t < tFire) return CANNON.x;
@@ -391,6 +560,14 @@ export function buildCircus() {
     tClap,
     tHead,
     tTip,
+    tGrab,
+    tDrop,
+    tPlop,
+    tRoar,
+    tLeap,
+    tLand,
+    tShake,
+    tOut,
     tCatch,
     tHoop,
     tHook,
@@ -402,6 +579,8 @@ export function buildCircus() {
     dipAt,
     nodAt,
     clapAt,
+    swingAt,
+    lionAt,
     unicycleAt,
     tasselAt,
     pulledAt,

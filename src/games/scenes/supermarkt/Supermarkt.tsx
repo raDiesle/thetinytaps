@@ -1,4 +1,4 @@
-import { ground } from "../layout";
+import { HORIZON, ground } from "../layout";
 import type { Scene } from "../types";
 import { Background } from "./background";
 import { Eierkarton, Einkaufswagen, Kasse, Kassiererin, Kind, Laufband } from "./checkout";
@@ -21,6 +21,13 @@ export const supermarkt: Scene = {
   sky: "#f8f4ec",
   ground: "#f6f7f8",
   Background,
+  // Bubbles and a fish in the fish counter's tank, wind in the trees outside the window, a spider on the wall, a beetle on the floor.
+  spots: [
+    { box: [830, 158, 160, 80], kinds: ["bubbles"] },
+    { box: [8, 120, 84, 138], kinds: ["wind"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["spider"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["bug"] },
+  ],
   items: [
     // ---------- At the back wall ----------
     {

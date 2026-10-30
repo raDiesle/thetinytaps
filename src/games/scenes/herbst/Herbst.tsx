@@ -1,9 +1,9 @@
-import { float } from "../layout";
+import { float, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { FallingLeaves } from "../weather";
 import { Amsel, Eichhoernchen, Hund, Igel, Katze, Kraehe, Schnecke, Wurm } from "./animals";
-import { Background } from "./background";
+import { Background, FIELDS, PATH_BOXES } from "./background";
 import { kuerbis } from "./kuerbis";
 import {
   APPLE,
@@ -74,6 +74,13 @@ export const herbst: Scene = {
   ground: "#94ad56",
   Background,
   Overlay,
+  // A gust of wind through the sky, a mole on the fields, a beetle on the sandy path; on the meadow a mole or a gust of leaves.
+  spots: [
+    ...FIELDS.map((box) => ({ box, kinds: ["mole" as const] })),
+    ...PATH_BOXES.map((box) => ({ box, kinds: ["bug" as const] })),
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["mole", "wind"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

@@ -204,7 +204,6 @@ export const hi: LanguagePack = {
   exampleLetter: "क",
   countSentence: (n, thing) => `${numberWords[n]} ${n === 1 ? thing.singular : thing.plural}!`,
   praise: ["शाबाश!", "बहुत बढ़िया!", "वाह!", "कमाल है!", "हुर्रे!"],
-  firstLetterPrompt: (word) => `${word.word}! ${word.word} किस अक्षर से शुरू होता है?`,
   colors: relabel(de.colors, {
     "🔴": "लाल",
     "🔵": "नीला",
