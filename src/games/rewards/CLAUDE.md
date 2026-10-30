@@ -65,9 +65,11 @@ targets) – keep it that way.
   `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
   `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Info.tsx` – „ℹ️ Über die Tafel“ and „Über den
   Plan“; `RewardsGame.tsx` – the page for boards and plans (above).
-- `bilder/prompts.ts` – every picture the chart may want, as Gemini prompts. No picture is made yet: the user reviews
-  them on `/management/` (🎨 Bildvorschläge, `src/components/PicturePromptReview.tsx`) first. Only generate after
-  that, with the reviewed text, and then swap the emoji for the pictures.
+- `bilder/prompts.ts` – every picture the chart may want, as Gemini prompts. All were made on 30 October 2026 (`bilder/*.webp`; the
+  user asked for them before reviewing them on `/management/`, 🎨 Bildvorschläge), not yet built in: the board still
+  shows the emoji. A changed or new prompt is reviewed there first, then made. Card pictures are free-standing cut-outs
+  (never „inside a circle“, `rewards.test.ts`), at least 600 px for photo prints; the `-linie` twins are drawn from the
+  colour picture flattened onto white.
 
 ## The page
 

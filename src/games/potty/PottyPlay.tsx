@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { GameEnd } from "@/components/GameEnd";
+import { targetLanguageFor } from "@/content/targetLanguages";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import {
@@ -171,6 +172,14 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
   const say = (text: string) => {
     if (settings.speech) speak(text, voiceFor(text, language));
   };
+  /** A thought's line; one not translated yet is said in German with the German voice, then the rest in the app's. */
+  const sayScene = (id: string, withFinish: boolean) => {
+    const own = texts.scenes[id];
+    if (own !== undefined) return say(withFinish ? `${own} ${texts.finish}` : own);
+    if (!settings.speech) return;
+    speak(POTTY_TEXTS.de.scenes[id], targetLanguageFor("de").speechLang);
+    if (withFinish) speak(texts.finish, voiceFor(texts.finish, language), { queue: true });
+  };
   const sound = (ms: number, play: () => void) => {
     if (settings.sounds) later(ms, play);
   };
@@ -314,8 +323,8 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
     // Once per round the voice says what the ✓ is for; after that only tapped scenes speak.
     if (!toldFinish.current) {
       toldFinish.current = true;
-      say(`${texts.scenes[scene.id]} ${texts.finish}`);
-    } else if (tapped) say(texts.scenes[scene.id]);
+      sayScene(scene.id, true);
+    } else if (tapped) sayScene(scene.id, false);
   };
 
   /**

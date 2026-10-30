@@ -168,8 +168,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "🚽 Bilder und Texte",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“.",
+        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“. Die 15 Denkblasen vom 30. Oktober 2026 (Wasserrutsche bis Kastanie) sprechen nur Deutsch, bis sie übersetzt werden.",
       },
       {
         label: "🎵 Warte-Lied (gesungen)",
