@@ -34,10 +34,10 @@ export function CategoryPage() {
         }
       />
       {category.subtitle && <p className="home-subtitle">{t(category.subtitle)}</p>}
-      <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
+      <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
         {category.games.map((g) => (
           <li key={g.href}>
-            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} />
+            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
           </li>
         ))}
       </ul>

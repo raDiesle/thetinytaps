@@ -23,6 +23,7 @@ export const firstVisitIdeas: IdeaArea = {
       text: "Die Karten der Startseite („Lebendige Welten“, „Zuordnen“, …) zeigen nicht ein Emoji, sondern drei bis vier kleine Bilder ihrer Spiele als Fächer oder Collage, dazu klein die Zahl der Spiele. Mit V-01 sind es die Spiel-Bilder, vorher die Emojis der Spiele.",
       why: "Heute weiß man erst nach dem Antippen, was hinter „Lebendige Welten“ steckt; so sieht man auf einen Blick, wie viele Spiele es gibt.",
       effort: "S",
+      done: true,
     },
     {
       id: "V-03",
@@ -55,6 +56,7 @@ export const firstVisitIdeas: IdeaArea = {
       text: "Am Computer und auf dem Tablet steht unter dem Namen jeder Karte eine kurze Zeile, was das Spiel ist („Wimmelbilder zum Antippen“, „Zähneputzen mit Lied und Timer“). Auf Handys fällt sie weg, damit alle Karten auf einen Bildschirm passen. Die Texte gibt es schon fast: die Beschreibungen in `seo.ts`.",
       why: "Eltern entscheiden, was ihr Kind spielt – und „Kettenreaktion“ oder „Laut und leise“ sagt ohne Erklärung wenig.",
       effort: "S",
+      done: true,
     },
     {
       id: "V-07",
@@ -71,6 +73,7 @@ export const firstVisitIdeas: IdeaArea = {
       text: "Jeder Bereich bekommt seinen Hintergrund und seine Farben statt des gleichen Himmels: Lebendige Welten eine Wiese mit Hof und Hügeln, Zuordnen einen Tisch mit Spielsachen, Buchstaben & Zahlen bunte Bauklötze, Weitere ein Kinderzimmer. Die Karten eines Bereichs in einer Farbfamilie, und die Bereichs-Karte auf der Startseite zeigt schon dieses Bild.",
       why: "Kinder finden „ihren“ Bereich am Bild wieder, und die App wirkt wie eine Welt statt wie Seiten mit Knöpfen.",
       effort: "M",
+      done: true,
     },
     {
       id: "V-09",

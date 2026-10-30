@@ -267,8 +267,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   cards while they wait (`usePreloadPages`, `src/lib/preloadPages.ts`, each lazy page registers its addresses in
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
+- Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
+  it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
+  home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
+  Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
   with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step

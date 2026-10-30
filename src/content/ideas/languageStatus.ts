@@ -193,7 +193,17 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
     note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
+    parts: [
+      {
+        label: "🏠 Startseite, Menüs und Einstellungen",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+      },
+      {
+        label: "📝 Zeilen für Eltern unter den Karten",
+        languages: { de: "done" },
+        note: "Nur auf Tablet und Computer zu sehen (`blurb` in games.ts); ohne Übersetzung stehen sie auf Deutsch da.",
+      },
+    ],
   },
 ];
