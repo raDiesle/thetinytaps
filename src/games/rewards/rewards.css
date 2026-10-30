@@ -960,6 +960,52 @@
   filter: grayscale(1) contrast(1.15);
 }
 
+/* A picture in place of an emoji (pictures.tsx): as big as the emoji's font size, a little more, since a picture
+   leaves more of its square empty than an emoji does. */
+.rw-pic {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+/* A task's or reward's picture has room to be bigger than the emoji was. */
+:is(.rw-task-emoji, .rw-reward-emoji) .rw-pic {
+  width: 1.5em;
+  height: 1.5em;
+}
+
+/* On paper a week row's picture takes no more width than its emoji did, so the words beside it still fit. */
+.rw-on-paper .rw-grid .rw-task-emoji .rw-pic {
+  width: 1em;
+  height: 1em;
+}
+
+.rw-chips .rw-pic {
+  width: 1.8em;
+  height: 1.8em;
+  margin: -0.4em 0;
+}
+
+/* The strip of pictures along the top of a colour print, from edge to edge over the sheet's padding. */
+.rw-strip {
+  flex: none;
+  width: calc(100% + 6cqmin);
+  height: 13cqmin;
+  margin: -2.5cqmin -3cqmin 0;
+  border-radius: 3.3cqmin 3.3cqmin 0 0;
+  object-fit: cover;
+}
+
+.rw-info-picture {
+  float: right;
+  width: 7rem;
+  height: 7rem;
+  margin: 0 0 0.5rem 1rem;
+  object-fit: contain;
+}
+
 .rw-head {
   display: flex;
   flex-wrap: wrap;

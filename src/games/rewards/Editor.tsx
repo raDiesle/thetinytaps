@@ -3,6 +3,7 @@ import { useT } from "@/lib/language";
 import { type Board, type BoardTask, COLLECT_GOALS, fieldCount, MAX_TASKS, newId, rewardFromCatalog, taskFromCatalog } from "./board";
 import { useBoardTitle, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { MARKS, REWARDS, SLOTS, TASK_BY_ID, TASKS, THEMES } from "./catalog";
+import { ItemPic } from "./pictures";
 
 const DAY_NAMES = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
@@ -155,7 +156,7 @@ export function Editor({
           <div className="rw-chips" role="group" aria-label={t({ de: "Aufgabe dazu" })}>
             {unused.map((task) => (
               <button key={task.id} type="button" onClick={() => addTask(taskFromCatalog(task.id))}>
-                + {task.emoji} {t(task.label)}
+                + <ItemPic item={{ emoji: task.emoji, catalog: task.id }} /> {t(task.label)}
               </button>
             ))}
             <button type="button" onClick={() => addTask({ id: newId(), emoji: "⭐", label: "" })}>
@@ -224,7 +225,7 @@ export function Editor({
                 aria-pressed={on}
                 onClick={() => onChange({ reward: rewardFromCatalog(reward.id) })}
               >
-                {reward.emoji} {t(reward.label)}
+                <ItemPic item={{ emoji: reward.emoji, catalog: reward.id }} kind="reward" /> {t(reward.label)}
               </button>
             );
           })}

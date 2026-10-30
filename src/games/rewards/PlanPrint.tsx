@@ -8,6 +8,7 @@ import { distinctSteps, type Plan } from "./plan";
 import { PlanSheet, type PlanLook, useStepLabel } from "./PlanSheet";
 import { MIN_CARD_MM, type PhotoFormat } from "./photo";
 import { PhotoPrint } from "./PhotoPrint";
+import { itemPicture, ItemPic } from "./pictures";
 import { A4, Preview } from "./PrintPanel";
 
 /** How a plan is printed. */
@@ -57,7 +58,7 @@ export function PlanPrint({
       <PhotoPrint
         title={t({ de: "Bildkarten als Fotoabzug" })}
         note={t({ de: "Jedes Bild des Plans einmal, von allen Tagen, als Karte für eine Klett-Tafel." })}
-        cards={distinctSteps(plan).map((step) => ({ emoji: step.emoji, label: label(step) }))}
+        cards={distinctSteps(plan).map((step) => ({ emoji: step.emoji, picture: itemPicture(step, "task"), label: label(step) }))}
         min={MIN_CARD_MM}
         theme={THEME_BY_ID.get(plan.theme) ?? THEMES[0]}
         name="tagesplan-karten"
@@ -120,7 +121,7 @@ function PlanPages({ plan, day, options, orientation }: { plan: Plan; day: Date;
           {page.map((step) => (
             <span key={step.id} className="pl-cut-card">
               <span className="pl-emoji" aria-hidden>
-                {step.emoji}
+                <ItemPic item={step} lines={!look.color} />
               </span>
               <span className="pl-label">{label(step)}</span>
             </span>

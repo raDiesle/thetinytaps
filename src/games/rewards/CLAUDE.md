@@ -44,7 +44,8 @@ targets) – keep it that way.
   times of day they come with – Zähne putzen: morning and evening), the times of day (`SLOTS`: ☀️ morgens, 🌤️ mittags,
   🌙 abends), rewards (time together first, the ice cream last), marks for a field (with an outline to colour in for
   some), colours, the four views (`KINDS`: Tag, Woche, Monat, Sammeln, each with a line for grown-ups) and the
-  templates (each with a `hint`, and `slots` where a task has fewer times than in the catalogue). All emoji for now.
+  templates (each with a `hint`, and `slots` where a task has fewer times than in the catalogue). Each entry has an
+  emoji; its picture comes from `pictures.tsx`.
 - `board.ts` – a board and the star log, pure functions: days of a week or month board, field keys (`YYYY-MM-DD|task`,
   with a time of day `YYYY-MM-DD|task|evening`, or `count` on a collecting board; `cellKey`/`parseCellKey`), the fields
   of a task (`taskSlots`), progress, add, take back, start over, `withKind` (the same board in another view: stars
@@ -65,11 +66,16 @@ targets) – keep it that way.
   `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
   `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Info.tsx` – „ℹ️ Über die Tafel“ and „Über den
   Plan“; `RewardsGame.tsx` – the page for boards and plans (above).
-- `bilder/prompts.ts` – every picture the chart may want, as Gemini prompts. All were made on 30 October 2026 (`bilder/*.webp`; the
-  user asked for them before reviewing them on `/management/`, 🎨 Bildvorschläge), not yet built in: the board still
-  shows the emoji. A changed or new prompt is reviewed there first, then made. Card pictures are free-standing cut-outs
-  (never „inside a circle“, `rewards.test.ts`), at least 600 px for photo prints; the `-linie` twins are drawn from the
-  colour picture flattened onto white.
+- `pictures.tsx` – the pictures of `bilder/` in place of the catalogue's emoji (`ItemPic`, `MarkPic`, `Pic`): tasks,
+  plan cards, rewards and marks on screen, in the wizard and the editor's chips, on paper and on the photo prints
+  (`PhotoCard.picture`, drawn on the canvas); Tapsi celebrating (`fest`) at a party without a reward and at the end of a
+  plan, Tapsi with the star (`stern-halten`) in „Über die Tafel“, a theme's strip (`SheetStrip`) along the top of a
+  colour print, and the `-linie` twins on grey prints. An `<img class="rw-pic">` takes its size from the font size the
+  emoji had (`1.2em`, more where there is room). `tafel.webp` waits for pages with their own og:image (idea V-10).
+- `bilder/prompts.ts` – every picture of the chart as its Gemini prompt (made on 30 October 2026, shown on
+  `/management/`, 🎨 Bildvorschläge). A changed or new prompt is reviewed there first, then made. Card pictures are
+  free-standing cut-outs (never „inside a circle“, `rewards.test.ts`), at least 600 px for photo prints; the `-linie`
+  twins are drawn from the colour picture flattened onto white.
 
 ## The page
 
@@ -161,7 +167,12 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   evening); a linked game fills the field of the time it was played, never every field of the day.
 - Class names built from data get a prefix of their own (`rw-kind-${kind}`), never plain `rw-${id}`: `rw-day` and
   `rw-month` once styled a whole sheet with the rules of a weekday label and the calendar.
-- A new catalogue entry needs its picture prompt and line-art twin in `bilder/prompts.ts` (`rewards.test.ts` checks).
+- A new catalogue entry needs its picture prompt and line-art twin in `bilder/prompts.ts`, and the pictures made
+  (`rewards.test.ts` checks both).
+- A picture stands for the catalogue's emoji only: a task, card or reward whose emoji a grown-up changed, and an own
+  one, shows that emoji (`itemPicture`); never put a picture over what a grown-up chose.
+- On paper a picture never takes more room than the emoji it replaces where words stand beside it (a week row): the
+  bigger pictures cut „Zähne putzen“ to „Zähne putze“ in the A4 preview. Look at the print preview after changing sizes.
 
 # Tagesplan
 

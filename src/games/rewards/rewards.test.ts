@@ -24,9 +24,24 @@ import {
   withKind,
 } from "./board";
 import { snakeLayout } from "./BoardSheet";
-import { CHART_TYPES, KINDS, MARKS, PLAN_TEMPLATES, REWARDS, TASK_BY_ID, TASKS, TEMPLATES, THEMES, MARK_BY_ID, REWARD_BY_ID, THEME_BY_ID } from "./catalog";
+import {
+  ACTIVITIES,
+  CHART_TYPES,
+  KINDS,
+  MARKS,
+  PLAN_TEMPLATES,
+  REWARDS,
+  TASK_BY_ID,
+  TASKS,
+  TEMPLATES,
+  THEMES,
+  MARK_BY_ID,
+  REWARD_BY_ID,
+  THEME_BY_ID,
+} from "./catalog";
 import { CATEGORIES } from "@/content/games";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
+import { itemPicture, markPicture, picture } from "./pictures";
 import { DEFAULT_REWARDS_SETTINGS } from "./settings";
 
 const prompts = REWARDS_PICTURE_PROMPTS.groups.flatMap((g) => g.prompts);
@@ -305,5 +320,30 @@ describe("one page for boards and plans", () => {
     const games = CATEGORIES.flatMap((category) => category.games);
     expect(games.find((game) => game.href === "/belohnungstafel/")?.also).toEqual(["/tagesplan/"]);
     expect(games.some((game) => game.href === "/tagesplan/")).toBe(false);
+  });
+});
+
+describe("pictures in place of the emoji", () => {
+  test("every catalogue task, plan card, reward and mark has its picture, and a line-art twin for grey prints", () => {
+    for (const entry of [...TASKS, ...ACTIVITIES]) {
+      const item = { emoji: entry.emoji, catalog: entry.id };
+      expect(itemPicture(item, "task"), entry.id).toBeDefined();
+      expect(itemPicture(item, "task", true), entry.id).toBeDefined();
+    }
+    for (const reward of REWARDS) {
+      const item = { emoji: reward.emoji, catalog: reward.id };
+      expect(itemPicture(item, "reward"), reward.id).toBeDefined();
+      expect(itemPicture(item, "reward", true), reward.id).toBeDefined();
+    }
+    for (const mark of MARKS) expect(markPicture(mark), mark.id).toBeDefined();
+    for (const name of ["fest", "stern-halten", ...THEMES.map((theme) => `streifen-${theme.id}`)]) expect(picture(name), name).toBeDefined();
+  });
+
+  test("a task, card or reward keeps the emoji a grown-up picked or typed instead of the catalogue's", () => {
+    expect(itemPicture({ emoji: "🦷", catalog: "zaehne" }, "task")).toBeUndefined();
+    expect(itemPicture({ emoji: "⭐" }, "task")).toBeUndefined();
+    expect(itemPicture({ emoji: "🎈", catalog: "zoo" }, "reward")).toBeUndefined();
+    // Spielplatz is a reward and a plan card: each finds its own picture.
+    expect(itemPicture({ emoji: "🛝", catalog: "spielplatz" }, "task")).not.toBe(itemPicture({ emoji: "🛝", catalog: "spielplatz" }, "reward"));
   });
 });

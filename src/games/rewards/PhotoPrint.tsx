@@ -7,6 +7,8 @@ import { PHOTO_FORMATS, type PhotoFormat, type PhotoLayout, photoFormat, photoLa
 /** One card on a photo: a picture and, for a plan's step, its name. */
 export interface PhotoCard {
   emoji: string;
+  /** Drawn instead of the emoji where there is one (`pictures.tsx`). */
+  picture?: string;
   label?: string;
 }
 
@@ -173,9 +175,10 @@ function useJpegs(cards: PhotoCard[], format: PhotoFormat, layout: PhotoLayout, 
     const urls: string[] = [];
     (async () => {
       await fontsReady();
+      const images = await loadImages(cards);
       const made: Jpeg[] = [];
       for (const sheet of photoSheets(cards, layout.cols * layout.rows)) {
-        const blob = await drawPhoto(sheet, format, layout, theme);
+        const blob = await drawPhoto(sheet, images, format, layout, theme);
         if (cancelled) return;
         const url = URL.createObjectURL(blob);
         urls.push(url);
@@ -200,8 +203,26 @@ async function fontsReady() {
   }
 }
 
+/** The cards' pictures, loaded: a canvas draws only a picture that is there. One that fails is drawn as its emoji. */
+async function loadImages(cards: PhotoCard[]): Promise<Map<string, HTMLImageElement>> {
+  const urls = [...new Set(cards.flatMap((card) => card.picture ?? []))];
+  const loaded = await Promise.all(
+    urls.map(async (url) => {
+      const image = new Image();
+      image.src = url;
+      try {
+        await image.decode();
+        return [[url, image] as const];
+      } catch {
+        return [];
+      }
+    }),
+  );
+  return new Map(loaded.flat());
+}
+
 /** One photo at 300 dpi: white, the cut lines from edge to edge, and every card in the theme's colours. */
-function drawPhoto(cards: PhotoCard[], format: PhotoFormat, layout: PhotoLayout, theme: Theme): Promise<Blob> {
+function drawPhoto(cards: PhotoCard[], images: Map<string, HTMLImageElement>, format: PhotoFormat, layout: PhotoLayout, theme: Theme): Promise<Blob> {
   const canvas = document.createElement("canvas");
   canvas.width = photoPx(format.width);
   canvas.height = photoPx(format.height);
@@ -250,8 +271,19 @@ function drawPhoto(cards: PhotoCard[], format: PhotoFormat, layout: PhotoLayout,
 
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `${Math.round(side * (card.label ? 0.5 : 0.62))}px ${emojiFont}`;
-    ctx.fillText(card.emoji, x + side / 2, y + side * (card.label ? 0.42 : 0.53));
+    const image = card.picture ? images.get(card.picture) : undefined;
+    if (image) {
+      // The picture in a square above the word (or in the middle without one), as big as it fits.
+      const box = side * (card.label ? 0.66 : 0.8);
+      const scale = Math.min(box / image.naturalWidth, box / image.naturalHeight);
+      const w = image.naturalWidth * scale;
+      const h = image.naturalHeight * scale;
+      const top = card.label ? y + side * 0.08 : y + (side - box) / 2;
+      ctx.drawImage(image, x + (side - w) / 2, top + (box - h) / 2, w, h);
+    } else {
+      ctx.font = `${Math.round(side * (card.label ? 0.5 : 0.62))}px ${emojiFont}`;
+      ctx.fillText(card.emoji, x + side / 2, y + side * (card.label ? 0.42 : 0.53));
+    }
     if (card.label) {
       // As big as the card's width allows, never bigger than a tenth of it.
       let size = side * 0.11;

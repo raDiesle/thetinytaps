@@ -4,6 +4,7 @@ import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
 import { cellKey, type LinkedDays, possessive, weekday } from "./board";
 import { STEP_BY_ID, THEME_BY_ID, THEMES } from "./catalog";
+import { ItemPic, SheetStrip } from "./pictures";
 import { currentStep, nightsUntil, type Plan, type PlanStep, splitDone, stepDone, stepsOn } from "./plan";
 
 const DAY_NAMES: Localized<string[]> = { de: ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] };
@@ -105,6 +106,7 @@ export function PlanSheet({
 
   return (
     <div className={`rw-sheet pl-sheet pl-view-${plan.view}${look.print ? " rw-on-paper" : ""}${grey ? " rw-grey" : ""}`} style={style}>
+      {look.print && look.color && <SheetStrip theme={theme} />}
       <header className="rw-head">
         <span className="rw-title">{title}</span>
         {sub && <span className="rw-blank">{sub}</span>}
@@ -166,7 +168,7 @@ function StepCard({
     >
       {number !== undefined && <span className="pl-number">{number}</span>}
       <span className="pl-emoji" aria-hidden>
-        {step.emoji}
+        <ItemPic item={step} lines={look.print && !look.color} />
       </span>
       <span className="pl-label">{label}</span>
       {state === "done" && (
@@ -261,7 +263,7 @@ function DoneBox({ day, done, example, fresh, full }: { day: Date; done: PlanSte
               title={stepLabel(step)}
               style={{ "--pl-tilt": `${(i % 2 ? 1 : -1) * (4 + ((i * 3) % 5))}deg` } as CSSProperties}
             >
-              {step.emoji}
+              <ItemPic item={step} />
             </span>
           );
         })}

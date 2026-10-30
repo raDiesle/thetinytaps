@@ -3,7 +3,7 @@ import { ACTIVITIES, MARKS, REWARDS, TASKS, THEMES } from "../catalog";
 
 // Every picture the Belohnungstafel may get, as prompts for the grown-up to check on
 // /management/ (Bildvorschläge) before any is made. All of them were made on 30 October 2026 (the user asked for them before
-// reviewing), but the board still shows the catalogue's emoji until they are built in. Tapsi is the fox of
+// reviewing) and show in place of the catalogue's emoji (pictures.tsx). Tapsi is the fox of
 // „Aufs Töpfchen“, drawn after its first picture so it looks the same.
 
 const DIR = "src/games/rewards/bilder";
@@ -181,7 +181,7 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = {
   title: "Belohnungstafel",
   date: "2026-10-28",
   intro:
-    "Bilder, die die Emoji der Belohnungstafel ersetzen könnten – auf dem Bildschirm und im Ausdruck. Tapsi ist der Fuchs aus „Aufs Töpfchen“ (dessen erstes Bild ist die Referenz). Prüfen: Erkennt ein Zweijähriger die Aufgabe ohne Worte? Passt die Belohnung (Zeit zusammen)? Fehlt eine Aufgabe? Alle erzeugt am 30. Oktober 2026 (src/games/rewards/bilder/), noch nicht eingebaut: Die Tafel zeigt weiter die Emoji. Ein geändertes Bild wird einzeln neu erzeugt (Batch, je Bild etwa 2 Cent).",
+    "Bilder, die die Emoji der Belohnungstafel ersetzen könnten – auf dem Bildschirm und im Ausdruck. Tapsi ist der Fuchs aus „Aufs Töpfchen“ (dessen erstes Bild ist die Referenz). Prüfen: Erkennt ein Zweijähriger die Aufgabe ohne Worte? Passt die Belohnung (Zeit zusammen)? Fehlt eine Aufgabe? Alle erzeugt am 30. Oktober 2026 (src/games/rewards/bilder/) und eingebaut; nur das Vorschaubild „tafel“ wartet noch auf eigene Vorschaubilder je Seite. Ein geändertes Bild wird einzeln neu erzeugt (Batch, je Bild etwa 2 Cent).",
   groups: [
     {
       title: "Aufgaben",
