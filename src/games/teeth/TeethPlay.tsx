@@ -54,7 +54,7 @@ type Ending = "cheer" | "tidy" | "rest";
 type Prelude = "sweets" | "grow" | "brush" | "paste" | "monsters";
 
 /** How the monsters grow depends on the time of day (over the day or the night), see DAYTIME. `sounds` play at their moment of the part. */
-const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized; sounds?: Cue[] }> = {
+export const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized; sounds?: Cue[] }> = {
   sweets: {
     ms: ORIGIN_MS.sweets,
     sounds: ORIGIN_CUES,
@@ -157,7 +157,7 @@ const PRELUDE: Record<Prelude, { ms: number; title: Localized; cue?: Localized; 
 };
 
 /** Said at the end, before the daytime's goodbye (unless the sung finale sings it). */
-const DONE_SAY: Localized = {
+export const DONE_SAY: Localized = {
   de: "Fertig! Alle Zuckermonster sind weg. Jetzt den Schaum ausspucken. Blitzeblank!",
   en: "Done! All the sugar monsters are gone. Now spit out the foam. Sparkling clean!",
   zh: "刷好啦！糖怪兽都没有了。现在把泡沫吐掉。亮晶晶！",
@@ -168,7 +168,7 @@ const DONE_SAY: Localized = {
 };
 
 /** Said while the brush is rinsed and put away (unless the song sings). */
-const TIDY_SAY: Localized = {
+export const TIDY_SAY: Localized = {
   de: "Zahnbürste ausspülen und zurück in den Becher. Geschafft!",
   en: "Rinse the toothbrush and back into the cup. All done!",
   zh: "把牙刷冲干净，放回杯子里。完成啦！",

@@ -11,7 +11,7 @@ import type { FeelingsSettings } from "./settings";
 const FRAME_MS = 900;
 
 /** Said with the laugh when a good idea is chosen (only when speech is on), one at random. */
-const PRAISE: Localized<string[]> = {
+export const PRAISE: Localized<string[]> = {
   de: ["Juhu!", "Ja!", "Super!"],
   ru: ["Ура!", "Да!", "Молодец!"],
   en: ["Yay!", "Yes!", "Great!"],

@@ -7,11 +7,11 @@ import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
-import { useAppLanguage, useT } from "@/lib/language";
+import { useT } from "@/lib/language";
 import { countGame, isPlaytimeOver, usePlaytime, usePlaytimeState } from "@/lib/playtime";
 import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
-import { speak, stopSpeaking, unlockSpeech } from "@/lib/speech";
+import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
 import { forwardNearTaps } from "@/lib/tapTargets";
 
@@ -382,21 +382,9 @@ function Dusk({ level }: { level: number }) {
 /** Play time is over: a quiet night sky that ignores taps and keys until a grown-up exits. */
 function GoodNight() {
   const t = useT();
-  const language = useAppLanguage();
-  const sentence = t({
-    de: "Gute Nacht! Die Spielzeit ist vorbei.",
-    ru: "Спокойной ночи! Время игры закончилось.",
-    en: "Good night! Play time is over.",
-    zh: "晚安！游戏时间结束了。",
-    hi: "शुभ रात्रि! खेलने का समय ख़त्म हो गया।",
-    es: "¡Buenas noches! Se acabó el tiempo de juego.",
-    ar: "ليلة سعيدة! انتهى وقت اللعب.",
-  });
-  useEffect(() => {
-    playLullaby();
-    const timer = setTimeout(() => speak(sentence, language.speechLang, { rate: 0.7 }), 1200);
-    return () => clearTimeout(timer);
-  }, [sentence, language.speechLang]);
+  // Only the lullaby: the browser's voice never speaks (root CLAUDE.md). The sentence for it waits for its
+  // recording on the list in src/content/voiceLines.ts.
+  useEffect(() => playLullaby(), []);
 
   return (
     <div className="good-night" role="status">
