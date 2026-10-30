@@ -1,7 +1,8 @@
-import { type ReactNode, useId } from "react";
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { BookFamily } from "@/components/BookFamily";
 import { FullscreenCorner } from "@/components/FullscreenButton";
+import { PageCornerArt } from "@/components/PageCornerArt";
 import { useTurnPage } from "@/lib/look";
 
 /**
@@ -53,31 +54,9 @@ export function MenuHead({ to, back, title, tools, children }: { to: string; bac
  */
 function PageCorner({ to, back }: { to: string; back: string }) {
   const turnPage = useTurnPage(to, "back");
-  const id = useId();
   return (
     <Link to={to} className="page-corner" aria-label={back} title={back} onClick={turnPage} data-tap>
-      <svg viewBox="0 0 100 100" aria-hidden>
-        <defs>
-          {/* Under the lifted corner: the next page's paper, in the corner's shadow towards the fold. */}
-          <linearGradient id={`${id}u`} x1="1" y1="0" x2="0.5" y2="0.5">
-            <stop offset="0" stopColor="#efe4ca" />
-            <stop offset="1" stopColor="#cdbb93" />
-          </linearGradient>
-          {/* The corner's back: lit where it bends at the fold, darker towards its tip. */}
-          <linearGradient id={`${id}b`} x1="0.5" y1="0.5" x2="0" y2="1">
-            <stop offset="0" stopColor="#d8c8a2" />
-            <stop offset="0.18" stopColor="#fffaf0" />
-            <stop offset="0.7" stopColor="#f3e8cf" />
-            <stop offset="1" stopColor="#dfd0ac" />
-          </linearGradient>
-        </defs>
-        <path d="M0 0H100V100Z" fill={`url(#${id}u)`} />
-        <path d="M100 100L96 0" stroke="#c9b68f" strokeWidth="1.5" />
-        {/* The corner's shadow on the page, then the corner itself, curling a little at its tip. */}
-        <path className="page-corner-shadow" d="M0 0L100 100Q56 93 14 100Q6 56 0 0Z" />
-        <path className="page-corner-back" d="M0 0L100 100Q58 90 9 95Q3 52 0 0Z" fill={`url(#${id}b)`} />
-        <path className="page-corner-arrow" d="M58 80Q40 82 28 68M28 68l1 11M28 68l11 1" />
-      </svg>
+      <PageCornerArt sign="back" />
     </Link>
   );
 }

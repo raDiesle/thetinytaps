@@ -51,6 +51,19 @@ test("in the book look a menu turns back at the page's top right corner", () => 
   expect(rules.some((r) => r.selector === ':root[data-look="book"] .menu-head .back-link' && /display:\s*none/.test(r.body))).toBe(true);
 });
 
+// Leaving a game is the same corner in the book look (user feedback, October 2026: every way back turns the page back),
+// with a ✕ on it and held like the ✕ – so a child's tap still can't end the game.
+test("in the book look a game is left by holding the page's corner", () => {
+  const shell = readFileSync("src/components/GameShell.tsx", "utf8");
+  const exit = shell.slice(shell.indexOf("function ExitButton"));
+  expect(exit).toContain("useHold(");
+  expect(exit).toContain('<PageCornerArt sign="close" />');
+  const rules = cssRules();
+  expect(rules.some((r) => r.selector === ".hold-exit .page-corner-art" && /display:\s*none/.test(r.body))).toBe(true);
+  expect(rules.some((r) => r.selector === ':root[data-look="book"] .play-area .exit-corner .page-corner-art' && /display:\s*block/.test(r.body))).toBe(true);
+  expect(rules.some((r) => r.selector === ':root[data-look="book"] .play-area .exit-corner .hold-exit-sign' && /display:\s*none/.test(r.body))).toBe(true);
+});
+
 // The sun is in the top left corner, so the grown-ups' buttons (fullscreen, the home page's options) keep the top right one.
 test("the menus' sun is in the top left corner", () => {
   const sun = cssRules().filter((r) => r.selector === ".sky-sun");

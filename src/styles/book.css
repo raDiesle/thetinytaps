@@ -372,8 +372,8 @@
   background: var(--paper-grain), var(--paper-mottle), var(--paper);
 }
 
-/* ✕, the fullscreen button and ⚙️ while playing: still pale see-through discs with a thin dark edge (findable on dark
-   pictures too), but of paper. */
+/* The fullscreen button and ⚙️ while playing: still pale see-through discs with a thin dark edge (findable on dark
+   pictures too), but of paper. The ✕ becomes the page's corner (below, at the way back). */
 :root[data-look="book"] :is(.play-fullscreen, .hold-exit) {
   background-color: #fbf4e3b3;
   box-shadow:
@@ -514,7 +514,7 @@
 }
 
 /* A finger or the mouse on it lifts the corner a little more, inviting the turn. */
-:root[data-look="book"] .page-corner svg {
+:root[data-look="book"] .page-corner .page-corner-art {
   display: block;
   width: 100%;
   height: 100%;
@@ -524,11 +524,11 @@
   filter: drop-shadow(-2px 3px 3px #3d304540);
 }
 
-:root[data-look="book"] .page-corner:hover svg {
+:root[data-look="book"] .page-corner:hover .page-corner-art {
   scale: 1.12;
 }
 
-:root[data-look="book"] .page-corner:active svg {
+:root[data-look="book"] .page-corner:active .page-corner-art {
   scale: 1.25;
 }
 
@@ -548,13 +548,85 @@
   stroke-width: 1.5;
 }
 
-.page-corner-arrow {
+.page-corner-sign {
   fill: none;
   stroke: var(--ink);
   stroke-width: 5;
   stroke-linecap: round;
   stroke-linejoin: round;
   opacity: 0.7;
+}
+
+/*
+ * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top right, held like the ✕ – it lifts
+ * further while the finger stays (instead of the ring filling), and the page turns back. The fullscreen button and
+ * „Zurück zum Menü · halten“ stay beside it, on the picture's edge.
+ */
+.hold-exit .page-corner-art {
+  display: none;
+}
+
+/* Room left of the corner for it to lift into, so it never covers the fullscreen button or the hint. */
+:root[data-look="book"] .play-area .exit-corner {
+  align-items: flex-start;
+  gap: calc(var(--play-corner) * 0.4 + 4px);
+}
+
+:root[data-look="book"] .play-area .exit-corner > :not(.hold-exit) {
+  margin-top: 8px;
+}
+
+:root[data-look="book"] .play-area .exit-corner .exit-hint {
+  top: 14px;
+}
+
+:root[data-look="book"] .play-area .exit-corner .hold-exit {
+  width: var(--play-corner);
+  height: var(--play-corner);
+  margin: calc(-1 * var(--frame) - 8px) calc(-1 * var(--frame) - 8px) 0 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+:root[data-look="book"] .play-area .exit-corner .hold-exit-sign {
+  display: none;
+}
+
+:root[data-look="book"] .play-area .exit-corner .page-corner-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 100% 0;
+  filter: drop-shadow(-2px 3px 3px #3d304540);
+}
+
+:root[data-look="book"] .play-area .exit-corner .hold-exit.holding .page-corner-art {
+  animation: book-corner-lift var(--hold-ms) linear forwards;
+}
+
+@keyframes book-corner-lift {
+  to {
+    scale: 1.4;
+  }
+}
+
+:root[data-look="book"] .play-area {
+  --play-corner: 64px;
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"] .play-area {
+    --play-corner: 54px;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  :root[data-look="book"] .play-area {
+    --play-corner: 76px;
+  }
 }
 
 /* The round arrow gives way to the corner; ℹ️ and ⚙️ stay beside the title. */

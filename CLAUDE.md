@@ -197,13 +197,17 @@ In a fresh worktree run `bun install` first.
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
   (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
   lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
-  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them. The way back from a menu is a big yellow
+  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them (in the book look the ✕
+  is the page's corner, see below). The way back from a menu is a big yellow
   round arrow without words (its target only as tooltip and read out, `MenuTop`), right next to the title on its left, close to the
   cards – never far off in the screen's corner, where grown-ups on a big monitor didn't find it (biggest on a computer). A
   menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right. In the
   book look the way back is instead the page's turned-up corner in the top right (`PageCorner`, user decision, October
   2026) – where a reader turns a page back, so it is found there – with the fullscreen button left of it and the round
-  arrow hidden (`MenuTop.test.ts`); nothing else goes into that corner.
+  arrow hidden (`MenuTop.test.ts`); nothing else goes into that corner. Every way back in the book look is that corner:
+  while playing, the ✕ held to leave is the same corner at the page's top right with a ✕ on it (`PageCornerArt`), held
+  just like the ✕ – it lifts further while held instead of a ring filling – with the fullscreen button and „Zurück zum
+  Menü · halten“ left of it, clear of the room it lifts into (user feedback, October 2026).
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); a category of a few games that stand apart (`onHome`: „Weitere“) has no card and no page of its
   own, its games stand right on the home page on a frame named after it, like a game's sorts below; and variants of one way to play (which words, how long, whole word or first letter) are
@@ -328,8 +332,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   instead of the sun and clouds (`BookFamily`, in `MenuHead` and the home page's `.home-top`), shrinking into the room
   left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
   that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
-  of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; ✕ and the fullscreen
-  button stay pale see-through discs there too. Pictures of animal parents with their children (the fox and bear
+  of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
+  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of animal parents with their children (the fox and bear
   families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
