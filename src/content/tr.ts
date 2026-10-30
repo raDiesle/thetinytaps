@@ -231,7 +231,6 @@ export const tr: LanguagePack = {
   keyboardRows: ["1234567890", "QWERTYUIOPĞÜ", "ASDFGHJKLŞİ", "ZXCVBNMÖÇ"],
   countSentence: (n, thing) => `${tr.numberWords[n]} ${thing.singular}!`,
   praise: ["Süper!", "Aferin!", "Harika!", "Bravo!", "Yaşasın!"],
-  firstLetterPrompt: (word) => `${word.word}! ${word.word} hangi harfle başlar?`,
   colors: relabel(de.colors, {
     "🔴": "Kırmızı",
     "🔵": "Mavi",

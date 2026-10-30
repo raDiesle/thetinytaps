@@ -327,7 +327,6 @@ export const de: LanguagePack = {
   keyboardRows: ["1234567890ß", "QWERTZUIOPÜ", "ASDFGHJKLÖÄ", "YXCVBNM"],
   countSentence: (n, thing) => (n === 1 ? `${indefiniteArticle(thing.singular)} ${thing.singular}!` : `${de.numberWords[n]} ${thing.plural}!`),
   praise: ["Super!", "Toll!", "Prima!", "Juhu!", "Klasse!"],
-  firstLetterPrompt: (word) => `${word.word}! Womit fängt ${word.word} an?`,
   colors,
   actions,
   joinIn: (word) => `${word.word} mit!`,

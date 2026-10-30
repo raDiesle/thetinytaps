@@ -57,7 +57,7 @@ function paradeSpots(count: number) {
   }));
 }
 
-/** „Wörter tippen“: a picture with its word, typed letter by letter (or only the first letter). */
+/** „Wörter tippen“ with the whole word: a picture with its word, typed letter by letter. */
 export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: LettersSettings }) {
   const [current, setCurrent] = useState<{ id: number; word: WordEntry } | null>(null);
   const [typed, setTyped] = useState(0);
@@ -79,7 +79,6 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   const letters = useMemo(() => (current ? textUnits(spellingOf(current.word)) : []), [current]);
   const forms = useMemo(() => joinedForms(letters), [letters]);
   const done = current !== null && typed === letters.length;
-  const firstOnly = settings.wordTyping === "first";
   const color = current && isColor(current.word) ? current.word : null;
   const action = current && isAction(current.word) ? current.word : null;
   const parade = useMemo(() => (color ? paradeSpots(color.things.length) : []), [color]);
@@ -128,14 +127,13 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     setTyped(0);
     setNudges(0);
     setBackground(BACKGROUNDS[id % BACKGROUNDS.length]);
-    say(firstOnly ? pack.firstLetterPrompt(word) : `${word.word}!`);
-  }, [words, current, say, firstOnly, pack]);
+    say(`${word.word}!`);
+  }, [words, current, say]);
 
   const typeNext = useCallback(() => {
     if (!current || done) return;
     const char = letters[typed];
-    // In the first-letter game the rest of the word flies in by itself.
-    const next = firstOnly ? letters.length : typed + 1;
+    const next = typed + 1;
     setTyped(next);
     setNudges(0);
     sayLetter(char);
@@ -149,7 +147,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     say(`${word.word}! ${isAction(word) ? pack.joinIn(word) : pick(pack.praise)}`, true);
     if (isColor(word)) setBackground(word.color);
     for (let i = 0; i < 8; i++) spawn();
-  }, [current, done, letters, typed, firstOnly, pack, say, sayLetter, spawn, settings.sounds]);
+  }, [current, done, letters, typed, pack, say, sayLetter, spawn, settings.sounds]);
 
   /** Type the next letter unless the last one was too recent. */
   const tryType = useCallback(() => {
@@ -167,7 +165,7 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
     return true;
   }, [done, nextWord]);
 
-  // Start with a word right away; settings can't change while playing.
+  // Start with a word right away; changed options while playing bring a new game (its key in LettersGame).
   useEffect(() => nextWord(), []);
 
   /** A key was pressed, on the keyboard or on the screen. */
@@ -233,11 +231,6 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
   /** Typed letters are bright; colour words are written in their colour, and in white once the screen has it. */
   const typedColor = (i: number) => (color ? (done ? "#fff" : color.color) : BRIGHT_COLORS[i % BRIGHT_COLORS.length]);
 
-  const slotClass = (i: number) => {
-    if (i < typed) return firstOnly && i > 0 ? "slot typed flown" : "slot typed";
-    return firstOnly ? "slot hidden" : "slot later";
-  };
-
   return (
     <div className={`words-play${color && done ? " colored" : ""}`} style={{ background }} onPointerDown={onPlayAreaPointer}>
       <div className="stage">
@@ -270,7 +263,11 @@ export function WordsPlay({ pack, settings }: { pack: LanguagePack; settings: Le
                     {display(char)}
                   </span>
                 ) : (
-                  <span key={i} className={slotClass(i)} style={{ "--i": i, color: i < typed ? typedColor(i) : undefined } as CSSProperties}>
+                  <span
+                    key={i}
+                    className={i < typed ? "slot typed" : "slot later"}
+                    style={{ "--i": i, color: i < typed ? typedColor(i) : undefined } as CSSProperties}
+                  >
                     {display(char)}
                   </span>
                 ),

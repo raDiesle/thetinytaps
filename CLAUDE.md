@@ -175,7 +175,9 @@ In a fresh worktree run `bun install` first.
   `MenuHead` with that corner, which keeps the title clear of it (it moves right or wraps, never under the corner).
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`), and variants of one way to play (which words, how long, whole word or first letter) are
-  choices in the always visible row above the cards (`level`), not cards or a menu of their own.
+  choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
+  plays at once, options while playing behind ⚙️ held in the top left corner like ✕ (`PlayOptions`, Buchstaben & Zahlen),
+  never a tap a child could make by chance.
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit

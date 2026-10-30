@@ -97,8 +97,6 @@ export interface LanguagePack {
   countSentence: (n: number, thing: Countable) => string;
   /** Short cheers, one is picked when a word has been typed. */
   praise: string[];
-  /** "Womit fängt Bär an?", asked when only the first letter is to be typed. */
-  firstLetterPrompt: (word: WordEntry) => string;
   /** Colour words for the colour game. */
   colors: ColorWord[];
   /** Doing words that a figure acts out. */

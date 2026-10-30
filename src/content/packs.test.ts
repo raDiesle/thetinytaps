@@ -26,7 +26,7 @@ function packTexts(pack: LanguagePack): string[] {
   return [
     ...pack.themes.map((t) => t.label),
     ...pack.letters.flatMap((l) => [l.spoken, pack.findPrompt(l), ...l.words.map((w) => pack.letterSentence(l, w))]),
-    ...words.flatMap((w) => [w.word, pack.firstLetterPrompt(w)]),
+    ...words.map((w) => w.word),
     ...pack.numberWords,
     ...pack.countables.flatMap((c) => [c.singular, c.plural, ...[0, 1, 2, 3, 5, 9].map((n) => pack.countSentence(n, c))]),
     pack.zero.sentence,

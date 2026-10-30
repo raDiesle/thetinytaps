@@ -307,7 +307,6 @@ export const es: LanguagePack = {
   letterOfKey: spanishLetterOf,
   countSentence,
   praise: ["¡Muy bien!", "¡Bravo!", "¡Genial!", "¡Súper!", "¡Hurra!"],
-  firstLetterPrompt: (word) => `¡${word.word}! ¿Con qué letra empieza ${small(word)}?`,
   colors: relabel(de.colors, {
     "🔴": "Rojo",
     "🔵": "Azul",

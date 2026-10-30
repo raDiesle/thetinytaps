@@ -366,7 +366,6 @@ export const ru: LanguagePack = {
   letterOfKey: cyrillicLetterOf,
   countSentence,
   praise: ["Молодец!", "Ура!", "Здорово!", "Супер!", "Класс!"],
-  firstLetterPrompt: (word) => `${word.word}! С какой буквы начинается ${small(word)}?`,
   colors: relabel(de.colors, {
     "🔴": "Красный",
     "🔵": "Синий",
