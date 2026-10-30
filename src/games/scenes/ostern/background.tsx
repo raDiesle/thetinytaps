@@ -1,5 +1,7 @@
 import { HORIZON, depthScale, transformOf } from "../layout";
 import { Cloud, INK } from "../shared";
+import { Poke } from "../spots";
+import type { Box } from "../types";
 import { BUSH, POT, TABLE, TREE, WILLOW } from "./layout";
 
 // A spring garden behind a white picket fence. Beyond it lie green hills with blossoming
@@ -25,6 +27,14 @@ function pathOutline() {
   const right = ys.map((y) => `${pathX(y) + pathHalf(y)} ${y}`).reverse();
   return `M${left.join(" L")} L${right.join(" L")} Z`;
 }
+
+/** The gravel path as boxes from the gate down to the front, for the scene's spots (a beetle crawls out there). */
+export const PATH_BOXES: Box[] = Array.from({ length: 10 }, (_, i) => {
+  const top = HORIZON + (i * (1000 - HORIZON)) / 10;
+  const height = (1000 - HORIZON) / 10;
+  const middle = top + height / 2;
+  return [pathX(middle) - pathHalf(middle), top, 2 * pathHalf(middle), height];
+});
 
 /** Stepping stones along the path. */
 const STONES = [372, 410, 455, 505, 560, 620, 690, 770, 860, 960];
@@ -104,13 +114,15 @@ function Hills() {
     <g>
       <path d="M0 236 Q140 196 300 222 T640 214 T1000 220 T1340 206 T1600 224 V300 H0 Z" fill="#cfe9d3" />
       {/* A little church far away, the Easter bells ring there */}
-      <g fill="#e3ecf6">
-        <rect x="508" y="214" width="62" height="40" />
-        <path d="M502 216 L539 192 L576 216 Z" fill="#d8b4b4" />
-        <rect x="474" y="190" width="30" height="64" />
-        <path d="M470 192 L489 146 L508 192 Z" fill="#d8b4b4" />
-        <circle cx="489" cy="206" r="6" fill="#c5d3e6" />
-      </g>
+      <Poke kind="wobble">
+        <g fill="#e3ecf6">
+          <rect x="508" y="214" width="62" height="40" />
+          <path d="M502 216 L539 192 L576 216 Z" fill="#d8b4b4" />
+          <rect x="474" y="190" width="30" height="64" />
+          <path d="M470 192 L489 146 L508 192 Z" fill="#d8b4b4" />
+          <circle cx="489" cy="206" r="6" fill="#c5d3e6" />
+        </g>
+      </Poke>
       <path d="M0 256 Q200 228 420 250 T860 244 T1300 238 T1600 250 V320 H0 Z" fill="#b9e2c0" />
       {/* Blossoming trees on the hills */}
       {[
@@ -121,11 +133,11 @@ function Hills() {
         [1380, 242, "#ffd6e7"],
         [1500, 248, "#ffd6e7"],
       ].map(([x, y, colour]) => (
-        <g key={`${x}`}>
+        <Poke key={`${x}`} kind="sway">
           <rect x={Number(x) - 2} y={Number(y) - 4} width="4" height="12" fill="#a68a7a" />
           <circle cx={x} cy={Number(y) - 12} r="12" fill={String(colour)} />
           <circle cx={Number(x) + 6} cy={Number(y) - 16} r="6" fill="#fff" opacity="0.6" />
-        </g>
+        </Poke>
       ))}
       <path d="M0 282 Q260 262 520 278 T1040 272 T1600 280 V330 H0 Z" fill="#a8dcb0" />
     </g>
@@ -142,10 +154,10 @@ function Fence() {
       <rect x="0" y={FENCE_TOP + 44} width={GATE[0]} height="7" fill="#e9ecef" />
       <rect x={GATE[1]} y={FENCE_TOP + 44} width={1600 - GATE[1]} height="7" fill="#e9ecef" />
       {pickets.map((x) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <path d={`M${x} ${HORIZON} V${FENCE_TOP + 6} L${x + 6} ${FENCE_TOP} L${x + 12} ${FENCE_TOP + 6} V${HORIZON} Z`} fill="#fff" />
           <rect x={x + 9} y={FENCE_TOP + 6} width="3" height={HORIZON - FENCE_TOP - 6} fill="#dee2e6" />
-        </g>
+        </Poke>
       ))}
     </g>
   );
@@ -160,11 +172,11 @@ function Path() {
         const s = depthScale(y);
         const x = pathX(y) + (i % 2 ? 14 : -14) * s;
         return (
-          <g key={y}>
+          <Poke key={y} kind="hop">
             <ellipse cx={x} cy={y + 3 * s} rx={46 * s} ry={14 * s} fill="#c9b48a" opacity="0.6" />
             <ellipse cx={x} cy={y} rx={44 * s} ry={13 * s} fill="#e9ecef" />
             <ellipse cx={x - 10 * s} cy={y - 3 * s} rx={20 * s} ry={4 * s} fill="#fff" opacity="0.7" />
-          </g>
+          </Poke>
         );
       })}
     </g>
@@ -174,12 +186,14 @@ function Path() {
 function Daisy({ x, y }: { x: number; y: number }) {
   const s = depthScale(y);
   return (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      {[0, 60, 120, 180, 240, 300].map((a) => (
-        <ellipse key={a} cx="0" cy="-7" rx="3.4" ry="6" fill="#fff" transform={`rotate(${a})`} />
-      ))}
-      <circle r="3.6" fill="#ffd43b" />
-    </g>
+    <Poke kind="sway">
+      <g transform={`translate(${x} ${y}) scale(${s})`}>
+        {[0, 60, 120, 180, 240, 300].map((a) => (
+          <ellipse key={a} cx="0" cy="-7" rx="3.4" ry="6" fill="#fff" transform={`rotate(${a})`} />
+        ))}
+        <circle r="3.6" fill="#ffd43b" />
+      </g>
+    </Poke>
   );
 }
 
@@ -209,7 +223,9 @@ export function Background() {
       <circle cx="1470" cy="96" r="150" fill="url(#os-sunglow)" />
       <Cloud x={1040} y={120} scale={0.4} className="os-cloud" />
       <Cloud x={620} y={92} scale={0.3} className="os-cloud os-cloud-slow" />
-      <path d="M860 170 q6 -6 12 0 q6 -6 12 0 M900 156 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      <Poke kind="drift">
+        <path d="M860 170 q6 -6 12 0 q6 -6 12 0 M900 156 q5 -5 10 0 q5 -5 10 0" stroke="#5c677d" strokeWidth="2.5" fill="none" />
+      </Poke>
       <Hills />
       <rect y="190" width="1600" height="110" fill="url(#os-haze)" />
       <Fence />
@@ -237,7 +253,9 @@ export function Background() {
 
       <g opacity="0.85">
         {SPECKS.map(([x, y, colour]) => (
-          <circle key={`${x}-${y}`} cx={x} cy={y} r={5 * depthScale(y)} fill={colour} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <circle cx={x} cy={y} r={5 * depthScale(y)} fill={colour} />
+          </Poke>
         ))}
       </g>
       {DAISIES.map(([x, y]) => (
@@ -245,7 +263,9 @@ export function Background() {
       ))}
       <g stroke="#52b788" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       {/* Roots of the cherry tree on the lawn */}

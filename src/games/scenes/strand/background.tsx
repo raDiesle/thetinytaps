@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, transformOf } from "../layout";
 import { Cloud, nth } from "../shared";
+import { Poke } from "../spots";
 import { LIGHTHOUSE, TOWEL, shoreY } from "./layout";
 
 // A summer beach. Far away a hazy headland and a few sailing boats sit on the horizon; the sea
@@ -47,15 +48,21 @@ function Distance() {
   return (
     <g>
       {/* A hazy headland on the left, a tiny ship and two sails far away */}
-      <path d={`M0 ${HORIZON} V${HORIZON - 34} Q80 ${HORIZON - 58} 180 ${HORIZON - 30} Q260 ${HORIZON - 12} 340 ${HORIZON} Z`} fill="#b9d4e8" />
-      <path d={`M0 ${HORIZON - 20} Q60 ${HORIZON - 40} 120 ${HORIZON - 28}`} stroke="#d0e3f1" strokeWidth="5" fill="none" />
-      <path d={`M1300 ${HORIZON} Q1400 ${HORIZON - 22} 1500 ${HORIZON - 16} Q1560 ${HORIZON - 14} 1600 ${HORIZON - 20} V${HORIZON} Z`} fill="#c5dcec" />
-      <g fill="#fff" opacity="0.85">
-        <path d={`M420 ${HORIZON - 2} V${HORIZON - 26} L436 ${HORIZON - 4} Z`} />
-        <path d={`M1240 ${HORIZON - 2} V${HORIZON - 22} L1253 ${HORIZON - 4} Z`} />
-      </g>
-      <path d={`M412 ${HORIZON - 2} h28`} stroke="#9fb7cc" strokeWidth="3" />
-      <path d={`M1234 ${HORIZON - 2} h24`} stroke="#9fb7cc" strokeWidth="3" />
+      <Poke kind="wobble">
+        <path d={`M0 ${HORIZON} V${HORIZON - 34} Q80 ${HORIZON - 58} 180 ${HORIZON - 30} Q260 ${HORIZON - 12} 340 ${HORIZON} Z`} fill="#b9d4e8" />
+        <path d={`M0 ${HORIZON - 20} Q60 ${HORIZON - 40} 120 ${HORIZON - 28}`} stroke="#d0e3f1" strokeWidth="5" fill="none" />
+      </Poke>
+      <Poke kind="wobble">
+        <path d={`M1300 ${HORIZON} Q1400 ${HORIZON - 22} 1500 ${HORIZON - 16} Q1560 ${HORIZON - 14} 1600 ${HORIZON - 20} V${HORIZON} Z`} fill="#c5dcec" />
+      </Poke>
+      <Poke kind="sway">
+        <path d={`M420 ${HORIZON - 2} V${HORIZON - 26} L436 ${HORIZON - 4} Z`} fill="#fff" opacity="0.85" />
+        <path d={`M412 ${HORIZON - 2} h28`} stroke="#9fb7cc" strokeWidth="3" />
+      </Poke>
+      <Poke kind="sway">
+        <path d={`M1240 ${HORIZON - 2} V${HORIZON - 22} L1253 ${HORIZON - 4} Z`} fill="#fff" opacity="0.85" />
+        <path d={`M1234 ${HORIZON - 2} h24`} stroke="#9fb7cc" strokeWidth="3" />
+      </Poke>
     </g>
   );
 }
@@ -75,7 +82,9 @@ function Sea() {
           [1460, 372, 34],
           [1400, 388, 18],
         ].map(([x, y, w]) => (
-          <rect key={`${x}-${y}`} x={x} y={y} width={w * depthScale(y)} height={3 * depthScale(y)} rx="1.5" />
+          <Poke key={`${x}-${y}`} kind="glow">
+            <rect x={x} y={y} width={w * depthScale(y)} height={3 * depthScale(y)} rx="1.5" />
+          </Poke>
         ))}
       </g>
       <g className="sd-sea-lines" stroke="#d0ebff" strokeLinecap="round" fill="none" opacity="0.8">
@@ -143,9 +152,13 @@ function Beach() {
       </g>
       {PEBBLES.map(([x, y, kind], i) => {
         const s = depthScale(y);
-        if (kind === 0) return <path key={i} d={`M${x - 8 * s} ${y} Q${x} ${y - 12 * s} ${x + 8 * s} ${y} Z`} fill="#ffc9c9" />;
-        if (kind === 1) return <circle key={i} cx={x} cy={y} r={4 * s} fill="#fff" opacity="0.8" />;
-        return <ellipse key={i} cx={x} cy={y} rx={6 * s} ry={3.5 * s} fill={kind === 2 ? "#ced4da" : "#d9b27a"} />;
+        return (
+          <Poke key={i} kind="hop">
+            {kind === 0 && <path d={`M${x - 8 * s} ${y} Q${x} ${y - 12 * s} ${x + 8 * s} ${y} Z`} fill="#ffc9c9" />}
+            {kind === 1 && <circle cx={x} cy={y} r={4 * s} fill="#fff" opacity="0.8" />}
+            {kind > 1 && <ellipse cx={x} cy={y} rx={6 * s} ry={3.5 * s} fill={kind === 2 ? "#ced4da" : "#d9b27a"} />}
+          </Poke>
+        );
       })}
       {STEPS.map(([x, y], i) => {
         const s = depthScale(y);
@@ -153,11 +166,12 @@ function Beach() {
       })}
       <g stroke="#94b86a" strokeWidth="5" strokeLinecap="round" fill="none">
         {GRASS.map(([x, y]) => (
-          <path
-            key={`${x}-${y}`}
-            d="M0 0 q-6 -30 -20 -44 M6 0 q0 -36 4 -56 M12 0 q8 -26 24 -38 M-6 0 q-10 -18 -26 -22"
-            transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
-          />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path
+              d="M0 0 q-6 -30 -20 -44 M6 0 q0 -36 4 -56 M12 0 q8 -26 24 -38 M-6 0 q-10 -18 -26 -22"
+              transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
+            />
+          </Poke>
         ))}
       </g>
     </g>
@@ -167,14 +181,16 @@ function Beach() {
 /** The striped towel under the sunshade, in the towel's coordinates. */
 function Towel() {
   return (
-    <g transform={transformOf(TOWEL)}>
-      <path d="M-90 14 L250 14 L216 -46 L-60 -46 Z" fill="#ff8787" />
-      {[0, 1, 2, 3, 4].map((i) => {
-        const t = 0.1 + i * 0.2;
-        return <path key={i} d={`M${-90 + 340 * t - 8} 14 L${-60 + 276 * t - 6} -46 h12 L${-90 + 340 * t + 8} 14 Z`} fill="#fff" />;
-      })}
-      <path d="M-90 14 L250 14" stroke="#e8590c" strokeWidth="4" opacity="0.4" />
-    </g>
+    <Poke kind="wobble">
+      <g transform={transformOf(TOWEL)}>
+        <path d="M-90 14 L250 14 L216 -46 L-60 -46 Z" fill="#ff8787" />
+        {[0, 1, 2, 3, 4].map((i) => {
+          const t = 0.1 + i * 0.2;
+          return <path key={i} d={`M${-90 + 340 * t - 8} 14 L${-60 + 276 * t - 6} -46 h12 L${-90 + 340 * t + 8} 14 Z`} fill="#fff" />;
+        })}
+        <path d="M-90 14 L250 14" stroke="#e8590c" strokeWidth="4" opacity="0.4" />
+      </g>
+    </Poke>
   );
 }
 

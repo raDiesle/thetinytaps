@@ -1,35 +1,5 @@
 /* Animations of the Kita scene. Durations match durationMs in Kita.tsx. */
 
-/* ---------- Idle movement: only with "Bild bewegt sich auch von allein" (.lively) ---------- */
-
-.scene.lively .ki-uhr-minute {
-  animation: ki-spin 60s linear infinite;
-}
-
-.scene.lively .ki-fenster-curtain {
-  animation: ki-curtain 5s ease-in-out infinite;
-}
-
-.scene.lively .ki-vogel-body {
-  animation: ki-bob 3s ease-in-out infinite;
-}
-
-.scene.lively .ki-hamster-body {
-  animation: ki-bob 2s ease-in-out infinite;
-}
-
-.scene.lively .ki-wimpel {
-  animation: ki-wiggle-small 4s ease-in-out calc(var(--i) * -0.3s) infinite;
-}
-
-.scene.lively .ki-schlaf-blanket {
-  animation: ki-breathe 4s ease-in-out infinite;
-}
-
-.scene.lively .ki-zug-balloon {
-  animation: ki-wiggle-small 3s ease-in-out infinite;
-}
-
 /* Puffs, drops, notes and other things that only show up in an animation; they can't be tapped meanwhile. */
 .ki-lid,
 .ki-mouth,
@@ -340,16 +310,6 @@
   }
   60% {
     transform: rotate(calc((var(--i) * 2 - 1) * 3deg));
-  }
-}
-
-@keyframes ki-bob {
-  0%,
-  100% {
-    transform: none;
-  }
-  50% {
-    transform: translateY(-3px);
   }
 }
 

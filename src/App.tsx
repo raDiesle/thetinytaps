@@ -1,32 +1,35 @@
 import { lazy, Suspense, type ComponentType } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { CategoryPage } from "@/pages/CategoryPage";
+import { registerPage } from "@/lib/preloadPages";
 import { Home } from "@/pages/Home";
 
 /**
  * A page loaded only when it is opened, so the first visit doesn't download every
  * game (three.js, all pictures). Offline the service worker has them all anyway.
+ * `paths` are the addresses it opens at, so a menu can load it before its card is tapped (`usePreloadPages`).
  */
-function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) {
+function page<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K, ...paths: string[]) {
+  registerPage(paths, load);
   return lazy(() => load().then((module) => ({ default: module[name] })));
 }
 
-const AdventurePage = page(() => import("@/pages/AdventurePage"), "AdventurePage");
-const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage");
-const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage");
-const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage");
-const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage");
-const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage");
+const AdventurePage = page(() => import("@/pages/AdventurePage"), "AdventurePage", "/abenteuer/");
+const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage", "/tiere/");
+const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage", "/kleine-abenteuer/");
+const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage", "/gefuehle/");
+const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage", "/buchstaben/");
+const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage", "/laut-leise/");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
-const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage");
-const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage");
-const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage");
-const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage");
+const MarblePage = page(() => import("@/pages/MarblePage"), "MarblePage", "/kettenreaktion/");
+const PottyPage = page(() => import("@/pages/PottyPage"), "PottyPage", "/toepfchen/");
+const RewardsPage = page(() => import("@/pages/RewardsPage"), "RewardsPage", "/belohnungstafel/");
+const PlannerPage = page(() => import("@/pages/RewardsPage"), "PlannerPage", "/tagesplan/");
 const ScenePage = page(() => import("@/pages/ScenePage"), "ScenePage");
-const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu");
-const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage");
-const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage");
-const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage");
+const ScenesMenu = page(() => import("@/pages/ScenesMenu"), "ScenesMenu", "/bilder/");
+const ShadowsPage = page(() => import("@/pages/ShadowsPage"), "ShadowsPage", "/schatten/");
+const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage", "/socken/");
+const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/");
 
 export function App() {
   return (

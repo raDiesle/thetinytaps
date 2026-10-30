@@ -1,7 +1,36 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
-import { BASIN, type Bath, BRUSH, BUBBLES, BUTTON, buildBath, COUNTER, FLOOR, LAMP, LEVER, leverKnob, MUG, SHELF, TAP, TUB, TUBE, WORLD_W } from "./bath";
-import { easeOut, seg } from "./machineKit";
+import {
+  BASIN,
+  BATH_SHELF,
+  type Bath,
+  BLOWHOLE,
+  BRUSH,
+  BUBBLES,
+  BUTTON,
+  buildBath,
+  COUNTER,
+  DRYER,
+  FLOOR,
+  HANDLE,
+  HOLDER,
+  KEY,
+  LAMP,
+  LEVER,
+  leverKnob,
+  MUG,
+  NOZZLE,
+  ROLL,
+  SHELF,
+  TAP,
+  TEAR,
+  TUB,
+  TUBE,
+  WAND,
+  WHALE,
+  WORLD_W,
+} from "./bath";
+import { easeOut, rad, seg, svgLine } from "./machineKit";
 import { MachineStage } from "./MachineStage";
 import { BAR_COLORS } from "./parts";
 import { INK, Sparkles } from "./scenery";
@@ -15,6 +44,9 @@ const ENAMEL = "#fdfdff";
 const CHROME = "#cfd8e3";
 const PASTE = "#ffffff";
 const DUCK_YELLOW = "#ffd23f";
+const WHALE_BLUE = "#4ea8de";
+const DRYER_PURPLE = "#b388ff";
+const CAP_PINK = "#ff9ed8";
 /** Where the tiles end and the paint begins. */
 const TILES_TOP = 380;
 
@@ -22,8 +54,12 @@ const TILES_TOP = 380;
  * Level 13: the bathroom (R-05). One tap on the red button squeezes the
  * toothpaste tube, the blob tips the toothbrush off the glass shelf into the
  * tooth mug, the mug topples and knocks the squeaky duck onto the bath tap's
- * lever, the tub fills with foam and overflows, and soap bubbles float up to
- * the ceiling lamp, popping there one by one. The camera travels along.
+ * lever, the tub fills with foam and overflows, the wave carries the duck over
+ * the rim against the toilet roll, which rolls off its holder and away over the
+ * floor in a long paper ribbon until it winds up the wind-up whale. The whale
+ * waddles to the hair dryer and spouts a fountain onto its switch; the dryer
+ * blows the shower cap onto the ceiling lamp and soap bubbles out of the
+ * bubble wand, which pop at the lamp one by one. The camera travels along.
  */
 export function BathLevel(props: LevelProps) {
   const bath = useMemo(buildBath, []);
@@ -44,10 +80,19 @@ export function BathLevel(props: LevelProps) {
           <Duck bath={bath} t={t} />
           <Tub />
           <Overflow bath={bath} t={t} />
+          <Holder />
+          <Roll bath={bath} t={t} />
+          <Whale bath={bath} t={t} belly={`${ids}-belly`} />
+          <Fountain bath={bath} t={t} />
+          <DryerRing />
+          <Dryer bath={bath} t={t} />
+          <BathShelf />
+          <Wand bath={bath} t={t} />
+          <FlyingCap bath={bath} t={t} />
           <Lamp bath={bath} t={t} glow={`${ids}-glow`} />
           <Bubbles bath={bath} t={t} sheen={`${ids}-sheen`} />
           <Sparkles x={LAMP.x} y={LAMP.y + 20} age={t - bath.tLast - 0.15} n={12} spread={260} />
-          <Sparkles x={TUB.x0 + 520} y={TUB.rim - 120} age={t - bath.tLast - 0.5} n={8} spread={200} />
+          <Sparkles x={WHALE.stop} y={FLOOR - 170} age={t - bath.tLast - 0.5} n={8} spread={200} />
           {t < 0 && <Hint />}
         </>
       )}
@@ -57,7 +102,8 @@ export function BathLevel(props: LevelProps) {
 
 /* ---------- The room ---------- */
 
-function Room({ tiles }: { tiles: string }) {
+/** The walls, ceiling and floor, with the pictures on them: drawn once, it never changes. */
+const Room = memo(function Room({ tiles }: { tiles: string }) {
   return (
     <g>
       <defs>
@@ -71,9 +117,10 @@ function Room({ tiles }: { tiles: string }) {
       {/* The ceiling */}
       <rect x="-400" y="-200" width={WORLD_W + 800} height="214" fill="#fff" stroke={INK} strokeWidth="4" />
       <Porthole x={2400} y={190} />
-      <TowelRail x={2330} />
-      <Basket x={3260} />
-      <Plant x={3540} />
+      <Porthole x={3500} y={190} />
+      <TowelRail x={2860} />
+      <Basket x={5320} />
+      <Plant x={5600} />
       {/* The floor: big black and white tiles */}
       <rect x="-400" y={FLOOR} width={WORLD_W + 800} height={VIEW_H - FLOOR + 200} fill="#f4f1ea" />
       {Array.from({ length: Math.ceil((WORLD_W + 800) / 100) }, (_, i) =>
@@ -85,7 +132,7 @@ function Room({ tiles }: { tiles: string }) {
       <line x1="-400" y1={FLOOR} x2={WORLD_W + 400} y2={FLOOR} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** A round frosted window, with a little cloud behind the glass. */
 function Porthole({ x, y }: { x: number; y: number }) {
@@ -138,7 +185,8 @@ function Plant({ x }: { x: number }) {
 
 /* ---------- Washstand, tube, brush, mug ---------- */
 
-function Washstand() {
+/** The washstand with its mirror, cupboard and basin: drawn once, it never changes. */
+const Washstand = memo(function Washstand() {
   const { x0, x1, top } = COUNTER;
   return (
     <g>
@@ -173,10 +221,10 @@ function Washstand() {
       <rect x={BASIN.x1 + 40} y={top - 60} width="40" height="60" rx="8" fill="#b9fbc0" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The glass shelf on two brackets. */
-function Shelf() {
+const Shelf = memo(function Shelf() {
   const { x0, x1, y } = SHELF;
   return (
     <g>
@@ -186,7 +234,7 @@ function Shelf() {
       <rect x={x0} y={y} width={x1 - x0} height="12" rx="4" fill="#c9f1ff" opacity="0.85" stroke={INK} strokeWidth="3" />
     </g>
   );
-}
+});
 
 /** The tube hanging upside down in its holder; the button presses it flat from the top and the paste comes out below. */
 function Tube({ bath, t }: { bath: Bath; t: number }) {
@@ -299,8 +347,8 @@ function Mug({ bath, t }: { bath: Bath; t: number }) {
 /** The squeaky duck, in a little blue sailor's hat; it turns as it flies. */
 function Duck({ bath, t }: { bath: Bath; t: number }) {
   const { pt, spin } = bath.duckAt(t);
-  // It squeaks happily (beak open) when it is hit and when it lands on the lever.
-  const open = (t > bath.tHit && t < bath.tHit + 0.35) || (t > bath.tLever && t < bath.tLever + 0.35);
+  // It squeaks happily (beak open) when it is hit, when it lands on the lever and when it bonks the toilet roll.
+  const open = [bath.tHit, bath.tLever, bath.tBonk].some((at) => t > at && t < at + 0.35);
   return (
     <g transform={`translate(${pt.x} ${pt.y}) rotate(${spin})`}>
       <path
@@ -359,7 +407,7 @@ function Tap({ bath, t }: { bath: Bath; t: number }) {
 /** The tub seen cut open from the side: thick enamel walls round the inside, on four little feet. */
 const TUB_INSIDE = `M${TUB.x0 + 30} ${TUB.rim} L${TUB.x0 + 60} ${TUB.bottom - 50} Q${TUB.x0 + 80} ${TUB.bottom} ${TUB.x0 + 160} ${TUB.bottom} L${TUB.x1 - 160} ${TUB.bottom} Q${TUB.x1 - 80} ${TUB.bottom} ${TUB.x1 - 60} ${TUB.bottom - 50} L${TUB.x1 - 30} ${TUB.rim} Z`;
 
-function Tub() {
+const Tub = memo(function Tub() {
   const { x0, x1, rim, bottom } = TUB;
   const outer = `M${x0} ${rim} L${x0 + 30} ${bottom} Q${x0 + 50} ${bottom + 30} ${x0 + 140} ${bottom + 30} L${x1 - 140} ${bottom + 30} Q${x1 - 50} ${bottom + 30} ${x1 - 30} ${bottom} L${x1} ${rim} Z`;
   return (
@@ -378,7 +426,7 @@ function Tub() {
       <rect x={x1 - 40} y={rim - 12} width="54" height="20" rx="10" fill={ENAMEL} stroke={INK} strokeWidth="4" />
     </g>
   );
-}
+});
 
 /** The water in the tub and the foam on it, both rising until they reach the rim. */
 function Water({ bath, t, inside }: { bath: Bath; t: number; inside: string }) {
@@ -444,9 +492,291 @@ function Overflow({ bath, t }: { bath: Bath; t: number }) {
   );
 }
 
+/* ---------- Toilet roll ---------- */
+
+/** The toilet roll holder: a chrome arm out of a wall plate, and the tear bar under it that keeps the paper's end. */
+const Holder = memo(function Holder() {
+  const { x, y } = HOLDER;
+  return (
+    <g>
+      <rect x={x - 76} y={y - 34} width="20" height="68" rx="6" fill={CHROME} stroke={INK} strokeWidth="3" />
+      <line x1={x - 58} y1={y} x2={x + 12} y2={y} stroke={INK} strokeWidth="12" strokeLinecap="round" />
+      <line x1={x - 58} y1={y} x2={x + 12} y2={y} stroke={CHROME} strokeWidth="6" strokeLinecap="round" />
+      <path d={`M${x - 58} ${y + 28} Q${x - 20} ${TEAR.y + 6} ${TEAR.x - 22} ${TEAR.y}`} fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+      <rect x={TEAR.x - 24} y={TEAR.y - 5} width="44" height="10" rx="4" fill={CHROME} stroke={INK} strokeWidth="3" />
+    </g>
+  );
+});
+
+/** The paper ribbon: white with a dark edge and little perforation lines. */
+function Paper({ d }: { d: string }) {
+  return (
+    <g fill="none" strokeLinejoin="round" strokeLinecap="round">
+      <path d={d} stroke={INK} strokeWidth="18" />
+      <path d={d} stroke="#fff" strokeWidth="12" />
+      <path d={d} stroke="#d9d9e6" strokeWidth="12" strokeDasharray="2 26" strokeLinecap="butt" />
+    </g>
+  );
+}
+
+/** The toilet roll: on its holder with its end hanging over the tear bar, then rolling off, thinner and thinner. */
+function Roll({ bath, t }: { bath: Bath; t: number }) {
+  const { pt, r, spin } = bath.rollAt(t);
+  const ribbon = bath.ribbon(t);
+  const flap = `M${HOLDER.x + ROLL.r - 2} ${HOLDER.y} L${TEAR.x + 6} ${TEAR.y - 2} L${TEAR.x + 6} ${TEAR.y + 46}`;
+  return (
+    <g>
+      <Paper d={ribbon ? svgLine(ribbon) : flap} />
+      <g transform={`translate(${pt.x} ${pt.y}) rotate(${spin})`}>
+        <circle r={r} fill="#fff" stroke={INK} strokeWidth="4" />
+        {/* Little hearts printed on the paper show it turning. */}
+        {r > ROLL.core + 8 &&
+          [0, 120, 240].map((a) => {
+            const m = (r + ROLL.core) / 2;
+            return <circle key={a} cx={m * Math.cos(rad(a))} cy={m * Math.sin(rad(a))} r={Math.min(6, (r - ROLL.core) / 3)} fill={CAP_PINK} />;
+          })}
+        <circle r={ROLL.core} fill="#d9a86c" stroke={INK} strokeWidth="3" />
+        <circle r={ROLL.core - 7} fill="#8a5a2b" />
+        <line x1="0" y1={-ROLL.core} x2="0" y2={-r} stroke="#d9d9e6" strokeWidth="3" />
+      </g>
+    </g>
+  );
+}
+
+/* ---------- Wind-up whale ---------- */
+
+/** The wind-up whale on its two little feet, its golden key in its side; asleep (eyes shut) until it is wound up. */
+function Whale({ bath, t, belly }: { bath: Bath; t: number; belly: string }) {
+  const { x, tilt, lift, foot, awake, swell, keyTurn } = bath.whaleAt(t);
+  const { half, h, feet } = WHALE;
+  const cy = -feet - h / 2;
+  const turnK = Math.cos(rad(keyTurn));
+  const keyY = KEY.y - FLOOR;
+  // Its tail wags while it walks and when it wakes.
+  const wag = awake ? 10 * Math.sin(Math.min(t, bath.duration) * 9) * (foot !== 0 || t < bath.tWalk ? 1 : 0.2) : 0;
+  return (
+    <g transform={`translate(${x} ${FLOOR - lift}) rotate(${tilt})`}>
+      {/* Feet: the back one lifts on one step, the front one on the next */}
+      {[-48, 40].map((fx, i) => {
+        const up = (i === 0 ? Math.max(0, -foot) : Math.max(0, foot)) * 12;
+        return <rect key={fx} x={fx - 14} y={-feet - 4 - up} width="34" height={feet + 4} rx="10" fill="#ff8c42" stroke={INK} strokeWidth="3" />;
+      })}
+      {/* The key */}
+      <line x1={-half + 50} y1={keyY} x2={KEY.dx} y2={keyY} stroke={INK} strokeWidth="9" strokeLinecap="round" />
+      <line x1={-half + 50} y1={keyY} x2={KEY.dx} y2={keyY} stroke="#ffc94a" strokeWidth="4" strokeLinecap="round" />
+      {[-1, 1].map((side) => (
+        <ellipse key={side} cx={KEY.dx - 2} cy={keyY + side * 16 * turnK} rx="9" ry={Math.abs(15 * turnK) + 2} fill="#ffc94a" stroke={INK} strokeWidth="3" />
+      ))}
+      <g transform={`translate(0 ${cy}) scale(${1 + swell}) translate(0 ${-cy})`}>
+        {/* The tail with its fluke, up behind */}
+        <g transform={`rotate(${wag} ${-half + 20} ${cy})`}>
+          <path
+            d={`M${-half + 20} ${cy + 10} Q${-half - 20} ${cy - 10} ${-half - 18} ${cy - 50} q-30 -6 -36 -26 q24 -4 40 14 q8 -24 34 -26 q-2 22 -28 34 Q${-half + 4} ${cy - 24} ${-half + 34} ${cy - 16} z`}
+            fill={WHALE_BLUE}
+            stroke={INK}
+            strokeWidth="4"
+            strokeLinejoin="round"
+          />
+        </g>
+        <defs>
+          <clipPath id={belly}>
+            <ellipse cx="0" cy={cy} rx={half} ry={h / 2} />
+          </clipPath>
+        </defs>
+        <ellipse cx="0" cy={cy} rx={half} ry={h / 2} fill={WHALE_BLUE} />
+        <g clipPath={`url(#${belly})`}>
+          <ellipse cx="25" cy={cy + h / 2} rx="90" ry="30" fill="#dff4ff" />
+          {[-30, 0, 30, 60].map((bx) => (
+            <line key={bx} x1={bx} y1={cy + h / 2 - 26} x2={bx + 10} y2={cy + h / 2} stroke="#a9d8f5" strokeWidth="3" />
+          ))}
+        </g>
+        <ellipse cx="0" cy={cy} rx={half} ry={h / 2} fill="none" stroke={INK} strokeWidth="4" />
+        {/* The flipper */}
+        <path d={`M-10 ${cy + 14} q-14 26 10 34 q10 -16 8 -30 z`} fill="#3a8fc4" stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+        {/* The face: eyes shut until it is wound up, then wide open; pink cheeks and a smile */}
+        {awake ? (
+          <g>
+            <circle cx="62" cy={cy - 12} r="11" fill="#fff" stroke={INK} strokeWidth="3" />
+            <circle cx="65" cy={cy - 12} r="5" fill={INK} />
+          </g>
+        ) : (
+          <path d={`M51 ${cy - 12} q11 8 22 0`} fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+        )}
+        <circle cx="84" cy={cy + 8} r="9" fill={CAP_PINK} opacity="0.7" />
+        <path d={`M72 ${cy + 18} q18 12 36 -4`} fill="none" stroke={INK} strokeWidth="4" strokeLinecap="round" />
+        {/* The blowhole */}
+        <ellipse cx={BLOWHOLE.dx} cy={BLOWHOLE.dy + 5} rx="9" ry="4" fill={INK} />
+      </g>
+    </g>
+  );
+}
+
+/** The whale's water: a little spurt, then a big jet up to the dryer's switch, splashing there and dripping down. */
+function Fountain({ bath, t }: { bath: Bath; t: number }) {
+  const f = bath.fountainAt(t);
+  if (!f) return null;
+  const x = WHALE.stop + BLOWHOLE.dx;
+  const base = FLOOR + BLOWHOLE.dy + 4;
+  const w = 8 + 10 * f.k;
+  const top = f.top;
+  const atSwitch = top <= HANDLE.y + 2;
+  return (
+    <g opacity={Math.min(1, 0.4 + f.k)}>
+      <path
+        d={`M${x - w / 2} ${base} Q${x - w / 4} ${(base + top) / 2} ${x - w} ${top} H${x + w} Q${x + w / 4} ${(base + top) / 2} ${x + w / 2} ${base} Z`}
+        fill={WATER}
+        stroke="#4fb6e8"
+        strokeWidth="3"
+      />
+      <line x1={x - 2} y1={base - 6} x2={x - 2} y2={top + 10} stroke="#fff" strokeWidth="3" strokeDasharray="14 16" />
+      {/* The crown of drops at the top, flying out wider at the switch */}
+      {[-1, -0.5, 0.5, 1].map((s, i) => (
+        <circle
+          key={s}
+          cx={x + s * (atSwitch ? 42 : 18 + 10 * f.k)}
+          cy={top + 8 + Math.abs(s) * (atSwitch ? 18 : 8) + (i % 2) * 4}
+          r={4 + 4 * f.k}
+          fill={WATER}
+          stroke="#4fb6e8"
+          strokeWidth="2"
+        />
+      ))}
+    </g>
+  );
+}
+
+/* ---------- Hair dryer, shelf, cap and wand ---------- */
+
+/** The chrome ring on the wall the dryer rests in, and the socket its cord goes into. */
+const DryerRing = memo(function DryerRing() {
+  return (
+    <g>
+      <rect x={DRYER.x - 40} y={DRYER.y - 84} width="80" height="18" rx="6" fill={CHROME} stroke={INK} strokeWidth="3" />
+      <rect x={DRYER.x - 12} y={DRYER.y - 68} width="24" height="34" fill={CHROME} stroke={INK} strokeWidth="3" />
+      <rect x={DRYER.x - 150} y={DRYER.y + 150} width="40" height="54" rx="8" fill="#fff" stroke={INK} strokeWidth="3" />
+      <circle cx={DRYER.x - 136} cy={DRYER.y + 177} r="4" fill={INK} />
+      <circle cx={DRYER.x - 124} cy={DRYER.y + 177} r="4" fill={INK} />
+    </g>
+  );
+});
+
+/** The hair dryer: it jolts in its ring when the jet hits its switch, the switch slides on, and air streams out of it. */
+function Dryer({ bath, t }: { bath: Bath; t: number }) {
+  const { x, y } = DRYER;
+  const on = bath.blowing(t);
+  const still = Math.min(t, bath.duration);
+  const knob = t >= bath.tHitDryer && t < bath.tDryerOff + 0.15 ? -16 : 0;
+  return (
+    <g>
+      {on > 0 && (
+        <g opacity={on} fill="none" stroke="#8fb8d8" strokeWidth="6" strokeLinecap="round" strokeDasharray="44 34" strokeDashoffset={-still * 520}>
+          {[-30, -10, 10, 30].map((dy, i) => (
+            <path key={dy} d={`M${NOZZLE.x + 10} ${y + dy * 0.6} q90 ${dy * 0.4 + (i % 2 ? 10 : -10)} 180 ${dy * 0.9} t180 ${dy * 1.4}`} />
+          ))}
+        </g>
+      )}
+      <g transform={`rotate(${bath.dryerAngle(t)} ${x} ${y})`}>
+        {/* The cord, curling down to the socket */}
+        <path d={`M${HANDLE.x} ${HANDLE.y} q-8 40 -40 34 q-24 -6 -20 24 q4 30 -40 44`} fill="none" stroke={INK} strokeWidth="5" strokeLinecap="round" />
+        {/* The handle, with its switch */}
+        <path
+          d={`M${x - 56} ${y + 20} L${x - 16} ${y + 20} L${HANDLE.x + 16} ${HANDLE.y} L${HANDLE.x - 16} ${HANDLE.y} Z`}
+          fill={DRYER_PURPLE}
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        <rect x={HANDLE.x - 6} y={y + 52} width="12" height="40" rx="5" fill="#7c5bd6" stroke={INK} strokeWidth="2" />
+        <rect x={HANDLE.x - 9} y={y + 74 + knob} width="18" height="14" rx="4" fill={knob ? "#3ec300" : "#ff5d73"} stroke={INK} strokeWidth="2" />
+        {/* The barrel with its nozzle and the grille at the back */}
+        <path
+          d={`M${x + 70} ${y - 26} L${NOZZLE.x} ${y - 18} V${y + 18} L${x + 70} ${y + 26} Z`}
+          fill="#7c5bd6"
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        <rect x={x - 76} y={y - 36} width="150" height="72" rx="34" fill={DRYER_PURPLE} stroke={INK} strokeWidth="4" />
+        <ellipse cx={x - 64} cy={y} rx="14" ry="30" fill="#e9e1ff" stroke={INK} strokeWidth="3" />
+        {[-14, 0, 14].map((dy) => (
+          <line key={dy} x1={x - 72} y1={y + dy} x2={x - 56} y2={y + dy} stroke={INK} strokeWidth="2" />
+        ))}
+        <ellipse cx={x} cy={y - 18} rx="34" ry="7" fill="#fff" opacity="0.5" />
+        {/* It glows a little while it blows */}
+        <circle cx={x + 30} cy={y} r="8" fill={on > 0 ? "#ffd23f" : "#e9e1ff"} stroke={INK} strokeWidth="2" />
+      </g>
+    </g>
+  );
+}
+
+/** The little glass shelf with the jar of bubble soap on it. */
+const BathShelf = memo(function BathShelf() {
+  const { x0, x1, y } = BATH_SHELF;
+  return (
+    <g>
+      {[x0 + 30, x1 - 50].map((bx) => (
+        <path key={bx} d={`M${bx} ${y + 6} v30 l20 -30 z`} fill={CHROME} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+      ))}
+      <rect x={x0} y={y} width={x1 - x0} height="12" rx="4" fill="#c9f1ff" opacity="0.85" stroke={INK} strokeWidth="3" />
+      <rect x={WAND.x - 24} y={y - 40} width="48" height="40" rx="10" fill="#ffd6f5" stroke={INK} strokeWidth="3" />
+      <rect x={WAND.x - 28} y={y - 46} width="56" height="10" rx="4" fill="#3a86ff" stroke={INK} strokeWidth="3" />
+    </g>
+  );
+});
+
+/** The bubble wand in its jar: a ring that trembles in the dryer's air, its soap film bulging out toward the lamp. */
+function Wand({ bath, t }: { bath: Bath; t: number }) {
+  const on = bath.blowing(t);
+  const still = Math.min(t, bath.duration);
+  const shake = on * 4 * Math.sin(still * 30);
+  return (
+    <g transform={`rotate(${shake} ${WAND.x} ${BATH_SHELF.y - 40})`}>
+      <line x1={WAND.x} y1={BATH_SHELF.y - 40} x2={WAND.x} y2={WAND.y + WAND.r} stroke={INK} strokeWidth="6" strokeLinecap="round" />
+      {on > 0 && <ellipse cx={WAND.x + 10 * on} cy={WAND.y} rx={6 + 14 * on} ry={WAND.r - 3} fill="#e6f8ff" opacity="0.6" stroke="#9fe6ff" strokeWidth="2" />}
+      <circle cx={WAND.x} cy={WAND.y} r={WAND.r} fill="none" stroke={INK} strokeWidth="9" />
+      <circle cx={WAND.x} cy={WAND.y} r={WAND.r} fill="none" stroke="#ff7bd0" strokeWidth="4" />
+    </g>
+  );
+}
+
+/** The pink shower cap with white dots and a frilly edge; its bottom middle is at 0 0. */
+function ShowerCap() {
+  return (
+    <g>
+      <path d="M-46 0 q0 -50 46 -50 q46 0 46 50 z" fill={CAP_PINK} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      {[
+        [-22, -28],
+        [4, -40],
+        [24, -20],
+        [-4, -14],
+      ].map(([cx, cy]) => (
+        <circle key={`${cx}`} cx={cx} cy={cy} r="5" fill="#fff" />
+      ))}
+      <path
+        d="M-50 0 q6 10 12.5 0 q6 10 12.5 0 q6 10 12.5 0 q6 10 12.5 0 q6 10 12.5 0 q6 10 12.5 0 q6 10 12.5 0 q6 10 12.5 0"
+        fill="#fff"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
+/** The shower cap on the shelf, then fluttering through the air; once it sits on the lamp the lamp draws it. */
+function FlyingCap({ bath, t }: { bath: Bath; t: number }) {
+  const cap = bath.capAt(t);
+  if (!cap) return null;
+  return (
+    <g transform={`translate(${cap.pt.x} ${cap.pt.y}) rotate(${cap.angle} 0 -24)`}>
+      <ShowerCap />
+    </g>
+  );
+}
+
 /* ---------- Lamp and bubbles ---------- */
 
-/** The ceiling lamp: a glass globe on a cord that glows a little more with every bubble and swings at the last one. */
+/** The ceiling lamp: a glass globe on a cord that glows a little more with every bubble and swings at the last one; once the shower cap has landed it wears it like a hat. */
 function Lamp({ bath, t, glow }: { bath: Bath; t: number; glow: string }) {
   const lit = bath.popped(t) / BUBBLES;
   return (
@@ -463,6 +793,11 @@ function Lamp({ bath, t, glow }: { bath: Bath; t: number; glow: string }) {
       <circle cx={LAMP.x} cy={LAMP.y} r={LAMP.r} fill={lit > 0 ? "#fff3b0" : "#e9f3fb"} stroke={INK} strokeWidth="4" />
       <circle cx={LAMP.x} cy={LAMP.y} r={LAMP.r} fill="#ffd23f" opacity={0.6 * lit} />
       <ellipse cx={LAMP.x - 20} cy={LAMP.y - 22} rx="14" ry="8" fill="#fff" opacity="0.8" />
+      {t >= bath.tCapLand && (
+        <g transform={`translate(${bath.capOn.x} ${bath.capOn.y})`}>
+          <ShowerCap />
+        </g>
+      )}
     </g>
   );
 }

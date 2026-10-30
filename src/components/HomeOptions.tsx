@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
-import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
-import { VoiceSetting } from "@/components/VoiceSetting";
-import { sampleLetter, useLanguagePack } from "@/content/languages";
+import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { targetLanguageFor } from "@/content/targetLanguages";
 import { useCommonSettings } from "@/lib/common";
 import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "@/lib/language";
@@ -11,9 +9,9 @@ import { downloadMusic } from "@/lib/musicFile";
 
 /**
  * On the home page, for the grown-ups: small buttons in the top left corner –
- * the play time for all games, the language, fullscreen and the options most
- * games share – each opening its menu only when tapped, so the games fill the
- * screen. All on the left, so the sun in the top right corner stays in sight.
+ * the play time for all games and the language, each opening its menu only when
+ * tapped, so the games fill the screen, then fullscreen and music, switched by one
+ * tap. All on the left, so the sun in the top right corner stays in sight.
  */
 export function HomeOptions() {
   const t = useT();
@@ -34,21 +32,7 @@ export function HomeOptions() {
         <AppLanguageOptions />
       </MenuButton>
       <FullscreenButton />
-      <MenuButton
-        icon="⚙️"
-        label={t({
-          de: "Einstellungen für alle Spiele",
-          ru: "Настройки для всех игр",
-          en: "Settings for all games",
-          zh: "所有游戏的设置",
-          hi: "सभी खेलों की सेटिंग्स",
-          es: "Ajustes para todos los juegos",
-          ar: "إعدادات كل الألعاب",
-        })}
-        iconOnly
-      >
-        <CommonOptions />
-      </MenuButton>
+      <MusicButton />
     </nav>
   );
 }
@@ -60,7 +44,7 @@ export function HomeOptions() {
  * starts the game underneath. While there is more below, a bar at the bottom
  * says so, so a grown-up knows to scroll.
  */
-function MenuButton({ icon, label, iconOnly = false, children }: { icon: string; label: string; iconOnly?: boolean; children: ReactNode }) {
+function MenuButton({ icon, label, children }: { icon: string; label: string; children: ReactNode }) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [more, setMore] = useState(false);
@@ -100,16 +84,9 @@ function MenuButton({ icon, label, iconOnly = false, children }: { icon: string;
     <div className="home-menu">
       {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
       {open && <div className="home-menu-backdrop" onClick={() => setOpen(false)} />}
-      <button
-        type="button"
-        className={`home-menu-button${iconOnly ? " icon-only" : ""}`}
-        aria-expanded={open}
-        aria-label={iconOnly ? label : undefined}
-        title={iconOnly ? label : undefined}
-        onClick={() => setOpen(!open)}
-      >
+      <button type="button" className="home-menu-button" aria-expanded={open} onClick={() => setOpen(!open)}>
         <span aria-hidden>{icon}</span>
-        {!iconOnly && label}
+        {label}
       </button>
       {open && (
         <div ref={panel} className="home-menu-panel">
@@ -173,85 +150,50 @@ function AppLanguageOptions() {
   );
 }
 
-function CommonOptions() {
+/**
+ * The background song in every game, on or off with one tap – no menu: read aloud and
+ * sounds are no switches any more (`src/lib/common.ts`), so music is all there is to set.
+ */
+function MusicButton() {
   const t = useT();
   const [common, update] = useCommonSettings();
-  const pack = useLanguagePack();
-  const b = sampleLetter(pack);
-
+  const label = t({ de: "Musik", ru: "Музыка", en: "Music", zh: "音乐", hi: "संगीत", es: "Música", ar: "الموسيقى" });
   return (
-    <section className="settings">
-      <SettingsGroup title={t({ de: "Ton", ru: "Звук", en: "Sound", zh: "声音", hi: "ध्वनि", es: "Sonido", ar: "الصوت" })}>
-        <Toggle
-          label={t({
-            de: "Vorlesen (Namen, Sätze, Fragen)",
-            ru: "Читать вслух (названия, фразы, вопросы)",
-            en: "Read aloud (names, sentences, questions)",
-            zh: "朗读（名称、句子、问题）",
-            hi: "पढ़कर सुनाना (नाम, वाक्य, सवाल)",
-            es: "Leer en voz alta (nombres, frases, preguntas)",
-            ar: "القراءة بصوت عالٍ (الأسماء، الجمل، الأسئلة)",
-          })}
-          checked={common.speech}
-          onChange={(speech) => update({ speech })}
-        />
-        {common.speech && <VoiceSetting lang={pack.speechLang} sample={pack.letterSentence(b, b.words[0])} />}
-        <Toggle
-          label={t({
-            de: "Töne und Geräusche",
-            ru: "Звуки и шумы",
-            en: "Sounds and noises",
-            zh: "声音和音效",
-            hi: "आवाज़ें और ध्वनि प्रभाव",
-            es: "Sonidos y ruidos",
-            ar: "الأصوات والمؤثرات",
-          })}
-          checked={common.sounds}
-          onChange={(sounds) => update({ sounds })}
-        />
-        <Toggle
-          label={t({ de: "🎵 Musik", ru: "🎵 Музыка", en: "🎵 Music", zh: "🎵 音乐", hi: "🎵 संगीत", es: "🎵 Música", ar: "🎵 الموسيقى" })}
-          checked={common.music}
-          onChange={(music) => {
-            // Switched back on: fetch the song now, so it is there when the game starts.
-            if (music) void downloadMusic();
-            update({ music });
-          }}
-        />
-        <p className="setting-note">
-          {common.music
-            ? t({
-                de: "Leise Musik im Hintergrund, ab dem ersten Tippen im Spiel. Spiele mit eigener Musik spielen ihre eigene.",
-                ru: "Тихая музыка на фоне – с первого касания в игре. Игры со своей музыкой играют свою.",
-                en: "Soft music in the background, from the first tap in the game. Games with their own music play their own.",
-                zh: "轻柔的背景音乐，从游戏里第一次点按开始。有自己音乐的游戏播放自己的音乐。",
-                hi: "हल्का बैकग्राउंड संगीत, खेल में पहले टैप से। जिन खेलों का अपना संगीत है, वे अपना ही बजाते हैं।",
-                es: "Música suave de fondo desde el primer toque en el juego. Los juegos con música propia tocan la suya.",
-                ar: "موسيقى هادئة في الخلفية من أول لمسة في اللعبة. الألعاب التي لها موسيقاها تشغّل موسيقاها الخاصة.",
-              })
-            : t({
-                de: "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen.",
-                ru: "Без музыки во всех играх – тогда она и не скачивается.",
-                en: "No music in any game – then it isn’t downloaded either.",
-                zh: "所有游戏都不放音乐——也就不会下载音乐。",
-                hi: "किसी भी खेल में संगीत नहीं – तब वह डाउनलोड भी नहीं होता।",
-                es: "Sin música en ningún juego; así tampoco se descarga.",
-                ar: "لا موسيقى في أي لعبة – وعندها لا يتم تنزيلها أيضًا.",
-              })}
-        </p>
-      </SettingsGroup>
-
-      <p className="setting-note">
-        {t({
-          de: "Alles Weitere, was nur zu einem Spiel gehört, steht auf dessen Startseite unter „Einstellungen“.",
-          ru: "Всё остальное, что относится только к одной игре, – на её стартовой странице в разделе «Настройки».",
-          en: "Everything else that belongs to just one game is on that game’s start page under “Settings”.",
-          zh: "只属于某一个游戏的其他选项，在该游戏开始页的“设置”里。",
-          hi: "बाकी सब कुछ जो सिर्फ़ एक खेल से जुड़ा है, उस खेल के शुरुआती पेज पर “सेटिंग्स” में है।",
-          es: "Todo lo demás que pertenece a un solo juego está en su página de inicio, en «Ajustes».",
-          ar: "كل ما يخص لعبة واحدة فقط موجود في صفحة بدايتها تحت «الإعدادات».",
-        })}
-      </p>
-    </section>
+    <button
+      type="button"
+      className="home-menu-button home-music"
+      aria-pressed={common.music}
+      title={
+        common.music
+          ? t({
+              de: "Leise Musik im Hintergrund aller Spiele. Tippen schaltet sie aus.",
+              ru: "Тихая музыка на фоне во всех играх. Нажмите, чтобы выключить.",
+              en: "Soft background music in every game. Tap to turn it off.",
+              zh: "所有游戏都有轻柔的背景音乐。点按可关闭。",
+              hi: "सभी खेलों में हल्का बैकग्राउंड संगीत। बंद करने के लिए टैप करें।",
+              es: "Música suave de fondo en todos los juegos. Toque para apagarla.",
+              ar: "موسيقى هادئة في خلفية كل الألعاب. انقروا لإيقافها.",
+            })
+          : t({
+              de: "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen. Tippen schaltet sie ein.",
+              ru: "Без музыки во всех играх – тогда она и не скачивается. Нажмите, чтобы включить.",
+              en: "No music in any game – then it isn’t downloaded either. Tap to turn it on.",
+              zh: "所有游戏都不放音乐——也就不会下载音乐。点按可打开。",
+              hi: "किसी भी खेल में संगीत नहीं – तब वह डाउनलोड भी नहीं होता। चालू करने के लिए टैप करें।",
+              es: "Sin música en ningún juego; así tampoco se descarga. Toque para encenderla.",
+              ar: "لا موسيقى في أي لعبة – وعندها لا يتم تنزيلها أيضًا. انقروا لتشغيلها.",
+            })
+      }
+      onClick={(e) => {
+        // Not left focused: a child's space bar would switch it again.
+        e.currentTarget.blur();
+        // Switched back on: fetch the song now, so it is there when the game starts.
+        if (!common.music) void downloadMusic();
+        update({ music: !common.music });
+      }}
+    >
+      <span aria-hidden>{common.music ? "🎵" : "🔇"}</span>
+      {label}
+    </button>
   );
 }

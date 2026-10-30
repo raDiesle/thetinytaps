@@ -1,24 +1,34 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
 import {
   BED,
+  BLOBS,
   BULB_DROP,
   BULBS,
   buildLight,
+  CAROUSEL,
   CHEST,
+  DESK,
   DISCO,
   DOME_Y,
   DRESSER,
   FIREFLIES,
   FLOOR,
+  GLOBE,
+  GLOBE_BUTTON,
   JAR,
   LAMP,
+  LAVA,
+  lavaHalf,
   type Light,
   MIRROR,
   NAILS,
   NIGHTSTAND,
   OWL,
+  SHADOW,
+  SIDE_TABLE,
   STOOL,
+  SWITCH,
   TORCH,
   WORLD_W,
   wireY,
@@ -34,6 +44,11 @@ const WALL = "#9fb0e8";
 const NIGHT = "#070b2a";
 const LIGHT = "#fff6b8";
 const PLUSH = "#a77bca";
+/** The black card of the shadow cut-outs, and the colour of their shadows on the wall. */
+const CARD = "#241a4d";
+const SHADE = "#1a1440";
+/** How much bigger than their shapes the cut-outs are drawn (their shadows are `SHADOW.scale` times the shapes). */
+const CUT = 1.4;
 
 /** A place where light makes a hole in the dark: middle, size, and how much (0 to 1). */
 interface Hole {
@@ -47,9 +62,14 @@ interface Hole {
  * Level 8: the light chain (R-10). A dark children's room; one tap switches
  * on the torch, its beam bounces off the mirror onto the disco ball, a golden
  * spot from the ball wanders onto the jar of sleeping fireflies, they wake up
- * and fly along the fairy lights (each bulb comes on as they pass) to the star
- * lamp, which throws stars all over the room. Then the toy owl on the bed wakes
- * up. The camera travels along with the light.
+ * and fly along the fairy lights (each bulb comes on as they pass) down to the
+ * lava lamp, where the first lands on its switch. The lamp's blobs warm up and
+ * rise, the warm air turns the paper carousel on its cap, and the rabbit and
+ * bird cut-outs throw big shadows that hop and fly over the wall. The paper bird
+ * comes loose, flutters onto the globe's button, the globe lights up and turns,
+ * and its glow calls the fireflies over it to the star lamp, which throws stars
+ * all over the room. Then the toy owl on the bed wakes up. The camera travels
+ * along with the light.
  */
 export function LightLevel(props: LevelProps) {
   const light = useMemo(buildLight, []);
@@ -60,6 +80,7 @@ export function LightLevel(props: LevelProps) {
       {(t) => (
         <>
           <Room paper={`${ids}-paper`} />
+          <WallShadows light={light} t={t} />
           <Nightstand />
           <Torch on={t >= 0} />
           <Chest />
@@ -68,6 +89,13 @@ export function LightLevel(props: LevelProps) {
           <Stool />
           <Jar light={light} t={t} />
           <FairyLights />
+          <SideTable />
+          <Carousel light={light} t={t} side="back" />
+          <LavaLamp light={light} t={t} />
+          <Carousel light={light} t={t} side="front" />
+          <WarmAir light={light} t={t} />
+          <Desk />
+          <Globe light={light} t={t} />
           <Dresser />
           <Lamp light={light} t={t} />
           <Bed />
@@ -79,7 +107,10 @@ export function LightLevel(props: LevelProps) {
           <DiscoSpots light={light} t={t} />
           <GoldenSpot light={light} t={t} />
           <LitBulbs light={light} t={t} glow={`${ids}-glow`} />
+          <Halo x={LAVA.x} y={490} r={170} k={0.3 * light.lavaGlow(t)} glow={`${ids}-glow`} />
+          <Halo x={GLOBE.x} y={GLOBE.y} r={170} k={0.35 * light.globeGlow(t)} glow={`${ids}-glow`} />
           <LampLight light={light} t={t} glow={`${ids}-glow`} />
+          <PaperBird light={light} t={t} />
           <Fireflies light={light} t={t} glow={`${ids}-glow`} />
           <Sparkles x={LAMP.x} y={DOME_Y - 140} age={t - light.tLamp - 0.6} n={12} spread={300} />
           <Sparkles x={OWL.x} y={OWL.y - 40} age={t - light.tOwl} n={8} spread={140} />
@@ -313,6 +344,295 @@ function Bulb({ x, color }: { x: number; color: string }) {
   );
 }
 
+/* ---------- Lava lamp, shadow play, globe ---------- */
+
+const SideTable = memo(function SideTable() {
+  const { x0, x1, top } = SIDE_TABLE;
+  return (
+    <g>
+      {[x0 + 30, x1 - 46].map((x) => (
+        <rect key={x} x={x} y={top + 16} width="16" height={FLOOR - top - 16} rx="4" fill="#ff8c42" stroke={INK} strokeWidth="3" />
+      ))}
+      <rect x={x0} y={top} width={x1 - x0} height="22" rx="10" fill="#ffd23f" stroke={INK} strokeWidth="4" />
+    </g>
+  );
+});
+
+/** The outline of the lava lamp's glass, from the bottom left up and down the right side. */
+const GLASS = (() => {
+  const left: Pt[] = [];
+  for (let y = LAVA.glass0; y >= LAVA.glass1; y -= 10) left.push({ x: LAVA.x - lavaHalf(y), y });
+  const right = left.map((p) => ({ x: 2 * LAVA.x - p.x, y: p.y })).reverse();
+  return `M${[...left, ...right].map((p) => `${p.x} ${p.y}`).join(" L")} Z`;
+})();
+
+/** The lava lamp: foot, glass with its blobs, cap, and the cord to the switch on the table, whose button the first firefly presses. */
+function LavaLamp({ light, t }: { light: Light; t: number }) {
+  const { x, glass0, glass1, top } = LAVA;
+  const g = light.lavaGlow(t);
+  const down = light.switchDown(t);
+  return (
+    <g>
+      <path d={`M${x + 52} ${SIDE_TABLE.top - 4} L${SWITCH.x - 20} ${SIDE_TABLE.top - 4}`} stroke={INK} strokeWidth="4" fill="none" />
+      <path
+        d={`M${SWITCH.x + 20} ${SIDE_TABLE.top - 4} Q${SIDE_TABLE.x1 + 30} ${SIDE_TABLE.top} ${SIDE_TABLE.x1 + 16} ${FLOOR}`}
+        stroke={INK}
+        strokeWidth="4"
+        fill="none"
+      />
+      <rect x={SWITCH.x - 20} y={SWITCH.y} width="40" height="12" rx="5" fill="#f2f2ff" stroke={INK} strokeWidth="3" />
+      <ellipse cx={SWITCH.x} cy={SWITCH.y - 1 + 4 * down} rx="10" ry="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+      <path d={GLASS} fill="#463a78" />
+      <path d={GLASS} fill="#c9a8ff" opacity={g} />
+      {BLOBS.map(({ color }, i) => {
+        const b = light.blobAt(i, t);
+        // Dull while cold, brighter as the lamp shines and fully once warm.
+        return <ellipse key={color} cx={b.x} cy={b.y} rx={b.rx} ry={b.ry} fill={color} opacity={0.45 + 0.55 * Math.max(g * 0.6, b.warm)} />;
+      })}
+      <path
+        d={`M${x - 30} ${glass0 - 40} Q${x - 40} ${(glass0 + glass1) / 2} ${x - 18} ${glass1 + 20}`}
+        stroke="#fff"
+        strokeWidth="5"
+        fill="none"
+        opacity="0.5"
+        strokeLinecap="round"
+      />
+      <path d={GLASS} fill="none" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${x - 60} ${SIDE_TABLE.top} L${x - 42} ${glass0} L${x + 42} ${glass0} L${x + 60} ${SIDE_TABLE.top} Z`}
+        fill="#8e7dff"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+      <path
+        d={`M${x - 26} ${glass1 + 2} L${x - 15} ${top} L${x + 15} ${top} L${x + 26} ${glass1 + 2} Z`}
+        fill="#8e7dff"
+        stroke={INK}
+        strokeWidth="4"
+        strokeLinejoin="round"
+      />
+    </g>
+  );
+}
+
+/** The rabbit cut-out (or its shadow), facing right, its feet at 0 and about 56 high; it takes its fill from around it. */
+function RabbitShape({ eye }: { eye?: boolean }) {
+  return (
+    <g>
+      <ellipse cx="13" cy="-56" rx="4.5" ry="14" transform="rotate(-14 13 -56)" />
+      <ellipse cx="23" cy="-54" rx="4.5" ry="13" transform="rotate(12 23 -54)" />
+      <ellipse cx="0" cy="-18" rx="21" ry="16" />
+      <circle cx="18" cy="-36" r="12" />
+      <circle cx="-21" cy="-22" r="6" />
+      <ellipse cx="8" cy="-3" rx="11" ry="4" />
+      {eye && <circle cx="22" cy="-38" r="2.5" fill="#fff" />}
+    </g>
+  );
+}
+
+/** The bird cut-out (or its shadow), facing right around its middle; `flap` from -1 (wing down) to 1 (up). */
+function BirdShape({ flap, eye }: { flap: number; eye?: boolean }) {
+  return (
+    <g>
+      <path d="M-16 -2 L-31 -11 L-28 5 Z" />
+      <ellipse rx="18" ry="10" />
+      <circle cx="16" cy="-6" r="8" />
+      <path d="M22 -9 L32 -5 L22 -2 Z" />
+      <path d={`M-8 -3 Q0 ${-4 - 24 * flap} 12 -3 Z`} />
+      {eye && <circle cx="18" cy="-8" r="2" fill="#fff" />}
+    </g>
+  );
+}
+
+/** The wing beat of the bird cut-out: a gentle flap on its thread, quicker while it flies, still on the globe and at the end. */
+function birdFlap(light: Light, t: number) {
+  const tt = Math.min(t, light.duration);
+  if (t < light.tLoose) return 0.5 * Math.sin(tt * 6);
+  return t < light.tGlobe ? Math.sin(tt * 16) : 0.3;
+}
+
+/** How high the rabbit is in its hop, 0 to 1 (its shadow on the wall hops with it). */
+const rabbitHop = (light: Light, t: number) => (SHADOW.floor - light.rabbitShadow(t).y) / 50;
+
+/** The big shadows the cut-outs throw on the wall behind the lava lamp: the rabbit hopping, the bird flying. */
+function WallShadows({ light, t }: { light: Light; t: number }) {
+  const r = light.rabbitShadow(t);
+  const b = light.birdShadow(t);
+  return (
+    <g fill={SHADE}>
+      {r.show > 0 && (
+        <g opacity={0.7 * r.show} transform={`translate(${r.x} ${r.y}) scale(${SHADOW.scale})`}>
+          <RabbitShape />
+        </g>
+      )}
+      {b.show > 0 && (
+        <g opacity={0.7 * b.show} transform={`translate(${b.x} ${b.y}) scale(${SHADOW.scale})`}>
+          <BirdShape flap={birdFlap(light, t)} />
+        </g>
+      )}
+    </g>
+  );
+}
+
+/**
+ * The paper carousel on the lava lamp's cap. `side` "back" draws the cut-outs behind the lamp (towards the wall),
+ * "front" those in front of it with the needle, the hoop and the paper rotor. A cut-out turns its face along the
+ * hoop, so it looks narrow at the sides.
+ */
+function Carousel({ light, t, side }: { light: Light; t: number; side: "back" | "front" }) {
+  const { r, hoop, rotor } = CAROUSEL;
+  const turn = light.carousel(t);
+  const rabbit = light.rabbitAt(t);
+  const bird = light.birdOnHoop(t);
+  const figures = [{ key: "rabbit", ...rabbit, lift: 12 * rabbitHop(light, t) }, ...(bird ? [{ key: "bird", ...bird, lift: 0 }] : [])].filter((f) =>
+    side === "back" ? Math.cos(f.a) < 0 : Math.cos(f.a) >= 0,
+  );
+  return (
+    <g>
+      {figures.map((f) => {
+        // Behind the lamp it moves right, in front of it left; the face follows.
+        const face = Math.cos(f.a) < 0 ? 1 : -1;
+        const narrow = Math.max(0.2, Math.abs(Math.cos(f.a)));
+        const y = f.pt.y - f.lift;
+        return (
+          <g key={f.key}>
+            <line x1={f.pt.x} y1={hoop} x2={f.pt.x} y2={y - (f.key === "rabbit" ? 2 : 12)} stroke={INK} strokeWidth="1.5" />
+            <g
+              transform={`translate(${f.pt.x} ${f.key === "rabbit" ? y + 96 : y}) scale(${face * narrow * CUT} ${CUT})`}
+              fill={CARD}
+              stroke={INK}
+              strokeWidth="1"
+            >
+              {f.key === "rabbit" ? <RabbitShape eye /> : <BirdShape flap={birdFlap(light, t)} eye />}
+            </g>
+          </g>
+        );
+      })}
+      {side === "front" && (
+        <g>
+          <line x1={LAVA.x} y1={LAVA.top} x2={LAVA.x} y2={rotor - 6} stroke={INK} strokeWidth="3" />
+          {[0, 1, 2, 3].map((k) => {
+            const a = turn + (k * Math.PI) / 2;
+            return <line key={k} x1={LAVA.x} y1={rotor + 4} x2={LAVA.x + r * Math.sin(a)} y2={hoop + 12 * Math.cos(a)} stroke={INK} strokeWidth="1.5" />;
+          })}
+          <ellipse cx={LAVA.x} cy={hoop} rx={r} ry="12" fill="none" stroke={INK} strokeWidth="5" />
+          <ellipse cx={LAVA.x} cy={hoop} rx={r} ry="12" fill="none" stroke="#ffb703" strokeWidth="2.5" />
+          {Array.from({ length: 6 }, (_, k) => {
+            const a = turn * 1.5 + (k * Math.PI) / 3;
+            return (
+              <ellipse
+                key={k}
+                cx={LAVA.x + 26 * Math.sin(a)}
+                cy={rotor + 4 * Math.cos(a)}
+                rx={4 + 12 * Math.abs(Math.cos(a))}
+                ry="6"
+                fill={BAR_COLORS[k % BAR_COLORS.length]}
+                stroke={INK}
+                strokeWidth="2"
+              />
+            );
+          })}
+          <circle cx={LAVA.x} cy={rotor} r="6" fill="#ffd23f" stroke={INK} strokeWidth="2" />
+        </g>
+      )}
+    </g>
+  );
+}
+
+/** Wavy lines of warm air rising from the lava lamp's cap to the paper rotor. */
+function WarmAir({ light, t }: { light: Light; t: number }) {
+  const k = light.heat(t);
+  if (k <= 0) return null;
+  const tt = Math.min(t, light.duration);
+  return (
+    <g opacity={0.7 * k} fill="none" stroke={LIGHT} strokeWidth="3" strokeLinecap="round">
+      {[-1, 0, 1].map((j) => {
+        const pts: Pt[] = [];
+        for (let y = LAVA.top - 6; y >= CAROUSEL.rotor + 16; y -= 6) pts.push({ x: LAVA.x + 11 * j + 5 * Math.sin(y / 8 + tt * 7 + j * 2), y });
+        return <path key={j} d={`M${pts.map((p) => `${p.x} ${p.y}`).join(" L")}`} />;
+      })}
+    </g>
+  );
+}
+
+const Desk = memo(function Desk() {
+  const { x0, x1, top } = DESK;
+  return (
+    <g>
+      <rect x={x0} y={top} width={x1 - x0} height={FLOOR - top} rx="8" fill="#b39cff" stroke={INK} strokeWidth="4" />
+      <rect x={x0 + 18} y={top + 26} width={x1 - x0 - 36} height="50" rx="6" fill="#cbbcff" stroke={INK} strokeWidth="3" />
+      <circle cx={(x0 + x1) / 2} cy={top + 51} r="7" fill="#ffd23f" stroke={INK} strokeWidth="2" />
+    </g>
+  );
+});
+
+/** Land on the globe: longitude and latitude (radians) and size of each blob. */
+const LANDS = [
+  { lon: 0, lat: -0.5, s: 30 },
+  { lon: 0.5, lat: 0.35, s: 24 },
+  { lon: 1.9, lat: -0.3, s: 34 },
+  { lon: 2.4, lat: 0.6, s: 18 },
+  { lon: 3.7, lat: 0.1, s: 28 },
+  { lon: 4.9, lat: -0.55, s: 22 },
+];
+
+/** The globe on its foot: dark until the paper bird presses the button, then it shines, wobbles and turns. */
+function Globe({ light, t }: { light: Light; t: number }) {
+  const { x, y, r } = GLOBE;
+  const g = light.globeGlow(t);
+  const turn = light.globeTurn(t);
+  const plinth = DESK.top - 24;
+  return (
+    <g>
+      <rect x={x - 6} y={y + r} width="12" height={plinth - y - r} fill="#ffb703" stroke={INK} strokeWidth="3" />
+      <rect x={x - 60} y={plinth} width="120" height="24" rx="8" fill="#8a5a2b" stroke={INK} strokeWidth="4" />
+      <ellipse cx={GLOBE_BUTTON.x} cy={GLOBE_BUTTON.y - 2 + 4 * light.globeButton(t)} rx="10" ry="6" fill="#ff5d73" stroke={INK} strokeWidth="3" />
+      <g transform={`rotate(${23 + light.globeWobble(t)} ${x} ${y})`}>
+        <circle cx={x} cy={y} r={r} fill="#34508f" />
+        <circle cx={x} cy={y} r={r} fill="#7fdcff" opacity={g} />
+        {LANDS.map((l, i) => {
+          const lon = l.lon + turn;
+          const front = Math.cos(lon);
+          if (front <= 0.05) return null;
+          const ring = r * Math.cos(l.lat);
+          return (
+            <ellipse
+              key={i}
+              cx={x + (ring - l.s * 0.3) * Math.sin(lon)}
+              cy={y + r * 0.85 * Math.sin(l.lat)}
+              rx={l.s * front * Math.cos(l.lat)}
+              ry={l.s * 0.6}
+              fill={g > 0.5 ? "#8ee07a" : "#4f7d55"}
+            />
+          );
+        })}
+        <circle cx={x - 26} cy={y - 30} r="12" fill="#fff" opacity={0.3 + 0.4 * g} />
+        <circle cx={x} cy={y} r={r} fill="none" stroke={INK} strokeWidth="4" />
+        <path d={`M${x} ${y + r + 12} A${r + 12} ${r + 12} 0 0 0 ${x} ${y - r - 12}`} fill="none" stroke={INK} strokeWidth="9" />
+        <path d={`M${x} ${y + r + 12} A${r + 12} ${r + 12} 0 0 0 ${x} ${y - r - 12}`} fill="none" stroke="#ffb703" strokeWidth="5" />
+      </g>
+    </g>
+  );
+}
+
+/** A soft glow round something that shines, over the night. */
+function Halo({ x, y, r, k, glow }: { x: number; y: number; r: number; k: number; glow: string }) {
+  if (k <= 0) return null;
+  return <circle cx={x} cy={y} r={r} fill={`url(#${glow})`} opacity={k} />;
+}
+
+/** The paper bird once it has come loose: it flutters over to the globe and sits on its button. */
+function PaperBird({ light, t }: { light: Light; t: number }) {
+  const b = light.birdFlying(t);
+  if (!b) return null;
+  return (
+    <g transform={`translate(${b.pt.x} ${b.pt.y}) rotate(${b.tilt}) scale(${CUT})`} fill={CARD} stroke={INK} strokeWidth="1">
+      <BirdShape flap={birdFlap(light, t)} eye />
+    </g>
+  );
+}
+
 function Dresser() {
   const { x0, x1, top } = DRESSER;
   return (
@@ -444,6 +764,12 @@ function Night({ light, t, ids }: { light: Light; t: number; ids: string }) {
     const on = light.bulbOn(k, t);
     if (on > 0) holes.push({ x, y: wireY(x) + BULB_DROP, r: 150, k: on });
   });
+  const lava = light.lavaGlow(t);
+  if (lava > 0) holes.push({ x: LAVA.x, y: 470, r: 300 + 260 * lava, k: lava });
+  const bird = light.birdFlying(t);
+  const globe = light.globeGlow(t);
+  if (bird) holes.push({ x: bird.pt.x, y: bird.pt.y, r: 130, k: 0.6 * (1 - globe) });
+  if (globe > 0) holes.push({ x: GLOBE.x, y: GLOBE.y, r: 200 + 120 * globe, k: globe });
   const lamp = light.lampGlow(t);
   if (lamp > 0) holes.push({ x: LAMP.x, y: DOME_Y - 40, r: 260 + 400 * easeOut(seg(t, light.tLamp, light.tLamp + 2)), k: lamp });
 

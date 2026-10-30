@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BOARD,
@@ -7,8 +7,11 @@ import {
   BUNNY,
   COOKTOP,
   COUNTER,
+  CRANK,
+  DIAL_MAX,
   FLOOR,
   HOPPER,
+  JAR,
   KETTLE,
   type Kitchen,
   KNOB_X,
@@ -17,6 +20,8 @@ import {
   MEATBALL,
   MUG,
   mugTop,
+  PAN,
+  PANCAKE,
   PEG,
   PIN,
   PLATE,
@@ -26,10 +31,13 @@ import {
   ROLL,
   SHELF,
   SPAGHETTI,
+  SPINNER,
   SPOON,
   spoonY,
   TOAST,
+  TIMER,
   TOASTER,
+  WEDGE,
   WORLD_W,
 } from "./kitchen";
 import { deg, hop, seg } from "./machineKit";
@@ -45,12 +53,15 @@ const POPCORN = "#fff4cf";
 
 /**
  * Level 5: the crazy kitchen. One tap lets the marble out of the spice jar,
- * and then one thing sets off the next for about half a minute: the wooden
+ * and then one thing sets off the next for about forty seconds: the wooden
  * spoon, the paper towel roll, the rolling pin down the cutting board, the
  * swinging ladle that throws a meatball, a plate rolling along the counter
- * onto the cooktop, popcorn popping into a mug that pulls down the toaster
- * lever, and the toast flying onto the bunny's plate. The camera travels
- * along with whatever moves.
+ * into the salad spinner's crank, the whirling spinner popping its lid and
+ * flinging lettuce, a leaf winding up the egg timer, which ticks, rings and
+ * rattles off the cookie jar onto the pancake pan's handle, the pancake's
+ * double somersault onto the cooktop, popcorn popping into a mug that pulls
+ * down the toaster lever, and the toast flying onto the bunny's plate. The
+ * camera travels along with whatever moves.
  */
 export function KitchenLevel(props: LevelProps) {
   const kitchen = useMemo(buildKitchen, []);
@@ -68,6 +79,8 @@ export function KitchenLevel(props: LevelProps) {
           <LadleRail />
           <Spaghetti />
           <PlatePegs />
+          <Wedge />
+          <CookieJar />
           <Cooktop kitchen={kitchen} t={t} />
           <Kettle />
           <Steam kitchen={kitchen} t={t} />
@@ -107,6 +120,10 @@ function MovingThings({ kitchen, t }: { kitchen: Kitchen; t: number }) {
       </g>
       <RollingPin at={pin.pt} turned={pin.turned} />
       <Plate at={plate.pt} turned={plate.turned} tilt={plate.tilt} flat={plate.flat} />
+      <SaladSpinner kitchen={kitchen} t={t} />
+      <PancakePan kitchen={kitchen} t={t} />
+      <EggTimer kitchen={kitchen} t={t} />
+      <Leaves kitchen={kitchen} t={t} />
       <Kernels kitchen={kitchen} t={t} />
       <Toast kitchen={kitchen} t={t} />
       <Toaster kitchen={kitchen} t={t} />
@@ -130,8 +147,9 @@ function Room({ tiles }: { tiles: string }) {
       <Window x={1250} />
       <WallClock x={2420} y={150} />
       <Window x={3420} />
+      <Window x={4560} />
       <SpiceRack />
-      <Bunting x0={5240} x1={WORLD_W + 20} y={30} />
+      <Bunting x0={BREAKFAST.cx - 140} x1={WORLD_W + 20} y={30} />
       {/* Worktop and the cupboards under it */}
       <rect x="-400" y={COUNTER + 24} width={WORLD_W + 800} height={FLOOR - COUNTER - 24} fill="#8ecae6" />
       {Array.from({ length: Math.ceil(WORLD_W / 260) + 2 }, (_, i) => {
@@ -160,15 +178,17 @@ function SpiceRack() {
   const y = 300;
   return (
     <g>
-      {[4330, 4410, 4490, 4570].map((x, i) => (
-        <g key={x}>
-          <rect x={x} y={y - 64} width="50" height="64" rx="8" fill="#e8f6ffcc" stroke={INK} strokeWidth="3" />
-          <rect x={x + 4} y={y - 40} width="42" height="36" rx="5" fill={BAR_COLORS[(i * 3) % BAR_COLORS.length]} opacity="0.75" />
-          <rect x={x - 2} y={y - 76} width="54" height="16" rx="5" fill={BAR_COLORS[(i * 3 + 5) % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
-        </g>
-      ))}
-      <rect x="4300" y={y} width="350" height="16" rx="5" fill={WOOD} stroke={INK} strokeWidth="3" />
-      {[4340, 4610].map((x) => (
+      {[-70, 10, 90, 170]
+        .map((dx) => KETTLE.cx + dx)
+        .map((x, i) => (
+          <g key={x}>
+            <rect x={x} y={y - 64} width="50" height="64" rx="8" fill="#e8f6ffcc" stroke={INK} strokeWidth="3" />
+            <rect x={x + 4} y={y - 40} width="42" height="36" rx="5" fill={BAR_COLORS[(i * 3) % BAR_COLORS.length]} opacity="0.75" />
+            <rect x={x - 2} y={y - 76} width="54" height="16" rx="5" fill={BAR_COLORS[(i * 3 + 5) % BAR_COLORS.length]} stroke={INK} strokeWidth="3" />
+          </g>
+        ))}
+      <rect x={KETTLE.cx - 100} y={y} width="350" height="16" rx="5" fill={WOOD} stroke={INK} strokeWidth="3" />
+      {[KETTLE.cx - 60, KETTLE.cx + 210].map((x) => (
         <path key={x} d={`M${x} ${y + 16} L${x} ${y + 50} L${x + 26} ${y + 16} Z`} fill={MID_WOOD} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
       ))}
     </g>
@@ -584,6 +604,225 @@ function Steam({ kitchen, t }: { kitchen: Kitchen; t: number }) {
   return <g>{puffs}</g>;
 }
 
+/* ---------- Salad spinner, egg timer, pancake pan ---------- */
+
+/** A ruffled lettuce leaf with its pale middle vein, lengthwise round (0, 0). */
+function Lettuce({ x, y, angle, s = 1 }: { x: number; y: number; angle: number; s?: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${angle}) scale(${s})`}>
+      <path
+        d="M-26 0 Q-24 -14 -12 -12 Q-6 -20 4 -14 Q14 -20 20 -10 Q30 -6 26 2 Q28 12 16 12 Q8 18 -2 12 Q-12 18 -18 10 Q-28 10 -26 0 Z"
+        fill="#7ed957"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      <path d="M-20 1 Q0 -3 22 0 M-4 -1 L4 -9 M6 -1 L12 6" fill="none" stroke="#d4f7b5" strokeWidth="3" strokeLinecap="round" />
+    </g>
+  );
+}
+
+/**
+ * The salad spinner: a see-through bowl with the basket and lettuce going
+ * round inside, and the lid with its crank, which pops off while it whirls.
+ */
+function SaladSpinner({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { cx, top, w, foot } = SPINNER;
+  const dx = kitchen.spinnerShake(t);
+  const phi = kitchen.crankAngle(t);
+  const turned = Math.PI - phi;
+  const half = w / 2;
+  const low = foot / 2;
+  const bottom = COUNTER - 8;
+  const bowl = `M${cx - half} ${top} L${cx + half} ${top} L${cx + low} ${bottom - 14} Q${cx + low - 2} ${bottom} ${cx + low - 16} ${bottom} L${cx - low + 16} ${bottom} Q${cx - low + 2} ${bottom} ${cx - low} ${bottom - 14} Z`;
+  // Only the basket's slats on the front half are drawn, so it seems to turn.
+  const slats = Array.from({ length: 10 }, (_, i) => turned + (i * Math.PI) / 5).filter((a) => Math.sin(a) > 0);
+  const lid = kitchen.lidAt(t);
+  const kx = CRANK.r * Math.cos(phi);
+  const ky = 4 * Math.sin(phi);
+  return (
+    <g>
+      <g transform={`translate(${dx} 0)`}>
+        <path d={bowl} fill="#d8f5e3" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        {[0, 1, 2, 3].map((i) => {
+          const a = turned + (i * Math.PI) / 2;
+          return <Lettuce key={i} x={cx + 40 * Math.cos(a)} y={top + 40 + (i % 2) * 22} angle={i * 50 + 20 * Math.cos(a)} s={0.85 + 0.15 * Math.sin(a)} />;
+        })}
+        {slats.map((a) => (
+          <line key={a} x1={cx + 64 * Math.cos(a)} y1={top + 10} x2={cx + 52 * Math.cos(a)} y2={bottom - 8} stroke="#fff" strokeWidth="4" opacity="0.85" />
+        ))}
+        <path d={bowl} fill="#7fd6a8" opacity="0.35" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        <path d={`M${cx - half + 16} ${top + 14} L${cx - low + 12} ${bottom - 22}`} stroke="#fff" strokeWidth="6" strokeLinecap="round" opacity="0.8" />
+        <rect x={cx - low + 8} y={bottom} width={foot - 16} height="8" rx="3" fill="#3ec300" stroke={INK} strokeWidth="2.5" />
+      </g>
+      <g transform={`translate(${lid.pt.x} ${lid.pt.y}) rotate(${lid.angle})`}>
+        <path d={`M${-half - 4} 6 Q${-half} -10 0 -10 Q${half} -10 ${half + 4} 6 Z`} fill="#3ec300" stroke={INK} strokeWidth="3.5" strokeLinejoin="round" />
+        <path d={`M${-half + 18} -2 Q0 -8 ${half - 18} -2`} fill="none" stroke="#a6f07a" strokeWidth="3" strokeLinecap="round" />
+        <rect x="-9" y="-24" width="18" height="16" rx="4" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+        <line x1="0" y1="-18" x2={kx} y2={-18 + ky} stroke={INK} strokeWidth="11" strokeLinecap="round" />
+        <line x1="0" y1="-18" x2={kx} y2={-18 + ky} stroke="#ffd23f" strokeWidth="5" strokeLinecap="round" />
+        <circle cx={kx} cy={-CRANK.knobUp + ky} r={CRANK.knobR} fill="#ff5d73" stroke={INK} strokeWidth="3" />
+      </g>
+    </g>
+  );
+}
+
+/** The leaves flung out of the salad spinner; the big one flies to the egg timer. */
+function Leaves({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  return (
+    <g>
+      {kitchen.leaves.map((_, i) => {
+        const leaf = kitchen.leafAt(i, t);
+        return leaf && <Lettuce key={i} x={leaf.pt.x} y={leaf.pt.y} angle={leaf.angle} s={leaf.big ? 1.5 : 1} />;
+      })}
+    </g>
+  );
+}
+
+/** The wooden wedge the pancake pan rests on. */
+const Wedge = memo(function Wedge() {
+  const { x, h, w } = WEDGE;
+  return (
+    <path
+      d={`M${x - w / 2} ${COUNTER} L${x - 5} ${COUNTER - h + 4} Q${x} ${COUNTER - h - 1} ${x + 5} ${COUNTER - h + 4} L${x + w / 2} ${COUNTER} Z`}
+      fill={MID_WOOD}
+      stroke={INK}
+      strokeWidth="3.5"
+      strokeLinejoin="round"
+    />
+  );
+});
+
+/** The glass cookie jar the egg timer stands on. */
+const CookieJar = memo(function CookieJar() {
+  const { x0, x1, top } = JAR;
+  const w = x1 - x0;
+  const cookies = [
+    [34, -26],
+    [86, -24],
+    [58, -64],
+    [100, -66],
+  ];
+  return (
+    <g>
+      <rect x={x0} y={top + 16} width={w} height={COUNTER - top - 16} rx="20" fill="#e8f6ff" stroke={INK} strokeWidth="4" />
+      {cookies.map(([dx, dy]) => (
+        <g key={dx}>
+          <circle cx={x0 + dx} cy={COUNTER + dy} r="22" fill="#d9a35b" stroke={INK} strokeWidth="2.5" />
+          {[
+            [-8, -6],
+            [7, -2],
+            [-2, 9],
+          ].map(([cx, cy]) => (
+            <circle key={cx} cx={x0 + dx + cx} cy={COUNTER + dy + cy} r="3.5" fill="#6b4423" />
+          ))}
+        </g>
+      ))}
+      <path d={`M${x0 + 18} ${top + 36} L${x0 + 18} ${COUNTER - 30}`} stroke="#fff" strokeWidth="7" strokeLinecap="round" opacity="0.8" />
+      <rect x={x0 + 10} y={top + 12} width={w - 20} height="10" fill="#ff5d73" stroke={INK} strokeWidth="2.5" />
+      <rect x={x0 - 6} y={top} width={w + 12} height="18" rx="8" fill="#ff7bd0" stroke={INK} strokeWidth="3.5" />
+    </g>
+  );
+});
+
+/** The egg timer, face on: its dial turns, it rocks with every tick, and it rings with its little bell on top. */
+function EggTimer({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const { pt, tilt, dial, ringing } = kitchen.timerAt(t);
+  const { rx, ry, foot } = TIMER;
+  const egg = `M0 ${-ry} C${rx * 0.75} ${-ry} ${rx} ${-ry * 0.1} ${rx} ${ry * 0.25} C${rx} ${ry * 0.75} ${rx * 0.55} ${ry} 0 ${ry} C${-rx * 0.55} ${ry} ${-rx} ${ry * 0.75} ${-rx} ${ry * 0.25} C${-rx} ${-ry * 0.1} ${-rx * 0.75} ${-ry} 0 ${-ry} Z`;
+  return (
+    <g transform={`translate(${pt.x} ${pt.y}) rotate(${tilt})`}>
+      {[-1, 1].map((side) => (
+        <ellipse key={side} cx={side * 15} cy={foot - 5} rx="11" ry="5" fill="#ff8c42" stroke={INK} strokeWidth="3" />
+      ))}
+      <path d={egg} fill="#fffaf0" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path
+        d={`M${-rx + 1} 12 Q0 20 ${rx - 1} 12 C${rx - 2} ${ry * 0.75} ${rx * 0.55} ${ry - 2} 0 ${ry - 2} C${-rx * 0.55} ${ry - 2} ${-rx + 2} ${ry * 0.75} ${-rx + 1} 12 Z`}
+        fill="#ffd23f"
+      />
+      <path d={egg} fill="none" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      {/* The dial: its marks and the red part of the set time go round with it */}
+      <circle cy="-10" r="22" fill="#fff" stroke={INK} strokeWidth="3" />
+      <g transform={`translate(0 -10) rotate(${dial})`}>
+        <path
+          d={`M0 0 L0 -18 A18 18 0 0 0 ${-18 * Math.sin((DIAL_MAX * Math.PI) / 180 / 4)} ${-18 * Math.cos((DIAL_MAX * Math.PI) / 180 / 4)} Z`}
+          fill="#ff5d73"
+          opacity="0.8"
+        />
+        {Array.from({ length: 12 }, (_, i) => (
+          <line key={i} x1="0" y1={i % 3 ? -15 : -12} x2="0" y2="-19" stroke={INK} strokeWidth="2.5" strokeLinecap="round" transform={`rotate(${i * 30})`} />
+        ))}
+        <circle r="4" fill={INK} />
+      </g>
+      <path d="M0 -30 L-6 -40 L6 -40 Z" fill="#ff3b3b" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      {/* A little face */}
+      <circle cx="-10" cy="24" r="3.5" fill={INK} />
+      <circle cx="10" cy="24" r="3.5" fill={INK} />
+      {ringing ? (
+        <ellipse cy="33" rx="5" ry="6" fill="#ff5d73" stroke={INK} strokeWidth="2.5" />
+      ) : (
+        <path d="M-6 31 Q0 36 6 31" fill="none" stroke={INK} strokeWidth="2.5" strokeLinecap="round" />
+      )}
+      <circle cy={-ry - 5} r="8" fill="#ffd23f" stroke={INK} strokeWidth="3" />
+      {ringing &&
+        [-1, 1].map((side) => (
+          <path
+            key={side}
+            d={`M${side * 16} ${-ry - 6} q${side * 8} -4 ${side * 8} -16 M${side * 24} ${-ry + 2} q${side * 12} -6 ${side * 14} -24`}
+            fill="none"
+            stroke="#ff8c42"
+            strokeWidth="4"
+            strokeLinecap="round"
+          />
+        ))}
+    </g>
+  );
+}
+
+/** The pancake, seen from the side: a golden disc that turns somersaults; `squash` flattens it as it lands. */
+function Pancake({ at, angle, squash }: { at: Pt; angle: number; squash: number }) {
+  const { r, h } = PANCAKE;
+  return (
+    <g transform={`translate(${at.x} ${at.y + h / 2}) scale(${2 - squash} ${squash}) translate(0 ${-h / 2}) rotate(${angle})`}>
+      <ellipse rx={r} ry={h / 2 + 1} fill="#e9a23b" stroke={INK} strokeWidth="3" />
+      <ellipse cy="-2" rx={r - 10} ry={h / 2 - 3} fill="#ffd27a" />
+      {[-26, 2, 24].map((dx) => (
+        <circle key={dx} cx={dx} cy="-1" r="2.5" fill="#b8691f" />
+      ))}
+    </g>
+  );
+}
+
+/** The pancake pan on its wedge, the pancake in it; the egg timer landing on its handle tips it over. */
+function PancakePan({ kitchen, t }: { kitchen: Kitchen; t: number }) {
+  const cake = kitchen.pancakeAt(t);
+  const pan = `translate(${WEDGE.x} ${COUNTER - WEDGE.h}) rotate(${-kitchen.panAngle(t)})`;
+  const { back, rimH, handle, handleH } = PAN;
+  const left = -back - 22;
+  const mid = (left + 12) / 2;
+  const rx = (12 - left) / 2;
+  return (
+    <g>
+      <g transform={pan}>
+        <ellipse cx={mid} cy={-rimH} rx={rx} ry="9" fill="#2b2d42" stroke={INK} strokeWidth="3" />
+      </g>
+      <Pancake at={cake.pt} angle={cake.angle} squash={cake.squash} />
+      <g transform={pan}>
+        <rect x="0" y={-handleH} width={handle} height={handleH} rx="7" fill="#ff5d73" stroke={INK} strokeWidth="3.5" />
+        <circle cx={handle - 12} cy={-handleH / 2} r="3.5" fill={INK} />
+        <path
+          d={`M${left} ${-rimH} L${-back} -3 Q${-back + 1} 0 ${-back + 6} 0 L-14 0 Q-9 0 -8 -3 L12 ${-rimH} A${rx} 9 0 0 1 ${left} ${-rimH} Z`}
+          fill="#4a4e69"
+          stroke={INK}
+          strokeWidth="4"
+          strokeLinejoin="round"
+        />
+        <path d={`M${left + 24} ${-rimH + 14} Q${mid} ${-rimH + 20} ${-24} ${-rimH + 14}`} fill="none" stroke="#8d93a8" strokeWidth="4" strokeLinecap="round" />
+      </g>
+    </g>
+  );
+}
+
 /* ---------- Popcorn ---------- */
 
 /** A popped corn: a little cloud with an outline. */
@@ -753,17 +992,19 @@ function Toast({ kitchen, t }: { kitchen: Kitchen; t: number }) {
 /** The breakfast plate lying on the counter, a cup of cocoa and a jar of jam. */
 function BreakfastPlate() {
   const { cx, top } = BREAKFAST;
+  const cup = cx - 204;
+  const jam = cx + 310;
   return (
     <g>
       <path
-        d={`M5130 ${COUNTER} L5140 ${COUNTER - 62} L5212 ${COUNTER - 62} L5222 ${COUNTER} Z`}
+        d={`M${cup - 46} ${COUNTER} L${cup - 36} ${COUNTER - 62} L${cup + 36} ${COUNTER - 62} L${cup + 46} ${COUNTER} Z`}
         fill="#ff7bd0"
         stroke={INK}
         strokeWidth="3.5"
         strokeLinejoin="round"
       />
-      <ellipse cx="5176" cy={COUNTER - 62} rx="36" ry="7" fill="#7a3b1c" stroke={INK} strokeWidth="2.5" />
-      <path d={`M5222 ${COUNTER - 48} q24 4 0 30`} fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx={cup} cy={COUNTER - 62} rx="36" ry="7" fill="#7a3b1c" stroke={INK} strokeWidth="2.5" />
+      <path d={`M${cup + 46} ${COUNTER - 48} q24 4 0 30`} fill="none" stroke={INK} strokeWidth="6" strokeLinecap="round" />
       <path
         d={`M${cx - 40} ${COUNTER} L${cx - 30} ${top + 8} L${cx + 30} ${top + 8} L${cx + 40} ${COUNTER} Z`}
         fill="#e8eefc"
@@ -773,9 +1014,9 @@ function BreakfastPlate() {
       />
       <ellipse cx={cx} cy={top} rx="92" ry="14" fill="#fff" stroke={INK} strokeWidth="3.5" />
       <ellipse cx={cx} cy={top} rx="70" ry="9" fill="none" stroke="#3a86ff" strokeWidth="3" />
-      <rect x="5690" y={COUNTER - 74} width="56" height="74" rx="10" fill="#ff3b3bcc" stroke={INK} strokeWidth="3.5" />
-      <rect x="5684" y={COUNTER - 88} width="68" height="20" rx="6" fill="#fff" stroke={INK} strokeWidth="3" />
-      <path d="M5684 552 l8 -6 l8 6 l8 -6 l8 6 l8 -6 l8 6 l8 -6 l8 6" fill="none" stroke="#ff5d73" strokeWidth="3" />
+      <rect x={jam} y={COUNTER - 74} width="56" height="74" rx="10" fill="#ff3b3bcc" stroke={INK} strokeWidth="3.5" />
+      <rect x={jam - 6} y={COUNTER - 88} width="68" height="20" rx="6" fill="#fff" stroke={INK} strokeWidth="3" />
+      <path d={`M${jam - 6} 552 l8 -6 l8 6 l8 -6 l8 6 l8 -6 l8 6 l8 -6 l8 6`} fill="none" stroke="#ff5d73" strokeWidth="3" />
     </g>
   );
 }

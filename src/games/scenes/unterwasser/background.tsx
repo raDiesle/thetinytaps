@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, transformOf } from "../layout";
 import { Cloud, nth } from "../shared";
+import { Poke } from "../spots";
 import { MERMAID_ROCK, OCTO_ROCK, SNAIL_STONE, SURFACE } from "./layout";
 
 // A thin strip of sky above the waves; below it the water gets deeper and bluer. Rays of
@@ -66,14 +67,16 @@ const RAYS = [
 
 function Tuft({ x, y, tall = 1, color = "#40916c" }: { x: number; y: number; tall?: number; color?: string }) {
   return (
-    <path
-      d={`M0 0 q-10 ${-30 * tall} 0 ${-60 * tall} M14 0 q12 ${-36 * tall} 2 ${-74 * tall} M28 0 q-6 ${-24 * tall} 6 ${-50 * tall}`}
-      transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
-      stroke={color}
-      strokeWidth="9"
-      strokeLinecap="round"
-      fill="none"
-    />
+    <Poke kind="sway">
+      <path
+        d={`M0 0 q-10 ${-30 * tall} 0 ${-60 * tall} M14 0 q12 ${-36 * tall} 2 ${-74 * tall} M28 0 q-6 ${-24 * tall} 6 ${-50 * tall}`}
+        transform={`translate(${x} ${y}) scale(${depthScale(y)})`}
+        stroke={color}
+        strokeWidth="9"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </Poke>
   );
 }
 
@@ -144,9 +147,13 @@ export function Background() {
         opacity="0.75"
       />
       <g stroke="#62b3d6" strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.8">
-        <path d="M200 318 V286 M200 300 l-14 -14 M200 296 l12 -16" />
-        <path d="M1040 316 V280 M1040 296 l-12 -12 M1040 290 l14 -14" />
-        <path d="M1380 320 V292 M1380 304 l-12 -10" />
+        {["M200 318 V286 M200 300 l-14 -14 M200 296 l12 -16", "M1040 316 V280 M1040 296 l-12 -12 M1040 290 l14 -14", "M1380 320 V292 M1380 304 l-12 -10"].map(
+          (d) => (
+            <Poke key={d} kind="sway">
+              <path d={d} />
+            </Poke>
+          ),
+        )}
       </g>
 
       {/* The sea floor */}
@@ -157,21 +164,24 @@ export function Background() {
       <rect y={HORIZON - 30} width="1600" height="200" fill="url(#uw-haze)" />
 
       {/* Rocks at the back left, behind the submarine */}
-      <path d="M-20 480 Q-10 420 40 410 Q90 400 120 440 Q140 470 130 486 Z" fill="#7f9fb5" />
-      <path d="M10 424 Q50 408 90 418" stroke="#a3bfd0" strokeWidth="8" strokeLinecap="round" fill="none" />
+      <Poke kind="wobble">
+        <path d="M-20 480 Q-10 420 40 410 Q90 400 120 440 Q140 470 130 486 Z" fill="#7f9fb5" />
+        <path d="M10 424 Q50 408 90 418" stroke="#a3bfd0" strokeWidth="8" strokeLinecap="round" fill="none" />
+      </Poke>
 
       {/* Seagrass meadow behind the seahorse */}
       {[1100, 1124, 1150, 1176, 1200].map((x, i) => (
-        <path
-          key={x}
-          d={`M0 0 q-14 -60 0 -120 q14 -60 -2 -${110 + (i % 2) * 40}`}
-          transform={`translate(${x} 470) scale(${depthScale(470)})`}
-          stroke={i % 2 ? "#52b788" : "#40916c"}
-          strokeWidth="14"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.9"
-        />
+        <Poke key={x} kind="sway">
+          <path
+            d={`M0 0 q-14 -60 0 -120 q14 -60 -2 -${110 + (i % 2) * 40}`}
+            transform={`translate(${x} 470) scale(${depthScale(470)})`}
+            stroke={i % 2 ? "#52b788" : "#40916c"}
+            strokeWidth="14"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.9"
+          />
+        </Poke>
       ))}
 
       {RIPPLES.map(([x, y]) => (
@@ -186,28 +196,36 @@ export function Background() {
         />
       ))}
       {PEBBLES.map(([x, y], i) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
-          <ellipse cx="0" cy="-6" rx={14 + (i % 3) * 4} ry="9" fill={y < 520 ? "#9fb6b8" : "#c8b28a"} />
-          <ellipse cx="22" cy="-4" rx="8" ry="6" fill={y < 520 ? "#b3c7c4" : "#ddc69b"} />
-        </g>
+        <Poke key={`${x}-${y}`} kind="hop">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
+            <ellipse cx="0" cy="-6" rx={14 + (i % 3) * 4} ry="9" fill={y < 520 ? "#9fb6b8" : "#c8b28a"} />
+            <ellipse cx="22" cy="-4" rx="8" ry="6" fill={y < 520 ? "#b3c7c4" : "#ddc69b"} />
+          </g>
+        </Poke>
       ))}
       {TUFTS.map(([x, y]) => (
         <Tuft key={`${x}-${y}`} x={x} y={y} color={y < 520 ? "#4f9f86" : "#40916c"} />
       ))}
 
       {/* The mermaid's rock, the octopus's rock and the snail's stone */}
-      <g transform={transformOf(MERMAID_ROCK)}>
-        <Rock d="M-132 0 Q-142 -60 -82 -88 Q0 -106 82 -90 Q142 -66 134 0 Z" top="M-90 -76 Q-10 -96 70 -82" />
-        <path d="M-132 0 Q-60 -30 134 0 Z" fill="#6b7d91" />
-        <path d="M100 -60 q10 -20 0 -40 M112 -56 q12 -16 6 -36" stroke="#52b788" strokeWidth="6" fill="none" strokeLinecap="round" />
-      </g>
-      <g transform={transformOf(OCTO_ROCK)}>
-        <Rock d="M-140 0 Q-150 -58 -92 -84 Q0 -102 92 -86 Q150 -60 140 0 Z" top="M-100 -72 Q0 -92 90 -76" />
-        <path d="M-140 0 Q-60 -26 140 0 Z" fill="#6b7d91" />
-      </g>
-      <g transform={transformOf(SNAIL_STONE)}>
-        <Rock d="M-72 0 Q-76 -32 -40 -42 Q0 -50 40 -42 Q76 -32 72 0 Z" top="M-46 -34 Q0 -46 40 -36" />
-      </g>
+      <Poke kind="wobble">
+        <g transform={transformOf(MERMAID_ROCK)}>
+          <Rock d="M-132 0 Q-142 -60 -82 -88 Q0 -106 82 -90 Q142 -66 134 0 Z" top="M-90 -76 Q-10 -96 70 -82" />
+          <path d="M-132 0 Q-60 -30 134 0 Z" fill="#6b7d91" />
+          <path d="M100 -60 q10 -20 0 -40 M112 -56 q12 -16 6 -36" stroke="#52b788" strokeWidth="6" fill="none" strokeLinecap="round" />
+        </g>
+      </Poke>
+      <Poke kind="wobble">
+        <g transform={transformOf(OCTO_ROCK)}>
+          <Rock d="M-140 0 Q-150 -58 -92 -84 Q0 -102 92 -86 Q150 -60 140 0 Z" top="M-100 -72 Q0 -92 90 -76" />
+          <path d="M-140 0 Q-60 -26 140 0 Z" fill="#6b7d91" />
+        </g>
+      </Poke>
+      <Poke kind="wobble">
+        <g transform={transformOf(SNAIL_STONE)}>
+          <Rock d="M-72 0 Q-76 -32 -40 -42 Q0 -50 40 -42 Q76 -32 72 0 Z" top="M-46 -34 Q0 -46 40 -36" />
+        </g>
+      </Poke>
     </>
   );
 }

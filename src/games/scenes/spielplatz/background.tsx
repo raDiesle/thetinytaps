@@ -1,5 +1,6 @@
 import { HORIZON, depthScale, towardsHorizon, transformOf } from "../layout";
 import { Cloud } from "../shared";
+import { Poke } from "../spots";
 import { PUMP, SAND_LEFT, SAND_RIGHT, SAND_TOP, SWING, TOWER, pathHalf, pathY } from "./layout";
 
 // A playground in the park. Far away the roofs of the town and rows of trees fade into the
@@ -77,20 +78,20 @@ function Distance() {
   return (
     <g>
       {ROOFS.map(([x, w, h, colour]) => (
-        <g key={x}>
+        <Poke key={x} kind="wobble">
           <rect x={x} y={HORIZON - 20 - h} width={w} height={h} fill="#f1f3f5" />
           <path d={`M${x - 6} ${HORIZON - 20 - h} L${x + w / 2} ${HORIZON - 44 - h} L${x + w + 6} ${HORIZON - 20 - h} Z`} fill={colour} />
           <rect x={x + 12} y={HORIZON - 6 - h} width="14" height="12" fill="#d0ebff" />
           <rect x={x + w - 26} y={HORIZON - 6 - h} width="14" height="12" fill="#d0ebff" />
-        </g>
+        </Poke>
       ))}
       <path d="M1384 238 v-24 h12 v20" fill="#e8c3a8" />
       {FAR_TREES.map(([x, r]) => (
-        <g key={x}>
+        <Poke key={x} kind="sway">
           <rect x={x - 4} y={HORIZON - 34} width="8" height="20" fill="#b08968" opacity="0.6" />
           <circle cx={x} cy={HORIZON - 30 - r * 0.7} r={r} fill="#b7e4c7" />
           <circle cx={x - r * 0.3} cy={HORIZON - 30 - r} r={r * 0.4} fill="#d8f3dc" />
-        </g>
+        </Poke>
       ))}
     </g>
   );
@@ -105,12 +106,14 @@ function Hedge() {
       />
       <path d={`M0 ${HORIZON - 6} H1600`} stroke="#52b788" strokeWidth="8" opacity="0.6" />
       {/* White picket fence in front of the hedge */}
-      <g fill="#fff">
-        {Array.from({ length: 81 }, (_, i) => (
-          <path key={i} d={`M${i * 20 - 3} ${HORIZON + 6} V${HORIZON - 12} l3 -4 l3 4 V${HORIZON + 6} Z`} />
-        ))}
-      </g>
-      <path d={`M0 ${HORIZON - 6} H1600 M0 ${HORIZON + 1} H1600`} stroke="#e9ecef" strokeWidth="3" />
+      <Poke kind="wobble">
+        <g fill="#fff">
+          {Array.from({ length: 81 }, (_, i) => (
+            <path key={i} d={`M${i * 20 - 3} ${HORIZON + 6} V${HORIZON - 12} l3 -4 l3 4 V${HORIZON + 6} Z`} />
+          ))}
+        </g>
+        <path d={`M0 ${HORIZON - 6} H1600 M0 ${HORIZON + 1} H1600`} stroke="#e9ecef" strokeWidth="3" />
+      </Poke>
     </g>
   );
 }
@@ -133,7 +136,11 @@ function Path() {
         {GRAVEL.map(([x, off], i) => {
           const y = pathY(x) + off * pathHalf(x);
           const s = depthScale(y);
-          return <ellipse key={i} cx={x} cy={y} rx={4.5 * s} ry={3 * s} />;
+          return (
+            <Poke key={i} kind="hop">
+              <ellipse cx={x} cy={y} rx={4.5 * s} ry={3 * s} />
+            </Poke>
+          );
         })}
       </g>
     </g>
@@ -218,7 +225,9 @@ function Stream() {
         [10, 110],
         [100, 120],
       ].map(([cx, cy]) => (
-        <ellipse key={`${cx}-${cy}`} cx={cx} cy={cy} rx="12" ry="7" fill="#adb5bd" />
+        <Poke key={`${cx}-${cy}`} kind="hop">
+          <ellipse cx={cx} cy={cy} rx="12" ry="7" fill="#adb5bd" />
+        </Poke>
       ))}
     </g>
   );
@@ -272,16 +281,20 @@ export function Background() {
 
       <g stroke="#51cf66" strokeWidth="5" strokeLinecap="round" fill="none">
         {TUFTS.map(([x, y]) => (
-          <path key={`${x}-${y}`} d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          <Poke key={`${x}-${y}`} kind="sway">
+            <path d="M0 0 q4 -24 12 -30 M10 0 q0 -26 -6 -36 M20 0 q2 -20 12 -26" transform={`translate(${x} ${y}) scale(${depthScale(y)})`} />
+          </Poke>
         ))}
       </g>
       {DAISIES.map(([x, y]) => (
-        <g key={`${x}-${y}`} transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
-          {[0, 72, 144, 216, 288].map((a) => (
-            <ellipse key={a} cx="0" cy="-7" rx="3.5" ry="6" fill="#fff" transform={`rotate(${a})`} />
-          ))}
-          <circle r="3.5" fill="#ffd43b" />
-        </g>
+        <Poke key={`${x}-${y}`} kind="sway">
+          <g transform={`translate(${x} ${y}) scale(${depthScale(y)})`}>
+            {[0, 72, 144, 216, 288].map((a) => (
+              <ellipse key={a} cx="0" cy="-7" rx="3.5" ry="6" fill="#fff" transform={`rotate(${a})`} />
+            ))}
+            <circle r="3.5" fill="#ffd43b" />
+          </g>
+        </Poke>
       ))}
 
       <Path />

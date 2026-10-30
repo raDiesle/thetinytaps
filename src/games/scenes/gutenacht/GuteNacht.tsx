@@ -1,9 +1,9 @@
-import { ground } from "../layout";
+import { HORIZON, ground } from "../layout";
 import type { Scene } from "../types";
 import { Elefant, Hase, Katze, Schaf } from "./animals";
 import { Background } from "./background";
 import { Bett, Decke, Kind, Lampe, Nachttisch, Teddy, Wecker } from "./bed";
-import { BED, DOLLHOUSE, NIGHTSTAND, SHELF } from "./layout";
+import { BED, DOLLHOUSE, NIGHTSTAND, SHELF, WINDOW } from "./layout";
 import { Buch, Goldfisch, Puppenhaus, Spieluhr } from "./shelf";
 import { Ball, Bausteine, Eisenbahn, Hausschuhe, Kreisel, Puppenwagen, Roboter, Schaukelpferd, Spielzeugkiste, Taschenlampe, Teppich } from "./toys";
 import { Bild, Kuckucksuhr, Lichterkette, Mama, Maus, Mobile, Nachtlicht, Schlafanzug, Tuer, Vorhang } from "./wall";
@@ -25,6 +25,12 @@ export const gutenacht: Scene = {
   ground: "#e8bd8a",
   Background,
   bedtime: true,
+  // Calm at bedtime: a shooting star in the window, fireflies glowing along the wall, a ladybird on the floor.
+  spots: [
+    { box: [WINDOW.x, WINDOW.y, WINDOW.w, WINDOW.h], kinds: ["stars"] },
+    { box: [0, 0, 1600, HORIZON], kinds: ["fireflies"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["bug"] },
+  ],
   items: [
     // ---------- On the wall ----------
     {

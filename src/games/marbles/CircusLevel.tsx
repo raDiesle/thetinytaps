@@ -1,4 +1,4 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { wobble, VIEW_H, type LevelProps } from "./level";
 import {
   BASKET,
@@ -14,24 +14,32 @@ import {
   ELEPHANT,
   END,
   EYE,
+  FEET,
   FLOOR,
   HAT,
   HEAD,
   HOOP,
+  LION_FROM,
+  LION_NECK,
+  LION_TO,
+  MANE,
   MAST,
   MUZZLE,
   NECK,
   NET,
+  PEDESTAL_W,
   PLATFORM,
   RAIL,
   SEAL,
   STAGE,
   TRAMPOLINE,
+  TRAPEZE,
   TRUNK_W,
   UNICYCLE,
   WIRE,
   WORLD_W,
   type Circus,
+  type LionPose,
 } from "./circus";
 import { beside, deg, lerp, rad, seg, svgLine } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
@@ -46,10 +54,13 @@ const GOLD = "#ffc93c";
 
 /**
  * The circus. One tap lets the marble drop out of the magician's
- * top hat, and then one act sets off the next for about half a minute: a drum
+ * top hat, and then one act sets off the next for about forty seconds: a drum
  * roll with a cymbal, a trampoline, a seal balancing the marble on its nose,
- * the elephant's trunk as a slide that flings the marble into a teddy's basket,
- * the teddy on a unicycle along the high wire through a ring of paper flames,
+ * the elephant's trunk as a slide that flings the marble up to a monkey on a
+ * trapeze, who catches it with its feet, swings higher and higher and drops it
+ * into the mane of a dozing lion; the lion wakes with a start, roars, leaps
+ * onto the next pedestal and shakes the marble out into a teddy's basket, and
+ * the teddy rides a unicycle along the high wire through a ring of paper flames,
  * pulling the ribbon of the cannon that shoots the clown doll into the net. Then the curtain opens. The camera travels along
  * with whatever moves.
  */
@@ -79,6 +90,10 @@ export function CircusLevel(props: LevelProps) {
             <Seal nod={circus.nodAt(t)} clap={circus.clapAt(t)} />
             <Chute />
             <Elephant circus={circus} t={t} />
+            <Trapeze angle={circus.swingAt(t)} grabbed={t - circus.tGrab} dropped={t - circus.tDrop} />
+            <Pedestals />
+            <Lion pose={circus.lionAt(t)} dozing={t < circus.tPlop} />
+            <LionMarks circus={circus} t={t} />
             <HighWire />
             <Mast />
             <Hoop t={t} tPass={circus.tHoop} part="back" />
@@ -105,7 +120,8 @@ export function CircusLevel(props: LevelProps) {
 
 /* ---------- The tent ---------- */
 
-function Tent({ stripes }: { stripes: string }) {
+/** The tent, drawn once: it never changes. */
+const Tent = memo(function Tent({ stripes }: { stripes: string }) {
   const bulbs = Math.floor((WORLD_W + 800) / 80);
   return (
     <g>
@@ -117,20 +133,21 @@ function Tent({ stripes }: { stripes: string }) {
       </defs>
       <rect x="-400" y="-200" width={WORLD_W + 800} height={FLOOR + 200} fill={`url(#${stripes})`} />
       {/* Soft spots of light on the tent wall */}
-      {[700, 2100, 3500, 4300].map((x) => (
+      {[700, 2100, 3300, 4760, 5560].map((x) => (
         <ellipse key={x} cx={x} cy="330" rx="230" ry="170" fill="#fff" opacity="0.18" />
       ))}
       {[
         { x: 520, y: 600 },
         { x: 1660, y: 260 },
-        { x: 2900, y: 330 },
-        { x: 3750, y: 420 },
-        { x: 4560, y: 330 },
+        { x: 4160, y: 330 },
+        { x: 5010, y: 420 },
+        { x: 5820, y: 330 },
       ].map((p) => (
         <Star key={p.x} x={p.x} y={p.y} r={34} fill={GOLD} />
       ))}
       <Bunting x0={1500} x1={2700} y={86} />
-      <Bunting x0={2900} x1={4100} y={86} />
+      <Bunting x0={3420} x1={3880} y={86} />
+      <Bunting x0={4160} x1={5360} y={86} />
       {/* The scalloped edge at the top, with light bulbs */}
       <rect x="-400" y="-200" width={WORLD_W + 800} height="236" fill="#c8323f" />
       {Array.from({ length: bulbs }, (_, i) => {
@@ -156,7 +173,7 @@ function Tent({ stripes }: { stripes: string }) {
       ))}
     </g>
   );
-}
+});
 
 /** A five-pointed star with its middle at (x, y). */
 function Star({ x, y, r, fill, turn = 0 }: { x: number; y: number; r: number; fill: string; turn?: number }) {
@@ -440,6 +457,266 @@ function Elephant({ circus, t }: { circus: Circus; t: number }) {
         <g opacity={1 - toot / 1.2} stroke={INK} strokeWidth="4" fill="none" strokeLinecap="round">
           {[0, 1, 2].map((k) => (
             <path key={k} transform={`rotate(${tipTurn} ${tip.x} ${tip.y})`} d={`M${tip.x + 30 + k * 16 + toot * 30} ${tip.y - 20} q10 20 0 40`} />
+          ))}
+        </g>
+      )}
+    </g>
+  );
+}
+
+/* ---------- Trapeze monkey and lion ---------- */
+
+const MONKEY_FUR = "#9c6232";
+const MONKEY_FACE = "#f2c69b";
+
+/**
+ * The trapeze with the monkey hanging from its bar, swung `angle` degrees to
+ * the right round its hook. `grabbed` and `dropped` count the seconds since the
+ * monkey caught the marble with its feet and since it let it go.
+ */
+function Trapeze({ angle, grabbed, dropped }: { angle: number; grabbed: number; dropped: number }) {
+  const { x, y, len } = TRAPEZE;
+  const holding = grabbed >= 0 && dropped < 0;
+  // The feet: a little apart, ready to catch; round the marble; then kicking for joy.
+  const kick = dropped >= 0 ? 10 * Math.sin(dropped * 12) * Math.exp(-dropped * 0.8) : 0;
+  const spread = holding ? 24 : 30;
+  const feet = [
+    { x: FEET.x - spread, y: FEET.y - (holding ? 0 : 4) + kick },
+    { x: FEET.x + spread, y: FEET.y - (holding ? 0 : 4) - kick },
+  ];
+  const happy = dropped >= 0 && dropped < 1.2;
+  return (
+    <g>
+      <circle cx={x} cy={y} r="10" fill="none" stroke={INK} strokeWidth="8" />
+      <circle cx={x} cy={y} r="10" fill="none" stroke={GOLD} strokeWidth="3.5" />
+      <g transform={`translate(${x} ${y}) rotate(${-angle})`}>
+        {[-45, 45].map((bx) => (
+          <line key={bx} x1={bx / 6} y1="8" x2={bx} y2={len} stroke="#8a6a4a" strokeWidth="4" />
+        ))}
+        <rect x="-54" y={len - 6} width="108" height="12" rx="6" fill={GOLD} stroke={INK} strokeWidth="3" />
+        {[-1, 1].map((side) => (
+          <rect key={side} x={side * 54 - 6} y={len - 8} width="12" height="16" rx="4" fill="#ff3b5c" stroke={INK} strokeWidth="2.5" />
+        ))}
+        {/* The tail, curled */}
+        <path
+          d={`M8 ${len + 118} C40 ${len + 132} 54 ${len + 92} 40 ${len + 80} C30 ${len + 72} 24 ${len + 88} 34 ${len + 90}`}
+          fill="none"
+          stroke={INK}
+          strokeWidth="10"
+          strokeLinecap="round"
+        />
+        <path
+          d={`M8 ${len + 118} C40 ${len + 132} 54 ${len + 92} 40 ${len + 80} C30 ${len + 72} 24 ${len + 88} 34 ${len + 90}`}
+          fill="none"
+          stroke={MONKEY_FUR}
+          strokeWidth="5"
+          strokeLinecap="round"
+        />
+        {/* The legs down to the feet that hold the marble */}
+        {feet.map((f, i) => {
+          const hip = { x: i ? 12 : -12, y: len + 114 };
+          const d = `M${hip.x} ${hip.y} Q${(hip.x + f.x) / 2 + (i ? 10 : -10)} ${hip.y + 14} ${f.x} ${f.y}`;
+          return (
+            <g key={i}>
+              <path d={d} fill="none" stroke={INK} strokeWidth="15" strokeLinecap="round" />
+              <path d={d} fill="none" stroke={MONKEY_FUR} strokeWidth="9" strokeLinecap="round" />
+              <ellipse cx={f.x + (i ? 4 : -4)} cy={f.y} rx="10" ry="7" fill={MONKEY_FACE} stroke={INK} strokeWidth="2.5" />
+            </g>
+          );
+        })}
+        {/* The arms up to the bar */}
+        {[-1, 1].map((side) => (
+          <g key={side}>
+            <line x1={side * 22} y1={len + 64} x2={side * 30} y2={len + 2} stroke={INK} strokeWidth="15" strokeLinecap="round" />
+            <line x1={side * 22} y1={len + 64} x2={side * 30} y2={len + 2} stroke={MONKEY_FUR} strokeWidth="9" strokeLinecap="round" />
+            <circle cx={side * 30} cy={len} r="7" fill={MONKEY_FACE} stroke={INK} strokeWidth="2.5" />
+          </g>
+        ))}
+        <ellipse cx="0" cy={len + 90} rx="24" ry="34" fill={MONKEY_FUR} stroke={INK} strokeWidth="3.5" />
+        <ellipse cx="0" cy={len + 95} rx="14" ry="22" fill={MONKEY_FACE} />
+        {/* The head between the arms */}
+        {[-1, 1].map((side) => (
+          <g key={side}>
+            <circle cx={side * 27} cy={len + 38} r="10" fill={MONKEY_FUR} stroke={INK} strokeWidth="2.5" />
+            <circle cx={side * 27} cy={len + 38} r="5" fill={MONKEY_FACE} />
+          </g>
+        ))}
+        <circle cx="0" cy={len + 34} r="25" fill={MONKEY_FUR} stroke={INK} strokeWidth="3" />
+        <path
+          d={`M-18 ${len + 36} C-18 ${len + 22} -4 ${len + 22} 0 ${len + 30} C4 ${len + 22} 18 ${len + 22} 18 ${len + 36} C18 ${len + 52} -18 ${len + 52} -18 ${len + 36} Z`}
+          fill={MONKEY_FACE}
+          stroke={INK}
+          strokeWidth="2"
+        />
+        {happy ? (
+          [-1, 1].map((side) => (
+            <path key={side} d={`M${side * 8 - 5} ${len + 33} q5 -6 10 0`} stroke={INK} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          ))
+        ) : (
+          <>
+            <circle cx="-7" cy={len + 32} r="3.5" fill={INK} />
+            <circle cx="7" cy={len + 32} r="3.5" fill={INK} />
+          </>
+        )}
+        <path
+          d={`M-8 ${len + 42} Q0 ${len + (happy ? 52 : 48)} 8 ${len + 42}`}
+          stroke={INK}
+          strokeWidth="2.5"
+          fill={happy ? "#ff6b81" : "none"}
+          strokeLinecap="round"
+        />
+      </g>
+    </g>
+  );
+}
+
+/** The lion's two pedestals; they never change, so they are drawn once. */
+const Pedestals = memo(function Pedestals() {
+  return (
+    <g>
+      <Tub cx={LION_FROM.x} top={LION_FROM.top} w={PEDESTAL_W} color="#8e7dff" />
+      <Tub cx={LION_TO.x} top={LION_TO.top} w={PEDESTAL_W} color="#3ec300" />
+    </g>
+  );
+});
+
+const LION_FUR = "#f4b942";
+const LION_MANE = "#d9822b";
+const LION_LIGHT = "#ffe3a8";
+
+/** The scalloped outline of the mane round its middle, `r` across. */
+function manePath(r: number) {
+  const n = 14;
+  const pts = Array.from({ length: n + 1 }, (_, i) => {
+    const a = (i / n) * 2 * Math.PI;
+    return `${MANE.x + r * Math.cos(a)} ${MANE.y + r * Math.sin(a)}`;
+  });
+  const bump = r * 0.26;
+  return `M${pts[0]} ${pts
+    .slice(1)
+    .map((p) => `A${bump} ${bump} 0 0 1 ${p}`)
+    .join(" ")} Z`;
+}
+
+/** The lion in `pose`, facing right; while `dozing` its eyes are shut and a little „z“ floats over it. */
+function Lion({ pose, dozing }: { pose: LionPose; dozing: boolean }) {
+  const { x, y, tilt, sx, sy, head, puff, roar, stretch, eyes } = pose;
+  const wag = roar * 20 + 18 * stretch;
+  const eye = (cx: number, cy: number) => {
+    if (eyes === "sleep") return <path key={cx} d={`M${cx - 7} ${cy} q7 6 14 0`} stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />;
+    if (eyes === "squint") return <path key={cx} d={`M${cx - 7} ${cy + 2} q7 -8 14 0`} stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />;
+    if (eyes === "wide")
+      return (
+        <g key={cx}>
+          <circle cx={cx} cy={cy} r="10" fill="#fff" stroke={INK} strokeWidth="2.5" />
+          <circle cx={cx + 2} cy={cy} r="4.5" fill={INK} />
+        </g>
+      );
+    return (
+      <g key={cx}>
+        <circle cx={cx} cy={cy} r="5.5" fill={INK} />
+        <circle cx={cx + 1.5} cy={cy - 2} r="1.8" fill="#fff" />
+      </g>
+    );
+  };
+  return (
+    <g transform={`translate(${x} ${y}) rotate(${tilt}) scale(${sx} ${sy})`}>
+      {/* The tail with its tuft */}
+      <g transform={`rotate(${wag} -52 -22)`}>
+        <path d="M-52 -22 C-92 -20 -98 -70 -80 -92" fill="none" stroke={INK} strokeWidth="10" strokeLinecap="round" />
+        <path d="M-52 -22 C-92 -20 -98 -70 -80 -92" fill="none" stroke={LION_FUR} strokeWidth="5" strokeLinecap="round" />
+        <circle cx="-79" cy="-98" r="11" fill={LION_MANE} stroke={INK} strokeWidth="3" />
+      </g>
+      {/* The back paw, kicking back in the leap, then the body */}
+      <g transform={`rotate(${40 * stretch} -30 -28)`}>
+        <ellipse cx="-40" cy="-7" rx="22" ry="9" fill={LION_FUR} stroke={INK} strokeWidth="3" />
+      </g>
+      <ellipse cx="-30" cy="-30" rx="34" ry="28" fill={LION_FUR} stroke={INK} strokeWidth="3.5" />
+      <ellipse cx="-8" cy="-58" rx="46" ry="50" fill={LION_FUR} stroke={INK} strokeWidth="4" />
+      <ellipse cx="6" cy="-50" rx="22" ry="34" fill={LION_LIGHT} />
+      <path d="M-40 -52 Q-44 -30 -36 -18" stroke={INK} strokeWidth="3" fill="none" strokeLinecap="round" />
+      {/* The front legs, reaching forward in the leap */}
+      <g transform={`rotate(${-50 * stretch} 16 -56)`}>
+        {[6, 26].map((lx) => (
+          <g key={lx}>
+            <rect x={lx - 9} y="-62" width="18" height="58" rx="8" fill={LION_FUR} stroke={INK} strokeWidth="3" />
+            <ellipse cx={lx + 2} cy="-5" rx="12" ry="7" fill={LION_FUR} stroke={INK} strokeWidth="3" />
+          </g>
+        ))}
+      </g>
+      {/* The head, turning round the neck */}
+      <g transform={`rotate(${head} ${LION_NECK.x} ${LION_NECK.y})`}>
+        <path d={manePath(MANE.r * puff - 6)} fill={LION_MANE} stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+        <path d={manePath(MANE.r * puff - 24)} fill="none" stroke="#b8651c" strokeWidth="4" strokeLinejoin="round" />
+        {[
+          { x: 4, y: -156 },
+          { x: 42, y: -152 },
+        ].map((p) => (
+          <g key={p.x}>
+            <circle cx={p.x} cy={p.y} r="11" fill={LION_FUR} stroke={INK} strokeWidth="3" />
+            <circle cx={p.x} cy={p.y} r="5" fill="#ff9bb5" />
+          </g>
+        ))}
+        <circle cx="22" cy="-122" r="38" fill={LION_FUR} stroke={INK} strokeWidth="4" />
+        <circle cx="8" cy="-106" r="7" fill="#ff9bb5" opacity="0.8" />
+        {eye(16, -132)}
+        {eye(40, -130)}
+        <ellipse cx="40" cy="-104" rx="20" ry="13" fill={LION_LIGHT} stroke={INK} strokeWidth="2.5" />
+        {roar > 0.05 ? (
+          <g>
+            <ellipse cx="42" cy={-96 + 6 * roar} rx={9 + 6 * roar} ry={3 + 12 * roar} fill="#8a1f2b" stroke={INK} strokeWidth="2.5" />
+            <ellipse cx="42" cy={-90 + 12 * roar} rx={5 + 3 * roar} ry={2 + 4 * roar} fill="#ff6b81" />
+          </g>
+        ) : (
+          <path d="M34 -98 q4 5 8 0 q4 5 8 0" stroke={INK} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        )}
+        <path d="M36 -114 L48 -114 L42 -106 Z" fill="#6b3a1f" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+        <path d="M56 -106 L72 -110 M56 -101 L72 -99 M24 -106 L10 -112" stroke={INK} strokeWidth="2" strokeLinecap="round" />
+      </g>
+      {dozing && (
+        <text x="64" y="-178" fontSize="34" fontWeight="bold" fill="#fff" stroke={INK} strokeWidth="2" paintOrder="stroke">
+          z
+        </text>
+      )}
+    </g>
+  );
+}
+
+/** What goes with the lion's moments: a „!“ with the fright, rings with the roar, dust when it lands, swish lines when it shakes its mane. */
+function LionMarks({ circus, t }: { circus: Circus; t: number }) {
+  const pose = circus.lionAt(t);
+  const fright = t - circus.tPlop;
+  const roar = t - circus.tRoar;
+  const land = t - circus.tLand;
+  const shake = t - circus.tShake;
+  const mouth = { x: pose.x + 70, y: pose.y - 100 };
+  const top = { x: pose.x + 14, y: pose.y - 230 };
+  return (
+    <g>
+      {fright >= 0 && fright < 0.9 && (
+        <g transform={`translate(${top.x + 50} ${top.y - 10}) scale(${Math.min(1, fright * 6)})`} opacity={1 - seg(fright, 0.6, 0.9)}>
+          <path d="M-8 -50 L8 -50 L4 -10 L-4 -10 Z" fill={GOLD} stroke={INK} strokeWidth="3" strokeLinejoin="round" />
+          <circle cy="4" r="7" fill={GOLD} stroke={INK} strokeWidth="3" />
+        </g>
+      )}
+      {roar >= 0 && roar < 1.3 && (
+        <g opacity={1 - roar / 1.3} stroke={INK} strokeWidth="5" fill="none" strokeLinecap="round">
+          {[0, 1, 2].map((k) => (
+            <path key={k} d={`M${mouth.x + 16 + k * 22 + roar * 50} ${mouth.y - 26 - k * 6} q${16 + k * 4} ${26 + k * 6} 0 ${52 + k * 12}`} />
+          ))}
+        </g>
+      )}
+      {land >= 0 && land < 0.6 && (
+        <g opacity={1 - land / 0.6} fill="#fff" stroke={INK} strokeWidth="2.5">
+          {[-1, 1].map((side) => (
+            <circle key={side} cx={LION_TO.x + side * (60 + land * 90)} cy={LION_TO.top - 10 - land * 20} r={12 + land * 10} />
+          ))}
+        </g>
+      )}
+      {shake >= 0 && shake < 0.8 && (
+        <g stroke={INK} strokeWidth="4" fill="none" strokeLinecap="round" opacity={1 - shake / 0.8}>
+          {[-1, 1].map((side) => (
+            <path key={side} d={`M${top.x + side * 78} ${top.y + 70} q${side * 16} 30 0 60 M${top.x + side * 96} ${top.y + 80} q${side * 12} 20 0 40`} />
           ))}
         </g>
       )}
@@ -854,7 +1131,7 @@ function Spotlights({ on }: { on: number }) {
   const target = { x: (NET.x0 + NET.x1) / 2, y: NET.y + NET.sag - 30 };
   return (
     <g>
-      {[4520, 5460].map((x) => {
+      {[5780, 6720].map((x) => {
         const lamp = { x, y: 150 };
         const a = deg(Math.atan2(target.y - lamp.y, target.x - lamp.x));
         const n = { x: Math.cos(rad(a + 90)), y: Math.sin(rad(a + 90)) };
@@ -881,7 +1158,7 @@ function Spotlights({ on }: { on: number }) {
 }
 
 const CONFETTI = Array.from({ length: 90 }, (_, i) => ({
-  x: 4020 + ((i * 397) % 1560),
+  x: 5280 + ((i * 397) % 1560),
   y0: -40 - ((i * 53) % 360),
   speed: 190 + ((i * 37) % 130),
   rest: FLOOR + 6 + ((i * 29) % 46),

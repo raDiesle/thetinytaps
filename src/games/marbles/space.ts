@@ -1,34 +1,63 @@
 // The rocket launch ("Raketenstart"), a Rube Goldberg machine on a toy space
 // station at night: one tap lets a marble out of the satellite dish, and one
-// thing sets off the next for about half a minute until the rocket lifts off.
+// thing sets off the next for about forty seconds until the rocket lifts off –
+// the marble wakes the robot, the robot pushes the moon buggy into the planet
+// mobile, the earth bonks the telescope, which spins round and points at the
+// sky, a UFO comes to have a look, beams up a moon rock and drops it onto the
+// switch, the magnet lets go of its iron ball and the countdown begins.
 // Everything is worked out ahead as a function of the seconds since the tap,
 // so SpaceLevel.tsx only asks where each thing is at a moment. Coordinates are
-// those of the launch site, 6000 × 900; the screen shows 1600 of it at a time.
+// those of the launch site, 6900 × 900; the screen shows 1600 of it at a time.
 
 import {
   playAlien,
+  playBeam,
+  playBeeps,
   playBoing,
+  playClick,
   playClonk,
   playCountNote,
   playCreak,
+  playGiggle,
   playHiss,
   playHum,
   playKnock,
   playLaunch,
   playPing,
+  playPlop,
   playPoof,
   playPop,
   playRobot,
   playRumble,
   playThump,
+  playTrill,
   playTwinkle,
+  playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
 import { wobble } from "./level";
-import { along, cameraOn, distAt, easeIn, easeInOut, easeOut, GRAVITY, lerp, pathOf, rad, roll, rounded, seg, STEP, timeline, timeWhen } from "./machineKit";
+import {
+  along,
+  cameraOn,
+  distAt,
+  easeIn,
+  easeInOut,
+  easeOut,
+  GRAVITY,
+  hop,
+  lerp,
+  pathOf,
+  rad,
+  roll,
+  rounded,
+  seg,
+  STEP,
+  timeline,
+  timeWhen,
+} from "./machineKit";
 import { arc, BALL_R, line, quad, type Pt } from "./path";
 
-export const WORLD_W = 6000;
+export const WORLD_W = 6900;
 export const FLOOR = 800;
 
 /* ---------- Layout ---------- */
@@ -88,36 +117,62 @@ export const PLANETS = [
 ] as const;
 export type Planet = (typeof PLANETS)[number];
 
-/** The switch for the magnet: a handle on a box, tilted `rest` degrees (left) until the earth knocks it over. */
-export const LEVER = { x: 3950, y: FLOOR - 30, len: 64, knob: 13, rest: -28, flipped: 32 };
+/**
+ * The telescope on its tripod, looking down at the mobile: it turns round its
+ * `pivot`, the objective `front` ahead of it (at `rest` degrees, 0 is to the
+ * right and 90 down) and the eyepiece `back` behind. The earth bonks the
+ * objective, and the telescope swings down and round until it points up at
+ * the sky (`sky`), wobbling. It swings the way the push sends it and never
+ * comes round to the left again, where the earth is still turning.
+ */
+export const SCOPE = { pivot: { x: 4024, y: 652 }, front: 120, back: 50, lens: 16, rest: 150, sky: -40 };
+/** The objective's middle, the telescope turned to `angle` degrees. */
+export const scopeTip = (angle: number): Pt => ({
+  x: SCOPE.pivot.x + SCOPE.front * Math.cos(rad(angle)),
+  y: SCOPE.pivot.y + SCOPE.front * Math.sin(rad(angle)),
+});
+
+/** The moon rock lying on the ground, which the UFO beams up; `r` is about its radius. */
+export const ROCK = { x: 4270, r: 22 };
+/** The UFO's spot above the moon rock, where it hovers while it beams it up. */
+export const UFO_HOVER = { x: ROCK.x, y: 430 };
+/** How far below the UFO's middle its beam starts, and how far below that the moon rock hangs in the beam. */
+export const UFO_BELOW = 22;
+export const ROCK_HANG = 70;
+
+/** How far the parts from the switch on stand right of where they stood before the telescope and the UFO came. */
+const MOVED = 900;
+
+/** The switch for the magnet: a handle on a box, tilted `rest` degrees (left) until the moon rock knocks it down flat. */
+export const LEVER = { x: 3950 + MOVED, y: FLOOR - 30, len: 64, knob: 13, rest: -28, flipped: -76 };
 /** The middle of the lever's knob at `tilt` degrees. */
 export const leverKnob = (tilt: number): Pt => ({ x: LEVER.x + LEVER.len * Math.sin(rad(tilt)), y: LEVER.y - LEVER.len * Math.cos(rad(tilt)) });
 
 /** The space-station truss: a mast at `x` carrying a long beam with solar wings; the mobile hangs from its left end, the magnet from its right. */
-export const TRUSS = { x: 4120, w: 70, jibY: 170, jibH: 26, jib0: 3670, jib1: 4640 };
+export const TRUSS = { x: 4120 + MOVED, w: 70, jibY: 170, jibH: 26, jib0: 3670, jib1: 4640 + MOVED };
 /** The magnet's bottom, where the iron ball sticks. */
-export const MAGNET = { x: 4560, y: 280 };
+export const MAGNET = { x: 4560 + MOVED, y: 280 };
 export const IRON = { r: 34 };
 
 /** The countdown board with three lamps and a screen; the iron ball drops into the slot on its top, right under the magnet. */
-export const BOARD = { x: 4480, y: 500, w: 380, h: 220 };
+export const BOARD = { x: 4480 + MOVED, y: 500, w: 380, h: 220 };
 export const SLOT = { x: MAGNET.x, w: 100, h: 46 };
 
 /** The launch tower and its arm, which reaches over to the rocket's window. */
-export const TOWER = { x: 5280, w: 70, top: 230 };
-export const ROCKET = { x: 5500, w: 130, h: 400, nose: 120, bottom: FLOOR - 44 };
-export const PAD = { x0: 5360, x1: 5640 };
+export const TOWER = { x: 5280 + MOVED, w: 70, top: 230 };
+export const ROCKET = { x: 5500 + MOVED, w: 130, h: 400, nose: 120, bottom: FLOOR - 44 };
+export const PAD = { x0: 5360 + MOVED, x1: 5640 + MOVED };
 /** The window's middle, measured up from the rocket's bottom. */
 export const WINDOW_UP = 30 + ROCKET.h * 0.72;
 export const TOWER_ARM = { x: TOWER.x + TOWER.w / 2, y: ROCKET.bottom - WINDOW_UP };
 /** The fuel tank and the hose to the rocket's side. */
-export const TANK = { x: 5740, w: 120, h: 230 };
+export const TANK = { x: 5740 + MOVED, w: 120, h: 230 };
 export const HOSE = {
   from: { x: TANK.x, y: FLOOR - 180 },
   plug: { x: ROCKET.x + ROCKET.w / 2 + 6, y: ROCKET.bottom - 200 },
-  dropped: { x: 5660, y: FLOOR - 9 },
+  dropped: { x: 5660 + MOVED, y: FLOOR - 9 },
 };
-export const MOON = { x: 5060, y: 150, r: 70 };
+export const MOON = { x: 5060 + MOVED, y: 150, r: 70 };
 
 /* ---------- Helpers ---------- */
 
@@ -246,20 +301,126 @@ export function buildSpace() {
     return { pt: { x: buggyStop - back, y: FLOOR }, angle: 0, turned: buggyPath.total - back, bob: bob + wobble(t - tBump, 5, 22, 6) };
   };
 
-  /* The mobile turns; half a turn on, the earth comes round and knocks the lever over. */
+  /* The mobile turns; half a turn on, the earth comes round and bonks the telescope's objective. */
   const SPIN = 2.4 * Math.PI;
   const SPIN_SLOW = 3.4;
   const spinAt = (t: number) => (t < tBump ? 0 : SPIN * (1 - Math.exp(-(t - tBump) / SPIN_SLOW)));
-  const knob0 = leverKnob(LEVER.rest);
+  const tip0 = scopeTip(SCOPE.rest);
   let u = 0;
   for (; u < 6; u += STEP) {
     const e = planetSpot(earth, spinAt(tBump + u));
-    if (Math.hypot(e.x - knob0.x, e.y - knob0.y) <= earth.r * e.scale + LEVER.knob) break;
+    if (Math.hypot(e.x - tip0.x, e.y - tip0.y) <= earth.r * e.scale + SCOPE.lens) break;
   }
-  const tLever = tBump + u;
+  const tScope = tBump + u;
   at(tBump, { sound: () => playKnock(1300) });
   at(tBump + 0.15, { sound: playTwinkle });
+
+  /* The telescope swings down and round, overshoots, wobbles and stays pointing at the sky; its lens glints. */
+  const SCOPE_SPIN = 1.4;
+  const tSettle = tScope + SCOPE_SPIN;
+  const tGlint = tSettle + 0.3;
+  at(tScope, { sound: playBoing });
+  at(tScope + 0.05, { sound: playWhirr });
+  at(tSettle, { sound: playClick });
+  at(tGlint, { sound: playTwinkle });
+  /** The telescope's angle in degrees (0 to the right, 90 down). */
+  const scopeAngle = (t: number) => (t < tScope ? SCOPE.rest : lerp(SCOPE.rest, SCOPE.sky, easeOut(seg(t, tScope, tSettle))) - wobble(t - tSettle, 14, 12, 3));
+
+  /*
+   * A UFO saw it: it comes floating in from far away where the telescope
+   * points (small, growing as it comes near), hovers over the moon rock, beams
+   * it up, carries it to the switch and drops it onto the knob; then its alien
+   * waves and it zooms off.
+   */
+  const SKY_DIR = rad(SCOPE.sky);
+  const far = { x: SCOPE.pivot.x + 600 * Math.cos(SKY_DIR), y: SCOPE.pivot.y + 600 * Math.sin(SKY_DIR) };
+  const tAppear = tGlint + 0.6;
+  const tArrive = tAppear + 3.6;
+  const tBeam = tArrive + 1.5;
+  const tLift0 = tBeam + 0.4;
+  const tGrab = tLift0 + 2;
+  const tCarry = tGrab + 0.3;
+  const tOver = tCarry + 3.2;
+  const tRelease = tOver + 0.4;
+  const tLeave = tRelease + 1.6;
+  const tGone = tLeave + 1.6;
+  const knob0 = leverKnob(LEVER.rest);
+  const away = { x: LEVER.x + 700, y: -160 };
+
+  /** The UFO's middle and size along its way, without the tilt. */
+  const ufoSpot = (t: number): { pt: Pt; scale: number } => {
+    if (t < tArrive) {
+      // A swoop in from far away: an S-curve sideways, a little hop up, growing as it comes near.
+      const e = easeInOut(seg(t, tAppear, tArrive));
+      return {
+        pt: { x: lerp(far.x, UFO_HOVER.x, e) + 140 * Math.sin(2 * Math.PI * e) * (1 - e), y: lerp(far.y, UFO_HOVER.y, e) - 70 * Math.sin(Math.PI * e) },
+        scale: lerp(0.18, 1, e),
+      };
+    }
+    const bob = 5 * Math.sin((t - tArrive) * 5);
+    if (t < tLeave) {
+      const k = easeInOut(seg(t, tCarry, tOver));
+      return { pt: { x: lerp(UFO_HOVER.x, knob0.x, k), y: UFO_HOVER.y - 30 * Math.sin(Math.PI * k) + bob }, scale: 1 };
+    }
+    const k = easeIn(seg(t, tLeave, tGone));
+    const from = ufoSpot(tLeave - 1e-6).pt;
+    return { pt: { x: lerp(from.x, away.x, k), y: lerp(from.y, away.y, k) }, scale: lerp(1, 0.2, k) };
+  };
+  /** The UFO while it is there (null before it comes and after it has gone): middle, size, tilt (degrees), and how its alien looks and waves. */
+  const ufoAt = (t: number) => {
+    if (t < tAppear || t >= tGone) return null;
+    const { pt, scale } = ufoSpot(t);
+    // It leans into the way it goes, as a flying saucer does.
+    const vx = (ufoSpot(t + 0.02).pt.x - ufoSpot(t - 0.02).pt.x) / 0.04;
+    const tilt = Math.max(-18, Math.min(18, vx / 30));
+    const waving = (t >= tArrive && t < tBeam - 0.2) || t >= tRelease + 0.2;
+    /** Where the alien's eye looks: at the telescope while it comes, at the moon rock while it beams, at us when it waves. */
+    const look: Pt = waving ? { x: 0, y: 0 } : t < tArrive ? { x: -1, y: 0.6 } : { x: 0, y: 1 };
+    return { pt, scale, tilt, waving, look };
+  };
+  /** How bright the UFO's beam is: 0 off, 1 on. */
+  const beamAt = (t: number) => (t < tBeam ? 0 : t < tRelease ? easeOut(seg(t, tBeam, tBeam + 0.3)) : 1 - seg(t, tRelease, tRelease + 0.2));
+
+  /* The moon rock: trembles in the beam, floats up, hangs under the UFO, falls onto the knob and bounces off to the left. */
+  const rockGround = { x: ROCK.x, y: FLOOR - ROCK.r };
+  const hangAt = (t: number): Pt => {
+    const { pt } = ufoSpot(t);
+    return { x: pt.x, y: pt.y + UFO_BELOW + ROCK_HANG + 4 * Math.sin(t * 6) };
+  };
+  const dropFrom = hangAt(tRelease);
+  const hitY = knob0.y - LEVER.knob - ROCK.r;
+  const tLever = tRelease + Math.sqrt((2 * (hitY - dropFrom.y)) / GRAVITY);
+  const rockRest = { x: knob0.x - 120, y: FLOOR - ROCK.r };
+  const tRest = tLever + 0.7;
+  /** Where the moon rock is and how far it has turned (degrees). */
+  const rockAt = (t: number): { pt: Pt; spin: number } => {
+    if (t < tLift0) return { pt: { x: rockGround.x + (t >= tBeam ? 3 * Math.sin(t * 45) : 0), y: rockGround.y }, spin: 0 };
+    if (t < tGrab) {
+      const k = easeInOut(seg(t, tLift0, tGrab));
+      const top = hangAt(t);
+      return { pt: { x: lerp(rockGround.x, top.x, k), y: lerp(rockGround.y, top.y, k) }, spin: 200 * k };
+    }
+    if (t < tRelease) return { pt: hangAt(t), spin: 200 + 60 * (t - tGrab) };
+    const spinOff = 200 + 60 * (tRelease - tGrab);
+    if (t < tLever) return { pt: { x: dropFrom.x, y: dropFrom.y + 0.5 * GRAVITY * (t - tRelease) ** 2 }, spin: spinOff };
+    const k = seg(t, tLever, tRest);
+    return { pt: hop({ x: dropFrom.x, y: hitY }, rockRest, 50, k), spin: spinOff - 360 * k };
+  };
+
+  at(tAppear, { sound: playAlien });
+  at(tAppear + 0.1, { say: { de: "Oh, ein Ufo!" } });
+  at(tAppear + 0.5, { sound: playWhoosh });
+  at(tArrive, { sound: playTrill });
+  at(tBeam, { sound: playBeam });
+  at(tLift0, { sound: playTwinkle });
+  at(tGrab, { sound: playPop });
+  at(tCarry, { sound: playBeeps });
+  at(tRelease, { sound: playPlop });
   at(tLever, { sound: playClonk });
+  at(tRelease + 0.3, { sound: playGiggle });
+  at(tRest, { sound: playThump });
+  at(tLeave, { sound: playWhoosh });
+
   const leverTilt = (t: number) =>
     t < tLever ? LEVER.rest : lerp(LEVER.rest, LEVER.flipped, easeOut(seg(t, tLever, tLever + 0.16))) + wobble(t - tLever - 0.16, 5, 22, 6);
 
@@ -333,7 +494,9 @@ export function buildSpace() {
     if (t < tRobot) return marbleAt(t).pt.x;
     if (t < tPush) return ROBOT.cx + 100;
     if (t < tBump) return buggyAt(t).pt.x;
-    if (t < tLever) return MOBILE.cx + 120;
+    if (t < tScope) return MOBILE.cx + 120;
+    if (t < tGrab) return (SCOPE.pivot.x + ROCK.x) / 2 + 40;
+    if (t < tLever) return ufoSpot(t).pt.x;
     if (t < tWake) return (LEVER.x + MAGNET.x) / 2;
     return ROCKET.x;
   };
@@ -348,7 +511,18 @@ export function buildSpace() {
     tRobot,
     tPush,
     tBump,
+    tScope,
+    tSettle,
+    tGlint,
+    tAppear,
+    tArrive,
+    tBeam,
+    tGrab,
+    tRelease,
+    tLeave,
+    tGone,
     tLever,
+    tRest,
     tOff,
     tWake,
     tCount,
@@ -359,6 +533,10 @@ export function buildSpace() {
     backArm,
     buggyAt,
     spinAt,
+    scopeAngle,
+    ufoAt,
+    beamAt,
+    rockAt,
     leverTilt,
     ironAt,
     countAt,

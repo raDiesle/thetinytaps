@@ -30,8 +30,8 @@ Each line can have a recording in `stories/<story>/stimme/<hash>.mp3` (German) o
 `stimme/<language>/<language>-<hash>.mp3`, made with ElevenLabs as a warm children's coach voice, the same voice
 in every language (`bun run voice`, see `scripts/elevenlabs-voice.mjs`; the voice and model are in `stimme.json`,
 the key in `ELEVENLABS_API_KEY`). The file name is a hash of the text (`voiceId.ts`), so a changed line has no
-recording until `bun run voice make` records it again; `voice.ts` plays recordings and falls back to the browser's
-voice for lines without one. `voice.test.ts` checks the translations against the German steps and that a
+recording until `bun run voice make` records it again; `voice.ts` plays recordings always, without a switch, like a sound
+(root `CLAUDE.md`); a line without one stays silent, never the browser's voice. `voice.test.ts` checks the translations against the German steps and that a
 language with recordings has one for every line and no extra ones. Recordings in other languages than German
 are not kept offline by every phone, only once the story has started in that language (`tools/build.ts`, `src/sw.js`).
 - A new story or changed lines come in German only: translate (`lines.<language>.ts`) and record (`bun run voice make`)
@@ -44,7 +44,7 @@ are not kept offline by every phone, only once the story has started in that lan
   10,399 characters (all seven missing story languages) cost 995 credits, about 0.1 per character, so check
   `bun run voice credits` after a run instead of holding back translations for the estimate.
 
-The game has no settings of its own: read aloud, sounds, its own music and the language follow the shared options on the home page (`useCommonSettings`, `useAppLanguage`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen only has „Über das Spiel“.
+The game has no settings of its own: its own music and the language follow the shared options on the home page (`useCommonSettings`, `useAppLanguage`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen only has „Über das Spiel“.
 
 ## Grown-ups' texts in the app language
 

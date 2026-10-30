@@ -3,7 +3,7 @@ import { float, ground } from "../layout";
 // Placements of the winter site. The house with the crane (SITE) and the digger (DIGGER) stand where
 // they stand in the Baustelle, so they are imported from there; everything else is placed here.
 
-export { DIGGER, SITE } from "../baustelle/layout";
+export { DIGGER, PAVEMENT, ROAD_BOTTOM, ROAD_TOP, SITE } from "../baustelle/layout";
 
 /** The big snowy fir at the back left and the squirrel on its branch. */
 export const FIR = ground(0, 0, 80, 414, 1.7);

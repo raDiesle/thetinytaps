@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, type CSSProperties } from "react";
-import { playDrum, playKnock } from "@/lib/sfx";
+import { playDrum, playKnock, playTwinkle } from "@/lib/sfx";
 import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { cameraOn } from "./machineKit";
+import { Sparkles } from "./scenery";
 import { pickThings, type Thing } from "./things";
 import type { Pt } from "./path";
 
@@ -14,8 +15,8 @@ const PUSH = 1.3;
 /** Each thing stands this share of its height away from the next, so it can reach it. */
 const SPACING = 0.45;
 const DRUM = { w: 150, h: 110 };
-/** Runs of small-to-tall things in the long row. */
-const GROUPS = 5;
+/** Runs of small-to-tall things in the long row (the last one ends with the broom). */
+const GROUPS = 7;
 /** The things are drawn this much bigger than their own numbers. */
 const SCALE = 1.3;
 /** Room before the first thing and after the drum, in the picture's pixels. */
@@ -25,7 +26,7 @@ const CAMERA_FOLLOW = 2.2;
 /** One after another the things on the first screen drop in from above. */
 const DROP_STAGGER_MS = 130;
 const DROP_MS = 600;
-const DONE_AFTER_DRUM_MS = 1600;
+const DONE_AFTER_DRUM_MS = 2600;
 /** If something got stuck, end anyway after this long per thing. */
 const MAX_FALL_MS_EACH = 1500;
 
@@ -105,7 +106,8 @@ type Phase = "dropping" | "ready" | "falling" | "done";
  * Everyday things stand in a long row through the room, small to tall again
  * and again, with a drum at the end. A tap pushes the first one; it tips over
  * onto the next, which tips onto the next … and the camera walks along, until
- * the last one hits the drum. Every round brings other things.
+ * the broom at the end hits the drum and sparkles burst out of it. Every
+ * round brings other things.
  */
 export function ToppleLevel({ sound, say, onDone }: LevelProps) {
   const label = useLevelName("topple");
@@ -181,6 +183,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
           } else {
             drumAt.current = t;
             sound(playDrum);
+            setTimeout(() => sound(playTwinkle), 350);
             say({
               de: "Bumm! Alles umgefallen!",
               en: "Boom! Everything fell over!",
@@ -238,6 +241,7 @@ export function ToppleLevel({ sound, say, onDone }: LevelProps) {
             <g transform={`translate(${drumLeft + DRUM.w / 2} 0) scale(${1 + drumSquash} ${1 - drumSquash}) translate(${-DRUM.w / 2} 0)`}>
               <Drum />
             </g>
+            <Sparkles x={drumLeft + DRUM.w / 2} y={-DRUM.h - 70} age={drumAge - 0.25} n={14} spread={200} />
             {/* Only once everything has dropped in, so the finger doesn't stand in the air before the first thing. */}
             {phase.current === "ready" && (
               <text className="topple-hint" x={-24} y={-first.h * 0.62} fontSize={86 / SCALE} textAnchor="end" dominantBaseline="middle">

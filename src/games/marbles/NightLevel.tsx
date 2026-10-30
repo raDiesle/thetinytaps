@@ -1,21 +1,27 @@
-import { useId, useMemo } from "react";
+import { memo, useId, useMemo } from "react";
 import { VIEW_H, type LevelProps } from "./level";
-import { easeOut, seg } from "./machineKit";
+import { deg, easeOut, seg } from "./machineKit";
 import { MachineStage, TapHint } from "./MachineStage";
 import {
   BASKET,
+  BIRD,
   buildNight,
   CAROUSEL,
   CHAIN,
+  CHAIR,
+  CLOCK,
   CRADLE,
   CRANK,
   CURTAIN,
+  DOOR,
   FLOOR,
+  KNOB0,
   LAMP,
   LEGS,
   MOON,
   MUSICBOX,
   type Night,
+  PENDULUM,
   PULLEY1,
   PULLEY2,
   RAIL,
@@ -30,7 +36,7 @@ import {
 } from "./night";
 import { STAR_POINTS } from "./parts";
 import type { Pt } from "./path";
-import { INK, MID_WOOD, WOOD } from "./scenery";
+import { DARK_WOOD, INK, MID_WOOD, WOOD } from "./scenery";
 
 /** Warm evening wallpaper; the night lies over it as a dark veil once the lamp is out. */
 const WALL = "#ffd9b5";
@@ -44,9 +50,12 @@ const MOON_YELLOW = "#fff3b0";
  * Level 13: the good-night machine (R-07). A children's room at dusk; one tap
  * winds the music box, its crank nudges the star ball down the zigzag gutter
  * into the basket, the basket sinks and pulls the curtain shut, the curtain
- * pushes the lamp's pull chain – click, the light goes out – and the moon rises
- * in the round window. The teddy yawns and everything falls asleep while the
- * camera glides slowly back to the music box. Slow and quiet throughout.
+ * tips the rocking chair in the reading corner, whose backrest taps the cuckoo
+ * clock's pendulum. Tick, tack – at the full hour the sleepy cuckoo slides out,
+ * calls a soft „kuckuck“ and yawns, and its beak pushes the lamp's pull chain:
+ * click, the light goes out, and the moon rises in the round window. The teddy
+ * yawns and everything falls asleep while the camera glides slowly back to the
+ * music box. Slow and quiet throughout.
  */
 export function NightLevel(props: LevelProps) {
   const night = useMemo(buildNight, []);
@@ -71,6 +80,10 @@ export function NightLevel(props: LevelProps) {
             <BasketFront night={night} t={t} />
             <Curtain edge={night.curtainEdge(t)} />
             <ArcLamp night={night} t={t} ids={ids} />
+            <CuckooClock night={night} t={t} ids={ids} />
+            <g transform={`rotate(${deg(night.chairAngle(t))} ${CHAIR.x} ${FLOOR})`}>
+              <RockingChair />
+            </g>
             <Cradle night={night} t={t} />
 
             <rect x="-400" y="-200" width={WORLD_W + 800} height={VIEW_H + 400} fill={NIGHT} opacity={night.dark(t)} />
@@ -79,6 +92,7 @@ export function NightLevel(props: LevelProps) {
             <StarGlow night={night} t={t} ids={ids} />
             <Zzz x={TEDDY.x + 40} y={TEDDY.y - 50} from={night.tTeddy} t={end} />
             <Zzz x={MOON.x + 60} y={MOON.y1 - 40} from={night.tMoonSleep} t={end} />
+            <Zzz x={DOOR.x + 34} y={DOOR.y - 30} from={night.tCuckoo} t={end} />
             <Zzz x={BASKET.x + 34} y={BASKET.rim1 - 50} from={night.tStar} t={end} />
             <Zzz x={CAROUSEL.x + 80} y={CAROUSEL.y - 30} from={night.tSheep} t={end} />
             <TapHint t={t} x={CRANK.x + 6} y={SHELF.top + 150} />
@@ -392,6 +406,178 @@ function StarGlow({ night, t, ids }: { night: Night; t: number; ids: string }) {
   return <circle cx={pt.x} cy={pt.y} r="70" fill={`url(#${ids}-glow)`} opacity={0.8 * k} />;
 }
 
+/* ---------- Reading corner: rocking chair, cuckoo clock ---------- */
+
+/** The rocking chair, standing still; its group is turned round the spot where the rockers touch the floor. */
+const RockingChair = memo(function RockingChair() {
+  const x = CHAIR.x;
+  const seat = 668;
+  const rocker = `M${x - 165} ${FLOOR - 36} Q${x} ${FLOOR + 34} ${x + 165} ${FLOOR - 36}`;
+  const wood = (d: string, w: number) => (
+    <g key={d}>
+      <path d={d} fill="none" stroke={INK} strokeWidth={w + 7} strokeLinecap="round" strokeLinejoin="round" />
+      <path d={d} fill="none" stroke={WOOD} strokeWidth={w} strokeLinecap="round" strokeLinejoin="round" />
+    </g>
+  );
+  return (
+    <g>
+      {/* The rocker with a little curl at each end */}
+      <path d={rocker} fill="none" stroke={INK} strokeWidth="16" strokeLinecap="round" />
+      <path d={rocker} fill="none" stroke={MID_WOOD} strokeWidth="9" strokeLinecap="round" />
+      {[x - 165, x + 165].map((cx) => (
+        <circle key={cx} cx={cx} cy={FLOOR - 44} r="9" fill={MID_WOOD} stroke={INK} strokeWidth="3.5" />
+      ))}
+      {/* Legs, back rest with its spindles, arm rest */}
+      {[`M${x - 72} ${FLOOR - 10} L${x - 78} ${seat}`, `M${x + 86} ${FLOOR - 12} L${x + 92} ${seat}`].map((d) => wood(d, 9))}
+      {[0.25, 0.5, 0.75].map((k) => wood(`M${x - 78 + 28 * k} ${seat - 4} L${KNOB0.x + 30 * k + 4} ${KNOB0.y + 10}`, 5))}
+      {wood(`M${x - 78} ${seat} L${KNOB0.x} ${KNOB0.y}`, 10)}
+      {wood(`M${x - 50} ${seat} L${KNOB0.x + 32} ${KNOB0.y + 6}`, 8)}
+      {wood(`M${KNOB0.x} ${KNOB0.y + 4} Q${KNOB0.x + 18} ${KNOB0.y - 8} ${KNOB0.x + 36} ${KNOB0.y + 6}`, 9)}
+      {wood(`M${x - 66} ${seat - 50} L${x + 96} ${seat - 54} q14 0 12 14`, 8)}
+      {wood(`M${x + 92} ${seat - 46} L${x + 92} ${seat}`, 7)}
+      {/* The seat with a soft cushion */}
+      <rect x={x - 92} y={seat - 6} width="200" height="20" rx="8" fill={WOOD} stroke={INK} strokeWidth="4" />
+      <path
+        d={`M${x - 74} ${seat - 6} Q${x - 76} ${seat - 30} ${x - 50} ${seat - 28} L${x + 74} ${seat - 28} Q${x + 98} ${seat - 28} ${x + 96} ${seat - 6} Z`}
+        fill="#ff9ec7"
+        stroke={INK}
+        strokeWidth="3.5"
+        strokeLinejoin="round"
+      />
+      {[-30, 10, 50].map((dx) => (
+        <circle key={dx} cx={x + dx} cy={seat - 17} r="3" fill="#fff" opacity="0.8" />
+      ))}
+      <circle cx={KNOB0.x} cy={KNOB0.y} r={CHAIR.knobR} fill={GOLD} stroke={INK} strokeWidth="3.5" />
+    </g>
+  );
+});
+
+/** The cuckoo clock's carved case: roof, body, dial, the door's frame and the two pine cone weights; drawn once. */
+const ClockCase = memo(function ClockCase() {
+  const { x, top, bottom, w } = CLOCK;
+  const dial = { y: top + 100, r: 28 };
+  return (
+    <g>
+      {/* Pine cone weights on their chains */}
+      {[x - 40, x + 40].map((cx, i) => (
+        <g key={cx}>
+          <line x1={cx} y1={bottom} x2={cx} y2={bottom + 44 + i * 10} stroke={INK} strokeWidth="3" strokeDasharray="4 4" />
+          <ellipse cx={cx} cy={bottom + 64 + i * 10} rx="10" ry="20" fill={DARK_WOOD} stroke={INK} strokeWidth="3" />
+          {[-8, 2, 12].map((dy) => (
+            <path key={dy} d={`M${cx - 7} ${bottom + 64 + i * 10 + dy - 4} l7 5 l7 -5`} fill="none" stroke="#5c3a1a" strokeWidth="2" />
+          ))}
+        </g>
+      ))}
+      <rect x={x - w / 2} y={top} width={w} height={bottom - top} rx="6" fill="#a8643a" stroke={INK} strokeWidth="4" />
+      {/* Carved leaves along the bottom */}
+      <path
+        d={`M${x - w / 2} ${bottom} Q${x - 30} ${bottom + 26} ${x} ${bottom + 8} Q${x + 30} ${bottom + 26} ${x + w / 2} ${bottom} Z`}
+        fill="#7a4524"
+        stroke={INK}
+        strokeWidth="3"
+        strokeLinejoin="round"
+      />
+      {/* The roof */}
+      <path d={`M${x - 85} ${top + 6} L${x} ${top - 30} L${x + 85} ${top + 6} Z`} fill="#6b3d1f" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
+      <path d={`M${x - 60} ${top + 4} L${x} ${top - 20} L${x + 60} ${top + 4}`} fill="none" stroke="#b8763d" strokeWidth="3" strokeLinejoin="round" />
+      {/* The dial with its twelve dots and an evening sky in the middle */}
+      <circle cx={x} cy={dial.y} r={dial.r} fill="#fff6e0" stroke={INK} strokeWidth="3.5" />
+      {Array.from({ length: 12 }, (_, i) => {
+        const a = (i * Math.PI) / 6;
+        return <circle key={i} cx={x + (dial.r - 7) * Math.sin(a)} cy={dial.y - (dial.r - 7) * Math.cos(a)} r={i % 3 ? 1.6 : 2.6} fill={INK} />;
+      })}
+      {/* The door's frame and the little ledge the perch slides over */}
+      <rect
+        x={DOOR.x - DOOR.w / 2 - 5}
+        y={DOOR.y - DOOR.h / 2 - 5}
+        width={DOOR.w + 10}
+        height={DOOR.h + 10}
+        rx="5"
+        fill="#6b3d1f"
+        stroke={INK}
+        strokeWidth="3"
+      />
+      <rect x={DOOR.x - DOOR.w / 2} y={DOOR.y - DOOR.h / 2} width={DOOR.w} height={DOOR.h} fill="#2a1a10" />
+    </g>
+  );
+});
+
+/** The cuckoo clock: hands, pendulum, the little door and the sleepy cuckoo sliding out on its perch. */
+function CuckooClock({ night, t, ids }: { night: Night; t: number; ids: string }) {
+  const { x, top, bottom } = CLOCK;
+  const dial = { x, y: top + 100 };
+  const clip = `${ids}-cuckoo`;
+  const x0 = DOOR.x - DOOR.w / 2;
+  const open = night.doorOpen(t);
+  const birdX = night.birdX(t);
+  const show = birdX > BIRD.inX + 2;
+  return (
+    <g>
+      {/* The pendulum swings behind the case's carved bottom */}
+      <g transform={`rotate(${-deg(night.pendulumAngle(t))} ${x} ${bottom})`}>
+        <line x1={x} y1={bottom} x2={x} y2={bottom + PENDULUM.len} stroke={INK} strokeWidth="5" />
+        <line x1={x} y1={bottom} x2={x} y2={bottom + PENDULUM.len} stroke={GOLD} strokeWidth="2" />
+        <circle cx={x} cy={bottom + PENDULUM.len} r={PENDULUM.bobR} fill={GOLD} stroke={INK} strokeWidth="3.5" />
+        <path d={`M${x - 6} ${bottom + PENDULUM.len + 2} l6 -9 l6 9 Z`} fill="#e09a00" stroke="#e09a00" strokeWidth="2" strokeLinejoin="round" />
+      </g>
+      <ClockCase />
+      {/* Hands: the hour hand on seven, the minute hand stepping up to the full hour */}
+      <g strokeLinecap="round" stroke={INK}>
+        <line x1={dial.x} y1={dial.y} x2={dial.x} y2={dial.y - 15} strokeWidth="5" transform={`rotate(210 ${dial.x} ${dial.y})`} />
+        <line x1={dial.x} y1={dial.y} x2={dial.x} y2={dial.y - 23} strokeWidth="3.5" transform={`rotate(${night.minuteHand(t)} ${dial.x} ${dial.y})`} />
+      </g>
+      <circle cx={dial.x} cy={dial.y} r="3.5" fill={INK} />
+      {/* The cuckoo comes out of the dark door hole */}
+      <defs>
+        <clipPath id={clip}>
+          <rect x={x0} y={DOOR.y - 80} width="300" height="160" />
+        </clipPath>
+      </defs>
+      {show && (
+        <g clipPath={`url(#${clip})`}>
+          <line x1={x0 + 2} y1={BIRD.y + 19} x2={birdX + 4} y2={BIRD.y + 19} stroke={INK} strokeWidth="7" strokeLinecap="round" />
+          <line x1={x0 + 2} y1={BIRD.y + 19} x2={birdX + 4} y2={BIRD.y + 19} stroke={MID_WOOD} strokeWidth="3.5" strokeLinecap="round" />
+          <g transform={`translate(${birdX} ${BIRD.y})`}>
+            <Cuckoo beak={night.beakOpen(t)} sleep={night.birdSleep(t)} />
+          </g>
+        </g>
+      )}
+      {/* The door, hinged on its left, swings open */}
+      <g transform={`translate(${x0} 0) scale(${Math.cos(open * Math.PI * 0.85)} 1) translate(${-x0} 0)`}>
+        <rect x={x0} y={DOOR.y - DOOR.h / 2} width={DOOR.w} height={DOOR.h} fill="#c98b55" stroke={INK} strokeWidth="2.5" />
+        <circle cx={x0 + DOOR.w - 8} cy={DOOR.y} r="3" fill={GOLD} />
+      </g>
+    </g>
+  );
+}
+
+/** The little cuckoo, seen from the side and looking right: a sleepy eye, and a beak that opens to call and to yawn. */
+function Cuckoo({ beak, sleep }: { beak: number; sleep: number }) {
+  // Drawn with its beak's tip at (27, -11), and scaled so the tip lands where the machine has it.
+  const b = { dx: 27, dy: -11 };
+  return (
+    <g transform={`scale(${BIRD.beak.dx / b.dx})`}>
+      <path d="M-14 -2 L-30 -12 L-27 6 Z" fill="#3d6fa8" stroke={INK} strokeWidth="2.5" strokeLinejoin="round" />
+      <ellipse rx="17" ry="13" fill="#9ad0ec" stroke={INK} strokeWidth="3" />
+      <ellipse cx="4" cy="5" rx="9" ry="6" fill="#fff6e0" />
+      <path d="M-12 -4 Q-2 -8 6 0 Q-4 6 -12 -4 Z" fill="#5b8fc7" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <circle cx="10" cy="-11" r="10" fill="#9ad0ec" stroke={INK} strokeWidth="3" />
+      {/* Lower beak drops open; the upper one stays */}
+      <path
+        d={`M18 -10 L${b.dx - 2} ${b.dy + 2} L18 -7 Z`}
+        fill="#ff9a3d"
+        stroke={INK}
+        strokeWidth="2"
+        strokeLinejoin="round"
+        transform={`rotate(${45 * beak} 18 -10)`}
+      />
+      <path d={`M18 -14 L${b.dx} ${b.dy} L18 -9 Z`} fill="#ffb347" stroke={INK} strokeWidth="2" strokeLinejoin="round" />
+      <Eye x={11} y={-14} r={2.4} sleep={sleep} />
+      <circle cx="6" cy="-6" r="3" fill="#ffb3c1" opacity="0.8" />
+    </g>
+  );
+}
+
 /* ---------- Curtain, lamp ---------- */
 
 /** The curtain on its rail: dark blue with little golden stars, its folds spreading out as it is drawn shut. */
@@ -437,13 +623,16 @@ function Curtain({ edge }: { edge: number }) {
   );
 }
 
-/** The arc floor lamp: shining warmly until its pull chain clicks it off. */
+/** The arc floor lamp over the reading corner: shining warmly until its pull chain clicks it off. */
 function ArcLamp({ night, t, ids }: { night: Night; t: number; ids: string }) {
   const { base, shade, shadeH } = LAMP;
   const on = night.lampOn(t);
   const swing = night.chainSwing(t);
   const bead = { x: CHAIN.x + CHAIN.len * Math.sin(swing), y: CHAIN.top + CHAIN.len * Math.cos(swing) };
   const glow = `${ids}-glow`;
+  // The arc rises a little above the shade and bends over to it.
+  const arcY = shade.y - 60;
+  const arm = `M${base} ${FLOOR - 16} L${base} ${arcY + 70} Q${base} ${arcY} ${(base + shade.x) / 2} ${arcY} Q${shade.x} ${arcY} ${shade.x} ${shade.y}`;
   return (
     <g>
       <defs>
@@ -463,18 +652,8 @@ function ArcLamp({ night, t, ids }: { night: Night; t: number; ids: string }) {
         </g>
       )}
       <ellipse cx={base} cy={FLOOR - 6} rx="70" ry="16" fill="#5b4a6e" stroke={INK} strokeWidth="4" />
-      <path
-        d={`M${base} ${FLOOR - 16} L${base} 200 Q${base} 130 ${(base + shade.x) / 2} 130 Q${shade.x} 130 ${shade.x} ${shade.y}`}
-        fill="none"
-        stroke={INK}
-        strokeWidth="12"
-      />
-      <path
-        d={`M${base} ${FLOOR - 16} L${base} 200 Q${base} 130 ${(base + shade.x) / 2} 130 Q${shade.x} 130 ${shade.x} ${shade.y}`}
-        fill="none"
-        stroke="#9aa3c8"
-        strokeWidth="6"
-      />
+      <path d={arm} fill="none" stroke={INK} strokeWidth="12" />
+      <path d={arm} fill="none" stroke="#9aa3c8" strokeWidth="6" />
       <path
         d={`M${shade.x - 60} ${shade.y + shadeH} Q${shade.x - 56} ${shade.y} ${shade.x} ${shade.y} Q${shade.x + 56} ${shade.y} ${shade.x + 60} ${shade.y + shadeH} Z`}
         fill="#ff8c42"

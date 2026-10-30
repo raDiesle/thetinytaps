@@ -1,8 +1,12 @@
 # Lebendige Bilder
 
-Routes `/bilder/` (menu) and `/bilder/<id>/`.
+Routes `/bilder/` (menu) and `/bilder/<id>/`. The menu has the mode as a choice row above the pictures
+(`mode` in `settings.ts`), and a tap on a picture plays it at once in that mode: a picture has no start screen,
+no „Über das Spiel“ and no „Einstellungen“ (`GameShell` with `startMode` and `leaveTo`), and ✕, Esc and „Menü“ go
+back to `/bilder/`.
 
-Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, hover / swipe or keys with arrow-key frame in `focus.ts`; vehicles that drive into another picture in `roads.ts` – every second tap sends the fire engine, the tractor, the bus or the dump truck off, a sign at the edge follows it, and in the other picture the same drawing drives in and parks as a guest) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`, `kueche/`, `supermarkt/`, `flughafen/`, `winterbaustelle/` (reuses the Baustelle drawings with snow on top), `kita/`, `kinderarzt/`, `strand/`, `dinotal/`, `gutenacht/` (bedtime picture: `bedtime` on the scene makes every tapped thing fall asleep, and when all sleep the room goes dark instead of the party), and the season pictures `winter/`, `herbst/`, `ostern/`; hidden surprises in `hideout.tsx` (an item with `hideout` draws a `<Hideout>` behind its door, lid or sand pile, and on every tap another animal or present peeks out); shared depth helpers (`onFloor` for rooms), drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx`; leaves and snow on the ground and in the air for outdoor pictures in `weather.tsx`.
+Scene engine (modes in menu order: "Freies Entdecken" first and the default, see below; colouring in – a tapped item gets its colour back, and every tap paints a big round dab of colour into the grey background, so the parts that never move can be painted too; Space paints a random spot of the background where nothing happens (Enter still starts the item in the frame), shown as a small wide key at the bottom in the middle while the key badges are on; find with only the item, glowing, in the bubble; trait questions in `quests.ts` (colours also count for a part, `colourParts.ts`); "Freies Entdecken" with chain reactions and "alles entdeckt" party; tap, or keys with arrow-key frame in `focus.ts` (keys mode is on wherever there is a keyboard, with the key
+badges in the picture; ⌨️ in the bottom left corner switches it off and on, kept for the next pictures); vehicles that drive into another picture in `roads.ts` – every second tap sends the fire engine, the tractor, the bus or the dump truck off, a sign at the edge follows it, and in the other picture the same drawing drives in and parks as a guest) and the scenes `baustelle/`, `stadt/`, `bauernhof/`, `hof/`, `zoo/`, `unterwasser/`, `badezimmer/`, `wald/`, `feuerwache/`, `weltall/`, `spielplatz/`, `kueche/`, `supermarkt/`, `flughafen/`, `winterbaustelle/` (reuses the Baustelle drawings with snow on top), `kita/`, `kinderarzt/`, `strand/`, `dinotal/`, `gutenacht/` (bedtime picture: `bedtime` on the scene makes every tapped thing fall asleep, and when all sleep the room goes dark instead of the party), and the season pictures `winter/`, `herbst/`, `ostern/`; every tap on the background brings something to life in `spots.tsx` (a thing of the background wrapped in `<Poke>` sways, wobbles, hops or glows; anywhere else the scene's `spots` say what comes out there – a gust of wind in the sky that bends the trees and blows the clouds along, a beetle crawling out of the floor tiles, a spider on the wall, a flower and butterfly from the meadow, a fish jumping out of the water; no speech, so nothing to translate); hidden surprises in `hideout.tsx` (an item with `hideout` draws a `<Hideout>` behind its door, lid or sand pile, and on every tap another animal or present peeks out); shared depth helpers (`onFloor` for rooms), drawing helpers and sky in `layout.ts`, `shared.tsx`, `sky.tsx`; leaves and snow on the ground and in the air for outdoor pictures in `weather.tsx`.
 
 ## Working on scenes
 
@@ -55,6 +59,15 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
 
 ## Rules
 
+- No options for grown-ups on a picture: what the start screen once offered (counting with a party, vehicles
+  driving into other pictures, hints in Fragen, the picture moving by itself, how the picture is set off, what
+  is said) is fixed – the party, the vehicles and the hints are always on, the picture never moves by itself.
+  The only choice is the mode, in the row on `/bilder/`; don't bring back a ⚙️ or ℹ️ for a picture, and put
+  something a grown-up must switch while playing (like ⌨️) small into a corner of the picture.
+- Every tap on a picture brings something to life, never only shapes: on an item its animation, on the
+  background a `<Poke>` thing or what lives in that part of the picture (`spots`, covering the whole picture,
+  `scenes.test.ts`). A new picture or a new background drawing gets both; pick what a toddler expects there
+  (a crab from sand, not from a kitchen floor), and keep bedtime pictures calm (fireflies, stars).
 - Find mode asks without words on screen: the bubble shows only the item (the question is spoken and is the
   bubble's `aria-label`), small enough to leave the picture free, and makes itself seen by a glow that grows and
   shrinks three times when a new question comes, then stands still.

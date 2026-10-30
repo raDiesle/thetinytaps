@@ -1,4 +1,4 @@
-import { float, ground } from "../layout";
+import { float, ground, HORIZON } from "../layout";
 import { Sonne, Wolke } from "../sky";
 import type { Scene } from "../types";
 import { Background } from "./background";
@@ -20,7 +20,7 @@ import {
   Wassersaurier,
 } from "./critters";
 import { Ankylosaurus, Brachiosaurus, DinoMama, Parasaurolophus, Stegosaurus, TRex, Triceratops, TriceratopsBaby } from "./dinos";
-import { BAUM, BLUME, BRACHIO, FLUG, HOEHLE, SEEROSE, STAMM, VULKAN } from "./layout";
+import { BAUM, BLUME, BRACHIO, FLUG, HOEHLE, LAKE_WATER, SEEROSE, STAMM, TRAIL_BOXES, VULKAN } from "./layout";
 import { Baumstamm, Bernstein, Hoehle, Pfuetze, Vulkan } from "./places";
 import { Baum, Blume, Farn, Palmfarn, Pilze, Schachtelhalm } from "./plants";
 import "./dinotal.css";
@@ -39,6 +39,13 @@ export const dinotal: Scene = {
   sky: "#8fd3f4",
   ground: "#7ab656",
   Background,
+  // A fish jumps out of the lake, a beetle crawls along the sandy trail, the meadow grows flowers or a mole peeks out.
+  spots: [
+    { box: LAKE_WATER, kinds: ["splash"] },
+    ...TRAIL_BOXES.map((box) => ({ box, kinds: ["bug" as const] })),
+    { box: [0, 0, 1600, HORIZON], kinds: ["wind"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["flower", "mole"] },
+  ],
   items: [
     // ---------- Sky ----------
     {

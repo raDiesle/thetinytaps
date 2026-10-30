@@ -59,6 +59,11 @@ interface GameShellProps {
    * moment (the child has to go now). The start screen shows only after leaving the game (✕, Esc, „Menü“).
    */
   startMode?: string;
+  /**
+   * With `startMode`: a game without a start screen of its own, whose menu is the page before it (a picture of
+   * Lebendige Bilder). Leaving the game (✕, Esc, „Menü“) goes there instead.
+   */
+  leaveTo?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
   /**
@@ -80,7 +85,7 @@ interface GameShellProps {
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({ title, emoji, modes, mode, onMode, startMode, level, info, settings, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveTo, level, info, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const t = useT();
@@ -127,6 +132,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
     // Only the keyboard lock ends: fullscreen stays on, the menus are part of the app too.
     exitKidMode();
     if (returnTo) navigate(returnTo, { replace: true });
+    else if (leaveTo) navigate(leaveTo, { replace: true });
   };
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -169,7 +175,9 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
     if ((!startMode && !returnTo) || started.current) return;
     started.current = true;
     if (startMode) onMode?.(startMode);
-    void start();
+    // Play time is over: no start screen to wait on, so back to the menu, which the lock covers.
+    if (leaveTo && !returnTo && isPlaytimeOver()) navigate(leaveTo, { replace: true });
+    else void start();
   }, []);
 
   if (playing) {
@@ -193,6 +201,9 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
       </div>
     );
   }
+
+  // Nothing to show before the game starts at once, or after it was left.
+  if (leaveTo) return null;
 
   /** One mode's card. */
   const card = (m: GameMode) => (
@@ -279,17 +290,6 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
             ar: "اختيار طريقة اللعب",
           })}
         >
-          <h2 className="mode-heading">
-            {t({
-              de: "Was spielen wir?",
-              ru: "Во что играем?",
-              en: "What shall we play?",
-              zh: "我们玩什么？",
-              hi: "क्या खेलें?",
-              es: "¿A qué jugamos?",
-              ar: "ماذا نلعب؟",
-            })}
-          </h2>
           {level && <div className="mode-level">{level}</div>}
           <ul ref={grid.ref} className={`game-list mode-list ${grid.className}`} style={grid.style}>
             {groups

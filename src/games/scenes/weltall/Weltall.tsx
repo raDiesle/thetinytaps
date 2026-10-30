@@ -1,4 +1,4 @@
-import { ground } from "../layout";
+import { ground, HORIZON } from "../layout";
 import type { Scene } from "../types";
 import { Background } from "./background";
 import { Flagge, Gewaechshaus, Landefaehre, Mondbasis, Rakete, Schuessel, Solarzellen } from "./base";
@@ -21,6 +21,11 @@ export const weltall: Scene = {
   sky: "#141a3d",
   ground: "#dcdce6",
   Background,
+  // Shooting stars streak through space; out of the moon's dust a moon bunny peeks, or a shooting star falls by.
+  spots: [
+    { box: [0, 0, 1600, HORIZON], kinds: ["stars"] },
+    { box: [0, HORIZON, 1600, 1000 - HORIZON], kinds: ["snow", "stars"] },
+  ],
   items: [
     // ---------- Space ----------
     {
