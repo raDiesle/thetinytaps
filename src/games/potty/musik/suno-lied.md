@@ -415,12 +415,14 @@ Title:
 Esperando en el orinal
 ```
 
-## 中文 (`zh`, written 30 Oct 2026)
+## 中文 (`zh`, written 30 Oct 2026; made 30 Oct 2026 → `musik-toepfchen-warten-zh.mp3`)
 
 The German song in Mandarin, verse for verse, same tempo, key and instruments. „小马桶“ for the potty, „尿不湿“ for the
 diaper, „尿尿“ and „便便“ as in the game; the shout-back answers are „我！“. Nothing changes for boy or girl in Chinese
 anyway. Flushing is „冲一冲“, never with „水“ (the bubble's water). Rhymes loosely, as Chinese children's songs do. Not
 yet read by a native speaker.
+Suno sang it at exactly 100 BPM in 2:01 with a two-bar intro and a kazoo outro after the last chorus, every verse and
+chorus four bars, in order; Whisper heard every line, but smeared „我“ over the intro (its words from 0 s, sung from 5.2 s).
 
 Lyrics:
 
