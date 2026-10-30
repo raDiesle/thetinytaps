@@ -209,7 +209,10 @@ In a fresh worktree run `bun install` first.
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
   install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
-  while there is more to scroll to. Check menus at 844×390 and 390×844 as well as tablet and computer.
+  while there is more to scroll to. Buttons and cards in a menu never touch or overlap, also not with a tilted card's
+  corner or a button's shadow: keep clear room between the menu's head (its rows of buttons) and the cards
+  (`.home > .menu-head` margin in `menus.css`) and between buttons in a row.
+  Check menus at 844×390 and 390×844 as well as tablet and computer.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
