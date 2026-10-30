@@ -1,58 +1,37 @@
-import { useLayoutEffect, useRef, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Link } from "react-router";
 import { FullscreenCorner } from "@/components/FullscreenButton";
 
-/** Room between the corner and the title, in px. */
-const CORNER_GAP = 16;
-
 /**
- * The top left corner of every menu but the home page: the way back and, for
- * grown-ups, the fullscreen button next to it – both on the left, so the sun in
- * the top right corner stays in sight.
+ * The way back from a menu: a big round arrow without words (`back` names where it leads, for screen readers and as
+ * a tooltip), with `children` – small round buttons for grown-ups such as ℹ️ – right next to it.
  */
-export function MenuTop({ to, children }: { to: string; children: ReactNode }) {
+export function MenuTop({ to, back, children }: { to: string; back: string; children?: ReactNode }) {
   return (
     <div className="menu-top">
-      <Link to={to} className="back-link">
-        ← {children}
+      <Link to={to} className="back-link" aria-label={back} title={back}>
+        <svg className="back-arrow" viewBox="0 0 24 24" aria-hidden>
+          <path d="M20 12H5M11 5l-7 7 7 7" />
+        </svg>
       </Link>
-      <FullscreenCorner />
+      {children}
     </div>
   );
 }
 
 /**
- * The top of a menu: the corner (MenuTop), the title centred next to it and, below
- * the title, `children` such as a start screen's small buttons for grown-ups. A computer
- * keeps the corner fixed while the page scrolls, so it takes no room of its own: the
- * title's column starts where the corner ends (`--corner`), and the title moves right
- * or wraps rather than hide under it.
+ * The top of a menu: the way back (MenuTop, with `tools` next to it) right left of the centred title, close to the
+ * cards where a grown-up looks, and the fullscreen button on the right, across from the sun in the top left corner.
+ * `children`, such as a start screen's labelled buttons for grown-ups, go in a row of their own under the title.
  */
-export function MenuHead({ to, back, title, children }: { to: string; back: ReactNode; title: ReactNode; children?: ReactNode }) {
-  const head = useRef<HTMLDivElement>(null);
-
-  useLayoutEffect(() => {
-    const el = head.current;
-    const corner = el?.querySelector(".menu-top");
-    if (!el || !corner) return;
-    const measure = () =>
-      el.style.setProperty("--corner", `${Math.max(0, corner.getBoundingClientRect().right - el.getBoundingClientRect().left + CORNER_GAP)}px`);
-    measure();
-    // The back link's width changes with the font and the language; the head moves with the window.
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    observer.observe(corner);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, []);
-
+export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: ReactNode; tools?: ReactNode; children?: ReactNode }) {
   return (
-    <div ref={head} className="menu-head">
-      <MenuTop to={to}>{back}</MenuTop>
+    <div className="menu-head">
+      <MenuTop to={to} back={back}>
+        {tools}
+      </MenuTop>
       <h1 className="menu-title">{title}</h1>
+      <FullscreenCorner />
       {children}
     </div>
   );

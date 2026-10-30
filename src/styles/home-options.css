@@ -1,11 +1,12 @@
 /* ---------- Home: play time and options for all games ---------- */
 
-/* All buttons on the left, so the sun in the top right corner stays in sight; their menus open from there. */
+/* All buttons on the right, where every menu has its fullscreen button, so the sun in the top left corner stays in sight; their menus open from there. */
 .home-bar {
   position: relative;
   z-index: 10;
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   align-items: flex-start;
   gap: 12px;
   margin: -24px 0 8px;
@@ -21,7 +22,7 @@
   stroke-linejoin: round;
 }
 
-/* Next to the back link, always: phones leave fullscreen when another app was opened in between. */
+/* In the top right of every menu, always: phones leave fullscreen when another app was opened in between. */
 .fullscreen-corner {
   display: block;
 }
@@ -77,7 +78,7 @@
 .home-menu-panel {
   position: absolute;
   top: calc(100% + 12px);
-  left: 0;
+  right: 0;
   width: min(560px, calc(100vw - 32px));
   max-height: calc(100dvh - 120px);
   overflow: auto;

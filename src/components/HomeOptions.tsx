@@ -10,10 +10,11 @@ import { APP_LANGUAGES, OWN_NAMES, setAppLanguage, useAppLanguage, useT } from "
 import { downloadMusic } from "@/lib/musicFile";
 
 /**
- * On the home page, for the grown-ups: small buttons in the top left corner –
- * the play time for all games, the language, fullscreen and the options most
- * games share – each opening its menu only when tapped, so the games fill the
- * screen. All on the left, so the sun in the top right corner stays in sight.
+ * On the home page, for the grown-ups: small buttons in the top right corner –
+ * the play time for all games, the language, the options most games share and
+ * fullscreen (last, where every menu has it) – each opening its menu only when
+ * tapped, so the games fill the screen. All on the right, so the sun in the top
+ * left corner stays in sight.
  */
 export function HomeOptions() {
   const t = useT();
@@ -33,7 +34,6 @@ export function HomeOptions() {
       <MenuButton icon="🌐" label={OWN_NAMES[language.id].split(" ")[1]}>
         <AppLanguageOptions />
       </MenuButton>
-      <FullscreenButton />
       <MenuButton
         icon="⚙️"
         label={t({
@@ -49,6 +49,7 @@ export function HomeOptions() {
       >
         <CommonOptions />
       </MenuButton>
+      <FullscreenButton />
     </nav>
   );
 }

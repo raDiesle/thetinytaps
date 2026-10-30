@@ -45,7 +45,7 @@ export function FullscreenButton({ className = "home-menu-button icon-only", pla
 }
 
 /**
- * The same button next to the back link of the other menus, always: the browser
+ * The same button in the top right of the other menus (MenuHead), always: the browser
  * leaves fullscreen when a phone switches to another app and back, so the
  * grown-up gets it back right there, or leaves it, without going to the home page first.
  */

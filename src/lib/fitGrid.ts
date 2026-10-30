@@ -124,7 +124,7 @@ export function useFitGrid(count: number, groups?: number[]) {
     if (!list || !page) return;
     const measure = () => {
       // An open settings panel grows the page below the cards; they keep their size.
-      if (page.querySelector(".panel-button[aria-expanded='true']")) return;
+      if (page.querySelector(":is(.panel-button, .panel-icon)[aria-expanded='true']")) return;
       const phone = Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
       const next = bestFit(
         count,

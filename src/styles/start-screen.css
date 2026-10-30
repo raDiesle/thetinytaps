@@ -21,21 +21,42 @@
   margin-block: auto;
 }
 
+/* The way back from a menu (MenuTop): a big yellow round arrow, no words, so a grown-up finds it at once. */
 .back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  align-self: flex-start;
-  min-height: 48px;
-  padding: 8px 22px;
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 56px;
+  height: 56px;
   border: 3px solid var(--ink);
-  border-radius: 999px;
-  background: #fff;
+  border-radius: 50%;
+  background: var(--sunshine);
   color: inherit;
-  font-size: 1.1rem;
-  font-weight: 600;
   text-decoration: none;
   box-shadow: 0 5px 0 var(--ink);
+}
+
+.back-arrow {
+  width: 62%;
+  height: 62%;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* „Über das Spiel“ next to the way back: a plain dark „i“ in the round button, like the fullscreen sign. */
+.home-menu-button .info-sign {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.back-link:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
 }
 
 .back-link:active {
@@ -62,8 +83,8 @@
 }
 
 /*
- * "Über das Spiel" and the options, small at the top in the menu's head, folded into two buttons until a
- * grown-up opens one (its panel opens under the head). Above the cards, never under them.
+ * Labelled buttons for grown-ups in a row under a menu's title (the Belohnungstafel's „Gestalten“, „Drucken“ …),
+ * each opening its panel under the head. A start screen's ℹ️ and ⚙️ are round signs next to the way back instead.
  */
 .panel-button {
   display: inline-flex;
@@ -527,27 +548,13 @@ kbd {
   font-size: 1.1rem;
 }
 
-/*
- * More room for the cards on big screens: the back link (with the fullscreen button next to it) moves up
- * into the corner, bigger and yellow so a grown-up finds it at once, and stays there while the page scrolls.
- * The title stays clear of it: MenuHead starts the title's column where the corner ends.
- */
+/* Big screens: a bigger way back, still right next to the title, and more room for the cards. */
 @media (min-width: 900px) and (min-height: 600px) {
-  .home > .menu-top,
-  .menu-head > .menu-top {
-    position: fixed;
-    top: max(20px, env(safe-area-inset-top));
-    left: max(20px, env(safe-area-inset-left));
-    z-index: 10;
-    margin: 0;
-  }
-
-  .menu-top > .back-link {
-    min-height: 60px;
-    padding: 10px 30px 10px 24px;
-    background: var(--sunshine);
-    font-size: 1.4rem;
-    font-weight: 700;
+  .back-link {
+    width: 72px;
+    height: 72px;
+    border-width: 4px;
+    box-shadow: 0 6px 0 var(--ink);
   }
 
   .start-screen {
@@ -656,9 +663,8 @@ kbd {
   }
 
   .back-link {
-    min-height: 40px;
-    padding: 4px 16px;
-    font-size: 0.95rem;
+    width: 48px;
+    height: 48px;
     box-shadow: 0 4px 0 var(--ink);
   }
 

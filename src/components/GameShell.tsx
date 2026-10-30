@@ -221,7 +221,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
   return (
     <main className="start-screen">
       <Sky />
-      {/* Small, at the top next to the way back: for grown-ups, out of the cards' way, never under them. */}
+      {/* Small round signs right next to the way back: for grown-ups, out of the cards' way, taking no row of their own. */}
       <MenuHead
         to={back}
         back={backText}
@@ -230,14 +230,13 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
             <span aria-hidden>{emoji}</span> {title}
           </>
         }
-      >
-        {(info || settings) && (
-          <div className="panel-buttons">
+        tools={
+          <>
             {info && (
               <PanelButton
                 open={panel === "info"}
                 onClick={() => setPanel(panel === "info" ? null : "info")}
-                emoji="ℹ️"
+                icon={<span className="info-sign">i</span>}
                 label={t({
                   de: "Über das Spiel",
                   ru: "Об игре",
@@ -253,13 +252,13 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, level,
               <PanelButton
                 open={panel === "settings"}
                 onClick={() => setPanel(panel === "settings" ? null : "settings")}
-                emoji="⚙️"
+                icon={<span>⚙️</span>}
                 label={t({ de: "Einstellungen", ru: "Настройки", en: "Settings", zh: "设置", hi: "सेटिंग्स", es: "Ajustes", ar: "الإعدادات" })}
               />
             )}
-          </div>
-        )}
-      </MenuHead>
+          </>
+        }
+      />
       {panel === "info" && info && <section className="settings game-info">{info}</section>}
       {panel === "settings" && settings && <section className="settings">{settings}</section>}
       {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
@@ -348,11 +347,14 @@ function PlaytimeNote() {
   );
 }
 
-/** One of the small buttons in the top row that opens its panel below that row, or folds it away again. */
-function PanelButton({ open, onClick, emoji, label }: { open: boolean; onClick: () => void; emoji: string; label: string }) {
+/**
+ * One of the small round signs next to the way back (i, ⚙️): opens its panel below the top row, or folds it away
+ * again. Its name is only a tooltip and read out, so it takes no more room than the sign.
+ */
+function PanelButton({ open, onClick, icon, label }: { open: boolean; onClick: () => void; icon: ReactNode; label: string }) {
   return (
-    <button type="button" className="panel-button" aria-expanded={open} onClick={onClick}>
-      <span aria-hidden>{emoji}</span> {label}
+    <button type="button" className="home-menu-button icon-only panel-icon" aria-expanded={open} aria-label={label} title={label} onClick={onClick}>
+      {icon}
     </button>
   );
 }

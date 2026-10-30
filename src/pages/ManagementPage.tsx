@@ -149,7 +149,7 @@ export function ManagementPage() {
 
   return (
     <main className="home ideas">
-      <MenuTop to="/">Alle Spiele</MenuTop>
+      <MenuTop to="/" back="Alle Spiele" />
       <h1>
         <span aria-hidden>🧭</span> Management
       </h1>

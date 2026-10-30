@@ -164,15 +164,16 @@ In a fresh worktree run `bun install` first.
   nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
 - The fullscreen button is always there to get back into fullscreen, which a phone leaves whenever another app was
-  opened in between: in every menu next to the back link (`MenuTop`) and next to ✕ while playing. Grown-ups on a
+  opened in between: in every menu in the top right (`MenuHead`, the last of the home page's buttons) and next to ✕ while playing. Grown-ups on a
   computer (≥ 900 px wide with a mouse) see it always, also to leave fullscreen; on phones and tablets a game shows it
   only while out of fullscreen, so a child's tap can't end it. Starting or leaving a game in fullscreen must not make the browser
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
   (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
   lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
-  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them. On a computer the back link of a menu is big, yellow and
-  fixed in the top left corner, so it never scrolls away; phones and tablets keep it small. A menu's title goes into
-  `MenuHead` with that corner, which keeps the title clear of it (it moves right or wraps, never under the corner).
+  a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them. The way back from a menu is a big yellow
+  round arrow without words (its target only as tooltip and read out, `MenuTop`), right next to the title on its left, close to the
+  cards – never far off in the screen's corner, where grown-ups on a big monitor didn't find it (biggest on a computer). A
+  menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right.
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`), and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own.
@@ -181,10 +182,10 @@ In a fresh worktree run `bun install` first.
 - Menus show as many cards as possible without scrolling, on phones too (shorter side < 600 px – the same limit
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title,
   no line under it and no „Was spielen wir?“ (only read out – the cards say enough; the home logo stays), and the
-  cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). Buttons for grown-ups sit in the top
-  left corner, never over the sun in the top right one. „ℹ️ Über das Spiel“ and „⚙️ Einstellungen“ (where a game still has them) are small, above the cards,
-  never under them: in the top row next to the back link (on a computer centred under the title), and a panel opens right
-  under that row. When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
+  cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
+  left corner; buttons for grown-ups never cover it (the home page's sit on the right, a phone's way back in the middle). „Über das Spiel“
+  and „Einstellungen“ (where a game still has them) are small round signs without words (a plain „i“, ⚙️; the name as
+  tooltip and read out) right next to the way back, so they take no row of their own; a panel opens right under the top row. When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
   install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar

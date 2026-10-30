@@ -11,9 +11,11 @@
 
 .sky-sun {
   position: absolute;
+  /* Top left: the buttons for grown-ups (fullscreen, the home page's options) keep the top right corner. */
   top: -40px;
-  right: -30px;
-  width: clamp(150px, 22vw, 240px);
+  left: -30px;
+  /* Small enough on a tablet that the way back next to a long title stays clear of its face. */
+  width: clamp(130px, 18vw, 240px);
 }
 
 .sky-sun circle {
