@@ -244,7 +244,7 @@ function saltShaker(): Thing {
   const h = 112;
   return {
     kind: "salt",
-    name: { de: "Salzstreuer" },
+    name: { de: "Salzstreuer", en: "Salt shaker", zh: "盐瓶", hi: "नमकदानी", es: "Salero", ar: "مملحة", ru: "Солонка" },
     w,
     h,
     sound: () => playKnock(1300),
@@ -268,7 +268,15 @@ function vase(): Thing {
   const h = 200;
   return {
     kind: "vase",
-    name: { de: "Vase mit Blume" },
+    name: {
+      de: "Vase mit Blume",
+      en: "Vase with a flower",
+      zh: "插着花的花瓶",
+      hi: "फूल वाला गुलदान",
+      es: "Florero con flor",
+      ar: "مزهرية فيها وردة",
+      ru: "Ваза с цветком",
+    },
     w,
     h,
     sound: playDing,
@@ -294,7 +302,7 @@ function thermos(): Thing {
   const h = 226;
   return {
     kind: "thermos",
-    name: { de: "Thermoskanne" },
+    name: { de: "Thermoskanne", en: "Flask", zh: "保温瓶", hi: "थर्मस", es: "Termo", ar: "ترمس", ru: "Термос" },
     w,
     h,
     sound: playClonk,
@@ -315,7 +323,7 @@ function broom(): Thing {
   const h = 330;
   return {
     kind: "broom",
-    name: { de: "Besen" },
+    name: { de: "Besen", en: "Broom", zh: "扫帚", hi: "झाड़ू", es: "Escoba", ar: "مكنسة", ru: "Метла" },
     w,
     h,
     sound: playThump,

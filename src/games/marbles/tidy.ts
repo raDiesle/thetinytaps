@@ -525,7 +525,17 @@ export function buildTidy() {
   at(tBlanket + 0.7, { sound: playPlop });
   at(tGlitter, { sound: playTwinkle });
   at(tGlitter + 0.4, { sound: playChime });
-  at(tGlitter + 0.5, { say: { de: "Alles aufgeräumt! Alles glitzert!" } });
+  at(tGlitter + 0.5, {
+    say: {
+      de: "Alles aufgeräumt! Alles glitzert!",
+      en: "All tidy! Everything sparkles!",
+      zh: "都收拾好啦！亮晶晶的！",
+      hi: "सब साफ़! सब चमक रहा है!",
+      es: "¡Todo ordenado! ¡Todo brilla!",
+      ar: "كل شيء مرتّب! كل شيء يلمع!",
+      ru: "Всё убрано! Всё блестит!",
+    },
+  });
   at(tDone, { done: true });
 
   /** The truck's wheels: how far they have turned (degrees); they go on whirring while it bounces on the bellows. */

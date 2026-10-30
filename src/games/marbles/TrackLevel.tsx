@@ -826,7 +826,7 @@ export function TrackLevel({ sound, say, onDone }: LevelProps) {
           type="button"
           className="run-up"
           data-tap
-          aria-label={tr({ de: "Nach oben" })}
+          aria-label={tr({ de: "Nach oben", en: "Back up", zh: "回到上面", hi: "ऊपर चलें", es: "Arriba", ar: "إلى الأعلى", ru: "Наверх" })}
           onPointerDown={(e) => {
             e.stopPropagation();
             lookUp();

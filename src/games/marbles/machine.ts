@@ -526,7 +526,17 @@ export function buildMachine() {
   /** How far the plane has pushed the red knob in. */
   const buttonPress = (t: number) => (t >= tButton ? BUTTON.press : Math.min(BUTTON.press, Math.max(0, planeAt(t).pt.x - knobX)));
   at(tSplit, { sound: playWhoosh });
-  at(tSplit + 0.3, { say: { de: "Huiii, ein Papierflieger!" } });
+  at(tSplit + 0.3, {
+    say: {
+      de: "Huiii, ein Papierflieger!",
+      en: "Wheee, a paper plane!",
+      zh: "呜——纸飞机！",
+      hi: "वाह, काग़ज़ का हवाई जहाज़!",
+      es: "¡Uiii, un avión de papel!",
+      ar: "ووووه، طائرة ورقية!",
+      ru: "У-у-ух, бумажный самолётик!",
+    },
+  });
   at(tSplit + timeWhen(plane, (_, d) => d >= planeLoopIn), { sound: playSwirl });
   at(tLoopOut, { sound: playSlide });
   at(tSplit + timeWhen(plane, (pt) => pt.x >= 8480), { sound: playSlide });

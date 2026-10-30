@@ -1,4 +1,6 @@
 import { dayKey } from "@/games/teeth/daytime";
+import type { TargetLanguageId } from "@/content/targetLanguages";
+import { pick } from "@/lib/language";
 import { cellKey, type LinkedDays, newId, type StarLog, weekday } from "./board";
 import { type LinkedGame, type PlanTemplate, type PlanView, type Slot, STEP_BY_ID } from "./catalog";
 
@@ -74,14 +76,14 @@ export function stepFromCatalog(id: string, slot?: Slot): PlanStep {
  * A plan made from a ready-made one. Its steps keep their catalogue ids (unique within a day), so the default plan,
  * made anew on every load until something is saved, finds its ticks again.
  */
-export function planFromTemplate(template: PlanTemplate): Plan {
+export function planFromTemplate(template: PlanTemplate, language: TargetLanguageId = "de"): Plan {
   const lists = typeof template.days[0] === "string" ? [template.days as string[]] : (template.days as string[][]);
   return {
     id: newId(),
     template: template.id,
     view: template.view,
     childName: "",
-    title: template.title?.de ?? "",
+    title: template.title ? pick(template.title, language) : "",
     days: lists.map((ids) => ids.map((id) => ({ ...stepFromCatalog(id, template.slots?.[id]), id }))),
     same: lists.length === 1,
     theme: template.theme,

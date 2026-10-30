@@ -241,6 +241,11 @@ describe("Aufs Töpfchen", () => {
       "salpic",
       "gota",
     );
+    // And in Chinese, Hindi and Arabic: water, rain, fountain, watering, hose, balloon, ketchup, hen, egg, play dough,
+    // pushing, squeezing, splashing, drops.
+    banned.push("水", "雨", "喷泉", "浇", "气球", "番茄酱", "鸡", "蛋", "橡皮泥", "用力", "挤");
+    banned.push("पानी", "बारिश", "फव्वारा", "फ़व्वारा", "पाइप", "गुब्बारा", "केचप", "मुर्गी", "अंड", "ज़ोर", "जोर", "छपाक", "बूँद");
+    banned.push("ماء", "مطر", "نافورة", "خرطوم", "بالون", "كاتشب", "دجاج", "بيض", "صلصال", "ضغط", "اضغط", "رذاذ", "قطرة");
     for (const text of lyrics) expect(banned.filter((word) => text.includes(word))).toEqual([]);
   });
 });

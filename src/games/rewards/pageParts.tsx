@@ -1,6 +1,37 @@
 import { type ReactNode, useEffect, useState } from "react";
+import type { Localized } from "@/lib/language";
 
 // Parts the page and the wizard share, for the Belohnungstafel and the Tagesplan alike.
+
+/** „🖨️ Drucken“: the button on top and the print panel's heading. */
+export const PRINT: Localized = { de: "Drucken", en: "Print", zh: "打印", hi: "प्रिंट", es: "Imprimir", ar: "طباعة", ru: "Печать" };
+
+/** The switch of views above the chart, and the wizard's step that picks one. */
+export const VIEW: Localized = { de: "Ansicht", en: "View", zh: "视图", hi: "दृश्य", es: "Vista", ar: "العرض", ru: "Вид" };
+/** The wizard's last step: name and colours. */
+export const LOOK: Localized = { de: "Aussehen", en: "Look", zh: "外观", hi: "रूप", es: "Aspecto", ar: "المظهر", ru: "Оформление" };
+/** The colour themes to pick from. */
+export const COLORS: Localized = { de: "Farben", en: "Colors", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" };
+/** The field for the child's name, which goes into the heading. */
+export const CHILD_NAME: Localized = {
+  de: "Name des Kindes (steht in der Überschrift, bleibt auf diesem Gerät)",
+  en: "Child’s name (goes in the heading, stays on this device)",
+  zh: "孩子的名字（显示在标题里，只保存在本设备上）",
+  hi: "बच्चे का नाम (शीर्षक में आता है, इसी डिवाइस पर रहता है)",
+  es: "Nombre (aparece en el título y se queda en este dispositivo)",
+  ar: "اسم الطفل (يظهر في العنوان ويبقى على هذا الجهاز)",
+  ru: "Имя ребёнка (будет в заголовке, хранится только на этом устройстве)",
+};
+/** An example name in the field, a common one in each language. */
+export const NAME_EXAMPLE: Localized = {
+  de: "z. B. Lena",
+  en: "e.g. Emma",
+  zh: "例如：小雨",
+  hi: "जैसे, अनु",
+  es: "p. ej., Lucía",
+  ar: "مثلًا: ليلى",
+  ru: "например, Лена",
+};
 
 /** Grown-ups on a computer, with room to scroll: the same limit as the fixed back link (`playing.css`). */
 const COMPUTER = "(min-width: 900px) and (any-pointer: fine)";

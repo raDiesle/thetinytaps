@@ -62,7 +62,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abenteuer/",
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch. Der Satz zu 🎵 und 🌐 in „Über das Spiel“ nur auf Deutsch (Oktober 2026).",
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch.",
     parts: [
       {
         label: "🏝️ Die Schatzinsel",
@@ -79,88 +79,39 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/gefuehle/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten. „Erwachsene erzählen die Geschichte anhand der Bilder.“ in „Über das Spiel“ nur auf Deutsch (Oktober 2026).",
+    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
   },
-  {
-    href: "/kettenreaktion/",
-    parts: [
-      {
-        label: "🎢 Kugelbahn, Nagelbrett, Hatschi-Kette, Wasserbahn",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-      },
-      {
-        label: "⚙️ Alles fällt um und die sieben übersetzten Maschinen",
-        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "Längere Maschinen (Oktober 2026): Salzstreuer, Vase, Thermoskanne und Besen sowie die neuen Sätze (Papierflieger, Pfannkuchen, Walze, Ufo, Hase an der Wand) nur auf Deutsch.",
-      },
-      { label: "🛁 Badezimmer", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze der Maschine nur auf Deutsch (R-05)." },
-      { label: "🐓 Bauernhof", languages: { de: "done" }, note: "Name, erster Satz und zwei Sätze unterwegs nur auf Deutsch." },
-      { label: "🌙 Gute-Nacht-Maschine", languages: { de: "done" }, note: "Name, erster Satz und Gute-Nacht-Sätze nur auf Deutsch (R-07, Oktober 2026)." },
-      { label: "🧸 Aufräum-Maschine", languages: { de: "done" }, note: "Name, erster Satz und „Alles aufgeräumt!“ nur auf Deutsch (R-08, Oktober 2026)." },
-    ],
-  },
+  { href: "/kettenreaktion/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   {
     href: "/kleine-abenteuer/",
     parts: [
       {
-        label: "🧭 Die anderen sieben Geschichten",
+        label: "🛗 Aufzug-Geschichten und die ersten vier Wege",
         recorded: true,
         languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Alle Sätze von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); was neu dazukommt oder übersetzt wird: bun run voice make --only kleine-abenteuer.",
+        note: "Alle Sätze von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026).",
       },
       {
-        label: "🏖️ Die Sandburg",
+        label: "🏖️ Die fünf neueren Wege und 🚒 Die Feuerwehr",
         recorded: true,
-        languages: { de: "done" },
-        note: "Name und alle Sätze nur auf Deutsch (G-05, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
-      },
-      {
-        label: "🧺 Picknick im Wald",
-        recorded: true,
-        languages: { de: "done" },
-        note: "Name und alle Sätze nur auf Deutsch (G-07, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
-      },
-      {
-        label: "⛵ Das Floß",
-        recorded: true,
-        languages: { de: "done" },
-        note: "Name und alle Sätze nur auf Deutsch (G-08, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
-      },
-      {
-        label: "🐈 Wo ist die Katze?",
-        recorded: true,
-        languages: { de: "done" },
-        note: "Name und alle Sätze nur auf Deutsch (G-04, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
-      },
-      {
-        label: "⛄ Der Schneemann",
-        recorded: true,
-        languages: { de: "done" },
-        note: "Name und alle Sätze nur auf Deutsch (G-06, Oktober 2026); bis zur Übersetzung spricht das Level ganz Deutsch.",
-      },
-      {
-        label: "🚒 Die Feuerwehr",
-        recorded: true,
-        languages: { de: "done" },
-        note: "Der erste Film (G-15, Oktober 2026): Name und alle Sätze nur auf Deutsch; bis zur Übersetzung spricht der Film ganz Deutsch. Nur die Gruppe „🎬 Filme“ auf dem Startbildschirm ist übersetzt.",
+        languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
+        note: "Deutsch aufgenommen; übersetzt am 30. Oktober 2026, die 734 Sätze der anderen Sprachen (≈ 2.600 Credits) warten auf ihre Aufnahme: bun run voice make --only kleine-abenteuer. Bis dahin sind diese Sätze in den anderen Sprachen still.",
       },
     ],
   },
   { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
   {
     href: "/schatten/",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Gespielt wird ganz übersetzt; nur drei Absätze in „Über das Spiel“ (wie gespielt wird, wie die Schwierigkeit mitwächst, der Knopf für die Bilder) sind noch deutsch.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/socken/",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Gespielt wird ganz übersetzt; nur zwei Absätze in „Über das Spiel“ (Waschmaschine von selbst, wie die Schwierigkeit mitwächst) sind noch deutsch.",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/buchstaben/",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Gespielt wird ganz übersetzt; noch deutsch sind seit den Optionen im Spiel (Oktober 2026) „Weiter spielen“, „Spielart“, „Was tippen?“, „Nur Zahlen“, „Ziffer erst zeigen, …“ und drei Absätze in „Über das Spiel“ (Optionen im Spiel, Nur Zahlen, Erster Buchstabe). Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
   },
   {
     href: "/zaehne/",
@@ -184,37 +135,21 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     parts: [
       {
         label: "🚽 Bilder und Texte",
-        languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“. Die 15 Denkblasen vom 30. Oktober 2026 (Wasserrutsche bis Kastanie) sprechen nur Deutsch, bis sie übersetzt werden.",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“.",
       },
       {
         label: "🎵 Warte-Lied (gesungen)",
         recorded: true,
-        languages: { de: "done", en: "text", es: "done", ru: "done" },
-        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. Russisch und Spanisch aufgenommen (Oktober 2026); Englisch: Text für Suno fertig, noch nicht aufgenommen. Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
+        languages: { de: "done", en: "done", zh: "text", hi: "text", es: "done", ar: "text", ru: "done" },
+        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. Russisch, Spanisch und Englisch aufgenommen (Oktober 2026); Chinesisch, Hindi und Arabisch: Text für Suno fertig, noch nicht aufgenommen. Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
       },
     ],
   },
   {
     href: "/belohnungstafel/",
     note: "Belohnungstafel und Tagesplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite.",
-    parts: [
-      {
-        label: "🌟 Belohnungstafel",
-        languages: { de: "done" },
-        note: "Neu im Oktober 2026, nur auf Deutsch: Tafel, Gestalten, Drucken und der Katalog (catalog.ts). Für eine Sprache: die Labels im Katalog und die t()-Texte; Wochentage und Überschriften (possessive) brauchen je Sprache eine eigene Form.",
-      },
-      {
-        label: "🗓️ Tagesplan",
-        languages: { de: "done" },
-        note: "Neu im Oktober 2026, nur auf Deutsch: Plan, Gestalten, Drucken und die Tagesschritte im Katalog (ACTIVITIES in src/games/rewards/catalog.ts).",
-      },
-      {
-        label: "🧭 Assistent „＋ Neu“",
-        languages: { de: "done" },
-        note: "Nur auf Deutsch: Wizard.tsx, WizardBoard.tsx, WizardPlan.tsx und CHART_TYPES im Katalog.",
-      },
-    ],
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
   },
   {
     href: "/laut-leise/",
@@ -222,23 +157,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/",
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch.",
-    parts: [
-      {
-        label: "🏠 Startseite, Menüs und Einstellungen",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-      },
-      {
-        label: "🌙 „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele)",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026).",
-      },
-      {
-        label: "📝 Zeilen für Eltern unter den Karten",
-        languages: { de: "done" },
-        note: "Nur auf Tablet und Computer zu sehen (`blurb` in games.ts); ohne Übersetzung stehen sie auf Deutsch da.",
-      },
-    ],
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur Management- und Suchmaschinenseiten bleiben Deutsch. „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026).",
   },
 ];

@@ -113,6 +113,12 @@ export function AdventureGame() {
           <p>
             {t({
               de: "Tapsi spricht immer. Die Musik stellt 🎵 auf der Startseite für alle Spiele ein, die Sprache 🌐.",
+              en: "Tapsi always speaks. 🎵 on the home page sets the music for all games, 🌐 the language.",
+              zh: "塔普西一直会说话。首页上的 🎵 为所有游戏设置音乐，🌐 设置语言。",
+              hi: "टैप्सी हमेशा बोलता है। मुखपृष्ठ पर 🎵 सभी खेलों का संगीत तय करता है, 🌐 भाषा।",
+              es: "Tapsi siempre habla. 🎵 en la página de inicio ajusta la música de todos los juegos, y 🌐 el idioma.",
+              ar: "تابسي يتكلم دائمًا. يضبط 🎵 في الصفحة الرئيسية الموسيقى لكل الألعاب، و🌐 اللغة.",
+              ru: "Тапси говорит всегда. 🎵 на главной странице включает музыку для всех игр, 🌐 – язык.",
             })}
             {language.id !== app.id &&
               t({

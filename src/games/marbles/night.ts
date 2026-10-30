@@ -262,14 +262,35 @@ export function buildNight() {
   const lampOn = (t: number) => 1 - seg(t, tClick, tClick + 0.15);
   /** How dark the room is: evening light until the click, then night falls softly. */
   const dark = (t: number) => 0.62 * easeInOut(seg(t, tClick, tClick + 1.8));
-  at(tClick, { sound: playClick, say: { de: "Klick! Licht aus." } });
+  at(tClick, {
+    sound: playClick,
+    say: {
+      de: "Klick! Licht aus.",
+      en: "Click! Lights out.",
+      zh: "咔嗒！关灯啦。",
+      hi: "क्लिक! बत्ती बंद।",
+      es: "¡Clic! Se apaga la luz.",
+      ar: "طق! نطفئ النور.",
+      ru: "Щёлк! Выключаем свет.",
+    },
+  });
 
   /* The moon rises in the round window. */
   const tMoon = tClick + 2;
   const tMoonUp = tMoon + 4;
   const moonY = (t: number) => lerp(MOON.y0, MOON.y1, easeOut(seg(t, tMoon, tMoonUp)));
   [0, 1, 2].forEach((i) => at(tMoon + 0.8 + i * 1.1, { sound: () => playChimeNote(3 + i * 2) }));
-  at(tMoon + 1.5, { say: { de: "Da kommt der Mond." } });
+  at(tMoon + 1.5, {
+    say: {
+      de: "Da kommt der Mond.",
+      en: "Here comes the moon.",
+      zh: "月亮出来啦。",
+      hi: "वो आया चाँद।",
+      es: "Ahí viene la luna.",
+      ar: "ها هو القمر يطلع.",
+      ru: "А вот и луна.",
+    },
+  });
 
   /* Everything falls asleep: first the teddy and the moon, then on the slow way back the cuckoo, the star and the sheep. */
   const tYawn = tMoonUp + 0.4;
@@ -287,11 +308,55 @@ export function buildNight() {
   const tSheep = tPanEnd + 0.3;
   const tDone = tSheep + 2.6;
   at(tYawn, { sound: playYawn });
-  at(tTeddy, { sound: () => playChimeNote(1), say: { de: "Gute Nacht, Teddy." } });
-  at(tMoonSleep, { sound: () => playChimeNote(0), say: { de: "Gute Nacht, Mond." } });
+  at(tTeddy, {
+    sound: () => playChimeNote(1),
+    say: {
+      de: "Gute Nacht, Teddy.",
+      en: "Good night, teddy.",
+      zh: "晚安，小熊。",
+      hi: "शुभ रात्रि, टेडी।",
+      es: "Buenas noches, osito.",
+      ar: "ليلة سعيدة يا دبدوب.",
+      ru: "Спокойной ночи, мишка.",
+    },
+  });
+  at(tMoonSleep, {
+    sound: () => playChimeNote(0),
+    say: {
+      de: "Gute Nacht, Mond.",
+      en: "Good night, moon.",
+      zh: "晚安，月亮。",
+      hi: "शुभ रात्रि, चाँद।",
+      es: "Buenas noches, luna.",
+      ar: "ليلة سعيدة يا قمر.",
+      ru: "Спокойной ночи, луна.",
+    },
+  });
   at(tCuckoo, { sound: () => playChimeNote(3) });
-  at(tStar, { sound: () => playChimeNote(2), say: { de: "Gute Nacht, Stern." } });
-  at(tSheep, { sound: () => playChimeNote(0), say: { de: "Gute Nacht, Schäfchen. Alle schlafen." } });
+  at(tStar, {
+    sound: () => playChimeNote(2),
+    say: {
+      de: "Gute Nacht, Stern.",
+      en: "Good night, star.",
+      zh: "晚安，星星。",
+      hi: "शुभ रात्रि, तारे।",
+      es: "Buenas noches, estrella.",
+      ar: "ليلة سعيدة يا نجمة.",
+      ru: "Спокойной ночи, звёздочка.",
+    },
+  });
+  at(tSheep, {
+    sound: () => playChimeNote(0),
+    say: {
+      de: "Gute Nacht, Schäfchen. Alle schlafen.",
+      en: "Good night, little sheep. Everyone is asleep.",
+      zh: "晚安，小绵羊。大家都睡着啦。",
+      hi: "शुभ रात्रि, नन्ही भेड़। सब सो रहे हैं।",
+      es: "Buenas noches, ovejita. Todos duermen.",
+      ar: "ليلة سعيدة يا خروف. الجميع نائمون.",
+      ru: "Спокойной ночи, барашек. Все спят.",
+    },
+  });
   at(tDone, { done: true });
 
   /** How far asleep each one is (0 awake, 1 eyes shut). */

@@ -55,8 +55,28 @@ export function PlanGallery({ selected, onPick, blank }: { selected?: string; on
             <span className="rw-thumb rw-thumb-blank" aria-hidden>
               ✏️
             </span>
-            <span className="rw-tpl-name">{t({ de: "Leer anfangen" })}</span>
-            <span className="rw-tpl-hint">{t({ de: "Alle Bilder selbst aussuchen" })}</span>
+            <span className="rw-tpl-name">
+              {t({
+                de: "Leer anfangen",
+                en: "Start blank",
+                zh: "从空白开始",
+                hi: "खाली से शुरू करें",
+                es: "Empezar en blanco",
+                ar: "البدء من الصفر",
+                ru: "Начать с чистого листа",
+              })}
+            </span>
+            <span className="rw-tpl-hint">
+              {t({
+                de: "Alle Bilder selbst aussuchen",
+                en: "Choose all the pictures yourself",
+                zh: "所有图片自己挑选",
+                hi: "सभी तस्वीरें खुद चुनें",
+                es: "Elegir usted todas las imágenes",
+                ar: "اختاروا كل الصور بأنفسكم",
+                ru: "Выбрать все картинки самим",
+              })}
+            </span>
           </button>
         </li>
       )}

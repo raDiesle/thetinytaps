@@ -49,7 +49,7 @@ export function PlayOptions({ children }: { children: ReactNode }) {
         >
           <section className="settings">{children}</section>
           <button type="button" className="play-options-close" onClick={() => setOpen(false)}>
-            ▶ {t({ de: "Weiter spielen" })}
+            ▶ {t({ de: "Weiter spielen", en: "Keep playing", zh: "继续玩", hi: "खेलते रहें", es: "Seguir jugando", ar: "متابعة اللعب", ru: "Играть дальше" })}
           </button>
         </div>
       )}

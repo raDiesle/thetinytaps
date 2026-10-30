@@ -197,7 +197,15 @@ export function buildBath() {
   /* Full: the foam spills over the rim, a puddle spreads on the floor. */
   at(tFull, { sound: playSplash });
   at(tFull + 0.3, {
-    say: { de: "Oh! Die Wanne läuft über!" },
+    say: {
+      de: "Oh! Die Wanne läuft über!",
+      en: "Oh! The tub is overflowing!",
+      zh: "哎呀！浴缸的水满出来啦！",
+      hi: "अरे! टब से पानी बह रहा है!",
+      es: "¡Oh! ¡La bañera se desborda!",
+      ar: "أوه! الحوض يفيض!",
+      ru: "Ой! Ванна переливается!",
+    },
   });
   /** How far the overflow has got: 0 to 1. */
   const spill = (t: number) => easeOut(seg(t, tFull, tFull + 1.6));
@@ -332,7 +340,17 @@ export function buildBath() {
   at(tStop + 0.1, { sound: playWhale });
   at(tSpurt, { sound: playPuff });
   at(tFountain, { sound: playSplash });
-  at(tFountain + 0.1, { say: { de: "Der Wal spritzt!" } });
+  at(tFountain + 0.1, {
+    say: {
+      de: "Der Wal spritzt!",
+      en: "The whale squirts!",
+      zh: "鲸鱼喷水啦！",
+      hi: "व्हेल पानी उछालती है!",
+      es: "¡La ballena echa agua!",
+      ar: "الحوت يرشّ الماء!",
+      ru: "Кит брызгается!",
+    },
+  });
 
   /** The whale: its middle on the floor, its tilt and bounce while it walks, how awake it is, its swell and its key's turn. */
   const whaleAt = (t: number) => {
@@ -442,7 +460,17 @@ export function buildBath() {
   const tDone = tLast + 3.2;
   at(tLast + 0.15, { sound: playPop });
   at(tLast + 0.4, { sound: playTwinkle });
-  at(tLast + 0.9, { say: { de: "Seifenblasen bis zur Lampe!" } });
+  at(tLast + 0.9, {
+    say: {
+      de: "Seifenblasen bis zur Lampe!",
+      en: "Soap bubbles up to the lamp!",
+      zh: "肥皂泡飞到灯那儿啦！",
+      hi: "साबुन के बुलबुले लैंप तक!",
+      es: "¡Burbujas hasta la lámpara!",
+      ar: "فقاعات صابون حتى المصباح!",
+      ru: "Мыльные пузыри до самой лампы!",
+    },
+  });
   at(tDone, { done: true });
   /** The lamp's swing in degrees: a little bump when the cap lands, then a big swing at the last pop, dying away. */
   const lampSwing = (t: number) => {

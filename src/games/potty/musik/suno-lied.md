@@ -212,11 +212,13 @@ Title:
 Сижу на горшочке
 ```
 
-## English (`en`, written 27 Oct 2026)
+## English (`en`, written 27 Oct 2026; made 30 Oct 2026 → `musik-toepfchen-warten-en.mp3`)
 
 The German song in American English, verse for verse, same tempo, key and instruments. „Mommy“ and „Daddy“,
 „diaper“, „pee-pee“ and „poo-poo“ as American parents say to toddlers; the shout-back answers are „Me!“. Not yet
-read by a native speaker. English is not an app language yet (`APP_LANGUAGES`), so the song waits until it is.
+read by a native speaker.
+Suno sang it at 98.7 BPM with a one-bar intro and a few bars of outro, steady to the end; Whisper heard every line
+in order, but smeared „I'm“ over the intro (its words from 0.1 s, sung from 2.3 s).
 
 Lyrics:
 
@@ -316,7 +318,7 @@ The German song in neutral Spanish, verse for verse, same tempo, key and instrum
 though Mexico says „bacinica“), „pañal“, „pipí“ and „caca“ as parents say to toddlers; the shout-back answers are
 „¡Yo!“. Present tense and nothing that changes for boy or girl: no „sentado/sentada“, „listo/lista“, „solito/solita“
 („espero con calma“, „ya soy grande“ instead). „¡Adiós!“ is waving it off when flushing, as toddlers do. Not yet read
-by a native speaker. Spanish is not an app language yet (`APP_LANGUAGES`), so the song waits until it is.
+by a native speaker.
 Suno sang it at about 101 BPM (99.6 at the start, 101.7 at the end), with a 4-bar bell intro, and after the last
 chorus a bell interlude and the last verse once more; Whisper heard every line in order, but smeared the first line
 over the intro (its words from 0.1 s, sung from 9.7 s).
@@ -411,4 +413,303 @@ Title:
 
 ```text
 Esperando en el orinal
+```
+
+## 中文 (`zh`, written 30 Oct 2026)
+
+The German song in Mandarin, verse for verse, same tempo, key and instruments. „小马桶“ for the potty, „尿不湿“ for the
+diaper, „尿尿“ and „便便“ as in the game; the shout-back answers are „我！“. Nothing changes for boy or girl in Chinese
+anyway. Flushing is „冲一冲“, never with „水“ (the bubble's water). Rhymes loosely, as Chinese children's songs do. Not
+yet read by a native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 100 BPM, steady, bouncy]
+
+[Verse 1 – ukulele, woodblock ticking]
+我坐在小马桶上，
+尿不湿已经拿掉！
+我长大了，我会了，
+坐得稳稳真正好！
+
+[Chorus – glockenspiel joins]
+滴答，滴答，我们等，
+时间还很多。
+尿尿还是便便——
+很快就来喔！
+
+[Verse 2 – ukulele, light shaker]
+妈妈去上大马桶，
+爸爸也一样！
+我有我的小马桶——
+真是棒棒棒！
+
+[Chorus – glockenspiel]
+滴答，滴答，我们等，
+时间还很多。
+尿尿还是便便——
+很快就来喔！
+
+[Verse 3 – playful, kazoo answers]
+小熊还穿尿不湿，
+它还那么小。
+我会说"我要上厕所"，
+自己说，多骄傲！
+
+[Chorus – glockenspiel]
+滴答，滴答，我们等，
+时间还很多。
+尿尿还是便便——
+很快就来喔！
+
+[Bridge – call and response, the same voice shouts back, woodblock]
+谁不穿尿不湿？（我！）
+谁坐小马桶？（我！）
+谁在耐心等？（我！）
+谁长得这么高？（我！）
+
+[Verse 4 – softer, calm]
+有时候很快，
+有时候很慢。
+我安安静静坐着，
+时钟滴答转。
+
+[Chorus – glockenspiel]
+滴答，滴答，我们等，
+时间还很多。
+尿尿还是便便——
+很快就来喔！
+
+[Verse 5 – bouncy again, kazoo]
+成功啦，成功啦，
+大家拍拍手！
+冲一冲，洗洗手，
+马桶歌儿唱一首！
+
+[Chorus – glockenspiel, everything together]
+滴答，滴答，我们等，
+时间还很多。
+尿尿还是便便——
+很快就来喔！
+
+[Instrumental turnaround – 2 bars, woodblock tick-tock, leads back to Verse 1]
+```
+
+Style of Music:
+
+```text
+playful cheerful Chinese children's song for toddlers, sung in Mandarin Chinese, 100 BPM, F major, one warm cheerful voice singing clearly, slow clear standard Mandarin pronunciation, ukulele, glockenspiel, woodblock ticking like a clock, kazoo answers, light shaker, bouncy and silly but never hectic, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 3:00
+```
+
+Exclude Styles:
+
+```text
+rap, heavy drums, electric guitar, distortion, choir, sad, fast, tempo changes, long intro, fade out, final chord, c-pop ballad, autotune
+```
+
+Title:
+
+```text
+小马桶上慢慢等
+```
+
+## हिन्दी (`hi`, written 30 Oct 2026)
+
+The German song in Hindi, verse for verse, same tempo, key and instruments. „पॉटी-सीट“ for the potty, „डायपर“,
+„सू-सू“ and „पॉटी“ as in the game, „मम्मी“ and „पापा“. Hindi verbs agree with the speaker's gender, so the child is
+never the subject of one: „let's“ and the subjunctive („चलो रुकें“, „फ्लश करें“), „मुझे … आता है“, and „समझदार“, which
+never changes, instead of „बड़ा/बड़ी“. The shout-back answers are „मैं!“, „मुझे!“, „मुझमें!“, as each question asks.
+Not yet read by a native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 100 BPM, steady, bouncy]
+
+[Verse 1 – ukulele, woodblock ticking]
+पॉटी-सीट पर मेरी बारी,
+डायपर अब तो गया!
+अब मैं समझदार हूँ —
+देखो, कितना मज़ा!
+
+[Chorus – glockenspiel joins]
+टिक-टिक, टिक-टिक, चलो रुकें,
+कोई जल्दी नहीं।
+सू-सू हो या पॉटी हो —
+आएगी अभी यहीं!
+
+[Verse 2 – ukulele, light shaker]
+मम्मी बड़े टॉयलेट जाती हैं,
+पापा भी, हाँ जी, हाँ!
+मेरी अपनी पॉटी-सीट है —
+कितनी प्यारी, वाह!
+
+[Chorus – glockenspiel]
+टिक-टिक, टिक-टिक, चलो रुकें,
+कोई जल्दी नहीं।
+सू-सू हो या पॉटी हो —
+आएगी अभी यहीं!
+
+[Verse 3 – playful, kazoo answers]
+टेडी अब भी डायपर पहने,
+वो तो नन्हा-सा है।
+मुझे बोलना आता है:
+"मुझे जाना है!" — हाँ!
+
+[Chorus – glockenspiel]
+टिक-टिक, टिक-टिक, चलो रुकें,
+कोई जल्दी नहीं।
+सू-सू हो या पॉटी हो —
+आएगी अभी यहीं!
+
+[Bridge – call and response, the same voice shouts back, woodblock]
+किसको डायपर नहीं चाहिए? (मुझे!)
+पॉटी-सीट पर कौन है? (मैं!)
+किसमें इतना धीरज है? (मुझमें!)
+कौन समझदार है? (मैं!)
+
+[Verse 4 – softer, calm]
+कभी झट से, कभी धीरे-धीरे —
+कोई बात नहीं।
+आराम से बैठे रहना है,
+घड़ी टिक-टिक करे यहीं।
+
+[Chorus – glockenspiel]
+टिक-टिक, टिक-टिक, चलो रुकें,
+कोई जल्दी नहीं।
+सू-सू हो या पॉटी हो —
+आएगी अभी यहीं!
+
+[Verse 5 – bouncy again, kazoo]
+और जब हो जाए तो,
+सब बजाएँ ताली!
+फ्लश करें, फिर हाथ धोएँ —
+मस्ती है निराली!
+
+[Chorus – glockenspiel, everything together]
+टिक-टिक, टिक-टिक, चलो रुकें,
+कोई जल्दी नहीं।
+सू-सू हो या पॉटी हो —
+आएगी अभी यहीं!
+
+[Instrumental turnaround – 2 bars, woodblock tick-tock, leads back to Verse 1]
+```
+
+Style of Music:
+
+```text
+playful cheerful children's rhyme for toddlers, sung in Hindi, 100 BPM, F major, one warm cheerful voice singing clearly, slow clear Hindi pronunciation, ukulele, glockenspiel, woodblock ticking like a clock, kazoo answers, light shaker, bouncy and silly but never hectic, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 3:00
+```
+
+Exclude Styles:
+
+```text
+rap, heavy drums, electric guitar, distortion, choir, sad, fast, tempo changes, long intro, fade out, final chord, bollywood, item song, autotune
+```
+
+Title:
+
+```text
+पॉटी-सीट पर इंतज़ार
+```
+
+## العربية (`ar`, written 30 Oct 2026)
+
+The German song in simple Modern Standard Arabic, verse for verse, same tempo, key and instruments. „النونيّة“ for the
+potty, „حفّاض“, „بيبي“ and „كاكا“ as in the game, „ماما“ and „بابا“, „دبدوبي“ for the teddy. Nothing that changes for boy
+or girl: first-person verbs („أجلسُ“, „أكبرُ“, „أقولُ“) and „we“ („ننتظرُ“, „نغسلُ“), never an adjective about the child
+(no „كبير/كبيرة“, „جالس/جالسة“). The shout-back answers are „أنا!“. Flushing is „نشدّ السيفون“, never „ماء“ (the bubble's
+water). Not yet read by a native speaker.
+
+Lyrics:
+
+```text
+[Tempo: 100 BPM, steady, bouncy]
+
+[Verse 1 – ukulele, woodblock ticking]
+أجلسُ على النونيّة،
+بلا حفّاضٍ، يا سلام!
+أكبرُ كلَّ يومٍ،
+وأعرفُ هذا تمام!
+
+[Chorus – glockenspiel joins]
+تِك تَك، ننتظرُ،
+عندنا وقتٌ كثير.
+بيبي أو كاكا —
+سيأتي بعد قليل!
+
+[Verse 2 – ukulele, light shaker]
+ماما تجلسُ على المرحاض،
+وبابا مثلها، نعم!
+وأنا لي نونيّتي —
+أجملُ شيءٍ في العالم!
+
+[Chorus – glockenspiel]
+تِك تَك، ننتظرُ،
+عندنا وقتٌ كثير.
+بيبي أو كاكا —
+سيأتي بعد قليل!
+
+[Verse 3 – playful, kazoo answers]
+دبدوبي يلبسُ حفّاضًا،
+فما زالَ صغير.
+وأنا أقولُ: «أحتاجُ الحمّام!» —
+وهذا شيءٌ كبير!
+
+[Chorus – glockenspiel]
+تِك تَك، ننتظرُ،
+عندنا وقتٌ كثير.
+بيبي أو كاكا —
+سيأتي بعد قليل!
+
+[Bridge – call and response, the same voice shouts back, woodblock]
+مَن بلا حفّاض؟ (أنا!)
+مَن على النونيّة؟ (أنا!)
+مَن ينتظرُ بهدوء؟ (أنا!)
+مَن يكبرُ كلَّ يوم؟ (أنا!)
+
+[Verse 4 – softer, calm]
+أحيانًا يأتي سريعًا،
+وأحيانًا يطول.
+أجلسُ هنا بهدوءٍ،
+والساعةُ «تِك تَك» تقول.
+
+[Chorus – glockenspiel]
+تِك تَك، ننتظرُ،
+عندنا وقتٌ كثير.
+بيبي أو كاكا —
+سيأتي بعد قليل!
+
+[Verse 5 – bouncy again, kazoo]
+وعندما ينجحُ الأمرُ،
+يصفّقُ الجميع!
+نشدُّ السيفون ونغسلُ أيدينا —
+يا له من شيءٍ بديع!
+
+[Chorus – glockenspiel, everything together]
+تِك تَك، ننتظرُ،
+عندنا وقتٌ كثير.
+بيبي أو كاكا —
+سيأتي بعد قليل!
+
+[Instrumental turnaround – 2 bars, woodblock tick-tock, leads back to Verse 1]
+```
+
+Style of Music:
+
+```text
+playful cheerful Arabic children's song for toddlers, sung in Modern Standard Arabic, 100 BPM, F major, one warm cheerful voice singing clearly, slow clear fusha pronunciation, ukulele, glockenspiel, woodblock ticking like a clock, kazoo answers, light shaker, bouncy and silly but never hectic, simple repeating melody, same tempo all the way through, no intro, no fade out, no big ending, about 3:00
+```
+
+Exclude Styles:
+
+```text
+rap, heavy drums, electric guitar, distortion, choir, sad, fast, tempo changes, long intro, fade out, final chord, arabic pop, autotune, heavy reverb
+```
+
+Title:
+
+```text
+أنتظرُ على النونيّة
 ```
