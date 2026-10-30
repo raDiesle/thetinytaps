@@ -200,7 +200,10 @@ In a fresh worktree run `bun install` first.
   a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them. The way back from a menu is a big yellow
   round arrow without words (its target only as tooltip and read out, `MenuTop`), right next to the title on its left, close to the
   cards – never far off in the screen's corner, where grown-ups on a big monitor didn't find it (biggest on a computer). A
-  menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right.
+  menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right. In the
+  book look the way back is instead the page's turned-up corner in the top right (`PageCorner`, user decision, October
+  2026) – where a reader turns a page back, so it is found there – with the fullscreen button left of it and the round
+  arrow hidden (`MenuTop.test.ts`); nothing else goes into that corner.
 - No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); a category of a few games that stand apart (`onHome`: „Weitere“) has no card and no page of its
   own, its games stand right on the home page on a frame named after it, like a game's sorts below; and variants of one way to play (which words, how long, whole word or first letter) are
@@ -306,15 +309,21 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   whose cards open lazy pages does the same.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
   brings back the old toy-block look, `src/lib/look.ts`): a cover to open on the first visit to the home page
-  (`BookCover`, its picture of Tapsi's family and the little bear's in `src/components/bilder/`), the home page as the
+  (`BookCover`, shown once per visit – `sessionStorage` – and only on the home page), the home page as the
   contents page with page numbers, paper and softened colours, and the game's picture inside the page's paper margin
   (`.book-frame`). All of it is CSS under `:root[data-look="book"]` in `src/styles/book.css`; games don't style for it.
   It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
-  drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close.
+  drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
+  open page lies on the book's cloth-covered board, lit from above. The cover's picture (`bilder/buch-cover.webp`) shows
+  one family of each: a fox parent with a fox child and a bear parent with a bear child, one of the children a boy and
+  one a girl – never a third grown-up or a child too many (user feedback, October 2026).
   Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
   any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
-  one. A page takes its time to turn, as a book's does (`TURN_SECONDS`, at least a second, its sound landing with it –
-  `look.test.ts`): corner first, dimming as it turns, its shadow lifting off the page beneath; never a quick flick.
+  one. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
+  with it – `look.test.ts`): its corner lifts first, the page bends and catches the light, then darkens as it turns away,
+  and its shadow slides across the page beneath with its edge; never a quick flick, never a stiff board. A lifted page
+  must not swell past the screen (keep the eye far: `perspective(320vw)`), and its keyframes run `linear` – an easing
+  restarts at every keyframe, so the page would stop and start.
   Where the page has no room for the families beside the cards (below 1400 × 640), they sit in the menu's top row
   instead of the sun and clouds (`BookFamily`, in `MenuHead` and the home page's `.home-top`), shrinking into the room
   left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into

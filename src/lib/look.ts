@@ -36,7 +36,7 @@ export function applyLook() {
 export const isBookLook = () => document.documentElement.dataset.look === "book";
 
 /** How long a page takes to turn: as long as `--turn-time` in `book.css` (`look.test.ts` checks), so its sound lands with it. */
-export const TURN_SECONDS = 1.2;
+export const TURN_SECONDS = 1.6;
 
 /** Which way a page turns: `forward` over to the left (on into a menu or a game), `back` from the left. */
 export type TurnDirection = "forward" | "back";

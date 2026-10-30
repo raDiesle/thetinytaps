@@ -13,9 +13,10 @@ test("a page turns as long as its sound says", () => {
   expect(seconds(css, /--turn-time:\s*([\d.]+)s/)).toBe(TURN_SECONDS);
 });
 
-// A quick flick didn't look like a book's page (user feedback, October 2026): a page takes its time to turn.
+// A quick flick didn't look like a book's page, and 1.2 s was still too quick (user feedback, October 2026): a page
+// takes its time to turn, as a grown-up turns it for a child.
 test("a page turns slowly enough to be seen", () => {
-  expect(TURN_SECONDS).toBeGreaterThanOrEqual(1);
+  expect(TURN_SECONDS).toBeGreaterThanOrEqual(1.5);
 });
 
 // The cover's screen goes away when its animation ends, and its board lands with the sound.

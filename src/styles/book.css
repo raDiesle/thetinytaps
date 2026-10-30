@@ -28,8 +28,15 @@
   --sky-bottom: var(--paper);
   --outline: 2px solid var(--ink);
   --lift: 0 1px 0 #3d304533, 0 8px 16px -8px #5a3c1f80;
-  /* How far a menu's page lies inside the screen, the table showing round it. */
-  --page-inset: 12px 22px 16px 12px;
+  /* How far a menu's page lies inside the screen, the book's board and the table showing round it. */
+  --page-top: 16px;
+  --page-right: 30px;
+  --page-inset: var(--page-top) var(--page-right) 26px 14px;
+  /* The board of the open book's cover reaching out round its pages: how far, and where it lies. */
+  --board: 6px 5px 0 10px;
+  --board-edge: 7px 6px 0 11px;
+  /* The page's turned-up corner in the top right, the way back (PageCorner). */
+  --corner: 72px;
   /* Fine speckles of paper fibres, and a large soft mottling like watercolour paper. */
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .26 0 0 0 0 .14 .7 0 0 0 -.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --paper-mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .42 0 0 0 0 .22 .5 0 0 0 -.16'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
@@ -53,7 +60,18 @@
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root[data-look="book"] {
-    --page-inset: 6px 12px 8px 6px;
+    --page-top: 8px;
+    --page-right: 16px;
+    --page-inset: var(--page-top) var(--page-right) 14px 6px;
+    --board: 5px 4px 0 6px;
+    --board-edge: 6px 5px 0 7px;
+    --corner: 58px;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  :root[data-look="book"] {
+    --corner: 92px;
   }
 }
 
@@ -63,7 +81,10 @@
   inset: var(--page-inset);
   border-radius: 4px 12px 12px 4px;
   background: var(--paper-mottle), linear-gradient(var(--sky-top), var(--sky-bottom) 72%);
-  /* The pages under this one, showing at the right and bottom edge, and the book's shadow on the table. */
+  /*
+   * The pages under this one, showing at the right and bottom edge; the cloth-covered board of the open book reaching
+   * out round them, with its darker edge; and the book's shadow on the table.
+   */
   box-shadow:
     1px 1px 0 var(--paper-edge),
     3px 2px 0 var(--paper),
@@ -72,7 +93,10 @@
     7px 5px 0 var(--paper-edge),
     9px 6px 0 #efe4ca,
     10px 8px 0 #c9b68f,
-    14px 16px 26px #0000008c;
+    11px 9px 3px #3d304559,
+    var(--board) var(--cloth),
+    var(--board-edge) #1d4554,
+    18px 22px 30px 8px #000000a6;
 }
 
 /* Paper grain over the whole picture, and the fold of the book's spine down the left edge. */
@@ -81,7 +105,13 @@
   position: absolute;
   inset: 0;
   z-index: 5;
-  background: linear-gradient(90deg, #00000038, #00000012 2.5%, #ffffff26 3.5%, #0000 6%), var(--paper-grain);
+  /*
+   * Also the lamp's light on the page, and the page curving down a little at its outer edges, as paper that is bound
+   * never lies quite flat.
+   */
+  background:
+    linear-gradient(90deg, #00000038, #00000012 2.5%, #ffffff26 3.5%, #0000 6%), linear-gradient(270deg, #3d304526, #0000 3%),
+    linear-gradient(#0000 96%, #3d30451f), radial-gradient(ellipse 110% 90% at 55% 28%, #fff8e61f, #0000 65%), var(--paper-grain);
 }
 
 :root[data-look="book"] .hill-back {
@@ -354,76 +384,108 @@
 /* ----- Turning the page between menus (a view transition) ----- */
 
 /*
- * Slow enough to see the page turn as a book's page does: it lifts first at its outer corner, bends and turns over to
- * the left, dimming as it turns away from the lamp, while its shadow on the page beneath lifts away with it.
- * As long as TURN_SECONDS in look.ts, which times the sound of it.
+ * Slow, as a grown-up turns a picture book's page for a child: a hand takes the bottom corner and lifts it, the page
+ * bends as it rises (its corner leading, the spine following), catches the lamp's light, swings over and darkens as it
+ * stands up and turns away; its shadow lies on the page beneath and slides along with its edge, the page beneath
+ * coming into the light as it goes. As long as TURN_SECONDS in look.ts, which times the sound of it.
  */
 :root[data-look="book"] {
-  --turn-time: 1.2s;
+  --turn-time: 1.6s;
 }
 
+/* What shows through the page beneath where the turning page's shadow lies on it. */
 :root[data-look="book"]::view-transition-group(root) {
   animation-duration: var(--turn-time);
+  background: #24140a;
 }
 
 /* Forward: the old page lifts at its right edge and turns over to the left, the new one lies under it. */
 :root[data-look="book"][data-turn="forward"]::view-transition-old(root) {
   z-index: 2;
   transform-origin: left center;
-  animation: book-turn-away var(--turn-time) cubic-bezier(0.42, 0, 0.5, 1) both;
+  animation: book-turn-away var(--turn-time) linear both;
 }
 
 :root[data-look="book"][data-turn="forward"]::view-transition-new(root) {
   z-index: 1;
-  animation: book-turn-under var(--turn-time) ease-in both;
+  mask-image: linear-gradient(90deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
+  mask-size: 250% 100%;
+  mask-repeat: no-repeat;
+  animation: book-turn-under var(--turn-time) linear both;
 }
 
-/* Back: the page turns back from the left over the old one, its shadow falling on it as it comes. */
+/* Back: the page turns back from the left over the old one, its shadow coming in ahead of it. */
 :root[data-look="book"][data-turn="back"]::view-transition-new(root) {
   z-index: 2;
   transform-origin: left center;
-  animation: book-turn-away var(--turn-time) cubic-bezier(0.5, 0, 0.58, 1) reverse both;
+  animation: book-turn-away var(--turn-time) linear reverse both;
 }
 
 :root[data-look="book"][data-turn="back"]::view-transition-old(root) {
   z-index: 1;
-  animation: book-turn-under var(--turn-time) ease-out reverse both;
+  mask-image: linear-gradient(90deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
+  mask-size: 250% 100%;
+  mask-repeat: no-repeat;
+  animation: book-turn-under var(--turn-time) linear reverse both;
 }
 
 /*
- * The turning page: a turn round a slightly slanted axis, so the bottom corner (where a finger takes a page) leads,
- * catching the light as it lifts and darkening as it stands up; the shadow it throws to the right goes with it.
+ * The turning page: a turn round a slanted axis, so the bottom corner leads, and a little shear, so the page bends
+ * instead of swinging like a board; slow while the hand lifts it, quick over the top, and off over the spine. The
+ * keyframes set the pace, so the animation runs linear (an easing would stop and start again at every keyframe), and
+ * the eye is far above the page (three screens' width), or a lifted page would swell past the screen's edge.
  */
 @keyframes book-turn-away {
   0% {
-    transform: perspective(2200px) rotate3d(0, 1, 0, 0deg);
+    transform: perspective(320vw) rotate3d(0, 1, 0, 0deg);
     filter: brightness(1);
-    box-shadow: 0 0 0 #0000;
   }
-  22% {
-    transform: perspective(2200px) rotate3d(-0.14, 1, 0, -16deg);
-    filter: brightness(1.04);
-    box-shadow: 18px 0 40px #2a180c40;
+  12% {
+    transform: perspective(320vw) rotate3d(-0.3, 1, 0, -5deg) skewY(-0.6deg);
+    filter: brightness(1.02);
   }
-  65% {
-    transform: perspective(2200px) rotate3d(-0.08, 1, 0, -64deg);
-    filter: brightness(0.86);
-    box-shadow: 40px 0 70px #2a180c59;
+  30% {
+    transform: perspective(320vw) rotate3d(-0.22, 1, 0, -20deg) skewY(-1.6deg);
+    filter: brightness(1.06);
+  }
+  55% {
+    transform: perspective(320vw) rotate3d(-0.12, 1, 0, -48deg) skewY(-1.8deg);
+    filter: brightness(0.92);
+  }
+  78% {
+    transform: perspective(320vw) rotate3d(-0.05, 1, 0, -72deg) skewY(-1deg);
+    filter: brightness(0.74);
   }
   100% {
-    transform: perspective(2200px) rotate3d(0, 1, 0, -92deg);
-    filter: brightness(0.62);
-    box-shadow: 60px 0 90px #2a180c00;
+    transform: perspective(320vw) rotate3d(0, 1, 0, -92deg);
+    filter: brightness(0.6);
   }
 }
 
-/* The page beneath: in the turning page's shadow at first, coming into the light as it lifts away. */
+/*
+ * The page beneath: dim under the lifting page at first, and the soft shadow band of the turning page's edge sliding
+ * from its right edge to the spine (`mask-position` moves the band, which lets the dark of the group show through).
+ */
 @keyframes book-turn-under {
   0% {
-    filter: brightness(0.78);
+    filter: brightness(0.84);
+    mask-position: 0% 0;
+  }
+  30% {
+    filter: brightness(0.86);
+    mask-position: 10% 0;
+  }
+  55% {
+    filter: brightness(0.92);
+    mask-position: 22% 0;
+  }
+  78% {
+    filter: brightness(0.98);
+    mask-position: 50% 0;
   }
   100% {
     filter: brightness(1);
+    mask-position: 100% 0;
   }
 }
 
@@ -431,6 +493,104 @@
   :root[data-look="book"]::view-transition-old(root),
   :root[data-look="book"]::view-transition-new(root) {
     animation: none;
+  }
+}
+
+/* ----- The way back: the page's turned-up corner in its top right (PageCorner in MenuTop.tsx) ----- */
+
+.page-corner {
+  display: none;
+}
+
+:root[data-look="book"] .page-corner {
+  display: block;
+  position: fixed;
+  top: var(--page-top);
+  right: var(--page-right);
+  z-index: 20;
+  width: var(--corner);
+  height: var(--corner);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* A finger or the mouse on it lifts the corner a little more, inviting the turn. */
+:root[data-look="book"] .page-corner svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 100% 0;
+  transition: scale 0.25s ease-out;
+  filter: drop-shadow(-2px 3px 3px #3d304540);
+}
+
+:root[data-look="book"] .page-corner:hover svg {
+  scale: 1.12;
+}
+
+:root[data-look="book"] .page-corner:active svg {
+  scale: 1.25;
+}
+
+:root[data-look="book"] .page-corner:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+.page-corner-shadow {
+  fill: #3d3045;
+  opacity: 0.2;
+  transform: translate(-3px, 6px);
+}
+
+.page-corner-back {
+  stroke: #3d304573;
+  stroke-width: 1.5;
+}
+
+.page-corner-arrow {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+/* The round arrow gives way to the corner; ℹ️ and ⚙️ stay beside the title. */
+:root[data-look="book"] .menu-head .back-link {
+  display: none;
+}
+
+/*
+ * A menu's head keeps clear of the corner: it needs the corner's room at the right edge of the screen, less what the
+ * margin round the menu already leaves there (`--menu-edge`: a home-like page is at most 1040 px wide, centred).
+ */
+:root[data-look="book"] .home {
+  --menu-edge: calc((100vw - min(100vw, 1040px)) / 2 + 20px);
+}
+
+:root[data-look="book"] .start-screen {
+  --menu-edge: 20px;
+}
+
+:root[data-look="book"] .menu-head {
+  margin-right: max(0px, calc(var(--page-right) + var(--corner) + 8px - var(--menu-edge, 20px)));
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"] .home {
+    --menu-edge: calc((100vw - min(100vw, 1040px)) / 2 + 12px);
+  }
+
+  :root[data-look="book"] .start-screen {
+    --menu-edge: 12px;
+  }
+
+  /* A phone's menu shows no title, and without the round arrow its head would fold away, letting the cards slide up
+     under the corner and the fullscreen button: it keeps their height. */
+  :root[data-look="book"] .menu-head {
+    min-height: 44px;
   }
 }
 
