@@ -89,7 +89,6 @@ export function AdventurePlay({
     try {
       player = new StoryPlayer(canvas, story, {
         onLine(text, kind, at) {
-          if (!settingsRef.current.speech) return;
           // A new step starts fresh; within a step, lines wait for each other.
           say(text, language, { queue: kind !== "situation" && !(kind === "instruction" && !story.lines[at].situation) });
         },
@@ -124,7 +123,7 @@ export function AdventurePlay({
       setFailed(true);
       return;
     }
-    if (settings.speech) loadVoice(story, language);
+    loadVoice(story, language);
     playerRef.current = player;
     // For trying out scenes in the browser console: __adventure.seek(90)
     if (!PROD) Object.assign(window, { __adventure: player });

@@ -154,7 +154,11 @@ In a fresh worktree run `bun install` first.
 - Silent and still until the child acts: no sound without a tap/hover/key, no idle
   animation unless the parent turns it on (`document.getAnimations()` is empty after load). In a game that plays
   at once (`startMode`), the tap on its card is that act: it may start moving and sounding right away.
-- Speech is off by default (`src/lib/common.ts`); sounds are on.
+- Sounds and voice have no switch (user decision, October 2026): sounds always play, and the browser's voice never
+  speaks (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
+  ElevenLabs recording (like Tapsi's lines in Bewegungsabenteuer), which always plays, like a sound; a line without
+  one stays silent. Never add a switch for either again. Recordings are made only when the user asks (see Language).
+  The home page's only option for all games is „🎵 Musik“, one tap on its own button, never a menu.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into
   the room left between them, instead of a fixed box with empty space round it. Look at both sizes in the preview.
@@ -238,11 +242,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   to a game that has none, and when touching a game that still has them, prefer removing them (keep the default
   behaviour, delete the code for the other). Where one is still kept, `info` says what the game is and how it is played (also
   keys and tips for grown-ups), `settings` holds only options and the notes that explain them. A game adds no own switch for what the home page already sets for all games
-  (Vorlesen, Töne, Musik, Sprache), nor a choice for what the game can tell by itself (morning or evening by the clock).
+  (Musik, Sprache), nor a switch for sounds or voice, nor a choice for what the game can tell by itself (morning or evening by the clock).
   A song that is the game itself (the Zahnputzlied sings the steps) plays even with Musik off and sings in the app language.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
-  defaults (so new fields need no migration); `speech`/`sounds` come from the shared
-  options on the home page. Bump the key's `.vN` only when old values would break.
+  defaults (so new fields need no migration); `speech`/`sounds` are filled in from the
+  shared options (always off and on). Bump the key's `.vN` only when old values would break.
 - Sounds: `src/lib/sfx/` synthesizes everything (Web Audio), one file per topic (animals, vehicles, music, home; helpers in `core.ts`), all imported from `@/lib/sfx`; `playRecorded(name, fallback)`
   plays `src/lib/sounds/<name>.mp3` when there is one (CC0, source in its README). A new file replaces the sound at every
   `playRecorded(name, …)` in every game, so grep the name first and pick a new one unless all of them should change.

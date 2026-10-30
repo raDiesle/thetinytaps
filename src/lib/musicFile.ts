@@ -1,7 +1,6 @@
 import songFiles from "./musik/*.mp3?glob";
-import { COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS } from "@/lib/common";
+import { loadCommon } from "@/lib/common";
 import { afterLoad } from "@/lib/pwa";
-import { loadStored } from "@/lib/storage";
 
 // Downloading the background song (musik/musik-hintergrund.mp3, see the README
 // there), apart from playing it (backgroundMusic.ts) so the start of the site
@@ -31,5 +30,5 @@ export function downloadMusic() {
  * A game started before that asks for it itself (downloadMusic).
  */
 export function downloadMusicIfOn() {
-  if (loadStored(COMMON_SETTINGS_KEY, DEFAULT_COMMON_SETTINGS).music) afterLoad(() => void downloadMusic());
+  if (loadCommon().music) afterLoad(() => void downloadMusic());
 }

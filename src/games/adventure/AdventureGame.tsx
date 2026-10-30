@@ -17,7 +17,7 @@ const STORIES: { id: AdventureStoryId; emoji: string; story: Story }[] = [
   { id: "wolkenreise", emoji: "☁️", story: CLOUD_TRIP },
 ];
 
-/** The start screen: no options of its own, read aloud, sounds, music and Tapsi's language come from the home page. */
+/** The start screen: no options of its own, music and Tapsi's language come from the home page. */
 export function AdventureGame() {
   const [settings, update] = useStoredSettings(ADVENTURE_SETTINGS_KEY, DEFAULT_ADVENTURE_SETTINGS);
   const [common] = useCommonSettings();
@@ -112,13 +112,7 @@ export function AdventureGame() {
           </p>
           <p>
             {t({
-              de: "Ob Tapsi spricht, Töne und Musik stellt ⚙️ auf der Startseite für alle Spiele ein, die Sprache 🌐.",
-              en: "Whether Tapsi talks, sounds and music are set with ⚙️ on the home page for all games, the language with 🌐.",
-              zh: "塔普西是否说话、声音和音乐，都在首页的 ⚙️ 里为所有游戏统一设置，语言用 🌐。",
-              hi: "टैप्सी बोले या नहीं, आवाज़ें और संगीत मुख्य पेज पर ⚙️ से सभी खेलों के लिए तय होते हैं, भाषा 🌐 से।",
-              es: "Si Tapsi habla, los sonidos y la música se ajustan con ⚙️ en la página de inicio para todos los juegos; el idioma, con 🌐.",
-              ar: "هل يتكلم تابسي، والأصوات والموسيقى، كلها تُضبط من ⚙️ في الصفحة الرئيسية لجميع الألعاب، واللغة من 🌐.",
-              ru: "Говорит ли Тапси, звуки и музыку настраивает ⚙️ на главной странице для всех игр, язык – 🌐.",
+              de: "Tapsi spricht immer. Die Musik stellt 🎵 auf der Startseite für alle Spiele ein, die Sprache 🌐.",
             })}
             {language.id !== app.id &&
               t({

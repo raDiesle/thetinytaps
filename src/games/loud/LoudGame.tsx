@@ -126,17 +126,6 @@ export function LoudGame() {
               ru: "Игра только измеряет, насколько сейчас громко, — ничего не записывается, не сохраняется и не отправляется. Нажимать тоже можно: короткое нажатие — короткий порыв ветра, если держать палец, ветер дует дальше.",
             })}
           </p>
-          <p>
-            {t({
-              de: "Mit „Vorlesen“ auf der Startseite sprechen die Tiere („Roaaar! Ich bin der Löwe!“) und laden zum Rufen und Pusten ein.",
-              en: "With “Read aloud” on the home page, the animals talk (“Roaaar! I'm the lion!”) and invite the child to shout and blow.",
-              zh: "在首页打开“朗读”后，动物们会说话（“嗷呜！我是狮子！”），还会邀请孩子喊和吹。",
-              hi: "मुख्य पेज पर “पढ़कर सुनाओ” चालू हो तो जानवर बोलते हैं (“गर्र्र! मैं शेर हूँ!”) और चिल्लाने व फूँकने को बुलाते हैं।",
-              es: "Con «Leer en voz alta» en la página de inicio, los animales hablan («¡Grrraaau! ¡Soy el león!») e invitan a gritar y soplar.",
-              ar: "عند تشغيل «القراءة بصوت عالٍ» في الصفحة الرئيسية تتكلم الحيوانات («غرررر! أنا الأسد!») وتدعو إلى الصراخ والنفخ.",
-              ru: "Если на главной странице включено «Читать вслух», звери говорят («Р-р-р! Я лев!») и зовут кричать и дуть.",
-            })}
-          </p>
         </>
       }
       settings={

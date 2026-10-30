@@ -62,7 +62,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/abenteuer/",
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme liest die Browserstimme. Eine Geschichte ohne Übersetzung spricht Deutsch.",
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch. Der Satz zu 🎵 und 🌐 in „Über das Spiel“ nur auf Deutsch (Oktober 2026).",
     parts: [
       {
         label: "🏝️ Die Schatzinsel",
@@ -79,7 +79,7 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/gefuehle/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
+    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten. „Erwachsene erzählen die Geschichte anhand der Bilder.“ in „Über das Spiel“ nur auf Deutsch (Oktober 2026).",
   },
   {
     href: "/kettenreaktion/",
