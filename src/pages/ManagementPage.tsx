@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Link } from "react-router";
 import { MenuTop } from "@/components/MenuTop";
 import { PicturePromptReview } from "@/components/PicturePromptReview";
@@ -66,10 +66,14 @@ const DEFAULTS = {
 const CONTENTS: { id: string; label: string }[] = [
   { id: "uebersicht", label: "📊 Überblick" },
   { id: "sprachen", label: "🌍 Sprachen" },
+  { id: "stimmen", label: "🎙️ Stimmen" },
   { id: "recherchen", label: "🔍 Recherchen" },
   { id: "bilder", label: "🎨 Bildvorschläge" },
   { id: "ideas-list", label: "💡 Alle Ideen" },
 ];
+
+/** The lines still to record: loaded after the page, since it reads the data of every game. */
+const VoiceList = lazy(() => import("@/components/VoiceList").then((module) => ({ default: module.VoiceList })));
 
 /**
  * Hidden page for grown-ups that collects everything that helps decide what to
@@ -182,6 +186,13 @@ export function ManagementPage() {
       </section>
 
       <Languages />
+
+      <section id="stimmen" className="ideas-panel">
+        <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
+        <Suspense fallback={<p className="ideas-hint">Die Sätze aller Spiele werden gelesen …</p>}>
+          <VoiceList />
+        </Suspense>
+      </section>
 
       <section id="recherchen" className="ideas-research">
         <h2>🔍 Recherchen</h2>

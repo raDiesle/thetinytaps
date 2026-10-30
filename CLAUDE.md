@@ -158,6 +158,9 @@ In a fresh worktree run `bun install` first.
   speaks (`FIXED` in `src/lib/common.ts`) – it sounds too poor for a child. What a game says comes as a high-quality
   ElevenLabs recording (like Tapsi's lines in Bewegungsabenteuer), which always plays, like a sound; a line without
   one stays silent. Never add a switch for either again. Recordings are made only when the user asks (see Language).
+  What still waits for its recording is listed on `/management/` (🎙️ Stimmen), read from the games' own data by
+  `src/content/voiceLines.ts`: a game that says something new adds where it comes from there, never a call of the
+  browser's voice (`voiceLines.test.ts` fails on a `speak()` that the always-off read aloud option doesn't guard).
   The home page's only option for all games is „🎵 Musik“, one tap on its own button, never a menu.
 - The picture is as big as the screen allows, on a phone on its side (844×390) and a tablet (1024×768)
   as well as a computer: let it fill the screen behind headings and controls and zoom what matters into

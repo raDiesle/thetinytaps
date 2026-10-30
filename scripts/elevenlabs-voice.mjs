@@ -2,8 +2,7 @@
 // coach voice for toddlers, one MP3 per line in the story's stimme/ folder
 // (src/games/adventure/stories/<story>/stimme/<hash of the text>.mp3), and the same
 // for every translation of the lines (lines.<language>.ts → stimme/<language>/<language>-<hash>.mp3).
-// The game plays them (src/games/adventure/voice.ts) and falls back to the browser's
-// voice for a line that has no recording.
+// The game plays them (src/games/adventure/voice.ts); a line without a recording stays silent.
 //
 //   bun run voice credits                       credits left this month
 //   bun run voice design ["<description>"]      three voice drafts into .voice-raw/ to listen to
