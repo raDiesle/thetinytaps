@@ -17,6 +17,7 @@ import { Mouth, type MonsterSpot, type MouthAction } from "./mouth";
 import { SUNG_LANGUAGES, sungSteps, useBrushingMusic, useSongLoad } from "./music";
 import type { Cue } from "./cues";
 import { Origin, ORIGIN_CUES, ORIGIN_MS, ORIGIN_RECORDINGS } from "./origin";
+import { Scenes, type SceneKind } from "./scenes";
 import { Prep, PREP_CUES, PREP_MS, PREP_RECORDINGS, TIDY_RECORDINGS } from "./prep";
 import type { TeethSettings } from "./settings";
 import { GRIN_VIEW, STEPS, stepText } from "./steps";
@@ -537,6 +538,9 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
   const mouthBefore = phase <= 0 ? "closed" : STEPS[phase - 1].mouth;
   const mouthMoves = step !== null && step.mouth !== mouthBefore;
   const action: MouthAction | null = step && mouthMoves && brushed - stepStarts[phase] < ACTION_MS ? (step.mouth === "open" ? "open" : "close") : null;
+  /** The picture on: the camera looks from the child's face down to the sink, up into the mirror, and down again to tidy up. */
+  const scene: SceneKind =
+    before === "sweets" || before === "grow" ? "story" : before === "brush" || before === "paste" || ending === "tidy" ? "sink" : "mirror";
   const target = step?.view ?? GRIN_VIEW;
   const view = useGlidingView(target, mouthMoves ? MOUTH_MS : TURN_MS);
 
@@ -655,27 +659,26 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
       {/* Before the picture, so it is there when the picture measures it. */}
       <div className="teeth-room" ref={room} />
       <div className="teeth-stage">
-        {before === "sweets" || before === "grow" ? (
-          <Origin key={round} part={before} daytime={daytime} tickled={tickled} onTickle={tickle} free={room} />
-        ) : before === "brush" || before === "paste" ? (
-          <Prep key={round} part={before} daytime={daytime} free={room} />
-        ) : ending === "tidy" ? (
-          <Prep key={round} part="tidy" daytime={daytime} free={room} />
-        ) : (
-          <Mouth
-            key={round}
-            view={view}
-            zone={step && { surface: step.surface, teeth: step.teeth }}
-            monsters={spots}
-            brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
-            happy={done}
-            daytime={daytime}
-            action={action}
-            paused={paused}
-            free={room}
-            onTickle={tickle}
-          />
-        )}
+        <Scenes id={`${round}-${scene}`} kind={scene} paused={paused}>
+          {scene === "story" ? (
+            <Origin key={round} part={before === "sweets" ? "sweets" : "grow"} daytime={daytime} tickled={tickled} onTickle={tickle} free={room} />
+          ) : scene === "sink" ? (
+            <Prep key={round} part={before === "brush" || before === "paste" ? before : "tidy"} daytime={daytime} free={room} />
+          ) : (
+            <Mouth
+              key={round}
+              view={view}
+              zone={step && { surface: step.surface, teeth: step.teeth }}
+              monsters={spots}
+              brush={step && { stops: inStep.map((m) => ({ tooth: m.tooth, spot: m.spot })), at: brushStop, surface: step.surface, motion: step.motion }}
+              happy={done}
+              daytime={daytime}
+              action={action}
+              free={room}
+              onTickle={tickle}
+            />
+          )}
+        </Scenes>
       </div>
 
       {/* The buttons and the week's new star wait until the brush is put away. */}
@@ -735,7 +738,7 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
                   className={`teeth-segment ${s.surface}${i === phase ? " now" : ""}`}
                   title={`${stepText(s, "title", language).text} · ${stepText(s, "hint", language).text}`}
                 >
-                  <span style={{ width: `${Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i))) * 100}%` }} />
+                  <span style={{ transform: `scaleX(${Math.max(0, Math.min(1, (brushed - stepStarts[i]) / stepLength(i)))})` }} />
                 </span>
               ))}
             </div>

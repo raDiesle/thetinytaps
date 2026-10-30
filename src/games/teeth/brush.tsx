@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, type CSSProperties } from "react";
 import type { Projector, Surface, ToothId, Vec3 } from "./jaw";
 import type { Motion } from "./steps";
 
@@ -104,25 +104,11 @@ function poseFor(anchor: BrushAnchor, surface: Surface, tooth: ToothId): Pose {
   return { at: anchor.at, u: across(forward, into), b: into };
 }
 
-/** One stroke, circle or wipe takes two beats of the song (112 BPM), calm enough to follow along. */
+/** One stroke, circle or wipe takes two beats of the song (112 BPM), calm enough to follow along; `.brush-move` in teeth.css. */
 const STROKE_S = 120 / 112;
-const SCRUB_S = STROKE_S;
-const CIRCLE_S = STROKE_S;
-const WIPE_S = STROKE_S;
 
-/** Where the brush is pushed to by its motion, `t` seconds in. */
-function motionOffset(pose: Pose, motion: Motion, jawUp: Vec3, t: number): Vec3 {
-  if (motion === "scrub") return scale(pose.u, 8 * Math.sin((2 * Math.PI * t) / SCRUB_S));
-  if (motion === "circle") {
-    const a = (2 * Math.PI * t) / CIRCLE_S;
-    const v = across([0, 1, 0], pose.b);
-    return add(scale(pose.u, 11 * Math.cos(a)), scale(v, 11 * Math.sin(a)));
-  }
-  // Slowly from the gum to the tip of the tooth, then quickly back.
-  const k = (t / WIPE_S) % 1;
-  const s = k < 0.7 ? 1 - (1 - k / 0.7) ** 2 : 1 - (k - 0.7) / 0.3;
-  return scale(jawUp, -10 + 20 * s);
-}
+/** How far each motion pushes the brush, in brush units: along the handle to scrub, round in a circle, from the gum up to wipe. */
+const REACH = { scrub: 8, circle: 11, wipe: 10 };
 
 /** A part of the brush: its extent along the handle (u), across the head (w) and along the bristles (b), in brush units. */
 export interface Box {
@@ -191,8 +177,6 @@ const FOAM: Vec3[] = [
 ];
 /** Seconds of brushing until all the foam is there. */
 const FOAM_FULL_S = 30;
-/** How far the brush rocks on its handle while it scrubs or circles (0.15 is about 9°). */
-const ROCK = 0.15;
 
 type Axis = "u" | "w" | "b";
 /** How much each of the brush's own axes points at the viewer (above 0: towards, below 0: away). */
@@ -240,8 +224,12 @@ function brushOrder(facing: Facing): number[] {
 
 const fmt = (p: { x: number; y: number }) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
 
-function drawBox(box: Box, pose: Pose, w: Vec3, project: Projector, key: number) {
-  const corner = (su: number, sw: number, sb: number) => project.point(add(pose.at, scale(add(scale(pose.u, su), add(scale(w, sw), scale(pose.b, sb))), SIZE)));
+/** A point of the brush, (su, sw, sb) brush units from its working point along its three axes. */
+const brushPoint = (pose: Pose, w: Vec3, su: number, sw: number, sb: number) =>
+  add(pose.at, scale(add(scale(pose.u, su), add(scale(w, sw), scale(pose.b, sb))), SIZE));
+
+function drawBox(box: Box, pose: Pose, w: Vec3, point: (p: Vec3) => { x: number; y: number }, facing: (n: Vec3) => number, key: number) {
+  const corner = (su: number, sw: number, sb: number) => point(brushPoint(pose, w, su, sw, sb));
   const [u0, u1] = box.u;
   const [w0, w1] = box.w;
   const [b0, b1] = box.b;
@@ -256,7 +244,7 @@ function drawBox(box: Box, pose: Pose, w: Vec3, project: Projector, key: number)
   return (
     <g key={key}>
       {faces
-        .filter((f) => project.facing(f.normal) > 0.02)
+        .filter((f) => facing(f.normal) > 0.02)
         .map((f, i) => (
           <path key={i} d={`M${f.points.map(fmt).join(" L")} Z`} fill={f.fill} stroke={INK} strokeWidth={box.line ?? 2.2} strokeLinejoin="round" />
         ))}
@@ -264,48 +252,43 @@ function drawBox(box: Box, pose: Pose, w: Vec3, project: Projector, key: number)
   );
 }
 
-/** Seconds of brushing, standing still while paused. */
-function useBrushTime(paused: boolean, speed: number) {
-  const [t, setT] = useState(0);
-  useEffect(() => {
-    if (paused) return;
-    let frame = 0;
-    let last = performance.now();
-    const tick = (now: number) => {
-      setT((prev) => prev + ((now - last) / 1000) * speed);
-      last = now;
-      frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [paused, speed]);
-  return t;
-}
-
-/** How quickly the brush follows to its next place: unhurried, like a hand. */
+/** How quickly the brush turns to its next hold: unhurried, like a hand. */
 const FOLLOW_S = 0.3;
 
+/** The picture the brush is drawn over: its viewBox and how many picture units one screen pixel is. */
+export interface BrushFrame {
+  viewBox: string;
+  box: { x: number; y: number; width: number; height: number };
+  unit: number;
+}
+
+/**
+ * The brush, in a layer of its own over the mirror. Its shape is drawn only when it turns or reaches the next spot
+ * (with the clock's tick, or while the head turns); gliding there and scrubbing, circling or wiping are CSS
+ * animations of that layer (`.brush-…` in teeth.css), which the browser moves without drawing anything again – drawn
+ * anew in every frame it made the brushing stutter on phones. The mouth is projected without perspective, so moving
+ * the flat picture is exactly moving the brush in 3D.
+ */
 export function Brush({
   anchor,
   surface,
   tooth,
   motion,
   project,
-  paused,
+  frame,
 }: {
   anchor: BrushAnchor;
   surface: Surface;
   tooth: ToothId;
   motion: Motion;
   project: Projector;
-  paused: boolean;
+  frame: BrushFrame;
 }) {
-  const slow = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const t = useBrushTime(paused, slow ? 0.5 : 1);
   const target = poseFor(anchor, surface, tooth);
   const current = useRef<{ pose: Pose; at: number } | null>(null);
+  const since = useRef(performance.now());
 
-  // Follow the target smoothly: along the row as the step goes on, and over to the next side when it changes.
+  // Turn to the new hold smoothly when the step changes (the head turns then, drawing every frame).
   // On the wall clock, so it still arrives when animation frames stop (paused, or a background tab).
   const now = performance.now();
   let pose = target;
@@ -314,35 +297,64 @@ export function Brush({
     const k = 1 - Math.exp(-dt / FOLLOW_S);
     const from = current.current.pose;
     const turn = blend(toQuat(from.u, from.b), toQuat(target.u, target.b), k);
-    pose = { at: lerp3(from.at, target.at, k), u: rotate(turn, [1, 0, 0]), b: rotate(turn, [0, 1, 0]) };
+    pose = { at: target.at, u: rotate(turn, [1, 0, 0]), b: rotate(turn, [0, 1, 0]) };
   }
   current.current = { pose, at: now };
 
-  const jawUp: Vec3 = tooth.jaw === "lower" ? [0, 1, 0] : [0, -1, 0];
-  // A real hand rocks the brush a little on its handle as it scrubs or circles; wiping keeps it steady.
-  const tilt = motion === "wipe" ? 0 : ROCK * Math.sin((2 * Math.PI * t) / (motion === "scrub" ? SCRUB_S : CIRCLE_S));
-  const side = cross(pose.u, pose.b);
-  const rocked = add(scale(pose.b, Math.cos(tilt)), scale(side, Math.sin(tilt)));
-  const moved = { u: pose.u, b: rocked, at: add(pose.at, motionOffset(pose, motion, jawUp, t)) };
-  const w = cross(moved.u, moved.b);
-  const order = brushOrder({ u: project.facing(moved.u), w: project.facing(w), b: project.facing(moved.b) });
-  const backShows = project.facing(scale(moved.b, -1)) > 0;
-  const foamCount = Math.min(FOAM.length, 4 + Math.floor(((FOAM.length - 4) * t) / FOAM_FULL_S));
+  // The shape is drawn with its working point in the middle of the picture; the layer is moved to the tooth.
+  const { box, unit } = frame;
+  const middle = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+  const anchorAt = project.point(pose.at);
+  const point = (p: Vec3) => {
+    const q = project.point(p);
+    return { x: q.x - anchorAt.x + middle.x, y: q.y - anchorAt.y + middle.y };
+  };
+  /** A 3D direction of `length` brush units on the screen, in px. */
+  const onScreen = (v: Vec3, length: number) => {
+    const q = project.point(add(pose.at, scale(v, length * SIZE)));
+    return { x: (q.x - anchorAt.x) / unit, y: (q.y - anchorAt.y) / unit };
+  };
+
+  const w = cross(pose.u, pose.b);
+  const order = brushOrder({ u: project.facing(pose.u), w: project.facing(w), b: project.facing(pose.b) });
+  const backShows = project.facing(scale(pose.b, -1)) > 0;
+  const brushed = (now - since.current) / 1000;
+  const foamCount = Math.min(FOAM.length, 4 + Math.floor(((FOAM.length - 4) * brushed) / FOAM_FULL_S));
   const foam = (
     <g className="brush-foam" fill="#fff" stroke="#bde0fe" strokeWidth={2}>
       {FOAM.slice(0, foamCount).map(([su, sw, sb], i) => {
-        const p = project.point(add(moved.at, scale(add(scale(moved.u, su), add(scale(w, sw), scale(moved.b, sb))), SIZE)));
+        const p = point(brushPoint(pose, w, su, sw, sb));
         return <circle key={i} cx={p.x} cy={p.y} r={(3.5 + (i % 3)) * project.zoom} />;
       })}
     </g>
   );
 
+  // The motion's two directions on the screen: scrubbing goes along the handle, circling also across it (both
+  // across the bristles), wiping goes from the gum to the tip of the tooth.
+  const up: Vec3 = tooth.jaw === "lower" ? [0, 1, 0] : [0, -1, 0];
+  const first = motion === "wipe" ? onScreen(up, REACH.wipe) : onScreen(pose.u, REACH[motion]);
+  const second = onScreen(across([0, 1, 0], pose.b), REACH.circle);
+  const offset = { x: (anchorAt.x - middle.x) / unit, y: (anchorAt.y - middle.y) / unit };
+  const vars = {
+    "--brush-x": `${first.x.toFixed(1)}px`,
+    "--brush-y": `${first.y.toFixed(1)}px`,
+    "--brush-x2": `${second.x.toFixed(1)}px`,
+    "--brush-y2": `${second.y.toFixed(1)}px`,
+    "--brush-s": `${STROKE_S}s`,
+  } as CSSProperties;
+
   return (
-    <g className="brush" pointerEvents="none">
-      {/* Seen from the back of the head, the foam is behind it. */}
-      {backShows && foam}
-      {order.map((i) => drawBox(BOXES[i], moved, w, project, i))}
-      {!backShows && foam}
-    </g>
+    <div className="brush-layer" style={{ transform: `translate(${offset.x.toFixed(1)}px, ${offset.y.toFixed(1)}px)` }} aria-hidden>
+      <div className={`brush-move ${motion}`} style={vars}>
+        <div className="brush-move-across">
+          <svg className="mouth brush" viewBox={frame.viewBox}>
+            {/* Seen from the back of the head, the foam is behind it. */}
+            {backShows && foam}
+            {order.map((i) => drawBox(BOXES[i], pose, w, point, project.facing, i))}
+            {!backShows && foam}
+          </svg>
+        </div>
+      </div>
+    </div>
   );
 }
