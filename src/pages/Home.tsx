@@ -5,6 +5,7 @@ import { BookFamily } from "@/components/BookFamily";
 import { GameCard } from "@/components/GameCard";
 import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
+import { SeoText } from "@/components/SeoText";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
@@ -123,10 +124,12 @@ export function Home() {
       </ul>
       <InstallHint />
       <BookCover />
-      <p className="home-version">
-        {t({ de: "Stand", ru: "Версия от", en: "Version", zh: "版本", hi: "संस्करण", es: "Versión", ar: "الإصدار" })} {buildDate()} ·{" "}
-        <LegalLink to="/impressum/">{t({ de: "Impressum" })}</LegalLink> · <LegalLink to="/datenschutz/">{t({ de: "Datenschutz" })}</LegalLink>
-      </p>
+      <SeoText>
+        <p className="home-version">
+          {t({ de: "Stand", ru: "Версия от", en: "Version", zh: "版本", hi: "संस्करण", es: "Versión", ar: "الإصدار" })} {buildDate()} ·{" "}
+          <LegalLink to="/impressum/">{t({ de: "Impressum" })}</LegalLink> · <LegalLink to="/datenschutz/">{t({ de: "Datenschutz" })}</LegalLink>
+        </p>
+      </SeoText>
     </main>
   );
 }

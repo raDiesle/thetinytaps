@@ -16,6 +16,9 @@ test("players get English when the browser's language isn't there, developers Ge
 
 test("search engines see the German the built pages are written in", () => {
   expect(playLanguage(["de", "en"], false, true)).toBe("de");
+  expect(playLanguage(["de", "en"], false, true, "en")).toBe("en");
+  // Players get their browser's language whatever the address (none in the test runner: English).
+  expect(playLanguage(["de", "en", "tr"], false, false, "de")).toBe("en");
   for (const agent of [
     "Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
     "Mozilla/5.0 AppleWebKit/537.36 (KHTML, like Gecko; compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm) Chrome/116.0.1938.76 Safari/537.36",

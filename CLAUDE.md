@@ -119,7 +119,7 @@ In a fresh worktree run `bun install` first.
   letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
-  in `base.css`) while pictures and layout stay as they are. Only the management page, the SEO pages and Impressum and Datenschutz (German law) stay German.
+  in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines are German and English (see Search engines).
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games
@@ -349,13 +349,19 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
-  (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
-  with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
-  (`useTitle`, `SeoHead`). Texts say only what the page really does. Google reads the page after the app ran,
-  in an English browser: so search engines play in German (`isCrawler` in `src/lib/locale.ts`), the language of the built
-  pages – a crawler that runs pages and isn't on its list gets added there. Pages that must stay out of results get a
+  and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
+  line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own
+  `index.html` per entry and language – German at `/zaehne/`, English at `/en/zaehne/`, joined by hreflang (GitHub
+  Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
+  and head in step (`useTitle`, `SeoHead`). Under `/en/` the router runs below the prefix (`routerBase()`,
+  `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
+  browser's language. Texts say only what the page really does. Google reads the page after the app ran, in an
+  English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
+  a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
+  it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
+  panel of its own; a new menu page does the same. Pages that must stay out of results get a
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
   `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).

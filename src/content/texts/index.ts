@@ -1,5 +1,6 @@
 import type { LanguageId } from "@/content/languages";
 import type { TargetLanguageId } from "@/content/targetLanguages";
+import type { SeoTranslation } from "@/content/seo";
 import type { LanguagePack } from "@/content/types";
 import type { StoryTranslation } from "@/games/adventure/stories/story";
 import type { AnimalTranslation } from "@/games/animals/content";
@@ -48,6 +49,8 @@ export interface LanguageTexts {
   feelings?: Partial<Record<FeelingId, FeelingText>>;
   /** Gefühle, Im Kindergarten (`feelings/kita.<id>.ts`). */
   situations?: Partial<Record<SituationId, SituationText>>;
+  /** What search engines read on the pages under /<id>/, shown below a menu's first screen too (`content/seo.<id>.ts`). */
+  seo?: SeoTranslation;
   /** Bewegungsabenteuer: Tapsi's lines by story folder (`adventure/stories/<story>/lines.<id>.ts`). */
   stories?: Partial<Record<"cloudTrip" | "treasureIsland", StoryTranslation>>;
 }

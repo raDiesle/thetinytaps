@@ -1,7 +1,10 @@
 // What search engines and link previews see of each page: title, description and
 // a short text. The build writes a page of its own for every entry (tools/build.ts),
 // so Google gets a real page with status 200 instead of 404.html, and the app sets
-// the same title and description while it runs (src/lib/title.ts, SeoHead).
+// the same title and description while it runs (src/lib/title.ts, SeoHead) and shows
+// the text below the first screen of a menu (SeoText).
+// German pages have the plain address (/zaehne/); every other language of SEO_LANGUAGES
+// has the same pages under its prefix (/en/zaehne/), its texts in seo.<id>.ts by German address.
 // No `@/` imports here: tools/build.ts reads this file too.
 // The texts are what parents search for (see the research on /management/).
 // No <meta name="keywords">: Google has ignored it since 2009 and Bing reads it as a hint of spam; the
@@ -29,6 +32,39 @@ export const PREVIEW_IMAGE = {
   height: 630,
   alt: "Eine Fuchs- und eine Bärenfamilie lesen auf einer Picknickdecke zusammen ein Bilderbuch.",
 };
+
+/** Languages with pages of their own for search engines, German first (it has no prefix). */
+export const SEO_LANGUAGES = ["de", "en"] as const;
+
+/** A language with pages of its own for search engines. */
+export type SeoLanguage = (typeof SEO_LANGUAGES)[number];
+
+/** A page's texts in another language than German. */
+export type PageText = Omit<PageSeo, "path">;
+
+/** What search engines read in a language besides German (seo.<id>.ts). */
+export interface SeoTranslation {
+  /** Language and country as link previews name it, e.g. "en_US". */
+  locale: string;
+  /** What every page says about the whole site (SITE_PROMISE). */
+  promise: string;
+  /** Each page's texts, by its German address. */
+  pages: Record<string, PageText>;
+  /** The preview picture's description (PREVIEW_IMAGE.alt). */
+  imageAlt: string;
+}
+
+/** The start of the addresses of a language's pages: none for German, "/en" for English. */
+export const languagePrefix = (language: SeoLanguage) => (language === "de" ? "" : `/${language}`);
+
+/** The language an address is in, and the address without its prefix: "/en/zaehne/" → English, "/zaehne/". */
+export function splitLanguage(pathname: string): { language: SeoLanguage; path: string } {
+  for (const language of SEO_LANGUAGES) {
+    const prefix = languagePrefix(language);
+    if (prefix && (pathname === prefix || pathname.startsWith(`${prefix}/`))) return { language, path: pathname.slice(prefix.length) || "/" };
+  }
+  return { language: "de", path: pathname };
+}
 
 /** What every page says about the whole site, after its own text. */
 export const SITE_PROMISE = "Kostenlos, ohne Werbung, ohne Anmeldung, funktioniert offline. Für Kinder ab 2 Jahren, mit Touch oder Tastatur.";
@@ -192,4 +228,4 @@ export function seoFor(pathname: string): PageSeo | undefined {
 }
 
 /** The full title as the browser tab and Google show it. */
-export const fullTitle = (page: PageSeo) => `${page.title} | ${SITE_NAME}`;
+export const fullTitle = (page: PageText) => `${page.title} | ${SITE_NAME}`;

@@ -2,9 +2,9 @@ import { DEV } from "@/lib/buildInfo";
 // Which language a language choice starts on, before a grown-up picks one: the
 // browser's own language when the game has it, otherwise English, which more
 // players understand than German. While developing (`bun run dev`) it is always
-// German, the language the app is written and checked in. Search engines get German
-// too: the built pages are German (src/content/seo.ts), and Googlebot renders them in
-// an English browser, so it would see English menus under a German title and description.
+// German, the language the app is written and checked in. Search engines get the language
+// of the page's address (German, or English under /en/, src/content/seo.ts): Googlebot renders
+// pages in an English browser, so it would see English menus under a German title and description.
 
 /** The first of the `wanted` languages ("de-AT", "zh-Hans-CN", "en") that is `supported`, by its two-letter code. */
 export function pickLanguage<T extends string>(supported: readonly T[], wanted: readonly string[]): T | undefined {
@@ -37,10 +37,11 @@ export function isCrawler(userAgent = typeof navigator === "undefined" ? "" : na
 }
 
 /**
- * The default of a language choice offering `supported`: German while developing and
- * for search engines, for players the browser's language, else English, else the first one offered.
+ * The default of a language choice offering `supported`: for search engines and while developing the
+ * language of the page's address (`page`, German unless /en/), for players the browser's language,
+ * else English, else the first one offered.
  */
-export function playLanguage<T extends string>(supported: readonly T[], dev = DEV, crawler = isCrawler()): T {
-  const wanted = dev || crawler ? ["de"] : [...browserLanguages(), "en"];
+export function playLanguage<T extends string>(supported: readonly T[], dev = DEV, crawler = isCrawler(), page = "de"): T {
+  const wanted = dev || crawler ? [page] : [...browserLanguages(), "en"];
   return pickLanguage(supported, wanted) ?? supported[0];
 }
