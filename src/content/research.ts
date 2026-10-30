@@ -96,7 +96,7 @@ export const RESEARCH: Research[] = [
       "Gleich dahinter: toddlepages (Seiten zum Umblättern; Google denkt an Ausmalbilder, „toddler pages to color“) und toddlestory (Google denkt an Vorlesestunden in der Bücherei, „toddler story time“). Beide frei, nichts Gleichnamiges, aber 11 Buchstaben, und eine Geschichte erzählen nur Kleine Abenteuer und Bewegungsabenteuer.",
       "„Toddlerverse“ ist als .com vergeben (dahinter antwortet eine Website), „toddleverse“ auch, und ein Mastodon-Nutzer entwirft unter „Toddlerverse“ gerade einen werbefreien Online-Raum für Kleinkinder – fast dieselbe Idee. Frei sind nur thetoddlerverse, toddlerverses und toddleverses: „the“ wird beim Tippen vergessen, die Mehrzahl hört man nicht. Dazu heißt „-verse“ vor allem Universum (Metaverse, Spider-Verse) und passt eher zu Welten als zum Buch; den Doppelsinn „Vers“ hören Nicht-Muttersprachler kaum.",
       "„Toddler Book Collection“ ist als Adresse zu lang (21 Buchstaben, toddlerbookcollection.com wäre frei), sagt aber gut, was die App ist: als Untertitel im Seitentitel und auf dem Umschlag, nicht in der Domain.",
-      "Rund ums Buch ist fast alles Kurze vergeben: toddletales, toddlertales, tinytales, foxtales, storytots, toddlerbook, toddlerstories, toddlerbookclub, tinybookclub, tinypages, littlepages, tapbook, foxbook, bookfox, wonderbook, toddlerpedia.",
+      "Rund ums Buch ist fast alles Kurze vergeben: toddletales, toddlertales, tinytales, foxtales, storytots, toddlerbook, toddlerstories, toddlerbookclub, tinybookclub, tinypages, littlepages (bei HugeDomains für rund 7.900 $ zu haben), tapbook, foxbook, bookfox, wonderbook, toddlerpedia.",
       "In der vierten Runde ausgeschieden: storytoddler (Google macht daraus „Toddlers & Tiaras“), toddlerhymes (liest sich „toddler hymes“, und „toddler rhymes“ sind Kinderlieder-Videos auf YouTube), booktots (klingt wie BookTok), toddlefable (Fable heißen schon zwei Geschichten-Apps für Kinder, und „fable“ kennen Nicht-Muttersprachler wenig), laptales (liest sich wie „laptop“), tapsitales (Tapsi ist kein Englisch).",
       "Der jetzige Name ist inzwischen mehrfach besetzt: Seit April 2026 gibt es im App Store „Tiny Taps Baby“, ein werbefreies Tipp-Spiel für Kleinkinder, unter tinytaps.pages.dev eine Seite „TinyTaps“ und dazu die App „Little Taps“ – das trifft auch littletappers.",
       "Der jetzige Name passt schlecht: „TinyTap“ ist eine bekannte Lern-App für Kinder (TinyTap Ltd., seit 2022 bei Animoca Brands) mit eingetragener US-Wortmarke für Software und Bildung (Klassen 9 und 41, seit 2014) – „The Tiny Taps“ liegt einen Buchstaben daneben. thetinytaps.com ist frei, „the“ wird beim Tippen vergessen, und Google ergänzt „tiny taps“ zu einer Bar und zu Zapfanlagen.",
@@ -389,6 +389,13 @@ export const RESEARCH: Research[] = [
       { name: "toddletales", rank: 13, free: [], taken: ["com"], why: "Vergeben, wie toddlertales, tinytales und foxtales." },
       { name: "toddlerbook", rank: 13, free: [], taken: ["com"], why: "Vergeben, wie toddlerstories, toddlerbookclub und tinypages." },
       { name: "storytots", rank: 13, free: [], taken: ["com"], why: "Vergeben." },
+      {
+        name: "littlepages",
+        rank: 13,
+        free: [],
+        taken: ["com"],
+        why: "Seit 2003 vergeben, steht aber bei HugeDomains zum Verkauf (die Seite nennt rund 7.900 $). Sagt nichts über das Alter, Google denkt an ein Möbelgeschäft in Baltimore, und „Little Pages“ heißen schon Ausmal- und Geschichtenbücher zum Ausdrucken. toddlepages ist frei und sagt mehr.",
+      },
     ],
   },
   {
