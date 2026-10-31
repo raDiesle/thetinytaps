@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type { BunPlugin } from "bun";
 
-// The one Bun plugin of the app, used by the build (tools/build.ts), the dev server (tools/dev.ts) and
+// The one Bun plugin of the app, used by the build (tools/build.ts), the dev server (tools/devServer.ts) and
 // the tests (src/testPreload.ts). It does what a bundler must do for us:
 //
 // - `import files from "./musik/*.mp3?glob"`: all files matching a pattern, relative to the importing

@@ -33,5 +33,5 @@ root = "src"
 preload = ["./src/testPreload.ts"]
 
 [serve.static]
-# The dev server (tools/dev.ts) bundles with the app's plugin too: `…?glob` imports and src/lib/buildInfo.ts.
+# The dev server (tools/devServer.ts) bundles with the app's plugin too: `…?glob` imports and src/lib/buildInfo.ts.
 plugins = ["./tools/appPlugin.ts"]

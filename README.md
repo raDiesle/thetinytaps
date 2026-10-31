@@ -6,7 +6,7 @@ Simple keyboard and touch games for toddlers (2–3 years), German first.
 
 ```bash
 bun install
-bun run dev        # http://localhost:3000 (Bun's dev server with hot reload, tools/dev.ts)
+bun run dev        # http://localhost:3000 (Bun's dev server with hot reload, tools/dev.ts restarts it when a merge leaves it stuck)
 bun run verify     # lint + format check (Biome), typecheck, unit tests (bun test)
 bun run format     # format and apply safe lint fixes
 bun test           # unit tests only

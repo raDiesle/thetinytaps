@@ -30,7 +30,9 @@ reload, so a game borrowing another's CSS shows only in `preview-pages` – `css
 
 Dev servers are in `.claude/launch.json`: start them with `preview_start`.
 Use `dev` – it moves to the next free port when another session has 3000, so
-never add configs with fixed ports. `preview-pages` serves the built site with
+never add configs with fixed ports. Bun's dev server can stay stuck on „Could not resolve“ after a merge brought new
+files with their importers; `tools/dev.ts` then restarts it on the same port (the page reloads), so a „Could not
+resolve“ that stays is a real typo or missing file – never work around it in the code. `preview-pages` serves the built site with
 the service worker. Sound and speech are muted when the browser
 is Claude's preview (`src/lib/silent.ts`).
 In a fresh worktree run `bun install` first.
