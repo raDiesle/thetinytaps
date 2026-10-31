@@ -88,6 +88,7 @@ export const RESEARCH: Research[] = [
       "Schon gekauft und in Betrieb ist toddlerfox.com (30. Oktober 2026, Build und DNS stehen darauf). Ein Wechsel heißt: neue Domain kaufen, SITE_ORIGIN und die Zonendatei umstellen; toddlerfox.com kann ein Jahr lang weiterleiten. Je früher, desto weniger Gespeichertes bleibt bei der alten Adresse zurück.",
       "Gekauft (31. Oktober 2026): funforboth.com bei Cloudflare. Die App läuft noch auf toddlerfox.com; Build und DNS sind nicht umgestellt.",
       "Favorit des Betreibers (31. Oktober 2026): booksforboth.com, die Mehrzahl – weil die App viele Bücher sein soll: jede Kategorie ein Buch im Regal, jedes Level eine Seite darin, und die Alltagshilfen ein eigenes Buch (Idee D-20). Am 31. Oktober noch frei; bookforboth.com (ebenfalls frei) wäre dann die Weiterleitung für wen es in der Einzahl hört, funforboth.com auch.",
+      "Gekauft (31. Oktober 2026): booksforboth.com bei Cloudflare – der neue Name der App, funforboth.com leitet später dorthin weiter. Die App läuft noch auf toddlerfox.com; Build, DNS und Titel sind nicht umgestellt. bookforboth.com (Einzahl) ist noch frei und als Weiterleitung zu empfehlen.",
       "Empfehlung dazu: bookforboth.com (am 31. Oktober noch frei, ebenso booksforboth.com) zusätzlich kaufen und zur Adresse der App machen, funforboth.com leitet dorthin weiter. bookforboth ist eigen und als Marke zu schützen, sagt das Buch, das die App zeigt, und hebt sich von Hunderten „fun“-Seiten ab; dass Google „fun for both“ zu dem ergänzt, was Eltern suchen, bringt der Domain keinen Vorsprung (Wörter in der Domain sind kein Rankingfaktor, Recherche „Domain“) – diese Wörter gehören in Titel und Texte.",
     ],
     topics: [
@@ -122,9 +123,9 @@ export const RESEARCH: Research[] = [
       {
         name: "booksforboth",
         rank: 1,
-        free: ["com"],
-        taken: [],
-        why: "Favorit des Betreibers: viele Bücher für Groß und Klein – jede Kategorie ein Buch, jedes Level eine Seite (D-20). 12 Buchstaben, Google kennt es nicht; bookforboth fängt die Einzahl ab.",
+        free: [],
+        taken: ["com"],
+        why: "Gekauft am 31. Oktober 2026, der neue Name. Favorit des Betreibers: viele Bücher für Groß und Klein – jede Kategorie ein Buch, jedes Level eine Seite (D-20). 12 Buchstaben, Google kennt es nicht; bookforboth fängt die Einzahl ab.",
       },
       {
         name: "bookforboth",
