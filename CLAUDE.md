@@ -275,6 +275,9 @@ In a fresh worktree run `bun install` first.
   never a tap a child could make by chance.
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
+- Headings carry no emoji (user feedback, October 2026): a menu's title is plain words („Lebendige Welten“, never
+  „🌳 Lebendige Welten“; `MenuHead` takes a string), and so is every heading inside a page – the emoji stays on the
+  card or the book, not over it (`MenuTop.test.ts` checks).
 - Nothing to read between a menu's title and its cards, on any screen: no line under the title, no „Was spielen
   wir?“, no tagline under the home logo (all removed, October 2026) – the cards say enough. Only the „level“ row of
   choices may sit there.

@@ -23,7 +23,6 @@ export function PottyGame() {
   return (
     <GameShell
       title={t(POTTY_TITLE)}
-      emoji="🚽"
       // Opened when the child has to go: the story starts at once, with no modes to pick (the star is its last step);
       // ✕ and „Menü“ go back to the shelf (GameShell), there is no start screen.
       startMode="story"

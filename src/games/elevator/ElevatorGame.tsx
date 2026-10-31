@@ -35,7 +35,6 @@ export function ElevatorGame() {
         es: "Pequeñas aventuras",
         ar: "مغامرات صغيرة",
       })}
-      emoji="🧭"
       modes={[
         { id: "hunger", emoji: "🥞", title: title("Pfannkuchen"), kind: t(LIFT) },
         { id: "gutenacht", emoji: "🌙", title: title("Gute Nacht"), kind: t(LIFT) },

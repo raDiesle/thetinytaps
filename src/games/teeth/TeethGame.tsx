@@ -30,7 +30,6 @@ export function TeethGame() {
   return (
     <GameShell
       title={t({ de: "Zähne putzen", en: "Brushing Teeth", zh: "刷牙", hi: "दाँत साफ़ करना", es: "Lavarse los dientes", ar: "تنظيف الأسنان", ru: "Чистим зубы" })}
-      emoji="🦷"
       settings={
         <SettingsGroup title={t({ de: "Putzen", en: "Brushing", zh: "刷牙", hi: "ब्रश करना", es: "Cepillado", ar: "التنظيف", ru: "Чистка" })}>
           <Choice<Before>

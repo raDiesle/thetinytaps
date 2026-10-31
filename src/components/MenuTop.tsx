@@ -30,7 +30,7 @@ export function MenuTop({ to, back, children }: { to: string; back: string; chil
  * In the book look the way back is the page's corner in the top left instead (PageCorner), and the fullscreen button and
  * ⚙️ are paper notes clipped onto the page's top edge (`book.css`).
  */
-export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: ReactNode; tools?: ReactNode; children?: ReactNode }) {
+export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: string; tools?: ReactNode; children?: ReactNode }) {
   return (
     <div className="menu-head">
       <MenuTop to={to} back={back}>

@@ -20,7 +20,7 @@ export function ScenesGame({ sceneId }: { sceneId: string }) {
   const scene = localizeScene(found, language.id);
 
   return (
-    <GameShell title={scene.title} emoji={scene.emoji} startMode={settings.mode} leaveTo="/bilder/">
+    <GameShell title={scene.title} startMode={settings.mode} leaveTo="/bilder/">
       {/* A new picture (a vehicle was followed into it) starts afresh. */}
       <ScenePlay key={scene.id} scene={scene} settings={settings} onKeys={(keys) => update({ keys })} />
     </GameShell>

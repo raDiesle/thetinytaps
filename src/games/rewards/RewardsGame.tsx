@@ -268,7 +268,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     <div className="rw-main">
       {screen}
       <aside className="rw-side" aria-label={t(TEMPLATES_LABEL)}>
-        <h2 className="rw-side-title">🧩 {t(TEMPLATES_LABEL)}</h2>
+        <h2 className="rw-side-title">{t(TEMPLATES_LABEL)}</h2>
         {type === "board" ? (
           <TemplateGallery selected={board?.template} onPick={pickTemplate} />
         ) : (
@@ -291,11 +291,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
               ? t(category.title)
               : t({ de: "Alle Spiele", en: "All games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب", ru: "Все игры" })
           }
-          title={
-            <>
-              <span aria-hidden>🌟</span> {t(REWARDS_TITLE)}
-            </>
-          }
+          title={t(REWARDS_TITLE)}
         >
           {/* While the wizard is open, nothing on top belongs to the chart behind it. */}
           {!wizard && (
@@ -384,7 +380,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
       {computer && !wizard && (
         <div className="rw-below">
           <section id="rw-edit" className="rw-below-part">
-            <h2 className="rw-panel-title">✏️ {t(DESIGN)}</h2>
+            <h2 className="rw-panel-title">{t(DESIGN)}</h2>
             {editor}
           </section>
           <section id="rw-print" className="rw-below-part">

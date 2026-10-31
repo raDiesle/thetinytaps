@@ -54,7 +54,6 @@ function byKind(modes: GameMode[]) {
 
 interface GameShellProps {
   title: string;
-  emoji: string;
   /** Ways to play, as big cards: tapping one picks it and starts the game. Without them there is one start button. */
   modes?: GameMode[];
   /** The mode played last, marked on its card. */
@@ -97,7 +96,7 @@ export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo"
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveTo, level, settings, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({ title, modes, mode, onMode, startMode, leaveTo, level, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const t = useT();
@@ -261,11 +260,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
       <MenuHead
         to={back}
         back={backText}
-        title={
-          <>
-            <span aria-hidden>{emoji}</span> {title}
-          </>
-        }
+        title={title}
         tools={
           settings && (
             <PanelButton

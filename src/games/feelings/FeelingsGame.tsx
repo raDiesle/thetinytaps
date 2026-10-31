@@ -30,7 +30,6 @@ export function FeelingsGame() {
   return (
     <GameShell
       title={t({ de: "Gefühle", ru: "Чувства", en: "Feelings", zh: "情绪", hi: "भावनाएँ", es: "Emociones", ar: "المشاعر" })}
-      emoji="🐻"
       modes={modes}
       mode={settings.story}
       onMode={(story) => update({ story })}

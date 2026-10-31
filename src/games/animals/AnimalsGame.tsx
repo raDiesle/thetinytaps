@@ -26,7 +26,6 @@ export function AnimalsGame() {
   return (
     <GameShell
       title={t(ANIMALS_TITLE)}
-      emoji="🐰"
       modes={[
         {
           id: "feed",

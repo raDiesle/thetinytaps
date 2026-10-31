@@ -19,12 +19,14 @@ of its kind, grouped under the names of their views; „Gestalten“,
 visitor land there.
 
 „＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart. Its first step, „Ansicht“, is the whole choice of form
-(user feedback, October 2026): both kinds on the one page, each in an area under its name („⭐ Belohnungstafel“,
-„🗓️ Zeitplan“, the one the page was opened on first), and in each every view, its name big on top as a heading (Tag,
+(user feedback, October 2026): both kinds on the one page, each in an area under its name („Belohnungstafel“,
+„Zeitplan“, without emoji like every heading, the one the page was opened on first), and in each every view, its name big on top as a heading (Tag,
 Woche, Monat, Sammeln; Ablaufplan, Jetzt – Dann, Erst – Dann, Woche), the view's Vorlagen as big pictures under it,
 each with its name above it, and a small „✏️ Leer anfangen“ beside the view's name. The views share the rows so they
-fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). On a big screen (≥ 1400 × 700)
-the steps are a column on the left, the kinds under „Ansicht“ as links to their areas with how many are picked.
+fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). The first step shows no list of
+steps – a lone „1 Ansicht“ over the pictures confused (user feedback, October 2026) –, its help sits at the foot; from
+the second step on the steps show, on a big screen (≥ 1400 × 700) as a column on the left, the kinds under „Ansicht“
+as links back to their areas with how many are picked.
 A tap picks a Vorlage (yellow glow, ✓), another puts it back; several, also
 of both kinds, are made at once with „✓ N anlegen“ (`onDone` takes a list). With exactly one picked, „Weiter“ goes
 on to its own steps – `WizardBoard.tsx`: Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Bilder (with which days),
@@ -178,7 +180,8 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   in the wizard is a `Pick`; detail that needs typing (own words, own emoji) stays under „Gestalten“.
 - The wizard goes from the form to the content (user feedback, October 2026): kind, view and Vorlage are one step,
   the content follows. Both kinds show at once, grouped in their two areas – never a switch that hides one, which
-  grown-ups overlooked; on a big screen they are named in the steps' column under „Ansicht“. Each view's name stands
+  grown-ups overlooked; from the second step on, on a big screen, they are named in the steps' column under „Ansicht“.
+  Never show a list of steps while there is only the first one to see (a lone „1 Ansicht“ confused). Each view's name stands
   big on top of its Vorlagen as a heading, and a Vorlage's name above its picture, never small below it; a picture has
   no second frame round it (it is framed itself), only a glow when picked. Several Vorlagen can be picked and made at
   once. The pictures are as big as the rows allow, with no empty room beside them: check at 1920 × 1080, 1440 × 900,

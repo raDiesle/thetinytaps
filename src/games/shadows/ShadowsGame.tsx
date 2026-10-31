@@ -23,7 +23,6 @@ export function ShadowsGame() {
   return (
     <GameShell
       title={t(SHADOWS_TITLE)}
-      emoji="👤"
       // Nothing to choose: the game finds the right difficulty by itself and the pictures are picked while playing, so
       // its card plays at once; ✕ and „Menü“ go back to the table of contents (GameShell), there is no start screen.
       startMode="play"

@@ -207,3 +207,15 @@ test("in the book look the families stand at the bottom of a menu's page, not in
   for (const rule of family) expect(rule.body).toMatch(/bottom:/);
   expect(readFileSync("src/lib/fitGrid.ts", "utf8")).toContain("--menu-floor");
 });
+
+// User feedback, October 2026: headings carry no emoji („Lebendige Welten“, never „🌳 Lebendige Welten“). MenuHead takes
+// its title as plain text, and no heading the app shows starts with an emoji or an emoji's span (only the management
+// page, which only the makers see, keeps its signs).
+test("headings carry no emoji", () => {
+  const leading = /<h[1-6][^>]*>\s*(<span aria-hidden>|\{?[^\s<{}]*\p{Extended_Pictographic})/u;
+  const offenders = readdirSync("src", { recursive: true, encoding: "utf8" })
+    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|PicturePromptReview|VoiceList/.test(file))
+    .filter((file) => leading.test(readFileSync(join("src", file), "utf8")));
+  expect(offenders).toEqual([]);
+  expect(readFileSync("src/components/MenuTop.tsx", "utf8")).toMatch(/title: string; tools/);
+});

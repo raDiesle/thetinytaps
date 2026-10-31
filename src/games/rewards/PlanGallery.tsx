@@ -32,9 +32,7 @@ export function PlanGallery({ selected, onPick }: { selected?: string; onPick: (
         return (
           templates.length > 0 && (
             <section key={view.id} className="rw-gallery-group">
-              <h3 className="rw-gallery-view">
-                <span aria-hidden>{view.emoji}</span> {t(view.label)}
-              </h3>
+              <h3 className="rw-gallery-view">{t(view.label)}</h3>
               <ul className="rw-gallery">
                 {templates.map((tpl) => {
                   const preview = PREVIEWS.get(tpl.id);

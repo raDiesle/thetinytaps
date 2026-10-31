@@ -95,8 +95,8 @@ const ready = (draft: Draft) =>
  * … or Ablaufplan, Jetzt – Dann, Erst – Dann, Woche – with its Vorlagen as big pictures beneath. A tap picks a Vorlage,
  * another tap puts it back, so several (of both kinds) are made at once with „✓ Anlegen“. With one picked, „Weiter“
  * goes on to its own steps – a board's tasks, reward and look, a plan's cards and look – with the whole board or plan
- * beside each step. „Leer anfangen“ in a view goes there at once. On a big screen the steps are a column on the left,
- * the two kinds under „Ansicht“ leading to their areas. Opened on a template from the gallery it starts on that
+ * beside each step. „Leer anfangen“ in a view goes there at once. The steps show only from the second one on; on a big
+ * screen they are a column on the left, the two kinds under „Ansicht“ leading back to their areas. Opened on a template from the gallery it starts on that
  * template's own steps. Without `onCancel` (nothing made yet) it can't be closed: the page has nothing else to show.
  */
 export function Wizard({
@@ -186,35 +186,39 @@ export function Wizard({
 
   return (
     <section
-      className="rw-wizard"
+      className={step === 0 ? "rw-wizard rw-wizard-start" : "rw-wizard"}
       aria-label={t({ de: "Neu anlegen", en: "Create new", zh: "新建", hi: "नया बनाएँ", es: "Crear nuevo", ar: "إنشاء جديد", ru: "Создать" })}
     >
       <header className="rw-wizard-head">
-        <ol className="rw-steps">
-          {(only ? steps : [FIRST_STEP]).map((s, i) => (
-            <li key={s.id}>
-              <button type="button" className={i === step ? "selected" : undefined} aria-current={i === step ? "step" : undefined} onClick={() => setStep(i)}>
-                <span className="rw-step-number">{i + 1}</span> <span className="rw-step-label">{t(s.label)}</span>
-              </button>
-              {/* Under „Ansicht“, on a big screen: the two kinds, each leading to its area, with how many are picked. */}
-              {s.id === FIRST_STEP.id && (
-                <ul className="rw-step-kinds" aria-label={t({ de: "Art", en: "Type", zh: "类型", hi: "प्रकार", es: "Tipo", ar: "النوع", ru: "Тип" })}>
-                  {kinds.map((kind) => {
-                    const count = drafts.filter((d) => d.type === kind.id).length;
-                    return (
-                      <li key={kind.id}>
-                        <button type="button" className={count ? "selected" : undefined} onClick={() => showKind(kind.id)}>
-                          <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
-                          {count > 0 && <span className="rw-kind-count">{count}</span>}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </li>
-          ))}
-        </ol>
+        {/* No steps on the first one: a lone „1 Ansicht“ over the pictures only confused (user feedback, October 2026).
+            They show from the second step on, when there is a way through them. */}
+        {step > 0 && (
+          <ol className="rw-steps">
+            {steps.map((s, i) => (
+              <li key={s.id}>
+                <button type="button" className={i === step ? "selected" : undefined} aria-current={i === step ? "step" : undefined} onClick={() => setStep(i)}>
+                  <span className="rw-step-number">{i + 1}</span> <span className="rw-step-label">{t(s.label)}</span>
+                </button>
+                {/* Under „Ansicht“, on a big screen: the two kinds, each leading to its area, with how many are picked. */}
+                {s.id === FIRST_STEP.id && (
+                  <ul className="rw-step-kinds" aria-label={t({ de: "Art", en: "Type", zh: "类型", hi: "प्रकार", es: "Tipo", ar: "النوع", ru: "Тип" })}>
+                    {kinds.map((kind) => {
+                      const count = drafts.filter((d) => d.type === kind.id).length;
+                      return (
+                        <li key={kind.id}>
+                          <button type="button" className={count ? "selected" : undefined} onClick={() => showKind(kind.id)}>
+                            <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
+                            {count > 0 && <span className="rw-kind-count">{count}</span>}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ol>
+        )}
         <Help className="rw-wizard-help-side" />
         {onCancel && (
           <button
@@ -233,17 +237,13 @@ export function Wizard({
           {id === FIRST_STEP.id &&
             kinds.map((kind) => (
               <section key={kind.id} id={`rw-area-${kind.id}`} className="rw-kind-area" aria-label={t(kind.label)}>
-                <h2 className="rw-kind-name">
-                  <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
-                </h2>
+                <h2 className="rw-kind-name">{t(kind.label)}</h2>
                 <div className="rw-view-groups">
                   {groupsOf(kind.id).map((group) => (
                     <section key={group.id} className="rw-view-group" style={{ "--rw-tiles": Math.max(1, group.tiles.length) } as CSSProperties}>
                       {/* The view's name stands big over its pictures, as the name of what they show. */}
                       <div className="rw-view-head">
-                        <h3 className="rw-view-name">
-                          <span aria-hidden>{group.emoji}</span> {t(group.label)}
-                        </h3>
+                        <h3 className="rw-view-name">{t(group.label)}</h3>
                         {/* No picture of anything: a small button beside the view's name, not a tile among the Vorlagen. */}
                         <button type="button" className="rw-view-blank" onClick={() => blank(group.blank.key, group.blank.make())}>
                           <span aria-hidden>✏️</span> {t(START_BLANK)}

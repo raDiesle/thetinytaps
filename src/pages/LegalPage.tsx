@@ -42,14 +42,12 @@ function Out({ href, children }: { href: string; children: ReactNode }) {
 }
 
 /** The frame both pages share: the way back, the title and the text in panels. */
-function LegalPage({ title, emoji, children }: { title: string; emoji: string; children: ReactNode }) {
+function LegalPage({ title, children }: { title: string; children: ReactNode }) {
   useTitle(title);
   return (
     <main className="home legal">
       <MenuTop to="/" back="Alle Spiele" />
-      <h1>
-        <span aria-hidden>{emoji}</span> {title}
-      </h1>
+      <h1>{title}</h1>
       {children}
     </main>
   );
@@ -58,7 +56,7 @@ function LegalPage({ title, emoji, children }: { title: string; emoji: string; c
 /** /impressum/: who runs the site (§ 5 DDG, § 18 Abs. 2 MStV). */
 export function ImprintPage() {
   return (
-    <LegalPage title="Impressum" emoji="📇">
+    <LegalPage title="Impressum">
       <section className="legal-panel">
         <h2>Angaben gemäß § 5 DDG</h2>
         <Operator />
@@ -86,7 +84,7 @@ export function ImprintPage() {
 /** /datenschutz/: what the site stores and sends, and to whom (Art. 13 DSGVO). */
 export function PrivacyPage() {
   return (
-    <LegalPage title="Datenschutz" emoji="🔒">
+    <LegalPage title="Datenschutz">
       <section className="legal-panel">
         <h2>Kurz gesagt</h2>
         <p>

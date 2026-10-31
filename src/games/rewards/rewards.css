@@ -1066,6 +1066,27 @@
   .rw-kind-area:first-child .rw-kind-name {
     padding-right: 52px;
   }
+
+  /* The first step has no column of steps (they show from the second on): its pictures take the whole width, the help at the foot. */
+  .rw-wizard-start {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rw-wizard-start .rw-wizard-head {
+    display: contents;
+  }
+
+  .rw-wizard-start .rw-wizard-help-side {
+    display: none;
+  }
+
+  .rw-wizard-start .rw-wizard-help-foot {
+    display: block;
+  }
+
+  .rw-wizard-start :is(.rw-wizard-body, .rw-wizard-foot) {
+    grid-column: 1;
+  }
 }
 
 .rw-wizard-done {

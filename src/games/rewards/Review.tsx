@@ -110,7 +110,7 @@ export function Review({ board, log, linked, sounds, onClose }: { board: Board; 
   return (
     <section className="rw-review" aria-label={t(REVIEW)}>
       <header className="rw-review-head">
-        <h2 className="rw-panel-title">📜 {t(REVIEW)}</h2>
+        <h2 className="rw-panel-title">{t(REVIEW)}</h2>
         {current && (
           <span className="rw-review-now">
             {label(kind, current.back, current.day)} · <span aria-hidden>{mark.emoji}</span> {current.count}

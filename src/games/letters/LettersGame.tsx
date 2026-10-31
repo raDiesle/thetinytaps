@@ -94,7 +94,6 @@ export function LettersGame() {
         es: "Letras y números",
         ar: "حروف وأرقام",
       })}
-      emoji="🔤"
       modes={[
         { id: "free", emoji: "⌨️", title: freeTitle },
         { id: "words", emoji: "✍️", title: wordsTitle },

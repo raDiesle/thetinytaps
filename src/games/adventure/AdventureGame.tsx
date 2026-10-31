@@ -47,7 +47,6 @@ export function AdventureGame() {
         ar: "مغامرات الحركة",
         ru: "Приключения в движении",
       })}
-      emoji="🏝️"
       modes={STORIES.map((s) => ({ id: s.id, emoji: s.emoji, title: storyTitle(s.story, app.id) }))}
       mode={settings.story}
       onMode={(id) => update({ story: id as AdventureStoryId })}

@@ -50,9 +50,7 @@ export function TemplateGallery({
         return (
           templates.length > 0 && (
             <section key={kind.id} className="rw-gallery-group">
-              <h3 className="rw-gallery-view">
-                <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
-              </h3>
+              <h3 className="rw-gallery-view">{t(kind.label)}</h3>
               <ul className="rw-gallery">
                 {templates.map((tpl) => {
                   const preview = PREVIEWS.get(tpl.id);

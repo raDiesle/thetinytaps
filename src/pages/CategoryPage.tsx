@@ -33,11 +33,7 @@ export function CategoryPage() {
       <MenuHead
         to="/"
         back={t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" })}
-        title={
-          <>
-            <span aria-hidden>{category.emoji}</span> {t(category.title)}
-          </>
-        }
+        title={t(category.title)}
       />
       {isBookLook() ? (
         <BookContents games={category.games} world={category.id} />

@@ -43,11 +43,7 @@ export function ScenesMenu() {
             ? t(CATEGORY.title)
             : t({ de: "Alle Spiele", ru: "Все игры", en: "All games", zh: "所有游戏", hi: "सारे खेल", es: "Todos los juegos", ar: "كل الألعاب" })
         }
-        title={
-          <>
-            <span aria-hidden>🖼️</span> {title}
-          </>
-        }
+        title={title}
       >
         {/* How the picture is played, always in sight above the pictures (on a phone in the top row, so they all still
             fit): a tap on a picture plays it so at once. */}

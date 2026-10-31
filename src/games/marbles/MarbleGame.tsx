@@ -40,7 +40,6 @@ export function MarbleGame() {
   return (
     <GameShell
       title={t(GAME_TITLE)}
-      emoji="🎳"
       modes={modes}
       mode={mode}
       onMode={(levels) => update({ levels: levels as MarbleLevel })}
