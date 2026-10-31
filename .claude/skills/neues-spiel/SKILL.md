@@ -1,6 +1,6 @@
 ---
 name: neues-spiel
-description: Add a new game to The Tiny Taps – folder, start screen, settings, page, route, home menu, docs and checks. Use when the user asks for a new game or wants to build an idea from the ideas page (e.g. "mach N-12") that is a game of its own, not a new mode of an existing game.
+description: Add a new game to Books for Both – folder, start screen, settings, page, route, home menu, docs and checks. Use when the user asks for a new game or wants to build an idea from the ideas page (e.g. "mach N-12") that is a game of its own, not a new mode of an existing game.
 ---
 
 # New game

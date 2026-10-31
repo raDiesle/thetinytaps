@@ -1,6 +1,6 @@
 # Buchstaben & Zahlen
 
-Route `/buchstaben/` (the old `/woerter/` leads here). The only game of its home category, so the home card opens it directly.
+Route `/buchstaben/` (the old `/woerter/` leads here). The only game of its book on the home page's shelf, so the book opens straight on it.
 
 Its card plays at once (`startMode`), in the way played last (Frei tippen at first); the start screen with its two cards
 comes only after ✕ or „Menü“. Two ways to play:

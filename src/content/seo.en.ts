@@ -20,7 +20,7 @@ export const SEO_EN: SeoTranslation = {
       title: "Games for 2 Year Olds – Free, No Ads, Offline",
       description:
         "Learning games for toddlers aged 2 to 3: look-and-find pictures, tooth brushing with a song, movement games, letters and animals. Free, no ads.",
-      text: "The Tiny Taps are simple games for the littlest ones: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. Look-and-find pictures, tooth brushing with a song, movement adventures, feelings, letters and numbers, matching and more.",
+      text: "Books for Both is a shelf of picture books to play, for grown-ups and little ones together: every tap and every key does something right away, nothing is ever wrong and there is nothing to read. Look-and-find pictures, tooth brushing with a song, movement adventures, feelings, letters and numbers, matching and more.",
     },
     "/spiele/lebendige-welten/": {
       title: "Living Pictures and Stories for Toddlers",
@@ -32,6 +32,12 @@ export const SEO_EN: SeoTranslation = {
       title: "Matching Games for Toddlers Aged 2 and Up",
       description: "What goes together? Feed the animals, find the shadow and pair the socks – first matching games for toddlers, free and without ads.",
       text: "First matching games: bring food to the animal, find the right shadow, hang pairs of socks on the line. Tap or drag, and nothing is ever wrong.",
+    },
+    "/spiele/alltag/": {
+      title: "Tooth Brushing, Potty and Day Plan for Toddlers",
+      description:
+        "Help for every day: brushing teeth with a song, going on the potty, a reward chart and a day plan in pictures, speaking loud and quiet. No ads.",
+      text: "What comes every day, as a game: brushing teeth with a song and a mirror, going on the potty, collecting stars and planning the day in pictures, speaking loud and quiet.",
     },
     "/bilder/": {
       title: "Interactive Look-and-Find Pictures for Toddlers",

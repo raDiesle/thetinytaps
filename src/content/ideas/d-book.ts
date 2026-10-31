@@ -97,9 +97,10 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-11",
+      partial: "Der Titel steht jetzt in einer Buchschrift mit Tapsi als Vignette (D-16); Sonne mit Gesicht und Pillen-Knöpfe sind noch offen.",
       emoji: "🌈",
       title: "Titel wie gedruckt",
-      text: "Prüfung, was noch nicht zum Buch passt: Der bunte Titel „The Tiny Taps“ auf der Inhaltsseite, die Sonne mit Gesicht und die runden Pillen-Knöpfe oben rechts sehen noch nach App aus. Ein Titel in einer Buchschrift mit einer Vignette, die Sonne als Zeichnung ohne Gesicht, die Knöpfe als kleine Lesezeichen am Seitenrand.",
+      text: "Prüfung, was noch nicht zum Buch passt: Der bunte Titel auf der Inhaltsseite, die Sonne mit Gesicht und die runden Pillen-Knöpfe oben rechts sehen noch nach App aus. Ein Titel in einer Buchschrift mit einer Vignette, die Sonne als Zeichnung ohne Gesicht, die Knöpfe als kleine Lesezeichen am Seitenrand.",
       why: "Die erste Seite nach dem Cover sieht dann wie eine Titelseite aus.",
       effort: "S",
     },
@@ -137,9 +138,10 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-16",
+      done: true,
       emoji: "🔤",
       title: "Titel „Books for Both“ auf Startseite und Cover",
-      text: "Die Startseite und das Cover heißen noch „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Books for Both“ in einer Buchschrift, mit einem kleinen gezeichneten Fuchs als Vignette (der Fuchs lehnt an einem der Wörter oder schaut aus einem Buch hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Fuchsohren. Hängt mit D-11 zusammen (Titel wie gedruckt).",
+      text: "Die Startseite und das Cover hießen „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Books for Both“ in einer Buchschrift, mit einem kleinen gezeichneten Fuchs als Vignette (der Fuchs lehnt an einem der Wörter oder schaut aus einem Buch hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Fuchsohren. Hängt mit D-11 zusammen (Titel wie gedruckt).",
       why: "Die Adresse heißt booksforboth.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder. (Bis 31. Oktober 2026 hieß die Idee „Toddlerfox“; kein „toddler“ im Namen, Recherche „Eine Domain ohne ‚toddler‘“.)",
       effort: "S",
     },
@@ -169,6 +171,7 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-20",
+      done: true,
       emoji: "📚",
       title: "Ein Regal voller Bücher: jede Sorte ein Buch, jedes Level eine Seite",
       text: "Die Startseite wird ein Bücherregal statt einer Inhaltsseite: Jede Kategorie ist ein eigenes Buch mit ihrem Umschlag (ihre Welt aus Worlds.tsx als Bild, der Titel auf dem Buchrücken). Ein Tipp zieht das Buch heraus und schlägt es auf; darin ist jedes Spiel oder Level eine Seite zum Umblättern (das Umblättern aus A-20 gibt es schon). Die „Weiteren“ Spiele, die heute ohne eigene Seite auf der Startseite stehen, kommen in ein neues Buch „Hilfen“ (oder „Für jeden Tag“) mit Zähne putzen, Aufs Töpfchen und Sterne & Tagesplan; ob Laut und leise dazugehört oder in ein anderes Buch, ist zu entscheiden. Passt zum Namen „Books for Both“ (booksforboth.com): viele Bücher, alle für Groß und Klein zusammen. Ändert zwei Regeln aus CLAUDE.md, die dann neu geschrieben werden müssen: eine Kategorie mit nur einem Spiel öffnet heute gleich das Spiel, und „Weitere“ hat heute keine eigene Seite (onHome).",

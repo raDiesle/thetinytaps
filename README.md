@@ -1,4 +1,4 @@
-# The Tiny Taps
+# Books for Both
 
 Simple keyboard and touch games for toddlers (2–3 years), German first.
 

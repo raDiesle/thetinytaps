@@ -90,7 +90,7 @@ export function PrivacyPage() {
       <section className="legal-panel">
         <h2>Kurz gesagt</h2>
         <p>
-          The Tiny Taps braucht kein Konto, setzt keine Cookies und zeigt keine Werbung. Was Ihr Kind spielt und was Sie einstellen, bleibt auf Ihrem Gerät.
+          Books for Both braucht kein Konto, setzt keine Cookies und zeigt keine Werbung. Was Ihr Kind spielt und was Sie einstellen, bleibt auf Ihrem Gerät.
           Beim Aufruf der Seite sieht der Anbieter, der sie ausliefert (GitHub), technisch nötige Daten wie Ihre IP-Adresse, und wir zählen die Besuche mit
           Cloudflare Web Analytics, ohne Cookies.
         </p>

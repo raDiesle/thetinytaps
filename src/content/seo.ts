@@ -11,7 +11,7 @@
 // words parents search for belong in title, description and text instead.
 
 /** The site's name, after every title. */
-export const SITE_NAME = "The Tiny Taps";
+export const SITE_NAME = "Books for Both";
 
 /** Search engines and previews for one address. */
 export interface PageSeo {
@@ -83,7 +83,7 @@ export const SEO_PAGES: PageSeo[] = [
     title: "Spiele für Kinder ab 2 – kostenlos, ohne Werbung",
     description:
       "Lernspiele für 2- bis 3-Jährige: Wimmelbilder, Zähneputzen mit Lied, Bewegungsspiele, Buchstaben und Tiere. Kostenlos, ohne Werbung, offline.",
-    text: "The Tiny Taps sind einfache Spiele für die Kleinsten: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. Wimmelbilder, Zähneputzen mit Lied, Bewegungsabenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und mehr.",
+    text: "Books for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. Wimmelbilder, Zähneputzen mit Lied, Bewegungsabenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und mehr.",
   },
   {
     path: "/spiele/lebendige-welten/",
@@ -98,6 +98,13 @@ export const SEO_PAGES: PageSeo[] = [
     description:
       "Was gehört zusammen? Tiere füttern, Schatten finden und Socken-Paare suchen – erste Zuordnungsspiele für Kleinkinder, kostenlos und ohne Werbung.",
     text: "Erste Zuordnungsspiele: Futter zum Tier bringen, den passenden Schatten finden, Socken-Paare an die Leine hängen. Antippen oder hinziehen, ohne Fehler.",
+  },
+  {
+    path: "/spiele/alltag/",
+    title: "Zähneputzen, Töpfchen und Tagesplan für Kleinkinder",
+    description:
+      "Hilfen für jeden Tag: Zähneputzen mit Lied, aufs Töpfchen gehen, Belohnungstafel und Tagesplan in Bildern, laut und leise sprechen. Ohne Werbung.",
+    text: "Was jeden Tag dran ist, als Spiel: Zähne putzen mit Lied und Spiegel, aufs Töpfchen gehen, Sterne sammeln und den Tag in Bildern planen, laut und leise sprechen.",
   },
   {
     path: "/bilder/",

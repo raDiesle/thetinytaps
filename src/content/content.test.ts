@@ -4,7 +4,7 @@ import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
 import { FOX_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
-import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, fullTitle, splitLanguage } from "./seo";
+import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SITE_NAME, fullTitle, splitLanguage } from "./seo";
 import { SEO_EN } from "./seo.en";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
@@ -19,17 +19,15 @@ describe("home menu", () => {
     expect(routes).toContain(href);
   });
 
-  test("a category of one game opens it directly, without a menu of one card", () => {
+  test("a book of one game opens it directly, without a menu of one card", () => {
     for (const category of CATEGORIES) {
-      if (category.onHome) continue;
       expect(categoryHref(category), category.id).toBe(category.games.length === 1 ? category.games[0].href : `/spiele/${category.id}/`);
     }
   });
 
-  test("a category whose games stand on the home page has no page, and its games lead back home", () => {
-    for (const category of CATEGORIES.filter((c) => c.onHome)) {
-      expect(hasPage(category), category.id).toBe(false);
-      for (const game of category.games) expect(categoryOf(game.href), game.href).toBeUndefined();
+  test("a game leads back to its book's page, or to the shelf when it is the book's only game", () => {
+    for (const category of CATEGORIES) {
+      for (const game of category.games) expect(categoryOf(game.href)?.id, game.href).toBe(hasPage(category) ? category.id : undefined);
     }
   });
 
@@ -38,7 +36,7 @@ describe("home menu", () => {
   });
 
   test("every card has a short line for grown-ups that fits in two lines", () => {
-    const lines = [...games.map((g) => [g.href, g.blurb] as const), ...CATEGORIES.filter((c) => !c.onHome).map((c) => [c.id, c.blurb] as const)];
+    const lines = [...games.map((g) => [g.href, g.blurb] as const), ...CATEGORIES.map((c) => [c.id, c.blurb] as const)];
     for (const [where, blurb] of lines) {
       expect(blurb?.de, where).toBeDefined();
       for (const text of Object.values(blurb ?? {})) expect(text.length, where).toBeLessThanOrEqual(42);
@@ -139,6 +137,25 @@ describe("search engine texts (seo.ts)", () => {
 
   test("grown-up pages are never in the search pages", () => {
     for (const path of NO_INDEX_PATHS) expect(paths).not.toContain(path);
+  });
+});
+
+describe("the app's name", () => {
+  test("is the same wherever it stands: browser tab, installed app, cover", () => {
+    const manifest = JSON.parse(readFileSync("public/manifest.webmanifest", "utf8"));
+    expect(manifest.name.startsWith(SITE_NAME), manifest.name).toBe(true);
+    expect(manifest.short_name).toBe(SITE_NAME);
+    const html = readFileSync("index.html", "utf8");
+    expect(html).toContain(`<title>${SITE_NAME} – `);
+    expect(html).toContain(`name="apple-mobile-web-app-title" content="${SITE_NAME}"`);
+    expect(readFileSync("src/components/BookCover.tsx", "utf8")).toContain(`>${SITE_NAME}<`);
+  });
+
+  test("the old name is gone from what players and search engines see", () => {
+    const seen = ["index.html", "public/manifest.webmanifest", ...readdirSync("src", { recursive: true, encoding: "utf8" }).map((f) => `src/${f}`)].filter(
+      (file) => /\.(tsx?|html|webmanifest|css)$/.test(file) && !file.includes("/ideas/") && !file.endsWith("research.ts") && !file.endsWith(".test.ts"),
+    );
+    for (const file of seen) expect(readFileSync(file, "utf8").includes("Tiny Taps"), file).toBe(false);
   });
 });
 

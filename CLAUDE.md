@@ -1,4 +1,4 @@
-# The Tiny Taps – notes for Claude
+# Books for Both – notes for Claude
 
 Keyboard and touch games for toddlers (2–3 years). A React 19 single-page app
 built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backend.
@@ -70,7 +70,7 @@ In a fresh worktree run `bun install` first.
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
-- The hidden page `/management/` (hold the „p“ in the home title; `/ideen/` is its old address) is where
+- The hidden page `/management/` (hold the fox in the home title, `Logo`; `/ideen/` is its old address) is where
   everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
@@ -228,9 +228,12 @@ In a fresh worktree run `bun install` first.
   same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held
   instead of a ring filling – with the fullscreen button and „Zurück zum Menü · halten“ right of it, clear of the room it
   lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it.
-- No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
-  in `content.test.ts`); a category of a few games that stand apart (`onHome`: „Weitere“) has no card and no page of its
-  own, its games stand right on the home page on a frame named after it, like a game's sorts below; and variants of one way to play (which words, how long, whole word or first letter) are
+- The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
+  toy look a card per category): one first picks a book, and only inside it, on its page, do its games stand on the
+  pasted-in cards (with tape and page numbers) – never games or levels on the shelf page itself, and no category whose
+  games stand on the home page (the old „Weitere“ frame is the book „Für jeden Tag“). A new category is a new book.
+- No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
+  in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
   plays at once, options while playing behind ⚙️ held in the top left corner like ✕ (`PlayOptions`, Buchstaben & Zahlen),
   never a tap a child could make by chance.
@@ -333,8 +336,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   whose cards open lazy pages does the same.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
   brings back the old toy-block look, `src/lib/look.ts`): a cover to open on the first visit to the home page
-  (`BookCover`, shown once per visit – `sessionStorage` – and only on the home page), the home page as the
-  contents page with page numbers, paper and softened colours, and the game's picture inside the page's paper margin
+  (`BookCover`, „Books for Both“, shown once per visit – `sessionStorage` – and only on the home page), the home
+  page as a bookshelf drawn on the page (a tapped book comes out towards the reader, then the page turns into it), each
+  book's page with its games' page numbers, paper and softened colours, and the game's picture inside the page's paper margin
   (`.book-frame`). All of it is CSS under `:root[data-look="book"]` in `src/styles/book.css`; games don't style for it.
   It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
   drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
@@ -359,12 +363,14 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
-  home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
+  book's cover on the shelf (the toy look's home card) shows a piece of it. A new category draws its world (`content.test.ts` checks).
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
-- The app lives at booksforboth.com (bought October 2026; toddlerfox.com and funforboth.com only redirect there). Its name
-  and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
+- The app is called „Books for Both“ and lives at booksforboth.com (bought October 2026; toddlerfox.com and funforboth.com
+  only redirect there; until then it was „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost).
+  The name is `SITE_NAME` in `seo.ts` and the same in every language; title, cover, manifest and `index.html` say it
+  (`content.test.ts` checks). Its name and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
   children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English

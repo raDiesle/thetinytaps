@@ -1,6 +1,6 @@
 ---
 name: bild-erzeugen
-description: Generate a raster picture (illustration, card, sprite with transparent background, backdrop) for The Tiny Taps with Gemini via `bun run image`, check it and put it into the game. Use when the user asks to make/generate a picture, Bild, illustration or asset with Gemini or AI, or to fill an image folder like src/games/feelings/bilder/.
+description: Generate a raster picture (illustration, card, sprite with transparent background, backdrop) for Books for Both with Gemini via `bun run image`, check it and put it into the game. Use when the user asks to make/generate a picture, Bild, illustration or asset with Gemini or AI, or to fill an image folder like src/games/feelings/bilder/.
 ---
 
 # Pictures with Gemini

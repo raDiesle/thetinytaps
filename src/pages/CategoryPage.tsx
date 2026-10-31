@@ -10,7 +10,7 @@ import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 import { SeoText } from "@/components/SeoText";
 
-/** One category of the home menu with its games. */
+/** One book of the home page's shelf, opened: its games on pasted-in cards, each on a page of its own. */
 export function CategoryPage() {
   const { category: id } = useParams();
   const category = CATEGORIES.find((c) => c.id === id);
@@ -35,9 +35,10 @@ export function CategoryPage() {
         }
       />
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
-        {category.games.map((g) => (
+        {/* The opened book: this is its first page, each game one of the pages after it. */}
+        {category.games.map((g, i) => (
           <li key={g.href}>
-            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
+            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} page={i + 2} />
           </li>
         ))}
       </ul>

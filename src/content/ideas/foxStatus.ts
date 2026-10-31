@@ -163,11 +163,11 @@ export const FOX_STATUS: FoxStatusRow[] = [
   },
   {
     href: "/",
-    note: "Cover und Familien neben den Karten sind Gemini-Bilder (components/bilder); der Titel heißt noch „The Tiny Taps“.",
+    note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder); der Titel „Books for Both“ hat Tapsi über einem Buch als Vignette (SVG).",
     tasks: [
       { label: "Cover nur mit der Fuchsfamilie", work: "picture", pictures: 1, effort: "S", idea: "D-14" },
       { label: "Oma oder Opa Fuchs mit Fuchskind statt der Bären", work: "picture", pictures: 1, effort: "S", idea: "D-15" },
-      { label: "Titel „Books for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16" },
+      { label: "Titel „Books for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
       { label: "Startseite als Fuchswald, ein Fuchs in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },
       { label: "Tapsi klatscht am Ende jedes Spiels (GameEnd)", work: "drawing", effort: "S", idea: "D-12" },
     ],

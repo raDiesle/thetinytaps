@@ -1,6 +1,6 @@
 ---
 name: neues-abenteuer
-description: Make a new trail level ("Weg-Abenteuer") for the game „Kleine Abenteuer“ in The Tiny Taps – a scrolling world, a goal that goes away, a bag of three things, obstacles, stairs and a small party at the end. Use when the user asks for a new Abenteuer, a new level for Kleine Abenteuer, a trail level, or wants to build one of the G ideas (e.g. "mach G-03", "neues Abenteuer", "neues Level für Kleine Abenteuer").
+description: Make a new trail level ("Weg-Abenteuer") for the game „Kleine Abenteuer“ in Books for Both – a scrolling world, a goal that goes away, a bag of three things, obstacles, stairs and a small party at the end. Use when the user asks for a new Abenteuer, a new level for Kleine Abenteuer, a trail level, or wants to build one of the G ideas (e.g. "mach G-03", "neues Abenteuer", "neues Level für Kleine Abenteuer").
 ---
 
 # New trail level for „Kleine Abenteuer“

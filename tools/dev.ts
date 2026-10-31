@@ -24,4 +24,4 @@ const server = serveOnFreePort(askedPort(3000), {
   routes: { ...publicRoutes, "/*": index },
   development: { hmr: true, console: true },
 });
-console.log(`The Tiny Taps: http://localhost:${server.port}/`);
+console.log(`Books for Both: http://localhost:${server.port}/`);

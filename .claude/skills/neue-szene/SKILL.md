@@ -1,6 +1,6 @@
 ---
 name: neue-szene
-description: Create a new "Lebendige Bilder" scene (Wimmelbild) for The Tiny Taps, e.g. Bauernhof, Zoo or Stadt – drawing, items, texts, animations, sounds, keys and checks. Use when the user asks for a new scene/picture, or to add many items to one.
+description: Create a new "Lebendige Bilder" scene (Wimmelbild) for Books for Both, e.g. Bauernhof, Zoo or Stadt – drawing, items, texts, animations, sounds, keys and checks. Use when the user asks for a new scene/picture, or to add many items to one.
 ---
 
 # New scene for "Lebendige Bilder"

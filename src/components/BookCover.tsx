@@ -80,7 +80,7 @@ export function BookCover() {
         </span>
         <span className="book-cover">
           <span className="book-cover-front">
-            <span className="book-cover-title">The Tiny Taps</span>
+            <span className="book-cover-title">Books for Both</span>
             {/* The animal families of the games reading the book together: it is read by a grown-up and a child. */}
             <span className="book-cover-label">{COVER && <img src={COVER} alt="" decoding="async" fetchPriority="high" />}</span>
             {CORNERS.map((corner) => (

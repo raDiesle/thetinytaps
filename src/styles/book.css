@@ -136,15 +136,32 @@
 
 /* ----- Headings: a book's title and chapters, printed, not jumping ----- */
 
+/* The name as on a book's title page (D-16): set in a book face, in ink, the small „for“ in italics. */
 :root[data-look="book"] .logo {
-  filter: saturate(0.6) brightness(0.97);
+  align-items: center;
+  gap: 0 0.28em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.4rem, 6.5vw, 4.4rem);
+  letter-spacing: 0.01em;
 }
 
 :root[data-look="book"] .logo-letter {
-  -webkit-text-stroke: 0.05em var(--ink);
-  text-shadow: none;
+  color: var(--ink);
+  -webkit-text-stroke: 0;
+  text-shadow: 0 0.04em 0 #3d304522;
   rotate: none;
   animation: none;
+}
+
+:root[data-look="book"] .logo-for .logo-letter {
+  color: var(--accent);
+  font-size: 0.62em;
+  font-style: italic;
+  font-weight: 400;
+}
+
+:root[data-look="book"] .logo-fox {
+  width: 1.05em;
 }
 
 /* A little printed flourish under the book's title, as over a table of contents. */
@@ -213,7 +230,7 @@
   font-weight: 600;
 }
 
-/* Page numbers, as in a table of contents (the home page's cards): on which page of the book each one is. */
+/* Page numbers, as in a table of contents (an opened book's cards): on which page of the book each one is. */
 .game-page {
   display: none;
 }
@@ -240,17 +257,207 @@
   }
 }
 
-/* A frame round a group of cards (the home page's „Weitere“, a game's sorts): a paper panel, stitched on. */
+/* A frame round a group of cards (a game's sorts): a paper panel, stitched on. */
 :root[data-look="book"] .mode-group::before {
   border: 2px dashed #3d304559;
   border-radius: 22px;
   background: #fffaf0a6;
 }
 
-:root[data-look="book"] .game-list .mode-group[data-world="weitere"]::before {
+/* ----- The home page: a bookshelf, one picture book per category (Bookshelf, D-20) ----- */
+
+/*
+ * The bookcase hugs its books: as wide as they are with the room between them (`BETWEEN` in Bookshelf.tsx), a row
+ * as tall as a book with room above its head (`HEADROOM`) and the board it stands on (`BOARD`), its top and sides
+ * (`FRAME`) of the same wood. The boards are painted down the back wall, one at the foot of every row.
+ */
+:root[data-look="book"] .shelf {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+:root[data-look="book"] .shelf:not(.fit) {
+  visibility: hidden;
+}
+
+:root[data-look="book"] .shelf-books {
+  --row: calc(var(--book-h) * 1.08 + 14px);
+  display: grid;
+  grid-template-columns: repeat(var(--per-row), var(--book-w));
+  grid-auto-rows: var(--row);
+  justify-content: space-evenly;
+  width: calc(var(--book-w) * (var(--per-row) + (var(--per-row) + 1) * 0.34));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 14px solid #a8693f;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
   background:
-    radial-gradient(circle, #fff 0 4px, transparent 5px) 0 0 / 40px 40px,
-    #f6dde6b0;
+    repeating-linear-gradient(
+      #0000 0 calc(var(--row) - 14px),
+      var(--ink) calc(var(--row) - 14px) calc(var(--row) - 12px),
+      #d39a62 calc(var(--row) - 12px) calc(var(--row) - 8px),
+      #a8693f calc(var(--row) - 8px) calc(var(--row) - 2px),
+      var(--ink) calc(var(--row) - 2px) var(--row)
+    ),
+    linear-gradient(90deg, #5a3c1f55, #0000 12%, #0000 88%, #5a3c1f55), linear-gradient(#5a3c1f40, #0000 30%),
+    repeating-linear-gradient(90deg, #e9cfa6 0 64px, #e1c394 64px 66px, #e6ca9e 66px 130px);
+  box-shadow:
+    0 0 0 2px var(--ink),
+    inset 0 0 0 2px var(--ink),
+    10px 14px 24px -8px #5a3c1f80;
+}
+
+/* Each book stands on its board, seen from a little in front, so a tap can lift it towards the reader. */
+:root[data-look="book"] .shelf-books > li {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 14px;
+  perspective: calc(var(--book-w) * 6);
+}
+
+/*
+ * The book, turned a little so its spine shows on the left; its spine is a side of its own in 3D. A tap pulls it
+ * out straight towards the reader before the page turns into it.
+ */
+:root[data-look="book"] .shelf-book {
+  --spine: calc(var(--book-w) * 0.18);
+  position: relative;
+  width: var(--book-w);
+  height: var(--book-h);
+  color: var(--ink);
+  text-decoration: none;
+  transform-style: preserve-3d;
+  transform-origin: 30% 100%;
+  transform: rotateY(26deg);
+  transition: transform 0.35s ease-out;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Not all books on a shelf are the same size. */
+:root[data-look="book"] .shelf-books > li:nth-child(4n + 2) .shelf-book {
+  height: calc(var(--book-h) * 0.93);
+}
+
+:root[data-look="book"] .shelf-books > li:nth-child(4n + 3) .shelf-book {
+  height: calc(var(--book-h) * 0.97);
+}
+
+@media (hover: hover) {
+  :root[data-look="book"] .shelf-book:hover {
+    transform: rotateY(16deg) translateZ(calc(var(--book-w) * 0.06));
+  }
+}
+
+:root[data-look="book"] .shelf-book.pulled {
+  z-index: 2;
+  transform: rotateY(0deg) translateZ(calc(var(--book-w) * 0.6)) translateY(-5%);
+  filter: drop-shadow(0 12px 14px #3d304566);
+}
+
+:root[data-look="book"] .shelf-book-spine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--spine) * -1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spine);
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 4px 0 0 4px;
+  transform-origin: right;
+  transform: rotateY(-90deg);
+  background:
+    linear-gradient(#0000 7%, #e0b75c 7% 9%, #0000 9% 91%, #e0b75c 91% 93%, #0000 93%), var(--paper-grain), color-mix(in srgb, var(--w1) 62%, #3d3045);
+}
+
+:root[data-look="book"] .shelf-book-spine span {
+  max-height: 80%;
+  overflow: hidden;
+  color: #fff6dc;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: calc(var(--spine) * 0.42);
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  writing-mode: vertical-rl;
+  rotate: 180deg;
+}
+
+/* The cover: cloth in the book's colour, the hinge's groove near the spine, its world pasted on as a picture. */
+:root[data-look="book"] .shelf-book-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6%;
+  padding: 9% 8% 7% 13%;
+  border: 2px solid var(--ink);
+  border-radius: 3px 10px 10px 3px;
+  background:
+    linear-gradient(90deg, #00000038, #0000 5%, #0000 8%, #00000026 8.5% 9.5%, #ffffff2e 10%, #0000 13%), var(--paper-grain),
+    color-mix(in srgb, var(--w1) 82%, #5a3c1f);
+  box-shadow: inset -3px -3px 0 #00000014;
+}
+
+:root[data-look="book"] .shelf-book-picture {
+  position: relative;
+  flex: none;
+  aspect-ratio: 1.3;
+  overflow: hidden;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  background: var(--paper);
+  box-shadow:
+    0 0 0 3px #fbf4e3,
+    0 0 0 5px #d9715f88;
+}
+
+:root[data-look="book"] .shelf-book-picture .world-card-scene {
+  inset: 0;
+  z-index: 0;
+  height: 100%;
+  border: 0;
+  clip-path: none;
+}
+
+:root[data-look="book"] .shelf-book-emoji {
+  position: absolute;
+  top: 8%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 1.5em;
+  height: 1.5em;
+  translate: -50% 0;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  font-family: var(--font-emoji);
+  font-size: calc(var(--book-w) * 0.17);
+  line-height: 1;
+}
+
+:root[data-look="book"] .shelf-book-title {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: calc(var(--book-w) * 0.095);
+  font-weight: 700;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root[data-look="book"] .shelf-book {
+    transition: none;
+  }
 }
 
 /* ----- Buttons, labels and panels: paper too, nothing glossy or app-like ----- */

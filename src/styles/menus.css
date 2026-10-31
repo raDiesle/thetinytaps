@@ -28,8 +28,22 @@
   display: inline-flex;
 }
 
+/* Tapsi peeking over a book in front of the name; hold it to open the management page. */
+.logo-fox {
+  display: inline-flex;
+  align-self: center;
+  width: 1.15em;
+}
+
+.logo-fox svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
 .logo-letter {
   display: inline-block;
+  color: var(--c);
   -webkit-text-stroke: 0.09em var(--ink);
   paint-order: stroke fill;
   text-shadow: 0 0.06em 0 var(--ink);
@@ -351,7 +365,7 @@ button.game-card:focus-visible {
   box-shadow: 0 1px 0 var(--ink);
 }
 
-/* The "p" in the home title: hold it to open the hidden idea page, without selecting text. */
+/* The fox in the home title: hold it to open the hidden management page, without selecting anything. */
 .secret-hold {
   user-select: none;
   -webkit-user-select: none;
