@@ -2,7 +2,9 @@ import type { Effort } from "./types";
 
 // Where the app's two mascots, the fox and the bear, could still turn up (D-18), game by game, shown
 // on the management page like the language table. Not every game needs them: they are a motif that
-// comes back, not a fox in every corner. A drawing is code and can be done any time; a picture from
+// comes back, not a fox in every corner. The motif is always a grown-up with a child (Mama, Papa, Oma or
+// Opa with the fox or bear child), since grown-up and child look at the book together: the child does the
+// thing, the grown-up is beside it. Only a fox or bear in a role (the baker) stands alone. A drawing is code and can be done any time; a picture from
 // Gemini waits here until the grown-up asks for them, and then all waiting ones are made in one batch,
 // which costs less than one by one. Kept by hand: when a game gets its fox or bear, mark the task here
 // in the same commit; a new game or picture adds its row or task. content.test.ts checks the rows
@@ -49,10 +51,10 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "Ein Kopf für alle: Rider in scenes/shared.tsx zeichnet etwa 33 Köpfe in Fahrzeugen.",
       },
       {
-        label: "Fuchs- oder Bärenkind schaut aus den Verstecken",
+        label: "Fuchs- oder Bärenkind schaut aus den Verstecken, Mama, Papa, Oma oder Opa gleich dahinter",
         work: "drawing",
         effort: "S",
-        note: "Fuchs und Bär zu Katze, Maus, Hase … in hideout.tsx, dann in jeder Szene.",
+        note: "Fuchs und Bär zu Katze, Maus, Hase … in hideout.tsx, dann in jeder Szene; das Kind vorn, der Große größer dahinter.",
       },
       {
         label: "Einige Erwachsene werden Füchse oder Bären: Erzieherin, Ärztin, Feuerwehr, Kassiererin, Bäckerin, Tierpfleger, Förster, Bauer …",
@@ -61,7 +63,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         note: "Jede Szene zeichnet ihre eigenen Leute; Szene für Szene, nicht alle – Menschen dürfen bleiben, die Kinder bleiben Kinder.",
       },
       {
-        label: "Ein Fuchs- oder Bärenkind unter den Kindern jeder Szene",
+        label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa in jeder Szene (Hand in Hand, auf den Schultern, auf der Bank daneben)",
         work: "drawing",
         effort: "M",
         note: "Kita, Spielplatz, Stadt, Strand, Herbst, Winter, Ostern.",
@@ -71,7 +73,10 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/abenteuer/",
     note: "Tapsi ist schon der Held in 3D und spricht. Der leuchtende Tänzer steht für das Kind und bleibt.",
-    tasks: [{ label: "Tapsi zeigt die Bewegungen", work: "drawing", effort: "S", state: "done" }],
+    tasks: [
+      { label: "Tapsi zeigt die Bewegungen", work: "drawing", effort: "S", state: "done" },
+      { label: "Mama, Papa, Oma oder Opa Fuchs macht bei Bewegungen zu zweit mit Tapsi vor", work: "drawing", effort: "M", idea: "M-05" },
+    ],
   },
   {
     href: "/gefuehle/",
@@ -84,7 +89,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "L",
         note: "Zu entscheiden: ein anderes Tier (Waschbär?) übernimmt Schubsen, Treten, Wegnehmen, Umwerfen (kita.ts und rund 56 Bilder); Fuchs und Bär, die Maskottchen, helfen und trösten.",
       },
-      { label: "Fuchs oder Bär tröstet oder hilft in den Geschichten", work: "picture", pictures: 8, effort: "M" },
+      { label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten", work: "picture", pictures: 8, effort: "M" },
     ],
   },
   {
@@ -106,7 +111,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
         effort: "M",
         note: "Ein Fuchs- und ein Bärenkopf in Grownup (film/people.tsx).",
       },
-      { label: "Fuchs oder Bär geht neben dem Hund mit auf den Wegen", work: "drawing", effort: "M" },
+      { label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen", work: "drawing", effort: "M" },
       { label: "Das Kind als Fuchs- oder Bärenkind", work: "drawing", effort: "M", idea: "D-19", note: "Erst entscheiden." },
     ],
   },
@@ -120,7 +125,7 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "Emoji, Verstecke als SVG.",
     tasks: [
       { label: "🦊 und 🐻 bei den Tieren", work: "drawing", effort: "S" },
-      { label: "Fuchs oder Bär schaut bei „Wer schaut da raus?“ aus dem Busch", work: "drawing", effort: "S" },
+      { label: "Fuchs- oder Bärenkind schaut bei „Wer schaut da raus?“ aus dem Busch, sein Großer winkt daneben", work: "drawing", effort: "S" },
     ],
   },
   {
@@ -128,20 +133,20 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     note: "SVG: Waschmaschine, Socken, Klammern, Korb.",
     tasks: [
       { label: "Socken mit Fuchs- und Bärenmuster", work: "drawing", effort: "S" },
-      { label: "Tapsi schaut aus dem Wäschekorb und freut sich", work: "drawing", effort: "M" },
+      { label: "Tapsi schaut aus dem Wäschekorb, Mama, Papa, Oma oder Opa Fuchs hängt lachend Wäsche auf", work: "drawing", effort: "M" },
     ],
   },
   {
     href: "/buchstaben/",
     note: "Emoji-Wörter zum Lernen (Mama, Oma, Junge …) bleiben Menschen. „Fuchs 🦊“ gibt es beim F.",
-    tasks: [{ label: "Tapsi auf Start und Ende", work: "drawing", effort: "S" }],
+    tasks: [{ label: "Tapsi mit Mama, Papa, Oma oder Opa Fuchs auf Start und Ende", work: "drawing", effort: "S" }],
   },
   {
     href: "/zaehne/",
     note: "SVG. Das Gesicht im Spiegel ist das Kind und bleibt; die Stimme ist schon Tapsi.",
     tasks: [
-      { label: "Tapsi putzt klein in der Ecke mit", work: "drawing", effort: "M" },
-      { label: "Tapsi jubelt bei Medaille und Wochenplan", work: "drawing", effort: "S" },
+      { label: "Tapsi putzt klein in der Ecke mit, Mama, Papa, Oma oder Opa Fuchs putzt nach", work: "drawing", effort: "M" },
+      { label: "Tapsi und sein Großer jubeln bei Medaille und Wochenplan", work: "drawing", effort: "S" },
     ],
   },
   {
@@ -157,15 +162,16 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
   {
     href: "/laut-leise/",
     note: "SVG: Löwe und Maus (das Thema des Spiels, sie bleiben), Kerzen, Pusteblume, Windrad, Boot.",
-    tasks: [{ label: "Tapsi pustet mit (Kerzen, Pusteblume)", work: "drawing", effort: "M" }],
+    tasks: [{ label: "Tapsi pustet mit (Kerzen, Pusteblume), Mama, Papa, Oma oder Opa Fuchs hält ihm die Pusteblume", work: "drawing", effort: "M" }],
   },
   {
     href: "/",
     note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; der Titel „Books for Both“ hat Fuchs und Bär über einem Buch als Vignette (SVG).",
     tasks: [
       { label: "Titel „Books for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
-      { label: "Startseite als Wald mit Fuchsbau und Bärenhöhle, Fuchs oder Bär in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },
-      { label: "Fuchs und Bär klatschen am Ende jedes Spiels (GameEnd)", work: "drawing", effort: "S", idea: "D-12" },
+      { label: "Startseite als Wald mit Fuchsbau und Bärenhöhle, Fuchs oder Bär mit seinem Kind in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },
+      { label: "Fuchs- oder Bärenkind und sein Großer klatschen am Ende jedes Spiels (GameEnd)", work: "drawing", effort: "S", idea: "D-12" },
+      { label: "Oma und Opa Fuchs, Oma und Opa Bär mit dem Kind neben den Karten (BookFamily)", work: "picture", pictures: 4, effort: "S", idea: "D-21" },
     ],
   },
 ];

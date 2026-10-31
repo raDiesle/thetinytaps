@@ -95,7 +95,7 @@ export const firstVisitIdeas: IdeaArea = {
       id: "V-11",
       emoji: "🐾",
       title: "Tapsi führt herum",
-      text: "Beim ersten Besuch winkt der Fuchs Tapsi (aus dem Bewegungsabenteuer) unten am Rand und zeigt mit der Pfote auf eine Karte, wie die zeigende Hand vor dem ersten Tippen in den Spielen. Mit Vorlesen sagt Tapsi beim Antippen einer Karte ihren Namen („Lebendige Welten!“). Danach sitzt Tapsi still in der Ecke.",
+      text: "Beim ersten Besuch winkt der Fuchs Tapsi (aus dem Bewegungsabenteuer) unten am Rand und zeigt mit der Pfote auf eine Karte, wie die zeigende Hand vor dem ersten Tippen in den Spielen; Mama, Papa, Oma oder Opa Fuchs steht dabei, den Arm um Tapsi. Mit Vorlesen sagt Tapsi beim Antippen einer Karte ihren Namen („Lebendige Welten!“). Danach sitzen die beiden still in der Ecke.",
       why: "Eine Figur, die durch alles führt, macht aus vielen Spielen eine App – und das Kind weiß, was es tun soll, ohne zu lesen.",
       effort: "M",
     },

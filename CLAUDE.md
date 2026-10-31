@@ -368,6 +368,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
   children beside the menu's cards (`BookFamily`) show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
+  Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
+  or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
+  with the child at the centre. Wherever they turn up (a menu, a game, an idea in `d-book.ts` or `mascotStatus.ts`), the
+  child does the thing (taps, brushes, blows, peeks out) and the grown-up is beside it, watching, helping, cheering; only
+  a fox or bear in a role (the baker, the doctor) stands alone. The cover keeps its two families (above).
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
   book's cover on the shelf (the toy look's home card) shows a piece of it. A new category draws its world (`content.test.ts` checks).
