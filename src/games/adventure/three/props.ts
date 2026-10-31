@@ -45,6 +45,66 @@ export function mergeStatic(root: THREE.Object3D) {
   return merged;
 }
 
+/**
+ * Bakes the parts of a thing that never move against it into one mesh per material, in place: what
+ * moves on its own (a lid, a wing, a finger) goes into `keep` and stays as it is, with everything under it.
+ * Every object costs the phone time in every frame, drawn or not, so a prop of thirty boxes is one
+ * mesh per colour instead. Hidden parts and parts with children stay too. Looks the same: the geometry
+ * keeps all its attributes, only moved to where the part was. `outlined` (the fox) also keeps how far
+ * each vertex's ink line reaches out (`inkNormal`, see contour.ts), which a part's own size scaled.
+ */
+export function mergeParts<T extends THREE.Object3D>(root: T, keep: THREE.Object3D[] = [], outlined = false): T {
+  root.updateMatrixWorld(true);
+  const toRoot = new THREE.Matrix4().copy(root.matrixWorld).invert();
+  const looks = new Map<string, THREE.Mesh[]>();
+  const kept = new Set(keep);
+  const visit = (o: THREE.Object3D) => {
+    for (const child of o.children) {
+      if (kept.has(child) || !child.visible) continue;
+      if (child instanceof THREE.Mesh && child.constructor === THREE.Mesh && child.children.length === 0 && !Array.isArray(child.material)) {
+        const g = child.geometry;
+        if (child.matrixWorld.determinant() < 0 || Object.keys(g.morphAttributes).length > 0) continue;
+        const attributes = Object.keys(g.attributes).sort().join();
+        const key = [child.material.uuid, child.castShadow, child.receiveShadow, child.renderOrder, child.layers.mask, g.index !== null, attributes].join("|");
+        looks.set(key, [...(looks.get(key) ?? []), child]);
+      } else if (!(child instanceof THREE.Mesh)) visit(child);
+    }
+  };
+  visit(root);
+  for (const meshes of looks.values()) {
+    if (meshes.length < 2) continue;
+    const parts = meshes.map((m) => {
+      const matrix = new THREE.Matrix4().multiplyMatrices(toRoot, m.matrixWorld);
+      const part = m.geometry.clone();
+      if (outlined) {
+        const ink = part.attributes.normal.clone();
+        ink.applyMatrix3(new THREE.Matrix3().setFromMatrix4(matrix));
+        part.setAttribute("inkNormal", ink);
+      }
+      return part.applyMatrix4(matrix);
+    });
+    const merged = new THREE.Mesh(mergeGeometries(parts), meshes[0].material);
+    for (const part of parts) part.dispose();
+    const first = meshes[0];
+    merged.castShadow = first.castShadow;
+    merged.receiveShadow = first.receiveShadow;
+    merged.renderOrder = first.renderOrder;
+    merged.layers.mask = first.layers.mask;
+    root.add(merged);
+    for (const m of meshes) {
+      // Groups this leaves empty go too.
+      let parent = m.parent;
+      m.removeFromParent();
+      while (parent && parent !== root && parent.children.length === 0) {
+        const up: THREE.Object3D | null = parent.parent;
+        parent.removeFromParent();
+        parent = up;
+      }
+    }
+  }
+  return root;
+}
+
 /** A pseudo-random number in 0..1 from a seed, so every run looks the same. */
 export function seeded(seed: number) {
   let s = seed;
@@ -83,9 +143,10 @@ export function makeRock(size: number, seed: number, color = "#a49a90") {
 export function makeBush(size: number, seed: number, colors = ["#4f9e3c", "#5fb547", "#3f8a33"]) {
   const rnd = seeded(seed);
   const group = new THREE.Group();
+  const leaves = colors.map((c) => mat(c, 0.85));
   for (let i = 0; i < 5; i++) {
     const r = size * (0.45 + rnd() * 0.35);
-    const ball = solid(wobble(new THREE.IcosahedronGeometry(r, 2), r * 0.18, seed + i), mat(colors[i % colors.length], 0.85));
+    const ball = solid(wobble(new THREE.IcosahedronGeometry(r, 2), r * 0.18, seed + i), leaves[i % leaves.length]);
     const a = rnd() * Math.PI * 2;
     ball.position.set(Math.cos(a) * size * 0.45, r * 0.75 + rnd() * size * 0.2, Math.sin(a) * size * 0.45);
     group.add(ball);
@@ -255,6 +316,7 @@ export function makeTurtle() {
     head.add(spot);
   }
   const eyes: THREE.Group[] = [];
+  const rosy = new THREE.MeshBasicMaterial({ color: "#ff8fa3", transparent: true, opacity: 0.6 });
   for (const side of [1, -1]) {
     const eye = new THREE.Group();
     eye.position.set(0.1 * side, 0.15, 0.4);
@@ -269,7 +331,7 @@ export function makeTurtle() {
     eye.add(glint);
     head.add(eye);
     eyes.push(eye);
-    const cheek = new THREE.Mesh(new THREE.CircleGeometry(0.035, 16), new THREE.MeshBasicMaterial({ color: "#ff8fa3", transparent: true, opacity: 0.6 }));
+    const cheek = new THREE.Mesh(new THREE.CircleGeometry(0.035, 16), rosy);
     cheek.position.set(0.15 * side, 0.06, 0.4);
     cheek.rotation.y = 0.7 * side;
     head.add(cheek);
@@ -278,6 +340,7 @@ export function makeTurtle() {
   smile.rotation.z = Math.PI;
   smile.position.set(0, 0.05, 0.48);
   head.add(smile);
+  mergeParts(head, eyes);
 
   // Four flippers on pivots under the shell's edge; the front ones big, like wings.
   const flipperGeo = new THREE.SphereGeometry(0.5, 18, 10);
@@ -339,12 +402,13 @@ export function makePaddle() {
   group.add(solid(new THREE.CylinderGeometry(0.025, 0.025, PADDLE_REACH * 2 - 0.3, 8), wood));
   const bladeGeo = new THREE.SphereGeometry(0.15, 16, 10);
   bladeGeo.scale(0.85, 1.6, 0.16);
+  const bladeMat = mat("#e0a464", 0.6);
   for (const end of [1, -1]) {
-    const blade = solid(bladeGeo, mat("#e0a464", 0.6));
+    const blade = solid(bladeGeo, bladeMat);
     blade.position.y = end * (PADDLE_REACH - 0.24);
     group.add(blade);
   }
-  return group;
+  return mergeParts(group);
 }
 
 /**
@@ -411,6 +475,7 @@ export function makeScorpion(color = "#e2683c") {
   sting.position.set(0, 0.28, -0.07);
   sting.rotation.x = 2.2;
   group.add(sting);
+  mergeParts(group, legs);
   return {
     group,
     walk(t: number) {
@@ -458,6 +523,7 @@ export function makeMonkey() {
   grin.rotation.z = Math.PI;
   grin.position.set(0, -0.05, 0.17);
   head.add(grin);
+  mergeParts(head);
   const arms: THREE.Group[] = [];
   for (const side of [1, -1]) {
     const shoulder = new THREE.Group();
@@ -475,6 +541,7 @@ export function makeMonkey() {
   tail.position.set(0, 0.15, -0.22);
   tail.rotation.y = Math.PI / 2;
   group.add(tail);
+  mergeParts(group, [head, ...arms]);
   const right = arms[1];
   return {
     group,
@@ -577,6 +644,8 @@ export function makeChest() {
   const glow = new THREE.PointLight("#ffd36b", 0, 6, 1.5);
   glow.position.set(0, 1.2, 0.2);
   group.add(glow);
+  mergeParts(lid);
+  mergeParts(group, [lid, coins]);
   return {
     group,
     open(k: number) {
@@ -609,8 +678,9 @@ export function makeParrot() {
   const beak = solid(beakGeo, mat("#3a2b22", 0.4));
   beak.position.set(0, 0.17, 0.2);
   group.add(beak);
+  const black = mat("#111111", 0.2);
   for (const side of [1, -1]) {
-    const eye = solid(new THREE.SphereGeometry(0.022, 10, 8), mat("#111111", 0.2), false);
+    const eye = solid(new THREE.SphereGeometry(0.022, 10, 8), black, false);
     eye.position.set(0.06 * side, 0.24, 0.15);
     group.add(eye);
   }
@@ -638,6 +708,7 @@ export function makeParrot() {
     feather.rotation.set(-0.5, 0, (i - 1) * 0.25);
     group.add(feather);
   }
+  mergeParts(group, [head, ...wings]);
   return {
     group,
     flap(time: number, flying: boolean) {
@@ -657,14 +728,16 @@ export function makeCrab() {
   body.scale.set(1.3, 0.6, 1);
   body.position.y = 0.18;
   group.add(body);
+  const white = mat("#ffffff", 0.3);
+  const black = mat("#111111", 0.2);
   for (const side of [1, -1]) {
     const stalk = solid(new THREE.CylinderGeometry(0.015, 0.015, 0.14, 6), shell, false);
     stalk.position.set(0.07 * side, 0.34, 0.1);
     group.add(stalk);
-    const eye = solid(new THREE.SphereGeometry(0.04, 10, 8), mat("#ffffff", 0.3), false);
+    const eye = solid(new THREE.SphereGeometry(0.04, 10, 8), white, false);
     eye.position.set(0.07 * side, 0.42, 0.1);
     group.add(eye);
-    const pupil = solid(new THREE.SphereGeometry(0.02, 8, 6), mat("#111111", 0.2), false);
+    const pupil = solid(new THREE.SphereGeometry(0.02, 8, 6), black, false);
     pupil.position.set(0.07 * side, 0.42, 0.135);
     group.add(pupil);
     for (let l = 0; l < 3; l++) {
@@ -685,6 +758,7 @@ export function makeCrab() {
     group.add(arm);
     claws.push(arm);
   }
+  mergeParts(group, claws);
   return {
     group,
     dance(time: number, amount: number) {
@@ -768,5 +842,5 @@ export function makeCloud(seed: number) {
     puff.scale.y = 0.7;
     group.add(puff);
   }
-  return group;
+  return mergeParts(group);
 }

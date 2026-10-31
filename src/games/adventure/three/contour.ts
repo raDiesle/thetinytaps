@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { RigidSkin } from "./skin";
 
 // Outlines around the fox, so its movements read clearly in a busy picture:
 // a thin dark ink line all around, drawn as "inverted hulls" (each part again,
@@ -24,13 +25,24 @@ export const GLOW_LAYER = 7;
 /** The solid things of the scene, which hide the moving parts behind them from the mask. */
 const SOLID_LAYER = 8;
 
-const hull = (color: string) =>
+/** `merged`: parts baked together (`mergeParts`, `skinRigid`) keep their own ink direction and length in `inkNormal`. */
+const hull = (color: string, merged: boolean) =>
   new THREE.ShaderMaterial({
     uniforms: { color: { value: new THREE.Color(color) }, thickness: { value: INK } },
+    defines: merged ? { INK_NORMAL: "" } : {},
     vertexShader: /* glsl */ `
       uniform float thickness;
+      #if defined(INK_NORMAL) || defined(USE_SKINNING)
+      attribute vec3 inkNormal;
+      #else
+      #define inkNormal normal
+      #endif
+      #include <skinning_pars_vertex>
       void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position + normal * thickness, 1.0);
+        vec3 transformed = position + inkNormal * thickness;
+        #include <skinbase_vertex>
+        #include <skinning_vertex>
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
       }`,
     fragmentShader: /* glsl */ `
       uniform vec3 color;
@@ -45,8 +57,12 @@ const maskMaterial = () =>
   new THREE.ShaderMaterial({
     uniforms: { strength: { value: 0 } },
     vertexShader: /* glsl */ `
+      #include <skinning_pars_vertex>
       void main() {
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        vec3 transformed = position;
+        #include <skinbase_vertex>
+        #include <skinning_vertex>
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
       }`,
     fragmentShader: /* glsl */ `
       uniform float strength;
@@ -162,13 +178,16 @@ export class Contour {
   private readonly screenCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   private readonly drawing = new THREE.Vector2();
   private readonly middle = new THREE.Vector3();
+  private readonly ahead = new THREE.Vector3();
+  private readonly bounds = new THREE.Sphere();
 
   /** Outlines every shadow-casting mesh under `root`; `partOf` says which body part it moves with. */
   constructor(
     private readonly root: THREE.Object3D,
     partOf: (mesh: THREE.Object3D) => ContourPart,
   ) {
-    const ink = hull("#2b160d");
+    const ink = hull("#2b160d", false);
+    const inkMerged = hull("#2b160d", true);
     for (const part of CONTOUR_PARTS) {
       this.mask.set(part, maskMaterial());
       this.maskMeshes.set(part, []);
@@ -183,10 +202,15 @@ export class Contour {
       const masked = new THREE.Mesh(mesh.geometry, this.mask.get(part));
       masked.layers.set(GLOW_LAYER);
       masked.visible = false;
-      mesh.add(new THREE.Mesh(mesh.geometry, ink), masked);
+      mesh.add(new THREE.Mesh(mesh.geometry, mesh.geometry.attributes.inkNormal ? inkMerged : ink), masked);
       this.maskMeshes.get(part)!.push(masked);
     }
     this.screen.frustumCulled = false;
+  }
+
+  /** Parts skinned after they were outlined (`skinRigid`): the glow's masks are their skinned meshes now. */
+  adopt(replaced: Map<THREE.Mesh, THREE.Mesh>) {
+    for (const [part, meshes] of this.maskMeshes) this.maskMeshes.set(part, [...new Set(meshes.map((m) => replaced.get(m) ?? m))]);
   }
 
   /** How much a part glows, 0 (only the ink line) to 1. */
@@ -226,14 +250,37 @@ export class Contour {
     renderer.autoClear = true;
 
     // First the depth of everything solid apart from the fox, then the moving parts where they are not behind it.
+    // Only what comes nearer to the camera than the far side of the moving parts can hide some of them, so
+    // the rest (most of the world, behind the fox) is left out of the depth: hundreds of draw calls fewer.
+    camera.getWorldDirection(this.ahead);
+    const depthOf = (mesh: THREE.Mesh, side: number) => {
+      // An instanced mesh's own bounds hold all its copies; one that keeps none (its copies move) may be anywhere.
+      if (mesh instanceof THREE.InstancedMesh && !mesh.boundingSphere) return -side * Infinity;
+      if (mesh instanceof RigidSkin) return mesh.reach(camera.position, this.ahead, side, this.bounds);
+      if (!mesh.geometry.boundingSphere) mesh.geometry.computeBoundingSphere();
+      this.bounds.copy(mesh instanceof THREE.InstancedMesh ? mesh.boundingSphere! : mesh.geometry.boundingSphere!).applyMatrix4(mesh.matrixWorld);
+      return this.bounds.center.sub(camera.position).dot(this.ahead) + side * this.bounds.radius;
+    };
+    let far = -Infinity;
+    for (const meshes of this.maskMeshes.values()) for (const mesh of meshes) if (mesh.visible) far = Math.max(far, depthOf(mesh, 1));
     let scene: THREE.Object3D = this.root;
     while (scene.parent) scene = scene.parent;
-    scene.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      const m = o.material;
-      if (!Array.isArray(m) && !m.transparent && m.depthWrite && m.colorWrite) o.layers.enable(SOLID_LAYER);
-      else o.layers.disable(SOLID_LAYER);
-    });
+    // What is hidden is not drawn, whatever its layers; nor is the fox here.
+    const sort = (o: THREE.Object3D) => {
+      if (!o.visible || o === this.root) return;
+      // The lights come along, though they light nothing here: whenever the lights of one picture differ from
+      // the one before, three.js works out the program of every lit material again, which took most of a
+      // phone's frame while a part glowed.
+      if (o instanceof THREE.Light) o.layers.enable(SOLID_LAYER);
+      else if (o instanceof THREE.Mesh) {
+        const m = o.material;
+        const solid = !Array.isArray(m) && !m.transparent && m.depthWrite && m.colorWrite;
+        if (solid && depthOf(o, -1) <= far) o.layers.enable(SOLID_LAYER);
+        else o.layers.disable(SOLID_LAYER);
+      }
+      for (const child of o.children) sort(child);
+    };
+    sort(scene);
     renderer.setRenderTarget(this.maskTarget);
     if (scene instanceof THREE.Scene) {
       const shadows = renderer.shadowMap.autoUpdate;
@@ -248,7 +295,11 @@ export class Contour {
     } else renderer.clear();
     renderer.autoClear = false;
     camera.layers.set(GLOW_LAYER);
+    // The fox's matrices are up to date from the picture just drawn.
+    const own = this.root.matrixWorldAutoUpdate;
+    this.root.matrixWorldAutoUpdate = false;
     renderer.render(this.root, camera);
+    this.root.matrixWorldAutoUpdate = own;
     camera.layers.mask = layers;
     renderer.autoClear = true;
 

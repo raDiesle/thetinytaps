@@ -60,6 +60,54 @@ The game has no settings of its own: its own music and the language follow the s
   Kiki is Kiki / 琪琪 / कीकी / كيكي / „Кики“; Ole is Ole / 奥乐 / ओले / أولي / „Оле“. Both stories have a title and every step name in
   all six languages (`voice.test.ts` checks it, and that Russian, Chinese, Hindi and Arabic ones have no Latin letters).
 
+## Keeping the scene cheap
+
+three.js visits every object in every frame – world matrices, culling, shadows, the glow's depth – drawn or not, and
+each mesh is a draw call or more; that, not the drawing, kept an old phone's main thread busy (`bun run perf abenteuer`,
+October 2026: 2,186 objects, 79 % busy, budget 60 %). So:
+- Bake what does not move: a prop builder ends with `mergeParts(group, keep)` (`three/props.ts`), which turns all parts
+  that never move against the group into one mesh per material; what moves on its own (a lid, a pivot, a head that
+  pecks, legs that wiggle) goes into `keep` and stays as it is, and parts shown or hidden together go into a group of
+  their own, baked by itself and kept (the star box's face stars). Parts bake together only when they share one
+  material, so make a prop's materials once, never `mat(…)` inside a loop (two eyes, two materials). Code that looks for
+  a part (the palm's top) runs before the bake. Scenery that never moves at all goes through `mergeStatic`. The fox's
+  rigid parts are baked per joint with `outlined`, so the ink line keeps its width.
+- Parts that move against each other but look alike are skinned: the fox's arms and legs with fingers and toes are one
+  skinned mesh per look (`skinRigid`, `three/skin.ts`), each vertex following its joint, so a limb is a handful of draws
+  in every pass instead of sixty. Skin after the ink line, the glow's mask and the see-through materials are made, and
+  hand the result to `contour.adopt`. Shaders of the fox's own (`contour.ts`) include three's skinning chunks, and code
+  that needs a skinned part's bounds asks `RigidSkin.reach`, never its geometry, which lies in its joints' spaces. Body
+  and head stay plain meshes: their see-through copies blend in the order three.js sorts them per mesh.
+- Many copies of one moving thing (the birds) are one `InstancedMesh` per part (`makeFlock` in
+  `stories/treasureIsland/scenery.ts`): the builders keep their groups to move, `update()` copies their matrices into
+  the instances, hides a hidden copy by scaling it to nothing and keeps the mesh's `boundingSphere` around all copies,
+  which culling and the glow's depth pass read.
+- The stage leaves out the shadow of anything whose shadow can't fall into the picture (`sun.shadow.getFrustum` in
+  `three/stage.ts`: a caster's sphere drawn out along the sunlight down to the lowest thing receiving shadows); nothing
+  to do for a new prop.
+- The stage's scene has `matrixWorldAutoUpdate = false`: `updateMoved()` (`three/matrices.ts`) brings up to date only
+  what moved. Use it, not `updateMatrixWorld(true)`, on anything big (the fox, Ole, a raft with things on it).
+- What draws nothing at the moment is hidden (`visible = false`), not left to draw nothing: the glow masks, the fox's
+  see-through copies while no limb marks. The glow's depth pass draws only what comes nearer than the fox.
+- An extra picture of the scene (the glow's depth pass) sees the same lights as the main one, also when its camera
+  looks at other layers: when the lights change from one picture to the next, three.js works out the program of every
+  lit material again – it did so every frame while a part glowed, a phone's whole frame.
+- `three/sceneSize.test.ts` keeps the fox and both worlds under an object count; `bun run perf abenteuer` measures the
+  opening and the drums (glowing). Check a new prop or station with both, and the look with a pixel diff in the preview
+  (`__adventure.seek`, then `readPixels`): baking must not change a pixel. Compare shots taken in one run over the same
+  times in the same order – seeking about differently changes the state, and two such runs differ by thousands of
+  pixels with the same code. Measure perf with the preview on an idle page (a story playing there costs the measured
+  browser a fifth of its time) and compare two versions back to back, as other programs change the numbers too.
+  After swapping the game's files under a running dev server (`git checkout` of another version), a story may fail to
+  build („Dieses Gerät kann die 3D-Bilder leider nicht zeigen“, the error is swallowed in `AdventurePlay.tsx`) and a
+  reload doesn't help: change a file the page imports, or restart the server, before checking or measuring.
+- Never drop to 30 fps on slow devices (user decision, October 2026): the motions must stay smooth. A part that holds a
+  steady 60 fps (p95 17 ms) may stay over the busy budget, but only as a per-part `budget` in `tools/perfScenarios.ts`
+  with the decision written next to it – never by loosening the scenario's limits.
+- Where it stands (October 2026): the opening about 47 % busy, the glowing drums 85–90 % (accepted, its own limit
+  95 %; both hold 60 fps); about a quarter of that is the headless browser's GL work on the CPU (SwiftShader), which a
+  phone's graphics chip does.
+
 ## Working on levels
 
 - Read `LEVEL-REGELN.md` in this folder first and check the work against it. Every piece of feedback

@@ -1,6 +1,6 @@
 ---
 name: neue-szene
-description: Create a new "Lebendige Bilder" scene (Wimmelbild) for The Tiny Taps, e.g. Bauernhof, Zoo or Stadt – drawing, items, texts, animations, sounds, keys and checks. Use when the user asks for a new scene/picture, or to add many items to one.
+description: Create a new "Lebendige Bilder" scene (Wimmelbild) for Books for Both, e.g. Bauernhof, Zoo or Stadt – drawing, items, texts, animations, sounds, keys and checks. Use when the user asks for a new scene/picture, or to add many items to one.
 ---
 
 # New scene for "Lebendige Bilder"
@@ -28,7 +28,8 @@ src/games/scenes/
 Register the scene in `src/games/scenes/index.ts` (`SCENES`) and remove it from
 `UPCOMING_SCENES`. The route `/bilder/<id>` (`src/pages/ScenePage.tsx`) finds it with `findScene`.
 Add its search engine entry to `src/content/seo.ts` (`scene("<id>", "<Titel>", "<three things to tap>")`,
-things that really are in the picture); `content.test.ts` fails without it.
+things that really are in the picture), and its English in `src/content/seo.en.ts` (`scene("<Title>", "<things>")`);
+`content.test.ts` fails without either.
 
 Reuse instead of copying: import the shared helpers from `../layout`, `../shared`
 and `../sky`. When a helper of one scene is needed by another, move it up to

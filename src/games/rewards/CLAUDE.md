@@ -2,7 +2,7 @@
 
 Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan: `also` in `games.ts`, so it keeps its
 own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
-„belohnungstafel“ in `src/content/research.ts`. One home card, „🌟 Belohnungstafel & Tagesplan“
+„belohnungstafel“ in `src/content/research.ts`. One card, „🌟 Belohnungstafel & Tagesplan“
 (both names, as parents search for them – user decision, October 2026): the **Belohnungstafel**
 (boards of stars, first part below) and the **Tagesplan** (plans of picture cards, second part) share one page, one
 row of tabs and one wizard.
@@ -37,7 +37,7 @@ whatever the address.
 # Belohnungstafel
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
-the same on screen and on paper (A4 from the browser, also offline). It stands in the „Weitere“ frame on the home page, but has no
+the same on screen and on paper (A4 from the browser, also offline). It stands in the book „Für jeden Tag“ on the home page's shelf, but has no
 `GameShell`: nothing to start or leave, no play time counted, and `PlaytimeLock` lets it through, so the evening
 brushing's star still lands after the minutes are over. It may become a website of its own one day (T-19), so the
 folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, speech, tap

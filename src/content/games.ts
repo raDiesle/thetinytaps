@@ -15,14 +15,12 @@ export interface Category {
   id: string;
   emoji: string;
   title: Localized;
-  /** One short line for grown-ups under the name on its home card, like `Game.blurb` (none for one without a card). */
-  blurb?: Localized;
-  /** Its games stand on the home page itself, together on a frame with the category's name above, instead of behind a card of their own. */
-  onHome?: boolean;
+  /** One short line for grown-ups under the name on its book, like `Game.blurb`. */
+  blurb: Localized;
   games: Game[];
 }
 
-/** The home menu: first a category, then its games (on `/spiele/<id>/`). */
+/** The home menu: the books on the shelf, one per category, then its games – the book's pages (on `/spiele/<id>/`). */
 export const CATEGORIES: Category[] = [
   {
     id: "lebendige-welten",
@@ -256,11 +254,10 @@ export const CATEGORIES: Category[] = [
     ],
   },
   {
-    id: "weitere",
-    emoji: "🎈",
-    title: { de: "Weitere", ru: "Ещё", en: "More", zh: "更多", hi: "और भी", es: "Más", ar: "المزيد" },
-    // Its games are few and stand apart from each other, so a tap on „Weitere“ first would only hide them.
-    onHome: true,
+    id: "alltag",
+    emoji: "🌞",
+    title: { de: "Für jeden Tag" },
+    blurb: { de: "Zähne putzen, Töpfchen, Tagesplan" },
     games: [
       {
         href: "/zaehne/",
@@ -331,14 +328,11 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-/**
- * A category of one game has no page of its own: a menu with a single card would only be one tap more.
- * Neither has one whose games stand on the home page.
- */
-export const hasPage = (category: Category) => !category.onHome && category.games.length > 1;
+/** A book of one game has no page of its own: it opens straight on its game, a menu with a single card would only be one tap more. */
+export const hasPage = (category: Category) => category.games.length > 1;
 
-/** Where the category's home card leads: its page, or its only game; the home page for one whose games stand there. */
-export const categoryHref = (category: Category) => (category.onHome ? "/" : hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+/** Where the category's book on the shelf leads: its page, or its only game. */
+export const categoryHref = (category: Category) => (hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
 
 /** Whether a page belongs to the game: its address or one below it. */
 const isGamePage = (game: Game, path: string) => [game.href, ...(game.also ?? [])].some((href) => path.startsWith(href));
