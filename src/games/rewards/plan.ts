@@ -20,6 +20,8 @@ export interface PlanStep {
   linked?: LinkedGame;
   /** The time of day of a linked step: only a brushing in the morning ticks a morning routine's teeth. */
   slot?: Slot;
+  /** The part of the day it belongs to, on a plan of parts (Mein Tag: Morgen and Abend on one page). */
+  part?: Slot;
   /** A tap ticks it like any card instead of opening its game: for a family that brushes without the app. */
   noGame?: boolean;
 }
@@ -73,23 +75,57 @@ export function stepFromCatalog(id: string, slot?: Slot): PlanStep {
 }
 
 /**
- * A plan made from a ready-made one. Its steps keep their catalogue ids (unique within a day), so the default plan,
- * made anew on every load until something is saved, finds its ticks again.
+ * A card added at the end of a day: in a plan of parts (morning and evening) it joins the last part, and a card a game
+ * ticks counts for that part's time of day.
+ */
+export function joinLastPart(steps: PlanStep[], step: PlanStep): PlanStep {
+  const part = steps.at(-1)?.part;
+  if (!part) return step;
+  return step.linked ? { ...step, part, slot: part } : { ...step, part };
+}
+
+/** A template's lists of catalogue ids: one for every day, seven (Monday first), or the parts of the day in one. */
+export function templateLists(template: PlanTemplate): string[][] {
+  if (template.parts) return [template.parts.flatMap((part) => part.steps)];
+  const days = template.days ?? [];
+  return typeof days[0] === "string" ? [days as string[]] : (days as string[][]);
+}
+
+/**
+ * A plan made from a ready-made one. Its steps keep their catalogue ids (unique within a day; in a plan of parts with
+ * the part's time of day, as Zähne putzen comes in the morning and the evening), so the plan, made anew on every
+ * load until something is saved, finds its ticks again.
  */
 export function planFromTemplate(template: PlanTemplate, language: TargetLanguageId = "de"): Plan {
-  const lists = typeof template.days[0] === "string" ? [template.days as string[]] : (template.days as string[][]);
+  const days = template.parts
+    ? [template.parts.flatMap(({ slot, steps }) => steps.map((id) => ({ ...stepFromCatalog(id, slot), id: `${id}@${slot}`, part: slot })))]
+    : templateLists(template).map((ids) => ids.map((id) => ({ ...stepFromCatalog(id, template.slots?.[id]), id })));
   return {
     id: newId(),
     template: template.id,
     view: template.view,
     childName: "",
     title: template.title ? pick(template.title, language) : "",
-    days: lists.map((ids) => ids.map((id) => ({ ...stepFromCatalog(id, template.slots?.[id]), id }))),
-    same: lists.length === 1,
+    days,
+    same: days.length === 1,
     theme: template.theme,
     examples: true,
   };
 }
+
+/** A day's steps in its parts (Morgen, Abend), each with its time of day; a plan without parts is one part without one. */
+export function partsOf(steps: PlanStep[]): { part?: Slot; steps: PlanStep[] }[] {
+  const parts: { part?: Slot; steps: PlanStep[] }[] = [];
+  for (const step of steps) {
+    const last = parts.at(-1);
+    if (last && last.part === step.part) last.steps.push(step);
+    else parts.push({ part: step.part, steps: [step] });
+  }
+  return parts;
+}
+
+/** An Erst–Dann plan's pairs: the steps two by two, in their order (a last one alone stays a pair of one). */
+export const pairsOf = <T>(steps: T[]): T[][] => Array.from({ length: Math.ceil(steps.length / 2) }, (_, i) => steps.slice(i * 2, i * 2 + 2));
 
 /** The steps of a day, in their order. */
 export const stepsOn = (plan: Plan, day: Date): PlanStep[] => (plan.same ? plan.days[0] : plan.days[weekday(day)]) ?? [];
@@ -111,6 +147,20 @@ export function currentStep(steps: PlanStep[], ticks: Record<string, number> | u
 }
 
 /**
+ * The steps to do now, by their place in the day: the first not done – or on an Erst–Dann, where each pair stands on
+ * its own and is used when it fits, the first not done of every pair.
+ */
+export function nowSteps(view: PlanView, steps: PlanStep[], ticks: Record<string, number> | undefined, linked: LinkedDays, day: Date): number[] {
+  if (view !== "first-then") {
+    const now = currentStep(steps, ticks, linked, day);
+    return now < 0 ? [] : [now];
+  }
+  return pairsOf(steps.map((step, i) => ({ step, i })))
+    .map((pair) => pair.find(({ step }) => !stepDone(ticks, linked, day, step))?.i ?? -1)
+    .filter((i) => i >= 0);
+}
+
+/**
  * A day's steps parted for the day view: those still to do stay in the row, the done ones lie in the Fertig-Kiste –
  * both in the day's order, so the row gets shorter from the front until only the last card (the bed) is left.
  */
@@ -121,17 +171,18 @@ export function splitDone(steps: PlanStep[], ticks: Record<string, number> | und
   return { open, done };
 }
 
-/** Example ticks so a new plan looks like one in use: today's first step or two, never all of them. */
+/** Example ticks so a new plan looks like one in use: today's first step or two (an Erst–Dann's first card), never all of them. */
 export function exampleTicks(plan: Plan, today: Date): Record<string, number> {
   const steps = stepsOn(plan, today);
-  const count = Math.min(steps.length - 1, Math.max(1, Math.floor(steps.length / 3)));
+  const count = plan.view === "first-then" ? 1 : Math.min(steps.length - 1, Math.max(1, Math.floor(steps.length / 3)));
   return Object.fromEntries(steps.slice(0, Math.max(0, count)).map((step) => [cellKey(today, step.id), 1]));
 }
 
-/** The log without a day's ticks: the routine starts over (after an Erst–Dann, or a tick by mistake). */
-export function restartDay(log: StarLog, planId: string, day: Date): StarLog {
+/** The log without a day's ticks – or only those of some steps: the routine starts over (a tick by mistake, an Erst–Dann done). */
+export function restartDay(log: StarLog, planId: string, day: Date, stepIds?: string[]): StarLog {
   const key = dayKey(day);
-  return { ...log, [planId]: Object.fromEntries(Object.entries(log[planId] ?? {}).filter(([k]) => k.slice(0, 10) !== key)) };
+  const gone = (k: string) => k.slice(0, 10) === key && (!stepIds || stepIds.some((id) => k === cellKey(day, id)));
+  return { ...log, [planId]: Object.fromEntries(Object.entries(log[planId] ?? {}).filter(([k]) => !gone(k))) };
 }
 
 /** Nights from today until a day: 0 today, 1 tomorrow; negative for a day gone by. */
@@ -156,13 +207,21 @@ export function withSame(plan: Plan, same: boolean, weekdayIndex: number): Plan 
   return { ...plan, same, days: [plan.days[weekdayIndex] ?? plan.days[0]] };
 }
 
-/** Every different card of a plan, once each, for the page of cards to cut out. */
+/**
+ * Every different card of a plan, for the page of cards to cut out: once each – or as often as one day has it, as
+ * „Mein Tag“ has the teeth card in the morning and the evening, both on the board at once.
+ */
 export function distinctSteps(plan: Plan): PlanStep[] {
-  const seen = new Set<string>();
-  return plan.days.flat().filter((step) => {
-    const key = `${step.emoji}|${step.label ?? step.catalog ?? ""}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
+  const kept = new Map<string, number>();
+  return plan.days.flatMap((day) => {
+    const inDay = new Map<string, number>();
+    return day.filter((step) => {
+      const key = `${step.emoji}|${step.label ?? step.catalog ?? ""}`;
+      const n = (inDay.get(key) ?? 0) + 1;
+      inDay.set(key, n);
+      if (n <= (kept.get(key) ?? 0)) return false;
+      kept.set(key, n);
+      return true;
+    });
   });
 }

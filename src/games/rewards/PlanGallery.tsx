@@ -1,6 +1,6 @@
 import { useT } from "@/lib/language";
 import { NO_LINKED } from "./board";
-import { PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate, type PlanView } from "./catalog";
+import { PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate } from "./catalog";
 import { exampleTicks, type Plan, planFromTemplate } from "./plan";
 import { PLAN_SCREEN, PlanSheet } from "./PlanSheet";
 
@@ -20,69 +20,46 @@ export function PlanThumb({ plan, today = new Date() }: { plan: Plan; today?: Da
 const PREVIEWS = new Map(PLAN_TEMPLATES.map((tpl) => [tpl.id, planFromTemplate(tpl)]));
 
 /**
- * The Vorlagen of the Tagesplan: every ready-made plan as a small picture, its name, view and one line – beside the
- * plan on wide screens. In the wizard only those of the view chosen, big and with their names, after „Leer anfangen“.
+ * The Vorlagen of the Zeitplan: every ready-made plan as a small picture, its name and one line, beside the plan on
+ * wide screens – grouped by view, with the view's name over its group, as for boards.
  */
-export function PlanGallery({
-  selected,
-  onPick,
-  view: only,
-  blank,
-}: {
-  selected?: string;
-  onPick: (template: PlanTemplate) => void;
-  /** Only the templates of this view, without their lines: the wizard's step after the view. */
-  view?: PlanView;
-  /** „Leer anfangen“ as the first card, in the wizard. */
-  blank?: () => void;
-}) {
+export function PlanGallery({ selected, onPick }: { selected?: string; onPick: (template: PlanTemplate) => void }) {
   const t = useT();
   return (
-    <ul className={`rw-gallery${only ? " rw-gallery-big" : ""}`}>
-      {blank && (
-        <li>
-          <button type="button" className="rw-tpl rw-tpl-blank" onClick={blank}>
-            <span className="rw-thumb rw-thumb-blank" aria-hidden>
-              ✏️
-            </span>
-            <span className="rw-tpl-name">
-              {t({
-                de: "Leer anfangen",
-                en: "Start blank",
-                zh: "从空白开始",
-                hi: "खाली से शुरू करें",
-                es: "Empezar en blanco",
-                ar: "البدء من الصفر",
-                ru: "Начать с чистого листа",
-              })}
-            </span>
-          </button>
-        </li>
-      )}
-      {PLAN_TEMPLATES.filter((tpl) => !only || tpl.view === only).map((tpl) => {
-        const view = PLAN_VIEWS.find((v) => v.id === tpl.view);
-        const preview = PREVIEWS.get(tpl.id);
+    <div className="rw-gallery-groups">
+      {PLAN_VIEWS.map((view) => {
+        const templates = PLAN_TEMPLATES.filter((tpl) => tpl.view === view.id);
         return (
-          <li key={tpl.id}>
-            <button type="button" className={`rw-tpl${selected === tpl.id ? " selected" : ""}`} aria-pressed={selected === tpl.id} onClick={() => onPick(tpl)}>
-              {preview && <PlanThumb plan={preview} />}
-              <span className="rw-tpl-name">
-                <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
-              </span>
-              {!only && (
-                <span className="rw-tpl-hint">
-                  {view && (
-                    <span className="rw-tpl-kind">
-                      {view.emoji} {t(view.label)}
-                    </span>
-                  )}{" "}
-                  {t(tpl.hint)}
-                </span>
-              )}
-            </button>
-          </li>
+          templates.length > 0 && (
+            <section key={view.id} className="rw-gallery-group">
+              <h3 className="rw-gallery-view">
+                <span aria-hidden>{view.emoji}</span> {t(view.label)}
+              </h3>
+              <ul className="rw-gallery">
+                {templates.map((tpl) => {
+                  const preview = PREVIEWS.get(tpl.id);
+                  return (
+                    <li key={tpl.id}>
+                      <button
+                        type="button"
+                        className={`rw-tpl${selected === tpl.id ? " selected" : ""}`}
+                        aria-pressed={selected === tpl.id}
+                        onClick={() => onPick(tpl)}
+                      >
+                        {preview && <PlanThumb plan={preview} />}
+                        <span className="rw-tpl-name">
+                          <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
+                        </span>
+                        <span className="rw-tpl-hint">{t(tpl.hint)}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )
         );
       })}
-    </ul>
+    </div>
   );
 }

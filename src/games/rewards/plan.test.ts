@@ -11,7 +11,10 @@ import {
   gameOf,
   MAX_STEPS,
   nightsUntil,
+  nowSteps,
+  pairsOf,
   parseRoutineStep,
+  partsOf,
   planFromTemplate,
   restartDay,
   routineStep,
@@ -19,11 +22,19 @@ import {
   stepDone,
   stepFromCatalog,
   stepsOn,
+  templateLists,
   withSame,
   withSteps,
 } from "./plan";
 import { planLayout } from "./PlanSheet";
 import { DEFAULT_PLANNER_SETTINGS, plannerDefaults } from "./planSettings";
+
+/** A ready-made plan by its id. */
+const template = (id: string) => {
+  const tpl = PLAN_TEMPLATES.find((t) => t.id === id);
+  if (!tpl) throw new Error(`no template ${id}`);
+  return planFromTemplate(tpl);
+};
 
 const promptIds = new Set(REWARDS_PICTURE_PROMPTS.groups.flatMap((g) => g.prompts).map((p) => p.id));
 /** A Wednesday. */
@@ -38,27 +49,44 @@ describe("plan catalogue", () => {
 
   test("templates name only what the catalogue has, with one list or seven, and few steps a day", () => {
     for (const tpl of PLAN_TEMPLATES) {
-      const lists = typeof tpl.days[0] === "string" ? [tpl.days as string[]] : (tpl.days as string[][]);
+      const lists = templateLists(tpl);
       expect([1, 7], tpl.id).toContain(lists.length);
       for (const list of lists) {
         expect(list.length, tpl.id).toBeGreaterThan(0);
         expect(list.length, tpl.id).toBeLessThanOrEqual(MAX_STEPS);
-        expect(new Set(list).size, `${tpl.id}: a step twice in a day`).toBe(list.length);
+        // A plan of parts may have a card in two of them (Zähne putzen morning and evening), never twice in one.
+        if (!tpl.parts) expect(new Set(list).size, `${tpl.id}: a step twice in a day`).toBe(list.length);
         for (const id of list) expect(STEP_BY_ID.has(id), `${tpl.id}: ${id}`).toBe(true);
       }
+      for (const part of tpl.parts ?? []) expect(new Set(part.steps).size, `${tpl.id}: a step twice in ${part.slot}`).toBe(part.steps.length);
       for (const id of Object.keys(tpl.slots ?? {})) expect(STEP_BY_ID.get(id)?.linked, `${tpl.id}: ${id} has a time but no game`).toBeDefined();
       expect(THEME_BY_ID.has(tpl.theme), tpl.theme).toBe(true);
     }
   });
 
-  // Both views are one tap from the first visit, each with a ready-made plan; an Erst–Dann is among them.
-  test("every view has a ready-made plan, and there is an Erst–Dann of two cards", () => {
+  // Every view is one tap from the first visit, each with a ready-made plan; an Erst–Dann fills a page with pairs.
+  test("every view has a ready-made plan, and the Erst–Dann is whole pairs, at most four", () => {
     for (const view of PLAN_VIEWS)
       expect(
         PLAN_TEMPLATES.some((tpl) => tpl.view === view.id),
         view.id,
       ).toBe(true);
-    expect(PLAN_TEMPLATES.some((tpl) => tpl.days.length === 2 && typeof tpl.days[0] === "string")).toBe(true);
+    for (const tpl of PLAN_TEMPLATES.filter((t) => t.view === "first-then"))
+      for (const list of templateLists(tpl)) {
+        expect(list.length % 2, tpl.id).toBe(0);
+        expect(list.length / 2, tpl.id).toBeLessThanOrEqual(4);
+      }
+  });
+
+  // Morning and evening belong together: nobody wants one without the other, and they print on one page.
+  test("„Mein Tag“ is the morning and the evening on one plan, each card once per part", () => {
+    const plan = template("mein-tag");
+    const steps = stepsOn(plan, WED);
+    expect(partsOf(steps).map((p) => p.part)).toEqual(["morning", "evening"]);
+    expect(new Set(steps.map((s) => s.id)).size).toBe(steps.length);
+    expect(steps.length).toBeLessThanOrEqual(MAX_STEPS);
+    // The teeth card is there twice, each for its own time of day.
+    expect(steps.filter((s) => s.linked === "teeth").map((s) => s.slot)).toEqual(["morning", "evening"]);
   });
 
   test("every activity has a picture prompt, and a line-art twin to colour in", () => {
@@ -88,12 +116,12 @@ describe("plans", () => {
     const kita = planFromTemplate(PLAN_TEMPLATES.find((tpl) => tpl.id === "kita-tag") ?? PLAN_TEMPLATES[0]);
     expect(stepsOn(kita, WED).some((s) => s.catalog === "kita")).toBe(true);
     expect(stepsOn(kita, SAT).some((s) => s.catalog === "kita")).toBe(false);
-    const morning = planFromTemplate(PLAN_TEMPLATES[0]);
-    expect(stepsOn(morning, WED)).toEqual(stepsOn(morning, SAT));
+    const day = template("mein-tag");
+    expect(stepsOn(day, WED)).toEqual(stepsOn(day, SAT));
   });
 
   test("the step to do now is the first not done; a tick moves it on, starting over brings it back", () => {
-    const plan = planFromTemplate(PLAN_TEMPLATES[0]);
+    const plan = template("mein-tag");
     const steps = stepsOn(plan, WED);
     expect(currentStep(steps, undefined, NO_LINKED, WED)).toBe(0);
     let log = addStar({}, plan.id, cellKey(WED, steps[0].id), WED);
@@ -108,7 +136,7 @@ describe("plans", () => {
 
   // H-42: the row gets shorter from the front until only the last card (the bed) is left; „Von vorn“ empties the box.
   test("done cards leave the row for the Fertig-Kiste, both in the day's order", () => {
-    const evening = planFromTemplate(PLAN_TEMPLATES.find((tpl) => tpl.id === "abendroutine") ?? PLAN_TEMPLATES[0]);
+    const evening = template("mein-tag");
     const steps = stepsOn(evening, WED);
     expect(splitDone(steps, undefined, NO_LINKED, WED)).toEqual({ open: steps, done: [] });
     const allButLast = steps.slice(0, -1).reduce<StarLog>((l, s) => addStar(l, evening.id, cellKey(WED, s.id), WED), {});
@@ -119,8 +147,7 @@ describe("plans", () => {
   });
 
   test("brushing ticks the teeth card of its own time of day only", () => {
-    const morning = planFromTemplate(PLAN_TEMPLATES.find((tpl) => tpl.id === "morgenroutine") ?? PLAN_TEMPLATES[0]);
-    const teeth = stepsOn(morning, WED).find((s) => s.linked === "teeth");
+    const teeth = stepsOn(template("mein-tag"), WED).find((s) => s.linked === "teeth");
     if (!teeth) throw new Error("no teeth step");
     expect(teeth.slot).toBe("morning");
     const evening: LinkedDays = { ...NO_LINKED, teeth: { "2026-10-28": { count: 1, slots: ["evening"] } } };
@@ -141,7 +168,7 @@ describe("plans", () => {
   });
 
   test("each weekday its own steps copies the list; every day the same keeps the day looked at", () => {
-    const plan = planFromTemplate(PLAN_TEMPLATES[0]);
+    const plan = template("mein-tag");
     const own = withSame(plan, false, 2);
     expect(own.days.length).toBe(7);
     const changed = withSteps(own, 5, []);
@@ -149,6 +176,19 @@ describe("plans", () => {
     expect(stepsOn(changed, WED).length).toBe(stepsOn(plan, WED).length);
     expect(withSame(changed, true, 5).days).toEqual([[]]);
     expect(distinctSteps(own).length).toBe(stepsOn(plan, WED).length);
+  });
+
+  // Each Erst–Dann pair stands on its own: its first open card is „now“, and starting over clears only finished pairs.
+  test("an Erst–Dann has a „now“ in every pair; starting over takes only the steps asked", () => {
+    const plan = template("erst-dann");
+    const steps = stepsOn(plan, WED);
+    expect(pairsOf(steps).map((p) => p.length)).toEqual([2, 2, 2, 2]);
+    expect(nowSteps("first-then", steps, undefined, NO_LINKED, WED)).toEqual([0, 2, 4, 6]);
+    const log = [0, 1, 2].reduce<StarLog>((l, i) => addStar(l, plan.id, cellKey(WED, steps[i].id), WED), {});
+    expect(nowSteps("first-then", steps, log[plan.id], NO_LINKED, WED)).toEqual([3, 4, 6]);
+    expect(nowSteps("day", steps, log[plan.id], NO_LINKED, WED)).toEqual([3]);
+    const again = restartDay(log, plan.id, WED, [steps[0].id, steps[1].id]);
+    expect(Object.keys(again[plan.id])).toEqual([cellKey(WED, steps[2].id)]);
   });
 
   test("nights until a day", () => {

@@ -178,8 +178,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   },
   {
     href: "/belohnungstafel/",
-    note: "Belohnungstafel und Tagesplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite.",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): die Ansichten „Ablaufplan“ und „Jetzt – Dann“ mit ihren Hinweisen, der Hinweis zu „Erst – Dann“, „Mein Kita-Tag“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, „N anlegen“ im Assistenten.",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
   },
   {
     href: "/",

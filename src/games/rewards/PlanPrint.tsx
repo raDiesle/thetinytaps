@@ -13,7 +13,7 @@ import { A4, PRINT_WORDS, Preview } from "./PrintPanel";
 
 /** How a plan is printed. */
 export interface PlanPrintOptions {
-  /** "auto": landscape for most plans, portrait for an Erst–Dann. */
+  /** "auto": landscape, but portrait for an Ablaufplan of one or two cards. */
   orientation: "auto" | "landscape" | "portrait";
   color: boolean;
   /** A page (or more) of the plan's pictures as cards to cut out, for a Velcro board. */
@@ -147,7 +147,7 @@ export function PlanPrint({
           onChange={(cards) => onChange({ cards })}
         />
         <p className="setting-note">
-          {plan.view === "day" && !plan.same && `${t(SHOWN_DAY)} `}
+          {plan.view !== "week" && !plan.same && `${t(SHOWN_DAY)} `}
           {t(CARDS_NOTE)}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>

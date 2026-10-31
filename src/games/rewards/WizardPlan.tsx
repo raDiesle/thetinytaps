@@ -4,7 +4,7 @@ import { weekday } from "./board";
 import { ACTIVITIES, DAY_NAMES, TASKS, THEMES } from "./catalog";
 import { CHILD_NAME, COLORS, LOOK, NAME_EXAMPLE, Pick } from "./pageParts";
 import { ItemPic } from "./pictures";
-import { MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, withSame, withSteps } from "./plan";
+import { joinLastPart, MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, withSame, withSteps } from "./plan";
 import { PlanThumb } from "./PlanGallery";
 import { useStepLabel } from "./PlanSheet";
 import type { WizardStep } from "./Wizard";
@@ -49,9 +49,9 @@ export function PlanStepView({ step, plan, onChange }: { step: string; plan: Pla
     setSteps(next);
   };
   const toggle = (catalogId: string) => {
-    const own = steps.find((s) => s.catalog === catalogId);
+    const own = steps.findLast((s) => s.catalog === catalogId);
     if (own) setSteps(steps.filter((s) => s !== own));
-    else if (steps.length < MAX_STEPS) setSteps([...steps, stepFromCatalog(catalogId)]);
+    else if (steps.length < MAX_STEPS) setSteps([...steps, joinLastPart(steps, stepFromCatalog(catalogId))]);
   };
 
   if (step === "cards")

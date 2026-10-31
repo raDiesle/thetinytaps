@@ -1,5 +1,4 @@
 import type { StarLog } from "./board";
-import { PLAN_TEMPLATES } from "./catalog";
 import { type Plan, planFromTemplate } from "./plan";
 import type { PlanPrintOptions } from "./PlanPrint";
 
@@ -12,8 +11,24 @@ export interface PlannerSettings {
   sounds: boolean;
 }
 
-/** The plan older versions showed before anything was saved (a morning routine, fixed id): kept only where it has ticks. */
-const OLD_FIRST: Plan = { ...planFromTemplate(PLAN_TEMPLATES[0]), id: "erster-plan" };
+/**
+ * The plan older versions showed before anything was saved (their morning routine, fixed id): kept only where it has
+ * ticks. Its template is gone from the gallery (Morgen and Abend are one page now), so it is kept here as it was.
+ */
+const OLD_FIRST: Plan = {
+  ...planFromTemplate({
+    id: "morgenroutine",
+    emoji: "🌅",
+    label: { de: "Morgenroutine" },
+    view: "day",
+    days: ["aufstehen", "anziehen", "fruehstueck", "zaehne", "schuhe"],
+    slots: { zaehne: "morning" },
+    theme: "sonne",
+    title: { de: "Mein Morgen" },
+    hint: { de: "" },
+  }),
+  id: "erster-plan",
+};
 
 /** No plan yet: the page opens with the wizard until a board or plan is made. */
 export const DEFAULT_PLANNER_SETTINGS: PlannerSettings = {
