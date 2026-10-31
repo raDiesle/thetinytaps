@@ -137,10 +137,11 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-16",
+      rejected: true,
       emoji: "🔤",
       title: "Titel „Toddlerfox“ auf Startseite und Cover",
       text: "Die Startseite und das Cover heißen noch „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Toddlerfox“ in einer Buchschrift, mit einem kleinen gezeichneten Fuchs als Vignette (der Fuchs sitzt auf dem x oder schaut hinter dem Wort hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Fuchsohren. Hängt mit D-11 zusammen (Titel wie gedruckt).",
-      why: "Die Adresse heißt toddlerfox.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder.",
+      why: "Die Adresse heißt toddlerfox.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder. Verworfen (31. Oktober 2026): kein „toddler“ im Namen; der neue Name kommt aus der Recherche „Eine Domain ohne ‚toddler‘“ (Favorit „Books for Both“, D-20).",
       effort: "S",
     },
     {
@@ -166,6 +167,14 @@ export const bookIdeas: IdeaArea = {
       text: "Zu entscheiden: Bleibt die Figur, die für das Kind steht (Junge / Mädchen in Kleine Abenteuer, Zähne putzen, Aufzug), ein Menschenkind, oder wird sie ein Fuchskind mit Zöpfen bzw. ohne? Ein Menschenkind lässt das Kind sich selbst erkennen; ein Fuchskind passt zum Buch. Bis zur Entscheidung bleibt sie ein Menschenkind.",
       why: "Die größte Frage des Fuchs-Umbaus – erst entscheiden, dann zeichnen.",
       effort: "M",
+    },
+    {
+      id: "D-20",
+      emoji: "📚",
+      title: "Ein Regal voller Bücher: jede Sorte ein Buch, jedes Level eine Seite",
+      text: "Die Startseite wird ein Bücherregal statt einer Inhaltsseite: Jede Kategorie ist ein eigenes Buch mit ihrem Umschlag (ihre Welt aus Worlds.tsx als Bild, der Titel auf dem Buchrücken). Ein Tipp zieht das Buch heraus und schlägt es auf; darin ist jedes Spiel oder Level eine Seite zum Umblättern (das Umblättern aus A-20 gibt es schon). Die „Weiteren“ Spiele, die heute ohne eigene Seite auf der Startseite stehen, kommen in ein neues Buch „Hilfen“ (oder „Für jeden Tag“) mit Zähne putzen, Aufs Töpfchen und Sterne & Tagesplan; ob Laut und leise dazugehört oder in ein anderes Buch, ist zu entscheiden. Passt zum Namen „Books for Both“ (booksforboth.com): viele Bücher, alle für Groß und Klein zusammen. Ändert zwei Regeln aus CLAUDE.md, die dann neu geschrieben werden müssen: eine Kategorie mit nur einem Spiel öffnet heute gleich das Spiel, und „Weitere“ hat heute keine eigene Seite (onHome).",
+      why: "Die App hat inzwischen so viel, dass eine Inhaltsseite voller Karten unübersichtlich wird. Ein Regal ordnet es wie zu Hause: Das Kind zeigt auf ein Buch, man nimmt es zusammen heraus und blättert.",
+      effort: "L",
     },
   ],
 };

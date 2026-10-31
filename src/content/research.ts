@@ -87,6 +87,7 @@ export const RESEARCH: Research[] = [
       "Alle Namen mit „lap“ (Schoß – lapandplay, lapandread, lapfriends, lapstories frei; lapbook, laptime vergeben) fallen durch: Google ergänzt „lap“ zu „laptop“, und Nicht-Muttersprachler lesen es auch so.",
       "Schon gekauft und in Betrieb ist toddlerfox.com (30. Oktober 2026, Build und DNS stehen darauf). Ein Wechsel heißt: neue Domain kaufen, SITE_ORIGIN und die Zonendatei umstellen; toddlerfox.com kann ein Jahr lang weiterleiten. Je früher, desto weniger Gespeichertes bleibt bei der alten Adresse zurück.",
       "Gekauft (31. Oktober 2026): funforboth.com bei Cloudflare. Die App läuft noch auf toddlerfox.com; Build und DNS sind nicht umgestellt.",
+      "Favorit des Betreibers (31. Oktober 2026): booksforboth.com, die Mehrzahl – weil die App viele Bücher sein soll: jede Kategorie ein Buch im Regal, jedes Level eine Seite darin, und die Alltagshilfen ein eigenes Buch (Idee D-20). Am 31. Oktober noch frei; bookforboth.com (ebenfalls frei) wäre dann die Weiterleitung für wen es in der Einzahl hört, funforboth.com auch.",
       "Empfehlung dazu: bookforboth.com (am 31. Oktober noch frei, ebenso booksforboth.com) zusätzlich kaufen und zur Adresse der App machen, funforboth.com leitet dorthin weiter. bookforboth ist eigen und als Marke zu schützen, sagt das Buch, das die App zeigt, und hebt sich von Hunderten „fun“-Seiten ab; dass Google „fun for both“ zu dem ergänzt, was Eltern suchen, bringt der Domain keinen Vorsprung (Wörter in der Domain sind kein Rankingfaktor, Recherche „Domain“) – diese Wörter gehören in Titel und Texte.",
     ],
     topics: [
@@ -111,13 +112,20 @@ export const RESEARCH: Research[] = [
       },
       { title: "togetherpages, tapstogether, familytaps, foxtaps", why: "Google denkt an PDF-Seiten zusammenfügen, Wasserhähne und Bars." },
     ],
-    ideas: [],
+    ideas: ["D-20"],
     sources: [
       { label: "Verisign RDAP – .com-Abfrage", url: "https://rdap.verisign.com/com/v1/" },
       { label: "Wikipedia – Fox Kids", url: "https://en.wikipedia.org/wiki/Fox_Kids" },
       { label: "App Store – An Adventure of Our Own (Eltern und Kind lesen gemeinsam)", url: "https://apps.apple.com/au/app/id1183087354" },
     ],
     domains: [
+      {
+        name: "booksforboth",
+        rank: 1,
+        free: ["com"],
+        taken: [],
+        why: "Favorit des Betreibers: viele Bücher für Groß und Klein – jede Kategorie ein Buch, jedes Level eine Seite (D-20). 12 Buchstaben, Google kennt es nicht; bookforboth fängt die Einzahl ab.",
+      },
       {
         name: "bookforboth",
         rank: 1,
