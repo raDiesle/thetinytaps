@@ -26,7 +26,7 @@ import { bookIdeas } from "./d-book";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
-export * from "./foxStatus";
+export * from "./mascotStatus";
 export * from "./languageStatus";
 
 /** Areas sorted by what kind of work they are: grow a game, make a new one, or for parents. */

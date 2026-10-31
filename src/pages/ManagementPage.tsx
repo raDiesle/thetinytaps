@@ -5,8 +5,8 @@ import { PicturePromptReview } from "@/components/PicturePromptReview";
 import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
-  FOX_STATUS,
-  type FoxTask,
+  MASCOT_STATUS,
+  type MascotTask,
   IDEA_AREAS,
   IDEA_GROUPS,
   LANGUAGE_STATUS,
@@ -19,7 +19,7 @@ import {
   type IdeaStatus,
   type LanguageState,
   languageStateOf,
-  waitingFoxPictures,
+  waitingMascotPictures,
 } from "@/content/ideas";
 import { RESEARCH, type Research } from "@/content/research";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/content/targetLanguages";
@@ -69,7 +69,7 @@ const DEFAULTS = {
 const CONTENTS: { id: string; label: string }[] = [
   { id: "uebersicht", label: "📊 Überblick" },
   { id: "sprachen", label: "🌍 Sprachen" },
-  { id: "fuechse", label: "🦊 Füchse" },
+  { id: "maskottchen", label: "🦊🐻 Fuchs & Bär" },
   { id: "stimmen", label: "🎙️ Stimmen" },
   { id: "recherchen", label: "🔍 Recherchen" },
   { id: "bilder", label: "🎨 Bildvorschläge" },
@@ -191,7 +191,7 @@ export function ManagementPage() {
 
       <Languages />
 
-      <Foxes onShow={showIdea} />
+      <Mascots onShow={showIdea} />
 
       <section id="stimmen" className="ideas-panel">
         <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
@@ -575,24 +575,25 @@ function Languages() {
   );
 }
 
-const FOX_WORK: Record<FoxTask["work"], string> = { drawing: "✏️ Zeichnung", picture: "🖼️ Gemini-Bild" };
-const FOX_STATE: Record<NonNullable<FoxTask["state"]>, string> = { done: "✅", partial: "🟡" };
+const MASCOT_WORK: Record<MascotTask["work"], string> = { drawing: "✏️ Zeichnung", picture: "🖼️ Gemini-Bild" };
+const MASCOT_STATE: Record<NonNullable<MascotTask["state"]>, string> = { done: "✅", partial: "🟡" };
 
 /**
- * Where the app's foxes still have to go (content/ideas/foxStatus.ts), game by game: drawings can be done
- * any time, Gemini pictures wait and are made together in one batch, so the footer counts them.
+ * Where the app's mascots, the fox and the bear, could still turn up (content/ideas/mascotStatus.ts), game by game:
+ * drawings can be done any time, Gemini pictures wait and are made together in one batch, so the footer counts them.
  */
-function Foxes({ onShow }: { onShow: (id: string) => void }) {
-  const tasks = FOX_STATUS.flatMap((row) => row.tasks);
+function Mascots({ onShow }: { onShow: (id: string) => void }) {
+  const tasks = MASCOT_STATUS.flatMap((row) => row.tasks);
   return (
-    <section id="fuechse" className="ideas-panel">
-      <h2>🦊 Füchse: wo der Fuchs der App noch hin soll</h2>
+    <section id="maskottchen" className="ideas-panel">
+      <h2>🦊🐻 Fuchs & Bär: wo die Maskottchen der App noch vorkommen könnten</h2>
       <p className="ideas-hint">
-        Spiel für Spiel, nach Aufwand. ✏️ Zeichnungen sind Code und gehen jederzeit; 🖼️ Gemini-Bilder warten und werden zusammen in einem Batch gemacht, das ist
-        günstiger – sag dann z. B. „mach die wartenden Fuchsbilder“. ✅ fertig, 🟡 teilweise, · offen. Ideen dazu: D-14 bis D-19.
+        Fuchs und Bär kommen in den Spielen immer wieder vor, aber nicht überall – Spiel für Spiel, nach Aufwand. ✏️ Zeichnungen sind Code und gehen jederzeit; 🖼️
+        Gemini-Bilder warten und werden zusammen in einem Batch gemacht, das ist günstiger – sag dann z. B. „mach die wartenden Fuchs- und Bärenbilder“. ✅
+        fertig, 🟡 teilweise, · offen. Ideen dazu: D-16 bis D-19.
       </p>
       <div className="ideas-overview-scroll">
-        <table className="ideas-overview ideas-languages ideas-foxes">
+        <table className="ideas-overview ideas-languages ideas-mascots">
           <thead>
             <tr>
               <th>Spiel und Aufgabe</th>
@@ -603,7 +604,7 @@ function Foxes({ onShow }: { onShow: (id: string) => void }) {
             </tr>
           </thead>
           <tbody>
-            {FOX_STATUS.flatMap((row) => {
+            {MASCOT_STATUS.flatMap((row) => {
               const game = GAME_BY_HREF.get(row.href);
               return [
                 <tr key={row.href}>
@@ -619,7 +620,7 @@ function Foxes({ onShow }: { onShow: (id: string) => void }) {
                       {task.note && <small>{task.note}</small>}
                     </th>
                     <td>
-                      {FOX_WORK[task.work]}
+                      {MASCOT_WORK[task.work]}
                       {task.pictures && task.pictures > 1 && ` ×${task.pictures}`}
                     </td>
                     <td>
@@ -628,7 +629,7 @@ function Foxes({ onShow }: { onShow: (id: string) => void }) {
                     <td>
                       <IdeaLink id={task.idea ?? "D-18"} onShow={onShow} />
                     </td>
-                    {task.state ? <td>{FOX_STATE[task.state]}</td> : <td className="ideas-zero">·</td>}
+                    {task.state ? <td>{MASCOT_STATE[task.state]}</td> : <td className="ideas-zero">·</td>}
                   </tr>
                 )),
               ];
@@ -637,7 +638,7 @@ function Foxes({ onShow }: { onShow: (id: string) => void }) {
           <tfoot>
             <tr>
               <th colSpan={5}>
-                Fertig {tasks.filter((t) => t.state === "done").length}/{tasks.length} · Gemini-Bilder für den nächsten Batch: {waitingFoxPictures()}
+                Fertig {tasks.filter((t) => t.state === "done").length}/{tasks.length} · Gemini-Bilder für den nächsten Batch: {waitingMascotPictures()}
               </th>
             </tr>
           </tfoot>

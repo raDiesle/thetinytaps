@@ -160,8 +160,8 @@
   font-weight: 400;
 }
 
-:root[data-look="book"] .logo-fox {
-  width: 1.05em;
+:root[data-look="book"] .logo-mascots {
+  width: 1.55em;
 }
 
 /* A little printed flourish under the book's title, as over a table of contents. */

@@ -70,7 +70,7 @@ In a fresh worktree run `bun install` first.
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
-- The hidden page `/management/` (hold the fox in the home title, `Logo`; `/ideen/` is its old address) is where
+- The hidden page `/management/` (hold fox and bear in the home title, `Logo`; `/ideen/` is its old address) is where
   everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
@@ -146,12 +146,14 @@ In a fresh worktree run `bun install` first.
   A scheduled task on the user's Mac (`tinytaps-perf-weekly`, Mondays) measures every game, keeps the numbers in
   `tools/perf-history/<date>.json` to compare with the week before, and turns a game over budget or clearly worse into
   an idea „Leistung: <Spiel> …“ in `src/content/ideas/a-all-games.ts` – the user picks it, the run fixes nothing.
-- **The app's animal is the fox** (Tapsi is a fox, the book's readers are a fox family; user decision, October 2026): new pictures
-  and games take foxes in wherever they fit – fox grown-ups instead of drawn people (the baker, the doctor, the driver),
-  a fox child peeking out of the background, Tapsi cheering at the end – and the book's readers are foxes only (no
-  bears). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Existing games
-  are turned over step by step from the table „🦊 Füchse“ on `/management/` (`src/content/ideas/foxStatus.ts`, area D):
-  a game that gets its foxes marks it there in the same commit, and a new game or picture adds its row or task.
+- **The app's mascots are the fox and the bear** (Tapsi is a fox, the book's readers are a fox and a bear family; user
+  decision, October 2026 – the fox alone was dropped with the address toddlerfox.com): they come back as a motif in
+  every game, so a child finds them again everywhere – a fox or bear grown-up instead of a drawn person here and there
+  (the baker, the doctor, the driver), a fox or bear child peeking out of the background, the two cheering at the end.
+  Not in every corner and not both everywhere: people may stay, and a bear is as welcome as a fox (never turn a bear
+  into a fox). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Games get them
+  step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game
+  that gets its fox or bear marks it there in the same commit, and a new game or picture adds its row or task.
   Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
@@ -343,8 +345,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
   drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
   open page lies on the book's cloth-covered board, lit from above. The cover's picture (`bilder/buch-cover.webp`) shows
-  one fox family reading a book together – no other animal family, never a third grown-up or a child too many (user
-  feedback, October 2026; the picture with the bears still waits for its new one, D-14).
+  one family of each mascot: a fox parent with a fox child and a bear parent with a bear child, one of the children a
+  boy and one a girl – never a third grown-up or a child too many (user feedback, October 2026).
   Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
   any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
   one. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
@@ -357,9 +359,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
   that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
   of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
-  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of foxes reading with their children beside the menu's
-  cards – a fox parent with its child, and grandma or grandpa fox laughing with the child over the book, never bears
-  (D-15; the bears still stand there until that picture is made) – show that the book is read together: they only go where there is room, never over a
+  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
+  children beside the menu's cards (`BookFamily`) show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its

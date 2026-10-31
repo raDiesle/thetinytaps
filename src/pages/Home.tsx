@@ -18,7 +18,7 @@ import { usePreloadPages } from "@/lib/preloadPages";
 import { buildDate, useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
-/** Holding the fox in the title this long opens the hidden management page. */
+/** Holding fox and bear in the title this long opens the hidden management page. */
 const IDEAS_HOLD_MS = 2000;
 
 /** Where the books (the toy look's cards) lead. */

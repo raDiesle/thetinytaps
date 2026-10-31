@@ -28,14 +28,14 @@
   display: inline-flex;
 }
 
-/* Tapsi peeking over a book in front of the name; hold it to open the management page. */
-.logo-fox {
+/* Fox and bear peeking over a book in front of the name; hold them to open the management page. */
+.logo-mascots {
   display: inline-flex;
   align-self: center;
-  width: 1.15em;
+  width: 1.7em;
 }
 
-.logo-fox svg {
+.logo-mascots svg {
   width: 100%;
   height: auto;
   overflow: visible;
@@ -365,7 +365,7 @@ button.game-card:focus-visible {
   box-shadow: 0 1px 0 var(--ink);
 }
 
-/* The fox in the home title: hold it to open the hidden management page, without selecting anything. */
+/* Fox and bear in the home title: hold them to open the hidden management page, without selecting anything. */
 .secret-hold {
   user-select: none;
   -webkit-user-select: none;

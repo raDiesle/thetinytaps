@@ -135,10 +135,11 @@ last line of the block, so „a page of a picture book“ doesn't come back as a
 with its own guide) keeps that set's look and is drawn from its pictures as `--ref`, even when they still have the
 older bright style with dark-purple outlines (#2a1e5c) – one story never mixes the two.
 
-Take foxes in wherever they fit (see „The app's animal is the fox“ in `CLAUDE.md`): a fox
-grown-up instead of a person, a fox child in the background; pass a picture of Tapsi or the fox family
-(`src/components/bilder/buch-fuechse.webp`) as `--ref`, so every fox is the same kind. A picture that a fox task in
-`src/content/ideas/foxStatus.ts` asks for goes into the batch with the other waiting ones there, and the task is marked.
+Let the app's mascots, the fox and the bear, come back where they fit (see „The app's mascots are the fox and the
+bear“ in `CLAUDE.md`): now and then a fox or bear grown-up instead of a person, a fox or bear child in the background –
+not in every picture. Pass a picture of Tapsi or the fox family (`src/components/bilder/buch-fuechse.webp`) or of the
+bear family (`buch-baeren.webp`) as `--ref`, so every fox and every bear is the same kind. A picture that a task in
+`src/content/ideas/mascotStatus.ts` asks for goes into the batch with the other waiting ones there, and the task is marked.
 
 For `--transparent` drop "Simple, uncluttered background" and "printed on matte paper" (a paper texture spoils the
 cut-out) – the script adds the flat backdrop instruction itself. Never ask a cut-out for a shape behind its subject („a round sticker“, „inside a

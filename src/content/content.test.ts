@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
 import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
-import { FOX_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
+import { MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
 import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SITE_NAME, fullTitle, splitLanguage } from "./seo";
@@ -192,15 +192,15 @@ describe("research on the management page", () => {
   });
 });
 
-describe("fox table on the management page", () => {
+describe("fox and bear table on the management page", () => {
   test("names every game of the home menu once, in menu order, then the home page", () => {
     const hrefs = [...CATEGORIES.flatMap((category) => category.games.map((game) => game.href)), "/"];
-    expect(FOX_STATUS.map((row) => row.href)).toEqual(hrefs);
+    expect(MASCOT_STATUS.map((row) => row.href)).toEqual(hrefs);
   });
 
   test("every task names an idea that exists and says how many pictures a picture needs", () => {
     const ids = new Set(IDEA_AREAS.flatMap((area) => area.ideas.map((idea) => idea.id)));
-    for (const row of FOX_STATUS) {
+    for (const row of MASCOT_STATUS) {
       expect(row.tasks.length, row.href).toBeGreaterThan(0);
       for (const task of row.tasks) {
         expect(ids, `${row.href} ${task.label}`).toContain(task.idea ?? "D-18");
