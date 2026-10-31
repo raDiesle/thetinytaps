@@ -1,18 +1,20 @@
 import { Navigate, useParams } from "react-router";
+import { BookContents } from "@/components/BookContents";
 import { GameCard } from "@/components/GameCard";
 import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useT } from "@/lib/language";
+import { isBookLook } from "@/lib/look";
 import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 import { SeoText } from "@/components/SeoText";
 
 /**
- * One book of the home page's shelf, opened: its first page is the table of contents, its games on pasted-in cards, each
- * on a page of its own.
+ * One book of the home page's shelf, opened: its first page is the table of contents (BookContents), each game on a page
+ * of its own. In the toy look its games are cards.
  */
 export function CategoryPage() {
   const { category: id } = useParams();
@@ -37,14 +39,17 @@ export function CategoryPage() {
           </>
         }
       />
-      <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
-        {/* The opened book: this is its first page, each game one of the pages after it. */}
-        {category.games.map((g, i) => (
-          <li key={g.href}>
-            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} page={i + 2} />
-          </li>
-        ))}
-      </ul>
+      {isBookLook() ? (
+        <BookContents games={category.games} world={category.id} />
+      ) : (
+        <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
+          {category.games.map((g) => (
+            <li key={g.href}>
+              <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
+            </li>
+          ))}
+        </ul>
+      )}
       <SeoText />
     </main>
   );

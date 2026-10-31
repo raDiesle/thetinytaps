@@ -41,15 +41,16 @@ const BOOKS: ShelfBook[] = CATEGORIES.map((c) => ({
 const SPINE_COLOURS = ["#b5523b", "#3f6f8f", "#d9a441", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62", "#a8443f", "#6b7fb0", "#e0b85c"];
 
 /** The eye's distance from the shelf and its height on it, as share of the shelf's (`perspective` in bookshelf.css). */
-const EYE = 1200;
+const EYE = 1300;
 const EYE_HEIGHT = 0.36;
+/** How deep the shelf is, in book heights (`--d` in bookshelf.css). */
+const DEPTH = 0.56;
 
 /** What stands in each of the grown-ups' compartments. */
 const THINGS: Record<ShelfThing, () => ReactNode> = {
   music: () => <RoomSpeaker />,
   playtime: () => <RoomHourglass />,
   language: () => <RoomGlobe />,
-  figure: () => <RoomStickers />,
 };
 
 /**
@@ -154,7 +155,7 @@ const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w
 function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout: ShelfLayout; seed: number; children?: ReactNode }) {
   // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
   // it sits in the middle of the back that can be seen, not half behind the plank in front.
-  const back = (layout.bookHeight * 0.62) / EYE / 2;
+  const back = (layout.bookHeight * DEPTH) / EYE / 2;
   const style = {
     ...rect(cell),
     "--cw": `${cell.w}px`,
@@ -185,12 +186,13 @@ function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout
           </span>
         </div>
       )}
-      {cell.thing === "figure" ? (
-        // Stuck on the back wall.
-        <div className="shelf-back-stuck">{THINGS.figure()}</div>
-      ) : (
-        cell.thing && <div className="shelf-thing">{THINGS[cell.thing]()}</div>
+      {cell.thing === "language" && (
+        // The stickers of the child's figure, stuck on the back wall above the globe (beside it where the compartment is wide).
+        <div className={`shelf-back-stuck${cell.w > cell.h * 1.2 ? " beside" : ""}`}>
+          <RoomStickers />
+        </div>
       )}
+      {cell.thing && <div className="shelf-thing">{THINGS[cell.thing]()}</div>}
     </div>
   );
 }

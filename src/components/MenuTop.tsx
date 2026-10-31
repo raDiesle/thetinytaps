@@ -50,14 +50,15 @@ export function MenuHead({ to, back, title, tools, children }: { to: string; bac
  * The way back in the book look: the corner of the page before stands up at the spine, the page's top left, with a
  * little arrow on it, and a tap on it turns that page back over to the right – the corner touched is the page that
  * turns (user feedback, October 2026; in the top right it turned the other page, and grown-ups didn't look there).
- * Big, so a grown-up finds it at once; `back` names where it leads, as tooltip and for screen readers. Hidden in the
- * toy look, which keeps the round arrow.
+ * Back to the shelf no page turns but the book closes and goes back (bookTravel.ts), so there it is the corner of the
+ * book's cover with a shelf on it. Big, so a grown-up finds it at once; `back` names where it leads, as tooltip and for
+ * screen readers. Hidden in the toy look, which keeps the round arrow.
  */
 function PageCorner({ to, back }: { to: string; back: string }) {
   const turnPage = useTurnPage(to, "back");
   return (
     <Link to={to} className="page-corner" aria-label={back} title={back} onClick={turnPage} data-tap>
-      <PageCornerArt sign="back" />
+      <PageCornerArt sign={to === "/" ? "shelf" : "back"} />
     </Link>
   );
 }

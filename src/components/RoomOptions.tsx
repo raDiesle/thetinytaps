@@ -14,19 +14,35 @@ import { OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
 /** The wooden loudspeaker standing in the shelf: one tap switches the music of all games on or off. */
 export function RoomSpeaker() {
   const music = useMusicSwitch();
+  const id = useId();
   return (
     <button type="button" className="room-thing room-speaker" aria-pressed={music.on} aria-label={music.label} title={music.title} onClick={music.toggle}>
       <svg viewBox="0 0 72 100" aria-hidden>
+        <defs>
+          {/* The lamp's light on the box's front, and the cones' hollows. */}
+          <linearGradient id={`${id}f`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#fff" stopOpacity="0.28" />
+            <stop offset="0.5" stopColor="#fff" stopOpacity="0" />
+            <stop offset="1" stopColor="#000" stopOpacity="0.2" />
+          </linearGradient>
+          <radialGradient id={`${id}h`} cx="0.42" cy="0.38" r="0.65">
+            <stop offset="0" stopColor="#000" stopOpacity="0" />
+            <stop offset="0.7" stopColor="#000" stopOpacity="0.15" />
+            <stop offset="1" stopColor="#000" stopOpacity="0.45" />
+          </radialGradient>
+        </defs>
         <ellipse className="room-shade" cx="33" cy="97" rx="30" ry="3" />
         {/* Its side, seen from the middle of the shelf, and its little feet. */}
         <path className="room-speaker-side" d="M56 30 L62 33 V90 L56 94 Z" />
         <path className="room-speaker-foot" d="M10 93 h8 v4 h-8 Z M44 93 h8 v4 h-8 Z" />
         <rect className="room-speaker-box" x="6" y="28" width="50" height="66" rx="5" />
+        <rect x="6" y="28" width="50" height="66" rx="5" fill={`url(#${id}f)`} />
         <path className="room-speaker-edge" d="M10 31 H52" />
         <circle className="room-speaker-ring" cx="31" cy="43" r="7" />
         <circle className="room-speaker-cone" cx="31" cy="43" r="3" />
         <circle className="room-speaker-ring" cx="31" cy="72" r="17" />
         <circle className="room-speaker-cone" cx="31" cy="72" r="11.5" />
+        <circle cx="31" cy="72" r="11.5" fill={`url(#${id}h)`} />
         <circle className="room-speaker-cap" cx="31" cy="72" r="4.5" />
         <circle className={`room-speaker-light${music.on ? " on" : ""}`} cx="49" cy="88" r="2.4" />
         {music.on ? (
@@ -121,6 +137,12 @@ export function RoomGlobe() {
             <clipPath id={`${id}c`}>
               <circle cx="42" cy="44" r="31" />
             </clipPath>
+            <radialGradient id={`${id}s`} cx="0.36" cy="0.3" r="0.75">
+              <stop offset="0" stopColor="#fff" stopOpacity="0.45" />
+              <stop offset="0.35" stopColor="#fff" stopOpacity="0" />
+              <stop offset="0.8" stopColor="#0b2a40" stopOpacity="0.22" />
+              <stop offset="1" stopColor="#0b2a40" stopOpacity="0.5" />
+            </radialGradient>
           </defs>
           <ellipse className="room-shade" cx="42" cy="109" rx="30" ry="3" />
           <path className="room-wood" d="M38 82 L36 95 H48 L46 82 Z" />
@@ -142,6 +164,8 @@ export function RoomGlobe() {
                 <path d="M11 44 H73 M14 28 Q42 34 70 28 M14 60 Q42 54 70 60" />
               </g>
             </g>
+            {/* Round: lit from the lamp above left, its far side in shadow. */}
+            <circle cx="42" cy="44" r="31" fill={`url(#${id}s)`} />
             <path className="room-globe-shine" d="M22 26 Q28 16 40 14" />
             <circle className="room-globe-outline" cx="42" cy="44" r="31" />
             {/* The brass half ring holding it at its poles. */}

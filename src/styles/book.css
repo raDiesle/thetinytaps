@@ -193,6 +193,160 @@
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 20'%3E%3Cg fill='none' stroke='%233d3045' stroke-width='2' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M10 10 C50 2 90 18 130 10'/%3E%3Cpath d='M170 10 C210 2 250 18 290 10'/%3E%3C/g%3E%3Cpath d='M150 3 L157 10 L150 17 L143 10 Z' fill='%23d9715f'/%3E%3C/svg%3E");
 }
 
+/*
+ * ----- A book's table of contents (BookContents, CategoryPage) -----
+ *
+ * As in a picture book: one line per game, a round picture, its name, dots leading to its page number. The lines share
+ * the page's room under the title (each a size container, its type growing with it), and each is a soft wash of its
+ * world's colour, so a finger sees what to tap.
+ */
+.toc {
+  /* What lies above and below the lines: the page's margin and the menu's head, and the world's picture at the bottom. */
+  --toc-top: 150px;
+  --toc-bottom: max(70px, 13vh);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.8vh, 18px);
+  width: min(100%, 900px);
+  height: calc(100dvh - var(--toc-top) - var(--toc-bottom));
+  max-height: calc(var(--toc-lines) * 132px);
+  margin: clamp(4px, 2vh, 20px) auto 0;
+  padding: 0;
+  list-style: none;
+  text-align: start;
+}
+
+.toc > li {
+  --card: var(--w1);
+  flex: 1 1 0;
+  min-height: 44px;
+  container-type: size;
+}
+
+.toc > li:nth-child(3n + 2) {
+  --card: var(--w2);
+}
+
+.toc > li:nth-child(3n + 3) {
+  --card: var(--w3);
+}
+
+.toc-line {
+  display: flex;
+  align-items: center;
+  gap: min(3cqw, 16cqh);
+  height: 100%;
+  padding: 0 min(2.5cqw, 20cqh) 0 min(1.2cqw, 8cqh);
+  border-radius: 999px 28px 28px 999px;
+  color: inherit;
+  text-decoration: none;
+  /* A watercolour wash, strongest under the picture, fading towards the page number, on the page's paper. */
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--card) 62%, #0000),
+      color-mix(in srgb, var(--card) 26%, #0000) 75%,
+      color-mix(in srgb, var(--card) 14%, #0000)
+    ),
+    color-mix(in srgb, var(--paper) 72%, #0000);
+  transition:
+    background-color 0.2s,
+    translate 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .toc-line:hover {
+    background-color: color-mix(in srgb, var(--card) 30%, #0000);
+    translate: 6px 0;
+  }
+}
+
+.toc-line:active {
+  translate: 2px 2px;
+}
+
+.toc-line:focus-visible {
+  outline: 4px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+/* The picture, a round print pasted in. */
+.toc-picture {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 84cqh;
+  height: 84cqh;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #ffffffa6, #fff0 55%), color-mix(in srgb, var(--card) 70%, var(--paper));
+  box-shadow: var(--lift);
+  font-family: var(--font-emoji);
+  font-size: 48cqh;
+  line-height: 1;
+}
+
+.toc-name {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.toc-title {
+  overflow: hidden;
+  font-size: min(38cqh, 5.6cqw);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* One line for grown-ups, only where the line is tall and wide enough to read it beside the name. */
+.toc-blurb {
+  display: none;
+  overflow: hidden;
+  font-size: min(15cqh, 2.6cqw);
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.75;
+}
+
+@container (min-height: 88px) and (min-width: 560px) {
+  .toc-blurb {
+    display: block;
+  }
+}
+
+/* The dots leading the eye from the name to its page. */
+.toc-dots {
+  flex: 1 1 1.5em;
+  min-width: 1.5em;
+  height: 6px;
+  margin-top: min(10cqh, 1.4cqw);
+  background: radial-gradient(circle, #3d3045a6 0 1.4px, #0000 2px) 0 50% / 11px 6px repeat-x;
+}
+
+.toc-page {
+  flex: none;
+  min-width: 1.3em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: min(38cqh, 6cqw);
+  font-style: italic;
+  font-weight: 700;
+  text-align: end;
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .toc {
+    --toc-top: 64px;
+    --toc-bottom: max(40px, 12vh);
+    width: min(100% - 28px, 900px);
+  }
+}
+
 /* ----- Cards: pictures pasted into the book, with a strip of tape ----- */
 
 :root[data-look="book"] .game-card {
@@ -236,33 +390,6 @@
 
 :root[data-look="book"] .game-title {
   font-weight: 600;
-}
-
-/* Page numbers, as in a table of contents (an opened book's cards): on which page of the book each one is. */
-.game-page {
-  display: none;
-}
-
-:root[data-look="book"] .game-page {
-  display: block;
-  position: absolute;
-  bottom: 6px;
-  left: 12px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1rem;
-  font-style: italic;
-  opacity: 0.6;
-}
-
-/* On a phone's flat cards the picture fills the left end: the number goes to the top right corner. */
-@media (max-width: 599.98px), (max-height: 599.98px) {
-  :root[data-look="book"] .game-page {
-    top: 2px;
-    right: 12px;
-    bottom: auto;
-    left: auto;
-    font-size: 0.8rem;
-  }
 }
 
 /* A frame round a group of cards (a game's sorts): a paper panel, stitched on. */
@@ -591,6 +718,36 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   opacity: 0.7;
+}
+
+/* The cover's corner (back to the shelf): cloth over board, a shelf stamped on it in gold. */
+.cover-corner-board {
+  stroke: #12303b;
+  stroke-width: 1.5;
+}
+
+.cover-corner-edge {
+  fill: none;
+  stroke: #e9dcc0;
+  stroke-width: 2.5;
+  opacity: 0.8;
+}
+
+.cover-corner-stamp {
+  fill: #e8c76a59;
+  stroke: #ecd083;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cover-corner-stamp .cover-corner-book {
+  fill: #ecd083;
+}
+
+.cover-corner-stamp .cover-corner-arrow {
+  fill: none;
+  stroke-width: 3;
 }
 
 /*

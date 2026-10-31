@@ -202,7 +202,7 @@ In a fresh worktree run `bun install` first.
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
   (in the book look things standing in the bookshelf, see the book look below).
 - **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 in a menu on the home page in the toy look;
-  in the book look stickers of a fox girl and a bear boy on the bookshelf's back wall, one tap on either chooses it – user
+  in the book look stickers of a fox girl and a bear boy on the bookshelf's back wall above the globe, one tap on either chooses it – user
   decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
@@ -233,14 +233,16 @@ In a fresh worktree run `bun install` first.
   book look the way back is instead the page's corner turned up in its top left, at the outer edge of the left page seen
   (`PageCorner`, user feedback, October 2026), and a tap lifts that very page there and turns it back over the spine to
   the right: what is touched must be what moves, like a real book – a corner in the top right turned the other page, and
-  grown-ups didn't look there for the way back. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
+  grown-ups didn't look there for the way back. Back onto the shelf (a menu whose way back is the home page) no page
+  turns: the book closes and goes back, so there the corner is the book's cloth cover with a shelf stamped on it in gold
+  (`PageCornerArt sign="shelf"`, user feedback, October 2026) – never a page's corner. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ held to leave is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held
   instead of a ring filling – with the fullscreen button and „Zurück zum Menü · halten“ right of it, clear of the room it
   lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it.
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
-  toy look a card per category): one first picks a book, and only inside it, on its page, do its games stand on the
-  pasted-in cards (with tape and page numbers) – never games or levels on the shelf page itself, and no category whose
+  toy look a card per category): one first picks a book, and only inside it, on its first page, its table of contents,
+  do its games stand – never games or levels on the shelf page itself, and no category whose
   games stand on the home page (the old „Weitere“ frame is the book „Für jeden Tag“). A new category is a new book.
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
@@ -347,7 +349,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
   brings back the old toy-block look, `src/lib/look.ts`): the home page is a room with a bookshelf (`Bookshelf`, D-20, user
   decision, October 2026), the app's name „Books for Both“ in its title, each category a picture book standing on it with its cover out;
-  a category's page is its book's table of contents (page numbers on its cards, a flourish under the title); every
+  a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
+  game sharing the page's height – a round picture, its name, dots leading to its page number – each line a soft wash of
+  its world's colour and all of it the tap, never cards; every
   menu is a paper page, and the game's picture lies inside the page's paper margin (`.book-frame`). The page seen is
   always the book's **left** page: its outer edge on the left with the board and the table round it, the spine on the
   right with the facing page in its shadow beyond it (`--page-left`, `--page-right`; `look.test.ts`). All of it is CSS
@@ -358,6 +362,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   every screen. Every compartment holds something to tap – never a board only of filler books (users found it odd that
   nothing up there could be tapped): the picture books stand two up top and two below on wider screens, each with clear
   room round it so it is seen whole and a finger finds one book, never its neighbour (`BOOK_GAP`, `shelfLayout.test.ts`).
+  The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) and
+  show that they are there to be taken: they stand at the board's front edge, before the books spine out, their tops
+  tipped forwards as a hand takes a book out, with a warm glow round the cover; a mouse over one tips it further out.
   A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
   to the left, and its left page, the next menu printed on it, comes close until it is the screen – **no page turns on
   the way into a book**. Back to the shelf (`useTurnPage("/")` → `putBookBack`) is the same backwards: the book closes
@@ -365,7 +372,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026): a wooden loudspeaker (music, one tap), an
   hourglass (play time), a globe with the 🌐 lines and the language's name on its foot (the language – never a light
-  switch), and stickers of the fox girl and the bear boy on the back wall (the figure). The app's name is a painted sign
+  switch), and stickers of the fox girl and the bear boy on the back wall above the globe, in its compartment (the
+  figure; user feedback, October 2026). The app's name is a painted sign
   on the shelf's top board. A new option becomes such a thing in a compartment of its own too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent

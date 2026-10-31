@@ -94,3 +94,12 @@ test("the menus' sun is in the top left corner", () => {
     expect(r.body).not.toMatch(/\bright:/);
   }
 });
+
+// Back onto the shelf no page turns, the book closes and goes back (bookTravel.ts): a page's corner there said „turn the
+// page“ (user feedback, October 2026), so the way back to the home page is the book's cover with a shelf on it.
+test("in the book look the way back onto the shelf is the book's cover, not a page's corner", () => {
+  const menuTop = readFileSync("src/components/MenuTop.tsx", "utf8");
+  const corner = menuTop.slice(menuTop.indexOf("function PageCorner"));
+  expect(corner).toMatch(/sign=\{to === "\/" \? "shelf" : "back"\}/);
+  expect(readFileSync("src/components/PageCornerArt.tsx", "utf8")).toMatch(/if \(sign === "shelf"\) return <CoverCornerArt \/>/);
+});

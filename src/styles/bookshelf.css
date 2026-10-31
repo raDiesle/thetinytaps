@@ -35,7 +35,7 @@
 .room-scene {
   /* The wall round the shelf, and above it the room for the sign with the app's name (it hangs over the top board). */
   --side: max(10px, 1.5vw);
-  --sign: clamp(1.1rem, min(6.4vh, 4.6vw), 3.3rem);
+  --sign: clamp(1.1rem, min(5.4vh, 4.2vw), 3rem);
   --top: calc(var(--sign) * 1.25 + 10px);
   --floor: clamp(14px, 5vh, 44px);
   position: relative;
@@ -477,10 +477,10 @@
 
 .shelf {
   /* How deep the shelf is, and where the eye is that looks at it: a little above its middle (EYE in Bookshelf.tsx). */
-  --d: calc(var(--bh) * 0.62);
+  --d: calc(var(--bh) * 0.56);
   position: relative;
   margin: 0 auto;
-  perspective: 1200px;
+  perspective: 1300px;
   perspective-origin: 50% 36%;
 }
 
@@ -567,7 +567,9 @@
 .shelf-cell-shade {
   inset: 0;
   transform: translateZ(calc(1px - var(--d)));
-  background: linear-gradient(#00000070, #00000026 14%, #0000 42%), linear-gradient(90deg, #00000040, #0000 16%, #0000 84%, #00000040);
+  background:
+    linear-gradient(#00000080, #0000002e 14%, #0000 42%, #0000 85%, #00000038), linear-gradient(90deg, #00000052, #0000 16%, #0000 84%, #00000052),
+    radial-gradient(ellipse 70% 60% at 50% 60%, #fff3d626, #0000 70%);
 }
 
 /* The walls' inner faces, going back: lit at the front, dark at the back. */
@@ -629,32 +631,63 @@
   display: flex;
   justify-content: center;
   align-items: flex-end;
-  transform: translateZ(calc(var(--d) * -0.45));
+  transform: translateZ(calc(var(--d) * -0.3));
 }
 
-/* The stickers, stuck on the back panel. */
+/*
+ * The stickers of the child's figure, stuck on the back panel of the globe's compartment: above the globe, or at its
+ * sides where the compartment is wider than tall (`beside`).
+ */
 .shelf-back-stuck {
+  --globe: min(calc(var(--ch) * 0.46), calc(var(--cw) * 0.86 / 0.75));
   position: absolute;
-  inset: 6% 4%;
+  inset: 5% 4% calc(var(--globe) + 4%);
   container-type: size;
   transform: translate3d(var(--sx), var(--sy), calc(2px - var(--d)));
 }
 
+.shelf-back-stuck.beside {
+  --globe: calc(var(--ch) * 0.8);
+  inset: 8% 3%;
+}
+
+.shelf-back-stuck.beside .room-stickers {
+  justify-content: space-between;
+}
+
+.shelf-back-stuck.beside .room-sticker {
+  --s: min(24cqw, 56cqh);
+}
+
+.shelf-cell.language .room-globe svg {
+  height: min(calc(var(--ch) * 0.46), calc(var(--cw) * 0.86 / 0.75));
+}
+
+.shelf-cell.language:has(.beside) .room-globe svg {
+  height: calc(var(--ch) * 0.8);
+}
+
 /* ----- The front of the frame: the planks between compartments, the posts, the top board, the plinth ----- */
 
+/* Each plank's front edge is rounded off: lit where it faces the lamp above and left, darker where it turns away. */
 .shelf-plank {
   background:
     linear-gradient(90deg, #ffffff40, #0000 25%, #0000 75%, #00000026),
     var(--wood-grain-v) 0 0 / 360px 1200px,
     var(--shelf-wood);
+  box-shadow:
+    inset 2px 0 0 #ffffff59,
+    inset -2px 0 0 #00000033;
 }
 
 .shelf-plank.board {
   background:
-    linear-gradient(#ffffff59 0 1px, #0000 2px, #0000 70%, #0000002e),
+    linear-gradient(#ffffff73 0 1px, #ffffff26 2px, #0000 35%, #0000 65%, #00000038),
     var(--wood-grain-h) 0 0 / 1200px 360px,
     var(--shelf-wood);
-  box-shadow: 0 2px 3px #3a261459;
+  box-shadow:
+    inset 0 -2px 0 #00000038,
+    0 3px 5px #3a261466;
 }
 
 .shelf-post {
@@ -665,6 +698,9 @@
     linear-gradient(90deg, #ffffff40, #0000 25%, #0000 75%, #00000026),
     var(--wood-grain-v) 0 0 / 360px 1200px,
     var(--shelf-wood);
+  box-shadow:
+    inset 2px 0 0 #ffffff66,
+    inset -3px 0 0 #00000038;
 }
 
 .shelf-post.left {
@@ -675,17 +711,20 @@
   right: 0;
 }
 
+/* The top board, a moulding: a rounded lip on top, a groove, and its shadow on the boards under it. */
 .shelf-crown {
   top: 0;
   right: -6px;
   left: -6px;
   height: var(--crown);
-  border-radius: 3px 3px 0 0;
+  border-radius: 4px 4px 1px 1px;
   background:
-    linear-gradient(#ffffff73 0 2px, #0000 3px, #0000 60%, #00000033),
+    linear-gradient(#ffffff8c 0 2px, #ffffff1f 3px, #0000 38%, #00000040 40% 46%, #ffffff33 48%, #0000 60%, #00000040),
     var(--wood-grain-h) 0 0 / 1200px 360px,
     var(--shelf-wood);
-  box-shadow: 0 3px 4px #3a261466;
+  box-shadow:
+    0 4px 6px #3a261473,
+    inset 0 -2px 0 #0000002e;
 }
 
 .shelf-plinth {
@@ -694,7 +733,7 @@
   left: 0;
   height: var(--plinth);
   background:
-    linear-gradient(#00000040, #0000 30%, #0000001a),
+    linear-gradient(#00000059, #0000 30%, #ffffff1f 34%, #0000 40%, #00000026),
     var(--wood-grain-h) 0 0 / 1200px 360px,
     #b8874f;
 }
@@ -713,8 +752,32 @@
   transform: translateZ(calc(var(--d) * -0.2));
 }
 
+/*
+ * A picture book stands out from the rest: at the board's front edge, before the books spine out, its top tipped
+ * forwards a little as one does to take a book out – so it shows it is there to be taken (user feedback, October
+ * 2026). A mouse over it tips it further out.
+ */
 .shelf-row > .shelf-book {
   margin: 0 auto;
+  transform-origin: 50% 100%;
+  transform: translateZ(calc(var(--d) * 0.17)) rotateX(-7deg);
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+}
+
+@media (hover: hover) {
+  .shelf-row > .shelf-book:hover {
+    transform: translateZ(calc(var(--d) * 0.3)) translateY(-3%) rotateX(-13deg);
+  }
+}
+
+.shelf-row > .shelf-book:focus-visible {
+  outline: none;
+  transform: translateZ(calc(var(--d) * 0.3)) translateY(-3%) rotateX(-13deg);
+}
+
+.shelf-row > .shelf-book:focus-visible .shelf-book-cover {
+  outline: 4px solid var(--ocean);
+  outline-offset: 3px;
 }
 
 .shelf-end {
@@ -836,7 +899,7 @@
 /* A picture book standing with its cover out: the pages at its right, the cloth spine at its left. */
 .shelf-book {
   --bw: calc(var(--bh) * 0.82);
-  --depth: calc(var(--bh) * 0.08);
+  --depth: calc(var(--bh) * 0.13);
   position: relative;
   flex: none;
   width: var(--bw);
@@ -850,12 +913,19 @@
   visibility: hidden;
 }
 
+/* The spine, rounded: a light band where it turns towards the lamp, gold bands across it. */
 .shelf-book > .box-left {
-  background: linear-gradient(90deg, #ffffff26, #00000040), color-mix(in srgb, var(--w1) 70%, #3d3045);
+  background:
+    linear-gradient(#0000 8%, #e8c76acc 8% 9.5%, #0000 9.5% 90.5%, #e8c76acc 90.5% 92%, #0000 92%),
+    linear-gradient(90deg, #0000004d, #ffffff40 40%, #0000 60%, #00000059), color-mix(in srgb, var(--w1) 70%, #3d3045);
+  border-radius: 3px 0 0 3px;
 }
 
+/* The pages' edge between the two boards, which stand out a little beyond it. */
 .shelf-book > .box-right {
-  background: repeating-linear-gradient(90deg, #f6eedb 0 1px, #d8c9a8 1px 2px);
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--w1) 70%, #3d3045) 0 6%, #0000 6% 94%, color-mix(in srgb, var(--w1) 55%, #3d3045) 94%),
+    linear-gradient(#0000 0 3%, #0000001f 3% 97%, #0000 97%), repeating-linear-gradient(#f6eedb 0 1px, #dccdab 1px 2px);
 }
 
 /* Its shadow on the board, lying round its foot. */
@@ -882,17 +952,31 @@
   overflow: hidden;
   container-type: size;
   border-radius: 2px 6px 6px 2px;
+  /* Cloth over a thick board: the hinge's crease by the spine, a sheen of the lamp's light, bevelled edges. */
   background:
-    linear-gradient(90deg, #00000047 0 6%, #ffffff40 6.5%, #0000 9%), linear-gradient(135deg, #ffffff33, #0000 45%, #0000001f), var(--paper-grain, none),
-    var(--w1);
+    linear-gradient(90deg, #00000052 0 5%, #ffffff59 5.5%, #00000024 7.5%, #0000 9%),
+    linear-gradient(122deg, #ffffff47 0 18%, #ffffff0d 34%, #0000 50%, #0000002e), var(--paper-grain, none), var(--w1);
   box-shadow:
-    inset 0 0 0 1px #3d304566,
-    inset -2px -2px 4px #0000002e;
+    inset 0 0 0 1px #3d304573,
+    inset 2px 2px 0 #ffffff4d,
+    inset -3px -3px 5px #00000038;
   backface-visibility: hidden;
+}
+
+/* A picture book on the shelf glows warm round its cover, so a child sees what is there to take. */
+.shelf-row > .shelf-book .shelf-book-cover {
+  box-shadow:
+    inset 0 0 0 1px #3d304573,
+    inset 2px 2px 0 #ffffff4d,
+    inset -3px -3px 5px #00000038,
+    0 0 0 2px #fff6dccc,
+    0 0 calc(var(--bh) * 0.08) calc(var(--bh) * 0.02) #fff1c2b3;
 }
 
 .shelf-book-title {
   display: -webkit-box;
+  /* Printed into the cloth: a light edge under the letters. */
+  text-shadow: 0 0.06em 0 #ffffff80;
   flex: none;
   margin-bottom: 3cqh;
   overflow: hidden;
@@ -916,8 +1000,10 @@
   border: 2px solid #fffaf0;
   border-radius: 5px;
   background: linear-gradient(#cfe6ee, #fbf4e3);
+  /* Pasted on: it lifts a little off the cloth. */
   box-shadow:
     0 0 0 1.5px #3d304580,
+    1px 2px 3px #0000004d,
     inset 0 0 6px #0000001f;
 }
 

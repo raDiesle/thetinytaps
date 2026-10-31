@@ -27,6 +27,13 @@ describe("the bookshelf", () => {
     for (const cell of cells) expect(Boolean(cell.books) !== Boolean(cell.thing)).toBe(true);
   });
 
+  // The stickers of the child's figure are stuck above the globe (user feedback, October 2026): its compartment is the biggest.
+  test.each(ROOMS)("the globe's compartment has room for the stickers too in a %i × %i room", (width, height) => {
+    const things = planShelf(width, height, BOOKS).cells.filter((c) => c.thing);
+    const globe = things.find((c) => c.thing === "language");
+    for (const c of things) expect((globe?.w ?? 0) * (globe?.h ?? 0)).toBeGreaterThanOrEqual(c.w * c.h - 0.01);
+  });
+
   test.each(ROOMS)("compartments and planks lie inside the frame and never on each other in a %i × %i room", (width, height) => {
     const { cells, planks, frame, width: w, height: h } = planShelf(width, height, BOOKS);
     expect(w).toBeLessThanOrEqual(width + 0.01);

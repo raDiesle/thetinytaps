@@ -23,7 +23,7 @@ const AT_LIFTED = LIFT / TOTAL;
 const AT_MIDDLE = (LIFT + FLY) / TOTAL;
 const AT_OPEN = (LIFT + FLY + OPEN) / TOTAL;
 /** The eye's distance from the screen, as on the shelf (`--shelf-eye` in bookshelf.css). */
-const EYE = 1200;
+const EYE = 1300;
 
 /** Only one book travels at a time: a second tap meanwhile does nothing. */
 let travelling = false;
