@@ -437,8 +437,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   The title shows who „Both“ are (user feedback, October 2026): in the book look the o of „Both“ is a picture of Papa Fox
   sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the name
   up to them (`Logo`). The picture's o is drawn from Georgia's bold o (the title's font) and laid exactly over the letter,
-  so it reads as part of the word. The shelf's sign is big for it (`--sign` in `bookshelf.css`; the shelf gives up the
-  height): at the sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
+  so it reads as part of the word, and the foxes are twice the letter's height, sitting above the sign on the wall. The
+  sign is big and has room above it for them (`--sign`, `--top` in `bookshelf.css`; the shelf gives up the height): at
+  the sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
   line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own

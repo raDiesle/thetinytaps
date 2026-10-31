@@ -36,7 +36,7 @@
   /* The wall round the shelf, and above it the room for the sign with the app's name (it hangs over the top board). */
   --side: max(10px, 1.5vw);
   --sign: clamp(1.5rem, min(9vh, 6.4vw), 5rem);
-  --top: calc(var(--sign) * 1.4 + 10px);
+  --top: calc(var(--sign) * 2 + 10px);
   --floor: clamp(14px, 5vh, 44px);
   position: relative;
   height: 100dvh;
