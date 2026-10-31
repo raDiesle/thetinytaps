@@ -896,7 +896,7 @@
 :root[data-look="book"] .page-corner.page-ribbon {
   position: absolute;
   top: calc(var(--page-top) - var(--ribbon) * 6 / 60);
-  left: calc(var(--page-left) + var(--corner) * 0.12);
+  left: var(--ribbon-left);
   width: var(--ribbon);
   height: calc(var(--ribbon) * 80 / 60);
 }
@@ -991,6 +991,7 @@
 :root[data-look="book"]:has(.page-ribbon) {
   --corner: 124px;
   --ribbon: calc(var(--corner) * 0.62);
+  --ribbon-left: calc(var(--page-left) + var(--corner) * 0.12);
   --ribbon-reach: calc(var(--page-top) + var(--ribbon) * 74 / 60);
 }
 
@@ -1034,6 +1035,39 @@
 
   :root[data-look="book"]:has(.page-ribbon) .toc {
     --toc-top: max(64px, calc(var(--ribbon-reach) + 6px + 16px + 8px));
+  }
+}
+
+/*
+ * A table of contents on a wide screen leaves a broad margin left of its lines (`--toc-left`; the lines are at most
+ * 900 px wide, centred): there the ribbon lies in that margin right beside the lines, as big as the margin and the
+ * screen's height allow, and needs no room above them (user feedback, October 2026: in the page's corner it was far too
+ * small, with much empty room between it and the lines). The gap to the lines leaves room for its sway and a scrollbar.
+ * The sun or a room's window steps out from under it, behind the lines, until the margin holds both (`--sun-room`).
+ */
+@media (min-width: 1260px) and (min-height: 600px) {
+  :root[data-look="book"]:has(.page-ribbon):has(.toc) {
+    --toc-left: calc((100vw - 900px) / 2);
+    --ribbon: clamp(110px, var(--toc-left) - 32px - var(--page-left) - 12px, min(220px, 28vh));
+    --ribbon-left: calc(var(--toc-left) - 32px - var(--ribbon));
+  }
+
+  :root[data-look="book"]:has(.page-ribbon):has(.toc) .menu-head {
+    min-height: 0;
+  }
+
+  :root[data-look="book"]:has(.page-ribbon):has(.toc) .toc {
+    --toc-top: 150px;
+  }
+
+  :root[data-look="book"]:has(.page-ribbon):has(.toc) :is(.sky-sun, .world-window) {
+    left: calc(var(--toc-left) - 28px - var(--page-left));
+  }
+}
+
+@media (min-width: 1870px) and (min-height: 600px) {
+  :root[data-look="book"]:has(.page-ribbon):has(.toc) :is(.sky-sun, .world-window) {
+    left: -30px;
   }
 }
 

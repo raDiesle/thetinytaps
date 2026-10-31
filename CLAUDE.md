@@ -247,9 +247,11 @@ In a fresh worktree run `bun install` first.
   (`PageCornerArt sign="shelf"`, user feedback, October 2026) – never a page's corner, nor a cover's corner lying over
   the page, which floated where no cover can be: what stands for a part of the book lies where that part really is. It
   is much bigger than a page's corner (`--corner`; a shelf stamped small in gold, then a small label with a squat shelf,
-  were not seen), yet it never lies over a card, a line, a title or the text below: it scrolls with the paper, and the
-  menu's head grows down past it (`--ribbon-reach`, `--menu-pad`) – making it bigger means keeping that room free with
-  it (`MenuTop.test.ts`).
+  were not seen), and where a wide screen leaves a broad margin beside the table of contents it lies in that margin
+  right next to the lines, as big as the margin allows (in the far corner it stayed small, with empty room between it
+  and the lines). It never lies over a card, a line, a title or the text below: it scrolls with the paper, and where it
+  hangs above the lines the menu's head grows down past it (`--ribbon-reach`, `--menu-pad`) – making it bigger means
+  keeping that room free with it (`MenuTop.test.ts`).
   Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ held to leave is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held

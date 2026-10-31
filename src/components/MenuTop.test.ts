@@ -146,6 +146,28 @@ test("the ribbon reaches no further than the room the menus keep free for it", (
   ]);
 });
 
+// On a wide screen the ribbon lies in the margin beside the table of contents, as big as that margin allows (user
+// feedback, October 2026: in the corner it was far too small, with much empty room between it and the lines). It keeps
+// clear of the lines from the first width it does so: even its smallest size fits, with room for its sway and a scrollbar.
+test("on a wide screen the ribbon lies beside the table of contents, never over its lines", () => {
+  const css = readFileSync("src/styles/book.css", "utf8");
+  const wide = css.match(
+    /@media \(min-width: (\d+)px\) and \(min-height: 600px\) \{\s*:root\[data-look="book"\]:has\(\.page-ribbon\):has\(\.toc\) \{([^}]*)\}/,
+  );
+  const [, from, body] = wide ?? [];
+  expect(css).toMatch(/\.toc \{[^}]*width: min\(100%, 900px\);/);
+  expect(body).toContain("--toc-left: calc((100vw - 900px) / 2);");
+  const size = body?.match(/--ribbon: clamp\((\d+)px, var\(--toc-left\) - (\d+)px - var\(--page-left\) - (\d+)px, min\((\d+)px, (\d+)vh\)\);/);
+  const [, smallest, gap] = (size ?? []).map(Number);
+  // Its right edge keeps `gap` from the lines: the hover sways it 5° (its disc moves about 20 px at the biggest size)
+  // and a scrollbar moves the lines 8 px left.
+  expect(body).toContain(`--ribbon-left: calc(var(--toc-left) - ${gap}px - var(--ribbon));`);
+  expect(gap).toBeGreaterThanOrEqual(28);
+  // Even at its smallest it still begins on the page, from the first width it lies there.
+  const pageLeft = Number(css.match(/--page-left: (\d+)px;/)?.[1]);
+  expect((Number(from) - 900) / 2 - (gap ?? 0) - (smallest ?? 0)).toBeGreaterThanOrEqual(pageLeft);
+});
+
 // The arrow on the ribbon's disc is a plain arrow pointing back, as the toy look's round arrow: a straight shaft and a
 // head of two equal strokes meeting at its tip (a bent shaft with uneven strokes was not seen as an arrow).
 test("the ribbon's arrow is a straight arrow with an even head", () => {
