@@ -227,6 +227,14 @@ export const rewardChartIdeas: IdeaArea = {
       effort: "S",
     },
     {
+      id: "T-28",
+      emoji: "📒",
+      title: "Der Tagesplan als Umklapp-Kalender zum Kaufen",
+      text: "Ein Tischkalender mit Ringbindung und Aufsteller (wie bei Online-Druckereien ab 1 Stück) als Plan auf dem Tisch: jede Seite ein Schritt der Morgen- oder Abendroutine, groß mit dem Bild aus der App, und das Kind klappt die Seite um, wenn er geschafft ist; eine zweite Ausgabe mit einer Seite pro Wochentag. Eltern stellen ihn im Assistenten zusammen (Name, Bilder) und bestellen ihn gedruckt. Ohne Klett und ohne lose Teile – die Druckerei macht alles, nichts muss von Hand geklebt werden. Erst 10 Stück zum Ausprobieren, dann weitersehen.",
+      why: "Die Lücke aus der Recherche „Belohnungstafel“: Bildschirm und Papier genau gleich – das Kind findet auf dem Tisch dieselben Bilder wie auf dem Tablet. Kleine Klettpunkte wären für Unter-Dreijährige verschluckbar (Recherche „Wochenplaner und Belohnungstafel zum Kaufen“).",
+      effort: "L",
+    },
+    {
       id: "T-21",
       emoji: "📺",
       title: "Bildschirmzeit als Belohnung",
