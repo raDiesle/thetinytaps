@@ -352,7 +352,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   brings back the old toy-block look, `src/lib/look.ts`): the home page is a room with a bookshelf (`Bookshelf`, D-20, user
   decision, October 2026), the app's name „Books for Both“ in its title, each category a picture book standing on it with its cover out;
   a category's page looks like its book's table of contents (`BookContents`, user feedback, October 2026): one line per
-  game sharing the page's height – a round picture, its name, dots leading to its page number – each line a soft wash of
+  game sharing the page's height – a round picture, its name, dots leading to its page number (the first game on page 1,
+  `gamePage`, user feedback, October 2026) – each line a soft wash of
   its world's colour and all of it the tap, never cards; every
   menu is a paper page, and the game's picture lies inside the page's paper margin (`.book-frame`). The page seen is
   always the book's **left** page: its outer edge on the left with the board and the table round it, the spine on the
@@ -384,7 +385,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Inside a book every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or
   ending (or any other change of screen) goes through `turnPageWith(direction, update)` – forward the next page comes
   over from the right onto this one, back this one lifts at its outer edge, where the
-  way back's corner is, and turns over to the right. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
+  way back's corner is, and turns over to the right. Between two pages of one book further apart (a game's page back to
+  the table of contents, or on to a later game) as many pages turn as lie between them (`pagesBetween`), **in one turn**,
+  as a bundle taken at once: blank sheets fan out under the turning page (`.turn-sheet`), never one turn per page (user
+  feedback, October 2026). The turning page is the app (`#root`, `view-transition-name: turn-page`, only while it turns),
+  so the table lies still and the sheets can lie between it and the page beneath. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
   with it – `look.test.ts`): its corner lifts first, the page bends and catches the light, then darkens as it turns away,
   and its shadow slides across the page beneath with its edge; never a quick flick, never a stiff board. A lifted page
   must not swell past the screen (keep the eye far: `perspective(320vw)`), and its keyframes run `linear` – an easing

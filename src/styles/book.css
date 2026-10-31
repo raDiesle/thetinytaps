@@ -644,17 +644,37 @@
 }
 
 /*
+ * The page that turns is the app (`#root`) in the state that turns, a picture of its own over the rest of the screen
+ * (`turnPageWith` in look.ts), so the table stays where it is; the page beneath is the screen of the other state.
+ */
+:root[data-look="book"][data-turning] #root {
+  view-transition-name: turn-page;
+  /* While playing everything in it is fixed and it has no height: its picture would turn as a line, unseen. */
+  min-height: 100dvh;
+}
+
+:root[data-look="book"]::view-transition-group(turn-page) {
+  z-index: 3;
+  animation-duration: var(--turn-time);
+}
+
+/* The screen of the turning state without the app is only the table, which lies still under it anyway. */
+:root[data-look="book"][data-turn="back"]::view-transition-old(root),
+:root[data-look="book"][data-turn="forward"]::view-transition-new(root) {
+  opacity: 0;
+  animation: none;
+}
+
+/*
  * The page seen is the book's left page, the spine at its right. Forward: the next page comes over from the right,
  * turning on the spine and lying down on this one, its shadow coming in ahead of it.
  */
-:root[data-look="book"][data-turn="forward"]::view-transition-new(root) {
-  z-index: 2;
+:root[data-look="book"][data-turn="forward"]::view-transition-new(turn-page) {
   transform-origin: right center;
   animation: book-turn-away var(--turn-time) linear reverse both;
 }
 
 :root[data-look="book"][data-turn="forward"]::view-transition-old(root) {
-  z-index: 1;
   mask-image: linear-gradient(270deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
   mask-size: 250% 100%;
   mask-repeat: no-repeat;
@@ -662,18 +682,72 @@
 }
 
 /* Back: this page lifts at its outer (left) edge and turns over the spine to the right, the page before lying under it. */
-:root[data-look="book"][data-turn="back"]::view-transition-old(root) {
-  z-index: 2;
+:root[data-look="book"][data-turn="back"]::view-transition-old(turn-page) {
   transform-origin: right center;
   animation: book-turn-away var(--turn-time) linear both;
 }
 
 :root[data-look="book"][data-turn="back"]::view-transition-new(root) {
-  z-index: 1;
   mask-image: linear-gradient(270deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
   mask-size: 250% 100%;
   mask-repeat: no-repeat;
   animation: book-turn-under var(--turn-time) linear both;
+}
+
+/*
+ * Several pages at once (from a game's page back to the table of contents, or on to a later game): blank sheets as big
+ * as the page turn with it on the same spine, as a bundle a grown-up takes in one go – one turn, not one per page. Each
+ * sheet is a little behind the one above it, so their edges fan out: back they follow the page up, forward they come
+ * down ahead of it, so the page lands last, on top. Only their pictures in the turn show; the element is empty.
+ */
+.turn-sheet {
+  position: fixed;
+  inset: var(--page-inset);
+  pointer-events: none;
+  view-transition-class: turn-sheet;
+}
+
+/* How far down the bundle a sheet is (its name, set in look.ts), and so how far it lags behind the page. */
+:root[data-look="book"]::view-transition-group(turn-sheet-1) {
+  --lag: 1;
+}
+
+:root[data-look="book"]::view-transition-group(turn-sheet-2) {
+  --lag: 2;
+}
+
+:root[data-look="book"]::view-transition-group(turn-sheet-3) {
+  --lag: 3;
+}
+
+:root[data-look="book"]::view-transition-group(turn-sheet-4) {
+  --lag: 4;
+}
+
+:root[data-look="book"]::view-transition-group(turn-sheet-5) {
+  --lag: 5;
+}
+
+:root[data-look="book"]::view-transition-group(*.turn-sheet) {
+  z-index: 2;
+  --sheet-lag: calc(var(--turn-time) * 0.05 * var(--lag));
+}
+
+:root[data-look="book"]::view-transition-old(*.turn-sheet),
+:root[data-look="book"]::view-transition-new(*.turn-sheet) {
+  /* The spine lies at the screen's right edge, past the page's margin there, as for the page turning. */
+  transform-origin: calc(100% + var(--page-right)) center;
+  border-radius: 12px 4px 4px 12px;
+  background: linear-gradient(270deg, #00000038, #00000012 2.5%, #0000 6%), linear-gradient(90deg, #3d304526, #0000 3%), var(--paper-grain), var(--paper);
+  box-shadow: -1px 1px 0 var(--paper-edge);
+}
+
+:root[data-look="book"][data-turn="back"]::view-transition-old(*.turn-sheet) {
+  animation: book-turn-away calc(var(--turn-time) - var(--sheet-lag)) linear var(--sheet-lag) both;
+}
+
+:root[data-look="book"][data-turn="forward"]::view-transition-new(*.turn-sheet) {
+  animation: book-turn-away calc(var(--turn-time) - var(--sheet-lag)) linear reverse both;
 }
 
 /*
@@ -739,7 +813,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   :root[data-look="book"]::view-transition-old(root),
-  :root[data-look="book"]::view-transition-new(root) {
+  :root[data-look="book"]::view-transition-new(root),
+  :root[data-look="book"]::view-transition-old(turn-page),
+  :root[data-look="book"]::view-transition-new(turn-page),
+  :root[data-look="book"]::view-transition-old(*.turn-sheet),
+  :root[data-look="book"]::view-transition-new(*.turn-sheet) {
     animation: none;
   }
 }
