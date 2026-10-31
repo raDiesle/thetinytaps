@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router";
 import { FullscreenCorner } from "@/components/FullscreenButton";
 import { PageCornerArt } from "@/components/PageCornerArt";
@@ -53,9 +54,12 @@ export function MenuHead({ to, back, title, tools, children }: { to: string; bac
  */
 function PageCorner({ to, back }: { to: string; back: string }) {
   const turnPage = useTurnPage(to, "back");
-  return (
+  const corner = (
     <Link to={to} className={to === "/" ? "page-corner page-ribbon" : "page-corner"} aria-label={back} title={back} onClick={turnPage} data-tap>
       <PageCornerArt sign={to === "/" ? "shelf" : "back"} />
     </Link>
   );
+  // The ribbon lies on the paper and scrolls with it, placed from the page's top left (`#root`, which the page turns
+  // with), never from a menu's own boxes, which some screens position.
+  return to === "/" ? createPortal(corner, document.getElementById("root") ?? document.body) : corner;
 }
