@@ -3,14 +3,15 @@ import { SITE_NAME } from "@/content/seo";
 import { BRIGHT_COLORS } from "./Bursts";
 import pictures from "./bilder/*.webp?glob";
 
-/** Papa Fox and his child on the letter o (Gemini, `bilder/`), drawn on Georgia's bold o so it sits in the word. */
+/** Papa Fox and his child (Gemini, `bilder/`), drawn sitting on Georgia's bold o, which was then cut out of the picture. */
 const FOX_O = pictures["logo-fuchs-o.webp"];
 
 /**
  * The app's name, "Books for Both", in bouncy letters, each in its own colour, and in the book look printed like a
- * book's title (book.css). What „Both“ means is drawn into the word: its o is a picture of Papa Fox sitting on the
- * letter with his child on his lap, reading it a story, and a big and a small paw track run under the name up to them.
- * The toy look's rounded letters keep a plain o (the picture's o is Georgia's). `secretProps` go onto the o with the foxes (the home page uses them as the hidden way to the management page: hold them).
+ * book's title (book.css). What „Both“ means is drawn into the word: on its o sits Papa Fox with his child on his lap,
+ * reading it a story, and a big and a small paw track run under the name up to them. The toy look's rounded letters go
+ * without them (the foxes were drawn on Georgia's o). `secretProps` go onto the o with the foxes (the home page uses
+ * them as the hidden way to the management page: hold them).
  */
 export function Logo({ secretProps }: { secretProps?: HTMLAttributes<HTMLSpanElement> }) {
   let i = 0;

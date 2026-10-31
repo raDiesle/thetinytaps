@@ -397,7 +397,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   words for search engines, `SeoWords`) and „Ein paar Worte von uns“ (`ParentsNote`) – one book, not one per text; a tap
   opens it, and its text stays in the page unseen while closed (`MenuButton keep`) so search engines read it
   (`RoomNotes`, user feedback, October 2026). The app's name is a painted sign
-  on the shelf's top board. A new option becomes such a thing in a compartment of its own too (`SHELF_THINGS`); their
+  hanging on two little chains from above, with clear room between it and the shelf – it never touches or stands on the
+  shelf (user feedback, October 2026). A new option becomes such a thing in a compartment of its own too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
   with a bear child, one of the children a boy and one a girl – never a third grown-up or a child too many (user
@@ -444,8 +445,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
   The title shows who „Both“ are (user feedback, October 2026): in the book look the o of „Both“ is a picture of Papa Fox
   sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the name
-  up to them (`Logo`). The picture's o is drawn from Georgia's bold o (the title's font) and laid exactly over the letter,
-  so it reads as part of the word, and the foxes are twice the letter's height, sitting above the sign on the wall. The
+  up to them (`Logo`). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
+  Georgia's bold o, which was then cut out) and lies over it so that Papa really sits on the letter – never floating above
+  it (user feedback, October 2026). The foxes are twice the letter's height, sitting above the sign on the wall. The
   sign is big and has room above it for them (`--sign`, `--top` in `bookshelf.css`; the shelf gives up the height): at
   the sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`

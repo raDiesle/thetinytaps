@@ -33,10 +33,11 @@
 }
 
 .room-scene {
-  /* The wall round the shelf, and above it the room for the sign with the app's name (it hangs over the top board). */
+  /* The wall round the shelf, and above it the room for the sign with the app's name, hanging on its chains above the
+   * shelf, and for Papa Fox and his child sitting on it (Logo). */
   --side: max(10px, 1.5vw);
   --sign: clamp(1.5rem, min(9vh, 6.4vw), 5rem);
-  --top: calc(var(--sign) * 2 + 10px);
+  --top: calc(var(--sign) * 2.1 + 16px);
   --floor: clamp(14px, 5vh, 44px);
   position: relative;
   height: 100dvh;
@@ -538,10 +539,10 @@
   box-shadow: 10px 6px 30px 6px #3a26144d;
 }
 
-/* The app's name painted on a framed board fixed to the front of the shelf's top board, standing up over it. */
+/* The app's name painted on a framed board, hanging on two little chains from above, clear of the shelf below it. */
 .shelf-sign {
   position: absolute;
-  bottom: calc(100% - var(--crown));
+  bottom: calc(100% + var(--sign) * 0.14 + 4px);
   z-index: 1;
   left: 50%;
   translate: -50% 0;
@@ -552,6 +553,28 @@
   box-shadow:
     inset 0 0 0 2px #00000024,
     6px 4px 10px #3a261447;
+}
+
+/* Its chains go up out of the picture; each ends in the frame's top edge. */
+.shelf-sign::before,
+.shelf-sign::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 7%;
+  width: calc(var(--sign) * 0.16);
+  height: 100vh;
+  background:
+    center bottom / 100% auto repeat-y
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 16'%3E%3Crect x='3.9' y='6' width='2.2' height='10.5' rx='1.1' fill='%235c4632'/%3E%3Cellipse cx='5' cy='4' rx='3.6' ry='3.4' fill='none' stroke='%23866548' stroke-width='1.7'/%3E%3C/svg%3E");
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.shelf-sign::after {
+  right: 7%;
+  left: auto;
+  translate: 50% 0;
 }
 
 .room .shelf .shelf-sign .logo {
