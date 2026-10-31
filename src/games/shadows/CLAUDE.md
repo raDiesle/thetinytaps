@@ -2,7 +2,7 @@
 
 Route `/schatten/`.
 
-Its card plays at once (`startMode`): there is nothing to choose before playing. A picture looks for its shadow among 2–6 black ones (the same emoji with `filter: brightness(0)`); tap the right shadow or drag the picture onto it, or choose with arrow keys + Enter / 1–6. A wrong shadow shows its colours for a moment (spoken: "Das ist die Giraffe."). Pictures and texts in `content.ts`, by theme (Tiere, Fahrzeuge, Essen, Dinge).
+Its card plays at once (`startMode`): there is nothing to choose before playing, and ✕ and „Menü“ go back to the table of contents („Was gehört zum Tier?“ …), never to a start screen with only „Los geht’s!“. A picture looks for its shadow among 2–6 black ones (the same emoji with `filter: brightness(0)`); tap the right shadow or drag the picture onto it, or choose with arrow keys + Enter / 1–6. A wrong shadow shows its colours for a moment (spoken: "Das ist die Giraffe."). Pictures and texts in `content.ts`, by theme (Tiere, Fahrzeuge, Essen, Dinge).
 
 **Difficulty** (`SHADOW_LEVELS`, `nextLevel`, `dealShadows` in `levels.ts`, like Socken-Paare): it begins with 2 shadows of different kinds (an animal among a car and a banana), then 3, then 3 of the same kind (`alike`), up to 6. After each picture, from the wrong shadows tapped in the pictures on the current step: two pictures in a row without one → one up; two in one picture, or one in each of two pictures in a row → one down. Time plays no part (a slow but sure child climbs too). Every visit begins on the first step.
 
