@@ -82,7 +82,7 @@ start and length:
 
 - **A line not found:** it prints what Whisper heard there. Usually Suno left out or
   changed the line – a new take is better than forcing it.
-- **Nothing found at all** (Chinese and Hindi so far, expect it for every language not in
+- **Nothing found at all** (Chinese, Hindi and from part 3 on Arabic so far, expect it for every language not in
   Latin or Cyrillic letters): the `.mp3` is already written; the matching failed, not the
   song. Whisper writes in another script (Chinese in traditional characters with homophones,
   牙齿 → 雅之; Hindi in Latin or Urdu letters) and over a whole song often falls into a loop
@@ -93,6 +93,11 @@ start and length:
   3. Draw part 1 (there is usually a whistled intro) and check the grid: Suno sings a line
      every 2 bars (about 4.3 s), so a start that breaks it is suspect.
   4. Each start 0.3 s before the first word; check every step is 13–26 s.
+  Arabic (October 2026) was heard right, word for word, yet stopped at part 3: Whisper's spelling of vowels
+  differs too much for the matcher. There the whole-song pass put every line's first word on a whole second,
+  and cuts of 5 s pulled the first word to the cut's start, so neither is exact. What decided: the lines
+  that repeat in the same place of neighbouring parts (3–5, 6–7) lie exactly one part apart (17.0 s), and
+  every verse began the same bar after the part grid of `bun run song` – a start off that pattern is suspect.
   A `--prompt` in the right script got Chinese into simplified characters but sent Hindi into
   an endless „music music“, so the script doesn't use one.
 - **"odd length"** (a step under 13 s or over 26 s): Suno crammed or stretched a verse.
