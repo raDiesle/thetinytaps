@@ -1136,12 +1136,14 @@
     linear-gradient(90deg, #00000040, #ffffff2e 45%, #0000001f 70%, #00000047), var(--c);
 }
 
-/* The paper label between the gold bands, the name running down it (two lines where it is long). */
+/* The paper label between the gold bands: the game's emoji on top, the name running down below it (two lines where it is long). */
 .shelf-daily-label {
   position: absolute;
   inset: 14% 6%;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   container-type: size;
   border-radius: 2px;
@@ -1151,8 +1153,18 @@
     inset 0 0 4px #0000002e;
 }
 
+/* Its size in the label's own units (`cqw`), which only the label's children can use. */
+.shelf-daily-emoji {
+  flex: none;
+  margin-block: 8cqw 6cqw;
+  font-size: 70cqw;
+  line-height: 1;
+}
+
 .shelf-daily-title {
-  max-height: 100%;
+  flex: 1 1 0;
+  min-height: 0;
+  margin-bottom: 8cqw;
   overflow: hidden;
   font-size: 45cqw;
   font-weight: 700;

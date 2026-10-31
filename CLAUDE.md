@@ -133,6 +133,8 @@ In a fresh worktree run `bun install` first.
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games
   are German where they are user-facing (`/bilder/`, `/aufzug/`).
+- Container units (`cqw`, `cqh`) measure the nearest container *above* the element: on the container itself (its own
+  padding, gap) they measure the next one up, often the whole window, so size only a container's children with them.
 - CSS is global and each game's CSS arrives only when the game is opened: prefix
   classes and `@keyframes` by game or scene (`el-`, `bs-`); never style another
   game's classes. A game using another game's parts imports that CSS itself. Keyframes a game borrows
@@ -247,7 +249,8 @@ In a fresh worktree run `bun install` first.
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
   category whose games stand apart (`Category.apart`, „Für jeden Tag“: Zähne putzen, Töpfchen, Tagesplan, Laut und
   leise – user decision, October 2026): each of its games is a book of its own, standing spine out side by side in the
-  room of one picture book, its name on a paper label along the spine (`SpineBook`), opening its game directly; the
+  room of one picture book, its emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a
+  child finds it at a glance, user feedback, October 2026), opening its game directly; the
   category has no page, and its games' way back is the shelf. Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
   emojis: a new category gets one with it (`content.test.ts` checks).
