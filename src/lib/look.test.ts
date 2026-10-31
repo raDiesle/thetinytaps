@@ -29,3 +29,15 @@ test("the page seen is the left page, turning on the spine at its right", () => 
   // The outer edge has the wider margin, where the board and the pages under it show; the spine's side the narrow one.
   expect(Number(css.match(/--page-left:\s*(\d+)px/)?.[1])).toBeGreaterThan(Number(css.match(/--page-right:\s*(\d+)px/)?.[1]));
 });
+
+/** The declarations of the first rule in book.css whose selector ends with `selector`. */
+const rule = (selector: string) => css.match(new RegExp(`${selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*\\{([^}]*)\\}`))?.[1] ?? "";
+
+// What is on in the grown-ups' options (⚙️ open, the chosen choice in its panel) is marked by a highlighter drawn across
+// it, not by yellow paper taped down like the level row's chosen slip (user feedback, October 2026).
+test("what is on in the options is marked with a highlighter, not yellow paper", () => {
+  expect(rule(".play-options-button.holding)::after")).toContain("animation: book-highlight");
+  expect(css).toMatch(/\.menu-head \.panel-icon\[aria-expanded="true"\][^{]*::after\s*\{[^}]*animation: book-highlight/);
+  expect(rule(".settings .choice button.selected::after")).toContain("animation: book-highlight");
+  expect(rule(".settings .choice button.selected")).toContain("background-color: var(--paper)");
+});

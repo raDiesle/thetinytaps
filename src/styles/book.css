@@ -50,6 +50,9 @@
   /* Fine speckles of paper fibres, and a large soft mottling like watercolour paper. */
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .26 0 0 0 0 .14 .7 0 0 0 -.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --paper-mottle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.008' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .42 0 0 0 0 .22 .5 0 0 0 -.16'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E");
+  /* A silver paperclip (notes clipped to the page) and a highlighter's yellow (what is on). */
+  --paperclip: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-7 -1 14 42'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath stroke='%2378828e' stroke-width='2' d='M-1.5 10V28A1.5 1.5 0 0 0 1.5 28V4A3.5 3.5 0 0 0-5.5 4V33A5.5 5.5 0 0 0 5.5 33V12'/%3E%3Cpath stroke='%23f2f4f6' stroke-width='.7' d='M-1.5 10V28A1.5 1.5 0 0 0 1.5 28V4A3.5 3.5 0 0 0-5.5 4V33A5.5 5.5 0 0 0 5.5 33V12'/%3E%3C/g%3E%3C/svg%3E");
+  --highlighter: #ffe14fd9;
   /*
    * The table the book lies on: planks of oiled wood, their grain drawn by noise stretched along them (one long tile,
    * painted once), the seams between them, each plank a little lighter or darker, and the warm light of a lamp.
@@ -612,15 +615,6 @@
   background: var(--paper-grain), var(--paper-mottle), var(--paper);
 }
 
-/* The fullscreen button and ⚙️ while playing: still pale see-through discs with a thin dark edge (findable on dark
-   pictures too), but of paper. The ✕ becomes the page's corner (below, at the way back). */
-:root[data-look="book"] :is(.play-fullscreen, .hold-exit) {
-  background-color: #fbf4e3b3;
-  box-shadow:
-    0 0 0 1.5px #3d304566,
-    0 1px 4px #00000033;
-}
-
 /* ----- Turning the page between menus (a view transition) ----- */
 
 /*
@@ -976,6 +970,11 @@
   margin-top: 8px;
 }
 
+/* The fullscreen slip hangs from the picture's top edge, its clip over it (see the notes clipped on, below). */
+:root[data-look="book"] .play-area .exit-corner > .play-fullscreen {
+  margin-top: -5px;
+}
+
 :root[data-look="book"] .play-area .exit-corner .exit-hint {
   top: 14px;
   right: auto;
@@ -1150,7 +1149,7 @@
 }
 
 :root[data-look="book"] .play-area .play-options-corner {
-  top: max(calc(var(--frame) + 8px), env(safe-area-inset-top));
+  top: max(calc(var(--frame) + 3px), env(safe-area-inset-top));
   right: max(calc(var(--frame) + 8px), env(safe-area-inset-right));
   left: auto;
 }
@@ -1258,82 +1257,141 @@
 }
 
 /*
- * ----- A menu's buttons for grown-ups: paper tabs taped on at the page's top edge -----
+ * ----- Buttons for grown-ups: notes clipped to the page with a paperclip -----
  *
- * The fullscreen button in the page's top right corner and ⚙️ beside it hang down from the page's top edge like tabs
- * stuck into a book, a strip of tape over the edge (user feedback, October 2026): part of the book, not round buttons
- * lying on it, and out of the cards' way – and clear of the sun or the room's window, which stand beside the way back's
- * corner on the left. The head keeps their height (`min-height` on a phone).
+ * The fullscreen button and ⚙️ are small slips of plain paper, a pencil sign on them, clipped onto the page's top
+ * edge in a menu and onto the picture's top edge while playing (user decision, October 2026): quieter than a button
+ * and part of the book, as one clips a note into it. Their clip and paper keep them findable on dark pictures too.
+ * What is on (⚙️ while its options are open, or held while playing) is marked with a highlighter drawn across the
+ * slip, never by turning it yellow and taping it down like a chosen card or level slip.
  */
+:root[data-look="book"] :is(.menu-head > .fullscreen-corner .home-menu-button, .menu-head .panel-icon, .play-area .play-fullscreen, .play-options-button) {
+  isolation: isolate;
+  width: 42px;
+  height: 46px;
+  min-height: 0;
+  padding: 8px 0 0;
+  border: 1px solid #3d304566;
+  border-radius: 2px 3px 2px 4px;
+  background: var(--paper-grain), color-mix(in srgb, var(--paper) 55%, #fff);
+  box-shadow:
+    1px 2px 0 #5a3c1f26,
+    2px 4px 6px -2px #00000040;
+  color: var(--ink);
+  rotate: 3deg;
+}
+
+:root[data-look="book"] :is(.menu-head .panel-icon, .play-options-button) {
+  rotate: -3deg;
+}
+
+/* The menu's slips are placed on the page below; the ones on the picture hold their clip themselves. */
+:root[data-look="book"] .play-area :is(.play-fullscreen, .play-options-button) {
+  position: relative;
+}
+
+/* The paperclip over the edge the slip hangs from. */
+:root[data-look="book"]
+  :is(.menu-head > .fullscreen-corner .home-menu-button, .menu-head .panel-icon, .play-area .play-fullscreen, .play-options-button)::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  right: 5px;
+  width: 13px;
+  height: 39px;
+  rotate: 5deg;
+  background: var(--paperclip) center / contain no-repeat;
+  filter: drop-shadow(1px 1px 0.5px #00000033);
+  pointer-events: none;
+}
+
+/* The highlighter's stroke across the slip, drawn from left to right when it comes on. */
+:root[data-look="book"] :is(.menu-head .panel-icon[aria-expanded="true"], .play-options-button.holding)::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 3px);
+  left: -5px;
+  right: -5px;
+  z-index: 1;
+  height: 13px;
+  border-radius: 2px 6px 3px 5px / 5px 6px 4px 6px;
+  /* More ink where the stroke starts and ends, as a real highlighter leaves. */
+  background: linear-gradient(90deg, #f5c800 0 3px, #0000 6px calc(100% - 6px), #f5c800 calc(100% - 3px)), var(--highlighter);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  rotate: -9deg;
+  pointer-events: none;
+  animation: book-highlight 0.35s ease-out both;
+}
+
+/* Held while playing, the stroke grows as long as the hold takes, instead of a ring filling. */
+:root[data-look="book"] .play-area .play-options-button.hold-exit.holding::after {
+  animation: book-highlight var(--hold-ms) linear both;
+}
+
+/*
+ * In the grown-ups' options (a game's ⚙️, the shelf's things), the chosen choice is marked the same way: a highlighter
+ * stroke drawn across its words as it is chosen or the options open – not yellow paper like the level row's slips.
+ */
+:root[data-look="book"] .settings .choice button.selected {
+  position: relative;
+  isolation: isolate;
+  background-color: var(--paper);
+}
+
+:root[data-look="book"] .settings .choice button.selected::after {
+  content: "";
+  position: absolute;
+  top: calc(50% - 0.5em);
+  left: 7px;
+  right: 7px;
+  height: 1.05em;
+  border-radius: 3px 8px 4px 7px / 6px 8px 5px 8px;
+  background: linear-gradient(90deg, #f5c800 0 3px, #0000 7px calc(100% - 7px), #f5c800 calc(100% - 3px)), var(--highlighter);
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  rotate: -1.5deg;
+  pointer-events: none;
+  animation: book-highlight 0.4s ease-out both;
+}
+
+@keyframes book-highlight {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
 :root[data-look="book"] .menu-head > .fullscreen-corner,
 :root[data-look="book"] .menu-head .panel-icon {
   position: fixed;
-  top: calc(var(--page-top) - 3px);
+  top: calc(var(--page-top) + 6px);
   z-index: 20;
 }
 
 :root[data-look="book"] .menu-head > .fullscreen-corner {
-  right: calc(var(--page-right) + 14px);
+  right: calc(var(--page-right) + 16px);
 }
 
 :root[data-look="book"] .menu-head .panel-icon {
-  right: calc(var(--page-right) + 14px + 46px + 12px);
+  right: calc(var(--page-right) + 16px + 42px + 14px);
 }
 
-:root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon) {
-  width: 46px;
-  height: 54px;
-  min-height: 0;
-  padding: 10px 0 0;
-  border: 2px solid #3d304599;
-  border-top: 0;
-  border-radius: 0 0 14px 12px / 0 0 12px 14px;
-  background: var(--paper-grain), linear-gradient(#5a3c1f1f, #0000 30%), color-mix(in srgb, var(--sunshine) 42%, var(--paper));
-  box-shadow: 0 4px 6px -3px #5a3c1f73;
-  transform-origin: 50% 0;
-  rotate: 1.5deg;
-}
-
-:root[data-look="book"] .menu-head .panel-icon.home-menu-button {
-  rotate: -2deg;
-  background: var(--paper-grain), linear-gradient(#5a3c1f1f, #0000 30%), color-mix(in srgb, var(--mint) 42%, var(--paper));
-}
-
-:root[data-look="book"] .menu-head .panel-icon.home-menu-button[aria-expanded="true"] {
-  height: 62px;
-  background: var(--paper-grain), linear-gradient(#5a3c1f1f, #0000 30%), color-mix(in srgb, var(--sunshine) 75%, var(--paper));
-}
-
-/* A phone's tabs are a little shorter, so the head's height keeps them clear of what comes below. */
+/* A phone's slips are a little shorter, so the head's height keeps them clear of what comes below. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
-  :root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon) {
-    height: 46px;
-    padding-top: 7px;
-  }
-
-  :root[data-look="book"] .menu-head .panel-icon.home-menu-button[aria-expanded="true"] {
-    height: 52px;
+  :root[data-look="book"] :is(.menu-head > .fullscreen-corner .home-menu-button, .menu-head .panel-icon) {
+    height: 40px;
+    padding-top: 6px;
   }
 }
 
-/* The tape over the page's edge, holding the tab. */
-:root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon)::before {
-  content: "";
-  position: absolute;
-  top: -5px;
-  left: 50%;
-  width: 40px;
-  height: 18px;
-  translate: -50% 0;
-  rotate: -4deg;
-  background: repeating-linear-gradient(90deg, #fff6c8a0 0 6px, #ffeeb0a0 6px 12px);
-  box-shadow: 0 1px 2px #0000001f;
-  pointer-events: none;
-}
-
-:root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon):active {
-  translate: 0 3px;
-  box-shadow: 0 2px 3px -2px #5a3c1f73;
+:root[data-look="book"]
+  :is(.menu-head > .fullscreen-corner .home-menu-button, .menu-head .panel-icon, .play-area .play-fullscreen, .play-options-button):active {
+  translate: 0 2px;
+  box-shadow: 1px 1px 0 #5a3c1f26;
 }
 
 /*

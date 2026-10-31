@@ -233,7 +233,7 @@ In a fresh worktree run `bun install` first.
   (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
   lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
   a dark sign (`playing.css`), never only a dark see-through sign; a game never restyles them (in the book look the ✕
-  is the page's corner, see below). The way back from a menu is a big yellow
+  is the page's corner and the fullscreen button and ⚙️ are paper notes clipped on, see below). The way back from a menu is a big yellow
   round arrow without words (its target only as tooltip and read out, `MenuTop`), right next to the title on its left, close to the
   cards – never far off in the screen's corner, where grown-ups on a big monitor didn't find it (biggest on a computer). A
   menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right. In the
@@ -277,7 +277,7 @@ In a fresh worktree run `bun install` first.
   left corner (in the book look not on a phone, where it only crowds the cards); buttons for grown-ups never cover it (the
   home page's sit on the right, a phone's way back in the middle). „Einstellungen“ (where a game still has them) is a
   small sign without words (⚙️; the name as tooltip and read out) right next to the way back – in the book look a paper
-  tab beside the fullscreen tab, see there – so it takes no row of its own; a panel opens right under the top row. A
+  note clipped beside the fullscreen note, see there – so it takes no row of its own; a panel opens right under the top row. A
   menu has no „Über das Spiel“ (user decision, October 2026: „wir brauchen keine Infos im Menü“). When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
   install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
@@ -420,12 +420,15 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`), and the world's things that
   stood there (barn, trees, blocks, toys) are left out; wider pages have them on the margins beside the cards. Never in
   the top row beside the title, where they were too small and in the way (user feedback, October 2026); the cards move
-  up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). A menu's fullscreen button and ⚙️ are
-  paper tabs hanging from the page's top edge in its top right corner, a strip of tape over the edge, as if stuck into
-  the book (user feedback, October 2026); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
+  up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). The fullscreen button and ⚙️ are
+  small notes of plain paper with a paperclip over the edge they hang from – the page's top edge in a menu's top right
+  corner, the picture's top edge while playing (user decision, October 2026: quieter than buttons or taped tabs, and
+  findable on dark pictures). What is on – ⚙️ while its options are open or held, and the chosen choice inside the
+  grown-ups' options (`.settings`) – is marked by a highlighter stroke drawn across it as it comes on
+  (`book-highlight`), never by yellow paper and tape like the level row's chosen slip (user feedback, October 2026;
+  `look.test.ts`); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
   over its top edge; and the emoji of cards and the table of contents look printed into the paper (softer colours, the
-  paper's grain over them, `book.css`). While playing, the fullscreen
-  button and ⚙️ stay pale see-through discs, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
+  paper's grain over them, `book.css`). While playing, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
   children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book.
   Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
   or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
