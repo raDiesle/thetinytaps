@@ -17,7 +17,7 @@
 /* Before the brushing the clock counts down to its start, big enough for a grown-up to see across the bathroom. */
 .teeth-clock {
   position: absolute;
-  top: max(12px, env(safe-area-inset-top));
+  top: calc(max(12px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(16px, env(safe-area-inset-left));
   margin: 0;
   font-variant-numeric: tabular-nums;
@@ -1414,7 +1414,7 @@
 /* Next to the clock, away from the grown-ups' ✕ in the other corner. */
 .teeth-sky {
   position: absolute;
-  top: calc(max(12px, env(safe-area-inset-top)) + clamp(1.4rem, 4vmin, 2rem));
+  top: calc(max(12px, env(safe-area-inset-top)) + clamp(1.4rem, 4vmin, 2rem) + var(--corner-clear, 0px));
   left: max(16px, env(safe-area-inset-left));
   font-size: clamp(2.4rem, 9vmin, 4.5rem);
   line-height: 1;

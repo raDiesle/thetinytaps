@@ -4,12 +4,13 @@ import { canFullscreen, enterFullscreen, enterKidMode, exitFullscreen, useFullsc
 /**
  * Small round button for the grown-ups: puts the whole app, menus included,
  * into fullscreen or back out. Hidden where the browser can't (iPhone).
- * While playing (`playing`) it also locks the keyboard again, as starting the game did.
+ * While playing (`playing`) it is there only to get back into fullscreen, which a phone leaves when another app was
+ * opened, and locks the keyboard again as starting the game did; in fullscreen it shows only in the menus.
  */
 export function FullscreenButton({ className = "home-menu-button icon-only", playing = false }: { className?: string; playing?: boolean }) {
   const on = useFullscreen();
   const t = useT();
-  if (!canFullscreen()) return null;
+  if (!canFullscreen() || (playing && on)) return null;
   const label = on
     ? t({
         de: "Vollbild beenden",
@@ -24,7 +25,6 @@ export function FullscreenButton({ className = "home-menu-button icon-only", pla
   return (
     <button
       type="button"
-      // "on" lets the styles hide it in fullscreen where only entering is wanted (a game on a tablet).
       className={`${className}${on ? " on" : ""}`}
       aria-label={label}
       title={label}

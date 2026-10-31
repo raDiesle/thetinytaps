@@ -19,7 +19,6 @@ const AnimalsPage = page(() => import("@/pages/AnimalsPage"), "AnimalsPage", "/t
 const ElevatorPage = page(() => import("@/pages/ElevatorPage"), "ElevatorPage", "/kleine-abenteuer/");
 const FeelingsPage = page(() => import("@/pages/FeelingsPage"), "FeelingsPage", "/gefuehle/");
 const LettersPage = page(() => import("@/pages/LettersPage"), "LettersPage", "/buchstaben/");
-const LoudPage = page(() => import("@/pages/LoudPage"), "LoudPage", "/laut-leise/");
 const ImprintPage = page(() => import("@/pages/LegalPage"), "ImprintPage");
 const PrivacyPage = page(() => import("@/pages/LegalPage"), "PrivacyPage");
 const ManagementPage = page(() => import("@/pages/ManagementPage"), "ManagementPage");
@@ -55,7 +54,6 @@ export function App() {
         <Route path="gefuehle/:place" element={<Navigate to="/gefuehle/" replace />} />
         <Route path="schatten" element={<ShadowsPage />} />
         <Route path="socken" element={<SocksPage />} />
-        <Route path="laut-leise" element={<LoudPage />} />
         <Route path="kettenreaktion" element={<MarblePage />} />
         {/* Kettenreaktion's old address, then the Klingende Kugelbahn's; the marble run is a level of Kettenreaktion now. */}
         <Route path="kugelbahn" element={<Navigate to="/kettenreaktion/" replace />} />

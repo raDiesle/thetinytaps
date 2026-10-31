@@ -100,7 +100,7 @@
 /* Pause, for a grown-up (or a child – any tap goes on): in the top left corner, a pale disc like the ✕ across. */
 .fm-pause {
   position: absolute;
-  top: max(12px, env(safe-area-inset-top));
+  top: calc(max(12px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(12px, env(safe-area-inset-left));
   z-index: 2;
   display: grid;

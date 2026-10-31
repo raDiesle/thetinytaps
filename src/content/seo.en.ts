@@ -103,11 +103,6 @@ export const SEO_EN: SeoTranslation = {
         "Daily routine, morning and bedtime routine or a week plan for toddlers in pictures: the child taps off what is done. With picture cards to print.",
       text: "A daily plan in pictures (a visual schedule) for toddlers: the steps of the day as big picture cards – what is next lights up, the child taps it off when it is done, and the next card lights up. Templates for the morning routine, the bedtime routine, a day with daycare and a first-then board; a week plan shows what happens on which day, with a moon for every sleep until then. A helper leads in pictures to your own plan, and to print there are pages with every picture as a card to cut out for a Velcro board. On the same page: a reward chart to collect stars.",
     },
-    "/laut-leise/": {
-      title: "Loud and Quiet – Voice Game for Toddlers",
-      description: "Roaring makes the lion jump, whispering makes the mouse squeak: practice loud and quiet voices in play. Nothing is recorded, no ads.",
-      text: "The microphone only measures how loud it is: loud calls the lion, quiet the mouse. Tapping works too. Nothing is recorded.",
-    },
     "/bilder/baustelle/": scene("Construction Site", "excavator, crane and cement mixer"),
     "/bilder/stadt/": scene("City", "bus, traffic light and police car"),
     "/bilder/bauernhof/": scene("Farm", "cow, pig and tractor"),

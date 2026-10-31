@@ -1542,7 +1542,7 @@
 
 .rw-pending-cancel {
   position: absolute;
-  top: max(16px, env(safe-area-inset-top));
+  top: calc(max(16px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(16px, env(safe-area-inset-left));
 }
 

@@ -4,6 +4,7 @@ import { Bookshelf } from "@/components/Bookshelf";
 import { GameCard } from "@/components/GameCard";
 import { HomeOptions } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
+import { ParentsNote } from "@/components/ParentsNote";
 import { SeoText } from "@/components/SeoText";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
@@ -21,40 +22,6 @@ const IDEAS_HOLD_MS = 2000;
 
 /** Where the books (the toy look's cards) lead. */
 const HREFS = SHELF.map((entry) => entry.href);
-
-/**
- * For parents at the foot of the home page, a few words from us as parents: why no age is named (each family decides
- * when screens come in), that the real world comes first, then playing on a screen together, a learning game alone
- * later, and plain watching least – and that this book means to be that first step together.
- */
-function ParentsNote() {
-  const t = useT();
-  return (
-    <section className="seo-text parents-note">
-      <h2>{t({ de: "Ein paar Worte von uns" })}</h2>
-      <p>
-        {t({
-          de: "Wir sind selbst Eltern und haben Books for Both gemacht, weil wir uns immer wieder dieselbe Frage gestellt haben: Wie viel Bildschirm tut einem kleinen Kind eigentlich gut? Eine Altersangabe finden Sie hier deshalb nicht. Wann Ihr Kind die ersten Schritte ins Digitale macht, wissen Sie selbst am besten – jedes Kind ist anders, und jede Familie auch.",
-        })}
-      </p>
-      <p>
-        {t({
-          de: "Ehrlich gesagt ist das Schönste ohnehin nicht digital. In Pfützen springen, Türme bauen und wieder umwerfen, ein Bilderbuch so oft vorlesen, bis alle es auswendig können – die echte Welt bleibt der beste Spielplatz, und kein Bildschirm kommt da heran.",
-        })}
-      </p>
-      <p>
-        {t({
-          de: "Kommt der Bildschirm doch dazu, dann am liebsten zusammen: auf dem Schoß, ein kleiner Finger auf dem Bild, viel Staunen und Erzählen dazwischen. Später darf ein Kind auch mal allein ein kleines Lernspiel spielen. Am wenigsten halten wir vom bloßen Zuschauen, ein Video nach dem anderen, ohne selbst etwas zu tun.",
-        })}
-      </p>
-      <p>
-        {t({
-          de: "Genau für diesen ersten gemeinsamen Schritt ist Books for Both gedacht: ein Bilderbuch, das Sie zusammen aufschlagen, das auf jedes Antippen antwortet – und das sich genauso gut wieder zuklappen lässt, um draußen weiterzuspielen. Wir wünschen Ihnen und Ihrem Kind viele schöne Momente damit, auf dem Bildschirm und noch viel mehr daneben.",
-        })}
-      </p>
-    </section>
-  );
-}
 
 /** Impressum and Datenschutz, below the first screen, for grown-ups. */
 function LegalLink({ to, children }: { to: string; children: ReactNode }) {
@@ -76,18 +43,20 @@ export function Home() {
   useUpdateBetweenGames();
   usePreloadPages(HREFS);
   const secretProps = useSecretHold();
+  const book = isBookLook();
+  // In the book look the page's words and ours are little books in the shelf (RoomNotes), only the rest stays below.
   const foot = (
     <>
       <InstallHint />
-      <SeoText>
-        <ParentsNote />
+      <SeoText words={!book}>
+        {!book && <ParentsNote />}
         <p className="home-version">
           <LegalLink to="/impressum/">{t({ de: "Impressum" })}</LegalLink> · <LegalLink to="/datenschutz/">{t({ de: "Datenschutz" })}</LegalLink>
         </p>
       </SeoText>
     </>
   );
-  if (isBookLook()) return <Bookshelf secretProps={secretProps}>{foot}</Bookshelf>;
+  if (book) return <Bookshelf secretProps={secretProps}>{foot}</Bookshelf>;
   return (
     <main className="home">
       <Sky />

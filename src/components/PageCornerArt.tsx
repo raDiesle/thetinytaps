@@ -33,8 +33,10 @@ export function PageCornerArt({ sign }: { sign: "back" | "close" | "shelf" }) {
 
 /**
  * The way out of a book, back onto the shelf (user feedback, October 2026: a page's corner said „turn the page“, but the
- * book is closed and put back): the corner of the book's cloth cover, lifted as a hand takes it to close the book, with
- * a shelf stamped on it in gold – books standing and this one going back into its gap.
+ * book is closed and put back): the corner of the book's cloth cover, lifted as a hand takes it to close the book. On it
+ * a round paper label with a little bookshelf in colour, and the app's yellow round arrow of the way back over its edge –
+ * big and plain, so a grown-up sees at once where it leads (a shelf stamped small in gold was not recognised, user
+ * feedback, October 2026).
  */
 function CoverCornerArt() {
   const id = useId();
@@ -53,17 +55,24 @@ function CoverCornerArt() {
       <path className="cover-corner-board" d="M0 0Q46 0 90 5Q58 54 0 96Z" fill={`url(#${id}c)`} />
       {/* The board's edge, its thickness showing where the cloth folds round it. */}
       <path className="cover-corner-edge" d="M90 5Q58 54 0 96" />
-      <g className="cover-corner-stamp">
-        {/* The shelf's board and the books standing on it, with a gap. */}
-        <path d="M6 47H48" />
-        <rect x="8" y="27" width="5" height="20" rx="1" />
-        <rect x="14" y="31" width="5" height="16" rx="1" />
-        <rect x="33" y="29" width="5" height="18" rx="1" />
-        <rect x="39" y="33" width="5" height="14" rx="1" />
-        {/* This book, going back into its gap. */}
-        <rect className="cover-corner-book" x="22" y="18" width="8" height="22" rx="1.2" transform="rotate(14 26 40)" />
-        <path className="cover-corner-arrow" d="M38 6Q30 4 27 12M27 12l-1-7M27 12l6-3" />
+      <circle className="cover-corner-label" cx="28" cy="28" r="25" />
+      <g className="cover-corner-shelf" transform="translate(28 28) scale(1.14) translate(-28 -28)">
+        {/* The shelf: its frame, a board in the middle, books standing on both boards, one gap for this book. */}
+        <rect className="cover-corner-wood" x="13" y="13" width="30" height="31" rx="1.5" />
+        <rect className="cover-corner-inside" x="16" y="16" width="24" height="11" />
+        <rect className="cover-corner-inside" x="16" y="30" width="24" height="11" />
+        <rect x="17" y="18" width="4" height="9" fill="#c0503c" />
+        <rect x="21.5" y="19.5" width="3.5" height="7.5" fill="#3f6f8f" />
+        <rect x="30" y="18.5" width="4" height="8.5" fill="#5d8a5a" />
+        <rect x="34.5" y="20" width="4.5" height="7" fill="#e0b85c" />
+        <rect x="17" y="32" width="4.5" height="9" fill="#8a5a8f" />
+        <rect x="22" y="33" width="3.5" height="8" fill="#d9a441" />
+        <rect x="26" y="31.5" width="4" height="9.5" fill="#2f5d62" />
+        <rect x="34" y="32.5" width="5" height="8.5" fill="#c77d4f" />
       </g>
+      {/* The way back's round yellow arrow, as on every menu in the toy look. */}
+      <circle className="cover-corner-badge" cx="48" cy="47" r="13" />
+      <path className="cover-corner-arrow" d="M53.5 52.5Q55.5 41 44.5 41M44.5 41l4.5-5M44.5 41l5 4" />
     </svg>
   );
 }

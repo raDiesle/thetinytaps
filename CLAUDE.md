@@ -209,7 +209,7 @@ In a fresh worktree run `bun install` first.
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
   (in the book look things standing in the bookshelf, see the book look below).
 - **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 in a menu on the home page in the toy look;
-  in the book look stickers of a fox girl and a bear boy on the bookshelf's back wall above the globe, one tap on either chooses it – user
+  in the book look stickers of a fox girl and a bear boy on the shelf's right inner side, one tap on either chooses it – user
   decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
@@ -226,9 +226,9 @@ In a fresh worktree run `bun install` first.
   nearest – use `tapState({ goal, done })`. Targets react on `onPointerDown` (only that is sent on);
   overlays inside a game get `data-tap-root`, drawing/dragging surfaces `data-tap-keep`.
 - The fullscreen button is always there to get back into fullscreen, which a phone leaves whenever another app was
-  opened in between: in every menu in the top right (`MenuHead`, the last of the home page's buttons) and next to ✕ while playing. Grown-ups on a
-  computer (≥ 900 px wide with a mouse) see it always, also to leave fullscreen; on phones and tablets a game shows it
-  only while out of fullscreen, so a child's tap can't end it. Starting or leaving a game in fullscreen must not make the browser
+  opened in between: in every menu in the top right (`MenuHead`, the last of the home page's buttons) and next to ✕ while playing. A game shows it
+  only while out of fullscreen, on every device, to get back in – never to leave it, so a child's tap can't end it and a
+  game in fullscreen shows nothing of it (user feedback, October 2026); leaving is the menus' button. Starting or leaving a game in fullscreen must not make the browser
   show its „how to leave fullscreen“ note again: no new fullscreen request when already in it, and the keyboard lock
   (which re-shows the note on lock and unlock) only on computers (`enterKidMode`, `fullscreen.test.ts`). ✕ and the fullscreen button
   lie over every game's picture, also dark ones (night, space): they are pale see-through discs with a thin dark edge and
@@ -241,17 +241,20 @@ In a fresh worktree run `bun install` first.
   (`PageCorner`, user feedback, October 2026), and a tap lifts that very page there and turns it back over the spine to
   the right: what is touched must be what moves, like a real book – a corner in the top right turned the other page, and
   grown-ups didn't look there for the way back. Back onto the shelf (a menu whose way back is the home page) no page
-  turns: the book closes and goes back, so there the corner is the book's cloth cover with a shelf stamped on it in gold
-  (`PageCornerArt sign="shelf"`, user feedback, October 2026) – never a page's corner. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
+  turns: the book closes and goes back, so there the corner is the book's cloth cover with a little bookshelf in colour on a round
+  paper label and the yellow round arrow of the way back (`PageCornerArt sign="shelf"`, user feedback, October 2026) –
+  never a page's corner – and bigger than a page's corner (`--corner`): a shelf stamped small in gold was not recognised.
+  Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ held to leave is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held
   instead of a ring filling – with the fullscreen button and „Zurück zum Menü · halten“ right of it, clear of the room it
-  lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it.
+  lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it, and a game's own buttons and signs in the top
+  left keep below it with `top: calc(… + var(--corner-clear, 0px))` (Schatten finden's picture choice lay under the ✕,
+  user feedback, October 2026; `css.test.ts` checks).
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
   toy look a card per category): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
-  category whose games stand apart (`Category.apart`, „Für jeden Tag“: Zähne putzen, Töpfchen, Tagesplan, Laut und
-  leise – user decision, October 2026): each of its games is a book of its own, standing spine out side by side in the
+  category whose games stand apart (`Category.apart`, „Für jeden Tag“: Zähne putzen, Töpfchen, Tagesplan – user decision, October 2026): each of its games is a book of its own, standing spine out side by side in the
   room of one picture book, its emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a
   child finds it at a glance, user feedback, October 2026), opening its game directly; the
   category has no page, and its games' way back is the shelf. Every picture book's cover shows a picture painted for its
@@ -287,7 +290,8 @@ In a fresh worktree run `bun install` first.
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
   of a level. Never add another. Starting a game shows no note on how to leave: the
-  „Zurück zum Menü“ next to ✕ appears only while it is held or a mouse is over it.
+  „Zurück zum Menü“ next to ✕ appears only while it is held or a mouse is over it – the moment the finger lands, without
+  fading in (user feedback, October 2026; `css.test.ts`).
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
@@ -387,8 +391,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026): a wooden loudspeaker (music, one tap), an
   hourglass (play time), a globe with the 🌐 lines and the language's name on its foot (the language – never a light
-  switch), and stickers of the fox girl and the bear boy on the back wall above the globe, in its compartment (the
-  figure; user feedback, October 2026). The app's name is a painted sign
+  switch) in a compartment of its own with a board between it and the one above, stickers of the fox girl and the bear
+  boy stuck on the inner side of the shelf's right wall in that compartment above (the figure), and on its board one
+  little book for grown-ups with an „i“ on it, holding both texts that stood below the shelf – what the app is (the page's
+  words for search engines, `SeoWords`) and „Ein paar Worte von uns“ (`ParentsNote`) – one book, not one per text; a tap
+  opens it, and its text stays in the page unseen while closed (`MenuButton keep`) so search engines read it
+  (`RoomNotes`, user feedback, October 2026). The app's name is a painted sign
   on the shelf's top board. A new option becomes such a thing in a compartment of its own too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
@@ -443,13 +451,13 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
   browser's language. Texts say only what the page really does. No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
-  screens, which the home page's foot („Ein paar Worte von uns“) tells: the real world first, then a screen together,
+  screens, which „Ein paar Worte von uns“ on the home page (`ParentsNote`) tells: the real world first, then a screen together,
   later a learning game alone, plain watching least – Books for Both meant as that first step together (user
   decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
   it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
-  panel of its own; a new menu page does the same. Pages that must stay out of results get a
+  panel of its own (the book look's home page in the shelf's little „i“ book instead); a new menu page does the same. Pages that must stay out of results get a
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
   `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).

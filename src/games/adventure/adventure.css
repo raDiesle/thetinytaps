@@ -114,7 +114,7 @@
 /* For grown-ups: back, pause and forward, small and out of the way. */
 .adventure-controls {
   position: absolute;
-  top: max(14px, env(safe-area-inset-top));
+  top: calc(max(14px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(14px, env(safe-area-inset-left));
   z-index: 1;
   display: flex;
