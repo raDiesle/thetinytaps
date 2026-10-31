@@ -146,7 +146,7 @@ In a fresh worktree run `bun install` first.
   A scheduled task on the user's Mac (`tinytaps-perf-weekly`, Mondays) measures every game, keeps the numbers in
   `tools/perf-history/<date>.json` to compare with the week before, and turns a game over budget or clearly worse into
   an idea „Leistung: <Spiel> …“ in `src/content/ideas/a-all-games.ts` – the user picks it, the run fixes nothing.
-- **The app's animal is the fox** (the site is toddlerfox.com, Tapsi is a fox; user decision, October 2026): new pictures
+- **The app's animal is the fox** (Tapsi is a fox, the book's readers are a fox family; user decision, October 2026): new pictures
   and games take foxes in wherever they fit – fox grown-ups instead of drawn people (the baker, the doctor, the driver),
   a fox child peeking out of the background, Tapsi cheering at the end – and the book's readers are foxes only (no
   bears). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Existing games
@@ -363,6 +363,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
   (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
+- The app lives at booksforboth.com (bought October 2026; toddlerfox.com and funforboth.com only redirect there). Its name
+  and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
+  children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
   and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
   line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own

@@ -579,14 +579,14 @@ const FOX_WORK: Record<FoxTask["work"], string> = { drawing: "✏️ Zeichnung",
 const FOX_STATE: Record<NonNullable<FoxTask["state"]>, string> = { done: "✅", partial: "🟡" };
 
 /**
- * Where the foxes of toddlerfox.com still have to go (content/ideas/foxStatus.ts), game by game: drawings can be done
+ * Where the app's foxes still have to go (content/ideas/foxStatus.ts), game by game: drawings can be done
  * any time, Gemini pictures wait and are made together in one batch, so the footer counts them.
  */
 function Foxes({ onShow }: { onShow: (id: string) => void }) {
   const tasks = FOX_STATUS.flatMap((row) => row.tasks);
   return (
     <section id="fuechse" className="ideas-panel">
-      <h2>🦊 Füchse: wo der Fuchs von toddlerfox.com noch hin soll</h2>
+      <h2>🦊 Füchse: wo der Fuchs der App noch hin soll</h2>
       <p className="ideas-hint">
         Spiel für Spiel, nach Aufwand. ✏️ Zeichnungen sind Code und gehen jederzeit; 🖼️ Gemini-Bilder warten und werden zusammen in einem Batch gemacht, das ist
         günstiger – sag dann z. B. „mach die wartenden Fuchsbilder“. ✅ fertig, 🟡 teilweise, · offen. Ideen dazu: D-14 bis D-19.

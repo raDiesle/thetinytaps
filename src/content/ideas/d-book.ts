@@ -2,14 +2,14 @@ import type { IdeaArea } from "./types";
 
 /**
  * D: das Buch – the app as a picture book a grown-up and a child read together (A-20), what still doesn't fit it, and
- * the foxes of toddlerfox.com that go into it (their tasks game by game in foxStatus.ts).
+ * the app's foxes that go into it (their tasks game by game in foxStatus.ts).
  */
 export const bookIdeas: IdeaArea = {
   prefix: "D",
   emoji: "📖",
   title: "Das Bilderbuch und die Füchse",
   intro:
-    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite. Seit die App toddlerfox.com heißt, ist der Fuchs ihr Tier (D-14 bis D-19): Wer liest, sind Füchse, und in den Spielen kommen Füchse vor, wo es passt – Spiel für Spiel in der Tabelle „🦊 Füchse“ oben.",
+    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite. Der Fuchs ist das Tier der App, wie Tapsi (D-14 bis D-19): Wer liest, sind Füchse, und in den Spielen kommen Füchse vor, wo es passt – Spiel für Spiel in der Tabelle „🦊 Füchse“ oben.",
   ideas: [
     {
       id: "D-01",
@@ -124,7 +124,7 @@ export const bookIdeas: IdeaArea = {
       emoji: "🦊",
       title: "Cover nur mit der Fuchsfamilie",
       text: "Das Bild auf dem Cover zeigt nur noch Tapsis Fuchsfamilie: ein Fuchs-Elternteil und ein Fuchskind, die zusammen ein Buch anschauen und lachen. Die Bärenfamilie fällt weg. Ein Bild mit Gemini (buch-cover.webp), mit den Füchsen von buch-fuechse.webp als Vorlage, im Sammel-Batch der Tabelle „🦊 Füchse“.",
-      why: "toddlerfox.com: Schon das erste Bild sagt, wer hier vorliest – der Fuchs.",
+      why: "Schon das erste Bild sagt, wer hier vorliest – der Fuchs.",
       effort: "S",
     },
     {
@@ -137,11 +137,10 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-16",
-      rejected: true,
       emoji: "🔤",
-      title: "Titel „Toddlerfox“ auf Startseite und Cover",
-      text: "Die Startseite und das Cover heißen noch „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Toddlerfox“ in einer Buchschrift, mit einem kleinen gezeichneten Fuchs als Vignette (der Fuchs sitzt auf dem x oder schaut hinter dem Wort hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Fuchsohren. Hängt mit D-11 zusammen (Titel wie gedruckt).",
-      why: "Die Adresse heißt toddlerfox.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder. Verworfen (31. Oktober 2026): kein „toddler“ im Namen; der neue Name kommt aus der Recherche „Eine Domain ohne ‚toddler‘“ (Favorit „Books for Both“, D-20).",
+      title: "Titel „Books for Both“ auf Startseite und Cover",
+      text: "Die Startseite und das Cover heißen noch „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Books for Both“ in einer Buchschrift, mit einem kleinen gezeichneten Fuchs als Vignette (der Fuchs lehnt an einem der Wörter oder schaut aus einem Buch hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Fuchsohren. Hängt mit D-11 zusammen (Titel wie gedruckt).",
+      why: "Die Adresse heißt booksforboth.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder. (Bis 31. Oktober 2026 hieß die Idee „Toddlerfox“; kein „toddler“ im Namen, Recherche „Eine Domain ohne ‚toddler‘“.)",
       effort: "S",
     },
     {

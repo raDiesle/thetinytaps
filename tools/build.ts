@@ -29,8 +29,8 @@ const OUT = join(ROOT, "out");
 const base = (process.env.PUBLIC_BASE_PATH || "/").replace(/\/$/, "");
 
 // Where the site is online, for links that search engines keep (canonical, sitemap).
-// GitHub Pages serves it on its own domain (repo settings → Pages, DNS in tools/toddlerfox.com.zone).
-const siteUrl = `${process.env.SITE_ORIGIN || "https://toddlerfox.com"}${base}`;
+// GitHub Pages serves it on its own domain (repo settings → Pages, DNS in tools/booksforboth.com.zone).
+const siteUrl = `${process.env.SITE_ORIGIN || "https://booksforboth.com"}${base}`;
 
 // READABLE=1 (`bun run perf --profile`): the same build with its names and lines kept, so a profile shows where time goes.
 const minify = process.env.READABLE === "1" ? { syntax: true, whitespace: false, identifiers: false } : true;

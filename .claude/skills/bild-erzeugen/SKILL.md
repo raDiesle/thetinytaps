@@ -135,7 +135,7 @@ last line of the block, so „a page of a picture book“ doesn't come back as a
 with its own guide) keeps that set's look and is drawn from its pictures as `--ref`, even when they still have the
 older bright style with dark-purple outlines (#2a1e5c) – one story never mixes the two.
 
-Take foxes in wherever they fit (the app is toddlerfox.com, see „The app's animal is the fox“ in `CLAUDE.md`): a fox
+Take foxes in wherever they fit (see „The app's animal is the fox“ in `CLAUDE.md`): a fox
 grown-up instead of a person, a fox child in the background; pass a picture of Tapsi or the fox family
 (`src/components/bilder/buch-fuechse.webp`) as `--ref`, so every fox is the same kind. A picture that a fox task in
 `src/content/ideas/foxStatus.ts` asks for goes into the batch with the other waiting ones there, and the task is marked.

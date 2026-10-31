@@ -182,7 +182,7 @@ export const allGamesIdeas: IdeaArea = {
       emoji: "🇬🇧",
       title: "Seiten für Google auf Englisch",
       text: "Jede Seite aus seo.ts bekommt eine englische Fassung unter eigener Adresse (z. B. /en/zaehne/), mit englischem Titel und Text und hreflang-Verweisen zwischen beiden. Wer über die englische Seite kommt, spielt auf Englisch. Danach weitere Sprachen der App.",
-      why: "toddlerfox.com ist eine englische Adresse, die App spricht sieben Sprachen, Google kennt aber nur deutsche Seiten. Englische Eltern suchen „toddler games online free“ oder „toddler apps without subscription“.",
+      why: "booksforboth.com ist eine englische Adresse, die App spricht sieben Sprachen, Google kennt aber nur deutsche Seiten. Englische Eltern suchen „toddler games online free“ oder „toddler apps without subscription“.",
       effort: "M",
       done: true,
     },

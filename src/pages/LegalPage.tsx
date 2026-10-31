@@ -117,8 +117,9 @@ export function PrivacyPage() {
           <Out href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement">Datenschutzerklärung von GitHub</Out>.
         </p>
         <p>
-          Die Domain toddlerfox.com ist bei der Cloudflare, Inc. registriert, deren Namensserver Ihrem Browser sagen, wo die Seite liegt. Die Seite selbst läuft
-          nicht über Cloudflare.
+          Die Domain booksforboth.com ist bei der Cloudflare, Inc. registriert, deren Namensserver Ihrem Browser sagen, wo die Seite liegt. Die Seite selbst
+          läuft nicht über Cloudflare. Wer eine frühere Adresse (toddlerfox.com) oder funforboth.com aufruft, wird von Cloudflare zu booksforboth.com
+          weitergeleitet; dafür verarbeitet Cloudflare kurz Ihre IP-Adresse und die aufgerufene Adresse.
         </p>
       </section>
 
@@ -149,8 +150,8 @@ export function PrivacyPage() {
         </p>
         <p>
           Das alles bleibt auf Ihrem Gerät und wird nicht an uns oder andere übertragen. Sie können es jederzeit löschen, indem Sie in Ihrem Browser die
-          Website-Daten von toddlerfox.com löschen. Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG: Das Speichern ist nötig, damit die Spiele so funktionieren, wie
-          Sie es gewählt haben.
+          Website-Daten von booksforboth.com löschen. Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG: Das Speichern ist nötig, damit die Spiele so funktionieren,
+          wie Sie es gewählt haben.
         </p>
       </section>
 

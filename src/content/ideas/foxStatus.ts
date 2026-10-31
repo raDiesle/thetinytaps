@@ -1,6 +1,6 @@
 import type { Effort } from "./types";
 
-// Where the foxes of toddlerfox.com still have to go (D-18), game by game, shown on
+// Where the app's foxes still have to go (D-18), game by game, shown on
 // the management page like the language table. A drawing is code and can be done any
 // time; a picture from Gemini waits here until the grown-up asks for them, and then all
 // waiting ones are made in one batch, which costs less than one by one. Kept by hand:
@@ -167,7 +167,7 @@ export const FOX_STATUS: FoxStatusRow[] = [
     tasks: [
       { label: "Cover nur mit der Fuchsfamilie", work: "picture", pictures: 1, effort: "S", idea: "D-14" },
       { label: "Oma oder Opa Fuchs mit Fuchskind statt der Bären", work: "picture", pictures: 1, effort: "S", idea: "D-15" },
-      { label: "Titel „Toddlerfox“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16" },
+      { label: "Titel „Books for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16" },
       { label: "Startseite als Fuchswald, ein Fuchs in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },
       { label: "Tapsi klatscht am Ende jedes Spiels (GameEnd)", work: "drawing", effort: "S", idea: "D-12" },
     ],
