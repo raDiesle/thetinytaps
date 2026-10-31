@@ -31,7 +31,8 @@
 /*
  * The o of „Both“: Papa Fox on the letter with his child on his lap (Logo). An invisible o keeps the letter's width and
  * baseline; the picture hangs from a point on that baseline, its o placed over the invisible one (measured in the picture:
- * the o is 0.563em wide, the foxes rise about 1em above the baseline). Hold it to open the management page.
+ * its o is 271 px of 0.563em; the foxes, twice the letter's height, rise 1.5em above the baseline onto the wall above the
+ * shelf's sign, which leaves them room, `--top` in bookshelf.css). Hold it to open the management page.
  */
 .logo-o {
   position: relative;
@@ -53,9 +54,9 @@
 
 .logo-o img {
   position: absolute;
-  right: 0.04em;
-  bottom: -0.036em;
-  width: 0.635em;
+  right: -0.065em;
+  bottom: -0.051em;
+  width: 0.943em;
   max-width: none;
   pointer-events: auto;
 }

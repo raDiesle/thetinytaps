@@ -156,8 +156,10 @@ A picture that takes a letter's place in a word (the o of „Both“ in the titl
 the letter in the page's font as a reference picture (sharp, dark plum on white, saved in `.image-raw/`), pass it as
 `--ref` and ask for it „copied exactly … flat solid plum, no outline“, then measure where the letter lies in the result
 and place the picture over an invisible letter of the font in em (`.logo-o` in `menus.css`). Figures on a letter are
-only as big as the text: make the text big enough for them to be seen. A reference picture sets the layout for the
-Lite model – asked for bigger figures with the earlier picture as `--ref`, it drew the same picture again.
+only as big as the text: draw them about twice the letter's height and make the text big enough. A reference picture
+sets the layout for the Lite model – asked for bigger figures with the earlier picture as `--ref`, it drew the same
+picture again; what worked was the letter drawn small at the bottom of an empty canvas as the first `--ref` („Redraw
+the first reference picture: keep its letter o exactly as it is … the same small size“), the figures alone as the second.
 A long strip (a print border, `--aspect 21:9` cropped to 4:1) comes back as a narrower strip with white bands
 above and below, even when the prompt says „edge to edge“: the cover crop then keeps white rows, or cuts the sides
 (the sun of a sky strip). Trim the white rows from the raw `.image-raw/` picture first (sharp `extract`), then crop
