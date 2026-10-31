@@ -52,6 +52,8 @@ export interface Part {
   tap?: { selector: string; every: number };
   /** Press these keys one after the other while measuring, every `every` ms. */
   type?: { keys: string[]; every: number };
+  /** Limits of this stretch alone, over the scenario's; only for a decision written down next to it. */
+  budget?: Partial<Budget>;
 }
 
 /** One game (or one mode of it) to play. */
@@ -115,5 +117,21 @@ export const SCENARIOS: Scenario[] = [
     parts: [{ label: "Erste Geschichte", before: [START, { wait: 2000 }], ms: 12000, tap: TAPS }],
   },
   // three.js: headless Chrome draws WebGL on the CPU (SwiftShader), so this measures more than a phone's GPU would cost.
-  { name: "abenteuer", path: "/abenteuer/", parts: [{ label: "Tapsi bewegt sich", before: [START, { wait: 3000 }], ms: 10000 }] },
+  {
+    name: "abenteuer",
+    path: "/abenteuer/",
+    parts: [
+      { label: "Tapsi bewegt sich", before: [START, { wait: 3000 }], ms: 10000 },
+      // The arrow keys skip from the first movement to the drums: the busiest place, and the arms glow.
+      // It stays busier than the budget: user decision, October 2026 – it keeps 60 fps (p95 17 ms), never drops to 30 fps
+      // on slow phones, and a quarter of the busy time is SwiftShader's WebGL work on the CPU, which a phone's GPU does.
+      // Measured 85–90 % busy (up to 98 % while other programs load the computer); more than 95 % is a real regression.
+      {
+        label: "Trommeln (leuchtet)",
+        before: [...key("ArrowRight", 8), { wait: 4000 }],
+        ms: 10000,
+        budget: { busy: 0.95 },
+      },
+    ],
+  },
 ];
