@@ -23,7 +23,7 @@ Keys: arrows (and any other key) move a frame over the socks still on the floor 
 
 ## Languages
 
-The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage()`): start screen and „Über das Spiel“ texts inline with `t({ de, en, zh, hi, es, ar, ru })`, spoken texts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, the others in `content.<language>.ts`: sock / calcetín / 袜子 / मोज़ा / جورب), speech in `language.speechLang`. Arabic talks to the child with "let's" (هيّا نبحث), Hindi with commands, Spanish with tú: nothing that changes for a boy or a girl.
+The game speaks the app language (German, English, Chinese, Hindi, Spanish, Arabic, Russian; `useAppLanguage()`): start screen texts inline with `t({ de, en, zh, hi, es, ar, ru })`, spoken texts through `SOCK_TEXTS` (`SockTexts` in `content.ts`, the others in `content.<language>.ts`: sock / calcetín / 袜子 / मोज़ा / جورب), speech in `language.speechLang`. Arabic talks to the child with "let's" (هيّا نبحث), Hindi with commands, Spanish with tú: nothing that changes for a boy or a girl.
 - Translations come only when the user asks. A new or changed German line comes German-only; add the Russian only on request. Gaps are marked in `src/content/ideas/languageStatus.ts`.
 - When a German line changes its meaning, delete its Russian in the same change (a stale translation is worse than German).
 - The translated texts are `Partial<SockTexts>`: a sentence they lack is said in German, and `say` gives a sentence without the language's own letters to the German voice (`voiceFor`).

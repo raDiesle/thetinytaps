@@ -48,14 +48,6 @@
   stroke-linejoin: round;
 }
 
-/* „Über das Spiel“ next to the way back: a plain dark „i“ in the round button, like the fullscreen sign. */
-.home-menu-button .info-sign {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
 .back-link:focus-visible {
   outline: 3px solid var(--ocean);
   outline-offset: 3px;
@@ -86,7 +78,7 @@
 
 /*
  * Labelled buttons for grown-ups in a row under a menu's title (the Belohnungstafel's „Gestalten“, „Drucken“ …),
- * each opening its panel under the head. A start screen's ℹ️ and ⚙️ are round signs next to the way back instead.
+ * each opening its panel under the head. A start screen's ⚙️ is a round sign next to the way back instead.
  */
 .panel-button {
   display: inline-flex;
@@ -130,6 +122,7 @@
   gap: 10px;
 }
 
+/* The Belohnungstafel's „Über die Tafel“ panel: paragraphs of text for grown-ups. */
 .game-info {
   gap: 14px;
   line-height: 1.45;

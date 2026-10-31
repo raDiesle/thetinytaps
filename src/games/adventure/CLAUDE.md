@@ -23,7 +23,7 @@ What Tapsi says is in `stories/<story>/lines.ts` (no three.js there, so Node can
 languages of the app (`src/content/targetLanguages.ts`) in `lines.<language>.ts` next to it: the same steps and
 lines in the same order (`StoryTranslation`, listed in `src/content/texts/texts-<lang>.ts` (`stories`), which fills the story's `translations.ts`; `storyIn()` swaps them in).
 Tapsi speaks the app language (🌐 on the home page), like the menus; a story without a translation into it
-is said in English, then German (and „Über das Spiel“ says so). The other recorded languages wait until the
+is said in English, then German. The other recorded languages wait until the
 whole app speaks them and they join 🌐. Translations say
 nothing that changes for a boy or a girl (no "you did", no "brave boy"): commands, "we" and "your turn".
 Each line can have a recording in `stories/<story>/stimme/<hash>.mp3` (German) or
@@ -46,7 +46,7 @@ are not kept offline by every phone, only once the story has started in that lan
   Audio tags are not spoken in any language (Whisper heard none in 140 lines of seven languages), so other games are
   recorded with them in every language.
 
-The game has no settings of its own: its own music and the language follow the shared options on the home page (`useCommonSettings`, `useAppLanguage`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen only has „Über das Spiel“.
+The game has no settings of its own: its own music and the language follow the shared options on the home page (`useCommonSettings`, `useAppLanguage`), the glow and the child figure are always on. Only the story played last is stored (`settings.ts`). The start screen has only the story cards: no „Über das Spiel“ (removed October 2026, like in every game).
 
 ## Grown-ups' texts in the app language
 

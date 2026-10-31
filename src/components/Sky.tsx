@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { useLocation } from "react-router";
-import { FAMILY_PICTURES } from "@/components/BookFamily";
+import { BookFamilies } from "@/components/BookFamily";
 import { INDOOR, Sun, type WorldId, WorldGround, WorldWindow } from "@/components/Worlds";
 import { worldOf } from "@/content/games";
 
@@ -31,13 +31,8 @@ export const Sky = memo(function Sky() {
         </>
       )}
       {world && <WorldGround world={world} />}
-      {/*
-       * In the book look, where the page is wide enough to leave room beside the cards: Tapsi's family and the little
-       * bear's read together on the page's margins, so grown-ups see the book is to be read with the child.
-       * Lazy, so a screen that hides them never downloads them.
-       */}
-      <img className="book-family fox" src={FAMILY_PICTURES.fox} alt="" loading="lazy" decoding="async" />
-      <img className="book-family bear" src={FAMILY_PICTURES.bear} alt="" loading="lazy" decoding="async" />
+      {/* In the book look: the fox and the bear family reading together at the bottom of the page. */}
+      <BookFamilies />
     </div>
   );
 });

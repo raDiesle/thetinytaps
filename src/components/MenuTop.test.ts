@@ -103,3 +103,23 @@ test("in the book look the way back onto the shelf is the book's cover, not a pa
   expect(corner).toMatch(/sign=\{to === "\/" \? "shelf" : "back"\}/);
   expect(readFileSync("src/components/PageCornerArt.tsx", "utf8")).toMatch(/if \(sign === "shelf"\) return <CoverCornerArt \/>/);
 });
+
+// User decision, October 2026: menus need no „Über das Spiel“. GameShell has no `info`, and no game passes one.
+test("no start screen has an „Über das Spiel“", () => {
+  expect(readFileSync("src/components/GameShell.tsx", "utf8")).not.toMatch(/\binfo\?:/);
+  const games = readdirSync("src/games", { recursive: true, encoding: "utf8" })
+    .filter((file) => file.endsWith(".tsx"))
+    .filter((file) => /<GameShell[\s\S]*?\binfo=\{/.test(readFileSync(join("src/games", file), "utf8")));
+  expect(games).toEqual([]);
+});
+
+// User feedback, October 2026: the animal families stand at the bottom of a menu's page, never in its top row beside
+// the title, where they were too small and in the way; the page keeps room for them under its cards.
+test("in the book look the families stand at the bottom of a menu's page, not in its head", () => {
+  expect(readFileSync("src/components/MenuTop.tsx", "utf8")).not.toContain("BookFamil");
+  expect(readFileSync("src/components/Sky.tsx", "utf8")).toContain("<BookFamilies />");
+  const family = cssRules().filter((r) => r.selector === ':root[data-look="book"] .book-family');
+  expect(family.length).toBeGreaterThan(0);
+  for (const rule of family) expect(rule.body).toMatch(/bottom:/);
+  expect(readFileSync("src/lib/fitGrid.ts", "utf8")).toContain("--menu-floor");
+});

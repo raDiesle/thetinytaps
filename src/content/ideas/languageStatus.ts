@@ -73,27 +73,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     ],
   },
   {
-    href: "/abenteuer/",
-    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch.",
-    parts: [
-      {
-        label: "🏝️ Die Schatzinsel",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
-      },
-      {
-        label: "☁️ Die Wolkenreise",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
-      },
-    ],
-  },
-  {
-    href: "/gefuehle/",
-    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
-  },
-  {
     href: "/kettenreaktion/",
     parts: [
       {
@@ -126,6 +105,27 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
         recorded: true,
         languages: { de: "done", en: "text", zh: "text", hi: "text", es: "text", ar: "text", ru: "text" },
         note: "Deutsch aufgenommen; übersetzt am 30. Oktober 2026, die 734 Sätze der anderen Sprachen (≈ 2.600 Credits) warten auf ihre Aufnahme: bun run voice make --only kleine-abenteuer. Bis dahin sind diese Sätze in den anderen Sprachen still.",
+      },
+    ],
+  },
+  {
+    href: "/gefuehle/",
+    languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+    note: "Übersetzungen in bear.<Sprache>.ts und kita.<Sprache>.ts, Schritt für Schritt neben den deutschen Geschichten.",
+  },
+  {
+    href: "/abenteuer/",
+    note: "Tapsis Stimme ist von ElevenLabs aufgenommen (bun run voice make, kostet Credits); ohne Aufnahme bleibt der Satz stumm (keine Browserstimme). Eine Geschichte ohne Übersetzung spricht Deutsch.",
+    parts: [
+      {
+        label: "🏝️ Die Schatzinsel",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
+      },
+      {
+        label: "☁️ Die Wolkenreise",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
       },
     ],
   },

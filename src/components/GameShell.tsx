@@ -71,11 +71,6 @@ interface GameShellProps {
   leaveTo?: string;
   /** A level or difficulty choice shown above the mode cards. */
   level?: ReactNode;
-  /**
-   * What the game is, how it is played and what helps; behind its own button on the start screen, apart from the settings.
-   * Left out where the game explains itself, so the start screen stays clear.
-   */
-  info?: ReactNode;
   /** Parent-facing options shown on the start screen; left out where the game needs none. */
   settings?: ReactNode;
   /** The game itself; only mounted while playing. */
@@ -90,7 +85,7 @@ interface GameShellProps {
  * fullscreen (kept after the game) + keyboard lock while playing, and the exit: a click on the corner
  * button, or holding Esc.
  */
-export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveTo, level, info, settings, children, backHref, backLabel }: GameShellProps) {
+export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveTo, level, settings, children, backHref, backLabel }: GameShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const t = useT();
@@ -104,8 +99,8 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
       ? t(category.title)
       : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
   const [playing, setPlaying] = useState(false);
-  // The panel opened below the two buttons, if any: folded away by default, so the start screen stays short.
-  const [panel, setPanel] = useState<"info" | "settings" | null>(null);
+  // The settings panel below the top row: folded away by default, so the start screen stays short.
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const playtime = usePlaytime(playing && !returnTo);
   const groups = modes?.some((m) => m.kind) ? byKind(modes) : undefined;
   const grid = useFitGrid(
@@ -246,7 +241,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
   return (
     <main className="start-screen">
       <Sky />
-      {/* Small round signs right next to the way back: for grown-ups, out of the cards' way, taking no row of their own. */}
+      {/* The settings' small round sign right next to the way back: for grown-ups, out of the cards' way, taking no row of their own. */}
       <MenuHead
         to={back}
         back={backText}
@@ -256,36 +251,17 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
           </>
         }
         tools={
-          <>
-            {info && (
-              <PanelButton
-                open={panel === "info"}
-                onClick={() => setPanel(panel === "info" ? null : "info")}
-                icon={<span className="info-sign">i</span>}
-                label={t({
-                  de: "Über das Spiel",
-                  ru: "Об игре",
-                  en: "About the game",
-                  zh: "关于游戏",
-                  hi: "खेल के बारे में",
-                  es: "Sobre el juego",
-                  ar: "عن اللعبة",
-                })}
-              />
-            )}
-            {settings && (
-              <PanelButton
-                open={panel === "settings"}
-                onClick={() => setPanel(panel === "settings" ? null : "settings")}
-                icon={<span>⚙️</span>}
-                label={t({ de: "Einstellungen", ru: "Настройки", en: "Settings", zh: "设置", hi: "सेटिंग्स", es: "Ajustes", ar: "الإعدادات" })}
-              />
-            )}
-          </>
+          settings && (
+            <PanelButton
+              open={settingsOpen}
+              onClick={() => setSettingsOpen(!settingsOpen)}
+              icon={<span>⚙️</span>}
+              label={t({ de: "Einstellungen", ru: "Настройки", en: "Settings", zh: "设置", hi: "सेटिंग्स", es: "Ajustes", ar: "الإعدادات" })}
+            />
+          )
         }
       />
-      {panel === "info" && info && <section className="settings game-info">{info}</section>}
-      {panel === "settings" && settings && <section className="settings">{settings}</section>}
+      {settingsOpen && settings && <section className="settings">{settings}</section>}
       {/* Right under the title, so it stays in sight however long the options get. Centred in the room the
           cards leave (data-spread), so the back link and the grown-ups' buttons stay in the top row. */}
       {modes ? (
@@ -363,7 +339,7 @@ function PlaytimeNote() {
 }
 
 /**
- * One of the small round signs next to the way back (i, ⚙️): opens its panel below the top row, or folds it away
+ * The small round sign next to the way back (⚙️): opens its panel below the top row, or folds it away
  * again. Its name is only a tooltip and read out, so it takes no more room than the sign.
  */
 function PanelButton({ open, onClick, icon, label }: { open: boolean; onClick: () => void; icon: ReactNode; label: string }) {

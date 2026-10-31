@@ -71,28 +71,6 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     ],
   },
   {
-    href: "/abenteuer/",
-    note: "Tapsi ist schon der Held in 3D und spricht. Der leuchtende Tänzer steht für das Kind und bleibt.",
-    tasks: [
-      { label: "Tapsi zeigt die Bewegungen", work: "drawing", effort: "S", state: "done" },
-      { label: "Mama, Papa, Oma oder Opa Fuchs macht bei Bewegungen zu zweit mit Tapsi vor", work: "drawing", effort: "M", idea: "M-05" },
-    ],
-  },
-  {
-    href: "/gefuehle/",
-    note: "Gemini-Bilder mit Tierkindern (Bär, Fuchs, Hase, Igel). Im Kita-Teil ist der Fuchs der, der schubst, tritt, wegnimmt und umwirft.",
-    tasks: [
-      {
-        label: "Der Fuchs ist nicht mehr der Störenfried",
-        work: "picture",
-        pictures: 56,
-        effort: "L",
-        note: "Zu entscheiden: ein anderes Tier (Waschbär?) übernimmt Schubsen, Treten, Wegnehmen, Umwerfen (kita.ts und rund 56 Bilder); Fuchs und Bär, die Maskottchen, helfen und trösten.",
-      },
-      { label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten", work: "picture", pictures: 8, effort: "M" },
-    ],
-  },
-  {
     href: "/kettenreaktion/",
     note: "SVG. Ein 🦊 schaut schon auf der Schneebahn hervor.",
     tasks: [
@@ -113,6 +91,28 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
       },
       { label: "Ein Fuchs- oder Bärenkind mit Mama, Papa, Oma oder Opa geht ein Stück mit auf den Wegen", work: "drawing", effort: "M" },
       { label: "Das Kind als Fuchs- oder Bärenkind", work: "drawing", effort: "M", idea: "D-19", note: "Erst entscheiden." },
+    ],
+  },
+  {
+    href: "/gefuehle/",
+    note: "Gemini-Bilder mit Tierkindern (Bär, Fuchs, Hase, Igel). Im Kita-Teil ist der Fuchs der, der schubst, tritt, wegnimmt und umwirft.",
+    tasks: [
+      {
+        label: "Der Fuchs ist nicht mehr der Störenfried",
+        work: "picture",
+        pictures: 56,
+        effort: "L",
+        note: "Zu entscheiden: ein anderes Tier (Waschbär?) übernimmt Schubsen, Treten, Wegnehmen, Umwerfen (kita.ts und rund 56 Bilder); Fuchs und Bär, die Maskottchen, helfen und trösten.",
+      },
+      { label: "Mama, Papa, Oma oder Opa Fuchs bzw. Bär tröstet oder hilft dem Kind in den Geschichten", work: "picture", pictures: 8, effort: "M" },
+    ],
+  },
+  {
+    href: "/abenteuer/",
+    note: "Tapsi ist schon der Held in 3D und spricht. Der leuchtende Tänzer steht für das Kind und bleibt.",
+    tasks: [
+      { label: "Tapsi zeigt die Bewegungen", work: "drawing", effort: "S", state: "done" },
+      { label: "Mama, Papa, Oma oder Opa Fuchs macht bei Bewegungen zu zweit mit Tapsi vor", work: "drawing", effort: "M", idea: "M-05" },
     ],
   },
   {

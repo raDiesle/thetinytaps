@@ -1,6 +1,6 @@
 import { byLanguage } from "@/content/texts";
 import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages";
-import { type Localized, type Spoken, spokenIn } from "@/lib/language";
+import { type Spoken, spokenIn } from "@/lib/language";
 import { ALL_TEETH, type Jaw, type Side, type Surface, type ToothId, type View } from "./jaw";
 
 /** How the brush moves: back and forth on the chewing surfaces, small circles outside, wiping from gum to tooth inside. */
@@ -37,17 +37,6 @@ const leftToRight = (ids: ToothId[]) => [...ids].sort((a, b) => (a.side === b.si
 
 const FLAT = { upper: 0, lower: 0 };
 const CLOSED_FRONT: View = { open: 0, pitch: 6, yaw: 0, look: [0, 8, 100], zoom: 1.3, tilt: FLAT };
-
-/** The routine German kindergartens teach, for the grown-ups. */
-export const KAI: Localized = {
-  de: "Kauflächen, Außenflächen, Innenflächen",
-  en: "chewing surfaces, outer surfaces, inner surfaces",
-  zh: "咬合面、外侧面、内侧面",
-  hi: "चबाने वाली सतह, बाहरी सतह, अंदरूनी सतह",
-  es: "superficies de masticación, exteriores, interiores",
-  ar: "أسطح المضغ، الأسطح الخارجية، الأسطح الداخلية",
-  ru: "жевательные, наружные, внутренние поверхности",
-};
 
 export const STEPS: Step[] = [
   {
