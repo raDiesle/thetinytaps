@@ -19,10 +19,13 @@ of its kind, grouped under the names of their views; „Gestalten“,
 visitor land there.
 
 „＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart. Its first step, „Ansicht“, is the whole choice of form
-(user feedback, October 2026): in its head the kind – „Belohnungstafel | Zeitplan“, two plain words, no pictures –
-and below every view of that kind, its name big on top as a heading (Tag, Woche, Monat, Sammeln; Ablaufplan, Jetzt –
-Dann, Erst – Dann, Woche), the view's Vorlagen as pictures under it and a small „✏️ Leer anfangen“ beside the name.
-The views stand side by side where they fit. A tap picks a Vorlage (yellow, ✓), another puts it back; several, also
+(user feedback, October 2026): both kinds on the one page, each in an area under its name („⭐ Belohnungstafel“,
+„🗓️ Zeitplan“, the one the page was opened on first), and in each every view, its name big on top as a heading (Tag,
+Woche, Monat, Sammeln; Ablaufplan, Jetzt – Dann, Erst – Dann, Woche), the view's Vorlagen as big pictures under it,
+each with its name above it, and a small „✏️ Leer anfangen“ beside the view's name. The views share the rows so they
+fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). On a big screen (≥ 1400 × 700)
+the steps are a column on the left, the kinds under „Ansicht“ as links to their areas with how many are picked.
+A tap picks a Vorlage (yellow glow, ✓), another puts it back; several, also
 of both kinds, are made at once with „✓ N anlegen“ (`onDone` takes a list). With exactly one picked, „Weiter“ goes
 on to its own steps – `WizardBoard.tsx`: Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Bilder (with which days),
 Aussehen – with the whole board or plan beside each step, and „✓ So nehmen“ makes it from any of them. „Leer
@@ -174,10 +177,15 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   (views, colours) or a big picture card (tasks, cards, rewards, marks), never only words or small chips. A new choice
   in the wizard is a `Pick`; detail that needs typing (own words, own emoji) stays under „Gestalten“.
 - The wizard goes from the form to the content (user feedback, October 2026): kind, view and Vorlage are one step,
-  the content follows. The kind is two plain words (no pictures, they only repeated the views); each view's name
-  stands big on top of its Vorlagen as a heading, never small below a picture; several Vorlagen can be picked and made
-  at once. Its pictures are the explanation – no description lines under the steps or the choices (check them on a
-  computer too: even there they were „viel zu klein“).
+  the content follows. Both kinds show at once, grouped in their two areas – never a switch that hides one, which
+  grown-ups overlooked; on a big screen they are named in the steps' column under „Ansicht“. Each view's name stands
+  big on top of its Vorlagen as a heading, and a Vorlage's name above its picture, never small below it; a picture has
+  no second frame round it (it is framed itself), only a glow when picked. Several Vorlagen can be picked and made at
+  once. The pictures are as big as the rows allow, with no empty room beside them: check at 1920 × 1080, 1440 × 900,
+  1024 × 768 and 844 × 390 (on a computer they were „viel zu klein“, „erkenne ich nicht“). The pictures are the
+  explanation – no description lines under the choices; the one help line, on every step, says what the wizard is
+  for: use the charts on screen, print and make them, or order the photo prints, and several are made at once.
+- A button that can do nothing is left out, never shown greyed (the first step has no „Zurück“).
 - Group what belongs together, and what nobody wants without the other goes on one page: Mein Morgen and Mein Abend
   are one „Mein Tag“ (a plan's `parts`, a board's tasks with their times of day), printed on one page (user feedback,
   October 2026). A view's name says what it shows: „Ablaufplan“, never „Tagesansicht“, which reads as „one day only“.
