@@ -5,6 +5,8 @@ import { PicturePromptReview } from "@/components/PicturePromptReview";
 import { CATEGORIES } from "@/content/games";
 import {
   EFFORT_LABELS,
+  MASCOT_STATUS,
+  type MascotTask,
   IDEA_AREAS,
   IDEA_GROUPS,
   LANGUAGE_STATUS,
@@ -17,9 +19,11 @@ import {
   type IdeaStatus,
   type LanguageState,
   languageStateOf,
+  waitingMascotPictures,
 } from "@/content/ideas";
 import { RESEARCH, type Research } from "@/content/research";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/content/targetLanguages";
+import { buildDate } from "@/lib/pwa";
 import { useStoredSettings } from "@/lib/storage";
 import { useTitle } from "@/lib/title";
 import "@/styles/ideas.css";
@@ -66,6 +70,7 @@ const DEFAULTS = {
 const CONTENTS: { id: string; label: string }[] = [
   { id: "uebersicht", label: "📊 Überblick" },
   { id: "sprachen", label: "🌍 Sprachen" },
+  { id: "maskottchen", label: "🦊🐻 Fuchs & Bär" },
   { id: "stimmen", label: "🎙️ Stimmen" },
   { id: "recherchen", label: "🔍 Recherchen" },
   { id: "bilder", label: "🎨 Bildvorschläge" },
@@ -157,6 +162,7 @@ export function ManagementPage() {
       <h1>
         <span aria-hidden>🧭</span> Management
       </h1>
+      <p className="ideas-build">Stand: {buildDate()}</p>
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, Bildvorschläge. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
         abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
@@ -186,6 +192,8 @@ export function ManagementPage() {
       </section>
 
       <Languages />
+
+      <Mascots onShow={showIdea} />
 
       <section id="stimmen" className="ideas-panel">
         <h2>🎙️ Stimmen: was ElevenLabs noch aufnehmen muss</h2>
@@ -561,6 +569,80 @@ function Languages() {
                   {LANGUAGE_STATUS.filter((row) => languageStateOf(row, l.id) === "done").length}/{LANGUAGE_STATUS.length}
                 </td>
               ))}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+  );
+}
+
+const MASCOT_WORK: Record<MascotTask["work"], string> = { drawing: "✏️ Zeichnung", picture: "🖼️ Gemini-Bild" };
+const MASCOT_STATE: Record<NonNullable<MascotTask["state"]>, string> = { done: "✅", partial: "🟡" };
+
+/**
+ * Where the app's mascots, the fox and the bear, could still turn up (content/ideas/mascotStatus.ts), game by game:
+ * drawings can be done any time, Gemini pictures wait and are made together in one batch, so the footer counts them.
+ */
+function Mascots({ onShow }: { onShow: (id: string) => void }) {
+  const tasks = MASCOT_STATUS.flatMap((row) => row.tasks);
+  return (
+    <section id="maskottchen" className="ideas-panel">
+      <h2>🦊🐻 Fuchs & Bär: wo die Maskottchen der App noch vorkommen könnten</h2>
+      <p className="ideas-hint">
+        Fuchs und Bär kommen in den Spielen immer wieder vor, aber nicht überall – Spiel für Spiel, nach Aufwand, und immer als Großer mit Kind (Mama, Papa, Oma
+        oder Opa mit dem Fuchs- oder Bärenkind): Das Kind tut die Sache, der Große ist dabei. ✏️ Zeichnungen sind Code und gehen jederzeit; 🖼️ Gemini-Bilder
+        warten und werden zusammen in einem Batch gemacht, das ist günstiger – sag dann z. B. „mach die wartenden Fuchs- und Bärenbilder“. ✅ fertig, 🟡
+        teilweise, · offen. Ideen dazu: D-16 bis D-21.
+      </p>
+      <div className="ideas-overview-scroll">
+        <table className="ideas-overview ideas-languages ideas-mascots">
+          <thead>
+            <tr>
+              <th>Spiel und Aufgabe</th>
+              <th>Wie</th>
+              <th>Aufwand</th>
+              <th>Idee</th>
+              <th>Stand</th>
+            </tr>
+          </thead>
+          <tbody>
+            {MASCOT_STATUS.flatMap((row) => {
+              const game = GAME_BY_HREF.get(row.href);
+              return [
+                <tr key={row.href}>
+                  <th colSpan={5}>
+                    {game ? `${game.emoji} ${game.title.de}` : "🏠 Startseite, Cover & Menüs"}
+                    {row.note && <small>{row.note}</small>}
+                  </th>
+                </tr>,
+                ...row.tasks.map((task) => (
+                  <tr key={`${row.href} ${task.label}`} className="ideas-languages-part">
+                    <th>
+                      {task.label}
+                      {task.note && <small>{task.note}</small>}
+                    </th>
+                    <td>
+                      {MASCOT_WORK[task.work]}
+                      {task.pictures && task.pictures > 1 && ` ×${task.pictures}`}
+                    </td>
+                    <td>
+                      <EffortTag effort={task.effort} short />
+                    </td>
+                    <td>
+                      <IdeaLink id={task.idea ?? "D-18"} onShow={onShow} />
+                    </td>
+                    {task.state ? <td>{MASCOT_STATE[task.state]}</td> : <td className="ideas-zero">·</td>}
+                  </tr>
+                )),
+              ];
+            })}
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colSpan={5}>
+                Fertig {tasks.filter((t) => t.state === "done").length}/{tasks.length} · Gemini-Bilder für den nächsten Batch: {waitingMascotPictures()}
+              </th>
             </tr>
           </tfoot>
         </table>

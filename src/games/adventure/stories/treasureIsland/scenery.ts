@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { makeBush, makePalm, makeRock, mat, seeded, solid, TURTLE_BACK } from "../../three/props";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
+import { makeBush, makePalm, makeRock, mat, mergeParts, seeded, solid, TURTLE_BACK } from "../../three/props";
 import {
   BOAT_END,
   BOAT_START,
@@ -182,6 +183,8 @@ export function makeSwing() {
   const blossom = solid(new THREE.SphereGeometry(0.12, 12, 8), mat("#ff7eb6", 0.5));
   blossom.position.set(-0.5, -length + 0.3, 0.1);
   pivot.add(blossom);
+  mergeParts(pivot);
+  mergeParts(group, [pivot]);
   return { group, pivot, length };
 }
 
@@ -303,11 +306,13 @@ export function makeSpider() {
   const head = solid(new THREE.SphereGeometry(0.05, 14, 10), body);
   head.position.set(0, -0.06, 0.03);
   group.add(head);
+  const white = mat("#ffffff", 0.3);
+  const black = mat("#111111", 0.3);
   for (const side of [1, -1]) {
-    const eye = solid(new THREE.SphereGeometry(0.02, 10, 8), mat("#ffffff", 0.3), false);
+    const eye = solid(new THREE.SphereGeometry(0.02, 10, 8), white, false);
     eye.position.set(side * 0.02, -0.055, 0.075);
     group.add(eye);
-    const pupil = solid(new THREE.SphereGeometry(0.01, 8, 6), mat("#111111", 0.3), false);
+    const pupil = solid(new THREE.SphereGeometry(0.01, 8, 6), black, false);
     pupil.position.set(side * 0.02, -0.055, 0.092);
     group.add(pupil);
     for (let i = 0; i < 4; i++) {
@@ -328,6 +333,7 @@ export function makeSpider() {
   const thread = solid(new THREE.CylinderGeometry(0.004, 0.004, 1, 4), mat("#ffffff", 0.4), false);
   thread.position.y = 0.6;
   group.add(thread);
+  mergeParts(group, [thread]);
   return { group, thread };
 }
 
@@ -364,15 +370,18 @@ export function makeStarBox() {
   };
   const goldMat = new THREE.MeshStandardMaterial({ color: "#ffd23f", emissive: "#ffb400", emissiveIntensity: 0.5, roughness: 0.3, metalness: 0.4 });
   const faceStar = new THREE.ExtrudeGeometry(starShape(0.15, 0.065), { depth: 0.02, bevelEnabled: false });
-  const faces: THREE.Mesh[] = [];
+  // The four stars on its sides go away together.
+  const faces = new THREE.Group();
+  crate.add(faces);
   for (let i = 0; i < 4; i++) {
     const star = solid(faceStar, goldMat, false);
     const a = (i / 4) * TAU;
     star.position.set(Math.sin(a) * 0.255, 0, Math.cos(a) * 0.255);
     star.rotation.y = a;
-    crate.add(star);
-    faces.push(star);
+    faces.add(star);
   }
+  mergeParts(faces);
+  mergeParts(crate, [faces]);
   const popStar = solid(
     new THREE.ExtrudeGeometry(starShape(0.2, 0.085), { depth: 0.06, bevelEnabled: true, bevelThickness: 0.02, bevelSize: 0.02, bevelSegments: 2 }),
     new THREE.MeshStandardMaterial({ color: "#ffd23f", emissive: "#ffcc33", emissiveIntensity: 0.9, roughness: 0.25, metalness: 0.5 }),
@@ -389,7 +398,7 @@ export function makeStarBox() {
       const hop = bumped && since < 0.5 ? Math.sin((since / 0.5) * Math.PI) * 0.22 : 0;
       crate.position.y = hop + (bumped ? 0 : Math.sin(time * 2.2) * 0.03);
       crate.rotation.z = bumped && since < 0.5 ? Math.sin((since / 0.5) * TAU) * 0.08 : 0;
-      for (const star of faces) star.visible = !bumped;
+      faces.visible = !bumped;
       // The star jumps out of the top, then floats above it, turning.
       popStar.visible = bumped;
       if (bumped) {
@@ -438,7 +447,7 @@ export function makeBridge() {
     pile.position.set(side * (BRIDGE_HALF - 0.12), top / 2, (BRIDGE_FROM + BRIDGE_TO) / 2);
     group.add(pile);
   }
-  return group;
+  return mergeParts(group);
 }
 
 /** A big, round coconut with a fibrous look. */
@@ -456,13 +465,14 @@ export function makeCoconut(seed: number) {
   }
   geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
   const nut = solid(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95 }));
+  const eyeMat = mat("#3a2412");
   for (let i = 0; i < 3; i++) {
-    const eye = solid(new THREE.SphereGeometry(0.06, 8, 6), mat("#3a2412"), false);
+    const eye = solid(new THREE.SphereGeometry(0.06, 8, 6), eyeMat, false);
     const ang = (i / 3) * TAU;
     eye.position.set(Math.cos(ang) * 0.12, 0.47, Math.sin(ang) * 0.12);
     nut.add(eye);
   }
-  return nut;
+  return mergeParts(nut);
 }
 
 /** A fishing rod along its own y, from the cork handle (0) to the tip (`ROD_LENGTH`), with a reel. */
@@ -502,59 +512,42 @@ export function makeFish(color: string) {
   tail.rotation.x = Math.PI / 2;
   tail.position.z = -0.24;
   group.add(tail);
+  const white = mat("#ffffff", 0.3);
+  const black = mat("#111111", 0.3);
   for (const side of [1, -1]) {
-    const eye = solid(new THREE.SphereGeometry(0.035, 10, 8), mat("#ffffff", 0.3), false);
+    const eye = solid(new THREE.SphereGeometry(0.035, 10, 8), white, false);
     eye.position.set(side * 0.08, 0.04, 0.11);
     group.add(eye);
-    const pupil = solid(new THREE.SphereGeometry(0.018, 8, 6), mat("#111111", 0.3), false);
+    const pupil = solid(new THREE.SphereGeometry(0.018, 8, 6), black, false);
     pupil.position.set(side * 0.105, 0.045, 0.12);
     group.add(pupil);
   }
-  return group;
+  return mergeParts(group);
 }
 
 /**
  * A small round bird that sits on the path, looking ahead along its own z; `pose(time, flying)` pecks
- * at the ground while it sits and beats its wings while it flies.
+ * at the ground while it sits and beats its wings while it flies. Its group only says where it is and
+ * how it moves: `makeFlock` draws it, with all the other birds.
  */
 export function makeBird(color: string, wingColor: string) {
   const group = new THREE.Group();
-  const feathers = mat(color, 0.55);
-  const body = solid(new THREE.SphereGeometry(0.1, 16, 12), feathers);
-  body.scale.set(0.85, 0.8, 1.15);
-  body.position.y = 0.1;
-  group.add(body);
   const head = new THREE.Group();
   head.position.set(0, 0.19, 0.08);
   group.add(head);
-  head.add(solid(new THREE.SphereGeometry(0.065, 14, 10), feathers));
-  const beakGeo = new THREE.ConeGeometry(0.022, 0.06, 8);
-  beakGeo.rotateX(Math.PI / 2);
-  const beak = solid(beakGeo, mat("#ffb02e", 0.4), false);
-  beak.position.set(0, -0.005, 0.08);
-  head.add(beak);
-  for (const side of [1, -1]) {
-    const eye = solid(new THREE.SphereGeometry(0.013, 8, 6), mat("#111111", 0.2), false);
-    eye.position.set(side * 0.042, 0.018, 0.045);
-    head.add(eye);
-  }
-  const tail = solid(new THREE.BoxGeometry(0.08, 0.015, 0.1), mat(wingColor, 0.6));
-  tail.position.set(0, 0.13, -0.13);
-  tail.rotation.x = -0.4;
-  group.add(tail);
   const wings: THREE.Group[] = [];
   for (const side of [1, -1]) {
     const pivot = new THREE.Group();
     pivot.position.set(side * 0.075, 0.14, 0);
-    const wingGeo = new THREE.SphereGeometry(0.08, 12, 8);
-    wingGeo.scale(1, 0.18, 0.75);
-    wingGeo.translate(side * 0.07, 0, -0.01);
-    pivot.add(solid(wingGeo, mat(wingColor, 0.55)));
     group.add(pivot);
     wings.push(pivot);
   }
   return {
     group,
+    color,
+    wingColor,
+    head,
+    wings,
     pose(time: number, flying: boolean) {
       // Folded along the body while sitting, wide beats while flying.
       const beat = flying ? Math.sin(time * 26) * 0.9 : -1.2;
@@ -565,6 +558,85 @@ export function makeBird(color: string, wingColor: string) {
       head.position.y = 0.19 - peck * 0.04;
     },
   };
+}
+
+/** A bird of `makeBird`. */
+export type Bird = ReturnType<typeof makeBird>;
+
+/**
+ * Draws `birds`: each part of a bird (body, head, beak, eyes, tail, a wing) once for all of them, in its
+ * bird's colours. Twenty birds of seven parts each were 240 draw calls with their shadows, an old
+ * phone's whole frame at the drums (October 2026); now they are twelve. `update()` after posing the
+ * birds puts every part where its bird is; a hidden bird is not drawn.
+ */
+export function makeFlock(birds: Bird[]) {
+  const group = new THREE.Group();
+  const placed = (geometry: THREE.BufferGeometry, position: THREE.Vector3, rotation = new THREE.Euler(), scale = new THREE.Vector3(1, 1, 1)) =>
+    geometry.applyMatrix4(new THREE.Matrix4().compose(position, new THREE.Quaternion().setFromEuler(rotation), scale));
+  const beak = new THREE.ConeGeometry(0.022, 0.06, 8);
+  beak.rotateX(Math.PI / 2);
+  const eye = (side: number) => placed(new THREE.SphereGeometry(0.013, 8, 6), v3(side * 0.042, 0.018, 0.045));
+  const wing = (side: number) => {
+    const g = new THREE.SphereGeometry(0.08, 12, 8);
+    g.scale(1, 0.18, 0.75);
+    return g.translate(side * 0.07, 0, -0.01);
+  };
+  // What each part hangs on (the bird, its head or a wing), and its colour: white materials take the bird's own.
+  const parts: [THREE.BufferGeometry, THREE.Material, (b: Bird) => THREE.Object3D, ((b: Bird) => string) | null, boolean][] = [
+    [placed(new THREE.SphereGeometry(0.1, 16, 12), v3(0, 0.1, 0), undefined, v3(0.85, 0.8, 1.15)), mat("#ffffff", 0.55), (b) => b.group, (b) => b.color, true],
+    [new THREE.SphereGeometry(0.065, 14, 10), mat("#ffffff", 0.55), (b) => b.head, (b) => b.color, true],
+    [placed(beak, v3(0, -0.005, 0.08)), mat("#ffb02e", 0.4), (b) => b.head, null, false],
+    [mergeGeometries([eye(1), eye(-1)]), mat("#111111", 0.2), (b) => b.head, null, false],
+    [
+      placed(new THREE.BoxGeometry(0.08, 0.015, 0.1), v3(0, 0.13, -0.13), new THREE.Euler(-0.4, 0, 0)),
+      mat("#ffffff", 0.6),
+      (b) => b.group,
+      (b) => b.wingColor,
+      true,
+    ],
+    [wing(1), mat("#ffffff", 0.55), (b) => b.wings[0], (b) => b.wingColor, true],
+    [wing(-1), mat("#ffffff", 0.55), (b) => b.wings[1], (b) => b.wingColor, true],
+  ];
+  const meshes = parts.map(([geometry, material, , color, shadow]) => {
+    const mesh = new THREE.InstancedMesh(geometry, material, birds.length);
+    if (color) birds.forEach((b, i) => mesh.setColorAt(i, new THREE.Color(color(b))));
+    mesh.castShadow = shadow;
+    mesh.receiveShadow = true;
+    geometry.computeBoundingSphere();
+    // update() keeps the bounds of the birds shown, so the flock is left out where none of them is seen.
+    mesh.boundingSphere = new THREE.Sphere();
+    group.add(mesh);
+    return mesh;
+  });
+  const hidden = new THREE.Matrix4().makeScale(0, 0, 0);
+  const matrix = new THREE.Matrix4();
+  const sphere = new THREE.Sphere();
+  const update = () => {
+    for (const mesh of meshes) mesh.boundingSphere!.makeEmpty();
+    birds.forEach((b, i) => {
+      if (b.group.visible) b.group.updateMatrix();
+      meshes.forEach((mesh, n) => {
+        if (!b.group.visible) {
+          mesh.setMatrixAt(i, hidden);
+          return;
+        }
+        const frame = parts[n][2](b);
+        if (frame === b.group) matrix.copy(b.group.matrix);
+        else {
+          frame.updateMatrix();
+          matrix.multiplyMatrices(b.group.matrix, frame.matrix);
+        }
+        mesh.setMatrixAt(i, matrix);
+        mesh.boundingSphere!.union(sphere.copy(mesh.geometry.boundingSphere!).applyMatrix4(matrix));
+      });
+    });
+    for (const mesh of meshes) {
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.visible = !mesh.boundingSphere!.isEmpty();
+    }
+  };
+  update();
+  return { group, update };
 }
 
 /**
@@ -585,8 +657,9 @@ export function makeDrums() {
   pole.rotation.z = Math.PI / 2;
   pole.position.set(0, top, -0.2);
   group.add(pole);
+  const ringMat = mat("#8f8a3e", 0.7);
   for (const x of [-2, -1, 0, 1, 2]) {
-    const ring = solid(new THREE.TorusGeometry(0.072, 0.012, 6, 16), mat("#8f8a3e", 0.7));
+    const ring = solid(new THREE.TorusGeometry(0.072, 0.012, 6, 16), ringMat);
     ring.rotation.y = Math.PI / 2;
     ring.position.set(x * 1.05, top, -0.2);
     group.add(ring);
@@ -621,8 +694,14 @@ export function makeDrums() {
       rope.position.set(dx * (DRUM_RADIUS + 0.02), -length / 2, 0);
       pivot.add(rope);
     }
+    mergeParts(drum, [skin]);
+    mergeParts(pivot, [drum]);
     return { pivot, skin, at };
   });
+  mergeParts(
+    group,
+    drums.map((d) => d.pivot),
+  );
   return {
     group,
     /** Where the top of drum n is, in the group's space (n = 0 left, 1 right). */
@@ -646,12 +725,13 @@ export function makeRaft() {
     log.position.set(-0.68 + i * 0.34, 0, 0);
     group.add(log);
   }
+  const rope = mat("#6e4a2a", 0.9);
   for (const z of [-0.7, 0.7]) {
-    const tie = solid(new THREE.BoxGeometry(1.9, 0.08, 0.12), mat("#6e4a2a", 0.9));
+    const tie = solid(new THREE.BoxGeometry(1.9, 0.08, 0.12), rope);
     tie.position.set(0, 0.15, z);
     group.add(tie);
   }
-  return group;
+  return mergeParts(group);
 }
 
 /**
@@ -856,6 +936,10 @@ export function makeGate() {
     r.scale.y = a.distanceTo(b);
     r.quaternion.setFromUnitVectors(v3(0, 1, 0), b.clone().sub(a).normalize());
   };
+  mergeParts(gate);
+  mergeParts(crank, [bar]);
+  mergeParts(winch, [crank]);
+  mergeParts(group, [gate, winch, ...ropes]);
   const drumTop = v3(WINCH_X, CRANK_Y + 0.13, WINCH_Z - GATE_Z - WINCH_POST + 0.3);
   const overPulley = v3(WINCH_X + 0.45, 3.25, 0.2);
   return {
@@ -902,7 +986,7 @@ export function makeAppleTree(boughY: number) {
     crown.position.set(x, boughY + up + y, z);
     group.add(crown);
   }
-  return group;
+  return mergeParts(group);
 }
 
 /** A padlock; `open(k)` swings its shackle up. */

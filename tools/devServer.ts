@@ -25,7 +25,7 @@ const server = serveOnFreePort(askedPort(3000), {
   routes: { ...publicRoutes, "/*": index },
   development: { hmr: true, console: true },
 });
-console.log(`The Tiny Taps: http://localhost:${server.port}/`);
+console.log(`Books for Both: http://localhost:${server.port}/`);
 
 // Started by tools/dev.ts: when that ends without stopping this one (killed hard), end too instead of
 // keeping the port.

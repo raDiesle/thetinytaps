@@ -58,8 +58,8 @@ export function PanelButton({ open, onClick, emoji, label }: { open: boolean; on
 }
 
 /**
- * A choice in the wizard shown as what it makes: a small picture of the result (or a big emoji), its name and, where
- * it helps, one line – so a grown-up sees what they decide on, as with the Vorlagen.
+ * A choice in the wizard shown as what it makes: a picture of the result (or a big emoji) and its name – the picture
+ * says the rest, so a grown-up sees what they decide on, as with the Vorlagen.
  */
 export function Pick({
   selected,
@@ -67,7 +67,6 @@ export function Pick({
   picture,
   emoji,
   label,
-  hint,
   disabled,
 }: {
   selected: boolean;
@@ -77,7 +76,6 @@ export function Pick({
   /** Without a picture: a big emoji, or the catalogue's picture in its place (`ItemPic`). */
   emoji?: ReactNode;
   label: string;
-  hint?: string;
   disabled?: boolean;
 }) {
   return (
@@ -95,7 +93,6 @@ export function Pick({
         </span>
       )}
       <span className="rw-pick-label">{label}</span>
-      {hint && <span className="rw-pick-hint">{hint}</span>}
     </button>
   );
 }

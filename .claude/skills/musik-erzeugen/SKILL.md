@@ -1,6 +1,6 @@
 ---
 name: musik-erzeugen
-description: Background music for a The Tiny Taps game made with Suno – write the copy-paste texts for suno.com, then measure the song the user downloads (tempo, parts), convert it and build it into the game so it loops, follows pause and jumps and gets quiet while the voice speaks. Use when the user wants music, a song or Musik for a game, mentions Suno, or hands over a WAV/MP3 from Suno.
+description: Background music for a Books for Both game made with Suno – write the copy-paste texts for suno.com, then measure the song the user downloads (tempo, parts), convert it and build it into the game so it loops, follows pause and jumps and gets quiet while the voice speaks. Use when the user wants music, a song or Musik for a game, mentions Suno, or hands over a WAV/MP3 from Suno.
 ---
 
 # Music with Suno
@@ -52,6 +52,9 @@ parts change exactly with the brushing steps, a finale on the end screen.
   Whisper's first words after an intro (smeared over it, even a one-bar one) do not. Short windows (1–2 s) over a held
   last note or the quiet gap before a verse have too few onsets and point a beat or a bar off (the English waiting
   song seemed to hold its last chorus a bar longer); windows of 5–8 s reaching across the chorus-to-verse change decide.
+  The loop's length is then those two measured distances added up (last chorus − first chorus + verse 2 − verse 1),
+  never bars × the tempo: Suno sang the Arabic waiting song's last verse two beats short, so its choruses stood 8, 12,
+  12 and then 11.45 bars apart. Check every chorus distance against whole bars before trusting a bar count.
 - **Find the parts from the music, not from Whisper's line times.** Whisper (base) heard the Hindi waiting song as
   English, Urdu and an endless „tititi“ and put lines seconds off; it only shows the order of the lines. Where the
   choruses are comes from matching one chorus's spectrum (log bands plus onsets, 10 ms frames) against the whole song:

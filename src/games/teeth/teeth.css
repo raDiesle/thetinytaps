@@ -179,6 +179,82 @@
   inset: 0;
 }
 
+/* One picture each (scenes.tsx); on a change of picture the old one slides out while the new one slides in, two beats,
+   like a camera tilting down to the sink or up into the mirror. They only move, so the phone paints nothing new. */
+.teeth-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.teeth-scene.enter-down {
+  animation: teeth-scene-from-below 1.072s ease-in-out both;
+}
+
+.teeth-scene.leave-down {
+  animation: teeth-scene-to-above 1.072s ease-in-out forwards;
+}
+
+.teeth-scene.enter-up {
+  animation: teeth-scene-from-above 1.072s ease-in-out both;
+}
+
+.teeth-scene.leave-up {
+  animation: teeth-scene-to-below 1.072s ease-in-out forwards;
+}
+
+.teeth-scene.enter-fade {
+  animation: teeth-scene-fade-in 1.072s ease-in-out both;
+}
+
+.teeth-scene.leave-fade {
+  animation: teeth-scene-fade-out 1.072s ease-in-out forwards;
+}
+
+.teeth-scene[class*="leave-"] {
+  pointer-events: none;
+}
+
+.teeth-play.paused .teeth-scene {
+  animation-play-state: paused;
+}
+
+@keyframes teeth-scene-from-below {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes teeth-scene-to-above {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes teeth-scene-from-above {
+  from {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes teeth-scene-to-below {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes teeth-scene-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes teeth-scene-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
 .teeth-room {
   flex: 1;
   min-height: 0;
@@ -321,24 +397,78 @@
   }
 }
 
-/* Foam on the brush. */
-.brush-foam circle {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: foam 1.07s ease-in-out infinite alternate;
+/* The brush (brush.tsx): a layer of its own, moved to its tooth with a glide, and inside it the scrubbing, circling
+   or wiping, all as transforms of HTML layers that the browser moves without painting the brush again. A stroke,
+   circle or wipe takes two beats (--brush-s). The circle is two swings a quarter apart, one along the handle and one
+   across it. */
+.brush-layer,
+.brush-move,
+.brush-move-across {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.brush-foam circle:nth-child(even) {
-  animation-delay: -0.536s;
+.brush-layer {
+  will-change: transform;
+  transition: transform 0.4s ease-out;
 }
 
-@keyframes foam {
-  from {
-    transform: scale(0.6);
+.brush-move.scrub,
+.brush-move.circle {
+  animation: brush-swing var(--brush-s) ease-in-out infinite;
+}
+
+.brush-move.circle > .brush-move-across {
+  animation: brush-swing-across var(--brush-s) ease-in-out calc(var(--brush-s) / -4) infinite;
+}
+
+.brush-move.wipe {
+  animation: brush-wipe var(--brush-s) infinite;
+}
+
+@keyframes brush-swing {
+  0%,
+  100% {
+    transform: translate(var(--brush-x), var(--brush-y));
   }
-  to {
-    transform: scale(1.15);
+  50% {
+    transform: translate(calc(-1 * var(--brush-x)), calc(-1 * var(--brush-y)));
   }
+}
+
+@keyframes brush-swing-across {
+  0%,
+  100% {
+    transform: translate(var(--brush-x2), var(--brush-y2));
+  }
+  50% {
+    transform: translate(calc(-1 * var(--brush-x2)), calc(-1 * var(--brush-y2)));
+  }
+}
+
+/* Slowly from the gum to the tip of the tooth, then quickly back. */
+@keyframes brush-wipe {
+  0%,
+  100% {
+    transform: translate(calc(-1 * var(--brush-x)), calc(-1 * var(--brush-y)));
+    animation-timing-function: ease-out;
+  }
+  70% {
+    transform: translate(var(--brush-x), var(--brush-y));
+    animation-timing-function: ease-in-out;
+  }
+}
+
+.teeth-play.paused .brush-move,
+.teeth-play.paused .brush-move-across {
+  animation-play-state: paused;
+}
+
+/* In the mirror only the monsters to brush now move: the waiting ones stand still, so a phone keeps up. */
+.sugar-monster.still .monster-body,
+.sugar-monster.still .monster-eyes {
+  animation: none;
 }
 
 .tooth-sparkle {
@@ -410,7 +540,9 @@
   display: block;
   height: 100%;
   background: var(--mint);
-  transition: width 0.2s linear;
+  /* Grows by scaling, not by its width: a width that changes lays out the bar again in every frame of its glide. */
+  transform-origin: left;
+  transition: transform 0.2s linear;
 }
 
 .teeth-segment.top > span {
@@ -426,7 +558,6 @@
 }
 
 /* Pause: brush, monsters and glow stand still under a big button that goes on. */
-.teeth-play.paused .brush-foam circle,
 .teeth-play.paused .monster-glow,
 .teeth-play.paused .monster-body,
 .teeth-play.paused .zone-glow {
@@ -543,8 +674,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .brush-move,
+  .brush-move-across {
+    animation-duration: calc(2 * var(--brush-s));
+  }
+
   .monster-body,
-  .brush-foam circle,
   .zone-glow,
   .tooth-sparkle,
   .teeth-cue,
@@ -625,9 +760,39 @@
 /* ---------- The story at the start: sweets, then the monsters grow (origin.tsx) ---------- */
 
 .origin {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.origin-camera,
+.origin-picture,
+.origin-frame {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+
+.origin-frame {
+  pointer-events: none;
+}
+
+/* The camera: from the head to the mouth while the monsters grow (origin.tsx sets where), 4 beats from beat 4.
+   It moves the picture as a whole, an HTML layer, so the phone doesn't paint it again in every frame. */
+.origin-camera {
+  transform-origin: 0 0;
+}
+
+.origin.at-grow .origin-camera {
+  animation: teeth-origin-zoom 2.14s ease-in-out 2.14s forwards;
+}
+
+@keyframes teeth-origin-zoom {
+  to {
+    transform: translate(var(--zoom-x), var(--zoom-y)) scale(var(--zoom));
+  }
 }
 
 /* Each sweet takes its time, so a toddler sees what it is: it grows in its corner (0.5 s), floats there
@@ -946,6 +1111,48 @@
 
 .prep.at-brush .prep-hand {
   animation: reach 4.5s ease-out forwards;
+}
+
+/* The hand turns against the brush (grab-brush, tidy-brush), so its arm points down off the screen however the brush
+   stands: it reaches up from below to the brush in its cup, not in from the side. */
+.prep.at-brush .prep-wrist {
+  animation: wrist-grab 4.5s ease-in-out forwards;
+}
+
+@keyframes wrist-grab {
+  0%,
+  62% {
+    transform: rotate(-90deg);
+  }
+  85%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.prep.at-tidy .prep-wrist {
+  animation: wrist-tidy 8.57s ease-in-out forwards;
+}
+
+@keyframes wrist-tidy {
+  0% {
+    transform: rotate(0deg);
+  }
+  12.5%,
+  50% {
+    transform: rotate(12deg);
+  }
+  62.5%,
+  75% {
+    transform: rotate(-90deg);
+  }
+  78% {
+    transform: rotate(-84deg);
+  }
+  81.25%,
+  100% {
+    transform: rotate(-90deg);
+  }
 }
 
 /* It starts far enough out to be off the screen however much of the sink shows on a wide one. */

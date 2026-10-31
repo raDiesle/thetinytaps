@@ -30,8 +30,8 @@ const DUCK_CHECK_MS = 150;
 
 /**
  * The part of each song that repeats, in seconds, measured on its beat grid (`bun run song`): from just before the
- * first sung word to the same place in the bar after the last turnaround, a whole number of bars, so the beat goes on
- * across the jump. Looping inside the file rather than the whole file keeps it seamless in every browser, however it
+ * first sung word to the same place in the bar after the last turnaround, so the beat goes on across the jump: a whole
+ * number of bars, unless Suno dropped a beat inside (then the parts' measured distances). Looping inside the file rather than the whole file keeps it seamless in every browser, however it
  * trims the silence an MP3 starts and ends with. A song without an entry repeats the whole file.
  */
 const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
@@ -58,6 +58,11 @@ const LOOPS: Record<string, { loopStart: number; loopEnd: number }> = {
   // 44 bars (verses, choruses, bridge), from a tenth before it to the same place after the last chorus, where the
   // backing goes on as before verse 2 and Suno ends with a few bars of bells – never reached.
   hi: { loopStart: 0.4, loopEnd: 0.4 + 44 * (240 / 100.007) },
+  // 101.5 BPM (the choruses come 8, 12 and 12 bars apart), but Suno sang the last verse two beats short, so the loop is
+  // no whole number of bars: its length is measured, the last chorus 102.64 s after the first (where it goes on into
+  // verse 2) and verse 1 18.955 s before verse 2. From a tenth before „أجلسُ“ to the same place after the last chorus,
+  // where Suno sings one more line of it – never reached.
+  ar: { loopStart: 0.4, loopEnd: 0.4 + 102.64 + 18.955 },
 };
 
 const loading = new Map<string, Promise<AudioBuffer | null>>();

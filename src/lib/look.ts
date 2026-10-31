@@ -1,12 +1,14 @@
 import type { MouseEvent } from "react";
 import { flushSync } from "react-dom";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
+import { putBookBack } from "@/lib/bookTravel";
 import { playPageTurn } from "@/lib/sfx";
 
 /**
- * The app's look: „Buch“ (a picture book – a cover to open, paper pages, a page's edge round every game) or the
+ * The app's look: „Buch“ (picture books on a shelf – one to take out, paper pages, a page's edge round every game) or the
  * toy-block look it had before. The book is the default: `?buch=aus` turns it off, `?buch` on again, and the choice is
- * kept for the next visits. The look lives only in CSS (`data-look` on html, `src/styles/book.css`) and in the cover.
+ * kept for the next visits. The look lives in CSS (`data-look` on html, `src/styles/book.css`), the home page's
+ * bookshelf (Bookshelf.tsx) and the way a book is taken out and put back (bookTravel.ts).
  */
 export type Look = "book" | "toy";
 
@@ -38,7 +40,11 @@ export const isBookLook = () => document.documentElement.dataset.look === "book"
 /** How long a page takes to turn: as long as `--turn-time` in `book.css` (`look.test.ts` checks), so its sound lands with it. */
 export const TURN_SECONDS = 1.6;
 
-/** Which way a page turns: `forward` over to the left (on into a menu or a game), `back` from the left. */
+/**
+ * Which way a page turns. The page seen is always the book's left page, the spine on its right: `forward` (on into a
+ * menu or a game) the next page comes over from the right and lies down on it, `back` it lifts at its left edge and
+ * turns over to the right, showing the page before.
+ */
 export type TurnDirection = "forward" | "back";
 
 /**
@@ -59,13 +65,16 @@ export function turnPageWith(direction: TurnDirection, update: () => void) {
 
 /**
  * The click handler of a link to another menu, which turns the page there in the book look (the router's own
- * `viewTransition` works only with a data router). A click that opens a new tab is left alone.
+ * `viewTransition` works only with a data router). Back to the home page, the bookshelf, no page turns: the book
+ * closes and goes back on the shelf (bookTravel.ts). A click that opens a new tab is left alone.
  */
 export function useTurnPage(to: string, direction: TurnDirection) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   return (e: MouseEvent) => {
     if (!isBookLook() || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
-    turnPageWith(direction, () => navigate(to));
+    if (to === "/") putBookBack(pathname, () => navigate(to));
+    else turnPageWith(direction, () => navigate(to));
   };
 }

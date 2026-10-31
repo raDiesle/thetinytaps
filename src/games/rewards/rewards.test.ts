@@ -28,6 +28,7 @@ import {
   ACTIVITIES,
   CHART_TYPES,
   KINDS,
+  PLAN_VIEWS,
   MARKS,
   PLAN_TEMPLATES,
   REWARDS,
@@ -42,7 +43,7 @@ import {
 import { CATEGORIES } from "@/content/games";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { itemPicture, markPicture, picture } from "./pictures";
-import { DEFAULT_REWARDS_SETTINGS } from "./settings";
+import { DEFAULT_REWARDS_SETTINGS, rewardsDefaults } from "./settings";
 
 const prompts = REWARDS_PICTURE_PROMPTS.groups.flatMap((g) => g.prompts);
 const promptIds = new Set(prompts.map((p) => p.id));
@@ -138,7 +139,16 @@ test("a board from a template is the same on every load, but for its own id", ()
     const { id: _b, ...again } = boardFromTemplate(tpl);
     expect(again).toEqual(first);
   }
-  expect(DEFAULT_REWARDS_SETTINGS.boards[0].id).toBe(DEFAULT_REWARDS_SETTINGS.current);
+});
+
+// A first visit starts with the wizard: no Zähne-Woche nobody chose. An older first board keeps its stars, though.
+test("there is no board before the wizard made one, but an old first board with stars stays", () => {
+  expect(DEFAULT_REWARDS_SETTINGS.boards).toEqual([]);
+  expect(rewardsDefaults({})).toBe(DEFAULT_REWARDS_SETTINGS);
+  const old = rewardsDefaults({ erste: { "2026-10-26|zaehne": 1 } });
+  expect(old.boards.map((b) => b.id)).toEqual(["erste"]);
+  expect(old.current).toBe("erste");
+  expect(rewardsDefaults({ erste: {} }).boards[0]).toEqual(old.boards[0]);
 });
 
 describe("stars", () => {
@@ -269,8 +279,8 @@ describe("example stars", () => {
     expect(Object.keys(week).map((k) => k.slice(0, 10))).toEqual(["2026-10-26", "2026-10-26", "2026-10-27"]);
   });
 
-  test("the default board shows them, and they are never in the saved stars", () => {
-    expect(DEFAULT_REWARDS_SETTINGS.boards[0].examples).toBe(true);
+  test("a board from a template shows them", () => {
+    for (const tpl of TEMPLATES) expect(boardFromTemplate(tpl).examples, tpl.id).toBe(true);
   });
 });
 
@@ -314,6 +324,16 @@ describe("one page for boards and plans", () => {
     expect(CHART_TYPES.map((kind) => kind.id).sort()).toEqual(["board", "plan"]);
     expect(TEMPLATES.length).toBeGreaterThan(0);
     expect(PLAN_TEMPLATES.length).toBeGreaterThan(0);
+  });
+
+  // The wizard asks for the view before the Vorlage and shows only that view's: each needs one besides „Leer anfangen“
+  // (a board's views are checked with the ready-made boards).
+  test("every view of a plan has a Vorlage", () => {
+    for (const view of PLAN_VIEWS)
+      expect(
+        PLAN_TEMPLATES.some((tpl) => tpl.view === view.id),
+        view.id,
+      ).toBe(true);
   });
 
   test("the home menu has one card for both, and /tagesplan/ is another address of it", () => {

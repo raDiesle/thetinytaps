@@ -3,6 +3,7 @@
  * cascade order: keep it. Game styles that load with their game live next to
  * the game (and must be prefixed, see CLAUDE.md).
  */
+@import "./styles/font.css";
 @import "./styles/base.css";
 @import "./styles/animations.css";
 @import "./styles/sky.css";
@@ -15,6 +16,7 @@
 @import "./styles/playtime.css";
 @import "./styles/screen-hint.css";
 @import "./styles/book.css";
+@import "./styles/bookshelf.css";
 @import "./games/letters/letters.css";
 @import "./games/letters/find.css";
 @import "./games/scenes/scenes.css";

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
@@ -46,7 +47,20 @@ export function HomeOptions() {
  * starts the game underneath. While there is more below, a bar at the bottom
  * says so, so a grown-up knows to scroll.
  */
-function MenuButton({ icon, label, children }: { icon: string; label: string; children: ReactNode }) {
+export function MenuButton({
+  icon,
+  label,
+  art,
+  className = "home-menu-button",
+  children,
+}: {
+  icon: string;
+  label: string;
+  /** What the button shows instead of `icon` and `label` (a thing in the bookshelf's room); `label` is then its name. */
+  art?: ReactNode;
+  className?: string;
+  children: ReactNode;
+}) {
   const t = useT();
   const [open, setOpen] = useState(false);
   const [more, setMore] = useState(false);
@@ -82,52 +96,61 @@ function MenuButton({ icon, label, children }: { icon: string; label: string; ch
     box?.scrollBy({ top: box.clientHeight * 0.7, behavior: "smooth" });
   };
 
+  const sheet = open && (
+    <>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
+      <div className="home-menu-backdrop" onClick={() => setOpen(false)} />
+      <div ref={panel} className="home-menu-panel">
+        <div className="home-menu-head">
+          <span className="home-menu-name">
+            <span aria-hidden>{icon}</span> {label}
+          </span>
+          <button
+            type="button"
+            className="home-menu-close"
+            aria-label={t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
+            onClick={() => setOpen(false)}
+          >
+            ✕
+          </button>
+        </div>
+        <div className="home-menu-body">{children}</div>
+        {more && (
+          <button type="button" className="home-menu-more" onClick={scrollDown}>
+            <span aria-hidden>▼</span>{" "}
+            {t({
+              de: "Weiter unten gibt es mehr",
+              ru: "Ниже есть ещё",
+              en: "There’s more further down",
+              zh: "下面还有更多",
+              hi: "नीचे और भी है",
+              es: "Hay más abajo",
+              ar: "يوجد المزيد في الأسفل",
+            })}
+          </button>
+        )}
+      </div>
+    </>
+  );
+
   return (
     <div className="home-menu">
-      {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
-      {open && <div className="home-menu-backdrop" onClick={() => setOpen(false)} />}
-      <button type="button" className="home-menu-button" aria-expanded={open} title={label} onClick={() => setOpen(!open)}>
-        <span aria-hidden>{icon}</span>
-        <span className="home-menu-label">{label}</span>
+      <button type="button" className={className} aria-expanded={open} title={label} aria-label={art ? label : undefined} onClick={() => setOpen(!open)}>
+        {art ?? (
+          <>
+            <span aria-hidden>{icon}</span>
+            <span className="home-menu-label">{label}</span>
+          </>
+        )}
       </button>
-      {open && (
-        <div ref={panel} className="home-menu-panel">
-          <div className="home-menu-head">
-            <span className="home-menu-name">
-              <span aria-hidden>{icon}</span> {label}
-            </span>
-            <button
-              type="button"
-              className="home-menu-close"
-              aria-label={t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
-              onClick={() => setOpen(false)}
-            >
-              ✕
-            </button>
-          </div>
-          <div className="home-menu-body">{children}</div>
-          {more && (
-            <button type="button" className="home-menu-more" onClick={scrollDown}>
-              <span aria-hidden>▼</span>{" "}
-              {t({
-                de: "Weiter unten gibt es mehr",
-                ru: "Ниже есть ещё",
-                en: "There’s more further down",
-                zh: "下面还有更多",
-                hi: "नीचे और भी है",
-                es: "Hay más abajo",
-                ar: "يوجد المزيد في الأسفل",
-              })}
-            </button>
-          )}
-        </div>
-      )}
+      {/* A thing in the bookshelf's 3D room opens its menu outside it, over the whole screen (a transform would hold it in). */}
+      {art ? sheet && createPortal(<div className="room-menu">{sheet}</div>, document.body) : sheet}
     </div>
   );
 }
 
 /** The language of the whole app: the grown-ups' screens and what the games say, where a game speaks it. */
-function AppLanguageOptions() {
+export function AppLanguageOptions() {
   const t = useT();
   const language = useAppLanguage();
   return (
@@ -192,45 +215,45 @@ function FigureMenu() {
  * sounds are no switches any more (`src/lib/common.ts`), so music is all there is to set.
  */
 function MusicButton() {
+  const music = useMusicSwitch();
+  return (
+    <button type="button" className="home-menu-button home-music" aria-pressed={music.on} title={music.title} onClick={music.toggle}>
+      <span aria-hidden>{music.on ? "🎵" : "🔇"}</span>
+      <span className="home-menu-label">{music.label}</span>
+    </button>
+  );
+}
+
+/** The background music's switch for all games: whether it is on, its name and tooltip, and one tap to switch it. */
+export function useMusicSwitch() {
   const t = useT();
   const [common, update] = useCommonSettings();
   const label = t({ de: "Musik", ru: "Музыка", en: "Music", zh: "音乐", hi: "संगीत", es: "Música", ar: "الموسيقى" });
-  return (
-    <button
-      type="button"
-      className="home-menu-button home-music"
-      aria-pressed={common.music}
-      title={
-        common.music
-          ? t({
-              de: "Leise Musik im Hintergrund aller Spiele. Tippen schaltet sie aus.",
-              ru: "Тихая музыка на фоне во всех играх. Нажмите, чтобы выключить.",
-              en: "Soft background music in every game. Tap to turn it off.",
-              zh: "所有游戏都有轻柔的背景音乐。点按可关闭。",
-              hi: "सभी खेलों में हल्का बैकग्राउंड संगीत। बंद करने के लिए टैप करें।",
-              es: "Música suave de fondo en todos los juegos. Toque para apagarla.",
-              ar: "موسيقى هادئة في خلفية كل الألعاب. انقروا لإيقافها.",
-            })
-          : t({
-              de: "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen. Tippen schaltet sie ein.",
-              ru: "Без музыки во всех играх – тогда она и не скачивается. Нажмите, чтобы включить.",
-              en: "No music in any game – then it isn’t downloaded either. Tap to turn it on.",
-              zh: "所有游戏都不放音乐——也就不会下载音乐。点按可打开。",
-              hi: "किसी भी खेल में संगीत नहीं – तब वह डाउनलोड भी नहीं होता। चालू करने के लिए टैप करें।",
-              es: "Sin música en ningún juego; así tampoco se descarga. Toque para encenderla.",
-              ar: "لا موسيقى في أي لعبة – وعندها لا يتم تنزيلها أيضًا. انقروا لتشغيلها.",
-            })
-      }
-      onClick={(e) => {
-        // Not left focused: a child's space bar would switch it again.
-        e.currentTarget.blur();
-        // Switched back on: fetch the song now, so it is there when the game starts.
-        if (!common.music) void downloadMusic();
-        update({ music: !common.music });
-      }}
-    >
-      <span aria-hidden>{common.music ? "🎵" : "🔇"}</span>
-      <span className="home-menu-label">{label}</span>
-    </button>
-  );
+  const title = common.music
+    ? t({
+        de: "Leise Musik im Hintergrund aller Spiele. Tippen schaltet sie aus.",
+        ru: "Тихая музыка на фоне во всех играх. Нажмите, чтобы выключить.",
+        en: "Soft background music in every game. Tap to turn it off.",
+        zh: "所有游戏都有轻柔的背景音乐。点按可关闭。",
+        hi: "सभी खेलों में हल्का बैकग्राउंड संगीत। बंद करने के लिए टैप करें।",
+        es: "Música suave de fondo en todos los juegos. Toque para apagarla.",
+        ar: "موسيقى هادئة في خلفية كل الألعاب. انقروا لإيقافها.",
+      })
+    : t({
+        de: "Keine Musik in allen Spielen – sie wird dann auch nicht heruntergeladen. Tippen schaltet sie ein.",
+        ru: "Без музыки во всех играх – тогда она и не скачивается. Нажмите, чтобы включить.",
+        en: "No music in any game – then it isn’t downloaded either. Tap to turn it on.",
+        zh: "所有游戏都不放音乐——也就不会下载音乐。点按可打开。",
+        hi: "किसी भी खेल में संगीत नहीं – तब वह डाउनलोड भी नहीं होता। चालू करने के लिए टैप करें।",
+        es: "Sin música en ningún juego; así tampoco se descarga. Toque para encenderla.",
+        ar: "لا موسيقى في أي لعبة – وعندها لا يتم تنزيلها أيضًا. انقروا لتشغيلها.",
+      });
+  const toggle = (e: MouseEvent<HTMLElement>) => {
+    // Not left focused: a child's space bar would switch it again.
+    e.currentTarget.blur();
+    // Switched back on: fetch the song now, so it is there when the game starts.
+    if (!common.music) void downloadMusic();
+    update({ music: !common.music });
+  };
+  return { on: common.music, label, title, toggle };
 }

@@ -1,8 +1,8 @@
 /*
  * ---------- The book look (src/lib/look.ts) ----------
  *
- * A design concept: the app as a picture book lying on a table, so it looks less like a screen game. The home page
- * starts closed (BookCover), every menu is a paper page with the book's edges round it, a tap on a card turns the
+ * A design concept: the app as a picture book, so it looks less like a screen game. The home page is a bookshelf
+ * (bookshelf.css), every menu inside a book is its left page with the book's edges round it, a tap on a card turns the
  * page, and while playing the picture lies in the page's paper margin. Everything here is under
  * `:root[data-look="book"]`, so the toy-block look stays as it was with `?buch=aus`.
  */
@@ -28,14 +28,24 @@
   --sky-bottom: var(--paper);
   --outline: 2px solid var(--ink);
   --lift: 0 1px 0 #3d304533, 0 8px 16px -8px #5a3c1f80;
-  /* How far a menu's page lies inside the screen, the book's board and the table showing round it. */
+  /*
+   * How far a menu's page lies inside the screen. The page seen is always the book's left page: its outer edge on the
+   * left, with the board and the table showing round it, and the spine on the right, the facing page beyond it in the
+   * spine's shadow (as where the book's travel ends, bookTravel.ts, which reads these too).
+   */
   --page-top: 16px;
-  --page-right: 30px;
-  --page-inset: var(--page-top) var(--page-right) 26px 14px;
+  --page-left: 30px;
+  --page-right: 14px;
+  --page-inset: var(--page-top) var(--page-right) 26px var(--page-left);
   /* The board of the open book's cover reaching out round its pages: how far, and where it lies. */
-  --board: 6px 5px 0 10px;
-  --board-edge: 7px 6px 0 11px;
-  /* The page's turned-up corner in the top right, the way back (PageCorner). */
+  --board: -6px 5px 0 10px;
+  --board-edge: -7px 6px 0 11px;
+  /* The facing page across the spine, turned away from the lamp. */
+  --facing: #6d6656;
+  /*
+   * The page's corner turned up at its outer edge in the top left: the way back (PageCorner) – the page touched is the
+   * page that turns back.
+   */
   --corner: 72px;
   /* Fine speckles of paper fibres, and a large soft mottling like watercolour paper. */
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .26 0 0 0 0 .14 .7 0 0 0 -.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -61,10 +71,11 @@
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root[data-look="book"] {
     --page-top: 8px;
-    --page-right: 16px;
-    --page-inset: var(--page-top) var(--page-right) 14px 6px;
-    --board: 5px 4px 0 6px;
-    --board-edge: 6px 5px 0 7px;
+    --page-left: 16px;
+    --page-right: 6px;
+    --page-inset: var(--page-top) var(--page-right) 14px var(--page-left);
+    --board: -5px 4px 0 6px;
+    --board-edge: -6px 5px 0 7px;
     --corner: 58px;
   }
 }
@@ -79,27 +90,29 @@
 
 :root[data-look="book"] .sky {
   inset: var(--page-inset);
-  border-radius: 4px 12px 12px 4px;
+  border-radius: 12px 4px 4px 12px;
   background: var(--paper-mottle), linear-gradient(var(--sky-top), var(--sky-bottom) 72%);
   /*
-   * The pages under this one, showing at the right and bottom edge; the cloth-covered board of the open book reaching
-   * out round them, with its darker edge; and the book's shadow on the table.
+   * The facing page across the spine on the right, in its shadow; the pages under this one, showing at the left and
+   * bottom edge; the cloth-covered board of the open book reaching out round them, with its darker edge; and the
+   * book's shadow on the table.
    */
   box-shadow:
-    1px 1px 0 var(--paper-edge),
-    3px 2px 0 var(--paper),
-    4px 3px 0 var(--paper-edge),
-    6px 4px 0 var(--paper),
-    7px 5px 0 var(--paper-edge),
-    9px 6px 0 #efe4ca,
-    10px 8px 0 #c9b68f,
-    11px 9px 3px #3d304559,
+    80px 0 0 var(--facing),
+    -1px 1px 0 var(--paper-edge),
+    -3px 2px 0 var(--paper),
+    -4px 3px 0 var(--paper-edge),
+    -6px 4px 0 var(--paper),
+    -7px 5px 0 var(--paper-edge),
+    -9px 6px 0 #efe4ca,
+    -10px 8px 0 #c9b68f,
+    -11px 9px 3px #3d304559,
     var(--board) var(--cloth),
     var(--board-edge) #1d4554,
-    18px 22px 30px 8px #000000a6;
+    -18px 22px 30px 8px #000000a6;
 }
 
-/* Paper grain over the whole picture, and the fold of the book's spine down the left edge. */
+/* Paper grain over the whole picture, and the fold of the book's spine down the right edge. */
 :root[data-look="book"] .sky::after {
   content: "";
   position: absolute;
@@ -110,8 +123,8 @@
    * never lies quite flat.
    */
   background:
-    linear-gradient(90deg, #00000038, #00000012 2.5%, #ffffff26 3.5%, #0000 6%), linear-gradient(270deg, #3d304526, #0000 3%),
-    linear-gradient(#0000 96%, #3d30451f), radial-gradient(ellipse 110% 90% at 55% 28%, #fff8e61f, #0000 65%), var(--paper-grain);
+    linear-gradient(270deg, #00000038, #00000012 2.5%, #ffffff26 3.5%, #0000 6%), linear-gradient(90deg, #3d304526, #0000 3%),
+    linear-gradient(#0000 96%, #3d30451f), radial-gradient(ellipse 110% 90% at 45% 28%, #fff8e61f, #0000 65%), var(--paper-grain);
 }
 
 :root[data-look="book"] .hill-back {
@@ -127,28 +140,39 @@
   stroke-width: 3;
 }
 
+/* The sun (or a room's window) steps right, out from under the way back's corner (PageCorner). */
+:root[data-look="book"] :is(.sky-sun, .world-window) {
+  left: calc(var(--corner) - 8px);
+}
+
 /* ----- Headings: a book's title and chapters, printed, not jumping ----- */
 
+/* The name as on a book's title page (D-16): set in a book face, in ink, the small „for“ in italics. */
 :root[data-look="book"] .logo {
-  filter: saturate(0.6) brightness(0.97);
+  align-items: center;
+  gap: 0 0.28em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.4rem, 6.5vw, 4.4rem);
+  letter-spacing: 0.01em;
 }
 
 :root[data-look="book"] .logo-letter {
-  -webkit-text-stroke: 0.05em var(--ink);
-  text-shadow: none;
+  color: var(--ink);
+  -webkit-text-stroke: 0;
+  text-shadow: 0 0.04em 0 #3d304522;
   rotate: none;
   animation: none;
 }
 
-/* A little printed flourish under the book's title, as over a table of contents. */
-:root[data-look="book"] .home-top > .logo::after {
-  content: "";
-  flex-basis: 100%;
-  height: 0.28em;
-  margin-top: 0.08em;
-  background:
-    center / contain no-repeat
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 20'%3E%3Cg fill='none' stroke='%233d3045' stroke-width='2' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M10 10 C50 2 90 18 130 10'/%3E%3Cpath d='M170 10 C210 2 250 18 290 10'/%3E%3C/g%3E%3Cpath d='M150 3 L157 10 L150 17 L143 10 Z' fill='%23d9715f'/%3E%3C/svg%3E");
+:root[data-look="book"] .logo-for .logo-letter {
+  color: var(--accent);
+  font-size: 0.62em;
+  font-style: italic;
+  font-weight: 400;
+}
+
+:root[data-look="book"] .logo-mascots {
+  width: 1.55em;
 }
 
 :root[data-look="book"] .menu-title {
@@ -159,6 +183,168 @@
     bottom / min(100%, 9em) 0.5em no-repeat
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 20' preserveAspectRatio='none'%3E%3Cpath d='M6 12 C80 4 160 18 294 8' fill='none' stroke='%233d3045' stroke-width='3' stroke-linecap='round' opacity='.5'/%3E%3C/svg%3E");
   box-shadow: none;
+}
+
+/* A book's first page is its table of contents (CategoryPage): a printed flourish under its title, as over one. */
+:root[data-look="book"] [data-contents] .menu-title {
+  padding-bottom: 0.55em;
+  background:
+    bottom / min(100%, 8em) 0.5em no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 20'%3E%3Cg fill='none' stroke='%233d3045' stroke-width='2' stroke-linecap='round' opacity='.55'%3E%3Cpath d='M10 10 C50 2 90 18 130 10'/%3E%3Cpath d='M170 10 C210 2 250 18 290 10'/%3E%3C/g%3E%3Cpath d='M150 3 L157 10 L150 17 L143 10 Z' fill='%23d9715f'/%3E%3C/svg%3E");
+}
+
+/*
+ * ----- A book's table of contents (BookContents, CategoryPage) -----
+ *
+ * As in a picture book: one line per game, a round picture, its name, dots leading to its page number. The lines share
+ * the page's room under the title (each a size container, its type growing with it), and each is a soft wash of its
+ * world's colour, so a finger sees what to tap.
+ */
+.toc {
+  /* What lies above and below the lines: the page's margin and the menu's head, and the world's picture at the bottom. */
+  --toc-top: 150px;
+  --toc-bottom: max(70px, 13vh);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1.8vh, 18px);
+  width: min(100%, 900px);
+  height: calc(100dvh - var(--toc-top) - var(--toc-bottom));
+  max-height: calc(var(--toc-lines) * 132px);
+  margin: clamp(4px, 2vh, 20px) auto 0;
+  padding: 0;
+  list-style: none;
+  text-align: start;
+}
+
+.toc > li {
+  --card: var(--w1);
+  flex: 1 1 0;
+  min-height: 44px;
+  container-type: size;
+}
+
+.toc > li:nth-child(3n + 2) {
+  --card: var(--w2);
+}
+
+.toc > li:nth-child(3n + 3) {
+  --card: var(--w3);
+}
+
+.toc-line {
+  display: flex;
+  align-items: center;
+  gap: min(3cqw, 16cqh);
+  height: 100%;
+  padding: 0 min(2.5cqw, 20cqh) 0 min(1.2cqw, 8cqh);
+  border-radius: 999px 28px 28px 999px;
+  color: inherit;
+  text-decoration: none;
+  /* A watercolour wash, strongest under the picture, fading towards the page number, on the page's paper. */
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--card) 62%, #0000),
+      color-mix(in srgb, var(--card) 26%, #0000) 75%,
+      color-mix(in srgb, var(--card) 14%, #0000)
+    ),
+    color-mix(in srgb, var(--paper) 72%, #0000);
+  transition:
+    background-color 0.2s,
+    translate 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (hover: hover) {
+  .toc-line:hover {
+    background-color: color-mix(in srgb, var(--card) 30%, #0000);
+    translate: 6px 0;
+  }
+}
+
+.toc-line:active {
+  translate: 2px 2px;
+}
+
+.toc-line:focus-visible {
+  outline: 4px solid var(--ocean);
+  outline-offset: 3px;
+}
+
+/* The picture, a round print pasted in. */
+.toc-picture {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 84cqh;
+  height: 84cqh;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, #ffffffa6, #fff0 55%), color-mix(in srgb, var(--card) 70%, var(--paper));
+  box-shadow: var(--lift);
+  font-family: var(--font-emoji);
+  font-size: 48cqh;
+  line-height: 1;
+}
+
+.toc-name {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.toc-title {
+  overflow: hidden;
+  font-size: min(38cqh, 5.6cqw);
+  font-weight: 700;
+  line-height: 1.15;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* One line for grown-ups, only where the line is tall and wide enough to read it beside the name. */
+.toc-blurb {
+  display: none;
+  overflow: hidden;
+  font-size: min(15cqh, 2.6cqw);
+  line-height: 1.25;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0.75;
+}
+
+@container (min-height: 88px) and (min-width: 560px) {
+  .toc-blurb {
+    display: block;
+  }
+}
+
+/* The dots leading the eye from the name to its page. */
+.toc-dots {
+  flex: 1 1 1.5em;
+  min-width: 1.5em;
+  height: 6px;
+  margin-top: min(10cqh, 1.4cqw);
+  background: radial-gradient(circle, #3d3045a6 0 1.4px, #0000 2px) 0 50% / 11px 6px repeat-x;
+}
+
+.toc-page {
+  flex: none;
+  min-width: 1.3em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: min(38cqh, 6cqw);
+  font-style: italic;
+  font-weight: 700;
+  text-align: end;
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  .toc {
+    --toc-top: 64px;
+    --toc-bottom: max(40px, 12vh);
+    width: min(100% - 28px, 900px);
+  }
 }
 
 /* ----- Cards: pictures pasted into the book, with a strip of tape ----- */
@@ -196,54 +382,53 @@
     0 3px 6px -3px #5a3c1f80;
 }
 
-:root[data-look="book"] .game-emoji,
-:root[data-look="book"] .game-go {
+:root[data-look="book"] .game-emoji {
   border: 2px solid var(--ink);
   background: var(--paper);
+}
+
+/*
+ * A picture pasted into a book has no ▶ on it: the whole card is what is tapped (user feedback, October 2026). Without
+ * it the card needs no room below its title, so it is that much lower than its row and sits in the middle of it.
+ */
+:root[data-look="book"] .game-go {
+  display: none;
+}
+
+:root[data-look="book"] .game-list.fit li:has(> .game-card) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@container (min-height: 130px) {
+  :root[data-look="book"] .game-list.fit .game-card {
+    height: calc(100% - max(2cqh, 30px - 5cqh));
+    padding-bottom: 5cqh;
+  }
+}
+
+@container (max-height: 129.98px) {
+  :root[data-look="book"] .game-list.fit .game-card {
+    padding-right: 10px;
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"] .game-list:not(.fit) .game-card {
+    padding-right: 12px;
+  }
 }
 
 :root[data-look="book"] .game-title {
   font-weight: 600;
 }
 
-/* Page numbers, as in a table of contents (the home page's cards): on which page of the book each one is. */
-.game-page {
-  display: none;
-}
-
-:root[data-look="book"] .game-page {
-  display: block;
-  position: absolute;
-  bottom: 6px;
-  left: 12px;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1rem;
-  font-style: italic;
-  opacity: 0.6;
-}
-
-/* On a phone's flat cards the picture fills the left end: the number goes to the top right corner. */
-@media (max-width: 599.98px), (max-height: 599.98px) {
-  :root[data-look="book"] .game-page {
-    top: 2px;
-    right: 12px;
-    bottom: auto;
-    left: auto;
-    font-size: 0.8rem;
-  }
-}
-
-/* A frame round a group of cards (the home page's „Weitere“, a game's sorts): a paper panel, stitched on. */
+/* A frame round a group of cards (a game's sorts): a paper panel, stitched on. */
 :root[data-look="book"] .mode-group::before {
   border: 2px dashed #3d304559;
   border-radius: 22px;
   background: #fffaf0a6;
-}
-
-:root[data-look="book"] .game-list .mode-group[data-world="weitere"]::before {
-  background:
-    radial-gradient(circle, #fff 0 4px, transparent 5px) 0 0 / 40px 40px,
-    #f6dde6b0;
 }
 
 /* ----- Buttons, labels and panels: paper too, nothing glossy or app-like ----- */
@@ -367,6 +552,65 @@
   box-shadow: none;
 }
 
+/*
+ * The level row's choices (Lebendige Bilder's ways to play): small slips of paper lying a little askew on the page, like
+ * the cards under them, not buttons standing up from it; the chosen one is yellow and taped down like a card.
+ */
+:root[data-look="book"] .mode-level .choice {
+  gap: 8px;
+}
+
+:root[data-look="book"] .mode-level .choice button {
+  position: relative;
+  border: 1.5px solid #3d3045b3;
+  border-radius: 4px 7px 5px 8px / 7px 4px 8px 5px;
+  background-color: color-mix(in srgb, var(--paper) 70%, #fff);
+  box-shadow:
+    0 1px 1px #3d304526,
+    0 5px 8px -6px #5a3c1f8c;
+  rotate: -1.2deg;
+}
+
+:root[data-look="book"] .mode-level .choice button:nth-of-type(even) {
+  rotate: 1deg;
+}
+
+:root[data-look="book"] .mode-level .choice button.selected {
+  border-color: var(--ink);
+  background-color: color-mix(in srgb, var(--sunshine) 70%, var(--paper));
+  rotate: 0deg;
+}
+
+:root[data-look="book"] .mode-level .choice button.selected::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 34px;
+  height: 13px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: repeating-linear-gradient(90deg, #fff6c8a0 0 5px, #ffeeb0a0 5px 10px);
+  box-shadow: 0 1px 2px #0000001f;
+  pointer-events: none;
+}
+
+/* Their pictures say what they are: the label above them is only read out, so the slips keep to one line. */
+:root[data-look="book"] .menu-head > .mode-level legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@media (min-width: 600px) and (min-height: 600px) {
+  :root[data-look="book"] .menu-head > .mode-level .choice button {
+    min-height: 36px;
+    padding: 3px 10px;
+  }
+}
+
 /* „Bitte quer halten“ lies on the book's paper too. */
 :root[data-look="book"] .screen-hint {
   background: var(--paper-grain), var(--paper-mottle), var(--paper);
@@ -399,41 +643,45 @@
   background: #24140a;
 }
 
-/* Forward: the old page lifts at its right edge and turns over to the left, the new one lies under it. */
-:root[data-look="book"][data-turn="forward"]::view-transition-old(root) {
-  z-index: 2;
-  transform-origin: left center;
-  animation: book-turn-away var(--turn-time) linear both;
-}
-
+/*
+ * The page seen is the book's left page, the spine at its right. Forward: the next page comes over from the right,
+ * turning on the spine and lying down on this one, its shadow coming in ahead of it.
+ */
 :root[data-look="book"][data-turn="forward"]::view-transition-new(root) {
-  z-index: 1;
-  mask-image: linear-gradient(90deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
-  mask-size: 250% 100%;
-  mask-repeat: no-repeat;
-  animation: book-turn-under var(--turn-time) linear both;
-}
-
-/* Back: the page turns back from the left over the old one, its shadow coming in ahead of it. */
-:root[data-look="book"][data-turn="back"]::view-transition-new(root) {
   z-index: 2;
-  transform-origin: left center;
+  transform-origin: right center;
   animation: book-turn-away var(--turn-time) linear reverse both;
 }
 
-:root[data-look="book"][data-turn="back"]::view-transition-old(root) {
+:root[data-look="book"][data-turn="forward"]::view-transition-old(root) {
   z-index: 1;
-  mask-image: linear-gradient(90deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
+  mask-image: linear-gradient(270deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
   mask-size: 250% 100%;
   mask-repeat: no-repeat;
   animation: book-turn-under var(--turn-time) linear reverse both;
 }
 
+/* Back: this page lifts at its outer (left) edge and turns over the spine to the right, the page before lying under it. */
+:root[data-look="book"][data-turn="back"]::view-transition-old(root) {
+  z-index: 2;
+  transform-origin: right center;
+  animation: book-turn-away var(--turn-time) linear both;
+}
+
+:root[data-look="book"][data-turn="back"]::view-transition-new(root) {
+  z-index: 1;
+  mask-image: linear-gradient(270deg, #000 0 42%, #0009 47%, #000b 50%, #000 58%);
+  mask-size: 250% 100%;
+  mask-repeat: no-repeat;
+  animation: book-turn-under var(--turn-time) linear both;
+}
+
 /*
- * The turning page: a turn round a slanted axis, so the bottom corner leads, and a little shear, so the page bends
- * instead of swinging like a board; slow while the hand lifts it, quick over the top, and off over the spine. The
- * keyframes set the pace, so the animation runs linear (an easing would stop and start again at every keyframe), and
- * the eye is far above the page (three screens' width), or a lifted page would swell past the screen's edge.
+ * The turning page, from lying on the left to standing up on the spine: a turn round a slanted axis, so the bottom
+ * corner leads, and a little shear, so the page bends instead of swinging like a board; slow while the hand lifts it,
+ * quick over the top. The keyframes set the pace, so the animation runs linear (an easing would stop and start again
+ * at every keyframe), and the eye is far above the page (three screens' width), or a lifted page would swell past the
+ * screen's edge.
  */
 @keyframes book-turn-away {
   0% {
@@ -441,43 +689,43 @@
     filter: brightness(1);
   }
   12% {
-    transform: perspective(320vw) rotate3d(-0.3, 1, 0, -5deg) skewY(-0.6deg);
+    transform: perspective(320vw) rotate3d(0.3, 1, 0, 5deg) skewY(0.6deg);
     filter: brightness(1.02);
   }
   30% {
-    transform: perspective(320vw) rotate3d(-0.22, 1, 0, -20deg) skewY(-1.6deg);
+    transform: perspective(320vw) rotate3d(0.22, 1, 0, 20deg) skewY(1.6deg);
     filter: brightness(1.06);
   }
   55% {
-    transform: perspective(320vw) rotate3d(-0.12, 1, 0, -48deg) skewY(-1.8deg);
+    transform: perspective(320vw) rotate3d(0.12, 1, 0, 48deg) skewY(1.8deg);
     filter: brightness(0.92);
   }
   78% {
-    transform: perspective(320vw) rotate3d(-0.05, 1, 0, -72deg) skewY(-1deg);
+    transform: perspective(320vw) rotate3d(0.05, 1, 0, 72deg) skewY(1deg);
     filter: brightness(0.74);
   }
   100% {
-    transform: perspective(320vw) rotate3d(0, 1, 0, -92deg);
+    transform: perspective(320vw) rotate3d(0, 1, 0, 92deg);
     filter: brightness(0.6);
   }
 }
 
 /*
  * The page beneath: dim under the lifting page at first, and the soft shadow band of the turning page's edge sliding
- * from its right edge to the spine (`mask-position` moves the band, which lets the dark of the group show through).
+ * from its outer (left) edge to the spine (`mask-position` moves the band, which lets the dark of the group show through).
  */
 @keyframes book-turn-under {
   0% {
     filter: brightness(0.84);
-    mask-position: 0% 0;
+    mask-position: 100% 0;
   }
   30% {
     filter: brightness(0.86);
-    mask-position: 10% 0;
+    mask-position: 90% 0;
   }
   55% {
     filter: brightness(0.92);
-    mask-position: 22% 0;
+    mask-position: 78% 0;
   }
   78% {
     filter: brightness(0.98);
@@ -485,7 +733,7 @@
   }
   100% {
     filter: brightness(1);
-    mask-position: 100% 0;
+    mask-position: 0% 0;
   }
 }
 
@@ -496,7 +744,13 @@
   }
 }
 
-/* ----- The way back: the page's turned-up corner in its top right (PageCorner in MenuTop.tsx) ----- */
+/*
+ * ----- The way back: the page's corner turned up in its top left (PageCorner in MenuTop.tsx) -----
+ *
+ * Where a reader takes the left page to turn it back, at its outer edge, and the page turning back is this one
+ * (`data-turn="back"`): the corner touched is the page that moves. A corner in the top right turned the other page (user feedback, October
+ * 2026), and grown-ups looked for the way back in the top left anyway.
+ */
 
 .page-corner {
   display: none;
@@ -506,7 +760,7 @@
   display: block;
   position: fixed;
   top: var(--page-top);
-  right: var(--page-right);
+  left: var(--page-left);
   z-index: 20;
   width: var(--corner);
   height: var(--corner);
@@ -519,9 +773,9 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  transform-origin: 100% 0;
+  transform-origin: 0 0;
   transition: scale 0.25s ease-out;
-  filter: drop-shadow(-2px 3px 3px #3d304540);
+  filter: drop-shadow(2px 3px 3px #3d304540);
 }
 
 :root[data-look="book"] .page-corner:hover .page-corner-art {
@@ -540,7 +794,7 @@
 .page-corner-shadow {
   fill: #3d3045;
   opacity: 0.2;
-  transform: translate(-3px, 6px);
+  transform: translate(3px, 5px);
 }
 
 .page-corner-back {
@@ -557,17 +811,48 @@
   opacity: 0.7;
 }
 
+/* The cover's corner (back to the shelf): cloth over board, a shelf stamped on it in gold. */
+.cover-corner-board {
+  stroke: #12303b;
+  stroke-width: 1.5;
+}
+
+.cover-corner-edge {
+  fill: none;
+  stroke: #e9dcc0;
+  stroke-width: 2.5;
+  opacity: 0.8;
+}
+
+.cover-corner-stamp {
+  fill: #e8c76a59;
+  stroke: #ecd083;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cover-corner-stamp .cover-corner-book {
+  fill: #ecd083;
+}
+
+.cover-corner-stamp .cover-corner-arrow {
+  fill: none;
+  stroke-width: 3;
+}
+
 /*
- * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top right, held like the ✕ – it lifts
+ * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top left, held like the ✕ – it lifts
  * further while the finger stays (instead of the ring filling), and the page turns back. The fullscreen button and
- * „Zurück zum Menü · halten“ stay beside it, on the picture's edge.
+ * „Zurück zum Menü · halten“ stay beside it, right of it on the picture's edge.
  */
 .hold-exit .page-corner-art {
   display: none;
 }
 
-/* Room left of the corner for it to lift into, so it never covers the fullscreen button or the hint. */
+/* Room right of the corner for it to lift into, so it never covers the fullscreen button or the hint. */
 :root[data-look="book"] .play-area .exit-corner {
+  flex-direction: row-reverse;
   align-items: flex-start;
   gap: calc(var(--play-corner) * 0.4 + 4px);
 }
@@ -578,12 +863,25 @@
 
 :root[data-look="book"] .play-area .exit-corner .exit-hint {
   top: 14px;
+  right: auto;
+  left: calc(100% + 8px);
+  translate: -6px 0;
+}
+
+:root[data-look="book"] .play-area .exit-corner.hinted .exit-hint {
+  translate: 0 0;
+}
+
+@media (hover: hover) {
+  :root[data-look="book"] .play-area .exit-corner:hover .exit-hint {
+    translate: 0 0;
+  }
 }
 
 :root[data-look="book"] .play-area .exit-corner .hold-exit {
   width: var(--play-corner);
   height: var(--play-corner);
-  margin: calc(-1 * var(--frame) - 8px) calc(-1 * var(--frame) - 8px) 0 0;
+  margin: calc(-1 * var(--frame) - 8px) 0 0 calc(-1 * var(--frame) - 8px);
   padding: 0;
   border-radius: 0;
   background: none;
@@ -599,8 +897,8 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  transform-origin: 100% 0;
-  filter: drop-shadow(-2px 3px 3px #3d304540);
+  transform-origin: 0 0;
+  filter: drop-shadow(2px 3px 3px #3d304540);
 }
 
 :root[data-look="book"] .play-area .exit-corner .hold-exit.holding .page-corner-art {
@@ -635,7 +933,7 @@
 }
 
 /*
- * A menu's head keeps clear of the corner: it needs the corner's room at the right edge of the screen, less what the
+ * A menu's head keeps clear of the corner: it needs the corner's room at the left edge of the screen, less what the
  * margin round the menu already leaves there (`--menu-edge`: a home-like page is at most 1040 px wide, centred).
  */
 :root[data-look="book"] .home {
@@ -647,7 +945,7 @@
 }
 
 :root[data-look="book"] .menu-head {
-  margin-right: max(0px, calc(var(--page-right) + var(--corner) + 8px - var(--menu-edge, 20px)));
+  margin-left: max(0px, calc(var(--page-left) + var(--corner) + 8px - var(--menu-edge, 20px)));
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
@@ -697,22 +995,14 @@
   pointer-events: none;
 }
 
-/* The page's own edges at the screen's rim: the spine's fold on the left, the pages under it on the right. */
+/* The page's own edges at the screen's rim: the spine's fold on the right, the pages under it on the left. */
 :root[data-look="book"] .book-frame::before {
   content: "";
   position: absolute;
   inset: calc(-1 * var(--frame));
   background:
-    linear-gradient(90deg, #0000003d, #0000 calc(var(--frame) * 0.9)),
-    linear-gradient(
-      270deg,
-      var(--paper-edge) 0 1px,
-      var(--paper) 1px 3px,
-      var(--paper-edge) 3px 4px,
-      var(--paper) 4px 6px,
-      var(--paper-edge) 6px 7px,
-      #0000 7px
-    ),
+    linear-gradient(270deg, #0000003d, #0000 calc(var(--frame) * 0.9)),
+    linear-gradient(90deg, var(--paper-edge) 0 1px, var(--paper) 1px 3px, var(--paper-edge) 3px 4px, var(--paper) 4px 6px, var(--paper-edge) 6px 7px, #0000 7px),
     var(--paper-grain);
   /* Only the margin: the picture inside stays clear of the grain. */
   clip-path: polygon(
@@ -729,393 +1019,35 @@
   );
 }
 
-/* ✕, the fullscreen button and ⚙️ step in off the paper margin, onto the picture's corner. */
+/*
+ * ✕, the fullscreen button and ⚙️ step in off the paper margin, onto the picture's corner: the way back on the left,
+ * at the spine (above), so ⚙️ trades places with it and goes to the top right, its note to its left.
+ */
 :root[data-look="book"] .play-area .exit-corner {
   top: max(calc(var(--frame) + 8px), env(safe-area-inset-top));
-  right: max(calc(var(--frame) + 8px), env(safe-area-inset-right));
+  right: auto;
+  left: max(calc(var(--frame) + 8px), env(safe-area-inset-left));
 }
 
 :root[data-look="book"] .play-area .play-options-corner {
   top: max(calc(var(--frame) + 8px), env(safe-area-inset-top));
-  left: max(calc(var(--frame) + 8px), env(safe-area-inset-left));
+  right: max(calc(var(--frame) + 8px), env(safe-area-inset-right));
+  left: auto;
 }
 
-/* ----- The cover (BookCover): a cloth-bound book lying on the table, opened with one tap ----- */
-
-/*
- * The table seen from a chair: the book lies on it, a little turned, and is drawn in 3D – a board cover with its edge,
- * the block of pages under it and the back board – so that its thickness shows along the front and the right side.
- * Sizes follow `--w`, the book's width: `--t` is the whole book's thickness, `--c` one board's.
- */
-.book-cover-screen {
-  --w: min(62vw, 115vh);
-  --t: calc(var(--w) * 0.09);
-  --c: calc(var(--w) * 0.014);
-  position: fixed;
-  inset: 0;
-  /* Under the play-time lock and the „Bitte quer halten“ note, over the home page. */
-  z-index: 800;
-  display: grid;
-  place-items: center;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: var(--lamp), var(--table);
-  font: inherit;
-  color: var(--ink);
-  cursor: pointer;
-  perspective: calc(var(--w) * 2.6);
-  perspective-origin: 50% 30%;
-  -webkit-tap-highlight-color: transparent;
+:root[data-look="book"] .play-area .play-options-hint {
+  right: calc(100% + 8px);
+  left: auto;
+  translate: 6px 0;
 }
 
-.book-closed {
-  position: relative;
-  width: var(--w);
-  aspect-ratio: 4 / 3;
-  transform: rotateX(32deg) rotateZ(4deg);
-  transform-style: preserve-3d;
+:root[data-look="book"] .play-area .play-options-corner.hinted .play-options-hint {
+  translate: 0 0;
 }
 
-.book-closed span {
-  transform-style: preserve-3d;
-}
-
-/* Its shadow on the table: soft and wide away from the lamp, dark and close where the book touches the wood. */
-.book-shadow {
-  position: absolute;
-  inset: -1% -2% -2% 0;
-  border-radius: 6px;
-  box-shadow:
-    calc(var(--w) * 0.03) calc(var(--w) * 0.05) calc(var(--w) * 0.09) calc(var(--w) * 0.01) #1e0d0499,
-    0 0 calc(var(--w) * 0.012) #1e0d04b3;
-}
-
-/* The back board, lying on the table: it shows only where it reaches out past the pages, and along its edge. */
-.book-back {
-  position: absolute;
-  inset: -1% -1.2% -1% 0;
-  border-radius: 4px 12px 12px 4px;
-  background: var(--cloth);
-}
-
-/* The block of pages between the boards: the first page on top, their edges on the right and at the front. */
-.book-pages {
-  position: absolute;
-  inset: 0;
-}
-
-.book-first-page {
-  position: absolute;
-  inset: 0;
-  border-radius: 2px 6px 6px 2px;
-  background: linear-gradient(90deg, #0000002e, #0000 6%), var(--paper-mottle), var(--paper);
-  transform: translateZ(calc(var(--t) - var(--c)));
-}
-
-/* An edge standing up from the table: `--h` how high, turned up from the face's right or bottom side. */
-.book-edge {
-  position: absolute;
-  backface-visibility: hidden;
-}
-
-.book-edge.right {
-  top: 0;
-  right: 0;
-  width: var(--h);
-  height: 100%;
-  transform-origin: 100% 50%;
-  transform: translateZ(var(--z, 0px)) rotateY(90deg);
-}
-
-.book-edge.bottom {
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: var(--h);
-  transform-origin: 50% 100%;
-  transform: translateZ(var(--z, 0px)) rotateX(-90deg);
-}
-
-/* The pages' edges: many fine lines of paper, a little shaded inside, lit from above. */
-.book-pages .book-edge {
-  --h: calc(var(--t) - 2 * var(--c));
-  --z: var(--c);
-}
-
-.book-pages .book-edge.right {
-  background:
-    linear-gradient(90deg, #fff8 0, #0000 30%, #0000 70%, #5a3c1f40), repeating-linear-gradient(90deg, #efe3c6 0 1px, #fbf4e3 1px 2.5px, #d8c7a2 2.5px 3px),
-    var(--paper);
-}
-
-.book-pages .book-edge.bottom {
-  background:
-    linear-gradient(#fff8 0, #0000 30%, #0000 70%, #5a3c1f40), repeating-linear-gradient(#efe3c6 0 1px, #fbf4e3 1px 2.5px, #d8c7a2 2.5px 3px), var(--paper);
-  /* In shadow: the front edge faces away from the lamp. */
-  filter: brightness(0.86);
-}
-
-/* The boards' own edges: cloth wrapped round the board. */
-:is(.book-back, .book-cover) .book-edge {
-  --h: var(--c);
-  background: linear-gradient(90deg, #00000026, #0000 40%), var(--cloth);
-  filter: brightness(0.7);
-}
-
-.book-cover {
-  position: absolute;
-  inset: -1% -1.2% -1% 0;
-  transform-origin: left center;
-  transform: translateZ(calc(var(--t) - var(--c)));
-}
-
-.book-cover-front,
-.book-cover-back {
-  position: absolute;
-  inset: 0;
-  border-radius: 4px 12px 12px 4px;
-  backface-visibility: hidden;
-}
-
-/*
- * Cloth over board: a fine weave, the lamp's light falling from the top left and a soft sheen across it, the spine on
- * the left with its raised bands, and a gold line pressed in all round.
- */
-.book-cover-front {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3.5%;
-  padding: 4% 8% 5% 12%;
-  background:
-    linear-gradient(115deg, #0000 30%, #ffffff17 42%, #0000 55%), linear-gradient(90deg, #00000066 0 1.2%, #0000 1.2% 2%, #ffffff1f 2% 2.4%, #0000 2.4%),
-    linear-gradient(90deg, #0000 0 8.2%, #00000047 8.2% 8.7%, #ffffff29 8.7% 9.1%, #0000 9.1%), radial-gradient(ellipse at 30% 12%, #ffffff33, #0000 60%),
-    radial-gradient(ellipse at 80% 100%, #00000040, #0000 55%), repeating-linear-gradient(0deg, #ffffff0f 0 1px, #0000 1px 3px),
-    repeating-linear-gradient(90deg, #0000001a 0 1px, #0000 1px 3px), var(--cloth);
-  transform: translateZ(var(--c));
-  /* The glow that marks it as the thing to tap. */
-  box-shadow:
-    inset 0 0 0 2px #00000033,
-    inset -3px -4px 6px #0000004d,
-    0 0 0 5px #fff3b066,
-    0 0 42px 12px #ffe9a080;
-}
-
-/* The spine's raised bands, across the spine strip at the left. */
-.book-cover-front::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 8.2%;
-  background: linear-gradient(
-    #0000 0 14%,
-    #00000040 14% 15%,
-    #ffffff26 15% 16.5%,
-    #00000040 16.5% 17.5%,
-    #0000 17.5% 82.5%,
-    #00000040 82.5% 83.5%,
-    #ffffff26 83.5% 85%,
-    #00000040 85% 86%,
-    #0000 86%
-  );
-}
-
-/* A gold line pressed into the cloth, a hand's width inside the edge. */
-.book-cover-front::after {
-  content: "";
-  position: absolute;
-  inset: 3.5% 3% 3.5% 11%;
-  border: 2px solid #e2c27a;
-  border-radius: 8px;
-  box-shadow:
-    inset 0 0 0 4px #0000,
-    inset 0 0 0 5px #e2c27a99,
-    0 1px 0 #00000059,
-    inset 0 1px 0 #00000059;
-  pointer-events: none;
-}
-
-/* The title in gold foil, pressed into the cloth. */
-.book-cover-title {
-  position: relative;
-  z-index: 1;
-  font-size: calc(var(--w) * 0.082);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  background: linear-gradient(#fff1c4, #e0b75c 55%, #b98a35);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 -1px 0 #00000080) drop-shadow(0 1px 0 #ffffff40);
-}
-
-/* The painted picture pasted on the cover, with a paper border and a thin red line round it. */
-.book-cover-label {
-  position: relative;
-  z-index: 1;
-  display: block;
-  height: 72%;
-  aspect-ratio: 4 / 3;
-  padding: 1.6%;
-  border-radius: 6px;
-  background: var(--paper-grain), var(--paper-mottle), var(--paper);
-  box-shadow:
-    inset 0 0 0 1px #3d304540,
-    0 2px 0 #0000002e,
-    0 4px 10px #00000073;
-  rotate: -0.6deg;
-}
-
-.book-cover-label img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 3px;
-  box-shadow: 0 0 0 1.5px #d9715fb3;
-}
-
-/* Leather corners on the outer edge, as an old picture book has. */
-.book-corner {
-  position: absolute;
-  z-index: 2;
-  width: 10%;
-  aspect-ratio: 1;
-  background: radial-gradient(ellipse at 70% 30%, #ffffff2e, #0000 60%), #7a3b2a;
-}
-
-.book-corner.top-right {
-  top: 0;
-  right: 0;
-  border-top-right-radius: 12px;
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-}
-
-.book-corner.bottom-right {
-  right: 0;
-  bottom: 0;
-  border-bottom-right-radius: 12px;
-  clip-path: polygon(100% 0, 100% 100%, 0 100%);
-}
-
-/* A still hand on the cover's corner, where a finger opens a book. */
-.book-cover-hand {
-  position: absolute;
-  right: 4%;
-  bottom: 5%;
-  z-index: 3;
-  font-family: var(--font-emoji);
-  font-size: calc(var(--w) * 0.085);
-  line-height: 1;
-  rotate: -20deg;
-}
-
-/* Inside the cover: patterned endpaper, seen as it swings over, and lying open on the table after. */
-.book-cover-back {
-  rotate: y 180deg;
-  background:
-    linear-gradient(270deg, #0000002e, #0000 6%),
-    radial-gradient(circle, #d9715f66 0 3px, #0000 4px) 0 0 / 26px 26px,
-    radial-gradient(circle, #2e6a8055 0 2px, #0000 3px) 13px 13px / 26px 26px,
-    var(--paper);
-  box-shadow: inset 2px 0 0 #00000026;
-}
-
-/* The ribbon of a bookmark, coming out of the pages at the front and lying on the table. */
-.book-ribbon {
-  position: absolute;
-  bottom: -10%;
-  left: 72%;
-  width: 3.2%;
-  height: 11%;
-  background: linear-gradient(90deg, #a83a2c, #c9503f 50%, #a83a2c);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
-  filter: drop-shadow(1px 2px 1px #0000004d);
-}
-
-/*
- * One tap: the heavy cover lifts slowly at its edge and swings over onto the table to the left, turning away from the
- * lamp and its endpaper towards it; then the book is drawn up flat and close until its first page – the contents
- * page under it – fills the screen. As long as OPEN_MS in BookCover.
- */
-.book-cover-screen.opening {
-  animation: book-reveal 2.4s linear both;
-}
-
-.book-cover-screen.opening .book-cover {
-  animation: book-cover-open 1.7s cubic-bezier(0.55, 0, 0.3, 1) both;
-}
-
-.book-cover-screen.opening .book-cover-front {
-  animation: book-cover-dim 1.7s cubic-bezier(0.55, 0, 0.3, 1) both;
-}
-
-.book-cover-screen.opening .book-cover-back {
-  animation: book-cover-dim 1.7s cubic-bezier(0.55, 0, 0.3, 1) reverse both;
-}
-
-.book-cover-screen.opening .book-shadow {
-  animation: book-shadow-open 1.7s cubic-bezier(0.55, 0, 0.3, 1) both;
-}
-
-.book-cover-screen.opening .book-closed {
-  animation: book-come-close 1s cubic-bezier(0.45, 0, 0.3, 1) 1.4s both;
-}
-
-@keyframes book-cover-open {
-  from {
-    transform: translateZ(calc(var(--t) - var(--c))) rotateY(0);
-  }
-  to {
-    transform: translateZ(calc(var(--t) - var(--c))) rotateY(-180deg);
-  }
-}
-
-@keyframes book-cover-dim {
-  from {
-    filter: brightness(1);
-  }
-  to {
-    filter: brightness(0.45);
-  }
-}
-
-@keyframes book-shadow-open {
-  to {
-    left: -100%;
-  }
-}
-
-@keyframes book-come-close {
-  from {
-    transform: rotateX(32deg) rotateZ(4deg);
-  }
-  to {
-    transform: rotateX(0) rotateZ(0) scale(1.45);
-  }
-}
-
-@keyframes book-reveal {
-  0%,
-  80% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .book-cover-screen.opening,
-  .book-cover-screen.opening * {
-    animation-duration: 0.01s !important;
-    animation-delay: 0s !important;
+@media (hover: hover) {
+  :root[data-look="book"] .play-area .play-options-corner:hover .play-options-hint {
+    translate: 0 0;
   }
 }
 
@@ -1188,17 +1120,6 @@
     }
   }
 
-  /* The home page: the buttons on top, the title in the middle between the two families. */
-  :root[data-look="book"] .home-top {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    column-gap: 16px;
-  }
-
-  :root[data-look="book"] .home-top > .home-bar {
-    grid-column: 1 / -1;
-  }
-
   /* A menu's head: the foxes left of the way back, the bears between the title and the fullscreen button. */
   :root[data-look="book"] .menu-head {
     grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr) auto;
@@ -1225,60 +1146,9 @@
   }
 }
 
-/* A phone: the title moves into the top row, on the left where the sun was, so the cards get the room. */
+/* A phone: the families share the row with the menu's buttons, taking the room left. */
 @media (max-width: 599.98px), (max-height: 599.98px) {
-  /* Where title and buttons don't fit side by side (a phone held upright), the buttons get a line of their own. */
-  :root[data-look="book"] .home-top {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  :root[data-look="book"] .home-top > .logo {
-    order: -1;
-    flex: none;
-    flex-wrap: nowrap;
-    font-size: clamp(1.5rem, min(7.5vh, 7vw), 2.2rem);
-  }
-
-  :root[data-look="book"] .home-top > .logo::after {
-    content: none;
-  }
-
-  :root[data-look="book"] .home-top > .book-family-slot,
   :root[data-look="book"] .menu-head > .book-family-slot {
     flex: 1 1 0;
-  }
-
-  :root[data-look="book"] .home-top > .home-bar {
-    order: 1;
-    flex: none;
-    margin: 0 0 0 auto;
-  }
-
-  /* A little taller than the buttons, so the families are big enough to see. */
-  :root[data-look="book"] .home-top > .book-family-slot {
-    min-height: 64px;
-  }
-
-  /*
-   * The buttons for grown-ups become round signs without words, as ℹ️ and ⚙️ are in the menus, so the row has room
-   * for the families: the name is the tooltip, is read out and heads the menu the sign opens.
-   */
-  :root[data-look="book"] .home-top .home-menu-button {
-    justify-content: center;
-    width: 44px;
-    padding: 0;
-  }
-
-  :root[data-look="book"] .home-top .home-menu-label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 }

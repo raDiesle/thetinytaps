@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { Contour, CONTOUR_PARTS, GLOW_LAYER, type ContourPart } from "./contour";
+import { skinRigid } from "./skin";
+import { mergeParts } from "./props";
 
 // Tapsi, the guide: a little fox explorer with a red bandana, built from
 // simple rounded shapes and posed by joint angles, so any movement of the
@@ -246,6 +248,8 @@ export class Guide {
   private previousTime = 0;
   /** The limbs' materials that mark where they show through the body, by part. */
   private readonly markers: [ContourPart, THREE.Material][] = [];
+  /** The see-through copies of body and head; they show something only while a limb marks where it is. */
+  private readonly ghosts: THREE.Mesh[] = [];
   /** Follow-through: the paws trail behind a quick arm, ears and tail bounce after the body. */
   private readonly sway = {
     wristL: [new Spring(160, 15), new Spring(160, 15)],
@@ -541,6 +545,17 @@ export class Guide {
     this.lap.position.set(0, 0.075, 0.19);
     this.hips.add(this.lap);
 
+    // What does not move against its joint is one mesh per material: a third fewer objects to draw and
+    // outline in every frame. Joints, fingers, toes, eyes, ears and the moving face stay apart.
+    const joints = (o: THREE.Object3D) => o.children.filter((c) => !(c instanceof THREE.Mesh));
+    mergeParts(this.spine, joints(this.spine), true);
+    mergeParts(face, [...joints(face), this.mouth], true);
+    for (const a of [this.armL, this.armR]) mergeParts(a.hand, a.fingers, true);
+    for (const l of [this.legL, this.legR]) {
+      mergeParts(l.foot, [l.toes], true);
+      mergeParts(l.toes, [], true);
+    }
+
     const parts: [THREE.Object3D, ContourPart][] = [
       [this.armL.shoulder, "armL"],
       [this.armR.shoulder, "armR"],
@@ -562,6 +577,8 @@ export class Guide {
       this.legL.hip.children[0],
       this.legR.hip.children[0],
     ]);
+    // Arms and legs, fingers and toes: one skinned mesh per look each, instead of a mesh for every part in every pass.
+    this.contour.adopt(skinRigid(parts.slice(0, 4).map(([group]) => group)));
     this.root.scale.setScalar(GUIDE_SIZE);
   }
 
@@ -640,6 +657,7 @@ export class Guide {
         );
         ghost.renderOrder = 11;
         m.add(ghost);
+        this.ghosts.push(ghost);
       }
     }
   }
@@ -747,7 +765,13 @@ export class Guide {
     this.laugh.scale.set(1, laughOpen, 1);
 
     // Only the limbs the movement is about show through the body.
-    for (const [part, m] of this.markers) m.stencilWrite = this.focus.includes(part);
+    let marking = false;
+    for (const [part, m] of this.markers) {
+      m.stencilWrite = this.focus.includes(part);
+      marking ||= m.stencilWrite;
+    }
+    // Without a mark they would draw nothing, at the cost of a draw call each.
+    for (const ghost of this.ghosts) ghost.visible = marking;
 
     this.glowMoving(p, time);
   }

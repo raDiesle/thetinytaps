@@ -1,6 +1,6 @@
 # Buchstaben & Zahlen
 
-Route `/buchstaben/` (the old `/woerter/` leads here). The only game of its home category, so the home card opens it directly.
+Route `/buchstaben/` (the old `/woerter/` leads here). The only game of its book on the home page's shelf, so the book opens straight on it.
 
 Its card plays at once (`startMode`), in the way played last (Frei tippen at first); the start screen with its two cards
 comes only after ✕ or „Menü“. Two ways to play:
@@ -19,7 +19,7 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
 
 ## Rules
 
-- Every option is changed while playing, never in the menu: ⚙️ in the top left corner, held like ✕ (`PlayOptions`),
+- Every option is changed while playing, never in the menu: ⚙️ in the top left corner (top right in the book look, where the way back takes the left), held like ✕ (`PlayOptions`),
   opens them over the game, which keeps playing behind; the start screen has no `level` row and no `settings`. The way
   to play (Frei tippen / Wörter tippen) is one of these options too. A variant of a way to play is an option of it,
   never a card of its own („Wo ist das B?“ is Wörter tippen's first letter, Zählen is Frei tippen's „Nur Zahlen“), and

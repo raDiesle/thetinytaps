@@ -1,15 +1,21 @@
 import { Navigate, useParams } from "react-router";
+import { BookContents } from "@/components/BookContents";
 import { GameCard } from "@/components/GameCard";
 import { MenuHead } from "@/components/MenuTop";
 import { Sky } from "@/components/Sky";
 import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { useT } from "@/lib/language";
+import { isBookLook } from "@/lib/look";
 import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
+import { SeoText } from "@/components/SeoText";
 
-/** One category of the home menu with its games. */
+/**
+ * One book of the home page's shelf, opened: its first page is the table of contents (BookContents), each game on a page
+ * of its own. In the toy look its games are cards.
+ */
 export function CategoryPage() {
   const { category: id } = useParams();
   const category = CATEGORIES.find((c) => c.id === id);
@@ -22,7 +28,7 @@ export function CategoryPage() {
   // An old address of a category that has only one game now.
   if (!hasPage(category)) return <Navigate to={categoryHref(category)} replace />;
   return (
-    <main className="home">
+    <main className="home" data-contents>
       <Sky />
       <MenuHead
         to="/"
@@ -33,13 +39,18 @@ export function CategoryPage() {
           </>
         }
       />
-      <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
-        {category.games.map((g) => (
-          <li key={g.href}>
-            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
-          </li>
-        ))}
-      </ul>
+      {isBookLook() ? (
+        <BookContents games={category.games} world={category.id} />
+      ) : (
+        <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
+          {category.games.map((g) => (
+            <li key={g.href}>
+              <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
+            </li>
+          ))}
+        </ul>
+      )}
+      <SeoText />
     </main>
   );
 }

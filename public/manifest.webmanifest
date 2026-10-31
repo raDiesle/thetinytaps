@@ -1,7 +1,7 @@
 {
-  "name": "The Tiny Taps – Spiele für die Kleinsten",
-  "short_name": "Tiny Taps",
-  "description": "Einfache Tastatur- und Klickspiele für Kinder ab 2 Jahren.",
+  "name": "Books for Both – Spiele für die Kleinsten",
+  "short_name": "Books for Both",
+  "description": "Einfache Tastatur- und Klickspiele für Kleinkinder.",
   "lang": "de",
   "start_url": "./",
   "scope": "./",

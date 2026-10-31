@@ -1,0 +1,10 @@
+$ORIGIN toddlerfox.com.
+$TTL 3600
+
+; Only redirects to https://booksforboth.com (Cloudflare → Rules → Redirect Rules).
+; Import with „Proxy imported DNS records“ ON: a redirect rule only sees proxied traffic.
+; 192.0.2.1 and 100:: lead nowhere on purpose – Cloudflare answers before they are reached.
+toddlerfox.com.      3600  IN  A     192.0.2.1
+toddlerfox.com.      3600  IN  AAAA  100::
+www.toddlerfox.com.  3600  IN  A     192.0.2.1
+www.toddlerfox.com.  3600  IN  AAAA  100::

@@ -647,7 +647,10 @@ Title: `चलो ब्रश करें`
 
 ## العربية (`ar`, 26 Oct 2026)
 
-Not made in Suno yet. Modern Standard Arabic. Arabic imperatives change for boy or girl
+Made in Suno on 31 Oct 2026 with the texts below. No intro: the voice begins at once, and every verse
+is sung as written, 17 s per part (113 BPM), the finale from 2:01 on; the brushing lasts 2:01, the song
+runs 2:35. `bun run song:verses` matched parts 1–2 only (Whisper spells the vowels differently), so the
+starts were written by hand: Whisper's word times, the repeated lines one part apart and the beat grid. Modern Standard Arabic. Arabic imperatives change for boy or girl
 (افتحْ / افتحي), so the verses say "let's" (هيّا نـ…, first person plural) or speak of "my
 teeth". Sound words to join in: _فَرْك_ (scrubbing), _زُن_ (buzzing circles), _فِش_ (wiping),
 _هيييه_ (hooray). Lines 3–4 repeat in parts 1–2, 3–5 and 6–7. Not yet read by a native
