@@ -33,7 +33,7 @@ export interface WizardStep {
   label: Localized;
 }
 
-/** The first step of every chart: its kind and its view, with the Vorlagen of each view to pick, one or several. */
+/** The first step of every chart: every view of both kinds, with the Vorlagen of each view to pick, one or several. */
 const FIRST_STEP: WizardStep = { id: "view", label: VIEW };
 
 /** „Leer anfangen“: a board or plan of one view with nothing on it yet. */
@@ -90,14 +90,14 @@ const ready = (draft: Draft) =>
   draft.type === "board" ? draft.board.tasks.length > 0 || draft.board.kind === "collect" : draft.plan.days.some((day) => day.length > 0);
 
 /**
- * „＋ Neu“, for a Belohnungstafel and a Zeitplan alike. The first step is the whole choice of form: on top the kind
- * (Belohnungstafel or Zeitplan, plain words, no pictures), below it every view of that kind under its name in big
- * letters – Tag, Woche, … or Ablaufplan, Jetzt – Dann, Erst – Dann, Woche – with its Vorlagen as pictures beneath. A
- * tap picks a Vorlage, another tap puts it back, so several (of both kinds) are made at once with „✓ Anlegen“. With
- * one picked, „Weiter“ goes on to its own steps – a board's tasks, reward and look, a plan's cards and look – with the
- * whole board or plan beside each step. „Leer anfangen“ in a view goes there at once. Opened on a template from the
- * gallery it starts on that template's own steps. Without `onCancel` (nothing made yet) it can't be closed: the page
- * has nothing else to show.
+ * „＋ Neu“, for a Belohnungstafel and a Zeitplan alike. The first step is the whole choice of form, both kinds on one
+ * page, each in an area of its own under its name: every view of the kind under its name in big letters – Tag, Woche,
+ * … or Ablaufplan, Jetzt – Dann, Erst – Dann, Woche – with its Vorlagen as big pictures beneath. A tap picks a Vorlage,
+ * another tap puts it back, so several (of both kinds) are made at once with „✓ Anlegen“. With one picked, „Weiter“
+ * goes on to its own steps – a board's tasks, reward and look, a plan's cards and look – with the whole board or plan
+ * beside each step. „Leer anfangen“ in a view goes there at once. On a big screen the steps are a column on the left,
+ * the two kinds under „Ansicht“ leading to their areas. Opened on a template from the gallery it starts on that
+ * template's own steps. Without `onCancel` (nothing made yet) it can't be closed: the page has nothing else to show.
  */
 export function Wizard({
   type: startType,
@@ -105,7 +105,7 @@ export function Wizard({
   onDone,
   onCancel,
 }: {
-  /** The kind shown first (the address or the chart shown). */
+  /** The kind whose area comes first (the address or the chart shown). */
   type: ChartType;
   start?: WizardStart;
   onDone: (drafts: Draft[]) => void;
@@ -113,7 +113,8 @@ export function Wizard({
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
-  const [type, setType] = useState<ChartType>(start?.type ?? startType);
+  const first = start?.type ?? startType;
+  const kinds = [...CHART_TYPES].sort((a, b) => Number(b.id === first) - Number(a.id === first));
   /** What is picked, by key, as the board or plan it makes (changed by the later steps where only one is picked). */
   const [picked, setPicked] = useState<Map<string, Draft>>(() =>
     start ? new Map([[start.type === "board" ? boardKey(start.template.id) : planKey(start.template.id), fromStart(start, language)]]) : new Map(),
@@ -142,7 +143,13 @@ export function Wizard({
     setPicked(new Map([[key, draft]]));
   };
 
-  const groups =
+  // Back on the first step, the kind's area comes into sight: its views and Vorlagen.
+  const showKind = (kind: ChartType) => {
+    setStep(0);
+    requestAnimationFrame(() => document.getElementById(`rw-area-${kind}`)?.scrollIntoView({ behavior: still() ? "auto" : "smooth", block: "start" }));
+  };
+
+  const groupsOf = (type: ChartType) =>
     type === "board"
       ? KINDS.map((kind) => ({
           id: kind.id,
@@ -182,35 +189,33 @@ export function Wizard({
       className="rw-wizard"
       aria-label={t({ de: "Neu anlegen", en: "Create new", zh: "新建", hi: "नया बनाएँ", es: "Crear nuevo", ar: "إنشاء جديد", ru: "Создать" })}
     >
-      <header className={`rw-wizard-head${id === FIRST_STEP.id ? " has-kinds" : ""}`}>
+      <header className="rw-wizard-head">
         <ol className="rw-steps">
           {(only ? steps : [FIRST_STEP]).map((s, i) => (
             <li key={s.id}>
               <button type="button" className={i === step ? "selected" : undefined} aria-current={i === step ? "step" : undefined} onClick={() => setStep(i)}>
                 <span className="rw-step-number">{i + 1}</span> <span className="rw-step-label">{t(s.label)}</span>
               </button>
+              {/* Under „Ansicht“, on a big screen: the two kinds, each leading to its area, with how many are picked. */}
+              {s.id === FIRST_STEP.id && (
+                <ul className="rw-step-kinds" aria-label={t({ de: "Art", en: "Type", zh: "类型", hi: "प्रकार", es: "Tipo", ar: "النوع", ru: "Тип" })}>
+                  {kinds.map((kind) => {
+                    const count = drafts.filter((d) => d.type === kind.id).length;
+                    return (
+                      <li key={kind.id}>
+                        <button type="button" className={count ? "selected" : undefined} onClick={() => showKind(kind.id)}>
+                          <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
+                          {count > 0 && <span className="rw-kind-count">{count}</span>}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </li>
           ))}
         </ol>
-        {/* The kind: plain words, no pictures – the views below show what each makes. */}
-        {id === FIRST_STEP.id && (
-          <div className="rw-kinds" role="group" aria-label={t({ de: "Art", en: "Type", zh: "类型", hi: "प्रकार", es: "Tipo", ar: "النوع", ru: "Тип" })}>
-            {CHART_TYPES.map((kind) => (
-              <button
-                key={kind.id}
-                type="button"
-                className={kind.id === type ? "selected" : undefined}
-                aria-pressed={kind.id === type}
-                onClick={() => setType(kind.id)}
-              >
-                <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
-                {drafts.some((d) => d.type === kind.id) && kind.id !== type && (
-                  <span className="rw-kind-count">{drafts.filter((d) => d.type === kind.id).length}</span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
+        <Help className="rw-wizard-help-side" />
         {onCancel && (
           <button
             type="button"
@@ -225,49 +230,53 @@ export function Wizard({
 
       <div className={`rw-wizard-body${own ? "" : " rw-wizard-wide"}`}>
         <div className="rw-wizard-step">
-          {id === FIRST_STEP.id && (
-            <>
-              <div className="rw-view-groups">
-                {groups.map((group) => (
-                  <section key={group.id} className="rw-view-group" style={{ "--rw-tiles": Math.max(1, group.tiles.length) } as CSSProperties}>
-                    {/* The view's name stands over its pictures, as the name of what they show. */}
-                    <div className="rw-view-head">
-                      <h2 className="rw-view-name">
-                        <span aria-hidden>{group.emoji}</span> {t(group.label)}
-                      </h2>
-                      {/* No picture of anything: a small button beside the view's name, not a tile among the Vorlagen. */}
-                      <button type="button" className="rw-view-blank" onClick={() => blank(group.blank.key, group.blank.make())}>
-                        <span aria-hidden>✏️</span> {t(START_BLANK)}
-                      </button>
-                    </div>
-                    <ul className="rw-gallery rw-gallery-big">
-                      {group.tiles.map((tile) => {
-                        const selected = picked.has(tile.key);
-                        return (
-                          <li key={tile.key}>
-                            <button
-                              type="button"
-                              className={`rw-tpl${selected ? " selected" : ""}`}
-                              aria-pressed={selected}
-                              onClick={() => toggle(tile.key, tile.make)}
-                            >
-                              {tile.picture}
-                              <span className="rw-tpl-name">
-                                <span aria-hidden>{tile.emoji}</span> {t(tile.label)}
-                              </span>
-                              <span className="rw-tpl-check" aria-hidden>
-                                ✓
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </section>
-                ))}
-              </div>
-            </>
-          )}
+          {id === FIRST_STEP.id &&
+            kinds.map((kind) => (
+              <section key={kind.id} id={`rw-area-${kind.id}`} className="rw-kind-area" aria-label={t(kind.label)}>
+                <h2 className="rw-kind-name">
+                  <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
+                </h2>
+                <div className="rw-view-groups">
+                  {groupsOf(kind.id).map((group) => (
+                    <section key={group.id} className="rw-view-group" style={{ "--rw-tiles": Math.max(1, group.tiles.length) } as CSSProperties}>
+                      {/* The view's name stands big over its pictures, as the name of what they show. */}
+                      <div className="rw-view-head">
+                        <h3 className="rw-view-name">
+                          <span aria-hidden>{group.emoji}</span> {t(group.label)}
+                        </h3>
+                        {/* No picture of anything: a small button beside the view's name, not a tile among the Vorlagen. */}
+                        <button type="button" className="rw-view-blank" onClick={() => blank(group.blank.key, group.blank.make())}>
+                          <span aria-hidden>✏️</span> {t(START_BLANK)}
+                        </button>
+                      </div>
+                      <ul className="rw-gallery rw-gallery-big">
+                        {group.tiles.map((tile) => {
+                          const selected = picked.has(tile.key);
+                          return (
+                            <li key={tile.key}>
+                              <button
+                                type="button"
+                                className={`rw-tpl${selected ? " selected" : ""}`}
+                                aria-pressed={selected}
+                                onClick={() => toggle(tile.key, tile.make)}
+                              >
+                                {tile.picture}
+                                <span className="rw-tpl-name">
+                                  <span aria-hidden>{tile.emoji}</span> {t(tile.label)}
+                                </span>
+                                <span className="rw-tpl-check" aria-hidden>
+                                  ✓
+                                </span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </section>
+                  ))}
+                </div>
+              </section>
+            ))}
 
           {only?.type === "board" && own && <BoardStep step={id} board={only.board} onChange={(board) => change({ type: "board", board })} />}
           {only?.type === "plan" && own && <PlanStepView step={id} plan={only.plan} onChange={(plan) => change({ type: "plan", plan })} />}
@@ -277,9 +286,13 @@ export function Wizard({
       </div>
 
       <footer className="rw-wizard-foot">
-        <button type="button" className="rw-wizard-back" disabled={step === 0} onClick={() => setStep(step - 1)}>
-          ‹ {t({ de: "Zurück", en: "Back", zh: "上一步", hi: "पीछे", es: "Atrás", ar: "السابق", ru: "Назад" })}
-        </button>
+        {/* Nothing to go back to on the first step: no greyed „Zurück“ there. */}
+        {step > 0 && (
+          <button type="button" className="rw-wizard-back" onClick={() => setStep(step - 1)}>
+            ‹ {t({ de: "Zurück", en: "Back", zh: "上一步", hi: "पीछे", es: "Atrás", ar: "السابق", ru: "Назад" })}
+          </button>
+        )}
+        <Help className="rw-wizard-help-foot" />
         {only && step < steps.length - 1 && (
           <button type="button" className="rw-wizard-next" onClick={() => setStep(step + 1)}>
             {t({ de: "Weiter", en: "Next", zh: "下一步", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Далее" })} ›
@@ -307,5 +320,24 @@ export function Wizard({
         )}
       </footer>
     </section>
+  );
+}
+
+/** Whether the grown-up asked for less motion: the jump to a kind's area is then instant. */
+const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/**
+ * What the wizard is for, on every step (user feedback, October 2026): the chart works on screen, printed to make at
+ * home or ordered as photo prints, and several are picked and made at once, each then a tab of its own. Beside the
+ * steps on a big screen and a phone, between the buttons at the foot elsewhere – only one of the two shows.
+ */
+function Help({ className }: { className: string }) {
+  const t = useT();
+  return (
+    <p className={`rw-wizard-help ${className}`}>
+      {t({
+        de: "Nutzen Sie Tafeln und Pläne hier am Bildschirm, drucken Sie sie aus und basteln Sie sie selbst – oder bestellen Sie die Bilder als Fotoabzug. Tippen Sie ruhig mehrere Vorlagen an: Sie werden auf einmal angelegt und stehen danach oben als Reiter, zum Wechseln mit einem Tipp.",
+      })}
+    </p>
   );
 }
