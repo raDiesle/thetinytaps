@@ -26,7 +26,7 @@ export const bookIdeas: IdeaArea = {
     {
       id: "D-02",
       partial:
-        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Fuchs- oder Bärenpaare passend zu jeder Welt und Oma und Opa (D-21) fehlen noch.",
+        "Fuchs- und Bärenfamilie stehen unten auf jeder Menüseite, die Füchse links, die Bären rechts – auf breiten Bildschirmen (ab 1400 px) neben den Karten, auf Handys und Tablets unter den Karten, wo die Seite ihnen Platz lässt (statt Scheune und Bäumen). Fuchs- oder Bärenpaare passend zu jeder Welt und Oma und Opa (D-21) fehlen noch.",
       emoji: "🦊",
       title: "Tiereltern am Seitenrand",
       text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: die Fuchs- und die Bärenfamilie, und später in jeder Welt ein Großer mit seinem Kind, wie sie zu ihr passen (Papa Bär und das Bärenkind mit Bauhelm auf der Baustelle, Oma Fuchs und das Fuchskind in Gummistiefeln auf dem Bauernhof). Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
@@ -190,6 +190,14 @@ export const bookIdeas: IdeaArea = {
       text: "Neben den Karten und auf den Kapitelseiten liest nicht immer Mama oder Papa mit dem Kind: mal ist es Oma Fuchs, mal Opa Bär, die mit dem Fuchs- oder Bärenkind ins Buch schauen. Wer gerade vorliest, wechselt von Besuch zu Besuch; das Cover bleibt bei den zwei Familien. Vier Gemini-Bilder (Oma und Opa Fuchs, Oma und Opa Bär, jeweils mit dem Kind, freigestellt wie buch-fuechse.webp), im Sammel-Batch der Tabelle „🦊🐻 Fuchs & Bär“. In den Spielen kommen Oma und Opa wie Mama und Papa als der Große neben dem Tierkind vor (D-18).",
       why: "Viele Kinder spielen und lesen mit Oma und Opa – auch sie sollen sich im Buch wiederfinden, nicht nur Eltern.",
       effort: "S",
+    },
+    {
+      id: "D-22",
+      emoji: "🎨",
+      title: "Jedes Buch in seinem eigenen Stil, jede Seite eigens gestaltet",
+      text: "Heute sehen alle Bücher innen gleich aus: dasselbe Papier, dieselben Karten, nur die Farben und die Welt im Hintergrund wechseln. Jedes Buch im Regal bekommt einen eigenen Stil, wie echte Bilderbücher von verschiedenen Zeichnern: „Lebendige Welten“ in Wasserfarben, „Zuordnen“ wie aus Papier ausgeschnitten und aufgeklebt, „Buchstaben & Zahlen“ wie ein Stempel- oder Holzklötzchenbuch, „Für jeden Tag“ mit Buntstift gezeichnet. Darüber hinaus kann jede Seite eines Buchs (das Inhaltsverzeichnis, die Startseite jedes Spiels) einzeln gestaltet sein: ein eigenes Bild, eine eigene Anordnung der Karten, eine kleine Szene am Rand, die zum Spiel passt. Alles in book.css und Worlds.tsx je Buch (data-world), ohne dass die Spiele selbst etwas tun müssen.",
+      why: "Ein Regal voller gleich aussehender Bücher wirkt wie eine App; verschiedene Stile machen jedes Buch zu einem eigenen Ding, das Kinder wiedererkennen und auf das sie sich freuen.",
+      effort: "L",
     },
   ],
 };

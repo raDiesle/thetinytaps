@@ -13,7 +13,7 @@ grown-ups' buttons on the right next to it.
 
 The story (`PottyPlay.tsx`, once called „Muss mal!“): one story for both needs, since a child often can't tell beforehand.
 The game has no modes. Opening it (its tile on the home menu) starts the story at once (`GameShell`'s `startMode`); the
-start screen, with only „Los geht’s!“ and the info, shows only after leaving with ✕ or „Menü“. It opens on the first step, `eat`: Tapsi the fox
+start screen, with only „Los geht’s!“, shows only after leaving with ✕ or „Menü“. It opens on the first step, `eat`: Tapsi the fox
 (`TAPSI` in `content.ts`) at the kitchen table, eating and drinking by turns (the `essen` and `trinken` pictures are that step's
 frames, moving at once).
 Every tap on the picture or background (anything but a button) and every key does the most sensible thing there
@@ -103,7 +103,7 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
   whole story of about 50 pictures drawn again. Never add another animal or family unless the user asks for it.
 - The game is opened when the child has to go now: the tile starts the story at once, with no start screen or
   submenu before it, and the game has no modes – everything (the star too) is a step of the one story, the start
-  screen behind ✕ has only „Los geht’s!“ and the info. Never add a mode card for something the story can show as a step.
+  screen behind ✕ has only „Los geht’s!“. Never add a mode card for something the story can show as a step.
 - So unlike other games the picture moves before any tap (the user's choice): Tapsi eats and drinks by turns. Eating
   and drinking are one step, never two.
 - The first steps never go on by themselves (`Step.nudge`; going on alone after three seconds was too fast for the user),

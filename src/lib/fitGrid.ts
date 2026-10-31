@@ -109,11 +109,17 @@ function contentHeight(page: HTMLElement) {
 export const isPhone = () => Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
 
 /**
+ * Room the page keeps free under its cards for a picture standing there: `--menu-floor`, a registered length
+ * (`@property` in `book.css`, so it reads as pixels), the book look's animal families at the bottom of the page.
+ */
+const floorOf = (page: HTMLElement) => parseFloat(getComputedStyle(page).getPropertyValue("--menu-floor")) || 0;
+
+/**
  * How tall `part` of the menu `page` may grow so that the page's first screen holds everything above and below it
  * (not what waits `data-below-fold`), with the room under the last row the cards keep.
  */
 export function roomFor(part: HTMLElement, page: HTMLElement) {
-  return window.innerHeight - (contentHeight(page) - part.offsetHeight) - (isPhone() ? BOTTOM_PHONE : BOTTOM);
+  return window.innerHeight - (contentHeight(page) - part.offsetHeight) - Math.max(isPhone() ? BOTTOM_PHONE : BOTTOM, floorOf(page));
 }
 
 /**

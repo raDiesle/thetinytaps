@@ -53,7 +53,7 @@ the app language (🌐, `useLanguagePack()`), never in another one and never wit
   with tone marks, no key needed for a tone): the characters stand above, the pinyin under them; the voice says the
   Chinese word, and letters are named as Chinese children read pinyin (b → 玻).
 - Hindi and Arabic letters have one form (`hasCase`): the options hide A / A a / a and the game plays with the one form.
-- The examples in the options and in „Über das Spiel“ use `sampleLetter` (B, Russian Б, or the pack's `exampleLetter`: Hindi क, Arabic ب).
+- The examples in the options use `sampleLetter` (B, Russian Б, or the pack's `exampleLetter`: Hindi क, Arabic ب).
 - A new pack needs every letter with a spoken name and words (a letter no word starts with, like Ъ Ы Ь, Hindi ङ ञ ण ष
   or pinyin I O U, gets `inWord: true` and words with it inside; the card marks it there), number words 0–9, counting
   that is right for 0–9 (three forms in `ru.ts`/`pl.ts`, gender and dual in `ar.ts`, measure words in `zh.ts`) and keyboard

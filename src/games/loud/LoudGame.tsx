@@ -91,43 +91,6 @@ export function LoudGame() {
           ]}
         />
       }
-      info={
-        <>
-          <p>
-            {t({
-              de: "Löwe und Maus: Ruft das Kind laut, brüllt der Löwe und springt. Spricht oder flüstert es leise, piepst die kleine Maus. Nach zehn Tönen geht es mit „Weiter“ zum Pusten.",
-              en: "Lion and Mouse: when the child shouts loudly, the lion roars and jumps. When the child talks or whispers quietly, the little mouse squeaks. After ten sounds, “Next” goes on to Blowing.",
-              zh: "狮子和老鼠：孩子大声喊，狮子就吼叫着跳起来；孩子小声说话或轻声耳语，小老鼠就吱吱叫。十个声音之后，点“继续”就进入“吹一吹”。",
-              hi: "शेर और चूहा: बच्चा ज़ोर से चिल्लाए तो शेर दहाड़ता है और उछलता है। धीरे से बोले या फुसफुसाए तो छोटा चूहा चूँ-चूँ करता है। दस आवाज़ों के बाद “आगे” से “फूँकना” शुरू होता है।",
-              es: "El león y el ratón: si el niño o la niña grita fuerte, el león ruge y salta. Si habla o susurra bajito, chilla el ratoncito. Después de diez sonidos, «Siguiente» lleva a Soplar.",
-              ar: "الأسد والفأر: عندما يصرخ الطفل بصوت عالٍ يزأر الأسد ويقفز. وعندما يتكلم أو يهمس بهدوء يصيء الفأر الصغير. بعد عشرة أصوات ينتقل «التالي» إلى النفخ.",
-              ru: "Лев и мышка: если ребёнок громко кричит, лев рычит и прыгает. Если говорит или шепчет тихо, пищит маленькая мышка. После десяти звуков «Дальше» ведёт к игре «Дуем».",
-            })}
-          </p>
-          <p>
-            {t({
-              de: "Pusten: Ins Mikrofon pusten bläst die Kerzen auf dem Geburtstagskuchen aus, lässt die Schirmchen der Pusteblume fliegen, dreht ein Windrad, bis der Regenbogen fertig ist, und treibt das Segelboot mit der Maus zum Löwen. Lautes Rufen pustet auch; so laut wie für den Löwen ist ganz fest gepustet.",
-              en: "Blowing: blowing into the microphone blows out the candles on the birthday cake, makes the dandelion fluff fly, spins a pinwheel until the rainbow is done, and drives the sailboat with the mouse to the lion. Loud shouting blows too; as loud as for the lion means blowing really hard.",
-              zh: "吹一吹：对着麦克风吹气，可以吹灭生日蛋糕上的蜡烛，吹飞蒲公英的小伞，吹转风车直到彩虹画好，还能把载着小老鼠的帆船吹到狮子那里。大声喊也算吹；像让狮子吼那么大声，就是用力吹。",
-              hi: "फूँकना: माइक्रोफ़ोन में फूँकने से जन्मदिन के केक की मोमबत्तियाँ बुझती हैं, सिंहपर्णी के रुएँ उड़ते हैं, फिरकी तब तक घूमती है जब तक इंद्रधनुष पूरा न हो, और पाल वाली नाव चूहे को शेर के पास ले जाती है। ज़ोर से चिल्लाना भी फूँक गिना जाता है; शेर जितनी ज़ोर से, यानी बहुत ज़ोर से फूँकना।",
-              es: "Soplar: al soplar en el micrófono se apagan las velas del pastel de cumpleaños, vuelan las semillitas del diente de león, gira un molinillo hasta que el arcoíris está completo y el velero lleva al ratón hasta el león. Gritar fuerte también sopla; tan fuerte como para el león es soplar muy fuerte.",
-              ar: "النفخ: النفخ في الميكروفون يطفئ شموع كعكة عيد الميلاد، ويُطيّر مظلات زهرة الهندباء، ويُدير مروحة ورقية حتى يكتمل قوس قزح، ويدفع المركب الشراعي بالفأر إلى الأسد. الصراخ العالي ينفخ أيضًا؛ وبقدر علوّ الصوت للأسد يكون النفخ قويًّا جدًّا.",
-              ru: "Дуем: если дуть в микрофон, гаснут свечки на праздничном торте, разлетаются пушинки одуванчика, крутится вертушка, пока не появится радуга, и парусник везёт мышку ко льву. Громкий крик тоже дует; так громко, как для льва, — значит, подуть очень сильно.",
-            })}
-          </p>
-          <p>
-            {t({
-              de: "Das Spiel misst nur, wie laut es gerade ist – nichts wird aufgenommen, gespeichert oder verschickt. Antippen geht auch: Ein Tipp ist ein kurzer Puster, Finger draufhalten pustet weiter.",
-              en: "The game only measures how loud it is right now – nothing is recorded, saved or sent. Tapping works too: a tap is a short puff, holding a finger down keeps blowing.",
-              zh: "游戏只测量当前有多大声——不录音、不保存、不发送任何内容。点屏幕也可以：点一下是短短吹一口，按住不放就一直吹。",
-              hi: "खेल सिर्फ़ यह मापता है कि अभी कितनी आवाज़ है – कुछ भी रिकॉर्ड, सेव या भेजा नहीं जाता। टैप करना भी चलता है: एक टैप एक छोटी फूँक है, उँगली दबाए रखने से फूँक चलती रहती है।",
-              es: "El juego solo mide qué tan fuerte suena en este momento: no se graba, guarda ni envía nada. También se puede tocar: un toque es un soplido corto, y mantener el dedo sigue soplando.",
-              ar: "اللعبة تقيس فقط مدى علوّ الصوت الآن – لا يُسجَّل شيء ولا يُحفظ ولا يُرسل. اللمس يعمل أيضًا: اللمسة نفخة قصيرة، وإبقاء الإصبع ضاغطًا يواصل النفخ.",
-              ru: "Игра только измеряет, насколько сейчас громко, — ничего не записывается, не сохраняется и не отправляется. Нажимать тоже можно: короткое нажатие — короткий порыв ветра, если держать палец, ветер дует дальше.",
-            })}
-          </p>
-        </>
-      }
       settings={
         <SettingsGroup title={t({ de: "Mikrofon", en: "Microphone", zh: "麦克风", hi: "माइक्रोफ़ोन", es: "Micrófono", ar: "الميكروفون", ru: "Микрофон" })}>
           <MicCheck sensitivity={settings.sensitivity} />
