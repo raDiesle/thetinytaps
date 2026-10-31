@@ -173,9 +173,7 @@ export function PrivacyPage() {
 
       <section className="legal-panel">
         <h2>Kinder</h2>
-        <p>
-          Die Spiele sind für Kinder ab 2 Jahren gemacht. Sie fragen keine Namen ab, haben keine Konten und keine Chats und senden nichts über Ihr Kind an uns.
-        </p>
+        <p>Die Spiele sind für kleine Kinder gemacht. Sie fragen keine Namen ab, haben keine Konten und keine Chats und senden nichts über Ihr Kind an uns.</p>
       </section>
 
       <section className="legal-panel">

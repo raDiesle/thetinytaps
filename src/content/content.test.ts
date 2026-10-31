@@ -4,7 +4,7 @@ import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
 import { MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
-import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SITE_NAME, fullTitle, splitLanguage } from "./seo";
+import { NO_INDEX_PATHS, PREVIEW_IMAGE, SEO_PAGES, SITE_NAME, SITE_PROMISE, fullTitle, splitLanguage } from "./seo";
 import { SEO_EN } from "./seo.en";
 import { SCENES } from "../games/scenes";
 import { WORLDS } from "../components/Worlds";
@@ -137,6 +137,25 @@ describe("search engine texts (seo.ts)", () => {
 
   test("grown-up pages are never in the search pages", () => {
     for (const path of NO_INDEX_PATHS) expect(paths).not.toContain(path);
+  });
+});
+
+describe("no age to start at", () => {
+  // Each family decides when its child starts with screens (the home page's foot says so), so nothing about the site
+  // names an age it is for – no „ab 2“, „2- bis 3-Jährige“, „Ages 2+“ (user decision, October 2026).
+  const AGE = /\b(ab|aged?|ages|from|für) (2|zwei|two)\b|\b2\s*(-|–| bis | to | and )\s*3\b|-Jährige|year.?olds?|Ages? \d\+/i;
+
+  test.each([
+    ["SITE_PROMISE", SITE_PROMISE],
+    ["SEO_EN.promise", SEO_EN.promise],
+    ...SEO_PAGES.map((page) => [page.path, `${page.title} ${page.description} ${page.text}`]),
+    ...Object.entries(SEO_EN.pages).map(([path, page]) => [`/en${path}`, `${page.title} ${page.description} ${page.text}`]),
+    ...["index.html", "public/manifest.webmanifest", "README.md", "src/pages/LegalPage.tsx", "src/pages/Home.tsx"].map((file) => [
+      file,
+      readFileSync(file, "utf8"),
+    ]),
+  ])("%s names no age", (_, text) => {
+    expect(text.match(AGE)?.[0]).toBeUndefined();
   });
 });
 

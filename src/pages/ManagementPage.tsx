@@ -23,6 +23,7 @@ import {
 } from "@/content/ideas";
 import { RESEARCH, type Research } from "@/content/research";
 import { TARGET_LANGUAGES, type TargetLanguage } from "@/content/targetLanguages";
+import { buildDate } from "@/lib/pwa";
 import { useStoredSettings } from "@/lib/storage";
 import { useTitle } from "@/lib/title";
 import "@/styles/ideas.css";
@@ -161,6 +162,7 @@ export function ManagementPage() {
       <h1>
         <span aria-hidden>🧭</span> Management
       </h1>
+      <p className="ideas-build">Stand: {buildDate()}</p>
       <p className="home-subtitle">
         Alles, was beim Entscheiden hilft: Ideen, Sprachen, Recherchen, Bildvorschläge. {active - done} offene Ideen, {done} schon umgesetzt, {rejected}{" "}
         abgelehnt. Die Nummern (z.&nbsp;B. <b>N-03</b>) bleiben fest, damit man sie nennen kann.
