@@ -334,7 +334,7 @@ function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; o
       onClick={onClick}
     >
       <span className="box-front">
-        <SpineLabel title={t(book.title)} />
+        <SpineLabel title={t(book.title)} emoji={book.emoji} />
       </span>
       <span className="box-left" />
       <span className="box-right" />
@@ -346,10 +346,13 @@ function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; o
   );
 }
 
-/** The paper label on the spine of a game's own book, its name running down it. */
-function SpineLabel({ title }: { title: string }) {
+/** The paper label on the spine of a game's own book: its emoji on top, so a child finds it at a glance, its name running down below. */
+function SpineLabel({ title, emoji }: { title: string; emoji: string }) {
   return (
     <span className="shelf-daily-label">
+      <span className="shelf-daily-emoji" aria-hidden>
+        {emoji}
+      </span>
       <span className="shelf-daily-title">{title}</span>
     </span>
   );
@@ -363,7 +366,7 @@ function BookFaces({ book, spine }: { book: ShelfBook; spine?: boolean }) {
   const t = useT();
   return (
     <>
-      <span className="box-left">{spine && <SpineLabel title={t(book.title)} />}</span>
+      <span className="box-left">{spine && <SpineLabel title={t(book.title)} emoji={book.emoji} />}</span>
       <span className="box-right" />
       <span className="box-top" />
       <span className="shelf-book-cover">
