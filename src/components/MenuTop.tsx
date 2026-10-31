@@ -27,7 +27,7 @@ export function MenuTop({ to, back, children }: { to: string; back: string; chil
  * cards where a grown-up looks, and the fullscreen button on the right, across from the sun in the top left corner.
  * `children`, such as a start screen's labelled buttons for grown-ups, go in a row of their own under the title.
  * In the book look the way back is the page's corner in the top left instead (PageCorner), and the fullscreen button and
- * ⚙️ are paper tabs taped on at the page's top edge (`book.css`).
+ * ⚙️ are paper notes clipped onto the page's top edge (`book.css`).
  */
 export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: ReactNode; tools?: ReactNode; children?: ReactNode }) {
   return (
