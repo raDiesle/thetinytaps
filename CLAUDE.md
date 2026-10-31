@@ -121,6 +121,9 @@ In a fresh worktree run `bun install` first.
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
   in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines are German and English (see Search engines).
+- Texts for parents (the home page's foot, `info`, the SEO texts' prose) speak as the parents who made the app: warm,
+  flowing sentences in our own words, the way one parent tells another. The user's notes on what to say are a rough
+  guide, never wording to copy or to turn into a list of steps (user feedback, October 2026).
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games
@@ -382,8 +385,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
   browser's language. Texts say only what the page really does. No text names an age the app is for („ab 2“,
   „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
-  screens, which the home page's foot explains with the steps from analog to digital – Books for Both always on the
-  first, played together (user decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
+  screens, which the home page's foot („Ein paar Worte von uns“) tells: the real world first, then a screen together,
+  later a learning game alone, plain watching least – Books for Both meant as that first step together (user
+  decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
   it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a

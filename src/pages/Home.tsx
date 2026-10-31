@@ -25,38 +25,33 @@ const IDEAS_HOLD_MS = 2000;
 const HREFS = CATEGORIES.map(categoryHref);
 
 /**
- * For parents at the foot of the home page: no age to start at (each family decides that itself), but the steps
- * from analog to digital, best first, and where this book stands among them – always on the first step into digital,
- * played together.
+ * For parents at the foot of the home page, a few words from us as parents: why no age is named (each family decides
+ * when screens come in), that the real world comes first, then playing on a screen together, a learning game alone
+ * later, and plain watching least – and that this book means to be that first step together.
  */
-function MediaSteps() {
+function ParentsNote() {
   const t = useT();
   return (
-    <section className="seo-text media-steps">
-      <h2>{t({ de: "Wann ist die richtige Zeit für Bildschirme?" })}</h2>
+    <section className="seo-text parents-note">
+      <h2>{t({ de: "Ein paar Worte von uns" })}</h2>
       <p>
         {t({
-          de: "Das entscheiden Sie als Eltern – Sie kennen Ihr Kind am besten. Darum nennen wir kein Alter. Digitale Medien sind für kleine Kinder immer ein Grenzfall, und Analoges ist immer besser. Wenn Ihr Kind anfängt, hilft diese Reihenfolge, von der besten Stufe zur schlechtesten:",
+          de: "Wir sind selbst Eltern und haben Books for Both gemacht, weil wir uns immer wieder dieselbe Frage gestellt haben: Wie viel Bildschirm tut einem kleinen Kind eigentlich gut? Eine Altersangabe finden Sie hier deshalb nicht. Wann Ihr Kind die ersten Schritte ins Digitale macht, wissen Sie selbst am besten – jedes Kind ist anders, und jede Familie auch.",
         })}
       </p>
-      <ol>
-        <li>
-          <b>{t({ de: "Die echte Welt und analoge Spiele" })}</b> –{" "}
-          {t({ de: "draußen sein, Bücher, Bauklötze, zusammen spielen. Das kommt vor allem Digitalen." })}
-        </li>
-        <li>
-          <b>{t({ de: "Digital zusammen mit Ihnen" })}</b> – {t({ de: "Groß und Klein schauen, tippen und reden gemeinsam." })}
-        </li>
-        <li>
-          <b>{t({ de: "Lernspiele allein" })}</b> – {t({ de: "später spielt Ihr Kind einfache Lernspiele auch ohne Sie." })}
-        </li>
-        <li>
-          <b>{t({ de: "Passiver Medienkonsum" })}</b> – {t({ de: "Videos und Serien, bei denen das Kind nur zuschaut, sind die schlechteste Stufe." })}
-        </li>
-      </ol>
       <p>
         {t({
-          de: "Books for Both bleibt immer auf der ersten Stufe vom Analogen ins Digitale: ein Bilderbuch, das Sie zusammen mit Ihrem Kind anschauen. So bekommt Ihr Kind einen guten Einstieg in den Umgang mit Medien.",
+          de: "Ehrlich gesagt ist das Schönste ohnehin nicht digital. In Pfützen springen, Türme bauen und wieder umwerfen, ein Bilderbuch so oft vorlesen, bis alle es auswendig können – die echte Welt bleibt der beste Spielplatz, und kein Bildschirm kommt da heran.",
+        })}
+      </p>
+      <p>
+        {t({
+          de: "Kommt der Bildschirm doch dazu, dann am liebsten zusammen: auf dem Schoß, ein kleiner Finger auf dem Bild, viel Staunen und Erzählen dazwischen. Später darf ein Kind auch mal allein ein kleines Lernspiel spielen. Am wenigsten halten wir vom bloßen Zuschauen, ein Video nach dem anderen, ohne selbst etwas zu tun.",
+        })}
+      </p>
+      <p>
+        {t({
+          de: "Genau für diesen ersten gemeinsamen Schritt ist Books for Both gedacht: ein Bilderbuch, das Sie zusammen aufschlagen, das auf jedes Antippen antwortet – und das sich genauso gut wieder zuklappen lässt, um draußen weiterzuspielen. Wir wünschen Ihnen und Ihrem Kind viele schöne Momente damit, auf dem Bildschirm und noch viel mehr daneben.",
         })}
       </p>
     </section>
@@ -114,7 +109,7 @@ export function Home() {
       <InstallHint />
       <BookCover />
       <SeoText>
-        <MediaSteps />
+        <ParentsNote />
         <p className="home-version">
           <LegalLink to="/impressum/">{t({ de: "Impressum" })}</LegalLink> · <LegalLink to="/datenschutz/">{t({ de: "Datenschutz" })}</LegalLink>
         </p>
