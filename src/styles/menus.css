@@ -304,7 +304,7 @@ button.game-card:focus-visible {
 
 /*
  * At the very end of a menu, for parents and search engines: what the page is (SeoText), and on the home page
- * when the running version was built. Seen only after scrolling down: it starts below the first screen even
+ * the steps from analog to digital and the legal links. Seen only after scrolling down: it starts below the first screen even
  * when everything else fits on it.
  */
 .page-foot {
@@ -336,6 +336,20 @@ button.game-card:focus-visible {
 
 .seo-text p {
   margin: 0 0 8px;
+}
+
+/* The steps from analog to digital (home page): a list reads better from the left. */
+.media-steps {
+  text-align: left;
+}
+
+.media-steps ol {
+  margin: 0 0 8px;
+  padding-left: 1.4em;
+}
+
+.media-steps li {
+  margin-bottom: 4px;
 }
 
 .home-version {

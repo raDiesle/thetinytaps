@@ -67,12 +67,12 @@ export function splitLanguage(pathname: string): { language: SeoLanguage; path: 
 }
 
 /** What every page says about the whole site, after its own text. */
-export const SITE_PROMISE = "Kostenlos, ohne Werbung, ohne Anmeldung, funktioniert offline. Für Kinder ab 2 Jahren, mit Touch oder Tastatur.";
+export const SITE_PROMISE = "Kostenlos, ohne Werbung, ohne Anmeldung, funktioniert offline. Mit Touch oder Tastatur, am besten zusammen mit einem Erwachsenen.";
 
 const scene = (id: string, title: string, things: string): PageSeo => ({
   path: `/bilder/${id}/`,
-  title: `Wimmelbild ${title} für Kinder ab 2`,
-  description: `Wimmelbild ${title} zum Antippen: ${things} bewegen sich und machen Geräusche. Für Kinder ab 2, kostenlos und ohne Werbung.`,
+  title: `Wimmelbild ${title} für Kleinkinder`,
+  description: `Wimmelbild ${title} zum Antippen: ${things} bewegen sich und machen Geräusche. Für Kleinkinder, kostenlos und ohne Werbung.`,
   text: `Ein lebendiges Wimmelbild: ${things} – jedes Antippen bringt etwas zum Leben, mit Geräusch und Bewegung. Dazu Suchen, Ausmalen und freies Entdecken.`,
 });
 
@@ -80,21 +80,19 @@ const scene = (id: string, title: string, things: string): PageSeo => ({
 export const SEO_PAGES: PageSeo[] = [
   {
     path: "/",
-    title: "Spiele für Kinder ab 2 – kostenlos, ohne Werbung",
-    description:
-      "Lernspiele für 2- bis 3-Jährige: Wimmelbilder, Zähneputzen mit Lied, Bewegungsspiele, Buchstaben und Tiere. Kostenlos, ohne Werbung, offline.",
+    title: "Spiele für Kleinkinder – kostenlos, ohne Werbung",
+    description: "Lernspiele für Kleinkinder: Wimmelbilder, Zähneputzen mit Lied, Bewegungsspiele, Buchstaben und Tiere. Kostenlos, ohne Werbung, offline.",
     text: "Books for Both ist ein Regal voller Bilderbücher zum Spielen, für Groß und Klein zusammen: Jedes Antippen und jede Taste macht sofort etwas, es gibt kein Falsch und nichts zu lesen. Wimmelbilder, Zähneputzen mit Lied, Bewegungsabenteuer, Gefühle, Buchstaben und Zahlen, Zuordnen und mehr.",
   },
   {
     path: "/spiele/lebendige-welten/",
-    title: "Wimmelbilder und Geschichten für Kinder ab 2",
-    description:
-      "Lebendige Wimmelbilder, Bewegungsspiele, Gefühle und kleine Abenteuer, die auf jedes Antippen antworten. Für Kinder ab 2 Jahren, ohne Werbung.",
+    title: "Wimmelbilder und Geschichten für Kleinkinder",
+    description: "Lebendige Wimmelbilder, Bewegungsspiele, Gefühle und kleine Abenteuer, die auf jedes Antippen antworten. Für Kleinkinder, ohne Werbung.",
     text: "Bilder und Geschichten, die auf jedes Antippen antworten: Lebendige Bilder, Bewegungsabenteuer zum Mitmachen, Gefühle, Kettenreaktionen und Kleine Abenteuer.",
   },
   {
     path: "/spiele/zuordnen/",
-    title: "Zuordnen lernen – Spiele für Kinder ab 2",
+    title: "Zuordnen lernen – Spiele für Kleinkinder",
     description:
       "Was gehört zusammen? Tiere füttern, Schatten finden und Socken-Paare suchen – erste Zuordnungsspiele für Kleinkinder, kostenlos und ohne Werbung.",
     text: "Erste Zuordnungsspiele: Futter zum Tier bringen, den passenden Schatten finden, Socken-Paare an die Leine hängen. Antippen oder hinziehen, ohne Fehler.",
@@ -110,17 +108,18 @@ export const SEO_PAGES: PageSeo[] = [
     path: "/bilder/",
     title: "Lebendige Wimmelbilder zum Antippen für Kinder",
     description: "Über 20 Wimmelbilder für Kleinkinder: Baustelle, Bauernhof, Zoo, Feuerwache und mehr. Alles bewegt sich und macht Geräusche – ohne Werbung.",
-    text: "Wimmelbilder, die lebendig werden: Bagger baggern, Kühe muhen, das Feuerwehrauto fährt los. Mit Suchen, Ausmalen, Straßen malen und Entdecken, für Kinder ab 2 Jahren.",
+    text: "Wimmelbilder, die lebendig werden: Bagger baggern, Kühe muhen, das Feuerwehrauto fährt los. Mit Suchen, Ausmalen, Straßen malen und Entdecken, für Kleinkinder.",
   },
   {
     path: "/abenteuer/",
     title: "Bewegungsspiele für Kleinkinder drinnen",
-    description: "Bewegungsabenteuer zum Mitmachen: Der Fuchs Tapsi zeigt Hüpfen, Strecken und Schleichen, das Kind macht vor dem Bildschirm mit. Ab 2 Jahren.",
+    description:
+      "Bewegungsabenteuer zum Mitmachen: Der Fuchs Tapsi zeigt Hüpfen, Strecken und Schleichen, das Kind macht vor dem Bildschirm mit. Ohne Werbung.",
     text: "Eine Bewegungsgeschichte für drinnen: Tapsi springt, duckt sich und streckt sich, das Kind macht mit, und die Welt antwortet. Ohne Lesen, Tapsi sagt alles.",
   },
   {
     path: "/gefuehle/",
-    title: "Gefühle für Kinder erklärt – Spiel ab 2 Jahren",
+    title: "Gefühle für Kinder erklärt – Spiel für Kleinkinder",
     description:
       "Wütend, traurig, fröhlich: Der kleine Bär erlebt Gefühle zu Hause und in der Kita, und das Kind hilft ihm. Gefühle Kindern spielerisch erklären.",
     text: "Kleine Geschichten vom Bären: Er ist wütend, traurig oder froh, und das Kind entscheidet, was ihm hilft. Für Gespräche über Gefühle mit Kleinkindern.",
@@ -128,20 +127,19 @@ export const SEO_PAGES: PageSeo[] = [
   {
     path: "/kettenreaktion/",
     title: "Kettenreaktion und Kugelbahn für Kinder",
-    description:
-      "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kinder ab 2 Jahren, ohne Werbung.",
+    description: "Eine Kugel rollt los und stößt eine Maschine an: Kugelbahn und Kettenreaktionen zum Antippen und Staunen, für Kleinkinder, ohne Werbung.",
     text: "Zwanzig Bahnen und Maschinen: Kugeln rollen über Holz, Schnee, Wasserrutschen und Förderbänder, Dominosteine fallen, eins stößt das nächste an. Ein Tippen startet die Kettenreaktion – zum Staunen und Nochmal-Machen.",
   },
   {
     path: "/kleine-abenteuer/",
-    title: "Kleine Abenteuer – Bildergeschichten ab 2",
+    title: "Kleine Abenteuer – Bildergeschichten für Kleinkinder",
     description:
-      "Kurze Bilder-Abenteuer für 2- bis 3-Jährige: mit dem Aufzug fahren, einen Weg entlanglaufen, Dinge einsammeln. Jedes Tippen bringt die Geschichte weiter.",
+      "Kurze Bilder-Abenteuer für Kleinkinder: mit dem Aufzug fahren, einen Weg entlanglaufen, Dinge einsammeln. Jedes Tippen bringt die Geschichte weiter.",
     text: "Abenteuer von wenigen Minuten: Aufzug fahren und auf jedem Stockwerk etwas entdecken, oder einen Weg entlanglaufen und am Ende feiern.",
   },
   {
     path: "/tiere/",
-    title: "Tiere füttern – Tierspiel für Kinder ab 2",
+    title: "Tiere füttern – Tierspiel für Kleinkinder",
     description:
       "Was gehört zum Tier? Futter zum hungrigen Tier ziehen oder das Tier in sein Zuhause bringen, mit Tiergeräuschen. Für Kleinkinder, ohne Werbung.",
     text: "Der Hase will eine Möhre, der Hund einen Knochen: Futter zum Tier ziehen oder antippen, das Tier freut sich und macht sein Geräusch.",
@@ -149,32 +147,31 @@ export const SEO_PAGES: PageSeo[] = [
   {
     path: "/schatten/",
     title: "Schatten finden – Zuordnungsspiel für Kinder",
-    description:
-      "Welcher Schatten gehört zur Giraffe? Ein Bild sucht seinen Schatten unter zwei bis sechs – erstes Zuordnen für Kinder ab 2 Jahren, ohne Werbung.",
+    description: "Welcher Schatten gehört zur Giraffe? Ein Bild sucht seinen Schatten unter zwei bis sechs – erstes Zuordnen für Kleinkinder, ohne Werbung.",
     text: "Tiere, Fahrzeuge, Essen und Dinge suchen ihren Schatten. Antippen oder hinziehen; ein falscher Schatten zeigt kurz, wer er ist. Erst zwei ganz verschiedene Schatten, dann mehr und ähnlichere, sobald das Kind sicher wird.",
   },
   {
     path: "/socken/",
     title: "Socken-Paare finden – Spiel für Kleinkinder",
-    description: "Die Waschmaschine ist fertig: Socken-Paare finden und an die Wäscheleine hängen. Erstes Paare-Suchen für Kinder ab 2 Jahren, ohne Werbung.",
+    description: "Die Waschmaschine ist fertig: Socken-Paare finden und an die Wäscheleine hängen. Erstes Paare-Suchen für Kleinkinder, ohne Werbung.",
     text: "Die Socken purzeln aus der Waschmaschine. Gleiche Socken klingen gleich; ein Paar hüpft an die Wäscheleine. Erst wenige Paare in bunten Farben, dann mehr, mit Mustern und unter Wäschekörben wie bei Memory – sobald das Kind sicher wird.",
   },
   {
     path: "/buchstaben/",
-    title: "Buchstaben und Zahlen lernen – Tastatur-Spiel ab 2",
-    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Dazu Zählen, „Wo ist das B?“ und erste Wörter tippen. Ab 2 Jahren.",
+    title: "Buchstaben und Zahlen lernen – Tastatur-Spiel",
+    description: "Jede Taste zeigt ihren Buchstaben mit Bild und Stimme: B wie Bär. Dazu Zählen, „Wo ist das B?“ und erste Wörter tippen. Ohne Werbung.",
     text: "Freies Tippen auf der Tastatur oder dem Bildschirm: Buchstaben mit Bild und Wort, Zahlen mit Dingen zum Zählen, Buchstaben suchen und erste Wörter, Farben und Tu-Wörter tippen.",
   },
   {
     path: "/zaehne/",
     title: "Zähneputzen für Kinder – Zahnputzlied mit Timer",
     description:
-      "Zähneputzen mit Lied: Schritt für Schritt putzen, die Zuckermonster verschwinden, morgens und abends ein Stern. Zahnputz-Timer für Kinder ab 2.",
+      "Zähneputzen mit Lied: Schritt für Schritt putzen, die Zuckermonster verschwinden, morgens und abends ein Stern. Zahnputz-Timer für Kleinkinder.",
     text: "Ein Zahnputz-Begleiter: Zahnputzlied, sieben Schritte nach KAI (Kauflächen, außen, innen), Zuckermonster auf den Zähnen und eine Wochentafel mit Sonne und Mond.",
   },
   {
     path: "/toepfchen/",
-    title: "Töpfchentraining spielerisch – Töpfchen-Spiel ab 2",
+    title: "Töpfchentraining spielerisch – das Töpfchen-Spiel",
     description:
       "Tapsi muss Pipi oder Kaka: Mama und Papa rufen, Hose runter, sitzen, abziehen, Hände waschen – ein Tippen pro Schritt. Ein Stern, wenn es wirklich klappt.",
     text: "Ein Töpfchen-Spiel für Kleinkinder in bewegten Bildern: Tapsi der Fuchs isst und trinkt, merkt, dass er muss, ruft Mama und Papa und geht Schritt für Schritt aufs Töpfchen. Beim Sitzen machen Mama und Papa Quatsch, gießen Blumen oder drücken Zahnpasta – bis ein grüner Haken „fertig“ sagt: der Erwachsene tippt, ob Pipi, Kaka oder beides kam. Am Ende feiert eine Wochentafel echte Erfolge mit einem Stern.",
@@ -184,14 +181,14 @@ export const SEO_PAGES: PageSeo[] = [
     title: "Belohnungstafel für Kinder – gestalten und drucken",
     description:
       "Belohnungstafel für Kleinkinder selbst gestalten: Tag, Woche, Monat oder Sterne sammeln, mit Bildern, Name und Belohnung. Am Tablet nutzen oder A4 ausdrucken.",
-    text: "Eine Belohnungstafel für Kinder ab 2, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Ein Assistent führt Schritt für Schritt zur eigenen Tafel und zeigt jede Wahl als Bild. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Keine Strafen, nichts wird weggenommen. Auf derselben Seite: ein Tagesplan in Bildern.",
+    text: "Eine Belohnungstafel für Kleinkinder, frei einstellbar: Wochentafel mit Aufgaben und Tagen, Monatstafel als Kalender, Tagestafel für Morgen oder Abend, oder ein Weg aus Sternen bis zur Belohnung. Aufgaben als Bilder (Zähne putzen, Töpfchen, Anziehen, im eigenen Bett schlafen …), der Name des Kindes und eine Belohnung, am liebsten Zeit zusammen. Ein Assistent führt Schritt für Schritt zur eigenen Tafel und zeigt jede Wahl als Bild. Am Tablet hält ein Erwachsener ein Feld gedrückt und das Kind tippt den Stern hinein; zum Ausdrucken als A4 quer oder hochkant, in Farbe oder Schwarz-weiß, mit Feldern zum Ausmalen und Sternen zum Ausschneiden. Keine Strafen, nichts wird weggenommen. Auf derselben Seite: ein Tagesplan in Bildern.",
   },
   {
     path: "/tagesplan/",
     title: "Tagesplan für Kinder – Tag und Woche in Bildern",
     description:
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Mit Bildkarten zum Ausdrucken.",
-    text: "Ein Tagesplan in Bildern (Strukturtafel) für Kinder ab 2: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
+    text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
   },
   {
     path: "/laut-leise/",

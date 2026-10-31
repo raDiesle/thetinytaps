@@ -15,7 +15,7 @@ import { useFitGrid } from "@/lib/fitGrid";
 import { isBookLook, useTurnPage } from "@/lib/look";
 import { useT } from "@/lib/language";
 import { usePreloadPages } from "@/lib/preloadPages";
-import { buildDate, useUpdateBetweenGames } from "@/lib/pwa";
+import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
 /** Holding fox and bear in the title this long opens the hidden management page. */
@@ -24,7 +24,46 @@ const IDEAS_HOLD_MS = 2000;
 /** Where the books (the toy look's cards) lead. */
 const HREFS = CATEGORIES.map(categoryHref);
 
-/** Impressum and Datenschutz, below the first screen with the version, for grown-ups. */
+/**
+ * For parents at the foot of the home page: no age to start at (each family decides that itself), but the steps
+ * from analog to digital, best first, and where this book stands among them – always on the first step into digital,
+ * played together.
+ */
+function MediaSteps() {
+  const t = useT();
+  return (
+    <section className="seo-text media-steps">
+      <h2>{t({ de: "Wann ist die richtige Zeit für Bildschirme?" })}</h2>
+      <p>
+        {t({
+          de: "Das entscheiden Sie als Eltern – Sie kennen Ihr Kind am besten. Darum nennen wir kein Alter. Digitale Medien sind für kleine Kinder immer ein Grenzfall, und Analoges ist immer besser. Wenn Ihr Kind anfängt, hilft diese Reihenfolge, von der besten Stufe zur schlechtesten:",
+        })}
+      </p>
+      <ol>
+        <li>
+          <b>{t({ de: "Die echte Welt und analoge Spiele" })}</b> –{" "}
+          {t({ de: "draußen sein, Bücher, Bauklötze, zusammen spielen. Das kommt vor allem Digitalen." })}
+        </li>
+        <li>
+          <b>{t({ de: "Digital zusammen mit Ihnen" })}</b> – {t({ de: "Groß und Klein schauen, tippen und reden gemeinsam." })}
+        </li>
+        <li>
+          <b>{t({ de: "Lernspiele allein" })}</b> – {t({ de: "später spielt Ihr Kind einfache Lernspiele auch ohne Sie." })}
+        </li>
+        <li>
+          <b>{t({ de: "Passiver Medienkonsum" })}</b> – {t({ de: "Videos und Serien, bei denen das Kind nur zuschaut, sind die schlechteste Stufe." })}
+        </li>
+      </ol>
+      <p>
+        {t({
+          de: "Books for Both bleibt immer auf der ersten Stufe vom Analogen ins Digitale: ein Bilderbuch, das Sie zusammen mit Ihrem Kind anschauen. So bekommt Ihr Kind einen guten Einstieg in den Umgang mit Medien.",
+        })}
+      </p>
+    </section>
+  );
+}
+
+/** Impressum and Datenschutz, below the first screen, for grown-ups. */
 function LegalLink({ to, children }: { to: string; children: ReactNode }) {
   const turnPage = useTurnPage(to, "forward");
   return (
@@ -75,8 +114,8 @@ export function Home() {
       <InstallHint />
       <BookCover />
       <SeoText>
+        <MediaSteps />
         <p className="home-version">
-          {t({ de: "Stand", ru: "Версия от", en: "Version", zh: "版本", hi: "संस्करण", es: "Versión", ar: "الإصدار" })} {buildDate()} ·{" "}
           <LegalLink to="/impressum/">{t({ de: "Impressum" })}</LegalLink> · <LegalLink to="/datenschutz/">{t({ de: "Datenschutz" })}</LegalLink>
         </p>
       </SeoText>

@@ -1,6 +1,6 @@
 # Books for Both – notes for Claude
 
-Keyboard and touch games for toddlers (2–3 years). A React 19 single-page app
+Keyboard and touch games for toddlers. A React 19 single-page app
 built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backend.
 
 ## Commands (always Bun, never npm, yarn or npx)
@@ -380,7 +380,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
   and head in step (`useTitle`, `SeoHead`). Under `/en/` the router runs below the prefix (`routerBase()`,
   `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
-  browser's language. Texts say only what the page really does. Google reads the page after the app ran, in an
+  browser's language. Texts say only what the page really does. No text names an age the app is for („ab 2“,
+  „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
+  screens, which the home page's foot explains with the steps from analog to digital – Books for Both always on the
+  first, played together (user decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
   it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
