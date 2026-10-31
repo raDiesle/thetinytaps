@@ -79,8 +79,9 @@ In a fresh worktree run `bun install` first.
   everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
-  A number the conclusion rests on that you could not read (a price behind a configurator) you ask the user for before
-  concluding, never guess: guessed desk calendars at 4–7 € each turned out to be 0.72 € and changed the verdict.
+  What a conclusion rests on and you could not read (a price behind a configurator, a law's text) you read some other
+  way or ask the user for before concluding, never guess or give an impression: guessed desk calendars at 4–7 € each
+  were 0.72 €, and a flip calendar first called „eher kein Spielzeug“ is one by the EU's own guidance on books.
 
 ## Language and style
 
