@@ -23,7 +23,7 @@ import {
   withSteps,
 } from "./plan";
 import { planLayout } from "./PlanSheet";
-import { DEFAULT_PLANNER_SETTINGS } from "./planSettings";
+import { DEFAULT_PLANNER_SETTINGS, plannerDefaults } from "./planSettings";
 
 const promptIds = new Set(REWARDS_PICTURE_PROMPTS.groups.flatMap((g) => g.prompts).map((p) => p.id));
 /** A Wednesday. */
@@ -77,8 +77,11 @@ describe("plans", () => {
       expect({ ...a, id: "" }).toEqual({ ...b, id: "" });
       for (const day of a.days) expect(new Set(day.map((s) => s.id)).size).toBe(day.length);
     }
-    expect(DEFAULT_PLANNER_SETTINGS.plans[0].id).toBe("erster-plan");
-    expect(DEFAULT_PLANNER_SETTINGS.plans[0].examples).toBe(true);
+    // No plan before the wizard made one; an old first plan with ticks stays.
+    expect(DEFAULT_PLANNER_SETTINGS.plans).toEqual([]);
+    expect(plannerDefaults({})).toBe(DEFAULT_PLANNER_SETTINGS);
+    const old = plannerDefaults({ "erster-plan": { "2026-10-28|zaehne": 1 } });
+    expect(old.plans.map((p) => [p.id, p.examples])).toEqual([["erster-plan", true]]);
   });
 
   test("a week plan has each weekday's steps, a routine the same every day", () => {

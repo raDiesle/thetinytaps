@@ -1,8 +1,8 @@
 /*
  * ---------- The book look (src/lib/look.ts) ----------
  *
- * A design concept: the app as a picture book lying on a table, so it looks less like a screen game. The home page
- * starts closed (BookCover), every menu is a paper page with the book's edges round it, a tap on a card turns the
+ * A design concept: the app as a picture book, so it looks less like a screen game. The home page is a bookshelf
+ * (bookshelf.css), every menu inside a book is its left page with the book's edges round it, a tap on a card turns the
  * page, and while playing the picture lies in the page's paper margin. Everything here is under
  * `:root[data-look="book"]`, so the toy-block look stays as it was with `?buch=aus`.
  */
@@ -42,7 +42,10 @@
   --board-edge: -7px 6px 0 11px;
   /* The facing page across the spine, turned away from the lamp. */
   --facing: #6d6656;
-  /* The page's turned-up corner in the top right, the way back (PageCorner). */
+  /*
+   * The page's corner turned up at its outer edge in the top left: the way back (PageCorner) – the page touched is the
+   * page that turns back.
+   */
   --corner: 72px;
   /* Fine speckles of paper fibres, and a large soft mottling like watercolour paper. */
   --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .26 0 0 0 0 .14 .7 0 0 0 -.22'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
@@ -70,6 +73,7 @@
     --page-top: 8px;
     --page-left: 16px;
     --page-right: 6px;
+    --page-inset: var(--page-top) var(--page-right) 14px var(--page-left);
     --board: -5px 4px 0 6px;
     --board-edge: -6px 5px 0 7px;
     --corner: 58px;
@@ -136,17 +140,39 @@
   stroke-width: 3;
 }
 
+/* The sun (or a room's window) steps right, out from under the way back's corner (PageCorner). */
+:root[data-look="book"] :is(.sky-sun, .world-window) {
+  left: calc(var(--corner) - 8px);
+}
+
 /* ----- Headings: a book's title and chapters, printed, not jumping ----- */
 
+/* The name as on a book's title page (D-16): set in a book face, in ink, the small „for“ in italics. */
 :root[data-look="book"] .logo {
-  filter: saturate(0.6) brightness(0.97);
+  align-items: center;
+  gap: 0 0.28em;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2.4rem, 6.5vw, 4.4rem);
+  letter-spacing: 0.01em;
 }
 
 :root[data-look="book"] .logo-letter {
-  -webkit-text-stroke: 0.05em var(--ink);
-  text-shadow: none;
+  color: var(--ink);
+  -webkit-text-stroke: 0;
+  text-shadow: 0 0.04em 0 #3d304522;
   rotate: none;
   animation: none;
+}
+
+:root[data-look="book"] .logo-for .logo-letter {
+  color: var(--accent);
+  font-size: 0.62em;
+  font-style: italic;
+  font-weight: 400;
+}
+
+:root[data-look="book"] .logo-mascots {
+  width: 1.55em;
 }
 
 :root[data-look="book"] .menu-title {
@@ -212,7 +238,7 @@
   font-weight: 600;
 }
 
-/* Page numbers, as in a table of contents (the home page's cards): on which page of the book each one is. */
+/* Page numbers, as in a table of contents (an opened book's cards): on which page of the book each one is. */
 .game-page {
   display: none;
 }
@@ -239,17 +265,11 @@
   }
 }
 
-/* A frame round a group of cards (the home page's „Weitere“, a game's sorts): a paper panel, stitched on. */
+/* A frame round a group of cards (a game's sorts): a paper panel, stitched on. */
 :root[data-look="book"] .mode-group::before {
   border: 2px dashed #3d304559;
   border-radius: 22px;
   background: #fffaf0a6;
-}
-
-:root[data-look="book"] .game-list .mode-group[data-world="weitere"]::before {
-  background:
-    radial-gradient(circle, #fff 0 4px, transparent 5px) 0 0 / 40px 40px,
-    #f6dde6b0;
 }
 
 /* ----- Buttons, labels and panels: paper too, nothing glossy or app-like ----- */
@@ -506,7 +526,13 @@
   }
 }
 
-/* ----- The way back: the page's turned-up corner in its top right (PageCorner in MenuTop.tsx) ----- */
+/*
+ * ----- The way back: the page's corner turned up in its top left (PageCorner in MenuTop.tsx) -----
+ *
+ * Where a reader takes the left page to turn it back, at its outer edge, and the page turning back is this one
+ * (`data-turn="back"`): the corner touched is the page that moves. A corner in the top right turned the other page (user feedback, October
+ * 2026), and grown-ups looked for the way back in the top left anyway.
+ */
 
 .page-corner {
   display: none;
@@ -516,7 +542,7 @@
   display: block;
   position: fixed;
   top: var(--page-top);
-  right: var(--page-right);
+  left: var(--page-left);
   z-index: 20;
   width: var(--corner);
   height: var(--corner);
@@ -529,9 +555,9 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  transform-origin: 100% 0;
+  transform-origin: 0 0;
   transition: scale 0.25s ease-out;
-  filter: drop-shadow(-2px 3px 3px #3d304540);
+  filter: drop-shadow(2px 3px 3px #3d304540);
 }
 
 :root[data-look="book"] .page-corner:hover .page-corner-art {
@@ -550,7 +576,7 @@
 .page-corner-shadow {
   fill: #3d3045;
   opacity: 0.2;
-  transform: translate(-3px, 6px);
+  transform: translate(3px, 5px);
 }
 
 .page-corner-back {
@@ -568,16 +594,17 @@
 }
 
 /*
- * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top right, held like the ✕ – it lifts
+ * Leaving a game (ExitButton): the ✕ becomes the same corner at the page's top left, held like the ✕ – it lifts
  * further while the finger stays (instead of the ring filling), and the page turns back. The fullscreen button and
- * „Zurück zum Menü · halten“ stay beside it, on the picture's edge.
+ * „Zurück zum Menü · halten“ stay beside it, right of it on the picture's edge.
  */
 .hold-exit .page-corner-art {
   display: none;
 }
 
-/* Room left of the corner for it to lift into, so it never covers the fullscreen button or the hint. */
+/* Room right of the corner for it to lift into, so it never covers the fullscreen button or the hint. */
 :root[data-look="book"] .play-area .exit-corner {
+  flex-direction: row-reverse;
   align-items: flex-start;
   gap: calc(var(--play-corner) * 0.4 + 4px);
 }
@@ -588,12 +615,25 @@
 
 :root[data-look="book"] .play-area .exit-corner .exit-hint {
   top: 14px;
+  right: auto;
+  left: calc(100% + 8px);
+  translate: -6px 0;
+}
+
+:root[data-look="book"] .play-area .exit-corner.hinted .exit-hint {
+  translate: 0 0;
+}
+
+@media (hover: hover) {
+  :root[data-look="book"] .play-area .exit-corner:hover .exit-hint {
+    translate: 0 0;
+  }
 }
 
 :root[data-look="book"] .play-area .exit-corner .hold-exit {
   width: var(--play-corner);
   height: var(--play-corner);
-  margin: calc(-1 * var(--frame) - 8px) calc(-1 * var(--frame) - 8px) 0 0;
+  margin: calc(-1 * var(--frame) - 8px) 0 0 calc(-1 * var(--frame) - 8px);
   padding: 0;
   border-radius: 0;
   background: none;
@@ -609,8 +649,8 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  transform-origin: 100% 0;
-  filter: drop-shadow(-2px 3px 3px #3d304540);
+  transform-origin: 0 0;
+  filter: drop-shadow(2px 3px 3px #3d304540);
 }
 
 :root[data-look="book"] .play-area .exit-corner .hold-exit.holding .page-corner-art {
@@ -645,7 +685,7 @@
 }
 
 /*
- * A menu's head keeps clear of the corner: it needs the corner's room at the right edge of the screen, less what the
+ * A menu's head keeps clear of the corner: it needs the corner's room at the left edge of the screen, less what the
  * margin round the menu already leaves there (`--menu-edge`: a home-like page is at most 1040 px wide, centred).
  */
 :root[data-look="book"] .home {
@@ -657,7 +697,7 @@
 }
 
 :root[data-look="book"] .menu-head {
-  margin-right: max(0px, calc(var(--page-right) + var(--corner) + 8px - var(--menu-edge, 20px)));
+  margin-left: max(0px, calc(var(--page-left) + var(--corner) + 8px - var(--menu-edge, 20px)));
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
@@ -731,15 +771,36 @@
   );
 }
 
-/* ✕, the fullscreen button and ⚙️ step in off the paper margin, onto the picture's corner. */
+/*
+ * ✕, the fullscreen button and ⚙️ step in off the paper margin, onto the picture's corner: the way back on the left,
+ * at the spine (above), so ⚙️ trades places with it and goes to the top right, its note to its left.
+ */
 :root[data-look="book"] .play-area .exit-corner {
   top: max(calc(var(--frame) + 8px), env(safe-area-inset-top));
-  right: max(calc(var(--frame) + 8px), env(safe-area-inset-right));
+  right: auto;
+  left: max(calc(var(--frame) + 8px), env(safe-area-inset-left));
 }
 
 :root[data-look="book"] .play-area .play-options-corner {
   top: max(calc(var(--frame) + 8px), env(safe-area-inset-top));
-  left: max(calc(var(--frame) + 8px), env(safe-area-inset-left));
+  right: max(calc(var(--frame) + 8px), env(safe-area-inset-right));
+  left: auto;
+}
+
+:root[data-look="book"] .play-area .play-options-hint {
+  right: calc(100% + 8px);
+  left: auto;
+  translate: 6px 0;
+}
+
+:root[data-look="book"] .play-area .play-options-corner.hinted .play-options-hint {
+  translate: 0 0;
+}
+
+@media (hover: hover) {
+  :root[data-look="book"] .play-area .play-options-corner:hover .play-options-hint {
+    translate: 0 0;
+  }
 }
 
 /* ----- The animal families reading together on a wide page's margins (Sky) ----- */

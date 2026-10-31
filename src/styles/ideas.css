@@ -9,6 +9,17 @@
   text-align: center;
 }
 
+/* When the running version was built, right under the title: the first thing to check after an update. */
+.ideas-build {
+  width: fit-content;
+  margin: -4px auto 10px;
+  padding: 2px 14px;
+  border-radius: 999px;
+  background: #ffffffd9;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
 .ideas-panel {
   margin-bottom: 24px;
   padding: 20px 24px;

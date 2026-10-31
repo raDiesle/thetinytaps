@@ -81,6 +81,11 @@ const SAMPLES = 4;
  * gum instead of standing on it. Front teeth arch more than molars.
  */
 const GUM_LINE = { papilla: [0.36, 0.34, 0.32, 0.24, 0.22], middle: 0.06 };
+/**
+ * How far the gum's walls reach up over the foot of the crown, as a share of the tooth's height. They are drawn
+ * over the tooth, so its ink outline ends under the gum and the tooth grows out of it instead of standing in it.
+ */
+const GUM_OVERLAP = 0.08;
 
 const rad = (deg: number) => (deg * Math.PI) / 180;
 const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -123,8 +128,13 @@ export interface Tooth {
 
 export interface GumPiece {
   jaw: Jaw;
+  /** The tooth it holds (same key as the tooth). */
+  key: string;
   center: Vec3;
+  /** The top between the walls lies under the tooth; the outer and inner walls go over its foot. */
   faces: Face[];
+  /** The gum's edge on the cheek side and on the tongue side, drawn darker so the line where the tooth comes out shows. */
+  rims: Record<"outer" | "inner", Vec3[]>;
 }
 
 /** Y of the chewing plane and of the gum line for a jaw. */
@@ -213,7 +223,7 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   // More points than a tooth has, so the gum line arches smoothly up between the teeth.
   const angles = sweep(side, from, to, 4 * SAMPLES);
   const bottom = base - dir * GUM;
-  const rim = (t: number) => base + (top - base) * gumLine(n, Math.abs(t));
+  const rim = (t: number) => base + (top - base) * (gumLine(n, Math.abs(t)) + GUM_OVERLAP);
   const outerRim = angles.map((t) => archPoint(jaw, t, -3, rim(t)));
   const outerFoot = angles.map((t) => archPoint(jaw, t, -3, bottom));
   const innerRim = angles.map((t) => archPoint(jaw, t, spec.depth + 4, rim(t)));
@@ -222,7 +232,9 @@ function buildGum(jaw: Jaw, side: Side, n: number, open: number): GumPiece {
   const face = (kind: FaceKind, points: Vec3[]): Face => ({ kind, points, normal: normalOf(points, center), center: mean(points) });
   return {
     jaw,
+    key: toothKey({ jaw, side, n }),
     center,
+    rims: { outer: outerRim, inner: innerRim },
     faces: [
       face("outer", [...outerRim, ...[...outerFoot].reverse()]),
       face("top", [...outerRim, ...[...innerRim].reverse()]),
@@ -256,9 +268,10 @@ export function buildMouth(open: number): MouthModel {
   const palate = ring(28, (s) => [82 * Math.cos(s), upperRoof + 4, 22 + 66 * Math.sin(s)]);
 
   // The lips: a wide grin when biting, a big round "Aaah" when open. The corners sit further back.
+  // Wide enough that a band of gum shows above and below the teeth, past the lips' thick outline.
   const width = 150 + 6 * open;
-  const above = 58 + 64 * open;
-  const below = 54 + 62 * open;
+  const above = 64 + 64 * open;
+  const below = 60 + 62 * open;
   const boxy = 3.4 - 1 * open;
   const lips = ring(40, (s) => {
     const c = Math.cos(s);

@@ -89,10 +89,11 @@
   padding: 0 max(12px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
 }
 
-.room-top .logo {
+/* `.room` first, to win over the book look's size for the title on other pages (book.css). */
+.room .room-top .logo {
   grid-column: 2;
   margin: 0;
-  font-size: clamp(1.7rem, min(7vh, 5vw), 3.6rem);
+  font-size: clamp(2.2rem, min(9vh, 6.5vw), 4.4rem);
 }
 
 .room-top-right {
@@ -419,12 +420,12 @@
 
 /*
  * A screen held upright (a grown-up chose „Trotzdem hochkant“): too narrow for the title between the speaker and the
- * heads, so it gets a line of its own under them, and the hourglass stands on the wall left of the shelf, as the light
- * switch does on the right, instead of where the title now is.
+ * heads, so it gets a line of its own under them, beside the speaker.
  */
 @media (max-aspect-ratio: 4 / 5) {
   .room-top {
     grid-template-rows: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: start;
     padding-top: 8px;
   }
@@ -436,17 +437,25 @@
 
   .room-top-right {
     grid-row: 1;
+    grid-column: 2;
   }
 
-  .room-top .logo {
+  .room .room-top .logo {
     grid-row: 2;
-    grid-column: 1 / -1;
+    /* Beside the speaker, never over it: the title's fox and bear stand at its left. */
+    grid-column: 2;
     align-self: center;
     justify-self: center;
-    font-size: clamp(1.4rem, 7vw, 2.2rem);
-    white-space: nowrap;
+    flex-wrap: nowrap;
+    font-size: clamp(1.2rem, 6vw, 2.2rem);
   }
+}
 
+/*
+ * On a screen not much wider than tall (a tablet, a phone held upright) the title reaches over the shelf's top left
+ * corner, so the hourglass stands on the wall left of the shelf instead, as the light switch does on the right.
+ */
+@media (max-aspect-ratio: 3 / 2) {
   .room-hourglass-place {
     top: 30%;
     bottom: auto;
@@ -517,9 +526,8 @@
   bottom: var(--plinth);
   left: var(--post);
   transform: translateZ(calc(-1 * var(--d)));
-  /* The shadow under each board, the dark in the corners, the back panel's warm painted wood. */
+  /* The dark in the corners and the back panel's warm painted wood (each board's shadow on it: .shelf-tier-shade). */
   background:
-    repeating-linear-gradient(#0000006b 0, #00000026 calc(var(--tier) * 0.12), #0000 calc(var(--tier) * 0.4), #0000 calc(var(--tier) + var(--board))),
     linear-gradient(90deg, #00000047, #0000 14%, #0000 86%, #00000047),
     var(--wood-grain-h) 0 0 / 1200px 360px,
     #b88654;
@@ -568,6 +576,19 @@
   right: var(--post);
   left: var(--post);
   height: var(--tier);
+}
+
+/* The shadow the board above casts on the back panel, behind this board's books. */
+.shelf-tier-shade {
+  inset: 0;
+  transform: translateZ(calc(1px - var(--d)));
+  background: linear-gradient(#0000006b, #00000026 12%, #0000 40%);
+}
+
+/* A board of smaller books spine out: two rows of them at its ends, a gap in the middle as on a used shelf. */
+.shelf-row.spare {
+  justify-content: space-between;
+  padding: 0 var(--gap);
 }
 
 /* A board: its front edge, its top seen from above (below the eye) and its underside seen from below (above it). */
@@ -647,29 +668,6 @@
     linear-gradient(#00000040, #0000 30%, #0000001a),
     var(--wood-grain-h) 0 0 / 1200px 360px,
     #b8874f;
-}
-
-/* „Weitere“: a little paper label hanging from the board above its books, as a library names its shelves. */
-.shelf-label {
-  top: 0;
-  left: 50%;
-  z-index: 1;
-  padding: 1px 10px 2px;
-  border: 1.5px solid #3d304599;
-  border-top: 0;
-  border-radius: 0 0 4px 4px;
-  background: var(--paper-grain, none), #fffaf0;
-  color: var(--ink);
-  font-size: clamp(0.68rem, calc(var(--tier) * 0.07), 1rem);
-  font-weight: 700;
-  line-height: 1.25;
-  white-space: nowrap;
-  box-shadow: 0 2px 3px #3a261440;
-  translate: -50% 0;
-}
-
-.shelf-label span {
-  font-family: var(--font-emoji);
 }
 
 /* The books of a board, standing a little behind its front edge. */

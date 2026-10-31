@@ -336,9 +336,12 @@ export function Prep({ part, daytime, free }: { part: PrepPart; daytime: Daytime
             <Toothbrush />
             {part === "paste" && <Paste />}
             {part === "tidy" && <Foam />}
-            <g className="prep-hand">
-              <g transform="translate(118 12)">
-                <Fist daytime={daytime} />
+            <g transform="translate(118 12)">
+              {/* Turned against the brush, so the arm always comes up from below, also while the brush stands in its cup. */}
+              <g className="prep-wrist">
+                <g className="prep-hand">
+                  <Fist daytime={daytime} />
+                </g>
               </g>
             </g>
           </g>

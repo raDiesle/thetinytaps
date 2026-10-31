@@ -18,7 +18,7 @@ export interface GameCardProps {
   games?: string[];
   /** A picture behind the lower part of the card (a category's world). */
   scene?: ReactNode;
-  /** On which page of the book it is, as in a table of contents; shown only in the book look. */
+  /** On which page of its book it is, as in a table of contents; shown only in the book look. */
   page?: number;
 }
 

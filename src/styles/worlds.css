@@ -23,7 +23,7 @@
   --w3: #8fe3ff;
 }
 
-[data-world="weitere"] {
+[data-world="alltag"] {
   --w1: var(--berry);
   --w2: #f78fc4;
   --w3: #d7b8ff;
@@ -43,13 +43,6 @@
 .game-list[data-world] > li:nth-child(3n + 3),
 .game-list .mode-group[data-world] li:nth-child(3n + 3) {
   --card: var(--w3);
-}
-
-/* „Weitere“ stands on the home page on a frame: its world, the children's room, is the frame's wallpaper. */
-.game-list .mode-group[data-world="weitere"]::before {
-  background:
-    radial-gradient(circle, #fff 0 5px, transparent 6px) 0 0 / 44px 44px,
-    #ffd9ecd0;
 }
 
 /* ----- The backdrop ----- */
@@ -122,7 +115,7 @@
   background: repeating-linear-gradient(90deg, #ffeac0 0 48px, #ffe1a6 48px 96px);
 }
 
-.sky[data-world="weitere"] {
+.sky[data-world="alltag"] {
   background:
     radial-gradient(circle, #fff 0 5px, transparent 6px) 0 0 / 56px 56px,
     radial-gradient(circle, #ffc2e0 0 4px, transparent 5px) 28px 28px / 56px 56px,
@@ -204,7 +197,7 @@
   width: clamp(54px, 10vh, 110px);
 }
 
-/* Weitere: the children's room, with a wooden floor, a rug, a toy chest and a teddy. */
+/* Für jeden Tag: the children's room, with a wooden floor, a rug, a toy chest and a teddy. */
 .world-floor {
   position: absolute;
   bottom: 0;
@@ -271,6 +264,10 @@
 
 .world-card-wall {
   fill: #ffeac0;
+}
+
+.world-card-room {
+  fill: #ffe3f1;
 }
 
 .world-card-scene .hill-back,

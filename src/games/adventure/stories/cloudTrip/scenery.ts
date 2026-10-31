@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { makeBush, mat, seeded, solid } from "../../three/props";
+import { makeBush, mat, mergeParts, seeded, solid } from "../../three/props";
 import { groundHeight, PUFF_RADIUS, RAINBOW_BAND, RAINBOW_COLORS, RAINBOW_RADIUS, SUN_RADIUS, TAU, WOLLE_REST, WOLLE_TOP } from "./layout";
 
 // The props of „Die Wolkenreise“, modelled from simple shapes like the rest:
@@ -36,15 +36,17 @@ export function makeWolle() {
     body.add(puff);
   }
   const dark = mat("#2b2f3a", 0.3);
+  const shiny = mat("#ffffff", 0.3);
+  const rosy = mat("#ffb3c1", 0.9);
   for (const side of [1, -1]) {
     const eye = solid(new THREE.SphereGeometry(0.065, 16, 12), dark, false);
     eye.position.set(0.2 * side, 0.08, 0.75);
     eye.scale.z = 0.5;
     body.add(eye);
-    const shine = solid(new THREE.SphereGeometry(0.02, 8, 6), mat("#ffffff", 0.3), false);
+    const shine = solid(new THREE.SphereGeometry(0.02, 8, 6), shiny, false);
     shine.position.set(0.2 * side + 0.02, 0.1, 0.785);
     body.add(shine);
-    const cheek = solid(new THREE.SphereGeometry(0.075, 14, 10), mat("#ffb3c1", 0.9), false);
+    const cheek = solid(new THREE.SphereGeometry(0.075, 14, 10), rosy, false);
     cheek.position.set(0.34 * side, -0.04, 0.68);
     cheek.scale.set(1, 0.6, 0.4);
     body.add(cheek);
@@ -54,6 +56,7 @@ export function makeWolle() {
   smile.rotation.z = Math.PI;
   smile.position.set(0, -0.02, 0.77);
   body.add(smile);
+  mergeParts(body);
   return {
     group,
     squash(k: number) {
@@ -90,6 +93,7 @@ export function makePlane(color: string) {
   prop.position.z = 0.42;
   prop.add(solid(new THREE.BoxGeometry(0.36, 0.045, 0.012), mat("#3a3a3a", 0.5), false));
   group.add(prop);
+  mergeParts(group, [prop]);
   return {
     group,
     spin(time: number) {

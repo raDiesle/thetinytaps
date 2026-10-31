@@ -33,19 +33,10 @@ const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 /** Whether a page belongs to the game: its address or one below it. */
 const ofGame = (hrefs: string[], path: string) => hrefs.some((href) => path.startsWith(href));
 
-/**
- * The book on the shelf a page is in, by its `data-book`: a category's (its page and its games) or, for a game of
- * „Weitere“, which stands on the shelf as a book of its own, the game's address.
- */
+/** The book on the shelf a page is in, by its `data-book`: its category's (its page and its games). */
 export function shelfBookOf(pathname: string): string | undefined {
   const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
-  for (const category of CATEGORIES) {
-    for (const game of category.games) {
-      if (ofGame([game.href, ...(game.also ?? [])], path)) return category.onHome ? game.href : category.id;
-    }
-    if (path.startsWith(`/spiele/${category.id}/`)) return category.id;
-  }
-  return undefined;
+  return CATEGORIES.find((c) => path.startsWith(`/spiele/${c.id}/`) || c.games.some((g) => ofGame([g.href, ...(g.also ?? [])], path)))?.id;
 }
 
 function element(className: string, tag = "div") {

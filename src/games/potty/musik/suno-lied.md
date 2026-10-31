@@ -618,13 +618,15 @@ Title:
 पॉटी-सीट पर इंतज़ार
 ```
 
-## العربية (`ar`, written 30 Oct 2026)
+## العربية (`ar`, written 30 Oct 2026; made 31 Oct 2026 → `musik-toepfchen-warten-ar.mp3`)
 
 The German song in simple Modern Standard Arabic, verse for verse, same tempo, key and instruments. „النونيّة“ for the
 potty, „حفّاض“, „بيبي“ and „كاكا“ as in the game, „ماما“ and „بابا“, „دبدوبي“ for the teddy. Nothing that changes for boy
 or girl: first-person verbs („أجلسُ“, „أكبرُ“, „أقولُ“) and „we“ („ننتظرُ“, „نغسلُ“), never an adjective about the child
 (no „كبير/كبيرة“, „جالس/جالسة“). The shout-back answers are „أنا!“. Flushing is „نشدّ السيفون“, never „ماء“ (the bubble's
 water). Not yet read by a native speaker.
+Suno sang it at 101.5 BPM with a 7 s intro, made verse 3 eight bars (the kazoo answers), sang verse 5 two beats short
+and added a line of the chorus at the end; Whisper (base) heard the lines in order, the first one smeared over the intro.
 
 Lyrics:
 

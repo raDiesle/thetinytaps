@@ -3,18 +3,18 @@ import type { ReactNode } from "react";
 /*
  * Each home category has a world of its own (idea V-08), so a child finds „its“ area again by the picture: a meadow
  * with a farm for Lebendige Welten, a table with toys for Zuordnen, building blocks for Buchstaben & Zahlen and a
- * children's room for Weitere. Its menus show it behind the cards (Sky), its home card a small piece of it
- * (WorldCardScene). The things are drawn once here, each in its own box, and placed by the two.
+ * children's room for Für jeden Tag. Its menus show it behind the cards (Sky), its book on the home page's shelf a
+ * small piece of it (WorldCardScene). The things are drawn once here, each in its own box, and placed by the two.
  */
 
 /** The categories that have a world drawn here: every one of the home menu (content.test.ts checks it). */
-export const WORLDS = ["lebendige-welten", "zuordnen", "buchstaben-zahlen", "weitere"] as const;
+export const WORLDS = ["lebendige-welten", "zuordnen", "buchstaben-zahlen", "alltag"] as const;
 
 /** A category id that has a world drawn here. */
 export type WorldId = (typeof WORLDS)[number];
 
 /** Worlds inside a room: a wall with a window (the sun looks in) instead of the open sky with hills. */
-export const INDOOR: readonly string[] = ["zuordnen", "weitere"];
+export const INDOOR: readonly string[] = ["zuordnen", "alltag"];
 
 /** A red barn with a white door; box 120 × 110. */
 function Barn() {
@@ -257,7 +257,7 @@ export function WorldGround({ world }: { world: WorldId }) {
           </Thing>
         </>
       );
-    case "weitere":
+    case "alltag":
       return (
         <>
           <svg className="world-floor" viewBox="0 0 1200 100" preserveAspectRatio="none">
@@ -306,6 +306,19 @@ export function WorldCardScene({ world }: { world: WorldId }) {
           </g>
           <g transform="translate(248 60) scale(0.54)">
             <RingStacker />
+          </g>
+        </>
+      )}
+      {world === "alltag" && (
+        <>
+          <rect className="world-card-room" x="-400" y="-300" width="1100" height="460" />
+          <path className="world-floor-boards" d="M-400 120 H700 V160 H-400 Z" />
+          <ellipse className="world-rug" cx="150" cy="134" rx="90" ry="10" />
+          <g transform="translate(10 72) scale(0.48)">
+            <ToyChest />
+          </g>
+          <g transform="translate(250 64) scale(0.5)">
+            <Teddy />
           </g>
         </>
       )}

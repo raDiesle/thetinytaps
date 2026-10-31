@@ -105,6 +105,17 @@ function contentHeight(page: HTMLElement) {
   return bottom - top - free + parseFloat(getComputedStyle(page).paddingTop);
 }
 
+/** Whether the screen is a phone's (its shorter side below `PHONE_SCREEN`). */
+export const isPhone = () => Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
+
+/**
+ * How tall `part` of the menu `page` may grow so that the page's first screen holds everything above and below it
+ * (not what waits `data-below-fold`), with the room under the last row the cards keep.
+ */
+export function roomFor(part: HTMLElement, page: HTMLElement) {
+  return window.innerHeight - (contentHeight(page) - part.offsetHeight) - (isPhone() ? BOTTOM_PHONE : BOTTOM);
+}
+
 /**
  * Sizes a menu's card grid so that every card and what is around it fit on
  * one screen without scrolling, on phones too (with smaller, flatter cards).
@@ -125,14 +136,8 @@ export function useFitGrid(count: number, groups?: number[]) {
     const measure = () => {
       // An open settings panel grows the page below the cards; they keep their size.
       if (page.querySelector(":is(.panel-button, .panel-icon)[aria-expanded='true']")) return;
-      const phone = Math.min(window.innerWidth, window.innerHeight) < PHONE_SCREEN;
-      const next = bestFit(
-        count,
-        list.clientWidth,
-        window.innerHeight - (contentHeight(page) - list.offsetHeight) - (phone ? BOTTOM_PHONE : BOTTOM),
-        phone,
-        groups,
-      );
+      const phone = isPhone();
+      const next = bestFit(count, list.clientWidth, roomFor(list, page), phone, groups);
       setFit((prev) => (prev?.columns === next?.columns && prev?.row === next?.row ? prev : next));
     };
     measure();

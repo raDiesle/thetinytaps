@@ -1,8 +1,22 @@
 import { createHash } from "node:crypto";
 import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fullTitle, NO_INDEX_PATHS, type PageSeo, SEO_PAGES, SITE_NAME, SITE_PROMISE } from "../src/content/seo";
-import { appPlugin } from "./appPlugin";
+import {
+  fullTitle,
+  languagePrefix,
+  NO_INDEX_PATHS,
+  type PageSeo,
+  type PageText,
+  PREVIEW_IMAGE,
+  SEO_LANGUAGES,
+  SEO_PAGES,
+  type SeoLanguage,
+  type SeoTranslation,
+  SITE_NAME,
+  SITE_PROMISE,
+} from "../src/content/seo";
+import { SEO_EN } from "../src/content/seo.en";
+import { appPlugin, PRODUCTION } from "./appPlugin";
 
 // `bun run build`: the site for players in out/, built by Bun from index.html (which starts src/index.tsx).
 // After bundling it adds what GitHub Pages and an offline app need: public/, the manifest and icon links,
@@ -15,8 +29,11 @@ const OUT = join(ROOT, "out");
 const base = (process.env.PUBLIC_BASE_PATH || "/").replace(/\/$/, "");
 
 // Where the site is online, for links that search engines keep (canonical, sitemap).
-// GitHub Pages serves it on its own domain (repo settings → Pages, DNS in tools/toddlerfox.com.zone).
-const siteUrl = `${process.env.SITE_ORIGIN || "https://toddlerfox.com"}${base}`;
+// GitHub Pages serves it on its own domain (repo settings → Pages, DNS in tools/booksforboth.com.zone).
+const siteUrl = `${process.env.SITE_ORIGIN || "https://booksforboth.com"}${base}`;
+
+// READABLE=1 (`bun run perf --profile`): the same build with its names and lines kept, so a profile shows where time goes.
+const minify = process.env.READABLE === "1" ? { syntax: true, whitespace: false, identifiers: false } : true;
 
 const escapeHtml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
@@ -58,7 +75,8 @@ async function bundle() {
     entrypoints: [join(ROOT, "index.html")],
     outdir: OUT,
     splitting: true,
-    minify: true,
+    minify,
+    ...PRODUCTION,
     sourcemap: "none",
     publicPath: `${base}/`,
     naming: { entry: "[dir]/[name].[ext]", chunk: "static/[name].[hash].[ext]", asset: "static/[name].[hash].[ext]" },
@@ -81,47 +99,98 @@ const APP_LINKS = [
   `<link rel="apple-touch-icon" href="${href("/icons/apple-touch-icon.png")}" />`,
 ];
 
+// Visits are counted by Cloudflare Web Analytics: no cookies, nothing kept on the device, so no consent
+// banner a child would have to get past. Its site token is the repository variable CF_BEACON_TOKEN (set in
+// GitHub, passed in by deploy.yml); without it, as in every local build, nothing is counted.
+const beaconToken = process.env.CF_BEACON_TOKEN?.trim();
+if (beaconToken && !/^[0-9a-f]{32}$/i.test(beaconToken)) throw new Error("build: CF_BEACON_TOKEN is not a Cloudflare Web Analytics site token");
+const ANALYTICS = beaconToken
+  ? [`<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "${beaconToken}", "spa": true}'></script>`]
+  : [];
+
+/** One built page: a page of seo.ts in one language. */
+interface BuiltPage {
+  language: SeoLanguage;
+  /** The page's German entry; its address without the language's prefix. */
+  page: PageSeo;
+  /** Its texts in `language`. */
+  text: PageText;
+}
+
+/** A language's texts besides German (seo.<id>.ts). */
+const TRANSLATIONS: Record<Exclude<SeoLanguage, "de">, SeoTranslation> = { en: SEO_EN };
+
+const textIn = (page: PageSeo, language: SeoLanguage): PageText => {
+  if (language === "de") return page;
+  const text = TRANSLATIONS[language].pages[page.path];
+  if (!text) throw new Error(`build: ${page.path} has no texts in seo.${language}.ts`);
+  return text;
+};
+
+/** The full address of a page in a language. */
+const urlOf = (path: string, language: SeoLanguage) => `${siteUrl}${languagePrefix(language)}${path}`;
+
 /** What a page shows before the app has started, and all a crawler without JavaScript sees: its text and links to the other pages. */
-function staticBody(page: PageSeo) {
+function staticBody({ language, page, text }: BuiltPage) {
   const isScene = (p: PageSeo) => p.path.startsWith("/bilder/") && p.path !== "/bilder/";
   const links = SEO_PAGES.filter((p) => p.path !== page.path && (!isScene(p) || page.path.startsWith("/bilder/")));
+  const promise = language === "de" ? SITE_PROMISE : TRANSLATIONS[language].promise;
+  // The same page in the other languages, named in their own language.
+  const others = SEO_LANGUAGES.filter((other) => other !== language).map(
+    (other) => `<a href="${href(`${languagePrefix(other)}${page.path}`)}" hreflang="${other}">${LANGUAGE_NAMES[other]}</a>`,
+  );
   return [
     '<main class="seo-page">',
-    `<h1>${escapeHtml(page.title)}</h1>`,
-    `<p>${escapeHtml(page.text)}</p>`,
-    `<p>${escapeHtml(SITE_PROMISE)}</p>`,
+    `<h1>${escapeHtml(text.title)}</h1>`,
+    `<p>${escapeHtml(text.text)}</p>`,
+    `<p>${escapeHtml(promise)}</p>`,
     "<nav><ul>",
-    ...links.map((p) => `<li><a href="${href(p.path)}">${escapeHtml(p.title)}</a></li>`),
+    ...links.map((p) => `<li><a href="${href(`${languagePrefix(language)}${p.path}`)}">${escapeHtml(textIn(p, language).title)}</a></li>`),
     "</ul></nav>",
+    `<p>${others.join(" · ")}</p>`,
     "</main>",
   ].join("");
 }
 
+/** Each language by its own name, for the link to the same page in it. */
+const LANGUAGE_NAMES: Record<SeoLanguage, string> = { de: "Deutsch", en: "English" };
+
 /** Tags for search engines and link previews (WhatsApp, Messenger) in the page's head. */
-function headTags(page: PageSeo) {
-  const url = `${siteUrl}${page.path}`;
+function headTags({ language, page, text }: BuiltPage) {
+  const url = urlOf(page.path, language);
   const meta = (property: string, content: string) => `<meta property="${property}" content="${escapeHtml(content)}" />`;
+  const locale = (id: SeoLanguage) => (id === "de" ? "de_DE" : TRANSLATIONS[id].locale);
   const tags = [
     `<link rel="canonical" href="${url}" />`,
+    // The same page in every language, itself included, and English for everyone else (x-default).
+    ...SEO_LANGUAGES.map((id) => `<link rel="alternate" hreflang="${id}" href="${urlOf(page.path, id)}" />`),
+    `<link rel="alternate" hreflang="x-default" href="${urlOf(page.path, "en")}" />`,
     meta("og:type", "website"),
     meta("og:site_name", SITE_NAME),
-    meta("og:locale", "de_DE"),
-    meta("og:title", page.title),
-    meta("og:description", page.description),
+    meta("og:locale", locale(language)),
+    ...SEO_LANGUAGES.filter((id) => id !== language).map((id) => meta("og:locale:alternate", locale(id))),
+    meta("og:title", text.title),
+    meta("og:description", text.description),
     meta("og:url", url),
-    meta("og:image", `${siteUrl}/icons/icon-512.png`),
-    '<meta name="twitter:card" content="summary" />',
+    meta("og:image", `${siteUrl}${PREVIEW_IMAGE.path}`),
+    meta("og:image:width", String(PREVIEW_IMAGE.width)),
+    meta("og:image:height", String(PREVIEW_IMAGE.height)),
+    meta("og:image:alt", language === "de" ? PREVIEW_IMAGE.alt : TRANSLATIONS[language].imageAlt),
+    '<meta name="twitter:card" content="summary_large_image" />',
   ];
   if (page.path === "/") {
+    // The site's name in Google's results comes from WebSite; without it Google guesses from the domain.
+    const site = { "@context": "https://schema.org", "@type": "WebSite", name: SITE_NAME, url, inLanguage: language };
+    tags.push(`<script type="application/ld+json">${JSON.stringify(site)}</script>`);
     const app = {
       "@context": "https://schema.org",
       "@type": "WebApplication",
       name: SITE_NAME,
       url,
-      description: page.description,
+      description: text.description,
       applicationCategory: "GameApplication",
       operatingSystem: "Web",
-      inLanguage: "de",
+      inLanguage: language,
       isAccessibleForFree: true,
       offers: { "@type": "Offer", price: "0", priceCurrency: "EUR" },
       audience: { "@type": "PeopleAudience", suggestedMinAge: 2, suggestedMaxAge: 4 },
@@ -134,34 +203,48 @@ function headTags(page: PageSeo) {
 // Search engines: GitHub Pages answers every address but the start page with 404.html and status 404,
 // which Google does not index. So every page of src/content/seo.ts gets an index.html of its own (status
 // 200) with its title, description, canonical link, preview tags and its text in #root, which the app
-// replaces when it starts. Then sitemap.xml and robots.txt, which names the sitemap (robots.txt only
-// counts at the root of a domain, so under a folder the sitemap has to be given to the Search Console by hand).
+// replaces when it starts – once in German at its plain address and once in every other language of
+// SEO_LANGUAGES under its prefix (/en/zaehne/), linked to each other with hreflang. Then sitemap.xml and
+// robots.txt, which names the sitemap (robots.txt only counts at the root of a domain, so under a folder the
+// sitemap has to be given to the Search Console by hand).
+// The pages for grown-ups only (NO_INDEX_PATHS) get a page too, with a noindex tag: Google has to be let in to
+// read that tag, so robots.txt must not block them – a blocked page that is linked (the Impressum is, from the
+// home page) can still turn up in results, as a bare address. The sitemap has no <lastmod>: the build date on
+// every page would be wrong, and Google ignores lastmod on a site where it is often wrong.
 // 404.html stays the plain start page, so deep links like /bilder/baustelle/ still boot the app.
 async function writePages(template: string) {
   await writeFile(join(OUT, "404.html"), template);
-  for (const page of SEO_PAGES) {
-    let html = replaceOnce(template, /<title>[^<]*<\/title>/, `<title>${escapeHtml(fullTitle(page))}</title>`);
-    html = replaceOnce(html, /<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${escapeHtml(page.description)}" />`);
-    html = replaceOnce(html, "</head>", `  ${headTags(page)}\n  </head>`);
-    html = replaceOnce(html, '<div id="root"></div>', `<div id="root">${staticBody(page)}</div>`);
-    const dir = join(OUT, page.path);
+  const built = SEO_LANGUAGES.flatMap((language) => SEO_PAGES.map((page): BuiltPage => ({ language, page, text: textIn(page, language) })));
+  for (const one of built) {
+    let html = replaceOnce(template, '<html lang="de">', `<html lang="${one.language}">`);
+    html = replaceOnce(html, /<title>[^<]*<\/title>/, `<title>${escapeHtml(fullTitle(one.text))}</title>`);
+    html = replaceOnce(html, /<meta name="description" content="[^"]*" \/>/, `<meta name="description" content="${escapeHtml(one.text.description)}" />`);
+    html = replaceOnce(html, "</head>", `  ${headTags(one)}\n  </head>`);
+    html = replaceOnce(html, '<div id="root"></div>', `<div id="root">${staticBody(one)}</div>`);
+    const dir = join(OUT, languagePrefix(one.language), one.page.path);
     await mkdir(dir, { recursive: true });
     await writeFile(join(dir, "index.html"), html);
   }
-  const today = new Date().toISOString().slice(0, 10);
-  const urls = SEO_PAGES.map((page) => `  <url><loc>${siteUrl}${page.path}</loc><lastmod>${today}</lastmod></url>`);
+  for (const language of SEO_LANGUAGES) {
+    for (const path of NO_INDEX_PATHS) {
+      const dir = join(OUT, languagePrefix(language), path);
+      await mkdir(dir, { recursive: true });
+      const html = replaceOnce(template, '<html lang="de">', `<html lang="${language}">`);
+      await writeFile(join(dir, "index.html"), replaceOnce(html, "</head>", '<meta name="robots" content="noindex" /></head>'));
+    }
+  }
+  const urls = built.map(({ language, page }) => `  <url><loc>${urlOf(page.path, language)}</loc></url>`);
   await writeFile(
     join(OUT, "sitemap.xml"),
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
   );
-  const disallow = NO_INDEX_PATHS.map((path) => `Disallow: ${href(path)}`).join("\n");
-  await writeFile(join(OUT, "robots.txt"), `User-agent: *\n${disallow}\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
+  await writeFile(join(OUT, "robots.txt"), `User-agent: *\nAllow: /\n\nSitemap: ${siteUrl}/sitemap.xml\n`);
 }
 
 // Offline support (PWA): writes out/sw.js from src/sw.js with the list of all built files, so the
 // service worker can keep them in the browser. The version is a hash over the worker and all files,
 // so every change installs a new one. 404.html is left out: the worker answers deep links with
-// index.html itself. So are songs (files named musik-*.mp3): music can be switched off for all games,
+// index.html itself, and so is the picture for link previews (PREVIEW_IMAGE), which only other sites fetch. So are songs (files named musik-*.mp3): music can be switched off for all games,
 // and then they must not be downloaded; the worker keeps a song once a page has fetched it. The same
 // for Tapsi's voice in languages besides German (en-<hash>.mp3 and so on, src/lib/voiceName.ts)
 // and the texts of each language (texts-ru.<hash>.js, src/content/texts): only the chosen one is needed, and
@@ -173,6 +256,7 @@ async function writeServiceWorker() {
     (file) =>
       file !== "404.html" &&
       file !== "sw.js" &&
+      `/${file}` !== PREVIEW_IMAGE.path &&
       !/\.(map|LICENSE\.txt)$/.test(file) &&
       !/(^|\/)(musik-[^/]*|[a-z]{2}-[0-9a-f]{8}[^/]*)\.mp3$/.test(file) &&
       !Object.values(texts).includes(`./${file}`),
@@ -191,7 +275,7 @@ const started = performance.now();
 await rm(OUT, { recursive: true, force: true });
 const result = await bundle();
 await cp(join(ROOT, "public"), OUT, { recursive: true });
-const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${APP_LINKS.join("")}</head>`);
+const template = replaceOnce(await readFile(join(OUT, "index.html"), "utf8"), "</head>", `${[...APP_LINKS, ...ANALYTICS].join("")}</head>`);
 await writeFile(join(OUT, "index.html"), template);
 await writePages(template);
 await writeServiceWorker();

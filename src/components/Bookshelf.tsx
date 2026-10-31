@@ -1,7 +1,6 @@
-import { type CSSProperties, type HTMLAttributes, type MouseEvent, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
-import { InstallHint } from "@/components/InstallHint";
 import { Logo } from "@/components/Logo";
 import { RoomFigures, RoomHourglass, RoomSpeaker, RoomSwitch } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
@@ -9,57 +8,47 @@ import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
-import { buildDate } from "@/lib/pwa";
 import { BOOK_ASPECT, planShelf, type ShelfLayout } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
 /** The picture hanging on the wall where there is room: the fox family and the bear family reading together. */
 const READING = pictures["buch-cover.webp"];
 
-/** A book on the shelf: a category (its page, or its only game) or a game of „Weitere“, which stands there on its own. */
+/** A book on the shelf: a category, opening on its page (its table of contents) or on its only game. */
 interface ShelfBook {
   /** Its `data-book`, by which the way back finds its gap (`shelfBookOf` in bookTravel.ts). */
   id: string;
   href: string;
   world: WorldId;
   title: Localized;
-  blurb?: Localized;
+  blurb: Localized;
   emoji: string;
   /** A category's games, shown on its cover as a collage. */
   games?: string[];
 }
 
-/** The categories behind a book of their own. */
-const CARDS = CATEGORIES.filter((c) => !c.onHome);
-/** The categories whose games are books of their own, together on a board named after them. */
-const FRAMED = CATEGORIES.filter((c) => c.onHome);
-
-const BOOKS: ShelfBook[] = [
-  ...CARDS.map((c) => ({
-    id: c.id,
-    href: categoryHref(c),
-    world: c.id as WorldId,
-    title: c.title,
-    blurb: c.blurb,
-    emoji: c.emoji,
-    games: hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
-  })),
-  ...FRAMED.flatMap((c) => c.games.map((g) => ({ id: g.href, href: g.href, world: c.id as WorldId, title: g.title, blurb: g.blurb, emoji: g.emoji }))),
-];
-/** How many books each group has, each on a board (or two) of its own. */
-const GROUPS = [CARDS.length, ...FRAMED.map((c) => c.games.length)];
+const BOOKS: ShelfBook[] = CATEGORIES.map((c) => ({
+  id: c.id,
+  href: categoryHref(c),
+  world: c.id as WorldId,
+  title: c.title,
+  blurb: c.blurb,
+  emoji: c.emoji,
+  games: hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
+}));
+/** All books are one group: the shelf may put them on one board or more. */
+const GROUPS = [BOOKS.length];
 
 /** The colours of the books standing with their spines out beside the picture books, only to fill the shelf. */
 const SPINE_COLOURS = ["#b5523b", "#3f6f8f", "#d9a441", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62", "#a8443f", "#6b7fb0", "#e0b85c"];
 
 /**
- * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category and each game
- * of „Weitere“ is a picture book standing on it with its cover out; a tap takes it out and opens it (bookTravel.ts).
- * Around the shelf the room's things are the options for grown-ups (RoomOptions). Drawn in 3D – the boards seen from
- * the eye's height, the walls inside going back – but still: nothing moves until it is tapped.
+ * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category is a picture
+ * book standing on it with its cover out; a tap takes it out and opens it (bookTravel.ts). Around the shelf the room's
+ * things are the options for grown-ups (RoomOptions). Drawn in 3D – the boards seen from the eye's height, the walls
+ * inside going back – but still: nothing moves until it is tapped. `children` follow below the first screen.
  */
-export function Bookshelf({ secretProps }: { secretProps: HTMLAttributes<HTMLElement> }) {
-  const t = useT();
+export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttributes<HTMLElement>; children?: ReactNode }) {
   const navigate = useNavigate();
   const room = useRef<HTMLDivElement>(null);
   const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number; height: number } | null>(null);
@@ -128,26 +117,25 @@ export function Bookshelf({ secretProps }: { secretProps: HTMLAttributes<HTMLEle
                 <span className="shelf-side right" />
                 <span className="shelf-ceiling" />
                 {layout.rows.map((row, r) => {
-                  const group = groupOf(row[0]);
-                  const first = r === 0 || groupOf(layout.rows[r - 1][0]) !== group;
+                  const tier = layout.tierHeights[r];
+                  const top = layout.frame.crown + layout.tierHeights.slice(0, r).reduce((sum, t) => sum + t + layout.frame.board, 0);
+                  // A board of smaller books, above the picture books: its own book height for the spines on it.
+                  const spare = row.length === 0;
+                  const style = { top, "--tier": `${tier}px`, ...(spare && { "--bh": `${tier * 0.86}px` }) } as CSSProperties;
+                  const sides = spare ? spareSpines(layout, tier * 0.86) : spinesFor(layout, row.length);
                   return (
-                    <div key={row[0]} className="shelf-tier" style={{ top: layout.frame.crown + r * (layout.tierHeight + layout.frame.board) }}>
-                      <div className="shelf-row">
-                        <Spines count={spinesFor(layout, row.length)} seed={r * 3} />
+                    <div key={spare ? `spare-${r}` : row[0]} className="shelf-tier" style={style}>
+                      <div className={`shelf-row${spare ? " spare" : ""}`}>
+                        <Spines count={sides} seed={r * 3} />
                         {row.map((i) => (
                           <Book key={BOOKS[i].id} book={BOOKS[i]} onClick={take(BOOKS[i])} />
                         ))}
-                        <Spines count={spinesFor(layout, row.length) + (r % 2)} seed={r * 3 + 5} />
+                        <Spines count={sides + (r % 2)} seed={r * 3 + 5} />
                       </div>
+                      <span className="shelf-tier-shade" />
                       <span className="shelf-board-top" />
                       <span className="shelf-board-under" />
                       <span className="shelf-board" />
-                      {/* „Weitere“ is named once, on the edge of its first board, as a library labels its shelves. */}
-                      {group && first && (
-                        <span className="shelf-label">
-                          <span aria-hidden>{group.emoji}</span> {t(group.title)}
-                        </span>
-                      )}
                     </div>
                   );
                 })}
@@ -169,28 +157,20 @@ export function Bookshelf({ secretProps }: { secretProps: HTMLAttributes<HTMLEle
           </div>
         </div>
       </div>
-      <InstallHint />
-      <p className="home-version">
-        {t({ de: "Stand", ru: "Версия от", en: "Version", zh: "版本", hi: "संस्करण", es: "Versión", ar: "الإصدار" })} {buildDate()}
-      </p>
+      {children}
     </main>
   );
-}
-
-/** The category on a board of its own a book belongs to („Weitere“), none for a category's own book. */
-function groupOf(book: number) {
-  let start = CARDS.length;
-  for (const category of FRAMED) {
-    if (book >= start && book < start + category.games.length) return category;
-    start += category.games.length;
-  }
-  return undefined;
 }
 
 /** How many spines fit on each side of a board's picture books, to fill it as a real shelf is. */
 function spinesFor(layout: ShelfLayout, books: number) {
   const free = layout.width - 2 * layout.frame.post - books * layout.bookHeight * BOOK_ASPECT - (books + 1) * layout.gap;
   return Math.max(0, Math.min(5, Math.floor(free / 2 / (layout.bookHeight * 0.17))));
+}
+
+/** How many spines stand at each end of a board without picture books, books `height` high: most of its width. */
+function spareSpines(layout: ShelfLayout, height: number) {
+  return Math.max(0, Math.min(16, Math.floor(((layout.width - 2 * layout.frame.post) * 0.36) / (height * 0.16 + 1))));
 }
 
 /** A few books standing with their spines out, only to fill the shelf: their colours and heights from `seed`. */
@@ -229,7 +209,7 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
       data-world={book.world}
       data-tap
       aria-label={title}
-      title={book.blurb && t(book.blurb)}
+      title={t(book.blurb)}
       // The page starts loading as the finger lands, not only once it is lifted.
       onPointerDown={() => preloadPage(book.href)}
       onClick={onClick}
@@ -241,8 +221,8 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
       <span className="shelf-book-cover">
         <span className="shelf-book-title">{title}</span>
         <span className="shelf-book-picture">
-          {/* A category's book shows a piece of its world; „Weitere“'s games have none of their own. */}
-          {book.world !== "weitere" && <WorldCardScene world={book.world} />}
+          {/* Each book shows a piece of its category's world. */}
+          <WorldCardScene world={book.world} />
           {book.games ? (
             <span className="shelf-book-collage" data-count={Math.min(book.games.length, 4)}>
               {book.games.slice(0, 4).map((e, i) => (
@@ -253,7 +233,7 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
             <span className="shelf-book-emoji">{book.emoji}</span>
           )}
         </span>
-        {book.blurb && <span className="shelf-book-blurb">{t(book.blurb)}</span>}
+        <span className="shelf-book-blurb">{t(book.blurb)}</span>
       </span>
     </Link>
   );

@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useRef, useState, type ReactNode 
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
+import { SeoText } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
@@ -324,6 +325,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
         </button>
       )}
       <PlaytimeNote />
+      <SeoText />
     </main>
   );
 }

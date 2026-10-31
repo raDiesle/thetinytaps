@@ -8,11 +8,12 @@ import { useT } from "@/lib/language";
 import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
+import { SeoText } from "@/components/SeoText";
 
-/** The page of the book each game's chapter starts on, as its table of contents lists them (book look). */
-const pageOf = (game: number) => 3 + game * 6;
-
-/** One category of the home menu with its games; in the book look the table of contents of the category's book. */
+/**
+ * One book of the home page's shelf, opened: its first page is the table of contents, its games on pasted-in cards, each
+ * on a page of its own.
+ */
 export function CategoryPage() {
   const { category: id } = useParams();
   const category = CATEGORIES.find((c) => c.id === id);
@@ -37,12 +38,14 @@ export function CategoryPage() {
         }
       />
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
+        {/* The opened book: this is its first page, each game one of the pages after it. */}
         {category.games.map((g, i) => (
           <li key={g.href}>
-            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} page={pageOf(i)} />
+            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} page={i + 2} />
           </li>
         ))}
       </ul>
+      <SeoText />
     </main>
   );
 }

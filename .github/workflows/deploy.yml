@@ -26,8 +26,11 @@ jobs:
       # Exactly what bun.lock says, with the safety settings of bunfig.toml (no install scripts, 3 days old).
       - run: bun install --frozen-lockfile
       - run: bun run verify
-      # The site is served from the root of https://toddlerfox.com (repo settings → Pages → Custom domain).
+      # The site is served from the root of https://booksforboth.com (repo settings → Pages → Custom domain).
       - run: bun run build
+        env:
+          # Cloudflare Web Analytics' site token: Settings → Secrets and variables → Actions → Variables.
+          CF_BEACON_TOKEN: ${{ vars.CF_BEACON_TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out

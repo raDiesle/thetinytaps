@@ -23,6 +23,16 @@ export interface BuildInfo {
   BUILD_TIME: string;
 }
 
+/**
+ * What the build for players adds to Bun.build: React's production code and JSX without its development checks.
+ * Without it Bun compiles every element with `jsxDEV` and keeps React's development code, which made every game
+ * several times slower on phones (October 2026; `src/buildTools.test.ts` checks it).
+ */
+export const PRODUCTION = {
+  define: { "process.env.NODE_ENV": JSON.stringify("production") },
+  jsx: { development: false },
+} as const;
+
 /** The folder part of a pattern ("../sounds" of "../sounds/*.mp3") and the glob below it. */
 function splitPattern(pattern: string) {
   const parts = pattern.split("/");

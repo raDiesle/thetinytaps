@@ -1,12 +1,17 @@
 import type { IdeaArea } from "./types";
 
-/** D: das Buch – the app as a picture book a grown-up and a child read together (A-20), and what still doesn't fit it. */
+/**
+ * D: das Buch – the app as a picture book a grown-up and a child read together (A-20), what still doesn't fit it, and
+ * the app's two mascots, the fox and the bear, that come back in its games (their tasks game by game in mascotStatus.ts).
+ * The mascots are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs or Bär with its
+ * child – since the book is about grown-ups and children experiencing it together, with the child at the centre.
+ */
 export const bookIdeas: IdeaArea = {
   prefix: "D",
   emoji: "📖",
-  title: "Das Bilderbuch",
+  title: "Das Bilderbuch, Fuchs und Bär",
   intro:
-    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite.",
+    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite. Fuchs und Bär sind die Maskottchen der App (D-16 bis D-21) – aber nie ein Tier allein, sondern immer ein Großer mit einem Kind: Mama, Papa, Oma oder Opa Fuchs mit dem Fuchskind, ebenso bei den Bären. Denn das Thema ist das gemeinsame Erleben: Die App heißt „Books for Both“, Großer und Kind schauen Buch und Spiele zusammen an, nicht das Kind allein. Im Mittelpunkt steht dabei das Kind: Das Tierkind tut die Sache (tippt, putzt, pustet, entdeckt), der Große ist daneben, schaut zu, hilft und freut sich mit – so wie der Große vor dem Bildschirm. Wer liest, sind die Fuchs- und die Bärenfamilie vom Cover, und in den Spielen tauchen sie immer wieder auf, damit Kinder sie überall wiederfinden – nicht in jeder Ecke und nicht beide überall, sondern wo es passt. Nur wo ein Fuchs oder Bär eine Rolle spielt (die Bäckerin, die Ärztin), darf er allein stehen. Spiel für Spiel in der Tabelle „🦊🐻 Fuchs & Bär“ oben. (Bis 31. Oktober 2026 sollte nur der Fuchs überall vorkommen, passend zur Adresse toddlerfox.com; seit dem Umzug auf booksforboth.com ist der Bär genauso willkommen.)",
   ideas: [
     {
       id: "D-01",
@@ -21,10 +26,10 @@ export const bookIdeas: IdeaArea = {
     {
       id: "D-02",
       partial:
-        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Die Tiere aus den Spielen fehlen noch.",
-      emoji: "🐻",
+        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Fuchs- oder Bärenpaare passend zu jeder Welt und Oma und Opa (D-21) fehlen noch.",
+      emoji: "🦊",
       title: "Tiereltern am Seitenrand",
-      text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: Fuchs, Bär, und später die Tiere aus den Spielen (Gefühle-Tiere, Bauernhof-Tiere), jede Welt ihre eigenen. Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
+      text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: die Fuchs- und die Bärenfamilie, und später in jeder Welt ein Großer mit seinem Kind, wie sie zu ihr passen (Papa Bär und das Bärenkind mit Bauhelm auf der Baustelle, Oma Fuchs und das Fuchskind in Gummistiefeln auf dem Bauernhof). Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
       why: "Erinnert Eltern bei jedem Blättern: Das Kind spielt nicht allein, wir schauen zusammen.",
       effort: "S",
     },
@@ -95,9 +100,10 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-11",
+      partial: "Der Titel steht jetzt in einer Buchschrift mit Fuchs und Bär als Vignette (D-16); Sonne mit Gesicht und Pillen-Knöpfe sind noch offen.",
       emoji: "🌈",
       title: "Titel wie gedruckt",
-      text: "Prüfung, was noch nicht zum Buch passt: Der bunte Titel „The Tiny Taps“ auf der Inhaltsseite, die Sonne mit Gesicht und die runden Pillen-Knöpfe oben rechts sehen noch nach App aus. Ein Titel in einer Buchschrift mit einer Vignette, die Sonne als Zeichnung ohne Gesicht, die Knöpfe als kleine Lesezeichen am Seitenrand.",
+      text: "Prüfung, was noch nicht zum Buch passt: Der bunte Titel auf der Inhaltsseite, die Sonne mit Gesicht und die runden Pillen-Knöpfe oben rechts sehen noch nach App aus. Ein Titel in einer Buchschrift mit einer Vignette, die Sonne als Zeichnung ohne Gesicht, die Knöpfe als kleine Lesezeichen am Seitenrand.",
       why: "Die erste Seite nach dem Cover sieht dann wie eine Titelseite aus.",
       effort: "S",
     },
@@ -116,6 +122,74 @@ export const bookIdeas: IdeaArea = {
       text: "Auf Tablets lässt sich eine Menüseite auch mit einer Wischbewegung von der rechten Ecke umblättern, die Ecke biegt sich mit dem Finger mit; ein Tipp auf eine Karte bleibt wie bisher.",
       why: "Fühlt sich an wie ein echtes Buch in der Hand.",
       effort: "M",
+    },
+    {
+      id: "D-14",
+      rejected: true,
+      emoji: "🦊",
+      title: "Cover nur mit der Fuchsfamilie",
+      text: "Das Bild auf dem Cover zeigt nur noch Tapsis Fuchsfamilie: ein Fuchs-Elternteil und ein Fuchskind, die zusammen ein Buch anschauen und lachen. Die Bärenfamilie fällt weg. Ein Bild mit Gemini (buch-cover.webp), mit den Füchsen von buch-fuechse.webp als Vorlage, im Sammel-Batch der Tabelle „🦊 Füchse“.",
+      why: "Abgelehnt (31. Oktober 2026): Seit die App booksforboth.com heißt und nicht mehr toddlerfox.com, muss der Fuchs nicht allein sein – Fuchs und Bär sind beide Maskottchen, das Cover mit beiden Familien bleibt.",
+      effort: "S",
+    },
+    {
+      id: "D-15",
+      rejected: true,
+      emoji: "👵",
+      title: "Oma oder Opa Fuchs statt der Bären",
+      text: "Wo heute die Bärenfamilie neben den Karten und in der obersten Zeile steht, sitzt Oma oder Opa Fuchs mit dem Fuchskind, beide lachen und schauen ins Buch. Ein Bild mit Gemini (freigestellt wie buch-fuechse.webp), dann fliegt der Bär aus BookFamily, Sky und MenuTop.",
+      why: "Abgelehnt (31. Oktober 2026): Der Bär bleibt, Fuchs und Bär sind beide Maskottchen. Großeltern, die vorlesen, kommen als Oma und Opa Bär bzw. Fuchs dazu (D-21).",
+      effort: "S",
+    },
+    {
+      id: "D-16",
+      done: true,
+      emoji: "🔤",
+      title: "Titel „Books for Both“ auf Startseite und Cover",
+      text: "Die Startseite und das Cover hießen „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Books for Both“ in einer Buchschrift, mit Fuchs und Bär als kleiner gezeichneter Vignette (sie lehnen an den Wörtern oder schauen zusammen aus einem Buch hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Ohren von Fuchs oder Bär. Hängt mit D-11 zusammen (Titel wie gedruckt).",
+      why: "Die Adresse heißt booksforboth.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder. (Bis 31. Oktober 2026 hieß die Idee „Toddlerfox“; kein „toddler“ im Namen, Recherche „Eine Domain ohne ‚toddler‘“.)",
+      effort: "S",
+    },
+    {
+      id: "D-17",
+      emoji: "🌲",
+      title: "Startseite als Wald von Fuchs und Bär",
+      text: "Hinter der Inhaltsseite steht heute nur ein Himmel. Neu: unten ein Waldrand mit Tapsis Fuchsbau und der Höhle der Bären, aus denen die Familien schauen, ein Pfad, Gräser, Pilze – still wie ein gedrucktes Bild, nichts bewegt sich von allein. Ein Tippen auf Bau oder Höhle lässt das Fuchs- oder Bärenkind herausschauen, und gleich hinter ihm Mama, Papa, Oma oder Opa – jedes Mal ein anderer. Jede Welt (Worlds.tsx) bekommt irgendwo in ihrem Bild einen kleinen Fuchs oder Bären mit seinem Kind, die zusammen etwas anschauen. Als Zeichnung (SVG), keine Bilddatei.",
+      why: "Die erste Seite zeigt sofort, wer durch das Buch führt: Fuchs und Bär, Groß und Klein zusammen.",
+      effort: "M",
+    },
+    {
+      id: "D-18",
+      emoji: "🗂️",
+      title: "Fuchs und Bär als Maskottchen in allen Spielen",
+      text: "Fuchs und Bär tauchen als wiederkehrendes Muster in allen Spielen auf, Spiel für Spiel nach Aufwand – nicht in jeder Ecke, aber so, dass Kinder sie überall wiederfinden. Das Muster ist immer ein Paar aus Großem und Kind: Das Fuchs- oder Bärenkind tut, was das Kind im Spiel tut (putzt mit, pustet mit, schaut aus dem Versteck), und Mama, Papa, Oma oder Opa sind dabei, helfen, staunen und klatschen am Ende mit ihm. Allein steht ein Fuchs oder Bär nur in einer Rolle, als Erwachsener statt eines gezeichneten Menschen (Bäckerin, Ärztin, Feuerwehr). Menschen dürfen bleiben. Die Aufgaben stehen in der Tabelle „🦊🐻 Fuchs & Bär“ oben (mascotStatus.ts), getrennt nach Zeichnung (im Code, jederzeit) und Gemini-Bild (wartet und wird gesammelt in einem Batch gemacht, das ist günstiger).",
+      why: "Aus vielen einzelnen Spielen wird eine Welt mit zwei Familien, die Kinder überall wiederfinden – und jedes Mal sehen Kind und Großer vor dem Bildschirm sich selbst darin: ein Kind, das etwas tut, und einen Großen, der dabei ist.",
+      effort: "L",
+    },
+    {
+      id: "D-19",
+      emoji: "🧒",
+      title: "Das Kind als Fuchs- oder Bärenkind?",
+      text: "Zu entscheiden: Bleibt die Figur, die für das Kind steht (Junge / Mädchen in Kleine Abenteuer, Zähne putzen, Aufzug), ein Menschenkind, oder wird sie ein Fuchs- oder Bärenkind mit Zöpfen bzw. ohne? Ein Menschenkind lässt das Kind sich selbst erkennen; ein Tierkind passt zum Buch und bekommt leicht seinen Großen dazu (Mama, Papa, Oma oder Opa Fuchs, der mitgeht). Bis zur Entscheidung bleibt sie ein Menschenkind.",
+      why: "Die größte Frage bei Fuchs und Bär – erst entscheiden, dann zeichnen.",
+      effort: "M",
+    },
+    {
+      id: "D-20",
+      done: true,
+      emoji: "📚",
+      title: "Ein Regal voller Bücher: jede Sorte ein Buch, jedes Level eine Seite",
+      text: "Die Startseite wird ein Bücherregal statt einer Inhaltsseite: Jede Kategorie ist ein eigenes Buch mit ihrem Umschlag (ihre Welt aus Worlds.tsx als Bild, der Titel auf dem Buchrücken). Ein Tipp zieht das Buch heraus und schlägt es auf; darin ist jedes Spiel oder Level eine Seite zum Umblättern (das Umblättern aus A-20 gibt es schon). Die „Weiteren“ Spiele, die heute ohne eigene Seite auf der Startseite stehen, kommen in ein neues Buch „Hilfen“ (oder „Für jeden Tag“) mit Zähne putzen, Aufs Töpfchen und Sterne & Tagesplan; ob Laut und leise dazugehört oder in ein anderes Buch, ist zu entscheiden. Passt zum Namen „Books for Both“ (booksforboth.com): viele Bücher, alle für Groß und Klein zusammen. Ändert zwei Regeln aus CLAUDE.md, die dann neu geschrieben werden müssen: eine Kategorie mit nur einem Spiel öffnet heute gleich das Spiel, und „Weitere“ hat heute keine eigene Seite (onHome).",
+      why: "Die App hat inzwischen so viel, dass eine Inhaltsseite voller Karten unübersichtlich wird. Ein Regal ordnet es wie zu Hause: Das Kind zeigt auf ein Buch, man nimmt es zusammen heraus und blättert.",
+      effort: "L",
+    },
+    {
+      id: "D-21",
+      emoji: "👵",
+      title: "Oma und Opa lesen auch vor",
+      text: "Neben den Karten und auf den Kapitelseiten liest nicht immer Mama oder Papa mit dem Kind: mal ist es Oma Fuchs, mal Opa Bär, die mit dem Fuchs- oder Bärenkind ins Buch schauen. Wer gerade vorliest, wechselt von Besuch zu Besuch; das Cover bleibt bei den zwei Familien. Vier Gemini-Bilder (Oma und Opa Fuchs, Oma und Opa Bär, jeweils mit dem Kind, freigestellt wie buch-fuechse.webp), im Sammel-Batch der Tabelle „🦊🐻 Fuchs & Bär“. In den Spielen kommen Oma und Opa wie Mama und Papa als der Große neben dem Tierkind vor (D-18).",
+      why: "Viele Kinder spielen und lesen mit Oma und Opa – auch sie sollen sich im Buch wiederfinden, nicht nur Eltern.",
+      effort: "S",
     },
   ],
 };
