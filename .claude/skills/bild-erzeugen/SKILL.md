@@ -131,7 +131,11 @@ no frames, no book, page or paper edge drawn around the picture.
 ```
 
 The app draws the book, its page and margin round every picture itself: never ask Gemini for them, and keep the
-last line of the block, so „a page of a picture book“ doesn't come back as a drawn open book. A picture added to a set that already exists (a story, a folder
+last line of the block, so „a page of a picture book“ doesn't come back as a drawn open book. Never call the picture a
+„cover“ or „the cover picture of a book“ either: with that word the shelf books' covers came back as a booklet with
+paper edge and rounded corners, or framed by a black border, despite the block. Write „The picture of a book about …“
+and add „The illustration fills the whole square edge to edge (full bleed): no border, no frame, no margin, no rounded
+corners“. A picture added to a set that already exists (a story, a folder
 with its own guide) keeps that set's look and is drawn from its pictures as `--ref`, even when they still have the
 older bright style with dark-purple outlines (#2a1e5c) – one story never mixes the two.
 

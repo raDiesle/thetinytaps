@@ -1,5 +1,6 @@
-import { CATEGORIES } from "@/content/games";
+import { shelfEntryOf } from "@/content/games";
 import { playPageTurn } from "@/lib/sfx";
+import { BOOK_ASPECT } from "@/lib/shelfLayout";
 
 /*
  * The way into a book and back onto the shelf, in the book look (bookshelf.css): the home page is a bookshelf, and a
@@ -30,14 +31,8 @@ let travelling = false;
 
 const still = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** Whether a page belongs to the game: its address or one below it. */
-const ofGame = (hrefs: string[], path: string) => hrefs.some((href) => path.startsWith(href));
-
-/** The book on the shelf a page is in, by its `data-book`: its category's (its page and its games). */
-export function shelfBookOf(pathname: string): string | undefined {
-  const path = pathname.endsWith("/") ? pathname : `${pathname}/`;
-  return CATEGORIES.find((c) => path.startsWith(`/spiele/${c.id}/`) || c.games.some((g) => ofGame([g.href, ...(g.also ?? [])], path)))?.id;
-}
+/** The book on the shelf a page is in, by its `data-book`: its category's (its page and its games), or a game's own. */
+export const shelfBookOf = (pathname: string): string | undefined => shelfEntryOf(pathname)?.id;
 
 function element(className: string, tag = "div") {
   const el = document.createElement(tag);
@@ -63,17 +58,28 @@ function copyScreen() {
   return print;
 }
 
-/** The book flying, built from the shelf book `book` (its faces) and placed where its cover is on the screen. */
+/**
+ * The book flying, built from the shelf book `book` (its faces) and placed where its cover is on the screen. A book
+ * standing with its spine out (`.shelf-daily`) flies as the picture book it keeps hidden inside (`.shelf-daily-book`):
+ * as high as its spine, its spine as thick, at first turned so that its spine faces out where it stood.
+ */
 function buildBook(book: HTMLElement) {
+  const template = book.querySelector<HTMLElement>(".shelf-daily-book");
+  const spine = template && book.querySelector<HTMLElement>(".box-front");
   const cover = book.querySelector<HTMLElement>(".shelf-book-cover");
-  const rect = (cover ?? book).getBoundingClientRect();
-  const copy = book.cloneNode(true) as HTMLElement;
+  const rect = (spine ?? cover ?? book).getBoundingClientRect();
+  const copy = (template ?? book).cloneNode(true) as HTMLElement;
   copy.className = "shelf-book bt-book";
+  copy.hidden = false;
   copy.removeAttribute("href");
   copy.querySelector(".shelf-book-shadow")?.remove();
-  Object.assign(copy.style, { left: `${rect.left}px`, top: `${rect.top}px` });
-  copy.style.setProperty("--bw", `${rect.width}px`);
+  // Turned, the spine lies left of the cover's edge, which the book turns on: there, at the spine's right.
+  const w = spine ? rect.height * BOOK_ASPECT : rect.width;
+  const x = spine ? rect.right : rect.left;
+  Object.assign(copy.style, { left: `${x}px`, top: `${rect.top}px` });
+  copy.style.setProperty("--bw", `${w}px`);
   copy.style.setProperty("--bh", `${rect.height}px`);
+  if (spine) copy.style.setProperty("--depth", `${rect.width}px`);
   // The page under the cover (the right page once open), and the cover turning on the spine with the left page inside it.
   const right = element("bt-page bt-right");
   const lid = element("bt-lid");
@@ -83,7 +89,7 @@ function buildBook(book: HTMLElement) {
   lid.append(left);
   copy.prepend(right);
   copy.append(lid);
-  return { book: copy, right, lid, left, w: rect.width, h: rect.height, x: rect.left, y: rect.top };
+  return { book: copy, right, lid, left, w, h: rect.height, x, y: rect.top, turned: Boolean(spine) };
 }
 
 type Built = ReturnType<typeof buildBook>;
@@ -92,18 +98,19 @@ type Built = ReturnType<typeof buildBook>;
  * The book's moves, from its place on the shelf to its left page filling the screen, and the scale of that page then
  * (to print the screen on it at the right size).
  */
-function moves({ w, h, x, y }: Built) {
+function moves({ w, h, x, y, turned }: Built) {
   const vw = innerWidth;
   const vh = innerHeight;
   const margin = pageMargins();
-  const at = (dx: number, dy: number, s: number, z = 0) => `translate3d(${dx}px, ${dy}px, ${z}px) scale(${s})`;
+  // A book standing spine out turns its cover towards the eye as it comes out, done once it is in the middle.
+  const at = (dx: number, dy: number, s: number, z = 0, deg = 0) => `translate3d(${dx}px, ${dy}px, ${z}px) scale(${s})${turned ? ` rotateY(${deg}deg)` : ""}`;
   // In the middle closed, as big as it fits open; open with the spine in the middle; close with its left page as the screen.
   const middle = Math.min((0.7 * vh) / h, (0.42 * vw) / w);
   const page = (vw - margin.left - margin.right) / w;
   const pageTop = vh / 2 - (page * h) / 2;
   const book = [
-    { offset: 0, transform: at(0, 0, 1), easing: "cubic-bezier(.3,0,.4,1)" },
-    { offset: AT_LIFTED, transform: at(0, -0.09 * h, 1, 60), easing: "cubic-bezier(.45,0,.35,1)" },
+    { offset: 0, transform: at(0, 0, 1, 0, 90), easing: "cubic-bezier(.3,0,.4,1)" },
+    { offset: AT_LIFTED, transform: at(0, -0.09 * h, 1, turned ? 60 + w / 2 : 60, 50), easing: "cubic-bezier(.45,0,.35,1)" },
     { offset: AT_MIDDLE, transform: at(vw / 2 - (middle * w) / 2 - x, vh / 2 - (middle * h) / 2 - y, middle), easing: "cubic-bezier(.45,0,.35,1)" },
     { offset: AT_OPEN, transform: at(vw / 2 - x, vh / 2 - (middle * h) / 2 - y, middle), easing: "cubic-bezier(.55,0,.4,1)" },
     { offset: 1, transform: at(vw - margin.right - x, pageTop - y, page) },
@@ -227,7 +234,7 @@ export function putBookBack(from: string, go: () => void) {
   go();
   const started = performance.now();
   const findBook = async (): Promise<HTMLElement | null> => {
-    const book = document.querySelector<HTMLElement>(`.shelf-book[data-book="${id}"]`);
+    const book = document.querySelector<HTMLElement>(`.shelf [data-book="${id}"]`);
     if (book || performance.now() - started > 1500) return book;
     await frames(1);
     return findBook();
