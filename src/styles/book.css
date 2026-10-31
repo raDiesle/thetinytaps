@@ -382,10 +382,42 @@
     0 3px 6px -3px #5a3c1f80;
 }
 
-:root[data-look="book"] .game-emoji,
-:root[data-look="book"] .game-go {
+:root[data-look="book"] .game-emoji {
   border: 2px solid var(--ink);
   background: var(--paper);
+}
+
+/*
+ * A picture pasted into a book has no ▶ on it: the whole card is what is tapped (user feedback, October 2026). Without
+ * it the card needs no room below its title, so it is that much lower than its row and sits in the middle of it.
+ */
+:root[data-look="book"] .game-go {
+  display: none;
+}
+
+:root[data-look="book"] .game-list.fit li:has(> .game-card) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+@container (min-height: 130px) {
+  :root[data-look="book"] .game-list.fit .game-card {
+    height: calc(100% - max(2cqh, 30px - 5cqh));
+    padding-bottom: 5cqh;
+  }
+}
+
+@container (max-height: 129.98px) {
+  :root[data-look="book"] .game-list.fit .game-card {
+    padding-right: 10px;
+  }
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"] .game-list:not(.fit) .game-card {
+    padding-right: 12px;
+  }
 }
 
 :root[data-look="book"] .game-title {
@@ -518,6 +550,65 @@
   border: 0;
   background: none;
   box-shadow: none;
+}
+
+/*
+ * The level row's choices (Lebendige Bilder's ways to play): small slips of paper lying a little askew on the page, like
+ * the cards under them, not buttons standing up from it; the chosen one is yellow and taped down like a card.
+ */
+:root[data-look="book"] .mode-level .choice {
+  gap: 8px;
+}
+
+:root[data-look="book"] .mode-level .choice button {
+  position: relative;
+  border: 1.5px solid #3d3045b3;
+  border-radius: 4px 7px 5px 8px / 7px 4px 8px 5px;
+  background-color: color-mix(in srgb, var(--paper) 70%, #fff);
+  box-shadow:
+    0 1px 1px #3d304526,
+    0 5px 8px -6px #5a3c1f8c;
+  rotate: -1.2deg;
+}
+
+:root[data-look="book"] .mode-level .choice button:nth-of-type(even) {
+  rotate: 1deg;
+}
+
+:root[data-look="book"] .mode-level .choice button.selected {
+  border-color: var(--ink);
+  background-color: color-mix(in srgb, var(--sunshine) 70%, var(--paper));
+  rotate: 0deg;
+}
+
+:root[data-look="book"] .mode-level .choice button.selected::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  width: 34px;
+  height: 13px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: repeating-linear-gradient(90deg, #fff6c8a0 0 5px, #ffeeb0a0 5px 10px);
+  box-shadow: 0 1px 2px #0000001f;
+  pointer-events: none;
+}
+
+/* Their pictures say what they are: the label above them is only read out, so the slips keep to one line. */
+:root[data-look="book"] .menu-head > .mode-level legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+@media (min-width: 600px) and (min-height: 600px) {
+  :root[data-look="book"] .menu-head > .mode-level .choice button {
+    min-height: 36px;
+    padding: 3px 10px;
+  }
 }
 
 /* „Bitte quer halten“ lies on the book's paper too. */

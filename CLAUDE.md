@@ -389,7 +389,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   restarts at every keyframe, so the page would stop and start.
   Where the page has no room for the families beside the cards (below 1400 × 640), they sit in the menu's top row
   instead of the sun and clouds (`BookFamily`, in `MenuHead`), shrinking into the room left and hiding where too little
-  is: never pushing or covering a button. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
+  is: never pushing or covering a button. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026); the fullscreen
   button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
   children beside the menu's cards (`BookFamily`) show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
