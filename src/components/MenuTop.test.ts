@@ -96,12 +96,31 @@ test("the menus' sun is in the top left corner", () => {
 });
 
 // Back onto the shelf no page turns, the book closes and goes back (bookTravel.ts): a page's corner there said „turn the
-// page“ (user feedback, October 2026), so the way back to the home page is the book's cover with a shelf on it.
-test("in the book look the way back onto the shelf is the book's cover, not a page's corner", () => {
+// page“, and the cover's corner lying over the page floated where no cover can be (user feedback, October 2026), so the
+// way back to the home page is the book's ribbon hanging over the page's top edge, with a shelf on it.
+test("in the book look the way back onto the shelf is the book's ribbon, not a corner", () => {
   const menuTop = readFileSync("src/components/MenuTop.tsx", "utf8");
   const corner = menuTop.slice(menuTop.indexOf("function PageCorner"));
   expect(corner).toMatch(/sign=\{to === "\/" \? "shelf" : "back"\}/);
-  expect(readFileSync("src/components/PageCornerArt.tsx", "utf8")).toMatch(/if \(sign === "shelf"\) return <CoverCornerArt \/>/);
+  expect(corner).toMatch(/className=\{to === "\/" \? "page-corner page-ribbon" : "page-corner"\}/);
+  const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
+  expect(art).toMatch(/if \(sign === "shelf"\) return <RibbonArt \/>/);
+  expect(art).not.toContain("CoverCorner");
+});
+
+// The menus keep the corner's room free and nothing more (on a phone the table of contents starts right under it): the
+// ribbon, lifted over the page's top edge by the part of its drawing above that edge, ends within that room.
+test("the ribbon hangs no lower than the page's corner would", () => {
+  const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
+  const [, w, h] = art.match(/className="page-ribbon-art" viewBox="0 0 (\d+) (\d+)"/) ?? [];
+  const rule = cssRules().find((r) => r.selector === ':root[data-look="book"] .page-corner.page-ribbon');
+  const share = Number(rule?.body.match(/--ribbon:\s*calc\(var\(--corner\) \* ([\d.]+)\)/)?.[1]);
+  const lift = Number(rule?.body.match(/top:\s*calc\(var\(--page-top\) - var\(--ribbon\) \* (\d+) \/ (\d+)\)/)?.[1]);
+  expect(rule?.body).toContain(`height: calc(var(--ribbon) * ${h} / ${w})`);
+  expect(rule?.body).toContain(`top: calc(var(--page-top) - var(--ribbon) * ${lift} / ${w})`);
+  const bottom = share * ((Number(h) - lift) / Number(w));
+  expect(bottom).toBeGreaterThan(0.6);
+  expect(bottom).toBeLessThanOrEqual(1);
 });
 
 // User decision, October 2026: menus need no „Über das Spiel“. GameShell has no `info`, no game passes one, and no

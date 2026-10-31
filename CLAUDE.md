@@ -236,8 +236,11 @@ In a fresh worktree run `bun install` first.
   (`PageCorner`, user feedback, October 2026), and a tap lifts that very page there and turns it back over the spine to
   the right: what is touched must be what moves, like a real book – a corner in the top right turned the other page, and
   grown-ups didn't look there for the way back. Back onto the shelf (a menu whose way back is the home page) no page
-  turns: the book closes and goes back, so there the corner is the book's cloth cover with a shelf stamped on it in gold
-  (`PageCornerArt sign="shelf"`, user feedback, October 2026) – never a page's corner. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
+  turns: the book closes and goes back, so there the way back is the book's ribbon (Lesebändchen) coming out over the
+  page's top edge, lying on the page with its shadow, a shelf embroidered on it in gold (`PageCornerArt sign="shelf"`,
+  user feedback, October 2026) – never a page's corner, nor a cover's corner lying over the page, which floated where no
+  cover can be: what stands for a part of the book lies where that part really is. It hangs no lower than the corner's
+  room, which the menus keep free (`MenuTop.test.ts`). The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ held to leave is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held
   instead of a ring filling – with the fullscreen button and „Zurück zum Menü · halten“ right of it, clear of the room it

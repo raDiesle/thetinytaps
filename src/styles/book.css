@@ -889,34 +889,72 @@
   opacity: 0.7;
 }
 
-/* The cover's corner (back to the shelf): cloth over board, a shelf stamped on it in gold. */
-.cover-corner-board {
-  stroke: #12303b;
-  stroke-width: 1.5;
+/*
+ * Back to the shelf: the book's ribbon (Lesebändchen) instead of a corner, coming out over the page's top edge a little
+ * in from the outer edge and lying down the page – within the corner's room, which the menus keep free (on a phone the
+ * table of contents starts right under it), clear of the sun that steps right of it. Its drawing has the page's edge
+ * at 8 of its 36 wide, so it is lifted by that much.
+ */
+:root[data-look="book"] .page-corner.page-ribbon {
+  --ribbon: calc(var(--corner) * 0.46);
+  top: calc(var(--page-top) - var(--ribbon) * 8 / 36);
+  left: calc(var(--page-left) + var(--corner) * 0.28);
+  width: var(--ribbon);
+  height: calc(var(--ribbon) * 80 / 36);
 }
 
-.cover-corner-edge {
+/* A finger or the mouse on it sways the ribbon from where it comes out of the book; a tap tugs it, as to close the book. */
+:root[data-look="book"] .page-ribbon .page-ribbon-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 10%;
+  transition:
+    rotate 0.3s ease-out,
+    translate 0.15s ease-out;
+}
+
+:root[data-look="book"] .page-ribbon:hover .page-ribbon-art {
+  rotate: -5deg;
+}
+
+:root[data-look="book"] .page-ribbon:active .page-ribbon-art {
+  rotate: -3deg;
+  translate: 0 4%;
+}
+
+/* Lying on the paper, it casts a soft shadow just below and right of itself. */
+.page-ribbon-shadow {
+  fill: #3d3045;
+  opacity: 0.3;
+  transform: translate(1.4px, 2px);
+}
+
+.page-ribbon-edge {
   fill: none;
-  stroke: #e9dcc0;
-  stroke-width: 2.5;
-  opacity: 0.8;
+  stroke: #f2a3a0;
+  stroke-width: 0.6;
+  opacity: 0.55;
 }
 
-.cover-corner-stamp {
-  fill: #e8c76a59;
-  stroke: #ecd083;
-  stroke-width: 2.4;
+/* Gold thread: its shelf embroidered on, a little raised from the satin. */
+.page-ribbon-stamp {
+  fill: #f0d27a66;
+  stroke: #f3d98c;
+  stroke-width: 1.1;
   stroke-linecap: round;
   stroke-linejoin: round;
+  filter: drop-shadow(0 0.5px 0 #4a0f18);
 }
 
-.cover-corner-stamp .cover-corner-book {
-  fill: #ecd083;
-}
-
-.cover-corner-stamp .cover-corner-arrow {
+.page-ribbon-stamp .page-ribbon-frame {
   fill: none;
-  stroke-width: 3;
+  stroke-width: 1.4;
+}
+
+.page-ribbon-stamp .page-ribbon-book {
+  fill: #f3d98c;
 }
 
 /*

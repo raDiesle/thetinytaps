@@ -6,11 +6,11 @@ import { useId } from "react";
  * `data-turn="back"`), so the corner that is touched is the page that moves (user feedback, October 2026). Its sign
  * tells where it leads: back out of a menu (`back`, an arrow: MenuHead's PageCorner) or out of a game (`close`, a ✕:
  * GameShell's ExitButton, held). Only drawn in the book look; it fills the box it is put in, its spine on the left.
- * The way out of a book back onto the shelf is no page turning but the book closing: `shelf` draws the cover instead.
+ * The way out of a book back onto the shelf is no page turning but the book closing: `shelf` draws its ribbon instead.
  */
 export function PageCornerArt({ sign }: { sign: "back" | "close" | "shelf" }) {
   const id = useId();
-  if (sign === "shelf") return <CoverCornerArt />;
+  if (sign === "shelf") return <RibbonArt />;
   return (
     <svg className="page-corner-art" viewBox="0 0 100 100" aria-hidden>
       <defs>
@@ -32,38 +32,57 @@ export function PageCornerArt({ sign }: { sign: "back" | "close" | "shelf" }) {
 }
 
 /**
- * The way out of a book, back onto the shelf (user feedback, October 2026: a page's corner said „turn the page“, but the
- * book is closed and put back): the corner of the book's cloth cover, lifted as a hand takes it to close the book, with
- * a shelf stamped on it in gold – books standing and this one going back into its gap.
+ * The way out of a book, back onto the shelf (user feedback, October 2026): no page turns there, the book is closed and
+ * put back. A page's corner said „turn the page“, and a corner of the cover lying over the page floated where no cover
+ * can be (the open book's cover lies under its pages). So it is the book's ribbon instead, the Lesebändchen one lays in
+ * before closing a book: a band of red satin coming out over the page's top edge from the book's head, lying on the
+ * page with its shadow and ending in a swallowtail, with a shelf embroidered on it in gold – books standing and this
+ * one going back into its gap. Drawn in a box 36 × 80, the page's edge at y 8, so it hangs no lower than a page's corner would.
  */
-function CoverCornerArt() {
+function RibbonArt() {
   const id = useId();
   return (
-    <svg className="page-corner-art cover-corner-art" viewBox="0 0 100 100" aria-hidden>
+    <svg className="page-ribbon-art" viewBox="0 0 36 80" aria-hidden>
       <defs>
-        {/* Cloth over board, lit where it bends over towards the lamp. */}
-        <linearGradient id={`${id}c`} x1="0" y1="0" x2="1" y2="0.3">
-          <stop offset="0" stopColor="#1d4554" />
-          <stop offset="0.35" stopColor="#3f88a2" />
-          <stop offset="0.8" stopColor="#2e6a80" />
-          <stop offset="1" stopColor="#245668" />
+        {/* Satin: dark at its edges, where it curves down onto the paper, and a band of sheen along it from the lamp. */}
+        <linearGradient id={`${id}s`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#7a1d28" />
+          <stop offset="0.18" stopColor="#ad2f3b" />
+          <stop offset="0.36" stopColor="#e06a6c" />
+          <stop offset="0.5" stopColor="#c23e47" />
+          <stop offset="0.85" stopColor="#a02a36" />
+          <stop offset="1" stopColor="#701a25" />
         </linearGradient>
+        {/* Where it bends over the page's edge: in the book's shadow above, catching the light on the fold. */}
+        <linearGradient id={`${id}f`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#2b0a10" stopOpacity="0.75" />
+          <stop offset="0.55" stopColor="#2b0a10" stopOpacity="0.25" />
+          <stop offset="0.75" stopColor="#ffd9d0" stopOpacity="0.45" />
+          <stop offset="1" stopColor="#ffd9d0" stopOpacity="0" />
+        </linearGradient>
+        {/* The fine ribs of the woven band. */}
+        <pattern id={`${id}r`} width="4" height="1.6" patternUnits="userSpaceOnUse">
+          <rect width="4" height="0.6" fill="#3a0c14" opacity="0.18" />
+        </pattern>
       </defs>
-      <path className="page-corner-shadow" d="M0 0Q50 2 96 10Q64 60 0 102Z" />
-      <path className="cover-corner-board" d="M0 0Q46 0 90 5Q58 54 0 96Z" fill={`url(#${id}c)`} />
-      {/* The board's edge, its thickness showing where the cloth folds round it. */}
-      <path className="cover-corner-edge" d="M90 5Q58 54 0 96" />
-      <g className="cover-corner-stamp">
-        {/* The shelf's board and the books standing on it, with a gap. */}
-        <path d="M6 47H48" />
-        <rect x="8" y="27" width="5" height="20" rx="1" />
-        <rect x="14" y="31" width="5" height="16" rx="1" />
-        <rect x="33" y="29" width="5" height="18" rx="1" />
-        <rect x="39" y="33" width="5" height="14" rx="1" />
-        {/* This book, going back into its gap. */}
-        <rect className="cover-corner-book" x="22" y="18" width="8" height="22" rx="1.2" transform="rotate(14 26 40)" />
-        <path className="cover-corner-arrow" d="M38 6Q30 4 27 12M27 12l-1-7M27 12l6-3" />
+      <path className="page-ribbon-shadow" d={RIBBON} />
+      <path d={RIBBON} fill={`url(#${id}s)`} />
+      <path d={RIBBON} fill={`url(#${id}r)`} />
+      <rect x="6" y="0" width="24" height="14" fill={`url(#${id}f)`} />
+      {/* Its woven edges, a little lighter. */}
+      <path className="page-ribbon-edge" d="M7.6 2C7.8 24 8 46 9 72M28.4 2C28.6 24 29 46 30 71" />
+      <g className="page-ribbon-stamp" transform="translate(1.2 0)">
+        {/* A shelf's compartment with its books, a gap between them, and this book going back into it. */}
+        <rect className="page-ribbon-frame" x="8.5" y="36" width="19" height="24" rx="0.8" />
+        <rect x="10.4" y="42" width="2.6" height="17" rx="0.5" />
+        <rect x="13.6" y="45" width="2.6" height="14" rx="0.5" />
+        <rect x="21" y="43" width="2.6" height="16" rx="0.5" />
+        <rect x="24" y="46" width="2.2" height="13" rx="0.5" />
+        <rect className="page-ribbon-book" x="17" y="32" width="3.4" height="19" rx="0.6" transform="rotate(14 18.7 51)" />
       </g>
     </svg>
   );
 }
+
+/** The ribbon's outline: out of the book's head above the page, lying down it, drifting a little as satin does, cut into a swallowtail. */
+const RIBBON = "M6 0H30C29.8 12 29.6 24 30.1 38C30.6 52 30.9 62 31.6 76L19.6 68.5L7.6 77.5C7.2 63 6.8 52 6.6 38C6.4 24 6.2 12 6 0Z";
