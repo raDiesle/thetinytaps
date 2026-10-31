@@ -81,10 +81,11 @@ const THINGS: Record<ShelfThing, () => ReactNode> = {
  * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category is a picture
  * book standing in its middle compartments with its cover out, room round each; a tap takes it out and opens it
  * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
- * app's name is a painted sign standing on top. Drawn in 3D – each compartment a box going back, the boards seen from
- * the eye's height – but still: nothing moves until it is tapped. `children` follow below the first screen.
+ * app's name is a painted sign hanging above it. Drawn in 3D – each compartment a box going back, the boards seen from
+ * the eye's height – but still: nothing moves until it is tapped. The room fills the screen and nothing follows below it:
+ * `legal` (Impressum, Datenschutz) stands small in its bottom right corner.
  */
-export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttributes<HTMLElement>; children?: ReactNode }) {
+export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<HTMLElement>; legal?: ReactNode }) {
   const navigate = useNavigate();
   const room = useRef<HTMLDivElement>(null);
   const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number } | null>(null);
@@ -171,8 +172,8 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
             </div>
           )}
         </div>
+        {legal && <nav className="room-legal">{legal}</nav>}
       </div>
-      {children}
     </main>
   );
 }

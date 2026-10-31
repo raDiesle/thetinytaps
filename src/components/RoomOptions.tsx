@@ -1,5 +1,6 @@
 import { useId } from "react";
 import { AppLanguageOptions, MenuButton, useMusicSwitch } from "@/components/HomeOptions";
+import { InstallHint } from "@/components/InstallHint";
 import { ParentsNote } from "@/components/ParentsNote";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { SeoWords } from "@/components/SeoText";
@@ -221,8 +222,8 @@ export function RoomStickers() {
 /**
  * A little book standing below the stickers, for grown-ups, an „i“ on its cover (user feedback, October 2026: the texts
  * below the shelf belong in it, both in one book): what the app is (the page's words for search engines, SeoWords) and a
- * few words from us as parents (ParentsNote). A tap opens it; while closed the text stays in the page unseen (`keep`),
- * so search engines still read it.
+ * few words from us as parents (ParentsNote), and how to install the app (InstallHint) – the shelf's page has nothing below
+ * its first screen. A tap opens it; while closed the text stays in the page unseen (`keep`), so search engines still read it.
  */
 export function RoomNotes() {
   const t = useT();
@@ -230,6 +231,7 @@ export function RoomNotes() {
     <MenuButton icon="ℹ️" label={t({ de: "Über Books for Both" })} className="room-thing room-note" keep art={<InfoBook />}>
       <SeoWords />
       <ParentsNote />
+      <InstallHint />
     </MenuButton>
   );
 }

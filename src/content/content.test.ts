@@ -204,6 +204,14 @@ describe("the app's name", () => {
     expect(existsSync(`src/components/bilder/${file}`)).toBe(true);
   });
 
+  test("the bookshelf fills the screen and nothing follows below it: Impressum and Datenschutz stand in its corner", () => {
+    const shelf = readFileSync("src/components/Bookshelf.tsx", "utf8");
+    expect(shelf.match(/export function Bookshelf\(\{([^}]*)\}/)?.[1]).not.toContain("children");
+    expect(shelf).toContain('className="room-legal"');
+    const home = readFileSync("src/pages/Home.tsx", "utf8");
+    expect(home).toMatch(/<Bookshelf [^>]*legal=\{<LegalLinks \/>\} \/>/);
+  });
+
   test("the shelf's sign hangs above the shelf, never touching it", () => {
     const css = readFileSync("src/styles/bookshelf.css", "utf8");
     const sign = css.match(/\n\.shelf-sign \{([^}]*)\}/)?.[1] ?? "";
