@@ -127,6 +127,8 @@ describe("research on the management page", () => {
       for (const { name, free, taken } of domains) {
         const endings = [...free, ...taken];
         expect(new Set(endings).size, name).toBe(endings.length);
+        // Only endings like "com" or "co.uk" – a taken spelling of the name (plural, other word) goes into `why`.
+        for (const ending of endings) expect(ending, name).toMatch(/^[a-z]{2,}(\.[a-z]{2,})?$/);
       }
     }
   });
