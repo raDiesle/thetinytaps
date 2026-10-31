@@ -73,11 +73,12 @@ export const RESEARCH: Research[] = [
     question:
       "Entschieden (31. Oktober 2026): Kein „toddler“ (und kein „toddle“) im Namen – Spiele am Bildschirm ausdrücklich für Kleinkinder anzubieten ist heikel, und der Name soll das nicht ausstellen. Welcher englische .com-Name mit „kids“, dem Buch oder dem gemeinsamen Spielen von Eltern und Kind ist frei und trägt alles, was die App kann?",
     method:
-      "Fünfte Runde der Domain-Suche: rund 400 Namen aus „kids“/„kid“, tiny, book, booklet, catalog, pages, story, tales, playbook, together, side by side, for two, for both, lap, big & little, cub, paw, fox als .com bei Verisign abgefragt (RDAP, die Favoriten zusätzlich im Verisign-whois), Stand 31. Oktober 2026. „Frei“ heißt nur: nicht registriert – Premium-Preise zeigt das nicht. Dazu Google-Autovervollständigung auf Englisch (USA) für rund 30 Namen und Websuchen nach gleichnamigen Apps und Marken. Markenregister sind nicht durchsucht.",
+      "Fünfte Runde der Domain-Suche: rund 480 Namen aus „kids“/„kid“, tiny, book, booklet, catalog, pages, story, tales, playbook, together, side by side, for two, for both, lap, big & little, cub, paw, fox als .com bei Verisign abgefragt (RDAP, die Favoriten zusätzlich im Verisign-whois), Stand 31. Oktober 2026. „Frei“ heißt nur: nicht registriert – Premium-Preise zeigt das nicht. Dazu Google-Autovervollständigung auf Englisch (USA) für rund 45 Namen und Websuchen nach gleichnamigen Apps und Marken. Markenregister sind nicht durchsucht.",
     findings: [
       "Fast alles Kurze mit „kids“ ist vergeben: kidsbook, kidbook, kidspages, kidpages, kidstory, kidsstory, kidstales, kidtales, kidsplaybook, kidslibrary, kidsnook, kidsfox, kidfox, foxkids.",
       "Fast alles zum Gemeinsam-Machen auch: readtogether, playtogether, togetherbook, togethertales, readwithme, playwithme, tapwithme, youandmebook, ourbook, ourlittlebook, ourstorybook, familybook, sidebyside, handinhand, bigandlittle, bigandsmall, cuddlebook, snugglebook, cozybook, sofabook, bookbuddies, bookpals.",
       "„Bookforboth“ ist frei und passt am besten: „ein Buch für euch beide“ – Eltern und Kind, und der Buch-Look der App. 11 Buchstaben, nur Wörter aus dem Englischunterricht, kein Wort, das ein Alter nennt. Google kennt den Namen nicht (zu „book for both“ nur Fremdes wie Prüfungsbücher), und keine App heißt so. Haken: Wer es hört, tippt vielleicht „book4both“ (auch frei) – als Weiterleitung billig zu haben.",
+      "Ähnlich wie bookforboth (nachgefragt): Mit „for both“ sind fast alle frei – pagesforboth, talesforboth, storiesforboth, funforboth, gamesforboth, playforboth, tapsforboth, booksforboth, bookforbothofus, bookforyouandme, bookforbigandsmall; mit „for two“ nur pagesfortwo, tapsfortwo und storybookfortwo (bookfortwo, playfortwo, storyfortwo, talesfortwo sind vergeben). Am besten passt „pagesforboth“: Seiten zum Umblättern für euch beide, Google ergänzt dazu gar nichts. „Funforboth“ ist mit 10 Buchstaben am kürzesten, und Google ergänzt es zu „fun activities for both kids and adults“ – genau was Eltern suchen –, sagt aber nichts vom Buch und ist kaum als Marke zu schützen. Durchgefallen: playforboth (Fußball, „play for both teams“), pagesfortwo („coloring pages for two year olds“ nennt wieder das Alter), tapsforboth und tapsfortwo (Wasserhähne), twoandabook („Two and a Half Men“), gamesforboth („for both boys and girls“, „PC and mobile“). Wer bookforboth nimmt, sollte booksforboth (auch frei) dazukaufen, weil man die Mehrzahl beim Hören nicht unterscheidet.",
       "„Cubbook“ ist der kürzeste freie Name (7 Buchstaben): „cub“ ist das Tierkind, wie die Fuchs- und Bärenkinder auf dem Umschlag, und das Kind, mit dem gelesen wird. Aber „cub“ kennen Nicht-Muttersprachler kaum, Google macht aus „cub book“ Würfelregale („cube bookshelf“), und in den USA sind „Cubs“ die Pfadfinder und das Baseballteam; beim Hören bleibt offen, ob „cub“, „cup“ oder „club“.",
       "Mit „kids“ und dem Fuchs Tapsi ist kidsfoxbook frei (auch kidfoxbook, foxkidbook, kidsbookfox), aber Google ergänzt „kids fox book“ zur Kinderbuchreihe „Fox Kid“ von Adrian Beck, und „Fox Kids“ war ein bekannter Kinderfernsehsender – zu nah an fremden Namen.",
       "Weitere freie: foxstorybook (12 Buchstaben, Google denkt an „Little Fox“, eine Englisch-Lernplattform für Kinder), tapabook („tap a book“, 8 Buchstaben, frei und unbekannt – sagt aber weder kids noch gemeinsam), biglittlefox (groß und klein zusammen, aber „Big Fox Little Fox“ ist ein Kinderlied), foxfamilybook, playbookfortwo, booksfortwo, readfortwo, twoofusbook, kidsplaypages, kidsbooktime, kidspicturepages.",
@@ -121,6 +122,27 @@ export const RESEARCH: Research[] = [
         free: ["com"],
         taken: [],
         why: "Ein Buch für Eltern und Kind zusammen, passt zum Buch-Look und zu allen Spielen; einfache Wörter, kein Alter, Google und App Stores kennen es nicht.",
+      },
+      {
+        name: "pagesforboth",
+        rank: 2,
+        free: ["com"],
+        taken: [],
+        why: "Seiten zum Umblättern für euch beide, wie der Buch-Look; 12 Buchstaben, Google ergänzt nichts, nichts Gleichnamiges.",
+      },
+      {
+        name: "funforboth",
+        rank: 2,
+        free: ["com"],
+        taken: [],
+        why: "Am kürzesten (10 Buchstaben), und Google ergänzt es zu „fun activities for both kids and adults“; sagt aber nichts vom Buch und ist als Lobwort kaum als Marke zu schützen.",
+      },
+      {
+        name: "talesforboth",
+        rank: 2,
+        free: ["com"],
+        taken: [],
+        why: "Geschichten für euch beide, Google kennt es nicht; „tales“ kennen Nicht-Muttersprachler weniger als „book“, und erzählt wird nur in zwei Spielen.",
       },
       {
         name: "cubbook",
