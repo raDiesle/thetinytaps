@@ -1,6 +1,6 @@
 import { useT } from "@/lib/language";
 import { NO_LINKED } from "./board";
-import { PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate } from "./catalog";
+import { PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate, type PlanView } from "./catalog";
 import { exampleTicks, type Plan, planFromTemplate } from "./plan";
 import { PLAN_SCREEN, PlanSheet } from "./PlanSheet";
 
@@ -21,34 +21,24 @@ const PREVIEWS = new Map(PLAN_TEMPLATES.map((tpl) => [tpl.id, planFromTemplate(t
 
 /**
  * The Vorlagen of the Tagesplan: every ready-made plan as a small picture, its name, view and one line – beside the
- * plan on wide screens, and the second step of the wizard (with „Leer anfangen“ last).
+ * plan on wide screens. In the wizard only those of the view chosen, big and with their names, after „Leer anfangen“.
  */
-export function PlanGallery({ selected, onPick, blank }: { selected?: string; onPick: (template: PlanTemplate) => void; blank?: () => void }) {
+export function PlanGallery({
+  selected,
+  onPick,
+  view: only,
+  blank,
+}: {
+  selected?: string;
+  onPick: (template: PlanTemplate) => void;
+  /** Only the templates of this view, without their lines: the wizard's step after the view. */
+  view?: PlanView;
+  /** „Leer anfangen“ as the first card, in the wizard. */
+  blank?: () => void;
+}) {
   const t = useT();
   return (
-    <ul className="rw-gallery">
-      {PLAN_TEMPLATES.map((tpl) => {
-        const view = PLAN_VIEWS.find((v) => v.id === tpl.view);
-        const preview = PREVIEWS.get(tpl.id);
-        return (
-          <li key={tpl.id}>
-            <button type="button" className={`rw-tpl${selected === tpl.id ? " selected" : ""}`} aria-pressed={selected === tpl.id} onClick={() => onPick(tpl)}>
-              {preview && <PlanThumb plan={preview} />}
-              <span className="rw-tpl-name">
-                <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
-              </span>
-              <span className="rw-tpl-hint">
-                {view && (
-                  <span className="rw-tpl-kind">
-                    {view.emoji} {t(view.label)}
-                  </span>
-                )}{" "}
-                {t(tpl.hint)}
-              </span>
-            </button>
-          </li>
-        );
-      })}
+    <ul className={`rw-gallery${only ? " rw-gallery-big" : ""}`}>
       {blank && (
         <li>
           <button type="button" className="rw-tpl rw-tpl-blank" onClick={blank}>
@@ -66,20 +56,33 @@ export function PlanGallery({ selected, onPick, blank }: { selected?: string; on
                 ru: "Начать с чистого листа",
               })}
             </span>
-            <span className="rw-tpl-hint">
-              {t({
-                de: "Alle Bilder selbst aussuchen",
-                en: "Choose all the pictures yourself",
-                zh: "所有图片自己挑选",
-                hi: "सभी तस्वीरें खुद चुनें",
-                es: "Elegir usted todas las imágenes",
-                ar: "اختاروا كل الصور بأنفسكم",
-                ru: "Выбрать все картинки самим",
-              })}
-            </span>
           </button>
         </li>
       )}
+      {PLAN_TEMPLATES.filter((tpl) => !only || tpl.view === only).map((tpl) => {
+        const view = PLAN_VIEWS.find((v) => v.id === tpl.view);
+        const preview = PREVIEWS.get(tpl.id);
+        return (
+          <li key={tpl.id}>
+            <button type="button" className={`rw-tpl${selected === tpl.id ? " selected" : ""}`} aria-pressed={selected === tpl.id} onClick={() => onPick(tpl)}>
+              {preview && <PlanThumb plan={preview} />}
+              <span className="rw-tpl-name">
+                <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
+              </span>
+              {!only && (
+                <span className="rw-tpl-hint">
+                  {view && (
+                    <span className="rw-tpl-kind">
+                      {view.emoji} {t(view.label)}
+                    </span>
+                  )}{" "}
+                  {t(tpl.hint)}
+                </span>
+              )}
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
 }

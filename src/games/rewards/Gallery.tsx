@@ -1,7 +1,7 @@
 import { useT } from "@/lib/language";
 import { type Board, boardFromTemplate, exampleStars, NO_LINKED } from "./board";
 import { BoardSheet, SCREEN_LOOK } from "./BoardSheet";
-import { KINDS, type Template, TEMPLATES } from "./catalog";
+import { type BoardKind, KINDS, type Template, TEMPLATES } from "./catalog";
 
 /** Width / height of a small picture of a board. */
 const THUMB_ASPECT = 1.45;
@@ -30,45 +30,27 @@ export function Thumb({ board, today = new Date() }: { board: Board; today?: Dat
 const PREVIEWS = new Map(PRESETS.map((tpl) => [tpl.id, boardFromTemplate(tpl)]));
 
 /**
- * The Vorlagen: every ready-made board as a small picture with example stars, its name and one line about it.
- * Beside the board on wide screens, and the first step of the wizard.
+ * The Vorlagen: every ready-made board as a small picture with example stars, its name and one line about it, beside
+ * the board on wide screens. In the wizard only those of the view chosen, as big pictures with their names (the view
+ * is chosen, the picture says the rest), after „Leer anfangen“.
  */
 export function TemplateGallery({
   selected,
   onPick,
+  kind: only,
   blank,
 }: {
   /** The template of the board shown, marked in the gallery. */
   selected?: string;
   onPick: (template: Template) => void;
-  /** „Leer anfangen“ as the last card, in the wizard. */
+  /** Only the templates of this view, without their lines: the wizard's step after the view. */
+  kind?: BoardKind;
+  /** „Leer anfangen“ as the first card, in the wizard. */
   blank?: () => void;
 }) {
   const t = useT();
   return (
-    <ul className="rw-gallery">
-      {PRESETS.map((tpl) => {
-        const kind = KINDS.find((k) => k.id === tpl.kind);
-        const preview = PREVIEWS.get(tpl.id);
-        return (
-          <li key={tpl.id}>
-            <button type="button" className={`rw-tpl${selected === tpl.id ? " selected" : ""}`} aria-pressed={selected === tpl.id} onClick={() => onPick(tpl)}>
-              {preview && <Thumb board={preview} />}
-              <span className="rw-tpl-name">
-                <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
-              </span>
-              <span className="rw-tpl-hint">
-                {kind && (
-                  <span className="rw-tpl-kind">
-                    {kind.emoji} {t(kind.label)}
-                  </span>
-                )}{" "}
-                {t(tpl.hint)}
-              </span>
-            </button>
-          </li>
-        );
-      })}
+    <ul className={`rw-gallery${only ? " rw-gallery-big" : ""}`}>
       {blank && (
         <li>
           <button type="button" className="rw-tpl rw-tpl-blank" onClick={blank}>
@@ -86,20 +68,33 @@ export function TemplateGallery({
                 ru: "Начать с чистого листа",
               })}
             </span>
-            <span className="rw-tpl-hint">
-              {t({
-                de: "Alles selbst aussuchen",
-                en: "Choose everything yourself",
-                zh: "全部自己挑选",
-                hi: "सब कुछ खुद चुनें",
-                es: "Elegir todo usted",
-                ar: "اختاروا كل شيء بأنفسكم",
-                ru: "Выбрать всё самим",
-              })}
-            </span>
           </button>
         </li>
       )}
+      {PRESETS.filter((tpl) => !only || tpl.kind === only).map((tpl) => {
+        const kind = KINDS.find((k) => k.id === tpl.kind);
+        const preview = PREVIEWS.get(tpl.id);
+        return (
+          <li key={tpl.id}>
+            <button type="button" className={`rw-tpl${selected === tpl.id ? " selected" : ""}`} aria-pressed={selected === tpl.id} onClick={() => onPick(tpl)}>
+              {preview && <Thumb board={preview} />}
+              <span className="rw-tpl-name">
+                <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
+              </span>
+              {!only && (
+                <span className="rw-tpl-hint">
+                  {kind && (
+                    <span className="rw-tpl-kind">
+                      {kind.emoji} {t(kind.label)}
+                    </span>
+                  )}{" "}
+                  {t(tpl.hint)}
+                </span>
+              )}
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
 }

@@ -1,8 +1,9 @@
-# Sterne & Tagesplan: Belohnungstafel and Tagesplan on one page
+# Belohnungstafel & Tagesplan: both on one page
 
 Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan: `also` in `games.ts`, so it keeps its
 own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
-„belohnungstafel“ in `src/content/research.ts`. One home card, „🌟 Sterne & Tagesplan“: the **Belohnungstafel**
+„belohnungstafel“ in `src/content/research.ts`. One home card, „🌟 Belohnungstafel & Tagesplan“
+(both names, as parents search for them – user decision, October 2026): the **Belohnungstafel**
 (boards of stars, first part below) and the **Tagesplan** (plans of picture cards, second part) share one page, one
 row of tabs and one wizard.
 
@@ -16,18 +17,22 @@ board's Tag/Woche/Monat/Sammeln, a plan's Tag/Woche) with ‹ ›; beside it the
 visitor land there.
 
 „＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart: 1 Art (two big pictures: a board with example stars, a
-plan with example ticks), 2 Vorlage (that kind's gallery, „Leer anfangen“ last), then the kind's own steps –
-`WizardBoard.tsx`: Ansicht, Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Ansicht (and which days), Bilder,
-Aussehen. Every choice is a `Pick` (`pageParts.tsx`): a small picture of the board or plan as that choice would make
-it (views, colours) or a big picture card (tasks, cards, rewards, marks) – never a plain list of words. The whole
-board or plan stands beside each step; „✓ So nehmen“ makes it from any step after the Vorlage. A Vorlage from the
-gallery beside the chart opens the wizard on step 3 (or shows the board or plan made from it before). While the wizard
-is open nothing on top or below belongs to the chart behind it.
+plan with example ticks), 2 Ansicht (only how it looks: a board's Tag, Woche, Monat, Sammeln, a plan's Tag, Woche –
+each as one example board or plan in that view), 3 Vorlage („Leer anfangen“ first, then only that view's
+templates), then the kind's own steps – `WizardBoard.tsx`: Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Bilder
+(with which days), Aussehen. Every choice is a `Pick` (`pageParts.tsx`): a picture of the board or plan as that
+choice would make it (kinds, views, colours) or a big picture card (tasks, cards, rewards, marks) – never a plain list
+of words. The first three steps are pictures only, as big as the screen lets them stay in sight (`.rw-picks-big`,
+`.rw-picks-views`, `.rw-gallery-big`), with their names and no lines of text. From step 4 the whole board or plan
+stands beside each step; „✓ So nehmen“ makes it from any step after the Vorlage. A Vorlage from the gallery beside the
+chart opens the wizard on step 4 (or shows the board or plan made from it before). While the wizard is open nothing
+on top or below belongs to the chart behind it.
 
-A first visit (nothing saved under any of the keys, `firstVisit`) opens with the wizard. The first board and plan
-(`erste`, `erster-plan`) exist before anything is saved; never used (`untouched`: their store never saved, no stars),
-they are no tabs of their own unless shown, and the first board or plan the wizard makes takes their place – a
-grown-up who makes a plan never sees a Zähne-Woche they didn't choose.
+No board or plan exists before the wizard made one (`DEFAULT_REWARDS_SETTINGS`, `DEFAULT_PLANNER_SETTINGS` are
+empty): with nothing made – a first visit – the page is the wizard, with no ✕ and no row of tabs, as there is nothing
+behind it. Only where an older version's first board or plan (`erste`, `erster-plan`, made before anything was saved)
+already has stars, `rewardsDefaults` / `plannerDefaults` keep it. Where only one kind is made, the page shows that one,
+whatever the address.
 
 # Belohnungstafel
 
@@ -149,16 +154,22 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - Few tasks: the editor advises one to three and allows `MAX_TASKS`; templates use at most three.
 - The child's name stays in localStorage only – never in a URL, a log or a picture prompt.
 - What is printed and what is on screen come from the same `BoardSheet`; never give print its own layout.
-- Defaults are the same on every load: no random id in anything `DEFAULT_REWARDS_SETTINGS` holds, since an unsaved
+- Defaults are the same on every load: no random id in anything `rewardsDefaults` gives, since an unsaved
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
 - The views and the ready-made boards are clear from the first visit, never behind a menu: a first visit opens the
-  wizard, whose first steps show both kinds and every Vorlage as pictures; Tag, Woche and Monat are the big switch
+  wizard, whose first steps show both kinds, their views and the Vorlagen of a view as big pictures; Tag, Woche and Monat are the big switch
   above the board (parents do ask for months: „belohnungskalender“, „monthly reward chart“), every view has at least
-  one template (`rewards.test.ts` checks), the gallery lies beside the board where there is room and „🧩 Vorlagen“ is
+  one template, and so has every view of a plan (`rewards.test.ts` checks), the gallery lies beside the board where there is room and „🧩 Vorlagen“ is
   in the first row where there is not, and switching a view never loses stars.
 - Making a board or plan is the wizard's job, and the wizard shows what each choice makes: a picture of the result
   (views, colours) or a big picture card (tasks, cards, rewards, marks), never only words or small chips. A new choice
   in the wizard is a `Pick`; detail that needs typing (own words, own emoji) stays under „Gestalten“.
+- The wizard goes from the form to the content (user feedback, October 2026): kind, then the view (how it looks, never
+  what is on it), then a Vorlage of that view, „Leer anfangen“ first, then the content. Its pictures are the
+  explanation – no description lines under the steps or the choices, and the room they took goes to bigger pictures
+  (check them on a computer too: even there they were „viel zu klein“).
+- Never show a board or plan the grown-up didn't make: no default chart (a Zähne-Woche nobody chose was removed),
+  a first visit always starts with the wizard (`rewards.test.ts`, `plan.test.ts` check the empty defaults).
 - Boards and plans are one page: never a second page, menu card or wizard for one of them; a new kind of chart joins
   `CHART_TYPES` and the wizard's first step.
 - A board is never shown empty the first time: templates and new boards show example stars as if in use, but never a
@@ -195,7 +206,7 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   screen the Fertig-Kiste below them (`DoneBox`), Erst–Dann with the arrow while both of its two steps are open, the week's columns with moons for the nights until a day.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
   `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
-  `WizardPlan.tsx` – a plan's steps in the wizard; `planSettings.ts` – plans, current one, print options
+  `WizardPlan.tsx` – a plan's own steps in the wizard; `planSettings.ts` – plans, current one, print options
   (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick`;
   `planner.css` – classes `pl-`.
 - Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
@@ -239,7 +250,7 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
 - A new activity needs its `schritt-<id>` prompt and line-art twin in `bilder/prompts.ts` (`plan.test.ts` checks).
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
-- Defaults are the same on every load (the first plan has the fixed id `erster-plan`), as for the board.
+- Defaults are the same on every load (the old first plan kept the fixed id `erster-plan`), as for the board.
 - A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
   than tall, or the last card stretched across the whole sheet.
 

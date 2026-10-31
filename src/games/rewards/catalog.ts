@@ -11,35 +11,17 @@ export type LinkedGame = "teeth" | "potty";
 /** What a grown-up makes on the page: a reward chart (stars) or a picture schedule (the steps of a day). */
 export type ChartType = "board" | "plan";
 
-/** The two kinds of chart, the first choice of the wizard, each with one line for grown-ups. */
-export const CHART_TYPES: { id: ChartType; emoji: string; label: Localized; hint: Localized }[] = [
+/** The two kinds of chart, the first choice of the wizard. */
+export const CHART_TYPES: { id: ChartType; emoji: string; label: Localized }[] = [
   {
     id: "board",
     emoji: "🌟",
     label: { de: "Belohnungstafel", en: "Reward chart", zh: "奖励表", hi: "इनाम चार्ट", es: "Tabla de premios", ar: "لوحة المكافآت", ru: "Таблица наград" },
-    hint: {
-      de: "Sterne sammeln für das, was klappen soll – bis zur Belohnung",
-      en: "Collect stars for what should go well – all the way to the reward",
-      zh: "为想做到的事收集星星，一直到拿到奖励",
-      hi: "जो सीखना है उसके लिए सितारे इकट्ठा करें – इनाम तक",
-      es: "Reunir estrellas por lo que debe salir bien, hasta el premio",
-      ar: "جمع النجوم لما نريده أن ينجح – حتى المكافأة",
-      ru: "Собирать звёзды за то, что должно получаться, – до награды",
-    },
   },
   {
     id: "plan",
     emoji: "🗓️",
     label: { de: "Tagesplan", en: "Day plan", zh: "日程表", hi: "दिन की योजना", es: "Plan del día", ar: "خطة اليوم", ru: "План дня" },
-    hint: {
-      de: "Bilder zeigen, was jetzt kommt und was danach – das Kind hakt selbst ab",
-      en: "Pictures show what comes now and what comes next – the child ticks them off",
-      zh: "图片显示现在做什么、接下来做什么——孩子自己打勾",
-      hi: "तस्वीरें दिखाती हैं कि अभी क्या है और उसके बाद क्या – बच्चा खुद निशान लगाता है",
-      es: "Las imágenes muestran qué toca ahora y qué después; el peque las marca",
-      ar: "الصور تُظهر ما يأتي الآن وما بعده – والطفل يضع العلامة بنفسه",
-      ru: "Картинки показывают, что сейчас и что потом, – ребёнок сам отмечает",
-    },
   },
 ];
 

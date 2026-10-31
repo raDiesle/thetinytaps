@@ -472,7 +472,7 @@
   flex-direction: column;
   gap: 12px;
   width: 100%;
-  max-width: 1400px;
+  max-width: 1800px;
   padding: 12px 16px;
   border: 3px solid var(--ink);
   border-radius: 24px;
@@ -607,12 +607,41 @@
   gap: 10px;
 }
 
-/* The first step: the two kinds, big. */
-.rw-picks-type {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+/*
+ * The first steps are only pictures, so they get the room: two choices (the kinds, a plan's views) side by side as
+ * big as the screen's height lets both stay in sight, a board's four views in one row, the Vorlagen big.
+ */
+.rw-picks-big {
+  --rw-pick-tall: calc(100dvh - 330px);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
   width: 100%;
-  max-width: 900px;
+  max-width: min(1300px, max(640px, var(--rw-pick-tall) * 2.9 + 60px));
   margin-inline: auto;
+}
+
+.rw-picks-views {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 14px;
+}
+
+/* Few Vorlagen in a view: they grow to fill the row (up to a size that still fits the screen), centred. */
+.rw-gallery-big {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.rw-gallery-big > li {
+  flex: 1 1 300px;
+  max-width: 480px;
+}
+
+.rw-picks-big .rw-pick-label,
+.rw-picks-views .rw-pick-label,
+.rw-gallery-big .rw-tpl-name {
+  font-size: 1.2rem;
 }
 
 /* Picture cards (tasks, rewards, cards of a day): small tiles with a big emoji. */
@@ -673,16 +702,6 @@
   font-size: 0.92rem;
   font-weight: 800;
   line-height: 1.15;
-}
-
-.rw-picks-type .rw-pick-label {
-  font-size: 1.25rem;
-}
-
-.rw-pick-hint {
-  font-size: 0.82rem;
-  line-height: 1.25;
-  opacity: 0.85;
 }
 
 /* A plan's cards in their order, as in the plan: a row of big cards with ‹ ✕ › under each. */
@@ -836,6 +855,34 @@
 
   .rw-wizard-row li {
     width: 76px;
+  }
+
+  /* Less above and below the pictures here (no title, steps as numbers), so they keep the height that is left. */
+  .rw-picks-big {
+    --rw-pick-tall: calc(100dvh - 230px);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 10px;
+    max-width: max(400px, var(--rw-pick-tall) * 2.9 + 40px);
+  }
+
+  .rw-picks-views {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+    gap: 8px;
+  }
+
+  .rw-gallery-big {
+    gap: 10px;
+  }
+
+  .rw-gallery-big > li {
+    flex-basis: 180px;
+    max-width: 260px;
+  }
+
+  .rw-picks-big .rw-pick-label,
+  .rw-picks-views .rw-pick-label,
+  .rw-gallery-big .rw-tpl-name {
+    font-size: 0.95rem;
   }
 }
 
