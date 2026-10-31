@@ -423,7 +423,7 @@ async function measure(cdp: Cdp, scenario: Scenario, part: Part, budget: Budget)
     hot,
     over: [],
   };
-  const limits = { ...budget, ...scenario.budget };
+  const limits = { ...budget, ...scenario.budget, ...part.budget };
   if (m.p95 > limits.p95) m.over.push(`p95 ${m.p95} > ${limits.p95} ms`);
   if (m.stutters / wall > limits.stuttersPerS) m.over.push(`${m.stutters} stutters`);
   if (m.busy > limits.busy) m.over.push(`busy ${Math.round(m.busy * 100)} % > ${Math.round(limits.busy * 100)} %`);
