@@ -29,20 +29,15 @@
 }
 
 /*
- * The o of „Both“: Papa Fox on the letter with his child on his lap (Logo). An invisible o keeps the letter's width and
- * baseline; the picture hangs from a point on that baseline, its o placed over the invisible one (measured in the picture:
- * its o is 271 px of 0.563em; the foxes, twice the letter's height, rise 1.5em above the baseline onto the wall above the
- * shelf's sign, which leaves them room, `--top` in bookshelf.css). Hold it to open the management page.
+ * The o of „Both“: Papa Fox on the letter with his child on his lap (Logo). The o is the title's own letter; the picture
+ * holds only the foxes (drawn on Georgia's o, 271 px of the picture to the letter's 0.563em, the o then cut out). It hangs
+ * from a point on the baseline, placed where the cut-out o lay and 0.075em lower, so Papa sits on the letter instead of
+ * floating over it. The foxes, twice the letter's height, rise 1.5em above the baseline onto the wall above the shelf's
+ * sign, which leaves them room (`--top` in bookshelf.css). Hold it to open the management page.
  */
 .logo-o {
   position: relative;
   display: inline-block;
-}
-
-:root[data-look="book"] .logo-o .logo-letter {
-  color: transparent;
-  -webkit-text-stroke: 0;
-  text-shadow: none;
 }
 
 .logo-o-anchor {
@@ -55,7 +50,7 @@
 .logo-o img {
   position: absolute;
   right: -0.065em;
-  bottom: -0.051em;
+  bottom: -0.126em;
   width: 0.943em;
   max-width: none;
   pointer-events: auto;
@@ -78,7 +73,7 @@
   overflow-x: clip;
 }
 
-/* The picture's o is Georgia's, the book look's letter: the toy look's rounded letters keep their own o. */
+/* The foxes were drawn on Georgia's o, the book look's letter: the toy look's rounded letters go without them. */
 :root:not([data-look="book"]) .logo-o-anchor {
   display: none;
 }

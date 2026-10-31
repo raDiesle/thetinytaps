@@ -155,7 +155,10 @@ picture“), or the model cuts a tub or pool at the edge.
 A picture that takes a letter's place in a word (the o of „Both“ in the title) is drawn on that very letter: render
 the letter in the page's font as a reference picture (sharp, dark plum on white, saved in `.image-raw/`), pass it as
 `--ref` and ask for it „copied exactly … flat solid plum, no outline“, then measure where the letter lies in the result
-and place the picture over an invisible letter of the font in em (`.logo-o` in `menus.css`). Figures on a letter are
+and place the picture in em over the letter of the font. Look closely where a figure meets the letter: Gemini drew
+Papa Fox a little above the o's top, floating. Then cut the flat letter out of the picture (its thick plum areas, eroded
+so outlines stay, the cut legs' edges outlined again) and let the font's real letter show beneath, the figures placed
+lower until they sit on it (`.logo-o` in `menus.css`, the original kept in `.image-raw/`). Figures on a letter are
 only as big as the text: draw them about twice the letter's height and make the text big enough. A reference picture
 sets the layout for the Lite model – asked for bigger figures with the earlier picture as `--ref`, it drew the same
 picture again; what worked was the letter drawn small at the bottom of an empty canvas as the first `--ref` („Redraw

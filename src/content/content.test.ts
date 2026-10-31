@@ -204,6 +204,13 @@ describe("the app's name", () => {
     expect(existsSync(`src/components/bilder/${file}`)).toBe(true);
   });
 
+  test("the shelf's sign hangs above the shelf, never touching it", () => {
+    const css = readFileSync("src/styles/bookshelf.css", "utf8");
+    const sign = css.match(/\n\.shelf-sign \{([^}]*)\}/)?.[1] ?? "";
+    expect(sign).toMatch(/bottom: calc\(100% \+ [^;]+\);/);
+    expect(css).toMatch(/\.shelf-sign::before/);
+  });
+
   test("the old name is gone from what players and search engines see", () => {
     const seen = ["index.html", "public/manifest.webmanifest", ...readdirSync("src", { recursive: true, encoding: "utf8" }).map((f) => `src/${f}`)].filter(
       (file) => /\.(tsx?|html|webmanifest|css)$/.test(file) && !file.includes("/ideas/") && !file.endsWith("research.ts") && !file.endsWith(".test.ts"),
