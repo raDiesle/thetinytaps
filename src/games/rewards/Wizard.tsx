@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type Board, boardFromTemplate, newId, withKind } from "./board";
@@ -14,10 +14,10 @@ import {
   type Template,
   TEMPLATES,
 } from "./catalog";
-import { TemplateGallery, Thumb } from "./Gallery";
-import { Pick, VIEW } from "./pageParts";
+import { Thumb } from "./Gallery";
+import { VIEW } from "./pageParts";
 import { type Plan, planFromTemplate } from "./plan";
-import { PlanGallery, PlanThumb } from "./PlanGallery";
+import { PlanThumb } from "./PlanGallery";
 import { BOARD_STEPS, BoardStep } from "./WizardBoard";
 import { PLAN_STEPS, PlanStepView } from "./WizardPlan";
 
@@ -33,18 +33,19 @@ export interface WizardStep {
   label: Localized;
 }
 
-/** The three steps every chart begins with – the kind, how it looks, a Vorlage of that look; the kind's own steps follow. */
-const FIRST_STEPS: WizardStep[] = [
-  { id: "type", label: { de: "Art", en: "Type", zh: "类型", hi: "प्रकार", es: "Tipo", ar: "النوع", ru: "Тип" } },
-  { id: "view", label: VIEW },
-  { id: "template", label: { de: "Vorlage", en: "Template", zh: "模板", hi: "टेम्पलेट", es: "Plantilla", ar: "القالب", ru: "Шаблон" } },
-];
+/** The first step of every chart: its kind and its view, with the Vorlagen of each view to pick, one or several. */
+const FIRST_STEP: WizardStep = { id: "view", label: VIEW };
 
-/** The step of the Vorlage: the kind's own steps come after it. */
-const TEMPLATE_STEP = FIRST_STEPS.length - 1;
-
-/** The view marked first for each kind: a week of stars, a plan of one day. */
-const FIRST_VIEW: { board: BoardKind; plan: PlanView } = { board: "week", plan: "day" };
+/** „Leer anfangen“: a board or plan of one view with nothing on it yet. */
+const START_BLANK: Localized = {
+  de: "Leer anfangen",
+  en: "Start blank",
+  zh: "从空白开始",
+  hi: "खाली से शुरू करें",
+  es: "Empezar en blanco",
+  ar: "البدء من الصفر",
+  ru: "Начать с чистого листа",
+};
 
 /** A board with nothing on it yet, for „Leer anfangen“, in the view chosen. */
 function blankBoard(kind: BoardKind): Board {
@@ -69,11 +70,14 @@ function blankPlan(view: PlanView): Plan {
   return { id: newId(), view, childName: "", title: "", days: [[]], same: true, theme: "sonne", examples: true };
 }
 
-/** The first board and plan of the gallery, as the pictures of the first steps: what each kind and view looks like in use. */
-const TYPE_PICTURES = { board: boardFromTemplate(TEMPLATES[0]), plan: planFromTemplate(PLAN_TEMPLATES[0]) };
-/** That board in each view and that plan in each view, made once. */
-const BOARD_VIEWS = new Map(KINDS.map((kind) => [kind.id, withKind(TYPE_PICTURES.board, kind.id)]));
-const PLAN_VIEW_PICTURES = new Map(PLAN_VIEWS.map((view) => [view.id, { ...TYPE_PICTURES.plan, view: view.id }]));
+/** Every template as the board or plan it makes, once, for the pictures of the first step. */
+const BOARD_PICTURES = new Map(TEMPLATES.map((tpl) => [tpl.id, boardFromTemplate(tpl)]));
+const PLAN_PICTURES = new Map(PLAN_TEMPLATES.map((tpl) => [tpl.id, planFromTemplate(tpl)]));
+
+/** What can be picked on the first step, by a key of its own: a template of either kind, or „Leer anfangen“ in a view. */
+const boardKey = (id: string) => `board:${id}`;
+const planKey = (id: string) => `plan:${id}`;
+const BLANK = "leer";
 
 /** A draft made from a template, with an id of its own (the template's board made before keeps its stars). */
 const fromStart = (start: WizardStart, language: TargetLanguageId): Draft =>
@@ -81,13 +85,19 @@ const fromStart = (start: WizardStart, language: TargetLanguageId): Draft =>
     ? { type: "board", board: { ...boardFromTemplate(start.template, language), id: newId() } }
     : { type: "plan", plan: planFromTemplate(start.template, language) };
 
+/** Whether a draft can be made as it is: a board needs a task (a collecting board none), a plan a card. */
+const ready = (draft: Draft) =>
+  draft.type === "board" ? draft.board.tasks.length > 0 || draft.board.kind === "collect" : draft.plan.days.some((day) => day.length > 0);
+
 /**
- * „＋ Neu“ step by step, for a Belohnungstafel and a Tagesplan alike: 1 the kind (two big pictures), 2 the view (Tag,
- * Woche, …, each as a big picture – how it looks, not what is on it), 3 a Vorlage of that view (or „Leer anfangen“,
- * first), then the kind's own steps – a board's tasks, reward and look, a plan's cards and look. Every choice shows
- * what it makes, and from step 4 the whole board or plan stands beside each step. „✓ So nehmen“ makes it from any step
- * after the Vorlage; everything can still be changed under „Gestalten“. Opened on a template from the gallery, it
- * starts on step 4. Without `onCancel` (nothing made yet) it can't be closed: the page has nothing else to show.
+ * „＋ Neu“, for a Belohnungstafel and a Zeitplan alike. The first step is the whole choice of form: on top the kind
+ * (Belohnungstafel or Zeitplan, plain words, no pictures), below it every view of that kind under its name in big
+ * letters – Tag, Woche, … or Ablaufplan, Jetzt – Dann, Erst – Dann, Woche – with its Vorlagen as pictures beneath. A
+ * tap picks a Vorlage, another tap puts it back, so several (of both kinds) are made at once with „✓ Anlegen“. With
+ * one picked, „Weiter“ goes on to its own steps – a board's tasks, reward and look, a plan's cards and look – with the
+ * whole board or plan beside each step. „Leer anfangen“ in a view goes there at once. Opened on a template from the
+ * gallery it starts on that template's own steps. Without `onCancel` (nothing made yet) it can't be closed: the page
+ * has nothing else to show.
  */
 export function Wizard({
   type: startType,
@@ -95,66 +105,112 @@ export function Wizard({
   onDone,
   onCancel,
 }: {
-  /** The kind marked on the first step (the address or the chart shown). */
+  /** The kind shown first (the address or the chart shown). */
   type: ChartType;
   start?: WizardStart;
-  onDone: (draft: Draft) => void;
+  onDone: (drafts: Draft[]) => void;
   onCancel?: () => void;
 }) {
   const t = useT();
   const { id: language } = useAppLanguage();
   const [type, setType] = useState<ChartType>(start?.type ?? startType);
-  const [draft, setDraft] = useState<Draft | null>(() => (start ? fromStart(start, language) : null));
-  const [view, setView] = useState<BoardKind | PlanView>(() =>
-    start ? (start.type === "board" ? start.template.kind : start.template.view) : FIRST_VIEW[type],
+  /** What is picked, by key, as the board or plan it makes (changed by the later steps where only one is picked). */
+  const [picked, setPicked] = useState<Map<string, Draft>>(() =>
+    start ? new Map([[start.type === "board" ? boardKey(start.template.id) : planKey(start.template.id), fromStart(start, language)]]) : new Map(),
   );
-  const [step, setStep] = useState(start ? TEMPLATE_STEP + 1 : 0);
-  const steps = [...FIRST_STEPS, ...(type === "board" ? BOARD_STEPS : PLAN_STEPS)];
-  const id = steps[step].id;
+  const [step, setStep] = useState(start ? 1 : 0);
+  const drafts = [...picked.values()];
+  const [only] = drafts.length === 1 ? drafts : [];
+  const steps = [FIRST_STEP, ...(only ? (only.type === "board" ? BOARD_STEPS : PLAN_STEPS) : [])];
+  const id = steps[step]?.id ?? FIRST_STEP.id;
+  const own = step > 0 && !!only;
 
-  const pickType = (next: ChartType) => {
-    if (next !== type) {
-      setDraft(null);
-      setView(FIRST_VIEW[next]);
-    }
-    setType(next);
+  const toggle = (key: string, make: () => Draft) =>
+    setPicked((before) => {
+      const next = new Map([...before].filter(([k]) => !k.endsWith(BLANK)));
+      if (before.has(key)) next.delete(key);
+      else next.set(key, make());
+      return next;
+    });
+  // „Leer anfangen“ is one chart of its own: it goes on to its steps at once, as there is nothing to see before.
+  const blank = (key: string, draft: Draft) => {
+    setPicked(new Map([[key, draft]]));
     setStep(1);
   };
-  // Another view keeps what was chosen so far, as the switch above the chart does.
-  const pickView = (next: BoardKind | PlanView) => {
-    setView(next);
-    if (draft?.type === "board") setDraft({ type: "board", board: withKind(draft.board, next as BoardKind) });
-    if (draft?.type === "plan") setDraft({ type: "plan", plan: { ...draft.plan, view: next as PlanView } });
-    setStep(TEMPLATE_STEP);
+  const change = (draft: Draft) => {
+    const [key] = [...picked.keys()];
+    setPicked(new Map([[key, draft]]));
   };
-  const pick = (made: Draft) => {
-    setDraft(made);
-    setStep(TEMPLATE_STEP + 1);
-  };
-  const ready = draft?.type === "board" ? draft.board.tasks.length > 0 || draft.board.kind === "collect" : !!draft?.plan.days.some((day) => day.length > 0);
-  const own = step > TEMPLATE_STEP;
+
+  const groups =
+    type === "board"
+      ? KINDS.map((kind) => ({
+          id: kind.id,
+          emoji: kind.emoji,
+          label: kind.label,
+          blank: { key: boardKey(`${kind.id}-${BLANK}`), make: (): Draft => ({ type: "board", board: blankBoard(kind.id) }) },
+          tiles: TEMPLATES.filter((tpl) => tpl.kind === kind.id).map((tpl) => {
+            const board = BOARD_PICTURES.get(tpl.id);
+            return {
+              key: boardKey(tpl.id),
+              emoji: tpl.emoji,
+              label: tpl.label,
+              picture: board && <Thumb board={board} />,
+              make: (): Draft => ({ type: "board", board: { ...boardFromTemplate(tpl, language), id: newId() } }),
+            };
+          }),
+        }))
+      : PLAN_VIEWS.map((view) => ({
+          id: view.id,
+          emoji: view.emoji,
+          label: view.label,
+          blank: { key: planKey(`${view.id}-${BLANK}`), make: (): Draft => ({ type: "plan", plan: blankPlan(view.id) }) },
+          tiles: PLAN_TEMPLATES.filter((tpl) => tpl.view === view.id).map((tpl) => {
+            const plan = PLAN_PICTURES.get(tpl.id);
+            return {
+              key: planKey(tpl.id),
+              emoji: tpl.emoji,
+              label: tpl.label,
+              picture: plan && <PlanThumb plan={plan} />,
+              make: (): Draft => ({ type: "plan", plan: planFromTemplate(tpl, language) }),
+            };
+          }),
+        }));
 
   return (
     <section
       className="rw-wizard"
       aria-label={t({ de: "Neu anlegen", en: "Create new", zh: "新建", hi: "नया बनाएँ", es: "Crear nuevo", ar: "إنشاء جديد", ru: "Создать" })}
     >
-      <header className="rw-wizard-head">
+      <header className={`rw-wizard-head${id === FIRST_STEP.id ? " has-kinds" : ""}`}>
         <ol className="rw-steps">
-          {steps.map((s, i) => (
+          {(only ? steps : [FIRST_STEP]).map((s, i) => (
             <li key={s.id}>
-              <button
-                type="button"
-                className={i === step ? "selected" : undefined}
-                aria-current={i === step ? "step" : undefined}
-                disabled={!draft && i > TEMPLATE_STEP}
-                onClick={() => setStep(i)}
-              >
+              <button type="button" className={i === step ? "selected" : undefined} aria-current={i === step ? "step" : undefined} onClick={() => setStep(i)}>
                 <span className="rw-step-number">{i + 1}</span> <span className="rw-step-label">{t(s.label)}</span>
               </button>
             </li>
           ))}
         </ol>
+        {/* The kind: plain words, no pictures – the views below show what each makes. */}
+        {id === FIRST_STEP.id && (
+          <div className="rw-kinds" role="group" aria-label={t({ de: "Art", en: "Type", zh: "类型", hi: "प्रकार", es: "Tipo", ar: "النوع", ru: "Тип" })}>
+            {CHART_TYPES.map((kind) => (
+              <button
+                key={kind.id}
+                type="button"
+                className={kind.id === type ? "selected" : undefined}
+                aria-pressed={kind.id === type}
+                onClick={() => setType(kind.id)}
+              >
+                <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
+                {drafts.some((d) => d.type === kind.id) && kind.id !== type && (
+                  <span className="rw-kind-count">{drafts.filter((d) => d.type === kind.id).length}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
         {onCancel && (
           <button
             type="button"
@@ -169,153 +225,84 @@ export function Wizard({
 
       <div className={`rw-wizard-body${own ? "" : " rw-wizard-wide"}`}>
         <div className="rw-wizard-step">
-          {id === "type" && (
+          {id === FIRST_STEP.id && (
             <>
-              <h2>
-                {t({
-                  de: "Was möchten Sie anlegen?",
-                  en: "What would you like to create?",
-                  zh: "您想创建什么？",
-                  hi: "क्या बनाना है?",
-                  es: "¿Qué desea crear?",
-                  ar: "ماذا تريدون أن تنشئوا؟",
-                  ru: "Что вы хотите создать?",
-                })}
-              </h2>
-              <div className="rw-picks rw-picks-big">
-                {CHART_TYPES.map((kind) => (
-                  <Pick
-                    key={kind.id}
-                    selected={kind.id === type}
-                    onClick={() => pickType(kind.id)}
-                    picture={kind.id === "board" ? <Thumb board={TYPE_PICTURES.board} /> : <PlanThumb plan={TYPE_PICTURES.plan} />}
-                    label={`${kind.emoji} ${t(kind.label)}`}
-                  />
+              <div className="rw-view-groups">
+                {groups.map((group) => (
+                  <section key={group.id} className="rw-view-group" style={{ "--rw-tiles": Math.max(1, group.tiles.length) } as CSSProperties}>
+                    {/* The view's name stands over its pictures, as the name of what they show. */}
+                    <div className="rw-view-head">
+                      <h2 className="rw-view-name">
+                        <span aria-hidden>{group.emoji}</span> {t(group.label)}
+                      </h2>
+                      {/* No picture of anything: a small button beside the view's name, not a tile among the Vorlagen. */}
+                      <button type="button" className="rw-view-blank" onClick={() => blank(group.blank.key, group.blank.make())}>
+                        <span aria-hidden>✏️</span> {t(START_BLANK)}
+                      </button>
+                    </div>
+                    <ul className="rw-gallery rw-gallery-big">
+                      {group.tiles.map((tile) => {
+                        const selected = picked.has(tile.key);
+                        return (
+                          <li key={tile.key}>
+                            <button
+                              type="button"
+                              className={`rw-tpl${selected ? " selected" : ""}`}
+                              aria-pressed={selected}
+                              onClick={() => toggle(tile.key, tile.make)}
+                            >
+                              {tile.picture}
+                              <span className="rw-tpl-name">
+                                <span aria-hidden>{tile.emoji}</span> {t(tile.label)}
+                              </span>
+                              <span className="rw-tpl-check" aria-hidden>
+                                ✓
+                              </span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </section>
                 ))}
               </div>
             </>
           )}
 
-          {id === "view" && (
-            <>
-              <h2>
-                {type === "board"
-                  ? t({
-                      de: "Wie lange geht die Tafel?",
-                      en: "How long does the chart run?",
-                      zh: "奖励表用多久？",
-                      hi: "चार्ट कितने समय का हो?",
-                      es: "¿Cuánto dura la tabla?",
-                      ar: "ما مدة اللوحة؟",
-                      ru: "На какой срок таблица?",
-                    })
-                  : t({
-                      de: "Was soll der Plan zeigen?",
-                      en: "What should the plan show?",
-                      zh: "日程表要显示什么？",
-                      hi: "योजना में क्या दिखे?",
-                      es: "¿Qué debe mostrar el plan?",
-                      ar: "ماذا تعرض الخطة؟",
-                      ru: "Что показывать в плане?",
-                    })}
-              </h2>
-              {type === "board" ? (
-                <div className="rw-picks rw-picks-views">
-                  {KINDS.map((kind) => {
-                    const board = BOARD_VIEWS.get(kind.id);
-                    return (
-                      <Pick
-                        key={kind.id}
-                        selected={kind.id === view}
-                        onClick={() => pickView(kind.id)}
-                        picture={board && <Thumb board={board} />}
-                        label={`${kind.emoji} ${t(kind.label)}`}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="rw-picks rw-picks-big">
-                  {PLAN_VIEWS.map((planView) => {
-                    const plan = PLAN_VIEW_PICTURES.get(planView.id);
-                    return (
-                      <Pick
-                        key={planView.id}
-                        selected={planView.id === view}
-                        onClick={() => pickView(planView.id)}
-                        picture={plan && <PlanThumb plan={plan} />}
-                        label={`${planView.emoji} ${t(planView.label)}`}
-                      />
-                    );
-                  })}
-                </div>
-              )}
-            </>
-          )}
-
-          {id === "template" && (
-            <>
-              <h2>
-                {t({
-                  de: "Womit fangen wir an?",
-                  en: "Where shall we start?",
-                  zh: "从哪里开始？",
-                  hi: "किससे शुरू करें?",
-                  es: "¿Con qué empezamos?",
-                  ar: "بماذا نبدأ؟",
-                  ru: "С чего начнём?",
-                })}
-              </h2>
-              {type === "board" ? (
-                <TemplateGallery
-                  kind={view as BoardKind}
-                  selected={draft?.type === "board" ? draft.board.template : undefined}
-                  onPick={(tpl) => pick({ type: "board", board: { ...boardFromTemplate(tpl, language), id: newId() } })}
-                  blank={() => pick({ type: "board", board: blankBoard(view as BoardKind) })}
-                />
-              ) : (
-                <PlanGallery
-                  view={view as PlanView}
-                  selected={draft?.type === "plan" ? draft.plan.template : undefined}
-                  onPick={(tpl) => pick({ type: "plan", plan: planFromTemplate(tpl, language) })}
-                  blank={() => pick({ type: "plan", plan: blankPlan(view as PlanView) })}
-                />
-              )}
-            </>
-          )}
-
-          {draft?.type === "board" && own && <BoardStep step={id} board={draft.board} onChange={(board) => setDraft({ type: "board", board })} />}
-          {draft?.type === "plan" && own && <PlanStepView step={id} plan={draft.plan} onChange={(plan) => setDraft({ type: "plan", plan })} />}
+          {only?.type === "board" && own && <BoardStep step={id} board={only.board} onChange={(board) => change({ type: "board", board })} />}
+          {only?.type === "plan" && own && <PlanStepView step={id} plan={only.plan} onChange={(plan) => change({ type: "plan", plan })} />}
         </div>
 
-        {draft && own && <div className="rw-wizard-preview">{draft.type === "board" ? <Thumb board={draft.board} /> : <PlanThumb plan={draft.plan} />}</div>}
+        {only && own && <div className="rw-wizard-preview">{only.type === "board" ? <Thumb board={only.board} /> : <PlanThumb plan={only.plan} />}</div>}
       </div>
 
       <footer className="rw-wizard-foot">
         <button type="button" className="rw-wizard-back" disabled={step === 0} onClick={() => setStep(step - 1)}>
           ‹ {t({ de: "Zurück", en: "Back", zh: "上一步", hi: "पीछे", es: "Atrás", ar: "السابق", ru: "Назад" })}
         </button>
-        {(step < TEMPLATE_STEP || (draft && own && step < steps.length - 1)) && (
-          <button type="button" className="rw-wizard-next" onClick={() => (step === 0 ? pickType(type) : step === 1 ? pickView(view) : setStep(step + 1))}>
+        {only && step < steps.length - 1 && (
+          <button type="button" className="rw-wizard-next" onClick={() => setStep(step + 1)}>
             {t({ de: "Weiter", en: "Next", zh: "下一步", hi: "आगे", es: "Siguiente", ar: "التالي", ru: "Далее" })} ›
           </button>
         )}
-        {draft && own && (
-          <button type="button" className="rw-wizard-done" disabled={!ready} onClick={() => onDone(draft)}>
+        {drafts.length > 0 && (
+          <button type="button" className="rw-wizard-done" disabled={!drafts.every(ready)} onClick={() => onDone(drafts)}>
             ✓{" "}
-            {step === steps.length - 1
-              ? type === "board"
-                ? t({
-                    de: "Tafel anlegen",
-                    en: "Create chart",
-                    zh: "创建奖励表",
-                    hi: "चार्ट बनाएँ",
-                    es: "Crear tabla",
-                    ar: "إنشاء اللوحة",
-                    ru: "Создать таблицу",
-                  })
-                : t({ de: "Plan anlegen", en: "Create plan", zh: "创建日程表", hi: "योजना बनाएँ", es: "Crear plan", ar: "إنشاء الخطة", ru: "Создать план" })
-              : t({ de: "So nehmen", en: "Use as is", zh: "就这样用", hi: "ऐसे ही लें", es: "Usar así", ar: "استخدامها هكذا", ru: "Взять так" })}
+            {drafts.length > 1
+              ? t({ de: (n: number) => `${n} anlegen` })(drafts.length)
+              : step === steps.length - 1 && only
+                ? only.type === "board"
+                  ? t({
+                      de: "Tafel anlegen",
+                      en: "Create chart",
+                      zh: "创建奖励表",
+                      hi: "चार्ट बनाएँ",
+                      es: "Crear tabla",
+                      ar: "إنشاء اللوحة",
+                      ru: "Создать таблицу",
+                    })
+                  : t({ de: "Plan anlegen", en: "Create plan", zh: "创建日程表", hi: "योजना बनाएँ", es: "Crear plan", ar: "إنشاء الخطة", ru: "Создать план" })
+                : t({ de: "So nehmen", en: "Use as is", zh: "就这样用", hi: "ऐसे ही लें", es: "Usar así", ar: "استخدامها هكذا", ru: "Взять так" })}
           </button>
         )}
       </footer>

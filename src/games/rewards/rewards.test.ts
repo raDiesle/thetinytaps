@@ -226,9 +226,13 @@ describe("times of day", () => {
     expect(TASK_BY_ID.get("zaehne")?.slots).toEqual(["morning", "evening"]);
     expect(teeth.slots).toEqual(["morning", "evening"]);
     expect(fieldCount(teethWeek, wednesday)).toBe(14);
-    // A template may give a task fewer times: Mein Morgen brushes only in the morning.
-    const morning = boardFromTemplate(TEMPLATES.find((t) => t.id === "morgen") ?? TEMPLATES[0]);
-    expect(morning.tasks.find((t) => t.catalog === "zaehne")?.slots).toEqual(["morning"]);
+    // Mein Tag is the morning and the evening on one board: brushing at both, dressing in the morning, the bath at night.
+    const day = boardFromTemplate(TEMPLATES.find((t) => t.id === "mein-tag") ?? TEMPLATES[0]);
+    expect(day.tasks.map((t) => [t.catalog, t.slots])).toEqual([
+      ["anziehen", ["morning"]],
+      ["zaehne", ["morning", "evening"]],
+      ["baden", ["evening"]],
+    ]);
     for (const tpl of TEMPLATES) for (const id of Object.keys(tpl.slots ?? {})) expect(tpl.tasks, `${tpl.id}: ${id}`).toContain(id);
   });
 

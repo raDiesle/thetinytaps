@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { SeoText } from "@/components/SeoText";
+import { Sky } from "@/components/Sky";
 import { MenuHead } from "@/components/MenuTop";
 import { categoryHref, categoryOf } from "@/content/games";
 import { useGameSettings } from "@/lib/common";
@@ -109,7 +110,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const setLog = (next: StarLog) => setStored({ log: next });
   const today = new Date();
   const boardDay = back === 0 || !board ? today : shiftPeriod(board.kind, today, -back);
-  const planDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (plan?.view === "day" ? -back : 0), 12);
+  const planDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + (plan && plan.view !== "week" ? -back : 0), 12);
 
   // Back from a game a plan's card opened (the brushing): that card gets its tick, whatever time of day the game counted.
   useEffect(() => {
@@ -177,10 +178,15 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     if (made) showPlan(made.id);
     else openWizard({ type: "plan", template });
   };
-  const add = (draft: Draft) => {
-    if (draft.type === "board") updateBoards({ boards: [...boards.boards, draft.board], current: draft.board.id });
-    else updatePlans({ plans: [...plans.plans, draft.plan], current: draft.plan.id });
-    show(draft.type);
+  /** What the wizard made, one chart or several at once: each is added, the last of each kind is shown. */
+  const add = (drafts: Draft[]) => {
+    const newBoards = drafts.flatMap((d) => (d.type === "board" ? [d.board] : []));
+    const newPlans = drafts.flatMap((d) => (d.type === "plan" ? [d.plan] : []));
+    if (newBoards.length > 0) updateBoards({ boards: [...boards.boards, ...newBoards], current: newBoards[newBoards.length - 1].id });
+    if (newPlans.length > 0) updatePlans({ plans: [...plans.plans, ...newPlans], current: newPlans[newPlans.length - 1].id });
+    show(drafts[drafts.length - 1].type);
+    // The wizard may have been scrolled far down: the new chart starts at the top of the page.
+    window.scrollTo({ top: 0 });
   };
   const removeBoard = (gone: Board) => {
     const rest = boards.boards.filter((b) => b.id !== gone.id);
@@ -274,6 +280,8 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
 
   return (
     <main className={`start-screen rw-page-screen${computer ? " rw-computer" : ""}`}>
+      {/* The page of the book (in the book look) and the families reading at its foot, as on every menu. */}
+      <Sky />
       {/* The first screen: everything down to the chart, which fills what is left of it. */}
       <div className="rw-first">
         <MenuHead
@@ -323,7 +331,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
             {!wizard && type === "plan" && plan && (
               <div className="rw-switch">
                 <ViewSwitch views={PLAN_VIEWS} selected={plan.view} onPick={setView} />
-                {plan.view === "day" && <DayNav day={planDay} shift={-back} setShift={(shift) => setBack(-shift)} />}
+                {plan.view !== "week" && <DayNav day={planDay} shift={-back} setShift={(shift) => setBack(-shift)} />}
               </div>
             )}
             <nav

@@ -21,7 +21,7 @@ export const CHART_TYPES: { id: ChartType; emoji: string; label: Localized }[] =
   {
     id: "plan",
     emoji: "🗓️",
-    label: { de: "Tagesplan", en: "Day plan", zh: "日程表", hi: "दिन की योजना", es: "Plan del día", ar: "خطة اليوم", ru: "План дня" },
+    label: { de: "Zeitplan", en: "Schedule", zh: "时间表", hi: "समय-सारणी", es: "Horario", ar: "الجدول الزمني", ru: "Расписание" },
   },
 ];
 
@@ -513,48 +513,19 @@ export const TEMPLATES: Template[] = [
     },
   },
   {
-    id: "morgen",
-    emoji: "🌅",
-    label: { de: "Mein Morgen", en: "My morning", zh: "我的早晨", hi: "मेरी सुबह", es: "Mi mañana", ar: "صباحي", ru: "Моё утро" },
+    // Morning and evening on one board: nobody wants the one without the other (user feedback, October 2026).
+    id: "mein-tag",
+    emoji: "🌞",
+    label: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
     kind: "day",
-    tasks: ["anziehen", "zaehne", "schuhe"],
-    slots: { zaehne: ["morning"] },
+    tasks: ["anziehen", "zaehne", "baden"],
+    slots: { anziehen: ["morning"], zaehne: ["morning", "evening"], baden: ["evening"] },
     goal: 3,
     reward: null,
     mark: "sonne",
     theme: "sonne",
-    title: { de: "Mein Morgen", en: "My morning", zh: "我的早晨", hi: "मेरी सुबह", es: "Mi mañana", ar: "صباحي", ru: "Моё утро" },
-    hint: {
-      de: "Anziehen, Zähne, Schuhe – jeden Morgen neu",
-      en: "Get dressed, teeth, shoes – fresh every morning",
-      zh: "穿衣、刷牙、穿鞋——每天早上重新开始",
-      hi: "कपड़े, दाँत, जूते – हर सुबह फिर से",
-      es: "Vestirse, dientes, zapatos: cada mañana de nuevo",
-      ar: "الملابس، الأسنان، الحذاء – كل صباح من جديد",
-      ru: "Одеться, зубы, обувь – каждое утро заново",
-    },
-  },
-  {
-    id: "abend",
-    emoji: "🌙",
-    label: { de: "Mein Abend", en: "My evening", zh: "我的晚上", hi: "मेरी शाम", es: "Mi noche", ar: "مسائي", ru: "Мой вечер" },
-    kind: "day",
-    tasks: ["baden", "zaehne", "aufraeumen"],
-    slots: { zaehne: ["evening"] },
-    goal: 3,
-    reward: "buch",
-    mark: "stern",
-    theme: "nacht",
-    title: { de: "Mein Abend", en: "My evening", zh: "我的晚上", hi: "मेरी शाम", es: "Mi noche", ar: "مسائي", ru: "Мой вечер" },
-    hint: {
-      de: "Baden, Zähne, Aufräumen – dann eine Geschichte",
-      en: "Bath, teeth, tidy up – then a story",
-      zh: "洗澡、刷牙、收拾——然后讲故事",
-      hi: "नहाना, दाँत, सामान समेटना – फिर एक कहानी",
-      es: "Baño, dientes, recoger y luego un cuento",
-      ar: "الاستحمام، الأسنان، الترتيب – ثم قصة",
-      ru: "Купание, зубы, уборка – потом сказка",
-    },
+    title: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
+    hint: { de: "Morgens anziehen, abends baden, Zähne putzen bei beidem – auf einer Seite" },
   },
   {
     id: "toepfchen",
@@ -757,8 +728,12 @@ export const ACTIVITIES: CatalogTask[] = [
   { id: "arzt", emoji: "🩺", label: { de: "Zum Arzt", en: "Doctor", zh: "看医生", hi: "डॉक्टर के पास", es: "Al médico", ar: "إلى الطبيب", ru: "К врачу" } },
 ];
 
-/** The two views of a plan: today's steps as big cards one after the other, or the whole week. */
-export type PlanView = "day" | "week";
+/**
+ * The views of a plan, each its own way of showing the same cards: the Ablaufplan (the steps in their order, „Jetzt“
+ * apart and big), Jetzt – Dann (only the card to do and the next), Erst – Dann (pairs of two, up to four on a page)
+ * and the week.
+ */
+export type PlanView = "day" | "now-next" | "first-then" | "week";
 
 /** A view of a plan with what it shows, in one line for grown-ups. */
 export interface PlanViewInfo {
@@ -771,17 +746,21 @@ export interface PlanViewInfo {
 export const PLAN_VIEWS: PlanViewInfo[] = [
   {
     id: "day",
-    emoji: "☀️",
-    label: { de: "Tag", en: "Day", zh: "日", hi: "दिन", es: "Día", ar: "يوم", ru: "День" },
-    hint: {
-      de: "Heute: Schritt für Schritt, was jetzt kommt und was danach",
-      en: "Today: step by step, what comes now and what comes next",
-      zh: "今天：一步一步，现在做什么、接下来做什么",
-      hi: "आज: कदम-दर-कदम, अभी क्या है और उसके बाद क्या",
-      es: "Hoy: paso a paso, qué toca ahora y qué después",
-      ar: "اليوم: خطوة بخطوة، ما يأتي الآن وما بعده",
-      ru: "Сегодня: шаг за шагом, что сейчас и что потом",
-    },
+    emoji: "📋",
+    label: { de: "Ablaufplan" },
+    hint: { de: "Alle Schritte der Reihe nach – was jetzt dran ist, steht groß vorne" },
+  },
+  {
+    id: "now-next",
+    emoji: "👉",
+    label: { de: "Jetzt – Dann" },
+    hint: { de: "Nur zwei Karten: was jetzt dran ist und was danach kommt" },
+  },
+  {
+    id: "first-then",
+    emoji: "➡️",
+    label: { de: "Erst – Dann", en: "First – Then", zh: "先 – 然后", hi: "पहले – फिर", es: "Primero – Después", ar: "أولًا – ثم", ru: "Сначала – потом" },
+    hint: { de: "Paare aus zwei Karten: erst das eine, dann das Schöne – bis zu vier auf einer Seite" },
   },
   {
     id: "week",
@@ -799,14 +778,24 @@ export const PLAN_VIEWS: PlanViewInfo[] = [
   },
 ];
 
-/** A ready-made plan: catalogue ids per weekday (Monday first), or one list for every day. */
+/** A part of a plan's day, with its own row on the page: Mein Morgen and Mein Abend on one sheet. */
+export interface PlanTemplatePart {
+  /** The time of day of the part: its heading, and the brushing that ticks its teeth card. */
+  slot: Slot;
+  /** Catalogue ids in their order. */
+  steps: string[];
+}
+
+/** A ready-made plan: catalogue ids per weekday (Monday first), one list for every day, or the parts of a day. */
 export interface PlanTemplate {
   id: string;
   emoji: string;
   label: Localized;
   view: PlanView;
-  /** One list for every day, or seven (Monday first). */
-  days: string[] | string[][];
+  /** One list for every day, or seven (Monday first); left out where the day comes in `parts`. */
+  days?: string[] | string[][];
+  /** The day in parts, the same every day: Morgen and Abend on one page, as nobody wants the one without the other. */
+  parts?: PlanTemplatePart[];
   /** The time of day a linked step belongs to: a morning routine's brushing is the morning one. */
   slots?: Record<string, Slot>;
   theme: string;
@@ -815,82 +804,26 @@ export interface PlanTemplate {
   hint: Localized;
 }
 
+/** The parts of the day that belong together on one page: the morning and the evening routine. */
+const MORNING_AND_EVENING: PlanTemplatePart[] = [
+  { slot: "morning", steps: ["anziehen", "fruehstueck", "zaehne", "schuhe"] },
+  { slot: "evening", steps: ["baden", "zaehne", "vorlesen", "schlafen"] },
+];
+
 const KITA_DAY = ["fruehstueck", "kita", "mittagessen", "mittagsschlaf", "spielplatz", "abendessen", "schlafen"];
 const HOME_DAY = ["fruehstueck", "ausflug", "mittagessen", "mittagsschlaf", "spielen", "abendessen", "schlafen"];
 
-/** The gallery of the Tagesplan, day plans first; the first is the plan a new visitor sees. */
+/** The gallery of the Zeitplan in the order of its views; the first is the plan whose pictures the wizard shows first. */
 export const PLAN_TEMPLATES: PlanTemplate[] = [
   {
-    id: "morgenroutine",
+    id: "mein-tag",
     emoji: "🌅",
-    label: {
-      de: "Morgenroutine",
-      en: "Morning routine",
-      zh: "早晨流程",
-      hi: "सुबह की दिनचर्या",
-      es: "Rutina de la mañana",
-      ar: "روتين الصباح",
-      ru: "Утренний распорядок",
-    },
+    label: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
     view: "day",
-    days: ["aufstehen", "anziehen", "fruehstueck", "zaehne", "schuhe"],
-    slots: { zaehne: "morning" },
+    parts: MORNING_AND_EVENING,
     theme: "sonne",
-    title: { de: "Mein Morgen", en: "My morning", zh: "我的早晨", hi: "मेरी सुबह", es: "Mi mañana", ar: "صباحي", ru: "Моё утро" },
-    hint: {
-      de: "Aufstehen, Anziehen, Frühstück, Zähne, Schuhe – jeden Morgen gleich",
-      en: "Get up, get dressed, breakfast, teeth, shoes – the same every morning",
-      zh: "起床、穿衣、早餐、刷牙、穿鞋——每天早上都一样",
-      hi: "उठना, कपड़े, नाश्ता, दाँत, जूते – हर सुबह एक जैसा",
-      es: "Levantarse, vestirse, desayuno, dientes, zapatos: igual cada mañana",
-      ar: "الاستيقاظ، الملابس، الفطور، الأسنان، الحذاء – كل صباح بالترتيب نفسه",
-      ru: "Подъём, одеться, завтрак, зубы, обувь – каждое утро одинаково",
-    },
-  },
-  {
-    id: "abendroutine",
-    emoji: "🌙",
-    label: {
-      de: "Abendroutine",
-      en: "Bedtime routine",
-      zh: "睡前流程",
-      hi: "शाम की दिनचर्या",
-      es: "Rutina de la noche",
-      ar: "روتين المساء",
-      ru: "Вечерний распорядок",
-    },
-    view: "day",
-    days: ["abendessen", "baden", "zaehne", "vorlesen", "schlafen"],
-    slots: { zaehne: "evening" },
-    theme: "nacht",
-    title: { de: "Mein Abend", en: "My evening", zh: "我的晚上", hi: "मेरी शाम", es: "Mi noche", ar: "مسائي", ru: "Мой вечер" },
-    hint: {
-      de: "Essen, Baden, Zähne, Buch, Schlafen – ruhig in den Schlaf",
-      en: "Dinner, bath, teeth, book, sleep – calmly off to sleep",
-      zh: "吃饭、洗澡、刷牙、看书、睡觉——安安静静入睡",
-      hi: "खाना, नहाना, दाँत, किताब, सोना – आराम से नींद तक",
-      es: "Cena, baño, dientes, cuento, dormir: con calma hasta el sueño",
-      ar: "العشاء، الاستحمام، الأسنان، الكتاب، النوم – بهدوء إلى النوم",
-      ru: "Ужин, купание, зубы, книжка, сон – спокойно засыпаем",
-    },
-  },
-  {
-    id: "erst-dann",
-    emoji: "➡️",
-    label: { de: "Erst – Dann", en: "First – Then", zh: "先 – 然后", hi: "पहले – फिर", es: "Primero – Después", ar: "أولًا – ثم", ru: "Сначала – потом" },
-    view: "day",
-    days: ["schuhe", "spielplatz"],
-    theme: "wiese",
-    title: { de: "Erst – Dann", en: "First – Then", zh: "先 – 然后", hi: "पहले – फिर", es: "Primero – Después", ar: "أولًا – ثم", ru: "Сначала – потом" },
-    hint: {
-      de: "Zwei große Karten: erst das eine, dann das Schöne",
-      en: "Two big cards: first one thing, then the fun one",
-      zh: "两张大卡片：先做一件事，然后做开心的事",
-      hi: "दो बड़े कार्ड: पहले एक काम, फिर मज़े वाला",
-      es: "Dos tarjetas grandes: primero una cosa, después lo divertido",
-      ar: "بطاقتان كبيرتان: أولًا شيء، ثم الشيء الممتع",
-      ru: "Две большие карточки: сначала одно, потом приятное",
-    },
+    title: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
+    hint: { de: "Mein Morgen und mein Abend auf einer Seite" },
   },
   {
     id: "kita-tag",
@@ -907,7 +840,7 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
     view: "day",
     days: [KITA_DAY, KITA_DAY, KITA_DAY, KITA_DAY, KITA_DAY, HOME_DAY, HOME_DAY],
     theme: "meer",
-    title: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
+    title: { de: "Mein Kita-Tag" },
     hint: {
       de: "Der ganze Tag in Bildern, am Wochenende ohne Kita",
       en: "The whole day in pictures, without daycare at the weekend",
@@ -917,6 +850,26 @@ export const PLAN_TEMPLATES: PlanTemplate[] = [
       ar: "اليوم كله بالصور، وفي عطلة نهاية الأسبوع بلا حضانة",
       ru: "Весь день в картинках, в выходные без садика",
     },
+  },
+  {
+    id: "jetzt-dann",
+    emoji: "👉",
+    label: { de: "Jetzt – Dann" },
+    view: "now-next",
+    parts: MORNING_AND_EVENING,
+    theme: "wiese",
+    title: { de: "Mein Tag", en: "My day", zh: "我的一天", hi: "मेरा दिन", es: "Mi día", ar: "يومي", ru: "Мой день" },
+    hint: { de: "Morgen und Abend Karte für Karte: nur was jetzt dran ist und was danach kommt" },
+  },
+  {
+    id: "erst-dann",
+    emoji: "➡️",
+    label: { de: "Erst – Dann", en: "First – Then", zh: "先 – 然后", hi: "पहले – फिर", es: "Primero – Después", ar: "أولًا – ثم", ru: "Сначала – потом" },
+    view: "first-then",
+    days: ["schuhe", "spielplatz", "zaehne", "vorlesen", "anziehen", "draussen", "aufraeumen", "spielen"],
+    theme: "wiese",
+    title: { de: "Erst – Dann", en: "First – Then", zh: "先 – 然后", hi: "पहले – फिर", es: "Primero – Después", ar: "أولًا – ثم", ru: "Сначала – потом" },
+    hint: { de: "Vier Paare auf einer Seite: erst das eine, dann das Schöne" },
   },
   {
     id: "wochenplan",

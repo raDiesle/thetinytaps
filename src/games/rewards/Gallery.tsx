@@ -1,7 +1,7 @@
 import { useT } from "@/lib/language";
 import { type Board, boardFromTemplate, exampleStars, NO_LINKED } from "./board";
 import { BoardSheet, SCREEN_LOOK } from "./BoardSheet";
-import { type BoardKind, KINDS, type Template, TEMPLATES } from "./catalog";
+import { KINDS, type Template, TEMPLATES } from "./catalog";
 
 /** Width / height of a small picture of a board. */
 const THUMB_ASPECT = 1.45;
@@ -31,70 +31,53 @@ const PREVIEWS = new Map(PRESETS.map((tpl) => [tpl.id, boardFromTemplate(tpl)]))
 
 /**
  * The Vorlagen: every ready-made board as a small picture with example stars, its name and one line about it, beside
- * the board on wide screens. In the wizard only those of the view chosen, as big pictures with their names (the view
- * is chosen, the picture says the rest), after „Leer anfangen“.
+ * the board on wide screens – grouped by view, the view's name over its group, so it reads as the name of what the
+ * pictures show (never hidden in the line below them).
  */
 export function TemplateGallery({
   selected,
   onPick,
-  kind: only,
-  blank,
 }: {
   /** The template of the board shown, marked in the gallery. */
   selected?: string;
   onPick: (template: Template) => void;
-  /** Only the templates of this view, without their lines: the wizard's step after the view. */
-  kind?: BoardKind;
-  /** „Leer anfangen“ as the first card, in the wizard. */
-  blank?: () => void;
 }) {
   const t = useT();
   return (
-    <ul className={`rw-gallery${only ? " rw-gallery-big" : ""}`}>
-      {blank && (
-        <li>
-          <button type="button" className="rw-tpl rw-tpl-blank" onClick={blank}>
-            <span className="rw-thumb rw-thumb-blank" aria-hidden>
-              ✏️
-            </span>
-            <span className="rw-tpl-name">
-              {t({
-                de: "Leer anfangen",
-                en: "Start blank",
-                zh: "从空白开始",
-                hi: "खाली से शुरू करें",
-                es: "Empezar en blanco",
-                ar: "البدء من الصفر",
-                ru: "Начать с чистого листа",
-              })}
-            </span>
-          </button>
-        </li>
-      )}
-      {PRESETS.filter((tpl) => !only || tpl.kind === only).map((tpl) => {
-        const kind = KINDS.find((k) => k.id === tpl.kind);
-        const preview = PREVIEWS.get(tpl.id);
+    <div className="rw-gallery-groups">
+      {KINDS.map((kind) => {
+        const templates = PRESETS.filter((tpl) => tpl.kind === kind.id);
         return (
-          <li key={tpl.id}>
-            <button type="button" className={`rw-tpl${selected === tpl.id ? " selected" : ""}`} aria-pressed={selected === tpl.id} onClick={() => onPick(tpl)}>
-              {preview && <Thumb board={preview} />}
-              <span className="rw-tpl-name">
-                <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
-              </span>
-              {!only && (
-                <span className="rw-tpl-hint">
-                  {kind && (
-                    <span className="rw-tpl-kind">
-                      {kind.emoji} {t(kind.label)}
-                    </span>
-                  )}{" "}
-                  {t(tpl.hint)}
-                </span>
-              )}
-            </button>
-          </li>
+          templates.length > 0 && (
+            <section key={kind.id} className="rw-gallery-group">
+              <h3 className="rw-gallery-view">
+                <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
+              </h3>
+              <ul className="rw-gallery">
+                {templates.map((tpl) => {
+                  const preview = PREVIEWS.get(tpl.id);
+                  return (
+                    <li key={tpl.id}>
+                      <button
+                        type="button"
+                        className={`rw-tpl${selected === tpl.id ? " selected" : ""}`}
+                        aria-pressed={selected === tpl.id}
+                        onClick={() => onPick(tpl)}
+                      >
+                        {preview && <Thumb board={preview} />}
+                        <span className="rw-tpl-name">
+                          <span aria-hidden>{tpl.emoji}</span> {t(tpl.label)}
+                        </span>
+                        <span className="rw-tpl-hint">{t(tpl.hint)}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )
         );
       })}
-    </ul>
+    </div>
   );
 }

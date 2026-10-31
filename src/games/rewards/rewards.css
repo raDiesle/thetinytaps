@@ -237,14 +237,16 @@
     width: clamp(200px, 18vw, 260px);
   }
 
-  .rw-side .rw-gallery {
+  .rw-side .rw-gallery-groups {
     position: absolute;
     inset: 34px 0 0;
-    grid-template-columns: 1fr;
-    align-content: start;
     overflow-y: auto;
     padding: 4px 6px 10px 4px;
     scrollbar-width: thin;
+  }
+
+  .rw-side .rw-gallery {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -324,9 +326,25 @@
   opacity: 0.85;
 }
 
-.rw-tpl-kind {
-  font-weight: 700;
-  white-space: nowrap;
+/* The Vorlagen grouped by view: the view's name over its group, as the name of what the pictures show. */
+.rw-gallery-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rw-gallery-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rw-gallery-view {
+  margin: 0;
+  padding-bottom: 2px;
+  border-bottom: 2px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  font-size: 1.05rem;
+  font-weight: 900;
 }
 
 /* ---------- Rückblick: the last weeks, one big and all of them small to flip through ---------- */
@@ -485,6 +503,16 @@
   gap: 10px;
 }
 
+/* On the first step the kinds stand in the middle of the head, between the steps and ✕. */
+.rw-wizard-head.has-kinds {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.rw-wizard-head.has-kinds .rw-wizard-close {
+  justify-self: end;
+}
+
 .rw-steps {
   display: flex;
   flex: 1;
@@ -607,41 +635,141 @@
   gap: 10px;
 }
 
-/*
- * The first steps are only pictures, so they get the room: two choices (the kinds, a plan's views) side by side as
- * big as the screen's height lets both stay in sight, a board's four views in one row, the Vorlagen big.
- */
-.rw-picks-big {
-  --rw-pick-tall: calc(100dvh - 330px);
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 16px;
-  width: 100%;
-  max-width: min(1300px, max(640px, var(--rw-pick-tall) * 2.9 + 60px));
-  margin-inline: auto;
+/* The first step: the kind as two plain words side by side, no pictures – the views below show what each makes. */
+.rw-kinds {
+  display: flex;
+  align-self: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  overflow: hidden;
 }
 
-.rw-picks-views {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
-  gap: 14px;
+.rw-kinds button {
+  position: relative;
+  min-height: 48px;
+  padding: 4px 24px;
+  border: 0;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
 }
 
-/* Few Vorlagen in a view: they grow to fill the row (up to a size that still fits the screen), centred. */
+.rw-kinds button + button {
+  border-left: 3px solid var(--ink);
+}
+
+.rw-kinds button.selected {
+  background: var(--sunshine);
+}
+
+/* How many of the other kind are picked already: they stay picked while this one is shown. */
+.rw-kind-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 0.8rem;
+}
+
+/* The views side by side where they fit, so a wide screen shows every Vorlage at once. */
+.rw-view-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 32px;
+}
+
+/* A view and its Vorlagen: the view's name big on top, its pictures below. */
+.rw-view-group {
+  /* As wide as its Vorlagen side by side, so a view with two keeps them in one row. */
+  flex: 1 1 calc(var(--rw-tiles) * 230px + (var(--rw-tiles) - 1) * 14px);
+  min-width: min(100%, 230px);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The view's name on the left, „Leer anfangen“ small on the right, underlined together. */
+.rw-view-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 14px;
+  padding-bottom: 4px;
+  border-bottom: 3px solid var(--ink);
+}
+
+.rw-wizard-step .rw-view-name {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  text-align: left;
+}
+
+.rw-view-blank {
+  min-height: 34px;
+  padding: 2px 12px;
+  border: 2px dashed color-mix(in srgb, var(--ink) 55%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.rw-view-blank:hover {
+  background: color-mix(in srgb, var(--sunshine) 30%, transparent);
+}
+
 .rw-gallery-big {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .rw-gallery-big > li {
-  flex: 1 1 300px;
-  max-width: 480px;
+  flex: 0 1 230px;
+  min-width: 0;
 }
 
-.rw-picks-big .rw-pick-label,
-.rw-picks-views .rw-pick-label,
 .rw-gallery-big .rw-tpl-name {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
+}
+
+/* A picked Vorlage: yellow, with a tick in its corner – several can be picked and made at once. */
+.rw-tpl {
+  position: relative;
+}
+
+.rw-tpl-check {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  display: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.rw-tpl.selected .rw-tpl-check {
+  display: grid;
 }
 
 /* Picture cards (tasks, rewards, cards of a day): small tiles with a big emoji. */
@@ -857,17 +985,14 @@
     width: 76px;
   }
 
-  /* Less above and below the pictures here (no title, steps as numbers), so they keep the height that is left. */
-  .rw-picks-big {
-    --rw-pick-tall: calc(100dvh - 230px);
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
-    gap: 10px;
-    max-width: max(400px, var(--rw-pick-tall) * 2.9 + 40px);
+  .rw-kinds button {
+    min-height: 40px;
+    padding: 2px 16px;
+    font-size: 1rem;
   }
 
-  .rw-picks-views {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
-    gap: 8px;
+  .rw-wizard-step .rw-view-name {
+    font-size: 1.15rem;
   }
 
   .rw-gallery-big {
@@ -876,11 +1001,8 @@
 
   .rw-gallery-big > li {
     flex-basis: 180px;
-    max-width: 260px;
   }
 
-  .rw-picks-big .rw-pick-label,
-  .rw-picks-views .rw-pick-label,
   .rw-gallery-big .rw-tpl-name {
     font-size: 0.95rem;
   }
@@ -1861,4 +1983,52 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+}
+
+/*
+ * ---------- The book look: the page is a page of the book (`Sky`), the wizard a sheet of paper laid on it ----------
+ * Kept here rather than in book.css, so the chart's folder stays whole (it may become a site of its own, T-19).
+ */
+:root[data-look="book"] .rw-wizard {
+  border: 2px solid var(--ink);
+  border-radius: 14px;
+  background: var(--paper-grain), var(--paper-mottle), var(--paper);
+  box-shadow:
+    0 2px 0 #3d304540,
+    0 12px 24px -10px #5a3c1f80;
+}
+
+:root[data-look="book"] .rw-wizard-foot {
+  background: var(--paper);
+}
+
+:root[data-look="book"] :is(.rw-tpl, .rw-kinds button, .rw-steps button, .rw-wizard-close, .rw-wizard-foot button) {
+  background-color: var(--paper);
+  background-image: var(--paper-grain);
+}
+
+:root[data-look="book"] :is(.rw-tpl, .rw-steps button, .rw-wizard-foot button) {
+  border-width: 2px;
+}
+
+:root[data-look="book"] .rw-tpl {
+  border-radius: 14px 18px 15px 19px / 18px 14px 19px 15px;
+  box-shadow: 0 2px 0 #3d304559;
+}
+
+:root[data-look="book"] :is(.rw-tpl.selected, .rw-kinds button.selected, .rw-steps button.selected, .rw-wizard-done) {
+  background-color: color-mix(in srgb, var(--sunshine) 75%, var(--paper));
+}
+
+:root[data-look="book"] .rw-view-head {
+  border-bottom-width: 2px;
+}
+
+:root[data-look="book"] .rw-wizard-step .rw-view-name {
+  font-weight: 800;
+}
+
+/* The chart fills the page down to its foot, where the families would stand half hidden behind it: they stay out. */
+:root[data-look="book"] .rw-page-screen .book-family {
+  display: none;
 }

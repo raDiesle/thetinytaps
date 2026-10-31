@@ -9,7 +9,7 @@ import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { addStar, type LinkedDays, parseCellKey, type StarLog, takeBackStar } from "./board";
 import { Pic, picture } from "./pictures";
-import { currentStep, exampleTicks, gameOf, nightsUntil, type Plan, restartDay, routineStep, stepDone, stepsOn } from "./plan";
+import { currentStep, exampleTicks, gameOf, nightsUntil, pairsOf, type Plan, restartDay, routineStep, stepDone, stepsOn } from "./plan";
 import { PLAN_SCREEN, PlanSheet, SLEEPS_LEFT, type StepState, TODAY, useStepLabel } from "./PlanSheet";
 
 /** How long „Zurück“ stays after a tick, for a grown-up whose child tapped too soon. */
@@ -84,6 +84,10 @@ export function PlanScreen({
   const shown = plan.examples ? { ...exampleTicks(plan, today), ...ticks } : ticks;
   const todaySteps = stepsOn(plan, today);
   const allDone = todaySteps.length > 0 && currentStep(todaySteps, ticks, linked, today) === -1;
+  /** The views whose done cards go into the Fertig-Kiste; the week and Erst–Dann keep them in place with a tick. */
+  const boxed = plan.view === "day" || plan.view === "now-next";
+  /** An Erst–Dann's pairs done today: „Von vorn“ makes them ready for the next time. */
+  const pairsDone = plan.view === "first-then" ? pairsOf(todaySteps).filter((pair) => pair.every((step) => stepDone(ticks, linked, today, step))) : [];
 
   const sound = (play: () => void) => sounds && play();
   // A line without its translation is German and gets the German voice.
@@ -199,14 +203,16 @@ export function PlanScreen({
     }
     // The card to do now: done, with a tick, and the next one glows.
     const next = addStar(log, plan.id, key, today);
-    if (plan.view === "day") move.current = { key, from: el.getBoundingClientRect(), into: true };
+    if (boxed) move.current = { key, from: el.getBoundingClientRect(), into: true };
     setLog(next);
     setFresh(key);
     setUndo(key);
     sound(playChime);
     const rect = el.getBoundingClientRect();
     spawn(rect.left + rect.width / 2, rect.top + rect.height / 2);
-    const after = currentStep(steps, next[plan.id], linked, stepDay);
+    // An Erst–Dann pair stands on its own: done with its Dann card, and its Erst card says what comes then.
+    const pair = plan.view === "first-then" ? pairsOf(steps)[Math.floor(index / 2)] : steps;
+    const after = currentStep(pair, next[plan.id], linked, stepDay);
     if (after === -1) {
       setTimeout(() => {
         setParty(step.emoji);
@@ -226,7 +232,7 @@ export function PlanScreen({
       }, 450);
     } else {
       say(
-        `${t({ de: "Super! Jetzt:", en: "Super! Now:", zh: "太棒了！现在：", hi: "शाबाश! अब:", es: "¡Genial! Ahora:", ar: "رائع! والآن:", ru: "Супер! Теперь:" })} ${stepLabel(steps[after])}`,
+        `${t({ de: "Super! Jetzt:", en: "Super! Now:", zh: "太棒了！现在：", hi: "शाबाश! अब:", es: "¡Genial! Ahora:", ar: "رائع! والآن:", ru: "Супер! Теперь:" })} ${stepLabel(pair[after])}`,
       );
     }
   };
@@ -285,11 +291,11 @@ export function PlanScreen({
     setFresh(null);
   };
 
-  /** „Von vorn“: the day's ticks go, and in the day view every card comes back out of the box. */
+  /** „Von vorn“: the day's ticks go (an Erst–Dann's only for its pairs done), and every card comes back out of the box. */
   const startOver = () => {
     const from = boxRect();
     if (from) move.current = { key: "", from, into: false };
-    setLog(restartDay(log, plan.id, today));
+    setLog(restartDay(log, plan.id, today, pairsDone.length ? pairsDone.flat().map((step) => step.id) : undefined));
   };
 
   return (
@@ -301,7 +307,7 @@ export function PlanScreen({
         <div className="rw-example-note">
           <span>
             ✨{" "}
-            {plan.view === "day"
+            {boxed
               ? t({
                   de: "Die Karten in der Kiste sind nur ein Beispiel – mit dem ersten Tippen kommen sie wieder heraus.",
                   en: "The cards in the box are only an example – the first tap brings them back out.",
@@ -326,7 +332,7 @@ export function PlanScreen({
           </button>
         </div>
       )}
-      {!plan.examples && allDone && dayKey(day) === dayKey(today) && (
+      {!plan.examples && (allDone || pairsDone.length > 0) && dayKey(day) === dayKey(today) && (
         <button type="button" className="pl-again" onClick={startOver}>
           ↺ {t({ de: "Von vorn", en: "Start again", zh: "重新开始", hi: "फिर से शुरू", es: "Otra vez", ar: "من جديد", ru: "Сначала" })}
         </button>

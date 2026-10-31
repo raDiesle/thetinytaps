@@ -4,7 +4,7 @@ import { useT } from "@/lib/language";
 import { newId, weekday } from "./board";
 import { ACTIVITIES, DAY_NAMES, SLOTS, STEP_BY_ID, TASKS, THEMES } from "./catalog";
 import { ItemPic } from "./pictures";
-import { MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, stepsOn, withSame, withSteps } from "./plan";
+import { joinLastPart, MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, stepsOn, withSame, withSteps } from "./plan";
 import { usePlanTitle, useStepLabel } from "./PlanSheet";
 
 /** Steps a plan offers to add: the day's activities first, then the tasks of the Belohnungstafel. */
@@ -47,7 +47,7 @@ export function PlanEditor({
     next.splice(index + by, 0, step);
     setSteps(next);
   };
-  const add = (step: PlanStep) => steps.length < MAX_STEPS && setSteps([...steps, step]);
+  const add = (step: PlanStep) => steps.length < MAX_STEPS && setSteps([...steps, joinLastPart(steps, step)]);
   /** This day's steps on other weekdays too (fresh ids, the ticks of those days are their own anyway). */
   const copyTo = (days: number[]) =>
     onChange({ ...plan, days: plan.days.map((list, i) => (days.includes(i) && i !== editDay ? steps.map((step) => ({ ...step })) : list)) });

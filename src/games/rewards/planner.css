@@ -254,37 +254,197 @@
   animation: wiggle 0.45s ease-in-out;
 }
 
-/* Erst – Dann: two big cards with an arrow between them. */
-.pl-firstthen {
+/*
+ * Ablaufplan and Jetzt – Dann: the card to do now stands apart on the left, big, on a lit panel under a „Jetzt“
+ * banner; a dashed line parts it from the „Dann“ cards, smaller, in rows (one per part of the day: morning, evening).
+ */
+.pl-flow {
+  display: flex;
+  flex: 1;
+  gap: 3cqmin;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pl-now,
+.pl-then {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5cqmin;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pl-now {
+  flex: 0 0 36%;
+  /* On a wide, low sheet (a phone on its side) no wider than its square card needs: the rest goes to „Dann“. */
+  max-width: 62cqh;
+  box-sizing: border-box;
+  padding: 2cqmin;
+  border: max(2px, 0.7cqmin) solid var(--rw-ink);
+  border-radius: 4cqmin;
+  background: color-mix(in srgb, var(--rw-main) 32%, #fff);
+}
+
+.pl-then {
+  flex: 1;
+}
+
+.pl-flow.has-now > .pl-then {
+  padding-left: 3cqmin;
+  border-left: max(2px, 0.6cqmin) dashed color-mix(in srgb, var(--rw-ink) 45%, transparent);
+}
+
+/* The big card under „Jetzt“: as tall as the panel lets it, never wider than tall. */
+.pl-now > .pl-slot {
+  flex: 1;
+  align-self: center;
+  aspect-ratio: 1;
+  max-width: 100%;
+}
+
+.pl-flow .pl-tag {
+  align-self: flex-start;
+  font-size: clamp(0.8rem, 4.5cqmin, 1.8rem);
+  color: color-mix(in srgb, var(--rw-ink) 70%, transparent);
+}
+
+/* „Jetzt“ is a banner of its own, in the ink's colour: what hangs under it matters most. */
+.pl-flow .pl-tag-now {
+  align-self: center;
+  padding: 0.15em 0.9em;
+  border-radius: 999px;
+  background: var(--rw-ink);
+  color: #fff;
+  font-size: clamp(1rem, 6.5cqmin, 2.8rem);
+}
+
+.pl-row {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1cqmin;
+  min-height: 0;
+}
+
+/* A part's cards in one line, each as tall as the row and square, narrower only when many share it. */
+.pl-steps.pl-line {
+  display: flex;
+}
+
+.pl-steps.pl-line > .pl-slot {
+  flex: 0 1 auto;
+  height: 100%;
+  min-width: 0;
+}
+
+.pl-part {
+  flex: none;
+  text-align: start;
+  font-size: clamp(0.7rem, 3.8cqmin, 1.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.pl-row + .pl-row {
+  padding-top: 1.5cqmin;
+  border-top: max(1px, 0.3cqmin) solid color-mix(in srgb, var(--rw-ink) 20%, transparent);
+}
+
+/* Jetzt – Dann: two cards only, „Jetzt“ the bigger one; „Dann“ waits smaller beside it. */
+.pl-nownext > .pl-now {
+  flex: 1.25;
+}
+
+.pl-nownext > .pl-then > .pl-slot {
+  flex: 0 1 72%;
+  align-self: center;
+  aspect-ratio: 1;
+  max-width: 100%;
+  margin: auto 0;
+}
+
+/* An empty place for a Velcro card (on paper). */
+.pl-frame {
+  flex: 1;
+  box-sizing: border-box;
+  border: max(2px, 1.5cqmin) dashed color-mix(in srgb, var(--rw-ink) 45%, transparent);
+  border-radius: 12cqmin;
+  background: #fff;
+}
+
+/*
+ * Erst – Dann: up to four pairs on a page, each a small board of its own (its container), with „Erst“, an arrow and
+ * „Dann“. On paper they are parted by dashed lines to cut along.
+ */
+.pl-pairs {
   display: grid;
   flex: 1;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: stretch;
   gap: 3cqmin;
   min-height: 0;
 }
 
-.pl-firstthen > .pl-slot:first-child {
+.pl-pair {
+  container-type: size;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 2cqmin;
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 0;
+  padding: 2.5cqmin 3cqmin;
+  border: max(2px, 1.2cqmin) solid var(--rw-main);
+  border-radius: 6cqmin;
+  background: color-mix(in srgb, var(--rw-main) 12%, #fff);
+}
+
+.rw-on-paper .pl-pair {
+  border: max(1px, 0.8cqmin) dashed #0007;
+  border-radius: 0;
+  background: none;
+}
+
+.pl-pair.done {
+  opacity: 0.7;
+}
+
+.pl-pair-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 1cqmin;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pl-pair-slot:first-child {
   grid-column: 1;
   grid-row: 1;
 }
 
-.pl-firstthen > .pl-slot:nth-child(2) {
+.pl-pair-slot:nth-child(2) {
   grid-column: 3;
   grid-row: 1;
+}
+
+.pl-pair-slot > .pl-slot {
+  flex: 1;
+  align-self: center;
+  aspect-ratio: 1;
+  max-width: 100%;
+}
+
+.pl-pair .pl-tag {
+  font-size: clamp(0.7rem, 9cqmin, 2.2rem);
 }
 
 .pl-arrow {
   grid-column: 2;
   grid-row: 1;
   align-self: center;
-  font-size: 12cqmin;
+  padding-top: 9cqmin;
+  font-size: 18cqmin;
   font-weight: 900;
   line-height: 1;
-}
-
-.pl-firstthen .pl-tag {
-  font-size: clamp(1rem, 12cqmin, 3rem);
 }
 
 /* Week view: a column per day, today's tinted, moons over the days to come. */
