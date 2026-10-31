@@ -183,13 +183,6 @@ export const SEO_PAGES: PageSeo[] = [
       "Tagesablauf, Morgen- und Abendroutine oder Wochenplan für Kleinkinder in Bildern: das Kind tippt ab, was geschafft ist. Mit Bildkarten zum Ausdrucken.",
     text: "Ein Tagesplan in Bildern (Strukturtafel) für Kleinkinder: die Schritte des Tages als große Bildkarten – was jetzt dran ist, leuchtet, das Kind tippt es ab, wenn es geschafft ist, und die nächste Karte leuchtet. Vorlagen für die Morgenroutine, die Abendroutine, einen Tagesablauf mit Kita und eine Erst-dann-Tafel; ein Wochenplan zeigt, was an welchem Tag ist, mit Monden für jedes Mal Schlafen bis dahin. Ein Assistent führt in Bildern zum eigenen Plan, und zum Ausdrucken gibt es A4 mit allen Bildern als Karten zum Ausschneiden für eine Klett-Tafel. Auf derselben Seite: eine Belohnungstafel zum Sterne sammeln.",
   },
-  {
-    path: "/laut-leise/",
-    title: "Laut und leise – Stimmspiel für Kleinkinder",
-    description:
-      "Brüllen lässt den Löwen springen, Flüstern die Maus piepsen: Laut und leise sprechen spielerisch üben. Nichts wird aufgenommen, ohne Werbung.",
-    text: "Das Mikrofon misst nur, wie laut es ist: Laut ruft den Löwen, leise die Maus. Antippen geht auch. Nichts wird aufgenommen.",
-  },
   scene("baustelle", "Baustelle", "Bagger, Kran und Betonmischer"),
   scene("stadt", "Stadt", "Bus, Ampel und Polizeiauto"),
   scene("bauernhof", "Bauernhof", "Kuh, Schwein und Traktor"),

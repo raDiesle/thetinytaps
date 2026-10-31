@@ -299,19 +299,64 @@
   font-weight: 700;
 }
 
-/* The two stickers on the shelf's back wall, glossy, a little askew: the chosen one bright, the other pale. */
+/* The little book below the stickers (RoomNotes), standing a little askew, left of the stickers' wall. */
+.room-note {
+  margin-right: calc(var(--cw) * 0.16);
+  rotate: -4deg;
+  transform-origin: bottom right;
+}
+
+.room-note svg {
+  height: min(calc(var(--ch) * 0.56), calc(var(--cw) * 0.5 / 0.71));
+  width: auto;
+}
+
+.room-note-spine {
+  fill: #5d8a5a;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  filter: brightness(0.7);
+}
+
+.room-note-cover {
+  fill: #5d8a5a;
+  stroke: var(--ink);
+  stroke-width: 1.8;
+}
+
+.room-note-shine {
+  stroke: #ffffff40;
+  stroke-width: 2;
+}
+
+.room-note-label {
+  fill: #fbf4e3;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.room-note-sign {
+  fill: var(--ink);
+}
+
+.room-note-title {
+  stroke: #fbf4e3cc;
+  stroke-width: 2.6;
+}
+
+/* The two stickers on the shelf's right inner side, glossy, a little askew: the chosen one bright, the other pale. */
 .room-stickers {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 8cqh;
+  gap: 6cqh;
   width: 100%;
   height: 100%;
 }
 
 .room-sticker {
-  --s: min(56cqw, 33cqh);
+  --s: min(66cqw, 38cqh);
   position: relative;
   width: var(--s);
   height: var(--s);
@@ -353,15 +398,15 @@
   filter: none;
 }
 
-/* Side by side where the compartment is wider than tall (on top of an upright screen's shelf). */
+/* Side by side where the wall is deeper than tall (a low compartment on top of an upright screen's shelf). */
 @container (orientation: landscape) {
   .room-stickers {
     flex-direction: row;
-    gap: 8cqw;
+    gap: 6cqw;
   }
 
   .room-sticker {
-    --s: min(34cqw, 58cqh);
+    --s: min(38cqw, 66cqh);
   }
 }
 
@@ -636,36 +681,22 @@
 }
 
 /*
- * The stickers of the child's figure, stuck on the back panel of the globe's compartment: above the globe, or at its
- * sides where the compartment is wider than tall (`beside`).
+ * The stickers of the child's figure, stuck on the inner face of the shelf's right wall in their compartment above the
+ * globe's (user feedback, October 2026): turned with the wall, seen at a slant from the middle of the room.
  */
-.shelf-back-stuck {
-  --globe: min(calc(var(--ch) * 0.46), calc(var(--cw) * 0.86 / 0.75));
+.shelf-side-stuck {
   position: absolute;
-  inset: 5% 4% calc(var(--globe) + 4%);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--d);
   container-type: size;
-  transform: translate3d(var(--sx), var(--sy), calc(2px - var(--d)));
-}
-
-.shelf-back-stuck.beside {
-  --globe: calc(var(--ch) * 0.8);
-  inset: 8% 3%;
-}
-
-.shelf-back-stuck.beside .room-stickers {
-  justify-content: space-between;
-}
-
-.shelf-back-stuck.beside .room-sticker {
-  --s: min(24cqw, 56cqh);
+  transform-origin: right center;
+  transform: rotateY(-90deg) translateZ(1px);
 }
 
 .shelf-cell.language .room-globe svg {
-  height: min(calc(var(--ch) * 0.46), calc(var(--cw) * 0.86 / 0.75));
-}
-
-.shelf-cell.language:has(.beside) .room-globe svg {
-  height: calc(var(--ch) * 0.8);
+  height: min(calc(var(--ch) * 0.8), calc(var(--cw) * 0.86 / 0.75));
 }
 
 /* ----- The front of the frame: the planks between compartments, the posts, the top board, the plinth ----- */

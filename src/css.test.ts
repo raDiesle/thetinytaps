@@ -76,3 +76,32 @@ test("phone media queries use useFitGrid's phone size for width and height", () 
   }
   expect(wrong).toEqual([]);
 });
+
+// In the book look the way out of a game is the page's corner in the top left (book.css): a game's own buttons and signs
+// put in the top left corner of the screen lay under it (Schatten finden's picture choice, user feedback, October 2026).
+// They keep below it with `--corner-clear`, which is 0 in the toy look. Aufs Töpfchen's thought bubble is round and has
+// nothing to tap, so its empty corner may lie under it.
+const UNDER_THE_CORNER = new Set([".pt-think"]);
+
+test("a game's controls in the top left corner keep clear of the book look's way out", () => {
+  const under: string[] = [];
+  for (const file of cssFiles.filter((f) => f.startsWith(join("src", "games")))) {
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    for (const [rule, selector] of css.matchAll(/([^{}]+)\{([^{}]*)\}/g).map((m) => [m[2], m[1].trim()])) {
+      if (
+        /(^|;)\s*top:[^;]*safe-area-inset-top/.test(rule) &&
+        /(^|;)\s*left:[^;]*safe-area-inset-left/.test(rule) &&
+        !rule.includes("--corner-clear") &&
+        !UNDER_THE_CORNER.has(selector)
+      )
+        under.push(`${file}: ${selector}`);
+    }
+  }
+  expect(under).toEqual([]);
+});
+
+// „Zurück zum Menü · halten“ shows the moment ✕ is held, not fading in while the grown-up wonders (user feedback, October 2026).
+test("the note on leaving shows at once when ✕ is held", () => {
+  const css = readFileSync("src/styles/playing.css", "utf8");
+  expect(css).toMatch(/\.exit-corner\.hinted \.exit-hint \{[^}]*transition: none/);
+});

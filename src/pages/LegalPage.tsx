@@ -156,14 +156,6 @@ export function PrivacyPage() {
       </section>
 
       <section className="legal-panel">
-        <h2>Mikrofon (Laut und leise)</h2>
-        <p>
-          Das Spiel „Laut und leise“ fragt nach dem Mikrofon, damit ein Löwe brüllt, wenn Ihr Kind laut ist. Es misst dabei nur, wie laut es gerade ist. Der Ton
-          wird nicht aufgenommen, nicht gespeichert und nicht übertragen. Ohne Ihre Erlaubnis im Browser bleibt das Mikrofon aus.
-        </p>
-      </section>
-
-      <section className="legal-panel">
         <h2>Sprachausgabe des Browsers</h2>
         <p>
           Wo für einen Satz noch keine Aufnahme da ist, lassen manche Spiele ihn von der Sprachausgabe Ihres Browsers vorlesen. Je nach Browser (etwa Chrome mit

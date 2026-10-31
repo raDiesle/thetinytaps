@@ -42,13 +42,13 @@ import "./planner.css";
 
 /** The page's name, in the menu head and the browser tab: both things it makes, as parents search for them. */
 export const REWARDS_TITLE: Localized = {
-  de: "Belohnungstafel & Tagesplan",
-  en: "Reward Chart & Day Plan",
-  zh: "奖励表和日程表",
-  hi: "इनाम चार्ट और दिन की योजना",
-  es: "Tabla de premios y plan del día",
-  ar: "لوحة المكافآت وخطة اليوم",
-  ru: "Таблица наград и план дня",
+  de: "Belohnungstafel & Zeitplan",
+  en: "Reward Chart & Schedule",
+  zh: "奖励表和时间表",
+  hi: "इनाम चार्ट और समय-सारणी",
+  es: "Tabla de premios y horario",
+  ar: "لوحة المكافآت والجدول الزمني",
+  ru: "Таблица наград и расписание",
 };
 
 /** „✏️ Gestalten“: the button on top and the heading of the editor below the chart. */

@@ -2,7 +2,7 @@ import { type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNod
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
-import { RoomGlobe, RoomHourglass, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
+import { RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
@@ -69,10 +69,11 @@ const EYE_HEIGHT = 0.36;
 /** How deep the shelf is, in book heights (`--d` in bookshelf.css). */
 const DEPTH = 0.56;
 
-/** What stands in each of the grown-ups' compartments. */
+/** What stands in each of the grown-ups' compartments (the stickers' has its little books; the stickers are on its side). */
 const THINGS: Record<ShelfThing, () => ReactNode> = {
   music: () => <RoomSpeaker />,
   playtime: () => <RoomHourglass />,
+  figure: () => <RoomNotes />,
   language: () => <RoomGlobe />,
 };
 
@@ -217,9 +218,9 @@ function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout
           </span>
         </div>
       )}
-      {cell.thing === "language" && (
-        // The stickers of the child's figure, stuck on the back wall above the globe (beside it where the compartment is wide).
-        <div className={`shelf-back-stuck${cell.w > cell.h * 1.2 ? " beside" : ""}`}>
+      {cell.thing === "figure" && (
+        // The stickers of the child's figure, stuck on the compartment's right wall: the shelf's right inner side.
+        <div className="shelf-side-stuck">
           <RoomStickers />
         </div>
       )}

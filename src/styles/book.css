@@ -839,6 +839,12 @@
   width: var(--corner);
   height: var(--corner);
   -webkit-tap-highlight-color: transparent;
+  /* Only the corner drawn is the way back, not the empty rest of its square, which reaches the first card or line. */
+  pointer-events: none;
+}
+
+:root[data-look="book"] .page-corner .page-corner-art > :not(.page-corner-shadow) {
+  pointer-events: visiblePainted;
 }
 
 /* A finger or the mouse on it lifts the corner a little more, inviting the turn. */
@@ -898,21 +904,56 @@
   opacity: 0.8;
 }
 
-.cover-corner-stamp {
-  fill: #e8c76a59;
-  stroke: #ecd083;
-  stroke-width: 2.4;
+.cover-corner-label {
+  fill: #fbf4e3;
+  stroke: #12303b;
+  stroke-width: 1.2;
+}
+
+.cover-corner-wood {
+  fill: #9a6334;
+  stroke: #4a2e17;
+  stroke-width: 1;
+}
+
+.cover-corner-inside {
+  fill: #e3bf8c;
+}
+
+.cover-corner-shelf rect:not(.cover-corner-wood, .cover-corner-inside) {
+  stroke: #3d304599;
+  stroke-width: 0.5;
+}
+
+.cover-corner-badge {
+  fill: var(--sunshine);
+  stroke: var(--ink);
+  stroke-width: 1.6;
+}
+
+.cover-corner-arrow {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-.cover-corner-stamp .cover-corner-book {
-  fill: #ecd083;
+/* The way back onto the shelf is bigger than a page's corner: the one way out of a book, found at once. */
+:root[data-look="book"]:has(.page-corner .cover-corner-art) {
+  --corner: 104px;
 }
 
-.cover-corner-stamp .cover-corner-arrow {
-  fill: none;
-  stroke-width: 3;
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"]:has(.page-corner .cover-corner-art) {
+    --corner: 78px;
+  }
+}
+
+@media (min-width: 900px) and (min-height: 600px) {
+  :root[data-look="book"]:has(.page-corner .cover-corner-art) {
+    --corner: 132px;
+  }
 }
 
 /*
@@ -987,6 +1028,11 @@
 
 :root[data-look="book"] .play-area {
   --play-corner: 64px;
+  /*
+   * How far a game's own buttons and signs in the top left stay below the way out, which is the page's corner there in
+   * the book look (in the toy look the ✕ is in the top right, and it is 0): `top: calc(… + var(--corner-clear, 0px))`.
+   */
+  --corner-clear: calc(var(--play-corner) + 6px);
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
