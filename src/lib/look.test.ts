@@ -21,7 +21,7 @@ test("a page turns slowly enough to be seen", () => {
 // The page seen is always the book's left page (user feedback, October 2026): its spine on the right, so every page
 // turns on the right edge – forward the next one comes over from the right, back this one turns over to the right.
 test("the page seen is the left page, turning on the spine at its right", () => {
-  const turning = [...css.matchAll(/\[data-turn="(forward|back)"\]::view-transition-(old|new)\(root\) \{([^}]*)\}/g)].filter((m) =>
+  const turning = [...css.matchAll(/\[data-turn="(forward|back)"\]::view-transition-(old|new)\((?:root|turn-page)\) \{([^}]*)\}/g)].filter((m) =>
     m[3].includes("book-turn-away"),
   );
   expect(turning.map((m) => m[1]).sort()).toEqual(["back", "forward"]);

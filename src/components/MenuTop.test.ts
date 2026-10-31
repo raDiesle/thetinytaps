@@ -55,7 +55,7 @@ test("in the book look a menu turns back at the page's corner, top left", () => 
 // What is touched is what moves: the corner is the left page's outer corner, so the page turning back is this one,
 // lifted at its left edge and swung over the spine on its right (the page seen is the book's left page, look.test.ts).
 test("in the book look the page turning back is the one whose corner is touched, lifted at its left edge", () => {
-  const back = cssRules().filter((r) => r.selector === ':root[data-look="book"][data-turn="back"]::view-transition-old(root)');
+  const back = cssRules().filter((r) => r.selector === ':root[data-look="book"][data-turn="back"]::view-transition-old(turn-page)');
   expect(back.length).toBe(1);
   expect(back[0]?.body).toMatch(/transform-origin:\s*right center/);
   expect(back[0]?.body).toMatch(/book-turn-away/);

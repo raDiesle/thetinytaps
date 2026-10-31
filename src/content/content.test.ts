@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, categoryHref, categoryOf, hasPage } from "./games";
+import { CATEGORIES, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
 import { MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
@@ -48,6 +48,26 @@ describe("home menu", () => {
     expect(new Set(ids).size).toBe(ids.length);
     const hrefs = games.map((game) => game.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);
+  });
+});
+
+// In the book look a book's table of contents numbers its games from 1 (user feedback, October 2026: not from 2), and
+// going between two of its pages turns as many pages as lie between them, in one go.
+describe("pages of a book", () => {
+  const books = CATEGORIES.filter(hasPage);
+
+  test("the first game is on page 1, the table of contents before it", () => {
+    for (const c of books) {
+      expect(bookPage(categoryHref(c))).toEqual({ book: c.id, page: 0 });
+      c.games.forEach((g, i) => expect(bookPage(g.href), g.href).toEqual({ book: c.id, page: i + 1 }));
+    }
+  });
+
+  test("back from a game to the table of contents turns as many pages as its number", () => {
+    for (const c of books) c.games.forEach((g, i) => expect(pagesBetween(g.href, categoryHref(c))).toBe(i + 1));
+    // Out of a book, or between two books, one page turns.
+    expect(pagesBetween(books[0].games.at(-1)!.href, categoryHref(books[1]))).toBe(1);
+    expect(pagesBetween("/", categoryHref(books[0]))).toBe(1);
   });
 });
 

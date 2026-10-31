@@ -345,6 +345,28 @@ export function categoryOf(pathname: string) {
   return CATEGORIES.find((c) => hasPage(c) && c.games.some((g) => isGamePage(g, path)));
 }
 
+/** The page a category's `index`-th game starts on, as its book's table of contents lists it: the first game on page 1. */
+export const gamePage = (index: number) => index + 1;
+
+/**
+ * Where a menu is in its book, in the book look: its category's table of contents on page 0 (unnumbered), each game's
+ * start screen on its `gamePage`. None for any other page (the shelf, a game while playing, a scene inside a game).
+ */
+export function bookPage(pathname: string): { book: string; page: number } | undefined {
+  const path = withSlash(pathname);
+  for (const c of CATEGORIES.filter(hasPage)) {
+    if (path === categoryHref(c)) return { book: c.id, page: 0 };
+    const index = c.games.findIndex((g) => g.href === path);
+    if (index >= 0) return { book: c.id, page: gamePage(index) };
+  }
+}
+
+/** How many pages turn going from one menu to another: between two pages of one book as many as lie between them, else one. */
+export function pagesBetween(from: string, to: string) {
+  const [a, b] = [bookPage(from), bookPage(to)];
+  return a && b && a.book === b.book ? Math.max(1, Math.abs(a.page - b.page)) : 1;
+}
+
 /**
  * The category whose world (backdrop and card colours, see Worlds.tsx) a page shows: its own page or one of its
  * games, also for a category without a page of its own. None for the home page.

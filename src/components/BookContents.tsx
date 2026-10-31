@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router";
-import type { Game } from "@/content/games";
+import { type Game, gamePage } from "@/content/games";
 import { useT } from "@/lib/language";
 import { useTurnPage } from "@/lib/look";
 import { preloadPage } from "@/lib/preloadPages";
@@ -15,7 +15,7 @@ export function BookContents({ games, world }: { games: Game[]; world: string })
     <ol className="toc" data-world={world} style={{ "--toc-lines": games.length } as CSSProperties}>
       {games.map((g, i) => (
         <li key={g.href}>
-          <ContentsLine game={g} page={i + 2} />
+          <ContentsLine game={g} page={gamePage(i)} />
         </li>
       ))}
     </ol>
