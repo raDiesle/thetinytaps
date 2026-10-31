@@ -887,23 +887,18 @@
 
 /*
  * Back to the shelf: the book's ribbon (Lesebändchen) instead of a corner, coming out over the page's top edge a little
- * in from the outer edge and lying down the page, its label on it – within the corner's room, which the menus keep free,
- * clear of the sun that steps right of it. Its drawing has
- * the page's edge at 8 of its 60 wide, so it is lifted by that much.
+ * in from the outer edge and lying down the page, its label on it – clear of the sun that steps right of it. Its
+ * drawing has the page's edge at 6 of its 60 wide, so it is lifted by that much. It reaches down to `--ribbon-reach`,
+ * and the menu's head grows down to there, so its cards and lines always begin below it (user feedback, October 2026).
+ * It lies on the paper, so it scrolls away with the menu (PageCorner puts it straight into `#root`) instead of staying
+ * fixed over the lines and the text for grown-ups scrolling under it.
  */
 :root[data-look="book"] .page-corner.page-ribbon {
-  --ribbon: calc(var(--corner) * 0.6);
-  top: calc(var(--page-top) - var(--ribbon) * 8 / 60);
+  position: absolute;
+  top: calc(var(--page-top) - var(--ribbon) * 6 / 60);
   left: calc(var(--page-left) + var(--corner) * 0.12);
   width: var(--ribbon);
-  height: calc(var(--ribbon) * 88 / 60);
-}
-
-/* A phone's table of contents starts higher, a little under the corner's room: the ribbon ends above its first line. */
-@media (max-width: 599.98px), (max-height: 599.98px) {
-  :root[data-look="book"] .page-corner.page-ribbon {
-    --ribbon: calc(var(--corner) * 0.55);
-  }
+  height: calc(var(--ribbon) * 80 / 60);
 }
 
 /* Only the ribbon and its label are tapped, not the box round them. */
@@ -963,7 +958,7 @@
 .page-ribbon-wood {
   fill: #9a6334;
   stroke: #4a2e17;
-  stroke-width: 1;
+  stroke-width: 0.5;
 }
 
 .page-ribbon-inside {
@@ -972,7 +967,7 @@
 
 .page-ribbon-shelf rect:not(.page-ribbon-wood, .page-ribbon-inside) {
   stroke: #3d304599;
-  stroke-width: 0.5;
+  stroke-width: 0.3;
 }
 
 .page-ribbon-badge {
@@ -984,25 +979,61 @@
 .page-ribbon-arrow {
   fill: none;
   stroke: var(--ink);
-  stroke-width: 2.6;
+  stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
-/* The way back onto the shelf is bigger than a page's corner: the one way out of a book, found at once. */
+/*
+ * The way back onto the shelf is much bigger than a page's corner: the one way out of a book, found at once (user
+ * feedback, October 2026: the label was too small to be seen). `--ribbon-reach` is how far down the screen it hangs.
+ */
 :root[data-look="book"]:has(.page-ribbon) {
-  --corner: 104px;
+  --corner: 124px;
+  --ribbon: calc(var(--corner) * 0.62);
+  --ribbon-reach: calc(var(--page-top) + var(--ribbon) * 74 / 60);
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
   :root[data-look="book"]:has(.page-ribbon) {
-    --corner: 78px;
+    --corner: 90px;
   }
 }
 
 @media (min-width: 900px) and (min-height: 600px) {
   :root[data-look="book"]:has(.page-ribbon) {
-    --corner: 132px;
+    --corner: 160px;
+  }
+}
+
+/*
+ * It never lies over a card, a line or the title: the menu's head reaches down past it (from the top of the menu's
+ * padding, `--menu-pad`, the padding-top of `.home` and `.start-screen`), so what follows the head begins below it, and
+ * the table of contents counts that room as taken (`--toc-top`).
+ */
+:root[data-look="book"] .home {
+  --menu-pad: 40px;
+}
+
+:root[data-look="book"] .start-screen {
+  --menu-pad: 24px;
+}
+
+:root[data-look="book"]:has(.page-ribbon) .menu-head {
+  min-height: calc(var(--ribbon-reach) + 6px - var(--menu-pad));
+}
+
+:root[data-look="book"]:has(.page-ribbon) .toc {
+  --toc-top: max(150px, calc(var(--ribbon-reach) + 6px + 24px + 20px));
+}
+
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"] :is(.home, .start-screen) {
+    --menu-pad: 10px;
+  }
+
+  :root[data-look="book"]:has(.page-ribbon) .toc {
+    --toc-top: max(64px, calc(var(--ribbon-reach) + 6px + 16px + 8px));
   }
 }
 

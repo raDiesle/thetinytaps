@@ -242,11 +242,14 @@ In a fresh worktree run `bun install` first.
   the right: what is touched must be what moves, like a real book – a corner in the top right turned the other page, and
   grown-ups didn't look there for the way back. Back onto the shelf (a menu whose way back is the home page) no page
   turns: the book closes and goes back, so there the way back is the book's ribbon (Lesebändchen) coming out over the
-  page's top edge and lying on the page with its shadow, a round paper label on it with a little bookshelf in colour and
-  the yellow round arrow of the way back (`PageCornerArt sign="shelf"`, user feedback, October 2026) – never a page's
-  corner, nor a cover's corner lying over the page, which floated where no cover can be: what stands for a part of the
-  book lies where that part really is. It is bigger than a page's corner (`--corner`; a shelf stamped small in gold was
-  not recognised) and hangs no lower than the corner's room, which the menus keep free (`MenuTop.test.ts`).
+  page's top edge and lying on the page with its shadow, a big round paper label on it with a tall, slim bookshelf in
+  colour and the yellow round arrow of the way back – the toy look's plain arrow, a straight shaft and an even head
+  (`PageCornerArt sign="shelf"`, user feedback, October 2026) – never a page's corner, nor a cover's corner lying over
+  the page, which floated where no cover can be: what stands for a part of the book lies where that part really is. It
+  is much bigger than a page's corner (`--corner`; a shelf stamped small in gold, then a small label with a squat shelf,
+  were not seen), yet it never lies over a card, a line, a title or the text below: it scrolls with the paper, and the
+  menu's head grows down past it (`--ribbon-reach`, `--menu-pad`) – making it bigger means keeping that room free with
+  it (`MenuTop.test.ts`).
   Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
   else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ held to leave is the
   same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held

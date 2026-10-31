@@ -108,24 +108,57 @@ test("in the book look the way back onto the shelf is the book's ribbon, not a c
   expect(art).not.toContain("CoverCorner");
 });
 
-// The menus keep the corner's room free and nothing more – on a phone a little less: its table of contents starts at
-// about 0.8 of the corner's height (8 px page top, 78 px corner, first line at 70 px). The ribbon, lifted over the
-// page's top edge by the part of its drawing above that edge, ends within that room on every screen.
-test("the ribbon hangs no lower than the room the menus keep free for it", () => {
+// The ribbon is big, so a grown-up sees it at once (user feedback, October 2026), and it never lies over a card, a line or
+// the title: the menu's head reaches down past it from the top of the menu's padding (`--menu-pad`, which must be the
+// padding the menus really have), the table of contents counts that room as taken, and it stays left of the head.
+test("the ribbon reaches no further than the room the menus keep free for it", () => {
   const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
   const [, w, h] = (art.match(/className="page-ribbon-art" viewBox="0 0 (\d+) (\d+)"/) ?? []).map(Number);
-  const rules = cssRules().filter((r) => r.selector === ':root[data-look="book"] .page-corner.page-ribbon');
-  const lift = Number(rules[0]?.body.match(/top:\s*calc\(var\(--page-top\) - var\(--ribbon\) \* (\d+) \/ (\d+)\)/)?.[1]);
-  expect(rules[0]?.body).toContain(`height: calc(var(--ribbon) * ${h} / ${w})`);
-  expect(rules[0]?.body).toContain(`top: calc(var(--page-top) - var(--ribbon) * ${lift} / ${w})`);
-  const bottoms = rules
-    .map((r) => Number(r.body.match(/--ribbon:\s*calc\(var\(--corner\) \* ([\d.]+)\)/)?.[1]))
-    .filter((share) => share > 0)
-    .map((share) => (share * ((h ?? 0) - lift)) / (w ?? 1));
-  expect(bottoms.length).toBe(2);
-  expect(Math.max(...bottoms)).toBeLessThanOrEqual(1);
-  expect(Math.min(...bottoms)).toBeLessThanOrEqual(0.75);
-  expect(Math.min(...bottoms)).toBeGreaterThan(0.6);
+  const rules = cssRules();
+  const body = (selector: string) => rules.filter((r) => r.selector === selector).map((r) => r.body);
+  const [ribbon] = body(':root[data-look="book"] .page-corner.page-ribbon');
+  const lift = Number(ribbon?.match(/top:\s*calc\(var\(--page-top\) - var\(--ribbon\) \* (\d+) \/ (\d+)\)/)?.[1]);
+  expect(ribbon).toContain(`height: calc(var(--ribbon) * ${h} / ${w})`);
+  expect(ribbon).toContain("position: absolute");
+  expect(readFileSync("src/components/MenuTop.tsx", "utf8")).toContain('createPortal(corner, document.getElementById("root")');
+  const sizes = body(':root[data-look="book"]:has(.page-ribbon)');
+  expect(sizes.join("")).toContain(`--ribbon-reach: calc(var(--page-top) + var(--ribbon) * ${(h ?? 0) - lift} / ${w})`);
+  // Left of the head, which keeps the corner's room free (`.menu-head`'s margin): its widest part, the arrow's disc.
+  const share = Number(sizes.join("").match(/--ribbon:\s*calc\(var\(--corner\) \* ([\d.]+)\)/)?.[1]);
+  const disc = art.match(/className="page-ribbon-badge" cx="([\d.]+)" cy="[\d.]+" r="([\d.]+)"/);
+  expect(0.12 + (share * (Number(disc?.[1]) + Number(disc?.[2]))) / (w ?? 1)).toBeLessThanOrEqual(1);
+  expect(body(':root[data-look="book"]:has(.page-ribbon) .menu-head').join("")).toContain("min-height: calc(var(--ribbon-reach) + 6px - var(--menu-pad))");
+  expect(rules.filter((r) => r.selector === ':root[data-look="book"]:has(.page-ribbon) .toc').map((r) => r.body)).toEqual([
+    expect.stringContaining("var(--ribbon-reach)"),
+    expect.stringContaining("var(--ribbon-reach)"),
+  ]);
+  // `--menu-pad` is the padding-top the menus have (in the book look they keep the toy look's).
+  const pad = (file: string, selector: string) =>
+    rules.filter((r) => r.file === file && r.selector === selector).flatMap((r) => r.body.match(/padding:\s*max\((\d+px)/)?.[1] ?? []);
+  const menuPad = (selector: string) => body(selector).flatMap((b) => b.match(/--menu-pad:\s*(\d+px)/)?.[1] ?? []);
+  expect(pad("styles/menus.css", ".home")).toEqual([
+    ...menuPad(':root[data-look="book"] .home'),
+    ...menuPad(':root[data-look="book"] :is(.home, .start-screen)'),
+  ]);
+  expect(pad("styles/start-screen.css", ".start-screen")).toEqual([
+    ...menuPad(':root[data-look="book"] .start-screen'),
+    ...menuPad(':root[data-look="book"] :is(.home, .start-screen)'),
+  ]);
+});
+
+// The arrow on the ribbon's disc is a plain arrow pointing back, as the toy look's round arrow: a straight shaft and a
+// head of two equal strokes meeting at its tip (a bent shaft with uneven strokes was not seen as an arrow).
+test("the ribbon's arrow is a straight arrow with an even head", () => {
+  const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
+  const d = art.match(/className="page-ribbon-arrow" d="([^"]+)"/)?.[1] ?? "";
+  const [x0, y0, x1, ax, ay, tx, ty, bx, by] = (d.match(/-?[\d.]+/g) ?? []).map(Number);
+  expect(d).toMatch(/^M[\d.]+ [\d.]+H[\d.]+M[\d.]+ [\d.]+L[\d.]+ [\d.]+L[\d.]+ [\d.]+$/);
+  expect(x1).toBeLessThan(x0 ?? 0);
+  expect(ty).toBe(y0);
+  expect(tx).toBeLessThanOrEqual(x1 ?? 0);
+  expect(ax).toBe(bx);
+  expect((ay ?? 0) + (by ?? 0)).toBeCloseTo(2 * (ty ?? 0));
+  expect((ax ?? 0) - (tx ?? 0)).toBeCloseTo((ty ?? 0) - (ay ?? 0));
 });
 
 // User decision, October 2026: menus need no „Über das Spiel“. GameShell has no `info`, no game passes one, and no
