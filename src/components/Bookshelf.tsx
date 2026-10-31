@@ -2,13 +2,13 @@ import { type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNod
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
-import { RoomFigures, RoomHourglass, RoomSpeaker, RoomSwitch } from "@/components/RoomOptions";
+import { RoomGlobe, RoomHourglass, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
-import { BOOK_ASPECT, planShelf, type ShelfLayout } from "@/lib/shelfLayout";
+import { BOOK_ASPECT, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
 /** The picture hanging on the wall where there is room: the fox family and the bear family reading together. */
@@ -36,28 +36,39 @@ const BOOKS: ShelfBook[] = CATEGORIES.map((c) => ({
   emoji: c.emoji,
   games: hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
 }));
-/** All books are one group: the shelf may put them on one board or more. */
-const GROUPS = [BOOKS.length];
 
 /** The colours of the books standing with their spines out beside the picture books, only to fill the shelf. */
 const SPINE_COLOURS = ["#b5523b", "#3f6f8f", "#d9a441", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62", "#a8443f", "#6b7fb0", "#e0b85c"];
 
+/** The eye's distance from the shelf and its height on it, as share of the shelf's (`perspective` in bookshelf.css). */
+const EYE = 1200;
+const EYE_HEIGHT = 0.36;
+
+/** What stands in each of the grown-ups' compartments. */
+const THINGS: Record<ShelfThing, () => ReactNode> = {
+  music: () => <RoomSpeaker />,
+  playtime: () => <RoomHourglass />,
+  language: () => <RoomGlobe />,
+  figure: () => <RoomStickers />,
+};
+
 /**
  * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category is a picture
- * book standing on it with its cover out; a tap takes it out and opens it (bookTravel.ts). Around the shelf the room's
- * things are the options for grown-ups (RoomOptions). Drawn in 3D – the boards seen from the eye's height, the walls
- * inside going back – but still: nothing moves until it is tapped. `children` follow below the first screen.
+ * book standing in its middle compartments with its cover out, room round each; a tap takes it out and opens it
+ * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
+ * app's name is a painted sign standing on top. Drawn in 3D – each compartment a box going back, the boards seen from
+ * the eye's height – but still: nothing moves until it is tapped. `children` follow below the first screen.
  */
 export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttributes<HTMLElement>; children?: ReactNode }) {
   const navigate = useNavigate();
   const room = useRef<HTMLDivElement>(null);
-  const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number; height: number } | null>(null);
+  const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number } | null>(null);
 
   // The shelf's plan follows the room it has (the screen turned, the window resized).
   useLayoutEffect(() => {
     const box = room.current;
     if (!box) return;
-    const measure = () => setPlan({ layout: planShelf(box.clientWidth, box.clientHeight, GROUPS), roomWidth: box.clientWidth, height: box.clientHeight });
+    const measure = () => setPlan({ layout: planShelf(box.clientWidth, box.clientHeight, BOOKS.length), roomWidth: box.clientWidth });
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(box);
@@ -75,14 +86,11 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
   const style = layout
     ? ({
         "--bh": `${layout.bookHeight}px`,
-        "--tier": `${layout.tierHeight}px`,
-        "--gap": `${layout.gap}px`,
         "--post": `${layout.frame.post}px`,
         "--crown": `${layout.frame.crown}px`,
-        "--board": `${layout.frame.board}px`,
         "--plinth": `${layout.frame.plinth}px`,
         width: `${layout.width}px`,
-        height: `${plan?.height}px`,
+        height: `${layout.height}px`,
       } as CSSProperties)
     : undefined;
 
@@ -92,12 +100,7 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
         <div className="room-wall" aria-hidden />
         <div className="room-floor" aria-hidden />
         <div className="room-top">
-          <RoomSpeaker />
-          <Logo secretProps={secretProps} />
-          <div className="room-top-right">
-            <RoomFigures />
-            <FullscreenButton />
-          </div>
+          <FullscreenButton />
         </div>
         {READING && margin > 200 && (
           <span
@@ -111,34 +114,22 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
         <div className="room-shelf-place" ref={room}>
           {layout && (
             <div className="shelf" style={style}>
+              {/* The app's name, painted on a sign standing on the shelf. */}
+              <div className="shelf-sign">
+                <Logo secretProps={secretProps} />
+              </div>
               <div className="shelf-box">
                 <span className="shelf-back" />
-                <span className="shelf-side left" />
-                <span className="shelf-side right" />
-                <span className="shelf-ceiling" />
-                {layout.rows.map((row, r) => {
-                  const tier = layout.tierHeights[r];
-                  const top = layout.frame.crown + layout.tierHeights.slice(0, r).reduce((sum, t) => sum + t + layout.frame.board, 0);
-                  // A board of smaller books, above the picture books: its own book height for the spines on it.
-                  const spare = row.length === 0;
-                  const style = { top, "--tier": `${tier}px`, ...(spare && { "--bh": `${tier * 0.86}px` }) } as CSSProperties;
-                  const sides = spare ? spareSpines(layout, tier * 0.86) : spinesFor(layout, row.length);
-                  return (
-                    <div key={spare ? `spare-${r}` : row[0]} className="shelf-tier" style={style}>
-                      <div className={`shelf-row${spare ? " spare" : ""}`}>
-                        <Spines count={sides} seed={r * 3} />
-                        {row.map((i) => (
-                          <Book key={BOOKS[i].id} book={BOOKS[i]} onClick={take(BOOKS[i])} />
-                        ))}
-                        <Spines count={sides + (r % 2)} seed={r * 3 + 5} />
-                      </div>
-                      <span className="shelf-tier-shade" />
-                      <span className="shelf-board-top" />
-                      <span className="shelf-board-under" />
-                      <span className="shelf-board" />
-                    </div>
-                  );
-                })}
+                {layout.cells.map((cell, i) => (
+                  <Compartment key={i} cell={cell} layout={layout} seed={i * 5}>
+                    {cell.books?.map((b) => (
+                      <Book key={BOOKS[b].id} book={BOOKS[b]} onClick={take(BOOKS[b])} />
+                    ))}
+                  </Compartment>
+                ))}
+                {layout.planks.map((p, i) => (
+                  <span key={i} className={`shelf-plank${p.w > p.h ? " board" : ""}`} style={rect(p)} />
+                ))}
                 <span className="shelf-post left" />
                 <span className="shelf-post right" />
                 <span className="shelf-crown" />
@@ -146,15 +137,6 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
               </div>
             </div>
           )}
-          {/* Outside the shelf's 3D, where its menu can open over the whole room. */}
-          {layout && (
-            <div className="room-hourglass-place" style={{ "--at": `calc(50% - ${layout.width / 2 - layout.frame.post - 6}px)` } as CSSProperties}>
-              <RoomHourglass />
-            </div>
-          )}
-          <div className="room-switch-place" style={{ left: `calc(50% + ${(layout?.width ?? 0) / 2}px + 10px)` }}>
-            <RoomSwitch />
-          </div>
         </div>
       </div>
       {children}
@@ -162,22 +144,76 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
   );
 }
 
-/** How many spines fit on each side of a board's picture books, to fill it as a real shelf is. */
-function spinesFor(layout: ShelfLayout, books: number) {
-  const free = layout.width - 2 * layout.frame.post - books * layout.bookHeight * BOOK_ASPECT - (books + 1) * layout.gap;
-  return Math.max(0, Math.min(5, Math.floor(free / 2 / (layout.bookHeight * 0.17))));
+/** A rectangle of the shelf's plan as a style. */
+const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w, height: r.h });
+
+/**
+ * A compartment of the shelf, a box going back from its opening: walls, the board's underside above and its top below,
+ * the shadow inside. In it either picture books (`children`) with books spine out filling its ends, or a grown-up's thing.
+ */
+function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout: ShelfLayout; seed: number; children?: ReactNode }) {
+  // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
+  // it sits in the middle of the back that can be seen, not half behind the plank in front.
+  const back = (layout.bookHeight * 0.62) / EYE / 2;
+  const style = {
+    ...rect(cell),
+    "--cw": `${cell.w}px`,
+    "--ch": `${cell.h}px`,
+    "--sx": `${(cell.x + cell.w / 2 - layout.width / 2) * back}px`,
+    "--sy": `${(cell.y + cell.h / 2 - layout.height * EYE_HEIGHT) * back}px`,
+  } as CSSProperties;
+  const ends = cell.books ? endsFor(cell, layout.bookHeight) : undefined;
+  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next.
+  const stackLeft = seed % 2 === 0;
+  return (
+    <div className={`shelf-cell${cell.thing ? ` thing ${cell.thing}` : ""}`} style={style}>
+      <span className="shelf-cell-shade" />
+      <span className="shelf-wall left" />
+      <span className="shelf-wall right" />
+      <span className="shelf-cell-ceiling" />
+      <span className="shelf-cell-floor" />
+      {ends && (
+        <div className="shelf-row">
+          <span className="shelf-end">
+            {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
+            <Spines count={stackLeft ? ends.spines - ends.stack : ends.spines} seed={seed} />
+          </span>
+          {children}
+          <span className="shelf-end">
+            <Spines count={stackLeft ? ends.spines : ends.spines - ends.stack} seed={seed + 3} />
+            {ends.stack > 0 && !stackLeft && <Stack seed={seed + 1} />}
+          </span>
+        </div>
+      )}
+      {cell.thing === "figure" ? (
+        // Stuck on the back wall.
+        <div className="shelf-back-stuck">{THINGS.figure()}</div>
+      ) : (
+        cell.thing && <div className="shelf-thing">{THINGS[cell.thing]()}</div>
+      )}
+    </div>
+  );
 }
 
-/** How many spines stand at each end of a board without picture books, books `height` high: most of its width. */
-function spareSpines(layout: ShelfLayout, height: number) {
-  return Math.max(0, Math.min(16, Math.floor(((layout.width - 2 * layout.frame.post) * 0.36) / (height * 0.16 + 1))));
+/**
+ * How many books stand spine out at each end of a compartment of picture books, and whether a stack lies there too:
+ * what the room beside the books leaves, keeping room round each picture book and more between them.
+ */
+function endsFor(cell: ShelfCell, bh: number) {
+  const n = cell.books?.length ?? 0;
+  const end = (cell.w - n * bh * BOOK_ASPECT - (n - 1) * bh * 0.5) / 2 - bh * 0.15;
+  const spine = bh * 0.16 + 1;
+  const spines = Math.max(0, Math.min(7, Math.floor(end / spine)));
+  // A stack takes the room of this many spines, where there is room for it.
+  const stack = end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
+  return { spines, stack };
 }
 
 /** A few books standing with their spines out, only to fill the shelf: their colours and heights from `seed`. */
 function Spines({ count, seed }: { count: number; seed: number }) {
   return (
     <span className="shelf-spines" aria-hidden>
-      {Array.from({ length: count }, (_, i) => {
+      {Array.from({ length: Math.max(0, count) }, (_, i) => {
         const n = seed + i;
         const style = {
           "--c": SPINE_COLOURS[(n * 7) % SPINE_COLOURS.length],
@@ -185,7 +221,31 @@ function Spines({ count, seed }: { count: number; seed: number }) {
           "--sw": `${[0.16, 0.13, 0.19, 0.14, 0.17][n % 5]}`,
         } as CSSProperties;
         return (
-          <span key={i} className="shelf-spine" style={style}>
+          <span key={i} className={`shelf-spine${n % 4 === 1 ? " label" : ""}`} style={style}>
+            <span className="box-front" />
+            <span className="box-left" />
+            <span className="box-right" />
+            <span className="box-top" />
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+/** Two or three books lying flat on each other, as on a shelf that is used. */
+function Stack({ seed }: { seed: number }) {
+  return (
+    <span className="shelf-stack" aria-hidden>
+      {Array.from({ length: 2 + (seed % 2) }, (_, i) => {
+        const n = seed + i * 3;
+        const style = {
+          "--c": SPINE_COLOURS[(n * 3 + 1) % SPINE_COLOURS.length],
+          "--lw": `${[0.62, 0.56, 0.5][i]}`,
+          "--lx": `${[0, 4, -3][i]}%`,
+        } as CSSProperties;
+        return (
+          <span key={i} className="shelf-lying" style={style}>
             <span className="box-front" />
             <span className="box-left" />
             <span className="box-right" />

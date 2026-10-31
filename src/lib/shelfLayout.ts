@@ -1,114 +1,176 @@
 /**
- * How the bookshelf of the home page (book look, Bookshelf.tsx) is laid out in the room it gets: how many shelf
- * boards, which books stand on each, and how big they are. A pure function of the room's size, so it can be checked.
+ * How the bookshelf of the home page (book look, Bookshelf.tsx) is laid out in the room it gets: its compartments, the
+ * picture books standing in the middle ones and the grown-ups' things (RoomOptions) in narrow ones beside them, and how
+ * big it all is. A pure function of the room's size, so it can be checked.
  */
 
 /** A picture book's width for its height: a little taller than wide. */
 export const BOOK_ASPECT = 0.82;
 
 /** The biggest a book gets, also on a huge screen: a real shelf's books, not posters. */
-const MAX_BOOK = 340;
+const MAX_BOOK = 320;
 
-/** The shelf's planks, in px: the side posts, the top board, each shelf board and the plinth on the floor. */
+/** The least room beside each picture book, in book heights: a child's finger finds one book, never two. */
+export const BOOK_GAP = 0.3;
+
+/** A picture book's height for its compartment's: room above it to take it out. */
+export const TAKE_OUT = 0.85;
+
+/** The things for grown-ups standing in the shelf's side compartments, one each (RoomOptions). */
+export type ShelfThing = "music" | "playtime" | "language" | "figure";
+
+/** In this order: the speaker and the hourglass on the left, the globe and the stickers on the right. */
+export const SHELF_THINGS: ShelfThing[] = ["music", "playtime", "language", "figure"];
+
+/** The shelf's planks, in px: the side posts, the walls between compartments, the top board, each board, the plinth. */
 export interface ShelfFrame {
   post: number;
+  wall: number;
   crown: number;
   board: number;
   plinth: number;
 }
 
+/** A rectangle in the shelf's front, in px from its top left corner. */
+export interface ShelfRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** A compartment's opening: picture books standing in it, or one of the grown-ups' things. */
+export interface ShelfCell extends ShelfRect {
+  /** The picture books in it, by their place in the list of books. */
+  books?: number[];
+  thing?: ShelfThing;
+}
+
 /** The plan of the shelf. */
 export interface ShelfLayout {
-  /**
-   * The books on each shelf board, top to bottom, by their place in the list of books; none on a board above them that
-   * only holds other books standing with their spines out, filling a shelf taller than its picture books need.
-   */
-  rows: number[][];
-  /** Each book's height (its width is `BOOK_ASPECT` of it). */
-  bookHeight: number;
-  /** The free height between two boards where picture books stand. */
-  tierHeight: number;
-  /** The free height above each board, top to bottom: `tierHeight` for the picture books' boards, less for the others. */
-  tierHeights: number[];
-  /** The gap between two books, and between a book and a post. */
-  gap: number;
-  /** The whole shelf's width: less than the room's where a wide room would leave the books lost in it. */
   width: number;
+  height: number;
   frame: ShelfFrame;
+  cells: ShelfCell[];
+  /** The fronts of the planks between the compartments: the walls and the boards (the outer frame comes from `frame`). */
+  planks: ShelfRect[];
+  /** Each picture book's height (its width is `BOOK_ASPECT` of it). */
+  bookHeight: number;
 }
 
-/** The planks' sizes for a shelf of this size. */
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+
+/** The planks' sizes for a shelf in a room of this size. */
 function frameFor(width: number, height: number): ShelfFrame {
-  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-  return {
-    post: clamp(width * 0.018, 10, 22),
-    crown: clamp(height * 0.035, 12, 26),
-    board: clamp(height * 0.024, 8, 16),
-    plinth: clamp(height * 0.04, 12, 26),
-  };
+  const post = clamp(width * 0.018, 10, 22);
+  return { post, wall: post * 0.8, crown: clamp(height * 0.035, 12, 24), board: clamp(height * 0.024, 8, 15), plinth: clamp(height * 0.04, 12, 26) };
 }
+
+/** The biggest book that stands `n` in a row `width` wide, with `BOOK_GAP` round each, and can be taken out of a `tier` high compartment. */
+function bookFor(width: number, tier: number, n: number) {
+  return Math.min(MAX_BOOK, tier * TAKE_OUT, width / (n * BOOK_ASPECT + (n + 1) * BOOK_GAP));
+}
+
+/** How wide a row of `n` books `bh` high is best: room between them and for a few books spine out at its ends. */
+const rowWidth = (n: number, bh: number) => bh * (n * BOOK_ASPECT + (n - 1) * 0.6 + 1.4);
 
 /** `count` books on `rows` boards, as even as can be, the fuller boards first. */
-function split(first: number, count: number, rows: number): number[][] {
+function split(count: number, rows: number): number[][] {
   const out: number[][] = [];
-  let next = first;
+  let next = 0;
   for (let r = 0; r < rows; r++) {
-    const n = Math.ceil((count - (next - first)) / (rows - r));
+    const n = Math.ceil((count - next) / (rows - r));
     out.push(Array.from({ length: n }, (_, i) => next + i));
     next += n;
   }
   return out;
 }
 
-/**
- * The plan that makes the books biggest in a room of `width` × `height`: each group of books stands on one board of
- * its own, or on two where the room is tall and narrow (a phone held upright). Where the books leave much room above
- * them, the shelf gets more boards up there instead, with smaller books standing spine out – a shelf, not a cupboard.
- */
-export function planShelf(width: number, height: number, groups: number[]): ShelfLayout {
-  const frame = frameFor(width, height);
-  // Every way of putting each group on one or two boards.
-  let options: number[][][] = [[]];
-  let first = 0;
-  for (const count of groups) {
-    const ways = [1, 2].filter((rows) => rows <= count).map((rows) => split(first, count, rows));
-    options = options.flatMap((rows) => ways.map((way) => [...rows, ...way]));
-    first += count;
-  }
-  let best: ShelfLayout | undefined;
-  for (const rows of options) {
-    const innerWidth = width - 2 * frame.post;
-    const tierHeight = (height - frame.crown - frame.plinth - rows.length * frame.board) / rows.length;
-    // Room above the books to take one out, and a gap of a twentieth of the width round each.
-    let bookHeight = Math.min(MAX_BOOK, tierHeight * 0.84);
-    for (const row of rows) bookHeight = Math.min(bookHeight, (innerWidth * 0.95) / (row.length * BOOK_ASPECT + (row.length + 1) * 0.1));
-    if (best && bookHeight <= best.bookHeight) continue;
-    const gap = bookHeight * 0.1;
-    const widest = Math.max(...rows.map((row) => row.length));
-    // Wider than its books need, with room for a few more on the sides, but never as wide as a huge screen.
-    const needed = widest * bookHeight * BOOK_ASPECT + (widest + 1) * gap;
-    best = { rows, bookHeight, tierHeight, gap, tierHeights: rows.map(() => tierHeight), width: Math.min(width, needed * 1.3 + 2 * frame.post), frame };
-  }
-  return withSpareBoards(best as ShelfLayout, height);
+/** Of two ways, the one with more boards unless the other's books are much bigger: two books up top, not an empty board. */
+function prefer<T extends { bh: number }>(more: T, fewer: T) {
+  return more.bh * 1.25 >= fewer.bh ? more : fewer;
 }
 
 /**
- * The plan with boards above the picture books for what room they leave: their boards as high as they need, the rest
- * shared by boards of smaller books, each at least half as high as a picture book.
+ * The plan for a room of `width` × `height` and `count` picture books. A screen wider than tall gets a narrow column of
+ * two compartments on each side for the grown-ups' things and the books in the middle, two boards of them where that
+ * keeps them nearly as big (every board holds books, none only fills the shelf). An upright screen gets the things in
+ * a row of compartments on top and the books below.
  */
-function withSpareBoards(plan: ShelfLayout, height: number): ShelfLayout {
-  const { frame, bookHeight, rows } = plan;
-  const bookTier = Math.min(plan.tierHeight, bookHeight / 0.8);
-  const left = height - frame.crown - frame.plinth - rows.length * (bookTier + frame.board);
-  const least = bookHeight * 0.5;
-  let spare = Math.round(left / (bookTier + frame.board));
-  while (spare > 0 && left / spare - frame.board < least) spare--;
-  if (spare === 0) return plan;
-  const spareTier = left / spare - frame.board;
-  return {
-    ...plan,
-    rows: [...Array.from({ length: spare }, () => []), ...rows],
-    tierHeight: bookTier,
-    tierHeights: [...Array.from({ length: spare }, () => spareTier), ...rows.map(() => bookTier)],
+export function planShelf(width: number, height: number, count: number): ShelfLayout {
+  return width / height < 0.95 ? planUpright(width, height, count) : planWide(width, height, count);
+}
+
+function planWide(width: number, height: number, count: number): ShelfLayout {
+  const frame = frameFor(width, height);
+  const { post, wall, crown, board } = frame;
+  const inner = height - crown - frame.plinth;
+  const side = clamp(width * 0.12, 62, 150);
+  const room = width - 2 * post - 2 * wall - 2 * side;
+  const option = (rows: number) => {
+    const n = Math.ceil(count / rows);
+    const tier = (inner - (rows - 1) * board) / rows;
+    return { rows, n, tier, bh: bookFor(room, tier, n) };
   };
+  const plan = count > 1 ? prefer(option(2), option(1)) : option(1);
+  const middle = Math.min(room, rowWidth(plan.n, plan.bh));
+  const sideTier = (inner - board) / 2;
+  const left = post;
+  const mid = left + side + wall;
+  const right = mid + middle + wall;
+  const cells: ShelfCell[] = [];
+  const planks: ShelfRect[] = [
+    { x: left + side, y: crown, w: wall, h: inner },
+    { x: mid + middle, y: crown, w: wall, h: inner },
+  ];
+  SHELF_THINGS.forEach((thing, i) => {
+    const x = i < 2 ? left : right;
+    cells.push({ x, y: crown + (i % 2) * (sideTier + board), w: side, h: sideTier, thing });
+  });
+  planks.push({ x: left, y: crown + sideTier, w: side, h: board }, { x: right, y: crown + sideTier, w: side, h: board });
+  split(count, plan.rows).forEach((books, r) => {
+    const y = crown + r * (plan.tier + board);
+    cells.push({ x: mid, y, w: middle, h: plan.tier, books });
+    if (r > 0) planks.push({ x: mid, y: y - board, w: middle, h: board });
+  });
+  return { width: right + side + post, height, frame, cells, planks, bookHeight: plan.bh };
+}
+
+function planUpright(width: number, height: number, count: number): ShelfLayout {
+  const frame = frameFor(width, height);
+  const { post, wall, crown, board } = frame;
+  const inner = height - crown - frame.plinth;
+  const room = width - 2 * post;
+  const things = clamp(inner * 0.16, 64, 150);
+  const rest = inner - things - board;
+  const option = (rows: number) => {
+    const n = Math.ceil(count / rows);
+    const tier = (rest - (rows - 1) * board) / rows;
+    return { rows, n, tier, bh: bookFor(room, tier, n) };
+  };
+  const plan = count > 2 ? prefer(option(count), option(2)) : option(1);
+  // The books' boards only as high as they need; what is left goes to the things on top.
+  const tier = Math.min(plan.tier, plan.bh / 0.75);
+  const top = inner - plan.rows * (tier + board);
+  const middle = Math.min(room, Math.max(rowWidth(plan.n, plan.bh), 4 * 64 + 3 * wall));
+  // The four things in a row, or two by two where the row on top is tall and narrow.
+  const cols = top > ((middle - 3 * wall) / 4) * 2.2 ? 2 : 4;
+  const thingRows = 4 / cols;
+  const cw = (middle - (cols - 1) * wall) / cols;
+  const ch = (top - (thingRows - 1) * board) / thingRows;
+  const cells: ShelfCell[] = [];
+  const planks: ShelfRect[] = [];
+  SHELF_THINGS.forEach((thing, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    cells.push({ x: post + col * (cw + wall), y: crown + row * (ch + board), w: cw, h: ch, thing });
+    if (col > 0) planks.push({ x: post + col * (cw + wall) - wall, y: crown + row * (ch + board), w: wall, h: ch });
+    if (row > 0 && col === 0) planks.push({ x: post, y: crown + row * (ch + board) - board, w: middle, h: board });
+  });
+  split(count, plan.rows).forEach((books, r) => {
+    const y = crown + top + r * (tier + board) + board;
+    cells.push({ x: post, y, w: middle, h: tier, books });
+    planks.push({ x: post, y: y - board, w: middle, h: board });
+  });
+  return { width: middle + 2 * post, height, frame, cells, planks, bookHeight: plan.bh };
 }

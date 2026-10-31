@@ -1,4 +1,5 @@
 import { type MouseEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
@@ -95,10 +96,45 @@ export function MenuButton({
     box?.scrollBy({ top: box.clientHeight * 0.7, behavior: "smooth" });
   };
 
+  const sheet = open && (
+    <>
+      {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
+      <div className="home-menu-backdrop" onClick={() => setOpen(false)} />
+      <div ref={panel} className="home-menu-panel">
+        <div className="home-menu-head">
+          <span className="home-menu-name">
+            <span aria-hidden>{icon}</span> {label}
+          </span>
+          <button
+            type="button"
+            className="home-menu-close"
+            aria-label={t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
+            onClick={() => setOpen(false)}
+          >
+            ✕
+          </button>
+        </div>
+        <div className="home-menu-body">{children}</div>
+        {more && (
+          <button type="button" className="home-menu-more" onClick={scrollDown}>
+            <span aria-hidden>▼</span>{" "}
+            {t({
+              de: "Weiter unten gibt es mehr",
+              ru: "Ниже есть ещё",
+              en: "There’s more further down",
+              zh: "下面还有更多",
+              hi: "नीचे और भी है",
+              es: "Hay más abajo",
+              ar: "يوجد المزيد في الأسفل",
+            })}
+          </button>
+        )}
+      </div>
+    </>
+  );
+
   return (
     <div className="home-menu">
-      {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a tap beside the menu closes it; Esc does the same */}
-      {open && <div className="home-menu-backdrop" onClick={() => setOpen(false)} />}
       <button type="button" className={className} aria-expanded={open} title={label} aria-label={art ? label : undefined} onClick={() => setOpen(!open)}>
         {art ?? (
           <>
@@ -107,38 +143,8 @@ export function MenuButton({
           </>
         )}
       </button>
-      {open && (
-        <div ref={panel} className="home-menu-panel">
-          <div className="home-menu-head">
-            <span className="home-menu-name">
-              <span aria-hidden>{icon}</span> {label}
-            </span>
-            <button
-              type="button"
-              className="home-menu-close"
-              aria-label={t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
-              onClick={() => setOpen(false)}
-            >
-              ✕
-            </button>
-          </div>
-          <div className="home-menu-body">{children}</div>
-          {more && (
-            <button type="button" className="home-menu-more" onClick={scrollDown}>
-              <span aria-hidden>▼</span>{" "}
-              {t({
-                de: "Weiter unten gibt es mehr",
-                ru: "Ниже есть ещё",
-                en: "There’s more further down",
-                zh: "下面还有更多",
-                hi: "नीचे और भी है",
-                es: "Hay más abajo",
-                ar: "يوجد المزيد في الأسفل",
-              })}
-            </button>
-          )}
-        </div>
-      )}
+      {/* A thing in the bookshelf's 3D room opens its menu outside it, over the whole screen (a transform would hold it in). */}
+      {art ? sheet && createPortal(<div className="room-menu">{sheet}</div>, document.body) : sheet}
     </div>
   );
 }

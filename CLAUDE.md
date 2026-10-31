@@ -200,9 +200,9 @@ In a fresh worktree run `bun install` first.
   while a recording plays (`talking()`). The dev server keeps the file list of a `?glob` from its start: after
   recording (or adding any files to a globbed folder) restart it before checking, or the new files seem missing.
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
-  (in the book look things in the room with the bookshelf, see the book look below).
+  (in the book look things standing in the bookshelf, see the book look below).
 - **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 in a menu on the home page in the toy look;
-  in the book look the heads of a fox girl and a bear boy on the room's wall, one tap on either chooses it – user
+  in the book look stickers of a fox girl and a bear boy on the bookshelf's back wall, one tap on either chooses it – user
   decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
@@ -354,14 +354,20 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   under `:root[data-look="book"]` in `src/styles/book.css` and `bookshelf.css`; games don't style for it.
   It should look real, not flat (user feedback, October 2026): the shelf is drawn in 3D (boards seen from the eye's
   height, walls going back, books as boxes with spines and page edges, other books standing with their spines out to
-  fill it), still until tapped, and planned by `planShelf` (`shelfLayout.ts`) to fill the room on every screen. A tap on
-  a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
+  fill it, some lying in stacks), still until tapped, and planned by `planShelf` (`shelfLayout.ts`) to fill the room on
+  every screen. Every compartment holds something to tap – never a board only of filler books (users found it odd that
+  nothing up there could be tapped): the picture books stand two up top and two below on wider screens, each with clear
+  room round it so it is seen whole and a finger finds one book, never its neighbour (`BOOK_GAP`, `shelfLayout.test.ts`).
+  A tap on a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
   to the left, and its left page, the next menu printed on it, comes close until it is the screen – **no page turns on
   the way into a book**. Back to the shelf (`useTurnPage("/")` → `putBookBack`) is the same backwards: the book closes
   and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The grown-ups' options on the shelf's page are
-  things in the room, never buttons (`RoomOptions.tsx`): a loudspeaker hanging from the ceiling (music, one tap), an
-  hourglass on the shelf (play time), the fox girl's and bear boy's heads, and a small light switch on the wall for the
-  language, kept out of the way. A new option becomes such a thing too. The wall's picture (`bilder/buch-cover.webp`,
+  things one finds on a bookshelf, standing in its own narrow compartments beside the books, never buttons and never
+  loose around the room (`RoomOptions.tsx`, user feedback, October 2026): a wooden loudspeaker (music, one tap), an
+  hourglass (play time), a globe with the 🌐 lines and the language's name on its foot (the language – never a light
+  switch), and stickers of the fox girl and the bear boy on the back wall (the figure). The app's name is a painted sign
+  on the shelf's top board. A new option becomes such a thing in a compartment of its own too (`SHELF_THINGS`); their
+  menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
   only where there is room beside the shelf) shows one family of each mascot: a fox parent with a fox child and a bear parent
   with a bear child, one of the children a boy and one a girl – never a third grown-up or a child too many (user
   feedback, October 2026).
