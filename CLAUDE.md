@@ -43,7 +43,8 @@ In a fresh worktree run `bun install` first.
   never push (and don't offer to – pushing is the user's move). Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
   the user once checked another session's server by mistake. Look at that server before naming it: a running dev server
-  does not pick up a merge that brings new files or a changed `index.html` (it kept showing the old name after a rename),
+  does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
+  or new exports between modules (a reload still threw „plannerDefaults is not a function“),
   so when it still shows the old state, say it must be restarted (`bun run dev` in the repo root) instead of handing over a stale URL.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
