@@ -8,7 +8,7 @@ import { SeoText } from "@/components/SeoText";
 import { Logo } from "@/components/Logo";
 import { Sky } from "@/components/Sky";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
-import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
+import { hasPage, SHELF } from "@/content/games";
 import { useFitGrid } from "@/lib/fitGrid";
 import { isBookLook, useTurnPage } from "@/lib/look";
 import { useT } from "@/lib/language";
@@ -20,7 +20,7 @@ import { useTitle } from "@/lib/title";
 const IDEAS_HOLD_MS = 2000;
 
 /** Where the books (the toy look's cards) lead. */
-const HREFS = CATEGORIES.map(categoryHref);
+const HREFS = SHELF.map((entry) => entry.href);
 
 /**
  * For parents at the foot of the home page, a few words from us as parents: why no age is named (each family decides
@@ -125,20 +125,23 @@ function useSecretHold(): HTMLAttributes<HTMLElement> {
   };
 }
 
-/** The toy look's home page (`?buch=aus`): a card per category, a piece of its world and its games as a collage. */
+/**
+ * The toy look's home page (`?buch=aus`): a card per book of the shelf – a category, with a piece of its world and its
+ * games as a collage, or a game standing apart.
+ */
 function CategoryCards() {
   const t = useT();
-  const grid = useFitGrid(CATEGORIES.length);
+  const grid = useFitGrid(SHELF.length);
   return (
     <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style}>
-      {CATEGORIES.map((c) => (
-        <li key={c.id} data-world={c.id}>
+      {SHELF.map(({ id, href, category: c, game }) => (
+        <li key={id} data-world={c.id}>
           <GameCard
-            href={categoryHref(c)}
-            emoji={c.emoji}
-            title={t(c.title)}
-            blurb={t(c.blurb)}
-            games={hasPage(c) ? c.games.map((g) => g.emoji) : undefined}
+            href={href}
+            emoji={game?.emoji ?? c.emoji}
+            title={t(game?.title ?? c.title)}
+            blurb={t(game?.blurb ?? c.blurb)}
+            games={!game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined}
             scene={<WorldCardScene world={c.id as WorldId} />}
           />
         </li>

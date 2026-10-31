@@ -244,8 +244,13 @@ In a fresh worktree run `bun install` first.
   lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it.
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
   toy look a card per category): one first picks a book, and only inside it, on its first page, its table of contents,
-  do its games stand – never games or levels on the shelf page itself, and no category whose
-  games stand on the home page (the old „Weitere“ frame is the book „Für jeden Tag“). A new category is a new book.
+  do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
+  category whose games stand apart (`Category.apart`, „Für jeden Tag“: Zähne putzen, Töpfchen, Tagesplan, Laut und
+  leise – user decision, October 2026): each of its games is a book of its own, standing spine out side by side in the
+  room of one picture book, its name on a paper label along the spine (`SpineBook`), opening its game directly; the
+  category has no page, and its games' way back is the shelf. Every picture book's cover shows a picture painted for its
+  book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
+  emojis: a new category gets one with it (`content.test.ts` checks).
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that

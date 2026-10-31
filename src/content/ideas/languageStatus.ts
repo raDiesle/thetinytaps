@@ -188,6 +188,6 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
     href: "/",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), das Buch „Für jeden Tag“ im Bücherregal (Titel und Zeile, games.ts) der Name des Regals für Vorleseprogramme (Bookshelf.tsx) und unten auf der Startseite „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, Home.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) und unten auf der Startseite „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, Home.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
   },
 ];

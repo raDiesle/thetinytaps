@@ -4,7 +4,7 @@ import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
 import { RoomGlobe, RoomHourglass, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
-import { CATEGORIES, categoryHref, hasPage } from "@/content/games";
+import { hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
@@ -14,7 +14,10 @@ import pictures from "./bilder/*.webp?glob";
 /** The picture hanging on the wall where there is room: the fox family and the bear family reading together. */
 const READING = pictures["buch-cover.webp"];
 
-/** A book on the shelf: a category, opening on its page (its table of contents) or on its only game. */
+/**
+ * A book on the shelf: a category, opening on its page (its table of contents) or on its only game, standing with its
+ * cover out; or a game of a category whose games stand apart, standing with its spine out (`colour` its cloth).
+ */
 interface ShelfBook {
   /** Its `data-book`, by which the way back finds its gap (`shelfBookOf` in bookTravel.ts). */
   id: string;
@@ -23,19 +26,39 @@ interface ShelfBook {
   title: Localized;
   blurb: Localized;
   emoji: string;
-  /** A category's games, shown on its cover as a collage. */
+  /** The picture pasted on its cover (`bilder/cover-<category>.webp`); without one a piece of its world and its emoji. */
+  cover?: string;
+  /** A category's games, shown on its cover as a collage where it has no picture. */
   games?: string[];
+  /** The cloth of a book standing spine out. */
+  colour?: string;
 }
 
-const BOOKS: ShelfBook[] = CATEGORIES.map((c) => ({
-  id: c.id,
-  href: categoryHref(c),
-  world: c.id as WorldId,
-  title: c.title,
-  blurb: c.blurb,
-  emoji: c.emoji,
-  games: hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
-}));
+/** The cloths of the books standing spine out with a game's name, one after the other. */
+const DAILY_COLOURS = ["#a8443f", "#3f6f8f", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62"];
+
+/**
+ * The shelf's places, each standing where a picture book can: a picture book, or the books of a category whose games
+ * stand apart, side by side with their spines out in the room of one picture book.
+ */
+const PLACES: ShelfBook[][] = [];
+for (const entry of SHELF) {
+  const c = entry.category;
+  const last = PLACES.at(-1);
+  const book: ShelfBook = {
+    id: entry.id,
+    href: entry.href,
+    world: c.id as WorldId,
+    title: entry.game?.title ?? c.title,
+    blurb: entry.game?.blurb ?? c.blurb,
+    emoji: entry.game?.emoji ?? c.emoji,
+    cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
+    games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
+  };
+  if (!entry.game) PLACES.push([book]);
+  else if (last?.[0].colour && last[0].world === book.world) last.push({ ...book, colour: DAILY_COLOURS[last.length % DAILY_COLOURS.length] });
+  else PLACES.push([{ ...book, colour: DAILY_COLOURS[0] }]);
+}
 
 /** The colours of the books standing with their spines out beside the picture books, only to fill the shelf. */
 const SPINE_COLOURS = ["#b5523b", "#3f6f8f", "#d9a441", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62", "#a8443f", "#6b7fb0", "#e0b85c"];
@@ -69,7 +92,7 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
   useLayoutEffect(() => {
     const box = room.current;
     if (!box) return;
-    const measure = () => setPlan({ layout: planShelf(box.clientWidth, box.clientHeight, BOOKS.length), roomWidth: box.clientWidth });
+    const measure = () => setPlan({ layout: planShelf(box.clientWidth, box.clientHeight, PLACES.length), roomWidth: box.clientWidth });
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(box);
@@ -123,9 +146,17 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
                 <span className="shelf-back" />
                 {layout.cells.map((cell, i) => (
                   <Compartment key={i} cell={cell} layout={layout} seed={i * 5}>
-                    {cell.books?.map((b) => (
-                      <Book key={BOOKS[b].id} book={BOOKS[b]} onClick={take(BOOKS[b])} />
-                    ))}
+                    {cell.books?.map((b) =>
+                      PLACES[b][0].colour ? (
+                        <span key={PLACES[b][0].id} className="shelf-daily-row">
+                          {PLACES[b].map((book) => (
+                            <SpineBook key={book.id} book={book} count={PLACES[b].length} onClick={take(book)} />
+                          ))}
+                        </span>
+                      ) : (
+                        <Book key={PLACES[b][0].id} book={PLACES[b][0]} onClick={take(PLACES[b][0])} />
+                      ),
+                    )}
                   </Compartment>
                 ))}
                 {layout.planks.map((p, i) => (
@@ -262,7 +293,6 @@ function Stack({ seed }: { seed: number }) {
 /** A picture book standing on the shelf with its cover out: a box of cover, spine, pages' edge and top. */
 function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
   const t = useT();
-  const title = t(book.title);
   return (
     <Link
       to={book.href}
@@ -270,33 +300,95 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
       data-book={book.id}
       data-world={book.world}
       data-tap
-      aria-label={title}
+      aria-label={t(book.title)}
       title={t(book.blurb)}
       // The page starts loading as the finger lands, not only once it is lifted.
       onPointerDown={() => preloadPage(book.href)}
       onClick={onClick}
     >
       <span className="shelf-book-shadow" />
+      <BookFaces book={book} />
+    </Link>
+  );
+}
+
+/**
+ * A game's own book, standing with its spine out and its name printed on a label along the spine, so grown-ups find it
+ * like a book on a real shelf. It keeps the picture book it is hidden inside (`.shelf-daily-book`): taken out, that one
+ * turns its cover out and opens (bookTravel.ts).
+ */
+function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
+  const t = useT();
+  const style = { "--c": book.colour, "--w1": book.colour, "--n": count } as CSSProperties;
+  return (
+    <Link
+      to={book.href}
+      className="shelf-spine shelf-daily"
+      style={style}
+      data-book={book.id}
+      data-world={book.world}
+      data-tap
+      aria-label={t(book.title)}
+      title={t(book.blurb)}
+      onPointerDown={() => preloadPage(book.href)}
+      onClick={onClick}
+    >
+      <span className="box-front">
+        <SpineLabel title={t(book.title)} />
+      </span>
       <span className="box-left" />
       <span className="box-right" />
       <span className="box-top" />
+      <span className="shelf-daily-book" data-world={book.world} data-spine style={style} hidden>
+        <BookFaces book={book} spine />
+      </span>
+    </Link>
+  );
+}
+
+/** The paper label on the spine of a game's own book, its name running down it. */
+function SpineLabel({ title }: { title: string }) {
+  return (
+    <span className="shelf-daily-label">
+      <span className="shelf-daily-title">{title}</span>
+    </span>
+  );
+}
+
+/**
+ * A picture book's faces: spine, pages' edge, top, and the cover with its title, picture and line for grown-ups. A
+ * game's own book (`spine`) has its name on its spine too, as it stood on the shelf.
+ */
+function BookFaces({ book, spine }: { book: ShelfBook; spine?: boolean }) {
+  const t = useT();
+  return (
+    <>
+      <span className="box-left">{spine && <SpineLabel title={t(book.title)} />}</span>
+      <span className="box-right" />
+      <span className="box-top" />
       <span className="shelf-book-cover">
-        <span className="shelf-book-title">{title}</span>
+        <span className="shelf-book-title">{t(book.title)}</span>
         <span className="shelf-book-picture">
-          {/* Each book shows a piece of its category's world. */}
-          <WorldCardScene world={book.world} />
-          {book.games ? (
-            <span className="shelf-book-collage" data-count={Math.min(book.games.length, 4)}>
-              {book.games.slice(0, 4).map((e, i) => (
-                <span key={i}>{e}</span>
-              ))}
-            </span>
+          {book.cover ? (
+            <img className="shelf-book-art" src={book.cover} alt="" decoding="async" draggable={false} />
           ) : (
-            <span className="shelf-book-emoji">{book.emoji}</span>
+            <>
+              {/* Without a picture of its own, a book shows a piece of its category's world. */}
+              <WorldCardScene world={book.world} />
+              {book.games ? (
+                <span className="shelf-book-collage" data-count={Math.min(book.games.length, 4)}>
+                  {book.games.slice(0, 4).map((e, i) => (
+                    <span key={i}>{e}</span>
+                  ))}
+                </span>
+              ) : (
+                <span className="shelf-book-emoji">{book.emoji}</span>
+              )}
+            </>
           )}
         </span>
         <span className="shelf-book-blurb">{t(book.blurb)}</span>
       </span>
-    </Link>
+    </>
   );
 }

@@ -21,14 +21,20 @@ describe("home menu", () => {
 
   test("a book of one game opens it directly, without a menu of one card", () => {
     for (const category of CATEGORIES) {
-      expect(categoryHref(category), category.id).toBe(category.games.length === 1 ? category.games[0].href : `/spiele/${category.id}/`);
+      const href = category.apart ? "/" : category.games.length === 1 ? category.games[0].href : `/spiele/${category.id}/`;
+      expect(categoryHref(category), category.id).toBe(href);
     }
   });
 
-  test("a game leads back to its book's page, or to the shelf when it is the book's only game", () => {
+  test("a game leads back to its book's page, or to the shelf when it is the book's only game or a book of its own", () => {
     for (const category of CATEGORIES) {
       for (const game of category.games) expect(categoryOf(game.href)?.id, game.href).toBe(hasPage(category) ? category.id : undefined);
     }
+  });
+
+  // The books on the shelf show a picture painted for them, not emojis (user decision, October 2026).
+  test("every picture book on the shelf has a cover picture", () => {
+    for (const category of CATEGORIES.filter((c) => !c.apart)) expect(existsSync(`src/components/bilder/cover-${category.id}.webp`), category.id).toBe(true);
   });
 
   test("every category has its world (backdrop, card colours, the picture on its card)", () => {

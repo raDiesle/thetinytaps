@@ -18,6 +18,11 @@ export interface Category {
   /** One short line for grown-ups under the name on its book, like `Game.blurb`. */
   blurb: Localized;
   games: Game[];
+  /**
+   * Its games stand apart, each a book of its own: on the shelf they stand side by side with their spines out, each
+   * spine carrying its game's name, and open their game directly. The category has no page and no book of its own.
+   */
+  apart?: boolean;
 }
 
 /** The home menu: the books on the shelf, one per category, then its games – the book's pages (on `/spiele/<id>/`). */
@@ -258,6 +263,8 @@ export const CATEGORIES: Category[] = [
     emoji: "🌞",
     title: { de: "Für jeden Tag" },
     blurb: { de: "Zähne putzen, Töpfchen, Tagesplan" },
+    // Each a book of its own on the shelf, its name on its spine (user decision, October 2026).
+    apart: true,
     games: [
       {
         href: "/zaehne/",
@@ -328,11 +335,34 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-/** A book of one game has no page of its own: it opens straight on its game, a menu with a single card would only be one tap more. */
-export const hasPage = (category: Category) => category.games.length > 1;
+/**
+ * A book of one game has no page of its own: it opens straight on its game, a menu with a single card would only be one
+ * tap more. Nor has a category whose games stand apart, each a book of its own.
+ */
+export const hasPage = (category: Category) => !category.apart && category.games.length > 1;
 
-/** Where the category's book on the shelf leads: its page, or its only game. */
-export const categoryHref = (category: Category) => (hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+/** Where the category's book on the shelf leads: its page, or its only game; the shelf for one whose games stand apart. */
+export const categoryHref = (category: Category) => (category.apart ? "/" : hasPage(category) ? `/spiele/${category.id}/` : category.games[0].href);
+
+/** A book on the shelf: a category's, or a game's that stands apart (`Category.apart`), standing with its spine out. */
+export interface ShelfEntry {
+  /** Its `data-book` on the shelf, by which the way back finds its gap. */
+  id: string;
+  href: string;
+  category: Category;
+  /** The game, for a game's own book. */
+  game?: Game;
+}
+
+/** The game's own book's id: its address without slashes. */
+const gameBookId = (game: Game) => game.href.replaceAll("/", "");
+
+/** The books on the shelf, in order: one per category, or, for a category whose games stand apart, one per game. */
+export const SHELF: ShelfEntry[] = CATEGORIES.flatMap((category) =>
+  category.apart
+    ? category.games.map((game) => ({ id: gameBookId(game), href: game.href, category, game }))
+    : [{ id: category.id, href: categoryHref(category), category }],
+);
 
 /** Whether a page belongs to the game: its address or one below it. */
 const isGamePage = (game: Game, path: string) => [game.href, ...(game.also ?? [])].some((href) => path.startsWith(href));
@@ -365,6 +395,14 @@ export function bookPage(pathname: string): { book: string; page: number } | und
 export function pagesBetween(from: string, to: string) {
   const [a, b] = [bookPage(from), bookPage(to)];
   return a && b && a.book === b.book ? Math.max(1, Math.abs(a.page - b.page)) : 1;
+}
+
+/** The book on the shelf a page is in: its category's (its page and its games), or a game's own. */
+export function shelfEntryOf(pathname: string): ShelfEntry | undefined {
+  const path = withSlash(pathname);
+  return SHELF.find((entry) =>
+    entry.game ? isGamePage(entry.game, path) : path.startsWith(`/spiele/${entry.category.id}/`) || entry.category.games.some((g) => isGamePage(g, path)),
+  );
 }
 
 /**

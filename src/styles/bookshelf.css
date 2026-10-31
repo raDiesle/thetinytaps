@@ -524,7 +524,7 @@
   pointer-events: none;
 }
 
-.shelf-box :is(.shelf-book, .room-thing) {
+.shelf-box :is(.shelf-book, .shelf-daily, .room-thing) {
   pointer-events: auto;
 }
 
@@ -533,6 +533,7 @@
 .shelf-row,
 .shelf-end,
 .shelf-spines,
+.shelf-daily-row,
 .shelf-spine,
 .shelf-stack,
 .shelf-lying,
@@ -909,7 +910,8 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.shelf-book[data-away] {
+.shelf-book[data-away],
+.shelf-daily[data-away] {
   visibility: hidden;
 }
 
@@ -1050,6 +1052,114 @@
   .shelf-book-blurb {
     display: block;
   }
+}
+
+/* The picture pasted on a cover (bilder/cover-*.webp), filling its frame. */
+.shelf-book-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/*
+ * The books of a category whose games stand apart: side by side in the room of one picture book, spines out, each
+ * spine with its game's name on a paper label. Like the picture books they stand at the board's front edge, a little
+ * apart (a finger finds one) and tipped forwards, glowing warm, so they show they are there to be taken.
+ */
+.shelf-daily-row {
+  display: flex;
+  flex: none;
+  gap: calc(var(--bh) * 0.03);
+  align-items: flex-end;
+  width: calc(var(--bh) * 0.82);
+  height: var(--bh);
+  margin: 0 auto;
+  transform: translateZ(calc(var(--d) * 0.17));
+}
+
+.shelf-daily {
+  --depth: calc(var(--bh) * 0.42);
+  display: block;
+  flex: none;
+  width: calc((var(--bh) * 0.82 - (var(--n) - 1) * var(--bh) * 0.03) / var(--n));
+  height: calc(var(--bh) * 0.97);
+  color: var(--ink);
+  text-decoration: none;
+  transform-origin: 50% 100%;
+  transform: rotateX(-6deg);
+  transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shelf-daily:nth-child(4n + 2) {
+  height: calc(var(--bh) * 0.92);
+}
+
+.shelf-daily:nth-child(4n + 3) {
+  height: var(--bh);
+}
+
+.shelf-daily:nth-child(4n + 4) {
+  height: calc(var(--bh) * 0.94);
+}
+
+.shelf-daily > .box-front {
+  box-shadow:
+    0 0 0 2px #fff6dccc,
+    0 0 calc(var(--bh) * 0.06) calc(var(--bh) * 0.015) #fff1c2b3;
+}
+
+@media (hover: hover) {
+  .shelf-daily:hover {
+    transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+  }
+}
+
+.shelf-daily:focus-visible {
+  outline: none;
+  transform: translateZ(calc(var(--d) * 0.12)) translateY(-2%) rotateX(-11deg);
+}
+
+.shelf-daily:focus-visible > .box-front {
+  outline: 4px solid var(--ocean);
+  outline-offset: 2px;
+}
+
+/* Taken out (bookTravel.ts), the book keeps its spine as it stood on the shelf. */
+.bt-book[data-spine] > .box-left {
+  border-radius: 2px;
+  background:
+    linear-gradient(#0000 9%, #e8c76acc 9% 11%, #0000 11% 87%, #e8c76acc 87% 89%, #0000 89%),
+    linear-gradient(90deg, #00000040, #ffffff2e 45%, #0000001f 70%, #00000047), var(--c);
+}
+
+/* The paper label between the gold bands, the name running down it (two lines where it is long). */
+.shelf-daily-label {
+  position: absolute;
+  inset: 14% 6%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  container-type: size;
+  border-radius: 2px;
+  background: var(--paper-grain, none), #f6ead0;
+  box-shadow:
+    inset 0 0 0 1px #3d304559,
+    inset 0 0 4px #0000002e;
+}
+
+.shelf-daily-title {
+  max-height: 100%;
+  overflow: hidden;
+  font-size: 45cqw;
+  font-weight: 700;
+  line-height: 1.08;
+  text-align: center;
+  text-wrap: balance;
+  writing-mode: vertical-rl;
 }
 
 /* ----- The book taken out (bookTravel.ts): a layer of its own over the app ----- */

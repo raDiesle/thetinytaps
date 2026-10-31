@@ -98,13 +98,6 @@ export const SEO_PAGES: PageSeo[] = [
     text: "Erste Zuordnungsspiele: Futter zum Tier bringen, den passenden Schatten finden, Socken-Paare an die Leine hängen. Antippen oder hinziehen, ohne Fehler.",
   },
   {
-    path: "/spiele/alltag/",
-    title: "Zähneputzen, Töpfchen und Tagesplan für Kleinkinder",
-    description:
-      "Hilfen für jeden Tag: Zähneputzen mit Lied, aufs Töpfchen gehen, Belohnungstafel und Tagesplan in Bildern, laut und leise sprechen. Ohne Werbung.",
-    text: "Was jeden Tag dran ist, als Spiel: Zähne putzen mit Lied und Spiegel, aufs Töpfchen gehen, Sterne sammeln und den Tag in Bildern planen, laut und leise sprechen.",
-  },
-  {
     path: "/bilder/",
     title: "Lebendige Wimmelbilder zum Antippen für Kinder",
     description: "Über 20 Wimmelbilder für Kleinkinder: Baustelle, Bauernhof, Zoo, Feuerwache und mehr. Alles bewegt sich und macht Geräusche – ohne Werbung.",

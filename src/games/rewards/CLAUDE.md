@@ -37,7 +37,7 @@ whatever the address.
 # Belohnungstafel
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
-the same on screen and on paper (A4 from the browser, also offline). It stands in the book „Für jeden Tag“ on the home page's shelf, but has no
+the same on screen and on paper (A4 from the browser, also offline). It stands as a book of its own (spine out, of „Für jeden Tag“) on the home page's shelf, but has no
 `GameShell`: nothing to start or leave, no play time counted, and `PlaytimeLock` lets it through, so the evening
 brushing's star still lands after the minutes are over. It may become a website of its own one day (T-19), so the
 folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, speech, tap
