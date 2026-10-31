@@ -166,7 +166,7 @@ export const allGamesIdeas: IdeaArea = {
       why: "Manche Eltern sehen Bildschirmspiele für Kleinkinder kritisch – ein Bilderbuch wirkt ruhiger und vertrauter.",
       effort: "M",
       partial:
-        "Gebaut und Standard (?buch=aus bringt den alten Look zurück): Cover mit Tierfamilien, Umblättern zwischen Menüs und beim Starten und Verlassen der Spiele, Inhaltsseite, Papierknöpfe, Papierrand im Spiel. Die Zeichnungen der Spiele selbst sind noch die alten – weitere Schritte im Bereich D „Das Bilderbuch“.",
+        "Gebaut und Standard (?buch=aus bringt den alten Look zurück): Die Startseite ist ein Zimmer mit Bücherregal – ein Tipp nimmt ein Buch heraus und schlägt es auf, zurück stellt es sich wieder ins Regal; Lautsprecher, Sanduhr, Fuchs- und Bärenkopf und ein Lichtschalter statt Knöpfen. Die Seite einer Welt ist das Inhaltsverzeichnis ihres Buchs, man sieht immer die linke Seite, im Buch blättert man um (auch beim Starten und Verlassen der Spiele); Papierknöpfe, Papierrand im Spiel. Die Zeichnungen der Spiele selbst sind noch die alten – weitere Schritte im Bereich D „Das Bilderbuch“.",
     },
   ],
 };

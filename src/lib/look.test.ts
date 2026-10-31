@@ -3,7 +3,6 @@ import { expect, test } from "bun:test";
 import { TURN_SECONDS } from "./look";
 
 const css = readFileSync("src/styles/book.css", "utf8");
-const cover = readFileSync("src/components/BookCover.tsx", "utf8");
 
 /** The number of seconds a `name: <n>s` (or a `const NAME = <n>`) in `text` gives. */
 const seconds = (text: string, pattern: RegExp) => Number(text.match(pattern)?.[1]);
@@ -19,8 +18,14 @@ test("a page turns slowly enough to be seen", () => {
   expect(TURN_SECONDS).toBeGreaterThanOrEqual(1.5);
 });
 
-// The cover's screen goes away when its animation ends, and its board lands with the sound.
-test("the cover opens as long as BookCover waits for it", () => {
-  expect(seconds(css, /\.book-cover-screen\.opening \{\s*animation: book-reveal ([\d.]+)s/)).toBe(seconds(cover, /const OPEN_MS = (\d+);/) / 1000);
-  expect(seconds(css, /\.opening \.book-cover \{\s*animation: book-cover-open ([\d.]+)s/)).toBe(seconds(cover, /const SWING_SECONDS = ([\d.]+);/));
+// The page seen is always the book's left page (user feedback, October 2026): its spine on the right, so every page
+// turns on the right edge – forward the next one comes over from the right, back this one turns over to the right.
+test("the page seen is the left page, turning on the spine at its right", () => {
+  const turning = [...css.matchAll(/\[data-turn="(forward|back)"\]::view-transition-(old|new)\(root\) \{([^}]*)\}/g)].filter((m) =>
+    m[3].includes("book-turn-away"),
+  );
+  expect(turning.map((m) => m[1]).sort()).toEqual(["back", "forward"]);
+  for (const m of turning) expect(m[3]).toContain("transform-origin: right center");
+  // The outer edge has the wider margin, where the board and the pages under it show; the spine's side the narrow one.
+  expect(Number(css.match(/--page-left:\s*(\d+)px/)?.[1])).toBeGreaterThan(Number(css.match(/--page-right:\s*(\d+)px/)?.[1]));
 });

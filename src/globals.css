@@ -15,6 +15,7 @@
 @import "./styles/playtime.css";
 @import "./styles/screen-hint.css";
 @import "./styles/book.css";
+@import "./styles/bookshelf.css";
 @import "./games/letters/letters.css";
 @import "./games/letters/find.css";
 @import "./games/scenes/scenes.css";

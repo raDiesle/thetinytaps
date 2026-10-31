@@ -9,7 +9,10 @@ import { usePreloadPages } from "@/lib/preloadPages";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
 
-/** One category of the home menu with its games. */
+/** The page of the book each game's chapter starts on, as its table of contents lists them (book look). */
+const pageOf = (game: number) => 3 + game * 6;
+
+/** One category of the home menu with its games; in the book look the table of contents of the category's book. */
 export function CategoryPage() {
   const { category: id } = useParams();
   const category = CATEGORIES.find((c) => c.id === id);
@@ -22,7 +25,7 @@ export function CategoryPage() {
   // An old address of a category that has only one game now.
   if (!hasPage(category)) return <Navigate to={categoryHref(category)} replace />;
   return (
-    <main className="home">
+    <main className="home" data-contents>
       <Sky />
       <MenuHead
         to="/"
@@ -34,9 +37,9 @@ export function CategoryPage() {
         }
       />
       <ul ref={grid.ref} className={`game-list ${grid.className}`} style={grid.style} data-world={category.id}>
-        {category.games.map((g) => (
+        {category.games.map((g, i) => (
           <li key={g.href}>
-            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} />
+            <GameCard href={g.href} emoji={g.emoji} title={t(g.title)} blurb={t(g.blurb)} page={pageOf(i)} />
           </li>
         ))}
       </ul>

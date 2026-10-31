@@ -1,0 +1,962 @@
+/*
+ * ---------- The bookshelf: the home page in the book look (Bookshelf.tsx, RoomOptions.tsx, bookTravel.ts) ----------
+ *
+ * A children's room: wallpaper, a wooden floor, and a bookshelf standing on it, drawn in 3D with one eye in front of
+ * it (`perspective`), so the boards show their tops below the eye and their undersides above it, the walls inside go
+ * back to the back panel, and each picture book is a box with its cover, spine, pages and top. Around it the room's
+ * things are the grown-ups' options. Sizes come from the shelf's plan (shelfLayout.ts) as px in custom properties:
+ * `--bh` a book's height, `--tier` the room between two boards, `--post`, `--crown`, `--board`, `--plinth` the planks.
+ */
+
+:root {
+  --room-wall-a: #f4e7cd;
+  --room-wall-b: #efdfc1;
+  --room-dot: #e3cfa6;
+  /* Light birch, its grain running along the planks; the posts' grain runs up and down. */
+  --shelf-wood: #d4a874;
+  --wood-grain-v: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='1200'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.075 .0018' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .16 0 0 0 0 .06 1.6 0 0 0 -.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  --wood-grain-h: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1200' height='360'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0018 .075' numOctaves='4' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .16 0 0 0 0 .06 1.6 0 0 0 -.75'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+/* With „Mädchen“ the room's wallpaper goes lilac and pink, as the menus' sky does. */
+:root[data-figure="girl"] {
+  --room-wall-a: #f1e1ee;
+  --room-wall-b: #ead6e8;
+  --room-dot: #dcc0d8;
+}
+
+.room {
+  position: relative;
+  min-height: 100dvh;
+  background: var(--room-wall-a);
+}
+
+.room-scene {
+  /* The wall round the shelf: room for the speaker on the left and the light switch on the right. */
+  --side: max(58px, 6vw);
+  --top: clamp(62px, 15vh, 132px);
+  --floor: clamp(14px, 5vh, 44px);
+  position: relative;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Striped wallpaper with little dots, the lamp's light on it and a moulding under the ceiling. */
+.room-wall {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(#fffaf0 0 5px, #c9b18a 5px 7px, #0000001f 7px 10px, #0000 22px),
+    radial-gradient(ellipse 70% 60% at 50% 30%, #fff6e033, #0000 70%),
+    radial-gradient(ellipse at 50% 40%, #0000 50%, #3a26141f),
+    radial-gradient(circle, var(--room-dot) 0 2px, #0000 2.5px) 17px 20px / 68px 52px,
+    repeating-linear-gradient(90deg, var(--room-wall-a) 0 34px, var(--room-wall-b) 34px 68px);
+}
+
+.room-wall::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--paper-grain, none);
+  opacity: 0.6;
+}
+
+/* The floor: oiled planks seen a little from above, a white skirting board along the wall. */
+.room-floor {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: calc(var(--floor) + 8px);
+  background:
+    linear-gradient(#fffaf0 0 6px, #cdbb9c 6px 7px, #0000004d 7px 9px, #0000 16px),
+    linear-gradient(#0000 40%, #0000002e),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    #a87447;
+}
+
+/* ----- The top of the wall: the speaker hanging on the left, the title, the heads and fullscreen on the right ----- */
+
+.room-top {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--top);
+  padding: 0 max(12px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left));
+}
+
+.room-top .logo {
+  grid-column: 2;
+  margin: 0;
+  font-size: clamp(1.7rem, min(7vh, 5vw), 3.6rem);
+}
+
+.room-top-right {
+  display: flex;
+  grid-column: 3;
+  justify-content: flex-end;
+  align-items: center;
+  gap: clamp(8px, 1.5vw, 16px);
+}
+
+/* The things in the room are buttons without a button's look: only the drawing, a little lift under a finger. */
+.room-thing {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.room-thing svg {
+  display: block;
+  overflow: visible;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.room-thing:focus-visible {
+  outline: 3px solid var(--ocean);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.room-thing:active svg {
+  transform: translateY(2px);
+}
+
+/* The loudspeaker, its cable going up to the ceiling. */
+.room-speaker {
+  grid-column: 1;
+  justify-self: start;
+  align-self: start;
+  margin-left: max(0px, calc(var(--side) / 2 - clamp(30px, 6vh, 50px)));
+}
+
+.room-speaker svg {
+  height: clamp(66px, 14vh, 122px);
+  width: auto;
+}
+
+.room-cable {
+  fill: none;
+  stroke: #3a2f2a;
+  stroke-width: 2.5;
+}
+
+.room-metal {
+  fill: #8d8a86;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.room-speaker-box {
+  fill: #b98552;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.room-speaker-side {
+  fill: #00000026;
+}
+
+.room-speaker-cloth {
+  fill: #4a3b3f;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.room-speaker-cone {
+  fill: #6c5a5e;
+}
+
+.room-speaker-light {
+  fill: #6e625a;
+}
+
+.room-speaker-light.on {
+  fill: #7fd06a;
+}
+
+.room-speaker-waves,
+.room-speaker-off {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 3;
+}
+
+.room-speaker-off {
+  stroke: #b0473d;
+}
+
+/* The music switched off: the speaker pales a little, so the state shows at a glance. */
+.room-speaker[aria-pressed="false"] .room-speaker-box {
+  fill: #c9ab8a;
+}
+
+/*
+ * The hourglass standing on the shelf's top, at its left end (`--at`, placed by Bookshelf) – but never touching the
+ * speaker hanging beside it, where the shelf reaches far out (a tablet): then it stands further in (the speaker's
+ * drawing is 0.7 times as wide as high, see .room-speaker svg).
+ */
+.room-hourglass-place {
+  position: absolute;
+  bottom: 100%;
+  left: max(var(--at), calc(clamp(66px, 14vh, 122px) * 0.7 + 36px - var(--side)));
+}
+
+.room-hourglass svg {
+  height: clamp(42px, 9vh, 86px);
+  width: auto;
+}
+
+.room-glass {
+  fill: #e6f2fb99;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.room-sand {
+  fill: #e7b65c;
+}
+
+.room-sand-thread {
+  stroke: #e7b65c;
+  stroke-width: 1.5;
+}
+
+.room-glass-shine {
+  fill: none;
+  stroke: #ffffffcc;
+  stroke-width: 2;
+}
+
+.room-wood {
+  fill: #9a6237;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.room-post {
+  stroke: #7a4a28;
+  stroke-width: 3.5;
+}
+
+/* The two heads on the wall, in round wooden frames: the chosen one lit and ringed, the other pale. */
+.room-figures {
+  display: flex;
+  gap: clamp(6px, 1vw, 12px);
+}
+
+.room-head {
+  width: clamp(42px, 8vh, 68px);
+  height: clamp(42px, 8vh, 68px);
+  padding: 3px;
+  border: 3px solid #a8774a;
+  border-radius: 50%;
+  background: #fff8e8;
+  box-shadow:
+    0 3px 6px #3a26144d,
+    inset 0 0 0 2px #fff;
+  opacity: 0.5;
+  filter: grayscale(0.7);
+}
+
+.room-head svg {
+  width: 100%;
+  height: 100%;
+}
+
+.room-head[aria-pressed="true"] {
+  border-color: #c8862e;
+  box-shadow:
+    0 0 0 4px var(--sunshine),
+    0 4px 10px #3a261466;
+  opacity: 1;
+  filter: none;
+}
+
+.head-fox {
+  fill: #e98a43;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.head-ear-in {
+  fill: #5a3a2c;
+}
+
+.head-muzzle {
+  fill: #fff6ea;
+}
+
+.head-bear {
+  fill: #a8693e;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.head-ear-bear,
+.head-snout {
+  fill: #e8c49a;
+}
+
+.head-cheek {
+  fill: #f2a596aa;
+}
+
+.head-eye {
+  fill: #2b2230;
+}
+
+.head-lash,
+.head-line {
+  fill: none;
+  stroke: #2b2230;
+  stroke-width: 2;
+}
+
+.head-bow {
+  fill: #ee7fae;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.head-cap {
+  fill: #4f80cf;
+  stroke: var(--ink);
+  stroke-width: 2.5;
+}
+
+.head-cap-brim {
+  fill: #3a64a8;
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+/* The light switch on the wall right of the shelf, at a grown-up's hand height: small, not one of the main things. */
+.room-switch-place {
+  position: absolute;
+  top: 38%;
+}
+
+.room-switch svg {
+  width: clamp(26px, 4vh, 38px);
+  height: auto;
+  filter: drop-shadow(1px 2px 2px #3a261440);
+}
+
+.room-switch-plate {
+  fill: #fbf6ea;
+  stroke: #b9a78a;
+  stroke-width: 1.5;
+}
+
+.room-switch-rocker {
+  fill: #f2ead9;
+  stroke: #a8967a;
+  stroke-width: 1.5;
+}
+
+.room-switch-lit {
+  fill: #fff;
+}
+
+.room-switch-globe {
+  fill: none;
+  stroke: #8a7a62;
+  stroke-width: 1.4;
+}
+
+/* The picture of the two families reading, hanging on the wall where the shelf leaves room for it. */
+.room-picture {
+  position: absolute;
+  top: calc(var(--top) + 4vh);
+  border: 10px solid #9a6a40;
+  border-radius: 3px;
+  background: #fffaf0;
+  box-shadow:
+    inset 0 0 0 2px #00000033,
+    4px 8px 16px #3a261466;
+}
+
+.room-picture img {
+  display: block;
+  width: 100%;
+  height: auto;
+  padding: 8px;
+}
+
+/* The grown-ups' menus open as a sheet in the middle of the room, over the shelf (a phone's cover the screen). */
+.room .home-menu {
+  position: static;
+}
+
+.room .home-menu-backdrop {
+  z-index: 40;
+}
+
+.room .home-menu-panel {
+  z-index: 41;
+}
+
+@media (min-width: 600px) and (min-height: 600px) {
+  .room .home-menu-panel {
+    position: fixed;
+    top: 50%;
+    right: auto;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/*
+ * A screen held upright (a grown-up chose „Trotzdem hochkant“): too narrow for the title between the speaker and the
+ * heads, so it gets a line of its own under them, and the hourglass stands on the wall left of the shelf, as the light
+ * switch does on the right, instead of where the title now is.
+ */
+@media (max-aspect-ratio: 4 / 5) {
+  .room-top {
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    padding-top: 8px;
+  }
+
+  .room-speaker {
+    grid-row: 1 / span 2;
+    margin-top: -8px;
+  }
+
+  .room-top-right {
+    grid-row: 1;
+  }
+
+  .room-top .logo {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    align-self: center;
+    justify-self: center;
+    font-size: clamp(1.4rem, 7vw, 2.2rem);
+    white-space: nowrap;
+  }
+
+  .room-hourglass-place {
+    top: 30%;
+    bottom: auto;
+    left: calc(var(--side) / 2 - var(--side));
+    translate: -50% 0;
+  }
+}
+
+/* ----- The shelf ----- */
+
+.room-shelf-place {
+  position: absolute;
+  top: var(--top);
+  right: var(--side);
+  bottom: calc(var(--floor) * 0.55);
+  left: var(--side);
+}
+
+.shelf {
+  /* How deep the shelf is, and where the eye is that looks at it: a little above its middle. */
+  --d: calc(var(--bh) * 0.62);
+  --bw: calc(var(--bh) * 0.82);
+  position: relative;
+  margin: 0 auto;
+  perspective: 1200px;
+  perspective-origin: 50% 36%;
+}
+
+/* Its shadow on the wall. */
+.shelf::before {
+  content: "";
+  position: absolute;
+  inset: 2% -1% 0 1%;
+  z-index: -1;
+  box-shadow: 10px 6px 30px 6px #3a26144d;
+}
+
+/* Taps go through the shelf's planes (a board's box lies in front of its books) to the books. */
+.shelf-box {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.shelf-box .shelf-book {
+  pointer-events: auto;
+}
+
+.shelf-box > span,
+.shelf-tier,
+.shelf-row,
+.shelf-spines,
+.shelf-spine,
+.shelf-book {
+  transform-style: preserve-3d;
+}
+
+.shelf-box > span,
+.shelf-tier > span {
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+.shelf-back {
+  top: var(--crown);
+  right: var(--post);
+  bottom: var(--plinth);
+  left: var(--post);
+  transform: translateZ(calc(-1 * var(--d)));
+  /* The shadow under each board, the dark in the corners, the back panel's warm painted wood. */
+  background:
+    repeating-linear-gradient(#0000006b 0, #00000026 calc(var(--tier) * 0.12), #0000 calc(var(--tier) * 0.4), #0000 calc(var(--tier) + var(--board))),
+    linear-gradient(90deg, #00000047, #0000 14%, #0000 86%, #00000047),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    #b88654;
+}
+
+/* The inner faces of the side walls, going back from the posts: lit at the front, dark at the back. */
+.shelf-side {
+  top: var(--crown);
+  bottom: var(--plinth);
+  width: var(--d);
+}
+
+.shelf-side.left {
+  left: var(--post);
+  transform-origin: left center;
+  transform: rotateY(90deg);
+  background:
+    linear-gradient(90deg, #0000, #00000070),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    #c4935d;
+}
+
+.shelf-side.right {
+  right: var(--post);
+  transform-origin: right center;
+  transform: rotateY(-90deg);
+  background:
+    linear-gradient(270deg, #0000000a, #00000080),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    #b6844f;
+}
+
+/* The underside of the top board, seen from below. */
+.shelf-ceiling {
+  top: var(--crown);
+  right: var(--post);
+  left: var(--post);
+  height: var(--d);
+  transform-origin: center top;
+  transform: rotateX(-90deg);
+  background: linear-gradient(#0000004d, #0000008c), #b07c4a;
+}
+
+.shelf-tier {
+  position: absolute;
+  right: var(--post);
+  left: var(--post);
+  height: var(--tier);
+}
+
+/* A board: its front edge, its top seen from above (below the eye) and its underside seen from below (above it). */
+.shelf-board {
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: var(--board);
+  background:
+    linear-gradient(#ffffff59 0 1px, #0000 2px, #0000 70%, #0000002e),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    var(--shelf-wood);
+  box-shadow: 0 2px 3px #3a261459;
+}
+
+.shelf-board-top {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--d);
+  transform-origin: center bottom;
+  transform: rotateX(90deg);
+  background:
+    linear-gradient(#00000080, #00000014 70%, #ffffff26),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    #d9ae7b;
+}
+
+.shelf-board-under {
+  top: calc(100% + var(--board));
+  right: 0;
+  left: 0;
+  height: var(--d);
+  transform-origin: center top;
+  transform: rotateX(-90deg);
+  background: linear-gradient(#00000040, #0000008c), #a8784a;
+}
+
+/* The frame's front: the two posts, the top board reaching out a little, the plinth on the floor. */
+.shelf-post {
+  top: 0;
+  bottom: 0;
+  width: var(--post);
+  background:
+    linear-gradient(90deg, #ffffff40, #0000 25%, #0000 75%, #00000026),
+    var(--wood-grain-v) 0 0 / 360px 1200px,
+    var(--shelf-wood);
+}
+
+.shelf-post.left {
+  left: 0;
+}
+
+.shelf-post.right {
+  right: 0;
+}
+
+.shelf-crown {
+  top: 0;
+  right: -6px;
+  left: -6px;
+  height: var(--crown);
+  border-radius: 3px 3px 0 0;
+  background:
+    linear-gradient(#ffffff73 0 2px, #0000 3px, #0000 60%, #00000033),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    var(--shelf-wood);
+  box-shadow: 0 3px 4px #3a261466;
+}
+
+.shelf-plinth {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--plinth);
+  background:
+    linear-gradient(#00000040, #0000 30%, #0000001a),
+    var(--wood-grain-h) 0 0 / 1200px 360px,
+    #b8874f;
+}
+
+/* „Weitere“: a little paper label hanging from the board above its books, as a library names its shelves. */
+.shelf-label {
+  top: 0;
+  left: 50%;
+  z-index: 1;
+  padding: 1px 10px 2px;
+  border: 1.5px solid #3d304599;
+  border-top: 0;
+  border-radius: 0 0 4px 4px;
+  background: var(--paper-grain, none), #fffaf0;
+  color: var(--ink);
+  font-size: clamp(0.68rem, calc(var(--tier) * 0.07), 1rem);
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+  box-shadow: 0 2px 3px #3a261440;
+  translate: -50% 0;
+}
+
+.shelf-label span {
+  font-family: var(--font-emoji);
+}
+
+/* The books of a board, standing a little behind its front edge. */
+.shelf-row {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: var(--gap);
+  transform: translateZ(calc(var(--d) * -0.2));
+}
+
+.shelf-spines {
+  display: flex;
+  align-items: flex-end;
+  gap: 1px;
+  height: 100%;
+}
+
+/* ----- A book as a box: `.box-front` (or the cover), `.box-left`, `.box-right` and `.box-top`, `--depth` deep ----- */
+
+:is(.shelf-book, .shelf-spine) > :is(.box-left, .box-right, .box-top) {
+  position: absolute;
+  backface-visibility: hidden;
+}
+
+:is(.shelf-book, .shelf-spine) > .box-left {
+  top: 0;
+  right: 100%;
+  bottom: 0;
+  width: var(--depth);
+  transform-origin: right center;
+  transform: rotateY(-90deg);
+}
+
+:is(.shelf-book, .shelf-spine) > .box-right {
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: var(--depth);
+  transform-origin: left center;
+  transform: rotateY(90deg);
+}
+
+:is(.shelf-book, .shelf-spine) > .box-top {
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: var(--depth);
+  transform-origin: center bottom;
+  transform: rotateX(90deg);
+}
+
+/* A book standing with its spine out: cloth, gold bands, its boards at the sides and the pages' top. */
+.shelf-spine {
+  --depth: calc(var(--bh) * 0.38);
+  position: relative;
+  width: calc(var(--bh) * var(--sw));
+  height: calc(var(--bh) * var(--sh));
+}
+
+.shelf-spine > .box-front {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background:
+    linear-gradient(#0000 9%, #e8c76acc 9% 11%, #0000 11% 87%, #e8c76acc 87% 89%, #0000 89%),
+    linear-gradient(90deg, #00000040, #ffffff2e 45%, #0000001f 70%, #00000047), var(--c);
+  backface-visibility: hidden;
+}
+
+.shelf-spine > :is(.box-left, .box-right) {
+  background: linear-gradient(90deg, #00000026, #00000059), var(--c);
+}
+
+.shelf-spine > .box-top,
+.shelf-book > .box-top {
+  background: repeating-linear-gradient(#f6eedb 0 1px, #d8c9a8 1px 2px);
+}
+
+/* A picture book standing with its cover out: the pages at its right, the cloth spine at its left. */
+.shelf-book {
+  --bw: calc(var(--bh) * 0.82);
+  --depth: calc(var(--bh) * 0.08);
+  position: relative;
+  flex: none;
+  width: var(--bw);
+  height: var(--bh);
+  color: var(--ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shelf-book[data-away] {
+  visibility: hidden;
+}
+
+.shelf-book > .box-left {
+  background: linear-gradient(90deg, #ffffff26, #00000040), color-mix(in srgb, var(--w1) 70%, #3d3045);
+}
+
+.shelf-book > .box-right {
+  background: repeating-linear-gradient(90deg, #f6eedb 0 1px, #d8c9a8 1px 2px);
+}
+
+/* Its shadow on the board, lying round its foot. */
+.shelf-book-shadow {
+  position: absolute;
+  right: -8%;
+  bottom: 0;
+  left: -8%;
+  height: calc(var(--d) * 0.5);
+  transform-origin: center bottom;
+  transform: rotateX(90deg) translateZ(1px);
+  background: radial-gradient(ellipse 60% 70% at 50% 100%, #0000006b, #0000 70%);
+}
+
+/* The cover: cloth in the colour of its world, the spine's crease, a picture pasted on and the title printed. */
+.shelf-book-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* In % of the book's width: units of the cover's own size (cqh) only work for what is inside it. */
+  padding: 8% 7% 8% 13%;
+  overflow: hidden;
+  container-type: size;
+  border-radius: 2px 6px 6px 2px;
+  background:
+    linear-gradient(90deg, #00000047 0 6%, #ffffff40 6.5%, #0000 9%), linear-gradient(135deg, #ffffff33, #0000 45%, #0000001f), var(--paper-grain, none),
+    var(--w1);
+  box-shadow:
+    inset 0 0 0 1px #3d304566,
+    inset -2px -2px 4px #0000002e;
+  backface-visibility: hidden;
+}
+
+.shelf-book-title {
+  display: -webkit-box;
+  flex: none;
+  margin-bottom: 3cqh;
+  overflow: hidden;
+  font-size: min(10cqh, 12cqw);
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  text-wrap: balance;
+}
+
+.shelf-book-picture {
+  position: relative;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 2px solid #fffaf0;
+  border-radius: 5px;
+  background: linear-gradient(#cfe6ee, #fbf4e3);
+  box-shadow:
+    0 0 0 1.5px #3d304580,
+    inset 0 0 6px #0000001f;
+}
+
+.shelf-book-picture .world-card-scene {
+  top: auto;
+  bottom: 0;
+  z-index: 0;
+  height: 100%;
+  border: 0;
+  clip-path: none;
+}
+
+.shelf-book-emoji {
+  position: relative;
+  font-family: var(--font-emoji);
+  font-size: min(34cqh, 50cqw);
+  line-height: 1;
+}
+
+.shelf-book-collage {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 2cqh 4cqw;
+  font-family: var(--font-emoji);
+  font-size: min(15cqh, 22cqw);
+  line-height: 1;
+}
+
+.shelf-book-collage[data-count="3"] > :last-child {
+  grid-column: span 2;
+  justify-self: center;
+}
+
+/* One line for grown-ups, only where the book is big enough to read it. */
+.shelf-book-blurb {
+  display: none;
+  font-size: 5.6cqh;
+  line-height: 1.15;
+  text-align: center;
+}
+
+@container (min-height: 250px) {
+  .shelf-book-blurb {
+    display: block;
+  }
+}
+
+/* ----- The book taken out (bookTravel.ts): a layer of its own over the app ----- */
+
+.book-travel {
+  position: fixed;
+  inset: 0;
+  /* Under the play-time lock and the „Bitte quer halten“ note, over everything else. */
+  z-index: 800;
+  overflow: hidden;
+  perspective: var(--bt-eye);
+  perspective-origin: 50% 50%;
+}
+
+.bt-backdrop {
+  position: absolute;
+  pointer-events: none;
+}
+
+.bt-book {
+  position: absolute;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.bt-lid {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+}
+
+.bt-page {
+  position: absolute;
+  inset: 0;
+  background: var(--paper-grain, none), var(--paper, #fbf4e3);
+}
+
+/* The page under the cover: the right page once the book is open, the stack of pages at its edges, the back board. */
+.bt-right {
+  transform: translateZ(-1px);
+  background: linear-gradient(90deg, #00000059, #0000 12%), var(--paper-grain, none), var(--paper, #fbf4e3);
+  box-shadow:
+    1px 1px 0 var(--paper-edge, #dccdab),
+    3px 2px 0 var(--paper, #fbf4e3),
+    4px 3px 0 var(--paper-edge, #dccdab),
+    6px 4px 0 #efe4ca,
+    7px 6px 0 2px color-mix(in srgb, var(--w1) 70%, #3d3045);
+}
+
+/* The inside of the cover once it lies open on the left: the page the book's first menu is printed on. */
+.bt-left {
+  overflow: hidden;
+  transform: rotateY(180deg);
+  backface-visibility: hidden;
+  background: linear-gradient(270deg, #00000059, #00000014 4%, #0000 8%), var(--paper-mottle, none), linear-gradient(var(--sky-top), var(--paper, #fbf4e3) 72%);
+}
+
+/* A still copy of the screen, printed on the page; or at first, on the way back, the screen itself. */
+.bt-print {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.bt-print-full {
+  background: var(--lamp, none), var(--table, #94603d);
+}
+
+/* On the page the copy's own book edges and board aren't printed: the page has its own. */
+.bt-left .bt-print .sky {
+  box-shadow: none;
+}

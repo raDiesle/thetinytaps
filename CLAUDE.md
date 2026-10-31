@@ -173,9 +173,11 @@ In a fresh worktree run `bun install` first.
   Abenteuer and the good-night sentence do; the management list then leaves its recorded lines out. Music hushes
   while a recording plays (`talking()`). The dev server keeps the file list of a `?glob` from its start: after
   recording (or adding any files to a globbed folder) restart it before checking, or the new files seem missing.
-  The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“.
-- **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 on the home page, a menu so a child's tap
-  can't switch it; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
+  The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
+  (in the book look things in the room with the bookshelf, see the book look below).
+- **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 in a menu on the home page in the toy look;
+  in the book look the heads of a fox girl and a bear boy on the room's wall, one tap on either chooses it – user
+  decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
   Bewegungsabenteuer's dark dancer (no hair, it stands for anyone) stay as they are; no game adds a choice of its own for
@@ -312,27 +314,36 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   `App.tsx` – checked in `preloadPages.test.ts`), and a card starts loading its page as the finger lands. A new menu
   whose cards open lazy pages does the same.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
-  brings back the old toy-block look, `src/lib/look.ts`): a cover to open on the first visit to the home page
-  (`BookCover`, shown once per visit – `sessionStorage` – and only on the home page), the home page as the
-  contents page with page numbers, paper and softened colours, and the game's picture inside the page's paper margin
-  (`.book-frame`). All of it is CSS under `:root[data-look="book"]` in `src/styles/book.css`; games don't style for it.
-  It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
-  drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
-  open page lies on the book's cloth-covered board, lit from above. The cover's picture (`bilder/buch-cover.webp`) shows
-  one family of each: a fox parent with a fox child and a bear parent with a bear child, one of the children a boy and
-  one a girl – never a third grown-up or a child too many (user feedback, October 2026).
-  Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
-  any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
-  one. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
+  brings back the old toy-block look, `src/lib/look.ts`): the home page is a room with a bookshelf (`Bookshelf`, user
+  decision, October 2026), each category and each game of „Weitere“ a picture book standing on it with its cover out;
+  a category's page is its book's table of contents (page numbers on its cards, a flourish under the title); every
+  menu is a paper page, and the game's picture lies inside the page's paper margin (`.book-frame`). The page seen is
+  always the book's **left** page: its outer edge on the left with the board and the table round it, the spine on the
+  right with the facing page in its shadow beyond it (`--page-left`, `--page-right`; `look.test.ts`). All of it is CSS
+  under `:root[data-look="book"]` in `src/styles/book.css` and `bookshelf.css`; games don't style for it.
+  It should look real, not flat (user feedback, October 2026): the shelf is drawn in 3D (boards seen from the eye's
+  height, walls going back, books as boxes with spines and page edges, other books standing with their spines out to
+  fill it), still until tapped, and planned by `planShelf` (`shelfLayout.ts`) to fill the room on every screen. A tap on
+  a book takes it out (`takeOutBook`, `bookTravel.ts`): it comes off its board, into the middle, its cover swings open
+  to the left, and its left page, the next menu printed on it, comes close until it is the screen – **no page turns on
+  the way into a book**. Back to the shelf (`useTurnPage("/")` → `putBookBack`) is the same backwards: the book closes
+  and goes back into its own gap (`shelfBookOf`, `bookTravel.test.ts`). The grown-ups' options on the shelf's page are
+  things in the room, never buttons (`RoomOptions.tsx`): a loudspeaker hanging from the ceiling (music, one tap), an
+  hourglass on the shelf (play time), the fox girl's and bear boy's heads, and a small light switch on the wall for the
+  language, kept out of the way. A new option becomes such a thing too. The wall's picture (`bilder/buch-cover.webp`,
+  only where there is room beside the shelf) shows one family of each: a fox parent with a fox child and a bear parent
+  with a bear child, one of the children a boy and one a girl – never a third grown-up or a child too many (user
+  feedback, October 2026).
+  Inside a book every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or
+  ending (or any other change of screen) goes through `turnPageWith(direction, update)` – forward the next page comes
+  over from the right onto this one, back this one lifts at its left edge and turns over to the right. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
   with it – `look.test.ts`): its corner lifts first, the page bends and catches the light, then darkens as it turns away,
   and its shadow slides across the page beneath with its edge; never a quick flick, never a stiff board. A lifted page
   must not swell past the screen (keep the eye far: `perspective(320vw)`), and its keyframes run `linear` – an easing
   restarts at every keyframe, so the page would stop and start.
   Where the page has no room for the families beside the cards (below 1400 × 640), they sit in the menu's top row
-  instead of the sun and clouds (`BookFamily`, in `MenuHead` and the home page's `.home-top`), shrinking into the room
-  left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
-  that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
-  of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
+  instead of the sun and clouds (`BookFamily`, in `MenuHead`), shrinking into the room left and hiding where too little
+  is: never pushing or covering a button. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
   button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of animal parents with their children (the fox and bear
   families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.

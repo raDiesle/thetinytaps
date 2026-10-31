@@ -10,7 +10,8 @@ export const bookIdeas: IdeaArea = {
   ideas: [
     {
       id: "D-01",
-      done: true,
+      partial:
+        "Das Cover gab es bis Oktober 2026; seit die Startseite ein Bücherregal ist, hängt das Bild der Tierfamilien gerahmt an der Wand neben dem Regal (wo Platz ist).",
       emoji: "🦊",
       title: "Cover mit Tierfamilien",
       text: "Das Cover ist ein Buch mit Stoffeinband, goldenem Titel, Lederecken und Lesebändchen; aufgeklebt ist ein Bild, auf dem Tapsis Fuchsfamilie und Mama Bär mit ihrem Kleinen zusammen ein Buch anschauen.",
