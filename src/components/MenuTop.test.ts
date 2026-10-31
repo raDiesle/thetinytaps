@@ -34,10 +34,11 @@ test("the way back from a menu is never fixed in a corner", () => {
   expect(fixed).toEqual([]);
 });
 
-// In the book look the way back is the page's turned-up corner in the top right, where a reader turns a page back
-// (user decision, October 2026): every menu head draws it, it lies fixed at the page's corner, and the round arrow
-// gives way to it there (the toy look keeps the arrow, next to the title).
-test("in the book look a menu turns back at the page's top right corner", () => {
+// In the book look the way back is the corner of the page before, at the spine in the top left, and the page turning
+// back comes from there (user feedback, October 2026: a corner in the top right turned the other page, and grown-ups
+// didn't look there). Every menu head draws it, it lies fixed at the page's corner, and the round arrow gives way to it
+// (the toy look keeps the arrow, next to the title).
+test("in the book look a menu turns back at the corner of the page before, top left", () => {
   const menuTop = readFileSync("src/components/MenuTop.tsx", "utf8");
   const head = menuTop.slice(menuTop.indexOf("export function MenuHead"), menuTop.indexOf("function PageCorner"));
   expect(head).toContain("<PageCorner ");
@@ -45,15 +46,25 @@ test("in the book look a menu turns back at the page's top right corner", () => 
   const corner = rules.filter((r) => r.selector === ':root[data-look="book"] .page-corner');
   expect(corner.length).toBe(1);
   expect(corner[0]?.body).toMatch(/position:\s*fixed/);
-  expect(corner[0]?.body).toMatch(/\bright:/);
+  expect(corner[0]?.body).toMatch(/\bleft:/);
+  expect(corner[0]?.body).not.toMatch(/\bright:/);
   expect(corner[0]?.body).toMatch(/\btop:/);
   expect(rules.some((r) => r.selector === ".page-corner" && /display:\s*none/.test(r.body))).toBe(true);
   expect(rules.some((r) => r.selector === ':root[data-look="book"] .menu-head .back-link' && /display:\s*none/.test(r.body))).toBe(true);
 });
 
+// What is touched is what moves: the corner is on the left, so the page turning back swings over from the left edge.
+test("in the book look the page turning back comes from the left, where its corner is", () => {
+  const back = cssRules().filter((r) => r.selector === ':root[data-look="book"][data-turn="back"]::view-transition-new(root)');
+  expect(back.length).toBe(1);
+  expect(back[0]?.body).toMatch(/transform-origin:\s*left center/);
+  expect(back[0]?.body).toMatch(/book-turn-away[^;]*\breverse\b/);
+});
+
 // Leaving a game is the same corner in the book look (user feedback, October 2026: every way back turns the page back),
-// with a ✕ on it and held like the ✕ – so a child's tap still can't end the game.
-test("in the book look a game is left by holding the page's corner", () => {
+// with a ✕ on it and held like the ✕ – so a child's tap still can't end the game – in the top left like a menu's, and
+// a game's ⚙️ moves to the top right for it.
+test("in the book look a game is left by holding the page's corner, top left", () => {
   const shell = readFileSync("src/components/GameShell.tsx", "utf8");
   const exit = shell.slice(shell.indexOf("function ExitButton"));
   expect(exit).toContain("useHold(");
@@ -62,6 +73,15 @@ test("in the book look a game is left by holding the page's corner", () => {
   expect(rules.some((r) => r.selector === ".hold-exit .page-corner-art" && /display:\s*none/.test(r.body))).toBe(true);
   expect(rules.some((r) => r.selector === ':root[data-look="book"] .play-area .exit-corner .page-corner-art' && /display:\s*block/.test(r.body))).toBe(true);
   expect(rules.some((r) => r.selector === ':root[data-look="book"] .play-area .exit-corner .hold-exit-sign' && /display:\s*none/.test(r.body))).toBe(true);
+  const placed = (selector: string) => rules.filter((r) => r.selector === selector && /\btop:/.test(r.body));
+  const exitCorner = placed(':root[data-look="book"] .play-area .exit-corner');
+  expect(exitCorner.length).toBe(1);
+  expect(exitCorner[0]?.body).toMatch(/\bleft:\s*max\(/);
+  expect(exitCorner[0]?.body).toMatch(/\bright:\s*auto/);
+  const options = placed(':root[data-look="book"] .play-area .play-options-corner');
+  expect(options.length).toBe(1);
+  expect(options[0]?.body).toMatch(/\bright:\s*max\(/);
+  expect(options[0]?.body).toMatch(/\bleft:\s*auto/);
 });
 
 // The sun is in the top left corner, so the grown-ups' buttons (fullscreen, the home page's options) keep the top right one.
