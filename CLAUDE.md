@@ -287,7 +287,7 @@ In a fresh worktree run `bun install` first.
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
   or in the grown-ups' menus. A new way to start a game calls `countGame()` (GameShell and GameEnd do).
 - Every end of a level or story shows the shared `GameEnd` (`src/components/GameEnd.tsx`): big „Menü“ (back to the
-  current game's own start screen before play, `useLeaveGame()` – never the home page; its picture is four cards,
+  current game's own start screen before play, `useLeaveGame()`, or the page before it for a game without one – never the home page from inside a book; its picture is four cards,
   `MenuIcon`, never a house), „Nochmal“ and „Weiter“ (the next level in the game's order, after the last
   the first, so there is always one). So a start screen has no „all in turn“ card (`GameMode` has no such kind):
   the picked level plays first and „Weiter“ goes on from there. A game with only one level or story leaves „Weiter“ out (`next` is optional):
@@ -313,7 +313,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once; the start screen comes only after ✕ or „Menü“. A game whose menu is
+  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once. When there is still something to choose on its start screen (modes,
+  `level`, settings: Buchstaben & Zahlen), that comes after ✕ or „Menü“; when there is nothing, ✕, Esc and „Menü“ go
+  back to the page before it, the book's table of contents (or the shelf for a game standing apart), never to a start
+  screen with only „Los geht’s!“ (user feedback, October 2026; `GameShell` does it by itself). A game whose menu is
   the page before it (a picture of Lebendige Bilder, its mode chosen in the row on `/bilder/`) has no start screen at all:
   `leaveTo` sends ✕, Esc and „Menü“ back to that page. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or

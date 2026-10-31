@@ -25,7 +25,7 @@ export function ShadowsGame() {
       title={t(SHADOWS_TITLE)}
       emoji="👤"
       // Nothing to choose: the game finds the right difficulty by itself and the pictures are picked while playing, so
-      // its card plays at once; after ✕ the start screen has only „Los geht’s!“.
+      // its card plays at once; ✕ and „Menü“ go back to the table of contents (GameShell), there is no start screen.
       startMode="play"
     >
       <ShadowsPlay settings={settings} />

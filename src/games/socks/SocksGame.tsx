@@ -24,8 +24,8 @@ export function SocksGame() {
     <GameShell
       title={t(SOCKS_TITLE)}
       emoji="🧦"
-      // Nothing to choose: the game finds the right difficulty by itself, so its card plays at once; after ✕ the
-      // start screen has only „Los geht’s!“.
+      // Nothing to choose: the game finds the right difficulty by itself, so its card plays at once; ✕ and „Menü“
+      // go back to the table of contents (GameShell), there is no start screen.
       startMode="play"
     >
       <SocksPlay settings={settings} />

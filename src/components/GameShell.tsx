@@ -5,8 +5,9 @@ import { MenuHead } from "@/components/MenuTop";
 import { PageCornerArt } from "@/components/PageCornerArt";
 import { SeoText } from "@/components/SeoText";
 import { Sky } from "@/components/Sky";
-import { categoryHref, categoryOf } from "@/content/games";
+import { categoryHref, categoryOf, pagesBetween } from "@/content/games";
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
+import { putBookBack } from "@/lib/bookTravel";
 import { useFitGrid } from "@/lib/fitGrid";
 import { enterKidMode, exitKidMode } from "@/lib/fullscreen";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
@@ -15,7 +16,7 @@ import { routineReturn } from "@/lib/routine";
 import { playLullaby, setSfxVolume, unlockAudio } from "@/lib/sfx";
 import { stopSpeaking, unlockSpeech } from "@/lib/speech";
 import { useHold } from "@/lib/hold";
-import { turnPageWith } from "@/lib/look";
+import { isBookLook, turnPageWith } from "@/lib/look";
 import { forwardNearTaps } from "@/lib/tapTargets";
 import { hush as hushVoice, recordedVoice } from "@/lib/voice";
 import goodNightFiles from "./stimme/**/*.mp3?glob";
@@ -66,7 +67,9 @@ interface GameShellProps {
   startMode?: string;
   /**
    * With `startMode`: a game without a start screen of its own, whose menu is the page before it (a picture of
-   * Lebendige Bilder). Leaving the game (✕, Esc, „Menü“) goes there instead.
+   * Lebendige Bilder). Leaving the game (✕, Esc, „Menü“) goes there instead. A game with `startMode` and nothing to
+   * pick (no modes, level or settings) goes back to its category's page (or the shelf) without it: a start screen with
+   * only „Los geht’s!“ is no menu.
    */
   leaveTo?: string;
   /** A level or difficulty choice shown above the mode cards. */
@@ -78,6 +81,15 @@ interface GameShellProps {
   /** Where the start screen's back link leads; by default the game's category on the home menu. */
   backHref?: string;
   backLabel?: string;
+}
+
+/**
+ * Where leaving a game (✕, Esc, „Menü“) goes when it has no start screen worth showing: its `leaveTo`, or `back` (its
+ * category's table of contents, or the shelf) for a game that plays at once with nothing to pick before it. None when
+ * the start screen comes after playing.
+ */
+export function menuAfterPlay(game: Pick<GameShellProps, "startMode" | "leaveTo" | "modes" | "level" | "settings">, back: string) {
+  return game.leaveTo ?? (game.startMode && !game.modes && !game.level && !game.settings ? back : undefined);
 }
 
 /**
@@ -98,6 +110,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
     (category
       ? t(category.title)
       : t({ de: "Alle Spiele", ru: "Все игры", en: "All Games", zh: "全部游戏", hi: "सभी खेल", es: "Todos los juegos", ar: "كل الألعاب" }));
+  const menu = menuAfterPlay({ startMode, leaveTo, modes, level, settings }, back);
   const [playing, setPlaying] = useState(false);
   // The settings panel below the top row: folded away by default, so the start screen stays short.
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -133,12 +146,15 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
     hushVoice();
     // Only the keyboard lock ends: fullscreen stays on, the menus are part of the app too.
     exitKidMode();
-    // In the book look the page turns back from the game to its menu.
-    turnPageWith("back", () => {
+    const leave = () => {
       setPlaying(false);
       if (returnTo) navigate(returnTo, { replace: true });
-      else if (leaveTo) navigate(leaveTo, { replace: true });
-    });
+      else if (menu) navigate(menu, { replace: true });
+    };
+    // In the book look the page turns back from the game to its menu: as many pages as lie between them, or the book
+    // closes and goes back on the shelf.
+    if (!returnTo && menu === "/" && isBookLook()) putBookBack(location.pathname, leave);
+    else turnPageWith("back", leave, !returnTo && menu ? pagesBetween(location.pathname, menu) : 1);
   };
   const stopRef = useRef(stop);
   stopRef.current = stop;
@@ -182,7 +198,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
     started.current = true;
     if (startMode) onMode?.(startMode);
     // Play time is over: no start screen to wait on, so back to the menu, which the lock covers.
-    if (leaveTo && !returnTo && isPlaytimeOver()) navigate(leaveTo, { replace: true });
+    if (menu && !returnTo && isPlaytimeOver()) navigate(menu, { replace: true });
     else void start();
   }, []);
 
@@ -211,7 +227,7 @@ export function GameShell({ title, emoji, modes, mode, onMode, startMode, leaveT
   }
 
   // Nothing to show before the game starts at once, or after it was left.
-  if (leaveTo) return null;
+  if (menu) return null;
 
   /** One mode's card. */
   const card = (m: GameMode) => (
