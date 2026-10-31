@@ -35,8 +35,8 @@
 .room-scene {
   /* The wall round the shelf, and above it the room for the sign with the app's name (it hangs over the top board). */
   --side: max(10px, 1.5vw);
-  --sign: clamp(1.1rem, min(5.4vh, 4.2vw), 3rem);
-  --top: calc(var(--sign) * 1.25 + 10px);
+  --sign: clamp(1.5rem, min(9vh, 6.4vw), 5rem);
+  --top: calc(var(--sign) * 1.4 + 10px);
   --floor: clamp(14px, 5vh, 44px);
   position: relative;
   height: 100dvh;
@@ -500,7 +500,7 @@
   z-index: 1;
   left: 50%;
   translate: -50% 0;
-  padding: 0.12em 0.7em 0.16em;
+  padding: 0.12em 0.7em calc(var(--sign) * 0.2);
   border: clamp(4px, 0.9vh, 8px) solid #9a6a40;
   border-radius: 10px 10px 4px 4px;
   background: linear-gradient(#ffffff80, #0000 30%, #0000 80%, #a0784a26), var(--paper-grain, none), #fbf3df;

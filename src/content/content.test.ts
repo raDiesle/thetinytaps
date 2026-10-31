@@ -197,6 +197,13 @@ describe("the app's name", () => {
     expect(readFileSync("src/components/Bookshelf.tsx", "utf8")).toContain("<Logo ");
   });
 
+  test("the title's o of „Both“ is the picture of Papa Fox reading to his child, and that picture is there", () => {
+    const logo = readFileSync("src/components/Logo.tsx", "utf8");
+    const file = logo.match(/pictures\["([^"]+)"\]/)?.[1];
+    expect(file).toBe("logo-fuchs-o.webp");
+    expect(existsSync(`src/components/bilder/${file}`)).toBe(true);
+  });
+
   test("the old name is gone from what players and search engines see", () => {
     const seen = ["index.html", "public/manifest.webmanifest", ...readdirSync("src", { recursive: true, encoding: "utf8" }).map((f) => `src/${f}`)].filter(
       (file) => /\.(tsx?|html|webmanifest|css)$/.test(file) && !file.includes("/ideas/") && !file.endsWith("research.ts") && !file.endsWith(".test.ts"),
