@@ -104,8 +104,13 @@ test("in the book look the way back onto the shelf is the book's cover, not a pa
   expect(readFileSync("src/components/PageCornerArt.tsx", "utf8")).toMatch(/if \(sign === "shelf"\) return <CoverCornerArt \/>/);
 });
 
-// User decision, October 2026: menus need no „Über das Spiel“. GameShell has no `info`, and no game passes one.
+// User decision, October 2026: menus need no „Über das Spiel“. GameShell has no `info`, no game passes one, and no
+// game's own menu has an ℹ️ panel either (the Belohnungstafel's „Über die Tafel“ went too).
 test("no start screen has an „Über das Spiel“", () => {
+  const panels = readdirSync("src/games", { recursive: true, encoding: "utf8" })
+    .filter((file) => file.endsWith(".tsx"))
+    .filter((file) => readFileSync(join("src/games", file), "utf8").includes('emoji="ℹ️"'));
+  expect(panels).toEqual([]);
   expect(readFileSync("src/components/GameShell.tsx", "utf8")).not.toMatch(/\binfo\?:/);
   const games = readdirSync("src/games", { recursive: true, encoding: "utf8" })
     .filter((file) => file.endsWith(".tsx"))

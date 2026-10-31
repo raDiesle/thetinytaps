@@ -122,16 +122,6 @@
   gap: 10px;
 }
 
-/* The Belohnungstafel's „Über die Tafel“ panel: paragraphs of text for grown-ups. */
-.game-info {
-  gap: 14px;
-  line-height: 1.45;
-}
-
-.game-info p {
-  margin: 0;
-}
-
 .settings-summary-note {
   padding: 0 10px;
   border-radius: 999px;

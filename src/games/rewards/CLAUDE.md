@@ -69,12 +69,13 @@ targets) – keep it that way.
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars;
   `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
-  `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Info.tsx` – „ℹ️ Über die Tafel“ and „Über den
-  Plan“; `RewardsGame.tsx` – the page for boards and plans (above).
+  `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `RewardsGame.tsx` – the page for boards and plans
+  (above). There is no „ℹ️ Über die Tafel“ or „Über den Plan“ (removed with every menu's „Über das Spiel“, user
+  decision, October 2026): the chart explains itself by its pictures, the wizard and „Gestalten“.
 - `pictures.tsx` – the pictures of `bilder/` in place of the catalogue's emoji (`ItemPic`, `MarkPic`, `Pic`): tasks,
   plan cards, rewards and marks on screen, in the wizard and the editor's chips, on paper and on the photo prints
   (`PhotoCard.picture`, drawn on the canvas); Tapsi celebrating (`fest`) at a party without a reward and at the end of a
-  plan, Tapsi with the star (`stern-halten`) in „Über die Tafel“, a theme's strip (`SheetStrip`) along the top of a
+  plan, Tapsi with the star (`stern-halten`, unused since „Über die Tafel“ went, waiting for a new place), a theme's strip (`SheetStrip`) along the top of a
   colour print, and the `-linie` twins on grey prints. An `<img class="rw-pic">` takes its size from the font size the
   emoji had (`1.2em`, more where there is room). `tafel.webp` waits for pages with their own og:image (idea V-10).
 - `bilder/prompts.ts` – every picture of the chart as its Gemini prompt (made on 30 October 2026, shown on

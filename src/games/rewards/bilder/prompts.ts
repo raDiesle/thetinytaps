@@ -226,7 +226,7 @@ export const REWARDS_PICTURE_PROMPTS: PicturePromptSet = withPictures({
         {
           id: "stern-halten",
           file: `${DIR}/stern-halten.webp`,
-          use: "Der große Stern, den das Kind antippt, gehalten von Tapsi; auch Kopf von „Über die Tafel“",
+          use: "Der große Stern, den das Kind antippt, gehalten von Tapsi",
           prompt: `${REF_ONLY}${STYLE} ${TAPSI}, holds a big shining golden star high above its head with both paws, proud and happy. Tapsi is the only character.`,
           options: "--transparent --size 768",
           ref: [TAPSI_REF],

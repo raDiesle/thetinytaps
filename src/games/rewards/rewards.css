@@ -1045,14 +1045,6 @@
   object-fit: cover;
 }
 
-.rw-info-picture {
-  float: right;
-  width: 7rem;
-  height: 7rem;
-  margin: 0 0 0.5rem 1rem;
-  object-fit: contain;
-}
-
 .rw-head {
   display: flex;
   flex-wrap: wrap;

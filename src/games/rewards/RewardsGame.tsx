@@ -24,7 +24,6 @@ import {
 } from "./catalog";
 import { Editor } from "./Editor";
 import { TemplateGallery } from "./Gallery";
-import { BoardInfo, PlanInfo } from "./Info";
 import { loadLinkedDays } from "./linked";
 import { PanelButton, PRINT, useComputer, VIEW } from "./pageParts";
 import { type Plan, parseRoutineStep, restartDay } from "./plan";
@@ -57,7 +56,7 @@ const DESIGN: Localized = { de: "Gestalten", en: "Design", zh: "设计", hi: "�
 /** „🧩 Vorlagen“: beside the chart, and the button where there is no room for it. */
 const TEMPLATES_LABEL: Localized = { de: "Vorlagen", en: "Templates", zh: "模板", hi: "टेम्पलेट", es: "Plantillas", ar: "القوالب", ru: "Шаблоны" };
 
-type Panel = "info" | "edit" | "print" | "review";
+type Panel = "edit" | "print" | "review";
 
 /** The main views of a board: the same stars for a day, a week or a month. Collecting stands apart in the switch. */
 const MAIN_KINDS = KINDS.filter((k) => k.id !== "collect");
@@ -158,7 +157,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   // On a computer the panels are always open below the chart: the buttons on top only scroll there.
   const toggle = (which: Panel) => {
     setWizard(null);
-    if (computer && which !== "info" && which !== "review") document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (computer && which !== "review") document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
     else setPanel(panel === which ? null : which);
   };
   const openWizard = (start?: WizardStart) => {
@@ -293,32 +292,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
           {/* While the wizard is open, nothing on top belongs to the chart behind it. */}
           {!wizard && (
             <div className="panel-buttons">
-              <PanelButton
-                open={panel === "info"}
-                onClick={() => toggle("info")}
-                emoji="ℹ️"
-                label={
-                  type === "board"
-                    ? t({
-                        de: "Über die Tafel",
-                        en: "About the chart",
-                        zh: "关于奖励表",
-                        hi: "इनाम चार्ट के बारे में",
-                        es: "Sobre la tabla",
-                        ar: "عن اللوحة",
-                        ru: "О таблице",
-                      })
-                    : t({
-                        de: "Über den Plan",
-                        en: "About the plan",
-                        zh: "关于日程表",
-                        hi: "योजना के बारे में",
-                        es: "Sobre el plan",
-                        ar: "عن الخطة",
-                        ru: "О плане",
-                      })
-                }
-              />
               <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t(DESIGN)} />
               <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t(PRINT)} />
               {review && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t(REVIEW)} />}
@@ -397,7 +370,6 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
           </div>
         )}
 
-        {panel === "info" && (type === "board" ? <BoardInfo /> : <PlanInfo />)}
         {!computer && panel === "edit" && !wizard && editor}
         {main}
       </div>
