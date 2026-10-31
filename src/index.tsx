@@ -9,11 +9,10 @@ import { SeoHead } from "./components/SeoHead";
 import { applySavedFigure } from "./lib/common";
 import { loadAppLanguage } from "./lib/language";
 import { applyLook } from "./lib/look";
+import { routerBase } from "./lib/pageAddress";
 import { downloadMusicIfOn } from "./lib/musicFile";
 import { setUpPwa } from "./lib/pwa";
-import "@fontsource-variable/fredoka";
 import "./globals.css";
-import { BASE_URL } from "@/lib/buildInfo";
 
 setUpPwa();
 downloadMusicIfOn();
@@ -25,7 +24,7 @@ await loadAppLanguage();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <BrowserRouter basename={BASE_URL}>
+    <BrowserRouter basename={routerBase()}>
       <App />
       <PlaytimeLock />
       <ScreenHint />

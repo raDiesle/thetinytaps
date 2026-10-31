@@ -2,6 +2,7 @@ import { useSyncExternalStore } from "react";
 import { type TargetLanguage, type TargetLanguageId, targetLanguageFor } from "@/content/targetLanguages";
 import { hasTexts, loadTexts } from "@/content/texts";
 import { playLanguage } from "@/lib/locale";
+import { addressLanguage } from "@/lib/pageAddress";
 import { keepTextsOffline } from "@/lib/pwa";
 
 // The language of the whole app, chosen once on the home page: the grown-ups'
@@ -30,7 +31,7 @@ function load(): TargetLanguageId {
   } catch {
     // Storage unavailable: the default below.
   }
-  return playLanguage(APP_LANGUAGES);
+  return playLanguage(APP_LANGUAGES, undefined, undefined, addressLanguage());
 }
 
 let current = load();

@@ -1,6 +1,6 @@
 ---
 name: musik-erzeugen
-description: Background music for a The Tiny Taps game made with Suno – write the copy-paste texts for suno.com, then measure the song the user downloads (tempo, parts), convert it and build it into the game so it loops, follows pause and jumps and gets quiet while the voice speaks. Use when the user wants music, a song or Musik for a game, mentions Suno, or hands over a WAV/MP3 from Suno.
+description: Background music for a Books for Both game made with Suno – write the copy-paste texts for suno.com, then measure the song the user downloads (tempo, parts), convert it and build it into the game so it loops, follows pause and jumps and gets quiet while the voice speaks. Use when the user wants music, a song or Musik for a game, mentions Suno, or hands over a WAV/MP3 from Suno.
 ---
 
 # Music with Suno

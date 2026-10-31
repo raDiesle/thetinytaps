@@ -1,6 +1,6 @@
-# The Tiny Taps – notes for Claude
+# Books for Both – notes for Claude
 
-Keyboard and touch games for toddlers (2–3 years). A React 19 single-page app
+Keyboard and touch games for toddlers. A React 19 single-page app
 built and served by Bun, deployed to GitHub Pages, works offline (PWA). No backend.
 
 ## Commands (always Bun, never npm, yarn or npx)
@@ -12,6 +12,7 @@ bun test           # unit tests only (bun test, < 1 s); bun test --watch while w
 bun run build      # production build into out/ (tools/build.ts) – never `bun build`, that is Bun's bare bundler
 bun run image ...  # picture with Gemini, see /bild-erzeugen
 bun run song ...   # measure a song from Suno, see /musik-erzeugen
+bun run perf ...   # how smoothly the games run on a ten-year-old Android phone, see Language and style
 bun run frames     # do the two frames of each moving picture stay the same scene? --scenes: every picture of a story
 ```
 
@@ -41,7 +42,10 @@ In a fresh worktree run `bun install` first.
   is done: `bun run verify`, commit on the branch, merge into **local** `main` without asking,
   never push (and don't offer to – pushing is the user's move). Each session may run a dev server on its own
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
-  the user once checked another session's server by mistake.
+  the user once checked another session's server by mistake. Look at that server before naming it: a running dev server
+  does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
+  or new exports between modules (a reload still threw „plannerDefaults is not a function“),
+  so when it still shows the old state, say it must be restarted (`bun run dev` in the repo root) instead of handing over a stale URL.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
   Before building something bigger in a game, merge local `main` into your branch and read the game's latest
@@ -69,7 +73,7 @@ In a fresh worktree run `bun install` first.
   built, set `done: true` (or `partial`) there; an idea the user turns down gets `rejected: true` (kept, never deleted).
   An idea round only collects – the user decides later what to implement, so don't offer to implement
   after one (say „umsetzen“, not the ambiguous „bauen“).
-- The hidden page `/management/` (hold the „p“ in the home title; `/ideen/` is its old address) is where
+- The hidden page `/management/` (hold fox and bear in the home title, `Logo`; `/ideen/` is its old address) is where
   everything goes that helps the user decide: ideas, the language table, and research. Research (searches,
   market or keyword analyses, measurements) is written into `src/content/research.ts` with its date, method,
   findings and the ideas it led to – not only told in chat. `content.test.ts` checks that its ideas and games exist.
@@ -119,7 +123,10 @@ In a fresh worktree run `bun install` first.
   letters take the letter at their place on that language's keyboard: Cyrillic at ЙЦУКЕН (`cyrillicKeys.ts`),
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
-  in `base.css`) while pictures and layout stay as they are. Only the management page and the SEO pages stay German.
+  in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines are German and English (see Search engines).
+- Texts for parents (the home page's foot, `info`, the SEO texts' prose) speak as the parents who made the app: warm,
+  flowing sentences in our own words, the way one parent tells another. The user's notes on what to say are a rough
+  guide, never wording to copy or to turn into a list of steps (user feedback, October 2026).
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
   type, field and function has a short `/** … */`. Match that density.
 - Names are English (`ScenePlay`, `useGameSettings`); folder and route names of games
@@ -134,7 +141,26 @@ In a fresh worktree run `bun install` first.
   Phones must keep up: what moves across a big picture as a whole (a scrolling world, a camera) is an HTML layer of its
   own (its own svg in a `div` with `will-change: transform`), never a moved group inside one big svg, which the browser
   paints whole again in every frame; and a big still drawing is built once (`useMemo`, `memo`), not again with every
-  tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this).
+  tick, step or key (Zähne putzen and Kleine Abenteuer both stuttered on phones from this). What moves on every frame
+  moves by CSS (`transform`, `opacity` of an HTML layer), never by React drawing it again per frame, and only what the
+  child is busy with moves (waiting figures stand still). `bun run perf` measures it: it plays each game in headless
+  Chrome as a ten-year-old Android phone (6× slower CPU, 640×360 at 3× pixels) and fails a stretch over the budget
+  (`tools/perfScenarios.ts`: p95 frame ≤ 34 ms, ≤ 0.5 frames over 50 ms a second, main thread ≤ 60 % busy). A new game,
+  or a new part that moves a lot, gets a scenario there; run it after changing what moves (`bun run perf <name>`,
+  `--profile` names the functions that cost, `--shots` shows what was measured). The build ships React's production code
+  (`PRODUCTION` in `tools/appPlugin.ts`, checked in `buildTools.test.ts`): without it every game ran several times slower.
+  A scheduled task on the user's Mac (`tinytaps-perf-weekly`, Mondays) measures every game, keeps the numbers in
+  `tools/perf-history/<date>.json` to compare with the week before, and turns a game over budget or clearly worse into
+  an idea „Leistung: <Spiel> …“ in `src/content/ideas/a-all-games.ts` – the user picks it, the run fixes nothing.
+- **The app's mascots are the fox and the bear** (Tapsi is a fox, the book's readers are a fox and a bear family; user
+  decision, October 2026 – the fox alone was dropped with the address toddlerfox.com): they come back as a motif in
+  every game, so a child finds them again everywhere – a fox or bear grown-up instead of a drawn person here and there
+  (the baker, the doctor, the driver), a fox or bear child peeking out of the background, the two cheering at the end.
+  Not in every corner and not both everywhere: people may stay, and a bear is as welcome as a fox (never turn a bear
+  into a fox). Animals that are a game's subject (the farm's cow, the Gefühle animals) stay what they are. Games get them
+  step by step from the table „🦊🐻 Fuchs & Bär“ on `/management/` (`src/content/ideas/mascotStatus.ts`, area D): a game
+  that gets its fox or bear marks it there in the same commit, and a new game or picture adds its row or task.
+  Pictures from Gemini wait there and are made together in one batch when the user asks, since a batch costs less.
 - TypeScript is strict with `noUnusedLocals`/`noUnusedParameters`: delete what is no
   longer used instead of leaving it around.
 - Formatting is Biome's (`biome.json`, 160 columns): don't format by hand, run
@@ -202,15 +228,20 @@ In a fresh worktree run `bun install` first.
   round arrow without words (its target only as tooltip and read out, `MenuTop`), right next to the title on its left, close to the
   cards – never far off in the screen's corner, where grown-ups on a big monitor didn't find it (biggest on a computer). A
   menu's title goes into `MenuHead`, which puts the way back beside it and the fullscreen button on the right. In the
-  book look the way back is instead the page's turned-up corner in the top right (`PageCorner`, user decision, October
-  2026) – where a reader turns a page back, so it is found there – with the fullscreen button left of it and the round
-  arrow hidden (`MenuTop.test.ts`); nothing else goes into that corner. Every way back in the book look is that corner:
-  while playing, the ✕ held to leave is the same corner at the page's top right with a ✕ on it (`PageCornerArt`), held
-  just like the ✕ – it lifts further while held instead of a ring filling – with the fullscreen button and „Zurück zum
-  Menü · halten“ left of it, clear of the room it lifts into (user feedback, October 2026).
-- No menu level more than needed: a home category with one game opens that game directly (`categoryHref`, checked
-  in `content.test.ts`); a category of a few games that stand apart (`onHome`: „Weitere“) has no card and no page of its
-  own, its games stand right on the home page on a frame named after it, like a game's sorts below; and variants of one way to play (which words, how long, whole word or first letter) are
+  book look the way back is instead the corner of the page before, standing up at the spine in the page's top left
+  (`PageCorner`, user feedback, October 2026), and a tap turns that very page back over to the right: what is touched must
+  be what moves, like a real book – a corner in the top right turned the other page, and grown-ups didn't look there for
+  the way back. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
+  else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ held to leave is the
+  same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held
+  instead of a ring filling – with the fullscreen button and „Zurück zum Menü · halten“ right of it, clear of the room it
+  lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it.
+- The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
+  toy look a card per category): one first picks a book, and only inside it, on its page, do its games stand on the
+  pasted-in cards (with tape and page numbers) – never games or levels on the shelf page itself, and no category whose
+  games stand on the home page (the old „Weitere“ frame is the book „Für jeden Tag“). A new category is a new book.
+- No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
+  in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
   plays at once, options while playing behind ⚙️ held in the top left corner like ✕ (`PlayOptions`, Buchstaben & Zahlen),
   never a tap a child could make by chance.
@@ -313,14 +344,15 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   whose cards open lazy pages does the same.
 - **The app looks like a picture book a grown-up and a child read together** (A-20, area D on `/management/`; `?buch=aus`
   brings back the old toy-block look, `src/lib/look.ts`): a cover to open on the first visit to the home page
-  (`BookCover`, shown once per visit – `sessionStorage` – and only on the home page), the home page as the
-  contents page with page numbers, paper and softened colours, and the game's picture inside the page's paper margin
+  (`BookCover`, „Books for Both“, shown once per visit – `sessionStorage` – and only on the home page), the home
+  page as a bookshelf drawn on the page (a tapped book comes out towards the reader, then the page turns into it), each
+  book's page with its games' page numbers, paper and softened colours, and the game's picture inside the page's paper margin
   (`.book-frame`). All of it is CSS under `:root[data-look="book"]` in `src/styles/book.css`; games don't style for it.
   It should look real, not flat (user feedback, October 2026): the closed book lies on a wooden table seen at a slant,
   drawn in 3D with its boards, page edges and shadow, and its cover swings open slowly before the book comes close; the
   open page lies on the book's cloth-covered board, lit from above. The cover's picture (`bilder/buch-cover.webp`) shows
-  one family of each: a fox parent with a fox child and a bear parent with a bear child, one of the children a boy and
-  one a girl – never a third grown-up or a child too many (user feedback, October 2026).
+  one family of each mascot: a fox parent with a fox child and a bear parent with a bear child, one of the children a
+  boy and one a girl – never a third grown-up or a child too many (user feedback, October 2026).
   Every change of page turns a page: a new menu link uses `useTurnPage(to, direction)`, a game starting or ending (or
   any other change of screen) goes through `turnPageWith(direction, update)` – forward into a menu or game, back out of
   one. A page takes its time to turn, as a grown-up turns it for a child (`TURN_SECONDS`, at least 1.5 s, its sound landing
@@ -333,20 +365,51 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   left and hiding where too little is: never pushing or covering a button. On a phone the home page's title moves up into
   that row, top left, and its buttons for grown-ups become round signs without words (name as tooltip, read out, on top
   of the menu they open), so the cards keep the room. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; the fullscreen
-  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of animal parents with their children (the fox and bear
-  families beside the menu's cards) show that the book is read together: they only go where there is room, never over a
+  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
+  children beside the menu's cards (`BookFamily`) show that the book is read together: they only go where there is room, never over a
   card or button. Nothing idles: the sky's clouds and rays stand still in the book.
+  Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
+  or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
+  with the child at the centre. Wherever they turn up (a menu, a game, an idea in `d-book.ts` or `mascotStatus.ts`), the
+  child does the thing (taps, brushes, blows, peeks out) and the grown-up is beside it, watching, helping, cheering; only
+  a fox or bear in a role (the baker, the doctor) stands alone. The cover keeps its two families (above).
 - Each home category has a world of its own (`src/components/Worlds.tsx`): its page and its games' start screens show
   it behind the cards (`Sky` finds it from the address), its cards come in its family of colours (`data-world`), and its
-  home card shows a piece of it under the collage of its games. A new category draws its world (`content.test.ts` checks).
+  book's cover on the shelf (the toy look's home card) shows a piece of it. A new category draws its world (`content.test.ts` checks).
   Every card has a `blurb`: one short line for grown-ups, shown only on tablets and computers with room for it.
 - A new game needs: folder, page, route in `App.tsx`, entry in `CATEGORIES`
-  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` – use `/neues-spiel`.
+  (`src/content/games.ts`, with its `blurb`), a row in `src/content/ideas/languageStatus.ts`, an entry in `src/content/seo.ts` and its English in `seo.en.ts` – use `/neues-spiel`.
+- The app is called „Books for Both“ and lives at booksforboth.com (bought October 2026; toddlerfox.com and funforboth.com
+  only redirect there; until then it was „The Tiny Taps“, whose `tinytaps.` storage keys stay so nothing saved is lost).
+  The name is `SITE_NAME` in `seo.ts` and the same in every language; title, cover, manifest and `index.html` say it
+  (`content.test.ts` checks). Its name and addresses never say „toddler“ or „baby“ (user decision, October 2026: offering screen games expressly for small
+  children is delicate) – the age may stand in page texts, where parents search for it, never in a name.
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
-  (checked by `content.test.ts`). The build writes an own `index.html` per entry (GitHub Pages would answer
-  with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title and head in step
-  (`useTitle`, `SeoHead`). Texts say only what the page really does. Heavy downloads (service worker copy,
+  and in English in `seo.en.ts` (the English pages are part of being found, A-22, so a new entry gets its English
+  line in the same commit, unlike other translations; `content.test.ts` checks both). The build writes an own
+  `index.html` per entry and language – German at `/zaehne/`, English at `/en/zaehne/`, joined by hreflang (GitHub
+  Pages would answer with 404.html and status 404, which Google skips), plus `sitemap.xml`; the app keeps title
+  and head in step (`useTitle`, `SeoHead`). Under `/en/` the router runs below the prefix (`routerBase()`,
+  `src/lib/pageAddress.ts`), so links stay in English pages and routes need no change; players still get their
+  browser's language. Texts say only what the page really does. No text names an age the app is for („ab 2“,
+  „2- bis 3-Jährige“, „Ages 2+“; „Kleinkinder“, „toddlers“ are fine): each family decides when its child starts with
+  screens, which the home page's foot („Ein paar Worte von uns“) tells: the real world first, then a screen together,
+  later a learning game alone, plain watching least – Books for Both meant as that first step together (user
+  decision, October 2026; `content.test.ts` checks). Google reads the page after the app ran, in an
+  English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
+  a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
+  it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
+  panel of its own; a new menu page does the same. Pages that must stay out of results get a
+  `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
+  `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).
+- Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
+  repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
+  cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
+- Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked next to the version
+  below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
+  stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung
+  and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work

@@ -1,11 +1,11 @@
 import { Slider } from "@/components/SettingControls";
 import { type Localized, useT } from "@/lib/language";
-import { type Board, type BoardTask, COLLECT_GOALS, fieldCount, MAX_TASKS, rewardFromCatalog, taskFromCatalog, withKind } from "./board";
+import { type Board, type BoardTask, COLLECT_GOALS, fieldCount, MAX_TASKS, rewardFromCatalog, taskFromCatalog } from "./board";
 import { useTaskLabel } from "./BoardSheet";
-import { KINDS, MARKS, REWARDS, TASKS, THEMES } from "./catalog";
+import { MARKS, REWARDS, TASKS, THEMES } from "./catalog";
 import { SlotChips } from "./Editor";
 import { Thumb } from "./Gallery";
-import { CHILD_NAME, COLORS, LOOK, NAME_EXAMPLE, Pick, VIEW } from "./pageParts";
+import { CHILD_NAME, COLORS, LOOK, NAME_EXAMPLE, Pick } from "./pageParts";
 import { ItemPic, MarkPic, Pic, picture } from "./pictures";
 import type { WizardStep } from "./Wizard";
 
@@ -25,17 +25,16 @@ const MARK_QUESTION: Localized = {
   ru: "Что будет в клеточках?",
 };
 
-/** A board's own steps in the wizard, after the kind and the Vorlage. */
+/** A board's own steps in the wizard, after the kind, the view and the Vorlage. */
 export const BOARD_STEPS: WizardStep[] = [
-  { id: "kind", label: VIEW },
   { id: "tasks", label: TASKS_LABEL },
   { id: "goal", label: REWARD },
   { id: "look", label: LOOK },
 ];
 
 /**
- * One of a board's steps in the wizard, every choice as a picture: the views as the board in each of them, tasks,
- * rewards and marks as big picture cards, the colours as the board in each colour.
+ * One of a board's steps in the wizard, every choice as a picture: tasks, rewards and marks as big picture cards, the
+ * colours as the board in each colour.
  */
 export function BoardStep({ step, board, onChange }: { step: string; board: Board; onChange: (board: Board) => void }) {
   const t = useT();
@@ -49,46 +48,6 @@ export function BoardStep({ step, board, onChange }: { step: string; board: Boar
     if (own) change({ tasks: board.tasks.filter((task) => task !== own) });
     else if (board.tasks.length < MAX_TASKS) change({ tasks: [...board.tasks, taskFromCatalog(catalogId)] });
   };
-
-  if (step === "kind")
-    return (
-      <>
-        <h2>
-          {t({
-            de: "Wie lange geht die Tafel?",
-            en: "How long does the chart run?",
-            zh: "奖励表用多久？",
-            hi: "चार्ट कितने समय का हो?",
-            es: "¿Cuánto dura la tabla?",
-            ar: "ما مدة اللوحة؟",
-            ru: "На какой срок таблица?",
-          })}
-        </h2>
-        <div className="rw-picks">
-          {KINDS.map((kind) => (
-            <Pick
-              key={kind.id}
-              selected={kind.id === board.kind}
-              onClick={() => onChange(withKind(board, kind.id))}
-              picture={<Thumb board={withKind(board, kind.id)} />}
-              label={`${kind.emoji} ${t(kind.label)}`}
-              hint={t(kind.hint)}
-            />
-          ))}
-        </div>
-        <p className="setting-note">
-          {t({
-            de: "Tag, Woche und Monat zeigen dieselben Sterne – oben über der Tafel lässt sich jederzeit umschalten. Für Zweijährige ist ein Tag oder ein kurzer Weg mit 5 Sternen oft genug.",
-            en: "Day, week and month show the same stars – you can switch at any time above the chart. For two-year-olds, a day or a short path of 5 stars is often enough.",
-            zh: "日、周、月显示的是同样的星星——随时可以在奖励表上方切换。对两岁的孩子来说，一天或一条只有5颗星的短路往往就够了。",
-            hi: "दिन, हफ़्ता और महीना एक ही सितारे दिखाते हैं – चार्ट के ऊपर कभी भी बदला जा सकता है। दो साल के बच्चों के लिए एक दिन या 5 सितारों वाला छोटा रास्ता अक्सर काफ़ी होता है।",
-            es: "Día, semana y mes muestran las mismas estrellas: puede cambiar en cualquier momento encima de la tabla. Para niños de dos años, un día o un camino corto de 5 estrellas suele bastar.",
-            ar: "اليوم والأسبوع والشهر تعرض النجوم نفسها – يمكن التبديل في أي وقت أعلى اللوحة. للأطفال في عمر سنتين يكفي غالبًا يوم واحد أو طريق قصير من 5 نجوم.",
-            ru: "День, неделя и месяц показывают одни и те же звёзды – переключить можно в любой момент над таблицей. Двухлеткам часто хватает одного дня или короткого пути из 5 звёзд.",
-          })}
-        </p>
-      </>
-    );
 
   if (step === "tasks")
     return (

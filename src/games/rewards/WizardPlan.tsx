@@ -1,17 +1,16 @@
 import { useState } from "react";
 import { type Localized, useT } from "@/lib/language";
 import { weekday } from "./board";
-import { ACTIVITIES, DAY_NAMES, PLAN_VIEWS, TASKS, THEMES } from "./catalog";
-import { CHILD_NAME, COLORS, LOOK, NAME_EXAMPLE, Pick, VIEW } from "./pageParts";
+import { ACTIVITIES, DAY_NAMES, TASKS, THEMES } from "./catalog";
+import { CHILD_NAME, COLORS, LOOK, NAME_EXAMPLE, Pick } from "./pageParts";
 import { ItemPic } from "./pictures";
 import { MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, withSame, withSteps } from "./plan";
 import { PlanThumb } from "./PlanGallery";
 import { useStepLabel } from "./PlanSheet";
 import type { WizardStep } from "./Wizard";
 
-/** A plan's own steps in the wizard, after the kind and the Vorlage. */
+/** A plan's own steps in the wizard, after the kind, the view and the Vorlage. */
 export const PLAN_STEPS: WizardStep[] = [
-  { id: "view", label: VIEW },
   { id: "cards", label: { de: "Bilder", en: "Pictures", zh: "图片", hi: "तस्वीरें", es: "Imágenes", ar: "الصور", ru: "Картинки" } },
   { id: "look", label: LOOK },
 ];
@@ -34,8 +33,8 @@ const WHICH_DAYS: Localized = { de: "Welche Tage?", en: "Which days?", zh: "哪�
 const OFFERED = [...ACTIVITIES, ...TASKS];
 
 /**
- * One of a plan's steps in the wizard, every choice as a picture: the views as the plan in each of them, the cards of
- * a day as a row in their order with big picture cards to add, the colours as the plan in each colour.
+ * One of a plan's steps in the wizard, every choice as a picture: the same day every day or one for each weekday, the
+ * cards of a day as a row in their order with big picture cards to add, the colours as the plan in each colour.
  */
 export function PlanStepView({ step, plan, onChange }: { step: string; plan: Plan; onChange: (plan: Plan) => void }) {
   const t = useT();
@@ -55,32 +54,20 @@ export function PlanStepView({ step, plan, onChange }: { step: string; plan: Pla
     else if (steps.length < MAX_STEPS) setSteps([...steps, stepFromCatalog(catalogId)]);
   };
 
-  if (step === "view")
+  if (step === "cards")
     return (
       <>
         <h2>
           {t({
-            de: "Was soll der Plan zeigen?",
-            en: "What should the plan show?",
-            zh: "日程表要显示什么？",
-            hi: "योजना में क्या दिखे?",
-            es: "¿Qué debe mostrar el plan?",
-            ar: "ماذا تعرض الخطة؟",
-            ru: "Что показывать в плане?",
+            de: "Was kommt nacheinander?",
+            en: "What comes in what order?",
+            zh: "按什么顺序来？",
+            hi: "क्या किसके बाद आता है?",
+            es: "¿Qué viene después de qué?",
+            ar: "ما الذي يأتي بالترتيب؟",
+            ru: "Что за чем идёт?",
           })}
         </h2>
-        <div className="rw-picks">
-          {PLAN_VIEWS.map((view) => (
-            <Pick
-              key={view.id}
-              selected={view.id === plan.view}
-              onClick={() => onChange({ ...plan, view: view.id })}
-              picture={<PlanThumb plan={{ ...plan, view: view.id }} />}
-              label={`${view.emoji} ${t(view.label)}`}
-              hint={t(view.hint)}
-            />
-          ))}
-        </div>
         <h3 className="rw-wizard-sub">{t(WHICH_DAYS)}</h3>
         <div className="rw-picks rw-picks-tiles" role="group" aria-label={t(WHICH_DAYS)}>
           <Pick
@@ -112,34 +99,6 @@ export function PlanStepView({ step, plan, onChange }: { step: string; plan: Pla
             })}
           />
         </div>
-        <p className="setting-note">
-          {t({
-            de: "„Tag“ und „Woche“ lassen sich auch später oben über dem Plan umschalten. Eine Routine ist meist jeden Tag gleich, ein Tag mit Kita nicht.",
-            en: "You can switch between day and week later too, above the plan. A routine is usually the same every day; a day with daycare is not.",
-            zh: "之后也可以在日程表上方切换按天或按周显示。日常习惯通常每天都一样，上幼儿园的日子则不同。",
-            hi: "दिन और हफ़्ते के बीच बाद में भी योजना के ऊपर बदला जा सकता है। रोज़ का क्रम आमतौर पर हर दिन एक जैसा होता है, प्लेस्कूल वाला दिन नहीं।",
-            es: "Más adelante también puede cambiar entre día y semana encima del plan. Una rutina suele ser igual cada día; un día de guardería, no.",
-            ar: "يمكن لاحقًا أيضًا التبديل بين اليوم والأسبوع أعلى الخطة. الروتين غالبًا متشابه كل يوم، أما يوم الحضانة فلا.",
-            ru: "Переключать день и неделю можно и потом, над планом. Распорядок обычно каждый день одинаковый, а день с садиком – нет.",
-          })}
-        </p>
-      </>
-    );
-
-  if (step === "cards")
-    return (
-      <>
-        <h2>
-          {t({
-            de: "Was kommt nacheinander?",
-            en: "What comes in what order?",
-            zh: "按什么顺序来？",
-            hi: "क्या किसके बाद आता है?",
-            es: "¿Qué viene después de qué?",
-            ar: "ما الذي يأتي بالترتيب؟",
-            ru: "Что за чем идёт?",
-          })}
-        </h2>
         {!plan.same && (
           <div
             className="rw-chips pl-day-chips"

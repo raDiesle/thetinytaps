@@ -1,6 +1,6 @@
-# The Tiny Taps
+# Books for Both
 
-Simple keyboard and touch games for toddlers (2–3 years), German first.
+Simple keyboard and touch games for toddlers, German first.
 
 ## Development
 
@@ -15,9 +15,16 @@ bun run preview    # serve the built site like GitHub Pages (tools/preview.ts)
 ```
 
 Pushing to `main` deploys to GitHub Pages via `.github/workflows/deploy.yml`
-(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **toddlerfox.com**, Enforce HTTPS).
-The domain is registered at Cloudflare; its DNS records are `tools/toddlerfox.com.zone` (import it under
+(repo settings → Pages → Source: **GitHub Actions**, Custom domain: **booksforboth.com**, Enforce HTTPS).
+The domain is registered at Cloudflare; its DNS records are `tools/booksforboth.com.zone` (import it under
 DNS → Records → Import, without „Proxy imported DNS records“, so GitHub can issue the HTTPS certificate).
+toddlerfox.com (the address until October 2026) and funforboth.com only redirect: import
+`tools/redirect-<domain>.zone` *with* „Proxy imported DNS records“ (delete the old GitHub records first), then
+Rules → Redirect Rules → a rule for all incoming requests, dynamic target
+`concat("https://booksforboth.com", http.request.uri.path)`, status 301, preserve query string.
+Visits are counted with Cloudflare Web Analytics (no cookies): Cloudflare → Analytics & Logs → Web Analytics →
+Add a site (booksforboth.com), manual setup, and its site token as the repository variable `CF_BEACON_TOKEN` (repo settings →
+Secrets and variables → Actions → Variables); without it the build counts nothing.
 
 Use **Bun** (not npm or yarn) for everything: installing, scripts, tests, bundling, dev server; dependencies are locked in `bun.lock`.
 `bunfig.toml` keeps installs safe: only the public npm registry, only versions at least 3 days old, no install scripts.
@@ -51,7 +58,7 @@ where its parts are. Skills in `.claude/skills/`: `/neues-spiel`, `/neue-szene`,
 | `src/games/shadows/` | Game „Schatten finden“: find the shadow of a picture; also hosts „Wer schaut da raus?“. Details in its [`CLAUDE.md`](src/games/shadows/CLAUDE.md) |
 | `src/games/socks/` | Game „Socken-Paare“: socks tumble out of the washing machine, two same ones hop onto the line. Details in its [`CLAUDE.md`](src/games/socks/CLAUDE.md) |
 | `src/games/potty/` | Game „Aufs Töpfchen“: an animal goes to the potty, one tap per step; „Hat geklappt!“ gives a star. Details in its [`CLAUDE.md`](src/games/potty/CLAUDE.md) |
-| `src/games/rewards/` | „Sterne & Tagesplan“: one page for the Belohnungstafel (a reward chart grown-ups design freely, stars on screen, printable as A4) and the Tagesplan (`/tagesplan/`, the day and week in picture cards to tick off and print), both made with one wizard that shows every choice as a picture. Details in its [`CLAUDE.md`](src/games/rewards/CLAUDE.md) |
+| `src/games/rewards/` | „Belohnungstafel & Tagesplan“: one page for the Belohnungstafel (a reward chart grown-ups design freely, stars on screen, printable as A4) and the Tagesplan (`/tagesplan/`, the day and week in picture cards to tick off and print), both made with one wizard that shows every choice as a picture. Details in its [`CLAUDE.md`](src/games/rewards/CLAUDE.md) |
 | `src/games/teeth/` | Game „Zähne putzen“: brushing timer with a 3D mouth and brush. Details in its [`CLAUDE.md`](src/games/teeth/CLAUDE.md) |
 | `src/games/loud/` | Game „Laut und leise“: the microphone's loudness moves lion and mouse; „Pusten“. Details in its [`CLAUDE.md`](src/games/loud/CLAUDE.md) |
 | `src/games/feelings/` | Game „Gefühle“: comfort the bear, kindergarten stories with picture choices. Details in its [`CLAUDE.md`](src/games/feelings/CLAUDE.md) |

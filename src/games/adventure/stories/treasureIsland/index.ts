@@ -22,6 +22,7 @@ import {
   sitProgress,
 } from "../../three/clips";
 import { GUIDE_SIZE, type Guide } from "../../three/guide";
+import { updateMoved } from "../../three/matrices";
 import { PADDLE_REACH, TURTLE_BACK, TURTLE_HALF_WIDTH, turtleTop } from "../../three/props";
 import { DAY, SUNSET, type Stage } from "../../three/stage";
 import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from "../story";
@@ -196,6 +197,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     keyTurns,
     lastTurn,
     birds,
+    flock,
     gate,
     rollers,
     monkeys,
@@ -735,7 +737,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     turtle.group.position.set(x, y + Math.abs(step) * 0.025 - dip, z);
     turtle.group.rotation.set(Math.atan2(back - front, 1.5), yaw, Math.atan2(left - right, 1.2) + step * 0.03, "YXZ");
     turtle.move(ride.stride, ride.walking, swimming, t);
-    turtle.group.updateMatrixWorld(true);
+    updateMoved(turtle.group);
   }
 
   /** The top of Ole's back at (x, z) in the world, e.g. where something lies on it. */
@@ -766,7 +768,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
   function holdPaddle(f: StoryFrame) {
     const { step, act, praise } = f;
     const clip = act + f.demo;
-    guide.root.updateMatrixWorld(true);
+    updateMoved(guide.root);
     // Across the lap, the blades flat; the paddle's own y (the shaft) to Tapsi's left.
     const lapPos = guide.lap.getWorldPosition(tmpA);
     lapQ.copy(guide.lap.getWorldQuaternion(tmpQ)).multiply(ACROSS);
@@ -827,7 +829,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       paddle.position.copy(lapPos);
       paddle.quaternion.copy(lapQ);
     }
-    paddle.updateMatrixWorld(true);
+    updateMoved(paddle);
 
     // The paws on the shaft: a shoulder's width apart on the lap, where they are when paddling; they
     // let go as the paddle swings out to fall.
@@ -917,7 +919,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const down = fishing ? Math.max(1 - smooth((f.local - 0.7) / 1.0), smooth((praise - 0.2) / 0.8)) : 1;
     const grip = fishing ? smooth((f.local - 0.2) / 0.5) * (1 - smooth((praise - 0.4) / 0.5)) : 0;
     if (down < 1) {
-      guide.root.updateMatrixWorld(true);
+      updateMoved(guide.root);
       // The right paw holds the rod in front of the chest; swung back it is up beside the head, over the
       // right shoulder and outside the head, cast out it is up ahead. The left paw holds lower down.
       const { back, out } = clip > 0 ? castSwing(clip) : { back: 0, out: 0 };
@@ -943,7 +945,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       rod.position.copy(resting);
       rod.quaternion.copy(restQ);
     }
-    rod.updateMatrixWorld(true);
+    updateMoved(rod);
     if (grip > 0) {
       const along = new THREE.Vector3(0, 1, 0).applyQuaternion(rod.quaternion);
       guide.hold("R", rod.position.clone().addScaledVector(along, ROD_GRIP_R), along, grip);
@@ -1140,7 +1142,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     }
     if (h >= CARRY.lift) {
       // Level, whichever way the raft rocks.
-      raft.updateMatrixWorld(true);
+      updateMoved(raft);
       chest.group.position.copy(raft.worldToLocal(tmpB.copy(chestAt)));
       chest.group.quaternion.copy(raft.quaternion).invert();
     }
@@ -1166,7 +1168,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     const clip = act + f.demo;
     /** True if this frame passed the moment `c` of the step's clip. */
     const atClip = (c: number) => crossed(f, TRAVEL[step] + c);
-    guide.root.updateMatrixWorld(true);
+    updateMoved(guide.root);
 
     // Scorpions crawl over the sand and up onto Ole's shell, one for every stomp of the clip, straight
     // to a foot at an even pace: they are still crawling when it comes down on them – plopp, flat, and
@@ -1263,6 +1265,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
       b.group.rotation.set(-0.35 * turn, b.look + ((b.side * Math.PI) / 2 - b.look) * turn, 0, "YXZ");
       b.pose(time, t > 0.08);
     });
+    flock.update();
 
     // The gate: the crank follows Tapsi's paws, and every half turn the gate clicks up a bit.
     let lift = step > S.gate ? GATE_LIFT : 0;
@@ -1476,7 +1479,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     raft.rotation.set(-tug * 0.06, 0, Math.sin(time * 1.1) * 0.03);
     // In the opening the chest waits far out in the bay, at the end of the trail.
     raft.visible = step >= S.webs || f.opening !== null;
-    raft.updateMatrixWorld(true);
+    updateMoved(raft);
 
     // The key: Kiki drops it in front of Tapsi, Tapsi picks it up, puts it in the lock and turns it.
     const [keyX, keyZ] = standAt(S.key);

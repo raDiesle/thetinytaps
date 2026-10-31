@@ -1,6 +1,5 @@
 import { type Board, boardFromTemplate, type StarLog } from "./board";
 import { type ChartType, TEMPLATES } from "./catalog";
-import { PLANNER_SETTINGS_KEY } from "./planSettings";
 import type { PhotoFormat } from "./photo";
 
 /** How the board is printed. */
@@ -28,16 +27,24 @@ export interface RewardsSettings {
   sounds: boolean;
 }
 
-/** The first board: a week of brushing teeth, which the Zähne-putzen game fills by itself. A fixed id, so its stars stay theirs before anything is saved. */
-const FIRST: Board = { ...boardFromTemplate(TEMPLATES[0]), id: "erste" };
+/**
+ * The board that older versions showed before anything was saved (a week of brushing teeth, fixed id): no longer made,
+ * a first visit starts with the wizard, but kept where it already has stars, so they are never lost.
+ */
+const OLD_FIRST: Board = { ...boardFromTemplate(TEMPLATES[0]), id: "erste" };
 
+/** No board yet: the page opens with the wizard until one is made. */
 export const DEFAULT_REWARDS_SETTINGS: RewardsSettings = {
-  boards: [FIRST],
-  current: FIRST.id,
+  boards: [],
+  current: "",
   print: { orientation: "auto", color: true, colorIn: false, stickers: false, nextMonth: false },
   speech: false,
   sounds: true,
 };
+
+/** The defaults on this device: none, or the old first board while its stars are kept and nothing was saved over it. */
+export const rewardsDefaults = (log: StarLog): RewardsSettings =>
+  log[OLD_FIRST.id] ? { ...DEFAULT_REWARDS_SETTINGS, boards: [OLD_FIRST], current: OLD_FIRST.id } : DEFAULT_REWARDS_SETTINGS;
 
 export const REWARDS_SETTINGS_KEY = "tinytaps.rewards.v1";
 
@@ -53,15 +60,3 @@ export interface ChartsSettings {
 }
 
 export const CHARTS_KEY = "tinytaps.tafeln.v1";
-
-/** Whether something was saved under a key; without storage, as if it was (nothing is hidden or replaced then). */
-export function saved(key: string): boolean {
-  try {
-    return localStorage.getItem(key) !== null;
-  } catch {
-    return true;
-  }
-}
-
-/** Nothing saved yet by the board, the plan or the page: the page opens with the wizard. */
-export const firstVisit = () => ![REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, PLANNER_SETTINGS_KEY, CHARTS_KEY].some(saved);

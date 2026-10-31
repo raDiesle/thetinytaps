@@ -162,7 +162,7 @@ export const rewardChartIdeas: IdeaArea = {
       id: "T-19",
       emoji: "🌐",
       title: "Eigene Seite für die Belohnungstafel",
-      text: "Die Tafel als eigene kleine Website (eigene Adresse, eigene Suchmaschinen-Texte, z. B. „belohnungstafel gestalten“) mit Link zu The Tiny Taps. Der Ordner src/games/rewards hängt dafür nur an wenigen gemeinsamen Teilen.",
+      text: "Die Tafel als eigene kleine Website (eigene Adresse, eigene Suchmaschinen-Texte, z. B. „belohnungstafel gestalten“) mit Link zu Books for Both. Der Ordner src/games/rewards hängt dafür nur an wenigen gemeinsamen Teilen.",
       why: "Wer „belohnungstafel zum ausdrucken“ sucht, findet so die Tafel und von dort die Spiele.",
       effort: "M",
     },

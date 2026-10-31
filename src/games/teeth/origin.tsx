@@ -28,6 +28,8 @@ export const ORIGIN_MS: Record<OriginPart, number> = { sweets: 9600, grow: 6000 
 const { width: W } = PICTURE;
 /** What has to fit between heading and controls: the head, with the corners the sweets appear in; the screen shows more sky round it. */
 const FOCUS: Box = { x: 40, y: 34, width: 360, height: 340 };
+/** Where the camera ends up while the monsters grow: the mouth with them, as big as the free room allows. */
+const MOUTH_FOCUS: Box = { x: 95, y: 222, width: 250, height: 150 };
 const HEAD = { x: W / 2, y: 215, r: 165 };
 /** The open smile: a nearly straight top edge and a round bottom. */
 const MOUTH = { left: 110, right: 330, top: 262, depth: 95 };
@@ -36,10 +38,38 @@ const HALF = (MOUTH.right - MOUTH.left) / 2;
 const MOUTH_PATH = `M${MOUTH.left} ${MOUTH.top} Q${MID} ${MOUTH.top + 12} ${MOUTH.right} ${MOUTH.top} A${HALF} ${MOUTH.depth} 0 0 1 ${MOUTH.left} ${MOUTH.top} Z`;
 /** The bottom edge of the mouth below x. */
 const bottomAt = (x: number) => MOUTH.top + MOUTH.depth * Math.sqrt(Math.max(0, 1 - ((x - MID) / HALF) ** 2));
+/** The top edge of the mouth above x (it dips a little in the middle). */
+const topAt = (x: number) => {
+  const s = (x - MOUTH.left) / (MOUTH.right - MOUTH.left);
+  return MOUTH.top + 24 * s * (1 - s);
+};
 const TOOTH_W = 30;
 /** Six teeth along the top, four along the round bottom. */
-const upperX = (i: number) => MOUTH.left + 6 + i * 34.5 + TOOTH_W / 2;
-const lowerX = (i: number) => MID + (i - 1.5) * 35;
+const UPPER = [0, 1, 2, 3, 4, 5].map((i) => MOUTH.left + 6 + i * 34.5 + TOOTH_W / 2);
+const LOWER = [0, 1, 2, 3].map((i) => MID + (i - 1.5) * 35);
+const upperX = (i: number) => UPPER[i];
+const lowerX = (i: number) => LOWER[i];
+
+/**
+ * How far the gum reaches from the mouth's edge at x: furthest between the teeth and arching back over the middle of
+ * each one, so the teeth grow out of it like in the mirror (jaw.ts).
+ */
+function gumDepth(x: number, teeth: number[]) {
+  const d = Math.min(...teeth.map((t) => Math.abs(x - t))) / (TOOTH_W / 2);
+  return d >= 1 ? 14 : 6 + 8 * d ** 2;
+}
+
+/** The gum's edge over the upper teeth and under the lower ones, left to right. */
+const GUM_EDGE = {
+  upper: Array.from({ length: 111 }, (_, i) => MOUTH.left + i * 2).map((x) => ({ x, y: topAt(x) + gumDepth(x, UPPER) })),
+  lower: Array.from({ length: 111 }, (_, i) => MOUTH.left + i * 2).map((x) => ({ x, y: bottomAt(x) - gumDepth(x, LOWER) })),
+};
+const edgePath = (edge: { x: number; y: number }[]) => edge.map((p, i) => `${i ? "L" : "M"}${p.x} ${p.y.toFixed(1)}`).join(" ");
+/** The gum as a band: the edge, then back along the mouth's outline (clipped by it). */
+const GUM_PATHS = {
+  upper: `${edgePath(GUM_EDGE.upper)} L${MOUTH.right} ${MOUTH.top - 20} L${MOUTH.left} ${MOUTH.top - 20} Z`,
+  lower: `${edgePath(GUM_EDGE.lower)} L${MOUTH.right} ${MOUTH.top + MOUTH.depth + 20} L${MOUTH.left} ${MOUTH.top + MOUTH.depth + 20} Z`,
+};
 
 /** Tickle ids of the monsters here start above the mirror's (step × 100 + order in TeethPlay). */
 const FIRST_ID = 1000;
@@ -241,196 +271,219 @@ export function Origin({
   free: RefObject<HTMLElement | null>;
 }) {
   const t = useT();
-  const svg = useRef<SVGSVGElement>(null);
-  const { box, unit } = fitBox(useRoom(svg, free), FOCUS);
+  const scene = useRef<HTMLDivElement>(null);
+  const room = useRoom(scene, free);
+  const { box, unit } = fitBox(room, FOCUS);
   const frame = screenFrame(box, unit);
   const bottom = box.y + box.height;
   const sweets = part === "sweets";
   const girl = useFigure() === "girl";
+  // The camera zooms in on the mouth while the monsters grow: the whole picture is scaled as an HTML layer, which the
+  // browser moves without painting it again, so the picture goes from showing `box` to showing `close`.
+  const close = fitBox(room, MOUTH_FOCUS);
+  const camera = {
+    "--zoom": (unit / close.unit).toFixed(4),
+    "--zoom-x": `${((box.x - close.box.x) / close.unit).toFixed(1)}px`,
+    "--zoom-y": `${((box.y - close.box.y) / close.unit).toFixed(1)}px`,
+  } as CSSProperties;
   return (
-    <svg
-      ref={svg}
-      className={`origin at-${part} ${daytime}`}
-      viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`}
-      role="img"
-      aria-label={
-        part === "sweets"
-          ? t({
-              de: "Ein Kind isst Süßigkeiten",
-              en: "A child eats sweets",
-              zh: "一个孩子在吃甜食",
-              hi: "एक बच्चा मिठाई खा रहा है",
-              es: "Un niño come dulces",
-              ar: "طفل يأكل الحلوى",
-              ru: "Ребёнок ест сладости",
-            })
-          : t({
-              de: "Aus dem Zucker auf den Zähnen wachsen kleine Monster",
-              en: "Little monsters grow out of the sugar on the teeth",
-              zh: "牙齿上的糖长成了小怪兽",
-              hi: "दाँतों पर लगी चीनी से छोटे मॉन्स्टर बनते हैं",
-              es: "Del azúcar en los dientes crecen monstruitos",
-              ar: "من السكر على الأسنان تنمو وحوش صغيرة",
-              ru: "Из сахара на зубках вырастают маленькие монстры",
-            })
-      }
-    >
-      <defs>
-        <clipPath id="origin-frame">
-          <rect {...frame} />
-        </clipPath>
-        <clipPath id="origin-mouth">
-          <path d={MOUTH_PATH} />
-        </clipPath>
-        <pattern id="origin-pyjama" width={36} height={36} patternUnits="userSpaceOnUse">
-          <rect width={36} height={36} fill="#3a4a9e" />
-          <circle cx={9} cy={9} r={4} fill="#ffe680" />
-          <circle cx={27} cy={27} r={3} fill="#fff" />
-        </pattern>
-      </defs>
+    <div ref={scene} className={`origin at-${part} ${daytime}`}>
+      <div className="origin-camera" style={camera}>
+        <svg
+          className="origin-picture"
+          viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`}
+          role="img"
+          aria-label={
+            part === "sweets"
+              ? t({
+                  de: "Ein Kind isst Süßigkeiten",
+                  en: "A child eats sweets",
+                  zh: "一个孩子在吃甜食",
+                  hi: "एक बच्चा मिठाई खा रहा है",
+                  es: "Un niño come dulces",
+                  ar: "طفل يأكل الحلوى",
+                  ru: "Ребёнок ест сладости",
+                })
+              : t({
+                  de: "Aus dem Zucker auf den Zähnen wachsen kleine Monster",
+                  en: "Little monsters grow out of the sugar on the teeth",
+                  zh: "牙齿上的糖长成了小怪兽",
+                  hi: "दाँतों पर लगी चीनी से छोटे मॉन्स्टर बनते हैं",
+                  es: "Del azúcar en los dientes crecen monstruitos",
+                  ar: "من السكر على الأسنان تنمو وحوش صغيرة",
+                  ru: "Из сахара на зубках вырастают маленькие монстры",
+                })
+          }
+        >
+          <defs>
+            <clipPath id="origin-frame">
+              <rect {...frame} />
+            </clipPath>
+            <clipPath id="origin-mouth">
+              <path d={MOUTH_PATH} />
+            </clipPath>
+            <pattern id="origin-pyjama" width={36} height={36} patternUnits="userSpaceOnUse">
+              <rect width={36} height={36} fill="#3a4a9e" />
+              <circle cx={9} cy={9} r={4} fill="#ffe680" />
+              <circle cx={27} cy={27} r={3} fill="#fff" />
+            </pattern>
+          </defs>
 
-      <g clipPath="url(#origin-frame)">
-        <rect className="origin-sky" {...box} />
-        {/* In the morning the night ends with the sun coming up beside the head. */}
-        {daytime === "morning" && part === "grow" && <circle className="origin-sunrise" cx={72} cy={72} r={26} fill="#ffd23f" stroke={INK} strokeWidth={4} />}
-        <SkyBody daytime={daytime} />
+          <g clipPath="url(#origin-frame)">
+            <rect className="origin-sky" {...box} />
+            {/* In the morning the night ends with the sun coming up beside the head. */}
+            {daytime === "morning" && part === "grow" && (
+              <circle className="origin-sunrise" cx={72} cy={72} r={26} fill="#ffd23f" stroke={INK} strokeWidth={4} />
+            )}
+            <SkyBody daytime={daytime} />
 
-        {/* Shoulders in a T-shirt, or pyjamas in the evening, down to the screen's bottom. */}
-        <path
-          d={`M20 ${Math.max(480, bottom + 20)} V440 C20 395 110 365 ${W / 2} 365 C330 365 420 395 420 440 V${Math.max(480, bottom + 20)} Z`}
-          fill={daytime === "evening" ? "url(#origin-pyjama)" : "#8e7dff"}
-          stroke={INK}
-          strokeWidth={5}
-        />
-
-        {/* The girl (👧 on the home page): two pigtails behind the head; their bands come over the hair below. */}
-        {girl &&
-          [-1, 1].map((s) => (
-            <ellipse
-              key={s}
-              cx={HEAD.x + s * (HEAD.r + 22)}
-              cy={140}
-              rx={44}
-              ry={72}
-              transform={`rotate(${s * -35} ${HEAD.x + s * (HEAD.r + 22)} 140)`}
-              fill="#8a5a3b"
+            {/* Shoulders in a T-shirt, or pyjamas in the evening, down to the screen's bottom. */}
+            <path
+              d={`M20 ${Math.max(480, bottom + 20)} V440 C20 395 110 365 ${W / 2} 365 C330 365 420 395 420 440 V${Math.max(480, bottom + 20)} Z`}
+              fill={daytime === "evening" ? "url(#origin-pyjama)" : "#8e7dff"}
               stroke={INK}
               strokeWidth={5}
             />
-          ))}
-        <g stroke={INK} strokeWidth={5}>
-          <circle cx={HEAD.x - HEAD.r} cy={228} r={26} fill={SKIN} />
-          <circle cx={HEAD.x + HEAD.r} cy={228} r={26} fill={SKIN} />
-          <circle cx={HEAD.x} cy={HEAD.y} r={HEAD.r} fill={SKIN} />
-        </g>
-        {/* Hair with a fringe and a little curl on top. */}
-        <path
-          d="M58 200 C48 92 140 42 220 42 C300 42 392 92 382 200 C372 150 342 118 302 124 Q280 98 250 118 Q222 92 192 118 Q162 96 138 124 C98 118 68 150 58 200 Z"
-          fill="#8a5a3b"
-          stroke={INK}
-          strokeWidth={5}
-          strokeLinejoin="round"
-        />
-        <path d="M222 44 C206 18 238 4 244 24 C248 38 230 42 228 32" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-        {girl && [-1, 1].map((s) => <circle key={s} cx={HEAD.x + s * (HEAD.r - 12)} cy={118} r={17} fill="#ffd43b" stroke={INK} strokeWidth={4} />)}
 
-        <g style={sweets ? DELIGHT : undefined}>
-          <path className="origin-brow left" d="M140 150 Q160 140 180 148" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-          <path className="origin-brow right" d="M260 148 Q280 140 300 150" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-        </g>
-        <Eye x={160} y={186} side={-1} look={sweets ? LOOK : undefined} />
-        <Eye x={280} y={186} side={1} look={sweets ? LOOK : undefined} />
-        {/* Happy closed eyes while chewing: skin over the eye and a smiling arc. */}
-        {sweets && (
-          <g className="origin-happy-eyes" style={HAPPY_EYES}>
-            {[160, 280].map((x) => (
-              <g key={x}>
-                <ellipse cx={x} cy={188} rx={27} ry={31} fill={SKIN} />
-                <path d={`M${x - 18} 194 Q${x} 172 ${x + 18} 194`} fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
-              </g>
-            ))}
-          </g>
-        )}
-        <path d="M212 226 Q220 234 228 226" fill="none" stroke={INK} strokeWidth={4} strokeLinecap="round" />
-        <ellipse className="origin-cheek" style={sweets ? GLOW : undefined} cx={104} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
-        <ellipse className="origin-cheek" style={sweets ? GLOW : undefined} cx={336} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
-
-        {/* The mouth closes and chews when a sweet arrives. */}
-        <g className="origin-mouth" style={sweets ? CHEWING : undefined}>
-          <path d={MOUTH_PATH} fill="#7a1f3d" />
-          <g clipPath="url(#origin-mouth)">
-            {/* The tongue lies behind the lower teeth. */}
-            <ellipse cx={MID} cy={MOUTH.top + MOUTH.depth - 42} rx={64} ry={22} fill="#ff7088" />
-            <g fill="#fffdf6" stroke={INK} strokeWidth={3}>
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <rect key={`u${i}`} x={upperX(i) - TOOTH_W / 2} y={MOUTH.top - 14} width={TOOTH_W} height={46} rx={9} />
+            {/* The girl (👧 on the home page): two pigtails behind the head; their bands come over the hair below. */}
+            {girl &&
+              [-1, 1].map((s) => (
+                <ellipse
+                  key={s}
+                  cx={HEAD.x + s * (HEAD.r + 22)}
+                  cy={140}
+                  rx={44}
+                  ry={72}
+                  transform={`rotate(${s * -35} ${HEAD.x + s * (HEAD.r + 22)} 140)`}
+                  fill="#8a5a3b"
+                  stroke={INK}
+                  strokeWidth={5}
+                />
               ))}
-              {[0, 1, 2, 3].map((i) => (
-                <rect key={`l${i}`} x={lowerX(i) - TOOTH_W / 2} y={bottomAt(lowerX(i)) - 30} width={TOOTH_W} height={46} rx={9} />
-              ))}
+            <g stroke={INK} strokeWidth={5}>
+              <circle cx={HEAD.x - HEAD.r} cy={228} r={26} fill={SKIN} />
+              <circle cx={HEAD.x + HEAD.r} cy={228} r={26} fill={SKIN} />
+              <circle cx={HEAD.x} cy={HEAD.y} r={HEAD.r} fill={SKIN} />
             </g>
-          </g>
-          <path d={MOUTH_PATH} fill="none" stroke={INK} strokeWidth={6} strokeLinejoin="round" />
+            {/* Hair with a fringe and a little curl on top. */}
+            <path
+              d="M58 200 C48 92 140 42 220 42 C300 42 392 92 382 200 C372 150 342 118 302 124 Q280 98 250 118 Q222 92 192 118 Q162 96 138 124 C98 118 68 150 58 200 Z"
+              fill="#8a5a3b"
+              stroke={INK}
+              strokeWidth={5}
+              strokeLinejoin="round"
+            />
+            <path d="M222 44 C206 18 238 4 244 24 C248 38 230 42 228 32" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+            {girl && [-1, 1].map((s) => <circle key={s} cx={HEAD.x + s * (HEAD.r - 12)} cy={118} r={17} fill="#ffd43b" stroke={INK} strokeWidth={4} />)}
 
-          {/* Sugar crumbs: they show once the mouth opens after its sweet, and in the grow part each becomes a monster. */}
-          {CRUMBS.map((c, i) => {
-            const { x, y } = crumbAt(c);
-            return (
-              <g
-                key={i}
-                className="origin-crumb"
-                style={{ "--crumb": `${ARRIVE_MS[c.sweet] + CHEW_MS - 200}ms`, "--grow": `${600 + i * 700}ms` } as CSSProperties}
-              >
-                <circle cx={x - 6} cy={y + 2} r={4.5} fill={c.color} stroke={INK} strokeWidth={1.5} />
-                <circle cx={x + 6} cy={y - 3} r={3.5} fill={c.color} stroke={INK} strokeWidth={1.5} />
-                <circle cx={x + 3} cy={y + 7} r={3} fill="#fff" stroke={INK} strokeWidth={1.5} />
-              </g>
-            );
-          })}
-          {part === "grow" &&
-            CRUMBS.map((c, i) => {
-              const { x, y } = crumbAt(c);
-              return (
-                <g key={i} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(0.8)`}>
-                  <g className="origin-monster" style={{ "--grow": `${600 + i * 700}ms` } as CSSProperties}>
-                    <Monster
-                      color={c.color}
-                      variant={i % 3}
-                      active={false}
-                      gone={false}
-                      scared={false}
-                      tickled={tickled === FIRST_ID + i}
-                      blinkMs={i * 900}
-                      onTickle={() => onTickle(FIRST_ID + i)}
-                    />
+            <g style={sweets ? DELIGHT : undefined}>
+              <path className="origin-brow left" d="M140 150 Q160 140 180 148" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+              <path className="origin-brow right" d="M260 148 Q280 140 300 150" fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
+            </g>
+            <Eye x={160} y={186} side={-1} look={sweets ? LOOK : undefined} />
+            <Eye x={280} y={186} side={1} look={sweets ? LOOK : undefined} />
+            {/* Happy closed eyes while chewing: skin over the eye and a smiling arc. */}
+            {sweets && (
+              <g className="origin-happy-eyes" style={HAPPY_EYES}>
+                {[160, 280].map((x) => (
+                  <g key={x}>
+                    <ellipse cx={x} cy={188} rx={27} ry={31} fill={SKIN} />
+                    <path d={`M${x - 18} 194 Q${x} 172 ${x + 18} 194`} fill="none" stroke={INK} strokeWidth={5} strokeLinecap="round" />
                   </g>
+                ))}
+              </g>
+            )}
+            <path d="M212 226 Q220 234 228 226" fill="none" stroke={INK} strokeWidth={4} strokeLinecap="round" />
+            <ellipse className="origin-cheek" style={sweets ? GLOW : undefined} cx={104} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
+            <ellipse className="origin-cheek" style={sweets ? GLOW : undefined} cx={336} cy={238} rx={24} ry={14} fill="#ff8fab" opacity={0.65} />
+
+            {/* The mouth closes and chews when a sweet arrives. */}
+            <g className="origin-mouth" style={sweets ? CHEWING : undefined}>
+              <path d={MOUTH_PATH} fill="#7a1f3d" />
+              <g clipPath="url(#origin-mouth)">
+                {/* The tongue lies behind the lower teeth. */}
+                <ellipse cx={MID} cy={MOUTH.top + MOUTH.depth - 42} rx={64} ry={22} fill="#ff7088" />
+                <g fill="#fffdf6" stroke={INK} strokeWidth={3}>
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <rect key={`u${i}`} x={upperX(i) - TOOTH_W / 2} y={MOUTH.top - 14} width={TOOTH_W} height={50} rx={9} />
+                  ))}
+                  {[0, 1, 2, 3].map((i) => (
+                    <rect key={`l${i}`} x={lowerX(i) - TOOTH_W / 2} y={bottomAt(lowerX(i)) - 34} width={TOOTH_W} height={50} rx={9} />
+                  ))}
                 </g>
-              );
-            })}
-        </g>
+                {/* The gum over the teeth's roots, with a darker edge where they come out of it. */}
+                {(["upper", "lower"] as const).map((jaw) => (
+                  <g key={jaw}>
+                    <path d={GUM_PATHS[jaw]} fill="#ff8fab" />
+                    <path d={edgePath(GUM_EDGE[jaw])} fill="none" stroke="#e2577c" strokeWidth={3} strokeLinejoin="round" />
+                  </g>
+                ))}
+              </g>
+              <path d={MOUTH_PATH} fill="none" stroke={INK} strokeWidth={6} strokeLinejoin="round" />
 
-        {/* Hearts for each sweet: the child is delighted. */}
-        {sweets &&
-          HEARTS.map(({ x, y, at }, i) => (
-            <g key={i} transform={`translate(${x} ${y})`}>
-              <path className="origin-heart" style={{ "--at": `${at}ms` } as CSSProperties} d={HEART_PATH} fill="#ff6b9a" stroke={INK} strokeWidth={3} />
+              {/* Sugar crumbs: they show once the mouth opens after its sweet, and in the grow part each becomes a monster. */}
+              {CRUMBS.map((c, i) => {
+                const { x, y } = crumbAt(c);
+                return (
+                  <g
+                    key={i}
+                    className="origin-crumb"
+                    style={{ "--crumb": `${ARRIVE_MS[c.sweet] + CHEW_MS - 200}ms`, "--grow": `${600 + i * 700}ms` } as CSSProperties}
+                  >
+                    <circle cx={x - 6} cy={y + 2} r={4.5} fill={c.color} stroke={INK} strokeWidth={1.5} />
+                    <circle cx={x + 6} cy={y - 3} r={3.5} fill={c.color} stroke={INK} strokeWidth={1.5} />
+                    <circle cx={x + 3} cy={y + 7} r={3} fill="#fff" stroke={INK} strokeWidth={1.5} />
+                  </g>
+                );
+              })}
+              {part === "grow" &&
+                CRUMBS.map((c, i) => {
+                  const { x, y } = crumbAt(c);
+                  return (
+                    <g key={i} transform={`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(0.8)`}>
+                      <g className="origin-monster" style={{ "--grow": `${600 + i * 700}ms` } as CSSProperties}>
+                        <Monster
+                          color={c.color}
+                          variant={i % 3}
+                          active={false}
+                          gone={false}
+                          scared={false}
+                          tickled={tickled === FIRST_ID + i}
+                          blinkMs={i * 900}
+                          onTickle={() => onTickle(FIRST_ID + i)}
+                        />
+                      </g>
+                    </g>
+                  );
+                })}
             </g>
-          ))}
 
-        {/* Each sweet appears big in a top corner, floats a moment, then glides into the mouth. */}
-        {sweets &&
-          SWEETS.map((Sweet, i) => (
-            <g
-              key={i}
-              className="origin-sweet"
-              style={{ "--arrive": `${ARRIVE_MS[i]}ms`, "--sx": `${SWEET_FROM[i].x}px`, "--sy": `${SWEET_FROM[i].y}px` } as CSSProperties}
-            >
-              <Sweet />
-            </g>
-          ))}
-      </g>
+            {/* Hearts for each sweet: the child is delighted. */}
+            {sweets &&
+              HEARTS.map(({ x, y, at }, i) => (
+                <g key={i} transform={`translate(${x} ${y})`}>
+                  <path className="origin-heart" style={{ "--at": `${at}ms` } as CSSProperties} d={HEART_PATH} fill="#ff6b9a" stroke={INK} strokeWidth={3} />
+                </g>
+              ))}
 
-      <FrameStroke frame={frame} unit={unit} />
-    </svg>
+            {/* Each sweet appears big in a top corner, floats a moment, then glides into the mouth. */}
+            {sweets &&
+              SWEETS.map((Sweet, i) => (
+                <g
+                  key={i}
+                  className="origin-sweet"
+                  style={{ "--arrive": `${ARRIVE_MS[i]}ms`, "--sx": `${SWEET_FROM[i].x}px`, "--sy": `${SWEET_FROM[i].y}px` } as CSSProperties}
+                >
+                  <Sweet />
+                </g>
+              ))}
+          </g>
+        </svg>
+      </div>
+      {/* The frame stays at the screen's edge while the camera moves. */}
+      <svg className="origin-frame" viewBox={`${box.x.toFixed(1)} ${box.y.toFixed(1)} ${box.width.toFixed(1)} ${box.height.toFixed(1)}`} aria-hidden>
+        <FrameStroke frame={frame} unit={unit} />
+      </svg>
+    </div>
   );
 }
