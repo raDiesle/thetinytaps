@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { updateMoved } from "./matrices";
 
 // The 3D stage every story plays on: renderer, sky with sun, light, fog and
 // the camera. Lighting is soft and warm, like an animated film; the sky can
@@ -55,6 +56,13 @@ export class Stage {
   private envTarget: THREE.WebGLRenderTarget | null = null;
   private readonly pmrem: THREE.PMREMGenerator;
   private readonly skyMesh: THREE.Mesh;
+  /** What the camera sees, for leaving out shadows that fall where it does not look. */
+  private readonly view = new THREE.Frustum();
+  private readonly toSun = new THREE.Vector3();
+  private readonly sunTarget = new THREE.Vector3();
+  private readonly viewMatrix = new THREE.Matrix4();
+  /** The lowest thing a shadow can fall on: no shadow reaches further, worked out with the first picture. */
+  private floor: number | null = null;
 
   constructor(canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, stencil: true, powerPreference: "high-performance" });
@@ -79,6 +87,8 @@ export class Stage {
     this.skyMesh.frustumCulled = false;
     this.scene.add(this.skyMesh);
     this.scene.fog = this.fog;
+    // The world matrices are brought up to date in render(), only where something moved.
+    this.scene.matrixWorldAutoUpdate = false;
 
     this.sun.castShadow = true;
     this.sun.shadow.mapSize.set(2048, 2048);
@@ -90,6 +100,29 @@ export class Stage {
     s.near = 1;
     s.far = 120;
     this.scene.add(this.sun, this.sun.target, this.fill);
+    // The shadow's own box holds much that throws its shadow behind the camera or out of the picture: drawing
+    // those into the shadow cost an old phone as much as drawing what is seen (October 2026), and leaving them
+    // out changes no pixel. The box stays as it is, so the shadows look the same; only fewer things go in.
+    const box = this.sun.shadow.getFrustum();
+    const sphere = new THREE.Sphere();
+    const end = new THREE.Vector3();
+    const cull = {
+      intersectsObject: (o: THREE.Mesh) => {
+        if (!box.intersectsObject(o)) return false;
+        if (this.floor === null || this.toSun.y < 0.05) return true;
+        const own = (o as Partial<THREE.InstancedMesh>).boundingSphere;
+        sphere.copy(own ?? o.geometry.boundingSphere!).applyMatrix4(o.matrixWorld);
+        // A little more, for the soft edge of the shadow.
+        const r = sphere.radius + 0.3;
+        // The shadow runs from the thing away from the sun, down to the floor at most: seen if any of it is in view.
+        const reach = Math.max(0, (sphere.center.y + r - this.floor) / this.toSun.y);
+        end.copy(sphere.center).addScaledVector(this.toSun, -reach);
+        for (const plane of this.view.planes) if (plane.distanceToPoint(sphere.center) < -r && plane.distanceToPoint(end) < -r) return false;
+        return true;
+      },
+      intersectsSprite: (sprite: THREE.Sprite) => box.intersectsSprite(sprite),
+    };
+    this.sun.shadow.getFrustum = () => cull as unknown as THREE.Frustum;
 
     this.pmrem = new THREE.PMREMGenerator(this.renderer);
     this.refreshEnvironment();
@@ -146,7 +179,33 @@ export class Stage {
   }
 
   render() {
+    updateMoved(this.scene);
+    this.sweepView();
     this.renderer.render(this.scene, this.camera);
+  }
+
+  /** Where the camera looks and the sun shines from, for the shadow's culling above. */
+  private sweepView() {
+    if (this.camera.parent === null) this.camera.updateMatrixWorld();
+    this.viewMatrix.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+    this.view.setFromProjectionMatrix(this.viewMatrix, this.camera.coordinateSystem, this.camera.reversedDepth);
+    this.toSun.setFromMatrixPosition(this.sun.matrixWorld);
+    this.toSun.sub(this.sunTarget.setFromMatrixPosition(this.sun.target.matrixWorld)).normalize();
+    if (this.floor === null) {
+      let floor = Number.POSITIVE_INFINITY;
+      const bounds = new THREE.Box3();
+      this.scene.traverse((o) => {
+        // A skinned figure's vertices lie where its joints put them, not where its own matrix does; it stands on something anyway.
+        if (!(o instanceof THREE.Mesh) || !o.receiveShadow || o instanceof THREE.SkinnedMesh) return;
+        // An instanced mesh's copies lie wherever their own matrices put them.
+        if (o instanceof THREE.InstancedMesh) o.computeBoundingBox();
+        else if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+        const box = o instanceof THREE.InstancedMesh ? o.boundingBox : o.geometry.boundingBox;
+        floor = Math.min(floor, bounds.copy(box!).applyMatrix4(o.matrixWorld).min.y);
+      });
+      // Things that sink further later (a fish diving) still end there: two metres more for them.
+      this.floor = floor - 2;
+    }
   }
 
   dispose() {

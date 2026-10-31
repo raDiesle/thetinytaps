@@ -17,6 +17,7 @@ import {
   makeScorpion,
   makeTurtle,
   mat,
+  mergeParts,
   mergeStatic,
   seeded,
   solid,
@@ -53,6 +54,7 @@ import {
   cobwebTexture,
   makeAppleTree,
   makeBird,
+  makeFlock,
   makeBobber,
   makeBridge,
   makeCoconut,
@@ -258,9 +260,10 @@ export function makeWorld(scene: THREE.Scene) {
     // Mostly looking towards us, each a little differently.
     const look = (r() - 0.5) * 1.6;
     bird.group.rotation.y = look;
-    scene.add(bird.group);
     return { ...bird, home, look, side };
   });
+  const flock = makeFlock(birds);
+  scene.add(flock.group);
 
   const gate = makeGate();
   gate.group.position.set(0, groundHeight(0, GATE_Z), GATE_Z);
@@ -294,6 +297,7 @@ export function makeWorld(scene: THREE.Scene) {
         if (at.y > top.y) top.copy(at);
       }
     });
+    mergeParts(palm);
     // A bunch of coconuts under the leaves beside the monkey, on the side of the path, where it takes the
     // ones it drops.
     for (let i = 0; i < 5; i++) {
@@ -467,6 +471,7 @@ export function makeWorld(scene: THREE.Scene) {
     keyTurns,
     lastTurn,
     birds,
+    flock,
     gate,
     rollers,
     monkeys,

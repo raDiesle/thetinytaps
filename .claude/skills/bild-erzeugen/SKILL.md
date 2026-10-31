@@ -117,17 +117,31 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
 
 ## Style
 
-Always start the prompt with the style block, so all pictures fit together:
+Always start the prompt with the style block, so all pictures fit together. The app looks like a picture book
+(paper pages, softened printed colours, plum ink – see „The app looks like a picture book“ in the root `CLAUDE.md`
+and the colours in `src/styles/book.css`), so the pictures are drawn as pages of that book:
 
 ```
-Children's picture-book illustration for 2–4 year olds. Soft, flat, rounded
-shapes with thick dark-purple outlines (#2a1e5c), bright friendly colours, gentle
-shading. Simple, uncluttered background. No text, no letters, no numbers,
-no speech bubbles, no frames.
+Children's picture-book illustration for 2–4 year olds, like a page of a printed
+picture book. Soft, flat, rounded shapes with thick dark plum ink outlines
+(#3d3045), warm friendly colours softened like gouache printed on matte paper –
+still clear and easy to tell apart, never dull or grey – gentle shading. Simple,
+uncluttered background. No text, no letters, no numbers, no speech bubbles,
+no frames, no book, page or paper edge drawn around the picture.
 ```
 
-For `--transparent` drop "Simple, uncluttered background" – the script adds the
-flat backdrop instruction itself. Never ask a cut-out for a shape behind its subject („a round sticker“, „inside a
+The app draws the book, its page and margin round every picture itself: never ask Gemini for them, and keep the
+last line of the block, so „a page of a picture book“ doesn't come back as a drawn open book. A picture added to a set that already exists (a story, a folder
+with its own guide) keeps that set's look and is drawn from its pictures as `--ref`, even when they still have the
+older bright style with dark-purple outlines (#2a1e5c) – one story never mixes the two.
+
+Take foxes in wherever they fit (the app is toddlerfox.com, see „The app's animal is the fox“ in `CLAUDE.md`): a fox
+grown-up instead of a person, a fox child in the background; pass a picture of Tapsi or the fox family
+(`src/components/bilder/buch-fuechse.webp`) as `--ref`, so every fox is the same kind. A picture that a fox task in
+`src/content/ideas/foxStatus.ts` asks for goes into the batch with the other waiting ones there, and the task is marked.
+
+For `--transparent` drop "Simple, uncluttered background" and "printed on matte paper" (a paper texture spoils the
+cut-out) – the script adds the flat backdrop instruction itself. Never ask a cut-out for a shape behind its subject („a round sticker“, „inside a
 circle“): Gemini then draws a disc that keeps the magenta of the backdrop, a white ring, or a small circle on a white
 square, and the cut-out fails. Ask for a free-standing illustration with no circle, disc or frame behind it instead
 (only a sticker that *is* a shape, a star or a heart, is fine). Leave out light that spreads (a lamp's glow, sunbeams

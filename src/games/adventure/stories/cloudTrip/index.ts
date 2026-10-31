@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { arcDraw, ARC_PERIOD, CHEER_PERIOD, clipPose, duckDepth, FLAP_PERIOD, LEAN_PERIOD, PUSH_PERIOD, sitProgress } from "../../three/clips";
 import { type Guide, lerpPose, type Pose } from "../../three/guide";
+import { updateMoved } from "../../three/matrices";
 import { sitDown } from "../../three/player";
 import { DAY, type SkyColors, type Stage } from "../../three/stage";
 import { crossed, type Cue, type Story, type StoryFrame, type StoryWorld } from "../story";
@@ -187,7 +188,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     wolle.group.position.set(p.x, p.y, p.z);
     wolle.group.rotation.set(0, p.yaw, p.roll, "YXZ");
     wolle.squash(p.squash);
-    wolle.group.updateMatrixWorld(true);
+    updateMoved(wolle.group);
   }
   /** Where Tapsi's feet are on Wolle (the guide's root). */
   const rootOn = (p: Place, sitting: number, out: THREE.Vector3) =>
@@ -206,7 +207,7 @@ function build(stage: Stage, guide: Guide, cue: (c: Cue) => void): StoryWorld {
     // Far apart in time, so the springs of the paws and ears settle at once.
     measureTime -= 10;
     guide.apply(sitDown(pose, sitting), measureTime);
-    guide.root.updateMatrixWorld(true);
+    updateMoved(guide.root);
     return {
       L: guide.gripPoint("L", new THREE.Vector3()),
       R: guide.gripPoint("R", new THREE.Vector3()),

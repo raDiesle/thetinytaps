@@ -37,6 +37,8 @@ interface Bone {
   /** Width of the body around it; 0 for the skeleton only (fingers). */
   width: number;
   lines: SVGLineElement[];
+  /** Where it was drawn last, so a bone that stands still is not written again (every write repaints the glow). */
+  drawn: string;
 }
 
 const joint = (parent: THREE.Object3D, x: number, y: number, z = 0) => {
@@ -57,8 +59,9 @@ export class Silhouette {
   private readonly legs: { hip: THREE.Object3D; knee: THREE.Object3D }[] = [];
   private readonly bones: Bone[] = [];
   /** Joints drawn as dots on the skeleton. */
-  private readonly dots: { at: THREE.Object3D; circle: SVGCircleElement }[] = [];
+  private readonly dots: { at: THREE.Object3D; circle: SVGCircleElement; drawn: string }[] = [];
   private readonly heads: SVGCircleElement[] = [];
+  private headDrawn = "";
   private readonly at = new THREE.Vector3();
 
   constructor() {
@@ -156,7 +159,7 @@ export class Silhouette {
       circle.setAttribute("r", "0.022");
       circle.setAttribute("stroke", "none");
       skeleton.append(circle);
-      this.dots.push({ at, circle });
+      this.dots.push({ at, circle, drawn: "" });
     }
   }
 
@@ -170,7 +173,7 @@ export class Silhouette {
   }
 
   private bone(from: THREE.Object3D, to: THREE.Object3D, width: number) {
-    this.bones.push({ from, to, width, lines: [] });
+    this.bones.push({ from, to, width, lines: [], drawn: "" });
   }
 
   /** Puts the figure into the guide's pose, seen from `view` (radians round it, 0 = front, π = behind). */
@@ -204,6 +207,9 @@ export class Silhouette {
       bone.to.getWorldPosition(this.at);
       const x2 = this.at.x.toFixed(3);
       const y2 = (-this.at.y).toFixed(3);
+      const drawn = `${x1} ${y1} ${x2} ${y2}`;
+      if (drawn === bone.drawn) continue;
+      bone.drawn = drawn;
       for (const line of bone.lines) {
         line.setAttribute("x1", x1);
         line.setAttribute("y1", y1);
@@ -212,14 +218,23 @@ export class Silhouette {
       }
     }
     this.head.getWorldPosition(this.at);
-    for (const head of this.heads) {
-      head.setAttribute("cx", this.at.x.toFixed(3));
-      head.setAttribute("cy", (-this.at.y).toFixed(3));
+    const cx = this.at.x.toFixed(3);
+    const cy = (-this.at.y).toFixed(3);
+    if (`${cx} ${cy}` !== this.headDrawn) {
+      this.headDrawn = `${cx} ${cy}`;
+      for (const head of this.heads) {
+        head.setAttribute("cx", cx);
+        head.setAttribute("cy", cy);
+      }
     }
     for (const dot of this.dots) {
       dot.at.getWorldPosition(this.at);
-      dot.circle.setAttribute("cx", this.at.x.toFixed(3));
-      dot.circle.setAttribute("cy", (-this.at.y).toFixed(3));
+      const x = this.at.x.toFixed(3);
+      const y = (-this.at.y).toFixed(3);
+      if (`${x} ${y}` === dot.drawn) continue;
+      dot.drawn = `${x} ${y}`;
+      dot.circle.setAttribute("cx", x);
+      dot.circle.setAttribute("cy", y);
     }
   }
 }

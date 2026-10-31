@@ -11,6 +11,7 @@ import { useFitGrid } from "@/lib/fitGrid";
 import { useAppLanguage, useT } from "@/lib/language";
 import { useUpdateBetweenGames } from "@/lib/pwa";
 import { useTitle } from "@/lib/title";
+import { SeoText } from "@/components/SeoText";
 
 const CATEGORY = categoryOf("/bilder/");
 
@@ -79,6 +80,7 @@ export function ScenesMenu() {
           </li>
         ))}
       </ul>
+      <SeoText />
     </main>
   );
 }

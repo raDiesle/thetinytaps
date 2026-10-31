@@ -10,6 +10,7 @@ import {
   type Face,
   type FaceKind,
   type Jaw,
+  type MouthModel,
   type Point2,
   type Projector,
   type Surface,
@@ -28,6 +29,8 @@ export const INK = "#2a1e5c";
 export const SKIN = "#f7c9a1";
 const TOOTH_FILLS: Record<FaceKind, string> = { outer: "#fffdf6", top: "#fbeed0", inner: "#f2e6d2", side: "#e6d8bd" };
 const GUM_FILLS: Record<FaceKind, string> = { outer: "#ff8fab", top: "#ffa6bc", inner: "#f27c9c", side: "#ff8fab" };
+/** The gum's edge round each tooth. */
+const GUM_RIM = "#e2577c";
 const ZONE_FILL = "#fff2a8";
 const MIN_FACING = 0.03;
 /** Monsters still waiting for a later step only show where their side of the tooth clearly faces out of the mouth. */
@@ -61,10 +64,12 @@ export interface Room {
  * controls, and the free part of the screen between them (`free`), where what
  * matters has to fit.
  */
-export function useRoom(svg: RefObject<SVGSVGElement | null>, free: RefObject<HTMLElement | null>): Room | null {
+export function useRoom(svg: RefObject<Element | null>, free: RefObject<HTMLElement | null>): Room | null {
   const [room, setRoom] = useState<Room | null>(null);
   useLayoutEffect(() => {
-    const element = svg.current;
+    // The pictures fill the stage, and while one slides in or zooms (a scene change, the story's camera) only the
+    // stage keeps its place: measured there, the picture is sized for where it ends up.
+    const element = svg.current?.closest(".teeth-stage") ?? svg.current;
     const area = free.current;
     if (!element || !area) return;
     const measure = () => {
@@ -177,7 +182,6 @@ interface MouthProps {
   monsters: MonsterSpot[];
   /** The brush goes from stop to stop; `at` is how far, 1.5 is half way from the second to the third. */
   brush: { stops: { tooth: ToothId; spot: number }[]; at: number; surface: Surface; motion: Motion } | null;
-  paused: boolean;
   /** All clean: sparkles and smiling eyes. */
   happy: boolean;
   /** In the morning breakfast crumbs stick round the mouth until all is clean. */
@@ -191,7 +195,21 @@ interface MouthProps {
 
 type Project = Projector;
 
-const fmt = (p: { x: number; y: number }) => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+/** A point for a path, to a tenth (rounding is quicker than `toFixed`, and the mouth formats thousands per frame while it moves). */
+const fmt = (p: { x: number; y: number }) => `${Math.round(p.x * 10) / 10} ${Math.round(p.y * 10) / 10}`;
+
+/** How finely the opening mouth's model is built: a hundred steps from shut to wide open, each built once. */
+const OPEN_STEPS = 100;
+const models = new Map<number, MouthModel>();
+/** The mouth's model for an opening, kept: while the mouth opens it is needed every frame, and again on the next step. */
+function mouthAt(open: number) {
+  const step = Math.round(open * OPEN_STEPS);
+  const kept = models.get(step);
+  if (kept) return kept;
+  const model = buildMouth(step / OPEN_STEPS);
+  models.set(step, model);
+  return model;
+}
 
 /** A polygon with its corners rounded off by up to `radius`. */
 function roundedPath(points: { x: number; y: number }[], radius = 3) {
@@ -234,7 +252,7 @@ const jawOrder = (view: View): Jaw[] => {
   return view.pitch >= 0 ? ["lower", "upper"] : ["upper", "lower"];
 };
 
-export function Mouth({ view, zone, monsters, brush, happy, daytime, action, paused, free, onTickle }: MouthProps) {
+export function Mouth({ view, zone, monsters, brush, happy, daytime, action, free, onTickle }: MouthProps) {
   const pictureLabel = useT()({
     de: "Ein Kindergesicht im Spiegel beim Zähneputzen",
     en: "A child's face in the mirror while brushing teeth",
@@ -244,10 +262,11 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
     ar: "وجه طفل في المرآة أثناء تنظيف الأسنان",
     ru: "Лицо ребёнка в зеркале во время чистки зубов",
   });
-  const model = useMemo(() => buildMouth(view.open), [view.open]);
+  const model = mouthAt(view.open);
   const all = useMemo(() => projectors(view), [view]);
   const project = all.face;
   const teethByKey = useMemo(() => new Map(model.teeth.map((t) => [t.key, t])), [model]);
+  const gumsByKey = useMemo(() => new Map(model.gums.map((g) => [g.key, g])), [model]);
   const toothFace = (id: ToothId, surface: Surface) => surfaceFace(teethByKey.get(toothKey(id))!.faces, surface);
 
   /** Where on a tooth the brush works. Outside with the teeth together, it brushes both rows at once, on the bite. */
@@ -279,41 +298,54 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
     const jawParts = jawOrder(view).map((jaw) => {
       const project = all[jaw];
       const p = project.point;
-      const gums = model.gums.filter((g) => g.jaw === jaw).sort((a, b) => p(a.center).depth - p(b.center).depth);
       const teeth = model.teeth.filter((t) => t.id.jaw === jaw).sort((a, b) => p(a.center).depth - p(b.center).depth);
       return (
         <g key={jaw}>
-          {gums.flatMap((g, i) =>
-            g.faces
-              .filter((f) => project.facing(f.normal) > MIN_FACING)
-              .map((f, j) => {
-                const d = facePath(f, project);
-                return <path key={`${i}-${j}`} d={d} fill={GUM_FILLS[f.kind]} stroke={GUM_FILLS[f.kind]} strokeWidth={1.5} />;
-              }),
-          )}
-          {teeth.map((t) => (
-            <g key={t.key}>
-              {t.faces
-                // Slivers of the sides between teeth only add clutter.
-                .filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING))
-                .map((f, j) => (
+          {teeth.map((t) => {
+            // Far teeth first; each one stands in its own piece of gum: the gum's top under it, its walls over its foot.
+            const gum = gumsByKey.get(t.key)!;
+            const gumFaces = (top: boolean) =>
+              gum.faces
+                .filter((f) => (f.kind === "top") === top && project.facing(f.normal) > MIN_FACING)
+                .map((f, j) => <path key={`gum-${top}-${j}`} d={facePath(f, project)} fill={GUM_FILLS[f.kind]} stroke={GUM_FILLS[f.kind]} strokeWidth={1.5} />);
+            const rims = (["outer", "inner"] as const).filter((kind) => project.facing(surfaceFace(gum.faces, kind).normal) > MIN_FACING);
+            return (
+              <g key={t.key}>
+                {gumFaces(true)}
+                {t.faces
+                  // Slivers of the sides between teeth only add clutter.
+                  .filter((f) => project.facing(f.normal) > (f.kind === "side" ? 0.3 : MIN_FACING))
+                  .map((f, j) => (
+                    <path
+                      key={j}
+                      d={facePath(f, project, f.kind === "outer" ? 7 : 3)}
+                      fill={f.kind === zoneSurface && zoneKeys.has(t.key) ? ZONE_FILL : TOOTH_FILLS[f.kind]}
+                      stroke={INK}
+                      strokeWidth={2.2}
+                      strokeLinejoin="round"
+                    />
+                  ))}
+                {project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
+                  <path d={`M${fmt(p(t.shine[0]))} L${fmt(p(t.shine[1]))}`} stroke="#fff" strokeWidth={4} strokeLinecap="round" opacity={0.9} />
+                )}
+                {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && (
+                  <path d={`M${t.groove.map((g) => fmt(p(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />
+                )}
+                {gumFaces(false)}
+                {rims.map((kind) => (
                   <path
-                    key={j}
-                    d={facePath(f, project, f.kind === "outer" ? 7 : 3)}
-                    fill={f.kind === zoneSurface && zoneKeys.has(t.key) ? ZONE_FILL : TOOTH_FILLS[f.kind]}
-                    stroke={INK}
-                    strokeWidth={2.2}
+                    key={kind}
+                    d={`M${gum.rims[kind].map((r) => fmt(p(r))).join(" L")}`}
+                    fill="none"
+                    stroke={GUM_RIM}
+                    strokeWidth={2.4}
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 ))}
-              {project.facing(surfaceFace(t.faces, "outer").normal) > 0.55 && (
-                <path d={`M${fmt(p(t.shine[0]))} L${fmt(p(t.shine[1]))}`} stroke="#fff" strokeWidth={4} strokeLinecap="round" opacity={0.9} />
-              )}
-              {t.groove && project.facing(surfaceFace(t.faces, "top").normal) > 0.25 && (
-                <path d={`M${t.groove.map((g) => fmt(p(g))).join(" L")}`} fill="none" stroke="#d9c49a" strokeWidth={2} strokeLinecap="round" />
-              )}
-            </g>
-          ))}
+              </g>
+            );
+          })}
         </g>
       );
     });
@@ -331,7 +363,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
         </g>
       </>
     );
-  }, [view, all, model, lipsPath, zoneSurface, zoneTeeth, happy, daytime]);
+  }, [view, all, model, gumsByKey, lipsPath, zoneSurface, zoneTeeth, happy, daytime]);
 
   // Two pictures on top of each other: the still one below, and above it in a layer of its own everything that
   // moves (the glow, the monsters, the brush; the lips go with them, over the glow), so the brush moving on every frame never has the browser paint the
@@ -399,6 +431,7 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
                 color={m.color}
                 variant={m.variant}
                 active={!m.waiting}
+                still={m.waiting}
                 gone={m.gone}
                 scared={m.scared}
                 tickled={m.tickled}
@@ -428,20 +461,6 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
               );
             })}
 
-          {brush &&
-            brush.stops.length > 0 &&
-            (() => {
-              // Glide between the two stops either side of `at`.
-              const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
-              const next = Math.min(brush.stops.length - 1, i + 1);
-              const k = Math.min(1, Math.max(0, brush.at - i));
-              const a = anchorAt(brush.stops[i], brush.surface);
-              const b = anchorAt(brush.stops[next], brush.surface);
-              const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
-              const tooth = brush.stops[k < 0.5 ? i : next].tooth;
-              return <Brush anchor={anchor} surface={brush.surface} tooth={tooth} motion={brush.motion} project={all[tooth.jaw]} paused={paused} />;
-            })()}
-
           {action && <LipArrows action={action} lips={lipPoints} zoom={project.zoom} />}
 
           {/* The mirror glass catches the light. */}
@@ -452,6 +471,19 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, pau
         </g>
         <FrameStroke frame={frame} unit={unit} />
       </svg>
+      {brush &&
+        brush.stops.length > 0 &&
+        (() => {
+          // Glide between the two stops either side of `at`.
+          const i = Math.min(brush.stops.length - 1, Math.max(0, Math.floor(brush.at)));
+          const next = Math.min(brush.stops.length - 1, i + 1);
+          const k = Math.min(1, Math.max(0, brush.at - i));
+          const a = anchorAt(brush.stops[i], brush.surface);
+          const b = anchorAt(brush.stops[next], brush.surface);
+          const anchor = { at: lerp3(a.at, b.at, k), normal: unitOf(lerp3(a.normal, b.normal, k)), along: unitOf(lerp3(a.along, b.along, k)) };
+          const tooth = brush.stops[k < 0.5 ? i : next].tooth;
+          return <Brush anchor={anchor} surface={brush.surface} tooth={tooth} motion={brush.motion} project={all[tooth.jaw]} frame={{ viewBox, box, unit }} />;
+        })()}
     </>
   );
 }
@@ -466,11 +498,25 @@ const PlacedMonster = memo(function PlacedMonster({
   onTickle,
   ...monster
 }: { id: number; transform: string; onTickle: (id: number) => void } & Omit<Parameters<typeof Monster>[0], "onTickle">) {
-  return (
-    <g transform={transform}>
-      <Monster {...monster} onTickle={() => onTickle(id)} />
-    </g>
+  // While the head turns only `transform` changes: the monster itself is kept, so React doesn't draw it again.
+  const { color, variant, active, still, gone, scared, tickled, blinkMs } = monster;
+  const drawn = useMemo(
+    () => (
+      <Monster
+        color={color}
+        variant={variant}
+        active={active}
+        still={still}
+        gone={gone}
+        scared={scared}
+        tickled={tickled}
+        blinkMs={blinkMs}
+        onTickle={() => onTickle(id)}
+      />
+    ),
+    [id, color, variant, active, still, gone, scared, tickled, blinkMs, onTickle],
   );
+  return <g transform={transform}>{drawn}</g>;
 });
 
 /** A point just in front of a face, where a monster or the brush sits. */
@@ -631,7 +677,7 @@ function KidFace({ project, head, happy, open, crumbs }: { project: Project; hea
       {crumbs &&
         CRUMBS.map(([x, below, size], i) => {
           // They sit just below the lower lip, which drops as the mouth opens.
-          const { at, facing } = feature(x, -(54 + 62 * open) - below, 110 - Math.abs(x) / 4);
+          const { at, facing } = feature(x, -(60 + 62 * open) - below, 110 - Math.abs(x) / 4);
           if (facing <= 0) return null;
           const r = size * project.zoom * squash(facing);
           return (
@@ -671,11 +717,14 @@ export function Monster({
   scared,
   tickled,
   blinkMs,
+  still,
   onTickle,
 }: {
   color: string;
   variant: number;
   active: boolean;
+  /** Stands still, not even blinking: in the mirror only the ones to brush now move, so a phone keeps up. */
+  still?: boolean;
   gone: boolean;
   scared: boolean;
   tickled: boolean;
@@ -688,7 +737,7 @@ export function Monster({
   };
   return (
     <g
-      className={`sugar-monster${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}`}
+      className={`sugar-monster${gone ? " gone" : ""}${scared ? " scared" : ""}${tickled ? " tickled" : ""}${still ? " still" : ""}`}
       style={{ "--blink": `${-(blinkMs % 3700)}ms` } as CSSProperties}
     >
       {/* The ones to brush now glow. */}
