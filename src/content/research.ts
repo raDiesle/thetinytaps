@@ -86,6 +86,8 @@ export const RESEARCH: Research[] = [
       "„Catalog“ mit „kids“ (nachgefragt): kidscatalog, kidcatalog, kidscatalogs und kidscatalogue sind vergeben; frei sind catalogkids, catalogforkids, kidsplaycatalog, kidsgamecatalog und kidsbookcatalog. Davon passt keiner: Google denkt bei „catalog kids“ an Spielzeug- und Kleiderkataloge und Kindermodels, und beim Hören bleibt offen, ob „catalog“ (amerikanisch) oder „catalogue“ (britisch).",
       "Alle Namen mit „lap“ (Schoß – lapandplay, lapandread, lapfriends, lapstories frei; lapbook, laptime vergeben) fallen durch: Google ergänzt „lap“ zu „laptop“, und Nicht-Muttersprachler lesen es auch so.",
       "Schon gekauft und in Betrieb ist toddlerfox.com (30. Oktober 2026, Build und DNS stehen darauf). Ein Wechsel heißt: neue Domain kaufen, SITE_ORIGIN und die Zonendatei umstellen; toddlerfox.com kann ein Jahr lang weiterleiten. Je früher, desto weniger Gespeichertes bleibt bei der alten Adresse zurück.",
+      "Gekauft (31. Oktober 2026): funforboth.com bei Cloudflare. Die App läuft noch auf toddlerfox.com; Build und DNS sind nicht umgestellt.",
+      "Empfehlung dazu: bookforboth.com (am 31. Oktober noch frei, ebenso booksforboth.com) zusätzlich kaufen und zur Adresse der App machen, funforboth.com leitet dorthin weiter. bookforboth ist eigen und als Marke zu schützen, sagt das Buch, das die App zeigt, und hebt sich von Hunderten „fun“-Seiten ab; dass Google „fun for both“ zu dem ergänzt, was Eltern suchen, bringt der Domain keinen Vorsprung (Wörter in der Domain sind kein Rankingfaktor, Recherche „Domain“) – diese Wörter gehören in Titel und Texte.",
     ],
     topics: [
       {
@@ -133,9 +135,9 @@ export const RESEARCH: Research[] = [
       {
         name: "funforboth",
         rank: 2,
-        free: ["com"],
-        taken: [],
-        why: "Am kürzesten (10 Buchstaben), und Google ergänzt es zu „fun activities for both kids and adults“; sagt aber nichts vom Buch und ist als Lobwort kaum als Marke zu schützen.",
+        free: [],
+        taken: ["com"],
+        why: "Gekauft am 31. Oktober 2026. Am kürzesten (10 Buchstaben), und Google ergänzt es zu „fun activities for both kids and adults“; sagt aber nichts vom Buch und ist als Lobwort kaum als Marke zu schützen.",
       },
       {
         name: "talesforboth",
