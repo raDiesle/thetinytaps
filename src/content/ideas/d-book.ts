@@ -100,7 +100,8 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-11",
-      partial: "Der Titel steht jetzt in einer Buchschrift mit Fuchs und Bär als Vignette (D-16); Sonne mit Gesicht und Pillen-Knöpfe sind noch offen.",
+      partial:
+        "Der Titel steht jetzt in einer Buchschrift, auf dem o von „Both“ liest Papa Fuchs seinem Kind auf dem Schoß vor (D-16); Sonne mit Gesicht und Pillen-Knöpfe sind noch offen.",
       emoji: "🌈",
       title: "Titel wie gedruckt",
       text: "Prüfung, was noch nicht zum Buch passt: Der bunte Titel auf der Inhaltsseite, die Sonne mit Gesicht und die runden Pillen-Knöpfe oben rechts sehen noch nach App aus. Ein Titel in einer Buchschrift mit einer Vignette, die Sonne als Zeichnung ohne Gesicht, die Knöpfe als kleine Lesezeichen am Seitenrand.",

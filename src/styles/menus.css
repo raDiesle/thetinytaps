@@ -28,17 +28,58 @@
   display: inline-flex;
 }
 
-/* Fox and bear peeking over a book in front of the name; hold them to open the management page. */
-.logo-mascots {
-  display: inline-flex;
-  align-self: center;
-  width: 1.7em;
+/*
+ * The o of „Both“: Papa Fox on the letter with his child on his lap (Logo). An invisible o keeps the letter's width and
+ * baseline; the picture hangs from a point on that baseline, its o placed over the invisible one (measured in the picture:
+ * the o is 0.563em wide, the foxes rise about 1em above the baseline). Hold it to open the management page.
+ */
+.logo-o {
+  position: relative;
+  display: inline-block;
 }
 
-.logo-mascots svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
+:root[data-look="book"] .logo-o .logo-letter {
+  color: transparent;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+
+.logo-o-anchor {
+  position: relative;
+  display: inline-block;
+  width: 0;
+  height: 0;
+}
+
+.logo-o img {
+  position: absolute;
+  right: 0.04em;
+  bottom: -0.036em;
+  width: 0.635em;
+  max-width: none;
+  pointer-events: auto;
+}
+
+/* A big and a small fox track run along under the name from its start up to the o, where the two now sit together. */
+.logo-tracks {
+  position: absolute;
+  top: 0.06em;
+  right: 0.34em;
+  width: 30em;
+  height: 0.32em;
+  background:
+    right center / auto 100% repeat-x
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 36'%3E%3Cg transform='translate(22 9) rotate(90) scale(0.55)' fill='%23d9692a'%3E%3Cpath d='M-9 4C-9-4-3-6 0-6S9-4 9 4 4 10 0 9-9 9-9 4Z'/%3E%3Cellipse cx='-10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3Cellipse cx='-3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3C/g%3E%3Cg transform='translate(67 13) rotate(90) scale(0.55)' fill='%23d9692a'%3E%3Cpath d='M-9 4C-9-4-3-6 0-6S9-4 9 4 4 10 0 9-9 9-9 4Z'/%3E%3Cellipse cx='-10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3Cellipse cx='-3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3C/g%3E%3Cg transform='translate(10 28) rotate(90) scale(0.38)' fill='%23e8914f'%3E%3Cpath d='M-9 4C-9-4-3-6 0-6S9-4 9 4 4 10 0 9-9 9-9 4Z'/%3E%3Cellipse cx='-10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3Cellipse cx='-3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3C/g%3E%3Cg transform='translate(32 31) rotate(90) scale(0.38)' fill='%23e8914f'%3E%3Cpath d='M-9 4C-9-4-3-6 0-6S9-4 9 4 4 10 0 9-9 9-9 4Z'/%3E%3Cellipse cx='-10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3Cellipse cx='-3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3C/g%3E%3Cg transform='translate(55 28) rotate(90) scale(0.38)' fill='%23e8914f'%3E%3Cpath d='M-9 4C-9-4-3-6 0-6S9-4 9 4 4 10 0 9-9 9-9 4Z'/%3E%3Cellipse cx='-10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3Cellipse cx='-3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3C/g%3E%3Cg transform='translate(78 31) rotate(90) scale(0.38)' fill='%23e8914f'%3E%3Cpath d='M-9 4C-9-4-3-6 0-6S9-4 9 4 4 10 0 9-9 9-9 4Z'/%3E%3Cellipse cx='-10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3Cellipse cx='-3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='3.8' cy='-13.5' rx='3.3' ry='4.6'/%3E%3Cellipse cx='10.5' cy='-8' rx='3.3' ry='4.3'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.logo {
+  overflow-x: clip;
+}
+
+/* The picture's o is Georgia's, the book look's letter: the toy look's rounded letters keep their own o. */
+:root:not([data-look="book"]) .logo-o-anchor {
+  display: none;
 }
 
 .logo-letter {
@@ -374,7 +415,7 @@ button.game-card:focus-visible {
   box-shadow: 0 1px 0 var(--ink);
 }
 
-/* Fox and bear in the home title: hold them to open the hidden management page, without selecting anything. */
+/* Papa Fox and his child in the home title: hold them to open the hidden management page, without selecting anything. */
 .secret-hold {
   user-select: none;
   -webkit-user-select: none;

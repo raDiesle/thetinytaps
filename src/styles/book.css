@@ -171,10 +171,6 @@
   font-weight: 400;
 }
 
-:root[data-look="book"] .logo-mascots {
-  width: 1.55em;
-}
-
 :root[data-look="book"] .menu-title {
   padding: 0 0.4em 0.35em;
   border: 0;
