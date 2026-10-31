@@ -16,7 +16,7 @@ If the idea fits an existing game as a mode or level, add it there instead
 
 ```
 src/games/<game>/          folder name: short English word (marbles, elevator)
-  <X>Game.tsx              start screen: <GameShell title emoji modes mode onMode level info settings>
+  <X>Game.tsx              start screen: <GameShell title emoji modes mode onMode level settings>
   <X>Play.tsx              the game, mounted only while playing; props: settings (+ mode)
   settings.ts              <X>Settings, DEFAULT_<X>_SETTINGS, <X>_SETTINGS_KEY = "tinytaps.<game>.v1"
   content.ts               German texts, pictures, sentences
@@ -45,7 +45,8 @@ Wire it up (the tests in `src/content/content.test.ts` fail if one is missing):
 - `useGameSettings(KEY, DEFAULTS)` in `<X>Game`; include `speech` and `sounds` fields
   if the game talks or makes noise – they are filled in from the home page options.
   Defaults: `speech: false`, `sounds: true`.
-- A new game has no `info` („ℹ️ Über das Spiel“) and no `settings` („⚙️ Einstellungen“): it explains itself by playing
+- A game has no „Über das Spiel“ (`GameShell` has no `info`, user decision, October 2026) and a new game no `settings`
+  („⚙️ Einstellungen“): it explains itself by playing
   (glow, pointing hand, a reaction to every tap), and what a switch would choose is decided once, the way that plays
   best. Only if the user asks for an option, put it into `settings` with `SettingsGroup`, `Toggle`, `Choice`
   (`src/components/SettingControls.tsx`) – only options, no description; never an own switch for

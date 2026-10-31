@@ -97,43 +97,6 @@ export function AnimalsGame() {
           />
         </>
       }
-      info={
-        <>
-          <p>
-            {t({
-              de: "Tiere füttern: Ein Tier hat Hunger, und das Kind zieht das passende Futter zu ihm – die Möhre zum Hasen, den Knochen zum Hund.",
-              ru: "Покорми зверюшку: зверюшка проголодалась, и ребёнок тянет к ней подходящую еду – морковку к зайке, косточку к собачке.",
-              en: "Feed the animals: an animal is hungry, and the child drags the right food to it – the carrot to the bunny, the bone to the puppy.",
-              zh: "喂小动物：一只小动物饿了，孩子把合适的食物拖给它——胡萝卜给小兔子，骨头给小狗。",
-              hi: "जानवरों को खिलाओ: एक जानवर को भूख लगी है, और बच्चा सही खाना खींचकर उसके पास ले जाता है – गाजर खरगोश के पास, हड्डी कुत्ते के पास।",
-              es: "Dar de comer: un animal tiene hambre, y su peque le arrastra la comida que le va: la zanahoria al conejito, el hueso al perrito.",
-              ar: "إطعام الحيوانات: حيوان جائع، ويسحب الطفل إليه الطعام المناسب – الجزرة إلى الأرنب، والعظمة إلى الكلب.",
-            })}
-          </p>
-          <p>
-            {t({
-              de: "Wer wohnt wo? Das Kind bringt das Tier in sein Zuhause: den Vogel ins Nest, die Kuh in den Stall.",
-              ru: "Кто где живёт? Ребёнок относит зверюшку в её домик: птичку в гнездо, корову в хлев.",
-              en: "Who lives where? The child brings the animal to its home: the bird to the nest, the cow to the barn.",
-              zh: "谁住在哪里？孩子把小动物送回家：小鸟送到鸟窝，奶牛送到棚子。",
-              hi: "कौन कहाँ रहता है? बच्चा जानवर को उसके घर ले जाता है: चिड़िया को घोंसले में, गाय को तबेले में।",
-              es: "¿Quién vive dónde? Su peque lleva al animal a su casa: el pajarito al nido, la vaca al establo.",
-              ar: "من يعيش أين؟ يأخذ الطفل الحيوان إلى بيته: العصفور إلى العش، والبقرة إلى الإسطبل.",
-            })}
-          </p>
-          <p>
-            {t({
-              de: "Wer schaut da raus? Nur ein Stück von einem Tier schaut aus dem Busch oder dem Teich. Das Kind tippt unten auf das ganze Tier, und es kommt heraus.",
-              ru: "Кто там выглядывает? Из куста или пруда видна только часть зверюшки. Ребёнок нажимает внизу на всю зверюшку, и она выходит.",
-              en: "Who's peeking out? Only a bit of an animal peeks out of the bush or the pond. The child taps the whole animal below, and it comes out.",
-              zh: "谁在偷偷看？灌木丛或池塘里只露出小动物的一部分。孩子点一下下面完整的小动物，它就出来了。",
-              hi: "कौन झाँक रहा है? झाड़ी या तालाब से जानवर का बस एक हिस्सा दिखता है। बच्चा नीचे पूरे जानवर को छूता है, और वह बाहर आ जाता है।",
-              es: "¿Quién se asoma? Solo un trocito de un animal asoma del arbusto o del estanque. Su peque toca abajo el animal entero, y sale.",
-              ar: "من يطل من هناك؟ يظهر جزء صغير فقط من حيوان من الشجيرة أو البركة. يلمس الطفل في الأسفل الحيوان كاملا، فيخرج.",
-            })}
-          </p>
-        </>
-      }
       settings={
         <>
           <SettingsGroup title={t({ de: "Anzeige", ru: "Отображение", en: "Display", zh: "显示", hi: "दिखावट", es: "Visualización", ar: "العرض" })}>

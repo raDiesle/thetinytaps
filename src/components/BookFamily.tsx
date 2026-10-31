@@ -10,15 +10,16 @@ export const FAMILY_PICTURES: Record<Family, string | undefined> = {
 };
 
 /**
- * One family in a menu's top row, in the book look, where the page is too small for them beside the cards (Sky):
- * next to the home page's title, or beside the way back. The slot takes what room the row leaves and the picture
- * shrinks into it – and hides where too little is left (`book.css`), so it never pushes or covers a button.
- * Lazy, so a screen that hides it never downloads it.
+ * Both families at the bottom of a menu's page in the book look (Sky), the foxes in the left corner and the bears in the
+ * right, so grown-ups see the book is to be read with the child: below the cards, in the room the page keeps free for
+ * them (`--menu-floor`, `book.css`), or on a wide page's margins beside the cards. Never in the top row, beside the
+ * title (user feedback, October 2026). Lazy, so a screen that hides them never downloads them.
  */
-export function BookFamily({ family }: { family: Family }) {
+export function BookFamilies() {
   return (
-    <span className={`book-family-slot ${family}`} aria-hidden>
-      <img src={FAMILY_PICTURES[family]} alt="" loading="lazy" decoding="async" />
-    </span>
+    <>
+      <img className="book-family fox" src={FAMILY_PICTURES.fox} alt="" loading="lazy" decoding="async" />
+      <img className="book-family bear" src={FAMILY_PICTURES.bear} alt="" loading="lazy" decoding="async" />
+    </>
   );
 }

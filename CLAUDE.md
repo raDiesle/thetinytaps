@@ -126,7 +126,7 @@ In a fresh worktree run `bun install` first.
   Devanagari at InScript (`devanagariKeys.ts`, a Shift letter also on its key without Shift), Arabic on the Arabic
   keyboard (`arabicKeys.ts`); Chinese types pinyin on Latin keys. Arabic text runs right to left (`:root[lang="ar"]`
   in `base.css`) while pictures and layout stay as they are. Only the management page and Impressum and Datenschutz (German law) stay German; the pages for search engines are German and English (see Search engines).
-- Texts for parents (the home page's foot, `info`, the SEO texts' prose) speak as the parents who made the app: warm,
+- Texts for parents (the home page's foot, the SEO texts' prose) speak as the parents who made the app: warm,
   flowing sentences in our own words, the way one parent tells another. The user's notes on what to say are a rough
   guide, never wording to copy or to turn into a list of steps (user feedback, October 2026).
 - Comments explain *why* and what a thing is for, in plain sentences; every exported
@@ -265,10 +265,11 @@ In a fresh worktree run `bun install` first.
   in `useFitGrid` and in the styles' `(max-width: 599.98px), (max-height: 599.98px)`): there a menu shows no title
   either (only read out; the home logo stays), and the
   cards get smaller and flat (emoji beside the title; too narrow for that, emoji above a small title without ▶). The sun sits in the top
-  left corner (in the book look, where the families take its place, they do); buttons for grown-ups never cover it (the
-  home page's sit on the right, a phone's way back in the middle). „Über das Spiel“
-  and „Einstellungen“ (where a game still has them) are small round signs without words (a plain „i“, ⚙️; the name as
-  tooltip and read out) right next to the way back, so they take no row of their own; a panel opens right under the top row. When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
+  left corner (in the book look not on a phone, where it only crowds the cards); buttons for grown-ups never cover it (the
+  home page's sit on the right, a phone's way back in the middle). „Einstellungen“ (where a game still has them) is a
+  small sign without words (⚙️; the name as tooltip and read out) right next to the way back – in the book look a paper
+  tab beside the fullscreen tab, see there – so it takes no row of its own; a panel opens right under the top row. A
+  menu has no „Über das Spiel“ (user decision, October 2026: „wir brauchen keine Infos im Menü“). When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
   install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
@@ -279,7 +280,7 @@ In a fresh worktree run `bun install` first.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
 - Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
-  of a level. Never add another. Starting a game shows no note on how to leave (that goes into `info`): the
+  of a level. Never add another. Starting a game shows no note on how to leave: the
   „Zurück zum Menü“ next to ✕ appears only while it is held or a mouse is over it.
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
@@ -301,7 +302,7 @@ In a fresh worktree run `bun install` first.
 src/App.tsx              routes; every game page is lazy-loaded (its own JS and CSS chunk)
 src/pages/<X>Page.tsx    thin wrapper: useTitle + <XGame/>
 src/games/<game>/        one folder per game, see its CLAUDE.md
-  <X>Game.tsx            start screen: <GameShell> with modes, level, info, settings
+  <X>Game.tsx            start screen: <GameShell> with modes, level, settings
   <X>Play.tsx            the game itself, mounted only while playing
   settings.ts            settings type, defaults, storage key "tinytaps.<game>.v1"
   content.ts             German texts and pictures
@@ -319,11 +320,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   „Menü“ go back to the routine.
   **Aim for no settings and no description**, so start screens stay clear: a game should explain itself by playing
   (a glow, the pointing hand, a reaction to every tap), and what a switch would choose is decided once, the way that
-  plays best, instead of being left to grown-ups. `info` („ℹ️ Über das Spiel“) and `settings` („⚙️ Einstellungen“)
-  are optional in `GameShell`, and their buttons show only when a game passes them; Kettenreaktion has neither. Never add one
-  to a game that has none, and when touching a game that still has them, prefer removing them (keep the default
-  behaviour, delete the code for the other). Where one is still kept, `info` says what the game is and how it is played (also
-  keys and tips for grown-ups), `settings` holds only options and the notes that explain them. A game adds no own switch for what the home page already sets for all games
+  plays best, instead of being left to grown-ups. `GameShell` has no `info` („ℹ️ Über das Spiel“, removed from every
+  game, user decision, October 2026): never bring a description back to a start screen. `settings` („⚙️ Einstellungen“)
+  is optional and its button shows only when a game passes it; Kettenreaktion has none. Never add it to a game that has
+  none, and when touching a game that still has it, prefer removing it (keep the default behaviour, delete the code for
+  the other). Where it is still kept, it holds only options and the notes that explain them. A game adds no own switch for what the home page already sets for all games
   (Musik, Sprache), nor a switch for sounds or voice, nor a choice for what the game can tell by itself (morning or evening by the clock).
   A song that is the game itself (the Zahnputzlied sings the steps) plays even with Musik off and sings in the app language.
 - Settings: `useGameSettings(KEY, DEFAULTS)` – saved in localStorage, merged into the
@@ -399,12 +400,18 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   and its shadow slides across the page beneath with its edge; never a quick flick, never a stiff board. A lifted page
   must not swell past the screen (keep the eye far: `perspective(320vw)`), and its keyframes run `linear` – an easing
   restarts at every keyframe, so the page would stop and start.
-  Where the page has no room for the families beside the cards (below 1400 × 640), they sit in the menu's top row
-  instead of the sun and clouds (`BookFamily`, in `MenuHead`), shrinking into the room left and hiding where too little
-  is: never pushing or covering a button. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026); the fullscreen
-  button and ⚙️ stay pale see-through discs there too, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
-  children beside the menu's cards (`BookFamily`) show that the book is read together: they only go where there is room, never over a
-  card or button. Nothing idles: the sky's clouds and rays stand still in the book.
+  The fox and the bear family stand at the bottom of every menu's page (`BookFamilies`, in `Sky`), the foxes in the left
+  corner and the bears in the right, seen whole on every screen: below 1400 × 640 the page keeps that room free under
+  its cards (`--menu-floor`, read by `useFitGrid`, and the table of contents' `--toc-bottom`), and the world's things that
+  stood there (barn, trees, blocks, toys) are left out; wider pages have them on the margins beside the cards. Never in
+  the top row beside the title, where they were too small and in the way (user feedback, October 2026); the cards move
+  up into the room the top row leaves. On a phone the sun, clouds and a room's window are left out too. A new kind of button gets its paper look in `book.css` with the others, never shiny plastic; a card is a picture taped onto the page without a ▶ on it (the whole card is tapped, so it is lower than its row), and the level row's choices are slips of paper lying askew, the chosen one yellow and taped down like a card (user feedback, October 2026). A menu's fullscreen button and ⚙️ are
+  paper tabs hanging from the page's top edge in its top right corner, a strip of tape over the edge, as if stuck into
+  the book (user feedback, October 2026); „zuletzt“ and „bald“ on a card are page markers of coloured film stuck on
+  over its top edge; and the emoji of cards and the table of contents look printed into the paper (softer colours, the
+  paper's grain over them, `book.css`). While playing, the fullscreen
+  button and ⚙️ stay pale see-through discs, the ✕ is the page's corner. Pictures of the fox and the bear family reading with their
+  children at the bottom of the menu's page (`BookFamilies`) show that the book is read together: never over a card or button. Nothing idles: the sky's clouds and rays stand still in the book.
   Fox and bear, the app's mascots, are never a lone animal but a grown-up with a child – Mama, Papa, Oma or Opa Fuchs
   or Bär with its child (user feedback, October 2026): the book is about grown-up and child experiencing it together,
   with the child at the centre. Wherever they turn up (a menu, a game, an idea in `d-book.ts` or `mascotStatus.ts`), the

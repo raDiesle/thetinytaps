@@ -3,7 +3,7 @@ import { targetLanguageFor } from "@/content/targetLanguages";
 import { DAYTIME, DAYTIME_TRANSLATIONS, daytimeText } from "./daytime";
 import { DAYTIME_RU } from "./daytime.ru";
 import { spokenIn } from "@/lib/language";
-import { KAI, STEP_TRANSLATIONS, STEPS, stepText } from "./steps";
+import { STEP_TRANSLATIONS, STEPS, stepText } from "./steps";
 import { STEP_TEXTS_RU } from "./steps.ru";
 import { sungLanguageFor } from "./sung";
 
@@ -35,7 +35,6 @@ test("the Russian morning and evening texts are Cyrillic and have a German one",
       expect(text, `${daytime}.${key}`).toMatch(CYRILLIC);
     }
   }
-  if (KAI.ru) expect(KAI.ru).toMatch(CYRILLIC);
 });
 
 /** The script of each translated language not written in Latin letters: no Latin word may slip into it. */
@@ -53,7 +52,6 @@ test("a step or daytime text with Russian is there in en, zh, hi, es and ar too,
       ...(["morning", "evening"] as const).flatMap((daytime) =>
         (["hello", "grow", "doneTitle", "after"] as const).filter((key) => DAYTIME_RU[daytime][key]).map((key) => daytimeText(daytime, key, language)),
       ),
-      ...(KAI.ru ? [{ text: KAI[id] ?? "", lang: language.speechLang }] : []),
     ];
     for (const { text, lang } of lines) {
       expect(lang, `${id}: ${text}`).toBe(language.speechLang);

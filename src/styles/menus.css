@@ -219,7 +219,7 @@ button.game-card:focus-visible {
   font-size: 1.3rem;
 }
 
-/* The way back and, for grown-ups, small round signs (ℹ️, ⚙️) next to it (MenuTop). */
+/* The way back and, for grown-ups, small round signs (⚙️) next to it (MenuTop). */
 .menu-top {
   display: flex;
   align-items: center;
@@ -262,7 +262,7 @@ button.game-card:focus-visible {
   justify-self: end;
 }
 
-.menu-head > :not(.menu-top, .menu-title, .fullscreen-corner, .book-family-slot) {
+.menu-head > :not(.menu-top, .menu-title, .fullscreen-corner) {
   grid-column: 1 / -1;
   justify-content: center;
 }

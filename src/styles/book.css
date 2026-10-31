@@ -203,7 +203,7 @@
 .toc {
   /* What lies above and below the lines: the page's margin and the menu's head, and the world's picture at the bottom. */
   --toc-top: 150px;
-  --toc-bottom: max(70px, 13vh);
+  --toc-bottom: max(70px, 13vh, var(--menu-floor));
   display: flex;
   flex-direction: column;
   gap: clamp(6px, 1.8vh, 18px);
@@ -342,7 +342,7 @@
 @media (max-width: 599.98px), (max-height: 599.98px) {
   .toc {
     --toc-top: 64px;
-    --toc-bottom: max(40px, 12vh);
+    --toc-bottom: max(40px, 12vh, var(--menu-floor));
     width: min(100% - 28px, 900px);
   }
 }
@@ -536,7 +536,7 @@
   filter: drop-shadow(0 1px 1px #0000004d);
 }
 
-/* Panels that open for grown-ups (options, settings, info) and the level row: a sheet of paper laid on the page. */
+/* Panels that open for grown-ups (options, settings) and the level row: a sheet of paper laid on the page. */
 :root[data-look="book"] :is(.home-menu-panel, .settings, .mode-level, .playtime-lock-panel .settings) {
   border: 2px solid var(--ink);
   border-radius: 14px;
@@ -1005,7 +1005,7 @@
   }
 }
 
-/* The round arrow gives way to the corner; ℹ️ and ⚙️ stay beside the title. */
+/* The round arrow gives way to the corner; ⚙️ becomes a paper tab in the top right (see below). */
 :root[data-look="book"] .menu-head .back-link {
   display: none;
 }
@@ -1129,12 +1129,64 @@
   }
 }
 
-/* ----- The animal families reading together on a wide page's margins (Sky) ----- */
+/* ----- The animal families reading together at the bottom of a menu's page (BookFamilies, in Sky) ----- */
+
+/* The room a menu keeps free under its cards for the families; registered, so `useFitGrid` reads it as pixels. */
+@property --menu-floor {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
 
 .book-family {
   display: none;
 }
 
+/*
+ * Below the cards, the foxes in the left corner and the bears in the right (user feedback, October 2026: in the top
+ * row beside the title they were too small and in the way). The page keeps that room free, so every screen sees them
+ * whole, a phone's as well as a tablet's; the cards move up into the room the top row leaves. The world's things that
+ * stood there (the barn and trees, the blocks, the toys) are left out: on a page this small they only crowd it.
+ */
+@media (max-width: 1399.98px), (max-height: 639.98px) {
+  :root[data-look="book"] {
+    --family-height: clamp(64px, 19vh, 170px);
+    /* The families and the page's bottom margin below them (`--page-inset`). */
+    --menu-floor: calc(var(--family-height) + 30px);
+  }
+
+  :root[data-look="book"] .book-family {
+    display: block;
+    position: absolute;
+    bottom: 2px;
+    z-index: 4;
+    width: auto;
+    max-width: 34%;
+    height: var(--family-height);
+    object-fit: contain;
+    object-position: bottom;
+    filter: drop-shadow(0 3px 3px #5a3c1f40);
+  }
+
+  :root[data-look="book"] .book-family.fox {
+    left: 6px;
+  }
+
+  :root[data-look="book"] .book-family.bear {
+    right: 14px;
+  }
+
+  :root[data-look="book"] .sky .world-thing {
+    display: none;
+  }
+
+  /* The cards keep clear of them; centred in the room between the top row and the families. */
+  :root[data-look="book"] .start-screen {
+    padding-bottom: max(var(--menu-floor), env(safe-area-inset-bottom));
+  }
+}
+
+/* A wide page has room beside the cards: the families stand on its margins, as tall as the margin is wide. */
 @media (min-width: 1400px) and (min-height: 640px) {
   :root[data-look="book"] .book-family {
     display: block;
@@ -1156,77 +1208,132 @@
   }
 }
 
-/* ----- Where the page has no room beside the cards: the families in the top row, instead of the sun and clouds ----- */
-
-.book-family-slot {
-  display: none;
-}
-
-@media (max-width: 1399.98px), (max-height: 639.98px) {
-  :root[data-look="book"] :is(.sky-sun, .sky-cloud) {
+/* A phone's page has no room for the sun and clouds or a room's window beside the cards: behind them they only crowd it. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"] :is(.sky-sun, .sky-cloud, .world-window) {
     display: none;
   }
+}
 
-  /* A slot taking the room the row leaves; its picture shrinks into it, standing on the row's floor. */
-  :root[data-look="book"] .book-family-slot {
-    display: block;
-    position: relative;
-    align-self: stretch;
-    min-width: 0;
-    container-type: inline-size;
+/*
+ * ----- A menu's buttons for grown-ups: paper tabs taped on at the page's top edge -----
+ *
+ * The fullscreen button in the page's top right corner and ⚙️ beside it hang down from the page's top edge like tabs
+ * stuck into a book, a strip of tape over the edge (user feedback, October 2026): part of the book, not round buttons
+ * lying on it, and out of the cards' way – and clear of the sun or the room's window, which stand beside the way back's
+ * corner on the left. The head keeps their height (`min-height` on a phone).
+ */
+:root[data-look="book"] .menu-head > .fullscreen-corner,
+:root[data-look="book"] .menu-head .panel-icon {
+  position: fixed;
+  top: calc(var(--page-top) - 3px);
+  z-index: 20;
+}
+
+:root[data-look="book"] .menu-head > .fullscreen-corner {
+  right: calc(var(--page-right) + 14px);
+}
+
+:root[data-look="book"] .menu-head .panel-icon {
+  right: calc(var(--page-right) + 14px + 46px + 12px);
+}
+
+:root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon) {
+  width: 46px;
+  height: 54px;
+  min-height: 0;
+  padding: 10px 0 0;
+  border: 2px solid #3d304599;
+  border-top: 0;
+  border-radius: 0 0 14px 12px / 0 0 12px 14px;
+  background: var(--paper-grain), linear-gradient(#5a3c1f1f, #0000 30%), color-mix(in srgb, var(--sunshine) 42%, var(--paper));
+  box-shadow: 0 4px 6px -3px #5a3c1f73;
+  transform-origin: 50% 0;
+  rotate: 1.5deg;
+}
+
+:root[data-look="book"] .menu-head .panel-icon.home-menu-button {
+  rotate: -2deg;
+  background: var(--paper-grain), linear-gradient(#5a3c1f1f, #0000 30%), color-mix(in srgb, var(--mint) 42%, var(--paper));
+}
+
+:root[data-look="book"] .menu-head .panel-icon.home-menu-button[aria-expanded="true"] {
+  height: 62px;
+  background: var(--paper-grain), linear-gradient(#5a3c1f1f, #0000 30%), color-mix(in srgb, var(--sunshine) 75%, var(--paper));
+}
+
+/* A phone's tabs are a little shorter, so the head's height keeps them clear of what comes below. */
+@media (max-width: 599.98px), (max-height: 599.98px) {
+  :root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon) {
+    height: 46px;
+    padding-top: 7px;
   }
 
-  :root[data-look="book"] .book-family-slot img {
-    position: absolute;
-    inset: auto 0 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: right bottom;
-    filter: drop-shadow(0 3px 3px #5a3c1f40);
-  }
-
-  /* Each family next to what it sits beside: the foxes on its left, the bears on its right. */
-  :root[data-look="book"] .book-family-slot.bear img {
-    object-position: left bottom;
-  }
-
-  /* Too little room left: no picture squeezed into a stamp. */
-  @container (max-width: 64px) {
-    :root[data-look="book"] .book-family-slot img {
-      display: none;
-    }
-  }
-
-  /* A menu's head: the foxes left of the way back, the bears between the title and the fullscreen button. */
-  :root[data-look="book"] .menu-head {
-    grid-template-columns: minmax(0, 1fr) auto auto minmax(0, 1fr) auto;
-  }
-
-  :root[data-look="book"] .menu-head > .book-family-slot.fox {
-    grid-area: 1 / 1;
-  }
-
-  :root[data-look="book"] .menu-head > .menu-top {
-    grid-area: 1 / 2;
-  }
-
-  :root[data-look="book"] .menu-head > .menu-title {
-    grid-area: 1 / 3;
-  }
-
-  :root[data-look="book"] .menu-head > .book-family-slot.bear {
-    grid-area: 1 / 4;
-  }
-
-  :root[data-look="book"] .menu-head > .fullscreen-corner {
-    grid-area: 1 / 5;
+  :root[data-look="book"] .menu-head .panel-icon.home-menu-button[aria-expanded="true"] {
+    height: 52px;
   }
 }
 
-/* A phone: the families share the row with the menu's buttons, taking the room left. */
-@media (max-width: 599.98px), (max-height: 599.98px) {
-  :root[data-look="book"] .menu-head > .book-family-slot {
-    flex: 1 1 0;
-  }
+/* The tape over the page's edge, holding the tab. */
+:root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon)::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 40px;
+  height: 18px;
+  translate: -50% 0;
+  rotate: -4deg;
+  background: repeating-linear-gradient(90deg, #fff6c8a0 0 6px, #ffeeb0a0 6px 12px);
+  box-shadow: 0 1px 2px #0000001f;
+  pointer-events: none;
+}
+
+:root[data-look="book"] .menu-head :is(.fullscreen-corner .home-menu-button, .panel-icon):active {
+  translate: 0 3px;
+  box-shadow: 0 2px 3px -2px #5a3c1f73;
+}
+
+/*
+ * ----- „zuletzt“ and „bald“ on a card: a page marker stuck on, as one marks a page in a book -----
+ * A strip of see-through coloured film with its glued end darker, sticking out over the card's top edge.
+ */
+:root[data-look="book"] .game-card .badge {
+  top: -18px;
+  right: 18px;
+  z-index: 3;
+  padding: 3px 12px 5px 20px;
+  border: 0;
+  border-radius: 2px 3px 3px 2px;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 85%, #0000) 0 10px, #0000 10px), linear-gradient(#ffffff40, #0000 60%),
+    color-mix(in srgb, var(--accent) 38%, #fff8e0d9);
+  box-shadow:
+    0 1px 1px #0000002e,
+    1px 4px 6px -3px #5a3c1f80;
+  font-size: 0.85rem;
+  font-weight: 700;
+  rotate: -5deg;
+}
+
+/*
+ * ----- The pictures (emoji) printed into the paper -----
+ * A little softer and warmer than on a screen, with the paper's grain and a faint ink edge over them, so they look
+ * printed on the page like everything else rather than lying on top of it (user feedback, October 2026).
+ */
+:root[data-look="book"] :is(.game-emoji, .toc-picture) {
+  position: relative;
+  isolation: isolate;
+  filter: saturate(0.82) sepia(0.12) contrast(0.96);
+}
+
+:root[data-look="book"] :is(.game-emoji, .toc-picture)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--paper-grain), radial-gradient(circle, #0000 58%, #5a3c1f1a);
+  mix-blend-mode: multiply;
+  opacity: 0.6;
+  pointer-events: none;
 }

@@ -1,13 +1,12 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router";
-import { BookFamily } from "@/components/BookFamily";
 import { FullscreenCorner } from "@/components/FullscreenButton";
 import { PageCornerArt } from "@/components/PageCornerArt";
 import { useTurnPage } from "@/lib/look";
 
 /**
  * The way back from a menu: a big round arrow without words (`back` names where it leads, for screen readers and as
- * a tooltip), with `children` – small round buttons for grown-ups such as ℹ️ – right next to it.
+ * a tooltip), with `children` – small round buttons for grown-ups such as ⚙️ – right next to it.
  */
 export function MenuTop({ to, back, children }: { to: string; back: string; children?: ReactNode }) {
   const turnPage = useTurnPage(to, "back");
@@ -27,18 +26,16 @@ export function MenuTop({ to, back, children }: { to: string; back: string; chil
  * The top of a menu: the way back (MenuTop, with `tools` next to it) right left of the centred title, close to the
  * cards where a grown-up looks, and the fullscreen button on the right, across from the sun in the top left corner.
  * `children`, such as a start screen's labelled buttons for grown-ups, go in a row of their own under the title.
- * In the book look the way back is the corner of the page before, at the spine, instead (PageCorner), and where the page has no room for
- * them beside the cards, the animal families sit in the row's free room.
+ * In the book look the way back is the page's corner in the top left instead (PageCorner), and the fullscreen button and
+ * ⚙️ are paper tabs taped on at the page's top edge (`book.css`).
  */
 export function MenuHead({ to, back, title, tools, children }: { to: string; back: string; title: ReactNode; tools?: ReactNode; children?: ReactNode }) {
   return (
     <div className="menu-head">
-      <BookFamily family="fox" />
       <MenuTop to={to} back={back}>
         {tools}
       </MenuTop>
       <h1 className="menu-title">{title}</h1>
-      <BookFamily family="bear" />
       <FullscreenCorner />
       <PageCorner to={to} back={back} />
       {children}
