@@ -2,14 +2,14 @@ import type { IdeaArea } from "./types";
 
 /**
  * D: das Buch – the app as a picture book a grown-up and a child read together (A-20), what still doesn't fit it, and
- * the app's foxes that go into it (their tasks game by game in foxStatus.ts).
+ * the app's two mascots, the fox and the bear, that come back in its games (their tasks game by game in mascotStatus.ts).
  */
 export const bookIdeas: IdeaArea = {
   prefix: "D",
   emoji: "📖",
-  title: "Das Bilderbuch und die Füchse",
+  title: "Das Bilderbuch, Fuchs und Bär",
   intro:
-    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite. Der Fuchs ist das Tier der App, wie Tapsi (D-14 bis D-19): Wer liest, sind Füchse, und in den Spielen kommen Füchse vor, wo es passt – Spiel für Spiel in der Tabelle „🦊 Füchse“ oben.",
+    "Die App sieht aus wie ein Bilderbuch, das ein Großer und ein Kind zusammen anschauen (A-20). Die Ideen hier machen daraus ein gemeinsames Lesen: Bilder von Tiereltern mit ihren Kindern, kleine Gesprächsanstöße für Eltern, und alles, was noch nach Bildschirmspiel statt nach Buch aussieht. Was ins Bild für Kinder kommt, bleibt ohne Text; was Eltern lesen sollen, steht klein am Seitenrand oder unter der ersten Bildschirmseite. Fuchs und Bär sind die Maskottchen der App (D-16 bis D-19): Wer liest, sind die Fuchs- und die Bärenfamilie vom Cover, und in den Spielen tauchen die beiden immer wieder auf, damit Kinder sie überall wiederfinden – nicht in jeder Ecke und nicht beide überall, sondern wo es passt. Spiel für Spiel in der Tabelle „🦊🐻 Fuchs & Bär“ oben. (Bis 31. Oktober 2026 sollte nur der Fuchs überall vorkommen, passend zur Adresse toddlerfox.com; seit dem Umzug auf booksforboth.com ist der Bär genauso willkommen.)",
   ideas: [
     {
       id: "D-01",
@@ -23,10 +23,10 @@ export const bookIdeas: IdeaArea = {
     {
       id: "D-02",
       partial:
-        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Statt der Bären kommen Oma oder Opa Fuchs (D-15); Füchse passend zu jeder Welt fehlen noch.",
+        "Fuchs- und Bärenfamilie stehen auf breiten Bildschirmen (ab 1400 px) neben den Karten jeder Menüseite, auf Handys und Tablets in der obersten Zeile statt Sonne und Wolken, wo Platz ist. Fuchs oder Bär passend zu jeder Welt fehlen noch.",
       emoji: "🦊",
       title: "Tiereltern am Seitenrand",
-      text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: die Fuchsfamilie, Oma oder Opa Fuchs, und später in jeder Welt Füchse, die zu ihr passen (mit Bauhelm auf der Baustelle, im Gummistiefel auf dem Bauernhof). Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
+      text: "Auf jeder Menüseite stehen Tiereltern mit ihrem Kind am Rand und schauen ins Buch: die Fuchs- und die Bärenfamilie, und später in jeder Welt Fuchs oder Bär, wie sie zu ihr passen (mit Bauhelm auf der Baustelle, im Gummistiefel auf dem Bauernhof). Auf Tablets klein in einer Ecke, wo Platz ist, nie über Karten oder Knöpfen.",
       why: "Erinnert Eltern bei jedem Blättern: Das Kind spielt nicht allein, wir schauen zusammen.",
       effort: "S",
     },
@@ -121,50 +121,52 @@ export const bookIdeas: IdeaArea = {
     },
     {
       id: "D-14",
+      rejected: true,
       emoji: "🦊",
       title: "Cover nur mit der Fuchsfamilie",
       text: "Das Bild auf dem Cover zeigt nur noch Tapsis Fuchsfamilie: ein Fuchs-Elternteil und ein Fuchskind, die zusammen ein Buch anschauen und lachen. Die Bärenfamilie fällt weg. Ein Bild mit Gemini (buch-cover.webp), mit den Füchsen von buch-fuechse.webp als Vorlage, im Sammel-Batch der Tabelle „🦊 Füchse“.",
-      why: "Schon das erste Bild sagt, wer hier vorliest – der Fuchs.",
+      why: "Abgelehnt (31. Oktober 2026): Seit die App booksforboth.com heißt und nicht mehr toddlerfox.com, muss der Fuchs nicht allein sein – Fuchs und Bär sind beide Maskottchen, das Cover mit beiden Familien bleibt.",
       effort: "S",
     },
     {
       id: "D-15",
+      rejected: true,
       emoji: "👵",
       title: "Oma oder Opa Fuchs statt der Bären",
       text: "Wo heute die Bärenfamilie neben den Karten und in der obersten Zeile steht, sitzt Oma oder Opa Fuchs mit dem Fuchskind, beide lachen und schauen ins Buch. Ein Bild mit Gemini (freigestellt wie buch-fuechse.webp), dann fliegt der Bär aus BookFamily, Sky und MenuTop.",
-      why: "Keine Bären mehr im Fuchsbuch – und Großeltern lesen genauso oft vor wie Eltern.",
+      why: "Abgelehnt (31. Oktober 2026): Der Bär bleibt, Fuchs und Bär sind beide Maskottchen. Großeltern, die vorlesen, können später als Oma oder Opa Bär bzw. Fuchs dazukommen.",
       effort: "S",
     },
     {
       id: "D-16",
       emoji: "🔤",
       title: "Titel „Books for Both“ auf Startseite und Cover",
-      text: "Die Startseite und das Cover heißen noch „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Books for Both“ in einer Buchschrift, mit einem kleinen gezeichneten Fuchs als Vignette (der Fuchs lehnt an einem der Wörter oder schaut aus einem Buch hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Fuchsohren. Hängt mit D-11 zusammen (Titel wie gedruckt).",
+      text: "Die Startseite und das Cover heißen noch „The Tiny Taps“ in bunten Hüpfbuchstaben. Neu: „Books for Both“ in einer Buchschrift, mit Fuchs und Bär als kleiner gezeichneter Vignette (sie lehnen an den Wörtern oder schauen zusammen aus einem Buch hervor). Dazu der Name überall, wo er steht: Seitentitel, App-Name beim Installieren (Manifest), Texte für Suchmaschinen, README. Das geheime Halten fürs Management (heute das „p“ in „Taps“) braucht eine neue Stelle, z. B. die Ohren von Fuchs oder Bär. Hängt mit D-11 zusammen (Titel wie gedruckt).",
       why: "Die Adresse heißt booksforboth.com – der Titel muss genauso heißen, sonst finden Eltern die App nicht wieder. (Bis 31. Oktober 2026 hieß die Idee „Toddlerfox“; kein „toddler“ im Namen, Recherche „Eine Domain ohne ‚toddler‘“.)",
       effort: "S",
     },
     {
       id: "D-17",
       emoji: "🌲",
-      title: "Startseite als Fuchswald",
-      text: "Hinter der Inhaltsseite steht heute nur ein Himmel. Neu: unten ein Waldrand mit Tapsis Fuchsbau, aus dem die Familie schaut, ein Pfad, Gräser, Pilze – still wie ein gedrucktes Bild, nichts bewegt sich von allein. Ein Tippen auf den Fuchsbau lässt ein Fuchskind kurz herausschauen. Jede Welt (Worlds.tsx) bekommt einen kleinen Fuchs irgendwo in ihrem Bild. Als Zeichnung (SVG), keine Bilddatei.",
-      why: "Die erste Seite zeigt sofort: Das ist das Fuchsbuch.",
+      title: "Startseite als Wald von Fuchs und Bär",
+      text: "Hinter der Inhaltsseite steht heute nur ein Himmel. Neu: unten ein Waldrand mit Tapsis Fuchsbau und der Höhle der Bären, aus denen die Familien schauen, ein Pfad, Gräser, Pilze – still wie ein gedrucktes Bild, nichts bewegt sich von allein. Ein Tippen auf Bau oder Höhle lässt das Fuchs- oder Bärenkind kurz herausschauen. Jede Welt (Worlds.tsx) bekommt einen kleinen Fuchs oder Bären irgendwo in ihrem Bild. Als Zeichnung (SVG), keine Bilddatei.",
+      why: "Die erste Seite zeigt sofort, wer durch das Buch führt: Fuchs und Bär.",
       effort: "M",
     },
     {
       id: "D-18",
       emoji: "🗂️",
-      title: "Füchse in allen Spielen",
-      text: "Jedes Spiel bekommt seine Füchse, Spiel für Spiel nach Aufwand: Fuchs-Erwachsene statt gezeichneter Menschen (Bäckerin, Ärztin, Feuerwehr), ein Fuchskind, das im Hintergrund hervorschaut, Tapsi, der am Ende klatscht. Die Aufgaben stehen in der Tabelle „🦊 Füchse“ oben (foxStatus.ts), getrennt nach Zeichnung (im Code, jederzeit) und Gemini-Bild (wartet und wird gesammelt in einem Batch gemacht, das ist günstiger).",
-      why: "Aus vielen einzelnen Spielen wird eine Welt mit einem Tier, das Kinder überall wiederfinden.",
+      title: "Fuchs und Bär als Maskottchen in allen Spielen",
+      text: "Fuchs und Bär tauchen als wiederkehrendes Muster in allen Spielen auf, Spiel für Spiel nach Aufwand – nicht in jeder Ecke, aber so, dass Kinder sie überall wiederfinden: mal ein Fuchs oder Bär als Erwachsener statt eines gezeichneten Menschen (Bäckerin, Ärztin, Feuerwehr), ein Fuchs- oder Bärenkind, das im Hintergrund hervorschaut, die beiden, die am Ende klatschen. Menschen dürfen bleiben. Die Aufgaben stehen in der Tabelle „🦊🐻 Fuchs & Bär“ oben (mascotStatus.ts), getrennt nach Zeichnung (im Code, jederzeit) und Gemini-Bild (wartet und wird gesammelt in einem Batch gemacht, das ist günstiger).",
+      why: "Aus vielen einzelnen Spielen wird eine Welt mit zwei Freunden, die Kinder überall wiederfinden.",
       effort: "L",
     },
     {
       id: "D-19",
       emoji: "🧒",
-      title: "Das Kind als Fuchskind?",
-      text: "Zu entscheiden: Bleibt die Figur, die für das Kind steht (Junge / Mädchen in Kleine Abenteuer, Zähne putzen, Aufzug), ein Menschenkind, oder wird sie ein Fuchskind mit Zöpfen bzw. ohne? Ein Menschenkind lässt das Kind sich selbst erkennen; ein Fuchskind passt zum Buch. Bis zur Entscheidung bleibt sie ein Menschenkind.",
-      why: "Die größte Frage des Fuchs-Umbaus – erst entscheiden, dann zeichnen.",
+      title: "Das Kind als Fuchs- oder Bärenkind?",
+      text: "Zu entscheiden: Bleibt die Figur, die für das Kind steht (Junge / Mädchen in Kleine Abenteuer, Zähne putzen, Aufzug), ein Menschenkind, oder wird sie ein Fuchs- oder Bärenkind mit Zöpfen bzw. ohne? Ein Menschenkind lässt das Kind sich selbst erkennen; ein Tierkind passt zum Buch. Bis zur Entscheidung bleibt sie ein Menschenkind.",
+      why: "Die größte Frage bei Fuchs und Bär – erst entscheiden, dann zeichnen.",
       effort: "M",
     },
     {
