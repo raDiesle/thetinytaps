@@ -555,6 +555,29 @@
     6px 4px 10px #3a261447;
 }
 
+/* Impressum and Datenschutz, small in the room's bottom right corner on the floor: the shelf's page never scrolls. */
+.room-legal {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right));
+  bottom: max(1px, env(safe-area-inset-bottom));
+  z-index: 3;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.25;
+  /* Light on the dark wooden floor. */
+  color: #fbf3dfd9;
+  text-shadow: 0 1px 2px #2a1a0e99;
+}
+
+.room-legal a {
+  color: inherit;
+}
+
+/* The install hint in the little „i“ book (RoomNotes), below its texts. */
+.home-menu-panel .install-hint {
+  margin: 12px 0 0;
+}
+
 /* Its chains go up out of the picture; each ends in the frame's top edge. */
 .shelf-sign::before,
 .shelf-sign::after {

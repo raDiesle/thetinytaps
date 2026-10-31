@@ -280,7 +280,9 @@ In a fresh worktree run `bun install` first.
   tab beside the fullscreen tab, see there – so it takes no row of its own; a panel opens right under the top row. A
   menu has no „Über das Spiel“ (user decision, October 2026: „wir brauchen keine Infos im Menü“). When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
-  install hint) waits below the first screen (`data-below-fold`), never fixed over it. On a phone the home
+  install hint) waits below the first screen (`data-below-fold`), never fixed over it – except on the bookshelf, the
+  book look's home page, which never scrolls (user feedback, October 2026): there it goes into the shelf's little „i“
+  book (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`). On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
   while there is more to scroll to. Buttons and cards in a menu never touch or overlap, also not with a tilted card's
   corner or a button's shadow: keep clear room between the menu's head (its rows of buttons) and the cards
@@ -447,7 +449,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   sitting on the letter with his child on his lap, reading it a story, and a big and a small paw track run under the name
   up to them (`Logo`). The o itself is the title's real letter; the picture holds only the foxes (Gemini drew them on
   Georgia's bold o, which was then cut out) and lies over it so that Papa really sits on the letter – never floating above
-  it (user feedback, October 2026). The foxes are twice the letter's height, sitting above the sign on the wall. The
+  it (user feedback, October 2026, twice: look at the seat magnified, his thighs must lie on the letter's top stroke). The foxes are twice the letter's height, sitting above the sign on the wall. The
   sign is big and has room above it for them (`--sign`, `--top` in `bookshelf.css`; the shelf gives up the height): at
   the sign's earlier size the foxes were a few pixels and nobody saw them (user feedback, October 2026).
 - Search engines: every game, category and scene has a title, description and text in `src/content/seo.ts`
@@ -472,8 +474,8 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 - Visits are counted only by Cloudflare Web Analytics (no cookies, no consent banner; the build adds it with the
   repository variable `CF_BEACON_TOKEN`, `tools/build.ts`): never add Google Analytics or another tracker that sets
   cookies or needs consent (user decision, October 2026; `tracking.test.ts` checks).
-- Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked next to the version
-  below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
+- Impressum and Datenschutz (`/impressum/`, `/datenschutz/`, `src/pages/LegalPage.tsx`, linked small in the bookshelf room's
+  bottom right corner, in the toy look below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
   stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung
   and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
 - A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
