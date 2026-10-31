@@ -66,6 +66,55 @@ export interface Research {
 
 export const RESEARCH: Research[] = [
   {
+    id: "tafel-verkaufen",
+    date: "2026-10-31",
+    emoji: "💶",
+    title: "Wochenplaner und Belohnungstafel zum Kaufen – ein Geschäft?",
+    question:
+      "Lohnt es sich, Tagesplan, Wochenplaner und Belohnungstafel auch gedruckt zu verkaufen – z. B. 100 Tischkalender bei Saxoprint, alle Ansichten auf den Seiten, Bildkarten getrennt gedruckt, Klett dazu, zugeschnitten zum Umklappen?",
+    method:
+      "Vier Websuchen (Magnet- und Klett-Tafeln bei Amazon, Etsy und Händlern, Vorschriften für Kinderprodukte, Saxoprint) und die Saxoprint-Seite zu Tischkalendern gelesen, 31. Oktober 2026. Die Preise der Druckerei stehen nur im Konfigurator, der hier nicht zu öffnen war: Die Kosten unten sind geschätzt, nicht abgelesen. Keine Rechtsberatung – was für Spielzeug gilt, vor dem Verkauf mit IHK oder Händlerbund klären.",
+    findings: [
+      "Der Markt ist voll und billig: Magnetische Wochenplaner mit 150 bis 250 Magneten kosten bei Amazon und Händlern etwa 7 bis 30 € (Likarto, MeinSchlaufuchs, Yourganize, Momsiv; Action hat einen eigenen). Handgemachte Klett-Sets mit Namen gibt es bei Etsy für rund 40 € (eines: über 300 Karten, CA$ 59), Vorlagen zum Selbstdrucken für 4 bis 14 $.",
+      "Saxoprint druckt Tischkalender ab 1 Stück (ab 100 Stück günstiger): 297 × 105 mm quer, 13 Blatt, Wire-O-Ringbindung mit Aufsteller, bis 300 g/m², auf Wunsch mit Folie (Cellophanierung). Die Seite spricht nur von Kalenderblättern; ob 13 Seiten mit Tagesplan statt Monaten gehen, ist dort nicht gesagt – vermutlich ja, da jede Seite frei gestaltet wird, aber vorher fragen.",
+      "Geschätzte Kosten je Set bei 100 Stück: Kalender etwa 4 bis 7 €, 30 Bildkarten mit Folie etwa 1 bis 2 €, 30 Paar Klettpunkte etwa 2 bis 3 €, Versandtasche und Porto etwa 4 bis 5 €, Gebühren bei Etsy (Verkauf, Zahlung) etwa 10 %. Zusammen rund 12 bis 17 € – bei 25 bis 35 € Preis bleiben 10 bis 18 € je Set, bei 100 verkauften also 1.000 bis 1.800 €.",
+      "Die Handarbeit frisst das auf: 30 Klettpunkte kleben, Karten zuschneiden, packen – etwa 20 bis 30 Minuten je Set, bei 100 Sets 35 bis 50 Stunden. Dazu kommt, die 100 überhaupt zu verkaufen: Die Seiten der App sind neu und bringen noch kaum Besucher.",
+      "Das Wichtigste dagegen: Die App ist für Zwei- und Dreijährige, und Klettpunkte (1 bis 2 cm) lösen sich – sie passen in den Kleinteile-Zylinder (31,7 mm) und sind für Unter-Dreijährige verschluckbar, wie die Magnete der Magnettafeln (Recherche „Belohnungstafel“). Gilt der Plan als Spielzeug, braucht er CE-Kennzeichnung, Prüfung nach EN 71 und technische Unterlagen; gilt er nicht als Spielzeug, die Pflichten der Produktsicherheitsverordnung (GPSR). Ein Warnhinweis „nicht für Kinder unter 36 Monaten“ widerspräche genau der Zielgruppe.",
+      "Weitere Pflichten beim Verkauf: Gewerbe anmelden, Verpackungsregister LUCID und ein Dualsystem vor dem ersten Paket, Impressum und Datenschutz für den Shop (Adressen, Zahlungen – die Datenschutzerklärung der App ändert sich dann, PRIVACY_UPDATED), Widerrufsrecht (entfällt für Sets mit Namen, weil persönlich gefertigt).",
+      "Die Bilder: Was gedruckt verkauft wird, sollte aus den eigenen Bildern der App sein (Gemini), nicht aus Emojis – die Emojis von Apple dürfen nicht verkauft werden, nur offen lizenzierte wie Noto. KI-Bilder sind kaum urheberrechtlich geschützt, Nachahmer können sie übernehmen.",
+      "Was die App wirklich anders macht, ist dasselbe Bild auf dem Tablet und auf dem Tisch (die Lücke aus der Recherche „Belohnungstafel“: Bildschirm und Papier genau gleich) – mit Masse und Preis gegen die Magnettafeln anzutreten wäre aussichtslos.",
+      "Besser als Klett: Der Tischkalender selbst ist der Plan. Jede Seite ein Schritt (Anziehen, Zähne, Schuhe), das Kind klappt die Seite um, wenn er geschafft ist; oder eine Seite pro Wochentag. Keine losen Teile, keine Handarbeit – die Druckerei liefert fertig, auch einzeln mit Namen und den Bildern, die Eltern im Assistenten gewählt haben (Idee T-28). Für den Kalender als Plan gilt die Kleinteil-Frage nicht, Spielzeug-Recht ist trotzdem zu klären.",
+      "Fazit: Als Geschäft mit 100 Stück, Klett und Handarbeit lohnt es sich kaum – ein paar hundert bis tausend Euro für eine Woche Arbeit, mit Restbeständen und Haftung für Kleinteile. Als Begleiter der App kann es sich lohnen, wenn es klein beginnt: 10 Umklapp-Kalender als Muster, mit Freunden und der eigenen Familie ausprobieren, dann wenige über Etsy oder Kleinanzeigen anbieten, und erst bei Nachfrage mehr.",
+    ],
+    topics: [],
+    games: [],
+    excluded: [
+      {
+        title: "100 Sets auf Vorrat mit Klettpunkten",
+        why: "Kleinteile für Unter-Dreijährige, viel Handarbeit, Restbestand, und gegen 7-bis-30-€-Magnettafeln kaum zu verkaufen.",
+      },
+      { title: "Magnete statt Klett", why: "Verschluckungsgefahr unter drei Jahren, schon in der Recherche „Belohnungstafel“ ausgeschlossen." },
+    ],
+    ideas: ["T-28"],
+    sources: [
+      { label: "Saxoprint – Tischkalender", url: "https://www.saxoprint.de/kalender/tischkalender" },
+      {
+        label: "kita.de – Magnetische Wochenplaner im Vergleich",
+        url: "https://www.kita.de/ratgeber/haushalt/buero/bueroartikel/magnetischer-wochenplaner-fuer-kinder/",
+      },
+      { label: "Action – Magnetischer Wochenplaner", url: "https://www.action.com/de-at/p/3220634/magnetischer-wochenplaner/" },
+      { label: "Etsy – Wochenplaner mit Klett und Namen", url: "https://www.etsy.com/listing/4376533776" },
+      {
+        label: "Händlerbund – Spielzeug rechtssicher verkaufen",
+        url: "https://ohn.haendlerbund.de/recht/rechtsfragen/rechtssicher-spielzeug-verkaufen-leitfaden-small-business-haendlerinnen",
+      },
+      {
+        label: "EU-Kommission – Leitfaden Spielzeug unter und über 36 Monaten",
+        url: "https://ec.europa.eu/docsroom/documents/5849/attachments/1/translations/de/renditions/pdf",
+      },
+    ],
+  },
+  {
     id: "domain-tafel",
     date: "2026-10-31",
     emoji: "🔗",
