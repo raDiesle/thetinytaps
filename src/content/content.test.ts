@@ -197,6 +197,28 @@ describe("the app's name", () => {
     expect(readFileSync("src/components/Bookshelf.tsx", "utf8")).toContain("<Logo ");
   });
 
+  test("the title's o of „Both“ is the picture of Papa Fox reading to his child, and that picture is there", () => {
+    const logo = readFileSync("src/components/Logo.tsx", "utf8");
+    const file = logo.match(/pictures\["([^"]+)"\]/)?.[1];
+    expect(file).toBe("logo-fuchs-o.webp");
+    expect(existsSync(`src/components/bilder/${file}`)).toBe(true);
+  });
+
+  test("the bookshelf fills the screen and nothing follows below it: Impressum and Datenschutz stand in its corner", () => {
+    const shelf = readFileSync("src/components/Bookshelf.tsx", "utf8");
+    expect(shelf.match(/export function Bookshelf\(\{([^}]*)\}/)?.[1]).not.toContain("children");
+    expect(shelf).toContain('className="room-legal"');
+    const home = readFileSync("src/pages/Home.tsx", "utf8");
+    expect(home).toMatch(/<Bookshelf [^>]*legal=\{<LegalLinks \/>\} \/>/);
+  });
+
+  test("the shelf's sign hangs above the shelf, never touching it", () => {
+    const css = readFileSync("src/styles/bookshelf.css", "utf8");
+    const sign = css.match(/\n\.shelf-sign \{([^}]*)\}/)?.[1] ?? "";
+    expect(sign).toMatch(/bottom: calc\(100% \+ [^;]+\);/);
+    expect(css).toMatch(/\.shelf-sign::before/);
+  });
+
   test("the old name is gone from what players and search engines see", () => {
     const seen = ["index.html", "public/manifest.webmanifest", ...readdirSync("src", { recursive: true, encoding: "utf8" }).map((f) => `src/${f}`)].filter(
       (file) => /\.(tsx?|html|webmanifest|css)$/.test(file) && !file.includes("/ideas/") && !file.endsWith("research.ts") && !file.endsWith(".test.ts"),

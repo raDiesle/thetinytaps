@@ -40,9 +40,12 @@
     translate 0.4s;
 }
 
+/* At once when the finger lands, no fading in: a grown-up holding it must see straight away what it does (user feedback,
+   October 2026). It fades only when let go. */
 .exit-corner.hinted .exit-hint {
   opacity: 1;
   translate: 0 0;
+  transition: none;
 }
 
 @media (hover: hover) {
@@ -65,8 +68,8 @@
 }
 
 /*
- * Fullscreen on and off while playing, as quiet as the ✕ next to it. On computers always; on phones and
- * tablets only while out of fullscreen (switching apps leaves it), to get back in – never to leave it.
+ * Back into fullscreen while playing, as quiet as the ✕ next to it: only while out of it (switching apps leaves it),
+ * never to leave it – that is the menus' button (FullscreenButton).
  */
 .play-fullscreen {
   display: grid;
@@ -87,16 +90,6 @@
 
 .play-fullscreen:hover .fullscreen-icon {
   stroke: var(--ink);
-}
-
-.play-fullscreen.on {
-  display: none;
-}
-
-@media (min-width: 900px) and (any-pointer: fine) {
-  .play-fullscreen.on {
-    display: grid;
-  }
 }
 
 .hold-exit {
@@ -170,6 +163,7 @@
 .play-options-corner.hinted .play-options-hint {
   opacity: 1;
   translate: 0 0;
+  transition: none;
 }
 
 @media (hover: hover) {

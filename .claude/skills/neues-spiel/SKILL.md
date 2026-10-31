@@ -7,7 +7,7 @@ description: Add a new game to Books for Both – folder, start screen, settings
 
 Read the root `CLAUDE.md` first (toddler rules, style). Pick the closest existing
 game as reference and copy its patterns: `shadows/` (small, cards and drag),
-`elevator/` (SVG story with a script of waits), `loud/` (levels with „Nochmal / Weiter“).
+`elevator/` (SVG story with a script of waits), `socks/` (a game that plays at once).
 
 If the idea fits an existing game as a mode or level, add it there instead
 (`modes` on its `GameShell`) – fewer games in the menu are easier for parents.

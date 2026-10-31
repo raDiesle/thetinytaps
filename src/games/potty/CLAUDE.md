@@ -12,8 +12,8 @@ the wall and the thought bubble, confetti, and at the bottom the row of step ico
 grown-ups' buttons on the right next to it.
 
 The story (`PottyPlay.tsx`, once called „Muss mal!“): one story for both needs, since a child often can't tell beforehand.
-The game has no modes. Opening it (its tile on the home menu) starts the story at once (`GameShell`'s `startMode`); the
-start screen, with only „Los geht’s!“, shows only after leaving with ✕ or „Menü“. It opens on the first step, `eat`: Tapsi the fox
+The game has no modes. Opening it (its tile on the home menu) starts the story at once (`GameShell`'s `startMode`); it has
+no start screen: ✕ and „Menü“ go back to the shelf, where the game stands as a book of its own. It opens on the first step, `eat`: Tapsi the fox
 (`TAPSI` in `content.ts`) at the kitchen table, eating and drinking by turns (the `essen` and `trinken` pictures are that step's
 frames, moving at once).
 Every tap on the picture or background (anything but a button) and every key does the most sensible thing there
@@ -102,8 +102,8 @@ The waiting song (`waitMusic.ts`, `useWaitingMusic`): `musik/musik-toepfchen-war
 - Only Tapsi goes to the potty (the user's choice, to save pictures and tokens): every animal more would need the
   whole story of about 50 pictures drawn again. Never add another animal or family unless the user asks for it.
 - The game is opened when the child has to go now: the tile starts the story at once, with no start screen or
-  submenu before it, and the game has no modes – everything (the star too) is a step of the one story, the start
-  screen behind ✕ has only „Los geht’s!“. Never add a mode card for something the story can show as a step.
+  submenu before it, and the game has no modes – everything (the star too) is a step of the one story, and ✕ goes
+  back to the shelf, never to a start screen with only „Los geht’s!“. Never add a mode card for something the story can show as a step.
 - So unlike other games the picture moves before any tap (the user's choice): Tapsi eats and drinks by turns. Eating
   and drinking are one step, never two.
 - The first steps never go on by themselves (`Step.nudge`; going on alone after three seconds was too fast for the user),

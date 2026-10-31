@@ -52,6 +52,7 @@ export function MenuButton({
   label,
   art,
   className = "home-menu-button",
+  keep = false,
   children,
 }: {
   icon: string;
@@ -59,6 +60,8 @@ export function MenuButton({
   /** What the button shows instead of `icon` and `label` (a thing in the bookshelf's room); `label` is then its name. */
   art?: ReactNode;
   className?: string;
+  /** Text that stays in the page while closed, unseen: words search engines are to find (RoomNotes). */
+  keep?: boolean;
   children: ReactNode;
 }) {
   const t = useT();
@@ -145,6 +148,7 @@ export function MenuButton({
       </button>
       {/* A thing in the bookshelf's 3D room opens its menu outside it, over the whole screen (a transform would hold it in). */}
       {art ? sheet && createPortal(<div className="room-menu">{sheet}</div>, document.body) : sheet}
+      {keep && !open && <div hidden>{children}</div>}
     </div>
   );
 }

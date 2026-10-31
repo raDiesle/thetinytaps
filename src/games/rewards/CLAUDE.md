@@ -1,9 +1,10 @@
-# Belohnungstafel & Tagesplan: both on one page
+# Belohnungstafel & Zeitplan: both on one page
 
 Route `/belohnungstafel/` (and `/tagesplan/`, the same page opened on a plan: `also` in `games.ts`, so it keeps its
 own search entry) · ideas H-01, H-02 (partial) and area T (`src/content/ideas/t-reward-chart.ts`) · research
-„belohnungstafel“ in `src/content/research.ts`. One card, „🌟 Belohnungstafel & Tagesplan“
-(both names, as parents search for them – user decision, October 2026): the **Belohnungstafel**
+„belohnungstafel“ in `src/content/research.ts`. One card, „📅 Belohnungstafel & Zeitplan“
+(both things it makes, a calendar as its sign – user decision, October 2026; the search entries keep „Tagesplan“, as
+parents search for it): the **Belohnungstafel**
 (boards of stars, first part below) and the **Tagesplan** (plans of picture cards, second part) share one page, one
 row of tabs and one wizard.
 

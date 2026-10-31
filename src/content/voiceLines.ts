@@ -18,7 +18,6 @@ import { SITUATIONS } from "@/games/feelings/kita";
 import { MOOD_ANSWER, MOOD_QUESTION } from "@/games/feelings/mood";
 import { PRAISE as FEELINGS_PRAISE } from "@/games/feelings/shared";
 import type { Beat } from "@/games/feelings/story";
-import { NUDGES, SAYS, STATION_TEXTS } from "@/games/loud/texts";
 import { buildBath } from "@/games/marbles/bath";
 import { buildBuilding } from "@/games/marbles/building";
 import { buildCircus } from "@/games/marbles/circus";
@@ -288,14 +287,6 @@ function socks(): VoiceGroup[] {
   return [{ label: "Alle Sätze", lines: once([texts.start, ...texts.pair, texts.done]) }];
 }
 
-function loud(): VoiceGroup[] {
-  return [
-    { label: "Löwe und Maus", lines: once([...SAYS.lion.de, ...SAYS.mouse.de]) },
-    { label: "Ermuntern", lines: once(Object.values(NUDGES).flatMap((n) => [n.mic.de, n.tap.de])) },
-    { label: "Pusten", lines: once(Object.values(STATION_TEXTS).flatMap((s) => [s.intro.mic.de, s.intro.tap.de, s.cheer.de])) },
-  ];
-}
-
 function rewards(): VoiceGroup[] {
   return [
     {
@@ -342,7 +333,6 @@ export function voiceLines(): VoiceGame[] {
     { href: "/zaehne/", groups: teeth() },
     { href: "/toepfchen/", groups: potty() },
     { href: "/socken/", groups: socks() },
-    { href: "/laut-leise/", groups: loud() },
     { href: "/belohnungstafel/", groups: rewards() },
     {
       href: "",

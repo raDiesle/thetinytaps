@@ -160,13 +160,8 @@ export const MASCOT_STATUS: MascotStatusRow[] = [
     tasks: [{ label: "Tapsi und Familie in den Aufgabenbildern", work: "picture", pictures: 130, effort: "L", state: "done" }],
   },
   {
-    href: "/laut-leise/",
-    note: "SVG: Löwe und Maus (das Thema des Spiels, sie bleiben), Kerzen, Pusteblume, Windrad, Boot.",
-    tasks: [{ label: "Tapsi pustet mit (Kerzen, Pusteblume), Mama, Papa, Oma oder Opa Fuchs hält ihm die Pusteblume", work: "drawing", effort: "M" }],
-  },
-  {
     href: "/",
-    note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; der Titel „Books for Both“ hat Fuchs und Bär über einem Buch als Vignette (SVG).",
+    note: "Cover und Familien neben dem Bücherregal sind Gemini-Bilder (components/bilder) mit Fuchs- und Bärenfamilie – so bleibt es; im Titel „Books for Both“ ist das o von „Both“ ein Gemini-Bild: Papa Fuchs sitzt auf dem Buchstaben, sein Kind auf dem Schoß, und liest ihm vor; eine große und eine kleine Fußspur führen unter dem Namen zu ihnen.",
     tasks: [
       { label: "Titel „Books for Both“ auf Startseite, Cover, Manifest, Suchmaschinen", work: "drawing", effort: "S", idea: "D-16", state: "done" },
       { label: "Startseite als Wald mit Fuchsbau und Bärenhöhle, Fuchs oder Bär mit seinem Kind in jeder Welt", work: "drawing", effort: "M", idea: "D-17" },

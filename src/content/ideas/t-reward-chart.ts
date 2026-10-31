@@ -219,6 +219,22 @@ export const rewardChartIdeas: IdeaArea = {
       done: true,
     },
     {
+      id: "T-27",
+      emoji: "🔗",
+      title: "Kurze Adressen, die direkt zur Tafel und zum Plan führen",
+      text: "Ein paar eigene Domains, die nur weiterleiten: kinderbelohnungstafel.de → /belohnungstafel/, kindertagesplan.de → /tagesplan/ (dort ist auch der Wochenplan), auf Englisch kidsrewardcharts.com → /en/belohnungstafel/ und kidsvisualschedule.com → /en/tagesplan/. Bei Cloudflare eine Weiterleitungsregel wie für funforboth.com, nur mit dem Pfad im Ziel; .de gibt es nicht bei Cloudflare zu kaufen (INWX o. ä., die Nameserver dann zu Cloudflare).",
+      why: "Eine Adresse, die man sagen, auf einen Zettel schreiben oder in einer Elterngruppe posten kann und die ohne Umweg zur Tafel führt. Bei Google bringt sie nichts (Recherche „Adressen für Belohnungstafel und Tagesplan“).",
+      effort: "S",
+    },
+    {
+      id: "T-28",
+      emoji: "📒",
+      title: "Der Tagesplan als Umklapp-Kalender zum Kaufen",
+      text: "Ein Tischkalender mit Ringbindung und Aufsteller (wie bei Online-Druckereien ab 1 Stück) als Plan auf dem Tisch: jede Seite ein Schritt der Morgen- oder Abendroutine, groß mit dem Bild aus der App, und das Kind klappt die Seite um, wenn er geschafft ist; eine zweite Ausgabe mit einer Seite pro Wochentag. Eltern stellen ihn im Assistenten zusammen (Name, Bilder) und bestellen ihn gedruckt. Ohne Klett und ohne lose Teile – die Druckerei macht alles, nichts muss von Hand geklebt werden. Rechtlich ist er ein Spielzeug für unter drei Jahre (CE, EN 71 – Recherche „Wochenplaner und Belohnungstafel zum Kaufen“). Gedruckt kostet er fast nichts (250 gleiche 180 €, also 0,72 € das Stück): zuerst ein Entwurf mit Deckblatt, 6 Schritten am Morgen und 6 am Abend, ausprobieren, dann weitersehen.",
+      why: "Die Lücke aus der Recherche „Belohnungstafel“: Bildschirm und Papier genau gleich – das Kind findet auf dem Tisch dieselben Bilder wie auf dem Tablet. Kleine Klettpunkte wären für Unter-Dreijährige verschluckbar (Recherche „Wochenplaner und Belohnungstafel zum Kaufen“).",
+      effort: "L",
+    },
+    {
       id: "T-21",
       emoji: "📺",
       title: "Bildschirmzeit als Belohnung",

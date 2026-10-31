@@ -2,7 +2,7 @@ import { type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNod
 import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
-import { RoomGlobe, RoomHourglass, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
+import { RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
 import { hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
@@ -69,10 +69,11 @@ const EYE_HEIGHT = 0.36;
 /** How deep the shelf is, in book heights (`--d` in bookshelf.css). */
 const DEPTH = 0.56;
 
-/** What stands in each of the grown-ups' compartments. */
+/** What stands in each of the grown-ups' compartments (the stickers' has its little books; the stickers are on its side). */
 const THINGS: Record<ShelfThing, () => ReactNode> = {
   music: () => <RoomSpeaker />,
   playtime: () => <RoomHourglass />,
+  figure: () => <RoomNotes />,
   language: () => <RoomGlobe />,
 };
 
@@ -80,10 +81,11 @@ const THINGS: Record<ShelfThing, () => ReactNode> = {
  * The home page in the book look: a room with a bookshelf, the first thing a visit sees. Each category is a picture
  * book standing in its middle compartments with its cover out, room round each; a tap takes it out and opens it
  * (bookTravel.ts). The grown-ups' options are things in the narrow compartments beside them (RoomOptions), and the
- * app's name is a painted sign standing on top. Drawn in 3D – each compartment a box going back, the boards seen from
- * the eye's height – but still: nothing moves until it is tapped. `children` follow below the first screen.
+ * app's name is a painted sign hanging above it. Drawn in 3D – each compartment a box going back, the boards seen from
+ * the eye's height – but still: nothing moves until it is tapped. The room fills the screen and nothing follows below it:
+ * `legal` (Impressum, Datenschutz) stands small in its bottom right corner.
  */
-export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttributes<HTMLElement>; children?: ReactNode }) {
+export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<HTMLElement>; legal?: ReactNode }) {
   const navigate = useNavigate();
   const room = useRef<HTMLDivElement>(null);
   const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number } | null>(null);
@@ -170,8 +172,8 @@ export function Bookshelf({ secretProps, children }: { secretProps: HTMLAttribut
             </div>
           )}
         </div>
+        {legal && <nav className="room-legal">{legal}</nav>}
       </div>
-      {children}
     </main>
   );
 }
@@ -217,9 +219,9 @@ function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout
           </span>
         </div>
       )}
-      {cell.thing === "language" && (
-        // The stickers of the child's figure, stuck on the back wall above the globe (beside it where the compartment is wide).
-        <div className={`shelf-back-stuck${cell.w > cell.h * 1.2 ? " beside" : ""}`}>
+      {cell.thing === "figure" && (
+        // The stickers of the child's figure, stuck on the compartment's right wall: the shelf's right inner side.
+        <div className="shelf-side-stuck">
           <RoomStickers />
         </div>
       )}
@@ -334,7 +336,7 @@ function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; o
       onClick={onClick}
     >
       <span className="box-front">
-        <SpineLabel title={t(book.title)} />
+        <SpineLabel title={t(book.title)} emoji={book.emoji} />
       </span>
       <span className="box-left" />
       <span className="box-right" />
@@ -346,10 +348,13 @@ function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; o
   );
 }
 
-/** The paper label on the spine of a game's own book, its name running down it. */
-function SpineLabel({ title }: { title: string }) {
+/** The paper label on the spine of a game's own book: its emoji on top, so a child finds it at a glance, its name running down below. */
+function SpineLabel({ title, emoji }: { title: string; emoji: string }) {
   return (
     <span className="shelf-daily-label">
+      <span className="shelf-daily-emoji" aria-hidden>
+        {emoji}
+      </span>
       <span className="shelf-daily-title">{title}</span>
     </span>
   );
@@ -363,7 +368,7 @@ function BookFaces({ book, spine }: { book: ShelfBook; spine?: boolean }) {
   const t = useT();
   return (
     <>
-      <span className="box-left">{spine && <SpineLabel title={t(book.title)} />}</span>
+      <span className="box-left">{spine && <SpineLabel title={t(book.title)} emoji={book.emoji} />}</span>
       <span className="box-right" />
       <span className="box-top" />
       <span className="shelf-book-cover">

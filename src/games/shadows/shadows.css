@@ -203,7 +203,7 @@
 .sh-bar {
   position: absolute;
   z-index: 7;
-  top: max(12px, env(safe-area-inset-top));
+  top: calc(max(12px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(16px, env(safe-area-inset-left));
   display: flex;
   align-items: flex-start;

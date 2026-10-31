@@ -276,7 +276,7 @@
 
 .find-stars {
   position: absolute;
-  top: max(14px, env(safe-area-inset-top));
+  top: calc(max(14px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(16px, env(safe-area-inset-left));
   max-width: 30vw;
   font-family: var(--font-emoji);
@@ -324,7 +324,7 @@
 /* "Alles entdeckt": how many items were tapped, small at the edge. */
 .scene-goal {
   position: absolute;
-  top: max(14px, env(safe-area-inset-top));
+  top: calc(max(14px, env(safe-area-inset-top)) + var(--corner-clear, 0px));
   left: max(16px, env(safe-area-inset-left));
   display: flex;
   align-items: center;

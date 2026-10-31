@@ -20,13 +20,17 @@ export const BOOK_GAP = 0.3;
 export const TAKE_OUT = 0.9;
 
 /**
- * The things for grown-ups standing in the shelf's side compartments, one each (RoomOptions). The stickers of the
- * child's figure have none of their own: they are stuck on the back wall above the globe.
+ * The things for grown-ups in the shelf's side compartments, one each (RoomOptions): the stickers of the child's figure
+ * (`figure`) are stuck on the inner side of the shelf's right wall, in a compartment of their own above the globe's, so
+ * the globe stands apart (user feedback, October 2026).
  */
-export type ShelfThing = "music" | "playtime" | "language";
+export type ShelfThing = "music" | "playtime" | "figure" | "language";
 
-/** In this order: the speaker and the hourglass on the left, the globe with the stickers above it on the right. */
-export const SHELF_THINGS: ShelfThing[] = ["music", "playtime", "language"];
+/**
+ * In this order where they stand in a row (on top of an upright screen's shelf), the stickers at the right side;
+ * in columns the speaker and the hourglass stand on the left, the stickers above the globe on the right.
+ */
+export const SHELF_THINGS: ShelfThing[] = ["music", "playtime", "language", "figure"];
 
 /** The shelf's planks, in px: the side posts, the walls between compartments, the top board, each board, the plinth. */
 export interface ShelfFrame {
@@ -99,8 +103,8 @@ function prefer<T extends { bh: number }>(more: T, fewer: T) {
 
 /**
  * The plan for a room of `width` × `height` and `count` picture books. A screen wider than tall gets a narrow column on
- * each side for the grown-ups' things – two compartments on the left, one tall one on the right for the globe with the
- * stickers above it – and the books in the middle, two boards of them where that keeps them nearly as big (every board
+ * each side for the grown-ups' things – two compartments on each side, the stickers' above the globe's on the right –
+ * and the books in the middle, two boards of them where that keeps them nearly as big (every board
  * holds books, none only fills the shelf). An upright screen gets the things in compartments on top and the books below.
  */
 export function planShelf(width: number, height: number, count: number): ShelfLayout {
@@ -132,9 +136,10 @@ function planWide(width: number, height: number, count: number): ShelfLayout {
   cells.push(
     { x: left, y: crown, w: side, h: sideTier, thing: "music" },
     { x: left, y: crown + sideTier + board, w: side, h: sideTier, thing: "playtime" },
-    { x: right, y: crown, w: side, h: inner, thing: "language" },
+    { x: right, y: crown, w: side, h: sideTier, thing: "figure" },
+    { x: right, y: crown + sideTier + board, w: side, h: sideTier, thing: "language" },
   );
-  planks.push({ x: left, y: crown + sideTier, w: side, h: board });
+  planks.push({ x: left, y: crown + sideTier, w: side, h: board }, { x: right, y: crown + sideTier, w: side, h: board });
   split(count, plan.rows).forEach((books, r) => {
     const y = crown + r * (plan.tier + board);
     cells.push({ x: mid, y, w: middle, h: plan.tier, books });
@@ -159,20 +164,26 @@ function planUpright(width: number, height: number, count: number): ShelfLayout 
   // The books' boards only as high as they need; what is left goes to the things on top.
   const tier = Math.min(plan.tier, plan.bh / 0.75);
   const top = inner - plan.rows * (tier + board);
-  const middle = Math.min(room, Math.max(rowWidth(plan.n, plan.bh), 3 * 64 + 2 * wall));
+  const n = SHELF_THINGS.length;
+  const middle = Math.min(room, Math.max(rowWidth(plan.n, plan.bh), n * 64 + (n - 1) * wall));
   const cells: ShelfCell[] = [];
   const planks: ShelfRect[] = [];
-  const cw = (middle - 2 * wall) / 3;
-  if (top > cw * 1.6) {
-    // Tall and narrow: the speaker over the hourglass on the left, the globe in a tall compartment on the right.
+  const cw = (middle - (n - 1) * wall) / n;
+  if (top > cw * 3.2) {
+    // Tall and narrow: the speaker over the hourglass on the left, the stickers over the globe on the right.
     const half = (middle - wall) / 2;
     const ch = (top - board) / 2;
     cells.push(
       { x: post, y: crown, w: half, h: ch, thing: "music" },
       { x: post, y: crown + ch + board, w: half, h: ch, thing: "playtime" },
-      { x: post + half + wall, y: crown, w: half, h: top, thing: "language" },
+      { x: post + half + wall, y: crown, w: half, h: ch, thing: "figure" },
+      { x: post + half + wall, y: crown + ch + board, w: half, h: ch, thing: "language" },
     );
-    planks.push({ x: post + half, y: crown, w: wall, h: top }, { x: post, y: crown + ch, w: half, h: board });
+    planks.push(
+      { x: post + half, y: crown, w: wall, h: top },
+      { x: post, y: crown + ch, w: half, h: board },
+      { x: post + half + wall, y: crown + ch, w: half, h: board },
+    );
   } else {
     SHELF_THINGS.forEach((thing, i) => {
       cells.push({ x: post + i * (cw + wall), y: crown, w: cw, h: top, thing });

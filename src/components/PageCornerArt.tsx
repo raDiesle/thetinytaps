@@ -34,15 +34,17 @@ export function PageCornerArt({ sign }: { sign: "back" | "close" | "shelf" }) {
 /**
  * The way out of a book, back onto the shelf (user feedback, October 2026): no page turns there, the book is closed and
  * put back. A page's corner said „turn the page“, and a corner of the cover lying over the page floated where no cover
- * can be (the open book's cover lies under its pages). So it is the book's ribbon instead, the Lesebändchen one lays in
- * before closing a book: a band of red satin coming out over the page's top edge from the book's head, lying on the
- * page with its shadow and ending in a swallowtail, with a shelf embroidered on it in gold – books standing and this
- * one going back into its gap. Drawn in a box 36 × 80, the page's edge at y 8, so it hangs no lower than a page's corner would.
+ * can be (the open book's cover lies under its pages). So it is the book's ribbon, the Lesebändchen one lays in before
+ * closing a book: a band of red satin coming out over the page's top edge from the book's head, lying on the page with
+ * its shadow and ending in a swallowtail. On it hangs a round paper label with a little bookshelf in colour, and the
+ * app's yellow round arrow of the way back over its edge – big and plain, so a grown-up sees at once where it leads (a
+ * shelf stamped small in gold was not recognised). Drawn in a box 60 × 88, the page's edge at y 8: short, so it
+ * stays in the room the menus keep free for it.
  */
 function RibbonArt() {
   const id = useId();
   return (
-    <svg className="page-ribbon-art" viewBox="0 0 36 80" aria-hidden>
+    <svg className="page-ribbon-art" viewBox="0 0 60 88" aria-hidden>
       <defs>
         {/* Satin: dark at its edges, where it curves down onto the paper, and a band of sheen along it from the lamp. */}
         <linearGradient id={`${id}s`} x1="0" y1="0" x2="1" y2="0">
@@ -65,24 +67,38 @@ function RibbonArt() {
           <rect width="4" height="0.6" fill="#3a0c14" opacity="0.18" />
         </pattern>
       </defs>
-      <path className="page-ribbon-shadow" d={RIBBON} />
+      <g className="page-ribbon-shadow">
+        <path d={RIBBON} />
+        <circle cx="30" cy="49" r="23" />
+      </g>
       <path d={RIBBON} fill={`url(#${id}s)`} />
       <path d={RIBBON} fill={`url(#${id}r)`} />
-      <rect x="6" y="0" width="24" height="14" fill={`url(#${id}f)`} />
+      <rect x="19" y="0" width="22" height="14" fill={`url(#${id}f)`} />
       {/* Its woven edges, a little lighter. */}
-      <path className="page-ribbon-edge" d="M7.6 2C7.8 24 8 46 9 72M28.4 2C28.6 24 29 46 30 71" />
-      <g className="page-ribbon-stamp" transform="translate(1.2 0)">
-        {/* A shelf's compartment with its books, a gap between them, and this book going back into it. */}
-        <rect className="page-ribbon-frame" x="8.5" y="36" width="19" height="24" rx="0.8" />
-        <rect x="10.4" y="42" width="2.6" height="17" rx="0.5" />
-        <rect x="13.6" y="45" width="2.6" height="14" rx="0.5" />
-        <rect x="21" y="43" width="2.6" height="16" rx="0.5" />
-        <rect x="24" y="46" width="2.2" height="13" rx="0.5" />
-        <rect className="page-ribbon-book" x="17" y="32" width="3.4" height="19" rx="0.6" transform="rotate(14 18.7 51)" />
+      <path className="page-ribbon-edge" d="M20.6 2C20.8 26 21 52 22.2 82M39.4 2C39.6 26 40 52 41.2 81" />
+      {/* The label, a patch of paper-coloured cloth sewn on round its edge. */}
+      <circle className="page-ribbon-label" cx="30" cy="49" r="23" />
+      <circle className="page-ribbon-stitch" cx="30" cy="49" r="20.6" />
+      <g className="page-ribbon-shelf" transform="translate(30 49) translate(-28 -28.5)">
+        {/* The shelf: its frame, a board in the middle, books standing on both boards, one gap for this book. */}
+        <rect className="page-ribbon-wood" x="13" y="13" width="30" height="31" rx="1.5" />
+        <rect className="page-ribbon-inside" x="16" y="16" width="24" height="11" />
+        <rect className="page-ribbon-inside" x="16" y="30" width="24" height="11" />
+        <rect x="17" y="18" width="4" height="9" fill="#c0503c" />
+        <rect x="21.5" y="19.5" width="3.5" height="7.5" fill="#3f6f8f" />
+        <rect x="30" y="18.5" width="4" height="8.5" fill="#5d8a5a" />
+        <rect x="34.5" y="20" width="4.5" height="7" fill="#e0b85c" />
+        <rect x="17" y="32" width="4.5" height="9" fill="#8a5a8f" />
+        <rect x="22" y="33" width="3.5" height="8" fill="#d9a441" />
+        <rect x="26" y="31.5" width="4" height="9.5" fill="#2f5d62" />
+        <rect x="34" y="32.5" width="5" height="8.5" fill="#c77d4f" />
       </g>
+      {/* The way back's round yellow arrow, as on every menu in the toy look. */}
+      <circle className="page-ribbon-badge" cx="47" cy="66" r="11" />
+      <path className="page-ribbon-arrow" d="M51.5 70.5Q53 61 44 61M44 61l4-4.2M44 61l4.2 3.4" />
     </svg>
   );
 }
 
 /** The ribbon's outline: out of the book's head above the page, lying down it, drifting a little as satin does, cut into a swallowtail. */
-const RIBBON = "M6 0H30C29.8 12 29.6 24 30.1 38C30.6 52 30.9 62 31.6 76L19.6 68.5L7.6 77.5C7.2 63 6.8 52 6.6 38C6.4 24 6.2 12 6 0Z";
+const RIBBON = "M19 0H41C40.8 14 40.6 30 41.1 46C41.6 60 41.9 72 42.6 86L31.6 79L20.6 87.5C20.2 72 19.8 60 19.6 46C19.4 30 19.2 14 19 0Z";

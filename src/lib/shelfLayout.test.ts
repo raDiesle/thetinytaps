@@ -27,11 +27,15 @@ describe("the bookshelf", () => {
     for (const cell of cells) expect(Boolean(cell.books) !== Boolean(cell.thing)).toBe(true);
   });
 
-  // The stickers of the child's figure are stuck above the globe (user feedback, October 2026): its compartment is the biggest.
-  test.each(ROOMS)("the globe's compartment has room for the stickers too in a %i × %i room", (width, height) => {
-    const things = planShelf(width, height, BOOKS).cells.filter((c) => c.thing);
-    const globe = things.find((c) => c.thing === "language");
-    for (const c of things) expect((globe?.w ?? 0) * (globe?.h ?? 0)).toBeGreaterThanOrEqual(c.w * c.h - 0.01);
+  // The stickers of the child's figure are stuck on the shelf's right inner side, the globe in a compartment of its own
+  // (user feedback, October 2026): theirs is the rightmost at the top, so its right wall is the shelf's.
+  test.each(ROOMS)("the stickers' compartment lies at the shelf's right side, the globe apart from it, in a %i × %i room", (width, height) => {
+    const { cells, frame, width: w } = planShelf(width, height, BOOKS);
+    const figure = cells.find((c) => c.thing === "figure");
+    const globe = cells.find((c) => c.thing === "language");
+    expect(figure && figure.x + figure.w).toBeCloseTo(w - frame.post);
+    expect(figure?.y).toBeCloseTo(frame.crown);
+    expect(globe).not.toEqual(figure);
   });
 
   test.each(ROOMS)("compartments and planks lie inside the frame and never on each other in a %i × %i room", (width, height) => {

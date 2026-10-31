@@ -108,19 +108,24 @@ test("in the book look the way back onto the shelf is the book's ribbon, not a c
   expect(art).not.toContain("CoverCorner");
 });
 
-// The menus keep the corner's room free and nothing more (on a phone the table of contents starts right under it): the
-// ribbon, lifted over the page's top edge by the part of its drawing above that edge, ends within that room.
-test("the ribbon hangs no lower than the page's corner would", () => {
+// The menus keep the corner's room free and nothing more – on a phone a little less: its table of contents starts at
+// about 0.8 of the corner's height (8 px page top, 78 px corner, first line at 70 px). The ribbon, lifted over the
+// page's top edge by the part of its drawing above that edge, ends within that room on every screen.
+test("the ribbon hangs no lower than the room the menus keep free for it", () => {
   const art = readFileSync("src/components/PageCornerArt.tsx", "utf8");
-  const [, w, h] = art.match(/className="page-ribbon-art" viewBox="0 0 (\d+) (\d+)"/) ?? [];
-  const rule = cssRules().find((r) => r.selector === ':root[data-look="book"] .page-corner.page-ribbon');
-  const share = Number(rule?.body.match(/--ribbon:\s*calc\(var\(--corner\) \* ([\d.]+)\)/)?.[1]);
-  const lift = Number(rule?.body.match(/top:\s*calc\(var\(--page-top\) - var\(--ribbon\) \* (\d+) \/ (\d+)\)/)?.[1]);
-  expect(rule?.body).toContain(`height: calc(var(--ribbon) * ${h} / ${w})`);
-  expect(rule?.body).toContain(`top: calc(var(--page-top) - var(--ribbon) * ${lift} / ${w})`);
-  const bottom = share * ((Number(h) - lift) / Number(w));
-  expect(bottom).toBeGreaterThan(0.6);
-  expect(bottom).toBeLessThanOrEqual(1);
+  const [, w, h] = (art.match(/className="page-ribbon-art" viewBox="0 0 (\d+) (\d+)"/) ?? []).map(Number);
+  const rules = cssRules().filter((r) => r.selector === ':root[data-look="book"] .page-corner.page-ribbon');
+  const lift = Number(rules[0]?.body.match(/top:\s*calc\(var\(--page-top\) - var\(--ribbon\) \* (\d+) \/ (\d+)\)/)?.[1]);
+  expect(rules[0]?.body).toContain(`height: calc(var(--ribbon) * ${h} / ${w})`);
+  expect(rules[0]?.body).toContain(`top: calc(var(--page-top) - var(--ribbon) * ${lift} / ${w})`);
+  const bottoms = rules
+    .map((r) => Number(r.body.match(/--ribbon:\s*calc\(var\(--corner\) \* ([\d.]+)\)/)?.[1]))
+    .filter((share) => share > 0)
+    .map((share) => (share * ((h ?? 0) - lift)) / (w ?? 1));
+  expect(bottoms.length).toBe(2);
+  expect(Math.max(...bottoms)).toBeLessThanOrEqual(1);
+  expect(Math.min(...bottoms)).toBeLessThanOrEqual(0.75);
+  expect(Math.min(...bottoms)).toBeGreaterThan(0.6);
 });
 
 // User decision, October 2026: menus need no „Über das Spiel“. GameShell has no `info`, no game passes one, and no
