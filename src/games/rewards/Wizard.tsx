@@ -307,7 +307,6 @@ export function Wizard({
 
       {zoomAt >= 0 && (
         <Zoom
-          emoji={tiles[zoomAt].emoji}
           label={t(tiles[zoomAt].label)}
           picture={tiles[zoomAt].picture}
           selected={picked.has(tiles[zoomAt].key)}
@@ -384,7 +383,6 @@ const ZOOM: Localized = { de: "Groß ansehen" };
  * book's page and its transforms too.
  */
 function Zoom({
-  emoji,
   label,
   picture,
   selected,
@@ -392,7 +390,6 @@ function Zoom({
   onStep,
   onClose,
 }: {
-  emoji: string;
   label: string;
   picture: ReactNode;
   selected: boolean;
@@ -421,9 +418,7 @@ function Zoom({
       }}
     >
       <div className="rw-zoom-head">
-        <h3 className="rw-zoom-name">
-          <span aria-hidden>{emoji}</span> {label}
-        </h3>
+        <h3 className="rw-zoom-name">{label}</h3>
         <button type="button" className={`rw-zoom-pick${selected ? " selected" : ""}`} aria-pressed={selected} onClick={onToggle}>
           {selected ? `✓ ${t({ de: "Ausgewählt" })}` : t({ de: "Auswählen" })}
         </button>

@@ -58,7 +58,7 @@ export function Certificate({
   return (
     <section className="rw-review rw-cert" aria-label={t(CERTIFICATE)}>
       <header className="rw-review-head">
-        <h2 className="rw-panel-title">🏅 {t(CERTIFICATE)}</h2>
+        <h2 className="rw-panel-title">{t(CERTIFICATE)}</h2>
         <span className="rw-review-now" />
         <button type="button" className="rw-review-close" onClick={onClose}>
           ✕ {t(TO_CHART)}
