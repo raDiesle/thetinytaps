@@ -42,8 +42,9 @@ function flyFrom(el: HTMLElement, from: DOMRect, scale: number, delay = 0) {
  * A plan on screen, as big as the room allows, and how its steps get done: the child taps the card that glows
  * („Jetzt“) when that step is done – it gets a tick with a sound and the next card glows. A card done before
  * twinkles, a later one wiggles and says when it comes („noch 2-mal schlafen“ in the week). The last tick of the day
- * is a party, and „↺ Von vorn“ starts the day again (after an Erst–Dann, the next one). In the day view a done card
- * flies into the Fertig-Kiste instead of getting a tick, and „Von vorn“ takes them all out again. The teeth card under
+ * is a party, and „↺ Von vorn“ starts the day again (after an Erst–Dann, the next one). On a Jetzt – Dann the marker
+ * slides on to the next card, as the child moves the paper one; with its „Jetzt“ field a done card flies into the
+ * Fertig-Kiste instead of getting a tick, and „Von vorn“ takes them all out again. The teeth card under
  * „Jetzt“ opens Zähne putzen instead, which comes back here with the card done. A new plan shows example ticks until
  * the first tap.
  */
@@ -79,13 +80,15 @@ export function PlanScreen({
   const [party, setParty] = useState<string | null>(null);
   const { bursts, spawn } = useBursts();
   const move = useRef<Move | null>(null);
+  /** Where the marker lay before a tick or „Zurück“: it slides from there to the card to do now. */
+  const markerFrom = useRef<DOMRect | null>(null);
   const today = new Date();
   const ticks = log[plan.id];
   const shown = plan.examples ? { ...exampleTicks(plan, today), ...ticks } : ticks;
   const todaySteps = stepsOn(plan, today);
   const allDone = todaySteps.length > 0 && currentStep(todaySteps, ticks, linked, today) === -1;
-  /** The views whose done cards go into the Fertig-Kiste; the week and Erst–Dann keep them in place with a tick. */
-  const boxed = plan.view === "day" || plan.view === "now-next";
+  /** A Jetzt – Dann with the „Jetzt“ field puts done cards into the Fertig-Kiste; the others keep them in place with a tick. */
+  const boxed = plan.view === "day" && !!plan.nowField;
   /** An Erst–Dann's pairs done today: „Von vorn“ makes them ready for the next time. */
   const pairsDone = plan.view === "first-then" ? pairsOf(todaySteps).filter((pair) => pair.every((step) => stepDone(ticks, linked, today, step))) : [];
 
@@ -120,8 +123,13 @@ export function PlanScreen({
   useLayoutEffect(() => {
     const m = move.current;
     const root = box.current;
+    const from = markerFrom.current;
     move.current = null;
-    if (!m || !root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    markerFrom.current = null;
+    if (!root || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const marker = root.querySelector<HTMLElement>(".pl-marker");
+    if (from && marker) flyFrom(marker, from, 1);
+    if (!m) return;
     if (m.into) {
       const card = root.querySelector<HTMLElement>(`.pl-box-card[data-step="${m.key}"]`);
       if (card) flyFrom(card, m.from, m.from.height / Math.max(1, card.getBoundingClientRect().height));
@@ -130,6 +138,11 @@ export function PlanScreen({
     const cards = root.querySelectorAll<HTMLElement>(m.key ? `.pl-dayview .pl-card[data-step="${m.key}"]` : ".pl-dayview .pl-card");
     cards.forEach((card, i) => flyFrom(card, m.from, 0.2, i * 70));
   });
+
+  /** Notes where the marker is, so it slides on from there after the next render. */
+  const keepMarker = () => {
+    markerFrom.current = box.current?.querySelector(".pl-marker")?.getBoundingClientRect() ?? null;
+  };
 
   /** Where the Fertig-Kiste is now, for a card leaving it; null in the week, which has none. */
   const boxRect = () => box.current?.querySelector(".pl-box")?.getBoundingClientRect() ?? null;
@@ -166,6 +179,7 @@ export function PlanScreen({
     if (plan.examples) {
       const from = boxRect();
       if (from) move.current = { key: "", from, into: false };
+      keepMarker();
       onExamplesOff();
       sound(playPop);
       return;
@@ -204,6 +218,7 @@ export function PlanScreen({
     // The card to do now: done, with a tick, and the next one glows.
     const next = addStar(log, plan.id, key, today);
     if (boxed) move.current = { key, from: el.getBoundingClientRect(), into: true };
+    keepMarker();
     setLog(next);
     setFresh(key);
     setUndo(key);
@@ -286,6 +301,7 @@ export function PlanScreen({
     if (!undo) return;
     const from = boxRect();
     if (from) move.current = { key: undo, from, into: false };
+    keepMarker();
     setLog(takeBackStar(log, plan.id, undo));
     setUndo(null);
     setFresh(null);

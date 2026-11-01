@@ -914,22 +914,105 @@
   background: var(--sunshine);
 }
 
-/* How many of a kind are picked, beside its name under „Ansicht“. */
-.rw-kind-count {
-  display: inline-grid;
-  place-items: center;
-  min-width: 1.5em;
-  height: 1.5em;
-  margin-left: 6px;
-  border-radius: 999px;
-  background: var(--ink);
-  color: #fff;
-  font-size: 0.8rem;
-}
-
 /* The kinds under „Ansicht“ show only in the column of steps on a big screen (below). */
 .rw-step-kinds {
   display: none;
+}
+
+/*
+ * Beside „Mein Tag“, in the place of a second picture: the form of a Jetzt – Dann – parts, how many cards, what moves –
+ * as small picks, a counter per part and the note on what it means at home.
+ */
+.rw-day-config-cell {
+  grid-column: span 2;
+}
+
+/* Beside the form, „Mein Tag“ keeps to the top instead of the row's foot. */
+.rw-view-config .rw-gallery-big {
+  align-items: start;
+}
+
+.rw-day-config {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.rw-wizard-step .rw-day-config-head {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  text-align: left;
+}
+
+.rw-day-picks {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rw-day-picks .rw-pick {
+  padding: 6px;
+}
+
+.rw-day-picks .rw-pick-emoji {
+  font-size: 1.6rem;
+}
+
+.rw-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.rw-count {
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.rw-count-name {
+  font-weight: 800;
+}
+
+.rw-count button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rw-count button:hover:not(:disabled) {
+  background: var(--sunshine);
+}
+
+.rw-count button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rw-count-number {
+  min-width: 1.4em;
+  font-size: 1.4rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.rw-day-note {
+  margin: 0;
 }
 
 /* What the wizard is for, on every step: between the buttons at the foot, or beside the steps (big screen, phone). */
@@ -1092,7 +1175,7 @@
   text-align: center;
 }
 
-/* Stays in sight while a long step scrolls, so „Weiter“ and „So nehmen“ are always one tap away. */
+/* Stays in sight while a long step scrolls, so „Weiter“ and „✓ Plan anlegen“ are always one tap away. */
 .rw-wizard-foot {
   position: sticky;
   bottom: 0;

@@ -255,7 +255,7 @@
 }
 
 /*
- * Ablaufplan and Jetzt – Dann: the card to do now stands apart on the left, big, on a lit panel under a „Jetzt“
+ * Jetzt – Dann with the „Jetzt“ field: the card to do now stands apart on the left, big, on a lit panel under a „Jetzt“
  * banner; a dashed line parts it from the „Dann“ cards, smaller, in rows (one per part of the day: morning, evening).
  */
 .pl-flow {
@@ -351,17 +351,29 @@
   border-top: max(1px, 0.3cqmin) solid color-mix(in srgb, var(--rw-ink) 20%, transparent);
 }
 
-/* Jetzt – Dann: two cards only, „Jetzt“ the bigger one; „Dann“ waits smaller beside it. */
-.pl-nownext > .pl-now {
-  flex: 1.25;
+/*
+ * Jetzt – Dann with a marker: every card keeps its place, a little smaller than its slot, so the marker – a sticky note
+ * in yellow, as one at home would be – peeks out round the card to do. It slides on after a tap (PlanScreen).
+ */
+.pl-marked .pl-slot {
+  position: relative;
 }
 
-.pl-nownext > .pl-then > .pl-slot {
-  flex: 0 1 72%;
-  align-self: center;
-  aspect-ratio: 1;
-  max-width: 100%;
-  margin: auto 0;
+.pl-marked .pl-slot > .pl-card {
+  margin: 8cqmin;
+}
+
+.pl-marker {
+  position: absolute;
+  inset: 0;
+  border-radius: 3cqmin;
+  background: linear-gradient(#f2c230 0 16%, #ffe066 16%);
+  box-shadow: 0 1.5cqmin 3cqmin #0003;
+  rotate: -5deg;
+}
+
+.pl-marked .pl-card.now {
+  box-shadow: 0 max(2px, 2cqmin) 0 var(--rw-ink);
 }
 
 /* An empty place for a Velcro card (on paper). */
