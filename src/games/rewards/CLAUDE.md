@@ -146,7 +146,9 @@ one. A full day gets small bursts, the goal a party (and speech, if Vorlesen is 
 CSS hides everything else. The print is empty, with „Woche vom ____“ / „Datum ____“ to fill in (a month board prints its month, this one or
 the next); options: orientation
 (auto: portrait for a day board with up to two tasks), colour or grey (no inline colours, so `.rw-grey` wins), fields
-to colour in, and a page of stickers to cut out. Any later print feature (H-02: Schnullerfee-Brief) can
+to colour in, a page of stickers to cut out, and a page of the tasks and the reward as picture cards to cut out
+(`cards`, T-20, for a Velcro board beside the chart). Both charts print such cards with the same `CutCardPages`
+(`PrintPanel.tsx`), never a page layout of their own. Any later print feature (H-02: Schnullerfee-Brief) can
 use the same way.
 
 **Fotoabzug** (`photo.ts`, `PhotoPrint.tsx`, H-02): cards for a Velcro board are made for photo paper first – firm,
@@ -207,12 +209,15 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   (`rewards.test.ts` checks both).
 - A picture stands for the catalogue's emoji only: a task, card or reward whose emoji a grown-up changed, and an own
   one, shows that emoji (`itemPicture`); never put a picture over what a grown-up chose.
+- A rule that changes `.rw-page` (its `display`, padding) for one kind of page goes after `.rw-page` in `rewards.css`,
+  never into `planner.css`: the two stylesheets load in another order on the dev server than in the build, so a page's
+  grid in `planner.css` lost to `.rw-page`'s flex and the cut-out cards stood as tall strips in the preview.
 - On paper a picture never takes more room than the emoji it replaces where words stand beside it (a week row): the
   bigger pictures cut „Zähne putzen“ to „Zähne putze“ in the A4 preview. Look at the print preview after changing sizes.
 
 # Tagesplan
 
-Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-43 (H-42 done), T-20 (partial) · research
+Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-43 (H-42 done), T-20 · research
 „tagesplan“ in `src/content/research.ts`.
 
 A picture schedule („Strukturtafel“), called „Zeitplan“ beside the Belohnungstafel (`CHART_TYPES`), in four views –
@@ -239,7 +244,7 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   Fertig-Kiste below, `DoneBox`), `NowNext`, `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a
   day). No date on the sheet: only a printed plan whose weekdays differ names its weekday.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
-  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
+  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out (`CutCardPages`); `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
   `WizardPlan.tsx` – a plan's own steps in the wizard; `planSettings.ts` – plans, current one, print options
   (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick`;
   `planner.css` – classes `pl-`.

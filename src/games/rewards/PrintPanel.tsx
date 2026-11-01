@@ -3,11 +3,11 @@ import { createPortal } from "react-dom";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { type Localized, useT } from "@/lib/language";
 import { type Board, NO_LINKED } from "./board";
-import { BoardSheet, type SheetLook } from "./BoardSheet";
-import { MARK_BY_ID, MARKS, THEME_BY_ID, THEMES } from "./catalog";
+import { BoardSheet, type SheetLook, useRewardLabel, useTaskLabel } from "./BoardSheet";
+import { MARK_BY_ID, MARKS, THEME_BY_ID, type Theme, THEMES } from "./catalog";
 import { MIN_STAR_MM, photoFormat, photoLayout } from "./photo";
 import { PRINT } from "./pageParts";
-import { MarkPic, markPicture } from "./pictures";
+import { ItemPic, MarkPic, markPicture } from "./pictures";
 import { PhotoPrint } from "./PhotoPrint";
 import type { PrintOptions } from "./settings";
 
@@ -106,6 +106,11 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
           checked={options.stickers}
           onChange={(stickers) => onChange({ stickers })}
         />
+        <Toggle
+          label={t({ de: "Dazu: Aufgaben und Belohnung als Bildkarten zum Ausschneiden" })}
+          checked={!!options.cards}
+          onChange={(cards) => onChange({ cards })}
+        />
         <p className="setting-note">
           {t({
             de: "Gedruckt wird die Tafel leer – die Sterne kommen mit Aufklebern, Stempeln oder Buntstiften darauf. Laminiert (oder in einer Klarsichthülle) hält sie mit abwischbarem Stift viele Wochen.",
@@ -116,6 +121,8 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
             ar: "تُطبع اللوحة فارغة – وتُضاف النجوم بالملصقات أو الأختام أو الأقلام الملونة. إذا غُلّفت (أو وُضعت في غلاف شفاف) واستُخدم قلم قابل للمسح، تدوم أسابيع كثيرة.",
             ru: "Таблица печатается пустой – звёзды появляются с наклейками, штампами или карандашами. В ламинате (или в прозрачном файле) и со стираемым маркером она прослужит много недель.",
           })}
+          {options.cards &&
+            ` ${t({ de: "Die Bildkarten zeigen, wofür es Sterne gibt: laminiert und mit Klettpunkten (keine kleinen Magnete – unter drei Jahren können sie verschluckt werden) hängen sie neben der Tafel oder an einer Klett-Tafel." })}`}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>
           🖨️ {t(PRINT_WORDS.now)}
@@ -153,13 +160,22 @@ export function PrintPanel({ board, options, onChange }: { board: Board; options
   );
 }
 
-/** The printed pages: the board, and the marks to cut out if wanted. */
+/** The printed pages: the board, and if wanted the marks and the cards of tasks and reward to cut out. */
 function PrintPages({ board, options, look, orientation }: { board: Board; options: PrintOptions; look: SheetLook; orientation: "landscape" | "portrait" }) {
   const landscape = orientation === "landscape";
   const width = landscape ? A4.long : A4.short;
   const height = landscape ? A4.short : A4.long;
   const mark = MARK_BY_ID.get(board.mark) ?? MARKS[0];
   const theme = THEME_BY_ID.get(board.theme) ?? THEMES[0];
+  const taskLabel = useTaskLabel();
+  const rewardLabel = useRewardLabel();
+  const lines = !look.color;
+  const cards: CutCard[] = options.cards
+    ? [
+        ...board.tasks.map((task) => ({ key: task.id, picture: <ItemPic item={task} lines={lines} />, label: taskLabel(task) })),
+        ...(board.reward ? [{ key: "reward", picture: <ItemPic item={board.reward} kind="reward" lines={lines} />, label: rewardLabel(board.reward) }] : []),
+      ]
+    : [];
   // The body of the sheet is roughly the page without heading and goal: what the path of a collecting board fits into.
   const aspect = (width - 20) / (height - 60);
   const now = new Date();
@@ -184,8 +200,46 @@ function PrintPages({ board, options, look, orientation }: { board: Board; optio
           ))}
         </div>
       )}
+      <CutCardPages cards={cards} orientation={orientation} color={look.color} theme={theme} />
     </>
   );
+}
+
+/** A picture card on a page to cut out: what it shows and its words below. */
+export interface CutCard {
+  key: string;
+  picture: ReactNode;
+  label: string;
+}
+
+/** Cards on a page of cards to cut out: 3 × 4 or 4 × 3, each about 6 cm. */
+const CARDS_PER_PAGE = 12;
+
+/**
+ * Pages of picture cards to cut out for a Velcro board at home (four across on a landscape page, three on a portrait
+ * one): a plan's steps, or a board's tasks and reward.
+ */
+export function CutCardPages({ cards, orientation, color, theme }: { cards: CutCard[]; orientation: "landscape" | "portrait"; color: boolean; theme: Theme }) {
+  const landscape = orientation === "landscape";
+  const width = landscape ? A4.long : A4.short;
+  const height = landscape ? A4.short : A4.long;
+  const pages = Array.from({ length: Math.ceil(cards.length / CARDS_PER_PAGE) }, (_, i) => cards.slice(i * CARDS_PER_PAGE, (i + 1) * CARDS_PER_PAGE));
+  return pages.map((page, i) => (
+    <div
+      key={i}
+      className={`rw-page rw-card-page${landscape ? " wide" : ""}${color ? "" : " rw-grey"}`}
+      style={{ width: `${width}mm`, height: `${height}mm`, ...(color ? { "--rw-main": theme.main, "--rw-paper": theme.paper } : {}) } as CSSProperties}
+    >
+      {page.map((card) => (
+        <span key={card.key} className="rw-cut-card">
+          <span className="rw-cut-pic" aria-hidden>
+            {card.picture}
+          </span>
+          <span className="rw-cut-label">{card.label}</span>
+        </span>
+      ))}
+    </div>
+  ));
 }
 
 /** The pages made small enough for the panel, exactly as they will print. */
