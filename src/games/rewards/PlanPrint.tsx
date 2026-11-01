@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { type Localized, useT } from "@/lib/language";
@@ -9,7 +8,7 @@ import { PlanSheet, type PlanLook, useStepLabel } from "./PlanSheet";
 import { MIN_CARD_MM, type PhotoFormat } from "./photo";
 import { PhotoPrint } from "./PhotoPrint";
 import { itemPicture, ItemPic } from "./pictures";
-import { A4, PRINT_WORDS, Preview } from "./PrintPanel";
+import { A4, CutCardPages, PRINT_WORDS, Preview } from "./PrintPanel";
 
 /** How a plan is printed. */
 export interface PlanPrintOptions {
@@ -43,9 +42,6 @@ const CARDS_NOTE: Localized = {
   ar: "تثبت البطاقات من الورق العادي بعد تغليفها بنقاط الفيلكرو (لا مغناطيسات صغيرة – قد يبتلعها الأطفال دون الثالثة): هكذا يرتّب الطفل يومه بنفسه، وتنتقل البطاقات المنجزة إلى جيب «انتهى».",
   ru: "Карточки из обычной бумаги после ламинирования держатся на липучках (никаких маленьких магнитов – дети до трёх лет могут их проглотить): так ребёнок сам выкладывает свой день, а выполненные карточки отправляются в кармашек «Готово».",
 };
-
-/** Cards on a page of cards to cut out: 3 × 4 or 4 × 3, each about 6 cm. */
-const CARDS_PER_PAGE = 12;
 
 /** The page's orientation: the grown-up's choice, or what suits the plan. */
 export const planOrientation = (plan: Plan, options: PlanPrintOptions, day: Date): "landscape" | "portrait" =>
@@ -160,7 +156,7 @@ export function PlanPrint({
   );
 }
 
-/** The printed pages: the plan, then the cards to cut out (four across on a landscape page, three on a portrait one). */
+/** The printed pages: the plan, then its pictures as cards to cut out (CutCardPages). */
 function PlanPages({ plan, day, options, orientation }: { plan: Plan; day: Date; options: PlanPrintOptions; orientation: "landscape" | "portrait" }) {
   const label = useStepLabel();
   const landscape = orientation === "landscape";
@@ -168,30 +164,16 @@ function PlanPages({ plan, day, options, orientation }: { plan: Plan; day: Date;
   const height = landscape ? A4.short : A4.long;
   const look: PlanLook = { print: true, color: options.color };
   const theme = THEME_BY_ID.get(plan.theme) ?? THEMES[0];
-  const cards = options.cards ? distinctSteps(plan) : [];
-  const cardPages = Array.from({ length: Math.ceil(cards.length / CARDS_PER_PAGE) }, (_, i) => cards.slice(i * CARDS_PER_PAGE, (i + 1) * CARDS_PER_PAGE));
+  const cards = options.cards
+    ? distinctSteps(plan).map((step) => ({ key: step.id, picture: <ItemPic item={step} lines={!look.color} />, label: label(step) }))
+    : [];
   return (
     <>
       <style>{`@page { size: A4 ${orientation}; margin: 0; }`}</style>
       <div className="rw-page" style={{ width: `${width}mm`, height: `${height}mm` }}>
         <PlanSheet plan={plan} ticks={undefined} linked={NO_LINKED} today={day} day={day} look={look} aspect={(width - 20) / (height - 40)} />
       </div>
-      {cardPages.map((page, i) => (
-        <div
-          key={i}
-          className={`rw-page pl-card-page${landscape ? " wide" : ""}${look.color ? "" : " rw-grey"}`}
-          style={{ width: `${width}mm`, height: `${height}mm`, ...(look.color ? { "--rw-main": theme.main, "--rw-paper": theme.paper } : {}) } as CSSProperties}
-        >
-          {page.map((step) => (
-            <span key={step.id} className="pl-cut-card">
-              <span className="pl-emoji" aria-hidden>
-                <ItemPic item={step} lines={!look.color} />
-              </span>
-              <span className="pl-label">{label(step)}</span>
-            </span>
-          ))}
-        </div>
-      ))}
+      <CutCardPages cards={cards} orientation={orientation} color={look.color} theme={theme} />
     </>
   );
 }

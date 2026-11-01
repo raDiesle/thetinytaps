@@ -2324,6 +2324,53 @@
   line-height: 1;
 }
 
+/* Picture cards to cut out (CutCardPages), for a board's tasks and reward and a plan's steps: 3 × 4 or 4 × 3 a page.
+   After .rw-page in this file, so its grid wins over the page's flex whatever order the stylesheets load in. */
+.rw-card-page {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 6mm;
+}
+
+.rw-card-page.wide {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+
+.rw-cut-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+  border: 1mm solid var(--rw-main, #999);
+  border-radius: 6mm;
+  background: var(--rw-paper, #fff);
+  outline: 0.3mm dashed #999;
+  outline-offset: 2mm;
+}
+
+.rw-cut-pic {
+  font-family: var(--font-emoji);
+  font-size: 30mm;
+  line-height: 1;
+}
+
+.rw-cut-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 7mm;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.rw-grey .rw-cut-pic {
+  filter: grayscale(1) contrast(1.15);
+}
+
 /* Only while printing: the pages, and nothing else of the app. */
 .rw-print-root {
   display: none;

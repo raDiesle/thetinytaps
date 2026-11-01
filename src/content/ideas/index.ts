@@ -23,6 +23,7 @@ import { figureIdeas } from "./f-figure";
 import { rewardChartIdeas } from "./t-reward-chart";
 import { firstVisitIdeas } from "./v-first-visit";
 import { bookIdeas } from "./d-book";
+import { matchingIdeas } from "./z-matching";
 import type { IdeaArea, IdeaGroup } from "./types";
 
 export * from "./types";
@@ -34,7 +35,18 @@ export const IDEA_GROUPS: IdeaGroup[] = [
   {
     emoji: "🧱",
     title: "Bestehende Spiele ausbauen",
-    areas: [scenesIdeas, newScenesIdeas, lettersIdeas, wordsIdeas, marblesIdeas, chainReactionIdeas, adventureIdeas, littleAdventuresIdeas, otherGamesIdeas],
+    areas: [
+      scenesIdeas,
+      newScenesIdeas,
+      lettersIdeas,
+      wordsIdeas,
+      marblesIdeas,
+      chainReactionIdeas,
+      adventureIdeas,
+      littleAdventuresIdeas,
+      matchingIdeas,
+      otherGamesIdeas,
+    ],
   },
   { emoji: "✨", title: "Ganz neue Spiele", areas: [newGamesIdeas] },
   {
