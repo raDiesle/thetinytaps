@@ -342,6 +342,43 @@ export function reviewPeriods(board: Board, stars: Record<string, number> | unde
   }).filter((period) => period.count > 0);
 }
 
+/** Days in a row a day board must be full before it suggests a certificate: a day alone says little. */
+const SETTLED_DAYS = 7;
+
+/**
+ * Whether the board asks if something works by itself now, and offers its certificate (T-15): its goal reached
+ * (this week's, this month's, the path's end), or on a day board every one of the last `SETTLED_DAYS` days full.
+ * Never while it shows examples, which are no one's success.
+ */
+export function suggestsCertificate(board: Board, stars: Record<string, number> | undefined, linked: LinkedDays, today: Date): boolean {
+  if (board.examples || board.tasks.length === 0) return false;
+  if (board.kind === "day") {
+    return Array.from({ length: SETTLED_DAYS }, (_, i) => new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1 - i)).every((day) =>
+      dayFull(board, stars, linked, day),
+    );
+  }
+  const { count, goal } = progress(board, stars, linked, today);
+  return count >= goal;
+}
+
+/**
+ * Winding down (T-15): the board's next, longer goal – more stars until the same reward – or null where there is none:
+ * a day board's goal is its day, a collecting board stops at its last size, and a week or month at all its fields.
+ */
+export function longerGoal(board: Board, today: Date): number | null {
+  if (board.kind === "day") return null;
+  if (board.kind === "collect") return COLLECT_GOALS.find((goal) => goal > board.goal) ?? null;
+  const next = Math.min(fieldCount(board, today), Math.ceil(board.goal * 1.5));
+  return next > board.goal ? next : null;
+}
+
+/** Winding down (T-15): a task with a field per time of day keeps only its last one (brushing: the evening). */
+export function oncePerDay(task: BoardTask): BoardTask {
+  const slots = taskSlots(task);
+  const last = slots[slots.length - 1];
+  return last ? { ...task, slots: [last] } : task;
+}
+
 /** The log with a star on a field (a key of `cellKey`), or one more collected; old days dropped. */
 export function addStar(log: StarLog, boardId: string, key: string | null, today: Date): StarLog {
   const oldest = dayKey(new Date(today.getFullYear(), today.getMonth(), today.getDate() - KEEP_DAYS));

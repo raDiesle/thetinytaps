@@ -22,11 +22,13 @@ visitor land there.
 (user feedback, October 2026): both kinds on the one page, each in an area under its name („Belohnungstafel“,
 „Zeitplan“, without emoji like every heading, the one the page was opened on first), and in each every view, its name big on top as a heading (Tag,
 Woche, Monat, Sammeln; Ablaufplan, Jetzt – Dann, Erst – Dann, Woche), the view's Vorlagen as big pictures under it,
-each with its name above it, and a small „✏️ Leer anfangen“ beside the view's name. The views share the rows so they
-fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). The first step shows no list of
-steps – a lone „1 Ansicht“ over the pictures confused (user feedback, October 2026) –, its help sits at the foot; from
-the second step on the steps show, on a big screen (≥ 1400 × 700) as a column on the left, the kinds under „Ansicht“
-as links back to their areas with how many are picked.
+each with its name above it, a 🔍 on its corner and a small „✏️ Leer anfangen“ beside the view's name. The views
+share the rows so they fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). The first
+step shows no list of steps – a lone „1 Ansicht“ over the pictures confused (user feedback, October 2026) –, its help
+sits at the foot; from the second step on the steps show, on a big screen (≥ 1400 × 700) as a column on the left, the
+kinds under „Ansicht“ as links to their areas with how many are picked. On a big screen the pictures stand three a
+row, on columns the views share (`--rw-span`, holes filled by a later view).
+The 🔍 shows the Vorlage over the whole screen (`Zoom`, a modal `<dialog>`), with „Auswählen“ and ‹ › through all.
 A tap picks a Vorlage (yellow glow, ✓), another puts it back; several, also
 of both kinds, are made at once with „✓ N anlegen“ (`onDone` takes a list). With exactly one picked, „Weiter“ goes
 on to its own steps – `WizardBoard.tsx`: Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Bilder (with which days),
@@ -68,7 +70,8 @@ targets) – keep it that way.
   with a time of day `YYYY-MM-DD|task|evening`, or `count` on a collecting board; `cellKey`/`parseCellKey`), the fields
   of a task (`taskSlots`), progress, add, take back, start over, `withKind` (the same board in another view: stars
   stay, the goal fits), `exampleStars`, `shiftPeriod`/`samePeriod`/`OLDEST_BACK` for looking back, `reviewPeriods`
-  for the Rückblick, `possessive` for the title („Lenas Sterne“).
+  for the Rückblick, `suggestsCertificate`/`longerGoal`/`oncePerDay` for the Urkunde and winding down, `possessive`
+  for the title („Lenas Sterne“).
 - `linked.ts` – what Zähne putzen (`loadWeek`, with morning or evening) and Aufs Töpfchen (`loadStars`, a count) did
   on which day; such a field is filled without a star in the log – brushing fills the field of its time of day, the
   potty fills a task's fields in the order of the day. Only on day, week and month boards: those games keep two weeks,
@@ -82,7 +85,8 @@ targets) – keep it that way.
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars, grouped by view;
   `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
-  `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `RewardsGame.tsx` – the page for boards and plans
+  `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Certificate.tsx` – „🏅 Urkunde“ (below);
+  `RewardsGame.tsx` – the page for boards and plans
   (above). There is no „ℹ️ Über die Tafel“ or „Über den Plan“ (removed with every menu's „Über das Spiel“, user
   decision, October 2026): the chart explains itself by its pictures, the wizard and „Gestalten“.
 - `pictures.tsx` – the pictures of `bilder/` in place of the catalogue's emoji (`ItemPic`, `MarkPic`, `Pic`): tasks,
@@ -122,6 +126,18 @@ scrolls sideways. A tap on the big one, ‹ › or the arrow keys flip on (round
 looks back by months, a day board by weeks (a day is too little). Only weeks with stars, as far back as stars are
 kept; nothing can be changed there – a forgotten star is added on the board with ‹.
 
+„🏅 Urkunde“ (T-15, a board with tasks) shows in place of the board what ends a round when something works by
+itself: a certificate on one A4 page standing – a rosette, „Urkunde für Lena“ (a line to write on without a name),
+the task's picture big (its line-art twin on a grey print), its name, „Das kann ich jetzt ganz allein!“, the board's
+marks, the date and a line to sign – beside the task to pick, the child's name and „Urkunde drucken“. Below, „Wie
+geht es weiter?“ says how parents' guides wind a reward chart down (announce it, then make the stars rarer, then let
+the task go) and does each in one tap: „Mehr Sterne bis zur Belohnung: 8 statt 5“ (`longerGoal`, half as many again,
+on a collecting board the next size; not on a day board), „nur noch einmal am Tag“ for a task with several times
+(`oncePerDay` keeps the last, brushing the evening), and „ablösen“, which takes the task off the board and opens
+„Gestalten“ for the next one. Once the goal is reached (on a day board: the last seven days full,
+`suggestsCertificate`), a line under the board asks „Klappt es schon von selbst?“ and opens the Urkunde – a grown-up's
+line, never a party a child taps into. The certificate prints in colour or grey as the board does.
+
 On a computer (≥ 900 px, mouse) „✏️ Gestalten“ and „🖨️ Drucken“ lie open below the board, reached by scrolling (the
 buttons on top scroll there); on phones and tablets they open as panels in place of the board.
 
@@ -146,7 +162,9 @@ one. A full day gets small bursts, the goal a party (and speech, if Vorlesen is 
 CSS hides everything else. The print is empty, with „Woche vom ____“ / „Datum ____“ to fill in (a month board prints its month, this one or
 the next); options: orientation
 (auto: portrait for a day board with up to two tasks), colour or grey (no inline colours, so `.rw-grey` wins), fields
-to colour in, and a page of stickers to cut out. Any later print feature (H-02: Schnullerfee-Brief) can
+to colour in, a page of stickers to cut out, and a page of the tasks and the reward as picture cards to cut out
+(`cards`, T-20, for a Velcro board beside the chart). Both charts print such cards with the same `CutCardPages`
+(`PrintPanel.tsx`), never a page layout of their own. Any later print feature (H-02: Schnullerfee-Brief) can
 use the same way.
 
 **Fotoabzug** (`photo.ts`, `PhotoPrint.tsx`, H-02): cards for a Velcro board are made for photo paper first – firm,
@@ -163,6 +181,11 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 
 - No punishment, ever: a star is never taken away by the board, only undone right after a mistake; a missed day stays
   an empty field, not a cross or a sad face. No screen time as a reward (T-21 rejected).
+- Winding down only ever asks more of a habit that already works – a longer way to the same reward, fewer fields a
+  day, a task let go with a certificate – never fewer stars for the same thing or a reward taken back (`rewards.test.ts`
+  checks `longerGoal` never shortens).
+- Only one set of pages waits for the printer: a panel that prints on its own (the Urkunde) hides the board's print
+  pages below it on a computer, or both would come out of the printer (`.rw-print-root` is one per panel).
 - The Rückblick shows only what worked: a week without stars is left out, never shown empty or counted as missed
   (`rewards.test.ts` checks `reviewPeriods`).
 - Few tasks: the editor advises one to three and allows `MAX_TASKS`; templates use at most three.
@@ -185,7 +208,9 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   big on top of its Vorlagen as a heading, and a Vorlage's name above its picture, never small below it; a picture has
   no second frame round it (it is framed itself), only a glow when picked. Several Vorlagen can be picked and made at
   once. The pictures are as big as the rows allow, with no empty room beside them: check at 1920 × 1080, 1440 × 900,
-  1024 × 768 and 844 × 390 (on a computer they were „viel zu klein“, „erkenne ich nicht“). The pictures are the
+  1024 × 768 and 844 × 390 (on a computer they were „viel zu klein“, „erkenne ich nicht“, and five a row still were
+  on 1920), and every picture of a whole chart has a 🔍 beside the tap that picks it, opening it as big as the screen
+  allows – a picture small enough to sit among others is never big enough to read. The pictures are the
   explanation – no description lines under the choices; the one help line, on every step, says what the wizard is
   for: use the charts on screen, print and make them, or order the photo prints, and several are made at once.
 - A button that can do nothing is left out, never shown greyed (the first step has no „Zurück“).
@@ -206,12 +231,15 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   (`rewards.test.ts` checks both).
 - A picture stands for the catalogue's emoji only: a task, card or reward whose emoji a grown-up changed, and an own
   one, shows that emoji (`itemPicture`); never put a picture over what a grown-up chose.
+- A rule that changes `.rw-page` (its `display`, padding) for one kind of page goes after `.rw-page` in `rewards.css`,
+  never into `planner.css`: the two stylesheets load in another order on the dev server than in the build, so a page's
+  grid in `planner.css` lost to `.rw-page`'s flex and the cut-out cards stood as tall strips in the preview.
 - On paper a picture never takes more room than the emoji it replaces where words stand beside it (a week row): the
   bigger pictures cut „Zähne putzen“ to „Zähne putze“ in the A4 preview. Look at the print preview after changing sizes.
 
 # Tagesplan
 
-Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-43 (H-42 done), T-20 (partial) · research
+Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-43 (H-42 done), T-20 · research
 „tagesplan“ in `src/content/research.ts`.
 
 A picture schedule („Strukturtafel“), called „Zeitplan“ beside the Belohnungstafel (`CHART_TYPES`), in four views –
@@ -238,7 +266,7 @@ shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the galle
   Fertig-Kiste below, `DoneBox`), `NowNext`, `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a
   day). No date on the sheet: only a printed plan whose weekdays differ names its weekday.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
-  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out; `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
+  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out (`CutCardPages`); `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
   `WizardPlan.tsx` – a plan's own steps in the wizard; `planSettings.ts` – plans, current one, print options
   (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick`;
   `planner.css` – classes `pl-`.

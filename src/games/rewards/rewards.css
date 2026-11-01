@@ -777,6 +777,143 @@
   display: grid;
 }
 
+/* 🔍 on the picture's lower corner, always there (a touch screen has no hover): it opens the Vorlage big. */
+.rw-gallery-big li {
+  position: relative;
+}
+
+.rw-tpl-zoom {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 3px 0 var(--ink);
+  font-family: var(--font-emoji);
+  font-size: 1.5rem;
+  cursor: zoom-in;
+}
+
+.rw-tpl-zoom:hover {
+  background: var(--sunshine);
+}
+
+/* A Vorlage big: the whole screen, its name and „Auswählen“ on top, ‹ › beside the picture, which takes all the rest. */
+.rw-zoom {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 12px 16px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-rounded);
+}
+
+.rw-zoom[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* A plain colour: a backdrop doesn't see the page's custom properties in every browser. */
+.rw-zoom::backdrop {
+  background: rgb(42 30 92 / 85%);
+}
+
+.rw-zoom-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  align-self: center;
+  max-width: 100%;
+  padding: 6px 8px 6px 20px;
+  border-radius: 999px;
+  background: var(--cream);
+}
+
+.rw-zoom-name {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 900;
+}
+
+.rw-zoom-head button {
+  min-height: 48px;
+  border: 3px solid var(--ink);
+  border-radius: 999px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.rw-zoom-pick {
+  padding: 0 20px;
+}
+
+.rw-zoom-pick.selected {
+  background: var(--sunshine);
+}
+
+.rw-zoom-close {
+  width: 48px;
+  padding: 0;
+}
+
+.rw-zoom-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* The picture as big as both width and height allow at its own shape (the thumbnail's 1.45). */
+.rw-zoom-picture {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  container-type: size;
+  display: grid;
+  place-items: center;
+}
+
+.rw-zoom-picture .rw-thumb {
+  width: min(100cqw, 100cqh * 1.45);
+  height: auto;
+}
+
+.rw-zoom-step {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 3px solid var(--ink);
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--ink);
+  font: inherit;
+  font-size: 2.2rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rw-zoom-step:hover {
+  background: var(--sunshine);
+}
+
 /* How many of a kind are picked, beside its name under „Ansicht“. */
 .rw-kind-count {
   display: inline-grid;
@@ -985,6 +1122,27 @@
  * „Ansicht“ – where they are chosen – and the help below them; the step takes all the rest of the width.
  */
 @media (min-width: 1400px) and (min-height: 700px) {
+  /*
+   * Three pictures a row, in a grid whose columns the views share (a view spans as many as it has pictures, its
+   * pictures on the same columns, so all are the same size) and fill up holes with a later view: five a row were still
+   * too small on a 1920 screen (user feedback, October 2026).
+   */
+  .rw-view-groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: row dense;
+    gap: 20px 24px;
+  }
+
+  .rw-view-group {
+    grid-column: span var(--rw-span);
+  }
+
+  .rw-gallery-big {
+    grid-template-columns: repeat(var(--rw-span), minmax(0, 1fr));
+    gap: 24px;
+  }
+
   .rw-wizard {
     position: relative;
     display: grid;
@@ -1283,6 +1441,42 @@
 }
 
 @media (max-width: 599.98px), (max-height: 599.98px) {
+  .rw-tpl-zoom {
+    right: 6px;
+    bottom: 6px;
+    width: 38px;
+    height: 38px;
+    border-width: 2px;
+    font-size: 1.1rem;
+  }
+
+  .rw-zoom {
+    padding: 6px 8px 8px;
+  }
+
+  .rw-zoom[open] {
+    gap: 6px;
+  }
+
+  .rw-zoom-name {
+    font-size: 1.1rem;
+  }
+
+  .rw-zoom-head button {
+    min-height: 38px;
+    font-size: 0.95rem;
+  }
+
+  .rw-zoom-close {
+    width: 38px;
+  }
+
+  .rw-zoom-step {
+    width: 44px;
+    height: 44px;
+    font-size: 1.6rem;
+  }
+
   .rw-example-note {
     font-size: 0.72rem;
   }
@@ -2151,6 +2345,53 @@
   line-height: 1;
 }
 
+/* Picture cards to cut out (CutCardPages), for a board's tasks and reward and a plan's steps: 3 × 4 or 4 × 3 a page.
+   After .rw-page in this file, so its grid wins over the page's flex whatever order the stylesheets load in. */
+.rw-card-page {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 6mm;
+}
+
+.rw-card-page.wide {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+
+.rw-cut-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3mm;
+  border: 1mm solid var(--rw-main, #999);
+  border-radius: 6mm;
+  background: var(--rw-paper, #fff);
+  outline: 0.3mm dashed #999;
+  outline-offset: 2mm;
+}
+
+.rw-cut-pic {
+  font-family: var(--font-emoji);
+  font-size: 30mm;
+  line-height: 1;
+}
+
+.rw-cut-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 7mm;
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.rw-grey .rw-cut-pic {
+  filter: grayscale(1) contrast(1.15);
+}
+
 /* Only while printing: the pages, and nothing else of the app. */
 .rw-print-root {
   display: none;
@@ -2239,4 +2480,213 @@
 /* The chart fills the page down to its foot, where the families would stand half hidden behind it: they stay out. */
 :root[data-look="book"] .rw-page-screen .book-family {
   display: none;
+}
+
+/* ---------- Urkunde (T-15): the certificate to print, and the ways to wind the board down beside it ---------- */
+
+.rw-cert-body {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(260px, 420px);
+  gap: 18px;
+  align-items: start;
+}
+
+.rw-cert-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.rw-cert-options .setting-note {
+  margin: 0;
+}
+
+.rw-cert-tasks {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.rw-cert-options .rw-print-button {
+  align-self: flex-start;
+}
+
+.rw-cert-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rw-cert-steps button {
+  min-height: 48px;
+  padding: 6px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rw-cert-steps button:hover {
+  background: color-mix(in srgb, var(--sunshine) 30%, #fff);
+}
+
+@media (max-width: 760px) {
+  .rw-cert-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The page: a double frame in the board's colour, everything centred down it. */
+.rw-cert-page {
+  padding: 12mm;
+  background: var(--rw-paper, #fff);
+}
+
+.rw-cert-frame {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 4mm;
+  padding: 10mm 14mm 12mm;
+  border: 2.5mm double var(--rw-main, #999);
+  border-radius: 6mm;
+  background: #fff;
+  font-family: var(--font-rounded, inherit);
+  text-align: center;
+}
+
+.rw-cert-rosette {
+  width: 34mm;
+  height: auto;
+  margin-bottom: -4mm;
+}
+
+.rw-cert-petal {
+  fill: #f6c445;
+  stroke: #b8860b;
+  stroke-width: 1;
+}
+
+.rw-cert-medal {
+  fill: #ffe07a;
+  stroke: #b8860b;
+  stroke-width: 1.5;
+}
+
+.rw-cert-star {
+  fill: #fff6c8;
+  stroke: #b8860b;
+  stroke-width: 1;
+}
+
+.rw-cert-ribbon {
+  fill: var(--rw-main, #e2574c);
+  stroke: #00000055;
+  stroke-width: 1;
+}
+
+.rw-cert-title {
+  margin: 0;
+  font-size: 22mm;
+  font-weight: 900;
+  letter-spacing: 1.5mm;
+  line-height: 1;
+}
+
+.rw-cert-name {
+  display: flex;
+  align-items: baseline;
+  gap: 3mm;
+  margin: 0;
+  font-size: 12mm;
+  font-weight: 800;
+}
+
+/* A line to write on: the name when the board has none, the signature. */
+.rw-cert-blank {
+  display: inline-block;
+  width: 70mm;
+  border-bottom: 0.5mm solid #444;
+}
+
+.rw-cert-picture {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  font-family: var(--font-emoji);
+  font-size: 60mm;
+  line-height: 1;
+}
+
+.rw-cert-picture .rw-pic {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.rw-cert-task {
+  margin: 0;
+  font-size: 13mm;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.rw-cert-says {
+  margin: 0;
+  font-size: 8mm;
+  font-weight: 700;
+}
+
+.rw-cert-marks {
+  display: flex;
+  gap: 4mm;
+  font-family: var(--font-emoji);
+  font-size: 10mm;
+}
+
+.rw-cert-sign {
+  display: flex;
+  justify-content: space-between;
+  gap: 16mm;
+  width: 100%;
+  margin-top: 6mm;
+  font-size: 4.5mm;
+}
+
+.rw-cert-sign > span {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.5mm;
+}
+
+.rw-cert-sign .rw-cert-blank,
+.rw-cert-date {
+  width: 100%;
+  min-height: 7mm;
+  border-bottom: 0.5mm solid #444;
+  font-size: 5.5mm;
+  font-weight: 700;
+}
+
+/* Grey to save ink: no colour but the line-art twin and grey marks. */
+.rw-cert-page.rw-grey {
+  background: #fff;
+}
+
+.rw-cert-page.rw-grey :is(.rw-cert-petal, .rw-cert-medal, .rw-cert-star, .rw-cert-ribbon) {
+  fill: #fff;
+  stroke: #555;
+}
+
+.rw-cert-page.rw-grey .rw-cert-marks {
+  filter: grayscale(1);
 }

@@ -11,6 +11,7 @@ import { useStoredSettings } from "@/lib/storage";
 import { addStar, type Board, isTemplateTitle, OLDEST_BACK, samePeriod, shiftPeriod, type StarLog, startOver, withKind } from "./board";
 import { BoardScreen } from "./BoardScreen";
 import { useBoardTitle } from "./BoardSheet";
+import { Certificate, CERTIFICATE } from "./Certificate";
 import {
   type BoardKind,
   type ChartType,
@@ -57,7 +58,7 @@ const DESIGN: Localized = { de: "Gestalten", en: "Design", zh: "设计", hi: "�
 /** „🧩 Vorlagen“: beside the chart, and the button where there is no room for it. */
 const TEMPLATES_LABEL: Localized = { de: "Vorlagen", en: "Templates", zh: "模板", hi: "टेम्पलेट", es: "Plantillas", ar: "القوالب", ru: "Шаблоны" };
 
-type Panel = "edit" | "print" | "review";
+type Panel = "edit" | "print" | "review" | "certificate";
 
 /** The main views of a board: the same stars for a day, a week or a month. Collecting stands apart in the switch. */
 const MAIN_KINDS = KINDS.filter((k) => k.id !== "collect");
@@ -158,8 +159,13 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   // On a computer the panels are always open below the chart: the buttons on top only scroll there.
   const toggle = (which: Panel) => {
     setWizard(null);
-    if (computer && which !== "review") document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (computer && (which === "edit" || which === "print")) document.getElementById(`rw-${which}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
     else setPanel(panel === which ? null : which);
+  };
+  /** „Gestalten“ from elsewhere (the Urkunde): its panel, or on a computer the editor below once it is back. */
+  const openEditor = () => {
+    setPanel(computer ? null : "edit");
+    if (computer) setTimeout(() => document.getElementById("rw-edit")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   };
   const openWizard = (start?: WizardStart) => {
     setPanel(null);
@@ -237,6 +243,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
             sounds={boards.sounds}
             speech={boards.speech}
             onExamplesOff={() => changeBoard({ examples: false })}
+            onCertificate={() => setPanel("certificate")}
           />
         )
       : plan && (
@@ -252,6 +259,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
           />
         );
   const review = type === "board" && !!board && board.kind !== "collect";
+  const certificate = type === "board" && !!board && board.tasks.length > 0;
   const main = wizard ? (
     <Wizard
       key={wizard.start ? `${wizard.start.type}-${wizard.start.template.id}` : "new"}
@@ -262,6 +270,8 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     />
   ) : !computer && panel === "print" ? (
     print
+  ) : panel === "certificate" && certificate && board ? (
+    <Certificate key={board.id} board={board} color={boards.print.color} onChange={changeBoard} onEdit={openEditor} onClose={() => setPanel(null)} />
   ) : panel === "review" && review && board ? (
     <Review board={board} log={log} linked={linked} sounds={boards.sounds} onClose={() => setPanel(null)} />
   ) : (
@@ -299,6 +309,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
               <PanelButton open={!computer && panel === "edit"} onClick={() => toggle("edit")} emoji="✏️" label={t(DESIGN)} />
               <PanelButton open={!computer && panel === "print"} onClick={() => toggle("print")} emoji="🖨️" label={t(PRINT)} />
               {review && <PanelButton open={panel === "review"} onClick={() => toggle("review")} emoji="📜" label={t(REVIEW)} />}
+              {certificate && <PanelButton open={panel === "certificate"} onClick={() => toggle("certificate")} emoji="🏅" label={t(CERTIFICATE)} />}
             </div>
           )}
         </MenuHead>
@@ -377,7 +388,8 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
         {!computer && panel === "edit" && !wizard && editor}
         {main}
       </div>
-      {computer && !wizard && (
+      {/* The Urkunde prints on its own: the board's print pages below would go to the printer with it. */}
+      {computer && !wizard && !(panel === "certificate" && certificate) && (
         <div className="rw-below">
           <section id="rw-edit" className="rw-below-part">
             <h2 className="rw-panel-title">{t(DESIGN)}</h2>
