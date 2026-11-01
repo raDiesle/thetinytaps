@@ -1,4 +1,4 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type Board, boardFromTemplate, newId, withKind } from "./board";
@@ -120,6 +120,8 @@ export function Wizard({
     start ? new Map([[start.type === "board" ? boardKey(start.template.id) : planKey(start.template.id), fromStart(start, language)]]) : new Map(),
   );
   const [step, setStep] = useState(start ? 1 : 0);
+  /** The Vorlage seen big over the whole screen (🔍), by key. */
+  const [zoomed, setZoomed] = useState<string>();
   const drafts = [...picked.values()];
   const [only] = drafts.length === 1 ? drafts : [];
   const steps = [FIRST_STEP, ...(only ? (only.type === "board" ? BOARD_STEPS : PLAN_STEPS) : [])];
@@ -184,6 +186,10 @@ export function Wizard({
           }),
         }));
 
+  const groups = kinds.map((kind) => ({ kind, views: groupsOf(kind.id) }));
+  const tiles = groups.flatMap(({ views }) => views.flatMap((view) => view.tiles));
+  const zoomAt = tiles.findIndex((tile) => tile.key === zoomed);
+
   return (
     <section
       className="rw-wizard"
@@ -231,14 +237,18 @@ export function Wizard({
       <div className={`rw-wizard-body${own ? "" : " rw-wizard-wide"}`}>
         <div className="rw-wizard-step">
           {id === FIRST_STEP.id &&
-            kinds.map((kind) => (
+            groups.map(({ kind, views }) => (
               <section key={kind.id} id={`rw-area-${kind.id}`} className="rw-kind-area" aria-label={t(kind.label)}>
                 <h2 className="rw-kind-name">
                   <span aria-hidden>{kind.emoji}</span> {t(kind.label)}
                 </h2>
                 <div className="rw-view-groups">
-                  {groupsOf(kind.id).map((group) => (
-                    <section key={group.id} className="rw-view-group" style={{ "--rw-tiles": Math.max(1, group.tiles.length) } as CSSProperties}>
+                  {views.map((group) => (
+                    <section
+                      key={group.id}
+                      className="rw-view-group"
+                      style={{ "--rw-tiles": Math.max(1, group.tiles.length), "--rw-span": Math.min(Math.max(1, group.tiles.length), 3) } as CSSProperties}
+                    >
                       {/* The view's name stands big over its pictures, as the name of what they show. */}
                       <div className="rw-view-head">
                         <h3 className="rw-view-name">
@@ -268,6 +278,16 @@ export function Wizard({
                                   ✓
                                 </span>
                               </button>
+                              {/* Separate from the tile, so looking closer never picks or puts back. */}
+                              <button
+                                type="button"
+                                className="rw-tpl-zoom"
+                                aria-label={`${t(ZOOM)}: ${t(tile.label)}`}
+                                title={t(ZOOM)}
+                                onClick={() => setZoomed(tile.key)}
+                              >
+                                <span aria-hidden>🔍</span>
+                              </button>
                             </li>
                           );
                         })}
@@ -284,6 +304,18 @@ export function Wizard({
 
         {only && own && <div className="rw-wizard-preview">{only.type === "board" ? <Thumb board={only.board} /> : <PlanThumb plan={only.plan} />}</div>}
       </div>
+
+      {zoomAt >= 0 && (
+        <Zoom
+          emoji={tiles[zoomAt].emoji}
+          label={t(tiles[zoomAt].label)}
+          picture={tiles[zoomAt].picture}
+          selected={picked.has(tiles[zoomAt].key)}
+          onToggle={() => toggle(tiles[zoomAt].key, tiles[zoomAt].make)}
+          onStep={(by) => setZoomed(tiles[(zoomAt + by + tiles.length) % tiles.length].key)}
+          onClose={() => setZoomed(undefined)}
+        />
+      )}
 
       <footer className="rw-wizard-foot">
         {/* Nothing to go back to on the first step: no greyed „Zurück“ there. */}
@@ -339,5 +371,80 @@ function Help({ className }: { className: string }) {
         de: "Nutzen Sie Tafeln und Pläne hier am Bildschirm, drucken Sie sie aus und basteln Sie sie selbst – oder bestellen Sie die Bilder als Fotoabzug. Tippen Sie ruhig mehrere Vorlagen an: Sie werden auf einmal angelegt und stehen danach oben als Reiter, zum Wechseln mit einem Tipp.",
       })}
     </p>
+  );
+}
+
+/** The 🔍 on every Vorlage, and its name read out. */
+const ZOOM: Localized = { de: "Groß ansehen" };
+
+/**
+ * A Vorlage seen big, filling the screen (🔍): even on a big monitor the pictures in the rows are too small to read
+ * (user feedback, October 2026). ‹ › and the arrow keys go through all Vorlagen of both kinds, and it can be picked or
+ * put back from here; Esc, ✕ or a tap beside the picture close it. A modal `<dialog>` lies above everything, the
+ * book's page and its transforms too.
+ */
+function Zoom({
+  emoji,
+  label,
+  picture,
+  selected,
+  onToggle,
+  onStep,
+  onClose,
+}: {
+  emoji: string;
+  label: string;
+  picture: ReactNode;
+  selected: boolean;
+  onToggle: () => void;
+  /** To the Vorlage before (-1) or after (1), round from the last to the first. */
+  onStep: (by: number) => void;
+  onClose: () => void;
+}) {
+  const t = useT();
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, []);
+  const back = t({ de: "Vorige Vorlage" });
+  const next = t({ de: "Nächste Vorlage" });
+  return (
+    <dialog
+      ref={ref}
+      className="rw-zoom"
+      aria-label={label}
+      onClose={onClose}
+      onClick={(event) => event.target === event.currentTarget && ref.current?.close()}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") onStep(event.key === "ArrowLeft" ? -1 : 1);
+      }}
+    >
+      <div className="rw-zoom-head">
+        <h3 className="rw-zoom-name">
+          <span aria-hidden>{emoji}</span> {label}
+        </h3>
+        <button type="button" className={`rw-zoom-pick${selected ? " selected" : ""}`} aria-pressed={selected} onClick={onToggle}>
+          {selected ? `✓ ${t({ de: "Ausgewählt" })}` : t({ de: "Auswählen" })}
+        </button>
+        <button
+          type="button"
+          className="rw-zoom-close"
+          aria-label={t({ de: "Schließen", ru: "Закрыть", en: "Close", zh: "关闭", hi: "बंद करें", es: "Cerrar", ar: "إغلاق" })}
+          onClick={() => ref.current?.close()}
+        >
+          ✕
+        </button>
+      </div>
+      <div className="rw-zoom-body">
+        <button type="button" className="rw-zoom-step" aria-label={back} title={back} onClick={() => onStep(-1)}>
+          ‹
+        </button>
+        <div className="rw-zoom-picture">{picture}</div>
+        <button type="button" className="rw-zoom-step" aria-label={next} title={next} onClick={() => onStep(1)}>
+          ›
+        </button>
+      </div>
+    </dialog>
   );
 }

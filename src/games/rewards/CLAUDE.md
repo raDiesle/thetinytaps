@@ -22,9 +22,11 @@ visitor land there.
 (user feedback, October 2026): both kinds on the one page, each in an area under its name („⭐ Belohnungstafel“,
 „🗓️ Zeitplan“, the one the page was opened on first), and in each every view, its name big on top as a heading (Tag,
 Woche, Monat, Sammeln; Ablaufplan, Jetzt – Dann, Erst – Dann, Woche), the view's Vorlagen as big pictures under it,
-each with its name above it, and a small „✏️ Leer anfangen“ beside the view's name. The views share the rows so they
-fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). On a big screen (≥ 1400 × 700)
-the steps are a column on the left, the kinds under „Ansicht“ as links to their areas with how many are picked.
+each with its name above it, a 🔍 on its corner and a small „✏️ Leer anfangen“ beside the view's name. The views
+share the rows so they fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). On a big
+screen (≥ 1400 × 700) the steps are a column on the left, the kinds under „Ansicht“ as links to their areas with how
+many are picked, and the pictures three a row, on columns the views share (`--rw-span`, holes filled by a later view).
+The 🔍 shows the Vorlage over the whole screen (`Zoom`, a modal `<dialog>`), with „Auswählen“ and ‹ › through all.
 A tap picks a Vorlage (yellow glow, ✓), another puts it back; several, also
 of both kinds, are made at once with „✓ N anlegen“ (`onDone` takes a list). With exactly one picked, „Weiter“ goes
 on to its own steps – `WizardBoard.tsx`: Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Bilder (with which days),
@@ -182,7 +184,9 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   big on top of its Vorlagen as a heading, and a Vorlage's name above its picture, never small below it; a picture has
   no second frame round it (it is framed itself), only a glow when picked. Several Vorlagen can be picked and made at
   once. The pictures are as big as the rows allow, with no empty room beside them: check at 1920 × 1080, 1440 × 900,
-  1024 × 768 and 844 × 390 (on a computer they were „viel zu klein“, „erkenne ich nicht“). The pictures are the
+  1024 × 768 and 844 × 390 (on a computer they were „viel zu klein“, „erkenne ich nicht“, and five a row still were
+  on 1920), and every picture of a whole chart has a 🔍 beside the tap that picks it, opening it as big as the screen
+  allows – a picture small enough to sit among others is never big enough to read. The pictures are the
   explanation – no description lines under the choices; the one help line, on every step, says what the wizard is
   for: use the charts on screen, print and make them, or order the photo prints, and several are made at once.
 - A button that can do nothing is left out, never shown greyed (the first step has no „Zurück“).
