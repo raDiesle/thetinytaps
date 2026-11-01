@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import {
   addStar,
+  type Board,
   boardDays,
   boardFromTemplate,
   cellKey,
@@ -10,8 +11,10 @@ import {
   fieldCount,
   isFilled,
   type LinkedDays,
+  longerGoal,
   monthOf,
   NO_LINKED,
+  oncePerDay,
   parseCellKey,
   possessive,
   progress,
@@ -20,6 +23,7 @@ import {
   shiftPeriod,
   type StarLog,
   startOver,
+  suggestsCertificate,
   takeBackStar,
   withKind,
 } from "./board";
@@ -320,6 +324,49 @@ describe("looking back", () => {
       [2, 1],
     ]);
     expect(reviewPeriods({ ...week, kind: "collect" }, { count: 4 }, NO_LINKED, wednesday)).toEqual([]);
+  });
+});
+
+describe("Urkunde und Ausklingen (T-15)", () => {
+  const today = new Date(2026, 9, 28);
+  const board: Board = {
+    id: "u",
+    kind: "week",
+    childName: "",
+    title: "",
+    tasks: [{ id: "z", emoji: "🪥", catalog: "zaehne", slots: ["morning", "evening"] }],
+    days: [0, 1, 2, 3, 4, 5, 6],
+    goal: 5,
+    reward: null,
+    mark: "stern",
+    theme: "sonne",
+  };
+  const starsOn = (days: Date[], slots: ("morning" | "evening")[]) =>
+    Object.fromEntries(days.flatMap((day) => slots.map((slot) => [cellKey(day, "z", slot), 1])));
+  const dayBefore = (n: number) => new Date(2026, 9, 28 - n);
+
+  test("the board offers the certificate once its goal is reached, a day board after a full week, never with examples", () => {
+    const four = starsOn([dayBefore(0), dayBefore(1)], ["morning", "evening"]);
+    expect(suggestsCertificate(board, four, NO_LINKED, today)).toBe(false);
+    const five = { ...four, [cellKey(dayBefore(2), "z", "morning")]: 1 };
+    expect(suggestsCertificate(board, five, NO_LINKED, today)).toBe(true);
+    expect(suggestsCertificate({ ...board, examples: true }, five, NO_LINKED, today)).toBe(false);
+    const day = { ...board, kind: "day" as const };
+    const week = starsOn([1, 2, 3, 4, 5, 6, 7].map(dayBefore), ["morning", "evening"]);
+    expect(suggestsCertificate(day, week, NO_LINKED, today)).toBe(true);
+    // One evening missing in the week: not yet – and today, not over yet, doesn't count.
+    expect(suggestsCertificate(day, { ...week, [cellKey(dayBefore(4), "z", "evening")]: 0 }, NO_LINKED, today)).toBe(false);
+  });
+
+  test("winding down makes the way to the reward longer, never shorter, and keeps one field a day", () => {
+    expect(longerGoal(board, today)).toBe(8);
+    expect(longerGoal({ ...board, goal: 12 }, today)).toBe(14);
+    expect(longerGoal({ ...board, goal: 14 }, today)).toBe(null);
+    expect(longerGoal({ ...board, kind: "collect", goal: 5 }, today)).toBe(7);
+    expect(longerGoal({ ...board, kind: "collect", goal: 30 }, today)).toBe(null);
+    expect(longerGoal({ ...board, kind: "day" }, today)).toBe(null);
+    expect(oncePerDay(board.tasks[0]).slots).toEqual(["evening"]);
+    expect(oncePerDay({ id: "a", emoji: "👕" })).toEqual({ id: "a", emoji: "👕" });
   });
 });
 

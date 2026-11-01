@@ -2413,3 +2413,212 @@
 :root[data-look="book"] .rw-page-screen .book-family {
   display: none;
 }
+
+/* ---------- Urkunde (T-15): the certificate to print, and the ways to wind the board down beside it ---------- */
+
+.rw-cert-body {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(260px, 420px);
+  gap: 18px;
+  align-items: start;
+}
+
+.rw-cert-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.rw-cert-options .setting-note {
+  margin: 0;
+}
+
+.rw-cert-tasks {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+}
+
+.rw-cert-options .rw-print-button {
+  align-self: flex-start;
+}
+
+.rw-cert-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rw-cert-steps button {
+  min-height: 48px;
+  padding: 6px 16px;
+  border: 3px solid var(--ink);
+  border-radius: 16px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rw-cert-steps button:hover {
+  background: color-mix(in srgb, var(--sunshine) 30%, #fff);
+}
+
+@media (max-width: 760px) {
+  .rw-cert-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The page: a double frame in the board's colour, everything centred down it. */
+.rw-cert-page {
+  padding: 12mm;
+  background: var(--rw-paper, #fff);
+}
+
+.rw-cert-frame {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 4mm;
+  padding: 10mm 14mm 12mm;
+  border: 2.5mm double var(--rw-main, #999);
+  border-radius: 6mm;
+  background: #fff;
+  font-family: var(--font-rounded, inherit);
+  text-align: center;
+}
+
+.rw-cert-rosette {
+  width: 34mm;
+  height: auto;
+  margin-bottom: -4mm;
+}
+
+.rw-cert-petal {
+  fill: #f6c445;
+  stroke: #b8860b;
+  stroke-width: 1;
+}
+
+.rw-cert-medal {
+  fill: #ffe07a;
+  stroke: #b8860b;
+  stroke-width: 1.5;
+}
+
+.rw-cert-star {
+  fill: #fff6c8;
+  stroke: #b8860b;
+  stroke-width: 1;
+}
+
+.rw-cert-ribbon {
+  fill: var(--rw-main, #e2574c);
+  stroke: #00000055;
+  stroke-width: 1;
+}
+
+.rw-cert-title {
+  margin: 0;
+  font-size: 22mm;
+  font-weight: 900;
+  letter-spacing: 1.5mm;
+  line-height: 1;
+}
+
+.rw-cert-name {
+  display: flex;
+  align-items: baseline;
+  gap: 3mm;
+  margin: 0;
+  font-size: 12mm;
+  font-weight: 800;
+}
+
+/* A line to write on: the name when the board has none, the signature. */
+.rw-cert-blank {
+  display: inline-block;
+  width: 70mm;
+  border-bottom: 0.5mm solid #444;
+}
+
+.rw-cert-picture {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  font-family: var(--font-emoji);
+  font-size: 60mm;
+  line-height: 1;
+}
+
+.rw-cert-picture .rw-pic {
+  width: 1.4em;
+  height: 1.4em;
+}
+
+.rw-cert-task {
+  margin: 0;
+  font-size: 13mm;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.rw-cert-says {
+  margin: 0;
+  font-size: 8mm;
+  font-weight: 700;
+}
+
+.rw-cert-marks {
+  display: flex;
+  gap: 4mm;
+  font-family: var(--font-emoji);
+  font-size: 10mm;
+}
+
+.rw-cert-sign {
+  display: flex;
+  justify-content: space-between;
+  gap: 16mm;
+  width: 100%;
+  margin-top: 6mm;
+  font-size: 4.5mm;
+}
+
+.rw-cert-sign > span {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1.5mm;
+}
+
+.rw-cert-sign .rw-cert-blank,
+.rw-cert-date {
+  width: 100%;
+  min-height: 7mm;
+  border-bottom: 0.5mm solid #444;
+  font-size: 5.5mm;
+  font-weight: 700;
+}
+
+/* Grey to save ink: no colour but the line-art twin and grey marks. */
+.rw-cert-page.rw-grey {
+  background: #fff;
+}
+
+.rw-cert-page.rw-grey :is(.rw-cert-petal, .rw-cert-medal, .rw-cert-star, .rw-cert-ribbon) {
+  fill: #fff;
+  stroke: #555;
+}
+
+.rw-cert-page.rw-grey .rw-cert-marks {
+  filter: grayscale(1);
+}

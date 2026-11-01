@@ -9,6 +9,17 @@ import { type BoardKind, MARK_BY_ID, MARKS } from "./catalog";
 /** „📜 Rückblick“: the button on top and the heading of the view. */
 export const REVIEW: Localized = { de: "Rückblick", en: "Look back", zh: "回顾", hi: "पीछे देखें", es: "Repaso", ar: "نظرة إلى الوراء", ru: "Взгляд назад" };
 
+/** „✕ Zur Tafel“: back from the Rückblick or the Urkunde to the board. */
+export const TO_CHART: Localized = {
+  de: "Zur Tafel",
+  en: "Back to the chart",
+  zh: "返回奖励表",
+  hi: "चार्ट पर वापस",
+  es: "Volver a la tabla",
+  ar: "العودة إلى اللوحة",
+  ru: "К таблице",
+};
+
 /** „Gestern“, on the ‹ › of a board's or plan's day. */
 export const YESTERDAY: Localized = { de: "Gestern", en: "Yesterday", zh: "昨天", hi: "बीता कल", es: "Ayer", ar: "أمس", ru: "Вчера" };
 /** ‹: to the day, week or month before. */
@@ -117,16 +128,7 @@ export function Review({ board, log, linked, sounds, onClose }: { board: Board; 
           </span>
         )}
         <button type="button" className="rw-review-close" onClick={onClose}>
-          ✕{" "}
-          {t({
-            de: "Zur Tafel",
-            en: "Back to the chart",
-            zh: "返回奖励表",
-            hi: "चार्ट पर वापस",
-            es: "Volver a la tabla",
-            ar: "العودة إلى اللوحة",
-            ru: "К таблице",
-          })}
+          ✕ {t(TO_CHART)}
         </button>
       </header>
       {current ? (

@@ -68,7 +68,8 @@ targets) – keep it that way.
   with a time of day `YYYY-MM-DD|task|evening`, or `count` on a collecting board; `cellKey`/`parseCellKey`), the fields
   of a task (`taskSlots`), progress, add, take back, start over, `withKind` (the same board in another view: stars
   stay, the goal fits), `exampleStars`, `shiftPeriod`/`samePeriod`/`OLDEST_BACK` for looking back, `reviewPeriods`
-  for the Rückblick, `possessive` for the title („Lenas Sterne“).
+  for the Rückblick, `suggestsCertificate`/`longerGoal`/`oncePerDay` for the Urkunde and winding down, `possessive`
+  for the title („Lenas Sterne“).
 - `linked.ts` – what Zähne putzen (`loadWeek`, with morning or evening) and Aufs Töpfchen (`loadStars`, a count) did
   on which day; such a field is filled without a star in the log – brushing fills the field of its time of day, the
   potty fills a task's fields in the order of the day. Only on day, week and month boards: those games keep two weeks,
@@ -82,7 +83,8 @@ targets) – keep it that way.
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars, grouped by view;
   `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
-  `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `RewardsGame.tsx` – the page for boards and plans
+  `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Certificate.tsx` – „🏅 Urkunde“ (below);
+  `RewardsGame.tsx` – the page for boards and plans
   (above). There is no „ℹ️ Über die Tafel“ or „Über den Plan“ (removed with every menu's „Über das Spiel“, user
   decision, October 2026): the chart explains itself by its pictures, the wizard and „Gestalten“.
 - `pictures.tsx` – the pictures of `bilder/` in place of the catalogue's emoji (`ItemPic`, `MarkPic`, `Pic`): tasks,
@@ -121,6 +123,18 @@ child – what already worked (T-18): one big, newest first, and all of them bel
 scrolls sideways. A tap on the big one, ‹ › or the arrow keys flip on (round), a small one shows it big. A month board
 looks back by months, a day board by weeks (a day is too little). Only weeks with stars, as far back as stars are
 kept; nothing can be changed there – a forgotten star is added on the board with ‹.
+
+„🏅 Urkunde“ (T-15, a board with tasks) shows in place of the board what ends a round when something works by
+itself: a certificate on one A4 page standing – a rosette, „Urkunde für Lena“ (a line to write on without a name),
+the task's picture big (its line-art twin on a grey print), its name, „Das kann ich jetzt ganz allein!“, the board's
+marks, the date and a line to sign – beside the task to pick, the child's name and „Urkunde drucken“. Below, „Wie
+geht es weiter?“ says how parents' guides wind a reward chart down (announce it, then make the stars rarer, then let
+the task go) and does each in one tap: „Mehr Sterne bis zur Belohnung: 8 statt 5“ (`longerGoal`, half as many again,
+on a collecting board the next size; not on a day board), „nur noch einmal am Tag“ for a task with several times
+(`oncePerDay` keeps the last, brushing the evening), and „ablösen“, which takes the task off the board and opens
+„Gestalten“ for the next one. Once the goal is reached (on a day board: the last seven days full,
+`suggestsCertificate`), a line under the board asks „Klappt es schon von selbst?“ and opens the Urkunde – a grown-up's
+line, never a party a child taps into. The certificate prints in colour or grey as the board does.
 
 On a computer (≥ 900 px, mouse) „✏️ Gestalten“ and „🖨️ Drucken“ lie open below the board, reached by scrolling (the
 buttons on top scroll there); on phones and tablets they open as panels in place of the board.
@@ -163,6 +177,11 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 
 - No punishment, ever: a star is never taken away by the board, only undone right after a mistake; a missed day stays
   an empty field, not a cross or a sad face. No screen time as a reward (T-21 rejected).
+- Winding down only ever asks more of a habit that already works – a longer way to the same reward, fewer fields a
+  day, a task let go with a certificate – never fewer stars for the same thing or a reward taken back (`rewards.test.ts`
+  checks `longerGoal` never shortens).
+- Only one set of pages waits for the printer: a panel that prints on its own (the Urkunde) hides the board's print
+  pages below it on a computer, or both would come out of the printer (`.rw-print-root` is one per panel).
 - The Rückblick shows only what worked: a week without stars is left out, never shown empty or counted as missed
   (`rewards.test.ts` checks `reviewPeriods`).
 - Few tasks: the editor advises one to three and allows `MAX_TASKS`; templates use at most three.

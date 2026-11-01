@@ -4,7 +4,7 @@ import { playChime, playCountNote, playPop, playTusch, playTwinkle, playWhoosh, 
 import { useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak, unlockSpeech } from "@/lib/speech";
 import { forwardNearTaps } from "@/lib/tapTargets";
-import { addStar, type Board, dayFull, exampleStars, type LinkedDays, parseCellKey, progress, type StarLog, takeBackStar } from "./board";
+import { addStar, type Board, dayFull, exampleStars, type LinkedDays, parseCellKey, progress, type StarLog, suggestsCertificate, takeBackStar } from "./board";
 import { BoardSheet, type FieldState, SCREEN_LOOK, useRewardLabel, useTaskLabel } from "./BoardSheet";
 import { MARK_BY_ID, MARKS } from "./catalog";
 import { ItemPic, MarkPic, Pic, picture } from "./pictures";
@@ -44,6 +44,7 @@ export function BoardScreen({
   sounds,
   speech,
   onExamplesOff,
+  onCertificate,
 }: {
   board: Board;
   log: StarLog;
@@ -55,6 +56,8 @@ export function BoardScreen({
   speech: boolean;
   /** The example stars go: with the first real star, or when a grown-up hides them. */
   onExamplesOff: () => void;
+  /** Opens „🏅 Urkunde“, which the board offers once its goal is reached (T-15). */
+  onCertificate: () => void;
 }) {
   const t = useT();
   const language = useAppLanguage();
@@ -311,6 +314,15 @@ export function BoardScreen({
           </span>
           <button type="button" onClick={onExamplesOff}>
             {t({ de: "Ausblenden", en: "Hide", zh: "隐藏", hi: "छिपाएँ", es: "Ocultar", ar: "إخفاء", ru: "Скрыть" })}
+          </button>
+        </div>
+      )}
+      {/* A line for grown-ups, never a tap a child sets off by chance: it only opens the panel. */}
+      {!undo && suggestsCertificate(board, stars, linked, today) && (
+        <div className="rw-example-note rw-cert-note">
+          <span>🏅 {t({ de: "Klappt es schon von selbst? Dann gibt es eine Urkunde." })}</span>
+          <button type="button" onClick={onCertificate}>
+            {t({ de: "Zur Urkunde" })}
           </button>
         </div>
       )}
