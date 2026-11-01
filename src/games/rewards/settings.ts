@@ -12,6 +12,8 @@ export interface PrintOptions {
   colorIn: boolean;
   /** A second page of marks to cut out and stick on. */
   stickers: boolean;
+  /** A page of the board's tasks and reward as picture cards to cut out, for a Velcro board (T-20); missing in older options. */
+  cards?: boolean;
   /** A month board prints next month's calendar instead of this one's (printed near the month's end). */
   nextMonth: boolean;
   /** The photo size the stars are laid out on; missing in options saved before photo prints. */
@@ -37,7 +39,7 @@ const OLD_FIRST: Board = { ...boardFromTemplate(TEMPLATES[0]), id: "erste" };
 export const DEFAULT_REWARDS_SETTINGS: RewardsSettings = {
   boards: [],
   current: "",
-  print: { orientation: "auto", color: true, colorIn: false, stickers: false, nextMonth: false },
+  print: { orientation: "auto", color: true, colorIn: false, stickers: false, cards: false, nextMonth: false },
   speech: false,
   sounds: true,
 };
