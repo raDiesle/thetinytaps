@@ -46,7 +46,9 @@ In a fresh worktree run `bun install` first.
   port, so when you hand merged work over, name the URL of the one running from the repo root (local `main`) –
   the user once checked another session's server by mistake. Look at that server before naming it: a running dev server
   does not pick up a merge that brings new files, a changed `index.html` (it kept showing the old name after a rename)
-  or new exports between modules (a reload still threw „plannerDefaults is not a function“),
+  new exports between modules (a reload still threw „plannerDefaults is not a function“) or rules changed in a game's
+  CSS (a merged `rewards.css` stayed old after a reload while its new JS came through – test a class's computed style
+  there, not only that the page loads),
   so when it still shows the old state, say it must be restarted (`bun run dev` in the repo root) instead of handing over a stale URL.
   Shared files many branches touch (`ScenePlay.tsx`, `src/lib/sfx/`, `src/styles/`,
   `src/content/ideas/`): keep edits there small and local, so merges stay easy.
