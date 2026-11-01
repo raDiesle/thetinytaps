@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 /*
  * Each home category has a world of its own (idea V-08), so a child finds „its“ area again by the picture: a meadow
  * with a farm for Lebendige Welten, a table with toys for Zuordnen, building blocks for Buchstaben & Zahlen and a
- * children's room for Für jeden Tag. Its menus show it behind the cards (Sky), its book on the home page's shelf a
+ * children's room for the Alltagshelfer. Its menus show it behind the cards (Sky), its book on the home page's shelf a
  * small piece of it (WorldCardScene). The things are drawn once here, each in its own box, and placed by the two.
  */
 

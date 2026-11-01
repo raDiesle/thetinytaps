@@ -1,8 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import { BOOK_ASPECT, BOOK_GAP, planShelf, SHELF_THINGS, type ShelfRect, TAKE_OUT } from "./shelfLayout";
 
-/** The home page's books: one per category. */
-const BOOKS = 4;
+/** The home page's places: the everyday helpers' books with the words carved beside them, then three picture books. */
+const BOOKS = [2.2, 1, 1, 1];
 
 /** A phone on its side, upright, a tablet, a laptop, a big monitor (the room the shelf gets in each). */
 const ROOMS = [
@@ -62,7 +62,8 @@ describe("the bookshelf", () => {
     const { cells, bookHeight } = planShelf(width, height, BOOKS);
     for (const cell of cells.filter((c) => c.books)) {
       const n = cell.books?.length ?? 0;
-      expect(n * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
+      const span = (cell.books ?? []).reduce((sum, b) => sum + BOOKS[b], 0);
+      expect(span * bookHeight * BOOK_ASPECT + (n + 1) * BOOK_GAP * bookHeight).toBeLessThanOrEqual(cell.w + 0.01);
       expect(bookHeight).toBeLessThanOrEqual(cell.h * TAKE_OUT + 0.01);
     }
   });

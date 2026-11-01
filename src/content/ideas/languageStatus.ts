@@ -56,6 +56,44 @@ export function languageStateOf(row: LanguageStatusRow, language: TargetLanguage
 /** Every game of the home menu once, in menu order, then the home page. */
 export const LANGUAGE_STATUS: LanguageStatusRow[] = [
   {
+    href: "/belohnungstafel/",
+    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): die Ansichten „Ablaufplan“ und „Jetzt – Dann“ mit ihren Hinweisen, der Hinweis zu „Erst – Dann“, „Mein Kita-Tag“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, „N anlegen“ im Assistenten, sein Hilfetext auf jedem Schritt (Wizard.tsx).",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+  },
+  {
+    href: "/zaehne/",
+    parts: [
+      {
+        label: "🪥 Hinweise und Bilder",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Was vor dem Putzen und am Ende gesagt wird, von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); die Putzschritte auch, für den Fall, dass das Lied nicht lädt.",
+      },
+      {
+        label: "🎵 Zahnputzlied (gesungen)",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
+        note: "Text und Lied von Suno, eine neue Sprache: /zahnputzlied.",
+      },
+    ],
+  },
+  {
+    href: "/toepfchen/",
+    parts: [
+      {
+        label: "🚽 Bilder und Texte",
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“.",
+      },
+      {
+        label: "🎵 Warte-Lied (gesungen)",
+        recorded: true,
+        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
+        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. In allen sieben Sprachen aufgenommen (Oktober 2026). Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
+      },
+    ],
+  },
+  {
     href: "/bilder/",
     note: "Viele Namen und Sätze je Bild; jede Sprache in <Sprache>.ts jeder Szene (ru.ts, en.ts …), Satzbau in phrases.ts.",
     parts: [
@@ -144,46 +182,8 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
     note: "Mit „Wörter tippen“. Auch 🇹🇷 Türkisch und 🇵🇱 Polnisch. Jede Taste tippt den Buchstaben an ihrer Stelle der Tastatur der Sprache: Russisch ЙЦУКЕН, Hindi InScript, Arabisch die arabische Tastatur; Chinesisch tippt Pinyin auf lateinischen Tasten zu chinesischen Wörtern (B – 爸爸).",
   },
   {
-    href: "/zaehne/",
-    parts: [
-      {
-        label: "🪥 Hinweise und Bilder",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Was vor dem Putzen und am Ende gesagt wird, von ElevenLabs gesprochen (Tapsis Stimme, 30. Oktober 2026); die Putzschritte auch, für den Fall, dass das Lied nicht lädt.",
-      },
-      {
-        label: "🎵 Zahnputzlied (gesungen)",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done", it: "done" },
-        note: "Text und Lied von Suno, eine neue Sprache: /zahnputzlied.",
-      },
-    ],
-  },
-  {
-    href: "/toepfchen/",
-    parts: [
-      {
-        label: "🚽 Bilder und Texte",
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "Übersetzt im Oktober 2026; Tapsi heißt „Тапси“, „塔普西“, „टैप्सी“, „تابسي“.",
-      },
-      {
-        label: "🎵 Warte-Lied (gesungen)",
-        recorded: true,
-        languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
-        note: "„Warten auf dem Töpfchen“ von Suno (Oktober 2026), endlos wiederholt; der Text für Suno und für Übersetzungen steht in src/games/potty/musik/suno-lied.md. In allen sieben Sprachen aufgenommen (Oktober 2026). Eine neue Sprache: musik-toepfchen-warten-<Sprache>.mp3 und ihre Schleife in waitMusic.ts (/musik-erzeugen).",
-      },
-    ],
-  },
-  {
-    href: "/belohnungstafel/",
-    note: "Belohnungstafel und Zeitplan auf einer Seite (seit Oktober 2026), mit einem gemeinsamen Assistenten „＋ Neu“; /tagesplan/ öffnet dieselbe Seite. Neu und nur Deutsch (31. Oktober 2026): die Ansichten „Ablaufplan“ und „Jetzt – Dann“ mit ihren Hinweisen, der Hinweis zu „Erst – Dann“, „Mein Kita-Tag“, die Hinweise der Vorlagen „Mein Tag“ (Tafel und Plan) und „Erst – Dann“, „N anlegen“ im Assistenten, sein Hilfetext auf jedem Schritt (Wizard.tsx).",
-    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-  },
-  {
     href: "/",
     languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
-    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) und im Buch-Look das „i“-Buch „Über Books for Both“ im Regal, das sie und den Text für Suchmaschinen enthält (RoomOptions.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
+    note: "Startseite, Einstellungen und alles für Eltern (🌐 auf der Startseite); nur die Management-Seite bleibt Deutsch; die Seiten für Suchmaschinen gibt es auf Deutsch und Englisch (/en/, A-22). „Gute Nacht! Die Spielzeit ist vorbei.“ (alle Spiele) von ElevenLabs gesprochen, in allen sieben Sprachen (30. Oktober 2026). Neu und nur Deutsch: das Menü „Junge / Mädchen“ (👦 / 👧, HomeOptions.tsx), der Name des Regals für Vorleseprogramme (Bookshelf.tsx) „Ein paar Worte von uns“ (warum kein Alter, von analog zu digital, ParentsNote.tsx) im Buch-Look die Gruppe „Alltagshelfer“ im Regal und die Schnitzerei „Alltagshelfer & erste Spiele …“ mit „← Ein Blick in Belohnungstafel & Zeitplan lohnt sich.“ (Bookshelf.tsx) und das „i“-Buch „Über Books for Both“ im Regal, das sie und den Text für Suchmaschinen enthält (RoomOptions.tsx). Der Name „Books for Both“ bleibt in allen Sprachen gleich.",
   },
 ];

@@ -1,10 +1,10 @@
 import { type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
 import { RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
-import { hasPage, SHELF } from "@/content/games";
+import { CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
@@ -34,8 +34,45 @@ interface ShelfBook {
   colour?: string;
 }
 
-/** The cloths of the books standing spine out with a game's name, one after the other. */
-const DAILY_COLOURS = ["#a8443f", "#3f6f8f", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62"];
+/** The cloths of the books standing spine out with a game's name, one after the other; the first is gold (`.shelf-daily-first`). */
+const DAILY_COLOURS = ["#c8952c", "#3f6f8f", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62"];
+
+/**
+ * How the books standing spine out are marked as one group, the everyday helpers (user feedback, November 2026): a
+ * library's label on the board's edge under them, a bookend beside them, a sign hanging from the board above, or a paper
+ * band round them. Four drafts to choose from, by `?gruppe=` on the home page, until the user picks one.
+ */
+type GroupMark = "etikett" | "stuetze" | "schild" | "banderole";
+const GROUP_MARKS: GroupMark[] = ["etikett", "stuetze", "schild", "banderole"];
+
+/** How wide the books spine out stand and a bookend, in picture books' widths. */
+const DAILY_SPAN = 1.15;
+const BOOKEND_SPAN = 0.32;
+
+/** The words carved beside the everyday helpers: all of them, or only the first line where the room is small. */
+interface Carving {
+  /** How wide, in picture books' widths. */
+  span: number;
+  short: boolean;
+  /** The least height of a picture book for them: below it they would be too small to read. */
+  minBook: number;
+}
+
+/** The carvings tried, the widest first: the first that leaves the books nearly as big is carved. */
+const CARVINGS: Carving[] = [
+  { span: 1.9, short: false, minBook: 170 },
+  { span: 1.4, short: false, minBook: 170 },
+  { span: 0.8, short: true, minBook: 100 },
+];
+
+/** How much smaller the picture books may get for the carved words. */
+const CARVING_SHRINK = 0.8;
+
+/** The width of the place of the books spine out, in picture books' widths. */
+const dailySpan = (carving: Carving | undefined, mark: GroupMark) => DAILY_SPAN + (carving?.span ?? 0) + (mark === "stuetze" ? BOOKEND_SPAN : 0);
+
+/** Each place's width in picture books' widths, for the shelf's plan. */
+const spansFor = (carving: Carving | undefined, mark: GroupMark) => PLACES.map((place) => (place[0].colour ? dailySpan(carving, mark) : 1));
 
 /**
  * The shelf's places, each standing where a picture book can: a picture book, or the books of a category whose games
@@ -88,18 +125,28 @@ const THINGS: Record<ShelfThing, () => ReactNode> = {
 export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<HTMLElement>; legal?: ReactNode }) {
   const navigate = useNavigate();
   const room = useRef<HTMLDivElement>(null);
-  const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number } | null>(null);
+  const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number; carving?: Carving; spans: number[] } | null>(null);
+  const asked = new URLSearchParams(useLocation().search).get("gruppe");
+  const mark = GROUP_MARKS.find((m) => m === asked) ?? GROUP_MARKS[0];
 
-  // The shelf's plan follows the room it has (the screen turned, the window resized).
+  // The shelf's plan follows the room it has (the screen turned, the window resized). The words carved beside the
+  // everyday helpers' books come only where they leave the books nearly as big and can still be read.
   useLayoutEffect(() => {
     const box = room.current;
     if (!box) return;
-    const measure = () => setPlan({ layout: planShelf(box.clientWidth, box.clientHeight, PLACES.length), roomWidth: box.clientWidth });
+    const measure = () => {
+      const [width, height] = [box.clientWidth, box.clientHeight];
+      const plain = planShelf(width, height, spansFor(undefined, mark));
+      const carved = CARVINGS.map((carving) => ({ carving, layout: planShelf(width, height, spansFor(carving, mark)) })).find(
+        ({ carving, layout }) => layout.bookHeight >= Math.max(carving.minBook, plain.bookHeight * CARVING_SHRINK),
+      );
+      setPlan({ layout: carved?.layout ?? plain, roomWidth: width, carving: carved?.carving, spans: spansFor(carved?.carving, mark) });
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(box);
     return () => observer.disconnect();
-  }, []);
+  }, [mark]);
 
   const take = (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -147,14 +194,10 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
               <div className="shelf-box">
                 <span className="shelf-back" />
                 {layout.cells.map((cell, i) => (
-                  <Compartment key={i} cell={cell} layout={layout} seed={i * 5}>
+                  <Compartment key={i} cell={cell} layout={layout} spans={plan.spans} seed={i * 5}>
                     {cell.books?.map((b) =>
                       PLACES[b][0].colour ? (
-                        <span key={PLACES[b][0].id} className="shelf-daily-row">
-                          {PLACES[b].map((book) => (
-                            <SpineBook key={book.id} book={book} count={PLACES[b].length} onClick={take(book)} />
-                          ))}
-                        </span>
+                        <DailyGroup key={PLACES[b][0].id} books={PLACES[b]} mark={mark} carving={plan.carving} take={take} />
                       ) : (
                         <Book key={PLACES[b][0].id} book={PLACES[b][0]} onClick={take(PLACES[b][0])} />
                       ),
@@ -178,6 +221,56 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
   );
 }
 
+/**
+ * The books of a category whose games stand apart, spines out side by side, marked as one group (`mark`), the first –
+ * the Belohnungstafel – gold and pulled out a little further than the rest, so it is what the eye finds first (user
+ * feedback, November 2026). Beside them, where there is room, words carved into the shelf's back panel tell grown-ups
+ * in short what the shelf holds – the info book's gist – and that the Belohnungstafel is worth a look.
+ */
+function DailyGroup({
+  books,
+  mark,
+  carving,
+  take,
+}: {
+  books: ShelfBook[];
+  mark: GroupMark;
+  carving?: Carving;
+  take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void;
+}) {
+  const t = useT();
+  const name = t(CATEGORIES.find((c) => c.id === books[0].world)?.title ?? books[0].title);
+  const span = dailySpan(carving, mark);
+  return (
+    <span className="shelf-daily-row" data-mark={mark} style={{ "--span": span } as CSSProperties}>
+      <span className="shelf-daily-books">
+        {books.map((book) => (
+          <SpineBook key={book.id} book={book} count={books.length} onClick={take(book)} />
+        ))}
+        {mark === "etikett" && <span className="shelf-group-label">{name}</span>}
+        {mark === "schild" && <span className="shelf-group-sign">{name}</span>}
+        {mark === "banderole" && <span className="shelf-group-band">{name}</span>}
+      </span>
+      {mark === "stuetze" && (
+        <span className="shelf-group-bookend">
+          <span className="shelf-group-bookend-plate">{name}</span>
+        </span>
+      )}
+      {carving && (
+        <span className="shelf-carving" data-short={carving.short || undefined}>
+          <span className="shelf-carving-big">{t({ de: "Alltagshelfer & erste Spiele" })}</span>
+          {!carving.short && (
+            <>
+              <span>{t({ de: "zum Einstieg – gemeinsam erlebt, das Kind mit Eltern oder Großeltern." })}</span>
+              <span className="shelf-carving-hint">{t({ de: "← Ein Blick in Belohnungstafel & Zeitplan lohnt sich." })}</span>
+            </>
+          )}
+        </span>
+      )}
+    </span>
+  );
+}
+
 /** A rectangle of the shelf's plan as a style. */
 const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w, height: r.h });
 
@@ -185,7 +278,7 @@ const rect = (r: ShelfRect): CSSProperties => ({ left: r.x, top: r.y, width: r.w
  * A compartment of the shelf, a box going back from its opening: walls, the board's underside above and its top below,
  * the shadow inside. In it either picture books (`children`) with books spine out filling its ends, or a grown-up's thing.
  */
-function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout: ShelfLayout; seed: number; children?: ReactNode }) {
+function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell; layout: ShelfLayout; spans: number[]; seed: number; children?: ReactNode }) {
   // What is stuck on the back panel moves away from the eye by half of what the depth draws it towards the middle, so
   // it sits in the middle of the back that can be seen, not half behind the plank in front.
   const back = (layout.bookHeight * DEPTH) / EYE / 2;
@@ -196,9 +289,11 @@ function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout
     "--sx": `${(cell.x + cell.w / 2 - layout.width / 2) * back}px`,
     "--sy": `${(cell.y + cell.h / 2 - layout.height * EYE_HEIGHT) * back}px`,
   } as CSSProperties;
-  const ends = cell.books ? endsFor(cell, layout.bookHeight) : undefined;
-  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next.
-  const stackLeft = seed % 2 === 0;
+  const ends = cell.books ? endsFor(cell, layout.bookHeight, spans) : undefined;
+  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next. A group of books
+  // spine out stands right at the compartment's left wall, as the first books of the shelf, all filling at its right.
+  const groupFirst = !!cell.books && !!PLACES[cell.books[0]]?.[0].colour;
+  const stackLeft = seed % 2 === 0 && !groupFirst;
   return (
     <div className={`shelf-cell${cell.thing ? ` thing ${cell.thing}` : ""}`} style={style}>
       <span className="shelf-cell-shade" />
@@ -210,11 +305,11 @@ function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout
         <div className="shelf-row">
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
-            <Spines count={stackLeft ? ends.spines - ends.stack : ends.spines} seed={seed} />
+            <Spines count={groupFirst ? 0 : stackLeft ? ends.spines - ends.stack : ends.spines} seed={seed} />
           </span>
           {children}
           <span className="shelf-end">
-            <Spines count={stackLeft ? ends.spines : ends.spines - ends.stack} seed={seed + 3} />
+            <Spines count={(stackLeft ? ends.spines : ends.spines - ends.stack) + (groupFirst ? ends.spines : 0)} seed={seed + 3} />
             {ends.stack > 0 && !stackLeft && <Stack seed={seed + 1} />}
           </span>
         </div>
@@ -234,9 +329,10 @@ function Compartment({ cell, layout, seed, children }: { cell: ShelfCell; layout
  * How many books stand spine out at each end of a compartment of picture books, and whether a stack lies there too:
  * what the room beside the books leaves, keeping room round each picture book and more between them.
  */
-function endsFor(cell: ShelfCell, bh: number) {
+function endsFor(cell: ShelfCell, bh: number, spans: number[]) {
   const n = cell.books?.length ?? 0;
-  const end = (cell.w - n * bh * BOOK_ASPECT - (n - 1) * bh * 0.5) / 2 - bh * 0.15;
+  const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
+  const end = (cell.w - span * bh * BOOK_ASPECT - (n - 1) * bh * 0.5) / 2 - bh * 0.15;
   const spine = bh * 0.16 + 1;
   const spines = Math.max(0, Math.min(7, Math.floor(end / spine)));
   // A stack takes the room of this many spines, where there is room for it.

@@ -262,10 +262,19 @@ In a fresh worktree run `bun install` first.
 - The home page is a bookshelf, one picture book per category (D-20, user decision, October 2026; `Bookshelf`, in the
   toy look a card per category): one first picks a book, and only inside it, on its first page, its table of contents,
   do its games stand – never levels on the shelf page itself. A new category is a new book. The one exception is a
-  category whose games stand apart (`Category.apart`, „Für jeden Tag“: Zähne putzen, Töpfchen, Tagesplan – user decision, October 2026): each of its games is a book of its own, standing spine out side by side in the
-  room of one picture book, its emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a
-  child finds it at a glance, user feedback, October 2026), opening its game directly; the
-  category has no page, and its games' way back is the shelf. Every picture book's cover shows a picture painted for its
+  category whose games stand apart (`Category.apart`, „Alltagshelfer“: Belohnungstafel & Zeitplan, Zähne putzen,
+  Töpfchen – user decision, October 2026): each of its games is a book of its own, standing spine out side by side, its
+  emoji at the top of a paper label along the spine and its name below it (`SpineBook`, so a child finds it at a glance,
+  user feedback, October 2026), opening its game directly; the category has no page, and its games' way back is the
+  shelf. The Alltagshelfer are what parents need most, so they stand first, top left (first in `CATEGORIES`), the
+  Belohnungstafel first among them and the eye-catcher of the shelf: thicker, bound in gold, pulled out furthest, glowing
+  brightest, a red ribbon hanging out – still, nothing idles. The group is marked as one with its name (`DailyGroup`,
+  drafts by `?gruppe=` until one is chosen), and beside it words carved into the back panel tell grown-ups in short what
+  the shelf holds – the gist of the info book, everyday helpers and first games to share, child with parents or
+  grandparents (not „alles kostenlos“, user feedback) – and that the Belohnungstafel is worth a look (user feedback,
+  November 2026). The carving takes
+  room of its own on the board (`planShelf` takes each place's width) and comes only where the picture books stay
+  nearly as big (`CARVING_SHRINK`) and the words big enough to read – on a phone only its first line. Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
   emojis: a new category gets one with it (`content.test.ts` checks).
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked

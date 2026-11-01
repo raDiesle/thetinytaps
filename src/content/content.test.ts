@@ -1,6 +1,6 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "bun:test";
-import { CATEGORIES, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
+import { CATEGORIES, SHELF, bookPage, categoryHref, categoryOf, hasPage, pagesBetween } from "./games";
 import { MASCOT_STATUS, IDEA_AREAS, LANGUAGE_STATUS, type LanguageState, languageStateOf, TOP_PICKS } from "./ideas";
 import { keyMatches, keyOf, LANGUAGES, languageFor, letterIndex, toLower } from "./languages";
 import { RESEARCH } from "./research";
@@ -436,4 +436,12 @@ describe("Russian", () => {
     expect(pack.letterSentence(y, y.words[0])).toBe("ы – в слове сыр!");
     expect(pack.findPrompt(b)).toBe("Где буква бэ?");
   });
+});
+
+// User feedback, November 2026: the everyday helpers are what parents need most, so they stand first on the shelf
+// (top left), the Belohnungstafel first among them – the shelf's eye-catcher.
+test("the Alltagshelfer stand first on the shelf, the Belohnungstafel first among them", () => {
+  expect(CATEGORIES[0].apart).toBe(true);
+  expect(SHELF[0].href).toBe("/belohnungstafel/");
+  expect(SHELF[0].category.id).toBe(CATEGORIES[0].id);
 });

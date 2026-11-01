@@ -197,7 +197,7 @@
   width: clamp(54px, 10vh, 110px);
 }
 
-/* Für jeden Tag: the children's room, with a wooden floor, a rug, a toy chest and a teddy. */
+/* Alltagshelfer: the children's room, with a wooden floor, a rug, a toy chest and a teddy. */
 .world-floor {
   position: absolute;
   bottom: 0;
