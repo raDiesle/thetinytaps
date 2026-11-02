@@ -1,10 +1,11 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, wrongFoods, wrongHomes } from "./content";
+import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
+import { GIFTS } from "./gifts";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 import { lookOf, PEEK_ITEMS } from "@/games/shadows/content";
-import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind } from "./levels";
+import { ANIMAL_LEVELS, dealFeed, dealGift, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind } from "./levels";
 
 const CYRILLIC = /^[а-яё -]+$/;
 
@@ -41,10 +42,11 @@ test("no word of any language is left over from an animal, food or home that is 
   }
 });
 
-test("the translated languages have words for every animal, food and home", () => {
+// An animal only in "Was gibt uns das Tier?" (the sheep) waits for that round's translation.
+test("the translated languages have words for every animal fed or housed, every food and home", () => {
   for (const language of COMPLETE) {
     const { words } = ANIMAL_TRANSLATIONS[language]!;
-    for (const { id } of ANIMALS) expect(words.animals[id], `${language} ${id}`).toBeDefined();
+    for (const { id } of ANIMALS.filter((a) => a.food || a.home)) expect(words.animals[id], `${language} ${id}`).toBeDefined();
     for (const { id } of FOODS) expect(words.foods[id], `${language} ${id}`).toBeDefined();
     for (const id of Object.keys(HOMES) as HomeId[]) expect(words.homes[id], `${language} ${id}`).toBeDefined();
   }
@@ -82,17 +84,17 @@ test("an animal without its words gets the whole German sentence, in every langu
 });
 
 test("only the kinds switched on take turns, in their order, and none switched on plays all", () => {
-  const turns = (on: Record<"peek" | "feed" | "home", boolean>) => {
+  const turns = (on: Record<"peek" | "feed" | "gift" | "home", boolean>) => {
     const kinds = [nextKind(null, on)];
     for (let i = 0; i < 5; i++) kinds.push(nextKind(kinds[kinds.length - 1], on));
     return kinds;
   };
-  expect(turns({ peek: true, feed: true, home: true })).toEqual(["peek", "feed", "home", "peek", "feed", "home"]);
-  expect(turns({ peek: false, feed: true, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home"]);
-  expect(turns({ peek: true, feed: false, home: false })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek"]);
-  expect(turns({ peek: false, feed: false, home: false })).toEqual(["peek", "feed", "home", "peek", "feed", "home"]);
+  expect(turns({ peek: true, feed: true, gift: true, home: true })).toEqual(["peek", "feed", "gift", "home", "peek", "feed"]);
+  expect(turns({ peek: false, feed: true, gift: false, home: true })).toEqual(["feed", "home", "feed", "home", "feed", "home"]);
+  expect(turns({ peek: true, feed: false, gift: false, home: false })).toEqual(["peek", "peek", "peek", "peek", "peek", "peek"]);
+  expect(turns({ peek: false, feed: false, gift: false, home: false })).toEqual(["peek", "feed", "gift", "home", "peek", "feed"]);
   // A kind switched off while it plays: the turns go on with the next one switched on.
-  expect(nextKind("feed", { peek: true, feed: false, home: false })).toBe("peek");
+  expect(nextKind("feed", { peek: true, feed: false, gift: false, home: false })).toBe("peek");
   // The fixed difficulties are steps there are, easy to hard.
   expect(FIXED_LEVELS.easy).toBe(0);
   expect(FIXED_LEVELS.medium).toBeGreaterThan(FIXED_LEVELS.easy);
@@ -101,7 +103,7 @@ test("only the kinds switched on take turns, in their order, and none switched o
 
 test("the rounds take turns starting with who peeks out, and the steps only get harder", () => {
   expect(KIND_ORDER[0]).toBe("peek");
-  expect(new Set(KIND_ORDER).size).toBe(3);
+  expect(new Set(KIND_ORDER).size).toBe(4);
   ANIMAL_LEVELS.forEach((level, i) => {
     const before = ANIMAL_LEVELS[i - 1];
     expect(level.choices).toBeGreaterThanOrEqual(2);
@@ -134,6 +136,14 @@ test("every round offers exactly one right choice among as many as its step says
         expect(r.homes[r.correct].id).toBe(animal.home);
         for (const h of r.homes) if (h.id !== animal.home) expect(animal.alsoLives, animal.id).not.toContain(h.id);
       }
+    }
+    for (const animal of GIVERS) {
+      // There are only a few gifts: an animal that gives two gets as many as are left.
+      const r = dealGift(animal, level.choices);
+      expect(r.gifts.length).toBe(Math.min(level.choices, wrongGifts(animal).length + 1));
+      expect(new Set(r.gifts).size).toBe(r.gifts.length);
+      expect(r.gifts[r.correct].id).toBe(animal.gives!);
+      for (const g of r.gifts) if (g.id !== animal.gives) expect(animal.alsoGives, animal.id).not.toContain(g.id);
     }
     for (const item of PEEK_ITEMS) {
       const choices = dealPeek(item, PEEK_ITEMS, level.peek);
@@ -178,4 +188,28 @@ test("every animal with a home has enough wrong homes it really doesn't live in"
     for (const id of animal.alsoLives!) expect(wrong, animal.id).not.toContain(id);
     expect(wrong.length, `${animal.id}: ${wrong.join(", ")}`).toBeGreaterThanOrEqual(most - 1);
   }
+});
+
+test("every animal that gives us something says what else it gives, and enough is left to choose from", () => {
+  for (const animal of GIVERS) {
+    expect(animal.alsoGives, `${animal.id} needs its alsoGives list`).toBeDefined();
+    for (const id of animal.alsoGives!) {
+      expect(id in GIFTS, `${animal.id} ${id}`).toBe(true);
+      expect(id, animal.id).not.toBe(animal.gives!);
+    }
+    const wrong = wrongGifts(animal).map((g) => g.id);
+    for (const id of animal.alsoGives!) expect(wrong, animal.id).not.toContain(id);
+    expect(wrong.length, animal.id).toBeGreaterThanOrEqual(2);
+  }
+  // Every gift has an animal it comes from, which pops up when it is given to another.
+  for (const gift of Object.values(GIFTS)) expect(giverOf(gift).gives).toBe(gift.id);
+});
+
+test("the German gift sentences say „vom“ and „von der“ right", () => {
+  const de = GIFT_TEXTS.de;
+  const by = (id: string) => ANIMALS.find((a) => a.id === id)!;
+  expect(de.whatGives(by("kuh"))).toBe("Was gibt uns die Kuh?");
+  expect(de.gives(by("huhn"), GIFTS.ei)).toBe("Das Huhn gibt uns Eier. Danke!");
+  expect(de.comesFrom(GIFTS.ei, by("huhn"))).toBe("Das Ei kommt vom Huhn!");
+  expect(de.comesFrom(GIFTS.milch, by("kuh"))).toBe("Die Milch kommt von der Kuh!");
 });

@@ -7,15 +7,16 @@ import { DEV } from "@/lib/buildInfo";
 import { pick, useAppLanguage } from "@/lib/language";
 import { countGame, gameEnded, isPlaytimeOver } from "@/lib/playtime";
 import { AnimalsPlay } from "./AnimalsPlay";
-import { ANIMALS, type Animal } from "./content";
-import { ANIMAL_LEVELS, dealFeed, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
+import { ANIMALS, GIVERS, type Animal } from "./content";
+import { ANIMAL_LEVELS, dealFeed, dealGift, dealHome, dealPeek, FIXED_LEVELS, KIND_ORDER, nextKind, type RoundKind } from "./levels";
 import type { AnimalsSettings } from "./settings";
 
 const FED = ANIMALS.filter((a) => a.food);
 const HOUSED = ANIMALS.filter((a) => a.home);
 
 /**
- * "Was gehört zum Tier?" as one flowing game: who peeks out, feeding and who lives where take turns in that order,
+ * "Was gehört zum Tier?" as one flowing game: who peeks out, feeding, what the animal gives us and who lives where
+ * take turns in that order,
  * and the difficulty follows how the child plays (`ANIMAL_LEVELS`). Grown-ups may switch kinds off or fix the
  * difficulty while playing; that counts from the next round. Each round is mounted anew; the stars, the step and the
  * animals still to come live here.
@@ -33,10 +34,11 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   const resultsRef = useRef<number[]>([]);
   const drawFed = useDeck(FED);
   const drawHoused = useDeck(HOUSED);
+  const drawGiver = useDeck(GIVERS);
   const drawPeek = useDeck(PEEK_ITEMS);
   const lastAnimal = useRef<Animal | null>(null);
 
-  /** The next animal to feed or house, never the one of the round before (feeding and homes share some). */
+  /** The next animal to feed, house or ask, never the one of the round before (the kinds share some). */
   const drawAnimal = (draw: () => Animal) => {
     let animal = draw();
     if (animal === lastAnimal.current) animal = draw();
@@ -58,6 +60,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
       const item = drawPeek();
       return { kind, item, choices: dealPeek(item, PEEK_ITEMS, level.peek), level: level.peek } as const;
     }
+    if (kind === "gift") return dealGift(drawAnimal(drawGiver), level.choices);
     return kind === "feed" ? dealFeed(drawAnimal(drawFed), level.choices) : dealHome(drawAnimal(drawHoused), level.choices);
   }
   if (dealt.current?.turn !== turn) dealt.current = { turn, round: deal(dealt.current?.round.kind ?? null) };
@@ -78,7 +81,7 @@ export function AnimalsRounds({ settings }: { settings: AnimalsSettings }) {
   );
 
   const onNext = useCallback(() => {
-    // Every three rounds are a game for a game limit: with the last one played, the game says good night.
+    // Every four rounds (one of each kind) are a game for a game limit: with the last one played, the game says good night.
     if ((turn + 1) % KIND_ORDER.length === 0) {
       gameEnded();
       if (isPlaytimeOver()) return;

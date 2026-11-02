@@ -4,7 +4,7 @@ import type { RoundKind } from "./levels";
 export type Difficulty = "auto" | "easy" | "medium" | "hard";
 
 /**
- * The game starts at once and takes turns between its three kinds of rounds, finding the difficulty itself
+ * The game starts at once and takes turns between its four kinds of rounds, finding the difficulty itself
  * (`levels.ts`). Grown-ups may change both while playing, behind ⚙️ held in the corner (`PlayOptions`).
  */
 export interface AnimalsSettings extends Record<RoundKind, boolean> {
@@ -19,6 +19,7 @@ export interface AnimalsSettings extends Record<RoundKind, boolean> {
 export const DEFAULT_ANIMALS_SETTINGS: AnimalsSettings = {
   peek: true,
   feed: true,
+  gift: true,
   home: true,
   difficulty: "auto",
   speech: false,

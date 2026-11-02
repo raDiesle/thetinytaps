@@ -4,21 +4,24 @@ import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/s
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { ANIMAL_TEXTS, ANIMALS } from "./content";
+import { ANIMAL_TEXTS, ANIMALS, GIFT_TEXTS, giverOf } from "./content";
+import { GiftDrawing } from "./gifts";
 import { HomeDrawing } from "./homes";
-import type { FeedRound, HomeRound } from "./levels";
+import type { FeedRound, GiftRound, HomeRound } from "./levels";
 import type { AnimalsSettings } from "./settings";
 
 /** A finger that moves less than this is a tap, not a drag. */
 const TAP_PX = 12;
 /** Time to watch the munching or the moving in before the next animal comes. */
 const CELEBRATE_MS = 2800;
-/** Time for the "Bäh!" or the peeking neighbour before the child can try again. */
+/** Longer for a gift: the glass fills, the egg drops into the nest, the wool rolls out. */
+const GIFT_CELEBRATE_MS = 3400;
+/** Time for the "Bäh!", the peeking neighbour or the animal a gift comes from before the child can try again. */
 const WRONG_MS = 1400;
 /** Dropped this close to a target (as a share of its size) still counts: small fingers don't aim well. */
 const SNAP = 0.35;
 
-/** What is being dragged: a food (its index) or, when looking for a home, the animal itself. */
+/** What is being dragged: a food or gift (its index) or, when looking for a home, the animal itself. */
 type Mover = number | "animal";
 
 interface Offset {
@@ -38,23 +41,26 @@ function near(r: DOMRect, x: number, y: number) {
 const moveStyle = (o: Offset | null): CSSProperties | undefined =>
   o ? { translate: `${o.x}px ${o.y}px`, scale: o.scale === undefined ? undefined : `${o.scale}` } : undefined;
 
-/** What a feeding or home round gets from `AnimalsRounds`, which plays the kinds in turn. */
+/** What a feeding, gift or home round gets from `AnimalsRounds`, which plays the kinds in turn. */
 export interface AnimalsPlayProps {
   settings: Pick<AnimalsSettings, "speech" | "sounds">;
-  round: FeedRound | HomeRound;
-  /** The right food or home was picked after `misses` wrong ones. */
+  round: FeedRound | GiftRound | HomeRound;
+  /** The right food, gift or home was picked after `misses` wrong ones. */
   onSolved: (misses: number) => void;
   /** The munching or moving in has been watched: the next round may come. */
   onNext: () => void;
 }
 
 /**
- * One round of "Was gehört zum Tier?": food to the hungry animal (N-08), or the animal to its home (N-09). Tapping
- * is enough; dragging works too.
+ * One round of "Was gehört zum Tier?": food to the hungry animal (N-08), what the animal gives us to it (Z-01), or
+ * the animal to its home (N-09). Tapping is enough; dragging works too.
  */
 export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayProps) {
   const language = useAppLanguage();
   const texts = pick(ANIMAL_TEXTS, language.id);
+  const giftTexts = pick(GIFT_TEXTS, language.id);
+  /** The things below are taken to the animal (food, gifts); when looking for a home, the animal goes to them. */
+  const toAnimal = round.kind !== "home";
   const [drag, setDrag] = useState<{ who: Mover; x: number; y: number } | null>(null);
   /** The target the dragged thing is over, so it can lean towards it. */
   const [hover, setHover] = useState<Mover | null>(null);
@@ -99,7 +105,8 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     [settings.speech, language.id, language.speechLang],
   );
 
-  const prompt = (r: FeedRound | HomeRound) => (r.kind === "feed" ? texts.hungry(r.animal) : texts.whereLives(r.animal));
+  const prompt = (r: FeedRound | GiftRound | HomeRound) =>
+    r.kind === "feed" ? texts.hungry(r.animal) : r.kind === "gift" ? giftTexts.whatGives(r.animal) : texts.whereLives(r.animal);
 
   // The question and the animal's noise come with the round; the round is mounted anew for every animal.
   useEffect(() => {
@@ -130,6 +137,13 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
       if (round.kind === "feed") {
         if (settings.sounds) playYuck();
         say(texts.yuck(round.animal));
+      } else if (round.kind === "gift") {
+        // The animal it comes from pops up behind the plate and says so.
+        const gift = round.gifts[index];
+        const giver = giverOf(gift);
+        if (settings.sounds) later(300, () => giver.sound?.());
+        say(giftTexts.comesFrom(gift, giver));
+        say(prompt(round), true);
       } else {
         const resident = ANIMALS.find((a) => a.home === round.homes[index].id)!;
         if (settings.sounds) later(300, () => resident.sound?.());
@@ -154,6 +168,19 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
       }
       if (settings.sounds) later(450, playMunch);
       say(texts.yummy(round.animal, round.foods[index]));
+    } else if (round.kind === "gift") {
+      // The gift flies to the animal's side and is gone; there the animal makes it anew (`.ap-made`).
+      const gift = optionRefs.current[index]?.querySelector(".ap-food")?.getBoundingClientRect();
+      if (gift && animalBox) {
+        const start = centre(gift);
+        const side = { x: animalBox.right, y: animalBox.bottom - animalBox.height * 0.25 };
+        setLanded({ who: index, to: { x: side.x - start.x + from.x, y: side.y - start.y + from.y, scale: 0.5 } });
+      }
+      if (settings.sounds) {
+        later(500, () => round.animal.sound?.());
+        later(1300, playPop);
+      }
+      say(giftTexts.gives(round.animal, round.gifts[index]));
     } else {
       // The animal walks into its home and stays in the doorway, small enough to fit.
       const home = round.homes[index];
@@ -181,7 +208,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
     later(700, () => {
       for (let i = 0; i < 8; i++) spawn();
     });
-    later(CELEBRATE_MS, onNext);
+    later(round.kind === "gift" ? GIFT_CELEBRATE_MS : CELEBRATE_MS, onNext);
   };
 
   /** Tapping the animal asks again; it makes its noise and hops. */
@@ -272,7 +299,7 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
         funBurst();
         return;
       }
-      const count = round.kind === "feed" ? round.foods.length : round.homes.length;
+      const count = round.kind === "feed" ? round.foods.length : round.kind === "gift" ? round.gifts.length : round.homes.length;
       const digit = Number(e.key);
       // Read and set through the ref: fast key presses come before React has rendered the last one.
       const move = (to: number) => {
@@ -302,13 +329,15 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
 
   const won = outcome?.ok === true;
   const yuck = outcome?.ok === false && round.kind === "feed";
+  /** A wrong gift: the animal shakes its head, without a „Bäh!“ – it is not food. */
+  const notMine = outcome?.ok === false && round.kind === "gift";
 
   const animal = (
     <div
       ref={animalRef}
       className={`ap-animal${round.kind === "home" ? moverClass("animal") : ""}${hover === "animal" ? " near" : ""}${
         won && round.kind === "feed" ? " munch" : ""
-      }${yuck ? " yuck" : ""}`}
+      }${won && round.kind === "gift" ? " gives" : ""}${yuck || notMine ? " yuck" : ""}`}
       style={round.kind === "home" ? moveStyle(offsetOf("animal")) : undefined}
       data-tap
       onPointerDown={round.kind === "home" ? onMoverDown("animal") : onAnimalTap}
@@ -320,7 +349,12 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
         {round.animal.emoji}
       </span>
       {yuck && <span className="ap-bubble">{texts.yuckBubble}</span>}
-      {won && round.kind === "feed" && (
+      {won && round.kind === "gift" && (
+        <span className={`ap-made gift-${round.gifts[round.correct].id}`} aria-hidden>
+          <GiftDrawing gift={round.gifts[round.correct]} />
+        </span>
+      )}
+      {won && toAnimal && (
         <>
           <span className="ap-bubble thanks">{texts.thanksBubble}</span>
           <span className="ap-hearts" aria-hidden>
@@ -334,7 +368,36 @@ export function AnimalsPlay({ settings, round, onSolved, onNext }: AnimalsPlayPr
   );
 
   const options =
-    round.kind === "feed" ? (
+    round.kind === "gift" ? (
+      <div className="ap-options" style={{ "--n": round.gifts.length } as CSSProperties}>
+        {round.gifts.map((gift, i) => {
+          const giver = outcome?.pick === i && !outcome.ok ? giverOf(gift) : undefined;
+          return (
+            <div
+              key={gift.id}
+              ref={(el) => {
+                optionRefs.current[i] = el;
+              }}
+              className={`ap-option ap-plate${focus === i ? " focused" : ""}`}
+              data-tap={tapState({ goal: i === round.correct })}
+              onPointerDown={onMoverDown(i)}
+              onPointerMove={onMoverMove}
+              onPointerUp={onMoverUp}
+              onPointerCancel={onMoverCancel}
+            >
+              {giver && (
+                <span className="ap-giver ap-emoji" aria-hidden>
+                  {giver.emoji}
+                </span>
+              )}
+              <span className={`ap-food ap-gift${moverClass(i)}${giver ? " refused" : ""}`} style={moveStyle(offsetOf(i))}>
+                <GiftDrawing gift={gift} label={giftTexts.gift(gift)} />
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    ) : round.kind === "feed" ? (
       <div className="ap-options" style={{ "--n": round.foods.length } as CSSProperties}>
         {round.foods.map((food, i) => (
           <div

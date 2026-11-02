@@ -20,7 +20,7 @@ export const ANIMALS_TITLE: Localized = {
   ar: "ماذا يحتاج الحيوان؟",
 };
 
-/** The names of the three kinds of rounds, for switching them on and off. */
+/** The names of the four kinds of rounds, for switching them on and off. */
 const KIND_NAMES: Record<RoundKind, Localized> = {
   peek: {
     de: "🙈 Wer schaut da raus?",
@@ -40,6 +40,7 @@ const KIND_NAMES: Record<RoundKind, Localized> = {
     es: "🥕 Dar de comer",
     ar: "🥕 إطعام الحيوانات",
   },
+  gift: { de: "🥛 Was gibt uns das Tier?" },
   home: {
     de: "🏠 Wer wohnt wo?",
     ru: "🏠 Кто где живёт?",
@@ -59,7 +60,7 @@ export function AnimalsGame() {
   return (
     <GameShell
       title={t(ANIMALS_TITLE)}
-      // Nothing to choose first: its three kinds of rounds take turns and the game finds the difficulty itself, so its
+      // Nothing to choose first: its four kinds of rounds take turns and the game finds the difficulty itself, so its
       // card plays at once; ✕ and „Menü“ go back to the table of contents (GameShell), there is no start screen.
       // Grown-ups change both while playing (⚙️ held in the corner).
       startMode="play"

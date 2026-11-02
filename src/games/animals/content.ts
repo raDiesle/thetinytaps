@@ -1,11 +1,12 @@
 import { byLanguage } from "@/content/texts";
-import { playBark, playBuzz, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
+import { playBaa, playBark, playBuzz, playCluck, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Localized } from "@/lib/language";
+import { GIFTS, type Gift, type GiftId } from "./gifts";
 import { HOMES, type Home, type HomeId } from "./homes";
 
 // Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
-// and who lives where (N-09). The other languages are in content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids.
+// who lives where (N-09) and what it gives us (Z-01). The other languages are in content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids.
 
 export interface Food {
   /** Same id = same food, so two animals can share one (cat and penguin both like fish). */
@@ -31,6 +32,10 @@ export interface Animal {
   home?: HomeId;
   /** The other homes it lives in too (the fish's pond, the dog's basket): never a wrong choice, like `alsoEats`. */
   alsoLives?: HomeId[];
+  /** What it gives us, for "Was gibt uns das Tier?" (Z-01): the cow's milk. */
+  gives?: GiftId;
+  /** The other gifts it gives us too (the sheep's milk): never a wrong choice, like `alsoEats`. */
+  alsoGives?: GiftId[];
   sound?: () => void;
 }
 
@@ -116,6 +121,8 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["honig"],
     home: "bienenstock",
     alsoLives: ["baum", "nest"],
+    gives: "honig",
+    alsoGives: [],
     sound: playBuzz,
   },
   {
@@ -137,6 +144,8 @@ export const ANIMALS: Animal[] = [
     alsoEats: ["salat", "blaetter", "moehre", "apfel", "mais", "banane", "blume", "bambus"],
     home: "stall",
     alsoLives: [],
+    gives: "milch",
+    alsoGives: [],
     sound: playMoo,
   },
   {
@@ -180,6 +189,9 @@ export const ANIMALS: Animal[] = [
     the: "das Huhn",
     food: food("mais", "🌽", "Mais"),
     alsoEats: ["wurm", "fliege", "salat", "apfel", "moehre", "nuss", "banane", "blaetter"],
+    gives: "ei",
+    alsoGives: [],
+    sound: playCluck,
   },
   {
     id: "panda",
@@ -197,6 +209,8 @@ export const ANIMALS: Animal[] = [
     food: food("salat", "🥬", "Salat"),
     alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais"],
   },
+  // Only in "Was gibt uns das Tier?" so far, and so said in German in every language until that round is translated.
+  { id: "schaf", emoji: "🐑", name: "Schaf", the: "das Schaf", gives: "wolle", alsoGives: ["milch"], sound: playBaa },
   { id: "loewe", emoji: "🦁", name: "Löwe", the: "der Löwe", food: food("fleisch", "🍖", "Fleisch"), alsoEats: ["knochen", "fisch"] },
   {
     id: "giraffe",
@@ -216,6 +230,15 @@ export const wrongFoods = (animal: Animal): Food[] => FOODS.filter((f) => f.id !
 
 /** The homes that may stand next to an animal's home as wrong choices: neither its own nor one it lives in too. */
 export const wrongHomes = (animal: Animal): Home[] => Object.values(HOMES).filter((h) => h.id !== animal.home && !animal.alsoLives?.includes(h.id));
+
+/** The animals that give us something, for "Was gibt uns das Tier?". */
+export const GIVERS: Animal[] = ANIMALS.filter((a) => a.gives);
+
+/** The gifts that may lie next to an animal's gift as wrong choices: neither its own nor one it gives us too. */
+export const wrongGifts = (animal: Animal): Gift[] => Object.values(GIFTS).filter((g) => g.id !== animal.gives && !animal.alsoGives?.includes(g.id));
+
+/** The animal a gift comes from, the one that pops up when it is given to another: the first that gives it. */
+export const giverOf = (gift: Gift): Animal => GIVERS.find((a) => a.gives === gift.id)!;
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
@@ -253,6 +276,31 @@ const GERMAN_TEXTS: AnimalTexts = {
   yuckBubble: "Bäh!",
   thanksBubble: "Danke!",
   stars: (n) => `${n} geschafft`,
+};
+
+/** What "Was gibt uns das Tier?" says, in one language (only German so far: its translations wait to be asked for). */
+export interface GiftTexts {
+  /** The gift's name, for screen readers: "Milch". */
+  gift: (g: Gift) => string;
+  /** The question: "Was gibt uns die Kuh?". */
+  whatGives: (a: Animal) => string;
+  /** The right gift: "Die Kuh gibt uns Milch. Danke!". */
+  gives: (a: Animal, g: Gift) => string;
+  /** A wrong gift, while the animal it comes from pops up: "Das Ei kommt vom Huhn!". */
+  comesFrom: (g: Gift, giver: Animal) => string;
+}
+
+/** "vom Huhn", "von der Kuh": German's dative after „von“. */
+const fromThe = (a: Animal) => (a.the.startsWith("die ") ? `von der ${a.the.slice(4)}` : `vom ${a.the.slice(a.the.indexOf(" ") + 1)}`);
+
+/** The texts of "Was gibt uns das Tier?" by app language: `pick(GIFT_TEXTS, language.id)`. */
+export const GIFT_TEXTS: Localized<GiftTexts> = {
+  de: {
+    gift: (g) => g.name,
+    whatGives: (a) => `Was gibt uns ${a.the}?`,
+    gives: (a, g) => `${capitalize(a.the)} gibt uns ${g.gives}. Danke!`,
+    comesFrom: (g, giver) => `${capitalize(g.the)} kommt ${fromThe(giver)}!`,
+  },
 };
 
 /** A language of the game besides German: its words by id and the sentences built from them with its grammar. */

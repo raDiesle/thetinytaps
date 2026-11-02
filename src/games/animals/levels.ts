@@ -1,14 +1,18 @@
 import { lookOf, type ShadowItem } from "@/games/shadows/content";
 import { shuffle } from "@/games/shadows/deck";
-import { wrongFoods, wrongHomes, type Animal, type Food } from "./content";
+import { wrongFoods, wrongGifts, wrongHomes, type Animal, type Food } from "./content";
+import { GIFTS, type Gift } from "./gifts";
 import { HOMES, type Home } from "./homes";
 import type { Difficulty } from "./settings";
 
-/** The three kinds of rounds: who peeks out of the bush (X-04), feeding (N-08), who lives where (N-09). */
-export type RoundKind = "peek" | "feed" | "home";
+/**
+ * The four kinds of rounds: who peeks out of the bush (X-04), feeding (N-08), what the animal gives us (Z-01), who
+ * lives where (N-09).
+ */
+export type RoundKind = "peek" | "feed" | "gift" | "home";
 
 /** The kinds take turns in this order, starting with the easiest: who peeks out. */
-export const KIND_ORDER: RoundKind[] = ["peek", "feed", "home"];
+export const KIND_ORDER: RoundKind[] = ["peek", "feed", "gift", "home"];
 
 /** How "Wer schaut da raus?" is played on a step. */
 export interface PeekLevel {
@@ -27,7 +31,7 @@ export interface PeekLevel {
 
 /** One step of difficulty. */
 export interface AnimalLevel {
-  /** Foods or homes to choose from when feeding or looking for a home. */
+  /** Foods, gifts or homes to choose from when feeding, giving or looking for a home. */
   choices: number;
   peek: PeekLevel;
 }
@@ -67,6 +71,14 @@ export interface FeedRound {
   correct: number;
 }
 
+/** A gift round: what does `animal` give us? One of `gifts` (at `correct`) is its own. */
+export interface GiftRound {
+  kind: "gift";
+  animal: Animal;
+  gifts: Gift[];
+  correct: number;
+}
+
 /** A home round: `animal` looks for its home among `homes`. */
 export interface HomeRound {
   kind: "home";
@@ -80,6 +92,16 @@ export function dealFeed(animal: Animal, count: number): FeedRound {
   const right = animal.food!;
   const foods = shuffle([right, ...shuffle(wrongFoods(animal)).slice(0, count - 1)]);
   return { kind: "feed", animal, foods, correct: foods.indexOf(right) };
+}
+
+/**
+ * The gifts of a gift round, `animal`'s own among `count` it doesn't give (`wrongGifts`), in random order. There are
+ * only a few gifts, so an animal that gives two (the sheep's wool and milk) gets as many as are left.
+ */
+export function dealGift(animal: Animal, count: number): GiftRound {
+  const right = GIFTS[animal.gives!];
+  const gifts = shuffle([right, ...shuffle(wrongGifts(animal)).slice(0, count - 1)]);
+  return { kind: "gift", animal, gifts, correct: gifts.indexOf(right) };
 }
 
 /** The homes of a home round, `animal`'s own among `count` it doesn't live in (`wrongHomes`), in random order. */

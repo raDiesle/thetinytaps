@@ -184,7 +184,12 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       {
         label: "⚙️ Einstellungen beim Spielen",
         languages: { de: "done" },
-        note: "„Was drankommt“ und „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer) gibt es nur auf Deutsch (November 2026); die Namen der drei Spielarten sprechen alle Sprachen.",
+        note: "„Was drankommt“ und „Schwierigkeit“ (Von selbst, Leicht, Mittel, Schwer) gibt es nur auf Deutsch (November 2026); die Namen der ersten drei Spielarten sprechen alle Sprachen.",
+      },
+      {
+        label: "🥛 Was gibt uns das Tier?",
+        languages: { de: "done" },
+        note: "Neu (Z-01, November 2026): Frage, Sätze, die Namen von Milch, Ei, Honig, Wolle und vom Schaf und der Name der Spielart unter ⚙️ gibt es nur auf Deutsch (`GIFT_TEXTS` in content.ts); Kuh, Huhn und Biene sprechen schon alle Sprachen.",
       },
     ],
   },
