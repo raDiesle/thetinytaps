@@ -226,15 +226,7 @@ export const CATEGORIES: Category[] = [
           es: "¿Qué necesita el animal?",
           ar: "ماذا يحتاج الحيوان؟",
         },
-        blurb: {
-          de: "Futter und Zuhause für die Tiere",
-          en: "Food and homes for the animals",
-          zh: "给动物找食物和家",
-          hi: "जानवरों के लिए खाना और घर",
-          es: "Comida y casa para los animales",
-          ar: "طعام وبيوت للحيوانات",
-          ru: "Корм и домики для зверей",
-        },
+        blurb: { de: "Futter, Zuhause und versteckte Tiere" },
       },
       {
         href: "/schatten/",

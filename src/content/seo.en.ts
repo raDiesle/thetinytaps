@@ -62,8 +62,8 @@ export const SEO_EN: SeoTranslation = {
     "/tiere/": {
       title: "Feed the Animals – Animal Game for Toddlers",
       description:
-        "What does the animal want? Drag food to the hungry animal or bring the animal home, with animal sounds. For toddlers, free and without ads.",
-      text: "The rabbit wants a carrot, the dog a bone: drag or tap the food to the animal, and it is happy and makes its sound.",
+        "What does the animal want? Drag food to the hungry animal, bring the animal home or guess who peeks out of the bush – with animal sounds. Free, no ads.",
+      text: "The rabbit wants a carrot, the dog a bone: drag or tap the food to the animal, and it is happy and makes its sound. The fox looks for its den, the fish for its aquarium. And only ears or a tail peek out of the bush: who is it? Tap it, and the whole animal comes out.",
     },
     "/schatten/": {
       title: "Find the Shadow – Matching Game for Toddlers",

@@ -167,7 +167,11 @@ export const LANGUAGE_STATUS: LanguageStatusRow[] = [
       },
     ],
   },
-  { href: "/tiere/", languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" } },
+  {
+    href: "/tiere/",
+    languages: { de: "done", en: "partial", zh: "partial", hi: "partial", es: "partial", ar: "partial", ru: "partial" },
+    note: "Neu und nur Deutsch (2. November 2026): die Zeile unter dem Namen im Inhaltsverzeichnis, „Futter, Zuhause und versteckte Tiere“ (games.ts).",
+  },
   {
     href: "/schatten/",
     languages: { de: "done", en: "done", zh: "done", hi: "done", es: "done", ar: "done", ru: "done" },
