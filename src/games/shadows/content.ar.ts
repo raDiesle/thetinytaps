@@ -102,7 +102,6 @@ export function arabicTexts(german: ShadowTexts): ShadowTexts {
     peek: "من يطل من هناك؟",
     there: about((ar, the) => `${ar.female ? "ها هي" : "ها هو"} ${the}!`, german.there),
     shadow: (n) => `الظل ${n}`,
-    stars: (n) => `تم ${n}`,
   };
 }
 

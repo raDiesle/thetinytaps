@@ -180,7 +180,7 @@
   animation: wiggle 0.5s ease-in-out 0.6s 2;
 }
 
-/* Top left: the button for the kind of pictures, and the stars for the shadows found. */
+/* Top left: the button for the kind of pictures. */
 .sh-bar {
   position: absolute;
   z-index: 7;
@@ -259,21 +259,6 @@
 
 .sh-theme-choice .sh-theme-icon.mixed {
   font-size: 24px;
-}
-
-.sh-stars {
-  max-width: 30vw;
-  padding-top: 10px;
-  font-family: var(--font-emoji);
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  pointer-events: none;
-}
-
-/* The number after ten stars, in „Wer schaut da raus?“ only. */
-.sh-count {
-  margin-left: 6px;
-  font-family: var(--font-rounded);
-  font-weight: 800;
 }
 
 /* ---------- Wer schaut da raus? (X-04) ---------- */

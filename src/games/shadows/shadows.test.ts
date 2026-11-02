@@ -43,7 +43,7 @@ test("the sentences have no German left in them, and none in another script has 
       const sentences = [texts.search(item), texts.found(item), texts.thatIs(item), texts.there(item)];
       sentences.forEach((sentence, i) => expect(sentence, `${language} ${item.id}`).not.toBe([de.search, de.found, de.thatIs, de.there][i](item)));
       if (OWN_SCRIPT.includes(language)) {
-        for (const sentence of [...sentences, texts.name(item), texts.peek, texts.shadow(2), texts.stars(3)]) {
+        for (const sentence of [...sentences, texts.name(item), texts.peek, texts.shadow(2)]) {
           expect(sentence, `${language} ${item.id}`).not.toMatch(/[A-Za-zäöüß]/);
         }
       }

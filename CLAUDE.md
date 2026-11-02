@@ -180,6 +180,9 @@ In a fresh worktree run `bun install` first.
 
 - One tap or key = one immediate, visible and audible reaction. Every key does something.
 - No wrong answers, no error sounds, nothing to read: pictures, sounds and voice.
+- No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
+  nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
+  (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.
 - A game that gets harder does so in what the child has to see, remember or tell apart (more things, more alike,
   some hidden like memory cards) – never by asking it to be quicker: no faster pace, nothing that speeds up, no clock.
   Time may only hint how easy a round was (Socken-Paare skips a step when it was quick), never be a hurdle.

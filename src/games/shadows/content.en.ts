@@ -101,7 +101,6 @@ export function englishTexts(german: ShadowTexts): ShadowTexts {
     peek: "Who's peeking out?",
     there: about((en) => `${en.many ? "There are" : "There's"} the ${en.name}!`, german.there),
     shadow: (n) => `Shadow ${n}`,
-    stars: (n) => `${n} done`,
   };
 }
 

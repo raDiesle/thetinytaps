@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, GIFT_TEXTS, giverOf, GIVERS, wrongFoods, wrongGifts, wrongHomes } from "./content";
@@ -66,7 +65,7 @@ test("the sentences have no German left in them, and none in another script has 
       if (animal.home && words.homes[animal.home]) pairs.push([texts.movedIn(animal, HOMES[animal.home]), german.movedIn(animal, HOMES[animal.home])]);
       for (const [sentence, de] of pairs) expect(sentence, `${language} ${animal.id}`).not.toBe(de);
       if (OWN_SCRIPT.includes(language)) {
-        const shown = [...pairs.map(([sentence]) => sentence), texts.animal(animal), texts.yuckBubble, texts.thanksBubble, texts.stars(3)];
+        const shown = [...pairs.map(([sentence]) => sentence), texts.animal(animal), texts.yuckBubble, texts.thanksBubble];
         for (const sentence of shown) expect(sentence, `${language} ${animal.id}`).not.toMatch(/[A-Za-zäöüß]/);
       }
     }
@@ -255,9 +254,4 @@ test("no round's sign is a picture the child picks from", () => {
   const pictures = new Set([...ANIMALS, ...FOODS, ...PEEK_ITEMS, ...GROWTHS].map((thing) => thing.emoji));
   expect(Object.values(KIND_SIGNS).filter((sign) => pictures.has(sign))).toEqual([]);
   expect(Object.keys(KIND_SIGNS).sort()).toEqual([...KIND_ORDER].sort());
-});
-
-// The game flows on with nothing to collect: no stars counting the rounds (user feedback, November 2026).
-test("no stars count the rounds", () => {
-  expect(readFileSync("src/games/animals/AnimalsRounds.tsx", "utf8")).not.toContain("⭐");
 });

@@ -174,8 +174,6 @@ export interface ShadowTexts {
   there: (item: ShadowItem) => string;
   /** For screen readers: the shadow at place `n` (from 1) while it is still black. */
   shadow: (n: number) => string;
-  /** For screen readers: the stars for `n` found ones. */
-  stars: (n: number) => string;
 }
 
 const GERMAN_TEXTS: ShadowTexts = {
@@ -186,7 +184,6 @@ const GERMAN_TEXTS: ShadowTexts = {
   peek: "Wer schaut da raus?",
   there: (item) => `Da ist ja ${item.the}!`,
   shadow: (n) => `Schatten ${n}`,
-  stars: (n) => `${n} geschafft`,
 };
 
 /** A language of the game besides German: the pictures' names by id and the sentences built from them with its grammar. */

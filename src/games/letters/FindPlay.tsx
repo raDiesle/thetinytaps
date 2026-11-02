@@ -6,7 +6,6 @@ import { TouchKeyboard, keyRows, useTouchKeys } from "@/components/TouchKeyboard
 import { keyMatches, keyOf, toLower } from "@/content/languages";
 import { inTheme } from "@/content/themes";
 import type { LanguagePack, LetterEntry, ThemeId, WordEntry } from "@/content/types";
-import { useT } from "@/lib/language";
 import { playChime, playRandomNote } from "@/lib/sfx";
 import { speak } from "@/lib/speech";
 import { LetterWord } from "./Cards";
@@ -54,10 +53,8 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
   /** Wrong keys for the current letter; changing it restarts the shake animation. */
   const [wrong, setWrong] = useState(0);
   const [found, setFound] = useState(false);
-  const [foundCount, setFoundCount] = useState(0);
   const [background, setBackground] = useState(BACKGROUNDS[0]);
   const { bursts, spawn } = useBursts();
-  const t = useT();
 
   const lastPress = useRef(0);
   const nextId = useRef(0);
@@ -143,7 +140,6 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
 
       if (keyMatches(key, current.letter.upper, pack)) {
         setFound(true);
-        setFoundCount((n) => n + 1);
         if (settings.sounds) playChime();
         say(`${pack.letterSentence(current.letter, current.word)} ${pick(pack.praise)}`);
         for (let i = 0; i < 8; i++) spawn();
@@ -197,23 +193,6 @@ export function FindPlay({ pack, settings }: { pack: LanguagePack; settings: Let
           </div>
         )}
       </div>
-      {foundCount > 0 && (
-        <div
-          className="find-stars"
-          aria-label={t({
-            de: `${foundCount} gefunden`,
-            ru: `Найдено: ${foundCount}`,
-            en: `${foundCount} found`,
-            zh: `找到了${foundCount}个`,
-            hi: `मिले: ${foundCount}`,
-            es: `Encontradas: ${foundCount}`,
-            ar: `وجدنا ${foundCount}`,
-          })}
-        >
-          {"⭐".repeat(Math.min(foundCount, 10))}
-          {foundCount > 10 && <span className="find-count">{foundCount}</span>}
-        </div>
-      )}
       {touchKeys ? (
         <TouchKeyboard
           rows={rows}
