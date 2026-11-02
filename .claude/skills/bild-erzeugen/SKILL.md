@@ -28,6 +28,31 @@ scene (see `/neue-szene`); use pictures for illustrations, cards and backdrops.
 - The key must be **exported** (`export GEMINI_API_KEY=…` in `~/.zshrc`); if the shell
   of this session started before, run `zsh -ic 'export GEMINI_API_KEY; bun run image …'`.
 
+## Cheap first: the queue (always)
+
+Pictures are always made as cheap as they can be (user decision, November 2026). A request costs the same whether
+it brings one picture or a sheet of two or four small ones (`--grid`), so small pictures of one kind wait until their
+sheet is full, and later sessions bring the partners.
+
+1. **Every picture asked for goes into `src/content/pictureQueue.ts` first** (id, file, German `use`, the prompt
+   *without* the style block, aspect, size, `transparent`, `ref`, date; `alone` with the reason for a second frame or a
+   story picture that must keep its room – those never share a sheet).
+2. **`bun run image queue`** shows the plan (`src/content/pictureQueuePlan.ts`): *cheap now* are full sheets and
+   pictures that never share one (no `size`, bigger than a panel, `alone`) – waiting saves nothing there; *waiting for
+   partners* are sheets not yet full, together with older pictures already waiting there; *after their reference* are
+   pictures drawn from another one still in the queue.
+3. **Make the cheap part at once without asking**: `bun run image queue --make` (in the background, like every batch).
+4. **For what waits, ask the user in the session** (AskUserQuestion, „warten“ first): wait for partners, or make it now
+   for one request more (≈ $0.017). Now: `bun run image queue --make --force <id,…>` (or `all`) – the sheet's spare
+   panels become variants of its pictures in `.image-raw/variants/`, to pick the best. Waiting: commit the queue entry
+   with the feature, which shows a placeholder until then (see Workflow 0), and merge it, so the next session finds it.
+5. **A made picture leaves the queue** in the commit that adds it (the script reminds you; `pictureQueue.test.ts`
+   fails while a queued file exists).
+
+Pictures that still wait for the user's word – the mascot pictures in `mascotStatus.ts`, prompts under review in
+`picturePrompts.ts` – come into the queue only once the user asks for them. „Offene Bilder“ on `/management/` shows the
+queue split the same way, with what forcing would cost.
+
 ## Batches (the default)
 
 Every request goes through the Gemini Batch API at half the price. It usually takes
@@ -117,7 +142,8 @@ comma-separated, one `--panel "<what differs>"` each, the prompt holds what is s
 
 ## Style
 
-Always start the prompt with the style block, so all pictures fit together. The app looks like a picture book
+Always start the prompt with the style block, so all pictures fit together (the queue adds it itself: `BOOK_STYLE`
+in `pictureQueuePlan.ts`, the same words as here – `pictureQueue.test.ts` checks). The app looks like a picture book
 (paper pages, softened printed colours, plum ink – see „The app looks like a picture book“ in the root `CLAUDE.md`
 and the colours in `src/styles/book.css`), so the pictures are drawn as pages of that book:
 
@@ -182,7 +208,8 @@ names – use those.
    toddler. One clear subject; describe characters with the same words every time.
 2. For a recurring character, make a reference first (character sheet or the best
    picture) and pass it with `--ref` to every later picture.
-3. Run `bun run image …` in the background, then **look at the saved file with Read**. Check: is it what was
+3. Put it into the queue and run `bun run image queue --make` in the background (see „Cheap first“; a single
+   `bun run image …` only for retries of a picture and `--now` tries of a prompt), then **look at the saved file with Read**. Check: is it what was
    asked, does a child who can't read understand it, faces/feelings clear, no text or
    stray letters, no extra limbs, edges of a cut-out clean (no magenta fringe, nothing
    of the subject cut away). A "warning: only N% of the border …" means the backdrop

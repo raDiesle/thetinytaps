@@ -520,7 +520,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   bottom right corner, in the toy look below the home page's first screen; who runs the site in `src/content/legal.ts`) stay true: a change that sends,
   stores or reads something new (a service, a tracker, camera, microphone, location) updates the Datenschutzerklärung
   and its `PRIVACY_UPDATED` in the same commit (`tracking.test.ts` checks the main ones). Both stay out of search results.
-- A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
+- A new Lebendige-Bilder picture: `/neue-szene`. A new Kleine-Abenteuer level: `/neues-abenteuer`. A generated picture: `/bild-erzeugen`
+  – always as cheap as it can be (user decision, November 2026): every picture asked for goes into the queue
+  (`src/content/pictureQueue.ts`, shown on `/management/` under „Offene Bilder“) and `bun run image queue` makes only
+  what is already as cheap as it gets; a small picture whose shared sheet isn't full waits for later sessions, unless
+  the user, asked in the session, says to make it now. Music from Suno: `/musik-erzeugen`; the Zähneputzen-Lied in a new language: `/zahnputzlied`.
 
 ## Checking your work
 

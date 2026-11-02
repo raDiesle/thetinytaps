@@ -214,7 +214,7 @@ test("in the book look the families stand at the bottom of a menu's page, not in
 test("headings carry no emoji", () => {
   const leading = /<h[1-6][^>]*>\s*(<span aria-hidden>|\{?[^\s<{}]*\p{Extended_Pictographic})/u;
   const offenders = readdirSync("src", { recursive: true, encoding: "utf8" })
-    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|PicturePromptReview|VoiceList/.test(file))
+    .filter((file) => file.endsWith(".tsx") && !/ManagementPage|PicturePromptReview|PictureQueue|VoiceList/.test(file))
     .filter((file) => leading.test(readFileSync(join("src", file), "utf8")));
   expect(offenders).toEqual([]);
   expect(readFileSync("src/components/MenuTop.tsx", "utf8")).toMatch(/title: string; tools/);
