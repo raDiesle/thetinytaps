@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/sfx";
+import { loadRecordings, playChime, playMunch, playPop, playRandomNote, playRecorded, playYuck } from "@/lib/sfx";
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { ANIMAL_TEXTS, ANIMALS, FOODS, type Animal, type Food } from "./content";
+import { ANIMAL_RECORDINGS, ANIMAL_TEXTS, ANIMALS, FOODS, type Animal, type Food } from "./content";
 import { HOMES, HomeDrawing, type Home } from "./homes";
 import type { AnimalsSettings } from "./settings";
 
@@ -148,6 +148,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
   }, [settings.mode, settings.mix, settings.choices, settings.sounds, drawAnimal, say, later]);
 
   // Start with an animal right away; settings can't change while playing.
+  useEffect(() => loadRecordings([...ANIMAL_RECORDINGS, "munch"]), []);
   useEffect(() => nextRound(), []);
 
   const funBurst = useCallback(
@@ -193,7 +194,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
         const mouth = { x: animalBox.left + animalBox.width / 2, y: animalBox.top + animalBox.height * 0.6 };
         setLanded({ who: index, to: { x: mouth.x - start.x + from.x, y: mouth.y - start.y + from.y, scale: 0.3 } });
       }
-      if (settings.sounds) later(450, playMunch);
+      if (settings.sounds) later(450, () => playRecorded("munch", playMunch));
       say(texts.yummy(round.animal, round.foods[index]));
     } else {
       // The animal walks into its home and stays in the doorway, small enough to fit.
@@ -367,16 +368,12 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
         {round.animal.emoji}
       </span>
       {settings.names && <span className="ap-name">{texts.animal(round.animal)}</span>}
-      {yuck && <span className="ap-bubble">{texts.yuckBubble}</span>}
       {won && round.kind === "feed" && (
-        <>
-          <span className="ap-bubble thanks">{texts.thanksBubble}</span>
-          <span className="ap-hearts" aria-hidden>
-            <span>💖</span>
-            <span>💛</span>
-            <span>💖</span>
-          </span>
-        </>
+        <span className="ap-hearts" aria-hidden>
+          <span>💖</span>
+          <span>💛</span>
+          <span>💖</span>
+        </span>
       )}
     </div>
   );

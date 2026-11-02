@@ -1,5 +1,5 @@
 import { INK, SKIN, Wheel, nth } from "../shared";
-import { Arm, Head, Leg, Lid, Notes, Puffs } from "./parts";
+import { Arm, Head, Leg, Lid, Puffs } from "./parts";
 
 // Grown-ups and children on the playground: grandpa on the bench, the ice cream man, mum
 // with the pram, the balance bike, the scooter, the bubbles and the child in the sandpit.
@@ -43,7 +43,6 @@ export function Opa() {
         <circle cx="-60" cy="-140" r="7" fill={SKIN} />
         <circle cx="22" cy="-136" r="7" fill={SKIN} />
       </g>
-      <Notes x={30} y={-200} texts={["Hallo!"]} colour="#ffd43b" />
     </>
   );
 }
@@ -122,7 +121,6 @@ export function Eiswagen() {
       <g className="sp-eis-wheel" style={{ transformOrigin: "-64px -40px" }}>
         <Wheel cx={-64} cy={-40} r={40} />
       </g>
-      <Notes x={150} y={-200} texts={["Bimm!", "Eis!"]} colour="#ffd43b" />
     </>
   );
 }
@@ -191,7 +189,6 @@ export function Kinderwagen() {
           <path d="M28 -112 Q28 -166 74 -172 M52 -112 Q52 -164 78 -168" stroke="#c2255c" strokeWidth="3" fill="none" />
         </g>
       </g>
-      <Notes x={150} y={-170} texts={["Hihi!"]} colour="#ffc9e0" />
     </>
   );
 }
@@ -227,7 +224,6 @@ export function Laufrad() {
         <path d="M-28 -172 Q-28 -200 -6 -200 Q18 -200 16 -172 Z" fill="#4dabf7" />
         <path d="M-20 -188 Q-6 -196 8 -188" stroke="#d0ebff" strokeWidth="4" strokeLinecap="round" fill="none" />
       </g>
-      <Notes x={40} y={-170} texts={["Kling!"]} colour="#ffd43b" />
     </g>
   );
 }
@@ -259,7 +255,6 @@ export function Roller() {
       </g>
       <path d="M-10 -148 Q4 -140 24 -148" stroke="#e64980" strokeWidth="8" strokeLinecap="round" fill="none" />
       <Head cx={4} cy={-170} r={20} hair="#2b2d42" style="pigtails" />
-      <Notes x={-90} y={-180} texts={["Wusch!"]} colour="#99e9f2" />
     </g>
   );
 }
@@ -361,7 +356,6 @@ export function Kind() {
         <path d="M-22 -136 Q-22 -160 0 -160 Q22 -160 22 -136 Z" fill="#ffe066" />
         <path d="M-22 -138 H22" stroke="#ff6b6b" strokeWidth="5" />
       </g>
-      <Notes x={-70} y={-150} texts={["Hihi!"]} colour="#ffd43b" />
     </>
   );
 }

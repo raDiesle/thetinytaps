@@ -97,9 +97,6 @@ export function Kraehe() {
         </g>
         <path className="he-kraehe-wing" d="M-6 -98 Q14 -112 30 -96 Q18 -84 -2 -86 Z" fill="#212529" style={{ transformOrigin: "-2px -96px" }} />
       </g>
-      <text className="he-kraehe-call" x="-46" y="-138" fontSize="20" fontWeight="800" fill={INK}>
-        Krah!
-      </text>
     </>
   );
 }

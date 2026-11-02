@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react";
 import { Hideout } from "../hideout";
 import { nth, sparklePath } from "../shared";
-import { Notes } from "../spielplatz/parts";
 import { Blades, Blossom, Egg, type EggPattern } from "./parts";
 
 // Trees, bushes and flowers of the Easter garden. Foot point at (0, 0).
@@ -265,7 +264,6 @@ export function HohlerBaum() {
           <rect key={i} x={x} y={y} width="6" height="4" style={nth(i)} />
         ))}
       </g>
-      <Notes x={-150} y={-250} texts={["Tock!", "Tock!"]} colour="#ffd43b" size={24} />
     </>
   );
 }
@@ -432,7 +430,6 @@ export function Osterglocken() {
           </g>
         );
       })}
-      <Notes x={-90} y={-190} texts={["Bimm!", "Bamm!"]} colour="#ffe066" size={28} />
     </>
   );
 }

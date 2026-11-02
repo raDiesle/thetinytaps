@@ -1,5 +1,5 @@
 import { CHEEK, Eye, INK, Inside, SKIN, nth } from "../shared";
-import { Arm, Drops, FOAM, Head, Lid, Notes, Puffs, Ripples, SEA } from "./parts";
+import { Arm, Drops, FOAM, Head, Lid, Puffs, Ripples, SEA } from "./parts";
 
 // At the water's edge: the waves, the child in the swim ring, the inflatable duck and dad on
 // his air mattress. Foot point (0, 0) on the water line.
@@ -57,7 +57,6 @@ export function Wellen() {
         r={7}
         fill="#d0ebff"
       />
-      <Notes x={-60} y={-110} texts={["Rausch!", "Platsch!"]} colour="#d0ebff" size={28} />
     </>
   );
 }
@@ -98,7 +97,6 @@ export function Schwimmring() {
         ]}
         r={7}
       />
-      <Notes x={36} y={-140} texts={["Juhu!"]} colour="#ffd43b" size={24} />
     </>
   );
 }
@@ -154,7 +152,6 @@ export function Luftmatratze() {
         ]}
         r={7}
       />
-      <Notes x={-20} y={-110} texts={["Hoppla!"]} colour="#ffd43b" size={24} />
     </>
   );
 }
@@ -194,7 +191,6 @@ export function Badeente() {
         ]}
         r={6}
       />
-      <Notes x={84} y={-130} texts={["Quak!", "Quak!"]} colour="#ffd43b" size={24} />
     </>
   );
 }

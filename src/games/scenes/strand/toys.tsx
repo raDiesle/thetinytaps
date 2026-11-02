@@ -1,6 +1,6 @@
 import { Hideout } from "../hideout";
 import { CHEEK, Eye, Face, INK, nth } from "../shared";
-import { Drops, Notes, Puffs, SAND, SAND_DARK, Sparkles, SEA } from "./parts";
+import { Drops, Puffs, SAND, SAND_DARK, Sparkles, SEA } from "./parts";
 
 // Things in the sand at the front: the sand castle, the bucket, the spade, the sand pile with
 // the lugworm, the half-buried treasure chest, the cool box, the pinwheel and the sun cream.
@@ -128,7 +128,6 @@ export function Eimer() {
         ]}
         r={6}
       />
-      <Notes x={40} y={-140} texts={["Plitsch!"]} colour="#a5d8ff" size={22} />
     </>
   );
 }
@@ -192,7 +191,6 @@ export function Sandhaufen() {
         r={7}
         fill={SAND_DARK}
       />
-      <Notes x={30} y={-120} texts={["Kuckuck!"]} colour="#ffc9e0" size={20} />
     </>
   );
 }
@@ -274,7 +272,6 @@ export function Kuehlbox() {
         <path d="M-30 -110 Q-30 -128 0 -128 Q30 -128 30 -110" stroke="#dee2e6" strokeWidth="8" fill="none" />
         <path d="M-74 -102 H60" stroke="#fff" strokeWidth="5" strokeLinecap="round" />
       </g>
-      <Notes x={60} y={-150} texts={["Brrr!"]} colour="#d0ebff" size={22} />
     </>
   );
 }
@@ -322,7 +319,6 @@ export function Sonnencreme() {
           <rect x="-10" y="-106" width="20" height="10" rx="4" fill="#e63946" />
         </g>
       </g>
-      <Notes x={24} y={-130} texts={["Quietsch!"]} colour="#fff" size={20} />
     </>
   );
 }

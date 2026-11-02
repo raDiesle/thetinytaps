@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playChime, playPop, playRandomNote } from "@/lib/sfx";
+import { loadRecordings, playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { PEEK_ITEMS, hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } from "./content";
+import { PEEK_ITEMS, hideoutOf, SHADOW_TEXTS, SHADOW_RECORDINGS, type Hideout, type ShadowItem } from "./content";
 import { shuffle, useDeck } from "./deck";
 import { emojiGlyph, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
@@ -152,6 +152,7 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
   }, [settings.choices, drawItem, say]);
 
   // Start with an animal right away; settings can't change while playing.
+  useEffect(() => loadRecordings(SHADOW_RECORDINGS), []);
   useEffect(() => nextRound(), []);
 
   const funBurst = useCallback(

@@ -120,8 +120,6 @@ export function spanishTexts(german: AnimalTexts): AnimalTexts {
     whereLives: (a) => (animal(a) ? `¿Dónde vive ${animal(a).the}?` : german.whereLives(a)),
     movedIn: (a, h) => (animal(a) && home(h) ? `¡Bien! ${capital(animal(a).the)} vive ${home(h)!.inPhrase}.` : german.movedIn(a, h)),
     livesHere: (resident) => (animal(resident) ? `¡No, aquí vive ${animal(resident).the}!` : german.livesHere(resident)),
-    yuckBubble: "¡Puaj!",
-    thanksBubble: "¡Gracias!",
     stars: (n) => `${n} hechos`,
   };
 }

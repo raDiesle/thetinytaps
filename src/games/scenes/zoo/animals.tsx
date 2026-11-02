@@ -109,12 +109,6 @@ export function Papagei() {
         <Eye cx={99} cy={-426} r={2.6} />
         <Lid cx={99} cy={-426} r={2.6} fill="#fff" />
       </g>
-      <g className="zo-papagei-bubble" style={{ transformOrigin: "70px -440px" }}>
-        <path d="M70 -440 L60 -456 H8 Q-2 -456 -2 -466 V-482 Q-2 -492 8 -492 H76 Q86 -492 86 -482 V-466 Q86 -456 76 -456 H70 Z" fill="#fff" />
-        <text x="42" y="-468" textAnchor="middle" dominantBaseline="central" fontSize="17" fontWeight="800" fill={INK}>
-          Hallo!
-        </text>
-      </g>
     </g>
   );
 }

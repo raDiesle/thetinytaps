@@ -1,6 +1,6 @@
 import { Hideout } from "../hideout";
 import { INK, Wheel, nth } from "../shared";
-import { Notes, Puffs, Sparkles } from "./parts";
+import { Puffs, Sparkles } from "./parts";
 
 // Things on the playground: the bin, the ball, the toys in the sandpit and the water pump.
 // Foot point at (0, 0).
@@ -44,7 +44,6 @@ export function Ball() {
           <circle cx="-14" cy="-54" r="8" fill="#fff" opacity="0.6" />
         </g>
       </g>
-      <Notes x={30} y={-90} texts={["Boing!"]} colour="#ffd43b" size={24} />
     </>
   );
 }
@@ -210,7 +209,6 @@ export function Bagger() {
           <circle cx="20" cy="-60" r="7" fill={INK} />
         </g>
       </g>
-      <Notes x={-90} y={-120} texts={["Brumm!"]} colour="#ffd43b" size={22} />
     </>
   );
 }
@@ -242,7 +240,6 @@ export function Pumpe() {
         <rect x="-108" y="-182" width="30" height="20" rx="8" fill="#e63946" transform="rotate(24 -93 -172)" />
       </g>
       <circle cx="-14" cy="-136" r="6" fill={INK} />
-      <Notes x={70} y={-130} texts={["Platsch!"]} colour="#a5d8ff" size={22} />
     </>
   );
 }

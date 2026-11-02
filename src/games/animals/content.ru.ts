@@ -108,8 +108,6 @@ export function russianTexts(german: AnimalTexts): AnimalTexts {
     whereLives: (a) => (animal(a) ? `Где живёт ${animal(a)}?` : german.whereLives(a)),
     movedIn: (a, h) => (animal(a) && home(h) ? `Ура! ${capital(animal(a))} живёт ${home(h)!.inPhrase}.` : german.movedIn(a, h)),
     livesHere: (resident) => (animal(resident) ? `Нет, тут живёт ${animal(resident)}!` : german.livesHere(resident)),
-    yuckBubble: "Фу!",
-    thanksBubble: "Спасибо!",
     stars: (n) => `Готово: ${n}`,
   };
 }

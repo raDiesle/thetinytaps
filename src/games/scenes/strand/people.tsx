@@ -1,5 +1,5 @@
 import { INK, SKIN, nth } from "../shared";
-import { Arm, Head, Hearts, Leg, Notes, Sparkles } from "./parts";
+import { Arm, Head, Hearts, Leg, Sparkles } from "./parts";
 
 // Mum and her chips on the towel (drawn in the towel's coordinates, see TOWEL in layout.ts)
 // and the child with the fishing net. Foot point at (0, 0).
@@ -75,7 +75,6 @@ export function Pommes() {
         r={8}
         fill="#fff9db"
       />
-      <Notes x={-30} y={-80} texts={["Mmh!"]} colour="#ffd43b" size={22} />
     </g>
   );
 }
@@ -101,7 +100,6 @@ export function Kind() {
         <Arm x1={22} y1={-112} x2={46} y2={-146} sleeve="#40c057" w={12} />
       </g>
       <Head cx={0} cy={-150} r={26} hair="#e9c46a" cap="#ff6b6b" />
-      <Notes x={-70} y={-196} texts={["He!", "Hallo!"]} colour="#fff" size={26} />
     </g>
   );
 }

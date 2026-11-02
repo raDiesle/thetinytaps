@@ -107,8 +107,6 @@ export function hindiTexts(german: AnimalTexts): AnimalTexts {
     whereLives: (a) => (animal(a) ? `${of(a)} का घर कहाँ है?` : german.whereLives(a)),
     movedIn: (a, h) => (animal(a) && home(h) ? `अरे वाह! ${home(h)} ${of(a)} का घर है।` : german.movedIn(a, h)),
     livesHere: (resident) => (animal(resident) ? `नहीं, यह ${of(resident)} का घर है!` : german.livesHere(resident)),
-    yuckBubble: "छी!",
-    thanksBubble: "धन्यवाद!",
     stars: (n) => `${n} पूरे`,
   };
 }

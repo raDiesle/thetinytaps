@@ -4,7 +4,7 @@ import { nth } from "../shared";
 // sparkles come from the playground (their blink and float animations are in spielplatz.css);
 // water drops and ripples are this scene's own and animated in strand.css.
 
-export { Arm, Head, Hearts, Leg, Lid, Notes, Puffs, Sparkles } from "../spielplatz/parts";
+export { Arm, Head, Hearts, Leg, Lid, Puffs, Sparkles } from "../spielplatz/parts";
 
 export const SAND = "#f6d89c";
 export const SAND_DARK = "#e2b46a";

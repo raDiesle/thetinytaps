@@ -1,6 +1,6 @@
 import { Hideout } from "../hideout";
 import { CHEEK, Eye, INK, Inside, Pane, SKIN, heartPath, nth, sparklePath } from "../shared";
-import { Lid, Notes, Puffs } from "../spielplatz/parts";
+import { Lid, Puffs } from "../spielplatz/parts";
 import { Blossom, Egg } from "./parts";
 
 // Things in the Easter garden: the shed, the gate, the nest box, the wheelbarrow, the bird
@@ -189,7 +189,6 @@ export function Nistkasten() {
         <path d="M-50 -300 L0 -340 L50 -300 Z" fill="#e03131" />
         <path d="M-50 -300 L0 -340 L50 -300" stroke="#c92a2a" strokeWidth="6" strokeLinejoin="round" fill="none" />
       </g>
-      <Notes x={20} y={-330} texts={["Zi-zi!"]} colour="#fff" size={22} />
     </>
   );
 }
@@ -277,7 +276,6 @@ export function Vogelbad() {
         r={6}
         fill="#74c0fc"
       />
-      <Notes x={-70} y={-150} texts={["Plitsch!"]} colour="#e7f5ff" size={22} />
     </>
   );
 }
@@ -345,7 +343,6 @@ export function Maltisch() {
         ]}
         r={9}
       />
-      <Notes x={-140} y={-230} texts={["Bunt!"]} colour="#ff8fab" size={24} />
     </>
   );
 }
@@ -528,7 +525,6 @@ export function Gartenzwerg() {
           <path d="M-26 -126 Q0 -136 26 -126" stroke="#c92a2a" strokeWidth="6" fill="none" strokeLinecap="round" />
         </g>
       </g>
-      <Notes x={30} y={-170} texts={["Uaah!"]} colour="#fff" size={24} />
     </>
   );
 }

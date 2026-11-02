@@ -54,8 +54,8 @@ export function Lines({ x, y, dir = 1, colour = "#fff", size = 1 }: { x: number;
 }
 
 /**
- * Words that float up one after the other while the item plays ("Tröt!", "Hatschi!").
- * `delays` (seconds) times each word; by default one every half second.
+ * Music notes (♪ ♫) that float up one after the other while the item plays – never words, the sound says it.
+ * `delays` (seconds) times each note; by default one every half second.
  */
 export function Notes({
   x,

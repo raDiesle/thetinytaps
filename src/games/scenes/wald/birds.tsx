@@ -1,5 +1,5 @@
 import { INK, nth } from "../shared";
-import { Lid, Lines, Notes } from "./parts";
+import { Lid, Lines } from "./parts";
 
 // The birds. Each sits on something else and is drawn in its coordinates: the owl in the
 // oak's hollow, the cuckoo on the fir, woodpecker and nest on the birch, the raven on the signpost.
@@ -38,7 +38,6 @@ export function Eule() {
         <Lid cx={-9} cy={-184} r={7} fill={OWL} />
         <Lid cx={9} cy={-184} r={7} fill={OWL} />
       </g>
-      <Notes x={22} y={-212} texts={["Schu", "hu!"]} size={18} />
     </g>
   );
 }
@@ -66,7 +65,6 @@ export function Kuckuck() {
         </g>
         <path d="M108 -202 v8 M116 -202 v8" stroke="#ffb703" strokeWidth="2.5" strokeLinecap="round" />
       </g>
-      <Notes x={140} y={-256} texts={["Kuckuck!", "Kuckuck!"]} size={20} />
     </>
   );
 }

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { playChime, playPop, playRandomNote } from "@/lib/sfx";
+import { loadRecordings, playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { type Localized, pick, useAppLanguage, useT, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { ITEMS, SHADOW_TEXTS, type ShadowItem } from "./content";
+import { ITEMS, SHADOW_TEXTS, SHADOW_RECORDINGS, type ShadowItem } from "./content";
 import { useDeck } from "./deck";
 import { dealShadows, nextLevel, SHADOW_LEVELS } from "./levels";
 import type { ShadowsSettings, ShadowTheme } from "./settings";
@@ -158,6 +158,7 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   }, [settings.sounds, say, later]);
 
   // Start with a picture right away; settings can't change while playing.
+  useEffect(() => loadRecordings(SHADOW_RECORDINGS), []);
   useEffect(() => nextRound(), []);
 
   const funBurst = useCallback(

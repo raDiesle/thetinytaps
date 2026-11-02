@@ -1,5 +1,5 @@
 import { Inside, nth, sparklePath } from "../shared";
-import { Cheek, DinoEye, Notes, Smile } from "./parts";
+import { Cheek, DinoEye, Smile } from "./parts";
 
 // The smaller animals: pterosaurs, the Urvogel, the swimming saurian, fish, frog, turtle,
 // the eggs, the lizard and the little bugs. Each drawing has its foot point at (0, 0),
@@ -35,7 +35,6 @@ export function Flugsaurier() {
         <DinoEye cx={34} cy={-18} r={7.5} skin={FLUG} look={1} />
         <Cheek cx={40} cy={-4} r={5} />
       </g>
-      <Notes x={70} y={-50} texts={["Krääh!"]} size={22} delays={[0.4]} />
     </g>
   );
 }
@@ -63,7 +62,6 @@ export function FlugsaurierBaby() {
       </g>
       <path d="M-36 -298 Q-34 -276 14 -274 Q62 -276 64 -298 Q40 -288 14 -288 Q-12 -288 -36 -298 Z" fill="#9c6644" />
       <path d="M-30 -292 L0 -282 M20 -296 L52 -284 M-14 -280 L40 -290" stroke="#b08968" strokeWidth="4" strokeLinecap="round" />
-      <Notes x={64} y={-340} texts={["Piep!", "Piep!"]} size={20} delays={[0.3, 0.8]} />
     </>
   );
 }
@@ -92,7 +90,6 @@ export function Urvogel() {
         <path d="M100 -370 Q124 -384 140 -366 Q130 -352 108 -356 Z" fill="#2f9e8f" />
         <path d="M108 -362 l-6 -6 M114 -360 l-6 -6" stroke="#e08e2b" strokeWidth="2" strokeLinecap="round" />
       </g>
-      <Notes x={54} y={-404} texts={["Piep!"]} size={18} delays={[0.5]} />
     </g>
   );
 }
@@ -158,7 +155,6 @@ export function Wassersaurier() {
           <circle key={i} cx={-6 + i * 10} cy={-6} r={6} style={nth(i)} />
         ))}
       </g>
-      <Notes x={60} y={-212} texts={["Platsch!"]} size={24} delays={[1.3]} />
     </>
   );
 }
@@ -238,7 +234,6 @@ export function Frosch() {
       <Smile x={-38} y={-24} w={20} d={4} width={2.4} />
       <Cheek cx={-46} cy={-22} r={4} />
       <Cheek cx={-10} cy={-22} r={4} />
-      <Notes x={-14} y={-56} texts={["Quak!"]} size={18} delays={[0.4]} />
     </g>
   );
 }
@@ -323,7 +318,6 @@ export function Nest() {
       <Egg x={0} y={-48} rx={25} ry={31} baby="#ffd8a8" i={1} cls="dt-nest" />
       <path d="M-100 -28 Q-96 4 0 6 Q96 4 100 -28 Q60 -12 0 -12 Q-60 -12 -100 -28 Z" fill="#9c6644" />
       <path d="M-88 -16 L-40 -4 M-20 -2 L40 -10 M30 2 L84 -14 M-70 -2 L-10 -12" stroke="#b08968" strokeWidth="5" strokeLinecap="round" />
-      <Notes x={90} y={-70} texts={["Tock!", "Tock!"]} size={20} delays={[0.3, 0.9]} />
     </>
   );
 }
@@ -381,7 +375,6 @@ export function DinoEi() {
         <circle cx="-18" cy="-18" r="5" fill="#63e6be" />
         <circle cx="-4" cy="-36" r="4" fill="#63e6be" />
       </g>
-      <Notes x={30} y={-110} texts={["Knack!", "Hallo!"]} size={22} delays={[0.6, 1.3]} />
     </>
   );
 }

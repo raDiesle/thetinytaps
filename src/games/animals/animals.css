@@ -113,25 +113,6 @@
   animation: shake 0.3s ease-in-out 3;
 }
 
-.ap-bubble {
-  position: absolute;
-  top: 0;
-  right: -0.4em;
-  padding: 0.15em 0.6em;
-  border: var(--outline);
-  border-radius: 1em;
-  background: #fff;
-  font-size: clamp(1.3rem, 4.5vh, 2.4rem);
-  font-weight: 800;
-  pointer-events: none;
-  animation: pop-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.ap-bubble.thanks {
-  animation-delay: 0.5s;
-  animation-fill-mode: backwards;
-}
-
 .ap-hearts {
   position: absolute;
   inset: 0;

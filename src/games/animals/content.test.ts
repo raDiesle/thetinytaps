@@ -59,7 +59,7 @@ test("the sentences have no German left in them, and none in another script has 
       if (animal.home && words.homes[animal.home]) pairs.push([texts.movedIn(animal, HOMES[animal.home]), german.movedIn(animal, HOMES[animal.home])]);
       for (const [sentence, de] of pairs) expect(sentence, `${language} ${animal.id}`).not.toBe(de);
       if (OWN_SCRIPT.includes(language)) {
-        const shown = [...pairs.map(([sentence]) => sentence), texts.animal(animal), texts.yuckBubble, texts.thanksBubble, texts.stars(3)];
+        const shown = [...pairs.map(([sentence]) => sentence), texts.animal(animal), texts.stars(3)];
         for (const sentence of shown) expect(sentence, `${language} ${animal.id}`).not.toMatch(/[A-Za-zäöüß]/);
       }
     }

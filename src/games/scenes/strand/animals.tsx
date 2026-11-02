@@ -1,5 +1,5 @@
 import { CHEEK, Eye, Face, INK, side } from "../shared";
-import { Lid, Notes, Puffs, Sparkles } from "./parts";
+import { Lid, Puffs, Sparkles } from "./parts";
 
 // Animals on the sand: the cheeky gull, the crab, the starfish and the shell. Foot point at (0, 0).
 
@@ -23,7 +23,6 @@ export function Moewe() {
       <rect className="sd-moewe-chip" x="-96" y="-93" width="30" height="8" rx="3" fill="#ffd43b" transform="rotate(-12 -80 -89)" />
       <Eye cx={-36} cy={-98} r={3.6} />
       <Lid cx={-36} cy={-98} r={3.6} fill="#fff" />
-      <Notes x={-90} y={-130} texts={["Kriäh!"]} colour="#fff" size={24} />
     </g>
   );
 }
@@ -75,7 +74,6 @@ export function Krebs() {
         <circle cx="-22" cy="-26" r="5" fill={CHEEK} opacity="0.6" />
         <circle cx="22" cy="-26" r="5" fill={CHEEK} opacity="0.6" />
       </g>
-      <Notes x={70} y={-110} texts={["Zwick!", "Zwack!"]} colour="#ffa8a8" size={22} />
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { CHEEK, Eye, SKIN, nth, sparklePath } from "../shared";
-import { Arm, Head, Leg, Lid, Notes } from "../spielplatz/parts";
+import { Arm, Head, Leg, Lid } from "../spielplatz/parts";
 import { Blades, Egg } from "./parts";
 
 // The Easter bunny and the children looking for eggs. Foot point at (0, 0).
@@ -110,7 +110,6 @@ export function Osterhase() {
         ]}
         r={12}
       />
-      <Notes x={60} y={-260} texts={["Hopp!", "Hopp!"]} colour="#fff" size={30} />
     </g>
   );
 }
@@ -164,7 +163,6 @@ export function Korbkind() {
         ]}
         r={11}
       />
-      <Notes x={-90} y={-230} texts={["Ein Ei!"]} colour="#fff" size={28} />
     </g>
   );
 }
@@ -205,7 +203,6 @@ export function Eierlauf() {
         <path d="M-27 -186 Q0 -214 27 -186" stroke="#f783ac" strokeWidth="5" fill="none" />
         <circle cx="12" cy="-158" r="3.5" fill="#ff8fa3" />
       </g>
-      <Notes x={70} y={-200} texts={["Huch!", "Puh!"]} colour="#fff" size={26} />
     </g>
   );
 }

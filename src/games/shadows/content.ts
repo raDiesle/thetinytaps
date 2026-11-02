@@ -19,11 +19,13 @@ import {
   playSiren,
   playSnap,
   playSqueak,
+  playSquawk,
   playTrumpet,
   playTwinkle,
   playWhale,
   playWhistle,
   playWhoosh,
+  recorded,
 } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { byLanguage } from "@/content/texts";
@@ -60,46 +62,54 @@ const fahrzeug = item("vehicles");
 const essen = item("food");
 const ding = item("things");
 
+/** Every recording the pictures' sounds play, loaded when a round starts so even the first sound is the real one. */
+export const SHADOW_RECORDINGS: string[] = [];
+/** The recording `name` from src/lib/sounds/, `synth` until it is loaded. */
+const real = (name: string, synth: () => void) => {
+  SHADOW_RECORDINGS.push(name);
+  return recorded(name, synth);
+};
+
 export const ITEMS: ShadowItem[] = [
-  tier("elefant", "🐘", "der Elefant", playTrumpet),
+  tier("elefant", "🐘", "der Elefant", real("trumpet", playTrumpet)),
   tier("giraffe", "🦒", "die Giraffe"),
   tier("schildkroete", "🐢", "die Schildkröte"),
   tier("schnecke", "🐌", "die Schnecke"),
   tier("schmetterling", "🦋", "der Schmetterling"),
-  tier("fisch", "🐟", "der Fisch", playBlub),
-  tier("hahn", "🐓", "der Hahn", playCrow),
-  tier("ente", "🦆", "die Ente", playQuack),
+  tier("fisch", "🐟", "der Fisch", real("bubbles", playBlub)),
+  tier("hahn", "🐓", "der Hahn", real("crow", playCrow)),
+  tier("ente", "🦆", "die Ente", real("quack", playQuack)),
   tier("hase", "🐇", "der Hase"),
-  tier("katze", "🐈", "die Katze", playMeow),
-  tier("hund", "🐕", "der Hund", playBark),
-  tier("pferd", "🐎", "das Pferd", playNeigh),
-  tier("kuh", "🐄", "die Kuh", playMoo),
-  tier("schwein", "🐖", "das Schwein", playOink),
-  tier("schaf", "🐑", "das Schaf", playBaa),
+  tier("katze", "🐈", "die Katze", real("meow", playMeow)),
+  tier("hund", "🐕", "der Hund", real("bark", playBark)),
+  tier("pferd", "🐎", "das Pferd", real("neigh", playNeigh)),
+  tier("kuh", "🐄", "die Kuh", real("moo", playMoo)),
+  tier("schwein", "🐖", "das Schwein", real("oink", playOink)),
+  tier("schaf", "🐑", "das Schaf", real("baa", playBaa)),
   tier("igel", "🦔", "der Igel"),
   tier("krebs", "🦀", "der Krebs"),
   tier("tintenfisch", "🐙", "der Tintenfisch"),
   tier("dino", "🦕", "der Dino"),
   tier("krokodil", "🐊", "das Krokodil", playSnap),
   tier("eichhoernchen", "🐿️", "das Eichhörnchen"),
-  tier("eule", "🦉", "die Eule", playHoot),
-  tier("biene", "🐝", "die Biene", playBuzz),
-  tier("wal", "🐳", "der Wal", playWhale),
+  tier("eule", "🦉", "die Eule", real("hoot", playHoot)),
+  tier("biene", "🐝", "die Biene", real("buzz", playBuzz)),
+  tier("wal", "🐳", "der Wal", real("whale", playWhale)),
   tier("flamingo", "🦩", "der Flamingo"),
-  tier("pinguin", "🐧", "der Pinguin"),
-  tier("maus", "🐁", "die Maus", playSqueak),
+  tier("pinguin", "🐧", "der Pinguin", real("penguin", playSquawk)),
+  tier("maus", "🐁", "die Maus", real("mouse", playSqueak)),
 
-  fahrzeug("auto", "🚗", "das Auto", playHonk),
-  fahrzeug("fahrrad", "🚲", "das Fahrrad", playRing),
-  fahrzeug("lok", "🚂", "die Lok", playWhistle),
+  fahrzeug("auto", "🚗", "das Auto", real("honk", playHonk)),
+  fahrzeug("fahrrad", "🚲", "das Fahrrad", real("ring", playRing)),
+  fahrzeug("lok", "🚂", "die Lok", real("whistle", playWhistle)),
   fahrzeug("flugzeug", "✈️", "das Flugzeug", playWhoosh),
-  fahrzeug("hubschrauber", "🚁", "der Hubschrauber", playRotor),
+  fahrzeug("hubschrauber", "🚁", "der Hubschrauber", real("helicopter", playRotor)),
   fahrzeug("segelboot", "⛵", "das Segelboot"),
-  fahrzeug("rakete", "🚀", "die Rakete", playLaunch),
-  fahrzeug("traktor", "🚜", "der Traktor", playEngine),
+  fahrzeug("rakete", "🚀", "die Rakete", real("launch", playLaunch)),
+  fahrzeug("traktor", "🚜", "der Traktor", real("engine", playEngine)),
   fahrzeug("roller", "🛴", "der Roller"),
-  fahrzeug("feuerwehr", "🚒", "die Feuerwehr", playSiren),
-  fahrzeug("motorrad", "🏍️", "das Motorrad", playEngine),
+  fahrzeug("feuerwehr", "🚒", "die Feuerwehr", real("siren", playSiren)),
+  fahrzeug("motorrad", "🏍️", "das Motorrad", real("engine", playEngine)),
 
   essen("banane", "🍌", "die Banane"),
   essen("apfel", "🍎", "der Apfel"),
@@ -127,7 +137,7 @@ export const ITEMS: ShadowItem[] = [
   ding("schuh", "👟", "der Schuh"),
   ding("teddy", "🧸", "der Teddy"),
   ding("drachen", "🪁", "der Drachen"),
-  ding("glocke", "🔔", "die Glocke", playBells),
+  ding("glocke", "🔔", "die Glocke", real("bells", playBells)),
   ding("herz", "❤️", "das Herz"),
 ];
 

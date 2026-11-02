@@ -58,7 +58,6 @@ export function Brachiosaurus() {
           <ellipse key={i} cx={224 + i * 8} cy={-430} rx="6" ry="3.5" style={nth(i)} />
         ))}
       </g>
-      <Notes x={250} y={-480} texts={["Mampf!", "Mampf!"]} size={26} delays={[0.8, 1.3]} />
     </>
   );
 }
@@ -97,7 +96,6 @@ export function Parasaurolophus() {
         <ellipse className="dt-para-cheek" cx="-90" cy="-186" rx="11" ry="8" fill="#ff8fa3" opacity="0.6" />
         <Smile x={-112} y={-182} w={18} d={4} width={2.6} />
       </g>
-      <Notes x={30} y={-290} texts={["Tröt!", "Tröt!"]} size={28} delays={[0.5, 1]} />
     </g>
   );
 }
@@ -219,7 +217,6 @@ export function TriceratopsBaby() {
       <g transform="scale(0.52)">
         <TriBody c={TRI_BABY} baby />
       </g>
-      <Notes x={60} y={-110} texts={["Mini!"]} size={18} delays={[0.5]} />
     </g>
   );
 }
@@ -326,7 +323,6 @@ export function Ankylosaurus() {
         <Cheek cx={-140} cy={-42} r={6} />
         <Smile x={-160} y={-44} w={18} d={4} width={2.6} />
       </g>
-      <Notes x={150} y={-90} texts={["Bumm!"]} size={24} delays={[1]} />
     </g>
   );
 }
@@ -404,10 +400,6 @@ export function TRex() {
           ))}
         </g>
       </g>
-      <Notes x={-250} y={-246} texts={["Rrr…"]} size={26} delays={[0.2]} />
-      <Notes x={-200} y={-330} texts={["Ha…"]} size={28} delays={[0.95]} />
-      <Notes x={-150} y={-350} texts={["ha…"]} size={28} delays={[1.3]} />
-      <Notes x={-330} y={-300} texts={["Hatschi!"]} size={40} delays={[1.75]} colour="#fff3b0" />
     </g>
   );
 }
