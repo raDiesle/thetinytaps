@@ -6,7 +6,6 @@ import {
   playCroak,
   playDrops,
   playFlush,
-  playGiggle,
   playGlug,
   playKettle,
   playKnock,
@@ -28,6 +27,7 @@ import {
   playYawn,
   recorded,
 } from "@/lib/sfx";
+import { playGiggle } from "@/lib/realSounds";
 import type { Holding, Outfit, PicId, Pose } from "./kid";
 import { Bad, Dachboden, Flur, Garten, Keller, Kinderzimmer, Kueche, Schlafzimmer, Terrasse, Wohnzimmer, type RoomProps, type Weather } from "./rooms";
 
@@ -136,7 +136,7 @@ const clink = () => playKnock(2000);
 const tock = () => playKnock(900);
 
 /** Recordings to load before the first story. */
-export const RECORDINGS = ["quack", "croak", "munch", "scrub", "splash", "flush"];
+export const RECORDINGS = ["quack", "croak", "munch", "scrub", "splash", "flush", "laugh", "washer"];
 
 /** One pancake: a press pours the batter into the pan, it bakes, and flips itself onto the plate. */
 const pancake = (n: number): Task[] => [

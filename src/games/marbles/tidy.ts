@@ -25,7 +25,6 @@ import {
   playCountNote,
   playCreak,
   playKnock,
-  playNeigh,
   playPlink,
   playPlop,
   playPop,
@@ -36,6 +35,7 @@ import {
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
+import { playNeigh } from "@/lib/realSounds";
 import { VIEW_W, wobble } from "./level";
 import {
   along,

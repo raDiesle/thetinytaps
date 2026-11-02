@@ -16,7 +16,6 @@
 // screen shows 1600 of it at a time.
 
 import {
-  playBlow,
   playBlub,
   playBoing,
   playClick,
@@ -33,13 +32,12 @@ import {
   playRip,
   playRustle,
   playSlide,
-  playSplash,
   playSqueak,
   playTwinkle,
-  playWhale,
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
+import { playBlow, playSplash, playWhale } from "@/lib/realSounds";
 import { wobble } from "./level";
 import { cameraOn, clamp01, easeIn, easeInOut, easeOut, hop, lerp, rad, seg, timeline, turn } from "./machineKit";
 import type { Pt } from "./path";

@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import { INK } from "@/games/scenes/shared";
-import { playBark } from "@/lib/sfx";
+import { playBark } from "@/lib/realSounds";
 import type { ItemId } from "./items";
 
 // Friends (G-10, „Ein Freund kommt mit“): a creature the child has helped walks along behind it, and its picture

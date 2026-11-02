@@ -15,7 +15,8 @@
 // each thing is at a moment. Coordinates are those of the room, 3650 × 900; the
 // screen shows 1600 of it at a time.
 
-import { playChimeNote, playClick, playCreak, playCuckoo, playCurtain, playKnock, playMusicbox, playPlop, playTick, playTwinkle, playYawn } from "@/lib/sfx";
+import { playChimeNote, playClick, playCreak, playCurtain, playKnock, playMusicbox, playPlop, playTick, playTwinkle, playYawn } from "@/lib/sfx";
+import { playCuckoo } from "@/lib/realSounds";
 import { along, cameraOn, distAt, easeInOut, easeOut, hop, lerp, pathOf, rad, roll, seg, timeline, timeWhen, turn } from "./machineKit";
 import { arc, line, type Pt } from "./path";
 

@@ -19,7 +19,6 @@ import {
   playCreak,
   playDing,
   playDrops,
-  playFlush,
   playKnock,
   playLeaves,
   playPlop,
@@ -29,16 +28,15 @@ import {
   playRumble,
   playSneeze,
   playSniff,
-  playSplash,
   playSqueak,
   playSwirl,
   playThump,
   playTrill,
-  playTweet,
   playTwinkle,
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
+import { playFlush, playSplash, playTweet } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,

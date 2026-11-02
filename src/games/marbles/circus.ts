@@ -11,28 +11,22 @@
 // those of the tent, 6860 × 900; the screen shows 1600 of it at a time.
 
 import {
-  playBark,
   playBoing,
-  playChatter,
   playCreak,
   playDing,
   playDrum,
-  playGiggle,
   playKnock,
-  playLaunch,
   playLeaves,
   playMelody,
   playPlop,
   playPop,
-  playRing,
-  playRoar,
   playSqueak,
   playThump,
   playTick,
-  playTrumpet,
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
+import { playBark, playChatter, playGiggle, playLaunch, playRing, playRoar, playTrumpet } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,

@@ -18,11 +18,9 @@ import {
   playClonk,
   playCountNote,
   playCreak,
-  playGiggle,
   playHiss,
   playHum,
   playKnock,
-  playLaunch,
   playPing,
   playPlop,
   playPoof,
@@ -35,6 +33,7 @@ import {
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
+import { playGiggle, playLaunch } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,

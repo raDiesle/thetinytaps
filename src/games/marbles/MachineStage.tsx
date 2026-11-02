@@ -3,6 +3,7 @@ import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } f
 import type { MarbleLevel } from "./settings";
 import type { MachineEvent } from "./machineKit";
 import { PROD } from "@/lib/buildInfo";
+import { loadRealSounds } from "@/lib/realSounds";
 
 /** How fast the camera catches up with the action, per second. */
 const CAMERA_FOLLOW = 2.6;
@@ -34,6 +35,9 @@ export function MachineStage({
   const clock = useRef(-1);
   const fired = useRef(0);
   const camera = useRef(machine.cameraTarget(-1));
+
+  // The real recordings among the machine's sounds, loaded at once so even the first one is real.
+  useEffect(() => loadRealSounds(machine.events.map((e) => e.sound)), [machine]);
 
   useFrames((dt) => {
     if (clock.current >= 0) {

@@ -1,22 +1,6 @@
-import { useId, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
-import {
-  playBaa,
-  playBark,
-  playGiggle,
-  playHa,
-  playHatschi,
-  playLeaves,
-  playMeow,
-  playMoo,
-  playOink,
-  playQuack,
-  playSniff,
-  playSqueak,
-  playTrumpet,
-  playTweet,
-  playTwinkle,
-  playWhoosh,
-} from "@/lib/sfx";
+import { useEffect, useId, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
+import { playHa, playHatschi, playLeaves, playSniff, playSqueak, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { loadRealSounds, playBaa, playBark, playGiggle, playMeow, playMoo, playOink, playQuack, playTrumpet, playTweet } from "@/lib/realSounds";
 import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import { deg, easeIn, easeInOut, easeOut, lerp } from "./machineKit";
 import type { Pt } from "./path";
@@ -142,6 +126,7 @@ interface Pose {
  */
 export function SneezeLevel({ sound, say, onDone }: LevelProps) {
   const label = useLevelName("sneeze");
+  useEffect(() => loadRealSounds([playBaa, playBark, playGiggle, playMeow, playMoo, playOink, playQuack, playTrumpet, playTweet]), []);
   const row = useMemo(() => layOutRow(pickAnimals()), []);
   const feather = useMemo(() => FEATHERS[Math.floor(Math.random() * FEATHERS.length)], []);
   const leaves = useMemo(() => leavesOf(row.tree), [row]);

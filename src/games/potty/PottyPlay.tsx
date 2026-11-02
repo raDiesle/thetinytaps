@@ -10,7 +10,6 @@ import {
   playDrops,
   playDrumRoll,
   playFlush,
-  playGiggle,
   playGlug,
   playKnock,
   playMelody,
@@ -27,10 +26,11 @@ import {
   playTusch,
   playTwinkle,
   playBlow,
-  playWhistle,
   playWhoosh,
+  loadRecordings,
   recorded,
 } from "@/lib/sfx";
+import { loadRealSounds, playGiggle, playWhistle } from "@/lib/realSounds";
 import { speak } from "@/lib/speech";
 import {
   expectedWent,
@@ -142,6 +142,12 @@ export function PottyPlay({ settings }: { settings: PottySettings }) {
       run();
     }, ms);
     timers.current.add(timer);
+  }, []);
+
+  // The real recordings, loaded at once so even the first sound of each is real.
+  useEffect(() => {
+    loadRecordings(["flush", "splash", "scrub", "munch", "blow", "cheer", "partyhorn"]);
+    loadRealSounds([playGiggle, playWhistle]);
   }, []);
 
   useEffect(() => {

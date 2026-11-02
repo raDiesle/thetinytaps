@@ -15,9 +15,7 @@ import {
   playBoing,
   playClonk,
   playCountNote,
-  playCuckoo,
   playDing,
-  playHonk,
   playHum,
   playKnock,
   playPlink,
@@ -31,9 +29,9 @@ import {
   playTick,
   playTwinkle,
   playWhirr,
-  playWhistle,
   playWhoosh,
 } from "@/lib/sfx";
+import { playCuckoo, playHonk, playWhistle } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,
