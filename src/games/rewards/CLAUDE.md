@@ -356,6 +356,11 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
   (`plan.test.ts`).
 - Printed cards are big (at least `MIN_CARD_MM`, 4.5 cm, room for a 20 mm Velcro dot) and the texts suggest Velcro
   (Klett), never small magnets: they are a choking hazard under three (research „belohnungstafel“, „tagesplan“).
+- Every print instruction that names something to buy links the user's example on German screens (`shopLinks.tsx`,
+  user feedback, November 2026): „Aufkleber“ for the stars → `StickerLink` (reward stickers), „Klettpunkte“ for cards
+  → `VelcroLink` (a search for self-adhesive Velcro dots) – in the board's A4 note, the photo guide and the plan's
+  note alike, never in one place only (`rewards.test.ts` checks). Links are cut to the product or search, without
+  Amazon's tracking parameters.
 - Pictures for the boards are made for print first: cards go on a photo format every shop sells (`PHOTO_FORMATS`,
   never a size of our own), in its exact shape at 300 dpi, nothing that matters within `PHOTO_MARGIN_MM` of the edge
   (`photo.test.ts` checks). A generated picture that replaces an emoji must still be sharp there: at least 600 px
