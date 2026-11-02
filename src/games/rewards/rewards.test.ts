@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import {
   addStar,
   type Board,
@@ -49,6 +49,7 @@ import { CATEGORIES } from "@/content/games";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { itemPicture, markPicture, picture } from "./pictures";
 import { DEFAULT_REWARDS_SETTINGS, pageStart, rewardsDefaults } from "./settings";
+import { STICKER_EXAMPLE, VELCRO_EXAMPLE } from "./shopLinks";
 
 const prompts = REWARDS_PICTURE_PROMPTS.groups.flatMap((g) => g.prompts);
 const promptIds = new Set(prompts.map((p) => p.id));
@@ -437,4 +438,13 @@ test("each address opens its own kind, or the wizard on it", () => {
   expect(pageStart("board", { board: false, plan: true })).toEqual({ type: "plan", wizard: true });
   expect(pageStart("plan", { board: true, plan: false })).toEqual({ type: "board", wizard: true });
   expect(pageStart("board", { board: false, plan: false })).toEqual({ type: "board", wizard: true });
+});
+
+test("the print instructions link the user's stickers and Velcro dots", () => {
+  expect(STICKER_EXAMPLE).toContain("amazon.de/dp/B0FN3HCT7Y");
+  expect(VELCRO_EXAMPLE).toContain("amazon.de/s?k=klettpunkte+selbstklebend");
+  const source = (file: string) => readFileSync(`${import.meta.dir}/${file}`, "utf8");
+  // The board's A4 note names stickers and, with the picture cards, Velcro dots; the photo guide and the plan's note Velcro.
+  expect(source("PrintPanel.tsx")).toContain("<StickerLink />");
+  for (const file of ["PrintPanel.tsx", "PhotoPrint.tsx", "PlanPrint.tsx"]) expect(source(file)).toContain("<VelcroLink />");
 });

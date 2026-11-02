@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Choice, SettingsGroup } from "@/components/SettingControls";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import type { Theme } from "./catalog";
+import { VelcroLink } from "./shopLinks";
 import { PHOTO_FORMATS, type PhotoFormat, type PhotoLayout, photoFormat, photoLayout, photoPx, photoSheets } from "./photo";
 
 /** One card on a photo: a picture and, for a plan's step, its name. */
@@ -54,11 +55,6 @@ const FIT: Localized<(f: { per: number; cm: string; size: string; inches: string
   ru: ({ per, cm, size, inches, count }) =>
     `На один снимок ${size} (${inches}) помещается ${per} ${ruPlural(per, "карточка", "карточки", "карточек")} по ${cm} см: нужно ${count} фото.`,
 };
-
-/** Velcro dots of the size the guide names, as an example to buy (the user's pick). */
-const VELCRO_EXAMPLE = "https://www.amazon.de/dp/B0D1475P6J";
-/** The example is a German shop's page: only German screens link to it. */
-const VELCRO_EXAMPLE_LANGUAGE = "de";
 
 /**
  * Cards as photo prints: the grown-up picks a photo size every shop has, sees the photos, saves them as JPG
@@ -134,7 +130,6 @@ export function PhotoPrint({
 /** The steps from saved picture to card on the wall, each with a big picture of its own. */
 function PhotoGuide({ size, inches, cm }: { size: string; inches: string; cm: string }) {
   const t = useT();
-  const { id: language } = useAppLanguage();
   const steps: { emoji: string; title: string; text: string }[] = [
     {
       emoji: "💾",
@@ -252,15 +247,7 @@ function PhotoGuide({ size, inches, cm }: { size: string; inches: string; cm: st
               <strong>{step.title}</strong>
               <span>
                 {step.text}
-                {step.emoji === "🧷" && language === VELCRO_EXAMPLE_LANGUAGE && (
-                  <>
-                    {" "}
-                    <a href={VELCRO_EXAMPLE} target="_blank" rel="noopener noreferrer">
-                      {/* Shown on German screens only, so German only. */}
-                      Zum Beispiel diese.
-                    </a>
-                  </>
-                )}
+                {step.emoji === "🧷" && <VelcroLink />}
               </span>
             </span>
           </li>

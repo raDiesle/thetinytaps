@@ -9,6 +9,7 @@ import { MIN_CARD_MM, type PhotoFormat } from "./photo";
 import { PhotoPrint } from "./PhotoPrint";
 import { itemPicture, ItemPic } from "./pictures";
 import { A4, CutCardPages, PRINT_WORDS, Preview } from "./PrintPanel";
+import { VelcroLink } from "./shopLinks";
 
 /** How a plan is printed. */
 export interface PlanPrintOptions {
@@ -159,6 +160,7 @@ export function PlanPrint({
           {plan.view !== "week" && !plan.same && `${t(SHOWN_DAY)} `}
           {/* A marker's plan: nothing to cut out; the „Jetzt“ field's: its cards always come, the note says why. */}
           {t(cards === "never" ? NOW_WAYS[0].note : cards === "always" ? NOW_WAYS[1].note : CARDS_NOTE)}
+          {cards !== "never" && <VelcroLink />}
         </p>
         <button type="button" className="rw-print-button" onClick={() => window.print()}>
           🖨️ {t(PRINT_WORDS.now)}
