@@ -1,14 +1,15 @@
-import { type CSSProperties, type HTMLAttributes, type MouseEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router";
+import { type CSSProperties, type HTMLAttributes, type MouseEvent, type PointerEvent, type ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { Logo } from "@/components/Logo";
 import { RoomGlobe, RoomHourglass, RoomNotes, RoomSpeaker, RoomStickers } from "@/components/RoomOptions";
 import { type WorldId, WorldCardScene } from "@/components/Worlds";
-import { CATEGORIES, hasPage, SHELF } from "@/content/games";
+import { bookIdOf, CATEGORIES, hasPage, SHELF } from "@/content/games";
 import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
-import { BOOK_ASPECT, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
+import { playKnock } from "@/lib/sfx";
+import { BOOK_ASPECT, BOOK_GAP, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
 /** The picture hanging on the wall where there is room: the fox family and the bear family reading together. */
@@ -32,22 +33,18 @@ interface ShelfBook {
   games?: string[];
   /** The cloth of a book standing spine out. */
   colour?: string;
+  /** A game standing as several books in one slipcase (`Game.volumes`): those books, spine out. */
+  volumes?: ShelfBook[];
 }
 
-/** The cloths of the books standing spine out with a game's name, one after the other; the first is gold (`.shelf-daily-first`). */
-const DAILY_COLOURS = ["#c8952c", "#3f6f8f", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62"];
+/** The cloths of the books standing spine out with a game's name, one after the other: bright, unlike the books only filling the shelf. */
+const DAILY_COLOURS = ["#2f78a8", "#3f8a4a", "#b0457a", "#c77d4f", "#2f5d62"];
 
-/**
- * How the books standing spine out are marked as one group, the everyday helpers (user feedback, November 2026): a
- * library's label on the board's edge under them, a bookend beside them, a sign hanging from the board above, or a paper
- * band round them. Four drafts to choose from, by `?gruppe=` on the home page, until the user picks one.
- */
-type GroupMark = "etikett" | "stuetze" | "schild" | "banderole";
-const GROUP_MARKS: GroupMark[] = ["etikett", "stuetze", "schild", "banderole"];
+/** The cloths of the books in a slipcase: the first (the Belohnungstafel) gold, the shelf's eye-catcher. */
+const VOLUME_COLOURS = ["#c8952c", "#7a4fa0", "#2f78a8"];
 
-/** How wide the books spine out stand and a bookend, in picture books' widths. */
-const DAILY_SPAN = 1.15;
-const BOOKEND_SPAN = 0.32;
+/** How wide the books spine out stand, in picture books' widths: wide enough for their names in one line, big enough to read. */
+const DAILY_SPAN = 1.3;
 
 /** The words carved beside the everyday helpers: all of them, or only the first line where the room is small. */
 interface Carving {
@@ -58,21 +55,24 @@ interface Carving {
   minBook: number;
 }
 
-/** The carvings tried, the widest first: the first that leaves the books nearly as big is carved. */
+/**
+ * The carvings tried, the widest first: the first that leaves the books nearly as big is carved, and the last where
+ * none does, since its „mehr …“ is the way to the texts for grown-ups.
+ */
 const CARVINGS: Carving[] = [
-  { span: 1.9, short: false, minBook: 170 },
   { span: 1.4, short: false, minBook: 170 },
-  { span: 0.8, short: true, minBook: 100 },
+  { span: 1.3, short: false, minBook: 170 },
+  { span: 1.25, short: true, minBook: 100 },
 ];
 
 /** How much smaller the picture books may get for the carved words. */
 const CARVING_SHRINK = 0.8;
 
 /** The width of the place of the books spine out, in picture books' widths. */
-const dailySpan = (carving: Carving | undefined, mark: GroupMark) => DAILY_SPAN + (carving?.span ?? 0) + (mark === "stuetze" ? BOOKEND_SPAN : 0);
+const dailySpan = (carving: Carving | undefined) => DAILY_SPAN + (carving?.span ?? 0);
 
 /** Each place's width in picture books' widths, for the shelf's plan. */
-const spansFor = (carving: Carving | undefined, mark: GroupMark) => PLACES.map((place) => (place[0].colour ? dailySpan(carving, mark) : 1));
+const spansFor = (carving: Carving | undefined) => PLACES.map((place) => (place[0].colour ? dailySpan(carving) : 1));
 
 /**
  * The shelf's places, each standing where a picture book can: a picture book, or the books of a category whose games
@@ -92,13 +92,21 @@ for (const entry of SHELF) {
     cover: entry.game ? undefined : pictures[`cover-${c.id}.webp`],
     games: !entry.game && hasPage(c) ? c.games.map((g) => g.emoji) : undefined,
   };
+  const volumes = entry.game?.volumes?.map(
+    (v, i): ShelfBook => ({ ...book, id: bookIdOf(v.href), href: v.href, title: v.title, emoji: v.emoji, colour: VOLUME_COLOURS[i % VOLUME_COLOURS.length] }),
+  );
+  const daily = (n: number): ShelfBook => ({ ...book, colour: DAILY_COLOURS[n % DAILY_COLOURS.length], volumes });
   if (!entry.game) PLACES.push([book]);
-  else if (last?.[0].colour && last[0].world === book.world) last.push({ ...book, colour: DAILY_COLOURS[last.length % DAILY_COLOURS.length] });
-  else PLACES.push([{ ...book, colour: DAILY_COLOURS[0] }]);
+  else if (last?.[0].colour && last[0].world === book.world) last.push(daily(last.filter((b) => !b.volumes).length));
+  else PLACES.push([daily(0)]);
 }
 
-/** The colours of the books standing with their spines out beside the picture books, only to fill the shelf. */
-const SPINE_COLOURS = ["#b5523b", "#3f6f8f", "#d9a441", "#5d8a5a", "#8a5a8f", "#c77d4f", "#2f5d62", "#a8443f", "#6b7fb0", "#e0b85c"];
+/**
+ * The colours of the books standing with their spines out beside the picture books, only to fill the shelf: dusty and
+ * dim, so that they are plainly not what is there to be taken – the books that open something are bright, labelled
+ * and glowing (user feedback, November 2026).
+ */
+const SPINE_COLOURS = ["#7d6a5c", "#5f6b73", "#8a7d64", "#6c735f", "#76656c", "#5d5f6b", "#857261", "#66706a", "#7b7466", "#6a6359"];
 
 /** The eye's distance from the shelf and its height on it, as share of the shelf's (`perspective` in bookshelf.css). */
 const EYE = 1300;
@@ -106,11 +114,25 @@ const EYE_HEIGHT = 0.36;
 /** How deep the shelf is, in book heights (`--d` in bookshelf.css). */
 const DEPTH = 0.56;
 
-/** What stands in each of the grown-ups' compartments (the stickers' has its little books; the stickers are on its side). */
-const THINGS: Record<ShelfThing, () => ReactNode> = {
+/**
+ * A book only filling the shelf, tapped: it rocks on its board with a soft knock and stays where it is, so a child sees
+ * the tap was felt even though this book opens nothing (user feedback, November 2026).
+ */
+function nudge(e: PointerEvent<HTMLElement>) {
+  const book = (e.target as Element).closest<HTMLElement>(".shelf-spines > .shelf-spine, .shelf-lying");
+  if (!book) return;
+  book.classList.remove("nudged");
+  // Read once so that the rocking starts again on a second tap while it still rocks.
+  void book.offsetWidth;
+  book.classList.add("nudged");
+  book.addEventListener("animationend", () => book.classList.remove("nudged"), { once: true });
+  playKnock(book.classList.contains("shelf-lying") ? 420 : 560);
+}
+
+/** What stands in each of the grown-ups' compartments (the stickers' has nothing on its board: they are on its side). */
+const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
   music: () => <RoomSpeaker />,
   playtime: () => <RoomHourglass />,
-  figure: () => <RoomNotes />,
   language: () => <RoomGlobe />,
 };
 
@@ -126,8 +148,6 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
   const navigate = useNavigate();
   const room = useRef<HTMLDivElement>(null);
   const [plan, setPlan] = useState<{ layout: ShelfLayout; roomWidth: number; carving?: Carving; spans: number[] } | null>(null);
-  const asked = new URLSearchParams(useLocation().search).get("gruppe");
-  const mark = GROUP_MARKS.find((m) => m === asked) ?? GROUP_MARKS[0];
 
   // The shelf's plan follows the room it has (the screen turned, the window resized). The words carved beside the
   // everyday helpers' books come only where they leave the books nearly as big and can still be read.
@@ -136,17 +156,19 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
     if (!box) return;
     const measure = () => {
       const [width, height] = [box.clientWidth, box.clientHeight];
-      const plain = planShelf(width, height, spansFor(undefined, mark));
-      const carved = CARVINGS.map((carving) => ({ carving, layout: planShelf(width, height, spansFor(carving, mark)) })).find(
+      const plain = planShelf(width, height, spansFor(undefined));
+      const carved = CARVINGS.map((carving) => ({ carving, layout: planShelf(width, height, spansFor(carving)) })).find(
         ({ carving, layout }) => layout.bookHeight >= Math.max(carving.minBook, plain.bookHeight * CARVING_SHRINK),
       );
-      setPlan({ layout: carved?.layout ?? plain, roomWidth: width, carving: carved?.carving, spans: spansFor(carved?.carving, mark) });
+      const last = CARVINGS[CARVINGS.length - 1];
+      const carving = carved?.carving ?? last;
+      setPlan({ layout: carved?.layout ?? planShelf(width, height, spansFor(last)), roomWidth: width, carving, spans: spansFor(carving) });
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(box);
     return () => observer.disconnect();
-  }, [mark]);
+  }, []);
 
   const take = (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -159,6 +181,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
   const style = layout
     ? ({
         "--bh": `${layout.bookHeight}px`,
+        "--gap": BOOK_GAP,
         "--post": `${layout.frame.post}px`,
         "--crown": `${layout.frame.crown}px`,
         "--plinth": `${layout.frame.plinth}px`,
@@ -191,13 +214,13 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
               <div className="shelf-sign">
                 <Logo secretProps={secretProps} />
               </div>
-              <div className="shelf-box">
+              <div className="shelf-box" onPointerDown={nudge}>
                 <span className="shelf-back" />
                 {layout.cells.map((cell, i) => (
                   <Compartment key={i} cell={cell} layout={layout} spans={plan.spans} seed={i * 5}>
                     {cell.books?.map((b) =>
                       PLACES[b][0].colour ? (
-                        <DailyGroup key={PLACES[b][0].id} books={PLACES[b]} mark={mark} carving={plan.carving} take={take} />
+                        <DailyGroup key={PLACES[b][0].id} books={PLACES[b]} carving={plan.carving} take={take} />
                       ) : (
                         <Book key={PLACES[b][0].id} book={PLACES[b][0]} onClick={take(PLACES[b][0])} />
                       ),
@@ -222,51 +245,65 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
 }
 
 /**
- * The books of a category whose games stand apart, spines out side by side, marked as one group (`mark`), the first –
- * the Belohnungstafel – gold and pulled out a little further than the rest, so it is what the eye finds first (user
- * feedback, November 2026). Beside them, where there is room, words carved into the shelf's back panel tell grown-ups
- * in short what the shelf holds – the info book's gist – and that the Belohnungstafel is worth a look.
+ * The books of a category whose games stand apart, spines out side by side, marked as one group by a library's label
+ * with its name clipped on the board's edge under them (chosen from four drafts, user decision, November 2026). A game
+ * with several parts stands as a slipcase of books (`Slipcase`): the Belohnungstafel's, right of Aufs Töpfchen, gold
+ * and pulled out a little further than the rest, so it is what the eye finds first (user feedback, November 2026).
+ * Beside them words carved into the shelf's back panel tell grown-ups in short who the shelf is for and that it is a
+ * first step into the digital world taken together – never an advert for one of its games (user feedback, November
+ * 2026) – and their „mehr …“ opens all the texts for grown-ups (RoomNotes).
  */
 function DailyGroup({
   books,
-  mark,
   carving,
   take,
 }: {
   books: ShelfBook[];
-  mark: GroupMark;
   carving?: Carving;
   take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const t = useT();
   const name = t(CATEGORIES.find((c) => c.id === books[0].world)?.title ?? books[0].title);
-  const span = dailySpan(carving, mark);
+  const span = dailySpan(carving);
   return (
-    <span className="shelf-daily-row" data-mark={mark} style={{ "--span": span } as CSSProperties}>
+    <span className="shelf-daily-row" style={{ "--span": span, "--books-span": DAILY_SPAN } as CSSProperties}>
       <span className="shelf-daily-books">
-        {books.map((book) => (
-          <SpineBook key={book.id} book={book} count={books.length} onClick={take(book)} />
-        ))}
-        {mark === "etikett" && <span className="shelf-group-label">{name}</span>}
-        {mark === "schild" && <span className="shelf-group-sign">{name}</span>}
-        {mark === "banderole" && <span className="shelf-group-band">{name}</span>}
+        {books.map((book) =>
+          book.volumes ? <Slipcase key={book.id} volumes={book.volumes} take={take} /> : <SpineBook key={book.id} book={book} onClick={take(book)} />,
+        )}
+        <span className="shelf-group-label">{name}</span>
       </span>
-      {mark === "stuetze" && (
-        <span className="shelf-group-bookend">
-          <span className="shelf-group-bookend-plate">{name}</span>
-        </span>
-      )}
       {carving && (
         <span className="shelf-carving" data-short={carving.short || undefined}>
-          <span className="shelf-carving-big">{t({ de: "Alltagshelfer & erste Spiele" })}</span>
+          {/* Kept whole, so a narrow carving never breaks it. */}
+          <span className="shelf-carving-big">{t({ de: "Für\u00a0Groß\u00a0&\u00a0Klein" })}</span>
           {!carving.short && (
             <>
-              <span>{t({ de: "zum Einstieg – gemeinsam erlebt, das Kind mit Eltern oder Großeltern." })}</span>
-              <span className="shelf-carving-hint">{t({ de: "← Ein Blick in Belohnungstafel & Zeitplan lohnt sich." })}</span>
+              <span>{t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen und kleinen Helfern für den Tag." })}</span>
+              <span>{t({ de: "Alles kostenlos." })}</span>
             </>
           )}
+          <RoomNotes />
         </span>
       )}
+    </span>
+  );
+}
+
+/**
+ * Books standing in one slipcase, each a part of one game with its own name on its spine (Belohnungstafel and
+ * Zeitplan): the case's edges frame their spines, so they are seen as belonging together, and each opens its own part.
+ */
+function Slipcase({ volumes, take }: { volumes: ShelfBook[]; take: (book: ShelfBook) => (e: MouseEvent<HTMLAnchorElement>) => void }) {
+  return (
+    <span className="shelf-slipcase" style={{ "--volumes": volumes.length } as CSSProperties}>
+      <span className="box-left" />
+      <span className="box-right" />
+      <span className="box-top" />
+      {volumes.map((book) => (
+        <SpineBook key={book.id} book={book} onClick={take(book)} />
+      ))}
+      <span className="shelf-slipcase-edge" />
     </span>
   );
 }
@@ -290,10 +327,8 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
     "--sy": `${(cell.y + cell.h / 2 - layout.height * EYE_HEIGHT) * back}px`,
   } as CSSProperties;
   const ends = cell.books ? endsFor(cell, layout.bookHeight, spans) : undefined;
-  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next. A group of books
-  // spine out stands right at the compartment's left wall, as the first books of the shelf, all filling at its right.
-  const groupFirst = !!cell.books && !!PLACES[cell.books[0]]?.[0].colour;
-  const stackLeft = seed % 2 === 0 && !groupFirst;
+  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next.
+  const stackLeft = seed % 2 === 0;
   return (
     <div className={`shelf-cell${cell.thing ? ` thing ${cell.thing}` : ""}`} style={style}>
       <span className="shelf-cell-shade" />
@@ -305,11 +340,11 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
         <div className="shelf-row">
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
-            <Spines count={groupFirst ? 0 : stackLeft ? ends.spines - ends.stack : ends.spines} seed={seed} />
+            <Spines count={stackLeft ? ends.spines - ends.stack : ends.spines} seed={seed} />
           </span>
           {children}
           <span className="shelf-end">
-            <Spines count={(stackLeft ? ends.spines : ends.spines - ends.stack) + (groupFirst ? ends.spines : 0)} seed={seed + 3} />
+            <Spines count={stackLeft ? ends.spines : ends.spines - ends.stack} seed={seed + 3} />
             {ends.stack > 0 && !stackLeft && <Stack seed={seed + 1} />}
           </span>
         </div>
@@ -320,21 +355,22 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
           <RoomStickers />
         </div>
       )}
-      {cell.thing && <div className="shelf-thing">{THINGS[cell.thing]()}</div>}
+      {cell.thing && THINGS[cell.thing] && <div className="shelf-thing">{THINGS[cell.thing]?.()}</div>}
     </div>
   );
 }
 
 /**
  * How many books stand spine out at each end of a compartment of picture books, and whether a stack lies there too:
- * what the room beside the books leaves, keeping room round each picture book and more between them.
+ * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each.
  */
 function endsFor(cell: ShelfCell, bh: number, spans: number[]) {
   const n = cell.books?.length ?? 0;
   const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
-  const end = (cell.w - span * bh * BOOK_ASPECT - (n - 1) * bh * 0.5) / 2 - bh * 0.15;
-  const spine = bh * 0.16 + 1;
-  const spines = Math.max(0, Math.min(7, Math.floor(end / spine)));
+  const end = (cell.w - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh) / 2 - 2;
+  // The widest spine's room, so that they never reach past the wall.
+  const spine = bh * 0.17 + 1;
+  const spines = Math.max(0, Math.min(12, Math.floor(end / spine)));
   // A stack takes the room of this many spines, where there is room for it.
   const stack = end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
   return { spines, stack };
@@ -415,9 +451,9 @@ function Book({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTML
  * like a book on a real shelf. It keeps the picture book it is hidden inside (`.shelf-daily-book`): taken out, that one
  * turns its cover out and opens (bookTravel.ts).
  */
-function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
+function SpineBook({ book, onClick }: { book: ShelfBook; onClick: (e: MouseEvent<HTMLAnchorElement>) => void }) {
   const t = useT();
-  const style = { "--c": book.colour, "--w1": book.colour, "--n": count } as CSSProperties;
+  const style = { "--c": book.colour, "--w1": book.colour } as CSSProperties;
   return (
     <Link
       to={book.href}
@@ -444,10 +480,13 @@ function SpineBook({ book, count, onClick }: { book: ShelfBook; count: number; o
   );
 }
 
-/** The paper label on the spine of a game's own book: its emoji on top, so a child finds it at a glance, its name running down below. */
+/**
+ * The paper label on the spine of a game's own book: its emoji on top, so a child finds it at a glance, its name running
+ * down below in one line, never broken (user feedback, November 2026) – the longer the name, the smaller (`--len`).
+ */
 function SpineLabel({ title, emoji }: { title: string; emoji: string }) {
   return (
-    <span className="shelf-daily-label">
+    <span className="shelf-daily-label" style={{ "--len": [...title].length } as CSSProperties}>
       <span className="shelf-daily-emoji" aria-hidden>
         {emoji}
       </span>

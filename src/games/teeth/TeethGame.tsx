@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { GameShell } from "@/components/GameShell";
+import { PlayOptions } from "@/components/PlayOptions";
 import { Choice, SettingsGroup, Toggle } from "@/components/SettingControls";
 import { useGameSettings } from "@/lib/common";
 import { useAppLanguage, useT } from "@/lib/language";
@@ -24,13 +25,18 @@ export function TeethGame() {
   const [settings, update] = useGameSettings(TEETH_SETTINGS_KEY, DEFAULT_TEETH_SETTINGS);
   const t = useT();
   const language = useAppLanguage();
-  // The song loads from the moment the game is chosen, while the grown-up looks at this screen and the story plays.
+  // The song loads from the moment the game is chosen, while the story and the sink play.
   useEffect(() => preloadSong(sungLanguageFor(language.id, SUNG_LANGUAGES)), [language.id]);
 
   return (
     <GameShell
       title={t({ de: "Zähne putzen", en: "Brushing Teeth", zh: "刷牙", hi: "दाँत साफ़ करना", es: "Lavarse los dientes", ar: "تنظيف الأسنان", ru: "Чистим зубы" })}
-      settings={
+      // Nothing to choose first: the book on the shelf starts the brushing at once (a start screen with only „Los geht’s!“
+      // is no menu), and the few options are changed while playing (⚙️ held in the corner).
+      startMode="play"
+    >
+      <TeethPlay settings={settings} />
+      <PlayOptions>
         <SettingsGroup title={t({ de: "Putzen", en: "Brushing", zh: "刷牙", hi: "ब्रश करना", es: "Cepillado", ar: "التنظيف", ru: "Чистка" })}>
           <Choice<Before>
             label={t({ de: "Vorher zeigen", en: "Show first", zh: "先播放", hi: "पहले दिखाएँ", es: "Mostrar antes", ar: "اعرضوا أولًا", ru: "Сначала показать" })}
@@ -123,9 +129,7 @@ export function TeethGame() {
             })}
           </p>
         </SettingsGroup>
-      }
-    >
-      <TeethPlay settings={settings} />
+      </PlayOptions>
     </GameShell>
   );
 }

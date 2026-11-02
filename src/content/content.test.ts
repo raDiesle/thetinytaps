@@ -219,6 +219,21 @@ describe("the app's name", () => {
     expect(css).toMatch(/\.shelf-sign::before/);
   });
 
+  // User feedback, November 2026: a game's name on its spine stands in one line, never broken („Zähne / putzen“); and
+  // the books only filling the shelf look plainly unlike the ones to take (dull, no paper label), yet answer a tap by
+  // rocking, so a child sees the tap was felt.
+  test("names on the spines stay in one line, and the books only filling the shelf answer a tap", () => {
+    const css = readFileSync("src/styles/bookshelf.css", "utf8");
+    const title = css.match(/\n\.shelf-daily-title \{([^}]*)\}/)?.[1] ?? "";
+    expect(title).toContain("white-space: nowrap;");
+    expect(title).not.toContain("hyphens");
+    expect(css).not.toMatch(/\.shelf-spines > \.shelf-spine[^{]*\{[^}]*#f3e6c8/);
+    expect(css).toMatch(/\.shelf-box :is\([^)]*\.shelf-spines > \.shelf-spine[^)]*\.shelf-lying[^)]*\) \{\s*pointer-events: auto;/);
+    expect(css).toMatch(/\.shelf-spines > \.shelf-spine\.nudged \{[^}]*animation: shelf-nudge /);
+    const shelf = readFileSync("src/components/Bookshelf.tsx", "utf8");
+    expect(shelf).toContain('<div className="shelf-box" onPointerDown={nudge}>');
+  });
+
   test("the old name is gone from what players and search engines see", () => {
     const seen = ["index.html", "public/manifest.webmanifest", ...readdirSync("src", { recursive: true, encoding: "utf8" }).map((f) => `src/${f}`)].filter(
       (file) => /\.(tsx?|html|webmanifest|css)$/.test(file) && !file.includes("/ideas/") && !file.endsWith("research.ts") && !file.endsWith(".test.ts"),
@@ -439,9 +454,9 @@ describe("Russian", () => {
 });
 
 // User feedback, November 2026: the everyday helpers are what parents need most, so they stand first on the shelf
-// (top left), the Belohnungstafel first among them – the shelf's eye-catcher.
-test("the Alltagshelfer stand first on the shelf, the Belohnungstafel first among them", () => {
+// (top left); the Belohnungstafel and the Zeitplan, the shelf's eye-catcher, stand in their slipcase right of Aufs Töpfchen.
+test("the Alltagshelfer stand first on the shelf, the slipcase of Belohnungstafel & Zeitplan right of Aufs Töpfchen", () => {
   expect(CATEGORIES[0].apart).toBe(true);
-  expect(SHELF[0].href).toBe("/belohnungstafel/");
-  expect(SHELF[0].category.id).toBe(CATEGORIES[0].id);
+  expect(SHELF.filter((e) => e.category.id === CATEGORIES[0].id).map((e) => e.href)).toEqual(["/zaehne/", "/toepfchen/", "/belohnungstafel/"]);
+  expect(SHELF[2].game?.volumes?.map((v) => v.href)).toEqual(["/belohnungstafel/", "/tagesplan/"]);
 });

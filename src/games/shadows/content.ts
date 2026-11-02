@@ -150,6 +150,22 @@ export const PEEK_ITEMS = ITEMS.filter((i) => i.theme === "animals");
 
 export const hideoutOf = (item: ShadowItem): Hideout => (IN_THE_POND.has(item.id) ? "pond" : "bush");
 
+/**
+ * Animals that look alike when only a part of them shows, for the harder steps of "Wer schaut da raus?": small furry
+ * ones, big ones on four legs, birds, small crawling or flying ones – and the pond's own, since the pond already tells
+ * that it is one of them. Every peeking animal is in exactly one (`shadows.test.ts`).
+ */
+export const PEEK_LOOKS: string[][] = [
+  ["hase", "katze", "hund", "maus", "eichhoernchen", "igel"],
+  ["pferd", "kuh", "schwein", "schaf", "elefant", "giraffe", "dino"],
+  ["hahn", "eule", "flamingo", "pinguin"],
+  ["schnecke", "schildkroete", "schmetterling", "biene"],
+  [...IN_THE_POND],
+];
+
+/** Which of `PEEK_LOOKS` an animal belongs to (its index). */
+export const lookOf = (item: ShadowItem) => PEEK_LOOKS.findIndex((ids) => ids.includes(item.id));
+
 const capital = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** "seinen" or "ihren" Schatten. */
@@ -168,8 +184,6 @@ export interface ShadowTexts {
   there: (item: ShadowItem) => string;
   /** For screen readers: the shadow at place `n` (from 1) while it is still black. */
   shadow: (n: number) => string;
-  /** For screen readers: the stars for `n` found ones. */
-  stars: (n: number) => string;
 }
 
 const GERMAN_TEXTS: ShadowTexts = {
@@ -180,7 +194,6 @@ const GERMAN_TEXTS: ShadowTexts = {
   peek: "Wer schaut da raus?",
   there: (item) => `Da ist ja ${item.the}!`,
   shadow: (n) => `Schatten ${n}`,
-  stars: (n) => `${n} geschafft`,
 };
 
 /** A language of the game besides German: the pictures' names by id and the sentences built from them with its grammar. */

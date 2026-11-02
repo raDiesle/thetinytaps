@@ -11,32 +11,29 @@ row of tabs and one wizard.
 ## One page, one wizard
 
 `RewardsGame.tsx` is the page for both. On top the grown-up's boards and plans side by side in one row (boards first),
-„＋ Neu“ and, where the gallery has no room, „🧩 Vorlagen“; above that row the switch of views of the one shown (a
-board's Tag/Woche/Monat/Sammeln, a plan's Ablaufplan/Jetzt – Dann/Erst – Dann/Woche) with ‹ ›; beside it the Vorlagen
-of its kind, grouped under the names of their views; „Gestalten“,
-„Drucken“ (and a board's „Rückblick“) work on the one shown. The page remembers whether a board or a plan was shown
-(`CHARTS_KEY`, `tinytaps.tafeln.v1`); `/tagesplan/` always opens on a plan, so the teeth card's return and a search
-visitor land there.
+„＋ Neu“ and, where the gallery has no room, „🧩 Vorlagen“; above that row only ‹ › to go back in time – no switch of
+views there any more: the view (Tag, Woche, Monat, Erst – Dann, Sammeln) is the „Zeitraum“ option of the editor (user
+feedback, November 2026). Beside it the Vorlagen of its kind, grouped under the names of their views; „Gestalten“,
+„Drucken“ (and a board's „Rückblick“) work on the one shown. Each address opens its own kind: `/belohnungstafel/` a board
+or a plan with a Zähler (below), `/tagesplan/` a plan (so the teeth card's return and a search visitor land there) – on
+the shelf each is a book of its own in one slipcase (`Game.volumes`, user feedback, November 2026), so the book named
+Belohnungstafel opens a board, or the wizard where none is made yet (below). Nothing remembers which was shown last.
 
-„＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart. Its first step, „Ansicht“, is the whole choice of form
-(user feedback, October 2026): both kinds on the one page, each in an area under its name („Belohnungstafel“,
-„Zeitplan“, without emoji like every heading, the one the page was opened on first), and in each every view, its name big on top as a heading (Tag,
-Woche, Monat, Sammeln; Ablaufplan, Jetzt – Dann, Erst – Dann, Woche), the view's Vorlagen as big pictures under it,
-each with its name above it, a 🔍 on its corner and a small „✏️ Leer anfangen“ beside the view's name. The views
-share the rows so they fill them (`--rw-tile`: room for five pictures a row, a view as wide as its pictures). The first
-step shows no list of steps – a lone „1 Ansicht“ over the pictures confused (user feedback, October 2026) –, its help
-sits at the foot; from the second step on the steps show, on a big screen (≥ 1400 × 700) as a column on the left, the
-kinds under „Ansicht“ as links to their areas with how many are picked. On a big screen the pictures stand three a
-row, on columns the views share (`--rw-span`, holes filled by a later view).
-The 🔍 shows the Vorlage over the whole screen (`Zoom`, a modal `<dialog>`), with „Auswählen“ and ‹ › through all.
-A tap picks a Vorlage (yellow glow, ✓), another puts it back; several, also
-of both kinds, are made at once with „✓ N anlegen“ (`onDone` takes a list). With exactly one picked, „Weiter“ goes
-on to its own steps – `WizardBoard.tsx`: Aufgaben, Belohnung, Aussehen; `WizardPlan.tsx`: Bilder (with which days),
-Aussehen – with the whole board or plan beside each step, and „✓ So nehmen“ makes it from any of them. „Leer
-anfangen“ goes there at once. Every choice of the later steps is a `Pick` (`pageParts.tsx`): a picture of the board
-or plan as that choice would make it (colours) or a big picture card (tasks, cards, rewards, marks) – never a plain
-list of words. A Vorlage from the gallery beside the chart opens the wizard on its own steps (or shows the board or
-plan made from it before). While the wizard is open nothing on top or below belongs to the chart behind it.
+**One editor, on the chart itself** (`ChartEditor.tsx`, user decision, November 2026: „exakt gleiche Seite für
+Assistent und Seite … alles gleich aussieht und funktioniert“): „＋ Neu“ (`Wizard.tsx`) and „✏️ Gestalten“ are the same
+component, the very sheet that will be used, changed right on it (WYSIWYG). Above the sheet one row of quiet options
+(`.rw-options`): **Zeitraum** (Tag, Woche, Monat, Erst – Dann, Sammeln, `SPANS`; on the page only the views of the
+chart's own kind, since a plan's Tag and a board's Monat are different charts), the **⭐ Zähler** (stars a card, 0 to
+`MAX_STARS`), one **🎁 Belohnung** switch for the whole chart, and for the Tag „Morgens und abends“ / „Am Stück“, „Anzahl
+Karten“ per part, „Pfeil wandert“ / „Karte wandert“ (only without a Zähler), the colours and the child's name. On the
+sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) a tap on a card opens its window: its own stars (every day
+or only this weekday), earlier / later in its part, remove, swap for another card; ＋ adds a card to a part, a part's
+✕ takes the row of the day away (and ＋ brings it back), a tap on the reward opens the goal, „Ohne Belohnung“ and the
+rewards; a board shows its tasks as chips over the sheet to tap. What needs typing (own words, own emoji, times of day,
+„Von vorn“) stays below under „Weitere Einstellungen“ (`Editor`, `PlanEditor`). The wizard starts on **„Mein Tag“**
+(`defaultDraft`): morning and evening on one sheet, three cards each, a Zähler of 1 and a reward; a Zeitraum keeps
+name, colours and reward (`draftInSpan`), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. Opened on a template from the
+gallery it starts on that template. While the wizard is open nothing on top or below belongs to the chart behind it.
 
 In the book look the page is a page of the book like every menu (`<Sky />`), the wizard a sheet of paper laid on it
 and its buttons paper (`:root[data-look="book"]` rules at the end of `rewards.css`, kept in the folder rather than in
@@ -45,13 +42,14 @@ and its buttons paper (`:root[data-look="book"]` rules at the end of `rewards.cs
 No board or plan exists before the wizard made one (`DEFAULT_REWARDS_SETTINGS`, `DEFAULT_PLANNER_SETTINGS` are
 empty): with nothing made – a first visit – the page is the wizard, with no ✕ and no row of tabs, as there is nothing
 behind it. Only where an older version's first board or plan (`erste`, `erster-plan`, made before anything was saved)
-already has stars, `rewardsDefaults` / `plannerDefaults` keep it. Where only one kind is made, the page shows that one,
-whatever the address.
+already has stars, `rewardsDefaults` / `plannerDefaults` keep it. Where only the other kind is made than the address asks for (a plan
+without a Zähler, the Belohnungstafel's book opened), the wizard opens with the other kind's chart behind it, which ✕ shows (`pageStart` in `settings.ts`, user feedback, November 2026): a book is
+never just its neighbour's chart.
 
 # Belohnungstafel
 
 Not a game but a tool for grown-ups that a child taps too: a reward chart the parents design freely and that looks
-the same on screen and on paper (A4 from the browser, also offline). It stands as a book of its own (spine out, the first and gold of the „Alltagshelfer“) on the home page's shelf, but has no
+the same on screen and on paper (A4 from the browser, also offline). It stands on the home page's shelf as two books, „Belohnungstafel“ and „Zeitplan“, in one gold slipcase right of Aufs Töpfchen among the „Alltagshelfer“, but has no
 `GameShell`: nothing to start or leave, no play time counted, and `PlaytimeLock` lets it through, so the evening
 brushing's star still lands after the minutes are over. It may become a website of its own one day (T-19), so the
 folder leans on few shared parts (`MenuHead`, `PanelButton`, `SettingControls`, `useStoredSettings`, sfx, speech, tap
@@ -84,7 +82,7 @@ targets) – keep it that way.
 - `BoardScreen.tsx` – the sheet on screen and the star flow (below).
 - `Editor.tsx` – „✏️ Gestalten“ (and `SlotChips`, how often a day a task gets a star); `PrintPanel.tsx` – „🖨️ Drucken“
   with the preview and the print pages; `Gallery.tsx` – the Vorlagen as small pictures (`Thumb`) with example stars, grouped by view;
-  `Wizard.tsx` and `WizardBoard.tsx` – „＋ Neu“ step by step (above); `Review.tsx` – „📜 Rückblick“ (and
+  `ChartEditor.tsx` – the one editor of „＋ Neu“ and „Gestalten“ (above), `Wizard.tsx` – „＋ Neu“ around it; `Review.tsx` – „📜 Rückblick“ (and
   `usePeriodLabel`, „Letzte Woche“, shared with the ‹ › on top); `Certificate.tsx` – „🏅 Urkunde“ (below);
   `RewardsGame.tsx` – the page for boards and plans
   (above). There is no „ℹ️ Über die Tafel“ or „Über den Plan“ (removed with every menu's „Über das Spiel“, user
@@ -102,10 +100,8 @@ targets) – keep it that way.
 
 ## The page
 
-From the first visit, above the board: the switch of views – Tag, Woche, Monat as one big switch (the same stars,
-kept per day, seen for a day, a week or a month), Sammeln smaller beside it (it counts stars, not days) – and ‹ › to
-go back to earlier days, weeks or months (about two months, as long as stars are kept) to add a forgotten star; the
-label turns yellow while it shows the past, and another board or view starts at today again. Below the switch the
+From the first visit, above the board: ‹ › to go back to earlier days, weeks or months (about two months, as long as stars are kept) to add a forgotten star; the
+label turns yellow while it shows the past, and another board or view starts at today again. Below it the
 row of tabs (a board's tab says the template's name until the board has a heading or a child's name). On phones both
 rows share one line that scrolls sideways, so the board keeps the screen.
 
@@ -117,8 +113,7 @@ in sight.
 A new board (from a template, the wizard or the default) shows example stars (`Board.examples`, `exampleStars`): the
 first two days of a week (Monday and Tuesday, the second short of one), the first four days of a month, all but the
 last card of a day, two on a path – pale, with a line under the board saying so and „Ausblenden“. They are never in
-the log and never printed; the first real star or „Ausblenden“ ends them. An example field is open: holding it gives
-the real star.
+the log and never printed; the first real star or „Ausblenden“ ends them. An example field is open: a tap gives the real star.
 
 „📜 Rückblick“ (not on a collecting board) shows in place of the board the last weeks to look at together with the
 child – what already worked (T-18): one big, newest first, and all of them below as small pictures in a strip that
@@ -138,8 +133,9 @@ on a collecting board the next size; not on a day board), „nur noch einmal am 
 `suggestsCertificate`), a line under the board asks „Klappt es schon von selbst?“ and opens the Urkunde – a grown-up's
 line, never a party a child taps into. The certificate prints in colour or grey as the board does.
 
-On a computer (≥ 900 px, mouse) „✏️ Gestalten“ and „🖨️ Drucken“ lie open below the board, reached by scrolling (the
-buttons on top scroll there); on phones and tablets they open as panels in place of the board.
+„✏️ Gestalten“ turns the chart itself into the editor (above), in place, on every screen. On a computer (≥ 900 px,
+mouse) „🖨️ Drucken“ lies open below the board, reached by scrolling; on phones and tablets it opens as a panel in place
+of the board.
 
 ## Times of day
 
@@ -150,11 +146,10 @@ field carries its sun or moon on its edge, filled or not, on screen and on paper
 
 ## The star flow
 
-A grown-up holds an open field (`HOLD_MS`) while a ring fills; then a big star waits in the middle and the child taps
-it (or presses any key), and it flies into the field with a sound. A short tap gives no star: a filled field twinkles,
-a field of a later day wiggles, an open one only starts the ring. On a collecting board any open field fills the next
+The child taps an open field and its star pops in with a sound – one tap is enough (user decision, November 2026: the
+grown-up's hold and the big star to send off are gone). A filled field twinkles, a field of a later day wiggles. On a collecting board any open field fills the next
 one. A full day gets small bursts, the goal a party (and speech, if Vorlesen is on). „Stern zurück“ shows for
-`UNDO_MS` after a star, for a grown-up who held the wrong field.
+`UNDO_MS` after a star, for a wrong tap.
 
 ## Printing
 
@@ -194,33 +189,39 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 - Defaults are the same on every load: no random id in anything `rewardsDefaults` gives, since an unsaved
   default is rebuilt on each load and stars are keyed by board and task id (a random task id once lost the stars).
 - The views and the ready-made boards are clear from the first visit, never behind a menu: a first visit opens the
-  wizard, whose first step shows both kinds, every view by its name and its Vorlagen as pictures; Tag, Woche and Monat are the big switch
-  above the board (parents do ask for months: „belohnungskalender“, „monthly reward chart“), every view has at least
-  one template, and so has every view of a plan (`rewards.test.ts` checks), the gallery lies beside the board where there is room and „🧩 Vorlagen“ is
-  in the first row where there is not, and switching a view never loses stars.
-- Making a board or plan is the wizard's job, and the wizard shows what each choice makes: a picture of the result
-  (views, colours) or a big picture card (tasks, cards, rewards, marks), never only words or small chips. A new choice
-  in the wizard is a `Pick`; detail that needs typing (own words, own emoji) stays under „Gestalten“.
-- The wizard goes from the form to the content (user feedback, October 2026): kind, view and Vorlage are one step,
-  the content follows. Both kinds show at once, grouped in their two areas – never a switch that hides one, which
-  grown-ups overlooked; from the second step on, on a big screen, they are named in the steps' column under „Ansicht“.
-  Never show a list of steps while there is only the first one to see (a lone „1 Ansicht“ confused). Each view's name stands
-  big on top of its Vorlagen as a heading, and a Vorlage's name above its picture, never small below it; a picture has
-  no second frame round it (it is framed itself), only a glow when picked. Several Vorlagen can be picked and made at
-  once. The pictures are as big as the rows allow, with no empty room beside them: check at 1920 × 1080, 1440 × 900,
-  1024 × 768 and 844 × 390 (on a computer they were „viel zu klein“, „erkenne ich nicht“, and five a row still were
-  on 1920), and every picture of a whole chart has a 🔍 beside the tap that picks it, opening it as big as the screen
-  allows – a picture small enough to sit among others is never big enough to read. The pictures are the
-  explanation – no description lines under the choices; the one help line, on every step, says what the wizard is
-  for: use the charts on screen, print and make them, or order the photo prints, and several are made at once.
-- A button that can do nothing is left out, never shown greyed (the first step has no „Zurück“).
+  wizard on „Mein Tag“ with every Zeitraum named in its first option (parents do ask for months: „belohnungskalender“,
+  „monthly reward chart“), every view has at least one template, and so has every view of a plan (`rewards.test.ts`
+  checks), the gallery lies beside the board where there is room and „🧩 Vorlagen“ is in the first row where there is
+  not, and switching a view never loses stars. The view is an option of the editor, never a row of view pictures or a
+  switch on top of the page (user feedback, November 2026).
+- The wizard and „Gestalten“ are one editor (`ChartEditor`), the chart itself changed in place: a new choice joins
+  it on the sheet (a tap on what it changes, opening a window of picture cards) or as a quiet option in `.rw-options`,
+  never as a step, a page or a second editor of its own (user decision, November 2026). Only what needs typing stays
+  under „Weitere Einstellungen“. The help line says what the chart is for: on screen, printed, or as photo prints.
+- The options are quiet so the chart leads: small segments, counters and buttons in soft lines, the chosen one plainly
+  yellow, no heading over a choice that explains itself (at most a small label such as „Anzahl Karten“), and what a
+  choice means goes into its own button in a few words with a visual sign – never a paragraph of notes under it.
+- **The Zähler** (`PlanStep.stars`, user decision, November 2026): above 0 the plan's cards count stars – a star field
+  per star under each card, the child taps the card for the next star, and there may be a reward; only at 0 the paper
+  arrow (or the „Jetzt“ field) shows the card to do. A card may have more stars than the others, every day or on one
+  weekday only (`withStepStars`, two stars on Monday for brushing). A plan with a Zähler is a Belohnungstafel: „✓ Tafel
+  anlegen“, and the Belohnungstafel's book opens it.
+- **One „🎁 Belohnung“ switch** for the whole chart, on by default (`defaultReward`). Turning it off or „Ohne Belohnung“
+  takes away only the reward (`Plan.reward` null) – the stars and the Zähler stay; „＋ Belohnung“ on the sheet brings
+  it back.
+- A sheet in the editor stands in a row (`rw-main` round `rw-screen`), like the chart on the page: in a column under a
+  box with only a min-height it got no height and shrank to a strip.
+- A button that can do nothing is left out, never shown greyed.
 - Group what belongs together, and what nobody wants without the other goes on one page: Mein Morgen and Mein Abend
   are one „Mein Tag“ (a plan's `parts`, a board's tasks with their times of day), printed on one page (user feedback,
-  October 2026). A view's name says what it shows: „Ablaufplan“, never „Tagesansicht“, which reads as „one day only“.
+  October 2026). A view's name says what it shows, never „Tagesansicht“, which reads as „one day only“. What differs
+  only in shape is one view with its shape chosen among the options, never views or Vorlagen of their own: the old
+  Ablaufplan, Jetzt – Dann and „Mein Kita-Tag“ were one plan told apart only by parts and number of cards, and are now
+  the one „Jetzt – Dann“ (user feedback, November 2026).
 - Never show a board or plan the grown-up didn't make: no default chart (a Zähne-Woche nobody chose was removed),
   a first visit always starts with the wizard (`rewards.test.ts`, `plan.test.ts` check the empty defaults).
 - Boards and plans are one page: never a second page, menu card or wizard for one of them; a new kind of chart joins
-  `CHART_TYPES` and the wizard's first step.
+  `CHART_TYPES` and the wizard's first step, its views placed in the time spans (`SPANS`).
 - A board is never shown empty the first time: templates and new boards show example stars as if in use, but never a
   full board (`rewards.test.ts` checks), pale and named as examples, never saved and never printed.
 - What is done more than once a day gets a field each time, marked with its time of day (Zähne putzen: morning and
@@ -242,52 +243,63 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
 Route `/tagesplan/` (the page above, opened on a plan) · ideas H-03, H-41–H-43 (H-42 done), T-20 · research
 „tagesplan“ in `src/content/research.ts`.
 
-A picture schedule („Strukturtafel“), called „Zeitplan“ beside the Belohnungstafel (`CHART_TYPES`), in four views –
-four ways of showing the same cards (`PLAN_VIEWS`): the **Ablaufplan** (the day's steps in order, the one to do now big
-on a panel of its own under „Jetzt“, the others smaller under „Dann“, a row per part of the day), **Jetzt – Dann**
-(only the card to do and the next), **Erst – Dann** (pairs of two, each a small board of its own, up to four on a
+A picture schedule („Strukturtafel“), called „Zeitplan“ beside the Belohnungstafel (`CHART_TYPES`), in three views –
+three ways of showing the same cards (`PLAN_VIEWS`): **Jetzt – Dann** (view id `"day"`: the day's cards in reading
+order, left to right and row by row, a row per part of the day where it has two; all of them stay fixed on one sheet
+and a paper arrow cut out of card (`PaperArrow`) points up at the card to do from below it and moves on;
+or, as a variant, `nowField`, the card to do stands big on a panel of its own under „Jetzt“, the others smaller under
+„Dann“, and done cards go into the Fertig-Kiste), **Erst – Dann** (pairs of two, each a small board of its own, up to four on a
 page to cut apart) and the **Woche** (a column per day). Like the Belohnungstafel a tool, not a game: no `GameShell`, `PlaytimeLock` lets it through, and it
 shares the board's page and parts (sheet look, themes, `A4`/`Preview`, the gallery's classes, the star log).
 
 ## Files
 
-- `plan.ts` – a plan (`Plan`: its `view`, `days` as seven lists Monday first, or `same: true` and only `days[0]`; a
-  step's `part` is its part of the day, morning or evening), pure functions: `planFromTemplate`, `templateLists`,
+- `plan.ts` – a plan (`Plan`: its `view`, `days` as seven lists Monday first, or `same: true` and only `days[0]`,
+  `nowField` for the „Jetzt“ field; a step's `part` is its part of the day, morning or evening; `fromOlder` reads a
+  plan saved as the old view „now-next“ as a Jetzt – Dann with the field), pure functions: the day's shape
+  (`shapeOf`, `DAY_SHAPES`, `dayCards`, `withShape`, `partRoom`, `stepLimit`), `planFromTemplate`, `templateLists`,
   `stepsOn`, `stepDone` (a tick in the log, or the linked game – brushing only for the step's `slot`), `currentStep`,
   `nowSteps` (the cards to do now: one, or on an Erst–Dann the first open one of every pair), `partsOf`, `pairsOf`,
   `splitDone` (the row and the Fertig-Kiste), `exampleTicks`, `restartDay` (a day, or only some of its steps),
   `nightsUntil`, `withSteps`, `withSame`, `joinLastPart` (a new card joins the last part), `distinctSteps` (the cards
   to print, a card twice where one day has it twice).
-- `catalog.ts` – `ACTIVITIES` (the day's parts, beside the board's `TASKS`), `PLAN_VIEWS` and `PLAN_TEMPLATES`:
-  Mein Tag (Ablaufplan: Morgen and Abend as `parts` on one page), Mein Kita-Tag (own weekdays), Jetzt – Dann, Erst –
-  Dann (four pairs), Wochenplan.
-- `PlanSheet.tsx` – the sheet for screen and print, one component per view: `DaySteps` (the „Jetzt“ panel, the „Dann“
-  rows – `planLayout` picks rows and columns for one part, several parts get a line each – and on screen the
-  Fertig-Kiste below, `DoneBox`), `NowNext`, `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a
-  day). No date on the sheet: only a printed plan whose weekdays differ names its weekday.
+- `catalog.ts` – `ACTIVITIES` (the day's parts, beside the board's `TASKS`), `PLAN_VIEWS`, `NOW_WAYS` (marker or
+  „Jetzt“ field, each with the note that says what it means to make), `DAY_CARDS` (the cards a day's shape is filled
+  from, per part in the day's order, `rank` saying which come first) and `PLAN_TEMPLATES`: Mein Tag (Jetzt – Dann:
+  Morgen and Abend as `parts` on one page), Erst – Dann (four pairs), Wochenplan (own weekdays, with the Kita).
+- `PlanSheet.tsx` – the sheet for screen and print, one component per view: `DaySteps` (the rows – `planLayout` picks
+  rows and columns for one part, as many in a row as fit unless another row makes the cards clearly bigger, several
+  parts get a line each with their ☀️ / 🌙 before it – with the paper arrow under the card to do; with the field
+  the „Jetzt“ panel under a 👇, the other rows and on screen the Fertig-Kiste below, `DoneBox`, and on paper `FieldFrames`),
+  `FirstThen` (`pairLayout`), `WeekColumns` (moons for the nights until a day). No date on the sheet: only a printed
+  plan whose weekdays differ names its weekday.
 - `PlanScreen.tsx` – the sheet on screen and the tick flow (below); `PlanEditor.tsx` – „✏️ Gestalten“;
-  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out (`CutCardPages`); `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
-  `WizardPlan.tsx` – a plan's own steps in the wizard; `planSettings.ts` – plans, current one, print options
-  (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick`;
+  `PlanPrint.tsx` – „🖨️ Drucken“: the cards as photo prints (`PhotoPrint`), then A4 with the cards to cut out
+  (`CutCardPages`) – what comes besides the sheet is `printsCards`: a marker's plan nothing, the field's always its
+  cards, the other views as chosen; `PlanGallery.tsx` – the templates as small pictures (`PlanThumb`);
+  `planSettings.ts` – plans, current one, print options
+  (`tinytaps.planner.v1`); the page is `RewardsGame.tsx`; `pageParts.tsx` – `useComputer`, `PanelButton`, `Pick` (a picture card to choose in the editor's windows);
   `planner.css` – classes `pl-`.
 - Ticks live in the board's star log (`REWARDS_STARS_KEY`) under the plan's id, keyed `YYYY-MM-DD|stepId` (`cellKey`).
 
 ## The tick flow
 
-The child taps the card under „Jetzt“: in the Ablaufplan and Jetzt – Dann it flies with a sound into the Fertig-Kiste at the bottom edge
-(H-42), as on a Velcro board at home, and the row gets shorter until only the last card (the bed) is left; the voice (if
-on) names what comes next, and the last one starts a small party, the full basket filling the sheet. The flight
-(`PlanScreen`, Web Animations from the card's old place) only follows a tap, and is left out with reduced motion. In the
+The child taps the card to do. In Jetzt – Dann with the marker the card stays in its place with a tick and the paper
+arrow slides on to the next card, as at home the paper arrow moves along the sheet; with the „Jetzt“ field the card
+flies with a sound into the Fertig-Kiste at the bottom edge (H-42), as on a Velcro board at home, and the row gets
+shorter until only the last card (the bed) is left. The voice (if on) names what comes next, and the last one starts a
+small party. The flight (`PlanScreen`, Web Animations from the card's or the marker's old place, `flyFrom`) only
+follows a tap, and is left out with reduced motion. In the
 week the cards are small and stay in their column with a ✓. A done card (in the box) twinkles, the box itself names
-what is in it, a later one wiggles (in the week: „Noch N-mal schlafen“). No
-grown-up hold as on the board: a plan is a guide through the day, not a reward. A key wiggles the „Jetzt“ card but
+what is in it, a later one wiggles (in the week: „Noch N-mal schlafen“). With a Zähler (above) any open card of today takes a tap: one star per tap pops into its fields until it has
+them all, and the reward's party comes when its goal is reached. A key wiggles the „Jetzt“ card but
 never ticks it. „↶ Zurück“ shows for a moment after a tick; when the day is done „↺ Von vorn“ starts it again and
-every card flies back out of the box. On an Erst – Dann each pair stands on its own: the first open card of every
+every card flies back out of the box (the marker back to the first). On an Erst – Dann each pair stands on its own: the first open card of every
 pair is „now“, done cards keep their place with a tick, and „↺ Von vorn“ (shown once a pair is done) clears only the
 finished pairs, so the pair can be used again. A new plan shows example ticks (the first steps of today,
-never all; in the day view pale cards in the box), and the first tap only ends them.
+never all; with the field pale cards in the box), and the first tap only ends them.
 
-The teeth card under „Jetzt“ opens Zähne putzen instead of ticking (`gameOf`, `GAME_ROUTES` in `plan.ts`): the plan
+The teeth card, when it is the one to do, opens Zähne putzen instead of ticking (`gameOf`, `GAME_ROUTES` in `plan.ts`): the plan
 navigates there with `{ returnTo }` in the router state (`src/lib/routine.ts`), `GameShell` plays at once without the
 start screen, and leaving (✕, Esc, „Menü“) goes back to the plan. The plan first notes the card (`waitForStep`, per
 visit), the brushing's end calls `finishRoutineStep`, and back on the plan `takeFinishedStep` ticks exactly that card –
@@ -297,20 +309,35 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
 
 ## Rules
 
-- A key never ticks a card – only a tap on „Jetzt“ does, so a child hammering keys doesn't finish the day.
+- A key never ticks a card – only a tap on the card to do does, so a child hammering keys doesn't finish the day.
 - A card whose game ticks it opens that game only when it is „Jetzt“ (never a done or later card), and the game always
   comes back to the plan; never tick it by the tap as well. A finished game ticks the card it was opened for, whatever
   its own log says (by the clock a late morning brushing is an evening one), so the child never comes back to a card
   that still glows after brushing.
-- Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most; a template stays within it (`plan.test.ts`).
+- Few steps: three to six for two- and three-year-olds, `MAX_STEPS` at most, or `MAX_PART_STEPS` in each part of a day
+  in two parts (`stepLimit`); a template and every shape the wizard offers stay within it (`plan.test.ts`).
 - No clock times and no dates on a plan's sheet: order, „Jetzt – Dann“ and moons for the days to come; toddlers read
   no clock (the date in the corner was removed, user feedback, October 2026).
-- „Jetzt“ stands apart: its card big on a lit panel under a banner in the ink's colour, parted from the smaller „Dann“
-  cards by a line, so it is plain which card matters now (user feedback, October 2026). Jetzt – Dann and Erst – Dann
-  are views of a plan, like the week, not templates of the day view; an Erst – Dann holds up to four pairs, a page of
-  them (`plan.test.ts`).
+- No words for the child on a plan's sheet (user feedback, November 2026): a card is its picture only (its word is the
+  tooltip and what is read out), a part of the day is its ☀️ or 🌙, „Jetzt“ is a 👇, an Erst – Dann pair is card ➜ card.
+  Only what grown-ups need stays written: the heading and the week's day names. The cards are square, with little room
+  between them, so as many as possible fit a row.
+- In Jetzt – Dann every card stays fixed on one sheet in reading order and only a marker moves to show the card to do
+  – on screen a paper arrow cut by hand, red card with a strip of tape, as one a family would make (user feedback,
+  November 2026), and on paper the room under every card where the real one goes – that is the default, since nothing is cut out and one sheet is the whole plan (user feedback, November 2026). The
+  card that moves into a „Jetzt“ field is a variant (`nowField`), and its cost is said plainly wherever it is chosen
+  (wizard, Gestalten) and printed: its cards are printed separately, cut out and fixed with Velcro (`NOW_WAYS`'
+  `print` and notes, `printsCards`). With the field, „Jetzt“ stands apart: its card big on a lit panel under a 👇 on a
+  banner edged in the ink's colour, parted from the smaller cards to come by a line, so it is plain which card matters now (user feedback,
+  October 2026). Erst – Dann is a view of a plan, like the week; it holds up to four pairs, a page of them
+  (`plan.test.ts`).
 - Printed cards are big (at least `MIN_CARD_MM`, 4.5 cm, room for a 20 mm Velcro dot) and the texts suggest Velcro
   (Klett), never small magnets: they are a choking hazard under three (research „belohnungstafel“, „tagesplan“).
+- Every print instruction that names something to buy links the user's example on German screens (`shopLinks.tsx`,
+  user feedback, November 2026): „Aufkleber“ for the stars → `StickerLink` (reward stickers), „Klettpunkte“ for cards
+  → `VelcroLink` (a search for self-adhesive Velcro dots) – in the board's A4 note, the photo guide and the plan's
+  note alike, never in one place only (`rewards.test.ts` checks). Links are cut to the product or search, without
+  Amazon's tracking parameters.
 - Pictures for the boards are made for print first: cards go on a photo format every shop sells (`PHOTO_FORMATS`,
   never a size of our own), in its exact shape at 300 dpi, nothing that matters within `PHOTO_MARGIN_MM` of the edge
   (`photo.test.ts` checks). A generated picture that replaces an emoji must still be sharp there: at least 600 px
@@ -319,6 +346,8 @@ Gestalten a grown-up sets the card to „Nur abhaken“ (`PlanStep.noGame`) when
 - Container units: a `.pl-col` sizes its own gap, padding and border in the sheet's units (`cqmin`), what is inside
   it in its own width (`cqi`) – cqi on the column itself resolves against the sheet and gave huge borders and tiny cards.
 - Defaults are the same on every load (the old first plan kept the fixed id `erster-plan`), as for the board.
+- A day's cards come from `DAY_CARDS` by rank: a new card for the day's shape joins its part with a rank of its own
+  (`plan.test.ts` checks the ranks are unique and that 4 + 4 is Mein Tag).
 - A card standing alone in the row (the others in the Fertig-Kiste) keeps a card's shape: a day's slot is never wider
   than tall, or the last card stretched across the whole sheet.
 

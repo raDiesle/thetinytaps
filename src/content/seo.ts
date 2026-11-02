@@ -134,8 +134,8 @@ export const SEO_PAGES: PageSeo[] = [
     path: "/tiere/",
     title: "Tiere füttern – Tierspiel für Kleinkinder",
     description:
-      "Was gehört zum Tier? Futter zum hungrigen Tier ziehen oder das Tier in sein Zuhause bringen, mit Tiergeräuschen. Für Kleinkinder, ohne Werbung.",
-    text: "Der Hase will eine Möhre, der Hund einen Knochen: Futter zum Tier ziehen oder antippen, das Tier freut sich und macht sein Geräusch.",
+      "Was gehört zum Tier? Wer schaut aus dem Busch, was frisst das Tier, was gibt es uns, wo wohnt es? Mit Tiergeräuschen, für Kleinkinder, ohne Werbung.",
+    text: "Wer schaut da aus dem Busch? Der Hase will eine Möhre, die Kuh gibt uns Milch, der Hund sucht seine Hütte, aus der Raupe wird ein Schmetterling: Tier erkennen, Futter, Milch, Ei oder Zuhause antippen, das Tier freut sich und macht sein Geräusch. Das Spiel wird von selbst leichter oder schwerer.",
   },
   {
     path: "/schatten/",

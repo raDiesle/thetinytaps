@@ -109,7 +109,6 @@ export function russianTexts(german: ShadowTexts): ShadowTexts {
     peek: "Кто там выглядывает?",
     there: about((ru) => `А вот и ${ru.name}!`, german.there),
     shadow: (n) => `Тень ${n}`,
-    stars: (n) => `Готово: ${n}`,
   };
 }
 

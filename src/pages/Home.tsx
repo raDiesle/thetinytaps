@@ -46,7 +46,7 @@ function LegalLink({ to, children }: { to: string; children: ReactNode }) {
 /**
  * The home page: in the book look a room with a bookshelf, its books the categories (Bookshelf); in the toy look the
  * cards with, below the first screen, what grown-ups need. The bookshelf fills the screen and nothing is to be scrolled to
- * (user feedback, October 2026): those texts and the install hint are in its little „i“ book (RoomNotes), the legal
+ * (user feedback, October 2026): those texts and the install hint open from the carving's „mehr …“ (RoomNotes), the legal
  * links small in the room's corner.
  */
 export function Home() {

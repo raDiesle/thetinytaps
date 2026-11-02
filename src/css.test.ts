@@ -100,8 +100,9 @@ test("a game's controls in the top left corner keep clear of the book look's way
   expect(under).toEqual([]);
 });
 
-// „Zurück zum Menü · halten“ shows the moment ✕ is held, not fading in while the grown-up wonders (user feedback, October 2026).
-test("the note on leaving shows at once when ✕ is held", () => {
-  const css = readFileSync("src/styles/playing.css", "utf8");
-  expect(css).toMatch(/\.exit-corner\.hinted \.exit-hint \{[^}]*transition: none/);
+// ✕ says nothing beside it, not even while pressed: „Zurück zum Menü“ there was more than grown-ups needed (user feedback,
+// November 2026). Its name is only read out.
+test("no note shows beside ✕", () => {
+  const files = ["src/components/GameShell.tsx", "src/styles/playing.css", "src/styles/book.css"];
+  expect(files.filter((file) => readFileSync(file, "utf8").includes("exit-hint"))).toEqual([]);
 });

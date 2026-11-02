@@ -92,7 +92,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
   const busy = useRef(false);
   /** Bumped to make the picture hop again, e.g. "drag me" when tapping isn't enough. */
   const [nudge, setNudge] = useState(0);
-  const [stars, setStars] = useState(0);
   const { bursts, spawn } = useBursts();
 
   const nextId = useRef(0);
@@ -216,7 +215,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
       later(700, () => round.item.sound?.());
     }
     say(texts.found(round.item));
-    setStars((n) => n + 1);
     later(700, () => {
       for (let i = 0; i < 8; i++) spawn();
     });
@@ -466,11 +464,6 @@ export function ShadowsPlay({ settings }: { settings: ShadowsSettings }) {
             </div>
           )}
         </div>
-        {stars > 0 && (
-          <div className="sh-stars" aria-label={texts.stars(stars)}>
-            {"⭐".repeat(Math.min(stars, 10))}
-          </div>
-        )}
       </div>
       <BurstLayer bursts={bursts} />
     </div>

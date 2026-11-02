@@ -15,6 +15,7 @@ export const matchingIdeas: IdeaArea = {
       text: "Eine dritte Karte bei Was gehört zum Tier?: Kuh – Milch, Huhn – Ei, Biene – Honig, Schaf – Wolle. Das Kind tippt oder zieht das Richtige zum Tier, und es zeigt, was daraus wird: Die Kuh füllt das Glas, das Huhn gackert und legt ein Ei ins Nest, das Schaf wird ein Wollknäuel los.",
       why: "Die Frage „Woher kommt die Milch?“ stellen Kleine ständig. Läuft auf dem vorhandenen Spiel, nur neue Bilder und Sätze.",
       effort: "S",
+      done: true,
     },
     {
       id: "Z-02",
@@ -103,6 +104,7 @@ export const matchingIdeas: IdeaArea = {
       text: "Oben ist etwas Kleines: eine Raupe, ein Ei, ein Samen, eine Kaulquappe. Unten stehen Schmetterling, Küken, Sonnenblume und Frosch. Das Kind tippt, was daraus wird, und sieht es werden: Die Raupe spinnt sich ein und fliegt davon, der Samen wächst zur Blume.",
       why: "Staunen über das Werden; passt zu den Filmen vom Werden (G-20), aber als kurzes Zuordnen.",
       effort: "M",
+      done: true,
     },
     {
       id: "Z-13",

@@ -52,7 +52,6 @@ export const ENGLISH_FOODS: Record<string, EnglishFood> = {
   heu: { name: "hay", likes: "hay" },
   apfel: { name: "apple", likes: "apples" },
   nuss: { name: "nut", likes: "nuts" },
-  kartoffel: { name: "potato", likes: "potatoes" },
   banane: { name: "banana", likes: "bananas" },
   mais: { name: "corn", likes: "corn" },
   bambus: { name: "bamboo", likes: "bamboo" },

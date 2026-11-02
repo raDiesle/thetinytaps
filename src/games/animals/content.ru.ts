@@ -53,7 +53,6 @@ export const RUSSIAN_FOODS: Record<string, RussianFood> = {
   heu: { name: "сено", likes: "сено" },
   apfel: { name: "яблоко", likes: "яблоки" },
   nuss: { name: "орешек", likes: "орешки" },
-  kartoffel: { name: "картошка", likes: "картошку" },
   banane: { name: "банан", likes: "бананы" },
   mais: { name: "кукуруза", likes: "кукурузу" },
   bambus: { name: "бамбук", likes: "бамбук" },

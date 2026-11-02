@@ -45,7 +45,6 @@ export const CHINESE_FOODS: Record<string, string> = {
   heu: "干草",
   apfel: "苹果",
   nuss: "坚果",
-  kartoffel: "土豆",
   banane: "香蕉",
   mais: "玉米",
   bambus: "竹子",

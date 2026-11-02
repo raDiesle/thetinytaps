@@ -94,7 +94,9 @@ export const SCENARIOS: Scenario[] = [
     path: "/",
     parts: [
       { label: "Startseite", ms: 3000 },
-      { label: "Seite blättern in ein Spiel", before: [{ tap: ".game-card" }], ms: 2500 },
+      // The home page is a bookshelf: a book is taken out and opened at its table of contents, whose line turns a page.
+      { label: "Buch aus dem Regal nehmen", before: [{ tap: '.shelf-book[data-book="lebendige-welten"]' }], ms: 2500 },
+      { label: "Seite blättern in ein Spiel", before: [{ waitFor: ".toc-line" }, { tap: ".toc-line" }], ms: 2500 },
     ],
   },
   {
@@ -102,7 +104,14 @@ export const SCENARIOS: Scenario[] = [
     path: "/buchstaben/",
     parts: [{ label: "Tippen auf der Tastatur", before: [{ wait: 1500 }], ms: 8000, type: { keys: [..."abcmotx"], every: 500 } }],
   },
-  { name: "tiere", path: "/tiere/", parts: [{ label: "Füttern", before: [START, { wait: 1500 }], ms: 8000, tap: TAPS }] },
+  { name: "tiere", path: "/tiere/", parts: [{ label: "Wer schaut da raus? und Füttern", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
+  {
+    // „Was wird aus mir?“ alone, the right one tapped each time, so the small ones keep growing up.
+    name: "tiere-werden",
+    path: "/tiere/",
+    storage: `localStorage.setItem("tinytaps.animals.v3", JSON.stringify({ peek: false, feed: false, gift: false, home: false, grow: true }))`,
+    parts: [{ label: "Was wird aus mir?", before: [{ wait: 1500 }], ms: 9000, tap: { selector: '[data-tap="goal"]', every: 700 } }],
+  },
   { name: "bilder", path: "/bilder/flughafen/", parts: [{ label: "Flughafen antippen", before: [{ wait: 2000 }], ms: 10000, tap: TAPS }] },
   { name: "toepfchen", path: "/toepfchen/", parts: [{ label: "Geschichte", before: [{ wait: 1500 }], ms: 8000, tap: TAPS }] },
   { name: "belohnungstafel", path: "/belohnungstafel/", parts: [{ label: "Sterne kleben", before: [START, { wait: 1500 }], ms: 6000, tap: TAPS }] },

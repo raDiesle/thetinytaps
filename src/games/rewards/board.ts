@@ -379,18 +379,22 @@ export function oncePerDay(task: BoardTask): BoardTask {
   return last ? { ...task, slots: [last] } : task;
 }
 
-/** The log with a star on a field (a key of `cellKey`), or one more collected; old days dropped. */
-export function addStar(log: StarLog, boardId: string, key: string | null, today: Date): StarLog {
+/**
+ * The log with a star on a field (a key of `cellKey`), or one more collected; old days dropped. A plan's card with a
+ * Zähler of more than one takes a star per tap, up to `most` (`PlanStep.stars`); a board's field takes one.
+ */
+export function addStar(log: StarLog, boardId: string, key: string | null, today: Date, most = 1): StarLog {
   const oldest = dayKey(new Date(today.getFullYear(), today.getMonth(), today.getDate() - KEEP_DAYS));
   const kept = Object.fromEntries(Object.entries(log[boardId] ?? {}).filter(([k]) => k === "count" || k.slice(0, 10) > oldest));
-  const next = key === null ? { ...kept, count: (kept.count ?? 0) + 1 } : { ...kept, [key]: 1 };
+  const next = key === null ? { ...kept, count: (kept.count ?? 0) + 1 } : { ...kept, [key]: Math.min(Math.max(1, most), (kept[key] ?? 0) + 1) };
   return { ...log, [boardId]: next };
 }
 
-/** The log without a star put there by mistake (only right after it was put, never as a punishment). */
+/** The log without a star put there by mistake (only right after it was put, never as a punishment): one star less. */
 export function takeBackStar(log: StarLog, boardId: string, key: string | null): StarLog {
   const stars = { ...(log[boardId] ?? {}) };
   if (key === null) stars.count = Math.max(0, (stars.count ?? 0) - 1);
+  else if ((stars[key] ?? 0) > 1) stars[key] -= 1;
   else delete stars[key];
   return { ...log, [boardId]: stars };
 }

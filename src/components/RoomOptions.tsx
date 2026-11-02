@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { AppLanguageOptions, MenuButton, useMusicSwitch } from "@/components/HomeOptions";
+import { AppLanguageOptions, LeaveOptions, MenuButton, useMusicSwitch } from "@/components/HomeOptions";
 import { InstallHint } from "@/components/InstallHint";
 import { ParentsNote } from "@/components/ParentsNote";
 import { PlaytimeOptions } from "@/components/PlaytimeOptions";
@@ -10,8 +10,8 @@ import { OWN_NAMES, useAppLanguage, useT } from "@/lib/language";
 /*
  * The grown-ups' options on the home page in the book look, as things standing in the bookshelf's own compartments
  * (Bookshelf.tsx) instead of buttons: a wooden loudspeaker (music), an hourglass (play time), a globe (the language),
- * stickers of a fox girl and a bear boy stuck on the shelf's right inner side (the child's figure), and below them a
- * little book with what the toy look has below its first screen (RoomNotes). Each opens the same menu as the toy look's
+ * stickers of a fox girl and a bear boy stuck on the shelf's right inner side (the child's figure), and „mehr …“ in the
+ * words carved beside the everyday helpers with what the toy look has below its first screen (RoomNotes). Each opens the same menu as the toy look's
  * buttons (HomeOptions), or switches with one tap where that has none.
  */
 
@@ -65,7 +65,10 @@ export function RoomSpeaker() {
   );
 }
 
-/** The hourglass standing in the shelf, turned wood and glass with sand running: the play time for all games (PlaytimeOptions). */
+/**
+ * The hourglass standing in the shelf, turned wood and glass with sand running: the play time for all games
+ * (PlaytimeOptions) and how a game is left (LeaveOptions).
+ */
 export function RoomHourglass() {
   const t = useT();
   const id = useId();
@@ -118,6 +121,7 @@ export function RoomHourglass() {
       }
     >
       <PlaytimeOptions />
+      <LeaveOptions />
     </MenuButton>
   );
 }
@@ -187,18 +191,20 @@ export function RoomGlobe() {
 
 /**
  * The child's figure (`useFigure`): stickers of a fox girl and a bear boy stuck on the shelf's back wall, one tap on
- * either chooses it (user decision, October 2026) – the chosen one bright, the other one pale.
+ * either chooses it (user decision, October 2026) – the chosen one bright, the other one pale. A little ♀ or ♂ beside
+ * each makes plain what is chosen (user feedback, November 2026).
  */
 export function RoomStickers() {
   const t = useT();
   const [common, update] = useCommonSettings();
-  const heads: { id: Figure; name: string; Head: () => React.JSX.Element }[] = [
-    { id: "girl", name: t({ de: "Mädchen" }), Head: FoxGirlHead },
-    { id: "boy", name: t({ de: "Junge" }), Head: BearBoyHead },
+  // The signs in their text form (U+FE0E), never as an emoji.
+  const heads: { id: Figure; name: string; sign: string; Head: () => React.JSX.Element }[] = [
+    { id: "girl", name: t({ de: "Mädchen" }), sign: "\u2640\uFE0E", Head: FoxGirlHead },
+    { id: "boy", name: t({ de: "Junge" }), sign: "\u2642\uFE0E", Head: BearBoyHead },
   ];
   return (
     <div className="room-stickers" role="group" aria-label={t({ de: "Junge oder Mädchen" })}>
-      {heads.map(({ id, name, Head }) => (
+      {heads.map(({ id, name, sign, Head }) => (
         <button
           key={id}
           type="button"
@@ -213,6 +219,9 @@ export function RoomStickers() {
           }}
         >
           <Head />
+          <span className="room-sticker-sign" data-figure={id} aria-hidden>
+            {sign}
+          </span>
         </button>
       ))}
     </div>
@@ -220,39 +229,26 @@ export function RoomStickers() {
 }
 
 /**
- * A little book standing below the stickers, for grown-ups, an „i“ on its cover (user feedback, October 2026: the texts
- * below the shelf belong in it, both in one book): what the app is (the page's words for search engines, SeoWords) and a
- * few words from us as parents (ParentsNote), and how to install the app (InstallHint) – the shelf's page has nothing below
- * its first screen. A tap opens it; while closed the text stays in the page unseen (`keep`), so search engines still read it.
+ * „mehr …“ at the end of the words carved beside the everyday helpers (Bookshelf.tsx), for grown-ups: it opens what the
+ * app is (the page's words for search engines, SeoWords), a few words from us as parents (ParentsNote) and how to install
+ * the app (InstallHint) – the shelf's page has nothing below its first screen. It took the place of a little „i“ book in
+ * the shelf, which grown-ups had to find (user feedback, November 2026). While closed the text stays in the page unseen
+ * (`keep`), so search engines still read it.
  */
 export function RoomNotes() {
   const t = useT();
   return (
-    <MenuButton icon="ℹ️" label={t({ de: "Über Books for Both" })} className="room-thing room-note" keep art={<InfoBook />}>
+    <MenuButton
+      icon="ℹ️"
+      label={t({ de: "Über Books for Both" })}
+      className="room-thing shelf-carving-more"
+      keep
+      art={<span aria-hidden>{t({ de: "mehr …" })}</span>}
+    >
       <SeoWords />
       <ParentsNote />
       <InstallHint />
     </MenuButton>
-  );
-}
-
-/** The little book standing cover out, its spine towards the middle of the shelf, a round label with an „i“ on the cover. */
-function InfoBook() {
-  return (
-    <svg viewBox="0 0 60 84" aria-hidden>
-      <ellipse className="room-shade" cx="32" cy="81" rx="28" ry="3" />
-      {/* Its spine, seen from the middle of the shelf, and the cover's board. */}
-      <path className="room-note-spine" d="M4 9 L11 5 V79 L4 81 Z" />
-      <rect className="room-note-cover" x="11" y="5" width="44" height="74" rx="2.5" />
-      <path className="room-note-shine" d="M15 9 V75" />
-      <circle className="room-note-label" cx="33" cy="34" r="14" />
-      <g className="room-note-sign">
-        <circle cx="33" cy="26.5" r="2.6" />
-        <rect x="30.6" y="31" width="4.8" height="12" rx="1.8" />
-      </g>
-      {/* The title, printed small below the label. */}
-      <path className="room-note-title" d="M20 58 H46 M24 64 H42" />
-    </svg>
   );
 }
 

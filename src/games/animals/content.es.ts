@@ -63,7 +63,6 @@ export const SPANISH_FOODS: Record<string, SpanishFood> = {
   heu: { name: "heno", likes: "el heno" },
   apfel: { name: "manzana", likes: "las manzanas", many: true },
   nuss: { name: "nuez", likes: "las nueces", many: true },
-  kartoffel: { name: "papa", likes: "las papas", many: true },
   banane: { name: "plátano", likes: "los plátanos", many: true },
   mais: { name: "maíz", likes: "el maíz" },
   bambus: { name: "bambú", likes: "el bambú" },

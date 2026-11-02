@@ -317,7 +317,8 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
     return cue ? spokenIn(cue, language) : daytimeText(daytime, "grow", language);
   };
   const perStep = useMemo(() => STEPS.map((_, s) => monsters.filter((m) => m.step === s).length), [monsters]);
-  const prelude = useMemo(() => preludeOf(settings), [settings.origin, settings.prep]);
+  // Taken at the start of each brushing: „Vorher zeigen“ changed meanwhile (⚙️ while playing) applies to the next one, so the clock never jumps.
+  const prelude = useMemo(() => preludeOf(settings), [round]);
   const introMs = introOf(prelude);
   // The song is sung in the app language; the brushing lasts as long as the song and each step as long as its verse.
   const sungIn = sungLanguageFor(language.id, SUNG_LANGUAGES);
@@ -469,10 +470,10 @@ export function TeethPlay({ settings }: { settings: TeethSettings }) {
 
   const again = useCallback(() => {
     const t = performance.now();
-    setClock({ banked: 0, since: t, until: song.ready ? undefined : waitAt(prelude) });
+    setClock({ banked: 0, since: t, until: song.ready ? undefined : waitAt(preludeOf(settings)) });
     setNow(t);
     setRound((r) => r + 1);
-  }, [song.ready, prelude]);
+  }, [song.ready, settings.origin, settings.prep]);
 
   const togglePause = useCallback(() => {
     const t = performance.now();

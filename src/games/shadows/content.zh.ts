@@ -91,7 +91,6 @@ export function chineseTexts(german: ShadowTexts): ShadowTexts {
     peek: "谁在偷偷看？",
     there: about((name) => `原来是${name}！`, german.there),
     shadow: (n) => `影子 ${n}`,
-    stars: (n) => `完成了 ${n} 个`,
   };
 }
 

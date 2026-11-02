@@ -6,12 +6,6 @@ import type { Localized } from "@/lib/language";
 /** „🖨️ Drucken“: the button on top and the print panel's heading. */
 export const PRINT: Localized = { de: "Drucken", en: "Print", zh: "打印", hi: "प्रिंट", es: "Imprimir", ar: "طباعة", ru: "Печать" };
 
-/** The switch of views above the chart, and the wizard's step that picks one. */
-export const VIEW: Localized = { de: "Ansicht", en: "View", zh: "视图", hi: "दृश्य", es: "Vista", ar: "العرض", ru: "Вид" };
-/** The wizard's last step: name and colours. */
-export const LOOK: Localized = { de: "Aussehen", en: "Look", zh: "外观", hi: "रूप", es: "Aspecto", ar: "المظهر", ru: "Оформление" };
-/** The colour themes to pick from. */
-export const COLORS: Localized = { de: "Farben", en: "Colors", zh: "颜色", hi: "रंग", es: "Colores", ar: "الألوان", ru: "Цвета" };
 /** The field for the child's name, which goes into the heading. */
 export const CHILD_NAME: Localized = {
   de: "Name des Kindes (steht in der Überschrift, bleibt auf diesem Gerät)",
@@ -64,34 +58,22 @@ export function PanelButton({ open, onClick, emoji, label }: { open: boolean; on
 export function Pick({
   selected,
   onClick,
-  picture,
   emoji,
   label,
   disabled,
 }: {
   selected: boolean;
   onClick: () => void;
-  /** A small picture of the board or plan as it would be (`Thumb`, `PlanThumb`). */
-  picture?: ReactNode;
-  /** Without a picture: a big emoji, or the catalogue's picture in its place (`ItemPic`). */
-  emoji?: ReactNode;
+  /** A big emoji, or the catalogue's picture in its place (`ItemPic`). */
+  emoji: ReactNode;
   label: string;
   disabled?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      className={`rw-pick${picture ? " rw-pick-picture" : ""}${selected ? " selected" : ""}`}
-      aria-pressed={selected}
-      disabled={disabled}
-      onClick={onClick}
-    >
-      {picture}
-      {!picture && emoji && (
-        <span className="rw-pick-emoji" aria-hidden>
-          {emoji}
-        </span>
-      )}
+    <button type="button" className={`rw-pick${selected ? " selected" : ""}`} aria-pressed={selected} disabled={disabled} onClick={onClick}>
+      <span className="rw-pick-emoji" aria-hidden>
+        {emoji}
+      </span>
       <span className="rw-pick-label">{label}</span>
     </button>
   );

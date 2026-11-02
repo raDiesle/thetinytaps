@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { loadRecordings, playChime, playPop, playRandomNote } from "@/lib/sfx";
+import { playChime, playPop, playRandomNote } from "@/lib/sfx";
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { PEEK_ITEMS, hideoutOf, SHADOW_TEXTS, SHADOW_RECORDINGS, type Hideout, type ShadowItem } from "./content";
-import { shuffle, useDeck } from "./deck";
-import { emojiGlyph, type Glyph } from "./glyph";
+import { hideoutOf, SHADOW_TEXTS, type Hideout, type ShadowItem } from "./content";
+import { shuffle } from "./deck";
+import { emojiGlyph, pickPeepholes, type Glyph } from "./glyph";
 import { BUSH, Bush, POND, Pond, STAGE } from "./hideouts";
+import type { PeekLevel } from "@/games/animals/levels";
 import type { AnimalsSettings } from "@/games/animals/settings";
 
 /** Time to watch the animal that came out before the next one hides. */
@@ -28,19 +29,52 @@ const SIDES: Side[] = ["top", "left", "right"];
 /** Hiding with a part peeking out, all of it out next to the bush, then out in front (or above the pond). */
 type Phase = "hidden" | "out" | "front";
 
+/** A gap in the bush's leaves the animal shows through: its middle and radius, in stage units. */
+interface Hole {
+  x: number;
+  y: number;
+  r: number;
+}
+
 interface Round {
-  id: number;
   item: ShadowItem;
   hideout: Hideout;
   side: Side;
   /** The share of the animal that peeks out. */
   show: number;
+  /** With gaps, the animal stands wholly behind the bush and shows only through them. */
+  holes: Hole[];
   choices: ShadowItem[];
   correct: number;
 }
 
+/** The side of the last round, so the next one peeks out of another; kept between rounds, which are mounted anew. */
+let lastSide: Side | null = null;
+
+/** Hides `item` as `level` says: at which side, how much of it shows, and the gaps it shows through. */
+function hideAnimal(item: ShadowItem, choices: ShadowItem[], level: PeekLevel): Round {
+  const hideout = hideoutOf(item);
+  const glyph = emojiGlyph(item.emoji);
+  const holes: Hole[] = [];
+  // Through the leaves only where the shape could be measured; out of the pond it always peeks out.
+  if (level.holes && hideout === "bush" && glyph.url) {
+    const { count, r } = level.holes;
+    const box = place(glyph, { hideout, side: "top", show: 0, holes: [{ x: 0, y: 0, r }] }, "hidden");
+    for (const h of pickPeepholes(glyph.cover, box.w, box.h, count, 2.3 * r)) {
+      // Never past the bush's foot: a gap there would hang over the meadow.
+      holes.push({ x: box.x + h.x * box.w, y: Math.min(box.y + h.y * box.h, BUSH.y + BUSH.height - r - 12), r });
+    }
+  }
+  // Flat animals would show only their back over the bush, so they peek out at a side; and
+  // never from the same side twice in a row, so it doesn't always look the same.
+  const sides = glyph.aspect > FLAT ? SIDES.filter((s) => s !== "top") : SIDES;
+  const side = hideout === "pond" || holes.length > 0 ? "top" : shuffle(sides.filter((s) => s !== lastSide))[0];
+  lastSide = side;
+  return { item, hideout, side, show: level.show + Math.random() * 0.08, holes, choices, correct: choices.indexOf(item) };
+}
+
 /** The animal's box on the stage, in stage units. */
-function place(glyph: Glyph, round: Round, phase: Phase) {
+function place(glyph: Glyph, round: Pick<Round, "hideout" | "side" | "show" | "holes">, phase: Phase) {
   const w = glyph.aspect >= 1 ? SIZE : SIZE * glyph.aspect;
   const h = glyph.aspect >= 1 ? SIZE / glyph.aspect : SIZE;
   const middle = STAGE.width / 2 - w / 2;
@@ -50,6 +84,8 @@ function place(glyph: Glyph, round: Round, phase: Phase) {
     return { x: middle, y: phase === "hidden" ? POND.line - round.show * h : POND.y + 12 - h, w, h };
   }
   if (phase === "front") return { x: middle, y: STAGE.height + 6 - h, w, h };
+  // Wholly behind the bush, low in its middle, where the leaves hide all of it.
+  if (round.holes.length > 0 && phase === "hidden") return { x: middle, y: BUSH.y + BUSH.height - 8 - h, w, h };
 
   const ground = STAGE.height - 6 - h;
   const left = BUSH.x + BUSH_EDGE;
@@ -73,17 +109,29 @@ const HIDE_DIRECTION: Record<Side, { x: number; y: number }> = {
   right: { x: -1, y: 0 },
 };
 
-/** The settings "Wer schaut da raus?" reads; it is played from "Was gehört zum Tier?". */
-export type PeekSettings = Pick<AnimalsSettings, "choices" | "names" | "speech" | "sounds">;
+/** What a round of "Wer schaut da raus?" gets from "Was gehört zum Tier?", which plays it in turn with the others. */
+export interface PeekPlayProps {
+  settings: Pick<AnimalsSettings, "speech" | "sounds">;
+  /** The animal that hides. */
+  item: ShadowItem;
+  /** The whole animals to choose from, `item` among them. */
+  choices: ShadowItem[];
+  level: PeekLevel;
+  /** The right animal was picked after `misses` wrong ones. */
+  onSolved: (misses: number) => void;
+  /** Its coming out has been watched: the next round may come. */
+  onNext: () => void;
+}
 
 /**
- * "Wer schaut da raus?" (X-04): a part of an animal peeks out of a bush or the pond; tap the whole animal below.
- * A mode of "Was gehört zum Tier?", but it lives here since it shares the stage, pictures and glyphs with the shadows.
+ * "Wer schaut da raus?" (X-04), one round: a part of an animal peeks out of a bush or the pond (on the hardest steps
+ * only bits of it show through gaps in the leaves); tap the whole animal below. A kind of round of "Was gehört zum
+ * Tier?", but it lives here since it shares the stage, pictures and glyphs with the shadows.
  */
-export function PeekPlay({ settings }: { settings: PeekSettings }) {
+export function PeekPlay({ settings, item, choices, level, onSolved, onNext }: PeekPlayProps) {
   const language = useAppLanguage();
   const texts = pick(SHADOW_TEXTS, language.id);
-  const [round, setRound] = useState<Round | null>(null);
+  const [round] = useState(() => hideAnimal(item, choices, level));
   const [phase, setPhase] = useState<Phase>("hidden");
   const [outcome, setOutcome] = useState<{ pick: number; ok: boolean } | null>(null);
   /** The keyboard frame; appears with the first key. */
@@ -93,13 +141,10 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
   const busy = useRef(false);
   /** Bumped when the hiding place is tapped: it rustles and the animal wiggles. */
   const [rustle, setRustle] = useState(0);
-  const [stars, setStars] = useState(0);
   const { bursts, spawn } = useBursts();
-
-  const nextId = useRef(0);
-  const lastSide = useRef<Side | null>(null);
+  /** Wrong animals picked in this round, for the difficulty. */
+  const misses = useRef(0);
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>());
-  const drawItem = useDeck(PEEK_ITEMS);
 
   const later = useCallback((ms: number, run: () => void) => {
     const timer = setTimeout(() => {
@@ -123,37 +168,8 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
     [settings.speech, language.id, language.speechLang],
   );
 
-  const nextRound = useCallback(() => {
-    const item = drawItem();
-    const hideout = hideoutOf(item);
-    // Flat animals would show only their back over the bush, so they peek out at a side; and
-    // never from the same side twice in a row, so it doesn't always look the same.
-    const sides = emojiGlyph(item.emoji).aspect > FLAT ? SIDES.filter((s) => s !== "top") : SIDES;
-    const side = hideout === "pond" ? "top" : shuffle(sides.filter((s) => s !== lastSide.current))[0];
-    lastSide.current = side;
-    const count = Number(settings.choices);
-    const choices = shuffle([item, ...shuffle(PEEK_ITEMS.filter((i) => i !== item)).slice(0, count - 1)]);
-    setRound({
-      id: nextId.current++,
-      item,
-      hideout,
-      side,
-      show: 0.35 + Math.random() * 0.1,
-      choices,
-      correct: choices.indexOf(item),
-    });
-    setPhase("hidden");
-    setOutcome(null);
-    setRustle(0);
-    setFocus(null);
-    focusRef.current = null;
-    busy.current = false;
-    say(texts.peek);
-  }, [settings.choices, drawItem, say]);
-
-  // Start with an animal right away; settings can't change while playing.
-  useEffect(() => loadRecordings(SHADOW_RECORDINGS), []);
-  useEffect(() => nextRound(), []);
+  // The question comes with the round; the round is mounted anew for every animal.
+  useEffect(() => say(texts.peek), []);
 
   const funBurst = useCallback(
     (x?: number, y?: number) => {
@@ -164,12 +180,14 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
   );
 
   const choose = (index: number) => {
-    if (!round || busy.current) return;
+    if (busy.current) return;
     busy.current = true;
     const ok = index === round.correct;
     setOutcome({ pick: index, ok });
 
     if (!ok) {
+      // Never a "wrong" for the child; only the difficulty takes note.
+      misses.current++;
       const owner = round.choices[index];
       if (settings.sounds) later(250, () => (owner.sound ?? playPop)());
       say(texts.thatIs(owner));
@@ -191,17 +209,17 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
       later(600, () => round.item.sound?.());
     }
     say(texts.there(round.item));
-    setStars((n) => n + 1);
+    onSolved(misses.current);
     later(800, () => {
       for (let i = 0; i < 8; i++) spawn();
     });
-    later(CELEBRATE_MS, nextRound);
+    later(CELEBRATE_MS, onNext);
   };
 
   /** Tapping the hiding place: it rustles, the animal wiggles and makes its noise, as a hint. */
   const onHideoutDown = (e: PointerEvent) => {
     e.stopPropagation();
-    if (!round || busy.current) return;
+    if (busy.current) return;
     setRustle((n) => n + 1);
     if (settings.sounds) (round.item.sound ?? playPop)();
     say(texts.peek);
@@ -215,7 +233,7 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
   // Arrow keys (or any key) move the frame, Space or Enter picks, 1–4 pick straight away.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.repeat || !round || e.key === "Escape") return;
+      if (e.repeat || e.key === "Escape") return;
       if (outcome) {
         funBurst();
         return;
@@ -243,8 +261,6 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
     return () => window.removeEventListener("keydown", onKeyDown);
   });
 
-  if (!round) return null;
-
   const won = outcome?.ok === true;
   const glyph = emojiGlyph(round.item.emoji);
   const box = place(glyph, round, phase);
@@ -260,16 +276,20 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
   const Hiding = round.hideout === "bush" ? Bush : Pond;
   const spot = round.hideout === "bush" ? BUSH : POND;
   const wiggle = rustle ? ` again-${rustle % 2}` : "";
+  const behind = round.holes.length > 0 && phase === "hidden";
 
   return (
     <div className="shadows-play peek-play" onPointerDown={(e) => funBurst(e.clientX, e.clientY)}>
-      <p key={`${round.id}-${won}`} className="sh-prompt">
-        {won ? texts.there(round.item) : texts.peek}
-      </p>
       <div className="sh-top">
-        <div key={`stage-${round.id}`} className="pk-stage" data-tap onPointerDown={onHideoutDown}>
+        <div className="pk-stage" data-tap onPointerDown={onHideoutDown}>
           {glyph.url ? (
-            <img src={glyph.url} alt="" draggable={false} className={`pk-animal pk-${phase}${phase === "hidden" ? wiggle : ""}`} style={animalStyle} />
+            <img
+              src={glyph.url}
+              alt=""
+              draggable={false}
+              className={`pk-animal pk-${phase}${behind ? " pk-behind" : phase === "hidden" ? wiggle : ""}`}
+              style={animalStyle}
+            />
           ) : (
             // Without a canvas: the emoji itself, roughly in place.
             <span className={`pk-animal pk-emoji sh-emoji pk-${phase}`} style={animalStyle}>
@@ -286,6 +306,27 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
             }}
           >
             <Hiding />
+            {/* The gaps in the leaves, each showing the bit of the animal behind it. */}
+            {behind &&
+              round.holes.map((h) => (
+                <span
+                  key={`${h.x}-${h.y}`}
+                  className="pk-hole"
+                  style={{ left: pct(h.x - h.r - BUSH.x, BUSH.width), top: pct(h.y - h.r - BUSH.y, BUSH.height), width: pct(2 * h.r, BUSH.width) }}
+                >
+                  <img
+                    src={glyph.url}
+                    alt=""
+                    draggable={false}
+                    style={{
+                      left: pct(box.x - (h.x - h.r), 2 * h.r),
+                      top: pct(box.y - (h.y - h.r), 2 * h.r),
+                      width: pct(box.w, 2 * h.r),
+                      height: pct(box.h, 2 * h.r),
+                    }}
+                  />
+                </span>
+              ))}
           </div>
         </div>
       </div>
@@ -293,7 +334,7 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
         <div className="sh-options" style={{ "--n": round.choices.length } as CSSProperties}>
           {round.choices.map((c, i) => (
             <div
-              key={`${round.id}-${c.id}`}
+              key={c.id}
               className={`sh-option pk-option${focus === i ? " focused" : ""}${won && outcome.pick === i ? " matched" : ""}${
                 outcome?.ok === false && outcome.pick === i ? " nope" : ""
               }`}
@@ -305,19 +346,10 @@ export function PeekPlay({ settings }: { settings: PeekSettings }) {
               <span className="pk-choice sh-emoji" aria-hidden>
                 {c.emoji}
               </span>
-              {settings.names && <span className="pk-name">{texts.name(c)}</span>}
             </div>
           ))}
         </div>
       </div>
-      {stars > 0 && (
-        <div className="sh-bar">
-          <div className="sh-stars" aria-label={texts.stars(stars)}>
-            {"⭐".repeat(Math.min(stars, 10))}
-            {stars > 10 && <span className="sh-count">{stars}</span>}
-          </div>
-        </div>
-      )}
       <BurstLayer bursts={bursts} />
     </div>
   );

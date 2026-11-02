@@ -82,6 +82,8 @@ The pictures speak the app language (chosen on the home page, `src/lib/language.
 
 ## Rules
 
+- The picture keeps its count of what was found: „⭐ found/all“ (`scene-goal`) and the stars in Suchen (`find-stars`).
+  Grown-ups need both (user decision, November 2026), though other games lost their stars; never remove them.
 - No options for grown-ups on a picture: what the start screen once offered (counting with a party, vehicles
   driving into other pictures, hints in Fragen, the picture moving by itself, how the picture is set off, what
   is said) is fixed – the party, the vehicles and the hints are always on, the picture never moves by itself.
