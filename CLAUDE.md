@@ -349,7 +349,10 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once. When there is still something to choose on its start screen (modes,
+  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once. A game without
+  cards or a `level` row to pick from never has a start screen with only „Los geht’s!“: it plays at once, and the options
+  it keeps go behind ⚙️ while playing (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026;
+  `GameShell.test.ts` checks). When there is still something to choose on its start screen (modes,
   `level`, settings: Buchstaben & Zahlen), that comes after ✕ or „Menü“; when there is nothing, ✕, Esc and „Menü“ go
   back to the page before it, the book's table of contents (or the shelf for a game standing apart), never to a start
   screen with only „Los geht’s!“ (user feedback, October 2026; `GameShell` does it by itself). A game whose menu is
