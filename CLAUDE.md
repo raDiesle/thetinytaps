@@ -272,9 +272,10 @@ In a fresh worktree run `bun install` first.
   Belohnungstafel first among them and the eye-catcher of the shelf: thicker, bound in gold, pulled out furthest, glowing
   brightest, a red ribbon hanging out – still, nothing idles. The group is marked as one with its name (`DailyGroup`,
   drafts by `?gruppe=` until one is chosen), and beside it words carved into the back panel tell grown-ups in short what
-  the shelf holds – the gist of the info book, everyday helpers and first games to share, child with parents or
-  grandparents (not „alles kostenlos“, user feedback) – and nothing else: no pointer to one game („Ein Blick in die
-  Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). The carving takes
+  the shelf is for – „Für Groß & Klein, Seite an Seite“ (Seite both page and side, user's choice), then that it is the
+  first step into the digital world taken together, with games and little helpers for the day (not „alles kostenlos“,
+  user feedback) – and nothing else: no pointer to one game („Ein Blick in die Belohnungstafel lohnt sich“ was taken
+  out, user feedback, November 2026). The carving takes
   room of its own on the board (`planShelf` takes each place's width) and comes only where the picture books stay
   nearly as big (`CARVING_SHRINK`) and the words big enough to read – on a phone only its first line. Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never

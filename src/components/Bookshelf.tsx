@@ -225,7 +225,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
  * The books of a category whose games stand apart, spines out side by side, marked as one group (`mark`), the first –
  * the Belohnungstafel – gold and pulled out a little further than the rest, so it is what the eye finds first (user
  * feedback, November 2026). Beside them, where there is room, words carved into the shelf's back panel tell grown-ups
- * in short what the shelf holds – the info book's gist – never an advert for one of its games (user feedback,
+ * in short who the shelf is for and that it is a first step into the digital world taken together – never an advert for one of its games (user feedback,
  * November 2026).
  */
 function DailyGroup({
@@ -259,8 +259,9 @@ function DailyGroup({
       )}
       {carving && (
         <span className="shelf-carving" data-short={carving.short || undefined}>
-          <span className="shelf-carving-big">{t({ de: "Alltagshelfer & erste Spiele" })}</span>
-          {!carving.short && <span>{t({ de: "zum Einstieg – gemeinsam erlebt, das Kind mit Eltern oder Großeltern." })}</span>}
+          {/* Kept whole on either side of the comma, so a narrow carving breaks only there. */}
+          <span className="shelf-carving-big">{t({ de: "Für\u00a0Groß\u00a0&\u00a0Klein, Seite\u00a0an\u00a0Seite" })}</span>
+          {!carving.short && <span>{t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Spielen und kleinen Helfern für den Tag." })}</span>}
         </span>
       )}
     </span>
