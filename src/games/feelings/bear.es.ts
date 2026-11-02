@@ -33,15 +33,15 @@ export const FEELINGS_ES: Partial<Record<FeelingId, FeelingText>> = {
     endCaption: "Contento otra vez",
   },
   angry: {
-    title: "Enojo, la torre se cayó",
+    title: "Enojo, el zapato no entra",
     questions: [
-      "La torre se cayó y Osito está enojado. ¿Qué puede hacer él?",
+      "El zapato no entra y Osito está enojado. ¿Qué puede hacer él?",
       "Osito sigue enojado. ¿Qué puede hacer él?",
       "Osito todavía está un poquito enojado. ¿Qué haces tú?",
     ],
-    intro: "¡Osito está enojado! Su torre se cayó.",
+    intro: "¡Osito está enojado! Su zapato no entra.",
     instead: [
-      { caption: "Tirar juguetes", answer: "Mmm, si tiras las cosas, se rompen. Mejor saca el enojo: ¡zapatea fuerte!" },
+      { caption: "Tirar el zapato", answer: "Mmm, si tiras las cosas, se rompen. Mejor saca el enojo: ¡zapatea fuerte!" },
       { caption: "Gritar fuerte", answer: "Mmm, con los gritos el enojo se hace más grande. Mejor sopla hondo: Fuuu." },
       { caption: "Pegar", answer: "Mmm, pegar duele. Mejor abrázalo." },
     ],

@@ -1,6 +1,7 @@
 import { lazy, Suspense, type ComponentType } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { CategoryPage } from "@/pages/CategoryPage";
+import { useHistoryTrail } from "@/lib/goBack";
 import { registerPage } from "@/lib/preloadPages";
 import { Home } from "@/pages/Home";
 
@@ -33,6 +34,8 @@ const SocksPage = page(() => import("@/pages/SocksPage"), "SocksPage", "/socken/
 const TeethPage = page(() => import("@/pages/TeethPage"), "TeethPage", "/zaehne/");
 
 export function App() {
+  // Where each way back can step back in the history (goBack.ts).
+  useHistoryTrail();
   return (
     <Suspense fallback={null}>
       <Routes>

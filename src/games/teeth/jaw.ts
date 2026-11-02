@@ -312,6 +312,52 @@ export function insideBy(p: { x: number; y: number }, points: { x: number; y: nu
   return inside && nearest >= margin;
 }
 
+/** A point on a tooth's face, `i` steps along the tooth from one end, half way between its long edges. */
+export function alongFace(face: Face, i: number): Vec3 {
+  const a = face.points[i];
+  const b = face.points[face.points.length - 1 - i];
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+}
+
+/** A face's line from one end of the tooth to the other, half way between its long edges. */
+export const midLine = (face: Face): Vec3[] => Array.from({ length: face.points.length / 2 }, (_, i) => alongFace(face, i));
+
+/** How far inside the lips' outline the teeth being brushed stay, from end to end: past the thick lip (34 wide), so all of them shows. */
+export const TOOTH_CLEAR = 24;
+
+/** How far a corner of the mouth may be pulled out, as a share of its half width. */
+const MAX_STRETCH = 1.8;
+
+/**
+ * The lips with their corners pulled out sideways, as a cheek is when the brush works behind it, so every point of
+ * `keep` (the teeth being brushed) lies at least `margin` inside the opening. Seen from the side the near corner of
+ * the mouth would otherwise hide the back teeth and their monsters. Each side stretches on its own about the middle of
+ * the mouth, only as far as needed; a point no stretch sideways can free (above or below the lips) is left alone.
+ */
+export function openCorners(lips: Point2[], keep: { x: number; y: number }[], margin: number): Point2[] {
+  const xs = lips.map((p) => p.x);
+  const middle = (Math.min(...xs) + Math.max(...xs)) / 2;
+  let out = lips;
+  for (const side of [-1, 1]) {
+    const stretch = (k: number) => out.map((p) => (Math.sign(p.x - middle) === side ? { ...p, x: middle + (p.x - middle) * k } : p));
+    const widest = stretch(MAX_STRETCH);
+    const mine = keep.filter((p) => Math.sign(p.x - middle) === side && insideBy(p, widest, margin));
+    const fits = (k: number) => {
+      const lipsAt = stretch(k);
+      return mine.every((p) => insideBy(p, lipsAt, margin));
+    };
+    if (fits(1)) continue;
+    let [low, high] = [1, MAX_STRETCH];
+    for (let i = 0; i < 12; i++) {
+      const k = (low + high) / 2;
+      if (fits(k)) high = k;
+      else low = k;
+    }
+    out = stretch(high);
+  }
+  return out;
+}
+
 /** Turns 3D points into picture coordinates for a view. */
 export function projector(view: View) {
   const yaw = rad(view.yaw);

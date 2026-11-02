@@ -2,8 +2,9 @@
 
 Route `/buchstaben/` (the old `/woerter/` leads here). The only game of its book on the home page's shelf, so the book opens straight on it.
 
-Its card plays at once (`startMode`), in the way played last (Frei tippen at first); the start screen with its two cards
-comes only after ✕ or „Menü“. Two ways to play:
+Its book plays at once (`startMode`), in the way played last (Frei tippen at first), and it has no start screen: ✕ and
+„Menü“ go back to the shelf, the page before it (a start screen with two cards for the ways to play came after ✕ once,
+a menu the child had never seen, user feedback, November 2026). Two ways to play, switched behind ⚙️:
 - Frei tippen (`LettersPlay.tsx`): every key shows its letter with a picture and word; a number shows its things and
   digit at once, or optionally counts them aloud, step by step or by tapping each thing. With „Nur Zahlen“
   (`numbersOnly`, once the card Zählen) only numbers come: a digit shows itself, any other key without a meaning of its
@@ -19,8 +20,8 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
 
 ## Rules
 
-- Every option is changed while playing, never in the menu: ⚙️ in the top left corner (top right in the book look, where the way back takes the left), held like ✕ (`PlayOptions`),
-  opens them over the game, which keeps playing behind; the start screen has no `level` row and no `settings`. The way
+- Every option is changed while playing, never in the menu: ⚙️ in the top left corner (top right in the book look, where the way back takes the left), always held (`PlayOptions`),
+  opens them over the game, which keeps playing behind; there is no start screen, no `level` row and no `settings`. The way
   to play (Frei tippen / Wörter tippen) is one of these options too. A variant of a way to play is an option of it,
   never a card of its own („Wo ist das B?“ is Wörter tippen's first letter, Zählen is Frei tippen's „Nur Zahlen“), and
   the panel shows only the options of the way being played. An option that changes what comes next (which words, the

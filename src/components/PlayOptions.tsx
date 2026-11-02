@@ -6,7 +6,7 @@ import { useHold } from "@/lib/hold";
 const HOLD_MS = 500;
 
 /**
- * A game's options while it plays, for grown-ups: ⚙️ in the top left corner, held like ✕ (the ring fills), opens
+ * A game's options while it plays, for grown-ups: ⚙️ in the top left corner, always held (the ring fills), opens
  * `children` in a panel over the game; „Weiter spielen“ or a tap beside it closes it. While it is open, keys don't
  * reach the game (holding Esc still leaves it). Changes apply at once, the game keeps playing behind.
  */

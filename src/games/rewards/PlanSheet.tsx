@@ -63,24 +63,29 @@ export function usePlanTitle() {
 
 /**
  * Rows and columns for `count` cards in a box of width / height `aspect`, so each card is as big as it can be (a card is
- * a little taller than wide: picture over its word). Reading order: left to right, then the next row.
+ * square: a picture without words, as the child doesn't read). As many as fit stay in one row: another row only where
+ * it makes the cards clearly bigger (`ROW_GAIN`, user feedback, November 2026). Reading order: left to right, then the
+ * next row.
  */
 export function planLayout(count: number, aspect: number): { cols: number; rows: number } {
   let best = { cols: Math.max(1, count), rows: 1, size: 0 };
   for (let rows = 1; rows <= Math.max(1, count); rows++) {
     const cols = Math.ceil(count / rows);
-    // Width of a card when the box is 1 high, with a card 1.25 times as tall as wide.
-    const size = Math.min(aspect / cols, 1 / rows / 1.25);
-    if (size > best.size + 1e-9) best = { cols, rows, size };
+    // Width of a card when the box is 1 high.
+    const size = Math.min(aspect / cols, 1 / rows);
+    if (size > best.size * ROW_GAIN) best = { cols, rows, size };
   }
   return { cols: best.cols, rows: best.rows };
 }
 
+/** How much bigger the cards must get for another row: a day read in one line beats cards a little bigger. */
+const ROW_GAIN = 1.15;
+
 /**
  * A plan as one picture, the same on screen and on paper: the heading (no date – the switch above says the day), and
- * the cards in the plan's view: the Ablaufplan (every step in its order, „Jetzt“ apart and big on screen, the day's
- * parts in rows of their own), Jetzt – Dann (the card to do and the next), Erst – Dann (pairs, up to four on a page)
- * or the week in seven columns with moons for the nights until each day. Pure markup – PlanScreen adds the taps
+ * the cards in the plan's view: Jetzt – Dann (every step in its order, the day's parts in rows of their own, a marker
+ * on the one to do – or that one apart and big in a „Jetzt“ field), Erst – Dann (pairs, up to four on a page) or the
+ * week in seven columns with moons for the nights until each day. Pure markup – PlanScreen adds the taps
  * through `data-step` – sized in container units like BoardSheet.
  */
 export function PlanSheet({
@@ -129,8 +134,6 @@ export function PlanSheet({
           <WeekColumns {...props} />
         ) : plan.view === "first-then" ? (
           <FirstThen {...props} aspect={aspect} />
-        ) : plan.view === "now-next" ? (
-          <NowNext {...props} />
         ) : (
           <DaySteps {...props} aspect={aspect} />
         )}
@@ -156,7 +159,10 @@ function statesOf({ plan, ticks, linked, today, look }: StepsProps, day: Date, s
   return steps.map((step, i) => (stepDone(ticks, linked, day, step) ? "done" : now.includes(i) ? "now" : "later"));
 }
 
-/** One step as a card: its picture, its word, its number in the day, and a tick once done. */
+/**
+ * One step as a card: its picture, its number in the day, and a tick once done. No word on it – the child doesn't read
+ * (user feedback, November 2026); the word is only its name for a mouse's tooltip and read out.
+ */
 function StepCard({
   day,
   step,
@@ -182,12 +188,14 @@ function StepCard({
       data-step={look.print ? undefined : key}
       data-state={look.print ? undefined : state}
       data-tap={look.print ? undefined : tapState({ goal: state === "now", done: state === "done" })}
+      role="img"
+      aria-label={label}
+      title={look.print ? undefined : label}
     >
       {number !== undefined && <span className="pl-number">{number}</span>}
       <span className="pl-emoji" aria-hidden>
         <ItemPic item={step} lines={look.print && !look.color} />
       </span>
-      <span className="pl-label">{label}</span>
       {state === "done" && (
         <span className="pl-tick" aria-hidden>
           ✓
@@ -221,59 +229,78 @@ function NoSteps() {
   );
 }
 
-/** A part's heading over its row: „☀️ Morgens“, „🌙 Abends“. */
+/** A part's sign before its row: ☀️ for the morning, 🌙 for the evening – a picture, not a word („Morgens“ only read out). */
 function PartName({ part }: { part: Slot }) {
   const t = useT();
   const slot = SLOT_BY_ID.get(part);
   return slot ? (
-    <span className="pl-part">
-      <span aria-hidden>{slot.emoji}</span> {t(slot.label)}
+    <span className="pl-part" role="img" aria-label={t(slot.label)} title={t(slot.label)}>
+      {slot.emoji}
     </span>
   ) : null;
 }
 
 /**
- * The Ablaufplan: one day's steps as cards in their order. On screen the card to do stands apart under „Jetzt“, big
- * and in front, and the rest follows smaller under „Dann“ beyond a line, so what matters now is never one of a row; a
- * done card leaves for the Fertig-Kiste below, as on a Velcro board at home. A day in parts (Morgen, Abend) gives each
- * part a row with its name. Paper keeps every card, numbered, in its row.
+ * The marker of a Jetzt – Dann on screen: an arrow cut out of red card, a strip of tape on its tail, as a grown-up would
+ * cut one at home (user feedback, November 2026) – it points up at the card to do from below it. Its edges are a little
+ * uneven on purpose, cut by hand. Also the picture of „Pfeil wandert“ in the wizard.
+ */
+export function PaperArrow({ className = "" }: { className?: string }) {
+  return (
+    <svg className={`pl-paper-arrow ${className}`} viewBox="0 0 100 120" aria-hidden>
+      <path d="M51 3 L95 49 L69 47.5 L67.5 115 L34 117.5 L32.5 49.5 L6 52 Z" fill="#e8590c" stroke="#a83a06" strokeWidth="3" strokeLinejoin="round" />
+      {/* The card's lighter grain along one side, and a pencil line left from drawing it before cutting. */}
+      <path d="M51 9 L86 47" stroke="#ff8a4c" strokeWidth="4" strokeLinecap="round" opacity="0.7" />
+      <path d="M40 55 L41 108" stroke="#8a3005" strokeWidth="1.2" strokeDasharray="4 5" opacity="0.5" />
+      <rect x="22" y="86" width="58" height="17" rx="1.5" fill="#fffbe6" opacity="0.78" transform="rotate(-8 51 94)" />
+    </svg>
+  );
+}
+
+/**
+ * Jetzt – Dann: one day's steps as cards in their order, a row per part of the day (Morgen, Abend) with its sun or moon
+ * before it. As it is printed every card stays in its place, read from the top left to the bottom right, and a marker –
+ * a paper arrow the child moves on (`PaperArrow`) – points up at the card to do; a done card keeps its place with a
+ * tick. With the „Jetzt“ field (`nowField`) the card to do stands apart under a pointing hand, big and in front, the
+ * rest follows smaller beyond a line, and a done card leaves for the Fertig-Kiste below, as on a Velcro board
+ * at home – so on paper that board is empty frames, and the cards come on a page of their own to cut out.
  */
 function DaySteps(props: StepsProps & { aspect: number }) {
   const { plan, ticks, linked, day, look, aspect, fresh } = props;
-  const t = useT();
   const steps = stepsOn(plan, day);
+  const field = !!plan.nowField;
+  if (field && look.print) return <FieldFrames count={steps.length} aspect={aspect} />;
   const states = statesOf(props, day, steps);
-  const { open, done } = look.print ? { open: steps, done: [] } : splitDone(steps, ticks, linked, day);
-  const lead = open.find((step) => states[steps.indexOf(step)] === "now");
+  const { open, done } = field ? splitDone(steps, ticks, linked, day) : { open: steps, done: [] };
+  const lead = field ? open.find((step) => states[steps.indexOf(step)] === "now") : undefined;
   const rest = open.filter((step) => step !== lead);
   const parts = partsOf(rest);
   // A part's name only where the day has more than one, also once the morning's cards are all done.
   const named = partsOf(steps).length > 1;
-  const box = dayBox(props, steps, done, open);
+  const box = field ? dayBox(props, steps, done, open) : null;
   // The room for the rows: the sheet less its heading and the box, less the „Jetzt“ column; each part a row of it.
   const width = lead ? 0.62 : 1;
   const card = (step: PlanStep) => (
     <StepCard day={day} step={step} state={states[steps.indexOf(step)]} number={steps.indexOf(step) + 1} look={look} fresh={fresh} />
   );
   return (
-    <div className="pl-dayview">
+    <div className={`pl-dayview${field ? "" : " pl-marked"}`}>
       {steps.length === 0 && <NoSteps />}
       {open.length > 0 && (
         <div className={`pl-flow${lead ? " has-now" : ""}`}>
           {lead && (
             <div className="pl-now">
-              <span className="pl-tag pl-tag-now">{t(NOW)}</span>
+              <NowSign />
               <div className="pl-slot">{card(lead)}</div>
             </div>
           )}
           {rest.length > 0 && (
             <div className="pl-then">
-              {lead && <span className="pl-tag">{t(THEN)}</span>}
               {parts.map(({ part, steps: row }, i) => {
                 // Several parts (morning, evening): each a line of cards as tall as its row, from the left.
                 const { cols, rows } = planLayout(row.length, aspect * (box ? 1.5 : 1.12) * width);
                 return (
-                  <div key={`${part}-${i}`} className="pl-row">
+                  <div key={`${part}-${i}`} className={`pl-row${part && named ? " pl-row-named" : ""}`}>
                     {part && named && <PartName part={part} />}
                     <ol
                       className={`pl-steps${parts.length > 1 ? " pl-line" : ""}`}
@@ -285,6 +312,8 @@ function DaySteps(props: StepsProps & { aspect: number }) {
                     >
                       {row.map((step) => (
                         <li key={step.id} className="pl-slot">
+                          {/* The marker the child moves on, under the card to do (never printed: on paper it is a real one). */}
+                          {!field && !look.print && states[steps.indexOf(step)] === "now" && <PaperArrow className="pl-marker" />}
                           {card(step)}
                         </li>
                       ))}
@@ -301,36 +330,44 @@ function DaySteps(props: StepsProps & { aspect: number }) {
   );
 }
 
-/**
- * Jetzt – Dann: only two cards, the one to do big under „Jetzt“ and the next one smaller under „Dann“, the rest out of
- * sight; done cards go into the Fertig-Kiste. On paper two empty frames for Velcro cards, the cards to cut out follow.
- */
-function NowNext(props: StepsProps) {
-  const { plan, ticks, linked, day, look, fresh } = props;
+/** Over the „Jetzt“ field: a hand pointing down at its card, no word („Jetzt“ only read out). */
+function NowSign() {
   const t = useT();
-  const steps = stepsOn(plan, day);
-  const states = statesOf(props, day, steps);
-  const { open, done } = look.print ? { open: [], done: [] } : splitDone(steps, ticks, linked, day);
-  const [lead, next] = open;
-  const box = dayBox(props, steps, done, look.print ? steps : open);
-  const slot = (step: PlanStep | undefined, now: boolean) => (
-    <div className={now ? "pl-now" : "pl-then"}>
-      <span className={`pl-tag${now ? " pl-tag-now" : ""}`}>{t(now ? NOW : THEN)}</span>
-      <div className="pl-slot">
-        {step ? <StepCard day={day} step={step} state={states[steps.indexOf(step)]} look={look} fresh={fresh} /> : <span className="pl-frame" />}
-      </div>
-    </div>
+  return (
+    <span className="pl-tag pl-tag-now" role="img" aria-label={t(NOW)}>
+      👇
+    </span>
   );
+}
+
+/**
+ * A Jetzt – Dann board with the „Jetzt“ field on paper: an empty frame under „Jetzt“ and one under „Dann“ for every
+ * other card, to stick the cut-out cards on with Velcro.
+ */
+function FieldFrames({ count, aspect }: { count: number; aspect: number }) {
+  if (count === 0) return <NoSteps />;
+  const { cols, rows } = planLayout(Math.max(1, count - 1), aspect * 1.12 * 0.62);
   return (
     <div className="pl-dayview">
-      {steps.length === 0 && <NoSteps />}
-      {steps.length > 0 && (look.print || lead) && (
-        <div className="pl-flow has-now pl-nownext">
-          {slot(lead, true)}
-          {(look.print || next) && slot(next, false)}
+      <div className="pl-flow has-now">
+        <div className="pl-now">
+          <NowSign />
+          <div className="pl-slot">
+            <span className="pl-frame" />
+          </div>
         </div>
-      )}
-      {box}
+        {count > 1 && (
+          <div className="pl-then">
+            <ol className="pl-steps" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`, gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))` }}>
+              {Array.from({ length: count - 1 }, (_, i) => (
+                <li key={i} className="pl-slot">
+                  <span className="pl-frame" />
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -347,7 +384,7 @@ function pairLayout(count: number, aspect: number): { cols: number; rows: number
 }
 
 /**
- * Erst – Dann: the plan's cards two by two, each pair a small board of its own – „Erst“, an arrow, „Dann“ – used when
+ * Erst – Dann: the plan's cards two by two, each pair a small board of its own – a card, an arrow, a card – used when
  * it fits, so each pair's first open card is the one to do. Up to four pairs fill a page, to cut apart. Done cards keep
  * their place with a tick.
  */
@@ -364,8 +401,7 @@ function FirstThen(props: StepsProps & { aspect: number }) {
       {pairs.map((pair) => (
         <div key={pair[0].id} className={`pl-pair${pair.every((step) => states[steps.indexOf(step)] === "done") ? " done" : ""}`}>
           {[0, 1].map((i) => (
-            <div key={i} className="pl-pair-slot">
-              <span className="pl-tag">{t(i === 0 ? FIRST : THEN)}</span>
+            <div key={i} className="pl-pair-slot" role="group" aria-label={t(i === 0 ? FIRST : THEN)}>
               <div className="pl-slot">
                 {pair[i] ? (
                   <StepCard day={day} step={pair[i]} state={states[steps.indexOf(pair[i])]} look={look} fresh={fresh} />

@@ -1,12 +1,26 @@
 import { useState } from "react";
 import { type Localized, useT } from "@/lib/language";
 import { weekday } from "./board";
-import { ACTIVITIES, DAY_NAMES, TASKS, THEMES } from "./catalog";
+import { ACTIVITIES, DAY_NAMES, NOW_WAYS, SLOT_BY_ID, TASKS, THEMES } from "./catalog";
 import { CHILD_NAME, COLORS, LOOK, NAME_EXAMPLE, Pick } from "./pageParts";
 import { ItemPic } from "./pictures";
-import { joinLastPart, MAX_STEPS, type Plan, type PlanStep, stepFromCatalog, withSame, withSteps } from "./plan";
+import {
+  DAY_PARTS,
+  DAY_SHAPES,
+  joinLastPart,
+  stepLimit,
+  MIN_PART_STEPS,
+  type Plan,
+  type PlanStep,
+  partRoom,
+  shapeOf,
+  stepFromCatalog,
+  withSame,
+  withShape,
+  withSteps,
+} from "./plan";
 import { PlanThumb } from "./PlanGallery";
-import { useStepLabel } from "./PlanSheet";
+import { PaperArrow, useStepLabel } from "./PlanSheet";
 import type { WizardStep } from "./Wizard";
 
 /** A plan's own steps in the wizard, after the kind, the view and the Vorlage. */
@@ -28,6 +42,74 @@ const REMOVE: Localized<(card: string) => string> = {
 
 /** „Welche Tage?“: the same plan every day or one for each weekday. */
 const WHICH_DAYS: Localized = { de: "Welche Tage?", en: "Which days?", zh: "哪几天？", hi: "कौन-से दिन?", es: "¿Qué días?", ar: "أي أيام؟", ru: "Какие дни?" };
+
+/** „Tag aufteilen?“: the day in two parts on one sheet, or one flow from morning to night (only read out). */
+const SPLIT: Localized = { de: "Tag aufteilen?" };
+/** „Anzahl Karten“: over the counters of each part's cards, the one word the form shows. */
+const HOW_MANY: Localized = { de: "Anzahl Karten" };
+/** „Was wandert?“: a marker over cards that stay, or the card itself into a „Jetzt“ field (only read out). */
+const WHAT_MOVES: Localized = { de: "Was wandert?" };
+
+/**
+ * The form of a Jetzt – Dann plan, beside its picture on the wizard's first step (user feedback, November 2026): the
+ * day in two parts (the default) or in one, how many cards each part has, and what the child moves along it – a paper
+ * arrow over cards printed on one sheet, or the card itself into a „Jetzt“ field, which means cards to cut out. Quiet
+ * small controls without headings (only „Anzahl Karten“ over the counters), each button saying what it means in a
+ * picture and a few words – what it costs to print inside the button, never in a note below it.
+ */
+export function DayConfig({ plan, onChange }: { plan: Plan; onChange: (plan: Plan) => void }) {
+  const t = useT();
+  const shape = shapeOf(plan.days[0] ?? []);
+  const setCount = (index: number, count: number) => onChange(withShape(plan, { ...shape, counts: shape.counts.map((n, i) => (i === index ? count : n)) }));
+  const way = NOW_WAYS.find((w) => w.field === !!plan.nowField) ?? NOW_WAYS[0];
+  return (
+    <div className="rw-day-config">
+      <div className="rw-segments" role="group" aria-label={t(SPLIT)}>
+        <button type="button" aria-pressed={shape.split} onClick={() => onChange(withShape(plan, DAY_SHAPES.split))}>
+          <span aria-hidden>☀️🌙</span> {t({ de: "Morgens und abends" })}
+        </button>
+        <button type="button" aria-pressed={!shape.split} onClick={() => onChange(withShape(plan, DAY_SHAPES.whole))}>
+          <span aria-hidden>🌈</span> {t({ de: "Am Stück" })}
+        </button>
+      </div>
+      <div className="rw-counts" role="group" aria-label={t(HOW_MANY)}>
+        <span className="rw-counts-name">{t(HOW_MANY)}</span>
+        {shape.counts.map((count, i) => {
+          const slot = shape.split ? SLOT_BY_ID.get(DAY_PARTS[i]) : undefined;
+          return (
+            <div key={slot?.id ?? "whole"} className="rw-count" role="group" aria-label={slot ? t(slot.label) : t(HOW_MANY)}>
+              {slot && (
+                <span className="rw-count-name" aria-hidden>
+                  {slot.emoji}
+                </span>
+              )}
+              <button type="button" disabled={count <= MIN_PART_STEPS} aria-label={t({ de: "Eine Karte weniger" })} onClick={() => setCount(i, count - 1)}>
+                −
+              </button>
+              <span className="rw-count-number">{count}</span>
+              <button type="button" disabled={count >= partRoom(shape, i)} aria-label={t({ de: "Eine Karte mehr" })} onClick={() => setCount(i, count + 1)}>
+                +
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      <div className="rw-ways" role="group" aria-label={t(WHAT_MOVES)}>
+        {NOW_WAYS.map((w) => (
+          <button key={w.emoji} type="button" className="rw-way" aria-pressed={w === way} onClick={() => onChange({ ...plan, nowField: w.field })}>
+            <span className="rw-way-pic" aria-hidden>
+              {w.field ? w.emoji : <PaperArrow />}
+            </span>
+            <span className="rw-way-label">{t(w.label)}</span>
+            <span className={`rw-way-print${w.field ? " more" : ""}`}>
+              <span aria-hidden>{w.field ? "✂️" : "🖨️"}</span> {t(w.print)}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /** Cards a plan offers: the day's activities first, then the tasks of the Belohnungstafel (as under Gestalten). */
 const OFFERED = [...ACTIVITIES, ...TASKS];
@@ -51,7 +133,7 @@ export function PlanStepView({ step, plan, onChange }: { step: string; plan: Pla
   const toggle = (catalogId: string) => {
     const own = steps.findLast((s) => s.catalog === catalogId);
     if (own) setSteps(steps.filter((s) => s !== own));
-    else if (steps.length < MAX_STEPS) setSteps([...steps, joinLastPart(steps, stepFromCatalog(catalogId))]);
+    else if (steps.length < stepLimit(steps)) setSteps([...steps, joinLastPart(steps, stepFromCatalog(catalogId))]);
   };
 
   if (step === "cards")
@@ -181,7 +263,7 @@ export function PlanStepView({ step, plan, onChange }: { step: string; plan: Pla
               <Pick
                 key={item.id}
                 selected={on}
-                disabled={!on && steps.length >= MAX_STEPS}
+                disabled={!on && steps.length >= stepLimit(steps)}
                 onClick={() => toggle(item.id)}
                 emoji={<ItemPic item={{ emoji: item.emoji, catalog: item.id }} />}
                 label={t(item.label)}

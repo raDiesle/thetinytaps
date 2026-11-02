@@ -7,7 +7,10 @@ import { shelfBookOf } from "./bookTravel";
 test("every category's page and every game finds its book on the shelf", () => {
   for (const category of CATEGORIES) {
     if (!category.apart) expect(shelfBookOf(categoryHref(category))).toBe(category.id);
-    for (const game of category.games) expect(shelfBookOf(game.href)).toBe(category.apart ? game.href.replaceAll("/", "") : category.id);
+    for (const game of category.games) {
+      const own = game.volumes ? game.volumes[0].href : game.href;
+      expect(shelfBookOf(game.href)).toBe(category.apart ? own.replaceAll("/", "") : category.id);
+    }
   }
 });
 
@@ -15,7 +18,19 @@ test("the games standing apart are books of their own, each found by its pages",
   const apart = CATEGORIES.filter((c) => c.apart).flatMap((c) => c.games);
   expect(apart.length).toBeGreaterThan(0);
   expect(new Set(apart.map((g) => shelfBookOf(g.href))).size).toBe(apart.length);
-  for (const game of apart) for (const href of game.also ?? []) expect(shelfBookOf(href)).toBe(shelfBookOf(game.href));
+  for (const game of apart.filter((g) => !g.volumes)) for (const href of game.also ?? []) expect(shelfBookOf(href)).toBe(shelfBookOf(game.href));
+});
+
+// A game in a slipcase (Belohnungstafel & Zeitplan) has a book for each of its addresses: going back from a part puts
+// that part's book back, not its neighbour.
+test("each volume in a slipcase is found by its own address", () => {
+  const games = CATEGORIES.flatMap((c) => c.games).filter((g) => g.volumes);
+  expect(games.length).toBeGreaterThan(0);
+  for (const game of games) {
+    const volumes = game.volumes ?? [];
+    expect(volumes.map((v) => v.href).sort()).toEqual([game.href, ...(game.also ?? [])].sort());
+    for (const v of volumes) expect(shelfBookOf(v.href)).toBe(v.href.replaceAll("/", ""));
+  }
 });
 
 test("a page outside any book has none", () => {

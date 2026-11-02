@@ -145,15 +145,15 @@ export const FEELINGS: Feeling[] = [
   {
     id: "angry",
     emoji: "😠",
-    title: "Wut, Turm umgefallen",
+    title: "Wut, Schuh geht nicht an",
     questions: [
-      "Der Turm ist umgefallen, der Bär ist wütend. Was kann er machen?",
+      "Der Schuh geht nicht an, der Bär ist wütend. Was kann er machen?",
       "Der Bär ist noch wütend. Was kann er machen?",
       "Der Bär ist noch ein bisschen wütend. Was machst du?",
     ],
     comforts: ["stomp", "blow", "hug"],
     instead: [
-      { caption: "Spielzeug werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", sound: "crash" },
+      { caption: "Schuh werfen", answer: "Hmm, Werfen macht Sachen kaputt. Lass die Wut lieber raus: Stampf ganz fest!", sound: "crash" },
       { caption: "Laut schreien", answer: "Hmm, vom Schreien wird die Wut noch größer. Puste lieber ganz tief: Puuuh." },
       { caption: "Hauen", answer: "Hmm, Hauen tut weh. Nimm ihn lieber in den Arm.", sound: "aua" },
     ],
