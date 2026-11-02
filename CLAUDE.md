@@ -359,10 +359,12 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
   before playing (Socken-Paare finds its difficulty itself, Buchstaben & Zahlen changes everything behind ⚙️ while
-  playing), skips it with `startMode` and plays at once. Then ✕, Esc and „Menü“ go back to the page before it, the
-  book's table of contents (or the shelf), never to a start screen the child didn't see on the way in – neither one
-  with only „Los geht’s!“ nor one with cards whose choice is made while playing (user feedback, October and November
-  2026; `GameShell` does it by itself). A game whose menu is
+  playing), skips it with `startMode` and plays at once. A game without cards or a `level` row to pick from never has a
+  start screen with only „Los geht’s!“: it plays at once, and the options it keeps go behind ⚙️ while playing
+  (`PlayOptions`; Zähne putzen had such a screen, user feedback, November 2026; `GameShell.test.ts` checks). A game that
+  plays at once goes back with ✕, Esc and „Menü“ to the page before it, the book's table of contents (or the shelf),
+  never to a start screen the child didn't see on the way in – neither one with only „Los geht’s!“ nor one with cards
+  whose choice is made while playing (user feedback, October and November 2026; `GameShell` does it by itself). A game whose menu is
   the page before it (a picture of Lebendige Bilder, its mode chosen in the row on `/bilder/`) has no start screen at all:
   `leaveTo` sends ✕, Esc and „Menü“ back to that page. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or

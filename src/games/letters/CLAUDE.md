@@ -20,7 +20,7 @@ Settings saved while Zählen and „Wo ist das B?“ were cards (`mode: "count" 
 
 ## Rules
 
-- Every option is changed while playing, never in the menu: ⚙️ in the top left corner (top right in the book look, where the way back takes the left), held like ✕ (`PlayOptions`),
+- Every option is changed while playing, never in the menu: ⚙️ in the top left corner (top right in the book look, where the way back takes the left), always held (`PlayOptions`),
   opens them over the game, which keeps playing behind; there is no start screen, no `level` row and no `settings`. The way
   to play (Frei tippen / Wörter tippen) is one of these options too. A variant of a way to play is an option of it,
   never a card of its own („Wo ist das B?“ is Wörter tippen's first letter, Zählen is Frei tippen's „Nur Zahlen“), and

@@ -9,6 +9,20 @@ test("a game that plays at once with nothing to pick leaves to the page before i
   expect(menuAfterPlay({ startMode: "scene", leaveTo: "/bilder/" }, "/")).toBe("/bilder/");
 });
 
+// Zähne putzen had a start screen with only „Los geht’s!“ (and ⚙️): a tap that does nothing for the child. A game
+// with nothing to pick plays at once and keeps its options behind ⚙️ while playing (`PlayOptions`).
+test("every game without cards or a level row to pick from plays at once", async () => {
+  const shells = [...new Bun.Glob("src/games/*/*.tsx").scanSync()].filter((file) => !file.endsWith(".test.tsx"));
+  const lonely: string[] = [];
+  for (const file of shells) {
+    const source = await Bun.file(file).text();
+    const shell = source.match(/<GameShell[\s\S]*?\n {4}>/)?.[0];
+    if (shell && !/\bmodes=|\blevel=/.test(shell) && !/\bstartMode=/.test(shell)) lonely.push(file);
+  }
+  expect(shells.length).toBeGreaterThan(5);
+  expect(lonely).toEqual([]);
+});
+
 // Buchstaben & Zahlen plays at once and showed its start screen with two cards after ✕ – a menu the child had never
 // seen, whose choice was already made while playing (user feedback, November 2026): back is the menu before the game.
 test("a game that plays at once leaves to the page before it, even with modes it could show", () => {
