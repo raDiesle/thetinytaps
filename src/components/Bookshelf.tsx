@@ -245,7 +245,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
  * with several parts stands as a slipcase of books (`Slipcase`): the Belohnungstafel's, right of Aufs Töpfchen, gold
  * and pulled out a little further than the rest, so it is what the eye finds first (user feedback, November 2026).
  * Beside them, where there is room, words carved into the shelf's back panel tell grown-ups in short what the shelf
- * holds – the info book's gist – and that the Belohnungstafel is worth a look.
+ * holds – the info book's gist – never an advert for one of its games (user feedback, November 2026).
  */
 function DailyGroup({
   books,
@@ -270,12 +270,7 @@ function DailyGroup({
       {carving && (
         <span className="shelf-carving" data-short={carving.short || undefined}>
           <span className="shelf-carving-big">{t({ de: "Alltagshelfer & erste Spiele" })}</span>
-          {!carving.short && (
-            <>
-              <span>{t({ de: "zum Einstieg – gemeinsam erlebt, das Kind mit Eltern oder Großeltern." })}</span>
-              <span className="shelf-carving-hint">{t({ de: "← Ein Blick in Belohnungstafel & Zeitplan lohnt sich." })}</span>
-            </>
-          )}
+          {!carving.short && <span>{t({ de: "zum Einstieg – gemeinsam erlebt, das Kind mit Eltern oder Großeltern." })}</span>}
         </span>
       )}
     </span>

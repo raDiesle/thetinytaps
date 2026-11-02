@@ -1352,11 +1352,6 @@
   font-style: normal;
 }
 
-/* The pointer to the Belohnungstafel, a little smaller under what the shelf holds. */
-.shelf-carving-hint {
-  font-size: 0.92em;
-}
-
 /* Only the first line, where the room is small (a phone): as big as the books' names, so it can still be read. */
 .shelf-carving[data-short] {
   padding-inline: calc(var(--bh) * 0.08);
