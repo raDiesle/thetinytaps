@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, type PointerEvent, type ReactNode } from "react";
-import { playBark, playCroak, playMeow, playMoo, playOink, playPlink, playPop, playQuack } from "@/lib/sfx";
+import { playPlink, playPop } from "@/lib/sfx";
+import { loadRealSounds, playBark, playCroak, playMeow, playMoo, playOink, playQuack } from "@/lib/realSounds";
 import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, wobble, type LevelProps } from "./level";
 import { BAR_COLORS, Ball } from "./parts";
 import { BALL_R } from "./path";
@@ -103,6 +104,7 @@ export function PegsLevel({ sound, onDone }: LevelProps) {
   const doneTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(doneTimer.current), []);
+  useEffect(() => loadRealSounds([playBark, playCroak, playMeow, playMoo, playOink, playQuack]), []);
 
   const plink = (peg: number) => {
     pegHit.current[peg] = now.current;

@@ -20,7 +20,6 @@ import {
   playChimeNote,
   playClick,
   playDing,
-  playHoot,
   playHum,
   playMusicbox,
   playPing,
@@ -29,10 +28,10 @@ import {
   playSwirl,
   playTick,
   playTrill,
-  playTweet,
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
+import { playHoot, playTweet } from "@/lib/realSounds";
 import { along, cameraOn, deg, easeInOut, easeOut, lerp, pathOf, rad, seg, timeline } from "./machineKit";
 import { arc, line, quad, type Pt } from "./path";
 

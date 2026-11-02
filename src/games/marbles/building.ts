@@ -10,7 +10,6 @@
 // so BuildingLevel.tsx only asks where each thing is at a moment. Coordinates
 // are those of the site, 6600 × 900; the screen shows 1600 of it at a time.
 import {
-  playBells,
   playBlub,
   playBoing,
   playClonk,
@@ -18,8 +17,6 @@ import {
   playCrunch,
   playDing,
   playDrum,
-  playEngine,
-  playHonk,
   playKnock,
   playPlop,
   playPop,
@@ -33,6 +30,7 @@ import {
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
+import { playBells, playEngine, playHonk } from "@/lib/realSounds";
 import { wobble } from "./level";
 import {
   along,

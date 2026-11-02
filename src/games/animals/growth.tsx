@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { playBlub, playCrack, playCroak, playPlop, playPop, playRustle, playTrill, playTweet, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { playBlub, playCrack, playPlop, playPop, playRustle, playTrill, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { playCroak, playTweet } from "@/lib/realSounds";
 import type { Localized } from "@/lib/language";
 
 // Something small and what it becomes, for "Was wird aus mir?" (Z-12): caterpillar and butterfly, egg and chick,

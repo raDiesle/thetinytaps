@@ -86,5 +86,9 @@ To try another recording: search Freesound with the licence filter
 `squeak`, `rotor`), so they don't change what Lebendige Bilder plays: Zuordnen (Was gehört zum Tier?, Schatten
 finden, Wer schaut da raus?) and Socken-Paare use them through `recorded(name, synth)` / `playRecorded`.
 
+Games play most of these through `src/lib/realSounds.ts`: the synthesized sounds of `@/lib/sfx` under the same
+names, swapped for their recording (`playGiggle` → `laugh`, `playWash` → `washer` …). A new recording for such a
+sound gets its line there.
+
 Still synthesized because Freesound has no fitting CC0 recording yet: `aua` (a small
 child's „Aua!“ in Gefühle, `playAua`). An `aua.mp3` here replaces it.

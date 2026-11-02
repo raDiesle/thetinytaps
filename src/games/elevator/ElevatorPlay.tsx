@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { BurstLayer, useBursts } from "@/components/Bursts";
-import { loadRecordings, playDing, playGiggle, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
+import { loadRecordings, playDing, playKnock, playLift, playLullaby, playMelody, playRandomNote, playSlide } from "@/lib/sfx";
+import { playGiggle } from "@/lib/realSounds";
 import type { TargetLanguage } from "@/content/targetLanguages";
 import { StoryEnd, nextCard } from "./cards";
 import { STORIES, RECORDINGS, texts, type Step, type Story, type Task, type Who } from "./content";

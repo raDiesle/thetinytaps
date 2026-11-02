@@ -11,23 +11,8 @@
 // Coordinates are those of the hillside, 6200 × 2000; the screen shows
 // 1600 × 900 of it at a time.
 
-import {
-  playBlub,
-  playCreak,
-  playCroak,
-  playDing,
-  playDrops,
-  playFlush,
-  playGlug,
-  playKnock,
-  playPlop,
-  playPop,
-  playQuack,
-  playSlide,
-  playSplash,
-  playTwinkle,
-  playWhoosh,
-} from "@/lib/sfx";
+import { playBlub, playCreak, playDing, playDrops, playGlug, playKnock, playPlop, playPop, playSlide, playTwinkle, playWhoosh } from "@/lib/sfx";
+import { playCroak, playFlush, playQuack, playSplash } from "@/lib/realSounds";
 import { VIEW_H, wobble } from "./level";
 import { along, cameraOn, clamp01, deg, easeIn, easeOut, hop, pathOf, rounded, seg, STEP, timeline, type MachineEvent, type Path } from "./machineKit";
 import { arc, line, quad, type Pt } from "./path";

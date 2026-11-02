@@ -185,6 +185,9 @@ In a fresh worktree run `bun install` first.
   belong to the drawn world (FEUERWEHR, TAXI) may stay. `src/soundWords.test.ts` checks the drawings. Where a
   game plays only synthesized noises, a real CC0 recording from Freesound is better: `src/lib/sounds/README.md` says how
   to cut one, and a game loads its recordings when it starts (`loadRecordings`), so even the first sound is the real one.
+  An animal, water or machine sound that has a recording is imported from `@/lib/realSounds` (same names as in
+  `@/lib/sfx`, preloaded with `loadRealSounds`), not from `@/lib/sfx` – unless the recording doesn't fit the moment (a
+  bicycle bell is no telephone, the farm's goat and donkey bend the synthesized sheep, horse and cow).
 - No row of stars counting the rounds played or the things found (user feedback, November 2026): a game flows on with
   nothing to collect. The one exception is Lebendige Bilder, whose „⭐ found/all“ of a picture grown-ups need
   (`src/progressStars.test.ts`). A star chart that is the point (Belohnungstafel, the week charts) is no such count.

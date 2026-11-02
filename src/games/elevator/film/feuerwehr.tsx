@@ -13,10 +13,10 @@ import {
   playSiren,
   playSplash,
   playTusch,
-  playWash,
   playWhirr,
   playWhoosh,
 } from "@/lib/sfx";
+import { playWash } from "@/lib/realSounds";
 import { FIRE_STRIPE, FireHelmet, Kid, type Look, type Pose, useHero } from "../kid";
 import { Mug } from "../things";
 import type { Picture } from "../trail/items";

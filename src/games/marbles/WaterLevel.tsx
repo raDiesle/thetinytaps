@@ -1,5 +1,6 @@
 import { useEffect, useId, useMemo, useRef, type PointerEvent } from "react";
-import { playPlop, playQuack } from "@/lib/sfx";
+import { playPlop } from "@/lib/sfx";
+import { loadRealSounds, playCroak, playFlush, playQuack, playSplash } from "@/lib/realSounds";
 import { useAnyKey, useFrames, useLevelName, VIEW_H, VIEW_W, type LevelProps } from "./level";
 import { deg, svgLine } from "./machineKit";
 import type { Pt } from "./path";
@@ -75,6 +76,7 @@ interface Ripple {
  */
 export function WaterLevel({ sound, say, onDone }: LevelProps) {
   const label = useLevelName("water");
+  useEffect(() => loadRealSounds([playCroak, playFlush, playQuack, playSplash]), []);
   const water = useMemo(buildWater, []);
   const { stretches } = water;
   const ids = useId();

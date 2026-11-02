@@ -2,7 +2,9 @@ import { type ComponentType, type PointerEvent, type ReactNode, type Ref, useCal
 import { BurstLayer, useBursts } from "@/components/Bursts";
 import { INK } from "@/games/scenes/shared";
 import { useDevice } from "@/lib/device";
-import { playCountNote, playGiggle, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
+import { playCountNote, playMelody, playPop, playRandomNote, playSlide } from "@/lib/sfx";
+import { loadRealSounds, playGiggle } from "@/lib/realSounds";
+import { TRAIL_SOUNDS } from "./levels";
 import { type TargetLanguage, targetLanguageFor } from "@/content/targetLanguages";
 import { pick } from "@/lib/language";
 import { tapState } from "@/lib/tapTargets";
@@ -487,6 +489,8 @@ export function TrailPlay({
 
   /** Resolves after `ms`; never, once the child has left, so the script just stops. */
   const wait = (ms: number) => new Promise<void>((resolve) => later(ms, resolve));
+
+  useEffect(() => loadRealSounds(TRAIL_SOUNDS), []);
 
   useEffect(
     () => () => {

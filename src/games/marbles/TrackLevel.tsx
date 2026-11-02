@@ -11,7 +11,6 @@ import { BALL_R, type Pt } from "./path";
 import { useDevice } from "@/lib/device";
 import { useT } from "@/lib/language";
 import {
-  playBells,
   playBlub,
   playBoing,
   playChime,
@@ -32,6 +31,7 @@ import {
   playTwinkle,
   playWhoosh,
 } from "@/lib/sfx";
+import { loadRealSounds, playBells } from "@/lib/realSounds";
 import {
   BARS,
   BASKET,
@@ -270,6 +270,7 @@ function Run({ sound, say, onDone, watch = false, look }: LevelProps & { look: T
   // `t` is the time everywhere here, so the translation helper gets another name.
   const tr = useT();
   const routes = useMemo(buildRoutes, []);
+  useEffect(() => loadRealSounds([...Object.values(look.release), look.landSound, look.fullSound]), [look]);
   /** How long the whole run is with the parts it starts with, for how much of it lies behind a thing. */
   const runLength = useMemo(
     () =>

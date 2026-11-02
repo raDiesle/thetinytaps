@@ -4,7 +4,8 @@ import type { TargetLanguage, TargetLanguageId } from "@/content/targetLanguages
 import { useNoBackgroundMusic } from "@/lib/backgroundMusic";
 import type { CommonSettings } from "@/lib/common";
 import { useAppLanguage, useT } from "@/lib/language";
-import { playChime, playKnock, playPop, playRumble, playSplash, playTweet, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
+import { playChime, playKnock, playPop, playRumble, playTwinkle, playWhoosh, playDrum } from "@/lib/sfx";
+import { loadRealSounds, playSplash, playTweet } from "@/lib/realSounds";
 import { useWakeLock } from "@/lib/wakeLock";
 import { movement } from "./library/movements";
 import { type Cue, type Story, type StoryFrame, storyTitle } from "./stories/story";
@@ -78,6 +79,7 @@ export function AdventurePlay({
   useWakeLock(!ended && !paused);
   // The story has its own music, which the stop dance needs to control.
   useNoBackgroundMusic();
+  useEffect(() => loadRealSounds([playSplash, playTweet]), []);
 
   useEffect(() => {
     const canvas = canvasRef.current!;

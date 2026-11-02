@@ -3,7 +3,8 @@
 // chutes into a little pool, and when it is full fountains spray up out of it.
 
 import { memo, useId } from "react";
-import { playBlub, playBoing, playDrops, playPop, playQuack, playSplash, playThump } from "@/lib/sfx";
+import { playBlub, playBoing, playDrops, playPop, playThump } from "@/lib/sfx";
+import { playQuack, playSplash } from "@/lib/realSounds";
 import { VIEW_W, wobble } from "./level";
 import { BALL_R, type Pt } from "./path";
 import { BASKET, TRACK_H } from "./track";
@@ -186,7 +187,7 @@ export const SLIDE_TRACK: TrackTheme = {
   tunnel: { fill: "#ff8c42", lines: "#e06b1f" },
   Thing: SlideThing,
   release: { marble: playPop, tennis: playBoing, iron: playThump, apple: playQuack, bubble: playBlub },
-  landSound: () => playSplash(),
+  landSound: playSplash,
   fullSound: playDrops,
   full: { de: "Alle sind im Becken!" },
   peekers: ["🐬", "🐠", "🐳", "🦦", "🐢", "🐙"],
