@@ -255,9 +255,9 @@ In a fresh worktree run `bun install` first.
   hangs above the lines the menu's head grows down past it (`--ribbon-reach`, `--menu-pad`) – making it bigger means
   keeping that room free with it (`MenuTop.test.ts`).
   Only what is drawn of a corner is tapped, never the empty rest of its square, which reaches the first line. The round arrow is hidden there (`MenuTop.test.ts`), the sun or a room's window step aside, and nothing
-  else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ held to leave is the
-  same corner at the top left with a ✕ on it (`PageCornerArt`), held just like the ✕ – it lifts further while held
-  instead of a ring filling – with the fullscreen button and „Zurück zum Menü · halten“ right of it, clear of the room it
+  else goes into that corner. Every way back in the book look is that corner: while playing, the ✕ that leaves is the
+  same corner at the top left with a ✕ on it (`PageCornerArt`), tapped or held just like the ✕ – held, it lifts further
+  instead of a ring filling – with the fullscreen button and „Zurück zum Menü“ right of it, clear of the room it
   lifts into; a game's ⚙️ (`PlayOptions`) moves to the top right for it, and a game's own buttons and signs in the top
   left keep below it with `top: calc(… + var(--corner-clear, 0px))` (Schatten finden's picture choice lay under the ✕,
   user feedback, October 2026; `css.test.ts` checks).
@@ -284,7 +284,7 @@ In a fresh worktree run `bun install` first.
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
   in `content.test.ts`); and variants of one way to play (which words, how long, whole word or first letter) are
   choices in the always visible row above the cards (`level`), not cards or a menu of their own – or, in a game that
-  plays at once, options while playing behind ⚙️ held in the top left corner like ✕ (`PlayOptions`, Buchstaben & Zahlen),
+  plays at once, options while playing behind ⚙️ held in the top left corner (`PlayOptions`, Buchstaben & Zahlen; always held, whatever ✕ needs),
   never a tap a child could make by chance.
   Where a game's cards come in sorts (`GameMode.kind`: lift stories, walks), the sort is named once above its group of
   cards on a shared frame (`GameShell`, `packGroups` in `useFitGrid`), never as a tag on every card.
@@ -314,10 +314,19 @@ In a fresh worktree run `bun install` first.
   Check menus at 844×390 and 390×844 as well as tablet and computer.
 - Works with touch and keyboard. `src/lib/device.ts` hides keyboard hints on touch
   devices and on-screen keys on computers.
-- Leaving needs a grown-up: hold Esc or the ✕ (`GameShell`). The only other way out is „Menü“ at the end
-  of a level. Never add another. Starting a game shows no note on how to leave: the
-  „Zurück zum Menü“ next to ✕ appears only while it is held or a mouse is over it – the moment the finger lands, without
-  fading in (user feedback, October 2026; `css.test.ts`).
+- A game is left with one tap on its ✕, or by holding Esc (`GameShell`): holding ✕ for a moment was the only way once
+  and got in the grown-ups' way (user decision, November 2026), so it is a choice now, „Spiel verlassen“ under ⏳ on
+  the home page (`leave` in `src/lib/common.ts`, `LeaveOptions`), for parents whose child taps ✕ by chance. Esc is
+  always held, since children press it while typing. The only other way out is „Menü“ at the end of a level. Never add
+  another. Starting a game shows no note on how to leave: the „Zurück zum Menü“ (with „· halten“ where it is held) next
+  to ✕ appears only while it is pressed or a mouse is over it – the moment the finger lands, without fading in (user
+  feedback, October 2026; `css.test.ts`).
+- **Back is always the screen seen before** (user feedback, November 2026): ✕, Esc, „Menü“ and a menu's way back lead
+  to the menu the child came from, never to a menu it didn't pass on its way in. And they step back in the browser's
+  history rather than adding a page to it, or the phone's own back button afterwards opened the game just left again,
+  or the same menu twice, so that it seemed not to work: a way back goes through `goBack` (`src/lib/goBack.ts`) or
+  `useTurnPage(to, "back")`, never a plain `<Link>` or `navigate(to)`. A way back is never dropped while something
+  moves (a book still coming out, a page turning): it goes at once, without the animation if need be.
 - Play time (`src/lib/playtime.ts`, ⏳ on the home page) limits minutes or games per day for all games. When it is over the game
   says good night, and `PlaytimeLock` (mounted in `index.tsx`) covers every menu, so a child stays there until a grown-up
   holds ⏳ for three seconds. Anything a child could tap never gives more time or resets it: that lives only behind the lock
@@ -349,10 +358,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
 ```
 
 - Start screen: a game opened in the moment (Aufs Töpfchen: the child has to go now), or one with nothing to choose
-  before playing (Socken-Paare finds its difficulty itself), skips it with `startMode` and plays at once. When there is still something to choose on its start screen (modes,
-  `level`, settings: Buchstaben & Zahlen), that comes after ✕ or „Menü“; when there is nothing, ✕, Esc and „Menü“ go
-  back to the page before it, the book's table of contents (or the shelf for a game standing apart), never to a start
-  screen with only „Los geht’s!“ (user feedback, October 2026; `GameShell` does it by itself). A game whose menu is
+  before playing (Socken-Paare finds its difficulty itself, Buchstaben & Zahlen changes everything behind ⚙️ while
+  playing), skips it with `startMode` and plays at once. Then ✕, Esc and „Menü“ go back to the page before it, the
+  book's table of contents (or the shelf), never to a start screen the child didn't see on the way in – neither one
+  with only „Los geht’s!“ nor one with cards whose choice is made while playing (user feedback, October and November
+  2026; `GameShell` does it by itself). A game whose menu is
   the page before it (a picture of Lebendige Bilder, its mode chosen in the row on `/bilder/`) has no start screen at all:
   `leaveTo` sends ✕, Esc and „Menü“ back to that page. A game a routine opens for one of its steps (the Tagesplan's
   🪥 card, `{ returnTo }` in the router state, `src/lib/routine.ts`) plays at once too, outside play time, and ✕ or

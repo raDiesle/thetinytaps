@@ -9,8 +9,12 @@ test("a game that plays at once with nothing to pick leaves to the page before i
   expect(menuAfterPlay({ startMode: "scene", leaveTo: "/bilder/" }, "/")).toBe("/bilder/");
 });
 
-test("a game with something to pick on its start screen shows it after playing", () => {
-  expect(menuAfterPlay({ startMode: "free", modes: [{ id: "free", emoji: "⌨️", title: "Frei tippen" }] }, "/")).toBeUndefined();
-  expect(menuAfterPlay({ startMode: "free", level: "Wörter" }, "/")).toBeUndefined();
+// Buchstaben & Zahlen plays at once and showed its start screen with two cards after ✕ – a menu the child had never
+// seen, whose choice was already made while playing (user feedback, November 2026): back is the menu before the game.
+test("a game that plays at once leaves to the page before it, even with modes it could show", () => {
+  expect(menuAfterPlay({ startMode: "free" }, "/")).toBe("/");
+});
+
+test("a game started from its own start screen shows it again", () => {
   expect(menuAfterPlay({}, "/")).toBeUndefined();
 });
