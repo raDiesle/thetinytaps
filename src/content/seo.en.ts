@@ -61,9 +61,8 @@ export const SEO_EN: SeoTranslation = {
     },
     "/tiere/": {
       title: "Feed the Animals – Animal Game for Toddlers",
-      description:
-        "What does the animal want? Drag food to the hungry animal or bring the animal home, with animal sounds. For toddlers, free and without ads.",
-      text: "The rabbit wants a carrot, the dog a bone: drag or tap the food to the animal, and it is happy and makes its sound.",
+      description: "What does the animal need? Who peeks out of the bush, what does it eat, where does it live? With animal sounds, for toddlers, without ads.",
+      text: "Who is peeking out of the bush? The rabbit wants a carrot, the dog looks for its kennel: spot the animal, tap the food or the home, and it is happy and makes its sound. The game gets easier or harder by itself.",
     },
     "/schatten/": {
       title: "Find the Shadow – Matching Game for Toddlers",

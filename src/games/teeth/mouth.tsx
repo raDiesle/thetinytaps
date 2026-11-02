@@ -3,9 +3,13 @@ import { STAR_PATH } from "@/components/Bursts";
 import { useFigure } from "@/lib/common";
 import { useT } from "@/lib/language";
 import {
+  alongFace,
   buildMouth,
   insideBy,
+  midLine,
+  openCorners,
   projectors,
+  TOOTH_CLEAR,
   toothKey,
   type Face,
   type FaceKind,
@@ -281,7 +285,14 @@ export function Mouth({ view, zone, monsters, brush, happy, daytime, action, fre
     return { at: alongFace(face, stop.spot), normal: face.normal, along };
   };
 
-  const lipPoints = useMemo(() => model.lips.map(project.point), [model, project]);
+  // The corners of the mouth open as far as the teeth being brushed need, so seen from the side none hides behind them.
+  const lipPoints = useMemo(() => {
+    const keep = (zone?.teeth ?? []).flatMap((id) => {
+      const face = surfaceFace(teethByKey.get(toothKey(id))!.faces, zone!.surface);
+      return all[id.jaw].facing(face.normal) > MIN_FACING ? midLine(face).map(all[id.jaw].point) : [];
+    });
+    return openCorners(model.lips.map(project.point), keep, TOOTH_CLEAR);
+  }, [model, project, all, teethByKey, zone?.teeth, zone?.surface]);
   const lipsPath = useMemo(() => smoothPath(lipPoints), [lipPoints]);
 
   const svg = useRef<SVGSVGElement>(null);
@@ -527,13 +538,6 @@ const unitOf = (a: Vec3): Vec3 => {
   const length = Math.hypot(...a) || 1;
   return [a[0] / length, a[1] / length, a[2] / length];
 };
-
-/** A point on a face, `i` steps along the tooth from one end, half way between its long edges. */
-function alongFace(face: Face, i: number): Vec3 {
-  const a = face.points[i];
-  const b = face.points[face.points.length - 1 - i];
-  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
-}
 
 const ARROW_PATH = "M0 -28 L22 -4 L9 -4 L9 24 L-9 24 L-9 -4 L-22 -4 Z";
 
