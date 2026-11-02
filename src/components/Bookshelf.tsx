@@ -9,7 +9,7 @@ import { takeOutBook } from "@/lib/bookTravel";
 import { type Localized, useT } from "@/lib/language";
 import { preloadPage } from "@/lib/preloadPages";
 import { playKnock } from "@/lib/sfx";
-import { BOOK_ASPECT, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
+import { BOOK_ASPECT, BOOK_GAP, planShelf, type ShelfCell, type ShelfLayout, type ShelfRect, type ShelfThing } from "@/lib/shelfLayout";
 import pictures from "./bilder/*.webp?glob";
 
 /** The picture hanging on the wall where there is room: the fox family and the bear family reading together. */
@@ -55,11 +55,14 @@ interface Carving {
   minBook: number;
 }
 
-/** The carvings tried, the widest first: the first that leaves the books nearly as big is carved. */
+/**
+ * The carvings tried, the widest first: the first that leaves the books nearly as big is carved, and the last where
+ * none does, since its „mehr …“ is the way to the texts for grown-ups.
+ */
 const CARVINGS: Carving[] = [
-  { span: 1.9, short: false, minBook: 170 },
-  { span: 1.4, short: false, minBook: 170 },
-  { span: 0.8, short: true, minBook: 100 },
+  { span: 1.5, short: false, minBook: 170 },
+  { span: 1.2, short: false, minBook: 170 },
+  { span: 1.25, short: true, minBook: 100 },
 ];
 
 /** How much smaller the picture books may get for the carved words. */
@@ -126,11 +129,10 @@ function nudge(e: PointerEvent<HTMLElement>) {
   playKnock(book.classList.contains("shelf-lying") ? 420 : 560);
 }
 
-/** What stands in each of the grown-ups' compartments (the stickers' has its little books; the stickers are on its side). */
-const THINGS: Record<ShelfThing, () => ReactNode> = {
+/** What stands in each of the grown-ups' compartments (the stickers' has nothing on its board: they are on its side). */
+const THINGS: Partial<Record<ShelfThing, () => ReactNode>> = {
   music: () => <RoomSpeaker />,
   playtime: () => <RoomHourglass />,
-  figure: () => <RoomNotes />,
   language: () => <RoomGlobe />,
 };
 
@@ -158,7 +160,9 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
       const carved = CARVINGS.map((carving) => ({ carving, layout: planShelf(width, height, spansFor(carving)) })).find(
         ({ carving, layout }) => layout.bookHeight >= Math.max(carving.minBook, plain.bookHeight * CARVING_SHRINK),
       );
-      setPlan({ layout: carved?.layout ?? plain, roomWidth: width, carving: carved?.carving, spans: spansFor(carved?.carving) });
+      const last = CARVINGS[CARVINGS.length - 1];
+      const carving = carved?.carving ?? last;
+      setPlan({ layout: carved?.layout ?? planShelf(width, height, spansFor(last)), roomWidth: width, carving, spans: spansFor(carving) });
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -177,6 +181,7 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
   const style = layout
     ? ({
         "--bh": `${layout.bookHeight}px`,
+        "--gap": BOOK_GAP,
         "--post": `${layout.frame.post}px`,
         "--crown": `${layout.frame.crown}px`,
         "--plinth": `${layout.frame.plinth}px`,
@@ -244,8 +249,9 @@ export function Bookshelf({ secretProps, legal }: { secretProps: HTMLAttributes<
  * with its name clipped on the board's edge under them (chosen from four drafts, user decision, November 2026). A game
  * with several parts stands as a slipcase of books (`Slipcase`): the Belohnungstafel's, right of Aufs Töpfchen, gold
  * and pulled out a little further than the rest, so it is what the eye finds first (user feedback, November 2026).
- * Beside them, where there is room, words carved into the shelf's back panel tell grown-ups in short who the shelf
- * is for and that it is a first step into the digital world taken together – never an advert for one of its games (user feedback, November 2026).
+ * Beside them words carved into the shelf's back panel tell grown-ups in short who the shelf is for and that it is a
+ * first step into the digital world taken together – never an advert for one of its games (user feedback, November
+ * 2026) – and their „mehr …“ opens all the texts for grown-ups (RoomNotes).
  */
 function DailyGroup({
   books,
@@ -271,7 +277,12 @@ function DailyGroup({
         <span className="shelf-carving" data-short={carving.short || undefined}>
           {/* Kept whole on either side of the comma, so a narrow carving breaks only there. */}
           <span className="shelf-carving-big">{t({ de: "Für\u00a0Groß\u00a0&\u00a0Klein, Seite\u00a0an\u00a0Seite" })}</span>
-          {!carving.short && <span>{t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Spielen und kleinen Helfern für den Tag." })}</span>}
+          {!carving.short && (
+            <span>
+              {t({ de: "Der erste gemeinsame Schritt ins Digitale – mit Lernspielen, die die Kommunikation fördern, und kleinen Helfern für den Tag." })}
+            </span>
+          )}
+          <RoomNotes />
         </span>
       )}
     </span>
@@ -315,10 +326,8 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
     "--sy": `${(cell.y + cell.h / 2 - layout.height * EYE_HEIGHT) * back}px`,
   } as CSSProperties;
   const ends = cell.books ? endsFor(cell, layout.bookHeight, spans) : undefined;
-  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next. A group of books
-  // spine out stands right at the compartment's left wall, as the first books of the shelf, all filling at its right.
-  const groupFirst = !!cell.books && !!PLACES[cell.books[0]]?.[0].colour;
-  const stackLeft = seed % 2 === 0 && !groupFirst;
+  // The stack of books lying flat goes to one end, the left in one compartment, the right in the next.
+  const stackLeft = seed % 2 === 0;
   return (
     <div className={`shelf-cell${cell.thing ? ` thing ${cell.thing}` : ""}`} style={style}>
       <span className="shelf-cell-shade" />
@@ -330,11 +339,11 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
         <div className="shelf-row">
           <span className="shelf-end">
             {ends.stack > 0 && stackLeft && <Stack seed={seed} />}
-            <Spines count={groupFirst ? 0 : stackLeft ? ends.spines - ends.stack : ends.spines} seed={seed} />
+            <Spines count={stackLeft ? ends.spines - ends.stack : ends.spines} seed={seed} />
           </span>
           {children}
           <span className="shelf-end">
-            <Spines count={(stackLeft ? ends.spines : ends.spines - ends.stack) + (groupFirst ? ends.spines : 0)} seed={seed + 3} />
+            <Spines count={stackLeft ? ends.spines : ends.spines - ends.stack} seed={seed + 3} />
             {ends.stack > 0 && !stackLeft && <Stack seed={seed + 1} />}
           </span>
         </div>
@@ -345,21 +354,22 @@ function Compartment({ cell, layout, spans, seed, children }: { cell: ShelfCell;
           <RoomStickers />
         </div>
       )}
-      {cell.thing && <div className="shelf-thing">{THINGS[cell.thing]()}</div>}
+      {cell.thing && THINGS[cell.thing] && <div className="shelf-thing">{THINGS[cell.thing]?.()}</div>}
     </div>
   );
 }
 
 /**
  * How many books stand spine out at each end of a compartment of picture books, and whether a stack lies there too:
- * what the room beside the books leaves, keeping room round each picture book and more between them.
+ * what the room beside the books leaves, the books standing together in the middle with `BOOK_GAP` round each.
  */
 function endsFor(cell: ShelfCell, bh: number, spans: number[]) {
   const n = cell.books?.length ?? 0;
   const span = (cell.books ?? []).reduce((sum, b) => sum + spans[b], 0);
-  const end = (cell.w - span * bh * BOOK_ASPECT - (n - 1) * bh * 0.5) / 2 - bh * 0.15;
-  const spine = bh * 0.16 + 1;
-  const spines = Math.max(0, Math.min(7, Math.floor(end / spine)));
+  const end = (cell.w - span * bh * BOOK_ASPECT - (n + 1) * BOOK_GAP * bh) / 2 - 2;
+  // The widest spine's room, so that they never reach past the wall.
+  const spine = bh * 0.17 + 1;
+  const spines = Math.max(0, Math.min(12, Math.floor(end / spine)));
   // A stack takes the room of this many spines, where there is room for it.
   const stack = end >= bh * 0.6 ? Math.ceil((bh * 0.62) / spine) : 0;
   return { spines, stack };

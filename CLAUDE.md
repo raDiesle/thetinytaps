@@ -211,8 +211,8 @@ In a fresh worktree run `bun install` first.
   The home page's options for all games are „🎵 Musik“, one tap on its own button, never a menu, and „Junge / Mädchen“
   (in the book look things standing in the bookshelf, see the book look below).
 - **A figure that stands for the child follows „Junge / Mädchen“** (👦 / 👧 in a menu on the home page in the toy look;
-  in the book look stickers of a fox girl and a bear boy on the shelf's right inner side, one tap on either chooses it – user
-  decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
+  in the book look stickers of a fox girl and a bear boy on the shelf's right inner side, each with a little ♀ / ♂ beside
+  it so it is plain which is which, one tap on either chooses it – user decision, October 2026; `useFigure()` from `src/lib/common.ts`, boy by default): the child of Kleine Abenteuer (`useHero()`),
   the face in Zähne putzen's mirror and story. The girl differs only in hair (pigtails, lashes where only the eyes show)
   and clothes' colours, never in size or poses. Animals (Tapsi, the Gefühle animals), the people in the pictures and the
   Bewegungsabenteuer's dark dancer (no hair, it stands for anyone) stay as they are; no game adds a choice of its own for
@@ -280,12 +280,13 @@ In a fresh worktree run `bun install` first.
   board's edge under it (`DailyGroup`, chosen from four drafts – bookend, sign, paper band – user decision, November
   2026), and beside it words carved into the back panel tell grown-ups in short what
   the shelf is for – „Für Groß & Klein, Seite an Seite“ (Seite both page and side, user's choice), then that it is the
-  first step into the digital world taken together, with games and little helpers for the day (not „alles kostenlos“,
-  user feedback) – and nothing else: no pointer to one game („Ein Blick in die
-  Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). The carving takes
-  room of its own on the board (`planShelf` takes each place's width) and comes only where the picture books stay
-  nearly as big (`CARVING_SHRINK`) and the words big enough to read – where room is short only its first line, and on a
-  phone on its side none (`CARVINGS`). Every picture book's cover shows a picture painted for its
+  first step into the digital world taken together, with learning games that foster talking together and little helpers
+  for the day (not „alles kostenlos“, user feedback) – and nothing else: no pointer to one game („Ein Blick in die
+  Belohnungstafel lohnt sich“ was taken out, user feedback, November 2026). It ends with a carved, underlined „mehr …“
+  that opens the texts for grown-ups (`RoomNotes`, see below). The carving takes room of its own on the board
+  (`planShelf` takes each place's width), all of it where the picture books stay nearly as big (`CARVING_SHRINK`) and the
+  words big enough to read, else only its first line and „mehr …“ – never none, since „mehr …“ is the way to those
+  texts (`CARVINGS`). Its place is only as wide as its words need: a wider one left a gap beside them. Every picture book's cover shows a picture painted for its
   book (`src/components/bilder/cover-<category>.webp`, made with `/bild-erzeugen`, user decision, October 2026), never
   emojis: a new category gets one with it (`content.test.ts` checks).
 - No menu level more than needed: a book with one game opens that game directly (`categoryHref`, checked
@@ -317,8 +318,8 @@ In a fresh worktree run `bun install` first.
   menu has no „Über das Spiel“ (user decision, October 2026: „wir brauchen keine Infos im Menü“). When a menu fits on one screen, the free room goes around its cards (or „Los geht’s!“, `data-spread`) –
   never everything bunched in the middle; `useFitGrid` leaves that room out when it sizes the cards. What only grown-ups need below the cards (version,
   install hint) waits below the first screen (`data-below-fold`), never fixed over it – except on the bookshelf, the
-  book look's home page, which never scrolls (user feedback, October 2026): there it goes into the shelf's little „i“
-  book (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`). On a phone the home
+  book look's home page, which never scrolls (user feedback, October 2026): there it opens from the carving's „mehr …“
+  (`RoomNotes`), and Impressum and Datenschutz stand small in the room's bottom right corner (`.room-legal`). On a phone the home
   page's option menus cover the whole screen, with name and ✕ on top and a „Weiter unten gibt es mehr“ bar
   while there is more to scroll to. Buttons and cards in a menu never touch or overlap, also not with a tilted card's
   corner or a button's shadow: keep clear room between the menu's head (its rows of buttons) and the cards
@@ -434,6 +435,9 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   every screen. Every compartment holds something to tap – never a board only of filler books (users found it odd that
   nothing up there could be tapped): the picture books stand two up top and two below on wider screens, each with clear
   room round it so it is seen whole and a finger finds one book, never its neighbour (`BOOK_GAP`, `shelfLayout.test.ts`).
+  On each board the books stand together in the middle with just `BOOK_GAP` between them, and books spine out fill the
+  ends up to them – never spread over a wide board with big empty room between them (on a big monitor they looked lost,
+  user feedback, November 2026; `.shelf-row`, `endsFor`).
   The picture books are as big as the shelf allows (`TAKE_OUT`, little room above them, user feedback, October 2026) and
   show that they are there to be taken: they stand at the board's front edge, before the books spine out, their tops
   tipped forwards as a hand takes a book out, with a warm glow round the cover; a mouse over one tips it further out.
@@ -445,11 +449,11 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   loose around the room (`RoomOptions.tsx`, user feedback, October 2026): a wooden loudspeaker (music, one tap), an
   hourglass (play time), a globe with the 🌐 lines and the language's name on its foot (the language – never a light
   switch) in a compartment of its own with a board between it and the one above, stickers of the fox girl and the bear
-  boy stuck on the inner side of the shelf's right wall in that compartment above (the figure), and on its board one
-  little book for grown-ups with an „i“ on it, holding both texts that stood below the shelf – what the app is (the page's
-  words for search engines, `SeoWords`) and „Ein paar Worte von uns“ (`ParentsNote`) – one book, not one per text; a tap
-  opens it, and its text stays in the page unseen while closed (`MenuButton keep`) so search engines read it
-  (`RoomNotes`, user feedback, October 2026). The app's name is a painted sign
+  boy stuck on the inner side of the shelf's right wall in that compartment above (the figure). The texts that stood below
+  the shelf – what the app is (the page's words for search engines, `SeoWords`) and „Ein paar Worte von uns“
+  (`ParentsNote`) – open together from „mehr …“ at the end of the carved words, where grown-ups already read (a little
+  „i“ book in the shelf was replaced by it, user feedback, November 2026); their text stays in the page unseen while
+  closed (`MenuButton keep`) so search engines read it (`RoomNotes`). The app's name is a painted sign
   hanging on two little chains from above, with clear room between it and the shelf – it never touches or stands on the
   shelf (user feedback, October 2026). A new option becomes such a thing in a compartment of its own too (`SHELF_THINGS`); their
   menus open outside the shelf's 3D (`MenuButton` portals them), since a transform would hold them in. The wall's picture (`bilder/buch-cover.webp`,
@@ -521,7 +525,7 @@ src/lib/                 speech, sfx (synthesized + recorded sounds), storage, d
   English browser: so search engines play in the language of the address (`isCrawler` in `src/lib/locale.ts`) –
   a crawler that runs pages and isn't on its list gets added there. The app replaces the built page's text when
   it starts, so every menu ends its `<main>` with `<SeoText />`, which shows that text below the first screen on a
-  panel of its own (the book look's home page in the shelf's little „i“ book instead); a new menu page does the same. Pages that must stay out of results get a
+  panel of its own (the book look's home page behind the carving's „mehr …“ instead); a new menu page does the same. Pages that must stay out of results get a
   `noindex` tag (`NO_INDEX_PATHS`), never a `Disallow` in robots.txt, which hides the tag from Google. No
   `<meta name="keywords">` (ignored by Google, a spam hint for Bing): the searched words go into title, description and text. Heavy downloads (service worker copy,
   songs) start only after the page has loaded (`afterLoad` in `src/lib/pwa.ts`).

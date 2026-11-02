@@ -300,51 +300,6 @@
   font-weight: 700;
 }
 
-/* The little book below the stickers (RoomNotes), standing a little askew, left of the stickers' wall. */
-.room-note {
-  margin-right: calc(var(--cw) * 0.16);
-  rotate: -4deg;
-  transform-origin: bottom right;
-}
-
-.room-note svg {
-  height: min(calc(var(--ch) * 0.56), calc(var(--cw) * 0.5 / 0.71));
-  width: auto;
-}
-
-.room-note-spine {
-  fill: #5d8a5a;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-  filter: brightness(0.7);
-}
-
-.room-note-cover {
-  fill: #5d8a5a;
-  stroke: var(--ink);
-  stroke-width: 1.8;
-}
-
-.room-note-shine {
-  stroke: #ffffff40;
-  stroke-width: 2;
-}
-
-.room-note-label {
-  fill: #fbf4e3;
-  stroke: var(--ink);
-  stroke-width: 1.5;
-}
-
-.room-note-sign {
-  fill: var(--ink);
-}
-
-.room-note-title {
-  stroke: #fbf4e3cc;
-  stroke-width: 2.6;
-}
-
 /* The two stickers on the shelf's right inner side, glossy, a little askew: the chosen one bright, the other pale. */
 .room-stickers {
   display: flex;
@@ -389,6 +344,32 @@
 .room-sticker svg {
   width: 100%;
   height: 100%;
+}
+
+/* The little ♀ or ♂ on each sticker's right edge, in the girl's lilac or the boy's blue. */
+.room-sticker-sign {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--s) * -0.26);
+  display: grid;
+  place-items: center;
+  width: calc(var(--s) * 0.4);
+  height: calc(var(--s) * 0.4);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 1px 2px #3a261459,
+    inset 0 0 0 1px #00000014;
+  color: #2f6db0;
+  font-family: "Segoe UI Symbol", "Apple Symbols", "DejaVu Sans", sans-serif;
+  font-size: calc(var(--s) * 0.32);
+  font-weight: 700;
+  line-height: 1;
+  translate: 0 -50%;
+}
+
+.room-sticker-sign[data-figure="girl"] {
+  color: #b0457a;
 }
 
 .room-sticker[aria-pressed="true"] {
@@ -573,7 +554,7 @@
   color: inherit;
 }
 
-/* The install hint in the little „i“ book (RoomNotes), below its texts. */
+/* The install hint behind the carving's „mehr …“ (RoomNotes), below its texts. */
 .home-menu-panel .install-hint {
   margin: 12px 0 0;
 }
@@ -819,14 +800,16 @@
 }
 
 /*
- * The books of a compartment, standing a little behind its front edge: books spine out at the ends, the picture books
- * between them with even room round each (their auto margins share what is left).
+ * The books of a compartment, standing a little behind its front edge: the picture books together in the middle,
+ * `BOOK_GAP` round each (`--gap`), and books spine out filling the ends up to them – never spread over a wide board
+ * with big empty room between them, which looked lost on a big monitor (user feedback, November 2026).
  */
 .shelf-row {
   position: absolute;
   inset: 0;
   display: flex;
-  justify-content: space-between;
+  gap: calc(var(--bh) * var(--gap));
+  justify-content: center;
   align-items: flex-end;
   padding: 0 2px;
   transform: translateZ(calc(var(--d) * -0.2));
@@ -838,7 +821,7 @@
  * 2026). A mouse over it tips it further out.
  */
 .shelf-row > .shelf-book {
-  margin: 0 auto;
+  flex: none;
   transform-origin: 50% 100%;
   transform: translateZ(calc(var(--d) * 0.17)) rotateX(-7deg);
   transition: transform 0.35s cubic-bezier(0.3, 0.7, 0.4, 1.2);
@@ -860,11 +843,19 @@
   outline-offset: 3px;
 }
 
+/* Each end takes half of what the books leave; its spines stand next to the books, any room left is at the wall. */
 .shelf-end {
   display: flex;
+  flex: 1 1 0;
+  justify-content: flex-end;
   align-items: flex-end;
   gap: 2px;
+  min-width: 0;
   height: 100%;
+}
+
+.shelf-end:last-child {
+  justify-content: flex-start;
 }
 
 .shelf-spines {
@@ -1200,7 +1191,6 @@
   align-items: flex-end;
   width: calc(var(--bh) * 0.82 * var(--span, 1));
   height: var(--bh);
-  margin: 0 auto;
   transform: translateZ(calc(var(--d) * 0.17));
 }
 
@@ -1344,6 +1334,21 @@
     0 -1px 0 #2a170866;
   transform: translate(var(--sx), var(--sy)) translateZ(calc(var(--d) * -0.97 + 2px));
   pointer-events: none;
+}
+
+/* „mehr …“ (RoomNotes): carved like the words, underlined as a link, the one part of them that takes a tap. */
+.shelf-carving .home-menu {
+  align-self: center;
+}
+
+.shelf-carving-more {
+  padding: 0.1em 0.4em;
+  font-style: italic;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+  pointer-events: auto;
 }
 
 .shelf-carving-big {

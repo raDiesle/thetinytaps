@@ -8,7 +8,7 @@ import { seoWords } from "@/lib/seoText";
  * engines get (src/content/seo.ts), in the app language where it has them (German, English). Google reads
  * the page after the app has started, which replaces the built page's text, so without this a start screen
  * would say four words. `children` follow it (the home page's version and legal links). Without `words` only the
- * children: the book look's home page has its words in a little book in the shelf instead (RoomNotes).
+ * children: the book look's home page has its words behind the carving's „mehr …“ instead (RoomNotes).
  */
 export function SeoText({ children, words = true }: { children?: ReactNode; words?: boolean }) {
   const shown = useSeoWords();
