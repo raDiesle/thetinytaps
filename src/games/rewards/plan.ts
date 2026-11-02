@@ -365,6 +365,21 @@ export function withSteps(plan: Plan, weekdayIndex: number, steps: PlanStep[]): 
   return { ...plan, days: plan.days.map((list, i) => (i === index ? steps : list)) };
 }
 
+/** The plan with every day's cards changed alike (`change` gets each day's list): the one list of a plan the same every day, or all seven. */
+export function withEveryDay(plan: Plan, change: (steps: PlanStep[]) => PlanStep[]): Plan {
+  return { ...plan, days: plan.days.map(change) };
+}
+
+/**
+ * Whether every day has the same cards in the same order (their stars may differ by day): such a week with a Zähler is
+ * drawn as the grid of a reward chart, a row per card and a column per day, as a Belohnungstafel always looked.
+ */
+export function sameCards(plan: Plan): boolean {
+  if (plan.same) return true;
+  const ids = (steps: PlanStep[]) => steps.map((step) => step.id).join("|");
+  return plan.days.every((day) => ids(day) === ids(plan.days[0]));
+}
+
 /**
  * The plan with each day its own steps, or every day the same. Splitting copies the one list to all seven days;
  * joining keeps the list of `weekdayIndex` (the day the grown-up was looking at).

@@ -37,6 +37,7 @@ import {
   THEMES,
 } from "./catalog";
 import { SlotChips } from "./Editor";
+import { emptyHistory, type History, record, redo, undo } from "./history";
 import { CHILD_NAME, Pick } from "./pageParts";
 import { ItemPic } from "./pictures";
 import {
@@ -62,6 +63,7 @@ import {
   withCounter,
   withSame,
   withShape,
+  withEveryDay,
   withStepStars,
   withSteps,
 } from "./plan";
@@ -78,10 +80,14 @@ interface Span {
   id: SpanId;
   label: Localized;
   type: ChartType;
+  /** What it shows, in a line for grown-ups (its tooltip). */
+  hint?: Localized;
 }
 
 const kindLabel = (id: BoardKind) => KINDS.find((kind) => kind.id === id)?.label ?? { de: id };
+const kindHint = (id: BoardKind) => KINDS.find((kind) => kind.id === id)?.hint;
 const planLabel = (id: PlanView) => PLAN_VIEWS.find((view) => view.id === id)?.label ?? { de: id };
+const planHint = (id: PlanView) => PLAN_VIEWS.find((view) => view.id === id)?.hint;
 
 /**
  * „Zeitraum“ in the wizard, by the time a chart covers (user feedback, November 2026): a day, a week, a month, then
@@ -89,11 +95,11 @@ const planLabel = (id: PlanView) => PLAN_VIEWS.find((view) => view.id === id)?.l
  * (with a Zähler, a Belohnungstafel), Monat and Sammeln boards.
  */
 export const SPANS: Span[] = [
-  { id: "day", label: kindLabel("day"), type: "plan" },
-  { id: "week", label: kindLabel("week"), type: "plan" },
-  { id: "month", label: kindLabel("month"), type: "board" },
-  { id: "first-then", label: planLabel("first-then"), type: "plan" },
-  { id: "collect", label: kindLabel("collect"), type: "board" },
+  { id: "day", label: kindLabel("day"), type: "plan", hint: kindHint("day") },
+  { id: "week", label: kindLabel("week"), type: "plan", hint: kindHint("week") },
+  { id: "month", label: kindLabel("month"), type: "board", hint: kindHint("month") },
+  { id: "first-then", label: planLabel("first-then"), type: "plan", hint: planHint("first-then") },
+  { id: "collect", label: kindLabel("collect"), type: "board", hint: kindHint("collect") },
 ];
 
 /** The span a draft is in: its view, of either kind. */
@@ -118,11 +124,20 @@ export function draftInSpan(span: Span, from: Draft, language: TargetLanguageId)
   if (span.type === "plan") {
     const template = PLAN_TEMPLATES.find((tpl) => tpl.view === span.id) ?? PLAN_TEMPLATES[0];
     const stars = from.type === "plan" ? counterOf(from.plan) : 1;
-    const plan = withCounter({ ...planFromTemplate(template, language), childName, theme }, stars);
-    return { type: "plan", plan: { ...plan, reward } };
+    const made = { ...planFromTemplate(template, language), childName, theme };
+    // A week that counts stars is a reward chart's week: the same tasks every day, a row each (`WeekStars`), not the
+    // Kita's Wochenplan, whose days differ.
+    const week = span.id === "week" && stars > 0 ? rewardWeek(made) : made;
+    return { type: "plan", plan: { ...withCounter(week, stars), reward } };
   }
   const template = TEMPLATES.find((tpl) => tpl.kind === span.id) ?? TEMPLATES[0];
   return { type: "board", board: { ...boardFromTemplate(template, language), id: newId(), childName, theme, reward } };
+}
+
+/** The Belohnungstafel's week as a plan: the board Vorlage „woche“'s tasks, the same every day. */
+function rewardWeek(plan: Plan): Plan {
+  const tasks = TEMPLATES.find((tpl) => tpl.id === "woche")?.tasks ?? [];
+  return { ...plan, days: [tasks.map((id) => ({ ...stepFromCatalog(id), id }))], same: true };
 }
 
 /** Cards a plan offers: the day's activities first, then the tasks of the Belohnungstafel. */
@@ -130,8 +145,8 @@ const OFFERED = [...ACTIVITIES, ...TASKS];
 
 /** What a tap on the sheet opened: a card, a place to add one, the reward, or a board's task. */
 type Editing =
-  | { what: "card"; key: string }
-  | { what: "add"; part?: Slot; day?: string }
+  | { what: "card"; key: string; every?: boolean }
+  | { what: "add"; part?: Slot; day?: string; every?: boolean }
   | { what: "reward" }
   | { what: "task"; id: string }
   | { what: "add-task" };
@@ -144,6 +159,68 @@ const COUNTER: Localized = { de: "Zähler" };
 const HOW_MANY: Localized = { de: "Anzahl Karten" };
 /** „Zeitraum“: what time the chart covers. */
 const SPAN: Localized = { de: "Zeitraum" };
+
+/** The chart itself of a draft: what changes when anything on it changes (the draft around it is made anew on every render). */
+const chartOf = (draft: Draft): Board | Plan => (draft.type === "board" ? draft.board : draft.plan);
+
+/** Letters typed within this time join one change, so ↶ takes back a word, not a letter. */
+const TYPING_MS = 1500;
+
+/** Whether the focus is in a box for words, where Ctrl+Z belongs to the browser's own undo of the letters. */
+const inTextBox = (el: Element | null) => el instanceof HTMLTextAreaElement || (el instanceof HTMLInputElement && el.type === "text");
+
+/**
+ * ↶ and ↷ for a chart being made or changed (user feedback, November 2026): every change of the draft – on the sheet,
+ * in the options or under „Weitere Einstellungen“ – is noted, and Ctrl+Z / Ctrl+Shift+Z (⌘ on a Mac) and Ctrl+Y work
+ * too, outside a box for words.
+ */
+function useDraftHistory(draft: Draft, onChange: (draft: Draft) => void) {
+  const [history, setHistory] = useState<History<Draft>>(emptyHistory);
+  const seen = useRef(draft);
+  const jumped = useRef<Board | Plan | null>(null);
+  const typed = useRef(0);
+
+  useEffect(() => {
+    const before = seen.current;
+    seen.current = draft;
+    if (chartOf(before) === chartOf(draft)) return;
+    if (jumped.current === chartOf(draft)) {
+      jumped.current = null;
+      return;
+    }
+    const typing = inTextBox(document.activeElement);
+    const merge = typing && Date.now() - typed.current < TYPING_MS;
+    typed.current = typing ? Date.now() : 0;
+    setHistory((h) => record(h, before, merge));
+  }, [draft]);
+
+  const jump = (step: { history: History<Draft>; value: Draft } | null) => {
+    if (!step) return;
+    jumped.current = chartOf(step.value);
+    typed.current = 0;
+    setHistory(step.history);
+    onChange(step.value);
+  };
+  const back = () => jump(undo(history, draft));
+  const forward = () => jump(redo(history, draft));
+
+  const keys = useRef({ back, forward });
+  keys.current = { back, forward };
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (!(event.ctrlKey || event.metaKey) || event.altKey || inTextBox(document.activeElement)) return;
+      const key = event.key.toLowerCase();
+      if (key === "z" && !event.shiftKey) keys.current.back();
+      else if ((key === "z" && event.shiftKey) || key === "y") keys.current.forward();
+      else return;
+      event.preventDefault();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  return { canUndo: history.past.length > 0, canRedo: history.future.length > 0, back, forward };
+}
 
 /**
  * A chart as it will look, changed right on it – the same in the wizard and under „Gestalten“ (user decision,
@@ -182,6 +259,7 @@ export function ChartEditor({
   const [aspect, setAspect] = useState(1.6);
   const [editing, setEditing] = useState<Editing | null>(null);
   const today = new Date();
+  const { canUndo, canRedo, back, forward } = useDraftHistory(draft, onChange);
 
   useEffect(() => {
     const el = box.current;
@@ -194,8 +272,19 @@ export function ChartEditor({
   const onClick = (event: React.MouseEvent) => {
     const el = (event.target as Element).closest<HTMLElement>("[data-edit], [data-step]");
     if (!el) return;
-    const { edit, part, day: dayId, task, step } = el.dataset;
-    if (draft.type === "plan" && edit === "row" && part) {
+    const { edit, part, day: dayId, task, step, cell, by, every, rowStep } = el.dataset;
+    const all = every !== undefined;
+    if (draft.type === "plan" && edit === "stars" && cell) {
+      // ± on a card: its own stars, on every day where the days are alike or in a week's grid, else that weekday's.
+      const plan = draft.plan;
+      const { day: cellDay, taskId } = parseCellKey(cell);
+      const own = stepsOn(plan, cellDay).find((s) => s.id === taskId);
+      if (!own) return;
+      const n = Math.max(0, Math.min(MAX_STARS, starsOf(own) + Number(by)));
+      onChange({ type: "plan", plan: withStepStars(plan, all || (plan.same && plan.view !== "week") ? null : weekday(cellDay), taskId, n) });
+    } else if (draft.type === "plan" && edit === "row" && rowStep) {
+      onChange({ type: "plan", plan: withEveryDay(draft.plan, (steps) => steps.filter((s) => s.id !== rowStep)) });
+    } else if (draft.type === "plan" && edit === "row" && part) {
       const plan = draft.plan;
       onChange({
         type: "plan",
@@ -205,10 +294,11 @@ export function ChartEditor({
           stepsOn(plan, day).filter((s) => s.part !== part),
         ),
       });
-    } else if (edit === "add") setEditing(draft.type === "board" ? { what: "add-task" } : { what: "add", part: part as Slot | undefined, day: dayId });
+    } else if (edit === "add")
+      setEditing(draft.type === "board" ? { what: "add-task" } : { what: "add", part: part as Slot | undefined, day: dayId, every: all });
     else if (edit === "reward") setEditing({ what: "reward" });
     else if (edit === "task" && task) setEditing({ what: "task", id: task });
-    else if (step) setEditing({ what: "card", key: step });
+    else if (step) setEditing({ what: "card", key: step, every: all });
   };
 
   const spans = making
@@ -237,117 +327,155 @@ export function ChartEditor({
 
   return (
     <div className="rw-chart-editor">
-      <div className="rw-options">
-        <Segments
-          label={t(SPAN)}
-          items={spans.map((span) => ({ id: span.id, label: t(span.label) }))}
-          selected={spanOf(draft)}
-          onPick={(id) => pickSpan(spans.find((span) => span.id === id) ?? spans[0])}
-        />
-        {plan && <Counter emoji="⭐" label={t(COUNTER)} value={counterOf(plan)} min={0} max={MAX_STARS} onChange={setCounter} />}
-        {counts && (
-          <button
-            type="button"
-            role="switch"
-            aria-checked={!!reward}
-            className="rw-reward-switch"
-            onClick={() => setReward(reward ? null : draft.type === "board" ? rewardFromCatalog(REWARDS[0].id) : defaultReward())}
-          >
-            <span aria-hidden>🎁</span> {t(REWARD)}
-            <span className="rw-switch-track" aria-hidden />
-          </button>
-        )}
-        {plan?.view === "day" && shape && (
-          <>
-            <Segments
-              label={t({ de: "Tag aufteilen?" })}
-              items={[
-                { id: "split", label: `☀️🌙 ${t({ de: "Morgens und abends" })}` },
-                { id: "whole", label: `🌈 ${t({ de: "Am Stück" })}` },
-              ]}
-              selected={shape.split ? "split" : "whole"}
-              onPick={(id) => setPlan(withShape(plan, id === "split" ? DAY_SHAPES.split : DAY_SHAPES.whole))}
-            />
-            <span className="rw-opt-group" role="group" aria-label={t(HOW_MANY)}>
-              <span className="rw-opt-name">{t(HOW_MANY)}</span>
-              {shape.counts.map((count, i) => {
-                const slot = shape.split ? SLOT_BY_ID.get(DAY_PARTS[i]) : undefined;
-                return (
-                  <Counter
-                    key={slot?.id ?? "whole"}
-                    emoji={slot?.emoji}
-                    label={slot ? t(slot.label) : t(HOW_MANY)}
-                    value={count}
-                    min={partFloor(shape, i)}
-                    max={partRoom(shape, i)}
-                    onChange={(n) => setPlan(withShape(plan, { ...shape, counts: shape.counts.map((c, j) => (j === i ? n : c)) }))}
-                  />
-                );
-              })}
+      <section className="rw-options-band" aria-label={t({ de: "Art der Tafel und Einstellungen" })}>
+        <div className="rw-spans" role="group" aria-label={t(SPAN)}>
+          <span className="rw-band-label">{t(SPAN)}</span>
+          {spans.map((span) => (
+            <button
+              key={span.id}
+              type="button"
+              className="rw-span"
+              aria-pressed={span.id === spanOf(draft)}
+              title={span.hint ? t(span.hint) : undefined}
+              onClick={() => pickSpan(span)}
+            >
+              <SpanPic id={span.id} />
+              <span className="rw-span-name">{t(span.label)}</span>
+            </button>
+          ))}
+        </div>
+        {making && (
+          <p className="rw-tip">
+            <span className="rw-tip-arrow" aria-hidden>
+              ⤴
             </span>
-          </>
+            {t({
+              de: "Wechseln Sie hier frei zwischen Tag, Woche, Monat, Erst – Dann und Sammeln, und stellen Sie darunter alles ein. Auch später lässt sich alles ändern.",
+            })}
+          </p>
         )}
-        {/* Only where nothing counts: with star fields the stars show what is done, and nothing moves. */}
-        {plan?.view === "day" && !counts && (
-          <span className="rw-opt-segments" role="group" aria-label={t({ de: "Was wandert?" })}>
-            {NOW_WAYS.map((way) => (
-              <button
-                key={way.emoji}
-                type="button"
-                aria-pressed={way.field === !!plan.nowField}
-                title={t(way.print)}
-                onClick={() => setPlan({ ...plan, nowField: way.field })}
-              >
-                <span className="rw-opt-pic" aria-hidden>
-                  {way.field ? way.emoji : <PaperArrow />}
-                </span>
-                {t(way.label)}
-                <span className="rw-opt-print" aria-hidden>
-                  {way.field ? "✂️" : "🖨️"}
-                </span>
-              </button>
-            ))}
-          </span>
-        )}
-        <span className="rw-opt-group rw-swatches" role="group" aria-label={t({ de: "Farben" })}>
-          {THEMES.map((theme) => {
-            const on = (draft.type === "board" ? draft.board.theme : draft.plan.theme) === theme.id;
-            return (
-              <button
-                key={theme.id}
-                type="button"
-                className="rw-swatch"
-                aria-pressed={on}
-                aria-label={t(theme.label)}
-                title={t(theme.label)}
-                style={{ background: theme.paper, borderColor: theme.ink, boxShadow: `inset 0 0 0 5px ${theme.main}` }}
-                onClick={() =>
-                  onChange(
-                    draft.type === "board"
-                      ? { type: "board", board: { ...draft.board, theme: theme.id } }
-                      : { type: "plan", plan: { ...draft.plan, theme: theme.id } },
-                  )
-                }
+        <div className="rw-options">
+          {plan && <Counter emoji="⭐" label={t(COUNTER)} value={counterOf(plan)} min={0} max={MAX_STARS} onChange={setCounter} />}
+          {counts && (
+            <button
+              type="button"
+              role="switch"
+              aria-checked={!!reward}
+              className="rw-reward-switch"
+              onClick={() => setReward(reward ? null : draft.type === "board" ? rewardFromCatalog(REWARDS[0].id) : defaultReward())}
+            >
+              <span aria-hidden>🎁</span> {t(REWARD)}
+              <span className="rw-switch-track" aria-hidden />
+            </button>
+          )}
+          {plan?.view === "day" && shape && (
+            <>
+              <Segments
+                label={t({ de: "Tag aufteilen?" })}
+                items={[
+                  { id: "split", label: `☀️🌙 ${t({ de: "Morgens und abends" })}` },
+                  { id: "whole", label: `🌈 ${t({ de: "Am Stück" })}` },
+                ]}
+                selected={shape.split ? "split" : "whole"}
+                onPick={(id) => setPlan(withShape(plan, id === "split" ? DAY_SHAPES.split : DAY_SHAPES.whole))}
               />
-            );
-          })}
+              <span className="rw-opt-group" role="group" aria-label={t(HOW_MANY)}>
+                <span className="rw-opt-name">{t(HOW_MANY)}</span>
+                {shape.counts.map((count, i) => {
+                  const slot = shape.split ? SLOT_BY_ID.get(DAY_PARTS[i]) : undefined;
+                  return (
+                    <Counter
+                      key={slot?.id ?? "whole"}
+                      emoji={slot?.emoji}
+                      label={slot ? t(slot.label) : t(HOW_MANY)}
+                      value={count}
+                      min={partFloor(shape, i)}
+                      max={partRoom(shape, i)}
+                      onChange={(n) => setPlan(withShape(plan, { ...shape, counts: shape.counts.map((c, j) => (j === i ? n : c)) }))}
+                    />
+                  );
+                })}
+              </span>
+            </>
+          )}
+          {/* Only where nothing counts: with star fields the stars show what is done, and nothing moves. */}
+          {plan?.view === "day" && !counts && (
+            <span className="rw-opt-segments" role="group" aria-label={t({ de: "Was wandert?" })}>
+              {NOW_WAYS.map((way) => (
+                <button
+                  key={way.emoji}
+                  type="button"
+                  aria-pressed={way.field === !!plan.nowField}
+                  title={t(way.print)}
+                  onClick={() => setPlan({ ...plan, nowField: way.field })}
+                >
+                  <span className="rw-opt-pic" aria-hidden>
+                    {way.field ? way.emoji : <PaperArrow />}
+                  </span>
+                  {t(way.label)}
+                  <span className="rw-opt-print" aria-hidden>
+                    {way.field ? "✂️" : "🖨️"}
+                  </span>
+                </button>
+              ))}
+            </span>
+          )}
+          <span className="rw-opt-group rw-swatches" role="group" aria-label={t({ de: "Farben" })}>
+            {THEMES.map((theme) => {
+              const on = (draft.type === "board" ? draft.board.theme : draft.plan.theme) === theme.id;
+              return (
+                <button
+                  key={theme.id}
+                  type="button"
+                  className="rw-swatch"
+                  aria-pressed={on}
+                  aria-label={t(theme.label)}
+                  title={t(theme.label)}
+                  style={{ background: theme.paper, borderColor: theme.ink, boxShadow: `inset 0 0 0 5px ${theme.main}` }}
+                  onClick={() =>
+                    onChange(
+                      draft.type === "board"
+                        ? { type: "board", board: { ...draft.board, theme: theme.id } }
+                        : { type: "plan", plan: { ...draft.plan, theme: theme.id } },
+                    )
+                  }
+                />
+              );
+            })}
+          </span>
+          <input
+            className="rw-opt-name-input"
+            type="text"
+            value={draft.type === "board" ? draft.board.childName : draft.plan.childName}
+            maxLength={24}
+            aria-label={t(CHILD_NAME)}
+            title={t(CHILD_NAME)}
+            placeholder={`👧 ${t({ de: "Name des Kindes" })}`}
+            onChange={(e) =>
+              onChange(
+                draft.type === "board"
+                  ? { type: "board", board: { ...draft.board, childName: e.target.value } }
+                  : { type: "plan", plan: { ...draft.plan, childName: e.target.value } },
+              )
+            }
+          />
+        </div>
+      </section>
+
+      <div className="rw-edit-bar">
+        <p className="rw-wysiwyg">
+          <span className="rw-wysiwyg-pic" aria-hidden>
+            ✏️
+          </span>
+          <span>
+            <strong>{t({ de: "Direkt auf der Tafel ändern:" })}</strong>{" "}
+            {t({ de: "Tippen Sie auf Karten, Sterne und Belohnung. So wie Sie die Tafel hier sehen, wird sie auch gedruckt." })}
+          </span>
+        </p>
+        <span className="rw-history" role="group" aria-label={t({ de: "Rückgängig und Wiederholen" })}>
+          <UndoButton sign="↶" label={t({ de: "Rückgängig" })} on={canUndo} onClick={back} />
+          <UndoButton sign="↷" label={t({ de: "Wiederholen" })} on={canRedo} onClick={forward} />
         </span>
-        <input
-          className="rw-opt-name-input"
-          type="text"
-          value={draft.type === "board" ? draft.board.childName : draft.plan.childName}
-          maxLength={24}
-          aria-label={t(CHILD_NAME)}
-          title={t(CHILD_NAME)}
-          placeholder={`👧 ${t({ de: "Name des Kindes" })}`}
-          onChange={(e) =>
-            onChange(
-              draft.type === "board"
-                ? { type: "board", board: { ...draft.board, childName: e.target.value } }
-                : { type: "plan", plan: { ...draft.plan, childName: e.target.value } },
-            )
-          }
-        />
       </div>
 
       {/* In a row, like the chart on the page (`rw-main`): only there the sheet gets the box's whole height. */}
@@ -386,12 +514,15 @@ export function ChartEditor({
         </details>
       )}
 
-      {editing && plan && editing.what === "card" && <CardDialog plan={plan} cellKey={editing.key} onChange={setPlan} onClose={() => setEditing(null)} />}
+      {editing && plan && editing.what === "card" && (
+        <CardDialog plan={plan} cellKey={editing.key} every={editing.every} onChange={setPlan} onClose={() => setEditing(null)} />
+      )}
       {editing && plan && editing.what === "add" && (
         <AddDialog
           plan={plan}
           day={editing.day ? parseCellKey(`${editing.day}|x`).day : day}
           part={editing.part}
+          every={editing.every}
           onChange={setPlan}
           onClose={() => setEditing(null)}
         />
@@ -406,6 +537,51 @@ export function ChartEditor({
         />
       )}
     </div>
+  );
+}
+
+/**
+ * ↶ or ↷ with its word. With nothing to undo it is hidden but keeps its place, so the other doesn't jump (a button that
+ * can do nothing is never shown greyed).
+ */
+function UndoButton({ sign, label, on, onClick }: { sign: string; label: string; on: boolean; onClick: () => void }) {
+  return (
+    <button type="button" className={`rw-history-button${on ? "" : " off"}`} tabIndex={on ? 0 : -1} aria-hidden={!on} title={label} onClick={onClick}>
+      <span className="rw-history-sign" aria-hidden>
+        {sign}
+      </span>
+      <span className="rw-history-name">{label}</span>
+    </button>
+  );
+}
+
+/**
+ * A Zeitraum's small picture: the shape its chart has – a day's cards in a row, a week's seven columns, a month's
+ * calendar, two cards with an arrow, a path of dots to the reward – so the choice reads at a glance as another chart.
+ */
+function SpanPic({ id }: { id: SpanId }) {
+  const box = (x: number, y: number, w: number, h: number, key?: string | number) => <rect key={key} x={x} y={y} width={w} height={h} rx={1.5} />;
+  return (
+    <svg className="rw-span-pic" viewBox="0 0 48 32" aria-hidden>
+      {id === "day" && [4, 18, 32].map((x) => box(x, 9, 12, 14, x))}
+      {id === "week" && Array.from({ length: 7 }, (_, i) => box(3 + i * 6.2, 5, 4.6, 22, i))}
+      {id === "month" && Array.from({ length: 20 }, (_, i) => box(4 + (i % 5) * 8.2, 4 + Math.floor(i / 5) * 6.2, 6.4, 4.8, i))}
+      {id === "first-then" && (
+        <>
+          {box(4, 8, 15, 16)}
+          <path d="M22 16h6m-3-3 3 3-3 3" fill="none" />
+          {box(30, 8, 15, 16)}
+        </>
+      )}
+      {id === "collect" && (
+        <>
+          {[6, 14, 22, 30].map((x, i) => (
+            <circle key={x} cx={x} cy={i % 2 ? 12 : 21} r={3} />
+          ))}
+          <path d="M38 13h7v9h-7z M41.5 13v9 M38 16h7" fill="none" />
+        </>
+      )}
+    </svg>
   );
 }
 
@@ -507,7 +683,20 @@ const cardIn = (id: string, part: Slot | undefined, stars: number): PlanStep => 
 };
 
 /** A card tapped: its stars (that day or every day), earlier or later, removed, or swapped for another picture. */
-function CardDialog({ plan, cellKey, onChange, onClose }: { plan: Plan; cellKey: string; onChange: (plan: Plan) => void; onClose: () => void }) {
+function CardDialog({
+  plan,
+  cellKey,
+  every = false,
+  onChange,
+  onClose,
+}: {
+  plan: Plan;
+  cellKey: string;
+  /** Tapped at the head of a week's grid: the card of every day changes alike. */
+  every?: boolean;
+  onChange: (plan: Plan) => void;
+  onClose: () => void;
+}) {
   const t = useT();
   const stepLabel = useStepLabel();
   const { day, taskId } = parseCellKey(cellKey);
@@ -516,15 +705,19 @@ function CardDialog({ plan, cellKey, onChange, onClose }: { plan: Plan; cellKey:
   const step = steps[index];
   const weekdayName = t(DAY_NAMES)[weekday(day)];
   // In the week a card is that day's; on a day's plan alike every day the stars are every day's, or only this weekday's.
-  const [onlyToday, setOnlyToday] = useState(plan.view === "week" || !plan.same);
+  const [onlyToday, setOnlyToday] = useState(!every && (plan.view === "week" || !plan.same));
   if (!step) return null;
-  const setSteps = (next: PlanStep[]) => onChange(withDay(plan, day, next));
-  const move = (by: number) => {
-    const next = [...steps];
-    next.splice(index, 1);
-    next.splice(index + by, 0, step);
-    setSteps(next);
-  };
+  /** The tapped day's cards changed, or with `every` each day's alike. */
+  const change = (edit: (list: PlanStep[]) => PlanStep[]) => onChange(every ? withEveryDay(plan, edit) : withDay(plan, day, edit(steps)));
+  const move = (by: number) =>
+    change((list) => {
+      const at = list.findIndex((s) => s.id === step.id);
+      if (at < 0) return list;
+      const next = [...list];
+      next.splice(at, 1);
+      next.splice(at + by, 0, list[at]);
+      return next;
+    });
   return (
     <EditDialog
       title={
@@ -547,7 +740,7 @@ function CardDialog({ plan, cellKey, onChange, onClose }: { plan: Plan; cellKey:
           max={MAX_STARS}
           onChange={(n) => onChange(withStepStars(plan, onlyToday ? weekday(day) : null, step.id, n))}
         />
-        {plan.view !== "week" && (
+        {plan.view !== "week" && !every && (
           <Segments
             label={t({ de: "Für welche Tage?" })}
             items={[
@@ -570,7 +763,7 @@ function CardDialog({ plan, cellKey, onChange, onClose }: { plan: Plan; cellKey:
           type="button"
           className="rw-edit-button"
           onClick={() => {
-            setSteps(steps.filter((s) => s.id !== step.id));
+            change((list) => list.filter((s) => s.id !== step.id));
             onClose();
           }}
         >
@@ -581,7 +774,9 @@ function CardDialog({ plan, cellKey, onChange, onClose }: { plan: Plan; cellKey:
       <CardPicks
         selected={step.catalog}
         onPick={(id) => {
-          setSteps(steps.map((s) => (s.id === step.id ? cardIn(id, s.part, starsOf(s)) : s)));
+          // One new id for every day's card, so a week's row stays one row.
+          const fresh = newId();
+          change((list) => list.map((s) => (s.id === step.id ? { ...cardIn(id, s.part, starsOf(s)), id: fresh } : s)));
           onClose();
         }}
       />
@@ -589,16 +784,33 @@ function CardDialog({ plan, cellKey, onChange, onClose }: { plan: Plan; cellKey:
   );
 }
 
-/** ＋ tapped: a card for that part of the day (or that day of the week), at its end. */
-function AddDialog({ plan, day, part, onChange, onClose }: { plan: Plan; day: Date; part?: Slot; onChange: (plan: Plan) => void; onClose: () => void }) {
+/** ＋ tapped: a card for that part of the day (or that day of the week, or with `every` every day of a week's grid), at its end. */
+function AddDialog({
+  plan,
+  day,
+  part,
+  every = false,
+  onChange,
+  onClose,
+}: {
+  plan: Plan;
+  day: Date;
+  part?: Slot;
+  every?: boolean;
+  onChange: (plan: Plan) => void;
+  onClose: () => void;
+}) {
   const t = useT();
   const steps = stepsOn(plan, day);
   const add = (id: string) => {
     const card = cardIn(id, part, counterOf(plan));
     // After the part's last card; a morning that was taken away comes back before the evening.
-    const last = steps.findLastIndex((s) => s.part === part);
-    const at = last >= 0 ? last + 1 : part === "morning" ? 0 : steps.length;
-    onChange(withDay(plan, day, [...steps.slice(0, at), card, ...steps.slice(at)]));
+    const placed = (list: PlanStep[]) => {
+      const last = list.findLastIndex((s) => s.part === part);
+      const at = last >= 0 ? last + 1 : part === "morning" ? 0 : list.length;
+      return [...list.slice(0, at), card, ...list.slice(at)];
+    };
+    onChange(every ? withEveryDay(plan, placed) : withDay(plan, day, placed(steps)));
     onClose();
   };
   return (

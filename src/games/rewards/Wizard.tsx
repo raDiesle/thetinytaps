@@ -36,11 +36,30 @@ export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDon
   const { id: language } = useAppLanguage();
   const [draft, setDraft] = useState<Draft>(() => (start ? fromStart(start, language) : defaultDraft(language)));
   const reward = draft.type === "board" || counting(draft.plan);
+  const done = reward
+    ? t({ de: "Tafel anlegen", en: "Create chart", zh: "创建奖励表", hi: "चार्ट बनाएँ", es: "Crear tabla", ar: "إنشاء اللوحة", ru: "Создать таблицу" })
+    : t({ de: "Plan anlegen", en: "Create plan", zh: "创建日程表", hi: "योजना बनाएँ", es: "Crear plan", ar: "إنشاء الخطة", ru: "Создать план" });
   return (
     <section
       className="rw-wizard"
       aria-label={t({ de: "Neu anlegen", en: "Create new", zh: "新建", hi: "नया बनाएँ", es: "Crear nuevo", ar: "إنشاء جديد", ru: "Создать" })}
     >
+      {/* On top and in sight while the page scrolls (user feedback, November 2026): printing, and the one button that makes it. */}
+      <header className="rw-wizard-head">
+        <PrintBadge />
+        <span className="rw-wizard-actions">
+          {onCancel && (
+            <button type="button" className="rw-wizard-back" onClick={onCancel}>
+              {t({ de: "Abbrechen", en: "Cancel", zh: "取消", hi: "रद्द करें", es: "Cancelar", ar: "إلغاء", ru: "Отмена" })}
+            </button>
+          )}
+          {ready(draft) && (
+            <button type="button" className="rw-wizard-done" onClick={() => onDone(draft)}>
+              <span aria-hidden>✓</span> {done}
+            </button>
+          )}
+        </span>
+      </header>
       <ChartEditor
         draft={draft}
         onChange={setDraft}
@@ -53,43 +72,25 @@ export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDon
           )
         }
       />
-      <footer className="rw-wizard-foot">
-        <Help />
-        {onCancel && (
-          <button type="button" className="rw-wizard-back" onClick={onCancel}>
-            {t({ de: "Abbrechen", en: "Cancel", zh: "取消", hi: "रद्द करें", es: "Cancelar", ar: "إلغاء", ru: "Отмена" })}
-          </button>
-        )}
-        <button type="button" className="rw-wizard-done" disabled={!ready(draft)} onClick={() => onDone(draft)}>
-          ✓{" "}
-          {reward
-            ? t({
-                de: "Tafel anlegen",
-                en: "Create chart",
-                zh: "创建奖励表",
-                hi: "चार्ट बनाएँ",
-                es: "Crear tabla",
-                ar: "إنشاء اللوحة",
-                ru: "Создать таблицу",
-              })
-            : t({ de: "Plan anlegen", en: "Create plan", zh: "创建日程表", hi: "योजना बनाएँ", es: "Crear plan", ar: "إنشاء الخطة", ru: "Создать план" })}
-        </button>
-      </footer>
     </section>
   );
 }
 
 /**
- * What the wizard is for (user feedback, October 2026): the chart works on screen, printed to make at home or ordered
- * as photo prints – and how it is changed right on it.
+ * That the chart prints, said on the first page a visitor sees (user feedback, November 2026): on A4, as photo prints
+ * for a Velcro board, or used right here on the screen. A stamp, not a button – there is nothing to print before it is made.
  */
-function Help() {
+function PrintBadge() {
   const t = useT();
   return (
-    <p className="rw-wizard-help">
-      {t({
-        de: "Nutzen Sie die Tafel hier am Bildschirm, drucken Sie sie aus oder bestellen Sie die Bilder als Fotoabzug. Tippen Sie auf eine Karte, um sie zu tauschen, auf ＋ für eine neue und auf die Belohnung, um sie zu ändern.",
-      })}
+    <p className="rw-print-badge">
+      <span className="rw-print-badge-pic" aria-hidden>
+        🖨️
+      </span>
+      <span>
+        <strong>{t({ de: "Zum Ausdrucken" })}</strong>{" "}
+        <span className="rw-print-badge-more">{t({ de: "auf A4 oder als Fotoabzug – oder hier am Bildschirm abhaken" })}</span>
+      </span>
     </p>
   );
 }

@@ -575,15 +575,30 @@
 
 /* ---------- The Zähler: star fields on the cards, and the reward at the sheet's end ---------- */
 
-/* A card that counts stars keeps room at its foot for them; the picture shrinks a little. */
+/*
+ * A card that counts stars is taller than wide (`STAR_CARD`): the picture above, a row of big star fields below, like
+ * the Belohnungstafel's fields (user feedback, November 2026: the generalised plan's small dots looked poorer).
+ */
+.pl-counts .pl-steps > .pl-slot {
+  aspect-ratio: 0.8;
+}
+
+.pl-marked.pl-counts .pl-slot > .pl-card {
+  margin: 1.5cqmin;
+}
+
 .pl-card.has-stars {
   justify-content: flex-start;
-  gap: 1cqmin;
-  padding-top: 3cqmin;
+  gap: 2cqmin;
+  padding: 4cqmin 3cqmin 3cqmin;
 }
 
 .pl-card.has-stars .pl-emoji {
-  font-size: 46cqmin;
+  display: grid;
+  flex: 1;
+  place-items: center;
+  min-height: 0;
+  font-size: 52cqmin;
 }
 
 .pl-card.small.has-stars .pl-emoji {
@@ -592,43 +607,27 @@
 
 .pl-stars {
   display: flex;
-  flex-wrap: wrap;
+  flex: none;
   justify-content: center;
-  gap: 2cqmin;
-  margin-top: auto;
+  gap: 1.5cqw;
+  width: 100%;
+  height: 34cqh;
 }
 
+/* Each field is a container, so the board's ring (84cqmin) fits it, whether a card holds one star or five. */
 .pl-star {
-  box-sizing: border-box;
-  display: grid;
-  place-items: center;
-  width: 19cqmin;
-  height: 19cqmin;
-  border: max(1.5px, 1.6cqmin) dashed var(--rw-ink);
-  border-radius: 50%;
-  background: #fff;
-  font-family: var(--font-emoji);
-  font-size: 14cqmin;
-  line-height: 1;
+  container-type: size;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 34cqh;
+  height: 100%;
 }
 
-.pl-star.filled {
-  border-style: solid;
-  border-color: var(--rw-main);
-  background: color-mix(in srgb, var(--rw-main) 30%, #fff);
-}
-
-.pl-card.small .pl-star {
-  width: 24cqmin;
-  height: 24cqmin;
-  font-size: 18cqmin;
-}
-
-.pl-card.fresh .pl-star.last {
+.pl-card.fresh .pl-star.last .rw-mark {
   animation: pl-tick-in 0.5s ease-out;
 }
 
-.pl-card.twinkle .pl-star.filled {
+.pl-card.twinkle .pl-star.filled .rw-mark {
   animation: pl-twinkle 0.6s ease-in-out;
 }
 
@@ -681,12 +680,6 @@
   font-weight: 800;
   line-height: 1.1;
   overflow-wrap: anywhere;
-}
-
-.pl-goal-count {
-  font-size: clamp(0.7rem, 14cqi, 1.8rem);
-  font-weight: 800;
-  white-space: nowrap;
 }
 
 .pl-goal-add {
@@ -743,27 +736,108 @@
   font-size: clamp(0.9rem, 4cqmin, 1.6rem);
 }
 
+/* A part's sign stands for its whole line: big, with room above it for 🗑️ while the chart is made. */
 .pl-part {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1cqmin;
 }
 
-/* The ✕ that takes a line of the day away, on its sun or moon. */
+.pl-part-sign {
+  font-size: clamp(1.4rem, 11cqmin, 5rem);
+  line-height: 1;
+}
+
+/* 🗑️ takes the whole line away; a mouse over it marks the line it would take, before the click. */
 .pl-row-remove {
-  position: absolute;
-  top: -0.35em;
-  right: -0.45em;
   display: grid;
   place-items: center;
-  width: 0.8em;
-  height: 0.8em;
-  border: 2px solid var(--rw-ink);
+  width: max(30px, 1.25em);
+  height: max(30px, 1.25em);
+  border: max(2px, 0.4cqmin) solid var(--rw-ink);
   border-radius: 50%;
   background: #fff;
-  color: var(--rw-ink);
-  font-family: inherit;
-  font-size: 0.5em;
-  font-weight: 900;
+  font-size: clamp(0.8rem, 4.5cqmin, 1.8rem);
   cursor: pointer;
+}
+
+.pl-row-remove:hover,
+.pl-row-remove:focus-visible {
+  border-color: #c62828;
+  background: #ffebee;
+}
+
+.pl-row:has(> .pl-part .pl-row-remove:hover),
+.pl-wrow:has(.pl-row-remove:hover) > * {
+  background: color-mix(in srgb, #e53935 14%, transparent);
+  outline: max(2px, 0.5cqmin) dashed #c62828;
+  outline-offset: -1px;
+}
+
+.pl-row:has(> .pl-part .pl-row-remove:hover) .pl-card,
+.pl-wrow:has(.pl-row-remove:hover) .pl-wcell .pl-stars,
+.pl-wrow:has(.pl-row-remove:hover) .pl-whead .pl-emoji {
+  opacity: 0.45;
+}
+
+.pl-row:has(> .pl-part .pl-row-remove:hover) {
+  border-radius: 2cqmin;
+}
+
+/* − ⭐ ＋ on a card while it is made: its own number of stars, in its top corner. */
+.pl-stepper {
+  position: absolute;
+  z-index: 2;
+  top: 2cqmin;
+  right: 2cqmin;
+  display: flex;
+  align-items: center;
+  gap: 0.15em;
+  padding: 0.1em;
+  border: max(1.5px, 1cqmin) solid var(--rw-ink);
+  border-radius: 999px;
+  background: #fff;
+  font-size: max(12px, 9cqmin);
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 0.15em 0 color-mix(in srgb, var(--rw-ink) 35%, transparent);
+}
+
+.pl-stepper-button {
+  display: grid;
+  place-items: center;
+  width: 1.4em;
+  height: 1.4em;
+  border-radius: 50%;
+  background: var(--rw-main);
+  cursor: pointer;
+}
+
+.pl-stepper-button:hover {
+  background: color-mix(in srgb, var(--rw-main) 60%, var(--rw-ink));
+  color: #fff;
+}
+
+.pl-stepper-button.off {
+  visibility: hidden;
+}
+
+.pl-stepper-count {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.pl-stepper-star {
+  font-family: var(--font-emoji);
+  font-size: 0.8em;
+}
+
+.pl-card.small .pl-stepper {
+  top: -1cqmin;
+  right: -1cqmin;
+  font-size: max(11px, 14cqmin);
 }
 
 .pl-part-back {
@@ -775,4 +849,134 @@
   font-weight: 700;
   opacity: 0.7;
   cursor: pointer;
+}
+
+/* ---------- A week of stars: a row per card, a column per day, as a reward chart always was ---------- */
+
+.pl-wgrid {
+  display: grid;
+  flex: 1;
+  grid-template-columns: minmax(0, 1.5fr) repeat(7, minmax(0, 1fr));
+  align-content: center;
+  gap: 0.8cqmin;
+  min-height: 0;
+}
+
+.pl-wrow {
+  display: contents;
+}
+
+.pl-wday {
+  container-type: inline-size;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 0.6cqmin 0;
+  border-radius: 2cqmin 2cqmin 0 0;
+}
+
+.pl-wday.today,
+.pl-wcell.today {
+  background: color-mix(in srgb, var(--rw-main) 45%, transparent);
+}
+
+.pl-wday .pl-day {
+  min-height: 0;
+}
+
+.pl-whead {
+  container-type: size;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2cqmin;
+  min-width: 0;
+  min-height: 0;
+  /* Its own edge in the sheet's units: cq units on a container measure the one above it. */
+  padding: 0.5cqmin;
+  border: max(2px, 0.6cqmin) solid var(--rw-main);
+  border-radius: 2cqmin;
+  background: #fff;
+}
+
+.pl-whead > .pl-emoji {
+  font-family: var(--font-emoji);
+  font-size: 66cqmin;
+  line-height: 1;
+}
+
+.pl-whead > .pl-emoji .rw-pic {
+  width: 1.3em;
+  height: 1.3em;
+}
+
+.pl-whead > .pl-row-remove {
+  position: absolute;
+  top: 50%;
+  left: 3cqmin;
+  translate: 0 -50%;
+}
+
+.pl-whead > .pl-stepper {
+  top: auto;
+  right: 3cqmin;
+  bottom: 3cqmin;
+  font-size: max(11px, 12cqmin);
+}
+
+.pl-editing .pl-whead {
+  cursor: pointer;
+}
+
+.pl-editing .pl-whead:hover {
+  outline: max(2px, 0.5cqmin) dashed var(--rw-ink);
+  outline-offset: 2px;
+}
+
+/* A cell holds the card's fields for that day, as big as the cell allows. */
+.pl-wcell {
+  container-type: size;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 1cqmin;
+  border-radius: 2cqmin;
+}
+
+.pl-wcell > .pl-stars {
+  height: min(100%, 100cqw);
+  gap: 3cqmin;
+}
+
+.pl-wcell > .pl-stars > .pl-star {
+  max-width: none;
+}
+
+.pl-wcell.later {
+  opacity: 0.85;
+}
+
+.pl-wcell.fresh .pl-star.last .rw-mark {
+  animation: pl-tick-in 0.5s ease-out;
+}
+
+.pl-wcell.twinkle .pl-star.filled .rw-mark {
+  animation: pl-twinkle 0.6s ease-in-out;
+}
+
+.pl-wcell.wiggle {
+  animation: wiggle 0.45s ease-in-out;
+}
+
+.pl-wadd {
+  display: flex;
+  grid-column: 1 / -1;
+  min-height: 0;
+}
+
+.pl-wadd > .pl-add {
+  aspect-ratio: auto;
 }

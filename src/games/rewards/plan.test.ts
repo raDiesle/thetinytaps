@@ -26,6 +26,7 @@ import {
   planFromTemplate,
   restartDay,
   routineStep,
+  sameCards,
   shapeOf,
   splitDone,
   starsGot,
@@ -35,6 +36,7 @@ import {
   stepsOn,
   templateLists,
   withCounter,
+  withEveryDay,
   withSame,
   withShape,
   withStepStars,
@@ -383,5 +385,25 @@ describe("Zähler", () => {
     const step = stepsOn(plan, day)[0];
     expect(starsGot({ [cellKey(day, step.id)]: 5 }, NO_LINKED, day, step)).toBe(2);
     expect(starsGot(undefined, NO_LINKED, day, step)).toBe(0);
+  });
+});
+
+describe("a week's grid of stars", () => {
+  const week = PLAN_TEMPLATES.find((tpl) => tpl.id === "wochenplan");
+  if (!week) throw new Error("no Wochenplan");
+
+  test("sameCards: the same cards in the same order every day, whatever their stars", () => {
+    const plan = planFromTemplate(week, "de");
+    expect(sameCards(plan)).toBe(false);
+    const alike = withEveryDay(plan, () => plan.days[0]);
+    expect(sameCards(alike)).toBe(true);
+    expect(sameCards(withStepStars(alike, 2, plan.days[0][0].id, 3))).toBe(true);
+  });
+
+  test("withEveryDay changes every day alike, a row taken out of the whole week", () => {
+    const plan = withSame(withCounter(planFromTemplate(week, "de"), 1), false, 0);
+    const out = withEveryDay(plan, (steps) => steps.filter((step) => step.catalog !== "kita"));
+    expect(out.days.flat().some((step) => step.catalog === "kita")).toBe(false);
+    expect(out.days.length).toBe(7);
   });
 });

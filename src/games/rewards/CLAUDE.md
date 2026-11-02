@@ -21,23 +21,33 @@ Belohnungstafel opens a board, or the wizard where none is made yet (below). Not
 
 **One editor, on the chart itself** (`ChartEditor.tsx`, user decision, November 2026: „exakt gleiche Seite für
 Assistent und Seite … alles gleich aussieht und funktioniert“): „＋ Neu“ (`Wizard.tsx`) and „✏️ Gestalten“ are the same
-component, the very sheet that will be used, changed right on it (WYSIWYG). Above the sheet one row of quiet options
-(`.rw-options`): **Zeitraum** (Tag, Woche, Monat, Erst – Dann, Sammeln, `SPANS`; on the page only the views of the
+component, the very sheet that will be used, changed right on it (WYSIWYG). Above the sheet a band of options
+(`.rw-options-band`): **Zeitraum** (Tag, Woche, Monat, Erst – Dann, Sammeln, `SPANS`; on the page only the views of the
 chart's own kind, since a plan's Tag and a board's Monat are different charts), the **⭐ Zähler** (stars a card, 0 to
 `MAX_STARS`), one **🎁 Belohnung** switch for the whole chart, and for the Tag „Morgens und abends“ / „Am Stück“, „Anzahl
 Karten“ per part, „Pfeil wandert“ / „Karte wandert“ (only without a Zähler), the colours and the child's name. On the
 sheet (`edit` on `PlanSheet` / `BoardSheet`, never on paper) a tap on a card opens its window: its own stars (every day
 or only this weekday), earlier / later in its part, remove, swap for another card; ＋ adds a card to a part, a part's
-✕ takes the row of the day away (and ＋ brings it back), a tap on the reward opens the goal, „Ohne Belohnung“ and the
+🗑️ takes the row of the day away (and ＋ brings it back), a tap on the reward opens the goal, „Ohne Belohnung“ and the
 rewards; a board shows its tasks as chips over the sheet to tap. What needs typing (own words, own emoji, times of day,
-„Von vorn“) stays below under „Weitere Einstellungen“ (`Editor`, `PlanEditor`). The wizard starts on **„Mein Tag“**
+„Von vorn“) stays below under „Weitere Einstellungen“ (`Editor`, `PlanEditor`). Between the band and the sheet „✏️ Direkt
+auf der Tafel ändern“ says that the sheet is changed as it is seen and printed so, beside ↶ Rückgängig and ↷ Wiederholen
+(`history.ts`, also Ctrl/⌘+Z, Ctrl+Shift+Z, Ctrl+Y outside a box for words; letters typed in a row undo as one word);
+the sheet has a dashed edge while it is changed. On a counting plan every card has − n⭐ ＋ for its own stars
+(`StarStepper`), and a part's sign (☀️ / 🌙) stands big for its whole line with 🗑️ above it, which marks the whole line
+red under the mouse before it takes it. The wizard starts on **„Mein Tag“**
 (`defaultDraft`): morning and evening on one sheet, three cards each, a Zähler of 1 and a reward; a Zeitraum keeps
-name, colours and reward (`draftInSpan`), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. Opened on a template from the
+name, colours and reward (`draftInSpan`; the Woche with a Zähler is the board Vorlage „woche“'s tasks, the same every
+day), „✓ Tafel anlegen“ / „✓ Plan anlegen“ makes it. The wizard's head (`.rw-wizard-head`, sticky on top) holds that
+button big and yellow, „Abbrechen“ and the stamp „🖨️ Zum Ausdrucken – auf A4 oder als Fotoabzug“; in the wizard an open
+note with an arrow under the Zeitraum says one may switch freely between the kinds and set everything. Opened on a template from the
 gallery it starts on that template. While the wizard is open nothing on top or below belongs to the chart behind it.
 
-In the book look the page is a page of the book like every menu (`<Sky />`), the wizard a sheet of paper laid on it
-and its buttons paper (`:root[data-look="book"]` rules at the end of `rewards.css`, kept in the folder rather than in
-`book.css`, T-19). The families at the page's foot stay out here: the chart fills the page and would hide them.
+In the book look the page is one tall page of the book that carries everything and scrolls with it (user feedback,
+November 2026): `<Sky />` lies in the page's box (`position: absolute`), not fixed to the window, the text for search
+engines is on it too, and the content keeps inside its paper margin. The wizard is printed on the page, no card laid on
+it; its buttons are paper (`:root[data-look="book"]` rules at the end of `rewards.css`, kept in the folder rather than in
+`book.css`, T-19). The families, the room's floor and its toys at the page's foot stay out here: the chart fills the page.
 
 No board or plan exists before the wizard made one (`DEFAULT_REWARDS_SETTINGS`, `DEFAULT_PLANNER_SETTINGS` are
 empty): with nothing made – a first visit – the page is the wizard, with no ✕ and no row of tabs, as there is nothing
@@ -195,16 +205,30 @@ card), safety. The Tagesplan shows it first, before A4; the board after its A4 p
   not, and switching a view never loses stars. The view is an option of the editor, never a row of view pictures or a
   switch on top of the page (user feedback, November 2026).
 - The wizard and „Gestalten“ are one editor (`ChartEditor`), the chart itself changed in place: a new choice joins
-  it on the sheet (a tap on what it changes, opening a window of picture cards) or as a quiet option in `.rw-options`,
+  it on the sheet (a tap on what it changes, opening a window of picture cards) or as an option in the band (`.rw-options-band`),
   never as a step, a page or a second editor of its own (user decision, November 2026). Only what needs typing stays
-  under „Weitere Einstellungen“. The help line says what the chart is for: on screen, printed, or as photo prints.
-- The options are quiet so the chart leads: small segments, counters and buttons in soft lines, the chosen one plainly
-  yellow, no heading over a choice that explains itself (at most a small label such as „Anzahl Karten“), and what a
-  choice means goes into its own button in a few words with a visual sign – never a paragraph of notes under it.
+  under „Weitere Einstellungen“.
+- The options draw the eye, as they lead to the other charts grown-ups come for (user feedback, November 2026, replacing
+  „quiet options“): a band of their own, the Zeitraum as big picture buttons (`SpanPic`, the shape of each chart) under
+  its visible name, the chosen one yellow; what a choice means goes into its button in a few words with a visual sign,
+  never a paragraph of notes under it.
+- The first screen says, without scrolling, that the chart prints (the stamp in the wizard's head, never „kostenlos“),
+  that it is changed right on the sheet („Direkt auf der Tafel ändern“) and that the kinds can be switched freely (the
+  note in the wizard); „✓ Tafel anlegen“ is the biggest button there and stays in sight while the page scrolls.
+- Every change in the editor can be undone and redone (↶ ↷, keys); a new kind of change needs nothing more as long as it
+  goes through the draft (`onChange`).
+- What a sheet shows for one card stays as nice in every view as the Belohnungstafel was before the charts were made
+  one: star fields are the board's big rings with its star sticker (`StarFields`, `rw-field`), a counting card is taller
+  than wide (`STAR_CARD`), and a counting week whose days have the same cards is the old grid – a row per card, a column
+  per day (`WeekStars`, `sameCards`). Look at every Zeitraum with and without a Zähler after changing a sheet.
+- No count of stars under the reward (user feedback, November 2026): on paper it is in the way, the fields show them.
+- A new class name is checked against the folder first (`grep`): the editor's ↶ ↷ were first called `rw-undo`, the
+  class of „Stern zurück“, and stood fixed in the screen's corner.
 - **The Zähler** (`PlanStep.stars`, user decision, November 2026): above 0 the plan's cards count stars – a star field
   per star under each card, the child taps the card for the next star, and there may be a reward; only at 0 the paper
   arrow (or the „Jetzt“ field) shows the card to do. A card may have more stars than the others, every day or on one
-  weekday only (`withStepStars`, two stars on Monday for brushing). A plan with a Zähler is a Belohnungstafel: „✓ Tafel
+  weekday only (`withStepStars`, two stars on Monday for brushing), set right on the card with its − ＋; in a week's
+  grid the row's − ＋, 🗑️ and its picture change the card of every day alike (`withEveryDay`, `data-every`). A plan with a Zähler is a Belohnungstafel: „✓ Tafel
   anlegen“, and the Belohnungstafel's book opens it.
 - **One „🎁 Belohnung“ switch** for the whole chart, on by default (`defaultReward`). Turning it off or „Ohne Belohnung“
   takes away only the reward (`Plan.reward` null) – the stars and the Zähler stay; „＋ Belohnung“ on the sheet brings
