@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { TargetLanguageId } from "@/content/targetLanguages";
-import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, wrongFoods } from "./content";
+import { ANIMAL_TEXTS, ANIMAL_TRANSLATIONS, ANIMALS, FOODS, wrongFoods, wrongHomes } from "./content";
 import { RUSSIAN_ANIMALS, RUSSIAN_FOODS, RUSSIAN_HOMES } from "./content.ru";
 import { HOMES, type HomeId } from "./homes";
 
@@ -92,6 +92,21 @@ test("every fed animal has enough wrong foods that it really doesn't eat", () =>
     const wrong = wrongFoods(animal).map((f) => f.id);
     expect(wrong, animal.id).not.toContain(animal.food!.id);
     for (const id of animal.alsoEats!) expect(wrong, animal.id).not.toContain(id);
+    expect(wrong.length, `${animal.id}: ${wrong.join(", ")}`).toBeGreaterThanOrEqual(most - 1);
+  }
+});
+
+test("every animal with a home has enough wrong homes it really doesn't live in", () => {
+  const most = 4; // the most choices the settings offer (ChoiceCount)
+  for (const animal of ANIMALS.filter((a) => a.home)) {
+    expect(animal.alsoLives, `${animal.id} needs its alsoLives list`).toBeDefined();
+    for (const id of animal.alsoLives!) {
+      expect(id in HOMES, `${animal.id} ${id}`).toBe(true);
+      expect(id, animal.id).not.toBe(animal.home!);
+    }
+    const wrong = wrongHomes(animal).map((h) => h.id);
+    expect(wrong, animal.id).not.toContain(animal.home!);
+    for (const id of animal.alsoLives!) expect(wrong, animal.id).not.toContain(id);
     expect(wrong.length, `${animal.id}: ${wrong.join(", ")}`).toBeGreaterThanOrEqual(most - 1);
   }
 });

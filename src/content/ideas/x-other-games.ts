@@ -127,7 +127,7 @@ export const otherGamesIdeas: IdeaArea = {
       why: "Ein Kind, das richtig denkt, hört sonst „Bäh! Das mag der Hase nicht.“ – das verwirrt und lehrt Falsches. Wichtiger als jede neue Erweiterung.",
       effort: "S",
       partial:
-        "Tiere füttern: jedes Tier hat eine Liste, was es auch frisst (der Bär auch Fisch, Nüsse, Apfel …), die nie als falsche Auswahl kommt, und ein Test prüft das. Das Schwein frisst fast alles und wird nicht mehr gefüttert. Offen: Wer wohnt wo?, Schatten finden und Wer schaut da raus?",
+        "Tiere füttern und Wer wohnt wo?: jedes Tier hat eine Liste, was es auch frisst (der Bär auch Fisch, Nüsse, Apfel …) und wo es auch wohnt (der Fisch auch im Teich, der Hund auch im Körbchen), die nie als falsche Auswahl kommt, und ein Test prüft das. Das Schwein frisst fast alles und wird nicht mehr gefüttert. Offen: Schatten finden und Wer schaut da raus? (ähnliche Umrisse).",
     },
   ],
 };

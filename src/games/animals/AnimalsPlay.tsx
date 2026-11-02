@@ -4,7 +4,7 @@ import { playChime, playMunch, playPop, playRandomNote, playYuck } from "@/lib/s
 import { pick, useAppLanguage, voiceFor } from "@/lib/language";
 import { speak } from "@/lib/speech";
 import { tapState } from "@/lib/tapTargets";
-import { ANIMAL_TEXTS, ANIMALS, wrongFoods, type Animal, type Food } from "./content";
+import { ANIMAL_TEXTS, ANIMALS, wrongFoods, wrongHomes, type Animal, type Food } from "./content";
 import { HOMES, HomeDrawing, type Home } from "./homes";
 import type { AnimalsSettings } from "./settings";
 
@@ -132,7 +132,7 @@ export function AnimalsPlay({ settings }: { settings: AnimalsSettings }) {
       next = { id, kind, animal, foods, correct: foods.indexOf(right) };
     } else {
       const right = HOMES[animal.home!];
-      const homes = shuffle([right, ...shuffle(Object.values(HOMES).filter((h) => h.id !== right.id)).slice(0, count - 1)]);
+      const homes = shuffle([right, ...shuffle(wrongHomes(animal)).slice(0, count - 1)]);
       next = { id, kind, animal, homes, correct: homes.indexOf(right) };
     }
     setRound(next);

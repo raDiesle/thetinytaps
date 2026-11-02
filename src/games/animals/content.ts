@@ -2,7 +2,7 @@ import { byLanguage } from "@/content/texts";
 import { playBark, playBuzz, playMeow, playMoo, playQuack, playSqueak, playTweet } from "@/lib/sfx";
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import type { Localized } from "@/lib/language";
-import type { Home, HomeId } from "./homes";
+import { HOMES, type Home, type HomeId } from "./homes";
 
 // Animals, foods and German texts for "Was gehört zum Tier?": who eats what (N-08)
 // and who lives where (N-09). The other languages are in content.<lang>.ts (en, zh, hi, es, ar, ru), by the same ids.
@@ -29,6 +29,8 @@ export interface Animal {
    */
   alsoEats?: string[];
   home?: HomeId;
+  /** The other homes it lives in too (the fish's pond, the dog's basket): never a wrong choice, like `alsoEats`. */
+  alsoLives?: HomeId[];
   sound?: () => void;
 }
 
@@ -49,6 +51,7 @@ export const ANIMALS: Animal[] = [
     food: food("moehre", "🥕", "Möhre", "Möhren"),
     alsoEats: ["salat", "apfel", "heu", "blaetter", "blume", "banane", "mais", "nuss", "bambus"],
     home: "bau",
+    alsoLives: ["stall", "huette", "hoehle"],
   },
   {
     id: "hund",
@@ -58,6 +61,7 @@ export const ANIMALS: Animal[] = [
     food: food("knochen", "🦴", "Knochen"),
     alsoEats: ["fleisch", "fisch", "kaese", "apfel", "moehre", "banane", "mais", "salat", "nuss", "honig", "fliege"],
     home: "huette",
+    alsoLives: ["koerbchen"],
     sound: playBark,
   },
   {
@@ -68,6 +72,7 @@ export const ANIMALS: Animal[] = [
     food: FISH,
     alsoEats: ["fleisch", "knochen", "kaese", "fliege"],
     home: "koerbchen",
+    alsoLives: ["huette", "stall"],
     sound: playMeow,
   },
   {
@@ -78,6 +83,7 @@ export const ANIMALS: Animal[] = [
     food: food("kaese", "🧀", "Käse"),
     alsoEats: ["nuss", "mais", "apfel", "moehre", "salat", "banane", "heu", "blaetter"],
     home: "mauseloch",
+    alsoLives: ["bau", "stall", "hoehle", "nest"],
     sound: playSqueak,
   },
   {
@@ -88,6 +94,7 @@ export const ANIMALS: Animal[] = [
     food: food("wurm", "🪱", "Wurm", "Würmer"),
     alsoEats: ["fliege", "mais", "nuss", "apfel", "banane", "fisch"],
     home: "nest",
+    alsoLives: ["baum", "stall", "huette", "koerbchen"],
     sound: playTweet,
   },
   {
@@ -98,6 +105,7 @@ export const ANIMALS: Animal[] = [
     food: food("honig", "🍯", "Honig"),
     alsoEats: ["fisch", "nuss", "apfel", "banane", "fleisch", "knochen", "mais", "wurm", "moehre", "blaetter", "bambus"],
     home: "hoehle",
+    alsoLives: ["bau", "eis"],
   },
   {
     id: "biene",
@@ -107,9 +115,19 @@ export const ANIMALS: Animal[] = [
     food: food("blume", "🌼", "Blume", "Blumen"),
     alsoEats: ["honig"],
     home: "bienenstock",
+    alsoLives: ["baum", "nest"],
     sound: playBuzz,
   },
-  { id: "frosch", emoji: "🐸", name: "Frosch", the: "der Frosch", food: food("fliege", "🪰", "Fliege", "Fliegen"), alsoEats: ["wurm"], home: "teich" },
+  {
+    id: "frosch",
+    emoji: "🐸",
+    name: "Frosch",
+    the: "der Frosch",
+    food: food("fliege", "🪰", "Fliege", "Fliegen"),
+    alsoEats: ["wurm"],
+    home: "teich",
+    alsoLives: ["aquarium"],
+  },
   {
     id: "kuh",
     emoji: "🐮",
@@ -118,6 +136,7 @@ export const ANIMALS: Animal[] = [
     food: food("heu", "🌾", "Heu"),
     alsoEats: ["salat", "blaetter", "moehre", "apfel", "mais", "banane", "blume", "bambus"],
     home: "stall",
+    alsoLives: [],
     sound: playMoo,
   },
   {
@@ -128,6 +147,7 @@ export const ANIMALS: Animal[] = [
     food: food("apfel", "🍎", "Apfel", "Äpfel"),
     alsoEats: ["moehre", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus"],
     home: "stall",
+    alsoLives: [],
   },
   {
     id: "eichhoernchen",
@@ -137,13 +157,14 @@ export const ANIMALS: Animal[] = [
     food: food("nuss", "🌰", "Nuss", "Nüsse"),
     alsoEats: ["mais", "apfel", "banane", "moehre", "blaetter"],
     home: "baum",
+    alsoLives: ["nest", "hoehle"],
   },
-  { id: "pinguin", emoji: "🐧", name: "Pinguin", the: "der Pinguin", food: FISH, alsoEats: [], home: "eis" },
-  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium" },
-  { id: "spinne", emoji: "🕷️", name: "Spinne", the: "die Spinne", home: "netz" },
-  { id: "ente", emoji: "🦆", name: "Ente", the: "die Ente", home: "teich", sound: playQuack },
-  { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau" },
-  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall" },
+  { id: "pinguin", emoji: "🐧", name: "Pinguin", the: "der Pinguin", food: FISH, alsoEats: [], home: "eis", alsoLives: ["teich", "aquarium"] },
+  { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium", alsoLives: ["teich"] },
+  { id: "spinne", emoji: "🕷️", name: "Spinne", the: "die Spinne", home: "netz", alsoLives: [] },
+  { id: "ente", emoji: "🦆", name: "Ente", the: "die Ente", home: "teich", alsoLives: ["stall", "nest"], sound: playQuack },
+  { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau", alsoLives: ["hoehle"] },
+  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall", alsoLives: [] },
   {
     id: "affe",
     emoji: "🐵",
@@ -192,6 +213,9 @@ export const FOODS: Food[] = [...new Map(ANIMALS.flatMap((a) => (a.food ? [[a.fo
 
 /** The foods that may lie next to an animal's food as wrong choices: neither its own nor one it eats too. */
 export const wrongFoods = (animal: Animal): Food[] => FOODS.filter((f) => f.id !== animal.food?.id && !animal.alsoEats?.includes(f.id));
+
+/** The homes that may stand next to an animal's home as wrong choices: neither its own nor one it lives in too. */
+export const wrongHomes = (animal: Animal): Home[] => Object.values(HOMES).filter((h) => h.id !== animal.home && !animal.alsoLives?.includes(h.id));
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
