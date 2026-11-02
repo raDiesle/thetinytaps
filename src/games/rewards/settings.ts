@@ -1,5 +1,5 @@
 import { type Board, boardFromTemplate, type StarLog } from "./board";
-import { TEMPLATES } from "./catalog";
+import { type ChartType, TEMPLATES } from "./catalog";
 import type { PhotoFormat } from "./photo";
 
 /** How the board is printed. */
@@ -54,3 +54,15 @@ export const REWARDS_SETTINGS_KEY = "tinytaps.rewards.v1";
 export const REWARDS_STARS_KEY = "tinytaps.rewards.stars.v1";
 
 export const NO_STARS: StarLog = {};
+
+/**
+ * What the page opens on for the kind its address asks for (`/belohnungstafel/` a board, `/tagesplan/` a plan): that
+ * kind's chart where one is made; else, where only the other kind is, that other chart behind the wizard opened on the
+ * asked kind's Vorlagen (`wizard`), so the Belohnungstafel's book never just shows a plan (user feedback, November 2026);
+ * with nothing made, the wizard alone.
+ */
+export function pageStart(wanted: ChartType, made: { board: boolean; plan: boolean }): { type: ChartType; wizard: boolean } {
+  if (!made.board && !made.plan) return { type: wanted, wizard: true };
+  if (made[wanted]) return { type: wanted, wizard: false };
+  return { type: wanted === "board" ? "plan" : "board", wizard: true };
+}

@@ -37,7 +37,7 @@ import { TODAY, usePlanTitle } from "./PlanSheet";
 import { PLANNER_SETTINGS_KEY, plannerDefaults } from "./planSettings";
 import { PrintPanel } from "./PrintPanel";
 import { EARLIER, LATER, REVIEW, Review, usePeriodLabel, YESTERDAY } from "./Review";
-import { NO_STARS, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
+import { NO_STARS, pageStart, REWARDS_SETTINGS_KEY, REWARDS_STARS_KEY, rewardsDefaults } from "./settings";
 import { type Draft, Wizard, type WizardStart } from "./Wizard";
 import "./rewards.css";
 import "./planner.css";
@@ -105,9 +105,10 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
   const plan: Plan | undefined = allPlans.find((p) => p.id === plans.current) ?? allPlans[0];
   // Nothing made yet (a first visit): the page is the wizard, which can't be closed, as there is nothing behind it.
   const empty = !board && !plan;
-  const wizard = wizardState ?? (empty ? {} : null);
-  // The kind asked for while there is one; else the one there is (only plans made: /belohnungstafel/ shows a plan).
-  const type: ChartType = empty || (wanted === "board" ? board : plan) ? wanted : wanted === "board" ? "plan" : "board";
+  // Only the other kind made (a plan, the Belohnungstafel's book opened): the wizard on the asked kind, the other behind it.
+  const start = pageStart(wanted, { board: !!board, plan: !!plan });
+  const wizard = wizardState ?? (start.wizard ? {} : null);
+  const type = start.type;
   const log = stored.log;
   const setLog = (next: StarLog) => setStored({ log: next });
   const today = new Date();
@@ -171,7 +172,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     setPanel(null);
     setWizard({ start });
   };
-  // Closing the wizard saves the page's choice, so a first visit that looked and left starts on the chart next time.
+  // Closing the wizard shows the chart behind it: where none of the kind asked for is made, the other kind's.
   const closeWizard = () => show(type);
   /** A template from the gallery: the board or plan made from it before, with its stars, or the wizard on it. */
   const pickTemplate = (template: Template) => {
@@ -262,6 +263,7 @@ export function RewardsGame({ type: routeType = "board" }: { type?: ChartType })
     <Wizard
       key={wizard.start ? `${wizard.start.type}-${wizard.start.template.id}` : "new"}
       start={wizard.start}
+      kind={start.wizard ? wanted : undefined}
       onDone={add}
       onCancel={empty ? undefined : closeWizard}
     />

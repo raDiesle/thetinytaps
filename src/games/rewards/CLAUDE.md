@@ -16,8 +16,8 @@ board's Tag/Woche/Monat/Sammeln, a plan's Jetzt – Dann/Erst – Dann/Woche) wi
 of its kind, grouped under the names of their views; „Gestalten“,
 „Drucken“ (and a board's „Rückblick“) work on the one shown. Each address opens its own kind: `/belohnungstafel/` a board,
 `/tagesplan/` a plan (so the teeth card's return and a search visitor land there) – on the shelf each is a book of its
-own in one slipcase (`Game.volumes`, user feedback, November 2026), so the book named Belohnungstafel opens a board
-wherever there is one. Nothing remembers which was shown last.
+own in one slipcase (`Game.volumes`, user feedback, November 2026), so the book named Belohnungstafel opens a board, or
+the wizard on boards where none is made yet (below). Nothing remembers which was shown last.
 
 „＋ Neu“ opens the wizard (`Wizard.tsx`) in place of the chart. Its first step, „Ansicht“, is the whole choice of form
 (user feedback, October 2026), sorted by the time a chart covers, not by its kind (`SPANS`, user feedback, November
@@ -55,8 +55,10 @@ and its buttons paper (`:root[data-look="book"]` rules at the end of `rewards.cs
 No board or plan exists before the wizard made one (`DEFAULT_REWARDS_SETTINGS`, `DEFAULT_PLANNER_SETTINGS` are
 empty): with nothing made – a first visit – the page is the wizard, with no ✕ and no row of tabs, as there is nothing
 behind it. Only where an older version's first board or plan (`erste`, `erster-plan`, made before anything was saved)
-already has stars, `rewardsDefaults` / `plannerDefaults` keep it. Where only one kind is made, the page shows that one,
-whatever the address.
+already has stars, `rewardsDefaults` / `plannerDefaults` keep it. Where only the other kind is made than the address asks for (a plan, the
+Belohnungstafel's book opened), the wizard opens on the asked kind – „Belohnung“ on in every span for a board – with the
+other kind's chart behind it, which ✕ shows (`pageStart` in `settings.ts`, user feedback, November 2026): a book is
+never just its neighbour's chart.
 
 # Belohnungstafel
 

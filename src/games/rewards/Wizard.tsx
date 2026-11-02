@@ -2,7 +2,7 @@ import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 
 import type { TargetLanguageId } from "@/content/targetLanguages";
 import { type Localized, useAppLanguage, useT } from "@/lib/language";
 import { type Board, boardFromTemplate, newId, withKind } from "./board";
-import { type BoardKind, KINDS, PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate, type PlanView, type Template, TEMPLATES } from "./catalog";
+import { type BoardKind, type ChartType, KINDS, PLAN_TEMPLATES, PLAN_VIEWS, type PlanTemplate, type PlanView, type Template, TEMPLATES } from "./catalog";
 import { Thumb } from "./Gallery";
 import { VIEW } from "./pageParts";
 import { type Plan, planFromTemplate } from "./plan";
@@ -132,12 +132,20 @@ const ready = (draft: Draft) =>
  * November 2026). „Leer anfangen“ in a span goes there at once. The steps show only from the second one on; on a big
  * screen they are a column on the left, the spans under „Ansicht“ leading back to theirs. Opened on a template from the gallery it starts on that
  * template's own steps. Without `onCancel` (nothing made yet) it can't be closed: the page has nothing else to show.
+ * `kind` is the kind the page's address asks for where none of it is made yet: a board turns „Belohnung“ on in every
+ * span, so the Belohnungstafel's book shows boards' Vorlagen.
  */
-export function Wizard({ start, onDone, onCancel }: { start?: WizardStart; onDone: (draft: Draft) => void; onCancel?: () => void }) {
+export function Wizard({ start, kind, onDone, onCancel }: { start?: WizardStart; kind?: ChartType; onDone: (draft: Draft) => void; onCancel?: () => void }) {
   const t = useT();
   const { id: language } = useAppLanguage();
-  /** „Belohnung“ per span that has both kinds: off by default, on where the wizard starts on a board's Vorlage. */
-  const [reward, setReward] = useState<Partial<Record<SpanId, boolean>>>(() => (start?.type === "board" ? { [start.template.kind]: true } : {}));
+  /** „Belohnung“ per span that has both kinds: off by default, on where the wizard starts on a board's Vorlage or for a board (`kind`). */
+  const [reward, setReward] = useState<Partial<Record<SpanId, boolean>>>(() =>
+    start?.type === "board"
+      ? { [start.template.kind]: true }
+      : kind === "board"
+        ? Object.fromEntries(SPANS.filter((span) => span.board && span.plan).map((span) => [span.id, true]))
+        : {},
+  );
   /** What is picked, by key, as the board or plan it makes (changed by the later steps). */
   const [picked, setPicked] = useState<Picked | null>(() =>
     start ? { key: start.type === "board" ? boardKey(start.template.id) : planKey(start.template.id), draft: fromStart(start, language) } : null,

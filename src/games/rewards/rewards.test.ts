@@ -48,7 +48,7 @@ import {
 import { CATEGORIES } from "@/content/games";
 import { REWARDS_PICTURE_PROMPTS } from "./bilder/prompts";
 import { itemPicture, markPicture, picture } from "./pictures";
-import { DEFAULT_REWARDS_SETTINGS, rewardsDefaults } from "./settings";
+import { DEFAULT_REWARDS_SETTINGS, pageStart, rewardsDefaults } from "./settings";
 
 const prompts = REWARDS_PICTURE_PROMPTS.groups.flatMap((g) => g.prompts);
 const promptIds = new Set(prompts.map((p) => p.id));
@@ -427,4 +427,14 @@ describe("pictures in place of the emoji", () => {
     // Spielplatz is a reward and a plan card: each finds its own picture.
     expect(itemPicture({ emoji: "🛝", catalog: "spielplatz" }, "task")).not.toBe(itemPicture({ emoji: "🛝", catalog: "spielplatz" }, "reward"));
   });
+});
+
+// Belohnungstafel and Zeitplan are two books on the shelf (user feedback, November 2026): each address opens its own
+// kind, and where none of it is made yet, the wizard on that kind – never just the other kind's chart.
+test("each address opens its own kind, or the wizard on it", () => {
+  expect(pageStart("board", { board: true, plan: true })).toEqual({ type: "board", wizard: false });
+  expect(pageStart("plan", { board: true, plan: true })).toEqual({ type: "plan", wizard: false });
+  expect(pageStart("board", { board: false, plan: true })).toEqual({ type: "plan", wizard: true });
+  expect(pageStart("plan", { board: true, plan: false })).toEqual({ type: "board", wizard: true });
+  expect(pageStart("board", { board: false, plan: false })).toEqual({ type: "board", wizard: true });
 });
