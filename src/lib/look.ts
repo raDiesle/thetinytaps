@@ -3,6 +3,7 @@ import { flushSync } from "react-dom";
 import { useLocation, useNavigate } from "react-router";
 import { pagesBetween } from "@/content/games";
 import { putBookBack } from "@/lib/bookTravel";
+import { goBack } from "@/lib/goBack";
 import { playPageTurn } from "@/lib/sfx";
 
 /**
@@ -110,15 +111,19 @@ function pageBundle(count: number) {
  * The click handler of a link to another menu, which turns the page there in the book look (the router's own
  * `viewTransition` works only with a data router): as many pages at once as lie between the two in their book
  * (`pagesBetween`). Back to the home page, the bookshelf, no page turns: the book closes and goes back on the shelf
- * (bookTravel.ts). A click that opens a new tab is left alone.
+ * (bookTravel.ts). A way back steps back in the browser's history (`goBack`), in either look. A click that opens a new
+ * tab is left alone.
  */
 export function useTurnPage(to: string, direction: TurnDirection) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   return (e: MouseEvent) => {
-    if (!isBookLook() || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    const go = direction === "back" ? () => goBack(navigate, to) : () => navigate(to);
+    if (!isBookLook() && direction === "forward") return;
     e.preventDefault();
-    if (to === "/") putBookBack(pathname, () => navigate(to));
-    else turnPageWith(direction, () => navigate(to), pagesBetween(pathname, to));
+    if (!isBookLook()) go();
+    else if (to === "/") putBookBack(pathname, go);
+    else turnPageWith(direction, go, pagesBetween(pathname, to));
   };
 }
