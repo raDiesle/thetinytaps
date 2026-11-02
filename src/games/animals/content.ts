@@ -23,6 +23,11 @@ export interface Animal {
   /** With its article, "der Hase". */
   the: string;
   food?: Food;
+  /**
+   * The ids of the other foods it eats too (the bear's fish, the rabbit's lettuce): they never lie next to its food
+   * as a wrong choice, so exactly one choice fits. Every animal with a food has this list, even an empty one.
+   */
+  alsoEats?: string[];
   home?: HomeId;
   sound?: () => void;
 }
@@ -36,33 +41,157 @@ const FISH = food("fisch", "🐟", "Fisch");
  * knocks ("Hier wohnt die Kuh!"), so the best-known resident comes first.
  */
 export const ANIMALS: Animal[] = [
-  { id: "hase", emoji: "🐰", name: "Hase", the: "der Hase", food: food("moehre", "🥕", "Möhre", "Möhren"), home: "bau" },
-  { id: "hund", emoji: "🐶", name: "Hund", the: "der Hund", food: food("knochen", "🦴", "Knochen"), home: "huette", sound: playBark },
-  { id: "katze", emoji: "🐱", name: "Katze", the: "die Katze", food: FISH, home: "koerbchen", sound: playMeow },
-  { id: "maus", emoji: "🐭", name: "Maus", the: "die Maus", food: food("kaese", "🧀", "Käse"), home: "mauseloch", sound: playSqueak },
-  { id: "vogel", emoji: "🐦", name: "Vogel", the: "der Vogel", food: food("wurm", "🪱", "Wurm", "Würmer"), home: "nest", sound: playTweet },
-  { id: "baer", emoji: "🐻", name: "Bär", the: "der Bär", food: food("honig", "🍯", "Honig"), home: "hoehle" },
-  { id: "biene", emoji: "🐝", name: "Biene", the: "die Biene", food: food("blume", "🌼", "Blume", "Blumen"), home: "bienenstock", sound: playBuzz },
-  { id: "frosch", emoji: "🐸", name: "Frosch", the: "der Frosch", food: food("fliege", "🪰", "Fliege", "Fliegen"), home: "teich" },
-  { id: "kuh", emoji: "🐮", name: "Kuh", the: "die Kuh", food: food("heu", "🌾", "Heu"), home: "stall", sound: playMoo },
-  { id: "pferd", emoji: "🐴", name: "Pferd", the: "das Pferd", food: food("apfel", "🍎", "Apfel", "Äpfel"), home: "stall" },
-  { id: "eichhoernchen", emoji: "🐿️", name: "Eichhörnchen", the: "das Eichhörnchen", food: food("nuss", "🌰", "Nuss", "Nüsse"), home: "baum" },
-  { id: "pinguin", emoji: "🐧", name: "Pinguin", the: "der Pinguin", food: FISH, home: "eis" },
+  {
+    id: "hase",
+    emoji: "🐰",
+    name: "Hase",
+    the: "der Hase",
+    food: food("moehre", "🥕", "Möhre", "Möhren"),
+    alsoEats: ["salat", "apfel", "heu", "blaetter", "blume", "banane", "mais", "nuss", "bambus"],
+    home: "bau",
+  },
+  {
+    id: "hund",
+    emoji: "🐶",
+    name: "Hund",
+    the: "der Hund",
+    food: food("knochen", "🦴", "Knochen"),
+    alsoEats: ["fleisch", "fisch", "kaese", "apfel", "moehre", "banane", "mais", "salat", "nuss", "honig", "fliege"],
+    home: "huette",
+    sound: playBark,
+  },
+  {
+    id: "katze",
+    emoji: "🐱",
+    name: "Katze",
+    the: "die Katze",
+    food: FISH,
+    alsoEats: ["fleisch", "knochen", "kaese", "fliege"],
+    home: "koerbchen",
+    sound: playMeow,
+  },
+  {
+    id: "maus",
+    emoji: "🐭",
+    name: "Maus",
+    the: "die Maus",
+    food: food("kaese", "🧀", "Käse"),
+    alsoEats: ["nuss", "mais", "apfel", "moehre", "salat", "banane", "heu", "blaetter"],
+    home: "mauseloch",
+    sound: playSqueak,
+  },
+  {
+    id: "vogel",
+    emoji: "🐦",
+    name: "Vogel",
+    the: "der Vogel",
+    food: food("wurm", "🪱", "Wurm", "Würmer"),
+    alsoEats: ["fliege", "mais", "nuss", "apfel", "banane", "fisch"],
+    home: "nest",
+    sound: playTweet,
+  },
+  {
+    id: "baer",
+    emoji: "🐻",
+    name: "Bär",
+    the: "der Bär",
+    food: food("honig", "🍯", "Honig"),
+    alsoEats: ["fisch", "nuss", "apfel", "banane", "fleisch", "knochen", "mais", "wurm", "moehre", "blaetter", "bambus"],
+    home: "hoehle",
+  },
+  {
+    id: "biene",
+    emoji: "🐝",
+    name: "Biene",
+    the: "die Biene",
+    food: food("blume", "🌼", "Blume", "Blumen"),
+    alsoEats: ["honig"],
+    home: "bienenstock",
+    sound: playBuzz,
+  },
+  { id: "frosch", emoji: "🐸", name: "Frosch", the: "der Frosch", food: food("fliege", "🪰", "Fliege", "Fliegen"), alsoEats: ["wurm"], home: "teich" },
+  {
+    id: "kuh",
+    emoji: "🐮",
+    name: "Kuh",
+    the: "die Kuh",
+    food: food("heu", "🌾", "Heu"),
+    alsoEats: ["salat", "blaetter", "moehre", "apfel", "mais", "banane", "blume", "bambus"],
+    home: "stall",
+    sound: playMoo,
+  },
+  {
+    id: "pferd",
+    emoji: "🐴",
+    name: "Pferd",
+    the: "das Pferd",
+    food: food("apfel", "🍎", "Apfel", "Äpfel"),
+    alsoEats: ["moehre", "heu", "salat", "mais", "blaetter", "banane", "blume", "bambus"],
+    home: "stall",
+  },
+  {
+    id: "eichhoernchen",
+    emoji: "🐿️",
+    name: "Eichhörnchen",
+    the: "das Eichhörnchen",
+    food: food("nuss", "🌰", "Nuss", "Nüsse"),
+    alsoEats: ["mais", "apfel", "banane", "moehre", "blaetter"],
+    home: "baum",
+  },
+  { id: "pinguin", emoji: "🐧", name: "Pinguin", the: "der Pinguin", food: FISH, alsoEats: [], home: "eis" },
   { id: "fisch", emoji: "🐠", name: "Fisch", the: "der Fisch", home: "aquarium" },
   { id: "spinne", emoji: "🕷️", name: "Spinne", the: "die Spinne", home: "netz" },
   { id: "ente", emoji: "🦆", name: "Ente", the: "die Ente", home: "teich", sound: playQuack },
   { id: "fuchs", emoji: "🦊", name: "Fuchs", the: "der Fuchs", home: "bau" },
-  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", food: food("kartoffel", "🥔", "Kartoffel", "Kartoffeln"), home: "stall" },
-  { id: "affe", emoji: "🐵", name: "Affe", the: "der Affe", food: food("banane", "🍌", "Banane", "Bananen") },
-  { id: "huhn", emoji: "🐔", name: "Huhn", the: "das Huhn", food: food("mais", "🌽", "Mais") },
-  { id: "panda", emoji: "🐼", name: "Panda", the: "der Panda", food: food("bambus", "🎋", "Bambus") },
-  { id: "schnecke", emoji: "🐌", name: "Schnecke", the: "die Schnecke", food: food("salat", "🥬", "Salat") },
-  { id: "loewe", emoji: "🦁", name: "Löwe", the: "der Löwe", food: food("fleisch", "🍖", "Fleisch") },
-  { id: "giraffe", emoji: "🦒", name: "Giraffe", the: "die Giraffe", food: food("blaetter", "🍃", "Blätter") },
+  { id: "schwein", emoji: "🐷", name: "Schwein", the: "das Schwein", home: "stall" },
+  {
+    id: "affe",
+    emoji: "🐵",
+    name: "Affe",
+    the: "der Affe",
+    food: food("banane", "🍌", "Banane", "Bananen"),
+    alsoEats: ["apfel", "nuss", "blaetter", "mais", "moehre", "salat", "bambus", "wurm", "fliege"],
+  },
+  {
+    id: "huhn",
+    emoji: "🐔",
+    name: "Huhn",
+    the: "das Huhn",
+    food: food("mais", "🌽", "Mais"),
+    alsoEats: ["wurm", "fliege", "salat", "apfel", "moehre", "nuss", "banane", "blaetter"],
+  },
+  {
+    id: "panda",
+    emoji: "🐼",
+    name: "Panda",
+    the: "der Panda",
+    food: food("bambus", "🎋", "Bambus"),
+    alsoEats: ["blaetter", "apfel", "honig", "moehre", "heu", "salat"],
+  },
+  {
+    id: "schnecke",
+    emoji: "🐌",
+    name: "Schnecke",
+    the: "die Schnecke",
+    food: food("salat", "🥬", "Salat"),
+    alsoEats: ["blaetter", "moehre", "apfel", "blume", "banane", "bambus", "heu", "mais"],
+  },
+  { id: "loewe", emoji: "🦁", name: "Löwe", the: "der Löwe", food: food("fleisch", "🍖", "Fleisch"), alsoEats: ["knochen", "fisch"] },
+  {
+    id: "giraffe",
+    emoji: "🦒",
+    name: "Giraffe",
+    the: "die Giraffe",
+    food: food("blaetter", "🍃", "Blätter"),
+    alsoEats: ["heu", "salat", "apfel", "moehre", "blume", "bambus", "banane", "mais"],
+  },
 ];
 
 /** Every food once, for the wrong choices next to the right one. */
 export const FOODS: Food[] = [...new Map(ANIMALS.flatMap((a) => (a.food ? [[a.food.id, a.food] as const] : []))).values()];
+
+/** The foods that may lie next to an animal's food as wrong choices: neither its own nor one it eats too. */
+export const wrongFoods = (animal: Animal): Food[] => FOODS.filter((f) => f.id !== animal.food?.id && !animal.alsoEats?.includes(f.id));
 
 const capitalize = (text: string) => text.charAt(0).toLocaleUpperCase("de-DE") + text.slice(1);
 
